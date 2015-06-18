@@ -1,0 +1,13 @@
+#!/bin/bash
+
+mkdir -p VDF
+mkdir -p VEF
+mkdir -p VEF_relache
+
+cp post_run VDF
+cp post_run VEF
+cp post_run VEF_relache
+
+cp les_Re405Pr071_T0Q_VDF.data VDF/les_Re405Pr071_T0Q.data
+cp les_Re405Pr071_T0Q_VEF.data VEF/les_Re405Pr071_T0Q.data
+sed "s/Nombre_de_Noeuds 15 8 15/Nombre_de_Noeuds 13 8 7/" les_Re405Pr071_T0Q_VEF.data > VEF_relache/les_Re405Pr071_T0Q.data

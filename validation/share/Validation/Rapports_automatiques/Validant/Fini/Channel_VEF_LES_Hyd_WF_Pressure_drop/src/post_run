@@ -1,0 +1,3 @@
+#!/bin/bash
+python ../propertiesGeometry.py
+python ../tableauCourbes.py CN 0.05

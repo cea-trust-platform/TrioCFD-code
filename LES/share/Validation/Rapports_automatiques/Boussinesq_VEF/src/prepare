@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# 1) Stokes Equation with Source Term
+# cas diffusion.data
+
+# 2a) Navier Stokes Temperature transport : P0P1Pa de 0 à 15000s et dt_post de 1000s
+sed "s/Symy/Symx Symy Symz/; 
+26d
+34a \# Runge_Kutta_ordre_3 sch \#
+34a \# Schema_Euler_explicite sch \#
+34a 
+s/tmax 1000./tmax 15000./; 
+s/Read gravite 3 0 0 0/Read gravite 3 0 0 9.81/; 
+s/convection { negligeable }/convection { ef_stab { alpha 1.0 } }/; 
+s/pz1      paroi_temperature_imposee Champ_front_uniforme 1 0.0/pz1      paroi_adiabatique/;
+s/pz0      paroi_temperature_imposee Champ_front_uniforme 1 2.0/pz0      paroi_adiabatique/;
+s/Champs binaire dt_post 100/Champs binaire dt_post 1000/; 
+112,113d " diffusion.data > convection_diffusion.data
+sed -i "79d" convection_diffusion.data
+sed -i "78a \		sources { boussinesq_temperature { T0 0 verif_boussinesq 0 } }" convection_diffusion.data
+# 2b) Conduction pure de 0 à 15000s et en mettant convection { negligeable } dans temperature et equation_non_resolue 1 dans la QDM
+sed " 74a \ 		equation_non_resolue 1
+s/convection { ef_stab { alpha 1.0 } }/convection { negligeable }/;
+s/Sauvegarde binaire Convection_diffusion.sauv/Sauvegarde binaire Conduction.sauv/; " convection_diffusion.data > conduction.data
+
+
+
+# 3a) Turbulent Navier Stokes Temperature transport : P0P1Pa + Turbulence de 0 à 12000s et dt_post 1000s
+sed "s/Pb_ThermoHydraulique pb/Pb_ThermoHydraulique_Turbulent pb/; 
+s/tmax 15000./tmax 12000./;
+s/Navier_Stokes_standard/Navier_Stokes_turbulent/; 
+91a \		modele_turbulence sous_maille { turbulence_paroi loi_standard_hydr }
+s/Convection_Diffusion_Temperature/Convection_Diffusion_Temperature_turbulent/; 
+106a \		modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire }
+121a \		   viscosite_turbulente elem
+s/Sauvegarde binaire Convection_diffusion.sauv/Sauvegarde binaire Convection_diffusion_turbulent.sauv/ " convection_diffusion.data > convection_diffusion_turbulent.data
+# 3b) Conduction pure de 0 à 15000s et en mettant convection { negligeable } dans temperature et equation_non_resolue 1 dans la QDM
+sed " 74a \ 		equation_non_resolue 1
+s/convection { ef_stab { alpha 1.0 } }/convection { negligeable }/;
+s/Sauvegarde binaire Convection_diffusion_turbulent.sauv/Sauvegarde binaire Conduction_turbulent.sauv/; " convection_diffusion_turbulent.data > conduction_turbulent.data
+
+
+
+# 4) Stokes P0P1 de 0 à 220s
+sed "s/tmax 1000./tmax 220./; 
+s/Read dis { P0 P1 Pa/Read dis { P0 P1/; 
+s/Champs binaire dt_post 100/Champs binaire dt_post 10/; " diffusion.data > diffusion_P0_P1.data
+
+
+
+# 5a) Navier-Stokes Equations with Temperature Transport : P0P1
+sed "s/tmax 15000./tmax 220./; 
+s/Read dis { P0 P1 Pa/Read dis { P0 P1/; 
+s/Champs binaire dt_post 1000/Champs binaire dt_post 10/; 
+s/Sauvegarde binaire Convection_diffusion.sauv/Sauvegarde binaire Convection_diffusion_P0_P1.sauv/ " convection_diffusion.data > convection_diffusion_P0_P1.data
+# 5b) Conduction pure P0P1
+sed " 74a \ 		equation_non_resolue 1
+s/convection { ef_stab { alpha 1.0 } }/convection { negligeable }/;
+s/Sauvegarde binaire Convection_diffusion_P0_P1.sauv/Sauvegarde binaire Conduction_P0_P1.sauv/; " convection_diffusion_P0_P1.data > conduction_P0_P1.data
+
+

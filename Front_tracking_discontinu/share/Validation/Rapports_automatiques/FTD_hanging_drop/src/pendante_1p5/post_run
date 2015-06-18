@@ -1,0 +1,97 @@
+# !/bin/sh
+
+######################################################################################
+# ATTENTION: numeros des trois pas de temps postraites utilises pour les courbes
+#  ces pas de temps doivent correspondre aux temps physiques 0.7xxx
+#  (temps utilise pour construire les courbes de reference)
+######################################################################################
+
+timestep1=45
+timestep2=115
+timestep3=205
+
+lata2dx ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_0.7.lata timestep=$timestep1  asciiout fortranblocs=no splitfiles=all domain=interfaces
+
+# Recupere, dans le fichier ascii.lata, le nom du fichier qui contient les coordonnees des sommets lagrangiens:
+fichiercoord=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_0.7.lata`
+fichiererr=../../build/pendante_1p5/goutte.err
+
+export temps=`awk '$1=="TEMPS"{print $2}' ascii_angle_1.5_longueur_0.7.lata`
+export nomfichiersommets1=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_0.7.lata`
+
+cx=`awk 'BEGIN{tt=ENVIRON["temps"]}$1=="Centre_gravite_phases" && $4<=tt{c=$6}END{print c}' $fichiererr`
+cz=`awk 'BEGIN{tt=ENVIRON["temps"]}$1=="Centre_gravite_phases" && $4<=tt{c=$8}END{print c}' $fichiererr`
+
+echo Affichage de cx et cz
+echo $cx $cz
+echo $temps
+export cx
+export cz
+
+awk 'BEGIN{cx=ENVIRON["cx"];cz=ENVIRON["cz"]}{print sqrt(($1-cx)*($1-cx)+($3-cz)*($3-cz)), $2}' $fichiercoord > profil_trio_u_t1.txt
+
+######################################################################################
+
+lata2dx ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_1.3.lata timestep=$timestep2  asciiout fortranblocs=no splitfiles=all domain=interfaces
+
+# Recupere, dans le fichier ascii.lata, le nom du fichier qui contient les coordonnees des sommets lagrangiens:
+fichiercoord=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_1.3.lata`
+fichiererr=../../build/pendante_1p5/goutte.err
+
+export temps=`awk '$1=="TEMPS"{print $2}' ascii_angle_1.5_longueur_1.3.lata`
+export nomfichiersommets2=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_1.3.lata`
+
+cx=`awk 'BEGIN{tt=ENVIRON["temps"]}$1=="Centre_gravite_phases" && $4<=tt{c=$6}END{print c}' $fichiererr`
+cz=`awk 'BEGIN{tt=ENVIRON["temps"]}$1=="Centre_gravite_phases" && $4<=tt{c=$8}END{print c}' $fichiererr`
+
+echo Affichage de cx et cz
+echo $cx $cz
+echo $temps
+
+echo $fichiercoord
+export cx
+export cz
+
+awk 'BEGIN{cx=ENVIRON["cx"];cz=ENVIRON["cz"]}{print sqrt(($1-cx)*($1-cx)+($3-cz)*($3-cz)), $2}' $fichiercoord > profil_trio_u_t2.txt
+
+######################################################################################
+
+lata2dx ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_1.9.lata timestep=$timestep3  asciiout fortranblocs=no splitfiles=all domain=interfaces
+
+# Recupere, dans le fichier ascii.lata, le nom du fichier qui contient les coordonnees des sommets lagrangiens:
+fichiercoord=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_1.9.lata`
+fichiererr=../../build/pendante_1p5/goutte.err
+
+export temps=`awk '$1=="TEMPS"{print $2}' ascii_angle_1.5_longueur_1.9.lata`
+export nomfichiersommets3=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_1.9.lata`
+
+cx=`awk 'BEGIN{tt=ENVIRON["temps"]}$1=="Centre_gravite_phases" && $4<=tt{c=$6}END{print c}' $fichiererr`
+cz=`awk 'BEGIN{tt=ENVIRON["temps"]}$1=="Centre_gravite_phases" && $4<=tt{c=$8}END{print c}' $fichiererr`
+
+echo Affichage de cx et cz
+echo $cx $cz
+echo $temps
+export cx
+export cz
+
+awk 'BEGIN{cx=ENVIRON["cx"];cz=ENVIRON["cz"]}{print sqrt(($1-cx)*($1-cx)+($3-cz)*($3-cz)), $2}' $fichiercoord > profil_trio_u_t3.txt
+
+######################################################################################
+
+file1=$nomfichiersommets1
+file2=$nomfichiersommets2
+file3=$nomfichiersommets3
+
+gnuplot<<EOF
+set term postscript eps color
+set output 'profil_1p5.eps'
+set key bottom
+
+plot "$file1" using (sqrt((\$1-$cx)**2+(\$3-$cz)**2)):(\$2) title 'Trio_u / Angle de contact 1,5 radian compte dans le gaz' with points 1\
+,"../../src/profil_1p5/nouv_1.5_0.737" using (\$1):(\$2) title 'Theorie / Angle de contact 1,5 radian, meme volume' with lines lw 2 lt 1\
+,"$file2" using (sqrt((\$1-$cx)**2+(\$3-$cz)**2)):(\$2) title 'Trio_u / Angle de contact 1,5 radian compte dans le gaz' with points 2\
+,"../../src/profil_1p5/nouv_1.5_1.146" using (\$1):(\$2) title 'Theorie / Angle de contact 1,5 radian, meme volume' with lines lw 2 lt 2\
+,"$file3" using (sqrt((\$1-$cx)**2+(\$3-$cz)**2)):(\$2) title 'Trio_u / Angle de contact 1,5 radian compte dans le gaz' with points 3\
+,"../../src/profil_1p5/nouv_1.5_1.9" using (\$1):(\$2) title 'Theorie / Angle de contact 1,5 radian, meme volume' with lines lw 2 lt 3
+
+EOF

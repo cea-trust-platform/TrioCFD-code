@@ -1,0 +1,59 @@
+#!/bin/bash
+
+mkdir -p RK_VDF_centre
+mkdir -p RK_Amont
+mkdir -p RK_EF_STAB
+mkdir -p RK_EF_STAB_0.2
+mkdir -p ImplFS4_Amont
+mkdir -p ImplFS4_EF_STAB
+mkdir -p ImplFS4_EF_STAB_0.2
+mkdir -p ImplFS4_muscl
+
+mkdir -p ImplFS2_Amont
+mkdir -p ImplFS2_EF_STAB
+mkdir -p ImplFS2_EF_STAB_0.2
+mkdir -p ImplFS2_muscl
+
+cp post_run_VDF RK_VDF_centre/post_run
+cp post_run RK_Amont
+cp post_run RK_EF_STAB
+cp post_run RK_EF_STAB_0.2
+cp post_run ImplFS4_Amont
+cp post_run ImplFS4_EF_STAB
+cp post_run ImplFS4_EF_STAB_0.2
+cp post_run ImplFS4_muscl
+
+cp post_run ImplFS2_Amont
+cp post_run ImplFS2_EF_STAB
+cp post_run ImplFS2_EF_STAB_0.2
+cp post_run ImplFS2_muscl
+
+
+cp model_VDF.data RK_VDF_centre/thi.data
+
+sed "s/_CHOIX_SCH_/schRK/" model.data > model_RK.data
+sed "s/_CHOIX_SCH_/schImpl/" model.data > model_Impl.data
+ 
+cp model_RK.data RK_Amont/thi.data
+sed "s/amont/EF_stab { volumes_etendus }/" model_RK.data > RK_EF_STAB/thi.data
+sed "s/amont/EF_stab { volumes_etendus alpha 0.2 }/" model_RK.data > RK_EF_STAB_0.2/thi.data
+
+sed "s/facsec_max 4/facsec_max 2/" model_Impl.data > ImplFS2_Amont/thi.data
+cp model_Impl.data  ImplFS4_Amont/thi.data
+
+sed "s/amont/EF_stab { volumes_etendus }/" model_Impl.data > tmp.data
+sed "s/facsec_max 4/facsec_max 2/" tmp.data > ImplFS2_EF_STAB/thi.data
+cp tmp.data  ImplFS4_EF_STAB/thi.data
+
+sed "s/amont/EF_stab { volumes_etendus alpha 0.2 }/" model_Impl.data > tmp.data
+sed "s/facsec_max 4/facsec_max 2/" tmp.data > ImplFS2_EF_STAB_0.2/thi.data
+cp tmp.data  ImplFS4_EF_STAB_0.2/thi.data
+
+sed "s/amont/muscl/" model_Impl.data > tmp.data
+sed "s/facsec_max 4/facsec_max 2/" tmp.data > ImplFS2_muscl/thi.data
+
+sed "s/amont/muscl/" model_Impl.data > ImplFS4_muscl/thi.data
+
+
+
+rm -f tmp.data

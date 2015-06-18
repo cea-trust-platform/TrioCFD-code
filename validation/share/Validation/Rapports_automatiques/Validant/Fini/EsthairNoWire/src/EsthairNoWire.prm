@@ -1,0 +1,295 @@
+Parameters {
+	Title "Esthair calculations of a 19 rods sub_assembly without space wire"
+        Description "Turbulent flow in a rod bundle"
+	Description "Validated Model"
+	Description "____convection scheme (EF_stab)"
+	Description "____wall function in VEF discretisation"
+	Description "Validation with"
+	Description "____adapted correlations (Rehme /1/, Blasius )"
+
+	VersionTrio_U "1.6.4"
+
+	ParametersTrio_U Type of problem : Hydraulique_turbulent
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Euler_Implicite
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi loi_expert_hydr
+	ParametersTrio_U Convection scheme : Momentum : EF_stab
+	ParametersTrio_U Diffusion scheme : Default {} for all equations
+	ParametersTrio_U Turbulence model : k-eps with wall function Amont convection scheme
+	ParametersTrio_U Type of boundary conditions : Periodicity in flow direction, wall for other boundaries
+	ParametersTrio_U Type of fluid : ~air
+
+  	TestCase ./Re200000 EsthydSf /* jdd en annexe */
+  	TestCase ./Re100000 EsthydSf
+  	TestCase ./Re50000 EsthydSf
+  	TestCase ./Re25000 EsthydSf
+ 	TestCase ./Re15000 EsthydSf
+	
+	Author "V.BARTHEL"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : 19 pins bundle"
+	Description "The section dimensions are given in the table below. The 3rd dimension (Z) is represented by a periodic condition"
+	Description "Mesh : 2D triangular GMSH mesh with iso cells extruded with 'Extruder_en3' "
+	Description "Initial conditions : the turbulent flow is chosen in order to have Reh=Wbulk*Dh/$\nu$ = 200000, 100000, 50000, 25000 and 15000"
+	Description "___ Hydraulic : Flat profil with bulk velocity of 200m/s, 100m/s, 50m/s, 25m/s and 15m/s."
+	Description "		     Turbulent values k_Eps depending on valocity value"
+	Description "		     These values are taken from first calculations conditions"
+	Description "Boundary conditions :"
+	Description "...The periodicity conditions need a source term to maintain the flow constant Canal_perio { bord perio }"
+	Description "...The symetry condition allows to model only one sixth of the complete bundle and hexagonal wall."
+	Description "...The other boundaries are wall with a standard law function only for faces concerned with dirichlet element type (default application of wall law since v157)"
+	
+	Table {
+		Title "Bundle characteristics"
+                nb_columns 1
+                Label Characteristic value
+                line {
+                        legend "Rod diameter Daig (mm)"
+                        values 16.
+                }
+                line {
+                        legend "Distance of rod centers P (mm)"
+                        values 19.84
+                }
+                line {
+                        legend "Rod distance ratio P/D"
+                        values 1.24
+                }
+                line {
+                        legend "Nuber of rods"
+                        values 19
+                }
+	}
+	
+	Table {
+		Title "Physical properties of air at 20°C"
+                nb_columns 1
+                Label Value
+                line {
+                        legend "$\rho$ en kg/m$³$"
+                        file ./Re200000/rho.dat
+                }
+                line {
+                        legend "$\mu$ en N/m$²$/s"
+                        file ./Re200000/mu.dat
+                }
+        }
+
+	visu {
+                Title "Mesh description"
+		Description "Three different meshes are used for this study. The mesh is thinner for Re numbers from 50000 up to 200000 (first figure below) and a little coarser for Re numbers 25000 and 15000 (respectively second and third figures below). This is in order to get the adimensional distance from the wall y+ in the wished magnitude (y+ > 30 or 40)." 
+		Description "Since only the pressure loss is studied, only two slices of vertical mesh are modelised. In order to get quite iso-dimension of the cells in all directions, the total height is 1.92mm for Re numbers 200000, 100000 and 50000. It is 2.5mm for Re number 25000 an 1.96mm for Re number 15000."
+                width 7cm, viewport=100 100 900 900, clip
+                mesh ./Re200000/EsthydSf.lata DOM_DOM
+                normal3D 0. -0.6 0.9
+                zoom3D  0. 0. 0.95
+		Operator no_axes
+                Operator no_bounding_box
+                Operator no_databaseinfo
+                Operator_to_all no_legend
+                Operator no_triad
+	     }
+	visu {
+                width 7cm, viewport=100 100 900 900, clip 
+                mesh ./Re25000/EsthydSf.lata DOM_DOM
+                normal3D 0. -0.6 0.9
+                zoom3D  0. 0. 0.95
+		Operator no_axes
+                Operator no_bounding_box
+                Operator no_databaseinfo
+                Operator_to_all no_legend
+                Operator no_triad
+		nb_img_without_newline 2
+	     }
+	visu {
+                width 7cm, viewport=100 100 900 900, clip
+                mesh ./Re15000/EsthydSf.lata DOM_DOM
+                normal3D 0. -0.6 0.9
+                zoom3D  0. 0. 0.95
+		Operator no_axes
+                Operator no_bounding_box
+                Operator no_databaseinfo
+                Operator_to_all no_legend
+                Operator no_triad
+        }
+	Table {
+		Title "Calculation method"
+		Description "Transitory calculation time : because of implicit solver, the CFL time step is increased via a "
+		Description " 'facsec' value which varies with convergence. The calculations can be stopped when a fully turbulent flow is well established."
+		Description "The convergence varies from 0.01s to 0.03s of physical time, it corresponds to a length superior to 50 times the hydraulic diameter, which is 11.2 mm."
+	}
+	Figure {
+          	Title "Convergence of calculations"
+          	Description "The curves represent evolution of the pressure gradient in the periodic domain."
+          	Dimension 2
+          	Width 12cm
+          	LabelX "time (s)"
+          	LabelY "Pressure gradient"
+          	RangeY -5000. 80000.
+          	Include_Description_Curves 0
+          	Curve {
+                  	legend "Evolution for Re=200000"
+                  	origin "Trio_U"
+                  	file ./Re200000/EsthydSf_Pressure_Gradient_pb_perio
+                  	Style linespoints
+          	}
+          	Curve {
+                  	legend "Evolution for Re=100000"
+                  	origin "Trio_U"
+                  	file ./Re100000/EsthydSf_Pressure_Gradient_pb_perio
+                  	Style linespoints
+          	}
+          	Curve {
+                  	legend "Evolution for Re=50000"
+                  	origin "Trio_U"
+                  	file ./Re50000/EsthydSf_Pressure_Gradient_pb_perio
+                  	Style linespoints
+          	}
+          	Curve {
+                  	legend "Evolution for Re=25000"
+                  	origin "Trio_U"
+                  	file ./Re25000/EsthydSf_Pressure_Gradient_pb_perio
+                  	Style linespoints
+          	}
+          	Curve {
+                  	legend "Evolution for Re=15000"
+                  	origin "Trio_U"
+                  	file ./Re15000/EsthydSf_Pressure_Gradient_pb_perio
+                  	Style linespoints
+          	}
+	}
+
+}
+
+Chapter {
+	Title "Results"
+	
+	Table {
+	
+	Description "The total pressure loss will be compared with the Blasius correlation which is the usual reference for this type of flow."
+	Description "For this, the friction coefficient will be calculated using the Esthair experimental geometry and a specific Reynolds number."
+	Description "In fact, we know that the Reynolds number and the hydraulic diameter are not exactly the same in Trio_U, due to some meshing and numerical defaults."
+	Description "The different values are shown below, the Trio_U values are calculated from 'err' and 'Channel_Flow_Rate_repr_pb_perio' files." 
+	Description "The hydraulic diameter Dhy is the value for the whole subassembly. The Reynolds number here is based upon this Dhy and the mean bulk velocity. Trio_U over estimates lightly the Esthair value of hydraulic diameter and the expected values of Re numbers."
+	Description ""
+	
+		Title "Bulk velocity and Reynolds number (objective and calculated)"
+		nb_columns 6
+		label Dhy (objective) | Dhy (Trio_U) | Dhy variation (%) | Re (objective) | Re (Trio_U) | Re variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re200000/reyno.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re100000/reyno.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re50000/reyno.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re25000/reyno.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re15000/reyno.dat
+		}
+	}
+	
+	Table {
+	
+	Description "We compare the friction coefficients found with Trio_U to the Blasius correlation."
+	Description "The Reynolds is the one based upon Dhy."
+	Description ""  
+		Title "Friction coefficient"
+		nb_columns 4
+		label Re | y+ | $\Delta$H=1/$\rho$*DP/Dx | Cf 
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re200000/press.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re100000/press.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re50000/press.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re25000/press.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re15000/press.dat
+		}
+	}
+	Table {
+		nb_columns 4
+		label Re | Cf (Trio_U) | Cf (Blasius) | variation (%) 
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re200000/frot.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re100000/frot.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re50000/frot.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re25000/frot.dat
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./Re15000/frot.dat
+		}
+	}
+	Table {
+		Description "The friction velocity is in concordance whith the Blasius correlation. The difference is very low for high Reynolds numbers but it becomes greater for Reynolds number under 30000."
+	}
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "For this typical type of sub-assembly with triangular array in a hexagonal channel, the friction coefficient calculated with Trio_U has been compared with the Blasius correlation at several Reynolds number."
+	Description "Trio_U gives a correct estimation of the friction and the pressure loss. For Reynolds numbers over 30000, the pressure loss is very good, under the prediction is lower."
+}
+
+Chapter {
+	Title "Recommendations for users"
+	Description "Use the Ef_stab convection scheme and the wall law function which is standard since the v157 version."
+	Description "When studying a turbulent flow at Re<30000, the standard k-eps model cannot give a pressure loss precision under 10 to 20%"
+}
+
+Chapter {
+        Title "Computing performance"
+	Description ""
+	Tableau_performance {
+        }
+}

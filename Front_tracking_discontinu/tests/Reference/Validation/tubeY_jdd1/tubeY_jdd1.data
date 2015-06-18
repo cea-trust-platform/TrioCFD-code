@@ -1,0 +1,366 @@
+# cas 2D de chimie #
+# PARALLEL OK #
+
+
+
+
+/*
+ Tube Y
+ Chimie iodure-iodate
+ 0 famille monodisperse
+*/
+Dimension 2
+Probleme_FT_Disc_gen pb3
+
+Domaine DOM3
+
+
+# # # Maillage # # #
+
+
+
+# BEGIN MESH #
+Read_file DOM3 Pb1_2D.geom 
+Dilate DOM3 0.001
+ 
+
+/* Postraiter_domaine { domaine DOM3  fichier domaine.lata format lml } */
+# END MESH #
+# BEGIN PARTITION
+Partition DOM3
+{
+PARTITIONNEUR metis {
+	
+	Nb_parts 2
+ }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM3
+END SCATTER #
+
+
+
+
+
+
+
+
+
+
+
+# # # Schema # # #
+VDF dis
+
+Sch_CN_EX_iteratif  sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 40.
+	dt_min 1.e-9
+	
+	seuil_statio -1
+	facsec 0.5
+	facsec_max 0.9
+	niter_min 1
+	niter_max 4
+}
+/*
+Schema_euler_implicite sch
+Read sch {
+tinit 0.
+	nb_pas_dt_max 3
+seuil_statio -1
+solveur implicite { solveur gmres { diag seuil 1e-5 impr  } }
+}
+*/
+# # # Schema # # #
+
+Constituant sirop
+Read sirop
+{
+coefficient_diffusion Champ_Uniforme 1 1e-9
+}
+
+Fluide_inCompressible fluide3
+Read fluide3
+{
+	mu Champ_Uniforme 1 1.e-3
+	rho   Champ_Uniforme 1 1000.
+}
+
+
+
+
+# # # Chimie # # #
+ Chimie la_chimie
+Read la_chimie
+{
+modele_micro_melange 1
+constante_modele_micro_melange 1e-20
+reactions {
+	{
+	reactifs H2BO3m+Hp
+	produits H3BO3
+	constante_taux_reaction 1.e11
+	coefficients_activites { H2BO3m 1 Hp 1 }
+	exposant_beta 0.
+	enthalpie_reaction 0.
+	energie_activation 0.
+	}
+	,
+	{
+	reactifs 6*Hp+5*Im+IO3m
+	produits 3*I2+3*H2O
+	constante_taux_reaction 5.8e7
+	coefficients_activites { Hp 2 Im 2 IO3m 1 }
+	exposant_beta 0.
+	enthalpie_reaction 0.
+	energie_activation 0.
+	}
+	, 
+	{
+	/* proportion_max_admissible 0.5 */
+	reactifs Im+I2
+	produits I3m
+	constante_taux_reaction 5.6e9 
+	contre_reaction 786.
+	coefficients_activites { Im 1 I2 1 I3m 1 }
+	exposant_beta 0.
+	enthalpie_reaction 0.
+	energie_activation 0.
+	contre_energie_activation 0.
+	} 
+   }
+}
+
+# # # Chimie # # #
+
+
+
+/*
+Champ_Uniforme gravite
+Read gravite 2 -6.935  -6.935
+Associate liquide gravite
+*/
+
+Navier_Stokes_FT_Disc              hydraulique
+Convection_Diffusion_Concentration H2BO3m
+Convection_Diffusion_Concentration Hp
+Convection_Diffusion_Concentration H3BO3
+Convection_Diffusion_Concentration Im
+Convection_Diffusion_Concentration IO3m
+Convection_Diffusion_Concentration I2
+Convection_Diffusion_Concentration H2O
+Convection_Diffusion_Concentration I3m
+# Transport_Interfaces_FT_Disc interf #
+
+Associate pb3 hydraulique
+Associate pb3 H2BO3m
+Associate pb3 Hp
+Associate pb3 H3BO3
+Associate pb3 Im
+Associate pb3 IO3m
+Associate pb3 I2
+Associate pb3 H2O
+Associate pb3 I3m
+
+
+Associate pb3 fluide3
+Associate pb3 sirop
+
+
+Associate pb3 DOM3
+
+
+Associate pb3 sch
+
+Associate pb3 la_chimie
+# Associate pb3 interf #
+Discretize pb3 dis
+
+
+
+
+
+# # # Domaine principal # # #
+Read pb3
+{
+	# constante_cinetique1 1.  #
+	# constante_cinetique2 0.1 #
+	
+	hydraulique {
+		modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable }
+		matrice_pression_invariante
+		solveur_pression petsc cholesky {  }
+		convection { amont }
+		diffusion { }
+		Traitement_particulier { Ec { Ec periode 0.000001 } }
+conditions_initiales { vitesse Champ_Uniforme 2 0 0 }
+		/* conditions_initiales { vitesse Champ_fonc_xyz DOM3 3 45*(x[(-0.02))+22.5/1.41*(x>(-0.02))*(z<0.02) 0 -45*(z]0.02)-22.5/1.41*(x>(-0.02))*(z<0.02) } */
+		boundary_conditions
+		{
+			defaut	paroi_fixe
+			entree1	frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 1.e-3 0.
+			entree2	frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 -1.e-3 0
+			sortie	Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		}
+	}
+	H2BO3m	{
+			diffusion { }
+			convection { amont }
+			nom_inconnue H2BO3m
+			masse_molaire 61
+			conditions_initiales { H2BO3m Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.25
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+		}
+	Hp	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue Hp
+			masse_molaire 1
+			conditions_initiales { Hp Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.1
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+		}
+	H3BO3	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue H3BO3
+			masse_molaire 62
+			conditions_initiales { H3BO3 Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.25
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+	}
+	Im	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue Im
+			masse_molaire 127
+			conditions_initiales { Im Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.035
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+	}
+	IO3m	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue IO3m
+			masse_molaire 175
+			conditions_initiales { IO3m Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.007
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+	}
+	I2	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue I2
+			masse_molaire 254
+			conditions_initiales { I2 Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.0
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+	}
+	H2O	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue H2O
+			masse_molaire 18
+			conditions_initiales { H2O Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+	}
+	I3m	{ 
+			diffusion { }
+			convection { amont }
+			nom_inconnue I3m
+			masse_molaire 381
+			conditions_initiales { I3m Champ_Uniforme 1 0. }
+			boundary_conditions
+			{
+				defaut	paroi
+				entree1	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				entree2	frontiere_ouverte_concentration_imposee Champ_front_Uniforme 1 0.
+				sortie	frontiere_ouverte C_ext Champ_front_Uniforme 1 0.
+			}
+	}
+
+
+
+	Postraitement 
+	{
+		format lml
+		champs dt_post 1e-1
+		{
+			H2BO3m	som
+			Hp	som
+			H3BO3	som
+			Im	som
+			IO3m	som
+			I2	som
+			H2O	som
+			I3m	som
+		}
+	}
+liste_de_postraitements
+{
+	Ecoulement Postraitement 
+	{
+		format lml
+		champs dt_post 1e-1
+		{
+			vitesse som
+			pression som
+		}
+	}
+}
+
+# Sauvegarde binaire TubeY.sauv #
+# reprise binaire TubeY.sauv #
+}
+
+# # # Domaine principal # # #
+
+
+
+Solve pb3
+End

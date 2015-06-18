@@ -1,0 +1,44 @@
+Parameters {
+	Title "Test des bilans de chaleur"
+	Author "fauchet "
+	description "On regarde si au cours du temps le flux du soolide vers le fluide compense celui du fluide vers le solide"	
+	TestCase Bilans_VEF Bilans_VEF
+	TestCase Bilans_VEF_Impl Bilans_VEF
+}
+Chapter {
+	Title flux au cours du temps	
+	Figure
+	{
+	labelx time
+	labely flux
+	
+	rangex 0 0.06
+	Description les 4 courbes sont elles superposees ?
+	
+	Include_Description_Curves 0
+	Curve {
+	file Bilans_VEF/Bilans_VEF_pb_solide_Diffusion_chaleur.out
+	columns $1 $4
+	legend explicite solide
+	style lines
+	}
+	Curve {
+	file Bilans_VEF/Bilans_VEF_pb_Diffusion_chaleur.out
+	columns $1 (-$5)
+	legend explicite (-Flux_fluide) 
+	style lines
+	}
+	Curve {
+	file Bilans_VEF_Impl/Bilans_VEF_pb_solide_Diffusion_chaleur.out
+	columns $1 $4
+	legend implicite solide
+	style lines
+	}
+	Curve {
+	file Bilans_VEF_Impl/Bilans_VEF_pb_Diffusion_chaleur.out
+	columns $1 (-$5)
+	legend implicite (-Flux_fluide) 
+	style lines
+	}
+}
+}

@@ -1,0 +1,175 @@
+#!/bin/sh
+create_box()
+{
+   home_rep=`pwd`
+   jdd=$ESSAI/$SCHEME
+   
+   # Je convertis les schemas de convection trouves au format Trio_U
+   SCHEMA=""
+   [ "$SCHEME" == "Muscl" ] && SCHEMA="Muscl"
+   [ "$SCHEME" == "Ef_Stab0.2" ] && SCHEMA="Ef_stab { alpha 0.2 }"
+   [ "$SCHEME" == "Ef_Stab1.0" ] && SCHEMA="Ef_stab { alpha 1.0 }"
+
+   # Je cree et lance toutes les boites de recirculation necessaire a tous les calculs, ssi celles-ci n'existent pas !
+   NAMEs="branch main0.23" && [ "$ESSAI" == "Wall_Jet" ] && NAMEs="branch main1.46"
+   for NAME in $NAMEs
+   do
+      if [[ "$NAME" == "branch" ]]
+      then
+         # Parametre du jdd pour le tuyau de raccordement
+         Dh=`grep "diametre_hydraulique_branch" Watlon.data | head -1 | $TRUST_Awk '{print $(NF-1)}'`
+	 BOUNDARY=BRANC
+         EXTRUD=0.01
+	 ROT="Rotation box x 0 0 90"
+	 Y=y-0.15
+	 Z=z
+	 TMAX=10
+	 FACSECMAX=500
+	 FACSEC=500
+	 VY=1.
+	 VZ=0.
+	 CY=-0.150
+	 CZ=0.
+	 SX1=-0.025
+	 SY1=-0.150
+	 SZ1=0.
+	 SX2=0.025
+	 SY2=-0.150
+	 SZ2=0.
+      else
+         # Parametre du jdd pour le tuyau principal
+         Dh=`grep "diametre_hydraulique_main" Watlon.data | head -1 | $TRUST_Awk '{print $(NF-1)}'`
+	 BOUNDARY=MAINI
+         EXTRUD=0.03
+	 ROT=""
+	 Y=y
+	 Z=z-0.18
+	 TMAX=150
+	 FACSECMAX=10000 && [ "$NAME" == "main1.46" ] && FACSECMAX=50000
+	 FACSEC=1000 && [ "$NAME" == "main1.46" ] && FACSEC=10000
+	 VY=0.
+	 VZ=0.23 && [ "$NAME" == "main1.46" ] && VZ=1.46
+	 CY=0.
+	 CZ=-0.150
+	 SX1=-0.075
+	 SY1=0.
+	 SZ1=-0.150
+	 SX2=0.075
+	 SY2=0.
+	 SZ2=-0.150
+      fi
+      
+      VX=0.
+      # Je calcul la norme de la vitesse pour calculer K et EPS.
+      VITESSE=`awk "BEGIN {print ($VX*$VX+$VY*$VY+$VZ*$VZ)^(1/2)}"`
+      K_INIT=`awk "BEGIN {print 3/2*0.1*0.1*$VITESSE*$VITESSE}"`
+      EPS_INIT=`awk "BEGIN {print 0.09*$K_INIT^(3/2)/(0.07*$Dh)}"`
+
+      # Je cree les repertoires des calculs
+      mkdir -p $jdd
+      cd $jdd
+      create=1
+     
+      # Je cree les jdd des boites a calculer
+      if (( create == 1 ))
+      then
+         mkdir -p $NAME\_box
+         cd $NAME\_box
+         echo 'Creation de '$jdd'/'$NAME'_box'
+         sed "s/\$NAME/$NAME/g
+	      s/\$BOUNDARY/$BOUNDARY/g
+   	      s/\$EXTRUD/$EXTRUD/g
+   	      s/\$ROT/$ROT/g
+   	      s/\$Y/$Y/g
+              s/\$Z/$Z/g
+              s/\$TMAX/$TMAX/g
+              s/\$FACSECMAX/$FACSECMAX/g
+	      s/\$FACSEC/$FACSEC/g
+	      s/\$SCHEME/$SCHEMA/g
+	      s/\$VY/$VY/g
+	      s/\$VZ/$VZ/g
+	      s/\$K_INIT/$K_INIT/g
+	      s/\$EPS_INIT/$EPS_INIT/g
+	      s/\$CY/$CY/g
+	      s/\$CZ/$CZ/g
+	      s/\$SX1/$SX1/g
+	      s/\$SY1/$SY1/g
+	      s/\$SZ1/$SZ1/g
+	      s/\$SX2/$SX2/g
+	      s/\$SY2/$SY2/g
+	      s/\$SZ2/$SZ2/g
+  	      " ../../../box.data > $NAME\_box.data      
+       fi
+      cd $home_rep 1>/dev/null 2>&1
+   done
+   
+}
+
+create_data()
+{
+   # Je convertis les schemas de convection trouves au format Trio_U
+   SCHEMA=""
+   [ "$SCHEME" == "Muscl" ] && SCHEMA="Muscl"
+   [ "$SCHEME" == "Ef_Stab0.2" ] && SCHEMA="Ef_stab { alpha 0.2 }"
+   [ "$SCHEME" == "Ef_Stab1.0" ] && SCHEMA="Ef_stab { alpha 1.0 }"
+   [ "$SCHEMA" == "" ] && echo "Schema de convection non prévu avec \$SCHEME = $SCHEME !" && exit -1
+   
+   MAIN="main0.23" && [ "$ESSAI" == "Wall_Jet" ] && MAIN="main1.46"
+   
+   # Je calcul k et eps resultant du regime d'ecoulement (vitesse)
+   # k ~ 3/2.(I.U)² Avec I = 10% = Intensite de la turbulence, U = Vitesse moyen de l'ecoulement
+   # Eps ~ Cmu.k^(3/2)/(0.07.Dh) Avec Cmu = Constante du modele de turbulence = 0.09, k = Energie cinetique turbulente, Dh = diametre hydraulique
+   Dh=`grep "diametre_hydraulique_main" Watlon.data | head -1 | $TRUST_Awk '{print $(NF-1)}'`
+   V_MEAN=0.23 && [ "$ESSAI" == "Wall_Jet" ] && V_MEAN=1.46
+   K=`awk "BEGIN {print 3/2*0.1*0.1*$V_MEAN*$V_MEAN}"`
+   EPS=`awk "BEGIN {print 0.09*$K^(3/2)/(0.07*$Dh)}"`
+
+   # Temps demarrage des statistiques
+   # Dans le cas Jet impactant = 2*temps de traversee d'une particule fluide (~4.5s)
+   # Dans le cas Jet de paroi = 2*temps de traversee d'une particule fluide (~1s)
+   DT_START=4.5  && [ "$ESSAI" == "Wall_Jet" ] && DT_START=1.0
+
+   # Temps max de calcul
+   # Dans le cas Jet impactant = 10*temps de traversee d'une particule fluide + 2*temps de traversee d'une particule fluide (~27s)
+   # Dans le cas Jet de paroi = 10*temps de traversee d'une particule fluide + 2*temps de traversee d'une particule fluide (~6s)
+   TMAX=27.0  && [ "$ESSAI" == "Wall_Jet" ] && TMAX=6.0
+
+   # Je renseigne le nom du JDD
+   jdd=$ESSAI/$SCHEME
+   cd $jdd
+   # Je remplace dans le JDD de base l'ensemble des informations a modifier
+   sed "s/\$SCHEMA/$SCHEMA/g
+   	s/\$TMAX/$TMAX/g
+   	s/\$DT_START/$DT_START/g
+   	s/\$MAIN/$MAIN/g
+	s/\$K/$K/g
+	s/\$EPS/$EPS/g
+	s/\$NB_PROCS/$NB_PROCS/g
+  	" ../../Watlon.data > Watlon.data
+   echo "Creation de $jdd"
+   ln -s -f ../../pre_run .
+#   ln -s -f ../../post_run .
+   cd - 1>/dev/null 2>&1
+}
+
+
+[ ! -f mesh/Watlon_mesh.geom ] && gunzip mesh/Watlon_mesh.geom.gz
+echo "*******************************************************************"
+
+ESSAIs="Impinging_Jet Wall_Jet"
+SCHEMEs="Muscl Ef_Stab1.0 Ef_Stab0.2"
+
+# Je boucle pour creer tout les cas test Trio_U
+for ESSAI in $ESSAIs
+do
+   for SCHEME in $SCHEMEs
+   do
+      # Je recherche dans la PRM pour chaque cas test le nombre de processeurs du cas test
+      NB_PROCS=`grep "CasTest $ESSAI/$SCHEME" Watlon_k_eps.prm | awk '{print $4}'`
+      # Je cree les repertoires de travail et calcul les boites de recirculation
+      create_box
+      create_data
+   done
+done
+
+echo "*******************************************************************"

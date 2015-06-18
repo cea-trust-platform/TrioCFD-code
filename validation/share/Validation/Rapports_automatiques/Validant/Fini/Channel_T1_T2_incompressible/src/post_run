@@ -1,0 +1,167 @@
+#!/bin/bash
+
+# Parametres
+fichier=`pwd | awk -F"/" '{print $NF}'`
+if [ -f ../../version_utilisee ]
+then
+	version=`grep "version :" ../../version_utilisee | awk '{print $3}' | awk -F. '{print $1$2$3}'`
+else
+	version=`grep "version :" $fichier.err | awk '{print $3}' | awk -F. '{print $1$2$3}'`
+fi
+version=${version%_beta}
+j=0 && (( 155 == $version )) && j=2
+
+echo "$version $j " > version.dat
+hy=0.004
+Pz=0.002
+[ "$fichier" == "Canal_plan_bi_periodique_M1" ]   && Lx=0.004
+[ "$fichier" == "Canal_plan_bi_periodique_M1_tetraedrise" ]   && Lx=0.004
+[ "$fichier" == "Canal_plan_bi_periodique_M1bis_tetraedrise" ]   && Lx=0.004
+[ "$fichier" == "Canal_plan_bi_periodique_M10" ]  && Lx=0.04
+[ "$fichier" == "Canal_plan_bi_periodique_M100" ] && Lx=0.4
+Type=`pwd | awk -F"$fichier" '{print $1}' | awk -F"/" '{print $(NF-1)}'`
+
+#prop physiques constantes en incompressible prises a Tm=(T1+T2)/2=676.5:
+rho=3.824
+mu=3.4753e-5
+lambda=0.266407
+
+
+Pres=7092750
+Rconst=2075.95
+Cp=5193
+T_bas=673
+T_haut=680
+U_bulk=80
+
+#Nu_Danov calcule sous maple pour Re_tau=908 - Pr=0.677 et Prt=0.9
+Nu_Danov=93
+
+# Extrait_coupe sur les fichiers
+extrait_coupe $fichier SONDE_TEMPERATURE
+extrait_coupe $fichier SONDE_VITESSE
+
+# Parametre d'adimensionnalisation
+Colonnes=`grep -E "# Bord:|# Boundary:" $fichier\_pb_Contrainte_visqueuse.out | sed "s?# Bord:??g" | sed "s?# Boundary:??g" | sed "s?Total??g"`
+nb_colonnes=`echo $Colonnes | wc -w`
+i=1
+while (( i <= nb_colonnes ))
+do
+	Col=`echo $Colonnes | awk '{print $'$i'}'`
+	if [ "$Col" == "Bas" ]
+	then
+		Col_PhyQDM_bas=`awk "BEGIN{print ($i+$j-1)*3+2}"`
+		Col_PhyNRJ_bas=`awk "BEGIN{print $i+$j+1}"`
+	fi
+	if [ "$Col" == "Haut" ]
+	then
+		Col_PhyQDM_haut=`awk "BEGIN{print ($i+$j-1)*3+2}"`
+		Col_PhyNRJ_haut=`awk "BEGIN{print $i+$j+1}"`
+	fi
+	((i=i+1))
+done
+
+Phy_diff_QDM_bas=`tail -1 $fichier\_pb_Contrainte_visqueuse.out | awk '{print $'$Col_PhyQDM_bas'}'`
+Phy_diff_NRJ_bas=`tail -1 $fichier\_pb_Diffusion_chaleur.out | awk '{print $'$Col_PhyNRJ_bas'}'`
+Phy_diff_NRJ_bas=`awk "BEGIN{if($Phy_diff_NRJ_bas<0) print -($Phy_diff_NRJ_bas); else print $Phy_diff_NRJ_bas;}"`
+rho_bas=$rho
+Ustar_bas=`awk "BEGIN{print sqrt($Phy_diff_QDM_bas/$rho_bas/$Lx/$Pz)}"`
+Tstar_bas=`awk "BEGIN{print $Phy_diff_NRJ_bas/($rho_bas*$Cp*$Ustar_bas*$Lx*$Pz)}"`
+mu_bas=$mu;
+nu_bas=`awk "BEGIN{print $mu/$rho}"`
+lambda_bas=$lambda;
+alpha_bas=`awk "BEGIN{print $lambda/($rho*$Cp)}"`
+Re_t_bas_Trio=`awk "BEGIN{print $Ustar_bas*$hy/2/$nu_bas}"`
+Pr_bas=`awk "BEGIN{print $nu_bas/$alpha_bas}"`
+
+
+Phy_diff_QDM_haut=`tail -1 $fichier\_pb_Contrainte_visqueuse.out | awk '{print $'$Col_PhyQDM_haut'}'`
+Phy_diff_NRJ_haut=`tail -1 $fichier\_pb_Diffusion_chaleur.out | awk '{print $'$Col_PhyNRJ_haut'}'`
+Phy_diff_NRJ_haut=`awk "BEGIN{if($Phy_diff_NRJ_haut<0) print -($Phy_diff_NRJ_haut); else print $Phy_diff_NRJ_haut;}"`
+rho_haut=$rho;
+Ustar_haut=`awk "BEGIN{print sqrt($Phy_diff_QDM_haut/$rho_haut/$Lx/$Pz)}"`
+Tstar_haut=`awk "BEGIN{print $Phy_diff_NRJ_haut/($rho_haut*$Cp*$Ustar_haut*$Lx*$Pz)}"`
+mu_haut=$mu;
+nu_haut=`awk "BEGIN{print $mu/$rho}"`
+lambda_haut=$lambda;
+alpha_haut=`awk "BEGIN{print $lambda/($rho*$Cp)}"`
+Re_t_haut_Trio=`awk "BEGIN{print $Ustar_haut*$hy/2/$nu_haut}"`
+Pr_haut=`awk "BEGIN{print $nu_haut/$alpha_haut}"`
+
+
+# Creation des fichiers resultats : Star_bas.cut ; Star_haut.cut ; Nusselt_bas.dat ; Nusselt_haut.dat
+nb_ligne_vitesse=`wc -l $fichier\_SONDE_VITESSE.coupe | awk '{print $1}'`
+i=2
+Uplus_bas_max=0
+Uplus_bas_bak=0
+Uplus_VD_bas_bak=0
+rho_sur_rhobas_bak=1
+somme_UT=0
+somme_U=0
+V_bak=0
+W_bak=0
+while (( i <= nb_ligne_vitesse ))
+do
+	Y=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $1}'`
+	U=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $2}'`
+	V=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $3}'`
+	W=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $4}'`
+	T=`head -$i $fichier\_SONDE_TEMPERATURE.coupe | tail -1 | awk '{print $2}'`
+	somme_U=`awk "BEGIN{print $somme_U+$U}"`
+	somme_UT=`awk "BEGIN{print $somme_UT+($U*$T)}"`
+	Yplus_bas=`awk "BEGIN{print $Y*$Ustar_bas/$nu_bas}"`
+	Uplus_bas=`awk "BEGIN{print $U/$Ustar_bas}"`
+	Tplus_bas=`awk "BEGIN{print ($T-($T_bas))/$Tstar_bas}"`
+	Delta_V=`awk "BEGIN{print $V-($V_bak)}"`
+	Delta_W=`awk "BEGIN{print $W-($W_bak)}"`
+	imprime=`awk "BEGIN{if(($Uplus_bas_max<$Uplus_bas)&&($Yplus_bas!=0)) print 1; else print 0;}"`
+	((i==2)) && echo "# Y+		U+		T+		U+ VD		Y+ SLS		U+ SLS		T+ SLS" > Star_bas.cut
+	((imprime==1)) && echo "$Yplus_bas		$Uplus_bas		$Tplus_bas		$Uplus_VD_bas		$Yplus_SLS_bas		$Uplus_SLS_bas		$Tplus_SLS_bas" >> Star_bas.cut
+
+	#si les valeurs de Uplus ou Yplus sont mauvaises et que donc imprime ==0 on renvoie cette info dans un fichier Erreur_Star
+	((imprime==0)) && echo "$i  $Yplus_bas	$Uplus_bas" > Erreur_Star_bas.cut 
+
+	((i==2)) && echo "# Y		DeltaV		DeltaW" > DeltaV.cut
+	echo "$Y	$Delta_V	$Delta_W" >> DeltaV.cut
+	Uplus_bas_max=`awk "BEGIN{if($Uplus_bas_max<$Uplus_bas) print $Uplus_bas; else print $Uplus_bas_max;}"`
+	Uplus_bas_bak=$Uplus_bas
+	Uplus_VD_bas_bak=$Uplus_VD_bas
+	rho_sur_rhobas_bak=$rho_sur_rhobas
+	V_bak=$V
+	W_bak=$W
+	((i=i+1))
+done
+
+T_bulk=`awk "BEGIN{print $somme_UT/$somme_U}"`
+
+Nusselt_bas_Trio=`awk "BEGIN{printf \"%.2f\", ($Phy_diff_NRJ_bas/($T_bulk-($T_bas))/$Lx/$Pz)*2*$hy/$lambda_bas}"`
+Nusselt_haut_Trio=`awk "BEGIN{printf \"%.2f\", ($Phy_diff_NRJ_haut/($T_haut-($T_bulk))/$Lx/$Pz)*2*$hy/$lambda_haut}"`
+Nusselt_Trio=`awk "BEGIN{printf \"%.2f\", ($Nusselt_bas_Trio+$Nusselt_haut_Trio)/2}"`
+ecart_th=`awk "BEGIN{printf \"%.2f\", ($Nusselt_Trio-$Nu_Danov)*100/$Nu_Danov}"`
+
+echo " $Nusselt_Trio	$ecart_th	" > Nusselt.dat
+
+((i=nb_ligne_vitesse))
+Uplus_haut_max=0
+Uplus_haut_bak=0
+Uplus_VD_haut_bak=0
+rho_sur_rhohaut_bak=1
+while (( 2 <= i ))
+do
+	Y=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $1}'`
+	U=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $2}'`
+	T=`head -$i $fichier\_SONDE_TEMPERATURE.coupe | tail -1 | awk '{print $2}'`
+	Yplus_haut=`awk "BEGIN{print ($hy-($Y))*$Ustar_haut/$nu_haut}"`
+	Uplus_haut=`awk "BEGIN{print $U/$Ustar_haut}"`
+	Tplus_haut=`awk "BEGIN{print ($T_haut-($T))/$Tstar_haut}"`
+	imprime=`awk "BEGIN{if(($Uplus_haut_max<$Uplus_haut)&&($Yplus_haut!=0)) print 1; else print 0;}"`
+	((i==nb_ligne_vitesse)) && echo "# Y+		U+		T+		U+ VD		Y+ SLS		U+ SLS		T+ SLS" > Star_haut.cut
+	((imprime==1)) && echo "$Yplus_haut		$Uplus_haut		$Tplus_haut		$Uplus_VD_haut		$Yplus_SLS_haut		$Uplus_SLS_haut		$Tplus_SLS_haut" >> Star_haut.cut
+
+	Uplus_haut_max=`awk "BEGIN{if($Uplus_haut_max<$Uplus_haut) print $Uplus_haut; else print $Uplus_haut_max;}"`
+	Uplus_haut_bak=$Uplus_haut
+	Uplus_VD_haut_bak=$Uplus_VD_haut
+	rho_sur_rhohaut_bak=$rho_sur_rhohaut
+	((i=i-1))
+done
+

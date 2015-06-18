@@ -1,0 +1,222 @@
+Dimension 3
+
+export domaine dom_pb1 
+export domaine dom_pb2 
+
+
+Mailler dom_pb1
+{
+Pave Cavite
+	{
+		Origine 0. -0.01 0.
+		Nombre_de_Noeuds 11 6 11
+		Longueurs 0.1 0.01 0.01
+
+	}
+	{
+		Bord paroi  X = 0.            	-0.01 <= Y <= 0.           0. <= Z <= 0.01
+		Bord paroi  X = 0.1   	-0.01 <= Y <= 0.           0. <= Z <= 0.01
+		Bord paroi     Y = -0.01           	0. <= X <= 0.1   0. <= Z <= 0.01
+		Raccord local homogene interface    Y = 0.           	0. <= X <= 0.1   0. <= Z <= 0.01
+                Bord paroi  Z = 0.           	0. <= X <= 0.1   -0.01 <= Y <= 0.
+		Bord paroi  Z = 0.01 	0. <= X <= 0.1   -0.01 <= Y <= 0.
+		} ,
+Pave Cavite2
+	{
+		Origine 0. 4.75e-3 0.
+		Nombre_de_Noeuds 11 6 11
+		Longueurs 0.1 0.01 0.01
+
+	}
+	{
+		Bord paroi  X = 0.            	4.75e-3 <= Y <= 0.01475           0. <= Z <= 0.01
+		Bord paroi  X = 0.1   	4.75e-3 <= Y <= 0.01475           0. <= Z <= 0.01
+		Raccord local homogene interface     Y = 4.75e-3           	0. <= X <= 0.1   0. <= Z <= 0.01
+		Bord paroi    Y = 0.01475           	0. <= X <= 0.1   0. <= Z <= 0.01
+                Bord paroi  Z = 0.           	0. <= X <= 0.1   4.75e-3 <= Y <= 0.01475
+		Bord paroi  Z = 0.01 	0. <= X <= 0.1   4.75e-3 <= Y <= 0.01475
+		}
+}
+
+# Tetraedriser dom_pb1 #
+
+Mailler dom_pb2
+{
+Pave Cavite
+	{
+		Origine 0. 0 0.
+		Nombre_de_Noeuds 11 2 11
+		Longueurs 0.1 4.75e-3 0.01
+
+	}
+	{
+		Bord paroi  X = 0.            	0 <= Y <= 4.75e-3           0. <= Z <= 0.01
+		Bord paroi  X = 0.1   	0 <= Y <= 4.75e-3           0. <= Z <= 0.01
+		Raccord local homogene interface     Y = 0           	0. <= X <= 0.1   0. <= Z <= 0.01
+		Raccord local homogene interface    Y = 4.75e-3           	0. <= X <= 0.1   0. <= Z <= 0.01
+                Bord sortie  Z = 0.           	0. <= X <= 0.1   0 <= Y <= 4.75e-3
+		Bord entree  Z = 0.01 	0. <= X <= 0.1   0 <= Y <= 4.75e-3
+		} 
+}
+
+# Tetraedriser dom_pb2 #
+# VerifierCoin dom_pb2 { } #
+
+Pb_conduction pb_solide
+Pb_thermohydraulique_turbulent  pbf
+
+
+
+
+schema_euler_explicite sch
+Read sch
+{
+        tinit 0 
+        tmax 500.
+        dt_min 1.E-8
+        dt_max 10.
+        dt_impr 50
+        seuil_statio 1.e-3
+        facsec 1.
+}
+
+
+VDF cubes
+
+Fluide_Incompressible He
+Read He
+{
+        mu Champ_Uniforme 1 4.4e-05 
+        rho Champ_Uniforme 1 4.4
+        lambda Champ_Uniforme 1 0.34   
+        Cp Champ_Uniforme 1 5193.
+        beta_th Champ_Uniforme 1 0.0014285714
+}
+
+
+Solide ceramique    
+Read ceramique  
+{
+
+        rho Champ_Uniforme 1 2225.
+        lambda Champ_Uniforme 1 60     
+        Cp Champ_Uniforme 1 6
+}
+
+Associate pb_solide dom_pb1
+Associate pb_solide ceramique     
+
+Associate pbf dom_pb2
+Associate pbf He     
+
+
+Probleme_couple pbc
+Associate pbc pbf 
+Associate pbc pb_solide 
+Associate pbc sch
+
+Discretize pbc cubes
+
+
+Read pbf
+{
+        Navier_Stokes_turbulent
+        {
+                solveur_pression Cholesky { }
+		convection { negligeable }
+                diffusion { negligeable }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 3  0. 0. -30
+                        }
+                boundary_conditions {
+                        paroi             symetrie
+                        entree frontiere_ouverte_vitesse_imposee champ_front_uniforme 3  0. 0. -30
+                        sortie    frontiere_ouverte_pression_imposee champ_front_uniforme 1  0. 
+			interface symetrie
+                }
+
+		modele_turbulence sous_maille_Smago { Cs 1.e-9 
+		        turbulence_paroi UTAU_IMP { u_tau Champ_uniforme 1 0. }
+		}
+        }
+
+        Convection_Diffusion_Temperature_turbulent
+        {
+                diffusion { }
+                convection { amont }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 751.
+                        }
+                boundary_conditions {
+                        paroi             symetrie
+                        entree frontiere_ouverte_temperature_imposee champ_front_uniforme 1 751
+                        sortie    frontiere_ouverte T_ext  champ_front_uniforme 1 1200
+			interface paroi_echange_contact_vdf pb_solide interface temperature 1.e9
+                                   }
+                Modele_Turbulence Prandtl { Turbulence_paroi Loi_Paroi_Nu_Impose { nusselt 0.023*Re^0.8*Pr^(1./3.) diam_hydr champ_uniforme 1 	9.5e-3 } }
+        }
+        Postraitement {
+		format lata
+                Sondes
+                {
+			sonde_He_T_sortie   nodes  temperature periode 0.1   points  1 0.05  2.375e-3 0.0  
+			sonde_He_T_entree   nodes  temperature periode 0.1   points  1 0.05 2.375e-3 0.01 
+			 
+			sonde_He_U_sortie   nodes vitesse  periode 0.1   points  1 0.05  2.375e-3 0.0 
+			sonde_He_U_entree   nodes vitesse  periode 0.1   points  1  0.05 2.375e-3 0.01
+                        coupe_He_T temperature    periode 0.1   segment 10   0.055  2.375e-3 0.0005 0.055 2.375e-3 0.0095 
+                }
+                Champs dt_post 1.
+                {
+                   vitesse elem
+                   temperature elem
+                }
+        }
+        sauvegarde formatte pb2.sauv
+}
+
+
+Read pb_solide
+{
+        Conduction
+        {
+                diffusion { }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 751.
+                        }
+                sources {
+                       Puissance_Thermique Champ_uniforme 1 1E9 
+                        }
+
+                boundary_conditions {
+                        paroi               paroi_adiabatique
+			interface paroi_echange_contact_vdf pbf interface temperature 1.e9
+
+                }
+        }
+        Postraitement {
+		format lata
+                Sondes
+                {
+                         coupe_combustible_long_canal_1_Tparoi    temperature periode  0.1  segment 10  0.055 -0.001 0.0005 0.055 -0.001      0.0095  
+			 sonde_combustible_entree    temperature periode 0.1   points 3 
+				 0.05 0.005 0.0
+				0.05 0.005 0.4
+ 				0.05 0.005 0.8
+                       
+               }
+                Champs dt_post 1.
+                {
+                   temperature elem
+                }
+        }
+        Sauvegarde binaire pb_solide.sauv
+
+}
+EcritureLectureSpecial 0
+Imprimer_flux  dom_pb1 { interface } 
+Imprimer_flux  dom_pb2 { interface } 
+Solve pbc
+EcritureLectureSpecial 0
+End
+

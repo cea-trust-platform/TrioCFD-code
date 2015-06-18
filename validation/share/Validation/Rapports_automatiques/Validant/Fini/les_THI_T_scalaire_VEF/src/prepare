@@ -1,0 +1,13 @@
+#!/bin/bash
+
+mkdir -p RK_EF_STAB_0.2
+mkdir -p ImplFS4_EF_STAB_0.2
+
+
+cp post_run RK_EF_STAB_0.2
+cp post_run ImplFS4_EF_STAB_0.2
+
+sed "s/_SCHTPS_/sch_RK/" model.data > RK_EF_STAB_0.2/thi.data
+sed "s/_SCHTPS_/sch_Impl/" model.data > ImplFS4_EF_STAB_0.2/thi.data
+
+

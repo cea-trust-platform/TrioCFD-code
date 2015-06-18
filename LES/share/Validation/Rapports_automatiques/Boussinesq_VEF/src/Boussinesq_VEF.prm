@@ -1,0 +1,529 @@
+Parameters {
+	Title "Check Boussinesq source term in VEF"
+	Author "Marthe Roux (CS) from initial work by Ulrich Bieder (CEA)"
+	Testcase . diffusion
+	Testcase . convection_diffusion
+	Testcase . conduction
+	Testcase . convection_diffusion_turbulent
+	Testcase . conduction_turbulent
+	Testcase . diffusion_P0_P1
+	Testcase . convection_diffusion_P0_P1
+	Testcase . conduction_P0_P1
+}
+
+Chapter {
+	Title "Calculation domain"
+	
+	Description "The calculation domain is a cube of 1m length in each direction with the centre at $(0, 0, 0)^T$."
+	
+	Figure {
+	Title Sketch of the calculation domain
+	Width 8cm
+	picture cube.pdf
+	}
+}
+
+Chapter {
+	Title "Meshing"
+	
+	Description "The domain is meshed in 9*9*9 cubic cells."
+	
+	Figure {
+	Title Tetrahedrization method
+	Description "Each cell is cut into 48 tetrahedrons according to the method show in the figure below."
+        Width 5cm
+	picture discr_tetra.pdf 
+	}
+	
+	Figure {
+	Title "Example of a meshing with symmetric expansion"
+	Description "In z-direction a symmetric expansion factor of 1.1 is applied in order to avoid a totally homogeneous meshing. The effect of a symmetric expansion factor on the mesh density is also shown in the figure below."
+        Width 8cm
+	picture sym_factor.pdf
+	}
+	
+}
+
+Chapter {
+	Title "Physical Properties"
+	Description "Air is used as a representative gas. Its physical properties at $20^oC$ are given in the next table."
+	
+	Table {
+		Title "Physical properties"
+		nb_columns 1
+		line {
+			legend "Cinematic viscosity $\nu$ ($m^2/s$)"
+			file propertiesGeometry.dat	
+			nb_columns_file 5
+			columns ($1)
+#			values 1.511e-5
+		}
+		line {
+			legend " Density $\rho$ ($kg/m^3$)"
+			file propertiesGeometry.dat	
+			nb_columns_file 5
+			columns ($2)
+#			values 1.205
+		}
+		line {
+			legend "Thermal diffusivity a ($m^2/s$)"
+			file propertiesGeometry.dat	
+			nb_columns_file 5
+			columns ($4)
+#			values 0.0257
+		}
+		line {
+			legend "Heat capacity \latex_( $ C_p $ \latex_) ($J/(kg\;K)$)"
+			file propertiesGeometry.dat	
+			nb_columns_file 5
+			columns ($3)
+#			values 1005
+		}
+		line {
+			legend "Thermal expansion coefficient $\beta$ ($1/K$)"
+			file propertiesGeometry.dat	
+			nb_columns_file 5
+			columns ($5)
+#			values 3.43e-3
+		}		
+	}
+}
+
+Chapter {
+	Title "Discretization"
+	Description "The calculation domain is meshed in a pure tetrahedral grid. The two discretisation methods described the nexts parts are analysed."
+	
+	Figure {
+	Title 2D discretisation
+	description "P1NC Velocity localization is on the centre of the faces, enlight by the square symbol $\blacksquare$."
+	description "P0 Pressure localization is on the centre of the element, enlight by the circle symbol $\bullet$."
+	description "P1 Pressure localization is on the vertices, enlight by the circle symbol $\bullet$."
+  	Width 5cm
+	picture triangle.pdf
+	}
+	
+	Figure {
+	Title 3D discretisation
+	description "P1NC Velocity localization is on the centre of the faces, enlight by the triangle symbol $\blacksquare$."
+	description "P0 Pressure localization is on the centre of the element, enlight by the pentagon symbol."
+	description "P1 Pressure localization is on the vertices, enlight by the circle symbol $\bullet$."
+	description "Pa Pressure localization is on the centre of the edges, enlight by the triangle symbol $\blacktriangle$."
+  	Width 5cm
+	picture tetra.pdf
+	}
+
+}
+
+Chapter {
+	Title "Analysed Equations"
+	Table {
+		Title "Stokes Equation with Source Term"
+		Description "The flow is assumed to be incompressible ($\rho$=constant)."
+		Description "Equation:"
+		Description \latex_( $$ \frac{\partial \vec u}{\partial t}=-\frac 1 \rho \nabla p + \vec \nabla \cdot \nu (\vec \nabla  \vec u) + \vec f (z)$$ \latex_)
+		Description $$\nabla \cdot \vec u = 0$$
+		Description \latex_( $$\vec f (z)=(0,0,f_0[1-\cos(\pi (z-0.5))])^T$$ \latex_)
+		Description "Initial condition:"
+		Description $$ \vec u (t=0)=(0,0,0)^T  $$
+		Description "Boundary condition:"
+		Description \latex_( $$ \left.\vec{u}\right|_{\partial \Omega} = 0 $$ \latex_)
+		Description "The exact solution of the problem is for all times: $\vec u (t)=(0,0,0)^T$. The analytical solution of the axial pressure course is:"
+		Description \latex_(  $$ p=f_0 \left[ z-\frac 1 \pi \sin (\pi (z-0.5)) \right] - c $$ \latex_)
+	}
+	
+	Table {
+		Title "Navier-Stokes Equations with Temperature Transport"
+		Description The flow is assumed to be incompressible ($\rho$=constant) and the Boussinesq hypothesis is applicable.
+		Description Equation:
+		Description \latex_( $$ \frac{\partial \vec u}{\partial t} + \vec u \cdot \vec \nabla \vec u=-\frac 1 \rho \nabla p + \vec \nabla \cdot \nu (\vec \nabla  \vec u) + \vec g \cdot (1-\beta \cdot (T - T0))$$ \latex_)
+		Description $$\nabla \cdot \vec u = 0$$
+		Description \latex_( $$ \frac{\partial T}{\partial t} + \vec u \cdot \nabla T = \nabla \cdot a (\nabla T)$$ \latex_)
+		Description "Initial condition:"
+		Description $$ \vec u (t=0)=(0,0,0)^T  $$
+		Description \latex_( $$ T(t=0, z)=f_0[1-\cos(\pi(z-0.5))]$$ \latex_)
+		Description "Boundary condition:"
+		Description \latex_( $$ \left.\vec{u}\right|_{\partial \Omega} = 0 $$ \latex_)
+		Description \latex_( $$ \left. a \frac{\partial T}{\partial \vec n} \right|_{\partial \Omega} =0 $$ \latex_)
+		Description "The exact solution of the problem for the velocity is for all times: $\vec u (t) = (0, 0, 0)^T$. The temperature is a function of $z$ and time. For times $t \rightarrow \infty$, the temperature approaches the spatial mean value of the initial temperature $(T(t \rightarrow \infty)=1)$."
+
+	}
+	
+	Table {
+		Title "Turbulent Navier-Stokes Equations with Temperature Transport"
+		Description The flow is assumed to be incompressible ($\rho$=constant)and the Boussinesq hypothesis is applicable.
+		Description "Equation:"
+		Description \latex_( $$ \frac{\partial \vec u}{\partial t} + \vec u \cdot \vec \nabla \vec u=-\frac 1 \rho \nabla p + \vec \nabla \cdot \nu_1 (\vec \nabla  \vec u + \vec \nabla^T  \vec u) + \vec g \cdot (1-\beta \cdot (T - T0))$$ \latex_)
+		Description $$\nabla \cdot \vec u = 0$$
+		Description \latex_( $$\frac{\partial T}{\partial t} + \vec u \cdot \nabla T = \nabla \cdot a_1 (\nabla T)$$ \latex_)
+		Description "Initial condition:"
+		Description $$ \vec u (t=0)=(0,0,0)^T  $$
+		Description \latex_( $$ T(t=0, z)=f_0[1-\cos(\pi(z-0.5))]$$ \latex_)
+		Description "Boundary condition:"
+		Description \latex_( $$ \left.\vec{u}\right|_{\partial \Omega} = 0 $$ \latex_)
+		Description \latex_( $$ \left. a \frac{\partial T}{\partial \vec n}\right|_{\partial \Omega} =0$$ \latex_)
+		Description "Turbulence Model:"
+		Description \latex_( $$\nu_1 = \nu + \nu_t$$ \latex_)
+		Description \latex_( $$a_1 = a + \frac{\nu_t}{Pr_t} $$ \latex_)
+		Description \latex_( $$\nu_t = (\kappa \cdot l)^2 \cdot ||\vec \nabla \vec u||$$ \latex_)
+		Description "The mixing length $l$ is calculated from the distance to the wall \latex_( $d_{wall}$ \latex_) and an upper bound \latex_( $d_{max}$ \latex_). For wall distances beyond \latex_( $d_{max}$ \latex_), the mixing length decreases exponentially:"
+		Description \latex_( $$ \begin{array}{ll} \mbox{for } d_{wall}<d_{max}, & l=d_{wall},\\ \mbox{for }d_{wall}>d_{max}, & l=d_{max}\cdot e^{\left[-2\frac{d_{wall}-d_{max}}{d_{max}}\right]}. \end{array}   $$ \latex_)
+		Description "The exact solution of the problem for the velocity is for all times: $\vec u (t) = (0, 0, 0)^T$. The temperature is a function of $z$ and time. For times $t \rightarrow \infty$, the temperature approaches the spatial mean value of the initial temperature $(T(t \rightarrow \infty)=1)$."
+
+	}
+
+
+}
+
+Chapter {
+	Title "Pressure discretization P0+P1+Pa"
+	
+	Visu {
+		Title "Stokes Equation with Source Term"
+		Description "A transient of 1000 seconds has been calculated to give the spurious velocity modes the time to develop. The spurious velocity which is in an order of 4.e-9 m/s is shown below. It is important to note that adding the convection term $\vec u \cdot \vec \nabla \vec u $ to the Stokes equations does not change the steady state solution. The spurious velocity of the steady state solution of the Navier-Stokes equations is also in an order of 4.e-9 m/s."
+		Width 8cm
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+     		vector diffusion.lata dom_dual VITESSE FACES 
+		zoom3D 0 0 0.75
+	}
+	Figure {
+		Description " The calculated reduced pressure \latex_( $  \frac{p}{\rho} - g z $ \latex_) is compared to the analytical solution. This comparison of the pressure course at 1000s is shown in the next figure."
+		Title_figure "Axial pressure profile after 100s"
+		labelx Hight (m)
+		labely p/rho (Pa.m^3/kg)
+		Width 11cm
+		Include_Description_Curves 0
+
+		legend bottom
+		
+		Curve {
+			segment  diffusion.data segme_pres 
+			legend Discretization P0+P1+Pa
+			style lines
+			}
+		Curve {
+			fonction x-sin(pi*(x-0.5))/pi-0.12
+			legend Analytical solution
+			style lines
+			}
+		}
+
+
+
+
+	Visu {
+		Title "Navier-Stokes Equations with Temperature Transport : Meshing"
+		Description "A transient of 15000 seconds has been calculated. Here is the meshing at the instant 1000s. "
+		Width 8cm
+		zoom3D 0 0 0.75
+		mesh ./convection_diffusion.lata dom
+	        normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+	}
+	Visu {
+		Title "Navier-Stokes Equations with Temperature Transport : Velocity vectors"
+		Description "Here is the velocity vectors at the instant 1000s. It must be as small as possible."
+		Width 8cm
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 1
+     		vector convection_diffusion.lata dom_dual VITESSE FACES 
+		zoom3D 0 0 0.75		
+	}
+	Visu {
+		Title "Navier-Stokes Equations with Temperature Transport : Temperature "
+		Description "Here is the temperature at the instant 1000s."
+		Width 8cm
+	       	normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		zoom3D 0 0 0.75
+		cycles 1
+		pseudocolor  ./convection_diffusion.lata dom_dual TEMPERATURE FACES
+	}	
+	Visu {
+		Title "Navier-Stokes Equations with Temperature Transport : Reduced pressure "
+		Description "Here is reduced pressure \latex_( $  \frac{p}{\rho} - g z $ \latex_) at the instant 1000s. It must be as small as possible. "
+		Width 8cm
+		zoom3D 0 0 0.75
+	       	normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 1
+		pseudocolor  ./convection_diffusion.lata dom PRESSION ELEM
+	}
+	Figure {
+		Description "As a reference, a calculation of pure conduction has been performed. The solution of this calculation should be reproduced correctly by the Navier-Stokes equations provided that the spurious velocity modes are small. For four points along the centre line in the elevations z=-0.3m, -0.1m, 0.1m and 0.3m the temporal course of the temperature is shown in the next figure. The temperature distribution at the beginning of the transient is also added to the Figure and the points for the comparison are shown."
+		Title_figure "Temperature at four elevations along the center line"	
+		labelx Time (s)
+		labely Temperature (C)
+		Width 11cm
+		Include_Description_Curves 0
+		legend top
+		Curve {
+			file convection_diffusion_SONDE_TEMP.son
+			Columns $1 $2
+			legend NS at z=-0.3m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_SONDE_TEMP.son
+			Columns $1 $3
+			legend NS at z=-0.1m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_SONDE_TEMP.son
+			Columns $1 $4
+			legend NS at z= 0.1m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_SONDE_TEMP.son
+			Columns $1 $5
+			legend NS at z= 0.3m
+			style lines
+			}
+		Curve {
+			file conduction_SONDE_TEMP.son
+			Columns $1 $2
+			legend Conduction at z=-0.3m
+			style lines
+			}
+		Curve {
+			file conduction_SONDE_TEMP.son
+			Columns $1 $3
+			legend Conduction at z=-0.1m
+			style lines
+			}
+		Curve {
+			file conduction_SONDE_TEMP.son
+			Columns $1 $4
+			legend Conduction at z= 0.1m
+			style lines
+			}
+		Curve {
+			file conduction_SONDE_TEMP.son
+			Columns $1 $5
+			legend Conduction at z= 0.3m
+			style lines
+			}
+	}
+	
+
+
+	Visu {
+		Title "Turbulent Navier-Stokes Equations with Temperature Transport : Velocity vectors"
+		Description "A transient of 15000 seconds has been calculated. At the instant 1000s the velocity vectors are given in the next figure. It must be as small as possible."
+		Width 8cm
+		zoom3D 0 0 0.75
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 1
+     		vector convection_diffusion_turbulent.lata dom_dual VITESSE FACES 
+	}
+	Visu {
+		Title "Turbulent Navier-Stokes Equations with Temperature Transport : Temperature"
+		Description "Here is the temperature at the instant 1000s."
+		Width 8cm
+		zoom3D 0 0 0.75
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 1
+     		pseudocolor  ./convection_diffusion_turbulent.lata dom_dual TEMPERATURE FACES 
+	}
+	Visu {
+		Title "Turbulent Navier-Stokes Equations with Temperature Transport : Reduced pressure"
+		Description "Here is the reduced pressure \latex_( $  \frac{p}{\rho} - g z $ \latex_) at the instant 1000s. It must be as small as possible."
+		Width 8cm
+		zoom3D 0 0 0.75
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 1
+     		pseudocolor  ./convection_diffusion_turbulent.lata dom PRESSION ELEM
+	}
+	Visu {
+		Title "Turbulent Navier-Stokes Equations with Temperature Transport : Turbulent viscosity and the meshing"
+		Description "Here is the turbulent viscosity and the meshing at the instant 1000s. It must be as small as possible."
+		Width 8cm
+		zoom3D 0 0 0.75
+		cycles 1
+		mesh ./convection_diffusion_turbulent.lata dom
+     		pseudocolor  ./convection_diffusion_turbulent.lata dom VISCOSITE_TURBULENTE ELEM
+		operator_to_all slice2D_z  0. 0. 0.
+	}
+
+	
+	Visu {
+		Description "As a reference, a calculation of pure conduction has been performed. The solution of this calculation should be reproduced correctly by the turbulent Navier-Stokes equations provided that the spurious velocity modes are small. For four points along the centre line in the elevations z=-0.3m, -0.1m, 0.1m and 0.3m the temporal course of the temperature is shown in the next figure. The temperature distribution at the beginning of the transient is also shown."
+		Width 8cm
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 0
+     		pseudocolor  ./convection_diffusion_turbulent.lata dom_dual TEMPERATURE FACES 
+		zoom3D 0 0 0.75
+	}
+	Figure {
+		Title_figure "Temporal course of the temperature at four elevations along the center line"
+		labelx Time (s)
+		labely Temperature (C)
+		Width 11cm
+		Include_Description_Curves 0
+		legend top
+		Curve {
+			file convection_diffusion_turbulent_SONDE_TEMP.son
+			Columns $1 $2
+			legend NS at z=-0.3m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_turbulent_SONDE_TEMP.son
+			Columns $1 $3
+			legend NS at z=-0.1m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_turbulent_SONDE_TEMP.son
+			Columns $1 $4
+			legend NS at z= 0.1m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_turbulent_SONDE_TEMP.son
+			Columns $1 $5
+			legend NS at z= 0.3m
+			style lines
+			}
+		Curve {
+			file conduction_turbulent_SONDE_TEMP.son
+			Columns $1 $2
+			legend Conduction at z=-0.3m
+			style lines
+			}
+		Curve {
+			file conduction_turbulent_SONDE_TEMP.son
+			Columns $1 $3
+			legend Conduction at z=-0.1m
+			style lines
+			}
+		Curve {
+			file conduction_turbulent_SONDE_TEMP.son
+			Columns $1 $4
+			legend Conduction at z= 0.1m
+			style lines
+			}
+		Curve {
+			file conduction_turbulent_SONDE_TEMP.son
+			Columns $1 $5
+			legend Conduction at z= 0.3m
+			style lines
+			}
+	}
+}
+
+Chapter {
+	Title "Pressure discretization P0+P1"
+	Visu {
+		Title "Stokes Equation with Source Term"
+		Description "A transient of 100 seconds has been calculated to give the spurious velocity modes the time to develop. The spurious velocity is shown here, it is in an order of 5.e-1 m/s. It must be as small as possible."
+		Width 8cm
+		zoom3D 0 0 0.75
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 10
+     		vector diffusion_P0_P1.lata dom_dual VITESSE FACES 
+	}
+	Figure {
+		Description "The comparison of the reduced pressure \latex_( $  \frac{p}{\rho} - g z $ \latex_) course at 100s to the analytical solution is shown in the figure below."
+		Title_figure "Axial pressure profile after 100s"
+		labelx Hight (m)
+		labely p/rho (Pa.m^3/kg)
+		Width 11cm
+		Include_Description_Curves 0
+		legend bottom
+		Curve {
+			segment  diffusion_P0_P1.data segme_pres 100
+			legend Discretization P0+P1
+			style lines
+			}
+		Curve {
+			fonction x-sin(pi*(x-0.5))/pi-0.12
+			legend Analytical solution
+			style lines
+			}
+		}
+	
+	Visu {
+		Title "Navier-Stokes Equations with Temperature Transport"
+		Description "As a reference, a calculation of pure conduction has been performed. The solution of this calculation should be reproduced correctly by the turbulent Navier-Stokes equations provided that the spurious velocity modes are small. For four points along the centre line in the elevations z=-0.3m, -0.1m, 0.1m and 0.3m the temporal course of the temperature is shown in the figure below. The temperature distribution at the beginning of the transient is also shown."
+		Width 8cm
+		normal3D -0.5 0.8 0.3
+		up3D 0.2 -0.3 0.9
+		cycles 0
+     		pseudocolor  ./convection_diffusion_P0_P1.lata dom_dual TEMPERATURE FACES 
+		zoom3D 0 0 0.75
+	}
+	Figure {
+		Title_figure "Temporal course of the temperature at four elevations along the center line"
+		labelx Time (s)
+		labely Temperature (C)
+		Width 11cm
+		Include_Description_Curves 0
+		legend top
+		Curve {
+			file convection_diffusion_P0_P1_SONDE_TEMP.son
+			Columns $1 $2
+			legend NS at z=-0.3m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_P0_P1_SONDE_TEMP.son
+			Columns $1 $3
+			legend NS at z=-0.1m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_P0_P1_SONDE_TEMP.son
+			Columns $1 $4
+			legend NS at z= 0.1m
+			style lines
+			}
+		Curve {
+			file convection_diffusion_P0_P1_SONDE_TEMP.son
+			Columns $1 $5
+			legend NS at z= 0.3m
+			style lines
+			}
+		Curve {
+			file conduction_P0_P1_SONDE_TEMP.son
+			Columns $1 $2
+			legend Conduction at z=-0.3m
+			style lines
+			}
+		Curve {
+			file conduction_P0_P1_SONDE_TEMP.son
+			Columns $1 $3
+			legend Conduction at z=-0.1m
+			style lines
+			}
+		Curve {
+			file conduction_P0_P1_SONDE_TEMP.son
+			Columns $1 $4
+			legend Conduction at z= 0.1m
+			style lines
+		}
+		Curve {
+			file conduction_P0_P1_SONDE_TEMP.son
+			Columns $1 $5
+			legend Conduction at z= 0.3m
+			style lines
+			}
+	}
+}
+
+Chapter {
+	Title "Computer performance"
+	Tableau_performance {
+	}
+}
+
+
+

@@ -1,0 +1,62 @@
+# Tasks:
+a) Read/build the mesh
+b) Partition the mesh
+c) Create a periodic box
+# 
+
+# Dimension #
+dimension 3
+
+# Geometric tolerance #
+PrecisionGeom 1.e-5
+
+# Define the domain and read the Tgrid mesh (~460000 cells) #
+domaine dom
+lire_tgrid dom Tube_coude_463259.msh
+
+# Switch the length units from mm to m #
+Dilate dom 0.001
+
+# Apply a transformation (mirror according to Z axis) #
+Transformer dom x y -z
+
+# Partition the domain #
+Partition dom
+{
+	partitionneur metis { nb_parts 6 }	# 6 parts for a 6 cores parallel calculation (rule of thumb: elements per part>20000) #
+   	larg_joint 2				# Joint width #
+   	Nom_Zones dom				# Name of the partitioned mesh .Zones files #
+}
+
+# Define the box #
+# and fill it with the extracted boundary inlet from the 3D domain #
+domaine box
+ExtrudeBord { 
+	domaine_init dom
+	direction 0 -0.01 0
+	domaine_final box
+	nom_bord inlet 
+	nb_tranches 2
+}
+
+
+# The box has by default "devant" and "derriere" boundaries on the top and bottom end #
+# Merge the box boundaries "devant" and "derriere" in a boundary named "perio" #
+RegroupeBord box perio { devant derriere }
+
+# Check the boundary is periodic and fix otherwise #
+Corriger_frontiere_periodique { domaine box bord perio } 
+
+# Partition the box #
+Partition box
+{
+	partitionneur metis { nb_parts 2 } nb_parts_tot 6	# Divided in 2 parts (rule of thumb: elements per part>20000) and will run for 2-6 cores parallel calculation #			
+   	larg_joint 2						# Joint width #
+   	Nom_Zones box						# Name of the partitioned mesh .Zones files #
+	periodique 1 perio					# Partition should care about the periodic boundary #
+}
+
+# Post process the box in a box.lata file #
+Postraiter_domaine { domaine box fichier box.lata format lata }
+# Post process the domain in a dom.lata file #
+Postraiter_domaine { domaine dom fichier dom.lata format lata }

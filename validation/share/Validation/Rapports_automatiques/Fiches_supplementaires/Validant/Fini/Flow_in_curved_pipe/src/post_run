@@ -1,0 +1,188 @@
+#!/bin/sh
+
+jdd1=box
+jdd2=tube_coude
+
+
+#Recuperation des donnees necessaires dans jdd
+#---------------------------------------------
+rho=`grep "rho" $jdd2.data| awk '{print $4}' | head -1`
+#recuperation de la valeur de la vitesse axiale par laquelle sont adimensionnalisees les donnnes
+#W0=`grep "vitesse Champ_Uniforme" $jdd1.data| awk '{print $7}'`
+# Pb : ou est place le fichier box.data???
+W0=10.4 
+
+# recuperation "en dur" des parametres geometriques du tube
+#-----------------------------------------------------------
+D=0.0762 # diametre tube en m
+Ra=0.03810 # Ra=D/2 
+Rmed=0.4953 # Rayon median courbure
+#################################################################
+###### Calcul des donnees relatives au champ de PRESSION ########
+#################################################################
+#principe : on decouple le calcul des coordonnes curvilignes qui se fait en DUR de la recuperation des mesures qui se fait automatiquement
+
+# calcul des abcisses curvilignes s/D 
+# le calcul ne peut etre automatise car dans le jdd on utilise des coordonnees cartesienne : on perd donc l'info sur l'angle traite  
+# pour y<0 et x<0 : s=y ( en amont de de la courbure )
+# pour y>0 et x>0 : s=y + Ltot_courbure (en aval de la courbure)
+# pour y<0 et x>0 : s=theta*R=theta*6.5D ( dans la partie courbe )
+# dans la partie courbe : longueur totale : Ltot_courbure=pi*6.5D=20.42D 
+  echo "#curv"  > tmp.txt  #coord_Y / rayon ou teta (rad)*Rmed/D
+#----------------------------------------------------------------  
+  echo "-2."  >> tmp.txt       #S/D=-2  
+  echo "-1.5"  >> tmp.txt       #S/D=-1.5
+  echo "-1" >> tmp.txt          #S/D=-1
+  echo "-0.5"  >> tmp.txt       #S/D=-0.5
+  echo "2.55" >> tmp.txt        #theta=pi/8
+  echo "5.11"  >> tmp.txt       #theta=2"pi/8
+  echo "7.66" >> tmp.txt        #theta=3pi/8
+  echo "12.76"  >> tmp.txt      #theta=5pi/8
+  echo "15.32"  >> tmp.txt      #theta=6pi/8
+  echo "17.87"  >> tmp.txt      #theta=7pi/8
+  echo "20.92"  >> tmp.txt      #S/D=+0.5   20.42+abcisse
+  echo "21.42" >> tmp.txt       #S/D=+1.
+  echo "21.92"  >> tmp.txt      #S/D=+1.5
+  echo "24.42"  >> tmp.txt      #S/D=+4
+  echo "26.42" >> tmp.txt       #S/D=+6
+  echo "29.42"  >> tmp.txt      #S/D=+9
+  echo "31.42"  >> tmp.txt      #S/D=+11
+ #----------------------------------------------------------------   
+# pour les sondes SEGMENTS, nous sommes obliges de traiter le fichier de maniere a recuperer les points de mesures uniquement pour le temps final
+# on peut ainsi tracer directement l'evolution spatiale des sondes pour la paroi INTERNE et pour la paroi EXTERNE du tube
+for fichier in `ls tube_coude_PRESSION_PAROI_*.son`
+do
+  extension=`echo ${fichier%.son} |awk -F "tube_coude_" '{print $NF}'`
+  echo $extension > $extension"_triou.txt" 
+  colonne=`tail -1 $fichier  | awk '{print 'NF-2'}'`  #  caracterise le nombre d'iterations
+  #on reprend toutes les colonnes SAUF la premiere qui indique le temps
+  for j in `seq 0 $colonne`
+  do 
+    tmp2=`echo $j | awk '{print $j+2}'`
+    #recuperation de la valeur de la pression
+    # ATTENTION : on utilise le champ PRESSION_PA (donc deja adimensionnalise)
+    pression=`tail -1 $fichier | awk '{print $'$tmp2'}'` 
+    #on ne compare pas directement la pression mais la variable :  (P-P0)/(0.5*rho*W0*W0)
+    # Comme on ne connait pas P0 (valeur expe en S=-18D), la constante d'ajustement (P0/0.5W0*W0*rho) est deduite de l'ecart entre courbe expe et resultats
+    P_adim=1.59
+    pression_adim=`echo $pression $W0 $P_adim $rho | awk '{print $1/(0.5*$2*$2*$4)-$3}'`   
+    echo $pression_adim >> $extension"_triou.txt" 
+    j=j+1
+  done
+done
+paste tmp.txt PRESSION_PAROI_INTERNE_triou.txt PRESSION_PAROI_EXTERNE_triou.txt > PRESSION_ALL_PAROI_triou.txt
+  
+  
+  
+#################################################################
+######     Traitement des sondes de VITESSE : W et V    ###############
+###### evolution temporelle => evolution spatiale ###############
+#################################################################  
+#on recupere tous les points de la sonde SEGMENT associes au temps final
+#traitement des sondes associees au plan HORIZONTAL AA et vertical BB
+##--------------------------------------------------------------
+#on commence par recuperer la position des sondes dans le plan XYZ
+for fichier in `ls tube_coude_SONDE_VITESSE*.son`
+do
+ extension=`echo ${fichier%.son} |awk -F "SONDE_" '{print $NF}'`
+ colonne=`tail -1 $fichier  | awk '{print 'NF-2'}'`  #  21 points 20 iterationS
+ echo "#coordonnes""X" "Y" "Z"  "valeur champ"> $extension"_triou.txt" 
+ for j in `seq 0 $colonne`
+ do 
+######recuperation des coordonnees X
+  tmp1=`echo $j | awk '{print $j*6+4}'`  
+  tmp1bis=`echo $tmp1 | awk '{print $1+2}'`
+  tmp1ter=`echo $tmp1 | awk '{print $1+4}'`
+  coord_X=`head -2 $fichier  | awk '{print($'$tmp1')}'`
+  coord_Y=`head -2 $fichier  | awk '{print($'$tmp1bis')}'`
+  coord_Z=`head -2 $fichier  | awk '{print($'$tmp1ter')}'`
+  tmp2=`echo $j | awk '{print $j+2}'`
+  #recuperation de la valeur de la vitesse
+  vit_W=`tail -1 $fichier | awk '{print $'$tmp2'}'` 
+  # pour la comparaison des resultats,
+  # attention : on utilise la variable vitesse adimensionnalisee par W0=10.4
+  vit_W_adim=`echo $vit_W $W0 | awk '{print $1/$2}'`  
+  # case 1 : vitesse localisee en S/D dans le plan AA
+  if [[ `echo "$extension" | grep "SD"` != "" ]] && [[ `echo "$extension" | grep "AA"` != "" ]]  
+  then
+     # on recupere l'abcisse en X, et on l'adimensionalise telle que : 
+     #  si X<0 : coord_X_adim = (Rmed+x)/a d'ou si X<0   => -1 < X < 1
+     # si X>0 : coord_X_adim = (Rmed-x)/a d'ou si X<0   => -1 < X < 1
+     if [[ `echo "$extension" | grep "SDM"` != "" ]]  # si X<0
+     then
+        coord_X_adim=`echo $coord_X $Rmed $Ra | awk '{print ($1+$2)/$3}'` 
+        echo $coord_X_adim"   "$coord_Y"   "$coord_Z"  "$vit_W_adim >> $extension"_triou.txt"
+     else   # si X>0
+     	coord_X_adim=`echo $coord_X $Rmed $Ra | awk '{print ($2-$1)/$3}'` 
+        echo $coord_X_adim"   "$coord_Y"   "$coord_Z"  "$vit_W_adim >> $extension"_triou.txt"
+     fi
+  # case 2 : vitesse localisee en theta dans le plan AA    
+  # on commence par calculer le rayon r=\sqrt{x^2+y^2}  => r tjs >0
+  # on calcul ensuite variable espace adimensionnee : (Rmed-r)/a
+  elif [[ `echo "$extension" | grep "TETA"` != "" ]] && [[ `echo "$extension" | grep "AA"` != "" ]]
+  then    
+  #coord=`echo $coord_X $coord_Y $Rmed | awk '{if ($1<0) print ($3-sqrt($1*$1+$2*$2)); if ($1>0) print (sqrt($1*$1+$2*$2)-$3)}'`
+  coord=`echo $coord_X $coord_Y $Rmed | awk '{ print ($3-sqrt($1*$1+$2*$2))}'`
+  coord_adim=`echo $coord $Ra | awk '{print $1/$2}'` 
+  echo $coord_X"   "$coord_Y"   "$coord_Z"  "$coord_adim" "$vit_W_adim >> $extension"_triou.txt"  
+  # case 3 : vitesse localisee dans le plan BB : en S/D ou theta, on applique le meme traitement
+  #  on recupere la coordonnee en z et on la divise par le rayon   
+  elif [[ `echo "$extension" | grep "BB"` != "" ]] 
+  then
+     coord_Z_adim=`echo $coord_Z $Ra | awk '{print $1/$2}'`  
+     echo $coord_X"   "$coord_Y"   "$coord_Z_adim"  "$vit_W_adim >> $extension"_triou.txt"  
+  else 
+     echo "probleme dans le traitement des donnees"   
+  fi   
+  j=j+1
+  done
+done
+
+
+  
+  
+#####################################################################################
+######     Traitement des sondes de VITESSE relatives au frottement: U_STAR #########
+###### evolution temporelle => evolution spatiale                     ###############
+#####################################################################################  
+# pour le traitement de U_star : tout comme pour les vitesses, on recupere la position des sondes.
+#----------------------------------------------------------------------------------------------------
+# Pb : quand le point de la sonde est hors de la paroi : le champs est nul
+# on double le nombre de points necessaire a la comparaison expe/calcul : 1 point tous les 5 degres plutot que tous les 10 degres
+# MAIS on supprime ensuite les valeurs nulles rencontrees quand le champ n'est pas interpole exactement a la paroi.
+#----------------------------------------------------------------------------------------------------
+# Pour finir, comme on ne cherche par a caracteriser la vitesse de forttement a la paroi MAIS le coefficient de frottement associe
+# on calcul donc le frottement par la formule : 
+##   Cf= 2 (U_star)^2/W0^2
+#----------------------------------------------------------------------------------------------------
+for fichier in `ls tube_coude_SONDE_U_STAR*.son`
+do
+ extension=`echo ${fichier%.son} |awk -F "SONDE_" '{print $NF}'`
+ iter=`tail -1 $fichier  | awk '{print 'NF-2'}'`  #  21 points 20 iterationS
+ echo "#angle"  "valeur champ"> $extension"_triou.txt" 
+ for j in `seq 0 $iter`
+ do 
+    degree=`echo $j | awk '{print $1*5.}'`  
+    tmp2=`echo $j | awk '{print $j+2}'`
+    #recuperation de la valeur de la vitesse radiale
+    vit=`tail -1 $fichier | awk '{print $'$tmp2'}'` 
+    val_null=`echo $vit | awk '{if ($1<=0) print 0; else print 1}'`
+    # on enleve toutes les valeurs multipliees par un exposant inferieur a 1e-10
+    if [[ `echo "$vit" | grep "e-1"` != "" ]]
+    then
+       echo " # " $degree"  "$vit >> $extension"_triou.txt"
+    # on enleve tous les zeros <=> le champ est interpole hors de la paroi  
+    elif [ $val_null != 1 ] 
+    then
+       echo " # " $degree"  "$vit >> $extension"_triou.txt"
+    else
+       Cf=`echo $vit $W0 | awk '{print (2.*$1*$1)/($2*$2)}'`
+       echo $degree"  "$vit "  " $Cf >> $extension"_triou.txt"
+    fi    
+    j=j+1 
+ done
+done
+
+
+
+

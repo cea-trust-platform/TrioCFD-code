@@ -1,0 +1,316 @@
+Parameters {
+	Title " Nusselt_Correlation_Coupling_Pb "
+#
+	Description " Coupling between a 1D flow using Nusselt number correlations at walls and a conduction problem " 
+#
+	VersionTrio_U "1.6.1"
+#
+	ParametersTrio_U Type of problem: thermal hydraulic
+	ParametersTrio_U Type of flow: 1D flow using a Nusselt number correlation, coupled to a conduction problem ; forced convection 
+	ParametersTrio_U Time scheme: Euler_Explicite
+	ParametersTrio_U Temperature convection scheme: Amont
+	ParametersTrio_U Momentum convection scheme: None
+	ParametersTrio_U Discretization: VDF and VEFP1B
+	ParametersTrio_U Turbulence model: none (In fact, we must use a Smagorinsky model with Cs=1.e-9 in order to be able to test the wall function 'Nusselt Correlation' with Trio_U ; with laminar problems, it is not possible to use a wall function)
+	ParametersTrio_U Boundary condition type: symmetry, coupling boudary conditions
+	ParametersTrio_U Type of fluid: helium
+	ParametersTrio_U Solving of equation: 
+	ParametersTrio_U - Equation Navier_Stokes_Turbulent (but with \latex_($\nu_{t}=0$ and $u_{\tau}=0$\latex_))
+	ParametersTrio_U - Convection_Diffusion_Temperature_Turbulent (with \latex_($\alpha_{t}=0$\latex_) and Nusselt correlations at the walls)
+	ParametersTrio_U - Conduction in solid 
+#
+	TestCase VDF test \*
+	TestCase VEF test
+#
+	Author "E.MOREAU (V.BARTHEL)"
+	IncludeData 2
+}
+##################################################
+###
+### test 1
+###
+Chapter {
+	Title "Description of the tests"
+	Description " $\bullet$ 3D hydraulic problem "
+	Description " $\bullet$ Dimension: 3D rectangular cavity (fluid: 0.1x4.75e-3x0.01 ; solid: 2x(0.1x0.01x0.1)) "
+	Description " $\bullet$ Volumic thermal power in Solid : Pvol = 1E9 W.m-3 "
+	Description " $\bullet$ Initial conditions: Velocity in $z$ direction of -30 m/s ; Temperature = 751 K "
+	Description " $\bullet$ Hydraulic boundary condition "
+	Description " Inlet: entree frontiere_ouverte_vitesse_imposee champ_front_uniforme 3  0. 0. -30 "
+	Description " Outlet: sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1  0 "
+	Description " Walls fluid/solid: interface symmetry "
+	Description " External walls: paroi symmetry "
+	Description " $\bullet$ Thermal boundary condition "
+	Description " Inlet: entree frontiere_ouverte_temperature_imposee champ_front_uniforme 1 751 "
+	Description " Outlet: sortie frontiere_ouverte T_ext  champ_front_uniforme 1 1200 "
+	Description " Walls fluid/solid (VDF): interface paroi_echange_contact_vdf pb_solide interface temperature 1.e9 "
+	Description " Walls fluid/solid (VEF): interface Paroi_contact pb_solide interface "
+	Description " External walls: paroi symetrie "
+	Description " $\bullet$ Wall function: Turbulence_paroi Loi_Paroi_Nu_Impose { nusselt 0.023*Re 0.8*Pr (1./3.) diam_hydr champ_uniforme 1 9.5e-3 }, known as the 'Colburn' correlation. "
+	Description " Solid (VDF): Adiabatic walls and 'interface paroi_echange_contact_vdf pb_solide interface temperature 1.e9' for the interface between solid and fluid. "
+	Description " Solid (VEF): Adiabatic walls and 'interface Paroi_contact pbf interface' for the interface between solid and fluid. "
+	Description " "
+	Description " \latex_(\underline{Validation with:}\latex_) analytical results "
+	Description " "
+	Description " \latex_(\underline{Validated model:}\latex_) wall functions: heat exchange correlations "
+#
+	Figure {
+		Title " General overview of the test "
+		Width 12cm
+		picture geometry.png
+	}
+	visu {
+		Title " VDF Solid mesh visualization "
+		Description " Number of elements: 500 (10x5x10) for each solid part "
+		Width 10cm, viewport= 0 0 1524 1324,clip
+		mesh VDF/test.lata dom_pb1
+		normal3D -0.965322 0.147857 0.215153
+		up3D 0.215607 -0.01311424 0.976392
+		operator no_axes
+	}
+	visu {
+		Title " VDF Fluid mesh visualization "
+		Description " Number of elements: 100 (10x1x10) "
+		Width 10cm, viewport= 0 0 1524 1324,clip
+		mesh VDF/test.lata dom_pb2
+		normal3D -0.909914 0.197518 0.36475
+		up3D 0.4122 0.002375 0.741928
+		operator no_axes
+	}
+#
+	visu {
+		Title " VEF Solid mesh visualization "
+		Description " Number of elements: 14400 (6x(6x5x12)) for each solid part "
+		Width 10cm, viewport= 0 0 1524 1324,clip
+		mesh VEF/test.lata dom_pb1
+		normal3D -0.909914 0.197518 0.36475
+		up3D 0.4122 0.002375 0.741928
+		operator no_axes
+	}
+	visu {
+		Title " VEF Fluid mesh visualization "
+		Description " Number of elements: 316 (6x(6x1x6) "
+		Width 10cm, viewport= 0 0 1524 1324,clip
+		mesh VEF/test.lata dom_pb2
+		normal3D -0.909914 0.197518 0.36475
+		up3D 0.4122 0.002375 0.741928
+		operator no_axes
+	}
+#
+# properties Geometry
+	Table {
+			Title "Fluid physical properties "
+			Description " The properties correspond to Helium under high temperature an high pressure (750 K and 70 bars). "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($2)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($3)
+			}
+			line {
+			      	legend " Cp (J/kg/K) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($4)
+			}
+			line {
+			      	legend " $\mu$ (kg.m.s) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($1)
+			}
+			line {
+			      	legend " $\beta$ (1/K) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($5)
+			}
+	}
+#
+	Table {
+			Title "Solid physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($6)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($7)
+			}
+			line {
+			      	legend " Cp (J/kg/K) "
+				file VDF/propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($8)
+			}
+	}
+#
+}
+#####
+#####
+Chapter {
+	Title " Results "
+	Description " VDF transitory calculation time: convergence is obtained after 26069 time steps (1.474 seconds) "
+	Description " VEF transitory calculation time: convergence is obtained after 2794906 time steps (4.693 seconds) "
+	Description " "
+	Description " In this study, we focus on the exchange coefficient $h$ between the center of the channel and the wall, that can be deduced from the values of the non-dimensional numbers Pr, Re and Nu (via the Colburn correlation): "
+	Description " \latex_($$\textrm{Pr} = \frac{\nu\;\rho\;\textrm{Cp}}{\lambda}$$\latex_) "
+	Description " \latex_($$\textrm{Re} = \frac{u\; D}{\nu}$$\latex_) "
+	Description " \latex_( $$\textrm{Nu}=0.023\textrm{Re}^{0.8}\textrm{Pr}^{0.33} $$\latex_) "
+	Description " \latex_( $$h(\textrm{W/K/m}^{-2}) = \frac{\textrm{Nu}\;\lambda}{D}\  $$\latex_) "
+	Description "  "
+	Table {
+			Title " Non-dimensional number values  and exchange coefficient "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      legend " Prandtl number "
+				file VDF/nh.dat
+				nb_columns_file 4
+				columns ($1)
+			}
+			line {
+			      legend " Reynolds number "
+				file VDF/nh.dat
+				nb_columns_file 4
+				columns ($2)
+			}
+			line {
+			      legend " Nusselt number "
+				file VDF/nh.dat
+				nb_columns_file 4
+				columns ($3)
+			}
+			line {
+			      legend " Exchange coefficient "
+				file VDF/nh.dat
+				nb_columns_file 4
+				columns ($4)
+			}
+	}
+#
+	Description "  "
+	Description "  The validation of the test is then made over three main quantities: "
+	Description "  "
+	Description "  (1) At convergence, the totality of the thermal power released in the solid domain is transmitted to the fluid. Indeed, we can read in the .out file, at the end of the simulation that the thermal flux at the interface between the solid and the fluid is 20000 W. This value corresponds to the thermal power released on the whole volume : PvolxVolume(solid) = 20000 W "
+	Description "  "
+	Description "  (2) Estimation of \latex_($T_{\textrm{outlet}} - T_{\textrm{inlet}}$\latex_): the energy conservation in the fluid gives the theoretical value of this quantity "
+	Description " \latex_($T_{\textrm{outlet}} - T_{\textrm{inlet}}$\latex_) = PvolxVolume(solid)/($\rho$USCp) = 61.42 K, in such a way that "
+	Description " \latex_( $$ T_{\textrm{outlet}} = 751 + 61.42 = 812.42 K $$\latex_) "
+	Description "  "
+	Description "  (3) Verification of the Nusselt correlation: In order to verify the use of the wall correlation, we want to compare the theoretical value to the one obtained by Trio_ U. For that, we consider the fluid and solid meshes at outlet and the following notations (see figure below): "
+	Figure {
+		Title " "
+		Width 12cm
+		picture i1.png
+	}
+	Description " The heat exchange coefficient can be deduced from the relation : "
+	Description " \latex_( $$ h = \frac{1}{\frac{(T_{s}-T_{f})S}{\phi}-\frac{ds}{\lambda_{s}}} $$\latex_) "
+	Description " where $\phi$ is the diffusive thermal flux (Watt) at the wall for the corresponding mesh (given by Trio_U)."
+	Table {
+			Title "The Trio_U simulations give the following results "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+				legend " Thermal Power released (W): theoretical "
+				values 20000
+			}
+			line {
+			      legend " Thermal Power released (W): VDF "
+				file VDF/test_pb_solide_Diffusion_chaleur.out
+				nb_columns_file 4
+				last_line	
+				columns (abs($4))
+			}
+			line {
+			      legend " Thermal Power released (W): VEF "
+				file VEF/test_pb_solide_Diffusion_chaleur.out
+				nb_columns_file 4
+				last_line	
+				columns (abs($4))
+			}
+#
+			line {
+			      	legend " Outlet temperature (K): theoretical "
+				values 812.42
+			}
+			line {
+			      	legend " Outlet temperature (K): VDF "
+				file VDF/test_SONDE_HE_T_SORTIE.son
+				nb_columns_file 2
+				last_line	
+				columns ($2)
+			}
+			line {
+			      	legend " Outlet temperature (K): VEF "
+				file VEF/test_SONDE_HE_T_SORTIE.son
+				nb_columns_file 2
+				last_line	
+				columns ($2)
+			}
+#
+			line {
+			      	legend " Heat exchange coefficient (W/k/m-2): theoretical "
+				file VDF/nh.dat
+				nb_columns_file 4
+				last_line	
+				columns ($4)
+			}
+			line {
+			      	legend " Heat exchange coefficient (W/k/m-2): VDF "
+				file VDF/h.dat
+				nb_columns_file 2
+				last_line	
+				columns ($2)
+			}
+			line {
+			      	legend " Heat exchange coefficient (W/k/m-2): VEF "
+				file VEF/h.dat
+				nb_columns_file 2
+				last_line	
+				columns ($2)
+			}
+#
+	}
+#
+}
+#################
+#####
+Chapter {
+	Title "Comments and Conclusion"
+	Description " - In VDF discretization, the thermal power, the outlet temperature and the heat exchange coefficient are in very good agreement with the theory. "
+	Description " In VEF discretization, the thermal power gives the theoretical value. The other value are egally in good agreement with the theory with error less than 2%. The VEF results are very near to the analytic ones. The differences are due to the fact that the temperature values taken for the post-treatment are not exactly those calculated on the nodes (face of the cell) but the interpolated ones. "
+
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description " It is recommended to use the VDF discretization. "
+}
+###
+
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+
+
+

@@ -1,0 +1,25 @@
+mkdir -p VDF_Quick VEF_muscl VEF_EFstab
+
+#cp ../src/* .
+
+cd VDF_Quick
+cp ../test_Pb1_2D.geom .
+cp ../test_VDF.data .
+cd ..
+
+cd VEF_muscl
+gunzip -c ../trio_BODY_geo.asc.gz > trio_BODY_geo.asc
+cp ../test_VEF.data .
+cd ..
+
+cd VEF_EFstab
+gunzip -c ../trio_BODY_geo.asc.gz > trio_BODY_geo.asc
+cp ../test_VEF.data .
+sed "s/muscl/EF_stab { alpha 0.2 }/" test_VEF.data > modifie.data
+mv modifie.data test_VEF.data
+cd ..
+
+
+
+
+

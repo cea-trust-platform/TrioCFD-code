@@ -1,0 +1,234 @@
+# Thermohydraulique 3D VDF couplee a conduction 2D avec rayonnement de paroi #
+# PARALLEL OK 3 #
+dimension 3    
+Schema_Euler_explicite sch
+Lire sch
+{
+        tinit 0.
+        tmax 1.
+        dt_min 1.e-9
+        dt_max 10.
+        dt_impr 0.01
+        dt_sauv 500.
+        seuil_statio 1.e-5
+	facsec 0.4
+}
+
+Pb_conduction pb1
+Pb_Thermohydraulique pb2
+
+Domaine dom_solide
+Domaine dom_fluide
+# BEGIN MESH #
+Mailler dom_solide
+{
+        Pave Cavite1
+                {
+                Origine 0. 0. 0.
+                Nombre_de_Noeuds 9 9 2
+                Longueurs 1. 5. 10.
+                }
+                {
+                Bord Gauche   X = 0.  0. <= Y <= 5.  0. <= Z <= 10.
+                Raccord local homogene Droit1   X = 1.  0. <= Y <= 5.  0. <= Z <= 10.
+                Bord Bas      Y = 0.  0. <= X <= 1.  0. <= Z <= 10.
+                Bord Haut     Y = 5.  0. <= X <= 1.  0. <= Z <= 10. 
+                Bord Arriere  Z = 10. 0. <= X <= 1.  0. <= Y <= 5.
+                Bord Avant    Z = 0.  0. <= X <= 1.  0. <= Y <= 5.
+                
+                }
+}
+
+Mailler dom_fluide
+{
+        Pave Cavite2
+                {
+                Origine 1. 0. 0.
+                Nombre_de_Noeuds 9 9 2
+                Longueurs 4. 5. 10. 
+                }
+                {
+                Raccord local homogene Droit1     X = 1.   0. <= Y <= 5.  0. <= Z <= 10.
+                Bord Droit2     X = 5.   2. <= Y <= 5.  0. <= Z <= 10. 
+                Bord Bas1       Y = 0.   1. <= X <= 5.  0. <= Z <= 10. 
+                Bord Haut1      Y = 5.   3. <= X <= 5.  0. <= Z <= 10. 
+                Bord Avant1     Z = 0.   1. <= X <= 5.  0. <= Y <= 5. 
+                Bord Arriere1   Z = 10.  1. <= X <= 5.  0. <= Y <= 5.
+                Bord Entree     Y = 5.   1. <= X <= 3.  0. <= Z <= 10.
+                Bord Sortie     X = 5.   0. <= Y <= 2.  0. <= Z <= 10. 
+                }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_fluide
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM2
+}
+
+Partition dom_solide
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM1
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom_solide
+Scatter DOM2.Zones dom_fluide
+END SCATTER #
+
+VDF dis
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 0.002
+	rho Champ_Uniforme 1 2
+        lambda Champ_Uniforme 1 1.0 
+	Cp Champ_Uniforme 1 500
+        beta_th Champ_Uniforme 1 0.0001
+}
+
+Solide sol
+Lire sol
+{
+        rho Champ_Uniforme 1 1000.
+        lambda Champ_Uniforme 1 250.    
+	Cp Champ_Uniforme 1 100
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 -9.81 0
+Associate sol gravite
+Associate fluide gravite
+
+Associate pb1 dom_solide
+Associate pb1 sol
+
+Associate pb2 dom_fluide
+Associate pb2 fluide
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb1
+Associate pbc pb2
+Associate pbc sch
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Lire mod 
+{
+  Rayonnement.facesrayo
+  Rayonnement.factforme
+}
+
+Lire pb2
+{
+        Navier_Stokes_standard
+        {
+                solveur_pression cholesky { }       
+                convection { amont }
+                diffusion { }
+                sources { boussinesq_temperature { T0 300. } }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 3 0. 0. 0.
+                        }
+                boundary_conditions {
+                        Entree frontiere_ouverte_vitesse_imposee
+                                Champ_front_Uniforme 3 0. -0.01 0.
+                        Sortie frontiere_ouverte_pression_imposee
+                                Champ_front_Uniforme 1 0.
+                        Droit1 paroi_fixe
+                        Haut1 paroi_fixe
+                        Droit2 paroi_fixe
+                        Bas1 paroi_fixe
+                        Avant1 symetrie
+                        Arriere1 symetrie
+                }
+        }
+        Convection_Diffusion_Temperature
+        {
+                diffusion { }
+                convection { amont }
+                boundary_conditions 
+                {	
+                        Entree Frontiere_Ouverte_Rayo_transp
+                                T_ext Champ_front_Uniforme 1 200.
+                        Sortie Frontiere_Ouverte_Rayo_transp
+                                T_ext Champ_front_Uniforme 1 200.
+                        Haut1 paroi_temperature_imposee
+                                Champ_Front_Uniforme 1 200.
+                        Droit2 paroi_flux_impose
+                                Champ_front_Uniforme 1 -0.1
+                        Bas1 paroi_temperature_imposee 
+                                 Champ_Front_Uniforme 1 200.
+                        Droit1 paroi_contact pb1 Droit1
+			            Arriere1 symetrie
+                        Avant1 symetrie
+                }
+                conditions_initiales { Temperature Champ_Uniforme 1 300. }
+        }
+        Postraitement
+        {
+                Sondes
+                { 
+                sonde_pression pression periode 1. points 1 2.5 2.5 5.
+                sonde_vitesse vitesse periode 1. points 1 2.5 2.5 5.
+                sonde_tflu temperature periode 1. points 1 2.5 2.5 5.
+		sonde_tflubas1 temperature periode 1. points 1 3.5 4.95 5.
+		sonde_tfluhaut1 temperature periode 1. points 1 3.5 0.05 5.
+                }
+                Champs dt_post 10.
+                {
+                        pression elem
+                        pression som
+                        vitesse elem
+                        vitesse som
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+Lire pb1
+{
+        Conduction
+        {
+                diffusion { }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 300.
+                        }
+                boundary_conditions {
+                        Gauche paroi_temperature_imposee
+                                Champ_Front_Uniforme 1 400.
+                        Droit1 paroi_contact pb2 Droit1
+                        Haut paroi_temperature_imposee
+                                Champ_Front_Uniforme 1 400.
+                        Bas paroi_temperature_imposee
+                                Champ_Front_Uniforme 1 400.
+                        Arriere symetrie
+                        Avant symetrie
+                }
+        }
+        Postraitement
+        {
+                Sondes
+                {
+                sonde_tsol temperature periode 0.1 points 1 0.15 0.55 5.
+                }
+                Champs dt_post 10.
+                {
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+Imprimer_flux dom_fluide { Droit1 Droit2 }
+
+Solve pbc
+Fin

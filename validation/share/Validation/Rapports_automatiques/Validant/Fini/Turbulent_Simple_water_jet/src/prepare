@@ -1,0 +1,95 @@
+#!/bin/bash
+
+gunzip -c jetsymfine3.geom.gz > jetsymfine3.geom
+
+#Creation des repertoires
+mkdir -p ./decoupe
+#
+mkdir -p ./v_1/EF_stab
+mkdir -p ./v_1/EF_stab02
+mkdir -p ./v_156/EF_stab
+mkdir -p ./v_156/EF_stab02
+#
+
+#
+RACINE=`pwd`
+###
+### phase de decoupage et d'initialisation
+#
+cd $RACINE/decoupe
+cp $RACINE/jetsymfine3.geom .
+cp $RACINE/TSW_jet.data .
+make_PAR.data TSW_jet.data 4
+
+
+##################################################
+# Cas VEF
+cd $RACINE/v_1/EF_stab
+cp $RACINE/decoupe/PAR_TSW_jet.data test.data
+cp $RACINE/decoupe/*Zones .
+#cp $RACINE/TSW_jet.data test.data
+cp $RACINE/post_run .
+cp $RACINE/curves.py .
+
+
+#################################################
+cd $RACINE/v_1/EF_stab02
+cp $RACINE/decoupe/PAR_TSW_jet.data test.data
+cp $RACINE/decoupe/*Zones .
+#cp $RACINE/TSW_jet.data test.data
+sed "s/Ef_stab { }/Ef_stab { alpha 0.2 }/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+cp $RACINE/curves.py .
+sed "s/w<0.15/w<0.19/" curves.py > modifie.data
+mv modifie.data curves.py
+
+
+#################################################
+cd $RACINE/v_156/EF_stab
+cp $RACINE/decoupe/PAR_TSW_jet.data test.data
+cp $RACINE/decoupe/*Zones .
+sed "s/3 0.0 0.0 1.0/3 0.0 0.0 1.56/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/2 0.0051886 0.2924415/2 0.0112985 0.9397039/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/2 1.0e-5 1.0e-5/2 0.1e-5 0.1e-5/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/tmax 4/tmax 3/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+cp $RACINE/curves.py .
+sed "s/w<0.15/w<0.13/" curves.py > modifie.data
+mv modifie.data curves.py
+
+
+
+#################################################
+cd $RACINE/v_156/EF_stab02
+cp $RACINE/decoupe/PAR_TSW_jet.data test.data
+cp $RACINE/decoupe/*Zones .
+sed "s/Ef_stab { }/Ef_stab { alpha 0.2 }/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/3 0.0 0.0 1.0/3 0.0 0.0 1.56/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/2 0.0051886 0.2924415/2 0.0112985 0.9397039/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/2 1.0e-5 1.0e-5/2 0.1e-5 0.1e-5/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/tmax 4/tmax 3/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+cp $RACINE/curves.py .
+sed "s/w<0.15/w<0.19/" curves.py > modifie.data
+mv modifie.data curves.py
+
+
+
+
+
+
+
+
+
+
+

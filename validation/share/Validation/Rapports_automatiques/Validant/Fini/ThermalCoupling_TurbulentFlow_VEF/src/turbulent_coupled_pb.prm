@@ -1,0 +1,637 @@
+Parameters {
+	Title "Thermal coupling - Turbulent flow"
+
+	description "The case studies the thermal coupling between a fluid and a solid domains for a turbulent flow."
+	description "Two meshes are tested: one performed by Trio_U and one performed by Icem software."
+	description "The laminar case is studied in another validation file."
+		
+	Author "V. Blind, O. Cioni, U. Bieder"
+
+	ParametersTrio_U Dimension: 3D.
+	ParametersTrio_U Discretization: VEFPrep1B.
+	ParametersTrio_U Thermal coupling
+	ParametersTrio_U Convection scheme: EF_Stab.
+	ParametersTrio_U Turbulent model: $k-\epsilon$.
+	
+	TestCase "./TrioU/alpha_02" "turbulent_coupled.data" data file printed in report file
+	TestCase "./ICEM/alpha_02" "turbulent_coupled_icem.data" 
+	
+	Reference "1. 'Reynolds Number Dependance of Skin Friction and Other Bulk Flow Variables in Two-Dimensional Rectangular Duct Flow.', R.B. Dean, Journal of Fluids Engineering, 1978, Vol. 100."
+	Reference "2. 'Les outils du thermicien.', L. Bernaz, 1993."
+	}	
+
+Chapter {
+	Title "Presentation"
+	
+	Table {
+		Title "Description"
+		description "The fluid domain is a rectangular duct. The fluid is a thermohydraulic problem, and the solid is a conduction problem. Both problems are thermally coupled."
+		description "The upper boundary of the fluid domain is a symmetry as the lower boundary of the solid. Inside the solid domain, a constant volume thermal power $q$ is imposed."
+		description "The problem is a 3D problem, but the solutions are two-dimensional."
+		}
+	 
+	 Figure {
+	 	Title "Geometry"
+		description "The geometry is a 3D geometry. The figure below is a schema of the geometry of the problem."
+		description "$h$ is the height of the solid domain (symmetry to wall)."
+		description "The height of the fluid domain (wall to wall) is equal to $H-h$. As a symmetry condition is imposed, only half of the duct is simulated (height \latex_($\dfrac{H-h}{2} $\latex_))."
+
+		description " "
+		Width 10cm
+		picture ./schema_turbulent.png
+	  	}
+		
+	Table {
+	 	Title "Geometry dimensions"
+		description "The table below shows the geometrical dimensions for both domains."
+				
+		description " "
+		nb_columns 4
+		Label "Length (m)" | "Thickness (m)" | "Heigth (m)" | "Other (m)"
+		line {
+			legend "Solid domain"
+			file ./TrioU/alpha_02/solide_dim.dat
+			}
+		line {
+			legend "Fluid domain"
+			file ./TrioU/alpha_02/fluide_dim.dat
+			}		
+		}		
+		
+		
+	Table {
+	 	Title "Fluid physical properties"
+		description "Fluid incompressible, constant physical properties."
+		description "The fluid parameters are chosen in order to obtain a Prandtl number \latex_($Pr=\dfrac{\mu.Cp}{\lambda} $\latex_) equal to 1."
+		
+		description " "		
+		nb_columns 1
+		Label "Value"
+		line {
+			legend "$\rho$  ($kg/m^3$)"
+			file ./TrioU/alpha_02/rho_f.dat
+			}
+		line {
+			legend "$\mu$  ($kg/m/s$)"
+			file ./TrioU/alpha_02/mu_f.dat
+			}
+		line {
+			legend "Cp  ($J/kg/K$)"
+			file ./TrioU/alpha_02/cp_f.dat
+			}
+		line {
+			legend "$\lambda$  ($W/m/K$)"
+			file ./TrioU/alpha_02/lambda_f.dat
+			}
+		line {
+			legend "$\beta$  ($1/K$)"
+			values 1
+			}
+		line {
+			legend "$Pr$"
+			file ./TrioU/alpha_02/Prandtl.dat
+			}		
+		}
+		
+	Table {
+	 	Title "Solid physical properties"
+		description "Constant physical properties."
+
+		description " "
+		nb_columns 1
+		Label Value
+		line {
+			legend "$\rho$  ($kg/m^3$)"
+			file ./TrioU/alpha_02/rho_s.dat
+			}
+		line {
+			legend "Cp  ($J/kg/K$)"
+			file ./TrioU/alpha_02/cp_s.dat
+			}
+		line {
+			legend "$\lambda$  ($W/m/K$)"
+			file ./TrioU/alpha_02/lambda_s.dat
+			}
+		}
+		
+	Table { 
+	 	Title "Hydraulic boundary conditions"
+		description "Periodicity between inlet and outlet boundaries. Initially, the velocity profile is flat and equal to the mean velocity $U$, which is given in the table below."
+		description "Upper boundary: symmetry."
+		description "Front and back boundaries: symmetries."
+		description "The joint boundary of both domains is a wall."
+		
+		description " "
+		nb_columns 1
+		Label Value
+		line {
+			legend "$U$  ($m/s$)"
+			file ./TrioU/alpha_02/mean_velocity.dat
+			}
+		}
+		
+	 Table {
+	 	Title "Fluid thermal boundary conditions"
+		description "Periodicity between inlet and outlet boundaries."
+		description "Upper boundary: symmetry."
+		description "Front and back boundaries: symmetries."
+		description "The joint boundary of both domains is a paroi_contact."
+		}
+		
+	Table {
+		Title "Solid thermal boundary conditions"
+		description "Lower boundary: symmetry."
+		description "Front and back boundaries: symmetries."
+		description "Lateral boundaries: symmetries." 
+		description "The joint boundary of both domains is a paroi_contact."
+		description "Volume thermal power: $q$, given in the table below." 
+
+		description " "
+		nb_columns 1
+		Label Value
+		line {
+			legend "$q$  ($W/m^3$)"
+			file ./TrioU/alpha_02/puissance_volumique.dat
+			}
+		
+		}
+		
+	Table {
+		Title "Numerical schemes"
+		description "Thermal coupled problem. Solid: conduction problem. Fluid: turbulent thermohydraulic problem."
+		description "Hydraulic convection scheme: EF_Stab ($\alpha=1$)."
+		description "Turbulent model: $k-\varepsilon$."
+		description "Turbulent convection scheme: EF_Stab ($\alpha=1$)."
+		description "Thermal convection scheme: EF_Stab: $\alpha=0.2$."
+		description "Thermal tubulent model: Prandtl."
+		description "Wall laws: logarithmic."
+		}
+		
+	}
+	
+Chapter {
+	Title "Trio_U mesh"
+	description " "
+	
+	Visu {
+		Title "Trio_U mesh - fluid domain"
+		description "The mesh is performed by a tetraedriser_homogene_fin."
+		description "The figure below is a view of the fluid domain mesh."
+		
+		Width 8cm
+		Mesh ./TrioU/alpha_02/turbulent_coupled_FLUIDE.lata dom_fluide
+		normal3d 0.5 -0.5 0.5
+		up3d 0 0 1
+		}
+		
+	Visu {
+		Title "Trio_U mesh - solid domain"
+		description "The mesh is performed by a tetraedriser_homogene_fin."
+		description "The figure below is a view of the solid domain mesh."
+		
+		Width 8cm
+		Mesh ./TrioU/alpha_02/turbulent_coupled_SOLIDE.lata dom_solide
+		normal3d 0.5 -0.5 0.5
+		up3d 0 0 1
+		}
+		
+		
+	Table {
+		Title "Trio_U mesh - Time scheme"
+		description "Time scheme: Euler explicit."
+		}
+	}
+	
+Chapter {
+	Title "ICEM mesh"
+	description "In order to obtain a correct friction on the wall, the meshes near the wall are created by an extrusion from the Icem mesh. In this case, the solid domain is also created by an extrusion."
+
+	Visu {
+		Title "ICEM mesh - fluid domain"
+		description "The meshes near the wall are performed with the option Extruder_en3."
+		description "The heigth of the extrusion is equal to 0.1 m. Two layers of meshes are created." 
+		description "As extruder_en3 does not keep the periodicity, the domain must be duplicate in order to obtain a periodic fluid domain."
+		description "The figure below is a view of the fluid domain mesh. The two layers of extruded meshes are visible."
+		
+		Width 8cm
+		Mesh ./ICEM/alpha_02/turbulent_coupled_icem_FLUIDE.lata DOMF
+		normal3d 0.5 -0.5 0.5
+		up3d 0 0 1
+		}
+		
+	Visu {
+		Title "ICEM mesh - solid domain"
+		description "The solid domain is created by an extrusion from the joint boundary. The option Extruder_en3 is chosen in order to limit the number of elements."
+		description "The figure below is a view of the solid domain mesh."
+		
+		Width 8cm
+		Mesh ./ICEM/alpha_02/turbulent_coupled_icem_SOLIDE.lata DOMS
+		normal3d 0.5 -0.5 0.5
+		up3d 0 0 1
+		}
+		
+		Table {
+		Title "ICEM mesh - Time scheme"
+		description "For the Icem mesh, the conduction timestep inside the solid is small compared to the fluid timestep." 
+		description "To accelerate the computation, the time scheme is an implicit scheme, with a timestep smaller than the fluid timestep. Thus, only the solid conduction equation is implicit."
+		description " "
+		description "Time scheme: Euler implicit."
+		description "Solver: implicit."
+		description "Timestep limited by the fluid stability timestep."
+		}		
+	}
+
+Chapter {
+	Title "Theoretical solutions"
+	description "The problem is solved for a stationnary flow." 
+
+	Table {
+		Title "Hydraulic correlation"
+		description "A correlation (Dean, [1]) is used for which the Reynolds number is defined as: \latex_($Re=\dfrac{U.2.(H-h)}{\nu} $\latex_)."
+		description "The friction coefficient is given by: \latex_($Cf=0.08681.Re^{-0.25}$\latex_)."
+		description "The pressure gradient is given by: \latex_($\dfrac{\Delta P}{\rho.L}=\dfrac{Cf.U^2}{H-h} $\latex_) and the friction velocity by: \latex_($u^*=\sqrt{\dfrac{1}{2}.Cf.U^2}$\latex_)." 
+		
+		description "The theoretical logarithmic velocity profile is given by: \latex_($u^+=\dfrac{1}{K}ln(y^+)+B$\latex_), with $K=0.41$ and $B=5.17$."
+		}
+
+	Table {
+		Title "Thermal equation"
+		description "Inside the fluid domain, the temperature profile \latex_($T_f(z)$\latex_) can not be solved analytically for a turbulent flow."
+		description " "
+		
+		description "For the solid domain, the temperature equation is: \latex_($T_s(z)=-\dfrac{q}{2.\lambda_s}.z^2+A.z+B $\latex_)."
+		description " "
+		description "The condition of symmetry at the lower boundary implies $A=0$."
+		description " "
+		description "The temperature equality condition at the joint boundary: \latex_($T_s(h)=T_f(h)$\latex_), must be applied with a correlation because the temperature profile in the fluid is unknown."
+		description " "
+		description "At the fluid joint boundary, a Nusselt correlation gives: \latex_($Nu=\dfrac{\hbar.D_h}{\lambda_f} $\latex_), where $Nu$ is the Nusselt number and $\hbar$ the heat exchange coefficient."	
+		description " "
+		
+		description "$\hbar$ depends on the thermal flux $\varphi$ which enters in the fluid domain by the relation: \latex_($\varphi=\hbar \: (T_f(h)-\overline{T})$\latex_), where \latex_($\overline{T}$\latex_) is the mixing temperature in the fluid domain."
+		description "The thermal flux $\varphi$ is given by the solid temperature equation: \latex_($\varphi=q.h $\latex_)."
+		description "Thus, the Nusselt correlation can be written: \latex_($Nu=\dfrac{q.h.D_h}{\lambda_f.(T_f(h)-\overline{T})} $\latex_), which gives:"
+		description "\latex_($T_f(h)=T_s(h)=-\dfrac{q}{2.\lambda_s}.h^2+B=\dfrac{q.h.D_h}{\lambda_f.Nu}+\overline{T} $\latex_)."
+		description "To determine the constant $B$, the mixing temperature must be calculated."
+		
+		description " "
+		description "The fluid mixing temperature \latex_($\overline{T}$\latex_) is defined as: \latex_($\displaystyle{\overline{T}=\frac{\int{u.T.dz}}{Q_l}}$\latex_), where \latex_($ Q_l $ \latex_) is the flowrate."
+		description "To evaluate the mixing temperature, a thermal balance is applied on the fluid domain, which gives: \latex_($\displaystyle{\rho_f.Cp_f.\dfrac{\partial}{\partial x}.\int_h^H{u(z).T(z).dz}=2.q.h} $\latex_),"
+		description "which can be written: \latex_($\displaystyle{\rho_f.Cp_f.\dfrac{\partial}{\partial x}(.Q_l.\overline{T})=2.q.h} $\latex_)."
+
+		description "The mixing temperature is: \latex_($\displaystyle{\overline{T}(x)=\dfrac{2.q.h}{\rho_f.Cp_f.Q_l}.x+T_0=\dfrac{2.q.h}{\rho_f.Cp_f.U.(H-h)}.x+T_0} $\latex_)."
+		description "The spatial variable $x$ can be remplaced by the temporal variable $t$ with the relation: \latex_($x=U.t$\latex_), so: \latex_($\overline{T}(t)=\dfrac{2.q.h}{\rho_f.Cp_f.(H-h)}.t+T_0$\latex_)."
+		
+		description " "
+		description "Finally, for an instant $t$, the temperature equation inside the solid is:"
+		description "\latex_($T_s(z,t)=\dfrac{q}{2.\lambda_s}.(h^2-z^2)+\dfrac{q.h.D_h}{\lambda_f.Nu}+\overline{T}(t)$\latex_)."
+		description "The equations show that a permanent state is not possible, because the temperature is time-dependant. However a stationnary state can be reached, for which the temperature increase linearly."
+		description " "
+		
+		description "Numerically, the temperature constant \latex_($T_0 $\latex_) can not be determined, but temperature differences can be calculated."
+		description "First, the contact temperature \latex_($T_c $\latex_) can be written: \latex_($(T_c-\overline{T})(t)=(T_s(h)-\overline{T})(t)=\dfrac{q.h.D_h}{\lambda_f.Nu}$\latex_)."
+		description "And the maximal temperature \latex_($T_{max} $\latex_) inside the solid can be written:"
+		description "\latex_($(T_{max}-\overline{T})(t)=(T_s(0)-\overline{T})(t)=\dfrac{q.h^2}{2.\lambda_s}+\dfrac{q.h.D_h}{\lambda_f.Nu}$\latex_)." 
+		}
+		
+	Table {
+		Title "Nusselt correlation used"		
+		description "The Nusselt correlation (Seban [2]) for a constant thermal flux applied on both plates of a two-dimensional rectangular duct is: \latex_($Nu=0.023.Pr^{\frac{1}{3}}.Re^{0.8}$\latex_), where \latex_($Re=\dfrac{U.D_h}{\nu}$\latex_)."
+		description "For the correlation, the hydraulic diameter is defined as: \latex_($D_h=2.(H-h)$\latex_)."		 
+		} 
+	}
+	
+	
+Chapter {
+	Title "Hydraulic numerical results"
+	description "The velocity profile must be correctly calculated in order to have a correct thermal exchange."
+	description "The parameter $\alpha$ of the EF_Stab convection scheme is equal to 1 for the hydraulic equation."
+	
+	Table {
+		Title "Comparison of the pressure loss"
+		description "The pressure loss is given by the Pressure_Gradient file. The results are gathered in the table below."
+		
+		description " "
+		nb_columns 5
+                Label  "$Re$" | "$y^+$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/pressure.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/pressure.dat
+                        }
+		}
+	
+	Table {
+		Title "Comparison of friction velocity"
+		description "The friction velocity is given by the Ustar.face file. The results are gathered in the table below."
+		
+		description " "
+		nb_columns 5
+                Label  "$Re$" | "$y^+$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/ustar.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/ustar.dat
+                        }
+		}
+			
+	Figure {
+	 	Title "Velocity profile"
+		description "The figure below compares the logarithmic profile and the calculated profile for half of the duct."
+		Dimension 2
+		LabelX "y+"
+		RangeY 0 30
+		LabelY "u+"
+		Include_Description_Curves 0
+		Width 10cm
+		Curve {
+			legend "Logarithmic profile"
+			file ./TrioU/alpha_02/profil_velocity.dat
+			columns 1 2
+			Style points
+			TypeLigne -1
+			linewidth 1.5
+			TypePoints 7
+			PointSize 2
+			}
+		Curve {
+			legend "TrioU mesh"
+			origin "Trio_U"
+			file ./TrioU/alpha_02/profil_velocity.dat
+			columns 1 3
+			Style linespoints
+			TypeLigne 1
+			linewidth 1.5
+			Typepoints 5
+			Pointsize 1
+			}
+		Curve {
+			legend "ICEM mesh"
+			origin "Trio_U"
+			file ./ICEM/alpha_02/profil_velocity.dat
+			columns 1 3
+			Style linespoints
+			TypeLigne 2
+			linewidth 1.5
+			Typepoints 9
+			Pointsize 1
+			}
+	  	}
+		
+	Table {
+		Title "Conclusion on the hydraulic results"
+		description "For both meshes, the hydraulic results (pressure gradient and friction velocity) are correctly calculated."
+		}		
+	}
+	
+Chapter {
+	Title "Thermal results"
+	description "As the problem solutions are time-dependant, all the results are given at the final time of the computations."
+	description "The parameter $\alpha$ of the EF_Stab convection scheme is equal to 0.2 for the thermal equation."
+	
+	Figure {
+	 	Title "Temporal evolution of the contact temperature"
+		description "For computations, the contact temperature is given by a probe."
+		description "The figure below shows the temporal evolution of the contact temperature, which is linear when the stationnary state is reached."
+		Dimension 2
+		LabelX "Time (s)"
+		LabelY "Temperature"
+		Include_Description_Curves 0
+		Width 8cm
+		Curve {
+			legend "TrioU"
+			origin "Trio_U"
+			file ./TrioU/alpha_02/turbulent_coupled_TEMP_CONTACT_SOLIDE.son
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			linewidth 1.5
+			Typepoints 5
+			PointSize 1
+			}
+		Curve {
+			legend "ICEM"
+			origin "Trio_U"
+			file ./ICEM/alpha_02/turbulent_coupled_icem_TEMP_CONTACT_SOLIDE.son
+			columns 1 2
+			Style linespoints
+			TypeLigne 2
+			linewidth 1.5
+			Typepoints 9
+			PointSize 1
+			}
+	  	}
+		
+	Figure {
+	 	Title "Temporal evolution of the maximal temperature"
+		description "For computations, the maximal temperature inside the solid is given by a probe."
+		description "The figure below shows the temporal evolution of the maximal temperature for both calculation, which is linear when the stationnary state is reached."
+		Dimension 2
+		LabelX "Time (s)"
+		LabelY "Temperature"
+		Include_Description_Curves 0
+		Width 8cm
+		Curve {
+			legend "TrioU"
+			origin "Trio_U"
+			file ./TrioU/alpha_02/turbulent_coupled_TEMP_MAX.son
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			linewidth 1.5
+			TypePoints 5
+			PointSize 1
+			}
+		Curve {
+			legend "ICEM"
+			origin "Trio_U"
+			file ./ICEM/alpha_02/turbulent_coupled_icem_TEMP_MAX.son
+			columns 1 2
+			Style linespoints
+			TypeLigne 2
+			linewidth 1.5
+			TypePoints 9
+			PointSize 1
+			}			
+	  	}
+	
+	Table {
+		Title "Temporal slope comparison"
+		description "The mixing temperature, $Tc$ and  $Tmax$ increase linearly with a slope equal to: \latex_($\dfrac{2.q.h}{\rho_f.Cp_f.(H-h)}$\latex_)."
+		description "The slope is calculated with the temporal evolution of the contact temperature."
+		description "The table below compares the temporal slope between computations and theory."
+		description " "
+		
+		nb_columns 4
+                Label  "$Re$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/temp_slope.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/temp_slope.dat
+                        }
+		}
+		
+	Table {
+		Title "Thermal flux"
+		description "The thermal flux at the joint boundary is equal to: \latex_($\varphi=q.h$\latex_)."
+		description "The file Diffusion_chaleur.out gives the thermal flux at the joint boundary."
+		description "The table below compares the thermal flux between theory and computations, which show that the stationnary state is reached."
+		
+		description " "
+		nb_columns 4
+                Label  "$Re$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/flux.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/flux.dat
+                        }
+		}
+	
+	Figure {
+	 	Title "Temperature profile inside the solid domain"
+		description "The temperature profile in the solid is theoretically given by: \latex_($(T_s(z)-\overline{T})(t)=\dfrac{q}{2.\lambda_s}.(h^2-z^2)+\dfrac{q.h.D_h}{\lambda_f.Nu}$\latex_)."
+		description "For computations, the temperature is given by a probe (segment), and the mixing temperature \latex_($ \overline{T} $\latex_) is computed by Traitement_particulier and given in the file Tmoyen."
+		description "Thus the temperature difference \latex_($(T_s(z)-\overline{T})$\latex_) can be calculated." "
+		description "The figure below compares the theoretical temperature profile ant the calculated profiles."
+		Dimension 2
+		LabelX "z(m)"
+		LabelY "Temperature"
+		Include_Description_Curves 0
+		Width 10cm
+		Curve {
+			legend "Theory"
+			file ./TrioU/alpha_02/profil_temp_solide.dat
+			columns 1 2
+			Style points
+			TypeLigne -1
+			linewidth 1.5
+			TypePoints 7
+			PointSize 2
+			}
+		Curve {
+			legend "TrioU"
+			origin "Trio_U"
+			file ./TrioU/alpha_02/profil_calc_temp_solide.dat
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			linewidth 1.5
+			Typepoints 5
+			Pointsize 1
+			}
+		Curve {
+			legend "ICEM"
+			origin "Trio_U"
+			file ./ICEM/alpha_02/profil_calc_temp_solide.dat
+			columns 1 2
+			Style linespoints
+			TypeLigne 2
+			linewidth 1.5
+			Typepoints 9
+			Pointsize 1
+			}
+	  	}
+		
+	Table {
+		Title "Temperature difference inside the solid domain"
+		description "The theory gives: \latex_($ (T_{max}-T_c)(t)=\dfrac{q.h^2}{2.\lambda_s} $\latex_)."
+		description "For computations, the contact and maximal temperatures are given by probes."
+		description "The table below compares the temperature differences for calculations. The results show that the conduction is correctly calculated inside the solid for both meshes."
+		
+		description " "
+		nb_columns 4
+                Label  "$Re$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/delta.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/delta.dat
+                        }
+		}
+		
+			
+	Table {
+		Title "Contact temperature comparison"
+		description "The theory gives: \latex_($(T_{c}-\overline{T})(t)=\dfrac{q.h.D_h}{\lambda_f.Nu} $\latex_). The theoretical Nusselt number is given by the correlation."
+		description "For the calculations, the contact temperature is given by a probe. The mixing temperature \latex_($ \overline{T} $\latex_) is computed by Traitement_particulier and given in the file Tmoyen."
+		description "The results are gathered in the table below."
+		
+		description " "
+		nb_columns 4
+                Label  "$Re$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/Tc.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/Tc.dat
+                        }
+		}
+		
+	Table {
+		Title "Maximal temperature comparison"
+		description "The theory gives : \latex_($(T_{max}-\overline{T})(t)=\dfrac{q.h^2}{2.\lambda_s}+\dfrac{q.h.D_h}{\lambda_f.Nu}$\latex_).
+		description "For the calculations, the maximal temperature is given by a probe."
+		description "The error calculated on the maximal temperature is linked to the error calculated on the contact temperature. The difference is smaller because the value of the maximal temperature is greater than the contact temperature."
+		description "The results are gathered in the table below."
+		
+		description " "
+		nb_columns 4
+                Label  "$Re$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/Tmax.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/Tmax.dat
+                        }
+		}
+		
+	Table {
+		Title "Nusselt number comparison"
+		description "The theoretical Nusselt number is given by the correlation."
+		description "For the calculation, the mixing temperature is given by the Tmoyen file and the contact temperature is given by a probe. The Nusselt number can be calculated with: \latex_($Nu=\dfrac{\varphi.D_h}{\lambda_f.(T_c-\overline{T})}$\latex_)."
+		description "The table below compares the Nusselt number."
+		
+		description " "
+		nb_columns 4
+                Label  "$Re$" | "Theory" | "Calculation" | "Difference (%)"
+		line {
+                	legend "TrioU mesh"
+                        file ./TrioU/alpha_02/nusselt.dat
+                        }
+		line {
+                	legend "ICEM mesh"
+                        file ./ICEM/alpha_02/nusselt.dat
+                        }
+		}	
+			
+	}
+	
+Chapter {
+	Title "Conclusions"
+	description "For a turbulent flow, the calculations are in good accordance with the hydraulic and thermal correlations. The maximal temperature and the Nusselt number are close to the correlation values."
+	description "The thermal coupling is correctly calculated." 
+	}
+	
+Chapter {
+	Title "Performances"
+	tableau_performance { 
+	}
+	}

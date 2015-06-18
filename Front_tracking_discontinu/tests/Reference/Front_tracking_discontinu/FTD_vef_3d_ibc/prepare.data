@@ -1,0 +1,7 @@
+dimension 3
+
+Domaine dom_surface
+lire_med dom_surface Mesh_1 halteres.med
+Dilate dom_surface 0.1
+Transformer dom_surface z x y+0.03
+Ecrire_fichier dom_surface halteres.geom

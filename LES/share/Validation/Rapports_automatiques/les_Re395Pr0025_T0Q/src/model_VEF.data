@@ -1,0 +1,217 @@
+#  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+
+#
+y+=17
+dx+= 50
+dz+= 50 #
+
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 15 8 8
+		Longueurs  6.4 2. 3.2
+		Facteurs 1. 1 1.
+	}
+	{
+		Bord periox   X = 0.             0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord periox   X = 6.4    0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord perioz   Z = 0.             0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2    0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord bas      Y = 0.             0. <= X <= 6.4   0. <= Z <= 3.2
+		Bord haut     Y = 2.             0. <= X <= 6.4   0. <= Z <= 3.2
+		}
+}
+
+tetraedriser_homogene_fin dom
+Reordonner_faces_periodiques dom periox
+Reordonner_faces_periodiques dom perioz
+
+# CN--
+Sch_CN_EX_iteratif sch
+Read sch 
+{
+        tinit 0
+        tmax 41
+        dt_min 1.e-10
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 1.
+        dt_sauv 100
+        seuil_statio 1.e-8  
+        facsec 1.
+        seuil 1e-3
+	facsec_max 6.
+  	niter_min 2
+  	niter_avg 6
+  	niter_max 10
+	omega 0
+}
+--CN #
+
+# Impli--
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.
+	tmax 41
+	dt_start dt_calc
+       dt_min 1.e-7
+       dt_max 1.
+        dt_impr 1.
+        dt_sauv 10
+       seuil_statio 1.e-15
+       facsec 4
+       facsec_max 4
+	no_check_disk_space
+	periode_sauvegarde_securite_en_heures 11
+	solveur Implicite
+             {
+                 seuil_convergence_solveur 1.e-12
+	         solveur  gmres { diag seuil 1e-12 impr controle_residu 1 }
+             }
+
+} 
+--Impli #
+
+
+VEFPreP1b dis
+
+Fluide_Incompressible air
+Read air
+{
+	mu Champ_Uniforme       1 2.84e-5
+ 	rho Champ_Uniforme      1 0.011928
+        lambda Champ_Uniforme   1 5.899248
+        Cp Champ_Uniforme       1 5193.
+        beta_th Champ_Uniforme  1 1.9954e-3                                                                                               
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate air gravite
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7  } 
+		convection { ef_stab { volumes_etendus alpha 0.2 }  }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_init_canal_sinal 3 { Ucent 24.225 h 1.0  ampli_sin 0. omega 1. ampli_bruit 0.5 }
+			}
+        	Sources {
+			Canal_perio { bord periox }
+			}
+		boundary_conditions {
+			periox  periodique direction_periodicite X 
+			perioz periodique direction_periodicite Z 
+			haut  paroi_fixe
+	                bas  paroi_fixe
+		}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 5
+			}
+
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 10
+		        dt_impr_moy_temp 20 
+		        debut_stat  20.
+				 }
+			}	
+        }
+
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+		convection { ef_stab { volumes_etendus alpha 1 }  }
+                Sources {
+                        Periodique_Temperature 0.0619195046439628483
+                        }                                                                                           
+                Modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire 
+				dt_impr_nusselt 5
+		}
+                boundary_conditions
+                        {
+                        periox periodique direction_periodicite X 
+                        perioz periodique direction_periodicite Z 
+                        haut   paroi_flux_impose Champ_Front_Uniforme 1 -1
+                        bas    paroi_flux_impose Champ_Front_Uniforme 1 -1
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0. }
+                }
+
+	Postraitement
+	{
+ 	Definition_champs
+
+                        {
+
+                        temperature_reconstruite Champ_Post_Transformation
+
+                                                           {
+
+                                                           fonction -temperature_natif_dom+0.0619195046439628483*x
+
+                                                           source Champ_Post_refChamp { Pb_champ pb temperature }
+
+                                                           }
+                        Moyenne_temperature_reconstruite Champ_Post_Statistiques_Moyenne
+
+                                                           {
+                                                           t_deb 20.	t_fin 40.
+                                                           sources_reference { temperature_reconstruite }
+                                                           }
+                        Ecart_type_temperature_reconstruite Champ_Post_Statistiques_Ecart_type
+                                                           {
+                                                           t_deb 20.	t_fin 40.
+                                                           source Champ_Post_Transformation
+							   {
+							   	fonction -temperature_natif_dom+0.0619195046439628483*x
+								source Champ_Post_refChamp { Pb_champ pb temperature }
+							   }
+                                                           }
+                        } 
+	     format lata
+	     Sondes
+	          {
+			coupe_vit  vitesse periode 1  segment 40   3.2 0. 1.6       3.2 2 1.6
+			coupe_theta temperature  periode 1. segment 40 3.2 0. 1.6       3.2 2 1.6
+			coupe_temp temperature_reconstruite  periode 1. segment 40 3.2 0. 1.6       3.2 2 1.6
+			coupe_T_moy Moyenne_temperature_reconstruite  periode 1. segment 40 3.2 0. 1.6       3.2 2 1.6
+			coupe_T_et Ecart_type_temperature_reconstruite  periode 1. segment 40 3.2 0. 1.6       3.2 2 1.6
+			sonde_U1 vitesse  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_T1 temperature  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_U2 vitesse  periode 0.1 points 1 3.2 1.8 1.6 
+			sonde_T2 temperature  periode 0.1 points 1 3.2 1.8 1.6 
+	          }
+		Champs binaire dt_post 5.0
+			{
+			vitesse elem
+			temperature elem
+			Moyenne_temperature_reconstruite elem
+			Ecart_type_temperature_reconstruite elem
+			}
+	}
+
+}
+
+Solve pb
+End

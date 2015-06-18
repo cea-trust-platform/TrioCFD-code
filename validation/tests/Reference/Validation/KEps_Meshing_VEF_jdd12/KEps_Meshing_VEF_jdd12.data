@@ -1,0 +1,163 @@
+# SIMULATION D UN CANAL PLAN #
+# lance_test 1 ecart #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave Cavite
+        {
+                Origine 0. 0. 0.
+                Nombre_de_Noeuds 3 21 3
+                Longueurs 0.2 2. 0.2
+        }
+        {
+                Bord periox   X = 0.  0. <= Y <= 2.  0. <= Z <= 0.2
+                Bord periox   X = 0.2 0. <= Y <= 2.  0. <= Z <= 0.2
+                Bord bas      Y = 0.  0. <= X <= 0.2 0. <= Z <= 0.2
+                Bord haut     Y = 2.  0. <= X <= 0.2 0. <= Z <= 0.2
+                Bord perioz   Z = 0.  0. <= X <= 0.2 0. <= Y <= 2.
+                Bord perioz   Z = 0.2 0. <= X <= 0.2 0. <= Y <= 2.
+ 
+                }
+} 
+Tetraedriser_homogene_fin dom
+
+Transformer dom 35*x y 25*z
+
+
+
+Corriger_frontiere_periodique { Domaine dom Bord periox }
+Corriger_frontiere_periodique { Domaine dom Bord perioz }
+
+
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+        Partitionneur metis { Nb_parts 2 }
+        Larg_joint 2
+        Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+
+END SCATTER #
+
+
+VEFPreP1b dis
+
+Schema_Euler_implicite sch
+
+Read sch 
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 30.
+        dt_min 1.e-7
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 0.01
+        dt_sauv 1.
+        seuil_statio 1.e-12  
+	facsec 5
+        facsec_max 500
+        Solveur
+           Implicite
+           {
+                seuil_convergence_solveur 1.e-8
+		
+           }
+}
+
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.0001
+	rho Champ_Uniforme 1 1
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		/* solveur_pression GCP {
+			 precond ssor { omega 1.5 } seuil 1e-9   
+		} */
+		solveur_pression petsc cholesky { }
+
+                convection { EF_stab { } }
+                diffusion  {  }
+                Sources { Canal_perio { bord periox } }
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz dom 3  10. 0.  0.
+			}
+		boundary_conditions
+			{
+			periox   periodique 
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+			}
+		modele_turbulence K_Epsilon {
+		    Transport_K_Epsilon
+		    {
+		         convection { EF_stab { } }
+		         diffusion { }
+		         boundary_conditions {
+				periox   periodique 
+				perioz   periodique 
+				haut     paroi
+				bas      paroi
+		         }
+			 parametre_equation parametre_implicite 
+			{
+				resolution_explicite
+			}
+		         conditions_initiales { k_eps Champ_Uniforme 2 1 0.5 }
+		    }
+		     turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 2
+		    }
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 2.
+       			}
+					}
+	}
+
+	Postraitement
+        	{       
+                Sondes
+                	{ 
+                        sonde_vit  vitesse periode 10. segment 50 0.05 0. 0.05 0.05 2. 0.05
+			sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05
+			sonde_k K  periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05
+			sonde_eps Eps  periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05
+			}
+		format lml 
+		Champs dt_post 10
+			{
+			vitesse elem
+			viscosite_turbulente elem
+			pression elem
+			y_plus elem
+			}
+		}
+	}
+
+Solve pb
+End

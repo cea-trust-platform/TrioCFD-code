@@ -1,0 +1,128 @@
+# Test qui valide le postraitement en parallele de champs aux sommets #
+# sur certains decoupages avec Dirichlet non uniforme #
+# PARALLEL OK #
+dimension 3
+
+Export domaine dom2
+
+# BEGIN MESH #
+Mailler dom2
+{
+	Pave Cavite_2
+        {
+                Origine 0.0 0. 0.
+                Nombre_de_Noeuds 8 3 3
+                Longueurs 2.5 0.5 0.6
+        }
+        {
+                Bord Entree	   	X = 0.0  	0. <= Y <= 0.5   	0. <= Z <= 0.6
+                Bord Sortie	  	X = 2.5 	0. <= Y <= 0.5   	0. <= Z <= 0.6
+                Bord p_bas      	Y = 0.  	0.0 <= X <= 2.5  	0. <= Z <= 0.6
+                Bord p_haut      	Y = 0.5  	0.0 <= X <= 2.5  	0. <= Z <= 0.6
+                Bord p_gauche   	Z = 0.	 	0.0 <= X <= 2.5  	0. <= Y <= 0.5
+                Bord p_droite   	Z = 0.6 	0.0 <= X <= 2.5  	0. <= Y <= 0.5
+ 
+        }
+}
+Tetraedriser_homogene dom2
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom2
+{
+	Partitionneur Metis { Nb_parts 5 }
+	Nb_parts_tot 5
+	Larg_joint 2
+	Nom_Zones DOM_2   
+}
+FIN
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM_2.Zones dom2 
+END SCATTER #
+
+
+Pb_hydraulique_Turbulent pb2
+VEFPreP1B dis
+
+# Schema en temps #
+
+Schema_Euler_explicite sch
+Lire sch
+{
+       tinit 0
+       tmax 1.
+       dt_min 1.e-6
+       dt_max 1.0
+       dt_impr 0.001
+       dt_sauv 1.
+       seuil_statio 1.e-8
+       facsec 1.
+       nb_pas_dt_max 0
+}
+
+# Proprietes du fluide #
+
+Fluide_Incompressible fluide_2
+Lire fluide_2
+{
+	mu Champ_Uniforme 1 1.845e-05
+	rho Champ_Uniforme 1 1.185
+}
+
+# Associate et coupler les problemes, domaines et fluides #
+
+
+Associate pb2 dom2
+Associate pb2 fluide_2
+Associate pb2 sch
+
+Discretize pb2 dis
+# Debog pb2 seq faces 1.e-6 0 #
+
+# Lecture des Problemes #
+
+Lire pb2
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression Gcp { precond ssor { omega 1.5 } seuil 1.e-12 }
+		convection { muscl }
+		diffusion { }
+		
+		conditions_initiales
+		{
+			vitesse Champ_Uniforme 3 2. 0. 0.
+		}
+		boundary_conditions
+		{
+			Entree		Frontiere_ouverte_vitesse_imposee	Champ_front_uniforme 3 1. 0. 0.
+			  			 
+			Sortie		Frontiere_ouverte_pression_imposee	Champ_front_uniforme 1 0.			 
+		 
+			p_bas		paroi_fixe
+	                p_haut		paroi_fixe
+			p_gauche	paroi_fixe
+			p_droite	paroi_fixe
+		}
+		
+		Modele_turbulence Sous_maille_wale
+                        {
+                        turbulence_paroi loi_standard_hydr dt_impr_ustar 0.1
+                        }     
+	}
+	
+	
+	
+	Postraitement 
+	{
+	format lml
+		Champs dt_post 1e-6
+		{
+			vitesse som			
+		}
+	}
+}
+
+Solve pb2

@@ -1,0 +1,141 @@
+Parameters {
+	Title "Validation of FTD bubbles transformation and reverse (VDF-VEF)"
+	Description "Transformation of gas bubbles (FTD) into particles"
+	Description "and vanishing of particles entering into the gas"
+	Author "M. Elmo"
+	TestCase "transfo_VDF" "transfo_VDF.data"
+	TestCase "transfo_VEF" "transfo_VEF.data"
+	
+}
+
+
+Chapter {
+	
+	Title "FTD bubbles transformation and particles vanishing (VDF)"
+	Description ""
+
+visu {
+	Title "Initial time (t=0)"
+	description "FTD bubbles and particles positions"
+        
+	mesh transfo_VDF/interface.lata INTERFACES
+	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
+
+	cycles -11
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.01)"
+	description "FTD bubbles and particles positions"
+        
+	mesh transfo_VDF/interface.lata INTERFACES
+        mesh transfo_VDF/marqueurs.lata PARTICULES
+	molecule transfo_VDF/marqueurs.lata PARTICULES DIAMETRE som 0.0005
+	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE som 
+	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	
+	cycles -9  
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.035)"
+	description "FTD bubbles and particles positions"
+        
+	mesh transfo_VDF/interface.lata INTERFACES
+        mesh transfo_VDF/marqueurs.lata PARTICULES
+	molecule transfo_VDF/marqueurs.lata PARTICULES DIAMETRE som 0.0005
+	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE som 
+	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	
+	cycles -4
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.05)"
+	description "FTD bubbles and particles positions"
+        
+	mesh transfo_VDF/interface.lata INTERFACES
+        mesh transfo_VDF/marqueurs.lata PARTICULES
+	molecule transfo_VDF/marqueurs.lata PARTICULES DIAMETRE som 0.0005
+	vector transfo_VDF/marqueurs.lata  PARTICULES VITESSE som 
+	pseudocolor_with_opacity transfo_VDF/transfo_VDF.lata dom DENSITE_PARTICULES ELEM 1e-4
+
+	cycles -1
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+}
+
+Chapter {
+	Title "FTD bubbles transformation and particles vanishing (VEF)"
+	Description ""
+visu {
+	Title "Initial time (t=0)"
+	description "FTD bubbles and particles positions"
+        
+	mesh transfo_VEF/interface.lata INTERFACES
+	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	
+	cycles -11  
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.01)"
+	description "FTD bubbles and particles positions"
+	
+        mesh transfo_VEF/interface.lata INTERFACES
+        mesh transfo_VEF/marqueurs.lata PARTICULES
+	molecule transfo_VEF/marqueurs.lata PARTICULES DIAMETRE som 0.0005
+	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE som 
+	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	
+	cycles -9
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.035)"
+	description "FTD bubbles and particles positions"
+        
+        mesh transfo_VEF/interface.lata INTERFACES
+	mesh transfo_VEF/marqueurs.lata PARTICULES
+	molecule transfo_VEF/marqueurs.lata PARTICULES DIAMETRE som 0.0005
+	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE som 
+	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	
+	cycles -4
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.05)"
+	description "FTD bubbles and particles positions"
+	
+        mesh transfo_VEF/interface.lata INTERFACES
+        mesh transfo_VEF/marqueurs.lata PARTICULES
+	molecule transfo_VEF/marqueurs.lata PARTICULES DIAMETRE som 0.0005
+	vector transfo_VEF/marqueurs.lata  PARTICULES VITESSE som
+	pseudocolor_with_opacity transfo_VEF/transfo_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	
+	cycles -1
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+}
+
+
+
+
+

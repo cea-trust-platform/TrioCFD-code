@@ -1,0 +1,100 @@
+# Hydraulique 2D : Paroi defilante #
+dimension 2
+Pb_Hydraulique pb
+Domaine dom
+Mailler dom
+{
+	Pave Cavite 
+		{
+		Origine 0. 0.
+     		Nombre_de_Noeuds 16 16
+		Longueurs 1. 1.
+		facteurs 1.05 1.05
+		symx
+		symy
+		}
+		{
+		Bord Gauche X = 0.  0. <= Y <= 1.
+		Bord Haut   Y = 1.  0. <= X <= 1.
+		Bord Bas    Y = 0.  0. <= X <= 1.
+		Bord Droit  X = 1.  0. <= Y <= 1.
+		}
+}
+Trianguler_H dom 
+
+VEFPreP1B dis
+
+# Runge_Kutta_rationnel_ordre_2 sch #
+
+Schema_Euler_explicite sch
+
+# Runge_Kutta_ordre_3 sch # 
+# Schema_MacCormack sch #
+# Schema_Predictor_Corrector sch #
+
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 500
+	dt_min 1.e-5
+	dt_max 1.
+	dt_impr 1.
+	dt_sauv 100.
+	facsec 1.
+        seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme  1 200.e-6
+	rho Champ_Uniforme 1 1.
+}
+
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression Gcp { precond ssor { omega 1.5 }
+                                       seuil 1.e-7
+                                     } 
+		convection { generic muscl vanleer 1 }
+		diffusion {  }
+		conditions_initiales {
+			vitesse  Champ_Uniforme 2 0.0 0.0
+			}
+		boundary_conditions {
+			Haut Frontiere_ouverte_vitesse_imposee
+			           Champ_Front_Uniforme 2 1. 0.
+			Bas    paroi_fixe
+			Gauche paroi_fixe
+			Droit  paroi_fixe
+		}
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+		sonde vitesse periode 5.e-1 point 1 2.e-1 0.5 			
+		seg_vit_y vitesse periode 10. segment 30 0.00 0.5  1.  0.5
+		seg_vit_x vitesse periode 10. segment 30 0.5  0.   0.5 1. 
+		}
+		format lml
+		Champs dt_post 50.
+		{ 
+			vitesse elem
+		}
+	}
+}
+EcritureLectureSpecial 0
+Solve pb
+End

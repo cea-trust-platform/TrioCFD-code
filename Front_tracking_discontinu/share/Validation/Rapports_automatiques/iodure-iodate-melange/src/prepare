@@ -1,0 +1,201 @@
+#!/bin/bash
+
+liste_t="20 14 12 10 9 8 7 6 5 3 1 -1 -4 -6 -14"
+
+echo > post_final
+for dt in ${liste_t}
+do
+td="-"$dt
+[ $dt -lt 0 ]  && td=`echo 0 -  $dt   | bc `
+echo echo \"1e\"$td \`cat  iod02-$dt/H2O.fin\`  \`cat  iod02-$dt/time_dec\` >> post_final
+done
+chmod  +x post_final
+file=chimie_ft_conc.prm
+chmod +w $file
+echo "Parameters {
+        Title "verification reactions concurentes"
+        Description "Calculs menes en VDF"
+        Author "G.F."
+	Prerequisite ./post_final >time_dec
+" > $file
+
+
+
+for dt in ${liste_t}
+do
+mkdir -p iod02-$dt
+cp post_run iod02-$dt
+sed "s/__cst__/1e-$dt/" iod02.data > iod02-$dt/iod02-$dt.data
+if [ $dt -eq 7 ]
+then 
+sed "s/__cst__/1e-$dt/;s/nb_pas_dt_max 100/nb_pas_dt_max 500/" iod02.data > iod02-$dt/iod02-$dt.data
+fi
+if [ $dt -le 6 ]
+then 
+
+mm=`echo -4 - $dt | bc `
+# [ $dt -eq -4 ] && mm=1
+
+if [ $dt -ge 0 ] 
+then
+sed "s/__cst__/1e-$dt/;s/nb_pas_dt_max 100/nb_pas_dt_max 300/;s/1e-11/1e$mm/" iod02.data > iod02-$dt/iod02-$dt.data
+else
+
+td=`echo 0 -  $dt   | bc `
+sed "s/__cst__/1e$td/;s/nb_pas_dt_max 100/nb_pas_dt_max 400 /;s/diffusion { }/diffusion { negligeable }/;s/1e-11/1e$mm/" iod02.data > iod02-$dt/iod02-$dt.data
+fi
+fi
+
+if [ $dt -eq 20 ]
+ then
+    echo "  TestCase iod02-$dt iod02-$dt.data en annexe" >> $file 
+else
+    echo "  TestCase iod02-$dt iod02-$dt.data " >> $file 
+fi
+done
+
+# creation d 'un cas avec reaction/6.
+
+   echo "   TestCase iod02-1B iod02-1B.data" >> $file
+   mkdir -p iod02-1B
+   sed "s/reactifs 6\*Hp+5\*Im+IO3m/reactifs Hp+5.\/6.*Im+IO3m\/6./;s/produits 3\*I2+3\*H2O/produits 0.5*I2+0.5*H2O/;s/constante_taux_reaction 5.8e7/constante_taux_reaction 34.8e7/" iod02-1/iod02-1.data >iod02-1B/iod02-1B.data
+   if [ "`diff iod02-1/iod02-1.data iod02-1B/iod02-1B.data`" = "" ]
+       then
+       echo "pb creation iod02-1B/iod02-1B.data"
+       mv iod02-1B/iod02-1B.data iod02-1B/iod02-1B.data.rate
+   fi
+# cas tets titre
+  echo "    TestCase titre titre.data">> $file
+  mkdir titre
+  cp titre.data titre
+echo " 
+}
+" >> $file
+if [ 0 -eq 1 ]
+then
+echo "Chapter {" >> $file
+for i in 1 2
+do
+echo "
+        Title H20
+	Figure {
+	Include_Description_Curves 0
+	dimension 2" >> $file
+
+if [ $i -eq 2 ]
+then
+echo "logx 
+logy" >> $file
+fi
+
+for dt in ${liste_t} 
+do
+	echo " Curve {
+	file iod02-$dt/iod02-${dt}_H2O.son
+	legend dt=1e-$dt
+	}" >> $file
+done  
+echo "}  " >>$file
+done
+echo " Table {
+	    nb_columns 1
+            label H20 final ">>$file
+
+for dt in ${liste_t} 
+do
+	echo " line {
+	file iod02-$dt/iod02-${dt}_H2O.son
+        last_line
+        nb_columns_file 2
+        columns (\$2)
+	legend dt=1e-$dt
+	}" >> $file
+done  
+echo " }" >> $file
+echo " }" >> $file
+fi
+echo "Chapter {
+Title  temps cara
+figure
+{
+Include_Description_Curves 0
+dimension 2
+logx 
+logy
+labelx constante modele
+labely temps disparition 90 % de H+
+Curve {
+file time_dec
+columns 1 3
+style linespoints
+}
+}
+}
+Chapter {
+Title  H2 produit
+figure
+{
+Include_Description_Curves 0
+dimension 2
+logx 
+logy
+labelx constante modele
+labely H2O produit 
+Curve {
+file time_dec
+
+style linespoints
+}
+}
+}
+
+Chapter {
+Title  verfication du titre en cas de reactions limitees par Hp
+figure
+{
+Include_Description_Curves 0
+dimension 2
+labelx temps
+labely titre
+rangex 1e-3 auto
+Curve {
+
+file titre/titre_SONDE_Y.son
+style lines
+}
+Curve {
+
+file titre/titre_SONDE_Y2.son
+style lines
+}
+Curve {
+origin ana 0.1418
+fonction 0.1418
+style lines 
+}
+}
+}
+
+
+Chapter {
+Title  verfication  production I3M avec equation divisee par 6
+figure
+{
+Include_Description_Curves 0
+dimension 2
+labelx temps
+labely I3M 
+Curve {
+
+file iod02-1/iod02-1_I3M.son
+style lines
+}
+Curve {
+
+file iod02-1B/iod02-1B_I3M.son
+style lines
+}
+}
+}
+
+" >> $file

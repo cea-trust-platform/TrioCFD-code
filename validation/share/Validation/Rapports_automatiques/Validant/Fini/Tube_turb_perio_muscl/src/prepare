@@ -1,0 +1,14 @@
+#!/bin/bash
+
+gunzip -c trio_perio_fin_DOM_geo.asc.gz > trio_perio_fin_DOM_geo.asc
+
+mkdir -p TUBE_TURB 
+
+cd TUBE_TURB
+cp ../TUBE_TURB_perio.data .
+cp ../post_run .
+cp ../trio_perio_fin_DOM_geo.asc .
+cp ../nut_profile_LaunderSh.dat .
+cp ../pre_run .
+
+cd ..

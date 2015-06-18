@@ -1,0 +1,568 @@
+Parameters {
+	Title " Evaluation of EF_stab an Muscl convective schemes in simple VEF-configurations "
+#
+	Description " Three different test cases are performed in order to study the impact of several convection schemes (EF_stab and Muscl with different limiters) in simple VEF-configurations. " 
+#
+	VersionTrio_U "1.6.1"
+#
+######################## bibliography
+#	
+	reference " \latex_($[1]$\latex_) U. Ghia, K.N. Ghia and C.T. Shin, \latex_(\textit{Hight-Reynolds solutions for incompressible flow using Navier-Stokes equation and a multigrid method}\latex_), Journal of computational Physics, \latex_($\textbf{48}$\latex_), 387-411 (1982). "
+
+#
+#
+	TestCase test1/EF_stab/alpha_1 test \*
+	TestCase test1/EF_stab/alpha_02 test
+	TestCase test1/Muscl/minmod_1 test
+	TestCase test1/Muscl/vanalbada_1 test 
+	TestCase test1/Muscl/chakravarthy_1 test 
+	TestCase test1/Muscl/vanleer_1 test 
+	TestCase test1/Muscl/superbee_1 test 
+#
+	TestCase test2/EF_stab/alpha_1 test \*
+	TestCase test2/EF_stab/alpha_02 test
+	TestCase test2/Muscl/minmod_1 test
+	TestCase test2/Muscl/vanalbada_1 test 
+	TestCase test2/Muscl/chakravarthy_1 test 
+	TestCase test2/Muscl/vanleer_1 test 
+	TestCase test2/Muscl/superbee_1 test 
+#
+	TestCase test3/EF_stab/alpha_1 test \*
+	TestCase test3/EF_stab/alpha_02 test
+	TestCase test3/Muscl/minmod_1 test
+	TestCase test3/Muscl/minmod_2 test 
+	TestCase test3/Muscl/vanleer_1 test 
+	TestCase test3/Muscl/vanleer_2 test 
+#
+	Author "E.MOREAU (V.BARTHEL)"
+	IncludeData 2
+
+}
+##################################################
+###
+### test 1
+###
+Chapter {
+	Title "Description of Test 1"
+#
+	Description " $\bullet$ 2D rotating spot: passive scalar transportation in a stationnary laminar flow "
+	Description " $\bullet$ Dimension: disque radius = 1m "
+	Description " $\bullet$ Type of mesh elements: triangles"
+	Description " $\bullet$ Hydraulic Initial conditions: constant angular speed (1 rad/s) "
+	Description " $\bullet$ Thermic Initial conditions: rectangular 0.2\latex_($\times$\latex_)0.2 spot profile (\latex_($T_{\rm{max}}$ = 1K\latex_) ; \latex_($T_{\rm{min}}$ = 0K\latex_)) "
+	Description " $\bullet$ Boundary conditions : adiabatic wall "
+	Description " $\bullet$ Solving of equations: Navier_Stokes_standard (without any resolution) and Convection_Diffusion_Temperature "
+	Description " $\bullet$ Convection momentum scheme: EF_stab of Muscl "
+	Description " $\bullet$ Time scheme: Runge-kutta 3 "
+	Description " "
+	Description " \latex_(\underline{Validation with:}\latex_) The rotation of the initial temperature profile "
+#
+	Figure {
+		Title " General overview of the test "
+		Width 12cm
+		picture post/geometry_test1.png
+	}
+	visu {
+		Title "Mesh visualization "
+		Width 10cm, viewport= 0 0 1024 1024,clip
+		mesh test1/EF_stab/alpha_1/test.lata DISQUE
+		Description " Number of elements: 6130 "
+	}
+#
+}
+###
+### test 2
+###
+Chapter {
+	Title "Description of Test 2"
+#
+	Description " $\bullet$ 3D translating spot: passive scalar transportation in a stationnary laminar flow "
+	Description " $\bullet$ Dimension: cube of 1m \latex_($\times$\latex_) 1m \latex_($\times$\latex_) 1m "
+	Description " $\bullet$ Type of mesh elements: tetrahedral (from option Tetraedriser_homogene_fin) "
+	Description " $\bullet$ Hydraulic Initial conditions: constant speed such as \latex_($\vec{u}$\latex_) = (1;1;1) "
+	Description " $\bullet$ Thermic Initial conditions: rectangular 0.2\latex_($\times$\latex_)0.2\latex_($\times$\latex_)0.2 spot profile (\latex_($T_{\rm{max}}$ = 1K\latex_) ; \latex_($T_{\rm{min}}$ = 0K\latex_)) "
+	Description " $\bullet$ Boundary conditions : 3D-periodic "
+	Description " $\bullet$ Solving of equations: Navier_Stokes_standard (without any resolution) and Convection_Diffusion_Temperature "
+	Description " $\bullet$ Convection momentum scheme: EF_stab of Muscl "
+	Description " $\bullet$ Time scheme: Runge-kutta 3 "
+	Description " "
+	Description " \latex_(\underline{Validation with:}\latex_) The rotation of the initial temperature profile "
+#
+	Figure {
+		Title " General overview of the test "
+		Width 14cm
+		picture post/geometry_test2.png
+	}
+	visu {
+		Title "Mesh visualization "
+		Width 10cm, viewport= 0 0 1024 1024,clip
+		mesh test2/EF_stab/alpha_1/test.lata dom
+		normal3D 0.6 0.2 0.8
+		up3D -0.1 1 -0.2
+		Description " Number of elements: 6000 (\latex_(\textbf{coarse mesh)}\latex_)) "
+	}
+#
+}
+###		Description " Number of elements: 6130 "
+### test 3
+###
+Chapter {
+	Title "Description of Test 3"
+#
+	Description " $\bullet$ 2D laminar flow with slipping wall "
+	Description " $\bullet$ Dimension: 1m \latex_($\times$\latex_) 1m "
+	Description " $\bullet$ Type of mesh elements: triangles (from option trianguler_h) "
+	Description " $\bullet$ Initial conditions: velocity = 0 "
+	Description " $\bullet$ Boundary conditions : slipping wall on the upper wall: Vx = 1m/s "
+	Description " $\bullet$ Time scheme: Euler explicite "
+	Description " $\bullet$ Convection momentum scheme: EF_stab of Muscl "
+ 	Description " $\bullet$ Solving of equations: Navier_Stokes_standard "
+ 	Description " "
+	Description " \latex_(\underline{Validation with:}\latex_) qualitative analysis between results and comparison with other numerical data (see $[1]$) "
+#
+	Figure {
+		Title " General overview of the test "
+		Width 14cm
+		picture post/geometry_test3.png
+	}
+	visu {
+		Title "Mesh visualization "
+		Width 8cm
+		mesh test3/Muscl/minmod_1/test.lata dom
+		Description " Number of elements: 900 "
+	}
+# properties Geometry
+	Table {
+			Title "Physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($1)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($2)
+			}
+			line {
+			      	legend " Re "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($3)
+			}
+	}
+#
+
+#
+}
+#####
+Chapter {
+	Title "Results of the test case 1"
+
+
+################
+### 
+	Figure {
+		Title " Profiles of temperature after a rotation of 180° of the spot "
+		Description " The results for the different EF_stab and Muscl schemes with different limiters are presented on the graphic for comparison with the referent profile. "
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 12cm
+		Dimension 2			
+		LabelX "X (m)"
+		RangeX -0.3 0.3
+		LabelY "T (K)"
+		RangeY -0.2 1.5
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Reference"
+			origin "Experimental"
+			Fonction (x>(-0.1))*(x<0.1)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "EF_stab (alpha = 1)"
+			origin "Trio_U"
+			Segment test1/EF_stab/alpha_1/test.data coupe_T_3 
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "minmod (Muscl)"
+			origin "Trio_U"
+			Segment test1/Muscl/minmod_1/test.data coupe_T_3
+			columns ($1) ($2)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Van Albada (Muscl)"
+			origin "Trio_U"
+			Segment test1/Muscl/vanalbada_1/test.data coupe_T_3
+			columns ($1) ($2)
+			Style points
+			TypeLigne 4
+		}
+		Curve {
+			legend "Chakravarthy (Muscl)"
+			origin "Trio_U"
+			Segment test1/Muscl/chakravarthy_1/test.data coupe_T_3
+			columns ($1) ($2)
+			Style points
+			TypeLigne 5
+		}
+		Curve {
+			legend "Van Leer (Muscl)"
+			origin "Trio_U"
+			Segment test1/Muscl/vanleer_1/test.data coupe_T_3
+			columns ($1) ($2)
+			Style points
+			TypeLigne 6
+		}
+		Curve {
+			legend "Superbee (Muscl)"
+			origin "Trio_U"
+			Segment test1/Muscl/superbee_1/test.data coupe_T_3
+			columns ($1) ($2)
+			Style points
+			TypeLigne 7
+		}
+	}
+
+
+#
+}
+##################
+Chapter {
+	Title "Results of the test case 2"
+
+################
+### 
+	Figure {
+		Title " Profiles of temperature after a one cross-flow of the spot "
+		Description " The results for the different EFstab and Muscl schemes with different limiters are presented on the graphic for comparison with the referent profile. Remind that the simulations have been performed on a coarse-grained mesh. "
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 12cm
+		Dimension 2			
+		LabelX "Z (m)"
+		RangeX 0 1
+		LabelY "T (K)"
+		RangeY -0.2 1.2
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Reference"
+			origin "Experimental"
+			Fonction (x>0.4)*(x<0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "EF_stab (alpha = 1)"
+			origin "Trio_U"
+			Segment test2/EF_stab/alpha_1/test.data sonde_temp0 
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "minmod (Muscl)"
+			origin "Trio_U"
+			Segment test2/Muscl/minmod_1/test.data sonde_temp0
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Van Albada (Muscl)"
+			origin "Trio_U"
+			Segment test2/Muscl/vanalbada_1/test.data sonde_temp0
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Chakravarthy (Muscl)"
+			origin "Trio_U"
+			Segment test2/Muscl/chakravarthy_1/test.data sonde_temp0
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Van Leer (Muscl)"
+			origin "Trio_U"
+			Segment test2/Muscl/vanleer_1/test.data sonde_temp0
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "Superbee (Muscl)"
+			origin "Trio_U"
+			Segment test2/Muscl/superbee_1/test.data sonde_temp0
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 7
+		}
+	}
+#
+}
+##################
+Chapter {
+	Title "Results of the test case 3"
+################
+### 
+	Figure {
+		Title " Vx Profiles of velocities at x = 0.5 "
+		Description " Profiles of velocities are shown for different EF_stab and Muscl schemes,  and with limiters of different orders. "
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 12cm
+		Dimension 2			
+		LabelX "y (m)"
+		RangeX 0 1
+		LabelY "Vx (m/s)"
+		RangeY -0.6 1.
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Reference"
+			origin "Experimental"
+			file post/exp_U.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+			Pointsize 1.5
+		}
+		Curve {
+			legend "EF_stab (alpha = 1)"
+			origin "Trio_U"
+			Segment test3/EF_stab/alpha_1/test.data seg_vit_x 
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "minmod (Muscl) order 1"
+			origin "Trio_U"
+			Segment test3/Muscl/minmod_1/test.data seg_vit_x
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "minmod (Muscl) order 2"
+			origin "Trio_U"
+			Segment test3/Muscl/minmod_2/test.data seg_vit_x
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Van Leer (Muscl) order 1"
+			origin "Trio_U"
+			Segment test3/Muscl/vanleer_1/test.data seg_vit_x
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Van Leer (Muscl) order 2"
+			origin "Trio_U"
+			Segment test3/Muscl/vanleer_2/test.data seg_vit_x
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 6
+		}
+	}
+#
+### 
+	Figure {
+		Title " Vy Profiles of velocities at y = 0.5 "
+		Description " Profiles of velocities are shown for different EF_stab and Muscl schemes, and with limiters of different orders. "
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 12cm
+		Dimension 2			
+		LabelX "y (m)"
+		RangeX 0 1
+		LabelY "Vy (m/s)"
+		RangeY -0.6 1.
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Reference"
+			origin "Experimental"
+			file post/exp_V.dat
+			columns 1 2 
+			Style points
+			TypePoints 7
+			Pointsize 1.5
+		}
+		Curve {
+			legend "EF_stab (alpha = 1)"
+			origin "Trio_U"
+			Segment test3/EF_stab/alpha_1/test.data seg_vit_y 
+			columns ($1) ($3)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "minmod (Muscl) order 1"
+			origin "Trio_U"
+			Segment test3/Muscl/minmod_1/test.data seg_vit_y
+			columns ($1) ($3)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "minmod (Muscl) order 2"
+			origin "Trio_U"
+			Segment test3/Muscl/minmod_2/test.data seg_vit_y
+			columns ($1) ($3)
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Van Leer (Muscl) order 1"
+			origin "Trio_U"
+			Segment test3/Muscl/vanleer_1/test.data seg_vit_y
+			columns ($1) ($3)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Van Leer (Muscl) order 2"
+			origin "Trio_U"
+			Segment test3/Muscl/vanleer_2/test.data seg_vit_y
+			columns ($1) ($3)
+			Style lines
+			TypeLigne 6
+		}
+	}
+### 
+	Figure {
+		Title " Time evolution of the velocity in a probe located at (0.2 ; -0.5) "
+		Description " Profiles of velocities are shown for different EF_stab and Muscl schemes, and with limiters of different orders. "
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 12cm
+		Dimension 2			
+		LabelX "temps (s)"
+		RangeX 0 100
+		LabelY "U (m/s)"
+		RangeY -0.04 0.02
+		Include_Description_Curves 0			
+		Curve {
+			legend "EF_stab (alpha = 1)"
+			origin "Trio_U"
+			file test3/EF_stab/alpha_1/test_SONDE.son
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "minmod (Muscl) order 1"
+			origin "Trio_U"
+			file test3/Muscl/minmod_1/test_SONDE.son
+			columns ($1) ($2)
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend "minmod (Muscl) order 2"
+			origin "Trio_U"
+			file test3/Muscl/minmod_2/test_SONDE.son
+			columns ($1) ($2)
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend "Van Leer (Muscl) order 1"
+			origin "Trio_U"
+			file test3/Muscl/vanleer_1/test_SONDE.son
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Van Leer (Muscl) order 2"
+			origin "Trio_U"
+			file test3/Muscl/vanleer_2/test_SONDE.son
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 7
+		}
+	}
+#
+#
+#
+	visu {
+		Title "Velocity field: EF_stab (alpha = 1) "
+		Width 8cm
+		Isovalues test3/EF_stab/alpha_1/test.lata dom norme_VITESSE ELEM 
+
+	}
+	visu {
+		Title "Velocity field: Muscl (minmod = 1) "
+		Width 8cm
+		Isovalues test3/Muscl/minmod_1/test.lata dom norme_VITESSE ELEM 
+	}
+	visu {
+		Title "Velocity field: Muscl (minmod = 2) "
+		Width 8cm
+		Isovalues test3/Muscl/minmod_2/test.lata dom norme_VITESSE ELEM 
+	}
+	visu {
+		Title "Velocity field: Muscl (vanleer = 1) "
+		Width 8cm
+		Isovalues test3/Muscl/vanleer_1/test.lata dom norme_VITESSE ELEM 
+	}
+	visu {
+		Title "Velocity field: Muscl (vanleer = 2) "
+		Width 8cm
+		Isovalues test3/Muscl/vanleer_2/test.lata dom norme_VITESSE ELEM 
+	}
+#
+#
+}
+#################
+#####
+Chapter {
+	Title "Comments and Conclusion"
+	Description " These basic test cases find out the dissipative effect of all the convective schemes and particularly for those using upwind formulation or minmod limiter. (Note that the strongly dissipative behaviour on test case 2 is mainly due to the use of a very coarse mesh). "
+	Description " "
+	Description " $\bullet$ \latex_(\textbf{Test cases 1 and 2}\latex_):"
+	Description " - The calculations with EF_stab with $\alpha = 0.2$ and Muscl with the limiter Superbee present instabilities. "
+	Description " - The less dissipative limiters appear to be Van Leer and Chakravarthy ones. But, because of non-symmetric formulation of Chakravarthy one, only Van Leer might be retained as the better limiter. For this reason, study 3 focused only on upwind, minmod and Van Leer limiters. "
+	Description " "
+	Description " $\bullet$ \latex_(\textbf{Test case 3}\latex_):"
+	Description " - The calculations with EF_stab present instabilities and doesn't seem suitable for this case. "
+	Description " - Elevation of the order (for the calculation of the fluxes) improves slightly the prediction of the flows. "
+	Description " - It can be noticed from the figure 7.3, that dynamical behaviour can be strongly different according to limiter and order chosen. "
+	Description " "
+	Description " As a conclusion, Van Leer limiter gathers good characteristics and must be retained as limiter for Muscl scheme in Trio_U, with 2nd order expression for fluxes calculation. Nevertheless, any other validations (in particularly in 3D configurations) are welcome to assess and confirm its good properties."
+
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description "In case of non correct values returned by Trio_U (due, for instance, to strong nonconformal transporting velocity flow field), user can redefine in data file a lower order and a smoother limiter for example by : "
+	Description " \latex_($$\mathbf{Convection\ \{\ decentre\ muscl\ minmod\ 1\ \}}$$\latex_) "
+	Description " The EF_stab scheme with alpha value near to 1 is also a good compromise for most cases."
+}
+###
+
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+
+
+

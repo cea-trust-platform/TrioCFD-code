@@ -1,0 +1,175 @@
+# Periodic box data file #
+# Calculate a fully developped turbulent flow in the box #
+
+# Dimension #
+dimension 3
+
+# Define and read the box #
+domaine box
+Scatter box.Zones box
+
+# Navier Stokes problem with energy and turbulence model defined #
+Pb_thermohydraulique_turbulent pb
+
+# Discretization #
+VEFPreP1B dis
+
+# High order explicit scheme used for RANS calculation #
+Runge_kutta_ordre_3 sch
+Read sch
+{
+	# Initial time #
+	tinit 0.
+	# End time #
+	tmax 1.
+	# .out output file printing period # 
+	dt_impr 0.001
+	# Backup period #
+	dt_sauv 400.
+	# Runge Kutta 3 scheme, the stability time step is increased 3 times compared to Euler explicit #  
+	facsec 3
+}
+
+# Water defined #
+Fluide_Incompressible water
+Read water
+{
+	# Dynamic viscosity #
+	mu  Champ_Uniforme 1 1.90e-5
+	# Volumic mass #
+ 	rho Champ_Uniforme 1 1.205
+	# Thermal conductivity #
+	lambda Champ_Uniforme 1 0.6
+	# Heat capacity #
+	cp Champ_Uniforme 1 4185	
+	# Thermal expanson coefficient #
+	beta_th Champ_Uniforme 1 0.0034
+}
+
+# Gravity field #
+Champ_Uniforme gravity
+Read gravity 3 0 -9.81 0
+
+# Objects linked #
+Associate water gravity
+Associate pb box
+Associate pb sch
+Associate pb water
+Discretize pb dis
+
+# Read the problem #
+Read pb
+{
+	Navier_Stokes_Turbulent
+	{
+		# Direct method to solve pressure linear system #
+		solveur_pression petsc Cholesky { }
+		# EF_stab scheme for advection operator #
+		convection { EF_stab { alpha 1. } }
+		diffusion { }
+		# Initial conditions for velocity #
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 10.4 0. } 
+		# Source term to force a constant flow rate #                
+		sources { Canal_perio { bord perio } }
+		# Boundary conditions #
+		boundary_conditions
+		{
+			# Periodic boundary condition #
+			perio		periodique
+			# Wall u=0 #
+			wall 		paroi_fixe
+			# Symmetry condition : u.n=0 #
+			symmetry	symetrie
+		}
+		# RANS model used: standard K-Epsilon #
+		modele_turbulence K_Epsilon 
+		{
+			# K-Eps transport equation definition #
+			Transport_K_Epsilon 
+                  	{
+				# Upwind scheme for the advection operators #
+				convection { amont }
+				diffusion { }
+				# Boundary conditions #
+				boundary_conditions
+				{
+					# Periodic boundary condition #
+					perio		periodique
+					# Wall law applied # 
+					wall		paroi
+					# Symmetry condition dk/dn=dEps/dn=0 #
+					symmetry	symetrie
+				} 
+				# Initial conditions for K and Epsilon #
+                         	conditions_initiales
+                           	{
+					# k=3/2(U*t)^2 (turbulence rate=5%), eps=Cmu/0.07/D*k^1.5 #
+                             		k_Eps Champ_Uniforme 2 0.405 7.73 	
+                           	}		
+            		}			
+			# Logarithmic standard wall law selected #
+			# Friction velocity u* printed with a 0.05s period # 
+                        Turbulence_paroi loi_standard_hydr dt_impr_ustar 0.05
+		}
+		# Write the "perio" boundary K-Epsilon field into a file #
+		Ecrire_fichier_xyz_valeur k_eps		1. bords 1 perio
+		# Write the "perio" boundary velocity field into a file #
+		Ecrire_fichier_xyz_valeur vitesse	1. bords 1 perio
+	}
+	# Energy equation #
+        Convection_Diffusion_Temperature_Turbulent 
+	{
+		# muscl scheme for advection operator #
+		convection { muscl }
+		diffusion { }
+		# Initial conditions for temperature #
+		conditions_initiales { temperature Champ_Uniforme 1 20 }
+                boundary_conditions {
+			# Periodic boundary condition #
+			perio		periodique
+			# Temperature imposed from a file #
+                        wall		paroi_temperature_imposee champ_front_uniforme 1 50
+			# Symmetry condition dT/dn=0 #
+			symmetry 	symetrie
+                   }
+		# Prandtl model for turbulent diffusivity #
+                Modele_Turbulence Prandtl { 
+			# wall law selected #
+			turbulence_paroi loi_standard_hydr_scalaire
+			# Nusselt number printed with a 0.05s period # 
+			dt_impr_nusselt 0.05
+		}
+		# Write the "perio" boundary temperature field into a file #
+		Ecrire_fichier_xyz_valeur temperature	1. bords 1 perio	
+        }	
+	# Post processing definition #
+	Postraitement
+	{
+		# 1D probes to monitor #
+		Sondes
+		{
+			# Define a velocity probe for checking evolution #
+			velocity 	nodes 	vitesse			periode 0.005 point   1 -0.5 -0.1524 0.
+			velocity2 	nodes 	vitesse			periode 0.005 point   1 -0.496362 -0.1524 0.021194
+			# Define non-interpolated profiles for velocity, K, Epsilon, turbulent viscosity, temperature #
+			inlet_velocity 	nodes	vitesse			periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.
+			inlet_K 	nodes	K			periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.	
+			inlet_Eps 	nodes	Eps			periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.	
+			inlet_nut 	nodes	Viscosite_turbulente	periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.
+			inlet_T 	nodes	temperature		periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.
+		}
+		# 3D fields post processing with LATA format for VisIt #
+		Format lata
+		Champs dt_post 0.2 
+		{
+			vitesse			faces	# velocity at the faces #        
+			Viscosite_turbulente	elem	# turbulent viscosity at the elements #
+			K			elem	# kinetic energy at the elements #
+			Eps			elem	# Turbulent dissipation rate at the elements #
+			y_plus			elem	# y+ at the elements #
+			temperature		faces	# temperature at the faces #
+		}
+	}
+}
+# Solve the problem #
+Solve pb

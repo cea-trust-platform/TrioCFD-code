@@ -1,0 +1,328 @@
+# Ecoulement de Couette cylindrique avec paroi defilante #
+# PARALLEL RUNS #
+
+dimension 2
+
+Probleme_FT_Disc_gen pb
+
+Domaine DOM
+
+# BEGIN MESH #
+Mailler DOM
+{
+
+        Pave domaine
+        {
+                Origine 0. 0.
+                Nombre_de_Noeuds 32 32
+                Longueurs 4. 4.
+        }
+        {
+                Bord up_down Y = 0. 0. <= X <= 4.
+                Bord up_down Y = 4. 0. <= X <= 4.
+                Bord left_right X = 0. 0. <= Y <= 4.
+                Bord left_right X = 4. 0. <= Y <= 4.
+        }
+}
+# END MESH #
+
+# BEGIN PARTITION
+
+Partition DOM
+{
+        Partitionneur tranche { tranches 2 1 }
+        Larg_joint 2
+        Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VDF dis
+
+# Runge_Kutta_ordre_4_D3P sch #
+Schema_Euler_Explicite sch
+Read sch
+{
+	tinit 0.   
+	tmax 5.
+	dt_min 1.5e-2
+	dt_max 1.5e-2
+	dt_impr 0.01
+	seuil_statio -1
+        facsec 1.
+        diffusion_implicite 1	   # PENA_LIN #
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 1.e-1
+	rho Champ_Uniforme 1 1.
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0. 0.
+
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc cylind_1
+Transport_Interfaces_FT_Disc cylind_2
+
+Associate pb eq_hydraulique
+Associate pb cylind_1
+Associate pb cylind_2
+
+Associate pb DOM
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	eq_hydraulique
+	{
+		modele_turbulence sous_maille_wale 
+		{	Cw 0.
+			turbulence_paroi negligeable 
+		}
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-16 impr }
+		convection { QUICK }
+		diffusion { }
+		conditions_initiales { Vitesse Champ_fonc_xyz DOM 2 0. 0. }
+                equations_interfaces_vitesse_imposee 2 cylind_1 cylind_2
+                penalisation_forcage { pression_reference 0. } 
+                Parametre_equation parametre_diffusion_implicite   # PENA_LIN #
+                {                                                  # PENA_LIN #
+                      preconditionnement_diag 1                    # PENA_LIN #
+                }                                                  # PENA_LIN #
+		boundary_conditions
+		{	
+		      up_down Frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+                      left_right Frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+		}
+        }
+
+	cylind_1
+	{
+		conditions_initiales { fonction -((x-2.)*(x-2.)+(y-2.)*(y-2.)-0.25) }  
+		remaillage
+		{
+			pas -1e8
+			nb_iter_remaillage 5
+			critere_arete 0.5
+			critere_remaillage 0.2
+			pas_lissage -1
+			nb_iter_barycentrage 5
+			relax_barycentrage 1
+			facteur_longueur_ideale 0.5
+		}
+
+		boundary_conditions
+		{
+			up_down paroi_ft_disc symetrie
+                        left_right paroi_ft_disc symetrie
+		}
+		methode_transport vitesse_imposee -(y-2.) (x-2.)
+                type_vitesse_imposee analytique
+		interpolation_champ_face lineaire { }
+                n_iterations_interpolation_ibc 1
+		vitesse_imposee_regularisee 0
+	}
+
+	cylind_2
+	{
+		conditions_initiales { fonction ((x-2.)*(x-2.)+(y-2.)*(y-2.)-2.25) }  
+		remaillage
+		{
+			pas -1e8
+			nb_iter_remaillage 5
+			critere_arete 0.5
+			critere_remaillage 0.2
+			pas_lissage -1
+			nb_iter_barycentrage 5
+			relax_barycentrage 1
+			facteur_longueur_ideale 0.5
+		}
+
+		boundary_conditions
+		{
+			up_down paroi_ft_disc symetrie
+                        left_right paroi_ft_disc symetrie
+		}
+		methode_transport vitesse_imposee -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4.
+                type_vitesse_imposee analytique
+		interpolation_champ_face lineaire { }
+                n_iterations_interpolation_ibc 1
+		vitesse_imposee_regularisee 0
+	}
+        
+        Postraitement
+        {
+         definition_champs 
+          {
+          L2_norme_Id reduction_0D
+          {
+              methode norme_L2 source Transformation {  methode formule expression 1 identite 
+                                  source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite }
+                                                     }
+          }
+          Max_norme_Id reduction_0D
+          {
+              methode max source Transformation {  methode formule expression 1 identite 
+                                  source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite }
+                                                     }
+          }
+          L2_norme_div reduction_0D
+          {
+              methode norme_L2 source Transformation {  methode formule expression 1 divergence 
+                                source refChamp { Pb_champ pb divergence_U nom_source divergence } 
+			     }
+          }
+          Max_norme_div reduction_0D
+          {
+              methode max source Transformation {  methode formule expression 1 divergence 
+                                source refChamp { Pb_champ pb divergence_U nom_source divergence } 
+			     }
+          }
+          L2_norme_err_fluide reduction_0D
+          {
+              methode norme_L2 source Transformation 
+              {
+                       methode formule expression 1 (vitesse-solution)*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
+                       sources { 
+                            refChamp { Pb_champ pb vitesse nom_source vitesse } , 
+                            Transformation { 
+                                methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution
+              }
+          }
+          }
+          }
+          Max_norme_err_fluide reduction_0D
+          {
+              methode max source Transformation 
+              {
+                       methode formule expression 1 (vitesse-solution)*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
+                       sources { 
+                            refChamp { Pb_champ pb vitesse nom_source vitesse } , 
+                            Transformation { 
+                                methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution
+              }
+          }
+          }
+          }
+          L2_norme_solution reduction_0D
+          {
+              methode norme_L2 source Transformation 
+              {
+                       methode formule expression 1 solution*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
+                       source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution }
+          }
+          }
+          Max_norme_solution reduction_0D
+          {
+              methode max source Transformation 
+              {
+                       methode formule expression 1 solution*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
+                       source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution }
+          }
+          }
+          }
+          Sondes
+          {
+           L2_norme_Id L2_norme_Id periode 0.1 numero_elem_sur_maitre 0
+           L2_norme_div L2_norme_div periode 0.1 numero_elem_sur_maitre 0
+           L2_err_fluide L2_norme_err_fluide periode 0.1 numero_elem_sur_maitre 0
+           L2_solution L2_norme_solution periode 0.1 numero_elem_sur_maitre 0
+           Max_err_fluide Max_norme_err_fluide periode 0.1 numero_elem_sur_maitre 0
+           Max_solution Max_norme_solution periode 0.1 numero_elem_sur_maitre 0
+           Max_norme_div Max_norme_div periode 0.1 numero_elem_sur_maitre 0
+           Max_norme_Id Max_norme_Id periode 0.1 numero_elem_sur_maitre 0
+          } 
+          
+           Champs dt_post 0.01
+           {
+        	vitesse elem
+           }
+        }
+        liste_de_postraitements
+	{	        
+            post_dom Postraitement_ft_lata 
+            {
+		dt_post 0.01
+        	nom_fichier lata/post_dom
+	        format binaire
+		print
+       		champs elements
+        	{
+	        	vitesse
+		        pression
+		        divergence_u
+        		indicatrice_cylind_1
+	        	indicatrice_cylind_2
+       		}
+        	champs Faces
+	        {
+		        vitesse
+        		indicatrice_faces_cylind_1
+	        	indicatrice_faces_cylind_2
+                        vitesse_imp_interp_cylind_1
+                        vitesse_imp_interp_cylind_2
+        	}
+	        interfaces cylind_2 
+                {
+                        champs sommets 
+                        {
+			        pe
+			        courbure
+			}
+			champs elements
+                        {
+			        pe
+			}
+		}
+           }
+	   post_cylind_1 Postraitement_ft_lata 
+           {
+		dt_post 0.01
+        	nom_fichier lata/post_cylind_1
+	        format binaire
+		print
+        	champs elements
+	        {
+		       	vitesse
+		        pression
+	        	indicatrice_cylind_1
+		       	indicatrice_cylind_2
+        	}
+	        champs Faces
+		{
+		        vitesse
+	        	indicatrice_faces_cylind_1
+		       	indicatrice_faces_cylind_2
+	        }
+	        interfaces cylind_1 
+                {
+		        champs sommets 
+                        {
+			        pe
+			        courbure
+			}
+			champs elements
+                        {
+			       pe
+			}
+		}
+	  }
+       }
+}
+
+# Calcul du moment resistant exerce par le fluide sur le disque tournant #
+Calculer_moments DOM centre_de_gravite 2.0 2.0
+
+Solve pb
+
+End

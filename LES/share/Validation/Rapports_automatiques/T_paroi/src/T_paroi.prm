@@ -1,0 +1,131 @@
+Parameters {
+	Title "Wall temperature verification in VEF discretisation with Neumann conditions"
+	Description "Calculations with imposed u*, and Nusselt number imposed or free"
+	Author "V.B."
+ 	TestCase "Nu_impose" "T_paroi.data" impression du jeu de donnees en fin de file
+  	TestCase "Symet" "T_paroi.data" 
+ 	TestCase "U_impose" "T_paroi.data" 
+	VersionTrio_U "1.5.6_beta"
+}
+
+Chapter {
+	Title "Model description"
+	
+Figure  {
+	Title "Geometry, Mesh and Boundary Conditions"
+	Description "Dimensions : h=200 mm, L=30 mm "
+	Description "7 x 10 rectangular mesh cut with "'trianguler' option"
+	Description "Velocity inlet = 10 m/s ; Temperature inlet = 0°C"
+	Description "Lateral Heat flux = 2285 W/m2"
+	Description "Outlet, pressure = 0"
+        Width 8cm
+        picture ./T_paroi_geo1.png
+	}
+	
+Table {
+	Title "Physical properties"
+        Description "Fluid domain: Helium"
+        Description "No Gravity effect"
+	nb_columns 1
+		Label Valeur
+                line {
+	        	legend "$\rho$ en kg/m$³$"
+                        file ./rho.dat
+                }
+                line {
+	        	legend "$\mu$ en N/m$²$/s"
+                        file ./mu.dat
+                }
+                line {
+	        	legend "$\lambda$ en W/m/K"
+                        file ./lambda.dat
+                }
+                line {
+	        	legend "Cp en J/kg/K"
+                        file ./Cp.dat
+                }
+	}
+}
+
+Chapter {
+	Title "Numerical Results"
+Table {
+  	Title "Analytical solutions for two calculation conditions"
+	Description "The mean outlet temperature is deduced from global energy balance :"
+	Description "\latex_($\rho\:Cp\:U\Delta Tes = \Phi,\: so \:\Delta Tes = 0.1\:K$\latex_) where $\Delta$Tes is the temperature difference between inlet and outlet."
+	Description ""
+	Description "The Nusselt number in Trio_U is a local heat exchange coefficient. Knowing this Nu number, we can deduce the theorical temperature gradient at the wall, i.e. the difference between wall and first fluid point temperatures :"
+	Description "\latex_($\Delta Tw = \Phi\:d(\lambda\:Nu)$\latex_)where $\Delta$ Tw is this wall temperature difference, it will be taken at the channel outlet."
+	Description "In our case, the distance between these two points is d = 2.14e$^-$$^3$m"
+	Description "When we impose a thermal wall law (Kader), the local gradient, and so the Nusselt number, is calculated with this law"
+	}
+}
+
+Chapter {
+	Title "First calculation : u*=0 and Nu=20"
+Table {
+  	Title "Comparisons of mean and wall temperature value at the outlet"
+	Description "As defined before, the theorical $\Delta$Tw can be known. We show in the following table, the different values calculated by Trio_U and compare with the analytical solution."
+	Description "The first $\Delta$Tw value corresponds to the difference between the first fluid temperature value and the face temperature at the wall. Thus it is disturbed by the convection term discretization."  
+	Description "The second $\Delta$Tw "equiv" value corresponds to the difference between the first fluid temperature value and the equivalent wall temperature calculated with the local Nusselt number in Trio_U. "  
+	Description " "
+	Description "The same calculation has be done with two different boundary conditions at the wall : 'symetrie' or 'paroi_fixe' to see the effect of non-tangential velocities at the edge" 
+	Description " "
+	nb_columns 6
+                label Tmean Outlet | Tfluid | Twall (face) | $\Delta$Tw | Twall "equiv" | $\Delta$Tw "equiv"
+                line {
+                        legend "Theorical value"
+                        file ./Nu_impose/theoric.dat
+                }
+                line {
+                        legend "Trio_U paroi_fixe"
+                        file ./Nu_impose/temp.dat
+			origin trio_u
+                }
+                line {
+                        legend "Trio_U symet"
+                        file ./Symet/temp.dat
+			origin trio_u
+                }
+        }
+}
+	
+Chapter {
+	Title "Second calculation : u*=0.2 and thermal law function"
+Figure  {
+	Title "New Boundary conditions"
+        Width 8cm
+        picture ./T_paroi_geo2.png
+	}
+	
+Table {
+  	Title "Second calculation results"
+	Description "Here, the wall friction velocity is imposed. Thus, the wall temperature gradient is calculated with this u* value. The theorical value of $\Delta$Tw is given thanks to the Kader law. We compare it with the Trio_U results, resumed in the table below."
+	Description " "
+	nb_columns 6
+                label Tmean Outlet | Tfluid | Twall (face) | $\Delta$Tw | Twall "equiv" | $\Delta$Tw "equiv"
+                line {
+                        legend "Theorical value"
+                        file ./U_impose/theoric.dat
+                }
+                line {
+                        legend "Trio_U paroi_fixe"
+                        file ./U_impose/temp.dat
+			origin trio_u
+                }
+        }
+Table {
+  	Title "Conclusions"
+  	Description "We can note than the temperature gradient calculated with the Trio_U face temperature(*) is very far from the analytical one. This is due to the convection terms in the VEF discretization method."
+  	Description "Because of this convection effect, the modification of the local Nusselt number as no visible effect on the wall temperature."
+  	Description "When we take the wall "equivalent" temperature calculated with the thermal wall law, or the local Nusselt number (*), the $\Delta$Tw_eq is perfectly correct."
+  	Description "We can assure that the total wall heat is brougth to the fluid since the mean temperature at the channel outlet is correct."
+	Description " "
+  	Description "(*) : this temperature values can be found in the "T_paroi_pbf_Nusselt.face" output file."
+        }
+	
+tableau_performance {
+	Title "Computing performance"
+        }
+}
+

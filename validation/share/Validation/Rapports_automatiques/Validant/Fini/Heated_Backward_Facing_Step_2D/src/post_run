@@ -1,0 +1,22 @@
+
+extrait_coupe test_VEF SONDE_V1_LONGI
+extrait_coupe test_VEF SONDE_V2_LONGI
+extrait_coupe test_VEF SONDE_V3_LONGI
+extrait_coupe test_VEF SONDE_V4_LONGI
+extrait_coupe test_VEF SONDE_V5_LONGI
+extrait_coupe test_VEF SONDE_V6_LONGI
+
+extrait_coupe test_VEF SONDE_TWALL
+
+extrait_coupe test_VEF SONDE_T1
+extrait_coupe test_VEF SONDE_T2
+extrait_coupe test_VEF SONDE_T3
+extrait_coupe test_VEF SONDE_T4
+extrait_coupe test_VEF SONDE_T5
+
+extrait_coupe test_VEF SONDE_BOTTOM_GRAV
+
+python Post.py
+
+
+

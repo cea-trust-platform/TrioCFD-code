@@ -1,0 +1,4 @@
+#!/bin/bash
+data=`pwd`
+data=`basename $data`
+compare_lata ref.lml $data.lml 1>verifie.log 2>&1

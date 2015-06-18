@@ -1,0 +1,5 @@
+gunzip -f Pb1_2D.geom.gz
+#mkdir -p VEF
+sed "s/Dilate DOM3 0.001/Dilate DOM3 0.001 trianguler_h DOM3/;s/VDF/VEFPrep1B/" tubeY02.data > VEF/tubeY02.data 
+cd VEF
+gunzip -c Pb1_2D_grossier.geom.gz >  Pb1_2D.geom

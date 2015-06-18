@@ -1,0 +1,5 @@
+#!/bin/bash
+extrait_coupe Conduite SONDE_VP
+extrait_coupe Conduite SONDE_TPN
+python ../propertiesGeometry.py
+python ../tableauCourbes.py

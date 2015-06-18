@@ -1,0 +1,14 @@
+dimension 3
+Domaine dom
+Read_file dom dom.geom
+Reordonner_faces_periodiques dom PERX
+Reordonner_faces_periodiques dom PERZ
+
+Partition dom
+{
+	Partitionneur Metis { nb_parts 12  }
+	Larg_joint 2
+	Nom_Zones dom
+	periodique 2 PERX PERZ 
+}
+End

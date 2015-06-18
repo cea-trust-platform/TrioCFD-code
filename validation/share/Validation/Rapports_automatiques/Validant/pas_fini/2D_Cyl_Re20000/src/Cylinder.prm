@@ -1,0 +1,1603 @@
+Parameters {
+	Title "Oscillating flow behind a 2D cylinder at Reynolds number of 17054 and 33720."
+	
+	Description "The objective is to validate the capacities of several VEF schemes of predicting"
+	Description "mean drag and Strouhal number on a cylinder for a turbulent flow."
+	
+	VersionTrio_U "1.6.2"
+	
+	ParametersTrio_U "Type of problem: 2D turbulent hydraulic_problem"
+	ParametersTrio_U "Discretization: VEFPreP1B"
+	ParametersTrio_U "Time scheme: Schema_euler_explicite"
+       	ParametersTrio_U Turbulence model: K-\latex_({\Large $ \epsilon $} \latex_) standard model   
+	ParametersTrio_U "Solving of equations: Navier_Stokes_Turbulent"
+
+#
+	Reference " $[1]$ Nishihara T., Kaneko S., Watanabe T., Characteristics of fluid dynamic forces acting on a circular cylinder oscillated in the streamwise direction and its wake patterns. Journal of Fluids and Structures. 20, 505-518, 2005 " 
+	Reference " $[2]$ Saxena A., Guidelines for Specification of Turbulence at Inflow Boundaries, http://support.esi-cfd.com/esi-users/turb_parameters/"
+	Reference " $[3]$ Norberg C., Flow around a circular cylinder : aspects of fluctuating lift. Journal of Fluids and Structures (2001) 15, 459-469"
+	TestCase 0.44_ef_stab_Gambit test 
+	TestCase 0.87_ef_stab_Gambit test 
+	TestCase 0.44_muscl_Gambit test 
+	TestCase 0.87_muscl_Gambit test 
+	TestCase 0.44_amont_Gambit test 
+	TestCase 0.87_amont_Gambit test 
+	TestCase 0.44_ef_stab_GambitFin test 
+	TestCase 0.87_ef_stab_GambitFin test 
+	TestCase 0.44_muscl_GambitFin test 
+	TestCase 0.87_muscl_GambitFin test 
+	TestCase 0.44_amont_GambitFin test 
+	TestCase 0.87_amont_GambitFin test 
+	TestCase 0.44_ef_stab_Gmsh test 
+	TestCase 0.87_ef_stab_Gmsh test 
+	TestCase 0.44_muscl_Gmsh test 
+	TestCase 0.87_muscl_Gmsh test 
+	TestCase 0.44_amont_Gmsh test 
+	TestCase 0.87_amont_Gmsh test 
+	
+			
+	Author "Ledac P., Vandroux S."
+	IncludeData 2
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Tests Description"
+	Description "Hydraulic initial conditions: fluid U = V = W = 0 m/s "
+	Description "Hydraulic boundary condition: "
+	Description " $\bullet$ The velocity is fixed in order to obtain Re = UD/$\nu$ = 17054 or 33720"
+	Description " $\bullet$ To create the Von Karman vortex street quicker, an asymmetry is created when initializing the velocity initial condition."
+	Description " $\bullet$ CYLINDER paroi_fixe "
+	Description " $\bullet$ WALL paroi_fixe "
+	Description " $\bullet$ OUTLET frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.0 "
+	Description " $\bullet$ INLET frontiere_ouverte_vitesse_imposee Champ_Fonc_xyz dom 2 0.44/0.87 0.01*sin(x) "
+	Description "Turbulent boundary condition: "
+	Description " $\bullet$ Turbulence kinetic energy is given by k=2/2(I*Uo$)^2$ where I is the turbulence intensity, taken to 1.5 % (See experimental details page 2 of $[1]$) "
+	Description " $\bullet$ Turbulence dissipation rate is given by \latex_({\Large $ \epsilon $} =Cmu$^{0.75}$*k$^{1.5}$/l\latex_) where Cmu=0.09 and l turbulence scale length is taken to 0.07*2*R (See reason in $[2]$)"
+	Description " $\bullet$ CYLINDER paroi "
+	Description " $\bullet$ WALL paroi "
+	Description " $\bullet$ OUTLET frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 k \latex_({\Large $ \epsilon $} \latex_)"
+	Description " $\bullet$ INLET  frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 k \latex_({\Large $ \epsilon $} \latex_)"
+# properties Geometry
+	Table {
+			Title "Physical properties"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($1)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($2)
+			}
+	}
+#
+	Figure {
+		Title "Geometry"
+		Description "In the following scheme, L = 1.25 m ; W = 1 m ; H = 1.0 m and R = 0.025 m."
+		Description "The origin is the cylinder center."
+		Width 14cm
+		picture geometry.png 
+	}
+	Table {
+                Title "Meshes"	
+		Description "Three meshes have been used for this study:"
+		Description "$\bullet$ Gambit 	: Mesh built with Gambit\&ICEM tools with 2 tetraedras layers near the cylinder but not refined near the wall."
+		Description "$\bullet$ GambitFin 	: Refined mesh built with Gambit\&ICEM tools with 2 tetraedras layers near the cylinder and the wall."
+		Description "$\bullet$ Gmsh 	: Refined mesh built with Gmsh tool but without tetraedras layers."
+		#Description "\latex_(\newline\latex_) "
+        }
+	visu {
+		Description "\latex_(\textbf {A) Gambit mesh} \latex_)"
+		Description "It has $NUMBER_OF_ELEMENTS_Gambit$ cells." 
+		mesh 0.44_muscl_Gambit/test.lata dom
+		Width 15cm, viewport=0 100 1000 800, clip
+	}
+	visu {
+		Description "Detail of the mesh around the cylinder and Y+ values:"
+		Pseudocolor_with_range 0.44_muscl_Gambit/test.lata dom Y_PLUS ELEM 0 100
+		mesh 0.44_muscl_Gambit/test.lata dom
+		Width 15cm, viewport=0 500 1000 800, clip
+		Zoom2D -0.05 0.06 -0.05 0.05
+		Operator no_axes
+		Operator no_bounding_box		
+        }	
+	visu {
+		Description "\latex_(\newpage\latex_) "
+		Description "\latex_(\textbf {B) Refined Gambit mesh} \latex_)"
+		Description "It has $NUMBER_OF_ELEMENTS_GambitFin$ cells." 
+		mesh 0.44_muscl_GambitFin/test.lata dom
+		Width 15cm, viewport=0 100 1000 800, clip
+	}
+	visu {
+		Description "Detail of the mesh around the cylinder and Y+ values:"
+		Pseudocolor_with_range 0.44_muscl_Gambit/test.lata dom Y_PLUS ELEM 0 100
+		mesh 0.44_muscl_GambitFin/test.lata dom
+		Width 15cm, viewport=0 500 1000 800, clip
+		Zoom2D -0.05 0.06 -0.05 0.05
+		Operator no_axes
+		Operator no_bounding_box		
+        }	
+	visu {
+		Description "\latex_(\newpage\latex_) "
+		Description "\latex_(\textbf {C) Refined Gmsh mesh} \latex_)"
+		Description "It has $NUMBER_OF_ELEMENTS_Gmsh$ cells." 
+		mesh 0.44_muscl_Gmsh/test.lata dom
+		Width 15cm, viewport=0 100 1000 800, clip
+	}
+	visu {
+		Description "Detail of the mesh around the cylinder and Y+ values:"
+		Pseudocolor_with_range 0.44_muscl_Gambit/test.lata dom Y_PLUS ELEM 0 100
+		mesh 0.44_muscl_Gmsh/test.lata dom
+		Width 15cm, viewport=0 500 1000 800, clip
+		Zoom2D -0.05 0.06 -0.05 0.05
+		Operator no_axes
+		Operator no_bounding_box		
+        }	
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter { 
+	Title "2D Results"
+	Description "The Trio_U simulations have been performed up to tmax=10*L/U in order to get sufficient cycles allowing the calculation of a frequency."	
+	Description ""		
+	Figure {
+		Title "Experimental results"
+		Description "Flow in the experiment (extracted from $[1]$) :"
+		Width 14cm
+		picture flow.jpg 
+	} 
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme ef_stab on mesh Gambit"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_ef_stab_Gambit/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_ef_stab_Gambit/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_ef_stab_Gambit/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_ef_stab_Gambit/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_ef_stab_Gambit/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_ef_stab_Gambit/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme muscl on mesh Gambit"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_muscl_Gambit/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_muscl_Gambit/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_muscl_Gambit/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_muscl_Gambit/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_muscl_Gambit/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_muscl_Gambit/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme amont on mesh Gambit"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_amont_Gambit/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_amont_Gambit/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_amont_Gambit/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_amont_Gambit/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_amont_Gambit/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_amont_Gambit/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme ef_stab on mesh GambitFin"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_ef_stab_GambitFin/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_ef_stab_GambitFin/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_ef_stab_GambitFin/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_ef_stab_GambitFin/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_ef_stab_GambitFin/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_ef_stab_GambitFin/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme muscl on mesh GambitFin"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_muscl_GambitFin/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_muscl_GambitFin/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_muscl_GambitFin/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_muscl_GambitFin/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_muscl_GambitFin/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_muscl_GambitFin/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme amont on mesh GambitFin"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_amont_GambitFin/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_amont_GambitFin/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_amont_GambitFin/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_amont_GambitFin/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_amont_GambitFin/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_amont_GambitFin/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme ef_stab on mesh Gmsh"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_ef_stab_Gmsh/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_ef_stab_Gmsh/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_ef_stab_Gmsh/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_ef_stab_Gmsh/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_ef_stab_Gmsh/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_ef_stab_Gmsh/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme muscl on mesh Gmsh"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_muscl_Gmsh/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_muscl_Gmsh/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_muscl_Gmsh/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_muscl_Gmsh/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_muscl_Gmsh/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_muscl_Gmsh/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+
+	   Table {
+		   Description "\latex_(\newpage\latex_) "
+	   }
+	   visu {
+		   Title "Scheme amont on mesh Gmsh"
+		   Description "Velocity (Re=17054)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.44_amont_Gmsh/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Velocity (Re=33720)"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor 0.87_amont_Gmsh/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=17054)"
+		   Width 7cm
+		   Pseudocolor 0.44_amont_Gmsh/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.44_amont_Gmsh/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description "Zoom near the cylinder (Re=33720)"
+		   Width 7cm
+		   Pseudocolor 0.87_amont_Gmsh/test.lata dom norme_VITESSE SOM
+		   BlackVector 0.87_amont_Gmsh/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+	}
+Chapter {
+	Title "1D Results"
+	Description "It can be seen that the beginning of the pseudo-steady state is at t=~5*L/U."
+	Description "From this instant, an oscillation frequency can be determined." 
+	
+	   Table {
+		   Title "Scheme ef_stab on mesh Gambit"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_ef_stab_Gambit/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_ef_stab_Gambit/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_ef_stab_Gambit/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_ef_stab_Gambit/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_ef_stab_Gambit/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_ef_stab_Gambit/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_ef_stab_Gambit/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_ef_stab_Gambit/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme muscl on mesh Gambit"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_muscl_Gambit/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_muscl_Gambit/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_muscl_Gambit/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_muscl_Gambit/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_muscl_Gambit/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_muscl_Gambit/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_muscl_Gambit/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_muscl_Gambit/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme amont on mesh Gambit"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_amont_Gambit/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_amont_Gambit/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_amont_Gambit/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_amont_Gambit/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_amont_Gambit/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_amont_Gambit/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_amont_Gambit/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_amont_Gambit/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme ef_stab on mesh GambitFin"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_ef_stab_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_ef_stab_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_ef_stab_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_ef_stab_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_ef_stab_GambitFin/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_ef_stab_GambitFin/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_ef_stab_GambitFin/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_ef_stab_GambitFin/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme muscl on mesh GambitFin"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_muscl_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_muscl_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_muscl_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_muscl_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_muscl_GambitFin/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_muscl_GambitFin/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_muscl_GambitFin/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_muscl_GambitFin/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme amont on mesh GambitFin"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_amont_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_amont_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_amont_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_amont_GambitFin/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_amont_GambitFin/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_amont_GambitFin/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_amont_GambitFin/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_amont_GambitFin/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme ef_stab on mesh Gmsh"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_ef_stab_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_ef_stab_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_ef_stab_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_ef_stab_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_ef_stab_Gmsh/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_ef_stab_Gmsh/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_ef_stab_Gmsh/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_ef_stab_Gmsh/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme muscl on mesh Gmsh"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_muscl_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_muscl_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_muscl_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_muscl_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_muscl_Gmsh/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_muscl_Gmsh/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_muscl_Gmsh/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_muscl_Gmsh/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	
+	   Table {
+		   Title "Scheme amont on mesh Gmsh"
+	   }	
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.44_amont_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.44_amont_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file 0.87_amont_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file 0.87_amont_Gmsh/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=17054"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.44_amont_Gmsh/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.44_amont_Gmsh/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure "Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=33720"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex  14.36781609195402298850
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file 0.87_amont_Gmsh/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file 0.87_amont_Gmsh/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+	}
+Chapter {
+	Title "Flow analysis"
+	Description "According schemes and meshes, Trio_U predicts or not the Von Karman wake. The following tables summarize the wake state behind the cylinder at Re=17054 (the pattern are the same at Re=33720)."
+	Table {
+			Description ""
+			nb_columns 3
+			label EF_stab | Muscl | Upwind 
+			line { 
+				legend "Gambit" 
+				values "Steady" "Unsteady" "Unsteady"
+			}			
+			line { 
+				legend "GambitFin" 
+				values "Unsteady" "Unsteady" "Steady"
+			}			
+			line { 
+				legend "Gmsh" 
+				values "Steady" "Unsteady" "Steady"
+			}			
+	}
+}
+Chapter {
+	Title "Comparison between Trio_U calculations and experiment"
+	Description "The steady drag coefficient number \latex_($C_{d}$\latex_) is defined as \latex_($C_{d}=\frac{Fx}{0.5*rho*U^2*D*W}$\latex_), where $Fx$ is the mean drag."
+	Description "The dynamic lift coefficient number \latex_($C'_{l}$\latex_) is defined as \latex_($C'_{l}=\frac{F'y}{0.5*rho*U^2*D*W}$\latex_), where $F'y$ is the root mean square amplitude of the lift."
+	Description "The dominant frequency of dynamic lift (page 508 of $[1]$) allows the determination of the Strouhal"
+	Description "number \latex_($S_{t}$\latex_) defined as \latex_($S_{t}=\frac{f.D}{U}$\latex_), where $f$ stands for the vortexes emission frequency."
+	Description "The following tables contain the Trio_U calculated numbers for the three different schemes and meshes and the relative error versus the experimental values."	
+####
+#### Drag coefficient number
+####
+	Table {
+			Title "Comparison of steady drag coefficient numbers"
+			Description "Experimental value found in [1] at Re=17054 for \latex_($C_{d}$\latex_) is 1.10"
+			Description "Trio_U calculated values are given below with relative error versus the experimental value in brackets:" 
+			nb_columns 4
+			label Mesh cells | EF_stab | Muscl | Upwind 
+			lines { 
+				file Cd_0.44.dat 
+				number_last_line 3
+			}			
+	}
+	Table {
+			Description "Experimental value found in [1] at Re=33720 for \latex_($C_{d}$\latex_) is 1.01"
+			Description "Trio_U calculated values are given below with relative error versus the experimental value in brackets:" 
+			nb_columns 4
+			label Mesh cells | EF_stab | Muscl | Upwind 
+			lines { 
+				file Cd_0.87.dat 
+				number_last_line 3
+			}			
+	}
+
+####
+#### Lift coefficient number
+####
+	Table {
+			Title "Comparison of dynamic lift coefficient numbers"
+			Description "Experimental value found in [1] at Re=17054 for \latex_($C_{l}$\latex_) is 0.038 but reference [3] (page 462) gives value in the range 0.4-0.6 so relative error with Trio_U is not computed:" 
+			nb_columns 4
+			label Mesh cells | EF_stab | Muscl | Upwind 
+			lines { 
+				file Cl_0.44.dat 
+				number_last_line 3
+			}			
+	}
+	Table {
+			Description "Experimental value found in [1] at Re=33720 for \latex_($C_{l}$\latex_) is 0.064 but reference [3] (page 462) gives value in the range 0.4-0.6 so relative error with Trio_U is not computed:" 
+			nb_columns 4
+			label Mesh cells | EF_stab | Muscl | Upwind 
+			lines { 
+				file Cl_0.87.dat 
+				number_last_line 3
+			}			
+	}
+####
+#### Strouhal number
+####
+	Table {
+			Title "Comparison of Strouhal numbers"
+			Description "Experimental value found in [1] at Re=17054 for \latex_($S_{t}$\latex_) is 0.184"
+			Description "Trio_U calculated values are given below with relative error versus the experimental value in brackets:" 
+			nb_columns 4
+			label Mesh cells | EF_stab | Muscl | Upwind 
+			lines { 
+				file St_0.44.dat
+				number_last_line 3
+			}			
+	}
+	Table {
+			Description "Experimental value found in [1] at Re=33720 for \latex_($S_{t}$\latex_) is 0.182"
+			Description "Trio_U calculated values are given below with relative error versus the experimental value in brackets:" 
+			nb_columns 4
+			label Mesh cells | EF_stab | Muscl | Upwind 
+			lines { 
+				file St_0.87.dat
+				number_last_line 3
+			}			
+	}	
+#
+}
+#####
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Conclusion"
+	Description "$\bullet$ The results confirm one of the standard K-Eps model limitation which is to not predict accurately adverse"
+	Description "pressure gradient flow, overestimating the separation angle and thus generally underestimating the drag"
+	Description "coefficient number."
+	Description "$\bullet$ Upwind scheme sometimes does not predict Von Karman vortexes on every mesh, and even if it does"
+	Description "the results are less good than the Muscl scheme."
+	Description "$\bullet$ EF_stab scheme has bad or false results on at least one mesh and further"
+	Description "investigations will be mandatory to explain or fix this problem."
+	Description "$\bullet$ Muscl scheme is the more robust scheme and despite of the standard K-Eps limitation give the more"
+	Description "consistent results, except for the dynamic lift coefficient number."
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description "$\bullet$ Correct K-Eps values for inlet boundary condition are critical to have an unstationary flow."
+	Description "$\bullet$ A small asymmetry is necessary to create quickly the Von Karman vortexes. This asymmetry may be created"
+	Description "on the mesh or by a small perturbation on the initial condition for the velocity field (perhaps the last perturbation"
+	Description "used for the calculations is not enough for the 2 meshes where upwind scheme resulted in a steady solution)."
+	Description "$\bullet$ Muscl scheme is the recommended scheme for this kind of calculation."
+	Description "$\bullet$ For each scheme giving the Von Karman wake, the higher the number of mesh points on the cylinder, the better the results are." 
+}
+#####
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		
+		}
+}
+
+
+
+

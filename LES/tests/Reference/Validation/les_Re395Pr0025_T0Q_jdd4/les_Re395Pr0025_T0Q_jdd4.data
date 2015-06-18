@@ -1,0 +1,175 @@
+#  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+
+#
+y+=17
+dx+= 50
+dz+= 50 #
+
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 15 8 8
+		Longueurs  6.4 2. 3.2
+		Facteurs 1. 1 1.
+	}
+	{
+		Bord periox   X = 0.             0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord periox   X = 6.4    0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord perioz   Z = 0.             0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2    0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord bas      Y = 0.             0. <= X <= 6.4   0. <= Z <= 3.2
+		Bord haut     Y = 2.             0. <= X <= 6.4   0. <= Z <= 3.2
+		}
+}
+
+tetraedriser_homogene_fin dom
+Reordonner_faces_periodiques dom periox
+Reordonner_faces_periodiques dom perioz
+
+Runge_Kutta_Ordre_3 sch_RK
+Read sch_RK
+{
+        tinit 0
+	nb_pas_dt_max 3
+        tmax 41
+        dt_min 1.e-10
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 1.
+        dt_sauv 100
+        seuil_statio 1.e-8  
+        facsec 1.5
+}
+
+Schema_Euler_implicite sch_impl
+Read sch_impl
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 41
+	dt_start dt_calc
+       dt_min 1.e-7
+       dt_max 1.
+        dt_impr 1.
+        dt_sauv 100
+       seuil_statio 1.e-15
+       facsec 4
+       facsec_max 1
+	no_check_disk_space
+	periode_sauvegarde_securite_en_heures 11
+	solveur Implicite
+             {
+                 seuil_convergence_solveur 1.e-12
+	         solveur  gmres { diag seuil 1e-12 impr controle_residu 1 }
+             }
+
+} 
+
+
+VEFPreP1b dis
+
+Fluide_Incompressible air
+Read air
+{
+	mu Champ_Uniforme       1 2.84e-5
+ 	rho Champ_Uniforme      1 0.011928
+        lambda Champ_Uniforme   1 5.899248
+        Cp Champ_Uniforme       1 5193.
+        beta_th Champ_Uniforme  1 1.9954e-3                                                                                               
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate air gravite
+Associate pb dom
+Associate pb sch_impl
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7  } 
+		convection { ef_stab { volumes_etendus alpha 0.2 }  }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_init_canal_sinal 3 { Ucent 24.225 h 1.0  ampli_sin 0. omega 1. ampli_bruit 0.0 }
+			}
+        	Sources {
+			Canal_perio { bord periox }
+			}
+		boundary_conditions {
+			periox  periodique
+			perioz periodique 
+			haut  paroi_fixe
+	                bas  paroi_fixe
+		}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 5
+			}
+
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 20
+		        dt_impr_moy_temp 20 
+		        debut_stat  20.
+				 }
+			}	
+        }
+
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+		convection { ef_stab { volumes_etendus alpha 1 }  }
+                Sources {
+                        Puissance_thermique Champ_uniforme 1 1
+                        }                                                                                           
+                Modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire 
+				dt_impr_nusselt 5
+		}
+                boundary_conditions
+                        {
+                        periox periodique
+                        perioz periodique
+                        haut   paroi_Temperature_imposee Champ_Front_Uniforme 1 0
+                        bas    paroi_Temperature_imposee Champ_Front_Uniforme 1 0
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0. }
+                }
+
+	Postraitement
+	{
+	     format lml
+	     Sondes
+	          {
+			coupe_vit  vitesse periode 1  segment 40   3.2 0. 1.6       3.2 2 1.6
+			coupe_theta temperature  periode 1. segment 40 3.2 0. 1.6       3.2 2 1.6
+			sonde_U1 vitesse  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_T1 temperature  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_U2 vitesse  periode 0.1 points 1 3.2 1.8 1.6 
+			sonde_T2 temperature  periode 0.1 points 1 3.2 1.8 1.6 
+	          }
+		Champs binaire dt_post 10
+			{
+			vitesse elem
+			temperature elem
+			}
+	}
+
+}
+
+Solve pb
+End

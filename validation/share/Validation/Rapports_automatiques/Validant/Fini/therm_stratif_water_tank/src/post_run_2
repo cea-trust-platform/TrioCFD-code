@@ -1,0 +1,12 @@
+#!/bin/bash
+cp ../2d_vdf_strat_amont/proberes1.dat ./proberes1_1.dat
+cp ../2d_vdf_strat_amont/proberes2.dat ./proberes2_1.dat
+cp ../2d_vdf_strat_amont/proberes3.dat ./proberes3_1.dat
+cp ../2d_vdf_strat_amont/proberes4.dat ./proberes4_1.dat
+cp ../2d_vdf_strat_amont/proberes5.dat ./proberes5_1.dat
+cp ../2d_vdf_strat_amont/proberes6.dat ./proberes6_1.dat
+cp ../2d_vdf_strat_amont/proberes7.dat ./proberes7_1.dat
+cp ../2d_vdf_strat_amont/proberes8.dat ./proberes8_1.dat
+cp ../2d_vdf_strat_amont/proberes9.dat ./proberes9_1.dat
+sh ../stratif1.awk 2d_strat
+sh ../stratif2.awk 

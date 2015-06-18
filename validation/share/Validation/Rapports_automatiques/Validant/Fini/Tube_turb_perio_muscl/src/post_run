@@ -1,0 +1,5 @@
+#!/bin/bash
+extrait_coupe TUBE_TURB_perio SONDE_VP
+
+python ../propertiesGeometry.py
+python ../tableauCourbes.py

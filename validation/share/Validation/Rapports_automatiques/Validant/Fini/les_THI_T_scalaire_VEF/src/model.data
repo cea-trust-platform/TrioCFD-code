@@ -1,0 +1,229 @@
+# Boite 3D avec periodicite dans les trois directions : THI_VEF #
+# calcul en parallele #
+
+dimension 3
+
+Pb_Thermohydraulique_Turbulent_Scalaires_Passifs pb
+Domaine dom
+PrecisionGeom 1e-14
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entree 
+	{
+	Origine 0. 0. 0.
+	Nombre_de_Noeuds 33 33 33
+	Longueurs 6.283185307 6.283185307 6.283185307
+	}
+	{
+	Bord periox X = 0. 0. <= Y <= 6.283185307 0. <= Z <= 6.283185307 
+	Bord periox X = 6.283185307 0. <= Y <= 6.283185307 0. <= Z <= 6.283185307 
+	Bord perioy Y = 0. 0. <= X <= 6.283185307 0. <= Z <= 6.283185307 
+	Bord perioy Y = 6.283185307 0. <= X <= 6.283185307 0. <= Z <= 6.283185307 
+	Bord perioz Z = 0. 0. <= X <= 6.283185307 0. <= Y <= 6.283185307 
+	Bord perioz Z = 6.283185307 0. <= X <= 6.283185307 0. <= Y <= 6.283185307 	
+
+	}
+}
+Tetraedriser_par_prisme dom
+
+Reordonner_faces_periodiques dom periox
+Reordonner_faces_periodiques dom perioy
+Reordonner_faces_periodiques dom perioz
+# END MESH #
+
+# Ecrire_fic_meshtv dom verif_domaine.meshtv #
+
+VEFPreP1b dis
+
+Runge_Kutta_Ordre_3 sch_RK
+Read sch_RK
+{
+	tinit 0.
+	tmax 200
+	dt_start dt_calc
+       dt_min 1.e-7
+       dt_max 1.
+        dt_impr 1.
+        dt_sauv 10
+       seuil_statio 1.e-15
+
+} 
+Schema_Euler_implicite sch_Impl
+Read sch_Impl
+{
+	tinit 0.
+	tmax 200
+	dt_start dt_calc
+       dt_min 1.e-7
+       dt_max 1.
+        dt_impr 1.
+        dt_sauv 10
+       seuil_statio 1.e-15
+       facsec 4
+       facsec_max 4
+	no_check_disk_space
+	periode_sauvegarde_securite_en_heures 11
+	solveur Implicite
+             {
+                 seuil_convergence_solveur 1.e-12
+	         solveur  gmres { diag seuil 1e-12 impr controle_residu 1 }
+             }
+
+} 
+
+Fluide_Incompressible air
+Read air
+{
+	mu  Champ_Uniforme 1 1e-20
+ 	rho Champ_Uniforme 1 1.
+  lambda Champ_Uniforme 1 1e-3
+  Cp Champ_Uniforme 1 1.
+  beta_th Champ_Uniforme 1 1.0
+}
+
+Associate pb dom
+Associate pb _SCHTPS_
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+  Navier_Stokes_Turbulent
+
+  {
+    solveur_pression Petsc Cholesky { }
+    
+    
+    convection { EF_stab { volumes_etendus alpha 0.2 } }
+    
+    
+    diffusion {  }
+    
+    conditions_initiales {  
+      vitesse Champ_fonc_xyz dom 3
+      0.5*sin(y+1)+1.0*sin(2*y)+0.5*sin(3*y)+0.5*sin(z+2+3.14)+1.0*sin(2*z)+0.5*sin(3*z)
+      0.5*sin(z+2)+1.0*sin(2*z)+0.5*sin(3*z)+0.5*sin(x+3+3.14)+1.0*sin(2*x)+0.5*sin(3*x)
+      0.5*sin(x+3)+1.0*sin(2*x)+0.5*sin(3*x)+0.5*sin(y+1+3.14)+1.0*sin(2*y)+0.5*sin(3*y)
+      	                 }
+    boundary_conditions
+    {
+      periox  periodique 
+      perioy  periodique 
+      perioz  periodique 
+    }
+    
+    Modele_turbulence Sous_maille_wale
+    {
+      turbulence_paroi loi_standard_hydr
+    }     
+
+    Traitement_particulier { THI { init_Ec 0 
+                                   calc_spectre 1 periode_calc_spectre 0.25 3D 1 1D 1 
+			longueur_boite 6.283185307
+			champs_scalaires 3 temperature temperature0 temperature1
+				   
+				   } }		
+
+
+  }
+  Convection_Diffusion_Temperature_Turbulent
+
+  {    
+    
+    convection { amont }
+    diffusion {  }
+    
+    conditions_initiales {  
+    temperature Champ_fonc_xyz dom 1 
+    	1-((INT(x/1.5707963267)+INT(y/1.5707963267)+INT(z/1.5707963267))%2) 
+      	                 }
+    boundary_conditions
+    {
+      periox  periodique 
+      perioy  periodique 
+      perioz  periodique 
+    }
+    
+    Modele_turbulence Prandtl
+    {
+      turbulence_paroi loi_standard_hydr_scalaire
+    }     
+
+  }
+ 	Equations_Scalaires_Passifs
+        {
+  Convection_Diffusion_Temperature_Turbulent
+
+  {    
+    
+    convection { muscl }
+    diffusion {  }
+    
+    conditions_initiales {  
+    temperature0 Champ_fonc_xyz dom 1 
+    	1-((INT(x/1.5707963267)+INT(y/1.5707963267)+INT(z/1.5707963267))%2) 
+      	                 }
+    boundary_conditions
+    {
+      periox  periodique 
+      perioy  periodique 
+      perioz  periodique 
+    }
+    
+    Modele_turbulence Prandtl
+    {
+      turbulence_paroi loi_standard_hydr_scalaire
+    }     
+
+  }
+  Convection_Diffusion_Temperature_Turbulent
+
+  {    
+    
+    convection { EF_stab { volumes_etendus alpha 1. } }
+    diffusion {  }
+    
+    conditions_initiales {  
+    temperature1 Champ_fonc_xyz dom 1 
+    	1-((INT(x/1.5707963267)+INT(y/1.5707963267)+INT(z/1.5707963267))%2) 
+      	                 }
+    boundary_conditions
+    {
+      periox  periodique
+      perioy  periodique
+      perioz  periodique
+    }
+    
+    Modele_turbulence Prandtl
+    {
+      turbulence_paroi loi_standard_hydr_scalaire
+    }     
+
+  }
+
+ }
+  
+Postraitement
+{
+	format lata
+	Champs dt_post 10
+	{
+		vitesse elem
+		temperature elem
+		temperature0 elem
+		temperature1 elem
+				
+	}
+}
+}
+
+Solve pb
+End
+Champ_Don_lu_spec dom pb 3 ../pb_THIVITESSE_xyz_valelem
+    Traitement_particulier { THI { init_Ec 1 val_Ec 8.27e-1
+                                   calc_spectre 0.25 3D 1 1D 1 
+			conservation_Ec
+				   
+				   } }		

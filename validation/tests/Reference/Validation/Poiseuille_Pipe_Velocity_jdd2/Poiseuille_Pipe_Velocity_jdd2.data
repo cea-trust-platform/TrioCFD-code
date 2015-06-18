@@ -1,0 +1,92 @@
+# Hydraulique Poiseuille - maillage tetra #
+  dimension 3 
+  Pb_hydraulique pb
+  Domaine dom
+
+# cylindre 3D
+  rayon 1.
+  longueur 20.
+#
+
+Read_file dom dom_3D.geom
+
+Postraiter_domaine { domaine dom format lml fichier geom.lata }
+
+
+
+
+VEFPreP1B dis
+
+schema_Euler_Implicite sch
+
+Read sch
+{
+	tinit   0.
+	nb_pas_dt_max 3
+	tmax    30.
+	dt_min  1.e-4
+	dt_max  10.
+	dt_impr 1.
+	dt_sauv 10.
+	seuil_statio 1.e-4	
+	facsec 30
+        facsec_max 1000
+	Solveur
+           Implicite
+           {
+                solveur gmres { diag seuil 1e-20 nb_it_max 5 impr }
+           } 
+}
+
+
+Fluide_Incompressible fluid
+Read fluid
+{
+	mu  Champ_Uniforme 1 0.02 
+	rho Champ_Uniforme 1 1.8
+}
+Associate pb dom
+Associate pb sch
+Associate pb fluid
+
+Discretize pb dis
+
+Read pb
+{
+   Navier_Stokes_standard
+      {
+	solveur_pression petsc cholesky { }  
+           convection { Muscl }
+           diffusion { }
+        conditions_initiales {
+           vitesse champ_uniforme 3 0 0 0.5
+                        }
+        boundary_conditions {
+           paroi paroi_fixe
+           derriere Frontiere_ouverte_pression_imposee  Champ_Front_uniforme 1 0.
+           devant Frontiere_ouverte_vitesse_imposee  Champ_Front_fonc_xyz 3 0 0 1-(x*x+y*y) 
+                                       }
+        }
+
+    Postraitement 
+    {
+      format lml
+      Sondes 
+	{
+	 sonde_P_entree pression periode 0.1 points 1   0.0  0.0   0.010 
+	 sonde_P_sortie pression periode 0.1 points 1   0.0  0.0   19.99 
+	 sonde_Vx        vitesse periode 0.1 points 1   0.0  0.0    5.0
+	 sonde_V_sortie vitesse periode  0.1 segment 20  0.0 1.0  0.01    0.0 -1.0 0.01
+	 sonde_V_entree vitesse periode  0.1 segment 20  0.0 1.0 19.99    0.0 -1.0 19.99
+	 sonde_P_in_out pression periode 0.1 segment 40  0.0 0.0 0.0     0.0  0.0  20.
+	}
+      Champs dt_post 10.
+	{
+	  pression elem
+	  vitesse elem
+	}
+   }
+}
+EcritureLectureSpecial 0
+Solve pb
+End

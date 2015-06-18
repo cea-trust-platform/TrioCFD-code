@@ -1,0 +1,278 @@
+Parameters {
+	Title " 2D_coupling_Pb "
+#
+	Description " Flow in a rectangular pipe with heat transfert from solid to fluid. Energy balance checking " 
+#
+	VersionTrio_U "1.6.1"
+#
+	ParametersTrio_U Type of problem: Thermal hydraulic coupled conduction  2D
+	ParametersTrio_U Time scheme: Euler_Explicite / explicite and semi implicite diffusion
+	ParametersTrio_U Momentum convection scheme: Upwind
+	ParametersTrio_U thermal convection scheme: Upwind
+	ParametersTrio_U Discretization: VEFPreP1B / VDF
+	ParametersTrio_U Turbulence model: None
+	ParametersTrio_U Type of boundary conditions: wall exchange contact fluid/solid
+	ParametersTrio_U Type of fluid: vapour 
+	ParametersTrio_U Type of solid: pure numerical properties to accelerate the calculation
+	ParametersTrio_U Solving of equation: Navier_stokes_standard ; Convection_diffusion_temperature ; Conduction
+#
+	TestCase VDF_di_0 test \* *\
+	TestCase VEF_di_0 test
+#
+	Author "E.MOREAU (V.BARTHEL)"
+	IncludeData 2
+
+}
+##################################################
+###
+### test 1
+###
+Chapter {
+	Title "Description of the tests"
+#
+	Description " $\bullet$ Initial conditions for fluid: Velocity = 0 ; temperature = 0"
+	Description " $\bullet$ Initial conditions for solid: temperature = 0 "
+	Description " $\bullet$ Hydraulic boundary conditions: "
+	Description " - Inlet: imposed velocity (0.1 m/s) "
+	Description " - Outlet: imposed pressure (0 Pa) "
+	Description " - Left wall: fixed wall "
+	Description " - Right wall: fixed wall "
+	Description " $\bullet$ Thermal boundary conditions for fluid: "
+	Description " - Inlet: T = 0°C  "
+	Description " - Outlet: T = 0°C "
+	Description " - Left wall: adiabatic wall "
+	Description " - Right wall: wall exchange contact (VDF), paroi contact (VEF). Val_h_contact of 1.e10 W/m2/K "
+	Description " $\bullet$ Thermal boundary conditions for solid: "
+	Description " Low wall: adiabatic wall "
+	Description " Top wall: adiabatic wall "
+	Description " Right wall: adiabatic wall "
+	Description " "
+	Description " $\bullet$ Energy source in the solid: uniform power surface of  10 w/m2 "
+	Description " "
+	Description " \latex_(\underline{Validation with:}\latex_) Energy balance between fluid and solid "
+#
+	Figure {
+		Title " General overview of the test "
+		Width 12cm
+		picture geometry.png
+	}
+	visu {
+		Title " VDF fluid / solid mesh visualization "
+		Width 10cm, viewport= 0 0 1024 1024,clip
+		mesh VDF_di_0/test.lata dom_fluide
+		Description " The coordinates below represent the fluid domain "
+		Description " Number of elements: 18 for each mesh "
+	}
+	visu {
+		Title " VEF fluid / solid mesh visualization "
+		Width 10cm, viewport= 0 0 1024 1024,clip
+		mesh VEF_di_0/test.lata dom_acier
+		Description " The coordinates below represent the solid domain "
+		Description " Number of elements: 32 for each mesh "
+	}
+#
+# properties Geometry
+	Table {
+			Title "Fluid physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($2)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($3)
+			}
+			line {
+			      	legend " Cp (J/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($4)
+			}
+			line {
+			      	legend " $\mu$ (kg.m.s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($1)
+			}
+			line {
+			      	legend " $\beta$ (1/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($5)
+			}
+	}
+#
+	Table {
+			Title "Solid physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($6)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($7)
+			}
+			line {
+			      	legend " Cp (J/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 7
+				columns ($4)
+			}
+	}
+#
+}
+#####
+#####
+Chapter {
+	Title " Results "
+	Description " The solid volume is: \latex_($(Ra-Re)*L=18\ \textrm{m}^{2}$\latex_) and the energy flux is of 10 W.m\latex_($^{2}$\latex_) in such a way that the theoretical released power is 180 W. "
+	Description " The average time step is of about 0.00104s in VEF and of about 0.0166s in VDF. "
+	Table {
+			Title " Thermal values (VDF) "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " Theoretical released power (W) "
+				values 180
+			}
+			line {
+			      	legend " Diffusion flux: from solid to wall exchange (VDF) "
+				file VDF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($1)
+			}
+			line {
+			      	legend " Diffusion flux: from wall exchange to fluid (VDF) "
+				file VDF_di_0/thermal.dat
+				nb_columns_file 2
+				last_line
+				columns ($2)
+			}
+
+			line {
+			      	legend " Convection flux: from fluid to outlet (VDF) "
+				file VDF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($3)
+			}
+			line {
+			      	legend " Convection flux: from fluid to inlet (VDF) "
+				file VDF_di_0/thermal.dat
+				nb_columns_file 6
+				last_line
+				columns ($4)
+			}
+			line {
+			      	legend " Convection flux: from fluid to outlet (VDF) "
+				file VDF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($5)
+			}
+			line {
+			      	legend " Flux balance "
+				file VDF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($6)
+			}
+
+	}
+#VEF
+	Table {
+			Title " Thermal values (VEF) "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " Theoretical released power (W) "
+				values 180
+			}
+			line {
+			      	legend " Diffusion flux: from solid to wall exchange (VEF) "
+				file VEF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($1)
+			}
+			line {
+			      	legend " Diffusion flux: from wall exchange to fluid (VEF) "
+				file VEF_di_0/thermal.dat
+				nb_columns_file 2
+				last_line
+				columns ($2)
+			}
+
+			line {
+			      	legend " Convection flux: from fluid to outlet (VEF) "
+				file VEF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($3)
+			}
+			line {
+			      	legend " Diffusion flux: from fluid to inlet (VEF) "
+				file VEF_di_0/thermal.dat
+				nb_columns_file 6
+				last_line
+				columns ($4)
+			}
+			line {
+			      	legend " Diffusion flux: from fluid to outlet (VEF) "
+				file VEF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($5)
+			}
+			line {
+			      	legend " Flux balance "
+				file VEF_di_0/thermal.dat	
+				nb_columns_file 6
+				last_line
+				columns ($6)
+			}
+	}
+#
+}
+#################
+#####
+Chapter {
+	Title " Conclusion "
+	Description " - In VDF, the total thermal power is entirely transferred from solid to fluid, through the to interface solid/fluid. The power is found to be of 89 % of the released one in outlet fluid convection term. In addition, the energy balance between inlet and outlet is equal to zero. "
+	Description " "
+	Description " - In VEF, the comparison of the energy balance between fluid and solid gives also the accurate value of 180 W. Then, despite appearance of differences in the quantities related to the diffusion with the VDF scheme, the total amount of the diffusion and convection quantities leads to the value of 180 W. "
+
+
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description " In term of time calculation, it is  recommanded to use the VDF discretization. "
+}
+###
+
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+
+
+

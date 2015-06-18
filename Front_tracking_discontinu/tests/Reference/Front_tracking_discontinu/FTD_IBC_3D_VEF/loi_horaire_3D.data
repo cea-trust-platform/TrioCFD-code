@@ -1,0 +1,12 @@
+# Rotation #
+export Loi_horaire rotation
+Lire rotation
+{
+	rotation		9 	cos(10*t) 	-sin(10*t) 	0 
+					sin(10*t) 	cos(10*t) 	0
+					0 		0 		1
+	derivee_rotation	9 	-10*sin(10*t) 	-10*cos(10*t) 	0
+					10*cos(10*t) 	-10*sin(10*t) 	0
+					0		0		1
+} 
+ 

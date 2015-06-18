@@ -1,0 +1,140 @@
+# SIMULATION D UN CANAL PLAN #
+# lance_test 1 ecart #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave Cavite
+        {
+                Origine 0. 0. 0.
+                Nombre_de_Noeuds 10 20 5
+                Longueurs 0.8 2. 0.4
+        }
+        {
+                Bord periox   X = 0.  0. <= Y <= 2.  0. <= Z <= 0.4
+                Bord periox   X = 0.8 0. <= Y <= 2.  0. <= Z <= 0.4
+                Bord bas      Y = 0.  0. <= X <= 0.8 0. <= Z <= 0.4
+                Bord haut     Y = 2.  0. <= X <= 0.8 0. <= Z <= 0.4
+                Bord perioz   Z = 0.  0. <= X <= 0.8 0. <= Y <= 2.
+                Bord perioz   Z = 0.4 0. <= X <= 0.8 0. <= Y <= 2.
+ 
+                }
+} 
+
+Transformer dom 15*x y 10*z
+
+
+
+Corriger_frontiere_periodique { Domaine dom Bord periox }
+Corriger_frontiere_periodique { Domaine dom Bord perioz }
+
+
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+        Partitionneur metis { Nb_parts 2 }
+        Larg_joint 2
+        Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+
+END SCATTER #
+
+
+VDF dis
+
+Schema_Euler_explicite sch
+
+Read sch 
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 15.
+        dt_min 1.e-7
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 0.01
+        dt_sauv 10.
+        seuil_statio 1.e-12  
+	facsec 0.2
+        
+        
+}
+
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.0001
+	rho Champ_Uniforme 1 1
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP {
+			 precond ssor { omega 1.5 } seuil 1e-9   
+		}
+                convection { Quick }
+                diffusion  {  }
+                Sources { Canal_perio { bord periox } }
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz dom 3  10. 0.  0.
+			}
+		boundary_conditions
+			{
+			periox   periodique 
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+			}
+		modele_turbulence Longueur_Melange {
+		    
+		     turbulence_paroi loi_standard_hydr dt_impr_ustar 4
+		     
+		    }
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 4.
+       			}
+					}
+	}
+
+	Postraitement
+        	{       
+                Sondes
+                	{ 
+                        sonde_vit  vitesse periode 10. segment 50 0.05 0. 0.05 0.05 2. 0.05
+			sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05
+			
+			}
+		format lml 
+		Champs dt_post 10
+			{
+			vitesse elem
+			viscosite_turbulente elem
+			pression elem
+			y_plus elem
+			}
+		}
+	}
+EcritureLectureSpecial 0
+Solve pb
+End

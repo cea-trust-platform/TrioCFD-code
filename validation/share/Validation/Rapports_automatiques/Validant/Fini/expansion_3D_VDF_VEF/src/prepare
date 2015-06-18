@@ -1,0 +1,111 @@
+#!/bin/bash
+mkdir -p 3d_vdf_rect_1
+mkdir -p 3d_vdf_rect_2_5
+mkdir -p 3d_vdf_rect_5
+mkdir -p 3d_vdf_rect_7_5
+mkdir -p 3d_vdf_rect_10
+mkdir -p 3d_vef_rect_1
+mkdir -p 3d_vef_rect_2_5
+mkdir -p 3d_vef_rect_5
+mkdir -p 3d_vef_rect_7_5
+mkdir -p 3d_vef_rect_10
+
+
+
+cd 3d_vdf_rect_1
+cp ../3d_vdf_rect.data ./generique.data
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 1. 0. 0./" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp ../post_run .
+
+cd ../3d_vdf_rect_2_5
+cp ../3d_vdf_rect.data ./generique.data
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 2.5  0. 0./" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp 3d_vdf_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 4.0/" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp ../post_run .
+
+cd ../3d_vdf_rect_5
+cp ../3d_vdf_rect.data ./generique.data
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 5.  0. 0./" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp ../post_run .
+cp 3d_vdf_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 3.0/" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp ../post_run .
+
+cd ../3d_vdf_rect_7_5
+cp ../3d_vdf_rect.data ./generique.data
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 7.5  0. 0./" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp 3d_vdf_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 2.0/" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp ../post_run .
+
+cd ../3d_vdf_rect_10
+cp ../3d_vdf_rect.data ./generique.data
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 10.  0. 0./" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp 3d_vdf_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 1.0/" generique.data > 3d_vdf_rect.data
+rm generique.data
+cp ../post_run .
+
+cd ../3d_vef_rect_1
+cp ../3d_vef_rect.data ./generique.data
+sed "s/*1.0*/*1.0/" generique.data > generique2.data
+sed "s/# velocity 1.0 /# velocity 1.0 /" generique2.data > 3d_vef_rect.data
+rm generique.data
+rm generique2.data
+cp ../post_run_vef ./post_run
+
+cd ../3d_vef_rect_2_5
+cp ../3d_vef_rect.data ./generique.data
+sed "s/*1.0*/*2.5/" generique.data > generique2.data
+sed "s/# velocity 1.0 /# velocity 2.5 /" generique2.data > 3d_vef_rect.data
+rm generique.data
+rm generique2.data
+cp 3d_vef_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 4.0/" generique.data > 3d_vef_rect.data
+rm generique.data
+cp ../post_run_vef ./post_run
+
+
+cd ../3d_vef_rect_5
+cp ../3d_vef_rect.data ./generique.data
+sed "s/*1.0*/*5.0/" generique.data > generique2.data
+sed "s/# velocity 1.0 /# velocity 5.0 /" generique2.data > 3d_vef_rect.data
+rm generique.data
+rm generique2.data
+cp 3d_vef_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 3.0/" generique.data > 3d_vef_rect.data
+rm generique.data
+cp ../post_run_vef ./post_run
+
+
+cd ../3d_vef_rect_7_5
+cp ../3d_vef_rect.data ./generique.data
+sed "s/*1.0*/*7.5/" generique.data > generique2.data
+sed "s/# velocity 1.0 /# velocity 7.5 /" generique2.data > 3d_vef_rect.data
+rm generique.data
+rm generique2.data
+cp 3d_vef_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 2.0/" generique.data > 3d_vef_rect.data
+rm generique.data
+cp ../post_run_vef ./post_run
+
+
+cd ../3d_vef_rect_10
+cp ../3d_vef_rect.data ./generique.data
+sed "s/*1.0*/*10.0/" generique.data > generique2.data
+sed "s/# velocity 1.0 /# velocity 10.0 /" generique2.data > 3d_vef_rect.data
+rm generique.data
+rm generique2.data
+cp 3d_vef_rect.data ./generique.data
+sed "s/tmax 7.0/tmax 1.0/" generique.data > 3d_vef_rect.data
+rm generique.data
+cp ../post_run_vef ./post_run

@@ -1,0 +1,14 @@
+#!/bin/bash
+cd CN_0.05;sh post_run;cd ..
+cd CN_0.1; sh post_run;cd ..
+cd CN_0.2; sh post_run;cd ..
+cd CN_0.3; sh post_run;cd ..
+cd CN_0.4; sh post_run;cd ..
+cd CN_0.5; sh post_run;cd ..
+cd EE_0.05;sh post_run;cd ..
+cd EE_0.1; sh post_run;cd ..
+cd EE_0.2; sh post_run;cd ..
+cd EE_0.3; sh post_run;cd ..
+cd EE_0.4; sh post_run;cd ..
+cd EE_0.5; sh post_run;cd ..
+

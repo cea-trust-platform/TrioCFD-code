@@ -1,0 +1,6 @@
+export Fluide_Incompressible liquide
+Lire liquide
+{
+	mu  Champ_Uniforme 1 10
+ 	rho Champ_Uniforme 1 1000.
+}

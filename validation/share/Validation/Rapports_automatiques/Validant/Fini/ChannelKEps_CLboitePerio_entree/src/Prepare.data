@@ -1,0 +1,169 @@
+# SIMULATION D UN CANAL PLAN #
+# lance_test 1 ecart #
+PrecisionGeom 1.e-8
+dimension 3
+Pb_Hydraulique_Turbulent pb
+
+
+# BEGIN MESH #
+
+Domaine DOM_BODY
+
+Read_unsupported_ASCII_file_from_ICEM DOM_BODY trio_BODY_geo_sym.asc
+#
+ecrire_fic_meshtv DOM_BODY DOM_BODY.meshtv 
+#
+
+Domaine boxperio
+
+ExtrudeBord 
+{
+	domaine_init DOM_BODY direction 0.4 0. 0.
+	domaine_final boxperio nom_bord INLET
+	nb_tranches 2
+
+}
+	
+Regroupebord boxperio PERIO { devant derriere }
+
+VerifierCoin boxperio { }
+
+Ecrire_fichier boxperio boxperio.geom
+
+#
+ecrire_fic_meshtv boxperio boxperio.meshtv
+#
+# MAILLAGE FINAL DE LA BOITE PERIO #
+
+Domaine dom_prepare
+
+Read_file dom_prepare boxperio.geom
+
+Corriger_frontiere_periodique { Domaine dom_prepare bord PERIO }
+
+# Tailles 0.4 2.0 0.8 #
+
+# END MESH #
+
+VEFPreP1b dis
+
+Schema_Euler_implicite sch
+
+Read sch 
+{
+        tinit 0.
+        tmax 20.
+        dt_min 1.e-7
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 0.1
+        dt_sauv 1.
+        seuil_statio 1.e-8  
+	facsec 5
+        facsec_max 500
+        Solveur
+           Implicite
+           {
+                seuil_convergence_solveur 1.e-8
+		
+           }
+}
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.0001
+	rho Champ_Uniforme 1 1
+}
+
+Associate pb dom_prepare
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+
+
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP {
+			 precond ssor { omega 1.5 } seuil 1e-9   
+		}
+                convection { EF_stab { } }
+                diffusion  {  }
+                Sources { Canal_perio { bord PERIO } }
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz dom_prepare 3  10. 0. 0.
+			}
+		boundary_conditions
+			{
+			
+			PERIO  periodique
+			FRONT symetrie
+			BACK  symetrie		 
+			HAUT     paroi_fixe
+			BAS      paroi_fixe
+			}
+		modele_turbulence K_Epsilon {
+		    Transport_K_Epsilon
+		    {
+		         convection { EF_stab { } }
+		         diffusion { }
+		         boundary_conditions {
+				 
+				FRONT symetrie
+				BACK symetrie
+				HAUT     paroi
+				BAS      paroi
+				PERIO    periodique
+		         }
+
+			 parametre_equation parametre_implicite 
+			{
+				resolution_explicite
+			}
+		         conditions_initiales { k_eps Champ_Uniforme 2 1 0.5 }
+		    }
+		     turbulence_paroi loi_standard_hydr  dt_impr_ustar 5.
+		}
+		Ecrire_fichier_xyz_valeur k_eps		1. bords 1 PERIO
+		Ecrire_fichier_xyz_valeur vitesse	1. bords 1 PERIO
+		
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 20.
+       			}
+					}
+	}
+
+	Postraitement
+        	{       
+                Sondes
+                	{ 
+                        sonde_vit  vitesse periode 0.1 segment 20 0.1 0. 0.4 0.1 2. 0.4
+			sonde_visc_turb  viscosite_turbulente periode 0.1 segment 20 0.1 0. 0.4 0.1 2. 0.4 
+			sonde_k K  periode 0.1 segment 20 0.1 0. 0.4 0.1 2. 0.4
+			sonde_eps Eps  periode 0.1 segment 20 0.1 0. 0.4 0.1 2. 0.4 
+			}
+		format lata
+
+		Domaine dom_prepare
+		Champs dt_post 5.
+			{
+			vitesse faces
+			viscosite_turbulente elem
+			pression elem
+			y_plus elem
+			k elem
+			eps elem
+			}
+		}
+	}
+
+Solve pb
+End

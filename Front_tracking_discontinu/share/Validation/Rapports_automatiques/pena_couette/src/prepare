@@ -1,0 +1,10 @@
+mkdir -p pena_couette_base
+
+cp pena_couette/*.data pena_couette/pre_run pena_couette_base/
+cp post_run pena_couette_base
+cp post_run pena_couette
+
+chmod +w pena_couette_base/*
+grep -v PENA_LIN pena_couette/couette.data > pena_couette_base/couette_tmp.data
+grep -v lineaire pena_couette_base/couette_tmp.data > pena_couette_base/couette.data
+rm pena_couette_base/couette_tmp.data 

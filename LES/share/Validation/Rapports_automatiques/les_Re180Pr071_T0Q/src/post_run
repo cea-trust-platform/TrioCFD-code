@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+utau=`cat u_tau.dat | awk 'BEGIN{m=0;n=0;}{if ($1>200) {n++;m+=$2;}}END{print m/n;}'`
+
+utau_th=`cat ../utau_analytique.dat | awk '{print $1;}'`
+echo utau
+
+temps=`ls Moyennes_temporelles_vitesse_rho_mu_* | sed -e 's/Moyennes_temporelles_vitesse_rho_mu_//g' | sed -e 's/_adim.dat//g' | sort -g | tail -1`
+
+../adim_Stat.sh les_Re180Pr071_T0Q.data "Moyennes_temporelles_vitesse_rho_mu_"$temps  $utau
+cp "Moyennes_temporelles_vitesse_rho_mu_"$temps moy_spat_dim.dat
+mv "Moyennes_temporelles_vitesse_rho_mu_"$temps"_adim.dat" moy_spat.dat
+
+mu=`grep "mu " les_Re180Pr071_T0Q.data | awk '{print $4}'`
+rho=`grep "rho" les_Re180Pr071_T0Q.data | awk '{print $4}'`
+Cp=`grep "Cp" les_Re180Pr071_T0Q.data | awk '{print $4}'`
+ttau=`awk "BEGIN { print 1./($rho*$Cp*$utau) }"`
+#echo $mu $rho $Cp $ttau
+
+
+
+#ttau=`echo "scale=8;1./(0.0976*5193*$utau)" | bc`
+
+tail -1 u_tau.dat | awk -v utauth=$utau_th -v utau=$utau -v ttau=$ttau '{print $1" "utau" "100*sqrt((utau-utauth)*(utau-utauth))/utauth" "ttau" ";}' > post_utau   
+
+
+#echo $utau
+#echo $ttau
+temps=`ls Moyennes__temporelles_Temp_* | sed -e 's/Moyennes__temporelles_Temp_//g' | sed -e 's/_adim.dat//g' | sort -g | tail -1`
+
+#mv "Moyennes_temporelles_Temp_"$temps"_adim.dat" moy_tempo_T.dat
+../adim_TStat.sh les_Re180Pr071_T0Q.data "Moyennes__temporelles_Temp_"$temps  $utau $ttau   0
+mv "Moyennes__temporelles_Temp_"$temps"_adim.dat" moy_spat_T.dat

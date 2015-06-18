@@ -1,0 +1,15 @@
+#!/bin/bash
+
+mkdir -p  Calcul
+
+
+#creation par extrusion du maillage de la boite pério et calcul dans la boite
+cd Calcul
+cp ../Prepare.data .
+cp ../trio_BODY_geo_sym.asc .
+
+
+
+
+cp ../mixedBC.data .
+cp ../post_run ../pre_run .

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+ls marqueurs.lata.PARTICULES.dom.pb.* > list_files
+cat marqueurs.lata | grep TEMPS |awk '{print $2}' > file_temps
+rm -f val_out
+
+i=1
+
+#cat list_files
+#echo ""
+#cat file_temps
+
+while test $i -ne 42
+do
+
+temps=`head -$i file_temps|tail -1`
+fichier=`head -$i list_files|tail -1`
+
+#echo $temps
+#val=`awk "BEGIN{print -($temps+0.45045*exp(-2.22*$temps))+1.45045}"`
+#val=`awk "BEGIN{print -($temps+0.45045*exp(-2.22*$temps))+1.4404505}"`
+#val=`awk "BEGIN{print -1.635*$temps*$temps+0.99}"`
+#val=`awk "BEGIN{print -1.635*$temps*$temps+1.}"`
+
+#val=`awk "BEGIN{print -2.4729715*($temps+0.45045*(exp(-2.22*$temps)-1.))+1.}"`
+
+val=`awk "BEGIN{print (0.079577472*(1-cos(2*3.14159265358979323846*$temps)))+0.5}"`
+#val=`awk "BEGIN{print (0.25*(1-cos(2*$temps)))+0.5}"`
+
+#echo $val
+ctrl=`head -1 $fichier|awk '{print $2}'`
+
+if [ $ctrl = 1 ]
+then
+echo $temps" "`head -2 $fichier |tail -1`" "$val >> val_out
+fi
+
+i=$(($i+1))
+done

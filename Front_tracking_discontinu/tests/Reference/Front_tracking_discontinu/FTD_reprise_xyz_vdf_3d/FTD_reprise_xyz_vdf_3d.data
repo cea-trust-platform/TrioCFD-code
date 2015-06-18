@@ -1,0 +1,189 @@
+#  
+ Cas test Front-tracking discontinu VDF.
+ Test de la reprise xyz
+
+ Essai de reprise du fichier, puis trois pas de temps
+ Pas de remaillage ni de lissage car non parallele.
+
+ PARALLEL OK 4
+#
+
+dimension 3
+Probleme_FT_Disc_gen pb
+Domaine DOM
+
+# BEGIN MESH #
+Mailler DOM
+{
+	Pave pave1
+	{
+		origine 0. 0. 0.
+		longueurs 0.04 0.04 0.06
+		nombre_de_noeuds 11 11 16
+	}
+	{
+		bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
+		bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
+		bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
+		bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
+		bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
+		bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
+	}
+}
+# END MESH #
+
+# BEGIN PARTITION 
+Partition DOM {
+	partitionneur metis { Nb_parts 4 }
+	larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	tinit 1.000010e-02
+	tmax  0.1
+	dt_min 1.e-7
+	dt_max 0.25e-2
+	dt_impr 10.
+	dt_sauv 100
+	seuil_statio -1
+	nb_pas_dt_max 3
+}
+
+Fluide_Incompressible liquide
+Lire liquide
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+}
+
+Fluide_Incompressible gaz
+Lire gaz
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 100.
+}
+
+Fluide_Diphasique fluide
+Lire fluide
+{
+	fluide0 liquide
+	fluide1 gaz
+	sigma   Champ_Uniforme 1 0.05
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -9.81
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+Transport_Interfaces_FT_Disc       body
+
+Associate pb hydraulique
+Associate pb interf
+Associate pb body
+
+Associate pb DOM
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               1.e-16
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-14 impr }
+	convection           { quick }
+	diffusion            { }
+	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+	equation_interfaces_proprietes_fluide interf
+	equations_interfaces_vitesse_imposee 1   body
+	boundary_conditions
+	{
+		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		paroi  paroi_fixe
+		bas    Frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 0.0 0.0 0.001
+	}
+}
+interf
+{
+	methode_transport vitesse_interpolee hydraulique
+	conditions_initiales {
+		fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
+		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
+        }
+        iterations_correction_volume 0
+        n_iterations_distance 2
+	remaillage {
+		pas -1
+		pas_lissage -1
+	}
+	boundary_conditions
+	{
+		paroi Paroi_FT_disc symetrie
+		haut  Paroi_FT_disc symetrie
+		bas   Paroi_FT_disc symetrie
+	}
+}
+body
+{
+	conditions_initiales { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
+	remaillage {
+		pas -1e8
+		pas_lissage -1
+	}
+	boundary_conditions
+	{
+		haut  Paroi_FT_disc symetrie
+		paroi Paroi_FT_disc symetrie
+		bas   Paroi_FT_disc symetrie
+	}
+	methode_transport vitesse_imposee
+	    -(y-0.02)*10
+	    (x-0.02)*10
+	    0.
+}
+Postraitement {
+	Champs dt_post 1. {
+		indicatrice_interf elem
+		indicatrice_body elem
+		vitesse elem
+	}
+}
+liste_postraitements {
+  postraitement_ft_lata post1 { 
+	nom_fichier post1
+	interfaces  interf { } 
+	champs elements { indicatrice_body indicatrice_interf pression }
+	champs faces { vitesse } 
+  }
+  postraitement_ft_lata post2 { 
+	nom_fichier post2
+	interfaces  body { } 
+  }
+}
+Reprise xyz prepare.xyz
+Sauvegarde xyz bidon.xyz
+}
+
+Solve pb
+Fin
+

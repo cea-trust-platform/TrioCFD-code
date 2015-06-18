@@ -1,0 +1,333 @@
+# 2 problemes de Thermohydraulique 3D VEF couplee a 2 problemes de Conduction avec rayonnement de paroi transparent sur un 1 seul probleme fluide #
+# PARALLEL RUNS #
+dimension 3 
+
+Pb_Thermohydraulique_Turbulent pb1
+Pb_conduction                  pb2
+Pb_Thermohydraulique           pb3
+Pb_conduction                  pb4
+  
+Domaine dom1
+Domaine dom2
+Domaine dom3
+Domaine dom4
+
+# BEGIN MESH #
+Read_file dom1 Sodium.geom
+Read_file dom2 Paroi_Cuve.geom
+Read_file dom3 Argon.geom
+Read_file dom4 Paroi_Externe.geom
+# END MESH #
+	          
+# BEGIN PARTITION
+Partition dom1
+{
+	Partitionneur Metis { nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM1
+}
+Partition dom2
+{
+	Partitionneur Metis { nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM2
+}
+Partition dom3
+{
+	Partitionneur Metis { nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM3
+}
+Partition dom4
+{
+	Partitionneur Metis { nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM4
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom1
+Scatter DOM2.Zones dom2
+Scatter DOM3.Zones dom3
+Scatter DOM4.Zones dom4
+END SCATTER #
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit		0.
+	tcpumax		10000.
+	dt_min		1.e-6
+	dt_max		1.
+	dt_impr		100.
+	dt_sauv		500.
+	seuil_statio	1.e-5
+	nb_pas_dt_max	10
+}
+
+VEFPreP1B dis
+Lire dis { P0 }
+Fluide_Incompressible sodium
+Lire sodium
+{
+	mu	Champ_Uniforme	1 0.25e-3
+	rho	Champ_Uniforme	1 850.
+	lambda	Champ_Uniforme	1 68. 
+	Cp	Champ_Uniforme	1 1250
+	beta_th	Champ_Uniforme	1 2.809e-4
+}
+
+Solide acier1
+Lire acier1
+{
+	rho Champ_Uniforme	1 7200.
+	lambda Champ_Uniforme	1 18.    
+	Cp Champ_Uniforme	1 500.
+}
+
+Fluide_Incompressible argon
+Lire argon
+{
+	mu	Champ_Uniforme	1 2.682e-5
+	rho	Champ_Uniforme	1 1.389
+	lambda	Champ_Uniforme	1 2.24e-2 
+	Cp	Champ_Uniforme	1 520.
+	beta_th	Champ_Uniforme	1 2.681e-3
+}
+
+Solide acier2
+Lire acier2
+{
+	rho Champ_Uniforme	1 7200.
+	lambda Champ_Uniforme	1 18.    
+	Cp Champ_Uniforme	1 500.
+}
+
+Champ_Uniforme gravite
+Lire gravite 3  0.  0. -9.81
+
+Associate sodium gravite
+Associate acier1 gravite
+Associate argon  gravite
+Associate acier2 gravite
+
+Associate pb1 dom1
+Associate pb1 sodium
+
+Associate pb2 dom2
+Associate pb2 acier1
+
+Associate pb3 dom3
+Associate pb3 argon
+
+Associate pb4 dom4
+Associate pb4 acier2
+
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb1
+Associate pbc pb2
+Associate pbc pb3
+Associate pbc pb4
+Associate pbc sch
+
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Lire mod
+{
+	nom_pb_rayonnant	pb3
+	fichier_face_rayo	Rayonnement_Cuve_3D.facesrayo
+	fichier_fij		Rayonnement_Cuve_3D.factforme
+	fichier_matrice_binaire	Rayonnement_Cuve_3D.mat_ray_inv
+}
+
+
+Lire pb1
+{
+   Navier_Stokes_Turbulent
+   {
+	Modele_turbulence Sous_maille_Smago
+	{
+		Turbulence_paroi Loi_standard_hydr    
+	}
+	solveur_pression petsc cholesky { }
+	convection { muscl }
+	diffusion { }
+	sources { boussinesq_temperature { T0 400. } }
+	conditions_initiales { vitesse Champ_Uniforme 3  0. 0. 0. }
+	boundary_conditions
+	{
+		SNA	Paroi_Fixe
+		SREDAN	Paroi_Fixe 
+		SCUVE	Paroi_Fixe
+	}
+   }
+
+   Convection_Diffusion_Temperature_turbulent
+   {
+	diffusion { }
+	convection { muscl }		
+	Modele_turbulence Prandtl
+	{ 
+		Turbulence_paroi Loi_standard_hydr_scalaire
+	}
+	boundary_conditions
+	{
+		SNA	paroi_echange_externe_impose H_imp Champ_Front_Uniforme 1 10. T_ext Champ_Front_Uniforme 1 50.
+		SREDAN	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
+		SCUVE	paroi_contact pb2 SCUVE
+	}
+	conditions_initiales { Temperature Champ_Uniforme 1 395. }
+   }
+
+   Postraitement
+   {
+	Sondes
+	{
+		sonde_pres_ei	pression	periode 0.5 points 4	2.3951	6.0803	9.90
+									-2.3951	6.0803	9.90
+									-1.8563	4.7126	9.90
+									1.8563	4.7126	9.90
+
+		sonde_vit_ei	vitesse		periode 0.5 points 4	2.3951	6.0803	9.90
+									-2.3951	6.0803	9.90
+									-1.8563	4.7126	9.90
+									1.8563	4.7126	9.90
+
+		sonde_temp_ei	temperature	periode 0.5 points 4	2.3951	6.0803	9.90
+									-2.3951	6.0803	9.90
+									-1.8563	4.7126	9.90
+									1.8563	4.7126	9.90
+
+		sonde_pres_pomp	pression	periode 0.5 points 4	-5.0446	3.9125	3.50
+									-4.0446	2.9125	3.50
+									-5.0446	1.9125	3.50
+									-6.0446	2.9125	3.50
+
+		sonde_vit_pomp	vitesse		periode 0.5 points 4	-5.0446	3.9125	3.50
+									-4.0446	2.9125	3.50
+									-5.0446	1.9125	3.50
+									-6.0446	2.9125	3.50
+
+		sonde_temp_pomp	temperature	periode 0.5 points 4	-5.0446	3.9125	3.50
+									-4.0446	2.9125	3.50
+									-5.0446	1.9125	3.50
+									-6.0446	2.9125	3.50									    
+	}
+	Champs dt_post 10
+	{
+		temperature	elem
+	}
+   }
+}
+
+
+Lire pb2
+{
+   Conduction
+   {
+	diffusion { }
+	conditions_initiales { temperature Champ_Uniforme 1 400. }
+	boundary_conditions
+	{
+		SCUVE	paroi_contact pb1 SCUVE  
+		SCUVEE	paroi_contact pb3 SCUVEE
+		STOP	paroi_adiabatique
+	}
+   }
+
+   Postraitement
+   { 
+	Sondes
+	{
+		sonde_temp_cp	temperature	periode 0.5 points 2	7.05	0.	3.50
+									7.10	0.	3.50
+	}
+	Champs dt_post 10
+	{
+		temperature	elem
+	}
+   }
+}
+
+
+Lire pb3
+{
+   Navier_Stokes_standard
+   {
+	solveur_pression cholesky { } 
+	convection { amont }
+	diffusion { }
+	sources { boussinesq_temperature { T0 200. } }
+	conditions_initiales { vitesse Champ_Uniforme 3 0. 0. 0. }
+	boundary_conditions
+	{
+		SCUVEE	paroi_fixe
+		SEXARG	paroi_fixe
+		SSUP	paroi_fixe
+	}
+   }
+   
+   Convection_Diffusion_Temperature
+   {
+	diffusion { }
+	convection { amont }
+	boundary_conditions
+	{
+		SCUVEE	Paroi_contact pb2 SCUVEE
+		SEXARG	Paroi_contact pb4 SEXARG
+		SSUP	paroi_adiabatique
+	}
+	conditions_initiales { Temperature Champ_Uniforme 1 200. }
+   }
+   
+   Postraitement
+   {
+	Sondes
+	{
+		sonde_temp_ar	temperature	periode 0.5 points 2	7.10	0.	3.50
+									7.45	0.	3.50
+	}    
+	Champs dt_post 10
+	{
+		temperature	elem
+	}
+   }
+}
+
+
+Lire pb4
+{
+   Conduction
+   {
+	diffusion { }
+	conditions_initiales { temperature Champ_Uniforme 1 30. }
+	boundary_conditions
+	{
+		SEXARG	paroi_contact pb3 SEXARG      
+		SEXCS	paroi_echange_externe_impose H_imp Champ_Front_Uniforme 1 10. T_ext Champ_Front_Uniforme 1 30.
+		SSCS	paroi_adiabatique
+	}
+   }
+
+   Postraitement
+   {
+	Sondes
+	{
+		sonde_temp_cs	temperature	periode 0.5 points 2	7.45	0.	3.50
+									7.50	0.	3.50
+	}
+	Champs dt_post 10
+	{
+		temperature	elem
+	}
+   }
+}
+
+Solve pbc
+Fin

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+[ ! -f jetpool.geom ] && gunzip jetpool.geom.gz
+
+#Creation des repertoires
+#
+mkdir -p ./v_1/Muscl
+mkdir -p ./v_1/Amont
+mkdir -p ./v_1/EF_stab_alpha1
+mkdir -p ./v_1/EF_stab_alpha02
+#
+mkdir -p ./v_156/Muscl
+mkdir -p ./v_156/Amont
+mkdir -p ./v_156/EF_stab_alpha1
+mkdir -p ./v_156/EF_stab_alpha02
+#
+RACINE=`pwd`
+
+#1##########################              1.0                #######################
+# Muscl 
+cd $RACINE/v_1/Muscl
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Muscl/" test.data
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#2#################################################
+# Amont    
+cd $RACINE/v_1/Amont
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Amont/" test.data
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#3#################################################
+# EF_stab_alpha = 1
+cd $RACINE/v_1/EF_stab_alpha1
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Ef_stab { alpha 1.0 }/" test.data 
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#4#################################################
+# EF_stab_alpha = 0.2    
+cd $RACINE/v_1/EF_stab_alpha02
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Ef_stab { alpha 0.2 }/" test.data
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#5#####################      1.56      ################################################
+# Muscl 
+
+cd $RACINE/v_156/Muscl
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Muscl/" test.data
+sed -i "s/3 0.0 0.0 1.0/3 0.0 0.0 1.56/" test.data 
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#6#################################################
+# Amont    
+cd $RACINE/v_156/Amont
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Amont/" test.data 
+sed -i "s/3 0.0 0.0 1.0/3 0.0 0.0 1.56/" test.data
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#7#################################################
+# EF_stab_alpha = 1
+cd $RACINE/v_156/EF_stab_alpha1
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Ef_stab { alpha 1.0 }/" test.data
+sed -i "s/3 0.0 0.0 1.0/3 0.0 0.0 1.56/" test.data
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+#8#################################################
+# EF_stab_alpha = 0.2    
+cd $RACINE/v_156/EF_stab_alpha02
+cp $RACINE/TSW_jet.data test.data
+sed -i "s/Ef_stab { }/Ef_stab { alpha 0.2 }/" test.data 
+sed -i "s/3 0.0 0.0 1.0/3 0.0 0.0 1.56/" test.data
+cp $RACINE/post_run .
+cp $RACINE/pre_run .
+
+

@@ -1,0 +1,7 @@
+3
+0.0        0.442324 0.557676 
+0.00942725 0.0      0.990573 
+0.0110957  0.924733 0.0641715 
+
+# Facteurs de forme calcules avec la commande:
+# geom2ansys decoupe.geom 2

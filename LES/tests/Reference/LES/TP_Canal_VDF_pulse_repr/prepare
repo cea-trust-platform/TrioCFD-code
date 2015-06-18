@@ -1,0 +1,4 @@
+[ "$TRUST_DISABLE_MPI" != 1 ] && make_PAR.data TP_Canal_VDF_pulse.data
+triou TP_Canal_VDF_pulse
+[ "$TRUST_DISABLE_MPI" != 1 ] && triou PAR_TP_Canal_VDF_pulse 2
+exit 0

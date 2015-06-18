@@ -1,0 +1,36 @@
+TAILLES 3 243 83 83 
+RIEN 0 mesh
+MAIL_X_REG 4 xomin xomax nx-2 2 dx
+MAIL_Y_REG 4 yomin yomax ny-2 2 dy
+MAIL_Z_REG 4 zomin zomax nz-2 2 dz
+RIEN 0 blocks
+RIEN 0 boundaries
+REVOLAX 14 -0.25 0. 0. 0.2 0.2 0. 0. -PI/2. 3.*PI/2. 0. 20.0 -20.0 2 1000 sphere
+REVOLAX 14 0.25 0. 0. 0.2 0.2 0. 0. -PI/2. 3.*PI/2. 0. 20.0 -20.0 2 1000 sphere2
+CYLAX 7 0 0 0.05 -0.25 0.25 3 1000 cyl
+file maillage
+	real xomin,xomax,yomin,yomax,zomin,zomax,eps
+C       Cotes extremes de la geometrie maillee generalement
+	xomin=0.
+	xomax=3.
+	yomin=0.
+	yomax=1.
+	zomin=0.
+	zomax=1.
+C       eps sert a l'epaisseur des paves bords
+	eps=0.001
+
+        XM(1)=xomin-eps
+        XM(nx)=xomax+eps
+        YM(1)=yomin-eps
+        YM(ny)=yomax+eps
+        ZM(1)=zomin-eps
+        ZM(nz)=zomax+eps
+
+
+
+
+
+
+
+

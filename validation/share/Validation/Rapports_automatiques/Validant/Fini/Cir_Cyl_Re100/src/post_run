@@ -1,0 +1,8 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../../propertiesGeometry.py
+cp propertiesGeometry.dat ../..
+##
+##
+python ../../calculerFrequence.py test_SONDE_PRESSION.son 4 40

@@ -1,0 +1,42 @@
+Parameters {
+	Title "Test de la penalisation"
+	Description "Rapport utilisant visit"
+	Author "BM MB"
+	TestCase pena ellipsoid_vdf_therm
+	TestCase nopena ellipsoid_vdf_therm
+}
+
+Chapter {
+	Title "FT"
+	Description " test visu "
+visu {
+	Title "pena"
+
+	mesh pena/lata/post_therm_vdf.lata DOM
+
+        vector  pena/lata/post_therm_vdf.lata DOM VITESSE ELEM 
+	width 9cm
+}
+visu {
+	Title "non pena"
+
+	mesh nopena/lata/post_therm_vdf.lata DOM
+
+        vector  nopena/lata/post_therm_vdf.lata DOM VITESSE ELEM 
+	width 9cm
+}
+visu {
+	Title "non pena"
+
+	mesh nopena/lata/post_therm_vdf.lata DOM
+
+        pseudocolor  nopena/lata/post_therm_vdf.lata DOM PRESSION ELEM 
+	width 9cm
+}
+
+}
+
+
+
+
+

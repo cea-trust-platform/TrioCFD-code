@@ -1,0 +1,97 @@
+# Conversion d'un maillage 3D en maillage 2D #
+
+# Set la dimension a 3D #
+dimension 3
+
+# Domaine 3D #
+domaine dom3D
+
+# Domaine 2D #
+domaine dom2D
+
+# Lecture du maillage 3D #
+Read_file dom3D 3D.geom
+
+# Conversion #
+Extract_2D_from_3D dom3D ORIG dom2D
+
+# ReSet la dimension a 2D #
+dimension 2
+
+VerifierCoin dom2D { }
+
+Pb_Hydraulique_Turbulent pb
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit	0.
+	tmax	1.
+	dt_min	1.e-8
+	dt_max	1.e-1
+	dt_impr	0.1
+	dt_sauv	100
+	seuil_statio	-1
+}
+
+Fluide_Incompressible eau
+Lire eau
+{
+	mu  Champ_Uniforme 1 1.e-3
+ 	rho Champ_Uniforme 1 998.2
+}
+
+
+Champ_Uniforme gravite
+Lire gravite 2 0. -9.81
+Associate eau gravite
+
+Associate pb dom2D
+Associate pb sch
+Associate pb eau
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+	        solveur_pression Gcp { precond ssor { omega 1.5 } seuil 1.e-8 } 
+                convection { ef_stab { alpha 1.0 } }
+		diffusion { }
+		Modele_turbulence Sous_maille_Smago
+		{
+			Turbulence_paroi loi_standard_hydr
+			nut_max 0.3
+		}
+		conditions_initiales
+		{
+			vitesse Champ_Uniforme 2 0. 0.
+		}
+		boundary_conditions
+		{
+			WALL	paroi_fixe
+			INL	frontiere_ouverte_vitesse_imposee Champ_front_uniforme	2  1. 0.  
+			INV	frontiere_ouverte_vitesse_imposee Champ_front_uniforme	2  0. 1.
+			OUT	frontiere_ouverte_pression_imposee Champ_front_Uniforme	1  0.
+
+		}
+
+        }
+		
+	Postraitement
+	{
+                Champs dt_post 0.2
+		{
+			vitesse			elem
+			pression		elem
+			Y_plus			elem
+			viscosite_turbulente	elem
+		}
+        } 	
+}
+
+Solve pb
+Fin

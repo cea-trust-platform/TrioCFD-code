@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#Creation des repertoires
+#Cas VDF
+mkdir -p ./VDF/Amont
+mkdir -p ./VDF/Quick
+mkdir -p ./VEF/Amont
+mkdir -p ./VEF/Muscl
+mkdir -p ./VEF/EF_stab
+
+##########
+RACINE=`pwd`
+
+#Cas de base VEF/Amont
+cd $RACINE/VEF/Amont
+cp $RACINE/poiseuille.data test.data
+cp $RACINE/post_run .
+
+#VEF/muscl
+cd $RACINE/VEF/Muscl
+cp $RACINE/poiseuille.data test.data
+sed "s/amont/muscl/" test.data > modifie.data
+mv modifie.data test.data
+
+#VEF/EF_stab
+cd $RACINE/VEF/EF_stab
+cp $RACINE/poiseuille.data test.data
+sed "s/amont/EF_stab { }/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+#VDF/Amont
+cd $RACINE/VDF/Amont
+cp $RACINE/poiseuille.data test.data
+sed "s/trianguler dom/VDF dis/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VEFPreP1B dis//" test.data > modifie.data
+mv modifie.data test.data
+sed "s/tmax 5./tmax 5000./" test.data > modifie.data
+mv modifie.data test.data
+sed "s/dt_min 0.00001/dt_min 0.0001/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/dt_impr 0.1/dt_impr 0.0001/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/segment 10 0.5 0. 0.5 0.5/segment 10 0.5 0.025 0.5 0.475/" test.data > modifie.data
+mv modifie.data test.data
+
+#VDF/Quick
+cd $RACINE/VDF/Quick
+cp $RACINE/poiseuille.data test.data
+sed "s/trianguler dom/VDF dis/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VEFPreP1B dis//" test.data > modifie.data
+mv modifie.data test.data
+sed "s/amont/quick/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/tmax 5./tmax 5000./" test.data > modifie.data
+mv modifie.data test.data
+sed "s/dt_min 0.00001/dt_min 0.0001/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/dt_impr 0.1/dt_impr 0.0001/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/segment 10 0.5 0. 0.5 0.5/segment 10 0.5 0.025 0.5 0.475/" test.data > modifie.data
+mv modifie.data test.data
+
+
+
+

@@ -1,0 +1,86 @@
+Parameters {
+	Title "Tests remaillage front-tracking"
+	Description "Test de la conservation du volume lors du remaillage"
+	Author "B.M."
+	TestCase "FTD_remaillage_vdf" "FTD_remaillage_vdf.data"
+	TestCase "FTD_remaillage_vdf" "PAR_FTD_remaillage_vdf.data" 4
+	TestCase "FTD_remaillage_vef" "FTD_remaillage_vef.data"
+	TestCase "FTD_remaillage_vef" "PAR_FTD_remaillage_vef.data" 4
+	Prerequisite "./extrait_volumes.sh"
+}
+
+Chapter {
+	Title "VEF, remaillage Juric"
+	Description "Algorithme de remaillage global non conservatif"
+Figure {
+	Title "Volume"
+	Description "Le volume doit etre constant (reste un bug en parallele dans Remaillage Thomas ?)"
+	Description "pas forcement egal entre sequentiel et parallele".
+	Dimension 2
+	LabelX "s"
+	LabelY "m3"
+	Curve {
+		legend "VDF sequentiel"
+		origin "Trio_U"
+		Version ""
+		file ./vdf_v.txt
+		columns $1 $2
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+		legend "VDF parallele"
+		origin "Trio_U"
+		Version ""
+		file par_vdf_v.txt
+		columns $1 $2
+		Style linespoints
+		PointSize 2
+	}
+}
+Figure {
+        Title "Surface"
+        Description "La surface decroit a cause du lissage et saute lors du remaillage global (coalescence)"
+        Dimension 2
+        LabelX "s"
+        LabelY "m2"
+        Curve {
+                legend "VDF sequentiel"
+                origin "Trio_U"
+                Version ""
+                file vdf_s.txt
+                columns $1 $2
+                Style linespoints
+                PointSize 2
+        }
+        Curve {
+                legend "VDF parallele"
+                origin "Trio_U"
+                Version ""
+                file par_vdf_s.txt
+                columns $1 $2
+                Style linespoints
+                PointSize 2
+        }
+}
+visu {
+	Title "maillage avant et apres remaillage global"
+	mesh ./FTD_remaillage_vdf/lata/post.lata INTERFACES
+	mesh ./FTD_remaillage_vdf/lata/par_post.lata INTERFACES
+	instruction_visit SetActivePlots((0))
+	instruction_visit m=MeshAttributes()
+	instruction_visit m.opaqueMode=m.Off
+	instruction_visit SetPlotOptions(m)
+
+	instruction_visit SetActivePlots((1))
+	instruction_visit m2=MeshAttributes()
+	instruction_visit m2.opaqueMode=m2.Off
+	instruction_visit m2.foregroundFlag=0
+	instruction_visit m2.meshColor=(255,0,0,255)
+	instruction_visit SetPlotOptions(m2)
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.
+	cycles 6 10 14 17 
+      }
+
+}

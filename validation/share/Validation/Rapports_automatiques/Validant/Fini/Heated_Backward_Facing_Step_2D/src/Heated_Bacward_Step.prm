@@ -1,0 +1,829 @@
+Parameters {
+	Title "Turbulent flow above a heated backward facing step: K Epsilon modeling"
+	Description "Turbulent flow over a backward facing step, heated at the bottom"
+	Description "Validated Model"
+	Description "Time scheme: Euler Implicite and Explicite (for VDF case only)"
+	Description "Validation with:"
+	Description "Convection schemes: Muscl (VEF), EF_stab-alpha=1 (VEF) and Quick (VDF)"
+	Description "Turbulent flow, turbulent K Epsilon turbulence model"
+	Description "Pressure solver Cholesky, ICEM for VEF grid generation"	
+	Description "Boussinesq Approximation, with T0=20 degrees Celsius"
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of problem : Thermohydraulique_Turbulent 2D
+	ParametersTrio_U Discretization : VEF (ICEM mesh) and VDF (Trio_U)
+	ParametersTrio_U Time scheme : Schema_Euler_Implicite and Explicite (VDF only)
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent
+	ParametersTrio_U Solving of equations : Solver_pression Cholesky Modele_turbulence K Epsilon
+	ParametersTrio_U Convection schemes : Muscl and EF_stab-alpha=1 (VEF), Quick (VDF)
+	ParametersTrio_U Type of boundary conditions : adiabatic walls, walls with fixed heat flux, with zero velocity, fixed inlet velocity and temperature, fixed outlet pressure and temperature. 
+	ParametersTrio_U Type of fluid : Air
+	
+	Reference "[1] Turbulent separated convection flow adjacent to backward-facing step-effects of step height, Y.T. Chen and J.H. Nie and B.F. Armaly and H.T. Hsieh, International Journal of Heat and Mass Transfer 49 (2006) 3670-3680."
+
+	Reference "[2] Combined Heat Transfer and Fluid Dynamic Measurements Downstream of Backward-Facing Step, J.C. Vogel and J.K. Eaton, Journal of Heat Transfer, November 1985, Vol. 107, 922-929."
+	
+	
+	TestCase VDF_Quick test_VDF /* see data set in annex */
+	TestCase VEF_muscl test_VEF
+	TestCase VEF_EFstab test_VEF
+
+
+	Author "A.AUROUSSEAU (S.VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : L=0.76m, l=0.076m, h=0.038m, H=0.152m"
+	Description "Mesh : 10855 VEF cells (including prism layers) for VEF Icem mesh, 4134 rectangular cells for VDF Trio_U mesh"
+	Description "Initial conditions : Hydraulic : zero velocity"
+	Description "Initial conditions : Energy : Fixed temperature 
+	Description "Boundary conditions : Hydraulic : Fixed inlet velocity profile, fixed outlet pressure"
+	Description "Boundary conditions : Energy : Fixed inlet temperature, adiabatic or constant heat flux walls"
+	Description "Boussinesq Approximation, with T0=20 degrees Celsius"
+        Description "A grid convergence study has been carried out on several ICEM VEF meshes. This study showed the importance of the refinement at the start of the step (x=0). With a coarse mesh at this location, the calculations showed very bad results."
+		
+	Description "Computations with facsec=200 and facsec_max=1000 have been done originally for the VEF cases. However, for the EF_stab convection scheme with alpha=0.2 they diverge. This is most likely due to high values of facsec and facsec_max. Eventually, computations are done with alpha=1, facsec=1 and facsec_max=20."
+        Description "With the chosen meshes, the values of y+ at the wall are equal to 50 upstream the step and 100 downstream of the step." 	
+	
+	Figure {
+		Title "Geometry"
+		Width 12cm
+		picture geometry.png
+	}
+	
+
+
+
+	visu {
+		Title "VDF Mesh generated with Xprepro (Trio_U): 4134 cells"
+		mesh VDF_Quick/test_VDF.lata dom
+		width 17cm,viewport=0 0 1024 500,clip		
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+	visu {
+		Title "VEF Mesh generated with Icem: 10855 cells"
+		mesh VEF_muscl/test_VEF.lata dom
+		width 17cm,viewport=0 0 1024 500,clip
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+	Figure {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 1.205 kg/m$^3$"
+		Description "$\mu$ = 1.782e-5 kg/m/s"
+		Description "Pr = 0.71"
+		Description "Cp = 1005 J/kg/K"
+		Description "$\beta$ = 1/T0"
+		Description "Qw = 270 W/m$^2$"
+		Description "Boussinesq Approximation, with T0=20 degrees Celsius"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+
+Chapter {
+	Title "Computations convergence"
+
+	Description "For every test case, computation convergence curves are provided in the report. They display the velocity time evolution at two different locations in the flow: one point is located in the recirculation area, the other one further downstream."
+		
+	Figure {
+		Title "Longitudinal velocity in the recirculation zone: x=0.05 ,y=0.015"
+		Width 15cm
+		Dimension 2
+		LabelX "Temps"
+		RangeX 0 5.
+		LabelY "Velocity"
+		RangeY -5. 5.
+		Include_Description_Curves 0
+		legend below
+	
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_VITESSE_CONVERGENCE1.son
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_VITESSE_CONVERGENCE1.son
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_VITESSE_CONVERGENCE1.son
+			columns ($1) ($2)
+			TypePoints 1
+		}			
+	}
+
+	Figure {
+		Title "Longitudinal velocity downstream of the recirculation zone: x=0.6 ,y=0.005"
+		Width 15cm
+		Dimension 2
+		LabelX "Temps"
+		RangeX 0 5.
+		LabelY "Velocity"
+		RangeY 4.5 7.
+		Include_Description_Curves 0
+		legend below
+	
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_VITESSE_CONVERGENCE2.son
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_VITESSE_CONVERGENCE2.son
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF EFstab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_VITESSE_CONVERGENCE2.son
+			columns ($1) ($2)
+			TypePoints 1
+		}			
+	}
+}
+
+Chapter {
+		
+	Title "Computations results"
+	
+	visu {
+		Title "VDF Quick - Velocity vector field,legend"
+		Width 17cm,viewport=0 700 1024 950 ,clip
+		vector VDF_Quick/test_VDF.lata dom VITESSE ELEM 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }
+	
+	visu {
+		Title "VDF Quick - Velocity vector field
+		Width 17cm,viewport=0 0 1024 350,clip
+		vector VDF_Quick/test_VDF.lata dom VITESSE ELEM 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }		
+	
+	visu {
+		Title "VEF Muscl - Velocity vector field,Legend"
+		Width 17cm,viewport=0 700 1024 950,clip
+		vector VEF_muscl/test_VEF.lata dom VITESSE ELEM 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+
+	visu {
+		Title "VEF Muscl - Velocity vector field
+		Width 17cm,viewport=0 0 1024 350,clip
+		vector VEF_muscl/test_VEF.lata dom VITESSE ELEM 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+
+	visu {
+		Title "VEF EF_stab - Velocity vector field, Legend"
+		Width 17cm,viewport=0 700 1024 950,clip
+		vector VEF_EFstab/test_VEF.lata dom VITESSE ELEM 
+          	Operator no_databaseinfo
+		Operator no_bounding_box
+       }	
+
+	visu {
+		Title "VEF EF_stab - Velocity vector field
+		Width 17cm,viewport=0 0 1024 350,clip
+		vector VEF_EFstab/test_VEF.lata dom VITESSE ELEM 
+          	Operator no_databaseinfo
+		Operator no_bounding_box
+       }
+	
+	visu {
+		Title "Turbulent viscosity field Legend"
+		Width 17cm,viewport=0 700 1024 950,clip
+		pseudocolor_with_range VDF_Quick/test_VDF.lata dom VISCOSITE_TURBULENTE ELEM 0.0 0.01015 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+	
+	visu {
+		Title "VDF Quick - Turbulent viscosity field
+		Width 17cm,viewport=0 0 1024 350,clip
+		pseudocolor_with_range VDF_Quick/test_VDF.lata dom VISCOSITE_TURBULENTE ELEM 0.0 0.01015 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }		
+	
+	visu {
+		Title "VEF Muscl - Turbulent viscosity field
+		Width 17cm,viewport=0 0 1024 350,clip
+		pseudocolor_with_range VEF_muscl/test_VEF.lata dom VISCOSITE_TURBULENTE ELEM 0.0 0.01015 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+
+	visu {
+		Title "VEF EF_stab - Turbulent viscosity field
+		Width 17cm,viewport=0 0 1024 350,clip
+		pseudocolor_with_range VEF_EFstab/test_VEF.lata dom VISCOSITE_TURBULENTE ELEM 0.0 0.01015 
+         	Operator no_databaseinfo
+		Operator no_bounding_box
+       }
+
+	visu {
+		Title "Temperature field Legend"
+		Width 17cm,viewport=0 700 1024 950,clip
+		pseudocolor_with_range VDF_Quick/test_VDF.lata dom TEMPERATURE ELEM 293. 296. 
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }		
+
+	visu {
+		Title "VDF Quick - Temperature field
+		Width 17cm,viewport=0 0 1024 350,clip
+		pseudocolor_with_range VDF_Quick/test_VDF.lata dom TEMPERATURE ELEM 293. 296.  
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }		
+	
+	visu {
+		Title "VEF Muscl - Temperature field
+		Width 17cm,viewport=0 0 1024 350,clip
+		pseudocolor_with_range VEF_muscl/test_VEF.lata dom TEMPERATURE ELEM 293. 296.  
+           	Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+
+	visu {
+		Title "VEF EF_stab - Temperature field
+		Width 17cm,viewport=0 0 1024 350,clip
+		pseudocolor_with_range VEF_EFstab/test_VEF.lata dom TEMPERATURE ELEM 293. 296.  
+          	Operator no_databaseinfo
+		Operator no_bounding_box
+       }
+
+	Table {
+		Title "Velocity, temperature, friction velocity and Stanton number profiles"
+		Description "Most of the following profiles (velocity, temperature, and Stanton number profiles) feature a plotting of experimental datas. Those datas have been digitally extracted from the figures of two published papers [1] and [2] which have a relatively poor precision. Therefore, the error on the datas is quite large."
+	}
+
+	Figure {
+		Title "Longitudinal velocity profiles at x/h=1"
+		Width 12cm
+		Dimension 2
+		LabelX "U/U0"
+		RangeX -0.5 1.5
+		LabelY "y/h"
+		RangeY 0. 5.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_V1_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_V1_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_V1_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+	}
+
+	Figure {
+		Title "Longitudinal velocity profiles at x/h=3.2"
+		Width 12cm
+		Dimension 2
+		LabelX "U/U0"
+		RangeX -0.5 1.5
+		LabelY "y/h"
+		RangeY 0. 5.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_V2_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_V2_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_V2_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental: Chen and Nie [1]"
+			file xp/vitesse/Chen_Nie_V_3_2
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Longitudinal velocity profiles at x/h=4.5"
+		Width 12cm
+		Dimension 2
+		LabelX "U/U0"
+		RangeX -0.5 1.5
+		LabelY "y/h"
+		RangeY 0. 5.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_V3_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_V3_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_V3_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental: Chen and Nie [1]"
+			file xp/vitesse/Chen_Nie_V_4_5
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Longitudinal velocity profiles at x/h=5.9"
+		Width 12cm
+		Dimension 2
+		LabelX "U/U0"
+		RangeX -0.5 1.5
+		LabelY "y/h"
+		RangeY 0. 5.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_V4_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_V4_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_V4_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental: Chen and Nie [1]"
+			file xp/vitesse/Chen_Nie_V_5_9
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+	
+	Figure {
+		Title "Longitudinal velocity profiles at x/h=7.2"
+		Width 12cm
+		Dimension 2
+		LabelX "U/U0"
+		RangeX -0.5 1.5
+		LabelY "y/h"
+		RangeY 0. 5.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_V5_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_V5_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_V5_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental: Chen and Nie [1]"
+			file xp/vitesse/Chen_Nie_V_7_2
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Longitudinal velocity profiles at x/h=15"
+		Width 12cm
+		Dimension 2
+		LabelX "U/U0"
+		RangeX -0.5 1.5
+		LabelY "y/h"
+		RangeY 0. 5.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_V6_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_V6_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_V6_LONGI.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+	}
+	
+	Figure {
+		Title "Temperature profiles at x/h=1.7"
+		Width 12cm
+		Dimension 2
+		LabelX "T-T0"
+		RangeX -1. 4.
+		LabelY "y/h"
+		RangeY 0. 5.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_T1.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_T1.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_T1.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental:Chen and Nie [1]"
+			file xp/temperature/Chen_Nie_T_1_7
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Temperature profiles at x/h=3"
+		Width 12cm
+		Dimension 2
+		LabelX "T-T0"
+		RangeX -1. 4.
+		LabelY "y/h"
+		RangeY 0. 5.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_T2.coupe_normalise.dat
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_T2.coupe_normalise.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_T2.coupe_normalise.dat
+			columns ($1) ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental:Chen and Nie [1]"
+			file xp/temperature/Chen_Nie_T_3_0
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Temperature profiles at x/h=4.3"
+		Width 12cm
+		Dimension 2
+		LabelX "T-T0"
+		RangeX -1. 4.
+		LabelY "y/h"
+		RangeY 0. 5.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_T3.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_T3.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_T3.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental:Chen and Nie [1]"
+			file xp/temperature/Chen_Nie_T_4_3
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Temperature profiles at x/h=7"
+		Width 12cm
+		Dimension 2
+		LabelX "T-T0"
+		RangeX -1. 4.
+		LabelY "y/h"
+		RangeY 0. 5.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_T4.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_T4.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_T4.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental:Chen and Nie [1]"
+			file xp/temperature/Chen_Nie_T_7_0
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+
+	Figure {
+		Title "Temperature profiles at x/h=15"
+		Width 12cm
+		Dimension 2
+		LabelX "T-T0"
+		RangeX -1. 4.
+		LabelY "y/h"
+		RangeY 0. 5.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/test_VEF_SONDE_T5.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/test_VEF_SONDE_T5.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/test_VDF_SONDE_T5.coupe_normalise.dat
+			columns ($2) ($1)
+			TypePoints 3
+		}
+	}
+
+	Figure {
+		Title "Friction velocity evolution on the heated bottom wall"
+		Width 12cm
+		Dimension 2
+		LabelX "x/h"
+		RangeX 0 21.0
+		LabelY "Utau (m/s)"
+		RangeY 0. 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/Ustar_bottom.dat
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/Ustar_bottom.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/Ustar_bottom.dat
+			columns ($1) ($2)
+			TypePoints 3
+		}
+	}
+
+	Table {
+		Title "Stanton number"
+		Description "The following figure shows the evolution of Stanton number on the bottom wall. St = Qw / $\rho$ Cp U0 (Tw-T0). Tw is the wall temperature and T0 the fluid bulk temperature. Tw temperature is given by a "temperature_physique" probe"	
+	}
+	Figure {
+		Title "Stanton number evolution on the heated bottom wall"
+		Width 12cm
+		Dimension 2
+		LabelX "x/h"
+		RangeX 0 20.0
+		LabelY "St/Stmax"
+		RangeY 0. 1.1
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			file VEF_EFstab/Stanton_normalise.dat
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			file VEF_muscl/Stanton_normalise.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			file VDF_Quick/Stanton_normalise.dat
+			columns ($1) ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental: Vogel [2]
+			file xp/Stanton/Vogel_Stanton_transforme
+			columns ($1) ($2)
+			TypePoints 3
+		}
+	}
+
+	Table {
+		Title "Reattachement length"
+		nb_columns 5
+		label Xr | Xr/h | Error (%) | Xr (experimental) | Xr/h (expe)
+		line {
+			legend "VEF_muscl"
+			origin "Trio_U"
+			file VEF_muscl/longueur_reattachement.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF_EFstab"
+			origin "Trio_U"
+			file VEF_EFstab/longueur_reattachement.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VDF_Quick"
+			origin "Trio_U"
+			file VDF_Quick/longueur_reattachement.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+}
+
+Chapter {
+	Title "Conclusions"
+	
+	Description "The very first curves show the computations convergence by plotting the velocity evolution in two different points in the flow. Computation is longer with the EF_stab convection scheme since low facsec and facsec_max values has to be used, due to the instability of this scheme. The convergence is reached after 1 second for all the convection schemes. However, it can be noted that in the recirculation region, oscillations occur for the muscl convection scheme."
+
+	Description "The recirculation regions with the velocity vector field figures are plotted. The results are very similar from one convection scheme to the other, though the value obtained for the reattachment length is the closest to experiment for the muscl scheme."
+	Description "The reattachment point is defined as the point at the wall were the flow direction is negative. Table 4.30 compares the reattachement length obtained with Trio_U computation to the experimental values. VEF muscl is the closest, while the value is zero for the EF_stab calculation since no recirculation region was found in the flow. The VDF-Quick modelisation gives very similar results to the VEF-EF_stab model. It must be underlined however that the choice of the mesh refinment at the step location (x=0) is important to get proper results."
+
+	Description "The longitudinal velocity profiles obtained from Trio_U computations are plotted, along with some experimental results. All the calculations give very similar results. We note that the experimental and calculated data are very close up tu y/h=1.5. The precision of the digitalization method used to extract the experimental datas from the papers is however quite poor."
+
+	Description "For the temperature profiles, VEF_muscl results seem to be the closest to the experimental values. The VDF-Quick and VEF-EF_stab are very close to each other though the profiles are a little different from the experiment in the recirculation zone."
+
+	Description "The friction velocity figure shows a similar behaviour for all the schemes."
+
+	Description "Stanton number evolution on the bottom wall is plotted, and the closest profile to the theory is VDF Quick."
+	
+
+
+	
+
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

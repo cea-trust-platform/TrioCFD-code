@@ -1,0 +1,5 @@
+#!/bin/bash
+python ../propertiesGeometry.py
+extrait_coupe FC_VDF_Bouss COUPE_TEMP9
+extrait_coupe FC_VDF_Bouss COUPE_VIT9
+python ../freeConvection.py './FC_VDF_Bouss_COUPE_TEMP9.coupe' './FC_VDF_Bouss_COUPE_VIT9.coupe' 0.91 Bouss

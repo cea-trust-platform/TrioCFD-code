@@ -1,0 +1,191 @@
+dimension 3
+
+Pb_conduction pb1
+
+Domaine dom1
+
+# BEGIN MESH #
+Mailler dom1
+{
+        Pave Cavite1
+                {
+                Origine 0. 0. 0.
+                Nombre_de_Noeuds 13 2 2
+                Longueurs 0.012 0.001 0.001
+                }
+                {
+                Bord Gauche   X = 0.     0. <= Y <= 0.001  0. <= Z <= 0.001
+                Bord Droite   X = 0.012  0. <= Y <= 0.001  0. <= Z <= 0.001
+
+                Bord Bas      Z = 0.     0. <= X <= 0.012  0. <= Y <= 0.001
+                Bord Haut     Z = 0.001  0. <= X <= 0.012  0. <= Y <= 0.001
+
+                Bord Devant   Y = 0      0. <= X <= 0.012  0. <= Z <= 0.001
+                Bord Derriere Y = 0.001  0. <= X <= 0.012  0. <= Z <= 0.001
+                } 
+}
+
+
+Tetraedriser_homogene_fin dom1
+# END MESH #
+
+# Read_unsupported_ASCII_file_from_ICEM DOM_DOM trio_DOM_geo.asc #
+# Transformer DOM_DOM 0.001*x 0.001*y 0.001*z #
+
+VEFPreP1B dis
+
+# Begin explicite
+Schema_Euler_explicite sch1
+Read sch1
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 70.
+        dt_min 1e-10
+        dt_max 1.e-2
+        dt_impr 0.1
+        dt_sauv 300.
+        seuil_statio 1.e-10
+}
+ End explicite #
+
+
+# Begin RK3
+Runge_Kutta_ordre_3 sch1
+Read sch1
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 70.
+        dt_min 1e-10
+        dt_max 1.e-2
+        dt_impr 0.1
+        dt_sauv 300.
+        seuil_statio 1.e-10
+        facsec 1.
+}
+ End RK3 #
+
+# Begin implicite #
+
+Schema_Euler_implicite sch1
+Read sch1
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 70.
+   dt_start dt_calc
+   dt_min 1.e-10
+   dt_max 1.e-2
+   dt_impr 0.01
+   dt_sauv 20.
+   seuil_statio 1.e-15
+   facsec 50.
+   facsec_max 70.
+   no_check_disk_space
+      solveur implicite
+   {
+       seuil_convergence_solveur 1.e-11
+       solveur  gmres { diag seuil 1e-11 impr controle_residu 1 }
+   }
+}
+# End implicite #
+
+
+
+
+Solide sol
+Read sol
+{
+        rho Champ_Uniforme 1 7854.
+        lambda Champ_Uniforme 1 17.9    
+        Cp Champ_Uniforme 1 532.
+}
+
+
+Associate pb1 dom1
+Associate pb1 sol
+Associate pb1 sch1
+
+Discretize pb1 dis
+
+
+Read pb1
+{
+        Conduction
+        {
+                diffusion { }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 0.
+                        }
+                boundary_conditions {
+                        Haut     paroi_adiabatique
+                        Bas      paroi_adiabatique
+                        Devant   paroi_adiabatique
+                        Derriere paroi_adiabatique
+                        Droite   paroi_adiabatique
+                        Gauche   paroi_temperature_imposee champ_front_fonc_txyz  1 21.5*SIN((2*3.1416*2)*t)
+								
+                }
+        }
+ 	Postraitement 
+	{
+	 format lml
+                Champs dt_post 20.
+                {
+                        temperature som
+                }
+
+	}
+	Liste_postraitements
+	{
+        Postraitement TEMP 
+	{
+	 format lml
+                Champs dt_post 20.
+                {
+                        temperature som
+                }
+	        Sondes
+		{
+
+			fluct_temp0  nodes temperature periode 0.01 points 1 0.    0.00075 0.00025
+			fluct_temp1  nodes temperature periode 0.01 points 1 0.001 0.00075 0.00025
+			fluct_temp2  nodes temperature periode 0.01 points 1 0.002 0.00075 0.00025
+			fluct_temp3  nodes temperature periode 0.01 points 1 0.003 0.00075 0.00025
+			fluct_temp4  nodes temperature periode 0.01 points 1 0.004 0.00075 0.00025
+			fluct_temp5  nodes temperature periode 0.01 points 1 0.005 0.00075 0.00025
+			fluct_temp7  nodes temperature periode 0.01 points 1 0.007 0.00075 0.00025
+ 			fluct_temp12 nodes temperature periode 0.01 points 1 0.012 0.00075 0.00025
+               }
+
+	 }
+	 Postraitement STAT
+        {
+         champs binaire dt_post 20. { }
+         format lml
+         	statistiques dt_post 20.
+                {
+                        t_deb 60. t_fin 100.
+                        moyenne temperature som
+                        ecart_type temperature som
+
+                }
+		Sondes
+		{
+			Tmp_Moy nodes moyenne_temperature periode 1.e-1 segment 16     0. 0.00075 0.00025    0.012 0.00075 0.00025
+			Tmp_Rms nodes ecart_type_temperature periode 1.e-1 segment 16  0. 0.00075 0.00025    0.012 0.00075 0.00025
+		}
+	}
+
+
+
+
+	}
+	
+
+
+}
+
+Solve pb1
+End

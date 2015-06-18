@@ -1,0 +1,262 @@
+# Thermohydraulique 2D : Couplage Boussinesq et schema quick #
+
+dimension 2
+Pb_Thermohydraulique_Turbulent_QC pb
+Domaine dom
+
+Mailler dom
+{
+	Pave Entree1
+		{
+		Origine 		0. 1.022
+     		Nombre_de_Noeuds 	7 7
+		Longueurs 		0.018  0.018
+		}
+		{
+		Bord EntreeLow	X = 0.		1.022 <= Y <= 1.04
+		Bord Haut	Y = 1.04	0. <= X <= 0.018
+	
+		} ,
+
+	Pave Entree2
+		{
+		Origine 		0. 0.0
+     		Nombre_de_Noeuds        7 7
+		Longueurs 	        0.018 0.024
+		}
+		{
+		Bord EntreeHigh	Y = 0.		0.0 <= X <= 0.018
+	
+		Bord Gauche	X = 0.  	0.0 <= Y <= 0.024
+		} ,
+
+	Pave Entree3
+		{
+		Origine 		0.018 1.022
+     		Nombre_de_Noeuds 	61 7
+		Longueurs 		1.022  0.018
+		}
+		{
+		Bord Droit	X = 1.04	1.022 <= Y <= 1.04
+		Bord Haut	Y = 1.04	0.018 <= X <= 1.04
+	
+		} ,
+
+	Pave Entree4
+		{
+		Origine 		0. 0.024
+     		Nombre_de_Noeuds        7 61
+		Longueurs 	        0.018 0.998
+		}
+		{
+		
+		Bord Gauche	X = 0.  	0.024 <= Y <= 1.022
+		} ,
+
+
+	Pave Sortie
+		{
+		Origine 		0.018 0.
+     		Nombre_de_Noeuds	61 7
+		Longueurs		1.022 0.024
+		}
+		{
+		Bord Bas	Y = 0.		0.018 <= X <= 1.04
+		
+		Bord Sortie	X = 1.04	0. <= Y <= 0.024
+		
+ 		} ,
+        
+        Pave Milieu
+		{
+ 		Origine 		0.018 0.024
+     		Nombre_de_Noeuds	61 61
+		Longueurs  		1.022 0.998
+		}
+		{
+	
+		Bord Droit	X = 1.04	0.024 <= Y <= 1.022
+		} 
+}
+
+
+VDF dis
+
+Schema_Euler_explicite sch
+
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax  400.
+	dt_min 1.e-5
+	dt_max 1.
+	dt_impr 1.
+	dt_sauv 10.
+	seuil_statio 1.e-8
+}
+
+Fluide_Quasi_Compressible fluide
+
+Read fluide
+{
+	pression 1.01e5
+	mu Champ_Uniforme 1 1.85e-5
+	loi_etat gaz_parfait
+	{
+	Prandtl 0.71
+	Cp 1006.4
+	gamma 1.415
+	}
+	Traitement_Pth constant
+	Traitement_Rho_gravite moins_rho_moyen
+}
+
+# resume
+	density 1.18
+	pour un gaz parfait betha = 1/T donc ici 
+	beta_th 3.3e-3
+	lambda 0.0262
+#
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent_QC
+	{
+		solveur_pression petsc Cholesky { }
+		convection { amont }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+					}
+		boundary_conditions {
+			EntreeLow frontiere_ouverte_vitesse_imposee	
+				champ_front_Uniforme 2 0.57 0.
+       			EntreeHigh frontiere_ouverte_vitesse_imposee  	
+				champ_front_Uniforme 2 0.0 0.72
+			Sortie frontiere_ouverte_pression_imposee
+				champ_front_Uniforme 1 0.
+			Droit paroi_fixe
+			Gauche paroi_fixe
+			Haut paroi_fixe
+			Bas paroi_fixe
+					}
+
+      		 modele_turbulence K_Epsilon 
+                {
+           	   	Transport_K_Epsilon 
+                  		{
+           		  convection { amont }
+                 	  diffusion { }
+                 	  boundary_conditions
+                	    {
+              			EntreeLow frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 0.1475e-2 0.58056e-2
+              			EntreeHigh frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 0.1475e-2 0.58056e-2
+              			Sortie frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0.1475e-2 0.58056e-2
+              			Droit paroi
+	      			Gauche paroi
+              			Haut paroi               
+              			Bas paroi                                             
+          	 	    }
+           	 	  conditions_initiales 
+           	 	   {
+              			k_Eps Champ_Uniforme 2 0.1475e-2 0.58056e-2 
+                           }
+            	}
+           	turbulence_paroi loi_standard_hydr nut_max 0.01
+       	       }
+	}
+
+
+	Convection_Diffusion_Chaleur_Turbulent_QC
+	{
+		diffusion { }
+		convection { amont }
+		
+		modele_turbulence Prandtl { turbulence_paroi loi_standard_hydr_scalaire }
+		
+		boundary_conditions 
+		{			        	
+			EntreeLow frontiere_ouverte_temperature_imposee 
+				champ_front_uniforme 1 287.35
+			EntreeHigh frontiere_ouverte_temperature_imposee 
+				champ_front_uniforme 1 307.35
+			Sortie frontiere_ouverte T_ext
+				champ_front_uniforme 1 298.15
+ 			Droit  paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 287.15 H_imp Champ_Front_Uniforme 1 1.e11 
+			Gauche paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 287.15 H_imp Champ_Front_Uniforme 1 1.e11 
+ 			Haut   paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 287.15 H_imp Champ_Front_Uniforme 1 1.e11 
+			Bas    paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 287.15 H_imp Champ_Front_Uniforme 1 1.e11 
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 287.15 }	
+	}
+
+
+	Postraitement
+	{
+	        format lml
+		Sondes
+		{
+			sonde_T1 temperature periode 0.01 segment 60 0. 0.10  1.04 0.10
+
+			sonde_T3 temperature periode 0.1 segment 60 0. 0.52  1.04 0.52
+
+			sonde_T5 temperature periode 0.1 segment 60 0. 0.90  1.04 0.90
+ 
+			sonde_T7 temperature periode 0.1 segment 60 0.10  0. 0.10 1.04
+
+			sonde_T9 temperature periode 0.1 segment 60 0.52  0. 0.52 1.04
+
+			sonde_T11 temperature periode 0.1 segment 60 0.90  0. 0.90 1.04
+					
+			sonde_V1 vitesse periode 0.1 segment 60  0. 0.10  1.04 0.10
+
+			sonde_V3 vitesse periode 0.1 segment 60  0. 0.52  1.04 0.52
+
+			sonde_V5 vitesse periode 0.1 segment 60  0. 0.90  1.04 0.90
+			
+			sonde_V7 vitesse periode 0.1 segment 60  0.10 0.  0.10 1.04
+
+			sonde_V9 vitesse periode 0.1 segment 60  0.52 0.  0.52 1.04
+
+			sonde_V11 vitesse periode 0.1 segment 100  0.90 0.  0.90 1.04
+			
+			sonde_temperature  temperature periode 0.1 point 2 
+				0.52 0.52
+				0.20 0.82
+			sonde_vitesse vitesse periode 0.1 point 2
+				0.52 0.52
+				0.20 0.82
+	
+
+		}
+#     pause pb a la NR, deja defini au dessus Format lml #
+		Champs dt_post 20.
+		       {
+			pression som
+			vitesse som
+			temperature som
+			k
+			eps
+			viscosite_turbulente som
+		       }
+	}
+
+
+          
+}
+
+
+
+Solve pb
+End

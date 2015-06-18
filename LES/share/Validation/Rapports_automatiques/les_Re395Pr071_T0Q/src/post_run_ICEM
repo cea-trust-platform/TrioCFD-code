@@ -1,0 +1,52 @@
+#!/bin/bash
+
+
+
+utau=`cat *Ustar.face | grep "<u+>" | tail -1 | awk '{print $6;}'`
+
+utau_th=`cat ../utau_analytique.dat | awk '{print $1;}'`
+tail -1 les_Re395Pr071_T0Q.dt_ev | awk -v utauth=$utau_th -v utau=$utau '{printf ("%7.2f %7.4f %7.2f", $1,utau,100*sqrt((utau-utauth)*(utau-utauth))/utauth);}' > post_utau   
+
+
+echo $utau
+
+# les dernieres valeurs imprimes dans les sondes des stats sont nulles, pourquoi (reprise_auto??) ??? On les saute.
+temps=`cat les_Re395Pr071_T0Q_COUPE_U_MOY.son | awk '{print $1;}' | tail -6 | head -1`
+ttau=`echo "1" | awk  -v utau=$utau '{print  1/(0.011928*5193*utau);}'`
+
+extrait_coupe les_Re395Pr071_T0Q.data COUPE_U_MOY $temps
+extrait_coupe les_Re395Pr071_T0Q.data COUPE_U_ET $temps
+
+extrait_coupe les_Re395Pr071_T0Q.data COUPE_T_MOY $temps
+extrait_coupe les_Re395Pr071_T0Q.data COUPE_T_ET $temps
+
+mu=`grep "mu " les_Re395Pr071_T0Q.data | awk '{print $4}'`
+rho=`grep "rho" les_Re395Pr071_T0Q.data | awk '{print $4}'`
+Cp=`grep "Cp" les_Re395Pr071_T0Q.data | awk '{print $4}'`
+
+awk -v utau=$utau   -v mu=$mu -v rho=$rho -v Cp=$Cp 'BEGIN{nu=mu/rho;  ad=utau ; } {if (($1!="")&&($1!="#")) print $1*utau/nu " " $2/ad " " $3/ad " " $4/ad;}' les_Re395Pr071_T0Q_COUPE_U_MOY.coupe.$temps > coupe_U_moy_adim.dat
+
+awk -v utau=$utau  -v mu=$mu -v rho=$rho -v Cp=$Cp 'BEGIN{nu=mu/rho;  ad=utau ; } {if (($1!="")&&($1!="#")) print $1*utau/nu " "  $2/ad " " $3/ad " " $4/ad;}' les_Re395Pr071_T0Q_COUPE_U_ET.coupe.$temps > coupe_U_et_adim.dat
+
+awk -v utau=$utau -v ttau=$ttau -v tw=0 -v mu=$mu -v rho=$rho -v Cp=$Cp 'BEGIN{nu=mu/rho;  ad=ttau ; } {if (($1!="")&&($1!="#")) print $1*utau/nu " " ($2-tw)/ad ;}' les_Re395Pr071_T0Q_COUPE_T_MOY.coupe.$temps > coupe_T_moy_adim.dat
+
+awk -v utau=$utau -v ttau=$ttau -v mu=$mu -v rho=$rho -v Cp=$Cp 'BEGIN{nu=mu/rho;  ad=ttau ; } {if (($1!="")&&($1!="#")) print $1*utau/nu " "  $2/ad ;}' les_Re395Pr071_T0Q_COUPE_T_ET.coupe.$temps > coupe_T_et_adim.dat
+
+
+
+
+fs_moyen=`cat les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$3;}}END{print m/n;}'`
+dt_moyen=`cat les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$2;}}END{print m/n;}'`
+fs_moyen20=`tail -20 les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$3;}END{print m/n;}'`
+dt_moyen20=`tail -20 les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$2;}END{print m/n;}'`
+
+dt_conv=`grep -A 2 "time steps for the equation: Navier_Stokes_Turbulent" les_Re395Pr071_T0Q.out | grep convec | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffNS=`grep -A 2 "time steps for the equation: Navier_Stokes_Turbulent" les_Re395Pr071_T0Q.out | grep diffus | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffT=`grep -A 2 "time steps for the equation: Convec" les_Re395Pr071_T0Q.out | grep diffus | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+
+fs_conv=`echo "scale=8;$dt_moyen20/$dt_conv" | bc`
+fs_diffNS=`echo "scale=8;$dt_moyen20/$dt_diffNS" | bc`
+fs_diffT=`echo "scale=8;$dt_moyen20/$dt_diffT" | bc`
+
+echo  $fs_moyen20  " " $fs_conv " " $fs_diffNS " " $fs_diffT > comp_facsec 
+

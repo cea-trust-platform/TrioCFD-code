@@ -1,0 +1,137 @@
+# Thermohydraulique 2D VDF couplee a conduction avec rayonnement de paroi #
+# PARALLEL OK #
+dimension 2    
+Schema_Euler_explicite sch
+Read sch
+{
+        tinit 0.
+        tmax 10000000
+        dt_min 1.e-9
+        dt_max 10.
+        dt_impr 0.001
+        dt_sauv 500.
+        seuil_statio 1.e-5
+}
+
+Pb_Thermohydraulique pb2
+
+Domaine dom_fluide
+# BEGIN MESH #
+Mailler dom_fluide
+{
+        Pave Cavite
+                {
+                Origine 0. 0.
+                Nombre_de_Noeuds 11 11
+                Longueurs 0.05 0.05
+                }
+                {
+                Bord Gauche   X = 0.    0. <= Y <= 0.05 
+                Bord Droit    X = 0.05  0. <= Y <= 0.05
+                Bord Bas      Y = 0.    0. <= X <= 0.05
+                Bord Haut     Y = 0.05  0. <= X <= 0.05
+                }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_fluide
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM2
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM2.Zones dom_fluide
+END SCATTER #
+
+VDF dis
+
+Fluide_Incompressible fluide
+Read fluide
+{
+        mu Champ_Uniforme 1 1.85e-5
+        rho Champ_Uniforme 1 1.177
+        lambda Champ_Uniforme 1 0.0262
+        Cp Champ_Uniforme 1 1006.
+        beta_th Champ_Uniforme 1 0.0033
+}
+
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81 
+Associate fluide gravite
+
+Associate pb2 dom_fluide
+Associate pb2 fluide
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb2
+Associate pbc sch
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Read mod 
+{
+  dom_fluide.facesrayo
+  dom_fluide.factforme
+}
+
+Read pb2
+{
+        Navier_Stokes_standard
+        {
+                solveur_pression cholesky { }       
+                convection { amont }
+                diffusion { }
+                sources { boussinesq_temperature { T0 373. } }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 2 0. 0.
+                        }
+                boundary_conditions {
+                        Droit paroi_fixe
+                        Haut paroi_fixe
+                        Gauche  paroi_fixe
+                        Bas paroi_fixe
+                }
+        }
+        Convection_Diffusion_Temperature
+        {
+                diffusion { }
+                convection { amont }
+                boundary_conditions 
+                {	
+		 	Droit paroi_temperature_imposee Champ_front_Uniforme 1 323.15
+                        Haut Paroi_flux_impose Champ_front_Uniforme 1 0.
+                        Gauche  paroi_temperature_imposee  Champ_front_Uniforme 1 423.15
+                        Bas Paroi_flux_impose Champ_front_Uniforme 1 0.
+                }
+		conditions_initiales { Temperature Champ_fonc_xyz dom_fluide 1 423.15+((323.15-423.15)/0.05)*x }
+        }
+        Postraitement
+        {
+                Sondes
+                { 
+		T_FLUIDE temperature periode 100. segment 5 5.e-3 2.5e-2 4.5e-2 2.5e-2
+		TEST1D_FLUIDE temperature periode 100. segment 5 5.e-3 5.e-3 5.e-3 4.5e-2
+                }
+		format lata
+                Champs dt_post 500.
+                {
+                        pression elem
+                        pression som
+                        vitesse elem
+                        vitesse som
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+
+Solve pbc
+End

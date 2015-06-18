@@ -1,0 +1,120 @@
+TAILLES 3 36 195 11 
+RIEN 0 meshing
+MAIL_X_REG 4 xomin xmil 15 2 dx1
+MAIL_X_REG 4 xmil rdis-epsr 14 16 dx2
+MAIL_X_REG 4 rdis-epsr rcol 7 29 dx3
+FORT 0 do i=1,nbcell
+MAIL_Y_REG 4 yomin+(i-1)*hpas yomin+ep/2.+(i-1)*hpas 2 2+(i-1)*nycell dy1
+MAIL_Y_REG 4 yomin+ep/2.+(i-1)*hpas ymil+(i-1)*hpas 15 3+(i-1)*nycell dy2
+MAIL_Y_REG 4 ymil+(i-1)*hpas ymil+ylmil+(i-1)*hpas 3 17+(i-1)*nycell dy3
+MAIL_Y_REG 4 ymil+ylmil+(i-1)*hpas yhaut+(i-1)*hpas 15 19+(i-1)*nycell dy4
+MAIL_Y_REG 4 yhaut+(i-1)*hpas yhaut+ylhaut+(i-1)*hpas 2 33+(i-1)*nycell dy5
+FORT 0 enddo
+MAIL_Z_REG 4 zomin zomax nz-2 2 dz
+RIEN 0 filling up of the domain
+PARALAX 7 xomin xomax yomin yomax zomin zomax 1000 domaine
+RIEN 0 boundaries domain definition
+PARALAX 7 xomin-eps xomax+eps yomin-eps yomax+eps zomax zomax+eps -1000 arriere
+PARALAX 7 xomin-eps xomax+eps yomin-eps yomax+eps zomin-eps zomin -1000 avant
+PARALAX 7 xomin-eps xomin yomin-eps yomax+eps zomin-eps zomax+eps -2000 axe
+PARALAX 7 xomax xomax+eps yomin-eps yomax+eps zomin-eps zomax+eps -3000 paroi
+PARALAX 7 xomin-eps xomax+eps yomin-eps yomin zomin-eps zomax+eps -4000 entree
+PARALAX 7 xomin-eps xomax+eps yomax yomax+eps zomin-eps zomax+eps -5000 sortie
+FORT 0 do i=1,nbcell
+PARALAX 7 xbas xbas+xlbas ybas+(i-1)*hpas ybas+(i-1)*hpas+ylbas zomin-eps zomax+eps -6000 disque
+PARALAX 7 xmil xmil+xlmil ymil+(i-1)*hpas ymil+(i-1)*hpas+ylmil zomin-eps zomax+eps -7000 couronne
+PARALAX 7 xhaut xhaut+xlhaut yhaut+(i-1)*hpas yhaut+(i-1)*hpas+ylhaut zomin-eps zomax+eps -6000 disque
+FORT 0 enddo
+COUPEAXI2D 3 zomin 3 -8000 coupe_Axi2D
+file maillage
+	real xomin,xomax,yomin,yomax,zomin,zomax,eps
+	real epsr,rcol,rdis,rcou,het,ep,hpas
+	real Transp
+	real xbas, xmil, xhaut
+	real ybas, ymil, yhaut  
+        real xlbas, xlmil, xlhaut
+	real ylbas, ylmil, ylhaut
+C
+	integer nbcell,nbet
+	integer nycell
+C
+C Transparence :
+C Rapport (Aire_colonne - Aire_disque)/Aire_colonne
+C
+        Transp=0.235
+C	
+C  Tolerance axiale
+        epsr=1.e-6
+C  Rayon de la colonne	
+C	rcol=0.288/2.
+        rcol=0.045/2.
+C  Rayon du disque	
+	rdis=rcol*((1.-Transp)**0.5)
+C  Rayon interne de la couronne	
+	rcou=rcol*(Transp**0.5)
+C  Hauteur d un etage : espacement disque-couronne	
+C	het=0.045
+        het=0.050
+C  Epaisseur des plateaux	
+	ep=0.002
+C  Hauteur d une cellule	
+	hpas=2*(het+ep)
+C  Nombre de cellules	
+	nbcell=6
+C  Nombre d etages par cellule	
+	nbet=2
+C  Nombre de noeuds-1 sur la hauteur d une cellule	
+CCCC        nycell=50
+        nycell=32
+C
+C  Coordonnees des points extremums du pave initial
+C
+	xomin=epsr
+	xomax=rcol
+	yomin=0.
+	yomax=nbcell*nbet*(het+ep)
+	zomin=0.
+	zomax=1.
+C	
+C points origine des obstacles :
+C xbas, ybas pour la partie basse du disque
+C xhaut, yhaut pour la partie haute du disque
+C xmil, ymil pour la couronne
+C
+	xbas=xomin
+	ybas=yomin
+	xmil=rcou
+	ymil=yomin+(ep/2.+het)
+	xhaut=xomin
+	yhaut=yomin+hpas-ep/2.
+C
+C cotes des obstacles :
+C xlbas, ylbas, xlhaut, ylhaut pour les parties basse et haute du disque 
+C xlmil, ylmil pour la couronne
+C	
+        xlbas=rdis-epsr
+	xlmil=rcol-rcou
+	xlhaut=rdis-epsr
+C
+	ylbas=ep/2.
+	ylmil=ep
+	ylhaut=ep/2.
+C	
+C epaisseur des paves representatifs des bords
+	eps=0.001
+
+        XM(1)=xomin-eps
+        XM(nx)=xomax+eps
+        YM(1)=yomin-eps
+        YM(ny)=yomax+eps
+        ZM(1)=zomin-eps
+        ZM(nz)=zomax+eps
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,301 @@
+Parameters {
+	Title "Convection schemes for 3D scalar passive transport"
+	Description "Laminar stationary flow just to observe the diffusity of the convection schemes"
+	Description "Validated Models :"
+	Description "-	3D VEF convection scheme"
+	Description "-	Concentration is a passive scalar (no diffusion scheme too)"
+	Description "Validation method :"
+	Description "-	The initial profiles must simply be transported with less possible diffusion"
+
+	VersionTrio_U "1.5.5"
+
+	ParametersTrio_U Type of problem : Thermo hydraulics 3D
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Euler Explicite
+	ParametersTrio_U Solving of equations : Navier_Stokes_standard ; Convection_Diffusion_Concentration
+	ParametersTrio_U Type of fluid : incompressible
+
+	TestCase Amont Amont /* jdd en annexe */
+	TestCase EFstab EFstab
+	TestCase MinMod MinMod
+	TestCase VanLeer VanLeer
+	TestCase VanLeer0.5 VanLeer-f05
+	
+	Author "R. PAILLE/V.BARTHEL"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : 1m x 1m x 1m"
+	Description "Initial conditions :"
+	Description "- Hydraulic : constant speed of 1m/s in the 3 directions (diagonal direction)"
+	Description "- Concentration = 0"
+	Description "Boundary conditions :"
+	Description "- Hydraulic : constant speed of 1m/s in the 3 directions (diagonal direction)"
+	Description "- Concentration = 1 in the bottom-left corner (entry area); C=0 elsewhere"
+	Description "Mesh : tetraedra elements defined by tetraedriser_homogene_compact"
+	Description "number of elements : 192 000 (20x20x20 hexaedra decomposed in 24 tetraedra each); enough to have a good mesh resolution"
+	visu {
+		Title "mesh of the domain"
+		Width 8cm
+		mesh ./Amont/Amont.lata dom
+		normal3D 0.5 0.3 0.8
+		up3D -0.2 1 -0.2
+	}
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 1.2 kg/m$^3$"
+		Description "$\mu$ = 2.10$^-5$ kg/m/s"
+	}
+	Table {
+		Title "Calculation method"
+		nb_columns 1
+		label Average time step
+		line {
+			legend "Amont"
+			file ./Amont/Amont.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "Min_Mod"
+			file ./MinMod/MinMod.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "EF_stab"
+			file ./EFstab/EFstab.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "Van_Leer"
+			file ./VanLeer/VanLeer.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "Van_Leer with facsec=0.5"
+			file ./VanLeer0.5/VanLeer-f05.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description "The transport of the concentration area should be done with the less diffusion as possible. This means"
+	Description "that we should conserve the same width of concentration=1 accross the cube."
+	Description ""
+	Description "We compare the results given by five different convection schemes : the first order upwind scheme,"
+	Description "the second order muscl scheme with the VanLeer limiter (muscl default scheme in the Trio_U data), "
+	Description "the second order muscl scheme with the MinMod limiter, the Finite Element EF_stab scheme"
+	Description " and the muscl scheme with VanLeer limiter but facsec=0.5 (security factor to avoid some instabilities"
+	Description " "
+	Description "For these four calculations we show:"
+	Description "A- the concentration field across a transverse plane in the middle of the cube. So we can see a representation of the diffusion in the area and the min and max values of C in the whole domain"
+	Description "B- the concentration profile along the diagonal to measure the loss of concentration between inlet and outlet"
+}
+Chapter {
+	Title "A- Oblique plane of the concentration field"
+	Table {
+		Title "UPWIND scheme"
+		nb_columns 2
+		label Min | Max 
+		line { 
+			legend ""
+			nb_columns_file 3
+			file amontMinMax
+			columns ($2) ($3)
+		}
+	}
+	visu {
+		Width 8cm
+		mesh ./Amont/Amont.lata dom
+		pseudocolor ./Amont/Amont.lata dom CONCENTRATION ELEM
+		operator_to_all slice2d 0. 0. 0.  1. -1. 0
+		Query MinMax amontMinMax
+		
+	}
+	Table {
+		Title "Muscl with VanLeer limiter"
+		nb_columns 2
+		label Min | Max 
+		line { 
+			legend ""
+			nb_columns_file 3
+			file vanLeerMinMax
+			columns ($2) ($3)
+		}
+	}
+	visu {
+		Width 8cm
+		mesh ./VanLeer/VanLeer.lata dom
+		pseudocolor ./VanLeer/VanLeer.lata dom CONCENTRATION ELEM
+		operator_to_all slice2d 0. 0. 0.  1. -1. 0
+		Query MinMax vanLeerMinMax
+	}
+	Table {
+		Title "Muscl with Min_Mod limiter"
+		nb_columns 2
+		label Min | Max 
+		line { 
+			legend ""
+			nb_columns_file 3
+			file musclMinMax
+			columns ($2) ($3)
+		}
+	}
+	visu {
+		Width 8cm
+		mesh ./MinMod/MinMod.lata dom
+		pseudocolor ./MinMod/MinMod.lata dom CONCENTRATION ELEM
+		operator_to_all slice2d 0. 0. 0.  1. -1. 0
+		Query MinMax musclMinMax
+	}
+	Table {
+		Title "EF_stab scheme"
+		nb_columns 2
+		label Min | Max 
+		line { 
+			legend ""
+			nb_columns_file 3
+			file efStabMinMax
+			columns ($2) ($3)
+		}
+	}
+	visu {
+		Width 8cm
+		mesh ./EFstab/EFstab.lata dom
+		pseudocolor ./EFstab/EFstab.lata dom CONCENTRATION ELEM
+		operator_to_all slice2d 0. 0. 0.  1. -1. 0
+		Query MinMax efStabMinMax
+	}
+	Table {
+		Description "We can see that EF_stab is the less diffusive scheme and the concentration values are well kept in"	
+		Description "physical limits."
+		Description "The upwind scheme gives of course the biggest diffusion, the muscl scheme is not too diffusive, "
+		Description "in particular with the Van_Leer limiter but the min and max values are a little out of the physical limits"
+	}
+}
+Chapter {
+	Title "B- Concentration profile"
+	Figure {
+		Title "Concentration along the diagonal line"
+		Width 10cm
+		Dimension 2
+		LabelX "Distance from the entry corner (m)"
+		RangeX 0 1.75
+		LabelY "Concentration"
+		RangeY 0 1.4
+		Include_Description_Curves 0
+		Curve {
+			legend "Amont"
+			file ./Amont/Amont_SONDE_CONC_SEG_DIAGO.coupe
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl with Min_Mod limiter"
+			file ./MinMod/MinMod_SONDE_CONC_SEG_DIAGO.coupe
+			columns ($1) ($2)
+			Style points
+			Pointsize 3
+		}
+		Curve {
+			legend "EF_stab"
+			file ./EFstab/EFstab_SONDE_CONC_SEG_DIAGO.coupe
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Muscl with Van_Leer limiter"
+			file ./VanLeer/VanLeer_SONDE_CONC_SEG_DIAGO.coupe
+			columns ($1) ($2)
+			Style points
+			Pointsize 1
+		}
+#		Curve {
+#			legend "Muscl with Van_Leer limiter and facsec=0.5"
+#			file ./VanLeer0.5/VanLeer-f05_SONDE_CONC_SEG_DIAGO.coupe
+#			columns ($1) ($2)
+#			Style lines
+#		}
+	}
+	Table {
+		Description "On this concentration profile that crosses the cube from inlet to outlet in a diagonal way, one can observe"	
+		Description "that only two models keep the maximal concentration value in the center of the outlet: the EF_stab	and"
+		Description "muscl with Van_Leer limiter. The muscl with Min_Mod limiter shows a so little loss of concentration that it is difficult to see, the upwind scheme about 25$%$"
+		Description ""
+	}
+	Figure {
+		Description "Some convection schemes can give under or over-shoots with the concentration evolution as "
+		Description "we can observe on the next figure (the values are given with the node option for the probes)."
+		Title "Concentration evolution at the center of the cube"
+		Width 12cm
+		Dimension 2
+		LabelX "temps (s)"
+		RangeX 0 1.75
+		LabelY "Concentration"
+		RangeY -0.2 1.4
+		Include_Description_Curves 0
+		Curve {
+			legend "Amont"
+			file ./Amont/Amont_SONDE_CONC.son
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Muscl with Min_Mod limiter"
+			file ./MinMod/MinMod_SONDE_CONC.son
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "EF_stab"
+			file ./EFstab/EFstab_SONDE_CONC.son
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Muscl with Van_Leer limiter"
+			file ./VanLeer/VanLeer_SONDE_CONC.son
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Muscl with Van_Leer limiter and facsec=0.5"
+			file ./VanLeer0.5/VanLeer-f05_SONDE_CONC.son
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+	Table {
+		Description "This behaviour can be avoided or limited by using a facsec corrector as we can see on the figure above"
+	}
+}
+Chapter {
+	Title "Conclusion"
+	Description "The EF_stab scheme seems to be the best for scalar transport. It gives very few diffusion and keeps the"
+	Description "scalar values in the physical limits."
+	Description "The upwind scheme is very robust but its diffusive behaviour is annoying."
+	Description "The second order muscl schemes are low diffusive but can give extremum values out of the physical limits"
+	Description "and some under or over-shoots."
+}
+Chapter {
+	Title "Recommandations for users"
+	Description "Use first EF_stab scheme for scalar transport."
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

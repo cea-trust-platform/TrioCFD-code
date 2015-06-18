@@ -1,0 +1,116 @@
+# Extrusion d'une frontiere du maillage pour faire une boite de recirculation #
+dimension 3
+domaine dom
+lire_tgrid dom ../Tube_coude_463259.msh
+Transformer dom x y -z  # Pour avoir un domaine avec Z>=0 #
+# Postraiter_domaine { domaine dom fichier dom.lata format lata } #
+# Generation d'une boite de recirculation #
+domaine box
+
+# avec 3 tetraedres par prisme: #
+extract_2d_from_3d dom entree box
+dimension 2
+Extruder_en3 { domaine 1 box nb_tranches 2 direction 0 0 10 } # Taille de maille ~5mm #
+dimension 3
+# Deplace correctement la boite au contact de la frontiere entree de dom #
+Rotation box x 0 0 90
+Transformer box x y-152.4 z
+
+# Creation d'une frontiere unique perio #
+RegroupeBord box perio { devant derriere }
+
+# Postraitement de la boite de recirculation #
+# Postraiter_domaine { domaine box fichier box.lata format lata } #
+
+# Calcul de la boite de recirculation # 
+# Passage de mm en m #
+Dilate box 0.001
+Pb_hydraulique_turbulent pb
+VEFPreP1B dis
+Schema_Euler_Implicite sch
+Lire sch
+{
+	tinit	0.
+   	tmax    3
+	dt_impr 0.01
+	seuil_statio	1.e-4
+	seuil_statio_relatif_deconseille 1 
+        facsec		500
+	facsec_max	500
+	Solveur Implicite
+	{
+		seuil_convergence_implicite 1.e6		
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu	Champ_Uniforme 1 1.90e-5
+	rho	Champ_Uniforme 1 1.205
+}
+
+Associer pb box
+Associer pb sch
+Associer pb air
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression petsc Cholesky { }
+		convection { ef_stab { alpha 0.2 } }
+		diffusion { }
+                Sources { Canal_perio { bord perio } }
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 10.4 0. } 
+		conditions_limites
+		{
+			perio		periodique
+			parois 		paroi_fixe
+			symmetry	symetrie
+		}
+		modele_turbulence K_Epsilon 
+		{
+			Transport_K_Epsilon 
+                  	{
+				convection { amont }
+				diffusion { }
+				conditions_limites
+				{
+					perio		periodique
+					parois		paroi
+					symmetry	symetrie
+				} 
+				conditions_initiales { k_Eps Champ_Uniforme 2 0.405 7.73 } # k=3/2(U*t)² (t=5%), eps=Cmu/0.07/D*k^1.5 #
+            		}
+			turbulence_paroi loi_standard_hydr dt_impr_ustar 0.05
+		}
+		Ecrire_fichier_xyz_valeur k_eps		1. bords 1 perio
+		Ecrire_fichier_xyz_valeur vitesse	1. bords 1 perio
+	}
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_Ventree nodes	vitesse			periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.
+			sonde_Kentree nodes	K			periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.	
+			sonde_Epsentree nodes	Eps			periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.	
+			sonde_Nutentree nodes	Viscosite_turbulente	periode 0.05 segment 30 -0.5334 -0.1524 0. -0.4572 -0.1524 0.
+		}
+		Format lata
+		Champs dt_post 1000
+		{
+			vitesse			faces
+			Viscosite_turbulente	elem
+			K			elem
+			Eps			elem
+			Y_plus			elem
+		}
+	}
+}
+Resoudre pb
+Fin

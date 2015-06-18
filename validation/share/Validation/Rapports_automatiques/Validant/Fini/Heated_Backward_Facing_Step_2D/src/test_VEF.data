@@ -1,0 +1,217 @@
+# Simulation du cas test: Echange thermique en aval de marche descendante. #
+
+dimension 3
+
+domaine DOM_BODY
+
+Read_unsupported_ASCII_file_from_ICEM DOM_BODY trio_BODY_geo.asc
+
+domaine dom
+
+Extract_2D_from_3D DOM_BODY FRONT dom
+
+ecrire_fichier dom dom2D.geom
+
+dimension 2
+
+Read_file dom dom2D.geom
+
+
+
+
+# hauteur_marche 0.038 #
+# U0 11.3 #
+
+Pb_Thermohydraulique_turbulent pb
+
+# BEGIN PARTITION
+Partition dom
+{
+        Partitionneur tranche { tranches 2 1 }
+        Larg_joint 2
+	Periodique 1 periox
+        Nom_Zones DOM
+}
+
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VerifierCoin dom { }
+
+VEFPreP1B dis
+
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.
+	tmax 5.
+	dt_min 1.e-9
+	dt_max 1.
+	dt_impr 0.5
+	dt_sauv 500.
+	dt_start dt_calc
+	seuil_statio 1.e-8
+	facsec 200.
+	facsec_max 1000.
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+
+}
+
+Fluide_Incompressible fluide
+
+Read fluide {
+	mu Champ_Uniforme 1 1.782e-5
+	rho Champ_Uniforme 1 1.205
+	lambda Champ_Uniforme 1 0.025224
+	Cp Champ_Uniforme 1 1005.
+	Beta_th Champ_Uniforme 1 3.413e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{ 
+ 	Navier_Stokes_turbulent
+ 	{ 
+       		solveur_pression Gcp 
+		{ 
+			precond ssor { omega 1.5 } 
+                        seuil 1.e-8
+			impr
+                } 
+       		convection { muscl }
+       		diffusion  { }
+       		sources { boussinesq_temperature { T0 293 } }
+       	
+       		conditions_initiales 
+		{ 
+       			    Vitesse champ_uniforme 2 0. 0.
+       		}
+       
+       
+       		boundary_conditions 
+		{  
+				TOP     paroi_fixe
+				IN_BA  paroi_fixe
+				LEFT    paroi_fixe
+				BOTTO   paroi_fixe
+				IN      frontiere_ouverte_vitesse_imposee Champ_front_fonc_XYZ 2 (1.0754*LN(3.0181e4*y))+5.32 0.0
+				OUT     frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.0
+					
+		} 
+			  
+		Modele_turbulence K_epsilon
+		{
+			cmu 0.09
+			transport_k_epsilon
+			{
+				diffusion { }
+				convection { amont }		
+				conditions_initiales { k_eps champ_uniforme 2 0.47884 2.1799 }
+				
+				boundary_conditions 
+				{ 
+					
+					TOP       paroi
+					IN_BA    paroi
+					LEFT      paroi
+					BOTTO     paroi
+					IN        Frontiere_ouverte_K_Eps_impose Champ_Front_Uniforme 2 0.47884 2.1799
+					OUT       Frontiere_ouverte K_Eps_ext    Champ_Front_Uniforme 2 0.47884 2.1799
+				}
+			}
+			turbulence_paroi loi_standard_hydr dt_impr_ustar 20.
+        	}
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 20.
+       			}
+					}		                    
+	}
+    
+	Convection_Diffusion_Temperature_turbulent
+	{
+		diffusion { }
+		convection { muscl }
+
+		conditions_initiales { Temperature Champ_uniforme 1 293  }
+		boundary_conditions 
+		{
+			
+			TOP        Paroi_adiabatique
+			BOTTO      Paroi_flux_impose Champ_front_uniforme 1 270.
+			IN_BA     Paroi_adiabatique
+			LEFT       Paroi_adiabatique
+			IN         Frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 293.
+			OUT        frontiere_ouverte T_ext Champ_Front_Uniforme 1 293.
+		}
+               Modele_Turbulence Prandtl 
+                {
+                        Turbulence_Paroi loi_standard_hydr_scalaire dt_impr_nusselt 1.
+                }
+	}
+
+	Postraitement
+        {
+		format lata       
+		
+		Champs dt_post 5.0
+		{
+			vitesse elem
+			pression_Pa elem
+			temperature elem
+			gradient_pression elem
+			k elem
+			eps elem
+			viscosite_turbulente elem
+			y_plus elem
+		}
+
+		Sondes
+		{
+			sonde_T1 temperature periode 0.1 segment 50 0.0646 0.0 0.0646 0.19
+			sonde_T2 temperature periode 0.1 segment 50 0.114 0.0 0.114 0.19
+			sonde_T3 temperature periode 0.1 segment 50 0.1634 0.0 0.1634 0.19
+			sonde_T4 temperature periode 0.1 segment 50 0.266 0.0 0.266 0.19
+			sonde_T5 temperature periode 0.1 segment 50 0.57 0.0 0.57 0.19	
+			sonde_TWall temperature_physique periode 0.1 segment 50 0.0 0.0 0.760 0.0
+
+			sonde_V1_longi VitesseX periode 0.1 segment 50 0.038 0.0 0.038 0.19
+			sonde_V2_longi VitesseX periode 0.1 segment 50 0.1216 0.0 0.1216 0.19
+			sonde_V3_longi VitesseX periode 0.1 segment 50 0.171 0.0 0.171 0.19
+			sonde_V4_longi VitesseX periode 0.1 segment 50 0.2242 0.0 0.2242 0.19
+			sonde_V5_longi VitesseX periode 0.1 segment 50 0.2736 0.0 0.2736 0.19
+			sonde_V6_longi VitesseX periode 0.1 segment 50 0.57 0.0 0.57 0.19			
+	
+			sonde_bottom vitesse periode 0.1 segment 50 0.0 0.0 0.76 0.0
+			sonde_bottom_node nodes vitesse periode 0.1 segment 50 0.0 0.0 0.76 0.0
+			sonde_bottom_grav grav vitesse periode 0.1 segment 50 0.0 0.0 0.76 0.0
+
+
+			sonde_vitesse_convergence1 vitesse periode 0.1 point 1 0.05 0.015
+			sonde_vitesse_convergence2 vitesse periode 0.1 point 1 0.6 0.005
+	
+		}
+	}
+
+}
+
+Solve pb
+End

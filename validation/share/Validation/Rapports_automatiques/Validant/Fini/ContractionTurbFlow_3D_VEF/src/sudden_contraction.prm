@@ -1,0 +1,497 @@
+Parameters {
+	Title "Pressure loss through a sudden contraction"
+
+        description "The pressure loss through a sudden contraction in a pipe is calculated for two different meshes and with a $k-\varepsilon$ turbulent model."
+	description "The parameter $\alpha$ of the convection scheme EF_Stab is also tested."
+        description "The calculated pressure loss is compared to a correlation. The inlet boundary conditions are given by recirculation boxes."
+
+	Author "V. Blind, U.Bieder, S. Vandroux Koenig, V. Barthel"
+
+	TestCase "MESH_1/BOX" "recirculation_box" "1" 
+	TestCase "REFINED_MESH/BOX" "recirculation_box" "1"
+	TestCase "MESH_1/alpha_1" "sudden_contraction" "4"
+	TestCase "MESH_1/alpha_02" "sudden_contraction" "4" data file printed in report file
+	TestCase "REFINED_MESH/alpha_1" "sudden_contraction" "12"
+	TestCase "REFINED_MESH/alpha_02" "sudden_contraction" "12"
+
+	VersionTrio_U "1.5.7."
+
+	ParametersTrio_U Dimension: 3D.
+	ParametersTrio_U Discretization: VEFPrep1B.
+	ParametersTrio_U Convection scheme: EF_Stab.
+	ParametersTrio_U Turbulent model: $k-\varepsilon$.
+
+	Reference "1. 'Coefficient de pertes de charges singulieres et de perte de charge par frottement', I.E. Idel'Cik, Direction des etudes et recherches d'Électricite de France, 1986"
+
+
+	}	
+
+Chapter {
+	Title "Model description"
+
+	Figure {
+		Title "Geometry"
+		description "The geometry is a 3D pipe with a sudden contraction."
+		description "The geometry is a 30° axial section."
+		description "Dimensions of the pipe upstream: diameter: \latex_($D_1=2 \, m $\latex_); length: \latex_($L_1=2.5.D_1$\latex_)"
+		description "Dimensions of the pipe downstream: diameter: \latex_($D_2=1 \, m $\latex_); length: \latex_($L_2=10.D_2$\latex_)."
+		description "The figure below is a schema of the geometry."
+		Width 10cm
+		picture ./Figures/schema.png
+		}
+
+		
+	Table {
+		Title "Fluid"
+		description "Incompressible fluid."
+		description "Density: $\rho=1000 \; kg/m^3$"
+		description "Dynamic viscosity: $\mu=0.001 \; kg/m/s$"
+		}
+		
+	Table {
+		Title "Hydraulic boundary conditions"
+		description "Velocity inlet $U$: fully developed turbulent profile. A recirculation box gives the velocity inlet profile."
+		description "Pressure outlet."
+		description "External boundaries: wall."
+		description "Lateral boundaries: symmetry."
+		}
+	}
+		
+		
+Chapter { 
+	Title "First mesh"
+	description "All the meshes are performed with the software ICEM."
+	description "For this mesh, there are around 30 000 meshes."
+	
+	Figure {
+		Title "Mesh at the inlet"
+		description "The mesh at the inlet is less refined compared to the mesh near the contraction."
+		description "The figure below shows the mesh at the inlet of the pipe."
+		Width 8cm
+		picture ./Figures/mesh_1_inlet.png
+		}
+		
+	Figure {
+		Title "Mesh near the contraction"
+		description "The figure below shows the mesh near the contraction." 
+		Width 8cm
+		picture ./Figures/mesh_1.png
+		}
+		
+	Figure {
+		Title "Axial mesh"
+		description "The figure below is an axial slice of the mesh downstream the contraction."
+		Width 8cm
+		picture ./Figures/mesh_1_axial.png
+		}
+		
+
+		
+	Figure {
+		Title "Mesh"
+		description "The figure below shows the difference between the mesh at the inlet and the refined mesh in the contraction area."
+		Width 8cm
+		picture ./Figures/mesh_1_raccord.png
+		}	
+	}
+	
+Chapter { 
+	Title "Refined mesh"
+	description "The second mesh is refined compared to the previous mesh."
+	description "For this mesh, the total meshes number is around 110 000."
+	
+	Figure {
+		Title "Mesh at the inlet"
+		description "The figure below shows the mesh at the inlet of the pipe."
+		Width 8cm
+		picture ./Figures/mesh_2_inlet.png
+		}
+		
+	Figure {
+		Title "Mesh near the contraction"
+		description "The figure below shows the mesh near the contraction." 
+		Width 8cm
+		picture ./Figures/mesh_2.png
+		}
+		
+	Figure {
+		Title "Axial mesh"
+		description "The figure below is an axial slice of the mesh downstream the contraction."
+		Width 8cm
+		picture ./Figures/mesh_2_axial.png
+		}
+			
+
+		
+	Figure {
+		Title "Mesh"
+		description "The figure below shows the difference between the mesh at the inlet and the refined mesh in the contraction area."
+		Width 8cm
+		picture ./Figures/mesh_2_raccord.png
+		}
+	}	
+
+	
+Chapter {
+	Title "Numerical scheme"
+	description "Time scheme: Euler explicit."
+	description "Hydraulic convection scheme: EF_Stab with $\alpha$=1 or 0.2" 
+	description "Turbulence model: $k-\varepsilon$."
+	description "Turbulent convection scheme: EF_Stab with $\alpha=1$."
+	description "Wall law: logarithmic."
+	description " "
+	
+	description "The inlet turbulent conditions are given by the recirculation box."
+	}
+				
+Chapter {
+	Title "Pressure loss correlations"		
+	Table {
+		Title "Singular pressure loss for a sudden contraction"
+		description "The correlation used is a correlation for a sudden contraction [1]."
+
+		description " "
+		description "The singular pressure loss is defined by"
+		description "\latex_($\Delta P_s=\dfrac{1}{2}. \xi . \rho . U_2^2 \qquad \text{with} \qquad \xi=\dfrac{1}{2} . (1-\dfrac{S_2}{S_1})$\latex_),"
+		description "where $\xi$ is the pressure loss coefficient, $U$ the velocity and $S$ the cross-section of the pipe."
+		description "With the geometrical dimensions chosen, the ratio between the upstream and downstream cross-sections is equal to 4. Thus, the pressure loss coefficient $\xi$ is equal to 0.375."
+		description " "
+		
+		description "To apply the correlation, the Reynolds number $Re$ is calculated downstream the contraction:"
+		description "\latex_($Re=\dfrac{\rho.U_2.D_2}{\mu}$\latex_)."
+		description "This correlation is available for $Re$>$10^4$."
+		}
+		
+	Table {
+		Title "Regular pressure losses inside a pipe"
+		description "For turbulent flows, the regular pressure losses are calculated by (Blasius)"
+		description "\latex_($\Delta P_r=\dfrac{1}{2} . \rho . f_i . U_i^2 \qquad \text{with} \qquad f_i=\dfrac{0.316}{Re_i^{0.25}}. \dfrac{L_i}{D_i} $\latex_),"
+		description "The subscript $i$ refers upstream and downstream the contraction."
+		}
+		
+	Table {
+		Title "Total pressure loss"
+		description "The total pressure loss for the pipe is equal to the sum of the singular pressure loss and the regular pressure losses."
+		}
+	
+	}
+	
+Chapter {
+		Title "Pressure loss calculated for the sudden contraction"
+		description "Numerically, the pressure loss is calculated by"
+		description "\latex_($\Delta P=P_1-P_2+\dfrac{\rho}{2} (U_1^2-U_2^2) $\latex_),"
+		description "where \latex_($P_1-P_2$\latex_) is the static pressure difference between inlet and outlet of the pipe."
+		description "This value is post-processed by probes."
+	}
+
+
+
+Chapter { 
+	Title "Recirculation box"
+	description "The recircualtion box is situated before the inlet boundary of the pipe."
+	description "It gives the turbulent inlet profiles for the pipe (velocity and $k-\varepsilon$)."
+	
+	Table {
+		Title "Description"
+		description "The box is created by an extrude operation (ExtrudeBord) of the inlet boundary of the pipe."
+		description "Dimensions of the box: Diamter: \latex_($D_1$\latex_). Length: 0.4 m."
+		description "The box is a periodic domain."
+		description "As the recirculation box depends on the mesh, there is one recirculation box per mesh."
+                }
+		
+		Figure {
+		Title "Mesh"
+		description "4 layers of mesh are created."
+		description "For the first mesh ,the value of $y^+$ is around 60. For the refined mesh, it is around 50."
+		description "The figure below shows the recirculation box created for the refined mesh."
+		Width 8 cm
+		picture ./Figures/mesh_box.png
+		}
+		
+	Table {
+		Title "Numerical scheme"
+		description "Time scheme: Euler explicit."
+		description "Hydraulic convection scheme: Negligeable."
+		description "Turbulence model: $k-\varepsilon$."
+		description "Wall law: logarithmic."
+                description "For the box, the turbulent initial conditions are calculated by:"
+                description "\latex_($k=\dfrac{1}{2}.\dfrac{U_1^2}{100} \qquad \text{and} \qquad \varepsilon=\dfrac{C_{\mu}.k^2}{10^{-5}}  $\latex_)."
+                }
+	
+	Table {
+		Title "Pressure loss"
+		description "The etablishment of the flow inside the box is checked thanks to the pressure loss."
+		description "The pressure loss between the inlet and the outlet of the box is compared to the correlation for a regular pressure loss inside a pipe (Blasius)."
+		description "The pressure gradient file gives the pressure loss for the box defined by the formula" 
+		description "\latex_($\Delta P=\rho \, L . grad P $\latex_),"
+		description "where $L$ is the length of the box."
+		description " "
+		
+		description "The table below compares the calculated pressure loss of the boxes to the correlation."
+		nb_columns 4
+                Label "Reynolds" | "Correlation" | "Calculation" | "Difference (%)"
+                line {
+                        legend "First mesh"
+                        file ./MESH_1/BOX/res_pl.dat
+                        }
+                line {
+                        legend "Refined mesh"
+                        file ./REFINED_MESH/BOX/res_pl.dat
+                        }
+		}
+		
+	Table {
+		Title "Friction on the wall"
+		description "The friction on the wall can also be compared with a correlation."
+		description "The theoritical friction is given by the formula: \latex_($\tau=0.0395 \, \rho \, U^{1.75} \, \nu^{0.25} \, D^{-0.25} $\latex_)".
+		description "The viscous stress file gives the friction on the wall:" 
+		description "\latex_($\tau=\dfrac{F}{S} $\latex_), where $F$ is the viscous stress on the wall and $S$ the wall surface."
+		description " "
+		
+		description "The table below compares the friction between boxes and correlation."
+		nb_columns 4
+                Label "Reynolds" | "Correlation" | "Calculation" | "Difference (%)"
+                line {
+                        legend "First mesh"
+                        file ./MESH_1/BOX/res_friction.dat
+                        }
+                line {
+                        legend "Refined mesh"
+                        file ./REFINED_MESH/BOX/res_friction.dat
+                        }
+		}
+		
+	Table {
+		Title "Friction velocity"
+		description "The friction velocity can also be compared with a correlation."
+		description "The theoritical friction velocity is given by the formula: \latex_($u^*=\sqrt{\dfrac{0.316}{Re^{0.25}}.\dfrac{U^2}{8}} $\latex_)".
+		description "The Ustar file gives the friction velocities and the $y^+$ values." 
+		description " "
+		
+		description "The table below compares the velocity friction between boxes and correlation."
+		nb_columns 5
+                Label "Reynolds" | "$y^+$" | "Correlation" | "Calculation" | "Difference (%)"
+                line {
+                        legend "First mesh"
+                        file ./MESH_1/BOX/res_ustar.dat
+                        }
+                line {
+                        legend "Refined mesh"
+                        file ./REFINED_MESH/BOX/res_ustar.dat
+                        }
+		}
+		
+		
+	Table {
+		Title "Conclusion"
+		description "The differences between calculations and correlations are small, the turbulent profiles are correct."
+		description "With the recirculation box, the inlet boundary conditions are fully turbulent."
+		}
+	}
+
+	
+Chapter {
+	Title "Sudden contraction: numerical results"
+	description "All the calculations are performed for a Reynolds number equal to 200 000 downstream the contraction."
+	description "The calculations are performed for both described meshes and for a parameter $\alpha$ equal to 1 and 0.2."
+
+	Figure {
+                Title "Velocity profiles for the first mesh"
+                description "The velocity profile upstream the contraction is compared to the theoritical logarithmic profile, which is calculated with:"
+		description "\latex_($u^+=\dfrac{1}{K}.ln(y^+)+B \qquad \text{with $K$=0.4 and $B$=5.5} $\latex_)."
+		description "For the chosen Reynolds number, the upstream theoritical friction velocity is equal to \latex_($2.356.10^{-3} \, m/s $\latex_)."
+		description "The figure belows show the velocity profiles which are plotted at a distance of 4 m before the contraction. The plotted profiles are dimensional values."
+		
+                LabelX "y (m)"
+		RangeX 0. 1.
+                LabelY "Vx (m/s)"
+		RangeY 0. 0.08
+                Include_Description_Curves 0
+                Width 10cm
+                Curve {
+                        legend "Logarithmic profile"
+                        origin "Trio_U"
+                        version "1.5.7"
+                        Segment ./MESH_1/alpha_1/sudden_contraction.data vitesse_1
+                        columns ((-$1+1.)) 2.356e-3*(1/0.4*log((-$1+1)*1000./0.001*2.356e-3)+5.5)
+                        Style points
+                        typeligne -1
+                        typepoints 7
+			PointSize 1.5
+                        }
+                Curve {
+                        legend "alpha=1"
+                        origin "Trio_U"
+                        Version "1.5.7"
+                        Segment ./MESH_1/alpha_1/sudden_contraction.data vitesse_1
+                        columns (-$1+1.) ($2)
+                        Style linespoints
+                        typeligne 4
+                        typepoints 1
+                        }
+                Curve {
+                        legend "alpha=0.2"
+                        origin "Trio_U"
+                        Version "1.5.7"
+                        Segment ./MESH_1/alpha_02/sudden_contraction.data vitesse_1
+                        columns ((-$1+1.)) ($2)
+                        Style linespoints
+                        typeligne 1
+                        typepoints 2
+                        }
+                }
+		
+	Figure {
+                Title "Velocity profiles for the refined mesh"
+		description "As for the previous chapter, the figure below shows the velocity profiles for the refined mesh."
+		
+                LabelX "y (m)"
+		RangeX 0. 1.
+                LabelY "Vx (m/s)"
+		RangeY 0. 0.08
+                Include_Description_Curves 0
+                Width 10cm
+                Curve {
+                        legend "Logarithmic profile"
+                        origin "Trio_U"
+                        version "1.5.7"
+                        Segment ./REFINED_MESH/alpha_1/sudden_contraction.data vitesse_1
+                        columns ((-$1+1)) 2.356e-3*(1/0.4*log((-$1+1)*1000./0.001*2.356e-3)+5.5)
+                        Style points
+                        typeligne -1
+                        typepoints 7
+			PointSize 1.5
+                        }
+                Curve {
+                        legend "alpha=1"
+                        origin "Trio_U"
+                        Version "1.5.7"
+                        Segment ./REFINED_MESH/alpha_1/sudden_contraction.data vitesse_1
+                        columns (-$1+1) ($2)
+                        Style linespoints
+                        typeligne 4
+                        typepoints 1
+                        }
+                Curve {
+                        legend "alpha=0.2"
+                        origin "Trio_U"
+                        Version "1.5.7"
+                        Segment ./REFINED_MESH/alpha_02/sudden_contraction.data vitesse_1
+                        columns ((-$1+1)) ($2)
+                        Style linespoints
+                        typeligne 1
+                        typepoints 2
+                        }
+                }
+
+	Figure {
+                Title "Pressure profiles along the axis for the first mesh"
+                description "The figure below shows the pressure profile along the axis of the pipe for both $\alpha$."
+                LabelX "Axial distance (m)"
+                LabelY "Pressure (Pa)"
+                RangeX 0. 15.
+                Include_Description_Curves 0
+                Width 10cm
+                Curve {
+                        legend "alpha=1"
+                        origin "Trio_U"
+                        version "1.5.7"
+                        Segment ./MESH_1/alpha_1/sudden_contraction.data seg_pression
+                        columns ($1) ($2)
+                        Style linespoints
+                        typeligne 4
+                        typepoints 1
+                        }
+                Curve {
+                        legend "alpha=0.2"
+                        origin "Trio_U"
+                        Version "1.5.7"
+                        Segment ./MESH_1/alpha_02/sudden_contraction.data seg_pression
+                        columns ($1) ($2)
+                        Style linespoints
+                        typeligne 1
+                        typepoints 2
+                        }
+                }
+                                                                                                                                                            
+	
+	Table {
+		Title "Pressure loss comparison for the first mesh" 
+		description "The table below shows the pressure loss of the calculations and of the correlation."
+		nb_columns 4
+                Label "Reynolds" | "Correlation" | "Calculation" | "Difference (%)"
+                line {
+                        legend "$\alpha=1$"
+                        file ./MESH_1/alpha_1/res.dat
+                        }
+                line {
+                        legend "$\alpha=0.2$"
+                        file ./MESH_1/alpha_02/res.dat
+                        }
+		}
+		
+		
+	Figure {
+                Title "Pressure profiles along the axis for the refined mesh"
+                description "The figure below shows the pressure profile along the axis of the pipe for both $\alpha$."
+                LabelX "Axial distance (m)"
+                LabelY "Pressure (Pa)"
+                RangeX 0. 15.
+                Include_Description_Curves 0
+                Width 10cm
+                Curve {
+                        legend "alpha=1"
+                        origin "Trio_U"
+                        version "1.5.7"
+                        Segment ./REFINED_MESH/alpha_1/sudden_contraction.data seg_pression
+                        columns ($1) ($2)
+                        Style linespoints
+                        typeligne 4
+                        typepoints 1
+                        }
+                Curve {
+                        legend "alpha=0.2"
+                        origin "Trio_U"
+                        Version "1.5.7"
+                        Segment ./REFINED_MESH/alpha_02/sudden_contraction.data seg_pression
+                        columns ($1) ($2)
+                        Style linespoints
+                        typeligne 1
+                        typepoints 2
+                        }
+                }
+		
+		
+	Table {
+		Title "Pressure loss comparison for the refined mesh" 
+		description "The table below shows the pressure loss of the calculations and of the correlation."
+		nb_columns 4
+                Label "Reynolds" | "Correlation" | "Calculation" | "Difference (%)"
+                line {
+                        legend "$\alpha=1$"
+                        file ./REFINED_MESH/alpha_1/res.dat
+                        }
+                line {
+                        legend "$\alpha=0.2$"
+                        file ./REFINED_MESH/alpha_02/res.dat
+                        }
+		}
+		
+	
+	Table {
+		Title "Conclusions"
+		description "For both meshes, the EF_Stab parameter $\alpha=0.2$ gives better results than $\alpha=1$. 
+		description "For $\alpha=1$, the calculated pressure loss is better with a refined mesh."
+		description "For $\alpha=0.2$, the difference of the calculated pressure loss between the first and the refined mesh is small."
+		
+		} 
+		
+	}
+	
+
+Chapter {
+	Title "Performances"
+	tableau_performance { 
+	}
+	}
+

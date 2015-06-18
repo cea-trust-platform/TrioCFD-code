@@ -1,0 +1,21 @@
+#!/bin/bash
+
+rep=`pwd`
+data=`basename $rep`
+
+extrait_coupe $data VITESSE_ENTREE
+extrait_coupe $data VITESSE_SORTIE
+extrait_coupe $data EPS_ENTREE
+extrait_coupe $data EPS_SORTIE
+extrait_coupe $data K_ENTREE
+extrait_coupe $data K_SORTIE
+
+Utau=`grep "<u\*>" $data\_pb_Ustar.face | tail -1 | $TRUST_Awk '{print $NF}'`
+mu=`grep "mu" $data.data  | $TRUST_Awk '{print $NF}'`
+rho=`grep "rho" $data.data  | $TRUST_Awk '{print $NF}'`
+
+$TRUST_Awk -v Utau=$Utau -v mu=$mu -v rho=$rho '{print $1*Utau/(mu/rho) "\t" $2/Utau }' $data\_VITESSE_SORTIE.coupe > Uplus.out
+
+sed 's?0$?supprimer?g' Uplus.out > Uplus.tmp
+sed '/supprimer/d' Uplus.tmp > Uplus.out
+rm -f Uplus.tmp

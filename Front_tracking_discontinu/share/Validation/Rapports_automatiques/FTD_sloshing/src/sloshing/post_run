@@ -1,0 +1,12 @@
+# multiplication des valeurs HAUTEUR 1 2 3 par la constante appropriee
+# pour obtenir une hauteur en metres
+# (la valeur postraitee est une integrale de volume ponderee par une gaussienne)
+# la constante est calculee pour retrouver une hauteur de 0.2m a l'instant initial
+
+for i in 1 2 3
+do
+   infile=sloshing_HAUTEUR${i}.son
+   outfile=hauteur${i}.txt
+   export c=`awk '$1==0.0{print 0.2/$2}' $infile`
+   awk 'BEGIN{x=ENVIRON["c"]}$1>=0.0{print $1, $2*x}' $infile >$outfile
+done

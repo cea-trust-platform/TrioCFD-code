@@ -1,0 +1,37 @@
+#!/bin/bash
+gunzip -f R5_Z10.geom.gz
+mkdir EF_defaut_bar amont_grossier amont_raffine muscl_grossier negligeable_grossier
+for dir in `find . -mindepth 1 -type d `
+do
+	( cd $dir;   cp ../poise_tetra.data ../post_run .)
+done
+cd amont_raffine
+sed "s/coarse/raffine/" poise_tetra.data > modifie.data
+sed "s/Champs dt_post 1.0/Champs dt_post 5.0/" modifie.data > poise_tetra.data ; mv poise_tetra.data poise_tetra_raff.data
+sed "s/poise_tetra/poise_tetra_raff/" post_run > modifie
+sed "s/poise_tetra_SONDE_V_SORTIE_VERT.coupe/poise_tetra_raff_SONDE_V_SORTIE_VERT.coupe/" modifie > post_run
+
+cd ../muscl_grossier
+sed "s/{ Amont }/{ muscl }/" poise_tetra.data > modifie.data ; mv modifie.data poise_tetra_muscl.data
+sed "s/poise_tetra/poise_tetra_muscl/" post_run > modifie
+sed "s/poise_tetra_SONDE_V_SORTIE_VERT.coupe/poise_tetra_muscl_SONDE_V_SORTIE_VERT.coupe/" modifie > post_run
+rm poise_tetra.data
+
+cd ../negligeable_grossier
+sed "s/{ Amont }/{ negligeable }/" poise_tetra.data > modifie.data ; mv modifie.data poise_tetra_negligeable.data
+sed "s/poise_tetra/poise_tetra_negligeable/" post_run > modifie
+sed "s/poise_tetra_SONDE_V_SORTIE_VERT.coupe/poise_tetra_negligeable_SONDE_V_SORTIE_VERT.coupe/" modifie > post_run
+rm poise_tetra.data
+
+cd ../EF_defaut_bar
+sed "s/{ Amont }/{ EF defaut_bar }/" poise_tetra.data > modifie.data
+sed "s/Amont - coarse/convection EF/" modifie.data > poise_tetra.data
+sed "s/tmax    60./tmax    40./" poise_tetra.data > modifie.data
+sed "s/Champs dt_post 1.0/Champs dt_post 5.0/" modifie.data > poise_tetra.data
+sed "s/solveur_pression GCP { seuil 1.e-6  }/solveur_pression GCP { seuil 1.e-6  }\n\n\t\tsolveur_bar GCP\n\t\t{\n\t\tprecond ssor { omega 1.5 }\n\t\tseuil 1e-9\n\t\timpr\n\t\t}\n/" poise_tetra.data > poise_tetra_EF1.data
+rm poise_tetra.data
+rm modifie.data
+sed "s/poise_tetra/poise_tetra_EF1/" post_run > modifie
+sed "s/poise_tetra_SONDE_V_SORTIE_VERT.coupe/poise_tetra_EF1_SONDE_V_SORTIE_VERT.coupe/" modifie > post_run
+
+cd ..

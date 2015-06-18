@@ -1,0 +1,385 @@
+#!/bin/bash
+mkdir -p standard
+mkdir -p standard_alpha_1
+mkdir -p standard_sans_conv
+
+mkdir -p etire_50
+mkdir -p etire_50_alpha_1
+mkdir -p etire_50_sans_conv
+
+mkdir -p degrade
+mkdir -p degrade_alpha_1
+mkdir -p degrade_sans_conv
+
+mkdir -p icem
+mkdir -p icem_alpha_1
+mkdir -p icem_sans_conv
+
+mkdir -p icem_etire_20
+mkdir -p icem_etire_20_alpha_1
+mkdir -p icem_etire_20_sans_conv
+
+
+
+
+#
+# Maillage standard
+#-------------------
+cd standard
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+
+cd ../standard_alpha_1
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { EF_stab { } }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ../standard_sans_conv
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { negligeable }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+# Maillage etire
+#-------------------
+cd ../etire_50
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "s/facsec 20/facsec 3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 30/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x y 50\*z/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/sonde_v vitesse periode 10. point     3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_v vitesse periode 10. point     3 -0.5 0. 50.0     0. 0. 50.0   0.5 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_t temperature periode 10. point 3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_t temperature periode 10. point 3 -0.5 0. 50.0     0. 0. 50.0   0.5 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 1.0 1. 0. 1.0/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 1.0 1. 0. 1.0/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tp  temperature periode 10. segment               45 -1.0 0. 1.0 1. 0. 1.0/sonde_tp  temperature periode 10. segment               45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 1.0 1. 0. 1.0/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  50.   1.0  0.  50.    0.  -1.  50.  0.   1.  50. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+
+cd ../etire_50_alpha_1
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { EF_stab { } }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec 20/facsec 3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 30/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x y 50\*z/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+#
+sed "s/sonde_v vitesse periode 10. point     3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_v vitesse periode 10. point     3 -0.5 0. 50.0     0. 0. 50.0   0.5 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_t temperature periode 10. point 3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_t temperature periode 10. point 3 -0.5 0. 50.0     0. 0. 50.0   0.5 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 1.0 1. 0. 1.0/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 1.0 1. 0. 1.0/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tp  temperature periode 10. segment               45 -1.0 0. 1.0 1. 0. 1.0/sonde_tp  temperature periode 10. segment               45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 1.0 1. 0. 1.0/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  tparoi periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  tparoi periode 10. point 4 -1.0  0.  50.   1.0  0.  50.    0.  -1.  50.  0.   1.  50. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  50.   1.0  0.  50.    0.  -1.  50.  0.   1.  50. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+
+cd ../etire_50_sans_conv
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { negligeable }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec 20/facsec 3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 30/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x y 50\*z/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+#
+sed "s/sonde_v vitesse periode 10. point     3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_v vitesse periode 10. point     3 -0.5 0. 50.0     0. 0. 50.0   0.5 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_t temperature periode 10. point 3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_t temperature periode 10. point 3 -0.5 0. 50.0     0. 0. 50.0   0.5 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 1.0 1. 0. 1.0/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 1.0 1. 0. 1.0/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tp  temperature periode 10. segment               45 -1.0 0. 1.0 1. 0. 1.0/sonde_tp  temperature periode 10. segment               45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 1.0 1. 0. 1.0/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 50.0 1. 0. 50.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  tparoi periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  tparoi periode 10. point 4 -1.0  0.  50.   1.0  0.  50.    0.  -1.  50.  0.   1.  50. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  50.   1.0  0.  50.    0.  -1.  50.  0.   1.  50. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+
+#
+# Maillage degrade
+#-------------------
+cd ../degrade
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+#
+sed "s/facsec 20/facsec 3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 30/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/Nombre_de_Noeuds 4 4 2/Nombre_de_Noeuds 3 3 2/" Tuyau.data > modifie.data
+mv modifie.data Tuyau.data
+sed "s/Nombre_de_Noeuds    4 4 2/Nombre_de_Noeuds    3 2 2/" Tuyau.data > modifie.data
+mv modifie.data Tuyau.data
+
+
+cd ../degrade_alpha_1
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+#
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { EF_stab { } }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec 20/facsec 3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 30/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/Nombre_de_Noeuds 4 4 2/Nombre_de_Noeuds 3 3 2/" Tuyau.data > modifie.data
+mv modifie.data Tuyau.data
+sed "s/Nombre_de_Noeuds    4 4 2/Nombre_de_Noeuds    3 2 2/" Tuyau.data > modifie.data
+mv modifie.data Tuyau.data
+
+
+cd ../degrade_sans_conv
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+
+#
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { negligeable }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec 20/facsec 3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 30/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/Nombre_de_Noeuds 4 4 2/Nombre_de_Noeuds 3 3 2/" Tuyau.data > modifie.data
+mv modifie.data Tuyau.data
+sed "s/Nombre_de_Noeuds    4 4 2/Nombre_de_Noeuds    3 2 2/" Tuyau.data > modifie.data
+mv modifie.data Tuyau.data
+
+#
+# Maillage icem
+#-------------------
+cd ../icem
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x\*1e-3 y\*1e-3 z\*1e-3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+cp ../trio_DOM_geo.asc .
+sed "s/dom01234.geom/trio_DOM_geo.asc/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# PrecisionGeom 1e-6 #/PrecisionGeom 1e-6/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ../icem_alpha_1
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { EF_stab { } }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x\*1e-3 y\*1e-3 z\*1e-3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+cp ../trio_DOM_geo.asc .
+sed "s/dom01234.geom/trio_DOM_geo.asc/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# PrecisionGeom 1e-6 #/PrecisionGeom 1e-6/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ../icem_sans_conv
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { negligeable }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x\*1e-3 y\*1e-3 z\*1e-3/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+cp ../trio_DOM_geo.asc .
+sed "s/dom01234.geom/trio_DOM_geo.asc/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# PrecisionGeom 1e-6 #/PrecisionGeom 1e-6/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+#
+# Maillage icem_etire_20
+#----------------------
+cd ../icem_etire_20
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x\*1e-3 y\*1e-3 z\*2e-2/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+cp ../trio_DOM_geo.asc .
+sed "s/dom01234.geom/trio_DOM_geo.asc/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# PrecisionGeom 1e-6 #/PrecisionGeom 1e-4/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/facsec 20/facsec 2/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 50/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/seuil_convergence_solveur 1.e-10/seuil_convergence_solveur 1.e-10/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/sonde_v vitesse periode 10. point     3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_v vitesse periode 10. point     3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_t temperature periode 10. point 3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_t temperature periode 10. point 3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 1.0 1. 0. 1.0/sonde_vp vitesse periode 10. segment                    20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_nut viscosite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_alphat diffusivite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 1.0 1. 0. 1.0/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tp  temperature periode 10. segment               45 -1.0 0. 1.0 1. 0. 1.0/sonde_tp  temperature periode 10. segment               45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 1.0 1. 0. 1.0/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  tparoi periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  tparoi periode 10. point 4 -1.0  0.  20.   1.0  0.  20.    0.  -1.  20.  0.   1.  20. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  20.   1.0  0.  20.    0.  -1.  20.  0.   1.  20. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+
+cd ../icem_etire_20_alpha_1
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { EF_stab { } }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x\*1e-3 y\*1e-3 z\*2e-2/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+cp ../trio_DOM_geo.asc .
+sed "s/dom01234.geom/trio_DOM_geo.asc/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# PrecisionGeom 1e-6 #/PrecisionGeom 1e-4/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/facsec 20/facsec 2/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 50/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/seuil_convergence_solveur 1.e-10/seuil_convergence_solveur 1.e-10/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/sonde_v vitesse periode 10. point     3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_v vitesse periode 10. point     3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_t temperature periode 10. point 3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_t temperature periode 10. point 3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 1.0 1. 0. 1.0/sonde_vp vitesse periode 10. segment                    20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_nut viscosite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_alphat diffusivite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 1.0 1. 0. 1.0/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tp  temperature periode 10. segment               45 -1.0 0. 1.0 1. 0. 1.0/sonde_tp  temperature periode 10. segment               45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 1.0 1. 0. 1.0/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  20.   1.0  0.  20.    0.  -1.  20.  0.   1.  20. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+
+
+cd ../icem_etire_20_sans_conv
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { negligeable }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/# Transformer dom01234 x y 50\*z #/Transformer dom01234 x\*1e-3 y\*1e-3 z\*2e-2/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+cp ../trio_DOM_geo.asc .
+sed "s/dom01234.geom/trio_DOM_geo.asc/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/# PrecisionGeom 1e-6 #/PrecisionGeom 1e-4/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/facsec 20/facsec 2/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/facsec_max 200/facsec_max 50/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/seuil_convergence_solveur 1.e-10/seuil_convergence_solveur 1.e-10/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+#
+sed "s/sonde_v vitesse periode 10. point     3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_v vitesse periode 10. point     3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_t temperature periode 10. point 3 -0.5 0. 1.0     0. 0. 1.0   0.5 0. 1.0/sonde_t temperature periode 10. point 3 -0.5 0. 20.0     0. 0. 20.0   0.5 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_vp vitesse periode 10. segment                    30 -1.0 0. 1.0 1. 0. 1.0/sonde_vp vitesse periode 10. segment                    20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_nut viscosite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_nut viscosite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_alphat diffusivite_turbulente periode 10. segment 30 -1.0 0. 1.0 1. 0. 1.0/sonde_alphat diffusivite_turbulente periode 10. segment 20 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 1.0 1. 0. 1.0/sonde_tpn nodes temperature periode 10. segment         45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tp  temperature periode 10. segment               45 -1.0 0. 1.0 1. 0. 1.0/sonde_tp  temperature periode 10. segment               45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 1.0 1. 0. 1.0/sonde_tparoi  temperature_physique periode 10. segment  45 -1.0 0. 20.0 1. 0. 20.0/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+sed "s/point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  1.   1.0  0.  1.    0.  -1.  1.  0.   1.  1. /point_tparoi  temperature_physique periode 10. point 4 -1.0  0.  20.   1.0  0.  20.    0.  -1.  20.  0.   1.  20. /" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+
+
+
+
+cd ..

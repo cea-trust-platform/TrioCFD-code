@@ -1,0 +1,430 @@
+Parameters {
+	Title "Forced convection with EF_stab scheme"
+	Description "Developed turbulent wall heated flow in a long circular duct"
+	Description "Validated Model"
+	Description "....convection scheme (EF_stab)"
+	Description "....wall function in VEF discretisation"
+	Description "....Turbulent Prandtl law in sodium"
+	Description "Validation with"
+	Description "....analytical laws"
+
+	VersionTrio_U "1.5.6"
+
+	ParametersTrio_U Type of problem : Thermohydraulique_turbulent
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Euler_Implicite
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi loi_standard_hydr
+	ParametersTrio_U Solving of equations : Convection_Diffusion_Temperature_Turbulent with Modele_Turbulence Prandtl {Turbulence_paroi loi_standard_hydr_scalaire}
+	ParametersTrio_U Convection scheme : Momentum : EF_stab (Muscl to compare with) Temperature : EF_stab
+	ParametersTrio_U Diffusion scheme : Default {} for all equations
+	ParametersTrio_U Turbulence model : k-eps with wall function Amont convection scheme
+	ParametersTrio_U Turbulence model : Thermal Prandtl model with modification of Prt value
+	ParametersTrio_U Turbulence model : Prandtl_turbulent_fonction_nu_t_alpha nu_t*nu_t/(0.7*alpha+0.85*nu_t)
+	ParametersTrio_U Type of boundary conditions : Inlet/Outlet, Heated walls with constant flux
+	ParametersTrio_U Type of fluid : sodium
+
+	TestCase EF_stab Conduite 4 /* jdd en annexe */
+ 	TestCase Muscl Conduite 4
+ 	TestCase Prt_std Conduite 4
+	
+	Prerequisite "python tableauNusselt.py"
+	
+	Author "R. PAILLE/V.BARTHEL"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : Circular pipe"
+	Description "Dimensions : R=1 m, L=45 m"
+	Description "Mesh : 41040 tetraedral cells from tetraedriser_homogene_fin of a Trio_U mesh"
+	Description "Initial conditions : the turbulent flow is chosen in order to have Reh=Wbulk*D/v=200000"
+	Description "...Hydraulic : Flat profil with bulk velocity of 0.0276m/s"
+	Description "		    Turbulent values k_Eps Champ_Uniforme 2 7.56e-6 2.8e-7"
+	Description "...Temperature : T=0$°$C"
+	Description "Boundary conditions :"
+	Description "...Velocity, k, and eps and temperature fields are the same than initial conditions"
+	Description "...A constant heat flux is imposed on the wall paroi paroi_flux_impose Champ_Front_Uniforme 1 1."
+	visu {
+		Title "Mesh"
+		Width 10cm
+		mesh EF_stab/Conduite.lata dom01234
+		normal3D -0.6 0.2 0.8
+		up3D -0.08 1 -0.16
+	}
+	
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 900 kg/m$^3$"
+		Description "$\mu$ = 2.484e-4 kg/m/s"
+		Description "$\lambda$ = 80W/m/K"
+		Description "Cp = 1370J/kg/K"
+		Description "Pr = 0.00425"
+	}
+	Table {
+		Title "Calculation method"
+		Description "Transitory calculation time : "
+		Description "the calculations can be stopped when a fully turbulent flow is well established. The convergence is set"
+		Description "at about 2000 s of physical time. It corresponds to just more than the pipe length travel time."
+		Description "The results are given at 3000s"
+		Description ""
+		nb_columns 1
+		Label Average time step
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EF_stab/Conduite.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description "The velocity and temperature profiles are given in the adimensional form and compared with laws that"
+	Description " represent the logarithmic zone of the boundary layer."
+	Description "In order to avoid the inlet possible perturbations we calculate the flow caracteristics on the second half of the pipe. The Nusselt number will be calculated at the outlet."
+	Table {
+		Title "Hydraulic behaviour"
+		Description "The adimensional profile W$^+$=f(y$^+$) with W$^+$=W/u$\tau$ and y$^+$=y*u$\tau$/v is compared with the logarithmic law:"
+		Description "W$^+$=1/0.415*ln(y$^+$)+5.32"
+	}
+	Figure {
+		Title "Axial velocity profile across the pipe"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 10000
+		LogX
+		LabelY "W+"
+		RangeY 0 35
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi Log"
+			origin "Trio_U"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "First point EF_stab"
+			origin "Trio_U"
+			file EF_stab/first_Point.dat
+			columns ($1) ($2)
+			TypePoints 1
+			PointSize 3
+		}
+		Curve {
+			legend "Trio_U EF_stab"
+			origin "Trio_U"
+			file EF_stab/axial_velocity.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+	}
+	Table {
+		Description "The profile is very well aligned on the logarithmic law. The first point of the velocity calculated"
+		Description "with the wall function is kept on the law, i.e. it is not perturbed by the convection term."
+		Description ""
+		Description "The next tables will give the friction velocity u$\tau$ and the pressure loss"
+		Description "$\Delta$H (1/$\rho$ DP/dx = 4/Dh u$\tau$ $^2$ in a circular pipe)"
+		Description "But first we show the thorical and calculated values of velocity and Reynolds number "
+	}
+	Table {
+		Title "Bulk velocity and Reynolds (objective and calculated)"
+		nb_columns 5
+		label U (objective) | U (Trio_U) | Re (objective) | Re (Trio_U) | Re variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EF_stab/ligneReynolds.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+	Table {
+		Title "Friction velocity"
+		nb_columns 3
+		label U$\tau$ (Blasius) | U$\tau$ (Trio_U) | variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EF_stab/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3)
+		}
+	}
+	Table {
+		Title "Pressure loss"
+		nb_columns 5
+		label $\Delta$H=4U$\tau$$^2$/D (theoretical) | $\Delta$H=U$\tau$$^2$S/V (Trio_U) | variation (%) | $\Delta$H=1/$\rho$*DP/Dx (Trio_U) | variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EF_stab/ligneTableau.dat
+			nb_columns_file 8
+			columns ($4) ($5) ($6) ($7) ($8)
+		}
+	}
+	Table {
+		Description "The friction velocity is calculated by taking the mean value in the second half of the pipe from the 'Ustar.face' file."
+		Description "It is well predicted in comparison with the analytical Blasius value. The pressure loss given by Trio_U"
+		Description "using the probes, corresponds to the source term (1/$\rho$ dP/dx) in the second half of the pipe."
+		Description "It is not so far to the one calculated from the average u$\tau$ but should be closer."
+		Description ""
+		Description "To measure the real efficiency of the EF_stab scheme, a calculation was made with the standard"
+		Description "second order Muscl convection scheme in the momentum equation.In this case, the results are far from "
+		Description "the logarithmic function.This is probably due to the second order VEF discretisation."
+		Description ""
+	}
+	Figure {
+		Title "Axial velocity profile with EF_stab and Muscl convection schemes"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 10000
+		LogX
+		LabelY "W+"
+		RangeY 0 40
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi Log"
+			origin "Trio_U"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "First point EF_stab"
+			origin "Trio_U"
+			file EF_stab/first_Point.dat
+			columns ($1) ($2)
+			TypePoints 1
+			PointSize 3
+		}
+		Curve {
+			legend "Trio_U EF_stab"
+			origin "Trio_U"
+			file EF_stab/axial_velocity.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "First point Muscl"
+			origin "Trio_U"
+			file Muscl/first_Point.dat
+			columns ($1) ($2)
+			TypePoints 1
+			PointSize 3
+		}
+		Curve {
+			legend "Trio_U Muscl"
+			origin "Trio_U"
+			file Muscl/axial_velocity.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+	}
+	Table {
+		Title "Thermal behaviour"
+		Description "The adimensional temperature profile T$^+$=f(y$^+$) with T$^+$=(Tw-T)/T$\tau$ and T$\tau$=Qw/($\rho$Cpu$\tau$)"
+		Description "is compared with the Kader law : T$^+$=Pr y$^+$ exp(-$\Gamma$)+{2.12ln(1+y$^+$)+$\beta$(Pr)} exp(-1/$\Gamma$) with"
+		Description "$\Gamma$=0.01*(Pr*y$^+$)$^4$/(1 + 5 y$^+$ Pr$^3$) and $\beta$=(3.85Pr$^1$$^/$$^3$-1.3)$^2$+2.12ln(Pr)"
+		Description "Tw and Qw are the temperature and heat flux at the wall."
+		Description ""
+		Description "The Kader relation is used in Trio_U for the thermal wall function and gives a good profile of"
+		Description "temperatures across the boundary layer for a large panel of fluids from Pr<<1 to Pr>>1. But this"
+		Description "relation has some disadvantages. The link between linear and logarithmic profiles is not so clean"
+		Description "and the assumption is made that Prt does not depend on Pr."
+		Description "For the case of sodium that concern us in this work, a liquid metal law valid for Pe=RePr~>1000 is also"
+		Description " shown : T$^+$=1/0.3ln(1+0.3y$^+$$^+$), with y$^+$$^+$=Pry$^+$ and 0<=y$^+$$^+$<=60"
+	}
+	Figure {
+		Title "Temperature profile across the pipe"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 1 3000
+		LogX
+		LabelY "T+"
+		RangeY 0 7
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Pry+"
+			origin "reference"
+			file EF_stab/pryPlus.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Kader"
+			origin "reference"
+			file EF_stab/kader.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Loi metal liquide Pe>1000"
+			origin "reference"
+			file EF_stab/metal_liquide.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U EF_stab"
+			origin "Trio_U"
+			file EF_stab/temperature_profile.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+	}
+	Table {
+		Description "The calculated profile is really good and well aligned with the reference laws. This is due to the"
+		Description "modification of the turbulent Prandtl value Prt"
+	}
+	Figure {
+		Title "Temperature profile across the pipe with Trio_U standard version (Prt=0.9)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 1 3000
+		LogX
+		LabelY "T+"
+		RangeY 0 7
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Pry+"
+			origin "reference"
+			file Prt_std/pryPlus.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Kader"
+			origin "reference"
+			file Prt_std/kader.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Loi metal liquide Pe>1000"
+			origin "reference"
+			file Prt_std/metal_liquide.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U EF_stab Prt=0.9"
+			origin "Trio_U"
+			file Prt_std/temperature_profile.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+	}
+	Table {
+		Description "The profile calculated with the standard version is less good as we can see. The modification of Prt leads"
+		Description "to an eddy diffusivity that is lower than in the standard case. So, the temperature gradient is higher, the"
+		Description "slope of the temperature profile is higher and comes nearest to the reference laws."
+	}
+	Figure {
+		Title "Temperature profiles with several models"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 1 3000
+		LogX
+		LabelY "T+"
+		RangeY 0 7
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Kader"
+			origin "reference"
+			file Prt_std/kader.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Loi metal liquide Pe>1000"
+			origin "reference"
+			file EF_stab/metal_liquide.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U EF_stab"
+			origin "Trio_U"
+			file EF_stab/temperature_profile.dat
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U EF_stab Prt=0.9"
+			origin "Trio_U"
+			file Prt_std/temperature_profile.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U Muscl"
+			origin "Trio_U"
+			file Muscl/temperature_profile.dat
+			columns ($1) ($2)
+			TypePoints 3
+		}
+	}
+	Table {
+		Description "The figure shows the different temperature profiles calculatd by Trio_U in using different approaches."
+		Description "We can observe that using the combination 'EF_stab convection scheme + special modified value of Prt' is the better way to be near the reference laws. But using standard Prt with EF_stab scheme seems worse than using modified Prt value with Muscl scheme"
+	}
+	Table {
+		Title "Exchange coefficient expressed with Nusselt number"
+		Description "The impact on heat exchange coefficient is important. The next table gives the Nusselt number for each model."
+		Description "Nu=$\Phi$*D/$\lambda$/(Tw-Tbulk) compared with the Notter and Sleicher correlation : "
+		Description "NuH=6.3+0.0167Re$^0$$^.$$^8$$^5$Pr$^0$$^.$$^9$$^3$ that is the more appropriate for metal liquid in this range of Prandtl"
+		Description " and Reynolds number (0.004<Pr<0.1 and 10e4<Re<10e6)."
+		nb_columns 7
+		label Nu ref (Notter-Sleicher) | Nu EF_stab | variation (%) | Nu Std_Prt | variation (%) | Nu Muscl | variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./tableau_nusselt.dat
+			nb_columns_file 7
+			columns ($1) ($2) ($3) ($4) ($5) ($6) ($7)
+		}
+	}
+}
+Chapter {
+	Title "Conclusion"
+	Description "The results showed for this case of forced convection in a long circular duct are very satisfying. The "
+	Description "velocity friction, the heat exchange, the velocity and the temperature profiles are correct. The pressure "
+	Description "loss is not so bad but it should be better according to velocity friction. Prehaps the post-treatment way "
+	Description "to calculate the pressure gradient has to be examined. The modification of Prt number and the using of EF_stab convection scheme lead to the most convenient modelisation."
+	Description ""
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "Use the EF_stab convection scheme in solving the Navier-Stokes equations for forced convection flows."
+	Description "The sensitivity to using this scheme in the k-e equation seems not important. This sensitivity has not been studied for the thermal convection-diffusion equation, the EF_stab scheme was ever used."
+	Description ""
+	Description "The modification of the turbulent Prandtl number by a relation as the one used here gives a better "
+	Description "Nusselt coefficient and good temperature profile for sodium. It can be used from the v1.5.3 beta version for fluids with molecular Prandtl number far from unity."
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

@@ -1,0 +1,20 @@
+# SIMULATION D UN TUYAU COUDE AVEC ECOULt TURBULENT Re=50000 #
+dimension 3
+PrecisionGeom 1.e-5 # Pour pouvoir relire les fichiers .dat #
+Pb_Hydraulique_Turbulent pb
+
+Domaine dom_DOM
+
+Lire_Tgrid dom_DOM ../Tube_coude_463259.msh
+Transformer dom_DOM x y -z  # Pour avoir un domaine avec Z>=0 #
+Dilate dom_DOM 0.001
+
+Decouper dom_DOM
+{
+   larg_joint 2
+   partitionneur metis { nb_parts NB_PROCS }
+   Nom_Zones dom_DOM
+}
+
+Fin
+

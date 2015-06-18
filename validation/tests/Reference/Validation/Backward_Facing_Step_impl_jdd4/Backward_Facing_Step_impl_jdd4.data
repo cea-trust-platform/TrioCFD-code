@@ -1,0 +1,194 @@
+# Hydraulique 2D : schema muscl #
+
+dimension 2
+Pb_hydraulique_Turbulent pb
+Domaine dom
+
+Mailler dom
+{
+	Pave Entre 
+		{
+		Origine -0.19  0.
+		Nombre_de_Noeuds 12 10
+		Longueurs 0.19 0.0762
+		Facteurs  0.96 1.05
+		Symy
+		}
+		{
+		Bord Entree X = -0.19  0. <= Y <= 0.0762
+		Bord HautT  Y = 0.0762 -0.19 <= X <= 0.
+		Bord BasT   Y = 0. -0.19 <= X <= 0.
+		} ,
+	
+	Pave Haut
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 50 10 
+		Longueurs 0.762  0.0762
+		Facteurs 1.01 1.05
+		Symy
+		}
+		{
+		Bord Haut2  Y = 0.0762  0. <= X <= 0.762
+		Bord Sortie X = 0.762   0. <= Y <= 0.0762
+		} ,
+	
+		
+	Pave Bas
+		{
+		Origine 0. -0.0381 
+		Nombre_de_Noeuds 50 5
+		Longueurs 0.762 0.0381
+		Facteurs 1.01  0.95
+		symy
+		}
+		{
+		Bord Bas2   Y = -0.0381  0. <= X <= 0.762
+		Bord Gauche X = 0.  -0.0381 <= Y <= 0.
+		Bord Sortie X = 0.762   -0.0381 <= Y <= 0.
+		} 
+
+	
+	
+}
+
+Trianguler_H dom
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax  5.
+	dt_min 1.e-15
+	dt_max 100.
+	dt_impr 0.5
+	dt_sauv 10.
+	seuil_statio 5.3e-8
+}
+
+Schema_Euler_implicite sch_imp
+Read sch_imp
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 5.
+	dt_min 1.e-15
+	dt_max 100.
+	dt_impr 0.5
+	dt_sauv 10
+	seuil_statio 1.e-3
+	facsec_max 30
+	max_iter_implicite 50
+	
+	Solveur Simple
+	   {
+		seuil_convergence_solveur 1.e-8 relax_pression 0.1
+		
+	   }
+}
+
+Fluide_incompressible fluide
+
+Read fluide
+{	mu Champ_Uniforme     1 1.98e-5
+	rho Champ_uniforme 1 1.17
+}
+ 
+Associate pb dom
+Associate pb sch_imp
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 5.e-10 }
+		convection { muscl }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+					}
+		boundary_conditions {
+			Entree frontiere_ouverte_vitesse_imposee	
+				champ_front_Uniforme 2 18.2 0.
+       			Sortie frontiere_ouverte_pression_imposee
+				champ_front_Uniforme 1 0.
+			HautT paroi_fixe
+			Haut2 paroi_fixe
+			Gauche paroi_fixe
+			Bas2 paroi_fixe
+			BasT paroi_fixe
+					}
+
+      		modele_turbulence K_Epsilon 
+                {
+           	   	Transport_K_Epsilon 
+                  	{
+			  parametre_equation parametre_implicite { resolution_explicite }
+           		  convection { amont }
+                 	  diffusion { }
+                 	  boundary_conditions
+                	    {
+              			Entree frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2	6.6248 1205.7
+              			Sortie frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 6.6248 1205.7
+              			HautT paroi
+				Haut2 paroi
+				Gauche paroi
+				Bas2 paroi
+				BasT paroi                                          
+          	 	    }
+           	 	  conditions_initiales 
+           	 	   {
+              			k_Eps Champ_Uniforme 2 6.6248 1205.7
+                           }
+            		}
+           	turbulence_paroi loi_standard_hydr dt_impr_ustar 0.5
+       	       }
+	}
+
+
+	
+
+	Postraitement
+	{
+	        format lml
+		Sondes
+		{     					
+			sonde_U_x2h vitesse periode 0.1 segment 30  0.0762 -0.0381  0.0762 0.0762
+			sonde_U_x0h vitesse periode 0.1 segment 30  0.0 -0.0381  0.0 0.0762
+			
+			s_U_nodesx2h nodes vitesse  periode 0.1 segment 30  0.0762 -0.0381  0.0762 0.0762
+			s_U_nodesx0h nodes vitesse  periode 0.1 segment 30  0.0 -0.0381  0.0 0.0762
+			s_U_node_paroi nodes vitesse  periode 0.1 segment 40  0.0 -0.0381  0.762 -0.0381
+			s_U_grav_paroi grav vitesse periode 0.1 segment 40  0.0 -0.0381  0.762 -0.0381
+			s_U_som_paroi chsom vitesse periode 0.1 segment 40  0.0 -0.0381  0.762 -0.0381
+			s_U_gravx2h grav vitesse  periode 0.1 segment 30  0.0762 -0.0381  0.0762 0.0762
+			s_U_gravx0h grav vitesse  periode 0.1 segment 30  0.0 -0.0381  0.0 0.0762
+		}
+
+		Format lml
+		Champs dt_post 0.2
+		       {
+			pression som
+			vitesse som
+			k
+			eps
+			viscosite_turbulente
+			y_plus
+		       }
+	}
+
+
+          
+}
+
+
+
+Solve pb
+End
+

@@ -1,0 +1,732 @@
+Parameters {
+	Title "VEF calculation of Conduction in a wall"
+
+
+
+	description " Objectives: The aim of this file is to test the capabilities of the code to describe unsteady propagation of thermal loads within a solid."
+	description "The test consists in a plane metal wall with imposed oscillating temperature at boundary. Several meshes are tested: a refined mesh, a medium mesh, a coarse mesh close to the one used for the calculation of the Plajest experiment performed in 2010, the same coarse mesh with expanded cells and a coarse mesh obtained with an industrial mesher (ICEM). Several time schemes are also used: implicit, explicit and Runge Kutta 3. In the coupled problems, the boundary condition of the solid domain is a temperature obtained from the flux balance at the previous time step. This test case is thus representative for the calculation of the solid part in a coupled problem. It is designed for the validation of the calculation of the conduction in the solid for the Plajest experiment."
+		
+	Author "S.Vandroux"
+
+	TestCase calcul_plajest cond 
+	TestCase calcul_plajest_expl cond 
+	TestCase calcul_plajest_RK3 cond 
+	TestCase calcul_plajest_etire cond 
+	TestCase calcul_icem cond 
+	TestCase calcul_medium cond 
+	TestCase calcul_raff cond /* dans le rapport*/
+
+	VersionTrio_U "1.6.1."
+	
+	ParametersTrio_U Dimension: 3D.
+	ParametersTrio_U Discretization: VEFPrep1B.
+	ParametersTrio_U Time scheme: Euler implicit
+
+	Prerequisite " "
+
+
+	
+	Reference "1. Carslaw H.S and Jaeger J.C: Conduction of heat in solids; Oxford Sciences Publications, Second Edition, 1986, Clarendon Press"
+
+
+	}	
+
+Chapter {
+	Title "Presentation of the calculation"
+	description "The geometric and physical data are taken as close as possible to the Plajest experiment. "
+
+        visu {
+		   Title "Meshing of the solid wall: refined mesh"
+		   description "Length: along x: 12mm, along y: 1mm, along z: 1mm."
+		   description "Number of hexaedric cells: along x: 75, along y: 6, along z: 6"
+		   description "Discretization with tetrahedriser_homogene_fin (x48 cells)"
+		   description " "
+		   description "Total number of cells: 75x6x6x48=129600 cells."
+		   description "The first layer of hexaedric cells is 0.08mm wide. For the 2010 plajest calculation, it is 0.5mm wide. The mesh presented here is thus more refined than the mesh designed to calculate the plajest experiment in the 2010 study."
+
+		   Width 15cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_raff/cond_STAT.lata dom1
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+#       		Operator no_axes
+#        	Operator no_bounding_box
+		}
+        visu {
+		   Title "Meshing of the solid wall: Medium mesh"
+		   description "Total number of cells: 25x2x2x48=4800 cells."
+		   description "The first layer of hexaedric cells is 0.24mm wide. For the 2010 plajest calculation, it is 0.5mm wide. The mesh presented here is thus two times more refined than the mesh designed to calculate the plajest experiment in the 2010 study."
+
+		   Width 15cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_medium/cond_STAT.lata dom1
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+#       		Operator no_axes
+#        	Operator no_bounding_box
+		}
+        visu {
+		   Title "Meshing of the solid wall: Plajest mesh (2010 study)"
+		   description "Total number of cells: 12x1x1x48=576 cells."
+		   description "Like for the Plajest calculation, the first layer of hexaedric cells is 0.5m wide."
+
+		   Width 15cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_plajest/cond_STAT.lata dom1
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+#       		Operator no_axes
+#        	Operator no_bounding_box
+		}
+        visu {
+		   Title "Meshing of the solid wall: Plajest_expanded mesh (2010 study)"
+		   description "Total number of cells: 12x1x1x48=576 cells."
+		   description "Like for the 2010 Plajest calculation, the first layer of hexaedric cells is 0.5m wide. The cells are expanded along y and z dimension like for the plajest calculation in the 2010 study."
+
+		   Width 15cm,viewport= 0 0 1024 500,clip
+			mesh ./calcul_plajest_etire/cond_STAT.lata dom1
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+#       		Operator no_axes
+#        	Operator no_bounding_box
+		}
+
+        visu {
+		   Title "Meshing of the solid wall: ICEM mesh"
+		   description "Total number of cells: 1492 cells."
+		   description "The mesh is obtained with ICEM. The cell dimensions are of the same order of magnitude as the coarse Plajest mesh in the x dimension. They are not expanded in the y dimension."
+		   Width 15cm,viewport= 0 0 1024 500,clip
+			mesh ./calcul_icem/cond_STAT.lata DOM_DOM
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+#       		Operator no_axes
+#        	Operator no_bounding_box
+		}
+
+	Table {
+		Title "Physical properties"
+		description "Solid used: stainless stell type-316 (SUS316)."
+		description "Density: $\rho=7854 \: kg/m^3$"
+		description "Heat capacity: \latex_($C_p=532 \: J/kg/K$\latex_)"
+		description "Thermal conductivity: $\lambda=17.9 \: W/m/K$"
+		description " "
+		description "The thermal diffusivity is given by: \latex_($\alpha_s=\dfrac{\lambda_s}{\rho_s.Cp_s}=4,28.10^{-6} \: m^2/s$\latex_)"
+		}
+
+	Table {
+		Title "Boundary conditions"
+		description "Adiabatic walls everywhere, except for the left boundary, where a sinusoid temperature is imposed:"
+		description "The temperature imposed at the wall is given by: "
+		description "\latex_($T(0,t)=A.sin({\normalcolor {\normalcolor \omega t)}}$ with A=21.5 and $\omega=2\pi f$ and f=2Hz.\latex_)"
+
+		}
+
+	Table {
+		Title "Theoretical solution"
+		description "The corresponding solution in the wall is given, once the temperature is established, by: "
+		description "\latex_($T(x,t)=A.exp(-\sqrt{\frac{\omega}{2\alpha}}.x).sin({\normalcolor {\normalcolor \omega t-\sqrt{\frac{\omega}{2\alpha}}.x)}}$\latex_)"
+		description "The  amplitude decrease of Trms is given by : "
+		description "\latex_($Trms(x)=\frac{A}{\sqrt{2}}.exp(-\sqrt{\frac{\omega}{2\alpha}}.x)$\latex_)"
+		description "The amplitude has decreased of 90% for \latex_($x=\frac{Log(0.1)}{\sqrt{\frac{\omega}{2\alpha}}}$\latex_)=1.9mm."
+		}
+
+
+	}
+
+
+Chapter {
+	Title "Calculation results"
+	Description "The calculations are performed with an implicit time scheme. However, as the boundary condition varies with time, it is necessary to limit the maximum time step, in order to reproduce properly the sinusoid boundary condition. For a 'clean' boundary condition, a maximum time step of 0.01s is imposed. One period of the sinusoid will be modelled with 50 points (thus 50 time steps), which is enough for the results accuracy. More generally, in the case of a sinusoid with a frequency f, limiting dt_max to 1/(50.f) leads to a proper evaluation of the time depending temperature boundary condition."
+	description " For the refined and medium mesh, the initial facsec is chosen equal to 200. It rises to 454 for the fine mesh with corresponding time steps of 5.5e-3s. For the other meshes, the maximum value of dt_max=0.01s is used in the calculations."
+	description " "
+	description "As seen above, a decrease of 90% of the signal amplitude is done in about 1.9mm, it is thus necessary to have at least 8 calculation points (4 cells) in this interval."
+
+        visu {
+		   Title "Temperature field in the solid at t=70s
+		   description " Refined mesh"
+		   Width 7cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_raff/cond_TEMP.lata dom1
+			pseudocolor ./calcul_raff/cond_TEMP.lata dom1 TEMPERATURE SOM
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+#       		Operator no_axes
+#        	Operator no_bounding_box
+		nb_img_without_newline 2
+		}
+        visu {
+		   description " Medium mesh"
+		   Width 7cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_medium/cond_TEMP.lata dom1
+			pseudocolor ./calcul_medium/cond_TEMP.lata dom1 TEMPERATURE SOM
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+		}
+        visu {
+		   description " ICEM mesh"
+		   Width 7cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_icem/cond_TEMP.lata DOM_DOM
+			pseudocolor ./calcul_icem/cond_TEMP.lata DOM_DOM TEMPERATURE SOM
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+		nb_img_without_newline 2
+		}
+        visu {
+		   description " Plajest mesh (study 2010)"
+		   Width 7cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_plajest/cond_TEMP.lata dom1
+			pseudocolor ./calcul_plajest/cond_TEMP.lata dom1 TEMPERATURE SOM
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+		}
+        visu {
+		   description " Plajest expanded mesh (study 2010)"
+		   Width 7cm,viewport= 0 0 1024 400,clip
+			mesh ./calcul_plajest_etire/cond_TEMP.lata dom1
+			pseudocolor ./calcul_plajest_etire/cond_TEMP.lata dom1 TEMPERATURE SOM
+			normal3D 0.5 0.1 0.9
+			up3D -0.05 0.99 -0.01
+			zoom3D -0.06 -0.24 1
+		}
+
+		
+
+Figure {
+	Title "Amplitude decrease of the temperature fluctuation for the different meshes"
+	Dimension 2
+	Description "The graph below shows the amplitude decrease of the temperature fluctuation Trms along the x axis of the solid for the different meshes tested."
+	RangeX 0.0 7.
+	RangeY 0 16.
+	LabelX "Axial distance (in mm)"
+	LabelY "Temperature fluctuation (Trms)"
+	Include_Description_Curves 0
+	Width 15cm
+#	legend below title "legende"
+
+	Curve {
+		legend "Theory"
+		file ./theorie/Trms_theo.dat
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}	
+	Curve {
+		legend "Refined mesh"
+		file ./calcul_raff/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	Curve {
+		legend "Medium mesh"
+		file ./calcul_medium/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	Curve {
+		legend "ICEM mesh"
+		file ./calcul_icem/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	Curve {
+		legend "Plajest mesh"
+		file ./calcul_plajest/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	Curve {
+		legend "Plajest_expanded mesh"
+		file ./calcul_plajest_etire/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	}
+	Table {
+		description "For all the meshes, the results are very close to the experiment. The user must be careful with the position of the probes he uses. The result is sensitive to the probe position. If the probe is not placed properly on a cell edge, some differences with the theory can be seen.  "
+		}	
+	
+Figure {
+	Title "Amplitude decrease of the temperature fluctuation for different time schemes"
+	Dimension 2
+	Description "The graph below shows the amplitude decrease of the temperature fluctuation Trms along the x axis of the solid for the different time schemes tested."
+	RangeX 0.0 7.
+	RangeY 0 16.
+	LabelX "Axial distance (in mm)"
+	LabelY "Temperature fluctuation (Trms)"
+	Include_Description_Curves 0
+	Width 15cm
+#	legend below title "legende"
+
+	Curve {
+		legend "Theory"
+		file ./theorie/Trms_theo.dat
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}	
+	Curve {
+		legend "Plajest mesh implicit"
+		file ./calcul_plajest/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	Curve {
+		legend "Plajest mesh explicit"
+		file ./calcul_plajest_expl/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	Curve {
+		legend "Plajest mesh RK3"
+		file ./calcul_plajest_RK3/cond_TMP_RMS.coupe
+		Style lines
+#		Style linespoints
+		columns ($1*1000.) ($2)
+		}
+	}
+	Table {
+		description "The results are the same with the implicit scheme and dt=0.01s and with the explicit and the RK3 time scheme with dt=5.4e-4s, which validates the use of the implicit time scheme for the Plajest calculation."
+		}
+
+
+
+Figure {
+	Title "Evolution of the temperature as a function of time for the refined mesh"
+	Dimension 2
+	Description "The graphs below show the evolution of the temperature as a function of time for various values of x (from 0 to 12mm) once a pseudo steady state is reached in the solid."
+	RangeX 0.0 5.
+	RangeY -30. 30.
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Theory x=0mm"
+		file ./theorie/T_theo0.dat
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Theory x=1mm"
+		file ./theorie/T_theo0.001.dat
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Theory x=2mm"
+		file ./theorie/T_theo0.002.dat
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Refined x=0mm"
+		file ./calcul_raff/cond_FLUCT_TEMP0.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	Curve {
+		legend "Refined x=1mm"
+		file ./calcul_raff/cond_FLUCT_TEMP1.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	Curve {
+		legend "Refined x=2mm"
+		file ./calcul_raff/cond_FLUCT_TEMP2.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+
+	}
+
+
+Figure {
+	Dimension 2
+	Description "Temperature as a function of time for various x and refined mesh"
+	RangeX 0.0 5.
+	RangeY -1. 1.
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Theory x=3mm"
+		file ./theorie/T_theo0.003.dat
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Theory x=4mm"
+		file ./theorie/T_theo0.004.dat
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Theory x=12mm"
+		file ./theorie/T_theo0.012.dat
+		Style lines
+		columns ($1) ($2)
+		}
+	Curve {
+		legend "Refined x=3mm"
+		file ./calcul_raff/cond_FLUCT_TEMP3.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	Curve {
+		legend "Refined x=4mm"
+		file ./calcul_raff/cond_FLUCT_TEMP4.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	Curve {
+		legend "Refined x=12mm"
+		file ./calcul_raff/cond_FLUCT_TEMP12.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+
+	}
+	Table {
+		description "The amplitude decrease and the phase delay are very well reproduced between the theory and the calculation with the refined mesh."
+		}
+Figure {
+	Dimension 2
+	Title "Evolution of the temperature as a function of time for the different meshes"
+	Description "Temperature as a function of time for various meshes and x=0mm"
+	RangeX 0.0 5.
+	RangeY -30. 30.
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+	Curve {
+		legend "Theory x=0mm"
+		file ./theorie/T_theo0.dat
+		Style lines
+		columns ($1) ($2)
+		}		
+	Curve {
+		legend "Refined x=0mm"
+		file ./calcul_raff/cond_FLUCT_TEMP0.son
+		Style lines
+		columns ($1-60.) ($2)
+		}		
+	Curve {
+		legend "Medium x=0mm"
+		file ./calcul_medium/cond_FLUCT_TEMP0.son
+		Style lines
+		columns ($1-60.) ($2)
+		}		
+	Curve {
+		legend "ICEM x=0mm"
+		file ./calcul_icem/cond_FLUCT_TEMP0.son
+		Style lines
+		columns ($1-60.) ($2)
+		}		
+	Curve {
+		legend "Plajest x=0mm"
+		file ./calcul_plajest/cond_FLUCT_TEMP0.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	Curve {
+		legend "Plajest expanded x=0mm"
+		file ./calcul_plajest_etire/cond_FLUCT_TEMP0.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	}
+
+
+Figure {
+	Dimension 2
+	Description "Temperature as a function of time for various meshes and x=1mm"
+	RangeX 0.0 5.
+	RangeY -10. 10.
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Theory x=1mm"
+		file ./theorie/T_theo0.001.dat
+		Style lines
+		columns ($1) ($2)
+		}
+	Curve {
+		legend "Refined x=1mm"
+		file ./calcul_raff/cond_FLUCT_TEMP1.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "Medium x=1mm"
+		file ./calcul_medium/cond_FLUCT_TEMP1.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "ICEM x=1mm"
+		file ./calcul_icem/cond_FLUCT_TEMP1.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "Plajest x=1mm"
+		file ./calcul_plajest/cond_FLUCT_TEMP1.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "Plajest expanded x=1mm"
+		file ./calcul_plajest_etire/cond_FLUCT_TEMP1.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	}
+
+
+Figure {
+	Dimension 2
+	Description "Temperature as a function of time for various meshes and x=3mm"
+	RangeX 0.0 5.
+	RangeY -1. 1.
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Theory x=3mm"
+		file ./theorie/T_theo0.003.dat
+		Style lines
+		columns ($1) ($2)
+		}		
+	Curve {
+		legend "Refined x=3mm"
+		file ./calcul_raff/cond_FLUCT_TEMP3.son
+		Style lines
+		columns ($1-60.) ($2)
+		}		
+	Curve {
+		legend "Medium x=3mm"
+		file ./calcul_medium/cond_FLUCT_TEMP3.son
+		Style lines
+		columns ($1-60.) ($2)
+		}		
+	Curve {
+		legend "ICEM x=3mm"
+		file ./calcul_icem/cond_FLUCT_TEMP3.son
+		Style lines
+		columns ($1-60.) ($2)
+		}		
+	Curve {
+		legend "Plajest x=3mm"
+		file ./calcul_plajest/cond_FLUCT_TEMP3.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	Curve {
+		legend "Plajest expandedx=3mm"
+		file ./calcul_plajest_etire/cond_FLUCT_TEMP3.son
+		Style lines
+		columns ($1-60.) ($2)
+		}	
+	}
+
+Figure {
+	Dimension 2
+	Description "Temperature as a function of time for various meshes and x=4mm"
+	RangeX 0.0 5.
+	RangeY -0.2 0.2
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Theory x=4mm"
+		file ./theorie/T_theo0.004.dat
+		Style lines
+		columns ($1) ($2)
+		}
+	Curve {
+		legend "Refined x=4mm"
+		file ./calcul_raff/cond_FLUCT_TEMP4.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "Medium x=4mm"
+		file ./calcul_medium/cond_FLUCT_TEMP4.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "ICEM x=4mm"
+		file ./calcul_icem/cond_FLUCT_TEMP4.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "Plajest x=4mm"
+		file ./calcul_plajest/cond_FLUCT_TEMP4.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	Curve {
+		legend "Plajest expandedx=4mm"
+		file ./calcul_plajest_etire/cond_FLUCT_TEMP4.son
+		Style lines
+		columns ($1-60.) ($2)
+		}
+	}
+
+
+
+	Table {
+		description "For all the meshes except the expanded mesh the results are very close to the experiment: the oscillation amplitudes and the phase delays are very good, even for very small temperature values. For the expanded mesh, the phase delay increases with the distance to the boundary condition. However, the results are still acceptable. The calculation of the Plajest experiment with such an expanded mesh is still representative.  "
+		}
+	
+
+Figure {
+	Title "Temperature establishment"
+	Dimension 2
+	Description "The  temperature establishment close to the wall with imposed temperature is very quick. For x= 1mm, the temperature has reached a pseudo-stationnary state after 2s. On the other hand, it takes much longer for the temperature to reach this pseudo steady state for higher values of x. The calculation is thus run for 70s. The averages for Trms are started at 60s. A fully converged value of Trms is reached after a little less then 10s. "
+	RangeX 0.0 70.
+	RangeY -0.25 0.25
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Refined x=5mm"
+		file ./calcul_raff/cond_FLUCT_TEMP5.son
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Medium x=5mm"
+		file ./calcul_medium/cond_FLUCT_TEMP5.son
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Plajest x=5mm"
+		file ./calcul_plajest/cond_FLUCT_TEMP5.son
+		Style lines
+		columns ($1) ($2)
+		}	
+
+	}
+Figure {
+	Dimension 2
+	RangeX 0.0 70.
+	RangeY -0.1 0.1
+	LabelX "Time (in s)"
+	LabelY "Temperature"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Refined x=12mm"
+		file ./calcul_raff/cond_FLUCT_TEMP12.son
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Medium x=12mm"
+		file ./calcul_medium/cond_FLUCT_TEMP12.son
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Plajest x=12mm"
+		file ./calcul_plajest/cond_FLUCT_TEMP12.son
+		Style lines
+		columns ($1) ($2)
+		}
+}	
+Figure {
+	Dimension 2
+	Description "Trms average"
+	RangeX 60.  70.
+	RangeY 0. 17.
+	LabelX "Time (in s)"
+	LabelY "Trms"
+	Include_Description_Curves 0
+	Width 12cm
+
+	Curve {
+		legend "Refined"
+		file ./calcul_raff/cond_TMP_RMS.son
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Medium"
+		file ./calcul_medium/cond_TMP_RMS.son
+		Style lines
+		columns ($1) ($2)
+		}	
+	Curve {
+		legend "Plajest"
+		file ./calcul_plajest/cond_TMP_RMS.son
+		Style lines
+		columns ($1) ($2)
+		}	
+
+	}
+	
+
+
+
+}
+Chapter {
+	Title "Conclusion"
+	description " This test case is a good validation test case for coupled problems with conduction. Like for coupled problems, the boundary condition of the solid domain is an imposed temperature."
+	description " "
+	description " Several time schemes are tested and compared. They show that the use of an implicit time scheme is a good choice for conduction, as long as the time step remains small enough to 'capture' properly a time depending boundary condition."
+	description " "
+
+	description "Several meshes were also calculated: a refined mesh (129600 elements)  and a medium mesh (4800 elements)  were generated with the Trio_U mesher. A coarser mesh was generated with the ICEM mesher (1492 elements). An even coarser mesh (576 elements) was generated with the Trio_U mesher. This last mesh was created in order to have the same charcteristics along the x axis as the mesh used for the calculation of the conduction in the wall for the Plajest experiment (study 2010). It was also expanded radially in order to be totally similar to the mesh used for the Plajest calculation (study 2010)."
+	description " "
+	description "The evolution of the amplitude decrease of Trms in the wall is calculated very accurately by the code for all the meshes."
+	description "The temperatures at different points in the wall are also calculated accurately, both for the amplitude and the phase delay. The discrepancy for the the phase delay obtained with the expanded mesh is a little higher, but remains also acceptable for the calculation of the conduction in the wall. "
+	description "This test case is thus a good validating test case for the calculation of the conduction in the wall."
+
+}
+Chapter {
+	Title "Recommendation to users"
+	description "From this validation test case, some recommendations for users can be issued for the calculation of the convection in a wall: "
+	description "- The use of an implicit time scheme is recommended, but the user should limit the facsec value or the maximum time step in order to 'capture' properly a time depending boundary condition. In the case of a sinusoid with a frequency f, limiting dt_max to 1/(50.f) leads to a proper evaluation of the time depending temperature boundary condition."
+	description "- The temperature and temperature fluctuation decrease near the boundary is significant. To reproduce this slope properly, Trio_U should have at least 8 calculation points in the region corresponding to a decrease of 90%, that is for the distance:   \latex_($x=\frac{Log(0.1)}{\sqrt{\frac{2.\pi f}{2\alpha}}}$\latex_) "
+	description "- The mesh should be as regular as possible. Expansions of the mesh in any direction should be limited. In our case, an expansion of a factor 5 in the y and z direction is at the acceptable limit for the obtention of good results.
+	description "- To avoid unexpected temperature differences, The user should position the temperature probes at the middle of the faces of the cells. The use of the 'nodes' keyword is recommended."
+
+}
+
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}
+
+

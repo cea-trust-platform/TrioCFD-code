@@ -1,0 +1,178 @@
+# Chimie gaz+grains 0D #
+# 2 familles monodisperses #
+# PARALLEL NOT #
+dimension 2
+ Probleme_FT_Disc_gen pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entree
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 2 2
+		Longueurs 1. 1.
+		}
+		{
+		bord Bord   X = 0.0 0.0 <= Y <= 1.0
+		bord Bord   X = 1.0 0.0 <= Y <= 1.0
+		bord Bord   Y = 0.0 0.0 <= X <= 1.0
+		bord Bord Y = 1.0 0.0 <= X <= 1.0
+		}
+}
+trianguler_h dom
+# END MESH #
+# BEGIN PARTITION
+ /* Partition 1 maille ? */
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPrep1b dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax  50.0
+	dt_min 0.5
+	dt_max 0.5
+	dt_impr 1
+	dt_sauv 10
+
+	seuil_statio -1.e-8
+}
+
+
+Constituant sirop
+Read sirop 
+{
+coefficient_diffusion Champ_Uniforme 1 0.2e-4
+	
+}
+
+Fluide_inCompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho   Champ_Uniforme 1 1000.
+}
+
+
+
+Chimie la_chimie
+Read la_chimie 
+{
+reactions {
+	{
+	reactifs A+2*B
+	produits 4*C
+	constante_taux_reaction 1
+
+	exposant_beta 0.
+	enthalpie_reaction 0.
+	energie_activation 0.
+	coefficients_activites {  A 1 B 1 }
+	}
+}
+}
+# ecrire la_chimie #
+
+
+Navier_Stokes_FT_Disc              hydraulique
+Convection_Diffusion_Concentration C1
+Convection_Diffusion_Concentration C2
+Convection_Diffusion_Concentration C3
+
+
+Associate pb hydraulique
+Associate pb C1
+Associate pb C2
+Associate pb C3
+Associate pb  fluide
+Associate pb sirop
+Associate pb dom
+Associate pb sch
+Associate pb la_chimie
+Discretize pb dis
+
+
+Read pb
+{
+	hydraulique { 
+modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable } 
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-22  impr }
+		convection { amont }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			Bord paroi_fixe
+			}
+	}
+	C1 { 
+
+		diffusion { }
+		convection { amont }
+		boundary_conditions
+		{
+			Bord  paroi
+		}
+		nom_inconnue A
+		masse_molaire 1
+		conditions_initiales { A Champ_Uniforme 1 1 }
+	
+	}
+		
+		C2 { 
+
+		diffusion { }
+		convection { amont }
+		alias B
+		boundary_conditions
+		{
+			Bord  paroi
+		}
+		conditions_initiales { B Champ_Uniforme 1 2 }
+		masse_molaire 1
+	}
+		C3 { 
+
+		diffusion { }
+		convection { amont }
+		nom_inconnue C
+		boundary_conditions
+		{
+			Bord  paroi
+		}
+		conditions_initiales { C Champ_Uniforme 1 0. }
+		masse_molaire 0.75
+	
+	}
+     
+   Postraitement  {
+
+	Sondes {
+	A A periode 1e-5 numero_elem_sur_maitre 0
+
+	B B periode 1e-5 numero_elem_sur_maitre 0
+	C C periode 1e-5 numero_elem_sur_maitre 0
+}
+	format lml 
+	champs dt_post 1.
+	{		
+	vitesse elem
+	A
+	B	
+	C
+	}
+   }	 
+}
+Solve pb
+End
+

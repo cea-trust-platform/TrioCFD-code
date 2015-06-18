@@ -1,0 +1,117 @@
+# Hydraulique 3D turbulent : Calculs statistiques #
+# PARALLEL OK 8 #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Read_file stat.geo ;
+
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur Tranche { tranches 2 1 1 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0
+	tmax 1.5
+	dt_min 0.1
+	dt_max 0.1
+	dt_impr 0.1
+	dt_sauv 1.5
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 5e-05
+	rho Champ_Uniforme 1 2
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression Cholesky {  }
+		convection { quick }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 3  0. 0. 0.
+			}
+		boundary_conditions {
+			 Paroi Paroi_Fixe
+
+			 SortieBasse frontiere_ouverte_pression_imposee 
+					Champ_Front_Uniforme 1 0.
+			 SortieHaute frontiere_ouverte_pression_imposee 
+					Champ_Front_Uniforme 1 0.
+			 Entree frontiere_ouverte_vitesse_imposee 
+					Champ_Front_Uniforme 3  1. 0. 0.
+		}
+		modele_turbulence sous_maille {
+			TURBULENCE_PAROI loi_standard_hydr
+		}
+	}
+
+	Postraitements 
+	{
+		# lata
+		{
+		   fichier stat_reprise format lata
+		   Champs dt_post 1.1
+		   {
+			   pression elem
+		   }		   		
+		} #
+		lml
+		{
+		   Sondes 
+		   {
+			   sonde_pression pression periode 0.1 points 1 0.5 1.1 0.5
+			   sonde_vitesse vitesse periode 0.1 points 1 0. 1.1 0.5
+			   sonde_vitesse_vitesse Correlation_vitesse_vitesse periode 0.1 points 1 0. 1.1 0.5
+			   sonde_vitesse_pression Correlation_vitesse_pression periode 0.1 points 1 0. 1.1 0.5
+		   }
+		   format lml
+		   Champs dt_post 1.1
+		   {
+			   pression elem
+		   }
+		   Statistiques dt_post 1.1
+		   {
+		      t_deb 0.15 t_fin 3.0
+		      moyenne vitesse
+	              moyenne pression
+		      ecart_type pression
+		      ecart_type vitesse
+		      correlation vitesse vitesse som
+		      correlation vitesse pression elem
+		   }
+		 }
+	}
+        sauvegarde binaire stat_reprise.rep
+}
+
+Solve pb
+
+Fin

@@ -1,0 +1,979 @@
+Parameters {
+	Title "Convection Vahl Davis"
+	Description "Simulation of Vahl Davis case, in 2D, using and comparing different convection schemes, for momentum and temperature equations."
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Dimension: 2D
+	ParametersTrio_U Discretization: VEFPreP1B or VDF
+	ParametersTrio_U Time scheme: Euler Explicite for VDF, and Euler Implicite for VEF
+	ParametersTrio_U Momentum convection scheme: EF_stab, Muscl or Amont
+	ParametersTrio_U Temperature convection scheme: EF_stab, Muscl or Amont
+	ParametersTrio_U Momentum diffusion scheme: Negligible
+	ParametersTrio_U Temperature diffusion scheme: Negligible
+	ParametersTrio_U Solving of equations: Navier_Stokes_standard and Convection_Diffusion_Temperature
+
+	Reference "P.M.GRESHO, C.D. UPSON, R.L. LEE. 'Finite Element Simulations of Thermally Induced Convection in an Enclosed Cavity'. Lawrence Livermore Laboratory Report UCID-18602 (March, 1980)."
+	Reference "G. de VAHL DAVIS. 'Natural Convection in a Square Cavity-A Benchmark Solution'. International Journal for Numerical Methods in Fluids , 3 , 249 - 264."
+	Reference "K.H. WINTERS. 'A Numerical Study of Natural Convection in a Square Cavity'. United Kingdom Atomic Energy Authority, AERE-R9747 (August, 1980)."
+
+	TestCase VDF/Amont test \*
+	TestCase VDF/Quick test
+	TestCase VEF_CoarseMesh/Amont test
+	TestCase VEF_CoarseMesh/Muscl test
+	TestCase VEF_CoarseMesh/EF_stab test
+	TestCase VEF_CoarseMesh/EF_stab0.2 test
+	TestCase VEF_FineMesh/Amont test
+	TestCase VEF_FineMesh/Muscl test
+	TestCase VEF_FineMesh/EF_stab test
+	TestCase VEF_FineMesh/EF_stab0.2 test
+	
+	Author "E. MOREAU (S. VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+
+	visu {
+		Title "2D Mesh VDF"
+		Width 10cm
+		mesh VDF/Amont/test.lata dom
+		Description "Geometry of test: square domain"
+		Description "Dimensions: 1m x 1m"
+		Description "Coarse mesh: 4761 square cells"
+	}
+	visu {
+		Title "2D coarse Mesh VEF"
+		Width 10cm,viewport = 100 100 1900 1200,clip
+		mesh VEF_CoarseMesh/Amont/test.lata dom
+		Description "Geometry of test: square domai-not_run,n"
+		Description "Dimensions: 1m x 1m"
+		Description "Coarse mesh: 1444 triangular cells, obtained with option Trianguler_H"
+	}
+	visu {
+		Title "2D fine Mesh VEF"
+		Width 10cm,viewport = 0 0 1900 1200,clip
+		mesh VEF_FineMesh/Amont/test.lata dom
+		Description "Geometry of test: square domain"
+		Description "Dimensions: 1m x 1m"
+		Description "Fine mesh: 6084 triangular cells, obtained with option Trianguler_H"
+	}
+#
+	Description "Hydraulic initial conditions: unifom velocity U = 0m/s"
+	Description "Thermic initial conditions: gradient temperature T = -x + 300.5 (in K)"
+	Description "Hydraulic boundary condition: walls,"
+	Description "Thermic boundary condition: imposed temperature on the walls T(x=0)=300.5K, T(x=1)=299.5K"
+	
+	
+	Table {
+			Title "Physical properties"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($4)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($1)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($2)
+			}
+			line {
+			      	legend "Cp (J/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($3)
+			}
+			line {
+			      	legend " $\beta$_th "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($5)
+			}
+			line {
+			      	legend " Ra "
+				file vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($3)
+			}
+	}
+}
+########
+Chapter {
+	Title "Results"
+	Description " The temperature evolution with time at 2 points of the domain (point 1: x=0.5, y =0.2 ; point 2: x=0.2, y=0.5) shows after a few weakening oscillations, that the steady state is reached after about 60 seconds of physical time. "
+	Description " "
+	Description " Once the steady state is reached, the velocity and temperature profiles are compared at x = 0.5m and y = 0.5m:"
+	Description " $\bullet$ For the different time models "
+	Description " $\bullet$ For the different convection schemes used "
+	Description " $\bullet$ For the coarsed and refined mesh "
+	Description " $\bullet$ With reference values issued from the literature "
+	
+#	
+	Figure {
+		Title "Temperature evolution of two points in the domaine"
+		Width 10cm
+		Dimension 2
+		LabelX "time (s)"
+		RangeX 0 100
+		LabelY "T (K)"
+		RangeY 299.5 300.5
+		Include_Description_Curves 0
+		Curve {
+			legend "Point 1 (0.5 ; 0.2)"
+			origin "Trio_U"
+			file VEF_FineMesh/EF_stab/test_SONDE_TEMPPT0.son
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Point 2 (0.2 ; 0.5)"
+			origin "Trio_U"
+			file VEF_FineMesh/EF_stab/test_SONDE_TEMPPT1.son
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+	}
+####
+#### Visu
+####
+visu {
+	Title "Temperature and velocity fields at the stationnary state (refine mesh)"
+	width 8cm
+	Pseudocolor VEF_FineMesh/EF_stab/test.lata dom TEMPERATURE ELEM
+	Vector VEF_FineMesh/EF_stab/test.lata dom VITESSE ELEM 0.2
+	cycles -1
+      }
+####
+#### Comparison of the time model
+####
+
+### T = f(x)
+###
+	Figure {
+		Title "Comparison of the convection schemes for the Temperature (y = 0.5) "
+		Description "The Amont, Muscl and EF_stab (alpha = 1 and alpha = 0.2) convection schemes are used either for momentum or for energy equation. "
+		Width 8cm
+		Dimension 2
+		LabelX "x*"
+		RangeX 0 1
+		LabelY "T (K)"
+		RangeY 299.5 300.5
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF Amont"
+			origin "Trio_U"
+			Segment VDF/Amont/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF/Quick/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Muscl/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Amont (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Amont/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab0.2/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+## CoarseMesh
+		Curve {
+			legend "Muscl (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Muscl/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Amont (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Amont/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "EF_stab (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 7
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab0.2/test.data sonde_temp0
+			columns 1 2
+			Style lines
+			TypeLigne 8
+		}
+	}
+#### T = f (y)
+	Figure {
+		Title "Comparison of the convection schemes for the Temperature (x = 0.5) "
+		Width 8cm
+		Dimension 2
+		LabelX "y*"
+		RangeX 0 1
+		LabelY "T (K)"
+		RangeY 299.6 300.4
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF Amont"
+			origin "Trio_U"
+			Segment VDF/Amont/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF/Quick/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Muscl/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Amont (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Amont/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab0.2/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+## CoarseMesh
+		Curve {
+			legend "Muscl (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Muscl/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Amont (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Amont/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "EF_stab (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 7
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab0.2/test.data sonde_temp1
+			columns 1 2
+			Style lines
+			TypeLigne 8
+		}
+	}
+###
+####
+#### vitesses 
+####
+### V = f( x)
+###
+	Figure {
+		Title "Comparison of the convection schemes for the velocity v (y = 0.5) "
+		Description "The Amont, Muscl and EF_stab (alpha = 1 and alpha = 0.2) convection schemes are used either for momentum or for energy equation. "
+		Width 8cm
+		Dimension 2
+		LabelX "x*"
+		RangeX 0 1
+		LabelY "v (m/s)"
+		RangeY -0.4 0.4
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF Amont"
+			origin "Trio_U"
+			Segment VDF/Amont/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF/Quick/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Muscl/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Amont (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Amont/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab0.2/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 4
+		}
+## CoarseMesh
+		Curve {
+			legend "Muscl (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Muscl/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Amont (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Amont/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "EF_stab (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 7
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab0.2/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 8
+		}
+	}
+#### vit = f (y)
+	Figure {
+		Title "Comparison of the convection schemes for the velocity u (x = 0.5) "
+		Width 8cm
+		Dimension 2
+		LabelX "y*"
+		RangeX 0 1
+		LabelY "u (m/s)"
+		RangeY -0.1 0.1
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF Amont"
+			origin "Trio_U"
+			Segment VDF/Amont/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF/Quick/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Muscl/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Amont (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/Amont/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Fine Mesh)"
+			origin "Trio_U"
+			Segment VEF_FineMesh/EF_stab0.2/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+## CoarseMesh
+		Curve {
+			legend "Muscl (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Muscl/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Amont (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/Amont/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "EF_stab (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 7
+		}
+		Curve {
+			legend "EF_stab (alpha = 0.2) (Coarse Mesh)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab0.2/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 8
+		}
+	}
+#################################################################
+
+#### vitesses 
+####
+### V = f( probe type) at y = 0.5
+###
+	Figure {
+		Title "Comparison of the probe types for an EF_stab convection scheme in the VEF case (velocities at y = 0.5) "
+		Description "probe type: standard, grav or nodes. "
+		Width 8cm
+		Dimension 2
+		LabelX "x*"
+		RangeX 0 1
+		LabelY "V (m/s)"
+		RangeY -0.4 0.4
+		Include_Description_Curves 0
+## CoarseMesh
+		Curve {
+			legend "Muscl (Standard probe type)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit0
+			columns 1 3
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Amont (Grav probe type)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit0_g
+			columns 1 3
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "EF_stab (Nodes probe type)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit0_n
+			columns 1 3
+			Style lines
+			TypeLigne 7
+		}
+	}
+####
+### V = f( probe type) at x = 0.5
+###
+	Figure {
+		Title "Comparison of the probe types for an EF_stab convection scheme in the VEf case (velocities at x = 0.5) "
+		Description "Probe type: standard, grav or nodes. "
+		Width 8cm
+		Dimension 2
+		LabelX "x*"
+		RangeX 0 1
+		LabelY "V (m/s)"
+		RangeY -0.1 0.1
+		Include_Description_Curves 0
+## CoarseMesh
+		Curve {
+			legend "Muscl (Standard probe type)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit1
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "Amont (Grav probe type)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit1_g
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+		Curve {
+			legend "EF_stab (Nodes probe type)"
+			origin "Trio_U"
+			Segment VEF_CoarseMesh/EF_stab/test.data sonde_vit1_n
+			columns 1 2
+			Style lines
+			TypeLigne 7
+		}
+	}
+#########################################################
+}
+###
+
+Chapter {
+	Title "Comparison with values obtained from the literature"
+	Description "The following values of \latex_($u_{x}^{*}$\latex_) and \latex_($u_{u}^{*}$\latex_) are given respectiveley for x = 0.5m and y = 0.5m, with:"
+	Description "u* = $uL\latex_(\sqrt{Ra\times Pr}\latex_)$ ; "v* = $vL\latex_(\sqrt{Ra\times Pr}\latex_)$ ; "y* = y/L ; x* = x/L "
+	Description " "
+	Description " "
+##
+##
+	Table {
+			Title "The literature gives the following values: "
+			Description "  "
+			nb_columns 4
+			label Max(u*) | y* | Max(v*) | x*
+			line {
+			      	legend " Vahl_Davis "
+				values 64.63 0.85 216.36 0.03791
+			}
+			line {
+			      	legend " Gresho "
+				values 64.593 0.888 220.64 0.0237
+			}
+			line {
+			      	legend " Winter "
+				values 63.9 0.85 222 0.039
+			}
+	}
+###
+### calculs
+###
+	Table {
+			Title "Results for Max(u*) "
+			Description "  "
+			nb_columns 2
+			label Max(u*) | y* 
+			line {
+			      	legend " VDF (Amont) "
+				file ./VDF/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VDF (Quick) "
+				file ./VDF/Quick/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Amont) "
+				file ./VEF_CoarseMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab) "
+				file ./VEF_CoarseMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_CoarseMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Muscl) "
+				file ./VEF_CoarseMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+#
+			line {
+			      	legend " VEF Fine Mesh (Amont) "
+				file ./VEF_FineMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab) "
+				file ./VEF_FineMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_FineMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Fine Mesh (Muscl) "
+				file ./VEF_FineMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($1) ($2)
+			}
+	}
+#
+	Table {
+			Title "Results for Max(v*) "
+			Description "  "
+			nb_columns 2
+			label Max(v*) | x* 
+			line {
+			      	legend " VDF (Amont) "
+				file ./VDF/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VDF (Quick) "
+				file ./VDF/Quick/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Amont) "
+				file ./VEF_CoarseMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab) "
+				file ./VEF_CoarseMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_CoarseMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+				legend " VEF Coarse Mesh (Muscl) "
+				file ./VEF_CoarseMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+#
+			line {
+			      	legend " VEF Fine Mesh (Amont) "
+				file ./VEF_FineMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab) "
+				file ./VEF_FineMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_FineMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+			line {
+				legend " VEF Fine Mesh (Muscl) "
+				file ./VEF_FineMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($1) ($2)
+			}
+	}
+#
+# erreur relative Max(u*)
+#
+	Table {
+			Title "Relative errors for Max(u*): ERR[Max(v*)] in %"
+			Description "  "
+			nb_columns 3
+			label Vahl-Davis | Gresho | Winter 
+			line {
+			      	legend " VDF (Amont) "
+				file ./VDF/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VDF (Quick) "
+				file ./VDF/Quick/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Amont) "
+				file ./VEF_CoarseMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab) "
+				file ./VEF_CoarseMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_CoarseMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Muscl) "
+				file ./VEF_CoarseMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+#
+			line {
+			      	legend " VEF Fine Mesh (Amont) "
+				file ./VEF_FineMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab) "
+				file ./VEF_FineMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_FineMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Fine Mesh (Muscl) "
+				file ./VEF_FineMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				columns ($6) ($8) ($10)
+			}
+	}
+#
+# erreur relative Max(v*)
+#
+	Table {
+			Title "Relative errors for Max(v*): ERR[Max(v*)] in % "
+			Description "  "
+			nb_columns 3
+			label Vahl-Davis | Gresho | Winter 
+			line {
+			      	legend " VDF (Amont) "
+				file ./VDF/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VDF (Quick) "
+				file ./VDF/Quick/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Amont) "
+				file ./VEF_CoarseMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (EF_stab) "
+				file ./VEF_CoarseMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarsev Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_CoarseMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Coarse Mesh (Muscl) "
+				file ./VEF_CoarseMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+#
+			line {
+			      	legend " VEF Fine Mesh (Amont) "
+				file ./VEF_FineMesh/Amont/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab) "
+				file ./VEF_FineMesh/EF_stab/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Fine Mesh (EF_stab alpha = 0.2) "
+				file ./VEF_FineMesh/EF_stab0.2/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+			line {
+			      	legend " VEF Fine Mesh (Muscl) "
+				file ./VEF_FineMesh/Muscl/vitesseMaxAdim.dat
+				nb_columns_file 10
+				last_line
+				columns ($6) ($8) ($10)
+			}
+	}
+#
+}
+###############
+###############
+Chapter {
+	Title "Conclusion"
+	Description "$\bullet$ While the choice of the probe has no effect on the measured maximum velocity u (x = 0.5), this is not the case for v. Indeed, as can be seen on the previous arrays, the values of x* for which v* is maximal, are located in a area where significant different values of velocities are observed. The use of probes which display the velocity value either at the gravity center of cells (probe grav) or at the node of the cells (probe node), can lead to smoother curves. The information about maximum velocity along the segment profile y=0.5, cannot be obtained very precisely. the curves are much smotther however with finer mesh. "
+	Description " "
+	Description "$\bullet$ The different time models give approximatively the same results for a given set of convection schemes. "
+	Description " "
+	Description "$\bullet$ The convection scheme doesn't inluence the temperature profile very much for y = 0.5. The influence of the coefficient scheme is more significant for x = 0.5. "
+	Description " "
+	Description "$\bullet$ When using the different time models, the results obtained appear very closed from each other. Ther is no clearly visible difference. "
+	Description " "
+	Description "$\bullet$ The amont scheme applied to the energy equation leads to higher extremum values of the velocities for x = 0.5. "
+	Description " "
+	Description "$\bullet$ The temperature profiles are only little influenced by the different convection schemes. "
+	Description " "
+	Description "$\bullet$ The arrays concerning the relative errors show clearly the influence of the mesh refinement on the results."
+
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "Check the different profiles with different kinds of post processing probes, in order to ensure that the mesh is fine enough to perform a reliable calculation, especially where the velocity or temperature changes are steeps."
+}
+
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+

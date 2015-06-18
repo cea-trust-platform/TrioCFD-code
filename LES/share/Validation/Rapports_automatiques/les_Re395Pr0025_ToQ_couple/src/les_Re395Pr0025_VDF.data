@@ -1,0 +1,252 @@
+#  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Pb_Conduction pb_solide
+
+Domaine dom
+Domaine dom_solide
+
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 33 17 17
+		Longueurs  6.4 2. 3.2
+		Facteurs 1. 1 1.
+	}
+	{
+		Bord periox   X = 0.             0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord periox   X = 6.4    0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord perioz   Z = 0.             0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2    0. <= X <= 6.4   0. <= Y <= 2.0
+		Raccord local homogene interface_bas     Y = 0.             0. <= X <= 6.4   0. <= Z <= 3.2
+		Raccord local homogene interface_haut    Y = 2.             0. <= X <= 6.4   0. <= Z <= 3.2
+		}
+}
+
+Mailler dom_solide
+{
+Pave Cavite
+	{
+		Origine 0. -0.5 0.
+		Nombre_de_Noeuds 33 5 17
+		Longueurs  6.4 0.5 3.2
+	}
+	{
+		Bord paroi   X = 0.             -0.5 <= Y <= 0          0. <= Z <= 3.2
+		Bord paroi   X = 6.4    -0.5 <= Y <= 0        0. <= Z <= 3.2
+		Bord paroi   Z = 0.             0. <= X <= 6.4   -0.5 <= Y <= 0
+		Bord paroi   Z = 3.2    0. <= X <= 6.4    -0.5 <= Y <= 0
+		Bord paroi      Y = -0.5            0. <= X <= 6.4   0. <= Z <= 3.2
+		Raccord local homogene interface_bas     Y = 0             0. <= X <= 6.4   0. <= Z <= 3.2
+	}
+	,
+Pave Cavite2
+	{
+		Origine 0. 2 0.
+		Nombre_de_Noeuds 33 5 17
+		Longueurs  6.4 0.5 3.2
+	}
+	{
+		Bord paroi   X = 0.            2 <= Y <= 2.5         0. <= Z <= 3.2
+		Bord paroi   X = 6.4    2 <= Y <= 2.5       0. <= Z <= 3.2
+		Bord paroi   Z = 0.             0. <= X <= 6.4  2 <= Y <= 2.5
+		Bord paroi   Z = 3.2    0. <= X <= 6.4   2 <= Y <= 2.5
+		Bord paroi      Y = 2.5           0. <= X <= 6.4   0. <= Z <= 3.2
+		Raccord local homogene interface_haut     Y = 2             0. <= X <= 6.4   0. <= Z <= 3.2
+	}
+
+}
+
+VDF dis
+
+Runge_Kutta_ordre_3 sch
+Read sch
+{
+	tinit 0
+	tmax 2.5e6
+	dt_min 1.e-7
+	dt_impr 1e5
+	seuil_statio 1.e-18
+}
+
+# Acier #
+# K=0.2 #
+Solide sol
+Read sol
+{
+        rho Champ_Uniforme 1 8000
+        lambda Champ_Uniforme 1 50
+        Cp Champ_Uniforme 1 500.
+}
+
+Fluide_Incompressible mercure
+Read mercure
+{
+	mu Champ_Uniforme 1    1.5e-3
+	rho Champ_Uniforme 1 13500.
+	lambda Champ_Uniforme 1  8.4 
+	Cp Champ_Uniforme 1  140 
+        beta_th Champ_Uniforme  1 1.9954e-3     
+        
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate mercure gravite
+Associate pb dom
+Associate pb mercure
+
+
+Associate pb_solide dom_solide
+Associate pb_solide sol
+
+Probleme_Couple pbc
+Associate pbc pb
+Associate pbc pb_solide
+Associate pbc sch
+Discretize pbc dis
+
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression Cholesky { }
+		convection { Centre  }
+		diffusion { }
+		conditions_initiales { 
+			vitesse champ_init_canal_sinal 3 { Ucent 0.001131 h 1.0  ampli_sin 0. omega 1. ampli_bruit 1.0e-6 }
+			}
+        	Sources {
+			Canal_perio { bord periox }
+			}
+		boundary_conditions {
+			periox  periodique
+			perioz periodique 
+			interface_haut  paroi_fixe
+			interface_bas  paroi_fixe
+		}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 1e5
+			}
+
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 0.5e6
+		        dt_impr_moy_temp 0.5e6
+		        debut_stat  1e6
+			fin_stat 1e10
+			      }
+			}	
+        }
+
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+                convection { quick }
+                Sources {
+                        Puissance_thermique Valeur_totale_sur_volume dom 1 { Defaut 40.96  }
+                       }                                                                                           
+                Modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire 
+				dt_impr_nusselt 1e5
+		}
+                boundary_conditions
+                        {
+                        periox periodique
+                        perioz periodique
+                        interface_bas Paroi_contact pb_solide interface_bas
+                        interface_haut Paroi_contact pb_solide interface_haut
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0. }
+                }
+
+	Postraitement
+	{
+	     format lata
+	     Sondes
+	          {
+			coupe_vit  vitesse periode 1e5  segment 40   3.2 0. 1.6       3.2 2 1.6
+			coupe_theta temperature  periode 1e5 segment 40 3.2 0. 1.6       3.2 2 1.6
+			sonde_U1 vitesse  periode 1e3 points 1 3.2 1. 1.6 
+			sonde_T1 temperature  periode 1e3 points 1 3.2 1. 1.6 
+			sonde_U2 vitesse  periode 1e3 points 1 3.2 1.8 1.6 
+			sonde_T2 temperature  periode 1e3 points 1 3.2 1.8 1.6 
+	          }
+		Champs binaire dt_post 1e6
+			{
+			vitesse elem
+			temperature elem
+			}
+	}
+
+}
+Read pb_solide
+{
+        Conduction
+        {
+                diffusion { }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 0.
+	                        }
+                boundary_conditions {
+                        paroi 	paroi_adiabatique
+			interface_haut paroi_contact pb interface_haut
+			interface_bas paroi_contact pb interface_bas
+                }
+ 		sources { Puissance_thermique Champ_fonc_xyz dom_solide 1 -2 }
+        }
+        Postraitement
+        {
+                statistiques dt_post 1.e6
+                {
+                        t_deb 1e6 t_fin 1e10
+			
+                        moyenne temperature elem
+                        ecart_type temperature elem
+                }
+	     		Definition_champs
+        		{
+        		 temperature_max champ_post_reduction_0d
+        		   {
+        		     methode max
+			 source Champ_Post_refChamp { Pb_champ pb_solide temperature }
+        		   }
+        		 temperature_min champ_post_reduction_0d
+        		   {
+        		     methode min
+			 source Champ_Post_refChamp { Pb_champ pb_solide temperature }
+        		   }	
+         		 temperature_moy champ_post_reduction_0d
+        		   {
+        		     methode moyenne
+			 source Champ_Post_refChamp { Pb_champ pb_solide temperature }
+        		   }	
+        		
+      			}
+	     format lata
+	     Sondes
+	          {
+			sonde_TS_min temperature_min periode 1e3 points 1 3.2 -0.25 1.6 
+			sonde_TS_max temperature_max periode 1e3 points 1 3.2 -0.25 1.6 
+			sonde_TS_moy temperature_moy periode 1e3 points 1 3.2 -0.25 1.6 
+			sonde_TS1 temperature  periode 1e3 points 1 3.2 -0.25 1.6 
+			coupe_TS_moy nodes moyenne_temperature  periode 1e5 segment 11 3.2 -0.5 1.6    3.2 0 1.6
+			coupe_TS_et nodes ecart_type_temperature  periode 1e5 segment 11 3.2 -0.5 1.6    3.2 0 1.6
+	          }
+             Champs dt_post 1e6
+                {
+                        temperature elem
+                }
+        }
+}
+
+Solve pbc
+End
+39139.18260263333313

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+liste_t="7 8 9 10 11 12"
+
+file=chimie_ft_conc.prm
+chmod +w $file
+echo "Parameters {
+        Title "verification reactions concurentes"
+        Description "Calculs menes en VDF"
+        Author "G.F."
+" > $file
+
+
+
+for dt in ${liste_t}
+do
+mkdir iod02-$dt
+sed "s/__dt__/1e-$dt/" iod02.data > iod02-$dt/iod02-$dt.data
+if [ $dt -eq 11 ]
+then
+sed "s/__dt__/1e-$dt/;s/nb_pas_dt_max 10/nb_pas_dt_max 100/" iod02.data > iod02-$dt/iod02-$dt.data
+fi
+if [ $dt -eq 12 ]
+then
+sed "s/__dt__/1e-$dt/;s/nb_pas_dt_max 10/nb_pas_dt_max 1000/" iod02.data > iod02-$dt/iod02-$dt.data
+fi
+echo "  TestCase iod02-$dt iod02-$dt.data " >> $file 
+done
+
+for dt in 7
+do
+mkdir iod02-${dt}b
+sed "s/__dt__/1e-$dt/" iod02b.data > iod02-${dt}b/iod02-${dt}b.data
+echo "  TestCase iod02-${dt}b iod02-${dt}b.data " >> $file 
+done
+
+echo " 
+}
+Chapter {" >> $file
+for i in 1 2
+do
+echo "
+        Title H20
+	Figure {
+	Include_Description_Curves 0
+	dimension 2" >> $file
+
+if [ $i -eq 2 ]
+then
+echo "logx 
+logy" >> $file
+fi
+
+for dt in 7b ${liste_t} 
+do
+	echo "Curve {
+	file iod02-$dt/iod02-${dt}_H2O.son
+	legend dt=1e-$dt
+	}" >> $file
+done  
+echo "}  " >>$file
+done
+echo "Table {
+	    nb_columns 1
+            label H20 final ">>$file
+for dt in 7b ${liste_t} 
+do
+	echo "line {
+	file iod02-$dt/iod02-${dt}_H2O.son
+        last_line
+        nb_columns_file 2
+        columns (\$2)
+	legend dt=1e-$dt
+	}" >> $file
+done  
+echo " }" >> $file
+echo " }" >> $file

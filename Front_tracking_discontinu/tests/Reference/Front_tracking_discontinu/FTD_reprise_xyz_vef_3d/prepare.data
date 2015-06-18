@@ -1,0 +1,132 @@
+#  
+ Cas test Front-tracking discontinu VEF.
+ Chute d'une goutte avec G=-10 
+  (sonde de vitesse dans la goutte on verifie v(t)=-10*t)
+ Test de la reprise xyz
+
+ Essai de reprise du fichier, puis trois pas de temps
+#
+
+dimension 3
+Probleme_FT_Disc_gen pb
+
+Domaine DOM
+Read_file DOM cylindre_5000elts.geom
+Reorienter_tetraedres DOM
+Dilate DOM 0.0001
+Ecrire_fichier_bin DOM cylindre_bin.geom
+
+VEFPreP1B dis
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	tinit 0.0
+	tmax  0.1
+	dt_start dt_min
+	dt_min 1.e-7
+	dt_max 0.02
+	dt_impr 10.
+	dt_sauv 100
+	seuil_statio -1
+	nb_pas_dt_max 4
+}
+
+Fluide_Incompressible liquide
+Lire liquide
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+}
+
+Fluide_Incompressible gaz
+Lire gaz
+{
+	mu  Champ_Uniforme 1 0.282e-5
+ 	rho Champ_Uniforme 1 1.
+}
+
+Fluide_Diphasique fluide
+Lire fluide
+{
+	fluide0 liquide
+	fluide1 gaz
+	sigma   Champ_Uniforme 1 0.05
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -10.
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+
+Associate pb hydraulique
+Associate pb interf
+
+Associate pb DOM
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               1.e-16
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-16 impr }
+	convection           { amont }
+	diffusion            { }
+	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+	equation_interfaces_proprietes_fluide interf
+	boundary_conditions
+	{
+		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		paroi  paroi_fixe
+		bas    paroi_fixe
+	}
+	terme_gravite rho_g
+}
+interf
+{
+	methode_transport vitesse_interpolee hydraulique
+	conditions_initiales {
+		fonction x^2+y^2+(z-0.06)^2-0.02^2
+        }
+        iterations_correction_volume 0
+        n_iterations_distance 2
+	remaillage {
+                pas 1e8
+                nb_iter_remaillage 4
+                critere_arete 0.35
+                critere_remaillage 0.2
+                pas_lissage 0.000001
+                lissage_courbure_iterations 3
+                lissage_courbure_coeff -0.1
+                nb_iter_barycentrage 3
+                relax_barycentrage 1
+                critere_longueur_fixe 0.01
+                nb_iter_correction_volume 3
+                seuil_dvolume_residuel 1e-12		
+	}
+	boundary_conditions
+	{
+		paroi Paroi_FT_disc symetrie
+		haut  Paroi_FT_disc symetrie
+		bas   Paroi_FT_disc symetrie
+	}
+}
+postraitement {
+	sondes { v_goutte nodes vitesse periode 0.000001 points 1 0. 0. 0.04 }
+}
+Sauvegarde xyz prepare.xyz
+}
+
+Solve pb
+Fin

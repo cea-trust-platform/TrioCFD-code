@@ -1,0 +1,6 @@
+# !/bin/sh
+[ -f .monte.err ] && mv .monte.err monte.err
+[ -f .monte.out ] && mv .monte.out monte.out
+awk '$1=="Centre_gravite_phases"{print $4,$12}' monte.err > centre_bulle.txt
+awk 'BEGIN{z=0;t=-10000}FNR%10==0{print $1, ($2-z)/($1-t); z=$2; t=$1}' centre_bulle.txt > vitesse_bulle_12_01.txt
+awk 'BEGIN{z=0;t=-10000}{print $1*22.147, $2*2.258}' vitesse_bulle_12_01.txt > vitesse_bulle_12.txt

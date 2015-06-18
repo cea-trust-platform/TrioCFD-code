@@ -1,0 +1,417 @@
+# Thermohydraulique 3D VDF couplee a conduction avec rayonnement de paroi #
+# Le calcul STOPS en PARALLEL car le maillage n'est pas assez gros #
+# pour supporter un decoupage avec l'option BORDS_RAYO_1PROC #
+# PARALLEL STOPS #
+dimension 3    
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax 10000000.
+        dt_min 1.e-9
+        dt_max 10.
+        dt_impr 10.
+        dt_sauv 500.
+        seuil_statio 1.e-9
+	nb_pas_dt_max 200
+}
+
+Pb_Thermohydraulique pb2
+
+Domaine dom_fluide
+# BEGIN MESH #
+Read_file dom_fluide Test_3D_VDF_flux_imp_Radiation.geom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_fluide
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM2
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM2.Zones dom_fluide
+END SCATTER #
+
+VDF dis
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 0.002
+	rho Champ_Uniforme 1 2
+        lambda Champ_Uniforme 1 0.2
+	Cp Champ_Uniforme 1 500
+        beta_th Champ_Uniforme 1 0.
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. -9.81 0.
+Associate fluide gravite
+
+Associate pb2 dom_fluide
+Associate pb2 fluide
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb2
+Associate pbc sch
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Lire mod 
+{
+  Test_3D_VDF_flux_imp_Radiation.facesrayo
+  Test_3D_VDF_flux_imp_Radiation.factforme
+  Test_3D_VDF_flux_imp_Radiation.mat_ray_inv
+}
+
+Lire pb2
+{
+        Navier_Stokes_standard
+        {
+                solveur_pression cholesky { }       
+                convection { amont }
+                diffusion { }
+                sources { boussinesq_temperature { T0 373. } }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 3 0. 0. 0.
+                        }
+                boundary_conditions {
+bas11 paroi_fixe
+haut11 paroi_fixe
+gauche11 paroi_fixe
+droite11 paroi_fixe
+avant11 paroi_fixe
+arriere11 paroi_fixe
+bas12 paroi_fixe
+haut12 paroi_fixe
+gauche12 paroi_fixe
+droite12 paroi_fixe
+avant12 paroi_fixe
+arriere12 paroi_fixe
+bas13 paroi_fixe
+haut13 paroi_fixe
+gauche13 paroi_fixe
+droite13 paroi_fixe
+avant13 paroi_fixe
+arriere13 paroi_fixe
+bas14 paroi_fixe
+haut14 paroi_fixe
+gauche14 paroi_fixe
+droite14 paroi_fixe
+avant14 paroi_fixe
+arriere14 paroi_fixe
+bas15 paroi_fixe
+haut15 paroi_fixe
+gauche15 paroi_fixe
+droite15 paroi_fixe
+avant15 paroi_fixe
+arriere15 paroi_fixe
+bas21 paroi_fixe
+haut21 paroi_fixe
+gauche21 paroi_fixe
+droite21 paroi_fixe
+avant21 paroi_fixe
+arriere21 paroi_fixe
+bas22 paroi_fixe
+haut22 paroi_fixe
+gauche22 paroi_fixe
+droite22 paroi_fixe
+avant22 paroi_fixe
+arriere22 paroi_fixe
+bas23 paroi_fixe
+haut23 paroi_fixe
+gauche23 paroi_fixe
+droite23 paroi_fixe
+avant23 paroi_fixe
+arriere23 paroi_fixe
+bas24 paroi_fixe
+haut24 paroi_fixe
+gauche24 paroi_fixe
+droite24 paroi_fixe
+avant24 paroi_fixe
+arriere24 paroi_fixe
+bas25 paroi_fixe
+haut25 paroi_fixe
+gauche25 paroi_fixe
+droite25 paroi_fixe
+avant25 paroi_fixe
+arriere25 paroi_fixe
+bas31 paroi_fixe
+haut31 paroi_fixe
+gauche31 paroi_fixe
+droite31 paroi_fixe
+avant31 paroi_fixe
+arriere31 paroi_fixe
+bas32 paroi_fixe
+haut32 paroi_fixe
+gauche32 paroi_fixe
+droite32 paroi_fixe
+avant32 paroi_fixe
+arriere32 paroi_fixe
+bas33 paroi_fixe
+haut33 paroi_fixe
+gauche33 paroi_fixe
+droite33 paroi_fixe
+avant33 paroi_fixe
+arriere33 paroi_fixe
+bas34 paroi_fixe
+haut34 paroi_fixe
+gauche34 paroi_fixe
+droite34 paroi_fixe
+avant34 paroi_fixe
+arriere34 paroi_fixe
+bas35 paroi_fixe
+haut35 paroi_fixe
+gauche35 paroi_fixe
+droite35 paroi_fixe
+avant35 paroi_fixe
+arriere35 paroi_fixe
+bas41 paroi_fixe
+haut41 paroi_fixe
+gauche41 paroi_fixe
+droite41 paroi_fixe
+avant41 paroi_fixe
+arriere41 paroi_fixe
+bas42 paroi_fixe
+haut42 paroi_fixe
+gauche42 paroi_fixe
+droite42 paroi_fixe
+avant42 paroi_fixe
+arriere42 paroi_fixe
+bas43 paroi_fixe
+haut43 paroi_fixe
+gauche43 paroi_fixe
+droite43 paroi_fixe
+avant43 paroi_fixe
+arriere43 paroi_fixe
+bas44 paroi_fixe
+haut44 paroi_fixe
+gauche44 paroi_fixe
+droite44 paroi_fixe
+avant44 paroi_fixe
+arriere44 paroi_fixe
+bas45 paroi_fixe
+haut45 paroi_fixe
+gauche45 paroi_fixe
+droite45 paroi_fixe
+avant45 paroi_fixe
+arriere45 paroi_fixe
+bas51 paroi_fixe
+haut51 paroi_fixe
+gauche51 paroi_fixe
+droite51 paroi_fixe
+avant51 paroi_fixe
+arriere51 paroi_fixe
+bas52 paroi_fixe
+haut52 paroi_fixe
+gauche52 paroi_fixe
+droite52 paroi_fixe
+avant52 paroi_fixe
+arriere52 paroi_fixe
+bas53 paroi_fixe
+haut53 paroi_fixe
+gauche53 paroi_fixe
+droite53 paroi_fixe
+avant53 paroi_fixe
+arriere53 paroi_fixe
+bas54 paroi_fixe
+haut54 paroi_fixe
+gauche54 paroi_fixe
+droite54 paroi_fixe
+avant54 paroi_fixe
+arriere54 paroi_fixe
+bas55 paroi_fixe
+haut55 paroi_fixe
+gauche55 paroi_fixe
+droite55 paroi_fixe
+avant55 paroi_fixe
+arriere55 paroi_fixe
+                }
+        }
+        Convection_Diffusion_Temperature
+        {
+                diffusion { }
+                convection { amont }
+                boundary_conditions 
+                {	
+bas11 paroi_adiabatique
+haut11 paroi_adiabatique
+avant11 paroi_adiabatique
+arriere11 paroi_adiabatique
+gauche11 paroi_flux_impose Champ_front_uniforme 1 400.
+droite11 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas12 paroi_adiabatique
+haut12 paroi_adiabatique
+avant12 paroi_adiabatique
+arriere12 paroi_adiabatique
+gauche12 paroi_flux_impose Champ_front_uniforme 1 400.
+droite12 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas13 paroi_adiabatique
+haut13 paroi_adiabatique
+avant13 paroi_adiabatique
+arriere13 paroi_adiabatique
+gauche13 paroi_flux_impose Champ_front_uniforme 1 400.
+droite13 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas14 paroi_adiabatique
+haut14 paroi_adiabatique
+avant14 paroi_adiabatique
+arriere14 paroi_adiabatique
+gauche14 paroi_flux_impose Champ_front_uniforme 1 400.
+droite14 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas15 paroi_adiabatique
+haut15 paroi_adiabatique
+avant15 paroi_adiabatique
+arriere15 paroi_adiabatique
+gauche15 paroi_flux_impose Champ_front_uniforme 1 400.
+droite15 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas21 paroi_adiabatique
+haut21 paroi_adiabatique
+avant21 paroi_adiabatique
+arriere21 paroi_adiabatique
+gauche21 paroi_flux_impose Champ_front_uniforme 1 400.
+droite21 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas22 paroi_adiabatique
+haut22 paroi_adiabatique
+avant22 paroi_adiabatique
+arriere22 paroi_adiabatique
+gauche22 paroi_flux_impose Champ_front_uniforme 1 400.
+droite22 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas23 paroi_adiabatique
+haut23 paroi_adiabatique
+avant23 paroi_adiabatique
+arriere23 paroi_adiabatique
+gauche23 paroi_flux_impose Champ_front_uniforme 1 400.
+droite23 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas24 paroi_adiabatique
+haut24 paroi_adiabatique
+avant24 paroi_adiabatique
+arriere24 paroi_adiabatique
+gauche24 paroi_flux_impose Champ_front_uniforme 1 400.
+droite24 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas25 paroi_adiabatique
+haut25 paroi_adiabatique
+avant25 paroi_adiabatique
+arriere25 paroi_adiabatique
+gauche25 paroi_flux_impose Champ_front_uniforme 1 400.
+droite25 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas31 paroi_adiabatique
+haut31 paroi_adiabatique
+avant31 paroi_adiabatique
+arriere31 paroi_adiabatique
+gauche31 paroi_flux_impose Champ_front_uniforme 1 400.
+droite31 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas32 paroi_adiabatique
+haut32 paroi_adiabatique
+avant32 paroi_adiabatique
+arriere32 paroi_adiabatique
+gauche32 paroi_flux_impose Champ_front_uniforme 1 400.
+droite32 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas33 paroi_adiabatique
+haut33 paroi_adiabatique
+avant33 paroi_adiabatique
+arriere33 paroi_adiabatique
+gauche33 paroi_flux_impose Champ_front_uniforme 1 400.
+droite33 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas34 paroi_adiabatique
+haut34 paroi_adiabatique
+avant34 paroi_adiabatique
+arriere34 paroi_adiabatique
+gauche34 paroi_flux_impose Champ_front_uniforme 1 400.
+droite34 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas35 paroi_adiabatique
+haut35 paroi_adiabatique
+avant35 paroi_adiabatique
+arriere35 paroi_adiabatique
+gauche35 paroi_flux_impose Champ_front_uniforme 1 400.
+droite35 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas41 paroi_adiabatique
+haut41 paroi_adiabatique
+avant41 paroi_adiabatique
+arriere41 paroi_adiabatique
+gauche41 paroi_flux_impose Champ_front_uniforme 1 400.
+droite41 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas42 paroi_adiabatique
+haut42 paroi_adiabatique
+avant42 paroi_adiabatique
+arriere42 paroi_adiabatique
+gauche42 paroi_flux_impose Champ_front_uniforme 1 400.
+droite42 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas43 paroi_adiabatique
+haut43 paroi_adiabatique
+avant43 paroi_adiabatique
+arriere43 paroi_adiabatique
+gauche43 paroi_flux_impose Champ_front_uniforme 1 400.
+droite43 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas44 paroi_adiabatique
+haut44 paroi_adiabatique
+avant44 paroi_adiabatique
+arriere44 paroi_adiabatique
+gauche44 paroi_flux_impose Champ_front_uniforme 1 400.
+droite44 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas45 paroi_adiabatique
+haut45 paroi_adiabatique
+avant45 paroi_adiabatique
+arriere45 paroi_adiabatique
+gauche45 paroi_flux_impose Champ_front_uniforme 1 400.
+droite45 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas51 paroi_adiabatique
+haut51 paroi_adiabatique
+avant51 paroi_adiabatique
+arriere51 paroi_adiabatique
+gauche51 paroi_flux_impose Champ_front_uniforme 1 400.
+droite51 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas52 paroi_adiabatique
+haut52 paroi_adiabatique
+avant52 paroi_adiabatique
+arriere52 paroi_adiabatique
+gauche52 paroi_flux_impose Champ_front_uniforme 1 400.
+droite52 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas53 paroi_adiabatique
+haut53 paroi_adiabatique
+avant53 paroi_adiabatique
+arriere53 paroi_adiabatique
+gauche53 paroi_flux_impose Champ_front_uniforme 1 400.
+droite53 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas54 paroi_adiabatique
+haut54 paroi_adiabatique
+avant54 paroi_adiabatique
+arriere54 paroi_adiabatique
+gauche54 paroi_flux_impose Champ_front_uniforme 1 400.
+droite54 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+bas55 paroi_adiabatique
+haut55 paroi_adiabatique
+avant55 paroi_adiabatique
+arriere55 paroi_adiabatique
+gauche55 paroi_flux_impose Champ_front_uniforme 1 400.
+droite55 paroi_temperature_imposee Champ_front_Uniforme 1 323.236957
+                }
+                conditions_initiales { Temperature Champ_fonc_xyz dom_fluide 1 423.236957+((323.236957-423.236957)/0.05)*x }
+        }
+        Postraitement
+        {
+                Sondes
+                { 
+                T_FLUIDE temperature periode 10. segment 5 5.e-3 2.5e-2 2.5e-2  4.5e-2 2.5e-2 2.5e-2
+		TEST1D_FLUIDE temperature periode 10. segment 5 5.e-3 5.e-3 2.5e-2 5.e-3 4.5e-2 2.5e-2
+                }
+                Champs dt_post 10.
+                {
+                        pression elem
+                        pression som
+                        vitesse elem
+                        vitesse som
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+
+Solve pbc
+Fin

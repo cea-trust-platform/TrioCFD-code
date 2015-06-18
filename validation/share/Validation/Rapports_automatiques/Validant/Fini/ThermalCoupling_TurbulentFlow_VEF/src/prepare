@@ -1,0 +1,35 @@
+#!/bin/bash
+
+########################################################################################################
+## !! for the ICEM mesh, the geometrical dimensions must be written in the turbulent_icem.awk file !! ##
+########################################################################################################
+
+mkdir TrioU
+mkdir ICEM
+
+for dir in ./TrioU ./ICEM
+do
+cd $dir
+mkdir alpha_02
+cd ..
+done
+
+######################
+### maillage Triou ###
+######################
+
+cd ./TrioU/alpha_02
+cp ../../turbulent.awk ../../post_run ../../turbulent_coupled.data .
+echo "./turbulent.awk turbulent_coupled" >> ./post_run
+cd ../..
+
+
+#####################
+### maillage ICEM ###
+#####################
+
+cd ./ICEM/alpha_02
+cp ../../turbulent_icem.awk ../../post_run ../../turbulent_coupled_icem.data ../../*asc .
+echo "./turbulent_icem.awk turbulent_coupled_icem" >> ./post_run
+cd ../..
+

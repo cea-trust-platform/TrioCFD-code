@@ -1,0 +1,17 @@
+# Ecoulement 3D dans un Tuyau a section circulaire #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+
+Domaine dom01234
+
+Read_file dom01234 dom01234.geom
+
+Partition dom01234
+{
+   larg_joint 2
+   partitionneur metis { nb_parts NB_PROCS }
+   Nom_Zones dom01234
+}
+
+End
+

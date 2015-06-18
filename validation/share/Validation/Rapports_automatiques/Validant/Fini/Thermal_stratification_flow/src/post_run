@@ -1,0 +1,11 @@
+#!/bin/bash
+
+extrait_coupe Plenum SONDE_T1
+extrait_coupe Plenum SONDE_T2
+extrait_coupe Plenum SONDE_T3
+extrait_coupe Plenum SONDE_T4
+extrait_coupe Plenum SONDE_V1
+extrait_coupe Plenum SONDE_V2
+extrait_coupe Plenum SONDE_V3
+extrait_coupe Plenum SONDE_V4
+extrait_coupe Plenum SONDE_VENTREE

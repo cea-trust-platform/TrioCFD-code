@@ -1,0 +1,48 @@
+#!/bin/bash
+mkdir -p Re200000 Re100000 Re50000 Re25000 Re15000
+
+cp ./*data Re200000
+cp ./post_run Re200000
+cp ./*.awk Re200000
+
+cp ./*data Re100000/EsthydSf.data
+cp ./post_run Re100000
+cp ./*.awk Re100000
+
+cp ./*data Re50000/EsthydSf.data
+cp ./post_run Re50000
+cp ./*.awk Re50000
+
+cp ./*data Re25000/EsthydSf.data
+cp ./post_run Re25000
+cp ./*.awk Re25000
+
+cp ./*data Re15000/EsthydSf.data
+cp ./post_run Re15000
+cp ./*.awk Re15000
+
+cd Re100000
+sed "s/vitesse Champ_Uniforme 3 0. 0. 200./vitesse Champ_Uniforme 3 0. 0. 100./" EsthydSf.data > toto.data
+sed "s/conditions_initiales { k_Eps Champ_Uniforme 2 400. 1.6e7 }/conditions_initiales { k_Eps Champ_Uniforme 2 100. 2.e6 }/" toto.data > EsthydSf.data
+rm toto.data
+cd ..
+
+cd Re50000
+sed "s/vitesse Champ_Uniforme 3 0. 0. 200./vitesse Champ_Uniforme 3 0. 0. 50./" EsthydSf.data > toto.data
+sed "s/conditions_initiales { k_Eps Champ_Uniforme 2 400. 1.6e7 }/conditions_initiales { k_Eps Champ_Uniforme 2 25. 2.5e5 }/" toto.data > EsthydSf.data
+rm toto.data
+cd ..
+
+cd Re25000
+sed "s/motif_3D.geom/motif_gro3D.geom/" EsthydSf.data > toto.data
+sed "s/vitesse Champ_Uniforme 3 0. 0. 200./vitesse Champ_Uniforme 3 0. 0. 25./" toto.data > EsthydSf.data
+sed "s/conditions_initiales { k_Eps Champ_Uniforme 2 400. 1.6e7 }/conditions_initiales { k_Eps Champ_Uniforme 2 6.25 3.e4 }/" EsthydSf.data > toto.data
+mv toto.data EsthydSf.data
+cd ..
+
+cd Re15000
+sed "s/motif_3D.geom/motif_TG3D.geom/" EsthydSf.data > toto.data
+sed "s/vitesse Champ_Uniforme 3 0. 0. 200./vitesse Champ_Uniforme 3 0. 0. 15./" toto.data > EsthydSf.data
+sed "s/conditions_initiales { k_Eps Champ_Uniforme 2 400. 1.6e7 }/conditions_initiales { k_Eps Champ_Uniforme 2 2.25 6500. }/" EsthydSf.data > toto.data
+mv toto.data EsthydSf.data
+cd ..

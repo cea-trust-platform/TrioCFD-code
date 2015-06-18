@@ -1,0 +1,485 @@
+Parameters {
+	Title "Channel LES VEF \latex_($Re_\tau=1110$\latex_) with EF_STAB scheme"
+	Description "Channel LES VEF with EF_STAB scheme"
+	Description "Validated Model : LES (WALE) and EF_STAB scheme (with different values of $\alpha$) with Wall function in VEF discretisation"
+	Description "Validation with : analytical laws and LES Wei-Willmarth"
+
+	VersionTrio_U "1.5.4"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent
+	ParametersTrio_U Diffusion scheme : Default{}
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : CN_Ex_iteratif (facsec_max 3)
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent" 
+	ParametersTrio_U Solving of equations : "Turbulence_paroi loi_standard_hydr" and "Turbulence_paroi Paroi_TBLE { sans_source_boussinesq N 30  restart stationnaire 10 1e-4  alpha 1 }" 
+	ParametersTrio_U Convection : EF_stab (alpha=1; 0,2)
+	ParametersTrio_U Turbulence model : LES Wale 
+	ParametersTrio_U Type of boundary conditions : Periodicity in x and z directions, wall for y boundaries
+
+	TestCase  Alpha1 test /*jdd en annexe*/
+	TestCase  Alpha0.2 test 
+	TestCase  Alpha0.2_TBLE test 
+	TestCase  Alpha0.2_Implicite test 
+	 
+	
+	Author "O. Cioni"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : plane channel"
+	Description "Dimensions : Ly=2, Lx=6.3, Lz=3.2"
+	Description "Mesh : 15x8x15 and Tetraedriser_homogene_fin (dx+=230 ; dy+=40 ; dz+=110)"
+	Description "Initial conditions : Champ_init_canal_sinal 3 { Ucent 9.6575 h 1 ampli_sin 0.3 ampli_bruit 0.49 omega 0.49 }"
+	Description "Boundary conditions : The periodicity conditions need a source term to maintain the flow constant"
+	Description "Canal_perio { bord periox }"
+	visu {
+		Title "Mesh"
+		mesh Alpha1/test.lata dom
+	}
+	
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho = 0.0976$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\mu$ = 2.84e-5 such as Re$_\tau$ = ($u_\tau$.h) / $\nu$ = 1110 (h=1 : half-height)"
+	}
+}
+Chapter {
+	Title "Results"
+	Description "The results are compared to the wall-resolved LES of Wei and Willmarth."
+	Description "The calculation gives a relative error of about 10-15 \latex_(\%\latex_) on the evaluation of the \latex_($Re_\tau$\latex_). The best results are obtained using a value of the parameter $\alpha=0.2$. With this value, we note a good compromise between the evaluation of the friction velocity (\latex_($Re_\tau$\latex_)), the mean velocity and  the velocity fluctuations u', v'. Indeed, the choice EF_Stab $\alpha=0.2$ doesn't seem too dissipative and permits to estimate correctly the peak of fluctuations : the variations between the calculations and the reference LES of Wei and Willmarth are mainly due to the usage of wall functions (peak shifting to the right)."
+	Description "We compare too the advantage of the TBLE wall model. We note that the TBLE model doesn't affect strongly the mean velocity profile and the evaluation of the friction velocity. On the other hand, the TBLE model improves the estimation of the velocity fluctuations."
+
+
+	Table {
+		Title "\latex_($u_\tau$\latex_)"
+		nb_columns 3
+		label time | \latex_($u_\tau$\latex_) | Relative error
+		line {
+			origin "analytique"
+			legend "Theoretical(*)"
+			file utau_analytique.dat
+			nb_columns_file 1
+			columns "-" ($1) "-"
+		}
+		line {
+			origin "Trio_U"
+			legend "EF Stab $\alpha=1$"
+			file ./Alpha1/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "EF Stab $\alpha=0.2$"
+			file ./Alpha0.2/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "EF Stab $\alpha=0.2$ / TBLE"
+			file ./Alpha0.2_TBLE/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "EF Stab $\alpha=0.2$ / Implicite"
+			file ./Alpha0.2_Implicite/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+	}
+	Table {
+		Description "(*) : according to Dean's correlation : \latex_($Re_\tau = 0.175Re_b^{7/8}$\latex_) "	
+	}
+	Figure {
+		Title "Re_tau"
+		Width 12cm
+		Dimension 2
+		LabelX "t"
+		RangeX 0 80
+		LabelY "Re_tau"
+		RangeY 0 1200
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Re_tau=1110"
+			Fonction 1110
+			TypeLigne 0
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Mean velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		LogX
+		RangeX 10 1000
+		LabelY "U+"
+		LogY
+		RangeY 10 30
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Log Law"
+			Fonction 1/0.415*log(x)++5.32
+			TypeLigne 0
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Velocity fluctuation u'+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 1000
+		LabelY "u'/u_tau"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "LES Wei & Willmarth"
+			file ./LES_REF.dat
+			columns ($1) ($4)
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Velocity fluctuation v'+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 1000
+		LabelY "v'/u_tau"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "LES Wei & Willmarth"
+			file ./LES_REF.dat
+			columns ($1) ($5)
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Reynolds shear stress uv"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 1000
+		LabelY "uv/u_tau^2"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "LES Wei & Willmarth"
+			file ./LES_REF.dat
+			columns ($1) -($6)
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		
+	}
+
+}
+Chapter {
+	Title "Dimensional Results"
+	Figure {
+		Title "Mean velocity profile U"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "U"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Log Law"
+			Fonction 0.323271*(1/0.415*log(x*0.323271/0.0002909836065573770492)+5.32)
+			TypeLigne 0
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Velocity fluctuation u'"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "u'"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "LES Wei & Willmarth"
+			file ./LES_REF.dat
+			columns ($1)/0.323271*0.0002909836065573770492 ($4)*0.323271
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Velocity fluctuation v'"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "v'"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "LES Wei & Willmarth"
+			file ./LES_REF.dat
+			columns ($1)/0.323271*0.0002909836065573770492 ($5)*0.323271
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Reynolds shear stress uv"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "uv"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "LES Wei & Willmarth"
+			file ./LES_REF.dat
+			columns ($1)/0.323271*0.0002909836065573770492 -($6)*0.323271
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./Alpha1/moy_spat_dim.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./Alpha0.2/moy_spat_dim.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 TBLE"
+			file ./Alpha0.2_TBLE/moy_spat_dim.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2 Implicite"
+			file ./Alpha0.2_Implicite/moy_spat_dim.dat
+			columns ($1) ($8)
+			Style linespoints
+		}
+		
+	}
+
+}
+
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

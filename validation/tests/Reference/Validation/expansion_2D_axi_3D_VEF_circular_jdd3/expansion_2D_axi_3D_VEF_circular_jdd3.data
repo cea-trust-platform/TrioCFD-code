@@ -1,0 +1,187 @@
+# Hydraulique 2D turbulent K-Eps #
+# PARALLEL OK 8 #
+dimension 2
+Bidim_Axi
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entree
+		{
+		Origine .0 .0
+		Nombre_de_Noeuds 12 12
+		Longueurs .257 .25
+		facteurs 0.85 0.85 
+		}
+		{
+		Bord Entree Y = .0 .0 <= X <= .257
+		Bord Haut1  X = .257  0. <= Y <= .25
+		Bord Bas1   X = .0 .0 <= Y <= .25
+		} ,
+	Pave Mid1
+		{
+		Origine .257 .25
+		Nombre_de_Noeuds 12 50 
+		Longueurs 0.243 1.
+		facteurs 1.0 1.04
+		}
+		{
+		Bord Haut2  X = .5  .25 <= Y <= 1.25
+		Bord Gauche Y = .25  0.257 <= X <= .5
+		} ,
+	Pave Mid2
+		{
+		Origine .0 .25
+		Nombre_de_Noeuds 12 50 
+		Longueurs 0.257 1.
+		facteurs 0.85 1.04
+		}
+		{
+		Bord Bas2   X = 0.  .25 <= Y <= 1.25
+		} ,
+	Pave SHaute
+		{
+		Origine 0.257 1.25
+		Nombre_de_Noeuds 12 200 
+		Longueurs 0.243 4.75
+		facteurs 1.0 1.0
+		}
+		{
+		Bord SortieHaute Y = 6.0  .257 <= X <= .5
+		Bord Haut3  X = .5  1.25 <= Y <= 6.0
+		} ,
+	
+	Pave SBasse
+		{
+		Origine 0. 1.25 
+		Nombre_de_Noeuds 12 200  
+		Longueurs 0.257 4.75
+		facteurs 0.85 1.0 
+		}
+		{
+		Bord SortieBasse Y = 6.0 0. <= X <= .257
+		Bord Bas3   X = 0. 1.25 <= Y <= 6.0
+		}
+}
+
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 2 1 }
+	Larg_joint 1
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+schema_Euler_explicite sch
+Read sch
+{
+	tinit .0
+	nb_pas_dt_max 3
+	tmax 20.
+	dt_min 1.e-9
+	dt_max 0.1
+	dt_impr 0.1
+	seuil_statio 1.e-8
+}
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.001121
+	rho Champ_Uniforme 1 1000.0
+}
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+Discretize pb dis
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression cholesky { }
+		convection { Amont }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			 Haut1 Paroi_Fixe
+			 Bas1 symetrie
+			 Haut2 Paroi_Fixe
+			 Bas2 symetrie
+			 Haut3 Paroi_Fixe
+			 Bas3 symetrie
+			 Gauche Paroi_Fixe
+			 SortieBasse frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			 SortieHaute frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			 Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 5.
+		}
+		modele_turbulence K_Epsilon {
+       			Transport_K_Epsilon 
+			{
+			   	convection { amont }
+				diffusion { }
+				boundary_conditions {
+					Haut1 Paroi
+					Bas1 symetrie
+					Haut2 Paroi
+					Bas2 symetrie
+					Haut3 Paroi
+					Bas3 symetrie
+					Gauche Paroi
+		       			Entree frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 1.47e-3 2.56e-4
+		       			SortieBasse frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+		      			SortieHaute frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+			   	}
+			   	conditions_initiales {
+			      		k_Eps Champ_Uniforme 2 1.47e-3 2.56e-4
+			  	}
+			 }
+			 turbulence_paroi loi_standard_hydr dt_impr_ustar 10. eps_min 1.e-15
+		} 
+	}
+Postraitement 
+{
+	Sondes 
+	{
+		sonde_vitesse vitesse periode   0.01  points   2   0.05  0.28   0.05  1.2  
+		sonde_pression pression periode 0.01 Segment 50   0.05  0.00   0.05  6.0
+
+		
+		sonde_kz15     k        	    periode 1.00  Segment  10   0.00  1.50   0.500 1.50
+		sonde_kr257    k        	    periode 1.00  Segment  10   0.257 0.00   0.257 3.00
+		sonde_kr0      k        	    periode 1.00  Segment  10   0.000 0.00   0.000 3.00
+                sonde_k03      k                    periode 1.00  Segment  10   0.000 0.30   0.500 0.30
+		sonde_visc     viscosite_turbulente periode 1.00  Segment  10   0.00  1.50   0.500 1.50
+				
+		
+		
+		
+	}
+	format lml Champs dt_post 2.
+	{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+			k elem
+			k som
+			eps elem
+			eps som
+			viscosite_turbulente elem
+			viscosite_turbulente som
+	}
+}
+}
+Solve pb
+End
+End
+

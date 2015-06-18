@@ -1,0 +1,23 @@
+Parameters {
+        Title verification reactions concurentes
+        Description Calculs menes en VDF
+        Author G.F.
+
+  TestCase  . tubeY02.data
+  TestCase  VEF tubeY02.data
+ 
+}
+Chapter {
+	Title calcul VDF
+	visu {
+	mesh tubeY02.lata DOM3 
+	pseudocolor  tubeY02.lata DOM3 H2O SOM
+}	
+}
+Chapter {
+	Title calcul VEF
+	visu {
+	mesh VEF/tubeY02.lata DOM3 
+	pseudocolor  VEF/tubeY02.lata DOM3 H2O SOM
+}	
+}

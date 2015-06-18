@@ -1,0 +1,110 @@
+#!/bin/bash
+
+#Creation des repertoires
+mkdir -p ./vef/test3
+mkdir -p ./vef/test4
+mkdir -p ./vef/test18
+mkdir -p ./vef/test22
+#
+mkdir -p ./vdf/test1
+mkdir -p ./vdf/test2
+mkdir -p ./vdf/test11
+mkdir -p ./vdf/test12
+#
+RACINE=`pwd`
+###
+# Cas VEF
+cd $RACINE/vef/test3
+cp $RACINE/data_set/test_VEF.data test.data
+cp $RACINE/post_run .
+sed "s/40/20/" post_run > modifie.data
+mv modifie.data post_run
+
+cd $RACINE/vef/test4
+cp $RACINE/data_set/test_VEF.data test.data
+sed "s/29729.87372\*(0.0274\*x-x\*x)/3.72/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/paroi_fixe/symetrie/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+sed "s/40/20/" post_run > modifie.data
+mv modifie.data post_run
+
+cd $RACINE/vef/test18
+cp $RACINE/data_set/test_VEF.data test.data
+sed "s/convection { amont }/convection { muscl }/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/29729.87372\*(0.0274\*x-x\*x)/3.72/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/gauche   paroi_fixe/gauche symetrie/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit    paroi_fixe/droit symetrie/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/gauche    Paroi_adiabatique/gauche Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit     Paroi_adiabatique/droit Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156. }/# #/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+sed "s/40/20/" post_run > modifie.data
+mv modifie.data post_run
+
+cd $RACINE/vef/test22
+cp $RACINE/data_set/test_VEF.data test.data
+sed "s/convection { amont }/convection { muscl }/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/gauche    Paroi_adiabatique/gauche Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit     Paroi_adiabatique/droit Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156. }/# #/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+sed "s/40/20/" post_run > modifie.data
+mv modifie.data post_run
+
+# Cas VDF
+cd $RACINE/vdf/test1
+cp $RACINE/data_set/test_VDF.data test.data
+cp $RACINE/post_run .
+
+cd $RACINE/vdf/test2
+cp $RACINE/data_set/test_VDF.data test.data
+sed "s/29729.87372\*(0.0274\*x-x\*x)/3.72/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/fonc_xyz dom/uniforme/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/paroi_fixe/symetrie/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+
+cd $RACINE/vdf/test11
+cp $RACINE/data_set/test_VDF.data test.data
+sed "s/29729.87372\*(0.0274\*x-x\*x)/3.72/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/champ_front_fonc_xyz/champ_front_uniforme/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/gauche   paroi_fixe/gauche symetrie/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit    paroi_fixe/droit symetrie/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/gauche    Paroi_adiabatique/gauche Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit     Paroi_adiabatique/droit Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156. }/# #/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+
+cd $RACINE/vdf/test12
+cp $RACINE/data_set/test_VDF.data test.data
+sed "s/gauche    Paroi_adiabatique/gauche Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit     Paroi_adiabatique/droit Paroi_flux_impose champ_front_uniforme 1 8469.0/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156. }/# #/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+
+

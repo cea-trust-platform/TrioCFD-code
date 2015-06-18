@@ -1,0 +1,114 @@
+# verification de l invariance des resultats par rotation - ici : angle = 0 (reference)  #
+# PARALLEL OK #
+# vis a vis de la prise en compte des lois de paroi dans l operateur de diffusion   #
+
+dimension 2
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0
+		Nombre_de_Noeuds 4 4
+		Longueurs 1. 1. 
+	}
+	{
+		Bord entree  X = 0.            0. <= Y <= 1.0          
+		Bord sortie  X = 1.   	       0. <= Y <= 1.0           
+		Bord paroi   Y = 0.            0. <= X <= 1.           
+		Bord paroi   Y = 1.            0. <= X <= 1.           
+		}
+}
+
+Trianguler_H dom
+
+
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 2 1 }
+	Larg_joint 1
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+Lire dis { P0 }
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax 10.
+	dt_min 1.e-10
+	dt_max 1.e-1
+	dt_impr 0.00001
+	dt_sauv 1.5
+	seuil_statio 1.e-8
+	nb_pas_dt_max 10
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu Champ_Uniforme 1 1.0e+2
+ 	rho Champ_Uniforme 1 1.0
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		projection_initiale 0
+		solveur_pression GCP { precond ssor { omega 2.5 } seuil 1.e+20 }	
+		convection { negligeable  }
+		diffusion {   }
+		conditions_initiales { vitesse champ_fonc_xyz dom 2 100. 0. }
+		boundary_conditions {
+                        paroi  paroi_fixe
+                        entree Frontiere_ouverte_vitesse_imposee Champ_front_fonc_xyz  2 100. 0.
+                        sortie  Frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+		}
+        	Modele_turbulence Sous_maille_wale
+                        {
+                        Cw 0.
+                        Turbulence_paroi loi_standard_hydr
+                        } 
+     }
+	      
+        Postraitement
+        {
+	Format lata
+                Champs dt_post 1.
+                {
+                        
+                        y_plus elem
+
+                }
+        }
+}
+
+Solve pb
+Fin
+
+Champs dt_post 1.
+                {
+                        vitesse elem
+                        y_plus elem
+
+                }

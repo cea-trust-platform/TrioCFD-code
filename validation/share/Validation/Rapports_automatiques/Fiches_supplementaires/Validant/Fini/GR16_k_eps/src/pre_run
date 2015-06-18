@@ -1,0 +1,4 @@
+# Decoupage
+make_PAR.data GR16.data
+mv PAR_GR16.data GR16.data
+mkdir -p Post_TOTAL Post_INOUT Post_WALL Post_HOT

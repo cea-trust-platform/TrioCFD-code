@@ -1,0 +1,27 @@
+#!/bin/bash
+
+cherche_zero()
+{
+ awk 'BEGIN {old=0;v=-2;new=0} {if (new==0) {if ($2>0) { new=$1; vn=$2 } else {old=$1; v=$2}}} END {print old,new ,v ,vn,-v*(new-old)/(vn-v)+old}' $1
+}
+
+traite_file()
+{
+extrait_coupe $1 $2
+cherche_zero $1_$2.coupe > $1_$2.zero
+echo $1_$2 `cat   $1_$2.zero`
+}
+
+
+traite_file  marche_VDF_quick SONDE_U_PAROI
+traite_file  marche_VDF_centre SONDE_U_PAROI
+
+
+for suf in VEF_muscl  VEF_efstab VEF_efstab2   VEF_efstab_alpha02
+do
+  traite_file  marche_$suf S_U_GRAV_PAROI
+  traite_file  marche_$suf S_U_NODE_PAROI
+  traite_file  marche_$suf S_U_SOM_PAROI
+done
+
+

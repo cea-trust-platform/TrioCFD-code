@@ -1,0 +1,18 @@
+# Comparaison des forces exercees sur le cube #
+echo
+for data in `ls Force*data`
+do
+   jdd=${data%.data}
+   [ -f PAR_$jdd.TU ] && jdd=PAR_$jdd
+   if [ "${jdd%Forces_NO_IBC_VDF}" != $jdd ]
+   then
+      fv=`awk '{print $2}' $jdd"_pb_Contrainte_visqueuse.out" | tail -1`
+      fp=`awk '{print $2}' $jdd"_pb_Force_pression.out" | tail -1`
+      ft=`echo $fv $fp | awk '{print $1+$2}'`
+   else
+      ft=`awk '{print $2}' $jdd"_Force_totale_sur_body.out" | tail -1`
+      # Verifie que la valeur de la force totale est egale en sequentiel et parallele
+      [ ${jdd#PAR_} != $jdd ] && [ $ft != `awk '{print $2}' ${jdd#PAR_}"_Force_totale_sur_body.out" | tail -1` ] && exit -1
+   fi
+   echo $ECHO_OPTS $jdd"    \t "ft=$ft
+done

@@ -1,0 +1,55 @@
+#!/bin/bash
+dis=`basename $PWD`
+prm=`ls ../*prm 2>/dev/null` 
+echo "--------------------"
+echo "post_run for $dis:"
+echo "--------------------"
+
+# Physical properties
+python ../propertiesGeometry.py
+cp propertiesGeometry.dat ..
+
+# Extract number of cells and update the prm
+err=`ls test.err .test.err 2>/dev/null`
+cells=`awk '/Total number of elements/ && (NF==6) {gsub(":","",$NF);print $NF}' $err`
+echo $ECHO_OPTS "1,$ s?\$"$dis"_NUMBER_OF_ELEMENTS\$?$cells?g\nw" | ed $prm 1>/dev/null 2>&1
+
+# Profiling if binary _pg
+[ -f gmon.out ] && [ gmon.out -nt test.cpu ] && [ ${exec%_pg} != $exec ] && gprof $exec 1>test.cpu && nedit test.cpu &
+
+# Length recirculation calculated from several probes files near the wall 
+# For each profile velocity, we look the point where the Ux velocity change (becomes positive after beeing negative)
+# There is several profiles along Z so we calculate a mean of all the values found
+for file in `ls test_VELOCITY_PROFILE_WALL*.son`
+do
+   awk 'BEGIN {n=0} \
+      /Temps/ { # Recupere les x \
+         dim=($7=="z="?3:2); \
+         col=4; ncol=2*dim; \
+         for (i=0;i<(NF-2)/ncol;i++) { x[i]=$col;col+=ncol;}\
+      }      
+      END { \
+	 col=2; ncol=dim; \
+	 # Recherche du premier point ou U est negatif \
+	 for (i0=0;i0<(NF-1)/ncol;i0++) \
+	 { \
+            u[i0]=$col; \
+            if (u[i0]<0) break; \
+            else col+=ncol; \
+	 } \
+	 # Recherche du point ou U redevient positif \
+	 for (i=i0;i<(NF-1)/ncol;i++) \
+	 { \
+            u[i]=$col; \
+            #print x[i]" "u[i]; \
+            if (u[i]>0) { 
+	       # On fait une interpolation lineaire \
+               posx=x[i-1]+(x[i]-x[i-1])*(0-u[i-1])/(u[i]-u[i-1]);\
+	       print posx;exit;\
+            } \
+            else col+=ncol; \
+	 } \
+	 # Pas de recirculation:\
+	 print 0; \
+      }' $file
+done | awk '// {s+=$1;if ($1>0) n++} END {print s/n}' > test.zero # Mean value plotted in this file

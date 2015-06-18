@@ -1,0 +1,111 @@
+# Turbulent flow around 2 dimension cylinder at Re~17054 #
+dimension 2
+Pb_hydraulique_turbulent pb
+Domaine dom
+
+# Read the mesh #
+# BEGIN MESH #
+Read_file dom.geo ;
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_euler_explicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	/* tinit important pour generation NR */
+	tmax 28.40909090909090909090
+	seuil_statio -1
+	seuil_statio_relatif_deconseille 1
+	dt_impr 1.e0	
+	facsec 1.
+}
+
+Fluide_Incompressible air
+Read air
+{
+	mu  Champ_Uniforme 1 0.00129
+	rho Champ_Uniforme 1 1000.
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression petsc cholesky { }
+		convection { muscl }
+		diffusion { }
+		conditions_initiales 
+		{
+			vitesse Champ_Fonc_xyz dom 2 0.44 0.01*sin(x) 
+		}
+		boundary_conditions 
+		{
+			CYLINDER	paroi_fixe
+			WALL		paroi_fixe
+			INLET 		frontiere_ouverte_vitesse_imposee 	Champ_front_Uniforme 2 0.44 0. 
+			OUTLET  	frontiere_ouverte_pression_imposee 	Champ_Front_Uniforme 1 0
+			
+		}
+		
+                modele_turbulence K_Epsilon {
+                     Transport_K_Epsilon
+                     {
+                             convection { amont }
+                             diffusion { }
+                             boundary_conditions {
+				CYLINDER	paroi
+				WALL 		paroi
+				INLET 		frontiere_ouverte_K_eps_impose 	Champ_front_Uniforme 2 .00004356000000000000 .00001314267428444000
+				OUTLET  	frontiere_ouverte K_EPS_EXT 	Champ_Front_Uniforme 2 .00004356000000000000 .00001314267428444000
+				
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 .00004356000000000000 .00001314267428444000 }
+                      }
+                      turbulence_paroi loi_standard_hydr
+		}
+	}
+        Postraitement
+	{
+		Sondes
+		{
+			sonde_pression pression periode 1.e-10 points 2 0. -.025025  0. .025025 
+                }
+
+		Format lml
+                Champs dt_post 1
+		{
+		    vitesse 			elem
+		    vitesse			som
+		    pression_pa 		elem
+		    y_plus 			elem
+		    viscosite_turbulente 	elem	
+		    k				elem
+		    eps				elem
+		}
+       }
+}
+
+Solve pb
+End

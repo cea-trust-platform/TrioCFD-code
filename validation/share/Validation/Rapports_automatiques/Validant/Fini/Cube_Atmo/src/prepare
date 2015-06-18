@@ -1,0 +1,24 @@
+#!/bin/bash
+tar xf experience.tar
+mkdir -p cube_fin_LPSTD cube_fin_TBLE cube_gros_LPSTD cube_gros_TBLE
+
+cd cube_gros_LPSTD
+cp ../Cube.data .
+
+cd ../cube_gros_TBLE
+cp ../Cube.data .
+sed "s/loi_standard_hydr dt_impr_ustar 1./Paroi_TBLE { N 50 facteur 1 }/" Cube.data > modifie.data
+mv modifie.data Cube.data
+
+cd ../cube_fin_LPSTD
+cp ../Cube.data .
+sed "s/moyen.geom/fin.geom/" Cube.data > modifie.data
+mv modifie.data Cube.data
+
+cd ../cube_fin_TBLE
+cp ../Cube.data .
+sed "s/moyen.geom/fin.geom/" Cube.data > modifie.data
+sed "s/loi_standard_hydr dt_impr_ustar 1./Paroi_TBLE { N 50 facteur 1 }/" modifie.data > Cube.data
+
+rm modifie.data
+cd ..

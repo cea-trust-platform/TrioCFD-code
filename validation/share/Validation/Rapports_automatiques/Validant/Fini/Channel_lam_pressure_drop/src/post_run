@@ -1,0 +1,3 @@
+#!/bin/bash
+python ../propertiesGeometry.py
+python ../tableauCourbes.py VEF Amont 0.1

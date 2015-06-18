@@ -1,0 +1,187 @@
+# Verification des bilans thermiques en VEF #
+# PARALLEL OK 4 #
+dimension 2
+Pb_Thermohydraulique_turbulent pb
+Pb_conduction pb_solide
+Domaine dom
+Domaine dom_solide
+# BEGIN MESH #
+Mailler dom
+{
+        Pave Cavite
+                {
+                Origine 0. 0.01
+                Nombre_de_Noeuds 3 3
+                Longueurs 0.01 0.01
+                }
+                {
+                Bord Entree 			X = 0.  	0.01 <= Y <= 0.02
+                Bord Haut 			Y = 0.02  	0. <= X <= 0.01
+                Raccord local homogene 	Contact Y = 0.01     	0. <= X <= 0.01
+                Bord Sortie 			X = 0.01 	0.01 <= Y <= 0.02
+                }
+}
+Trianguler_H dom
+Mailler dom_solide
+{
+        Pave Cavite
+                {
+                Origine 0. 0.
+                Nombre_de_Noeuds 3 3
+                Longueurs 0.01 0.01
+                }
+                {
+                Bord Cote 			X = 0.  	0. <= Y <= 0.01
+                Raccord local homogene 	Contact	Y = 0.01  	0. <= X <= 0.01
+                Bord Bas 			Y = 0.     	0. <= X <= 0.01
+                Bord Cote 			X = 0.01 	0. <= Y <= 0.01
+                }
+}
+Trianguler_H dom_solide
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Partition dom_solide
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM_SOLIDE
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+Scatter DOM_SOLIDE.Zones dom_solide
+END SCATTER #
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 0.2
+	dt_min 1.e-5
+	dt_max 5.
+	dt_impr 0.001
+	dt_sauv 100
+	seuil_statio 1.e-9
+	precision_impr 4
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+        rho Champ_Uniforme 1 2.
+        lambda Champ_Uniforme 1 0.0262
+	Cp Champ_Uniforme 1 1.006
+	beta_th Champ_Uniforme 1 0.
+}
+Solide sol
+Lire sol
+{
+        rho Champ_Uniforme 1 1.1
+        lambda Champ_Uniforme 1 0.025
+        Cp Champ_Uniforme 1 2.
+}
+
+
+Champ_Uniforme gravite
+Lire gravite 2 0 0
+
+Associate sol gravite
+Associate fluide gravite
+
+Associate pb_solide dom_solide
+Associate pb_solide sol
+
+Associate pb dom
+Associate pb fluide
+
+Probleme_Couple pbc
+Associate pbc pb
+Associate pbc pb_solide
+Associate pbc sch
+Discretize pbc dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression cholesky { }
+		convection { muscl } 
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+                        Contact   	paroi_fixe
+                        Haut 		Symetrie
+                        Sortie 		frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+                        Entree 		frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 .1 0.
+		}
+		modele_turbulence sous_maille { turbulence_paroi loi_standard_hydr }
+	}
+        Convection_Diffusion_Temperature_turbulent
+        {
+                diffusion { }
+                convection { muscl }
+                boundary_conditions 
+                {
+                        Contact   	Paroi_contact pb_solide Contact
+                        Haut 		Symetrie
+                        Sortie 		frontiere_ouverte T_ext Champ_Front_Uniforme 1 283
+                        Entree  	frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 283
+                }
+                conditions_initiales { Temperature Champ_Uniforme 1 283 }
+		modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire }
+        }
+
+	Postraitement
+	{
+               Sondes {
+                        vitesse vitesse periode 0.001 point 1 0.005 0.015
+                        temperature_fluide temperature periode 0.001 point 1 0.005 0.015
+                }
+		Champs dt_post 10.
+		{
+			pression_pa som
+			vitesse som
+			temperature som
+		}
+	}
+}
+# 200*0.01=2W par flux impose + 100000*0.01*0.01=1W par terme source = 3W que l'on doit retrouver en sortie #
+Lire pb_solide
+{
+        Conduction
+        {
+                diffusion { }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 303.
+                        }
+                boundary_conditions {
+                        Cote 	Paroi_adiabatique
+			Bas 	Paroi_flux_impose Champ_Front_Uniforme 1 200.
+			Contact	Paroi_contact pb Contact
+                }
+		Sources { puissance_thermique champ_uniforme 1 10000 }
+        }
+        Postraitement
+        {
+		Sondes { temperature_solide temperature periode 0.001 point 1 0.005 0.005 }
+                Champs dt_post 10.
+                {
+                        temperature elem
+                }
+        }
+}
+Solve pbc
+Fin

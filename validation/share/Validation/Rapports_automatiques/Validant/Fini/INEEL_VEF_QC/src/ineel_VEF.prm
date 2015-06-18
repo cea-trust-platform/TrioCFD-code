@@ -1,0 +1,1552 @@
+Parameters {
+	Title " INEEL_VEF_QC "
+	Description " Laminar flow heated either with a volumetric power or with a wall heat flux. Calculation with the Trio_U quasi_compressible model. Analytical validation based on INEEL experimental results. Comparison between VDF and VEF calculation for 1D and 2D calculations "
+
+	VersionTrio_U " 1.6.1 "
+
+	ParametersTrio_U Type of problem: thermo hydraulic QC
+	ParametersTrio_U Discretization: VDF and VEFPreP1B
+	ParametersTrio_U Time scheme: Implicit Euler
+	ParametersTrio_U Momentum convection scheme: Amont or Muscl
+	ParametersTrio_U Turbulence model: none
+	ParametersTrio_U Temperature convection scheme: Amont or Muscl
+	ParametersTrio_U Solving of equations: Navier_Stokes_QC, Pb_thermohydraulique_QC, Convection_diffusion_Chaleur_QC
+	ParametersTrio_U Turbulence model: none
+	ParametersTrio_U No gravity
+	ParametersTrio_U Type of boundary conditions: symmetry, no slip at wall, adiabatic, heated walls with constant flow
+	ParametersTrio_U Type of fluid: air, compressible with constant $\mu$ and $\gamma$
+#
+	Reference " $[1]$ Validation des correlations a partir des donneees INEEL avec le modele quasi-compressible du code TRUST, S. Vandroux, DEN/DER/SSTH/LMDL/2004-031 " 
+
+#VDF
+	TestCase vdf/test1 test \*
+	TestCase vdf/test2 test
+	TestCase vdf/test11 test
+	TestCase vdf/test12 test
+#VEF
+	TestCase vef/test3 test
+	TestCase vef/test4 test
+	TestCase vef/test18 test
+	TestCase vef/test22 test
+	
+	Author "E. MOREAU (S. VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+#
+	Description " Fluid domain: air "
+	Description " Volumetric Heating source term (1): Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156 } "
+	Description " Volumetric Heating source term (2): gauche Paroi_flux_impose champ_front_uniforme 1 8469.0 
+	Description " Hydraulic initial condition: uniform velocity or parabolic profile (constant in $z$ direction) "
+	Description " "
+	Description " Thermic initial condition: uniform temperature "
+	Description " "
+	Description " Boundary condition: "
+	Description " - entry: imposed velocity and temperature "
+	Description " - exit: imposed pressure and temperature (uniform)"
+	Description " - x = constant: no slip and constant heat flux or symmetry and adiabatic (see below) "
+	Description " - z = constant: symmetry and adiabatic "
+	Description " "
+	Description " 1D and 2D calculations: "
+	Description " For each mesh, two kinds of calculations are done, using different boundary conditions: "
+	Description " -(pseudo-)1D calculations: wall conditions are symmetrical boundaries, and inlet imposed values are uniform ; "
+	Description " -2D calculations: wall conditions are real wall boundaries, and inlet imposed values have parabolic profiles. "
+	Description " "
+	Description " Imposed volumetric heating (if no wall heat flux) "
+	Description " "
+	Description " \latex_(\underline{Calculation method:}\latex_) "
+	Description " - Transitory calculation time: in all cases, the calculations have reached the transitory after 0.5s "
+#
+	Figure {
+		Title "Geometry"
+		Description " The pseudo 2D volume is 5.17 \latex_($10^{-4}\textrm{m}^{3}$\latex_) "
+		Width 9cm
+		picture geometry.png
+	}
+#
+	visu {
+		Title "Zoom of the VDF mesh: inlet "
+		Description " Mesh build with option Pave cavite: 6400 cells (40x160x1) "
+		Width 5cm, viewport= 0 0 1000 850,clip
+		mesh vdf/test1/test.lata dom
+		normal3D -0.0171926 -0.999677 -0.0187327
+		up3D 0.166902 -0.021342 0.985742
+		zoom3D -0.00985044 -0.0132986 20.7924
+		operator no_axes
+	}
+	visu {
+		Title "Zoom of the VDF mesh: outlet "
+		Description " Mesh build with option Pave cavite: 6400 cells (40x160x1) "
+		Width 5cm, viewport= 0 0 1000 850,clip
+		mesh vdf/test1/test.lata dom
+		normal3D -0.028088 0.999568 0.00755309
+		up3D -0.520087 -0.00832773 -0.854073
+		zoom3D -0.0109729 0.0062355 21.4929 
+		operator no_axes
+	}
+#
+	visu {
+		Title " Zoom of the VEF mesh: inlet "
+		Description " Mesh build with option Tetraedriser_homogene_compact: 19200 cells 24x(20x40x1) "
+		Width 5cm, viewport= 0 0 900 1000,clip
+		mesh vef/test3/test.lata dom
+		normal3D -0.028088 0.999568 0.00755309
+		up3D -0.520087 -0.00832773 -0.854073
+		zoom3D -0.0109729 0.0062355 21.4929 
+		operator no_axes
+	}
+	visu {
+		Title " Zoom of the VEF mesh: outlet "
+		Description " Mesh build with option Tetraedriser_homogene_compact: 19200 cells 24x(20x40x1) "
+		Width 5cm, viewport= 0 0 900 1000,clip
+		mesh vef/test3/test.lata dom
+		normal3D -0.0171926 -0.999677 -0.0187327
+		up3D 0.166902 -0.021342 0.985742
+		zoom3D -0.00985044 -0.0132986 20.7924
+		operator no_axes
+	}
+
+#
+# properties Geometry
+	Table {
+			Title "Physical properties"
+			Description " Prefect gas with a constant thermical pressure "
+			nb_columns 1 
+			label Value
+			line {
+			      	legend " Pressure (Pa) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($5)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($1)
+			}
+			line {
+			      	legend " Prandtl "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($2)
+			}
+			line {
+			      	legend " Cp (kJ/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($3)
+			}
+			line {
+			      	legend " $\gamma$ "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($4)
+			}
+	}
+#
+}
+#########
+#########
+Chapter {
+	Title " Calculation Details "
+#
+# run set
+	Table {
+			Title " Volumetric Heating Runs "
+			nb_columns 4 
+			label Condition at the wall | Scheme | Cell type | Cell number
+			line {
+			      	legend " Run n°1 "
+				file data_set/run_1.dat
+				columns 
+			}
+			line {
+			      	legend " Run n°2 "
+				file data_set/run_2.dat
+				columns 
+			}
+			line {
+			      	legend " Run n°3 "
+				file data_set/run_3.dat
+				columns 
+			}
+			line {
+			      	legend " Run n°4 "
+				file data_set/run_4.dat
+				columns 
+			}
+		}
+#
+	Table {
+			Title " Wall Heat Flux "
+			nb_columns 4 
+			label Condition at the wall | Scheme | Cell type | Cell number
+			line {
+			      	legend " Run n°11 "
+				file data_set/run_11.dat
+				columns 
+			}
+			line {
+			      	legend " Run n°12 "
+				file data_set/run_12.dat
+				columns 
+			}
+			line {
+			      	legend " Run n°18 "
+				file data_set/run_18.dat
+				columns 
+			}
+			line {
+			      	legend " Run n°22 "
+				file data_set/run_22.dat
+				columns 
+			}
+		}
+
+#
+}
+####
+####
+
+Chapter {
+	Title "Analytical solution"
+
+	Description " For the different configurations, the following simplified equations must be verified: "
+	Description " "
+	Description " $\bullet$ (1) \latex_(\textbf{Perfect gas:}\latex_) \latex_($P_{\textrm{th}}=\rho R T$\latex_), with $R$=287.06 J/kg/K for air. "
+	Description " "
+	Description " $\bullet$ (2) \latex_(\textbf{Mass conservation:}\latex_) $\rho(y).U(y).S=Q$ (constant mass flow rate in kg/s). "
+	Description " "
+	Description " $\bullet$ (3) \latex_(\textbf{Energy conservation:}\latex_) \latex_($T(y)=T_{\textrm{inlet}} + \frac{P_{\textrm{vol}}. D. P. y}{\rho(y).U(y). S. C_{\textrm{p}}}$\latex_), where \latex_($P_{\textrm{vol}}= 618156\; \textrm{W.m}^{-3}$\latex_) is the volumetric heating. "
+	Description " "
+	Description " $\bullet$ (4) \latex_(\textbf{Momentum conservation (conservative forces):}\latex_) \latex_($\rho(y). U^{2}(y)+P_{\textrm{hyd}}(y) = \rho_{\textrm{inlet}}. U^{2}_{\textrm{inlet}}+P_{\textrm{hyd\ inlet}}$\latex_)
+# values based on the INEEL experiment n°635 
+	Table {
+			Title "INEEL values"
+			Description "The different values are based on the INEEL experiment 635 (see $[1]$): "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " Q (kg/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($13)
+			}
+			line {
+			      	legend " \latex_($T_{\textrm{inlet}}\latex_)$ (K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($9)
+			}
+			line {
+			      	legend " \latex_($P_{\textrm{th}}\latex_)$ (Pa) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($5)
+			}
+			line {
+			      	legend " D (m) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($6)
+			}
+			line {
+			      	legend " P (m) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($7)
+			}
+			line {
+			      	legend " L (m) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($8)
+			}
+			line {
+			      	legend " \latex_($U_{\textrm{inlet}}\latex_)$ (m/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($11)
+			}
+			line {
+			      	legend " \latex_($P_{\textrm{vol}}\latex_)$ (\latex_(W.m$^{3}$\latex_)) "
+				file propertiesGeometry.dat	
+				nb_columns_file 13
+				columns ($10)
+			}
+	}
+#
+	Description " "
+	Description " "
+	Description " "
+	Description " \latex_(\textbf{The averages are calculated for a given $y$  with the following relations:}\latex_) "
+	Description " "
+	Description " \latex_($$ P_{\textrm{bulk}}(y) = \frac{\int_{x=0}^{x=D} P(x,y).S(x,y)\;\textrm{d}x}{S_{\textrm{tot}}}$$\latex_) "
+	Description " "
+	Description " \latex_($$ T_{\textrm{bulk}}(y) = \frac{\int_{x=0}^{x=D} \rho(x,y).T(x,y).U(x,y).S(x,y)\;\textrm{d}x} {\int_{x=0}^{x=D} \rho(x,y).U(x,y).S(x,y)\;\textrm{d}x}$$\latex_) "
+	Description " "
+	Description " \latex_($$ \rho_{\textrm{bulk}}(y) = \frac{\int_{x=0}^{x=D} \rho (x,y).T(x,y).S(x,y)\;\textrm{d}x}  {T_\textrm{bulk}(y).S_{\textrm{tot}}}$$\latex_) "
+	Description " "
+	Description " \latex_($$ V_{\textrm{bulk}}(y) = \frac{\int_{x=0}^{x=D} \rho (x,y).U(x,y).S(x,y)\;\textrm{d}x)} {\rho_{\textrm{bulk}}(y).S_{\textrm{tot}}}$$\latex_) "
+	Description " "
+	Description " In our case, all surfaces $S(x,y)$ are constant for a given $y$ in such a way that \latex_($S_{\textrm{tot}} = N. S(x,y)$\latex_), where $N$ is the number of cells taken into account in the axial averaging. Yet, the approximation used that make post processing easier is the cause of a maximum relative error of 3%. "
+#
+# Analtical pressure drop
+	Description "  "
+	Description "  "
+	Description "  "
+	Description "  "
+	Description "  "
+	Description "  "
+
+	Description " \latex_(\textbf{Analytical pressure:}\latex_) "
+	Description " "
+	Description " For all runs, pressure loss is calculated by Trio_U. But the analytical calculation is made without the loss of pressure due to friction at the walls, that is why there is a difference between calculated and analytical results when there is friction. With symmetric conditions, the two results must be equal. With friction, the calculated pressure must be greater than the analytic one.  "
+	Description " "
+	Description " The momentum conservation equation allows the calculation of the total pressure in the domain. In the presence of regular  head losses, a new term arises in Eq. (4):  "
+	Description " \latex_($$ \Delta P = \lambda(\textrm{Re})\;\frac{\rho.L.U^{2}}{4.D_{\textrm{H}}}$$ \latex_) "
+	Description " Where \latex_($D_{\textrm{H}}$\latex_) stands for the Hydraulic Diameter. In our case, the head losses coefficient $\lambda$ usally takes the form \latex_($a + b.\textrm{Re}^{c}$\latex_), where the coefficients $a$, $b$ and $c$ may be determined from different correlation laws: Blasius, Drew, Bathi and al.,... (cf. \latex_(\textit{AnalyticalSolution.py}\latex_)) "
+#
+}
+####
+#### Results test case 2 and 4
+####
+Chapter {
+	Title " Volumetric heating and symmetry at the walls (run 2 VDF and 4 VEF): "
+
+	Description " With symmetric conditions at the walls, the different profiles in the tube are flat initially, as there is no friction at the wall, they remain flat and the value of the loss of pressure calculated is equal to the analytical one. As seen in the further figures, calculation and analytical results correspond well. VDF and VEF give the same results. "
+
+######## 
+######## Temperature evolution
+#
+	Figure {
+		Title " Temperature evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Temperature (K)"
+		RangeY 290 450
+		Include_Description_Curves 0
+		Curve {
+			legend " run 2 "
+			origin "Trio_U"
+			file vdf/test2/averages.dat
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 4 "
+			origin "Trio_U"
+			file vef/test4/averages.dat
+			columns 1 2
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend "T analytic"
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## Velocity evolution
+#
+	Figure {
+		Title " Velocity evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Velocity (m/s)"
+		RangeY 3 6
+		Include_Description_Curves 0
+		Curve {
+			legend " run 2 "
+			origin "Trio_U"
+			file vdf/test2/averages.dat
+			columns 1 3
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 4 "
+			origin "Trio_U"
+			file vef/test4/averages.dat
+			columns 1 3
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " V Analytic "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 4
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## Density evolution
+#
+	Figure {
+		Title " Density evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY " Rho kg/m3 "
+		RangeY 0.6 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend " run 2 "
+			origin "Trio_U"
+			file vdf/test2/averages.dat
+			columns 1 4
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 4 "
+			origin "Trio_U"
+			file vef/test4/averages.dat
+			columns 1 4
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " Analytic density "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 3
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## head losses evolution
+#
+	Figure {
+		Title " Head losses evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Delta P (Pa)"
+		RangeY 0 8
+		Include_Description_Curves 0
+		Curve {
+			legend " run 2 "
+			origin "Trio_U"
+			file vdf/test2/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 4 "
+			origin "Trio_U"
+			file vef/test4/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " Analytic Pressure "
+			origin "analytic"
+			file vdf/test1/P_drop.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## Velocity profile at different positions 
+#
+	Figure {
+		Title " Velocity profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Velocity (m/s)"
+		RangeY 3.5 7.5
+		Include_Description_Curves 0
+		Curve {
+			legend " run 2 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test2/test.data coupe_vit_radia1
+			columns 1 3
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 2 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test2/test.data coupe_vit_radia3
+			columns 1 3
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 2 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test2/test.data coupe_vit_radia5
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 4 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test4/test.data coupe_vit_radia1
+			columns 1 3
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 4 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test4/test.data coupe_vit_radia3
+			columns 1 3
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 4 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test4/test.data coupe_vit_radia5
+			columns 1 3
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+######## 
+######## temperature profile at different positions 
+#
+	Figure {
+		Title " Temperature profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Temperature (K)"
+		RangeY 250 700
+		Include_Description_Curves 0
+		Curve {
+			legend " run 2 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test2/test.data coupe_temp_radia1
+			columns 1 2
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 2 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test2/test.data coupe_temp_radia3
+			columns 1 2
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 2 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test2/test.data coupe_temp_radia5
+			columns 1 2
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 4 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test4/test.data coupe_temp_radia1
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 4 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test4/test.data coupe_temp_radia3
+			columns 1 2
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 4 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test4/test.data coupe_temp_radia5
+			columns 1 2
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+# end resus run 2 and 4
+}
+
+####
+####
+#### Results test case 1 and 3
+####
+Chapter {
+	Title " Volumetric heating and friction at walls (run 1 VDF and run 3 VEF): "
+
+	Description " With non slip conditions at the walls and a parabolic velocity profile at the entry, the different profiles in the tube are not flat any more. The different bulk values must be calculated by averages on the cross section of the flow. For the bulk values, the analytical mass conservation equation, perfect gas equation and energy conservation equation are still verified. Thus, the bulk temperature, density and velocity are still fitting perfectly the analytical calculation (see below curves). Due to the parabolic profile induced by wall friction, the analytical momentum conservation equation is not verified any more. This leads to a higher calculated pressure loss, as seen below. "
+	Description " "
+	Description " Moreover, the method used yields approximate results since distance between probes are taken equidistant for convenience.  In order to get accurate values, the probes ought to be located exactly at the position where the fields are discretized by Triou_U. For example in the VEF case, the fields are discretized at the gravity center of the tetrahedrical faces. "
+	Description " A Muscl scheme employed for the run 3 might lead to results closer to those of the run 1. In the present case, the run 3 presents lower values of radial temperature near the walls (about 20 °C), and lower values of axial velocities along the tube (about 0.1 m/s). "
+	Description " "
+	Description " When the wall friction is added in the analytical solution, the calculation and the analytical results fit quite well at the entrance of the tube. At the exit of the tube, as the effects of compressibility are not taken into account in the friction correlations, some differences between analytical and calculated values are observed. "
+
+######## 
+######## Temperature evolution
+#
+	Figure {
+		Title " Temperature evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Temperature (K)"
+		RangeY 290 450
+		Include_Description_Curves 0
+		Curve {
+			legend " run 1 "
+			origin "Trio_U"
+			file vdf/test1/averages.dat
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 3 "
+			origin "Trio_U"
+			file vef/test3/averages.dat
+			columns 1 2
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend "T analytic"
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## Velocity evolution
+#
+	Figure {
+		Title " Velocity evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Velocity (m/s)"
+		RangeY 3.5 6
+		Include_Description_Curves 0
+		Curve {
+			legend " run 1 "
+			origin "Trio_U"
+			file vdf/test1/averages.dat
+			columns 1 3
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 3 "
+			origin "Trio_U"
+			file vef/test3/averages.dat
+			columns 1 3
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " V Analytic "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 4
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## Density evolution
+#
+	Figure {
+		Title " Density evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY " Rho kg/m3 "
+		RangeY 0.6 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend " run 1 "
+			origin "Trio_U"
+			file vdf/test1/averages.dat
+			columns 1 4
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 3 "
+			origin "Trio_U"
+			file vef/test3/averages.dat
+			columns 1 4
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " Analytic density "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 3
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## head losses evolution
+#
+	Figure {
+		Title " Head losses evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Delta P (Pa)"
+		RangeY 0 12
+		Include_Description_Curves 0
+		Curve {
+			legend " run 1 "
+			origin "Trio_U"
+			file vdf/test1/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 1 
+		}
+		Curve {
+			legend " run 3 "
+			origin "Trio_U"
+			file vef/test3/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 2 
+		}
+		Curve {
+			legend " Analytic Pressure "
+			origin "analytic"
+			file vdf/test1/P_drop.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+		Curve {
+			legend " Analytic Pressure with head losses "
+			origin "analytic"
+			file vdf/test1/P_drop.dat
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+	}
+######## 
+######## Velocity profile at different positions 
+#
+	Figure {
+		Title " Velocity profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Velocity (m/s)"
+		RangeY 0 7.5
+		Include_Description_Curves 0
+		Curve {
+			legend " run 1 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test1/test.data coupe_vit_radia1
+			columns 1 3
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 1 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test1/test.data coupe_vit_radia3
+			columns 1 3
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 1 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test1/test.data coupe_vit_radia5
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 3 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test3/test.data coupe_vit_radia1
+			columns 1 3
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 3 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test3/test.data coupe_vit_radia3
+			columns 1 3
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 3 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test3/test.data coupe_vit_radia5
+			columns 1 3
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+######## 
+######## temperature profile at different positions 
+#
+	Figure {
+		Title " Temperature profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Temperature (K)"
+		RangeY 250 700
+		Include_Description_Curves 0
+		Curve {
+			legend " run 1 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test1/test.data coupe_temp_radia1
+			columns 1 2
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 1 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test1/test.data coupe_temp_radia3
+			columns 1 2
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 1 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test1/test.data coupe_temp_radia5
+			columns 1 2
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 3 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test3/test.data coupe_temp_radia1
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 3 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test3/test.data coupe_temp_radia3
+			columns 1 2
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 3 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test3/test.data coupe_temp_radia5
+			columns 1 2
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+# end resus run 1 and 3
+}
+
+
+#### Results test case 11, 12, 18 and 22
+####
+Chapter {
+	Title " Wall heat flux and symmetry at walls (run 11 VDF amont and run 18 VEF muscl) "
+#
+	description " The use of QC module induces a decrease of density, and due to mass conservation an increase of the velocity. Non friction conditions correspond to a flat velocity profile at the entry but no more in the tube. "
+	Description " The two cases give similar results (close to analytic ones), although the run 18 gives higher values for the axial profile of temperature (up to 10 K). "
+	Description " Pressure is well calculated when there is no friction. "
+######## 
+######## Velocity profile at different positions 
+#
+	Figure {
+		Title " Bulk velocity evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Velocity (m/s)"
+		RangeY 3.5 6
+		Include_Description_Curves 0
+		Curve {
+			legend " run 11 "
+			origin "Trio_U"
+			file vdf/test11/averages.dat
+			columns 1 3
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 18 "
+			origin "Trio_U"
+			file vef/test18/averages.dat
+			columns 1 3
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " V Analytic "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 4
+			Style lines
+			TypeLigne -1 
+		}
+	}
+######## 
+######## Temperature profile at different positions 
+#
+	Figure {
+		Title " Bulk temperature evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY " Temperature (K)"
+		RangeY 290 540
+		Include_Description_Curves 0
+		Curve {
+			legend " run 11 "
+			origin "Trio_U"
+			file vdf/test11/averages.dat
+			columns 1 2
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 18 "
+			origin "Trio_U"
+			file vef/test18/averages.dat
+			columns 1 2
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " T Analytic "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+	}
+#
+######## 
+######## Velocity profile at different positions 
+#
+	Figure {
+		Title " Velocity profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Velocity (m/s)"
+		RangeY 3 8
+		Include_Description_Curves 0
+		Curve {
+			legend " run 11 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_vit_radia1
+			columns 1 3
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 11 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_vit_radia3
+			columns 1 3
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 11 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_vit_radia5
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 18 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_vit_radia1
+			columns 1 3
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 18 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_vit_radia3
+			columns 1 3
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 18 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_vit_radia5
+			columns 1 3
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+######## 
+######## temperature profile at different positions 
+#
+	Figure {
+		Title " Temperature profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Temperature (K)"
+		RangeY 280 1200
+		Include_Description_Curves 0
+		Curve {
+			legend " run 11 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_temp_radia1
+			columns 1 2
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 11 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_temp_radia3
+			columns 1 2
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 11 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_temp_radia5
+			columns 1 2
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 18 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_temp_radia1
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 18 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_temp_radia3
+			columns 1 2
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 18 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_temp_radia5
+			columns 1 2
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+######## 
+######## head losses evolution
+#
+	Figure {
+		Title " Head losses evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Delta P (Pa)"
+		RangeY 0 8
+		Include_Description_Curves 0
+		Curve {
+			legend " run 11 "
+			origin "Trio_U"
+			file vdf/test11/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 18 "
+			origin "Trio_U"
+			file vef/test18/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " Analytic Pressure "
+			origin "analytic"
+			file vdf/test1/P_drop.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+	}
+#
+#
+}
+##########
+##########
+Chapter {
+	Title " Wall heat flux and friction at walls (Run 12 VDF amont and Run 22 VEF muscl) "
+#
+	Description " This is a calculation with wall friction and a parabolic profile of the velocity at the entry. QC module increases the velocity and decreases the density near the walls. "
+	Description " The VEF simulation presents some differencies. This is due to the localisation of the probes which must be located at the accurate place where the fields are discretized by Trio_U, i.e on a plane passing on all faces of a given profile. "
+	Description " Results for pressure are good. VEF and VDF gives approximately the same values and are higher than the analytic calculation (here, the flow is more sheared near the walls so loss of pressure must be greater). " 
+######## 
+######## Velocity profile at different positions 
+#
+	Figure {
+		Title " Bulk velocity evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Velocity (m/s)"
+		RangeY 3.5 6
+		Include_Description_Curves 0
+		Curve {
+			legend " run 12 "
+			origin "Trio_U"
+			file vdf/test12/averages.dat
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+		Curve {
+			legend " run 22 "
+			origin "Trio_U"
+			file vef/test22/averages.dat
+			columns 1 3
+			Style lines
+			TypeLigne 4 
+		}
+		Curve {
+			legend " V Analytic "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 4
+			Style lines
+			TypeLigne -1 
+		}
+	}
+#
+######## 
+######## Temperature profile at different positions 
+#
+	Figure {
+		Title " Bulk temperature evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY " Temperature (K)"
+		RangeY 290 540
+		Include_Description_Curves 0
+		Curve {
+			legend " run 12 "
+			origin "Trio_U"
+			file vdf/test12/averages.dat
+			columns 1 2
+			Style lines
+			TypeLigne 3 
+		}
+		Curve {
+			legend " run 22 "
+			origin "Trio_U"
+			file vef/test22/averages.dat
+			columns 1 2
+			Style lines
+			TypeLigne 4 
+		}
+		Curve {
+			legend " T Analytic "
+			origin "analytic"
+			file vdf/test1/analytic.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+	}
+#
+######## 
+######## Velocity profile at different positions 
+#
+	Figure {
+		Title " Velocity profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Velocity (m/s)"
+		RangeY 0 8
+		Include_Description_Curves 0
+		Curve {
+			legend " run 12 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test12/test.data coupe_vit_radia1
+			columns 1 3
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 12 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test12/test.data coupe_vit_radia3
+			columns 1 3
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 12 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test12/test.data coupe_vit_radia5
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 22 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test22/test.data coupe_vit_radia1
+			columns 1 3
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 22 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test22/test.data coupe_vit_radia3
+			columns 1 3
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 22 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test22/test.data coupe_vit_radia5
+			columns 1 3
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+######## 
+######## temperature profile at different positions 
+#
+	Figure {
+		Title " Temperature profile at different positions "
+		Width 10cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 0.03
+		LabelY "Temperature (K)"
+		RangeY 250 1200
+		Include_Description_Curves 0
+		Curve {
+			legend " run 11 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_temp_radia1
+			columns 1 2
+			Style lines
+			TypeLigne 1 
+		}
+		Curve {
+			legend " run 11 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_temp_radia3
+			columns 1 2
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend " run 11 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vdf/test11/test.data coupe_temp_radia5
+			columns 1 2
+			Style lines
+			TypeLigne 3 
+		}
+#
+		Curve {
+			legend " run 18 (y = 0.02192) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_temp_radia1
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 18 (y = 0.39456) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_temp_radia3
+			columns 1 2
+			Style points
+			TypePoints 2
+			PointSize 2 
+		}
+		Curve {
+			legend " run 18 (y = 0.85488) "
+			origin "Trio_U"
+			Segment vef/test18/test.data coupe_temp_radia5
+			columns 1 2
+			Style points
+			TypePoints 3 
+			PointSize 2
+		}
+	}
+#
+######## 
+######## head losses evolution
+#
+	Figure {
+		Title " Head losses evolution "
+		Width 10cm
+		Dimension 2
+		LabelX " y (m)"
+		RangeX 0 1
+		LabelY "Delta P (Pa)"
+		RangeY 0 10
+		Include_Description_Curves 0
+		Curve {
+			legend " run 12 "
+			origin "Trio_U"
+			file vdf/test12/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 1 
+			PointSize 2
+		}
+		Curve {
+			legend " run 22 "
+			origin "Trio_U"
+			file vef/test22/pmoyen.dat
+			columns 1 2
+			Style points
+			TypePoints 2 
+			PointSize 2
+		}
+		Curve {
+			legend " Analytic Pressure "
+			origin "analytic"
+			file vdf/test1/P_drop.dat
+			columns 1 2
+			Style lines
+			TypeLigne -1 
+		}
+		Curve {
+			legend " Analytic Pressure with head losses "
+			origin "analytic"
+			file vdf/test1/P_drop.dat
+			columns 1 3
+			Style lines
+			TypeLigne 3 
+		}
+	}
+#
+}
+###############
+###############	 Erreurs relatives
+###############
+Chapter {
+	Title " Relative errors "
+
+	Table {
+			Title " Errors on the temperatures "
+			Description " Errors on the calculated temperature with respect to \latex_($T_{\textrm{bulk}}$\latex_), and located at the domain outlet ($y$=0.8768) are presented "
+			nb_columns 1
+			label " % "
+			line {
+				legend " Run n°1 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vdf/test1/err.dat
+				columns
+			}
+			line {
+				legend " Run n°2 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vdf/test2/err.dat
+				columns
+			}
+			line {
+				legend " Run n°3 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vef/test3/err.dat
+				columns
+			}
+			line {
+				legend " Run n°4 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vef/test4/err.dat
+				columns
+			}
+			line {
+				legend " Run n°11 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vdf/test11/err.dat
+				columns
+			}
+			line {
+				legend " Run n°12 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vdf/test12/err.dat
+				columns
+			}
+			line {
+				legend " Run n°18 "
+				origin "Trio_U"
+				nb_columns_file 1
+				last_line
+				file ./vef/test18/err.dat
+				columns
+			}
+			line {
+				legend " Run n°22 "
+				origin "Trio_U"
+				nb_columns_file 4
+				nb_columns_file 1
+				last_line
+				file ./vef/test22/err.dat
+				columns
+			}
+	}
+#
+}
+#########
+#########
+Chapter {
+	Title "Conclusion"
+	Description "- Results obtained are close to the analytic for both muscl and amont schemes. "
+	Description " - The profiles are very similar with the QC module between VEF (but a muscl scheme and a 20x40x1 tetaedriser homogene compact mesh must be used) and VDF without turbulence. "
+	Description " - The profiles obtained are not compared with the experimental ones. The comparison is made between VDF and VEF, and it works very well. "
+	Description " - When simulating a calculation performed in VDF with VEF discretization, the rise of calculation time is very important in order to obtain good results. "
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description " - In order to simulate a wall heat flux, it is necessary to use a muscl scheme for NS and thermal equations."
+	Description " - Even if the average results are good, it is possible that profiles are wrong. One then should use more cells in the normal direction of the walls equations. "
+	Description " - For the parameterization of a flow between two walls with conditions corresponding to the INEEL experimentation, one should use the QC module with 20 cells in the normal direction of walls and 1 cell in depth (before tetraedrisation) for a laminar calculation. "
+	Description " - For average calculations, the probes must be located at the accurate place where the fields are discretized by Trio_U, i.e on a plane passing on all faces of a given profile. " 
+#
+}
+#####
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+
+}
+
+
+
+

@@ -1,0 +1,186 @@
+# Hydraulique 3D turbulent K-Eps avec transport de constituant #
+# CUBE VEF #
+
+dimension 3
+Pb_Hydraulique_Turbulent pb
+export domaine  dom
+
+# BEGIN MESH #
+
+Read_file dom fin.geom
+
+VEFPreP1B dis
+
+schema_Euler_implicite sch
+Read sch
+{ 	tinit 0.
+	nb_pas_dt_max 3
+        tmax 2.6
+        dt_min 1.e-6
+        dt_max 1.0
+        dt_impr 1.e-3
+        dt_sauv 5.
+        seuil_statio 1.e-8
+	facsec 50
+        facsec_max 300
+	Solveur
+           Implicite
+           {
+                solveur gmres { diag seuil 1e-20 nb_it_max 5 impr }
+           }  
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.
+}
+
+Champ_Uniforme gravite
+Read gravite 3  0. 0. -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression petsc cholesky { } 
+		convection { EF_stab { Volumes_etendus } }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 3 0. 0. 0.
+			}
+		boundary_conditions {
+			 sol Paroi_Fixe
+			 plafond symetrie
+			 arriere symetrie
+			 avant symetrie
+			 sortie frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1  0. 
+			 entree frontiere_ouverte_vitesse_imposee Champ_front_fonc_xyz 3 (0.2916/0.4)*ln(z/0.000394) 0. 0.
+		}
+		modele_turbulence K_Epsilon {
+       			Transport_K_Epsilon 
+			{
+			   	convection { amont }
+				diffusion { }
+				boundary_conditions {
+			 		sol Paroi
+					plafond symetrie
+			 		arriere symetrie
+			 		avant symetrie
+		       			entree frontiere_ouverte_K_eps_impose Champ_front_fonc_xyz 2 (0.2916^2)/sqrt(0.09) (0.2916)^3/(0.4*z)
+		       			sortie frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+			   	}
+			   	conditions_initiales {
+			      		k_Eps Champ_Uniforme 2 0.2834352 0.4958
+			  	}
+			 }
+			 turbulence_paroi loi_standard_hydr dt_impr_ustar 1. 
+		} 
+	}
+Postraitement 
+{
+	format lml
+	Sondes 
+	{
+		sonde_vitessex0  vitesse periode 0.5 segment 20 0. 0.6875 0. 0. 0.6875 0.368755
+		sonde_vitessex0_375   vitesse periode 0.5 segment 20 0.375 0.6875 0. 0.375 0.6875 0.368755
+		sonde_vitessex0_4375   vitesse periode 0.5 segment 20 0.4375 0.6875 0. 0.4375 0.6875 0.368755
+		sonde_vitessex0_5   vitesse periode 0.5 segment 20 0.5 0.6875 0. 0.5 0.6875 0.368755
+		sonde_vitessex0_5625    vitesse periode 0.5 segment 20 0.5625 0.6875 0. 0.5625 0.6875 0.368755
+		sonde_vitessex0_59375   vitesse periode 0.5 segment 20 0.59375 0.6875 0. 0.59375 0.6875 0.368755
+		sonde_vitessex0_609375    vitesse periode 0.5 segment 20 0.609375 0.6875 0. 0.609375 0.6875 0.368755
+		sonde_vitessex0_625   vitesse periode 0.5 segment 20 0.625 0.6875 0. 0.625 0.6875 0.368755
+		sonde_vitessex0_65625   vitesse periode 0.5 segment 20 0.65625 0.6875 0. 0.65625 0.6875 0.368755
+		sonde_vitessex0_6875   vitesse periode 0.5 segment 40 0.6875 0.6875 0. 0.6875 0.6875 0.368755
+		sonde_vitessex0_71875   vitesse periode 0.5 segment 20 0.71875 0.6875 0. 0.71875 0.6875 0.368755
+		sonde_vitessex0_75   vitesse periode 0.5 segment 20 0.75 0.6875 0. 0.75 0.6875 0.368755
+		sonde_vitessex0_765625   vitesse periode 0.5 segment 20 0.765625 0.6875 0. 0.765625 0.6875 0.368755
+		sonde_vitessex0_78125   vitesse periode 0.5 segment 20 0.78125 0.6875 0. 0.78125 0.6875 0.368755
+		sonde_vitessex0_8125   vitesse periode 0.5 segment 20 0.8125 0.6875 0. 0.8125 0.6875 0.368755
+		sonde_vitessex0_875   vitesse periode 0.5 segment 20 0.875 0.6875 0. 0.875 0.6875 0.368755
+		sonde_vitessex0_9375   vitesse periode 0.5 segment 20 0.9375 0.6875 0. 0.9375 0.6875 0.368755
+		sonde_vitessex1   vitesse periode 0.5 segment 20 1.0 0.6875 0. 1.0 0.6875 0.368755
+		sonde_vitessex1_125   vitesse periode 0.5 segment 20 1.125 0.6875 0. 1.125 0.6875 0.368755
+		sonde_vitessex1_375   vitesse periode 0.5 segment 20 1.375 0.6875 0. 1.375 0.6875 0.368755
+		
+		sonde_kx0   k periode 0.5 segment 20 0. 0.6875 0. 0. 0.6875 0.368755
+		sonde_kx0_5   k periode 0.5 segment 20 0.5 0.6875 0. 0.5 0.6875 0.368755
+		sonde_kx0_5625   k periode 0.5 segment 20 0.5625 0.6875 0. 0.5625 0.6875 0.368755
+		sonde_kx0_59375     k periode 0.5 segment 20 0.59375 0.6875 0. 0.59375 0.6875 0.368755
+		sonde_kx0_609375     k periode 0.5 segment 20 0.609375 0.6875 0. 0.609375 0.6875 0.368755
+		sonde_kx0_625     k periode 0.5 segment 20 0.625 0.6875 0. 0.625 0.6875 0.368755
+		sonde_kx0_65625     k periode 0.5 segment 20 0.65625 0.6875 0. 0.65625 0.6875 0.368755
+		sonde_kx0_6875     k periode 0.5 segment 40 0.6875 0.6875 0. 0.6875 0.6875 0.368755
+		sonde_kx0_71875     k periode 0.5 segment 20 0.71875 0.6875 0. 0.71875 0.6875 0.368755
+		sonde_kx0_75     k periode 0.5 segment 20 0.75 0.6875 0. 0.75 0.6875 0.368755
+		sonde_kx0_765625     k periode 0.5 segment 20 0.765625 0.6875 0. 0.765625 0.6875 0.368755
+		sonde_kx0_78125     k periode 0.5 segment 20 0.78125 0.6875 0. 0.78125 0.6875 0.368755
+		sonde_kx0_8125     k periode 0.5 segment 20 0.8125 0.6875 0. 0.8125 0.6875 0.368755
+		sonde_kx0_875     k periode 0.5 segment 20 0.875 0.6875 0. 0.875 0.6875 0.368755
+		sonde_kx0_9375     k periode 0.5 segment 20 0.9375 0.6875 0. 0.9375 0.6875 0.368755
+		sonde_kx1     k periode 0.5 segment 20 1.0 0.6875 0. 1.0 0.6875 0.368755
+		sonde_kx1_125     k periode 0.5 segment 20 1.125 0.6875 0. 1.125 0.6875 0.368755
+		sonde_kx1_375     k periode 0.5 segment 20 1.375 0.6875 0. 1.375 0.6875 0.368755
+		
+		sonde_viscx0     viscosite_turbulente periode 0.5 segment 20 0. 0.6875 0. 0. 0.6875 0.368755
+		sonde_viscx0_5     viscosite_turbulente periode 0.5 segment 20 0.5 0.6875 0. 0.5 0.6875 0.368755
+		sonde_viscx0_5625     viscosite_turbulente periode 0.5 segment 20 0.5625 0.6875 0. 0.5625 0.6875 0.368755
+		sonde_viscx0_59375     viscosite_turbulente periode 0.5 segment 20 0.59375 0.6875 0. 0.59375 0.6875 0.368755
+		sonde_viscx0_609375     viscosite_turbulente periode 0.5 segment 20 0.609375 0.6875 0. 0.609375 0.6875 0.368755
+		sonde_viscx0_625     viscosite_turbulente periode 0.5 segment 20 0.625 0.6875 0. 0.625 0.6875 0.368755
+		sonde_viscx0_65625     viscosite_turbulente periode 0.5 segment 20 0.65625 0.6875 0. 0.65625 0.6875 0.368755
+		sonde_viscx0_6875     viscosite_turbulente periode 0.5 segment 40 0.6875 0.6875 0. 0.6875 0.6875 0.368755
+		sonde_viscx0_71875     viscosite_turbulente periode 0.5 segment 20 0.71875 0.6875 0. 0.71875 0.6875 0.368755
+		sonde_viscx0_75     viscosite_turbulente periode 0.5 segment 20 0.75 0.6875 0. 0.75 0.6875 0.368755
+		sonde_viscx0_765625     viscosite_turbulente periode 0.5 segment 20 0.765625 0.6875 0. 0.765625 0.6875 0.368755
+		sonde_viscx0_78125     viscosite_turbulente periode 0.5 segment 20 0.78125 0.6875 0. 0.78125 0.6875 0.368755
+		sonde_viscx0_8125     viscosite_turbulente periode 0.5 segment 20 0.8125 0.6875 0. 0.8125 0.6875 0.368755
+		sonde_viscx0_875     viscosite_turbulente periode 0.5 segment 20 0.875 0.6875 0. 0.875 0.6875 0.368755
+		sonde_viscx0_9375     viscosite_turbulente periode 0.5 segment 20 0.9375 0.6875 0. 0.9375 0.6875 0.368755
+		sonde_viscx1     viscosite_turbulente periode 0.5 segment 20 1.0 0.6875 0. 1.0 0.6875 0.368755
+		sonde_viscx1_125     viscosite_turbulente periode 0.5 segment 20 1.125 0.6875 0. 1.125 0.6875 0.368755
+		sonde_viscx1_375     viscosite_turbulente periode 0.5 segment 20 1.375 0.6875 0. 1.375 0.6875 0.368755
+		
+		sonde_epsx0     eps periode 0.5 segment 20 0. 0.6875 0. 0. 0.6875 0.368755
+		sonde_epsx0_5     eps periode 0.5 segment 20 0.5 0.6875 0. 0.5 0.6875 0.368755
+		sonde_epsx0_5625     eps periode 0.5 segment 20 0.5625 0.6875 0. 0.5625 0.6875 0.368755
+		sonde_epsx0_59375     eps periode 0.5 segment 20 0.59375 0.6875 0. 0.59375 0.6875 0.368755
+		sonde_epsx0_609375     eps periode 0.5 segment 20 0.609375 0.6875 0. 0.609375 0.6875 0.368755
+		sonde_epsx0_625     eps periode 0.5 segment 20 0.625 0.6875 0. 0.625 0.6875 0.368755
+		sonde_epsx0_65625     eps periode 0.5 segment 20 0.65625 0.6875 0. 0.65625 0.6875 0.368755
+		sonde_epsx0_6875     eps periode 0.5 segment 40 0.6875 0.6875 0. 0.6875 0.6875 0.368755
+		sonde_epsx0_71875     eps periode 0.5 segment 20 0.71875 0.6875 0. 0.71875 0.6875 0.368755
+		sonde_epsx0_75     eps periode 0.5 segment 20 0.75 0.6875 0. 0.75 0.6875 0.368755
+		sonde_epsx0_765625     eps periode 0.5 segment 20 0.765625 0.6875 0. 0.765625 0.6875 0.368755
+		sonde_epsx0_78125     eps periode 0.5 segment 20 0.78125 0.6875 0. 0.78125 0.6875 0.368755
+		sonde_epsx0_8125     eps periode 0.5 segment 20 0.8125 0.6875 0. 0.8125 0.6875 0.368755
+		sonde_epsx0_875    eps periode 0.5 segment 20 0.875 0.6875 0. 0.875 0.6875 0.368755
+		sonde_epsx0_9375    eps periode 0.5 segment 20 0.9375 0.6875 0. 0.9375 0.6875 0.368755
+		sonde_epsx1   eps periode 0.5 segment 20 1.0 0.6875 0. 1.0 0.6875 0.368755
+		sonde_epsx1_125  eps periode 0.5 segment 20 1.125 0.6875 0. 1.125 0.6875 0.368755
+		sonde_epsx1_375  eps periode 0.5 segment 20 1.375 0.6875 0. 1.375 0.6875 0.368755
+		
+		sonde_vitesseh1  vitesse  periode 0.5 point 1 0.76 0.76 0.14
+
+	}
+	Champs dt_post 3.
+	{
+			vitesse elem
+			k elem
+			eps elem
+			viscosite_turbulente elem
+			Y_plus elem
+	}
+}
+sauvegarde_simple binaire Cube_pb.sauv
+}
+EcritureLectureSpecial 0
+Solve pb
+End

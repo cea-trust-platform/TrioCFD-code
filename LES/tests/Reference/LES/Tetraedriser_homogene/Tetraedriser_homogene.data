@@ -1,0 +1,128 @@
+# Ecoulement 3D autour d'une barre de section carree 	#
+# PARALLEL OK #
+# Caillaux, 04/01/99					#
+# Cas test pour le maillage "Tetraedriser_Homogene"	#
+#	utilisation du schema   "VEFPreP1B"		#
+
+Dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Read_file barre_3D.geo ;
+
+Tetraedriser_Homogene dom
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_Explicite sch
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu      Champ_Uniforme 1 1.983e-5
+   	rho     Champ_Uniforme 1 1.177
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Lire sch
+{
+	nb_pas_dt_max 5
+	tinit 0.
+	tmax 0.5
+	dt_min 0.01
+	dt_max 0.02
+	dt_impr 0.03
+	dt_sauv 1.0
+	seuil_statio 1.e-8
+}
+
+Discretize pb dis
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		Solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-10 impr }
+		Convection { EF_stab { alpha 0.2 } }
+		Diffusion { }
+		Conditions_initiales { vitesse Champ_Uniforme 3 1. 0. 0. }
+		boundary_conditions
+		{
+			Entree_Haut_5		Paroi_fixe
+			Entree_Haut_6		Paroi_fixe
+			Entree_Bas_5		Paroi_fixe
+			Entree_Bas_6		Paroi_fixe
+			Entree_2		Paroi_fixe
+			Entree_5		Paroi_fixe
+			Entree_6		Paroi_fixe
+			Haut_3			Paroi_fixe
+			Haut_5			Paroi_fixe
+			Haut_6			Paroi_fixe
+			Bas_4			Paroi_fixe
+			Bas_5			Paroi_fixe
+			Bas_6			Paroi_fixe
+			Sortie_Haut_5		Paroi_fixe
+			Sortie_Haut_6		Paroi_fixe
+			Sortie_Bas_5		Paroi_fixe
+			Sortie_Bas_6		Paroi_fixe
+			Sortie_1		Paroi_fixe
+			Sortie_5		Paroi_fixe
+			Sortie_6		Paroi_fixe
+	
+			Entree_Haut_4		Symetrie
+			Entree_Bas_3		Symetrie
+			Sortie_Haut_4		Symetrie
+			Sortie_Bas_3		Symetrie
+			Haut_4			Symetrie
+			Bas_3			Symetrie
+
+			Entree_Haut_1		Frontiere_ouverte_vitesse_imposee
+						Champ_front_uniforme 3 1. 0. 0.
+			Entree_1		Frontiere_ouverte_vitesse_imposee
+						Champ_front_uniforme 3 1. 0. 0.
+			Entree_Bas_1		Frontiere_ouverte_vitesse_imposee
+						Champ_front_uniforme 3 1. 0. 0.
+			Sortie_Haut_2		Frontiere_ouverte_pression_imposee
+						Champ_front_uniforme 1 0.
+			Sortie_2		Frontiere_ouverte_pression_imposee
+						Champ_front_uniforme 1 0.
+			Sortie_Bas_2		Frontiere_ouverte_pression_imposee
+						Champ_front_uniforme 1 0.
+		}
+		Modele_turbulence sous_maille
+		{		
+			Turbulence_paroi loi_standard_hydr
+	    	}
+	}
+	Postraitement
+	{
+		Sondes
+		{
+			Sonde_vitesse vitesse periode 1.0 segment 10 1.0 0.0 -2.0 1.0 0.0 2.0
+		}
+		Champs dt_post 0.5
+		{
+			vitesse
+		}
+	   
+	}
+}
+
+Solve pb
+Fin

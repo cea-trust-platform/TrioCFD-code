@@ -1,0 +1,207 @@
+#  
+ Validation de l'algorithme de remaillage global Thomas (Fortin)
+ Le volume de la phase 1 doit etre strictement conserve en tout temps
+ (comparer en remplacant Thomas par Juric)
+ PARALLEL RUNS
+#
+# lance_test 1 ecarts #
+dimension 3
+Probleme_FT_Disc_gen pb
+Domaine DOM
+
+# BEGIN MESH #
+Mailler DOM
+{
+	Pave pave1
+	{
+		origine 0. 0. 0.
+		longueurs 0.04 0.04 0.06
+		nombre_de_noeuds 11 11 16
+	}
+	{
+		bord paroi X = 0.   0. <= Y <= 0.04 0. <= Z <= 0.06
+		bord paroi X = 0.04 0. <= Y <= 0.04 0. <= Z <= 0.06
+		bord paroi Y = 0.   0. <= X <= 0.04 0. <= Z <= 0.06
+		bord paroi Y = 0.04 0. <= X <= 0.04 0. <= Z <= 0.06
+		bord bas   Z = 0.   0. <= X <= 0.04 0. <= Y <= 0.04
+		bord haut  Z = 0.06 0. <= X <= 0.04 0. <= Y <= 0.04
+	}
+}
+Transformer DOM x-0.02 y-0.02 z
+# END MESH #
+
+# BEGIN PARTITION
+Partition DOM
+{
+	Partitionneur metis { nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	tinit 0.
+	tmax  1.
+	dt_min 1.e-7
+	dt_max 2e-3
+	dt_impr 10.
+	dt_sauv 100
+	seuil_statio -1
+	nb_pas_dt_max 10
+}
+
+Fluide_Incompressible liquide
+Lire liquide
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+}
+
+Fluide_Incompressible gaz
+Lire gaz
+{
+	mu  Champ_Uniforme 1 0.282e-5
+ 	rho Champ_Uniforme 1 10.
+}
+
+Fluide_Diphasique fluide
+Lire fluide
+{
+	fluide0 liquide
+	fluide1 gaz
+	sigma   Champ_Uniforme 1 0.2
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. 0.
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+
+Associate pb hydraulique
+Associate pb interf
+
+Associate pb DOM
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+System "mkdir -p lata"
+Lire pb
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               1.e-16
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-12 impr }
+	convection           { quick }
+	diffusion            { }
+	conditions_initiales { vitesse champ_fonc_xyz DOM 3 0. 0. -1*(z>0.03) }
+	equation_interfaces_proprietes_fluide interf
+	boundary_conditions
+	{
+		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		paroi  paroi_fixe
+		bas    paroi_fixe
+	}
+	terme_gravite rho_g
+}
+interf
+{
+	methode_transport vitesse_interpolee hydraulique
+	parcours_interface { correction_parcours_thomas }
+	conditions_initiales {
+		fonction x^2+y^2+(z-0.016)^2-(0.012)^2 ,
+		fonction_ignorer_collision ajout_phase0 x^2+y^2+(z-0.042)^2-(0.012)^2
+        }
+        iterations_correction_volume 2
+        n_iterations_distance 2
+	remaillage {
+		pas 0.000001
+		nb_iter_remaillage 1
+		critere_arete 0.35
+		critere_remaillage 0.35
+		pas_lissage 0.000001
+		lissage_courbure_iterations 4
+		lissage_courbure_coeff -0.1
+		nb_iter_barycentrage 3
+		relax_barycentrage 1
+		facteur_longueur_ideale 0.8
+		nb_iter_correction_volume 4
+		seuil_dvolume_residuel 1e-15
+	}
+	collisions
+	{
+                active
+                juric_pour_tout
+                type_remaillage Thomas { distance_interface_element_max 2 }
+	}
+	boundary_conditions
+	{
+		paroi Paroi_FT_disc symetrie
+		haut  Paroi_FT_disc symetrie
+		bas   Paroi_FT_disc symetrie
+	}
+}
+
+
+Postraitement
+{
+	champs dt_post 1.
+	{
+		indicatrice_interf
+	}
+}
+
+liste_postraitements
+{
+	Postraitement_ft_lata post1
+	{
+		dt_post 0.002
+		nom_fichier lata/post1
+		format binaire
+		print
+		champs sommets
+		{
+			vitesse
+		}
+		champs elements
+		{
+			distance_interface_elem_interf
+			indicatrice_interf
+			pression
+			vitesse
+		}
+		interfaces interf {
+			champs sommets {
+				courbure
+			}
+			champs sommets {
+				pe
+			}
+			champs elements {
+				pe
+			}
+		}
+	}
+}
+
+}
+
+Solve pb
+Fin

@@ -1,0 +1,108 @@
+# SIMULATION D UN CANAL 3D NON TOURNANT LES avec la loi de paroi TBLE #
+# PARALLEL OK #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 9 21 7
+		Longueurs 6.283185307 2.0 3.141592653
+
+	}
+	{
+		Bord periox  X = 0.            	0. <= Y <= 2.0           0. <= Z <= 3.141592653
+		Bord periox  X = 6.283185307   	0. <= Y <= 2.0           0. <= Z <= 3.141592653
+		Bord bas     Y = 0.           	0. <= X <= 6.283185307   0. <= Z <= 3.141592653
+		Bord haut    Y = 2.           	0. <= X <= 6.283185307   0. <= Z <= 3.141592653
+                Bord perioz  Z = 0.           	0. <= X <= 6.283185307   0. <= Y <= 2.0
+		Bord perioz  Z = 3.141592653 	0. <= X <= 6.283185307   0. <= Y <= 2.0
+		}
+}
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 1 2 1 }
+	Larg_joint 1
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Runge_Kutta_ordre_3 sch
+Lire sch
+{
+	tinit 0. 
+	tmax 0.8
+	dt_min 1.e-7
+	dt_max 1.e-1
+	dt_impr 1.e-7
+	dt_sauv 100.0
+	seuil_statio 1.e-8
+	facsec 1.
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu Champ_Uniforme 1 0.00622
+	rho Champ_Uniforme 1 2
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+# Attention: ampli_bruit est passe de 0.5 a 0 pour avoir les memes resultats en sequentiel
+et en parallele. En effet il est impossible d'avoir les memes resultats pour ce test de
+non regression avec un tirage aleatoire pour le bruit #
+Lire pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression Petsc Cholesky { }	
+		convection { Centre  }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_init_canal_sinal 3 { Ucent 50. h 1.0  ampli_sin 0. omega 1. ampli_bruit 0. }
+			}
+        	Sources { Canal_perio { bord periox }  } 
+		boundary_conditions {
+			periox periodique 
+			perioz periodique 
+			haut  paroi_fixe
+	                bas  paroi_fixe
+		}
+                 Modele_turbulence sous_maille_selectif {
+                        Turbulence_paroi Paroi_TBLE { N 6 facteur 1.33 }
+			formulation_a_nb_points 4 0 2
+                   	                		}
+
+        }
+	Postraitement
+	{
+     		Champs dt_post 1.
+		{
+			vitesse elem
+		}
+	}
+
+}
+
+Solve pb
+Fin
+dt_impr 0.1
+                

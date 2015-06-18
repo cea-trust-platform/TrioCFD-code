@@ -1,0 +1,607 @@
+Parameters {
+	Title "2D VDF_axi and 3D VEF expanding turbulent flow with various inlet velocities"
+	Description "Turbulent flow in a sharply expanding tube with circular cross-section"
+#
+	Author "Ritesh Bagul, Simone Vandroux"
+#
+	Description "Validated Model : "
+	Description "    - 2D-VDF Bidim axi and 3D VEF modelisation "
+	Description "    - k epsilon"
+	Description "    "
+	Description "Validated with : "
+	Description " The geometry has been taken from Experiments by Szczepura /1/"
+#	Description " The results are validated against the correlations from, "Handbook of Hydraulic Resistance", Idelchik I. E., Hemishphere Publishing Corporation, 1966)."
+
+	VersionTrio_U "1.5.7"
+
+	Description "  "
+	Description "Tested options  "
+	ParametersTrio_U Type of problem :  Hydraulic_Turbulent 
+	ParametersTrio_U Type of fluide : water
+	ParametersTrio_U Discretization : VDF, VEFPreP1B
+	ParametersTrio_U Dimension : 2D, 3D
+	ParametersTrio_U Time scheme : Euler_explicite for 2D VDF and Euler_Implicite for 3D VEF
+	ParametersTrio_U Convection scheme : Momentum : amont Temperature : amont for 2D VDF and Ef_stab for 3D VEF
+	ParametersTrio_U Turbulence model : k epsilon
+	ParametersTrio_U Type of boundary conditions : y-symmetry, no-slip at fluid/solid interface
+	ParametersTrio_U Solving of equations : Equation Navier_Stokes Turbulent
+	ParametersTrio_U Pressure solver:    solveur_pression_cholesky for 2D VDF and solveur_pression GCP for 3D VEF 
+
+	TestCase 2d_vdf_scz_1   2d_vdf_scz /* data sets in Appendix */
+	TestCase 2d_vdf_scz_2_5 2d_vdf_scz
+	TestCase 2d_vdf_scz_5   2d_vdf_scz
+	TestCase 2d_vdf_scz_7_5 2d_vdf_scz
+	TestCase 2d_vdf_scz_10  2d_vdf_scz
+
+	TestCase 3d_vef_scz_1   3d_vef_scz
+	TestCase 3d_vef_scz_2_5 3d_vef_scz
+	TestCase 3d_vef_scz_5   3d_vef_scz
+	TestCase 3d_vef_scz_7_5 3d_vef_scz
+	TestCase 3d_vef_scz_10  3d_vef_scz
+
+	IncludeData 2
+}
+
+Chapter {
+	Title "Tests Description"
+	Figure {
+		Title "Geometry"
+		Description "Dimensions : L=5.75m d=0.25m R1=0.257 R0=0.5m"
+		Width 12cm
+		picture ./geometry.png
+	}
+
+	visu {
+	Title "2D VDF mesh"
+	mesh 2d_vdf_scz_1/2d_vdf_scz.lata dom
+	description "Mesh : Structured mesh composed by 5577 elements realized with 'in-house mesher' of TRUST"
+	}
+	visu {
+	Title "2D VDF mesh: at the entrance"
+        mesh  2d_vdf_scz_1/2d_vdf_scz.lata dom
+        zoom2D 0 0.5 0 1.
+	}
+visu {
+	Title "3D VEF mesh: "
+        mesh  ./3d_vef_scz_1/3d_vef_scz.lata DOM_exc
+	normal3D 0.45 0.45 -0.75
+	up3D 0.8 -0.2 0.4
+       	Operator no_axes
+        Operator no_bounding_box
+        description "VEF Mesh composed of 65923 elements realized with Gmsh"
+	}
+
+Table {
+	Title "Physical properties, Initial and boundary conditions"
+	       Description "Physical properties"
+	       Description "\latex_($\rho = 1e3\: kg.m^{-3}$\latex_)"
+	       Description "\latex_($\mu$\latex_) = 1.121e-3 Pa.s"
+	       Description " "
+		Description "Initial conditions"
+		Description "  Hydraulic: velocity  vitesse Champ_Uniforme  2   0.  1. to 10 m/sec (1, 2.5, 5, 7.5 and 10)"
+		Description "  Turbulence: k_eps Champ_Uniforme  2   1.47e-3   2.56e-4"
+		Description ""
+		Description "Boundary conditions - 2D VDF"
+		Description "   "
+		Description "  Hydraulic:"
+		Description "    Haut1, Haut2, Haut3, Gauche :  paroi_fixe"
+		Description "    Bas1, Bas2, Bas3:    symetrie"
+		Description "    Entree :Frontiere_ouverte_vitesse_imposee      Champ_Front_Uniforme  2   0.  1.0 to 10.0 m/sec (1, 2.5, 5, 7.5 and 10)"
+		Description "    SortieBasse, SortieHaute : Frontiere_ouverte_pression_imposee   Champ_Front_Uniforme  1   0."
+		Description "  "
+		Description "  Turbulence :"
+		Description "    Haut1, Haut2, Haut3, Gauche :  paroi"
+		Description "    Bas1, Bas2, Bas3:    symetrie"
+		Description "    Entree  : Frontiere_ouverte_k_eps_impose Champ_front_Uniforme  2  1.47e-3   2.56e-4"
+		Description "    SortieBasse, SortieHaute  : Frontiere_ouverte k_eps_ext Champ_Front_Uniforme  2  0.0  0.0"
+		Description "  "
+		Description "  "
+		Description "Boundary conditions - 3D VEF"
+		Description "   "
+		Description "  Hydraulic:"
+		Description "  cl_43 (wall) :  paroi"
+		Description "  cl_41, cl_42 (symmetry faces) :  Symetrie"
+		Description "  cl_40 (outlet) :  frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0."
+		Description "  cl_39 (inlet) :  frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0"
+		Description "   "
+		Description "  Turbulence:"
+		Description "  cl_43 (wall) :  paroi"
+		Description "  cl_41, cl_42 (symmetry faces) :  Symetrie"
+		Description "  cl_40 (outlet) :  frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0."
+		Description "  cl_39 (inlet) :  frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 1.47e-3 2.56e-4"
+
+		Description "  Inlet turbulent kinetic energy (k) and dissipation rate (\latex_($\epsilon$\latex_))"
+		Description "  The turbulent intensity I at the inlet can be found from the following equation /3/:"
+	        Description "\latex_($I\simeq\frac{u^{'}}{u_{avg}}\simeq0.16$$\left[Re_{Dh}\right]^{\frac{-1}{8}}$\latex_)"
+		Description "  "
+		Description "  The turbulent kinetic energy can be found as:"
+	        Description "\latex_($k=\frac{3}{2}.u^{'2}$\latex_)"
+		Description "  "
+		Description "  And the turbulent dissipation can be found as:"
+	        Description "\latex_($\varepsilon=\frac{C_{\mu}^{\frac{3}{4}}.k^{\frac{3}{2}}}{l}$\latex_)"
+		Description "  With \latex_($C_{\mu}=0.09$\latex_) and l=0.07.D is the characteristic length for fully developped folow"
+		Description "  D is the diameter of the tube."
+
+}
+
+Table {
+	Title "Calculation method"
+	Description "The Euler equation for conservation of energy gives"
+	Description "\latex_($P_{1}+\frac{1}{2}.\rho.V_{1}^{2}=P_{2}+\frac{1}{2}.\rho.V_{2}^{2}+\triangle P$\latex_) "
+	Description "1 and 2 refers to upstream and  down stream respectively "
+	Description "where  "
+	Description "   Pi  = Pressure at the entree and at exit, Pa, i=1,2  "
+	Description "   Vi  = Velocity at inlet and outlet, m/sec, i=1,2 "
+	Description "\latex_(   $\rho = Density\: of\: water\: kg.m^{-3}$\latex_)"
+	Description "  "
+	Description " The theoretical value of pressure drop can be calculated as follows: "
+	Description "   $\triangle P$ = Pressure loss, Pa, given by:"
+	Description "\latex_($\triangle P=\left(k+\frac{f.L_{i}}{D_{i}}\right).\rho.\frac{V_{i}^{2}}{2}..........(1)$\latex_)"
+	Description "where, local loss due to sudden expension (see reference /2/ is \latex_( $k=\left(1-\frac{A_{1}}{A_{2}}\right)^{2}$\latex_)"
+	Description " "
+	Description "friction factor for laminar flow is \latex_($f=\frac{64}{Re}$ \latex_)"
+	Description "friction factor for turbulent flow (which is the case here) is \latex_( $f=\frac{0.316}{Re^{0.25}}$\latex_)"
+	Description " "
+	Description "Li is the axial length of the tube"
+	Description " "
+	Description "Re=Reynolds number \latex_( $Re=\frac{V_{i}.D_{i}}{\nu}$\latex_)"
+	Description "where $\nu$ is the kinematic velocity and Di is the hydraulic diameter."
+	Description "The theoretical value of pressure drop (1) $\triangle P$ is obtained by combining these previous expressions"
+        Description  " "
+        Description  " "
+        Description  " With the TRUST calculation, the pressure drop is calculated with:"
+	Description "\latex_($\triangle P=P_{1}-P_{2}+\rho.\frac{\left(V{}_{1}^{2}-V{}_{2}^{2}\right)}{2}........(2)$\latex_)"
+	Description "P2=0 due to the imposed boundary condition"
+	Description "P1 is found from the TRUST results"
+	Description "V1 is imposed at the inlet"
+	Description "For validation, the value of pressure drop (2) $\triangle P$ is compared to the theoretical value calculated with (1)"
+	Description " "
+	Description " "
+	Description "For the Szczepura case "
+	Description " "
+	Description "\latex_($D_{1}=0.514\:m$\latex_)"
+	Description "\latex_($D_{2}=1\:m$\latex_)"
+	Description "\latex_($L_{1}=0.25\:m$\latex_)"
+	Description "\latex_($L_{2}=5.75\:m$\latex_)"
+	Description "\latex_($V_{1}=1\:m.s^{-1}$\latex_)"
+	Description "\latex_($V_{2}=V_{1}.$$\frac{D{}_{1}^{2}}{D{}_{2}^{2}}$\latex_)"
+       }
+
+}
+
+Chapter {
+	Title "Calculation results - 2D VDF"
+
+Visu {
+	Title "Velocity distribution at t=8s"
+        Width 11 cm
+        vector ./2d_vdf_scz_1/2d_vdf_scz.lata dom VITESSE ELEM
+}
+Visu {
+	Title "Pressure distribution for inlet velocity=1m/s at t=8s"
+        Width 11 cm
+        pseudocolor ./2d_vdf_scz_1/2d_vdf_scz.lata dom PRESSION ELEM
+}
+Visu {
+	Title "Turbulent kinetic energy for inlet velocity=1m/s at t=8s"
+        Width 11 cm
+        pseudocolor ./2d_vdf_scz_1/2d_vdf_scz.lata dom K ELEM
+}
+
+Figure {
+	Title "Axial pressure distribution for inlet velocity =1m/s at t=8s"
+	Dimension 2
+	Description "The graph below shows the pressure distribution along the axis of the pipe"
+	Description "The value of P1 is taken for an axial distance equal to zero."
+
+	LabelX "Axial distance (in m)"
+	LabelY "Pressure (in kPa)"
+	Include_Description_Curves 0
+#	legend below title "legende"
+
+	Curve {
+		legend "-axial pressure"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./2d_vdf_scz_1/2d_vdf_scz_SONDE_PRESSION.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+}
+
+Table {
+	Title "Comparison of 2D VDF results to theoretical calculations : Table"
+	Description "This table shows the results of the pressure drop analysis with different inlet velocities."
+	Description "The maximum error is about 3.4%"
+	Description "The theoretical values include both the frictionnal loss and the loss due to the sudden expansion"
+
+	nb_columns 5
+
+	label   "Inlet velocity (m/s)" | "Inlet Re" | "Theor. Press drop (Pa)" | "TRUST press drop Pa" | error (%)
+	Include_Description_lines 0
+	line {	
+		file ./2d_vdf_scz_1/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./2d_vdf_scz_2_5/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./2d_vdf_scz_5/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./2d_vdf_scz_7_5/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./2d_vdf_scz_10/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	
+
+}
+
+Figure {
+
+	Title "Comparison of 2D VDF results to theoretical calculations : Curve"
+	Dimension 2
+	Description "The graph below shows the pressure drop as a function of the reynolds number."
+	Description "The theoretical values obtained with /2/ are compared with those obtained from the calculations"
+
+	LabelX "Reynolds number"
+	LabelY "Pressure drop (in Pa)"
+	Include_Description_Curves 0
+#	legend below title "legende"
+
+	Curve {
+		legend "Correlations"
+		Version "1.5.5"
+		file ./deltap_courbe2d.dat
+		Style linespoints
+#               TypeLigne 1
+		columns ($2) ($3)	
+		}
+	Curve {
+		legend "TRUST"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./deltap_courbe2d.dat
+		Style linespoints
+		columns ($2) ($4)	
+	
+	}
+ }
+
+}
+
+Chapter {
+	Title "Calculation results - 3D VEF"
+
+Visu {
+	Title "Pressure distribution at t=8s"
+        Width 15 cm
+        pseudocolor ./3d_vef_scz_1/3d_vef_scz.lata DOM_exc PRESSION SOM
+	normal3D 0.45 0.45 -0.75
+	up3D 0.8 -0.2 0.4
+       	Operator no_axes
+        Operator no_bounding_box
+	Description "Pressure concentration is observed at the nodes on fixed boundary at the inlet, this is contributed to the use of a flat velocity profile at the inlet and has no incidence on the rest of the calculation. This can be avoided by using a proper velocity profile at the inlet."
+}
+
+Visu {
+	Title "Velocity distribution at t=8s"
+        Width 15 cm
+        vector ./3d_vef_scz_1/3d_vef_scz.lata DOM_exc VITESSE SOM
+	normal3D 0.375 -0.65 -0.66
+       	up3D 0.92 0.21 0.31
+       	Operator no_axes
+        Operator no_bounding_box
+}
+
+Visu {
+	Title "Turbulent Kinetic Energy distribution at t=8s"
+        Width 15 cm
+        pseudocolor ./3d_vef_scz_1/3d_vef_scz.lata DOM_exc K SOM
+	normal3D 0.375 -0.65 -0.66
+        up3D 0.92 0.21 0.31
+       	Operator no_axes
+        Operator no_bounding_box
+}
+
+Figure {
+	Title "Axial pressure distribution for inlet velocity =1m/s at t=8s"
+	Dimension 2
+	Description "The graph below shows the pressure distribution along the axis of the pipe for 3D VEF analysis and is compared with the results from 2D VDF. It can be observed that the 3D VEF results are in good agreeement with the expected trend."
+	Description "The value of P1 is taken for an axial distance equal to zero."
+	Description "The "
+
+	LabelX "Axial distance (in m)"
+	LabelY "Pressure (in kPa)"
+	Include_Description_Curves 0
+#	legend below title "legende"
+
+	Curve {
+		legend "3D VEF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./3d_vef_scz_1/3d_vef_scz_SONDE_PRESSION.coupe
+		Style linespoints
+		columns ($1) ($2)	
+		}
+Curve {
+		legend "2D VDF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./2d_vdf_scz_1/2d_vdf_scz_SONDE_PRESSION.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+}
+
+Table {
+	Title "Comparison of 3D VEF results to theoretical calculations : Table"
+	Description "This table shows the results of the pressure drop analysis with different inlet velocities."
+	Description "The maximum error is about -3.29%"
+	Description "The theoretical values include both the frictionnal loss and the loss due to the sudden expansion"
+
+	nb_columns 5
+
+	label   "Inlet velocity (m/s)" | "Inlet Re" | "Theor. Press drop (Pa)" | "TRUST press drop Pa" | error (%)
+	Include_Description_lines 0
+	line {	
+		file ./3d_vef_scz_1/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./3d_vef_scz_2_5/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./3d_vef_scz_5/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./3d_vef_scz_7_5/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	line {	
+		file ./3d_vef_scz_10/delta_p.dat
+		origin "Trio_U"
+		nb_columns_file 5
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5)
+               }  
+	
+
+}
+
+Figure {
+
+	Title "Comparison of 3D VEF results to theoretical calculations : Curve"
+	Dimension 2
+	Description "The graph below shows the pressure drop predicted with 3D VEF analysis as a function of the reynolds number."
+	Description "The theoretical values obtained with /2/ are compared with those obtained from the calculations"
+
+	LabelX "Reynolds number"
+	LabelY "Pressure drop (in Pa)"
+	Include_Description_Curves 0
+	legend below title "legende"
+
+	Curve {
+		legend "Correlations"
+		Version "1.5.5"
+		file ./deltap_courbe3d.dat
+		Style linespoints
+#               TypeLigne 1
+		columns ($2) ($3)	
+		}
+	Curve {
+		legend "TRUST"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./deltap_courbe3d.dat
+		Style linespoints
+		columns ($2) ($4)	
+	
+	}
+ }
+
+}
+
+
+Chapter {
+	Title "Comparison with szczepura experiment"
+	Description "For the inlet velocity of 1m/s, the results are compared to the Szczepura experiment."
+	Description "The comparison is not totally accurate, as the inlet mass flux in Sczepura is smaller as in TRUST, and the inlet velocity has an imposed profile instead of being uniform."
+
+
+Figure {
+	Title "Comparison of turbulent kinetic energy along the centerline R=0m
+	Dimension 2
+	Description "The Trio_U results are compared with the experimental results of /2/"
+	Description "The variation of k along the centreline of the circular geometry is shown here."
+        Description "From z=0.0 to 1.0 m, the axial varation of k matches well, but beyond z=0.1m, the prediction is much lower than that of the experimental results."
+	Description "Among 2D and 3D analysis the 3D VEF prediction of K is better"
+
+	LabelX "Axial distance, m (Z)"
+	LabelY "Kinetic energy k"
+	Include_Description_Curves 0
+	legend below title "legende"
+
+	Curve {
+		legend "Experimental /2/"
+		Version "1.5.5"
+		file ./r0.dat
+		Style linespoints
+#               TypeLigne 1
+		columns ($1) ($2)	
+	
+	}
+	Curve {
+		legend "TRUST 2D_axi VDF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./2d_vdf_scz_1/2d_vdf_scz_SONDE_KR0.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+
+Curve {
+		legend "TRUST 3D VEF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./3d_vef_scz_1/3d_vef_scz_SONDE_KR0.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+}
+
+Figure {
+
+	Title "Comparison of turbulent kinetic energy at R=0.257m"
+	Dimension 2
+	Description "The Trio_U results are compared with the experimental results of /2/"
+	Description "This figure shows the variation of k along z=0.0 to 3.0m at r=0.257 m (ie adjacent to the wall of the upstream region)."
+        Description "The prediction of k before the expansion is higher than the experimental values in 2D VDF, while it is predicted lower in 3D VEF. In real, the value of k near the wall is lower than far from the wall which is seen in 3D VEF results and experimental data."
+        Description "In TRUST, the values of k and epsilon are taken as uniform at the inlet, which can indude discrepancies"
+        Description "In the downstream part of the flow, k is fitting well with the experimental results"
+
+
+	LabelX "Axial distance, m (Z)"
+	LabelY "Kinetic energy k"
+	Include_Description_Curves 0
+	legend below title "legende"
+
+	Curve {
+		legend "Experimental /2/"
+		Version "1.5.5"
+		file ./r257.dat
+		Style linespoints
+#               TypeLigne 1
+		columns ($1) ($2)	
+	
+	}
+	Curve {
+		legend "TRUST 2D_axi VDF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./2d_vdf_scz_1/2d_vdf_scz_SONDE_KR257.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+Curve {
+		legend "TRUST 3D VEF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./3d_vef_scz_1/3d_vef_scz_SONDE_KR257.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+}
+
+Figure {
+
+	Title "Comparison of turbulent kinetic energy at z=1.5m"
+	Dimension 2
+	Description "The Trio_U results are compared with the experimental results of /2/"
+	Description "This figure shows the variation of k along the radial direction r=0.0 to 0.5m at z=1.5 m . It can be seen that the TRUST calculation underpredicts k from r=0.0m to 0.25m. Beyond r=0.25 (to r=0.5m), the prediction of k matches well with the experimental values"
+
+
+	LabelX "Radial distance, m (R)"
+	LabelY "Kinetic energy k"
+	Include_Description_Curves 0
+	legend below title "legende"
+
+	Curve {
+		legend "Experimental /2/"
+		Version "1.5.5"
+		file ./z15.dat
+		Style linespoints
+#               TypeLigne 1
+		columns ($1) ($2)	
+	
+	}
+	Curve {
+		legend "TRUST 2D_axi VDF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./2d_vdf_scz_1/2d_vdf_scz_SONDE_KZ15.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+
+Curve {
+		legend "TRUST 3D VEF"
+		origin "Trio_U"
+		Version "1.5.5"
+		file ./3d_vef_scz_1/3d_vef_scz_SONDE_KZ15.coupe
+		Style linespoints
+		columns ($1) ($2)	
+	
+	}
+}
+
+}
+
+
+Chapter {
+	Title "Conclusion"
+	Description "The pressure drop due to the sudden expansion of a pipe is calculated for various Reynolds numbers in 2D VDF axi and 3D VEF.   "
+	Description "The calculated results are very close from the theoretical results.  "
+	Description "  "
+
+	Description "A comparison with experimental values is also made for the kinetic energy k. Apart from the centerline and close from the entry, the comparison is quite good. "
+
+	Description "The results could be improved by using a velocity profile at the entry instead of a flat profile.   "
+
+}
+
+Chapter {
+	Title "References"
+	Description "/1/ ERCOFTAC Classic Database: case 13, sudden pipe expansion, experiments by Szczepura"
+	Description "/2/ Handbook of hydraulic resistance, Idelchik I.E. 1966"
+	Description "/3/ http://web.njit.edu/topics/Prog_Lang_Docs/html/FLUENT/fluent/fluent5/ug/html/node160.htm"
+}
+
+
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

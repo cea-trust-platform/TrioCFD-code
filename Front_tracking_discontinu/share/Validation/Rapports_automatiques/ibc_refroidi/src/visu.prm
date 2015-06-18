@@ -1,0 +1,34 @@
+Parameters {
+	Title "Test de la penalisation thermique"
+	Description "Rapport utilisant visit"
+	Author "MB"
+	TestCase ibc_refroidi ibc_refroidi
+	TestCase no_refr ibc_refroidi
+}
+
+Chapter {
+	Title "FT"
+	Description " test visu "
+visu {
+	Title "ibc_refroidi"
+
+	mesh ibc_refroidi/lata/post_cylindre_refroidi.lata DOM
+
+        pseudocolor  ibc_refroidi/lata/post_cylindre_refroidi.lata DOM TEMPERATURE ELEM 
+	width 9cm
+}
+visu {
+	Title "non refroidi"
+
+	mesh no_refr/lata/post_cylindre_refroidi.lata DOM
+
+        pseudocolor  no_refr/lata/post_cylindre_refroidi.lata DOM TEMPERATURE ELEM 
+	width 9cm
+}
+
+}
+
+
+
+
+

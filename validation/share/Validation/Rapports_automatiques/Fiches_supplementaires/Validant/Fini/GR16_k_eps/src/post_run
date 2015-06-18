@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Donnees issues de : Compte rendu d'essais GR16 (2eme campagne d'essais), A. Marechal, D. Andreolety, G. Berrebi, F. Girard, NT STT/LTHI/90/184, juillet 1990
+# Section d'essais
+S=0.01624
+# Perimetre d'essais
+P=1.514965
+# Longueur entre les barres anti-vobratoires
+L=1.2
+
+# Donnees issues du JDD
+g=`grep "gravite " GR16.data | awk '{print -$NF}'`
+rho=`grep "rho *.*Champ*" GR16.data | awk '{print $NF}'`
+mu=`grep "mu *.*Champ*" GR16.data | awk '{print $NF}'`
+lambda=`grep "lambda *.*Champ*" GR16.data | awk '{print $NF}'`
+Cp=`grep "Cp *.*Champ*" GR16.data | awk '{print $NF}'`
+beta=`grep "beta_th *.*Champ*" GR16.data | awk '{print $NF}'`
+
+# Calcul de la vitesse moyenne
+# Je recupere le numero de colonne de la sortie
+titres=`head -3 GR16_pb_Debit.out | tail -1`
+i=0
+for titre in $titres
+do
+   if [[ "$titre" == "OUT" ]]
+   then
+      col=$i
+   fi
+   ((i=i+1))
+done
+
+# Je releve le débit en sortie et calcul la vitesse moyenne
+Q=`tail -1 GR16_pb_Debit.out | awk '{print $'$col'}'`
+U=`awk "BEGIN{print \$Q/$S}"`
+
+# Calcul du diametre hydraulique
+Dh=`awk "BEGIN {print 4*$S/$P}"`
+
+# Calcul de la difference de temperature entre la surface d'un tube et le centre du sous-canal voisin
+Trod=`tail -1 GR16_SONDE_TM_ROD_3.son | awk '{print $7}'`
+Tchannel=`tail -1 GR16_SONDE_TM_PIN_1.son | awk '{print $2}'`
+DT=`awk "BEGIN {print $Trod-$Tchannel}"`
+
+# Calcul du nombre de Reynolds
+Re=`awk "BEGIN {printf \"%.4f\",$rho*$U*$Dh/$mu}"`
+
+# Calcul du nombre de Prandtl
+Pr=`awk "BEGIN {printf \"%.4f\",$mu*$Cp/$lambda}"`
+
+# Calcul du nombre de Peclet
+Pe=`awk "BEGIN {printf \"%.4f\",$Re*$Pr}"`
+
+# Calcul du nombre de Richardson
+Ri=`awk "BEGIN {printf \"%.4f\",2*$g*$beta*$DT*$L/$U/$U}"`
+
+echo "Reynolds	Prandlt		Pecle		Richardson" > Nombre.txt
+echo "$Re     $Pr	     $Pe     $Ri" >> Nombre.txt
+
+
+# Calcul des performances
+cas=`pwd | awk -F"build/" '{print $2"/GR16"}'`
+host=`hostname`
+sys=`uname | awk '{print $1}'`
+par_pdt=`grep "Secondes / pas de temps" GR16.TU| awk 'BEGIN {time=0} {time=$NF} END {print time}'`
+nb_elem=`grep -E "Nombre total d'elements|Total number of elements"  GR16.err| awk '{print $NF}'`
+nbligne=`wc -l GR16.dt_ev | awk '{print $1}'`
+tot=`awk "BEGIN{print $nbligne*$par_pdt}"`
+echo $cas $host $sys $tot $par_pdt $nb_elem > GR16.perf
+echo "#cas host systeme temps_total temps_par_pdt nb_elem" >> GR16.perf

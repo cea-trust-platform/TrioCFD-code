@@ -1,0 +1,7 @@
+#!/bin/bash
+for fact in `find . -name '*'.factforme`
+do
+dir=`dirname $fact`
+paste $dir/*.facesrayo $fact  >$dir/RIJ
+done
+

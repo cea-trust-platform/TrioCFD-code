@@ -1,0 +1,36 @@
+dimension 3
+Domaine dom1
+domaine dom_icem
+Read_unsupported_ASCII_file_from_ICEM dom_icem trio_DOM_geo.asc
+Dilate dom_icem 0.001
+
+extrudebord 
+{
+	domaine_init dom_icem 
+	direction 0 0.4 0
+	nb_tranches 2
+	domaine_final dom1
+	nom_bord TOP
+}
+Domaine dom2
+extrudebord 
+{
+	domaine_init dom_icem 
+	direction 0 -0.4 0
+	nb_tranches 2
+	domaine_final dom2
+	nom_bord LOW
+}
+
+Domaine dom
+Supprime_bord dom_icem { TOP LOW }
+Supprime_bord dom1 { devant }
+Supprime_bord dom2 { devant }
+
+Mailler dom { domain dom_icem , domain dom1 , domain dom2 }
+Transformer dom x y+0.4 z
+Corriger_frontiere_periodique { Domaine dom Bord PERX }
+Corriger_frontiere_periodique { Domaine dom Bord PERZ }
+
+ecrire_fichier dom dom.geom
+End

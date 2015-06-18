@@ -1,0 +1,175 @@
+# Hydraulique 3D laminaire : schema upwind #
+# PARALLEL ONLY 8 #
+# lance_test 2 ecarts #
+dimension 3
+Probleme_FT_Disc_gen pb1
+Domaine dom_pb1
+
+Scatter dom.Zones dom_pb1
+
+VDF dis
+
+schema_euler_explicite  sch
+Read sch
+{
+	tinit 0.0
+	nb_pas_dt_max 3
+	tmax  1.5
+	dt_min 1.e-10
+	dt_max 0.005
+	dt_impr 0.2
+	dt_sauv 10.
+	seuil_statio -1.e-8
+	facsec 1
+}
+
+Fluide_Incompressible eau
+Read eau
+{
+	mu Champ_Uniforme 1 2.82e-4
+	rho Champ_Uniforme 1 1000.
+}
+
+Fluide_Incompressible air
+Read air
+{
+	mu Champ_Uniforme 1 2.82e-5
+	rho Champ_Uniforme 1 10.
+}
+
+Fluide_Diphasique fluide
+Read fluide
+{
+	fluide0 eau
+	fluide1 air
+	sigma  Champ_Uniforme 1 0.
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0. -9.81 0.
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+
+Associate pb1 hydraulique
+Associate pb1 interf
+Associate pb1 dom_pb1
+Associate pb1 sch
+Associate pb1 fluide
+
+System "mkdir -p lata"
+
+Discretize pb1 dis
+Read pb1
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               1.e-16
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { optimized precond ssor { omega 1.6 } seuil 1.e-10 impr }
+	convection           { quick }
+	diffusion            { }
+	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+	equation_interfaces_proprietes_fluide interf
+	boundary_conditions
+	{
+		Haute	Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		Paroi	paroi_fixe
+	}
+#	terme_gravite rho_g #
+}
+interf
+{
+	conditions_initiales {
+           fonction
+ y-0.05+((y-SQRT((x+0.001)*(x+0.001)+z*z))>(0.05-0.055))*(SQRT((x+0.001)*(x+0.001)+z*z)-0.055-y+0.05)+((y-SQRT((x+0.001)*(x+0.001)+z*z))>(0.2-0.055))*(-SQRT((x+0.001)*(x+0.001)+z*z)+0.055+y-0.2)
+        }
+	methode_transport vitesse_interpolee hydraulique
+        iterations_correction_volume 0
+        n_iterations_distance 2
+	remaillage {
+                pas 1.e-4
+                nb_iter_remaillage 2
+                critere_arete 0.5
+                critere_remaillage 0.2
+                pas_lissage 1.e-5
+                lissage_courbure_iterations 3
+                lissage_courbure_coeff -0.05
+                nb_iter_barycentrage 3
+                relax_barycentrage 1.
+                facteur_longueur_ideale 0.9
+                nb_iter_correction_volume 1
+                seuil_dvolume_residuel 1e-12		
+	}
+        collisions {
+                    active
+                    juric_pour_tout
+                    type_remaillage
+                    Thomas { distance_interface_element_max 1 }	
+	}
+	boundary_conditions
+	{
+		Haute	Paroi_FT_disc symetrie
+		Paroi	Paroi_FT_disc symetrie
+	}
+}
+postraitement {
+ champs dt_post 1
+{
+ indicatrice_interf
+ }
+}
+liste_postraitements {
+	postraitement sondes {
+		Definition_champs {
+			hauteur1 Champ_Post_Reduction_0D {
+				methode moyenne_ponderee
+				source transformation {
+					methode formule
+					expression 1 exp(-(x*x+z*z)*1000)*(1-indicatrice_interf_natif_dom_pb1)
+					source Champ_Post_refChamp { Pb_champ pb1 indicatrice_interf }
+                        	}
+			}
+			hauteur2 Champ_Post_Reduction_0D {
+				methode moyenne_ponderee
+				source transformation {
+					methode formule
+					expression 1 exp(-(x*x+z*z)*10000)*(1-indicatrice_interf_natif_dom_pb1)
+					source Champ_Post_refChamp { Pb_champ pb1 indicatrice_interf }
+                        	}
+			}
+			hauteur3 Champ_Post_Reduction_0D {
+				methode moyenne_ponderee
+				source transformation {
+					methode formule
+					expression 1 exp(-(x*x+z*z)*100000)*(1-indicatrice_interf_natif_dom_pb1)
+					source Champ_Post_refChamp { Pb_champ pb1 indicatrice_interf }
+                        	}
+			}
+		}
+		Sondes {
+			hauteur1 hauteur1 periode 0.02 points 1 0. 0.1 0.
+			hauteur2 hauteur2 periode 0.02 points 1 0. 0.1 0.
+			hauteur3 hauteur3 periode 0.02 points 1 0. 0.1 0.
+		}
+	}
+	postraitement_ft_lata post1 {
+                dt_post 0.0075
+                nom_fichier lata/post
+                format binaire
+		champs elements { indicatrice_interf }
+		champs faces { vitesse }
+                interfaces interf { champs sommets { courbure } }
+	}
+}
+
+sauvegarde binaire Oscillation_bulle3.rep
+}
+
+Solve pb1
+End

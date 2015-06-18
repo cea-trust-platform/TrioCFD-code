@@ -1,0 +1,48 @@
+#!/bin/bash
+
+mkdir -p EF_stab Muscl Prt_std
+
+if [ ! -f dom01234.geom ]
+then
+   triou Tuyau 1>Tuyau.out 2>Tuyau.err
+fi
+
+# decoupage du domaine de calcul en 4 proc pour optimisation temps de calcul 
+# Recuperation du nombre de processeurs dans le fichier .prm
+NB_PROCS=`awk '/TestCase/ {print $4}' *.prm | sort -u`
+if [ "`echo $NB_PROCS | awk '{print NF}'`" != 1 ]
+then
+   echo "Nombre de processeurs multiple dans le prm impossible !"
+   echo "NB_PROCS=$NB_PROCS" 
+   exit -1
+fi
+sed "s/NB_PROCS/$NB_PROCS/" template_dec.data > dec.data
+triou dec 1>dec.out 2>dec.err
+
+# Creation des donnes des repertoires #
+cd EF_stab
+ln -s -f ../*.Zones . 
+cp ../Tuyau.data .
+cp ../pre_run .
+cp ../Conduite.data .
+cp ../post_run .
+
+cd ../Muscl
+ln -s -f ../*.Zones . 
+cp ../Tuyau.data .
+cp ../pre_run .
+cp ../Conduite.data .
+cp ../post_run .
+sed "s/convection { EF_stab { } }/convection { muscl }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ../Prt_std
+ln -s -f ../*.Zones .
+cp ../Tuyau.data .
+cp ../pre_run .
+cp ../Conduite.data .
+cp ../post_run .
+sed "/Prandt_turbulent_fonction_nu_t_alpha/d" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ..

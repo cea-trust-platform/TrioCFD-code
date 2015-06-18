@@ -1,0 +1,101 @@
+#!/bin/bash
+
+gunzip -c 3dmesh.geom.gz > 3dmesh.geom
+
+mkdir -p 2d_vdf_scz_1
+mkdir -p 2d_vdf_scz_2_5
+mkdir -p 2d_vdf_scz_5
+mkdir -p 2d_vdf_scz_7_5
+mkdir -p 2d_vdf_scz_10
+
+mkdir -p 3d_vef_scz_1
+mkdir -p 3d_vef_scz_2_5
+mkdir -p 3d_vef_scz_5
+mkdir -p 3d_vef_scz_7_5
+mkdir -p 3d_vef_scz_10
+
+cd 2d_vdf_scz_1
+cp ../2d_vdf_scz.data ./generique.data
+#cp ../post_run .
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 1./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 1./" generique.data > 2d_vdf_scz.data
+rm generique.data
+cp ../post_run .
+
+cd ../2d_vdf_scz_2_5
+cp ../2d_vdf_scz.data ./generique.data
+#cp ../post_run .
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 1./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 2.5/" generique.data > 2d_vdf_scz.data
+rm generique.data
+cp ../post_run .
+
+cd ../2d_vdf_scz_5
+cp ../2d_vdf_scz.data ./generique.data
+#cp ../post_run .
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 1./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 5./" generique.data > 2d_vdf_scz.data
+rm generique.data
+cp ../post_run .
+
+cd ../2d_vdf_scz_7_5
+cp ../2d_vdf_scz.data ./generique.data
+#cp ../post_run .
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 1./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 7.5/" generique.data > 2d_vdf_scz.data
+rm generique.data
+cp ../post_run .
+
+cd ../2d_vdf_scz_10
+cp ../2d_vdf_scz.data ./generique.data
+#cp ../post_run .
+sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 1./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  0. 10./" generique.data > 2d_vdf_scz.data
+rm generique.data
+cp ../post_run .
+
+
+cd ../3d_vef_scz_1
+cp ../3d_vef_scz.data ./generique.data
+cp ../3dmesh.geom ./3dmesh.geom
+#cp ../post_run .
+sed "s/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0/" generique.data > 3d_vef_scz.data
+rm generique.data
+cp ../post_run3d ./post_run
+
+cd ../3d_vef_scz_2_5
+cp ../3d_vef_scz.data ./generique.data
+cp ../3dmesh.geom ./3dmesh.geom
+#cp ../post_run .
+sed "s/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 2.5/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/tmax 8.0/tmax 4.0/" generique.data > 3d_vef_scz.data
+rm generique.data
+cp ../post_run3d ./post_run
+
+
+cd ../3d_vef_scz_5
+cp ../3d_vef_scz.data ./generique.data
+cp ../3dmesh.geom ./3dmesh.geom
+#cp ../post_run .
+sed "s/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 5.0/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/tmax 8.0/tmax 2.0/" generique.data > 3d_vef_scz.data
+rm generique.data
+cp ../post_run3d ./post_run
+
+cd ../3d_vef_scz_7_5
+cp ../3d_vef_scz.data ./generique.data
+cp ../3dmesh.geom ./3dmesh.geom
+#cp ../post_run .
+sed "s/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 7.5/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/tmax 8.0/tmax 2.0/" generique.data > 3d_vef_scz.data
+rm generique.data
+cp ../post_run3d ./post_run
+
+cd ../3d_vef_scz_10
+cp ../3d_vef_scz.data ./generique.data
+cp ../3dmesh.geom ./3dmesh.geom
+#cp ../post_run .
+sed "s/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 1.0/cl_39 frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 10.0/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/tmax 8.0/tmax 2.0/" generique.data > 3d_vef_scz.data
+rm generique.data
+cp ../post_run3d ./post_run
+

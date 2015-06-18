@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cp marche_VEF_muscl.data marche_VEF_muscl_piso.data
+sed "s/Piso/Implicite/" marche_VEF_muscl_piso.data > marche_VEF_muscl_implicite.data
+sed "s/Piso/Simple/" marche_VEF_muscl_piso.data > marche_VEF_muscl_simple.data
+sed "s/seuil_convergence_solveur 1.e-8/seuil_convergence_solveur 1.e-8 relax_pression 0.1/" marche_VEF_muscl_simple.data > marche_VEF_muscl_simple_tmp.data
+mv marche_VEF_muscl_simple_tmp.data marche_VEF_muscl_simple.data
+
+sed "s/facsec_max 30/facsec_max 500/" marche_VEF_muscl_piso.data > marche_VEF_muscl_piso_facsecmax500.data
+sed "s/facsec_max 30/facsec_max 500/" marche_VEF_muscl_implicite.data > marche_VEF_muscl_implicite_facsecmax500.data
+sed "s/facsec_max 30/facsec_max 500/" marche_VEF_muscl_simple.data > marche_VEF_muscl_simple_facsecmax500.data
+
+sed "s/relax_pression 0.1/relax_pression 0.2/" marche_VEF_muscl_simple.data > marche_VEF_muscl_simple_relax0.2.data
+sed "s/relax_pression 0.1/relax_pression 0.01/" marche_VEF_muscl_simple.data > marche_VEF_muscl_simple_relax0.01.data
+sed "s/relax_pression 0.1/relax_pression 0.001/" marche_VEF_muscl_simple.data > marche_VEF_muscl_simple_relax0.001.data
+
+sed "s/seuil_convergence_solveur 1.e-8/seuil_convergence_solveur 1.e-8 nb_corrections_max 2/" marche_VEF_muscl_piso.data > marche_VEF_muscl_piso_nb_proj2.data
+
+cp marche_VEF_muscl.data marche_VEF_muscl_explicite.data
+sed "s/Associate pb sch_imp/Associate pb sch/" marche_VEF_muscl_explicite.data > marche_VEF_muscl_explicite_tmp.data
+mv marche_VEF_muscl_explicite_tmp.data marche_VEF_muscl_explicite.data

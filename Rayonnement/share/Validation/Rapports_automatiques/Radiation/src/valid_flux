@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo usage $0 cas bord 
+cas=$1
+bord=$2
+ paste ${cas}_Flux_radiatif.out ${cas}_*_Diffusion_chaleur.out >2.out
+awk  -v bord=$bord 'BEGIN  {m=1;printf("plot ");tot="\"2.out\" u 1:("};{for (i=1;i<NF;i++) {if ($i==bord) {printf("\"2.out\" u 1:%d ,", i-m);tot=tot"+$"(i-m) ; m=m+1 } }} END {printf("%s) w lines\npause -1\n",tot);}' 2.out | tee > verif.gnu
+
+gnuplot "verif.gnu"

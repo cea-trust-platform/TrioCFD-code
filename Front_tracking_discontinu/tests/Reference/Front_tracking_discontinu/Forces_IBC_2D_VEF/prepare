@@ -1,0 +1,12 @@
+# Creation des maillages par Gmsh
+#rm -f *.med
+for file in  cavite_sans_disque.geo cavite_avec_disque.geo # disque.geo
+do
+   file=${file%.geo}
+   echo "$file..."
+   # gmsh -2 $file.geo -order 1 -clscale 1. -clmin 1.e-99 -clmax 1.e+22 -format med 1>$file.log 2>&1
+   gunzip -c $file.med.gz > $file.med
+   [ $? != 0 ] && echo "KO, see $file.log" && exit -1
+done
+
+triou Forces_NO_IBC_2D_VEF

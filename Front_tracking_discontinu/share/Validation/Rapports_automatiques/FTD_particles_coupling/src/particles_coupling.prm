@@ -1,0 +1,176 @@
+Parameters {
+	Title "One way and two way coupling validation (VDF-VEF)"
+	Description "Account for fluid effetcs on a particle in a column and"
+	Description "then account for reaction effect and two way coupling"
+	Author "M. Elmo"
+	TestCase "one_way_steady_VDF" "one_way_steady_VDF.data"
+	TestCase "one_way_steady_VEF" "one_way_steady_VEF.data"
+	TestCase "one_way_unsteady_VDF" "one_way_unsteady_VDF.data"
+	TestCase "one_way_unsteady_VEF" "one_way_unsteady_VEF.data"
+	TestCase "reverse_way_VDF" "reverse_way_VDF.data"
+	TestCase "reverse_way_VEF" "reverse_way_VEF.data"
+	TestCase "two_way_VEF" "two_way_VEF.data"
+}
+
+
+Chapter {
+	Title "Case of one way coupling with a steady fluid velocity field"
+	Description "Account for drag and buoyancy effects on a particle in a column"
+Figure {
+	Title "Time evolution of the particule position"
+	Dimension 2
+	LabelX "time (s)"
+	LabelY "z (m)"
+	Curve {
+		legend "VDF"
+		origin "Trio_U"
+		Version "1.5.4+IBC+particules (triou_particules)"
+		file ./one_way_steady_VDF/val_out
+		columns $1 $4
+	Style lines
+	}
+	Curve {
+		legend "VEF"
+		origin "Trio_U"
+		Version "1.5.4+IBC+particules (triou_particules)"
+		file ./one_way_steady_VEF/val_out
+		columns $1 $4
+	Style points
+	
+	}
+	Curve {
+		legend "Analytic solution"
+		origin "Analytic"
+		file ./one_way_steady_VDF/val_out
+		columns $1 $5
+	Style lines
+	}
+}
+
+
+
+
+}
+
+Chapter {
+	Title "Case of one way coupling with an unsteady fluid velocity field"
+	Description "Account for added mass effect on a particle in a column"
+Figure {
+	Title "Time evolution of the particule position"
+	Dimension 2
+	LabelX "time (s)"
+	LabelY "z (m)"
+	Curve {
+		legend "VDF"
+		origin "Trio_U"
+		Version "1.5.4+IBC+particules (triou_particules)"
+		file ./one_way_unsteady_VDF/val_out
+		columns $1 $4
+	Style lines
+	}
+	Curve {
+		legend "VEF"
+		origin "Trio_U"
+		Version "1.5.4+IBC+particules (triou_particules)"
+		file ./one_way_unsteady_VEF/val_out
+		columns $1 $4
+	Style points
+	
+	}
+	Curve {
+		legend "Analytic solution"
+		origin "Analytic"
+		file ./one_way_unsteady_VDF/val_out
+		columns $1 $5
+	Style lines
+	}
+}
+
+}
+
+Chapter {
+	Title "Case of reverse way coupling with a steady particle velocity field"
+	Description "Account for particle effect on the fluid in a column"
+
+visu {
+	Title "Focus at location of the particle position"
+	description "particle location and fluid velocity (VDF)"
+	
+	vector reverse_way_VDF/reverse_way_VDF.lata dom VITESSE SOM
+	molecule reverse_way_VDF/marqueurs.lata PARTICULES DIAMETRE som 0.01
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1. 
+	zoom3D -0.00578704 0.0180124 3.72685
+}
+
+visu {
+	Title "Focus at location of the particle position"
+	description "particle location and fluid velocity (VEF)"
+	
+	vector reverse_way_VEF/reverse_way_VEF.lata  dom VITESSE SOM
+	molecule reverse_way_VEF/marqueurs.lata PARTICULES DIAMETRE som 0.01
+	#operator_to_all slice2d 0.105 0.105 0.5  0. 1. 0. 
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1. 
+	zoom3D -0.00578704 0.0180124 3.72685
+      
+}
+
+}
+
+
+Chapter {
+	Title "Case of two way coupling "
+	Description "Account for two way coupling between fluid and particles in a column"
+
+visu {
+	Title "Initial time (t=0)"
+	description "particles positions and fluide velocity VEF"
+        
+        mesh two_way_VEF/marqueurs.lata PARTICULES
+	pseudocolor_with_opacity two_way_VEF/two_way_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	#blackvector two_way_VEF/marqueurs.lata dom VITESSE SOM
+	cycles -21  
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.25)"
+	description "particles positions and fluid velocity VEF"
+      
+        mesh two_way_VEF/marqueurs.lata PARTICULES
+	pseudocolor_with_opacity two_way_VEF/two_way_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	#blackvector two_way_VEF/marqueurs.lata dom VITESSE som
+	cycles -16
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.
+
+}
+
+visu {
+	Title "Transient time (t=0.75)"
+	description "particles positions and fluid velocity VEF"
+        
+        mesh two_way_VEF/marqueurs.lata PARTICULES
+	pseudocolor_with_opacity two_way_VEF/two_way_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
+	#blackvector two_way_VEF/marqueurs.lata dom VITESSE SOM
+	cycles -6  
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.   
+}
+
+visu {
+	Title "Transient time (t=0.1)"
+	description "focus on the fluid velocity in the up part of the domain"
+        
+        #mesh two_way_VEF/marqueurs.lata PARTICULES
+	vector two_way_VEF/two_way_VEF.lata dom VITESSE SOM
+	cycles -19  
+	normal3D 0. 1. 0.
+	up3D 0. 0. 1.
+	zoom3D   -0.0109954 -0.239752 2
+}
+
+
+}

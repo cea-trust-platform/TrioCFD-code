@@ -1,0 +1,139 @@
+Parameters {
+        Title verification reactions concurentes
+        Description Calculs menes en VDF
+        Author G.F.
+
+  TestCase iod02-7 iod02-7.data 
+  TestCase iod02-8 iod02-8.data 
+  TestCase iod02-9 iod02-9.data 
+  TestCase iod02-10 iod02-10.data 
+  TestCase iod02-11 iod02-11.data 
+  TestCase iod02-12 iod02-12.data 
+  TestCase iod02-7b iod02-7b.data 
+ 
+}
+Chapter {
+
+        Title H20
+	Figure {
+	Include_Description_Curves 0
+	dimension 2
+Curve {
+	file iod02-7b/iod02-7b_H2O.son
+	legend dt=1e-7b
+	}
+Curve {
+	file iod02-7/iod02-7_H2O.son
+	legend dt=1e-7
+	}
+Curve {
+	file iod02-8/iod02-8_H2O.son
+	legend dt=1e-8
+	}
+Curve {
+	file iod02-9/iod02-9_H2O.son
+	legend dt=1e-9
+	}
+Curve {
+	file iod02-10/iod02-10_H2O.son
+	legend dt=1e-10
+	}
+Curve {
+	file iod02-11/iod02-11_H2O.son
+	legend dt=1e-11
+	}
+Curve {
+	file iod02-12/iod02-12_H2O.son
+	legend dt=1e-12
+	}
+}  
+
+        Title H20
+	Figure {
+	Include_Description_Curves 0
+	dimension 2
+logx 
+logy
+Curve {
+	file iod02-7b/iod02-7b_H2O.son
+	legend dt=1e-7b
+	}
+Curve {
+	file iod02-7/iod02-7_H2O.son
+	legend dt=1e-7
+	}
+Curve {
+	file iod02-8/iod02-8_H2O.son
+	legend dt=1e-8
+	}
+Curve {
+	file iod02-9/iod02-9_H2O.son
+	legend dt=1e-9
+	}
+Curve {
+	file iod02-10/iod02-10_H2O.son
+	legend dt=1e-10
+	}
+Curve {
+	file iod02-11/iod02-11_H2O.son
+	legend dt=1e-11
+	}
+Curve {
+	file iod02-12/iod02-12_H2O.son
+	legend dt=1e-12
+	}
+}  
+Table {
+	    nb_columns 1
+            label H20 final 
+line {
+	file iod02-7b/iod02-7b_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-7b
+	}
+line {
+	file iod02-7/iod02-7_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-7
+	}
+line {
+	file iod02-8/iod02-8_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-8
+	}
+line {
+	file iod02-9/iod02-9_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-9
+	}
+line {
+	file iod02-10/iod02-10_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-10
+	}
+line {
+	file iod02-11/iod02-11_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-11
+	}
+line {
+	file iod02-12/iod02-12_H2O.son
+        last_line
+        nb_columns_file 2
+        columns ($2)
+	legend dt=1e-12
+	}
+ }
+ }

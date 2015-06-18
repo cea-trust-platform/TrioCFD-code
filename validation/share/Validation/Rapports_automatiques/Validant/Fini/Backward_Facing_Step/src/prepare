@@ -1,0 +1,5 @@
+#!/bin/bash
+sed "s/centre4/quick/" marche_VDF_centre.data > marche_VDF_quick.data
+sed "s/ef_stab { }/muscl/" marche_VEF_efstab.data > marche_VEF_muscl.data
+sed "s/loi_standard_hydr / loi_expert_hydr { methode_calcul_face_keps_impose QUE_LES_FACES_DES_ELTS_DIRICHLET } /" marche_VEF_efstab.data > marche_VEF_efstab2.data
+sed "s/ef_stab { }/ EF_stab { alpha 0.2 }/" marche_VEF_efstab.data > marche_VEF_efstab_alpha02.data

@@ -1,0 +1,4 @@
+#!/bin/bash
+extrait_coupe poise_tetra SONDE_V_SORTIE_VERT
+extrait_coupe poise_tetra SONDE_V_SORTIE_HOR
+python ../moyenneSonde.py './poise_tetra_SONDE_V_SORTIE_HOR.coupe' './poise_tetra_SONDE_V_SORTIE_VERT.coupe'

@@ -1,0 +1,146 @@
+# Boite 3D avec periodicite dans les trois directions : Test de la THI et des calculs de spectre #
+# ainsi que du schema de convection centre pour un scalaire #
+# PARALLEL OK #
+
+dimension 3
+
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+        Pave Entree 
+        {
+        Origine 0. 0. 0.
+        Nombre_de_Noeuds 17 17 17
+        Longueurs 6.283185307 6.283185307 6.283185307
+        }
+        {
+        Bord periox X = 0. 0. <= Y <= 6.283185307 0. <= Z <= 6.283185307 
+        Bord periox X = 6.283185307 0. <= Y <= 6.283185307 0. <= Z <= 6.283185307 
+        Bord perioy Y = 0. 0. <= X <= 6.283185307 0. <= Z <= 6.283185307 
+        Bord perioy Y = 6.283185307 0. <= X <= 6.283185307 0. <= Z <= 6.283185307 
+        Bord perioz Z = 0. 0. <= X <= 6.283185307 0. <= Y <= 6.283185307 
+        Bord perioz Z = 6.283185307 0. <= X <= 6.283185307 0. <= Y <= 6.283185307       
+
+        }
+}
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 2 2 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+	Periodique 3 periox perioy perioz
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+
+
+VDF dis
+
+
+Runge_Kutta_ordre_3 sch
+
+Lire sch
+{
+	tinit 0
+	tmax 10.
+        dt_min 1.e-4
+        dt_max 0.1
+        dt_impr 0.01
+        dt_sauv 10.
+        seuil_statio 1.e-8
+	nb_pas_dt_max 3
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu Champ_Uniforme 1 2e-20
+	rho Champ_Uniforme 1 2
+	lambda Champ_Uniforme	1 22.1e-2
+	Cp Champ_Uniforme 1 2596.5
+	beta_th Champ_Uniforme	1 1.9954e-3
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 0 0
+
+Associate air gravite
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Lire pb
+{
+        Navier_Stokes_turbulent
+
+        {
+                solveur_pression Gcp { precond ssor { omega 1.5 }
+                                        seuil 1.e-12
+                                        impr
+                                        }       
+                convection { centre }
+                diffusion  { } 
+                conditions_initiales { vitesse Champ_som_lu_VDF dom 3 1e-8 ./champ_ki5_16 }
+                boundary_conditions {
+periox periodique 
+perioy periodique 
+perioz periodique 
+                        
+                }
+
+
+                Traitement_particulier { THI_thermo { init_Ec 1 val_Ec 1.5 facon_init 0
+                                               calc_spectre 1 } } 
+
+		Modele_Turbulence Sous_maille_wale {
+                      	Cw 0.5
+                    	Turbulence_paroi loi_standard_hydr
+		}
+                       
+        }
+	
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { }
+		convection { centre4 }
+		Modele_turbulence Prandtl { turbulence_paroi negligeable_scalaire }
+		boundary_conditions
+			{
+periox periodique 
+perioy periodique 
+perioz periodique 
+			}
+		conditions_initiales { Temperature Champ_som_lu_VDF dom 1 1e-5 ./champ_ki5_16_temp }
+		}
+
+
+        Postraitement
+        {
+                Sondes
+                {
+                        sonde_pression pression periode 10. points 1 3.14 3.14 3.14
+                        sonde_vitesse_x vitesse periode 10. segment 32 0.00 3.14 3.14
+                                                                         6.28 3.14 3.14
+                }
+                Champs dt_post 20.
+                {
+                        vitesse elem
+			temperature elem
+                }
+        }
+}
+Solve pb
+Fin
+

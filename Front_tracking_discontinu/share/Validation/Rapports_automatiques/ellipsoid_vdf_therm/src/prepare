@@ -1,0 +1,6 @@
+mkdir -p nopena
+
+cp pena/* nopena/
+chmod +w nopena/*
+grep -v  "# CAS PENA #" pena/ellipsoid_vdf_therm.data > nopena/ellipsoid_vdf_therm.data
+

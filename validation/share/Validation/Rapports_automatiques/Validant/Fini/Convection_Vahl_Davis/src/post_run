@@ -1,0 +1,12 @@
+#!/bin/bash
+#recuperation des donnees physiques
+python ../../propertiesGeometry.py
+cp propertiesGeometry.dat ../..
+#recupeartion des donnees de vitesse
+extrait_coupe test SONDE_VIT0
+extrait_coupe test SONDE_VIT1
+
+
+# Calcul des valeurs max
+python ../../extraitMax.py 1 300.5 299.5
+cp vitesseMaxAdim.dat ../..

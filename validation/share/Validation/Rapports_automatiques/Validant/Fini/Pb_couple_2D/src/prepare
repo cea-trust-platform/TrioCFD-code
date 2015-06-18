@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#Creation des repertoires test 1
+mkdir -p ./VDF_di_0
+mkdir -p ./VEF_di_0
+#############
+RACINE=`pwd`
+
+echo $RACINE
+
+
+#####################
+##################### 
+#####################
+#
+cd $RACINE/VDF_di_0
+cp $RACINE/test.data .
+cp $RACINE/post_run .
+#
+cd $RACINE/VEF_di_0
+cp $RACINE/test.data .
+sed "s/3 10/3 5/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# Trianguler dom_acier #/Trianguler dom_acier /" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# Trianguler dom_fluide #/Trianguler dom_fluide /" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VDF dis/VEFPreP1B dis/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# VerifierCoin dom_fluide { } #/VerifierCoin dom_fluide { }/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# VerifierCoin dom_acier { } #/VerifierCoin dom_acier { }/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

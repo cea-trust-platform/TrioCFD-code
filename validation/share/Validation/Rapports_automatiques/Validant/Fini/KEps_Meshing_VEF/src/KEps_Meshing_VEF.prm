@@ -1,0 +1,1025 @@
+Parameters {
+	Title "Meshing tests for 3D VEF-plane channel with k-$\epsilon$ model"
+	Description "Meshing tests (different stretching factors - primary prismatic elements near the walls) for a turbulent flow in a bi-periodic plane channel"
+	Description "k-$\epsilon$ modelling with wall function"
+	Description "Validation with : analytical laws"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent
+	ParametersTrio_U Diffusion scheme : Default{}
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Euler_implicite - Solveur Implicite
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent"
+	ParametersTrio_U Convection : EF_stab  
+	ParametersTrio_U Turbulence model : "k-$\epsilon$ model"
+	ParametersTrio_U Wall law : "loi_standard_hydr (similar to loi_expert_hydr {  methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet })"
+	ParametersTrio_U Type of boundary conditions : Periodicity in x (and z for 3D) direction, wall for y boundaries
+
+	TestCase "3D_6_keps_f1g1" "3D_keps.data" /**/
+	TestCase "3D_6_keps_f15g10" "3D_keps.data"
+	TestCase "3D_6_keps_f35g25" "3D_keps.data"
+	TestCase "3D_6_keps_f40g1" "3D_keps.data"
+	TestCase "3D_6_keps_f100g1" "3D_keps.data" 
+	TestCase "3D_6_keps_f300g1" "3D_keps.data"
+	TestCase "3D_6_keps_f300g100" "3D_keps.data"
+	TestCase "3D_6_keps_f100g100" "3D_keps.data"
+	TestCase "3D_6_keps_f300g300 " "3D_keps.data"
+	
+	TestCase "3D_21_keps_f1g1" "3D_keps.data"
+	TestCase "3D_21_keps_f15g10" "3D_keps.data"
+	TestCase "3D_21_keps_f35g25" "3D_keps.data"
+	TestCase "3D_21_keps_f40g1" "3D_keps.data"
+
+	TestCase "3D_21_keps_f100g1" "3D_keps.data" 
+	TestCase "3D_21_keps_f300g1" "3D_keps.data"
+	TestCase "3D_21_keps_f300g100" "3D_keps.data"
+	TestCase "3D_21_keps_f100g100" "3D_keps.data"
+	TestCase "3D_21_keps_f300g300 " "3D_keps.data"
+
+	TestCase "2prismes_f1g1 " "3D_keps.data "
+	TestCase "2prismes_f15g10 " "3D_keps.data "
+	TestCase "3prismes_f1g1" "3D_keps.data "
+	TestCase "4prismes_f1g1 " "3D_keps.data "
+	TestCase "4prismes_f15g10 " "3D_keps.data "
+	
+	Reference "Reichardt H. : Vollstaendige Darstellung der turbulenten Geschwindigkeitsverteliung in glatten Leitungen. ZAMM 31, 208-219 (1951)"
+	Reference "http://www.sla.maschinenbau.tu-darmstadt.de/lehre/tms/Turbulence-TUDarmstadt-Pt2-6.pdf"
+	
+	Author "C. Fournier"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Meshes:"
+	Description "- TrioU meshes: tetraedriser_homogene_fin (Ny=2, 6 or 21, Nx=3, Nz=3) with different stretching factor in x direction \latex_($f=\frac{\Delta x}{\Delta y}$\latex_) and z direction \latex_($g=\frac{\Delta z}{\Delta y}$\latex_)"
+	Description "- In order to complete the study of mesh sensibility, we consider irregular meshes (in opposition to tetraedriser_homogene_fin meshes). It is not easy to obtain good friction velocities with this type of mesh. We test meshes with two, three or four regular layers of cells near the walls in order to improve the boundary layer description. These regular layers are obtained with primary prismatic elements  (ICEM mesh + TrioU process). Each prism is cut in 14 tetrahedral elements."
+
+	Description ""
+	Description "Dimensions:"
+	Description "h=2 ; Lx=Lz=4. (for mesh 3x2x3) or Lx=Lz=0.2 (for mesh 3x21x3) or Lx=Lz=0.8 (for other meshes)"
+	Description ""
+	Description "Initial conditions : Ux=10m/s"
+	Description "Boundary conditions : the periodicity conditions need a source term to maintain the flow constant"
+	Description "Canal_perio { bord periox }"
+	Description ""
+	Description "Physical properties:"
+	Description " \latex_($\rho = 1 kg/m^3$\latex_)"
+	Description "\latex_($\mu = 0.0001 Pa.s $\latex_) such as Reb = (Ub.h) / v = 100 000 (h=1 m : half-height)"
+
+	visu {
+		Title "Mesh 3 x 6 x 3 - 960 cells"
+		mesh 3D_6_keps_f1g1/3D_keps.lata dom
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+	}
+	visu {
+		Title "Mesh 3 x 21 x 6 - 3840 cells"
+		mesh 3D_21_keps_f1g1/3D_keps.lata dom
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+	}
+	visu {
+		Title "Mesh 2 layers of prisms - 11735 cells"
+		mesh 2prismes_f1g1/3D_keps.lata dom
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+	}
+}
+
+Chapter {
+	Title "Mesh tetraedriser_homogene_fin 3 x 6 x 3 - stretching effects"
+	Description "\latex_($y^+ \sim 285 $\latex_)"
+	Figure {
+		Title "Velocity profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "f=g=1"
+			file ./3D_6_keps_f1g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=15-g=10"
+			file ./3D_6_keps_f15g10/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=35-g=25"
+			file ./3D_6_keps_f35g25/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=40-g=1"
+			file ./3D_6_keps_f40g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=1"
+			file ./3D_6_keps_f100g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=1"
+			file ./3D_6_keps_f300g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=100"
+			file ./3D_6_keps_f100g100/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=100"
+			file ./3D_6_keps_f300g100/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=300"
+			file ./3D_6_keps_f300g300/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+	}
+	
+	Figure {
+		Title "Velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 5000
+		LabelY "U+"
+		RangeY 0 30
+		LogX
+		Include_Description_Curves 0
+		legend below
+		
+		Curve {
+			legend "Reichardt"
+			#Font "Arial,24"
+			Fonction 1/0.415*log(1+0.415*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "f=1-g=1"
+			file ./3D_6_keps_f1g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=15-g=10"
+			file ./3D_6_keps_f15g10/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=35-g=25"
+			file ./3D_6_keps_f35g25/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=40-g=1"
+			file ./3D_6_keps_f40g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=1"
+			file ./3D_6_keps_f100g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=1"
+			file ./3D_6_keps_f300g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=100"
+			file ./3D_6_keps_f100g100/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=100"
+			file ./3D_6_keps_f300g100/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=300"
+			file ./3D_6_keps_f300g300/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+
+	}
+
+	Table {
+		Title "\latex_($Re_{\tau}$\latex_) and pressure loss"
+		nb_columns 5
+		label y+ | \latex_($Re_{\tau}$\latex_) | Relative error | dP/dx | Relative error 
+		line {
+			origin "Trio_U"
+			legend "f=1 g=1 "
+			file ./3D_6_keps_f1g1/ligneTableau.dat
+			columns ($2) ($3) ($4) ($6) ($7)
+			nb_columns_file 7
+		}
+		line {
+			origin "Trio_U"
+			legend "f=15 g=10 "
+			file ./3D_6_keps_f15g10/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=35 g=25 "
+			file ./3D_6_keps_f35g25/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=40 g=1 "
+			file ./3D_6_keps_f40g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=100 g=1 "
+			file ./3D_6_keps_f100g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=300 g=1 "
+			file ./3D_6_keps_f300g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=100 g=100 "
+			file ./3D_6_keps_f100g100/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=300 g=100 "
+			file ./3D_6_keps_f300g100/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=300 g=300 "
+			file ./3D_6_keps_f300g300/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}		
+	}
+	Table {
+		Description "(*) : according to Dean's correlation : \latex_($Re_{\tau} = 0.175.Re_b^{7/8}$ \latex_)"		
+	}
+	#Figure {
+		#Titre "Turbulent viscosity "
+		#Width 12cm
+		#Dimension 2
+		#LabelX "y"
+		#RangeX 0 2
+		#LabelY "nut"
+		#RangeY 0 0.08
+		#InclureDescCourbes 0
+		#Legende below
+		#Courbe {
+			#Legende "f=g=1"
+			#Fichier ./3D_6_keps_f1g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=15-g=10"
+			#Fichier ./3D_6_keps_f15g10/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=35-g=25"
+			#Fichier ./3D_6_keps_f35g25/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=40 g=1"
+			#Fichier ./3D_6_keps_f40g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=100 g=1"
+			#Fichier ./3D_6_keps_f100g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=300 g=1"
+			#Fichier ./3D_6_keps_f300g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=100 g=100"
+			#Fichier ./3D_6_keps_f100g100/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=300 g=100"
+			#Fichier ./3D_6_keps_f300g100/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=300 g=300"
+			#Fichier ./3D_6_keps_f300g300/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+	#}
+}
+
+Chapter {
+	Title "Mesh tetraedriser_homogene_fin 3 x 21 x 6 - stretching effects"
+	Description "\latex_($y^+ \sim 70 $\latex_)"
+	Figure {
+		Title "Velocity profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "f=g=1"
+			file ./3D_21_keps_f1g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=15-g=10"
+			file ./3D_21_keps_f15g10/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=35-g=25"
+			file ./3D_21_keps_f35g25/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=40-g=1"
+			file ./3D_21_keps_f40g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=1"
+			file ./3D_21_keps_f100g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=1"
+			file ./3D_21_keps_f300g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=100"
+			file ./3D_21_keps_f100g100/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=100"
+			file ./3D_21_keps_f300g100/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=300"
+			file ./3D_21_keps_f300g300/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			
+		}
+	}
+	Figure {
+		Title "Velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 5000
+		LabelY "U+"
+		RangeY 0 30
+		LogX
+		Include_Description_Curves 0
+		legend below
+		
+		Curve {
+			legend "Reichardt"
+			#Font "Arial,24"
+			Fonction 1/0.415*log(1+0.415*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "f=1-g=1"
+			file ./3D_21_keps_f1g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=15-g=10"
+			file ./3D_21_keps_f15g10/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=35-g=25"
+			file ./3D_21_keps_f35g25/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=40-g=1"
+			file ./3D_21_keps_f40g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=1"
+			file ./3D_21_keps_f100g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=1"
+			file ./3D_21_keps_f300g1/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=100-g=100"
+			file ./3D_21_keps_f100g100/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=100"
+			file ./3D_21_keps_f300g100/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+		Curve {
+			legend "f=300-g=300"
+			file ./3D_21_keps_f300g300/courbe_reichardt.dat
+			columns ($1) ($2)
+			
+		}
+
+	}
+	Table {
+		Title "\latex_($Re_{\tau}$\latex_) and pressure loss"
+		nb_columns 5
+		label y+ | \latex_($Re_{\tau}$\latex_) | Relative error | dP/dx | Relative error 
+		line {
+			origin "Trio_U"
+			legend "f=1 g=1 "
+			file ./3D_21_keps_f1g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=15 g=10 "
+			file ./3D_21_keps_f15g10/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=35 g=25 "
+			file ./3D_21_keps_f35g25/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=40 g=1 "
+			file ./3D_21_keps_f40g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=100 g=1 "
+			file ./3D_21_keps_f100g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=300 g=1 "
+			file ./3D_21_keps_f300g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=100 g=100 "
+			file ./3D_21_keps_f100g100/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=300 g=100 "
+			file ./3D_21_keps_f300g100/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "f=300 g=300 "
+			file ./3D_21_keps_f300g300/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}		
+	}
+	
+	#Figure {
+		#Titre "Turbulent viscosity "
+		#Width 12cm
+		#Dimension 2
+		#LabelX "y"
+		#RangeX 0 2
+		#LabelY "nut"
+		#RangeY 0 0.08
+		#InclureDescCourbes 0
+		#Legende below
+		#Courbe {
+			#Legende "f=g=1"
+			#Fichier ./3D_21_keps_f1g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=15-g=10"
+			#Fichier ./3D_21_keps_f15g10/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=35-g=25"
+			#Fichier ./3D_21_keps_f35g25/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=40-g=1"
+			#Fichier ./3D_21_keps_f40g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=100-g=1"
+			#Fichier ./3D_21_keps_f100g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=300-g=1"
+			#Fichier ./3D_21_keps_f300g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=100-g=100"
+			#Fichier ./3D_21_keps_f100g100/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=300-g=100"
+			#Fichier ./3D_21_keps_f300g100/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "f=300-g=300"
+			#Fichier ./3D_21_keps_f300g300/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+	#}
+}
+
+Chapter {
+	Title "Mesh generated near walls with primary prisms - stretching effects"
+	Description "\latex_($y^+ \sim 54 $\latex_)"
+	Figure {
+		Title "Velocity profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "2 layers of prisms"
+			file ./2prismes_f1g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "2 layers of prisms - f=15-g=10"
+			file ./2prismes_f15g10/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+		}
+		Curve {
+			legend "3 layers of prisms"
+			file ./3prismes_f1g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+		}
+		Curve {
+			legend "4 layers of prisms"
+			file ./4prismes_f1g1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "4 layers of prisms - f=15-g=10"
+			file ./4prismes_f15g10/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+	Figure {
+		Title "Velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 1 5000
+		LabelY "U+"
+		RangeY 0 30
+		LogX
+		Include_Description_Curves 0
+		legend below
+		
+		Curve {
+			legend "Reichardt"
+			#Font "Arial,24"
+			Fonction 1/0.415*log(1+0.415*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "2 layers of prisms"
+			file ./2prismes_f1g1/courbe_reichardt.dat
+			columns ($1) ($2)
+		}
+		Curve {
+			legend "2 layers of prisms - f=15-g=10"
+			file ./2prismes_f15g10/courbe_reichardt.dat
+			columns ($1) ($2)
+		}
+		Curve {
+			legend "3 layers of prisms"
+			file ./3prismes_f1g1/courbe_reichardt.dat
+			columns ($1) ($2)
+		}
+		Curve {
+			legend "4 layers of prisms"
+			file ./4prismes_f1g1/courbe_reichardt.dat
+			columns ($1) ($2)
+		}
+		Curve {
+			legend "4 layers of prisms - f=15-g=10"
+			file ./4prismes_f15g10/courbe_reichardt.dat
+			columns ($1) ($2)
+		}
+
+	}
+	Table {
+		Title "\latex_($Re_{\tau}$\latex_) and pressure loss"
+		nb_columns 5
+		label y+ | \latex_($Re_{\tau}$\latex_) | Relative error | dP/dx | Relative error 
+		line {
+			origin "Trio_U"
+			legend "2 layers of prisms"
+			file ./2prismes_f1g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "2 layers of prisms - f=15-g=10 "
+			file ./2prismes_f15g10/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "3 layers of prisms "
+			file ./3prismes_f1g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "4 layers of prisms "
+			file ./4prismes_f1g1/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		line {
+			origin "Trio_U"
+			legend "4 layers of prisms - f=15-g=10 "
+			file ./4prismes_f15g10/ligneTableau.dat
+			nb_columns_file 7
+			columns ($2) ($3) ($4) ($6) ($7)
+		}
+		
+	}
+	
+	#Figure {
+		#Titre "Turbulent viscosity "
+		#Width 12cm
+		#Dimension 2
+		#LabelX "y"
+		#RangeX 0 2
+		#LabelY "nut"
+		#RangeY 0 0.08
+		#InclureDescCourbes 0
+		#Legende below
+		#Courbe {
+			#Legende "2 layers of prisms"
+			#Fichier ./2prismes_f1g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "2 layers of prisms - f=15-g=10 "
+			#Fichier ./2prismes_f15g10/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "3 layers of prisms"
+			#Fichier ./3prismes_f1g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			
+		#}
+		#Courbe {
+			#Legende "4 layers of prisms"
+			#Fichier ./4prismes_f1g1/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			#Style lines
+		#}
+		#Courbe {
+			#Legende "4 layers of prisms - f=15-g=10"
+			#Fichier ./4prismes_f15g10/Moyennes_spatiales_nut
+			#Colonnes ($1) ($2)
+			#Style lines
+		#}
+	#}
+}
+
+
+Chapter {
+Title "Conclusions"
+	Table {
+		Description "TrioU  meshes: Tetrahedriser_homogene_fin"
+		Description "The results with different stretching in x direction are closed to the objectives. The results obtained for cases with a stretching factor in x direction and z direction suggest a reasonable limit : f<100 and g<100.  "
+		Description ""
+	}
+	Table {
+		Description "ICEM mesh + regular layers of cells near the walls"
+		Description "The different cases give a good friction velocity. Results are lightly better with two regular layers cells. For this type of geometry with a privileged direction, we obtain good results for friction velocity and velocity profiles with a stretched mesh.
+	}	
+}
+
+
+Chapter {
+Title "Performances"
+Table {
+		nb_columns 5
+		label  host|system|Total CPU Time|CPU time/step|number of cell
+		line {
+			legend 3D_6_keps_f1g1
+			origin Trio_U
+			file 3D_6_keps_f1g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f15g10
+			origin Trio_U
+			file 3D_6_keps_f15g10/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f35g25
+			origin Trio_U
+			file 3D_6_keps_f35g25/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f40g1
+			origin Trio_U
+			file 3D_6_keps_f40g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f100g1
+			origin Trio_U
+			file 3D_6_keps_f100g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f300g1
+			origin Trio_U
+			file 3D_6_keps_f300g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f300g100
+			origin Trio_U
+			file 3D_6_keps_f300g100/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f100g100
+			origin Trio_U
+			file 3D_6_keps_f100g100/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f300g100
+			origin Trio_U
+			file 3D_6_keps_f300g100/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_6_keps_f300g300
+			origin Trio_U
+			file 3D_6_keps_f300g300/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f1g1
+			origin Trio_U
+			file 3D_21_keps_f1g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f15g10
+			origin Trio_U
+			file 3D_21_keps_f15g10/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f35g25
+			origin Trio_U
+			file 3D_21_keps_f35g25/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f40g1
+			origin Trio_U
+			file 3D_21_keps_f40g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f100g1
+			origin Trio_U
+			file 3D_21_keps_f100g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f300g1
+			origin Trio_U
+			file 3D_21_keps_f300g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f300g100
+			origin Trio_U
+			file 3D_21_keps_f300g100/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f100g100
+			origin Trio_U
+			file 3D_21_keps_f100g100/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f300g100
+			origin Trio_U
+			file 3D_21_keps_f300g100/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3D_21_keps_f300g300
+			origin Trio_U
+			file 3D_21_keps_f300g300/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 2 layers of prisms
+			origin Trio_U
+			file 2prismes_f1g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 2 layers of prisms - f=15 g=10
+			origin Trio_U
+			file 2prismes_f15g10/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 3 layers of prisms
+			origin Trio_U
+			file 3prismes_f1g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 4 layers of prisms
+			origin Trio_U
+			file 4prismes_f1g1/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend 4 layers of prisms - f=15 g=10
+			origin Trio_U
+			file 4prismes_f15g10/3D_keps.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Total
+			origin Trio_U
+			file temps_total
+			columns rien rien $1 rien rien
+			nb_columns_file 1
+		}
+	}
+}
+		
+

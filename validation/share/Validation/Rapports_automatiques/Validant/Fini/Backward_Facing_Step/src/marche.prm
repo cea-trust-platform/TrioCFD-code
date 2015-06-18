@@ -1,0 +1,380 @@
+Parameters {
+	Title "Flow over a backward-facing Step"
+	Description "The objective is to validate the k epsilon turbulence model on the backward facing step case, in 2D, VDF or VEF. Several convection schemes are tested. Two options for turbulent wall laws for ef_stab are also tested: the standard option in 2D (efstab)  and  another algorithm where less faces are concerned when applying keps boundary condition (efstab2) (the default option in 3D).
+
+	Description The validation is based on Kim experiment [1]
+	
+      ParametersTrio_U Type of problem:        hydraulic turbulent             
+       ParametersTrio_U Time scheme:    Euler_Explicite         
+       ParametersTrio_U Convection scheme:              Momentum:       
+       ParametersTrio_U hydraulic : quick / centre (VDF)          muscl / EF (VEF) 
+       ParametersTrio_U k_epsilon : quick / centre (VDF)         muscl (VEF)
+       ParametersTrio_U Discretization:         VDF / VEFreP1B  
+       ParametersTrio_U Turbulence model:        k_epsilon standard 2D model or model with less faces at the wall      
+       ParametersTrio_U Type of boundary conditions:    no slip at fluid/solid interface
+       ParametersTrio_U Type of fluid : incompressible
+
+
+	Author "G.Garnier V.Barthel"
+	TestCase . marche_VDF_quick.data
+	TestCase . marche_VDF_centre.data
+	TestCase . marche_VEF_muscl.data
+	TestCase . marche_VEF_efstab.data convection ef_stab for momentum
+	TestCase . marche_VEF_efstab2.data
+	TestCase . marche_VEF_efstab_alpha02.data
+
+	Prerequisite sh ./cherche_zero
+
+	Reference " 1: JJ.Kim, investigation of separation and reattachment of turbulent shear layer : flow over a backward-facing step, Standford university, 1978. http://www.stanford.edu/~cantwell/AFOSR_STANFORD_80_81_DATA_LIB/case_0421/F00538.CVT2"
+
+        Reference  " 2: L.Leal De Sousa, Projet N3S de mecanique des fluides : note de validation du noyau de la version 3.3.
+
+}
+Chapter { 
+	Title Tests Description
+
+	Figure {
+	Title Geometry
+	Description Dimensions:
+       Description H = 0,0762 m 
+       Description h = 0,0381 m 
+       Description L = 0,762 m
+       Description l = 0,190m   
+	picture step.png
+	}
+visu {
+	Title "mesh VDF"
+	
+	   Description Mesh:        VDF     :  (24 x 19) + (99 x 19) + (99 x 9) quadrangles (3228)
+	mesh marche_VDF_quick.lata dom
+	width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+}
+visu {
+	Title "mesh VEF"
+	description "Mesh: VEF :  VEF     :  (11 x 9) + (49 x 9) + (49 x 4)       quadrangles each cut in 4 triangles (2944)
+	mesh marche_VEF_muscl.lata dom
+	operator no_axes
+	width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+
+}
+}
+Chapter {
+	Title "Results"
+
+visu {
+	Description As we can see on the figure there is a recirculation zone behind the step.
+	pseudocolor marche_VDF_quick.lata dom norme_VITESSE SOM
+	blackvector  marche_VDF_quick.lata dom VITESSE SOM
+	width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+}
+	Figure {
+	Include_Description_Curves 0
+	legend  left	
+	Description We first plot the recirculation length behind the step which is a significant parameter for this calculation. This length is measured in the first mesh near the wall. 
+	Title velocity profile at y = -0,0321m (at the gravity center of the cells)
+
+	Dimension 2
+	labelx "x(m)"
+	labely "U(m/s)"
+	rangex  0 0.3
+	Curve  { 
+	   legend "k_eps VDF quick"
+	   segment marche_VDF_quick.data  SONDE_U_PAROI
+	   style lines
+	}
+	Curve  { 
+	   legend "k_eps VDF centre"
+	   segment marche_VDF_centre.data  SONDE_U_PAROI
+	   style lines
+	}
+	
+	Curve  { 
+	   legend "k_eps VEF muscl"
+	   segment marche_VEF_muscl.data  S_U_SOM_PAROI
+	   style lines
+	}
+	Curve  { 
+	   legend "k_eps VEF ef_stab "
+	   segment marche_VEF_efstab.data  S_U_SOM_PAROI
+	   style lines
+	}
+	Curve  { 
+	   legend "k_eps VEF ef_stab2 "
+	   segment marche_VEF_efstab2.data  S_U_SOM_PAROI
+	   style lines
+	}
+	Curve  { 
+	   legend "k_eps VEF ef_stab alpha 02 "
+	   segment marche_VEF_efstab_alpha02.data  S_U_SOM_PAROI
+	   style lines
+	}
+	Curve  {
+		legend ""
+		fonction 0
+		}
+	}
+
+	Figure {
+	Title " Effect of the position of the probe "
+	Include_Description_Curves 0
+	legend  left	
+	description "The probes used for post processing are placed in the calculation domain. For VEF calculations, the calculation result can be slightly different depending on the position of the probe. The reason for this is the following: the velocity is calculated in the middle of the faces. If the post processing position is not situated in the middle of the face, some interpolation can occur (som: default post processing option), leading to diffences in the results. Some keywords for the probes enable to plot the calculated value at the nearest gravity center of the probe (grav), or at the nearest face center of the cell (nodes). The influence of these options  is looked at."
+	labelx "x(m)"
+	labely "U(m/s)"
+	rangex  0 0.3
+	rangey  -6 4
+	Curve  { 
+	   legend "k_eps VEF ef_stab som"
+	   segment marche_VEF_efstab.data  S_U_SOM_PAROI
+	   style lines
+	}
+	Curve  { 
+	   legend "k_eps VEF ef_stab grav"
+	   segment marche_VEF_efstab.data  S_U_GRAV_PAROI
+	   style lines
+	}
+	Curve  { 
+	   legend "k_eps VEF ef_stab nodes"
+	   segment marche_VEF_efstab.data  S_U_NODE_PAROI
+	   style lines
+	}
+	Curve  {
+		legend ""
+		fonction 0
+		}
+	}
+Table {
+	  description "As can be seen, the position of the probe near the lower wall has an importance on the value of the velocity. For the 'nodes' option, the nearest face center is not always the face close to the wall leading to discontinuous values of velocity. It thus not recommended to use this kind of probes for our VEF mesh. In the two other cases however, the recirculation length remains the same.
+	}
+
+Table {
+	Title "Recirculation length" 
+	  Description We can compare this value with those obtained by Kim [1] and De Saousa [2]. The Trio_U results are rather good, the relative errors stand around 20%. These are the standard results given by k-epsilon models.
+  Description Trio_U calculations give good results in comparison to Kim experiment.
+ 
+	Description "  "
+	nb_columns 1
+	label Recirculation length (l/h)
+	line {
+	legend VDF quick
+	file marche_VDF_quick_SONDE_U_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VDF centre
+	file marche_VDF_centre_SONDE_U_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF muscl som
+	file marche_VEF_muscl_S_U_SOM_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF muscl grav
+	file marche_VEF_muscl_S_U_GRAV_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF ef_stab som
+	file marche_VEF_efstab_S_U_SOM_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF ef_stab grav
+	file marche_VEF_efstab_S_U_GRAV_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF efstab loi de paroi modifie som
+	file marche_VEF_efstab2_S_U_SOM_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF efstab loi de paroi modifie grav
+	file marche_VEF_efstab2_S_U_GRAV_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF efstab alpha 02 som
+	file marche_VEF_efstab_alpha02_S_U_SOM_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	legend VEF efstab alpha 02 grav
+	file marche_VEF_efstab_alpha02_S_U_GRAV_PAROI.zero
+	nb_columns_file 5
+	columns round($5/0.0381*100.)/100.
+	}
+	line {
+	origin "ref"
+	values 7
+	legend Kim experiment
+	}
+	line {
+	origin "N3S"
+	values 5.77
+	legend N3S
+	}
+	}
+Figure {
+	Title "velocity profile U* at x=0h"
+	description "We compare now the non-dimensional velocity at x=0."
+	dimension 2
+	labelx "U*"
+	labely "y(m)"
+	Include_Description_Curves 0
+	legend  center left
+	width 12cm
+	Curve {
+		legend "reference"
+		file x0h.csv
+		columns $1 $2
+		}
+	Curve {
+		 legend "k_eps VDF quick"
+	  	 segment marche_VDF_quick.data SONDE_U_X0H
+	  	 origin "Trio_U"
+		columns  $2/18.2 $1
+	#	style lines
+	}
+		Curve {
+		 legend "k_eps VDF centre"
+	  	 segment marche_VDF_centre.data SONDE_U_X0H
+	  	 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	Curve {
+		 legend "k_eps VEF ef_stab"
+	  	 segment marche_VEF_efstab.data SONDE_U_X0H
+		 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	
+	Curve {
+		 legend "k_eps VEF ef_stab2"
+	  	 segment marche_VEF_efstab2.data SONDE_U_X0H
+		 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	Curve {
+		 legend "k_eps VEF ef_stab alpha 02"
+	  	 segment marche_VEF_efstab_alpha02.data SONDE_U_X0H
+		 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	Curve {
+		 legend "k_eps VEF muscl"
+	  	 segment marche_VEF_muscl.data SONDE_U_X0H
+	  	 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	
+}
+
+
+Figure {
+	Title "velocity profile U* at x=2h"
+	description "We compare now the non-dimensional velocity at x=2h."
+	dimension 2
+	labelx "U*"
+	labely "y(m)"
+	Include_Description_Curves 0
+	legend  center left
+	width 12cm
+	Curve {
+		legend "reference"
+		file x2h.csv
+		columns $1 $2
+		}
+	Curve {
+		 legend "k_eps VDF quick"
+	  	 segment marche_VDF_quick.data SONDE_U_X2H
+	  	 origin "Trio_U"
+			columns  $2/18.2 $1
+			#	style lines
+	}
+		Curve {
+		 legend "k_eps VDF centre"
+	  	 segment marche_VDF_centre.data SONDE_U_X2H
+	  	 origin "Trio_U"
+			columns  $2/18.2 $1
+				style lines
+	}
+	Curve {
+		 legend "k_eps VEF muscl"
+	  	 segment marche_VEF_muscl.data SONDE_U_X2H
+	  	 origin "Trio_U"
+			columns  $2/18.2 $1
+				style lines
+	}
+	Curve {
+		 legend "k_eps VEF ef_stab"
+	  	 segment marche_VEF_efstab.data SONDE_U_X2H
+	  	 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	Curve {
+		 legend "k_eps VEF ef_stab2"
+	  	 segment marche_VEF_efstab2.data SONDE_U_X2H
+	  	 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+	Curve {
+		 legend "k_eps VEF ef_stab alpha 02"
+	  	 segment marche_VEF_efstab_alpha02.data SONDE_U_X2H
+	  	 origin "Trio_U"
+		columns  $2/18.2 $1
+		style lines
+	}
+}
+
+	Table {
+	Description   Calculated velocity profiles are relatively near Kim's experiment profiles.
+	Description NB : We don't obtain satisfying results with the EF convection scheme with the VEF discretization. In fact the EF scheme seems not adapted to study flows with wall laws when the boundary layer is separated. Using a smaller value of alpha (0.2 instead of the default value 1) improves the result.
+
+}
+}
+Chapter {
+	Title "Conclusion" 
+	Description This simulation enables the validation of k-epsilon calculations of a flow over a backward-facing step with VDF and VEF grids with respectively quick and muscl or EF_STAB convection schemes. In these cases calculated results are in relatively good agreement with those obtained by Kim [1].
+	Description The wall law using less cells at the wall is four times quicker then the other one.
+}
+
+Chapter { 
+       Title "Recommandations for users" 
+
+       Description Used a "facsec" coefficient of 0,1 in the data in order to stabilized the calculation with the centre convection scheme.
+       Description Don't use the EF convection scheme with alpha=1 for a problem with separated boundary layers resolved with wall laws.
+       Description Take great care of the position of the probes while post processing. If they are not posiotionned properly, the results might wrongfully seem inapropriate.
+	}
+
+Chapter {
+Title "Computer performance"
+Tableau_performance {
+}
+}
+
+
+
+
+

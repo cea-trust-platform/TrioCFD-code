@@ -1,0 +1,29 @@
+#!/bin/bash
+mkdir -p  Quasicompressible
+cd Quasicompressible
+mkdir -p  Canal_plan_bi_periodique_M1 Canal_plan_bi_periodique_M10 Canal_plan_bi_periodique_M100 
+
+cd Canal_plan_bi_periodique_M1
+cp ../../Canal_plan_bi_periodique_M1_QC.data .
+mv Canal_plan_bi_periodique_M1_QC.data Canal_plan_bi_periodique_M1.data
+cp ../../Canal_plan_bi_periodique_M1.msh.gz .
+gunzip -f Canal_plan_bi_periodique_M1.msh.gz
+ln -s ../../post_run .
+
+cd ../Canal_plan_bi_periodique_M10
+ln -s ../../Canal_plan_bi_periodique_M1.msh.gz  .
+cp ../../Canal_plan_bi_periodique_M1_QC.data .
+sed "s/Transformer dom x y z/Transformer dom 10*x y z/" Canal_plan_bi_periodique_M1_QC.data  > temp.data
+sed "s/segment 50  0.00025 0.0 0.00025	0.00025 0.004 0.00025/segment 50  0.0025 0.0 0.00025	0.0025 0.004 0.00025/g" temp.data > Canal_plan_bi_periodique_M10.data
+rm -f Canal_plan_bi_periodique_M1_QC.data temp.data
+ln -s ../../pre_run .
+
+cd ../Canal_plan_bi_periodique_M100
+ln -s ../../Canal_plan_bi_periodique_M1.msh.gz  .
+cp ../../Canal_plan_bi_periodique_M1_QC.data .
+sed "s/Transformer dom x y z/Transformer dom 100*x y z/" Canal_plan_bi_periodique_M1_QC.data  > temp.data
+sed "s/segment 50  0.00025 0.0 0.00025	0.00025 0.004 0.00025/segment 50  0.025 0.0 0.00025	0.025 0.004 0.00025/g" temp.data > Canal_plan_bi_periodique_M100.data
+rm -f Canal_plan_bi_periodique_M1_QC.data temp.data
+ln -s ../../pre_run .
+exit 0
+

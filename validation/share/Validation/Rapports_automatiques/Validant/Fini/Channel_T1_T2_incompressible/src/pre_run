@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ -f ../Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1.msh ]
+then
+	ln -sf ../Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1.msh .
+else
+	#cp -f ../Canal_plan_bi_periodique_M1.msh.gz .
+	gunzip Canal_plan_bi_periodique_M1.msh.gz
+fi
+
+ln -sf ../../post_run .
+exit 0

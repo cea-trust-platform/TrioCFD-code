@@ -1,0 +1,59 @@
+#!/bin/sh
+# QDM   	T     		KEps
+# muscl 	muscl 		muscl
+# ef_stab1 	ef_stab1 	ef_stab1
+# ef_stab0.2	ef_stab1	ef_stab1
+
+jdd=Turb_coupled_pipeFlow.data
+rho=`	grep -i " rho " 	$jdd | head -1 | awk '{print $4}'`
+mu=`	grep -i " mu "  	$jdd | head -1 | awk '{print $4}'`
+r1=0.8
+TURB_RATE=0.05 # 5% turbulence rate #
+
+for Re in 50000 100000 200000 500000 1000000
+do
+   U_VALUE=`awk "BEGIN {print $Re*$mu/(2*$r1*$rho)}"`
+   K_VALUE=`awk "BEGIN {print 1.5*($TURB_RATE*$U_VALUE)^2}"`
+   EPS_VALUE=`awk "BEGIN {print $K_VALUE^1.5/$r1}"`
+   
+   mkdir -p $Re
+   cd $Re
+   
+   mkdir -p muscl
+   cd muscl
+   ln -s -f ../../post_run .
+   cp -r ../../mesh .
+   sed -e "s/U_VALUE/$U_VALUE/" \
+       -e "s/K_VALUE/$K_VALUE/" \
+       -e "s/EPS_VALUE/$EPS_VALUE/" \
+       -e "s/convection { QDM_SCHEME }/convection { muscl }/" \
+       -e "s/convection { T_SCHEME }/convection { muscl }/" \
+       -e "s/convection { KEPS_SCHEME }/convection { muscl }/" ../../$jdd > test.data
+   cd ..
+
+   mkdir -p ef_stab1
+   cd ef_stab1
+   ln -s -f ../../post_run .
+   cp -r ../../mesh .
+   sed -e "s/U_VALUE/$U_VALUE/" \
+       -e "s/K_VALUE/$K_VALUE/" \
+       -e "s/EPS_VALUE/$EPS_VALUE/" \
+       -e "s/convection { QDM_SCHEME }/convection { ef_stab { alpha 1 } }/" \
+       -e "s/convection { T_SCHEME }/convection { ef_stab { alpha 1 } }/" \
+       -e "s/convection { KEPS_SCHEME }/convection { ef_stab { alpha 1 } }/" ../../$jdd > test.data
+   cd ..
+
+   mkdir -p ef_stab0.2
+   cd ef_stab0.2
+   ln -s -f ../../post_run .
+   cp -r ../../mesh .
+   sed -e "s/U_VALUE/$U_VALUE/" \
+       -e "s/K_VALUE/$K_VALUE/" \
+       -e "s/EPS_VALUE/$EPS_VALUE/" \
+       -e "s/convection { QDM_SCHEME }/convection { ef_stab { alpha 0.2 } }/" \
+       -e "s/convection { T_SCHEME }/convection { ef_stab { alpha 0.2 } }/" \
+       -e "s/convection { KEPS_SCHEME }/convection { ef_stab { alpha 1 } }/" ../../$jdd > test.data
+   cd ..
+   
+   cd ..
+done

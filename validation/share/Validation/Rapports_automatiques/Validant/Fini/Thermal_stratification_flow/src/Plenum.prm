@@ -1,0 +1,814 @@
+Parameters {
+	Title "Thermal stratification flow."
+	Description "The purpose of this document is to validate the thermal stratification of a flow and the establishment of a natural convection phenomena in a plenum.\newline"
+#	Description "The experiment, carried out by Kamide et al. (see reference), reproduces the geometry of a plenum with an inlet channel representing the upper part of a neutron shield of a fuel assembly. A wall of the cavity is cooled to simulate the cooling liquid metal. The experiment is performed in water. The purpose of this experiment is to highlight the thermal stratification of the flow and the establishment of a phenomenon of natural convection in the upper plenum.\newline"
+	Description ""
+	Description "Valitated model"
+	Description "....K-\latex_({\Large $ \epsilon $} \latex_) turbulence modeling,"
+	Description "....Thin boundary layer equations wall model,"
+	Description "....Wall heat transfert.\newline"
+	Description ""
+	Description "Valitated with"
+	Description "....Experimental data\newline"
+	Description ""
+	Author "MALOD C., VANDROUX S., BARTHEL V."
+	TestCase "./2D_H" "Plenum.data"
+	TestCase "./2D_T" "Plenum.data"
+	TestCase "./3D_H" "Plenum.data" "/* jdd attached */"
+	TestCase "./3D_T" "Plenum.data"
+	VersionTrio_U "1.6.2"
+	ParametersTrio_U "Type of problem : Pb_Thermohydraulique_Turbulent"
+	ParametersTrio_U "Discretization : VEFPreP1B"
+	ParametersTrio_U "Time scheme : Euler_Implicite with Solver Implicite"
+	ParametersTrio_U "Solving of equation : Navier_Stokes_turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi Paroi_TBLE, and Convection_Diffusion_Temperature_Turbulent with Modele_turbulence Prandtl and Turbulence_paroi Paroi_TBLE_scal"
+	ParametersTrio_U "Convection scheme : Ef_Stab for Momentum and Energy, and Amont for Turbulence"
+	ParametersTrio_U "Diffusion scheme : default for all equations"
+	ParametersTrio_U "Boundary condition : Velocity inlet, Pressure outlet, Symmetry and Wall"
+	ParametersTrio_U "Wall condition : Imposed heat flux (for test cases 2D_H and 3D_H) or temperature (for test cases 2D_T and 3D_T)"
+	Reference "H. Kamide, J. Kobayashi, Y. Leda, H. Ninokata : Benchmark exercise for multi-dimensional thermohydraulic analysis codes. Journal of Hydraulic research vol.34, 1996, n°3."
+	Reference "E. Krepper, H-G Willschutz, F-P Weiß : Solution of a mixed convection flow benchmark using computational fluid dynamic codes. 47-55."
+	Prerequisite "Extract_histogram dom_2D 2D_H/Plenum.err  > histo2D_H"
+	Prerequisite "Extract_histogram dom_3D 3D_H/Plenum.err  > histo3D_H"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests description"
+	Description "The geometry reproduces a plenum with an inlet channel representing the upper part of a neutron shield of a fuel assembly (see reference)."
+	Table {
+		Title "Mesh"
+		Description "The 3D mesh is made with Icem. It contain 27 252 tetrahedral cells and 6 546 nodes. The histogram of largest angles of 3D mesh is also presented.\newline"
+	}
+	Visu {
+		Width 4cm, viewport=350 10 654 1010, clip
+		mesh 3D_H/Plenum.lata dom_3D
+		normal3D -0.7 0.25 0.75
+		up3D 0. 1. 0.
+		zoom3D 0. 0. 1.
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	Figure {
+	 Width 8cm
+	Title_figure " "
+        dimension 2
+        Include_Description_Curves 0
+        labelx Angle (degree)
+        labely "Cells"
+        legend sans
+        Curve
+        {
+        file histo3D_H
+        style boxes fill solid 0.3
+        columns ($2+$5)/2 8
+        }
+ 
+	}
+	Table {
+		Description "The 2D mesh is obtained by extracting one of the 3D boundaries. It contain 2 968 triangular cells and 1 619 nodes. The histogram of largest angles of 2D mesh is also presented.\newline\newline"
+	}
+	Visu {
+		Width 5cm, viewport=200 152 520 975, clip
+		mesh 2D_H/Plenum.lata dom_2D
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	Figure {
+	 Width 8cm
+	Title_figure " "
+        dimension 2
+        Include_Description_Curves 0
+        labelx Angle (degree)
+        labely "Cells"
+        legend sans
+        Curve
+        {
+        file histo2D_H
+        style boxes fill solid 0.3
+        columns ($2+$5)/2 8
+        }
+ 
+	}
+	Table {
+		Title "Initial and Boundaries conditions"
+		Description "Initial conditions :\latex_(\hspace*{16.5mm}\latex_)Velocity set to 0 m/s in all the domain.\newline"
+		Description ""
+		Description "Boundaries conditions :\latex_(\hspace*{8mm}\latex_)Symmetry in the Z direction,"
+		Description "\latex_(\hspace*{45mm}\latex_)Velocity set on inlet to 0.0415 m/s,"
+		Description "\latex_(\hspace*{45mm}\latex_)Pressure set to 0 Pa at outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Turbulent kinetic energy set to 1.6e-7\latex_( $ m^2/s^2 $ \latex_) on intlet and outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Turbulence dissipation rate set to 1.6e-8\latex_( $ m^3/s^2 $ \latex_) on intlet and outlet."
+		Description "\latex_(\hspace*{45mm}\latex_)Thin boundary layer equations model on all wall boundaries with 50 nodes"
+		Description "\latex_(\hspace*{45mm}\latex_)in the TBLE grid and a stretching ratio equal to 1.\newline"
+		Description ""
+	}
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Water at 48.9°C:}\latex_)"	
+		Description "$\rho$ = 988.03 kg/m$^3$"
+		Description "$\mu$ = 5.49e-4 kg/m/s"
+		Description "$\lambda$ = 0.59 W/m/K"
+		Description "\latex_($C_p$\latex_) = 4180 J/kg/K"
+		Description "$\beta$ = 3.9e-4 1/K"
+	}
+}
+Chapter {
+	Title "Convergence"
+	Description "This chapter presents the convergence of the calculations."
+	Description "The calculations can be stopped when the steady state is established, and is set at about 2000 s of physical time. This convergence is evaluated on the evolution of velocity, temperature and also the pressure force (respectively point A, B and line C on the following figure). These physical quantities were chosen because they are the ones who are least well converged. The residual of each calculation is also plotted."
+	Figure {
+		Width 10cm, viewport=-350 200 600 1024, clip
+		picture ./Conv.png
+	}
+	Table {
+		Description "To ensure that the calculations are correct, the table below evaluate flow balance.\newline"	
+		nb_columns 3
+		label IN | OUT | Total
+		line {
+			legend "2D_H"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./2D_H/Plenum_pb_Debit.out
+			last_line
+			nb_columns_file 6
+			columns $3 $5 $6
+		}
+		line {
+			legend "2D_T"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./2D_T/Plenum_pb_Debit.out
+			last_line
+			nb_columns_file 6
+			columns $3 $5 $6
+		}
+		line {
+			legend "3D_H"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./3D_H/Plenum_pb_Debit.out
+			last_line
+			nb_columns_file 8
+			columns $3 $5 $8
+		}
+		line {
+			legend "3D_T"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./3D_T/Plenum_pb_Debit.out
+			last_line
+			nb_columns_file 8
+			columns $3 $5 $8
+		}
+	}
+	Figure {
+		Title "Convergence of X velocity on point A"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 2000.
+		LabelY "Vx (m/s)"
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_SONDE_V1.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 60
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_SONDE_V1.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 60
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_SONDE_V1.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 89
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_SONDE_V1.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 89
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Figure {
+		Title "Convergence of temperature on point B"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 2000.
+		LabelY "Temperature (K)"
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_SONDE_T4.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 6
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_SONDE_T4.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 6
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_SONDE_T4.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 6
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_SONDE_T4.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 6
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Figure {
+		Title "Convergence of pressure force on boundary 'Cold'"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 2000.
+		LabelY "Pressure force (N)"
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 ($6*0.025/0.5)
+			# La force de pression en 2D est en N/m => pour comparer avec le 3D, je divise par surface en 2D et multiplie par la surface en 3D
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 ($6*0.025/0.5)
+			# La force de pression en 2D est en N/m => pour comparer avec le 3D, je divise par surface en 2D et multiplie par la surface en 3D
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 8
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 8
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Figure {
+		Title "Evolution of residuals"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 2000.
+		LabelY "Residue"
+		LogY
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum.dt_ev
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum.dt_ev
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum.dt_ev
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum.dt_ev
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description "This chapter first presents the profiles along lines P1 and P4, of X velocity and temperature, compared with experimental data (see reference), distribution of Y+, velocity vectors and to finish mappings of temperature."
+	Figure {
+		Width 13cm, viewport=-200 0 298 575, clip
+		picture ./lines.png
+	}
+	Figure {
+		Title "X velocity profiles along P1 line"
+		Width 12cm
+		LabelX "Vx (cm/s)"
+		RangeX -2. 6.
+		LabelY "Height (mm)"
+		RangeY 0. 750.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Experimental data"
+			file ./Experimental_V1.dat
+			origin "Trio_U"
+			columns ($2*100) ($1*1000)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_SONDE_V1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_SONDE_V1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_SONDE_V1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_SONDE_V1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Figure {
+		Title "X velocity profiles along P4 line"
+		Width 12cm
+		LabelX "Vx (cm/s)"
+		RangeX -2. 6.
+		LabelY "Height (mm)"
+		RangeY 0. 750.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Experimental data"
+			file ./Experimental_V4.dat
+			origin "Trio_U"
+			columns ($2*100) ($1*1000)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_SONDE_V4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_SONDE_V4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_SONDE_V4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_SONDE_V4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2*100) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Figure {
+		Title "Temprature profiles along P1 line"
+		Width 12cm
+		LabelX "Temperature (C)"
+		RangeX 35. 50.
+		LabelY "Height (mm)"
+		RangeY 0. 750.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Experimental data"
+			file ./Experimental_T1.dat
+			origin "Trio_U"
+			columns ($2-273) ($1*1000)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_SONDE_T1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_SONDE_T1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_SONDE_T1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_SONDE_T1.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Figure {
+		Title "Temprature profiles along P4 line"
+		Width 12cm
+		LabelX "Temperature (C)"
+		RangeX 35. 50.
+		LabelY "Height (mm)"
+		RangeY 0. 750.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Experimental data"
+			file ./Experimental_T4.dat
+			origin "Trio_U"
+			columns ($2-273) ($1*1000)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "2D_H"
+			file ./2D_H/Plenum_SONDE_T4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "2D_T"
+			file ./2D_T/Plenum_SONDE_T4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "3D_H"
+			file ./3D_H/Plenum_SONDE_T4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+		Curve {
+			legend "3D_T"
+			file ./3D_T/Plenum_SONDE_T4.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($2-273) ($1*1000)
+			Style lines
+			linewidth 2
+			TypeLigne rgb "violet"
+		}
+	}
+	Table {
+		Title "Distribution of Y+"
+	}
+	visu {
+		Width 3cm, viewport=50 683 179 924, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_H/Plenum.lata dom_2D Y_PLUS ELEM 30 50
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "2D_H"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_H/Plenum.lata dom_2D Y_PLUS ELEM 30 50
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "3D_H"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 3D_H/Plenum.lata dom_3D Y_PLUS ELEM 30 50
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator Slice2D 0. 0. 0.025 0. 0. -1.
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Width 3cm, viewport=-129 683 50 924, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_H/Plenum.lata dom_2D Y_PLUS ELEM 30 50
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "2D_T"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_T/Plenum.lata dom_2D Y_PLUS ELEM 30 50
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "3D_T"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 3D_T/Plenum.lata dom_3D Y_PLUS ELEM 30 50
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator Slice2D 0. 0. 0.025 0. 0. -1.
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	Table {
+		Title "Velocity vectors"
+	}
+	visu {
+		Description "2D_H"
+		Width 7.5cm, viewport=50 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Vector 2D_H/Plenum.lata dom_2D_dual VITESSE FACES 0.5
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	visu {
+		Description "3D_H"
+		Width 7.5cm, viewport=50 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Vector 3D_H/Plenum.lata dom_3D_dual VITESSE FACES 0.5
+		Operator_to_all no_legend
+		Operator Slice2D 0. 0. 0.025 0. 0. -1.
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Description "2D_T"
+		Width 7.5cm, viewport=50 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Vector 2D_T/Plenum.lata dom_2D_dual VITESSE FACES 0.5
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	visu {
+		Description "3D_T"
+		Width 7.5cm, viewport=50 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Vector 3D_T/Plenum.lata dom_3D_dual VITESSE FACES 0.5
+		Operator_to_all no_legend
+		Operator Slice2D 0. 0. 0.025 0. 0. -1.
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	Table {
+		Title "Mappings of temperature"
+	}
+	visu {
+		Width 3cm, viewport=50 683 182 924, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_H/Plenum.lata dom_2D_dual TEMPERATURE FACES 317 321
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "2D_H"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_H/Plenum.lata dom_2D_dual TEMPERATURE FACES 317 321
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "3D_H"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 3D_H/Plenum.lata dom_3D_dual TEMPERATURE FACES 317 321
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator Slice2D 0. 0. 0.025 0. 0. -1.
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Width 3cm, viewport=-132 683 50 924, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_H/Plenum.lata dom_2D_dual TEMPERATURE FACES 317 321
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "2D_T"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 2D_T/Plenum.lata dom_2D_dual TEMPERATURE FACES 317 321
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 3
+	}
+	visu {
+		Description "3D_T"
+		Width 6cm, viewport=200 554 514 976, clip
+		origin "Trio_U 1.6.2"
+		Cycles -1
+		Pseudocolor_with_range 3D_T/Plenum.lata dom_3D_dual TEMPERATURE FACES 317 321
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator Slice2D 0. 0. 0.025 0. 0. -1.
+		Operator no_axes
+		Operator no_bounding_box
+	}
+}
+Chapter {
+	Title "Conclusions"
+	Description "This document shows that the results are in good agreement to the experimental data, and that Trio_U give similar results to the others studies which are in reference."
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "The time step and the cell size, used must be chosen small enough not to do to diverge the calculations."
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}
+

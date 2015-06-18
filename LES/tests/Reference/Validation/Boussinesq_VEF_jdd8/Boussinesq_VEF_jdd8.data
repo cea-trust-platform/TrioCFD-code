@@ -1,0 +1,130 @@
+dimension 3
+Pb_ThermoHydraulique pb
+Domaine dom
+
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine -0.5 -0.5 -0.5 
+		Nombre_de_Noeuds 10 10 10
+		Longueurs  1. 1. 1.
+		Facteurs   1. 1. 1.1
+		Symx Symy Symz 
+		}
+		{
+		Bord px   X = -0.5    -0.5 <= Y <= 0.5    -0.5 <= Z <= 0.5
+		Bord px   X =  0.5    -0.5 <= Y <= 0.5    -0.5 <= Z <= 0.5
+		Bord py   Y = -0.5    -0.5 <= X <= 0.5    -0.5 <= Z <= 0.5
+		Bord py   Y =  0.5    -0.5 <= X <= 0.5    -0.5 <= Z <= 0.5
+		Bord pz0  Z = -0.5    -0.5 <= X <= 0.5    -0.5 <= Y <= 0.5
+		Bord pz1  Z =  0.5    -0.5 <= X <= 0.5    -0.5 <= Y <= 0.5
+		}
+	}
+
+Tetraedriser_homogene_fin dom
+
+VEFPreP1b dis
+Read dis { P0 P1
+Changement_de_base_P1Bulle 0 
+Cl_pression_sommet_faible 0
+Modif_div_face_dirichlet 0 }
+
+Schema_Predictor_Corrector sch
+# Runge_Kutta_ordre_3 sch #
+# Schema_Euler_explicite sch #
+
+Read sch 
+{
+        tinit 0.0
+	nb_pas_dt_max 3
+        tmax 220.
+        dt_min 1.e-10
+        dt_max 30.
+	dt_start dt_fixe 1.
+        dt_impr 1.e-6
+        dt_sauv 100
+        seuil_statio 1.e-138  
+        facsec 1.0
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+        mu Champ_Uniforme         1 1.511e-5 
+        rho Champ_Uniforme        1 1.205
+        Cp Champ_Uniforme         1 1005
+        lambda Champ_Uniforme     1 0.0257
+        beta_th Champ_Uniforme    1 3.43e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 9.81
+
+Associate fluide gravite
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_standard
+		{
+ 		equation_non_resolue 1
+		solveur_pression PETSc Cholesky {  }
+		convection { negligeable }
+		diffusion {  }
+
+		sources { boussinesq_temperature { T0 0 verif_boussinesq 0 } }
+
+		conditions_initiales
+			{
+                        vitesse Champ_Uniforme 3 0.0 0.0 0.0 
+			}
+		boundary_conditions
+			{
+                        px       paroi_fixe
+                        py       paroi_fixe
+			pz1      paroi_fixe
+			pz0      paroi_fixe
+			}
+		}
+
+	Convection_Diffusion_Temperature
+		{
+		convection { negligeable }
+                diffusion { }		
+		boundary_conditions 
+			{
+                        px       paroi_adiabatique
+                        py       paroi_adiabatique
+			pz1      paroi_adiabatique
+                        pz0      paroi_adiabatique
+
+			}
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 1.0*(1-cos(PI*(z-0.5))) }
+		}
+
+	Postraitement
+        	{       
+             Sondes	{ 
+                   sonde_vit  vitesse     periode 1e-6 points 4 0. 0. -0.3   0. 0. -0.1   0. 0. 0.1   0. 0. 0.3
+		   sonde_temp temperature periode 1e-6 points 4 0. 0. -0.3   0. 0. -0.1   0. 0. 0.1   0. 0. 0.3
+			}
+
+             Format lml
+             Champs binaire dt_post 10
+                	{
+                   pression elem
+                   vitesse
+                   temperature
+                	}
+		}
+	}
+
+Solve pb
+
+End

@@ -1,0 +1,345 @@
+Parameters {
+	Title "Verification of porous module in VEF"
+	Description "This verification case deals with the flow in a porous channel. Calculations are run in VEF, 2D or 3D, laminar or turbulent, with amont or EF_stab convection scheme."
+	Description "The calculation is validated with analytical results."
+	Author "G.F."
+        TestCase "Poreux_VEF_2D" "Poreux_VEF_2D.data" /* data set in annex */
+        TestCase "Poreux_VEF_3D" "Poreux_VEF_3D.data"
+	TestCase "Poreux_VEF_3D_turb" "Poreux_VEF_3D_turb.data"
+        TestCase "Poreux_VEF_3D_EFstab_mod" "Poreux_VEF_3D_EFstab_mod.data"
+        TestCase "Poreux_VEF_Poiseuille" "Poreux_VEF_Poiseuille.data"
+        TestCase . "Poreux_Boussinesq_VEF_3D.data"
+}
+
+
+
+Chapter {
+	
+	Title "Channel with non uniform porosity description "
+
+Table {
+	Title "Mesh"
+	description "Mesh: VEF 2D 80 cells    :  20x2 cells each divided in 2 triangles (Trianguler)"
+	description "Mesh: VEF 2D2 80 cells   :  20x7 cells each divided in 2 triangles (Trianguler) for the case with wall friction."
+	description "Mesh: VEF 3D 504 cells   :  20x2x2 cells each divided in 6 tetrahedra (tetrahedriser)"
+}
+Table {
+	Title "Channel dimension"
+	description "-2D: 1x1m"
+	description "-3D: 1x1x1m"
+}
+Table {
+	Title "Boundary conditions"
+	Description "- symmetry at the top and the bottom"
+	Description "- porous zone from x=0.2 to x=0.8 with a porosity of 0.5 instead of 1"
+}
+
+Table {
+	Title "Physical properties"
+	       Description "\latex_($\rho = 1\: kg.m^{-3}$\latex_)"
+	       Description "\latex_($\mu$\latex_) = 1. Pa.s"
+}
+
+}
+Chapter {
+	Title "Amont as a convective scheme for momentum"
+	Description "The results are correct with an amont convection scheme."
+
+Figure {
+	Include_Description_Curves 0
+	Title "Velocity along x"
+	Description "Given by div(Phi U)=0"
+	Dimension 2
+	LabelX "X (m)"
+	LabelY "U (m/s)"
+	Width 12cm
+	Curve {
+		legend "convection { amont } 2D"
+		origin "Trio_U"
+#		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_U1 
+		Style linespoints
+	}
+	Curve {
+		legend "convection { amont } 3D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D/Poreux_VEF_3D SEG_U1
+		Style linespoints
+	}
+	Curve {
+		legend "convection { amont } 3D Turbulent"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D_turb/Poreux_VEF_3D_turb SEG_U1	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_U1 
+		columns $1 (1)/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)
+		Style linespoints
+	}
+}
+
+Figure {
+	Include_Description_Curves 0
+	Title "Pressure profile"
+	Description "The analytic pressure is given by 1/2*rho*u2+P=constant"
+	Dimension 2
+	LabelX "x (m)"
+	LabelY "P (Pa)"
+	Width 12cm
+	Curve {
+		legend "convection { amont } 2D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_P		
+		Style linespoints
+	}
+	Curve {
+		legend "convection { amont } 3D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D/Poreux_VEF_3D SEG_P
+		Style linespoints
+	}
+	Curve {
+		legend "convection { amont } 3D Turbulent"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D_turb/Poreux_VEF_3D_turb SEG_P
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_P 
+		columns $1 (0.5-0.5*(1/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)**2))
+		Style linespoints
+	}
+}
+
+Figure {
+	Include_Description_Curves 0
+	Title "Temperature profile"
+	Description "The initial and boundary temperature is constant equal to 1"
+	Dimension 2
+	LabelX "x (m)"
+	LabelY "Temperature (C)"
+	Width 12cm
+	Curve {
+		legend "convection { amont } 2D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_T	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_T
+		columns ($1) (1)
+		Style linespoints
+	}
+}
+}
+
+Chapter {
+	Title "Problem with ef_stab as a convective scheme for the momentum equation"
+	Description "The case is the same as the previous one but the ef_stab scheme used for the convection in the momentum equation."
+	Description " For an ef_stab calculation, UgradU instead of div (U U) is calculated. Bernoulli is not verified any more. Beware that with the TdivU option, there are problems with velocity and pressure."
+
+Figure {
+	Include_Description_Curves 0
+	Title "Velocity along x"
+	Description "Analytical solution given by div(Phi U)=0"
+	Dimension 2
+	LabelX "X (m)"
+	LabelY "U (m/s)"
+	Width 12cm
+	Curve {
+		legend "convection { EF_stab } 3D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D_EFstab_mod/Poreux_VEF_3D_EFstab_mod SEG_U1	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_U1 
+		columns $1 (1)/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)
+		Style linespoints
+	}
+}
+
+Figure {
+	Include_Description_Curves 0
+	Title "Pressure profile"
+	Description "The analytic pressure is given by 1/2*rho*u2+P=constant"
+	Dimension 2
+	LabelX "x (m)"
+	LabelY "P (Pa)"
+	Width 12cm
+	Curve {
+		legend "convection { EF_stab } 3D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D_EFstab_mod/Poreux_VEF_3D_EFstab_mod SEG_P	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_P 
+		columns $1 (0.5-0.5*(1/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)**2))
+		Style linespoints
+	}
+}
+
+Figure {
+	Include_Description_Curves 0
+	Title "Temperature profile"
+	Description "The initial and boundary temperature is constant equal to 1"
+	Dimension 2
+	LabelX "x (m)"
+	LabelY "Temperature (C)"
+	Width 12cm
+	Curve {
+		legend "convection { EF_stab } 3D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_3D_EFstab_mod/Poreux_VEF_3D_EFstab_mod SEG_T	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_T
+		columns ($1) (1)
+		Style linespoints
+	}
+}
+}
+
+Chapter {
+	Title "Channel with wall friction."
+	Description "In this case, the behaviour of the pressure and velocity can be checked with walls. The studied case is 2D."
+	Description " "
+	Description "Caution: Convection is taken as negligible to see the viscous effect on the pressure."
+	Description "The value for the velocity is 50./8.*0.5*(y)*(1-y)*(1+(x>0.2)*(x<0.8)), which then gives $\Phi \nabla P =- 6.25$"
+Figure {
+	Include_Description_Curves 0
+	Title "Velocity along x"
+	Dimension 2
+	LabelX "X (m)"
+	LabelY "U (m/s)"
+	Width 12cm
+	Curve {
+		legend "convection { negligeable } 2D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_Poiseuille/Poreux_VEF_Poiseuille SEG_U1	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_U1 0. 
+		# columns $1 (1)/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)
+		columns $1  (50./8.*0.5*(0.25)*(1+($1>0.2)*($1<0.8)+(($1==0.2)+($1==0.8))*0.5))
+		Style linespoints
+	}
+}
+Figure {
+	Include_Description_Curves 0
+	Title "Velocity profile along y at the center of the channel"
+	Dimension 2
+	LabelX "Y (m)"
+	LabelY "U (m/s)"
+	Width 12cm
+	Curve {
+		legend "convection { negligeable } 2D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_Poiseuille/Poreux_VEF_Poiseuille SEG_U2	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_U2 0. 
+		columns $1  (50./8.*0.5*(1-$1))*$1*2
+		Style linespoints
+	}
+}
+
+Figure {
+	Include_Description_Curves 0
+	Title "Pressure profile"
+	Description "The pressure is given by 1/2*rho*u2+P=constant"
+	Dimension 2
+	LabelX "x (m)"
+	LabelY "P (Pa)"
+	Width 12cm
+	Curve {
+		legend "convection { EF_stab } 2D"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		segment ./Poreux_VEF_Poiseuille/Poreux_VEF_Poiseuille SEG_P	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_VEF_2D/Poreux_VEF_2D SEG_P 
+		columns $1 (-6.25)*(($1>0.8)*($1-1)+($1<=0.8)*($1>=0.2)*(2*($1-0.8)-0.2)+($1<0.2)*(($1-0.2)+(-1.4)))
+		Style linespoints
+	}
+}
+
+
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "The different tests above show that the porosity is taken into account properly by the code."
+	Description "The tests without wall friction show that the velocity is calculated properly and that no unphysical temperature source term is generated. The use of EF_stab convection scheme however does not take into account properly the pressure evolution along the tube."
+	description "The test with wall friction shows that the analytical velocity profile is calculated properly in both flow direction. The wall friction is also taken properly into account."
+}
+
+Chapter {
+	Title "Recommendation to users"
+	Description "The porosity option of the code is verified. The use of EF_stab convection scheme won't give the expected pressure profile due to the way the equations are discretized"
+}
+
+
+Chapter {
+    Title "Porosity Boussinesq"
+    Description "With the correction : velocity max must be in order of 1.e-08 and convergence time at t=0.0002347 s."
+    Visu {
+        Cycles -1
+        Width           12cm
+        pseudocolor     LATA/Poreux_Boussinesq_VEF_3D.lata dom_magnitude VITESSE ELEM
+        operator        slice2D_z  0 0 0 
+        zoom2D          -0.2 1.2 -0.2 1.2
+    }
+}
+
+Chapter {
+    Description "With Trio_U version 1.7.0 (without correction) we had velocity max in order of 1.e-02 and convergence at t=0.2586 s."
+    Figure {
+        Image Poreux_Boussinesq_VEF_3D_v170.png
+        Width 12cm
+    }
+
+}
+
+
+Chapter {
+Title "Computer performance"
+Tableau_performance {
+}
+}

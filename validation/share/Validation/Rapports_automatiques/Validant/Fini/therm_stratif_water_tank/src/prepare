@@ -1,0 +1,129 @@
+#!/bin/bash
+mkdir -p 2d_vdf_strat_amont
+mkdir -p 2d_vdf_strat_quick
+mkdir -p 2d_vef_strat_amont
+mkdir -p 2d_vef_strat_efstab
+
+mkdir -p 3d_vdf_strat_amont
+mkdir -p 3d_vdf_strat_quick
+mkdir -p 3d_vef_strat_amont
+mkdir -p 3d_vef_strat_efstab
+
+cp 2d_strat_std_vdf.data generique.data
+sed "s/Nombre_de_Noeuds 200 70/Nombre_de_Noeuds 50 21/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/Nombre_de_Noeuds 200 130/Nombre_de_Noeuds 50 29/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/# Trianguler_fin dom #/Trianguler_fin dom/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/VDF dis/VEFPreP1B dis/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/facsec 0.1/facsec 1.0/" generique.data > 2d_strat_std_vef.data
+rm generique.data
+
+
+cp 3d_strat_std_vdf.data generique.data
+sed "s/Nombre_de_Noeuds 40 6 30/Nombre_de_Noeuds 10 3 10/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/Nombre_de_Noeuds 40 34 30/Nombre_de_Noeuds 10 10 10/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/Nombre_de_Noeuds 3 6 30/Nombre_de_Noeuds 2 3 10/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/Nombre_de_Noeuds 40 6 30/Nombre_de_Noeuds 10 3 10/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/Nombre_de_Noeuds 40 34 30/Nombre_de_Noeuds 10 10 10/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/# Tetraedriser_homogene_fin dom #/Tetraedriser_homogene_fin dom/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/VDF dis/VEFPreP1B dis/" generique.data > generique1.data
+mv generique1.data generique.data
+sed "s/facsec 0.1/facsec 1.0/" generique.data > 3d_strat_std_vef.data
+rm generique.data
+
+cd 2d_vdf_strat_amont
+cp ../2d_strat_std_vdf.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { amont }/" generique.data > 2d_strat.data
+rm generique.data
+cp ../post_run_1 post_run
+cd ..
+
+cd 2d_vdf_strat_quick
+cp ../2d_strat_std_vdf.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { quick }/" generique.data > 2d_strat.data
+rm generique.data
+cp ../post_run_2 post_run
+cd ..
+
+cd 2d_vef_strat_amont
+cp ../2d_strat_std_vef.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { amont }/" generique.data > 2d_strat.data
+rm generique.data
+cp ../post_run_1 post_run
+cd ..
+
+cd 2d_vef_strat_efstab
+cp ../2d_strat_std_vef.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { Ef_stab { } }/" generique.data > 2d_strat.data
+rm generique.data
+cp ../post_run_2 post_run_cp
+sed "s/2d_vdf_strat_amont/2d_vef_strat_amont/" post_run_cp > post_run
+rm post_run_cp
+cd ..
+
+# 3D area
+
+cd 3d_vdf_strat_amont
+cp ../3d_strat_std_vdf.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { amont }/" generique.data > 3d_strat.data
+rm generique.data
+cp ../post_run_1 post_run_cp
+sed "s/2d_strat/3d_strat/" post_run_cp > post_run
+rm post_run_cp
+cd ..
+
+cd 3d_vdf_strat_quick
+cp ../3d_strat_std_vdf.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { quick }/" generique.data > 3d_strat.data
+rm generique.data
+cp ../post_run_2 post_run_cp
+sed "s/2d_vdf_strat_amont/3d_vdf_strat_amont/" post_run_cp > post_run_cp2
+mv post_run_cp2 post_run_cp
+sed "s/2d_strat/3d_strat/" post_run_cp > post_run
+rm post_run_cp
+cd ..
+
+cd 3d_vef_strat_amont
+cp ../3d_strat_std_vef.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { amont }/" generique.data > 3d_strat.data
+rm generique.data
+cp ../post_run_1 post_run_cp
+sed "s/2d_strat/3d_strat/" post_run_cp > post_run
+rm post_run_cp
+cd ..
+
+cd 3d_vef_strat_efstab
+cp ../3d_strat_std_vef.data ./generique.data
+cp ../expttemp.dat ./expttemp.dat
+#cp ../post_run .
+sed "s/convection { amont }/convection { Ef_stab { } }/" generique.data > 3d_strat.data
+rm generique.data
+cp ../post_run_2 post_run_cp
+sed "s/2d_vdf_strat_amont/3d_vef_strat_amont/" post_run_cp > post_run_cp2
+mv post_run_cp2 post_run_cp
+sed "s/2d_strat/3d_strat/" post_run_cp > post_run
+rm post_run_cp
+cd ..

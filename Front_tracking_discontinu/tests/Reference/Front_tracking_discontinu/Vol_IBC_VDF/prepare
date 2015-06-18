@@ -1,0 +1,22 @@
+rm -f *.med
+visu=0
+for file in aile1.geo aile2.geo corps.geo
+do
+   file=${file%.geo}
+   echo "$file..."
+   gmsh -2 $file.geo -order 1 -clscale 1. -clmin 1.e-99 -clmax 1.e+22 -format med 1>$file.log 2>&1
+   [ $? != 0 ] && echo "KO, see $file.log"
+   if [ $visu = 1 ]
+   then
+      grep -i cl $file.geom
+      echo "dimension 3
+domaine dom
+lire_fichier dom $file.geom
+Postraiter_domaine { fichier $file.lata domaine dom format lata }
+" > $file.data
+      #gdb $TRUST_ROOT/exec/TRUST_mpi $file
+      $exec $file
+      visit -o $file.lata
+   fi
+done
+

@@ -1,0 +1,47 @@
+mkdir -p VDF_Quick VEF_muscl VEF_EFstab
+
+#cp -r ../src/* .
+
+cd VDF_Quick
+cp ../test_Pb1_2D.geom .
+cp ../test_VDF.data .
+cp ../post_run .
+cp ../Post.py .
+
+sed "s/test_VEF/test_VDF/" post_run > new
+mv new post_run
+
+sed "s/test_VEF/test_VDF/" Post.py > new
+mv new Post.py
+sed "s/i < 55/i < 129/" Post.py > new
+mv new Post.py
+
+cd ..
+gunzip -c trio_BODY_geo.asc.gz > trio_BODY_geo.asc
+cd VEF_muscl
+ln -s -f ../trio_BODY_geo.asc .
+cp ../test_VEF.data .
+cp ../post_run .
+cp ../Post.py .
+
+cd ..
+
+cd VEF_EFstab
+ln -s -f ../trio_BODY_geo.asc .
+cp ../test_VEF.data .
+sed "s/facsec 200./facsec 1./" test_VEF.data > new
+sed "s/facsec_max 1000./facsec_max 20./" new > test_VEF.data
+
+cp ../post_run .
+sed "s/muscl/EF_stab { }/" test_VEF.data > modifie.data
+mv modifie.data test_VEF.data
+
+cp ../Post.py .
+
+
+cd ..
+
+
+
+
+

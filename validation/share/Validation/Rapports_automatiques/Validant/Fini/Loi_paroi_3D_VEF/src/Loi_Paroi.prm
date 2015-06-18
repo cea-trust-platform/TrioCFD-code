@@ -1,0 +1,971 @@
+Parameters {
+	Title "Wall_function_VEF_3D"
+	Description "Validate behaviour of VEF/Cranck-Nicholson/$\lambda$u' approach doing a periodic canal plan turbulent"
+	Description "simulation with Reynolds Re=10310 (Re$\tau$=400) with wall law."
+	Description "Periodicity in direction x and z, and forcing term to maintain flow"
+	Description "Length melange model and standard logarithmic wall law"
+
+	VersionTrio_U "1.5.5"
+
+	ParametersTrio_U Type of problem : hydraulic turbulent 3D
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Cranck_Nicholson
+	ParametersTrio_U Solving of equations : Navier_Stokes_Turbulent
+	ParametersTrio_U Convection scheme : Momentum : none Temperature : amont
+	ParametersTrio_U Turbulence model : Length melange
+
+	TestCase A_T_1 LM_y20 /* jdd en annexe */
+	TestCase A_T_2 LM_y20
+	TestCase A_T_3 LM_y20
+	TestCase A_TC_1 LM_y20
+	TestCase A_TC_2 LM_y20
+	TestCase A_TC_3 LM_y20
+	TestCase A_TH_1 LM_y20
+	TestCase A_TH_2 LM_y20
+	TestCase A_TH_3 LM_y20
+	TestCase B_T_1 LM_y40
+	TestCase B_TC_1 LM_y40
+	TestCase B_TH_1 LM_y40
+	TestCase C_T_x9z5 LM_y20
+	TestCase C_T_x17z5 LM_y20
+	TestCase C_T_x5z9 LM_y20
+	TestCase C_T_x5z17 LM_y20
+	TestCase C_TC_x9z5 LM_y20
+	TestCase C_TC_x17z5 LM_y20
+	TestCase C_TC_x5z9 LM_y20
+	TestCase C_TC_x5z17 LM_y20
+	TestCase C_TH_x5z3 LM_y20
+	TestCase C_TH_x9z3 LM_y20
+	TestCase C_TH_x3z5 LM_y20
+	TestCase C_TH_x3z9 LM_y20
+	
+	Author "R. PAILLE/V.BARTHEL"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : 10h x 2h x 10h, h is a reference height"
+	Description "Mesh : non-structured mesh obtained with option Tetraedriser_homogene_compact, Tetraedriser_homogene"
+	Description "or Tetraedriser"
+	Description "Initial conditions :"
+	Description "...Hydraulic : poiseuille profile Ucentre=3m/s"
+	Description "Boundary conditions :"
+	Description "...periodicity and paroi_fixe with Loi_paroi_standard"
+	Figure {
+		Title "Tested options"
+		Width 15cm
+		picture ./tested_options.png
+	}
+	Table {
+		Title "Case A"
+		Description "$\Delta$y=0.055h between 2 calculation points in the direction y ($\Delta$y+|paroi=20)"
+	}
+	visu {
+		Title "Tetraedriser_homogene_compact"
+		Width 8cm
+		mesh A_TC_1/LM_y20.lata dom
+		normal3D 0.3 0.15 1
+		up3D -0.04 1 -0.15
+	}
+	visu {
+		Title "Tetraedriser_homogene"
+		Width 8cm
+		mesh A_TH_1/LM_y20.lata dom
+		normal3D 0.3 0.15 1
+		up3D -0.04 1 -0.15
+	}
+	visu {
+		Title "Tetraedriser"
+		Width 8cm
+		mesh A_T_1/LM_y20.lata dom
+		normal3D 0.3 0.15 1
+		up3D -0.04 1 -0.15
+	}
+	Table {
+		Title "Case B"
+		Description "$\Delta$y=0.111h between 2 calculation points in the direction y ($\Delta$y+|paroi=40)"
+	}
+	visu {
+		Title "Tetraedriser_homogene_compact"
+		Width 8cm
+		mesh B_TC_1/LM_y40.lata dom
+		normal3D 0.3 0.15 1
+		up3D -0.04 1 -0.15
+	}
+	visu {
+		Title "Tetraedriser_homogene"
+		Width 8cm
+		mesh B_TH_1/LM_y40.lata dom
+		normal3D 0.3 0.15 1
+		up3D -0.04 1 -0.15
+	}
+	visu {
+		Title "Tetraedriser"
+		Width 8cm
+		mesh B_T_1/LM_y40.lata dom
+		normal3D 0.3 0.15 1
+		up3D -0.04 1 -0.15
+	}
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 0.0976 kg/m$^3$"
+		Description "$\mu$ = 2.84e-05 kg/m/s"
+	}
+	Table {
+		Title "Calculation method"
+		Description "Implicit time step given by Cranck-Nicholson scheme is limited 5 times the time step returned by"
+		Description "stability criteria (CFL=1)"
+	}
+	Table {
+		Title "Influence of resolution in directions nx and nz"
+		Description "This study is done with configuration 1 and with the y resolution of case A, and $\Delta$x=$\Delta$z=2.5,"
+		Description "1.25 and 0.625 keeping the same time step in all cases."
+	}
+}
+Chapter {
+	Title "Conclusions"
+	Description "In A case (more raffined mesh), results obtained for Tetraedriser_homogene and Tetraedriser_homogene_compact"
+	Description "(configuration 1 and 2) are almost similar. They present the same velocity friction difference."
+	Description ""
+	Description "There is more difference concerning forcing term. In configuration 1 case, the term strong"
+	Description "overstatment could be due to the numeric dissipation introduced by stabilisation procedure $\lambda$u'"
+	Description ""
+	Description "For all studies, the use of configuration 3 (with Amont convection scheme) is not recommanded"
+	Description "because of he bad Log behaviour of velocity."
+	Description ""
+	Description "The option Tetra meshes results reveal that the best behaviour is obtained using configuration 2."
+	Description "Analizing configuration 1 results (strong understatment of friction velocity) it seems to be preferable"
+	Description "to not use this kind of mesh with EF convection scheme."
+	Description ""
+	Description "There is few differences between A case and B case values, that could be explained by the low"
+	Description "number of mesh in B case."
+	Description ""
+	Description "Finally, the resolution influence study reveals that for the 3 meshes, results obtained with"
+	Description "configuration 1 (using EF convection scheme), are very few sensitive to resolution in x and z."
+}
+Chapter {
+	Title "Results"
+	Table {
+		Title "Case A"
+		nb_columns 3
+		label u* | (u*theo-u*)/u*theo in $%$ | forcing
+		line {
+			legend "theoretical"
+			origin "theorie"
+			file ./A_TC_1/ligneTheoTableau.dat
+			nb_columns_file 2
+			columns ($1) rien ($2)
+		}
+		line {
+			legend "Tetra_compact"
+			values "" "" ""
+		}
+		line {
+			legend "Configuration 1"
+			origin "Trio_U"
+			file ./A_TC_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Configuration 2"
+			origin "Trio_U"
+			file ./A_TC_2/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Configuration 3"
+			origin "Trio_U"
+			file ./A_TC_3/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Tetra_homogene"
+			values "" "" ""
+		}
+		line {
+			legend "Configuration 1"
+			origin "Trio_U"
+			file ./A_TH_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Configuration 2"
+			origin "Trio_U"
+			file ./A_TH_2/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Configuration 3"
+			origin "Trio_U"
+			file ./A_TH_3/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Tetra"
+			values "" "" ""
+		}
+		line {
+			legend "Configuration 1"
+			origin "Trio_U"
+			file ./A_T_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Configuration 2"
+			origin "Trio_U"
+			file ./A_T_2/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Configuration 3"
+			origin "Trio_U"
+			file ./A_T_3/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+	}
+	Figure {
+		Title "Velocity profile - Case A - Config 1"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "u"
+		RangeY 1 3
+		Include_Description_Curves 0
+		Curve {
+			legend "Tetra_compact y+=20"
+			origin "Trio_U"
+			file A_TC_1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=20"
+			origin "Trio_U"
+			file A_TH_1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Tetra y+=20"
+			origin "Trio_U"
+			file A_T_1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+			TypePoints 3
+		}
+	}
+	Figure {
+		Title "Velocity profile : semi-log coordinates - Case A - Config 1"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_compact y+=20"
+			origin "Trio_U"
+			file A_TC_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=20"
+			origin "Trio_U"
+			file A_TH_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra y+=20"
+			origin "Trio_U"
+			file A_T_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Case A - Config 2"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "u"
+		RangeY 1 3
+		Include_Description_Curves 0
+		Curve {
+			legend "Tetra_compact y+=20"
+			origin "Trio_U"
+			file A_TC_2/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=20"
+			origin "Trio_U"
+			file A_TH_2/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Tetra y+=20"
+			origin "Trio_U"
+			file A_T_2/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+			TypePoints 3
+		}
+	}
+	Figure {
+		Title "Velocity profile : semi-log coordinates - Case A - Config 2"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_compact y+=20"
+			origin "Trio_U"
+			file A_TC_2/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=20"
+			origin "Trio_U"
+			file A_TH_2/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra y+=20"
+			origin "Trio_U"
+			file A_T_2/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Case A - Config 3"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "u"
+		RangeY 1 3
+		Include_Description_Curves 0
+		Curve {
+			legend "Tetra_compact y+=20"
+			origin "Trio_U"
+			file A_TC_3/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=20"
+			origin "Trio_U"
+			file A_TH_3/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Tetra y+=20"
+			origin "Trio_U"
+			file A_T_3/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+			TypePoints 3
+		}
+	}
+	Figure {
+		Title "Velocity profile : semi-log coordinates - Case A - Config 3"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_compact y+=20"
+			origin "Trio_U"
+			file A_TC_3/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=20"
+			origin "Trio_U"
+			file A_TH_3/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra y+=20"
+			origin "Trio_U"
+			file A_T_3/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Table {
+		Title "Case B"
+		nb_columns 3
+		label u* | (u*theo-u*)/u*theo in $%$ | forcing
+		line {
+			legend "theoretical"
+			origin "theorie"
+			file ./B_TC_1/ligneTheoTableau.dat
+			nb_columns_file 2
+			columns ($1) rien ($2)
+		}
+		line {
+			legend "Tetra_compact"
+			values "" "" ""
+		}
+		line {
+			legend "Configuration 1"
+			origin "Trio_U"
+			file ./B_TC_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Tetra_homogene"
+			values "" "" ""
+		}
+		line {
+			legend "Configuration 1"
+			origin "Trio_U"
+			file ./B_TH_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Tetra"
+			values "" "" ""
+		}
+		line {
+			legend "Configuration 1"
+			origin "Trio_U"
+			file ./B_T_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+	}
+	Figure {
+		Title "Velocity profile - Case B - Config 1"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "u"
+		RangeY 1 3
+		Include_Description_Curves 0
+		Curve {
+			legend "Tetra_compact y+=40"
+			origin "Trio_U"
+			file B_TC_1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=40"
+			origin "Trio_U"
+			file B_TH_1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Tetra y+=40"
+			origin "Trio_U"
+			file B_T_1/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+			TypePoints 3
+		}
+	}
+	Figure {
+		Title "Velocity profile : semi-log coordinates - Case B - Config 1"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_compact y+=40"
+			origin "Trio_U"
+			file B_TC_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_homogene y+=40"
+			origin "Trio_U"
+			file B_TH_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra y+=40"
+			origin "Trio_U"
+			file B_T_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Table {
+		Title "Study of influence of nx and nz resolution"
+		nb_columns 3
+		label u* | (u*theo-u*)/u*theo in $%$ | forcing
+		line {
+			legend "theoretical"
+			origin "theorie"
+			file ./A_TC_1/ligneTheoTableau.dat
+			nb_columns_file 2
+			columns ($1) rien ($2)
+		}
+		line {
+			legend "Tetra_compact"
+			values "" "" ""
+		}
+		line {
+			legend "$\Delta$x=$\Delta$z=2.5"
+			origin "Trio_U"
+			file ./A_TC_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=1.25 $\Delta$z=2.5"
+			origin "Trio_U"
+			file ./C_TC_x9z5/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=0.625 $\Delta$z=2.5"
+			origin "Trio_U"
+			file ./C_TC_x17z5/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=2.5 $\Delta$z=1.25"
+			origin "Trio_U"
+			file ./C_TC_x5z9/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=2.5 $\Delta$z=0.625"
+			origin "Trio_U"
+			file ./C_TC_x5z17/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Tetra_homogene"
+			values "" "" ""
+		}
+		line {
+			legend "$\Delta$x=$\Delta$z=2.5"
+			origin "Trio_U"
+			file ./A_TH_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=1.25 $\Delta$z=2.5"
+			origin "Trio_U"
+			file ./C_TH_x5z3/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=0.625 $\Delta$z=2.5"
+			origin "Trio_U"
+			file ./C_TH_x9z3/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=2.5 $\Delta$z=1.25"
+			origin "Trio_U"
+			file ./C_TH_x3z5/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=2.5 $\Delta$z=0.625"
+			origin "Trio_U"
+			file ./C_TH_x3z9/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "Tetra"
+			values "" "" ""
+		}
+		line {
+			legend "$\Delta$x=$\Delta$z=2.5"
+			origin "Trio_U"
+			file ./A_T_1/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=1.25 $\Delta$z=2.5"
+			origin "Trio_U"
+			file ./C_T_x9z5/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=0.625 $\Delta$z=2.5"
+			origin "Trio_U"
+			file ./C_T_x17z5/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=2.5 $\Delta$z=1.25"
+			origin "Trio_U"
+			file ./C_T_x5z9/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			legend "$\Delta$x=2.5 $\Delta$z=0.625"
+			origin "Trio_U"
+			file ./C_T_x5z17/ligneTableau.dat
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+	}
+	Figure {
+		Title "Velocity profile - Tetra_compact - Resolution in x direction"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_compact nx=5"
+			origin "Trio_U"
+			file A_TC_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_compact nx=9"
+			origin "Trio_U"
+			file C_TC_x9z5/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra_compact nx=17"
+			origin "Trio_U"
+			file C_TC_x17z5/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Tetra_compact - Resolution in z direction"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_compact nz=5"
+			origin "Trio_U"
+			file A_TC_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_compact nz=9"
+			origin "Trio_U"
+			file C_TC_x5z9/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra_compact nz=17"
+			origin "Trio_U"
+			file C_TC_x5z17/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Tetra_homogene - Resolution in x direction"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_homogene nx=3"
+			origin "Trio_U"
+			file A_TH_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_homogene nx=5"
+			origin "Trio_U"
+			file C_TH_x5z3/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra_homogene nx=9"
+			origin "Trio_U"
+			file C_TH_x9z3/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Tetra_homogene - Resolution in z direction"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra_homogene nz=3"
+			origin "Trio_U"
+			file A_TH_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra_homogene nz=5"
+			origin "Trio_U"
+			file C_TH_x3z5/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra_homogene nz=9"
+			origin "Trio_U"
+			file C_TH_x3z9/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Tetra - Resolution in x direction"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra nx=5"
+			origin "Trio_U"
+			file A_T_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra nx=9"
+			origin "Trio_U"
+			file C_T_x9z5/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra nx=17"
+			origin "Trio_U"
+			file C_T_x17z5/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+	Figure {
+		Title "Velocity profile - Tetra - Resolution in z direction"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "u+"
+		RangeY 5 25
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi log=(l/K)*ln(y+)+5.32"
+			origin "Theorie"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Tetra nz=5"
+			origin "Trio_U"
+			file A_T_1/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Tetra nz=9"
+			origin "Trio_U"
+			file C_T_x5z9/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Tetra nz=17"
+			origin "Trio_U"
+			file C_T_x5z17/velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+	}
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

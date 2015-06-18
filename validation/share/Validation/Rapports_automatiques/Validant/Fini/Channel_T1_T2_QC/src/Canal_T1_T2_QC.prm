@@ -1,0 +1,854 @@
+Parameters {
+	Title "Channel T1/T2 QC VEF "
+	Description "Periodic turbulent plane channel. Compressible case"
+	Description "Study of a Channel with T1 and T2 imposed wall temperatures and 3 tested mesh elongations: 1 10 and 100."
+	Description "\latex_($\displaystyle{Re_{bulk}=\frac{\rho(T_b).U_b.(h/2)}{\mu(T_b)}}$ \latex_) "
+	Description " \latex_($Re_{\tau}=0.175.Re_{bulk}^{7/8}$\latex_) (Dean's correlation)"
+	Description ""
+	Description "\latex_($\frac{T_2}{T_1}=1.59$\latex_) -   \latex_($Re_{bulk}=14775$ \latex_)  - \latex_($Re_{\tau}=779 $\latex_)"
+	Description ""
+	
+	Description "The mean velocity profile is compared with the logarithmic law."
+	Description "\latex_(The mean temperature profile is compared with linear law $T^+=PrY^+$ and the law of Kader.\latex_)"
+	Description "The Nusselt is compared with correlations of Kays and Crawford, Kasagi, Colburn, Dittus Boelter, and MacElligot,"
+	Author "MALOT C - FOURNIER C"
+	
+	TestCase "Quasicompressible/Canal_plan_bi_periodique_M1" "Canal_plan_bi_periodique_M1.data" /*data file in annex*/
+	TestCase "Quasicompressible/Canal_plan_bi_periodique_M10" "Canal_plan_bi_periodique_M10.data"
+	TestCase "Quasicompressible/Canal_plan_bi_periodique_M100" "Canal_plan_bi_periodique_M100.data"
+
+	ParametersTrio_U "Compressible fluid at low Mach number (Quasi-Compressible)"
+	ParametersTrio_U "Bi-periodic plane channel in X and Z"
+	ParametersTrio_U "Convection scheme = muscl" with the following correction: mode_calcul_convection divrhouT_moins_Tdivrhou in order to improve the calculation of the convective term (u.grad(T)). Thee EF_stab is not used, because it is a Quasi compressible calculation for which the EF_stab scheme has not been developped.
+	ParametersTrio_U "k-$\varepsilon$ modelling of turbulence"
+	ParametersTrio_U "Heat transfer with imposed temperatures"
+	ParametersTrio_U "No-slip at the wall"
+
+	IncludeData 2
+}
+
+Chapter {
+	Title "Test description"
+	Figure {
+		Title "Geometry"
+		Description "Dimensions : h=4 mm, L=4 mm x (1;10;100), P=2 mm"
+		Width 12cm
+		picture Geometry.png
+	}
+	Table {
+		Description "3 meshes M1 M10 and M100 (tetrahedral elements) are made by stretching the mesh below, by a factor 1, 10 or 100 in X direction."
+		Description "Number of cells : 2214"
+		}
+
+
+	Visu {
+		Title "Mesh M1"
+       		Width 6 cm
+		mesh Quasicompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1.lata dom
+        	Normal3d 0.5 0.5 0.5
+	}
+
+	Visu {
+		Title "Mesh M10"
+	       	Width 12 cm
+		mesh Quasicompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10.lata dom
+        	Normal3d 0.5 0.5 0.5
+	}
+
+
+	Table {
+		Title "Initial conditions"
+		Description "Hydraulic : uniform velocity set to 80 m/s in X direction."
+		Description "Temperature : linear profile. "
+		}
+	Table {
+		Title "Boundary conditions" 
+		Description "Hydraulic : Periodicity in X and Z directions"
+		Description "Temperature : Imposed wall temperature in Y direction." 
+		Description " T1 = 673 K (400°C); T2 = 1073 K (800°C)."
+	}
+	
+	
+	
+	Table {
+		Title "Physical properties"
+		Description "Fluid domain: Helium at 70 bars"
+		Description "Perfect gas with.....Pth = conservation_masse"
+		Description "..............................Pressure = 7 092 750 Pa"
+		Description "..............................\latex_($\mu(T) = 3.95 10^{-7} . T^{0.687} $\latex_) N/m$^2$/s......(T in Kelvin)"
+		Description "..............................\latex_($\lambda(T) = 2.774 10^{-3} . T^{0.701} $\latex_) W/m/K...(T in Kelvin)"
+		Description "..............................\latex_($C_p = 5193$\latex_) J/kg/K"
+		Description "..............................Prandtl = 0.673 (at T=873K)"
+		Description "..............................$\gamma$ = \latex_($C_p/C_v$\latex_) = 1.666"
+		Description "..............................$\rho$=P/RT.....with....P local pressure,"
+		Description "............................................................T local temperature,"
+		Description "............................................................R ideal gas constant ( = 2075.95 m$^2$/s$^2$/K )"
+	}
+	Table {
+		Title "Solving of equations"
+		Description "Pb_Thermohydraulique_Turbulent_QC"
+		Description "Schema_Euler_Explicite"
+		Description "Fluide_Quasi_Compressible"
+		Description "Navier_Stokes_Turbulent_QC"
+		Description ".........Convection { muscl }"
+		Description ".........Sources { Canal_perio { bord Periox } }"
+		Description ".........Modele_Turbulence K_Epsilon"
+		Description "Convection_Diffusion_Chaleur_QC"
+		Description ".........Convection { muscl }"
+		Description ".........Modele_Turbulence Prandtl"
+	}
+}
+Chapter {
+	Title "Parameters for non dimension"
+	Description " Different parameters are used to draw the non dimensionnal curves:"
+	Description "The friction velocity is defined by:\latex_($\;\;\; U_{\tau}=\frac{\mu\frac{\delta u}{\delta x}}{\rho}=\sqrt{\frac{\tau}{\rho}}$\latex_)
+	Description "The upper value is obtained by dividing the wall integrated value  from the file: pb_Contrainte_visqueuse.out with the wall surface. "
+	Description " y$^+$ is obtained from \latex_($y^{+}=y.U_{\tau}/\nu$\latex_)
+	Description "The friction temperature is defined by:\latex_($\;\;\; T_{\tau}=\frac{\lambda\frac{\delta T}{\delta y}}{\rho C_{p}u_{\tau}}$\latex_)
+	Description "The upper value obtained by dividing the wall integrated value from the file pb_Diffusion_chaleur.out with the wall surface. "
+	Description "The non dimension temperature is then obtained by: \latex_($\;\;\; T^{+}=\frac{T-T_{wall}}{T_{\tau}}$\latex_)
+	Description "The mean temperature profiles are compared to the linear law (T$^+$=Pr.Y$^+$) and to the law of Kader
+	Description "T$^+$ = PrY$^+$exp(-$\Gamma$) + [2.12 ln(1+Y$^+$)+$\beta$(Pr)]exp(-1/$\Gamma$)"
+	Description "With"
+	Description "$\Gamma$ = 0.01(PrY$^+$)$^4$ / (1+5Y$^+$Pr$^3$)"
+	Description "$\beta$(Pr) = (3.85Pr$^1$$^/$$^3$ - 1.3)$^2$ + 2.12 ln(Pr)"
+
+}
+
+
+Chapter {
+	Title "Calculation convergence"
+	Description "To make sure that the calculation has reached a converged state, the temperature and the Vx velocity probes are plotted at the point (2mm,1mm,1mm). It can be seen that at 0.02s, the calculation has reached a steady state. The different converged values are depending on the mesh: with a more elongated mesh, the profiles are not exeactly the same.
+	Figure {
+		Title "Convergence of velocity Vx at (2mm, 1mm, 1mm)"
+		Width 10cm
+		Dimension 2
+		LabelX "time (s)"
+		RangeX 0 0.02
+		LabelY "Vx (m/s)"
+		RangeY 80  90
+		Include_Description_Curves 0
+		Curve {
+			legend "M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1_PT_VITESSE.son
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+		}
+		Curve {
+			legend "M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10_PT_VITESSE.son
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+		}
+		Curve {
+			legend "M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Canal_plan_bi_periodique_M100_PT_VITESSE.son
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Title "Convergence of Temperature at (2mm, 1mm, 1mm)"
+		Width 10cm
+		Dimension 2
+		LabelX "time (s)"
+		RangeX 0 0.02
+		LabelY "Temperature (K)"
+		RangeY 750  850
+		Include_Description_Curves 0
+		Curve {
+			legend "M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1_PT_TEMPERATURE.son
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+		}
+		Curve {
+			legend "M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10_PT_TEMPERATURE.son
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+		}
+		Curve {
+			legend "M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Canal_plan_bi_periodique_M100_PT_TEMPERATURE.son
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+		}
+	}
+
+
+}
+Chapter {
+	Title "Velocity results"
+	Figure {
+		Title "Axial velocity profiles"
+		Width 10cm
+		Dimension 2
+		LabelX "Y (mm)(0 cold T1 ; 4 hot T2)"
+		RangeX 0 4 
+		LabelY "U"
+		RangeY 0 100
+		Include_Description_Curves 0
+		Curve {
+			legend "M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1_SONDE_VITESSE.coupe
+			origin "Trio_U"
+			columns $1*1000. 2
+			Style linespoints
+		}
+		Curve {
+			legend "M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10_SONDE_VITESSE.coupe
+			origin "Trio_U"
+			columns $1*1000. 2
+			Style linespoints
+		}
+		Curve {
+			legend "M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Canal_plan_bi_periodique_M100_SONDE_VITESSE.coupe
+			origin "Trio_U"
+			columns $1*1000. 2
+			Style linespoints
+		}
+	}
+
+	Figure {
+		Title "Mean axial velocity profiles"
+		Description "The mean axial velocity profiles on outlet ( U$^+$ = U/U$\tau$ ; Y$^+$ = Y.U$\tau$/$\nu$ ) are compared to the law of wall : U$^+$ = 1/0.415 x ln(Y$^+$) + 5.32"
+		Description "The results for mesh M1 are very far from the theoretical log law. Then, the more the mesh is stretched, the closer the results are from the log law.
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 1000
+		LogX
+		LabelY "U+"
+		RangeY 10 35
+		Include_Description_Curves 0
+		Curve {
+			legend "Low of the wall"
+			fonction 1/0.415*log(x)+5.32
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+	}
+
+
+
+
+
+	Figure {
+		Title "Explanations of M1 result : contribution of transverse velocity"
+		Width 15cm
+		picture Contrib_Transv_V.png
+		Description "The result obtained with the mesh M1 is not conclusive and can be interpreted by a non negligeable contribution of the deviation of transverse velocities, like in the non compressible test case. This is illustrated in the following curves. However, the meshes M10 and M100 obtained by stretching the M1 mesh give results which are closer to the objective.
+	}
+
+	Figure {
+		Title "Deviations of transverse velocity V"
+		Width 12cm
+		Dimension 2
+		LabelX "Y (m)"
+		RangeX 0 0.004
+		LabelY "Delta V (m/s)"
+		RangeY -1 1
+		Include_Description_Curves 0
+		Curve {
+			legend "mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "Deviations of transverse velocity W"
+		Description ""
+		Width 12cm
+		Dimension 2
+		LabelX "Y (m)"
+		RangeX 0 0.004
+		LabelY "Delta W (m/s)"
+		RangeY -1 1
+		Include_Description_Curves 0
+		Curve {
+			legend "mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "Van Driest transformation \& Semi Local Scaling"
+		Width 15.9cm
+		picture ./SLS_VD.png
+		Description " The Van Driest or the Semi local Scaling enable to take into account the compressibility of the fluid at the wall, in order to improve the representation of the non-dimensionnal curves. The effect of these transformations is neither obvious on the velocity nor on the temperature profile.
+	}
+
+
+
+
+
+	Figure {
+		Title "Mean axial velocity profiles with Van Driest transformation"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 1000
+		LogX
+		LabelY "U+ Van Driest"
+		RangeY 10 35
+		Include_Description_Curves 0
+		Curve {
+			legend "Low of the wall"
+			fonction 1/0.415*log(x)+5.32
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			origin "Trio_U"
+			columns 1 4
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			origin "Trio_U"
+			columns 1 4
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			origin "Trio_U"
+			columns 1 4
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			origin "Trio_U"
+			columns 1 4
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			origin "Trio_U"
+			columns 1 4
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			origin "Trio_U"
+			columns 1 4
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "Mean axial velocity profiles with Semi Local Scaling"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+ SLS"
+		RangeX 10 1000
+		LogX
+		LabelY "U+ SLS"
+		RangeY 10 35
+		Include_Description_Curves 0
+		Curve {
+			legend "Low of the wall"
+			fonction 1/0.415*log(x)+5.32
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			origin "Trio_U"
+			columns 5 6
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			origin "Trio_U"
+			columns 5 6
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			origin "Trio_U"
+			columns 5 6
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			origin "Trio_U"
+			columns 5 6
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			origin "Trio_U"
+			columns 5 6
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			origin "Trio_U"
+			columns 5 6
+			Style linespoints
+		}
+	}
+}
+Chapter {
+	Title "Temperature results"
+
+
+	Figure {
+		Title "Axial temperature profiles"
+		Width 12cm
+		Dimension 2
+		LabelX "Y (mm)(0 cold T1 ; 4 hot T2)"
+		RangeX 0 4 
+		LabelY "U"
+		RangeY 673 1073
+		Include_Description_Curves 0
+		Curve {
+			legend "M1"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1_SONDE_TEMPERATURE.coupe
+			origin "Trio_U"
+			columns $1*1000. 2
+			Style linespoints
+		}
+		Curve {
+			legend "M10"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10_SONDE_TEMPERATURE.coupe
+			origin "Trio_U"
+			columns $1*1000. 2
+			Style linespoints
+		}
+		Curve {
+			legend "M100"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Canal_plan_bi_periodique_M100_SONDE_TEMPERATURE.coupe
+			origin "Trio_U"
+			columns $1*1000. 2
+			Style linespoints
+		}
+	}
+
+
+
+	Figure {
+		Title "Mean temperature profiles"
+		Description "The mean temperature profiles on outlet  are compared to the linear law T$^+$ = PrY$^+$ and the law of Kader "
+		Description "Like for the velocity, the results for mesh M1 are quite far from the Kader log law.
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 1 10000
+		LogX
+		LabelY "T+"
+		RangeY 0 30
+		Include_Description_Curves 0
+		Curve {
+			legend "Pr.Y+"
+			fonction 0.6733*x
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Kader"
+			fonction (0.6733*x*exp(-((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3)))+(2.12*log(1+x)+((3.85*0.6733**(0.3333)-1.3)**2+2.12*log10(0.6733)))*exp(-1/((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))))
+			# gamma = ((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))
+			# beta  = ((3.85*0.6733**(0.3333)-1.3)**2+2.12*log(0.6733))
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "Mean temperature profiles with Semi Local Scaling"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+ SLS"
+		RangeX 1 10000
+		LogX
+		LabelY "T+ SLS"
+		RangeY 0 30
+		Include_Description_Curves 0
+		Curve {
+			legend "Pr.Y+"
+			fonction 0.6733*x
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Kader"
+			fonction (0.6733*x*exp(-((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3)))+(2.12*log(1+x)+((3.85*0.6733**(0.3333)-1.3)**2+2.12*log10(0.6733)))*exp(-1/((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))))
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			columns 5 7
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			columns 5 7
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			columns 5 7
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			columns 5 7
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			columns 5 7
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			columns 5 7
+			Style linespoints
+		}
+	}
+
+	Table {
+		Title "Nusselt correlations"
+		Description "Different Nusselt correlations (Colburn, Dittus Boelter and Mac Elligot) are used for comparison with the calculated results. They are classical correlations found in the litterature built to represent cases with an imposed heat flux or a constant wall temperature, mainly for non compressible fluids. 
+		Description "In the present case, two different wall temperatures are imposed (673K and 1073K), with a quasi-compressible fluid, leading to very different physical properties at each boundary of the calculated domain. 
+	Description "In the uncompressible T1/T2 Channel validation file, another correlation is used (Danov) for turbulent flows between parallel plates with unequal oniform temperatures. It is however not designed for compressible flows."
+		Description ".
+		Description "The definitions of bulk reynolds \latex_($Re_{b}$\latex_) and hydraulic diameter reynolds \latex_($Re_{DH}$\latex_) are the following:"
+		Description "\latex_($Re_{b}=\frac{\rho U_{b}h}{\mu}$\latex_)
+		Description "\latex_($Re_{DH}=\frac{4\rho U_{b}h}{\mu}$\latex_)
+		Description ".
+		Description "With these definitions, the different correlations used are:
+		Description "\latex_($\textbf{Colburn:}$\latex_) "
+		Description "\latex_($\;\;\; Nu_{DH}=0.023.Re_{DH}^{0.8}.Pr^{1/3}$ for $0.5<Pr<3$ and $10^{4}<Re_{DH}<10^{5}$\latex_)
+		Description "\latex_($\textbf{Dittus Boelter:}$\latex_) "
+		Description "\latex_($\;\;\; Nu_{DH}=0.026.Re_{DH}^{0.8}.Pr^{0.3}$ for cooling for $0.7<Pr<120$ and $2500 <Re_{DH}< 1.24 10^{5}$\latex_)
+		Description "\latex_($\;\;\; Nu_{DH}=0.024.Re_{DH}^{0.8}.Pr^{0.4}$ for heating\latex_)
+		Description "\latex_($\textbf{Mac Elligot:}$\latex_) "
+		Description "\latex_($\;\;\; Nu_{DH}=0.021.Re_{DH}^{0.8}.Pr^{0.4}.\left(\frac{T_{w}}{T_{b}}\right)^{-0.5}\;\;\; for\,\;1.1<\frac{T_{w}}{T_{b}}<2.5\;\;$ \latex_)
+		Description ".
+		Description "For each wall (hot and cold), the Nusselt numbers are calculated with the properties at the wall, like for the Trio_U calculation. We are clearly out of the scope of such correlations built with bulk temperatures. \latex_($\textbf{So it is difficult to conclude with the available correlations.}$\latex_)
+
+		}
+
+	Table {
+		Title "Main calculated values at the walls"
+		Description "The different calculated data used for adimensionning and for Nusselt calculation are presented below."
+		nb_columns 9
+		label y+  | Re bulk | Re DH | Pr | Utau | Re_tau | T_tau | T_bulk | T_wall
+		line {
+			legend "Cold wall M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/propri_par_bas.dat
+		}
+		line {
+			legend "Cold wall M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/propri_par_bas.dat
+		}
+		line {
+			legend "Cold wall M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/propri_par_bas.dat
+		}
+
+		line {
+			legend "Hot wall M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/propri_par_haut.dat
+		}
+		line {
+			legend "Hot wall M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/propri_par_haut.dat
+		}
+		line {
+			legend "Hot wall M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/propri_par_haut.dat
+		}
+
+
+
+
+	}
+
+
+
+	Table {
+		Title "Nusselt"
+		Description "The Nusselt is compared with correlations of Colburn, Dittus Boelter, and MacElligot."
+		Description ""
+		Description ""
+		nb_columns 4
+		label Nu Trio_U  | Nu Colburn | Nu DittusBoelter | Nu MacElligot 
+		line {
+			legend "Cold wall M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Nusselt_bas_th.dat
+		}
+		line {
+			legend "Cold wall M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Nusselt_bas_th.dat
+		}
+		line {
+			legend "Cold wall M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Nusselt_bas_th.dat
+		}
+		line {
+			legend "Hot wall M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Nusselt_haut_th.dat
+		}
+		line {
+			legend "Hot wall M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Nusselt_haut_th.dat
+		}
+		line {
+			legend "Hot wall M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Nusselt_haut_th.dat
+		}
+	}
+
+	Table {
+		Title "Nusselt: comparison"
+		Description "The Nusselt is compared with correlations of Colburn"
+		nb_columns 3
+		label Nu Trio_U  | Nu Colburn | Relative error in %
+		line {
+			legend "Cold wall M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Ecart_Nusselt_bas_th.dat
+		}
+		line {
+			legend "Cold wall M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Ecart_Nusselt_bas_th.dat
+		}
+		line {
+			legend "Cold wall M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Ecart_Nusselt_bas_th.dat
+		}
+		line {
+			legend "Hot wall M1"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M1/Ecart_Nusselt_haut_th.dat
+		}
+		line {
+			legend "Hot wall M10"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M10/Ecart_Nusselt_haut_th.dat
+		}
+		line {
+			legend "Hot wall M100"
+			origin "Trio_U"
+			file ./Quasicompressible/Canal_plan_bi_periodique_M100/Ecart_Nusselt_haut_th.dat
+		}
+	}
+
+
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "As was seen in these calculations, the results obtained for mesh M1 are quite far from the expected log laws, both for velocity and for temperature. This can be explained by the non neglectable contribution of the deviation of transverse velocity as already observed in the non compressible validation file.
+	Description "As far as the comparison with the Nusselt numbers is concerned, the calculation results are far from the results obtained with the classical Nusselt correlations. However, these correlations are not adapted to flows with different imposed temperatures at the wall, as they are usually calculated with bulk values.
+	}
+
+# on n' utilise pas Table performance a cause  des noms qu sont trop longs et qui genereraient un Table illisible
+#Chapitre {
+#       Title "Computer performance"
+#       tableau_performance {
+#       }
+#} 
+
+Chapter {
+Title "Performances"
+Table {
+		nb_columns 5
+		label  host|system|Total CPU Time|CPU time/step|number of cell
+		line {
+			legend Quasicompressible/M1
+			origin Trio_U
+			file Quasicompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Quasicompressible/M10
+			origin Trio_U
+			file Quasicompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Quasicompressible/M100
+			origin Trio_U
+			file Quasicompressible/Canal_plan_bi_periodique_M100/Canal_plan_bi_periodique_M100.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Total
+			origin Trio_U
+			file temps_total
+			columns rien rien $1 rien rien
+			nb_columns_file 1
+		}
+	}
+}
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../propertiesGeometry.py
+##cp propertiesGeometry.dat ..
+##
+python calculHH.py test_COUPE_COMBUSTIBLE_LONG_CANAL_1_TPAROI.son test_SONDE_HE_T_SORTIE.son test_pb_solide_Diffusion_chaleur.face propertiesGeometry.dat

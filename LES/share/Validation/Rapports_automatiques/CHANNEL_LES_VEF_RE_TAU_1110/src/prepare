@@ -1,0 +1,25 @@
+#!/bin/bash
+
+mkdir -p Alpha1
+mkdir -p Alpha0.2
+mkdir -p Alpha0.2_TBLE
+mkdir -p Alpha0.2_Implicite
+
+cp post_run Alpha1
+cp post_run Alpha0.2
+cp post_run Alpha0.2_TBLE
+cp post_run Alpha0.2_Implicite
+
+sed "s/# CN--//" model.data > tmp1.data
+sed "s/--CN #//" tmp1.data > tmp2.data
+
+cp tmp2.data Alpha1/test.data    
+
+sed "s/EF_stab { volumes_etendus }/EF_stab { volumes_etendus alpha 0.2 }/" tmp2.data > Alpha0.2/test.data
+
+sed "s/loi_standard_hydr/Paroi_TBLE { sans_source_boussinesq N 30 facteur 1.0  sonde_tble 1 x3625 4.5 0. 0 restart stationnaire 10 1e-4  alpha 1 }/" Alpha0.2/test.data > Alpha0.2_TBLE/test.data
+
+sed "s/# Impli--//" model.data > tmp1.data
+sed "s/--Impli #//" tmp1.data > Alpha0.2_Implicite/tmp.data
+sed "s/EF_stab { volumes_etendus }/EF_stab { volumes_etendus alpha 0.2 }/" Alpha0.2_Implicite/tmp.data > Alpha0.2_Implicite/test.data
+rm -f Alpha0.2_Implicite/tmp.data

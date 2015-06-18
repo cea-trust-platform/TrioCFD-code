@@ -1,0 +1,18 @@
+#extraction de la norme de la vitesse max au cours du temps
+#traitement des donnees relatives a (vitesse-solution)
+
+errnormmax=`tail -1 couette_MAX_ERR_FLUIDE.son | awk '{print $2}'`
+errnormL2=`tail -1 couette_L2_ERR_FLUIDE.son | awk '{print $2}'`
+echo $errnormmax" "$errnormL2  > norm_erreur_vit.txt
+
+#traitement des donnees relatives a (vitesse)
+
+vitnormmax=`tail -1 couette_MAX_NORME_ID.son | awk '{print $2}'`
+vitnormL2=`tail -1 couette_L2_NORME_ID.son | awk '{print $2}'`
+echo $vitnormmax" "$vitnormL2  > norm_vit.txt
+
+#traitement des donnees relatives a (solution)
+
+solnormmax=`tail -1 couette_MAX_SOLUTION.son | awk '{print $2}'`
+solnormL2=`tail -1 couette_L2_SOLUTION.son | awk '{print $2}'`
+echo $solnormmax" "$solnormL2  > norm_ref_vit.txt

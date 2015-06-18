@@ -1,0 +1,221 @@
+Parameters {
+	Title "Chimie FT"
+	Description "Calculs menes en VDF/VEF"
+	reference "moi_meme"
+	Author "G.F."
+	TestCase "." Chimie_grains_v13.data jdd
+	TestCase "." Chimie_grains_v13_vef.data
+	TestCase "." Chimie_grains_v13_1pas.data
+	TestCase "." def_Chimie_grains_v13.data jdd
+	TestCase "." def_Chimie_grains_v13_vef.data
+
+}	
+
+Chapter {
+	Title "A"
+	Description "un lineaire et l'autre pas."  
+Figure {
+	Title "A"
+	Dimension 2
+	Include_Description_Curves 0
+	width 12cm	
+	LabelX "s"
+
+      #  legend  below title "Legende"
+
+	Curve {
+		legend "vdf"
+	
+		file ./Chimie_grains_v13_A.son
+		Style linespoints
+	}
+	Curve {
+		legend "vef"
+	
+	file ./Chimie_grains_v13_vef_A.son
+		Style linespoints
+	}
+	Curve {
+		legend "vdf 1 pas"
+	
+		file ./Chimie_grains_v13_1pas_A.son
+		Style linespoints
+	}
+	Curve { 
+		# legend analytique
+		fonction 1/(2*x+1)
+		origin ana
+}
+
+}
+Figure {
+	Title "B"
+	Dimension 2
+	
+	LabelX "s"
+		Include_Description_Curves 0
+	width 12cm	
+
+      #  legend  below title "Legende"
+
+	Curve {
+		legend "vdf"
+	
+		file ./Chimie_grains_v13_B.son
+		Style linespoints
+	}
+	Curve {
+		legend "vef"
+	
+	file ./Chimie_grains_v13_vef_B.son
+		Style linespoints
+	}
+	Curve {
+		legend "vdf 1 pas"
+	
+		file ./Chimie_grains_v13_1pas_B.son
+		Style linespoints
+	}
+	Curve { 
+		# legend analytique
+		fonction 2/(2*x+1)
+		origin ana
+}
+
+
+}
+Figure {
+	Title "C"
+	Dimension 2
+	
+	LabelX "s"
+
+      #  legend  below title "Legende"
+	Include_Description_Curves 0
+	width 12cm	
+	Curve {
+		legend "vdf"
+	
+		file ./Chimie_grains_v13_C.son
+		Style linespoints
+	}
+	Curve {
+		legend "vef"
+	
+	file ./Chimie_grains_v13_vef_C.son
+		Style linespoints
+	}
+	Curve {
+		legend "vdf 1 pas"
+	
+		file ./Chimie_grains_v13_1pas_C.son
+		Style linespoints
+	}
+
+	Curve { 
+		# legend analytique
+		fonction 4*(1-1/(2*x+1))
+		origin ana
+}
+
+}
+}
+
+
+
+Chapter {
+	Title "A"
+	Description "un lineaire et l'autre pas."  
+Figure {
+	Title "A"
+	Dimension 2
+	Include_Description_Curves 0
+	width 12cm	
+	LabelX "s"
+
+      #  legend  below title "Legende"
+
+	Curve {
+		legend "vdf"
+	
+		file ./def_Chimie_grains_v13_A.son
+		Style linespoints
+	}
+	Curve {
+		legend "vef"
+	
+	file ./def_Chimie_grains_v13_vef_A.son
+		Style linespoints
+	}
+
+	Curve { 
+		#legende analytique
+		fonction (1e-3)*exp(-2*x)
+		origin ana
+}
+
+}
+Figure {
+	Title "B"
+	Dimension 2
+	
+	LabelX "s"
+		Include_Description_Curves 0
+	width 12cm	
+
+      #  legend  below title "Legende"
+
+	Curve {
+		legend "vdf"
+	
+		file ./def_Chimie_grains_v13_B.son
+		Style linespoints
+	}
+	Curve {
+		legend "vef"
+	
+	file ./def_Chimie_grains_v13_vef_B.son
+		Style linespoints
+	}
+
+	Curve { 
+		# legend analytique
+		fonction 2
+		origin ana
+}
+
+
+}
+Figure {
+	Title "C"
+	Dimension 2
+	
+	LabelX "s"
+
+      #  legend  below title "Legende"
+	Include_Description_Curves 0
+	width 12cm	
+	Curve {
+		legend "vdf"
+	
+		file ./def_Chimie_grains_v13_C.son
+		Style linespoints
+	}
+	Curve {
+		legend "vef"
+	
+	file ./def_Chimie_grains_v13_vef_C.son
+		Style linespoints
+	}
+
+
+	Curve { 
+		# legend analytique
+		fonction 4e-3*(1-exp(-2*x))
+		origin ana
+}
+
+}
+}
+
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+mkdir LATA
+mv *lata* LATA
+
+mkdir Probes
+mv *.son Probes

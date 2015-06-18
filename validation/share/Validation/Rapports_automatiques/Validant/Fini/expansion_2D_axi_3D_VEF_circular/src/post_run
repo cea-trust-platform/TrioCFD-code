@@ -1,0 +1,6 @@
+#!/bin/bash
+extrait_coupe 2d_vdf_scz SONDE_PRESSION
+extrait_coupe 2d_vdf_scz SONDE_KZ15
+extrait_coupe 2d_vdf_scz SONDE_KR257
+extrait_coupe 2d_vdf_scz SONDE_KR0
+sh ../first.awk 2d_vdf_scz

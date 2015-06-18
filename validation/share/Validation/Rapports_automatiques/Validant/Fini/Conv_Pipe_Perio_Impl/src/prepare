@@ -1,0 +1,26 @@
+#!/bin/bash
+mkdir -p EF_stab Muscl Prt_std
+
+cd EF_stab
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+
+cd ../Muscl
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "s/convection { EF_stab { } }/convection { muscl }/" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ../Prt_std
+cp ../Tuyau.data .
+cp ../Conduite.data .
+cp ../pre_run .
+cp ../post_run .
+sed "/Prandt_turbulent_fonction_nu_t_alpha/d" Conduite.data > modifie.data
+mv modifie.data Conduite.data
+
+cd ..

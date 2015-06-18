@@ -1,0 +1,107 @@
+Parameters {
+	Title "Test de la penalisation"
+	Description "Rapport utilisant visit"
+	Author "BM MB LD RE"
+	TestCase pena poiseuille
+	TestCase nopena poiseuille
+	Description "La valeur theorique utilisee pour calculer la pression en sortie est donnee par la loi de perte de charge suivante : "
+	Description "\latex_( \[\frac{\Delta P~=~8~ \nu~ U_{max} ~L}{l^2}\]\latex_)"
+	Description "ou \latex_($\nu=1$\latex_) est la viscosite cinematique du fluide, ou L et l representent respectivement la longueur et la largeur du domaine, tandis que \latex_($U_{max}$\latex_) est la valeur maximale de la norme de la vitesse."
+}
+
+Chapter {
+	Title "FT"
+	Description "Nous commencerons par presenter les champs de vitesse et de pression calcules par Trio_U pour chacun des deux modeles, avant de comparer leur valeur maximale via le calcul d'un ecart relatif."
+	Table {
+		Description "\newpage"
+	}
+	Table {
+		Title "Calcul avec penalisation"
+		Description "\latex_( \begin{center} \latex_) "
+	}
+
+	visu {
+		Description "Representation du champ de vitesse"
+
+		mesh pena/lata/post1.lata DOM
+
+        	vector  pena/lata/post1.lata DOM VITESSE ELEM 
+		width 9cm
+	}
+	visu {
+		Description "Representation du champ de pression"
+
+		mesh pena/lata/post1.lata DOM
+
+        	pseudocolor  pena/lata/post1.lata DOM PRESSION ELEM 
+		width 9cm
+	}
+	Table {
+		 Description "\latex_( \end{center} \latex_)"
+		 Description "\newpage"
+	}
+        Table {
+		Title "Calcul sans penalisation"
+		Description "\latex_( \begin{center} \latex_)"
+	}
+	visu {
+		Description "Representation du champ de vitesse"
+
+		mesh nopena/lata/post1.lata DOM
+
+        	vector  nopena/lata/post1.lata DOM VITESSE ELEM 
+		width 9cm
+	}
+	visu {
+		Description "Representation du champ de pression"
+
+		mesh nopena/lata/post1.lata DOM
+
+        	pseudocolor  nopena/lata/post1.lata DOM PRESSION ELEM 
+		width 9cm
+	}
+	Table {
+		 Description "\latex_( \end{center} \latex_)"
+		 Description "\newpage"
+	}
+	Table {
+		Title "Comparaison des resultats"		
+		Description "\latex_( \begin{center} \latex_)"
+		Description "Verification des ecarts relatifs entre theorie et calcul"   
+		nb_columns 3
+		label Theorie | Calcul | Ecart rel [%] 
+		line {
+			legend SANS penalisation : V_max
+			file ./nopena/compar_normvitmax.txt
+			origin "Trio_U"
+		
+		}
+		line {
+			legend AVEC penalisation : V_max
+			file ./pena/compar_normvitmax.txt
+			origin "Trio_U"
+		
+		}
+		line {
+			legend  SANS penalisation : P_max
+			file ./nopena/compar_pmax.txt			
+			origin "Trio_U"
+		
+		}
+		line {
+			legend AVEC penalisation : P_max
+			file ./pena/compar_pmax.txt			
+			origin "Trio_U"
+		
+		}
+	}
+
+	Table {
+		 Description "\latex_( \end{center} \latex_)"
+	}
+}
+
+
+
+
+

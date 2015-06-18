@@ -1,0 +1,6 @@
+#!/bin/bash
+python ../propertiesGeometry.py
+python ../ligneTableau.py "6" "10000" "2D"
+python ../courbes_reichardt.py 6 10000 2D Moyennes_spatiales_vitesse_rho_mu
+python ../dernierTemps.py Moyennes_spatiales_vitesse_rho_mu
+python ../dernierTemps.py Moyennes_spatiales_nut

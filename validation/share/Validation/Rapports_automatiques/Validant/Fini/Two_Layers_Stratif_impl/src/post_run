@@ -1,0 +1,4 @@
+#!/bin/bash
+#sh ../prophy.awk STABLE
+sh ../prophy.awk STABLE_piso
+

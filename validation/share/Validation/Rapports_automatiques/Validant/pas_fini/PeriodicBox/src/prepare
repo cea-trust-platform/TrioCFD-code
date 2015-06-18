@@ -1,0 +1,13 @@
+#!/bin/bash
+gunzip -c Tube_coude_463259.msh.gz > Tube_coude_463259.msh
+
+echo $ECHO_OPTS "Build the different meshes...\c"
+triou BuildMeshes 1>BuildMeshes.out 2>&1
+if [ $? = 0 ]
+then
+   echo OK
+else
+   echo KO. See `pwd`/BuildMeshes.out
+   exit -1
+fi
+

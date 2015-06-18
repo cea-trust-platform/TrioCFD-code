@@ -1,0 +1,140 @@
+# Procedure pour utiliser les facteurs de forme par Ansys #
+# Et DecoupeBord #
+# PARALLEL OK #
+dimension 3    
+Domaine dom_tetra
+Domaine dom_hexa_lache
+
+# Lecture d'un maillage tetraedre puis decoupage par un maillage hexaedre #
+# Si Ansys est installe on calcule ces facteurs de formes par Ansys #
+# Sinon on decompresse les facteurs de forme deja calcules #
+# Option 2 de geom2ansys: regoupement des calculs de forme dans TRUST: rapide mais moins precis #
+# Option 3 de geom2ansys: regoupement des calculs de forme dans Ansys: lent mais plus precis #
+
+# BEGIN MESH #
+lire_tgrid 		dom_tetra 	Test_radiatif_tetra.msh
+lire_tgrid 		dom_hexa_lache 	Test_radiatif_hexa.msh
+DecoupeBord_pour_rayonnement
+{
+            	Domaine 		dom_tetra
+		Domaine_grossier 	dom_hexa_lache
+		Nom_fichier_sortie 	dom_tetra_decoupe_par_hexa.geom
+		Bords_a_decouper 4  	Arriere_Droit Avant_Gauche Haut Bas
+}
+system "geom2ansys;
+if [ $? = 0 ] && [ `hostname` != moleson ]; 
+then geom2ansys -no_warning dom_tetra_decoupe_par_hexa.geom 2; 
+else gunzip -c dom_tetra_decoupe_par_hexa.facesrayo.gz > dom_tetra_decoupe_par_hexa.facesrayo;
+gunzip -c dom_tetra_decoupe_par_hexa.factforme.gz > dom_tetra_decoupe_par_hexa.factforme;
+fi"
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom_tetra
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom_tetra
+END SCATTER #
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	nb_pas_dt_max 10
+	tinit 0.
+	tmax 1000000.
+        dt_min 1.e-9
+        dt_max 1.
+        dt_impr 100.
+        dt_sauv 500.
+        seuil_statio 1.e-5	
+}
+
+Pb_Thermohydraulique pb
+VEFPreP1B dis
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 2e-09
+	rho Champ_Uniforme 1 2
+        lambda Champ_Uniforme 1 0.2
+	Cp Champ_Uniforme 1 500
+        beta_th Champ_Uniforme 1 0.
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. -9.81 0.
+Associate fluide gravite
+
+Associate pb dom_tetra
+Associate pb fluide
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb
+Associate pbc sch
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Lire mod 
+{
+  dom_tetra_decoupe_par_hexa.facesrayo
+  dom_tetra_decoupe_par_hexa.factforme
+  dom_tetra_decoupe_par_hexa.mat_ray_inv binaire
+}
+
+Lire pb
+{
+        Navier_Stokes_standard
+        {
+     		solveur_pression cholesky { } 
+                convection { muscl }
+                diffusion { }
+                sources { boussinesq_temperature { T0 373. } }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 3 0. 0. 0.
+                        }
+                boundary_conditions {
+                        Arriere_Droit 	paroi_fixe
+                        Avant_Gauche 	paroi_fixe
+                        Haut  		paroi_fixe
+                        Bas 		paroi_fixe
+                }
+        }
+        Convection_Diffusion_Temperature
+        {                
+                convection { muscl }
+		diffusion {  }
+                boundary_conditions 
+                {	
+                        Arriere_Droit 	paroi_flux_impose		Champ_front_Uniforme 1 0.
+                        Avant_Gauche 	paroi_adiabatique
+                        Haut  		paroi_temperature_imposee 	Champ_front_Uniforme 1 373.
+                        Bas 		paroi_temperature_imposee 	Champ_front_Uniforme 1 403.
+                }
+                conditions_initiales { Temperature Champ_Uniforme 1 373 }
+        }
+        Postraitement
+        {
+                Champs dt_post 100.
+                {
+                        pression elem
+                        pression som
+                        vitesse elem
+                        vitesse som
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+
+Solve pbc
+Fin

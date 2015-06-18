@@ -1,0 +1,10 @@
+# Donnees issues de : Compte rendu d'essais GR16 (2eme campagne d'essais), A. Marechal, D. Andreolety, G. Berrebi, F. Girard, NT STT/LTHI/90/184, juillet 1990
+# Valeur de temperature sur l'aiguilles 11
+# Xcentre=82.5mm Ycentre=16.5mm Zcentre=0mm
+# X (m)		Y (m)		T moyen (°C)
+0.07315		0.0165		335.1
+0.0744026625	0.011825	333.8
+0.077825	0.0084026625	333.3
+0.087425	0.0084026625	333.9
+0.090597338	0.011825	335.3
+0.09185		0.0165		336.2

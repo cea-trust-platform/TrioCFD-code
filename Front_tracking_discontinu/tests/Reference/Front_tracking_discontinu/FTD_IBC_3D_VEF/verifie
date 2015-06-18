@@ -1,0 +1,5 @@
+# Verification que l'on a les memes resultat avec loi_horaire ou vitesse_imposee pour methode_transport #
+jdd=`pwd`
+jdd=`basename $jdd`
+compare_lata loi.lml $jdd.lml 1>verifie.log 2>&1
+

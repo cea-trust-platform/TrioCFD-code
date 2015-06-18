@@ -1,0 +1,165 @@
+# Thermohydraulique 2D VEF Boussinesq + Rayonnement semi transparent #
+# PARALLEL OK #
+dimension 2
+Pb_Thermohydraulique pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Cavite 
+		{
+		Origine 0. 0.
+     		Nombre_de_Noeuds 20 20
+		Longueurs 0.1 0.1
+		}
+		{
+		Bord Gauche X = 0.  0. <= Y <= 0.1
+		Bord Haut Y = 0.1  0. <= X <= 0.1
+		Bord Bas Y = 0.     0. <= X <= 0.1
+		Bord Droit X = 0.1 0. <= Y <= 0.1
+		}
+}
+
+
+Trianguler_H dom
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	nb_pas_dt_max 25
+	tinit 0.
+	tmax 1.
+	dt_min 0.00001
+	dt_max 0.1
+	dt_impr 0.1
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 7.5888e-05
+	rho Champ_Uniforme 1 2
+	lambda Champ_Uniforme 1 0.029
+	Cp Champ_Uniforme 1 275.15
+	beta_th Champ_Uniforme 1 3.822e-3
+	indice Champ_Uniforme 1 1.
+	kappa Champ_Uniforme 1 10.
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0 -9.81
+
+Modele_rayo_semi_transp modele_rayo
+Associate modele_rayo dom
+Associate fluide gravite
+Associate pb dom
+Associate pb fluide
+
+Pb_Couple_rayo_semi_transp pbc
+Associate pbc pb
+Associate pbc modele_rayo
+Associate pbc sch
+Discretize pbc dis
+
+
+Lire modele_rayo
+{
+	Eq_rayo_semi_transp
+	{
+	solveur GCP { precond ssor { omega 1.5 } seuil 1.000000e-11 impr }
+	boundary_conditions 
+		{
+		Haut Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Bas Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Gauche Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Droit Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		}		
+	}
+	Postraitement
+	{
+		Sondes
+		{
+			irra irradiance periode 1.e-3 point 1 0.075 0.05
+			sonde_irra irradiance periode 1.e-3 segment 39 0. 0.05 0.1 0.05
+		}
+		Champs dt_post 0.5
+		{
+			irradiance elem
+		}
+	}
+}
+
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression GCP { precond ssor { omega 1.65 } seuil 1.e-11 }
+		convection { amont }
+		diffusion { }
+		sources { boussinesq_temperature { T0 400 } }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			Haut paroi_fixe
+			Bas paroi_fixe
+			Gauche paroi_fixe
+			Droit paroi_fixe
+		}
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { Amont }
+		sources { Source_rayo_semi_transp }
+		boundary_conditions 
+		{
+			Haut paroi_adiabatique
+			Bas paroi_adiabatique
+ 			Gauche Paroi_temperature_imposee
+					Champ_Front_Uniforme 1 266.66
+			Droit Paroi_temperature_imposee
+					Champ_front_Uniforme 1 533.33
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 400. }
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_vitesse 	vitesse periode 1.e-3 segment 39 0. 0.05 0.1 0.05
+			sonde_vit 	vitesse periode 1.e-3 segment 39 0.05 0. 0.05 0.1
+			sonde_temp 	temperature periode 1.e-3 segment 39 0. 0.05 0.1 0.05
+			sonde_v 	vitesse periode 1.e-3 point 1 0.075 0.05
+		}
+		Champs dt_post 0.5
+		{
+			vitesse som
+			temperature elem
+		}
+	}
+}
+
+Solve pbc
+Fin

@@ -1,0 +1,11 @@
+# Extraction de la pression max au cours du temps #
+
+pmax=`tail -1 poiseuille_PMAX.son | awk '{print $2}'`
+pref=7.92
+perreur=`echo $pref $pmax | awk '{print 2*($1-$2)/($1+$2)*100}'`
+echo $pref" "$pmax" "$perreur  > compar_pmax.txt
+
+vmax=`tail -1 poiseuille_VMAX.son | awk '{print $2}'`
+vref=0.605
+verreur=`echo $vref $vmax | awk '{print 2*($1-$2)/($1+$2)*100}'`
+echo $vref" "$vmax" "$verreur  > compar_normvitmax.txt

@@ -1,0 +1,176 @@
+# aaa #
+
+dimension 3
+
+domaine dom_pb1
+
+# BEGIN MESH #
+Mailler dom_pb1
+{
+	Pave Entree 
+	{
+	  Origine 0. 0. 0.
+
+	  Nombre_de_Noeuds 3 11 5
+	  Longueurs 2.0 2 1
+	}
+	{
+	  Bord Entree X = 0.   0. <= Y <= 2 0. <= Z <= 1      
+	  Bord Haut   Y = 2    0. <= X <= 2.0   0. <= Z <= 1 
+	  Bord Bas    Y = 0.   0. <= X <= 2.0   0. <= Z <= 1 
+	  Bord Entree X = 2.0   0. <= Y <= 2 0. <= Z <= 1 
+	  Bord Devant Z = 0.  0. <= X <= 2.0 0. <= Y <= 2 
+	  Bord Devant Z = 1   0. <= X <= 2.0 0. <= Y <= 2
+	}
+}
+
+Tetraedriser dom_pb1
+# END MESH #
+
+Corriger_frontiere_periodique { Domaine dom_pb1 Bord Entree }
+Corriger_frontiere_periodique { Domaine dom_pb1 Bord Devant }
+
+
+
+
+Pb_Hydraulique_Turbulent  pb1
+
+
+Schema_Euler_implicite sch
+Read sch
+{
+        tinit 0.
+        tmax 10000.
+        dt_start dt_calc		
+        dt_min 1.e-5
+        dt_max 10.
+	dt_impr 100
+        dt_sauv 500
+        dt_impr 1000.
+        seuil_statio 1.e-8
+	facsec 1.
+	facsec_max 200
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+
+
+}
+
+
+VEFpreP1b cubesregu
+
+Fluide_Incompressible He
+Read He
+{
+
+	    mu      Champ_Uniforme  1 3.56e-5
+	    rho     Champ_Uniforme  1 3.85
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0. 0. 0
+Associate He gravite
+Associate pb1 dom_pb1
+Associate pb1 He  
+Associate pb1 sch
+
+Discretize pb1 cubesregu
+
+Read pb1
+{
+        Navier_Stokes_Turbulent
+        {
+                solveur_pression Cholesky { } 
+		
+		convection { muscl }
+                diffusion { }
+       		Sources { Canal_perio { bord Entree }  }
+                conditions_initiales 
+		{
+             		vitesse Champ_Uniforme 3 0.05 0. 0.
+                }
+                boundary_conditions 
+		{
+                        Haut     paroi_fixe
+                        Bas      paroi_fixe
+                        Devant   periodique 
+                        Entree   periodique
+                }
+
+		modele_turbulence K_Epsilon 
+		{
+			Transport_K_Epsilon
+		    	{
+		        	convection { muscl }
+		        	diffusion { }
+		         	boundary_conditions 
+				{
+					Devant   periodique 
+					Entree   periodique 
+					Haut     paroi
+					Bas      paroi
+		         	}
+				parametre_equation parametre_implicite 
+				{
+					resolution_explicite
+				}
+		         	conditions_initiales { k_eps Champ_Uniforme 2 1 0.5 }
+		    	}
+		    	turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 2
+		}
+		
+		Traitement_particulier 
+		{ canal { 
+							debut_stat 9000.
+							fin_stat 10000.
+							dt_impr_moy_spat 500.	
+							dt_impr_moy_temp 500.	
+						} 
+		}
+                         
+
+        }
+
+        Postraitement {
+	format lata
+                Sondes
+                {
+                        sonde_He_entree_vdebut         vitesse periode 10. points 1  0. 1  0.5
+                        sonde_He_entree_vfin         vitesse periode 10. points 1  1.5 1  0.5
+                        sonde_He_entree_vfinparoi         vitesse periode 10. points 1 1.5 1.9  0.5
+			sonde_k 			K periode 10. segment 20 1.0 0.0 0.5 1.0 2.0 0.5                      	
+
+			coupe_He_long_Vxmilieu    vitesse periode 500.   segment 20 0 1 0.5 2.0 1 0.5 
+			coupe_He_long_Vxparoi    vitesse periode 500.   segment 20 0 1.9 0.5 2.0 1.9 0.5
+                        coupe_He_long_P    pression periode 500.   segment 20 0 1 0.5 2.0 1 0.5                   
+                        coupe_He_larg_Vz    vitesse periode 500.   segment 4 1.5 1 0.125 1.5 1 0.875
+			coupe_He_larg_Vy    vitesse periode 500.   segment 10 1.5 0.1 0.5 1.5 1.9 0.5
+			
+
+                }
+                Champs dt_post 1000.
+                {
+		   pression elem
+                   vitesse elem
+                }
+        }
+}
+
+
+
+Solve pb1
+End
+# solveur_pression Cholesky { } 
+solveur_pression GCP {
+                        precond ssor { omega 1.500000 }
+                        seuil 1.000000e-07
+                }
+
+
+
+#
+

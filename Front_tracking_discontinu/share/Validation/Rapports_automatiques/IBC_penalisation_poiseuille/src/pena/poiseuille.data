@@ -1,0 +1,202 @@
+# Ecoulement de Poiseuille entre 2 plaques - frontieres  immergees Profil parabolique entre les frontieres immergees #
+# PARALLEL OK #
+# lance_test 1 ecarts #
+
+dimension 2
+
+Probleme_FT_Disc_gen pb
+Domaine DOM
+# BEGIN MESH #
+Read_file DOM ./Pb1_2D.geom
+# END MESH #
+# BEGIN PARTITION
+
+Partition DOM
+{
+        Partitionneur tranche { tranches 2 1 }
+        Larg_joint 2
+        Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VDF dis
+
+# Runge_Kutta_ordre_3 sch #
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0.
+	tmax 10.
+	dt_min 1e-07
+	dt_max 1
+	dt_impr 0.1
+	dt_sauv 1
+	seuil_statio 1e-15
+	facsec 0.5
+}
+
+Fluide_Incompressible eau
+Read eau
+{
+	mu Champ_Uniforme 1 1.
+	rho Champ_Uniforme 1 1.
+}
+
+
+Champ_Uniforme gravite
+Read gravite 2 0. 0. 
+
+Navier_Stokes_FT_Disc eq_hydraulique
+Transport_Interfaces_FT_Disc agit
+
+Associate pb eq_hydraulique
+Associate pb agit
+
+Associate pb DOM
+Associate pb sch
+Associate pb eau
+
+Discretize pb dis
+
+# Debog pb seq faces 1.e-8 0 #
+PrecisionGeom 1.0e-11
+
+Read pb
+{
+	eq_hydraulique
+	{
+		modele_turbulence sous_maille_wale 
+		{	Cw 1.e-16 
+			turbulence_paroi negligeable 
+		}
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-18 impr }
+		convection { quick }
+		diffusion { }
+		conditions_initiales { Vitesse Champ_Uniforme 2 1. 1. }
+		equation_interfaces_vitesse_imposee agit
+                penalisation_forcage { pression_reference 0. } 
+		boundary_conditions
+		{	
+			paroi Frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+                        entree Frontiere_ouverte_vitesse_imposee Champ_front_fonc_XYZ 2 (0.605-0.5*(y-x)*(y-x))*((y-x)>(0.-1.1))*((y-x)<1.1)/sqrt(2.) (0.605-0.5*(y-x)*(y-x))*((y-x)>(0.-1.1))*((y-x)<1.1)/sqrt(2.)
+			sortie Frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+		}
+	}
+
+	agit
+	{
+		conditions_initiales { fonction -(0.605-0.5*(y-x)*(y-x)) }
+		remaillage
+		{
+			pas 1e8
+			nb_iter_remaillage 0
+			critere_arete 0.5
+			critere_remaillage 0.2
+			pas_lissage -1
+			nb_iter_barycentrage 0
+			relax_barycentrage 1
+			facteur_longueur_ideale 0.5
+		}
+		boundary_conditions
+		{
+			paroi paroi_ft_disc symetrie
+			entree paroi_ft_disc symetrie 
+			sortie paroi_ft_disc symetrie 
+		}
+		methode_transport vitesse_imposee 0. 0. 
+		interpolation_champ_face lineaire { }
+                n_iterations_interpolation_ibc 1
+		vitesse_imposee_regularisee 0
+	}
+	Postraitement
+	{
+			Definition_champs
+			{
+			# calcul de pmax #
+		   		pression_max Reduction_0D { methode max
+		   					  source Interpolation
+							  	{ localisation elem 
+		   					  	  source refChamp { Pb_champ pb pression }
+								} 
+							}			
+			
+			# calcul du max de la norme de la vitesse #
+			
+		   		vitesse_max Reduction_0D { methode max
+		   					  	source Transformation
+							  	{
+							  		methode norme 
+									localisation elem
+									source refChamp { Pb_champ pb vitesse }
+							  	}
+							}
+			}
+							  
+                        sondes
+                        {
+			 V1    grav     vitesse periode 1 segment 100 0.7 2.2    2.2 0.7
+			 V2    grav     vitesse periode 1 segment 100 0.65 2.15    2.15 0.65
+			 V3    grav     vitesse periode 1 segment 100 0.9 2.4    2.4 0.9
+			 # Sonde sur la pression max #
+			  Pmax grav  pression_max periode 1 points 1 1.27 1.31 
+			# Sonde sur la vitesse max #
+			 Vmax grav vitesse_max periode 1 points 1 1.27 1.31                            
+
+
+
+                        }
+			format lata
+	champs dt_post 0.1
+	{
+	vitesse elem
+	pression elem
+	}	
+	}
+	liste_de_postraitements
+	{
+	post1 Postraitement_ft_lata 
+        {
+		dt_post 0.1
+		nom_fichier lata/post1
+		format binaire
+		print
+		champs elements
+		{
+			vitesse
+			pression
+			indicatrice_agit
+                        Divergence_U
+		}
+		champs Faces
+		{
+			vitesse
+		}
+		interfaces agit {
+			champs sommets {
+				pe
+				courbure
+			}
+			champs elements {
+				pe
+			}
+		}
+		
+		
+	}
+	
+	}
+	
+}
+
+Solve pb
+
+End
+
+#
+                        entree Frontiere_ouverte_vitesse_imposee Champ_front_fonc_XYZ 2 (0.605-0.5*(y-x)*(y-x))*((y-x)>(0.-1.1))*((y-x)<1.1)/sqrt(2.) (0.605-0.5*(y-x)*(y-x))*((y-x)>(0.-1.1))*((y-x)<1.1)/sqrt(2.)
+#

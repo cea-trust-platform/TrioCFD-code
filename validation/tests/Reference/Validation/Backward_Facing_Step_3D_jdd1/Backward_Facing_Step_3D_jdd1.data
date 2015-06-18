@@ -1,0 +1,126 @@
+# 2D or 3D Keps Backward Facing Step #
+# PARALLEL OK #
+# lance_test 2 ecarts en parallele #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Read_file dom.geo ;
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 20 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_euler_explicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax .21978021978021978021
+	seuil_statio 1.e-4
+	seuil_statio_relatif_deconseille 1
+	dt_impr 1.e-10	
+	
+}
+
+# Air fluid #
+Fluide_Incompressible air
+Read air
+{
+	mu 	Champ_Uniforme 1 0.0000181
+	rho 	Champ_Uniforme 1 1.15
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression petsc cholesky { impr }
+		convection { quick }
+		diffusion { }
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 0. 0 }
+		boundary_conditions {
+			WALL 		paroi_fixe
+			OUTLET 		frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			INLET	 	frontiere_ouverte_vitesse_imposee Champ_Front_LU dom 3 VELOCITY_PROFILE_INLET.dat
+			SYMMETRY symetrie
+		}
+
+     		Modele_turbulence K_Epsilon 
+        	{
+			Transport_K_Epsilon 
+			{
+				convection { quick }
+                  		diffusion { }
+                  		boundary_conditions
+                    		{
+              				INLET 		frontiere_ouverte_K_eps_impose 	Champ_Front_Uniforme 2 .44717400000000000000 8.96977993140864470941
+              				OUTLET 		frontiere_ouverte K_EPS_EXT 	Champ_Front_Uniforme 2 .44717400000000000000 8.96977993140864470941
+              				WALL 		paroi
+					SYMMETRY symetrie 	                                     
+          	    		}
+           	  		conditions_initiales 
+           	   		{
+              				k_Eps Champ_Uniforme 2 .44717400000000000000 8.96977993140864470941
+                   		}
+            		}
+        		turbulence_paroi loi_standard_hydr
+		}
+       	}
+	Postraitement 
+	{
+		Sondes 
+		{
+			VELOCITY_PROBES 		nodes	vitesse periode 1.e-10 	points  2 0.0381 -.01905000000000000000 0 .3048 -.03726709573259990189 0	
+			VELOCITY_PROFILE_WALL1		nodes	vitesse periode	1.e-10	segment 63 		0. 	-.03726709573259990189 	0 		0.8 	-.03726709573259990189 	0
+			VELOCITY_PROFILE_WALL2		nodes	vitesse periode	1.e-10	segment 63 		0. 	-.03726709573259990189 	.01905000000000000000 	0.8 	-.03726709573259990189 	.01905000000000000000
+			VELOCITY_PROFILE_WALL3		nodes	vitesse periode	1.e-10	segment 63 		0. 	-.03726709573259990189 	.03810000000000000000 	0.8 	-.03726709573259990189 	.03810000000000000000
+			VELOCITY_PROFILE_WALL4		nodes	vitesse periode	1.e-10	segment 63 		0. 	-.03726709573259990189 	.057150 	0.8 	-.03726709573259990189 	.057150
+			VELOCITY_PROFILE_WALL5		nodes	vitesse periode	1.e-10	segment 63 		0. 	-.03726709573259990189 	0.0762 		0.8 	-.03726709573259990189 	0.0762
+			VELOCITY_PROFILE_X_-4h		nodes	vitesse periode	1.e-10	segment 40	-.1524 	0. 	0 	-.1524 	0.0762 	0
+			VELOCITY_PROFILE_X_-h		nodes	vitesse periode	1.e-10	segment 40 	-0.0381	 	0. 	0 	-0.0381	 	0.0762 	0
+			VELOCITY_PROFILE_X_0h		nodes	vitesse periode	1.e-10	segment 40 	0.  		0. 	0 	0.        	0.0762 	0
+			VELOCITY_PROFILE_X_1.333h	nodes	vitesse periode	1.e-10	segment 40 	.0507873 	-0.0381 	0 	.0507873 	0.0762 	0
+			VELOCITY_PROFILE_X_2.666h	nodes	vitesse periode	1.e-10	segment 40 	.1015746 	-0.0381 	0 	.1015746 	0.0762 	0
+			VELOCITY_PROFILE_X_5.333h	nodes	vitesse periode	1.e-10	segment 40 	.2031873 	-0.0381 	0 	.2031873 	0.0762 	0
+			VELOCITY_PROFILE_X_6.22h	nodes	vitesse periode	1.e-10	segment 40 	.236982 	-0.0381 	0 	.236982 	0.0762 	0
+			VELOCITY_PROFILE_X_7.113h	nodes	vitesse periode	1.e-10	segment 40 	.2710053 	-0.0381 	0 	.2710053 	0.0762 	0
+			VELOCITY_PROFILE_X_8h		nodes	vitesse periode	1.e-10	segment 40 	.3048 	-0.0381 	0 	.3048 	0.0762 	0
+			VELOCITY_PROFILE_X_9.780h	nodes	vitesse periode	1.e-10	segment 40 	.372618	-0.0381 	0 	.372618 	0.0762 	0			
+		}
+		format lml
+		Champs dt_post 0.05
+		{
+			pression_pa 		elem
+			vitesse 		elem
+			vitesse 		som
+			y_plus 			elem
+			k 			elem
+			eps 			elem
+			viscosite_turbulente 	elem
+		}
+	}
+}
+Solve pb
+End
+

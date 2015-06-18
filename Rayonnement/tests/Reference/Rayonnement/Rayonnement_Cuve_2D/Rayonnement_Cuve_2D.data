@@ -1,0 +1,343 @@
+# 2 problemes de Thermohydraulique 2D VEF couplee a 2 problemes de Conduction avec rayonnement de paroi transparent sur un 1 seul probleme fluide #
+# PARALLEL OK #
+dimension 2 
+
+Pb_Thermohydraulique_Turbulent pb1
+Pb_conduction                  pb2
+Pb_Thermohydraulique           pb3
+Pb_conduction                  pb4
+  
+Domaine dom1
+Domaine dom2
+Domaine dom3
+Domaine dom4
+
+# BEGIN MESH #
+Mailler dom1
+{
+	Pave Fluide_Gauche
+	{
+                Origine -0.06 0.
+                Nombre_de_Noeuds 6 10
+                Longueurs 0.05 0.05
+	}
+	{
+                Bord Gauche_FG			X = -0.06    0. <= Y <= 0.05
+                Raccord local homogene Racc1	X = -0.01    0. <= Y <= 0.05
+                Bord Bas_FG			Y = 0.    -0.06 <= X <= -0.01  
+                Bord Haut_FG			Y = 0.05  -0.06 <= X <= -0.01
+	}
+}
+Trianguler_H dom1
+
+Mailler dom2
+{
+	Pave Solide_Gauche
+	{
+                Origine -0.01 0.
+                Nombre_de_Noeuds 6 10
+                Longueurs 0.01 0.05
+	}
+	{
+                Raccord local homogene Gauche	X = 0.       0. <= Y <= 0.05
+                Raccord local homogene Racc1	X = -0.01    0. <= Y <= 0.05
+                Bord Bas_SG			Y = 0.    -0.01 <= X <= 0.  
+                Bord Haut_SG			Y = 0.05  -0.01 <= X <= 0.
+	}
+}
+Trianguler dom2
+
+Read_file dom3 Cavite.geom 
+
+Mailler dom4
+{
+        Pave Solide_Droit
+	{
+                Origine 0.05 0.
+                Nombre_de_Noeuds 6 6
+                Longueurs 0.01 0.05
+	}
+	{
+                Raccord local homogene Droit	X = 0.05     0. <= Y <= 0.05
+                Bord Droit_SD			X = 0.06     0. <= Y <= 0.05
+                Bord Bas_SD			Y = 0.     0.05 <= X <= 0.06  
+                Bord Haut_SD			Y = 0.05   0.05 <= X <= 0.06
+	}
+}
+Trianguler dom4
+# END MESH #
+	          
+# BEGIN PARTITION
+Partition dom1
+{
+	Partitionneur Metis { nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM1
+}
+Partition dom2
+{
+	Partitionneur Metis { nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM2
+}
+Partition dom3
+{
+	Partitionneur Metis { nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM3
+}
+Partition dom4
+{
+	Partitionneur Metis { nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM4
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom1
+Scatter DOM2.Zones dom2
+Scatter DOM3.Zones dom3
+Scatter DOM4.Zones dom4
+END SCATTER #
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit		0.
+	tmax		10.
+	dt_min		1.e-6
+	dt_max		1.
+	dt_impr		100.
+	dt_sauv		500.
+	seuil_statio	1.e-5
+}
+
+VEFPreP1B dis
+
+Fluide_Incompressible sodium
+Lire sodium
+{
+	mu	Champ_Uniforme	1 0.25e-3
+	rho	Champ_Uniforme	1 850.
+	lambda	Champ_Uniforme	1 68. 
+	Cp	Champ_Uniforme	1 1250
+	beta_th	Champ_Uniforme	1 2.809e-4
+}
+
+Solide acier1
+Lire acier1
+{
+	rho Champ_Uniforme	1 7200.
+	lambda Champ_Uniforme	1 18.    
+	Cp Champ_Uniforme	1 500.
+}
+
+Fluide_Incompressible argon
+Lire argon
+{
+	mu	Champ_Uniforme	1 2.682e-5
+	rho	Champ_Uniforme	1 1.389
+	lambda	Champ_Uniforme	1 2.24e-2 
+	Cp	Champ_Uniforme	1 520.
+	beta_th	Champ_Uniforme	1 2.681e-3
+}
+
+Solide acier2
+Lire acier2
+{
+	rho Champ_Uniforme	1 7200.
+	lambda Champ_Uniforme	1 18.    
+	Cp Champ_Uniforme	1 500.
+}
+
+Champ_Uniforme gravite
+Lire gravite 2  0.  -9.81
+
+Associate sodium gravite
+Associate acier1 gravite
+Associate argon  gravite
+Associate acier2 gravite
+
+Associate pb1 dom1
+Associate pb1 sodium
+
+Associate pb2 dom2
+Associate pb2 acier1
+
+Associate pb3 dom3
+Associate pb3 argon
+
+Associate pb4 dom4
+Associate pb4 acier2
+
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb1
+Associate pbc pb2
+Associate pbc pb3
+Associate pbc pb4
+Associate pbc sch
+
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Lire mod
+{
+	nom_pb_rayonnant	pb3
+	fichier_face_rayo	Rayonnement_Cuve_2D.facesrayo
+	fichier_fij		Rayonnement_Cuve_2D.factforme
+	fichier_matrice_binaire	Rayonnement_Cuve_2D.mat_ray_inv
+}
+
+
+Lire pb1
+{
+   Navier_Stokes_Turbulent
+   {
+	Modele_turbulence Sous_maille_Smago
+	{
+		Turbulence_paroi Loi_standard_hydr    
+	}
+	solveur_pression cholesky { }
+	convection { muscl }
+	diffusion { }
+	sources { boussinesq_temperature { T0 300. } }
+	conditions_initiales { vitesse Champ_Uniforme 2  0. 0. }
+	boundary_conditions
+	{
+		Gauche_FG	Paroi_Fixe
+		Racc1		Paroi_Fixe
+		Bas_FG		Paroi_Fixe
+		Haut_FG		Paroi_Fixe
+	}
+   }
+
+   Convection_Diffusion_Temperature_turbulent
+   {
+	diffusion { }
+	convection { muscl }		
+	Modele_turbulence Prandtl
+	{ 
+		Turbulence_paroi Loi_standard_hydr_scalaire
+	}
+	boundary_conditions
+	{
+		Gauche_FG	paroi_temperature_imposee Champ_Front_Uniforme 1 300.
+		Racc1		paroi_contact pb2 Racc1
+		Bas_FG		paroi_adiabatique
+		Haut_FG		paroi_adiabatique
+	}
+	conditions_initiales { Temperature Champ_Uniforme 1 300. }
+   }
+
+   Postraitement
+   {
+	Champs dt_post 0.5
+	{
+		pression	elem
+		vitesse		elem
+		temperature	elem
+	}
+   }
+}
+
+
+Lire pb2
+{
+   Conduction
+   {
+	diffusion { }
+	conditions_initiales { temperature Champ_Uniforme 1 400. }
+	boundary_conditions
+	{
+		Racc1	paroi_contact pb1 Racc1  
+		Gauche	paroi_contact pb3 Gauche
+		Bas_SG	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
+		Haut_SG	paroi_temperature_imposee Champ_Front_Uniforme 1 400.
+	}
+   }
+
+   Postraitement
+   { 
+	Champs dt_post 0.5
+	{
+		temperature	elem
+	}
+   }
+}
+
+
+Lire pb3
+{
+   Navier_Stokes_standard
+   {
+	solveur_pression cholesky { } 
+	convection { amont }
+	diffusion { }
+	sources { boussinesq_temperature { T0 200. } }
+	conditions_initiales { vitesse Champ_Uniforme 2 0. 0. }
+	boundary_conditions
+	{
+		Droit	paroi_fixe
+		Haut	paroi_fixe
+		Gauche	paroi_fixe
+		Bas	paroi_fixe
+	}
+   }
+   
+   Convection_Diffusion_Temperature
+   {
+	diffusion { }
+	convection { amont }
+	boundary_conditions
+	{
+		Droit	Paroi_contact pb4 Droit
+		Haut	paroi_adiabatique
+		Gauche	Paroi_contact pb2 Gauche
+		Bas	paroi_adiabatique
+	}
+	conditions_initiales { Temperature Champ_Uniforme 1 200. }
+   }
+   
+   Postraitement
+   {
+	Champs dt_post 0.5
+	{
+		pression	elem
+		vitesse		elem
+		temperature	elem
+	}
+   }
+}
+
+
+Lire pb4
+{
+   Conduction
+   {
+	diffusion { }
+	conditions_initiales { temperature Champ_Uniforme 1 200. }
+	boundary_conditions
+	{
+                Droit		Paroi_contact pb3 Droit
+                Droit_SD	paroi_temperature_imposee Champ_Front_Uniforme 1 200.
+                Bas_SD		paroi_adiabatique
+                Haut_SD		paroi_adiabatique
+	}
+   }
+
+   Postraitement
+   {
+	Champs dt_post 0.5
+	{
+		temperature	elem
+	}
+   }
+}
+
+Solve pbc
+Fin

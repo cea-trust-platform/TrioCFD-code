@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+extrait_coupe cond TMP_RMS
+extrait_coupe cond TMP_MOY

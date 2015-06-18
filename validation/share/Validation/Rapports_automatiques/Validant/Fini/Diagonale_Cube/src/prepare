@@ -1,0 +1,34 @@
+#!/bin/bash
+mkdir -p Amont EFstab MinMod VanLeer VanLeer0.5
+
+for dir in `find . -mindepth 1 -type d `
+do
+	( cd $dir;   cp ../Amont.data ../post_run .)
+done
+
+cd EFstab
+sed "s/convection { amont }/convection { EF_stab { } }/" Amont.data > EFstab.data
+sed "s/Amont/EFstab/" post_run > modifie
+mv modifie post_run
+rm Amont.data 
+
+cd ../MinMod
+sed "s/convection { amont }/convection { generic muscl minmod 2  }/" Amont.data > MinMod.data
+sed "s/Amont/MinMod/" post_run > modifie
+mv modifie post_run
+rm Amont.data
+
+cd ../VanLeer
+sed "s/convection { amont }/convection { generic muscl vanleer 2  }/" Amont.data > VanLeer.data
+sed "s/Amont/VanLeer/" post_run > modifie
+mv modifie post_run
+rm Amont.data
+
+cd ../VanLeer0.5
+sed "s/convection { amont }/convection { generic muscl vanleer 2  }/" Amont.data > modifie.data
+sed "s/facsec 1./facsec 0.5/" modifie.data > VanLeer-f05.data
+sed "s/Amont/VanLeer-f05/" post_run > modifie
+mv modifie post_run
+rm Amont.data modifie.data
+
+cd ..

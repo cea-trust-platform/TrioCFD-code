@@ -1,0 +1,1263 @@
+Parameters {
+	Title "Atmospheric flow around a cube."
+	Description "The flow is studied with a standard k-eps model with wall law function and TBLE and with two Salome meshes." 
+	Description "One mesh is of 42964 tetraedra (M1) and the thinner is of 55183 tetraedra (M2)"
+	Description "Mean global Y+ is respectively about 166 and 120"
+	Description "Mean Y+ around the cube is respectively about 160 and 80"
+	description "Mean u* is respectively around 0.189 and around 0.178"
+	Description "CAUTION : THE k-epsilon model IS NOT SO CONVENIENT for this type of flow."
+
+	VersionTrio_U "1.5.6"
+
+	ParametersTrio_U Dimension : 3D
+	ParametersTrio_U Discretisation : VEFPre1B
+	ParametersTrio_U Turbulence Modelling : k-Epsilon
+	ParametersTrio_U QDM Convection scheme : EF_Stab 
+	ParametersTrio_U kEpsilon Convection scheme : amont
+	ParametersTrio_U Wall law : standard \& TBLE
+
+  	TestCase cube_gros_LPSTD Cube /* jdd en annexe */
+  	TestCase cube_gros_TBLE Cube 
+ 	TestCase cube_fin_LPSTD Cube 
+  	TestCase cube_fin_TBLE  Cube
+
+	Reference "1. Projet TRAPOS. 'http://www.dmu.dk/AtmosphericEnvironment/trapos', Octobre 2000"                          
+	Author "S. Betin and V. Barthel"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Geometry and profile positions, Model description"
+	Description "The Cube has a side of h=0.125 m
+	Description "The calculation has the following limits : -5 < X/h < 15; 0 < Y/h < 11; 0 < Z/h < 3"
+	Figure {
+		Description "the profiles are positionned that way : 1 profile in front of the cube ; 1 profile in the middle of the cube ; 1 profile after the cube ; 2 profiles behind the cube."
+		picture ./Cube_Profils.png
+		}
+	Table {
+		Description "Boundary conditions : the velocity and turbulency profiles are given by the experimental measures."
+		Description "--------- The vertical profile of the mean wind field was measured upstream of the obstacle (i.e. at x/H=-8) and was used to derive u* (u* = 0.2916 m/s) and z0 (z0 = 0.000394m) and subsequently the logarithmic law (u=u*/ln(z/z0)) was applied to obtain the vertical profile of u at inflow."
+		Description "--------- For the turbulent kinetic energy k and the dissipation rate, the approximations k=u*2/sqrt(Cmu) with Cmu=0.09 and =u*3/(z) were used to specify the input data for the models (using the von Karmans constant =0.4)."
+		Description "--------- At the bottom the standard wall function and the TBLE law are used."
+		Description " "
+		Description "Initial conditions :"
+		Description "--------- The initial Velocity field is set to zero, K and Epsilon respectively to 0.2834352 0.4958"
+		Description " "
+		Description "Views at the ground of the two unstructured meshes are shown below." 
+		}
+	visu {
+                Title "First Salome Mesh, mean y+ around 166; near the cube y+ around 160"
+		Description "View at the ground"
+                Width 9cm
+                mesh cube_gros_LPSTD/Cube.lata dom
+                operator_to_all slice2d 0. 0.7 0. 0. 0. 1.
+        	}
+	visu {
+                Title "Second Salome Mesh, mean y+ around 120; near the cube y+ around 80"
+		Description "View at the ground"
+                Width 9cm
+                mesh cube_fin_LPSTD/Cube.lata dom
+                operator_to_all slice2d 0. 0.7 0. 0. 0. 1.
+        	}
+	}
+
+Chapter {
+	  Title "Controlling the velocity profiles at the inlet of the domain"
+	  Description "We first have to check if the velocity profile in front of the cube respects the imposed inlet profile"
+	  Description "We do it for the two meshes and the two wall functions."
+	  Figure {
+		Title "Curves of the inlet velocity profile"
+		Dimension 2
+		RangeX  0. 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental values"
+			origin "[1]"
+			file ./experience/Cube_SONDE_VITESSEX0_EXP.txt
+			columns ($2/6) ($1/0.125)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Standard wall function with mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Standard wall function with mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "TBLE with mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0
+			columns ($2/6) ($1/0.125)
+			Style points
+		}
+		Curve {
+			legend "TBLE with mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0
+			columns ($2/6) ($1/0.125)
+			Style points
+		}
+	}
+	Table {
+		Description "We can observe that the profile is not that good with the coarser mesh n°1. The mesh n°2 gives a rather good corresponding profile."
+		}
+	
+	Figure {
+		Title "Longitudinal velocity profile upwind the cube"
+		Description "For this kind of atmospheric flow, the velocity profile should be constant before beeing perturbed by the"
+		Description "obstacle. Because of no use of a rough wall law taht should be useful for Atmospheric Boundary Layer,
+		Description "there can be a disgression of the inlet profile. So we will watch it at a few distance (x=0.5m) upwind to the cube."
+		Dimension 2
+		RangeX  0. 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental values at inlet"
+			origin "[1]"
+			file ./experience/Cube_SONDE_VITESSEX0_EXP.txt
+			columns ($2/6) ($1/0.125)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U values with standard wf upwind the cube mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_5
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U values with TBLE upwind the cube mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_5
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U values with standard wf upwind the cube mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_5
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U values with TBLE upwind the cube mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_5
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+	}
+	Table {
+		Description "So, we can observe that the profile is no more so good even before being perturbed by the cube, even with the thinner mesh."
+		}
+}
+Chapter {
+	Title "Profiles at X/h=-1"
+	Description " "
+	
+	Figure {
+		Title "X Velocity profile at X/h=-1"
+		Dimension 2
+		RangeX  -0.5 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/UE_m1.txt
+			columns ($2) ($3)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_5625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_5625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_5625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_5625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_U_Cube_m1.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+			linewidth 1
+		}
+	}
+
+	Figure {
+		Title "W velocity profile at X/h=-1"
+		Dimension 2
+		RangeX  -0.22 0.5 
+		LabelX "W/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/WE_m1.txt
+			columns ($2) ($3)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_5625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_5625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_5625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_5625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_W_Cube_m1.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+
+	Figure {
+		Title "Turbulent kinetic Energy k profile at X/h=-1"
+		Dimension 2
+		RangeX  -0.01 0.1 
+		LabelX "K/(Uref^2)"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/KE_m1.txt
+			columns ($2) ($3)
+			Style linespoints
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_5625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_5625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_5625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_5625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_K_Cube_m1.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}	
+
+}
+
+Chapter {
+	Title "Profiles at X/h=-0.625"
+	Description " "
+	
+	Figure {
+		Title "X velocity profile at X/h=-0.625"
+		Dimension 2
+		RangeX  -0.50 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/UE_m0625.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_609375
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_609375
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_609375
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_609375
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_U_Cube_m0625.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+			linewidth 1
+		}
+	}
+
+	Figure {
+		Title "W velocity profile at X/h=-0.625"
+		Dimension 2
+		RangeX  -0.22 0.5 
+		LabelX "W/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/WE_m0625.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_609375
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_609375
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_609375
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_609375
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_W_Cube_m0625.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+
+	Figure {
+		Title "Turbulent kinetic Energy k profile at X/h=-0.625"
+		Dimension 2
+		RangeX  -0.01 0.1 
+		LabelX "K/(Uref^2)"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/KE_m0625.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_609375
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_609375
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_609375
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_609375
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_K_Cube_m0625.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+
+	}	
+
+}
+
+Chapter {
+	Title "Profiles at X/h=0."
+	Description " "
+	
+	Figure {
+		Title "X Velocity profile at X/h=0."
+		Dimension 2
+		RangeX  -0.5 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/UE_0.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_6875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_6875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_6875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_6875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_U_Cube_0.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+	
+	Figure {
+		Title "W velocity profile at X/h=0."
+		Dimension 2
+		RangeX  -0.22 0.5 
+		LabelX "W/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/WE_0.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_6875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_6875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_6875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_6875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_W_Cube_0.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+
+	Figure {
+		Title "Turbulent kinetic Energy k profile at X/h=0."
+		Dimension 2
+		RangeX  -0.01 0.1 
+		LabelX "K/(Uref^2)"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/KE_0.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_6875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_6875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_6875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_6875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_K_Cube_0.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+}
+
+Chapter {
+	Title "Profiles at X/h=0.625"
+	Description " "
+	
+	Figure {
+		Title "X Velocity profile at X/h=0.625"
+		Dimension 2
+		RangeX  -0.5 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/UE_p0625.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_765625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_765625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_765625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_765625
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_U_Cube_p0625.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+
+		Figure {
+		Title "W velocity profile at X/h=0.625"
+		Dimension 2
+		RangeX  -0.22 0.5 
+		LabelX "W/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/WE_p0625.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_765625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_765625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_765625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_765625
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_W_Cube_p0625.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+
+		Figure {
+		Title "Turbulent kinetic Energy k profile at X/h=0.625"
+		Dimension 2
+		RangeX  -0.01 0.1 
+		LabelX "K/(Uref^2)"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/KE_p0625.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_765625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_765625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_765625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_765625
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_K_Cube_p0625.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+}
+
+Chapter {
+	Title "Profiles at X/h=1.5"
+	Description " "
+	
+	Figure {
+		Title "X Velocity profile at X/h=1.5"
+		Dimension 2
+		RangeX  -0.5 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/UE_p15.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_875
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_U_Cube_p15.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+	
+	Figure {
+		Title "W velocity profile at X/h=1.5"
+		Dimension 2
+		RangeX  -0.22 0.5 
+		LabelX "W/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"  
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/WE_p15.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_875
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_W_Cube_p15.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+	
+	Figure {
+		Title "Turbulent kinetic Energy k profile at X/h=1.5"
+		Dimension 2
+		RangeX  -0.01 0.1 
+		LabelX "K/(Uref^2)"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/KE_p15.txt
+			columns ($2) ($1)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_875
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_K_Cube_p15.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+}
+
+Chapter {
+	Title "Profiles at X/h=2.5"
+	Description " "
+	
+	Figure {
+		Title "X Velocity profile at X/h=2.5"
+		Dimension 2
+		RangeX  -0.5 1 
+		LabelX "U/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/UE_p25.txt
+			columns ($2) ($3)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX1
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX1
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX1
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX1
+			columns ($2/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_U_Cube_p25.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+	
+	Figure {
+		Title "W velocity profile at X/h=2.5"
+		Dimension 2
+		RangeX  -0.22 0.5 
+		LabelX "W/Uref"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"  
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/WE_p25.txt
+			columns ($2) ($3)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX1
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX1
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX1
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX1
+			columns ($4/6) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_W_Cube_p25.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+	
+	Figure {
+		Title "Turbulent kinetic Energy k profile at X/h=2.5"
+		Dimension 2
+		RangeX  -0.01 0.1 
+		LabelX "K/(Uref^2)"
+		RangeY 0. 2.
+		LabelY "Z/h"
+		legend  below title "Legende"
+		Include_Description_Curves 0
+                Width 10cm
+		Curve {
+			legend "Experimental Values"
+			origin "[1]"
+			file ./experience/KE_p25.txt
+			columns ($2) ($3)
+			Style points
+			TypeLigne 1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX1
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°1"
+			origin "Trio_U"
+			Segment ./cube_gros_TBLE/Cube.data SONDE_KX1
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with std WF mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX1
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "Trio_U with TBLE mesh n°2"
+			origin "Trio_U"
+			Segment ./cube_fin_TBLE/Cube.data SONDE_KX1
+			columns ($2/36) ($1/0.125)
+			Style linespoints
+		}
+		Curve {
+			legend "CFX-Tascflow"
+			origin "[1]"
+			file ./experience/Ref_K_Cube_p25.txt
+			columns ($2) ($3)
+			Style lines
+			TypeLigne 7
+		}
+	}
+	Table {
+		Description "The different profiles given by Trio_U and shown before are in coherence with each others."
+		Description "The refined mesh (n°2) corrects some probe effects due to the tetraedra skewness."
+		Description "The TBLE model gives a kinetic energy level a little more important than the standard wall function. But neither the shape, neither the effect on the velocity profiles is great."
+		Description "Globally the velocity profiles do not describe the experimental recirculation flows near the cube. Higher and far behind, they are much better."
+		Description "If we compare with the CFX-tascflow results, this has the opposite comportment : a little better near the cube but a little less good far from it."
+		}
+}
+
+Chapter {
+        Title "Conclusions - Recommandations"
+        Description "The k-epsilon model is no real efficency on this type of configurations. Even if the global profiles are not "
+	Description "so far from experimental ones, the recirculation flows are not so well described."
+	Description "Using the TBLE function for describing the profile near the walls has no real impact neither."
+	Description "It would be useful to have a better corresponding profile upwind the cube, in order to avoid some disgression "
+	Description "before the flow is being perturbed by the obstacle. A more convenient k-epsilon model, especially for low "
+	Description "Reynolds number would be convenient too. These works are undergoing in the Trio_U development team."
+}
+
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}
+
+
+
+
+
+

@@ -1,0 +1,181 @@
+# Test case of Injecteur_interfaces keyword #
+dimension 3
+
+Probleme_FT_Disc_gen pb
+Domaine dom
+
+# BEGIN MESH #
+
+Mailler dom
+{
+	Pave pave1
+	{
+		origine 0. 0. 0.
+		longueurs 1.0 1.0 2.0
+		nombre_de_noeuds 40 40 80
+	}
+	{
+		bord paroi X = 0.   0. <= Y <= 1.0   0. <= Z <= 2.0
+		bord paroi X = 1.0  0. <= Y <= 1.0   0. <= Z <= 2.0
+		bord paroi Y = 0.   0. <= X <= 1.0   0. <= Z <= 2.0
+		bord paroi Y = 1.0  0. <= X <= 1.0   0. <= Z <= 2.0
+		bord bas   Z = 0.   0. <= X <= 1.0   0. <= Y <= 1.0  
+		bord haut  Z = 2.0  0. <= X <= 1.0   0. <= Y <= 1.0  
+	}
+
+}
+
+transformer dom
+x-0.5
+y-0.5
+z-0.3
+
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 1 1 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite mon_schema
+Lire mon_schema
+{
+	nb_pas_dt_max 10
+	tinit 0.
+	tmax 2.
+	dt_min 0.00001
+	dt_max 0.01
+	dt_impr 5.e-3
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+
+Fluide_Incompressible liquide
+Lire liquide
+{
+	mu  Champ_Uniforme 1 1.e-3
+ 	rho Champ_Uniforme 1 1000.
+}
+
+Fluide_Incompressible gaz
+Lire gaz
+{
+	mu  Champ_Uniforme 1 1.92e-5
+ 	rho Champ_Uniforme 1 1.2
+}
+
+Fluide_Diphasique fluide
+Lire fluide
+{
+	fluide0 gaz
+	fluide1 liquide
+	sigma   Champ_Uniforme 1 0.05
+}
+
+Champ_Uniforme gravite
+Lire gravite 3  0. 0. -9.81
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc          hydraulique
+Transport_Interfaces_FT_Disc   interf
+
+Associate pb hydraulique
+Associate pb interf
+Associate pb dom
+Associate pb mon_schema
+Associate pb fluide
+
+Discretize pb dis
+
+
+Lire pb
+{
+	hydraulique
+	{		
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.0e-08 }
+		convection { quick }
+		diffusion { }
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 0. 0. }
+		equation_interfaces_proprietes_fluide interf
+		/* terme_gravite rho_g */
+		boundary_conditions {
+			paroi  paroi_fixe
+			haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+			bas    paroi_fixe
+		}
+		
+		modele_turbulence sous_maille_wale { Cw 1.e-08  turbulence_paroi negligeable }
+	}
+	
+	interf
+	{
+	 methode_transport vitesse_interpolee hydraulique
+	 conditions_initiales { fonction -(z-1.2)  }
+	 injecteur_interfaces  loi_bulles.dat
+	 interpolation_repere_local
+	 iterations_correction_volume 1
+	 n_iterations_distance 2
+
+         remaillage {
+         	 	pas 0.0001
+         	 	nb_iter_remaillage 1
+         	 	critere_arete 0.35
+         	 	critere_remaillage 0.2
+         	 	pas_lissage 0.0001
+         	 	lissage_courbure_iterations 1
+         	 	lissage_courbure_coeff -0.1
+         	 	nb_iter_barycentrage 3
+         	 	relax_barycentrage 1
+         	 	facteur_longueur_ideale 2.
+         	 	nb_iter_correction_volume 3
+         	 	seuil_dvolume_residuel 1e-12
+         	 }
+
+	 boundary_conditions
+	 	{
+		 paroi  Paroi_FT_disc symetrie
+		 haut   Paroi_FT_disc symetrie 
+		 bas    Paroi_FT_disc symetrie
+	 	}
+	}
+	Postraitement
+	{
+        	Format lata
+		Champs dt_post 1
+		{
+			pression elem
+			masse_volumique elem
+			vitesse elem
+			gradient_pression elem
+			indicatrice_interf elem
+		}
+		
+	}
+	liste_postraitements
+	{	
+		Postraitement_ft_lata interface
+        	{
+                	dt_post 1
+                	nom_fichier interface
+                	print
+                	champs sommets {  vitesse }
+                	interfaces interf { }
+        	}	
+	}
+}
+
+Solve pb
+Fin
+

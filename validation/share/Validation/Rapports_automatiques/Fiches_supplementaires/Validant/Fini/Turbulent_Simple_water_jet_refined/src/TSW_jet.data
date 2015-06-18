@@ -1,0 +1,211 @@
+# fiche  Turbulent_Simple_water_jet #
+# PARALLEL ONLY 4 #
+# lance_test 1 ecarts #
+dimension 3
+
+Pb_Hydraulique_Concentration_Turbulent pb
+
+Domaine dom
+# Geometrie, parametres
+  diametre_jet 0.003
+  velocity_decay_cte            5.5
+  velocity_virtual_origin       0.
+  concentration_decay_cte       7.0
+  concentration_virtual_origin -2.5
+#
+
+Scatter dom2.Zones dom  
+
+VEFPreP1b dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+        tinit 0.
+        tmax 4.0
+        dt_min 1.e-12
+        dt_max 1.
+        dt_impr 0.1
+        dt_sauv 0.2
+        seuil_statio 1.e-8
+        facsec 10.0
+	facsec_max 1000.0
+	solveur implicite
+        {
+		solveur gmres { diag seuil 1.e-20 nb_it_max 5 impr }
+        }
+}
+
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+   mu      Champ_Uniforme 1 1.00e-3
+   rho     Champ_Uniforme 1 1000.
+   beta_co champ_uniforme 1 0.
+}
+
+Constituant c1
+Lire c1
+{
+	coefficient_diffusion Champ_Uniforme 1 2.8e-10
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 0 -9.81
+Associate fluide gravite
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+Associer pb c1
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression petsc cholesky { }
+		Diffusion { }
+		Convection { Ef_stab { } }
+		Conditions_initiales {
+					Vitesse Champ_Uniforme 3 0. 0. 0.
+					}
+	Conditions_limites {
+
+		cl_43 Frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 0.0 0.0 1.0			
+		cl_44 Frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 1.0e5
+		cl_48 Frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 1.0e5
+
+		cl_45 Symetrie
+		cl_46 Symetrie
+		cl_49 Symetrie
+		cl_51 Symetrie
+
+		cl_47 Paroi_fixe	
+
+		cl_50 Paroi_fixe
+		cl_52 Paroi_fixe
+		pipe Paroi_fixe
+
+			    }
+
+		modele_turbulence K_Epsilon {
+
+       			Transport_K_Epsilon 
+			{
+				convection { Ef_stab { } }
+				diffusion { }
+			
+				conditions_limites {
+					cl_43 frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 0.0051886 0.2924415
+                        		cl_44 frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+					cl_48 frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+					cl_45 Symetrie
+					cl_46 Symetrie
+					cl_49 Symetrie
+					cl_51 Symetrie
+					cl_47 Paroi
+					cl_50 Paroi
+					cl_52 Paroi
+					pipe Paroi
+			   		}
+
+			   	conditions_initiales {
+					      		k_Eps Champ_Uniforme 2 1.0e-5 1.0e-5
+						  }
+			 }
+			 Prandtl_K 1
+			 Prandtl_Eps 1.3
+			 turbulence_paroi loi_standard_hydr dt_impr_ustar 10. eps_min 1.e-15
+			Correction_visco_turb_pour_controle_pas_de_temps 
+			}
+
+		}
+
+	Convection_diffusion_concentration_turbulent
+			{
+		diffusion { }
+		convection { Ef_stab { } }
+		conditions_limites {
+
+			cl_43 Frontiere_ouverte_concentration_imposee Champ_Front_Uniforme 1 1.0			
+			cl_44 Frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.0 
+			cl_48 Frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.0 
+
+			cl_45 Symetrie
+			cl_46 Symetrie
+			cl_49 Symetrie
+			cl_51 Symetrie
+
+			cl_47 Paroi
+			cl_50 Paroi
+			cl_52 Paroi
+			pipe Paroi
+				}
+		conditions_initiales {
+			concentration Champ_Uniforme 1 0.0
+				     }
+	Modele_turbulence Schmidt
+		{
+		Turbulence_paroi Loi_standard_hydr_scalaire
+		}
+		}
+
+	Postraitement {
+
+		Sondes {
+			Sonde_CentraleVelocity_50  VitesseZ periode 0.1 segment 51  0.0 0.0 0.0 0.0 0.0 0.150 
+
+			Sonde_Uz0.000 VitesseZ periode 0.1 segment 66 0.0 0.0 0.000  0.0 0.1 0.000
+			Sonde_Uz0.015 VitesseZ periode 0.1 segment 66 0.0 0.0 0.015  0.0 0.1 0.015
+			Sonde_Uz0.030 VitesseZ periode 0.1 segment 66 0.0 0.0 0.030  0.0 0.1 0.030
+			Sonde_Uz0.045 VitesseZ periode 0.1 segment 66 0.0 0.0 0.045  0.0 0.1 0.045
+			Sonde_Uz0.060 VitesseZ periode 0.1 segment 66 0.0 0.0 0.060  0.0 0.1 0.060
+			Sonde_Uz0.075 VitesseZ periode 0.1 segment 66 0.0 0.0 0.075  0.0 0.1 0.075
+			Sonde_Uz0.090 VitesseZ periode 0.1 segment 66 0.0 0.0 0.090  0.0 0.1 0.090
+			Sonde_Uz0.105 VitesseZ periode 0.1 segment 66 0.0 0.0 0.105  0.0 0.1 0.105
+			Sonde_Uz0.120 VitesseZ periode 0.1 segment 66 0.0 0.0 0.120  0.0 0.1 0.120
+			Sonde_Uz0.135 VitesseZ periode 0.1 segment 66 0.0 0.0 0.135  0.0 0.1 0.135
+			Sonde_Uz0.150 VitesseZ periode 0.1 segment 66 0.0 0.0 0.150  0.0 0.1 0.150
+
+			Sonde_CentraleConcentration_50  Concentration periode 0.1 segment 51  0.0 0.0 0.0 0.0 0.0 0.150 
+
+			Sonde_Cz0.000 Concentration periode 0.1 segment 66 0.0 0.0 0.000  0.0 0.1 0.000
+			Sonde_Cz0.015 Concentration periode 0.1 segment 66 0.0 0.0 0.015  0.0 0.1 0.015
+			Sonde_Cz0.030 Concentration periode 0.1 segment 66 0.0 0.0 0.030  0.0 0.1 0.030
+			Sonde_Cz0.045 Concentration periode 0.1 segment 66 0.0 0.0 0.045  0.0 0.1 0.045
+			Sonde_Cz0.060 Concentration periode 0.1 segment 66 0.0 0.0 0.060  0.0 0.1 0.060
+			Sonde_Cz0.075 Concentration periode 0.1 segment 66 0.0 0.0 0.075  0.0 0.1 0.075
+			Sonde_Cz0.090 Concentration periode 0.1 segment 66 0.0 0.0 0.090  0.0 0.1 0.090
+			Sonde_Cz0.105 Concentration periode 0.1 segment 66 0.0 0.0 0.105  0.0 0.1 0.105
+			Sonde_Cz0.120 Concentration periode 0.1 segment 66 0.0 0.0 0.120  0.0 0.1 0.120
+			Sonde_Cz0.135 Concentration periode 0.1 segment 66 0.0 0.0 0.135  0.0 0.1 0.135
+			Sonde_Cz0.150 Concentration periode 0.1 segment 66 0.0 0.0 0.150  0.0 0.1 0.150
+
+			Sonde_conv1 vitesse  periode 0.01 points 1 0.0  0.0  0.150
+			Sonde_conv2 vitesse  periode 0.01 points 1 0.0  0.0  0.140
+			Sonde_conv3 vitesse  periode 0.01 points 1 0.0  0.0  0.040
+			Sonde_conv4 vitesse  periode 0.01 points 1 0.005  0.005  0.040
+
+		}
+
+		Format lata
+		Domaine dom
+
+		champs dt_post 1.0
+		{
+		
+		vitesse som
+		pression som
+		corr_visco_turb elem
+		concentration som
+		}
+
+			}
+	
+}
+
+Resoudre pb
+
+Fin

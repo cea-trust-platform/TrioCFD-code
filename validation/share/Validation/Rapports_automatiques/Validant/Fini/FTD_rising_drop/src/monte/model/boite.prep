@@ -1,0 +1,27 @@
+TAILLES 3 183 183 363 
+RIEN 0 maillage
+MAIL_X_REG 4 xomin xomax nx-2 2 dx
+MAIL_Y_REG 4 yomin yomax ny-2 2 dy
+MAIL_Z_REG 4 zomin zomax nz-2 2 dz
+PARALAX 7 xomin-eps xomax+eps yomin-eps yomax+eps zomin-eps zomax+eps 0 paroi
+PARALAX 7 xomin xomax yomin yomax zomin zomax 1000 boite
+PARALAX 7 xomin-eps xomax+eps yomin-eps yomax+eps zomax zomax+eps -3000 haut
+file maillage
+        real xomin,xomax,yomin,yomax,zomin,zomax,eps
+        xomin=0.
+        xomax=0.12
+        yomin=0.
+        yomax=0.12
+        zomin=0.
+        zomax=0.24
+        eps=0.0001
+
+        XM(1)=xomin-eps
+        XM(nx)=xomax+eps
+        YM(1)=yomin-eps
+        YM(ny)=yomax+eps
+        ZM(1)=zomin-eps
+        ZM(nz)=zomax+eps
+
+
+

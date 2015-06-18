@@ -1,0 +1,33 @@
+#!/bin/bash
+rep=`basename $PWD`
+echo "post run"
+
+rm -f *.dat
+for file in *.err
+do
+   CELLS=`awk '/Total number of elements/ && (NF==6) {gsub(":","",$NF);cells=$NF} END {print cells}' $file`
+   [ -f ${file%.err}.TU ] && awk -v CELLS=$CELLS '/Dont operateurs convection/ {print CELLS" "$4/CELLS}' ${file%.err}.TU
+done > cpu.dat
+
+# Calcul de l'erreur
+ERREUR=MOYENNE_ERREUR_RELATIVE_ENERGIE_CINETIQUE
+for file in *$ERREUR.son
+do
+   REFINE=`echo $file | awk -F_ '{print $1}'`
+   echo $REFINE" "`tail -1 $file | awk '{err=$NF;if (err<0) err*=-1;print err}'`
+done > erreur.dat
+echo "f(x)=a*x**-n
+fit f(x) 'erreur.dat' via a,n
+show v" > gnuplot.cmd
+ordre=`gnuplot gnuplot.cmd 2>&1 | awk '/n / && / = / && /%/ {printf("%2.2f+/-%2.2f",$3,$5)}'`
+erreur_min=`head -1 erreur.dat | awk '{printf("%2.3f"),$2}'`
+erreur_max=`tail -1 erreur.dat | awk '{printf("%2.3f"),$2}'`
+echo $erreur_min" "$erreur_max" "$ordre > order_scheme.dat
+for ordre in 1 2 3
+do
+    awk -v ordre=$ordre '(NR==1) {print $0;init=$2} (NR>1) {init/=(2^ordre);print $1" "init}' erreur.dat > ordre$ordre.dat
+done
+
+
+
+

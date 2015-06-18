@@ -1,0 +1,640 @@
+Parameters {
+	Title "Flow over a backward-facing 3D step"
+	Description "The objective is to validate the K-\latex_({\Large $ \epsilon $} \latex_) turbulence model on the backward facing step case, in 3D, VDF or VEF."
+	Description "The validation is based on Kim experiment [1]."
+	
+      	ParametersTrio_U Type of problem:        hydraulic turbulent    
+	ParametersTrio_U Discretization:         VDF / VEFPreP1B 
+       	ParametersTrio_U Time scheme: Euler_Explicite (VDF) 	Euler_Implicite (VEF)         
+	ParametersTrio_U Convection scheme:                 
+       	ParametersTrio_U hydraulic : quick (VDF)         EF_stab (VEF) 
+       	ParametersTrio_U k_epsilon : quick (VDF)         EF_stab (VEF)
+       	ParametersTrio_U Turbulence model: K-\latex_({\Large $ \epsilon $} \latex_) standard 3D model   
+       	ParametersTrio_U Type of fluid : incompressible
+
+	Author "P.Ledac, S.Vandroux"
+	TestCase ./VDF test.data $NB_PROCS_VDF		"/* See above the attached datafile */"
+	TestCase ./VEFPreP1B test.data $NB_PROCS_VEF 	"/* See above the attached datafile */"
+
+	Reference "[1]: JJ.Kim, investigation of separation and reattachment of turbulent shear layer : flow over a backward-facing step, Standford university, 1978. http://www.stanford.edu/~cantwell/AFOSR_STANFORD_80_81_DATA_LIB/case_0421/F00538.CVT2"
+        Reference "[2]: L.Leal De Sousa, Projet N3S de mecanique des fluides : note de validation du noyau de la version 3.3."
+	IncludeData 2
+}
+Chapter { 
+	Title Tests Description
+	Description "Uo=$U_IMPOSED m/s given in [1] is a reference velocity. It is NOT the bulk velocity."
+	Description "Based on the reference velocity, the Reynolds number is Re = HUo/$\nu$ = $Reynolds "
+	Description "We impose the experimental velocity profile (read in a file) on the INLET boundary."
+	Description "Hydraulic initial conditions: U = V = W = 0 m/s "
+	Description "Hydraulic boundary conditions: "
+	Description " $\bullet$ WALL paroi_fixe "
+	Description " $\bullet$ SYMMETRY symetrie "
+	Description " $\bullet$ OUTLET frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.0 "
+	Description " $\bullet$ INLET frontiere_ouverte_vitesse_imposee Champ_Front_Lu dom $DIM VELOCITY_PROFILE_INLET.dat"
+	Description "Turbulent boundary condition: "
+	Description " $\bullet$ Turbulence kinetic energy is given by k=3/2(I*Uo$)^2$ where I is the turbulence intensity, taken to $TURB % (See $[2]$) "
+	Description " $\bullet$ Turbulence dissipation rate is given by \latex_({\Large $ \epsilon $} =Cmu$^{0.75}$*k$^{1.5}$/l\latex_) where Cmu=0.09 and l turbulence scale length is taken to 0.07H"
+	Description " $\bullet$ WALL paroi "
+	Description " $\bullet$ SYMMETRY symetrie "
+	Description " $\bullet$ OUTLET frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 k \latex_({\Large $ \epsilon $} \latex_)"
+	Description " $\bullet$ INLET  frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 k \latex_({\Large $ \epsilon $} \latex_)"
+# properties Geometry
+	Table {
+			Title "Physical properties"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($1)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 3
+				columns ($2)
+			}
+	}
+#
+	Figure {
+		Title Geometry
+		Description Dimensions:
+       		Description H = $H m 
+       		Description h = $h m 
+       		Description L = $L m
+       		Description l = $l m   
+		Description W = $H m
+		picture step.png
+	} 
+	Table {
+                Title "Meshes"
+        }
+	visu {
+		Description "The VDF mesh is made with Trio_U data instructions."
+		Description "It has $VDF_NUMBER_OF_ELEMENTS$ cells with ($NX1 x $NY1 x $NZ) + ($NX2 x $NY2 x $NZ) + ($NX3 x $NY3 x $NZ) nodes."
+		mesh VDF/test.lata dom
+		Width 15cm, viewport=0 350 900 700, clip
+		Normal3d -0.75 0.24 0.61
+		up3D 0.1 0.9 -0.1
+               	Operator no_axes
+               	Operator no_bounding_box
+	}
+	visu {
+		Description "Zoom on the y+ field near the step for VDF mesh:"
+		mesh VDF/test.lata dom
+	 	pseudocolor VDF/test.lata dom Y_PLUS ELEM
+		Width 12cm, viewport=0 0 1000 1000, clip
+		Normal3d -0.52 -0.82 0.25
+		up3D 0.47 -0.03 0.88
+		zoom3D 0.223 0.155 5.13
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Description "The VEF mesh is made with Gambit. Icem is used to tetrahedralize the prismatic elements."
+		Description "It has $VEFPreP1B_NUMBER_OF_ELEMENTS$ cells." 
+		mesh VEFPreP1B/test.lata dom
+		Width 15cm, viewport=0 350 900 700, clip
+		Normal3d -0.75 0.24 0.61
+		up3D 0.1 0.9 -0.1
+               Operator no_axes
+               Operator no_bounding_box		
+	}
+	visu {
+		Description "Zoom on the y+ field near the step for VEF mesh:"
+		mesh VEFPreP1B/test.lata dom
+	 	pseudocolor VEFPreP1B/test.lata dom Y_PLUS ELEM
+		Width 12cm, viewport=0 0 1000 1000, clip
+		Normal3d -0.52 -0.82 0.25
+		up3D 0.47 -0.03 0.88
+		zoom3D 0.223 0.155 5.13
+		Operator no_axes
+		Operator no_bounding_box
+	}	
+}
+Chapter {
+	Title "Convergence analysis"
+	Description "We check the steady state convergence by looking at probes and residuals evolution."
+	Figure {
+		Title "Convergence of velocity timetraces"
+		Description "Velocity probes are near the wall behind the step into (x = h) and after the recirculation (x = 8h):" 
+		Dimension 2
+		Width 12cm
+		LabelX " time (s)"
+		LabelY "Velocity U(m/s)"
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF (x = h, y ~ -h, z = 0)"
+			origin "Trio_U"
+			file VDF/test_VELOCITY_PROBES.son
+			columns 1 $COL_UX1
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF (x = 8h, y ~ -h, z = 0)"
+			origin "Trio_U"
+			file VDF/test_VELOCITY_PROBES.son
+			columns 1 $COL_UX2
+			Style lines
+			TypeLigne 2 
+		}
+		Curve {
+			legend "VEF (x = h, y ~ -h, z = 0)"
+			origin "Trio_U"
+			file VEFPreP1B/test_VELOCITY_PROBES.son
+			columns 1 $COL_UX1
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "VEF (x = 8h, y ~ -h, z = 0)"
+			origin "Trio_U"
+			file VEFPreP1B/test_VELOCITY_PROBES.son
+			columns 1 $COL_UX2
+			Style lines
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Convergence of the relative residuals"
+		Description "We plot the following curves to compare the convergence speed for each calculation."
+		Width 12cm
+		LabelX "Time [s]"
+		LabelY "Relative residual"
+		LogY
+		RangeY 0.0001 100.
+		Include_Description_Curves 0
+		Curve { 
+			legend "VDF"
+			Style points
+			file VDF/test.dt_ev
+			columns $1 $4
+		}		
+		Curve { 
+			legend "VEF"
+			Style points
+			file VEFPreP1B/test.dt_ev
+			columns $1 $4
+		}
+	}
+}
+Chapter {
+	Title "3D Results"
+	Description "As we can see on the figures, there is a recirculation zone behind the step."
+	Description " "
+	Table { 
+		
+	}
+	visu {
+		Description "VDF velocity field"
+		mesh VDF/test.lata dom
+		pseudocolor VDF/test.lata dom norme_VITESSE SOM
+		Width 7cm
+		Normal3d 0 0 1
+		up3D 0 1 0
+		zoom3D 0.23 -0.047 3.
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	visu {
+		Description "VEF velocity field"
+		mesh VEFPreP1B/test.lata dom
+		pseudocolor VEFPreP1B/test.lata dom norme_VITESSE SOM
+		Width 7cm
+		Normal3d 0 0 1
+		up3D 0 1 0
+		zoom3D 0.23 -0.047 3.
+		Operator no_axes
+		Operator no_bounding_box
+	}	
+	visu {
+		Description "VDF turbulent viscosity field"
+		mesh VDF/test.lata dom
+		pseudocolor VDF/test.lata dom VISCOSITE_TURBULENTE ELEM
+		Width 7cm
+		Normal3d 0 0 1
+		up3D 0 1 0
+		zoom3D 0.23 -0.047 3.
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2		
+	}
+	visu {
+		Description "VEF turbulent viscosity field"
+		mesh VEFPreP1B/test.lata dom
+		pseudocolor VEFPreP1B/test.lata dom VISCOSITE_TURBULENTE ELEM
+		Width 7cm
+		Normal3d 0 0 1
+		up3D 0 1 0
+		zoom3D 0.23 -0.047 3.
+		Operator no_axes
+		Operator no_bounding_box		
+	}
+}
+Chapter {
+	Title "1D Results"	
+	Figure {
+	 	Title "Longitudinal profile"
+		Include_Description_Curves 0
+		legend center right	
+		Description ""
+		Title_figure "Velocity profile near the wall at y = -h, z = H/2"
+		Description "We see the point where the velocity becomes zero near the wall"
+		Description "indicating the end of the recirculation."
+		Dimension 2
+		Width 12cm
+		labelx "x(m)"
+		labely "U(m/s)"
+	 #	rangex  0 0.3
+		Curve  { 
+		   legend "VDF"
+		   segment VDF/test.data VELOCITY_PROFILE_WALL3
+		   style lines
+		}	
+		Curve  { 
+		   legend "VEF"
+		   segment VEFPreP1B/test.data VELOCITY_PROFILE_WALL3
+		   style lines
+		}
+		Curve  {
+			legend ""
+			fonction 0
+			}	
+		}
+	Figure {
+		Title "Transverse profiles"
+		Title_figure "Normalized velocity profile U*(y) at x=-4h"
+		Description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_-4h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_-4h
+			origin "Trio_U"
+			columns $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_-4h
+			origin "Trio_U"
+			columns $2/$U_IMPOSED $1
+			style lines
+		}	
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=-h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_-h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_-h
+			origin "Trio_U"
+			columns $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_-h
+			origin "Trio_U"
+			columns $2/$U_IMPOSED $1
+			style lines
+		}	
+	}
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=0h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_0h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_0h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_0h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=1.333h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_1.333h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_1.333h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_1.333h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=2.666h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_2.666h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_2.666h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_2.666h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=5.333h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_5.333h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_5.333h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_5.333h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=6.22h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_6.22h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_6.22h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_6.22h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=7.113h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_7.113h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_7.113h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_7.113h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=8h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_8h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_8h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_8h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}
+
+	Figure {
+		Title_figure "Normalized velocity profile U*(y) at x=9.780h"
+		description ""
+		dimension 2
+		Width 12cm
+		labelx "U*"
+		labely "y(m)"
+		Include_Description_Curves 0
+		legend  center left
+		width 12cm
+		Curve {
+			legend "Kim experiment"
+			file x_9.780h.csv
+			columns $1/$U_IMPOSED $2
+			}
+		Curve {
+			legend "VDF"
+			segment VDF/test.data VELOCITY_PROFILE_X_9.780h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+		Curve {
+			legend "VEF"
+			segment VEFPreP1B/test.data VELOCITY_PROFILE_X_9.780h
+			origin "Trio_U"
+			columns  $2/$U_IMPOSED $1
+			style lines
+		}
+	}	
+	Table {
+		Title "Recirculation length" 	
+		Description "The recirculation length is evaluated from Trio_U results by the mean from"
+		Description "five longitudinal velocity profiles (Z=-H/2 to Z=H, near the wall) of the "
+		Description "distance x where the velocity switches from negative to positive values." 
+		Description "We can compare this value x with those obtained by Kim [1] and De Saousa [2]."
+		nb_columns 2
+		label Normalized recirculation length (x/h) | Error (%) compare to Kim experiment   
+		line {
+			legend "Kim experiment"
+			origin "Kim"
+			values 7 0
+			alias ref
+		}		
+		line {
+			legend "VEF"
+			file VEFPreP1B/test.zero
+			nb_columns_file 1
+			columns round($1/$h*100.)/100. int((ref.$1-$1/$h)*2/(ref.$1+$1/$h)*10000)/100.
+		}
+		line {
+			legend "VDF"
+			file VDF/test.zero
+			nb_columns_file 1
+			columns round($1/$h*100.)/100. int((ref.$1-$1/$h)*2/(ref.$1+$1/$h)*10000)/100.
+		}
+		line {
+			legend "N3S"
+			origin "N3S"
+			values 5.77 19.26
+		}
+	}
+}
+
+Chapter {
+	Title "Conclusion" 
+	Description "This simulation enables the validation of k-epsilon calculations of a flow"
+	Description "over a backward-facing step with VDF and VEF grids with respectively QUICK"
+	Description "and EF_STAB convection schemes. The Trio_U results are rather good in VDF."
+	Description "In VEF, calculations on other meshes and/or with other schemes seem to show"
+	Description "EF_stab has difficulties to predict the good recirculation length."
+}
+
+Chapter { 
+       	Title "Recommendations for users" 
+       	Description "1) alpha value of 1 for EF_stab scheme for momentum equation is mandatory"
+	Description "for this calculation/mesh because a value of 0.2 leads to divergence."
+	Description "2) Impliciting the K-Eps equation runs the calculation faster."
+	Description "3) Using alpha of 1 for EF_stab scheme for K-Eps is recommended"
+	Description "for this calculation/mesh because a value of 0.2 leads to high variations of time step because of"
+	Description "turbulence viscosity peaks."
+}
+
+Chapter {
+	Title "Computer performance"
+	Tableau_performance { 
+	
+	}
+}
+
+
+
+
+

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+utau=`tail -1 u_tau.dat | awk '{print $2;}'`
+
+utau_th=`cat ../utau_analytique.dat | awk '{print $1;}'`
+
+tail -1 u_tau.dat | awk -v utauth=$utau_th '{print $1" "$2" "100*($2-utauth)/utauth;}' > post_utau   
+
+temps=`ls Moyennes_spatiales_vitesse_rho_mu_* | sed -e 's/Moyennes_spatiales_vitesse_rho_mu_//g' | sed -e 's/_adim.dat//g' | sort -g | tail -1`
+
+../adim_Stat.sh test.data "Moyennes_spatiales_vitesse_rho_mu_"$temps  $utau
+cp "Moyennes_spatiales_vitesse_rho_mu_"$temps moy_spat_dim.dat
+mv "Moyennes_spatiales_vitesse_rho_mu_"$temps"_adim.dat" moy_spat.dat

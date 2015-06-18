@@ -1,0 +1,158 @@
+# PARALLEL ONLY 4 #
+# lance_test 1 ecarts #
+dimension 3
+
+PrecisionGeom 1.e-6
+
+Pb_hydraulique_turbulent pb
+
+Domaine DOM_DOM
+
+# BEGIN MESH #
+Read_unsupported_ASCII_file_from_ICEM DOM_DOM trio_perio_fin_DOM_geo.asc
+Corriger_frontiere_periodique
+	{ 
+		domaine DOM_DOM
+		bord perio
+	}
+# END MESH #
+
+# BEGIN PARTITION
+Partition DOM_DOM
+{
+        Partitionneur Metis { nb_parts 3 }
+        Larg_joint 2
+        Nom_Zones DOM_DOM
+	periodique 1 perio
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM_DOM.Zones DOM_DOM
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+
+Read sch
+{
+        tinit 0.0001
+        tmax  100.
+        dt_min 1.e-12
+        dt_max 10.
+        dt_impr 1.e-7
+        dt_sauv 10
+        seuil_statio 1.e-15
+        facsec 50
+        facsec_max 10000
+        Solveur
+           Implicite
+           {
+#                seuil_convergence_solveur 1.e-12 #
+		solveur gmres { diag nb_it_max 5 seuil 1.e-16 impr controle_residu 1 }
+           }
+
+}
+
+Fluide_Incompressible fluide
+
+Read fluide
+{
+   mu Champ_Uniforme 1    1.E-03
+   rho Champ_Uniforme 1    1.
+}
+
+Champ_Uniforme gravite
+Read gravite 3  0. 0. -9.81
+
+Associate fluide gravite
+
+Associate pb DOM_DOM
+Associate pb sch
+Associate pb fluide
+
+
+Discretize pb dis
+
+
+Read pb
+{
+        Navier_Stokes_turbulent
+        {
+                solveur_pression petsc Cholesky { }
+
+                convection { EF_stab { } }
+                diffusion { }
+                Sources { Canal_perio { bord perio } }
+                conditions_initiales
+                        {
+                        vitesse Champ_Uniforme 3 0. 0. 27.5
+                        }
+                boundary_conditions
+                {
+                        tube paroi_fixe
+                        perio Periodique
+                }
+        	Modele_turbulence K_Epsilon {
+                        Transport_K_Epsilon
+                        {
+                                convection { EF_stab { } }
+                                diffusion { }
+                                boundary_conditions
+                                 {
+                                        tube paroi
+					perio Periodique
+                                 }
+                                conditions_initiales { k_Eps Champ_Uniforme 2 0.001 0.0001 }
+
+                         }
+                        turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 10.
+
+                 }
+        
+        }
+        Postraitement
+        {
+                Format lata
+                Champs dt_post 10.
+                   {
+                        vitesse faces
+			vitesse elem
+			pression elem 
+			pression som
+			gradient_pression elem
+			gradient_pression faces
+			k_eps faces
+			k elem
+			eps elem
+			viscosite_turbulente elem
+			y_plus elem
+                   }
+		Sondes
+		{
+			sonde_vp vitesse  periode 10 segment 30 -2. 0. 5. 2. 0. 5.
+			sonde_pb pression periode 10 segment 30  0. 0. 4. 0. 0. 9.
+			sonde_nut Viscosite_turbulente periode 10 segment 30 -2. 0. 5. 2. 0. 5.
+		
+		}
+        }
+Sauvegarde_simple binaire pb_perio.sauv
+
+}
+
+EcritureLectureSpecial 0
+Solve pb
+End
+
+Reprise binaire pb_perio.sauv
+
+solveur_pression GCP
+                       { precond SSOR { omega 1.4 } seuil 1.e-09 impr }
+                        correction_visco_turb_pour_controle_pas_de_temps
+                        corr_visco_turb elem
+
+solveur petsc bicgstab { precond diag { } seuil 1.e-16 impr }
+
+EF_stab { alpha 0.5 }

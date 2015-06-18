@@ -1,0 +1,95 @@
+#!/bin/bash
+
+#Creation des repertoires
+
+mkdir -p ./VDF/QC/Amont/
+mkdir -p ./VDF/QC/Quick
+mkdir -p ./VDF/NQC/Quick
+
+mkdir -p ./VEF/QC/Muscl
+mkdir -p ./VEF/QC/Amont
+
+#############
+RACINE=`pwd`
+
+echo $RACINE
+
+#cas de base pour QC : VEF/QC/Muscl
+cd $RACINE/VEF/QC/Muscl/
+cp $RACINE/test_QC.data test.data
+
+
+#cas de base pour /NQC : VDF/NQC/Quick
+cd $RACINE/VDF/NQC/Quick/
+cp $RACINE/test_NQC.data test.data
+
+#AUTRES CAS
+#--------------
+# VEF/QC/Amont
+cd $RACINE/VEF/QC/Amont/
+cp $RACINE/test_QC.data .
+sed "s/convection { muscl }/convection { amont }/" test_QC.data > modifie.data
+mv modifie.data test.data
+#
+#	VDF/QC/Amont
+#
+cd $RACINE/VDF/QC/Amont/
+cp $RACINE/test_QC.data .
+sed "s/4 4/7 7/" test_QC.data > modifie.data
+mv modifie.data test.data
+sed "s/31 4/61 7/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/4 31/7 61/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/31 31/61 61/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/Trianguler_H dom//" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VEFPreP1B/VDF/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/tmax 400/tmax 325/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/convection { muscl }/convection { amont }/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/temperature_imposee Champ/echange_externe_impose T_ext Champ/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/t_Uniforme 1 287.15/t_Uniforme 1 287.15 H_imp Champ_Front_Uniforme 1 1.e11/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#
+#
+#	VDF/QC/Quick
+#
+cd $RACINE/VDF/QC/Quick/
+cp $RACINE/test_QC.data .
+sed "s/4 4/7 7/" test_QC.data > modifie.data
+mv modifie.data test.data
+sed "s/31 4/61 7/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/4 31/7 61/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/31 31/61 61/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/Trianguler_H dom//" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VEFPreP1B/VDF/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/tmax 400/tmax 325/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/convection { muscl }/convection { quick }/" test.data > modifie.data
+mv modifie.data test.data
+#
+sed "s/temperature_imposee Champ/echange_externe_impose T_ext Champ/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/t_Uniforme 1 287.15/t_Uniforme 1 287.15 H_imp Champ_Front_Uniforme 1  1.e11/" test.data > modifie.data
+mv modifie.data test.data
+#

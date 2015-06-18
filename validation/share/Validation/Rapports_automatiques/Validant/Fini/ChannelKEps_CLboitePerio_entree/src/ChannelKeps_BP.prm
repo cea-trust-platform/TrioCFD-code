@@ -1,0 +1,373 @@
+Parameters {
+	Title "Periodic box on a turbulent flow in a 3D VEF plane channel with k-$\epsilon$ model."
+	Description "This case test aims to validate the production of boundary conditions for an inlet/outlet turbulent flow in a plane channel, with the use of a periodic box."
+	Description "k-$\epsilon$ modelling with wall function."
+	Description "Validation with comparison between profiles in the periodic box and in the main computation domain."
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent
+	ParametersTrio_U Diffusion scheme : Default{}
+	ParametersTrio_U Discretization : VEFPreP1B (ICEM mesh with prisms layer at walls)
+	ParametersTrio_U Time scheme : Euler_implicite - Solveur Implicite
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent"
+	ParametersTrio_U Convection : EF_stab  
+	ParametersTrio_U Turbulence model : "k-$\epsilon$ model"
+	ParametersTrio_U Wall law : "loi_standard_hydr"
+	ParametersTrio_U Type of boundary conditions : Periodic box: periodicity in the x direction, walls in the y directions, symmetry in the z direction. Main computation domain: Imposed velocity field and K-Epsilon field (from periodic box) for the inlet, outlet pressure, walls and symmetry.
+
+	TestCase "Calcul" "mixedBC.data" /**/
+
+	
+	Reference "Reichardt H. : Vollstaendige Darstellung der turbulenten Geschwindigkeitsverteliung in glatten Leitungen. ZAMM 31, 208-219 (1951)"
+	Reference "http://www.sla.maschinenbau.tu-darmstadt.de/lehre/tms/Turbulence-TUDarmstadt-Pt2-6.pdf"
+	
+	Author "A.AUROUSSEAU (S.VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+
+	Description "Dimensions:"
+	Description "Lx=10 (main computational domain), Lx=0.4 (periodic box) , Ly=2.0 and Lz=0.8"
+	Description "Initial conditions : Ux=10m/s"
+	Description "Boundary conditions : the periodicity conditions need a source term to maintain the flow constant. For the main computation domain, a velocity field and a K-Epsilon field from the periodic box are applied on the inlet. The outlet is a fixed pressure"
+	Description "Canal_perio { bord PERIO }"
+	Description "The main computation mesh features prism layers at the walls and is generated with ICEM. The periodic box grid is generated from the main computation mesh using the Trio_U keyword ExtrudeBord" 
+		
+	Figure {
+		Title "Physical properties"
+		Description " \latex_($\rho = 1 kg/m^3$\latex_)"
+		Description "\latex_($\mu = 0.0001 Pa.s $\latex_) such as Reb = (Ub.h) / v = 100 000 (h=1 m : half-height)"
+		
+		Width 0cm
+		picture ./nothing.png
+	}	
+
+	Figure {
+		Title "Computation configuration"
+		Width 12cm
+		picture ./Geometry.png
+	}
+	
+
+	visu {
+		Title "Main Computation Mesh (13552 cells)"
+		mesh Calcul/mixedBC.lata DOM_BODY
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+		zoom3D 0 0 0.8
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+
+	visu {
+		Title "Periodic Box Mesh (2100 cells)"
+		mesh Calcul/Prepare.lata dom_prepare
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+		zoom3D 0 0 0.8
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}	
+}
+
+Chapter {
+	Title "Results"
+
+	Figure {
+		Title "Computations convergence: friction velocity evolution"
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0 15.0
+		LabelY "Friction velocity"
+		RangeY 0.4 0.7
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic Box"
+			file ./Calcul/u_tau.dat.perio
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Main computation"
+			file ./Calcul/u_tau.dat
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		
+	}
+
+	Figure {
+		Title "Velocity profiles"
+		Width 12cm
+		Dimension 2
+		LabelX "Y (m)"
+		RangeX 0. 2. 
+		LabelY "Vx Velocity (m/s)"
+		RangeY 5. 12.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic box established profile"
+			Segment ./Calcul/Prepare.data SONDE_VIT
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Main computation profile at x=1"
+			file ./Calcul/mixedBC_SONDE_VIT.coupe.dat
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}
+		Curve {
+			legend "Main computation profile at x=9"
+			file ./Calcul/mixedBC_SONDE_VIT4.coupe.dat
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}
+		
+	}
+
+	Figure {
+		Title "Dimensionless velocity profiles"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10. 10000. 
+		LabelY "U+"
+		RangeY 0. 30.
+		LogX
+		Include_Description_Curves 0
+		legend below
+		
+		Curve {
+			legend "Reichardt"
+			Fonction 1/0.415*log(1+0.415*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "Periodic box established profile"
+			file ./Calcul/Prepare_SONDE_VIT.coupe_dimensionless.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Main computation profile at x=9"
+			file ./Calcul/mixedBC_SONDE_VIT4.coupe_dimensionless.dat
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}	
+	}
+
+	Figure {
+		Title "Turbulent viscosity profiles"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2. 
+		LabelY "Nut"
+		RangeY 0. 0.025
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic box  profile"
+			Segment ./Calcul/Prepare.data SONDE_VISC_TURB
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Main computation profile at x=1"
+			Segment ./Calcul/mixedBC.data SONDE_VISC_TURB1
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}
+		Curve {
+			legend "Main computation profile at x=0.9"
+			Segment ./Calcul/mixedBC.data SONDE_VISC_TURB2
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}	
+	}
+
+	Figure {
+		Title "Dimensionless turbulent viscosity profiles"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 1. 
+		LabelY "Dimensionless Nut"
+		RangeY 0. 0.15
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Profile at x=1"
+			file ./Calcul/mixedBC_SONDE_VISC_TURB1.coupe_Dimensionless.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Profile at x=9"
+			file ./Calcul/mixedBC_SONDE_VISC_TURB2.coupe_Dimensionless.dat
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.
+		}
+		Curve {
+			legend "Launder-Sharma profile"
+			file nut_profile_LaunderSh.dat
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.
+		}
+			
+	}
+	
+
+	Figure {
+		Title "Turbulence kinetic energy"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2. 
+		LabelY "K"
+		RangeY 0. 0.7
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic box established profile"
+			Segment ./Calcul/Prepare.data SONDE_K
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Main computation profile at x=1"
+			Segment ./Calcul/mixedBC.data SONDE_K1
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}
+		Curve {
+			legend "Main computation profile at x=0.9"
+			Segment ./Calcul/mixedBC.data SONDE_K4
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}	
+	}
+
+	Figure {
+		Title "Turbulence kinetic energy dissipation rate"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2. 
+		LabelY "Epsilon"
+		RangeY 0. 7.0
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic box established profile"
+			Segment ./Calcul/Prepare.data SONDE_EPS
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "Main computation profile at x=1"
+			Segment ./Calcul/mixedBC.data SONDE_EPS1
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}
+		Curve {
+			legend "Main computation profile at x=0.9"
+			Segment ./Calcul/mixedBC.data SONDE_EPS4
+			columns ($1) ($2)
+			TypePoints 5
+			PointSize 1.5
+		}	
+	}
+
+	Table {
+		Title "\latex_($Re_{\tau}$\latex_) of the Periodic box computation"
+		nb_columns 4
+		label y+ | \latex_($Re_{\tau}$\latex_) | Theoretical \latex_($Re_{\tau}$\latex_) | Relative error (pourcent)
+		line {
+			origin "Trio_U"
+			legend "Periodic Box
+			file ./Calcul/ligneTableau.dat.perio
+			nb_columns_file 4
+			columns ($1) ($2) ($4) ($3) 
+		}	
+	}
+
+	Table {
+		Title "\latex_($Re_{\tau}$\latex_) of the main computation"
+		nb_columns 4
+		label y+ | \latex_($Re_{\tau}$\latex_) | Theoretical \latex_($Re_{\tau}$\latex_) | Relative error (pourcent) 
+		line {
+			origin "Trio_U"
+			legend "Main computation"
+			file ./Calcul/ligneTableau.dat
+			nb_columns_file 5 
+			columns ($1) ($3) ($4) ($5) 
+		}	
+	}
+
+}
+
+Chapter {
+	Title "Conclusions"
+	Table {
+		
+		Description "Use of inlet velocity and K-Eps fields extracted from a periodic box has proved to be usefull since we have good results on the velocity profiles and friction Reynolds, and the canal length needed to get an established flow is reduced"
+				
+		Description "The velocity profiles of the main computation at two locations and the periodic box velocity profile are plotted on the same figure. The main computation profiles (one near the inlet: x=1.0 and one near the outlet: x=9.0) are relatively similar to each other. They're also close to the established profile of the periodic box."
+	
+		Description "The dimensionless velocity profiles have similar slopes and slopes that are close to Reichardt curve."
+
+	 	Description "The dimensionless Nut profiles for the main computation are plotted, and they're quite far from the Launder-Sharma model profile."
+	
+		Description "The friction Reynolds is also calculated in both computations. The error to the theory is much higher (6 pourcent) in the periodic box than in the main computation (0.08 pourcent). This difference on the friction Reynolds between the periodic box and the main computation domain can be explained by the difference in the meshing. Values of Y+ are indeed different."
+		
+		
+		}
+}
+
+Chapter {
+Title "Performances"
+Table {
+		nb_columns 5
+		label  host|system|Total CPU Time|CPU time/step|number of cell
+		line {
+			legend Calcul
+			origin Trio_U
+			file Calcul/mixedBC.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+	
+		line {
+			legend Prepare
+			origin Trio_U
+			file Calcul/temps_calcul
+			columns 0 0 $1 0 0 
+			nb_columns_file 1
+		}	
+	}
+}	
+

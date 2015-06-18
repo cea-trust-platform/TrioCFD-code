@@ -1,0 +1,18 @@
+#Script permettant d'adapter les donnees extraites de obi_diffuseur.pdf : figure 8
+
+awk '{print $2" "($1-6)/10;}' SKE_x6 > new
+mv new SKE_x6
+
+awk '{print $2" "($1-17)/10;}' SKE_x17 > new
+mv new SKE_x17
+
+awk '{print $2" "($1-20)/10;}' SKE_x20 > new
+mv new SKE_x20
+
+awk '{print $2" "($1-27)/10;}' SKE_x27 > new
+mv new SKE_x27
+
+awk '{print $2" "($1-34)/10;}' SKE_x34 > new
+mv new SKE_x34
+
+

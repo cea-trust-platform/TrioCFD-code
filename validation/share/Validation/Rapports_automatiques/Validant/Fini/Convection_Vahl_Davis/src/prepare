@@ -1,0 +1,125 @@
+#!/bin/bash
+
+#Creation des repertoires
+#Cas VDF
+for conv in Amont Quick ; do
+	mkdir -p ./VDF/$conv
+done;
+
+#Cas VEF
+for mesh in  CoarseMesh FineMesh  ; do
+	for conv in Amont Muscl EF_stab EF_stab0.2 ; do
+		mkdir -p ./VEF_$mesh/$conv
+	done;
+done;
+
+RACINE=`pwd`
+
+#Cas VDF
+#Schema amont
+cd $RACINE/VDF/Amont
+cp $RACINE/Vahl-Davis.data test.data
+sed "s/20 20/70 70/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Trianguler_H dom//" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VEFPreP1b/VDF/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/solveur implicite { seuil_convergence_solveur 1.e-9 }/ /" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Schema_Euler_Implicite/Schema_Euler_Explicite/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/EF_stab { }/Amont/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/EF_stab { alpha 0.2 }/Amont/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#Schema quick
+cd $RACINE/VDF/Quick
+cp $RACINE/Vahl-Davis.data test.data
+sed "s/20 20/70 70/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Trianguler_H dom//" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VEFPreP1b/VDF/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/solveur implicite { seuil_convergence_solveur 1.e-9 }/ /" test.data > modifie.data
+mv modifie.data test.data
+sed "s/Schema_Euler_Implicite/Schema_Euler_Explicite/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/EF_stab { }/Amont/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { Quick }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#Cas VEF
+#Maillage grossier
+#EF_stab
+cd $RACINE/VEF_CoarseMesh/EF_stab
+cp $RACINE/Vahl-Davis.data test.data
+#
+cp $RACINE/post_run .
+#
+#EF_stab 0.2
+cd $RACINE/VEF_CoarseMesh/EF_stab0.2
+cp $RACINE/VEF_CoarseMesh/EF_stab/test.data test.data
+sed "s/convection { EF_stab { } }/convection { EF_stab { alpha 0.2 } }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#Amont
+cd $RACINE/VEF_CoarseMesh/Amont
+cp $RACINE/VEF_CoarseMesh/EF_stab0.2/test.data test.data
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { Amont }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#Muscl
+cd $RACINE/VEF_CoarseMesh/Muscl
+cp $RACINE/VEF_CoarseMesh/EF_stab0.2/test.data test.data
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { Muscl }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+
+#Maillage fin
+#EF_stab
+cd $RACINE/VEF_FineMesh/EF_stab
+cp $RACINE/Vahl-Davis.data test.data
+sed "s/Nombre_de_Noeuds 20 20/Nombre_de_noeuds 40 40/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#EF_stab 0.2
+cd $RACINE/VEF_FineMesh/EF_stab0.2
+cp $RACINE/VEF_FineMesh/EF_stab/test.data test.data
+sed "s/convection { EF_stab { } }/convection { EF_stab { alpha 0.2 } }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#Amont
+cd $RACINE/VEF_FineMesh/Amont
+cp $RACINE/VEF_FineMesh/EF_stab0.2/test.data test.data
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { Amont }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+#Muscl
+cd $RACINE/VEF_FineMesh/Muscl
+cp $RACINE/VEF_FineMesh/EF_stab0.2/test.data test.data
+sed "s/convection { EF_stab { alpha 0.2 } }/convection { Muscl }/" test.data > modifie.data
+mv modifie.data test.data
+#
+cp $RACINE/post_run .
+#
+

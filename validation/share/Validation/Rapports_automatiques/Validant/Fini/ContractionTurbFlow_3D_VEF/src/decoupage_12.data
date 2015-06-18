@@ -1,0 +1,25 @@
+# preparation of the parallel files #
+
+
+dimension 3
+Pb_hydraulique_Turbulent pb
+export domaine DOM
+
+# BEGIN MESH #
+Read_unsupported_ASCII_file_from_ICEM DOM sudden_contraction_2.asc
+
+VerifierCoin DOM { }
+Reorienter_tetraedres DOM
+Dilate  DOM 0.001
+# END MESH #
+
+# BEGIN PARTITION
+Partition DOM {
+        Partitionneur metis { Nb_parts 12 }
+        Larg_joint 2
+        Nom_Zones DOM
+        Nb_parts_tot 12
+	}
+END PARTITION #
+
+

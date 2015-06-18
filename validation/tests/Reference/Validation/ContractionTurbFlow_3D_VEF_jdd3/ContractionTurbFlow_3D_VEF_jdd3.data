@@ -1,0 +1,180 @@
+# sudden contraction #
+# k-eps #
+# fully turbulent inlet profiles: recirculation box #
+# geometrical dimensions #
+# Diameter D1 : 2. #
+# Diameter D2 : 1. #
+# Length L1 : 5. #
+# Length L2 : 10. #
+# PARALLEL ONLY 4 #
+# lance_test 6 ecarts #
+PrecisionGeom 1.e-4
+
+Dimension 3
+
+export Domaine DOM
+
+# BEGIN SCATTER #
+Scatter DOM.Zones DOM
+# END SCATTER #
+
+Schema_Euler_implicite sch
+Read sch {
+	tinit   0.
+	nb_pas_dt_max 3
+	tmax    175.
+	dt_min  1e-10
+	dt_max  1.
+	dt_impr 10.
+	dt_sauv 100.
+	seuil_statio 1e-8
+	
+	facsec 5.
+        facsec_max 500.
+        Solveur
+           Implicite
+           {
+                seuil_convergence_solveur 1.e-12
+           }
+	}
+
+
+
+Fluide_Incompressible eau
+Read eau {
+	mu Champ_Uniforme 1 0.001
+	rho Champ_Uniforme 1 1000.
+}
+
+
+VEFPrep1B dis
+
+# Le Probleme #
+Pb_hydraulique_turbulent pb
+Associate pb DOM
+Associate pb sch
+Associate pb eau
+Discretize pb dis
+
+
+Read pb
+{ 
+ Navier_Stokes_turbulent
+ { 
+       solveur_pression Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-9
+					impr
+                            } 
+       convection { ef_stab { alpha 1. } }
+       diffusion  { }
+             
+
+       conditions_initiales { 
+       			    Vitesse champ_uniforme 3 0.05 0. 0.
+       			    }
+       
+       
+       boundary_conditions {  
+				IN frontiere_ouverte_vitesse_imposee champ_front_lu DOM 3 pb1_VITESSE_PERIO.dat
+				
+				SYM1 symetrie
+				SYM12 symetrie
+				SYM2 symetrie
+				SYM22 symetrie
+				SYM3 symetrie
+				SYM32 symetrie
+				
+				WALL1 paroi_fixe
+				WALL2 paroi_fixe
+				WALL3 paroi_fixe
+				
+				OUT frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.	
+                          } 
+			  
+                Modele_Turbulence K_epsilon
+                {
+			cmu 0.09   
+			transport_k_epsilon
+				{
+				diffusion { }
+				convection { amont }
+				parametre_equation parametre_implicite
+                        {
+                                resolution_explicite
+                        }
+				conditions_initiales { k_eps champ_uniforme 2 1.25e-5 1.4e-6 }
+				
+				boundary_conditions { 
+				IN frontiere_ouverte_k_eps_impose champ_front_lu DOM 2 pb1_K_EPS_PERIO.dat
+					
+				SYM1 symetrie
+				SYM12 symetrie
+				SYM2 symetrie
+				SYM22 symetrie
+				SYM3 symetrie
+				SYM32 symetrie
+				
+				WALL1 paroi
+				WALL2 paroi
+				WALL3 paroi
+
+					
+				OUT frontiere_ouverte K_eps_ext champ_front_uniforme 2 5.e-5 6.e-8
+					}
+	
+			}	
+		turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 50.
+		}                     
+	 
+  }
+ 
+   
+         
+	Postraitement 
+	{
+		format lml
+		champs binaire dt_post 50.
+		{
+			vitesse elem
+			pression_pa elem
+			viscosite_turbulente elem
+			eps elem
+			k elem
+			y_plus elem
+		}
+	}
+liste_de_postraitements 
+{
+	
+	Sonde Postraitement 
+	{
+		Sondes
+		{
+			seg_pression pression_pa periode 10. segment 41 0. 0. 0.01 15. 0. 0.01
+			pression_amont pression_pa periode 10. points 1 0. 0. 0.
+			pression_aval pression_pa periode 10. points 1 15. 0. 0.
+			pression_milieu1 pression_pa periode 10. points 1 5. 0. 0.
+			pression_milieu2 pression_pa periode 10. points 1 5. 0. 0.5
+			
+			vitesse_1 vitesse periode 10. segment 11 1. 0. 0. 1. 0. 1.
+			vitesse_2 vitesse periode 10. segment 11 2. 0. 0. 2. 0. 1.
+			vitesse_3 vitesse periode 10. segment 11 3. 0. 0. 3. 0. 1.
+			vitesse_4 vitesse periode 10. segment 11 4. 0. 0. 4. 0. 1.
+
+			
+			vitesse_out vitesse periode 10. segment 11 14 0. 0. 14. 0. 1.
+		}
+	}
+	
+} 
+
+sauvegarde binaire sudden_contraction.sauv
+}
+Solve pb
+End
+
+
+ 
+
+
+

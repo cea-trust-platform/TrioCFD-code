@@ -1,0 +1,177 @@
+#!/bin/bash
+
+#Creation des repertoires test 1
+mkdir -p ./test1/EF_stab/alpha_1
+mkdir -p ./test1/EF_stab/alpha_02
+mkdir -p ./test1/Muscl/minmod_1
+mkdir -p ./test1/Muscl/vanalbada_1
+mkdir -p ./test1/Muscl/chakravarthy_1
+mkdir -p ./test1/Muscl/vanleer_1
+mkdir -p ./test1/Muscl/superbee_1
+
+#Creation des repertoires test 2
+mkdir -p ./test2/Muscl/minmod_1
+mkdir -p ./test2/EF_stab/alpha_1
+mkdir -p ./test2/EF_stab/alpha_02
+mkdir -p ./test2/Muscl/vanalbada_1
+mkdir -p ./test2/Muscl/chakravarthy_1
+mkdir -p ./test2/Muscl/vanleer_1
+mkdir -p ./test2/Muscl/superbee_1
+
+#Creation des repertoires test 3
+mkdir -p ./test3/EF_stab/alpha_1
+mkdir -p ./test3/EF_stab/alpha_02
+mkdir -p ./test3/Muscl/minmod_1
+mkdir -p ./test3/Muscl/minmod_2
+mkdir -p ./test3/Muscl/vanleer_1
+mkdir -p ./test3/Muscl/vanleer_2
+
+#############
+RACINE=`pwd`
+
+echo $RACINE
+
+
+#####################
+##################### TEST 1
+#####################
+#cas de base : Muscl/minmod_1 muscl minmod 1
+cd $RACINE/test1/Muscl/minmod_1
+cp $RACINE/testcase_1.data test.data
+cp $RACINE/post_run .
+
+#
+cd $RACINE/test1/EF_stab/alpha_1
+cp $RACINE/testcase_1.data test.data
+sed "s/generic muscl minmod 1/EF_stab { }/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test1/EF_stab/alpha_02
+cp $RACINE/testcase_1.data test.data
+sed "s/generic muscl minmod 1/EF_stab { alpha 0.2 }/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test1/Muscl/vanalbada_1
+cp $RACINE/testcase_1.data test.data
+sed "s/minmod/vanalbada/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test1/Muscl/chakravarthy_1
+cp $RACINE/testcase_1.data test.data
+sed "s/minmod/chakravarthy/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test1/Muscl/vanleer_1
+cp $RACINE/testcase_1.data test.data
+sed "s/minmod/vanleer/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test1/Muscl/superbee_1
+cp $RACINE/testcase_1.data test.data
+sed "s/minmod/superbee/" test.data > modifie.data
+mv modifie.data test.data
+
+
+
+
+#####################
+##################### TEST 2
+#####################
+#cas de base : Muscl/minmod_1 muscl minmod 1
+cd $RACINE/test2/Muscl/minmod_1
+cp $RACINE/testcase_2.data test.data
+cp $RACINE/post_run .
+
+#
+cd $RACINE/test2/EF_stab/alpha_1
+cp $RACINE/testcase_2.data test.data
+sed "s/generic muscl minmod 1/EF_stab { }/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test2/EF_stab/alpha_02
+cp $RACINE/testcase_2.data test.data
+sed "s/generic muscl minmod 1/EF_stab { alpha 0.2 }/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test2/Muscl/vanalbada_1
+cp $RACINE/testcase_2.data test.data
+sed "s/minmod/vanalbada/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test2/Muscl/chakravarthy_1
+cp $RACINE/testcase_2.data test.data
+sed "s/minmod/chakravarthy/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test2/Muscl/vanleer_1
+cp $RACINE/testcase_2.data test.data
+sed "s/minmod/vanleer/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test2/Muscl/superbee_1
+cp $RACINE/testcase_2.data test.data
+sed "s/minmod/superbee/" test.data > modifie.data
+mv modifie.data test.data
+
+
+
+#####################
+##################### TEST 3
+#####################
+#cas de base : Muscl/minmod_1 muscl minmod 1
+cd $RACINE/test3/Muscl/minmod_1
+cp $RACINE/testcase_3.data test.data
+cp $RACINE/post_run .
+
+#
+cd $RACINE/test3/EF_stab/alpha_1
+cp $RACINE/testcase_3.data test.data
+sed "s/generic muscl minmod 1/EF_stab { }/" test.data > modifie.data
+mv modifie.data test.data
+\
+#
+cd $RACINE/test3/EF_stab/alpha_02
+cp $RACINE/testcase_3.data test.data
+sed "s/generic muscl minmod 1/EF_stab { alpha 0.2 }/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test3/Muscl/minmod_2
+cp $RACINE/testcase_3.data test.data
+sed "s/minmod 1/minmod 2/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test3/Muscl/vanleer_1
+cp $RACINE/testcase_3.data test.data
+sed "s/minmod/vanleer/" test.data > modifie.data
+mv modifie.data test.data
+
+#
+cd $RACINE/test3/Muscl/vanleer_2
+cp $RACINE/testcase_3.data test.data
+sed "s/minmod 1/vanleer 2/" test.data > modifie.data
+mv modifie.data test.data
+
+
+
+
+
+
+
+
+
+
+
+
+

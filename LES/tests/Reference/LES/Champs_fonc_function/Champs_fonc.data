@@ -1,0 +1,190 @@
+# Thermo_Hydraulique_Turbulent 3D VEF P1NC/P0  #
+# PARALLEL OK #
+# Pas d'ecarts sur la vitesse si on met pas de loi de paroi hydraulique #
+
+dimension 3
+
+Pb_Thermohydraulique_Turbulent pb
+
+Domaine DOM_DOM
+# BEGIN MESH #
+Mailler DOM_DOM
+{
+        Pave Cavite
+                {
+                Origine 0. 0. 0.
+                Nombre_de_Noeuds 3 3 3
+                Longueurs 0.01 0.01 0.01
+                }
+                {
+                Bord Gauche X = 0.    0. <= Y <= 0.01 0. <= Z <= 0.01
+                Bord Haut   Y = 0.01  0. <= X <= 0.01 0. <= Z <= 0.01
+                Bord Bas    Y = 0.    0. <= X <= 0.01 0. <= Z <= 0.01
+                Bord Droit  X = 0.01  0. <= Y <= 0.01 0. <= Z <= 0.01
+                Bord Z    Z = 0.    0. <= X <= 0.01 0. <= Y <= 0.01
+                Bord Z   Z = 0.01  0. <= X <= 0.01 0. <= Y <= 0.01
+                }
+}
+Tetraedriser_homogene DOM_DOM
+# END MESH #
+# BEGIN PARTITION
+Partition DOM_DOM
+{
+	Partitionneur Metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM_DOM
+END SCATTER #
+
+VEFPreP1B dis
+Lire dis { P0 P1 }
+# Schema_MacCormack sch #
+
+# Schema_Euler_Explicite sch #
+
+Schema_Predictor_Corrector sch
+
+Lire sch
+{
+        nb_pas_dt_max 60
+ 	tinit 0.
+        tmax  1000.
+        dt_min 1.e-7
+        dt_max 1.
+        dt_impr 1.e-7
+        dt_sauv 2.0
+        seuil_statio 1.e-10
+        facsec 1
+        diffusion_implicite 0
+}
+
+Fluide_Incompressible fluide
+
+Lire fluide
+{
+   mu       Champ_Uniforme 1 4.9488e-5
+   lambda  Champ_Fonc_Tabule 1 temperature
+        { 3  800.        1300.    1500.
+             7.0464E-02  0.1388   0.1666 }
+   Cp      Champ_Uniforme 1 2460.13
+   rho     Champ_Uniforme 1 27.019
+   beta_th Champ_Uniforme 1 9.105209E-4
+}
+
+Champ_Uniforme gravite
+Lire gravite 3  0. -9.81 0.
+
+Associate fluide gravite
+
+Associate pb DOM_DOM
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{ Navier_Stokes_turbulent
+        {
+                solveur_pression Gcp { precond ssor { omega 1.5 }
+                                       seuil 1.e-9
+                                       impr
+                                     }
+                convection { muscl }
+                diffusion { }
+                sources { boussinesq_temperature { T0 1309.608695652174 } }
+                Modele_turbulence Sous_maille_smago
+                        {
+                        cs 0.2
+                        Turbulence_paroi loi_standard_hydr
+                        }
+                conditions_initiales
+                        {
+                        vitesse Champ_Uniforme 3 0. 0. 0.
+                        }
+                boundary_conditions
+                {
+                        Haut  frontiere_ouverte_vitesse_imposee
+                              Champ_front_fonc_pois_tube 1.569  3
+                                                         0.     0.3   0.
+                                                        -0.406 -2.463 0.
+                                                         0      0     0
+                        Droit  frontiere_ouverte_pression_imposee
+                              Champ_front_Uniforme 1 0.
+                        Z  paroi_fixe
+                        Bas  frontiere_ouverte_vitesse_imposee
+                              Champ_front_fonc_pois_ipsn 1.590 3
+                                                     0.   +0.3   0.
+                                                     8.800 2.095 0.
+                        Gauche  frontiere_ouverte_vitesse_imposee
+                              Champ_front_fonc_pois_ipsn 1.590 3
+                                                     0.   -0.3   0.
+                                                     8.800 2.095 0.
+                }
+		Traitement_particulier { brech { calcul_flux { 1 0.005 0.005 0.005 666 666 666 0.001 0.005 10 10 } } }
+        }
+        Convection_Diffusion_Temperature_Turbulent
+        {
+                diffusion { }
+                convection { muscl }
+                conditions_initiales
+                  { Temperature
+                    Init_par_partie 1 0. 1301. 1499.
+                  }
+                boundary_conditions
+                {
+                        Z  paroi_adiabatique
+                        Haut  frontiere_ouverte_temperature_imposee
+                              Champ_front_Uniforme 1 1500.
+                        Bas  frontiere_ouverte T_ext
+                              Champ_front_Uniforme 1 1500.
+                        Gauche  frontiere_ouverte_temperature_imposee
+                              Champ_front_Uniforme 1 1300.
+                        Droit  frontiere_ouverte T_ext
+                              Champ_front_Uniforme 1 1300.
+                }
+                Modele_turbulence Prandtl
+                        { turbulence_paroi loi_standard_hydr_scalaire
+
+                        }
+        }
+        Postraitement
+        {
+              Sondes
+                {
+			sonde_vitesse vitesse periode 0.001 point 1 0.005 0.005 0.005
+			sonde_cor_vit correlation_vitesse_vitesse periode 0.001 point 1 0.005 0.005 0.005
+			sonde_UT correlation_temperature_vitesse periode 0.001 point 1 0.005 0.005 0.005
+                }
+                Champs dt_post 5e-7
+                {
+                        vitesse elem
+                        temperature elem
+                }
+		Statistiques dt_post 5e-7
+		{
+		   t_deb 0. t_fin 10
+		   moyenne vitesse
+		   moyenne temperature
+		   moyenne pression
+		   ecart_type vitesse
+		   ecart_type temperature
+		   ecart_type pression
+		   correlation vitesse vitesse
+		   correlation temperature vitesse
+                   moyenne vitesse elem
+		   moyenne temperature elem
+		   moyenne pression elem
+		   ecart_type vitesse elem
+		   ecart_type temperature elem
+		}
+        }
+	sauvegarde formatte Champs_fonc.rep
+}
+
+Solve pb
+Fin

@@ -1,0 +1,536 @@
+Parameters {
+	Title "Poiseuille comparisons: EF_stab versus Amont schemes, with different mesh sizes"
+	Description "Laminar Poiseuille flow in a 2D-periodic plane channel."
+	Description "Study of the behaviour of 3 convection schemes: EF_stab (alpha = 1), EF_stab (alpha = 0.2) and Amont with an Euler explicite time scheme, on the velocity. "
+	Description " Comparison with the analytical solution. "
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Dimension: 2D 
+	ParametersTrio_U Discretization: VEFPreP1B
+	ParametersTrio_U Time scheme: Euler explicite
+	ParametersTrio_U Momentum convection scheme: Amont and EF_stab with alpha = 1. and alpha = 0.2 
+	ParametersTrio_U Momentum diffusion scheme: standard{}
+	ParametersTrio_U Solving of equations: Navier_Stokes_standard
+
+	TestCase pois2D_N0/Amont test
+	TestCase pois2D_N0/EF_stab test
+	TestCase pois2D_N0/EF_stab02 test
+
+	TestCase pois2D_N1/Amont test
+	TestCase pois2D_N1/EF_stab test
+	TestCase pois2D_N1/EF_stab02 test
+
+	TestCase pois2D_N2/Amont test
+	TestCase pois2D_N2/EF_stab test
+	TestCase pois2D_N2/EF_stab02 test
+
+	TestCase pois2D_N3/Amont test
+	TestCase pois2D_N3/EF_stab test
+	TestCase pois2D_N3/EF_stab02 test
+
+	TestCase pois2D_N4/Amont test
+	TestCase pois2D_N4/EF_stab test
+	TestCase pois2D_N4/EF_stab02 test
+
+	TestCase pois2D_N5/Amont test
+	TestCase pois2D_N5/EF_stab test
+	TestCase pois2D_N5/EF_stab02 test
+
+
+	
+	Author "E. MOREAU (V.BARTHEL)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Rectangular domain (6m along x, 2m along y)"
+	Description "Hydraulic initial conditions: velocity profile U(y) = 3/2.y.(2-y)"
+	Description "Boundary conditions: Periodicity (x), and wall (y) "
+	Description "A source term of pressure force is calculated by the code to maintain the imposed bulk velocity. Several meshes and convection schemes are tested. The velocity profiles will be compared with the analytic one"
+
+
+	visu {
+		Title "Mesh N0"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh pois2D_N0/EF_stab/test.lata dom
+		Description "Mesh: 6 triangular cells obtained with option Trianguler"
+	}
+	
+	visu {
+		Title "Mesh N1"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh pois2D_N1/EF_stab/test.lata dom
+		Description "Mesh: 24 triangular cells obtained with option Trianguler"
+	}
+
+	visu {
+		Title "Mesh N2"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh pois2D_N2/EF_stab/test.lata dom
+		Description "Mesh: 96 triangular cells obtained with option Trianguler"
+	}
+
+	visu {
+		Title "Mesh N3"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh pois2D_N3/EF_stab/test.lata dom
+		Description "Mesh: 384 triangular cells obtained with option Trianguler"
+	}
+
+	visu {
+		Title "Mesh N4"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh pois2D_N4/EF_stab/test.lata dom
+		Description "Mesh: 1536 triangular cells obtained with option Trianguler"
+	}
+
+	visu {
+		Title "Mesh N5"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh pois2D_N5/EF_stab/test.lata dom
+		Description "Mesh: 6144 triangular cells obtained with option Trianguler"
+	}
+
+
+}
+########################
+########################  Profile with amont scheme
+########################
+Chapter {
+	Title "Presentation of the velocity profiles"
+	Figure {
+		Title " Velocity profile vs mesh refinement (Amont) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 2.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 1.5*x*(2-x)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			Segment pois2D_N0/Amont/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			Segment pois2D_N1/Amont/test.data SONDE_VINLET 
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			Segment pois2D_N2/Amont/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"Amont
+			Segment pois2D_N3/Amont/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			Segment pois2D_N4/Amont/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			Segment pois2D_N5/Amont/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################
+########################  Profile with EF_stab scheme
+########################
+Chapter {
+	Figure {
+		Title " Velocity profile vs mesh refinement (EF_stab) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 2.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 1.5*x*(2-x)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			Segment pois2D_N1/EF_stab/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			Segment pois2D_N2/EF_stab/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			Segment pois2D_N2/EF_stab/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			Segment pois2D_N4/EF_stab/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			Segment pois2D_N5/EF_stab/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################
+######################## Profile with EF_stab scheme and alpha = 0.2
+########################
+Chapter {
+	Figure {
+		Title " Velocity profile vs mesh refinement (EF_stab {alpha = 0.2}) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 2.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 1.5*x*(2-x)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			Segment pois2D_N0/EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			Segment pois2D_N1/EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			Segment pois2D_N2/EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"Amont
+			Segment pois2D_N3/EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			Segment pois2D_N4/EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			Segment pois2D_N5/EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+}
+########################
+######################## Forcing term with Amont scheme
+########################
+Chapter {
+	Figure {
+		Title " Forcing term evolution vs mesh refinement (Amont) "
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 20.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.2
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 0.03
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			file pois2D_N0/Amont/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			file pois2D_N1/Amont/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			file pois2D_N2/Amont/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"Amont
+			file pois2D_N3/Amont/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			file pois2D_N4/Amont/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			file pois2D_N5/Amont/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################
+########################  Forcing term with EF_stab scheme
+########################
+########################
+Chapter {
+	Figure {
+		Title " Velocity profile vs the mesh refinement (EF_stab) "
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 20.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.2
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 0.03
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			file pois2D_N0/EF_stab/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			file pois2D_N1/EF_stab/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			file pois2D_N2/EF_stab/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			file pois2D_N3/EF_stab/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			file pois2D_N4/EF_stab/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			file pois2D_N5/EF_stab/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+######################## Forcing term with EF_stab (alpha = 0.2) scheme
+########################
+########################
+Chapter {
+	Figure {
+		Title " Forcing term evolution vs mesh refinement (EF_stab { alpha = 0.2}) "
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 20.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.2
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 0.03
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			file pois2D_N0/EF_stab02/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			file pois2D_N1/EF_stab02/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			file pois2D_N2/EF_stab02/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			file pois2D_N3/EF_stab02/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			file pois2D_N4/EF_stab02/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			file pois2D_N5/EF_stab02/test_Pressure_Gradient_pb_periox
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################  
+########################
+
+Chapter {
+	Title "Recommendations for users"
+	Description "We can easily see the influence of the mesh on the results: the best results are obtained for the mesh presenting the greatest refinement. In addition, the EF_stab scheme is recommended rather than the Amont scheme. The results seem not to be affected by the value of the alpha coefficient of the EF_stab scheme"
+
+}
+
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}
+

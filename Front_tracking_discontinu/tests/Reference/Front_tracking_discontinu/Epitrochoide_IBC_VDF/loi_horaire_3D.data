@@ -1,0 +1,10 @@
+# Transport barreau le long d'un epitrochoide #
+export Loi_horaire loi
+Lire loi
+{
+	position  		3  3*cos(t)-1.5*cos(8*t) 3*sin(t)-1.5*sin(8*t) 0.
+	vitesse			3 -3*sin(t)+12*sin(8*t) 3*cos(t)-12*cos(8*t) 0.
+	rotation		9    cos(3*t)   -sin(3*t) 0.   sin(3*t)    cos(3*t) 0. 0. 0. 1.
+	derivee_rotation	9 -3*sin(3*t) -3*cos(3*t) 0. 3*cos(3*t) -3*sin(3*t) 0. 0. 0. 0.
+} 
+ 

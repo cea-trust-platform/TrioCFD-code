@@ -1,0 +1,139 @@
+#  SIMULATION D UN TUYAU AVEC ECOULt TURBULENT Re=50000 et Pr=0.004 (Na) + loi de paroi standard logarithmique #
+# PARALLEL ONLY 4 #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom01234
+
+Scatter dom01234.Zones dom01234
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 3000.
+	dt_min 1.e-6
+	dt_max 1.e+2
+	dt_impr 1000.
+	dt_sauv 1000.0
+	seuil_statio 1.e-8
+	facsec 20
+        facsec_max 150 	        
+	Solveur
+           Implicite
+           {
+                solveur gmres { diag seuil 1e-20 nb_it_max 5 impr }
+           }    
+	   
+	   
+}
+
+Fluide_Incompressible sodium
+Read sodium
+{
+	mu Champ_Uniforme       1 2.484e-4
+ 	rho Champ_Uniforme      1 900.
+        lambda Champ_Uniforme   1 80.
+        Cp Champ_Uniforme       1 1370.
+        beta_th Champ_Uniforme  1 0.
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate sodium gravite
+Associate pb dom01234
+Associate pb sch
+Associate pb sodium
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{	       		
+		solveur_pression petsc cholesky { }  
+		convection { EF_stab { } }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_fonc_xyz dom01234 3  0. 0. 0.0276
+			}
+		boundary_conditions {
+			sortie  frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  0. 0. 0.0276
+			paroi  paroi_fixe
+		}
+                 Modele_turbulence K_Epsilon {
+			Transport_K_Epsilon
+                        {
+                         convection { amont } 
+                         diffusion { }
+                         boundary_conditions
+                            {
+				entree frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 7.6e-6 2.8e-7
+                             sortie frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+                             paroi  paroi
+                            }
+                         conditions_initiales
+                           {
+                             k_Eps Champ_Uniforme 2 7.56e-6 2.8e-7
+                           }
+                        }
+                        Turbulence_paroi  loi_standard_hydr dt_impr_ustar 2000
+                }
+		Traitement_particulier { temperature { bord sortie direction 2 } }
+        }
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+                convection { EF_stab { } }
+                Modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire 
+                                            Prandt_turbulent_fonction_nu_t_alpha nu_t*nu_t/(0.7*alpha+0.85*nu_t)
+						dt_impr_nusselt 10000.
+                                          }
+                boundary_conditions
+                        {
+			entree frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 0.
+			sortie frontiere_ouverte T_ext Champ_Front_Uniforme 1 0.
+                        paroi   paroi_flux_impose Champ_Front_Uniforme 1 1.
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom01234 1 0. }
+                }
+
+	Postraitement
+	{
+         format lml
+		Champs dt_post 4000.0
+		{
+			vitesse
+			temperature
+			k elem
+			eps elem
+			}
+	Sondes
+	       {
+	       sonde_v vitesse periode 10. point 3 -0.5 0. 44.5
+				        0.  0. 44.5
+					0.5 0. 44.5	
+	       sonde_t temperature periode 10. point 3 -0.5 0. 44.5
+				            0.  0. 44.5
+				            0.5 0. 44.5	
+	       sonde_pc grav pression periode 100. segment 30  0.0 0. 0. 0. 0. 45.0
+	       sonde_pb grav pression periode 100. segment 30  0.9 0. 0. 0.9 0. 45.0
+	       sonde_pEnt pression periode 100. plan 12 12  0.0 0. 0. 1.0 0. 0.0 0. 1. 0.
+	       sonde_pSor pression periode 100. plan 12 12  0.0 0. 45. 1.0 0. 45.0 0. 1. 45.
+	       sonde_vp vitesse periode 100. segment 30 -1.0 0. 44.5 1. 0. 44.5
+	       sonde_nut viscosite_turbulente periode 100. segment 30 -1.0 0. 44.5 1. 0. 44.5
+	       sonde_alphat diffusivite_turbulente periode 100. segment 30 -1.0 0. 44.5 1. 0. 44.5
+	       sonde_tpn temperature periode 100. segment 30 -1.0 0. 44.5 1. 0. 44.5
+               }
+	}
+	Sauvegarde binaire Conduite.sauv
+}
+EcritureLectureSpecial 0
+Solve pb
+End
+

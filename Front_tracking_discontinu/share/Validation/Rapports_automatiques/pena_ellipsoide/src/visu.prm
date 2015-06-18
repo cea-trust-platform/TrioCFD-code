@@ -1,0 +1,35 @@
+Parameters {
+	Title "Test de la penalisation"
+	Description "Rapport utilisant visit"
+	Author "BM CI"
+	TestCase pena_ellipsoide lineaire
+	TestCase pena_ellipsoide_base lineaire
+}
+
+Chapter {
+	Title "FT"
+	Description " test visu "
+visu {
+	Title "pena_ellipsoide"
+
+	mesh pena_ellipsoide/lata/ancre.lata DOM
+
+        vector  pena_ellipsoide/lata/ancre.lata DOM VITESSE ELEM 
+	width 9cm
+}
+visu {
+	Title "pena_ellipsoide_base"
+
+	mesh pena_ellipsoide_base/lata/ancre.lata DOM
+
+        vector  pena_ellipsoide_base/lata/ancre.lata DOM VITESSE ELEM 
+	width 9cm
+}
+
+
+}
+
+
+
+
+

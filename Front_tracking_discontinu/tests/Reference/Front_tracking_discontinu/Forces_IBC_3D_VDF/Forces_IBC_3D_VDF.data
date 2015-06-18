@@ -1,0 +1,118 @@
+# Cas test Front Tracking force totale sur une IBC #
+# PARALLEL OK #
+dimension 3
+Probleme_FT_Disc_gen pb
+
+Domaine DOM
+# BEGIN MESH #
+Mailler DOM
+{
+        Pave pave1
+        {
+                origine          0 0 0
+                longueurs        5. 3. 3.
+                nombre_de_noeuds 41 25 25
+        }
+        {
+                bord entree 	X = 0       	0 <= Y <= 3    0 <= Z <= 3
+                bord sortie 	X = 5       	0 <= Y <= 3    0 <= Z <= 3
+                bord paroi 	Y = 0        	0 <= X <= 5    0 <= Z <= 3
+                bord paroi 	Y = 3        	0 <= X <= 5    0 <= Z <= 3
+                bord paroi 	Z = 0        	0 <= X <= 5    0 <= Y <= 3
+                bord paroi 	Z = 3        	0 <= X <= 5    0 <= Y <= 3
+        }
+}
+Reorienter_tetraedres DOM
+# END MESH #
+
+# BEGIN PARTITION 
+Partition DOM {
+        partitionneur metis { Nb_parts 4 }
+        larg_joint 1
+        Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VDF dis
+
+Read_file schema.data ;
+
+Read_file fluide.data ;
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       body
+
+Associate pb hydraulique
+Associate pb body
+
+Associate pb DOM
+Associate pb sch
+Associate pb liquide
+
+Discretize pb dis
+
+Lire pb
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               0
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1e-07 impr }
+	convection           { amont }
+	diffusion            { }
+	conditions_initiales { vitesse champ_uniforme 3 1. 0. 0. }
+	equations_interfaces_vitesse_imposee 1   body
+	boundary_conditions
+	{
+		entree	frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 1. 0. 0.
+		sortie	Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		paroi  	symetrie
+	}
+}
+body
+{
+	conditions_initiales { fichier_geom { 
+			fichier_geom cube.geom 
+			point_phase 0 4.9 2.9 2.9
+			default_phase 1
+			lata_dump connex
+                         } }
+	boundary_conditions
+	{
+		entree Paroi_FT_disc symetrie
+		sortie Paroi_FT_disc symetrie
+		paroi Paroi_FT_disc symetrie
+	}
+	methode_transport vitesse_imposee 0. 0. 0.
+}
+postraitement {
+  sondes 
+  {
+	   pression pression periode 0.001 	points 3 0.5 1.5 1.5 2.5 1.5 1.5 1.5 1.5 1.5 
+	   vitesse vitesse periode 0.001 	points 3 0.5 1.5 1.5 2.5 1.5 1.5 1.5 1.5 1.5 
+  }
+  champs dt_post 1. {
+  	pression elem
+	vitesse elem
+  }
+}
+liste_postraitements {
+   postraitement_ft_lata post1 {
+	interfaces body { champs sommets { courbure } } 
+	champs elements { indicatrice_body  pression } 
+	champs faces { vitesse }
+   }
+}
+}
+
+Solve pb
+Fin

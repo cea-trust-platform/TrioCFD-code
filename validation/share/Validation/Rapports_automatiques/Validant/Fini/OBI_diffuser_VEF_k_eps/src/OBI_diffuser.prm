@@ -1,0 +1,531 @@
+Parameters {
+	Title "Periodic box on a turbulent flow in a 2D diffuser with k-$\epsilon$ model."
+	Description "This case test aims to validate the use of Trio_U code for the simulation of a turbulent flow in a 2D diffuser, with the use of a periodic box."
+	Description "k-$\epsilon$ modelling with wall function."
+	Description "Validation with comparison between experimental and computational profiles. Experimental results are obtained from the ERCOFTAC experiment data base. The CFD results are obtained from several papers that are listed below."
+	Description "The test case computation grid is generated with ICEM. From this VEF mesh, two different meshes for periodic box computations are generated. The purpose of those two periodic computations is to provide the main computations with established inlet boundary conditions. There are two main computations in this test case since there are two periodic boxes."
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent
+	ParametersTrio_U Diffusion scheme : Default{}
+	ParametersTrio_U Discretization : VEFPreP1B (ICEM mesh with prisms layer at walls). Two meshes for the periodic box have been generated: one with the "extrudeBord" keyword, the other one with "extruder_en3."
+	ParametersTrio_U Time scheme : Euler_implicite - Solveur Implicite
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent"
+	ParametersTrio_U Convection : EF_stab { alpha 0.2 }
+	ParametersTrio_U Turbulence model : "k-$\epsilon$ model"
+	ParametersTrio_U Wall law : "turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet }, which is the default option for 3D calculations"
+	ParametersTrio_U Type of boundary conditions : Periodic box: periodicity in the x direction, walls in the y directions. Main computation domain (diffuser): Velocity field and K-Epsilon field (from periodic box) for the inlet, outlet pressure, walls.
+	
+	Reference "[1] A Comparative Study of Turbulence Models Performance for Turbulent Flow in a Planar Asymmetric Diffuser, Samy M. El-Behery and Mofreh H. Hamed. International Journal of Aerospace and Mechanical Engineering 5:2 2001."
+	Reference "[2] Advanced Turbulence Modelling of Separated Flow in a Diffuser, D.D Apsley and M.A Leschziner. Flow, Turbulence and Combustion 63:81-112,1999."
+	Reference "[3] Ten Years of Industrial Experience with the SST Turbulence Model, F.R Menter and M. Kuntz and R. Langtry. Turbulence, Heat and Mass Transfer 4. K. Hanjalic, Y. Nagano and M. Tummers (Editors), Begell House, Inc. 2003."
+	
+
+	TestCase Calcul_fin Calcul.data /*see data set in the appendix*/
+	TestCase Calcul_gros Calcul.data
+
+	
+	
+	Author "A.AUROUSSEAU (S.VANDROUX)"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Test Description"
+	
+	Figure  {
+		Title "Geometry, Mesh and Boundary Conditions"
+		width 12cm		
+		Description "Dimensions :     H = 1m"
+		Description "Velocity inlet:  U = 1 m/s "
+		Description "Outlet pressure: P = 0"
+       		picture ./Eaton.jpg
+	}
+	
+	Table {
+		Title "Physical properties"        	
+		Description "Fluid domain: Fictive fluid which lead to Re = 20000"
+        	Description "No Gravity effect"
+		nb_columns 1
+		Label Valeur
+                line {
+	        	legend "Fluid density"                        
+			file Calcul_fin/properties.dat
+			nb_columns_file 2
+			columns $1
+                }
+                line {
+	        	legend "Fluid dynamic viscosity"
+                        file Calcul_fin/properties.dat
+			nb_columns_file 2
+			columns $2
+                }
+	
+		
+	}
+
+	visu {
+        	Title "Periodic box: mesh 1 (1104 cells)" 
+
+        	Description Mesh: Extruder en 3 of the inlet face of 3D ICEM mesh 
+        	mesh Calcul_gros/Prepare.lata REC_2D
+		width 15cm,viewport=0 0 1024 600,clip
+       	 	origin mesh
+	}
+	
+	visu {
+        	Title "Periodic box: mesh 2 (440 cells)"
+
+        	Description Mesh: Extruder_bord of the inlet face of 3D ICEM mesh 
+        	mesh Calcul_fin/Prepare.lata REC_2D
+ 		width 15cm,viewport=0 0 1024 600,clip
+       	 	origin mesh
+	}	
+
+	visu {
+        	Title "Diffuser Mesh (36644 cells)"
+        	Description Mesh: 2D from 3D of ICEM mesh. This figure only shows the divergent part of the diffuser, but the actual domain lies betwen x=-10 and x=56.
+        	mesh Calcul_fin/Calcul.lata DOM_2D
+		zoom2D -1 23 0 5
+        	width 17cm,viewport=0 100 1024 350,clip
+       	 	origin mesh
+	}
+}
+
+
+Chapter {
+		
+	Title "Results"
+	
+	Description "The next two figures show the computations convergence by plotting the computed friction evolution vs time. The two curves on both figures show the friction evolution in the periodic box computation and in the main computation. The periodic box is a computation in a fictive periodic domain (shaped as a planned channel) that is used to generate an established velocity and K-Eps fields to be applied on the main domain inlet, the main domain being the diffuser. The two domains are different so the friction velocity is computed on different surfaces, Reynolds numbers are different, and the ways the friction velocity is averaged are different too. That is why the values of utau are different."	
+
+	Figure {
+		Title "Mesh 1 computations convergence: friction velocity evolution"
+		Description "Main computation values are increased on purpose to allow plotting both curves on the same figure"		
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0 300.
+		LabelY "Friction velocity"
+		RangeY 0.01 0.03
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic Box"
+			file ./Calcul_gros/u_tau.dat.perio
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Main computation (u_tau + 0.03)"
+			file ./Calcul_gros/u_tau.dat
+			columns ($1) ($2)+0.03
+			TypeLigne 2
+		}
+		
+	}
+	Figure {
+		Title "Mesh 2 computations convergence: friction velocity evolution"
+		Description "The convergence criteria on the periodic computation is met after 200s"		
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0 300.
+		LabelY "Friction velocity"
+		RangeY 0.01 0.04
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Periodic Box"
+			file ./Calcul_fin/u_tau.dat.perio
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Main computation"
+			file ./Calcul_fin/u_tau.dat
+			columns ($1) ($2)+0.03
+			TypeLigne 2
+		}
+		
+	}
+	
+	visu {
+		Title "Pressure field in the diffuser, Legend"
+                width 15cm,viewport=0 700 1024 950,clip 
+                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
+       		Operator no_databaseinfo
+		Operator no_bounding_box
+		zoom2D -11.0 56.0 0. 5.
+       	 
+	}	
+		
+	visu {
+		Title "Pressure field in the diffuser, mesh1."
+                width 15cm,viewport=0 100 1024 250, clip 
+                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
+       		Operator no_databaseinfo
+		Operator no_bounding_box
+		zoom2D -11.0 56.0 0. 5.
+       	 
+	}
+	visu {
+		Title "Pressure field in the diffuser, mesh2."
+                width 15cm, viewport=0 100 1024 250,clip
+                pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
+       		Operator no_databaseinfo
+		Operator no_bounding_box
+       	 	zoom2D -11.0 56.0 0. 5.
+	}
+	
+	visu {
+		Title "Velocity field in the diffuser, Legend."        	     
+		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D_dual norme_VITESSE FACES 0. 1.134
+        	width 15cm,viewport=0 700 1024 950,clip
+		zoom2D -11.0 56.0 0. 5.
+		Operator no_databaseinfo
+		Operator no_bounding_box
+     
+	}
+
+	visu {
+		Title "Velocity field in the diffuser, mesh 1."        	     
+		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D_dual norme_VITESSE FACES 0. 1.134
+        	width 15cm,viewport=0 100 1024 250,clip
+		zoom2D -11.0 56.0 0. 5.
+		Operator no_databaseinfo
+		Operator no_bounding_box
+     
+	}
+
+	visu {
+		Title "Velocity field in the diffuser, mesh 2."        	             		
+		width 15cm,viewport=0 100 1024 250,clip
+		pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D_dual norme_VITESSE FACES 0. 1.134
+        	zoom2D -11.0 56.0 0. 5.
+		Operator no_databaseinfo
+		Operator no_bounding_box
+   
+	}	
+
+	visu {
+		Title "Y+ field in the diffuser, Legend."
+                width 15cm,viewport=0 700 1024 950,clip
+                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
+		zoom2D -11.0 56.0 0. 5.       		
+		Operator no_databaseinfo
+		Operator no_bounding_box
+       	 
+	}
+
+
+	visu {
+		Title "Y+ field in the diffuser, mesh1."
+                width 15cm,viewport=0 100 1024 250,clip
+                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
+		zoom2D -11.0 56.0 0. 5.       		
+		Operator no_databaseinfo
+		Operator no_bounding_box
+       	 
+	}
+	visu {
+		Title "Y+ field in the diffuser, mesh2."
+                width 15cm,viewport=0 100 1024 250,clip
+                pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
+		zoom2D -11.0 56.0 0. 5.       		
+		Operator no_databaseinfo
+		Operator no_bounding_box
+	}
+
+	
+	Description "The velocity profiles are given at several longitudinal positions in the diffuser. x=0 is the longitudinal position where the divergent part of the diffuser begins. x=20 is the end of the divergent part. Beyond this point, the domain is a plane channel"
+
+
+	Figure {
+		Title "Longitudinal velocity profile at x=6"
+		width 12cm		
+		Dimension 2
+		LabelX "y/H"
+		LabelY "u/U"
+		PointSize 0.5
+		legend below title "Legend"
+		Include_Description_Curves 0
+		Curve {
+			legend "Experiment"
+			origin "ERCOFTAC"
+			Version ""
+			file xp/m__U%.x06
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			TypePoints 2
+		}
+				
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 1"
+			Segment  Calcul_gros/Calcul.data SONDE_V06
+			columns 1 2
+			Style linespoints
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 2"
+			Segment  Calcul_fin/Calcul.data SONDE_V06
+			columns 1 2
+			Style linespoints
+			TypeLigne 4
+			TypePoints 2
+		}
+		Curve {
+			legend "Standard K-Epsilon Model-Fluent [1]"
+			file code/SKE/SKE_x6
+			columns 1 2
+			Style linespoints
+			TypeLigne 5
+			TypePoints 3
+		}
+	
+	}
+
+	Figure {
+		Title "Longitudinal velocity profile at x=17"
+		width 12cm		
+		Dimension 2
+		LabelX "y/H"
+		LabelY "u/U"
+		PointSize 0.5
+		legend below title "Legend"
+		Include_Description_Curves 0
+		Curve {
+			legend "Experiment"
+			origin "ERCOFTAC"
+			Version ""
+			file xp/m__U%.x17
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			TypePoints 2
+		}
+				
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 1"
+			Segment  Calcul_gros/Calcul.data SONDE_V17
+			columns 1 2
+			Style linespoints
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 2"
+			Segment  Calcul_fin/Calcul.data SONDE_V17
+			columns 1 2
+			Style linespoints
+			TypeLigne 4
+			TypePoints 2
+		}
+		Curve {
+			legend "Standard K-Epsilon Model-Fluent [1]"
+			file code/SKE/SKE_x17
+			columns 1 2
+			Style linespoints
+			TypeLigne 5
+			TypePoints 3
+		}
+		Curve {
+			legend "UMIST K-Epsilon Model [2]"
+			file code/UMIST/UMIST_x17.dat
+			columns 1 2
+			Style linespoints
+			TypeLigne 7
+			TypePoints 3
+		}
+		Curve {
+			legend "Rolls-Royce K-Epsilon Model [2]"
+			file code/ROLLS/Rolls_publi.dat
+			columns 1 2
+			Style linespoints
+			TypeLigne 8
+			TypePoints 3
+		}
+	
+	}
+
+	Figure {
+		Title "Longitudinal velocity profile at x=20"
+		width 12cm		
+		Dimension 2
+		LabelX "y/H"
+		LabelY "u/U"
+		PointSize 0.5
+		legend below title "Legend"
+		Include_Description_Curves 0
+		Curve {
+			legend "Experiment"
+			origin "ERCOFTAC"
+			file xp/m__U%.x20
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			TypePoints 2
+		}
+				
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 1"
+			Segment  Calcul_gros/Calcul.data SONDE_V21
+			columns 1 2
+			Style linespoints
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 2"
+			Segment  Calcul_fin/Calcul.data SONDE_V21
+			columns 1 2
+			Style linespoints
+			TypeLigne 4
+			TypePoints 2
+		}
+		Curve {
+			legend "Standard K-Epsilon Model-Fluent [1]"
+			file code/SKE/SKE_x20
+			columns 1 2
+			Style linespoints
+			TypeLigne 5
+			TypePoints 3
+		}
+		Curve {
+			legend "SST Model [3]"
+			file code/SST/SST_x20.dat
+			columns 1 2
+			Style linespoints
+			TypeLigne 7
+			TypePoints 3
+		}
+	
+	}
+
+	Figure {
+		Title "Longitudinal velocity profile at x=27"
+		width 12cm		
+		Dimension 2
+		LabelX "y/H"
+		LabelY "u/U"
+		PointSize 0.5
+		legend below title "Legend"
+		Include_Description_Curves 0
+		Curve {
+			legend "Experiment"
+			origin "ERCOFTAC"
+			Version ""
+			file xp/m__U%.x27
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			TypePoints 2
+		}
+				
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 1"
+			Segment  Calcul_gros/Calcul.data SONDE_V27
+			columns 1 2
+			Style linespoints
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 2"
+			Segment  Calcul_fin/Calcul.data SONDE_V27
+			columns 1 2
+			Style linespoints
+			TypeLigne 4
+			TypePoints 2
+		}
+		Curve {
+			legend "Standard K-Epsilon Model-Fluent [1]"
+			file code/SKE/SKE_x27
+			columns 1 2
+			Style linespoints
+			TypeLigne 5
+			TypePoints 3
+		}
+	
+	}
+
+
+	Figure {
+		Title "Longitudinal velocity profile at x=34"
+		width 12cm		
+		Dimension 2
+		LabelX "y/H"
+		LabelY "u/U"
+		PointSize 0.5
+		legend below title "Legend"
+		Include_Description_Curves 0
+		Curve {
+			legend "Experiment"
+			origin "ERCOFTAC"
+			Version ""
+			file xp/m__U%.x34
+			columns 1 2
+			Style linespoints
+			TypeLigne 1
+			TypePoints 2
+		}
+				
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 1"
+			Segment  Calcul_gros/Calcul.data SONDE_V34
+			columns 1 2
+			Style linespoints
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U K-Epsilon model, mesh 2"
+			Segment  Calcul_fin/Calcul.data SONDE_V34
+			columns 1 2
+			Style linespoints
+			TypeLigne 4
+			TypePoints 2
+		}
+		Curve {
+			legend "Standard K-Epsilon Model-Fluent [1]"
+			file code/SKE/SKE_x34
+			columns 1 2
+			Style linespoints
+			TypeLigne 5
+			TypePoints 3
+		}
+	
+	}
+}
+
+Chapter {
+	Title "Conclusions"
+	Table {
+		Description "For both meshes, the main computation reaches convergence after about 250s of physical time, and the periodic computation after 75s. The periodic computation stops around 200s since the convergence criteria (seuil_statio) is met."
+		
+		Description "The pressure fields given by both computations are similar. There is a low pressure zone at the beginning of the diffuser divergent part."
+	
+		Description "The velocity fields are also similar in both computations.The divergent part of the diffuser is a low velocity zone."
+
+	 	Description "The longitudinal velocity vertical profiles are plotted for several values of x in the domain. Comparisons are made between the Trio_U K-Epsilon model, the Fluent Standard K-Epsilon model and the experimental results from Ercoftac experiment. For certain x values, other results are available to compare with."
+
+		Description "At x=6 (beginning of the divergent part) the profiles are relatively similar, with the Fluent SKE results being the closest to the experimental curve. This experimental profile is a little shifted toward larger y/H values, but it's at that x position that computational results are the closest to it."
+
+		Description "For the other velocity profiles (larger x values: 17,20,27,34) all the computational results are relatively similar but far from the experimental results. The experimental profiles are not symmetric, whereas the CFD profiles have a near symmetrical behavior."
+		
+		Description "We note that the Trio_U profiles are very close to each other, which shows that the method used to generate the periodic mesh has little influence on the final computation result."
+
+		Description "In conclusion, if it is known in the CFD field that K-Epsilon turbulence models give bad results for such a configuration, the Trio_U code is not a exception as it gives similar results. It is therefore recommended to use another model than K-Epsilon to simulate such a flow configuration." 
+
+		}
+}
+
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

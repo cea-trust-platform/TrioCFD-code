@@ -1,0 +1,7 @@
+#!/bin/bash
+extrait_coupe 3D_keps.data SONDE_VISC_TURB
+python ../propertiesGeometry.py
+python ../ligneTableau.py "3D"
+python ../courbes_reichardt.py 3D Moyennes_spatiales_vitesse_rho_mu
+python ../dernierTemps.py Moyennes_spatiales_vitesse_rho_mu
+python ../dernierTemps.py Moyennes_spatiales_nut

@@ -1,0 +1,35 @@
+# Verification des moments sur un ecoulement de Couette?
+# Expressions analytiques: 
+# Vitesse: 	Uteta(r)=omega*(4*R*R-r*r)/3/r varie entre 0 et 1 m/s
+# Moment:	Mz(R)=-10*omega*R*R*Pi*mu/3 vaut -3.14e-7N.m
+
+mz_theorique=-3.14e-7
+
+# Sans IBC:
+file=`ls -art *Forces_NO_IBC_2D_VEF_pb_Contrainte_visqueuse_moment.out | tail -1` && [ "$file" = "" ] && exit -1
+mz_sans_ibc=`tail -1 $file | awk '{print $2}'`
+
+# Avec IBC:
+file=`ls -art *Forces_IBC_2D_VEF_Moment_total_sur_body.out | tail -1`
+mz_avec_ibc=`tail -1 $file | awk '{print $2}'`
+
+# On verifie que la solution obtenue par IBC est acceptable:
+ok=`echo $mz_avec_ibc $mz_sans_ibc | awk '{err=($1-$2)/($1+$2); if (err<0) err*=-1; if (err<0.45) print 1;else print 0}'`
+if [ $ok = 0 ]
+then
+   echo "Sans IBC: Moment exerce par le fluide sur le body [N.m]: "$mz_sans_ibc
+   echo "Avec IBC: Moment exerce par le fluide sur le body [N.m]: "$mz_avec_ibc
+   echo "Solution: Moment exerce par le fluide sur le body [N.m]: "$mz_theorique
+   echo "Le calcul du moment obtenu avec IBC n'est pas valide par rapport a celui sans IBC"
+   exit -1
+fi
+# Verifie que le moment Mz est le meme en sequentiel qu'en parallele:
+if [ ${file#PAR_} != $file ]
+then
+   mz_avec_ibc_seq=`tail -1 Forces_IBC_2D_VEF_Moment_total_sur_body.out | awk '{print $2}'`
+   if [ $mz_avec_ibc_seq != $mz_avec_ibc ]
+   then
+      echo "Le moment calcule en sequentiel ($mz_avec_ibc_seq) n'est pas le meme qu'en parallele ($mz_avec_ibc)." && exit -1
+   fi
+fi
+exit 0

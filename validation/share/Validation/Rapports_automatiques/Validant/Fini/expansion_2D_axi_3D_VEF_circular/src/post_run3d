@@ -1,0 +1,6 @@
+#!/bin/bash
+extrait_coupe 3d_vef_scz SONDE_PRESSION
+extrait_coupe 3d_vef_scz SONDE_KZ15
+extrait_coupe 3d_vef_scz SONDE_KR257
+extrait_coupe 3d_vef_scz SONDE_KR0
+sh ../first3d.awk 3d_vef_scz

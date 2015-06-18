@@ -1,0 +1,12 @@
+#!/bin/bash
+mkdir -p Nu_impose U_impose Symet
+for dir in `find . -mindepth 1 -type d `
+do
+	( cd $dir;   cp ../first.awk ../post_run ../T_paroi.data .)
+done
+cd Symet
+sed "s/paroi_fixe/symetrie/" T_paroi.data > modifie.data ; mv modifie.data T_paroi.data
+cd ../U_impose
+(sed "s/Loi_Paroi_Nu_Impose { nusselt 20.\*Re^(0.)\*Pr^(0.) diam_hydr champ_uniforme 1 2.14e-3 }/Loi_standard_hydr_scalaire/" T_paroi.data | sed "s/{ u_tau Champ_uniforme 1 0. }/{ u_tau Champ_uniforme 1 0.2 }/" > modifie.data ; mv modifie.data T_paroi.data )
+cd ..
+

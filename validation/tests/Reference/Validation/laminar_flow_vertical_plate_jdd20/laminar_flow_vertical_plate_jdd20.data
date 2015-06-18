@@ -1,0 +1,149 @@
+# ThermoHydraulique 2D #
+# PARALLEL NOT #
+dimension 2
+ 
+Pb_Thermohydraulique pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom 
+{
+        Pave Entree
+                {
+                Origine  0. 0. 
+                Nombre_de_Noeuds 61 61
+                Facteurs  1.05 1.
+                Longueurs 0.3 1.
+                }
+                {
+                bord Bas            Y = 0.      0. <= X <= 3.e-1  
+                bord Haut           Y = 1.      0. <= X <= 3.e-1  
+                bord Gauche         X = 0.      0. <= Y <= 1.  
+                bord Droite         X = 3.e-1   0. <= Y <= 1.  
+                }
+}
+
+# END MESH #
+
+Trianguler_H dom
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax  0.00017 
+        dt_min 1.e-15
+        dt_max 1.e-2
+        dt_impr 5.e-4
+        dt_sauv 1.e1
+        seuil_statio 1.e-4
+	facsec 2.
+}
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme     1 13.
+	rho Champ_Uniforme    1 13.
+        lambda Champ_Uniforme 1 13.
+        Cp     Champ_Uniforme 1 1.
+        beta_th Champ_Uniforme 1 1.
+}
+
+# grashoff= 10^9 
+Pr= Rho*Cp/lambda = 1 #
+
+Champ_Uniforme gravite
+Read gravite 2 0. -1.e9
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+        Navier_Stokes_standard
+        {
+                solveur_pression Cholesky { }        
+                convection { amont }
+                diffusion { }
+                sources { boussinesq_temperature { T0 0.0 } }
+                conditions_initiales {
+                         vitesse Champ_Uniforme 2 0. 70710.7
+                        }
+                boundary_conditions {
+                        Gauche  paroi_fixe
+                        Droite  symetrie
+                        Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 70710.7
+                        Haut    frontiere_ouverte_Pression_imposee Champ_Front_Uniforme 1 0.   
+          }
+        }
+        Convection_Diffusion_Temperature
+        {
+                diffusion { }
+                convection { amont }
+                boundary_conditions 
+                {
+                        
+			Bas     Frontiere_ouverte T_ext Champ_Front_Uniforme 1 0  
+                        Haut    frontiere_ouverte T_ext Champ_Front_Uniforme 1 0.
+			Gauche  paroi_temperature_imposee Champ_Front_Uniforme 1 1.  
+ 			Droite  symetrie
+
+                }
+                conditions_initiales { Temperature Champ_Uniforme 1 0.0 }
+        }
+
+
+	
+        Postraitement
+        {
+	        Sondes
+	          	{
+			coupe_vitx0   vitesse periode 1.e-7 segment 40        0.0004 0.   0.004 1.  
+			coupe_tempx0  temperature  periode 1.e-7 segment 40   0.004 0.   0.004 1.
+			
+                        coupe_vitx   vitesse periode 1.e-7 segment 40        0.006 0.   0.006 1.  
+			coupe_tempx  temperature  periode 1.e-7 segment 40   0.009 0.   0.009 1.
+
+			coupe_vitx1   vitesse periode 1.e-7 segment 40        0.012 0. 0.012 1.  
+			coupe_tempx1  temperature  periode 1.e-7 segment 40   0.015 0. 0.015 1.
+
+			coupe_vitx2   vitesse periode 1.e-7 segment 40        0.018 0. 0.018 1.  
+			coupe_tempx2  temperature  periode 1.e-7 segment 40   0.021 0. 0.021 1.
+
+
+			coupe_vit9   vitesse periode 1.e-7 segment    40   0. 0.91 0.2 0.91  
+			coupe_temp9  temperature  periode 1.e-7 segment 40   0. 0.91 0.2 0.91
+                        
+                        coupe_vit5   vitesse periode 1.e-7 segment      40   0. 0.51 0.2 0.51 
+			coupe_temp5  temperature  periode 1.e-7 segment 40   0. 0.51 0.2 0.51 
+                        
+			coupe_vit6   vitesse periode 1.e-7 segment      40   0. 0.61 0.2 0.61
+                        coupe_temp6  temperature  periode 1.e-7 segment 40   0. 0.61 0.2 0.61 
+                        
+			coupe_vit7   vitesse periode 1.e-7 segment 40        0. 0.71  0.2  0.71 
+			coupe_temp7   temperature  periode 1.e-7 segment 40   0. 0.71  0.2  0.71 
+ 			
+			coupe_temp8   temperature  periode 1.e-7 segment 40   0. 0.81  0.2  0.81
+	        	coupe_vit8    vitesse periode 1.e-7 segment 40        0. 0.81  0.2  0.81 
+				
+			}
+			
+		Format lml
+		Champs dt_post 1.e-2
+			{
+			temperature elem
+			vitesse elem
+			}
+}
+
+}
+Imprimer_flux dom { Gauche  }
+Solve pb
+End

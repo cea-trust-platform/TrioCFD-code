@@ -1,0 +1,311 @@
+#!/bin/bash
+
+parse()
+{
+   sed "
+   	s/\$Castest/$Castest/g
+	s/\$HEIGHT/$HEIGHT/g
+	s/\$LENGTH/$LENGTH/g
+	s/\$WIDTH/$WIDTH/g
+	s/\$RADIUS/$RADIUS/g
+	s/\$mu/$mu/g
+	s/\$rho/$rho/g
+	s/\$Reynolds1/$Reynolds1/g
+	s/\$Reynolds2/$Reynolds2/g
+	s/\$Reynolds/$Reynolds/g
+	s/\$TURB/$TURB/g
+	s/\$DIM/$DIM/g
+	s/\$NB_PROCS/$NB_PROCS/g
+	s/\$U_IMPOSED/$U_IMPOSED/g
+	s/\$ZERO/$ZERO/g
+   	s/\$VELOCITY_IMPOSED/$DIM $U_IMPOSED 0. $ZERO/g
+	s/\$INITIAL_VELOCITY/$DIM $U_IMPOSED 0.01*sin(x) $ZERO/g
+   	s/\$TMAX_IMPOSED/$TMAX_IMPOSED/g
+	s/\$KEPS_IMPOSED/$KEPS_IMPOSED/g
+   	s/\$SCHEME_IMPOSED/$SCHEME_IMPOSED/g
+	s/\$TIME_SCHEME/$TIME_SCHEME/g
+	s/\$OPTIONS_TIME_SCHEME/$OPTIONS_TIME_SCHEME/g
+	s/\$BOUNDARY/`[ $DIM = 3 ] && echo SYMMETRY symetrie`/g
+	s/\$PRESSION_PROBES/2 0. -$RADIUS_PLUS_EPS $ZERO 0. $RADIUS_PLUS_EPS $ZERO/g
+	" $1
+}
+prm=`ls -rt *.prm | tail -1 2>/dev/null`
+DIM=2 && [ "`grep ' 3D ' $prm`" != "" ] && DIM=3 # Dimension du cas
+TURB=1.5 		# % de turbulence en entree
+RADIUS=0.025		# Rayon du cyclindre
+HEIGHT=1.0		# Hauteur du canal
+WIDTH=0.3 && [ $DIM = 2 ] && WIDTH=1		# Largeur du canal
+LENGTH=1.25		# Longueur du canal
+y=0.002 		# Epaisseur premiere maille desiree
+mu=0.00129		# Viscosite dynamique (air)
+rho=1000.		# Masse volumique (air)
+
+# values calculees
+ZERO="0" && [ $DIM = 2 ] && ZERO=""
+RADIUS_PLUS_EPS=`echo "$RADIUS*1.001" | bc -l`
+
+# Choix eventuel du parallelisme
+NB_PROCS="2"
+if [ $DIM = 3 ]
+then
+   [ $HOST = castor ] && NB_PROCS="16"
+   [ $HOST = titane ] && NB_PROCS="200"
+fi
+################
+TIME_SCHEME="Schema_euler_explicite" 
+OPTIONS_TIME_SCHEME="facsec 1."
+
+##############################
+# Creation des jeux de donnees
+##############################
+# Le maillage 3D doit avoir des bords FRONT et BACK
+mesh=GambitFin.geom.gz 	# 1/2 Maillage 3D plus fin
+mesh=Gambit.msh.gz	# 1/2 Maillage 3D
+mesh=Gmsh.geom.gz	# 1/2 Maillage 2D Gmsh
+   
+rm -f visu.include figure.include
+for mesh in Gambit.msh.gz GambitFin.geom.gz Gmsh.geom.gz 
+do
+   if [ -f $mesh ]
+   then
+      # Decompression du maillage
+      gunzip -c $mesh > ${mesh%.gz}
+      mesh=${mesh%.gz}
+      for SCHEME in ef_stab muscl amont
+      do
+	 i=0
+	 for U_IMPOSED in 0.44 0.87
+	 do
+            MESH=`echo $mesh | awk -F"." '{print $1}'`
+	    rep=$U_IMPOSED"_"$SCHEME"_"$MESH
+	    Castest=$Castest"TestCase $rep test `[ $NB_PROCS != 2 ] && echo $NB_PROCS`\n\t"
+	    echo $rep	
+	    # Calcul de certaines values en fonction de la vitesse
+	    Reynolds=`echo "$U_IMPOSED*2*$RADIUS/$mu*$rho" | bc -l | awk '{print int($1)}'`
+	    let i=$i+1
+	    [ $i = 1 ] && Reynolds1=$Reynolds && rep1=$rep
+	    [ $i = 2 ] && Reynolds2=$Reynolds && rep2=$rep
+	    TMAX_IMPOSED=`echo "10*$LENGTH/$U_IMPOSED" | bc -l`
+	    #TMIN_IMPOSED=`echo "9*$LENGTH/$U_IMPOSED" | bc -l`
+	    K_IMPOSED=`echo "$DIM/2*$TURB/100*$TURB/100*$U_IMPOSED*$U_IMPOSED" | bc -l`
+	    EPS_IMPOSED=`echo "0.16*sqrt($K_IMPOSED^3)/(0.07*2*$RADIUS)" | bc -l`
+	    KEPS_IMPOSED=$K_IMPOSED" "$EPS_IMPOSED
+	    SCHEME_IMPOSED=$SCHEME && [ $SCHEME = ef_stab ] && SCHEME_IMPOSED="$SCHEME { alpha 0.2 }"
+	    NUT=`echo "0.09*$K_IMPOSED^2/$EPS_IMPOSED" | bc -l`
+	    echo "Ratio NUT/NU="`echo "$NUT/$mu*$rho" | bc -l`
+
+	    ##################  
+	    # Create directory
+	    ##################
+	    #rm -r -f $rep
+	    mkdir -p $rep
+	    cd $rep
+
+	    #######################
+	    # Lecture du maillage #
+	    #######################
+	    ln -s -f ../$mesh  $mesh
+	    # Choix de l'interprete en fonction de l'extension du file de maillage
+	    read=read_file && [ ${mesh%.msh} != $mesh ] && read=lire_tgrid
+	    # Dimension du maillage
+	    MAILLAGE_3D=1 && [ $mesh = Gmsh.geom ] && MAILLAGE_3D=0
+            echo "`[ $MAILLAGE_3D = 1 ] && echo Dimension 3`
+	 domaine upper_dom
+	 $read upper_dom ./$mesh
+	 domaine lower_dom
+	 $read lower_dom ./$mesh
+	 transformer lower_dom x -y `[ $MAILLAGE_3D = 1 ] && echo z`
+	 Supprime_Bord upper_dom { BOTTOM }
+	 Supprime_Bord lower_dom { BOTTOM } 
+	 Mesh dom { domain upper_dom , domain lower_dom }
+	    " > dom.geo
+	    ####################################################
+	    # En 2D on extrait la frontiere FRONT du maillage 3D
+	    ####################################################
+	    if [ $MAILLAGE_3D = 1 ]
+	    then
+	       if [ $DIM = 2 ]
+	       then
+	          echo "
+      Domaine dom2D
+      Extract_2D_from_3D dom FRONT dom2D 
+      ecrire_fichier_bin dom2D dom2D.geom
+      dimension 2
+      read_file_binary dom dom2D.geom" >> dom.geo
+	       else
+	          echo "RegroupeBord dom SYMMETRY { FRONT BACK }" >> dom.geo
+	       fi
+            fi
+	    # On finalise le maillage
+	    echo "
+	 RegroupeBord dom WALL { TOP }
+	 VerifierCoin dom { }" >> dom.geo
+
+	    # Copie/create data files
+	    parse ../test.data > test.data
+	    cp ../post_run .
+	    cp ../pre_run .
+
+	    ##########################################
+	    # Creation d'un jeu de donnees parallele #
+	    ##########################################
+	    if [ "$NB_PROCS" != "2" ]
+	    then 
+	       make_PAR.data test.data
+	       mv -f PAR_test.data test.data
+	    fi
+	    cd - 1>/dev/null 2>&1
+	 done
+	 echo "
+	   Table {
+		   Description \"\latex_(\newpage\latex_) \"
+	   }
+	   visu {
+		   Title \"Scheme $SCHEME on mesh $MESH\"
+		   Description \"Velocity (Re=\$Reynolds1)\"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor $rep1/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description \"Velocity (Re=\$Reynolds2)\"
+		   Width 7cm, viewport=0 0 1000 1000, clip
+		   Pseudocolor $rep2/test.lata dom norme_VITESSE SOM
+		   zoom2D -0.25 1 -0.6 0.5
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   visu {
+		   Description \"Zoom near the cylinder (Re=\$Reynolds1)\"
+		   Width 7cm
+		   Pseudocolor $rep1/test.lata dom norme_VITESSE SOM
+		   BlackVector $rep1/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		   nb_img_without_newline 2 
+		 }
+	   visu {
+		   Description \"Zoom near the cylinder (Re=\$Reynolds2)\"
+		   Width 7cm
+		   Pseudocolor $rep2/test.lata dom norme_VITESSE SOM
+		   BlackVector $rep2/test.lata dom VITESSE SOM 0.1
+		   operator_to_all slice 0. 0. 0.  0. 0. 1.
+		   Zoom3D 0.21 0 16.7
+		   Operator no_axes
+		   Operator no_bounding_box		
+		 }
+	   " >> visu.include
+	 echo "	
+	   Table {
+		   Title \"Scheme $SCHEME on mesh $MESH\"
+	   }	
+	   Figure {
+		   Title_figure \"Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=$Reynolds1\"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex $TMIN_IMPOSED $TMAX_IMPOSED
+		   Rangey -0.5 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file $rep1/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file $rep1/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure \"Pressure timetrace (0<time<10*L/U) at the cylinder surface for Re=$Reynolds2\"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex $TMIN_IMPOSED $TMAX_IMPOSED
+		   Rangey -2.0 0.0
+		   LabelX time (s)
+		   LabelY Pressure (Pa)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend (x,y)=(0,R)
+			   file $rep2/test_SONDE_PRESSION.son
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend (x,y)=(0,-R)
+			   file $rep2/test_SONDE_PRESSION.son
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure \"Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=$Reynolds1\"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex $TMIN_IMPOSED $TMAX_IMPOSED
+		   Rangey -6.0 4.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file $rep1/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file $rep1/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }
+	   Figure {
+		   Title_figure \"Drag and lift timetraces (9*L/U<time<10*L/U) on the cylinder for Re=$Reynolds2\"
+		   Width 12cm
+		   Dimension 2
+		   #Rangex $TMIN_IMPOSED $TMAX_IMPOSED
+		   Rangey -25.0 25.0
+		   LabelX time (s)
+		   LabelY Force (N)
+		   Include_Description_Curves 0
+		   Curve {
+			   legend drag
+			   file $rep2/force.dat
+			   columns 1 2
+			   Style lines
+			   TypeLigne 1
+		   }
+		   Curve {
+			   legend lift
+			   file $rep2/force.dat
+			   columns 1 3
+			   Style lines
+			   TypeLigne 2 
+		   }
+	   }" >> figure.include
+      done
+   fi
+done
+#####################
+# Modification du prm
+#####################
+awk '/#include / {system("cat "$2)} !/#include / {print $0}' $prm.base > $prm.tmp
+parse $prm.tmp > $prm
+# rm -f *.dat

@@ -1,0 +1,918 @@
+Parameters {
+	Title "Turbulence (LES) and Heat transport (Heat Flux) in a channel flow \latex_($Re_\tau=395$\latex_) - \latex_($Pr=0.71$\latex_) "
+	Description "Turbulent channel Flow - T0-Q Boundary conditions "
+	Description "Validated Model : LES (WALE) and EF_STAB scheme with Wall function in VEF discretisation"
+	Description "Validation with : analytical laws, DNS Kim-Moser $Re_\tau=395$, and DNS Kawamura $Re_\tau=395$ - Pr=0.71"
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Type of problem : ThermoHydraulique_Turbulent
+	ParametersTrio_U Discretization : VDF and VEFPreP1B
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent, Convection_Diffusion_Temperature_Turbulent" 
+	ParametersTrio_U Solving of equations : "Turbulence_paroi loi_standard_hydr" and "Turbulence_paroi loi_standard_hydr_scalaire" 
+	ParametersTrio_U Turbulence model : LES Wale 
+	ParametersTrio_U Type of boundary conditions : Periodicity in x and z directions, wall for y boundaries
+	ParametersTrio_U Time schemes: Schema_Euler_implicite (facsec_max=4) ;  Runge_Kutta_Ordre_3 (facsec=1) ; Euler_Explicite with diffusion_implicite
+	ParametersTrio_U Convection schemes: centre, quick for VDF simulation ; muscl and EF_stab for VEF simulation 
+
+	TestCase  VDF les_Re395Pr071_T0Q /*jdd en annexe*/
+	TestCase  VEF_RK les_Re395Pr071_T0Q 
+	TestCase  VEF_Implicite les_Re395Pr071_T0Q 
+	TestCase  VEF_Implicite_muscl les_Re395Pr071_T0Q 
+	TestCase  VEF_Implicite_ICEM_Prisme les_Re395Pr071_T0Q 6
+
+	
+	Author "O. Cioni"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Presentation"
+	
+	Description "Here is a LES of turbulence and heat transport in a 3D biperiodic channel flow with $Re_\tau$= 395 and $Pr=0.71$. Uniform temperature (T=0) at both wall and  uniform heat source term (\latex_(Q=1W/m$^3$\latex_)) on the whole channel are applied. Temperature is treated like a passive scalar. " 
+	 
+	 Figure {
+	 	Title "Geometry"
+		Description "Geometry : 3D Plane channel with solid walls"
+		description "The figure below is a schema of the geometry of the problem."
+		description "The height of the fluid domain (wall to wall) is equal to $2$."
+		Description "Dimensions :  Lx=6.4 m, Ly=2 m, Lz=3.2 m"
+
+		description " "
+		picture ./domain.pdf
+	  	}
+		
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VDF"
+		mesh VDF/les_Re395Pr071_T0Q.lata dom
+		Description " 32x16x16 hexaedra "
+		Description "dx+=75 ; dy+=25 ; dz+=75"
+	}
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VEF"
+		mesh VEF_RK/les_Re395Pr071_T0Q.lata dom
+		Description " 11x7x6 hexaedra and 'tetraedriser_homogene_fin' option "
+		Description " dx+=50 ; dy+=16 ; dz+=50"
+	}
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VEF (ICEM)"
+		mesh VEF_Implicite_ICEM_Prisme/les_Re395Pr071_T0Q.lata dom
+		Description " dx+=30 ; dy+=14 ; dz+=30"
+	}
+	
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho = 0.011928$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\mu$ = 2.84e-5 such as Re$_\tau$ = ($u_\tau$.h) / $\nu$ = 395 (h=1 : half-height)"
+		Description "$\lambda$ = 20.772e-2 \latex_($W.m^{-1}.K^{-1}$\latex_) such as Pr = 0.71 "
+		Description "$Cp$= 5193 \latex_($J.kg^{-1}.K^{-1}$\latex_)"
+	}
+	Table {
+		Title "Hydraulic boundary conditions "
+		description "Periodicity between inlet and outlet boundaries. "
+		Description "Periodicity in  z-direction"	
+		description "Upper and lower boundary:  U=0 and wall functions."
+
+		}
+	 Table {
+	 	Title "Fluid thermal boundary conditions"
+		description "Periodicity between inlet and outlet boundaries."
+		Description "Periodicity in z-direction"	
+		description "Upper and lower boundary: constant wall temperature T=0"
+		}
+	Table {
+		Title "Initial conditions"
+		Description " Velocity : Champ_init_canal_sinal 3 { Ucent 24.225 h 1.0  ampli_sin 0. omega 1. ampli_bruit 0.5 }"	
+		Description " Temperature : T=0"	
+	}
+	
+}
+
+
+
+Chapter {
+	Title "Numerical schemes"
+	Table {
+		Title "VEF"
+		Description "Different time schemes are tested : Schema_Euler_implicite facsec_max=4 ; Runge_Kutta_Ordre_3 scheme with facsec=1.5 ; CN_Ex_iteratif (facsec_max 6)"
+		Description "Convection : muscl and EF_stab (alpha=0.2 for U; 1 for T)"
+		Description "Diffusion scheme : Default {}"
+	}
+
+	Table {
+		Title "VDF"
+		Description "Time scheme : Runge_Kutta_ordre_3 facsec=1"
+		Description "Convection : centered for U, quick for T"
+		Description "Diffusion scheme : Default {}"
+	}
+}
+
+Chapter {
+	Title "Results"
+Description "In this section, differents results are shown: first the friction velocity and friction Reynolds number are given. Then, the different time step computed for each simulation are shown. At last, profiles for the main quantities (U, T, U', T' etc...) and the adimensional equivalent quantites (U+, T+ etc...) are plotted. It must be noted that for all but the ICEM calculation, a special post processing is used directly in the data set. It enables to plot certain curves which are not available for the ICEM case. This special post processing can not be used for an irregular mesh. This explains that in the below figures and curves, the results obtained with the ICEM calculation are not always plotted. However, when they are plotted, they also might give the impression that they are not as good and regular as those obtained with regular meshes. The reason for that is again the post processing for the regular meshes which uses time ans spatial averaging, whereas for the ICEM case, the plotted curve is just obtained at one location at a given time."
+
+	Table {
+		Title "\latex_($u_\tau$\latex_)"
+		nb_columns 3
+		label time | \latex_($u_\tau$\latex_) | Relative error
+		line {
+			origin "analytique"
+			legend "Theoretical(*)"
+			file utau_analytique.dat
+			nb_columns_file 1
+			columns "-" ($1) "-"
+		}
+		line {
+			origin "Trio_U"
+			legend "VDF"
+			file ./VDF/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF RK"
+			file ./VEF_RK/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF_Implicite ICEM Prisme"
+			file ./VEF_Implicite_ICEM_Prisme/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
+		}
+	}
+	
+	Table {
+		Description "(*) : according to Dean's correlation : \latex_($Re_\tau = 0.175Re_b^{7/8}$\latex_) "	
+	}
+
+	Table {
+		Title "facsec"
+		nb_columns 4
+		label facsec | facsec Conv  | facsec diff QDM | facsec diff T
+		line {
+			origin "Trio_U"
+			legend "VDF"
+			file ./VDF/comp_facsec
+			nb_columns_file 4
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF_RK"
+			file ./VEF_RK/comp_facsec
+			nb_columns_file 4
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicite_muscl"
+			file ./VEF_Implicite_muscl/comp_facsec
+			nb_columns_file 4
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicite"
+			file ./VEF_Implicite/comp_facsec
+			nb_columns_file 4
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicite ICEM"
+			file ./VEF_Implicite_ICEM_Prisme/comp_facsec
+			nb_columns_file 4
+			columns ($1) ($2) ($3) ($4)
+		}
+	}
+	
+	
+	
+	Figure {
+		Title "Re_tau"
+		Width 12cm
+		Dimension 2
+		LabelX "t"
+		RangeX 0 30
+		LabelY "Re_tau"
+		RangeY 100 450
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Re_tau=395"
+			Fonction 395
+			Style lines
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Mean velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		LogX
+		RangeX 10 400
+		LabelY "U+"
+		LogY
+		RangeY 10 30
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./Kawa_U.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_ICEM"
+			file ./VEF_Implicite_ICEM_Prisme/coupe_U_moy_adim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "Log Law"
+			Fonction 1/0.415*log(x)+5.32
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Mean velocity profile U"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "U"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./Kawa_U.dat
+			columns ($1)/395 ($2)*395*2.84e-5/0.011928*0.9553948161543098252
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+
+
+	Figure {
+		Title "Non-dimensional Velocity fluctuation u'+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "u'/u_tau"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_ICEM"
+			file ./VEF_Implicite_ICEM_Prisme/coupe_U_et_adim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Velocity fluctuation u'"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "u'"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1)/395 ($5)*395*2.84e-5/0.011928
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Velocity fluctuation v'+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "v'/u_tau"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_ICEM"
+			file ./VEF_Implicite_ICEM_Prisme/coupe_U_et_adim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Velocity fluctuation v'"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "v'"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1)/395 ($6)*395*2.84e-5/0.011928
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Mean temperature profile T+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		LogX
+		RangeX 10 400
+		LabelY "T+"
+		RangeY 1 20
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_ICEM"
+			file ./VEF_Implicite_ICEM_Prisme/coupe_T_moy_adim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "Kader law Pr=0.71"
+			file ./kader071.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+
+	Figure {
+		Title "Mean temperature profile T"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "T"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1)/395 ($2)/5193./395/2.84e-5
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+
+
+	Figure {
+		Title "Non-dimensional Mean temperature fluctuation T'+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 1 400
+		LabelY "T'+"
+		RangeY 0.0 3
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+#		Curve {
+#			legend "VDF"
+#			file ./VDF/coupe_T_et_adim.dat
+#			columns ($1) ($2)
+#			Style linespoints
+#		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+#		Curve {
+#			legend "VEF"
+#			file ./VEF_CN/coupe_T_et_adim.dat
+#			columns ($1) ($2)
+#			Style linespoints
+#		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_ICEM"
+			file ./VEF_Implicite_ICEM_Prisme/coupe_T_et_adim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Temperature fluctuation T'"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "T'"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1)/395 ($3)/5193./395/2.84e-5
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite_muscl/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Mean temperature fluctuation  uT+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "uT+"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1) ($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+#		Curve {
+#			legend "VEF"
+#			file ./VEF_CN/moy_spat_T.dat
+#			columns ($1) -($4)
+#			Style linespoints
+#
+#		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		
+	}
+	
+	Figure {
+		Title "The streamwise turbulent heat flux  uT"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "uT"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1)/395 ($4)/5193./395/2.84e-5
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		
+	}
+	
+	Figure {
+		Title "Non-dimensional Mean temperature fluctuation  vT+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "vT+"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./vt.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "The wall-normal turbulent heat flux vT"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "vT"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./vt.dat
+			columns ($1)/395 ($2)/5193./395/2.84e-5
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK"
+			file ./VEF_RK/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite_muscl"
+			file ./VEF_Implicite_muscl/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF_Implicite"
+			file ./VEF_Implicite/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+	}
+	
+}
+Chapter {
+	Title "Conclusion"
+	
+	Description "The results are compared to the DNS of Kim and Moser and to the DNS of Kawamura $Re_\tau=395$ $Pr=0.71$.
+	Description "The performance of the VEF-EF_stab with $\alpha=1$ for the scalar transport and $\alpha=0.2$ for the velocity is studied. The quality of different time schemes is also investigated."
+	
+	Description " For all quantities (means and fluctuations), it must be noted a good correspondance between the results obtained by the VDF simulation and those obtained by the VEF simulation. However, the location of the  fluctuation peaks is not perfectly predicted : the simulations underestimate the intensity of the fluctuations. This is mainly due to the usage of wall functions (peak shifting to the right and lower intensity)."
+
+	Description "Concerning the time schemes, the usage of the RK3 time scheme improves the predictions for all quantities. On the other hand, the implicit time scheme (order 1) makes it possible to use larger time steps and thus to reach the the statistically converged state more quickly. For LES simulation with implicit time scheme, using a time step taken between one and four times the stability time step computed by the code (from Fourier condition and CFL condition) is recommended."
+	Description "It can also be noted that the results obtained with the muscl convection scheme are not very good as far as the wall friction is concerned. This is a well-known behaviour for the muscl convection scheme which leads to advise the use of the EF_stab convection scheme."
+	Description "It is reminded again that the post processing shows better results for the regular meshes due to time and space averaging which is not available for the non regular ICEM mesh."
+}
+
+Chapter {
+       Title "Computer performance"
+       tableau_performance {
+       }
+} 

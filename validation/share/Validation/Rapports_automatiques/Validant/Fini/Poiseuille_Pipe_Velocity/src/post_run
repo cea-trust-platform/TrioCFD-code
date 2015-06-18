@@ -1,0 +1,8 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../propertiesGeometry.py
+cp propertiesGeometry.dat ..
+##
+##
+python ../wall_strength.py test_pb_Contrainte_visqueuse.out

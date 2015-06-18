@@ -1,0 +1,132 @@
+# ThermoHydraulique 3D : canal quasi compressible gaz parfait VDF turbulent #
+# PARALLEL OK #
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 11 11 11 
+		Longueurs  0.093764 0.029846 0.046882
+		tanh_taille_premiere_maille 8.29e-5
+		}
+		{
+		Bord periox   X = 0.          0. <= Y <= 0.029846     0. <= Z <= 0.046882
+		Bord periox   X = 0.093764    0. <= Y <= 0.029846     0. <= Z <= 0.046882
+		Bord perioz   Z = 0.          0. <= X <= 0.093764     0. <= Y <= 0.029846
+		Bord perioz   Z = 0.046882    0. <= X <= 0.093764     0. <= Y <= 0.029846
+		Bord bas      Y = 0.          0. <= X <= 0.093764     0. <= Z <= 0.046882
+		Bord haut     Y = 0.029846    0. <= X <= 0.093764     0. <= Z <= 0.046882
+		}
+	}
+
+VDF dis
+
+Schema_Euler_Explicite sch
+Lire sch
+{
+        tinit 13.070016
+        tmax 13.070113
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.0001
+        seuil_statio 1.e-8
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu Champ_Fonc_Fonction 1 temperature (1.461e-6*(val^1.5)/(val+111.))
+        lambda Champ_Fonc_Fonction 1 temperature (1.93198026315789000e-3*(val^1.5)/(val+111.))
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+	traitement_pth conservation_masse
+	Traitement_rho_gravite moins_rho_moyen
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+		projection_initiale 0
+                solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7 impr }
+                convection { centre }
+                diffusion { }
+                Sources 
+		{ 
+			Canal_perio { bord periox } 
+		}	
+		conditions_initiales 
+		{
+                        vitesse champ_init_canal_sinal 3  { Ucent 10.06 h 0.0149  ampli_sin 1. omega 2. ampli_bruit 0. dir_wall 1 dir_flow 0 }
+                }
+                boundary_conditions 
+		{
+                        periox   periodique 
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		}   
+	}
+				
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+                convection { quick }
+		Sources {	}	
+		conditions_initiales { Temperature Champ_Uniforme 1 439.5 }
+		boundary_conditions 
+                {
+                 	periox periodique 
+			perioz periodique 
+ 		        haut paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 1465. H_imp Champ_Front_Uniforme 1  1.e11
+			bas paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 293. H_imp Champ_Front_Uniforme 1  1.e11
+		}
+    Modele_turbulence Prandtl
+		{ 
+ 		turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+        {
+		Champs dt_post 0.01
+			{
+    			}
+
+     		Statistiques dt_post 0.01
+		 {
+			t_deb 13.070030 t_fin 20.
+			moyenne vitesse
+			moyenne temperature
+			}															        
+        }	
+}
+
+Solve pb
+Fin
+

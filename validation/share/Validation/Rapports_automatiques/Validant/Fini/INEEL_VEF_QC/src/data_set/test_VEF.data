@@ -1,0 +1,276 @@
+
+dimension 3
+
+Domaine dom
+Mailler dom
+{
+        Pave cavite
+            {
+             Origine 0. 0. 0.
+             Nombre_de_Noeuds 21 41 2
+             Longueurs 0.0274 0.8768 0.02152
+            }
+            {
+             Bord entree    Y = 0.       0. <= X <= 0.0274  0. <= Z <= 0.02152
+             Bord sortie    Y = 0.8768   0. <= X <= 0.0274  0. <= Z <= 0.02152
+
+             Bord gauche    X = 0.       0. <= Y <= 0.8768  0. <= Z <= 0.02152
+             Bord droit     X = 0.0274   0. <= Y <= 0.8768  0. <= Z <= 0.02152
+
+             Bord devant    Z = 0.       0. <= X <= 0.0274  0. <= Y <= 0.8768  
+             Bord derriere  Z = 0.02152  0. <= X <= 0.0274  0. <= Y <= 0.8768  
+            }
+}
+
+Tetraedriser_homogene_compact dom
+
+Pb_thermohydraulique_QC pb 
+VEFPreP1B dis 
+
+# Runge_Kutta_Rationnel_ordre_2 sch #
+Schema_Euler_Implicite sch
+Read sch 
+{ 
+        tinit 0.0
+        tmax 0.5
+        dt_min 1.e-8
+        dt_max 1.e-1 
+        dt_impr 1e-10 
+        dt_sauv 20.
+        seuil_statio 1.e-8 
+        facsec 2.
+	facsec_max 100
+	solveur implicite { seuil_convergence_solveur 1.e-9 }
+} 
+
+# Parametres de la loi de Sutherland recuperes sur Internet #
+# ref: White F.M., Viscous Fluid flow, Mc Graw Hill, 1974 #
+# (Ou 2nd edition 1991) pages 28-29 et 32-33 #
+# T0 273.15,P0= 101325.  Pr = 0.72 #
+# mu0 1.716e-5      C = 110.6 #
+# lambda0= 2.414e-2 Slambda 194.4 #
+Fluide_Quasi_Compressible air
+Read air
+{
+        pression   92665.5
+        mu Champ_Uniforme  1  1.983e-5
+
+        loi_etat gaz_parfait {
+                Prandtl 0.72
+                Cp 1006.
+                gamma 1.4
+        }
+	traitement_pth constant
+}
+
+# Champ_Uniforme gravite #
+# Read gravite 2  0. -9.81 0. #
+Champ_Uniforme gravite
+Read gravite 3  0. 0. 0. 
+
+Associate air gravite
+Associate pb dom
+Associate pb sch 
+Associate pb air 
+
+Discretize pb dis 
+
+Read pb 
+{ 
+ Navier_Stokes_QC 
+ { 
+     solveur_pression petsc cholesky { }
+     convection { amont }
+     diffusion  {  }
+     conditions_initiales {  vitesse champ_fonc_xyz dom  3   0.  29729.87372*(0.0274*x-x*x)  0. }
+
+     boundary_conditions { 
+      sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+      entree frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz  3 0. 29729.87372*(0.0274*x-x*x) 0.
+      gauche   paroi_fixe
+      droit    paroi_fixe		   
+      devant   symetrie
+      derriere symetrie		   
+                         } 
+  }
+ 
+  Convection_Diffusion_Chaleur_QC
+    {
+
+      diffusion { }
+      convection { amont }
+      conditions_initiales { temperature Champ_Uniforme 1 296.7 }
+      boundary_conditions {
+       sortie  frontiere_ouverte T_ext champ_front_uniforme 1 450.
+       entree  frontiere_ouverte_temperature_imposee  champ_front_uniforme 1 296.7
+       gauche    Paroi_adiabatique
+       droit     Paroi_adiabatique
+       devant    Paroi_adiabatique
+       derriere  Paroi_adiabatique	   
+			 }
+     Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156. }
+
+     }
+
+  Postraitement
+    {     
+    Definition_champs {
+  	Rho_T Transformation {
+		methode formule expression 1 masse_vol*temp
+			sources { 
+				refChamp { Pb_Champ pb masse_volumique nom_source masse_vol } ,
+				refChamp { Pb_Champ pb temperature nom_source temp }
+			}
+		}
+	 Rho_U_T Transformation {
+		methode formule expression 1 masse_vol*vit*temp
+			sources { 
+				refChamp { Pb_Champ pb masse_volumique nom_source masse_vol } ,
+				refChamp { Pb_Champ pb temperature nom_source temp } ,
+				refChamp { Pb_Champ pb vitesse nom_source vit }
+			}
+		}        
+	Rho_V_T Transformation { methode composante numero 1 sources_reference { Rho_U_T } }
+
+	MV_U Transformation {
+		methode formule expression 1 masse_vol*vit
+			sources { 
+				refChamp { Pb_Champ pb masse_volumique nom_source masse_vol } ,
+				refChamp { Pb_Champ pb vitesse nom_source vit }
+			}
+		}
+	MV_Uy Transformation { methode composante numero 1 sources_reference { MV_U } }
+     }
+     format lata
+     Sondes {
+  	    point_vit nodes vitesse periode 			0.01 point 1 0.0137 0.8 0.01076
+	    point_temp nodes temperature periode 		0.01 point 1 0.0137 0.8 0.01076
+	    point_mas_vol nodes masse_volumique periode 	0.01 point 1 0.0137 0.8 0.01076
+
+	    coupe_vit_axia  vitesse periode 	0.01 segment 40         0.0137  0.000      0.01076    
+							                0.0137  0.8768     0.01076
+	    coupe_temp_axia  temperature periode 0.01 segment 40        0.0137  2.74e-3    0.01076
+                                                                        0.0137  0.87406    0.01076
+	    coupe_pression_axia  pression  periode 0.01 segment 40      0.0137  2.74e-3    0.01076
+                                                                        0.0137  0.87406    0.01076
+	    coupe_mas_vol_axia masse_volumique  periode 0.01 segment 40
+                                                                         0.0137  2.74e-3    0.01076
+                                                                         0.0137  0.87406    0.01076 
+	
+	    coupe_vit_radia1  vitesse periode 	0.01 segment 20 	 3.425e-4   0.02192 0.01076    
+							                 0.0270575  0.02192 0.01076
+	    coupe_temp_radia1  temperature periode 0.01 segment 20       3.425e-4   0.02192 0.01076
+                                                                         0.0270575  0.02192 0.01076
+	    coupe_pression_radia1  pression  periode 0.01 segment 20     3.425e-4   0.02192 0.01076
+                                                                         0.0270575  0.02192 0.01076
+	    coupe_mas_vol_radia1 masse_volumique  periode 0.01 segment 20 
+                                                                         3.425e-4   0.02192 0.01076
+                                                                         0.0270575  0.02192 0.01076
+ 	
+	    coupe_vit_radia2  vitesse periode 	0.01 segment 20 	 3.425e-4   0.19728  0.01076    
+							                 0.0270575  0.19728  0.01076
+	    coupe_temp_radia2  temperature periode 0.01 segment 20       3.425e-4   0.19728  0.01076
+                                                                         0.0270575  0.19728  0.01076
+	    coupe_pression_radia2  pression  periode 0.01 segment 20     3.425e-4   0.19728  0.01076
+                                                                         0.0270575  0.19728  0.01076
+	    coupe_mas_vol_radia2 masse_volumique  periode 0.01 segment 20 
+                                                                         3.425e-4   0.19728  0.01076
+                                                                         0.0270575  0.19728  0.01076
+ 	
+	    coupe_vit_radia3  vitesse periode 	0.01 segment 20 	 3.425e-4   0.39456  0.01076    
+							                 0.0270575  0.39456  0.01076
+	    coupe_temp_radia3  temperature periode 0.01 segment 20       3.425e-4   0.39456  0.01076
+                                                                         0.0270575  0.39456  0.01076
+	    coupe_pression_radia3  pression  periode 0.01 segment 20     3.425e-4   0.39456  0.01076
+                                                                         0.0270575  0.39456  0.01076
+	    coupe_mas_vol_radia3 masse_volumique  periode 0.01 segment 20 
+                                                                         3.425e-4   0.39456  0.01076
+                                                                         0.0270575  0.39456  0.01076
+									 
+	    coupe_vit_radia4  vitesse periode 	0.01 segment 20 	 3.425e-4   0.59184  0.01076    
+							                 0.0270575  0.59184  0.01076
+	    coupe_temp_radia4  temperature periode 0.01 segment 20	 3.425e-4   0.59184  0.01076
+                                                                         0.0270575  0.59184  0.01076
+	    coupe_pression_radia4  pression  periode 0.01 segment 20	 3.425e-4   0.59184  0.01076
+                                                                         0.0270575  0.59184  0.01076
+	    coupe_mas_vol_radia4 masse_volumique  periode 0.01 segment 20 
+                                                                         3.425e-4   0.59184  0.01076
+                                                                         0.0270575  0.59184  0.01076
+									 
+	    coupe_vit_radia5  vitesse periode 	0.01 segment 20 	 3.425e-4   0.85488  0.01076    
+							                 0.0270575  0.85488  0.01076
+	    coupe_temp_radia5  temperature periode 0.01 segment 20       3.425e-4   0.85488  0.01076
+                                                                         0.0270575  0.85488  0.01076
+	    coupe_pression_radia5  pression  periode 0.01 segment 20     3.425e-4   0.85488  0.01076
+                                                                         0.0270575  0.85488  0.01076
+	    coupe_mas_vol_radia5 masse_volumique  periode 0.01 segment 20 
+                                                                         3.425e-4   0.85488  0.01076
+                                                                         0.0270575  0.85488  0.01076
+
+	    pmoy0 pression periode 0.5 segment 20    3.425e-4    0.0      0.01076
+					              0.0270575   0.0      0.01076
+	    pmoy02 pression periode 0.5 segment 20   3.425e-4    0.2      0.01076
+						      0.0270575   0.2      0.01076
+	    pmoy04 pression periode 0.5 segment 20   3.425e-4    0.4      0.01076
+						      0.0270575   0.4      0.01076
+	    pmoy06 pression periode 0.5 segment 20   3.425e-4    0.6      0.01076
+						      0.0270575   0.6      0.01076
+	    pmoy087 pression periode 0.5 segment 20  3.425e-4    0.87406  0.01076
+						      0.0270575   0.87406  0.01076
+
+
+	    sonde_A0 Rho_U_T periode 0.5 segment 20    3.425e-4    0.0      0.01076
+						        0.0270575   0.0      0.01076
+	    sonde_A02 Rho_U_T periode 0.5 segment 20   3.425e-4    0.2      0.01076
+						        0.0270575   0.2      0.01076
+	    sonde_A04 Rho_U_T periode 0.5 segment 20   3.425e-4    0.4      0.01076
+						        0.0270575   0.4      0.01076
+	    sonde_A06 Rho_U_T periode 0.5 segment 20   3.425e-4    0.6      0.01076
+						        0.0270575   0.6      0.01076
+	    sonde_A087 Rho_U_T periode 0.5 segment 20  3.425e-4    0.87406  0.01076
+						        0.0270575   0.87406  0.01076
+
+
+
+	    sonde_B0 MV_U periode 0.5 segment 20    3.425e-4    0.0      0.01076
+						      0.0270575   0.0      0.01076
+	    sonde_B02 MV_U periode 0.5 segment 20   3.425e-4    0.2      0.01076
+						      0.0270575   0.2      0.01076
+	    sonde_B04 MV_U periode 0.5 segment 20   3.425e-4    0.4      0.01076
+						      0.0270575   0.4      0.01076
+	    sonde_B06 MV_U periode 0.5 segment 20   3.425e-4    0.6      0.01076
+						      0.0270575   0.6      0.01076
+	    sonde_B087 MV_U periode 0.5 segment 20  3.425e-4    0.87406  0.01076
+						      0.0270575   0.87406  0.01076
+
+
+
+	    sonde_C0 Rho_T periode 0.5 segment 20   3.425e-4    0.0      0.01076
+						      0.0270575   0.0      0.01076
+	    sonde_C02 Rho_T periode 0.5 segment 20   3.425e-4    0.2      0.01076
+						      0.0270575   0.2      0.01076
+	    sonde_C04 Rho_T periode 0.5 segment 20   3.425e-4    0.4      0.01076
+						      0.0270575   0.4      0.01076
+	    sonde_C06 Rho_T periode 0.5 segment 20   3.425e-4    0.6      0.01076
+						      0.0270575   0.6      0.01076
+	    sonde_C087 Rho_T periode 0.5 segment 20  3.425e-4    0.87406  0.01076
+						      0.0270575   0.87406  0.01076
+
+				
+            }
+     Champs dt_post 10.
+            {
+             	vitesse elem
+	     	vitesse som
+             	temperature elem
+             	masse_volumique elem
+	    	Rho_T 	elem
+		Rho_V_T	elem
+		MV_Uy	elem
+
+             }
+     }
+}
+Solve pb
+End
+ 

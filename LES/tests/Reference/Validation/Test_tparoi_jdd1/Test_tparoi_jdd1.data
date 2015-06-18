@@ -1,0 +1,148 @@
+# Thermohydraulique 3D couplage solide-fluide GCFR- concept plaque avec troncon de sortie Taille maille paroi n°4 (0.4 mm) #
+# PARALLEL OK #
+
+dimension 2
+Domaine dom_pb
+
+
+# BEGIN MESH #
+Mailler dom_pb
+{
+        Pave demi_plaque
+                {
+                Origine 0. 0.
+                Nombre_de_Noeuds 2 2
+                Longueurs 1. 1.
+                }
+                {
+                bord Gauche X = 0.   0. <= Y <= 1.
+                bord Droite X = 1.   0. <= Y <= 1.
+                bord Haut   Y = 1.   0. <= X <= 1.
+                bord Bas    Y = 0.   0. <= X <= 1.
+                }
+}
+Trianguler_h dom_pb
+# END MESH #
+# BEGIN PARTITION
+
+ Partition dom_pb
+ {
+         Partitionneur metis { nb_parts 2 }
+         Larg_joint 2
+         Nom_Zones DOM
+ }
+ End
+ END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom_pb
+END SCATTER #
+
+Pb_Thermohydraulique_turbulent  pb
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax  200.
+        dt_min 1.E-9
+        dt_max 1.E+5
+        dt_impr 0.01
+        dt_sauv 5000
+        seuil_statio 1.e-18
+        facsec 1.
+}
+
+
+VEFPrep1B dis
+
+
+Fluide_incompressible fluide    
+Read fluide  
+{
+	mu Champ_Uniforme 1 1.e-5	
+	rho Champ_Uniforme 1 1000.
+        lambda Champ_Uniforme 1 10.    
+        Cp Champ_Uniforme 1 0.1
+	beta_th Champ_Uniforme 1 1.
+}
+
+Associate pb dom_pb
+Associate pb fluide     
+Associate pb sch
+Discretize pb dis 
+
+Read pb
+{
+        Navier_Stokes_turbulent
+        {
+                projection_initiale 0
+		solveur_pression Gcp { precond ssor { omega 2.5 } seuil 1.e+100 }
+                convection { negligeable }
+                diffusion  { negligeable }
+                conditions_initiales { vitesse Champ_Uniforme 2 1. 0.  }
+                boundary_conditions {
+                        Gauche frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 1. 0.
+                        Droite frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 1. 0.
+                        Bas    paroi_fixe
+                        Haut   symetrie
+                }
+		Modele_turbulence Sous_maille_Smago
+		{
+		       Cs 0.0
+		       turbulence_paroi UTAU_IMP { u_tau Champ_uniforme 1 5.0 }
+		}
+        }
+        Convection_Diffusion_Temperature_turbulent
+        {
+                convection { negligeable }
+                diffusion {  }
+                conditions_initiales { Temperature Champ_Uniforme 1 100. }
+                boundary_conditions {
+                        Gauche frontiere_ouverte_temperature_imposee Champ_front_Uniforme 1 100.
+                        Droite frontiere_ouverte T_ext Champ_front_Uniforme 1 100.
+                        Bas    Paroi_temperature_imposee champ_front_uniforme 1  150. 
+                        Haut   Paroi_flux_impose champ_front_uniforme 1  0.
+                                   }
+                Modele_Turbulence Prandtl 
+			{ 
+                         Turbulence_paroi   Loi_standard_hydr_scalaire 
+			}
+        }
+
+        Postraitement {
+		Definition_champs {
+		tparoi Tparoi_VEF {
+		  source refChamp { Pb_champ pb temperature }
+
+			}
+}
+                Sondes
+                {
+                  sonde_T1 nodes temperature periode 0.1 point 1 0.25 0.25
+                  sonde_T2 nodes temperature periode 0.1 point 1 0.75 0.25
+                  sonde_Tp nodes temperature periode 0.1 point 1 0.5 0.
+               sonde_Tphy nodes temperature_physique periode 0.1 point 1 0.5 0.
+
+                }
+                
+		format lml
+		Champs dt_post 200
+                {
+                   vitesse elem
+		   pression elem
+		   temperature elem
+		   temperature
+		  
+		  
+		   temperature_physique elem
+		   temperature_physique som
+                }
+        }
+}
+
+Solve pb
+End
+                         Turbulence_paroi   negligeable_scalaire 
+                         Turbulence_paroi   Loi_standard_hydr_scalaire 
+

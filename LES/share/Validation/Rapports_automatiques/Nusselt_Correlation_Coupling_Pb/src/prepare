@@ -1,0 +1,61 @@
+#!/bin/bash
+
+#Creation des repertoires test 1
+mkdir -p ./VDF
+mkdir -p ./VEF
+#############
+RACINE=`pwd`
+
+echo $RACINE
+
+
+#####################
+##################### 
+#####################
+#
+cd $RACINE/VDF
+cp $RACINE/test.data .
+cp $RACINE/post_run .
+cp $RACINE/calculHH.py .
+#
+cd $RACINE/VEF
+cp $RACINE/test.data .
+sed "s/11 6 11/7 6 7/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/11 2 11/7 2 7/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# Tetraedriser dom_pb1 #/Tetraedriser dom_pb1 /" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# Tetraedriser dom_pb2 #/Tetraedriser dom_pb2 /" test.data > modifie.data
+mv modifie.data test.data
+sed "s/# VerifierCoin dom_pb2 { } #/VerifierCoin dom_pb2 { }/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/VDF cubes/VEFPreP1B cubes/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/paroi_echange_contact_vdf pb_solide interface temperature 1.e9/Paroi_contact pb_solide interface/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/paroi_echange_contact_vdf pbf interface temperature 1.e9/Paroi_contact pbf interface/" test.data > modifie.data
+mv modifie.data test.data
+cp $RACINE/post_run .
+sed "s/1.4/0.9/" post_run > modifie.data
+mv modifie.data post_run
+cp $RACINE/calculHH.py .
+sed "s/(nz-1)/(nz-1)\*0.5/" calculHH.py > modifie.data
+mv modifie.data calculHH.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

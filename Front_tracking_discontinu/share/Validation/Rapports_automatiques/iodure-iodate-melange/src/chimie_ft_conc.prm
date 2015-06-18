@@ -1,0 +1,111 @@
+Parameters {
+        Title verification reactions concurentes
+        Description Calculs menes en VDF
+        Author G.F.
+	Prerequisite ./post_final >time_dec
+
+  TestCase iod02-20 iod02-20.data en annexe
+  TestCase iod02-14 iod02-14.data 
+  TestCase iod02-12 iod02-12.data 
+  TestCase iod02-10 iod02-10.data 
+  TestCase iod02-9 iod02-9.data 
+  TestCase iod02-8 iod02-8.data 
+  TestCase iod02-7 iod02-7.data 
+  TestCase iod02-6 iod02-6.data 
+  TestCase iod02-5 iod02-5.data 
+  TestCase iod02-3 iod02-3.data 
+  TestCase iod02-1 iod02-1.data 
+  TestCase iod02--1 iod02--1.data 
+  TestCase iod02--4 iod02--4.data 
+  TestCase iod02--6 iod02--6.data 
+  TestCase iod02--14 iod02--14.data 
+   TestCase iod02-1B iod02-1B.data
+    TestCase titre titre.data
+ 
+}
+
+Chapter {
+Title  temps cara
+figure
+{
+Include_Description_Curves 0
+dimension 2
+logx 
+logy
+labelx constante modele
+labely temps disparition 90 % de H+
+Curve {
+file time_dec
+columns 1 3
+style linespoints
+}
+}
+}
+Chapter {
+Title  H2 produit
+figure
+{
+Include_Description_Curves 0
+dimension 2
+logx 
+logy
+labelx constante modele
+labely H2O produit 
+Curve {
+file time_dec
+
+style linespoints
+}
+}
+}
+
+Chapter {
+Title  verfication du titre en cas de reactions limitees par Hp
+figure
+{
+Include_Description_Curves 0
+dimension 2
+labelx temps
+labely titre
+rangex 1e-3 auto
+Curve {
+
+file titre/titre_SONDE_Y.son
+style lines
+}
+Curve {
+
+file titre/titre_SONDE_Y2.son
+style lines
+}
+Curve {
+origin ana 0.1418
+fonction 0.1418
+style lines 
+}
+}
+}
+
+
+Chapter {
+Title  verfication  production I3M avec equation divisee par 6
+figure
+{
+Include_Description_Curves 0
+dimension 2
+labelx temps
+labely I3M 
+Curve {
+
+file iod02-1/iod02-1_I3M.son
+style lines
+}
+Curve {
+
+file iod02-1B/iod02-1B_I3M.son
+style lines
+}
+}
+}
+
+

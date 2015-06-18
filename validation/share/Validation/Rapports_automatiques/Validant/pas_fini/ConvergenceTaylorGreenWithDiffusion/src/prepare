@@ -1,0 +1,519 @@
+#!/bin/bash
+
+SCHEME_IMPOSED()
+{
+#   SCHEME_IMPOSED=$SCHEME
+#   [ ${SCHEME%_diffusion_implicite} != $SCHEME ] && SCHEME_IMPOSED=${SCHEME%_diffusion_implicite}
+#   echo $SCHEME_IMPOSED
+     if [[ ${SCHEME%_dt_fixe} != "schema_euler_implicite" ]]         
+     then 
+        if [[ `echo "$SCHEME" | grep "implicite"` != "" ]]
+	then
+	   SCHEME_IMPOSED=${SCHEME%_diffusion_implicite*}
+	else 
+	   SCHEME_IMPOSED=${SCHEME%_dt_fixe}
+	fi   
+      else
+        if [[ `echo "$SCHEME" | grep "dt_fixe"` != "" ]]
+	then
+	   SCHEME_IMPOSED=${SCHEME%_dt_fixe}
+	else
+	   SCHEME_IMPOSED=$SCHEME
+	fi
+     fi 
+     echo $SCHEME_IMPOSED
+}  
+parse()
+{
+   sed "
+   	s/\$Castest/$Castest/g
+	s/\$LENGTH/$LENGTH/g
+   	s/\$MU/$MU/g
+	s/\$DIM/$DIM/g
+	s/\$NB_PROCS/$NB_PROCS/g
+   	s/\$TMAX_IMPOSED/$TMAX_IMPOSED/g
+	s/\$PERIODE_IMPOSED/$PERIODE_IMPOSED/g
+   	s/\$SCHEME_IMPOSED/`SCHEME_IMPOSED`/g
+	s/\$OPTIONS_TIME_SCHEME/$OPTIONS_TIME_SCHEME/g
+	s/\$MESH/$MESH/g
+	s/\$BOUNDARY_CONDITION/$BOUNDARY_CONDITION/g
+	s/\$DIFFUSION/$DIFFUSION/g
+	s/\$VELOCITY_FIELD/$VELOCITY_FIELD/g
+	s/\$MAX_KINETIC_ENERGY_FIELD/$MAX_KINETIC_ENERGY_FIELD/g
+	s/\$KINETIC_ENERGY_FIELD/$KINETIC_ENERGY_FIELD/g
+	s/\$BC /$BC /g
+	" $1
+}
+DIM=2
+prm=`ls -rt *.prm | tail -1 2>/dev/null`
+rm -f *.include
+# Choix eventuel du parallelisme
+NB_PROCS="2"
+if [ $DIM = 3 ]
+then
+   [ $HOST = castor ] && NB_PROCS="32"
+   [ $HOST = titane ] && NB_PROCS="200"
+fi
+#####################
+# CHOIX DES OPTIONS #
+#####################
+GMSH=0
+#pour tester les diverses options des schemas, il faut les mettre sous la forme : 
+#nom_schema (pour tester directement le schema)
+#nom_schema_diffusion_implicite : pour tester le schema avec l'option diffusion implicite
+#nom_schema_diffusion_implicite_dt_fixe : pour imposer en plus le pas de temps (par defaut, celui donne par le schema diffusion implicite)
+#Rq :chacune des options peut etre teste separemment
+SCHEMES="schema_euler_explicite schema_euler_explicite_diffusion_implicite schema_euler_explicite_dt_fixe schema_euler_explicite_diffusion_implicite_dt_fixe 
+Runge_kutta_Rationnel_ordre_2 Runge_kutta_Rationnel_ordre_2_diffusion_implicite Runge_kutta_Rationnel_ordre_2_dt_fixe Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe 
+Runge_kutta_ordre_3 Runge_kutta_ordre_3_diffusion_implicite Runge_kutta_ordre_3_dt_fixe Runge_kutta_ordre_3_diffusion_implicite_dt_fixe 
+Runge_kutta_ordre_4_D3P Runge_kutta_ordre_4_D3P_diffusion_implicite Runge_kutta_ordre_4_D3P_dt_fixe Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe 
+schema_euler_implicite schema_euler_implicite_dt_fixe "
+MU=0.01 # Pour comparaison avec OpenFOAM Voir TaylorGreenValidation.pdf
+#MU=0 # Mesure de la diffusion numerique des schemas
+###################################
+LENGTH=`awk '/LENGTH =/ {print $3}' Gmsh.geo` && echo LENGTH=$LENGTH
+PI=`echo "4*a(1)" | bc -l`
+TEMPS_CARACTERISTIQUE=`echo "$PI*$LENGTH" | bc -l` # Periode de temps ~ 2PI*R/U=PI*$LENGTH/U avec U=1
+if [ $MU = 0 ]
+then
+   NB_TOURS_VORTEX=0.1
+   TMAX_IMPOSED=`echo "$NB_TOURS_VORTEX*$TEMPS_CARACTERISTIQUE" | bc -l`
+   DIFFUSION=negligeable
+   REYNOLDS="INF"
+   BC="PERIODIQUE"
+else
+   TMAX_IMPOSED=1 # Voir TaylorGreenValidation.pdf
+   NB_TOURS_VORTEX=`echo "$TMAX_IMPOSED/$TEMPS_CARACTERISTIQUE" | bc -l`
+   DIFFUSION=""
+   REYNOLDS=`echo "scale=0;2/$MU" | bc -l`
+   BC="SYMETRIE"
+fi
+#BC="DIRICHLET"
+PERIODE_IMPOSED=`echo "$TMAX_IMPOSED/10" | bc -l`
+VELOCITY_FIELD="-cos(2*Pi*x)*sin(2*Pi*y)*exp(-8*Pi*Pi*$MU*t) sin(2*Pi*x)*cos(2*Pi*y)*exp(-8*Pi*Pi*$MU*t)"
+KINETIC_ENERGY_FIELD="0.5*((cos(2*Pi*x)*sin(2*Pi*y)*exp(-8*Pi*Pi*$MU*t))^2+(sin(2*Pi*x)*cos(2*Pi*y)*exp(-8*Pi*Pi*$MU*t))^2)"
+MAX_KINETIC_ENERGY_FIELD="exp(-16*Pi*Pi*$MU*t)"
+EC_INITIALE="`echo 0.25*$LENGTH*$LENGTH | bc -l`"
+if [ $BC = "SYMETRIE" ]
+then
+   InitMesh=Mesh.data
+   BOUNDARY_CONDITION="BOUNDARY symetrie"
+elif [ $BC = "PERIODIQUE" ]
+then
+   InitMesh=PeriodicMesh.data
+   BOUNDARY_CONDITION="BOUNDARY_X periodique BOUNDARY_Y periodique"
+elif [ $BC = DIRICHLET ]
+then
+   InitMesh=Mesh.data
+   BOUNDARY_CONDITION="BOUNDARY frontiere_ouverte_vitesse_imposee Champ_Front_Fonc_txyz 2 $VELOCITY_FIELD"
+fi
+###########################################
+# Creation des jeux de donnees et maillages
+###########################################
+REFINES="1 2 4"
+for REFINE in $REFINES
+do
+   if [ $GMSH = 1 ]
+   then
+      geo=Gmsh$REFINE.geo
+      geom=Gmsh$REFINE.geom
+      echo $ECHO_OPTS "1,$ s?REFINE?$REFINE?g\nw $geo" | ed Gmsh.geo 1>/dev/null 2>&1
+      [ ! -f $geom ] && gmsh -2 $geo && echo -e "1\nGmsh$REFINE\nn" | gmsh2geom
+   else
+      Nombre_de_Noeuds=`echo "8*$REFINE+1" | bc`
+      Nombre_de_Mailles=`echo "8*$REFINE" | bc`
+      [ $REFINE = 1 ] && COARSE=$Nombre_de_Mailles"*"$Nombre_de_Mailles
+      echo $ECHO_OPTS "1,$ s?\$Nombre_de_Noeuds?$Nombre_de_Noeuds?g\nw Mesh$REFINE.data" | ed $InitMesh 1>/dev/null 2>&1
+      echo $ECHO_OPTS "1,$ s?\$LENGTH?$LENGTH?g\nw" | ed Mesh$REFINE.data 1>/dev/null 2>&1
+   fi
+done
+tmp_liste_cas_exclu_nr=`mktemp_`
+FINEST=$Nombre_de_Mailles"*"$Nombre_de_Mailles
+for SCHEME in $SCHEMES
+do
+   rep=$SCHEME 
+   mkdir -p $rep
+   cd $rep
+   #rm -f *lata* *.son
+   cp ../post_run ../pre_run .
+   for REFINE in $REFINES
+   do
+      if [ $GMSH = 1 ]
+      then
+         MESH="dom \.\.\/Gmsh$REFINE.geom"
+      else
+         MESH="\.\.\/Mesh$REFINE.data ;"
+      fi
+      ############################################################################################
+      ### on construit 2 type de jdd : ceux a dt fixe et ceux a dt variable (evalue selon schema)
+      ########################################################################################### 
+      if [[ `echo "$SCHEME" | grep "dt_fixe"` != "" ]]
+      #construction jdd a dt fixe  : on force limitation du pas de temps pour avoir celui du schema implicite
+      then
+         if [ ${SCHEME%_dt_fixe} = "schema_euler_implicite" ]    
+         then
+            case $REFINE in 
+	       1) OPTIONS_TIME_SCHEME="facsec 1. facsec_max 1. dt_max 0.003 Solveur Implicite { solveur petsc gmres { precond diag { } seuil 1.e-12 impr } }";;
+	       2) OPTIONS_TIME_SCHEME="facsec 1. facsec_max 1. dt_max 0.001 Solveur Implicite { solveur petsc gmres { precond diag { } seuil 1.e-12 impr } }";;
+               4) OPTIONS_TIME_SCHEME="facsec 1. facsec_max 1. dt_max 0.0003 Solveur Implicite { solveur petsc gmres { precond diag { } seuil 1.e-12 impr } }";;
+	    esac
+          else
+            case $REFINE in 
+	       1) OPTIONS_TIME_SCHEME="facsec 1. dt_max 0.003" && [ ${SCHEME%_diffusion_implicite_dt_fixe} != $SCHEME ] && OPTIONS_TIME_SCHEME=$OPTIONS_TIME_SCHEME" diffusion_implicite 1";;
+	       2) OPTIONS_TIME_SCHEME="facsec 1. dt_max 0.001" && [ ${SCHEME%_diffusion_implicite_dt_fixe} != $SCHEME ] && OPTIONS_TIME_SCHEME=$OPTIONS_TIME_SCHEME" diffusion_implicite 1";;
+	       4) OPTIONS_TIME_SCHEME="facsec 1. dt_max 0.0003" && [ ${SCHEME%_diffusion_implicite_dt_fixe} != $SCHEME ] && OPTIONS_TIME_SCHEME=$OPTIONS_TIME_SCHEME" diffusion_implicite 1";;
+            esac
+          fi 
+      #construction jdd a dt variable  	  
+      elif [[ `echo "$SCHEME" | grep "dt_fixe"` = "" ]]
+      then  : 
+         if [ $SCHEME = "schema_euler_implicite" ]
+         then
+            OPTIONS_TIME_SCHEME="facsec 20. facsec_max 30. Solveur Implicite { solveur petsc gmres { precond diag { } seuil 1.e-12 impr } }"
+         else
+            OPTIONS_TIME_SCHEME="facsec 1." && [ ${SCHEME%_diffusion_implicite} != $SCHEME ] && OPTIONS_TIME_SCHEME=$OPTIONS_TIME_SCHEME" diffusion_implicite 1"
+         fi
+      else 
+          echo "Probleme dans la construction du jdd : parametre non reconnu"
+      fi
+      Castest=$Castest"TestCase $rep $REFINE `[ $NB_PROCS != 2 ] && echo $NB_PROCS`\n\t"
+      # On ne veut pas creer des cas tests de non regressions sur tous les maillages (juste le plus lache)
+      [ $REFINE != 1 ] && echo $rep/$REFINE.data >> $tmp_liste_cas_exclu_nr      
+      # Copie/create data files
+      parse ../test.data > $REFINE.data
+      ##########################################
+      # Creation d'un jeu de donnees parallele #
+      ##########################################
+      if [ "$NB_PROCS" != "2" ]
+      then
+	 make_PAR.data $REFINE.data
+	 mv -f PAR_$REFINE.data $REFINE.data
+      fi
+   done
+   cd - 1>/dev/null         
+   echo "
+#     Table {
+#             Description \"\latex_(\newpage\latex_) \"
+#     }
+     visu {
+             Title \"Scheme $SCHEME on finest mesh ($FINEST)\"
+             Description \"Velocity magnitude\"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor $rep/$REFINE.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description \"Pressure\"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor $rep/$REFINE.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description \"Kinetic energy relative error (%)\"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor $rep/$REFINE.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     " >> visu.include
+   RANGEY=`echo 0.*$EC_INITIALE | bc -l`" "`echo 1.2*$EC_INITIALE | bc -l`
+   echo "	
+     Table {
+	     Title \"Scheme $SCHEME\"
+     }
+     Figure {
+	     Title_figure \"Global kinetic energy\"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey $RANGEY
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~$NB_TOURS_VORTEX times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend \"Analytic solution\"
+		     file $rep/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend \"Trio_U on coarse mesh ($COARSE)\"
+		     file $rep/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend \"Trio_U on finest mesh ($FINEST)\"
+		     file $rep/$REFINE"_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son"
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }" >> figure.include
+done    	
+#      Figure {
+#	     Title_figure \"Average Error vs Grid Resolution \"
+#	     Width 12cm
+#	     Dimension 2
+#	     # Rangex 0.5 10 
+#	     LogX
+#	     #Rangey -0.5 0.0
+#	     LogY
+#	     LabelX Mesh refinement
+#	     LabelY Error (%)
+#	     Include_Description_Curves 0
+#	     Curve {
+#		     legend \"Trio_U\"
+#		     file $rep/erreur.dat
+#		     columns 1 2
+#		     Style points
+#		     TypeLigne 3
+#	     }
+#	     Curve {
+#		     legend \"Order 1\"
+#		     file $rep/ordre1.dat
+#		     columns 1 2
+#		     Style lines
+#		     TypeLigne 1
+#	     }
+#	     Curve {
+#		     legend \"Order 2\"
+#		     file $rep/ordre2.dat
+#		     columns 1 2
+#		     Style lines
+#		     TypeLigne 2
+#	     }  
+#	     Curve {
+#		     legend \"Order 3\"
+#		     file $rep/ordre3.dat
+#		     columns 1 2
+#		     Style lines
+#		     TypeLigne 3
+#	     }  	        
+#      }" >> figure.include
+#done
+###############################################################	
+#on fait une figure pour chacun des cas  : dt fixe et dt variable 
+#figure associe a dt variable
+echo "    
+     Table {
+             Description \"\latex_(\newpage\latex_) \"
+     }
+     Figure {
+     	     Title_figure \"Average Error vs Grid Resolution (all schemes, adjustable time step)\"
+	     Width 13cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0   
+      " >> figure.include
+for SCHEME in $SCHEMES
+do
+   if [[ `echo "$SCHEME" | grep "dt_fixe"` = "" ]]
+   then   
+      echo "  
+ 	     Curve {
+		     legend \"$SCHEME\"
+		     file $SCHEME/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      " >> figure.include
+   fi 
+done   
+echo "
+	}" >> figure.include
+#figure associe a dt fixe 
+echo "    
+     Figure {
+	     Title_figure \"Average Error vs Grid Resolution (all schemes, fixed time step)\"
+	     Width 13cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0   
+      " >> figure.include
+      
+for SCHEME in $SCHEMES
+do
+   if [[ `echo "$SCHEME" | grep "dt_fixe"` != "" ]]
+   then   
+      echo "   
+ 	     Curve {
+		     legend \"$SCHEME\"
+		     file $SCHEME/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      " >> figure.include
+   fi 
+done   
+echo "
+	}" >> figure.include
+###############################################################	
+#Tableau erreur associe a dt variable			
+echo "      	Table {
+                	Description \"\latex_(\newpage\latex_) \"
+		}
+                Table {
+                Title \"Numerical comparison (Re=$REYNOLDS) with boundary condition: $BC\"
+                Description "The average error is given for the coarse \($COARSE\) and the finest \($FINEST\) mesh for adjustable time step."
+		Description " "
+                nb_columns 3
+                label \"Error[%] | Error[%] | Order\"
+	"  >> figure.include	
+for SCHEME in $SCHEMES
+do
+   if [[ `echo "$SCHEME" | grep "dt_fixe"` = "" ]]
+   then 
+      echo "     	line {
+                        legend \"$SCHEME\"
+                        file $SCHEME/order_scheme.dat
+                        last_line
+                }" >> figure.include
+    fi		
+done
+echo "    		
+	}" >> figure.include
+#Tableau erreur associe a dt fixe			
+echo "      	Table {
+                Description "The average error is given for the coarse \($COARSE\) and the finest \($FINEST\) mesh for fixed time step."
+		Description " "
+                nb_columns 3
+                label \"Error[%] | Error[%] | Order\"
+	"  >> figure.include	
+for SCHEME in $SCHEMES
+do
+   if [[ `echo "$SCHEME" | grep "dt_fixe"` != "" ]]
+   then 
+      echo "     	line {
+                        legend \"$SCHEME\"
+                        file $SCHEME/order_scheme.dat
+                        last_line
+                }" >> figure.include
+    fi		
+done
+echo "    		
+	}" >> figure.include	
+	
+###############################################################	
+# Curve associe a figure  "Resolution time cpu (all schemes)"
+#pour les cas test presentant dt variable (different selon le type de schema traite)
+echo "    
+     Table {
+             Description \"\latex_(\newpage\latex_) \"
+	     }
+     Table {
+	     Title \"Resolution time CPU (all schemes)\"
+     }
+     Figure {
+	     Description \"Test cases with adjustable time step : \" 
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     #LogY
+	     LabelX Cells number
+	     LabelY CPU (s/cell)
+      " >> figure.include
+for SCHEME in $SCHEMES
+do   
+   if [[ `echo "$SCHEME" | grep "dt_fixe"` = "" ]]
+   then 
+
+   echo "     
+ 	     Curve {
+		     legend \"$SCHEME\"
+		     file $SCHEME/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      " >> figure.include
+     fi 
+done
+echo "
+	}" >> figure.include
+#pour les cas test presentant dt fixe
+echo "    
+     Figure {
+             Description \"\latex_(\newpage\latex_) \"
+             Description \"Test cases with fixed time step :  \"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     #LogY
+	     LabelX Cells number
+	     LabelY CPU (s/cell)
+	     legend top left
+      " >> figure.include
+for SCHEME in $SCHEMES
+do
+   if [[ `echo "$SCHEME" | grep "dt_fixe"` != "" ]]
+   then 
+
+   echo "     
+ 	     Curve {
+		     legend \"$SCHEME\"
+		     file $SCHEME/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      " >> figure.include
+    fi  
+done
+echo "
+	}" >> figure.include
+	
+	
+	
+#####################
+# Modification du prm
+#####################
+awk '/#include / {system("cat "$2)} !/#include / {print $0}' $prm.base > $prm.tmp
+parse $prm.tmp > $prm
+rm -f $prm.tmp
+rm -f *.dat
+# Mise a jour de liste_cas_exclu_nr
+if [ -d ../src ]
+then
+   cd ../src
+   if [ ! -f liste_cas_exclu_nr ]
+   then
+     mv $tmp_liste_cas_exclu_nr liste_cas_exclu_nr
+     CHECKOUT .
+     cleartool mkelem -nc liste_cas_exclu_nr
+   elif [ "`diff liste_cas_exclu_nr $tmp_liste_cas_exclu_nr`" != "" ]
+   then
+      CHECKOUT liste_cas_exclu_nr
+      mv -f $tmp_liste_cas_exclu_nr liste_cas_exclu_nr
+   fi
+   cd - 
+fi
+rm -f $tmp_liste_cas_exclu_nr
+

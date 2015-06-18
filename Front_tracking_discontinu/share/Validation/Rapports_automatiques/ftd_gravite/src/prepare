@@ -1,0 +1,8 @@
+#!/bin/bash
+[ ! -d FTD_reprise_xyz_vef_3d ] && copie_cas_test FTD_reprise_xyz_vef_3d
+# recupere l'instant de reprise et injecte l'instant dans le fichier .data
+cd FTD_reprise_xyz_vef_3d && ./prepare 1>prepare.out 2>prepare.err
+export x=`awk '$0~"Backup.*vitesse" && $(NF)>0.0{print $(NF)}' prepare.err`
+echo Instant de reprise $x
+awk '{if ($1=="tinit") printf "	tinit %s", ENVIRON["x"] ; else print}' FTD_reprise_xyz_vef_3d.data >tmp
+mv tmp FTD_reprise_xyz_vef_3d.data

@@ -1,0 +1,365 @@
+Parameters {
+	Title "Pressure drop in a 3D periodic turbulent flow in a plane channel"
+	Description "Poiseuille flow in a 3D periodic turbulent flow"
+	Description "Validated Model"
+	Description "	Time scheme Euler Explicite and Crank Nicholson"
+	Description "Validation with"
+	Description "	convection scheme upwind (amont), turbulent flow, turbulent model sous_maille,"
+	Description "	pressure solver Cholesky, VEF discretization"	
+
+	VersionTrio_U "1.5.5"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent 3D
+	ParametersTrio_U Discretization : VEF
+	ParametersTrio_U Time scheme : Schema_Euler_explicite / Schema_Crank_Nicholson
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent
+	ParametersTrio_U Solving of equations : Solver_pression Cholesky Modele_turbulence sous_maille_ML
+	ParametersTrio_U Convection scheme : upwind (amont)
+	ParametersTrio_U Type of boundary conditions : wall, x-periodicity and z-periodicity
+	ParametersTrio_U Type of fluid : Helium
+
+	TestCase CN_0.05 canal_turbu_CN /**/
+	TestCase CN_0.1 canal_turbu_CN
+	TestCase CN_0.2 canal_turbu_CN
+	TestCase CN_0.3 canal_turbu_CN
+	TestCase CN_0.4 canal_turbu_CN
+	TestCase CN_0.5 canal_turbu_CN
+	TestCase EE_0.05 canal_turbu_EE
+	TestCase EE_0.1 canal_turbu_EE
+	TestCase EE_0.2 canal_turbu_EE
+	TestCase EE_0.3 canal_turbu_EE
+	TestCase EE_0.4 canal_turbu_EE
+	TestCase EE_0.5 canal_turbu_EE
+	
+	Author "R. PAILLE"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : L=20m h=2m z=1m"
+	Description "Mesh : 21 x 11 x 5 hexahedral unstructured element for VEF"
+	Description "type of cells (VEF only): Tetraedriser"
+	Description "Initial conditions : Hydraulic : uniform velocity profile"
+	Description "Boundary conditions : Hydraulic : x and z periodicity Wall paroi_fixe"
+	Figure {
+		Title "Geometry"
+		Width 12cm
+		picture ./Geometry.png
+	}
+	visu {
+		Title "21 x 11 x 5"
+		mesh CN_0.05/canal_turbu_CN.lata dom_pb1
+		normal3D -0.95 0.04 0.3
+		up3D 0.04 1 -0.01
+	}
+	Figure {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 3.85 kg/m$^3$"
+		Description "$\mu$ = 3.56e-5 kg/m/s"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+Chapter {
+	Title "Results : Euler Explicit scheme"
+	Table {
+		Title "Pressure drop and U* calculation"
+		nb_columns 6
+		label U | Reynolds number Re | Y+ | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.05/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.1/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.2/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.3/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.4/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.5/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+	}
+	Table {
+		Title "Pressure drop and U* calculation"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.05/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.1/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.2/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.3/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.4/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./CN_0.5/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+	}
+	Figure {
+		Title "Pressure drop evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "dP/rho"
+		RangeY 0 0.012
+		Include_Description_Curves 0
+		Curve {
+			legend "dPTheorical/rho"
+			file CourbedPtheo_CN.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "dPTrio_U/rho"
+			file CourbedPtrio_CN.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+	Figure {
+		Title "U-evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "U*"
+		RangeY 0 0.025
+		Include_Description_Curves 0
+		Curve {
+			legend "U*_Theorical"
+			file CourbeUtautheo_CN.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "U*_Trio_U"
+			file CourbeUtautrio_CN.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+}
+Chapter {
+	Title "Results : Cranck Nicholson scheme"
+	Table {
+		Title "Pressure drop and U* computation"
+		nb_columns 6
+		label U | Reynolds number Re | Y+ | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.05/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.1/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.2/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.3/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.4/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.5/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+	}
+	Table {
+		Title "Pressure drop and U* computation"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.05/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.1/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.2/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.3/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.4/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./EE_0.5/ligneTableau.dat
+			nb_columns_file 9
+			columns ($1) ($2) ($7) ($8) ($9)
+		}
+	}
+	Figure {
+		Title "Pressure drop evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "dP/rho"
+		RangeY 0 0.012
+		Include_Description_Curves 0
+		Curve {
+			legend "dPTheorical/rho"
+			file CourbedPtheo_EE.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "dPTrio_U/rho"
+			file CourbedPtrio_EE.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+	Figure {
+		Title "U-evolution with Reynolds number"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 250000
+		LabelY "U*"
+		RangeY 0 0.025
+		Include_Description_Curves 0
+		Curve {
+			legend "U*_Theorical"
+			file CourbeUtautheo_EE.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "U*_Trio_U"
+			file CourbeUtautrio_EE.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+	Figure {
+		Title "Conclusion"
+		Description "Both time scheme give good results in comparison to the theory."
+		Description "The results of the Crank_Nicholson scheme are very closed to the Euler_Explicit scheme results"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

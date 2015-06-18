@@ -1,0 +1,204 @@
+dimension 3
+Probleme_FT_Disc_gen pb
+
+# PARALLEL OK #
+
+export domaine DOM
+
+# BEGIN MESH #
+
+Mailler DOM
+{ 
+	Pave pave1
+	{ 
+		origine -0.4 -0.4 0.
+		longueurs 0.8 0.8 0.550
+		nombre_de_noeuds 43 43 31
+	}
+	{ 
+		bord bord X = -0.4   -0.4 <= Y <= 0.4 0. <= Z <= 0.55
+		bord bord X = 0.4    -0.4 <= Y <= 0.4 0. <= Z <= 0.55
+		bord bord Y = -0.4   -0.4 <= X <= 0.4 0. <= Z <= 0.55
+		bord bord Y = 0.4    -0.4 <= X <= 0.4 0. <= Z <= 0.55
+		bord fond Z = 0.     -0.4 <= X <= 0.4 -0.4 <= Y <= 0.4
+		bord haut_p Z = 0.55   -0.4  <= X <= -0.37 -0.4 <= Y <= -0.37
+		bord haut_s Z = 0.55   -0.37 <= X <= 0.4   -0.4 <= Y <= -0.37
+		bord haut_s Z = 0.55   -0.4 <= X <= 0.4    -0.37 <= Y <= 0.4
+	}
+}
+
+Sous_zone zone_puissance
+Associate zone_puissance DOM
+lire zone_puissance {
+	Tube
+	Origine 0.0 0.0 0.15
+	dir z
+	ri 0.19
+	re 0.305
+	hauteur 0.35 }
+
+	
+# END MESH #
+
+# BEGIN PARTITION 
+Partition DOM
+{
+   Partitionneur Metis 
+   {
+      Nb_parts 2 
+   }
+   Larg_joint 2
+   Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+Sous_Zone zone_puissance
+Associate zone_puissance DOM
+Lire zone_puissance { Fichier zone_puissance.ssz }
+END SCATTER #
+
+# type de discretisation spatiale #
+
+VDF dis
+
+Runge_Kutta_ordre_4_D3P  sch
+Lire sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 0.8
+        dt_start dt_fixe 4.5e-3
+	dt_min 0.5e-4
+	dt_max 0.01
+	dt_impr 0.01
+	dt_sauv 3
+	seuil_statio -1
+        facsec 1.0
+        diffusion_implicite 0	
+}
+
+Fluide_Incompressible fluide
+
+Lire fluide
+{
+   beta_th  Champ_Uniforme 1 8.3e-5
+   rho      Champ_Uniforme 1 2596.0
+   mu       Champ_Fonc_Fonction 1 temperature 1.0e5*(val_LE_893.57)+10^(-6.8668+10603.8/val)*(893.57<val)*(val_LE_1200.0)+10^(-1.70617+1794.99/(val-710.352))*(val>1200.0) 
+   Cp       Champ_Uniforme 1 1500.0
+   lambda   Champ_Fonc_Fonction 1 temperature 1.0*(val_LE_373.0)+(7.6452e-4*val+0.7148)*(373.0<val)*(val_LE_700.0)+(3.8704e-3*val-1.45928)*(700.0<val)*(val_LE_1271.0)+(1.09725e-3*val+2.06538)*(1271.0<val)*(val_LE_1672.0)+3.9*(val>1672.0)
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -9.81
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc eq_hydraulique
+Convection_Diffusion_Temperature   temperature
+
+Associate pb eq_hydraulique
+Associate pb temperature
+
+Associate pb DOM
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+# Debog pb seq faces 1.e-12 0 #
+
+
+Lire pb
+{
+eq_hydraulique
+{
+	modele_turbulence sous_maille_wale
+	{
+	   Cw               1.e-16
+	   turbulence_paroi negligeable
+	} 
+	solveur_pression GCP { precond ssor { omega 1.5 } seuil 5.e-16 impr }
+	convection           { amont }
+	diffusion            { }
+        Sources { Boussinesq_temperature { T0 1400.0 verif_boussinesq 1 } }
+	conditions_initiales { vitesse Champ_uniforme 3 0. 0. 0. }
+	boundary_conditions
+	{
+		haut_s Symetrie
+		haut_p Frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+		fond paroi_fixe
+		bord paroi_fixe
+	}
+}
+
+temperature
+{
+
+        Diffusion { }
+        Convection { amont }
+        Sources { Puissance_thermique Champ_uniforme_morceaux DOM 1
+			{ 
+				defaut 0.
+				zone_puissance 2393700.06
+			} 
+	 	}
+        conditions_initiales { temperature champ_uniforme 1 1400.0 }
+        boundary_conditions
+        {
+                haut_s  Paroi_echange_externe_impose H_imp champ_front_fonction 1 temperature 20.0+0.9*5.6704e-8*(val*val+303.0*303.0)*(val+303.0) T_ext champ_front_fonc_XYZ 1 303.0+497.0*((x*x+y*y)^(0.5)>0.325)
+                haut_p  Paroi_echange_externe_impose H_imp champ_front_fonction 1 temperature 20.0+0.9*5.6704e-8*(val*val+303.0*303.0)*(val+303.0) T_ext champ_front_uniforme 1 800.0
+                fond    Paroi_temperature_imposee champ_front_uniforme 1 800.0
+		bord    Paroi_temperature_imposee champ_front_uniforme 1 800.0
+        }
+        
+}        
+
+Postraitement
+	{
+		Sondes 
+		{
+			Sonde_niv1 Vitesse Periode 0.01 Points 6 0. -0.280 0.03 0. -0.210 0.03 0. -0.140 0.03 0. 0.135 0.03 0. 0.180 0.03 0. 0.270 0.03
+
+			Sonde_niv3 Vitesse Periode 0.01 Points 3 0. -0.280 0.380 0. -0.210 0.380 0. -0.140 0.380
+
+			Sonde_niv3_temp Temperature Periode 0.01 Points 8 0. -0.280 0.380 0. -0.210 0.380 0. -0.140 0.380 0. -0.230 0.200 0. -0.320 0.200 0. 0.320 0.5  0. -0.325 0.200 0. 0.325 0.5   
+
+			Sonde_niv1_p Pression Periode 0.01 Points 1  0. -0.210 0.03
+		}
+
+  	       champs dt_post 100
+ 	       {
+	           vitesse elem
+	           pression elem
+                   temperature elem
+		   viscosite_dynamique elem
+		   conductivite elem
+	       }	
+	}
+
+ liste_postraitements
+       {
+	
+	
+	Postraitement_ft_lata post_therm_vdf
+	{	
+		
+		dt_post 0.01
+		format binaire
+		print
+                champs elements
+                {
+                        vitesse
+                        pression
+                        Divergence_U
+                        temperature
+                        Puissance_volumique
+                }
+               		
+	}
+    } 
+}
+
+Solve pb
+Fin

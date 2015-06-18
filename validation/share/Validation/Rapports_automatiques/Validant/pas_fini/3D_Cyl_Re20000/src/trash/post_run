@@ -1,0 +1,112 @@
+#!/bin/bash
+#Recuperation des donnees physiques
+python ../propertiesGeometry.py
+cp propertiesGeometry.dat ..
+
+# Calcul a partir de tmin
+tmin=0.
+U=`basename $PWD` 
+echo "--------------------"
+echo "post_run for U=$U:"
+echo "--------------------"
+D=0.05
+W=0.3
+rho=`awk '/rho/ {print $NF}' test.data`
+
+# Recherche de la colonne CYLINDER
+colonne=`awk '(NR==3) {for (i=1;i<=NF;i++) if ($(i)=="CYLINDER") colonne=i} END {print colonne}' test_pb_Force_pression.out`
+for file in test_pb_Force_pression.out test_pb_Contrainte_visqueuse.out
+do
+   [ "`awk -v colonne=$colonne '/# Bord/ || /# Boundary/ {print $colonne}' $file`" != "CYLINDER" ] && echo "Erreur, La colonne $colonne de $file doit contenir CYLINDER" && nedit && exit -1
+done
+
+echo | awk -v fp=test_pb_Force_pression.out -v fv=test_pb_Contrainte_visqueuse.out -v tmin=$tmin -v colonne=$colonne 'BEGIN {fic[0]=fp;fic[1]=fv} \
+{\
+   for (i=0;i<2;i++)\
+   {\
+      # On cherche la ligne Time pour connaitre la dimension \
+      do {getline < fic[i]} while ($2!="Time");\
+      dim=2;if ($5=="Fz") dim=3;\
+      # On va jusqua tmin \
+      do {getline < fic[i]} while ($1<tmin);\
+      # On calcule la force totale fp+fv \
+      n=0;\
+      col=(colonne-3)*dim+2;\
+      do\
+      {\
+         t[n]=$1;\
+         fx[n]+=$(col);   # Drag\
+	 fy[n]+=$(col+1); # Lift\
+	 if (dim==3) fz[n]+=$(col+2);\
+         n++;\
+      }\
+      while (getline<fic[i])\
+      close(fic[i]);\
+   }\
+}\
+END\
+{\
+      # Ecriture \
+      print "# time Fx Fy";\
+      for (i=0;i<n;i++) print t[i]" "fx[i]" "fy[i];\
+}\
+' > force.dat
+
+#############################################
+# Analyse spectrale du fichier force.dat (Fx)
+#############################################
+../Slotting force.dat 2 $tmin
+# Mean drag coefficient
+Cd=`echo | awk -v U=$U -v rho=$rho -v D=$D -v W=$W '/Moyenne de V1/ {print $NF/(0.5*rho*U*U*D*W)}' spectre.txt`
+echo "Cd=$Cd"
+[ $U = 0.44 ] && exp=1.10
+[ $U = 0.87 ] && exp=1.01
+echo $Cd $exp | awk '{print $1" "$2" "($1-$2)/$2*100}' > Cd.dat
+
+#############################################
+# Analyse spectrale du fichier force.dat (Fy)
+#############################################
+../Slotting force.dat 3 $tmin
+# RMS lift coefficient
+Cl=`echo | awk -v U=$U -v rho=$rho -v D=$D -v W=$W '/Ecart type de V1/ {print $NF/(0.5*rho*U*U*D*W)}' spectre.txt`
+echo "Cl=$Cl"
+[ $U = 0.44 ] && exp=0.038
+[ $U = 0.87 ] && exp=0.064
+echo $Cl $exp | awk '{print $1" "$2" "($1-$2)/$2*100}' > Cl.dat
+
+####################################
+# Analyse spectrale pour le Strouhal
+####################################
+# On se base sur la frequence dominante du lift (page 508)
+# Recupere la frequence depuis le fichier spectre
+frequence=`awk '!/#/ {if ($2>max) {max=$2;val=$1}} END {printf("%f",val)}' spectre.txt`
+
+# Verification par l'outil Python
+verifie=0
+if [ $verifie = 1 ]
+then
+   frequence2=`python ../calculerFrequence.py $fichier $colonne $tmin`
+   if [ "`echo $frequence $frequence2 | awk '{err=($1-$2)/($1+$2);if (err<0) err=-err;if (err>0.05) print 0;else print 1}'`" = 0 ]
+   then
+      echo "Error on the frequency calculation:"
+      echo "frequence=$frequence"
+      echo "frequence2=$frequence2"
+      exit -1
+   fi
+fi
+
+# Affichage spectre possible
+if [ "$gnuplot" != "" ]
+then
+   echo $ECHO_OPTS "set log x\nplot \"spectre.txt\"\n!read enter" > plot
+   echo "Press return to exit gnuplot"
+   gnuplot plot
+fi
+
+# Calcul du Strouhal
+St=`echo "$frequence*$D/$U" | bc -l`
+echo "St=$St"
+[ $U = 0.44 ] && exp=0.184
+[ $U = 0.87 ] && exp=0.182
+# Ecriture dans un fichier
+echo $St $exp `echo "($St-$exp)/$exp" | bc -l` > St.dat

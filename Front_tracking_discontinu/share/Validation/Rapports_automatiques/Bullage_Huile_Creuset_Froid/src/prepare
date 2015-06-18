@@ -1,0 +1,6 @@
+mkdir -p regul
+
+cp ibc_ftd/* regul/
+chmod +w regul/*
+grep -v  "vitesse_imposee_regularisee" ibc_ftd/ibc_ftd.data > regul/ibc_ftd.data
+

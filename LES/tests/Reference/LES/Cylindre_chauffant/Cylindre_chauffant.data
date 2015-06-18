@@ -1,0 +1,217 @@
+# Thermohydraulique 3D: Thermalisation, verification des bilans thermiques #
+# On doit trouver #
+# PARALLEL OK #
+
+dimension 3
+
+Pb_ThermoHydraulique_Turbulent pb
+Pb_Conduction pb_colis
+Domaine colis
+Domaine dom
+
+
+# BEGIN MESH #
+Read_file colis colis.geom
+VerifierCoin colis { }
+Read_file dom cylindre.geom
+VerifierCoin dom { }
+Dilate dom 1000
+# END MESH #
+
+# BEGIN PARTITION
+Partition colis
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones colis
+	Nb_parts_tot 9
+}
+Partition dom
+{
+	Partitionneur metis { Nb_parts 9 }
+	Larg_joint 2
+	Nom_Zones dom
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter colis.Zones colis
+Scatter dom.Zones dom
+END SCATTER #
+
+# Je choisis une discretisation #
+VEFPreP1B ma_discretisation
+
+Schema_Euler_explicite mon_schema
+Lire mon_schema
+{
+	nb_pas_dt_max 10
+	tinit 0
+	tmax 5.0
+	dt_min 1.e-6
+	dt_max 1.e-6
+	dt_impr 1.e-6
+	dt_sauv 100
+	seuil_statio 1.e-8
+	diffusion_implicite 1
+}
+
+# Je definis un milieu #
+Fluide_Incompressible milieu
+Lire milieu
+{
+	mu  Champ_Uniforme 1 0.01
+	rho Champ_Uniforme 1 2.
+        lambda Champ_Uniforme 1 2
+        Cp Champ_Uniforme 1 100.
+        beta_th Champ_Uniforme 1 0.	
+}
+
+# Je definis le colis #
+Solide solide
+Lire solide
+{
+	rho Champ_Uniforme 1 1000.
+	lambda Champ_Uniforme 1 250.    
+	Cp Champ_Uniforme 1 100.
+}
+
+# Associations #
+Associate pb_colis colis
+Associate pb_colis solide
+
+Associate pb dom
+Associate pb milieu
+
+Probleme_Couple pbc
+Associate pbc pb
+Associate pbc pb_colis
+Associate pbc mon_schema
+Discretize pbc ma_discretisation
+
+Domaine Cylindre
+# Thermalisation du colis: on veut relire un champ de vitesse dans un fichier .xyz #
+# que l'on maintient ensuite constant au cours du temps avec equation_non_resolue #
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		equation_non_resolue 1
+		solveur_pression GCP { 
+			precond ssor { omega 1.6 }
+			seuil 1.e-5
+		}
+		convection { muscl }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Fonc_Reprise Cx_pb.xyz pb Moyenne_vitesse last_time
+			}
+		boundary_conditions {
+			Cylindre paroi_fixe
+			Surfanz symetrie
+			Surfa  symetrie
+		      	Bas  symetrie
+			Haut symetrie
+			Sortie frontiere_ouverte_pression_imposee 
+			    Champ_front_Uniforme 1 0.
+			Entree frontiere_ouverte_vitesse_imposee 
+			    Champ_front_Uniforme 3 1. 0. 0.
+		}
+		Modele_turbulence sous_maille_wale {
+                        turbulence_paroi negligeable
+                }		
+	}
+        Convection_Diffusion_Temperature_Turbulent
+        {
+                diffusion { }
+                convection { muscl }
+                boundary_conditions
+                {
+			Cylindre paroi_contact pb_colis Cylindre
+			Surfanz symetrie
+			Surfa  symetrie
+		      	Bas  symetrie
+			Haut symetrie
+			Sortie frontiere_ouverte_temperature_imposee 
+			    Champ_front_Uniforme 1 20.
+			Entree frontiere_ouverte_temperature_imposee 
+			    Champ_front_Uniforme 1 20.
+                }
+                conditions_initiales { Temperature Champ_Uniforme 1 20. }
+		Modele_turbulence Prandtl { Turbulence_paroi negligeable_scalaire }
+        }
+
+	Postraitements
+	{
+		# Postraitement Champs volumiques #
+		volumique
+		{
+			Sondes
+			{
+				sonde_vitesse vitesse periode 0.005 points 1 -2.0 -0.1 0.0
+			}
+			format lata
+			Champs dt_post 1.
+			{ 
+				temperature elem
+				vitesse elem
+				u_star
+			}
+		} 
+		# Postraitement Champs surfaciques #
+		surfacique
+		{
+			Definition_Champs
+			{
+				temperature_surface_cylindre Extraction { 
+						domaine Cylindre 
+						nom_frontiere Cylindre 
+						methode trace
+						sources_reference { temperature_physique } 
+				}
+			}
+			format lata
+			fichier Cylindre
+			domaine Cylindre
+			Champs dt_post 1.
+			{ 
+				temperature_surface_cylindre
+			}	
+		}	
+	}
+}
+
+# 50 Watts par Cylindre_bas #
+# 50 Watts par Cylindre_haut #
+Lire pb_colis
+{
+	Conduction
+	{
+		diffusion { }
+		conditions_initiales {
+			temperature Champ_Uniforme 1 50.
+			}
+		boundary_conditions {
+			Cylindre_bas paroi_flux_impose
+				Champ_Front_Uniforme 1 68.052024411622196937
+			Cylindre_haut paroi_flux_impose
+                               	Champ_Front_Uniforme 1 68.052024411622196937
+		 	Cylindre paroi_contact pb Cylindre
+		}
+	}
+	Postraitement
+	{
+		Sondes
+		{
+			colis temperature periode 0.005 point 1 0. 0. 0.
+		}
+		Champs dt_post 1.
+		{
+			temperature elem
+		}
+	}
+}
+
+Solve pbc
+Fin

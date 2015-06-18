@@ -1,0 +1,24 @@
+Le cas test de validation propose ici ne donne pas lieu a la redaction d'une fiche de validation (Cas test propose par B. Duret lors du contrat "Couplage Ansys-Trio_U"). 
+
+On note juste que les resultats obtenus au cours de ce contrat ont ete acceptes horalement et donnaient apres convergence du calcul :
+
+-------------------------------------------------------------------
+Impression des flux radiatifs sur les bords de rayonnement
+----------------------------------------------------------------
+Gauche : 31.3337 W (temperature bord:423.15 °K)
+Droit : -31.3339 W (temperature bord:323.15 °K)
+Bas : -0 W (temperature bord:354.673 °K)
+Haut : 0 W (temperature bord:393.956 °K)
+Bilan flux radiatifs : -0.000243616 W
+
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+Impression des flux diffusifs sur les bords 
+Gauche : 20.1745
+Droit : -19.6219
+Bas : 0
+Haut : 0
+bilan : 0.552565
+
+
+soit un flux radiatif de 626,67 W/m2 et un flux diffusif de 403.01 W/m2 (surface = 0.05 m2).

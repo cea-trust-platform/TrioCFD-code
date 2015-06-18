@@ -1,0 +1,21 @@
+
+dimension 2
+Bidim_Axi
+
+Domaine dom_1
+
+# BEGIN MESH #
+Read_file dom_1 BURATTI_M4.geom
+# END MESH #
+
+# BEGIN PARTITION #
+Partition dom_1
+{
+	Partitionneur tranche { tranches 1 12 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+# END PARTITION #
+
+

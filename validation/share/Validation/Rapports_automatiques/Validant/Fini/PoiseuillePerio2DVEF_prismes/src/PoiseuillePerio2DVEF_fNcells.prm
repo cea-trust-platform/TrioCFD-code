@@ -1,0 +1,220 @@
+Parameters {
+	Title "Poiseuille comparisons: EF_stab versus Amont schemes with an ICEM generated VEF mesh"
+	Description "Laminar Poiseuille flow in a 2D-periodic plane channel."
+	Description "Study of the behaviour of 3 convection schemes: EF_stab (alpha = 1), EF_stab (alpha = 0.2) and Amont with an Euler explicite time scheme, on the velocity. "
+	Description "Comparison with the analytical solution."
+	Description "This test case deals with only mesh, a two dimensions mesh generated with the grid generation software ICEM"
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Dimension: 2D 
+	ParametersTrio_U Discretization: VEFPreP1B
+	ParametersTrio_U Time scheme: Euler implicite.
+	ParametersTrio_U Momentum convection scheme: Amont and EF_stab with alpha = 1. and alpha = 0.2 
+	ParametersTrio_U Momentum diffusion scheme: standard{}
+	ParametersTrio_U Solving of equations: Navier_Stokes_standard
+
+	TestCase Amont test /* jdd en annexe */
+	TestCase EF_stab test
+	TestCase EF_stab02 test
+
+	Author "E. MOREAU (V.BARTHEL), A.AUROUSSEAU (S.VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Rectangular domain (6m along x, 2m along y)"
+	Description "Hydraulic initial conditions: velocity profile U(y) = 3/2.y.(2-y)"
+	Description "Boundary conditions: Periodicity (x), and wall (y) "
+	Description "A source term of pressure force is calculated by the code to maintain the imposed bulk velocity. Several convection schemes are tested. The velocity profiles will be compared with the analytic one"
+	Description "Computations are carried out on unstructured meshes generated with the ICEM grid generation software."
+
+	visu {
+		Title "ICEM Mesh"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh EF_stab/test.lata dom
+		Description "Mesh: 2785 triangular cells obtained with ICEM"
+	}
+
+}
+########################
+########################  Profile with amont scheme
+########################
+Chapter {
+	Title "Presentation of the velocity profiles"
+	Figure {
+		Title " Velocity profile vs convection scheme "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 2.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 1.5*x*(2-x)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "EF_stab"
+			origin "Trio_U"
+			Segment EF_stab/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}		
+
+		Curve {
+			legend "EF_stab02"
+			origin "Trio_U"
+			Segment EF_stab02/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			Segment Amont/test.data SONDE_VINLET
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+}
+
+########################
+######################## Forcing term with different convection schemes
+########################
+Chapter {
+	Figure {
+		Title " Forcing term evolution vs convection scheme"
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 20.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.2
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 0.03
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "EF_stab"
+			origin "Trio_U"
+			file EF_stab/test_Pressure_Gradient_pb_PERIO
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "EF_stab02"
+			origin "Trio_U"
+			file EF_stab02/test_Pressure_Gradient_pb_PERIO
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			file Amont/test_Pressure_Gradient_pb_PERIO
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		
+	}
+}
+
+Chapter {
+	
+	Table {
+			Title "U* with different convection schemes"
+			nb_columns 5
+			label U | Reynolds number Re | U*theorical | U*trio_U | Error on U* in $%$
+			
+			line {
+				legend "EF_stab"
+				origin "Trio_U"
+				file EF_stab/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend "EF_stab02"
+				origin "Trio_U"
+				file EF_stab02/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend "Amont"
+				origin "Trio_U"
+				file Amont/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			
+		}	
+		
+}
+
+Chapter {
+	
+	Table {
+			Title "Pressure drop with different convection schemes"
+			nb_columns 5
+			label U | Reynolds number Re | dP theoretical | dP trio_U | Error on dP in $%$
+			
+			line {
+				legend "EF_stab"
+				origin "Trio_U"
+				file EF_stab/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend "EF_stab02"
+				origin "Trio_U"
+				file EF_stab02/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend "Amont"
+				origin "Trio_U"
+				file Amont/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			
+		}
+
+}
+
+
+########################  
+########################
+
+Chapter {
+	Title "Recommendations for users"
+	Description "The results are better with the EF_stab02 convection, although the difference in the error with EF_stab is very low"
+	Description "It is therefore recommended to use the EF_stab02 convection scheme for that kind of problem"
+}
+
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}
+

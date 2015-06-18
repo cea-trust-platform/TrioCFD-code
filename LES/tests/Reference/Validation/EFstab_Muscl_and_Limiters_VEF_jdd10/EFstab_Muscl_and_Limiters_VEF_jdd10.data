@@ -1,0 +1,150 @@
+# Hydraulique 3D : Transport d'une tache 3D en translation #
+# lance_test 2 ecarts #
+dimension 3
+Domaine dom
+Mailler dom
+{
+Pave Cavite
+        {
+                Origine 0. 0. 0.  
+                Nombre_de_Noeuds 6 6 6 
+                Longueurs 1. 1. 1. 
+        }
+        {
+                Bord periox   X = 0.     0. <= Y <= 1. 0. <= Z <= 1. 
+                Bord periox   X = 1.     0. <= Y <= 1. 0. <= Z <= 1.  
+                Bord perioy   Y = 0.     0. <= X <= 1. 0. <= Z <= 1.   
+                Bord perioy   Y = 1.     0. <= X <= 1. 0. <= Z <= 1.   
+                Bord perioz   Z = 0.     0. <= X <= 1. 0. <= Y <= 1.   
+                Bord perioz   Z = 1.     0. <= X <= 1. 0. <= Y <= 1.   
+ 
+                }
+}
+
+Tetraedriser_homogene_fin dom
+
+
+Corriger_frontiere_periodique {
+	domaine dom
+	bord periox
+}
+Corriger_frontiere_periodique {
+	domaine dom
+	bord perioy
+}
+Corriger_frontiere_periodique {
+	domaine dom
+	bord perioz
+}
+
+Pb_Thermohydraulique_Turbulent pb
+VEFPreP1b dis
+Runge_Kutta_ordre_3 sch
+
+Read sch
+	{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 1.
+	dt_min 1.e-8
+	dt_max 1.e-1
+	dt_impr 1.e-1
+	dt_sauv 500.
+        seuil_statio -1.e-8
+	facsec 1.
+	}
+
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 1.e-11
+	Cp Champ_Uniforme	1 5193.
+	beta_th Champ_Uniforme	1 1.9954e-3
+}
+
+
+Champ_Uniforme gravite
+Read gravite 3 0. 0. 0.
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 1e+20
+			}
+		convection { negligeable }
+		diffusion { negligeable }
+		conditions_initiales
+			{
+			vitesse champ_uniforme 3 1. 1. 1.  
+			}			
+		boundary_conditions
+			{
+			periox periodique
+			perioy periodique
+			perioz periodique
+			}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi negligeable
+			cw 0
+			}
+		}
+
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { negligeable }
+                convection { generic muscl minmod 1 } 
+		Modele_turbulence Prandtl
+			{
+			turbulence_paroi negligeable_scalaire
+			}
+		boundary_conditions 
+			{
+			periox periodique
+			perioy periodique
+			perioz periodique
+			}
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1
+ 		(x>0.4)*(x<0.6)*(y>0.4)*(y<0.6)*(z>0.4)*(z<0.6)			
+	
+} 					
+
+		}
+
+	Postraitement
+        	{       
+                format lml
+                Sondes
+                	{ 
+                        sonde_temp0 nodes temperature periode 0.2 segment 100  0.5 0.5 0. 0.5 0.5 1. 			
+			}
+		Champs  dt_post 1.
+			{
+			vitesse elem
+			temperature elem
+			}
+		}
+	
+	
+}
+EcritureLectureSpecial 0
+Solve pb
+End
+##########################################################################################################################
+

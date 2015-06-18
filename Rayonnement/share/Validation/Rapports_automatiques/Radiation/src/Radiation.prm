@@ -1,0 +1,389 @@
+Parameters {
+	Title "Tansparent radiation"
+	
+
+	Description "Validated Models :"	
+	Description " - radiation model for transparent medium."
+	Description " - implict scheme"
+
+	Description "Validation method :
+	Description "- the solution is compared to analitical solution."
+
+
+	ParametersTrio_U Type of problem : Thermo hydraulics and conuction problems
+	ParametersTrio_U Discretization : VEFPreP1B and VDF
+	ParametersTrio_U Time scheme : Euler Implicite
+	ParametersTrio_U Type of fluid : incompressible
+	
+	Author "G.F."
+	TestCase "./2D_VDF_Boussinesq_Radiation" "2D_VDF_Boussinesq_Radiation.data"
+	TestCase ./2D_VDF_Radiation 2D_VDF_Radiation.data Example of data
+        TestCase ./2D_VEF_Boussinesq_Radiation 2D_VEF_Boussinesq_Radiation.data
+        TestCase ./2D_VEF_Radiation 2D_VEF_Radiation.data
+        TestCase ./3D_VDF_Radiation 3D_VDF_Radiation.data
+        TestCase ./3D_VEF_Radiation 3D_VEF_Radiation.data
+        TestCase ./3D_VDF_flux_imp_Radiation 3D_VDF_flux_imp_Radiation.data
+        TestCase ./3D_VEF_flux_imp_Radiation 3D_VEF_flux_imp_Radiation.data
+        TestCase ./Cylindre_2D_Axi_VDF_Radiation Cylindre_2D_Axi_VDF_Radiation.data
+        TestCase ./Cylindre_3D_VEF_Radiation Cylindre_3D_VEF_Radiation.data
+
+	# Prerequisite "cd ../PROFILS_STRATIF/STABLE_Maillage_un/impl/; ls " 
+	
+	IncludeData 2
+
+	
+}
+
+Chapter {
+	Title "Cube 2D"
+	Description "Coupled problems in 2D."  
+	Figure 
+	{
+	Title "Tests Description"
+	Description The Geometry of the fluid field is shown below. 
+		 picture ./2D.jpg
+	}
+	Table
+	{
+	Description Initial Conditions:
+	Description - Fluid : Velocity: 0 m-1 s-1
+	Description - Fluid  Temperature : constant equal to 50 °C (323,15 K) 
+	Description - Solid : Temperature : constant equal to 50 °C (323,15 K)
+	Description
+	Description Boundary Conditions:
+	Description - Fluid Momentum Balance :
+	Description ... left :	paroi_fixe
+	Description ...	right :	paroi_fixe
+	Description ...	up:	paroi_fixe
+	Description ...	down:	paroi_fixe
+ 	Description - Fluid Energy balance :
+	Description ...	left : paroi_couple pb1
+	Description ...	right : paroi_couple pb2
+	Description ...	up : Paroi_flux_impose Champ_front_Uniforme 1 0.
+	Description ...	down : Paroi_flux_impose Champ_front_Uniforme 1 0.
+	Description - Left Solid Energy balance :
+	Description ...	left : Paroi_flux_impose Champ_front_Uniforme 1 400. (ou 600)
+	Description ...	right : paroi_couple pb2 
+	Description ...	up : Paroi_adiabatique
+	Description ...	down : Paroi_adiabatique
+	Description - Right Solid Energy balance :
+	Description ...	left : paroi_couple pb2
+	Description ...	right : Paroi_temperature_imposee Champ_Front_Uniforme 1 323,15
+	Description ...	up : Paroi_adiabatique
+	Description ...	down : Paroi_adiabatique
+	}
+Table {
+	Title The analitical shape factors matrix is given below.
+	nb_columns 4
+	label Gauche|Droit|Bas|Haut
+	lines {
+	file 2D_VDF_Radiation/RIJ
+	nb_columns_file 7
+	number_first_line 2
+	number_last_line 5
+	columns $1 $4 $5 $6 $7 
+	}	
+}	
+Figure {
+	Title "Comparison of temperature profiles with VDF"
+	Description " Comparison between reference solution and TRIO-U solution temperature profiles using analitical shape factors."
+ 
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide"
+		segment 2D_VDF_Radiation/2D_VDF_Radiation T_FLUIDE 
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_gauche"
+		segment 2D_VDF_Radiation/2D_VDF_Radiation T_SOLIDE_GAUCHE
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_droite"
+		segment 2D_VDF_Radiation/2D_VDF_Radiation T_solide_droite
+		Style linespoints
+	}
+	Curve {
+		legend "analitical solution"
+		origin "ana"
+		file 2D_VDF_Radiation/sol_400_2D
+		Style lines
+	}
+}
+
+Figure {
+	Title "Comparison of temperature profiles with VEF"
+	Description " Comparison between reference solution and TRIO-U solution temperature profiles using numerical shape factors."
+ 
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide"
+		segment 2D_VEF_Radiation/2D_VEF_Radiation T_FLUIDE 
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_gauche"
+		segment 2D_VEF_Radiation/2D_VEF_Radiation T_SOLIDE_GAUCHE
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_droite"
+		segment 2D_VEF_Radiation/2D_VEF_Radiation T_solide_droite
+		Style linespoints
+	}
+	Curve {
+		origin ana
+		legend "analitical solution"
+		file 2D_VEF_Radiation/sol_400_2D
+		Style lines
+	}
+}
+Table {
+	nb_columns 1
+	Title "radiated flux"
+	label  "W.m-2"
+	line { 
+	origin theorical 	
+	legend theorical
+	 values 175.512
+	}
+	line {
+	file 2D_VDF_Radiation/2D_VDF_Radiation_Flux_radiatif.out
+	last_line
+	columns $2/0.05
+	legend vdf
+	nb_columns_file 2
+	}
+
+	line {
+	file 2D_VEF_Radiation/2D_VEF_Radiation_Flux_radiatif.out
+	last_line
+	columns $2/0.05
+	legend vef
+		nb_columns_file 2
+	}
+} 
+}
+Chapter {
+Title "Cube 3D"
+Figure {
+	Title "3D_VDF_Radiation"
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide"
+		segment 3D_VDF_Radiation/3D_VDF_Radiation T_FLUIDE 
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_gauche"
+		segment 3D_VDF_Radiation/3D_VDF_Radiation T_SOLIDE_GAUCHE
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_droite"
+		segment 3D_VDF_Radiation/3D_VDF_Radiation T_solide_droite
+		Style linespoints
+	}
+	Curve {
+		origin ana
+		legend "analitical solution"
+		file 3D_VDF_Radiation/sol_400_3D
+		Style lines
+	}
+}
+Figure {
+	Title "3D_VEF_Radiation"
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide"
+		segment 3D_VEF_Radiation/3D_VEF_Radiation T_FLUIDE 
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_gauche"
+		segment 3D_VEF_Radiation/3D_VEF_Radiation T_SOLIDE_GAUCHE
+		Style linespoints
+	}
+	Curve {
+		legend "T solide_droite"
+		segment 3D_VEF_Radiation/3D_VEF_Radiation T_solide_droite
+		Style linespoints
+	}
+	Curve {
+		origin ana
+		legend "analitical solution"
+		file 3D_VEF_Radiation/sol_400_3D
+		Style lines
+	}
+}
+Table {
+	nb_columns 1
+	Title "radiated flux"
+	label  "W.m-2"
+	line { 
+	origin theorical 	
+	legend theorical
+	 values 168.722
+	}
+	line {
+	file 3D_VDF_Radiation/3D_VDF_Radiation_Flux_radiatif.out
+	last_line
+		# corriger facesray de ce cas la il manque une mulitplication par 0.05
+	columns $2/(0.05)
+	legend vdf
+	nb_columns_file 6
+	}
+
+	line {
+	file 3D_VEF_Radiation/3D_VEF_Radiation_Flux_radiatif.out
+	last_line
+	columns $2/(0.05*0.05)
+	legend vef
+	nb_columns_file 6
+	}
+} 
+}
+Chapter {
+	Title "Flux"
+Figure {
+	Title "3D_VDF_flux_imp_Radiation"
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide"
+		segment 3D_VDF_flux_imp_Radiation/3D_VDF_flux_imp_Radiation T_FLUIDE 
+		Style linespoints
+	}
+	Curve {
+		origin ana
+		legend "analitical solution"
+		file 3D_VDF_flux_imp_Radiation/sol_400_3D_non_couple
+		Style lines
+	}
+}
+Figure {
+	Title "3D_VEF_flux_imp_Radiation"
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide"
+		segment 3D_VEF_flux_imp_Radiation/3D_VEF_flux_imp_Radiation T_FLUIDE 
+		Style linespoints
+	}
+	Curve {
+		origin ana
+		legend "analitical solution"
+		file 3D_VDF_flux_imp_Radiation/sol_400_3D_non_couple
+		Style lines
+	}
+}
+Table {
+	nb_columns 1
+	Title "radiated flux"
+	label  "W.m-2"
+	line { 
+	origin theorical 	
+	legend theorical
+	 values 168.722
+	}
+	line {
+	file 3D_VDF_flux_imp_Radiation/3D_VDF_flux_imp_Radiation_Flux_radiatif.out
+	last_line
+		# corriger facesray de ce cas la il manque une mulitplication par 0.05
+	columns $2/(0.05)
+	legend vdf
+	nb_columns_file 6
+	}
+
+	line {
+	file 3D_VEF_flux_imp_Radiation/3D_VEF_flux_imp_Radiation_Flux_radiatif.out
+	last_line
+	columns $2/(0.05*0.05)
+	legend vef
+	nb_columns_file 6
+	}
+} 
+}
+Chapter {
+	Title "Cylinder"
+Figure {
+	Title "Cylindre_2D_Axi_VDF_Radiation Cylindre_3D_VEF_Radiation"
+	Dimension 2
+	LabelX "y"
+	LabelY "°"
+	Include_Description_Curves 0
+	Curve {
+		legend "T fluide Z=0.005 m"
+		segment Cylindre_2D_Axi_VDF_Radiation/Cylindre_2D_Axi_VDF_Radiation T_FLUIDE1 
+		Style linespoints
+	}
+	Curve {
+		legend "T fluide Z= 0.015 m"
+		segment Cylindre_2D_Axi_VDF_Radiation/Cylindre_2D_Axi_VDF_Radiation T_FLUIDE2 
+		Style linespoints
+	}
+	Curve {
+		legend "VEF T fluide Z=0.005 m"
+		segment Cylindre_3D_VEF_Radiation/Cylindre_3D_VEF_Radiation T_FLUIDE1 
+		Style linespoints
+	}
+	Curve {
+		legend "VEF T fluide Z= 0.015 m"
+		segment Cylindre_3D_VEF_Radiation/Cylindre_3D_VEF_Radiation T_FLUIDE2 
+		Style linespoints
+	}
+	Curve {
+		origin ana
+		legend "analitical solution"
+		file Cylindre_2D_Axi_VDF_Radiation/sol_cyl_400_2D
+		Style lines
+	}
+}
+Table {
+	nb_columns 1
+	Title "radiated flux"
+	label  "W.m-2"
+	line { 
+	origin theorical 	
+	legend theorical
+	 values 297.739
+	}
+	line {
+	file Cylindre_2D_Axi_VDF_Radiation/Cylindre_2D_Axi_VDF_Radiation_Flux_radiatif.out
+	last_line
+	columns $5/(0.02*2*3.1415926*0.01)
+	# corriger facesray de ce cas la il manque une mulitplication par 2 pi !!!!
+	columns $5/0.0002
+	legend vdf
+	nb_columns_file 6
+	}
+
+	line {
+	file Cylindre_3D_VEF_Radiation/Cylindre_3D_VEF_Radiation_Flux_radiatif.out
+	last_line
+	columns $5/(0.02*2*3.1415926*0.01)
+	legend vef
+		nb_columns_file 6
+	}
+} 
+}
+
+
+

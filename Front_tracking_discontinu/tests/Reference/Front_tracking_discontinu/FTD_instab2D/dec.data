@@ -1,0 +1,35 @@
+# Instabilite Rayleigh Taylor 2D #
+dimension 2
+
+domaine dom
+Probleme_FT_Disc_gen pb
+
+# BEGIN MESH #
+Mailler dom
+{  
+ 	pave pave1
+	{ 
+	origine 0. 0.
+	longueurs 1. 1. 
+	nombre_de_noeuds 121 1301
+	
+	}
+	{
+	bord paroi    X = 0.	    	0. <= Y <= 1.
+	bord haut     Y = 1.   		0. <= X <= 1.
+	bord bas      Y = 0.	    	0. <= X <= 1.
+	bord paroi    X = 1.   		0. <= Y <= 1.
+	}
+}
+transformer dom x*0.12 y*1.30-1.00
+# END MESH #
+
+# BEGIN PARTITION #
+Partition dom
+{
+	Partitionneur tranche { tranches 1 4 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+# END PARTITION #

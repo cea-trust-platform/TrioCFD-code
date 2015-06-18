@@ -1,0 +1,874 @@
+Parameters {
+	Title " Thermal stratification in Rectangular Water Tank"
+
+	Description "Vertical flat heated plate immersed in pool of water open to atmosphere"
+	Description "Laminar flow"
+#
+	Author " Ritesh Bagul , Simone Vandroux  "
+#
+	Description "  "
+	Description " Validated Model: "
+	Description "    - 2D, 3D -VDF and VEF modelisation"
+	Description "    - Amont, quick and EF-STAB schemes"
+	Description " "
+	
+	VersionTrio_U "1.5.7"
+
+	Description "  "
+	Description "Tested options  "
+  
+	ParametersTrio_U Type of problem :  Thermo-Hydraulic-laminar 
+	ParametersTrio_U Type of fluide : water
+	ParametersTrio_U Discretization : VDF and VEFPreP1B
+	ParametersTrio_U Dimension : 2D, 3D
+	ParametersTrio_U Time scheme : Euler-explicite with facsec 0.1 for 2D VDF, 3D VDF, Euler-explicite with facsec 1.0 for 2D VEF and 3D VEF
+	ParametersTrio_U Convection scheme : Momentum : amont, quick, EF_STAB
+	ParametersTrio_U Type of boundary conditions : y-symmetry, no-slip at solid boundaries,free surface
+	ParametersTrio_U Solving of equations : Navier Stokes standard
+	ParametersTrio_U Pressure solver: solveur pression cholesky for 2D (VDF and VEF)  and solveur Gcp for 3D (VDF and VEF).
+
+
+	TestCase 2d_vdf_strat_amont 2d_strat /*data set in appendix*/
+	TestCase 2d_vdf_strat_quick 2d_strat
+	TestCase 2d_vef_strat_amont 2d_strat
+	TestCase 2d_vef_strat_efstab 2d_strat
+
+	TestCase 3d_vdf_strat_amont 3d_strat /*data set in appendix*/
+	TestCase 3d_vdf_strat_quick 3d_strat
+	TestCase 3d_vef_strat_amont 3d_strat
+	TestCase 3d_vef_strat_efstab 3d_strat
+	
+	IncludeData 2
+}
+
+Chapter {
+	Title "Test Description"
+
+Figure {
+		Title "Experimental setup"
+		Description "The thermal stratification experiment is carried out in in a rectangular glass tank of size 440x100x300 mm filled with water upto 220 mm level as shown in figure below. Uniform heat flux is generated in the heater plate. The top of the tank is open to atmosphere. Nine thermocouples measure the water temperatures during the experiment. Details of the experiment can be found in reference -1"
+		Description " "
+		Description "The code calculations are compared with the temperature recorded at the thermocouples 1 to 9 during the experiment at time t = 1800 s"
+
+		Width 15cm
+		picture ./geoexpt.png
+	}
+
+Figure {
+		Title "Problem geometry for 2D analysis"
+		Description "The figure shows the geometry considered for 2D analysis of the thermal stratification experiments"
+		Width 15cm
+		picture ./geotrio2d.png
+	}
+
+Figure {
+		Title "Problem geometry for 3D analysis"
+		Description "The figure shows the geometry considered for 3D analysis of the thermal stratification experiments"
+		Width 15cm
+		picture ./geotrio3d.png
+	}
+
+	visu {
+		Title "2D-VDF mesh"
+		mesh 2d_vdf_strat_amont/2d_strat.lata dom
+		description "VDF Mesh composed of 39402 elements realized with 'in-house mesher' of TRUST"
+		 }
+	visu {
+		Title "2D-VEF mesh"
+		mesh 2d_vef_strat_amont/2d_strat.lata dom
+		description "VEF Mesh composed of 18816 elements realized with 'in-house mesher' of TRUST"
+	      }
+
+	visu {
+		Title "3D-VDF mesh"
+		mesh 3d_vdf_strat_amont/3d_strat.lata dom
+		description "VDF Mesh composed of 86246 elements realized with 'in-house mesher' of TRUST"
+		normal3D 0.3 0.2 0.5
+#		up3D 0.25 0.971 0.05
+        	Operator no_axes
+        	Operator no_bounding_box
+		 }
+	visu {
+		Title "3D-VEF mesh"
+		mesh 3d_vef_strat_amont/3d_strat.lata dom
+		description "VEF Mesh composed of  86400 elements realized with 'in-house mesher' of TRUST"
+		normal3D 0.3 0.2 0.5
+#		up3D 0.25 0.971 0.05
+		Operator no_axes
+        	Operator no_bounding_box
+	      }
+Table {
+	Title "Physical properties, Initial and boundary conditions"
+	       Description "Physical properties"
+	       Description "\latex_($\rho = 995\: kg.m^{-3}$\latex_)"
+	       Description "\latex_($\mu$\latex_) = 8.0e-4 Pa.s"
+	       Description " "
+		Description "Initial conditions"
+		Description "  Hydraulic: velocity  vitesse Champ_Uniforme  2   0.  0."
+		Description "Thermal: Temperature temperature Champ_Uniforme 1 26."
+		Description "  "
+		Description "Boundary conditions for 2D"
+		Description "  "
+		Description "  Hydraulic:"
+		Description "    Base, Droite1, Droit2, Gauche2 :  paroi_fixe"
+		Description "    Gauche1, Haute:    symetrie"
+		Description " "
+		Description "  Thermal :"
+		Description "    Base, Droite1, Droit2:  paroi_adiabatique"
+		Description "    Gauche1:  symetrie"
+		Description "    Haute:  paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 30 H_imp Champ_Front_Uniforme 1  10.0"
+		Description "    Gauche2: paroi_flux_impose Champ_Front_Uniforme 1  3125.0"
+Description "  "
+		Description "Boundary conditions for 3D"
+		Description "  "
+		Description "  Hydraulic:"
+		Description "  Base1, Base2, Base3, Top1, Top2, Top3, Front2, Front3, Front4, Front5,Back2, Back3, Back4, Back5, Droite1, Droite2, Droite3, Gauche1, Gauche2, Gauche3 :  paroi_fixe"
+		Description "  Top1, Top3 : symetry"
+		Description " "
+		Description "  Thermal :"
+		Description "    Base1, Base2, Base3, Top2, Top3, Front2, Front3, Front4, Front5,Back2, Back3, Back4, Back5, Droite2, Droite3, Gauche1, Gauche2 :  paroi_adiabatique"
+		Description "    Top1, Top3: paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 30 H_imp Champ_Front_Uniforme 1  10.0"
+		Description "    Droite1, Gauche3: paroi_flux_impose Champ_Front_Uniforme 1  3125.0"
+		
+	}
+
+	Table {
+		Title "Calculation method"
+		Description "The problem consists of heat transfer from the heater plate which is located at the center of the tank to the water and the heat loss from the free surface of water to the atmosphere by evaporation."
+		Description ""
+		Description " The heat loss from the free surface is simulated as:"
+		Description "\latex_($q = h (T_{w}-T_{a})$\latex_)"
+		Description " The value of heat loss from the free surface is taken from reference -2, for a water pool with covered water surface, i.e. 10.0 W/m2/k"
+		Description " The thermal buoyancy flow is verified to be laminar by calculating the Rayleigh Number given as:"
+		Description "\latex_($Ra_{H}=\frac{g.\beta.H^{4}.q^{"}}{\alpha.\nu.k}$\latex_)"
+		Description " The flow due to thermal buoyancy is laminar if  \latex_($Ra_{H}<=10^{12}$\latex_), as per reference 3."
+			Description " The value of \latex_($Ra_{H}$\latex_) is found to be \latex_($~10^{9}$\latex_), so the flow is laminar."
+	        } 
+}
+
+Chapter {
+
+	Title " 2D VDF Calculation results "
+	
+	Visu {
+		Title "Temperature distribution at t=1800s Convection Scheme - Amont"
+		Width 15 cm
+        	pseudocolor ./2d_vdf_strat_amont/2d_strat.lata dom TEMPERATURE SOM
+	     }
+
+	Visu {
+		Title "Temperature distribution at t=1800s Convection Scheme - Quick"
+        	Width 15 cm
+        	pseudocolor ./2d_vdf_strat_quick/2d_strat.lata dom TEMPERATURE SOM
+	     }
+
+Figure {
+		Title "2D VDF Results :Curve"
+		Dimension 2
+		Description "The graph below shows the comparison of temperatures predicted by Trio_U at the sensor locations with the experimental measurements"
+		RangeX 0.0 10.0
+		RangeY 20.0 50.0
+		LabelX "Sensor Number"
+		LabelY "Temperature"
+		Include_Description_Curves 0
+
+#	legend below title "legend"
+
+	Curve {
+		legend "2D_VDF_amont"
+		Version "1.5.7"
+		file ./2d_vdf_strat_amont/result.dat
+		Style points
+		TypePoints 4
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "2D_VDF_quick"
+		Version "1.5.7"
+		file ./2d_vdf_strat_quick/result.dat
+		Style points
+		TypePoints 5
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "Experiment"
+		origin "BARC"
+		Version "1.5.7"
+		file ./2d_vdf_strat_amont/result.dat
+		Style points
+		TypePoints 6
+		columns ($1) ($3)	
+		}
+	}
+	
+Table {
+
+	Title "Comparison of 2D VDF results with experiment : Table"
+	
+	Description "This table shows the comparison of 2D VDF calculations with experiments  "
+	
+	nb_columns 6
+
+	label   "Sensor no." | "2D VDF amont" | "2D VDF quick" | "Experiment" | "error (%)-amont" | "error (%)-quick"
+
+	Include_Description_lines 0
+
+	line {
+		file ./2d_vdf_strat_quick/recom1.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom2.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom3.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom4.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom5.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom6.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom7.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom8.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vdf_strat_quick/recom9.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	}
+
+ }
+
+Chapter {
+
+	Title " 2D VEF Calculation results "
+
+	Visu {
+		Title "Temperature distribution at t=1800s Convection Scheme - amont"
+        	Width 15 cm
+        	pseudocolor ./2d_vef_strat_amont/2d_strat.lata dom TEMPERATURE SOM
+	     }
+	
+	Visu {
+		Title "Temperature distribution at t=1800s Convection Scheme - ef_stab"
+        	Width 15 cm
+        	pseudocolor ./2d_vef_strat_efstab/2d_strat.lata dom TEMPERATURE SOM
+	     }
+
+	Figure {
+		Title "2D VEF Results :Curve"
+
+		Dimension 2
+	
+		Description "The graph below shows the comparison of temperatures predicted by Trio_U VEF calculations with the experimental measurements"
+		
+		RangeX 0.0 10.0
+		RangeY 20.0 50.0
+		LabelX "Sensor Number"
+		LabelY "Temperature (in DegC)"
+		Include_Description_Curves 0
+
+	Curve {
+		legend "2D_VEF_amont"
+		Version "1.5.1"
+		file ./2d_vef_strat_amont/result.dat
+		Style points
+		columns ($1) ($2)	
+		}
+	
+	Curve {
+		legend "2D_VEF_efstab"
+		Version "1.5.1"
+		file ./2d_vef_strat_efstab/result.dat
+		Style points
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "Experiment"
+		origin "BARC"
+		Version "1.5.1"
+		file ./2d_vef_strat_amont/result.dat
+		Style points
+		columns ($1) ($3)	
+		}
+	}
+
+Table {
+
+	Title "Comparison of TRUST results to theoretical calculations : Table"
+	Description "This table shows the comparison of Trio_U calculations with experiments"
+	nb_columns 6
+
+	label   "Sensor No." | "2D VEF amont" | "2D VEF EF_stab" | "Experiment" | "error (%)-amont" | "error (%)-EF_stab"
+
+	Include_Description_lines 0
+
+	line {
+		file ./2d_vef_strat_efstab/recom1.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom2.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom3.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom4.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom5.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom6.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom7.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom8.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./2d_vef_strat_efstab/recom9.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	}
+
+}
+
+Chapter {
+
+	Title " 3D VDF Calculation results "
+
+	Visu {
+		Title "Temperature distribution at t=1800s Convection Scheme - amont"
+        	Width 15 cm
+        	pseudocolor ./3d_vdf_strat_amont/3d_strat.lata dom TEMPERATURE SOM
+		normal3D 0.3 0.2 0.5
+	     }
+	Visu {
+		Title "Temperature distribution at t=1800s Convection Scheme - quick"
+        	Width 15 cm
+        	pseudocolor ./3d_vdf_strat_quick/3d_strat.lata dom TEMPERATURE SOM
+		normal3D 0.3 0.2 0.5
+	     }
+	
+	Figure {
+		Title " 3D VDF Results: Curve"
+		Dimension 2
+		Description "The graph below shows the comparison of temperatures predicted by Trio_U at the sensor locations with the experimental measurements"
+		RangeX 0.0 10.0
+		RangeY 20.0 50.0
+		LabelX "Sensor Number"
+		LabelY "Temperature"
+		Include_Description_Curves 0
+
+#	legend below title "legend"
+
+	Curve {
+		legend "3D_VDF_amont"
+		Version "1.5.7"
+		file ./3d_vdf_strat_amont/result.dat
+		Style points
+		TypePoints 4
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "3D_VDF_quick"
+		Version "1.5.7"
+		file ./3d_vdf_strat_quick/result.dat
+		Style points
+		TypePoints 5
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "Experiment"
+		origin "BARC"
+		Version "1.5.7"
+		file ./3d_vdf_strat_amont/result.dat
+		Style points
+		TypePoints 6
+		columns ($1) ($3)	
+		}
+	}
+
+Table {
+
+	Title "Comparison of 3D VDF results with experiment : Table"
+	
+	Description "This table shows the comparison of 3D VDF calculations with experiments  "
+	
+	nb_columns 6
+
+	label   "Sensor no." | "3D VDF amont" | "3D VDF quick" | "Experiment" | "error (%)-amont" | "error (%)-quick"
+
+	Include_Description_lines 0
+
+	line {
+		file ./3d_vdf_strat_quick/recom1.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom2.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom3.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom4.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom5.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom6.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom7.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom8.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vdf_strat_quick/recom9.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	}
+	}
+
+Chapter {
+
+	Title " 3D VEF Calculation results "
+
+	Visu {
+		Title "Temperature distribution at t=1800s (Convection Scheme - amont"
+        	Width 15 cm
+        	pseudocolor ./3d_vef_strat_amont/3d_strat.lata dom TEMPERATURE SOM
+		normal3D 0.3 0.2 0.5
+	     }
+	
+	Visu {
+		Title "Temperature distribution at t=1800s (Convection Scheme - ef_stab"
+        	Width 15 cm
+        	pseudocolor ./3d_vef_strat_efstab/3d_strat.lata dom TEMPERATURE SOM
+		normal3D 0.3 0.2 0.5
+	     }
+
+	Figure {
+		Title "3D VEF Results: Curve"
+
+		Dimension 2
+	
+		Description "The graph below shows the comparison of temperatures predicted by Trio_U VEF calculations with the experimental measurements"
+		
+		RangeX 0.0 10.0
+		RangeY 20.0 50.0
+
+		LabelX "Sensor Number"
+		LabelY "Temperature (in DegC)"
+		Include_Description_Curves 0
+
+	Curve {
+		legend "3D_VEF_amont"
+		Version "1.5.1"
+		file ./3d_vef_strat_amont/result.dat
+		Style points
+		columns ($1) ($2)	
+		}
+	
+	Curve {
+		legend "3D_VEF_efstab"
+		Version "1.5.1"
+		file ./3d_vef_strat_efstab/result.dat
+		Style points
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "Experiment"
+		origin "BARC"
+		Version "1.5.1"
+		file ./3d_vef_strat_amont/result.dat
+		Style points
+		columns ($1) ($3)	
+		}
+	}
+
+Table {
+
+	Title "Comparison of 3D VEF results with experiment : Table"
+	Description "This table shows the comparison of Trio_U 3D VEF calculations with experiments"
+	nb_columns 6
+
+	label   "Sensor No." | "3D VEF amont" | "3D VEF EF_stab" | "Experiment" | "error (%)-amont" | "error (%)-EF_stab"
+
+	Include_Description_lines 0
+
+	line {
+		file ./3d_vef_strat_efstab/recom1.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom2.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom3.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom4.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom5.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom6.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom7.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom8.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	line {
+		file ./3d_vef_strat_efstab/recom9.dat
+		origin "Trio_U"
+		nb_columns_file 6
+		legend " "  
+		columns ($1) ($2) ($3) ($4) ($5) ($6)
+               }
+
+	}
+
+}
+
+Chapter {
+
+	Title "Transient predicted by Trio_U"
+	Description "  "
+
+Figure {
+		Title "Transient results with 2D"
+
+		Dimension 2
+	
+		Description "The graph below shows the transient variation of temperature at thermocouple no 1 predicted by Trio_U 2D analysis"
+		
+		RangeX 0.0 2000.0
+		RangeY 20.0 50.0
+
+		LabelX "Time (s)"
+		LabelY "Temperature (in DegC)"
+		Include_Description_Curves 0
+
+	Curve {
+		legend "2D_VDF_amont"
+		Version "1.5.7"
+		file ./2d_vdf_strat_amont/2d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 1
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "2D_VDF_quick"
+		Version "1.5.7"
+		file ./2d_vdf_strat_quick/2d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 2
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "2D_VEF_amont"
+		Version "1.5.7"
+		file ./2d_vef_strat_amont/2d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 3
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "2D_VEF_ef_stab"
+		Version "1.5.7"
+		file ./2d_vef_strat_efstab/2d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 4
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "Experiment"
+		Version "1.5.7"
+		file expttempt.dat
+		Style points
+	      	TypePoints 1
+		columns ($1) ($2)	
+		}
+ }
+
+Figure {
+		Title "Transient Results - 3D"
+
+		Dimension 2
+	
+		Description "The graph below shows the transient variation of temprature at therocouple no 1 predicted by Trio_U 3D analysis"
+		
+		RangeX 0.0 2000.0
+		RangeY 20.0 50.0
+
+		LabelX "Time (s)"
+		LabelY "Temperature (in DegC)"
+		Include_Description_Curves 0
+	Curve {
+		legend "3D_VDF_amont"
+		Version "1.5.7"
+		file ./3d_vdf_strat_amont/3d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 1
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "3D_VDF_quick"
+		Version "1.5.7"
+		file ./3d_vdf_strat_quick/3d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 2
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "3D_VEF_amont"
+		Version "1.5.7"
+		file ./3d_vef_strat_amont/3d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 3
+		columns ($1) ($2)	
+		}
+
+	Curve {
+		legend "3D_VEF_ef_stab"
+		Version "1.5.7"
+		file ./3d_vef_strat_efstab/3d_strat_SONDE_TEMP1.son
+		Style lines
+	        TypeLigne 4
+		columns ($1) ($2)	
+		}
+	Curve {
+		legend "Experiment"
+		Version "1.5.7"
+		file expttempt.dat
+		Style points
+	      	TypePoints 1
+		columns ($1) ($2)	
+		}
+	}
+
+}
+
+Chapter {
+	Title "Conclusion"
+	Description " The Thermal stratification experiments were studied using CFD software Trio_U. The analysis was carried out with geometry in 2D and 3D. The VDF and VEF modules were used. Different convection schemes such as Amont and quick in VDF, Amont and EF_Stab in VEF were used to compare their performance and accuracy. Following are the conclusions from the study"
+	Description " "
+	Description "The analysis with 2D geometry VDF and VEF mesh showed good agreement with experiments with maximum error of 6.4%. Among the VDF and VEF methods, VEF produced better results with both the Amont and EF_Stab convection schemes. The EF_Stab scheme was found to predict most accurate results with maximum error of 2.5%"
+	Description " "
+	Description "The analysis with 3D geometry VDF and VEF mesh also showed good agreement with experiments with maximum error of 4.8%. Among the VDF and VEF methods, VEF produced better results as found in 2D analysis, with both the Amont and EF_Stab convection schemes. The EF_Stab scheme was found to predict most accurate results with maximum error of 4.7%"
+	Description " "
+	Description "Observing the transient prediction of temperatures for 2D and 3D analysis, it can be noted that the VEF method gives stable variation of temperatures with time. The VDF method showed oscillations on the temperatures with facsec 1.0,/reference 4/. Therefore, facsec 0.1 was used for VDF cases and it gives stable variation of temperature"
+	Description " "
+	Description "Though 3D analysis also predicted the results with good accuracy, the CPU time required for the calculation was much larger than the 2D analysis. The 3D VEF calculations took more time than the 3D VDF calculations."
+	Description " "
+
+	}
+
+
+Chapter {
+	Title "References"
+	Description "1- N.V. Satish Kumar, A.G. Patel, N.K. Maheshwari, P.K. Vijayan, D. Saha, 'Thermal stratification Studies related to the Passive Decay Heat Removal System of Advanced heavy Water Reactor', Presented in RCM4, IAEA, 2005"
+	Description " "
+	Description "2- Heat Transfer Coefficients for Natural Water Syrfaces, G.P. Williams, National Research Council Canada, Division of Building Research, Source: http://www.cig.ensmp.fr/~iahs/redbooks/a062/iahs_62_0203.pdf "
+	Description " "
+	Description "3- Vilet, G.C. and Liu, C.K., 'An Experimental Study of Turbulent Natural Convection Boundary Layer', Journal of Heat Transfer, 517-531, November, 1969"
+	Description "4- A. Borgohain, S. Vandroux, 'Report on Validation work of Trio_U code, in collaboration with BARC', DEN/CAD/DER/SSTH/LDAL/NT/2009-006/A"
+
+	}
+
+Chapter {
+	Title "Computer performance (explicit calculations)"
+	tableau_performance {
+				}
+	}

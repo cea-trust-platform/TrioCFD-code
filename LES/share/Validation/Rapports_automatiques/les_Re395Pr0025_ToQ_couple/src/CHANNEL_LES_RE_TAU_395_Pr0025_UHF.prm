@@ -1,0 +1,1216 @@
+Parameters {
+	Title "Turbulence (LES) and Heat transport (coupling with solid walls - thermal activity ratio K=0.28) in a channel flow \latex_($Re_\tau=395$\latex_) - \latex_($Pr=0.025$\latex_) "
+	Description "Turbulent channel Flow - Coupling with conduction problem in solid walls - \latex_($Re_\tau=395$\latex_) - \latex_($Pr=0.025$\latex_) - K=0.28"
+	Description "This value of Prandtl number is typical of mercury. This case can be considered as a validation of an LES for a low Prandtl number flow (mercury, sodium)."
+	Description "Validated time schemes : Schema_Euler_implicite (facsec_max=4 and 1) ; and Runge_Kutta_Ordre_3 (facsec=1)"
+	Description "Validated Model : LES (WALE) and EF_STAB scheme with Wall function in VEF discretisation"
+	Description "In the fluid: Validation with : analytical laws, DNS Kim-Moser $Re_\tau=395$, and DNS Kawamura $Re_\tau=395$ - Pr=0.025 with uniform heat-flux heating "
+	Description "In the solid: Comparison between VDF and VEF calculation."
+
+	VersionTrio_U "1.6.4"
+
+	ParametersTrio_U Type of problem : ThermoHydraulique_Turbulent
+	ParametersTrio_U Discretization : VDF and VEFPreP1B
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent, Convection_Diffusion_Temperature_Turbulent, Conduction"
+	ParametersTrio_U Solving of equations : "Turbulence_paroi loi_standard_hydr" for the velocity and "Turbulence_paroi loi_standard_hydr_scalaire" for the temperature.
+	ParametersTrio_U Turbulence model : LES Wale 
+	ParametersTrio_U Type of boundary conditions : Periodicity in x and z directions, wall for y boundaries
+	ParametersTrio_U Time schemes: Schema_Euler_implicite (facsec_max=4 and 1) ; and Runge_Kutta_Ordre_3 (facsec=1)
+	ParametersTrio_U Convection schemes: centre, quick for VDF simulation  and EF_stab for VEF simulation 
+
+	TestCase  VDF_Coupling les_Re395Pr0025 /*jdd en annexe*/
+	TestCase  VEF_Coupling les_Re395Pr0025 
+	TestCase  VEF_Coupling_facsec1 les_Re395Pr0025 
+	TestCase  VEF_Coupling_RK les_Re395Pr0025 
+
+	
+	Author "O. Cioni"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Presentation"
+	
+		description "The fluid domain is a rectangular duct. The fluid is a thermohydraulic problem, and the solid is a conduction problem. Both problems are thermally coupled."
+		description "The problem is a 3D problem."
+	 
+	 Figure {
+	 	Title "Geometry"
+		Description "Geometry : Plane channel with solid walls"
+		description "The geometry is a 3D geometry. The figure below is a scheme of the geometry of the problem."
+		description "The height of the fluid domain (wall to wall) is equal to $2$. The fluid domain is surrounded by two solid domains which both are 0.5m high."
+		Description "Dimensions :  Lx=6.4 m, Ly=2 m, Lz=3.2 m"
+
+		description " "
+		picture ./domain.pdf
+	  	}
+		
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VDF"
+		mesh VDF_Coupling/les_Re395Pr0025.lata dom
+		Description " 32x16x16 hexaedra "
+		Description "dx+=75 ; dy+=25 ; dz+=75"
+	}
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VDF  Solid walls"
+		mesh VDF_Coupling/les_Re395Pr0025.lata dom_solide
+		Description " 32x2x16 hexaedra"
+	}
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VEF"
+		mesh VEF_Coupling/les_Re395Pr0025.lata dom
+		Description " 11x7x6 hexaedra and 'tetraedriser_homogene_fin' option "
+		Description " dx+=50 ; dy+=20 ; dz+=50"
+	}
+	visu {
+		Width 11cm,viewport= 0 0 1024 800,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VEF Solid walls"
+		mesh VEF_Coupling/les_Re395Pr0025.lata dom_solide
+		Description " 11x2x6 hexaedra and 'tetraedriser_homogene_fin' option "
+	}
+	
+	Table {
+		Title "Physical properties of the fluid"
+		Description "\latex_(\textbf{Incompressible fluid : Mercury Pr = 0.025 }\latex_)"	
+		Description "$\rho = 13500$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\mu$ = 1.5e-03 \latex_($kg.m^{-1}.s^{-1}$\latex_)"
+		Description "$\lambda$ = 0.624301  \latex_($W.m^{-1}.K^{-1}$\latex_)"
+		Description "\latex_($C_p$\latex_)= 4179 \latex_($J.kg^{-1}.K^{-1}$\latex_)"
+		Description "beta_th=1.9954e-3"
+	}
+	Table {
+		Title "Physical properties of the solid"
+		Description "\latex_(\textbf{Solid wall: steel}\latex_)"	
+		Description "$\rho = 8000$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\lambda$ = 50.  \latex_($W.m^{-1}.K^{-1}$\latex_)"
+		Description "\latex_($C_p$\latex_)= 500 \latex_($J.kg^{-1}.K^{-1}$\latex_)"
+	}
+	Table {
+		Title "Hydraulic boundary conditions "
+		description "Periodicity between inlet and outlet boundaries. "
+		description "Upper and lower boundary:  U=0 and wall functions."
+		description "The interface between both domains is a wall."
+		Description "Periodicity in x and z directions"	
+
+		}
+	 Table {
+	 	Title "Fluid thermal boundary conditions"
+		description "Periodicity between inlet and outlet boundaries."
+		description "Upper and lower boundary: coupling boundary conditions with the fluids at the interface (paroi_contact)"
+		Description "Periodicity in x and z directions"	
+		}
+	Table {
+		Title "Solid thermal boundary conditions"
+		description "Lateral boundaries: adiabatic conditions." 
+		description "The joint boundary of both domains is a paroi_contact."
+	}
+	Table {
+		Title "Initial conditions"
+		Description " Velocity : U= 7.54e-4 m/s ; V=0 ; W=0"	
+		Description " Temperature : T=0 in the fluid and in the solid"	
+	}
+	
+}
+Chapter {
+	Title "Numerical schemes"
+	Table {
+		Title "VEF"
+		Description "Two time schemes are tested : Schema_Euler_implicite facsec_max=4 ; and Runge_Kutta_Ordre_3 scheme with facsec=1"
+		Description "Convection : EF_stab (alpha=0.2 for U; 1 for T)"
+		Description "Diffusion scheme : Default {}"
+	}
+
+	Table {
+		Title "VDF"
+		Description "Time scheme : Runge_Kutta_ordre_3 facsec=1"
+		Description "Convection : centered for U, quick for T"
+		Description "Diffusion scheme : Default {}"
+	}
+}
+Chapter {
+	Title "Results"
+
+	Table {
+		Title "\latex_($u_\tau$\latex_)"
+		nb_columns 2
+		label  \latex_($u_\tau$\latex_) | Relative error
+		line {
+			origin "analytique"
+			legend "Theoretical(*)"
+			file utau_analytique.dat
+			nb_columns_file 1
+			columns  ($1) "-"
+		}
+		line {
+			origin "Trio_U"
+			legend "VDF"
+			file ./VDF_Coupling/post_utau
+			nb_columns_file 3
+			columns  ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicit (FS 4)"
+			file ./VEF_Coupling/post_utau
+			nb_columns_file 3
+			columns  ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicit (FS 1)"
+			file ./VEF_Coupling/post_utau
+			nb_columns_file 3
+			columns  ($2) ($3)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/post_utau
+			nb_columns_file 3
+			columns  ($2) ($3)
+		}
+	}
+	
+	Table {
+		Description "(*) : according to Dean's correlation : \latex_($Re_\tau = 0.175Re_b^{7/8}$\latex_) "	
+	}
+
+	
+	Table {
+		Title "Time steps"
+		Description "In the following table, the time steps for each equation are given. dt_stab is the global stability time step computed by the code. dt is the time step used for the simulation. dt_cfl is the CFL time step given by the stability conditions on the convective terms. dt_Fourier_qdm and dt_Fourier_T are the Fourier time steps given by the stability conditions on the diffusive terms respectively for the momentum equation and for the energy equation and dt_conduction is the time step for the conduction equation in the solid. "
+		Description "It can be seen that in the VEF test cases the limiting time step is imposed by the conduction in the wall."
+		Description " "
+		nb_columns 5
+		label dt/dt_stab | dt/dt_cfl  | dt/dt_Fourier_qdm | dt/dt_Fourier_T |dt/dt_conduction
+		line {
+			origin "Trio_U"
+			legend "VDF"
+			file ./VDF_Coupling/comp_facsec
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicite FS4"
+			file ./VEF_Coupling/comp_facsec
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF Implicite FS1"
+			file ./VEF_Coupling_facsec1/comp_facsec
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			origin "Trio_U"
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/comp_facsec
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+	
+	Figure {
+		Title "Re_tau"
+		Width 12cm
+		Dimension 2
+		LabelX "t"
+		LabelY "Re_tau"
+		RangeY 100 450
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Re_tau=395"
+			Fonction 395
+			TypeLigne 0
+			Style lines
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/reynolds_tau.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Mean velocity profile U+"
+		Description "Mainly due to the use of wall functions with a LES modelling, the first computed point (at about y+=20) is relatively well estimated but the mean velocity field in the region just before the log law zone is not perfectly approximated."
+		Description "The results obtained with the fully implicit case with facsec=4 show that the velocity profile is not estimated properly. The use of a smaller value of facsec (1) shows an improvement of the results. The implicit scheme is not recommended here.
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LogX
+		LabelY "U+"
+		LogY
+		RangeY 10 30
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./Kawa_U.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "Log Law"
+			Fonction 1/0.415*log(x)+5.32
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+
+	Figure {
+		Title "Mean velocity profile U"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "U"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./Kawa_U.dat
+			columns ($1)/395 ($2)*4.388888888888888889e-05/2.63*2.55
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+
+
+	Figure {
+		Title "Non-dimensional Velocity fluctuation Urms +"
+
+		Description "The fluctuations Urms, Vrms are not perfectly predicted and the simulations underestimate the intensity of the fluctuations. This is mainly due to the use of wall functions (peak shifting to the right and low intensity)."
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "Urms/u_tau"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1) ($5)
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Velocity fluctuation Urms"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "Urms"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1)/395 ($5)*395*1.5e-3/13500.
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF FImplicit FS4"
+			file ./VEF_Coupling/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Velocity fluctuation Vrms+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "Vrms/u_tau"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1) ($6)
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Velocity fluctuation Vrms"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "Vrms"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kim - Moser"
+			file ./Kim_Moser.dat
+			columns ($1)/395 ($6)*395*1.5e-3/13500.
+			TypeLigne 0
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_dim.dat
+			columns ($1) ($6)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Non-dimensional Mean temperature profile T+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		LogX
+		RangeX 10 400
+		LabelY "T+"
+#		RangeY 1 20
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+#	       Curve {
+#		       legend "Kader law Pr=0.025"
+#		       file ./kader.dat
+#		       columns ($1) ($2)
+#		       Style points
+#	       }
+		
+	}
+
+	Figure {
+		Title "Mean temperature profile T"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "T"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1)/395 ($2)/140/395/1.5e-3
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T_dim.dat
+			columns ($1) ($2)
+			Style linespoints
+		}		
+	}
+
+
+	Figure {
+		Title "Non-dimensional Mean temperature fluctuation Trms+"
+		Description "Like the velocity fluctuations, the use of wall functions does not permit to estimate better the temperature fluctuation near the walls. The results below present a good quality for a Large Eddy Simulation using wall functions. It can be noted also a good correspondance between VDF simulation and VEF simulation."
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 1 400
+		LabelY "Trms+"
+		RangeY 0.0 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Temperature fluctuation Trms"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "Trms"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1)/395 ($3)/140./395/1.5e-3
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+		}
+		
+	}
+
+	Figure {
+		Title "Non-dimensional streamwise turbulent heat flux  uT+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "uT+"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1) ($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		
+	}
+
+	Figure {
+		Title "The streamwise turbulent heat flux uT"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "uT"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./T.dat
+			columns ($1)/395 ($4)/140./13500.
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T_dim.dat
+			columns ($1) -($4)
+			Style linespoints
+		} 
+		
+	}
+	
+	Figure {
+		Title "Non-dimensional wall-normal turbulent heat flux  vT+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 400
+		LabelY "vT+"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./vt.dat
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "The wall-normal turbulent heat flux vT"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "vT"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./vt.dat
+			columns ($1)/395 ($2)/140./13500.
+			Style linespoints
+		}
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/moy_spat_T_dim.dat
+			columns ($1) ($5)
+			Style linespoints
+		}
+		
+	}
+
+
+	
+	Figure {
+		Title "Time evolution of temperature at the position (3.2; -0.25 ; 1.6 ) in the solid walls"
+		Width 12cm
+		Dimension 2
+		LabelX "t (s)"
+		LabelY "T"
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF"
+			file ./VDF_Coupling/les_Re395Pr0025_SONDE_TS1.son
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			file ./VEF_Coupling/les_Re395Pr0025_SONDE_TS1.son
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			file ./VEF_Coupling_facsec1/les_Re395Pr0025_SONDE_TS1.son
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VEF RK3"
+			file ./VEF_Coupling_RK/les_Re395Pr0025_SONDE_TS1.son
+			columns ($1) ($2)
+			Style lines
+		}
+		
+	}
+	Figure {
+	Title "Minimum and maximum temperature evolution in the solid walls"
+	Dimension 2
+	LabelX "Time (s)"
+	LabelY "Temperature "
+	Include_Description_Curves 0
+	Width 12cm
+	Curve {
+		legend "T_MAX - VDF"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VDF_Coupling/les_Re395Pr0025_SONDE_TS_MAX.son
+		columns ($1) ($2)
+		Style lines
+		}
+
+	Curve {
+		legend "T_MAX - VEF Implicit FS4"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VEF_Coupling/les_Re395Pr0025_SONDE_TS_MAX.son
+		columns ($1) ($2)
+		Style lines
+		}
+	Curve {
+		legend "T_MAX - VEF Implicit FS1"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VEF_Coupling_facsec1/les_Re395Pr0025_SONDE_TS_MAX.son
+		columns ($1) ($2)
+		Style lines
+		}
+	Curve {
+		legend "T_MAX - VEF RK3"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VEF_Coupling_RK/les_Re395Pr0025_SONDE_TS_MAX.son
+		columns ($1) ($2)
+		Style lines
+		}
+	Curve {
+		legend "T_MIN - VDF"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VDF_Coupling/les_Re395Pr0025_SONDE_TS_MIN.son
+		columns ($1) ($2)
+		Style lines
+		}
+
+	Curve {
+		legend "T_MIN - VEF Implicit FS4"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VEF_Coupling/les_Re395Pr0025_SONDE_TS_MIN.son
+		columns ($1) ($2)
+		Style lines
+		}
+	Curve {
+		legend "T_MIN - VEF Implicit FS1"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VEF_Coupling_facsec1/les_Re395Pr0025_SONDE_TS_MIN.son
+		columns ($1) ($2)
+		Style lines
+		}
+	Curve {
+		legend "T_MIN - VEF RK3"
+		origin "Trio_U"
+		Version "1.6.1"
+		file ./VEF_Coupling_RK/les_Re395Pr0025_SONDE_TS_MIN.son
+		columns ($1) ($2)
+		Style lines
+		}
+
+	}
+	Figure {
+		Title "Mean temperature profile T in the wall"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "T"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VDF"
+			Segment ./VDF_Coupling/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			Segment ./VEF_Coupling/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			Segment ./VEF_Coupling_facsec1/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			Segment ./VEF_Coupling_RK/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+		}
+		
+	}
+	Figure {
+		Title "Mean temperature profile T in the wall and in the fluid"
+		Description "The difference between the different calculations in the wall is not very significant due to the very small temperature values."
+		Width 12cm
+		Dimension 2
+		RangeX -0.5 1 
+		LabelX "y"
+		LabelY "T"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VDF Solid"
+			Segment ./VDF_Coupling/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF Fluid"
+			file ./VDF_Coupling/moy_spat_T_dim_2.dat
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+		}
+		Curve {
+			legend "VEF Solid FS4"
+			Segment ./VEF_Coupling/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 2
+		}
+		Curve {
+			legend "VEF Fluid FS4"
+			file ./VEF_Coupling/moy_spat_T_dim_2.dat
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 2
+		}
+		Curve {
+			legend "VEF Solid FS1"
+			Segment ./VEF_Coupling_facsec1/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 4
+		}
+		Curve {
+			legend "VEF Fluid FS1"
+			file ./VEF_Coupling_facsec1/moy_spat_T_dim_2.dat
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 4
+		}
+		Curve {
+			legend "VEF RK3 Solid"
+			Segment ./VEF_Coupling_RK/les_Re395Pr0025.data COUPE_TS_MOY
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 3
+		}
+		Curve {
+			legend "VEF RK3 Fluid"
+			file ./VEF_Coupling_RK/moy_spat_T_dim_2.dat
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 3
+		}
+		
+	}
+
+	Figure {
+		Title "Temperature fluctuation profile Trms in the wall"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "Trms"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VDF"
+			Segment ./VDF_Coupling/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS4"
+			Segment ./VEF_Coupling/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF Implicit FS1"
+			Segment ./VEF_Coupling_facsec1/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+		}
+		Curve {
+			legend "VEF RK3"
+			Segment ./VEF_Coupling_RK/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "Temperature fluctuation profile Trms in the fluid and the solid"
+		Description "The difference between the different calculations in the wall is not very significant due to the very small temperature fluctuation values."
+		Width 12cm
+		Dimension 2
+		RangeX -0.5 1 
+		RangeY 0.0 0.005
+		LabelX "y"
+		LabelY "Trms"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VDF solid"
+			Segment ./VDF_Coupling/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+		}
+		Curve {
+			legend "VEF Implicit FS4 solid"
+			Segment ./VEF_Coupling/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 2
+		}
+		Curve {
+			legend "VEF Implicit FS1 solid"
+			Segment ./VEF_Coupling_facsec1/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 3
+		}
+		Curve {
+			legend "VEF RK3 solid"
+			Segment ./VEF_Coupling_RK/les_Re395Pr0025.data COUPE_TS_ET
+			columns ($1) ($2)
+			Style linespoints
+			TypeLigne 4
+		}
+		Curve {
+			legend "VDF liquid"
+			file ./VDF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+		}
+		Curve {
+			legend "VEF Implicit FS4 liquid"
+			file ./VEF_Coupling/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+		}
+		Curve {
+			legend "VEF Implicit FS1 liquid"
+			file ./VEF_Coupling_facsec1/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+			TypeLigne 3
+		}
+		Curve {
+			legend "VEF RK3 liquid"
+			file ./VEF_Coupling_RK/moy_spat_T_dim.dat
+			columns ($1) ($3)
+			Style linespoints
+			TypeLigne 4
+		}
+		
+	}
+
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "For this case, we focus on the validation of the thermal coupling boundary conditions in case of a Large Eddy Simulation of a biperiodic channel flow ($Re_\tau$= 395). The case mimics the coupling between a fluid with low Prandtl (similar to Na, Pr=0.025)  and solid walls made of steel. "
+	
+	Description ""
+	
+	Description " The thermal activity ratio corresponding to this coupling Na/steel is K=0.28. This ratio influences the fluid-structure interaction in such a way that when K$\rightarrow\infty$ the wall temperatures fluctuations tend to an iso-flux boundary condition behavior (maximum Trms), whereas when K$\rightarrow 0$ the interface behaves like an isothermal wall (Trms=0).Most nuclear applications (for instance, water/steel , sodium/steel; helium/steel) present a small value of K (<0.5)."
+	
+	Description ""
+	Description "Temperature is treated like a passive scalar. At the walls, a standard wall function (log law) is used." 
+	
+	Description "For the quantities in the fluid, the results are compared to the DNS of Kim and Moser and to the DNS of Kawamura $Re_\tau=395$ with uniform heat-flux heating. It must be underlined that the boundary conditions are not the same : for the DNS, constant wall temperature conditions are used and a constant volumic heat flux is imposed in the fluid ; on the other hand, for our simulation coupling conditions with solid walls are considered. However, the heat flux in the solid walls is chosen in order to be equal to the total heat flux imposed in the DNS."
+
+	Description "The results obtained with Trio_U for VDF and VEF discretization are also compared. The validation case Channel LES VEF \latex_($Re_\tau=395$\latex_) gives a more detailed analysis of the validation of the code for the hydraulic part. Here,  the response of the code in case of coupling condition with solid walls is evaluated."
+
+	Description " For all quantities (mean temperature and fluctuations), it must be noted that a good correspondance is obtained between the VDF simulation and the VEF simulation is obtained. However, the location of the fluctuations is not perfectly predicted and the simulations underestimate the intensity of the fluctuations in the fluid. This is mainly due to the use of wall functions (peak shifting to the right and low intensity)."
+
+	Description "Morever, we note that the use of a RK3 time scheme improves the predictions for all quantities. On the other hand, the implicit time scheme (order 1) makes it possible to use larger time steps (here about four times higher) and thus to reach the statistically converged state more quickly. However, the obtained velocity profile is not proper. A calculation test with a facsec equal to 1 gives better results. Thus, we do not recommend the use of an implicit time scheme, as the time step should only be taken equal to one time the stability time step computed by the code (from Fourier condition and CFL condition)."
+
+
+
+}
+
+Chapter {
+       Title "Computer performance"
+       tableau_performance {
+       }
+} 

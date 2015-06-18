@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+tempsdeb=0.002
+nbperio=5
+fic_son='melange_SONDE_VAR.son'
+RACINE=`pwd`
+#
+for F in 0.5 1 2;
+do
+cd $RACINE/../F$F
+$TRUST_Awk -v T1=$tempsdeb 'BEGIN {Tt=100000} { if ($1!="#") {Tt=$1}; if (Tt<T1) {print $1 " " $2}}' $fic_son > valvardeb
+$TRUST_Awk -v T1=$nbperio -v F1=$F 'BEGIN {Tt=100000} { if ($1!="#") {Tt=$1}; if (Tt<T1/F1) {print $1 " " $2}}' $fic_son > valvarfin
+tail -1 valvardeb > valdebut
+tail -1 valvarfin > valfin
+cat valdebut valfin > valeurs
+rm -f valvardeb valvarfin valdebut valfin
+$TRUST_Awk 'BEGIN {i=0; deltav=0; deltat=0; coeffd=0} {if (i==0) {i=i+1; deltat=-$1; deltav=-$2} else {deltat=deltat+$1; deltav=deltav+$2 ;if (deltat>0) {coeffd=10000*0.5*(deltav/deltat)} ; {print coeffd}}}' valeurs > coefficient"_F"$F
+rm -f valeurs
+done;
+#
+cd $RACINE
+coeff05=`$TRUST_Awk '{print $0 }' ../F0.5/coefficient"_F"0.5`
+coeff1=`$TRUST_Awk '{print $0 }' coefficient"_F"1`
+coeff2=`$TRUST_Awk '{print $0 }' ../F2/coefficient"_F"2`
+echo $coeff05 " " $coeff1 " " $coeff2 > coefficients_F
+#
+#
+F=1
+for mail in M1 M2 M4 M5;
+do
+cd $RACINE/../../BURATTI_$mail
+$TRUST_Awk -v T1=$tempsdeb 'BEGIN {Tt=100000} { if ($1!="#") {Tt=$1}; if (Tt<T1) {print $1 " " $2}}' $fic_son > valvardeb
+$TRUST_Awk -v T1=$nbperio -v F1=$F 'BEGIN {Tt=100000} { if ($1!="#") {Tt=$1}; if (Tt<T1/F1) {print $1 " " $2}}' $fic_son > valvarfin
+tail -1 valvardeb > valdebut
+tail -1 valvarfin > valfin
+cat valdebut valfin > valeurs
+rm -f valvardeb valvarfin valdebut valfin
+$TRUST_Awk 'BEGIN {i=0; deltav=0; deltat=0; coeffd=0} {if (i==0) {i=i+1; deltat=-$1; deltav=-$2} else {deltat=deltat+$1; deltav=deltav+$2 ;if (deltat>0) {coeffd=10000*0.5*(deltav/deltat)} ; {print coeffd}}}' valeurs > coefficient"_"$mail
+rm -f valeurs
+done;
+#
+cd $RACINE
+coeffM1=`$TRUST_Awk '{print $0 }' ../../BURATTI_M1/coefficient"_"M1`
+coeffM2=`$TRUST_Awk '{print $0 }' ../../BURATTI_M2/coefficient"_"M2`
+#coeffM3=`$TRUST_Awk '{print $0 }' ../../BURATTI_M3/coefficient"_"M3`
+coeffM4=`$TRUST_Awk '{print $0 }' ../../BURATTI_M4/coefficient"_"M4`
+coeffM5=`$TRUST_Awk '{print $0 }' ../../BURATTI_M5/coefficient"_"M5`
+echo $coeffM1" " $coeffM2 " " $coeff1 " " $coeffM4 " " $coeffM5 > coefficients_M

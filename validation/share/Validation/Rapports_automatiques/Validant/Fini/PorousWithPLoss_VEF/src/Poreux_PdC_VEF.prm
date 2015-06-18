@@ -1,0 +1,431 @@
+Parameters {
+	Title "Laminar flow in a channel with porous media and pressure loss"
+	Description "Verification of equations resolution in porous media with pressure loss for VEF discretisation."
+	Description "Validated Model"
+	Description "____convection scheme (amont ok, pb with EF_stab)"
+	Description "____non uniform porosity"
+	Description "____pressure loss of type Perte_charge_directionnelle"
+	Description "____no friction at walls"
+	Description "____2D with trianguler and 3D with tetraedriser "
+        Description "Validation with"
+	Description "____analytical solution"
+
+	VersionTrio_U "1.6.4"
+
+	ParametersTrio_U Type of problem : Thermohydraulique
+        ParametersTrio_U Discretization : VEFPreP1B
+        ParametersTrio_U Time scheme : Euler_Explicite
+        ParametersTrio_U Solving of equations : Navier Stokes_standard and Convection_diffusion_temperature
+        ParametersTrio_U Convection scheme : Momentum : amont (one calculation with EF_stab)
+        ParametersTrio_U Convection scheme : Temperature : amont 
+        ParametersTrio_U Diffusion scheme : Default {} for all equations
+        ParametersTrio_U Type of boundary conditions : inlet/outlet flow ; symmetry (no friction at walls) 
+        ParametersTrio_U Type of fluid : no specific one
+        ParametersTrio_U Type of porous medium : no specific one, only global porosity 
+
+        TestCase "Poreux_2D" "Poreux_VEF_2D.data" /* jdd */
+        TestCase "Poreux_3D" "Poreux_VEF_3D.data"
+        TestCase "Poreux_3D_EFstab" "Poreux_VEF_3D_EFstab.data"
+        TestCase "Poreux_Pdc_Z2_2D" "Poreux_VEF_2D.data"
+
+	Author "V. Barthel (Annex of CEA document DEN/CAD/DER/SSTH/LDAL/NT-2011-042/A) "
+}
+
+Chapter {
+	Title "Model description"
+        Description "- Channel dimension : 1x1m (2D) ; 1x1x1m (3D)"
+        Description "- Porous zone from x=0.2 to x=0.8 with a porosity of 0.5 instead of 1."
+        Description "- Imposed regular pressure loss in flow direction, with two cases studied :
+	Description "________ 1. pressure loss along all the domain "
+	Description "________ 2. pressure loss only in the porous zone"
+	Description "The scheme used for equation resolution is the upwind (amont) scheme since the porous approach doesn't need more precis scheme. Furthermore, the EF_stab scheme which is recommended in local CFD approach is not convenient in this case, it will be shown here."
+	Description " "
+	Description "- 2D mesh:  84 cells  ; 20x2   cells each divided in 2 triangles (Trianguler). "
+	Description "- 3D mesh: 486 cells  ; 20x2x2 cells each divided in 6 tetrahedra (Tetrahedriser) "
+	Description "To avoid having different boundary conditions at the same cell, some are cut automatically from the corner (VerifierCoin interpreter)."
+	Description "The meshes are rather coarse but these calculations do not need refined mesh : there is no friction at walls, so no profile velocity has to be found and the porous media used here is a global approach that allows only having mean velocities."
+#
+	Figure {
+		Width 10cm
+                Title "2D 'trianguler' mesh (84 cells)"
+                Title "Geometry for the test cases"
+                Width 12cm
+                picture ./Geom_FV.png
+        }
+#
+	visu {
+		Width 6cm, viewport=200 200 920 900, clip 
+                Title "2D 'trianguler' mesh (84 cells) and 3D 'tetrahedriser' mesh (486 cells)"
+                mesh Poreux_2D/Poreux_VEF_2D.lata dom
+                zoom2D -0.1 1.1 -0.1 1.1
+                Operator no_axes
+                Operator no_bounding_box
+                Operator no_databaseinfo
+                Operator_to_all no_legend
+                Operator no_triad
+		nb_img_without_newline 2
+        }
+	visu {
+		Width 6cm, viewport=80 60 920 900, clip 
+                mesh Poreux_3D/Poreux_VEF_3D.lata dom
+                normal3D 0.3 0.25 0.9
+                up3D -0.1 1 -0.3
+                zoom3D 0 0 0.95
+                Operator no_axes
+                Operator no_bounding_box
+                Operator no_databaseinfo
+                Operator_to_all no_legend
+                #Operator no_triad
+        }
+#
+	Table {
+                 Title "Coefficients for directionnal pressure loss"
+                 Description "This pressure loss is calculated thanks to a hydraulic diameter and a lambda function, such as"
+                 Description "1/$\rho$ $\Delta$P/dx=-1/2 $\lambda$ $U^2$/dhy, with the following imposed values :"
+                 nb_columns 1
+                 label Value
+                 line {
+                        legend " $\lambda$ "
+                        file ./Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($7)
+                       }
+                 line {
+                        legend " dhy (m) "
+                        file ./Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($6)
+                       }
+        }
+# properties Geometry
+        Table {
+                 Title "Physical properties "
+                 Description "These properties are just numerical ones"
+                 nb_columns 1
+                 label Value
+                 line {
+                        legend " $\mu$ (N/$m^2$/s) "
+                        file Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($1)
+                       }
+                 line {
+                        legend " $\rho$ (kg/$m^3$) "
+                        file Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($3)
+                       }
+                 line {
+                        legend " cp (J/kg/K) "
+                        file Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($2)
+                       }
+                 line {
+                        legend " $\lambda$t (W/m) "
+                        file Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($5)
+                       }
+                 line {
+                        legend " $\beta$ (N/$m^2$/s) "
+                        file Poreux_2D/propertiesGeometry.dat
+                        nb_columns_file 7
+                        columns ($4)
+                       }
+        }
+#
+}
+
+Chapter {
+	  Title "2D and 3D channel with non uniform porosity and regular pressure loss on all the domain (Test case 1)."
+	  Description "As it can be seen below, the results with Upwind (Amont) convection scheme are ok."
+		
+
+	  Figure {
+	  Title "Velocity along x"
+	  Description "The analytical result is given by div($\psi$ U)=0"
+	  Description "So the mean velocity along x is given by :"
+	  Description "Ui * $\psi$i = cte, so U1 = U3 = 1. and U2 = 2."
+	  Description "On the interfaces between the porous zones, we have Uint = 1/2 (U1+U2), and so $\lambda$ = 1/Uint = 2/3."  
+	  Dimension 2
+	  Width 12cm
+	  LabelX "X (m)"
+	  LabelY "U (m/s)"
+	  RangeY 0.95 2.05
+	  Include_Description_Curves 0
+	  Curve {
+	  	  legend "convection { amont } 2D"
+		  origin "Trio_U"
+		  segment ./Poreux_2D/Poreux_VEF_2D SEG_U1 
+		  Style linespoints
+	  }
+	  Curve {
+	          legend "convection { amont } 3D"
+		  origin "Trio_U"
+		  segment ./Poreux_3D/Poreux_VEF_3D SEG_U1
+		  Style linespoints
+	  }
+# on ecrit U analytique sous la forme 1/(psi_defaut - psi_zone_poreuse)
+# pour les interfaces on a ui=1/2(u1+u2) d'ou psi_interface=1/ui=2/3;  
+	  Curve {
+	    	  legend "Analytique"
+		  origin "Analytique"
+		  segment ./Poreux_2D/Poreux_VEF_2D SEG_U1 
+		  columns $1 (1)/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)
+		  Style linespoints
+	         }
+	  }
+
+	  Figure {
+	  Title "Pressure profile in case 1"
+	  Description "The analytic solution for pressure along x is given by :"
+	  Description "a) 1/2*$\rho$*$U^2$ + P = cte "
+	  Description "and by the regular pressure loss over all the domain :"
+	  Description "b) 1/$\rho$ $\Delta$P/dx=-1/2 $\lambda$ $U^2$/dhy"
+          Description "____________________________________________________"
+	  Description "So, from a) :
+	  Description "zone 3 : P/$\rho$ =0, so cte = 1/2*$U3^2$"
+	  Description "zone 2 : P/$\rho$ = 1/2*($U3^2$-$U2^2$)"
+	  Description "zone 1 : P/$\rho$ = 0"
+	  Description "From b) :
+	  Description "zone 3 and 1 : 1/$\rho$ $\Delta$P/dx=-1/2 $\lambda$ $U1^2$/dhy"
+	  Description "zone 2 ______ : 1/$\rho$ $\Delta$P/dx=-1/2 $\lambda$ $U2^2$/dhy (= 4 * ($\Delta$P/dx) from zones 3 and 1)"
+          Description "____________________________________________________"
+	  Description "With the present values of Dhy, $\psi$ and U1, it comes : "
+	  Description "Zone 3 : P/$\rho$  = 2.5*(x-1)"
+	  Description "Zone 2 : P/$\rho$ = 0.5 - 10*(x-0.8) - 1.5"
+	  Description "Zone 1 : P/$\rho$ = 0.5 + 6. - 2.5*(x-0.2) - 1.5"
+	  Dimension 2
+	  Width 12cm
+	  Include_Description_Curves 0
+	  LabelX "x (m)"
+	  LabelY "P/density (N.m/kg)"
+	  Curve {
+		  legend "convection { amont } 2D"
+		  origin "Trio_U"
+		  segment ./Poreux_2D/Poreux_VEF_2D SEG_P
+		  Style linespoints
+	  }
+	  Curve {
+	  	  legend "convection { amont } 3D"
+		  origin "Trio_U"
+		  segment ./Poreux_3D/Poreux_VEF_3D SEG_P
+		  Style linespoints
+	  }
+	  Curve {
+	       	  legend "Analytique"
+		  origin "Analytique"
+		  segment ./Poreux_2D/Poreux_VEF_2D SEG_P 
+		  columns $1 (-2.5)*($1>0.8)*($1-1)+($1<=0.8)*($1>=0.2)*(-10*($1-0.8)+0.5-1.5)+($1<0.2)*(-2.5*($1-0.2)+(0.5+6.))
+		  Style linespoints
+	  }
+	  }
+
+	   Figure {
+	   Title "Temperature profile in case 1)
+	   Description "The temperature is given constant and equal to 1°C"
+	   Dimension 2
+	   Width 12cm
+	   Include_Description_Curves 0
+	   LabelX "x (m)"
+	   LabelY "Temperature (°C)"
+	   RangeY 0.99 1.01
+	   Curve {
+	   	   legend "convection { amont } 2D"
+		   origin "Trio_U"
+		   segment ./Poreux_2D/Poreux_VEF_2D SEG_T	
+		   Style linespoints
+	   }
+	   Curve {
+		   legend "Analytique"
+		   origin "Analytique"
+		   segment ./Poreux_2D/Poreux_VEF_2D SEG_T
+		   columns ($1) (1)
+		   Style linespoints
+	   }
+	   }
+}
+
+Chapter {
+
+	  Title "Results with EF-stab scheme on QDM for the same 3D channel"
+	  Description "The results are not ok. In fact using EF_stab in QDM doesn't respect Bernouilli equation anymore."
+	  Figure {
+	  Title "Velocity along x"
+	  Description "The analytical result is given by div($\psi$ U)=0"
+	  Include_Description_Curves 0
+	  Dimension 2
+	  Width 12cm
+	  LabelX "X (m)"
+	  LabelY "U (m/s)"
+	  RangeY 0.95 2.05
+	  Curve {
+		legend "convection { EF_stab } 3D"
+		origin "Trio_U"
+		segment ./Poreux_3D_EFstab/Poreux_VEF_3D_EFstab SEG_U1	
+		Style linespoints
+	  }
+	  Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_2D/Poreux_VEF_2D SEG_U1 
+		columns $1 (1)/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)
+		Style linespoints
+	  }
+	  }
+
+	  Figure {
+	  Title "Pressure profile in case 1 and EF_stab convection scheme"
+	  Description "The analytical result is given by 1/2*$\rho$*$U^2$ + P = cte and by regular pressure loss over all the domain (see above)"
+          Description "The EF_stab scheme in the convection term of the QDM equation calculates ($\psi$ U)grad U and not div($\psi$U U), assuming that div U=0 which is not true here. So, the pressure variation in the porous zone does not correspond to analytical solution."
+	  Dimension 2
+	  Width 12cm
+	  Include_Description_Curves 0
+	  LabelX "x (m)"
+	  LabelY "P/density (N.m/kg)"
+	  Curve {
+		legend "convection { EF_stab } 3D"
+		origin "Trio_U"
+		segment ./Poreux_3D_EFstab/Poreux_VEF_3D_EFstab SEG_P	
+		Style linespoints
+	  }
+	  Curve {
+		legend "Analytique"
+
+		origin "Analytique"
+		segment ./Poreux_2D/Poreux_VEF_2D SEG_P 
+		columns $1 (-2.5)*($1>0.8)*($1-1)+($1<=0.8)*($1>=0.2)*(-10*($1-0.8)+0.5-1.5)+($1<0.2)*(-2.5*($1-0.2)+(0.5+6.))
+		Style linespoints
+	  }
+	  }
+
+	Figure {
+	Title "Temperature profile in case 1 and EF_stab scheme"
+	Description "The temperature is constant and equal to 1°C"
+	Dimension 2
+	Width 12cm
+	Include_Description_Curves 0
+	LabelX "x (m)"
+	LabelY "Temperature (°C)"
+	RangeY 0.99 1.01
+	Curve {
+		legend "convection { EF_stab } 3D"
+		origin "Trio_U"
+		segment ./Poreux_3D_EFstab/Poreux_VEF_3D_EFstab SEG_T	
+		Style linespoints
+	}
+	Curve {
+		legend "Analytique"
+		origin "Analytique"
+		segment ./Poreux_2D/Poreux_VEF_2D SEG_T
+		columns ($1) (1)
+		Style linespoints
+	}
+	}
+}
+
+Chapter {
+	  Title "2D channel with non uniform porosity and regular pressure loss only on the porous zone (Test case 2)."
+	  Description "As it can be seen below, the results with Upwind (Amont) convection scheme are ok."
+	  Figure {
+	  Title "Velocity along x"
+	  Description "The analytical result is given by div($\psi$ U)=0 as in test case 1."
+	  Dimension 2
+	  Width 12cm
+	  LabelX "X (m)"
+	  LabelY "U (m/s)"
+	  RangeY 0.95 2.05
+	  Include_Description_Curves 0
+	  Curve {
+	  	  legend "convection { amont } 2D"
+		  origin "Trio_U"
+		  segment ./Poreux_Pdc_Z2_2D/Poreux_VEF_2D SEG_U1 
+		  Style linespoints
+	  }
+	  Curve {
+	  	  legend "Analytique"
+		  origin "Analytique"
+		  segment ./Poreux_2D/Poreux_VEF_2D SEG_U1 
+		  columns $1 (1)/(1-0.5*($1>0.2)*($1<0.8)-(($1==0.2)+($1==0.8))*0.33)
+		  Style linespoints
+	  }
+	  }
+
+	  Figure {
+	          Title "Pressure profile with pressure loss only over the porous zone (case 2)"
+          	  Description "The analytic solution for pressure along x is given by :"
+                  Description "a) 1/2*$U^2$ + P/$\rho$ = cte "
+                  Description "and by the regular pressure loss ONLY in zone 2 :"
+                  Description "b) 1/$\rho$ $\Delta$P/dx=-1/2 $\lambda$ $U^2$/dhy"
+                  Description "__________________________________________________________"
+                  Description "So, from a) :
+                  Description "zone 3 : P/$\rho$ = 0, so cte = 1/2*$U3^2$"
+                  Description "zone 2 : P/$\rho$ = 1/2*($U3^2$-$U2^2$)"
+                  Description "zone 1 : P/$\rho$ = 0"
+                  Description "From b) :
+                  Description "zone 3 and 1 : 1/$\rho$ $\Delta$P/dx=0"
+                  Description "zone 2 ______ : 1/$\rho$ $\Delta$P/dx=-1/2 $\lambda$ $U2^2$/dhy"
+                  Description "__________________________________________________________"
+                  Description "With the present values of Dhy, $\psi$ and U1, it comes : "
+                  Description "Zone 3 : P/$\rho$ = 0.*(x-1.)"
+                  Description "Zone 2 : P/$\rho$ = 0. - 10*(x-0.8) - 1.5"
+                  Description "Zone 1 : P/$\rho$ = 0. + 6 - 0.*(x-0.2)"
+	          Dimension 2
+	          Width 12cm
+	          Include_Description_Curves 0
+	          LabelX "x (m)"
+	          LabelY "P/density (N.m/kg)"
+	          Curve {
+		          legend "convection { amont } 2D"
+		          origin "Trio_U"
+		          segment ./Poreux_Pdc_Z2_2D/Poreux_VEF_2D SEG_P
+		          Style linespoints
+	          }
+	          Curve {
+		          legend "Analytique"
+		          origin "Analytique"
+		          segment ./Poreux_Pdc_Z2_2D/Poreux_VEF_2D SEG_P 
+		          columns $1 (0.)*($1>0.8)*($1-1)+($1<=0.8)*($1>=0.2)*(-10*($1-0.8)-1.5)+($1<0.2)*(0*($1-0.2)+(6.))
+		          Style linespoints
+	          }
+	          }
+
+	  Figure {
+	  Title "Temperature profile in case 2"
+	  Description "The temperature is constant and equal to 1°C."
+	  Dimension 2
+	  Width 12cm
+	  Include_Description_Curves 0
+	  LabelX "x (m)"
+	  LabelY "Temperature (°C)"
+	  RangeY 0.99 1.01
+	  Curve {
+		  legend "convection { amont } 2D"
+		  origin "Trio_U"
+		  segment ./Poreux_Pdc_Z2_2D/Poreux_VEF_2D SEG_T	
+		  Style linespoints
+	  }
+	  Curve {
+		  legend "Analytique"
+		  origin "Analytique"
+		  segment ./Poreux_Pdc_Z2_2D/Poreux_VEF_2D SEG_T
+		  columns ($1) (1)
+		  Style linespoints
+	  }
+	  }
+}
+
+Chapter {
+        Title "Recommendations for users"
+        Description "In such a porous modelisation, use the Upwind (Amont) convection scheme for the QDM equation."
+}
+
+Chapter {
+        Title "Computing performance"
+        Description "The calculations have run on a Linux PC."
+        Description " "
+        Tableau_performance {
+        }
+}
+

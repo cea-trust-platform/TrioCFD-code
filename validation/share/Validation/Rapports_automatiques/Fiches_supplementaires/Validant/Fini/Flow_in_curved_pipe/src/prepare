@@ -1,0 +1,21 @@
+#!/bin/sh
+
+[ ! -f Tube_coude_463259.msh ] && gunzip Tube_coude_463259.msh.gz
+
+# Creation des repertoires #
+mkdir -p Muscl EF_stab
+cd Muscl
+cp ../box.data .
+cp ../post_run .
+cp ../pre_run .
+cp ../tube_coude.data .
+cd ..
+
+cd EF_stab
+cp ../box.data .
+cp ../post_run .
+cp ../pre_run .
+sed "s/convection { muscl }/convection { EF_stab { alpha 0.2 } }/" ../tube_coude.data > tube_coude.data
+
+cd ..
+

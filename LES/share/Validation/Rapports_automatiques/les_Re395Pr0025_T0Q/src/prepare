@@ -1,0 +1,49 @@
+#!/bin/bash
+
+mkdir -p VDF
+mkdir -p VEF_RK
+mkdir -p VEF_Implicite
+mkdir -p VEF_Implicite_muscl
+mkdir -p VEF_Implicite_FS1
+mkdir -p VEF_Implicite_ICEM
+
+cp post_run_ICEM VEF_Implicite_ICEM/post_run
+
+cp post_run VDF
+cp post_run VEF_RK
+cp post_run VEF_Implicite
+cp post_run VEF_Implicite_muscl
+cp post_run VEF_Implicite_FS1
+
+
+cp les_Re395Pr0025_T0Q_VDF.data VDF/les_Re395Pr0025_T0Q.data
+
+sed "s/_SCHTPS_/sch_RK/" les_Re395Pr0025_T0Q_VEF.data > VEF_RK/les_Re395Pr0025_T0Q.data
+
+sed "s/_SCHTPS_/sch_impl/" les_Re395Pr0025_T0Q_VEF.data > VEF_Implicite/les_Re395Pr0025_T0Q.data
+
+cp VEF_Implicite/les_Re395Pr0025_T0Q.data VEF_Implicite_muscl
+cd VEF_Implicite_muscl
+sed "s/ef_stab { volumes_etendus alpha 0.2 }/muscl/" les_Re395Pr0025_T0Q.data >toto.data
+sed "s/ef_stab { volumes_etendus alpha 1 }/muscl/" toto.data > les_Re395Pr0025_T0Q.data
+rm toto.data
+cd ..
+
+
+sed "s/facsec_max 4/facsec_max 1/" VEF_Implicite/les_Re395Pr0025_T0Q.data > VEF_Implicite_FS1/les_Re395Pr0025_T0Q.data
+
+cd VEF_Implicite_ICEM
+cp ../les_Re395Pr0025_T0Q_VEF_ICEM.data les_Re395Pr0025_T0Q.data
+cp ../post_run_ICEM post_run
+cp ../trio_DOM_geo.asc .
+cp ../geom.data .
+cp ../decoupe.data .
+
+$exec geom 1>geom.out 2>geom.err
+$exec decoupe 1>decoupe.out 2>decoupe.err
+echo fin du prepare
+cd ..
+
+
+
+

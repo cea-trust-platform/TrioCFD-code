@@ -1,0 +1,141 @@
+# Thermohydraulique 2D turbulent sous maille et Boussinesq #
+# PARALLEL OK #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Cavite 
+		{
+		Origine 0. 0. 0.
+     		Nombre_de_Noeuds 11 11 11
+		Longueurs 0.01 0.01 0.01
+		}
+		{
+		Bord Gauche X = 0.    0. <= Y <= 0.01 0. <= Z <= 0.01
+		Bord Haut   Y = 0.01  0. <= X <= 0.01 0. <= Z <= 0.01
+		Bord Bas    Y = 0.    0. <= X <= 0.01 0. <= Z <= 0.01
+		Bord Droit  X = 0.01  0. <= Y <= 0.01 0. <= Z <= 0.01
+		Bord Sud    Z = 0.    0. <= X <= 0.01 0. <= Y <= 0.01
+		Bord Nord   Z = 0.01  0. <= X <= 0.01 0. <= Y <= 0.01
+		}
+}
+
+      
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 2 1 1 }
+	Larg_joint 1
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax 1.2
+	dt_impr 0.00001
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.17
+	lambda Champ_Uniforme 1 0.0262 
+	Cp Champ_Uniforme 1 1006
+	beta_th Champ_fonc_fonction 1 temperature 1/val
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 -9.81 0
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent 
+	{
+		solveur_pression GCP { 
+			precond ssor { omega 1.500000 } 
+			seuil 1.000000e-20 
+			impr 
+		}
+		convection { amont }
+		diffusion { }
+		sources { boussinesq_temperature { T0 5. } }
+		conditions_initiales {
+			vitesse Champ_Uniforme 3 0. 0. 0.
+			}
+		boundary_conditions {
+			Haut paroi_fixe
+			Bas paroi_fixe
+			Gauche paroi_fixe
+			Droit paroi_fixe
+			Sud paroi_fixe
+			Nord paroi_fixe
+		}
+		modele_turbulence sous_maille 
+		{
+			Turbulence_paroi loi_standard_hydr
+		}
+	}
+	Convection_Diffusion_Temperature_Turbulent
+	{
+		diffusion { }
+		convection { amont }
+		boundary_conditions 
+		{
+			Haut paroi_adiabatique
+			Bas paroi_adiabatique
+ 			Gauche paroi_temperature_imposee Champ_Front_Uniforme 1 10. 
+			Droit paroi_temperature_imposee Champ_Front_Uniforme 1 0.  
+			Sud paroi_temperature_imposee Champ_Front_Uniforme 1 2. 
+			Nord paroi_temperature_imposee Champ_Front_Uniforme 1 5. 
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 5. }
+		modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire }
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_pression pression periode 0.01 points 2 0.0005 0.0045 0.0015 0.0045 0.0045 0.0015
+			sonde_vitesse vitesse periode 0.01 points 5 0.0005 0.004 0.0015 0.0015 0.004 0.0015 0.0025 0.004 0.0015 0.0035 0.004 0.0015 0.0045 0.004 0.0015
+			sonde_temp temperature periode 0.01 points 2 0.0005 0.0045 0.0015 0.0045 0.0045 0.0015
+			sonde_nut viscosite_turbulente periode 0.01 points 2 0.0005 0.0045 0.0015 0.0045 0.0045 0.0015
+			sonde_k k periode 0.01 points 2 0.0005 0.0045 0.0015 0.0045 0.0045 0.0015
+		}
+		Champs dt_post 0.7
+		{
+			pression elem
+			vitesse elem
+			temperature elem
+			k elem
+			viscosite_turbulente elem
+			vorticite elem
+		}
+	}
+}
+
+Solve pb
+Fin

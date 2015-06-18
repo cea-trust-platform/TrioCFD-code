@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#Creation des repertoires
+mkdir -p ./1D/SF
+mkdir -p ./2D/FLAT
+mkdir -p ./2D/PARABOLIC
+#
+RACINE=`pwd`
+###
+# Cas 1D/SF
+cd $RACINE/1D/SF
+cp $RACINE/1D_test.data test.data
+
+# Cas 2D/para
+cd $RACINE/2D/PARABOLIC
+cp $RACINE/2D_test.data test.data
+cp $RACINE/post_run .
+
+# Cas 2D/flat
+cd $RACINE/2D/FLAT
+cp $RACINE/2D_test.data test.data
+sed "s/vitesse champ_fonc_xyz dom/vitesse Champ_Uniforme/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/champ_front_fonc_xyz/champ_front_Uniforme/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/fonc_xyz  3/Uniforme  3/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/29729.87372\*(0.0274\*x-x\*x)/3.72/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/gauche   paroi_fixe/gauche   symetrie/" test.data > modifie.data
+mv modifie.data test.data
+sed "s/droit    paroi_fixe/droit   symetrie/" test.data > modifie.data
+mv modifie.data test.data
+
+

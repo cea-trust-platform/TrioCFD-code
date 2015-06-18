@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# Repertoire contenant les resultats theoriques
+#mkdir -p theorie
+#cp cond.data theorie
+#cp sol_ana.sh theorie
+#cd theorie
+#sh sol_ana.sh cond
+#cd ..
+
+# Repertoire(s) de calcul raffine
+mkdir -p calcul_raff
+cp cond.data calcul_raff
+cp post_run calcul_raff
+
+# Repertoire(s) de calcul avec raffinement moyen
+mkdir -p calcul_medium
+cp cond.data calcul_medium
+cp post_run calcul_medium
+cd  calcul_medium
+sed "s/Nombre_de_Noeuds 76 7 7/Nombre_de_Noeuds 26 3 3/" cond.data > temp.data
+mv temp.data cond.data
+cd ..
+
+# Repertoire(s) de calcul avec raffinement plajest
+mkdir -p calcul_plajest
+cp cond.data calcul_plajest
+cp post_run calcul_plajest
+cd  calcul_plajest
+sed "s/Nombre_de_Noeuds 76 7 7/Nombre_de_Noeuds 13 2 2/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/segment 51/segment 16/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec 200./facsec 50./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec_max 500./facsec_max 70./" cond.data > temp.data
+mv temp.data cond.data
+cd ..
+
+# Repertoire(s) de calcul avec raffinement plajest calcul explicite
+mkdir -p calcul_plajest_expl
+cp cond.data calcul_plajest_expl
+cp post_run calcul_plajest_expl
+cd  calcul_plajest_expl
+sed "s/Nombre_de_Noeuds 76 7 7/Nombre_de_Noeuds 13 2 2/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/segment 51/segment 16/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec 200./facsec 50./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec_max 500./facsec_max 70./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# Begin explicite/\# Begin explicite \#/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/ End explicite \#/\# End explicite \#/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# Begin implicite \#/\# Begin implicite /" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# End implicite \#/ End implicite \#/" cond.data > temp.data
+mv temp.data cond.data
+cd ..
+
+# Repertoire(s) de calcul avec raffinement plajest calcul RK3
+mkdir -p calcul_plajest_RK3
+cp cond.data calcul_plajest_RK3
+cp post_run calcul_plajest_RK3
+cd  calcul_plajest_RK3
+sed "s/Nombre_de_Noeuds 76 7 7/Nombre_de_Noeuds 13 2 2/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/segment 51/segment 16/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec 200./facsec 50./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec_max 500./facsec_max 70./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# Begin RK3/\# Begin RK3 \#/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/ End RK3 \#/\# End RK3 \#/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# Begin implicite \#/\# Begin implicite /" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# End implicite \#/ End implicite \#/" cond.data > temp.data
+mv temp.data cond.data
+cd ..
+
+# Repertoire(s) de calcul avec raffinement plajest et maillage etire
+mkdir -p calcul_plajest_etire
+cp cond.data calcul_plajest_etire
+cp post_run calcul_plajest_etire
+cd  calcul_plajest_etire
+sed "s/Nombre_de_Noeuds 76 7 7/Nombre_de_Noeuds 13 2 2/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/segment 51/segment 16/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec 200./facsec 50./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/facsec_max 500./facsec_max 70./" cond.data > temp.data
+mv temp.data cond.data
+sed "s/0.001/0.005/g" cond.data > temp.data
+mv temp.data cond.data
+sed "s/0.00075 0.00025/0.00375 0.00125/g" cond.data > temp.data
+mv temp.data cond.data
+sed "s/fluct_temp1  nodes temperature periode 0.01 points 1 0.005/fluct_temp1  nodes temperature periode 0.01 points 1 0.001/g" cond.data > temp.data
+mv temp.data cond.data
+cd ..
+
+# Repertoire(s) de calcul avec maillage icem
+mkdir -p calcul_icem
+cp cond.data calcul_icem
+cp post_run calcul_icem
+cd calcul_icem
+sed "s/dom1/DOM_DOM/g" cond.data > temp.data
+mv temp.data cond.data
+sed "s/Gauche/Gauch/g" cond.data > temp.data
+mv temp.data cond.data
+sed "s/Droite/Droit/g" cond.data > temp.data
+mv temp.data cond.data
+sed "s/Devant/Devan/g" cond.data > temp.data
+mv temp.data cond.data
+sed "s/Derriere/Derri/g" cond.data > temp.data
+mv temp.data cond.data
+
+sed "s/\# BEGIN MESH \#/\# BEGIN MESH /" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# END MESH \#/ END MESH \#/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# Read_unsupported_ASCII_file_from_ICEM DOM_DOM ..\/trio_DOM_geo.asc \#/Read_unsupported_ASCII_file_from_ICEM DOM_DOM ..\/trio_DOM_geo.asc/" cond.data > temp.data
+mv temp.data cond.data
+sed "s/\# Transformer DOM_DOM 0.001\*x 0.001\*y 0.001\*z \#/Transformer DOM_DOM 0.001\*x 0.001\*y 0.001\*z/" cond.data > temp.data
+mv temp.data cond.data

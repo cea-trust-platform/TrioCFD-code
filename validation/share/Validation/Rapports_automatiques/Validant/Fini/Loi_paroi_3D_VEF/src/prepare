@@ -1,0 +1,181 @@
+#!/bin/bash
+mkdir -p A_TC_1 A_TC_2 A_TC_3 A_TH_1 A_TH_2 A_TH_3 A_T_1 A_T_2 A_T_3 B_TC_1 B_TH_1 B_T_1 
+mkdir -p C_TC_x17z5 C_TC_x5z17 C_TC_x5z9 C_TC_x9z5 C_TH_x9z3 C_TH_x3z9 C_TH_x3z5 C_TH_x5z3 C_T_x17z5 C_T_x5z17 C_T_x5z9 C_T_x9z5
+chmod +w *
+
+cd A_T_1
+cp ../LM_y20.data .
+cp ../post_run .
+
+
+cd ../A_T_2
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/convection { EF defaut_bar }/convection { muscl }/" LM_y20.data > modifie.data
+sed "s/diffusion  { standard defaut_bar }/diffusion  {  }/" modifie.data > LM_y20.data
+sed "/Sources { Source_Qdm_lambdaup { lambda  2. } }/d" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../A_T_3
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/convection { EF defaut_bar }/convection { amont }/" LM_y20.data > modifie.data
+sed "s/diffusion  { standard defaut_bar }/diffusion  {  }/" modifie.data > LM_y20.data
+sed "/Sources { Source_Qdm_lambdaup { lambda  2. } }/d" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../A_TC_1
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 5/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../A_TC_2
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 5/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+sed "s/convection { EF defaut_bar }/convection { muscl }/" LM_y20.data > modifie.data
+sed "s/diffusion  { standard defaut_bar }/diffusion  {  }/" modifie.data > LM_y20.data
+sed "/Sources { Source_Qdm_lambdaup { lambda  2. } }/d" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../A_TC_3
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 5/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+sed "s/convection { EF defaut_bar }/convection { amont }/" LM_y20.data > modifie.data
+sed "s/diffusion  { standard defaut_bar }/diffusion  {  }/" modifie.data > LM_y20.data
+sed "/Sources { Source_Qdm_lambdaup { lambda  2. } }/d" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../A_TH_1
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 3 7 3/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../A_TH_2
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 3 7 3/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+sed "s/convection { EF defaut_bar }/convection { muscl }/" LM_y20.data > modifie.data
+sed "s/diffusion  { standard defaut_bar }/diffusion  {  }/" modifie.data > LM_y20.data
+sed "/Sources { Source_Qdm_lambdaup { lambda  2. } }/d" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../A_TH_3
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 3 7 3/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+sed "s/convection { EF defaut_bar }/convection { amont }/" LM_y20.data > modifie.data
+sed "s/diffusion  { standard defaut_bar }/diffusion  {  }/" modifie.data > LM_y20.data
+sed "/Sources { Source_Qdm_lambdaup { lambda  2. } }/d" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../B_T_1
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 5/" LM_y20.data > LM_y40.data
+rm LM_y20.data
+
+cd ../B_TC_1
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 4 5/" LM_y20.data > LM_y40.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" LM_y40.data > LM_y20.data
+mv LM_y20.data LM_y40.data 
+
+cd ../B_TH_1
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 3 4 3/" LM_y20.data > LM_y40.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" LM_y40.data > LM_y20.data
+mv LM_y20.data LM_y40.data
+
+cd ../C_T_x9z5
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 9 13 5/" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../C_T_x17z5
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 17 13 5/" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../C_T_x5z9
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 13 9/" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../C_T_x5z17
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 13 17/" LM_y20.data > modifie.data
+mv modifie.data LM_y20.data
+
+cd ../C_TC_x9z5
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 9 7 5/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TC_x17z5
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 17 7 5/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TC_x5z9
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 9/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TC_x5z17
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 17/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene_compact/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TH_x5z3
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 5 7 3/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TH_x9z3
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 9 7 3/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TH_x3z5
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 3 7 5/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ../C_TH_x3z9
+cp ../LM_y20.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 5 13 5/Nombre_de_Noeuds 3 7 9/" LM_y20.data > modifie.data
+sed "s/Tetraedriser/Tetraedriser_homogene/" modifie.data > LM_y20.data
+rm modifie.data
+
+cd ..

@@ -1,0 +1,44 @@
+message()
+{
+   [ $1 != $2 ] && echo $ECHO_OPTS "Error ($1!=$2) when checking:\n $msg" && export err=1
+   [ $debog = 1 ] && echo $msg
+}
+jdd=`pwd`;jdd=`basename $jdd`
+debog=0 && [ "$1" = "-print" ] && debog=1
+err=0
+
+##############
+# Comparaison resultats identiques entre C_D_Temperature_Turb et C_D_Concentration_Turb
+##############
+
+#################
+# Comparaison lml
+#################
+cp $jdd.lml $jdd"_LML".lml
+echo -e "1,$ s?TEMPERATURE?CONCENTRATION?g\nw" | ed $jdd"_LML".lml 1>/dev/null 2>&1
+compare_lata $jdd"_LML".lml C_$jdd"_LML".lml 1>compare_lata.log 2>&1
+[ $? != 0 ] && echo $ECHO_OPTS "Error when comparing $jdd"_LML".lml C_$jdd"_LML".lml files:" && cat compare_lata.log
+
+##################
+# Comparaison .son
+##################
+for son in `ls $jdd"_"*.son`
+do
+   msg="Sondes identiques entre $son C_$son"
+   compare_sonde $son C_$son 1>compare_sonde.log 2>&1
+   message $? 0
+done
+
+
+##################
+# Comparaison .out
+##################
+for out in `ls $jdd"_"*.out 2>/dev/null | grep -v Force_pression`
+do
+   T_out=$out
+   C_out=`echo C_$T_out | awk '{sub("chaleur","concentration",$0);print $0}'`
+   msg="Fichiers bilans identiques entre $T_out $C_out"
+   compare_sonde $T_out $C_out 1>compare_sonde.log 2>&1
+   message $? 0
+done
+exit $err

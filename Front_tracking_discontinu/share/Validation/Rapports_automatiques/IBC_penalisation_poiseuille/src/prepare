@@ -1,0 +1,8 @@
+mkdir -p nopena
+
+cp pena/*.data pena/pre_run pena/*.geom nopena/
+cp post_run pena
+cp post_run nopena
+
+chmod +w nopena/*
+grep -v  penalisation_forcage pena/poiseuille.data > nopena/poiseuille.data

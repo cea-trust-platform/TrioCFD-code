@@ -1,0 +1,132 @@
+# Hydraulique et concentration en 2D_axi #
+# PARALLEL RUNS #
+dimension 2
+Bidim_Axi
+
+Pb_hydraulique_Concentration pb
+Domaine dom_1
+
+# BEGIN MESH #
+Read_file dom_1 BURATTI_M1.geom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_1
+{
+	Partitionneur tranche { tranches 1 12 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom_1
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0
+	tmax 20.
+	dt_min 1.e-6
+	dt_max 0.002
+	dt_impr 0.01
+	dt_sauv 100
+	seuil_statio 1.e-5
+        # nb_pas_dt_max 3 #
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu	Champ_Uniforme 1 1.e-3
+	rho	Champ_Uniforme 1 1000
+}
+
+Constituant c
+Read c
+{
+coefficient_diffusion Champ_Uniforme 1 1.e-8
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom_1
+Associate pb sch
+Associate pb fluide
+Associate pb c
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+	 	solveur_pression petsc Cholesky { }
+		convection { quick }
+		diffusion { }
+		
+		conditions_initiales
+		{
+			vitesse Champ_Uniforme 2 0. 0.
+		}
+		boundary_conditions
+		{
+			sortie	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			entree	frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 2  0. 4.255*0.00625+4.255*0.019*PI*sin(2*PI*t)
+			paroi	paroi_fixe
+			axe	symetrie
+			disque_disque paroi_fixe
+			couronne paroi_fixe
+		}
+		
+	}
+	Convection_diffusion_Concentration
+	{
+		diffusion { negligeable }
+		convection { negligeable }
+		
+		conditions_initiales
+		{
+			concentration Champ_Uniforme 1 0.
+		}
+		boundary_conditions
+		{
+			sortie	frontiere_ouverte_concentration_imposee Champ_Front_Uniforme 1 0.
+			entree	frontiere_ouverte_concentration_imposee Champ_Front_Uniforme 1 0.
+			paroi	Paroi
+			axe	symetrie
+			disque_disque Paroi
+			couronne Paroi
+			
+		}
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_pres_bas  pression      periode 0.1 points 1 0.01125 0.01
+			sonde_vit_bas   vitesse	      periode 0.1 points 1 0.01125 0.01
+			sonde_pres_mil  pression      periode 0.1 points 1 0.01125 0.300
+			sonde_vit_mil   vitesse	      periode 0.1 points 1 0.01125 0.300
+			sonde_pres_haut pression      periode 0.1 points 1 0.01125 0.614
+			sonde_vit_haut  vitesse	      periode 0.1 points 1 0.01125 0.614	
+		}
+		
+		Format lata
+		Champs dt_post 1
+		{
+			vitesse		elem
+		}
+	}
+	sauvegarde_simple xyz hydraulique.xyz
+}
+
+Solve pb
+End

@@ -1,0 +1,135 @@
+dimension 2
+Pb_hydraulique_concentration_turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+        Pave Cavite
+                {
+                Origine 0. 0.01
+                Nombre_de_Noeuds 11 11
+                Longueurs 0.01 0.01
+                }
+                {
+                Bord Entree 			X = 0.  	0.01 <= Y <= 0.02
+                Bord Haut 			Y = 0.02  	0. <= X <= 0.01
+                Raccord local homogene 	Contact Y = 0.01     	0. <= X <= 0.01
+                Bord Sortie 			X = 0.01 	0.01 <= Y <= 0.02
+                }
+}
+Trianguler_H dom
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0
+	tmax 15.0
+        nb_pas_dt_max 2
+	dt_min 5.e-7
+	dt_max 5.
+	dt_impr 5.e-5
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+        rho Champ_Uniforme 1 2.
+	beta_co Champ_Uniforme 1 0.1
+}
+
+Constituant c
+Lire c
+{
+	coefficient_diffusion Champ_Uniforme 1 0.0262
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0 0
+
+Associate fluide gravite
+
+
+Associate pb dom
+Associate pb fluide
+Associate pb sch
+Associate pb c
+Discretize pb dis
+
+# sources { boussinesq_concentration { C0 278 } }  #
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-9 }	
+		convection { muscl } 
+		diffusion { }
+		
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+                        Contact   	paroi_fixe
+                        Haut 		paroi_fixe
+                        Sortie 		frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+                        Entree 		frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 .1 0.
+		}
+		modele_turbulence sous_maille { turbulence_paroi loi_standard_hydr }
+	}
+        Convection_Diffusion_Concentration_turbulent
+        {
+                diffusion { }
+                convection { muscl }
+                boundary_conditions 
+                {
+                        Contact   	Paroi_flux_impose Champ_Front_Uniforme 1 0.
+                        Haut 		Paroi_flux_impose Champ_Front_Uniforme 1 200.
+                        Sortie 		frontiere_ouverte C_ext Champ_Front_Uniforme 1 283
+                        Entree  	frontiere_ouverte_concentration_imposee Champ_Front_Uniforme 1 283
+                }
+                conditions_initiales { Concentration Champ_Uniforme 1 283 }
+		modele_turbulence Schmidt { Turbulence_paroi loi_standard_hydr_scalaire Scturb 1.0 }
+        }
+
+	Postraitements
+	{
+	lml {
+               Sondes {
+                        vitesse vitesse 	periode 0.001 point 1 0.005 0.015
+                        scalaire concentration 	periode 0.001 point 1 0.005 0.015
+                }
+		format lml Champs dt_post 10.
+		{
+			pression_pa som
+			vitesse som
+			concentration som
+		}
+	}
+	lata {
+		format lata Champs dt_post 10.
+		{
+			vitesse faces
+			concentration faces
+		}
+	}
+	}
+}
+Solve pb
+Fin

@@ -1,0 +1,368 @@
+#!/bin/bash
+mkdir -p FC_VDF_Bouss FC_VDF_QC FC_VEF_Bouss FC_VEF_QC MC_VDF_Bouss_amont_01 MC_VDF_Bouss_amont_01_ss_coin MC_VDF_Bouss_amont_02 MC_VDF_Bouss_amont_10 MC_VDF_Bouss_amont_10_ss_coin
+mkdir -p MC_VDF_Bouss_amont_2 MC_VDF_QC_amont_01 MC_VDF_QC_amont_02 MC_VDF_QC_amont_10 MC_VDF_QC_amont_2 MC_VEF_Bouss_amont_01 MC_VEF_Bouss_amont_02 MC_VEF_Bouss_amont_10 MC_VEF_Bouss_amont_2 MC_VEF_Bouss_muscl_01 MC_VEF_Bouss_muscl_02 MC_VEF_Bouss_muscl_10 MC_VEF_Bouss_muscl_2 MC_VEF_QC_muscl_01 MC_VEF_QC_muscl_02 MC_VEF_QC_muscl_10 MC_VEF_QC_muscl_10_grossier MC_VEF_QC_muscl_2
+
+
+#generation du fichier MixConv_QC_VEF a partir de Mixconv_QC
+sed "s/option_VDF { traitement_coins oui }/ /" Mixconv_QC.data > modifie.data
+sed "s/VDF dis/Trianguler_H dom\nVEFPreP1B dis/" modifie.data > MixConv_QC_VEF.data
+sed "s/dt_impr 5.e-1/dt_impr 1./" MixConv_QC_VEF.data > modifie.data
+sed "s/dt_sauv 10./dt_sauv 1./" modifie.data > MixConv_QC_VEF.data
+sed "s/facsec 1./facsec 2./" MixConv_QC_VEF.data > modifie.data
+sed "s/solveur_pression Cholesky { }/solveur_pression GcP { seuil 1.e-8 precond ssor { omega 1.2 } }/" modifie.data > MixConv_QC_VEF.data
+sed "s/amont/muscl/g" MixConv_QC_VEF.data > modifie.data
+sed "s/Gauche  paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1  297.65  H_imp Champ_Front_Uniforme 1  1.e11/Gauche  paroi_temperature_imposee Champ_Front_Uniforme 1  297.65/" modifie.data > MixConv_QC_VEF.data
+rm modifie.data
+
+#generation du fichier FC_VDF_QC a partir de Mixconv_QC
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0./" Mixconv_QC.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0./" modifie.data > FC_VDF_QC.data
+rm modifie.data
+
+#generation du fichier FC_VEF_QC a partir de MixConv_QC_VEF
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0./" MixConv_QC_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0./" modifie.data > FC_VEF_QC.data
+rm modifie.data
+
+
+#generation du fichier MixConv_VEF a partir de MixConv
+sed "s/option_VDF { traitement_coins oui }/ /" MixConv.data > modifie.data
+sed "s/VDF dis/Trianguler_H dom\nVEFPreP1B dis/" modifie.data > MixConv_VEF.data
+sed "s/Nombre_de_Noeuds 61  81/Nombre_de_Noeuds 61 61/" MixConv_VEF.data > modifie.data
+sed "s/Facteurs  1.05 1. Symy/Facteurs  1.05 1./" modifie.data > MixConv_VEF.data
+sed "s/facsec 1./facsec 2./" MixConv_VEF.data > modifie.data
+sed "s/tmax  40./tmax  10./" modifie.data > MixConv_VEF.data
+sed "s/dt_min 1.e-9/dt_min 1.e-15/" MixConv_VEF.data > modifie.data
+sed "s/dt_impr 1.e1/dt_impr 5.e-4/" modifie.data > MixConv_VEF.data
+sed "s/seuil_statio 1.e-8/seuil_statio 1.e-4/" MixConv_VEF.data > modifie.data
+sed "s/Bas     Frontiere_ouverte_Temperature_imposee Champ_Front_Uniforme 1 0./Bas     Frontiere_ouverte T_ext Champ_Front_Uniforme 1 0/" modifie.data > MixConv_VEF.data
+sed "s/Gauche  paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1  1.  H_imp Champ_Front_Uniforme 1  1.e11/Gauche  paroi_temperature_imposee Champ_Front_Uniforme 1 1./" MixConv_VEF.data > modifie.data
+mv modifie.data MixConv_VEF.data
+
+#generation du fichier FC_VDF_Bouss a partir de MixConv
+sed "s/dt_impr 1.e1/dt_impr 1.e-5/" MixConv.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0 0/" modifie.data > FC_VDF_Bouss.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0/" FC_VDF_Bouss.data > modifie.data
+sed "s/Bas     Frontiere_ouverte_Temperature_imposee Champ_Front_Uniforme 1 0./Bas     Frontiere_ouverte T_ext Champ_Front_Uniforme 1 0/" modifie.data > FC_VDF_Bouss.data
+rm modifie.data
+
+#generation du fichier FC_VEF_Bouss a partir de MixConv_VEF
+sed "s/amont/muscl/g" MixConv_VEF.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 0./" modifie.data > FC_VEF_Bouss.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0./" FC_VEF_Bouss.data > modifie.data
+mv modifie.data FC_VEF_Bouss.data
+
+cd FC_VDF_Bouss
+cp ../FC_VDF_Bouss.data .
+cp ../FC_post_run .
+mv FC_post_run post_run
+sed "s/tmax  40./tmax  0.005 /" FC_VDF_Bouss.data > modifie.data
+mv modifie.data FC_VDF_Bouss.data
+
+
+
+cd ../FC_VDF_QC
+cp ../FC_VDF_QC.data .
+cp ../FC_post_run .
+mv FC_post_run post_run
+sed "s/Bouss/QC/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+sed "s/Bouss/QC/" post_run > modifie
+mv modifie post_run
+
+cd ../FC_VEF_Bouss
+cp ../FC_VEF_Bouss.data .
+cp ../FC_post_run .
+mv FC_post_run post_run
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/VDF/VEF/" modifie > post_run
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.002 /" FC_VEF_Bouss.data > modifie.data
+mv modifie.data FC_VEF_Bouss.data
+
+cd ../FC_VEF_QC
+cp ../FC_VEF_QC.data .
+cp ../FC_post_run .
+mv FC_post_run post_run
+sed "s/Bouss/QC/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+sed "s/Bouss/QC/" post_run > modifie
+sed "s/VDF/VEF/" modifie > post_run
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/VDF/VEF/" modifie > post_run
+rm modifie
+sed "s/tmax  8./tmax  12. /" FC_VEF_QC.data > modifie.data
+mv modifie.data FC_VEF_QC.data
+
+
+cd ../MC_VDF_Bouss_amont_01
+cp ../MixConv.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+cd ../MC_VDF_Bouss_amont_01_ss_coin
+cp ../MixConv.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/option_VDF { traitement_coins oui }/ /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+cd ../MC_VDF_Bouss_amont_02
+cp ../MixConv.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 70710.7/" MixConv.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 70710.7/" modifie.data > MixConv.data
+rm modifie.data
+sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VDF_Bouss_amont_10
+cp ../MixConv.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 10000./" MixConv.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10000./" modifie.data > MixConv.data
+rm modifie.data
+sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+cd ../MC_VDF_Bouss_amont_10_ss_coin
+cp ../MixConv.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/option_VDF { traitement_coins oui }/ /" MixConv.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 10000./" modifie.data > MixConv.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10000./" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VDF_Bouss_amont_2
+cp ../MixConv.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 22360.7/" MixConv.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 22360.7/" modifie.data > MixConv.data
+rm modifie.data
+sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VDF_QC_amont_01
+cp ../Mixconv_QC.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/Bouss/QC/" post_run > modifie
+mv modifie post_run
+#sed "s/tmax  40./tmax  0.0003 /" MixConv.data > modifie.data
+#mv modifie.data MixConv.data
+
+
+cd ../MC_VDF_QC_amont_02
+cp ../Mixconv_QC.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 2.05/" Mixconv_QC.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.05/" modifie.data > Mixconv_QC.data
+rm modifie.data
+sed "s/Bouss/QC/" post_run > modifie
+mv modifie post_run
+
+
+cd ../MC_VDF_QC_amont_10
+cp ../Mixconv_QC.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0.29/" Mixconv_QC.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0.29/" modifie.data > Mixconv_QC.data
+rm modifie.data
+sed "s/Bouss/QC/" post_run > modifie
+mv modifie post_run
+
+cd ../MC_VDF_QC_amont_2
+cp ../Mixconv_QC.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0.6485/" Mixconv_QC.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0.6485/" modifie.data > Mixconv_QC.data
+rm modifie.data
+sed "s/Bouss/QC/" post_run > modifie
+mv modifie post_run
+
+cd ../MC_VEF_Bouss_amont_01
+cp ../MixConv_VEF.data .
+mv MixConv_VEF.data MixConv.data
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_Bouss_amont_02
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 70710.7/" MixConv_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 70710.7/" modifie.data > MixConv_VEF.data
+rm modifie.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_Bouss_amont_10
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 10000./" MixConv_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10000./" modifie.data > MixConv_VEF.data
+rm modifie.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_Bouss_amont_2
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 22360.7/" MixConv_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 22360.7/" modifie.data > MixConv_VEF.data
+rm modifie.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_Bouss_muscl_01
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
+mv modifie.data MixConv_VEF.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_Bouss_muscl_02
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 70710.7/" modifie.data > MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 70710.7/" MixConv_VEF.data > modifie.data
+mv modifie.data MixConv_VEF.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_Bouss_muscl_10
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 10000./" modifie.data > MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10000./" MixConv_VEF.data > modifie.data
+mv modifie.data MixConv_VEF.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+cd ../MC_VEF_Bouss_muscl_2
+cp ../MixConv_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 22360.7/" modifie.data > MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 22360.7/" MixConv_VEF.data > modifie.data
+mv modifie.data MixConv_VEF.data
+mv MixConv_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+mv modifie post_run
+sed "s/tmax  10./tmax  0.00017 /" MixConv.data > modifie.data
+mv modifie.data MixConv.data
+
+
+cd ../MC_VEF_QC_muscl_01
+cp ../MixConv_QC_VEF.data .
+mv MixConv_QC_VEF.data MixConv.data
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+rm modifie
+
+cd ../MC_VEF_QC_muscl_02
+cp ../MixConv_QC_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 2.05/" MixConv_QC_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.05/" modifie.data > MixConv_QC_VEF.data
+rm modifie.data
+mv MixConv_QC_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+rm modifie
+
+cd ../MC_VEF_QC_muscl_10
+cp ../MixConv_QC_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0.29/" MixConv_QC_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0.29/" modifie.data > MixConv_QC_VEF.data
+rm modifie.data
+mv MixConv_QC_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+rm modifie
+
+cd ../MC_VEF_QC_muscl_10_grossier
+cp ../MixConv_QC_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/Nombre_de_Noeuds 61  81/Nombre_de_Noeuds 31  81/" MixConv_QC_VEF.data > modifie.data
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0.29/" modifie.data > MixConv_QC_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0.29/" MixConv_QC_VEF.data > modifie.data
+mv modifie.data MixConv_QC_VEF.data
+mv MixConv_QC_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+rm modifie
+
+cd ../MC_VEF_QC_muscl_2
+cp ../MixConv_QC_VEF.data .
+cp ../MC_post_run .
+mv MC_post_run post_run
+sed "s/vitesse Champ_Uniforme 2 0. 2.9/vitesse Champ_Uniforme 2 0. 0.6485/" MixConv_QC_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 2.9/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0.6485/" modifie.data > MixConv_QC_VEF.data
+rm modifie.data
+mv MixConv_QC_VEF.data MixConv.data
+sed "s/VDF/VEF/" post_run > modifie
+sed "s/Bouss/QC/" modifie > post_run
+rm modifie
+
+cd ..

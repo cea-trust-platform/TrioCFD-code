@@ -1,0 +1,109 @@
+# SIMULATION D UN CANAL PLAN 2D avec modele Longueur de melange #
+
+dimension 2
+Pb_Hydraulique_turbulent pb
+Domaine dom
+
+# BEGIN MESH # 
+Mailler dom
+{
+Pave Cavite
+        {
+                Origine 0. 0.
+                Nombre_de_Noeuds 49 17
+                Longueurs 6. 2.
+        }
+        {
+                Bord periox   X = 0.  0. <= Y <= 2
+                Bord periox   X = 6.  0. <= Y <= 2
+                Bord bas      Y = 0.  0. <= X <= 6.
+                Bord haut     Y = 2   0. <= X <= 6.
+
+                }
+}
+Trianguler dom
+
+Distance_paroi dom 3 periox bas haut binaire
+
+# END MESH #
+
+
+VEFPreP1b dis
+
+Schema_Euler_explicite sch
+Read sch 
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 0.3
+        dt_min 1.e-7
+        dt_max 1.e-1
+	dt_start dt_calc
+        dt_impr 1.
+        dt_sauv 1.
+        seuil_statio 1.e-8  
+        facsec 1.
+}
+
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.02
+	rho Champ_Uniforme 1 2
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_turbulent
+		{
+                solveur_pression GCP {
+                        precond ssor { omega 1.5 }
+                        seuil 1.e-8
+                }
+                convection { EF_stab { } }
+                diffusion  {  }
+                Sources  { Canal_perio { bord periox } }
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz dom 2  200. 0. 
+			}
+		boundary_conditions
+			{
+			periox periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+			}
+                Modele_turbulence Longueur_Melange
+                 {
+                     turbulence_paroi loi_standard_hydr dt_impr_ustar 1.
+                     dmax 1000. fichier dom_Wall_length.xyz
+                  }
+                traitement_particulier { canal { dt_impr_moy_spat 1. } }
+	}
+
+	Postraitement
+        	{
+		format lml
+		Sondes
+			{
+			sonde_vinlet vitesse periode 0.05 Segment 90  0.0625 0. 0.0625 2		
+			}
+		Champs dt_post 5.
+			{
+			vitesse elem
+			pression elem
+			}
+		Champs dt_post 5. { Distance_paroi elem }
+		}
+	}
+EcritureLectureSpecial 0
+Solve pb
+End

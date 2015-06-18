@@ -1,0 +1,12 @@
+sed "s/,/./" Vogel_vFluctu_8_8 > new
+mv new Vogel_vFluctu_8_8
+
+sed "s/,/./" Vogel_vFluctu_6_6 > new
+mv new Vogel_vFluctu_6_6
+
+sed "s/,/./" Vogel_vFluctu_5_1 > new
+mv new Vogel_vFluctu_5_1
+
+sed "s/,/./" Vogel_vFluctu_3 > new
+mv new Vogel_vFluctu_3
+

@@ -1,0 +1,181 @@
+# Test oiseau qui se deplace #
+# PARALLEL NOT #
+# lance_test Ne passe pas si Gmsh pas ou mal installe #
+dimension 3
+Probleme_FT_Disc_gen pb
+Domaine DOM
+
+# BEGIN MESH #
+Mailler DOM
+{
+	Pave pave1
+	{
+		origine 	-2. -2. -2.
+		longueurs 	 4.  4.  4.
+		nombre_de_noeuds 6 6 6
+	}
+	{
+		bord paroi X = -2   	-2 <= Y <= 2 	-2 <= Z <= 2
+		bord paroi X = 2.   	-2 <= Y <= 2 	-2 <= Z <= 2
+		bord paroi Y = -2   	-2 <= X <= 2 	-2 <= Z <= 2
+		bord paroi Y = 2.   	-2 <= X <= 2 	-2 <= Z <= 2
+		bord paroi Z = -2.  	-2 <= X <= 2 	-2 <= Y <= 2
+		bord paroi Z = 2.   	-2 <= X <= 2 	-2 <= Y <= 2
+	}
+}
+Transformer DOM 0.1*x 0.1*y z
+
+domaine tmp
+lire_med family_names_from_group_names tmp aile1 aile1.med
+ecrire_fichier_formatte tmp aile1.geom
+lire_med family_names_from_group_names tmp aile2 aile2.med
+ecrire_fichier_formatte tmp aile2.geom
+lire_med family_names_from_group_names tmp corps corps.med
+ecrire_fichier_formatte tmp corps.geom
+
+
+# END MESH #
+
+# BEGIN PARTITION
+Partition DOM
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax  0.15
+	dt_min 0.01
+	dt_max 0.01
+	dt_impr 0.01
+	dt_sauv 100
+	seuil_statio -1
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu  Champ_Uniforme 1 1.8e-5
+ 	rho Champ_Uniforme 1 1.2
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -9.81
+Associate air gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       corps
+Transport_Interfaces_FT_Disc       aile_gauche
+Transport_Interfaces_FT_Disc       aile_droite
+
+Associate pb hydraulique
+Associate pb corps
+Associate pb aile_gauche
+Associate pb aile_droite
+
+Associate pb DOM
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+# Oiseau en translation #
+Read_file loi_horaire_3D.data ;
+
+# 
+Attention, probleme hydraulique degenere:
+-Pas de resolution en pression
+-Pas d'operateur de convection
+#
+Lire pb
+{
+     hydraulique
+     {
+	    modele_turbulence sous_maille_wale
+	    {
+               Cw 1.e-16
+               turbulence_paroi negligeable
+	    }
+
+	    solveur_pression GCP { precond ssor { omega -1.5 } seuil 1.e+20 impr }
+	    convection           { negligeable }
+	    diffusion            { }
+	    conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+	    equations_interfaces_vitesse_imposee 1 corps
+	    boundary_conditions 	 { paroi paroi_fixe }
+     }
+     corps
+     {
+	    conditions_initiales { fichier_geom { fichier_geom corps.geom
+                        point_phase 0 -0.2 -0.2 0 default_phase 1 }
+	    }
+	    boundary_conditions { paroi Paroi_FT_disc symetrie }
+	    methode_transport loi_horaire translation
+     }
+     aile_gauche
+     {
+	    conditions_initiales { fichier_geom { fichier_geom aile1.geom
+                        point_phase 0 -0.2 -0.2 0 default_phase 1 }
+	    }
+	    boundary_conditions { paroi Paroi_FT_disc symetrie }
+	    methode_transport loi_horaire battement_aile_gauche
+     }
+     aile_droite
+     {
+	    conditions_initiales { fichier_geom { fichier_geom aile2.geom
+                        point_phase 0 -0.2 -0.2 0 default_phase 1 }
+	    }
+	    boundary_conditions { paroi Paroi_FT_disc symetrie }
+	    methode_transport loi_horaire battement_aile_droite
+     }
+
+     Postraitement
+     {
+	    champs dt_post 0.01
+	    {
+		    indicatrice_corps		elem
+		    indicatrice_aile_droite	elem	
+		    indicatrice_aile_gauche	elem
+	    }
+     }
+     liste_postraitements
+     {
+	    Postraitement_ft_lata corps
+	    {
+		    dt_post 0.01
+		    nom_fichier corps
+		    format binaire
+		    champs elements { vitesse }
+		    interfaces corps { }
+	    } 
+	    Postraitement_ft_lata aile_gauche
+	    {
+		    dt_post 0.01
+		    nom_fichier aile_gauche
+		    format binaire
+		    interfaces aile_gauche { }
+	    } 
+	    Postraitement_ft_lata aile_droite
+	    {
+		    dt_post 0.01
+		    nom_fichier aile_droite
+		    format binaire
+		    interfaces aile_droite { }
+	    } 	    
+     }
+}
+
+Solve pb
+Fin

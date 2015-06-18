@@ -1,0 +1,226 @@
+# Ecoulement 3D dans un Tuyau a section circulaire #
+# PARALLEL OK #
+
+dimension 3
+Pb_Hydraulique_Turbulent pb1
+Domaine dom01234 
+
+# BEGIN MESH #
+Domaine dom0
+Domaine dom1
+Domaine dom2
+Domaine dom3
+Domaine dom4
+
+Mailler dom0
+{
+        Pave bloc
+                {
+                Origine -0.5 -0.5 0.
+                Nombre_de_Noeuds 3 3 6
+                Longueurs 1. 1. 4.
+                }
+                {
+                Bord perioz   Z = 0.  -0.5 <= X <= 0.5  -0.5 <= Y <= 0.5
+                Bord perioz   Z = 4.  -0.5 <= X <= 0.5  -0.5 <= Y <= 0.5
+                }
+}
+
+tetraedriser_homogene dom0
+
+Mailler dom1
+{
+        Pave bloc
+                {
+                Origine -0.785398163 0.5 0.
+                Nombre_de_Noeuds 3 3 6
+                Longueurs  1.570796326 1. 4.
+                facteurs 1. 0.7 1.
+                }
+                {
+                Bord perioz   Z = 0.  -0.785398163 <= X <= 0.785398163   0.5 <= Y <= 1.5
+                Bord perioz   Z = 4.  -0.785398163 <= X <= 0.785398163   0.5 <= Y <= 1.5
+                Bord paroi    Y = 1.5 -0.785398163 <= X <= 0.785398163   0.  <= Z <= 4.
+                }
+}
+
+tetraedriser_homogene dom1
+
+Transformer dom1
+ (y>0.5)*((COS(x)-0.5)*(y-0.5)+0.5)+(y<0.5001)*0.5
+ ((SIN(x)-(-0.5+(x+0.785398163)/1.570796326))*(y-0.5)+(-0.5+(x+0.785398163)/1.570796326))
+ z
+Ecrire_Fichier dom1 dom1.geom
+
+Read_file dom2 dom1.geom
+Read_file dom3 dom1.geom
+Read_file dom4 dom1.geom
+
+Transformer dom2
+ -y
+ x
+ z
+Transformer dom3
+ y
+ -x
+ z
+Transformer dom4
+ -x
+ -y
+ z
+
+{
+Domaine dom01 
+Mailler dom01
+        {  epsilon 1.e-2 ,
+                domain dom0 ,
+                domain dom1
+                }
+Ecrire_fichier dom01 dom01.geom
+}
+
+{
+Domaine dom01 
+Read_file dom01 dom01.geom
+Domaine dom012 
+Mailler dom012
+        {  epsilon 1.e-2 ,
+                domain dom01 ,
+                domain dom2
+                }
+Ecrire_fichier dom012 dom012.geom
+}
+
+{
+Domaine dom012 
+Read_file dom012 dom012.geom
+Domaine dom0123 
+Mailler dom0123
+        {  epsilon 1.e-2 ,
+                domain dom012 ,
+                domain dom3
+                }
+Ecrire_fichier dom0123 dom0123.geom
+}
+
+{
+Domaine dom0123 
+Read_file dom0123 dom0123.geom
+Mailler dom01234
+        {  epsilon 1.e-2 ,
+                domain dom0123 ,
+                domain dom4
+                }
+Ecrire_fichier dom01234 dom01234.geom
+}
+
+Read_file dom01234 dom01234.geom
+Corriger_frontiere_periodique { Domaine dom01234 Bord perioz }
+
+# END MESH #
+# BEGIN PARTITION
+Sous_Zone sous_zone1
+Associate sous_zone1 dom01234
+
+Lire sous_zone1
+{
+     Boite
+     Origine -0.5 -0.5 1.5
+     Cotes   1. 1. 1.
+}
+
+Partition dom01234
+{
+	Partitionneur tranche { tranches 2 1 1 }
+	Larg_joint 2
+	Nom_Zones DOM01234_PAR
+	Periodique 1 perioz
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM01234_PAR.Zones dom01234
+END SCATTER #
+
+VEFPreP1B dis 
+
+Sch_CN_EX_iteratif sch
+
+Lire sch 
+{ 
+        tinit 0.
+        tmax 100.
+        dt_min 1.e-7 
+        dt_max 1.e-1 
+	dt_start dt_calc
+        dt_impr 0.000001 
+        dt_sauv 10. 
+        seuil_statio 1.e-8 
+        facsec 1.       
+	nb_pas_dt_max 4
+	seuil 0.01	 
+} 
+
+Fluide_Incompressible fluide
+Lire fluide
+{ 
+	mu Champ_Uniforme       1 2.84e-5
+        rho Champ_Uniforme      1 0.0976
+
+} 
+
+Associate pb1 dom01234
+Associate pb1 fluide
+
+Associate pb1 sch 
+Discretize pb1 dis 
+
+Lire pb1
+{ 
+ Navier_Stokes_Turbulent 
+ { 
+       solveur_pression Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-15
+                            } 
+       convection { EF defaut_bar }
+       diffusion  { standard defaut_bar }
+       Sources
+       {
+       Canal_perio { bord perioz }
+       }
+       Sources { Source_Qdm_lambdaup { lambda 2. } }
+       conditions_initiales {  vitesse Champ_fonc_xyz dom01234 3  0. 0. 2.*(1.-(x*x+y*y)*(x*x+y*y)) }
+       boundary_conditions { 
+perioz periodique 
+		   paroi     paroi_fixe 
+                          } 
+        Modele_turbulence Sous_maille_wale
+                        {
+                        turbulence_paroi loi_standard_hydr
+			dt_impr_ustar 0.1
+                        }     
+}            
+ Postraitement 
+         {
+            Sondes 
+            { 
+             sonde_pression_pb1 pression periode 0.001 segment 50 0. 0. 0. 0. 0. 4. 
+             sonde_pression2_pb1 pression periode 0.001 segment 50 0.1 0. 0. 0.1 0. 4. 
+             sonde_vitesse1_pb1 vitesse periode 0.001 segment 50 0. -1. 0. 0. 1. 0. 
+             sonde_vitesse2_pb1 vitesse periode 0.001 segment 50 0. -1. 0.1 0. 1. 0.1    
+             sonde_vitesse3_pb1 vitesse periode 0.001 segment 50 0. -1. 2.  0. 1. 2.    
+             sonde_vitesse4_pb1 vitesse periode 0.001 segment 50 0. -1. 4. 0. 1. 4. 
+             sonde_vit_pb1 vitesse periode 0.001 points 1 0. 0. 0.5 
+             sonde_vit2_pb1 vitesse periode 0.001 points 1 0. 0. 2.
+            } 
+            Champs dt_post 0.1 
+            { 
+             vitesse elem
+            } 
+        } 
+} 
+
+Solve pb1
+
+Fin 

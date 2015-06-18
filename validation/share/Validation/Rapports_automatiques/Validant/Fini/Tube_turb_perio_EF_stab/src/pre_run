@@ -1,0 +1,5 @@
+# Partition the test case
+NB_PROCS=4
+jdd=`ls T*.data`
+make_PAR.data $jdd $NB_PROCS 1>/dev/null 2>&1
+mv PAR_$jdd $jdd

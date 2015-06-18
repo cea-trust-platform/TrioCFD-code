@@ -1,0 +1,214 @@
+# SIMULATION D UN CANAL plan 2D   #
+# Etude stratification regime stable #
+
+dimension 2
+Pb_thermohydraulique_turbulent pb
+
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Cavite
+		{
+                Origine  0. 0. 
+                Nombre_de_Noeuds 91 21 
+		Facteurs  1. 0.9  symy
+                Longueurs 4.5 0.2  
+                }
+                {
+                bord bas      Y = 0.      	0. <= X <= 4.5 		 
+                bord haut     Y = 0.2      	0. <= X <= 4.5 		 
+               	Bord entree   X = 0.            0. <= Y <= 0.2          
+		Bord sortie   X = 4.5    	0. <= Y <= 0.2  
+		}
+}
+
+Trianguler_H dom
+# END MESH #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 200.
+	dt_min 1.e-6
+	dt_max 100.
+	dt_impr 50.
+	dt_sauv 50.
+	seuil_statio 4.e-5
+}
+
+Schema_Euler_implicite sch_imp
+Read sch_imp
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 500
+	dt_min 1.e-6
+	dt_max 100.
+	dt_impr 50.
+	dt_sauv 50
+	seuil_statio 2.e-3
+	facsec 5
+	facsec_max 30
+	max_iter_implicite 50
+	
+	Solveur 
+           Implicite
+	   {
+		seuil_convergence_solveur 1.e-8
+	   }
+}
+
+
+# proprietes physiques de l'eau a 20°C #
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 1.0017e-3
+ 	rho Champ_Uniforme 1 998.2
+	lambda Champ_Uniforme 1 0.6034
+	Cp  Champ_Uniforme 1 4184.1 
+	beta_th  Champ_Uniforme 1 2.e-4
+}
+
+Champ_Uniforme gravite
+Read gravite 2  0. -9.81
+
+Associate pb dom
+Associate pb sch_imp
+Associate fluide gravite
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-9 }	
+		convection { EF_stab { } }
+		diffusion { }	
+		sources { Boussinesq_temperature { T0 20.0 } }
+		conditions_initiales {
+			vitesse Champ_fonc_xyz dom 2
+					(0.050175*(0.1>Y)+0.050175)  0.
+		}
+		boundary_conditions {
+			entree frontiere_ouverte_vitesse_imposee Champ_front_fonc_xyz 2  
+						(0.050175*(0.1>Y)+0.050175)
+						0. 
+			sortie frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1  0. 
+			haut  symetrie
+	                bas  paroi_fixe		
+		}
+		modele_turbulence K_Epsilon {
+       			Transport_K_Epsilon 
+			{
+			        parametre_equation parametre_implicite { resolution_explicite }
+			   	convection { amont }
+				diffusion { }
+				boundary_conditions {
+		       			entree frontiere_ouverte_K_eps_impose Champ_front_fonc_xyz 2 
+						((y>0.1)*2.52e-5+(y<0.1)*1.01e-4) 
+						((y>0.1)*1.40e-5+(y<0.1)*1.12e-4)
+		       			sortie frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+					haut  symetrie
+	               			bas  paroi	
+			   	}
+			   	conditions_initiales {
+			      		k_Eps Champ_fonc_xyz dom 2 
+						((y>0.1)*2.52e-5+(y<0.1)*1.01e-4) 
+						((y>0.1)*1.40e-5+(y<0.1)*1.12e-4)
+			  	}
+			 }
+			 turbulence_paroi loi_standard_hydr dt_impr_ustar 50. 
+		} 
+        }
+	Convection_diffusion_Temperature_Turbulent 
+	{
+		diffusion { }
+		convection { EF_stab { } }
+		boundary_conditions {
+		       	entree frontiere_ouverte_temperature_imposee Champ_front_fonc_xyz 1 ((y>0.1)*27.9+(y<0.1)*12.1)
+   			sortie frontiere_ouverte T_EXT Champ_Front_Uniforme 1 0.
+			haut  symetrie
+	                bas  paroi_adiabatique		
+		}
+		conditions_initiales
+		{
+			temperature Champ_fonc_xyz dom 1 ((y>0.1)*27.9+(y<0.1)*12.1)
+		}
+		Modele_Turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire  Prdt 0.5  }
+	}     
+	Postraitement
+	{
+	     Sondes
+	        {
+	           sonde_vitessex0_5     vitesse periode 50. segment 20 0.5 0. 0.5 0.2	
+	           sonde_temperaturex0_5 temperature periode 50. segment 20 0.5 0. 0.5 0.2	
+	           sonde_kx0_5           k periode 50. segment 20 0.5 0. 0.5 0.2	
+	           sonde_epsx0_5         eps  periode 50. segment 20 0.5 0. 0.5 0.2
+	 	   sonde_viscox0_5       viscosite_turbulente  periode 50. segment 20 0.5 0. 0.5 0.2
+
+	           sonde_vitessex1      vitesse periode 50. segment 20 1. 0. 1. 0.2	
+	           sonde_temperaturex1  temperature periode 50. segment 20 1. 0. 1. 0.2	
+	           sonde_kx1            k periode 50. segment 20 1. 0. 1. 0.2	
+	           sonde_epsx1          eps  periode 50. segment 20 1. 0. 1. 0.2
+	 	   sonde_viscox1        viscosite_turbulente  periode 50. segment 20 1. 0. 1. 0.2
+
+	           sonde_vitessex1_5      vitesse periode 50. segment 20 1.5 0. 1.5 0.2	
+	           sonde_temperaturex1_5  temperature periode 50. segment 20 1.5 0. 1.5 0.2	
+	           sonde_kx1_5            k periode 50. segment 20 1.5 0. 1.5 0.2	
+	           sonde_epsx1_5          eps  periode 50. segment 20 1.5 0. 1.5 0.2
+	 	   sonde_viscox1_5        viscosite_turbulente  periode 50. segment 20 1.5 0. 1.5 0.2
+
+	           sonde_vitessex2      vitesse periode 50. segment 20 2. 0. 2. 0.2	
+	           sonde_temperaturex2  temperature periode 50. segment 20 2. 0. 2. 0.2	
+	           sonde_kx2            k periode 50. segment 20 2. 0. 2. 0.2	
+	           sonde_epsx2          eps  periode 50. segment 20 2. 0. 2. 0.2
+	 	   sonde_viscox2        viscosite_turbulente  periode 50. segment 20 2. 0. 2. 0.2
+
+	           sonde_vitessex3      vitesse periode 50. segment 20 3. 0. 3. 0.2	
+	           sonde_temperaturex3  temperature periode 50. segment 20 3. 0. 3. 0.2	
+	           sonde_kx3            k periode 50. segment 20 3. 0. 3. 0.2	
+	           sonde_epsx3          eps  periode 50. segment 20 3. 0. 3. 0.2
+	 	   sonde_viscox3        viscosite_turbulente  periode 50. segment 20 3. 0. 3. 0.2
+
+	           sonde_vitessex4      vitesse periode 50. segment 20 4. 0. 4. 0.2	
+	           sonde_temperaturex4  temperature periode 50. segment 20 4. 0. 4. 0.2	
+	           sonde_kx4            k periode 50. segment 20 4. 0. 4. 0.2	
+	           sonde_epsx4          eps  periode 50. segment 20 4. 0. 4. 0.2
+
+	        }
+		format lml Champs dt_post 50.0
+		{			
+			vitesse elem
+			k elem
+			eps elem
+			viscosite_turbulente elem
+			temperature elem
+			Y_plus elem
+		}
+	}
+sauvegarde_simple binaire STABLE_pb1.sauv
+}
+EcritureLectureSpecial 0
+Solve pb
+End
+
+convection { EF_stab { } }
+convection { EF_stab { } }
+
+Solveur 
+           Simple
+	   {
+		seuil_convergence_implicite 1.e6
+		seuil_convergence_solveur 1.e-8
+		relax_pression 0.01
+	   }

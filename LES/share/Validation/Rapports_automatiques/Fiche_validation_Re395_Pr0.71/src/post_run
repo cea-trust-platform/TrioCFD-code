@@ -1,0 +1,92 @@
+# Format américain de nombres (nécessaire pour printf)
+#-----------------------------------------------------
+
+export LC_NUMERIC=C
+
+
+# Propriétés physiques et géométriques
+#-------------------------------------
+
+mu=$(grep mu Cas.data | awk '{printf "%.7f",$4}')
+rho=`grep rho Cas.data | awk '{print $4}'`
+lambda=`grep lambda Cas.data | awk '{print $4}'`
+Cp=`grep Cp Cas.data | awk '{print $4}'`
+Uc=`grep Ucent Cas.data | awk '{print $8}'`
+h=`grep Ucent Cas.data | awk '{print $10}'`
+
+
+# u_tau et Re_tau théoriques
+#---------------------------
+
+u_tau_th=$(printf "%.5f" "`echo "0.175*$mu/($rho*$h)*e(7/8*l(2*$rho*$Uc*$h/(3*$mu)))" | bc -l`")
+Re_tau_th=`echo "scale=0 ; $rho*$u_tau_th*$h/$mu" | bc -l`
+echo -n $u_tau_th > ../u_tau_th.dat
+
+
+# Evaluation du u_tau calculé (moyenne à partir de t=100s des valeurs du fichier u_tau.dat généré par le calcul)
+#---------------------------------------------------------------------------------------------------------------
+
+rep=${PWD##*/}
+type_LP=${rep/*_/}
+
+if [ "$type_LP" != "Pironneau" ] && [ "$type_LP" != "decale" ] ;
+	then u_tau_calc=`cat u_tau.dat | awk 'BEGIN{m=0;n=0;}{if ($1>100) {n++;m+=$2;}} END{printf "%.5f",m/n;}'`
+	else u_tau_calc=`cat u_tau_robin.dat | awk 'BEGIN{m=0;n=0;}{if ($1>100) {n++;m+=$2;}} END{printf "%.5f",m/n;}'`
+	cat u_tau_robin.dat | awk '{printf "%.8f\t%.3f\n",$1,$2*'$rho*$h/$mu'}' > Reynolds_tau_Pironneau.dat
+fi
+
+
+# Evaluation de l'écart par rapport au u_tau théorique et écriture dans post_utau du temps final, de u_tau calculé et de l'écart relatif
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+erreur=$(printf "%.2f" "`echo "100*sqrt(($u_tau_calc-$u_tau_th)*($u_tau_calc-$u_tau_th))/$u_tau_th" | bc -l`")
+t_final=$(tail -1 u_tau*.dat | awk '{printf "%.0f",$1}')
+echo -n "$t_final $u_tau_calc $erreur" > post_utau
+
+
+# Suppression des lignes 1 à 17 (en-tête) du dernier fichier Moyennes_temporelles_vitesse_rho_mu, et adimensionnement de chaque colonne (colonnes séparées par des tabulations)
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+t_final_stat=`ls Moyennes_temporelles_vitesse_rho_mu_* | sed -e 's/Moyennes_temporelles_vitesse_rho_mu_//g' | awk '{max_val=($1<max_val)?max_val:$1;} END{print max_val;}'`
+sed "1,17d" "Moyennes_temporelles_vitesse_rho_mu_"$t_final_stat | awk '{printf (" %.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\n",$1,$1*'$u_tau_calc*$rho/$mu',$2,$2/'$u_tau_calc',$3,$3/'$u_tau_calc',$4,$4/'$u_tau_calc',-$5*$5,-$5*$5/'$u_tau_calc/$u_tau_calc',-$6*$6,-$6*$6/'$u_tau_calc/$u_tau_calc',-$7*$7,-$7*$7/'$u_tau_calc/$u_tau_calc',$8,$8/'$u_tau_calc/$u_tau_calc',$9,$9/'$u_tau_calc/$u_tau_calc',$10,$10/'$u_tau_calc/$u_tau_calc')}' > tmp1
+sed "1i #      y     \t     y+     \t     U     \t     U+     \t      V      \t      V+     \t      W      \t      W+     \t    T_uu    \t    T+_uu   \t    T_vv    \t    T+_vv   \t    T_ww    \t    T+_ww   \t    T_uv    \t    T+_uv   \t    T_uw    \t    T+_uw   \t    T_vw    \t    T+_vw\n#" tmp1 > tmp2
+sed "1i #     (1)    \t    (2)     \t    (3)     \t    (4)     \t     (5)     \t     (6)     \t     (7)     \t     (8)     \t     (9)    \t    (10)    \t    (11)    \t    (12)    \t    (13)    \t    (14)    \t    (15)    \t    (16)    \t    (17)    \t    (18)    \t    (19)     \t    (20)" tmp2 > Moyennes_hydr_calc.dat
+
+if [ "$type_LP" != "VDF" ] && [ "$type_LP" != "decale" ] ;
+	then ligne1=`sed -n '4p' Moyennes_hydr_calc.dat | awk '{print $1"\t"$2"\t"$3"\t     /      \t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12"\t"$13"\t"$14"\t"$15"\t"$16"\t"$17"\t"$18"\t"$19"\t"$20}'`
+	sed "4c \ $ligne1" Moyennes_hydr_calc.dat > tmp3
+	mv tmp3 Moyennes_hydr_calc.dat
+fi
+
+rm -f tmp*
+
+
+# Définition des variables nécessaires pour l'adimensionnement en thermique
+#--------------------------------------------------------------------------
+
+Tw=$(grep paroi_temperature_imposee ../T0Q_VDF/Cas.data | awk '{print $5}' | head -1)
+
+if [ "$type_LP" != "decale" ] ;
+	then Ly=$(grep Longueurs ../T0Q_VDF/Cas.data | awk '{print $3}')
+	else Ly=$(grep Longueurs ../T0Q_VEF_Pironneau_maillage_decale/Cas.data | awk '{print $3}')
+fi
+
+Pth=$(grep puissance_thermique Cas.data | awk '{print $6}')
+qw=`echo "scale=5 ; $Pth*$Ly/2" | bc -l`
+T_tau=`echo "scale=5 ; $qw/($rho*$Cp*$u_tau_calc)" | bc -l`
+
+
+# Suppression des lignes 1 à 11 (en-tête) du dernier fichier Moyennes__temporelles_Temp, et adimensionnement de chaque colonne (colonnes séparées par des tabulations)
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+sed "1,11d" "Moyennes__temporelles_Temp_"$t_final_stat | awk '{printf (" %.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\n",$1,$1*'$u_tau_calc*$rho/$mu',$2,($2-'$Tw')/'$T_tau',$3,$3/'$T_tau',$4,$4/'$u_tau_calc/$T_tau',$5,$5/'$u_tau_calc/$T_tau',$6,$6/'$u_tau_calc/$T_tau')}' > tmp1
+sed "1i #      y     \t     y+     \t      T     \t     T+     \t    T_rms   \t   T_rms+   \t     R_uT    \t    R+_uT   \t    R_vT   \t    R+_vT   \t    R_wT     \t    R+_wT\n#" tmp1 > tmp2
+sed "1i #     (1)    \t    (2)     \t     (3)     \t    (4)     \t     (5)     \t    (6)     \t     (7)     \t     (8)     \t    (9)    \t    (10)    \t    (11)    \t    (12)" tmp2 >  Moyennes_Thydr_calc.dat
+
+if [ "$type_LP" != "VDF" ] && [ "$type_LP" != "decale" ] ;
+	then ligne1=`sed -n '4p' Moyennes_Thydr_calc.dat | awk '{print $1"\t"$2"\t"$3"\t     /      \t"$5"\t"$6"\t"$7"\t"$8"\t"$9"\t"$10"\t"$11"\t"$12}'`
+	sed "4c \ $ligne1" Moyennes_Thydr_calc.dat > tmp3
+	mv tmp3 Moyennes_Thydr_calc.dat
+fi
+
+rm -f tmp*

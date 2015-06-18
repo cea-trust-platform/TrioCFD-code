@@ -1,0 +1,119 @@
+# Hydraulique 2D laminaire schema centre #
+dimension 2
+Pb_hydraulique pb
+Domaine dom
+
+# Read_file dom Cir_Cyl.geom  #
+Read_file dom geometry.geom
+
+VEFPreP1B dis
+
+Schema_Euler_Explicite sch
+Read sch
+{
+	tinit 0.0 
+	nb_pas_dt_max 3
+	tmax 90.0
+	dt_min 1.e-6
+	dt_max 1.e-1
+	dt_impr 0.1
+	dt_sauv 10.0
+	seuil_statio 1.e-8
+        facsec 1.
+        diffusion_implicite 1
+}
+
+Fluide_Incompressible air
+Read air
+{
+	mu  Champ_Uniforme 1 1.00e-5
+	rho Champ_Uniforme 1 1.33
+}
+#
+	nu = mu/rho = 7.518e-6
+	Reynolds 100 
+#
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+			imprimer_flux dom { CERCLE }
+
+Read pb
+{
+	Navier_Stokes_standard 
+	{
+		solveur_pression Gcp { precond ssor { omega 1.6 }
+                                       seuil 1.e-9
+                                       impr
+                                     } 			
+		convection { EF_stab { alpha 0.2 } }
+		diffusion { }
+		conditions_initiales 
+		{
+			vitesse Champ_Uniforme 2 0. 0.
+		}
+		boundary_conditions 
+		{
+			CERCLE  paroi_fixe
+			PAROI1  symetrie
+			PAROI2  symetrie
+			SORTIE  frontiere_ouverte_pression_imposee
+			             Champ_Front_Uniforme 1 0.0
+			ENTREE frontiere_ouverte_vitesse_imposee 
+			             Champ_front_Uniforme 2 0.03937 0.0
+		}
+
+	}
+        Postraitement
+	{
+
+		Definition_champs {
+			Pmoy Champ_Post_Statistiques_Moyenne {	
+				t_deb 40 t_fin 89 source Champ_Post_refChamp { Pb_champ pb Pression_Pa }
+			}
+		}
+
+		Sondes
+		{
+			sonde_pression pression periode 1.e-6 points  4 0.1142 0.0762
+			                                                0.1398 0.0762
+			                                                0.1270 0.0890
+			                                                0.1270 0.0634
+
+			sonde_Pmoy1 Pmoy Periode 10 Circle 150 0.127 0.0762 0.0127 180 0
+			sonde_Pmoy2 nodes Pmoy Periode 10 Circle 150 0.127 0.0762 0.0127 180 0
+			sonde_Pmoy3 grav Pmoy Periode 10 Circle 150 0.127 0.0762 0.0127 180 0
+                }
+
+		Format lml
+                Champs dt_post 30.0
+		{
+			pression som
+                        Pression_Pa elem
+			vitesse som
+			vitesse elem
+		}
+
+       }
+
+}
+
+Solve pb
+End
+
+			sonde_Pmoy Pmoy Periode 10.5 Circle 150 0. 0. 0.0127 0 180
+
+ reprise formatte ./sauv/circ_cyl_100_pb.sauv  
+imprimer_flux dom { CERCLE }
+
+Cholesky { impr }
+
+Gcp { precond ssor { omega 1.5 }
+                                       seuil 1.e-14
+                                       impr
+                                     } 		
+
+GCP_ssor { omega 1.65 seuil 1.e-6 impr }

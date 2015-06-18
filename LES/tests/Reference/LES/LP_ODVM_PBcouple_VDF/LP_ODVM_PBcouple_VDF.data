@@ -1,0 +1,248 @@
+# SIMULATION D UN CANAL PLAN 3D EN LES EN THERMOHYDRAULIQUE avec la loi de paroi ODVM (TBLE) #
+# PARALLEL STOPS #
+dimension 3
+
+Domaine dom
+Domaine parois
+
+# BEGIN MESH #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 21 21 21
+		Longueurs  6.3 2. 3.2
+		}
+		{
+		Bord periox   X = 0.       0. <= Y <= 2.0    0. <= Z <= 3.2
+		Bord periox   X =  6.3     0. <= Y <= 2.0    0. <= Z <= 3.2
+		Bord perioz   Z = 0.       0. <= X <=  6.3   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2      0. <= X <=  6.3   0. <= Y <= 2.0
+		Raccord local homogene paroi      Y = 0.            0. <= X <=  6.3   0. <= Z <= 3.2
+		Raccord local homogene paroi     Y = 2.            0. <= X <=  6.3   0. <= Z <= 3.2
+		}
+	}
+
+
+Mailler parois
+        {
+        Pave mur_bas
+                {
+                Origine 0. -0.127 0.
+                Nombre_de_Noeuds 21 21 21
+                Longueurs  6.3 0.127 3.2
+                }
+                {
+                Bord adia              X = 0.        -0.127 <= Y <= 0.     0. <= Z <= 3.2
+                Bord adia              X = 6.3      -0.127 <= Y <= 0.     0. <= Z <= 3.2
+                Bord adia              Z = 0.         0. <= X <= 6.3      -0.127 <= Y <= 0.
+                Bord adia              Z = 3.2        0. <= X <= 6.3      -0.127 <= Y <= 0.
+                Bord adia              Y = -0.127    0. <= X <= 6.3       0. <= Z <= 3.2
+                Raccord local homogene paroi     Y = 0.              0. <= X <= 6.3     0. <= Z <= 3.2
+                } ,
+	Pave mur_haut
+                {
+                Origine 0. 2. 0.
+                Nombre_de_Noeuds 21 21 21
+                Longueurs  6.3 0.127 3.2
+                }
+                {
+                Bord adia   X = 0.             2. <= Y <= 2.127   0. <= Z <= 3.2
+                Bord adia   X = 6.3           2. <= Y <= 2.127   0. <= Z <= 3.2
+                Bord adia   Z = 0.             0. <= X <= 6.3     2. <= Y <= 2.127
+                Bord adia   Z = 3.2            0. <= X <= 6.3     2. <= Y <= 2.127
+                Raccord local homogene paroi      Y = 2.            0. <= X <= 6.3   0. <= Z <= 3.2
+                Bord adia   Y = 2.127         0. <= X <= 6.3     0. <= Z <= 3.2
+                }
+        }
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 1 2 1 }
+	Larg_joint 2
+	Nom_Zones DOM1
+}
+Partition parois
+{
+	Partitionneur tranche { tranches 1 2 1 }
+	Larg_joint 2
+	Nom_Zones DOM2
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom
+Scatter DOM2.Zones parois
+END SCATTER #
+
+
+VDF dis
+
+Runge_Kutta_ordre_3 sch
+Lire sch
+	{
+	nb_pas_dt_max 10
+	tinit 0.
+        tmax 4
+	dt_min 1.e-8
+	dt_max 1.e-1
+	dt_sauv 100.
+	dt_impr 0.01
+        seuil_statio 1.e-8
+	}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 20.772e-2
+	Cp Champ_Uniforme	1 5193.
+	beta_th Champ_Uniforme	1 1.
+}
+
+Solide cuivre
+Lire cuivre
+{
+        rho     Champ_Uniforme 1 1000.
+        Cp      Champ_Uniforme 1 5.067
+        lambda  Champ_Uniforme 1 2.0776
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 0 0
+
+Associate fluide gravite
+
+Pb_Conduction pbs
+Associate pbs parois
+Associate pbs cuivre
+
+Pb_Thermohydraulique_Turbulent pbf
+Associate pbf dom
+Associate pbf fluide
+
+Probleme_Couple pb_couplage
+Associate pb_couplage pbf
+Associate pb_couplage pbs
+
+Associate pb_couplage sch
+
+Discretize pb_couplage dis
+# Ampli_bruit mis a 0 car cela cree des differences entre sequentiel et parallele ou sur entre machines #
+# Sinon mettre Ampli_bruit 0.5 #
+Lire pbf
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 5e-6
+			}
+		convection { centre }
+		diffusion { }
+		Sources
+			{
+			Canal_perio { bord periox }
+			}
+		conditions_initiales
+			{
+			vitesse champ_init_canal_sinal 3  { Ucent 3. h 1.0  ampli_sin 0.5 omega 2. ampli_bruit 0 }
+			}
+		boundary_conditions
+			{
+periox periodique 
+			paroi   paroi_fixe
+perioz periodique 
+			}
+		Modele_turbulence sous_maille_selectif
+			{
+			turbulence_paroi loi_standard_hydr
+			formulation_a_nb_points 4 0 2
+			}
+		}
+
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { }
+		convection { quick }
+		Modele_turbulence Prandtl
+			{
+			turbulence_paroi loi_ODVM { N 20 GAMMA 0.05 STATS 200. 20. CHECK_FILES }
+			}
+		Sources
+			{
+			Puissance_Thermique Champ_Uniforme 1 0.127
+			}
+		boundary_conditions 
+			{
+periox periodique 
+perioz periodique 
+ 			paroi  Paroi_Echange_contact_ODVM_VDF pbs paroi temperature 1.e11
+			}
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0.2*y*(2.-y) }
+		}
+
+	Postraitement
+        	{       
+                Sondes
+                	{ 
+                        sonde_T_fluide        temperature periode 1.e-4   points 2
+				   3. 0.0025  1.
+				   3. 1.      1.
+			}
+		Champs dt_post 50.
+			{
+			temperature elem
+			}
+		}
+Sauvegarde formatte pbf.sauv
+	}
+
+Lire pbs
+        {
+        Conduction
+                {
+                diffusion { }
+                Conditions_initiales
+                        {
+                        temperature Champ_Uniforme 1 0.
+                        }
+		Sources
+			{
+			Puissance_Thermique Champ_Uniforme 1 -1.
+			}
+                boundary_conditions
+                        {
+                        adia    paroi_adiabatique
+			paroi Paroi_Echange_contact_ODVM_VDF pbf paroi temperature 1.e11
+                        }
+                }
+	 Postraitement
+        		{
+                	Sondes
+                		{
+	                        sonde_T_paroi        temperature periode 5.e-4   points 1
+                                   3. -0.0016    1.
+        	        	}
+        		
+			Champs dt_post 50.
+                	{
+                        	temperature som
+                	}
+			}
+Sauvegarde formatte pbs.sauv
+        }
+
+Solve pb_couplage
+Fin
+Champs binaire dt_post 50.
+                		{ temperature elem }
+pression som
+vitesse som
+masse_volumique som

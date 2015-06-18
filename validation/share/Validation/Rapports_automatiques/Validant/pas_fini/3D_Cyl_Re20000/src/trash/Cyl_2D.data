@@ -1,0 +1,117 @@
+# Lecture du 1/2 maillage #
+dimension 2
+Domaine dom
+Pb_hydraulique_turbulent pb
+# BEGIN MESH #
+Domaine dom1
+Read_file dom1 ../Cercle.geom
+Domaine dom2
+Read_file dom2 ../Cercle.geom
+Transformer dom2 x -y
+
+Supprime_Bord dom1 { Axe } 
+Supprime_Bord dom2 { Axe } 
+
+Mailler dom { domain dom1 , domain dom2 }
+RegroupeBord dom CYLINDER { Forme }
+Transformer dom x-0.25 y
+VerifierCoin dom { expert_only }
+
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 9 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+# Je choisis une discretisation #
+VEFPreP1B ma_discretisation
+
+Schema_Euler_explicite mon_schema
+Read mon_schema
+{
+	tinit 0
+	tmax 10
+	dt_min 1.e-10
+	dt_max 1.e+10
+	dt_impr 1.e-10 # Petit pour le calcul de Cp moyen #
+	dt_sauv 100
+	seuil_statio 1.e-40
+	seuil_statio_relatif_deconseille 1
+}
+
+# Je definis un milieu #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu  Champ_Uniforme 1 1.29e-3
+	rho Champ_Uniforme 1 1000
+}
+
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression petsc cholesky { } 
+		convection { ef_stab { alpha 0.2 } }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 U_IMPOSED 0.
+			}
+		boundary_conditions {
+			Haut  	paroi_fixe
+			CYLINDER 	paroi_fixe
+			Sortie 	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			Entree 	frontiere_ouverte_vitesse_imposee  Champ_front_uniforme 2 U_IMPOSED 0.
+
+		}
+
+               modele_turbulence K_Epsilon {
+                     Transport_K_Epsilon
+                     {
+
+                             convection { ef_stab { alpha 0.2 } }
+                             diffusion { }
+                             boundary_conditions {
+                                    Haut        Paroi
+                                    CYLINDER       Paroi
+                                    Sortie      frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 	2 	K_EPS_IMPOSED
+                                    Entree      frontiere_ouverte_K_eps_impose Champ_front_Uniforme 	2 	K_EPS_IMPOSED
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 K_EPS_IMPOSED }
+                      }
+                      turbulence_paroi loi_standard_hydr
+                }
+        }
+	Postraitement
+	{
+	    Sondes {
+	     	sonde_pression 	pression periode 	1.e-6 points 	2 0. 0.025 0. -0.025
+	    }
+	    format lata
+	    Champs dt_post 0.1
+	    { 
+	    	    vitesse faces
+		    vitesse elem
+		    pression_pa elem
+		    y_plus elem
+		    k elem
+		    eps elem
+		    viscosite_turbulente elem
+	    }
+	}
+}
+Solve pb

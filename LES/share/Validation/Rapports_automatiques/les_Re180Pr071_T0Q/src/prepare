@@ -1,0 +1,66 @@
+#!/bin/bash
+
+mkdir -p mesh_VDF
+mkdir -p mesh_VEF
+
+
+# geometrie VDF
+# decoupage du domaine de calcul en 2 proc pour optimisation temps de calcul 
+# Recuperation du nombre de processeurs dans le fichier .prm
+NB_PROCS=`awk '(/TestCase/ && /VDF/) {print $4}' *.prm | sort -u`
+if [ "`echo $NB_PROCS | awk '{print NF}'`" != 1 ]
+then
+   echo "Nombre de processeurs multiple dans le prm impossible !"
+   echo "NB_PROCS=$NB_PROCS" 
+   exit -1
+fi
+sed "s/NB_PROCS/$NB_PROCS/" template_dec_VDF.data > dec_VDF.data
+
+cp dec_VDF.data ./mesh_VDF
+cd mesh_VDF
+triou dec_VDF 1>dec_VDF.out 2>dec_VDF.err
+cd ../
+
+# geometrie VEF
+# decoupage du domaine de calcul en 4 proc pour optimisation temps de calcul 
+# Recuperation du nombre de processeurs dans le fichier .prm
+NB_PROCS=`awk '(/TestCase/ && /VEF/) {print $4}' *.prm | sort -u`
+if [ "`echo $NB_PROCS | awk '{print NF}'`" != 1 ]
+then
+   echo "Nombre de processeurs multiple dans le prm impossible !"
+   echo "NB_PROCS=$NB_PROCS" 
+   exit -1
+fi
+sed "s/NB_PROCS/$NB_PROCS/" template_dec_VEF.data > dec_VEF.data
+
+cp dec_VEF.data ./mesh_VEF
+cd mesh_VEF
+triou dec_VEF 1>dec_VEF.out 2>dec_VEF.err
+cd ../
+
+mkdir -p VDF_T0Q
+mkdir -p VEF_RK_Muscl
+mkdir -p VEF_RK_EF_Stab
+
+cd VEF_RK_Muscl
+cp ../post_run .
+ln -s -f ../mesh_VEF/*.Zones .
+cd ../
+
+cd VDF_T0Q
+cp ../post_run .
+ln -s -f ../mesh_VDF/*.Zones .
+cd ../
+
+cd VEF_RK_EF_Stab
+cp ../post_run .
+ln -s -f ../mesh_VEF/*.Zones .
+cd ../
+
+cp les_Re180Pr071_T0Q_VDF.data VDF_T0Q/les_Re180Pr071_T0Q.data
+
+cp les_Re180Pr071_T0Q_VEF.data VEF_RK_Muscl/les_Re180Pr071_T0Q.data
+
+sed "s/muscl/EF_stab { volumes_etendus alpha 1 }/" les_Re180Pr071_T0Q_VEF.data > VEF_RK_EF_Stab/les_Re180Pr071_T0Q.data
+
+

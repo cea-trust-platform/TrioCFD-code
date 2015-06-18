@@ -1,0 +1,15 @@
+extrait_coupe Cas PROFIL_VITESSE1
+extrait_coupe Cas PROFIL_TEMPERATURE1
+
+./Coupes_TBLE_adimensionnees.sh
+
+mu=$(grep mu Cas.data | awk '{printf "%.10f",$4}')
+rho=$(grep rho Cas.data | awk '{print $4}')
+Uo=$(grep "vitesse champ_uniforme" Cas.data | awk '{print $6}')
+Re=`echo "$rho*$Uo/$mu" | bc`
+Re_tau=`echo "0.175*e(7/8*l($Re))" | bc -l`
+u_tau=`echo "scale=10; $mu*$Re_tau/$rho" | bc`
+u_tau_N_NP_=$(grep "u\*=" tble_post_vitesse_N=_NP_.dat | sed -n '$'p | awk '{printf "%0.6f", $10}')
+erreur=`printf "%.2f\n" $(echo "scale=10; n=100*($u_tau-$u_tau_N_NP_)/$u_tau; if (n<0) print -n else print n" | bc)`
+
+echo -n "$u_tau_N_NP_ $erreur " >> ./../u_tau.dat

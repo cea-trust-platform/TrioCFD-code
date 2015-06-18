@@ -1,0 +1,18 @@
+# Script lance par Run_fiche avant de lancer les cas tests Trio_U
+# On genere le fichier .geom avec xprepro
+
+cd profil
+tar zxf data_theorie.tgz
+cd ..
+cd Xprepro/model
+# 2 signifie qu'il faut faire les deux etapes "modeling" et "???" Ca clique automatiquement
+$TRUST_ROOT/Outils/PRE_3DVDF/xprepro goutte_44_44_43.prep 2
+cd ../..
+if [ -f Xprepro/prepro/Probleme1/Pb1.geom ]
+then
+   cp Xprepro/prepro/Probleme1/Pb1.geom pendante_1p5/Pb1_44_44_43.geom
+   cp Xprepro/prepro/Probleme1/Pb1.geom pendante_2p5/Pb1_44_44_43.geom
+else
+   gunzip -c Pb1.geom.gz > pendante_1p5/Pb1_44_44_43.geom
+   gunzip -c Pb1.geom.gz > pendante_2p5/Pb1_44_44_43.geom
+fi

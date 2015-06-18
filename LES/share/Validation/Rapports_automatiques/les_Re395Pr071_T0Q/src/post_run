@@ -1,0 +1,55 @@
+#!/bin/bash
+
+
+
+utau=`cat u_tau.dat | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$2;}}END{print m/n;}'`
+
+utau_th=`cat ../utau_analytique.dat | awk '{print $1;}'`
+echo utau
+# tail -1 u_tau.dat | awk -v utauth=$utau_th -v utau=$utau '{print $1" "utau" "100*(utau-utauth)/utauth;}' > post_utau 
+tail -1 u_tau.dat | awk -v utauth=$utau_th -v utau=$utau '{printf ("%7.2f %7.4f %7.2f", $1,utau,100*sqrt((utau-utauth)*(utau-utauth))/utauth);}' > post_utau  
+ 
+ 
+
+temps=`ls Moyennes_temporelles_vitesse_rho_mu_* | sed -e 's/Moyennes_temporelles_vitesse_rho_mu_//g' | sed -e 's/_adim.dat//g' | sort -g | tail -1`
+echo $utau
+
+../adim_Stat.sh les_Re395Pr071_T0Q.data "Moyennes_temporelles_vitesse_rho_mu_"$temps  $utau
+cp "Moyennes_temporelles_vitesse_rho_mu_"$temps moy_spat_dim.dat
+mv "Moyennes_temporelles_vitesse_rho_mu_"$temps"_adim.dat" moy_spat.dat
+
+ttau=`echo "1" | awk  -v utau=$utau '{print  1/(0.011928*5193*utau);}'`
+
+#extrait_coupe les_Re395Pr071_T0Q.data COUPE_T_MOY
+#extrait_coupe les_Re395Pr071_T0Q.data COUPE_T_ET
+
+mu=`grep "mu " les_Re395Pr071_T0Q.data | awk '{print $4}'`
+rho=`grep "rho" les_Re395Pr071_T0Q.data | awk '{print $4}'`
+Cp=`grep "Cp" les_Re395Pr071_T0Q.data | awk '{print $4}'`
+
+#awk -v utau=$utau -v ttau=$ttau -v tw=0 -v mu=$mu -v rho=$rho -v Cp=$Cp 'BEGIN{nu=mu/rho;  ad=ttau ; } {if (($1!="")&&($1!="#")) print $1*utau/nu " " ($2-tw)/ad ;}' les_Re395Pr071_T0Q_COUPE_T_MOY.coupe > coupe_T_moy_adim.dat
+
+#awk -v utau=$utau -v ttau=$ttau -v mu=$mu -v rho=$rho -v Cp=$Cp 'BEGIN{nu=mu/rho;  ad=ttau ; } {if (($1!="")&&($1!="#")) print $1*utau/nu " "  $2/ad ;}' les_Re395Pr071_T0Q_COUPE_T_ET.coupe > coupe_T_et_adim.dat
+
+
+cp "Moyennes__temporelles_Temp_"$temps moy_spat_T_dim.dat
+
+../adim_TStat.sh les_Re395Pr071_T0Q.data "Moyennes__temporelles_Temp_"$temps  $utau $ttau   0
+mv "Moyennes__temporelles_Temp_"$temps"_adim.dat" moy_spat_T.dat
+
+
+
+fs_moyen=`cat les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$3;}}END{print m/n;}'`
+dt_moyen=`cat les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$2;}}END{print m/n;}'`
+fs_moyen20=`tail -20 les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$3;}END{print m/n;}'`
+dt_moyen20=`tail -20 les_Re395Pr071_T0Q.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$2;}END{print m/n;}'`
+
+dt_conv=`grep -A 2 "time steps for the equation: Navier_Stokes_Turbulent" les_Re395Pr071_T0Q.out | grep convective | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffNS=`grep -A 2 "time steps for the equation: Navier_Stokes_Turbulent" les_Re395Pr071_T0Q.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffT=`grep -A 2 "time steps for the equation: Convec" les_Re395Pr071_T0Q.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+
+fs_conv=`echo "scale=8;$dt_moyen20/$dt_conv" | bc`
+fs_diffNS=`echo "scale=8;$dt_moyen20/$dt_diffNS" | bc`
+fs_diffT=`echo "scale=8;$dt_moyen20/$dt_diffT" | bc`
+
+echo  $fs_moyen20  " " $fs_conv " " $fs_diffNS " " $fs_diffT > comp_facsec 

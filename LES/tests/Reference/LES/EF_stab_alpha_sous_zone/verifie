@@ -1,0 +1,24 @@
+#!/bin/bash
+# Check the .dat files in sequentiel and parallel
+# created by Traitement_particulier canal
+rep=`pwd`
+jdd=`basename $rep`
+if [ ! -f PAR_$jdd.TU ]
+then
+   # Sequential calculation finished
+   for file in *.dat
+   do
+      mv $file $file"_seq"
+   done
+else
+   # Parallel calculation finished
+   for file in *.dat
+   do
+      compare_sonde $file $file"_seq" 1>compare_sonde.log 2>&1
+      if [ $? != 0 ]
+      then
+         echo "`pwd`/compare_sonde.log" 
+	 exit -1
+      fi
+   done
+fi

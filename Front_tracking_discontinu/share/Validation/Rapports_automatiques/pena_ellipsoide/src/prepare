@@ -1,0 +1,5 @@
+mkdir -p pena_ellipsoide_base
+
+cp pena_ellipsoide/* pena_ellipsoide_base/
+chmod +w pena_ellipsoide_base/*
+grep -v lineaire pena_ellipsoide/lineaire.data > pena_ellipsoide_base/lineaire.data

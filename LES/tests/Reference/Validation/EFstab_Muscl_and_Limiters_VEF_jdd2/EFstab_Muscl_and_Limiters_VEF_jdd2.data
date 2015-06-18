@@ -1,0 +1,109 @@
+# Hydraulique 2D : Transport d'une tache 2D en rotation #
+
+dimension 2
+export domaine DISQUE 
+Read_file DISQUE dom_DISQUE.geom 
+
+
+
+
+Pb_thermohydraulique  pb2
+
+
+
+Runge_Kutta_ordre_3 sch
+
+Read sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 3.1415
+        dt_min 1.E-5
+        dt_max 1.E-1
+        dt_impr .5
+        dt_sauv 10
+        seuil_statio 1.e-8
+        facsec 1
+}
+
+VEFPreP1b dis
+
+
+Fluide_Incompressible He
+Read He
+{
+        mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 1.e-18
+	Cp Champ_Uniforme	1 5193.
+	beta_th Champ_Uniforme	1 1.9954e-3
+	   
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0. 0.
+Associate He gravite
+Associate pb2 DISQUE
+Associate pb2 He  
+
+
+
+
+Associate pb2 sch
+Discretize pb2 dis
+
+Read pb2
+{
+        Navier_Stokes_standard
+        {
+                solveur_pression GCP { 
+                        precond ssor { omega 2.500000 } 
+                        seuil 1e+20
+                }
+		convection { negligeable }
+                diffusion { negligeable }
+                conditions_initiales {
+                        vitesse Champ_fonc_xyz DISQUE 2 -y x
+                        }
+                boundary_conditions {
+                        CERCLE               paroi_fixe
+                }
+		
+        }
+        Convection_Diffusion_Temperature
+        {
+                diffusion { negligeable }
+                convection { EF_stab { alpha 0.2 } }
+                boundary_conditions 
+                {
+                        CERCLE               paroi_adiabatique
+                }
+                conditions_initiales { Temperature Champ_fonc_xyz DISQUE 1 
+		 (x>(-0.1))*(x<0.1)*(y>0.5)*(y<0.7) }
+        }
+
+	
+        Postraitement {
+	format lml
+                Sondes
+                {
+                        coupe_T_1         temperature periode 0.001 segment 150 -0.5 0.6 0.5 0.6 
+                        coupe_T_2         temperature periode 1. segment 150  -0.6 -0.5 -0.6 0.5
+                        coupe_T_3        temperature periode 1. segment 150 -0.5 -0.6 0.5 -0.6 
+                        coupe_T_4         temperature periode 1. segment 150  0.6 -0.5 0.6 0.5
+
+                }
+                Champs dt_post 3.
+                {
+		   pression elem
+                   vitesse elem
+		   temperature elem
+                }
+        }
+
+}
+EcritureLectureSpecial 0
+
+
+Solve pb2
+End

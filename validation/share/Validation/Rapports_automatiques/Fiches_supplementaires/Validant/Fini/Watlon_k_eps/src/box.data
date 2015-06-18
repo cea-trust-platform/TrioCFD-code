@@ -1,0 +1,122 @@
+# Generation de la boite de recirculation $NAME_box #
+
+dimension 3
+domaine box
+
+# DEBUT MAILLAGE #
+domaine dom
+lire_fichier dom ../../../mesh/Watlon_mesh.geom
+extract_2d_from_3d dom $BOUNDARY box
+dimension 2
+Extruder { domaine box nb_tranches 2 direction 0 0 $EXTRUD }
+dimension 3
+$ROT
+Transformer box x $Y $Z
+RegroupeBord box perio { devant derriere }
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+Decouper box
+{
+   Partitionneur Metis { nb_parts 2 }
+   Larg_joint 2
+   Periodique 1 perio
+   Nom_Zones box_cut
+}
+Fin
+FIN DECOUPAGE #
+
+# DEBUT LECTURE
+Scatter box_cut.Zones box
+FIN LECTURE #
+
+# Calcul de la boite de recirculation # 
+Pb_hydraulique_turbulent pb
+VEFPreP1B dis
+Schema_Euler_Implicite sch
+Lire sch
+{
+	tinit	0.
+   	tmax    $TMAX
+	dt_max	0.5
+	dt_impr 0.001
+	seuil_statio	1.e-6
+	seuil_statio_relatif_deconseille 1 
+        facsec		$FACSEC
+	facsec_max	$FACSECMAX
+	solveur implicite
+        {
+              solveur gmres { diag seuil 1.e-20 nb_it_max 5 controle_residu 1 impr }
+        }
+}
+
+# EAU 320 K #
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu	Champ_Uniforme 1 5.86e-4
+	rho	Champ_Uniforme 1 991.3
+}
+
+Associer pb box
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression petsc Cholesky { } 
+		convection { $SCHEME }
+		diffusion { }
+                Sources { Canal_perio { bord perio } }
+		conditions_initiales { vitesse Champ_Uniforme 3 0. $VY $VZ } 
+		conditions_limites
+		{
+			perio		periodique
+			WALL 		paroi_fixe
+		}
+		modele_turbulence K_Epsilon 
+		{
+			Transport_K_Epsilon 
+                  	{
+				convection { amont }
+				diffusion { }
+				conditions_limites
+				{
+					perio		periodique
+					WALL		paroi
+				} 
+				conditions_initiales { k_Eps Champ_Uniforme 2 $K_INIT $EPS_INIT } # k = 3/2.(I.U)^2 (I=10%), Eps = Cmu.k^(3/2)/(0.07.Dh) #
+            		}
+			turbulence_paroi loi_standard_hydr dt_impr_ustar 1.
+		}
+		Ecrire_fichier_xyz_valeur k_eps		5. bords 1 perio
+		Ecrire_fichier_xyz_valeur vitesse	5. bords 1 perio
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_Vcentre_box	vitesse	periode 0.05 point 1 0. $CY $CZ
+			sonde_Kcentre_box	k	periode 0.05 point 1 0. $CY $CZ
+			sonde_Epscentre_box	Eps	periode 0.05 point 1 0. $CY $CZ
+			sonde_V_box	nodes	vitesse	periode 0.05 segment 30 $SX1 $SY1 $SZ1	$SX2 $SY2 $SZ2
+		}
+		Format lata
+		Champs dt_post 1000
+		{
+			vitesse			faces
+			Viscosite_turbulente	elem
+			K			elem
+			Eps			elem
+			Y_plus			elem
+		}
+	}
+}
+
+Resoudre pb
+Fin

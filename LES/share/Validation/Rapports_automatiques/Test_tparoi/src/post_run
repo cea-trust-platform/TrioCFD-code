@@ -1,0 +1,4 @@
+#!/bin/bash
+flux=`grep "Bas    Paroi_flux_impose champ_front_uniforme 1 " flux_impose.data | awk '{print $5}'`
+test=`tail -1 Temp_imposee_pb_Diffusion_chaleur.out| awk -v flux=$flux '{if ($5==flux) {print "OK"} else {print "KO",$5,flux} }'`
+echo "test coherence jdd "  $test

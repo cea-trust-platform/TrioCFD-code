@@ -1,0 +1,233 @@
+#!/bin/sh
+print()
+{
+   string=$1
+   file=$2
+   error=`awk "BEGIN {print 100*($triou-$theorie)/$theorie}"`
+   echo "$string=$theorie (theory) $triou (Trio_U) $error %"
+   #echo "# $string Theory Trio_U Error[%]" > $file
+  # echo $theorie" "$triou" "$error > $file
+   echo $ECHO_OPTS $theorie" "$triou" \c" > $file
+   echo $error | awk '{printf("%2.2f\n",$1)}' >> $file  
+}
+
+jdd=test.data
+
+# fluid physical properties 
+rho_fluide=`	grep -i " rho "		$jdd | head -1 | awk '{print $4}'`
+mu=`		grep -i " mu " 		$jdd | head -1 | awk '{print $4}'`
+Cp_fluide=`	grep -i " cp " 		$jdd | head -1 | awk '{print $4}'`
+beta=`		grep -i " beta_th "  	$jdd | head -1 | awk '{print $4}'`
+lambda_fluide=`	grep -i " lambda "	$jdd | head -1 | awk '{print $4}'`
+# solid physical properties
+lambda_solide=`	grep -i " lambda "	$jdd | tail -1 | awk '{print $4}'`
+rho_solide=`	grep -i " rho "		$jdd | tail -1 | awk '{print $4}'`
+Cp_solide=`	grep -i " cp "  	$jdd | tail -1 | awk '{print $4}'`
+# mean velocity
+U=`		grep -i " vitesse " $jdd | head -1 | awk '{print $8}'`
+# volume thermal power
+q=`		grep -i " puissance_thermique " $jdd | head -1 | awk '{print $6}'`
+
+# ecriture des proprietes physiques des milieux dans fichier #
+echo $rho_fluide > rho_f.dat
+echo $mu > mu_f.dat
+echo $lambda_fluide > lambda_fluide.dat
+echo $Cp_fluide > cp_f.dat
+echo $beta > beta_f.dat
+echo $rho_solide > rho_solide.dat
+echo $Cp_solide > cp_solide.dat
+echo $lambda_solide > lambda_solide.dat
+
+echo $U > mean_velocity.dat
+echo $q > puissance_volumique.dat
+# geometrical dimensions 
+r1=0.8
+r2=1
+L=0.2
+teta=`awk "BEGIN {print 2*3.141/6}"` # Maillage camembert 2*Pi/6
+S=`awk "BEGIN {print $L*$teta*$r1}"` # Surface d'échange fluide-solide
+echo S_contact=$S
+volume_solide=`awk "BEGIN {print 0.5*$teta*($r2^2-$r1^2)*$L}"`
+echo volume_solide=$volume_solide
+volume_fluide=`awk "BEGIN {print 0.5*$teta*$r1^2*$L}"`
+echo volume_flude=$volume_fluide
+Dh=`awk -v L=$L '/Area of perio_fluid/ {area=0.5*$NF} /Area of paroi_fluid/ {pm=$NF/L} END {print 4*area/pm}' test.err`
+echo Dh=$Dh
+################################
+# Calcul du nombre de Reynolds #
+################################
+theorie=`awk "BEGIN {print $rho_fluide*$U*2*$r1/$mu}"`
+triou=` awk "BEGIN {print $rho_fluide*$U*$Dh/$mu}"`
+Re=$triou  # Used later
+print Re Re.txt
+paste mean_velocity.dat Re.txt > velocity_vs_Re.txt
+###############################
+# Calcul du nombre de Prandtl #
+###############################
+Pr=`awk "BEGIN {print $mu*$Cp_fluide/$lambda_fluide}"`
+echo "Prandtl=$Pr"
+echo $Pr > Pr.dat
+
+#########################
+# Recuperation y+ paroi #
+#########################
+y_plus=`awk '/u\*/ {print $4}' test_pb_fluide_Ustar.face | tail -1`
+echo "y+=$y_plus"
+echo $y_plus > y_plus.txt
+
+
+############################
+# Comparaison avec Blasius # ok #
+############################
+# U*=U sqrt(1/2*Cf) et Cf=0.079*Re^-0.25 
+Cf=`awk "BEGIN {print 0.079*$Re^-0.25}"`
+theorie=`awk "BEGIN {print $U*sqrt(0.5*$Cf)}"`
+triou=`awk '/u\*/ {print $6}' test_pb_fluide_Ustar.face | tail -1`
+u_star=$triou # Value used later
+print u*[m/s] u_star.txt
+
+#####################
+# Pertes de charges #
+#####################
+# Dp = 4*Cf*(L/Dh)*0.5*rho*U^2
+theorie=`awk "BEGIN {print 4*$Cf*$L/(2*$r1)*0.5*$rho_fluide*$U^2}"`
+triou=`awk -v rho=$rho_fluide -v L=$L '{gradP_etoile=$2} END {print gradP_etoile*rho*L}' test_Pressure_Gradient_pb_fluide_perio_fluid`
+print dp[Pa] dP.txt
+
+#####################
+# Nombre de Nusselt # ok #
+#####################
+# Nu=6.3+0.0167*Re^0.85*Pr^0.93
+
+debit=`         	awk '{print $3}' test_pb_fluide_Debit.out 		| tail -1`
+flux_chaleur=`  	awk '{print $3}' test_pb_fluide_Convection_chaleur.out 	| tail -1`
+flux_paroi_fluide=`    	awk '{print $4}' test_pb_fluide_Diffusion_chaleur.out 	| tail -1`
+flux_paroi_solide=`    	awk '{print -$4}' test_pb_solide_Diffusion_chaleur.out 	| tail -1`
+echo flux_paroi_fluide=$flux_paroi_fluide
+echo flux_paroi_solide=$flux_paroi_solide
+if [ `awk "BEGIN {if (($flux_paroi_fluide-$flux_paroi_fluide)/$flux_paroi_fluide>0.01) print 1;else print 0}"` = 1 ]
+then
+   echo "Error: Heat flux DO NOT match."
+   exit -1
+fi
+Tr1=`           	awk '{print $2}' test_TEMPERATURE_CONTACT.son 		| tail -1`
+Tbulk=`         	awk "BEGIN {print $flux_chaleur/$debit/$rho_fluide/$Cp_fluide}"`
+echo "Tbulk selon rapport des flux      : "$Tbulk
+Tbulk=`         	tail -1 Tmoyen_perio_fluid | awk '{print $2}'`
+echo "Tbulk selon traitement_particulier: "$Tbulk
+
+theorie=`awk "BEGIN {print 6.3+0.0167*$Re^0.85*$Pr^0.93}"`
+Nusselt=$theorie # Value used later
+triou=`awk "BEGIN {print $flux_paroi_solide/$S*2*$r1/($lambda_fluide*($Tr1-$Tbulk))}"`
+print Nusselt nusselt.txt
+
+###########
+# Loi log #
+###########
+# U+=1/0.415*ln(y+)+5.32
+# U+=U/U*
+# y+=yU*/nu
+extrait_coupe test VITESSE_PROFIL 1>extrait_coupe.log
+awk -v u_star=$u_star -v mu=$mu -v rho=$rho_fluide -v r1=$r1 'BEGIN {print "# y+ U+(theory) U+(Trio_U)"} \
+(NF==4) { \
+   y_plus=($1+r1)*u_star/mu*rho; \
+   print y_plus" "1./0.415*log(y_plus)+5.32" "$4/u_star; \
+}' test_VITESSE_PROFIL.coupe > vitesse.txt
+# Provisoire rajouter le point u+,y+ donné dans le fichier u_star ?
+
+#####################
+# Pente d'evolution #
+#####################
+dT_sur_dt_solide=`awk '{print $12}' test.dt_ev | tail -1`
+dT_sur_dt_fluide=`awk '{print $11}' test.dt_ev | tail -1`
+theorie=`awk "BEGIN {print $q/($rho_solide*$Cp_solide+$rho_fluide*$Cp_fluide*$volume_fluide/$volume_solide)}"`
+pente=$theorie # Used later
+triou=$dT_sur_dt_solide
+
+print dT/dt pente.txt
+
+#########
+# Bilan #
+#########
+echo "(q-rho*Cp*dT/dt)*vol(solide)"=`awk "BEGIN {print ($q-$rho_solide*$Cp_solide*$dT_sur_dt_solide)*$volume_solide}"`
+echo flux_surface=$flux_paroi_solide
+echo "rho*Cp*dT/dt*vol(fluide)"=`awk "BEGIN {print $rho_fluide*$Cp_fluide*$dT_sur_dt_fluide*$volume_fluide}"`
+
+#########################
+# Flux surfacique paroi #
+#########################
+# Flux[W/m2]
+theorie=`awk "BEGIN {print $q*$rho_fluide*$Cp_fluide/($rho_solide*$Cp_solide/$volume_fluide+$rho_fluide*$Cp_fluide/$volume_solide)/$S}"`
+flux_paroi=$theorie
+triou=`awk "BEGIN {print $flux_paroi_solide/$S}"` # Flux surfacique [W/m2] à partir du flux [W]
+print flux_paroi[W/m2] flux_paroi.txt
+
+################
+# Temperatures #
+################
+# Definition de Q=q-rho_solide*Cp_solide*pente
+Q=`awk "BEGIN {print $q-$rho_solide*$Cp_solide*$pente}"`
+
+Tr2=`awk '{print $2}' test_TEMPERATURE_EXTERNE.son | tail -1`
+theorie=`awk "BEGIN {print $Q/(4*$lambda_solide)*($r1^2-$r2^2)+$Q/(2*$lambda_solide)*$r2^2*log($r2/$r1)}"`
+triou=`awk "BEGIN {print $Tr2-$Tr1}"`
+print Tr2-Tr1 Tr2_moins_Tr1.txt
+
+theorie=`awk "BEGIN {print $flux_paroi*2*$r1/($lambda_fluide*$Nusselt)}"`
+triou=`awk "BEGIN {print $Tr1-$Tbulk}"`
+print Tr1-Tbulk Tr1_moins_Tbulk.txt
+
+theorie=`awk "BEGIN {print $Q/(4*$lambda_solide)*($r1^2-$r2^2)+$Q/(2*$lambda_solide)*$r2^2*log($r2/$r1)+$flux_paroi*2*$r1/($lambda_fluide*$Nusselt)}"`
+triou=`awk "BEGIN {print $Tr2-$Tbulk}"`
+print Tr2-Tbulk Tr2_moins_Tbulk.txt
+
+# Profil de temperature
+extrait_coupe test TEMPERATURE_PROFIL 1>>extrait_coupe.log
+# Provisoire voir fiche VB #
+#### profils de temperature dans le solide
+## profil THEORIQUE : T(r)_Tbulk
+	## temperature solide theorique
+echo 1 | awk -v Q=$Q -v lambda_solide=$lambda_solide -v lambda_fluide=$lambda_fluide -v r1=$r1 -v r2=$r2 -v Nusselt=$Nusselt -v flux_paroi=$flux_paroi '	
+	function T_s(r)
+		{
+		toto=Q/(4*lambda_solide)*(r1^2-r^2)+Q/(2*lambda_solide)*r2^2*log(r/r1)+flux_paroi*2*r1/(lambda_fluide*Nusselt);
+		return toto;
+		}
+	{
+	for(r=0.8;r<1.01;r=r+0.01) {printf "%.4f %.4f\n",r,T_s(r) > "profil_temp_solide.dat"}
+	}
+	'
+
+## profil CALCULE ##
+##################################################################################
+# pour tracer l'evolution spatiale des segments-sondes pour des champs scalaires #
+##################################################################################
+# avec extrait_coupe, on obtient evolution spatiale d'un champ en fonction d'une abcisse curviligne
+# on cherche ici a verifier la validite du trace avec extrait_coupe lorsque z varie
+# procedure utilisee pour recuperer l'evolution spatiale de champ scalaire au dernier pas de temps 
+
+      fichier=test_TEMPERATURE_PROFIL.son
+      extension=`echo ${fichier%.son} |awk -F "SONDE_" '{print $NF}'`
+#     # attention : il faut prendre l'AVANT dernier pas de temps
+      colonne=`tail -1 $fichier | head -1 | awk '{print NF-2}'`  #  on enleve le temps et on divise par 3 pour avoir nbre iterations 
+     echo "#coordonnes""X" "Y" "Z"  "valeur champ"> $extension"_triou.txt" 
+     for j in `seq 0 $colonne`
+     do 
+#      ######recuperation des coordonnees X
+        tmp1=`echo $j | awk '{print $j*6+4}'`  
+  	tmp1bis=`echo $tmp1 | awk '{print $1+2}'`
+  	tmp1ter=`echo $tmp1 | awk '{print $1+4}'`
+  	coord_X=`head -2 $fichier  | awk '{print($'$tmp1')}'`
+  	coord_Y=`head -2 $fichier  | awk '{print($'$tmp1bis')}'`
+  	coord_Z=`head -2 $fichier   | awk '{print($'$tmp1ter')}'`
+	coord_R=`echo $coord_X $coord_Y | awk '{print sqrt($1*$1+$2*$2)}'`
+#  	#recuperation de la valeur du champ scalaire
+	tmp2=`echo $j | awk '{print $1+2}'`
+  	Temp=`tail -1 $fichier | awk '{print ($'$tmp2')}'` 
+	Temp_fin=`echo $Temp $Tbulk | awk '{print $1-$2}'`
+#	#ecriture dans le fichier
+  	echo $coord_R"  "$Temp_fin >> $extension"_triou.txt"
+  	j=j+1
+      done
+
+

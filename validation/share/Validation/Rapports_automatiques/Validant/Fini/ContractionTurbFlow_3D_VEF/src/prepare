@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# Turbulent model tested k-epsilon
+# Downstream Reynolds number tested: 200 000
+# Upstream Reynolds number: 100 000
+# ratio between the section: 4
+# Recirculation box Re=100 000
+
+gunzip -c sudden_contraction_2.asc.gz > sudden_contraction_2.asc
+
+## creation of the different repertories
+mkdir MESH_1
+mkdir REFINED_MESH
+
+for dir in MESH_1 REFINED_MESH
+do
+	cd $dir
+	mkdir alpha_1
+	mkdir alpha_02
+	mkdir BOX
+	cd ..
+done
+
+## preparation of parallel calculations
+cd MESH_1
+cp ../sudden_contraction_1.asc ../decoupage_4.data .
+make_PAR.data decoupage_4.data
+sed "s/nbproc/4/"  ../sudden_contraction.data  > ./sudden_contraction.data
+cp ../box.mesh1.tgz  box.tgz
+cd ..
+cd REFINED_MESH
+cp ../sudden_contraction_2.asc ../decoupage_12.data .
+make_PAR.data decoupage_12.data
+sed "s/nbproc/12/"  ../sudden_contraction.data  > ./sudden_contraction.data
+cp ../box.refined_mesh.tgz  box.tgz
+cd ..
+
+## copy of the files
+for dir in MESH_1/alpha_1 REFINED_MESH/alpha_1 MESH_1/alpha_02 REFINED_MESH/alpha_02
+do
+	cd $dir
+	cp ../../contraction.awk ../../box.awk ../../post_run ../sudden_contraction.data  ../../pre_run ../box.tgz .
+	cp ../*Zones .
+	cd ../..
+done
+## modification of the parameter alpha for the contraction
+for dir in MESH_1/alpha_1 REFINED_MESH/alpha_1
+do
+	cd $dir
+	sed "s/convection { ef_stab { alpha 0.2 } }/convection { ef_stab { alpha 1. } }/" sudden_contraction.data > modifie.data ; mv modifie.data sudden_contraction.data
+	cd ../..
+done
+
+
+
+## preparation of recirculation box
+cd ./MESH_1/BOX
+cp ../../recirculation_box.data ../../sudden_contraction_1.asc ../../box.awk ../../post_run .
+cd ../..
+
+cd ./REFINED_MESH/BOX
+cp ../../recirculation_box.data ../../sudden_contraction_2.asc ../../box.awk ../../post_run .
+# modification of the mesh
+sed "s/ DOM sudden_contraction_1.asc/ DOM sudden_contraction_2.asc/" recirculation_box.data > modifie.data ; mv modifie.data recirculation_box.data
+cd ../..
+
+
+
+
+
+
+	

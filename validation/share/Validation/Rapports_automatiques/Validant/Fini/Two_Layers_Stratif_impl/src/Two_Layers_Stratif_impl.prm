@@ -1,0 +1,3292 @@
+Parameters {
+	Title "Turbulent Stratification with Thermal Gradient Implicit"
+	Description "Stable and Unstable Turbulent Layers in a channel"
+	Description
+	Description Here the test case of two stratified layers is considered to assess the implicit time scheme.
+	Description The calculations are performed with the Piso, Implicite and Simple algorithms as well as with the Euler explicit time scheme. The original test cases are those considered in the Two_Layers_Stratif validation case (explicit time scheme).
+	Description The resolution of the K_epsilon equation is explicit.
+        Description "Validated Model :"
+        Description "________________: k-epsilon for thermal turbulent flow "
+        Description "________________: Standard Wall function with low y+ value "
+        Description "________________: Free surface flow "
+        Description "Validation with Viollet's experiments [1]"
+	Description "CAUTION : THE k-epsilon model IS NOT SO CONVENIENT for this type of flow."
+
+	VersionTrio_U "1.5.7 + developpement algorithme Simple"
+
+	ParametersTrio_U Type of problem : thermohydraulic turbulent
+	ParametersTrio_U Dimension : 2D
+	ParametersTrio_U Time scheme : Euler_implicite (Piso - Implicite - Simple) and Euler_explicite
+        ParametersTrio_U Hydraulic Convection scheme: muscl		
+        ParametersTrio_U Thermal Convection scheme: muscl
+        ParametersTrio_U K_epsilon Convection scheme: amont
+        ParametersTrio_U Discretization : VEFPreP1B
+        ParametersTrio_U Turbulence model : k epsilon with standard wall law function and Prandtl model with Prt=0.5
+        ParametersTrio_U Type of boundary conditions : symmetry at the top edge, no-slip at fluid / solid interface, 
+        ParametersTrio_U Imposed stratified velocity, temperature, k and eps at the inlet, different for each layer
+        ParametersTrio_U Type of fluid : water
+
+	TestCase stable_vef STABLE_explicite
+  	TestCase stable_vef STABLE_piso
+	TestCase stable_vef STABLE_implicite /* data set in annex */
+	TestCase stable_vef STABLE_simple 
+	TestCase stable_vef STABLE_piso_facsecmax500
+	TestCase stable_vef STABLE_implicite_facsecmax500
+	TestCase stable_vef STABLE_simple_facsecmax500
+	TestCase stable_vef STABLE_simple_relax0.2
+	TestCase stable_vef STABLE_simple_relax0.01
+	TestCase stable_vef STABLE_piso_nb_proj2
+	
+	TestCase unstable_vef UNSTABLE_explicite
+   	TestCase unstable_vef UNSTABLE_piso
+	TestCase unstable_vef UNSTABLE_implicite  /* data set in annex */
+	TestCase unstable_vef UNSTABLE_simple
+	TestCase unstable_vef UNSTABLE_piso_facsecmax500 
+	TestCase unstable_vef UNSTABLE_implicite_facsecmax500
+	TestCase unstable_vef UNSTABLE_simple_facsecmax500
+	TestCase unstable_vef UNSTABLE_simple_relax0.2
+	TestCase unstable_vef UNSTABLE_simple_relax0.01
+	TestCase unstable_vef UNSTABLE_piso_nb_proj2
+
+	Reference "[1] Turbulent mixing in a two layer stratified shear flow, P.L.Viollet, 2nd international symposium on stratified flows, Trondheim, Norvege, 24-27/06/1980, pp 315-325"
+	Reference "[2] Simulation des grandes echelles d'ecoulements turbulents stratifies en densite, B.Fallon, these, INPG, CEA, 21 decembre 1994"
+	Reference "[3] http://www.env.leeds.ac.uk/envi2210/notes/node12.html"
+
+	Author "M. Elmo"
+	IncludeData 2
+}
+
+Chapter { 
+        Title "Test description"
+        Title "2D channel with specific dimensions : L=4,5m  H=2*h=0,2m"
+	Figure {
+                Title "Geometry description"
+                Width 9cm
+                picture ./Geometry.png
+		}
+		
+	visu {
+                Title "VEF meshing"
+                Width 9cm
+	        Description "7 200 meshes with trianguler_h option"
+		Description "Stable regime (from explicit calculation) : Y+ ~= 22.49, u* = 5.88e-3"
+		Description "Unstable regime (from explicit calculation) : Y+ ~= 40.11, u* = 1.05e-2"
+	        Description " The figure below is a Zoom on the first 0.5 m"
+                mesh stable_vef/STABLE_piso.lata dom
+		zoom2D 0. 0.5 0. 0.2
+        }	
+	
+	Description "In order to reduce the calculation time, the geometry is limited to X=4.5m. Of course the experimental facility is much longer, but there is no influence of the outlet"
+	Figure {
+                Title "Initial and Boundary conditions"
+	        Description "Initial conditions : u = U1 if y>0,1 U2 else ; v=0 "
+	        Description "__________________ : T = T1 if y>0,1 T2 else "
+		Description "Boundary conditions for Hydraulics: " 
+		Description "___________________: Top edge :  symetrie "
+     		Description "___________________: Low edge :  paroi_fixe "
+     		Description "___________________: Left edge :  inlet  with u=U1 if y >0,1 else U2  v=0 "
+     		Description "___________________: Right edge : outlet with u=0. "
+
+		Description "Boundary conditions for Temperature: "
+    		Description "___________________: Top edge :  symetrie "
+    		Description "___________________: Low edge :  paroi_adiabatique "
+    		Description "___________________: Left edge : inlet with  T=T1 if y >0,1 else T2   "
+    		Description "___________________: Right edge : outlet with T=0.   "
+		Description "K-$\varepsilon$ boundary and initial conditions : they are calculated for each layer with the correlations adapted to plane jet."
+                Width 9cm
+		picture ./BC-keps.png
+		Description "So we have the values below :"
+		Description "___________________: For u=0,1m.s-1, k=1.e-4 and $\varepsilon$=1.1e-4"   
+		Description "___________________: For u=0,05m.s-1, k=2.5e-5 and $\varepsilon$=1.39e-5"
+	}
+	Table { 
+                Title "Flow description"
+		Description "A stable and an unstable stratifications are calculated. The Reynolds number Reh = u1 h /$\nu$ and the Froude number \latex_(Fr = (u2 - u1) / [g$\beta(T1 - T2)h]^{1/2} $\latex_) have been chosen to respect the experimental values."
+         	Description "The stable two layers stratified flow is obtained with :"
+		Description "u1=0,05m.s-1 and u2=0,1m.s-1"
+		Description "T1=27,9°C    and T2=12,1°C "
+		Description "which corresponds to Reh = 5.10$^3$ and Fr = 0.9"
+		Description " "
+         	Description "The unstable two layers stratified flow is obtained with :"
+		Description "u1=0,1m.s-1  and u2=0,2m.s-1"
+		Description "T1=21°C      and T2=19°C"
+		Description "which respond to Reh = 10$^4$ and Fr = 5."
+		Description " "
+		Description "The velocity and temperature profiles obtained at different distances from the inlet are compared to those obtained by Viollet [1] in his experiment. The experimental values are not very well known, especially the top thermal condition is not so clear. A symetry condition models the free surface for the Trio_U calculations which is not very satisfying."
+		Description "A useful parameter in the study of buoyancy effects on turbulent mixing is the gradient Richardson number, which can be written in this study [3] : Rix = (b h/x) / (u2 - u1)$^2$"
+                Description "where b is the buoyancy term defined by b = g$\beta$$\Delta$T"
+                Description "Gravity effects are negligible if Rix is small, and there is general experimental agreement that turbulent mixing is nearly suppressed when Rix is greater than a critical value Ric (about 0,1 to 0,3). At x = 40h in the 'stable case', Rih=0,02 so that buoyancy effects are negligible. In the unstable case Rih=0,6 so that the stratification is destroyed by the turbulence of ambient shear flow."
+        }
+
+	Table {
+        Title "Physical properties"
+        Description "Fluid domain: water at 20°C"
+        nb_columns 1
+                Label Valeur
+                line {
+                        legend "$\rho$ en kg/m$³$"
+                        file ./rho.dat
+                }
+                line {
+                        legend "$\mu$ en N/m$²$/s"
+                        file ./mu.dat
+                }
+                line {
+                        legend "$\lambda$ en W/m/K"
+                        file ./lambda.dat
+                }
+                line {
+                        legend "Cp en J/kg/K"
+                        file ./Cp.dat
+                }
+        }
+	
+	Table {
+	Title "Time schemes parameters" 
+	Description "Notice that value -1 here indicates that the the specified variable has no sense for the algorithm."
+	
+	nb_columns 4
+	label Initial facsec | seuil_solveur | seuil_implicite | seuil_statio
+	
+	line {
+	 values  1 -1 -1 4.e-5
+	 legend Euler explicite
+	}
+	line {
+	 values 5 1.e-8 1.e6 2.e-3
+	 legend Piso
+	}
+	line {
+	 values 5 1.e-8 1.e6 2.e-3
+	 legend Implicite
+	}
+	line {
+	 values 5 1.e-8 1.e6 2.e-3
+	 legend Simple
+	}
+	
+	}
+}
+
+Chapter {
+	Title "Stable regime (temperature gradient of 15.54°C) : default case"
+        
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the stable stratified flow are compared to the experimental data."
+	Description "The results are presented here for the default case : facsec_max = 30 and relax_pression = 0.1 for the Simple algorithm." 
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 250
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+	  	 file stable_vef/STABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "Piso"
+	  	 file stable_vef/STABLE_piso.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file stable_vef/STABLE_implicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+	Curve {
+		 legend "Simple"
+	  	 file stable_vef/STABLE_simple.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+}
+
+
+Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 250
+	RangeY 0 40
+	Include_Description_Curves 0
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+	  	 file stable_vef/STABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Piso"
+	  	 file stable_vef/STABLE_piso.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file stable_vef/STABLE_implicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 file stable_vef/STABLE_simple.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+
+}
+	
+Chapter {
+	Title "Stable regime : influence of the facsec parameter"
+	Description "In this chapter the influence of the facsec parameter is tested." 
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the stable stratified flow are compared to the experimental data."
+	Description "The results are presented here for facsec_max = 500 and relax_pression = 0.1 for the Simple algorithm." 
+		
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_facsecmax500.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite_facsecmax500.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_facsecmax500.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_facsecmax500.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite_facsecmax500.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_facsecmax500.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_facsecmax500.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite_facsecmax500.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_facsecmax500.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_facsecmax500.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite_facsecmax500.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_facsecmax500.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_facsecmax500.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite_facsecmax500.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_facsecmax500.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_facsecmax500.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_implicite_facsecmax500.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_facsecmax500.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 300
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+	  	 file stable_vef/STABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "Piso"
+	  	 file stable_vef/STABLE_piso_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file stable_vef/STABLE_implicite_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+	Curve {
+		 legend "Simple"
+	  	 file stable_vef/STABLE_simple_facsecmax500.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+}
+
+Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 300
+	Include_Description_Curves 0
+	legend  center right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+	  	 file stable_vef/STABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+	  	 file stable_vef/STABLE_piso_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file stable_vef/STABLE_implicite_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 file stable_vef/STABLE_simple_facsecmax500.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+
+}
+
+
+Chapter {
+	Title "Stable regime : influence of the relax_pression parameter for the Simple algorithm"
+	Description "In this chapter the influence of the relax_pression parameter for the Simple algorithm is tested." 
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the stable stratified flow are compared to the experimental data."
+	Description "The results are presented here for the following values of the relaxation pressure factor : 0.2, 0.1, 0.01 and facsec_max = 30." 
+
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.2.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.01.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.2.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.01.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.2.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.01.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.2.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.01.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.2.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.01.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.2.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_simple_relax0.01.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 300
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+	  	 file stable_vef/STABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "relax_pression = 0.2"
+	  	 file stable_vef/STABLE_simple_relax0.2.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "relax_pression = 0.1"
+	  	 file stable_vef/STABLE_simple.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.2
+	}
+	
+	Curve {
+		 legend "relax_pression = 0.01"
+	  	 file stable_vef/STABLE_simple_relax0.01.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+}
+
+
+Chapter {
+	Title "Stable regime : influence of the number of corrections for the PISO algorithm"
+	Description "In this chapter the influence of the number of corrections for the PISO algorithm is tested." 
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the stable stratified flow are compared to the experimental data."
+	Description "The results are presented here for two cases. In the first one, a maximum of 21 corrections is applied and in a second case 2 corrections are applied (facsec_max = 30)." 
+
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_nb_proj2.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_nb_proj2.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_nb_proj2.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_nb_proj2.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_nb_proj2.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend  left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./stable_vef/STABLE_piso_nb_proj2.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	
+}
+
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 300
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+	  	 file stable_vef/STABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "nb corrections max = 21"
+	  	 file stable_vef/STABLE_piso.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "nb corrections max = 2"
+	  	 file stable_vef/STABLE_piso_nb_proj2.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+}
+}
+
+Chapter {
+          Title "Conclusions for the Stable case"
+          Table {
+		Description "It is first observed that the three implicit algorithms lead to identical results in comparison to those obtained with the explicit time scheme."
+		Description "It is also seen that none of the three implicit algorithms reach the stationnarity threshold value when the facsec is allowed to increase to values larger than 30. Despite of the weak convergency for facsec_max = 500, the results remains satisfactory in comparison to those obtained with the explicit time scheme."
+		
+		Description "-PISO : The efficiency of the algorithm is improved when the maximum corrections is reduced to 2. This fact is observed for facsec_max = 30."
+
+		Description "-Simple : It has to be noticed that the relaxation pressure factor affects the residu evolution since for the lower value (0.01) the requested convergency is not reached. However it has no influence on the physical results for the set of relaxation values considered." 
+		Description "-Implicite : the more efficient algorithm to obtain satisfactory results with the requested convergency criteria is the Implicite. Unlike the others, it is not necessary to choose different parameters to use it. It is thus more user friendly than the others and is recommended."
+          }
+}
+
+
+Chapter {
+	Title "Unstable regime (temperature gradient of 2°C) : default case"
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the unstable stratified flow are compared to the experimental data."
+	Description "The results are presented here for the default case : facsec_max = 30 and relax_pression = 0.1 for the Simple algorithm." 	
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 60
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	Curve {
+		 legend "Euler explicite"
+	  	 file unstable_vef/UNSTABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "Piso"
+	  	 file unstable_vef/UNSTABLE_piso.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file unstable_vef/UNSTABLE_implicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.2
+	}
+	Curve {
+		 legend "Simple"
+	  	 file unstable_vef/UNSTABLE_simple.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 60
+	RangeY 0 40
+	Include_Description_Curves 0
+	width 12cm
+	Curve {
+		 legend "Euler explicite"
+	  	 file unstable_vef/UNSTABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+	  	 file unstable_vef/UNSTABLE_piso.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1.
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file unstable_vef/UNSTABLE_implicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 file unstable_vef/UNSTABLE_simple.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+
+}
+
+Chapter {
+	Title "Unstable regime : influence of the facsec parameter"
+	Description "In this chapter the influence of the facsec parameter is tested." 
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the unstable stratified flow are compared to the experimental data."
+	Description "The results are presented here for facsec_max = 500 and relax_pression = 0.1 for the Simple algorithm." 
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_facsecmax500.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite_facsecmax500.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_facsecmax500.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_facsecmax500.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite_facsecmax500.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_facsecmax500.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_facsecmax500.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite_facsecmax500.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_facsecmax500.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_facsecmax500.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite_facsecmax500.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_facsecmax500.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_facsecmax500.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite_facsecmax500.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_facsecmax500.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "Piso"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_facsecmax500.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "Implicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_implicite_facsecmax500.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "Simple"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_facsecmax500.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 60
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	Curve {
+		 legend "Euler explicite"
+	  	 file unstable_vef/UNSTABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "Piso"
+	  	 file unstable_vef/UNSTABLE_piso_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file unstable_vef/UNSTABLE_implicite_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.2
+	}
+	Curve {
+		 legend "Simple"
+	  	 file unstable_vef/UNSTABLE_simple_facsecmax500.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+
+
+Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 60
+	Include_Description_Curves 0
+	width 12cm
+	Curve {
+		 legend "Euler explicite"
+	  	 file unstable_vef/UNSTABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+	  	 file unstable_vef/UNSTABLE_piso_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+	  	 file unstable_vef/UNSTABLE_implicite_facsecmax500.dt_ev
+		 origin "Trio_U"
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 file unstable_vef/UNSTABLE_simple_facsecmax500.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+
+}
+
+
+Chapter {
+	Title "Unstable regime : influence of the relax_pression parameter for the Simple algorithm"
+	Description "In this chapter the influence of the relax_pression parameter for the Simple algorithm is tested." 
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the unstable stratified flow are compared to the experimental data."
+	Description "The results are presented here for the following values of the relaxation pressure factor : 0.2, 0.1, 0.01 (facsec_max = 30)." 
+
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.2.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.01.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.2.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.01.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.2.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.01.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.2.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.01.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.2.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.01.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "relax_pression = 0.2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.2.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "relax_pression = 0.1"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1
+	}
+	Curve {
+		legend "relax_pression = 0.01"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_simple_relax0.01.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 0.1
+	}
+}
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 60
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	Curve {
+		 legend "Euler explicite"
+	  	 file unstable_vef/UNSTABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "relax_pression = 0.2"
+	  	 file unstable_vef/UNSTABLE_simple_relax0.2.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "relax_pression = 0.1"
+	  	 file unstable_vef/UNSTABLE_simple.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.2
+	}
+	Curve {
+		 legend "relax_pression = 0.01"
+	  	 file unstable_vef/UNSTABLE_simple_relax0.01.dt_ev
+	  	 origin "Trio_U"
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+}
+}
+
+Chapter {
+	Title "Unstable regime : influence of the number of corrections for the PISO algorithm"
+	Description "In this chapter the influence of the number of corrections for the PISO algorithm is tested." 
+	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the unstable stratified flow are compared to the experimental data."
+	Description "The results are presented here for two cases. In the first one, a maximum of 21 corrections is applied and in a second one 2 corrections are applied (facsec_max = 30)." 
+
+	
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_nb_proj2.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_nb_proj2.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_nb_proj2.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_nb_proj2.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_nb_proj2.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	Include_Description_Curves 0
+	legend left
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "Euler explicite"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_explicite.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 2.5
+	}
+	Curve {
+		legend "nb corrections max = 21"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+	Curve {
+		legend "nb corrections max = 2"
+		origin "Trio_U"
+		Segment ./unstable_vef/UNSTABLE_piso_nb_proj2.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		Pointsize 1.5
+	}
+}
+
+Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 60
+	Logy
+	Include_Description_Curves 0
+	width 12cm
+	Curve {
+		 legend "Euler explicite"
+	  	 file unstable_vef/UNSTABLE_explicite.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "nb corrections max = 21"
+	  	 file unstable_vef/UNSTABLE_piso.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "nb corrections max = 2"
+	  	 file unstable_vef/UNSTABLE_piso_nb_proj2.dt_ev
+		 origin "Trio_U"
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+}	
+	
+}
+
+Chapter {
+          Title "Conclusions for the unstable case"
+          Table {
+                  
+		Description "It is first observed that the three implicit algorithms lead to identical results in comparison to those obtained with the explicit time scheme."
+		Description "It may also be noticed that the three implicit algorithms reach the stationnarity threshold value when the facsec is allowed to increase to values larger than 30. It was not the case for the stable regime."
+		
+		Description "-PISO : The efficiency of the algorithm is improved when the maximum corrections is reduced to 2. This fact is observed for facsec_max = 30."
+
+		Description "-Simple : The relaxation pressure factor does not affect the results." 
+ 		Description "-Implicite:Finally the Simple and Implicite algorithms are the more efficient to obtain satisfactory results with the requested convergency criteria and they show indeed some very close performance for this test case. However, unlike the others, the implicite algorithm doesn't need any further parameter. It is thus more user friendly and is recommended."
+          }
+}
+
+Chapter {
+        Title "Recommendations for users"
+	description "The Implicite algorithm should be used to avoid the user to have to choose different parameters. As can be seen in the below table, the gain in calculation time is a factor ranged from 10 to 20 for this test case.	
+}
+
+Chapter {
+        Title "Computer performance"
+	Description "The performance data indicated in the array below corresponds to the values extracted from the .TU file." 
+	Description "It has to be noticed that by default these data corresponds to the elapsed time to perform each calculation (method gettimeofday used in Statistiques)."
+	
+        tableau_performance {
+        }
+}

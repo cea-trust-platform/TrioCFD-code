@@ -1,0 +1,35 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../../propertiesGeometry.py
+##
+extrait_coupe test.data SONDE_CENTRALECONCENTRATION_50
+extrait_coupe test.data SONDE_CENTRALEVELOCITY_50
+#
+extrait_coupe test.data SONDE_UZ0.000
+extrait_coupe test.data SONDE_UZ0.015
+extrait_coupe test.data SONDE_UZ0.030
+extrait_coupe test.data SONDE_UZ0.045
+extrait_coupe test.data SONDE_UZ0.060
+extrait_coupe test.data SONDE_UZ0.075
+extrait_coupe test.data SONDE_UZ0.090
+extrait_coupe test.data SONDE_UZ0.105
+extrait_coupe test.data SONDE_UZ0.120
+extrait_coupe test.data SONDE_UZ0.135
+extrait_coupe test.data SONDE_UZ0.150
+extrait_coupe test.data SONDE_CZ0.000
+extrait_coupe test.data SONDE_CZ0.015
+extrait_coupe test.data SONDE_CZ0.030
+extrait_coupe test.data SONDE_CZ0.045
+extrait_coupe test.data SONDE_CZ0.060
+extrait_coupe test.data SONDE_CZ0.075
+extrait_coupe test.data SONDE_CZ0.090
+extrait_coupe test.data SONDE_CZ0.105
+extrait_coupe test.data SONDE_CZ0.120
+extrait_coupe test.data SONDE_CZ0.135
+extrait_coupe test.data SONDE_CZ0.150
+#
+#
+python curves.py test_SONDE_CENTRALEVELOCITY_50.coupe test_SONDE_CENTRALECONCENTRATION_50.coupe propertiesGeometry.dat
+
+

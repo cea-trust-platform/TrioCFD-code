@@ -1,0 +1,61 @@
+Parameters {
+	Title "Study convergence of implicite diffusion scheme in 2D VEF"
+	
+	Description "The objective is to do a grid convergence."
+	
+	ParametersTrio_U "Type of problem: 2D hydraulic_problem"
+	ParametersTrio_U "Discretization: VEFPreP1B"
+	ParametersTrio_U "Convection scheme: muscl" 
+	ParametersTrio_U "Solving of equations: Navier_Stokes"
+#
+	Reference " $[1]$ Towards large-eddy simulation in complex geometries. Mahesh K., Ruetsch G. R., Moin P. Center for Turbulence Research, Annual Research Briefs 1999" 
+	Reference " $[2]$ Description of Taylor Green votexes: http://en.wikipedia.org/wiki/Taylor%E2%80%93Green_vortex"
+	$Castest
+			
+	Author "Ledac P., Reuillon E."
+	IncludeData 2
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Tests Description"
+	Description "Hydraulic initial conditions: fluid U = f(x,y) V = g(x,y)"
+	Description "where f(x,y)=-cos(2*Pi*x)*sin(2*Pi*y)*exp(-2*$\nu$*t) g(x,y)=sin(2*Pi*x)*cos(2*Pi*y)*exp(-2*$\nu$*t) and $\nu$=$\mu$/$\rho$"
+	Description "Hydraulic boundary condition: "
+	Description " $\bullet$ BOUNDARY with $BC condition.\newline"
+	Description "In this study, the implicite diffusion option is tested in function of the following schemes :  "
+	Description " - schema_euler_explicite "
+	Description " - Runge_Kutta_ordre_2  "
+	Description " - Runge_Kutta_ordre_3 "
+	Description " - Runge_Kutta_ordre_4 \newline "
+	Description " This schemes are compared to the diffusion implicite time scheme. \newline "
+	Description "At first, we will check only the impact of the option diffusion implicite on this time shemes."
+	Description "Secondly, we will try to estimate the accuracy of this different time schemes in using a fixed time step for all test cases (determined by CFL conditions)."
+       
+}
+Chapter { 
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "2D Results"
+	Description "Taylor Green vortexes"
+	#include visu.include
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "1D Results"
+	Description ""
+	#include figure.include
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Conclusion"
+	Description "The comparison of test cases with and without the diffusion implicite option shows that the use of this option damage the order of the time schemes and their accuracy. We notice a factor above 2 for order of explicite euler time scheme and Runge Kutta time scheme.\newline "
+	Description "When we study the test cases with a fixed time step, we note that both the accuracy and the order of the time schemes are better (factor 1.5).\newline"
+	Description "So, even if the diffusion implicite option allows to build a scheme favourable compared to the diffusion implicite time scheme, it is advised to consider the degradation of the order of the time scheme which increases the time of resolution."
+	}

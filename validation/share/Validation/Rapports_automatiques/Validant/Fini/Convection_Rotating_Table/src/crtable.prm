@@ -1,0 +1,1024 @@
+Parameters {
+	Title "Convection schemes for passive scalar transport: case of a rotating table"
+
+	Description "The aim is to observe the behaviour of 4 convection schemes (EF_stab (alpha = 1), EF_stab (alpha = 0.2), Muscl and Amont), for 4 time schemes (Euler explicite (facsec = 0.5), Euler explicite (facsec = 0.2), Cranck Nicholson iterative and Runge-Kutta 3), for the convection of a passive scalar (here the temperature) on a rotating table with constant velocity.
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Dimension: 2D 
+	ParametersTrio_U Discretization: VEFPreP1B
+	ParametersTrio_U Time scheme: Iterative Crank Nicholson, Euler explicite (facsec = 0.5 and facsec = 0.2), Runge-Kutta 3
+	ParametersTrio_U Momentum convection scheme: None
+	ParametersTrio_U Temperature convection scheme: EF_stab (alpha = 1), EF_stab (alpha = 0.2), Muscl or Amont
+	ParametersTrio_U Momentum diffusion scheme: None
+	ParametersTrio_U Temperature diffusion scheme: None
+	ParametersTrio_U Type of fluid: incompressible
+	ParametersTrio_U Solving of equations: Navier_Stokes_standard
+#
+#### Creneau
+	TestCase crtable_crenel/CN/Amont test
+	TestCase crtable_crenel/CN/Muscl test \*
+	TestCase crtable_crenel/CN/EF_stab test
+	TestCase crtable_crenel/CN/EF_stab02 test
+#
+	TestCase crtable_crenel/RK3/Amont test
+	TestCase crtable_crenel/RK3/Muscl test
+	TestCase crtable_crenel/RK3/EF_stab test
+	TestCase crtable_crenel/RK3/EF_stab02 test
+#
+	TestCase crtable_crenel/EE05/Amont test
+	TestCase crtable_crenel/EE05/Muscl test
+	TestCase crtable_crenel/EE05/EF_stab test
+	TestCase crtable_crenel/EE05/EF_stab02 test
+#
+	TestCase crtable_crenel/EE02/Muscl test
+	TestCase crtable_crenel/EE02/EF_stab test
+
+	Description " "
+
+#### Gaussien
+	TestCase crtable_gaussian/CN/Amont test
+	TestCase crtable_gaussian/CN/Muscl test
+	TestCase crtable_gaussian/CN/EF_stab test
+	TestCase crtable_gaussian/CN/EF_stab02 test
+#
+	TestCase crtable_gaussian/RK3/Amont test
+	TestCase crtable_gaussian/RK3/Muscl test
+	TestCase crtable_gaussian/RK3/EF_stab test
+	TestCase crtable_gaussian/RK3/EF_stab02 test
+#
+	TestCase crtable_gaussian/EE05/Amont test
+	TestCase crtable_gaussian/EE05/Muscl test
+	TestCase crtable_gaussian/EE05/EF_stab test
+	TestCase crtable_gaussian/EE05/EF_stab02 test
+#
+	TestCase crtable_gaussian/EE02/Muscl test
+	TestCase crtable_gaussian/EE02/EF_stab test
+	
+	Author "E. MOREAU (S.VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	visu {
+		Title "Mesh"
+		Width 10cm
+		mesh crtable_crenel/CN/Amont/test.lata DISQUE
+		Description "Geometry test: 2D circular table "
+		Description "Dimensions test: table radius = 1m "
+		Description "Mesh characteristic: 6130 triangular cells obtained with the option segment_2D"
+	}
+	
+	Description "Hydraulic constant angular velocity : 1 rad/s along x"
+	Description "Thermic initial conditions: spot crenel or gaussian profile, with Tmin = 11K ; Tmax = 10K. "
+	Description "Boundary conditions: adiabaticity "
+##	
+	Figure {
+		Title "Flow configuration: spot and gaussian initial condition"
+		Description " The initial imposed profile undergoes a rotation of 360° such as indicated in the following scheme "
+		Description ""
+		picture flow_configuration.png 
+##
+	}
+##
+	Table {
+			Title "Physical properties"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($5)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($2)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($3)
+			}
+			line {
+			      	legend "Cp (J/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($4)
+			}
+			line {
+			      	legend " \latex_($\beta_{th}$\latex_) "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($6)
+			}
+	}
+}
+######################################
+Chapter {
+	Title "Results for a crenel initial condition"
+	Description "For this study, the following comparisons are performed:"
+	Description "$\bullet$ Comparison of the 4 convection schemes for each time scheme"
+	Description "$\bullet$ Comparison of the 4 time schemes for each convection scheme (except for the Euler explicite case with a facsec value of 0.2 where simulations are performed only for the Muscl and the Ef_stab convection schemes)"
+	Description ""
+	Description "Time calculation (about 6.3 seconds of physical time): corresponds to the horizontal and vertical temperature profiles after a rotation of 360° of the spot. The following curves are taken after a complete 360° of rotation, i.e at time $t = 2\pi$ s "
+########################
+######################## Amont: horizontal
+########################
+	Figure {
+		Title "Convection of a crenel with an Amont scheme: vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX 0. 1.
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>0.5)*(x<0.7) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/Amont/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/Amont/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/Amont/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## Amont: vertical
+########################
+	Figure {
+		Title "Convection of a crenel with an Amont scheme: horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X(m)"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>(-0.1))*(x<0.1) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/Amont/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/Amont/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/Amont/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## Muscl: horizontal
+########################
+	Figure {
+		Title "Convection of a crenel with a Muscl scheme: vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX 0. 1.
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>0.5)*(x<0.7) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE02/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## Muscl: vertical
+########################
+	Figure {
+		Title "Convection of a crenel with a Muscl scheme: horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X(m)"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>(-0.1))*(x<0.1) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-N	\latex_(\newpage\latex_)icholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE02/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab: vertical
+########################
+	Figure {
+		Title "Convection of a crenel with an EF_stab scheme: vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>0.5)*(x<0.7) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab: horizontal
+########################
+	Figure {
+		Title "Convection of a crenel with an EF_stab scheme: horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X(m)"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>(-0.1))*(x<0.1) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE02/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+
+########################
+######################## EF_stab_0.2: vertical
+########################
+	Figure {
+		Title "Convection of a crenel with an EF_stab scheme (alpha = 0.2): vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X(m)"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>0.5)*(x<0.7) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/EF_stab02/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/EF_stab02/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/EF_stab02/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab_0.2: horizontal
+########################
+	Figure {
+		Title "Convection of a crenel with an EF_stab scheme (alpha = 0.2): horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + (x>(-0.1))*(x<0.1) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_crenel/CN/EF_stab02/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_crenel/RK3/EF_stab02/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_crenel/EE05/EF_stab02/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+}
+#\latex_(\newpage\latex_)
+#####################
+#####################
+##################### Gaussian structure
+#####################
+#####################
+Chapter {
+	Title "Results for a gaussian initial condition"
+	Description "The same comparisons as for the crenel condition are performed:"
+########################
+######################## Amont: horizontal
+########################
+	Figure {
+		Title "Convection of a gaussian with an Amont scheme: horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X(m)"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-x*x/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/Amont/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/Amont/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/Amont/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## Amont: vertical
+########################
+	Figure {
+		Title "Convection of a gaussian with an Amont scheme: vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-((x-0.6)*(x-0.6))/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/Amont/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/Amont/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/Amont/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## Muscl: horizontal
+########################
+
+	Figure {
+		Title "Convection of a gaussian with a Muscl scheme: horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X(m)"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-x*x/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE02/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/Muscl/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## Muscl: vertical
+########################
+	Figure {
+		Title "Convection of a gaussian with a Muscl scheme: vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-((x-0.6)*(x-0.6))/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE02/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/Muscl/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab: vertical
+########################
+	Figure {
+		Title "Convection of a gaussian with an EF_stab scheme: vertical clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "Y(m)"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-((x-0.6)*(x-0.6))/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE02/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/EF_stab/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab: horizontal
+########################
+	Figure {
+		Title "Convection of a gaussian with an EF_stab scheme: horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-x*x/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE02/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/EF_stab/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab02: horizontal
+########################
+	Figure {
+		Title "Convection of a gaussian with an EF_stab scheme (alpha = 0.2): horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X"
+		RangeX -0.5 0.5
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-x*x/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/EF_stab02/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/EF_stab02/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/EF_stab02/test.data coupe_T_1
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+######################## EF_stab_0.2: horizontal
+########################
+	Figure {
+		Title "Convection of a gaussian with an EF_stab scheme (alpha = 0.2): horizontal clipping"
+		Width 12cm, viewport = 0 0 1024 500,clip
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-((x-0.6)*(x-0.6))/0.01) 
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank-Nicholson"
+			origin "Trio_U"
+			Segment crtable_gaussian/CN/EF_stab02/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Runge-Kutta 3"
+			origin "Trio_U"
+			Segment crtable_gaussian/RK3/EF_stab02/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment crtable_gaussian/EE05/EF_stab02/test.data coupe_T_1_bis
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+}
+#####################
+#####################
+##################### Visit
+#####################
+#####################
+Chapter {
+	Title "Spot evolution with time for a crenel initial profile"
+	Description "Spot evolution taken respectively at t = 2$\pi/3\,$s, t = 4$\pi/3\,$s and t = 2$\pi\,$s"
+######################## 1.1 (muscl)
+	visu {
+		Title "Muscl convection scheme / Euler Explicite (facsec = 0.5) time scheme"
+		Width 5cm
+		mesh crtable_crenel/EE05/Muscl/test.lata DISQUE
+		pseudocolor crtable_crenel/EE05/Muscl/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+######################## 1.2 (muscl)
+	visu {
+		Title "Muscl convection scheme / Euler Explicite (facsec = 0.2) time scheme"
+		Width 5cm
+		mesh crtable_crenel/EE02/Muscl/test.lata DISQUE
+		pseudocolor crtable_crenel/EE02/Muscl/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+######################## 2.1 (amont)
+	visu {
+		Title "Amont convection scheme / Euler Explicite (facsec = 0.5) time scheme"
+		Width 5cm
+		mesh crtable_crenel/EE05/Amont/test.lata DISQUE
+		pseudocolor crtable_crenel/EE05/Amont/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+######################## 3.1 (EF_stab)
+	visu {
+		Title "EF_stab convection scheme / Euler Explicite (facsec = 0.5) time scheme"
+		Width 5cm
+		mesh crtable_crenel/EE05/EF_stab/test.lata DISQUE
+		pseudocolor crtable_crenel/EE05/EF_stab/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+######################## 3.2 (EF_stab)
+	visu {
+		Title "EF_stab convection scheme / Euler Explicite (facsec = 0.2) time scheme"
+		Width 5cm
+		mesh crtable_crenel/EE02/EF_stab/test.lata DISQUE
+		pseudocolor crtable_crenel/EE02/EF_stab/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3		
+	}
+######################## 4.1 (EF_stab (alpha = 0.2))
+	visu {
+		Title "EF_stab (alpha = 0.2) convection scheme / Euler Explicite (facsec = 0.5) time scheme"
+		Width 5cm
+		mesh crtable_crenel/EE05/EF_stab02/test.lata DISQUE
+		pseudocolor crtable_crenel/EE05/EF_stab02/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+######################## 5.1 (RK3 / Muscl)
+	visu {
+		Title "Muscl convection scheme / RK3 time scheme"
+		Width 5cm
+		mesh crtable_crenel/RK3/Muscl/test.lata DISQUE
+		pseudocolor crtable_crenel/RK3/Muscl/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+######################## 5.2 (RK3 / Muscl)
+	visu {
+		Title "Muscl convection scheme / RK3 time scheme"
+		Width 5cm
+		mesh crtable_crenel/RK3/Muscl/test.lata DISQUE
+		pseudocolor crtable_crenel/RK3/Muscl/test.lata DISQUE TEMPERATURE ELEM
+		Cycles 2 4 -1
+		nb_img_without_newline 3
+	}
+}
+
+###########
+###########
+###########
+Chapter {
+	Title "Summary / Conclusion"
+	Description "- It appears clearly that the EF_stab scheme taken with the value 0.2 for the coefficient alpha, is almost never stable, and gives non physical values. "
+ 	Description "- The amont convection scheme is very diffusive for both crenel and gaussian profiles. "
+ 	Description "- The use of a security factor 0.5 for the Euler explicite scheme improves the results with respect to the value 0.2. "
+ 	Description "- The crenel and gaussian transportation are rather well reproduced when using a Muscl scheme. "
+ 	Description "- The Muscl scheme taken with the Euler explicite time scheme is slightly radialy diffusive with a facsec value of 0.5. The radial diffusion disapears with a facsec value of 0.2. In addition, the results for the Muscl convection scheme combined with a RK3 or a Crank Nicholson time scheme are very closes."
+	Description "- In term of quality, the EF_stab scheme with an alpha value of 1, gives intermediate results between results for Muscl schemes (best results) and results for Amont schemes (worth results)."
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "The amont convection scheme does not conserves the spot profile by rotation."
+	description "The EF_stab convection scheme with alpha = 0.2, is very instable."
+	Description "The best results are obtained when combining the muscl convection scheme and the iterative Crank-Nicholson or the Runge-Kutta 3 time scheme."
+}
+##
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+

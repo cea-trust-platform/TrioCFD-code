@@ -1,0 +1,1081 @@
+Parameters {
+	Title "Jet impingement on a hot flat plate."
+	Description "This document presents the computational results obtained for the classical configuration of a turbulent jet impinging at a right angle an isothermal flat plat. The computations are performed for two jets Reynolds numbers, Re=23000 and Re=70000, and a jet-to-plate distance of H/D=2."
+	Description "Results are compared to experiments for both the thermal heat transfer and the structure of the flow field.\newline"
+	Description ""
+	Description "Valitated model"
+	Description "....K-\latex_({\Large $ \epsilon $} \latex_) turbulence modeling,"
+	Description "....Standard wall law,"
+	Description "....Wall heat transfert.\newline"
+	Description ""
+	Description "Valitated with"
+	Description "....Experimental data"
+	Author "MALOD C., BARTHEL V., VANDROUX S."
+	TestCase "./Re23000" "Impinging_jet.data" 10 "/* jdd attached */"
+	TestCase "./Re70000" "Impinging_jet.data" 10
+	VersionTrio_U "1.6.2"
+	ParametersTrio_U "Type of problem : Pb_Thermohydraulique_Turbulent"
+	ParametersTrio_U "Discretization : VEFPreP1B"
+	ParametersTrio_U "Time scheme : Euler_Implicite with Solver Implicite"
+	ParametersTrio_U "Solving of equation : Navier_Stokes_turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi Loi_Standard_Hydr, and Convection_Diffusion_Temperature_Turbulent with Modele_turbulence Prandtl and Turbulence_paroi Loi_Standard_Hydr_Scalaire"
+	ParametersTrio_U "Convection scheme : Ef_Stab for Momentum and Energy, and Amont for Turbulence"
+	ParametersTrio_U "Diffusion scheme : default for all equations"
+	ParametersTrio_U "Boundary condition : Velocity inlet, Pressure outlet, Symmetry and Wall"
+	ParametersTrio_U "Wall condition : Imposed temperature"
+#	ParametersTrio_U "Type of fluid : air at 20°C and 1e5 Pa"
+	Reference "1. J.W. Baughn, S. Shimizu : Heat transfer measurement from a surface with uniform heat flux and an impinging jet. ASME Journal of Heat Transfer vol 111, 1096-1098 (1989)."
+	Reference "2. D. Cooper, D.C. Jackson, B.E. Launder, G.X. Liao : Impinging jet studies for turbulence model assesment - I. Flow-field experiments. International journal of heat and mass transfer vol 36 n°10, 2675-2684 (1993)."
+	Reference "3. European Research Community On Flow, Turbulance and Combustion : Normally-Impinging Jet from a Circular Nozzle. http://cfd.mace.manchester.ac.uk/ercoftac, case 25."
+	IncludeData 2
+	Prerequisite "Extract_histogram dom Re23000/Impinging_jet.err  > histo23000"
+	Prerequisite "Extract_histogram dom Re23000/Prepare/Prepare.err  > histogrossier"
+}
+
+Chapter {
+	Title "Tests description"
+	Description "This study investigates the classical configuration of a cold jet impingement into a hot surface for two jets Reynolds numbers, Re=23000 and Re=70000 (based on the jet diameter D), and a jet-to-plate distance of H/D=2.\newline"
+	Description "The characteristics sizes are chosen in agreement with the references [1], [2] and [3] :"
+	Description "- Jet diameter D = 0.0265 m"
+	Description "- Jet height H = 2 x D"
+	Description "- Jet Reynolds number = 23000 or 70000"
+	Description "- Jet temperature = 293 K (20°C)"
+	Description "- Plate temperature = 323 K (50°C)"
+	Figure {
+		Width 11cm, viewport=-300 0 460 326, clip
+		picture ./Geom.png
+	}
+	Figure {
+		Title "Control of the size of the mesh"
+		Description "To be able to use the k-$\varepsilon$ turbulence model with standard wall law on this geometry, it is important to control the size of the mesh near the walls. So, the first cell size is estimated by this formula :\newline"
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ y^+={\rho . y_p . U_\tau \over \mu}$} \latex_)\newline"
+		Description ""
+		Description "\latex_(\hspace*{5.5cm} {\Large $ \Leftrightarrow y_p={y^+ . \mu \over \rho . U_\tau}$} \latex_)"
+		Description "\latex_(\hspace*{4cm}\latex_)with :"
+		Description "\latex_(\hspace*{6cm} {\large$y_p$} = first grid point\latex_)"
+		Description "\latex_(\hspace*{6cm} {\large $ U_\tau \simeq U . \sqrt{0.039 \over Re^{1/4}}$} \latex_)"
+		Description "\latex_(\hspace*{6cm} {\large $ y^+ \geq 30 $} \latex_)\newpage"
+		Description ""
+		Description "In the case of a 3D-VEF discretization, velocities are calculated at the center of gravity of the faces of the elements. So the first grid point, in this case, correspond to these locations. If we make the approximation that all elements are ideal tetrahedra, each face is an equilateral triangle : \latex_($ y_p = \frac 1 3 $ first cell size\latex_)."
+		Width 10cm, viewport=-500 30 277 195, clip
+		picture ./Yp.png
+	}
+	Table {
+		Description "\latex_(So, for Re = 23000 and $y^+$=30, $y_p \simeq$ 0.61 mm and $y_{first-cell} \simeq$ 1.84 mm\latex_)"
+		Description "\latex_(and for Re = 70000 and $y^+$=30, $y_p \simeq$ 0.23 mm and $y_{first-cell} \simeq$ 0.70 mm\latex_)"
+		Description ""
+		Description "For the all calculations (periodic calculations and validation calculations), the mesh will be the same and the first cell size, on all walls, is chosen equal to 2 mm. With this choice, for Re = 23000, $y^+ \simeq$ 33, and for Re = 70000, $y^+ \simeq$ 82."
+		Description "The same reasoning can not be done close to the impingement because the velocities are almost null."
+	}
+	Table {
+		Title "Meshes"
+		Description "The validation mesh is made with Gambit V2.4.6. It contain tetrahedral cells and 2 layers of prismatical cells. Each prismatic cell is cut into 3 tetrahedral cells with Icem V11.0.1. So the final mesh contain 116 356 tetrahedral cells, 236 584 faces and 21 556 nodes. The periodic mesh is made by extracting and extruding the inlet boundary of the validation mesh."
+		Description "The histograms of largest angles of 3D meshes are also presented.\newline"
+	}
+	Visu {
+		Width 6cm, viewport=220 66 1024 834, clip
+		mesh Re23000/Impinging_jet.lata dom
+		normal3D -0.27 -0.78 0.56
+		up3D 0.15 0.55 0.83
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	Figure {
+	 #Description "Histogram of largest angles of the mesh"
+	 Width 8cm
+	Title_figure " "
+        dimension 2
+        Include_Description_Curves 0
+        labelx Angle (degree)
+        labely "Cells"
+        legend sans
+        Curve
+        {
+        file histo23000
+        style boxes fill solid 0.3
+        columns ($2+$5)/2 8
+        }
+ 
+	}
+	Visu {
+		Width 6cm, viewport=220 174 940 738, clip
+		mesh Re23000/Prepare/Prepare.lata dom
+		normal3D -0.27 -0.78 0.56
+		up3D 0.15 0.55 0.83
+		zoom3D 0. 0. 0.8
+		Operator no_axes
+		Operator no_bounding_box
+		nb_img_without_newline 2
+	}
+	Figure {
+	 #Description "Histogram of largest angles of the mesh"
+	 Width 8cm
+	Title_figure " "
+        dimension 2
+        Include_Description_Curves 0
+        labelx Angle (degree)
+        labely "Cells"
+        legend sans
+        Curve
+        {
+        file histogrossier
+        style boxes fill solid 0.3
+        columns ($2+$5)/2 8
+        }
+ 
+	}
+	Table {
+		Title "Calculation method"
+		Description "For the inflow conditions at the pipe inlet, fully developed turbulent pipe flow profiles are used. These profiles were  calculated in a separate simulation, where a temporally developed pipe flow is computed using periodic boundary conditions at each end of a meshed part of the pipe."
+	}
+	Table {
+		Title "Initial and Boundaries conditions"
+		Description "Initial conditions :\latex_(\hspace*{16.5mm}\latex_)Velocity set to 0 m/s in all the domain,"
+		Description "\latex_(\hspace*{45mm}\latex_)Temperature set to 293 K in all the domain.\newline"
+		Description ""
+		Description "Boundaries conditions :\latex_(\hspace*{9mm}\latex_)Symmetry on both sides of the domain,"
+		Description "\latex_(\hspace*{45mm}\latex_)Inlet velocity profile (from periodic calculation),"
+		Description "\latex_(\hspace*{45mm}\latex_)Pressure set to 0 Pa on outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Inlet turbulent kinetic energy profile (from periodic calculation),"
+		Description "\latex_(\hspace*{45mm}\latex_)Turbulent kinetic energy set to 1.e-4\latex_( $ m^2/s^2 $ \latex_) on outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Inlet turbulence dissipation rate profile (from periodic calculation),"
+		Description "\latex_(\hspace*{45mm}\latex_)Turbulence dissipation rate set to 1.e-4\latex_( $ m^3/s^2 $ \latex_) on outlet."
+		Description "\latex_(\hspace*{45mm}\latex_)Standard law on all wall boundaries\newline"
+		Description "\latex_(\hspace*{45mm}\latex_)Temperature set to 293 K on inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Temperature set to 323 K on flat plate.\newline\newline"
+		Description ""
+		Description "The turbulent kinetic energy and turbulence dissipation rate were estimated by using these formulations:\newline"
+		Description "\latex_(\hspace*{6cm} $ k \simeq \frac{3}{2}.(U.t)^2$ \hspace*{1cm} t : turbulence level (4.1\% see [1]) \latex_)\newline"
+		Description "\latex_(\hspace*{6cm} $ \varepsilon \simeq C_\mu . {k^{3/2} \over {0.07 . D_h}}$\latex_)"
+	}
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Air at 20°C and 1e5 Pa:}\latex_)"	
+		Description "$\rho$ = 1.210 kg/m$^3$"
+		Description "$\mu$ = 1.815e-5 kg/m/s"
+		Description "$\lambda$ = 0.02565 W/m/K"
+		Description "\latex_($C_p$\latex_) = 1005.86 J/kg/K"
+		Description "$\beta$ = 3.333e-3 1/K"
+	}
+}
+Chapter {
+	Title "Convergence"
+	Description "This chapter presents the convergence of the calculations.\newline"
+	Description "The calculations can be stopped when the steady state is established, that is at about 0.15 s of physical time for the inlet profiles calculations and 0.25 s of physical time for the calculations of the jet impingement. This convergence is evaluated on the evolution of velocity at the center-line of the pipe for periodic calculations, and on the pressure force and the conduction heat transfer rate on the flat plate for jets impingements calculations. The residual of each calculation is also plotted."
+	Table {
+		Title "Convergence of the Z velocity at the center-line of the pipe"
+	}
+	Figure {
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.15
+		LabelY "Vz (m/s)"
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			file ./Re23000/Prepare/Prepare_SONDE_VENTREE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.15
+		LabelY "Vz (m/s)"
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 70000"
+			file ./Re70000/Prepare/Prepare_SONDE_VENTREE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Description "\newpage"
+	}
+	Table {
+		Title "Convergence of the pressure force on the flat plate"
+		Description "\latex_(\hspace*{6cm} $F_p = \int\int_{S}{P.\vec{n}.ds}$\latex_)"
+	}
+	Figure {
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.25
+		LabelY "Fp (N)"
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			file ./Re23000/Impinging_jet_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 16
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.25
+		LabelY "Fp (N)"
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 70000"
+			file ./Re70000/Impinging_jet_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 16
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Description "\newpage"
+	}
+	Table {
+		Title "Convergence of the conduction heat transfer rate on the flat plate"
+		Description "\latex_(\hspace*{6cm} $H_p = \int\int_{S}{\lambda . \vec{\nabla} T.\vec{n}.ds}$\latex_)"
+	}
+	Figure {
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.25
+		LabelY "Hp (W)"
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			file ./Re23000/Impinging_jet_pb_Diffusion_chaleur.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 6
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.25
+		LabelY "Hp (W)"
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 70000"
+			file ./Re70000/Impinging_jet_pb_Diffusion_chaleur.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 6
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Description "\newpage"
+	}
+	Figure {
+		Title "Evolution of residuals"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 0.25
+		LabelY "Residue"
+		LogY
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			file ./Re23000/Impinging_jet.dt_ev
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Re = 70000"
+			file ./Re70000/Impinging_jet.dt_ev
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Description "\newpage"
+	}
+}
+Chapter {
+	Title "Results on inlet profiles calculations"
+	Description "This chapter presents the profiles of Z velocity, turbulent kinetic energy, turbulence dissipation rate and turbulent viscosity. The dimensionless mean axial velocity profiles are compared to the law of the wall, the friction velocity is compared to the Blasius correlation and the pipe center-line velocity is compared to reference [2].\newline"
+	Figure {
+		Title "Z Velocities profiles at outlet"
+		Width 10cm
+		LabelX "r/D"
+		RangeX 0. 0.5
+		LabelY "Vz (m/s)"
+		RangeY -60. 0.
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Prepare/Prepare.data SONDE_VENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 4
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Prepare/Prepare.data SONDE_VENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 4
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Figure {
+		Title "Turbulent kinetic energy profiles at outlet"
+		Width 10cm
+		LabelX "r/D"
+		RangeX 0. 0.5
+		LabelY "k (m^2/s^2)"
+		RangeY 0. 14.
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Prepare/Prepare.data SONDE_KENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Prepare/Prepare.data SONDE_KENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Figure {
+		Title "Turbulence dissipation rate profiles at outlet"
+		Width 10.5cm
+		LabelX "r/D"
+		RangeX 0. 0.5
+		LabelY "eps (m^3/s^2)"
+		RangeY 0. 25000.
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Prepare/Prepare.data SONDE_EPSENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Prepare/Prepare.data SONDE_EPSENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Figure {
+		Title "Turbulent viscosity profiles at outlet"
+		Width 10.5cm
+		LabelX "r/D"
+		RangeX 0. 0.5
+		LabelY "Turbulent viscosity (m^2/s)"
+		RangeY 0. 0.001
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Prepare/Prepare.data SONDE_NUTENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Prepare/Prepare.data SONDE_NUTENTREE
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Description "\newpage"
+	}
+	Figure {
+		Title "Dimensionless mean axial velocity profiles"
+		Description "The mean axial velocity profiles in pipe for the two Reynolds numbers ( u$^+$ = U/U$\tau$ ; y$^+$ = Y.U$\tau$/$\nu$ ) are compared to the law of wall : u$^+$ = y$^+$ and u$^+$ = 1/0.415 ln(y$^+$) + 5.32."
+		Description ""
+		Width 11cm
+		LabelX "y+"
+		RangeX 1. 10000.
+		LogX
+		LabelY "u+"
+		RangeY 0. 50.
+		Include_Description_Curves 0
+		Curve {
+			legend "u+ = f(y+)"
+			file ./Uplus.out
+			columns 1 2
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend ""
+			file ./Uplus.out
+			columns 3 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			file ./Re23000/Prepare/Uplus.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Re = 70000"
+			file ./Re70000/Prepare/Uplus.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Comparison on the friction velocity"
+		Description "The friction velocity, \latex_(U$_\tau$\latex_), can be calculated from the Blasius correlation on the friction coefficient : for turbulent flow, the Blasius friction factor \latex_({\Large $C_f = {0.079 \over Re^{1/4} }$}\latex_)\newline"
+		Description ""
+		Description "However,\latex_(\hspace*{3cm} {\Large  $U_\tau = \sqrt{\tau \over \rho}$}\hspace*{1cm} and\hspace*{1cm} {\Large $C_f = {2 . \tau \over \rho . U_\infty^2}$}\latex_)"
+		Description "So :\latex_(\hspace*{3.5cm} {\Large  $U_\tau = \sqrt{\frac 1 2 . C_f . U_\infty^2}= \sqrt{\frac 1 2 . \frac {0.079} {Re^{1/4}} . U_\infty^2}$}\latex_)\newline\newline"
+		Description ""
+		nb_columns 3
+		label U$\tau$ Blasius | U$\tau$ Trio_U | Gap (%)
+		line {
+			legend "Re23000"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./Re23000/Prepare/Utau.tab
+			columns $1 $2 $3
+		}
+		line {
+			legend "Re70000"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./Re70000/Prepare/Utau.tab
+			columns $1 $2 $3
+		}
+	}
+	Table {
+		Title "Comparison on the pipe center-line velocity"
+		Description "The reference [2] gives a correspondence between pipe center-line and bulk velocities as a function of Reynolds number : \latex_({\Large $ \frac U {U_{cl}} = 0.811 + 0.038.(log(Re)-4)$}\latex_)\newline\newline"
+		nb_columns 3
+		label \latex_($U_{cl}$\latex_) Ref | \latex_($U_{cl}$\latex_) Trio_U | Gap (%)
+		line {
+			legend "Re23000"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./Re23000/Prepare/Ucl.tab
+			last_line
+			columns $1 $2 $3
+		}
+		line {
+			legend "Re70000"
+			origin "Trio_U"
+			Version 1.6.2
+			file ./Re70000/Prepare/Ucl.tab
+			last_line
+			columns $1 $2 $3
+		}
+	}
+	Table {
+		Title "Conclusion on periodic calculations"
+		Description "These results are slightly different from theoretical and experimental data. This comes from the mesh that is difficult to optimize (low number of cells) due to compliance with the value of y+ to be observed."
+	}
+}
+Chapter {
+	Title "Results on jets impingements calculations"
+	Description "This chapter presents the results for the two jet impingement calculations. The velocities profiles at r/D = 0.0, 0.5, 1.0, 1.5, 2.0, 2.5 and 3.0 are compared to the experimental data (see reference [3]). The evolution on the plate of the Nusselt number is also compared. To finish, mappings of velocity and temperature are presented."
+	Table {
+		Title "Velocity profiles at r/D = 0.0"
+	}
+	Figure {
+		Width 10cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-00-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD0.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2hr-00-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD0.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Velocity profiles at r/D = 0.5"
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-05-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD0.5
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD0.5
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Velocity profiles at r/D = 1.0"
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-10-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD1.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2hr-10-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD1.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Velocity profiles at r/D = 1.5"
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-15-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD1.5
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2hr-15-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD1.5
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Velocity profiles at r/D = 2.0"
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-20-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD2.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2hr-20-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD2.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Velocity profiles at r/D = 2.5"
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-25-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD2.5
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2hr-25-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD2.5
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Velocity profiles at r/D = 3.0"
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2lr-30-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			Segment ./Re23000/Impinging_jet.data SONDE_V_RD3.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/23000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "y/D"
+		RangeX 0. 0.4
+		LabelY "U/Ub"
+		RangeY 0. 1.2
+		Include_Description_Curves 0
+		Curve {
+			legend "Cooper et al."
+			file ./Experimental_data/ij2hr-30-sw-mu.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			Segment ./Re70000/Impinging_jet.data SONDE_V_RD3.0
+			origin "Trio_U"
+			Version 1.6.2
+			columns ($1/0.0265) (sqrt($2*$2+$3*$3+$4*$4)*1.21*0.0265/70000/1.815e-5)
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Title "Conclusion on velocities comparisons"
+		Description "We note that the trends are in good agreement compared to experimental data, but there are not enough point due to the resolution of the mesh.\newpage"
+	}
+	Table {
+		Title "Local Nusselt numbers on the heated plate"
+		Description "The local Nusselt number is calculated from the jet diameter : \latex_({\large$ Nu = \frac {h.D} {\lambda}$}\latex_)"
+		Description "where"
+		Description "\latex_(\hspace*{45mm}\latex_)h = heat transfert coefficient between fluid and solid"
+		Description "\latex_(\hspace*{45mm}\latex_)D = jet diameter"
+		Description "\latex_(\hspace*{45mm}\latex_)$\lambda$ = thermal conductivity\newline"
+		Description "h is calculated by Trio_U and these locals values are located in the *_Nusselt.face."
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "r/D"
+		RangeX 0. 5.0
+		LabelY "Nu/Re^0.7"
+		RangeY 0. 0.14
+		Include_Description_Curves 0
+		Curve {
+			legend "Baughn et al."
+			file ./Experimental_data/ij2lr-nuss.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 23000"
+			file ./Re23000/fichier_Nusselt.plot
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+	}
+	Figure {
+		Width 10.5cm
+		LabelX "r/D"
+		RangeX 0. 5.0
+		LabelY "Nu/Re^0.7"
+		RangeY 0. 0.14
+		Include_Description_Curves 0
+		Curve {
+			legend "Baughn et al."
+			file ./Experimental_data/ij2hr-nuss.dat
+			columns 1 2
+			Style points
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Re = 70000"
+			file ./Re70000/fichier_Nusselt.plot
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			Style linespoints
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+	}
+	Table {
+		Description "Here again, the mesh resolution can not be able to get all exchanges levels on the hot flat plate and particular in the impact zone. Is added here the low level of Reynolds numbers which is unable to be treated with the k-$\varepsilon$ turbulence model."
+	}
+	Table {
+		Title "Velocity vectors"
+	}
+	visu {
+		Title "Re23000"
+		Width 11cm, viewport=48 150 980 924, clip
+		origin "Trio_U 1.6.2_beta"
+		Cycles -1
+		Vector Re23000/Impinging_jet.lata dom_dual VITESSE FACES
+		Operator Slice2D 0. 0. 0. 0 -1 0
+		Operator no_databaseinfo
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Title "Re70000"
+		Width 11cm, viewport=48 150 980 924, clip
+		origin "Trio_U 1.6.2_beta"
+		Cycles -1
+		Vector Re70000/Impinging_jet.lata dom_dual VITESSE FACES
+		Operator Slice2D 0. 0. 0. 0 -1 0
+		Operator no_databaseinfo
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	Table {
+		Title "Mappings of Velocity"
+	}
+	visu {
+		Title "Re23000"
+		Width 11cm, viewport=48 150 980 924, clip
+		origin "Trio_U 1.6.2_beta"
+		Cycles -1
+		Pseudocolor_with_range Re23000/Impinging_jet.lata dom_dual norme_VITESSE FACES 0 15
+		Operator Slice2D 0. 0. 0. 0 -1 0
+		Operator no_databaseinfo
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Title "Re70000"
+		Width 11cm, viewport=48 150 980 924, clip
+		origin "Trio_U 1.6.2_beta"
+		Cycles -1
+		Pseudocolor_with_range Re70000/Impinging_jet.lata dom_dual norme_VITESSE FACES 0 50
+		Operator Slice2D 0. 0. 0. 0 -1 0
+		Operator no_databaseinfo
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	Table {
+		Title "Mappings of temperature"
+	}
+	visu {
+		Title "Re23000"
+		Width 11cm, viewport=48 150 980 924, clip
+		origin "Trio_U 1.6.2_beta"
+		Cycles -1
+		Pseudocolor_with_range Re23000/Impinging_jet.lata dom_dual TEMPERATURE FACES 293 295
+		Operator Slice2D 0. 0. 0. 0 -1 0
+		Operator no_databaseinfo
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	visu {
+		Title "Re70000"
+		Width 11cm, viewport=48 150 980 924, clip
+		origin "Trio_U 1.6.2_beta"
+		Cycles -1
+		Pseudocolor_with_range Re70000/Impinging_jet.lata dom_dual TEMPERATURE FACES 293 295
+		Operator Slice2D 0. 0. 0. 0 -1 0
+		Operator no_databaseinfo
+		Operator no_axes
+		Operator no_bounding_box
+	}
+}
+Chapter {
+	Title "Conclusions"
+	Description "Although the calculations do not overlap very well with the experimental data, all trends are correct."
+	Description "These calculations are difficult to implement because there is an incompatibility between the turbulence model and the physics involved. Indeed, the near wall cells size are too great for the fineness requested by physics."
+}
+Chapter {
+	Title "Recommendation for Users"
+	Description "- Try to use the finest mesh possible,"
+	Description "- For this type of calculation, an imposed temperature boundary is more stable and the calculation is more quick, than an imposed flux boundary,"
+	Description "- Although the calculations are able to be run on a simple PC (for Re23000 = 25 h), it is preferable to run the calculations in parallel mode on a super-computer (for Re23000 = 1,5 h for 10 processors)"
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

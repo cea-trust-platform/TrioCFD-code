@@ -1,0 +1,180 @@
+# Hyfraulique 2D avec transport constituant #
+# PARALLEL OK #
+dimension 3
+
+Pb_hydraulique_concentration pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Cavite 
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 21 21 21 
+		Longueurs 1. 1. 1.
+		}
+		{
+		Bord Avant_CoinBas   Y = 0.  0.  <= X <= 0.2  0.   <= Z <= 0.2
+		Bord Avant_ResteBas  Y = 0.  0.2 <= X <= 1.0  0.   <= Z <= 0.2
+		Bord Avant_ResteHau  Y = 0.  0.  <= X <= 1.0  0.2  <= Z <= 1.0
+		Bord Arriere         Y = 1.  0.  <= X <= 1.0  0.   <= Z <= 1.0
+		Bord Gauche_CoinBas  X = 0.  0.  <= Y <= 0.2  0.0  <= Z <= 0.2
+		Bord Gauche_ResteBas X = 0.  0.2 <= Y <= 1.0  0.0  <= Z <= 0.2
+		Bord Gauche_ResteHau X = 0.  0.  <= Y <= 1.0  0.2  <= Z <= 1.0
+		Bord Droit           X = 1.  0.  <= Y <= 1.0  0.   <= Z <= 1.0
+		Bord Bas_CoinGauche  Z = 0.  0.  <= X <= 0.2  0.0  <= Y <= 0.2
+		Bord Bas_ResteGauche Z = 0.  0.  <= X <= 0.2  0.2  <= Y <= 1.0
+		Bord Bas_ResteDroit  Z = 0.  0.2 <= X <= 1.0  0.0  <= Y <= 1.0
+		Bord Haut            Z = 1.  0.  <= X <= 1.0  0.   <= Y <= 1.0
+		}
+}
+Tetraedriser_homogene_compact dom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur Metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0.
+	tmax 3.
+	dt_min 0.0001
+	dt_max 1.01
+	dt_impr 0.01
+	dt_sauv 100
+	seuil_statio 1.e-8
+	facsec 1.
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 2.e-5
+	rho Champ_Uniforme 1 1.2
+	beta_co Champ_Uniforme 1 0.
+}
+
+Constituant c1
+Read c1
+{
+	coefficient_diffusion Champ_Uniforme 1 0.e-5
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+Associate pb c1
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression Gcp { precond ssor { omega 1.5 }
+                                       seuil 1.e+3
+                                     }
+		projection_initiale 0
+		convection { negligeable }
+		diffusion { negligeable }
+		conditions_initiales {
+			vitesse Champ_Uniforme 3 1. 1. 1.
+		}
+		boundary_conditions {
+			Haut frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Droit frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Arriere frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Avant_CoinBas frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Avant_ResteBas frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Avant_ResteHau frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Gauche_CoinBas frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Gauche_ResteBas frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Gauche_ResteHau frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Bas_CoinGauche frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Bas_ResteGauche frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+			Bas_ResteDroit frontiere_ouverte_vitesse_imposee 
+Champ_Front_Uniforme 3 1. 1. 1.
+		}
+	}
+	Convection_diffusion_Concentration {
+		diffusion { negligeable }
+		convection { amont }
+		boundary_conditions {
+			Haut frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.
+			Droit frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.
+			Arriere frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.
+			Avant_CoinBas frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 1.
+			Avant_ResteBas frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 0.
+			Avant_ResteHau frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 0.
+			Bas_CoinGauche frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 1.
+			Bas_ResteGauche frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 0.
+			Bas_ResteDroit frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 0.
+			Gauche_CoinBas frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 1.
+			Gauche_ResteBas frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 0.
+			Gauche_ResteHau frontiere_ouverte_concentration_imposee 
+Champ_Front_Uniforme 1 0.
+			
+		}
+		conditions_initiales {
+			concentration Champ_Uniforme 1 0.
+		}
+	}
+
+	Postraitement
+	{
+		format lata
+		Sondes
+		{
+			sonde_conc concentration periode 0.05 points 1 0.5 0.5 0.5
+			sonde_conc_seg_diago concentration periode 0.05 segment 10 0. 0. 0. 1.  1. 1.
+		}
+		Champs dt_post 1.0
+		{
+			vitesse elem
+			concentration elem
+		}
+	}
+}
+EcritureLectureSpecial 0
+Solve pb
+
+End
+

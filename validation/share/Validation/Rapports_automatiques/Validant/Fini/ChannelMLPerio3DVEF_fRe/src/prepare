@@ -1,0 +1,96 @@
+#!/bin/bash
+mkdir -p muscl_0.05 muscl_0.1 muscl_0.2 muscl_0.3 muscl_0.4 muscl_0.5 EFstab_0.05 EFstab_0.1 EFstab_0.2 EFstab_0.3 EFstab_0.4 EFstab_0.5
+
+for dir in `find . -mindepth 1 -type d `
+do
+	( cd $dir;   cp ../canal_turbu_muscl.data ../post_run .)
+done
+
+cd muscl_0.05
+sed "s/#OPTION/rm ..\/*.dat/" post_run > modifie
+mv modifie post_run
+cd ..
+
+cd muscl_0.1
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.1 0. 0./" canal_turbu_muscl.data > modifie.data
+mv modifie.data canal_turbu_muscl.data
+sed "s/muscl 0.05/muscl 0.1/" post_run > modifie
+mv modifie post_run
+
+cd ../muscl_0.2
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.2 0. 0./" canal_turbu_muscl.data > modifie.data
+mv modifie.data canal_turbu_muscl.data
+sed "s/muscl 0.05/muscl 0.2/" post_run > modifie
+mv modifie post_run
+
+cd ../muscl_0.3
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.3 0. 0./" canal_turbu_muscl.data > modifie.data
+mv modifie.data canal_turbu_muscl.data
+sed "s/muscl 0.05/muscl 0.3/" post_run > modifie
+mv modifie post_run
+
+cd ../muscl_0.4
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.4 0. 0./" canal_turbu_muscl.data > modifie.data
+mv modifie.data canal_turbu_muscl.data
+sed "s/muscl 0.05/muscl 0.4/" post_run > modifie
+mv modifie post_run
+
+cd ../muscl_0.5
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.5 0. 0./" canal_turbu_muscl.data > modifie.data
+mv modifie.data canal_turbu_muscl.data
+sed "s/muscl 0.05/muscl 0.5/" post_run > modifie
+mv modifie post_run
+
+cd ../EFstab_0.05
+sed "s/muscl/EF_stab { alpha 1 }/" canal_turbu_muscl.data > modifie.data
+mv modifie.data canal_turbu_EFstab.data
+sed "s/muscl 0.05/EFstab 0.05/" post_run > modifie
+mv modifie post_run
+rm canal_turbu_muscl.data
+
+cd ../EFstab_0.1
+sed "s/muscl/EF_stab { alpha 1 }/" canal_turbu_muscl.data > canal_turbu_EFstab.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.1 0. 0./" canal_turbu_EFstab.data > modifie
+mv modifie canal_turbu_EFstab.data
+sed "s/muscl 0.05/EFstab 0.1/" post_run > modifie
+mv modifie post_run
+rm canal_turbu_muscl.data
+
+
+cd ../EFstab_0.2
+sed "s/muscl/EF_stab { alpha 1 }/" canal_turbu_muscl.data > canal_turbu_EFstab.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.2 0. 0./" canal_turbu_EFstab.data > modifie
+mv modifie canal_turbu_EFstab.data
+sed "s/muscl 0.05/EFstab 0.2/" post_run > modifie
+mv modifie post_run
+rm canal_turbu_muscl.data
+
+
+cd ../EFstab_0.3
+sed "s/muscl/EF_stab { alpha 1 }/" canal_turbu_muscl.data > canal_turbu_EFstab.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.3 0. 0./" canal_turbu_EFstab.data > modifie
+mv modifie canal_turbu_EFstab.data
+sed "s/muscl 0.05/EFstab 0.3/" post_run > modifie
+mv modifie post_run
+rm canal_turbu_muscl.data
+
+
+cd ../EFstab_0.4
+sed "s/muscl/EF_stab { alpha 1 }/" canal_turbu_muscl.data > canal_turbu_EFstab.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.4 0. 0./" canal_turbu_EFstab.data > modifie
+mv modifie canal_turbu_EFstab.data
+sed "s/muscl 0.05/EFstab 0.4/" post_run > modifie
+mv modifie post_run
+rm canal_turbu_muscl.data
+
+
+cd ../EFstab_0.5
+sed "s/muscl/EF_stab { alpha 1 }/" canal_turbu_muscl.data > canal_turbu_EFstab.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.5 0. 0./" canal_turbu_EFstab.data > modifie
+mv modifie canal_turbu_EFstab.data
+sed "s/muscl 0.05/EFstab 0.5/" post_run > modifie
+mv modifie post_run
+rm canal_turbu_muscl.data
+
+
+cd ..

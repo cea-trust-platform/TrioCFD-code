@@ -1,0 +1,29 @@
+#!/bin/bash
+mkdir -p LoiParoiNusseltImpose_VEF LoiParoiNusseltImpose_VDF
+chmod +w *
+cd LoiParoiNusseltImpose_VEF
+cp ../LoiParoiNusseltImpose_VEF.data .
+cp ../post_run .
+
+cd ../LoiParoiNusseltImpose_VDF
+cp ../LoiParoiNusseltImpose_VEF.data .
+cp ../post_run .
+
+sed "/trianguler dom_pb2/d" LoiParoiNusseltImpose_VEF.data > modifie.data
+sed "/Verifiercoin dom_pb2/d" modifie.data > LoiParoiNusseltImpose_VEF.data
+sed "s/VEFPreP1B cubes Read cubes { P0 }/VDF cubes/" LoiParoiNusseltImpose_VEF.data > modifie.data
+sed "s/interface paroi_temperature_imposee Champ_front_uniforme 1 1000./interface paroi_echange_externe_impose\n\t\t\t\th_imp Champ_Front_Uniforme 1 1e10\n\t\t\t\tT_ext Champ_Front_Uniforme 1 1000./" modifie.data > LoiParoiNusseltImpose_VEF.data
+sed "s/coupe_He_T2 temperature    periode 1.E-6   segment 10    2.375e-3 0.0005 2.375e-3 0.0095/coupe_He_T temperature    periode 1.E-3   segment 10    2.375e-3 0.0005 2.375e-3 0.0095/" LoiParoiNusseltImpose_VEF.data > modifie.data
+sed "/coupe_He_T3 temperature    periode 1.E-6   segment 11    2.375e-3 0.0  2.375e-3 0.01/d" modifie.data > LoiParoiNusseltImpose_VEF.data
+sed "s/vitesse faces/vitesse elem/" LoiParoiNusseltImpose_VEF.data > modifie.data
+sed "s/temperature faces/temperature elem/" modifie.data > LoiParoiNusseltImpose_VEF.data
+sed "s/VEF_pb2.sauv/VDF_pb2.sauv/" LoiParoiNusseltImpose_VEF.data > modifie.data
+mv modifie.data LoiParoiNusseltImpose_VDF.data
+rm LoiParoiNusseltImpose_VEF.data
+
+sed "s/LoiParoiNusseltImpose_VEF COUPE_HE_T2/LoiParoiNusseltImpose_VDF COUPE_HE_T/" post_run > modifie
+sed "/extrait_coupe LoiParoiNusseltImpose_VEF COUPE_HE_T3/d" modifie > post_run
+sed "s/VEF/VDF/" post_run > modifie
+mv modifie post_run
+
+cd ..

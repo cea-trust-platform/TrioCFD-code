@@ -1,0 +1,112 @@
+import os,os.path, sys, math
+############
+############	Calcul de la pression moyenne dans le fichier test_pb_Force_pression.face
+############
+############
+## tdeb = temps a partir duquel on commence a moyenner
+## nbpoints = nombre de maille sur le demi cercle (entre theta = 0 et theta = 180 degres)
+## coeff1 = pi / nombre de points
+## coeff2 = coeff1 * diametre = coeff1 * 0.02545
+## nbiter = nombre d'iterations utilisees pour moyenner (a partir de tdeb)
+##
+## Des que l'on atteint une valeur telle que Pmoy(theta1) >= 0, alors doit avoir
+## Pmoy (theta) < 0 pour tout theta>theta1
+
+### determination du numero de ligne correspondant a tdeb : ligne_dm
+def dropligne(f, nbpoints, tdeb):
+	ligne_dm = 0
+	N = 0
+	M = nbpoints + 2
+	val = 0.
+	tab = []
+	fin = False
+	ligne_dm = -1
+	while not fin:
+		ligne = f.readline()
+		ligne_dm += 1
+		if ligne=='':
+			fin = True
+			ligne_dm = -1
+		else:
+			if (ligne_dm%(nbpoints+1)==0) and (ligne.find('au temps')>-1):
+				ligneT = ligne.strip().split()
+				temps = float(ligneT[8])
+				#print 'ligne %d temps=%f' % (ligne_dm, temps)
+				if temps>=tdeb:
+					fin = True
+	print '=> ligne_dm =%s, (ligne=%s)' % (ligne_dm, ligne)
+#####
+#####
+def writePMOY(f, nbpoints):
+	tabf = [0]*nbpoints
+	theta = [0]*nbpoints
+	coeff1 = math.pi/nbpoints
+	coeff2 = coeff1 * 0.0254
+	nbiter = 0
+	arg = 0.
+	pos = 1
+	fx = 0.
+	fy = 0.
+	xx = 0.
+	yy = 0.
+	nl = 0
+	angle = 0.
+	valf = 0.
+	fin = False
+	while not fin:
+		nbiter += 1
+		for ipt in range(nbpoints):
+			nl += 1
+			ligne = f.readline()
+			ligneT = ligne.strip().split()
+			fx = float(ligneT[9])
+			fy = float(ligneT[11])
+			xx = float(ligneT[4])-0.127
+			yy = float(ligneT[6])-0.0762
+			if (pos == 1):
+				arg = xx / math.sqrt(xx*xx+yy*yy)
+				#theta[ipt] = math.acos(arg) * 180/math.pi
+				theta[ipt] = math.acos(arg)
+			val_neg = 0.775
+			#if theta[ipt] < val_neg:
+			valf = math.sqrt(fx*fx+fy*fy)/(coeff2)
+			#else:
+			#	valf = -math.sqrt(fx*fx+fy*fy)/(coeff2)
+			tabf[ipt] = tabf[ipt]+valf
+			#print 'valf =%s' % (valf)
+			#print 'uu =%s' % (uu)
+		ligne = f.readline()
+		pos = 0
+		if ligne=='':
+			fin = True
+		nl += 1
+	f.close()
+#
+	fic = open('pmoyen.dat','w')
+	#tabf.sort()
+	#theta.sort()
+	for i in range(nbpoints):
+		#angle = i * math.pi / nbpoints
+		angle = theta[i]
+		valf = tabf[i] / nbiter
+		fic.write('%18.8f %18.8f\n' % (angle, valf))
+#
+	fic.close()		
+#
+if __name__=='__main__':
+	#recuperation des parametres passes en ligne de commande
+	args = sys.argv
+	if len(args)!=4:
+		#print 'Erreur sur le nb d\'arguments fournis : Usage\npython Pmoyen nomFichier.face nbpoints temps_debut'
+		sys.exit()
+#
+	nomFichier = args[1]
+	nbpoints = int(args[2])
+	tdeb = float(args[3])
+	
+	if os.path.isfile(nomFichier):
+		f = open(nomFichier, 'r')
+		dropligne(f, nbpoints, tdeb)
+		writePMOY(f, nbpoints)
+	else:
+		print 'Erreur : fichier non trouve %s' % (nomFichier)

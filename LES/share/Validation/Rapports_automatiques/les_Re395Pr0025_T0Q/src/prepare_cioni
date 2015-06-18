@@ -1,0 +1,23 @@
+#!/bin/bash
+
+mkdir -p VDF
+mkdir -p VEF_RK
+mkdir -p VEF_Implicite
+mkdir -p VEF_Implicite_FS1
+mkdir -p VEF_Implicite_ICEM
+
+cp post_run_ICEM VEF_Implicite_ICEM/post_run
+
+cp post_run VDF
+cp post_run VEF_RK
+cp post_run VEF_Implicite
+cp post_run VEF_Implicite_FS1
+
+
+sed "s/_SCHTPS_/sch_RK/" les_Re395Pr0025_T0Q_VEF.data > VEF_RK/les_Re395Pr0025_T0Q.data
+
+sed "s/_SCHTPS_/sch_impl/" les_Re395Pr0025_T0Q_VEF.data > VEF_Implicite/les_Re395Pr0025_T0Q.data
+
+sed "s/facsec_max 4/facsec_max 1/" VEF_Implicite/les_Re395Pr0025_T0Q.data > VEF_Implicite_FS1/les_Re395Pr0025_T0Q.data
+
+cp les_Re395Pr0025_T0Q_VDF.data VDF/les_Re395Pr0025_T0Q.data

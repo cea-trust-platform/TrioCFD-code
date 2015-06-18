@@ -1,0 +1,155 @@
+# Sudden contraction #
+# Recirculation box #
+# geometrical dimensions: #
+# Length L = 0.4 #
+# Diameter D1 = 2.   #
+
+
+PrecisionGeom 1.e-4
+
+dimension 3
+Pb_hydraulique_Turbulent pb1
+export domaine DOM
+
+Domaine BOX
+
+Domaine DOM1
+
+# BEGIN MESH #
+Read_unsupported_ASCII_file_from_ICEM DOM sudden_contraction_1.asc
+
+VerifierCoin DOM { }
+Reorienter_tetraedres DOM
+Dilate  DOM 0.001
+# END MESH #
+
+# Extrusion #
+Domaine EX_D
+extract_2d_from_3d DOM IN EX_D
+dimension 2
+extruder_en3 { domaine 1 EX_D nb_tranches 4 direction 0. 0. -0.4 }
+RegroupeBord EX_D PERIO { devant derriere }
+dimension 3
+
+transformer EX_D  z x y 
+
+Ecrire_fichier EX_D EX_D.geom
+Read_file DOM1 EX_D.geom
+
+Corriger_frontiere_periodique 
+{
+	domaine DOM1
+	bord  PERIO 
+	direction 3 0.4 0. 0. 
+ }
+
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Read sch {
+	tinit   0.
+	tmax    2500.
+	dt_min  1e-10
+	dt_max  1.
+	dt_impr 10.
+	dt_sauv 100.
+	seuil_statio 1e-8
+
+	facsec 5.
+        facsec_max 500.
+        Solveur
+           Implicite
+           {
+                seuil_convergence_solveur 1.e-12
+           }
+	}
+
+Fluide_Incompressible liquide
+Read liquide
+{
+	mu  Champ_Uniforme 1 0.001
+ 	rho Champ_Uniforme 1 1000
+}
+
+
+Associate pb1 DOM1
+Associate pb1 liquide
+Associate pb1 sch
+Discretize pb1 dis
+
+
+Read pb1
+{ 
+Navier_Stokes_Turbulent 
+{ 
+	solveur_pression Gcp
+	{
+	precond ssor { omega 1.5 } 
+	seuil 1.e-14 impr
+	} 
+	convection { negligeable }
+	diffusion  { }
+       
+	Traitement_particulier { Ec { Ec periode 10. } }
+
+	Sources
+	{
+	Canal_perio { bord PERIO }
+	}
+	conditions_initiales {  vitesse Champ_uniforme 3  0.05 0. 0. }
+	boundary_conditions { 
+	PERIO periodique 
+	WALL1 paroi_fixe
+	SYM1 symetrie
+	SYM12 symetrie
+	} 
+			  
+	Modele_turbulence K_epsilon
+	{
+	cmu 0.09
+	transport_k_epsilon
+		{
+		diffusion { }
+		convection { negligeable }		
+		parametre_equation parametre_implicite
+                        {
+                                resolution_explicite
+                        }
+		conditions_initiales { k_eps champ_uniforme 2 1.2e-5 1.4e-6 }
+				
+		boundary_conditions { 
+			PERIO periodique 
+			SYM1 symetrie
+			SYM12 symetrie
+			WALL1 paroi
+				}
+		}
+	turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 500.
+        }
+			
+	ecrire_fichier_xyz_valeur vitesse 500. bords 1 PERIO
+	ecrire_fichier_xyz_valeur k_eps 500. bords 1 PERIO
+			     
+}            
+	Postraitement 
+	{
+		format lata
+		champs binaire dt_post 1000.
+		{
+			vitesse elem
+			pression elem
+			pression_pa elem
+			viscosite_turbulente elem
+			y_plus elem
+			k elem
+			eps elem
+		}	
+	}        
+
+
+sauvegarde binaire box.sauv
+} 
+Solve pb1
+End
+

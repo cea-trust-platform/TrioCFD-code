@@ -1,0 +1,30 @@
+#!/bin/bash
+jdd=Cyl_2D
+#jdd=Cyl_3D
+if [ $jdd = Cyl_2D ]
+then
+   # Creation du maillage 2D
+   gmsh -2 Cercle.geo
+   echo -e "1\nCercle\nn" | gmsh2geom
+fi
+for U in 0.44 0.87
+do
+   # Create directory
+   rm -r -f $U
+   mkdir -p $U
+   cd $U
+   
+   # K and Eps calculation for boundary conditions
+   K=`echo "1.5*$U*$U*0.03*0.03" | bc -l`
+   EPS=`echo "0.16*sqrt($K*$K*$K)/(0.07*0.05)" | bc -l`
+   K=0
+   EPS=0
+   echo U=$U
+   echo K=$K
+   echo EPS=$EPS
+   # Copie/create data files
+   sed "s/U_IMPOSED/$U/ 
+        s/K_EPS_IMPOSED/$K $EPS/" ../$jdd.data > test.data
+   cp ../post_run .
+   cd -
+done

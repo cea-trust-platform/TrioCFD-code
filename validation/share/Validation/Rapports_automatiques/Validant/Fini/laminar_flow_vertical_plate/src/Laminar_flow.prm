@@ -1,0 +1,1049 @@
+Parameters {
+	Title "Free and mixed convection along a vertical flat plate"
+	Description "Free and mixed convection along a vertical hot plate."
+	Description "The cold fluid comes from the bottom with a different velocity value for each case and heated on the left wall."
+	Description "In these situations, the velocity and temperature profiles, and the Nusselt coefficients are compared with given correlations."
+	Description "Validated Model : "
+	Description "...2D Channel"
+	Description "...laminar flow"
+	Description "...isothermal wall"
+	Description "...heat exchange correlations"
+	Description "...No-slip at fluid/solid interface"
+	Description "...quasi-compressible fluid (case QC only)"
+
+	VersionTrio_U "1.5.4"
+
+	ParametersTrio_U Type of problem : thermohydraulic
+	ParametersTrio_U Type of fluide : does not correspond to any existing fluid but imposed Pr and Gr numbers
+	ParametersTrio_U Type of fluide : Quasi compressible Perfect gas (case QC)
+	ParametersTrio_U Discretization : VEFPreP1B/VDF
+	ParametersTrio_U Time scheme : Euler_explicite
+	ParametersTrio_U Solving of equations : Equation Navier_Stokes QC
+	ParametersTrio_U Solving of equations : Convection_Diffusion_Chaleur_QC
+	ParametersTrio_U Solving of equations : Equation Navier_Stokes_Standard (VEF/VDF)
+	ParametersTrio_U Solving of equations : Convection_Diffusion_Temperature (VEF/VDF)
+	ParametersTrio_U Solving of equations : Termes sources Boussinesq_Temperature (T0,0)(VEF/VDF)
+	ParametersTrio_U Solving of equations : Option_VDF { traitement_coins oui}
+	ParametersTrio_U Convection scheme : Momentum : amont(VDF) / muscl(VEF) Temperature : amont(VDF) / muscl(VEF)
+	ParametersTrio_U Turbulence model : none
+	ParametersTrio_U Type of boundary conditions : y-symmetry, no-slip at fluid/solid interface
+
+	TestCase FC_VDF_Bouss FC_VDF_Bouss
+	TestCase FC_VDF_QC FC_VDF_QC
+	TestCase FC_VEF_Bouss FC_VEF_Bouss
+	TestCase FC_VEF_QC FC_VEF_QC
+	TestCase MC_VDF_Bouss_amont_01 MixConv /*jdd en annexe*/
+	TestCase MC_VDF_Bouss_amont_01_ss_coin MixConv
+	TestCase MC_VDF_Bouss_amont_02 MixConv
+	TestCase MC_VDF_Bouss_amont_10 MixConv
+	TestCase MC_VDF_Bouss_amont_10_ss_coin MixConv
+	TestCase MC_VDF_Bouss_amont_2 MixConv
+	TestCase MC_VDF_QC_amont_01 Mixconv_QC	/*jdd en annexe*/
+	TestCase MC_VDF_QC_amont_02 Mixconv_QC
+	TestCase MC_VDF_QC_amont_10 Mixconv_QC
+	TestCase MC_VDF_QC_amont_2 Mixconv_QC
+	TestCase MC_VEF_Bouss_amont_01 MixConv
+	TestCase MC_VEF_Bouss_amont_02 MixConv
+	TestCase MC_VEF_Bouss_amont_10 MixConv
+	TestCase MC_VEF_Bouss_amont_2 MixConv
+	TestCase MC_VEF_Bouss_muscl_01 MixConv
+	TestCase MC_VEF_Bouss_muscl_02 MixConv
+	TestCase MC_VEF_Bouss_muscl_10 MixConv
+	TestCase MC_VEF_Bouss_muscl_2 MixConv
+	TestCase MC_VEF_QC_muscl_01 MixConv
+	TestCase MC_VEF_QC_muscl_02 MixConv
+	TestCase MC_VEF_QC_muscl_10 MixConv
+	TestCase MC_VEF_QC_muscl_10_grossier MixConv
+	TestCase MC_VEF_QC_muscl_2 MixConv
+
+	Author "R. PAILLE"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Figure {
+		Title "Geometry"
+		Description "Dimensions : L=1, W=0.3"
+		Width 12cm
+		picture ./Geometry.png
+	}
+	visu {
+	Title "VEF mesh"
+	mesh MC_VEF_Bouss_amont_01/MixConv.lata dom
+	description "Mesh : (1;0,3) Structured mesh with factors 1. 1."
+	description "(61;61) points (60x60) quadrangle cells (60x60x4 Triangles)"
+	description "Type of cells : homogenous triangles obtained by trianguler_H"
+	}
+	visu {
+	Title "VDF mesh"
+	mesh MC_VDF_Bouss_amont_01/MixConv.lata dom
+	description "Mesh : (1;0,3) Structured mesh with factors 1 1,05"
+	description "(61;81) points (60;80) cells"
+	}
+	visu {
+	Title "VEF QC mesh"
+	mesh MC_VEF_QC_muscl_01/MixConv.lata dom
+	description "Mesh : (1;0,3) Structured mesh with factors 1. 1."
+	description "(60;80) cells quadrangles (60 x 80 x 4 Triangles)"
+	description "Type of cells : homogenous triangles obtained by trianguler_H"
+	}
+	Figure {
+		Title "Conditions"
+		Description "Initial conditions"
+		Description "......Temperature=TO=0"
+		Description "......u=v=0"
+		Description "......u inlet = 0 (free convection) or U0 (forced convection)"
+		Description ""
+		Description "Boundary conditions"
+		Description "......Hydraulic"
+		Description ".........Top edge : frontiere_ouverte_pression_imposee champ_front_uniforme 1 0."
+		Description ".........Low edge : frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0. for free convection"
+		Description "                     2 0. U0 different de 0 for forced convection"
+		Description ".............Left edge : paroi_fixe"
+		Description ".........VEF Right edge : paroi_fixe"
+		Description ".........VDF Right edge : symetrie"
+		Description ".........VDF and VEF QC Right edge : symetrie"
+		Description ".........Option VDF {traitement_coins oui}"
+		Description ""
+		Description "......Temperature"
+		Description ".........Tw > T0 on left wall"
+		Description ".........VEF Top edge : frontiere_ouverte_T_ext champ_front_uniforme 1 0."
+		Description ".........VDF Top edge : frontiere_ouverte_T_ext champ_front_uniforme 1 0"
+		Description ".........VEF QC Top edge : frontiere_ouverte_T_ext champ_front_uniforme 1 273.15"
+		Description ".........VDF QC Top edge : frontiere_ouverte_T_ext champ_front_uniforme 1 273.15"
+		Description ".........VEF Low edge : frontiere_ouverte_T_ext champ_front_uniforme 1 0."
+		Description ".........VDF Low edge : frontiere_ouverte_T_ext champ_front_uniforme 1 0"
+		Description ".........VEF QC Low edge : frontiere_ouverte_T_ext champ_front_uniforme 1 273.15"
+		Description ".........VDF QC Low edge : frontiere_ouverte_T_ext champ_front_uniforme 1 273.15"
+		Description ".........VEF Left edge : paroi_temperature_imposee champ_front_uniforme 1 1."
+		Description ".........VDF Left edge : paroi_echange_externe_imposee T_ext champ_front_uniforme 1 1"
+		Description ".........VEF QC Left edge : paroi_temperature_imposee champ_front_uniforme 1 297.65"
+		Description ".........VDF QC Left edge : paroi_echange_externe_imposee T_ext champ_front_uniforme 1 297.65 H_imp Champ_front_uniforme 1 1.e11"
+		Description ".........VEF Right edge : paroi_adiabatique"
+		Description ".........VDF Right edge : symetrie"
+		Description ".........VDF and VEF QC Right edge : symetrie"
+		
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 13 kg/m$^3$"
+		Description "$\mu$ = 13 kg/m/s"
+		Description "g = (0, -10$^9$) m/s$^2$"
+		Description "Cp = 1 J/kg/K"
+		Description "$\beta$ = 1 K$^-1$"
+		Description "$\lambda$ = 13 W/m/K"
+		Description "These properties are numerical, some values are just chosen different from 1. For this non-real fluid Pr=1"
+		Description "The thermal and flow conditions are such that the global Grashof number (Gr) reached 10$^9$."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "QC Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "Cp = 1006,4 J/kg/K"
+		Description "$\mu$ = 2,9.10$^-5$ kg/m/s"
+		Description "Pr = 1"
+		Description "$\gamma$ = 1,53411"
+		Description "P = 1.10$^5$ Pa"
+		Description "The thermal and flow conditions are such that the global Grashof number (Gr) reached 10$^9$ and Pr=1."
+		Description "We deduce from this value that $\rho$=(P.$\gamma$)/(($\gamma$-1).Cp.T)=1 Kg/m$^3$, $\beta$=1/T=3,5.10$^-3$		K$^-1$,"
+		Description "$\lambda$=($\mu$.Cp)/Pr=0.029 W/m/K"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+Chapter {
+	Title "Results"
+	Description "The non-dimensional numbers used in this study are :"
+	Description "i) The Prandt number Pr=v$\rho$Cp/$\lambda$ defined by the ratio of the kinematical viscosity to the thermal diffusity"
+	Description "Pr=1 implies that thermal and hydraulic boundary layers have the same thickness"
+	Description ""
+	Description "ii) The Local Grashof number is defined by Grx=g$\beta$$\Delta$Tx$^3$/v$^2$. It compares floatablility to viscous"
+	Description "effects for free convection regimes. The global Grashof number obtained for x=L and reads GrL=g$\beta$$\Delta$TL$^3$/v$^2$"
+	Description ""
+	Description "iii) The Local boundary layer Reynolds number is defined by Rex=ux/v. It compares inertial and viscous effects."
+	Description "The global Reynolds number is obtained for x=L : ReL=uL/v"
+	Description ""
+	Description "iv) Finally, the Richardson number Rix=Grx/Rex$^2$ distinguishes free convection from mixed convection regimes."
+	Description "Rix >> 1 corresponds to free convection whereas Rix << 1 characterized forced convection, i.e. negligible floatability effects"
+	Description "Results are shown for free and mixed convection regimes (0,1 < Ri < 10)"
+}
+Chapter {
+	Title "Free convection"
+	Figure {
+		Description "We compare the non-dimensional temperature T*=(Tw-T)/(Tw-T0) and velocity transversal profiles at (x=0,91;0<y<0,036)"
+		Description "and with the Polhausen's solution [1] for GrL=10$^9$ and Pr=1. We check that profiles are the same for other x"
+		Description "or y values. x should be sufficiently far from the inlet and the outlet (0,5<x<0,91) in order to avoid inlet"
+		Description "and outlet effects and y should be near the wall (y<0,036)."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Transversal temperature profile for free convection along a vertical isothermal plate (RiL moy = 100)"
+		Dimension 2
+		LabelX "(y/x)(Grx/4)$^1/4$"
+		RangeX 0 10
+		LabelY "T*"
+		RangeY 0 1
+		Include_Description_Curves 0
+		Curve {
+			legend "Polhausen"
+			file ./polhausen.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Calcul Trio_U VDF"
+			origin "Trio_U"
+			file ./FC_VDF_Bouss/freeConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Calcul Trio_U VEF"
+			origin "Trio_U"
+			file ./FC_VEF_Bouss/freeConvection.dat
+			columns ($1) ($2)
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Calcul Trio_U VDF QC"
+			origin "Trio_U"
+			file ./FC_VDF_QC/freeConvection.dat
+			columns ($1) ($2)
+			TypeLigne 4
+			TypePoints 3
+		}
+		Curve {
+			legend "Calcul Trio_U VEF QC"
+			origin "Trio_U"
+			file ./FC_VEF_QC/freeConvection.dat
+			columns ($1) ($2)
+			TypeLigne 5
+			TypePoints 4
+		}
+	}
+	Figure {
+		Title "Transversal velocity(u) profile for free convection along a vertical isothermal plate (RiL moy = 100)"
+		Description "The two figures show a very good agreement between the present Trio_U calculations and the predictions"
+		Description "of Polhausen's law corresponding to free convection"
+		Description ""
+		Dimension 2
+		LabelX "(y/x)(Grx/4)$^1/4$"
+		RangeX 0 10
+		LabelY "ux/2vGrx$^1/2$"
+		RangeY 0 0.30
+		Include_Description_Curves 0
+		Curve {
+			legend "Polhausen"
+			file ./polhausen.dat
+			columns ($1) ($3)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Calcul Trio_U VDF"
+			origin "Trio_U"
+			file ./FC_VDF_Bouss/freeConvection.dat
+			columns ($1) ($3)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Calcul Trio_U VEF"
+			origin "Trio_U"
+			file ./FC_VEF_Bouss/freeConvection.dat
+			columns ($1) ($3)
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Calcul Trio_U VDF QC"
+			origin "Trio_U"
+			file ./FC_VDF_QC/freeConvection.dat
+			columns ($1) ($3)
+			TypeLigne 4
+			TypePoints 3
+		}
+		Curve {
+			legend "Calcul Trio_U VEF QC"
+			origin "Trio_U"
+			file ./FC_VEF_QC/freeConvection.dat
+			columns ($1) ($3)
+			TypeLigne 5
+			TypePoints 4
+		}
+
+	}
+}
+Chapter {
+	Title "Mixed convection"
+	Figure {
+		Description "The mixed convection regime is also addressed in this work. The velocity value U0 is chosen at the inlet in order to"
+		Description "vary the global Richardson number in the range 0,1 < RiL < 10. As in the free convection case, the Grashof"
+		Description "and Prandtl numbers were respectively equal to 10$^9$ and 1."
+		Description "The local Nusselt number can be calculated according to the formula Nux=q.x/$\lambda$$\Delta$T, with q representing"
+		Description "the exchanged heat flux at the wall (W/m$^2$) and $\Delta$T the difference between wall temperature and fluid temperature (K)"
+		Description "The computed Nusselt values are compared to :"
+		Description "- Blasius' correlation corresponding to pure forced convection [2] for RiL=0.1"
+		Description "- Szewczyk's free convection correlation [2] for RiL=10"
+		Description "- Szewczyk's mixed convection correlation [2] for RiL=2,0.2 and 0.1"
+		Description "- Merkin's mixed convection correlations. There are two different correlations :"		
+		Description "--- one corresponding to the region near the leading edge where bouyancy effects may be neglected in forced flow regimes (RiL=0.1 and 0.2)"
+		Description "--- the other corresponding to the region far from the leading edge (RiL=2 and 10) where bouyancy effects dominate [1]"
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=0,1 and 10"
+		Dimension 2
+		LabelX "x/L"
+		RangeX 0 1
+		LabelY "Nux"
+		RangeY 0 140
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Szewczyk Mixed Conv RiL=0.1"
+			file ./szewczyk01.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Szewczyk Free Conv RiL=10"
+			file ./szewczyk10.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Merkin near leading edge RiL=0.1"
+			file ./merkin01.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 2
+		}
+		Curve {
+			legend "Merkin far from leading edge RiL=10"
+			file ./merkin10.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Blasius purely Forced Conv RiL=0.1"
+			file ./blasius.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 3
+		}
+		Curve {
+			legend "Trio_U VDF RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_01/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U VDF RiL=10"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U VEF amont RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_amont_01/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 5
+		}
+		Curve {
+			legend "Trio_U VEF amont RiL=10"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_amont_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 5
+		}
+		Curve {
+			legend "Trio_U VEF muscl RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_01/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 6
+		}
+		Curve {
+			legend "Trio_U VEF muscl RiL=10"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 6
+		}
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=0,2 and 2"
+		Dimension 2
+		LabelX "x/L"
+		RangeX 0 1
+		LabelY "Nux"
+		RangeY 0 120
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Szewczyk Mixed Conv RiL=2"
+			file ./szewczykMC2.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Szewczyk Mixed Conv RiL=0.2"
+			file ./szewczykMC02.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Merkin far from leading edge RiL=2"
+			file ./merkin2.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 2
+		}
+		Curve {
+			legend "Merkin near leading edge RiL=0.2"
+			file ./merkin02.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Szewczyk Free Conv RiL=2"
+			file ./szewczykFC2.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 3
+		}
+		Curve {
+			legend "Trio_U VDF RiL=2"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_2/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U VDF RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_02/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U VEF amont RiL=2"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_amont_2/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 5
+		}
+		Curve {
+			legend "Trio_U VEF amont RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_amont_02/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 5
+		}
+		Curve {
+			legend "Trio_U VEF muscl RiL=2"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_2/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 6
+		}
+		Curve {
+			legend "Trio_U VEF muscl RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_02/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 6
+		}
+	}
+	Figure {
+		Description "Calculations are in good agreement with the theorical attempts for RiL>=10. For smaller RiL, that is to say"
+		Description "in forced convection, we note a deviation of Trio_U's calculations due to the amont thermal convection scheme"
+		Description "In order to improve these results calculations are done with the muscl convection thermal scheme which is"
+		Description "less diffusive than the amont scheme. We analyse the effects of this scheme on the results"
+		Width 0cm
+		picture ./nothing.png
+	}
+
+
+	Figure {
+		Description "Calculations are in good agreement with the theorical attempts for every cases (RiL=0.1,0.2,2 and 10)"
+		Description "As in the VDF discretization case we observe the transition between the free and the mixed convection"
+		Description "regime for RiL=2. At the inlet buoyancy effects may be neglected in forced flow so that Szewczyk's mixed"
+		Description "convection correlation can describe the flow. Whereas far downstream of the leading edge the flow is dominated"
+		Description "by the buoyancy forces so that Szewczyk's free convection correlation can be used."
+		Description ""
+		Description "We check that Trio_U's calculations with VEF discretization and adapted convection scheme are the same as"
+		Description "those with VDF discretization. For x/L<0.1, we can see a deviation between Trio_U's calculations with VDF"
+		Description "and VEF discretizations. There is no boundary effect with VEF discretization."
+		Description ""
+		Description "NB : We check that the muscl hydraulic convection scheme in the v1.5 (Van Leer) leads to the same Nusselt"
+		Description "numbers along the vertical plate for RiL=10. We check also that the EF convection scheme leads to the same"
+		Description "Nusselt numbers for RiL=2"
+		Description ""
+		Description "Nusselt number is compared to the Merkin solution for a mixed convection flow along a vertical plate [1]"
+		Description "Calculations with the muscl thermal convection scheme are similar with Merkin correlation."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=0,1 and 10 with QC"
+		Dimension 2
+		LabelX "x/L"
+		RangeX 0 1
+		LabelY "Nux"
+		RangeY 0 140
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Szewczyk Mixed Conv RiL=0.1"
+			file ./szewczyk01.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Szewczyk Free Conv RiL=10"
+			file ./szewczyk10.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Merkin near leading edge RiL=0.1"
+			file ./merkin01.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 2
+		}
+		Curve {
+			legend "Merkin far from leading edge RiL=10"
+			file ./merkin10.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Blasius purely Forced Conv RiL=0.1"
+			file ./blasius.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 3
+		}
+		Curve {
+			legend "Trio_U RiL=0.1 VDF QC"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_01/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U RiL=10 VDF QC"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U RiL=0.1 VEF QC"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_01/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 5
+		}
+		Curve {
+			legend "Trio_U RiL=10 VEF QC"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 5
+		}
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=0,2 and 2 with QC"
+		Description "Nusselt number is comparated to the Merkin solution for a mixed convection flow along a vertical plate"
+		Dimension 2
+		LabelX "x/L"
+		RangeX 0 1
+		LabelY "Nux"
+		RangeY 0 140
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Szewczyk Mixed Conv RiL=2"
+			file ./szewczykMC2.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Szewczyk Free Conv RiL=0.2"
+			file ./szewczykMC02.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Merkin near leading edge RiL=2"
+			file ./merkin2.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 2
+		}
+		Curve {
+			legend "Merkin far from leading edge RiL=0.2"
+			file ./merkin02.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Szewczyk Free Conv RiL=2"
+			file ./szewczykFC2.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 3
+		}
+		Curve {
+			legend "Trio_U RiL=2 VDF QC"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_2/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U RiL=0.2 VDF QC"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_02/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 4
+		}
+		Curve {
+			legend "Trio_U RiL=2 VEF QC"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_2/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 5
+		}
+		Curve {
+			legend "Trio_U RiL=0.2 VEF QC"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_02/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 5
+		}
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=0.1 and 10 without traitement_coins option"
+		Width 12cm
+		Dimension 2
+		LabelX "x/L"
+		RangeX 0 1
+		LabelY "Nux"
+		RangeY 0 140
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Trio_U VDF sans_coin RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_01_ss_coin/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VDF sans_coin RiL=10"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_10_ss_coin/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VDF RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_01/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U VDF RiL=10"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+	}
+	Figure {
+		Description "If we don't use the VDF option traitement_coins we see for x/L>0.9 a deviation of TRio_U's calculations"
+		Description "due to boundary effects at the outlet. This deviation appears also with the outlet boundary conditions "
+		Description "frontiere_ouverte_gradient_pression_impose or frontiere_ouverte_pression_imposee_Orlansky."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "influence of the mesh on the Nusselt profile with QC"
+		Description "Maillage fin : 60x80 quadrangles divided each in 4 triangles"
+		Description "Maillage grossier : 30x80 quadrangles divided each in 4 triangles"
+		Description ""
+		Width 12cm
+		Dimension 2
+		LabelX "x/L"
+		RangeX 0 1
+		LabelY "Nux"
+		RangeY 0 140
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Trio_U VDF QC RiL=10"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 1
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VEF QC muscl RiL=10"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_10/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U VEF QC grossier RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_10_grossier/mixedConvection.dat
+			columns ($1) ($2)
+			TypeLigne 3
+			TypePoints 3
+		}
+	}
+	Figure {
+		Description "As we can see special attention must be given on the meshing step. Mesh has to be thin enough near"
+		Description "the wall to get good values of heat exchanges especially with the VEF discretization."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=10,2,0.2,0.1 for VDF"
+		Width 12cm
+		Description "Nusselt number is compared in next figure to the Merkin's solution for a mixed convection flow along a vertical plate[1]."
+		Description ""
+		Description "For each value of RiL, the only local Ri value which are to be taken into account are those close from the RiL value."
+		Description "This eliminates all the points which are situated above the Merkin curve. It can therefore be seen that the calculations and the Merkin curve fit very well."
+		Dimension 2
+		LabelX "Ri"
+		RangeX 0.01 10
+		LabelY "Nux/Rex1/2"
+		RangeY 0 0.8
+		LogX
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Merkin"
+			file ./nusselt.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_01/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U RiL=10"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_10/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 3
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U RiL=2"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_2/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 4
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VDF_Bouss_amont_02/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 5
+			TypePoints 1
+		}
+	}
+	Figure {
+		Description "Calculations are in good agreement with the theorical attempts"
+		Description "We observe the transition between the mixed and the free convection regime for RiL=2. At the inlet bouyancy"
+		Description "effects may be neglected in forced flow so that Szewczyk's mixed convection correlation can describe"
+		Description "the flow. Whereas far downstream of the leading edge the flow id dominated by the bouyancy forces so that"
+		Description "Szewczyk's free convection correlation can be used."
+		Description "For x/L<0.1 there is a deviation of Trio_U's calculations due to boundary effects at the inlet probably"
+		Description "cause of the thermal boundary condition imposed on the wall."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate with muscl thermal convection scheme for RiL=10,2,0.2,0.1 for VEF."
+		Width 12cm
+		Description "For each value of RiL, the only local Ri value which are to be taken into account are those close from the RiL value."
+		Description "This eliminates all the points which are situated above the Merkin curve. It can therefore be seen that the calculations and the Merkin curve fit very well."
+		Dimension 2
+		LabelX "Ri"
+		RangeX 0.01 10
+		LabelY "Nux/Rex1/2"
+		RangeY 0 0.8
+		LogX
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Merkin"
+			file ./nusselt.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_01/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U RiL=10"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_10/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 3
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U RiL=2"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_2/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 4
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VEF_Bouss_muscl_02/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 5
+			TypePoints 1
+		}
+	}
+	Figure {
+		Title "Nusselt number along a vertical isothermal plate for RiL=10,2,0.2,0.1 for QC."
+		Width 12cm
+		Description "For each value of RiL, the only local Ri value which are to be taken into account are those close from the RiL value."
+		Description "This eliminates all the points which are situated above the Merkin curve. It can therefore be seen that the calculations and the Merkin curve fit very well."
+
+		Dimension 2
+		LabelX "Ri"
+		RangeX 0.01 10
+		LabelY "Nux/Rex1/2"
+		RangeY 0 0.8
+		LogX
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Merkin"
+			file ./nusselt.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U VDF QC RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_01/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 2
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VDF QC RiL=10"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_10/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 3
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VDF QC RiL=2"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_2/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 4
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VDF QC RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VDF_QC_amont_02/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 5
+			TypePoints 1
+		}
+		Curve {
+			legend "Trio_U VEF QC RiL=0.1"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_01/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 2
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U VEF QC RiL=10"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_10/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 3
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U VEF QC RiL=2"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_2/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 4
+			TypePoints 2
+		}
+		Curve {
+			legend "Trio_U VEF QC RiL=0.2"
+			origin "Trio_U"
+			file ./MC_VEF_QC_muscl_02/mixedConvection.dat
+			columns ($3) ($4)
+			TypeLigne 5
+			TypePoints 2
+		}
+	}
+	Figure {
+		Description "Calculations are in good agreement with the theorical attempts and with those obtained by Trio_U with a"
+		Description "non-compressible fluid"
+		Description "We observe the transition between the mixed and the free convection regime for RiL=2. At the inlet bouyancy"
+		Description "effects may be neglected in forced flow so that Szewczyk's mixed convection correlation can describe"
+		Description "the flow. Whereas far downstream of the leading edge the flow is dominated by the bouyancy forces so that"
+		Description "Szewczyk's free convection correlation can be used."
+		Description "For x/L<0.1 there is a deviation of Trio_U's calculations due to boundary effects at the inlet probably"
+		Description "cause of the thermal boundary condition imposed on the wall."
+		Description "If we don't use the VDF option traitement_coins we see for x/L>0.9 a deviation of TRio_U's calculations"
+		Description "due to boundary effects at the outlet."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Conclusion VDF"
+		Description "This simulation enables the validation of convection effects (free and mixed) along a vertical isothermal"
+		Description "plate with VDF grids. In this case, the calculated results are in good agreement with those obtained by Merkin"
+		Description "Szewczyk, Blasius and Polhausen."
+		Description ""
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Conclusion VEF"
+		Description "This simulation enables the validation of convection effects (free and mixed) along a vertical isothermal"
+		Description "plate with VEF grids with the muscl thermal convection scheme. Amont scheme can only be used for free convection"
+		Description "cases (RiL>=10) and muscl scheme must be used for forced convection cases (RiL<10). This leads to calculations"
+		Description "in good agreement with those obtained by Merkin, Szewczyk, Blasius and Polhausen."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Conclusion QC"
+		Description "The simulation enables the validation of convection effects (free and mixed) along a vertical isothermal plate"
+		Description "with VDF and VEF grids with a quasi compressible fluid. In this case, the calculated results are in good"
+		Description "agreement with those obtained by Merkin, Szewczyk, Blasius and Polhausen and with those obtained by Trio_U"
+		Description "with a non compressible fluid."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Recommandations for users VDF"
+		Description "Special attention must be given on the meshing step. The meshes have to be thin enough near the wall to get"
+		Description "good values of Nusselt numbers. Traitement_coins VDF option must be used in order to avoid boundary effects"
+		Description "with free outlet."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Recommandations for users VEF"
+		Description "Amont scheme can be used only for free convection cases (RiL>=10) but muscl scheme must be used for forced"
+		Description "convection cases (RiL<10) and can be used in every cases."
+		Description "The discretization must be fine enough to obtain good results."
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Recommandations for users QC"
+		Description "Special attention must be given on the meshing step. The meshes have to be thin enough near the wall to get"
+		Description "good values of heat exchanges especially with the VEF discretization"
+		Description ""
+		Description "Amont convection scheme does not give good results in VEF discretization."
+		Description ""
+		Description "The VDF option Traitement_coins must be used in order to avoid boundary effects with free outlet with the VDF discretization"
+		Description ""
+		Description "For RiL<1 we can note a deviation in the nusselt profile near the outlet with the v1.4.8 Trio_U version,"
+		Description "probably due to boundary conditions. This deviation disappears with the 1.4.9 version"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

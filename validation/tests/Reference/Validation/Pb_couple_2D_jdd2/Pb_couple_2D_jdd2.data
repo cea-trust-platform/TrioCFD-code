@@ -1,0 +1,199 @@
+# Thermohydraulique 2D couplee a conduction 2D #
+dimension 2
+# bidim_axi #
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 1000.
+	dt_min 0.0001
+	dt_max 10.
+	dt_impr 200.
+	dt_sauv 400.
+	seuil_statio 1.e-10
+	diffusion_implicite 0
+	facsec 1.
+}
+
+Pb_conduction pb_acier
+Pb_Thermohydraulique pb_fluide
+
+Domaine dom_acier
+Mailler dom_acier
+{
+	Pave pavacier
+		{
+		Origine 4. 0.
+     		Nombre_de_Noeuds 3 5
+		Longueurs 2. 9.
+		}
+		{
+		Bord paroidroite X = 6.  0. <= Y <= 9.
+		Bord paroihaute Y = 9.  4. <= X <= 6.
+		Bord paroibasse Y = 0.  4. <= X <= 6.
+		Raccord local homogene Racfluide_acier  X = 4.  0. <= Y <= 9.
+		} 
+}
+
+Trianguler dom_acier 
+
+Domaine dom_fluide
+Mailler dom_fluide
+{
+	Pave pavfluide
+		{
+		Origine 2. 0.
+		Nombre_de_Noeuds 3 5
+		Longueurs 2. 9.
+		}
+		{
+		Bord entree Y = 0.  2. <= X <= 4.
+		Bord sortie Y = 9.  2. <= X <= 4.
+		Bord gauche X = 2.  0. <= Y <= 9.
+		Raccord local homogene Racfluide_acier  X = 4.  0. <= Y <= 9.
+		}
+}
+
+Trianguler dom_fluide 
+
+VEFPreP1B dis
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 4.8e-5
+	rho Champ_Uniforme 1 27.
+	lambda Champ_Uniforme 1 0.14 
+	Cp Champ_Uniforme 1 1.
+	beta_th Champ_Uniforme 1 7.8e-4
+}
+Champ_uniforme gravite
+Read gravite 2 0. -9.81
+Associate fluide gravite
+Associate pb_fluide  dom_fluide
+Associate pb_fluide fluide
+
+Solide acier
+Read acier
+{
+	rho Champ_Uniforme 1 1.
+	lambda Champ_Uniforme 1 15.    
+	Cp Champ_Uniforme 1 1.
+}
+
+# Associate acier gravite #
+
+Associate pb_acier dom_acier
+Associate pb_acier acier
+
+Probleme_Couple Conduccouplethermoh
+Associate Conduccouplethermoh pb_fluide
+Associate Conduccouplethermoh pb_acier
+Associate Conduccouplethermoh sch
+
+VerifierCoin dom_fluide { }
+VerifierCoin dom_acier { }
+
+Discretize Conduccouplethermoh dis
+
+Read pb_acier
+{
+	Conduction
+	{
+		diffusion { }
+		sources { puissance_thermique champ_uniforme 1 10. }
+		conditions_initiales { temperature champ_uniforme 1 0. }
+		boundary_conditions 
+		{
+	 		paroidroite Symetrie
+	  		paroibasse paroi_adiabatique
+	  		paroihaute paroi_adiabatique
+	  		Racfluide_acier Paroi_contact pb_fluide Racfluide_acier 	
+		}
+	}
+	Postraitement
+	{
+	format lml
+		sondes
+		{
+		sonde_acier temperature periode 1. point 8
+		5. 1.
+		5. 2.
+		5. 3.
+		5. 4.
+		5. 5.
+		5. 6.
+		5. 7.
+		5. 8.
+		}
+		Champs dt_post 1.e+3
+		{
+			temperature elem
+		}
+	}
+	Sauvegarde binaire pb_acier.sauv
+}
+
+Read pb_fluide
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression Cholesky { impr } 
+		convection { amont }
+		diffusion { }
+		conditions_initiales { vitesse Champ_Uniforme 2 0. 0. }
+		boundary_conditions 
+		{
+			entree frontiere_ouverte_vitesse_imposee
+				Champ_front_Uniforme 2 0. 0.1
+			sortie frontiere_ouverte_pression_imposee
+				Champ_front_Uniforme 1 0.
+			gauche paroi_fixe
+			Racfluide_acier paroi_fixe
+		}
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { amont }
+		boundary_conditions 
+		{
+			entree frontiere_ouverte_temperature_imposee
+				Champ_front_Uniforme 1 0.
+			sortie frontiere_ouverte_temperature_imposee
+				Champ_front_Uniforme 1 0.
+			gauche paroi_adiabatique
+			Racfluide_acier Paroi_contact pb_acier Racfluide_acier 
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 0. }
+	}
+	Postraitement
+	{
+	format lml
+		sondes
+		{
+		sonde_fluide temperature periode 1. point 8
+		3. 1.
+		3. 2.
+		3. 3.
+		3. 4.
+		3. 5.
+		3. 6.
+		3. 7.
+		3. 8.
+		}
+		Champs dt_post 1.e+3
+		{
+			temperature elem
+			vitesse elem
+			vitesse som
+		}
+	}
+	Sauvegarde binaire pb_fluide.sauv
+
+}
+EcritureLectureSpecial 0
+Solve Conduccouplethermoh
+End
+

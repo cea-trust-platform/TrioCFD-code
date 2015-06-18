@@ -1,0 +1,828 @@
+Parameters {
+	Title "Turbulent flow above a heated floor: K Epsilon modeling"
+	Description "Turbulent flow in a bottom-heated squared domain"
+	Description "Validated Model"
+	Description "Time scheme: Euler Implicite and Explicite (for VDF case only)"
+	Description "Validation with:"
+	Description "Convection schemes: Muscl (VEF), EF_stab-alpha=0.2 (VEF) and Quick (VDF)"
+	Description "Turbulent flow, turbulent K Epsilon turbulence model"
+	Description "Pressure solver Cholesky, ICEM for VEF grid generation"	
+	Description "Boussinesq Approximation, with T0=15 degrees Celsius"
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of problem : Thermohydraulique_Turbulent 2D
+	ParametersTrio_U Discretization : VEF (ICEM mesh) and VDF (Trio_U)
+	ParametersTrio_U Time scheme : Schema_Euler_Implicite and Explicite (VDF only)
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent
+	ParametersTrio_U Solving of equations : Solver_pression Cholesky Modele_turbulence K Epsilon
+	ParametersTrio_U Convection schemes : Muscl and EF_stab-alpha=0.2 (VEF), Quick (VDF)
+	ParametersTrio_U Type of boundary conditions : walls with zero velocity and fixed temperature conditions, fixed inlet velocity and temperature, fixed outlet pressure. 
+	ParametersTrio_U Type of fluid : Air
+	
+
+	
+	TestCase VEF_muscl test_VEF
+	TestCase VEF_EFstab test_VEF
+	TestCase VDF_Quick test_VDF /* jdd en annexe */
+
+	Author "A.AUROUSSEAU (S.VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : L=1.04m h=1.04m"
+	Description "Mesh : 11385 VEF cells (including prism layers) for VEF Icem mesh, 7784 rectangular cells for VDF Trio_U mesh"
+	Description "Initial conditions : Hydraulic : zero velocity"
+	Description "Initial conditions : Energy : Fixed temperature 
+	Description "Boundary conditions : Hydraulic : Fixed inlet velocity, fixed outlet pressure"
+	Description "Boundary conditions : Energy : Fixed inlet temperature, fixed temperature on the walls"
+	Description "Boussinesq Approximation, with T0=15 degrees Celsius"
+	Figure {
+		Title "Geometry"
+		Width 12cm
+		picture ./geometry_Heated_floor.png
+	}
+	visu {
+		Title "VDF Mesh generated with Xprepro (Trio_U): 7784 cells"
+		mesh VDF_Quick/test_VDF.lata dom
+		normal3D -0.95 0.04 0.3
+		up3D 0.04 1 -0.01
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+	visu {
+		Title "VEF Mesh generated with Icem: 11385 cells"
+		mesh VEF_EFstab/test_VEF.lata dom
+		normal3D -0.95 0.04 0.3
+		up3D 0.04 1 -0.01
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+	Figure {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 1.18 kg/m$^3$"
+		Description "$\mu$ = 1.85e-5 kg/m/s"
+		Description "$\lambda$ = 0.0262 W/m/K"
+		Description "Cp = 1006 J/kg/K"
+		Description "$\beta$ = 3.30e-3 1/K"
+		Description "Boussinesq Approximation, with T0=15 degrees Celsius"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+
+Chapter {
+	Title "Computation convergence for VDF Quick test case"
+	Description "For every test case, computation convergence curves are provided in the report. They display the velocity time evolution at two different locations in the flow: one point is located near the domain center, the other one near the outlet"
+
+
+	Figure {
+	Title "Point: x=0.52, y=0.62"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.03 0.05
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vx"
+		origin "Trio_U"
+		file VDF_Quick/test_VDF_SONDE_VITESSE_POINT.son
+		columns ($1) ($2)
+		TypePoints 1
+		}	
+	}
+
+	Figure {
+	Title "Point: x=0.52, y=0.62"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.02 0.02
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vy"
+		origin "Trio_U"
+		file VDF_Quick/test_VDF_SONDE_VITESSE_POINT.son
+		columns ($1) ($3)
+		TypePoints 1
+		}
+	}
+
+	Figure {
+	Title "Point: x=1.0, y=0.2"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.1 -0.06
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vx"
+		origin "Trio_U"
+		file VDF_Quick/test_VDF_SONDE_VITESSE_POINT.son
+		columns ($1) ($4)
+		TypePoints 1
+		}
+	}
+	Figure {
+	Title "Point: x=1.0, y=0.2"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.25 -0.2
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vy"
+		origin "Trio_U"
+		file VDF_Quick/test_VDF_SONDE_VITESSE_POINT.son
+		columns ($1) ($5)
+		TypePoints 1
+		}
+	}
+	
+	Description "These curves show that the computation has converged. The oscillations are due to the strong swirl component of the flow."
+
+}
+	
+Chapter {
+	
+	Title "Results for VDF Quick test case"
+
+	visu {
+                Title "Velocity Vector Field"
+                Width 17cm
+                vector VDF_Quick/test_VDF.lata dom VITESSE ELEM 
+                zoom2D 0.0 1.14 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+
+	visu {
+                Title "Y+ Field"
+                Width 17cm
+                pseudocolor_with_range VDF_Quick/test_VDF.lata dom Y_PLUS ELEM -1.0 20.05
+                zoom2D 0.0 1.14 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }
+	
+	visu {
+                Title "Temperature Field"
+                Width 17cm
+                pseudocolor_with_range VDF_Quick/test_VDF.lata dom TEMPERATURE ELEM 287. 307.3
+                zoom2D 0.0 1.14 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }
+
+
+}		
+
+Chapter {
+	Title "Computation convergence for VEF Muscl test case"
+
+	Figure {
+	Title "Point: x=0.52, y=0.62"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.04 0.02
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vx"
+		origin "Trio_U"
+		file VEF_muscl/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($2)
+		TypePoints 1
+		}	
+	}
+
+	Figure {
+	Title "Point: x=0.52, y=0.62"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.08 -0.04
+	Include_Description_Curves 0
+	legend below	
+	Curve {
+		legend "Vy"
+		origin "Trio_U"
+		file VEF_muscl/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($3)
+		TypePoints 1
+		}	
+
+	}
+
+
+	Figure {
+	Title "Point: x=1.0, y=0.2"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.04 -0.02
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vx"
+		origin "Trio_U"
+		file VEF_muscl/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($4)
+		TypePoints 1
+		}
+	}
+	Figure {
+	Title "Point: x=1.0, y=0.2"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 5000.
+	LabelY "Velocity"
+	RangeY -0.35 -0.1
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vy"
+		origin "Trio_U"
+		file VEF_muscl/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($5)
+		TypePoints 1
+		}
+	}
+	
+	Description "These curves show that the computation has converged. It is noted that unlike the VDF-Quick test case, there are no oscillations of the velocity"
+
+}
+
+Chapter {
+	Title "Results vizualisation for VEF Muscl test case"
+
+	visu {
+               Title "Velocity Vector Field"
+               Width 17cm
+               vector VEF_muscl/test_VEF.lata dom VITESSE ELEM 
+               zoom2D -0.1 1.04 0.0 1.04
+	       Operator no_databaseinfo
+		Operator no_bounding_box
+       }	
+
+	visu {
+               Title "Y+ Field"
+               Width 17cm
+               pseudocolor_with_range VEF_muscl/test_VEF.lata dom Y_PLUS ELEM -1.0 20.05
+               zoom2D -0.1 1.04 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }
+	
+	visu {
+               Title "Temperature Field"
+              Width 17cm
+              pseudocolor_with_range VEF_muscl/test_VEF.lata dom TEMPERATURE ELEM 287. 307.3
+              zoom2D -0.1 1.04 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+      }
+
+
+}
+
+Chapter {
+	Title "Computation convergence for VEF EF_stab-alpha=0.2 test case"
+
+	Figure {
+	Title "Point: x=0.52, y=0.62"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 3000.
+	LabelY "Velocity"
+	RangeY -0.05 0.05
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vx"
+		origin "Trio_U"
+		file VEF_EFstab/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($2)
+		TypePoints 1
+		}	
+	}
+
+	Figure {
+	Title "Point: x=0.52, y=0.62"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 3000.
+	LabelY "Velocity"
+	RangeY -0.14 0.0
+	Include_Description_Curves 0
+	legend below	
+	Curve {
+		legend "Vy"
+		origin "Trio_U"
+		file VEF_EFstab/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($3)
+		TypePoints 1
+		}	
+
+	}
+
+	Figure {
+	Title "Point: x=1.0, y=0.2"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 3000.
+	LabelY "Velocity"
+	RangeY -0.05 0.02
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vx"
+		origin "Trio_U"
+		file VEF_EFstab/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($4)
+		TypePoints 1
+		}
+	}
+	Figure {
+	Title "Point: x=1.0, y=0.2"
+	Width 12cm
+	Dimension 2
+	LabelX "Temps"
+	RangeX 0 3000.
+	LabelY "Velocity"
+	RangeY -0.35 0.0
+	Include_Description_Curves 0
+	legend below
+	
+	Curve {
+		legend "Vy"
+		origin "Trio_U"
+		file VEF_EFstab/test_VEF_SONDE_VITESSE_POINT.son
+		columns ($1) ($5)
+		TypePoints 1
+		}
+	}
+
+	Description "These curves show that the computation has converged. This computation with the EF_stab model has converged much faster than the other test cases"
+
+}
+
+Chapter {
+	Title "Results vizualisation for VEF EF_stab-alpha=0.2 test case"
+
+	visu {
+                Title "Velocity Vector Field"
+                Width 17cm
+                vector VEF_EFstab/test_VEF.lata dom VITESSE ELEM 
+                zoom2D -0.1 1.04 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }	
+
+	visu {
+                Title "Y+ Field"
+                Width 17cm
+                pseudocolor_with_range VEF_EFstab/test_VEF.lata dom Y_PLUS ELEM -1.0 20.05
+                zoom2D -0.1 1.04 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }
+	
+	visu {
+                Title "Temperature Field"
+                Width 17cm
+                pseudocolor_with_range VEF_EFstab/test_VEF.lata dom TEMPERATURE ELEM 287. 307.3
+                zoom2D -0.1 1.04 0.0 1.04
+		Operator no_databaseinfo
+		Operator no_bounding_box
+        }
+
+
+}
+
+
+Chapter {
+	Title "Temperature and Velocity profiles"	
+
+	Figure {
+		Title "Temperature horizontal profiles at y=0.1"
+		Width 12cm
+		Dimension 2
+		LabelX "x (m)"
+		RangeX 0 1.04
+		LabelY "T"
+		RangeY 14. 30.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_T1
+			columns ($1) ($2)-273
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_T1
+			columns ($1) ($2)-273
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_T1
+			columns ($1)-0.1 ($2)-273
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file T1_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Temperature horizontal profiles at y=0.52"
+		Width 12cm
+		Dimension 2
+		LabelX "x (m)"
+		RangeX 0 1.04
+		LabelY "T"
+		RangeY 14. 30.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_T2
+			columns ($1) ($2)-273
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_T2
+			columns ($1) ($2)-273
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_T2
+			columns ($1)-0.1 ($2)-273
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file T2_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+	
+	Figure {
+		Title "Temperature horizontal profiles at y=0.9"
+		Width 12cm
+		Dimension 2
+		LabelX "x (m)"
+		RangeX 0 1.04
+		LabelY "T"
+		RangeY 14. 30.
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_T3
+			columns ($1) ($2)-273
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_T3
+			columns ($1) ($2)-273
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_T3
+			columns ($1)-0.1 ($2)-273
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file T3_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Velocity (vertical component) profiles at y=0.1"
+		Width 12cm
+		Dimension 2
+		LabelX "x (m)"
+		RangeX 0 1.04
+		LabelY "Vy (m/s)"
+		RangeY -0.5 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_V1_HORI
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_V1_HORI
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_V1_HORI
+			columns ($1)-0.1 ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file V1_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Velocity (vertical component) profiles at y=0.52"
+		Width 12cm
+		Dimension 2
+		LabelX "x (m)"
+		RangeX 0 1.04
+		LabelY "Vy (m/s)"
+		RangeY -0.5 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_V2_HORI
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_V2_HORI
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_V2_HORI
+			columns ($1)-0.1 ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file V2_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Velocity (vertical component) profiles at y=0.9"
+		Width 12cm
+		Dimension 2
+		LabelX "x (m)"
+		RangeX 0 1.04
+		LabelY "Vy (m/s)"
+		RangeY -0.5 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_V3_HORI
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_V3_HORI
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_V3_HORI
+			columns ($1)-0.1 ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file V3_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Velocity (horizontal component) profiles at x=0.1"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0 1.04
+		LabelY "Vx (m/s)"
+		RangeY -0.5 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_V1_VERTI
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_V1_VERTI
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_V1_VERTI
+			columns ($1) ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file V4_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Velocity (horizontal component) profiles at x=0.52"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0 1.04
+		LabelY "Vx (m/s)"
+		RangeY -0.5 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_V2_VERTI
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_V2_VERTI
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_V2_VERTI
+			columns ($1) ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file V5_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+	Figure {
+		Title "Velocity (horizontal component) profiles at x=0.9"
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0 1.04
+		LabelY "Vx (m/s)"
+		RangeY -0.5 0.5
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "VEF EF_stab"
+			origin "Trio_U"
+			Segment VEF_EFstab/test_VEF.data sonde_V3_VERTI
+			columns ($1) ($2)
+			TypePoints 1
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF_muscl/test_VEF.data sonde_V3_VERTI
+			columns ($1) ($2)
+			TypePoints 2
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF_Quick/test_VDF.data sonde_V3_VERTI
+			columns ($1) ($2)
+			TypePoints 3
+		}
+		Curve {
+			legend "Experimental"
+			origin "Trio_U"
+			file V6_exp.coupe
+			columns ($1) ($2)
+			TypePoints 4
+		}
+	}
+
+}
+
+Chapter {
+	Title "Conclusions"
+	
+	Description "First of all, we note that the computation convergence is reached much faster (3000s instead of 5000s) using the EF_stab convection scheme, with a VEF discretization."
+
+	Description "The temperature profiles are relatively close to the experimental results, except near the left wall for the first horizontal profile (y=0.1). The profiles from the VEF computations match the experimental curves better than the VDF ones"
+
+	Description "The horizontal and vertical velocity profiles don't fit the experimental profiles well. The curves shapes are similar but the the slopes are different. There is also a lack of experimental values in certains areas, which leads to uncertainties (as in the profile at x=0.1 between y=0.6 and 0.8, or near the walls)."
+	
+	Description "It is not obvious to draw a conclusion on the quality of the convection schemes or the discretization when it comes to the prediction of the velocity profiles. The VDF and VEF, and Muscl or EF_stab results are relatively similar, but none of them fit the experimental datas well."
+	
+	Description "Following these results, it is recommended to use the EF_stab convection scheme with a VEF discretization to carry out a computation on such a configuration".
+
+
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

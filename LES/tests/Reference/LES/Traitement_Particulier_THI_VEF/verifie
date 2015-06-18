@@ -1,0 +1,19 @@
+message()
+{
+   [ $1 != $2 ] && echo $ECHO_OPTS "Error ($1!=$2) when checking:\n $msg" && export err=1
+}
+err=0
+
+msg="Spectres identiques entre spectre_1D_tot_0.000000_x_u et REF_spectre_1D_tot_0.000000_x_u"
+compare_sonde spectre_1D_tot_0.000000_x_u  REF_spectre_1D_tot_0.000000_x_u 1>compare_sonde.log 2>&1
+message $? 0
+
+msg="Spectres identiques entre spectre_1D_tot_0.000000_x_v et REF_spectre_1D_tot_0.000000_x_v"
+compare_sonde spectre_1D_tot_0.000000_x_v  REF_spectre_1D_tot_0.000000_x_v 1>compare_sonde.log 2>&1
+message $? 0
+
+msg="Spectres identiques entre spectre_1D_tot_0.000000_x_w et REF_spectre_1D_tot_0.000000_x_w"
+compare_sonde spectre_1D_tot_0.000000_x_w  REF_spectre_1D_tot_0.000000_x_w 1>compare_sonde.log 2>&1
+message $? 0
+
+exit $err

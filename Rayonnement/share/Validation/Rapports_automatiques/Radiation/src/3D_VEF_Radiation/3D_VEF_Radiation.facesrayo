@@ -1,0 +1,18 @@
+16 6
+Gauche 0.0025 0.8
+Droit 0.0025 0.4
+Bas 0.0025 0. 
+Haut 0.0025 0.
+Avant 0.0025 0.
+Arriere 0.0025 0.
+Gauche_Gauche 0.05 -1
+Haut_Gauche 0.01 -1
+Bas_Gauche 0.01 -1
+Avant_Gauche 0.0005 -1
+Arriere_Gauche 0.0005 -1
+Droit_Droit 0.05 -1
+Haut_Droit 0.01 -1
+Bas_Droit 0.01 -1
+Avant_Droit 0.0005 -1
+Arriere_Droit 0.0005 -1
+

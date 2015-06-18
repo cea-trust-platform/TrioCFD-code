@@ -1,0 +1,961 @@
+Parameters {
+	Title "Convection k-epsilon QC"
+	Description "Type of flow: thermohydraulic and turbulent flow in a heated square cavity"
+	Description " "
+	Description " \latex_(\underline{Validated model:}\latex_) "
+	Description " $\bullet$ Quasi Compressible fluid at low Mach number (QC) in VDF and VEF discretizations"
+	Description " $\bullet$ k-epsilon modelling of turbulence "
+	Description " $\bullet$ Heat transfert with imposed wall temperatures "
+	Description " $\bullet$ No-slip at the wall "
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Type of probem: 2D thermohydraulic turbulent quasi compressible
+	ParametersTrio_U Discretization: VEFPreP1B and VDF 
+	ParametersTrio_U Time scheme: Euler explicite
+	ParametersTrio_U Temperature convection scheme: Quick, Muscl or Amont
+	ParametersTrio_U Momentum convection scheme: Quick, Muscl or Amont
+	ParametersTrio_U Turbulence model: k-epsilon
+	ParametersTrio_U Turbulence convection scheme: Amont
+	ParametersTrio_U Type of boundary condition: no-slip at fluid/solid interface, imposed flow and temperature
+	ParametersTrio_U Type of fluid: Quasi compressible, perfect gas
+	ParametersTrio_U Solving of equations: Navier_Stokes_turbulent_QC, Model_turbulent K_Epsilon, Convection_Diffusion_Chaleur_Turbulent_QC, Model_turbulent_Prandtl
+#
+######################## bibliography
+#	
+	reference " \latex_($[ 1 ]$\latex_) L-Leal de Sousa, Projet N3S de mecanique des fluides: Note de validation du noyau de la version 3.3, EDF-DER 1997, HE-41/96/020/B."
+	reference " $[ 2 ]$ D-Manzoni and F.X Rongere, Simulation Aeraulitique d'une cellule chauffee et ventilee, comparaison des calculs N3S version 3.1_Mesures sur maquette, EDF-DER 1993, HT-31/93/018/A. "
+	reference " \latex_($[ 3 ]$\latex_) Triou_U Users's manual. "
+#
+#
+	TestCase VEF/QC/Amont test \*
+	TestCase VEF/QC/Muscl test
+	TestCase VDF/NQC/Quick test
+	TestCase VDF/QC/Quick test 
+	TestCase VDF/QC/Amont test 
+
+	Author "E.MOREAU (V.BARTHEL)"
+	IncludeData 2
+
+}
+##################################################
+Chapter {
+	Title "Tests Description"
+	Figure {
+		Title "Geometry: "
+		Width 14cm
+		Description " Dimensions and domain overview "
+		picture geometry.png
+	}
+#
+	visu {
+		Title "VDF Mesh"
+		Width 10cm, , viewport = 100 100 1100 1100,clip
+		mesh VDF/QC/Amont/test.lata dom
+		Description "Geometry of the test: 2D square domain"
+		Description "Dimensions of the test: 1.04m \latex_($\times$\latex_) 1.04m"
+		Description "Mesh 2D: 4752 cells"
+	}
+
+	visu {
+		Title "VEF Mesh"
+		Width 10cm, , viewport = 0 0 1124 1124,clip
+		mesh VEF/QC/Amont/test.lata dom
+		Description "Geometry of the test: 2D square domain"
+		Description "Dimensions of the test: 1.04m \latex_($\times$\latex_) 1.04m"
+		Description "Mesh 2D: 4752 triangular cells obtained with option Trianguler_H"
+	}	
+##
+	Description "Different calculations have been performed in VEF or VDF discretization. A non compressible case in VDF discretization has been made for comparison. We have chosen to fix the same mass and heat flows in the non compressible and the quasi-compressible cases. Hence, as the density is quite different for the hot fluid in the quasi-compressible case, the velocity at the area ``EntreeHigh'' will be modified."
+	Description " "
+	Description " \latex_(\textbf{Initial velocities conditions:}\latex_) null values. "
+	Description " \latex_(\textbf{Initial temperature conditions:}\latex_) values imposed at 287.15K in the whole domain. "
+	Description " "
+	Description " \latex_(\textbf{Hydraulic Boundary conditions (see figure 2.1 below):}\latex_) "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ -$\latex_) ``haut'', ``bas'', ``gauche'' and ``droite'': paroi_fixe. "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ -$\latex_) ``sortie'': zero pressure (P = 0 Pa). "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ -$\latex_) ``EntreeLow'': velocity \latex_($U_x$\latex_) fixed at 0.57 m/s. "
+  	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ -$\latex_) ``EntreeHigh'': velocity \latex_($U_y$\latex_) fixed at 0.67 m/s (NQC) or 0.72 m/s (QC). "
+	Description " "
+	Description " $\bullet$ The velocities are fixed in order to have the same mass flows in both compressible and quasi-compressible cases.  "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ \rightarrow$\latex_) For the non compressible case: $\rho$ = 1.18 kg/$m^3$ and V = 0.67 m/s so that Q = 0.79 kg.\latex_($m^{-2}.s^{-1}$\latex_). "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ \rightarrow$\latex_) For the quasi-compressible cases: $\rho$ = 1.1 kg/$m^3$ for a temperature of T = 307.35K so that Q = 0.79 kg.\latex_($m^{-2}.s^{-1}$\latex_). "
+	Description " "
+	Description " $\bullet$ ``EntreeLow'': frontiere_ouverte_K_Eps_impose champ_front_uniforme \latex_($\hat{k}$\latex_) = 0,1475.e-2 ; \latex_($\hat{\epsilon}$\latex_) =0,492.e-2. "
+	Description " $\bullet$ ``EntreeHigh'': frontiere_ouverte_K_Eps_impose champ_front_uniforme \latex_($\hat{k}$\latex_) = 0,1475.e-2 ; \latex_($\hat{\epsilon}$\latex_) = 0,492.e-2. "
+	Description " $\bullet$ ``Sortie'': frontiere_ouverte_K_Eps_Ext champ_front_uniforme \latex_($\hat{k}$\latex_) = 0,1475.e-2 ; \latex_($\hat{\epsilon}$\latex_) = 0,492.e-2. "
+	Description " $\bullet$ ``haut'', ''bas'', ''gauche'' and ''droite'': paroi. "
+	Description " "
+	Description "It has to be highlighted that the previous values of \latex_($\hat{k}$\latex_) and \latex_($\hat{\epsilon}$\latex_) are such as \latex_($\hat{k}=\rho\times k$\latex_) and \latex_($\hat{\epsilon} = \rho\times\epsilon$\latex_)  "
+	Description " "
+	Description " \latex_(\textbf{Thermal Boundary conditions (see figure 2.1 below):}\latex_) "
+	Description " $\bullet$ ``EntreeLow'': frontiere_ouverte_temperature_imposee champ_front_uniforme 1 287.35. "
+	Description " $\bullet$ ``EntreeHigh'': frontiere_ouverte_temperature_imposee champ_front_uniforme 1 307.35 ."
+	Description " $\bullet$ ``Sortie'': frontiere_ouverte T_ext champ_front_uniforme 1 298.15. "
+	Description " $\bullet$ ``haut'', ''bas'', ''gauche'' and ''droite'': "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ -$\latex_) Paroi_temperature_imposee champ_front_uniforme 1 287.15 (VEF). "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ -$\latex_) Paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 287.15 H_imp champ_Front_Uniforme 1 1.e11 (VDF). "
+#
+	Table {
+			Title " Physical properties calculated at T = 287.15K"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($1)
+			}
+			line {
+			      	legend " Pressure (Pa) "
+				file propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($2)
+			}
+			line {
+			      	legend " Prandtl number "
+				file propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($3)
+			}
+			line {
+			      	legend "Cp (J/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($4)
+			}
+			line {
+			      	legend " $\gamma$ "
+				file propertiesGeometry.dat	
+				nb_columns_file 8
+				columns ($5)
+			}
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat
+				nb_columns_file 8
+				columns ($6)
+			}
+			line {
+			      	legend " $\beta$ "
+				file propertiesGeometry.dat
+				nb_columns_file 8
+				columns ($7)
+			}
+			line {
+			      	legend " $\lambda$ (\latex_(W.$m^{-1}$.$K^{-1}$\latex_)) "
+				file propertiesGeometry.dat
+				nb_columns_file 8
+				columns ($8)
+			}
+	}
+#
+} 
+#Chapitre {
+#	Title " "
+#	Description " \latex_(\newpage\latex_) "
+#}
+#############
+############# RESULTS
+#############
+Chapter {
+	Title "RESULTS"
+	Description " \latex_(\textbf{Convergence}\latex_): The convergence is obtained roughly towards 400s. "
+	Description " "
+	Description " The profiles of calculated values of temperatures and velocities are compared with experimental values adopted in EDF validation \latex_($[ 1 ]$\latex_). "
+	Description " "
+	Description " "
+	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ $\latex_) \latex_(\textbf{  VEF and VDF discretization}\latex_) "
+	Description " \latex_(\underline{Temperatures}\latex_)  "
+	Description " The horizontal profiles of temperatures are shown at fixed Y coordinate: Y = 0.10m, 0.52m, 0.90m. At the borders of the square cavity, the temperature of the wall is fixed to 14°C. "
+	Description " The vertical profiles of temperatures are shown at fixed X coordinate : X = 0.10m, 0.52m, 0.90m. "
+	Description " "
+	Description " \latex_(\underline{Velocities}\latex_)  "
+	Description " For the borders of the square cavity the values of the velocities are zero, because the non-slip wall boundary is adopted during the simulations. "
+	Description " The horizontal profiles of the vertical velocities (\latex_($U_y$\latex_)) are presented at fixed Y coordinate: Y = 0.10m, 0.52m, 0.90m. "
+	Description " The vertical profiles of the horizontal velocities (\latex_($U_x$\latex_)) are presented at fixed X coordinate: X = 0.10m, 0.52m, 0.90m. "
+#
+###
+### T_Y01
+	Figure {
+		Title "Horizontal profiles of temperature: Y = 0.1m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "X(m)"
+		RangeX 0. 1.05
+		LabelY "T(°C)"
+		RangeY 15 35
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/TY01.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_T1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_T1
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_T1
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_T1
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_T1
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 4
+		}
+	}
+# T_Y052
+	Figure {
+		Title "Horizontal profiles of temperature: Y = 0.52m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "X(m)"
+		RangeX 0. 1.05
+		LabelY "T(°C)"
+		RangeY 15 35
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/TY052.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_T3
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_T3
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_T3
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_T3
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_T3
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 4
+		}
+	}
+# T_Y090
+	Figure {
+		Title "Horizontal profiles of temperature: Y = 0.9m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "X(m)"
+		RangeX 0. 1.05
+		LabelY "T(°C)"
+		RangeY 15 35
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/TY09.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_T5
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_T5
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_T5
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_T5
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_T5
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 4
+		}
+	}
+#
+#	Description " Vertical profile of temperature "
+# T_X01
+	Figure {
+		Title "Vertical profiles of temperature: X = 0.1m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Y(m)"
+		RangeX 0. 1.05
+		LabelY "T(°C)"
+		RangeY 15 35
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/TX01.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_T7
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_T7
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_T7
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_T7
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_T7
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 4
+		}
+	}
+# T_X052
+	Figure {
+		Title "Vertical profiles of temperature: X = 0.52m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Y(m)"
+		RangeX 0. 1.05
+		LabelY "T(°C)"
+		RangeY 15 35
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/TX052.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_T9
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_T9
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_T9
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_T9
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_T9
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 4
+		}
+	}
+#T_X09
+	Figure {
+		Title "Vertical profiles of temperature: X = 0.9m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Y(m)"
+		RangeX 0. 1.05
+		LabelY "T(°C)"
+		RangeY 15 35
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/TX09.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_T11
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_T11
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_T11
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_T11
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_T11
+			columns ($1) ($2-273.15)
+			Style points
+			TypeLigne 4
+		}
+	}
+########
+################ velocities
+### V_Y01
+	Figure {
+		Title "Horizontal profiles of velocities: Y = 0.1m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "X(m)"
+		RangeX 0. 1.05
+		LabelY "\latex_($U_x$\latex_) (m/s)"
+		RangeY -0.5 1
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/VY01.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_V1
+			columns ($1) ($3)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_V1
+			columns ($1) ($3)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_V1
+			columns ($1) ($3)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_V1
+			columns ($1) ($3)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_V1
+			columns ($1) ($3)
+			Style points
+			TypeLigne 4
+		}
+	}
+# V_Y052
+	Figure {
+		Title "Horizontal profiles of velocities: Y = 0.52m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "X(m)"
+		RangeX 0. 1.05
+		LabelY "\latex_($U_x$\latex_) (m/s)"
+		RangeY -0.5 1
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/VY052.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_V3
+			columns ($1) ($3)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_V3
+			columns ($1) ($3)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_V3
+			columns ($1) ($3)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_V3
+			columns ($1) ($3)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_V3
+			columns ($1) ($3)
+			Style points
+			TypeLigne 4
+		}
+	}
+# V_Y090
+	Figure {
+		Title "Horizontal profiles of velocities: Y = 0.9m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "X(m)"
+		RangeX 0. 1.05
+		LabelY "\latex_($U_x$\latex_) (m/s)"
+		RangeY -0.5 1
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/VY09.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_V5
+			columns ($1) ($3)
+			Style points
+			TypeLigne 1
+			Pointsize 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_V5
+			columns ($1) ($3)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_V5
+			columns ($1) ($3)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_V5
+			columns ($1) ($3)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_V5
+			columns ($1) ($3)
+			Style points
+			TypeLigne 4
+		}
+	}
+#
+#	Description " Vertical profile of velocity "
+# V_X01
+	Figure {
+		Title "Vertical profiles of velocities: X = 0.1m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Y(m)"
+		RangeX 0. 1.05
+		LabelY "\latex_($U_y$\latex_) (m/s)"
+		RangeY -0.5 1
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/VX01.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_V7
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_V7
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_V7
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_V7
+			columns ($1) ($2)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_V7
+			columns ($1) ($2)
+			Style points
+			TypeLigne 4
+		}
+	}
+# V_X052
+	Figure {
+		Title "Vertical profiles of velocities : X = 0.52m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Y(m)"
+		RangeX 0. 1.05
+		LabelY "\latex_($U_y$\latex_) (m/s)"
+		RangeY -0.5 1
+ #		legend below title "Legende"beta_th
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/VX052.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_V9
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_V9
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_V9
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_V9
+			columns ($1) ($2)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_V9
+			columns ($1) ($2)
+			Style points
+			TypeLigne 4
+		}
+	}
+#V_X09
+	Figure {
+		Title "Vertical profiles of velocities: X = 0.9m"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Y(m)"
+		RangeX 0. 1.05
+		LabelY "\latex_($U_y$\latex_) (m/s)"
+		RangeY -0.5 1
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "Experience"
+			origin "Experimental"
+			file EXP/VX09.dat
+			columns 1 2 
+			Style points
+			TypeLigne -1
+			PointSize 2
+		}
+		Curve {
+			legend "Trio_U NQC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/NQC/Quick/test.data sonde_V11
+			columns ($1) ($2)
+			Style points
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U QC VDF Quick"
+			origin "Trio_U"
+			Segment VDF/QC/Quick/test.data sonde_V11
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VDF Amont"
+			origin "Trio_U"
+			Segment VDF/QC/Amont/test.data sonde_V11
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "Trio_U QC VEF Amont"
+			origin "Trio_U"
+			Segment VEF/QC/Amont/test.data sonde_V11
+			columns ($1) ($2)
+			Style points
+			TypeLigne 3
+		}
+		Curve {
+			legend "Trio_U QC VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/QC/Muscl/test.data sonde_V11
+			columns ($1) ($2)
+			Style points
+			TypeLigne 4
+		}
+	}
+}
+###
+#####
+Chapter {
+	Title "Conclusion"
+	Description " $\bullet$ Results for the temperatures: "
+	Description " - The calculated profiles of temperature do not show globaly good agreements with experimental data. In all cases, the hightest values are obtained with a VDF discretization, and the lowest values with a VEF discretization associated with a Muscl convection scheme. The extremum are located about $\pm$2°C with respect to the experience. "
+	Description " - For these calculations, a pressure of \latex_(1.01 $10^5$\latex_) Pa have been taken instead of \latex_(1. $10^5$\latex_) for experimental data $[2]$. Nevertheless, this higher value (1%) does not affect the thermodynamic since the simulations give similar results for VDF QC and VDF NQC (with a Quick scheme). "
+	Description " - The simulations give slightly different results with an Amont scheme, in particular at the vicinity of the walls. "
+	Description " - VEF and VDF discretizations present differences of about 4-5°C." 
+	Description " "
+	Description " $\bullet$ Results for the velocities: "
+	Description " - The horizontal profiles of velocities show good agreements with experimental data, in particular in the midlle of the channel (X or Y = 0.52), but in addition are more close to each others than the profiles of temperatures. Nevertheless, we can notice that the velocity values are underestimate at small X for Y = 0.9m. Concerning the vertical velocity profiles, for each position of X, velocity values are a little overestimate for hight values of Y and a little underestimate for the low values (except for VDF Amont and VDF Quick at X = 0.1m). This due to phenomenon occuring near the walls. "
+	Description " "
+ 	Description " The simulations have been performed to enable the validation of k-$\epsilon$ calculations of a convection case with quasi-compressible fluid with VEF or VDF grids. In our cases, the simulations present some differences with the thermic with those obtained by Manzoni and al. $[2]$. "
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description "Wall laws (thermal and hydraulic) are essential to obtain good results for these calculations. "
+}
+###
+
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+
+
+

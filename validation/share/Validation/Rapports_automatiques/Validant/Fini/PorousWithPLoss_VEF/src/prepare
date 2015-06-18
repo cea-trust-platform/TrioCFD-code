@@ -1,0 +1,37 @@
+#!/bin/bash
+ICI=`pwd`
+for cas in Poreux_VEF_2D Poreux_VEF_3D Poreux_VEF_3D_EFstab 
+do
+[ ! -d $cas ] && copie_cas_test $cas
+[ ! -d $cas ] && copie_cas_test $cas $TRUST_ROOT/tests
+(cd $cas ; sed "s/lml/lata/" $cas.data | sed "/solveur_pression GCP/i\sources { Perte_charge_directionnelle { diam_hydr Champ_uniforme 1 0.2 lambda 1.00 direction Champ_uniforme 3 1. 0. 0. } }" | sed "s/rho Champ_Uniforme 1 1./rho Champ_Uniforme 1 800./" > p; mv p $cas.data ; cp ../post_run . ; rm -f verifie *gz)
+done 
+mv Poreux_VEF_2D Poreux_2D
+mv Poreux_VEF_3D Poreux_3D 
+mv Poreux_VEF_3D_EFstab Poreux_3D_EFstab 
+mkdir -p Poreux_Pdc_Z2_2D
+#
+cd Poreux_2D
+sed "s/lambda 1.00 direction Champ_uniforme 3 1. 0. 0./lambda 1.00 direction Champ_uniforme 2 1. 0./"  Poreux_VEF_2D.data > p
+mv p Poreux_VEF_2D.data 
+##
+cd ..
+
+cd Poreux_3D_EFstab
+sed "s/amont/EF_stab { }/" Poreux_VEF_3D_EFstab.data > p 
+mv p Poreux_VEF_3D_EFstab.data
+sed "s/seg_P /seg_T temperature periode 0.1 segment 20 0.025 0.5 0.5 0.975 0.5 0.5 seg_P /" Poreux_VEF_3D_EFstab.data > p 
+mv p Poreux_VEF_3D_EFstab.data
+##
+cd ..
+
+cd Poreux_Pdc_Z2_2D
+cp ../Poreux_2D/*data .
+sed "/Discretize/i\Sous_Zone Poreuse" Poreux_VEF_2D.data > p
+mv p Poreux_VEF_2D.data
+sed "/Sous_Zone Poreuse/a\Read Poreuse { Fonction_sous_zone (x>0.2)*(x<0.8) }" Poreux_VEF_2D.data > p
+mv p Poreux_VEF_2D.data
+sed "/Sous_Zone Poreuse/a\Associate Poreuse dom" Poreux_VEF_2D.data > p
+mv p Poreux_VEF_2D.data
+sed "s/Perte_charge_directionnelle { /Perte_charge_directionnelle { sous_zone Poreuse /" Poreux_VEF_2D.data > p
+mv p Poreux_VEF_2D.data 

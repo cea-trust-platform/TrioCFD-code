@@ -1,0 +1,100 @@
+# aaa #
+
+dimension 3
+
+domaine DOM_BODY
+
+Read_unsupported_ASCII_file_from_ICEM DOM_BODY trio_BODY_geo.asc
+
+# Longueurs 0.1 0.2 0.1 #
+
+Pb_hydraulique  pb1
+
+Schema_Euler_implicite sch
+Read sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 1000.
+        dt_min 1.e-8
+        dt_max 100000.
+        dt_impr 100
+        dt_sauv 500
+        seuil_statio 1.e-8
+        facsec 1.
+	facsec_max 200
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+}
+
+Corriger_frontiere_periodique { Domaine DOM_BODY Bord PERIO } 
+
+
+VEFpreP1b cubesregu
+
+Fluide_Incompressible He
+Read He
+{
+	    mu      Champ_Uniforme  1 3.56e-5
+	    rho     Champ_Uniforme  1 3.85
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0. 0. 0
+Associate He gravite
+Associate pb1 DOM_BODY
+Associate pb1 He  
+Associate pb1 sch
+
+Discretize pb1 cubesregu
+
+Read pb1
+{
+        Navier_Stokes_standard
+        {
+		solveur_pression petsc cholesky  { }
+		convection { Amont }
+                diffusion { }
+       		Sources { Canal_perio { bord PERIO }  }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 3 0.001 0. 0.
+                           }
+                boundary_conditions {
+                        PERIO             periodique 
+                        HAUT             paroi_fixe
+                        BAS            paroi_fixe
+                        FRONT            Symetrie
+			BACK		Symetrie 
+               }
+                Traitement_particulier { Canal { dt_impr_moy_spat 300. }
+                                        }
+        }
+
+        Postraitement {
+	format lml
+                Champs dt_post 300.
+                {
+                   pression elem
+                   vitesse elem
+                }
+        }
+}
+
+
+EcritureLectureSpecial 0
+Solve pb1
+End
+# solveur_pression Cholesky { } 
+solveur_pression GCP {
+                        precond ssor { omega 1.500000 }
+                        seuil 1.000000e-07
+                }
+
+
+
+#
+

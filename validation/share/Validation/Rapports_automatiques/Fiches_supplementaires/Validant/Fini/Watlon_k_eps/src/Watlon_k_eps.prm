@@ -1,0 +1,3594 @@
+Parametres {
+	Titre "Watlon mixing-T experiment"
+	Description "This document is a study to validate Trio_U CFD code to simulate the watlon experiment, a water facility about fluid mixing in T-pipe with long cycle fluctuations. A cold jet coming from a branch is injected into the main pipe, in which hot water flows.\newline"
+	Description ""
+	Description "The validation of thermal-hydraulic behaviour is made for three different momentum convection schemes and two flow configurations."
+	Auteur "MALOD C., LEDAC P., VANDROUX S., BIEDER U., BARTHEL V"
+	CasTest Impinging_Jet/Muscl		Watlon 32 /* jdd attached */
+	CasTest Impinging_Jet/Ef_Stab1.0	Watlon 32
+	CasTest Impinging_Jet/Ef_Stab0.2	Watlon 32
+	CasTest Wall_Jet/Muscl			Watlon 32 /* jdd attached */
+	CasTest Wall_Jet/Ef_Stab1.0		Watlon 32
+	CasTest Wall_Jet/Ef_Stab0.2		Watlon 32
+	ParametresTrio_U "Type of problem : Turbulent Thermal-Hydraulic"
+	ParametresTrio_U "Discretization : VEFPreP1B"
+	ParametresTrio_U "Time scheme : Euler_implicite"
+	ParametresTrio_U "Solving of equations : Navier_Stokes_Turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi loi_standard_hydr"
+	ParametresTrio_U "Solving of equations : Convection_Diffusion_Temperature_Turbulent with Modele_turbulence Prandtl and Turbulence_paroi loi_standard_hydr_scalaire"
+	ParametresTrio_U "Velocity/Temperature coupling : not coupled"
+	ParametresTrio_U "Type of Navier Stokes boundary conditions : Inlet velocity, Outlet pressure, Wall on other"
+	ParametresTrio_U "Type of Temperature boundary conditions : Inlet and Outlet temperature, Adiabatic wall"
+	InclureData 2
+	Reference $[1]$ P. Coste, Large eddy simulation of the WATLON mixing-T experiment using TRUST VEF 1.4.8,NT SSTH/LMDL/2005-024
+	Reference $[3]$ P. Coste, P. Quemere, P. Roubin, P. Emonot, M. Tanaka, H. Kamide, Large eddy simulation of highly fluctuational temperature and velocity fields observed in a mixing-tee experiment, Nuclear Technology, vol.164, p 76-88, October 2008
+	PreRequis "./Calcul_U_Plus.sh 1>Calcul_U_Plus.log 2>&1"
+	PreRequis "Extract_histogram dom_Walton Impinging_Jet/Muscl/Watlon.err  > Impinging_Jet/Muscl/histo"
+}
+
+Chapitre {
+	Titre "Experimental description"
+	Tableau {
+		Titre "Test section"
+		Description "WATLON is a Tee junction mixing experiment, which was built to study fluid mixing phenomena for evaluation of thermal stripping. Hot water (48°C) is flowing in a 150 mm inner diameter pipe. Cold water (33°C) is injected in this main pipe from a 50 mm inner diameter branch pipe.\newline\newline"
+	}
+	Figure {
+		Width 14cm
+		nb_img_without_newline 1
+		Image ./Experimental_description.png
+	}
+	Tableau {
+		Titre "Experimental data"
+		Description "A fifteen thermocouples tree is used for temperature measurement, with a time response about 0.03 s and accuracy about $\pm$0.2°C. Velocities are measured by PIV, at 200 Hz."
+		Description "Time-averaged (also called "mean" in this report) and rms values of temperature, T, velocities components on z direction, Vz, and on y direction, Vy, are available. z is defined as the main pipe axis one, and its direction is the flow. y is defined as the branch pipe axis one, and its direction is the branch flow. x is defined from y and z, to form a direct cartesian coordinate.\newline"
+		Description "Measured profiles are provided at following positions :"
+		Description "- T: z= 0.5D, 1D, 2D,"
+		Description "- Vz: z= -0.36D,"
+		Description "- Vz, Vy: z=0.5D, 1D.\newline"
+		Description "T is normalized by (T-Tb)/(Tm-Tb), where the subscript 'm' denotes the main pipe and 'b' the branch. Vz and Vy are normalized by Vm.\newline" 
+	}
+	Tableau {
+		Titre "Flow configurations"
+		Description "Depending on momentum ratio between main pipe and branch, the cold jet coming from the branch flows either along the bottom wall (wall jet), or in the central part of the pipe (deflecting jet : not studied here), or to the opposite wall (impinging jet). In any case, branch velocity is 1m/s, Reynolds number is about 6.10$^4$. In the wall jet case (resp. impinging jet case), in the main branch, velocity is 1.46 m/s (resp. 0.23 m/s), Reynolds number is about 4.10$^5$ (resp. 6.10$^4$).\newline\newline"
+	}
+	Figure {
+		Description "\latex_( \[Wall~~jet~~configuration \] \latex_)"
+		Width 7cm
+		nb_img_without_newline 2
+		Image ./Experimental_wall_jet.png
+	}
+	Figure {
+		Description "\latex_( \[Impinging~~jet~~configuration \] \latex_)"
+		Width 7cm
+		Image ./Experimental_impinging_jet.png
+	}
+	Tableau {
+		Description "\latex_( \begin{center} \latex_)"
+		nb_colonnes 3
+		label Physical property | Wall jet configuration | Impinging jet configuration
+		Ligne {
+			Legende "Branch pipe"
+			valeurs "Inlet$~$temperature$~$(°C)" 33 33
+		}
+		Ligne {
+			Legende "Main pipe"
+			valeurs "Inlet$~$temperature$~$(°C)" 48 48
+		}
+		Ligne {
+			Legende "Branch pipe"
+			valeurs "Mean~inlet$~$velocity$~$(m/s)" 1 1
+		}
+		Ligne {
+			Legende "Main pipe"
+			valeurs "Mean~inlet$~$velocity$~$(m/s)" 1.46 0.23
+		}
+		Ligne {
+			Legende "Branch pipe"
+			valeurs "Reynolds$~$number" "6.10$^4$" "6.10$^4$"
+		}
+		Ligne {
+			Legende "Main pipe"
+			valeurs "Reynolds$~$number" "4.10$^5$" "6.10$^4$"
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Test description"
+	Tableau {
+		Titre "Geometry description"
+		Description "The next figures show a representation of the various components of the simulation.\latex_( \begin{center} \latex_)"
+	}
+	Visu {
+		Description "\latex_( \[Watlon~~calculation~~domain \] \latex_)"
+		Width 16cm,viewport=0 622 924 1024,clip
+		Mesh Impinging_Jet/Muscl/Post/Post.lata dom_Walton
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 1
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+	}
+	Visu {
+		Description "\latex_( \[Main~~box~~calculation~~domain \] \latex_)"
+		Width 7.5cm,viewport=380 466 720 860,clip
+		Mesh Impinging_Jet/Muscl/main0.23_box/main0.23_box.lata box
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 0.5
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "\latex_( \[Branch~~box~~calculation~~domain \] \latex_)"
+		Width 7.5cm,viewport=346 466 720 848,clip
+		Mesh Impinging_Jet/Muscl/branch_box/branch_box.lata box
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 0.5
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Mesh description"
+		Description "The mesh used in this study contains 661.632 tetrahedral cells. The next figures show the mesh, tested in this study, in vertical plan cut and in cross section, near branch pipe and main pipe intersection.\newline\newline\latex_( \begin{center} \latex_)"
+	}
+	Visu {
+		Description "\latex_( \[Vertical~~plan~~cut \] \latex_)"
+		Width 10.6cm,viewport=16 220 1024 840,clip
+		Mesh Impinging_Jet/Muscl/Post/Post.lata dom_Walton
+		normal3D -1 0 0
+		up3D 0 1 0
+		zoom3D 0.244674 0.00969105 2.12003
+		Operator Slice 0 0 0 -1 0 0
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "\latex_( \[Cross~~section \] \latex_)"
+		Width 4.4cm,viewport=330 260 690 800,clip
+		Mesh Impinging_Jet/Muscl/Post/Post.lata dom_Walton
+		normal3D 0 0 1
+		up3D 0 1 0
+		zoom3D 0. 0.00969105 2.12003
+		Operator Slice 0 0 0 0 0 1
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+	}
+	Figure 
+	{
+		Titre_figure "Histogram of angle of the mesh"
+		dimension 2
+		incluredesccourbes 0
+		width 10cm
+		labelx Angle
+		labely % of cells
+		courbe {
+			fichier Impinging_Jet/Muscl/histo
+			Legende ""
+			style boxes
+			colonnes ($2+$5)/2 11
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Physical properties"
+		Description "Fluid domain: Water flow at 47°C \latex_(\hspace*{19mm} Density : $\rho = 991.3$ kg/m$^3$\latex_)"
+		Description "\latex_(\hspace*{74mm}Kinematic viscosity : $\mu = 5.86e-4$\latex_) N/m$^2$/s"
+		Description "\latex_(\hspace*{74mm}Thermal conductivity : $\lambda = 0.555$\latex_) W/m/K"
+		Description "\latex_(\hspace*{74mm}Specific heat capacity : $Cp = 4172$\latex_) J/kg/K"
+		Description "\latex_(\hspace*{74mm}Isothermal compressibility : $\beta = 2.74e-4$ K$^{-1}$\latex_)"
+	}
+	Tableau {
+		Titre "Initial and boundaries conditions"
+		Description "\latex_(\textbf {Watlon configuration} \latex_)"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 0 m/s in all directions,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 47°C."
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Velocity profile given by a periodic box calculation on main pipe inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Velocity profile given by a periodic box calculation on branch pipe inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 48°C on main pipe inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 33°C on branch pipe inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Adiabatic walls.\newline"
+		Description ""
+		Description "\latex_(\textbf {Wall jet periodic box configuration} \latex_)"
+		Description "Branch box :"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 1 m/s in Y direction,"
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Periodic condition between inlet and outlet."
+		Description "Main box :"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 1.46 m/s in Z direction,"
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Periodic condition between inlet and outlet.\newline"
+		Description ""
+		Description "\latex_(\textbf {Impinging jet periodic box configuration} \latex_)"
+		Description "Branch box :"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 1 m/s in Y direction,"
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Periodic condition between inlet and outlet."
+		Description "Main box :"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 0.23 m/s in Z direction,"
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Periodic condition between inlet and outlet.\newline"
+		Description ""
+		Description "The turbulent kinetic energy and turbulence dissipation rate were estimated by using these formulations:"
+		Description "\latex_(\hspace*{1cm} {\large $ k \simeq \frac{3}{2}.(U.I)^2$} \hspace*{1cm}  {\large $ \varepsilon \simeq C_\mu . {k^{3/2} \over {0.07 . D_h}}$} \hspace*{1cm} with I : Turbulence intensity estimated to 10\%\latex_)"
+	}
+	Tableau {
+		Titre "Trio_U parameters tested"
+		Description "For the two different flow configurations, only the convection scheme of Navier-Stokes equation varies: It can be defined as Muscl (2nd order upwind scheme), EF_stab with $\alpha$=1 (2nd order mix between upwind and centered scheme), or EF_stab with $\alpha$=0.2 (2nd order almost full centered scheme). For all other equations, the convective scheme is defined as Amont (1er order upwind scheme)."
+		Description "Due to possible physical or numerical ocillations, a specific strategy is implemented for the time management and post processing :"
+		Description "- The calculation is performed from the initial time to the starting time statistics, which corresponds to the time that a fluid particle takes to cross two times the computational domain at the flow mean velocity (Wall jet configuration $\sim$ 1.0 s; Impinging jet configuration $\sim$ 4.5 s),"
+		Description "- The principal quantities are averaged from the starting time statistics to the final time = starting time statistics + the time that a fluid particle takes to cross ten times the computational domain at the flow mean velocity (Wall jet configuration $\sim$ 6.0 s; Impinging jet configuration $\sim$ 27.0 s).\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Results on periodic boxes"
+	Tableau {
+		Titre "Convergence of periodic boxes"
+		Description "The following figures show a good convergence of calculations on periodic boxes for the three convection schemes and the two flow configurations, which is checked on the instantaneous axial velocity time evolution at center of :"
+		Description "- Main box (mean axial velocity at 0.23 m/s for impinging jet configuration)"
+		Description "- Main box (mean axial velocity at 1.46 m/s for wall jet configuration)"
+		Description "- Branch box (mean axial velocity always at 1.00 m/s)\newline\newline\latex_( \begin{center} \latex_)"
+	}
+	Figure {
+		Description "\latex_( \[Main~box~impinging~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "\latex_( \[Main~box~wall~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "\latex_( \[Branch~box~all~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/branch_box/branch_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/branch_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/branch_box_SONDE_VCENTRE_BOX.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 3
+			Style lines
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Y+ distribution"
+		Description "The next figures present the Y+ distribution on the periodic boxes on the two flow configurations, for values of Y+ between [0:30]."
+		Description "We can observed that the mesh of the main box, for the wall jet configuration (high velocity), has a good cell sizes, to apply standard logarithmic law on walls. But for the impinging jet configuration, the cell sizes of this main box are too small and induce low values of Y+ to apply standard logarithmic law on walls. On the mesh of the branch box, the cell sizes are also too small.\newline\newline"
+	}
+	Visu {
+		Width 3cm,viewport=46 684 220 922,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/branch_box/branch_box.lata box Y_PLUS ELEM 0. 30.
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 0.5
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "\latex_( \[Branch~box~all~jet~configuration \] \latex_)"
+		Width 5cm,viewport=346 466 720 848,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/branch_box/branch_box.lata box Y_PLUS ELEM 0. 30.
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 0.5
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+	}
+	Visu {
+		Description "\latex_( \[Main~box~impinging~jet~configuration \] \latex_)"
+		Width 4.5cm,viewport=380 466 720 860,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/main0.23_box/main0.23_box.lata box Y_PLUS ELEM 0. 30.
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 0.5
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "\latex_( \[Main~box~wall~jet~configuration \] \latex_)"
+		Width 4.5cm,viewport=380 466 720 860,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/main1.46_box/main1.46_box.lata box Y_PLUS ELEM 0. 30.
+		normal3D -0.586526 -0.455195 -0.669914
+		up3D -0.680717 0.725241 0.103195
+		zoom3D 0.037037 0.301119 0.5
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator no_triad
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Titre "Dimensionless mean velocity profiles"
+		Description "The next figures present the comparison of the mean velocity profiles (u$^+$ = U/U$\tau$ ; y$^+$ = Y.U$\tau$/$\nu$) of calculations with the standard logarithmic law for the three convection scheme and the two flow configurations."
+		Description "The law of wall is composed by three different formula :"
+		Description "- u$^+$ = y$^+$ in the viscous sublayer (y$^+$ < 5)"
+		Description "- u$^+$ = ? in the buffer layer ( 5 < y$^+$ < 30)"
+		Description "- u$^+$ = 1/0.415 ln(y$^+$) + 5.32 in the fully turbulent region (y$^+$ > 30). This formula is the standard logarithmic law."
+		Description "\latex_( \begin{center} \latex_)"
+	}
+	Figure {
+		Description "\latex_( \[Main~box~impinging~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "y+"
+		RangeX 1. 10000.
+		LogX
+		LabelY "u+"
+		RangeY 0. 40.
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "u+ = f(y+)"
+			Fichier ./Uplus.out
+			Colonnes 1 2
+			Style lines
+			LargeurLigne 2
+			TypeLigne rgb "black"
+		}
+		Courbe {
+			Legende ""
+			Fichier ./Uplus.out
+			Colonnes 3 4
+			Style lines
+			LargeurLigne 2
+			TypeLigne rgb "black"
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Muscl"
+			Fichier ./Impinging_Jet/Muscl/main0.23_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/main0.23_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Description "\latex_( \[Main~box~wall~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "y+"
+		RangeX 1. 10000.
+		LogX
+		LabelY "u+"
+		RangeY 0. 40.
+		InclureDescCourbes 0
+		Courbe {
+			Legende "u+ = f(y+)"
+			Fichier ./Uplus.out
+			Colonnes 1 2
+			Style lines
+			LargeurLigne 2
+			TypeLigne rgb "black"
+		}
+		Courbe {
+			Legende ""
+			Fichier ./Uplus.out
+			Colonnes 3 4
+			Style lines
+			LargeurLigne 2
+			TypeLigne rgb "black"
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Muscl"
+			Fichier ./Wall_Jet/Muscl/main1.46_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/main1.46_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Description "\latex_( \[Branch~box~all~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "y+"
+		RangeX 1. 10000.
+		LogX
+		LabelY "u+"
+		RangeY 0. 40.
+		InclureDescCourbes 0
+		Courbe {
+			Legende "u+ = f(y+)"
+			Fichier ./Uplus.out
+			Colonnes 1 2
+			Style lines
+			LargeurLigne 2
+			TypeLigne rgb "black"
+		}
+		Courbe {
+			Legende ""
+			Fichier ./Uplus.out
+			Colonnes 3 4
+			Style lines
+			LargeurLigne 2
+			TypeLigne rgb "black"
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Muscl"
+			Fichier ./Impinging_Jet/Muscl/branch_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/branch_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "First point calculated by Trio_U - Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/Uplus_trio.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			PointSize 2
+			Style points
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/Uplus.out
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Comparisons of friction velocity"
+		Description "The next table presents the comparison of the friction velocity of each calculation, with the Blasius correlation :"
+		Description "\latex_( \[U\tau=U.\sqrt{\frac{1}{2} C_f}~~~~~with~~~~~C_f=0.079.Re^{-0.25} \] \begin{center} \latex_)"
+		nb_colonnes 3
+		label "U$\tau$ Blasius" | "U$\tau$ Trio_U" | "Variation ($%$)"
+		Ligne {
+			Legende "Branch box all jet configuration - Muscl"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Impinging_Jet/Muscl/branch_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Branch box all jet configuration - Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Branch box all jet configuration - Ef_Stab0.2"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Main box impinging jet configuration - Muscl"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Impinging_Jet/Muscl/main0.23_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Main box impinging jet configuration - Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Main box impinging jet configuration - Ef_Stab0.2"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Main box wall jet configuration - Muscl"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Wall_Jet/Muscl/main1.46_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Main box wall jet configuration - Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+		Ligne {
+			Legende "Main box wall jet configuration - Ef_Stab0.2"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/Utau.txt
+			nb_colonnes_fichier 3
+			derniere_ligne
+			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Non dimensional mean velocity profiles"
+		Description "The next figures present the comparison of the non dimensional mean velocity profiles (see normalization $\S$2.2) of calculations for the three convection scheme and the two flow configurations."
+		Description "\latex_( \begin{center} \latex_)"
+	}
+	Figure {
+		Description "\latex_( \[Main~box~impinging~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "Distance from axis (mm)"
+		RangeX -75 75
+		LabelY "Non dimensional Vz mean"
+		RangeY 0. 1.4
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Segment ./Impinging_Jet/Muscl/main0.23_box/main0.23_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($4/0.23)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./Impinging_Jet/Ef_Stab1.0/main0.23_box/main0.23_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($4/0.23)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment ./Impinging_Jet/Ef_Stab0.2/main0.23_box/main0.23_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($4/0.23)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Main~box~wall~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "Distance from axis (mm)"
+		RangeX -75 75
+		LabelY "Non dimensional Vz mean"
+		RangeY 0. 1.4
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Muscl"
+			Segment ./Wall_Jet/Muscl/main1.46_box/main1.46_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($4/1.46)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./Wall_Jet/Ef_Stab1.0/main1.46_box/main1.46_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($4/1.46)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment ./Wall_Jet/Ef_Stab0.2/main1.46_box/main1.46_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($4/1.46)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Branch~box~all~jet~configuration \] \latex_)"
+		Width 7cm
+		LabelX "Distance from axis (mm)"
+		RangeX -25 25
+		LabelY "Non dimensional Vy mean"
+		RangeY 0. 1.4
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Muscl"
+			Segment ./Impinging_Jet/Muscl/branch_box/branch_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($3)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./Impinging_Jet/Ef_Stab1.0/branch_box/branch_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($3)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment ./Impinging_Jet/Ef_Stab0.2/branch_box/branch_box.data SONDE_V_BOX
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($1*1000) ($3)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Conclusion"
+		Description "As it has been shown in the Y+ distribution, the cell sizes of the main box, for the impinging jet configuration, are too small and induce, due to standard wall law, lower values of dimensionless mean velocity, ie higher values of friction velocity."
+		Description "The cell sizes, in this study, result of the choice to extrude inlet facets of domain, to create periodic boxes, in 14 tetrahedral elements (symmetric mesh) instead of 3 (asymmetric mesh). This allows us to obtain a symmetrical velocity profile.\newpage"
+	}
+}
+	
+Chapitre {
+	Titre "Convergence of Watlon calculation"
+	Tableau {
+		Titre "Convergence of Impinging jet configuration"
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution at center of the main pipe for z=0.5D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeY 40 50
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_T_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous axial velocity time evolution at center of the main pipe for z=0.5D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeY -0.5 0.5
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_V_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution at center of the main pipe for z=1.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeY 40 50
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_T_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous axial velocity time evolution at center of the main pipe for z=1.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeY -0.5 0.5
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_V_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution at center of the main pipe for z=2.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeY 40 50
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_T_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous axial velocity time evolution at center of the main pipe for z=2.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeY -0.5 0.5
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_V_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Tableau {
+		Titre "Convergence of Wall jet configuration"
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution at center of the main pipe for z=0.5D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeY 47 48.5
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_T_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous axial velocity time evolution at center of the main pipe for z=0.5D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeY 1.5 2.1
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_V_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_0.5D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution at center of the main pipe for z=1.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeY 47 48.5
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_T_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous axial velocity time evolution at center of the main pipe for z=1.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeY 1.5 2.1
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_V_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_1D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution at center of the main pipe for z=2.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeY 47 48.5
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_T_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 ($2-273)
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous axial velocity time evolution at center of the main pipe for z=2.0D"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeY 1.5 2.1
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Muscl"
+			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_V_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_2D.son
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Tableau {
+		Titre "Convergence analysis"
+		Description "The curves above, for the impinging jet configuration, show that the instantaneous quantities oscillate around a mean value, after two travels of a fluid particle along the domain ($\sim$4.5s). The convection scheme Ef_Stab, with $\alpha$=0.2, seems to diverge after 15 seconds of physical time.\newline"
+		Description "For the wall jet configuration, the curves show that the instantaneous quantities seem to be very stable and do not vary.\newline"
+		Description "The calculation strategy of averaging the quantities after two travels is, at least for the impinging jet configuration, a good choice and is validated.\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Y+ distribution"
+	Description "The next figures present the Y+ distribution on the two flow configurations, for values of Y+ between [10:100].\newline"
+	Visu {
+		Width 4cm,viewport=45 684 282 920,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 10. 100.
+		Cycles -1
+		normal3D 0.313249 0.563058 0.764749
+		up3D -0.150773 0.824551 -0.545329
+		zoom3D -0.0583295 0.298793 0.7
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_( \[Impinging~jet~configuration \] \latex_)"
+		Width 4cm,viewport=234 464 626 960,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 10. 100.
+		Cycles -1
+		normal3D 0.313249 0.563058 0.764749
+		up3D -0.150773 0.824551 -0.545329
+		zoom3D -0.0583295 0.298793 0.7
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_( \[Wall~jet~configuration \] \latex_)"
+		Width 4cm,viewport=234 464 626 960,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 10. 100.
+		Cycles -1
+		normal3D 0.313249 0.563058 0.764749
+		up3D -0.150773 0.824551 -0.545329
+		zoom3D -0.0583295 0.298793 0.7
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Visu {
+		Width 4cm,viewport=-237 684 45 920,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 10. 100.
+		Cycles -1
+		normal3D 0.313249 0.563058 0.764749
+		up3D -0.150773 0.824551 -0.545329
+		zoom3D -0.0583295 0.298793 0.7
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Width 4.8cm,viewport=174 222 684 754,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 10. 100.
+		Cycles -1
+		normal3D -0.412961 -0.745299 -0.523443
+		up3D -0.778755 -0.00904561 0.627263
+		zoom3D -0.042593 0.00777706 0.7
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Width 4.8cm,viewport=174 222 684 754,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 10. 100.
+		Cycles -1
+		normal3D -0.412961 -0.745299 -0.523443
+		up3D -0.778755 -0.00904561 0.627263
+		zoom3D -0.042593 0.00777706 0.7
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Visu {
+		Width 7cm, viewport=80 96 982 976,clip
+        	Histogram Impinging_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 0. 100. 20
+		Cycles -1
+		operator no_databaseinfo		
+		nb_img_without_newline 2
+	}
+	Visu {
+		Width 7cm, viewport=80 96 982 976,clip
+        	Histogram Wall_Jet/Muscl/Post/Post.lata dom_Walton Y_PLUS ELEM 0. 100. 20
+		Cycles -1
+		operator no_databaseinfo		
+	}
+}
+
+Chapitre {
+	Titre "Results on Impinging jet configuration"
+	Tableau {
+		Titre "Reynolds numbers"
+		Description "The next table gives the automatically calculated Reynolds numbers of three convection schemes.\newline \latex_( \begin{center} \latex_)"
+		nb_colonnes 1
+		Ligne {
+			Legende "Impinging jet configuration"
+			valeurs "Reynolds"
+		}
+		Ligne {
+			Legende "Muscl"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier Impinging_Jet/Muscl/Watlon_pb_Debit.out
+			nb_colonnes_fichier 6
+			derniere_ligne
+			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+		}
+		Ligne {
+			Legende "Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier Impinging_Jet/Ef_Stab1.0/Watlon_pb_Debit.out
+			nb_colonnes_fichier 6
+			derniere_ligne
+			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+		}
+		Ligne {
+			Legende "Ef_Stab0.2"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier Impinging_Jet/Ef_Stab0.2/Watlon_pb_Debit.out
+			nb_colonnes_fichier 6
+			derniere_ligne
+			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Visu {
+		Titre "View of flow"
+		Width 16cm,viewport=90 98 996 388,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+        	Blackvector Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+# debut instruction
+		instruction_visit VectorAttributes = VectorAttributes()
+		instruction_visit VectorAttributes.useStride = 0
+		instruction_visit VectorAttributes.nVectors = 800
+		instruction_visit VectorAttributes.colorByMag=0
+		instruction_visit VectorAttributes.scale = 0.5
+		instruction_visit VectorAttributes.useLegend = 0
+		instruction_visit SetPlotOptions(VectorAttributes)
+# end instruction
+	}
+	Tableau {
+		Description "The measurement lines are located at (D = 0.150mm):"
+		Description "- Z = 0.5D (0.075 mm)"
+		Description "- Z = 1.0D (0.150 mm)\newline\newline"
+	}
+	Tableau {
+		Titre "Comparisons of view of temperature"
+		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized temperature and rms normalized temperature, on sectionnal views :"
+		Description "- at X = 0 mm,"
+		Description "- at Z = 0.5D,"
+		Description "- at Z = 1.0D.\newline\newline"
+		Description "These figures show that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence.\newpage"
+	}
+	Visu {
+		Description "\latex_( $ {{T-Tb} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 0. 1.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[T~Exp. \] \latex_)"
+		Width 6.25cm
+		Image ./Experimental_data/Exp_Impinging_jet_Tmean_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( $ {{Trms} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 0.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[Trms~Exp. \] \latex_)"
+		Width 6.25cm
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Muscl \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Muscl \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab1.0 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab1.0 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab0.2 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab0.2 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \[\newline \newline \newline X~=~0~mm \] \newpage \latex_)"
+	}
+	Visu {
+		Description "\latex_( $ {{T-Tb} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 0. 1.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[T~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Impinging_jet_Tmean_Z0_5D.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( $ {{Trms} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 0.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[Trms~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_Z0_5D.png
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \[Z~=~0.5D \] \newpage \latex_)"
+	}
+	Visu {
+		Description "\latex_( $ {{T-Tb} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 0. 1.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[T~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Impinging_jet_Tmean_Z1_0D.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( $ {{Trms} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 0.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[Trms~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_Z1_0D.png
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Impinging_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \[Z~=~1.0D \] \newpage \latex_)"
+	}
+	Tableau {
+		Titre "Comparisons of profiles of temperature"
+		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized temperature and rms normalized temperature, on profiles :"
+		Description "- at X = 0 mm and Z = 0.5D,"
+		Description "- at X = 0 mm and Z = 1.0D.\newline\newline\newline\newline"
+	}
+	Figure {
+		Description "\latex_( \[T~mean~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional T mean"
+		RangeX 0 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_T.txt
+			Origine "Experiment"
+			Colonnes 2 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~rms~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional T rms"
+		RangeX 0 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_T.txt
+			Origine "Experiment"
+			Colonnes 4 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~mean~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional T mean"
+		RangeX 0 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_T.txt
+			Origine "Experiment"
+			Colonnes 3 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~rms~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional T rms"
+		RangeX 0 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_T.txt
+			Origine "Experiment"
+			Colonnes 5 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\newpage"
+	}
+	Tableau {
+		Titre "Comparisons of profiles of velocity"
+		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized velocity, along Y and Z, and rms normalized velocity, along Y and Z, on profiles :"
+		Description "- at X = 0 mm and Z = 0.5D,"
+		Description "- at X = 0 mm and Z = 1.0D.\newline\newline\newline\newline"
+	}
+	Figure {
+		Description "\latex_( \[Vy~mean~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy mean"
+		RangeX -0.25 2.5
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 2 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vy~rms~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy rms"
+		RangeX 0. 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 4 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~mean~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz mean"
+		RangeX -1 4.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 3 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~rms~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz rms"
+		RangeX 0. 1.25
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 5 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\newpage"
+	}
+	Figure {
+		Description "\latex_( \[Vy~mean~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy mean"
+		RangeX -0.2 2.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 6 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vy~rms~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy rms"
+		RangeX 0. 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 8 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~mean~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz mean"
+		RangeX 0. 4.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 7 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~rms~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz rms"
+		RangeX 0. 1.25
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Impinging_jet_V.txt
+			Origine "Experiment"
+			Colonnes 9 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/0.23) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Titre "Conclusion of Impinging jet configuration"
+		Description "The comparisons of mean temperature and velocity profiles, show that the best results are obtained with the Ef_Stab convection scheme.\newline"
+		Description "The profiles of rms quantities show that the k-$\varepsilon$ model fails to model the turbulent fluctuations. Only the Ef_Stab convection scheme, with $\alpha$ = 0.2, seems to be the best. However, it should be reminded that this convection scheme diverges after 15 physical seconds. These results can't therefore be taken into account.\newline"
+		Description "The cut views of temperature confirm that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence.\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Results on Wall jet configuration"
+	Tableau {
+		Titre "Reynolds numbers"
+		Description "The next table gives the automatically calculated Reynolds numbers of three convection schemes.\newline \latex_( \begin{center} \latex_)"
+		nb_colonnes 1
+		Ligne {
+			Legende "Wall jet configuration"
+			valeurs "Reynolds"
+		}
+		Ligne {
+			Legende "Muscl"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier Wall_Jet/Muscl/Watlon_pb_Debit.out
+			nb_colonnes_fichier 6
+			derniere_ligne
+			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+		}
+		Ligne {
+			Legende "Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier Wall_Jet/Ef_Stab1.0/Watlon_pb_Debit.out
+			nb_colonnes_fichier 6
+			derniere_ligne
+			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+		}
+		Ligne {
+			Legende "Ef_Stab0.2"
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			fichier Wall_Jet/Ef_Stab0.2/Watlon_pb_Debit.out
+			nb_colonnes_fichier 6
+			derniere_ligne
+			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Visu {
+		Titre "View of flow"
+		Width 16cm,viewport=90 98 996 388,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+        	Blackvector Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+# debut instruction
+		instruction_visit VectorAttributes = VectorAttributes()
+		instruction_visit VectorAttributes.useStride = 0
+		instruction_visit VectorAttributes.nVectors = 800
+		instruction_visit VectorAttributes.colorByMag=0
+		instruction_visit VectorAttributes.scale = 0.5
+		instruction_visit VectorAttributes.useLegend = 0
+		instruction_visit SetPlotOptions(VectorAttributes)
+# end instruction
+	}
+	Tableau {
+		Description "The measurement lines are located at (D = 0.150mm):"
+		Description "- Z = -0.36D (-0.054 mm)"
+		Description "- Z = 0.5D (0.075 mm)"
+		Description "- Z = 1.0D (0.150 mm)"
+		Description "- Z = 2.0D (0.300 mm)\newline"
+	}
+	Tableau {
+		Titre "Comparisons of view of temperature"
+		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized temperature and rms normalized temperature, on sectionnal views :"
+		Description "- at X = 0 mm,"
+		Description "- at Z = 0.5D,"
+		Description "- at Z = 1.0D.\newline\newline"
+		Description "These figures confirm (see Impinging jet configuration) that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence.\newpage"
+	}
+	Visu {
+		Description "\latex_( $ {{T-Tb} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 0. 1.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[T~Exp. \] \latex_)"
+		Width 6.25cm
+		Image ./Experimental_data/Exp_Wall_jet_Tmean_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( $ {{Trms} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 0.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[Trms~Exp. \] \latex_)"
+		Width 6.25cm
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Muscl \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Muscl \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab1.0 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab1.0 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab0.2 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 0.4cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab0.2 \] \latex_)"
+		Width 7.35cm,viewport=290 154 750 384,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_x 0. 0. 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \[\newline \newline \newline X~=~0~mm \] \newpage \latex_)"
+	}
+	Visu {
+		Description "\latex_( $ {{T-Tb} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 0. 1.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[T~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Wall_jet_Tmean_Z0_5D.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( $ {{Trms} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 0.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[Trms~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Wall_jet_Trms_Z0_5D.png
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.075
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \[Z~=~0.5D \] \newpage \latex_)"
+	}
+	Visu {
+		Description "\latex_( $ {{T-Tb} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 0. 1.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[T~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Wall_jet_Tmean_Z1_0D.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( $ {{Trms} \over {Tm-Tb}} $ \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 0.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 4
+	}
+	Figure {
+		Description "\latex_( \[Trms~Exp. \] \latex_)"
+		Width 3.7cm
+		Image ./Experimental_data/Exp_Wall_jet_Trms_Z1_0D.png
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Muscl \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab1.0 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[T~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 4
+	}
+	Figure {
+		Width 1.5cm,viewport=-40 -20 -30 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		nb_img_without_newline 4
+	}
+	Visu {
+		Description "\latex_( \[Trms~Ef\_Stab0.2 \] \latex_)"
+		Width 3.7cm,viewport=205 427 751 973,clip
+		Pseudocolor_with_range Wall_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton ECART_TYPE_TEMPERATURE SOM 0. 4.5
+		Operator_to_all slice2D_z 0. 0. 0.150
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\latex_( \[Z~=~1.0D \] \newpage \latex_)"
+	}
+	Tableau {
+		Titre "Comparisons of view of velocity"
+		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized velocity on sectionnal views at Y = -65 mm.\newline"
+	}
+	Visu {
+		Description "\latex_( \center $ {{V} \over {Vm}} $ \endcenter \latex_)"
+		Width 1.5cm,viewport=40 684 150 888,clip
+		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton norme_MOYENNE_VITESSE SOM 0. 2.3
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Figure {
+		Description "\latex_( \[V~Exp. \] \latex_)"
+		Width 3cm
+		Image ./Experimental_data/Exp_Wall_jet_V_Y_65mm.png
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_( \[V~Muscl \] \latex_)"
+		Width 2.6cm,viewport=243 246 331 520,clip
+		Vector Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM 
+		Operator_to_all slice2D_y 0. -0.065 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Figure {
+		Width 1.5cm,viewport=-20 -20 -10 -10,clip
+		Image ./Experimental_data/Exp_Wall_jet_V_Y_65mm.png
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_( \[V~Ef\_Stab1.0 \] \latex_)"
+		Width 2.6cm,viewport=243 246 331 520,clip
+		Vector Wall_Jet/Ef_Stab1.0/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM 
+		Operator_to_all slice2D_y 0. -0.065 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_( \[V~Ef\_Stab0.2 \] \latex_)"
+		Width 2.6cm,viewport=243 246 331 520,clip
+		Vector Wall_Jet/Ef_Stab0.2/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM 
+		Operator_to_all slice2D_y 0. -0.065 0.
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Titre "Comparisons of profiles of temperature"
+		Description "Comparison of mean and rms normalized temperature on profiles at X=0mm and Z=0.5D, 1.0D or 2.0D.\newline"
+	}
+	Figure {
+		Description "\latex_( \[T~mean~Z~=~0.5D \] \latex_)"
+		Width 7.75cm, viewport=0 6 640 466,clip
+		LabelX "Non dimensional T mean"
+		RangeX 0 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_T.txt
+			Origine "Experiment"
+			Colonnes 2 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~rms~Z~=~0.5D \] \latex_)"
+		Width 7.75cm, viewport=0 6 640 466,clip
+		LabelX "Non dimensional T rms"
+		RangeX 0 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_T.txt
+			Origine "Experiment"
+			Colonnes 5 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_TRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~mean~Z~=~1.0D \] \latex_)"
+		Width 7.75cm, viewport=0 6 640 466,clip
+		LabelX "Non dimensional T mean"
+		RangeX 0 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_T.txt
+			Origine "Experiment"
+			Colonnes 3 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~rms~Z~=~1.0D \] \latex_)"
+		Width 7.75cm, viewport=0 6 640 466,clip
+		LabelX "Non dimensional T rms"
+		RangeX 0 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_T.txt
+			Origine "Experiment"
+			Colonnes 6 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_TRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~mean~Z~=~2.0D \] \latex_)"
+		Width 7.75cm, viewport=0 6 640 466,clip
+		LabelX "Non dimensional T mean"
+		RangeX 0 1.
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_T.txt
+			Origine "Experiment"
+			Colonnes 4 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_2D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_2D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_2D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes (($2-306)/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[T~rms~Z~=~2.0D \] \latex_)"
+		Width 7.75cm, viewport=0 6 640 466,clip
+		LabelX "Non dimensional T rms"
+		RangeX 0 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_T.txt
+			Origine "Experiment"
+			Colonnes 7 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_TRMS_Z_2D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_2D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_2D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($2/15) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\newpage"
+	}
+	Tableau {
+		Titre "Comparisons of profiles of velocity"
+		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized velocity, along Y and Z, and rms normalized velocity, along Y and Z, on profiles :"
+		Description "- at X = 0 mm and Z = -0.36D,"
+		Description "- at X = 0 mm and Z = 0.5D,"
+		Description "- at X = 0 mm and Z = 1.0D.\newline\newline\newline\newline"
+	}
+	Figure {
+		Description "\latex_( \[Vz~mean~Z~=~-0.36D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz mean"
+		RangeX 0.5 1.25
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 2 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_-0.36D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_-0.36D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_-0.36D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~rms~Z~=~-0.36D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz rms"
+		RangeX 0. 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 3 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_-0.36D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_-0.36D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_-0.36D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\newpage"
+	}
+	Figure {
+		Description "\latex_( \[Vy~mean~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy mean"
+		RangeX -0.05 0.2
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 4 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vy~rms~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy rms"
+		RangeX 0. 0.3
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 6 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~mean~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz mean"
+		RangeX -0.75 1.5
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 5 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~rms~Z~=~0.5D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz rms"
+		RangeX 0. 0.4
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 7 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\newpage"
+	}
+	Figure {
+		Description "\latex_( \[Vy~mean~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy mean"
+		RangeX -0.2 0.2
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 8 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vy~rms~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vy rms"
+		RangeX 0. 0.35
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 10 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($3/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~mean~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz mean"
+		RangeX 0. 1.5
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		nb_img_without_newline 2
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 9 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\latex_( \[Vz~rms~Z~=~1.0D \] \latex_)"
+		Width 7.75cm
+		LabelX "Non dimensional Vz rms"
+		RangeX 0. 0.4
+		LabelY "Distance from axis [mm]"
+		RangeY -75 75
+		InclureDescCourbes 0
+		Legende below title
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/Wall_jet_V.txt
+			Origine "Experiment"
+			Colonnes 11 1
+			Style lines
+			LargeurLigne 2
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab0.2"
+			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
+			Origine "Trio_U"
+			Version 1.6.6_beta
+			Colonnes ($4/1.46) ($1*1000)
+			Style linespoints
+		}
+	}
+	Tableau {
+		Titre "Conclusion of Wall jet configuration"
+		Description "The comparisons of mean temperature and velocity profiles, show that the results are not dependent of convection schemes. They all give the same results.\newline"
+		Description "As it was observed on Impinging jet confuguration, the profiles of rms quantities show that the k-$\varepsilon$ model fails to model the turbulent fluctuations.\newline"
+		Description "The cut views confirm that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence.\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Conclusion"
+	Description "The cell sizes, in this study, result of the choice to extrude inlet facets of domain, to create periodic boxes, in 14 tetrahedral elements (symmetric mesh) instead of 3 (asymmetric mesh). This allows us to obtain a symmetrical velocity profile. However, as it has been shown in the Y+ distribution, the cell sizes of the main box, for the impinging jet configuration, are too small and induce, due to standard wall law, lower values of dimensionless mean velocity, ie higher values of friction velocity.\newline"
+	Description ""
+	Description "The convergence analysis for the impinging jet configuration, shows that the instantaneous quantities oscillate around a mean value, after two travels of a fluid particle along the domain ($\sim$4.5s). The convection scheme Ef_Stab, with $\alpha$=0.2, seems to diverge after 15 seconds of physical time."
+	Description "For the wall jet configuration, the convergence shows that the instantaneous quantities seem to be very stable and do not vary."
+	Description "The calculation strategy of averaging the quantities after two travels is, at least for the impinging jet configuration, a good choice and is validated.\newline"
+	Description ""
+	Description "The comparisons of mean temperature and velocity profiles, show that the best results are obtained with the Ef_Stab convection scheme for the Impinging jet configuration, while for the Wall jet configuration, the results seem to not depend on convection schemes."
+	Description "The profiles of rms quantities show that the k-$\varepsilon$ model fails to model the turbulent fluctuations."
+	Description "The cut views confirm that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence."
+}
+
+Chapitre {
+	Titre "Performances"
+	tableau_performance { 
+	}
+}

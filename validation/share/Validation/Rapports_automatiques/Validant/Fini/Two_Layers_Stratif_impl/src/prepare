@@ -1,0 +1,62 @@
+#!/bin/bash
+tar xf Data_Ref.tar
+mkdir -p stable_vef
+mkdir -p unstable_vef
+cp post_run stable_vef
+cd stable_vef
+cp ../STABLE.data .
+
+cp STABLE.data STABLE_piso.data
+
+cd ../unstable_vef
+cp ../stable_vef/STABLE_piso.data UNSTABLE_piso.data
+sed "s/(0.050175\*(0.1>Y)+0.050175)/(0.1\*(0.1>Y)+0.1)/g" UNSTABLE_piso.data > modifie.data
+sed "s/((y>0.1)\*2.52e-5+(y<0.1)\*1.01e-4)/((y>0.1)\*1.01e-4+(y<0.1)\*4.03e-4)/g" modifie.data > UNSTABLE_piso.data
+sed "s/((y>0.1)\*1.40e-5+(y<0.1)\*1.12e-4)/((y>0.1)\*1.12e-4+(y<0.1)\*8.98e-4)/g" UNSTABLE_piso.data > modifie.data
+sed "s/((y>0.1)\*27.9+(y<0.1)\*12.1)/((y>0.1)\*21.+(y<0.1)\*19.)/g" modifie.data > UNSTABLE_piso.data
+
+cd ..
+
+cd stable_vef
+cp STABLE_piso.data STABLE_implicite.data
+sed "s/Piso/Implicite/" STABLE_piso.data > STABLE_implicite.data
+cp STABLE_piso.data STABLE_simple.data
+sed "s/Piso/Simple/" STABLE_piso.data > STABLE_simple.data
+sed "s/seuil_convergence_solveur 1.e-8/seuil_convergence_solveur 1.e-8 relax_pression 0.1/" STABLE_simple.data > STABLE_simple_tmp.data
+mv STABLE_simple_tmp.data STABLE_simple.data
+
+sed "s/facsec_max 30/facsec_max 500/" STABLE_piso.data > STABLE_piso_facsecmax500.data
+sed "s/facsec_max 30/facsec_max 500/" STABLE_implicite.data > STABLE_implicite_facsecmax500.data
+sed "s/facsec_max 30/facsec_max 500/" STABLE_simple.data > STABLE_simple_facsecmax500.data
+
+sed "s/relax_pression 0.1/relax_pression 0.2/"  STABLE_simple.data > STABLE_simple_relax0.2.data
+sed "s/relax_pression 0.1/relax_pression 0.01/" STABLE_simple.data > STABLE_simple_relax0.01.data
+
+sed "s/seuil_convergence_solveur 1.e-8/seuil_convergence_solveur 1.e-8 nb_corrections_max 2/" STABLE_piso.data > STABLE_piso_nb_proj2.data
+
+cp STABLE_piso.data STABLE_explicite.data
+sed "s/Associate pb sch_imp/Associate pb sch/" STABLE_explicite.data > STABLE_explicite_tmp.data
+mv STABLE_explicite_tmp.data STABLE_explicite.data
+
+cd ../unstable_vef
+cp UNSTABLE_piso.data UNSTABLE_implicite.data
+sed "s/Piso/Implicite/" UNSTABLE_piso.data > UNSTABLE_implicite.data
+cp UNSTABLE_piso.data UNSTABLE_simple.data
+sed "s/Piso/Simple/" UNSTABLE_piso.data > UNSTABLE_simple.data
+sed "s/seuil_convergence_solveur 1.e-8/seuil_convergence_solveur 1.e-8 relax_pression 0.1/" UNSTABLE_simple.data > UNSTABLE_simple_tmp.data
+mv UNSTABLE_simple_tmp.data UNSTABLE_simple.data
+
+sed "s/facsec_max 30/facsec_max 500/" UNSTABLE_piso.data > UNSTABLE_piso_facsecmax500.data
+sed "s/facsec_max 30/facsec_max 500/" UNSTABLE_implicite.data > UNSTABLE_implicite_facsecmax500.data
+sed "s/facsec_max 30/facsec_max 500/" UNSTABLE_simple.data > UNSTABLE_simple_facsecmax500.data
+
+sed "s/relax_pression 0.1/relax_pression 0.2/"  UNSTABLE_simple.data > UNSTABLE_simple_relax0.2.data
+sed "s/relax_pression 0.1/relax_pression 0.01/" UNSTABLE_simple.data > UNSTABLE_simple_relax0.01.data
+
+sed "s/seuil_convergence_solveur 1.e-8/seuil_convergence_solveur 1.e-8 nb_corrections_max 2/" UNSTABLE_piso.data > UNSTABLE_piso_nb_proj2.data
+
+cp UNSTABLE_piso.data UNSTABLE_explicite.data
+sed "s/Associate pb sch_imp/Associate pb sch/" UNSTABLE_explicite.data > UNSTABLE_explicite_tmp.data
+mv UNSTABLE_explicite_tmp.data UNSTABLE_explicite.data
+
+cd ..

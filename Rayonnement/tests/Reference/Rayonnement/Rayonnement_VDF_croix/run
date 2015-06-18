@@ -1,0 +1,9 @@
+#!/bin/bash
+# Script pour comparer les flux sur chaque sortie
+# Modifier le .data pour tester son developpement
+# puis taper ./run dans le repertoire
+echo "Usage ./run nom_du_cas"
+cas=$1
+echo "Lancement du calcul...."
+triou $cas
+./verifie

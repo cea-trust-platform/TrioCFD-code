@@ -1,0 +1,136 @@
+# SIMULATION D UN CANAL PLAN 2D avec modèle Longueur de mélange #
+# PARALLEL RUNS #
+# Tests du modèle Longueur de Mélange et de la procédure de calcul du frottement pariétal (ParoiVEFHyd.cpp) #
+dimension 3
+
+domaine DOM_BODY
+
+Read_unsupported_ASCII_file_from_ICEM DOM_BODY trio_BODY_geo.asc
+
+domaine dom
+
+Extract_2D_from_3D DOM_BODY FRONT dom
+
+ecrire_fichier dom dom2D.geom
+
+dimension 2
+
+lire_fichier dom dom2D.geom
+
+
+# Longueurs 1.0 2.0 #
+
+Pb_Hydraulique pb
+
+# DEBUT DECOUPAGE
+Decouper dom
+{
+        Partitionneur tranche { tranches 2 1 }
+        Larg_joint 2
+	Periodique 1 PERIO
+        Nom_Zones DOM
+}
+
+FIN DECOUPAGE #
+
+# DEBUT LECTURE
+Scatter DOM.Zones dom
+FIN LECTURE #
+
+
+Corriger_frontiere_periodique { Domaine dom Bord PERIO }
+
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch 
+{
+        tinit 0.
+        tmax 20.
+        dt_min 1.e-7
+        dt_max 1.e-1
+	dt_start dt_calc
+        dt_impr 0.001
+        dt_sauv 20.
+        seuil_statio 1.e-8  
+        facsec 1.
+}
+
+Schema_Euler_implicite sch2
+Lire sch2
+{
+	tinit 0
+	tmax 20.
+	dt_min 1.e-7
+	dt_max 1.e-1
+	dt_impr 0.001
+	dt_sauv 20.
+	dt_start dt_calc
+	seuil_statio 1.e-8
+	facsec 1.
+	facsec_max 200
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 0.02
+	rho Champ_Uniforme 1 2
+}
+
+Associer pb dom
+Associer pb sch2
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+	{
+	Navier_Stokes_standard
+		{
+                solveur_pression GCP {
+                        precond ssor { omega 1.5 }
+                        seuil 1.e-8
+                }
+                convection { amont }
+                diffusion  {  }
+                Sources  { Canal_perio { bord PERIO } }
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz dom 2  1. 0. 
+			}
+		conditions_limites
+			{
+			PERIO periodique  
+			HAUT     paroi_fixe
+			BAS      paroi_fixe
+			}
+		Traitement_particulier { Canal { dt_impr_moy_spat 6. }
+		}
+	}
+
+	Postraitement
+        	{
+		format lata       
+		Sondes
+			{
+			sonde_vinlet vitesse periode 0.001 Segment 90  0.5 0. 0.5 2.		
+			}
+		Champs dt_post 10.0
+			{
+			vitesse elem
+			pression_Pa elem
+			}
+		}
+	}
+
+Resoudre pb
+Fin

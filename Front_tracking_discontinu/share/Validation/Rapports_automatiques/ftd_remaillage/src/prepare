@@ -1,0 +1,7 @@
+#!/bin/bash
+[ ! -d FTD_remaillage_vef ] && copie_cas_test FTD_remaillage_vef
+[ ! -d FTD_remaillage_vdf ] && copie_cas_test FTD_remaillage_vdf
+cp -f pre_run_vef FTD_remaillage_vef/pre_run
+(cd FTD_remaillage_vef;./pre_run)
+cp -f pre_run_vdf FTD_remaillage_vdf/pre_run
+(cd FTD_remaillage_vdf;./pre_run)

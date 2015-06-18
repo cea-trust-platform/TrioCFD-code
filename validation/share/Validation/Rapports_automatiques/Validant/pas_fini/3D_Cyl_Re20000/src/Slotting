@@ -1,0 +1,29 @@
+#!/bin/bash
+fichier=$1
+colonne=$2
+[ "$1" = "" ] || [ "$2" = "" ] && echo "Usage `basename $0` fichier colonne [tmin [tmax]]" && exit -1
+shift
+shift
+# Extrait de $TRUST_ROOT/Outils/Slotting/test_IF/lance_test_3
+# Un peu complique cela serait bien que Slotting fonctionne par defaut sur les .son
+# Le deplacer sous scripts en faisant une petite doc
+nb_debut=`awk '// {n++;if($1!="#") exit} END {print n}' $fichier`
+tmin=$1 && [ "$tmin" = "" ] && tmin=`head -$nb_debut $fichier | awk -v nb=$nb_debut 'NR==nb {print $1}'`
+shift
+tmax=$1 && [ "$tmax" = "" ] && tmax=`tail -1 $fichier | awk '{print $1}'`
+
+nb_pt=`cat $fichier | wc -l`
+nb_pts=`awk "BEGIN {print $nb_pt-$nb_debut}"`
+[ "$nb_pts" = 0 ] && echo "Not enough points in the $fichier file." && exit -1
+delta_tau=`awk "BEGIN {print 2*($tmax-$tmin)/$nb_pts}"`
+nb_corbeille=`awk "BEGIN {print ($tmax-$tmin)/$delta_tau}"`
+puissance_2=`awk "BEGIN {print int(log($nb_corbeille)/log(2))}" `
+nb_corbeille=`awk "BEGIN {print 2^$puissance_2}"`
+
+# Analyse
+echo "Spectral analysis of the "$colonne"th column of the file $fichier from t=$tmin to t=$tmax..." 
+log=`pwd`/Slotting_$fichier.log
+$TRUST_ROOT/exec/Slotting $fichier /nv=3 /t=1 /v1=$colonne /nbc=$nb_corbeille /dt=$delta_tau /h=$nb_lignes_debut /t1=$tmin /t2=$tmax /f=1 1>$log 2>&1
+[ $? != 0 ] && echo "Error, see $log" && exit -1
+mv -f `ls -rt $fichier"_spe"*.txt | tail -1` spectre.txt
+mv -f `ls -rt $fichier"_cov"*.txt | tail -1` covariance.txt

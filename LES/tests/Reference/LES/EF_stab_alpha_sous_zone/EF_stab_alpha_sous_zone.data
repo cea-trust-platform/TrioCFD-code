@@ -1,0 +1,194 @@
+# Test option alpha_sous_zone of EF_stab scheme #
+# PARALLEL OK #
+dimension 3
+Pb_ThermoHydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 8 4 8
+		Longueurs  6.4 2. 3.2
+		Facteurs  1. 1.0 1.
+		Symy 
+		}
+		{
+		Bord periox   X = 0.		0. <= Y <= 2.0		0. <= Z <= 3.2
+		Bord periox   X = 6.4    	0. <= Y <= 2.0		0. <= Z <= 3.2
+		Bord perioz   Z = 0.		0. <= X <= 6.4		0. <= Y <= 2.0
+		Bord perioz   Z = 3.2    	0. <= X <= 6.4		0. <= Y <= 2.0
+		Bord bas      Y = 0.		0. <= X <= 6.4		0. <= Z <= 3.2
+		Bord haut     Y = 2.		0. <= X <= 6.4		0. <= Z <= 3.2
+		}
+	}
+Tetraedriser_homogene_fin dom
+Reordonner_faces_periodiques dom periox
+Reordonner_faces_periodiques dom perioz
+# END MESH #
+# dx+ = 100, dy+min = 1,6 dy+max = 31 et dz+ = 35  #
+	
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur Metis { Nb_parts 2 }
+	periodique 2 periox perioz
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin 
+END PARTITION 
+#
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+
+Sous_Zone zone_amont
+Associate zone_amont dom
+Lire zone_amont {
+   Boite
+      Origine 0 0 0
+      Cotes   0.1 0.1 0.1
+}
+
+Sous_Zone zone_a2
+Associate zone_a2 dom
+Lire zone_a2 {
+   Boite
+      Origine 0 0 0
+      Cotes   0.5 0.1 0.1
+}
+
+Sous_Zone zone_a1
+Associate zone_a1 dom
+Lire zone_a1 {
+   Boite
+      Origine 0.2 0 0
+      Cotes   0.1 0.1 0.1
+}
+
+VEFPreP1b dis
+
+Sch_CN_EX_iteratif sch
+Lire sch 
+{
+        tinit 0
+        tmax 500
+        dt_min 1.e-10
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 1.
+        dt_sauv 100
+        seuil_statio 1.e-8  
+        facsec 1.
+        seuil 1e-3
+	facsec_max 4.
+  	niter_min 2
+  	niter_avg 6
+  	niter_max 10
+	omega 0
+	nb_pas_dt_max 2
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	Cp Champ_Uniforme	1 1
+	lambda Champ_Uniforme	1 4e-5
+	beta_th Champ_Uniforme	1 1
+}
+
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 1e-5
+			}
+		convection { ef_stab { volumes_etendus alpha 0.2
+					amont_sous_zone  zone_amont
+					alpha_sous_zone 2 
+						zone_a1 0.5
+						zone_a2 0.2
+						} }
+		diffusion { }
+                Sources { Canal_perio { bord periox  } }
+		conditions_initiales
+			{
+			# Ampli_bruit mis a 0 pour le cas test de non regression car cela cree des differences entre sequentiel et parallele ou sur entre machines #
+			# Mettre ampli_bruit 0.49 pour une etude #
+                        vitesse Champ_init_canal_sinal 3 { Ucent 2.97 h 1 ampli_sin 0.3 ampli_bruit 0. omega 0.49 }
+			}
+		boundary_conditions
+			{
+			periox   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+			perioz   periodique
+			}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 50
+			}
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 10
+		        dt_impr_moy_temp 20 
+		        debut_stat  100.
+				 }
+			}	
+		}
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { }
+		convection { EF_stab { volumes_etendus alpha 1  } }
+		Modele_turbulence Prandtl { 			
+		turbulence_paroi loi_standard_hydr_scalaire
+			 }
+		
+		sources { Puissance_thermique Champ_Uniforme 1 1 }
+		boundary_conditions 
+			{
+			periox	periodique  
+			perioz	periodique  
+ 			haut	paroi_temperature_imposee Champ_Front_Uniforme 1 0.
+			bas	paroi_temperature_imposee Champ_Front_Uniforme 1 0.
+			}
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0 }
+		}
+
+	Postraitement
+        	{       
+                Sondes	{     sonde_vit vitesse periode 1 points 4	  4. 1. 1.  4. 0.5  1.  4. 0.25 1.  4. 0.00436261 1.  
+				sonde_vit_X0 vitesse periode 1 segment 30 0. 0. 1. 0. 1. 1. 
+				sonde_T temperature periode 1 points 1 6 1 1.6
+			}
+		Champs dt_post 10 { temperature elem }
+	
+		}
+
+	}
+
+
+Solve pb
+
+Fin
+

@@ -1,0 +1,143 @@
+# ThermoHydraulique 1D-3D : conduite chauffee #
+# quasi compressible gaz parfait VDF #
+# chauffage puissance volumique #
+
+dimension 3
+
+Domaine dom
+
+Mailler dom
+{
+        Pave cavite
+            {
+             Origine 0. 0. 0.
+             Nombre_de_Noeuds 2 401 2
+             Longueurs 0.0274 0.8768 0.02152
+            }
+            {
+             Bord entree    Y = 0.       0. <= X <= 0.0274  0. <= Z <= 0.02152
+             Bord sortie    Y = 0.8768   0. <= X <= 0.0274  0. <= Z <= 0.02152
+
+             Bord gauche    X = 0.       0. <= Y <= 0.8768  0. <= Z <= 0.02152
+             Bord droit     X = 0.0274   0. <= Y <= 0.8768  0. <= Z <= 0.02152
+
+             Bord devant    Z = 0.       0. <= X <= 0.0274  0. <= Y <= 0.8768  
+             Bord derriere  Z = 0.02152  0. <= X <= 0.0274  0. <= Y <= 0.8768  
+            }
+}
+
+
+Pb_Thermohydraulique_QC pb 
+VDF dis 
+
+# Runge_Kutta_Rationnel_ordre_2 sch #
+Schema_Euler_explicite sch
+Read sch 
+{ 
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 2. 
+        dt_min 1.e-8
+        dt_max 1.e-1 
+        dt_impr 1e-10 
+        dt_sauv 20.
+        seuil_statio 1.e-8 
+        facsec 1.
+} 
+
+# Parametres de la loi de Sutherland recuperes sur Internet #
+# ref: White F.M., Viscous Fluid flow, Mc Graw Hill, 1974 #
+# (Ou 2nd edition 1991) pages 28-29 et 32-33 #
+# T0 273.15,P0= 101325.  Pr = 0.72 #
+# mu0 1.716e-5      C = 110.6 #
+# lambda0= 2.414e-2 Slambda 194.4 #
+
+Fluide_Quasi_Compressible air
+Read air
+{
+        pression   92665.5
+        mu Champ_Uniforme  1  1.e-8
+
+        loi_etat gaz_parfait {
+                Prandtl 0.72
+                Cp 1006.
+                gamma 1.4
+        }
+	Traitement_Pth constant
+}
+
+
+ Champ_Uniforme gravite 
+ Read gravite 3  0. 0. 0.
+
+Associate air gravite
+Associate pb dom
+Associate pb sch 
+Associate pb air 
+
+Discretize pb dis 
+
+Read pb 
+{ 
+ Navier_Stokes_QC 
+ { 
+     solveur_pression Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-8 }
+     convection { negligeable }
+     diffusion  { negligeable }
+     conditions_initiales {  vitesse Champ_Uniforme 3   0. 3.72 0. }
+     boundary_conditions { 
+      sortie frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+      entree frontiere_ouverte_vitesse_imposee champ_front_uniforme  3 0. 3.72 0.
+      gauche   symetrie
+      droit    symetrie		   
+      devant   symetrie
+      derriere symetrie		   
+                         } 
+  }
+
+ 
+  Convection_Diffusion_Chaleur_QC
+    {
+      diffusion { }
+      convection { amont }
+      conditions_initiales { temperature Champ_Uniforme 1 296.7 }
+      boundary_conditions {
+       sortie  frontiere_ouverte T_ext champ_front_uniforme 1 450.
+       entree  frontiere_ouverte_temperature_imposee  champ_front_uniforme 1 296.7
+       gauche    Paroi_adiabatique
+       droit     Paroi_adiabatique	   
+       devant    Paroi_adiabatique
+       derriere  Paroi_adiabatique	   
+			 }
+      Sources { Puissance_thermique Champ_fonc_xyz dom 1 618156. }
+                       
+       }
+
+  Postraitement
+    {
+     format lml
+     Sondes {
+  	    point_vit vitesse periode 			0.0001 point 1 0.0137 0.8 0.01076
+	    point_temp temperature periode 		0.0001 point 1 0.0137 0.8 0.01076
+	    point_mas_vol masse_volumique periode 	0.0001 point 1 0.0137 0.8 0.01076
+
+	    coupe_vit  vitesse periode 	10.0 segment 401	 0.0137  0.0       0.01076    
+							         0.0137  0.8768    0.01076
+	    coupe_temp  temperature periode 	10.0 segment 400 0.0137  1.096e-3  0.01076
+                                                                 0.0137  0.875704  0.01076
+	    coupe_pression  pression  periode 	10.0 segment 400 0.0137  1.096e-3  0.01076
+                                                                 0.0137  0.875704  0.01076
+	    coupe_mas_vol masse_volumique  periode 	10.0 segment 400	
+								 0.0137  1.096e-3  0.01076
+                                                                 0.0137  0.875704  0.01076
+
+            }
+		Champs dt_post 1.0
+		{
+			vitesse elem
+		}
+     }
+}
+Solve pb
+End

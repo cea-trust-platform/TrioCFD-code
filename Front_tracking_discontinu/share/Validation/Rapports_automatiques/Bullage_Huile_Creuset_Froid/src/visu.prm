@@ -1,0 +1,34 @@
+Parametres {
+	Titre "Tests ibc/ftd"
+	Description "Rapport on IBC (PDF) with interfaces."
+	Auteur "BM"
+	CasTest ibc_ftd ibc_ftd
+	CasTest regul ibc_ftd
+}
+
+Chapitre {
+	Titre "FT/IBC"
+	Description " Tests with visit."
+visu {
+	titre "IBC_FTD no velocity regularization"
+
+	mesh ibc_ftd/lata/post_interf.lata DOM
+
+        vector  ibc_ftd/lata/post_interf.lata DOM VITESSE ELEM 
+	width 9cm
+}
+visu {
+	titre "IBC_FTD with velocity regularization"
+
+	mesh regul/lata/post_interf.lata DOM
+
+        vector  regul/lata/post_interf.lata DOM VITESSE ELEM 
+	width 9cm
+}
+
+}
+
+
+
+
+

@@ -1,0 +1,197 @@
+#!/bin/bash
+
+gunzip -c trio_BODY_geo.asc.gz > trio_BODY_geo.asc
+
+#Creation des repertoires
+
+mkdir -p ./VDF/Amont
+mkdir -p ./VDF/Quick
+mkdir -p ./VDF_CL2/Amont
+mkdir -p ./VDF_CL2/Quick
+mkdir -p ./VEF/Amont
+mkdir -p ./VEF/Muscl
+mkdir -p ./VEF/EF_stab
+mkdir -p ./VEF_CL2/Amont
+mkdir -p ./VEF_CL2/Muscl
+mkdir -p ./VEF_CL2/EF_stab
+
+##########
+RACINE=`pwd`
+#cp ../src/poiseuille_vef.data .
+#cp ../src/poiseuille_vdf.data .
+#cp ../src/trio_BODY_geo.asc .
+
+#Cas de base VEF/Amont
+cd $RACINE/VEF/Amont
+cp $RACINE/poiseuille_vef.data poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/1 1./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_Uniforme/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_VEF.py/" post_run > modifie
+mv modifie post_run
+cp $RACINE/trio_BODY_geo.asc .
+
+#VEF/muscl
+cd $RACINE/VEF/Muscl
+cp $RACINE/poiseuille_vef.data test.data
+sed "s/amont/muscl/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/1 1./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_Uniforme/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_VEF.py/" post_run > modifie
+mv modifie post_run
+cp $RACINE/trio_BODY_geo.asc .
+
+#VEF/EF_stab
+cd $RACINE/VEF/EF_stab
+cp $RACINE/poiseuille_vef.data test.data
+sed "s/amont/EF_stab { }/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/1 1./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_Uniforme/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_VEF.py/" post_run > modifie
+mv modifie post_run
+cp $RACINE/trio_BODY_geo.asc .
+
+#VDF/Amont
+cd $RACINE/VDF/Amont
+cp $RACINE/poiseuille_vdf.data test.data
+sed "s/segment 10 0.5 0. 0.5 0.5/segment 10 0.5 0.025 0.5 0.475/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/1 1./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_Uniforme/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+sed "s/Associate pb sch/Associate pb sch2/" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+
+#VDF/Quick
+cd $RACINE/VDF/Quick
+cp $RACINE/poiseuille_vdf.data test.data
+sed "s/amont/quick/" test.data > poiseuille.data
+mv poiseuille.data test.data
+sed "s/segment 10 0.5 0. 0.5 0.5/segment 10 0.5 0.025 0.5 0.475/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/1 1./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_Uniforme/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+sed "s/Associate pb sch/Associate pb sch2/" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+
+
+#Cas de base de l'autre condition VEF_CL2/Amont
+cd $RACINE/VEF_CL2/Amont
+cp $RACINE/poiseuille_vef.data poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_vitesse_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/2 -0.24*y*y+0.06 0./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_fonc_XYZ/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_CL2_VEF.py/" post_run > temp
+mv temp post_run
+sed "s/tableauCourbes.py/tableauCourbes_CL2.py/" post_run > temp
+mv temp post_run
+cp $RACINE/trio_BODY_geo.asc .
+
+#VEF_Cl2/muscl
+cd $RACINE/VEF_CL2/Muscl
+cp $RACINE/poiseuille_vef.data test.data
+sed "s/amont/muscl/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_vitesse_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/2 -0.24*y*y+0.06 0./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_fonc_XYZ/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_CL2_VEF.py/" post_run > temp
+mv temp post_run
+sed "s/tableauCourbes.py/tableauCourbes_CL2.py/" post_run > temp
+mv temp post_run
+cp $RACINE/trio_BODY_geo.asc .
+
+#VEF_CL2/EF_stab
+cd $RACINE/VEF_CL2/EF_stab
+cp $RACINE/poiseuille_vef.data test.data
+sed "s/amont/EF_stab { }/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_vitesse_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/2 -0.24*y*y+0.06 0./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_fonc_XYZ/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_CL2_VEF.py/" post_run > temp
+mv temp  post_run
+sed "s/tableauCourbes.py/tableauCourbes_CL2.py/" post_run > temp
+mv temp post_run
+cp $RACINE/trio_BODY_geo.asc .
+
+#VDF_CL2/Amont
+cd $RACINE/VDF_CL2/Amont
+cp $RACINE/poiseuille_vdf.data test.data
+sed "s/segment 10 0.5 0. 0.5 0.5/segment 10 0.5 0.025 0.5 0.475/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_vitesse_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/2 -0.24*y*y+0.06 0./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_fonc_XYZ/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+sed "s/Associate pb sch/Associate pb sch2/" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_CL2.py/" post_run > temp
+mv temp post_run
+sed "s/tableauCourbes.py/tableauCourbes_CL2.py/" post_run > temp
+mv temp post_run
+
+#VDF_Cl2/Quick
+cd $RACINE/VDF_CL2/Quick
+cp $RACINE/poiseuille_vdf.data test.data
+sed "s/amont/quick/" test.data > poiseuille.data
+mv poiseuille.data test.data
+sed "s/segment 10 0.5 0. 0.5 0.5/segment 10 0.5 0.025 0.5 0.475/" test.data > poiseuille.data
+sed "s/TYPE_CL_IN/frontiere_ouverte_vitesse_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_IN/2 -0.24*y*y+0.06 0./" test.data > poiseuille.data
+sed "s/TYPE_CHAMP_IN/Champ_Front_fonc_XYZ/" poiseuille.data > test.data
+sed "s/TYPE_CHAMP_OUT/Champ_Front_Uniforme/" test.data > poiseuille.data
+sed "s/TYPE_CL_OUT/frontiere_ouverte_pression_imposee/" poiseuille.data > test.data
+sed "s/VALEUR_CL_OUT/1 0./" test.data > poiseuille.data
+mv poiseuille.data test.data
+sed "s/Associate pb sch/Associate pb sch2/" test.data > poiseuille.data
+mv poiseuille.data test.data
+cp $RACINE/post_run .
+sed "s/propertiesGeometry.py/propertiesGeometry_CL2.py/" post_run > temp
+mv temp post_run
+sed "s/tableauCourbes.py/tableauCourbes_CL2.py/" post_run > temp
+mv temp post_run
+
+

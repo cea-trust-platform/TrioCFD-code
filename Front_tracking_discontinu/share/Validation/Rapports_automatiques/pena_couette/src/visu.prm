@@ -1,0 +1,90 @@
+Parameters {
+	Title "Test de la methode d'interpolation"
+	Description "Rapport utilisant visit"
+	Author "BM CI PL ER"
+	TestCase pena_couette couette
+	TestCase pena_couette_base couette
+	Description "Le cas teste represente un ecoulement fluide entre deux cylindres en contra-rotation"
+	Description "La vitesse maximale au bord du plus grand cylindre vaut theoriquement -1.5 m/s. "
+	Description " La vitesse maximale au bord du plus petit cylindre  vaut theoriquement 0.5 m/s."
+}
+
+Chapter {
+	Title "FT"
+	Table {
+		Title "Criteres d'erreur"
+		Description "La comparaison des resultats est etablie selon deux criteres, definis de la maniere suivante : \newline "
+		Description "Le premier critere qualifie la norme L2 de l'erreur, soit : "
+		Description "\latex_({\large \center \[ Err_{L2} (Q)= \frac {\sqrt{\sum_{i=1,n}(Q_i-E_i)^2}} {\sqrt{\sum_{i=1,n}(E_i)^2}} \] }\latex_)\newline"
+		Description "Le second critere qualifie la norme infinie de l'erreur, soit : " 
+		Description "\latex_({\large \center \[ Err_{Max}(Q)= \frac {Max_{i=1,n}|Q_i-E_i|} {Max_{i=1,n}|E_i|} \] }\latex_)\newline"
+		Description " ou \latex_({\large $ Q_i $}\latex_) et \latex_({\large $ E_i $}\latex_) representent respectivement la valeur de la quantite Q issue du calcul et celle issue de la theorie. "
+	}			
+	Table {
+		Title "Modele d'interpolation lineaire "
+	}
+	Table {
+		 Description "\latex_( \begin{center} \latex_)"
+	}
+	visu {
+	      Description "Representation du champ de vitesse"
+
+	      mesh pena_couette/lata/post_cylind_1.lata DOM
+
+	      vector  pena_couette/lata/post_cylind_1.lata DOM VITESSE ELEM 
+	      width 9cm
+	}
+	Table {
+		 Description "\latex_( \end{center} \latex_)"
+	}
+	Table {
+		Title "Modele d'interpolation de base "
+	}
+	Table {
+		 Description "\latex_( \begin{center} \latex_)"
+	}
+	visu {
+		Description "Representation du champ de vitesse"
+
+		mesh pena_couette_base/lata/post_cylind_1.lata DOM
+
+		vector  pena_couette_base/lata/post_cylind_1.lata DOM VITESSE ELEM 
+		width 9cm
+	 }
+	Table {
+		 Description "\latex_( \end{center} \latex_)"
+	}
+	Table {
+		Title "Comparaison des modeles d'interpolation pour le champ de vitesse "
+	}
+	Table {
+		 Description "\latex_( \begin{center} \latex_)"
+		}
+
+	Table {
+		Description "Verification des ecarts relatifs entre theorie et calculs \newline"   
+		nb_columns 2
+		label \latex_($Err_{L2} (vit)$\latex_) [%] | \latex_($Err_{Max} (vit)$\latex_) [%]
+		line {
+			legend Methode LINEAIRE
+			file ./pena_couette/norm_erreur_vit.txt
+			origin "Trio_U"
+		
+		}
+		line {
+			legend Methode BASE
+			file ./pena_couette_base/norm_erreur_vit.txt		
+			origin "Trio_U"
+		
+		}
+	}
+	Table {
+		 Description "\latex_( \end{center} \latex_)"
+		}
+
+}
+
+
+
+
+

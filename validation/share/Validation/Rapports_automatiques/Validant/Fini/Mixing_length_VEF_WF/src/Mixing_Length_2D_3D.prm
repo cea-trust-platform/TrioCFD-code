@@ -1,0 +1,685 @@
+Parameters {
+	Title "Mixing length in 2D and 3D VEF-plane channel"
+	Description "Turbulent flow in a bi-periodic plane channel"
+	Description "Validated Model"
+	Description "	Wall function in VEF discretisation"
+	Description "	Mixing length modelling (+ k-$\epsilon$ comparison)"
+	Description "Validation with : analytical laws"
+
+	VersionTrio_U "1.5.5"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent
+	ParametersTrio_U Diffusion scheme : Default{}
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Euler_explicite (fac_sec 0.9)
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent" with "Modele_turbulence Longueur_melange"
+	ParametersTrio_U Solving of equations : "Turbulence_paroi loi_standard_hydr" (new ones)
+	ParametersTrio_U Convection : EF_stab
+	ParametersTrio_U Turbulence model : Mixing Length (compared with k-$\epsilon$)
+	ParametersTrio_U Type of boundary conditions : Periodicity in x (and z for 3D) direction, wall for y boundaries
+
+	TestCase 2D_100000_11 2D 
+	TestCase 2D_100000_21 2D   
+	TestCase 2D_100000_41 2D
+	TestCase 2D_100000_6 2D
+	TestCase 2D_10000_11 2D
+	TestCase 2D_10000_21 2D
+	TestCase 2D_10000_41 2D
+	TestCase 2D_10000_6 2D /**/
+	TestCase 3D_11 3D
+	TestCase 3D_21 3D
+	TestCase 3D_21_keps 3D_keps
+	TestCase 3D_41 3D
+	TestCase 3D_6 3D /**/
+	TestCase 3D_6_keps 3D_keps /**/
+
+	Reference "Reichardt H. : Vollstaendige Darstellung der turbulenten Geschwindigkeitsverteliung in glatten Leitungen. ZAMM 31, 208-219 (1951)"
+	Reference "http://www.sla.maschinenbau.tu-darmstadt.de/lehre/tms/Turbulence-TUDarmstadt-Pt2-6.pdf"
+	
+	Author "R. PAILLE"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : plane channel"
+	Description "Dimensions : h=2, Lx=0.2 or 0.8 (same for Lz in 3D)"
+	Description "Mesh : Ny=6 - 11 - 21 - 41, Nx=3 (Nz=3 in 3D) and trianguler_fin (2D) or tetraedriser_homogene_fin (3D)"
+	Description "Initial conditions : Ux=10"
+	Description "Boundary conditions : The periodicity conditions need a source term to maintain the flow constant"
+	Description "Canal_perio { bord periox }"
+	visu {
+		Title "3 x 6"
+		mesh 2D_100000_6/2D.lata dom
+	}
+	visu {
+		Title "3 x 41"
+		mesh 2D_100000_41/2D.lata dom
+	}
+	visu {
+		Title "3 x 6 x 3"
+		mesh 3D_6/3D.lata dom
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+	}
+	visu {
+		Title "3 x 41 x 6"
+		mesh 3D_41/3D.lata dom
+		normal3D 0.2 0.3 0.9
+		up3D -0.1 1 -0.3
+	}
+	Figure {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 1"
+		Description "$\mu$ = 0.001 or 0.0001 such as Reb = (Ub.h) / v = 10 000 or 100 000 (h=1 : half-height)"
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+Chapter {
+	Title "Results : 2D - Reb = 10 000"
+	Table {
+		Title "2D - Reb = 10 000"
+		nb_columns 4
+		label Ny | y+ | Re$\tau$ | Relative error
+		line {
+			origin "analytique"
+			legend " "
+			file ./2D_10000_6/ligneTableau.dat
+			nb_columns_file 5
+			columns "Theoretical(*)" rien ($5) rien
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_10000_6/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_10000_11/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_10000_21/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_10000_41/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+	}
+	Figure {
+		Description "(*) : according to Dean's correlation : Re$\tau$ = 0.175.(Reb)7/8 "	
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Velocity profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		Curve {
+			legend "6"
+			file ./2D_10000_6/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "11"
+			file ./2D_10000_11/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "21"
+			file ./2D_10000_21/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "41"
+			file ./2D_10000_41/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 1 600
+		LabelY "U+"
+		RangeY 0 25
+		LogX
+		Include_Description_Curves 0
+		Curve {
+			legend "Reichardt"
+			Fonction 1/0.41*log(1+0.4*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 6"
+			file ./2D_10000_6/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 11"
+			file ./2D_10000_11/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./2D_10000_21/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+		Curve {
+			legend "Ny = 41"
+			file ./2D_10000_41/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 5
+		}
+	}
+	Figure {
+		Title "Turbulent viscosity"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "nut"
+		RangeY 0 0.1
+		Include_Description_Curves 0
+		Curve {
+			legend "Ny = 6"
+			file ./2D_10000_6/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 11"
+			file ./2D_10000_11/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./2D_10000_21/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 41"
+			file ./2D_10000_41/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+}
+Chapter {
+	Title "Results : 2D - Reb = 100 000"
+	Table {
+		Title "2D - Reb = 100 000"
+		nb_columns 4
+		label Ny | y+ | Re$\tau$ | Relative error
+		line {
+			origin "analytique"
+			legend " "
+			file ./2D_100000_6/ligneTableau.dat
+			nb_columns_file 5
+			columns "Theoretical(*)" rien ($5) rien
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_100000_6/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_100000_11/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_100000_21/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./2D_100000_41/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+	}
+	Figure {
+		Description "(*) : according to Dean's correlation : Re$\tau$ = 0.175.(Reb)7/8 "	
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Velocity profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		Curve {
+			legend "6"
+			file ./2D_100000_6/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "11"
+			file ./2D_100000_11/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "21"
+			file ./2D_100000_21/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "41"
+			file ./2D_100000_41/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 10000
+		LabelY "U+"
+		RangeY 0 30
+		LogX
+		Include_Description_Curves 0
+		Curve {
+			legend "Reichardt"
+			Fonction 1/0.41*log(1+0.4*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 6"
+			file ./2D_100000_6/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 11"
+			file ./2D_100000_11/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./2D_100000_21/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+		Curve {
+			legend "Ny = 41"
+			file ./2D_100000_41/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 5
+		}
+	}
+	Figure {
+		Title "Turbulent viscosity"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "nut"
+		RangeY 0 0.08
+		Include_Description_Curves 0
+		Curve {
+			legend "Ny = 6"
+			file ./2D_100000_6/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 11"
+			file ./2D_100000_11/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./2D_100000_21/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 41"
+			file ./2D_100000_41/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+}
+Chapter {
+	Title "Results : 3D - Reb = 100 000"
+	Table {
+		Title "3D - Reb = 100 000"
+		nb_columns 4
+		label Ny | y+ | Re$\tau$ | Relative error
+		line {
+			origin "analytique"
+			legend " "
+			file ./3D_6/ligneTableau.dat
+			nb_columns_file 5
+			columns "Theoretical(*)" rien ($5) rien
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./3D_6/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./3D_11/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./3D_21/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./3D_41/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./3D_6_keps/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+		line {
+			origin "Trio_U"
+			legend " "
+			file ./3D_21_keps/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4)
+		}
+	}
+	Figure {
+		Description "(*) : according to Dean's correlation : Re$\tau$ = 0.175.(Reb)7/8 "	
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Description "NB : The use of 'tetraedriser_homogene mesh' for Ny=21 and k-eps model leads to higher relative error"	
+		Width 0cm
+		picture ./nothing.png
+	}
+	Figure {
+		Title "Velocity profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		Curve {
+			legend "6"
+			file ./3D_6/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "11"
+			file ./3D_11/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "21"
+			file ./3D_21/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "41"
+			file ./3D_41/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 10000
+		LabelY "U+"
+		RangeY 0 30
+		LogX
+		Include_Description_Curves 0
+		Curve {
+			legend "Reichardt"
+			Fonction 1/0.41*log(1+0.4*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 6"
+			file ./3D_6/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 11"
+			file ./3D_11/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./3D_21/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+		Curve {
+			legend "Ny = 41"
+			file ./3D_41/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 5
+		}
+	}
+	Figure {
+		Title "Turbulent viscosity"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "nut"
+		RangeY 0 0.08
+		Include_Description_Curves 0
+		Curve {
+			legend "Ny = 6"
+			file ./3D_6/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 11"
+			file ./3D_11/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./3D_21/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 41"
+			file ./3D_41/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Velocity profile comparison with keps"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "U"
+		RangeY 0 12
+		Include_Description_Curves 0
+		Curve {
+			legend "6"
+			file ./3D_6/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "6 keps"
+			file ./3D_6_keps/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "21"
+			file ./3D_21/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "21 keps"
+			file ./3D_21_keps/Moyennes_spatiales_vitesse_rho_mu
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Velocity profile U+ comparison with keps"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		RangeX 10 1500
+		LabelY "U+"
+		RangeY 0 30
+		LogX
+		Include_Description_Curves 0
+		Curve {
+			legend "Reichardt"
+			Fonction 1/0.41*log(1+0.4*x)+7.44*(1-exp(-x/11)-(x)/11*exp(-x/3))
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 6"
+			file ./3D_6/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 6 - k-eps"
+			file ./3D_6_keps/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./3D_21/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+		Curve {
+			legend "Ny = 21 - k-eps"
+			file ./3D_21_keps/courbe_reichardt.dat
+			columns ($1) ($2)
+			TypeLigne 5
+		}
+	}
+	Figure {
+		Title "Turbulent viscosity comparison with keps"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		RangeX 0 2
+		LabelY "nut"
+		RangeY 0 0.08
+		Include_Description_Curves 0
+		Curve {
+			legend "Ny = 6"
+			file ./3D_6/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 1
+		}
+		Curve {
+			legend "Ny = 6 keps"
+			file ./3D_6_keps/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 2
+		}
+		Curve {
+			legend "Ny = 21"
+			file ./3D_21/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 3
+		}
+		Curve {
+			legend "Ny = 21 keps"
+			file ./3D_21_keps/Moyennes_spatiales_nut
+			columns ($1) ($2)
+			TypeLigne 4
+		}
+	}
+	Figure {
+		Title "Conclusion"
+		Description "By using mixing length model, the relative error for the friction in a plane channel is about 10$%$ for a "
+		Description "fully 3D turbulent (Reb=100000) modelisation."
+		Width 0cm
+		picture ./nothing.png
+	}
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

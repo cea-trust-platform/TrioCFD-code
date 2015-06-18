@@ -1,0 +1,302 @@
+#!/bin/bash
+
+rm -f Erreur_Star_bas.cut 
+rm -f Erreur_Star_haut.cut 
+
+# Parametres
+fichier=`pwd | awk -F"/" '{print $NF}'`
+if [ -f ../../version_utilisee ]
+then
+	version=`grep "version :" ../../version_utilisee | awk '{print $3}' | awk -F. '{print $1$2$3}'`
+else
+	version=`grep "version :" $fichier.err | awk '{print $3}' | awk -F. '{print $1$2$3}'`
+fi
+version=${version%_beta}
+j=0 && (( 155 == $version )) && j=2
+
+echo "$version $j " > version.dat
+
+
+#  Domain dimensions 
+#  Cannot be read in the data file as an exising mesh is used.
+hy=0.004
+Pz=0.002
+[ "$fichier" == "Canal_plan_bi_periodique_M1" ]   && Lx=0.004
+[ "$fichier" == "Canal_plan_bi_periodique_M10" ]  && Lx=0.04
+[ "$fichier" == "Canal_plan_bi_periodique_M100" ] && Lx=0.4
+
+# Type of calculation: Quasi compressible
+# Type=`pwd | awk -F"$fichier" '{print $1}' | awk -F"/" '{print $(NF-1)}'`
+Type=Quasicompressible
+
+# Physical properties
+Pres=`grep pression $fichier.data | head -n 1 | awk '{print $2}'`
+gamma=`grep gamma $fichier.data | awk '{print $2}'`
+Cp=`grep Cp $fichier.data | awk '{print $2}'`
+Rconst=`awk "BEGIN{print $Cp*(1-1/$gamma)}"`
+T_bas=`grep paroi_temperature_imposee $fichier.data| grep Bas | awk '{print $5}'`
+T_haut=`grep paroi_temperature_imposee $fichier.data| grep Haut | awk '{print $5}'`
+U_bulk=`grep champ_uniforme $fichier.data| grep vitesse | awk '{print $6}'`
+
+coefmu1=`grep mu $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?*? ?g"|awk '{print $1}'`
+coefmu2=`grep mu $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?l^? ?g"|awk '{print $2}'`
+coefla1=`grep lambda $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?*? ?g"|awk '{print $1}'`
+coefla2=`grep lambda $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?l^? ?g"|awk '{print $2}'`
+
+#echo coefmu1=$coefmu1  coefmu2=$coefmu2
+#echo coefla1=$coefla1  coefmu2=$coefla2
+#echo Pres = $Pres
+#echo gamma= $gamma
+#echo Cp= $Cp
+#echo Rconst= $Rconst
+#echo T_bas=$T_bas
+#echo T_haut=$T_haut
+#echo U_bulk=$U_bulk
+
+#Rconst=2075.95
+#Cp=5193
+#T_bas=673
+#T_haut=1073
+#U_bulk=80
+
+# Extrait_coupe sur les fichiers
+extrait_coupe $fichier SONDE_TEMPERATURE
+extrait_coupe $fichier SONDE_VITESSE
+
+# Parametre d'adimensionnalisation
+# Calcul du numero des colonnes sur les frontires Bas et Haut dans ls fichier *pb_Contrainte_visqueuse.out et *pb_Diffusion_chaleur.out
+Colonnes=`grep -E "# Bord:|# Boundary:" $fichier\_pb_Contrainte_visqueuse.out | sed "s?# Bord:??g" | sed "s?# Boundary:??g" | sed "s?Total??g"`
+nb_colonnes=`echo $Colonnes | wc -w`
+i=1
+while (( i <= nb_colonnes ))
+do
+	Col=`echo $Colonnes | awk '{print $'$i'}'`
+
+	if [ "$Col" == "Bas" ]
+	then
+		Col_PhyQDM_bas=`awk "BEGIN{print ($i+$jta-1)*3+2}"`
+		Col_PhyNRJ_bas=`awk "BEGIN{print $i+$j+1}"`
+	fi
+	if [ "$Col" == "Haut" ]
+	then
+		Col_PhyQDM_haut=`awk "BEGIN{print ($i+$j-1)*3+2}"`
+		Col_PhyNRJ_haut=`awk "BEGIN{print $i+$j+1}"`
+
+	fi
+	((i=i+1))
+done
+
+# Recuperation dans les fichiers des integrales sur la face basse
+Phy_diff_QDM_bas=`tail -1 $fichier\_pb_Contrainte_visqueuse.out | awk '{print $'$Col_PhyQDM_bas'}'`
+Phy_diff_NRJ_bas=`tail -1 $fichier\_pb_Diffusion_chaleur.out | awk '{print $'$Col_PhyNRJ_bas'}'`
+Phy_diff_NRJ_bas=`awk "BEGIN{if($Phy_diff_NRJ_bas<0) print -($Phy_diff_NRJ_bas); else print $Phy_diff_NRJ_bas;}"`
+
+# Calcul des proprietes physiques sur la face basse
+rho_bas=`awk "BEGIN{print $Pres/$Rconst/$T_bas}"`
+Ustar_bas=`awk "BEGIN{print sqrt($Phy_diff_QDM_bas/$rho_bas/$Lx/$Pz)}"`
+Tstar_bas=`awk "BEGIN{print $Phy_diff_NRJ_bas/($rho_bas*$Cp*$Ustar_bas*$Lx*$Pz)}"`
+
+mu_bas=`awk "BEGIN{print $coefmu1*$T_bas^$coefmu2}"`
+nu_bas=`awk "BEGIN{print $mu_bas/$rho_bas}"`
+
+lambda_bas=`awk "BEGIN{print ($coefla1*$T_bas^$coefla2)}"`
+
+alpha_bas=`awk "BEGIN{print $lambda_bas/($rho_bas*$Cp)}"`
+Re_t_bas_Trio=`awk "BEGIN{print $Ustar_bas*$hy/2/$nu_bas}"`
+Pr_bas=`awk "BEGIN{print $nu_bas/$alpha_bas}"`
+
+Re_bas_bulk_th=`awk "BEGIN{print $U_bulk*$hy/2/$nu_bas}"`
+Re_DH_bas=`awk "BEGIN{print $Re_bas_bulk_th*4}"`
+# echo Re_DH_bas $Re_DH_bas
+
+
+# Recuperation dans les fichiers des integrales sur la face haute
+Phy_diff_QDM_haut=`tail -1 $fichier\_pb_Contrainte_visqueuse.out | awk '{print $'$Col_PhyQDM_haut'}'`
+Phy_diff_NRJ_haut=`tail -1 $fichier\_pb_Diffusion_chaleur.out | awk '{print $'$Col_PhyNRJ_haut'}'`
+Phy_diff_NRJ_haut=`awk "BEGIN{if($Phy_diff_NRJ_haut<0) print -($Phy_diff_NRJ_haut); else print $Phy_diff_NRJ_haut;}"`
+
+# Calcul des proprietes physiques sur la face basse
+rho_haut=`awk "BEGIN{print $Pres/$Rconst/$T_haut}"`
+
+Ustar_haut=`awk "BEGIN{print sqrt($Phy_diff_QDM_haut/$rho_haut/$Lx/$Pz)}"`
+Tstar_haut=`awk "BEGIN{print $Phy_diff_NRJ_haut/($rho_haut*$Cp*$Ustar_haut*$Lx*$Pz)}"`
+
+mu_haut=`awk "BEGIN{print $coefmu1*$T_haut^$coefmu2}"`
+nu_haut=`awk "BEGIN{print $mu_haut/$rho_haut}"`
+
+lambda_haut=`awk "BEGIN{print (0.002774*$T_haut^0.701)}"`
+
+
+alpha_haut=`awk "BEGIN{print $lambda_haut/($rho_haut*$Cp)}"`
+Re_t_haut_Trio=`awk "BEGIN{print $Ustar_haut*$hy/2/$nu_haut}"`
+Pr_haut=`awk "BEGIN{print $nu_haut/$alpha_haut}"`
+
+Re_haut_bulk_th=`awk "BEGIN{print $U_bulk*$hy/2/$nu_haut}"`
+Re_DH_haut=`awk "BEGIN{print 4*$Re_haut_bulk_th}"`
+# echo Re_DH_haut $Re_DH_haut
+
+# Creation des fichiers resultats : Star_bas.cut ; Star_haut.cut ; Nusselt_bas.dat ; Nusselt_haut.dat
+nb_ligne_vitesse=`wc -l $fichier\_SONDE_VITESSE.coupe | awk '{print $1}'`
+
+
+# Boucle sur la paroi basse
+i=2
+Uplus_bas_max=0
+Uplus_bas_bak=0
+Uplus_VD_bas_bak=0
+rho_sur_rhobas_bak=1
+somme_UT=0
+somme_rhoU=0
+somme_rhoUT=0
+somme_U=0
+V_bak=0
+W_bak=0
+while (( i <= nb_ligne_vitesse ))
+do
+
+	# On recupere Y Vx, Vy, Vz et T dans les fichiers correspondants.
+	Y=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $1}'`
+	U=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $2}'`
+	V=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $3}'`
+	W=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $4}'`
+	T=`head -$i $fichier\_SONDE_TEMPERATURE.coupe | tail -1 | awk '{print $2}'`
+
+	# Prophy en chaque points
+	rho=`awk "BEGIN{print $Pres/$Rconst/$T}"`
+        mu=`awk "BEGIN{print $coefmu1*$T^$coefmu2}"`
+
+	somme_U=`awk "BEGIN{print $somme_U+$U}"`
+	somme_UT=`awk "BEGIN{print $somme_UT+($U*$T)}"`
+	somme_rhoU=`awk "BEGIN{print $somme_rhoU+$rho*$U}"`
+	somme_rhoUT=`awk "BEGIN{print $somme_rhoUT+($rho*$U*$T)}"`
+
+	Yplus_bas=`awk "BEGIN{print $Y*$Ustar_bas/$nu_bas}"`
+	Uplus_bas=`awk "BEGIN{print $U/$Ustar_bas}"`
+	Tplus_bas=`awk "BEGIN{print ($T-($T_bas))/$Tstar_bas}"`
+
+	rho_sur_rhobas=`awk "BEGIN{print ($rho/$rho_bas)^0.5}"`
+
+	moyenne_rho=`awk "BEGIN{print ($rho_sur_rhobas+$rho_sur_rhobas_bak)/2}"`
+	moyenne_rho_dUplus=`awk "BEGIN{print $moyenne_rho*($Uplus_bas-($Uplus_bas_bak))}"`
+	Uplus_VD_bas=`awk "BEGIN{print $Uplus_VD_bas_bak+$moyenne_rho_dUplus}"`
+
+	Delta_V=`awk "BEGIN{print $V-($V_bak)}"`
+	Delta_W=`awk "BEGIN{print $W-($W_bak)}"`
+
+	Yplus_SLS_bas=`awk "BEGIN{print $Yplus_bas*$rho_sur_rhobas*$mu_bas/$mu}"`
+	Uplus_SLS_bas=`awk "BEGIN{print $Uplus_bas*$rho_sur_rhobas}"`
+	Tplus_SLS_bas=`awk "BEGIN{print $Tplus_bas*$rho_sur_rhobas}"`
+
+	# Valeur imprime=0 ou 1: sert a eliminer les doublons sur les valeurs de y+ et a ne garder qu'une demi hauteur de canal pour le trace
+	imprime=`awk "BEGIN{if(($Uplus_bas_max<$Uplus_bas)&&($Yplus_bas!=0)) print 1; else print 0;}"`
+	((i==2)) && echo "# Y+		U+		T+		U+ VD		Y+ SLS		U+ SLS		T+ SLS" > Star_bas.cut
+	((imprime==1)) && echo "$Yplus_bas		$Uplus_bas		$Tplus_bas		$Uplus_VD_bas		$Yplus_SLS_bas		$Uplus_SLS_bas		$Tplus_SLS_bas" >> Star_bas.cut
+
+	#si les valeurs de Uplus ou Yplus sont mauvaises et que donc imprime ==0 on renvoie cette info dans un fichier Erreur_Star
+	((imprime==0)) && echo "$i  $Yplus_bas	$Uplus_bas " >> Erreur_Star_bas.cut 
+
+	((i==2)) && echo "# Y		DeltaV		DeltaW" > DeltaV.cut
+	echo "$Y	$Delta_V	$Delta_W" >> DeltaV.cut
+
+	# Initialisation pour l'iteration suivante
+	Uplus_bas_max=`awk "BEGIN{if($Uplus_bas_max<$Uplus_bas) print $Uplus_bas; else print $Uplus_bas_max;}"`
+	Uplus_bas_bak=$Uplus_bas
+	Uplus_VD_bas_bak=$Uplus_VD_bas
+	rho_sur_rhobas_bak=$rho_sur_rhobas
+	V_bak=$V
+	W_bak=$W
+	((i=i+1))
+done
+
+
+# Boucle sur la paroi haute
+((i=nb_ligne_vitesse))
+Uplus_haut_max=0
+Uplus_haut_bak=0
+Uplus_VD_haut_bak=0
+rho_sur_rhohaut_bak=1
+while (( 2 <= i ))
+do
+	# On recupere Y,Vx et T dans les fichiers correspondants.
+	Y=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $1}'`
+	U=`head -$i $fichier\_SONDE_VITESSE.coupe | tail -1 | awk '{print $2}'`
+	T=`head -$i $fichier\_SONDE_TEMPERATURE.coupe | tail -1 | awk '{print $2}'`
+
+	# Prophy en chaque points
+	rho=`awk "BEGIN{print $Pres/$Rconst/$T}"`
+        mu=`awk "BEGIN{print $coefmu1*$T^$coefmu2}"`
+
+	Yplus_haut=`awk "BEGIN{print ($hy-($Y))*$Ustar_haut/$nu_haut}"`
+	Uplus_haut=`awk "BEGIN{print $U/$Ustar_haut}"`
+	Tplus_haut=`awk "BEGIN{print ($T_haut-($T))/$Tstar_haut}"`
+
+
+	rho_sur_rhohaut=`awk "BEGIN{print ($rho/$rho_haut)^0.5}"`
+
+	moyenne_rho=`awk "BEGIN{print ($rho_sur_rhohaut+$rho_sur_rhohaut_bak)/2}"`
+	moyenne_rho_dUplus=`awk "BEGIN{print $moyenne_rho*($Uplus_haut-($Uplus_haut_bak))}"`
+	Uplus_VD_haut=`awk "BEGIN{print $Uplus_VD_haut_bak+$moyenne_rho_dUplus}"`
+
+	Yplus_SLS_haut=`awk "BEGIN{print $Yplus_haut*$rho_sur_rhohaut*$mu_haut/$mu}"`
+	Uplus_SLS_haut=`awk "BEGIN{print $Uplus_haut*$rho_sur_rhohaut}"`
+	Tplus_SLS_haut=`awk "BEGIN{print $Tplus_haut*$rho_sur_rhohaut}"`
+
+	# Valeur imprime=0 ou 1: sert a eliminer les doublons sur les valeurs de y+ et a ne garder qu'une demi hauteur de canal pour le trace
+	imprime=`awk "BEGIN{if(($Uplus_haut_max<$Uplus_haut)&&($Yplus_haut!=0)) print 1; else print 0;}"`
+	((i==nb_ligne_vitesse)) && echo "# Y+		U+		T+		U+ VD		Y+ SLS		U+ SLS		T+ SLS" > Star_haut.cut
+	((imprime==1)) && echo "$Yplus_haut		$Uplus_haut		$Tplus_haut		$Uplus_VD_haut		$Yplus_SLS_haut		$Uplus_SLS_haut		$Tplus_SLS_haut" >> Star_haut.cut
+
+	# Initialisation pour l'iteration suivante
+	Uplus_haut_max=`awk "BEGIN{if($Uplus_haut_max<$Uplus_haut) print $Uplus_haut; else print $Uplus_haut_max;}"`
+	Uplus_haut_bak=$Uplus_haut
+	Uplus_VD_haut_bak=$Uplus_VD_haut
+	rho_sur_rhohaut_bak=$rho_sur_rhohaut
+	((i=i-1))
+done
+
+# Attention a la facon de moyenner pour calculer Tbulk
+#T_bulk=`awk "BEGIN{print $somme_UT/$somme_U}"`
+T_bulk=`awk "BEGIN{print $somme_rhoUT/$somme_rhoU}"`
+# echo T_bulk $T_bulk
+
+yplus_par_haut=`head -n 2 Star_haut.cut|tail -n 1| awk '{print $1}'`
+yplus_par_bas=`head -n 2 Star_bas.cut|tail -n 1| awk '{print $1}'`
+# echo $yplus_par_haut $yplus_par_bas
+
+Nusselt_bas_Trio=`awk "BEGIN{printf \"%.2f\", ($Phy_diff_NRJ_bas/($T_bulk-($T_bas))/$Lx/$Pz)*2*$hy/$lambda_bas}"`
+Nusselt_haut_Trio=`awk "BEGIN{printf \"%.2f\", ($Phy_diff_NRJ_haut/($T_haut-($T_bulk))/$Lx/$Pz)*2*$hy/$lambda_haut}"`
+# echo Nu_bas  $Nusselt_bas_Trio  $Phy_diff_NRJ_bas  $T_bulk $T_bas  $Lx $Pz $hy $lambda_bas
+# echo Nu_haut $Nusselt_haut_Trio $Phy_diff_NRJ_haut $T_bulk $T_haut $Lx $Pz $hy $lambda_haut
+
+Nusselt_bas_C_th=`awk "BEGIN{printf \"%.2f\", 0.023*(4*$Re_bas_bulk_th)^0.8*$Pr_bas^(1/3)}"`
+Nusselt_haut_C_th=`awk "BEGIN{printf \"%.2f\", 0.023*(4*$Re_haut_bulk_th)^0.8*$Pr_haut^(1/3)}"`
+
+Nusselt_bas_DB_th=`awk "BEGIN{printf \"%.2f\", 0.024*(4*$Re_bas_bulk_th)^0.8*$Pr_bas^0.4}"`
+Nusselt_haut_DB_th=`awk "BEGIN{printf \"%.2f\", 0.026*(4*$Re_haut_bulk_th)^0.8*$Pr_haut^0.3}"`
+
+Q_bas=`awk "BEGIN{print ($Phy_diff_NRJ_bas/$Lx/$Pz)/($rho_bas*$Cp*$U_bulk*$T_bas)}"`
+Q_haut=`awk "BEGIN{print ($Phy_diff_NRJ_haut/$Lx/$Pz)/($rho_haut*$Cp*$U_bulk*$T_haut)}"`
+# Nusselt_bas_Mc_th=`awk "BEGIN{printf \"%.2f\",0.021*(4*$Re_bas_bulk_th)^0.8*$Pr_bas^0.4*exp(-90*$Q_bas)}"`
+# Nusselt_haut_Mc_th=`awk "BEGIN{printf \"%.2f\",0.021*(4*$Re_haut_bulk_th)^0.8*$Pr_haut^0.4*exp(-90*$Q_haut)}"`
+
+Ecart_Nu_bas=`awk "BEGIN{printf \"%.2f\", (sqrt(($Nusselt_bas_Trio-$Nusselt_bas_C_th)*($Nusselt_bas_Trio-$Nusselt_bas_C_th))/$Nusselt_bas_C_th*100)}"`
+Ecart_Nu_haut=`awk "BEGIN{printf \"%.2f\", (sqrt(($Nusselt_haut_Trio-$Nusselt_haut_C_th)*($Nusselt_haut_Trio-$Nusselt_haut_C_th))/$Nusselt_haut_C_th*100)}"`
+
+
+Nusselt_bas_Mc_th=`awk "BEGIN{printf \"%.2f\",0.021*(4*$Re_bas_bulk_th)^0.8*$Pr_bas^0.4*($T_bas/$T_bulk)^(-0.5)}"`
+Nusselt_haut_Mc_th=`awk "BEGIN{printf \"%.2f\",0.021*(4*$Re_haut_bulk_th)^0.8*$Pr_haut^0.4*($T_haut/$T_bulk)^(-0.5)}"`
+
+Nusselt_bas_PW_th=`awk "BEGIN{printf \"%.2f\",0.023*(4*$Re_bas_bulk_th)^0.8*$Pr_bas^0.4*(1+($T_bas/$T_bulk)^(0.7))}"`
+Nusselt_haut_PW_th=`awk "BEGIN{printf \"%.2f\",0.023*(4*$Re_haut_bulk_th)^0.8*$Pr_haut^0.4*(1+($T_haut/$T_bulk)^(0.7))}"`
+
+echo " $Nusselt_bas_Trio	$Nusselt_bas_C_th	$Nusselt_bas_DB_th  	$Nusselt_bas_Mc_th  " > Nusselt_bas_th.dat
+echo "$Nusselt_haut_Trio	 $Nusselt_haut_C_th	$Nusselt_haut_DB_th  	$Nusselt_haut_Mc_th " > Nusselt_haut_th.dat
+
+echo " $Nusselt_bas_Trio	$Nusselt_bas_C_th	$Ecart_Nu_bas" > Ecart_Nusselt_bas_th.dat
+echo " $Nusselt_haut_Trio	$Nusselt_haut_C_th	$Ecart_Nu_haut" > Ecart_Nusselt_haut_th.dat
+
+echo "$yplus_par_bas  $Re_bas_bulk_th   $Re_DH_bas   $Pr_bas    $Ustar_bas    $Re_t_bas_Trio    $Tstar_bas  $T_bulk  $T_bas" > propri_par_bas.dat
+echo "$yplus_par_haut $Re_haut_bulk_th  $Re_DH_haut  $Pr_haut   $Ustar_haut   $Re_t_haut_Trio   $Tstar_haut $T_bulk  $T_haut " > propri_par_haut.dat
+
+
+

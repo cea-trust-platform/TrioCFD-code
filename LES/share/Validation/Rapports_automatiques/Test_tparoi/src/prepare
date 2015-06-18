@@ -1,0 +1,4 @@
+#!/bin/bash
+sed "s?Paroi_temperature_imposee champ_front_uniforme 1  150.?Paroi_flux_impose champ_front_uniforme 1  7.820e+02 ?"  Temp_imposee.data > flux_impose.data
+
+sed "s?Turbulence_paroi   Loi_standard_hydr_scalaire?Turbulence_paroi   Loi_expert_scalaire  {  calcul_ldp_en_flux_impose 1 }?" flux_impose.data > ldp_flux_impose.data

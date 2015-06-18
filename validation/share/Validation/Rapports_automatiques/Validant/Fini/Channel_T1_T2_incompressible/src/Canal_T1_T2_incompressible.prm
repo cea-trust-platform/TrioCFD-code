@@ -1,0 +1,583 @@
+Parameters {
+	Title "Channel T1/T2 VEF "
+	Description "Periodic turbulent plane channel. Incompressible case."
+	Description "Effect of the type of mesh."
+	Description "\latex_($\displaystyle{Re_{bulk}=\frac{\rho(T_b).U_b.(h/2)}{\mu(T_b)}}$ \latex_) "
+	Description " \latex_($Re_{\tau}=0.175.Re_{bulk}^{7/8}$\latex_) (Dean's correlation)"
+	Description ""
+	Description "\latex_($\frac{T_2}{T_1}=1.01$\latex_) -  \latex_($Re_{bulk}=17605$ \latex_)  - \latex_($Re_{\tau}=908 $\latex_)"
+	Description ""
+	
+	Description "The mean velocity profile is compared with the logarithmic law."
+	Description "\latex_(The mean temperature profile is compared with linear law $T^+=PrY^+$ and the law of Kader.\latex_)"
+	Description "The Nusselt is compared with an analytical result."
+	Author "FOURNIER C"
+	
+	#Incompressible
+	#mailles plus ou moins etirees
+	TestCase "Incompressible/Canal_plan_bi_periodique_M1" "Canal_plan_bi_periodique_M1.data" /**/
+	TestCase "Incompressible/Canal_plan_bi_periodique_M10" "Canal_plan_bi_periodique_M10.data"
+	TestCase "Incompressible/Canal_plan_bi_periodique_M100" "Canal_plan_bi_periodique_M100.data"
+	
+	#maille hexaedriques tetraedrisees
+	TestCase "Incompressible/Canal_plan_bi_periodique_M1_tetraedrise" "Canal_plan_bi_periodique_M1_tetraedrise.data"
+	TestCase "Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise" "Canal_plan_bi_periodique_M1bis_tetraedrise.data"
+	
+	ParametersTrio_U "Bi-periodic plane channel in X and Z"
+	ParametersTrio_U "Convection scheme = EF_stab "
+	ParametersTrio_U "k-$\varepsilon$ modelling of turbulence"
+	ParametersTrio_U "Wall law = loi_standard_hydr (similar to loi_expert_hydr {  methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet })"
+	ParametersTrio_U "Heat transfer with imposed temperatures"
+	ParametersTrio_U "No-slip at the wall"
+
+	IncludeData 2
+}
+
+Chapter {
+	Title "Test description"
+	Figure {
+		Title "Geometry"
+		Description "Dimensions : h=4 mm, L=4 mm x (1;10;100), P=2 mm"
+		Width 12cm
+		picture Geometry.png
+	}
+	Visu {
+		Title "Mesh M1"
+		Description "3 meshes (tetrahedral elements) are made by stretching the mesh below, by a factor 1, 10 or 100 in X direction."
+		Description "Number of cells : 2214"
+        	Width 6 cm
+		mesh Incompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1.lata dom
+        	Normal3d 0.5 0.5 0.5
+	}
+	Visu {
+		Title "Mesh M1_tetraedrise"
+		Description "2 meshes (tetrahedral elements) generated from cartesian hexahedral elements are used"
+		Description "Number of cells: mesh M1_tetraedrise (drawn below) : 1536  "
+		Description "Number of cells: mesh M1bis_tetraedrise : 5184  "
+        	Width 6 cm
+		mesh Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Canal_plan_bi_periodique_M1_tetraedrise.lata dom
+        	Normal3d 0.5 0.5 0.5
+	}
+
+
+	Table {
+		Title "Initial conditions"
+		Description "Hydraulic : uniform velocity set to 80 m/s in X direction."
+		Description "Temperature : linear profile. "
+		}
+	Table {
+		Title "Boundary conditions" 
+		Description "Hydraulic : Periodicity in X and Z directions"
+		Description "Temperature : Imposed wall temperature in Y direction." 
+		Description "T1 = 673 K ; T2 = 680 K."
+	}
+	
+	
+	
+	Table {
+		Title "Physical properties"	
+		Description "Fluid domain: Helium at 70 bars and 676 K"
+		Description "Perfect gas with.....$\rho$ = 3.824 kg/m$^3$"
+		Description "..............................\latex_($\mu = 3.4753 10^{-7}$\latex_) N/m$^2$/s"
+		Description "..............................\latex_($\lambda = 2.56389 10^{-3}$\latex_) W/m/K"
+		Description "..............................\latex_($C_p = 5193$\latex_) J/kg/K"
+		Description "..............................\latex_($\beta_{th}$ = 0 K$^{-1}$\latex_)"
+		Description ""		
+	}
+	Table {
+		Title "Solving of equations"
+		Description "Pb_Thermohydraulique_Turbulent"
+		Description "Schema_Euler_Implicite - Solveur Implicite"
+		Description "Fluide_Incompressible with constant properties"
+		Description "Navier_Stokes_Turbulent"
+		Description ".........Convection { EF_stab { } }"
+		Description ".........Sources { Canal_perio { bord Periox } }"
+		Description ".........Modele_Turbulence K_Epsilon"
+		Description "Convection_Diffusion_Temperature_Turbulent"
+		Description ".........Convection { EF_stab { alpha 0.2 } }"
+		Description ".........Modele_Turbulence Prandtl"
+	}
+}
+
+Chapter {
+	Title "Velocity results"
+	
+	Figure {
+		Title "Mean axial velocity profiles for different stretch factors"
+		Description "The mean axial velocity profiles on outlet ( U$^+$ = U/U$\tau$ ; Y$^+$ = Y.U$\tau$/$\nu$ ) are compared to the law of wall : U$^+$ = 1/0.415 x ln(Y$^+$) + 5.32"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 1000
+		LogX
+		LabelY "U+"
+		RangeY 10 35
+		Include_Description_Curves 0
+		Curve {
+			legend "Low of the wall"
+			fonction 1/0.415*log(x)+5.32
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+	}
+
+	Figure {
+		Title "Comparison with mesh M1_tetraedrise"
+		Description ""
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 1000
+		LogX
+		LabelY "U+"
+		RangeY 10 35
+		Include_Description_Curves 0
+		Curve {
+			legend "Low of the wall"
+			fonction 1/0.415*log(x)+5.32
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M1_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M1bis_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise/Star_haut.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1bis_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise/Star_bas.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+	}
+	
+	Figure {
+		Title "Explanations of M1 result : contribution of transverse velocity"
+		Width 15cm
+		picture Contrib_Transv_V.png
+	}
+	Figure {
+		Title "Deviations of transverse velocity V"
+		Description ""
+		Width 12cm
+		Dimension 2
+		LabelX "Y (m)"
+		RangeX 0 0.004
+		LabelY "Delta V (m/s)"
+		RangeY -1 1
+		Include_Description_Curves 0
+		Curve {
+			legend "mesh M1"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M1_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M1bis_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M10"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M100"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/DeltaV.cut
+			origin "Trio_U"
+			columns 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Title "Deviations of transverse velocity W"
+		Description ""
+		Width 12cm
+		Dimension 2
+		LabelX "Y (m)"
+		RangeX 0 0.004
+		LabelY "Delta W (m/s)"
+		RangeY -1 1
+		Include_Description_Curves 0
+		Curve {
+			legend "mesh M1"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M1_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M1bis_tetraedrise"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M10"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "mesh M100"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/DeltaV.cut
+			origin "Trio_U"
+			columns 1 3
+			Style linespoints
+		}
+	}
+	Table {
+		Title "Conclusions"
+		Description "The result obtained with the mesh M1 is not conclusive and can be interpreted by a non negligeable contribution of the deviation of transverse velocities."
+		Description "However the meshes M10 and M100 (made by stretching the mesh M1) and the meshes generated from cartesian hexahedral elements (M1_ tetraedrise and M1bis_tetraedrise) give results very close to the objectives."
+		}
+}
+Chapter {
+	Title "Temperature results"
+	Figure {
+		Title "Mean temperature profiles for different stretch factors"
+		Description "The mean temperature profiles on outlet ( T$^+$ = T/T$\tau$ \& T$\tau$ = $\varphi$/(rho.Cp.U$\tau$) ;   Y$^+$ = Y.U$\tau$/$\nu$ ) are compared to the linear law T$^+$ = PrY$^+$ and the law of Kader :"
+		Description ""
+		Description "T$^+$ = PrY$^+$exp(-$\Gamma$) + [2.12 ln(1+Y$^+$)+$\beta$(Pr)]exp(-1/$\Gamma$)"
+		Description "With"
+		Description "$\Gamma$ = 0.01(PrY$^+$)$^4$ / (1+5Y$^+$Pr$^3$)"
+		Description "$\beta$(Pr) = (3.85Pr$^1$$^/$$^3$ - 1.3)$^2$ + 2.12 ln(Pr)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 1 10000
+		LogX
+		LabelY "T+"
+		RangeY 0 30
+		Include_Description_Curves 0
+		Curve {
+			legend "Pr.Y+"
+			fonction 0.6733*x
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Kader"
+			fonction (0.6733*x*exp(-((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3)))+(2.12*log(1+x)+((3.85*0.6733**(0.3333)-1.3)**2+2.12*log10(0.6733)))*exp(-1/((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))))
+			# gamma = ((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))
+			# beta  = ((3.85*0.6733**(0.3333)-1.3)**2+2.12*log(0.6733))
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M10"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M10"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M100"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M100"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+	}
+
+	Figure {
+		Title "Comparison with mesh M1_tetraedrise"
+		Description ""
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 1 10000
+		LogX
+		LabelY "T+"
+		RangeY 0 30
+		Include_Description_Curves 0
+		Curve {
+			legend "Pr.Y+"
+			fonction 0.6733*x
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Kader"
+			fonction (0.6733*x*exp(-((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3)))+(2.12*log(1+x)+((3.85*0.6733**(0.3333)-1.3)**2+2.12*log10(0.6733)))*exp(-1/((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))))
+			# gamma = ((0.01*(0.6733*x)**4)/(1+5*x*0.6733**3))
+			# beta  = ((3.85*0.6733**(0.3333)-1.3)**2+2.12*log(0.6733))
+			Style lines
+			TypeLigne 0
+		}
+		Curve {
+			legend "Hot wall mesh M1"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M1_tetraedrise"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1_tetraedrise"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Hot wall mesh M1bis_tetraedrise"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise/Star_haut.cut
+			columns 1 3
+			Style linespoints
+		}
+		Curve {
+			legend "Cold wall mesh M1bis_tetraedrise"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise/Star_bas.cut
+			columns 1 3
+			Style linespoints
+		}	
+		
+	}
+
+
+	Table {
+		Title "Nusselt Calculation"
+		Description "\latex_($\displaystyle{Nu=\frac{D_h.\left(\frac{dT}{dy}\right)}{\triangle\,T}}$\latex_) ; \latex_($D_h$\latex_)=hydraulic diameter"
+		Description "Classical correlations found in the literature (like Colburn or Dittus Boelter correlation) were acquired in cases where walls are subjected to an imposed flux or to the same temperature for each wall. None of them seem applicable in case both walls are subjected to different temperatures."
+		Description "In order to validate TrioU calculation, we compare TrioU results with approximate numerical solutions corresponding to convection in turbulent flow between parallel plates with unequal uniform temperature (ref. 1.). Danov proposes the following formulation for Nusselt number :"
+		Description "\latex_($\displaystyle{Nu_{Danov}=\frac{1}{4*\int_0^{1}\frac{dy^+}{1+\frac{Pr}{Pr_t}\left(\frac{(\overline{u'v'})^{++}}{1-(\overline{u'v'})^{++}} \right)}}}$\latex_)"
+		Description "with \latex_($(\overline{u'v'})^{++}=-\rho \overline{u'v'}/\tau $ \latex_)"
+		Description "We need an evaluation of the turbulent shear stress to calculate the Nusselt number numerically. In reference 1, the author uses a correlating equation based on a experimental data for a round tube and supposed to be valid for a flow between parallel plates. This correlation is detailed just below :"
+		Description "\latex_($ (\overline{u'v'})^{++}=\left(\left[0.7\left(\frac{y^+}{10}\right)^3\right]^{-8/7}+\left[exp\left(\frac{-1}{0.436y^+}\right)-\frac{1}{0.436Re_{\tau}}\left(1+\frac{6.95y^+}{Re_{\tau}}\right)\right]^{-8/7}\right)^{-7/8}$\latex_)"
+		Description "In our case, \latex_($Pr=0.667$\latex_),\latex_($Pr_t=0.9$\latex_), \latex_($Re_{\tau}=908 $\latex_) and \latex_($Nu_{Danov}=93$\latex_)."
+		Description " "
+		nb_columns 2
+		label \latex_($Nu_{TrioU}$\latex_)  |  \latex_($\Delta Nu_{Danov} (\%) $\latex_) 
+		line {
+			legend "M1"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1/Nusselt.dat
+		}
+		line {
+			legend "M10"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M10/Nusselt.dat
+		}
+		line {
+			legend "M100"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M100/Nusselt.dat
+		}
+		line {
+			legend "M1_tetraedrise"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Nusselt.dat
+		}
+		line {
+			legend "M1bis_tetraedrise"
+			origin "Trio_U"
+			file ./Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise/Nusselt.dat
+		}
+		Description "Triou results are very close to the analytical result except for the mesh M1 which is not a recommanded mesh (ref : Explanations of M1 result : contribution of transverse velocity \latex_(\S3.4\latex_) )"	
+	}
+	
+}
+
+
+
+
+Chapter {
+Title "Performances"
+#	tableau_performance { 
+#	}
+# on n' utilise pas Table performance a cause  des noms
+Table {
+		nb_columns 5
+		label  host|system|Total CPU Time|CPU time/step|number of cell
+		line {
+			legend Incompressible/M1
+			origin Trio_U
+			file Incompressible/Canal_plan_bi_periodique_M1/Canal_plan_bi_periodique_M1.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Incompressible/M10
+			origin Trio_U
+			file Incompressible/Canal_plan_bi_periodique_M10/Canal_plan_bi_periodique_M10.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Incompressible/M100
+			origin Trio_U
+			file Incompressible/Canal_plan_bi_periodique_M100/Canal_plan_bi_periodique_M100.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Incompressible/M1_tetraedrise
+			origin Trio_U
+			file Incompressible/Canal_plan_bi_periodique_M1_tetraedrise/Canal_plan_bi_periodique_M1_tetraedrise.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		line {
+			legend Incompressible/M1bis_tetraedrise
+			origin Trio_U
+			file Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise/Canal_plan_bi_periodique_M1bis_tetraedrise.perf
+			columns $2 $3 $4 $5 $6
+			nb_columns_file 6
+		}
+		
+		
+		line {
+			legend Total
+			origin Trio_U
+			file temps_total
+			columns rien rien $1 rien rien
+			nb_columns_file 1
+		}
+	}
+}
+
+Chapter {
+Title "Bibliography"
+Description "1. Stanislav N. Danov, Norio Arai and Stuart W. Churchill, Exact formulations and nearly exact numerical solutions for convection in turbulent flow between parallel plates, International Journal of Heat and Mass Transfer, Number 43, pp. 2767-2777, 2000."
+
+}
+

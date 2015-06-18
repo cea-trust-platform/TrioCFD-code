@@ -1,0 +1,76 @@
+# Preparation des cas tests
+for cas in `awk '/TestCase / {gsub("\"","",$2);print $2}' forme.prm | sort -u`
+do
+   mkdir -p $cas
+   cd $cas
+   # Copie du post_run
+   ln -s -f ../post_run .
+   # Copie du pre_run
+   ln -s -f ../pre_run .
+   # Copie du maillage
+   ln -s -f ../$cas.med forme.med
+   # Creation du forme.geo (important pour post_run)
+   awk -v cas=$cas '/ : / && ($4==cas) {Forme=$2} // {if ($1=="Forme") print "Forme = "Forme";";else print $0}' ../forme.geo > forme.geo
+   update_geo=0
+   if [ "$update_geo" = 1 ]
+   then      
+      gmsh -2 forme.geo -format med 1>gmsh.log 2>&1 || exit -1
+      echo "Update of the mesh $cas.med..."
+      src=$TRUST_ROOT/Validation/Rapports_automatiques/Validant/pas_fini/Drag/src
+      CHECKOUT $src/$cas.med 
+      cp -f forme.med $src/$cas.med 
+      CHECKIN $src/$cas.med
+   fi
+   # Boucle sur 2 modeles
+   for modele in keps lm
+   do
+       # Creation du jeu de donnee
+       cat ../seul.data > $modele.data
+       cat ../forme.data >> $modele.data
+       
+       if [ $modele = lm ]
+       then
+          echo $ECHO_OPTS "1,$ s?Distance_paroi?Distance_paroi dom 1 Forme binaire?g\nw" | ed $modele.data 1>/dev/null 2>&1
+          echo "
+	       modele_turbulence longueur_melange { dmax 1000 fichier dom_Wall_length.xyz turbulence_paroi loi_standard_hydr }" >> $modele.data  
+       elif [ $modele = keps ]
+       then
+          echo $ECHO_OPTS "1,$ s?Distance_paroi??g\nw" | ed $modele.data 1>/dev/null 2>&1
+          echo "
+               modele_turbulence K_Epsilon {
+                     Transport_K_Epsilon
+                     {
+
+                             convection { amont }
+                             diffusion { }
+                             boundary_conditions {
+                                    Haut        symetrie
+                                    Axe         symetrie
+                                    Forme       Paroi
+                                    Sortie      frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 1.44 43
+                                    Entree      frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 1.44 43
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
+                      }
+                      turbulence_paroi loi_standard_hydr
+                }" >> $modele.data    
+       fi
+       echo "        }
+	Postraitement
+	{
+	    format lata
+	    Champs dt_post 1
+	    { 
+		    vitesse elem
+		    pression_pa elem
+		    y_plus elem
+	    }
+	}
+}
+Solve pb" >> $modele.data
+
+      # Menage
+      rm -f *.xyz
+   done
+   cd -
+done

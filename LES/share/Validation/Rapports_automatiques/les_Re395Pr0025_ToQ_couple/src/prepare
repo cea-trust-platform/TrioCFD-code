@@ -1,0 +1,25 @@
+#!/bin/bash
+
+mkdir -p VDF_Coupling
+mkdir -p VEF_Coupling
+mkdir -p VEF_Coupling_facsec1
+mkdir -p VEF_Coupling_RK
+
+cp post_run VDF_Coupling
+cp post_run VEF_Coupling
+cp post_run VEF_Coupling_facsec1
+cp post_run VEF_Coupling_RK
+
+cp les_Re395Pr0025_VEF.data VEF_Coupling/les_Re395Pr0025.data
+cp les_Re395Pr0025_VDF.data VDF_Coupling/les_Re395Pr0025.data
+
+sed "s/_SCHTPS_/sch_Impl/" les_Re395Pr0025_VEF.data > VEF_Coupling/les_Re395Pr0025.data
+
+sed "s/_SCHTPS_/sch_Impl/" les_Re395Pr0025_VEF.data > VEF_Coupling_facsec1/les_Re395Pr0025.data
+sed "s/facsec 4/facsec 1/"  VEF_Coupling_facsec1/les_Re395Pr0025.data > VEF_Coupling_facsec1/temp 
+sed "s/facsec_max 4/facsec_max 1/"  VEF_Coupling_facsec1/temp > VEF_Coupling_facsec1/temp2
+mv VEF_Coupling_facsec1/temp2  VEF_Coupling_facsec1/les_Re395Pr0025.data
+rm VEF_Coupling_facsec1/temp 
+
+
+sed "s/_SCHTPS_/sch_RK/" les_Re395Pr0025_VEF.data > VEF_Coupling_RK/les_Re395Pr0025.data

@@ -1,0 +1,92 @@
+# Hydraulique Poiseuille - maillage tetra #
+ # Pressure-drop - Amont - coarse # 
+  dimension 3 
+  Pb_hydraulique pb
+  Domaine dom
+
+# Read_file DOM_DOM trio_hex4DOM_geo.asc #
+
+Read_file dom  R5_Z10.geom
+
+Postraiter_domaine { domaine dom format lml fichier geom.lata }
+
+# Read_file DOM_DOM hex.geom #
+
+VEFPreP1B dis
+
+schema_Euler_explicite sch
+
+Read sch
+{
+	tinit   0.
+	nb_pas_dt_max 3
+	tmax    60.
+	dt_min  1.e-4
+	dt_max  10.
+	dt_impr 0.001
+	dt_sauv 10.
+	seuil_statio 1.e-18
+}
+	
+Fluide_Incompressible fluid
+Read fluid
+{
+	mu  Champ_Uniforme 1 0.02 
+	rho Champ_Uniforme 1 2.
+}
+Associate pb dom
+Associate pb sch
+Associate pb fluid
+
+Discretize pb dis
+
+Read pb
+{
+   Navier_Stokes_standard
+      {
+        solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-6  }   
+           convection { Amont }
+           diffusion { }
+        conditions_initiales  {
+           vitesse champ_uniforme 3 0 0 0.5
+                               }
+        boundary_conditions   {
+           paroi paroi_fixe
+           derriere Frontiere_ouverte_pression_imposee  Champ_Front_uniforme 1 0.
+           devant Frontiere_ouverte_pression_imposee  Champ_Front_uniforme 1 1.6 
+                              }
+        }
+
+    Postraitement 
+    {
+      format lml
+      Sondes 
+	{
+	 sonde_P_entree  pression periode 0.1 points 1   0.0  0.0   0.010 
+	 sonde_P_sortie  pression periode 0.1 points 1   0.0  0.0   19.99 
+	 sonde_Vz_quart  vitesse periode  0.1 points 1   0.0  0.0    5.0
+	 sonde_Vz_sortie vitesse periode  0.1 points 1   0.0  0.0    19.99
+	 
+	 sonde_V_entree_hor  vitesse periode  0.1 segment 20  0.0 1.0  0.01    0.0 -1.0 0.01
+	 sonde_V_entree_vert vitesse periode  0.1 segment 20  1.0 0.0  0.01   -1.0  0.0 0.01
+	 sonde_V_sortie_hor  vitesse periode  0.1 segment 20  0.0 1.0 19.99    0.0 -1.0 19.99
+	 sonde_V_sortie_vert vitesse periode  0.1 segment 20  1.0 0.0 19.99   -1.0  0.0 19.99
+	 sonde_P_in_out pression periode 0.1 segment 40  0.0 0.0 0.0     0.0  0.0  20.
+
+	}
+      Champs dt_post 1.0
+	{
+	  pression 
+	  vitesse 
+	}
+    }
+   
+}
+Solve pb
+End 
+
+  reprise formatte poise_tetra_2.sauv
+
+
+
+

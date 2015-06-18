@@ -1,0 +1,7 @@
+#!/bin/bash
+grep -v trianguler_h Chimie_grains_v13_vef.data | sed "s/VEFPrep1b/VDF/" >  Chimie_grains_v13.data
+sed "s/nb_sous_pas_de_temps_reaction 100/nb_sous_pas_de_temps_reaction 1/" Chimie_grains_v13.data > Chimie_grains_v13_1pas.data
+for file in  Chimie_grains_v13_vef.data  Chimie_grains_v13.data
+do
+sed "s/A Champ_Uniforme 1 1/A Champ_Uniforme 1 1e-3/" $file > def_$file
+done

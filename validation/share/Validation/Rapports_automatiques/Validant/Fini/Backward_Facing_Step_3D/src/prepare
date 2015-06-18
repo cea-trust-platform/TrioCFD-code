@@ -1,0 +1,220 @@
+#!/bin/bash
+
+parse()
+{
+   sed "s/\$l/$l/g
+	s/\$h/$h/g
+	s/\$H_SUR_2/$H_SUR_2/g
+	s/\$H/$H/g
+	s/\$L/$L/g
+	s/\$mu/$mu/g
+	s/\$rho/$rho/g
+	s/\$Reynolds/$Reynolds/g
+	s/\$TURB/$TURB/g
+	s/\$DIM/$DIM/g
+	s/\$ZERO/$ZERO/g
+	s/\$NZ/$NZ/g
+	s/\$NX1/$NX1/g
+	s/\$NX2/$NX2/g
+	s/\$NX3/$NX3/g
+	s/\$NY1/$NY1/g
+	s/\$NY2/$NY2/g
+	s/\$NY3/$NY3/g
+	s/\$FX1/$FX1/g
+	s/\$FX2/$FX2/g
+	s/\$FX3/$FX3/g
+	s/\$FY1/$FY1/g
+	s/\$FY2/$FY2/g
+	s/\$FY3/$FY3/g
+	s/\$NB_PROCS_VDF/$NB_PROCS_VDF/g
+	s/\$NB_PROCS_VEF/$NB_PROCS_VEF/g
+	s/\$COL_UX1/2/g
+	s/\$COL_UX2/`echo 2+$DIM | bc`/g
+	s/\$U_IMPOSED/$U_IMPOSED/g
+   	s/\$VELOCITY_IMPOSED/$DIM $U_IMPOSED 0. $ZERO/g
+   	s/\$TMAX_IMPOSED/$TMAX_IMPOSED/g
+	s/\$KEPS_IMPOSED/$KEPS_IMPOSED/g
+   	s/\$SCHEME_IMPOSED/$SCHEME_IMPOSED/g
+	s/\$TIME_SCHEME/$TIME_SCHEME/g
+	s/\$OPTIONS_TIME_SCHEME/$OPTIONS_TIME_SCHEME/g
+	s/\$BOUNDARY/`[ $DIM = 3 ] && echo SYMMETRY symetrie`/g
+	s/\$SLICE/`[ $DIM = 3 ] && echo Operator slice2d 0. 0. 0. 0. 0. 1.`/g
+	s/\$VELOCITY_PROBES/2 $h -$h_sur_2 $ZERO $h_fois_8 $ypm $ZERO/g
+	s/\$VELOCITY_PROFILE_WALL1/$NX3 		0. 	$ypm 	$ZERO 		$L 	$ypm 	$ZERO/g
+	s/\$VELOCITY_PROFILE_WALL2/$NX3 		0. 	$ypm 	`[ $DIM = 3 ] && echo $H_SUR_4` 	$L 	$ypm 	`[ $DIM = 3 ] && echo $H_SUR_4`/g
+	s/\$VELOCITY_PROFILE_WALL3/$NX3 		0. 	$ypm 	`[ $DIM = 3 ] && echo $H_SUR_2` 	$L 	$ypm 	`[ $DIM = 3 ] && echo $H_SUR_2`/g
+	s/\$VELOCITY_PROFILE_WALL4/$NX3 		0. 	$ypm 	`[ $DIM = 3 ] && echo $H_fois_0_75` 	$L 	$ypm 	`[ $DIM = 3 ] && echo $H_fois_0_75`/g
+	s/\$VELOCITY_PROFILE_WALL5/$NX3 		0. 	$ypm 	`[ $DIM = 3 ] && echo $H` 		$L 	$ypm 	`[ $DIM = 3 ] && echo $H`/g
+	s/\$VELOCITY_PROFILE_X_-4h/$NY23	-$h_fois_4 	0. 	$ZERO 	-$h_fois_4 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_-h/$NY23 	-$h	 	0. 	$ZERO 	-$h	 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_0h/$NY23 	0.  		0. 	$ZERO 	0.        	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_1.333h/$NY23 	$h_fois_1_333 	-$h 	$ZERO 	$h_fois_1_333 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_2.666h/$NY23 	$h_fois_2_666 	-$h 	$ZERO 	$h_fois_2_666 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_5.333h/$NY23 	$h_fois_5_333 	-$h 	$ZERO 	$h_fois_5_333 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_6.22h/$NY23 	$h_fois_6_22 	-$h 	$ZERO 	$h_fois_6_22 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_7.113h/$NY23 	$h_fois_7_113 	-$h 	$ZERO 	$h_fois_7_113 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_8h/$NY23 	$h_fois_8 	-$h 	$ZERO 	$h_fois_8 	$H 	$ZERO/g
+	s/\$VELOCITY_PROFILE_X_9.780h/$NY23 	$h_fois_9_780	-$h 	$ZERO 	$h_fois_9_780 	$H 	$ZERO/g
+        s/\$DISCRETIZATION_IMPOSED/$dis/g
+	s/\$PROBE_LOC/$PROBE_LOC/g" $1
+}
+
+DIM=3		# Dimension du cas
+U_IMPOSED=18.2	# Vitesse de reference
+TURB=3 		# 3% de turbulence en entree
+h=0.0381	# Hauteur de marche h
+H=0.0762	# H=2*h (attention dans Kim, H designe h)
+L=0.8
+l=0.1524	# l=4h
+y=0.002 	# Epaisseur premiere maille desiree
+F=1.10
+mu=0.0000181
+rho=1.15
+# Choix du parallelisme
+NB_PROCS_VDF="" && [ $HOST = castor ] && NB_PROCS_VDF="2"
+NB_PROCS_VEF="" && [ $HOST = castor ] && NB_PROCS_VEF="12"
+# Valeurs calculees
+Reynolds=`echo "$U_IMPOSED*$H/$mu*$rho" | bc -l | awk '{print int($1)}'`
+H_SUR_2=`echo "$H/2" | bc -l`
+H_SUR_4=`echo "$H/4" | bc -l`
+H_fois_0_75=`echo "$H*0.75" | bc -l`
+h_sur_2=`echo "$h/2" | bc -l`
+h_fois_1_333=`echo "1.333*$h" | bc -l`
+h_fois_2=`echo "2*$h" | bc -l`
+h_fois_2_666=`echo "2.666*$h" | bc -l`
+h_fois_4=`echo "4*$h" | bc -l`
+h_fois_5_333=`echo "5.333*$h" | bc -l`
+h_fois_6_22=`echo "6.22*$h" | bc -l`
+h_fois_7_113=`echo "7.113*$h" | bc -l`
+h_fois_8=`echo "8*$h" | bc -l`
+h_fois_9_780=`echo "9.78*$h" | bc -l`
+
+TMAX_IMPOSED=`echo 5*$L/$U_IMPOSED | bc -l`
+K_IMPOSED=`echo "1.5*$TURB/100*$TURB/100*$U_IMPOSED*$U_IMPOSED" | bc -l`
+EPS_IMPOSED=`echo "0.16*sqrt($K_IMPOSED^3)/(0.07*$H)" | bc -l`
+KEPS_IMPOSED=$K_IMPOSED" "$EPS_IMPOSED
+PROBE_LOC="nodes"
+##############
+# Maillage VDF
+##############
+if [ $F = 1 ]
+then
+   NX1=`echo $l/$y | bc`
+   NY1=`echo $H/$y | bc`
+   NX2=`echo $L/$y | bc`
+   NY3=`echo $h/$y | bc`
+   FX1=$F
+   FY1=$F
+   FX2=$F
+   FY3=$F
+else
+   FX1=`echo "1/$F" | bc -l`
+   FY1=$F
+   FX2=1.05
+   FY3=$F
+   NX1=`echo "(1+l(1+$l*(1/$FX1-1)/$y)/l(1/$FX1))" | bc -l | awk '{print int($1)}'`
+   NY1=`echo "(1+l(1+$H*($FY1-1)/2/$y)/l($FY1))"   | bc -l | awk '{print int(2*$1)}'`
+   NX2=`echo "(1+l(1+$L*($FX2-1)/$y)/l($FX2))"     | bc -l | awk '{print int($1)}'`
+   NY3=`echo "(1+l(1+$h*($FY3-1)/2/$y)/l($FY3))"   | bc -l | awk '{print int(2*$1)}'`
+fi
+INY3=`echo "$NY3/2" | bc`
+ypm=`echo "-$h+0.5*$h*($FY3-1)/($FY3^$INY3-1)/2" | bc -l`	# y premiere demie maille reelle (Voir Pave.cpp)
+FY2=$FY1
+NY2=$NY1
+FX3=$FX2
+NX3=$NX2
+NZ=`echo $H/$y | bc`
+NZ=11
+NY23=`echo $NY2+$NY3 | bc`
+ZERO="0" && [ $DIM = 2 ] && ZERO=""
+################
+
+#####################
+# Modification du prm
+#####################
+prm=`ls *prm 2>/dev/null`
+parse $prm.base > $prm
+
+######################################################
+# Creation des jeux de donnees selon la discretisation
+######################################################
+for dis in VDF VEFPreP1B
+do
+   
+   # Create directory
+   #rm -r -f $dis
+   mkdir -p $dis
+   cd $dis
+   # pour le grep dans pre_run
+   cp ../prepare info.prepare
+   cp ../x_-4h.csv .
+   if [ $dis = VDF ]
+   then
+      SCHEME_IMPOSED="quick"
+      TIME_SCHEME="Schema_euler_explicite" 
+      OPTIONS_TIME_SCHEME=""
+      NB_PROCS=$NB_PROCS_VDF
+      # Maillage VDF
+      parse ../$dis.geo > dom.geo       
+   else
+      SCHEME_IMPOSED="ef_stab { alpha 1 }" # alpha = 0.2 diverge en QDM et provoque des pics de viscosite turbulent en KEps
+      TIME_SCHEME="Schema_euler_implicite" 
+      OPTIONS_TIME_SCHEME="facsec 30 facsec_max 60 solveur implicite { solveur petsc bicgstab { precond diag { } seuil 1.e-1 impr } }"
+      NB_PROCS=$NB_PROCS_VEF
+      # 3 maillages possibles:
+      # 1) VDF tetraedrise
+      # 2) VEF Gambit
+      # 3) VEF Gambit plus fin
+      num_mesh=3
+      if [ $num_mesh = 1 ]
+      then
+         echo "read_file dom ../VDF/dom3D.geom tetraedriser dom" > dom.geo
+      else
+         [ $num_mesh = 2 ] && mesh=Marche3D.msh
+	 [ $num_mesh = 3 ] && mesh=Marche3Dfin.msh
+         gunzip -f -c ../$mesh.gz  > $mesh
+         echo "lire_tgrid dom $mesh" > dom.geo
+	 # Les coordonnees en Z du maillage sont a inverser en VEF 3D...
+	 [ $DIM = 3 ] && echo "Transformer dom x y -z" >> dom.geo 
+      fi
+   fi
+   ##################################################
+   # En 2D on extrait la frontiere SUD du maillage 3D
+   ##################################################
+   if [ $DIM = 2 ]
+   then
+      # Le maillage 3D doit avoir des bords SUD et NORD
+      echo "
+Domaine dom2D
+Extract_2D_from_3D dom SUD dom2D 
+ecrire_fichier dom2D dom2D.geom
+dimension 2
+read_file dom dom2D.geom" >> dom.geo
+   else
+      # On regroupe SUD et NORD en un bord SYMMETRY
+      echo "RegroupeBord dom SYMMETRY { SUD NORD }" >> dom.geo
+   fi
+   # On ajoute un VerifierCoin en VEF:
+   [ $dis = VEFPreP1B ] && echo "VerifierCoin dom { }" >> dom.geo
+   # Copie/create data files
+   parse ../test.data > test.data
+   cp ../post_run .
+   cp ../pre_run .
+   
+   ##########################################
+   # Creation d'un jeu de donnees parallele #
+   ##########################################
+   if [ "$NB_PROCS" != "" ]
+   then
+      make_PAR.data test.data $NB_PROCS
+      mv -f PAR_test.data test.data
+   fi
+   
+   ###############################################################
+   # Construction d'un jeu de donnees prepare.data pour le pre_run
+   ###############################################################
+   sed "s/tmax /nb_pas_dt_max 1 tmax /g
+        s/solveur_pression/Ecrire_fichier_xyz_valeur vitesse 0.001 bords 1 INLET solveur_pression/g
+	s/Champ_Front_LU dom $DIM VELOCITY_PROFILE_INLET.dat/Champ_front_uniforme $DIM 0. 0. $ZERO/g" test.data > prepare.data
+   cd -
+done

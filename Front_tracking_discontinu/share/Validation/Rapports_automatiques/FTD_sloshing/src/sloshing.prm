@@ -1,0 +1,233 @@
+Parameters {
+	Title Sloshing experiment
+	Description VDF discretisation
+	ParametersTrio_U Type of fluid : air and water at 293K
+	Author S.Pigny
+	TestCase sloshing sloshing.data 8 /* data set in annex */
+}
+
+Chapter {
+	Title "Objectives of the application"
+	
+	Description "The test deals with an experiment in which the main phenomenon consists in free surface oscillations. The flow is transient, the fluid is water in an air environment. A cylindrical pool is divided in two concentric parts. In the inner cylinder is initially present a water column higher than the water level in the external cylinder. The initial state of the system is presented in figure 1. When the water column is released a sloshing motion of the liquid between the symmetry axis and the outer wall of the cylindrical pool is initiated. The main goal of the simulation is to compute the free surface flow and to predict the motion of the free surface correctly. This is important for the simulation of Pressurized Thermal Shock relevant steam water flows in the horizontal cold legs of PWRs. The original test case reference is Maschek et al. (1992). Despite the apparent simplicity of the case (the interface is reduced to one sheet), no analytical solution exists for this case."
+	Figure {
+	Title "Figure 1 : Sloshing in the pool: schematic representation of the experiment."
+	Width 12cm
+        picture Pavepave.png
+	}
+}
+Chapter {
+	Title "Description of the case"
+	Description "A cylindrical water column with a diameter of 11 cm and an initial height of 20 cm, is centered in a cylindrical pool with an outer diameter of 44 cm. The initial water level in the pool is 5 cm (D1X-3 experiment). The water sloshing is initiated by lifting quickly the sheet around the inner cylinder. The flow develops in several directions. Its kinetic energy is not conserved due to the action of some internal or external mechanism. Consequently, the mechanical energy of the system decreases. Maschek et al. (1992) described in their report the formation of a water wave with a defined wave surface moving towards the outer wall of the pool. At the same time the water column itself forms a wave, which moves outwards in the deep water at the bottom of the pool (visualized in the experiments by colouring the water in the water column and the initial water level in the pool differently). The water wave finally impacts the outer wall and climbs up. Then the water sloshes back towards the centre and forms a water hump without a significant peak. A rolling wave motion can be discriminated and this wave again sloshes outward. The next in-slosh forms the highly centralized sloshing peak. This peak collapses and induces further oscillations which show a pattern of interchanging water humps and water peaks. The motions are reproduced in the following figure."
+	Description "\latex_(\newpage\latex_)"	
+	Figure {
+	Title "Figure 2 : Sloshing in the pool (from left to right and top to bottom)."
+	Description "In the 1\latex_($^{st}$\latex_) picture the initial state of the system is represented. In the 9\latex_($^{th}$\latex_) picture the second peak occurs."
+	Width 15cm
+        picture slosh1.png
+	}
+	Figure {
+	Width 15cm
+        picture slosh3.png
+	}	
+	}
+	Chapter {
+Description "In the water step problem, standing wave phenomena could be observed in the experiments. The surfaces were much more stable and smooth than in the dam break experiments and the atomization process of the flow occurred only at the highest central sloshing peak. Detailed experimental data are provided by Maschek et al. (1992). They deal with the value of the wave maxima and the times of their occuring. The formation of a single wave and thus a clearly defined wave surface, allowed for accurate measurements of wave amplitude as a function of time. The first wave from the centre towards the wall is labelled 'Wall 1'. Then the wave is reflected back to the centre of the pool where the first peak appears (Peak 1). The third measurement is the second peak (Peak 2)."
+Description "Experimental features and data"
+Description "The basic experimental set-up to initiate the liquid sloshing process and simulating the diverging and converging water waves consisted of two Plexiglas cylindrical containers. By lifting the inner container the cylindrical water step problem could be simulated. In the experiment a central water column with different heights (5-20 cm) and diameters (11 cm and 19 cm) were released from a Plexiglas cylinder, which was moved upwards with a speed of approximately 3 m/s. This velocity was sufficient to obtain a free standing water column. The height of the waterlevel in the outer cylinder was varied from 1-10 cm. The water motion was filmed by a video and a high speed camera. In this way sloshing heights and velocities of reassembling liquids could be determined. The water density is 998 kg/m3 at a temperature of 22 C. For the D1X-3 experiment, which forms the basis for this verification test case, in the report of Maschek et al., a height of the Peak 2 of about 50 +/- 5 cm at t = 1.12s was reported. From discussions it was pointed out that this measured height of the Peak 2 corresponded to the height reached by larger droplets which had been formed by atomisation process on top of the rebounding water wave. The height of the continuous water level in these experiments was claimed to be 22 cm as stated in table 6.1. Furthermore it should be mentioned that the outward slosh and the pile-up of the water at the outer wall was very stable for all experiments performed. From this stable configuration however no conclusion could be drawn on the stability of the later converging water wave. In many cases the sloshing peak was strongly distorted sidewise or did not build-up correctly. These experiments were not taken into account. So the measurement data reflect only the successful experiments." 
+	  }
+Chapter {
+	Title "The interest of the case"
+	Description "The test case is useful to investigate the following numerical features, as defined by Pigny and Coste (2001), Pigny et al. (2004) : in this case a one-sheet interface between air and water crosses the mesh: it is therefore of interest to check the robustness of the algorithms with respect to residual phases treatment ; the case is useful to check the numerical diffusion and, possibly, dispersion, laying an emphasis on the damping of main oscillations). Concerning the diffusion of void fraction fronts, if it occurs it is easy to underline in it the role of physical modelling and the role of numerical features, in view of the damping of the oscillations ; accuracy of mass balances ; finally, the CPU time required for calculations should be investigated here.		 
+}
+Chapter {
+	Title "Computational representation"
+	Description "The values of the wave maxima and their times are expected. Due to the simple position of the interface during the time, some pictures about maxima are expected, too. The flow is two-phase, isothermal, laminar: only molecular viscosity is taken into account in the calculations. Among volumic forces, only gravity is taken into account. No turbulence model is considered. Gas lays above the liquid. Above it, far from the free surface, the pressure is considered atmospherical. Solid walls are considered for vertical and lower horizontal boundaries."
+}
+Chapter {
+	Title "Results-analysis"
+	Description "Residual phase treatment"
+	Description "\latex_(\vspace{0.2cm}\latex_)"	
+	Description "In the cells crossed by the interface, the void fraction varies in all the range between 0 and 1. Nevertheless, no particular numerical problem occured, when the calculations were carried out. The residual phase treatment does not face any difficulty in that case."
+	Description "Numerical diffusion and maxima of amplitude"
+	Description "The maxima are described in the following table. In figures 6.3 to 6.8 the amplitudes of the first wave close to the wall, and of the first and the second peak, at the center of the pool are represented. Unphysical peaks are present above the physical ones. This mathematical effect is due to the use of a finite volume approach in polar geometry. The heights of the peaks are estimated after elimination of the centerline peak. On can see that the representation of the waves do not suffer noticeable unphysical damping, due to numerical diffusion. The relative mass error is very low. The CPU time can be accepted."
+Table {
+	Title "Table 6.1 : experimental times and amplitudes of maxima."
+	legend toto
+	nb_columns 4
+	label Time (s) | +/- (s) | Height (m) | +/- (m)
+	
+	line { 
+		legend at wall
+		values 0.36 0.04 0.11 0.01
+	}
+	line { 
+		legend peak 1
+		values 0.62 0.04 0.15 0.03
+	}
+	line { 
+		legend peak 2
+		values 1.24 0.04 0.22 0.02
+	}
+	}
+}
+Chapter {
+	Title "Trio_u options for the calculations"
+	Description "In the input data, we considered the following options:"
+	Description "Time scheme : schema_euler_explicite"
+	Description "Convection space scheme : quick"
+	Description "Remaillage"
+	Description "nb_iter_remaillage 2"
+        Description "critere_remaillage 0.2"	
+	Description "facteur_longueur_ideale 0.9"
+	Description "The most recommended option deals with the way gravity effects are taken into account. The option triokeyword(gravite rho_g) has been preferred, rather than triokeyword(grad_I)."
+}
+Chapter {
+Figure {
+	Title "Liquid height at center"
+	Description "Integral of the liquid phase indicator weighted by a gaussian function exp(-(r*r)/(r0*r0)) where r is the distance to the axis of the cylinder, and rescaled to obtain an average liquid height. The red curve represents the average height on a large disc, and the blue one on a small disc. The second peak is very thin, the blue curve must therefore be considered to evaluate the maximum liquid height."
+	Dimension 2
+	LabelX "s"
+	LabelY "m"
+	Include_Description_Curves 0
+	Curve {
+		legend "r0 = 0.031"
+		origin "Trio_U"
+		file ./sloshing/hauteur1.txt
+		columns $1 $2
+		Style linespoints
+	}
+	Curve {
+		legend "r0 = 0.01"
+		origin "Trio_U"
+		file ./sloshing/hauteur2.txt
+		columns $1 $2
+		Style linespoints
+	}
+	Curve {
+		legend "r0 = 0.0031"
+		origin "Trio_U"
+		file ./sloshing/hauteur3.txt
+		columns $1 $2
+		Style linespoints
+	}
+	Curve {
+	        legend "experimental"
+		origin "experimental results with reported tolerances"
+		file experimental_results.txt
+		Style lines
+	}
+}
+}
+Chapter {
+	Description "Figure 6.2 : in this diagram, we represent the altitude of the interface in the center of the pool, in the calculation and in the experiment. The experimental value deals with the purple rectangles, where the data are given with uncertainties. Concerning the calculation, the different curves correspond to different values of the parameter r0, which is the radius of the region at the center of the pool over which the altitude of the peak is calculated, by the mean of an averaging operation."	
+}
+Chapter {
+	Description "\latex_(\vfill\latex_)"	
+}
+Chapter {
+visu {
+	Title "General mesh"
+# 	width 15cm, viewport= 0 0 1024 400, clip
+        mesh sloshing/lata/post.lata dom_pb1
+	
+	cycles 49
+	normal3D 0.5 0.433 0.749956
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Transient time (t=0.368)"
+	description "Interface between water and air"
+ 	width 15cm, viewport= 0 200 1024 650, clip
+        mesh sloshing/lata/post.lata INTERFACES
+	
+	cycles 49
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+visu {
+	Description "\latex_(\vspace{-0.1cm}\latex_)"	
+ 	width 15cm, viewport= 0 100 1024 800, clip
+        mesh sloshing/lata/post.lata INTERFACES
+	
+	cycles 49
+	normal3D 0. 0.5 0.866
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Transient time (t=0.62)"
+	description "Interface between water and air"
+ 	width 15cm, viewport= 0 200 1024 650, clip
+        mesh sloshing/lata/post.lata INTERFACES
+	
+	cycles 81
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+visu {
+ 	width 15cm, viewport= 0 100 1024 800, clip
+        mesh sloshing/lata/post.lata INTERFACES
+	
+	cycles 81
+	normal3D 0. 0.5 0.866
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Transient time (t=1.24)"
+	description "Interface between water and air"
+ 	width 15cm, viewport= 0 200 1024 750, clip
+        mesh sloshing/lata/post.lata INTERFACES
+	
+	cycles 169
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+visu {
+	Description "\latex_($\vspace{-2cm}$\latex_)"	
+ 	width 15cm, viewport= 0 100 1024 800, clip
+        mesh sloshing/lata/post.lata INTERFACES
+	
+	cycles 169
+	normal3D 0. 0.5 0.866
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+        Title "Conclusion - User recommendation"
+Description "We check the values of the maximas of the amplitudes. Figure 6.2 is helpful to compare computational results with experimental data."
+}
+
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}
+Chapter {
+Description "The calculation is carried out with the help of 8 processors".
+}
+Chapter {
+        Title "References"
+	Description "Maschek W., Roth A., Kirstahler M., Meyer L. Simulation Experiments for Centralized Liquid Sloshing Motions. KfK report n\latex_($^{o}$\latex_) 5090. Year 1992."
+	Description "\latex_($\vspace{0.5cm}$\latex_)"	
+	Description "Pigny, S. Coste, P. Two-phase flows averaged codes: criteria for numerical methods proceeding of the workshop "Trends in Numerical and Physical Modeling for Industrial Multiphase Flows, September 26-28 2001, Cargese, Corsica, France."
+	Description "\latex_($\vspace{0.5cm}$\latex_)"	
+	Description "Pigny, S.,Boucker, M., Lavieville, J., Mechitoua, N. Extensive Assessment of the Numerical Method of the New NEPTUNE Two-Phase CFD Solver on Numerical Benchmark Exercises for Steam-Water Flows, Proc. of Int. Conf. On Multiphase Flow '04, Yokohama, Japan (May 30-June 4 2004)."
+}

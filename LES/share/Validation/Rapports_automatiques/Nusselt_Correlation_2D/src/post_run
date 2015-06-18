@@ -1,0 +1,5 @@
+#!/bin/bash
+extrait_coupe LoiParoiNusseltImpose_VEF COUPE_HE_T2
+extrait_coupe LoiParoiNusseltImpose_VEF COUPE_HE_T3
+python ../propertiesGeometry.py
+python ../tableauCourbes.py VEF

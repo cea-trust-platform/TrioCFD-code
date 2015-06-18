@@ -1,0 +1,390 @@
+# Thermohydraulique 3D #
+# PARALLEL OK #
+dimension 3
+
+Domaine dom01234 
+Domaine dom56789 
+
+# BEGIN MESH #
+
+Domaine dom0
+Domaine dom1
+Domaine dom2
+Domaine dom3
+Domaine dom4
+
+Mailler dom0
+{
+        Pave bloc1
+                {
+                Origine -0.5 -0.5 0.
+                Nombre_de_Noeuds 3 3 6
+                Longueurs 1. 1. 0.4
+                }
+                {
+                Bord perioz1   Z = 0.   -0.5 <= X <= 0.5  -0.5 <= Y <= 0.5
+                Bord perioz1   Z = 0.4  -0.5 <= X <= 0.5  -0.5 <= Y <= 0.5
+                }
+}
+
+tetraedriser_homogene dom0
+
+Mailler dom1
+{
+        Pave bloc2
+                {
+                Origine -0.785398163 0.5 0.
+                Nombre_de_Noeuds 3 3 6
+                Longueurs  1.570796326 1. 0.4
+                facteurs 1. 0.7 1.
+                }
+                {
+                Bord perioz1  Z = 0.   -0.785398163 <= X <= 0.785398163   0.5 <= Y <= 1.5
+                Bord perioz1  Z = 0.4  -0.785398163 <= X <= 0.785398163   0.5 <= Y <= 1.5
+                Bord paroi    Y = 1.5  -0.785398163 <= X <= 0.785398163   0.  <= Z <= 0.4
+                }
+}
+
+tetraedriser_homogene dom1
+Transformer dom1
+ (y>0.5)*((COS(x)-0.5)*(y-0.5)+0.5)+(y<0.5001)*0.5
+ ((SIN(x)-(-0.5+(x+0.785398163)/1.570796326))*(y-0.5)+(-0.5+(x+0.785398163)/1.570796326))
+ z
+Ecrire_Fichier dom1 dom1.geom
+
+Read_file dom2 dom1.geom
+Read_file dom3 dom1.geom
+Read_file dom4 dom1.geom
+
+Transformer dom2
+ -y
+ x
+ z
+Transformer dom3
+ y
+ -x
+ z
+Transformer dom4
+ -x
+ -y
+ z
+
+{
+Domaine dom01 
+Mailler dom01
+        {  epsilon 1.e-2 ,
+                domain dom0 ,
+                domain dom1
+                }
+Ecrire_fichier dom01 dom01.geom
+}
+
+{
+Domaine dom01 
+Read_file dom01 dom01.geom
+Domaine dom012 
+Mailler dom012
+        {  epsilon 1.e-2 ,
+                domain dom01 ,
+                domain dom2
+                }
+Ecrire_fichier dom012 dom012.geom
+}
+
+{
+Domaine dom012 
+Read_file dom012 dom012.geom
+Domaine dom0123 
+Mailler dom0123
+        {  epsilon 1.e-2 ,
+                domain dom012 ,
+                domain dom3
+                }
+Ecrire_fichier dom0123 dom0123.geom
+}
+
+{
+Domaine dom0123 
+Read_file dom0123 dom0123.geom
+Mailler dom01234
+        {  epsilon 1.e-2 ,
+                domain dom0123 ,
+                domain dom4
+                }
+Ecrire_fichier dom01234 dom01234.geom
+}
+
+Domaine dom5
+Domaine dom6
+Domaine dom7
+Domaine dom8
+Domaine dom9
+
+Mailler dom5
+{
+        Pave bloc3
+                {
+                Origine -0.5 -0.5 0.4
+                Nombre_de_Noeuds 3 3 8
+                Longueurs 1. 1. 0.4
+                }
+                {
+                Bord entree2  Z = 0.4  -0.5 <= X <= 0.5  -0.5 <= Y <= 0.5
+                Bord sortie2  Z = 0.8  -0.5 <= X <= 0.5  -0.5 <= Y <= 0.5
+                }
+}
+
+tetraedriser_homogene dom5
+
+Mailler dom6
+{
+        Pave bloc4
+                {
+                Origine -0.785398163 0.5 0.4
+                Nombre_de_Noeuds 3 3 8
+                Longueurs  1.570796326 1. 0.4
+                facteurs 1. 0.7 1.
+                }
+                {
+                Bord entree2  Z = 0.4  -0.785398163 <= X <= 0.785398163   0.5 <= Y <= 1.5
+                Bord sortie2  Z = 0.8  -0.785398163 <= X <= 0.785398163   0.5 <= Y <= 1.5
+                Bord paroi    Y = 1.5 -0.785398163 <= X <= 0.785398163    0.4 <= Z <= 0.8
+                }
+}
+
+tetraedriser_homogene dom6
+Transformer dom6
+ (y>0.5)*((COS(x)-0.5)*(y-0.5)+0.5)+(y<0.5001)*0.5
+ ((SIN(x)-(-0.5+(x+0.785398163)/1.570796326))*(y-0.5)+(-0.5+(x+0.785398163)/1.570796326))
+ z
+Ecrire_Fichier dom6 dom6.geom
+
+Read_file dom7 dom6.geom
+Read_file dom8 dom6.geom
+Read_file dom9 dom6.geom
+
+Transformer dom7
+ -y
+ x
+ z
+Transformer dom8
+ y
+ -x
+ z
+Transformer dom9
+ -x
+ -y
+ z
+
+{
+Domaine dom56 
+Mailler dom56
+        {  epsilon 1.e-2 ,
+                domain dom5 ,
+                domain dom6
+                }
+Ecrire_fichier dom56 dom56.geom
+}
+
+{
+Domaine dom56 
+Read_file dom56 dom56.geom
+Domaine dom567 
+Mailler dom567
+        {  epsilon 1.e-2 ,
+                domain dom56 ,
+                domain dom7
+                }
+Ecrire_fichier dom567 dom567.geom
+}
+
+{
+Domaine dom567 
+Read_file dom567 dom567.geom
+Domaine dom5678 
+Mailler dom5678
+        {  epsilon 1.e-2 ,
+                domain dom567 ,
+                domain dom8
+                }
+Ecrire_fichier dom5678 dom5678.geom
+}
+
+{
+Domaine dom5678 
+Read_file dom5678 dom5678.geom
+Mailler dom56789
+        {  epsilon 1.e-2 ,
+                domain dom5678 ,
+                domain dom9
+                }
+Ecrire_fichier dom56789 dom56789.geom
+}
+
+Read_file dom01234 dom01234.geom
+
+Corriger_frontiere_periodique { Domaine dom01234 Bord perioz1 }
+
+Read_file dom56789 dom56789.geom
+
+# END MESH #
+
+# BEGIN PARTITION
+Sous_Zone sous_zone1a
+Associate sous_zone1a dom01234
+
+Sous_Zone sous_zone1b
+Associate sous_zone1b dom56789
+
+Lire sous_zone1a
+{
+      Boite
+      Origine  -2.   -2.   0.1
+      Cotes     4.    4.   0.2
+}
+
+Lire sous_zone1b
+{
+      Boite
+      Origine  -2.   -2.   0.4
+      Cotes     2.    4    0.6
+}
+
+Partition dom01234
+{
+	Partitionneur sous_zones { sous_zones 1 sous_zone1a }
+	Nom_Zones dom01234
+	Periodique 1 perioz1
+        Larg_joint 2
+}
+
+Partition dom56789
+{
+	Partitionneur sous_zones { sous_zones 1 sous_zone1b }
+	Nom_Zones dom56789
+        Larg_joint 2
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter dom01234.Zones dom01234
+Scatter dom56789.Zones dom56789
+END SCATTER #
+
+
+Pb_Hydraulique_Turbulent pb1
+Pb_Hydraulique_Turbulent pb2
+VEFPreP1B dis 
+
+Sch_CN_EX_iteratif sch
+Lire sch 
+{ 
+        tinit 0
+	nb_pas_dt_max 5
+	dt_start dt_calc
+        dt_min 1.e-7
+        dt_max 1.e-1 
+        dt_impr 0.0000001 
+        dt_sauv 10.
+        seuil_statio 1.e-8 
+        facsec 1.
+}
+
+Fluide_Incompressible fluide1
+Lire fluide1
+{ 
+        mu Champ_Uniforme       1 2.84e-5
+        rho Champ_Uniforme      1 0.0976
+} 
+
+Fluide_Incompressible fluide2
+Lire fluide2
+{ 
+        mu Champ_Uniforme       1 2.84e-5
+        rho Champ_Uniforme      1 0.0976
+} 
+
+Associate pb1 dom01234
+Associate pb1 fluide1
+Associate pb2 dom56789
+Associate pb2 fluide2
+
+Probleme_Couple pbc
+Lire pbc { groupes { { pb1 } , { pb2 } } }
+Associate pbc sch 
+Discretize pbc dis 
+
+Lire pb1
+{ 
+ Navier_Stokes_Turbulent 
+ { 
+       solveur_pression Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-8 
+                            } 
+       solveur_bar      Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-8 
+                            } 
+       convection { EF  defaut_bar }
+       diffusion  { standard  defaut_bar }
+       Sources { Source_Qdm_lambdaup { lambda 2. } }
+       Sources { Canal_perio { bord perioz1 } }
+       conditions_initiales {  vitesse Champ_fonc_xyz dom01234 3  0. 0. 20.*(1.-(x*x+y*y)*(x*x+y*y)) }
+       boundary_conditions { 
+perioz1 periodique 
+		   paroi     paroi_fixe 
+                          } 
+        Modele_turbulence Sous_maille_wale
+                        {
+                        turbulence_paroi loi_standard_hydr
+                        }     
+}            
+ Postraitement 
+         {  
+            Champs dt_post 10. 
+            { 
+             vitesse elem
+             pression elem
+            } 
+        } 
+} 
+Lire pb2
+{ 
+ Navier_Stokes_Turbulent 
+ { 
+       solveur_pression Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-8 
+                            } 
+       solveur_bar      Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-8 
+                            } 
+       convection { EF  defaut_bar }
+       diffusion  { standard  defaut_bar }
+       Sources { Source_Qdm_lambdaup { lambda 2. } }
+       conditions_initiales {  vitesse Champ_fonc_xyz dom56789 3  0. 0. 0. }
+       boundary_conditions { 
+                   entree2   frontiere_ouverte_vitesse_imposee Champ_front_recyclage
+     					    		       {
+     					     			pb_champ_evaluateur pb1 vitesse 3
+     					  		       }
+		   sortie2   frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+		   paroi     paroi_fixe 
+                          } 
+        Modele_turbulence Sous_maille_wale
+                        {
+                        turbulence_paroi loi_standard_hydr
+                        }     
+}            
+ Postraitement 
+         {  
+            Champs dt_post 10.
+            { 
+             vitesse elem
+             pression elem
+            } 
+        } 
+} 
+
+Solve pbc
+
+Fin 

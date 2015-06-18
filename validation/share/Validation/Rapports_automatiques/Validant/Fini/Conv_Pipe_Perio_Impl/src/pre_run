@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ ! -f ./dom01234.geom ]
+then
+   $exec Tuyau 1>Tuyau.out 2>Tuyau.err
+fi
+

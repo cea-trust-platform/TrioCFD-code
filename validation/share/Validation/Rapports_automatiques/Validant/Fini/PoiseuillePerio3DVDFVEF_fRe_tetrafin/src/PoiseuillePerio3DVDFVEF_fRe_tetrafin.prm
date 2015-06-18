@@ -1,0 +1,1283 @@
+Parameters {
+	Title "Pressure drop in a 3D periodic laminar flow in a plane channel"
+	Description "Poiseuille flow in a 3D periodic laminar flow for different velocity values and for VEF and VDF discretizations"
+	Description "These velocity values are 0.001 0.005 0.01 0.02 0.04 0.05 0.1"
+	Description "The name of each test case directory is given by : 1-discretization 2-convection_scheme 3_velocity_value"
+	Description "Validated Models :"
+	Description "- Convection scheme : amont for VDF, amont, muscl and EFstab for VEF discretization"
+	Description "- Time scheme :Euler Implicite, laminar flow, hydraulic 3D problem without thermal for several Reynolds numbers"	
+	Description "- Fine homogeneous mesh tetraedrisation for VEF discretization"	
+	Description "Validation with theorical analysis"
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of problem : Hydraulic_3D
+	ParametersTrio_U Discretization : VDF / VEF
+	ParametersTrio_U Time scheme : Schema_Euler_Implicite
+	ParametersTrio_U Solving of equations : Navier Stokes_standard
+	ParametersTrio_U Convection scheme : upwind (amont), muscl (only for VEF), EFstab (only for VEF)
+	ParametersTrio_U Type of boundary conditions : wall, x-periodicity and z-periodicity
+	ParametersTrio_U Type of fluid : Helium
+
+	TestCase vdf_Amont_0001 canal_lam_vdf 
+	TestCase vdf_Amont_0005 canal_lam_vdf 
+	TestCase vdf_Amont_001 canal_lam_vdf  
+	TestCase vdf_Amont_002 canal_lam_vdf 
+	TestCase vdf_Amont_004 canal_lam_vdf 
+	TestCase vdf_Amont_005 canal_lam_vdf 
+	TestCase vdf_Amont_01 canal_lam_vdf /* jdd en annexe */
+	TestCase vef_Amont_0001 canal_lam_vef
+	TestCase vef_Amont_0005 canal_lam_vef
+	TestCase vef_Amont_001 canal_lam_vef
+	TestCase vef_Amont_002 canal_lam_vef
+	TestCase vef_Amont_004 canal_lam_vef
+	TestCase vef_Amont_005 canal_lam_vef
+	TestCase vef_Amont_01 canal_lam_vef /* jdd en annexe */
+	TestCase vef_Muscl_0001 canal_lam_vef
+	TestCase vef_Muscl_0005 canal_lam_vef
+	TestCase vef_Muscl_001 canal_lam_vef
+	TestCase vef_Muscl_002 canal_lam_vef
+	TestCase vef_Muscl_004 canal_lam_vef
+	TestCase vef_Muscl_005 canal_lam_vef
+	TestCase vef_Muscl_01 canal_lam_vef
+	TestCase vef_EFstab_0001 canal_lam_vef
+	TestCase vef_EFstab_0005 canal_lam_vef
+	TestCase vef_EFstab_001 canal_lam_vef
+	TestCase vef_EFstab_002 canal_lam_vef
+	TestCase vef_EFstab_004 canal_lam_vef
+	TestCase vef_EFstab_005 canal_lam_vef
+	TestCase vef_EFstab_01 canal_lam_vef
+	
+	Prerequisite "python courbes.py"
+	
+	Author "R. PAILLE/V.BARTHEL/A.AUROUSSEAU"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Dimensions : L=1m h=0.2m z=0.1m"
+	Description "Mesh : "
+	Description "- 5 x 11 x 5 hexahedral structured element for VDF"
+	Description "- 5 x 21 x 5 hexahedral elements with transformation in tetrahedra for VEF"
+	Description "For VEF discretization, the mesh is generated using tetraedriser_homogene_fin keyword. Each hexahedral cell contains 48 tetrahedra"
+	Description "Initial conditions : Hydraulic : uniform velocity profile"
+	Description "Boundary conditions : Hydraulic : x and z periodicity Wall paroi_fixe"
+	Figure {
+		Title "Geometry"
+		Width 12cm
+		picture ./Geometry.png
+	}
+
+	Table {
+		Title "VEF mesh visualization"
+	}	
+	#IMAGE DU MAILLAGE
+	visu {
+		Description "VEF Mesh is generated according to Trio_U data set instructions"
+		mesh vef_Amont_01/canal_lam_vef.lata dom_pb1
+		Width 15cm , viewport=200 200 700 700, clip		
+		Normal3d -0.94 0.17 0.31
+		up3D 0.15 0.98 -0.07
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		Operator no_triad
+	}
+
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 3.85 kg/m$^3$"
+		Description "$\mu$ = 3.56e-5 kg/m/s"
+	}
+	Table {
+		Title "Calculation method"
+		Description "Transitory calculation time : 1000 sec"
+		Description "The next board gives time step value for each case, named as following :"
+		Description "discretization convection_scheme mean_velocity_value 		
+		nb_columns 1
+		label Average time step
+		line {
+			legend "VDF Amont 0.001"
+			file ./vdf_Amont_0001/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VDF Amont 0.005"
+			file ./vdf_Amont_0005/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VDF Amont 0.01"
+			file ./vdf_Amont_001/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VDF Amont 0.02"
+			file ./vdf_Amont_002/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VDF Amont 0.04"
+			file ./vdf_Amont_004/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VDF Amont 0.05"
+			file ./vdf_Amont_005/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VDF Amont 0.1"
+			file ./vdf_Amont_01/canal_lam_vdf.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.001"
+			file ./vef_Amont_0001/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.001"
+			file ./vef_Muscl_0001/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.001"
+			file ./vef_EFstab_0001/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.005"
+			file ./vef_Amont_0005/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.005"
+			file ./vef_Muscl_0005/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.005"
+			file ./vef_EFstab_0005/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.01"
+			file ./vef_Amont_001/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.01"
+			file ./vef_Muscl_001/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.01"
+			file ./vef_EFstab_001/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.02"
+			file ./vef_Amont_002/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.02"
+			file ./vef_Muscl_002/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.02"
+			file ./vef_EFstab_002/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.04"
+			file ./vef_Amont_004/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.04"
+			file ./vef_Muscl_004/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.04"
+			file ./vef_EFstab_004/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.05"
+			file ./vef_Amont_005/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.05"
+			file ./vef_Muscl_005/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.05"
+			file ./vef_EFstab_005/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Amont 0.1"
+			file ./vef_Amont_01/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF Muscl 0.1"
+			file ./vef_Muscl_01/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF EFstab 0.1"
+			file ./vef_EFstab_01/canal_lam_vef.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description "For several Reynolds values, Re=Um*Dh/v, with Dh=4*h/2, the results given in this part concern the "
+	Description "pressure loss $\Delta$P/$\rho$, and the friction velocity u*. They are defined as below :"
+	Description ""
+	Description "For theorical values"
+	Description "- u* is given by laminar formula for a channel : Cf=$\lambda$/4 and $\lambda$=96/Rehyd. "
+	Description "	As u*=sqrt(0.5*Cf*Um$^2$), it comes u*=Um*sqrt(12/Rehyd)"
+	Description "- $\Delta$P/$\rho$ is deduced by the theorical formula u*=sqrt($\Delta$P/$\rho$/$\Delta$x*V/S) where"
+	Description "	V and S are respectively the volume and the wall area of the geometry. For this bi-periodic channel"
+	Description "geometry, V/S=h/2"
+	Description ""
+	Description "For Trio_U calculations"
+	Description "- $\Delta$P/$\rho$ is taken as the established value given in the file Pressure_gradient_pb1_Entree (in fact the last value), then multiplied by the channel length (here L=1). Actually, the value in Pressure_gradient_pb1_Entree is $\Delta$P/$\rho$/$\Delta$x"
+	Description "- u* is taken as the established value given in the file u_tau.dat (in fact the last value too), issued from the data command :"
+	Description "	traitement_particulier_canal"
+	Description ""
+
+	Table
+	{	
+		Title "Method of discretization VDF (Finite Difference Volume)"
+	}
+	
+		Table {
+			Title "U* with VDF computation"
+			nb_columns 5
+			label U | Reynolds number Re | U*theorical | U*trio_U | Error on U* in $%$
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_0001/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_0005/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_001/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_002/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_004/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_005/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_01/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($3) ($4) ($5)
+			}
+		}
+		Figure {
+			Title "U* evolution with Reynolds number for VDF computation"
+			Width 12cm
+			Dimension 2
+			LabelX "Reynolds number Re"
+			RangeX 0 6000
+			LabelY "U*"
+			RangeY 0 0.006
+			Include_Description_Curves 0
+			Curve {
+				legend "U*_Theorical"
+				origin "theorie"
+				file CourbeUtautheo_vdf_Amont.dat
+				columns ($1) ($2)
+				Style lines
+				TypeLigne 1
+			}
+			Curve {
+				legend "U*_Trio_U"
+				origin "Trio_U"
+				file CourbeUtautrio_vdf_Amont.dat
+				columns ($1) ($2)
+				Style lines
+				TypeLigne 2
+			}
+		}
+		Table {
+			Title "Pressure drop with VDF computation"
+			nb_columns 5
+			label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_0001/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_0005/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_001/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_002/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_004/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_005/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+			line {
+				legend " "
+				origin "Trio_U"
+				file ./vdf_Amont_01/ligneTableau.dat
+				nb_columns_file 8
+				columns ($1) ($2) ($6) ($7) ($8)
+			}
+		}
+		Figure {
+			Title "Pressure drop evolution with Reynolds number for VDF computation"
+			Width 12cm
+			Dimension 2
+			LabelX "Reynolds number Re"
+			RangeX 0 6000
+			LabelY "dP/rho"
+			RangeY 0 0.0004
+			Include_Description_Curves 0
+			Curve {
+				legend "dPTheorical/rho"
+				origin "theorie"
+				file CourbedPtheo_vdf_Amont.dat
+				columns ($1) ($2)
+				Style lines
+				TypeLigne 1
+			}
+			Curve {
+				legend "dPTrio_U/rho"
+				origin "Trio_U"
+				file CourbedPtrio_vdf_Amont.dat
+				columns ($1) ($2)
+				Style lines
+				TypeLigne 2
+			}
+		}
+		Table {
+			Description "It can be seen that VDF discretization in laminar flow leads to very good results for both pressure drop and U* computation in a 3D periodic plane channel. Moreover, we note that Trio_U makes good simulations even in a "
+			Description "transitory flow (2000<Re<5000)"
+		}
+	#TERME DE FORCAGE POUR AMONT VDF
+	Figure {
+		Title " Forcing term evolution with Amont convection scheme (Re=4326) "
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 1000.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.001
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic" 
+			origin "Theoric" 
+			Fonction 0.00028         
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont VDF"
+			origin "Trio_U"
+			file vdf_Amont_01/canal_lam_vdf_Pressure_Gradient_pb1_Entree
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}	
+	}
+
+	Table {
+		Title "Method of discretization VEF (Finite Element Volume)"
+	}
+	Table {
+		Description "First of all, we realise a comparison between theoretical and Trio_U velocity profiles."
+		Description "We carry out this validation for different values of the velocity and the different convection schemes. These computations show good quality Trio_U results."
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.001m/s (Re=43)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.0018
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.001/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_0001/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_0001/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_0001/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.005m/s (Re=216)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.008
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.005/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_0005/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_0005/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_0005/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.01m/s (Re=433)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.018
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.01/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_001/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_001/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_001/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.02m/s (Re=865)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.032
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.02/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_002/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_002/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_002/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.04m/s (Re=1730)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.062
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.04/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_004/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_004/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_004/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.05m/s (Re=2163)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.08
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.05/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_005/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_005/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_005/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Figure {
+		Title "Vx Velocity profile following Y for U=0.1m/s (Re=4326)"
+		Width 12cm
+		Dimension 2
+		LabelX "Y"
+		RangeX 0 0.2
+		LabelY "Vx Velocity"
+		RangeY 0 0.18
+		Include_Description_Curves 0
+		Curve {
+			legend "Theoretical velocity profile"
+			origin "theorie"
+			Fonction ((-3*0.1/2)/(0.1*0.1))*x*(x-0.2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Trio_U with Upwind scheme"
+			origin "Trio_U"
+			file ./vef_Amont_01/Velocity_profile.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Trio_U with Muscl scheme"
+			origin "Trio_U"
+			file ./vef_Muscl_01/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+		Curve {
+			legend "Trio_U with EFstab scheme"
+			origin "Trio_U"
+			file ./vef_EFstab_01/Velocity_profile.dat
+			columns ($1) ($2)
+			Style points
+		}
+	}
+	Table {
+		Description "It is obvious from the analysis of those velocity profiles that the tetraedriser_homogene_fin option enhances the computation quality greatly. The numerical profiles are indeed much closer to the theoretical one than those obtained with a simple tetraedriser option"
+	}	
+
+
+
+	Table {
+		Title "Method of discretization VEF : results for several convection schemes"
+	}
+	
+	#TERME DE FORCAGE POUR AMONT VEF
+	Figure {
+		Title " Forcing term evolution for several convection scheme (Re=4326) "
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 1000.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 0.003
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic" 
+			origin "Theoric" 
+			Fonction 0.00028         
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont VEF"
+			origin "Trio_U"
+			file vef_Amont_01/canal_lam_vef_Pressure_Gradient_pb1_Entree
+			columns ($1) ($2)
+			Style lines
+			
+		}
+		Curve {
+			legend " Muscl VEF"
+			origin "Trio_U"
+			file vef_Muscl_01/canal_lam_vef_Pressure_Gradient_pb1_Entree
+			columns ($1) ($2)
+			Style lines
+			
+		}
+		Curve {
+			legend "EFstab VEF"
+			origin "Trio_U"
+			file vef_EFstab_01/canal_lam_vef_Pressure_Gradient_pb1_Entree
+			columns ($1) ($2)
+			Style lines
+			
+		}	
+	}
+
+	Figure {
+		Title "VEF U* evolution for several convection schemes"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 5000
+		LabelY "U*"
+		RangeY 0 0.006
+		Include_Description_Curves 0
+		Curve {
+			legend "U*_Theory"
+			origin "theorie"
+			file CourbeUtautheo_vef_Amont.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "U*_Amont"
+			origin "Trio_U"
+			file CourbeUtautrio_vef_Amont.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "U*_Muscl"
+			origin "Trio_U"
+			file CourbeUtautrio_vef_Muscl.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "U*_EF_stab"
+			origin "Trio_U"
+			file CourbeUtautrio_vef_EFstab.dat
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+	Table {
+		Title "U* with VEF computation with Amont convection scheme"
+		nb_columns 5
+		label U | Reynolds number Re | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_0001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_0005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_002/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_004/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_01/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}	
+	Table {
+		Title "U* with VEF computation with Muscl convection scheme"
+		nb_columns 5
+		label U | Reynolds number Re | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_0001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_0005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_002/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_004/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_01/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+
+	Table {
+		Title "U* with VEF computation with EFstab convection scheme"
+		nb_columns 5
+		label U | Reynolds number Re | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_0001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_0005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_002/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_004/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_01/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+	
+	
+	Figure {
+		Title "VEF Pressure drop evolution for several convection schemes"
+		Width 12cm
+		Dimension 2
+		LabelX "Reynolds number Re"
+		RangeX 0 5000
+		LabelY "dP/rho"
+		RangeY 0 0.0005
+		Include_Description_Curves 0
+		Curve {
+			legend "dPTheorical/rho"
+			origin "theorie"
+			file CourbedPtheo_vef_Amont.dat
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "dPTrio_U_Amont/rho"
+			origin "Trio_U"
+			file CourbedPtrio_vef_Amont.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "dPTrio_U_Muscl/rho"
+			origin "Trio_U"
+			file CourbedPtrio_vef_Muscl.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "dPTrio_U_EF_stab/rho"
+			origin "Trio_U"
+			file CourbedPtrio_vef_EFstab.dat
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+	
+	
+	Table {
+		Title "VEF Pressure drop with Amont convection scheme"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_0001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_0005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_002/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_004/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Amont_01/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+	}
+	
+	Table {
+		Description "The Trio_U computations are all similar to the theoretical results in a laminar flow."
+		Description "Nevertheless, when the transition appears in the flow (Re>2000), the results obtained with"
+		Description "Trio_U move away from the theory. Because the pressure drop estimation is not sufficient"
+		Description "with the amont convection scheme, another convection scheme is tested : muscl."
+	}
+	
+	Table {
+		Title "VEF Pressure drop with Muscl convection scheme"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_0001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_0005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_002/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_004/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_Muscl_01/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+	}
+	
+	Table {
+		Description "With the muscl convection scheme, calculation of pressure drop and U* with Trio_U gives very good results, even for a transient flow."
+		Description "Eventually, calculation with the EF_stab convection scheme is carried out:"
+	}
+	
+	Table {
+		Title "VEF Pressure drop with EFstab convection scheme"
+		nb_columns 5
+		label U | Reynolds number Re | $\Delta$Ptheorical/$\rho$ | $\Delta$Ptrio_U/$\rho$ | Error on $\Delta$P/$\rho$ in $%$
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_0001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_0005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_001/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_002/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_004/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_005/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./vef_EFstab_01/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+	}
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "Use of the muscl convection scheme is advised in VEF computation as it gives very good results for most geometry and flow configurations."
+	Description "For VEF computation, when one of the geometrical dimension is significantly larger than the others (length=100xheight), it is advised to use the Tetraedriser function instead of Tetraediser_Homogene. Indeed, cells in such a geometrical configuration are too much flattened, which leads to a low quality computation."
+	Description "However, we also observed that the computed velocity profiles, pressure drops and friction coefficients are much closer to the analytical ones with the Tetraedriser_homogene_fin option"	
+	# CONCLUSION A ECLAICIR
+	
+	Figure {
+		Title "Mesh sensitivity with v1.4.5 version"
+		Width 10cm
+		picture ./tableau_recommandations.png
+	}
+	Table {
+		Description "calculations were made with the version 1.4.5 and not repeated here."
+	}
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

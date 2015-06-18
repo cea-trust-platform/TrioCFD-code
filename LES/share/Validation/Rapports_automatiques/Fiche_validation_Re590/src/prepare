@@ -1,0 +1,168 @@
+# Format américain de nombres (nécessaire pour printf)
+#-----------------------------------------------------
+
+export LC_NUMERIC=C
+
+
+# Mettre la valeur choisie pour t_deb dans le post_run (où t_deb=100 par défaut)
+#-------------------------------------------------------------------------------
+
+T_DEB=20
+T_FIN=50
+
+
+# Donner l'altitude min et l'altitude max, et le nombre de points de maillage dans chaque direction
+#--------------------------------------------------------------------------------------------------
+
+Y_bas=0
+Y_haut=2
+
+Nx_VDF=55
+Ny_VDF=36
+Nz_VDF=34
+
+Nx_VEF=17
+Ny_VEF=11
+Nz_VEF=9
+
+
+# Donner le facteur fact tel que delta est égal à la hauteur des mailles de bord divisée par fact : fact=3 correspond au centre de gravité des FACES de bord (donc à y1), fact=4 correspond au centre de gravité des ELEMENTS de bord
+# ----------------------------------------------------------------------------------------------
+# (en vue de tests ultérieurs éventuels sur la valeur de delta)
+
+fact=3
+
+
+
+################################################
+
+
+Lx=$(grep Longueurs Cas.data | awk '{print $2}')
+Ly=`echo "$Y_haut-$Y_bas" | bc`
+Lz=$(grep Longueurs Cas.data | awk '{print $4}')
+
+mkdir -p T0Q_VDF
+mkdir -p T0Q_VEF
+mkdir -p T0Q_VEF_Pironneau
+mkdir -p T0Q_VEF_Pironneau_maillage_decale
+
+cp post_run T0Q_VDF
+cp post_run T0Q_VEF
+cp post_run T0Q_VEF_Pironneau
+cp post_run T0Q_VEF_Pironneau_maillage_decale
+
+
+# Jeu de données VDF_T0Q
+#-----------------------
+
+N=`echo "$Ny_VDF-1" | bc -l`
+Ox=$(printf "%.6f" "`echo "$Lx/(2*($Nx_VDF-1))" | bc -l`")
+Oy1=$(printf "%.6f" "`echo "$Ly/(2*($Ny_VDF-1))" | bc -l`")
+Oy2=$(printf "%.6f" "`echo "$Ly-$Oy1" | bc -l`")
+Oz=$(printf "%.6f" "`echo "$Lz/(2*($Nz_VDF-1))" | bc -l`")
+
+sed -e 's/_Y_BAS_/'$Y_bas'/g'	Cas.data > tmp1
+sed -e 's/_Y_HAUT_/'$Y_haut'/g'	tmp1 > tmp2
+sed -e 's/_Ly_/'$Ly'/g'		tmp2 > tmp3
+sed -e 's/_Nx_/'$Nx_VDF'/g'	tmp3 > tmp4
+sed -e 's/_Ny_/'$Ny_VDF'/g'	tmp4 > tmp5
+sed -e 's/_Nz_/'$Nz_VDF'/g'	tmp5 > tmp6
+sed -e '/_RAFFINEMENT_/d'	tmp6 > tmp7
+sed -e 's/_DIS_/VDF/g'		tmp7 > tmp8
+sed -e 's/_LOC_/grav/g'		tmp8 > tmp9
+sed -e 's/_N_/'$N'/g'		tmp9 > tmp10
+sed -e 's/_Ox_/'$Ox'/g'		tmp10 > tmp11
+sed -e 's/_Oy1_/'$Oy1'/g'	tmp11 > tmp12
+sed -e 's/_Oy2_/'$Oy2'/g'	tmp12 > tmp13
+sed -e 's/_Oz_/'$Oz'/g'		tmp13 > tmp14
+sed -e 's/_CONV_/Centre/g'	tmp14 > tmp15
+sed -e 's/_CLH_/paroi_fixe/g'	tmp15 > tmp16
+sed -e '/source_Robin/d'	tmp16 > tmp17
+sed -e 's/_T_DEB_/'$T_DEB'/g'	tmp17 > tmp18
+sed -e 's/_T_FIN_/'$T_FIN'/g'	tmp18 > T0Q_VDF/Cas.data
+rm -f tmp*
+
+
+# Jeu de données VEF_T0Q_Pironneau
+#---------------------------------
+
+N=`echo "2*$Ny_VEF-1" | bc -l`
+Ox=$(printf "%.6f" "`echo "$Lx/(6*($Nx_VEF-1))" | bc -l`")
+Oz=$(printf "%.6f" "`echo "$Lz/(6*($Nz_VEF-1))" | bc -l`")
+delta=$(printf "%.6f" "`echo "$Ly/(2*$fact*($Ny_VEF-1))" | bc -l`")
+
+sed -e 's/_Y_BAS_/'$Y_bas'/g'	Cas.data > tmp1
+sed -e 's/_Y_HAUT_/'$Y_haut'/g'	tmp1 > tmp2
+sed -e 's/_Ly_/'$Ly'/g'		tmp2 > tmp3
+sed -e 's/_Nx_/'$Nx_VEF'/g'	tmp3 > tmp4
+sed -e 's/_Ny_/'$Ny_VEF'/g'	tmp4 > tmp5
+sed -e 's/_Nz_/'$Nz_VEF'/g'	tmp5 > tmp6
+sed -e 's/_RAFFINEMENT_/Tetraedriser_homogene_fin dom/g' tmp6 > tmp7
+sed -e 's/_DIS_/VEFPreP1b/g'	tmp7 > tmp8
+sed -e 's/_LOC_/nodes/g'	tmp8 > tmp9
+sed -e 's/_N_/'$N'/g'		tmp9 > tmp10
+sed -e 's/_Ox_/'$Ox'/g'		tmp10 > tmp11
+sed -e 's/_Oy1_/0/g'		tmp11 > tmp12
+sed -e 's/_Oy2_/'$Ly'/g'	tmp12 > tmp13
+sed -e 's/_Oz_/'$Oz'/g'		tmp13 > tmp14
+sed -e 's/_CONV_/EF_stab { volumes_etendus alpha 0.2 }/g'	tmp14 > tmp15
+sed -e 's/_CLH_/paroi_decalee_Robin { delta _DELTA_ }/g'	tmp15 > tmp16
+sed -e 's/_DELTA_/'$delta'/g'	tmp16 > tmp17
+sed -e 's/_T_DEB_/'$T_DEB'/g'	tmp17 > tmp18
+sed -e 's/_T_FIN_/'$T_FIN'/g'	tmp18 > T0Q_VEF_Pironneau/Cas.data
+
+
+# Jeu de données VEF_T0Q
+#-----------------------
+
+sed -e 's/_CLH_/paroi_fixe/g' tmp15 > tmp19
+sed -e '/source_Robin/d' tmp19 > tmp20
+sed -e 's/_T_DEB_/'$T_DEB'/g' tmp20 > tmp21
+sed -e 's/_T_FIN_/'$T_FIN'/g' tmp21 > T0Q_VEF/Cas.data
+
+
+# Jeu de données VEF_T0Q_Pironneau_maillage_decale
+#-------------------------------------------------
+
+Yh=`echo "$Y_haut-$delta" | bc`
+Ly_dec=`echo "$Ly-2*$delta" | bc`
+
+sed -e 's/_Y_BAS_/'$delta'/g'	Cas.data > tmp1
+sed -e 's/_Y_HAUT_/'$Yh'/g'	tmp1 > tmp2
+sed -e 's/_Ly_/'$Ly_dec'/g'	tmp2 > tmp3
+sed -e 's/_Nx_/'$Nx_VEF'/g'	tmp3 > tmp4
+sed -e 's/_Ny_/'$Ny_VEF'/g'	tmp4 > tmp5
+sed -e 's/_Nz_/'$Nz_VEF'/g'	tmp5 > tmp6
+sed -e 's/_RAFFINEMENT_/Tetraedriser_homogene_fin dom/g' tmp6 > tmp7
+sed -e 's/_DIS_/VEFPreP1b/g'	tmp7 > tmp8
+sed -e 's/_LOC_/nodes/g'	tmp8 > tmp9
+sed -e 's/_N_/'$N'/g'		tmp9 > tmp10
+sed -e 's/_Ox_/'$Ox'/g'		tmp10 > tmp11
+sed -e 's/_Oy1_/'$delta'/g'	tmp11 > tmp12
+sed -e 's/_Oy2_/'$Yh'/g'	tmp12 > tmp13
+sed -e 's/_Oz_/'$Oz'/g'		tmp13 > tmp14
+sed -e 's/_CONV_/EF_stab { volumes_etendus alpha 0.2 }/g'	tmp14 > tmp15
+sed -e 's/_CLH_/paroi_decalee_Robin { delta _DELTA_ }/g'	tmp15 > tmp16
+sed -e 's/_DELTA_/'$delta'/g'	tmp16 > tmp17
+sed -e 's/_T_DEB_/'$T_DEB'/g'	tmp17 > tmp18
+sed -e 's/_T_FIN_/'$T_FIN'/g'	tmp18 > T0Q_VEF_Pironneau_maillage_decale/Cas.data
+
+rm -f tmp*
+
+
+# Dimensionnement des données de DNS (Kawamura et Moser-Kim-Mansour)
+#-------------------------------------------------------------------
+
+Re_tau_MKM=587.19
+
+mu=$(grep mu Cas.data | awk '{printf "%.7f",$4}')
+rho=`grep rho Cas.data | awk '{print $4}'`
+h=1
+
+u_tau_MKM=$(printf "%.5f" "`echo "$Re_tau_MKM*$mu/$rho/$h" | bc -l`")
+
+sed "1,4d" DNS_Moser_Kim_Mansour_Re590.dat | awk '{printf (" %.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\t%.6e\n",$1,$2,$3*'$u_tau_MKM',$3,$4*'$u_tau_MKM',$4,-$5*'$u_tau_MKM*$u_tau_MKM',-$5,-$6*'$u_tau_MKM*$u_tau_MKM',-$6,-$7*'$u_tau_MKM*$u_tau_MKM',-$7,-$8*'$u_tau_MKM*$u_tau_MKM',-$8,-$9*'$u_tau_MKM*$u_tau_MKM',-$9,-$10*'$u_tau_MKM*$u_tau_MKM',-$10)}' > tmp1
+sed "1i #      y     \t     y+     \t      U     \t     U+     \t     W\t    \t     W+     \t    R_uu    \t    R+_uu   \t    R_vv    \t    R+_vv   \t    R_ww    \t   R+_ww    \t     R_uv    \t    R+_uv    \t    R_uw     \t    R+_uw    \t     R_vw    \t   R+_vw\n#" tmp1 > tmp2
+sed "1i #     (1)    \t    (2)     \t     (3)     \t    (4)     \t    (5)     \t    (6)     \t     (7)     \t     (8)     \t     (9)    \t    (10)    \t    (11)    \t    (12)    \t     (13)    \t    (14)    \t    (15)    \t    (16)    \t     (17)    \t    (18)" tmp2 > DNS_Moser_Kim_Mansour_Re590_DIM.dat
+
+rm -f tmp*

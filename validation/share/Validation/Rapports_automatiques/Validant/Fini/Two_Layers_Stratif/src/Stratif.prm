@@ -1,0 +1,1536 @@
+Parameters {
+	Title "Turbulent Stratification with Thermal Gradient "
+	Description "Stable and Unstable Turbulent Layers in a channel "
+        Description "Validated Model :"
+        Description "________________: k-epsilon for thermal turbulent flow "
+        Description "________________: Standard Wall function with low y+ value "
+        Description "________________: Free surface flow "
+        Description "________________: implicit calculation "
+        Description "Validation with Viollet's experiments [1]"
+	Description "CAUTION : THE k-epsilon model IS NOT SO CONVENIENT for this type of flow."
+
+	VersionTrio_U "1.5.6"
+
+	ParametersTrio_U Type of problem : thermohydraulic turbulent
+	ParametersTrio_U Dimension : 2D
+        ParametersTrio_U Time scheme: 'implicite' implicit scheme		
+        ParametersTrio_U Hydraulic Convection scheme: For VEF:  EF_stab with alpha=1 (standard) or 0.2; For VDF: amont		
+        ParametersTrio_U Thermal Convection scheme: For VEF EF_stab with alpha=1 (standard) or 0.2; For VDF: amont			
+        ParametersTrio_U K_epsilon Convection scheme: amont		
+        ParametersTrio_U Discretization: VEFPreP1B
+        ParametersTrio_U Turbulence model: k epsilon with standard wall law function and Prandtl model with Prt=0.5
+        ParametersTrio_U Type of boundary conditions:	symmetry at the top edge, no-slip at fluid / solid interface, 
+        ParametersTrio_U Imposed stratified velocities, temperatures, k and eps at the inlet, different for each layer
+        ParametersTrio_U Type of fluid: water
+
+  	TestCase stable_vef STABLE /* jdd en annexe */
+  	TestCase stable_vef_alpha02 STABLE
+	TestCase stable_vdf STABLE
+   	TestCase unstable_vef UNSTABLE /* jdd en annexe */
+   	TestCase unstable_vef_alpha02 UNSTABLE
+ 	TestCase unstable_vdf UNSTABLE
+
+	Reference "[1] Turbulent mixing in a two layer stratified shear flow, P.L.Viollet, 2nd international symposium on stratified flows, Trondheim, Norvege, 24-27/06/1980, pp 315-325"
+	Reference "[2] Simulation des grandes echelles d'ecoulements turbulents stratifies en densite, B.Fallon, these, INPG, CEA, 21 decembre 1994"
+	Reference "[3] http://www.env.leeds.ac.uk/envi2210/notes/node12.html"
+
+	Author "S. BETIN, V. Barthel"
+	IncludeData 2
+}
+
+Chapter { 
+        Title "Test description"
+        Title "2D channel with specific dimensions: L=4,5m  H=2*h=0,2m"
+	Figure {
+                Title "Geometry description"
+                Width 9cm
+                picture ./Geometry.png
+		}
+	Description "In order to reduce the calculation time, we have stopped our discretization at X=4.5m. Of course the experimental facility is much longer, but there is no influence of the outlet"
+	Figure {
+                Title "Initial and Boundary conditions"
+	        Description "Initial conditions : u = U1 if y>0,1 U2 else ; v=0 "
+	        Description "__________________ : T = T1 if y>0,1 T2 else "
+		Description "Boundary conditions for Hydraulics: " 
+		Description "___________________: Top edge :  symetrie "
+     		Description "___________________: Low edge :  paroi_fixe "
+     		Description "___________________: Left edge :  inlet  with u=U1 if y >0,1 else U2  v=0 "
+     		Description "___________________: Right edge : outlet with u=0. "
+
+		Description "Boundary conditions for Temperature: "
+    		Description "___________________: Top edge :  symetrie "
+    		Description "___________________: Low edge :  paroi_adiabatique "
+    		Description "___________________: Left edge : inlet with  T=T1 if y >0,1 else T2   "
+    		Description "___________________: Right edge : outlet with T=0.   "
+		Description "K-$\varepsilon$ boundary and initial conditions : they are calculated for each layer with the correlations adapted to plane jet."
+                Width 9cm
+		picture ./BC-keps.png
+		Description "So we have the values below :"
+		Description "___________________: For u=0,1m.s-1, k=1.e-4 and $\varepsilon$=1.1e-4"   
+		Description "___________________: For u=0,05m.s-1, k=2.5e-5 and $\varepsilon$=1.39e-5"
+	}
+	Table { 
+                Title "Flow description"
+		Description "A stable and an unstable stratifications are calculated. The Reynolds number Reh = u1 h /$\nu$ and the Froude number \latex_(Fr = (u2 - u1) / [g$\beta(T1 - T2)h]^{1/2} $\latex_) have been chosen to respect the experimental values."
+         	Description "The stable two layers stratified flow is obtained with :"
+		Description "u1=0,05m.s-1 and u2=0,1m.s-1"
+		Description "T1=27,9°C    and T2=12,1°C "
+		Description "which corresponds to Reh = 5.10$^3$ and Fr = 0.9"
+		Description " "
+         	Description "The unstable two layers stratified flow is obtained with :"
+		Description "u1=0,1m.s-1  and u2=0,2m.s-1"
+		Description "T1=21°C      and T2=19°C"
+		Description "which respond to Reh = 10$^4$ and Fr = 5."
+		Description " "
+		Description "We will compare velocity and temperature profiles obtained at different distances from the inlet to those obtained by Viollet [1] in his experiments. We don't know the experimental values very well, especially the top thermal condition is not so clear. The free surface is modelized in the Trio_U calculations by a symmetry condition, this is not very satisfying."
+		Description "A useful parameter in the study of buoyancy effects on turbulent mixing is the gradient Richardson number, which can be written in this study [3] : Rix = (b h/x) / (u2 - u1)$^2$"
+        Description "where b is the buoyancy term defined by b = g$\beta$$\Delta$T"
+        Description "Gravity effects are negligible if Rix is small, and there is general experimental agreement that turbulent mixing is nearly suppressed when Rix is greater than a critical value Ric (about 0,1 to 0,3). At x = 40h in the 'stable case', Rih=0,02 so that buoyancy effects are negligible. In the unstable case Rih=0,6 so that the stratification is destroyed by the turbulence of ambient shear flow."
+        }
+
+	Table {
+        Title "Physical properties"
+        Description "Fluid domain: water at 20°C"
+        nb_columns 1
+                Label Valeur
+                line {
+                        legend "$\rho$ en kg/m$³$"
+                        file ./rho.dat
+                }
+                line {
+                        legend "$\mu$ en N/m$²$/s"
+                        file ./mu.dat
+                }
+                line {
+                        legend "$\lambda$ en W/m/K"
+                        file ./lambda.dat
+                }
+                line {
+                        legend "Cp en J/kg/K"
+                        file ./Cp.dat
+                }
+        }
+}
+
+Chapter {
+	Title "Calculation in stable regime : temperature gradient of 15.54°C"
+        visu {
+                Title "VEF Mesh"
+                Width 9cm
+	        Description " VEF Mesh :  7 200 meshes with trianguler_h option, Y+ ~= 22.5, u*=5.88e-3 "
+	        Description " The figure below is a Zoom on the first 0.5 m"
+                mesh stable_vef/STABLE.lata dom
+		zoom2D 0. 0.5 0. 0.2
+        }
+        visu {
+                Title "VDF Mesh"
+                Width 9cm
+	        Description " VDF Mesh :  7 000 meshes , Y+ ~= 28.8, u*=5.07e-3 "
+	        Description " The figure below is a Zoom on the first 0.5 m"
+                mesh stable_vdf/STABLE.lata dom
+		zoom2D 0. 0.5 0. 0.2
+        }
+	Description "We compare the non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5m , x=1m , x=1.5m , x=2m , x=3m and x=4m for the stable stratified flow."
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_VITESSEX0_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_TEMPERATUREX0_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=10"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U1m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_VITESSEX1
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_VITESSEX1
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_VITESSEX1
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=10"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T1m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "CAlcul VEF"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_TEMPERATUREX1
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "CAlcul VEF alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_TEMPERATUREX1
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_TEMPERATUREX1
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_VITESSEX1_5
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_TEMPERATUREX1_5
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=20"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U2m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_VITESSEX2
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_VITESSEX2
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_VITESSEX2
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=20"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T2m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_TEMPERATUREX2
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_TEMPERATUREX2
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_TEMPERATUREX2
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=30"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U3m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_VITESSEX3
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_VITESSEX3
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_VITESSEX3
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=30"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T3m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_TEMPERATUREX3
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_TEMPERATUREX3
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_TEMPERATUREX3
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+
+Figure {
+	Title "K profile at x/h=30"
+	Dimension 2
+        Width 9cm
+	RangeX 0 0.055
+	LabelX "K/u1^2"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_K_3m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_KX3
+		columns $2/(0.05*0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_KX3
+		columns $2/(0.05*0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_KX3
+		columns $2/(0.05*0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_VITESSEX4
+		columns ($2/0.05) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_stb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef/STABLE.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vef_alpha02/STABLE.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./stable_vdf/STABLE.data SONDE_TEMPERATUREX4
+		columns (($2-12.07)/15.84) ($1/0.1)
+		Style linespoints
+		TypeLigne 4      
+		TypePoints 4
+	}
+}
+
+}
+Chapter {
+          Title "Conclusions for the Stable case"
+          Table {
+                   Description "We observe that generally the temperature and velocity profiles given by Trio_U are rather close to the experimental profiles. "
+                   Description "This is especially true near the inlet, so we can say that the boundary conditions seem to be well modelized. But when we go more and more downstream the differences are greater."
+                   Description "The bottom wall condition in Trio_U leads to U=0 but in VDF discretization, the last value is given at the cell center so it is not zero."
+                   Description " We can see the greatest differences between the experimental and the calculated profiles at the top of the flow. The symmetry condition is not a so good model for free surface. For the temperature profile, perhaps that a heat exchange coefficient would be better to represent the boundary condition. In fact, the temperature seems to be lower in this part of the experimental curves."
+                  Description " Thus we see that the two layers channel velocity profiles are less similar near the outlet."
+                   Description "However we observe in the experimental profiles that the mass flow is not so constant along the channel... At the inlet we have estimated that the mean adimensionnal velocity is around 1.44 and at the outlet about 1.33 (with xmgr options). In Trio_U the mean velocity given with the same method is 1.4 and is constant at the outlet. But the mean value given by the code is 1.505, so the error induced by the graphical method is of about 7%"
+                   Description "The great variation in the experimental mass flow can be explained by the scanning of the curves from an old paper. It is difficult to measure the reality of this observation." 
+                   Description "The use of alpha=0.2 instead of 1 (standard) for the EF_stab convection scheme has little impact on the results. This more precise convection scheme gives results closer to the VDF results."
+                   Description "The standard k-epsilon model for this type of stable stratification is not so appropriate but the results are finally not so bad."
+          }
+}
+
+Chapter {
+	Title "Calculation in unstable regime : temperature gradient of 2°C"
+        Description "The VDF and VEF meshes are the same than in the stable case. But due to the different bottom velocity the friction velocity is different too."
+	Description " VEF Mesh :  7 200 meshes , Y+ ~= 40.1, u*=1.05e-2 "
+	Description " VDF Mesh :  7 000 meshes , Y+ ~= 32.6, u*=9.45-3 "
+
+Figure {
+	Title "Velocity profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_VITESSEX0_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=5"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T05m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_TEMPERATUREX0_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=10"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U1m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_VITESSEX1
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_VITESSEX1
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_VITESSEX1
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=10"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T1m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "CAlcul VEF"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_TEMPERATUREX1
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "CAlcul VEF alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_TEMPERATUREX1
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_TEMPERATUREX1
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_VITESSEX1_5
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=15"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T15m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_TEMPERATUREX1_5
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=20"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U2m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_VITESSEX2
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_VITESSEX2
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_VITESSEX2
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=20"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T2m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_TEMPERATUREX2
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_TEMPERATUREX2
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_TEMPERATUREX2
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=30"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U3m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_VITESSEX3
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_VITESSEX3
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_VITESSEX3
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=30"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T3m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_TEMPERATUREX3
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_TEMPERATUREX3
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_TEMPERATUREX3
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+
+Figure {
+	Title "K profile at x/h=30"
+	Dimension 2
+        Width 9cm
+	RangeX 0 0.055
+	LabelX "K/u1^2"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_K_3m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_KX3
+		columns $2/(0.1*0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_KX3
+		columns $2/(0.1*0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_KX3
+		columns $2/(0.1*0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Velocity profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0. 2.5
+	LabelX "U/u1 "
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_U4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_VITESSEX4
+		columns ($2/0.1) ($1/0.1)
+		Style linespoints
+		TypeLigne 4
+		TypePoints 4 
+	}
+}
+
+Figure {
+	Title "Temperature profile at x/h=40"
+	Dimension 2
+        Width 9cm
+	RangeX 0 1.
+	LabelX "(T-T2)/(T1-T2)"
+	RangeY 0. 2.
+	LabelY "Y/h"
+	legend  below title "Legende"
+	Include_Description_Curves 0
+	Curve {
+		legend "Experimental values"
+		origin "Reference 1"
+		Version "24-27/06/1980"
+		file ./Data_Ref/Ref_T4m_instb.txt
+		columns 2 3
+		Style points
+		TypeLigne 1
+		PointSize 2
+	}
+	Curve {
+		legend "VEF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef/UNSTABLE.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 3
+		TypePoints 3
+	}
+	Curve {
+		legend "VEF Calculation alpha=0.2"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vef_alpha02/UNSTABLE.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 5
+		TypePoints 5
+	}
+	Curve {
+		legend "VDF Calculation"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		Segment ./unstable_vdf/UNSTABLE.data SONDE_TEMPERATUREX4
+		columns (($2-19.)/2.) ($1/0.1)
+		Style linespoints
+		TypeLigne 4      
+		TypePoints 4
+	}
+}
+
+}
+Chapter {
+          Title "Conclusions for the unstable case"
+          Table {
+                   Description "First we can observe that the VEF and VDF discretizations gives very similar profiles, just the turbulent kinetic energy k has a little different level. But the temperature and velocity profiles given by Trio_U are not close to the experimental profiles. "
+		   Description "The calculated velocity profile corresponds well with the experiment. However, near the inlet, the calculated velocity profile is much more flat in the bottom part (u2=0.2 m/s) than the experimental profile... After h/D=30, the experimental ones are sometimes higher, sometimes lower. Again we can say again that the mass flow in the experimental profiles seems not so constant along the channel and that can explain some differences between velocity curves.  
+		   Description "The temperature mixing of the layers is much quicker in the calculated results than in the experimental profiles. The calculated thermal gradient is rapidly linear, while the experimental one keeps some "levels". The energy quantity seems to be different in the two models. Again we can say that it should be more respectful to put a heat exchange coefficient at the top boundary condition."
+                   Description "The use of alpha=0.2 instead of 1 (standard) for the EF_stab convection scheme has little impact on the results. This more precise convection scheme gives results closer to the VDF results."
+                   Description "The standard k-epsilon model with the Prandtl thermal model and Boussinesq gravity effects seems not so appropriate. Neither VDF nor VEF discretization give the experimental results, especially for thermal profiles. But the experimental result show some curious behaviour too. It is very difficult to say what can be validated or not."
+          }
+}
+
+Chapter {
+          Table {
+                   Title "Recommendations for users"
+                   Description "It has be recommended by Fallon [2] to use a turbulent Prandt number of 0.5 instead of 0.9 to modelize this type of free surface flow. This is what we have done but the results with a standard 0.9 Prt number are quite the same for this calculation."
+                   Description "A great attention has to be given to the turbulent boundary conditions that can have a significative effect on the results."
+                   Description "Use the EF_stab convection scheme for VEF discretization, and not the EF scheme that is not suitable yet for symmetric conditions."
+		   Description "The use of 'implicite' as an implicit time scheme enables a gain factor ranged between 5 to 20 (see validation file Two_Layers_stratif_impl). It is therfore recommended to use it in order to speed up the calculation."
+          }
+}
+
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}

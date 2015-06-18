@@ -1,0 +1,9 @@
+Dimension 3
+Domaine dom
+Read_file dom cylindre.geom
+Partition dom {
+        partitionneur tranche { tranches 2 2 2 }
+        larg_joint 2
+        nom_zones dom
+}
+End

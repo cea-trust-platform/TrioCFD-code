@@ -1,0 +1,254 @@
+# Thermohydraulique 2D : Conditions limites instationnaires #
+dimension 3
+Pb_Thermohydraulique pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave zone1 
+		{
+		Origine 0. 0. 0.
+     		Nombre_de_Noeuds 10 3 10
+		Longueurs 0.215 0.060 0.100
+                facteurs 1.00 1.0 1.0        
+		}
+		{
+		Bord Gauche1   X = 0.0   0. <= Y <= 0.060  0. <= Z <= 0.100 
+		Bord Base1     Y = 0.0   0. <= X <= 0.215  0. <= Z <= 0.100 
+		Bord Front1    Z = 0.0   0. <= X <= 0.215  0. <= Y <= 0.060
+		Bord Back1     Z = 0.1   0. <= X <= 0.215  0. <= Y <= 0.060
+		} ,
+		
+	Pave zone2 
+		{
+		Origine 0. 0.060 0.
+     		Nombre_de_Noeuds 10 10 10
+		Longueurs 0.215 0.160 0.100
+                facteurs 1.00 1.0 1.0        
+		}
+		{
+		Bord Gauche2   X = 0.0   0.06 <= Y <= 0.220  0.00 <= Z <= 0.100 
+		Bord Top1      Y = 0.220 0.00 <= X <= 0.215  0.00 <= Z <= 0.100 
+		Bord Front2    Z = 0.0   0.00 <= X <= 0.215  0.06 <= Y <= 0.220
+		Bord Back2     Z = 0.1   0.00 <= X <= 0.215  0.06 <= Y <= 0.220
+		Bord Droite1   X = 0.215 0.06 <= Y <= 0.220  0.00 <= Z <= 0.100
+		} ,	
+	
+	Pave zone3 
+		{
+		Origine 0.215 0. 0.
+     		Nombre_de_Noeuds 2 3 10
+		Longueurs 0.010 0.060 0.100
+                facteurs 1.00 1.0 1.0        
+		}
+		{
+		Bord Base2     Y = 0.0   0.215 <= X <= 0.225  0.00 <= Z <= 0.100 
+		Bord Top2      Y = 0.060 0.215 <= X <= 0.225  0.00 <= Z <= 0.100 
+		Bord Front3    Z = 0.0   0.215 <= X <= 0.225  0.00 <= Y <= 0.060
+		Bord Back3     Z = 0.1   0.215 <= X <= 0.225  0.00 <= Y <= 0.060
+		} ,	
+	
+
+	Pave zone4 
+		{
+		Origine 0.225 0. 0.
+     		Nombre_de_Noeuds 10 3 10
+		Longueurs 0.215 0.060 0.100
+                facteurs 1.00 1.0 1.0        
+		}
+		{
+		Bord Droite2    X = 0.440 0.000 <= Y <= 0.060  0. <= Z <= 0.100 
+		Bord Base3     Y = 0.000 0.225 <= X <= 0.440  0. <= Z <= 0.100 
+		Bord Front4    Z = 0.000 0.225 <= X <= 0.440  0. <= Y <= 0.060
+		Bord Back4     Z = 0.100 0.225 <= X <= 0.440  0. <= Y <= 0.060
+		} ,
+
+	Pave zone5 
+		{
+		Origine 0.225 0.060 0.
+     		Nombre_de_Noeuds 10 10 10
+		Longueurs 0.215 0.160 0.100
+                facteurs 1.00 1.0 1.0        
+		}
+		{
+		Bord Droite3    X = 0.440 0.060 <= Y <= 0.220  0.00 <= Z <= 0.100 
+		Bord Top3      Y = 0.220 0.225 <= X <= 0.440  0.00 <= Z <= 0.100 
+		Bord Front5    Z = 0.0   0.225 <= X <= 0.440  0.06 <= Y <= 0.220
+		Bord Back5     Z = 0.1   0.225 <= X <= 0.440  0.06 <= Y <= 0.220
+		Bord Gauche3   X = 0.225 0.060 <= Y <= 0.220  0.00 <= Z <= 0.100
+		} 	
+
+}
+
+Tetraedriser_homogene_fin dom
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0.0
+	nb_pas_dt_max 3
+	tmax 1800.0
+	dt_min 1.0e-8
+	dt_max .5
+	dt_impr 5.0
+	facsec 1.0
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible water
+Read water
+{       
+        mu Champ_Uniforme 1 0.0008	 
+	rho Champ_Uniforme 1 995.0
+	lambda Champ_Uniforme 1 0.6
+        Cp Champ_Uniforme 1 4179.0
+	beta_th Champ_Uniforme 1 2.8e-4
+}
+
+Champ_Uniforme gravite
+Read gravite 3  0.0 -9.81 0.0
+
+Associate water gravite
+Associate pb dom
+Associate pb sch
+Associate pb water
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression Gcp { 
+			precond ssor { omega 1.5 }
+			seuil 1.000000e-15
+			impr 
+			}
+		
+		convection { amont }
+		diffusion { }
+		sources { boussinesq_temperature { T0 26.0 } }
+		conditions_initiales {
+			vitesse Champ_Uniforme 3 0. 0. 0.
+			} 
+                 
+		boundary_conditions {
+			Gauche1 paroi_fixe  
+			Base1 paroi_fixe
+			Front1 paroi_fixe
+			Back1 paroi_fixe
+			
+			Gauche2 paroi_fixe
+			Top1 symetrie
+			Front2 paroi_fixe
+			Back2 paroi_fixe
+			Droite1 paroi_fixe
+			
+			Base2 Paroi_fixe 
+			Top2 paroi_fixe
+			Front3 paroi_fixe
+			Back3 paroi_fixe
+			
+			Droite2 paroi_fixe
+			Base3 paroi_fixe
+			Front4 paroi_fixe
+			Back4 paroi_fixe
+			
+			Droite3 paroi_fixe 
+			Top3 symetrie 
+			Front5 paroi_fixe
+			Back5 paroi_fixe
+			Gauche3 paroi_fixe
+		}
+
+
+
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { amont }
+		boundary_conditions 
+		{
+			Gauche1 paroi_adiabatique  
+			Base1 paroi_adiabatique
+			Front1 paroi_adiabatique
+			Back1 paroi_adiabatique
+			
+			
+			Gauche2 paroi_adiabatique
+			
+			Top1 paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1
+                        30 H_imp Champ_Front_Uniforme 1  10.0
+			
+			
+			Front2 paroi_adiabatique
+			Back2 paroi_adiabatique
+
+			Droite1  paroi_flux_impose Champ_Front_Uniforme 1  3125.0
+			
+			
+			Base2 Paroi_adiabatique
+			Top2 paroi_adiabatique
+			Front3 paroi_adiabatique
+			Back3 paroi_adiabatique
+			
+			
+			Droite2 paroi_adiabatique
+			Base3 paroi_adiabatique
+			Front4 paroi_adiabatique
+			Back4 paroi_adiabatique
+			
+			
+			Droite3 paroi_adiabatique
+						
+			Top3 paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1
+                        30 H_imp Champ_Front_Uniforme 1  10.0
+			
+			Front5 paroi_adiabatique
+			Back5 paroi_adiabatique
+
+                        Gauche3  paroi_flux_impose Champ_Front_Uniforme 1  3125.0
+
+
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 26. }
+		
+		
+             
+	}
+
+	Postraitement
+	{
+		Sondes
+		{       
+			
+			sonde_temp1  temperature periode 10.0 point 1 0.250 0.125 0.050
+                        sonde_temp2  temperature periode 10.0 point 1 0.325 0.125 0.050
+			sonde_temp3  temperature periode 10.0 point 1 0.400 0.125 0.050
+                        sonde_temp4  temperature periode 10.0 point 1 0.250 0.170 0.050
+			sonde_temp5  temperature periode 10.0 point 1 0.325 0.170 0.050
+			sonde_temp6  temperature periode 10.0 point 1 0.400 0.170 0.050
+                        sonde_temp7  temperature periode 10.0 point 1 0.250 0.205 0.050
+                        sonde_temp8  temperature periode 10.0 point 1 0.325 0.205 0.050
+			sonde_temp9  temperature periode 10.0 point 1 0.400 0.205 0.050
+			
+                        sonde_Y_plus Y_plus periode 10.0 segment 10 0.00 0.25 0.050 0.00 .220 0.050 
+		}
+		format lml Champs dt_post 300.0
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+			Y_plus
+			temperature elem
+			temperature som
+		}
+	}
+
+}
+
+Solve pb
+End

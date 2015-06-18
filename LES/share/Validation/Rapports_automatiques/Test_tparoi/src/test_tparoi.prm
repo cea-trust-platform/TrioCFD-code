@@ -1,0 +1,111 @@
+Parameters {
+	Title "Test du postraitement Tparoi"
+	Author "fauchet "
+	description "On regarde le calcul de la temperature de paroi en flux impose"
+	TestCase . Temp_imposee
+	TestCase . flux_impose
+	TestCase . ldp_flux_impose
+}
+Chapter {
+
+	Title "sans convection"
+	Visu {
+		Title "Reference"
+		pseudocolor Temp_imposee.lata dom_pb_dual TEMPERATURE FACES
+		query Max Timp
+	}
+	Visu {	
+		Title temperature en flux impose
+		pseudocolor flux_impose.lata dom_pb_dual TEMPERATURE FACES
+			query Max flux_imp
+	}
+	Visu {
+		Title "temperature Tparoi en flux impose"
+		pseudocolor flux_impose.lata dom_pb_dual TEMPERATURE_PHYSIQUE FACES
+			query Max tparoi_flux_imp
+	}
+	Visu {
+		Title "difference entre T en Temperature imposee et T en flux impose"
+		instruction_visit DefineScalarExpression("delta_TEMPERATURE_FACES_dom_pb_dual","TEMPERATURE_FACES_dom_pb_dual-pos_cmfe(<Temp_imposee.lata[0]id:TEMPERATURE_FACES_dom_pb_dual>,dom_pb_dual,1000.)")
+		pseudocolor flux_impose.lata dom_pb_dual delta_TEMPERATURE FACES
+		# pour eviter bug dans visit quan on fait un delta de delta
+		origin visit
+		
+	}
+	Visu {
+		Title "difference entre Tparoi en Temperature imposee et T en flux impose"	
+		instruction_visit DefineScalarExpression("delta_TEMPERATURE_PHYSIQUE_FACES_dom_pb_dual","TEMPERATURE_PHYSIQUE_FACES_dom_pb_dual-pos_cmfe(<Temp_imposee.lata[0]id:TEMPERATURE_PHYSIQUE_FACES_dom_pb_dual>,dom_pb_dual,1000.)")
+		pseudocolor flux_impose.lata dom_pb_dual delta_TEMPERATURE_PHYSIQUE FACES
+		# pour eviter bug dans visit quan on fait un delta de delta
+		origin visit
+	
+	}
+		
+}
+Chapter {
+	Visu {	
+		Title temperature en ldp_flux impose
+		pseudocolor ldp_flux_impose.lata dom_pb_dual TEMPERATURE FACES
+			query Max ldp_flux_imp
+	}
+	Visu {
+		Title "temperature Tparoi en ldp_flux impose"
+		pseudocolor ldp_flux_impose.lata dom_pb_dual TEMPERATURE_PHYSIQUE FACES
+			query Max tparoi_ldp_flux_imp
+	}
+	Visu {
+		Title "difference entre T en Temperature imposee et T en ldp_flux impose"
+		instruction_visit DefineScalarExpression("delta_TEMPERATURE_FACES_dom_pb_dual","TEMPERATURE_FACES_dom_pb_dual-pos_cmfe(<Temp_imposee.lata[0]id:TEMPERATURE_FACES_dom_pb_dual>,dom_pb_dual,1000.)")
+		pseudocolor ldp_flux_impose.lata dom_pb_dual delta_TEMPERATURE FACES
+		# pour eviter bug dans visit quan on fait un delta de delta
+		origin visit
+
+	}
+	Visu {
+		Title "difference entre Tparoi en ldp_imposee et  en ldp_flux impose"	
+		instruction_visit DefineScalarExpression("delta_TEMPERATURE_PHYSIQUE_FACES_dom_pb_dual","TEMPERATURE_PHYSIQUE_FACES_dom_pb_dual-pos_cmfe(<ldp_flux_impose.lata[0]id:TEMPERATURE_PHYSIQUE_FACES_dom_pb_dual>,dom_pb_dual,1000.)")
+		pseudocolor flux_impose.lata dom_pb_dual delta_TEMPERATURE_PHYSIQUE FACES
+		# pour eviter bug dans visit quan on fait un delta de delta
+		origin visit
+
+	}
+}
+Chapter {
+ 	Title recapitulatif
+	Table {
+	nb_columns 1 
+	label Temprerature max
+	line {
+	nb_columns_file 2
+	file Timp
+	columns $2
+	legend Temperature imposee
+	}
+	line {
+	nb_columns_file 2
+	file flux_imp
+	columns $2
+	legend flux impose
+	}
+	line {
+	nb_columns_file 2
+	file tparoi_flux_imp
+	columns $2
+	legend flux impose (T paroi)
+	}
+	line {
+	nb_columns_file 2
+	file ldp_flux_imp
+	columns $2
+	legend loi de paroi sur flux impose 
+	}
+	line {
+	nb_columns_file 2
+	file tparoi_ldp_flux_imp
+	columns $2
+	legend loi de paroi sur flux impose (T paroi)
+	}
+
+	}
+	
+}

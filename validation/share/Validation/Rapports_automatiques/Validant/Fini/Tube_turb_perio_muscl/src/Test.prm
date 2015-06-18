@@ -1,0 +1,274 @@
+Parameters {
+	Title "Fully developed turbulent flow in circular tube"
+	Description "Simulation of a periodic tube"
+	Description "Validated Model"
+	Description "Muscl convection scheme. The same test has been done with EF_stab scheme: see Tube_turb_perio_EF_stab report"
+	Description "Wall function"
+	Description "K-eps turbulence modelling"
+	Description "Validation with analytical laws"
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of problem : Hydraulique_turbulent
+	ParametersTrio_U Discretization : VEFPreP1B
+	ParametersTrio_U Time scheme : Euler Implicite
+	ParametersTrio_U Solving of equations : Navier Stokes_Turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi loi_standard_hydr
+	ParametersTrio_U Convection scheme : Momentum : Muscl
+	ParametersTrio_U Diffusion scheme : Default {} for all equations
+	ParametersTrio_U Turbulence model : k-eps with wall function muscl convection scheme 
+	ParametersTrio_U Type of fluid : fictive
+
+	TestCase TUBE_TURB TUBE_TURB_perio 4 /* jdd en annexe */
+
+	Author "U B, A. AUROUSSEAU (S.VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : Circular pipe"
+	Description "Dimensions : R=2 m, L=10 m"
+	Description "Mesh : 78576 tetraedral cells. That mesh has been generated with ICEM and features two layers of prisms."
+	Description "Initial conditions : the turbulent flow is chosen in order to have Reh=Wbulk*D/nu=110000"
+	Description "Flat profil of bulk velocity: Vitesse Champ_Uniforme 3 0.0 0.0 27.5"
+	Description "Constant values for turbulence: k_Eps Champ_Uniforme 2 0.001 0.0001"
+	Description "Boundary conditions : The tube is periodic"
+	visu {
+		Title "Mesh"
+		Width 10cm
+		mesh TUBE_TURB/TUBE_TURB_perio.lata DOM_DOM
+		normal3D -0.6 0.2 0.8
+		up3D -0.08 1 -0.16
+	}
+	
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho$ = 1 kg/m$^3$"
+		Description "$\mu$ = 0.001 kg/m/s"
+	}
+	Table {
+		Title "Calculation method"
+		Description "Implicit calculation : "
+		Description "the calculations can be stopped when a fully turbulent flow is well established. The convergence is set"
+		Description "to about Ttot=100 s of physical time. This corresponds to just more than 275 turn over cycles (Ttot*Wbulk/L)."
+		Description "The results are given at 100s"
+		Description ""
+        }
+	Table {
+                Title "Time step"
+		nb_columns 1
+		Label Average time step
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./TUBE_TURB/TUBE_TURB_perio.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description " Three dimensional visualisation of main fields and comparison to theoretical results  "
+	
+	visu {
+                Title "Axial velocity distribution"
+                Width 10cm
+                pseudocolor TUBE_TURB/TUBE_TURB_perio.lata DOM_DOM_dual VITESSE_Z FACES
+                normal3D -0.6 0.2 0.8
+                up3D -0.08 1 -0.16
+        }
+
+	visu {
+                Title "Distribution of the wall distance y+"
+                Width 10cm
+                pseudocolor TUBE_TURB/TUBE_TURB_perio.lata DOM_DOM Y_PLUS ELEM
+                normal3D -0.6 0.2 0.8
+                up3D -0.08 1 -0.16
+        }
+
+	visu {
+                Title "Distribution of turbulent viscosity in vertical cut plane"
+                Width 10cm
+                pseudocolor TUBE_TURB/TUBE_TURB_perio.lata DOM_DOM VISCOSITE_TURBULENTE ELEM
+		Operator Slice2d 0 0 0 1 0 0
+        }
+
+	Table {
+		Title "Comparison to analytical solutions"
+		Description "The velocity profiles are given in the adimensional form and compared with laws that "
+		Description "represent the logarithmic zone of the boundary layer."
+		Description "The adimensional profile W$^+$=f(y$^+$) with W$^+$=W/u$\tau$ and y$^+$=y*u$\tau$/nu is compared with the logarithmic law:"
+		Description "W$^+$=1/0.415*ln(y$^+$)+5.32"
+	}
+	
+	Table {
+		Description "The forcing term evolution is displayed on the following plot. Periodic boundary conditions implie that the code has to force the pressure gradient to keep the flow simulation going. The value of this forcing term matches the value of the pressure loss inside the pipe"
+		}	
+
+	Figure {
+		Title "Forcing term evolution"
+		Width 12cm
+		Dimension 2
+		LabelX "Time (s)"
+		RangeX 0. 100.
+		LabelY "Forcing (m/s**2)"
+		RangeY 0. 2.0
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic" 
+			origin "Theory" 
+			Fonction 1.6402        
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "EF_stab"
+			origin "Trio_U"
+			file TUBE_TURB/TUBE_TURB_perio_Pressure_Gradient_pb_perio
+			columns ($1) ($2)
+			Style lines
+		}
+			
+	}
+	
+	
+	Figure {
+		Title "Radial profile of axial velocity"
+		Width 12cm
+		Dimension 2
+		LabelX "Y+"
+		RangeX 10 10000
+		LogX
+		LabelY "W+"
+		RangeY 0 35
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Loi Log"
+			origin "Trio_U"
+			Fonction (1/0.415)*log(x)+5.32
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "First point EF_stab"
+			origin "Trio_U"
+			file TUBE_TURB/first_Point.dat
+			columns ($1) ($2)
+			TypePoints 1
+			PointSize 3
+		}
+		Curve {
+			legend "Trio_U EF_stab"
+			origin "Trio_U"
+			file TUBE_TURB/axial_velocity.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}
+	}
+
+	Table {
+		Description "The profile doesn't match the logarithmic law curve, the slope isn't correctly predicted. However, the first point of the Trio_U profile is on this theoretical curve "
+		
+	}
+	
+	Table {
+		Title "Bulk velocity and Reynolds (objective and calculated)"		
+		Description "We show the theorical and calculated values of velocity and Reynolds number "
+		nb_columns 5
+		label U (objective) | U (Trio_U) | Re (objective) | Re (Trio_U) | Re variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./TUBE_TURB/ligneReynolds.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+
+	Table {
+		Description "The next tables will give the friction velocity u$\tau$ and the pressure loss"
+		Description "$\Delta$H (1/$\rho$ DP/dx = 4/Dh u$\tau$ $^2$ in a circular pipe)"
+	}
+
+	Table {
+		Title "Friction velocity"
+		nb_columns 3
+		label U$\tau$ (Blasius) | U$\tau$ (Trio_U) | variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./TUBE_TURB/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3)
+		}
+	}
+	
+	Table {
+		Title "Pressure loss"
+		nb_columns 5
+		label $\Delta$H=4U$\tau$$^2$/D (theoretical) | $\Delta$H=U$\tau$$^2$S/V (Trio_U) | variation (%) | Source term Trio_U | variation (%)
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./TUBE_TURB/ligneTableau.dat
+			nb_columns_file 8
+			columns ($4) ($5) ($6) ($7) ($8)
+		}
+	}
+	
+	Table {
+		Description "The error on the friction velocity is about 15%, which is quite large. The pressure drop error is also large (around 17%). This demonstrates that the Trio_U code doesn't give good results for that kind of application with use of the Muscl convection scheme on the moment conservation equation."
+	}	
+
+	Table {
+		Description "The next figure displays the radial profile of the turbulent viscosity. Since the tube is periodic, the probe axial position (z position) doesn't matter for the analysis of this profile"
+		}
+	
+	Figure {
+		Title "Turbulent viscosity radial profile. (segment probe position: Y=0, Z=5)"
+		Width 12cm
+		Dimension 2			
+		LabelX "Dimensionless radial distance y/R"
+		RangeX 0 1.0
+		LabelY "Dimensioneless nut: nut/(RU*)"
+		RangeY 0 0.12
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend ""
+			origin "Trio_U"
+			Segment TUBE_TURB/TUBE_TURB_perio.data SONDE_NUT
+			columns (($1)+2)/2 ($2)/2.56
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Launder-Sharma model"
+			origin "Model"
+			file TUBE_TURB/nut_profile_LaunderSh.dat
+			columns ($1) ($2)
+			TypePoints 2
+		}	
+	}
+	Table {
+		Description "The turbulent viscosity profile matches the Launder-Sharma model for the lowest values (until about y/R=0.2), and the error goes larger as the radial distance increases."
+	}
+	
+}
+
+Chapter {
+	Title "Recommendation to user"
+	Description "This computation has been carried out with two convection schemes: Muscl and EF_stab. Results with EF_stab convection are presented in the report Tube_turb_perio_EF_stab. Results from both tests show that is best to use EF_stab scheme for that kind of application. However, the turbulent viscosity curves show that is with the muscl scheme that nut is best predicted"
+	
+	
+}
+
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}

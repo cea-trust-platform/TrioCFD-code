@@ -1,0 +1,168 @@
+#!/bin/bash
+# Maillage variable en etirement suivant la direction de l'ecoulement (facteur f) et suivant la direction transverse (facteur g)
+mkdir -p  3D_6_keps_f1g1  3D_6_keps_f15g10 3D_6_keps_f35g25 3D_6_keps_f40g1 3D_6_keps_f100g1 3D_6_keps_f300g1 3D_6_keps_f100g100 3D_6_keps_f300g100 3D_6_keps_f300g300 3D_21_keps_f1g1 3D_21_keps_f15g10 3D_21_keps_f35g25 3D_21_keps_f40g1 3D_21_keps_f100g1 3D_21_keps_f300g1 3D_21_keps_f100g100 3D_21_keps_f300g100 3D_21_keps_f300g300 2prismes_f1g1 2prismes_f15g10 3prismes_f1g1 4prismes_f1g1 4prismes_f15g10
+
+cd 3D_6_keps_f1g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+mv  3D_6_keps.data 3D_keps.data
+
+cd ../3D_6_keps_f15g10
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 15*x y 10*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f35g25
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 35*x y 25*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+
+cd ../3D_6_keps_f40g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 40*x y z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f100g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+
+cd ../3D_6_keps_f300g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f100g100
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y 100*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f300g100
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y 100*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f300g300
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y 300*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+
+cd ../3D_21_keps_f1g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6 3/Nombre_de_Noeuds 3 21 3/" 3D_6_keps.data > modifie.data
+sed "s/0.8/0.2/g"  modifie.data  > 3D_keps.data
+rm modifie.data 3D_6_keps.data
+cp 3D_keps.data 3D_21_keps.data
+mv 3D_21_keps.data ../.
+
+cd ../3D_21_keps_f15g10
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 15*x y 10*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data
+
+cd ../3D_21_keps_f35g25
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 35*x y 25*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data
+
+
+
+cd ../3D_21_keps_f40g1
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 40*x y z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+cd ../3D_21_keps_f100g1
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f300g1
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f100g100
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y 100*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f300g100
+cp ../3D_21_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y 100*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f300g300
+cp ../3D_21_keps.data .
+cp ../post_run .
+$TRUST_Awk '/dimension 3/ {print "# lance_test 1 ecart #";print $0;getline} 
+             /Transformer dom x y z/ {print "Transformer dom 300*x y 300*z";getline} 
+	     // {print $0}' 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data
+
+
+cd ../2prismes_f1g1
+cp ../keps_prisme.data .
+cp ../post_run .
+mv keps_prisme.data 3D_keps.data
+
+cd ../2prismes_f15g10
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 15*x y 10*z/" keps_prisme.data > modifie.data
+sed "s/facsec_max 500/facsec_max 100/"  modifie.data > 3D_keps.data
+rm keps_prisme.data modifie.data
+
+cd ../3prismes_f1g1
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/0.85/0.775/" keps_prisme.data > modifie.data
+sed "s/nb_tranches 2/nb_tranches 3/g" modifie.data > keps_prisme.data
+sed "s/0.15/0.225/g" keps_prisme.data > 3D_keps.data
+rm keps_prisme.data modifie.data
+
+cd ../4prismes_f1g1
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/0.85/0.7/" keps_prisme.data > modifie.data
+sed "s/nb_tranches 2/nb_tranches 4/g" modifie.data > keps_prisme.data
+sed "s/0.15/0.3/g" keps_prisme.data > 3D_keps.data
+rm keps_prisme.data modifie.data
+
+cd ../4prismes_f15g10
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/0.85/0.7/" keps_prisme.data > modifie.data
+sed "s/Transformer dom x y z/Transformer dom 15*x y 10*z/" modifie.data > keps_prisme.data
+sed "s/nb_tranches 2/nb_tranches 4/g" keps_prisme.data > modifie.data
+sed "s/0.15/0.3/g" modifie.data >  keps_prisme.data
+sed "s/facsec_max 500/facsec_max 100/"  keps_prisme.data > 3D_keps.data
+rm keps_prisme.data modifie.data
+
+
+cd ..
+
+

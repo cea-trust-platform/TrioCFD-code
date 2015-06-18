@@ -1,0 +1,555 @@
+Parameters {
+	Title "THI LES VEF"
+	Description "THI LES VEF"
+	Description "Validated Model : THI LES (WALE) "
+	Description "Validation with : analytical laws, a VDF calculation is taken as a reference."
+
+	VersionTrio_U "1.6.4"
+
+	ParametersTrio_U Type of problem : Hydraulique_Turbulent
+	ParametersTrio_U Diffusion scheme : Default{}
+	ParametersTrio_U Discretization : VEFPreP1B (+ a VDF reference test case)
+	ParametersTrio_U Time schemes: Schema_Euler_implicite (facsec_max=2 and facsec_max=4) ;  Runge_Kutta_Ordre_3 (facsec=1.)
+	ParametersTrio_U Solving of equations : "Navier Stokes turbulent" 
+	ParametersTrio_U Convection : Centre for VDF; Amont, EF_stab (alpha=1; 0,2), muscl for VEF
+	ParametersTrio_U Turbulence model : LES Wale 
+	ParametersTrio_U Type of boundary conditions : Periodicity in x, y and z directions
+
+	TestCase  RK_VDF_centre thi
+	TestCase  ImplFS4_Amont thi 
+	TestCase  ImplFS4_EF_STAB thi 
+	TestCase  ImplFS4_EF_STAB_0.2 thi 
+	TestCase  ImplFS4_muscl thi 
+	TestCase  ImplFS2_Amont thi 
+	TestCase  ImplFS2_EF_STAB thi 
+	TestCase  ImplFS2_EF_STAB_0.2 thi 
+	TestCase  ImplFS2_muscl thi 
+	TestCase  RK_Amont thi /*jdd en annexe*/
+	TestCase  RK_EF_STAB thi 
+	TestCase  RK_EF_STAB_0.2 thi 
+	 
+	
+	Author "O. Cioni"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Tests Description"
+	Description "Geometry : 3D periodic box"
+	Description "Dimensions : Ly=2*pi, Lx=2*pi, Lz=2*pi"
+	Description "Mesh : 32x32x32 and Tetraedriser_par_prisme "
+	Description "Initial conditions : Champ_fonc_xyz dom 3"
+	Description "0.5*sin(y+1)+1.0*sin(2*y)+0.5*sin(3*y)+0.5*sin(z+2+3.14)+1.0*sin(2*z)+0.5*sin(3*z)"
+	Description "0.5*sin(z+2)+1.0*sin(2*z)+0.5*sin(3*z)+0.5*sin(x+3+3.14)+1.0*sin(2*x)+0.5*sin(3*x)"
+	Description "0.5*sin(x+3)+1.0*sin(2*x)+0.5*sin(3*x)+0.5*sin(y+1+3.14)+1.0*sin(2*y)+0.5*sin(3*y)"
+	Description "Boundary conditions : periodicity conditions in all directions"
+
+	visu {
+		Width 11cm,viewport= 0 0 1024 1000,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VDF"
+		mesh RK_VDF_centre/thi.lata dom
+		Description " 58x58x58 hexaedra "
+	}
+	visu {
+		Width 11cm,viewport= 0 0 1024 1000,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Mesh : VEF"
+		mesh RK_Amont/thi.lata dom
+		Description " 32x32x32 hexaedra x6"
+	}
+
+	visu {
+		Width 11cm,viewport= 0 0 1024 1000,clip
+		normal3D -0.56614 0.324945 0.757559
+		up3D 0.161316 0.944928 -0.28476
+		Title "Initial velocity conditions"
+		pseudocolor RK_Amont/thi.lata dom norme_VITESSE ELEM
+		cycles 0
+	}
+
+
+}
+	
+	
+		
+	
+Chapter {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho = 1$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\mu$ = 1e-20 such as Re = \latex_($\infty$\latex_) "
+	}
+	
+Chapter {
+	Title "Numerical schemes"
+		Description "Different time schemes are tested : Schema_Euler_implicite facsec_max=4 ;  Schema_Euler_implicite facsec_max=2 Runge_Kutta_Ordre_3 scheme with facsec=1. "
+		Description "Convection : Amont, EF_stab (alpha=1 and alpha=0.2)"
+		Description "Diffusion scheme : Default {}"
+	Table {
+		Title "Time steps"
+		Description "In the following table, the time steps for each equation are given. dt_stab is the global stability time step computed by the code. dt is the time step used for the simulation. dt_cfl is the CFL time step given by the stability conditions on the convective terms. dt_Fourier is the Fourier time steps given by the stability conditions on the diffusive terms  for the momentum equation."
+		Description " "
+		nb_columns 3
+		label dt/dt_stab | dt/dt_cfl  | dt/dt_Fourier
+		line {
+			origin "Trio_U"
+			legend "RK_VDF_ventre"
+			file ./RK_VDF_centre/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "RK_Amont"
+			file ./RK_Amont/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "RK_EF_STAB"
+			file ./RK_EF_STAB/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "RK_EF_STAB_0.2"
+			file ./RK_EF_STAB_0.2/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "ImplFS2_Amont"
+			file ./ImplFS2_Amont/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "ImplFS2_EF_STAB"
+			file ./ImplFS2_EF_STAB/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "ImplFS2_EF_STAB_0.2"
+			file ./ImplFS2_EF_STAB_0.2/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "ImplFS4_Amont"
+			file ./ImplFS4_Amont/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "ImplFS4_EF_STAB"
+			file ./ImplFS4_EF_STAB/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+		line {
+			origin "Trio_U"
+			legend "ImplFS4_EF_STAB_0.2"
+			file ./ImplFS4_EF_STAB_0.2/comp_facsec
+			nb_columns_file 3
+			columns ($1) ($2) ($3) 
+		}
+	}
+	
+}
+	
+Chapter {
+	Title "Comments"
+	Description "Different curves are drawn.  "
+	Description "- First the kinetic energy EC as a function of an adimensionnal time t/tr, where tr is the reversal time. It is given by the following relation: tr=(box length/sqrt(2xinitial Ec)). With an initial value of Ec equal to 2.25 as it is the case here, tr=2.96."
+	Description "-Then, the Enstrophy which is the kinetic energy of the vorticity."
+	Description "-At last, the kinetic energy spectra after 6 turn over cycles."
+
+	Description "EF_STAB scheme with values of \latex_($\alpha$\latex_) = 1.0 and 0.2 have been tested extensively. In order to evaluate the quality of the scheme, let us consider first the kinetic energy time evolution for a free decaying isotropic turbulence in the periodic cube of 32*32*32 cells hexahedral cells, each cell cut into 6 tetrahedrons. Figures show the temporal kinetic energy decrease for several convection schemes  in conjunction with a standard SGSM (WALE model from Nicoud and Ducros (1999)), together with the \latex_($t^{-1.4}$\latex_) reference slope. As expected, the UPWIND scheme shows a particular trend to dissipate the kinetic energy more than the others, whereas no clear discrepancies can be exhibited for the others."
+	Description  "Similar picture (not shown) of a simulation with no SGS model will more or less lead to the same conclusions, suggesting that, once one has injected some non linear stabilizing process in the scheme, the diffusion is enough to extract kinetic energy and acts as a SGS model, at least for this global measure of kinetic energy."
+	Description "For a more profound test of the scheme, we show also the kinetic energy spectra at about 6 turns over times for simulations with WALE SGSM, together with the reference -5/3 slope. For low values of \latex_($\alpha$\latex_) the slope at small scales is controlled by the SGS modelling, the whole modelling assuring the turbulent spectrum to follow a more or less constant slope up to the cut-off scale. This suggests considering \latex_($\Delta/h$\latex_) (h is the local size of the mesh ; \latex_($\Delta$\latex_) is the filter scale of the LES) to be of the order of one. Hence, the whole modelling corresponds to "physical LES" in the Pope's classification (S.B. Pope, "Ten questions concerning the Large-Eddy Simulation of turbulent flows",New Journal of Physics, 6, 2004), which is close to an optimal compromise."
+}
+
+
+
+Chapter {
+Title "Results for Runge-Kutta time scheme"
+
+	Figure {
+		Title "Kinetic Energy"
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "t/tr"
+		RangeX 0.01 20
+		RangeY 0.01 3
+		LabelY "Ec"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./RK_Amont/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./RK_EF_STAB/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./RK_EF_STAB_0.2/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VDF centre"
+			file ./RK_VDF_centre/Sorties_THI_tadim
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "reference slope t^-1.4"
+			Fonction exp((-1.4)*log(x))
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Enstrophy"
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "t/tr"
+		RangeX 0.01 20
+		RangeY 0.1 60
+		LabelY "Df"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./RK_Amont/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./RK_EF_STAB/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./RK_EF_STAB_0.2/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "VDF centre"
+			file ./RK_VDF_centre/Sorties_THI_tadim
+			columns ($1) ($3)
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Kinetic Energy spectra after six turn over cycles "
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "k"
+		RangeX 1 15
+		RangeY 1e-6 0.02
+		LabelY "Ec"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./RK_Amont/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./RK_EF_STAB/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./RK_EF_STAB_0.2/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "reference slope k^-5/3"
+			Fonction exp((-5./3.)*log(x))/25
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+}
+
+Chapter {
+Title "Results for Implicit time scheme, facsec_max=2"
+
+	Figure {
+		Title "Kinetic Energy"
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "t/tr"
+		RangeX 0.01 20
+		RangeY 0.01 3
+		LabelY "Ec"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./ImplFS2_Amont/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./ImplFS2_EF_STAB/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./ImplFS2_EF_STAB_0.2/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "muscl"
+			file ./ImplFS2_muscl/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "reference slope t^-1.4"
+			Fonction exp((-1.4)*log(x))
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Enstrophy"
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "t/tr"
+		RangeX 0.01 20
+		RangeY 0.1 60
+		LabelY "Df"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./ImplFS2_Amont/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./ImplFS2_EF_STAB/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./ImplFS2_EF_STAB_0.2/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Kinetic Energy spectra after six turn over cycles "
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "k"
+		RangeX 1 15
+		RangeY 1e-6 0.02
+		LabelY "Ec"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./ImplFS2_Amont/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./ImplFS2_EF_STAB/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./ImplFS2_EF_STAB_0.2/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "reference slope k^-5/3"
+			Fonction exp((-5./3.)*log(x))/25
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+}
+
+
+
+Chapter {
+Title "Results for Implicit time scheme, facsec_max=4"
+
+	Figure {
+		Title "Kinetic Energy"
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "t/tr"
+		RangeX 0.01 20
+		RangeY 0.01 3
+		LabelY "Ec"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./ImplFS4_Amont/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./ImplFS4_EF_STAB/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./ImplFS4_EF_STAB_0.2/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "muscl"
+			file ./ImplFS4_muscl/Sorties_Ec_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "reference slope t^-1.4"
+			Fonction exp((-1.4)*log(x))
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Enstrophy"
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "t/tr"
+		RangeX 0.01 20
+		RangeY 0.1 60
+		LabelY "Df"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./ImplFS4_Amont/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./ImplFS4_EF_STAB/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./ImplFS4_EF_STAB_0.2/Sorties_Df_tot_spatial
+			columns ($1) ($2)
+			Style lines
+		}
+		
+	}
+	Figure {
+		Title "Kinetic Energy spectra after six turn over cycles "
+		Width 12cm
+		Dimension 2
+		LogX
+		LogY
+		LabelX "k"
+		RangeX 1 15
+		RangeY 1e-6 0.02
+		LabelY "Ec"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "upwind"
+			file ./ImplFS4_Amont/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=1"
+			file ./ImplFS4_EF_STAB/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "EF_Stab alpha=0.2"
+			file ./ImplFS4_EF_STAB_0.2/Ec_k_tr6.dat
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "k^-5/3"
+			Fonction exp((-5./3.)*log(x))/25
+			TypeLigne 0
+			Style lines
+		}
+		
+	}
+}
+
+
+Chapter {
+       Title "Computer performance"
+       tableau_performance {
+       }
+} 

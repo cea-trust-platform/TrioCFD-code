@@ -1,0 +1,129 @@
+dimension 3
+
+Pb_Hydraulique_Turbulent pb
+
+Domaine dom
+
+# BEGIN MESH #
+Lire_Tgrid dom ../Couche_Limite_Atmospherique_2couches.msh
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit	0
+	tmax	50.
+	dt_min	1.e-5
+	dt_impr	1.e-1
+	dt_sauv	1.
+	facsec	50.
+	facsec_max	5000.
+	seuil_statio	1.e-8
+	solveur implicite
+	{
+                seuil_convergence_solveur	1e-10
+                seuil_convergence_implicite	1e-12
+	}
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu	Champ_Uniforme 1 1.823e-5
+	rho	Champ_Uniforme 1 1.189
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression Cholesky { }
+		convection { Ef_stab { alpha 0.2 } }
+		diffusion { }
+		conditions_initiales
+		{
+			vitesse Champ_fonc_xyz dom 3 0.912/0.415*ln((Z+0.1)/0.1) 0. 0.
+		}
+		boundary_conditions
+		{
+			ENTREE	frontiere_ouverte_vitesse_imposee  Champ_Front_fonc_xyz 3 0.912/0.415*ln((Z+0.1)/0.1) 0. 0.
+			SORTIE	frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			LATERAL Symetrie
+			SOL	Paroi_fixe
+			HAUT	Symetrie
+		}
+		modele_turbulence K_Epsilon
+		{
+			Transport_K_Epsilon 
+			{
+				parametre_equation parametre_implicite { resolution_explicite }
+			   	convection { amont }
+				diffusion { }
+				sources { Source_Transport_K_Eps { C1_eps 1.44 C2_eps 1.92 } }
+				boundary_conditions
+				{
+					ENTREE	frontiere_ouverte_K_eps_impose Champ_Front_fonc_xyz 2 2.77 1.828/Z
+					SORTIE	frontiere_ouverte K_EPS_EXT Champ_Front_fonc_xyz 2 2.77 1.828/Z
+					LATERAL	Symetrie
+					SOL	Paroi
+					HAUT	Symetrie
+			   	}
+			   	conditions_initiales
+				{
+					k_Eps Champ_Uniforme 2 2.77 1.828
+			  	}
+			 }
+			 Prandtl_Eps 1.3
+			 turbulence_paroi loi_standard_hydr dt_impr_ustar 5.
+		} 
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			Vitesse_entree	nodes	VitesseX	periode 1. segment 1000	  0. 5. -1.	  0. 5. 31.
+			Vitesse_sortie	nodes	VitesseX	periode 1. segment 1000	200. 5. -1. 	200. 5. 31.
+			K_entree	nodes	K		periode 1. segment 1000	  0. 5. -1.	  0. 5. 31.
+			K_sortie	nodes	K		periode 1. segment 1000	200. 5. -1.	200. 5. 31.
+			Eps_entree	nodes	Eps		periode 1. segment 1000	  0. 5. -1.	  0. 5. 31.
+			Eps_sortie	nodes	Eps		periode 1. segment 1000	200. 5. -1.	200. 5. 31.
+		}
+		Format lata
+		Champs dt_post 10.
+		{
+			pression	elem
+			vitesse		faces
+			vorticite	elem
+			K		elem
+			Eps		elem
+		}
+	}
+}
+Solve pb
+End
+
+
+#			Sol Paroi_fixe = Sol Paroi_Rugueuse { Erugu 9.11 } #
+

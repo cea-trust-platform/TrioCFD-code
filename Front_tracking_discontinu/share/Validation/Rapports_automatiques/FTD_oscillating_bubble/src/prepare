@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#Creation des repertoires
+cd Bulle
+
+LISTE_CAS="Cas_01 Cas_02"
+for CAS in $LISTE_CAS ; do
+  REP=./$CAS
+  mkdir -p $REP
+  cp ../post_run $REP
+  SRCDATA=FTD_Oscillation_Bulle_3D_VDF.data
+  DESTDATA=$REP/$SRCDATA
+  if test "$CAS" = "Cas_01" ; then
+    sed "s/lissage_courbure_iterations 10/lissage_courbure_iterations 0/;
+         s/facteur_longueur_ideale 0.8/facteur_longueur_ideale 2./" $SRCDATA > $DESTDATA
+  else
+    cp $SRCDATA $DESTDATA
+  fi
+  cp decoupage.data $REP
+  cp pre_run $REP
+#  cp extrait_surface.sh $REP
+done
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,185 @@
+# Boiling bubble simulation #
+# PARALLEL ONLY 4 #
+dimension 2
+
+domaine dom
+Probleme_FT_Disc_gen pb
+
+Scatter DOM.Zones dom
+
+
+Fluide_Incompressible  liquide
+Lire liquide
+{
+  mu Champ_Uniforme 1 0.00089008
+  rho Champ_Uniforme 1 997.05
+  lambda Champ_Uniforme 1 0.60719
+  cp Champ_Uniforme 1 10.11e3
+  
+}
+
+Fluide_Incompressible vapeur
+Lire vapeur
+{
+ mu Champ_Uniforme 1 1.7891e-05
+ rho Champ_Uniforme 1 6.7878	
+ lambda Champ_Uniforme 1 0.025900
+ cp Champ_Uniforme 1 1.0495e3
+}
+
+Fluide_diphasique fluide
+Lire fluide
+{
+  fluide1 liquide
+  fluide0 vapeur
+  sigma Champ_Uniforme 1 0.07
+  # chaleur_latente constant -895.7e3  #
+  # sigma   Champ_Uniforme 1            0.002 #
+  # chaleur_latente Champ_Uniforme 1    -50000 #
+}
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	nb_pas_dt_max 10
+	tinit 0.
+	tmax  0.01
+	dt_min 1.e-18
+	dt_max 1.0e-5
+        dt_impr -100000
+	dt_sauv 50
+	seuil_statio -1
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0. -9.81
+Associate fluide gravite
+
+Navier_stokes_FT_disc                         hydraulique
+Transport_interfaces_FT_disc                  interf
+Associate pb dom
+Associate pb hydraulique
+Associate pb interf
+Associate pb fluide
+
+Associate pb sch
+VDF dis
+Discretize pb dis
+system "mkdir -p lata"
+Lire pb
+{
+	
+	hydraulique
+	{
+	 	modele_turbulence sous_maille_wale
+        	{
+         	  Cw               1.e-16
+         	  turbulence_paroi negligeable
+        	}
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
+		convection { quick }
+		diffusion { }
+		conditions_initiales { vitesse champ_uniforme 2 0. 0. }
+		# conditions_initiales { pression Champ_fonc_xyz 1.0e5*(y<0.)+6.e5*(y>0) } #
+		
+		equation_interfaces_proprietes_fluide interf
+		
+		boundary_conditions 
+		{
+		# paroi	Paroi_fixe #
+		paroi	Symetrie
+		haut    frontiere_ouverte_pression_imposee champ_front_uniforme 1 6.0e5
+		# bas	sortie_libre_rho_variable champ_front_uniforme 1 1.0e5 #
+		# bas	sortie_libre_rho_variable Champ_Front_Fonc_txyz 1 1.0e5+(5.0e5+9.81*(6.7878*0.3+997.05*1.))*exp(-t*1e5) #
+		# bas   frontiere_ouverte_pression_imposee champ_front_uniforme 1 609801.03699539998 # # = 6.0e5+9.81*(6.7878*0.3+997.05*1.) #
+		# bas	Sortie_libre_rho_variable champ_front_uniforme 1 0. #
+		
+		# bas   frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0. #
+		# bas	frontiere_ouverte_pression_imposee champ_front_uniforme 1 6.0e5 #
+		# bas	frontiere_ouverte_pression_imposee champ_front_uniforme 1 1.0e5 #
+		bas	sortie_libre_rho_variable Champ_Front_Fonc_txyz 1 1.0e5+5.0e5*exp(-t*1e5)
+        	}
+	}
+	interf
+	{
+		interpolation_repere_local
+		methode_transport vitesse_interpolee hydraulique
+	        # conditions_initiales { fonction (y) } #
+	        conditions_initiales { fonction (1.e-3*cos(2.*3.14159*x/0.12*3.)+y) }
+		iterations_correction_volume 1
+        	n_iterations_distance 2
+		remaillage
+		{
+			# Dans un exemple 3D : 
+			lissage_courbure_iterations 0
+			facteur_longueur_ideale 2. #
+			pas 0.000001
+			nb_iter_remaillage 1
+			critere_arete 0.35
+			critere_remaillage 0.2
+			pas_lissage 0.000001
+			lissage_courbure_iterations	5
+			lissage_courbure_coeff -0.1
+			nb_iter_barycentrage 3
+			relax_barycentrage 1
+			critere_longueur_fixe		0.002
+			nb_iter_correction_volume 3
+			seuil_dvolume_residuel 1e-12
+			}
+		collisions
+		{
+                active
+                juric_pour_tout
+		juric_local  phase_continue 1 
+                type_remaillage Juric { source_isovaleur indicatrice }
+		}
+		boundary_conditions
+		{
+		bas Paroi_FT_disc symetrie
+		paroi Paroi_FT_disc symetrie 
+		# paroi  Paroi_FT_disc constant Champ_Front_Uniforme 1 90 #
+		haut   Paroi_FT_disc symetrie
+		}
+	}
+	
+	postraitement 
+	{
+		format lata
+		champs dt_post 10
+		{
+			vitesse elem
+			pression elem
+		}
+	}
+	
+liste_postraitements
+{
+	
+   Postraitement_ft_lata post1
+   {
+	dt_post 1.0e-4
+	# dt_post 1.0e-8 #
+	nom_fichier lata/post
+ 	champs elements
+  	      {
+  		 
+  		 indicatrice_interf
+		 vitesse
+		 pression
+  	      }
+	      
+		
+	interfaces interf
+	      {  
+		champs sommets { courbure }
+
+              }
+
+    }
+    }
+}
+
+Solve pb
+FIN
+
+			     

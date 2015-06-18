@@ -1,0 +1,96 @@
+#!/bin/sh
+create_data()
+{
+   # Diametre hydraulique de tout les sous-canals (voir documentation GR16)
+   L_sous_canal=0.033
+   D_tube=0.0187
+   PI=`echo "a(1)*4" | bc -l`
+   S_mouille=`awk "BEGIN {print 0.139*0.1485-$PI*$D_tube^2/4*16}"`
+   P_mouille=`awk "BEGIN {print 0.139*2+0.1485*2+$PI*$D_tube*16}"`
+   Dh=`awk "BEGIN {print 4*$S_mouille/$P_mouille}"`
+
+   SURFACE_IN=0.00524747
+   
+   # Pour chaque essai, je renseigne les valeurs de la vitesse, temperature et flux de chaleur
+   if [ "$ESSAI" == "G1100" ] # Regime de convection mixte
+   then
+      
+      DEBIT=0.00277 && VITESSE=`awk "BEGIN {print $DEBIT/$SURFACE_IN}"`
+      TEMPERATURE=302.4
+      FLUX=266.0e3
+   else
+      if [ "$ESSAI" == "G900" ] # Regime de convection forcee
+      then
+         DEBIT=0.0222 && VITESSE=`awk "BEGIN {print $DEBIT/$SURFACE_IN}"`
+         TEMPERATURE=303.3
+         FLUX=443.0e3
+      fi
+   fi
+   
+   # Je calcul k et eps resultant du regime d'ecoulement (vitesse)
+   # k ~ 3/2.(I.U)² Avec I = 10% = Intensite de la turbulence, U = Vitesse moyen de l'ecoulement
+   # Eps ~ Cmu.k^(3/2)/(0.07.Dh) Avec Cmu = Constante du modele de turbulence = 0.09, k = Energie cinetique turbulente, Dh = diametre hydraulique
+   K_IN=`awk "BEGIN {print 3/2*0.1*0.1*$VITESSE*$VITESSE}"`
+   EPS_IN=`awk "BEGIN {print 0.09*$K_IN^(3/2)/(0.07*$Dh)}"`
+   V_MEAN=`awk "BEGIN {print $DEBIT/$S_mouille}"`
+   K=`awk "BEGIN {print 3/2*0.1*0.1*$V_MEAN*$V_MEAN}"`
+   EPS=`awk "BEGIN {print 0.09*$K^(3/2)/(0.07*$Dh)}"`
+
+   # gestion des temps : statistiques + finde simulation
+   # Temps de debut de statistique = temps que met une particule fluide pour traverser le domaine entier a la vitesse moyenne
+   TDEB=`awk "BEGIN {print 3.4/$V_MEAN}"`
+   # Temps de finde simulation = TDEB + 2 secondes
+   T_FIN=`awk "BEGIN {print $TDEB+2.}"`
+   
+   # Je convertis les schemas de convection trouves au format Trio_U
+   SCHEMA=""
+   [ "$SCHEME" == "Muscl" ] && SCHEMA="Muscl"
+   [ "$SCHEME" == "Ef_Stab0.2" ] && SCHEMA="Ef_stab { alpha 0.2 }"
+   [ "$SCHEME" == "Ef_Stab1.0" ] && SCHEMA="Ef_stab { alpha 1.0 }"
+   
+   [ "$SCHEMA" == "" ] && echo "Schema de convection non prévu avec \$SCHEME = $SCHEME !" && exit -1
+   
+   # Je renseigne le nom du JDD
+   jdd=$ESSAI/$SCHEME
+   # Je cree le repertoire de calucl
+   mkdir -p $jdd
+   cd $jdd
+   # Je remplace dans le JDD de base l'ensemble des informations a modifier
+   sed "s/\$SCHEMA/$SCHEMA/g
+   	s/\$VITESSE/$VITESSE/g
+   	s/\$V_MEAN/$V_MEAN/g
+        s/\$TEMPERATURE/$TEMPERATURE/g
+        s/\$T_FIN/$T_FIN/g
+        s/\$TDEB/$TDEB/g
+	s/\$FLUX/$FLUX/g
+	s/\$K_IN/$K_IN/g
+	s/\$EPS_IN/$EPS_IN/g
+	s/\$K/$K/g
+	s/\$EPS/$EPS/g
+	s/\$NB_PROCS/$NB_PROCS/g
+  	" ../../GR16.data > GR16.data
+   echo "Creation de $jdd"
+   ln -s -f ../../pre_run .
+   ln -s -f ../../post_run .
+   cp -r ../../maillage .
+   cd - 1>/dev/null 2>&1
+}
+
+[ ! -f maillage/With_antivibration_grid_and_inlet_outlet_on_annular_section.bin ] && gunzip maillage/With_antivibration_grid_and_inlet_outlet_on_annular_section.bin.gz
+echo "*******************************************************************"
+
+ESSAIs="G1100 G900"
+SCHEMEs="Muscl Ef_Stab1.0"
+
+# Je boucle pour creer tout les cas test Trio_U
+for ESSAI in $ESSAIs
+do
+   for SCHEME in $SCHEMEs
+   do
+      # Je recherche dans la PRM pour chaque cas test le nombre de processeurs du cas test
+      NB_PROCS=`grep "CasTest $ESSAI/$SCHEME" GR16_k_eps.prm | awk '{print $4}'`
+      create_data
+   done
+done
+
+echo "*******************************************************************"

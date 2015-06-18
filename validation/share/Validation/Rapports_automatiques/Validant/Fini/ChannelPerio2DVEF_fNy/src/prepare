@@ -1,0 +1,68 @@
+#!/bin/bash
+mkdir -p 2D_100000_11 2D_100000_21 2D_100000_41 2D_100000_6 2D_10000_11 2D_10000_21 2D_10000_41 2D_10000_6 
+
+cd 2D_100000_11
+cp ../2D.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 11/" 2D.data > modifie.data
+sed "s/mu Champ_Uniforme 1 0.001/mu Champ_Uniforme 1 0.0001/" modifie.data > 2D.data
+sed "s/6/11/" post_run > modifie
+sed "s/10000/100000/" modifie > post_run
+rm modifie.data
+
+cd ../2D_100000_21
+cp ../2D.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 21/" 2D.data > modifie.data
+sed "s/mu Champ_Uniforme 1 0.001/mu Champ_Uniforme 1 0.0001/" modifie.data > 2D.data
+sed "s/6/21/" post_run > modifie
+sed "s/10000/100000/" modifie > post_run
+rm modifie.data
+
+cd ../2D_100000_41
+cp ../2D.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 41/" 2D.data > modifie.data
+sed "s/mu Champ_Uniforme 1 0.001/mu Champ_Uniforme 1 0.0001/" modifie.data > 2D.data
+sed "s/6/41/" post_run > modifie
+sed "s/10000/100000/" modifie > post_run
+rm modifie.data
+
+cd ../2D_100000_6
+cp ../2D.data .
+cp ../post_run .
+sed "s/dt_impr_moy_spat 1./dt_impr_moy_spat 10./" 2D.data > modifie.data
+sed "s/mu Champ_Uniforme 1 0.001/mu Champ_Uniforme 1 0.0001/" modifie.data > 2D.data
+sed "s/10000/100000/" post_run > modifie
+mv modifie post_run
+rm modifie.data
+
+cd ../2D_10000_11
+cp ../2D.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 11/" 2D.data > modifie.data
+mv modifie.data 2D.data
+sed "s/6/11/" post_run > modifie
+mv modifie post_run
+
+cd ../2D_10000_21
+cp ../2D.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 21/" 2D.data > modifie.data
+mv modifie.data 2D.data
+sed "s/6/21/" post_run > modifie
+mv modifie post_run
+
+cd ../2D_10000_41
+cp ../2D.data .
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 41/" 2D.data > modifie.data
+mv modifie.data 2D.data
+sed "s/6/41/" post_run > modifie
+mv modifie post_run
+
+cd ../2D_10000_6
+cp ../2D.data .
+cp ../post_run .
+
+cd ..

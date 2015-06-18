@@ -1,0 +1,117 @@
+
+# Thermo_Hydraulique_Turbulent 3D VEF P1NC/P0 avec 3 traceurs  #
+
+dimension 3
+
+Pb_hydraulique_turbulent pb
+
+Domaine DOM_DOM
+
+Read_file DOM_DOM motif_3D.geom
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+        tmax  0.010
+        dt_min 1.e-8
+        dt_max 0.03
+        dt_impr 1.e-4
+        dt_sauv 0.005
+        seuil_statio 1.e-15
+	facsec 5
+	facsec_max 1000
+	Solveur
+           Implicite
+           {
+                seuil_convergence_solveur 1.e-12
+           }
+
+}
+
+Fluide_Incompressible fluide
+
+Read fluide
+{
+   mu           Champ_Uniforme 1    1.68E-05
+   rho          Champ_Uniforme 1    1.5
+}
+
+Champ_Uniforme gravite
+Read gravite 3  0. 0. -9.81
+
+Associate fluide gravite
+
+Associate pb DOM_DOM
+Associate pb sch
+Associate pb fluide
+
+
+Discretize pb dis
+
+
+Read pb
+{
+        Navier_Stokes_turbulent
+        {
+                solveur_pression GCP
+                       { precond SSOR { omega 1.4 } seuil 1.e-07 }
+                convection { EF_stab { alpha 0.2 } }
+                diffusion { }
+                Sources { Canal_perio { bord perio } }
+                conditions_initiales
+                        {
+                        vitesse Champ_Uniforme 3 0. 0. 200.
+                        }
+                boundary_conditions
+                {
+                        thi paroi_fixe
+			aiguilles paroi_fixe
+			symetrie symetrie
+                        perio  Periodique 
+                } 
+                Modele_turbulence K_Epsilon {
+                        Transport_K_Epsilon
+                        {
+                                convection { amont }
+                                diffusion { }
+                                boundary_conditions
+				 {
+                        		thi paroi
+					aiguilles paroi
+			                symetrie symetrie
+                        		perio  Periodique
+                         	 }
+                                conditions_initiales { k_Eps Champ_Uniforme 2 400. 1.6e7 }
+				parametre_equation parametre_implicite 
+				{
+				resolution_explicite
+				}
+                         }
+                        turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } dt_impr_ustar 0.0020
+			correction_visco_turb_pour_controle_pas_de_temps
+                 }
+	}
+        Postraitement
+        {
+                Format lml
+                Champs Binaire dt_post 0.005
+                   {
+			y_plus elem
+			vitesse
+                        viscosite_turbulente elem
+                        k elem
+                        eps elem
+			corr_visco_turb elem
+                   }
+        }
+Sauvegarde_simple binaire pb.sauv
+}
+
+EcritureLectureSpecial 0
+Solve pb
+End

@@ -1,0 +1,4 @@
+#!/bin/bash
+extrait_coupe 3d_vef_rect SONDE_PRESSION
+sh ../first_vef.awk 3d_vef_rect
+cat delta_p.dat >> deltap_courbe_vef.dat

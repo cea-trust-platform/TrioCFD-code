@@ -1,0 +1,136 @@
+#  SIMULATION D UN TUYAU AVEC ECOULt TURBULENT Re=50000 et Pr=0.004 (Na) + loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom01234
+Read_file dom01234 dom01234.geom
+Corriger_frontiere_periodique { Domaine dom01234 Bord sortie   }
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 6000.
+	dt_min 1.e-6
+	dt_max 1.e+2
+	dt_impr 1000.
+	dt_sauv 1000.0
+	seuil_statio 1.e-8
+	facsec 20
+        facsec_max 200
+        Solveur
+           Piso
+           {
+                seuil_convergence_solveur 1.e-12
+           }
+}
+
+Fluide_Incompressible sodium
+Read sodium
+{
+	mu Champ_Uniforme       1 2.484e-4
+ 	rho Champ_Uniforme      1 900.
+        lambda Champ_Uniforme   1 80.
+        Cp Champ_Uniforme       1 1370.
+        beta_th Champ_Uniforme  1 0.
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate sodium gravite
+Associate pb dom01234
+Associate pb sch
+Associate pb sodium
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-9 }	
+		convection { muscl }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_fonc_xyz dom01234 3 0. 0. 0.0552*(1-x*x-y*y)
+			}
+        	Sources {
+			Canal_perio { bord sortie }
+			}
+		boundary_conditions {
+			sortie  periodique 
+			paroi  paroi_fixe
+		}
+                 Modele_turbulence K_Epsilon {
+			Transport_K_Epsilon
+                        {
+                         convection { amont } 
+                         diffusion { }
+                         boundary_conditions
+                            {
+			     sortie  periodique 
+                             paroi  paroi
+                            }
+                         conditions_initiales
+                           {
+                             k_Eps Champ_Uniforme 2 7.56e-6 2.8e-7
+                           }
+                        }
+                        Turbulence_paroi  loi_standard_hydr dt_impr_ustar 3000
+                }
+		Traitement_particulier { temperature { bord sortie direction 2 } }
+		Ecrire_fichier_xyz_valeur vitesse 3000. bords 1 sortie
+                Ecrire_fichier_xyz_valeur k_eps 3000. bords 1 sortie
+        }
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+                convection { muscl }
+                Modele_turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire 
+                                            Prandt_turbulent_fonction_nu_t_alpha nu_t*nu_t/(0.7*alpha+0.85*nu_t)
+						dt_impr_nusselt 3000.
+                                          }
+                boundary_conditions
+                        {
+                        sortie periodique 
+                        paroi   paroi_flux_impose Champ_Front_Uniforme 1 1.
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom01234 1 0. }
+		Ecrire_fichier_xyz_valeur temperature 3000. bords 1 sortie
+                }
+
+	Postraitement
+	{
+         format lml
+		Champs dt_post 4000.0
+		{
+			vitesse elem
+			temperature elem
+			y_plus elem
+			viscosite_turbulente elem
+			diffusivite_turbulente elem
+			}
+	Sondes
+	       {
+	       sonde_v vitesse periode 10. point 3 -0.5 0. 1.0
+				        0.  0. 1.0
+					0.5 0. 1.0	
+	       sonde_t temperature periode 10. point 3 -0.5 0. 1.0
+				            0.  0. 1.0
+				            0.5 0. 1.0	
+	       sonde_vp vitesse periode 100. segment 30 -1.0 0. 1.0 1. 0. 1.0
+	       sonde_nut viscosite_turbulente periode 100. segment 30 -1.0 0. 1.0 1. 0. 1.0
+	       sonde_alphat diffusivite_turbulente periode 100. segment 30 -1.0 0. 1.0 1. 0. 1.0
+	       sonde_tpn temperature periode 100. segment 30 -1.0 0. 1.0 1. 0. 1.0
+               }
+	}
+	Sauvegarde binaire Conduite.sauv
+}
+EcritureLectureSpecial 0
+Solve pb
+End
+

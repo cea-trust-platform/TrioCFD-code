@@ -1,0 +1,145 @@
+#  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+#
+y+=23
+dx+= 74
+dz+= 74 #
+
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 33 17 17
+		Longueurs  6.4 2. 3.2
+		Facteurs 1. 1 1.
+	}
+	{
+		Bord periox   X = 0.             0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord periox   X = 6.4    0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord perioz   Z = 0.             0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2    0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord bas      Y = 0.             0. <= X <= 6.4   0. <= Z <= 3.2
+		Bord haut     Y = 2.             0. <= X <= 6.4   0. <= Z <= 3.2
+		}
+}
+
+VDF dis
+
+Runge_Kutta_ordre_3 sch
+Read sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 41
+	dt_min 1.e-7
+	dt_impr 2.
+	dt_sauv 100.0
+	seuil_statio 1.e-8
+	facsec 1.
+}
+
+Fluide_Incompressible air
+Read air
+{
+	mu Champ_Uniforme       1 2.84e-5
+ 	rho Champ_Uniforme      1 0.011928
+        lambda Champ_Uniforme   1 5.899248
+        Cp Champ_Uniforme       1 5193.
+        beta_th Champ_Uniforme  1 1.9954e-3                                                                                               
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate air gravite
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression Cholesky { }	
+		convection { Centre  }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_init_canal_sinal 3 { Ucent 24.225 h 1.0  ampli_sin 0. omega 1. ampli_bruit 0.0 }
+			}
+        	Sources {
+			Canal_perio { bord periox }
+			}
+		boundary_conditions {
+			periox  periodique
+			perioz periodique 
+			haut  paroi_fixe
+	                bas  paroi_fixe
+		}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 5
+			}
+
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 20
+		        dt_impr_moy_temp 20 
+		        debut_stat  20.
+				 }
+			}	
+        }
+
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+                convection { quick }
+                Sources {
+                        Puissance_thermique Champ_uniforme 1 1
+                        }                                                                                           
+                Modele_turbulence Prandtl { 
+		Turbulence_paroi loi_standard_hydr_scalaire 
+				dt_impr_nusselt 5
+			}
+                boundary_conditions
+                        {
+                        periox periodique
+                        perioz periodique
+                        haut   paroi_Temperature_imposee Champ_Front_Uniforme 1 0
+                        bas    paroi_Temperature_imposee Champ_Front_Uniforme 1 0
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0. }
+                }
+
+	Postraitement
+	{
+	     format lml
+	     Sondes
+	          {
+			coupe_vit  vitesse periode 1  segment 40   3.2 0. 1.6       3.2 2 1.6
+			coupe_theta temperature  periode 1. segment 40 3.2 0. 1.6       3.2 2 1.6
+			sonde_U1 vitesse  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_T1 temperature  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_U2 vitesse  periode 0.1 points 1 3.2 1.8 1.6 
+			sonde_T2 temperature  periode 0.1 points 1 3.2 1.8 1.6 
+	          }
+		Champs binaire dt_post 5.0
+			{
+			vitesse elem
+			temperature elem
+			}
+	}
+
+}
+
+Solve pb
+End
+

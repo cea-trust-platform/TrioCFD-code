@@ -1,0 +1,195 @@
+#!/bin/bash
+# Maillage variable en etirement suivant la direction de l'ecoulement (facteur f) et suivant la direction transverse (facteur g)
+mkdir -p  3D_6_keps_f1g1  3D_6_keps_f15g10 3D_6_keps_f35g25 3D_6_keps_f40g1 3D_6_keps_f100g1 3D_6_keps_f300g1 3D_6_keps_f100g100 3D_6_keps_f300g100 3D_6_keps_f300g300 3D_21_keps_f1g1 3D_21_keps_f15g10 3D_21_keps_f35g25 3D_21_keps_f40g1 3D_21_keps_f100g1 3D_21_keps_f300g1 3D_21_keps_f100g100 3D_21_keps_f300g100 3D_21_keps_f300g300 2prismes_f1g1 2prismes_f15g10 3prismes_f1g1 4prismes_f1g1 4prismes_f15g10 mixedBC_f1g1
+
+
+#### CAS RAJOUTE: Vin imposee, Vout Imposee
+
+# Execution du cas dans son repertoire de calcul
+cd mixedBC_f1g1
+cp ..//trio_BODY_geo_mixed.asc .
+cp ../mixedBC.data 3D_keps.data
+cp ../post_run .
+sed "s/python ..\/ligneTableau.py \"3D\"/extrait_coupe 3D_keps.data SONDE_VIT/" post_run > modifie
+sed "s/courbes_reichardt.py 3D Moyennes_spatiales_vitesse_rho_mu/postInOut.py/" modifie > post_run
+sed "s/python ..\/dernierTemps.py Moyennes_spatiales_vitesse_rho_mu//" post_run > modifie
+sed "s/python ..\/dernierTemps.py Moyennes_spatiales_nut//" modifie > post_run
+cd ..
+
+#### AUTRES CAS ORIGINAUX DE LA FICHE
+cd 3D_6_keps_f1g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+mv  3D_6_keps.data 3D_keps.data
+
+cd ../3D_6_keps_f15g10
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 15*x y 10*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f35g25
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 35*x y 25*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+
+cd ../3D_6_keps_f40g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 40*x y z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f100g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+
+cd ../3D_6_keps_f300g1
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f100g100
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y 100*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f300g100
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y 100*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+cd ../3D_6_keps_f300g300
+cp ../3D_6_keps.data .
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y 300*z/" 3D_6_keps.data > 3D_keps.data
+rm 3D_6_keps.data
+
+
+cd ../3D_21_keps_f1g1
+cp ../3D_6_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_6_keps.data > modifie.data
+mv modifie.data 3D_6_keps.data
+cp ../post_run .
+sed "s/Nombre_de_Noeuds 3 6 3/Nombre_de_Noeuds 3 21 3/" 3D_6_keps.data > modifie.data
+sed "s/0.8/0.2/g"  modifie.data  > 3D_keps.data
+rm modifie.data 3D_6_keps.data
+cp 3D_keps.data 3D_21_keps.data
+mv 3D_21_keps.data ../.
+
+cd ../3D_21_keps_f15g10
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 15*x y 10*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data
+
+cd ../3D_21_keps_f35g25
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 35*x y 25*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data
+
+
+cd ../3D_21_keps_f40g1
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 40*x y z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+cd ../3D_21_keps_f100g1
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f300g1
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f100g100
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 100*x y 100*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f300g100
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+sed "s/Transformer dom x y z/Transformer dom 300*x y 100*z/" 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data 
+
+
+cd ../3D_21_keps_f300g300
+cp ../3D_21_keps.data .
+sed "s/sonde_visc_turb  viscosite_turbulente periode 10. segment 20	0.05 0. 0.05  0.05 2. 0.05/sonde_visc_turb  viscosite_turbulente periode 10. segment 50	0.05 0. 0.05  0.05 2. 0.05/" 3D_21_keps.data > modifie.data
+mv modifie.data 3D_21_keps.data
+cp ../post_run .
+$TRUST_Awk '/dimension 3/ {print "# lance_test 1 ecart #";print $0;getline} 
+             /Transformer dom x y z/ {print "Transformer dom 300*x y 300*z";getline} 
+	     // {print $0}' 3D_21_keps.data > 3D_keps.data
+rm 3D_21_keps.data
+
+# cas modifies: on a retoucher le maillage avec couche de prisme: maillage maintenant 100% icem
+
+cd ../2prismes_f1g1
+cp ../keps_prisme.data .
+cp ../post_run .
+mv keps_prisme.data 3D_keps.data
+
+cd ../2prismes_f15g10
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/Transformer DOM_BODY x y z/Transformer DOM_BODY 15*x y 10*z/" keps_prisme.data > modifie.data
+sed "s/facsec_max 500/facsec_max 100/"  modifie.data > 3D_keps.data
+rm keps_prisme.data modifie.data
+
+cd ../3prismes_f1g1
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/trio_BODY_geo_2prismes.asc/trio_BODY_geo_3prismes.asc/" keps_prisme.data > modifie.data
+mv modifie.data 3D_keps.data
+rm keps_prisme.data 
+
+cd ../4prismes_f1g1
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/trio_BODY_geo_2prismes.asc/trio_BODY_geo_4prismes.asc/" keps_prisme.data > modifie.data
+mv modifie.data 3D_keps.data
+rm keps_prisme.data 
+
+cd ../4prismes_f15g10
+cp ../keps_prisme.data .
+cp ../post_run .
+sed "s/Transformer DOM_BODY x y z/Transformer DOM_BODY 15*x y 10*z/" keps_prisme.data > modifie.data
+sed "s/trio_BODY_geo_2prismes.asc/trio_BODY_geo_4prismes.asc/" modifie.data > keps_prisme.data
+sed "s/facsec_max 500/facsec_max 100/"  keps_prisme.data > 3D_keps.data
+rm keps_prisme.data modifie.data
+
+cd ..
+

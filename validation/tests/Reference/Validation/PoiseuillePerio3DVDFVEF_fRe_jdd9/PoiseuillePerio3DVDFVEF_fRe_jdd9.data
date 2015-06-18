@@ -1,0 +1,123 @@
+# aaa #
+# lance_test 1 ecarts #
+dimension 3
+
+domaine dom_pb1
+
+
+Mailler dom_pb1
+{
+	Pave Entree 
+	{
+	  Origine 0. 0. 0.
+
+	  Nombre_de_Noeuds 5 21 5
+	  Longueurs 1 0.2 0.1
+	}
+	{
+	  Bord Entree X = 0.   0. <= Y <= 0.2 0. <= Z <= 0.1      
+	  Bord Haut   Y = 0.2   0. <= X <= 1 0. <= Z <= 0.1 
+	  Bord Bas    Y = 0.   0. <= X <= 1   0. <= Z <= 0.1 
+	  Bord Entree X = 1   0. <= Y <= 0.2 0. <= Z <= 0.1 
+	  Bord Devant Z = 0.  0. <= X <= 1 0. <= Y <= 0.2 
+	  Bord Devant Z = 0.1   0. <= X <= 1 0. <= Y <= 0.2
+	}
+}
+
+Tetraedriser dom_pb1
+Corriger_frontiere_periodique { Domaine dom_pb1 Bord Entree   }
+Corriger_frontiere_periodique { Domaine dom_pb1 Bord Devant   }
+
+Pb_hydraulique  pb1
+
+Schema_Euler_implicite sch
+Read sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 1000.
+        dt_min 1.e-8
+        dt_max 100000.
+        dt_impr 100
+        dt_sauv 500
+        seuil_statio 1.e-8
+        facsec 1.
+	facsec_max 200
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+}
+
+
+VEFpreP1b cubesregu
+
+Fluide_Incompressible He
+Read He
+{
+	    mu      Champ_Uniforme  1 3.56e-5
+	    rho     Champ_Uniforme  1 3.85
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0. 0. 0
+Associate He gravite
+Associate pb1 dom_pb1
+Associate pb1 He  
+Associate pb1 sch
+
+Discretize pb1 cubesregu
+
+Read pb1
+{
+        Navier_Stokes_standard
+        {
+		solveur_pression GCP { 
+                        precond ssor { omega 1.5 }
+                        seuil 1.e-09
+                }
+		                solveur_pression petsc cholesky  { }
+
+		
+		convection { Amont }
+                diffusion { }
+       		Sources { Canal_perio { bord Entree }  }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 3 0.005 0. 0.
+                           }
+                boundary_conditions {
+                        Entree             periodique 
+                        Haut             paroi_fixe
+                        Bas             paroi_fixe
+                        Devant            periodique 
+               }
+                Traitement_particulier { Canal { dt_impr_moy_spat 300. }
+                                        }
+        }
+
+        Postraitement {
+	format lml
+                Champs dt_post 300.
+                {
+		   pression elem
+                   vitesse elem
+                }
+        }
+}
+
+
+EcritureLectureSpecial 0
+Solve pb1
+End
+# solveur_pression Cholesky { } 
+solveur_pression GCP {
+                        precond ssor { omega 1.500000 }
+                        seuil 1.000000e-07
+                }
+
+
+
+#
+

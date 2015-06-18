@@ -1,0 +1,154 @@
+#  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 13 8 7
+		Longueurs  6.4 2. 3.2
+		Facteurs  1. 1.0 1.
+		Symy 
+		}
+		{
+		Bord periox   X = 0.             0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord periox   X = 6.4    0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord perioz   Z = 0.             0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2    0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord bas      Y = 0.             0. <= X <= 6.4   0. <= Z <= 3.2
+		Bord haut     Y = 2.             0. <= X <= 6.4   0. <= Z <= 3.2
+		}
+	}
+	
+
+Tetraedriser_homogene_fin dom
+Reordonner_faces_periodiques dom periox
+Reordonner_faces_periodiques dom perioz
+
+VEFPreP1b dis
+
+Sch_CN_EX_iteratif sch
+Read sch 
+{
+        tinit 0
+	nb_pas_dt_max 3
+        tmax 80
+        dt_min 1.e-10
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 1.
+        dt_sauv 100
+        seuil_statio 1.e-8  
+        facsec 1.
+        seuil 1e-3
+	facsec_max 4.
+  	niter_min 2
+  	niter_avg 6
+  	niter_max 10
+	omega 0
+}
+
+Fluide_Incompressible air
+Read air
+{
+	mu Champ_Uniforme       1 2.84e-5
+ 	rho Champ_Uniforme      1 0.011928
+        lambda Champ_Uniforme   1 20.772e-2
+        Cp Champ_Uniforme       1 5193.
+        beta_th Champ_Uniforme  1 1.9954e-3                                                                                               
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate air gravite
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 1e-5
+			}
+		convection { ef_stab { volumes_etendus alpha 0.2 } }
+		diffusion { }
+                Sources { Canal_perio { bord periox } }
+		conditions_initiales
+			{
+			vitesse champ_init_canal_sinal 3 { Ucent 25. h 1.0  ampli_sin 0. omega 1. ampli_bruit 0.0 }
+			}
+		boundary_conditions
+			{
+			periox   periodique
+			haut     paroi_fixe
+			bas      paroi_fixe
+			perioz   periodique
+			}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 50
+			}
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 10
+		        dt_impr_moy_temp 20 
+		        debut_stat  60.
+				 }
+			}	
+		}
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { }
+		convection { EF_stab { volumes_etendus alpha 1  } }
+		Modele_turbulence Prandtl { 			
+		turbulence_paroi loi_standard_hydr_scalaire
+		dt_impr_nusselt 1
+			 }
+		
+		sources { Puissance_thermique Champ_Uniforme 1 1 }
+		boundary_conditions 
+			{
+			periox	periodique
+			perioz	periodique
+ 			haut	paroi_temperature_imposee Champ_Front_Uniforme 1 0.
+			bas	paroi_temperature_imposee Champ_Front_Uniforme 1 0.
+			}
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0 }
+		}
+
+	Postraitement
+	{
+     format lml
+	     Sondes
+	          {
+			sonde_vit  vitesse periode 1 segment 40   0. 0. 3.14             0. 2. 3.14
+			sonde_temp temperature  periode 1. segment 40 4. 0. 1.       4. 2. 1.
+	        }
+		Champs binaire dt_post 20000.0
+		{
+			vitesse elem
+			temperature elem
+			}
+	}
+
+
+}
+
+Solve pb
+End
+
+                        Turbulence_paroi  loi_standard_hydr

@@ -1,0 +1,6 @@
+mkdir -p no_refr
+
+cp ibc_refroidi/* no_refr/
+chmod +w no_refr/*
+grep -v  "# CAS PENA #" ibc_refroidi/ibc_refroidi.data > no_refr/ibc_refroidi.data
+

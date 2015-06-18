@@ -1,0 +1,288 @@
+Parameters {
+	Title Rising of a bubble in a closed box
+	Description VDF discretisation
+	ParametersTrio_U Type of fluid : air and water at 293K
+	Author S.Pigny	
+	Reference " $[1]$ Blanco-Alvarez, A. 1995. Quelques aspects de l'ecoulement d'un fluide visqueux autour d'une bulle deformable : une analyse par simulation directe. Ph.D. thesis, Institut National Polytechnique de Toulouse, France."
+	Reference " $[2]$ Harmathy, T.Z. 1960. Velocity of large drops and bubbles in media of infinite or restricted extend. American Institute of Chemical Engineers J., 6, 281-288."
+        Reference " $[3]$ Scardovelli, R. and Zaleski, S. 1999. Direct numerical Simulation of free-surface and interfacial flow. Annual Review of Fluid Mechanics, 31, 567-603."
+	TestCase monte monte.data 32 /* data set in annex */
+}
+Chapter {
+	Title "Description of the case"
+	Description "The test case deals with the rising of an inclusion of light fluid in a heavier one. The rising velocity and the shape of the bubble should be compared to the results obtained with the help of an accurate numerical technique."
+}
+Chapter {	
+visu {
+	Title "Figure 1 : Initial conditions"
+	description "A spherical is initially at rest in the bottom part of a box filled of water"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+	cycles 0
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {
+	Title "Practical significance and interest of the test-case"
+	Description "The present case can be used for investigating the numerical capability of the software. It deserves special attention for the result not only consists in a final shape of the bubble, which nevertheless is a real criteria of comparison, but also in a precise build-up of the bubble velocity, starting from rest, exhibiting an overshoot before reaching its final asymptotic value. To get the proper result, mainly the correct terminal velocity, and to reproduce the overshoot, a numerical method has to take accurately into account buoyancy, viscous stresses and surface tension effects. This test allows validating the numerical model that takes care of jump conditions at the interface (see e.g Scardovelli and Zaleski (1999). However, the test is less severe than the test : \latex_( " \latex_) Free rise of a liquid inclusion in a stagnant liquid \latex_( " \latex_), a test case proposed by Lemonnier and Hervieu."
+}
+Chapter {
+	Title "Definition and description"	
+	Description "The test case deals with the relative motion of a fluid inclusion in another one, initially at rest. Gravity induced buoyancy is the only force inducing the motion. The case consists in the computation of the transient build-up of the velocity of the rising inclusion that finally reaches a constant value. The physical model is reduced to Navier-Stokes equation in both phases, a constant surface tension at  the interface. No phase change takes place at the interface, or elsewhere. As the solution does not depend on a possible compressibility of one or both of the phases, the test case can be conducted in both cases (compressible/incompressible), depending on specific features of the numerical method to be evaluated. Reference calculations are available in non-dimensional units; however, a typical set of dimensional parameters is suggested. The length scale of the problem is the initial diameter \latex_($d_{e}$\latex_) in the inclusion whose initial shape is spherical. The velocity scale for the speed of displacement of the center of mass \latex_($U$\latex_) is :"
+	Description "\latex_($$U_{c}\ =\ \sqrt{{g\ d_{e}}},$$\latex_)"
+	Description "where \latex_($g$\latex_) is the acceleration of the gravity. The time scale is therefore :"
+	Description "\latex_($$t_{c}\ =\ \sqrt{{\frac{d_{e}}{g}}}.$$\latex_)"
+	Description "Reduced parameters are \latex_($\tau \ =\ \frac{t}{t_{c}}$\latex_) and \latex_($u\ =\ \frac{U}{U_{c}}$\latex_). According to these definitions, the non dimensional reference calculation consists in the reducing time evolution of the speed of displacement of the center of mass :"
+	Description "\latex_($$u\ =\ \frac{U}{U_{c}}\ =\ f(\tau )\ =\ f(t/t_{c}).$$\latex_)"	
+	Description "The computation can be conducted either for an axisymetrical domain or a true three dimensional domain. As the limited extend of the domain has an impact on the terminal velocity of the inclusion, the size of the computational domain has to be increased as long as an effect on the results is noticed. As a rough first estimate, we suggest that the computational domain has a minimal extend equal to ten diameters in all directions. According to the work of Harmathy (1960), the shape of the bubble is not affected by the domain extension whereas the terminal rise velocity modification can be estimated through the semi-empirical relation :"
+	Description "\latex_($$\frac{U_{c}^{confined}}{U_{c}^{\infty}}\ =\ 1\ -\ \left(\frac{d_{e}}{D}\right)^{2},$$\latex_)"
+	Description "where \latex_($D$\latex_) is a characteristic dimension of the domain in a plan perpendicular to the gravity direction. The physical parameters, namely \latex_($\rho_{L}$\latex_) and \latex_($\rho_{V}$\latex_), respectively the density of the surrounding fluid and the fluid of the inclusion, \latex_($\mu_{L}$\latex_) and \latex_($\mu_{V}$\latex_) the dynamic viscosities and \latex_($\sigma$\latex_) the surface tension, are chosen to get proper values of the non dimensional quantities for which reference computations are available : the Morton number \latex_($Mo$\latex_), the Bond number \latex_($Bo$\latex_) and the ratio of densities \latex_($\rho_{L}/\rho_{V}$\latex_) and viscosities \latex_($\mu_{L}/\mu_{V}$\latex_). The Morton number and the Bond number are usually defined as :
+	Description "\latex_($$Mo\ =\ \frac{g\mu_{L}^{4}}{\rho_{L}\sigma^{3}}\ ;\ Bo\ =\ \frac{g\rho_{L}d_{e}^{2}}{\sigma}.$$\latex_)"
+	}
+Chapter {
+	Title "Summary of the requested calculations"	
+	Description "Compute the displacement of an initially spherical inclusion with the following non dimensional properties : \latex_($Mo\ = \ 0.056,\ Bo\ =\ 40, \rho_{L}/\rho_{V}\ =\ 100\ \rm{and} \ \mu_{L}/\mu_{V}\ = \ 100.$\latex_)"
+	Description "As an example, we suggest the following physical properties : \latex_($\rho_{L}\ = \ 1000\ \rm{kg.m}^{-3};\ \rho_{V}\ = \ 10\ \rm{kg.m}^{-3};\ \mu_{L}\ = \ 0.273556\ \rm{Pa.s}^{-1};\  \mu_{V}\ = \ 0.00273556\ \rm{Pa.s}^{-1};\ \sigma\ =\ 0.1\ \rm{N.m};\ g\ = \ 10\ \rm{m.s}^{-2};\ d_{e}\ = \ 0.02\ \rm{m}.$\latex_)"
+	Description "Extract the position of the center of mass of the inclusion and then deduce its speed of displacement. The first point of comparison is the value of the reduced asymptotic velocity. This value can be obtained even with a peculiar point of the interface, such as the apex. Of course, in this later case, the temporal evolution around the overshoot cannot be captured. In fact, in the TRIO-U calculation, the position of the center of mass of the bubble is computed."	
+	Description "In addition to the main result, additional features consist in comparisons of the non dimensional values of the over-shoot in the build-up of velocity."
+	}
+Chapter {
+	Title "Trio-U calculations"
+        Description "Some preliminary tests have been conducted, concerning the size of the domain calculation, or the number of computational cell. Correct results are obtained providing that the size of the domain is 0.12 m in each horizontal direction and 0.24 m in the vertical one. The horizontal dimensions of the computational domain exceed the bubble diameter of a factor equal to 6. Calculations involving a smaller domain lead to underestimate the value of the bubble velocity. The mesh is regular. It involves 180 cells in each horizontal direction and 360 in the vertical. Such a number of cells is required, to allow the results fitting the reference."
+	}	
+Chapter {
+	Title "Conclusion"
+        Description "Providing some condiftions are fulfilled, concerning the size of the calculation domain and the number of computational cells used, a correct agreement, between the results of our calculation and the reference is obtained. This can be checked in the figures of pattern 2 and 3. In particular, the figure 3 shows correct agreement with the reference, concerning the speed of the bubble. Above all, the initial overshoot of the value of the velocity is correctly reproduced."
+	}	
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.1 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+	cycles 0
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.2 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 6
+        cycles 2
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.3 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 12
+        cycles 4
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.4 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 18
+        cycles 6
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.5 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 24
+        cycles 8
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.6 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 32
+        cycles 10
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.7 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 38
+        cycles 12
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.8 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 44
+        cycles 14
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.9 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 50
+        cycles 16
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.10 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 56
+        cycles 18
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {	
+visu {
+	Title "Figure 2.11 : Rising of the bubble"
+	description "The shape of the bubble changes in the field of its rising motion"
+        
+	mesh ./monte/lata/post.lata INTERFACES
+        mesh ./monte/lata/post.lata DOM
+        operator slice 0. 0. 0. 0. -1. 0.
+#	cycles 64
+        cycles 20
+	normal3D 0. 0.141 -0.99
+	up3D 0. 0. 1.   
+	width 18cm  
+}
+}
+Chapter {	
+	Description "\latex_(\newpage\latex_)"
+}
+Chapter {
+	Figure {
+	Title "Figure 3 : reduced time evolution of the speed of displacement of the bubble."
+	Width 15cm
+        dimension 2
+        labelx " "
+	labely " "
+	Curve {
+    legend "TRIO-U calculation"
+    file ./monte/vitesse_bulle_12.txt
+    style lines
+    origin "Trio_U"
+	}
+	Curve {
+    legend "Reference from Blanco and Alvarez"
+    file ./monte/vitesse_bulle_12.txt
+    style lines
+    file ./monte/courbe_blanco_alvarez.txt
+    style lines
+    origin "Reference"
+	}
+	}
+	}
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}

@@ -1,0 +1,206 @@
+# Hydraulique 2D VDF turbulent Sous-maille Smagorinsky avec transport constituant et schema quick et bridage viscosite #
+# PARALLEL OK 8 #
+dimension 2
+Pb_Thermohydraulique_concentration_Turbulent pb1 
+Domaine dom1
+
+# BEGIN MESH #
+Mailler dom1
+{
+        Pave Entree 
+        {
+        Origine 0. 0.
+        Nombre_de_Noeuds 6 25
+        Longueurs 0.92 0.22
+        }
+        {
+        Bord Entree X = 0. 0. <= Y <= 0.22
+        Bord Wall1 Y = 0.22 0. <= X <= 0.92
+        Bord Wall2 Y = 0. 0. <= X <= 0.92
+        Bord Sortie X = 0.92 0. <= Y <= 0.22
+        }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom1
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom1
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+        tinit	0.
+        tmax	0.25
+        dt_min	1.e-8
+        dt_max	1.
+        dt_impr	1.e-5
+        dt_sauv	100
+        seuil_statio	1.e-8
+        nb_pas_dt_max	100
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu	Champ_Uniforme 1 7.e-4
+	rho	Champ_Uniforme 1 2
+        beta_co	Champ_Uniforme 1 0.
+        lambda	Champ_Uniforme 1 0.0262
+	Cp	Champ_Uniforme 1 0.5
+        beta_th	Champ_Uniforme 1 0.
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0. -9.81
+
+Constituant c1
+Lire c1
+{
+	coefficient_diffusion Champ_Uniforme 1 0.02
+}
+
+Associate fluide gravite
+Associate pb1 dom1
+Associate pb1 sch
+Associate pb1 fluide
+Associate pb1 c1
+Discretize pb1 dis
+
+Lire pb1
+{
+        Navier_Stokes_Turbulent
+        {
+                solveur_pression GCP
+		{ 
+                        precond ssor { omega 1.500000 } 
+                        seuil 1e-09
+                }
+                convection { amont }
+                diffusion { }
+                conditions_initiales { vitesse Champ_Uniforme 2 0. 0. }
+                boundary_conditions
+		{
+                
+                        Wall1	paroi_fixe
+                        Wall2	paroi_fixe
+                        Sortie	frontiere_ouverte_pression_imposee	Champ_Front_Uniforme 1 0.
+                        Entree	frontiere_ouverte_vitesse_imposee	Champ_Front_Uniforme 2  100. 0.
+                }
+
+		modele_turbulence sous_maille_smago
+		{
+			turbulence_paroi loi_standard_hydr
+			Correction_visco_turb_pour_controle_pas_de_temps_parametre 1
+                } 
+
+         }
+        
+        Convection_Diffusion_Temperature_Turbulent
+	{
+                diffusion { }
+                convection { quick }
+                boundary_conditions
+		{
+                        Wall1	paroi_adiabatique
+                        Wall2	paroi_temperature_imposee 		Champ_Front_Uniforme 1 0.5
+                        Entree	frontiere_ouverte_temperature_imposee	Champ_Front_Uniforme 1 0.
+                        Sortie	frontiere_ouverte T_Ext			Champ_Front_Uniforme 1 1.
+                }
+                Modele_Turbulence Prandtl { turbulence_paroi loi_expert_scalaire { prdt_sur_kappa 2.09 } Prdt 0.87 }
+                conditions_initiales { temperature Champ_Uniforme 1 1. }
+        }
+
+                
+        Convection_diffusion_Concentration_Turbulent
+	{
+                diffusion { }
+                convection { quick }
+                boundary_conditions
+		{
+                        Wall1	Paroi
+                        Wall2	Paroi
+                        Entree	frontiere_ouverte_concentration_imposee	Champ_Front_Uniforme 1 0.
+                        Sortie	frontiere_ouverte C_ext			Champ_Front_Uniforme 1 0.
+                } 
+              
+                Modele_Turbulence Schmidt { turbulence_paroi loi_standard_hydr_scalaire ScTurb 0.7 }
+                conditions_initiales { concentration Champ_Uniforme 1 0. }
+        }
+
+        Postraitement
+        {
+                Sondes
+                {
+                        sonde_pression pression periode 0.001 segment 12 0.13 0.11 0.13 0.22
+                        sonde_vitesse vitesse periode 0.001 segment 12 0.13 0.11 0.13 0.22
+			sonde_concentration Moyenne_concentration periode 0.001 segment 12 0.13 0.11 0.13 0.22
+
+			sonde_temp_min temperature_reduction_min  periode 0.001 numero_elem_sur_maitre 0
+			sonde_temp_max temperature_reduction_max  periode 0.001 numero_elem_sur_maitre 0
+			sonde_temp_moy temperature_reduction_moy  periode 0.001 numero_elem_sur_maitre 0
+			sonde_temp_moyp temperature_reduction_moyp  periode 0.001 numero_elem_sur_maitre 0
+			sonde_temp_sum temperature_reduction_sum  periode 0.001 numero_elem_sur_maitre 0
+			
+			sonde_vit_min vitesse_reduction_min  periode 0.001 numero_elem_sur_maitre 0
+			sonde_vit_max vitesse_reduction_max  periode 0.001 numero_elem_sur_maitre 0
+			sonde_vit_moy vitesse_reduction_moy  periode 0.001 numero_elem_sur_maitre 0
+			sonde_vit_moyp vitesse_reduction_moyp  periode 0.001 numero_elem_sur_maitre 0
+			sonde_vit_sum vitesse_reduction_sum  periode 0.001 numero_elem_sur_maitre 0
+                }
+		
+		
+		definition_champs {
+		
+		  temperature_reduction_min Reduction_0D { methode min source refChamp { Pb_champ pb1 temperature } }
+		  temperature_reduction_max Reduction_0D { methode max source refChamp { Pb_champ pb1 temperature } }	
+		  temperature_reduction_moy Reduction_0D { methode moyenne source refChamp { Pb_champ pb1 temperature } }
+		  temperature_reduction_moyp Reduction_0D { methode moyenne_ponderee source refChamp { Pb_champ pb1 temperature } }
+		  temperature_reduction_sum Reduction_0D { methode somme source refChamp { Pb_champ pb1 temperature } }
+	   	  vitesse_reduction_min Interpolation { localisation elem source Reduction_0D { methode min source refChamp { Pb_champ pb1 vitesse } } }
+		  vitesse_reduction_max Interpolation { localisation elem source Reduction_0D { methode max source refChamp { Pb_champ pb1 vitesse } } }
+		  vitesse_reduction_moy Interpolation { localisation elem source Reduction_0D { methode moyenne source refChamp { Pb_champ pb1 vitesse } } }
+		  vitesse_reduction_moyp Interpolation { localisation elem source Reduction_0D { methode moyenne_ponderee source refChamp { Pb_champ pb1 vitesse } } }
+		  vitesse_reduction_sum Interpolation { localisation elem source Reduction_0D { methode somme source refChamp { Pb_champ pb1 vitesse } } }
+		  temperature_transformation Transformation {
+		  	methode formule expression 1 temperature_natif_dom1/Reduction_0D_temperature_natif_dom1
+			sources { refChamp { Pb_champ pb1 temperature } , 
+			          Reduction_0D { methode min source refChamp { Pb_champ pb1 temperature } }
+			}
+		  }
+		}
+		
+                Champs dt_post 0.005
+                {
+                        pression elem
+			vitesse elem
+                        concentration elem
+			viscosite_turbulente elem
+                        corr_visco_turb elem
+			temperature elem
+			temperature_reduction_min
+			temperature_reduction_max
+			temperature_reduction_moy
+			temperature_transformation
+                }
+		Statistiques dt_post 0.005
+		{
+		   t_deb 0. t_fin 10
+		   Moyenne concentration elem
+		   Ecart_type concentration som		   
+		}
+        }
+}
+Solve pb1
+Fin

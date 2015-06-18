@@ -1,0 +1,112 @@
+Dimension 2
+
+export domaine dom_pb2 
+
+Mailler dom_pb2
+{
+Pave Cavite
+	{
+		Origine  0 0.
+		Nombre_de_Noeuds  8 11
+		Longueurs 3.e-2 0.200
+	}
+	{
+		Bord interface     X = 0           0. <= Y <= 0.20
+		Bord interface     X = 3.00e-2     0. <= Y <= 0.20
+                Bord entree        Y = 0.          0. <= X <= 3.e-2
+                Bord sortie        Y = 0.20        0. <= X <= 3.e-2
+		} 
+}
+
+trianguler dom_pb2
+Verifiercoin dom_pb2 { }
+Pb_thermohydraulique_turbulent  pbf
+
+schema_euler_explicite sch
+Read sch
+{
+        tinit 0.
+        tmax 1.
+        dt_min 1.E-8
+        dt_max 10.
+        dt_impr 5000.
+        seuil_statio 1.e-8
+        facsec 1.
+}
+
+VEFPreP1B cubes
+
+Fluide_Incompressible He
+Read He
+{
+        mu Champ_Uniforme 1 4.4e-05 
+        rho Champ_Uniforme 1 4.4
+        lambda Champ_Uniforme 1 0.34   
+        Cp Champ_Uniforme 1 5193.
+        beta_th Champ_Uniforme 1 0.0014285714
+}
+
+Associate pbf dom_pb2
+Associate pbf He     
+Associate pbf sch
+
+Discretize pbf cubes
+
+Read pbf
+{
+        Navier_Stokes_turbulent
+        {
+                solveur_pression Cholesky  { }
+		convection { negligeable }
+                diffusion { negligeable }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 2  0. 10.0
+                        }
+                boundary_conditions {
+                        entree frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10.0
+                        sortie    frontiere_ouverte_pression_imposee champ_front_uniforme 1  0. 
+			interface paroi_fixe
+                }
+
+		modele_turbulence sous_maille_Smago { Cs 1.e-9 
+		        turbulence_paroi UTAU_IMP { u_tau Champ_uniforme 1 0. }
+}
+		traitement_particulier { temperature { bord sortie direction 1 } }
+        }
+
+        Convection_Diffusion_Temperature_turbulent
+        {
+                diffusion { }
+                convection { EF_stab { } }
+                conditions_initiales {
+                        temperature Champ_Uniforme 1 0.
+                        }
+                boundary_conditions {
+                        entree frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
+                        sortie    frontiere_ouverte T_ext  champ_front_uniforme 1 1200
+			interface paroi_flux_impose Champ_front_uniforme 1 2.285e3
+                                   }
+                Modele_Turbulence Prandtl { Turbulence_paroi Loi_Paroi_Nu_Impose { nusselt 20.*Re^(0.)*Pr^(0.) diam_hydr champ_uniforme 1 2.14e-3 } dt_impr_nusselt 5. }
+        }
+        Postraitement {
+		format lata
+                Sondes
+                {
+			sonde_He_T_sortie   temperature periode 1.   points  1 1.5e-2 0.20 
+			 
+                        coupe_He_TPG nodes temperature    periode 5000.   segment 10    0. 0. 0. 0.200 
+                        coupe_He_TPD nodes temperature    periode 5000.   segment 10    3.0e-2 0.  3.0e-2 0.200 
+              }
+                Champs dt_post 5000.0
+                {
+                   vitesse faces
+                   temperature faces
+                }
+        }
+        sauvegarde formatte VEF_pb2.sauv
+}
+
+EcritureLectureSpecial 0
+Imprimer_flux  dom_pb2 { interface } 
+Solve pbf
+End

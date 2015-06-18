@@ -1,0 +1,11 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../../propertiesGeometry.py
+cp propertiesGeometry.dat ../..
+##
+python ../../AnalyticalSolution.py ../../vdf/test1/propertiesGeometry.dat
+cp analytic.dat ../..
+cp P_drop.dat ../..
+##
+python ../../Averages.py test_PMOY0.son test_PMOY02.son test_PMOY04.son test_PMOY06.son test_PMOY087.son test_SONDE_A0.son test_SONDE_A02.son test_SONDE_A04.son test_SONDE_A06.son test_SONDE_A087.son test_SONDE_B0.son test_SONDE_B02.son test_SONDE_B04.son test_SONDE_B06.son test_SONDE_B087.son test_SONDE_C0.son test_SONDE_C02.son test_SONDE_C04.son test_SONDE_C06.son test_SONDE_C087.son Tbulk.dat

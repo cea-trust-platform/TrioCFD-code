@@ -1,0 +1,104 @@
+# Hydraulique turbulent 3D Keps dans une structure en croix pour verifier symetrie #
+# PARALLEL OK 8 #
+dimension 3
+Pb_Hydraulique_turbulent pb
+export domaine dom_pb1
+# BEGIN MESH #
+Read_file dom_pb1 croix_reduite.geom
+Tetraedriser_homogene dom_pb1
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_pb1
+{
+	Partitionneur tranche { tranches 2 1 1 }
+	Larg_joint 2
+	Nom_Zones DOM1
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom_pb1
+END SCATTER #
+
+VEFPrep1B dis
+Runge_Kutta_ordre_3 sch
+Lire sch
+{
+ tinit 0.
+ tmax 3.
+ dt_min 1.e-9
+ dt_max 1.e-1
+ dt_impr 1.e-9
+ dt_sauv 1.
+ seuil_statio 1.e-18
+ nb_pas_dt_max 5
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 0.002
+	rho Champ_Uniforme 1 2
+}
+
+
+Associate pb dom_pb1
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+
+Lire pb
+{
+ Navier_Stokes_turbulent
+ {
+  solveur_pression PETSC GCP { precond ssor { omega 1.65 } seuil 1.e-12 impr }
+
+  convection { amont }
+  diffusion {  }
+  conditions_initiales {
+   vitesse Champ_Uniforme 3 0. 0. 0.
+   }
+  boundary_conditions {
+   entree frontiere_ouverte_pression_imposee
+       Champ_front_uniforme 1 2.
+   sud frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+   nord frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+   gauche frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+   droit frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+   bas frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+   haut frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+   paroi paroi_fixe
+}
+   modele_turbulence Sous_maille {
+   turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 1.
+  }
+}
+
+ Postraitement
+ {
+  Sondes
+  {
+   sonde_vitesse1 vitesse periode 1.e-3 points 2  0.2 0.11 0.1 0.4 0.11
+0.1
+  }
+  
+  Definition_champs 
+   {
+    viscosite_turbulente_elem_dom_pb1 refChamp { Pb_champ pb viscosite_turbulente }	  	
+   }
+   
+  Champs dt_post 0.1
+  {
+   viscosite_turbulente_elem_dom_pb1
+   vitesse elem
+  }
+ }
+}
+
+Solve pb
+Fin

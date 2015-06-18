@@ -1,0 +1,8 @@
+mkdir -p model
+cp cylindre.prep model
+cd model
+Xprep=$TRUST_ROOT/Outils/PRE_3DVDF/xprepro
+$Xprep cylindre.prep 2
+cd -
+ln -s prepro/Probleme1/Pb1.geom cylindre.geom
+triou decoupage

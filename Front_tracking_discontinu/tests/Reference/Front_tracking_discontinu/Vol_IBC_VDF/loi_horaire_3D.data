@@ -1,0 +1,35 @@
+# Translation a 10m/s #
+export Loi_horaire translation
+Lire translation
+{
+	position		3 0. 0. 10.*t
+	vitesse			3 0. 0. 10.
+}
+
+# Battement des ailes #
+export Loi_horaire battement_aile_gauche
+Lire battement_aile_gauche
+{
+	position		3 0. 0. 10.*t
+	vitesse			3 0. 0. 10.
+	rotation		9 	cos(0.25*Pi*sin(50*t)) 	-sin(0.25*Pi*sin(50*t)) 	0 
+					sin(0.25*Pi*sin(50*t)) 	 cos(0.25*Pi*sin(50*t)) 	0 
+					0 						0 						1
+	derivee_rotation	9 	-12.5*Pi*sin(0.25*Pi*sin(50*t))*cos(50*t) 	-12.5*Pi*cos(0.25*Pi*sin(50*t))*cos(50*t) 	0 
+					12.5*Pi*cos(0.25*Pi*sin(50*t))*cos(50*t)	-12.5*Pi*sin(0.25*Pi*sin(50*t))*cos(50*t) 	0 
+					0 						0 						0
+}
+ 
+export Loi_horaire battement_aile_droite
+Lire battement_aile_droite
+{
+	position		3 0. 0. 10.*t
+	vitesse			3 0. 0. 10.
+	rotation		9 	cos(Pi-0.25*Pi*sin(50*t)) 			-sin(Pi-0.25*Pi*sin(50*t)) 			0 
+					sin(Pi-0.25*Pi*sin(50*t)) 			 cos(Pi-0.25*Pi*sin(50*t)) 			0 
+					0 						0 						1
+	derivee_rotation	9 	12.5*Pi*sin(Pi-0.25*Pi*sin(50*t))*cos(50*t) 	12.5*Pi*cos(Pi-0.25*Pi*sin(50*t))*cos(50*t) 	0 
+					-12.5*Pi*cos(Pi-0.25*Pi*sin(50*t))*cos(50*t)	12.5*Pi*sin(Pi-0.25*Pi*sin(50*t))*cos(50*t) 	0 
+					0 						0 						0
+}
+  

@@ -1,0 +1,409 @@
+Parameters {
+	Title "Oscillation of a bubble"
+	Description "____convection scheme : Schema_Euler_explicite"
+	Description "____VDF discretisation "
+	VersionTrio_U "1.6.1"
+	ParametersTrio_U Type of fluid : air and water
+	Author "S.Pigny"
+	TestCase Bulle/Cas_01 FTD_Oscillation_Bulle_3D_VDF.data 4 /* data file in appendix */
+	TestCase Bulle/Cas_02 FTD_Oscillation_Bulle_3D_VDF.data 4
+#	Prerequisite "extrait_surface.sh"
+}
+
+Chapter {
+	Title "Objectives of the application"
+	Description "In this test, we check the capability of the Front Tracking algorithm to describe the oscillations of the interface between an air bubble and the surrounding water."	
+	Description "The test deals with the presence of a bubble in a box filled of liquid. Initially, the liquid is at rest. No gravity forces are taken into account. In the calculation, the initial shape of the bubble is slightly an ellipsoidal one. It makes it be out of equilibrium, concerning surface tension forces. Its free surface is subject to oscillations. Their wavelengths are directly connected to the mass balance. To investigate their frequencies, the analytical results to be used as reference are relative to inviscid fluids. Therefore, this test-case is intended to provide a verification of the correct balance between surface tension and inertial effects which are the only effects which control the fluid motion. In addition, since the analytical results are non-dissipative, this test-case provides a tool to estimate the rate of the energy dissipation due to the modeling method. This is connected to the problem of numerical diffusion."
+	Description ""
+	Description "Description"
+	Description "In this two-fluid problem, the following notations are introduced to describe the fluids and interface physical and transport properties. The two fluids are considered as non-miscible. The inclusion equivalent diameter is defined as the diameter of the sphere which volume is equal to that of the actual inclusion. Let \latex_($D$\latex_) be this diameter and \latex_($R$\latex_) the corresponding radius. The test makes sense if the physical properties correspond roughly to an inertia dominated flow with a very low viscosity for the gas and the liquid. This means that the capillary numbers based on the physical properties of each phase are very small. They are defined by:"
+	Description "\latex_( $$ C_{a_{k}}\ =\ \frac{\rho_{k}}{\mu_{k}} \sqrt{\frac{D\sigma}{\rho_{k}}} $$ \latex_)"
+Description "where the subscript k = L;G denotes respectively the liquid or the gas phase, \latex_( $ \rho_{k} $ \latex_), \latex_( $\mu_{k}$\latex_) is the dynamical viscosity and\latex_( $\sigma$\latex_) is the surface tension between the gas and the liquid. Therefore, it is assumed that viscosity effects vanish when the following condition is fulfilled:"	
+	Description "\latex_( $$ C_{a_{k}}\ \gg \ 1$$ \latex_)"
+	Description "Rayleigh in 1879 derived the frequency of oscillations of such an inclusion. This derivation is based on the potential flow theory and is valid for any arbitrary inner and outer values of the density. This is shown for example by Lamb (1975, p. 475, equation 10). The angular frequency of the oscillations is obtained for each mode by using the linearized momentum jump at the interface; it is given by:"
+        Description "\latex_( $$ \omega_{n}^{2}\ =\ \frac{n(n+1)(n-2)(n+2)}{(n+1)\rho_{I} + n\rho_{O}} \frac{\sigma}{R^{3}} $$ \latex_)"
+Description "We focus on the main oscillation mode \latex_($n = 3$\latex_), which correspond to the slowest dissipation of kinetic energy. It leads to the theoretical value of 50 Hz, for the interface oscillation"	
+}
+Chapter {
+	Title "First calculation"
+        Description "The options of the calculation are : \latex_($lissage_courbure_iterations 0$\latex_) and \latex_($facteur_longueur_ideale 2.$\latex_). These two parameters deals with the Front Tracking algorithm to determine the surface tension forces. They are directly connected to the lagrangian mesh, which is in use for the interface. Their values are provided in the input data file. We compare the value of the frequency of the oscillation obtained in the calculation to the theoretical one. One can see in the figures below that results are not satisfactory. The oscillations of free surface do not correspond to the theoretical value of 50 Hz. Moreover, the pressure difference between inner and outer fluid suddenly decreases after 0.13 second. some parameters, which deal with the Front Tracking algorithm should be changed."
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : initial conditions"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 0
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 1
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 2
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 3
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 4
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 5
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 6
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	cycles 7
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+Figure {
+	Dimension 2
+	Title "Bubble in a square box"
+	Title "Pressure difference between the inner and outer fluid."
+	Description "The theoretical value is 88 Pa."
+	LabelX "Time (sec)"
+	LabelY "Inner/Outer pressure difference (Pa)"
+         Include_Description_Curves 0
+	Curve {
+		legend "version_actuelle(prepare)"
+		file Bulle/Cas_01/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+		columns ($1) ($2)
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+		legend "ana"
+		fonction 88.
+		Style lines
+	}
+       }
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+Figure {
+	Title "Bubble in a square box"
+	Title "Interfacial area between air and water."
+	Description "The theoretical value of oscillations is 50 Hz."
+	Dimension 2
+	LabelX "Time (sec)"
+	LabelY "Interfacial area (m2)"
+	 Include_Description_Curves 0
+	Curve {
+		legend "version_actuelle(prepare)"
+		file Bulle/Cas_01/Surface.txt
+		columns ($1) ($2)
+		Style linespoints
+		PointSize 2
+	}       
+	}	
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+	Title "Second calculation"
+        Description "The options of the calculation are : \latex_($lissage_courbure_iterations 10$\latex_) and \latex_($facteur_longueur_ideale 0.8$\latex_). The two parameters deal with the mesh of the interface. They are precised in the input data file. One can see in figures below that results are improved with regard to the previous case. The oscillations of free surface correspond to the theoritical value of 50  Hz. The pressure difference between inner and outer fluid is also correctly reproduced. It seems this result could be considered as a reference calculation. One can see a time damping of oscillations. This effect is due to numerical diffusion." 
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : initial conditions"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 0
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 1
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 2
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 3
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 4
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 5
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 6
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+visu {
+	Title "Bubble in a square box : oscillations of the interface"
+# 	width 15cm, viewport= 0 200 1024 650, clip
+ 	width 18cm
+        mesh Bulle/Cas_02/lata/post.lata INTERFACES
+	
+	cycles 7
+	normal3D 0. 0. 1.
+	up3D 0. 1. 0.   
+}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+Figure {
+	Dimension 2
+	Title "Bubble in a square box"
+	Title "Pressure difference between the inner and outer fluid."
+	Description "The theoretical value is 88 Pa."
+	LabelX "Time (sec)"
+	LabelY "Inner/Outer pressure difference (Pa)"
+         Include_Description_Curves 0
+	Curve {
+		legend "version_actuelle(prepare)"
+		file Bulle/Cas_02/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+		columns ($1) ($2)
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+		legend "ana"
+		fonction 88.
+		Style lines
+	}
+       }
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+Figure {
+	Title "Bubble in a square box"
+	Title "Interfacial area between air and water."
+	Description "The theoretical value of oscillations is 50 Hz."
+	Dimension 2
+	LabelX "Time (sec)"
+	LabelY "Interfacial area (m2)"
+	 Include_Description_Curves 0
+	Curve {
+		legend "version_actuelle(prepare)"
+		file Bulle/Cas_02/Surface.txt
+		columns ($1) ($2)
+		Style linespoints
+		PointSize 2
+	}       
+	}	
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+Figure {
+	Title "Bubble in a square box"
+	Title "Interfacial area between air and water."
+	Description "The theoretical value of oscillations is 50 Hz."
+	Dimension 2
+	LabelX "Time (sec)"
+	RangeX 0.1 0.16
+	LabelY "Interfacial area (m2)"
+	 Include_Description_Curves 0
+	Curve {
+		legend "version_actuelle(prepare)"
+		file Bulle/Cas_02/Surface.txt
+		columns ($1) ($2)
+		Style linespoints
+		PointSize 2
+	}       
+	}	
+}
+Chapter {
+	Description "\latex_(\newpage\latex_)"	
+}
+Chapter {
+	Description "Conclusion"	
+        Description "A too coarse lagrangian mesh to describe interface leads to wrong results. On the contrary, providing an accurate enough mesh is chosen, one can obtain results in agreement with theoretical data. The choice can be done via some options chosen in the input data."
+}
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}
+Chapter {
+        Title "References"
+	Description "Lamb. Year 1975."
+}

@@ -1,0 +1,366 @@
+Parameters {
+	Title "Poiseuille_flow_2D_VDF_VEF"
+	Description "Study of Poiseuille flow in a plane chanel"
+	Description " "
+	Description " \latex_(\underline{Validated model:}\latex_) Hydraulic with pressure drop "
+	Description " "
+	Description " \latex_(\underline{Validation with:}\latex_) Analytical solution "
+
+	VersionTrio_U "1.6.3"
+
+	ParametersTrio_U Type of probem: 2D hydraulic
+	ParametersTrio_U Discretization: VEFPreP1B and VDF 
+	ParametersTrio_U Time scheme: Euler explicite (for VDF cases) and implicite (for VEF cases)
+	ParametersTrio_U VDF convection scheme: Quick or Amont
+	ParametersTrio_U VEFPreP1B convection scheme: Muscl or Amont or EF_stab (alpha = 1)
+	ParametersTrio_U Turbulence model: none
+	ParametersTrio_U Type of boundary condition: inlet ; outlet
+	ParametersTrio_U Type of fluid: pure numerical properties
+	ParametersTrio_U Solving of equations: Navier_Stokes_standard
+
+	TestCase VDF/Amont test 
+	TestCase VDF/Quick test
+	TestCase VEF/Muscl test 
+	TestCase VEF/EF_stab test 
+	TestCase VEF/Amont test /* jdd en annexe */
+	TestCase VDF_CL2/Amont test
+	TestCase VDF_CL2/Quick test
+	TestCase VEF_CL2/Amont test
+	TestCase VEF_CL2/Muscl test
+	TestCase VEF_CL2/EF_stab test
+
+	Author "E.MOREAU (V.BARTHEL), A.AUROUSSEAU (S. VANDROUX)"
+	IncludeData 2
+}
+
+Chapter {
+	Title "Tests Description"
+	
+	Figure {
+		Title "Geometry: Dimensions and domain overview"
+		picture geometry.png
+	}
+
+	visu {
+		Title "VDF Mesh"
+		Width 10cm, viewport= 0 0 1000 1000,clip
+		mesh VDF/Amont/test.lata dom
+		Description "Geometry of the test: 2D plane chanel"
+		Description "Dimensions of the test: 0.5m \latex_($\times$\latex_) 1m"
+		Description "Mesh 2D: 600 cells (30\latex_($\times$\latex_)20)"
+	}
+		visu {
+		Title "VEF trianguler_fin Mesh"
+		Width 10cm, viewport= 0 0 1000 1000,clip
+		mesh VEF/Amont/test.lata dom
+		Description "Geometry of the test: 2D plane chanel"
+		Description "Dimensions of the test: 0.5m \latex_($\times$\latex_) 1m"
+		Description "Mesh 2D: 4800 triangular cells"
+	}
+
+	Description " $\bullet$ Dimensions: H = 0.5m ; L = 1m "
+	Description " $\bullet$ Initial conditions: velocity = 0 "
+	Description " $\bullet$ Two sets of hydraulic boundary conditions: "
+	Description " \latex_($\ \ \ \ \ $\latex_) - INLET pressure: P = 1 bar, or INLET velocity profile (set 2) \latex_(V(y)=0.24$y^{2}$+0.06\latex_)  "
+	Description " \latex_($\ \ \ \ \ $\latex_) - OUTLET pressure: P = 0 bar "
+	Description " \latex_($\ \ \ \ \ $\latex_) - Top wall: fixed wall " 
+	Description " \latex_($\ \ \ \ \ $\latex_) - Symmetry: symmetry "
+	Description " VEF mesh contains 4800 triangular cells and is generated using trianguler_fin option "
+	Description " $\bullet$ Comparison with the analytical solutions: \latex_(V(y)=0.24$y^{2}$+0.06\latex_) (mixed boundary conditions set) and \latex_(V(y)=0.5$y^{2}$+0.125\latex_) (constant pressure boundary condition set)"
+
+	Table {
+			Title " Physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 2
+				columns ($1)
+			}
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat
+				nb_columns_file 2
+				columns ($2)
+			}
+	}
+} 
+
+Chapter {
+	Title "RESULTS"
+	Description " $\bullet$ Transitory calculation time: about 2s of physical time (transitory calculation until a stationnary flow is reached).  "
+	Description " $\bullet$ Average time step: \latex_(2.0 $10^{-4}$\latex_)s in VDF and \latex_(1.25 $10^{-3}$\latex_)s in VEFPreP1B. "
+	Description " VDF computation use a Euler explicit time scheme, while VEF computations use a Euler implicit one. "
+	Description "Two sets of bounsdary conditions (BC) have been used in those computations, the first one being an inlet and an oulet pressure, the second one an inlet velocity profile and an outlet pressure. The results are therefore to be considered independently"
+	Description "Boundary conditions set 1: Inlet Pressure: 1., Outlet Pressure: 0."
+	Description "Boundary conditions set 2: Inlet velocity:\latex_(V(y)=0.24$y^{2}$+0.06\latex_) , Outlet Pressure: 0."
+
+	Figure {
+		Title "Transverse velocity profile for the constant pressure boundary conditions set"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Plane channel height (m)"
+		RangeX 0. 0.5
+		LabelY "Vx (m/s)"
+		RangeY 0 0.15
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "analytical solution"
+			origin "Analytic"
+			Fonction -0.5*x*x + 0.125
+			Style points
+			TypeLigne -1
+		}
+		Curve {
+			legend "VDF Amont"
+			origin "Trio_U"
+			Segment VDF/Amont/test.data SEG_U1
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF Quick"
+			origin "Trio_U"
+			Segment VDF/Quick/test.data SEG_U1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "VEF Amont"
+			origin "Trio_U"
+			Segment VEF/Amont/test.data SEG_U1
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "VEF Muscl"
+			origin "Trio_U"
+			Segment VEF/Muscl/test.data SEG_U1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 4
+		}
+		Curve {
+			legend "VEFP EF_stab"
+			origin "Trio_U"
+			Segment VEF/EF_stab/test.data SEG_U1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 5
+		}
+
+	}
+	Figure {
+		Title "Transverse velocity profile for the mixed constant velocity and pressure boundary conditions set"
+#		Width 12cm, viewport = 0 0 924 400,clip
+		Width 10cm
+		Dimension 2			
+		LabelX "Plane channel height (m)"
+		RangeX 0. 0.5
+		LabelY "Vx (m/s)"
+		RangeY 0 0.15
+ #		legend below title "Legende"
+		Include_Description_Curves 0			
+		Curve {
+			legend "analytical solution"
+			origin "Analytic"
+			Fonction -0.24*x*x + 0.06
+			Style points
+			TypeLigne -1
+		}
+		Curve {
+			legend "VDF_CL2 Amont"
+			origin "Trio_U"
+			Segment VDF_CL2/Amont/test.data SEG_U1
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VDF_CL2 Quick"
+			origin "Trio_U"
+			Segment VDF_CL2/Quick/test.data SEG_U1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 2
+		}
+		Curve {
+			legend "VEF_Cl2 Amont"
+			origin "Trio_U"
+			Segment VEF_CL2/Amont/test.data SEG_U1
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "VEF_CL2 Muscl"
+			origin "Trio_U"
+			Segment VEF_CL2/Muscl/test.data SEG_U1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 4
+		}
+		Curve {
+			legend "VEF_CL2 EF_stab"
+			origin "Trio_U"
+			Segment VEF_CL2/EF_stab/test.data SEG_U1
+			columns ($1) ($2)
+			Style points
+			TypeLigne 5
+		}
+	}
+
+	Table {
+		Title "U* with constant pressure BC set, computed with several meshes and convection schemes"
+		nb_columns 5
+		label U | Reynolds number Re | U*theorical | U*trio_U | Error on U* in $%$
+		line {
+			legend "VDF Amont "
+			origin "Trio_U"
+			file VDF/Amont/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VDF Quick "
+			origin "Trio_U"
+			file VDF/Quick/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF Amont "
+			origin "Trio_U"
+			file VEF/Amont/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF Muscl "
+			origin "Trio_U"
+			file VEF/Muscl/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF EF_stab "
+			origin "Trio_U"
+			file VEF/EF_stab/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}	
+
+	Table {
+		Title "U* with mixed BC set, computed with several meshes and convection schemes"
+		nb_columns 5
+		label U | Reynolds number Re | U*theoretical | U*trio_U | Error on U* in $%$
+		line {
+			legend "VDF Amont "
+			origin "Trio_U"
+			file VDF_CL2/Amont/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VDF Quick "
+			origin "Trio_U"
+			file VDF_CL2/Quick/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF Amont "
+			origin "Trio_U"
+			file VEF_CL2/Amont/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF Muscl "
+			origin "Trio_U"
+			file VEF_CL2/Muscl/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			legend "VEF EF_stab "
+			origin "Trio_U"
+			file VEF_CL2/EF_stab/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}	
+
+
+	Table {
+		Title "Pressure drop with mixed BC set, computed with several meshes and convection schemes"
+		nb_columns 5
+		label U | Reynolds number Re | dP theoretical | dP trio_U | Error on dP in $%$
+		line {
+			legend "VDF Amont "
+			origin "Trio_U"
+			file VDF_CL2/Amont/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend "VDF Quick "
+			origin "Trio_U"
+			file VDF_CL2/Quick/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend "VEF Amont "
+			origin "Trio_U"
+			file VEF_CL2/Amont/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend "VEF Muscl "
+			origin "Trio_U"
+			file VEF_CL2/Muscl/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+		line {
+			legend "VEF EF_stab "
+			origin "Trio_U"
+			file VEF_CL2/EF_stab/ligneTableau.dat
+			nb_columns_file 8
+			columns ($1) ($2) ($6) ($7) ($8)
+		}
+	}
+
+}
+
+Chapter {
+	Title " Conclusion "
+ 	Description " $\bullet$ In VEFPreP1B discretization (greatest refinement), the Trio_U results are fitting the analytical solution, in particular with the EF_stab scheme."
+ 	Description " $\bullet$ The simulations give slightly lower results in VDF discretization (less than 3%). " 
+	Description " $\bullet$ As mentioned in the results introduction, a velocity profile, and therefore not a constant value, is used for the inlet boundary condition in the first BC set. The reason is that a constant velocity as the inlet condition isn't adapted to the use of the traitement_particulier_canal calculation: this TrioU keyword manages the friction coefficient (Utau) computation in the canal, and it is best used for a steady velocity profile all along the flow. Defining a velocity profile on the inlet matches that particular condition (as it will be kept constant because of the inlet-outlet periodicity), while a constant velocity value leads to a profile development until about half-way to the outlet."
+}
+
+Chapter {
+	Title "Recommendations for users"
+	Description " The VEFPreP1B discretization associated to an EF_stab schem give the closest results on the whole domain. "
+}
+
+
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+
+
+

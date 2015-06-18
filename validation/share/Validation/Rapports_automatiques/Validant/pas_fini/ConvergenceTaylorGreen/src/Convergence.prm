@@ -1,0 +1,782 @@
+Parameters {
+	Title "Study convergence of Trio_U in 2D VEF"
+	
+	Description "The objective is to do a grid convergence."
+	
+	VersionTrio_U "1.6.2"
+	
+	ParametersTrio_U "Type of problem: 2D hydraulic_problem"
+	ParametersTrio_U "Discretization: VEFPreP1B"
+	ParametersTrio_U "Time scheme: Runge_kutta_ordre_3" 
+	ParametersTrio_U "Solving of equations: Navier_Stokes"
+#
+	Reference " $[1]$ Towards large-eddy simulation in complex geometries. Mahesh K., Ruetsch G. R., Moin P. Center for Turbulence Research, Annual Research Briefs 1999" 
+	Reference " $[2]$ Description of Taylor Green votexes: http://en.wikipedia.org/wiki/Taylor%E2%80%93Green_vortex"
+	TestCase amont 1 
+	TestCase amont 2 
+	TestCase amont 4 
+	TestCase amont 8 
+	TestCase ef_stab_0.2 1 
+	TestCase ef_stab_0.2 2 
+	TestCase ef_stab_0.2 4 
+	TestCase ef_stab_0.2 8 
+	TestCase muscl 1 
+	TestCase muscl 2 
+	TestCase muscl 4 
+	TestCase muscl 8 
+	TestCase muscl3_1.0 1 
+	TestCase muscl3_1.0 2 
+	TestCase muscl3_1.0 4 
+	TestCase muscl3_1.0 8 
+	TestCase muscl3_0.5 1 
+	TestCase muscl3_0.5 2 
+	TestCase muscl3_0.5 4 
+	TestCase muscl3_0.5 8 
+	
+			
+	Author "Ledac P."
+	IncludeData 2
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Tests Description"
+	Description "Hydraulic initial conditions: fluid U = f(x,y) V = g(x,y)"
+	Description "where f(x,y)=-cos(2*Pi*x)*sin(2*Pi*y)*exp(-2*$\nu$*t) g(x,y)=sin(2*Pi*x)*cos(2*Pi*y)*exp(-2*$\nu$*t) and $\nu$=$\mu$/$\rho$"
+	Description "Hydraulic boundary condition: "
+	Description " $\bullet$ BOUNDARY with PERIODIQUE condition."
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "2D Results"
+	Description "Taylor Green vortexes"
+
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     visu {
+             Title "Scheme amont on finest mesh (64*64)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor amont/8.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor amont/8.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor amont/8.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     visu {
+             Title "Scheme ef_stab { alpha 0.2 } on finest mesh (64*64)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor ef_stab_0.2/8.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor ef_stab_0.2/8.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor ef_stab_0.2/8.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     visu {
+             Title "Scheme muscl on finest mesh (64*64)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl/8.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl/8.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl/8.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     visu {
+             Title "Scheme muscl3 { alpha 1.0 } on finest mesh (64*64)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl3_1.0/8.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl3_1.0/8.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl3_1.0/8.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     visu {
+             Title "Scheme muscl3 { alpha 0.5 } on finest mesh (64*64)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl3_0.5/8.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl3_0.5/8.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor muscl3_0.5/8.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "1D Results"
+	Description ""
+	
+     Table {
+	     Title "Scheme amont"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy (amont)"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~0.1 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file amont/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file amont/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (64*64)"
+		     file amont/8_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }     	
+      Figure {
+	     Title_figure "Average Error vs Grid Resolution (amont)"
+	     Width 12cm
+	     Dimension 2
+	     # Rangex 0.5 10 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Trio_U"
+		     file amont/erreur.dat
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+	     Curve {
+		     legend "Order 1"
+		     file amont/ordre1.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Order 2"
+		     file amont/ordre2.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }  
+	     Curve {
+		     legend "Order 3"
+		     file amont/ordre3.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 3
+	     }  	        
+      }
+	
+     Table {
+	     Title "Scheme ef_stab { alpha 0.2 }"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy (ef_stab { alpha 0.2 })"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~0.1 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file ef_stab_0.2/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file ef_stab_0.2/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (64*64)"
+		     file ef_stab_0.2/8_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }     	
+      Figure {
+	     Title_figure "Average Error vs Grid Resolution (ef_stab { alpha 0.2 })"
+	     Width 12cm
+	     Dimension 2
+	     # Rangex 0.5 10 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Trio_U"
+		     file ef_stab_0.2/erreur.dat
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+	     Curve {
+		     legend "Order 1"
+		     file ef_stab_0.2/ordre1.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Order 2"
+		     file ef_stab_0.2/ordre2.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }  
+	     Curve {
+		     legend "Order 3"
+		     file ef_stab_0.2/ordre3.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 3
+	     }  	        
+      }
+	
+     Table {
+	     Title "Scheme muscl"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy (muscl)"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~0.1 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file muscl/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file muscl/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (64*64)"
+		     file muscl/8_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }     	
+      Figure {
+	     Title_figure "Average Error vs Grid Resolution (muscl)"
+	     Width 12cm
+	     Dimension 2
+	     # Rangex 0.5 10 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Trio_U"
+		     file muscl/erreur.dat
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+	     Curve {
+		     legend "Order 1"
+		     file muscl/ordre1.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Order 2"
+		     file muscl/ordre2.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }  
+	     Curve {
+		     legend "Order 3"
+		     file muscl/ordre3.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 3
+	     }  	        
+      }
+	
+     Table {
+	     Title "Scheme muscl3 { alpha 1.0 }"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy (muscl3 { alpha 1.0 })"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~0.1 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file muscl3_1.0/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file muscl3_1.0/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (64*64)"
+		     file muscl3_1.0/8_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }     	
+      Figure {
+	     Title_figure "Average Error vs Grid Resolution (muscl3 { alpha 1.0 })"
+	     Width 12cm
+	     Dimension 2
+	     # Rangex 0.5 10 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Trio_U"
+		     file muscl3_1.0/erreur.dat
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+	     Curve {
+		     legend "Order 1"
+		     file muscl3_1.0/ordre1.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Order 2"
+		     file muscl3_1.0/ordre2.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }  
+	     Curve {
+		     legend "Order 3"
+		     file muscl3_1.0/ordre3.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 3
+	     }  	        
+      }
+	
+     Table {
+	     Title "Scheme muscl3 { alpha 0.5 }"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy (muscl3 { alpha 0.5 })"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~0.1 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file muscl3_0.5/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file muscl3_0.5/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (64*64)"
+		     file muscl3_0.5/8_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }     	
+      Figure {
+	     Title_figure "Average Error vs Grid Resolution (muscl3 { alpha 0.5 })"
+	     Width 12cm
+	     Dimension 2
+	     # Rangex 0.5 10 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Trio_U"
+		     file muscl3_0.5/erreur.dat
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+	     Curve {
+		     legend "Order 1"
+		     file muscl3_0.5/ordre1.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Order 2"
+		     file muscl3_0.5/ordre2.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }  
+	     Curve {
+		     legend "Order 3"
+		     file muscl3_0.5/ordre3.dat
+		     columns 1 2
+		     Style lines
+		     TypeLigne 3
+	     }  	        
+      }
+    
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     Figure {
+	     Title_figure "Average Error vs Grid Resolution (all schemes)"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0
+	     #Courbe {
+	#	     legend "Order 1"
+	#	     file muscl/ordre1.dat
+	#	     columns 1 2
+	#	     Style lines
+	#	     TypeLigne 1
+	#     }
+	#     Curve {
+	#	     legend "Order 2"
+	#	     file muscl/ordre2.dat
+	#	     columns 1 2
+	#	     Style lines
+	#	     TypeLigne 2
+	 #    }     
+      
+     
+ 	     Curve {
+		     legend "amont"
+		     file amont/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+     
+ 	     Curve {
+		     legend "ef_stab { alpha 0.2 }"
+		     file ef_stab_0.2/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+     
+ 	     Curve {
+		     legend "muscl"
+		     file muscl/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+     
+ 	     Curve {
+		     legend "muscl3 { alpha 1.0 }"
+		     file muscl3_1.0/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+     
+ 	     Curve {
+		     legend "muscl3 { alpha 0.5 }"
+		     file muscl3_0.5/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+
+	}
+      	Table
+        {
+                Title "Numerical comparison (Re=INF) with boundary condition: PERIODIQUE"
+                Description The average error is given for the coarse (8*8) and the finest (64*64) mesh.
+		Description  
+                nb_columns 3
+                label "Error[%] | Error[%] | Order"
+	
+     	line {
+                        legend "amont"
+                        file amont/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "ef_stab { alpha 0.2 }"
+                        file ef_stab_0.2/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "muscl"
+                        file muscl/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "muscl3 { alpha 1.0 }"
+                        file muscl3_1.0/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "muscl3 { alpha 0.5 }"
+                        file muscl3_0.5/order_scheme.dat
+                        last_line
+                }
+    		
+	}
+    
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     Figure {
+	     Title "Convection operator CPU (all schemes)"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     #LogY
+	     LabelX Cells number
+	     LabelY CPU (s/cell)
+      
+     
+ 	     Curve {
+		     legend "amont"
+		     file amont/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "ef_stab { alpha 0.2 }"
+		     file ef_stab_0.2/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "muscl"
+		     file muscl/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "muscl3 { alpha 1.0 }"
+		     file muscl3_1.0/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "muscl3 { alpha 0.5 }"
+		     file muscl3_0.5/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+
+	}
+}

@@ -1,0 +1,390 @@
+# Chimie gaz+grains 0D #
+# 2 familles monodisperses #
+# PARALLEL NOT #
+dimension 2
+Pb_Thermohydraulique_QC_grains_fraction_massique pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entree
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 2 2
+		Longueurs 1. 1.
+		}
+		{
+		bord Bord   X = 0.0 0.0 <= Y <= 1.0
+		bord Bord   X = 1.0 0.0 <= Y <= 1.0
+		bord Bord   Y = 0.0 0.0 <= X <= 1.0
+		bord Bord Y = 1.0 0.0 <= X <= 1.0
+		}
+}
+
+# END MESH #
+# BEGIN PARTITION
+Decouper dom
+{
+	Tranche 2 1
+	Nb_parts 2
+	Larg_joint 1
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0
+	tmax  40.0
+	dt_min 5.e-5
+	dt_max 0.5
+	facsec 0.0001
+	dt_impr 1
+	dt_sauv 10
+	nb_pas_dt_max 100
+	seuil_statio -1.e-8
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+	pression 101300.
+	lambda Champ_Uniforme 1  0.0261685
+	loi_etat melange_gaz_parfait_grains {
+		rho_p 3900.
+		cp_p 1006.
+		verif_fraction
+		Sc 1.
+		nb_famille_grains 2
+	}
+	traitement_pth conservation_masse
+	traitement_rho_gravite moins_rho_moyen
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0.00 -9.81
+
+Chimie la_chimie
+Lire la_chimie 
+{
+	{
+	reactifs U_1+3*F2
+	produits UF6
+	constante_taux_reaction 1E30
+	d_D_G 2.2895E-3
+	exposant_beta 0.
+	enthalpie_reaction 0.
+	energie_activation 81000.
+	coefficients_activites {  F2 1 }
+	}
+	,
+	{
+	reactifs U_2+3*F2
+	produits UF6
+	constante_taux_reaction 21982.
+	d_D_G 1E30
+	exposant_beta 0.
+	enthalpie_reaction 0.
+	energie_activation 81000.
+	coefficients_activites {  F2 1 }
+	}
+}
+# ecrire la_chimie #
+
+Associer fluide gravite
+Associer pb fluide
+Associer pb dom
+Associer pb sch
+Associer pb la_chimie
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent_QC { 
+modele_turbulence sous_maille_wale { cw 0.  turbulence_paroi negligeable } 
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-22  impr }
+		convection { amont }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		conditions_limites {
+			Bord paroi_fixe
+			}
+	}
+	Convection_Diffusion_Chaleur_Turbulent_QC { 
+modele_turbulence Prandtl {  turbulence_paroi negligeable_scalaire }
+		diffusion { }
+		convection { amont }
+		conditions_limites
+		{
+			Bord  paroi_adiabatique
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 1500.0 }
+	sources { source_couplage { } }
+	}
+	EDP_Y_p
+	{
+	  masse_molaire .238
+	  alias U_1
+	  conditions_initiales { Y_p champ_fonc_xyz dom  1 (1-0.7982734)/2. }
+	  convection { amont }
+		diffusion {  }
+          conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	EDP_a_i
+	{
+	  conditions_initiales { a_i champ_fonc_xyz dom  1 0.6   }
+          convection { amont }
+          conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	EDP_nd10
+	{
+	  conditions_initiales { nd10 champ_fonc_xyz dom  1 0.190985931710274e4 }
+          convection { amont }
+          conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	EDP_ngrains
+	{
+	  conditions_initiales { ngrains champ_fonc_xyz dom  1 0.190985931710274e8 }
+          convection { amont }
+          conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	EDP_Y_p_1
+	{
+	  alias U_2
+	  masse_molaire .238
+	  conditions_initiales { Y_p_1 champ_fonc_xyz dom  1 (1-0.7982734)/2. }
+          convection { amont }
+		diffusion {  }
+          conditions_limites
+	  	{
+		Bord Symetrie
+		}
+	}
+	EDP_a_i_1
+	{
+	  conditions_initiales { a_i_1 champ_fonc_xyz dom  1 0.3  }
+	  convection { amont }
+	  conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	EDP_nd10_1
+	{
+	  conditions_initiales { nd10_1 champ_fonc_xyz dom  1 477.464829275686  }
+	  convection { amont }
+	  conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	EDP_ngrains_1
+	{
+	  conditions_initiales { ngrains_1 champ_fonc_xyz dom  1 0.238732414637843e7 }
+	  convection { amont }
+	  conditions_limites
+		{
+		Bord Symetrie
+		}
+	}
+	Equations_Scalaires_Passifs
+        {
+	  Convection_Diffusion_fraction_massique_turbulent_QC { 
+modele_turbulence Schmidt { turbulence_paroi negligeable_scalaire } 
+		diffusion { }
+		convection { amont }
+		conditions_limites {
+			Bord Paroi
+			}
+		conditions_initiales {
+			fraction_massique0 Champ_Uniforme 1 0.7982734
+			}
+		alias F2
+		espece {
+			mu Champ_Uniforme 1 1.85e-5
+			lambda Champ_Uniforme 1 0.0262
+			Cp Champ_Uniforme 1 1006
+			Masse_molaire .038
+		}
+	  }
+	  Convection_Diffusion_fraction_massique_turbulent_QC { 
+modele_turbulence Schmidt { turbulence_paroi negligeable_scalaire } 
+		diffusion { }
+		convection { amont }
+		conditions_limites {
+			Bord Paroi
+			}
+		conditions_initiales {
+			fraction_massique1 Champ_Uniforme 1 0.
+                        }
+		alias UF6
+		espece {
+			mu Champ_Uniforme 1 1.85e-5
+			lambda Champ_Uniforme 1 0.0262
+			Cp Champ_Uniforme 1 1006
+			Masse_molaire .352
+		}
+	  }
+     }
+	Postraitement  {
+	   Definition_champs {
+		alpha_p Champ_Post_Transformation {
+			fonction (Y_p_natif_dom*masse_volumique_natif_dom/3900.)
+			source Champ_Post_refChamp { Pb_champ pb Y_p }
+			source Champ_Post_refChamp { Pb_champ pb masse_volumique }
+		}
+	}
+	  Definition_champs {
+		d32_1 Champ_Post_Transformation {
+			fonction (6.*(Y_p_natif_dom>0)*Y_p_natif_dom*masse_volumique_natif_dom/3900./(a_i_natif_dom+1.e-15))
+			source Champ_Post_refChamp { Pb_champ pb Y_p }
+			source Champ_Post_refChamp { Pb_champ pb a_i }
+			source Champ_Post_refChamp { Pb_champ pb masse_volumique }	
+		}
+	  }
+	  Definition_champs {
+		d32_2 Champ_Post_Transformation {
+			fonction (6.*(Y_p_1_natif_dom>0)*Y_p_1_natif_dom*masse_volumique_natif_dom/3900./(a_i_1_natif_dom+1.e-15))
+			source Champ_Post_refChamp { Pb_champ pb Y_p_1 }
+			source Champ_Post_refChamp { Pb_champ pb a_i_1 }
+			source Champ_Post_refChamp { Pb_champ pb masse_volumique }
+		}
+	  }
+	  Definition_champs {
+		d32_tot Champ_Post_Transformation {
+			fonction (6.*((Y_p_natif_dom*masse_volumique_natif_dom/3900.+Y_p_1_natif_dom*masse_volumique_natif_dom/3900.)>0)*(Y_p_natif_dom*masse_volumique_natif_dom/3900.+Y_p_1_natif_dom*masse_volumique_natif_dom/3900.)/(a_i_natif_dom+a_i_1_natif_dom+1.e-15))
+			source Champ_Post_refChamp { Pb_champ pb Y_p }
+			source Champ_Post_refChamp { Pb_champ pb a_i }
+			source Champ_Post_refChamp { Pb_champ pb Y_p_1 }
+			source Champ_Post_refChamp { Pb_champ pb a_i_1 }
+			source Champ_Post_refChamp { Pb_champ pb masse_volumique }
+		}
+	  }
+	  Definition_champs {
+		d10_1 Champ_Post_Transformation {
+			fonction ((nd10_natif_dom>0)*nd10_natif_dom/(ngrains_natif_dom+1.e-15))
+			source Champ_Post_refChamp { Pb_champ pb nd10 }
+			source Champ_Post_refChamp { Pb_champ pb ngrains }
+			
+		}
+	  }
+	  Definition_champs {
+		d10_2 Champ_Post_Transformation {
+			fonction ((nd10_1_natif_dom>0)*nd10_1_natif_dom/(ngrains_1_natif_dom+1.e-15))
+			source Champ_Post_refChamp { Pb_champ pb nd10_1 }
+			source Champ_Post_refChamp { Pb_champ pb ngrains_1 }
+		}
+	  }
+	  Definition_champs {
+		d20_1 Champ_Post_Transformation {
+			fonction (((a_i_natif_dom>0)*a_i_natif_dom/3.14159265358979/(ngrains_natif_dom+1.e-15))^(1./2.))
+			source Champ_Post_refChamp { Pb_champ pb a_i }
+			source Champ_Post_refChamp { Pb_champ pb ngrains }
+		}
+	  }
+	  Definition_champs {
+		d20_2 Champ_Post_Transformation {
+			fonction (((a_i_1_natif_dom>0)*a_i_1_natif_dom/3.14159265358979/(ngrains_1_natif_dom+1.e-15))^(1./2.))
+			source Champ_Post_refChamp { Pb_champ pb a_i_1 }
+			source Champ_Post_refChamp { Pb_champ pb ngrains_1 }
+		}
+	  }
+	  Definition_champs {
+		d30_1 Champ_Post_Transformation {
+			fonction ((6.*(Y_p_natif_dom>0)*Y_p_natif_dom*masse_volumique_natif_dom/3900./3.14159265358979/(ngrains_natif_dom+1.e-15))^(1./3.))
+			source Champ_Post_refChamp { Pb_champ pb Y_p }
+			source Champ_Post_refChamp { Pb_champ pb ngrains }
+			source Champ_Post_refChamp { Pb_champ pb masse_volumique }
+		}
+	  }
+	  Definition_champs {
+		d30_2 Champ_Post_Transformation {
+			fonction ((6.*(Y_p_1_natif_dom>0)*Y_p_1_natif_dom*masse_volumique_natif_dom/3900./3.14159265358979/(ngrains_1_natif_dom+1.e-15))^(1./3.))
+			source Champ_Post_refChamp { Pb_champ pb Y_p_1 }
+			source Champ_Post_refChamp { Pb_champ pb ngrains_1 }
+			source Champ_Post_refChamp { Pb_champ pb masse_volumique }
+		}
+	  }
+	  Sondes 
+	  {
+		u_1 u_1         periode 1e-4 points 1 0.5 0.5
+		u_2 u_2         periode 1e-4 points 1 0.5 0.5
+		uf6   uf6           periode 1e-4 points 1 0.5 0.5
+		f2    f2            periode 1e-4 points 1 0.5 0.5	
+		T temperature       periode 1e-4 points 1 0.5 0.5
+		Y1 Y_p      periode 1e-4 points 1 0.5 0.5
+		Y2 Y_p_1    periode 1e-4 points 1 0.5 0.5
+		a_i_1  a_i          periode 1e-4 points 1 0.5 0.5
+		a_i_2  a_i_1        periode 1e-4 points 1 0.5 0.5
+		nd10_1  nd10        periode 1e-4 points 1 0.5 0.5
+		nd10_2  nd10_1      periode 1e-4 points 1 0.5 0.5
+		n_1  ngrains        periode 1e-4 points 1 0.5 0.5
+		n_2  ngrains_1      periode 1e-4 points 1 0.5 0.5
+		rho masse_volumique periode 1e-4 points 1 0.5 0.5
+		d32_1  d32_1        periode 1e-4 points 1 0.5 0.5
+		d32_2  d32_2        periode 1e-4 points 1 0.5 0.5
+		d32_T  d32_tot      periode 1e-4 points 1 0.5 0.5
+		d30_1  d30_1        periode 1e-4 points 1 0.5 0.5
+		d30_2  d30_2        periode 1e-4 points 1 0.5 0.5
+		d20_1  d20_1        periode 1e-4 points 1 0.5 0.5
+		d20_2  d20_2        periode 1e-4 points 1 0.5 0.5
+		d10_1  d10_1        periode 1e-4 points 1 0.5 0.5
+		d10_2  d10_2        periode 1e-4 points 1 0.5 0.5
+	  }
+	format lata 
+	 champs dt_post 1e-3 
+	{
+fraction_massique0 elem	
+fraction_massique1 elem	
+Y_p elem
+Y_p_1 elem
+	}
+} 
+}
+Resoudre_QComp pb
+Fin
+
+
+
+#latatoother lml NOM_DU_CAS#
+
+Postraitement_lata post1
+{
+	dt_post 0.005
+	nom_fichier Chimie_grains
+	format ascii
+	print
+	champs elements
+	{
+c		temperature
+		U_1
+		U_2
+		F2
+		UF6
+	}
+}
+
+	dt_min 5.e-10

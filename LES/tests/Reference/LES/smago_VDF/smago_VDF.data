@@ -1,0 +1,135 @@
+# Hydraulique 2D VDF Smago Cavite sans loi de paroi #
+# PARALLEL OK 8 #
+dimension 2
+Pb_hydraulique_turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom {
+Pave Entree
+                {
+                Origine -1.5 -1.5 
+                Nombre_de_Noeuds 11 11
+                Longueurs 3. 3.
+                }
+                {
+                bord CERCLE X = -1.5 -1.5 <= Y <= 1.5
+                bord CERCLE Y =  1.5 -1.5 <= X <= 1.5
+                bord CERCLE Y = -1.5 -1.5 <= X <= 1.5
+                bord CERCLE X =  1.5 -1.5 <= Y <= 1.5
+                } 
+}
+Sous_Zone zone1
+Associate zone1 dom
+Lire zone1
+{
+   Rectangle
+   Origine -1. -0.1
+   Cotes 0.2 0.2
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 2 1 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+Sous_Zone zone1
+Associate zone1 dom
+Lire zone1 { Fichier zone1.ssz }
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax 20.
+	dt_min 0.00001
+	dt_max 0.1
+	dt_impr 0.0001
+	dt_sauv 100
+	seuil_statio 1.e-8
+	facsec 0.5
+	nb_pas_dt_max 10
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 0.0002
+	rho Champ_Uniforme 1 2
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression GCP { precond ssor { omega 1.650000 } seuil 1.000000e-10 impr }
+		convection { quick }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_fonc_xyz dom 2 y -x
+			}
+		boundary_conditions {
+			CERCLE frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb vitesse 2 }
+		}
+                modele_turbulence sous_maille_smago {
+			 cs 0.1
+                         turbulence_paroi loi_standard_hydr
+                } 
+	}
+
+	Postraitements
+	{
+	  post_champs
+	  {
+		Sondes
+		{
+		s1 k periode 0.0001 point 3 -1.494 -0.077 -1.442 -0.103 -1.39 -0.128
+		s2 vitesse periode 0.0001 point 3 -1.494 -0.077 -1.442 -0.103 -1.39 -0.128
+		plan_k k periode 0.0001 plan 20 20 -1.5 -1.5 1.5 -1.5 -1.5 1.5
+		plan_nut viscosite_turbulente periode 0.0001 plan 20 20 -1.5 -1.5 1.5 -1.5 -1.5 1.5
+		}
+		
+		fichier smago_VDF
+		Champs dt_post 0.1
+		{
+			vitesse som
+			viscosite_turbulente elem
+			viscosite_turbulente som
+			k som
+			
+		}
+	  }
+	  post_flux
+	  {
+	  	Format lata
+	        Champs dt_post 0.1
+		{
+		 	flux_bords
+			y_plus
+		}
+	  }
+	}
+}
+
+Solve pb
+Fin

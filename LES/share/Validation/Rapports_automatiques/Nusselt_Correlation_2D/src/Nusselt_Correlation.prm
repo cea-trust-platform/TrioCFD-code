@@ -1,0 +1,210 @@
+Parameters {
+	Title "Nusselt number correlations in an heated plane channel (VDF,VEF)"
+	Description "1D flow using a Nusselt number correlation in a Forced convection regime"
+	Description "Validated Model :"
+	Description "- Wall functions with heat exchange correlations"
+	Description "Validation with analytical results"
+
+	VersionTrio_U "1.5.5"
+
+	ParametersTrio_U Type of problem : Thermal hydraulic
+	ParametersTrio_U Discretization : VDF and VEFPreP1B
+	ParametersTrio_U Time scheme : Euler_Explicite
+	ParametersTrio_U Solving of equations : Navier_Stokes_Turbulent (but with nu_t=0,u_tau=0)
+	ParametersTrio_U Solving of equations : Convection_Diffusion_Temperature_Turbulent (with alpha_t=0 and Nusselt correlations at the walls)
+	ParametersTrio_U Convection scheme : Momentum : none Temperature : amont
+	ParametersTrio_U Turbulence model : none (in fact, we must use a Smagorinsky model with Cs=1e-9 in order to be able to test the wall function "Nusselt Correlation" with Trio_U; with laminar problems, it is not possible to use a wall function)
+	ParametersTrio_U Type of boundary conditions : wall, temperature
+	ParametersTrio_U Type of fluid : Helium
+
+	TestCase LoiParoiNusseltImpose_VDF LoiParoiNusseltImpose_VDF 
+	TestCase LoiParoiNusseltImpose_VEF LoiParoiNusseltImpose_VEF /* jdd en annexe */
+	
+	Author "R. PAILLE/V.BARTHEL"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+	Figure {
+		Title "Geometry"
+		Description "Dimensions : L=4.75e-3 H=0.01"
+		Width 8cm
+		picture ./Geometry.png
+	}
+	visu {
+		Title "VDF Mesh"
+		Width 8cm
+		Description "Mesh : 1x10 meshes in the case of the VDF discretization"
+		mesh LoiParoiNusseltImpose_VDF/LoiParoiNusseltImpose_VDF.lata dom_pb2
+	}
+	visu {
+		Title "VEF Mesh"
+		Width 8cm
+		Description "In the case of VEF discretization, the operations trianguler and VerifierCoin are applied to the previous mesh"
+		mesh LoiParoiNusseltImpose_VEF/LoiParoiNusseltImpose_VEF.lata dom_pb2
+	}
+	Table {
+		Title "Conditions"
+		Description "Initial conditions :"
+		Description "- Temperature : T0=751K"
+		Description "- V0=-30m/s"
+		Description ""
+		Description "Boundary conditions :"
+		Description "- Hydraulic"
+		Description "............Top edge : frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. -30"
+		Description "............Low edge : frontiere_ouverte_pression_imposee champ_front_uniforme 1 0."
+		Description "............Left edge : paroi_fixe"
+		Description "............Right edge : paroi_fixe"
+		Description "- Temperature"
+		Description "............Top edge : frontiere_ouverte_temperature_imposee champ_front_uniforme 1 751"
+		Description "............Low edge : frontiere_ouverte T_ext champ_front_uniforme 1 1200"
+		Description "............Left edge : paroi_temperature_imposee champ_front_uniforme 1 1000"
+		Description "............Right edge : paroi_temperature_imposee champ_front_uniforme 1 1000"
+		Description "- Wall function : Turbulence_paroi Loi_paroi_Nu_Impose {Nusselt 0.023*Re$^0$$^.$$^8$*Pr$^1$$^/$$^3$ diam_hydr champ_uniforme 1 9.5e-3}"
+		Description ""
+		Description "This is the Colburn correlation for the Nusselt number."
+	}
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Constant values:}\latex_)"	
+		Description "$\rho$ = 4.4 kg/m$^3$"
+		Description "$\mu$ = 4.45e-05 kg/m/s"
+		Description "$\lambda$ = 0.34 W/m/K"
+		Description "Cp = 5193 J/kg/K"
+		Description "These properties correspond to the Helium under high temperature and high pressure (750K, 70bars)"
+	}
+	Table {
+		Title "Calculation method"
+		Description "Transitory calculation time : "
+		Description "Convergence is obtained after 16 time steps (0.000499 seconds) for the VDF case and 372 time steps	(0.000684212 seconds) for the VEF case"
+		nb_columns 1
+		label Average time step in second
+		line {
+			legend "VDF case"
+			origin "Trio_U"
+			file ./LoiParoiNusseltImpose_VDF/LoiParoiNusseltImpose_VDF.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+		line {
+			legend "VEF case"
+			origin "Trio_U"
+			file ./LoiParoiNusseltImpose_VEF/LoiParoiNusseltImpose_VEF.dt_ev
+			nb_columns_file 4
+			last_line
+			columns ($2)
+		}
+	}
+}
+Chapter {
+	Title "Results"
+	Description "In this study the values of the non-dimensional numbers Pr and Re are :"
+	Description "i) The Prandtl number Pr=$\nu$*$\rho$*Cp/$\lambda$=0.672"
+	Description "ii) The Reynolds number Re=uD/$\nu$=28500"
+	Description ""
+	Description "The Nusselt number correlation adapted to this case (flow in a plane channel with heated walls) is the Colburn correlation :"
+	Description "Nu=0.023Re$^0$$^.$$^8$Pr$^1$$^/$$^3$"
+	Description ""
+	Description "The previous values of Re and Pr numbers imply : Nu=73.8. So we can deduce the thoretical value of the exchange coefficient h by the relation h=Nu*$\lambda$/Dh in W.K$^-$$^1$.m$^-$$^2$, so"
+	Table {
+		nb_columns 1
+		label h
+		line {
+			legend " "
+			origin "Trio_U"
+			file ./LoiParoiNusseltImpose_VDF/ligneTableau.dat
+			nb_columns_file 5
+			columns ($1)
+		}
+	}
+	Table {
+		Description "In order to verify the use of the wall correlation, we compare this theorical value of h with the results obtained by Trio_U. To compute the exchange coefficient from the Trio_U simulation, we use the relation"
+		Description "h=Flux/(Tw-T1)S"
+		Description "where Tw is the boundary condition (Tw=1000),T1 is the mean fluid temperature in the first mesh from the wall at outlet (given by Trio_U), and Flux is the diffusive thermal flux (in Watt) at the wall for the corresponding mesh (given by Trio_U). S is the corresponding surface (S=0.001m)"
+		Description ""	
+	}
+	Figure {
+		Title "VDF case"
+		Width 5cm
+		picture ./VDF_case.png
+	}
+	Table {
+		Description "In the VDF case, the values of T1 and Flux are directly given in the output files."
+	}
+	Figure {
+		Title "VEF case"
+		Width 5cm
+		picture ./VEF_case.png
+	}
+	Table {
+		Description "In the case of the VEFPreP1B discretization, it is more difficult to extract from the Trio_U results the"
+		Description "quantity T1 (due to the location of the nodes). To do that, we determine the mean temperature on the last cell at outlet."
+		Description "With the notations given above, we use the interpolation T1=0.5*(T2+T3)"
+		Description ""
+	}
+	Table {
+		Title "Heat exchange comparisons"
+		nb_columns 6
+		label h theo | Flux | Tw | T1 | h Trio_U | variation (%)
+		line {
+			legend "VDF"
+			origin "Trio_U"
+			file ./LoiParoiNusseltImpose_VDF/ligneTableau.dat
+			nb_columns_file 6
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+		line {
+			legend "VEF"
+			origin "Trio_U"
+			file ./LoiParoiNusseltImpose_VEF/ligneTableau.dat
+			nb_columns_file 6
+			columns ($1) ($2) ($3) ($4) ($5) ($6)
+		}
+	}
+	Figure {
+		Title "Temperature profile between outlet and inlet"
+		Description "We compare also the profile of temperature in the stream wise direction for both case (next figure)."
+                Description "We can notice on this figure a negligible outlet effect on the temperature in the case of the VEF "
+                Description "discretization, that can explain the discrepancies on the estimation of the exchange coefficient."
+		Width 12cm
+		Dimension 2
+		LabelX ""
+		RangeX 0 0.01
+		LabelY ""
+		RangeY 751 756
+		Include_Description_Curves 0
+		Curve {
+			legend "VDF"
+			origin "Trio_U"
+			file LoiParoiNusseltImpose_VDF/LoiParoiNusseltImpose_VDF_COUPE_HE_T.coupe
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "VEF"
+			origin "Trio_U"
+			file LoiParoiNusseltImpose_VEF/LoiParoiNusseltImpose_VEF_COUPE_HE_T2.coupe
+			columns ($1) ($2)
+			Style lines
+			TypeLigne 2
+		}
+	}
+}
+Chapter {
+	Title "Conclusion"
+	Description "This simulation enables the validation of the wall function Loi_paroi_Nu_Impose for the VDF and the VEF discretizations in the case of a simple thermal-hydraulic problem."
+	Description "We verify that the Nusselt correlation introduced in the data file is really used in the simulations."
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "To use this wall function (Loi_paroi_Nu_Impose) without turbulence modeling, it is possible to choose in the data file the Smagorinsky model with Cs=0 (like in the test)."
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}
+
+#h=Nu*$\lambda$/Dh in W.K$^-$$^1$.m$^-$$^2$

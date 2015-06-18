@@ -1,0 +1,14 @@
+export Schema_Euler_explicite sch
+Lire sch
+{
+	nb_pas_dt_max 10
+	tinit 0.0
+	tmax 2.5
+	dt_min 1.e-7
+	dt_max 0.02
+	dt_impr 0.02
+	dt_sauv 100
+	seuil_statio -1
+}
+# nb_pas_dt_max 10000 #
+

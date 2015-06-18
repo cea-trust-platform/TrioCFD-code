@@ -1,0 +1,97 @@
+dimension 3
+Probleme_FT_Disc_gen pb
+
+Domaine DOM
+# DEBUT MAILLAGE #
+lire_fichier DOM maillage_sans_cube.geom
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+decouper DOM {
+        partitionneur metis { Nb_parts 4 }
+        larg_joint 1
+        Nom_Zones DOM
+}
+Fin
+FIN DECOUPAGE #
+
+# DEBUT LECTURE
+Scatter DOM.Zones DOM
+FIN LECTURE #
+
+VDF dis
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	tinit 0.0
+	tmax  0.5
+	dt_min 1.e-7
+	dt_max 0.02
+	dt_impr 0.02
+	dt_sauv 100
+	seuil_statio -1
+}
+
+Lire_fichier fluide.data ;
+
+Navier_Stokes_FT_Disc              hydraulique
+
+Associer pb hydraulique
+
+Associer pb DOM
+Associer pb sch
+Associer pb liquide
+
+Discretiser pb dis
+
+Lire pb
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               1.e-16
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-12 impr }
+	convection           { amont }
+	diffusion            { }
+	conditions_initiales { vitesse champ_uniforme 3 1. 0. 0. }
+	conditions_limites
+	{
+		entree	frontiere_ouverte_vitesse_imposee champ_front_uniforme 3 1. 0. 0.
+		sortie	Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		paroi  	symetrie
+		cube 	paroi_fixe
+	}
+}
+
+postraitements {
+  lata {
+     sondes 
+     {
+	   pression pression periode 0.001 points 2 0.5 1.5 1.5 2.5 1.5 1.5
+	   vitesse vitesse periode 0.001 points 1 0.5 1.5 1.5
+     }
+     fichier Forces_3D_VDF
+     format lata
+     champs dt_post 1. {
+	   pression elem
+	   vitesse elem
+     }
+  }
+  lml {
+     fichier Forces_3D_VDF
+     format lml
+     champs dt_post 1. {
+	   pression elem
+	   vitesse elem
+     }  
+  }
+}
+}
+
+Resoudre pb
+Fin

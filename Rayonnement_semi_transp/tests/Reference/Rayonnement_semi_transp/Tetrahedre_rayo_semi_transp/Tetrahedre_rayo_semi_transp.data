@@ -1,0 +1,149 @@
+# Rayonnement semi transparent 3D : calcul de l'irradiance #
+# PARALLEL OK 3 #
+dimension 3
+Pb_Thermohydraulique pb
+Domaine dom
+
+# BEGIN MESH #
+Read_file dom rayt3.geom
+VerifierCoin dom { }
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax 3.e-9
+	nb_pas_dt_max 1
+	dt_min 1.e-9
+	dt_max 1.e-9
+	dt_impr 0.001
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 7.588e-05
+	rho Champ_Uniforme 1 2
+	lambda Champ_Uniforme 1 0.029 
+	Cp Champ_Uniforme 1 275
+	beta_th Champ_Uniforme 1 3.822e-3
+	indice Champ_Uniforme 1 1.
+	kappa Champ_Uniforme 1 1.
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. 0.
+
+Modele_rayo_semi_transp modele_rayo
+Associate modele_rayo dom
+Associate fluide gravite
+Associate pb dom
+Associate pb fluide
+
+Pb_Couple_rayo_semi_transp pbc
+Associate pbc pb
+Associate pbc modele_rayo
+Associate pbc sch
+Discretize pbc dis
+
+
+Lire modele_rayo
+{
+	Eq_rayo_semi_transp
+	{
+	solveur GCP { precond ssor { omega 0.4 } seuil 1.000000e-12 impr }
+	boundary_conditions 
+		{
+		COTE1 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		COTE2 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		COTE3 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		COTE4 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		}		
+	}
+	Postraitement
+	{
+		Sondes
+		{
+		sonde_irra irradiance periode 1.e-9 segment 13 0.75 0.433 0. 0.25 0.144 0.5
+		}
+		Champs dt_post 0.1
+		{
+			irradiance elem
+		}
+	}
+}
+
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression GCP { 
+			precond ssor { omega 1.500000 } 
+			seuil 1.000000e-06 
+			impr 
+		}
+		convection { Amont }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 3 0. 0. 0.
+			}
+		boundary_conditions {
+			COTE1 paroi_fixe
+			COTE2 paroi_fixe
+			COTE3 paroi_fixe
+			COTE4 paroi_fixe
+		}
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { amont }
+		sources { Source_rayo_semi_transp }
+		boundary_conditions 
+		{
+			COTE1 Paroi_temperature_imposee
+					Champ_Front_Uniforme 1 0.
+			COTE2 Paroi_temperature_imposee
+					Champ_Front_Uniforme 1 0.
+ 			COTE3 Paroi_temperature_imposee
+					Champ_Front_Uniforme 1 0.
+			COTE4 Paroi_temperature_imposee
+					Champ_front_Uniforme 1 0.
+		}
+		conditions_initiales { Temperature Champ_Uniforme 1 54.49375 }
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+		sonde_temp temperature periode 1.e-9 segment 13 0.75 0.433 0. 0.5 0.288 0.817
+		}
+		Champs dt_post 0.1
+		{
+			temperature som
+		}
+	}
+}
+
+Solve pbc
+Fin

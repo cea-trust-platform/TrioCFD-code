@@ -1,0 +1,38 @@
+#!/bin/bash
+
+mkdir -p VDF
+mkdir -p VEF_Implicite
+mkdir -p VEF_RK
+mkdir -p VEF_Implicite_ICEM_Prisme
+mkdir -p VEF_Implicite_muscl
+
+cp post_run VDF
+cp post_run VEF_RK
+cp post_run VEF_Implicite
+cp post_run VEF_Implicite_muscl
+cp post_run_ICEM VEF_Implicite_ICEM_Prisme/post_run
+
+sed "s/_SCHTPS_/sch_RK/" les_Re395Pr071_T0Q_VEF.data > VEF_RK/les_Re395Pr071_T0Q.data
+sed "s/_SCHTPS_/sch_impl/" les_Re395Pr071_T0Q_VEF.data > VEF_Implicite/les_Re395Pr071_T0Q.data
+sed "s/_SCHTPS_/sch_impl/" les_Re395Pr071_T0Q_VEF.data > VEF_Implicite_muscl/les_Re395Pr071_T0Q.data
+
+cp les_Re395Pr071_T0Q_VDF.data VDF/les_Re395Pr071_T0Q.data
+
+cp trio_DOM_geo.asc VEF_Implicite_ICEM_Prisme
+cp les_Re395Pr071_T0Q_VEF_ICEM.data VEF_Implicite_ICEM_Prisme/les_Re395Pr071_T0Q.data
+cp geom.data VEF_Implicite_ICEM_Prisme/
+cp decoupe.data VEF_Implicite_ICEM_Prisme/
+cd VEF_Implicite_ICEM_Prisme
+$exec geom 1>geom.out 2>geom.err
+$exec decoupe 1>decoupe.out 2>decoupe.err
+echo fin du prepare
+cd ..
+
+cd VEF_Implicite_muscl
+sed "s/convection { ef_stab { volumes_etendus alpha 0.2 }  }/convection { muscl }/" les_Re395Pr071_T0Q.data > modif.data
+sed "s/convection { ef_stab { volumes_etendus alpha 1 }  }/convection { muscl }/" modif.data > les_Re395Pr071_T0Q.data
+cd ..
+
+
+
+

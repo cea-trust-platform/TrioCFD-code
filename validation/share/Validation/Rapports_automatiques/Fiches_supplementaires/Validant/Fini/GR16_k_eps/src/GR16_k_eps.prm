@@ -1,0 +1,1814 @@
+Parametres {
+	Titre "Thermal-hydraulic GR16 experiment"
+	Description "This document is a study to validate Trio_U CFD code to simulate the heat exchange in tube bundles without spacer wire on sodium heat exchangers."
+	Description ""
+	Description "The validation of thermal-hydraulic behaviour is made from comparison with the GR16 experiment of Marechal and al., for two different momentum convection schemes."
+	Auteur "MALOD C., LEDAC P., VANDROUX S., BIEDER U., BARTHEL V."
+	CasTest G1100/Muscl		GR16 96 /* jdd attached */
+	CasTest G1100/Ef_Stab1.0	GR16 96
+	CasTest G900/Muscl		GR16 96
+	CasTest G900/Ef_Stab1.0		GR16 96 /* jdd attached */
+	ParametresTrio_U "Type of problem : Turbulent Thermal-Hydraulic"
+	ParametresTrio_U "Discretization : VEFPreP1B"
+	ParametresTrio_U "Time scheme : Euler_implicite"
+	ParametresTrio_U "Solving of equations : Navier_Stokes_Turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi loi_standard_hydr"
+	ParametresTrio_U "Solving of equations : Convection_Diffusion_Temperature_Turbulent with Modele_turbulence Prandtl and Turbulence_paroi loi_standard_hydr_scalaire"
+	ParametresTrio_U "Velocity/Temperature coupling : Boussinesq hypothesis"
+	ParametresTrio_U "Type of Navier Stokes boundary conditions : Inlet velocity, Outlet pressure, Wall on other"
+	ParametresTrio_U "Type of Temperature boundary conditions : Inlet and Outlet temperature, Imposed flux on heated rod, Adiabatic wall on other"
+	InclureData 2
+	Reference $[1]$ A. Marechal, D. Andreolety, G. Berrebi, F. Girard,Compte rendu d'essais GR16 (2ème campagne d'essais) - NT STT/LTHI/90/184, juillet 1990
+	Reference $[2]$ M. Berthoux, Interpretation of sodium tests in GR16 tube bundle using TRIO_VF Thermalhydraulic code. 8th IAHR Working group meeting on advanced Nuclear Reactors Thermalhydraulics, June 13-15 1995
+	Reference $[3]$ M. Berthoux, Synthèse des essais réalisés sur le dispositif en sodium GR16,NT STR/LES/92-069, Mars 1992
+	Reference $[4]$ U. Bieder, V. Barthel, F. Ducros, P. Quéméré, S. Vandroux,CFD calculations of wire wrapped fuel bundles : modelling and validation strategy ; CFD4NRS, 14-16 September 2010, Washington DC
+	PreRequis "Extract_histogram DOM G900/Ef_Stab1.0/GR16.err  > G900/Ef_Stab1.0/histo"
+}
+
+Chapitre {
+	Titre "Experimental description"
+	Figure {
+		Titre "Test section"
+		Description "The test section consists of 16 parallel electrically heated rods (d = 18,7 mm outer diameter) which are arranged vertically in a square pitch (p = 33 mm) and cooled by sodium flowing upwards. Spacing of the needles is obtained by 2 anti-vibrating grids. The bundle is positioned in a rectangular channel. A non-heated bundle zone (1,2 m) allowing hydraulic flow development precedes the heated bundle zone (1,2 m). At the upper end of the heated bundle zone, a non heated bundle zone moves away the outlet hydraulic effects from the main measurement plane (situated 200 mm before the end of the heated bundle zone), where detailed two dimensional temperature fields are investigated.\newline\newline"
+		Width 16cm
+		Image ./Experimental_description.png
+	}
+	Tableau {
+		Titre "Experimental data"
+		Description "Detailed temperature measurements were performed at four levels (Z0, Z1, Z2 and Z3) in the upward sodium flow as well as on the surfaces of the rod and container walls. For the level Z0, spatially highly resolved temperature profiles in x direction were measured with a mobile device in the central sub-channels along the lines at y=0.001275m, y=0.003825m and y=0.006375m. The temperature profiles in x direction at y=0m were measured at the levels Z1, Z2 and Z3."
+	}
+	Tableau {
+		Titre "Flow configurations"
+		Description "Two different flow configurations are treated and compared in this study. The main characteristics of the two configurations are listed in the next table.\latex_( \begin{center} \latex_)"
+		nb_colonnes 2
+		label G1100 : Mixed convection | G900 : Forced convection
+		Ligne {
+			Legende "Flow rate (l/s)"
+			valeurs 2.77	22.2
+		}
+		Ligne {
+			Legende "Heat flux (kW/m$^2$)"
+			valeurs 266	433
+		}
+		Ligne {
+			Legende "Inlet temperature (°C)"
+			valeurs 302.4	303.3
+		}
+		Ligne {
+			Legende "Mean velocity (m/s)"
+			valeurs 0.17	1.35
+		}
+		Ligne {
+			Legende "Hydraulic diameter (m)"
+			valeurs 0.0429	0.0429
+		}
+		Ligne {
+			Legende "Flow section (m$^2$)"
+			valeurs 0.01624	0.01624
+		}
+		Ligne {
+			Legende "Reynolds number"
+			valeurs 20000	148000
+		}
+		Ligne {
+			Legende "Peclet number"
+			valeurs 108	749
+		}
+		Ligne {
+			Legende "Richardson number"
+			valeurs 5	0.05
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Test description"
+	Figure {
+		Titre "Geometry description"
+		Description "The next figure shows a representation of the various components of the simulation.\latex_( \begin{center} \latex_)"
+		Width 14cm
+		Image ./Geometric_description.png
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Mesh description"
+		Description "The mesh used in this study, was made with ICEM CFD meshing tool : It contains 2.851.995 tetrahedral cells. The next figure shows the mesh, tested in this study, at Z0 level. It is important to note that the mesh is expanded 4 times in the z direction.\newline"
+	}
+	Figure {
+		Width 7.5cm,viewport=84 200 870 700,clip
+		Image ./Mesh_description.png
+		nb_img_without_newline 2
+	}
+	Figure 
+	{
+		Titre_figure "Histogram of angle of the mesh"
+		dimension 2
+		incluredesccourbes 0
+		width 7.5cm
+		labelx Angle
+		labely % of cells
+		courbe {
+			fichier G900/Ef_Stab1.0/histo
+			Legende ""
+			style boxes
+			colonnes ($2+$5)/2 11
+		}
+	}
+	Tableau {
+		Titre "Physical properties"
+		Description "Fluid domain: Liquid sodium flow at 350°C \latex_(\hspace*{5mm} Density : $\rho = 868.09$ kg/m$^3$\latex_)"
+		Description "\latex_(\hspace*{74mm}Kinematic viscosity : $\mu = 3.08e-4$\latex_) N/m$^2$/s"
+		Description "\latex_(\hspace*{74mm}Thermal conductivity : $\lambda = 77.06$\latex_) W/m/K"
+		Description "\latex_(\hspace*{74mm}Specific heat capacity : $Cp = 1290.06$\latex_) J/kg/K"
+		Description "\latex_(\hspace*{74mm}Isothermal compressibility : $\beta = 2.74e-4$ K$^{-1}$\latex_)"
+	}
+	Tableau {
+		Titre "Initial and boundaries conditions"
+		Description "\latex_(\textbf {G900 : Forced convection} \latex_)"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 1.36639 m/s in Z direction,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 303.3 °C."
+		Description ""
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform velocity set to 4.23061 m/s in Z direction on inlet."
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform heat flux set to 433 kW/m$^2$ on heated rods, adiabatic otherwise."
+		Description ""
+		Description ""
+		Description "\latex_(\textbf {G1100 : Mixed convection} \latex_)"
+		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 0.170491 m/s in Z direction,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 302.4 °C."
+		Description ""
+		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
+		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform velocity set to 0.527873 m/s in Z direction on inlet."
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform heat flux set to 266 kW/m$^2$ on heated rods, adiabatic otherwise.\newline"
+		Description ""
+		Description "Values of inlet velocity differs from the values of initial condition because the inlet of the domain is made by an annular section (see §3.1)."
+		Description "The turbulent kinetic energy and turbulence dissipation rate were estimated by using these formulations:"
+		Description "\latex_(\hspace*{4.5cm} {\Large $ k \simeq \frac{3}{2}.(U.I)^2$} \hspace*{1cm} I : Turbulence intensity estimated to 10\%\latex_)"
+		Description "\latex_(\hspace*{4.5cm} {\Large $ \varepsilon \simeq C_\mu . {k^{3/2} \over {0.07 . D_h}}$}\latex_)"
+	}
+	Tableau {
+		Titre "Trio_U parameters tested"
+		Description "For the two different flow configurations, only the convection scheme of Navier-Stokes equation varies: It can be defined as Muscl (2nd order upwind scheme), EF_stab with $\alpha$=1 (2nd order mix between upwind and centered scheme). For all other equations, the convective scheme is defined as Amont (1er order upwind scheme)."
+		Description "The convection scheme of Navier-Stokes equation has also been tested for EF_stab with $\alpha$=0.2 (2nd order almost full centered scheme). However, despite having followed the Trio_U recommendations for implicite calculation (see $\S$4.9 : Time scheme on Trio_U user's manual - limitation of facsec_max), neither of the two tests made, for mixed convection flow or forced convection flow, has converged.\newline"
+		Description ""
+		Description "Due to possible physical or numerical ocillations, a specific strategy is implemented to the time management and post processing :"
+		Description "- The calculation is performed from the initial time to the starting time statistics, which corresponds to the time that a fluid particle takes to cross the computational domain at the flow mean velocity (G1100 $\sim$ 21.9 s; G900 $\sim$ 4.5 s),"
+		Description "- The principal quantities are averaged from the starting time statistics to the final time = starting time statistics + 2 physical seconds."
+		Description "\newpage"
+	}
+	Tableau {
+		Description "\newpage"
+	}
+}
+
+
+Chapitre {
+	Titre "Miscellaneous descriptions"
+	Tableau {
+		Titre "Mean velocity"
+		Description "The mean velocity U, of each configuration, is calculated by the ratio :\newline"
+		Description ""
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ U={Q \over S }$} \latex_)\newline"
+		Description ""
+		Description "With \latex_(\hspace*{10mm} Q : flow rate given by Trio\_U on outlet [m$^3$/s] \latex_)"
+		Description "\latex_(\hspace*{19mm} S : flow section given by the experiment [m$^2$] (see $\S$2.3) \latex_)"
+	}
+	Tableau {
+		Titre "Hydraulic diameter"
+		Description "The hydraulic diameter Dh, is calculated by the ratio :\newline"
+		Description ""
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ D_h={4.S \over P }$} \latex_)\newline"
+		Description ""
+		Description "With \latex_(\hspace*{10mm} S : flow section given by the experiment [m$^2$] (see $\S$2.3) \latex_)"
+		Description "\latex_(\hspace*{19mm} P : wetted perimeter calculated from the geometry [m] \latex_)"
+	}
+	Tableau {
+		Titre "Reynolds number calculation"
+		Description "The Reynolds number of each configuration is automatically calculated by the below formula :\newline"
+		Description ""
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ Re={\rho . U . D_h \over \mu }$} \latex_)\newline"
+		Description ""
+		Description "With \latex_(\hspace*{10mm} $\rho$ : density [kg/m$^3$] \latex_)"
+		Description "\latex_(\hspace*{19mm} U : mean velocity [m/s] (see above) \latex_)"
+		Description "\latex_(\hspace*{19mm} $D_h$ : hydraulic diameter [m] (see above) \latex_)"
+		Description "\latex_(\hspace*{19mm} $\mu$ : dynamic viscosity [Pa.s] \latex_)"
+	}
+	Tableau {
+		Titre "Prandtl number calculation"
+		Description "The Prandtl number is given by the below formula :\newline"
+		Description ""
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ Pr={\mu . C_p \over \lambda }$} \latex_)\newline"
+		Description ""
+		Description "With \latex_(\hspace*{10mm} $\mu$ : dynamic viscosity [Pa.s] \latex_)"
+		Description "\latex_(\hspace*{19mm} $C_p$ : specific heat capacity [J/kg/K] (see above) \latex_)"
+		Description "\latex_(\hspace*{19mm} $\lambda$ : thermal conductivity [W/m/K] (see above) \latex_)"
+	}
+	Tableau {
+		Titre "Peclet number calculation"
+		Description "The Peclet number is given by the below formula :\newline"
+		Description ""
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ Pe={Re . Pr}$} \latex_)\newline"
+		Description ""
+		Description "With \latex_(\hspace*{10mm} Re : Reynolds number (see above) \latex_)"
+		Description "\latex_(\hspace*{19mm} Pr : Prandtl number (see above) \latex_)"
+	}
+	Tableau {
+		Titre "Richardson number calculation"
+		Description "The Richardson number is given by the below formula :\newline"
+		Description ""
+		Description ""
+		Description "\latex_(\hspace*{6cm} {\Large $ Ri={2 . g . \beta . \Delta T . L \over U^2}$} \latex_)\newline"
+		Description ""
+		Description "With \latex_(\hspace*{10mm} g : gravitational acceleration [m/$s^2$] \latex_)"
+		Description "\latex_(\hspace*{19mm} $\beta$ : thermal expansion coefficient [1/K] \latex_)"
+		Description "\latex_(\hspace*{19mm} $\Delta T$ : thermal gap between surface temperature of a rod and the mean temperature of the nearest subchannel [K] \latex_)"
+		Description "\latex_(\hspace*{19mm} L : lenght between the anti-vibrating grids [m] \latex_)"
+		Description "\latex_(\hspace*{19mm} U : mean velocity [m/s] (see above) \latex_)\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Convergence"
+	Description "This chapter presents the convergence of the calculations.\newline"
+	Description "Du to possible physical or numerical ocillations :"
+	Description "- The calculation is performed from the initial time to the starting time statistics, which corresponds to the time that takes a fluid particle to cross the computational domain at the mean velocity of flow,"
+	Description "- The principal quantities are averaged from the starting time statistics to the final time = starting time statistics + 2 physical seconds."
+	Description "The convergence is checked on :"
+	Description "- The X, Y and Z instantaneous velocity time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m , z=0.m)"
+	Description "- The X, Y and Z mean velocity time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m , z=0.m)"
+	Description "- The instantaneous temperature time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m, z=0.m)"
+	Description "- The mean temperature time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m, z=0.m)"
+	Description "- The instantaneous temperature time evolution on the center of subchannel S3 (see §2.1) at Z3 level (x=-0.0990m, y=0.m, z=-0.750m)"
+	Description "- The mean temperature time evolution on the center of subchannel S3 (see §2.1) at Z3 level (x=-0.0990m, y=0.m, z=-0.750m)"
+	Description "- The instantaneous temperature time evolution on the rod R3 (see §2.1) at Z0 level (x=-0.00715m, y=0.00715m, z=0.m"
+	Description "- The mean temperature time evolution on the rod R3 (see §2.1) at Z0 level (x=-0.00715m, y=0.00715m, z=0.m"
+	Tableau {
+		Titre "Convergence of mixed convection calculations (G1100)"
+	}
+	Figure {
+		Description "X, Y and Z instantaneous velocity time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeX 0 25
+		RangeY -0.05 0.35
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "U Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "U Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "V Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "V Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "W Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "W Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "X, Y and Z mean velocity time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeX 15 25
+		RangeY -0.05 0.35
+		InclureDescCourbes 0
+		Courbe {
+			Legende "U Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "U Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "V Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "V Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "W Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "W Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 25
+		RangeY 300 400
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_T_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_T_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Description "Mean temperature time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 15 25
+		RangeY 300 400
+		InclureDescCourbes 0
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_TM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_TM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution on the rod R3 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 25
+		RangeY 300 400
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_T_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_T_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+	}
+	Figure {
+		Description "Mean temperature time evolution on the rod R3 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 15 25
+		RangeY 300 400
+		InclureDescCourbes 0
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_TM_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_TM_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution on the center of subchannel S3 at Z3 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 25
+		RangeY 300 325
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_T_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_T_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+	}
+	Figure {
+		Description "Mean temperature time evolution on the center of subchannel S3 at Z3 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 15 25
+		RangeY 300 325
+		InclureDescCourbes 0
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G1100/Muscl/GR16_SONDE_TM_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G1100/Ef_Stab1.0/GR16_SONDE_TM_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+	}
+	Tableau {
+		Titre "Convergence of forced convection calculations (G900)"
+	}
+	Figure {
+		Description "X, Y and Z instantaneous velocity time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeX 0 5
+		RangeY -0.5 2.5
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "U Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "U Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "V Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "V Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "W Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "W Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_V_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "X, Y and Z mean velocity time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Velocity [m/s]"
+		RangeX 0 5
+		RangeY -0.5 2.5
+		InclureDescCourbes 0
+		Courbe {
+			Legende "U Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "U Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "V Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "V Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 3
+			Style lines
+		}
+		Courbe {
+			Legende "W Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+		Courbe {
+			Legende "W Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_VM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 4
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 5
+		RangeY 300 330
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_T_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_T_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Description "Mean temperature time evolution on the center of subchannel S1 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 5
+		RangeY 300 330
+		InclureDescCourbes 0
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_TM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_TM_PIN_1.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution on the rod R3 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 5
+		RangeY 300 340
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_T_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_T_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+	}
+	Figure {
+		Description "Mean temperature time evolution on the rod R3 at Z0 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 5
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_TM_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_TM_ROD_3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 11
+			Style lines
+		}
+	}
+	Figure {
+		Description "Instantaneous temperature time evolution on the center of subchannel S3 at Z3 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 5
+		RangeY 300 310
+		InclureDescCourbes 0
+		nb_img_without_newline 2
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_T_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_T_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+	}
+	Figure {
+		Description "Mean temperature time evolution on the center of subchannel S3 at Z3 level"
+		Width 7cm
+		LabelX "Time [s]"
+		LabelY "Temperature [°C]"
+		RangeX 0 5
+		RangeY 300 310
+		InclureDescCourbes 0
+		Courbe {
+			Legende "T Muscl"
+			Fichier ./G900/Muscl/GR16_SONDE_TM_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+		Courbe {
+			Legende "T Ef_Stab1.0"
+			Fichier ./G900/Ef_Stab1.0/GR16_SONDE_TM_Z3.son
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 35
+			Style lines
+		}
+	}
+	Tableau {
+		Titre "Convergence analysis"
+		Description "The curves above, for the mixed flow configuration, show that the instantaneous quantities seem to begin to oscillate after one travel of a fluid particle along the domain.\newline"
+		Description "For the forced flow configuration, the curves show that the instantaneous quantities also begin to oscillate after one travel of a fluid particle along the domain.\newline"
+		Description "The calculation strategy of averaging the quantities after one travel is, for the two configurations, a good choice and is validated.\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Y+ distribution"
+	Description "The next figures present the Y+ distribution on the two flow configurations, for the advised traditional values of Y+ between [30:300].\newline\newline"
+	Visu {
+		Width 4cm,viewport=45 683 236 918,clip
+		Pseudocolor_with_range G900/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM 30. 300.
+		Cycles -1
+		normal3D -0.0985038 -0.222411 0.969964
+		up3D -0.00759921 0.974844 0.222758
+		zoom3D -0.102554 -0.0520376 2.59552
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_(\hspace*{15mm}\latex_)G1100 : Mixed convetion"
+		Width 5.5cm,viewport=80 92 496 838,clip
+		Pseudocolor_with_range G1100/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM 30. 300.
+		Cycles -1
+		normal3D -0.0985038 -0.222411 0.969964
+		up3D -0.00759921 0.974844 0.222758
+		zoom3D -0.102554 -0.0520376 2.59552
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_(\hspace*{15mm}\latex_)G900 : Forced convetion"
+		Width 5.5cm,viewport=80 92 496 838,clip
+		Pseudocolor_with_range G900/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM 30. 300.
+		Cycles -1
+		normal3D -0.0985038 -0.222411 0.969964
+		up3D -0.00759921 0.974844 0.222758
+		zoom3D -0.102554 -0.0520376 2.59552
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Visu {
+		Description "\latex_(\hspace*{25mm}\latex_)G1100 : Mixed convetion"
+		Width 7.5cm, viewport =80 96 982 976,clip
+#        	Histogram G1100/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM 0. 100. 20
+        	Histogram G1100/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM MIN MAX 20
+		operator no_databaseinfo		
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "\latex_(\hspace*{25mm}\latex_)G900 : Forced convetion"
+		Width 7.5cm, viewport =80 96 982 976,clip
+#        	Histogram G900/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM 0. 300. 30
+        	Histogram G900/Muscl/Post_WALL/Post.lata WALL Y_PLUS ELEM MIN MAX 30
+		operator no_databaseinfo		
+	}
+	Tableau {
+		Description "\newpage"
+	}
+	Tableau {
+		Description "The next figures present a vertical cut plane of Y+ at Z0 level on the two flow configurations.\newline\newline\newline"
+	}
+	Visu {
+		Width 4cm,viewport=45 683 236 918,clip
+		Pseudocolor_with_range G1100/Muscl/Post_TOTAL/Post.lata DOM Y_PLUS ELEM 0. 300.
+		Cycles -1
+		normal3D -0.0985038 -0.222411 0.969964
+		up3D -0.00759921 0.974844 0.222758
+		zoom3D -0.102554 -0.0520376 2.59552
+		Operator no_axes
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_(\hspace*{0mm}\latex_)G1100 : Mixed convetion"
+		Width 4cm,viewport=200 152 976 974,clip
+		Pseudocolor_with_range G1100/Muscl/Post_TOTAL/Post.lata DOM Y_PLUS ELEM 0. 300.
+		Cycles -1
+		Up3D 0 1 0
+		Operator Slice2D 0 0 0 0 0 1
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "\latex_(\hspace*{0mm}\latex_)G900 : Forced convetion"
+		Width 4cm,viewport=200 152 976 974,clip
+		Pseudocolor_with_range G900/Muscl/Post_TOTAL/Post.lata DOM Y_PLUS ELEM 0. 300.
+		Cycles -1
+		Up3D 0 1 0
+		Operator Slice2D 0 0 0 0 0 1
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Description "\newpage"
+	}
+}
+
+Chapitre {
+	Titre "Results on G1100 : mixed convection flow"
+	Tableau {
+		Titre "Comparison of dimensionless numbers"
+		Description "The next tables give the comparison with experiment, of dimensionless numbers on the mixed convection flow configuration.\newline \latex_( \begin{center} \latex_)"
+		nb_colonnes 8
+		Ligne {
+			Legende "G1100"
+			valeurs "Reynolds" "\%" "Prandlt" "\%" "Peclet" "\%" "Richardson" "\%"
+		}
+		Ligne {
+			Legende "expe"
+			valeurs 20000.0000 0 108.0000 5.0000 0 0 0 0
+			alias ref
+			afficher_ligne 0
+		}
+		Ligne {
+			Legende "Experiment"
+			valeurs "20000.0000" "-" "-" "-" "108.0000" "-" "5.0000" "-"
+		}
+		Ligne {
+			Legende "Muscl"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G1100/Muscl/Nombre.txt
+			nb_colonnes_fichier 4
+			derniere_ligne
+			colonnes $1 int(($1-ref.$1)*10000/ref.$1)/100. $2 "-" $3 int(($3-ref.$3)*10000/ref.$3)/100. $4 int(($4-ref.$4)*10000/ref.$4)/100.
+		}
+		Ligne {
+			Legende "Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G1100/Ef_Stab1.0/Nombre.txt
+			nb_colonnes_fichier 4
+			derniere_ligne
+			colonnes $1 int(($1-ref.$1)*10000/ref.$1)/100. $2 "-" $3 int(($3-ref.$3)*10000/ref.$3)/100. $4 int(($4-ref.$4)*10000/ref.$4)/100.
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Comparisons of profiles of temperature"
+		Description "The next figures present the comparison of calculations with the experimental data, of temperature evolution on three profiles at ZO level, one profile at Z1, Z2 and Z3 level and four profiles on rods surfaces 3, 7, 11 and 15 at Z0 level.\newline \latex_( \begin{center} \latex_)"
+	}
+	Figure {
+		Description "Mean temperature profile along the line y=0.001275m at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 360 400
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G1100_Y_0.001275.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_Y_0.001275
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_Y_0.001275
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\newpage Mean temperature profile along the line y=0.003825m at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 360 400
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G1100_Y_0.003825.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_Y_0.003825
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_Y_0.003825
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "Mean temperature profile along the line y=0.006375m at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 360 400
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G1100_Y_0.006375.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_Y_0.006375
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_Y_0.006375
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\newpage Mean temperature profile along the line y=0.m at Z1 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 340 380
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G1100_Z1.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_Z1
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_Z1
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "Mean temperature profile along the line y=0.m at Z2 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 320 360
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G1100_Z2.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_Z2
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_Z2
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\newpage Mean temperature profile along the line y=0.m at Z3 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G1100_Z3.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_Z3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_Z3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "Mean temperature profile on the rod surface 3, 7, 11 and 15 at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 380 420
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Experiment R3"
+			Fichier ./Experimental_data/GR16_G1100_Rod_3.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Experiment R7"
+			Fichier ./Experimental_data/GR16_G1100_Rod_7.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Experiment R11"
+			Fichier ./Experimental_data/GR16_G1100_Rod_11.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Experiment R15"
+			Fichier ./Experimental_data/GR16_G1100_Rod_15.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R3"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_ROD_3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0165+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R7"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_ROD_7
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0495+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R11"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_ROD_11
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0825+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R15"
+			Segment ./G1100/Muscl/GR16.data SONDE_TM_ROD_15
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.1155+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R3"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_ROD_3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0165+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R7"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_ROD_7
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0495+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R11"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_ROD_11
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0825+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R15"
+			Segment ./G1100/Ef_Stab1.0/GR16.data SONDE_TM_ROD_15
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.1155+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "View of temperature"
+		Description "The next figures present visualizations of stationary temperature field in :"
+		Description "- Perspective view,"
+		Description "- Vertical cut plane at Z0 level.\newline"
+	}
+	Visu {
+		Width 5cm,viewport=45 683 352 918,clip
+		Pseudocolor_with_range G1100/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 400.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator ThreeSlice 0 0 0
+		Operator no_axes
+		Operator no_triad
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Muscl"
+		Width 1.7cm,viewport=440 70 558 980,clip
+		Pseudocolor_with_range G1100/Muscl/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 400.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator ThreeSlice 0 0 0
+		Operator no_axes
+		Operator no_triad
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Ef_stab1.0"
+		Width 1.7cm,viewport=440 70 558 980,clip
+		Pseudocolor_with_range G1100/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 400.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator ThreeSlice 0 0 0
+		Operator no_axes
+		Operator no_triad
+		Operator no_bounding_box
+		Operator no_databaseinfo
+	}
+	Visu {
+		Width 5cm,viewport=45 683 352 918,clip
+		Pseudocolor_with_range G1100/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 370. 400.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Muscl"
+		Width 4cm,viewport=200 152 976 974,clip
+		Pseudocolor_with_range G1100/Muscl/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 370. 400.
+		Cycles -1
+		Up3D 0 1 0
+		Operator Slice2D 0 0 0 0 0 1
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Ef_stab1.0"
+		Width 4cm,viewport=200 152 976 974,clip
+		Pseudocolor_with_range G1100/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 370. 400.
+		Cycles -1
+		Up3D 0 1 0
+		Operator Slice2D 0 0 0 0 0 1
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Titre "Conclusion for the mixed convection flow"
+		Description "The comparison of dimensionless numbers show that there is no significative difference between the two schemes of convection. Both have low differences with experiment, on the Reynolds and Peclet numbers, probably due to a good estimation of the velocity field, but a more marked difference on the Richardson number, probably due to a smaller thermal gap between the temperature of rod and the mean temperature of flow. In fact, the experimental Richardson is estimated from the heat flux imposed on the rods, while the Trio_U Richardson is realy calculated from a thermal gap between surface temperature of a rod and the mean temperature of the nearest subchannel.\newline"
+		Description ""
+		Description "The comparison of temperature profiles confirms that there is no significative difference between the two schemes of convection. All profiles have a good agreement between GR16 experiment and Trio_U calculations. The only two things that can be noted, is that we observed :"
+		Description "- a slight 'desynchronization' between experiment and calculation on profiles that are lower level than Z0,"
+		Description "- that the calculations underestimate the temperature of rods by 2 or 3 °C.\newpage"
+	}	
+}
+
+Chapitre {
+	Titre "Results on G900 : forced convection flow"
+	Tableau {
+		Titre "Comparison of dimensionless numbers"
+		Description "The next tables give the comparison with experiment, of dimensionless numbers on the forced convection flow configuration.\latex_( \begin{center} \latex_)"
+		nb_colonnes 8
+		Ligne {
+			Legende "G900"
+			valeurs "Reynolds" "\%" "Prandlt" "\%" "Peclet" "\%" "Richardson" "\%"
+		}
+		Ligne {
+			Legende "expe"
+			valeurs 148000.0000 0 749.0000 0.0500 0 0 0 0
+			alias ref
+			afficher_ligne 0
+		}
+		Ligne {
+			Legende "Experiment"
+			valeurs "148000.0000" "-" "-" "-" "749.0000" "-" "0.0500" "-"
+		}
+		Ligne {
+			Legende "Muscl"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G900/Muscl/Nombre.txt
+			nb_colonnes_fichier 4
+			derniere_ligne
+			colonnes $1 int(($1-ref.$1)*10000/ref.$1)/100. $2 "-" $3 int(($3-ref.$3)*10000/ref.$3)/100. $4 int(($4-ref.$4)*10000/ref.$4)/100.
+		}
+		Ligne {
+			Legende "Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G900/Ef_Stab1.0/Nombre.txt
+			nb_colonnes_fichier 4
+			derniere_ligne
+			colonnes $1 int(($1-ref.$1)*10000/ref.$1)/100. $2 "-" $3 int(($3-ref.$3)*10000/ref.$3)/100. $4 int(($4-ref.$4)*10000/ref.$4)/100.
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "Comparisons of profiles of temperature"
+		Description "The next figures present the comparison of calculations with the experimental data, of temperature evolution on three profiles at ZO level, one profile at Z1, Z2 and Z3 level and four profiles on rods surfaces 3, 7, 11 and 15 at Z0 level.\newline \latex_( \begin{center} \latex_)"
+	}
+	Figure {
+		Description "Mean temperature profile along the line y=0.001275m at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G900_Y_0.001275.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_Y_0.001275
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_Y_0.001275
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\newpage Mean temperature profile along the line y=0.003825m at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G900_Y_0.003825.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_Y_0.003825
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_Y_0.003825
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "Mean temperature profile along the line y=0.006375m at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G900_Y_0.006375.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_Y_0.006375
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_Y_0.006375
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\newpage Mean temperature profile along the line y=0.m at Z1 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G900_Z1.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_Z1
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_Z1
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "Mean temperature profile along the line y=0.m at Z2 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G900_Z2.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_Z2
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_Z2
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "\newpage Mean temperature profile along the line y=0.m at Z3 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Courbe {
+			Legende "Experiment"
+			Fichier ./Experimental_data/GR16_G900_Z3.txt
+			Colonnes (-$1) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_Z3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_Z3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes 1 2
+			Style linespoints
+		}
+	}
+	Figure {
+		Description "Mean temperature profile on the rod surface 3, 7, 11 and 15 at Z0 level"
+		Width 13cm
+		LabelX "X [m]"
+		LabelY "Temperature [°C]"
+		RangeY 300 340
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Experiment R3"
+			Fichier ./Experimental_data/GR16_G900_Rod_3.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Experiment R7"
+			Fichier ./Experimental_data/GR16_G900_Rod_7.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Experiment R11"
+			Fichier ./Experimental_data/GR16_G900_Rod_11.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Experiment R15"
+			Fichier ./Experimental_data/GR16_G900_Rod_15.txt
+			Colonnes (-$1) 3
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R3"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_ROD_3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0165+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R7"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_ROD_7
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0495+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R11"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_ROD_11
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0825+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Muscl R15"
+			Segment ./G900/Muscl/GR16.data SONDE_TM_ROD_15
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.1155+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R3"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_ROD_3
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0165+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R7"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_ROD_7
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0495+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R11"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_ROD_11
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.0825+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+		Courbe {
+			Legende "Ef_Stab1.0 R15"
+			Segment ./G900/Ef_Stab1.0/GR16.data SONDE_TM_ROD_15
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			Colonnes (-0.1155+0.0187/2*cos($1*pi/180)) 2
+			Style linespoints
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+	Tableau {
+		Titre "View of temperature"
+		Description "The next figures present visualizations of stationary temperature field in :"
+		Description "- Perspective view,"
+		Description "- Vertical cut plane at Z0 level.\newline"
+	}
+	Visu {
+		Width 5cm,viewport=45 683 352 918,clip
+		Pseudocolor_with_range G900/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 330.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator ThreeSlice 0 0 0
+		Operator no_axes
+		Operator no_triad
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Muscl"
+		Width 1.7cm,viewport=440 70 558 980,clip
+		Pseudocolor_with_range G900/Muscl/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 330.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator ThreeSlice 0 0 0
+		Operator no_axes
+		Operator no_triad
+		Operator no_bounding_box
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Ef_Stab1.0"
+		Width 1.7cm,viewport=440 70 558 980,clip
+		Pseudocolor_with_range G900/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 330.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator ThreeSlice 0 0 0
+		Operator no_axes
+		Operator no_triad
+		Operator no_bounding_box
+		Operator no_databaseinfo
+	}
+	Visu {
+		Width 5cm,viewport=45 683 352 918,clip
+		Pseudocolor_with_range G900/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 330.
+		Cycles -1
+		normal3D -0.269858 -0.483696 0.832596
+		up3D 0.388292 0.73659 0.553773
+		zoom3D -0.0139213 -0.0617009 1.46857
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Muscl"
+		Width 4cm,viewport=200 152 976 974,clip
+		Pseudocolor_with_range G900/Muscl/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 330.
+		Cycles -1
+		Up3D 0 1 0
+		Operator Slice2D 0 0 0 0 0 1
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+		nb_img_without_newline 3
+	}
+	Visu {
+		Description "Ef_Stab1.0"
+		Width 4cm,viewport=200 152 976 974,clip
+		Pseudocolor_with_range G900/Ef_Stab1.0/Post_TOTAL/Post.lata DOM MOYENNE_TEMPERATURE SOM 300. 330.
+		Cycles -1
+		Up3D 0 1 0
+		Operator Slice2D 0 0 0 0 0 1
+		Operator no_bounding_box
+		Operator no_axes
+		Operator no_databaseinfo
+		Operator_to_all no_legend
+	}
+	Tableau {
+		Titre "Conclusion for the forced convection flow"
+		Description "The comparison of dimensionless numbers show that there is no significative difference between the two schemes of convection. All two have differences with experiment, on the Reynolds and Peclet numbers, which are not understood. The comparison of the Richardson number, presents less relative difference than in mixed convection flow. This is probably du to the larger range of temperature.\newline"
+		Description ""
+		Description "The comparison of temperature profiles confirms that there is no significative difference between the two schemes of convection. The profiles at bottom level have a good agreement between GR16 experiment and Trio_U calculations, but the higher level profiles differ more."
+		Description "The calculations underestimate the temperature of rods by 5 °C.\newpage"
+	}	
+}
+
+Chapitre {
+	Titre "Conclusion"
+	Tableau {
+		Description "The specific time management strategy implemented that consist to average the quantities after one travel that takes a fluid particle to cross the computational domain at the flow mean velocity, is validated for the two flow configurations.\newline\newline"
+		Description ""
+		Description "The comparisons between Trio_U calculations and experiment, validate :\newline"
+		Description "- the good agreement of results for the mixed flow configuration. We note also that there is no significative difference between the two schemes of convection. The comparisons of dimensionless numbers show a difference on Richardson number due to fact that in the experiment, the Richardson is estimated from the heat flux imposed on rods, while Trio_U Richardson is realy calculated by a thermal gap between surface temperature of a rod and the mean temperature of the nearest subchannel.\newline"
+		Description "- that bottom level profile of temperature are in agreement in the forced flow configuration, but higher level profiles differ more. The comparisons show also an unexplained difference between the Reynolds and Peclet numbers, which depend only of the flow rate, flow section and fluid properties.\newline\newline"
+		Description ""
+		Description "We note also :\newline"
+		Description "- on all calculations, an underestimation of surface rod's temperature.\newline"
+		Description "- on the mixed flow configuration, a slight 'desynchronization' between experiment and calculation on profiles that are lower level than Z0. The experimenters think that these gaps are probably du to fact that the k-$\varepsilon$ turbulence model does not take into account correctly the dissymmetry of the flow section."
+	}	
+}
+
+Chapitre {
+	Titre "Computer performance"
+	Tableau {
+		Description "The next table give the computer performances. These performances are automated calculated by a specific script due to the high duration of calculations.\latex_( \begin{center} \latex_)"
+		nb_colonnes 5
+		Ligne {
+			Legende ""
+			valeurs "host" "system" "Total-CPU-Time" "CPU-time-step" "number-of-cell"
+		}
+		Ligne {
+			Legende "G1100/Muscl"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G1100/Muscl/GR16.perf
+			nb_colonnes_fichier 6
+			colonnes $2 $3 $4 $5 $6
+		}
+		Ligne {
+			Legende "G1100/Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G1100/Ef_Stab1.0/GR16.perf
+			nb_colonnes_fichier 6
+			colonnes $2 $3 $4 $5 $6
+		}
+		Ligne {
+			Legende "G900/Muscl"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G900/Muscl/GR16.perf
+			nb_colonnes_fichier 6
+			colonnes $2 $3 $4 $5 $6
+		}
+		Ligne {
+			Legende "G900/Ef_Stab1.0"
+			Origine "Trio_U"
+			Version 1.6.5_patch
+			fichier G900/Ef_Stab1.0/GR16.perf
+			nb_colonnes_fichier 6
+			colonnes $2 $3 $4 $5 $6
+		}
+	}
+	Tableau {
+		Description "\latex_( \end{center} \latex_)"
+	}
+}

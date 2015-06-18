@@ -1,0 +1,53 @@
+rm -fr  N=150 N=150_EF_stab N=50 N=25 N=10 LP_standard LP_standard_EF_stab
+mkdir N=150 N=150_EF_stab N=50 N=25 N=10 LP_standard LP_standard_EF_stab
+
+sed -e 's/paroi_TBLE { N _NP_ facteur 1 sonde_tble 1 vitesse_N=_NP_ 0 0 0 sans_source_boussinesq }/loi_standard_hydr/g' Cas.data > tmp
+sed -e 's/paroi_TBLE_scal { N _NP_ facteur 1 sonde_tble 1 temperature_N=_NP_ 0 0 0 }/loi_standard_hydr_scalaire Prdt 0.9/g' tmp > LP_standard/Cas.data
+sed -e 's/_SCHEMADIFF_/negligeable/g' Coupes_LP_standard_adimensionnees.sh > LP_standard/Coupes_LP_standard_adimensionnees.sh
+chmod +x LP_standard/Coupes_LP_standard_adimensionnees.sh
+rm -f tmp*
+
+sed -e 's/negligeable/EF_stab { }/g' LP_standard/Cas.data > LP_standard_EF_stab/Cas.data
+sed -e 's/negligeable/EF_stab/g' LP_standard/Coupes_LP_standard_adimensionnees.sh > LP_standard_EF_stab/Coupes_LP_standard_adimensionnees.sh
+chmod +x LP_standard_EF_stab/Coupes_LP_standard_adimensionnees.sh
+
+sed -e 's/Coupes_TBLE_adimensionnees/Coupes_LP_standard_adimensionnees/g' post_run > LP_standard/tmp1
+sed -e 's/TBLE/LP_STANDARD/g' LP_standard/tmp1 > LP_standard/tmp2
+sed -e 's/N_NP_/LP_STANDARD/g' LP_standard/tmp2 > LP_standard/tmp3
+sed -e 's/u\\\*/<u\\*>/g' LP_standard/tmp3 > LP_standard/tmp4 # Protéger le / et le * avec un /
+sed -e 's/tble_post_vitesse_N=_NP_.dat/Cas_pb_Ustar.face/g' LP_standard/tmp4 > LP_standard/tmp5
+sed -e 's/$10/$6/g' LP_standard/tmp5 > LP_standard/post_run
+chmod +x LP_standard/post_run
+rm -f LP_standard/tmp*
+
+cp LP_standard/post_run LP_standard_EF_stab/
+
+sed -e 's/_NP_/150/g' Cas.data > N=150/Cas.data
+sed -e 's/negligeable/EF_stab { }/g' N=150/Cas.data > N=150_EF_stab/Cas.data
+sed -e 's/_NP_/50/g' Cas.data > N=50/Cas.data
+sed -e 's/_NP_/25/g' Cas.data > N=25/Cas.data
+sed -e 's/_NP_/10/g' Cas.data > N=10/Cas.data
+
+sed -e 's/_NP_/150/g' Coupes_TBLE_adimensionnees.sh > N=150/Coupes_TBLE_adimensionnees.sh
+sed -e 's/_NP_/150/g' Coupes_TBLE_adimensionnees.sh > N=150_EF_stab/Coupes_TBLE_adimensionnees.sh
+sed -e 's/_NP_/50/g' Coupes_TBLE_adimensionnees.sh > N=50/Coupes_TBLE_adimensionnees.sh
+sed -e 's/_NP_/25/g' Coupes_TBLE_adimensionnees.sh > N=25/Coupes_TBLE_adimensionnees.sh
+sed -e 's/_NP_/10/g' Coupes_TBLE_adimensionnees.sh > N=10/Coupes_TBLE_adimensionnees.sh
+
+chmod +x N=150/Coupes_TBLE_adimensionnees.sh
+chmod +x N=150_EF_stab/Coupes_TBLE_adimensionnees.sh
+chmod +x N=50/Coupes_TBLE_adimensionnees.sh
+chmod +x N=25/Coupes_TBLE_adimensionnees.sh
+chmod +x N=10/Coupes_TBLE_adimensionnees.sh
+
+sed -e 's/_NP_/150/g' post_run > N=150/post_run
+sed -e 's/_NP_/150/g' post_run > N=150_EF_stab/post_run
+sed -e 's/_NP_/50/g' post_run > N=50/post_run
+sed -e 's/_NP_/25/g' post_run > N=25/post_run
+sed -e 's/_NP_/10/g' post_run > N=10/post_run
+
+chmod +x N=150/post_run
+chmod +x N=150_EF_stab/post_run
+chmod +x N=50/post_run
+chmod +x N=25/post_run
+chmod +x N=10/post_run

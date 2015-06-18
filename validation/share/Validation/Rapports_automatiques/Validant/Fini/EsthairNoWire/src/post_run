@@ -1,0 +1,3 @@
+#!/bin/bash
+sh ./first.awk EsthydSf
+sh ./last.awk

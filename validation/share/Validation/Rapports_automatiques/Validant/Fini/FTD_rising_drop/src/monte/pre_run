@@ -1,0 +1,8 @@
+[ -f dom_0031.Zones ] && exit 0
+cd model
+Xprep=$TRUST_ROOT/Outils/PRE_3DVDF/xprepro
+$Xprep boite.prep 2
+cd -
+ln -s prepro/Probleme1/Pb1.geom boite.geom
+triou decoupage
+export prod=1

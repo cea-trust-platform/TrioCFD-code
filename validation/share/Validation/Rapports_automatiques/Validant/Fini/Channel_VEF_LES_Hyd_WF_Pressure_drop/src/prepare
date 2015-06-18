@@ -1,0 +1,80 @@
+#!/bin/bash
+mkdir CN_0.05 CN_0.1 CN_0.2 CN_0.3 CN_0.4 CN_0.5 EE_0.05 EE_0.1 EE_0.2 EE_0.3 EE_0.4 EE_0.5
+
+for dir in `find . -mindepth 1 -type d `
+do
+	( cd $dir;   cp ../canal_turbu_CN.data ../post_run .)
+done
+
+cd CN_0.1
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.1 0. 0./" canal_turbu_CN.data > modifie.data
+mv modifie.data canal_turbu_CN.data
+sed "s/CN 0.05/CN 0.1/" post_run > modifie
+mv modifie post_run
+
+cd ../CN_0.2
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.2 0. 0./" canal_turbu_CN.data > modifie.data
+mv modifie.data canal_turbu_CN.data
+sed "s/CN 0.05/CN 0.2/" post_run > modifie
+mv modifie post_run
+
+cd ../CN_0.3
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.3 0. 0./" canal_turbu_CN.data > modifie.data
+mv modifie.data canal_turbu_CN.data
+sed "s/CN 0.05/CN 0.3/" post_run > modifie
+mv modifie post_run
+
+cd ../CN_0.4
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.4 0. 0./" canal_turbu_CN.data > modifie.data
+mv modifie.data canal_turbu_CN.data
+sed "s/CN 0.05/CN 0.4/" post_run > modifie
+mv modifie post_run
+
+cd ../CN_0.5
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.5 0. 0./" canal_turbu_CN.data > modifie.data
+mv modifie.data canal_turbu_CN.data
+sed "s/CN 0.05/CN 0.5/" post_run > modifie
+mv modifie post_run
+
+cd ../EE_0.05
+sed "s/Sch_CN_EX_iteratif sch/Schema_Euler_explicite sch/" canal_turbu_CN.data > modifie.data
+mv modifie.data canal_turbu_EE.data
+sed "s/CN 0.05/EE 0.05/" post_run > modifie
+mv modifie post_run
+
+cd ../EE_0.1
+sed "s/Sch_CN_EX_iteratif sch/Schema_Euler_explicite sch/" canal_turbu_CN.data > modifie.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.1 0. 0./" modifie.data > canal_turbu_CN.data
+mv canal_turbu_CN.data canal_turbu_EE.data
+sed "s/CN 0.05/EE 0.1/" post_run > modifie
+mv modifie post_run
+
+cd ../EE_0.2
+sed "s/Sch_CN_EX_iteratif sch/Schema_Euler_explicite sch/" canal_turbu_CN.data > modifie.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.2 0. 0./" modifie.data > canal_turbu_CN.data
+mv canal_turbu_CN.data canal_turbu_EE.data
+sed "s/CN 0.05/EE 0.2/" post_run > modifie
+mv modifie post_run
+
+cd ../EE_0.3
+sed "s/Sch_CN_EX_iteratif sch/Schema_Euler_explicite sch/" canal_turbu_CN.data > modifie.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.3 0. 0./" modifie.data > canal_turbu_CN.data
+mv canal_turbu_CN.data canal_turbu_EE.data
+sed "s/CN 0.05/EE 0.3/" post_run > modifie
+mv modifie post_run
+
+cd ../EE_0.4
+sed "s/Sch_CN_EX_iteratif sch/Schema_Euler_explicite sch/" canal_turbu_CN.data > modifie.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.4 0. 0./" modifie.data > canal_turbu_CN.data
+mv canal_turbu_CN.data canal_turbu_EE.data
+sed "s/CN 0.05/EE 0.4/" post_run > modifie
+mv modifie post_run
+
+cd ../EE_0.5
+sed "s/Sch_CN_EX_iteratif sch/Schema_Euler_explicite sch/" canal_turbu_CN.data > modifie.data
+sed "s/vitesse Champ_Uniforme 3 0.05 0. 0./vitesse Champ_Uniforme 3 0.5 0. 0./" modifie.data > canal_turbu_CN.data
+mv canal_turbu_CN.data canal_turbu_EE.data
+sed "s/CN 0.05/EE 0.5/" post_run > modifie
+mv modifie post_run
+
+cd ..

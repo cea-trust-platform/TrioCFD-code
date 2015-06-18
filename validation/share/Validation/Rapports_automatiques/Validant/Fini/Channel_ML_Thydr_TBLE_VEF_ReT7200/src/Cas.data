@@ -1,0 +1,148 @@
+# Thermo Hydraulqiue TBLE #
+# PARALLEL OK #
+
+Dimension 3
+Pb_thermohydraulique_turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+	Pave demi_canal
+	{
+		Origine 0 0 0
+		Nombre_de_noeuds 3 19 3
+		Longueurs 1 2 1
+	}
+	{
+		Bord Plaque	Y = 0	0 <= X <= 1	0 <= Z <= 1
+		Bord Plaque	Y = 2	0 <= X <= 1	0 <= Z <= 1
+		Bord PerioX	X = 0	0 <= Y <= 2	0 <= Z <= 1
+		Bord PerioX	X = 1	0 <= Y <= 2	0 <= Z <= 1
+		Bord PerioZ	Z = 0	0 <= X <= 1	0 <= Y <= 2
+		Bord PerioZ	Z = 1	0 <= X <= 1	0 <= Y <= 2
+	}
+}
+
+Tetraedriser_homogene dom
+Corriger_frontiere_periodique { domaine dom bord PerioX }
+Corriger_frontiere_periodique { domaine dom bord PerioZ }
+
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { nb_parts 2 }
+	periodique 2 PerioX PerioZ
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1b dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit 0
+	tmax 5000
+	dt_min 1e-7
+	dt_max 10
+	dt_start dt_calc
+	dt_impr 500
+	dt_sauv 1000
+	seuil_statio 1e-8
+	solveur implicite
+		{
+		seuil_convergence_implicite 1e-3
+		seuil_convergence_solveur 1e-10
+		}
+	facsec 100
+	facsec_max 100
+}
+
+Fluide_incompressible He
+Lire He
+{
+	mu	champ_uniforme 1 4.46437e-05
+	rho	champ_uniforme 1 4.40684
+	lambda	champ_uniforme 1 0.344964
+	Cp	champ_uniforme 1 5193
+	beta_th	champ_uniforme 1 0.0014285714
+}
+
+Champ_uniforme gravite
+Lire gravite 3 0 0 0
+
+Associer He gravite
+Associer pb dom
+Associer pb He
+Associer pb sch
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		Solveur_pression	petsc Cholesky { }
+		Convection		{ negligeable }
+		Diffusion		{ }
+		Conditions_initiales	{ vitesse champ_uniforme 3 1.9 0 0 }
+		Conditions_limites	{
+					PerioX	periodique
+					PerioZ	periodique
+					Plaque	paroi_fixe
+					}
+		Modele_turbulence longueur_melange
+					{
+					turbulence_paroi paroi_TBLE { N _NP_ facteur 1 sonde_tble 1 vitesse_N=_NP_ 0 0 0 sans_source_boussinesq }
+					dt_impr_ustar 50
+					canalx 2
+					}
+		Sources			{ canal_perio { Bord PerioX } }
+	}
+
+	Convection_diffusion_temperature_turbulent
+	{
+		Diffusion		{ }
+		Convection		{ negligeable }
+		Conditions_initiales	{ temperature champ_uniforme 1 0 }
+		Conditions_limites	{
+					PerioX	periodique
+					PerioZ	periodique
+					Plaque	paroi_temperature_imposee champ_front_uniforme 1 0
+					}
+		Modele_turbulence Prandtl
+					{
+					turbulence_paroi paroi_TBLE_scal { N _NP_ facteur 1 sonde_tble 1 temperature_N=_NP_ 0 0 0 }
+					dt_impr_Nusselt 50
+					}
+		Sources			{ puissance_thermique champ_uniforme 1 1 }
+	}
+
+	Postraitement
+	{
+		Sondes			{
+					profil_vitesse1 nodes	vitesse	periode 0.5 segment 36	0.166667 0.018519 0	0.166667 1.981481 0
+					profil_vitesse2 nodes	vitesse	periode 0.5 segment 19	0.166667 0 0.083333	0.166667 2 0.083333
+					profil_temperature1 nodes	temperature	periode 0.5 segment 36	0.166667 0.018519 0	0.166667 1.981481 0
+					profil_temperature2 nodes	temperature	periode 0.5 segment 19	0.166667 0 0.083333	0.166667 2 0.083333
+					}
+		Format lata_v2
+		Champs dt_post 250	{
+					vitesse elem
+					pression elem
+					temperature elem
+					}
+	}
+	sauvegarde formatte pb.sauv
+}
+
+Resoudre pb
+Fin

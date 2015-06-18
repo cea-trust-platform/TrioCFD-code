@@ -1,0 +1,194 @@
+# Watlon : T de melange #
+# La configuration etudiee est un T de melange. Sur un ecoulement principal 'chaud' un fluide plus froid #
+# est injecte par un branchement perpendiculaire à l'ecoulement principal. L'experience utilisee pour le #
+# calcul est l'experience WATLON. #
+# Thermohydraulique 3D turbulent #
+
+dimension 3
+PrecisionGeom 1.e-5 # Pour pouvoir relire les fichiers .dat #
+Pb_Thermohydraulique_Turbulent pb
+
+export Domaine dom_Walton
+
+# DEBUT MAILLAGE #
+lire_fichier dom_Walton ../../mesh/Watlon_mesh.geom
+# FIN MAILLAGE #
+
+# Calcul parallele sur $NB_PROCS processeurs # 
+# DEBUT DECOUPAGE 
+Decouper dom_Walton
+{
+   Partitionneur Metis { nb_parts $NB_PROCS }
+   Larg_joint 2
+   Nom_Zones Watlon_cut
+}
+Fin
+FIN DECOUPAGE #
+
+# DEBUT LECTURE 
+Scatter Watlon_cut.Zones dom_Walton
+FIN LECTURE #
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit	0.
+	tmax	$TMAX
+	dt_impr	0.1
+	dt_sauv	1000.
+	seuil_statio	1.e-8
+	facsec	20.
+	facsec_max	100.
+	solveur implicite
+        {
+              solveur petsc gmres { precond diag { } seuil 1.e-10 impr }
+        }
+	periode_sauvegarde_securite_en_heures 23
+}
+
+# EAU 320 K #
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu	Champ_Uniforme 1 5.86e-4
+	rho	Champ_Uniforme 1 991.3
+	lambda	Champ_Uniforme 1 0.555
+	Cp	Champ_Uniforme 1 4172.
+	beta_th	Champ_Uniforme 1 2.74e-4
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 -9.81 0
+
+Associer fluide gravite
+Associer pb dom_Walton
+Associer pb fluide
+Associer pb sch
+
+Discretiser pb dis
+
+# Attention : les commentaires ci-dessous sont utilises afin de specifier les diametres hydrauliques dans les scripts #
+# diametre_hydraulique_branch = 0.05 #
+# diametre_hydraulique_main   = 0.15 #
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression petsc Cholesky { }
+		# Schema de convection teste : Muscl, Ef_stab { alpha 0.2 }, Ef_stab { alpha 1. } #
+		convection { $SCHEMA }
+		diffusion { }
+		
+		# Conditions initiales & limites #
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 0. 0. }
+		conditions_limites
+		{
+			MAINI	frontiere_ouverte_vitesse_imposee	champ_front_lu dom_Walton 3 $MAIN_box/pb_VITESSE_perio.dat
+			OUTFL	frontiere_ouverte_pression_imposee	champ_front_Uniforme 1 0.
+			BRANC	frontiere_ouverte_vitesse_imposee	champ_front_lu dom_Walton 3 branch_box/pb_VITESSE_perio.dat
+                        WALL	paroi_fixe 
+		}
+		modele_turbulence K_Epsilon 
+		{
+			Transport_K_Epsilon 
+			{
+				convection { amont }
+				diffusion { }
+				
+				# Conditions initiales & limites : k = 3/2.(I.U)^2, Eps = Cmu.k^(3/2)/(0.07.Dh) #
+				conditions_initiales { k_Eps Champ_Uniforme 2 $K $EPS }
+				conditions_limites
+				{
+					MAINI	frontiere_ouverte_K_eps_impose	champ_front_lu dom_Walton 2 $MAIN_box/pb_K_EPS_perio.dat
+					OUTFL	frontiere_ouverte K_EPS_EXT	champ_front_Uniforme 2 $K $EPS
+					BRANC	frontiere_ouverte_K_eps_impose	champ_front_lu dom_Walton 2 branch_box/pb_K_EPS_perio.dat
+                        		WALL	paroi
+				}
+			}
+			turbulence_paroi loi_standard_hydr 
+	       }
+	}
+
+	Convection_Diffusion_Temperature_Turbulent
+	{
+		diffusion { }
+		convection { amont }
+		modele_turbulence Prandtl { turbulence_paroi loi_standard_hydr_scalaire }
+		
+		# Conditions initiales & limites #
+		conditions_initiales { Temperature Champ_Uniforme 1 320. }	
+		conditions_limites 
+		{			        	
+			MAINI	frontiere_ouverte_temperature_imposee	Champ_front_uniforme 1 321.
+			OUTFL	frontiere_ouverte T_ext			Champ_front_uniforme 1 321.
+			BRANC	frontiere_ouverte_temperature_imposee	Champ_front_uniforme 1 306.
+ 			WALL	paroi_adiabatique 
+		}
+	}
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_T_-0.36D		temperature		periode 1e-3 points 1 0. 0. -0.054
+			sonde_T_0.5D		temperature		periode 1e-3 points 1 0. 0. 0.075
+			sonde_T_1D		temperature		periode 1e-3 points 1 0. 0. 0.150
+			sonde_T_2D		temperature		periode 1e-3 points 1 0. 0. 0.300
+			sonde_V_-0.36D		vitesse			periode 1e-3 points 1 0. 0. -0.054
+			sonde_V_0.5D		vitesse			periode 1e-3 points 1 0. 0. 0.075
+			sonde_V_1D		vitesse			periode 1e-3 points 1 0. 0. 0.150
+			sonde_V_2D		vitesse			periode 1e-3 points 1 0. 0. 0.300
+
+			sonde_Tmean_Z_-0.36D	moyenne_temperature	periode 1e-3 segment 100 0. -0.075 -0.054	0. 0.075 -0.054
+			sonde_Trms_Z_-0.36D	ecart_type_temperature	periode 1e-3 segment 100 0. -0.075 -0.054	0. 0.075 -0.054
+			sonde_Tmean_Z_0.5D	moyenne_temperature	periode 1e-3 segment 100 0. -0.075  0.075	0. 0.075  0.075
+			sonde_Trms_Z_0.5D	ecart_type_temperature	periode 1e-3 segment 100 0. -0.075  0.075	0. 0.075  0.075
+			sonde_Tmean_Z_1D	moyenne_temperature	periode 1e-3 segment 100 0. -0.075  0.150	0. 0.075  0.150
+			sonde_Trms_Z_1D		ecart_type_temperature	periode 1e-3 segment 100 0. -0.075  0.150	0. 0.075  0.150
+			sonde_Tmean_Z_2D	moyenne_temperature	periode 1e-3 segment 100 0. -0.075  0.300	0. 0.075  0.300
+			sonde_Trms_Z_2D		ecart_type_temperature	periode 1e-3 segment 100 0. -0.075  0.300	0. 0.075  0.300
+
+			sonde_Vmean_Z_-0.36D	moyenne_vitesse		periode 1e-3 segment 100 0. -0.075 -0.054	0. 0.075 -0.054
+			sonde_Vrms_Z_-0.36D	ecart_type_vitesse	periode 1e-3 segment 100 0. -0.075 -0.054	0. 0.075 -0.054
+			sonde_Vmean_Z_0.5D	moyenne_vitesse		periode 1e-3 segment 100 0. -0.075  0.075	0. 0.075  0.075
+			sonde_Vrms_Z_0.5D	ecart_type_vitesse	periode 1e-3 segment 100 0. -0.075  0.075	0. 0.075  0.075
+			sonde_Vmean_Z_1D	moyenne_vitesse		periode 1e-3 segment 100 0. -0.075  0.150	0. 0.075  0.150
+			sonde_Vrms_Z_1D		ecart_type_vitesse	periode 1e-3 segment 100 0. -0.075  0.150	0. 0.075  0.150
+			sonde_Vmean_Z_2D	moyenne_vitesse		periode 1e-3 segment 100 0. -0.075  0.300	0. 0.075  0.300
+			sonde_Vrms_Z_2D		ecart_type_vitesse	periode 1e-3 segment 100 0. -0.075  0.300	0. 0.075  0.300
+		}
+
+		Format lata
+		fichier Post/Post
+		Champs dt_post 1.
+		{
+			pression	elem
+			vitesse		faces
+			temperature	faces
+			k		elem
+			eps		elem
+			y_plus		elem
+			viscosite_turbulente elem
+		}
+
+		Statistiques dt_post 1.
+		{
+			t_deb $DT_START t_fin $TMAX
+			moyenne pression
+			moyenne vitesse
+			moyenne temperature
+			moyenne y_plus
+			moyenne Viscosite_turbulente
+			ecart_type pression
+			ecart_type vitesse
+			ecart_type temperature
+			ecart_type y_plus
+			ecart_type Viscosite_turbulente
+		}
+	}
+}
+
+Resoudre pb
+fin

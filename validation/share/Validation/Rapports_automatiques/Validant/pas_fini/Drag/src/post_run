@@ -1,0 +1,46 @@
+#!/bin/bash
+jdd=$1
+# Recuperation des grandeurs:
+cas=`pwd`;cas=`basename $cas`
+base=../forme
+Dilate=`awk '/Dilate / {print $NF}' $base.data` 
+D=`awk -v Dilate=$Dilate '/D =/ {print Dilate*$3}' $base.geo`
+V=`awk '/frontiere_ouverte_vitesse_imposee / {print $(NF-1)}' $base.data`
+rho=`awk '/rho / {print $NF}' $base.data`
+mu=`awk '/mu / {print $NF}' $base.data`
+
+# Affichage des donnees du calcul
+echo | awk -v D=$D -v V=$V -v rho=$rho -v mu=$mu '{Re=rho*D*V/mu;printf("Reynolds: %2.2e\nDiametre(cm): %2.1f\nVitesse(m/s): %2.1f\nTemps(s): %3.0f\n",Re,D*100,V,D*D*rho/mu)}'
+
+# Verification du numbre de Reynolds affiche dans la fiche de validation
+Re=`echo | awk -v D=$D -v V=$V -v rho=$rho -v mu=$mu '{Re=rho*D*V/mu;print int(Re)}'`
+if [ "`grep Re=$Re ../forme.prm`" = "" ]
+then
+   echo "Nombre de Reynolds affiche dans la fiche de validation incorrect par rapport a Re=$Re."
+   exit -1
+fi
+
+# Calcul des forces de trainees, on tient compte de la symetrie si le mot cle Axe est trouve
+symetrie=0 && [ "`grep Axe $jdd.data | grep -i symetrie`" != "" ] && symetrie=1
+
+# Verification que les bords sont correctement ranges
+[ "`awk '/# Bord/ {print $3} /# Boundary/ {print $3}' $jdd"_pb_Force_pression.out"`" != "Forme" ] && echo "La colonne 2 doit contenir Forme" && exit -1
+[ "`awk '/# Bord/ {print $3} /# Boundary/ {print $3}' $jdd"_pb_Contrainte_visqueuse.out"`" != "Forme" ] && echo "La colonne 2 doit contenir Forme" && exit -1
+
+# Recuperation des forces
+fp=`tail -1 $jdd"_pb_Force_pression.out" | $TRUST_Awk -v s=$symetrie '{print (s+1)*$2}'`
+fv=`tail -1 $jdd"_pb_Contrainte_visqueuse.out" | $TRUST_Awk -v s=$symetrie '{print (s+1)*$2}'`
+
+# Affichage:
+echo $cas" "$jdd
+# Affichage drag (en grammes)
+echo $fp $fv | awk '{drag=($1+$2);print "Drag(g/m): "int(drag/9.81*1000)}'
+
+# Affichage du Cx
+Cd=`awk -v cas=$cas '($4==cas) && /Cx / {print $NF}' forme.geo`
+echo $fp $fv | awk -v A=$D -v V=$V -v rho=$rho -v jdd=$jdd -v Cd=$Cd -v dat=../$cas.dat '{Cx=($1+$2)/(0.5*rho*A*V*V);\
+if (jdd=="keps") print "Hoerner \tK_Eps \t% \tLM \t%" > dat;\
+if (jdd=="keps") printf("%4.2f %4.2f %4.1f ",Cd,Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
+if (jdd=="lm") 	printf("%4.2f %4.1f\n",Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
+}'
+

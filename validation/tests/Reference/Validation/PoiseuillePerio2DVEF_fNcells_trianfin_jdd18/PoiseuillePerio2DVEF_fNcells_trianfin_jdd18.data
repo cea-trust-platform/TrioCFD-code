@@ -1,0 +1,139 @@
+# SIMULATION D UN CANAL PLAN 2D avec modele Longueur de melange #
+# PARALLEL RUNS #
+# Tests du modele Longueur de Melange et de la procedure de calcul du frottement parietal (ParoiVEFHyd.cpp) #
+dimension 2
+Pb_Hydraulique pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave Cavite
+        {
+                Origine 0. 0.
+                Nombre_de_Noeuds 25 9
+                Longueurs 6. 2.
+        }
+        {
+                Bord periox   X = 0.  0. <= Y <= 2
+                Bord periox   X = 6.  0. <= Y <= 2
+                Bord bas      Y = 0.  0. <= X <= 6.
+                Bord haut     Y = 2   0. <= X <= 6.
+ 
+                }
+} 
+Trianguler_fin dom
+Reordonner_faces_periodiques dom periox
+Ecrire_fichier dom dom.geom
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+        Partitionneur tranche { tranches 2 1 }
+        Larg_joint 2
+	Periodique 1 periox
+        Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+
+VEFPreP1b dis
+
+Schema_Euler_explicite sch
+Read sch 
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 20.
+        dt_min 1.e-7
+        dt_max 1.e-1
+	dt_start dt_calc
+        dt_impr 0.001
+        dt_sauv 20.
+        seuil_statio 1.e-8  
+        facsec 1.
+}
+
+Schema_Euler_implicite sch2
+Read sch2
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 20.
+	dt_min 1.e-7
+	dt_max 1.e-1
+	dt_impr 0.001
+	dt_sauv 20.
+	dt_start dt_calc
+	seuil_statio 1.e-8
+	facsec 1.
+	facsec_max 200
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.02
+	rho Champ_Uniforme 1 2
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_standard
+		{
+                solveur_pression GCP {
+                        precond ssor { omega 1.5 }
+                        seuil 1.e-8
+                }
+                convection { EF_stab { } }
+                diffusion  {  }
+                Sources  { Canal_perio { bord periox } }
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz dom 2  1. 0. 
+			}
+		boundary_conditions
+			{
+			periox periodique  
+			haut     paroi_fixe
+			bas      paroi_fixe
+			}
+		Traitement_particulier { Canal { dt_impr_moy_spat 6. }
+		}
+	}
+
+	Postraitement
+        	{
+		format lml       
+		Sondes
+			{
+			sonde_vinlet vitesse periode 0.001 Segment 90  0.125 0. 0.125 2		
+			}
+		Champs dt_post 10.0
+			{
+			vitesse elem
+			pression_Pa elem
+			}
+		}
+	}
+
+Solve pb
+End

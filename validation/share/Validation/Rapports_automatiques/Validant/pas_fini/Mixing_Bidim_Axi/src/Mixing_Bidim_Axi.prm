@@ -1,0 +1,210 @@
+Parameters {
+	Title "Mixing in  discs and doughnuts column."
+	Description "
+
+	Description The validation is based on Buratti measurements [1].
+	
+        ParametersTrio_U Type of problem:   Pb_hydraulique_Concentration                    
+        ParametersTrio_U Time scheme:       Schema_Euler_explicite       
+        ParametersTrio_U Convection scheme: hydraulic : quick ; concentration : quick 
+        ParametersTrio_U Discretization:    VDF (Bidim_Axi) 
+        ParametersTrio_U Turbulence model:  no      
+        ParametersTrio_U Type of boundary conditions for hydraulic: no slip at fluid/solid interface, pulsed imposed velocity at inlet, imposed pressure at outlet,symetric for the axe
+	ParametersTrio_U Type of boundary conditions for concentration: no flux at fluid/solid interface, imposed concentration (c=0) at inlet and outlet, symetric for the axe
+        ParametersTrio_U Type of fluid : incompressible
+
+
+	Author "M. Elmo"
+	TestCase ./BURATTI_M1 melange.data
+	TestCase ./BURATTI_M2 melange.data
+	TestCase ./BURATTI_M3/F0.5 melange.data
+	TestCase ./BURATTI_M3/F2 melange.data
+	TestCase ./BURATTI_M3/F1 melange.data
+		
+
+	Reference " 1: Buratti M. F. (1988), Etude des phenomenes de melange axial dans les columns pulsees equipees de garnissage disques-couronnes. Ph.D. thesis, Institut National Polytechnique de Lorraine, France."
+
+
+}
+
+
+Chapter { 
+
+        Title " Geometry and meshing"
+
+	Figure {
+	picture geometrie_Buratti.png
+	}
+
+        Description Geometry :
+        Description Dimensions:
+        Description H = 0,0762 m 
+        Description h = 0,0381 m 
+        Description L = 0,762 m
+        Description l = 0,190m
+	 
+	Description Transparence = 0.235 
+	Description Rcolonne = 0.045 m
+	Description het = 0.050 m
+	Description ep = 0.002 m
+	Description nb_etage = 2
+	Description nb_cellule = 6
+
+	Description Meshing :
+	Description Meshing: M1: Nr1=14 ; Nr2=13; Nr3=6 - Nz1=1 ; Nz2=14; Nz3=2; Nz4=14 ; Nz5=1 (5784 elements)
+	Description Meshing: M2: Nr1=14 ; Nr2=13; Nr3=6 - Nz1=2 ; Nz2=56; Nz3=2; Nz4=56 ; Nz5=2 (22488 elements)
+        Description Meshing: M3: M2 avec Nri/2 Nzj/2 (89952 elements)
+        Description Meshing: M4: M2 avec Nri/4 Nzj/4 (359808 elements)
+	Description Meshing: M5: M2 avec Nri/8 Nzj/8 (1439232 elements)
+	
+#	Title "Hydraulic velocity"
+#	Description up(t)=Uax*Rs+A*F*Rs*PI*sin(2*PI*F*t) at inlet
+#	Description P=0 at outlet
+#	Description Rs=Aire_fut/Aire_entree = 1/Tdisque
+#	Description Uax=0.00625 m/s ; A=0.019 m ; Rs=4.255; F=1Hz
+}
+      
+Chapter {
+Title "Hydraulic velocity"
+	Description up(t)=Uax*Rs+A*F*Rs*PI*sin(2*PI*F*t) at inlet
+	Description P=0 at outlet
+	Description Rs=Aire_fut/Aire_entree = 1/Tdisque
+	Description Uax=0.00625 m/s ; A=0.019 m ; Rs=4.255; F=1Hz
+}
+
+
+
+
+Chapter {
+	Title "Results"
+        
+	Description In the following part of the document, the presented results deal with the dispersion coefficient calculated by the variance method. This method consists to assume that the variance is linear with time during the first stages of dispersion and the coefficient dispersion is calculated by estimating the half slope of this linear law. Here the time evolution variance is assumed to be linear during five periods of pulsation. 
+	Description Notics that the coefficient dispersion is given in cm2/s.
+
+#visu {
+#	Description As we can see on the figure there is a recirculation zone behind the step.
+#	pseudocolor marche_VDF_quick.lata dom norme_VITESSE SOM
+#	blackvector  marche_VDF_quick.lata dom VITESSE SOM
+#	width 15cm,viewport=0 100 1024 300,clip
+#	origin mesh
+#}
+	
+	
+	Figure {
+	Title "Meshing convergence for the variance time evolution (F=1 Hz)"
+#	description "The convergence of the variance time evolution is checked with differents meshing for the time interval 0-5 s."
+	dimension 2
+	labelx "Time (s)"
+	labely "Var (m2)"
+	rangex  0 5.
+	Include_Description_Curves 0
+	legend  center left
+	width 12cm
+#	Curve {
+#		legend "reference"
+#		file x0h.csv
+#		columns $1 $2
+#		}
+	Curve {
+		 legend "Maillage M1"
+                 file ./BURATTI_M1/melange_SONDE_VAR.son
+	  	 origin "Trio_U (V165_beta 01/03/2012)"
+		 columns  $1 $2
+		 style lines
+	}
+	
+	Curve {
+		 legend "Maillage M2"
+                 file ./BURATTI_M2/melange_SONDE_VAR.son
+	  	 origin "Trio_U (V165_beta 01/03/2012) "
+		 columns  $1 $2
+		 style lines
+	}
+	
+	Curve {
+		 legend "Maillage M3"
+                 file ./BURATTI_M3/F1/melange_SONDE_VAR.son
+	  	 origin "Trio_U (V165_beta 01/03/2012)"
+		 columns  $1 $2
+		 style lines
+	}
+	
+	Curve {
+		 legend "Maillage M4"
+                 file ./BURATTI_M4/melange_SONDE_VAR.son
+	  	 origin "Trio_U (V165_beta 02/04/2012 sur castor)"
+		 columns  $1 $2
+		 style lines
+	}
+	
+	Curve {
+		 legend "Maillage M5"
+                 file ./BURATTI_M5/melange_SONDE_VAR.son
+	  	 origin "Trio_U (V165_beta 13/04/2012 sur titane)"
+		 columns  $1 $2
+		 style lines
+	}
+	
+	Curve {
+		 legend "Buratti (Dax=5.5)"
+                 file ./BURATTI_M5/melange_SONDE_VAR.son
+	  	 origin "Experience Buratti"
+		 columns  $1 0.0011*$1
+		 style lines
+	}
+	
+	
+#	Curve  {
+#		legend ""
+#		fonction 0.0002
+#		}
+      }    
+      
+      Table {
+	Title "Meshing convergence for the dispersion coefficient (F=1 Hz)"
+	Description This table shows the dispersion coefficient values obtained for five meshing. It is seen that the dispersion coefficient converges towards the experimental value (5.5).
+	Description Notice that the calculations for the M4 and M5 meshing have been performed only once and the the corresponding results are now stored. These two calculations are actually too long to be re-run in automatical mode. The presented values for these two meshing correspond to the stored ones.
+
+	nb_columns 5
+	label  "M1" | "M2" | "M3" | "M4" | "M5" 
+	line {
+	legend Simulation
+	origin "Trio_U (V165_beta 01/03/12 for M1, M2 and M3; 02/04/12 for M4; 13/04/12 for M5)"
+	file ./BURATTI_M3/F1/coefficients_M
+	}
+	line {
+	legend Measurement
+	origin "Buratti"
+	values 5.5 5.5 5.5 5.5 5.5
+	}
+	}  
+            
+Table {
+	Title "Dispersion coefficient dependency on pulse intensity AF"
+	Description This table shows the dispersion coefficient values obtained for three frequencies (F=0.5, 1 and 2 Hz). The coefficient dispersion is presented as a function of the pulse intensity AF given here in cm/s. The meshing considered for these calculations is M3. It is seen that the dispersion coefficient increases with the pulse intensity in agreement with the trend of the experimental results. The quantitative differences detected between the numerical and experimental values are likely to be due to the fact that the M3 meshing is not refined enough to provide a full agreement with the experimental results.
+
+	nb_columns 3
+	label  "AF=0.95" | "AF=1.9" | "AF=3.8"
+	line {
+	legend Measurements
+	values 2. 5.5 13.
+	}
+	line {
+	legend Simulation
+	origin "Trio_U (V165_beta 01/03/2012)"
+	file ./BURATTI_M3/F1/coefficients_F
+	}	
+}       
+      
+      
+##visu {
+##	Description Concentration field.
+##	pseudocolor ./BURATTI_M3/F1/melange.lata dom_1 CONCENTRATION SOM
+#	blackvector ./BURATTI_M3/F1/melange.lata  dom_1 VITESSE SOM
+##        Cycles 0 1
+#	width 15cm,viewport=0 100 1024 300,clip
+##        width 8cm
+#	origin mesh
+##    }      
+}
+

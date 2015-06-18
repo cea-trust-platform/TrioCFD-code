@@ -1,0 +1,114 @@
+# Hydraulique 2D VEF #
+# PARALLEL OK #
+dimension 2
+Pb_hydraulique_turbulent pb
+Domaine dom
+# BEGIN MESH #
+Read_file dom stat_VEF.geom
+VerifierCoin dom { }
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur Tranche { Tranches 2 1 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	nb_pas_dt_max 20
+	tinit 0.
+	tmax 1.2
+	dt_min 0.001
+	dt_max 0.001
+	dt_impr 0.001
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.17
+}
+
+Champ_Uniforme gravite
+Lire gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression GCP { 
+			precond ssor { omega 1.5 } 
+			seuil 1.000000e-8
+			impr 
+		}
+		convection { Amont }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 1. 0.
+			}
+		boundary_conditions {
+			OUEST frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 1. 0.
+			HAUT paroi_fixe
+			BAS paroi_fixe
+			EST frontiere_ouverte_pression_imposee champ_front_uniforme 1 0.
+		}
+                modele_turbulence sous_maille 
+                {
+                        Turbulence_paroi loi_standard_hydr
+                }
+	}
+
+	Postraitements
+	{
+		lml
+		{
+			fichier stat_VEF
+               	 	Statistiques dt_post 0.01
+                	{
+		   		t_deb 0.02 t_fin 1
+                   		moyenne vitesse
+                   		moyenne pression
+                	}
+		}
+		lata
+		{
+			Champs binaire dt_post 0.01
+			{	
+				vitesse elem	
+			}
+			format lata
+			fichier stat
+               	 	Statistiques dt_post 0.01
+                	{
+		   		t_deb 0.02 t_fin 1
+                   		moyenne vitesse
+                   		moyenne pression
+                	}
+		}		
+	}
+}
+
+Solve pb
+Fin
+Fin

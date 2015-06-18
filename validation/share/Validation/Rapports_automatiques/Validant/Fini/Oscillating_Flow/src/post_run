@@ -1,0 +1,7 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../../propertiesGeometry.py
+cp propertiesGeometry.dat ../..
+##
+python ../../calculerFrequence.py test_SONDE_VITESSE.son 2 270 1

@@ -1,0 +1,45 @@
+Parameters {
+	Title "Study convergence of Trio_U in 2D VEF"
+	
+	Description "The objective is to do a grid convergence."
+	
+	VersionTrio_U "1.6.2"
+	
+	ParametersTrio_U "Type of problem: 2D hydraulic_problem"
+	ParametersTrio_U "Discretization: VEFPreP1B"
+	ParametersTrio_U "Time scheme: $TIME_SCHEME" 
+	ParametersTrio_U "Solving of equations: Navier_Stokes"
+#
+	Reference " $[1]$ Towards large-eddy simulation in complex geometries. Mahesh K., Ruetsch G. R., Moin P. Center for Turbulence Research, Annual Research Briefs 1999" 
+	Reference " $[2]$ Description of Taylor Green votexes: http://en.wikipedia.org/wiki/Taylor%E2%80%93Green_vortex"
+	$Castest
+			
+	Author "Ledac P."
+	IncludeData 2
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Tests Description"
+	Description "Hydraulic initial conditions: fluid U = f(x,y) V = g(x,y)"
+	Description "where f(x,y)=-cos(2*Pi*x)*sin(2*Pi*y)*exp(-2*$\nu$*t) g(x,y)=sin(2*Pi*x)*cos(2*Pi*y)*exp(-2*$\nu$*t) and $\nu$=$\mu$/$\rho$"
+	Description "Hydraulic boundary condition: "
+	Description " $\bullet$ BOUNDARY with $BC condition."
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "2D Results"
+	Description "Taylor Green vortexes"
+	#include visu.include
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "1D Results"
+	Description ""
+	#include figure.include
+}

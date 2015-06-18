@@ -1,0 +1,115 @@
+# Verification du calcul du taux de cisaillement en VEF #
+# PARALLEL OK 2 #
+
+dimension 3
+Pb_Hydraulique_turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Mailler dom
+{
+Pave Cavite
+	{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 11 6 6
+		Longueurs 2 1 1
+	}
+	{
+		Bord periox  X = 0.            0. <= Y <= 1           0. <= Z <= 1
+		Bord periox  X = 2             0. <= Y <= 1           0. <= Z <= 1 
+		Bord bas     Y = 0.            0. <= X <= 2           0. <= Z <= 1
+		Bord haut    Y = 1.            0. <= X <= 2           0. <= Z <= 1
+                Bord perioz  Z = 0.            0. <= X <= 2           0. <= Y <= 1
+		Bord perioz  Z = 1.            0. <= X <= 2           0. <= Y <= 1   	
+	}
+}
+Tetraedriser dom
+Corriger_frontiere_periodique { domaine dom bord periox }
+Corriger_frontiere_periodique { domaine dom bord perioz }
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 1 2 1 }
+	Larg_joint 2
+	Nom_Zones DOM
+	periodique 2 periox perioz
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+VEFPreP1B dis
+
+
+Schema_Euler_explicite  sch
+Lire sch
+{
+	tinit 0.
+	tmax 10.
+	dt_min 1.e-7
+	dt_max 1.e-1
+	dt_impr 0.00001
+	dt_sauv 1.5
+	seuil_statio 1.e-8
+	nb_pas_dt_max 0
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu Champ_Uniforme 1 0.001 
+ 	rho Champ_Uniforme 1 1.0
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression petsc cholesky { }
+		convection { muscl }
+		diffusion { }
+		conditions_initiales { vitesse champ_fonc_xyz dom 3 y 0 0 }
+		boundary_conditions {
+			periox periodique 
+			perioz periodique 
+			haut  paroi_defilante champ_front_uniforme 3 1 0 0
+	                bas  paroi_fixe		  
+		}
+		modele_turbulence sous_maille { turbulence_paroi loi_standard_hydr }
+     	}
+	      
+	Postraitement
+	{
+		Sondes
+		{
+			taux_cisaillement taux_cisaillement periode 0.001 point 1 1 0.5 0.5
+		}
+		Definition_champs 
+		{
+			modele Transformation { methode formule expression 1 (nu+nut)*taux_cisaillement*taux_cisaillement
+				sources {
+					refChamp { Pb_champ pb viscosite_cinematique nom_source nu } ,
+					refChamp { Pb_champ pb viscosite_turbulente nom_source nut } ,
+					refChamp { Pb_champ pb taux_cisaillement nom_source taux_cisaillement }
+				}
+			}	
+		}
+		Champs dt_post 4.0
+		{
+			taux_cisaillement elem
+			modele elem
+		}
+	}
+}
+
+Solve pb
+Fin

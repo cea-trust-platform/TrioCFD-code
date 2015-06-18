@@ -1,0 +1,125 @@
+# 2D or 3D Keps Backward Facing Step #
+# PARALLEL OK #
+# lance_test 2 ecarts en parallele #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Read_file dom.geo ;
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 20 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+$DISCRETIZATION_IMPOSED dis
+
+$TIME_SCHEME sch
+Read sch
+{
+	tinit 0.
+	tmax $TMAX_IMPOSED
+	seuil_statio 1.e-4
+	seuil_statio_relatif_deconseille 1
+	dt_impr 1.e-10	
+	$OPTIONS_TIME_SCHEME
+}
+
+# Air fluid #
+Fluide_Incompressible air
+Read air
+{
+	mu 	Champ_Uniforme 1 $mu
+	rho 	Champ_Uniforme 1 $rho
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression petsc cholesky { impr }
+		convection { $SCHEME_IMPOSED }
+		diffusion { }
+		conditions_initiales { vitesse Champ_Uniforme $DIM 0. 0. $ZERO }
+		boundary_conditions {
+			WALL 		paroi_fixe
+			OUTLET 		frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			INLET	 	frontiere_ouverte_vitesse_imposee Champ_Front_LU dom $DIM VELOCITY_PROFILE_INLET.dat
+			$BOUNDARY
+		}
+
+     		Modele_turbulence K_Epsilon 
+        	{
+			Transport_K_Epsilon 
+			{
+				convection { $SCHEME_IMPOSED }
+                  		diffusion { }
+                  		boundary_conditions
+                    		{
+              				INLET 		frontiere_ouverte_K_eps_impose 	Champ_Front_Uniforme 2 $KEPS_IMPOSED
+              				OUTLET 		frontiere_ouverte K_EPS_EXT 	Champ_Front_Uniforme 2 $KEPS_IMPOSED
+              				WALL 		paroi
+					$BOUNDARY 	                                     
+          	    		}
+           	  		conditions_initiales 
+           	   		{
+              				k_Eps Champ_Uniforme 2 $KEPS_IMPOSED
+                   		}
+            		}
+        		turbulence_paroi loi_standard_hydr
+		}
+       	}
+	Postraitement 
+	{
+		Sondes 
+		{
+			VELOCITY_PROBES 		$PROBE_LOC	vitesse periode 1.e-10 	points  $VELOCITY_PROBES	
+			VELOCITY_PROFILE_WALL1		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_WALL1
+			VELOCITY_PROFILE_WALL2		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_WALL2
+			VELOCITY_PROFILE_WALL3		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_WALL3
+			VELOCITY_PROFILE_WALL4		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_WALL4
+			VELOCITY_PROFILE_WALL5		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_WALL5
+			VELOCITY_PROFILE_X_-4h		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_-4h
+			VELOCITY_PROFILE_X_-h		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_-h
+			VELOCITY_PROFILE_X_0h		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_0h
+			VELOCITY_PROFILE_X_1.333h	$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_1.333h
+			VELOCITY_PROFILE_X_2.666h	$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_2.666h
+			VELOCITY_PROFILE_X_5.333h	$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_5.333h
+			VELOCITY_PROFILE_X_6.22h	$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_6.22h
+			VELOCITY_PROFILE_X_7.113h	$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_7.113h
+			VELOCITY_PROFILE_X_8h		$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_8h
+			VELOCITY_PROFILE_X_9.780h	$PROBE_LOC	vitesse periode	1.e-10	segment $VELOCITY_PROFILE_X_9.780h			
+		}
+		format lata
+		Champs dt_post 0.05
+		{
+			pression_pa 		elem
+			vitesse 		elem
+			vitesse 		som
+			y_plus 			elem
+			k 			elem
+			eps 			elem
+			viscosite_turbulente 	elem
+		}
+	}
+}
+Solve pb
+End
+

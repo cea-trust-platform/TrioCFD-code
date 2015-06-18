@@ -1,0 +1,266 @@
+# Thermohydraulique 3D couplee a Thermohydraulique 3D #
+# PARALLEL OK #
+
+dimension 3
+Domaine dom_jeux
+Domaine dom_ass
+
+# BEGIN MESH #
+Read_file dom_jeux jeux_cuve3D.geom
+Read_file dom_ass assemblages_cuve3D.geom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_jeux
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM1
+}
+Partition dom_ass
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM2
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom_jeux
+Scatter DOM2.Zones dom_ass
+END SCATTER #
+
+VEFPreP1b dis
+Lire dis { P1 }
+
+schema_euler_explicite sch
+Lire sch
+{
+	nb_pas_dt_max 2
+	tinit  0.
+        tmax 0.12
+	dt_min 1.e-7
+	dt_max 1.
+	dt_impr 1.e-3
+	dt_sauv 1.
+        seuil_statio 1.e-7
+        facsec 1
+}
+
+# mu=2.938831e-5  rho=
+#
+Fluide_Incompressible fluide_assemblage
+Lire fluide_assemblage
+{
+	mu Champ_Uniforme 1 .0000295249
+	rho Champ_Uniforme 1 6.215604
+	lambda Champ_Uniforme 1 .226226
+	Cp champ_Uniforme 1 5193
+	Beta_th Champ_uniforme 1 0.0018761
+}
+
+Fluide_Incompressible fluide_jeux
+Lire fluide_jeux
+{
+	mu Champ_Uniforme 1 .0000295249
+	rho Champ_Uniforme 1 6.215604
+	lambda Champ_Uniforme 1 .226226
+	Cp champ_Uniforme 1 5193
+	Beta_th Champ_uniforme 1 0.0018761
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 0 -9.81
+
+Associate fluide_assemblage gravite
+Associate fluide_jeux gravite
+
+Pb_Thermohydraulique_Turbulent pb_jeux
+Pb_Thermohydraulique_Turbulent pb_assemblages
+
+Associate pb_assemblages dom_ass
+Associate pb_assemblages fluide_assemblage
+
+Associate pb_jeux dom_jeux
+Associate pb_jeux fluide_jeux	
+
+Probleme_couple pbc
+
+Associate pbc pb_assemblages 
+Associate pbc pb_jeux 
+Associate pbc sch
+
+Discretize pbc dis
+
+Lire pb_assemblages
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 1e-7
+                        }
+		convection { amont  }
+		diffusion {  }
+		sources { 
+			Boussinesq_temperature { T0 533 } 
+			,
+			Perte_charge_directionnelle {
+				diam_hydr champ_uniforme 1 0.00455
+				lambda 96/Re
+				direction champ_uniforme 3 0. 0. 1.
+				} 
+			,
+			Perte_charge_directionnelle {
+				diam_hydr champ_uniforme 1 0.00455
+				lambda 10000/Re
+				direction champ_uniforme 3 1. 0. 0.
+				} 
+			,
+			Perte_charge_directionnelle {
+				diam_hydr champ_uniforme 1 0.00455
+				lambda 10000/Re
+				direction champ_uniforme 3 0. 1. 0.
+				}	
+			}
+		conditions_initiales
+			{
+			vitesse  Champ_uniforme 3 0 0 30
+			}
+		modele_turbulence sous_maille_Smago { Cs 1.e-9 
+		        turbulence_paroi UTAU_IMP { u_tau Champ_uniforme 1 0. } }
+		boundary_conditions
+			{
+			devant frontiere_ouverte_vitesse_imposee Champ_front_uniforme 3 0 0 7.92
+			derriere frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			interface symetrie   
+			}
+		}
+
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { }	
+		convection { muscl }
+		sources { Puissance_thermique Champ_fonc_xyz dom_ass 1 0.89e8 }
+		boundary_conditions 
+			{
+			devant frontiere_ouverte_temperature_imposee Champ_front_uniforme 1 533
+			derriere frontiere_ouverte t_ext Champ_front_uniforme 1 833
+			interface paroi_contact pb_jeux interface
+			
+			}
+		conditions_initiales { Temperature Champ_fonc_xyz dom_ass 1  533  }
+                Modele_Turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire }
+		}
+
+	Postraitement		
+        	{     
+                Sondes
+                	{ 
+			sonde_Ve1 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.01
+			sonde_Ve2 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.1
+			sonde_Ve3 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.2
+			sonde_Ve4 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.3 
+			sonde_Ve5 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.4
+			sonde_Ve6 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.5
+			sonde_Ve7 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.6
+			sonde_Ve8 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.7
+			sonde_Ve9 vitesse                	periode 1.e-4 points 1 0.003 0.0025981 0.8 
+			sonde_Te1 temperature                	periode 1.e-4 points 1 0.003 0.0025981 0.01
+			sonde_Te2 temperature                	periode 1.e-4 points 1 0.003 0.0025981 0.1
+			sonde_Te3 temperature                	periode 1.e-4 points 1 0.003 0.0025981 0.2
+			sonde_Te4 temperature                	periode 1.e-4 points 1 0.003 0.0025981 0.3
+			sonde_Te5 temperature                	periode 1.e-4 points 1 0.003 0.0025981 0.4
+			sonde_Te6  temperature               	periode 1.e-4 points 1 0.003 0.0025981 0.5
+			sonde_Te7  temperature              	periode 1.e-4 points 1 0.003 0.0025981 0.6
+			sonde_Te8  temperature               	periode 1.e-4 points 1 0.003 0.0025981 0.7
+			sonde_Te9 temperature                	periode 1.e-4 points 1 0.003 0.0025981 0.85
+			profil_vitesse vitesse                periode 1.e-4 segment 20 0.003 0.0025981 0. 0. 0. 0.86
+			profil_temp temperature               periode 1.e-4 segment 20 0.003 0.0025981 0. 0. 0. 0.86
+			profil_viscosite viscosite_turbulente periode 1.e-4 segment 20 0.003 0.0025981 0. 0. 0. 0.86
+ 			}
+		Champs dt_post 0.002
+			{
+			temperature elem
+			}
+		}
+	Sauvegarde formatte pb_assemblages_VEF.sauv
+
+	}
+
+#
+verifier diametre hydraulique
+#
+
+Lire pb_jeux
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 1e-7
+			impr
+			}
+		convection { amont  }
+		diffusion {  }
+		sources { boussinesq_temperature { T0 533 } 
+			,
+			Perte_charge_isotrope
+				{
+				diam_hydr  champ_uniforme 1 0.006
+				lambda 96/Re
+				}
+			}
+		conditions_initiales
+			{
+			vitesse  Champ_fonc_xyz dom_jeux 3 0 0 30
+			}
+		modele_turbulence sous_maille_Smago { Cs 1.e-9 
+		        turbulence_paroi UTAU_IMP { u_tau Champ_uniforme 1 0. } }
+			
+		boundary_conditions
+			{
+			devant frontiere_ouverte_vitesse_imposee Champ_front_uniforme 3 0 0 7.92
+			derriere frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			interface      symetrie
+			cuve      symetrie
+			}
+		}
+
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { }	
+		convection { muscl }
+                Modele_Turbulence Prandtl { Turbulence_paroi loi_standard_hydr_scalaire }
+		boundary_conditions 
+			{
+			devant frontiere_ouverte_temperature_imposee Champ_front_uniforme 1 533
+			derriere frontiere_ouverte t_ext Champ_front_uniforme 1 833
+			cuve paroi_temperature_imposee  Champ_front_uniforme 1 533 
+			interface paroi_contact pb_assemblages interface
+			}
+		conditions_initiales { Temperature Champ_fonc_xyz dom_jeux 1  533 }
+		
+		
+		}
+
+	Postraitement
+        	{     
+		Champs dt_post 0.002
+			{
+			temperature elem
+			}
+		}
+	Sauvegarde formatte pb_jeux_VEF.sauv
+
+	}
+
+
+
+Solve pbc
+Fin

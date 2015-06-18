@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for dir in `find . -mindepth 1 -type d `
+do
+	( cd $dir;   sh post_run)
+done

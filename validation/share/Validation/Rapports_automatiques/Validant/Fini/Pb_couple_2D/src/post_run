@@ -1,0 +1,8 @@
+#!/bin/bash
+#recuperation des donnees physiques
+
+python ../propertiesGeometry.py
+cp propertiesGeometry.dat ..
+##
+python ../thermal.py test_pb_acier_Diffusion_chaleur.out test_pb_acier_Puissance_Thermique.out test_pb_fluide_Convection_chaleur.out test_pb_fluide_Diffusion_chaleur.out
+

@@ -1,0 +1,1172 @@
+Parameters {
+	Title "Temperature convection as a passive scalar"
+	Description "Temperature convection as a passive scalar: convection of a temperature crenel and gaussian, influence of dimension, time scheme and convection scheme."
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Dimension: 2D and 3D
+	ParametersTrio_U Discretization: VEFPreP1B
+	ParametersTrio_U Time scheme: Iterative Crank Nicholson and Runge-Kutta 3 with facsec = 1
+	ParametersTrio_U Time scheme: Euler explicit with facsec = 0.5 (Amont, EF_stab {alpha = 0.2})
+	ParametersTrio_U Time scheme: Euler explicit with facsec = 0.2 (Muscl, EF_stab) 
+	ParametersTrio_U Momentum convection scheme: Negligible
+	ParametersTrio_U Temperature convection scheme: EF_stab, Muscl or Amont
+	ParametersTrio_U Momentum diffusion scheme: Negligible
+	ParametersTrio_U Temperature diffusion scheme: Negligible
+	ParametersTrio_U Periodicity along x (and z axis for 3D) for the two studies
+	ParametersTrio_U Solving of equations: Navier_Stokes_Turbulent and Convection_Diffusion_Temperature_Turbulent
+
+	TestCase 2D/crenel/EE/Amont test  \*
+	TestCase 2D/crenel/EE/Muscl test 
+	TestCase 2D/crenel/EE/EF_stab test
+	TestCase 2D/crenel/EE/EF_stab02 test
+	TestCase 2D/crenel/CN/Amont test
+	TestCase 2D/crenel/CN/Muscl test
+	TestCase 2D/crenel/CN/EF_stab test
+	TestCase 2D/crenel/CN/EF_stab02 test
+	TestCase 2D/crenel/RK3/Amont test
+	TestCase 2D/crenel/RK3/Muscl test
+	TestCase 2D/crenel/RK3/EF_stab test
+	TestCase 2D/crenel/RK3/EF_stab02 test
+
+	TestCase 3D/crenel/EE/Amont test
+	TestCase 3D/crenel/EE/Muscl test
+	TestCase 3D/crenel/EE/EF_stab test
+	TestCase 3D/crenel/EE/EF_stab02 test
+	TestCase 3D/crenel/CN/Amont test
+	TestCase 3D/crenel/CN/Muscl test
+	TestCase 3D/crenel/CN/EF_stab test
+	TestCase 3D/crenel/CN/EF_stab02 test
+	TestCase 3D/crenel/RK3/Amont test
+	TestCase 3D/crenel/RK3/Muscl test
+	TestCase 3D/crenel/RK3/EF_stab test
+	TestCase 3D/crenel/RK3/EF_stab02 test
+	
+	TestCase 2D/gaussian/EE/Amont test
+	TestCase 2D/gaussian/EE/Muscl test
+	TestCase 2D/gaussian/EE/EF_stab test
+	TestCase 2D/gaussian/EE/EF_stab02 test
+	TestCase 2D/gaussian/CN/Amont test
+	TestCase 2D/gaussian/CN/Muscl test
+	TestCase 2D/gaussian/CN/EF_stab test
+	TestCase 2D/gaussian/CN/EF_stab02 test
+	TestCase 2D/gaussian/RK3/Amont test
+	TestCase 2D/gaussian/RK3/Muscl test
+	TestCase 2D/gaussian/RK3/EF_stab test
+	TestCase 2D/gaussian/RK3/EF_stab02 test
+
+	TestCase 3D/gaussian/EE/Amont test
+	TestCase 3D/gaussian/EE/Muscl test
+	TestCase 3D/gaussian/EE/EF_stab test
+	TestCase 3D/gaussian/EE/EF_stab02 test
+	TestCase 3D/gaussian/CN/Amont test
+	TestCase 3D/gaussian/CN/Muscl test
+	TestCase 3D/gaussian/CN/EF_stab test
+	TestCase 3D/gaussian/CN/EF_stab02 test
+	TestCase 3D/gaussian/RK3/Amont test
+	TestCase 3D/gaussian/RK3/Muscl test
+	TestCase 3D/gaussian/RK3/EF_stab test
+	TestCase 3D/gaussian/RK3/EF_stab02 test
+## facsec = 0.2
+	TestCase 2D/crenel/EE/Muscl_facsec02 test
+	TestCase 2D/crenel/EE/EF_stab_facsec02 test
+# 
+
+	Author "E.MOREAU (S.VANDROUX)"
+	IncludeData 2
+
+}
+Chapter {
+	Title "Tests Description"
+	visu {
+		Title "2D Mesh"
+		Width 10cm, viewport= 0 0 1024 400,clip
+		mesh 2D/crenel/EE/Amont/test.lata dom
+		Description "Geometry 2D test: rectangular domain"
+		Description "Dimensions 2D test: 0.2m = h along y ; 1m = 5h along x"
+		Description "Mesh 2D: 203 triangular cells obtained with option Trianguler_H"
+	}
+
+	visu {
+		Title "3D Mesh"
+#		Width 10cm, viewport= 0 0 1024 400,clip
+		Width 10cm
+		mesh 3D/crenel/EE/Amont/test.lata dom
+		normal3D 0.6 0.2 0.8
+		up3D -0.1 1 -0.2
+		Description "Geometry 3D test: rectangular box"
+		Description "Dimensions 3D test: 0.2m = h along y and z ; 1m = 5h along x"
+		Description "Mesh 3D: 1421 tetraedral cells obtained with option Tetraedriser_homogene"
+	}	
+
+	Description "Hydraulic initial conditions 2D and 3D: Unifom velocity U = 1m/s along x"
+	Description "Thermic initial conditions 2D and 3D: crenel or gaussian profile (with Tmin = 11K ; Tmax = 10K)"
+	Description "Boundary conditions 2D and 3D: Periodicity for boundaries normal to x and z axis, winding wall for boundaries normal to y axis "
+	
+	
+	Table {
+			Title "Physical properties"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($5)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($2)
+			}
+			line {
+			      	legend " $\lambda$ (W/m/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($3)
+			}
+			line {
+			      	legend "Cp (J/kg/K) "
+				file propertiesGeometry.dat	
+				nb_columns_file 5
+				columns ($4)
+			}
+			line {
+			      	legend " $\beta$_th "
+				file propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($6)
+			}
+	}
+}
+Chapter {
+	Title "Results for a crenel initial condition"
+	Description "For the study of both the 2D and 3D crenel initial condition, the following comparisons are performed:"
+	Description "$\bullet$ Comparison of the convection scheme with respect to the Crank Nicholson time scheme"
+	Description "$\bullet$ Comparison of the 3 time schemes for each convection scheme"
+	Description ""
+	Description "The time calculation (3 seconds of physical time) is varying from 1mn for the 2D simulation up to 12mn for the 3D simulations."
+########################
+########################  Crenel initial profile
+########################	
+	Figure {
+		Title "Comparison of 2D convection schemes (Crank Nicholson)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab02"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (Crank Nicholson)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab02 (divergence)"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of the 2D time schemes (Amont)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler Explicite"
+			origin "Trio_U"
+			Segment 2D/crenel/EE/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 2D/crenel/RK3/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+#######################
+	Figure {
+		Title "Comparison of the 3D time schemes (Amont)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler Explicite"
+			origin "Trio_U"
+			Segment 3D/crenel/EE/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 3D/crenel/RK3/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (EF_stab)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 2D/crenel/EE/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment 2D/crenel/EE/EF_stab_facsec02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK3"
+			origin "Trio_U"
+			Segment 2D/crenel/RK3/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (EF_stab)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 3D/crenel/EE/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 3D/crenel/RK3/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (EF_stab and alpha = 0.2)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 2D/crenel/EE/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 2D/crenel/RK3/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+#### 
+	Figure {
+		Title "Comparison of 3D convection schemes (EF_stab and alpha = 0.2)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson (divergence)"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 3D/crenel/EE/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3 (divergence)"
+			origin "Trio_U"
+			Segment 3D/crenel/RK3/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (Muscl)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/crenel/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5) (divergence)"
+			origin "Trio_U"
+			Segment 2D/crenel/EE/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.2)"
+			origin "Trio_U"
+			Segment 2D/crenel/EE/Muscl_facsec02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 2D/crenel/RK3/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (Muscl)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10+(x>0.4)-(x>0.6)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 3D/crenel/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5) (divergence)"
+			origin "Trio_U"
+			Segment 3D/crenel/EE/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 3D/crenel/RK3/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+}
+Chapter {
+	Title "Results for a gaussian initial condition"
+	Description "For the study of both the 2D and 3D gaussian initial condition, the following comparisons are performed"
+	Description "$\bullet$ Comparison of the convection scheme with respect to the Crank Nicholson time scheme"
+	Description "$\bullet$ Comparison of the 3 time schemes for each convection scheme"
+	Description ""
+	Description "The time calculation (3  and 12 seconds of physical time) is varying from 1mn for the 2D simulation up to 12mn for the 3D simulations."
+########################
+########################  Gaussian initial profile
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (Crank Nicholson)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab02"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (Crank Nicholson)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_Comp_Conv/stab"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab02 (divergence)"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of the 2D time schemes (Amont)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler Explicite"
+			origin "Trio_U"
+			Segment 2D/gaussian/EE/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 2D/gaussian/RK3/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+####
+	Figure {
+		Title "Comparison of the 3D time schemes (Amont)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "Euler Explicite"
+			origin "Trio_U"
+			Segment 3D/gaussian/EE/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 3D/gaussian/RK3/Amont/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (EF_stab)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 2D/gaussian/EE/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK3"
+			origin "Trio_U"
+			Segment 2D/gaussian/RK3/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (EF_stab)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5) "
+			origin "Trio_U"
+			Segment 3D/gaussian/EE/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 3D/gaussian/RK3/EF_stab/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (EF_stab and alpha = 0.2)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 2D/gaussian/EE/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 2D/gaussian/RK3/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (EF_stab and alpha = 0.2)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson (divergence)"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5) (divergence)"
+			origin "Trio_U"
+			Segment 3D/gaussian/EE/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3  (divergence)"
+			origin "Trio_U"
+			Segment 3D/gaussian/RK3/EF_stab02/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+########################
+	Figure {
+		Title "Comparison of 2D convection schemes (Muscl)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 2D/gaussian/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5)"
+			origin "Trio_U"
+			Segment 2D/gaussian/EE/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 2D/gaussian/RK3/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+####
+	Figure {
+		Title "Comparison of 3D convection schemes (Muscl)"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 1
+		LabelY "T(K)"
+		RangeY 9.5 11.5
+#		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Analytic"
+			origin "Theoric"
+			Fonction 10 + exp(-(x-0.5)*(x-0.5)/0.01)
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Crank Nicholson"
+			origin "Trio_U"
+			Segment 3D/gaussian/CN/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Euler Explicite (facsec = 0.5) (divergence)"
+			origin "Trio_U"
+			Segment 3D/gaussian/EE/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "RK 3"
+			origin "Trio_U"
+			Segment 3D/gaussian/RK3/Muscl/test.data sonde_temp
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+	}
+
+########################
+######################## 
+########################
+	Figure {
+		Title "Point evolution for the 2D crenel case: Muscl scheme with Euler Explcite"
+		Width 12cm, viewport = 0 0 1024 500
+		Dimension 2
+		LabelX "X"
+		RangeX 0 10
+		LabelY "T(K)"
+		RangeY 9.5 12.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl (facsec = 0.5)"
+			origin "Trio_U"
+			file 2D/crenel/EE/Muscl/test_SONDE_TEMP.son
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "Muscl (facsec = 0.2)"
+			origin "Trio_U"
+			file 2D/crenel/EE/Muscl_facsec02/test_SONDE_TEMP.son
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "EF_stab (facsec = 0.2)"
+			origin "Trio_U"
+			file 2D/crenel/EE/EF_stab_facsec02/test_SONDE_TEMP.son
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "EF_stab (facsec = 0.5)"
+			origin "Trio_U"
+			file 2D/crenel/EE/EF_stab/test_SONDE_TEMP.son
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "Amont (facsec = 0.5)"
+			origin "Trio_U"
+			file 2D/crenel/EE/Amont/test_SONDE_TEMP.son
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+	}
+}
+########################
+######################## 
+########################
+Chapter {
+	Title "Summary / Conclusion"
+	Description "$\bullet$ It appears clearly that the scheme EF_stab taken with the value 0.2 for the coefficient alpha, is almost never stable in this configuration, and gives non physical values."
+	Description " "
+	Description "$\bullet$ Concerning the Euler explicite scheme used with muscl: we can see that the value 0.5 of the security factor "facsec", is not sufficient. A smallest value (0.2) is needed to obtain a better convergence. "
+	Description " "
+	Description "$\bullet$ 2D crenel results: the closest results with respect to the initial profile are obtained with a Cranck-Nicholson or RK3 time scheme associated with an EF_stab convection scheme. "
+	Description " "
+	Description "$\bullet$ 3D crenel results: the closest results with respect to the initial profile are obtained with a Cranck-Nicholson or RK3 time scheme associated with an EF_stab or a  Muscl convection scheme. "
+	Description " "
+	Description "$\bullet$ 2D gaussian results: the closest results with respect to the initial profile are obtained with a Cranck-Nicholson or RK3 time scheme associated with an EF_stab or a Muscl convection scheme. "
+	Description " "
+	Description "$\bullet$ 3D gaussian results: the closest results with respect to the initial profile are obtained with: "
+	Description "- A Cranck-Nicholson time scheme associated with a Muscl convection scheme "
+ 	Description "- An Euler explicite time scheme associated with a Muscl convection scheme "
+	Description " "
+}
+Chapter {
+	Description " \latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Recommendations for users"
+	Description "- The Amont convection scheme is very diffusive but quasi-stable."
+	Description ""
+	Description "- When using an the EF_stab convection scheme, the default value of the alpha coefficient gives results in good aggreement with the analytical profile."
+	Description ""
+	Description "- The use of the Euler explicite (facsec = 0.5) time scheme combined with the muscl convection scheme presents high risk of divergence. "
+	Description ""
+	Description "- The Rung-Kutta 3 and the Crank-Nicholson time schemes give very close results."
+	Description ""
+	Description ""
+	Description ""
+}
+Chapter {
+	Description " \latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+}
+
+

@@ -1,0 +1,2 @@
+diff assemblages.dat assemblages.dat.ref
+exit $? 

@@ -1,0 +1,70 @@
+#!/bin/bash
+
+
+
+utau=`cat *Ustar.face | grep "<u+>" | tail -1 | awk '{print $6;}'`
+
+utau_th=`cat ../utau_analytique.dat | awk '{print $1;}'`
+echo utau
+tail -1 u_tau.dat | awk -v utauth=$utau_th -v utau=$utau '{print $1" "utau" "100*(utau-utauth)/utauth;}' > post_utau   
+
+temps=`ls Moyennes_temporelles_vitesse_rho_mu_* | sed -e 's/Moyennes_temporelles_vitesse_rho_mu_//g' | sed -e 's/_adim.dat//g' | sort -g | tail -1`
+echo $utau
+echo "temps=" $temps
+../adim_Stat.sh les_Re395Pr0025.data "Moyennes_temporelles_vitesse_rho_mu_"$temps  $utau
+cp "Moyennes_temporelles_vitesse_rho_mu_"$temps moy_spat_dim.dat
+mv "Moyennes_temporelles_vitesse_rho_mu_"$temps"_adim.dat" moy_spat.dat
+
+ttau=`echo "1" | awk  -v utau=$utau '{print  1/(13500*140*utau);}'`
+
+
+# Attetnion, on suppose que les props du fluide sont en seconde position dans le .data 
+mu=`grep "mu " les_Re395Pr0025.data  | tail -1 | awk '{print $4}'`
+rho=`grep "rho" les_Re395Pr0025.data  | tail -1 | awk '{print $4}'`
+Cp=`grep "Cp" les_Re395Pr0025.data  | tail -1 | awk '{print $4}'`
+
+
+
+#mv "Moyennes_spatiales_Temp_"$temps"_adim.dat" moy_tempo_T.dat
+
+n1=`cat les_Re395Pr0025_pb_Nusselt.face | grep -v "X" | grep -v "^--" | grep "\b" | grep -n "Bord interface_haut"  | sed "s/:/ /" | tail -n 1| awk '{print $1;}'`      
+h_moy=`cat les_Re395Pr0025_pb_Nusselt.face | awk -v n=$n1 'BEGIN{moy=0.;i=0;} {if (NR>(n+5)) { i++; moy+=$11;}} END{print moy/i;}'`
+
+T1=`cat "Moyennes__temporelles_Temp_"$temps  | grep " \b" | grep -v "#" | head -1 | awk '{print $2;}'`
+cas=`pwd | awk -F/  '{print "/"$NF }'`
+if [ $cas == "/VDF_Coupling" ]
+then
+echo "Cas VDF"
+Tw=`echo "scale=8;$T1-1./$h_moy" | bc`
+else
+echo "Cas VEF"
+Tw=$T1
+fi
+cp "Moyennes__temporelles_Temp_"$temps moy_spat_T_dim_2.dat
+#  on translate juste de Tw
+awk -v tw=$Tw '{if (($1!="")&&($1!="#")) print $1 " " ($2-tw)" " $3 " " $4 " " $5 " " $6 " ";}' "Moyennes__temporelles_Temp_"$temps > moy_spat_T_dim.dat
+
+
+# ici on adimensionne
+../adim_TStat.sh les_Re395Pr0025.data "Moyennes__temporelles_Temp_"$temps  $utau $ttau   $Tw
+mv "Moyennes__temporelles_Temp_"$temps"_adim.dat" moy_spat_T.dat
+
+
+
+
+fs_moyen=`cat les_Re395Pr0025.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$3;}}END{print m/n;}'`
+dt_moyen=`cat les_Re395Pr0025.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$2;}}END{print m/n;}'`
+fs_moyen20=`tail -20 les_Re395Pr0025.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$3;}END{print m/n;}'`
+dt_moyen20=`tail -20 les_Re395Pr0025.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$2;}END{print m/n;}'`
+
+dt_conv=`grep -A 2 "time steps for the equation: Navier_Stokes_Turbulent" les_Re395Pr0025.out | grep convective | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffNS=`grep -A 2 "time steps for the equation: Navier_Stokes_Turbulent" les_Re395Pr0025.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffT=`grep -A 2 "time steps for the equation: Convec" les_Re395Pr0025.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_cond=`grep -A 2 "time steps for the equation: Conduction" les_Re395Pr0025.out | grep diffusive | tail -20|awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+
+fs_conv=`echo "scale=8;$dt_moyen20/$dt_conv" | bc`
+fs_diffNS=`echo "scale=8;$dt_moyen20/$dt_diffNS" | bc`
+fs_diffT=`echo "scale=8;$dt_moyen20/$dt_diffT" | bc`
+fs_cond=`echo "scale=8;$dt_moyen20/$dt_cond" | bc`
+
+echo  $fs_moyen20  " " $fs_conv " " $fs_diffNS " " $fs_diffT  " " $fs_cond > comp_facsec 

@@ -1,0 +1,114 @@
+Parameters {
+	Title "Tests physique front-tracking"
+	Description ""
+	Author "B.M."
+	TestCase "FTD_reprise_xyz_vef_3d" "FTD_reprise_xyz_vef_3d.data"
+	Prerequisite "./extrait_centre.sh"
+}
+
+Chapter {
+	Title "Vitesse de chute libre sous gravite, VEF"
+	Description "Chute libre d'une goutte (on doit observer une acceleration de -10m/s**2)"
+Figure {
+	Title "Vitesse liquide"
+	Description "Sonde de vitesse dans la goutte en fonction du temps"
+	Dimension 2
+	LabelX "s"
+	LabelY "m/s"
+	Curve {
+		legend "version_actuelle(prepare)"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		file ./FTD_reprise_xyz_vef_3d/prepare_V_GOUTTE.son
+		columns $1 $4
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+		legend "version_actuelle(reprise)"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		file ./FTD_reprise_xyz_vef_3d/FTD_reprise_xyz_vef_3d_V_GOUTTE.son
+		columns $1 $4
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+	        legend "analytique"
+		origin "ana"
+		Version "1.5.3-beta_build_180907"
+		fonction -10*x
+		Style lines
+	
+	}
+}
+
+Figure {
+	Title "Position du centre de la goutte"
+	Description "Coordonnee Z du centre de gravite de la phase 0"
+	Description "(un ecart important est normal, du a integration par Euler explicite)"
+	Dimension 2
+	LabelX "s"
+	LabelY "m"
+	Curve {
+		legend "version_actuelle(prepare)"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		file ./FTD_reprise_xyz_vef_3d/position_goutte.txt
+		columns $1 $4
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+		legend "theorique"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		fonction 0.06-0.5*10*x*x
+		Style lines
+	}
+}
+
+Figure {
+	Title "Erreur relative"
+	Description "Definition: Erreur = (vitesse calculee - vitesse analytique) / vitesse_analytique"
+	Dimension 2
+	LabelX "s"
+	LabelY "m/s"
+	Curve {
+		legend "version_actuelle(prepare)"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		file ./FTD_reprise_xyz_vef_3d/prepare_V_GOUTTE.son
+		columns $1 (($4+10*$1)/(10*$1+1e-9))
+		Style linespoints
+		PointSize 2
+	}
+	Curve {
+		legend "version_actuelle(calcul)"
+		origin "Trio_U"
+		Version "1.5.3-beta_build_180907"
+		file ./FTD_reprise_xyz_vef_3d/FTD_reprise_xyz_vef_3d_V_GOUTTE.son
+		columns $1 (($4+10*$1)/(10*$1+1e-9))
+		Style linespoints
+		PointSize 2
+	}
+}
+visu {
+	Title "indicatrice"
+	mesh ./FTD_reprise_xyz_vef_3d/lata/post.lata INTERFACES
+	pseudocolor ./FTD_reprise_xyz_vef_3d/lata/post.lata DOM INDICATRICE_INTERF ELEM
+	operator slice 0. 0. 0. 0. -1. 0 
+	normal3D -0.5 0.7 0.4
+	up3D 0.2 -0.3 0.9
+      }
+
+visu {
+	Title "vitesse"
+	pseudocolor ./FTD_reprise_xyz_vef_3d/lata/post.lata DOM_dual VITESSE_Z FACES
+	operator slice 0. -0.000001 0. 0. -1. 0 
+	vector ./FTD_reprise_xyz_vef_3d/lata/post.lata DOM_dual VITESSE FACES
+	operator slice 0. 0. 0. 0. -1. 0 
+	normal3D 0. -1. 0.
+	up3D 0. 0. 1.
+      }
+}

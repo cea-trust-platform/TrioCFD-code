@@ -1,0 +1,1389 @@
+Parameters {
+	Title " Turbulent_simple_water_jet "
+	Description " Survey of the behaviour of a submerged round jet "
+
+	VersionTrio_U " 1.6.1 "
+
+	ParametersTrio_U Type of problem: Hydraulique_Concentration_Turbulent
+	ParametersTrio_U Discretization: VEFPreP1b
+	ParametersTrio_U Time scheme: Euler_implicite
+	ParametersTrio_U Momentum convection scheme: EF_stab with alpha = 1 and EF_stab with alpha = 2
+	ParametersTrio_U Diffusion: none
+	ParametersTrio_U Velocity turbulent model: K_Epsilon
+	ParametersTrio_U Concentration turbulent model: Schmidt
+	ParametersTrio_U Solving of equations: Navier_Stokes_Turbulent, Convection_diffusion_concentration_turbulent
+	ParametersTrio_U Turbulent parameter: implicite parameter with explicite resolution
+	ParametersTrio_U Prandtl numbers: using 1 and 1.3 for k-eps prandtl parameters
+	ParametersTrio_U Pressure solver: GCP (precondtioner: ssor, with following parameters omega 1.651, threshold 1.e-8)
+	ParametersTrio_U No gravity (buoyancy effects suppressed)
+	ParametersTrio_U Type of boundary conditions (Navier-Stokes): Symetrie, Paroi_fixe, Frontiere_ouverte_vitesse_imposee, Frontiere_ouverte_pression_imposee
+	ParametersTrio_U Type of boundary conditions (K_Epsilon): Symetrie, Paroi, Frontiere_ouverte_K_eps_impose, frontiere_ouverte K_EPS_EXT
+	ParametersTrio_U Type of boundary conditions (concentration): Symetrie, Paroi, Frontiere_ouverte_concentration_imposee, Frontiere_ouverte C_ext
+	ParametersTrio_U Type of fluid: water
+#
+	Reference " $[1]$ Report on validation work 2009 of Trio_U code in collaboration with BARC R. Bagul, DEN/CAD/SSTH/LDAL/NT/2010-019/A " 
+	Reference " $[2]$ L.P. Xia, K.M. Lam, \latex_(\textit{Velocity and concentration measurements in initial region of submerged round jets in stagnant environment and in coflow}\latex_), Journal of Hydro-environment Research 3 (2009), 21-34. "
+
+#
+	TestCase v_1/EF_stab test 4      \*  pour mise du jdd en annexe *\
+	TestCase v_1/EF_stab02 test 4
+	TestCase v_156/EF_stab test 4
+	TestCase v_156/EF_stab02 test 4
+	
+	Author "G. ETIEVENT (S. VANDROUX)"
+	IncludeData 2
+}
+Chapter {
+	Title "Tests Description"
+#
+	Description " $\bullet$ Navier_Stokes_Turbulent: "
+	Description " - Initial condition for the velocity: Vitesse Champ_Uniforme 3 0. 0. 0. "
+	Description " - Initial condition for the turbulence : k_Eps Champ_Uniforme 2 1.0e-5 1.0e-5 "
+	Description " "
+	Description " $\bullet$ Convection_diffusion_concentration_turbulent: "
+	Description " - Initial condition: concentration Champ_Uniforme 1 0.0 "
+	Description " "
+	Description " $\bullet$ Geometry: 3D rectangular domain (0.1m along $x$, 0.1m along $y$, 0.3m along $z$). "
+	Description " The dimensions along x and y correspond to about 10 times the maximum jet width and is sufficient to consider the effect of a large stagnant pool. "
+	Description " "
+	Description " \latex_(\underline{Comparison with:}\latex_) Xia and Lam [2] "
+	Description " "
+#
+	Figure {
+		Title " Schematic diagram of round jet "
+		Description " Schematic diagram of a round jet with diameter $d$ = 0.003m, discharged from a nozzle into a stagnant liquid pool, with jet velocity \latex_($\textrm{U}_{j}$\latex_). "
+		picture geometry.png
+	}
+##
+	Figure {
+		Title " Boundary conditions visualization "
+		Description " 1/4 of the whole domain is considered for the analysis "
+		picture CL.png
+	}
+	Figure {
+		Title " Boundary conditions detail "
+		picture TABCL.png
+	}
+##
+	visu {
+		Title " 3D mesh created using Gmsh "
+		Width 9cm
+		mesh v_1/EF_stab/test.lata dom
+		normal3D -0.273763 -0.58782 0.761263	
+		up3D 0.506119 0.585006 0.633729
+		zoom3D 0. 0. 0.826446
+		operator no_bounding_box
+		operator no_axes
+		Description " Number of elements: 72692 "
+	}
+#
+	visu {
+		Title " View of the sliced mesh near jet region "
+		Width 9cm
+		mesh v_1/EF_stab/test.lata dom
+		normal3D -0.0766416 -0.996656 0.028523	
+		up3D -0.00810396 0.0290576 0.999545
+		#zoom3D 0. 0. 0.826446
+		operator no_bounding_box
+		#operator no_axes
+	}
+	visu {
+		Title " Closer view of 3D mesh near jet region "
+		Width 9cm
+		mesh v_1/EF_stab/test.lata dom
+		normal3D -0.27453 -0.401271 0.873851
+		up3D 0.926438 0.133056 0.35215
+		zoom3D 0.0767345 -0.0498641 2.57987
+		operator no_bounding_box
+		operator no_axes
+	}
+	visu {
+		Title " Closer view of 3D mesh near jet region "
+		Width 9cm
+		mesh v_1/EF_stab/test.lata dom
+		normal3D 0 -1 0
+		up3D 0 0 1
+		zoom3D 0.128 0 16
+		operator no_bounding_box
+		operator no_axes
+	}
+
+##
+	Table {
+			Title " Initial parameters for axial development of velocity and concentration along centerline "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " Round jet diameter \latex_($d$\latex_)"
+				values 0.003
+			}
+			line {
+			      	legend " Velocity decay constant \latex_($C_1$\latex_) "
+				values 5.5
+			}
+			line {
+			      	legend " Velocity virtual origin \latex_($z_0/d$\latex_) "
+				values 0.0
+			}
+			line {
+			      	legend " Velocity ZFE length \latex_($L/d$\latex_) "
+				values 5.5
+			}
+			line {
+			      	legend " Concentration decay constant \latex_($C_1$\latex_) "
+				values 7.0
+			}
+			line {
+			      	legend " Concentration virtual origin \latex_($z_0/d$\latex_) "
+				values -2.5
+			}
+			line {
+			      	legend " Concentration ZFE length \latex_($L/d$\latex_) "
+				values 4.5
+			}
+	}
+#
+	Table {
+			Title " Water physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file v_1/EF_stab/propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($1)
+			}
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file v_1/EF_stab/propertiesGeometry.dat
+				nb_columns_file 6
+				columns ($2)
+			}
+			line {
+			      	legend " Diffusivity "
+				file v_1/EF_stab/propertiesGeometry.dat
+				nb_columns_file 6
+				columns ($3)
+			}
+	}
+#
+	Description " $\bullet$ Four Simulations are performed in the following way; at the entrance of the calculation domain, the velocity profile is flat, with Uj=1m/s (Re=3000) or Uj=1.56m/s (Re=4680): "
+	Description " - \latex_($U_j$\latex_) = 1 m/s with EF_stab and alpha = 1 "
+	Description " - \latex_($U_j$\latex_) = 1 m/s with EF_stab and alpha = 0.2 "
+	Description " - \latex_($U_j$\latex_) = 1.56 m/s with EF_stab and alpha = 1 "
+	Description " - \latex_($U_j$\latex_) = 1.56 m/s with EF_stab and alpha = 0.2 "
+#
+}
+#########
+#########
+Chapter {
+	Title " Theory "
+	Description " This part describes succintly the mechanics of the submerged jets in stagnant liquid pool and in coflow. It is based on various numerical and experimental studies on the round submerged jets [1]. "
+	Description " "
+	Description " The jet Reynolds number \latex_($\textrm{Re}_{j}$\latex_) is defined as "
+	Description " \latex_($$\textrm{Re}_{i}=\frac{U_{j}.d}{\nu}$$\latex_) "
+	Description " Where $\nu$ stands for the kinematic viscosity "
+	Description " In the initial region of the jet, the mean centreline velocity Uc is equal to the jet inlet velocity Uj. This indicates the jet simply penetrates and there is no momentum transfer or interaction with the surrounding liquid pool. This region is called as the potential core of the jet or Zone of Flow Establishment (ZFE). The region beyond ZFE is known as Zone of Established Flow (ZEF), wherein the jet interacts with the surrounding liquid, the momentum transfer occurs and the jet velocity starts dropping. The Jet centreline Velocity Uc decreases along the longitudinal distance $z$. The decay of the centreline velocity is expressed in the form "
+	Description " \latex_($$\frac{U_{c}}{U_{j}}=\frac{C_{1}}{(z-z_{0})/d}$$\latex_) "
+	Description " Where \latex_($C_{1}$\latex_) is the Velocity Decay Constant and \latex_($z_{0}$\latex_) is distance of virtual origin of the jet from jet exit. "
+	Description " The cross-section velocity profiles, i.e. in radial direction, $r$ ($x$ or $y$ axis), follow the Gaussian distribution given as "
+	Description " \latex_($$ U(z,r)=U_{c}(z)\exp{-(r(z)/b)^{2}}$$\latex_) "
+	Description " Where, $b$ is known as Gaussian width where "
+	Description " \latex_($$ \frac{U(z,b)}{U_{c}(z)}=\frac{1}{e} $$\latex_) "
+	Description " The quantity $b$ is also referred as Velocity/Momentum Jet width. The momentum jet width, increases in longitudinal direction as more surrounding liquid is entrained into jet boundary. The growth of momentum jet width is experimentally observed to be linear and is related to longitudinal distance $z$ as "
+	Description " \latex_($$ b=kz\ \ ;\ \ k = 0.107 $$\latex_) "
+	Description " The similar observations are made for a round jet with inlet concentration \latex_($C_{j}$\latex_) entering into the stagnant liquid pool with zero concentration. The centreline concentration \latex_($C_{c}$\latex_) follows the decay law given below: "
+	Description " \latex_($$\frac{C_{c}}{C_{j}}=\frac{C_{1}}{(z-z_{0})/d}$$\latex_) "
+	Description " Where \latex_($C_{1}$\latex_) is Decay Constant and \latex_($z_{0}$\latex_) is distance of virtual origin of the jet from jet exit.
+	Description " The radial concentration profile follows the Gaussian distribution given as: "
+	Description " \latex_($$ C(z,r)=C_{c}(z)\exp{-(r(z)/b_{t})^{2}}$$\latex_) "
+	Description " Where \latex_($b_{t}$\latex_) is the concentration jet width. The concentration jet width increases linearly with the longitudinal distance $z$, as: "
+	Description " \latex_($$ b_{t}=k_{t}z\ \ ;\ \ k_{t} = 0.120 $$\latex_) "
+#
+}
+#########
+#########
+Chapter {
+	Title " Results: 3D overviews "
+	visu {
+		Title " Velocity field for the jet with exit velocity 1 m/s at t = 4s "
+		width 12cm
+		Pseudocolor v_1/EF_stab/test.lata dom norme_VITESSE SOM
+
+		normal3D -0.648613 -0.727657 -0.223196	
+		up3D 0.0248723 0.272827 -0.961742
+		operator no_bounding_box
+		operator no_axes
+		cycles -1
+      }
+ 	visu {
+		Title " Concentration for the jet with exit velocity 1 m/s at t = 4s "
+		#width 12cm, viewport = 0 0 924 400,clip
+		Pseudocolor v_1/EF_stab/test.lata dom CONCENTRATION SOM
+		normal3D -0.648613 -0.727657 -0.223196	
+		up3D 0.0248723 0.272827 -0.961742
+		operator no_bounding_box
+		operator no_axes
+		cycles -1
+      }
+#
+}
+#########
+#########
+Chapter {
+	Title " Results: Centerline velocity curves "
+	Figure {
+		Title " Decay of centerline velocity: v = 1 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY "Uc/Uj"
+		RangeY 0.05 2.
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab/uc.dat 
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab02/uc.dat 
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+	}
+#v = 1.56 m/s
+	Figure {
+		Title " Decay of centerline velocity: v = 1 .56 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY "Uc/Uj"
+		RangeY 0.05 2.
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab/uc.dat 
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+		Curve {
+			legend " EF_stab: alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab02/uc.dat 
+			columns 1 2
+			Style points
+			TypePoints 13
+		}
+	}
+# 
+}
+#########
+#########
+Chapter {
+	Title " Results: Centerline concentration curves "
+	Figure {
+		Title " Decay of centerline  concentration: v = 1 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY "Cc/Cj"
+		RangeY 0.05 2.
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 3 4
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab/cc.dat 
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab02/cc.dat 
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+	}
+#v = 1.56 m/s
+	Figure {
+		Title " Decay of centerline concentration: v = 1 .56 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY "Cc/Cj"
+		RangeY 0.05 2.
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 3 4
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab/cc.dat 
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+		Curve {
+			legend " EF_stab: alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab02/cc.dat 
+			columns 1 2
+			Style points
+			TypePoints 13
+		}
+	}
+# 
+}
+#########
+#########
+Chapter {
+	Title " Results: width jet curves "
+
+	Description "In the calculation of jet width, the values used for Uc and Cc are the calculated values (value at centerline of velocity and concentration field)."
+	Figure {
+		Title " Velocity/Momentum jet width: v = 1 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY " b/d "
+		RangeY 0.4 10
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			Fonction 0.107*x
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab/bvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 13
+		}
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab02/bvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+	}
+#
+	Figure {
+		Title " Velocity/Momentum jet width: v = 1.56 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY " b/d "
+		RangeY 0.4 10
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			Fonction 0.107*x
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab/bvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 13
+		}
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab02/bvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+	}
+#
+	Figure {
+		Title " Concentration jet width: v = 1 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY " b/d "
+		RangeY 0.4 10
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			Fonction 0.120*x
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab/btvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 13
+		}
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab02/btvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+	}
+#
+	Figure {
+		Title " Concentration jet width: v = 1.56 m/s "
+		#Width 12cm, viewport= 0 0 700 750,clip
+		Width 12cm
+		Dimension 2
+		LabelX " z/d "
+		RangeX 1. 100.
+		LogX
+		LabelY " b/d "
+		RangeY 0.4 10
+		LogY
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			Fonction 0.120*x
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab/btvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 13
+		}
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab02/btvalues.dat
+			columns 1 2
+			Style points
+			TypePoints 12
+		}
+	}
+#
+
+#
+}
+#########
+#########
+Chapter {
+	Title " Results: normalised radial velocity and concentration profiles at different longitudinal distances along the jet "
+	Description "In the graphs below, the normalization values Uc and Cc are the calculated values (values at centerline of velocity and concentration field)."
+#velocity : v = 1 m/s
+	Figure {
+		Title " Normalised radial velocity: v = 1 m/s (alpha = 1) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " U/Uc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialU_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+	Figure {
+		Title " Normalised radial velocity: v = 1 m/s (alpha = 0.2) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " U/Uc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialU_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+# velocity: v = 1.56 m/s
+	Figure {
+		Title " Normalised radial velocity: v = 1.56 m/s (alpha = 1) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " U/Uc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialU_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+	Figure {
+		Title " Normalised radial velocity: v = 1.56 m/s (alpha = 0.2) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " U/Uc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialU_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+# concentration: v = 1 m/s
+	Figure {
+		Title " Normalised radial concentration: v = 1 m/s (alpha = 1)"
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " C/Cc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab/radialC_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+	Figure {
+		Title " Normalised radial concentration: v = 1 m/s (alpha = 0.2) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " C/Cc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab02/radialC_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+# concentration: v = 1.56 m/s
+	Figure {
+		Title " Normalised radial concentration: v = 1.56 m/s (alpha = 1) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " C/Cc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab/radialC_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+	Figure {
+		Title " Normalised radial concentration: v = 1.56 m/s (alpha = 0.2) "
+		Width 12cm
+		Dimension 2
+		LabelX " r/b "
+		RangeX 0. 3.
+		LabelY " C/Cc "
+		RangeY -0.1 1.1
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
+			Fonction exp(-(x**2))
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.015.dat
+			columns 1 2
+			Style points
+			TypePoints 1
+		}
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.030.dat
+			columns 1 2
+			Style points
+			TypePoints 2
+		}
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.045.dat
+			columns 1 2
+			Style points
+			TypePoints 3
+		}
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.060.dat
+			columns 1 2
+			Style points
+			TypePoints 4
+		}
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.075.dat
+			columns 1 2
+			Style points
+			TypePoints 5
+		}
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.090.dat
+			columns 1 2
+			Style points
+			TypePoints 6
+		}
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.105.dat
+			columns 1 2
+			Style points
+			TypePoints 7
+		}
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.120.dat
+			columns 1 2
+			Style points
+			TypePoints 8
+		}
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.135.dat
+			columns 1 2
+			Style points
+			TypePoints 9
+		}
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab02/radialC_0.150.dat
+			columns 1 2
+			Style points
+			TypePoints 10
+		}
+	}
+#
+}
+#########
+#########
+Chapter {
+	Title "Conclusion"
+	Description " $\bullet$ Decay of centerline velocity /  concentration:  "
+	Description " \latex_($\rightarrow$\latex_) The Decay of centerline velocity is reproduced very well, both for EF_stab=1 and for EF_stab=0.2. For the concentration, the tendency is very well reproduced in all cases, in spite of a slight and constant deviation. "
+	Description " "
+	Description " $\bullet$ Momentum / concentration jet width: "
+	Description " \latex_($\rightarrow$\latex_) We obtain a linear variation of $b/d=f(z/d)$ as predicted. The predicted slope is calculated very well in all cases is spite of a constant deviation. "
+	Description " \latex_($\rightarrow$\latex_) The two values of alpha give similar results, with very slightly better results at low z/d. "
+	Description " "
+	Description " $\bullet$ Normalized radial velocity: "
+	Description " \latex_($\rightarrow$\latex_) For both jet velocities (1m/s and 1.56m/s): good tendancies, values close to the analytical profile. "
+	Description " \latex_($\rightarrow$\latex_) The two values of alpha give similar results. "
+	Description " "
+	Description " $\bullet$ Normalized radial concentration: "
+	Description " \latex_($\rightarrow$\latex_) For both jet velocities (1m/s and 1.56m/s): good tendancies, values close to the analytical profile. "
+	Description " \latex_($\rightarrow$\latex_) The two values of alpha give similar results. "
+}
+#####
+Chapter {
+	Title "Recommendations for users"
+	Description " Calculations with alpha = 0.2 are slightly better than those with alpha = 1. " 
+}
+#####
+Chapter {
+	Title "Computer performance"
+		tableau_performance {
+		}
+
+}
+
+
+
+

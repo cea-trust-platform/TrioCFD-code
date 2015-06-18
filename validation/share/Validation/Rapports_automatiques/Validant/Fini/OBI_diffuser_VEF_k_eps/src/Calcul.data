@@ -1,0 +1,142 @@
+# Hydraulique 3 #
+# lance_test 3 ecarts #
+
+dimension 3
+
+Domaine DOM_DOM
+
+Read_unsupported_ASCII_file_from_ICEM DOM_DOM trio_DOM_geo.asc
+
+Domaine DOM_2D
+
+Extract_2D_from_3D DOM_DOM left DOM_2D
+
+dimension 2
+
+Pb_Hydraulique_Turbulent pb
+
+VerifierCoin DOM_2D { }
+
+Ecrire_fichier DOM_2D OBI_2D.geom
+
+VEFPreP1B dis
+Read dis { P0 P1 Changement_de_base_P1bulle 1  Modif_div_face_dirichlet 1 }
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.0
+	tmax 600.
+	dt_min 1.e-10
+	dt_max 3.0
+	dt_impr 1.0
+	dt_sauv 1000.
+	seuil_statio 1.e-8
+	facsec 50.	
+	facsec_max 2000
+	periode_sauvegarde_securite_en_heures 5
+	solveur implicite
+	{		
+		seuil_convergence_solveur 1.e-12
+		solveur gmres { diag seuil 1.e-12 impr controle_residu 1 }
+	}
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 5.7e-5
+	rho Champ_Uniforme 1 1.
+}
+
+
+Associate pb DOM_2D
+Associate pb fluide
+Associate pb sch
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent											
+	{
+		solveur_pression Cholesky { }
+		convection { EF_stab { alpha 0.2 } }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 1. 0. 
+					}
+		boundary_conditions 
+		{
+			in      frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb vitesse 2 
+											moyenne_imposee connexion_approchee fichier FICHIER_V_PREPARE
+											ampli_moyenne_imposee 2 1. 1. 
+											ampli_moyenne_recyclee 2 0. 0. 
+											ampli_fluctuation 2 0. 0. }
+			out     frontiere_ouverte_pression_imposee champ_front_Uniforme 1 0.
+			wall    paroi_fixe
+		}
+      		 modele_turbulence K_Epsilon 
+                 {
+           	   	Transport_K_Epsilon 
+                  	{
+           		  convection { EF_stab { alpha 0.2 } }
+                 	  diffusion { }
+                	  boundary_conditions
+                	    {
+              			in frontiere_ouverte_K_eps_impose champ_front_recyclage { pb_champ_evaluateur pb k_eps 2 
+											moyenne_imposee connexion_approchee fichier FICHIER_K_PREPARE 
+											ampli_moyenne_imposee 2 1. 1. 
+											ampli_moyenne_recyclee 2 0. 0. 
+											ampli_fluctuation 2 0. 0.  }
+              			out frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0.125e-2 0.492e-2
+              			wall paroi                                            
+          	 	    }
+           	 	  conditions_initiales 
+           	 	   {
+              			k_Eps Champ_Uniforme 2 1.6e-7 1.6e-8
+                           }
+            		}
+			turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet } 
+	       }
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 50.
+       			}
+					}
+	}
+	Postraitement
+	{
+
+		Sondes
+		{
+			
+			sonde_V03 vitesse periode 0.01 segment 30   3. 3.25  3. 4.55 
+			sonde_V06 vitesse periode 0.01 segment 30   6. 2.65  6. 4.55
+			sonde_V14 vitesse periode 0.01 segment 30  14. 1.50 14. 4.698
+			sonde_V17 vitesse periode 0.01 segment 30  17. 0.90 17. 4.698
+			sonde_V21 vitesse periode 0.01 segment 30  20. 0.43 20. 4.698
+			sonde_V24 vitesse periode 0.01 segment 30  24. 0.30 24. 4.698
+			sonde_V27 vitesse periode 0.01 segment 30  27. 0.30 27. 4.698
+			sonde_V30 vitesse periode 0.01 segment 30  30. 0.30 30. 4.698
+			sonde_V34 vitesse periode 0.01 segment 30  34. 0.30 34. 4.698
+			
+		}
+		Format lata
+		Champs binaire dt_post 100.
+		       {
+			pression_pa elem
+			vitesse faces
+			k elem
+			eps elem
+			viscosite_turbulente elem
+			y_plus elem
+		       }
+	}
+Sauvegarde binaire OBI.sauv 
+            
+}
+
+Solve pb
+End
+

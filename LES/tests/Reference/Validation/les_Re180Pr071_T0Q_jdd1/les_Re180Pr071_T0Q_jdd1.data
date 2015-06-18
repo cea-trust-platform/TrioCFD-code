@@ -1,0 +1,167 @@
+# SIMULATION D UN CANAL 3D NON TOURNANT avec la loi de paroi standard logarithmique #
+# PARALLEL ONLY 2 #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+Scatter dom.Zones dom
+#
+y+=17
+dx+= 50
+dz+= 50 #
+
+Runge_Kutta_ordre_3 sch
+Read sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 1000
+	dt_min 1.e-7
+	dt_impr 20
+	dt_sauv 500
+	seuil_statio 1.e-8
+}
+
+VDF dis
+
+Fluide_Incompressible air
+Read air
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 20.772e-2
+	Cp Champ_Uniforme	1 5193.
+	beta_th Champ_Uniforme	1 1.9954e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0
+ 
+Associate air gravite
+Associate pb dom
+Associate pb sch
+Associate pb air
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Turbulent	
+	{
+		solveur_pression Petsc Cholesky { } 
+		convection { centre }
+		diffusion { }
+		conditions_initiales {
+			vitesse champ_init_canal_sinal 3  { Ucent 1.2062 h 1.0  ampli_sin 0.3 omega 2. ampli_bruit 0.0 
+								dir_wall 1 dir_flow 0 }
+			}
+        	Sources {
+			Canal_perio { bord periox  }
+			}
+		boundary_conditions {
+			periox  periodique
+			perioz periodique 
+			haut  paroi_fixe
+	                bas  paroi_fixe
+		}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi loi_standard_hydr
+                        dt_impr_ustar 100
+			}
+		Traitement_particulier
+			{
+			canal { 	
+		        dt_impr_moy_spat 100
+		        dt_impr_moy_temp 100 
+		        debut_stat  600.
+				 }
+			}	
+
+        }
+
+
+        Convection_Diffusion_Temperature_Turbulent
+                {
+                diffusion { }
+		convection { quick }
+                Sources {
+                        Puissance_thermique Champ_uniforme 1 1
+                        }                                                                                           
+                Modele_turbulence Prandtl { 
+			Turbulence_paroi loi_standard_hydr_scalaire 
+			dt_impr_nusselt 100
+			}
+                boundary_conditions
+                        {
+                        periox periodique
+                        perioz periodique
+                        haut   paroi_temperature_imposee Champ_Front_Uniforme 1 0
+                        bas    paroi_temperature_imposee Champ_Front_Uniforme 1 0
+                        }
+                conditions_initiales { Temperature Champ_Fonc_xyz dom 1 0. }
+                }
+
+	Postraitement
+	{
+ 	Definition_champs
+
+                        {
+                        Moyenne_U Champ_Post_Statistiques_Moyenne
+
+                                                           {
+                                                            t_deb 600.	t_fin 1000.
+                                                           source Champ_Post_refChamp { Pb_champ pb vitesse }
+                                                           }
+                        Ecart_type_U Champ_Post_Statistiques_Ecart_type
+                                                           {
+                                                            t_deb 600.	t_fin 1000.
+                                                           source Champ_Post_refChamp { Pb_champ pb vitesse }
+                                                           }
+                        Moyenne_temperature Champ_Post_Statistiques_Moyenne
+
+                                                           {
+                                                            t_deb 600.	t_fin 1000.
+                                                           source Champ_Post_refChamp { Pb_champ pb temperature }
+                                                           }
+                        Ecart_type_temperature Champ_Post_Statistiques_Ecart_type
+                                                           {
+                                                            t_deb 600.	t_fin 1000.
+                                                           source Champ_Post_refChamp { Pb_champ pb temperature }
+                                                           }
+                        } 
+	     format lml
+	     Sondes
+	          {
+			coupe_vit  vitesse periode 10  segment 200   3.2 0. 1.6       3.2 2 1.6
+			coupe_theta temperature  periode 10. segment 200 3.2 0. 1.6       3.2 2 1.6
+			coupe_T_moyen Moyenne_temperature  periode 10. segment 200 3.2 0. 1.6       3.2 2 1.6
+			coupe_T_et Ecart_type_temperature  periode 10. segment 200 3.2 0. 1.6       3.2 2 1.6
+			coupe_U_moyen Moyenne_U  periode 10. segment 200 3.2 0. 1.6       3.2 2 1.6
+			coupe_U_et Ecart_type_U  periode 10. segment 200 3.2 0. 1.6       3.2 2 1.6
+			sonde_U1 vitesse  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_T1 temperature  periode 0.1 points 1 3.2 1. 1.6 
+			sonde_U2 vitesse  periode 0.1 points 1 3.2 1.8 1.6 
+			sonde_T2 temperature  periode 0.1 points 1 3.2 1.8 1.6 
+	          }
+		Champs binaire dt_post 100
+			{
+			vitesse elem
+			temperature elem
+			}
+		Statistiques dt_post 100
+		{
+                  t_deb 600.	t_fin 1000.
+                  moyenne vitesse
+		  moyenne temperature
+		  ecart_type temperature
+		  ecart_type vitesse
+		  correlation vitesse vitesse elem
+		  correlation vitesse temperature elem		  
+		}
+	}
+
+}
+
+Solve pb
+End

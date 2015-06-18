@@ -1,0 +1,74 @@
+# Hydraulique 2D, fluide air #
+dimension 2
+Pb_hydraulique_turbulent pb
+Domaine dom
+# Reynolds=0.14*12*1.2/0.00002~1e5 sans dilatation #
+# BEGIN MESH #
+Read_file_binary dom forme_bin.geom
+Dilate dom 0.3
+Postraiter_domaine { domaine dom format lata fichier forme }
+Distance_paroi
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 9 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+# Je choisis une discretisation #
+VEFPreP1B ma_discretisation
+
+Schema_Euler_implicite mon_schema
+Read mon_schema
+{
+	tinit 0
+	tmax 0.2
+	dt_min 1.e-10
+	dt_max 1.e+10
+	dt_impr 1.e-6
+	dt_sauv 100
+	seuil_statio 1.e-4
+	seuil_statio_relatif_deconseille 1
+	facsec 20
+	facsec_max 30
+	solveur implicite { solveur gmres { diag nb_it_max 5 seuil 1.e-20 impr } }
+}
+
+# Je definis un milieu #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu  Champ_Uniforme 1 0.00002
+	rho Champ_Uniforme 1 1.2
+}
+
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression petsc cholesky { } 
+		convection { muscl }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 12. 0.
+			}
+		boundary_conditions {
+			Haut  	symetrie
+		      	Axe  	symetrie
+			Forme 	paroi_fixe
+			Sortie 	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			Entree 	frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 12. 0.
+		}

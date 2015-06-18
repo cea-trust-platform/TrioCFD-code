@@ -1,0 +1,33 @@
+#!/bin/bash
+
+mkdir -p  Calcul_fin Calcul_gros
+gunzip -c trio_DOM_geo.asc.gz > trio_DOM_geo.asc
+
+
+############   CALCUL PRINCIPAL UTILISANT LA BOITE PERIO 1 ###############
+#preparation du repertoire pour le calcul final sur le vrai maillage
+cd ./Calcul_fin
+
+cp ../Prepare_extrude.data Prepare.data
+
+cp ../Calcul.data .
+cp ../properties.py .
+ln -s -f ../trio_DOM_geo.asc .
+cp ../post_run ../pre_run .
+
+
+
+########### CALCUL PRINCIPAL UTILISANT LA BOITE PERIO 2 #################
+#preparation du repertoire pour le calcul final sur le vrai maillage
+cd ../Calcul_gros
+
+cp ../Prepare_extract.data Prepare.data
+
+cp ../Calcul.data .
+cp ../properties.py .
+ln -s -f ../trio_DOM_geo.asc .
+cp ../post_run ../pre_run .
+
+
+
+

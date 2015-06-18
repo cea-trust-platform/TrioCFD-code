@@ -1,0 +1,144 @@
+# SIMULATION D UN CANAL PLAN 3D EN LES #
+# EN THERMOHYDRAULIQUE : Hypothese de Boussinesq #
+dimension 3
+Domaine dom
+Mailler dom
+{
+Pave Cavite
+        {
+                Origine 0. 0. 0. 
+                Nombre_de_Noeuds 29 7 7
+                Longueurs 1. 0.2 0.2
+        }
+        {
+                Bord periox   X = 0.     0. <= Y <= 0.2  0. <= Z <= 0.2
+                Bord periox   X = 1.     0. <= Y <= 0.2  0. <= Z <= 0.2 
+		Bord perioz   Z = 0.     0. <= X <= 1    0. <= Y <= 0.2 
+		Bord perioz   Z = 0.2    0. <= X <= 1    0. <= Y <= 0.2
+                Bord bas      Y = 0.     0. <= X <= 1.   0. <= Z <= 0.2 
+                Bord haut     Y = 0.2    0. <= X <= 1.   0. <= Z <= 0.2 
+ 
+                }
+}
+
+Tetraedriser_Homogene dom
+
+Corriger_frontiere_periodique {
+	domaine dom
+	bord periox
+}
+Corriger_frontiere_periodique {
+	domaine dom
+	bord perioz
+}
+
+Pb_Thermohydraulique_Turbulent pb
+VEFPreP1b dis
+
+
+# Sch_CN_iteratif sch #
+# Runge_Kutta_ordre_3 sch #
+Schema_Euler_Explicite sch
+Read sch
+	{
+	tinit 0.
+	nb_pas_dt_max 2
+        tmax 3.
+	dt_min 1.e-8
+	dt_max 1.e-1
+	dt_impr 1e-1
+	dt_sauv 500.
+        seuil_statio 1.e-8
+	facsec 0.5
+	}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme	1 2.84e-5
+	rho Champ_Uniforme	1 0.0976
+	lambda Champ_Uniforme	1 1.e-11
+	Cp Champ_Uniforme	1 5193.
+	beta_th Champ_Uniforme	1 1.9954e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0 0 0 
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP
+			{
+			precond ssor { omega 1.5 } 
+			seuil 1e-7
+			impr
+			}
+		convection { negligeable }
+		diffusion { negligeable }
+		conditions_initiales
+			{
+			vitesse champ_uniforme 3 1 0 0 
+			}			
+		boundary_conditions
+			{
+			periox   periodique
+			perioz   periodique
+			haut     paroi_defilante Champ_Front_Uniforme 3 1. 0. 0.
+			bas      paroi_defilante Champ_Front_Uniforme 3 1. 0. 0.
+			}
+		Modele_turbulence sous_maille_wale
+			{
+			turbulence_paroi negligeable
+			cw 1e-30
+			}
+		}
+
+
+	Convection_Diffusion_Temperature_Turbulent
+		{
+		diffusion { negligeable  }
+		convection { amont }
+		Modele_turbulence Prandtl
+			{
+			turbulence_paroi negligeable_scalaire
+			}
+		boundary_conditions 
+			{
+			periox periodique
+ 			perioz periodique
+			haut   paroi_adiabatique
+			bas    paroi_adiabatique
+			}
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1  10+(x>0.4)-(x>0.6) }
+		
+		}
+
+	Postraitement
+        	{       
+                format lml
+                Sondes
+                	{ 
+                        sonde_temp nodes temperature periode 0.01 segment 90 0. 0.15 0.15 
+									  1. 0.15 0.15							
+		
+			}
+		Champs binaire dt_post 5.
+			{
+			vitesse elem
+			temperature elem
+			}
+		}
+	}
+
+Solve pb
+End
+

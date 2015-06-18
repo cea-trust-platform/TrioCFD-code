@@ -1,0 +1,212 @@
+# Thermohydraulique 2D avec transport 1 constituant et terme source #
+# PARALLEL RUNS #
+dimension 2
+Bidim_Axi
+
+Pb_hydraulique_Concentration pb
+Domaine dom_1
+
+# BEGIN MESH #
+Read_file dom_1 BURATTI_M2.geom
+# END MESH #
+      
+# BEGIN PARTITION
+Partition dom_1
+{
+	Partitionneur tranche { tranches 1 12 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom_1
+END SCATTER #
+
+Sous_Zone zone_injection
+Associate zone_injection dom_1
+Read zone_injection {
+  Fonction_sous_zone (y>2*2*(0.050+0.002))*(y<(2*2*(0.050+0.002)+(0.050+0.002)))
+}
+
+VDF dis
+
+Schema_Euler_explicite sch
+Read sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 150.
+	dt_min 1.e-6
+	dt_max 0.002
+	dt_impr 10.
+	dt_sauv 50.
+	seuil_statio 1.e-5
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu	Champ_Uniforme 1 1.e-3
+	rho	Champ_Uniforme 1 1000
+      # beta_co	Champ_fonc_xyz dom_1 1 1. #
+}
+
+Constituant c
+Read c
+{
+coefficient_diffusion Champ_Uniforme 1 1.e-8
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom_1
+Associate pb sch
+Associate pb fluide
+Associate pb c
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+	 	solveur_pression petsc Cholesky { }
+		convection { quick }
+		diffusion { }
+		# sources { boussinesq_concentration { C0 Champ_uniforme 1 1. } } #
+		conditions_initiales
+		{
+		  vitesse Champ_Fonc_Reprise hydraulique.xyz pb vitesse last_time	
+		}
+		boundary_conditions
+		{
+			sortie	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			entree	frontiere_ouverte_vitesse_imposee Champ_Front_fonc_txyz 2  0. 4.255*0.00625+4.255*0.019*PI*sin(2*PI*t)
+			paroi	paroi_fixe
+			axe	symetrie
+			disque_disque paroi_fixe
+			couronne paroi_fixe
+		}
+		
+	}
+	Convection_diffusion_Concentration
+	{
+		diffusion { }
+		convection { quick }
+		
+		conditions_initiales
+		{
+		  concentration Champ_Uniforme_Morceaux dom_1 1
+			{
+				defaut 0.
+				zone_injection 1
+			}
+		}
+		boundary_conditions
+		{
+			sortie	frontiere_ouverte_concentration_imposee Champ_Front_Uniforme 1 0.
+			entree	frontiere_ouverte_concentration_imposee Champ_Front_Uniforme 1 0.
+			paroi	Paroi
+			axe	symetrie
+			disque_disque Paroi
+			couronne Paroi
+		}
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_pres_bas  pression      periode 0.1 points 1 0.01125 0.01
+			sonde_vit_bas   vitesse	      periode 0.1 points 1 0.01125 0.01
+			sonde_conc_bas  concentration periode 0.1 points 1 0.01125 0.01
+			
+			sonde_pres_mil  pression      periode 0.1 points 1 0.01125 0.300
+			sonde_vit_mil   vitesse	      periode 0.1 points 1 0.01125 0.300
+			sonde_conc_mil  concentration periode 0.1 points 1 0.01125 0.300
+			
+			sonde_pres_haut pression      periode 0.1 points 1 0.01125 0.614
+			sonde_vit_haut  vitesse	      periode 0.1 points 1 0.01125 0.614
+			sonde_conc_haut concentration periode 0.1 points 1 0.01125 0.614
+			
+			sonde_var       var           periode 0.1 points 1 0.01125 0.01
+			sonde_masse0    masse0        periode 0.1 points 1 0.01125 0.01
+			
+			sonde_conc_L1   concentration periode 0.1 points 1 0.01125 0.291			
+			sonde_conc_L2   concentration periode 0.1 points 1 0.01125 0.330
+			
+			sonde_conc_L1G      concentration periode 0.1 points 1 0.0025 0.291			
+			sonde_conc_L2G      concentration periode 0.1 points 1 0.0025 0.330
+		}
+		Format lml
+		
+		Definition_champs
+		{
+        	         masse0 Reduction_0D { methode somme_ponderee
+					         source Transformation 
+					         { 
+					          methode formule expression 1 rho/12      
+						  source refChamp { nom_source rho Pb_champ pb masse_volumique } 
+					         }  
+				             }
+		
+        		 ymoy_elem Transformation
+                             {
+			        
+				methode formule expression 1 (rho/masse0)*y*concent
+				sources { refChamp { nom_source concent Pb_champ pb concentration } , 
+				          refChamp { nom_source rho Pb_champ pb masse_volumique }  ,
+					  Reduction_0D { nom_source masse0
+					                 methode  somme_ponderee
+					                 source Transformation 
+					                  { 
+					                   methode formule expression 1 rho/12
+						           source refChamp { nom_source rho Pb_champ pb masse_volumique } 
+					                  }  
+				                      }  			       
+				       }
+                     	     }
+			 
+			    
+			var_elem  Transformation
+                             {
+				methode formule expression 1 (rho/masse0)*((y-ymoy)^2)*concent
+				sources { refChamp { nom_source concent Pb_champ pb concentration } ,
+					  refChamp { nom_source rho Pb_champ pb masse_volumique }  ,
+				          Reduction_0D { nom_source ymoy 
+					                 methode somme_ponderee
+							 sources_reference { ymoy_elem  }
+						       } ,
+					  Reduction_0D { nom_source masse0
+					                 methode  somme_ponderee
+					                 source Transformation 
+					                  { 
+					                   methode formule expression 1 rho/12    
+						           source refChamp { nom_source rho Pb_champ pb masse_volumique } 
+					                  }  
+				                      } 
+				        }
+                     	     }
+			     
+			var Reduction_0D
+			    {
+			        methode somme_ponderee sources_reference { var_elem }
+			    }     
+			    		
+		}
+		
+		Champs dt_post 100
+		{
+		        vitesse		som
+			concentration   som			
+		}
+	}
+}
+
+Solve pb
+End
+

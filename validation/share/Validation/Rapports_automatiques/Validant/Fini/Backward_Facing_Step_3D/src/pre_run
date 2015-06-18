@@ -1,0 +1,40 @@
+#!/bin/bash
+################################################################################
+# La base ERCOFTAC sur l'experience de Kim ne precise pas la vitesse debitante
+# mais parle uniquement d'une vitesse de reference U=18.2m/s qu'il serait abusif
+# de prendre comme vitesse debitante
+# Pour coller au plus pres de l'experience, on va donc imposer a x=-4h
+# le profil de vitesse experimental.
+# Pour cela:
+# A) Creation d'un fichier .dat au format xyz du INLET en faisant un 1er run
+# sur un pas de temps avec un jeu de donnees legerement modifie (fait par le pre_run)
+################################################################################
+rm -f *.dat
+NB_PROCS="`ls *.Zones 2>/dev/null | wc -l`" && [ "$NB_PROCS" = 0 ] && NB_PROCS=""
+triou prepare $NB_PROCS 1>prepare.out 2>&1
+dat=`ls -rt *.dat`
+[ "$dat" = "" ] && echo "Erreur dans prepare" && exit -1
+#################################################################################
+# B) Construction d'un fichier VELOCITY_PROFILE_INLET.dat en mixant
+# les coordonnes du fichier .dat precedant avec les donnees experimentales de Kim
+#################################################################################
+H=`awk '/H=/ {gsub("H=","",$1);print $1}' ./info.prepare`
+csv=./x_-4h.csv # Donnees experimentales de Kim a x=-4h
+awk -v H=$H -v csv=$csv 'BEGIN {Udeb=0;u[0]=0;y[0]=0;n=1;\
+   # Lecture du fichier csv \
+   while (getline < csv) {u[n]=$1;y[n]=$2;n++} \
+   # On complete dans la demie moitie superieure: \
+   for (i=0;i<n;i++) {y[n+i]=H-y[n-1-i];u[n+i]=u[n-1-i]} \
+   n*=2;\
+} \
+(NF<=1) {print $0};\
+(NF>1) {Y=$2;i=0;while (y[i+1]<Y) {i++};U=u[i]+(u[i+1]-u[i])*(Y-y[i])/(y[i+1]-y[i]); \
+print $1" "$2" "(NF==4?"":$3)" "U" "(NF==4?"0. ":" 0. 0."); \
+} ' $dat > VELOCITY_PROFILE_INLET.dat
+rm -f prepare*
+######################################################################################
+# C) On utilisera ensuite Champ_Front_Lu dans le jeu de donnees pour relire ce fichier
+######################################################################################
+
+# Pour castor (queue prod)
+export prod=1

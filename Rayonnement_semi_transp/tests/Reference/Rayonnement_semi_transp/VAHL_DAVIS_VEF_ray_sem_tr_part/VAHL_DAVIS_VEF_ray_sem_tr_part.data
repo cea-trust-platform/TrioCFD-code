@@ -1,0 +1,297 @@
+# Thermohydraulique 2D VEF Boussinesq + rayonnement semi transparent #
+# PARALLEL OK #
+dimension 2
+Pb_Thermohydraulique pb
+Pb_conduction pb_partition
+
+Domaine dom_fluide
+Domaine dom_solide
+
+# BEGIN MESH #
+Mailler dom_fluide
+{
+	Pave Cavite_fluide1
+		{
+		Origine 0. 0.
+     		Nombre_de_Noeuds 20 41
+		Longueurs 2.8575e-2 6.35e-2
+		}
+		{
+		Bord Gauche1                       X = 0.               0. <= Y <= 6.35e-2
+		Bord Haut1                         Y = 6.35e-2          0. <= X <= 2.8575e-2
+		Raccord local homogene Droit1_haut X = 2.8575e-2 4.7625e-2 <= Y <= 6.35e-2
+		Bord Bas1 			   Y = 0.               0. <= X <= 2.8575e-2
+		Raccord local homogene Droit1_bas  X = 2.8575e-2        0. <= Y <= 1.5875e-2
+		} ,
+
+	Pave Cavite_fluide2
+		{
+		Origine 2.8575e-2 1.5875e-2
+		Nombre_de_Noeuds 5 21
+		Longueurs 6.35e-3 3.175e-2
+		}
+		{
+		Raccord local homogene Haut2  Y = 4.7625e-2     2.8575e-2 <= X <= 3.4925e-2
+		Raccord local homogene Bas2   Y = 1.5875e-2     2.8575e-2 <= X <= 3.4925e-2
+		} ,
+	
+	Pave Cavite_fluide3
+		{
+		Origine 3.4925e-2 0.
+		Nombre_de_Noeuds 20 41
+		Longueurs 2.8575e-2 6.35e-2
+		}
+		{
+		Raccord local homogene Gauche3_haut    X = 3.4925e-2    4.7625e-2 <= Y <= 6.35e-2
+		Bord Haut3                             Y = 6.35e-2      3.4925e-2 <= X <= 6.35e-2
+		Bord Droit3                            X = 6.35e-2             0. <= Y <= 6.35e-2
+		Raccord local homogene Gauche3_bas     X = 3.4925e-2           0. <= Y <= 1.5875e-2
+		Bord Bas3                              Y = 0.           3.4925e-2 <= X <= 6.35e-2
+		}
+}
+
+Mailler dom_solide
+{
+	Pave Partition_Haut
+		{
+		Origine 2.8575e-2 4.7625e-2
+		Nombre_de_Noeuds 5 11
+		Longueurs 6.35e-3 1.5875e-2
+		}
+		{
+		Raccord local homogene Droit1_haut    X = 2.8575e-2   4.7625e-2 <= Y <= 6.35e-2
+		Raccord local homogene Haut2          Y = 4.7625e-2   2.8575e-2 <= X <= 3.4925e-2
+		Raccord local homogene Gauche3_haut   X = 3.4925e-2   4.7625e-2 <= Y <= 6.35e-2
+		Bord Haut_Part_Haut                   Y = 6.35e-2     2.8575e-2 <= X <= 3.4925e-2
+		} ,
+
+	Pave Partition_Bas
+		{
+		Origine 2.8575e-2 0.
+		Nombre_de_Noeuds 5 11
+		Longueurs 6.35e-3 1.5875e-2
+		}
+		{
+		Raccord local homogene Droit1_bas   X = 2.8575e-2         0. <= Y <= 1.5875e-2
+		Raccord local homogene Bas2         Y = 1.5875e-2  2.8575e-2 <= X <= 3.4925e-2
+		Raccord local homogene Gauche3_bas  X = 3.4925e-2         0. <= Y <= 1.5875e-2
+		Bord Bas_Part_Bas                   Y = 0.         2.8575e-2 <= X <= 3.4925e-2
+		}
+}
+
+Trianguler_H dom_solide
+Trianguler_H dom_fluide
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_fluide
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM1
+}
+Partition dom_solide
+{
+	Partitionneur tranche { tranches 2 1 }
+	Larg_joint 2
+	Nom_Zones DOM2
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom_fluide
+Scatter DOM2.Zones dom_solide
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0.
+	tmax 0.01
+	dt_min 0.0001
+	dt_max 0.1
+	dt_impr 0.001
+	dt_sauv 100
+	seuil_statio 1.e-8
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 7.5888e-05
+	rho Champ_Uniforme 1 2
+	lambda Champ_Uniforme 1 0.029
+	Cp Champ_Uniforme 1 275.15
+	beta_th Champ_Uniforme 1 1.8231e-2
+	indice Champ_Uniforme 1 1.
+	kappa Champ_Uniforme 1 1.
+}
+
+
+Solide solide
+Lire solide
+{
+	rho Champ_Uniforme 1 50.
+	lambda Champ_Uniforme 1 1.
+	Cp Champ_Uniforme 1 500
+}
+
+
+
+Champ_Uniforme gravite
+Lire gravite 2 0 -9.81
+
+Modele_rayo_semi_transp modele_rayo
+Associate modele_rayo dom_fluide
+Associate solide gravite
+Associate pb_partition dom_solide
+Associate pb_partition solide
+
+Associate fluide gravite
+Associate pb dom_fluide
+Associate pb fluide
+
+Pb_Couple_rayo_semi_transp pbc
+Associate pbc pb_partition
+Associate pbc pb
+Associate pbc modele_rayo
+Associate pbc sch
+Discretize pbc dis
+
+
+Lire modele_rayo
+{
+	Eq_rayo_semi_transp
+	{
+	solveur GCP { precond SSOR { omega 0.8 } seuil 1.000000e-10 impr }
+	boundary_conditions 
+		{
+		Haut1 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Gauche1 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Bas1 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Droit1_haut Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Droit1_bas Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Haut2 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Bas2 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Haut3 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Bas3 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Gauche3_haut Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Gauche3_bas Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		Droit3 Flux_radiatif_VEF A 2 emissivite Champ_front_Uniforme 1 1.
+		}		
+	}
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_irra irradiance periode 0.1 segment 40 0. 3.175e-2 6.35e-2 3.175e-2
+		}
+		Champs dt_post 0.5
+		{
+			irradiance elem
+		}
+	}
+}
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression GCP { precond ssor { omega 1.65 } seuil 1.e-10 } 
+		convection { Amont }
+		diffusion { }
+		sources { boussinesq_temperature { T0 304.35 } }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions 
+			{
+			Haut1 paroi_fixe
+			Gauche1 paroi_fixe
+			Bas1 paroi_fixe
+			Droit1_haut paroi_fixe
+			Droit1_bas paroi_fixe
+			Haut2 paroi_fixe
+			Bas2 paroi_fixe
+			Haut3 paroi_fixe
+			Bas3 paroi_fixe
+			Gauche3_haut paroi_fixe
+			Gauche3_bas paroi_fixe
+			Droit3 paroi_fixe
+			}
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { amont }
+		sources { Source_rayo_semi_transp }
+		boundary_conditions 
+			{
+			Haut1 paroi_adiabatique
+			Gauche1  Paroi_temperature_imposee Champ_Front_Uniforme 1 296.6
+			Bas1 paroi_adiabatique
+			Droit1_haut Paroi_contact pb_partition Droit1_haut 
+			Droit1_bas Paroi_contact pb_partition Droit1_bas
+			Haut2 Paroi_contact pb_partition Haut2 
+			Bas2 Paroi_contact pb_partition Bas2
+			Haut3 paroi_adiabatique
+			Bas3 paroi_adiabatique
+			Gauche3_haut Paroi_contact pb_partition Gauche3_haut
+			Gauche3_bas Paroi_contact pb_partition Gauche3_bas
+			Droit3  Paroi_temperature_imposee Champ_Front_Uniforme 1 312.1
+			}
+		conditions_initiales { Temperature Champ_Uniforme 1 304.35 }
+	}
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_vit vitesse periode 0.1 segment 40 0. 3.175e-2 6.35e-2 3.175e-2
+			sonde_temp_fluide temperature periode 0.1 segment 40 0. 3.175e-2 6.35e-2 3.175e-2
+			sonde_convergence vitesse periode 0.05 point 1 6.e-2 3.175e-2 
+		}
+		Champs dt_post 0.5
+		{
+ 			vitesse som
+			temperature elem
+		}
+	}
+}
+
+Lire pb_partition
+{
+	Conduction
+	{
+		diffusion { }
+		conditions_initiales { temperature Champ_Uniforme 1 304.35 }
+		boundary_conditions 
+		{
+		Droit1_haut Paroi_contact pb Droit1_haut
+		Haut2 Paroi_contact pb Haut2
+		Gauche3_haut Paroi_contact pb Gauche3_haut
+		Haut_Part_Haut paroi_adiabatique
+		Droit1_bas Paroi_contact pb Droit1_bas
+		Bas2 Paroi_contact pb Bas2
+		Gauche3_bas Paroi_contact pb Gauche3_bas
+		Bas_Part_Bas paroi_adiabatique
+		}
+	}
+	Postraitement
+	{
+		Sondes
+		{
+		sonde_temp_solide temperature periode 0.1 segment 40 0. 3.175e-2 6.35e-2 3.175e-2	
+		}
+		Champs dt_post 0.5
+		{
+			temperature elem
+		}
+	}
+}
+
+Solve pbc
+Fin

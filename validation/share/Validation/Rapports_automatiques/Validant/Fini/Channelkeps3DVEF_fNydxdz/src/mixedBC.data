@@ -1,0 +1,131 @@
+# SIMULATION D UN CANAL PLAN #
+# lance_test 1 ecart #
+dimension 3
+Pb_Hydraulique_Turbulent pb
+
+Domaine DOM_BODY
+
+
+Read_unsupported_ASCII_file_from_ICEM DOM_BODY trio_BODY_geo_mixed.asc
+Corriger_frontiere_periodique { Domaine DOM_BODY Bord PERZ }
+
+# Tailles 40.0 2.0 0.8 #
+
+VEFPreP1b dis
+
+Schema_Euler_implicite sch
+
+Read sch 
+{
+        tinit 0.
+        tmax 5.
+        dt_min 1.e-7
+        dt_max 1.
+	dt_start dt_calc
+        dt_impr 0.1
+        dt_sauv 10.
+        seuil_statio 1.e-12  
+	facsec 5
+        facsec_max 500
+        Solveur
+           Implicite
+           {
+                seuil_convergence_solveur 1.e-8
+		
+           }
+}
+
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.0001
+	rho Champ_Uniforme 1 1
+}
+
+Associate pb DOM_BODY
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+	{
+	Navier_Stokes_Turbulent
+		{
+		solveur_pression GCP {
+			 precond ssor { omega 1.5 } seuil 1e-9   
+		}
+                convection { EF_stab { } }
+                diffusion  {  }
+               
+		conditions_initiales
+			{
+                        vitesse Champ_fonc_xyz DOM_BODY 3  10. 0.  0.
+			}
+		boundary_conditions
+			{
+			
+			IN frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 10.0 0.0 0.0
+			OUT frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			PERZ   periodique 			 
+			HAUT     paroi_fixe
+			BAS      paroi_fixe
+			}
+		modele_turbulence K_Epsilon {
+		    Transport_K_Epsilon
+		    {
+		         convection { EF_stab { } }
+		         diffusion { }
+		         boundary_conditions {
+				 
+				PERZ   periodique 
+				HAUT     paroi
+				BAS      paroi
+				IN      frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 0.375 0.2296
+				OUT     frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 0.375 0.2296
+		         }
+
+			 parametre_equation parametre_implicite 
+			{
+				resolution_explicite
+			}
+		         conditions_initiales { k_eps Champ_Uniforme 2 1 0.5 }
+		    }
+		     turbulence_paroi loi_standard_hydr  dt_impr_ustar 4
+		    }
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 4.
+       			}
+					}
+	}
+
+	Postraitement
+        	{       
+                Sondes
+                	{ 
+                        sonde_vit  vitesse periode 0.1 segment 20 39.0 0. 0.8 39.0 2.0 0.8
+			sonde_vit2 vitesse periode 0.1 segment 20 35.0 0. 0.8 35.0 2.0 0.8
+			sonde_visc_turb  viscosite_turbulente periode 0.1 segment 20	39.0 0. 0.8 39.0 2. 0.8
+			sonde_k K  periode 0.1 segment 20	39.0 0. 0.8 39.0 2. 0.8
+			sonde_eps Eps  periode 0.1 segment 20	39.0 0. 0.8 39.0 2. 0.8
+			}
+		format lata
+
+		Domaine DOM_BODY
+		Champs dt_post 3
+			{
+			vitesse faces
+			viscosite_turbulente elem
+			pression elem
+			y_plus elem
+			k elem
+			eps elem
+			}
+		}
+	}
+EcritureLectureSpecial 0
+Solve pb
+End

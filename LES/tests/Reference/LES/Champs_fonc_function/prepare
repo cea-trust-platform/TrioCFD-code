@@ -1,0 +1,4 @@
+[ "$TRUST_DISABLE_MPI" != 1 ] && make_PAR.data Champs_fonc
+triou Champs_fonc
+[ "$TRUST_DISABLE_MPI" != 1 ] && triou PAR_Champs_fonc 2
+exit 0

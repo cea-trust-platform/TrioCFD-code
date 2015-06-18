@@ -1,0 +1,12 @@
+sed "s/,/./" Chen_Nie_T_7_0 > new
+mv new Chen_Nie_T_7_0
+
+sed "s/,/./" Chen_Nie_T_4_3 > new
+mv new Chen_Nie_T_4_3
+
+sed "s/,/./" Chen_Nie_T_3_0 > new
+mv new Chen_Nie_T_3_0
+
+sed "s/,/./" Chen_Nie_T_1_7 > new
+mv new Chen_Nie_T_1_7
+

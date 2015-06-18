@@ -1,0 +1,1858 @@
+Parameters {
+	Title "Study convergence of implicite diffusion scheme in 2D VEF"
+	
+	Description "The objective is to do a grid convergence."
+	
+	ParametersTrio_U "Type of problem: 2D hydraulic_problem"
+	ParametersTrio_U "Discretization: VEFPreP1B"
+	ParametersTrio_U "Convection scheme: muscl" 
+	ParametersTrio_U "Solving of equations: Navier_Stokes"
+#
+	Reference " $[1]$ Towards large-eddy simulation in complex geometries. Mahesh K., Ruetsch G. R., Moin P. Center for Turbulence Research, Annual Research Briefs 1999" 
+	Reference " $[2]$ Description of Taylor Green votexes: http://en.wikipedia.org/wiki/Taylor%E2%80%93Green_vortex"
+	TestCase schema_euler_explicite 1 
+	TestCase schema_euler_explicite 2 
+	TestCase schema_euler_explicite 4 
+	TestCase schema_euler_explicite_diffusion_implicite 1 
+	TestCase schema_euler_explicite_diffusion_implicite 2 
+	TestCase schema_euler_explicite_diffusion_implicite 4 
+	TestCase schema_euler_explicite_dt_fixe 1 
+	TestCase schema_euler_explicite_dt_fixe 2 
+	TestCase schema_euler_explicite_dt_fixe 4 
+	TestCase schema_euler_explicite_diffusion_implicite_dt_fixe 1 
+	TestCase schema_euler_explicite_diffusion_implicite_dt_fixe 2 
+	TestCase schema_euler_explicite_diffusion_implicite_dt_fixe 4 
+	TestCase Runge_kutta_Rationnel_ordre_2 1 
+	TestCase Runge_kutta_Rationnel_ordre_2 2 
+	TestCase Runge_kutta_Rationnel_ordre_2 4 
+	TestCase Runge_kutta_Rationnel_ordre_2_diffusion_implicite 1 
+	TestCase Runge_kutta_Rationnel_ordre_2_diffusion_implicite 2 
+	TestCase Runge_kutta_Rationnel_ordre_2_diffusion_implicite 4 
+	TestCase Runge_kutta_Rationnel_ordre_2_dt_fixe 1 
+	TestCase Runge_kutta_Rationnel_ordre_2_dt_fixe 2 
+	TestCase Runge_kutta_Rationnel_ordre_2_dt_fixe 4 
+	TestCase Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe 1 
+	TestCase Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe 2 
+	TestCase Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe 4 
+	TestCase Runge_kutta_ordre_3 1 
+	TestCase Runge_kutta_ordre_3 2 
+	TestCase Runge_kutta_ordre_3 4 
+	TestCase Runge_kutta_ordre_3_diffusion_implicite 1 
+	TestCase Runge_kutta_ordre_3_diffusion_implicite 2 
+	TestCase Runge_kutta_ordre_3_diffusion_implicite 4 
+	TestCase Runge_kutta_ordre_3_dt_fixe 1 
+	TestCase Runge_kutta_ordre_3_dt_fixe 2 
+	TestCase Runge_kutta_ordre_3_dt_fixe 4 
+	TestCase Runge_kutta_ordre_3_diffusion_implicite_dt_fixe 1 
+	TestCase Runge_kutta_ordre_3_diffusion_implicite_dt_fixe 2 
+	TestCase Runge_kutta_ordre_3_diffusion_implicite_dt_fixe 4 
+	TestCase Runge_kutta_ordre_4_D3P 1 
+	TestCase Runge_kutta_ordre_4_D3P 2 
+	TestCase Runge_kutta_ordre_4_D3P 4 
+	TestCase Runge_kutta_ordre_4_D3P_diffusion_implicite 1 
+	TestCase Runge_kutta_ordre_4_D3P_diffusion_implicite 2 
+	TestCase Runge_kutta_ordre_4_D3P_diffusion_implicite 4 
+	TestCase Runge_kutta_ordre_4_D3P_dt_fixe 1 
+	TestCase Runge_kutta_ordre_4_D3P_dt_fixe 2 
+	TestCase Runge_kutta_ordre_4_D3P_dt_fixe 4 
+	TestCase Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe 1 
+	TestCase Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe 2 
+	TestCase Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe 4 
+	TestCase schema_euler_implicite 1 
+	TestCase schema_euler_implicite 2 
+	TestCase schema_euler_implicite 4 
+	TestCase schema_euler_implicite_dt_fixe 1 
+	TestCase schema_euler_implicite_dt_fixe 2 
+	TestCase schema_euler_implicite_dt_fixe 4 
+	
+			
+	Author "Ledac P., Reuillon E."
+	IncludeData 2
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Tests Description"
+	Description "Hydraulic initial conditions: fluid U = f(x,y) V = g(x,y)"
+	Description "where f(x,y)=-cos(2*Pi*x)*sin(2*Pi*y)*exp(-2*$\nu$*t) g(x,y)=sin(2*Pi*x)*cos(2*Pi*y)*exp(-2*$\nu$*t) and $\nu$=$\mu$/$\rho$"
+	Description "Hydraulic boundary condition: "
+	Description " $\bullet$ BOUNDARY with SYMETRIE condition.\newline"
+	Description "In this study, the implicite diffusion option is tested in function of the following schemes :  "
+	Description " - schema_euler_explicite "
+	Description " - Runge_Kutta_ordre_2  "
+	Description " - Runge_Kutta_ordre_3 "
+	Description " - Runge_Kutta_ordre_4 \newline "
+	Description " This schemes are compared to the diffusion implicite time scheme. \newline "
+	Description "At first, we will check only the impact of the option diffusion implicite on this time shemes."
+	Description "Secondly, we will try to estimate the accuracy of this different time schemes in using a fixed time step for all test cases (determined by CFL conditions)."
+       
+}
+Chapter { 
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "2D Results"
+	Description "Taylor Green vortexes"
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme schema_euler_explicite on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme schema_euler_explicite_diffusion_implicite on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_diffusion_implicite/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_diffusion_implicite/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_diffusion_implicite/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme schema_euler_explicite_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme schema_euler_explicite_diffusion_implicite_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_diffusion_implicite_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_diffusion_implicite_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_explicite_diffusion_implicite_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_Rationnel_ordre_2 on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_Rationnel_ordre_2_diffusion_implicite on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_diffusion_implicite/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_diffusion_implicite/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_diffusion_implicite/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_Rationnel_ordre_2_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_3 on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_3_diffusion_implicite on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_diffusion_implicite/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_diffusion_implicite/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_diffusion_implicite/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_3_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_3_diffusion_implicite_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_4_D3P on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_4_D3P_diffusion_implicite on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_diffusion_implicite/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_diffusion_implicite/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_diffusion_implicite/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_4_D3P_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme schema_euler_implicite on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_implicite/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_implicite/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_implicite/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+
+#     Table {
+#             Description "\latex_(\newpage\latex_) "
+#     }
+     visu {
+             Title "Scheme schema_euler_implicite_dt_fixe on finest mesh (32*32)"
+             Description "Velocity magnitude"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_implicite_dt_fixe/4.lata dom_dual norme_VITESSE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+             nb_img_without_newline 2 
+           }
+     visu {
+             Description "Pressure"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_implicite_dt_fixe/4.lata dom PRESSION SOM
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box             
+           }
+     visu {
+             Description "Kinetic energy relative error (%)"
+             Width 7cm, viewport=0 0 1000 1000, clip
+             Pseudocolor schema_euler_implicite_dt_fixe/4.lata dom_dual ERREUR_RELATIVE_ENERGIE_CINETIQUE FACES
+#             zoom2D -0.25 1 -0.6 0.5
+             Operator no_axes
+             Operator no_bounding_box         
+           }
+
+     
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "1D Results"
+	Description ""
+	
+     Table {
+	     Title "Scheme schema_euler_explicite"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file schema_euler_explicite/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file schema_euler_explicite/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file schema_euler_explicite/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme schema_euler_explicite_diffusion_implicite"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file schema_euler_explicite_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file schema_euler_explicite_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file schema_euler_explicite_diffusion_implicite/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme schema_euler_explicite_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file schema_euler_explicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file schema_euler_explicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file schema_euler_explicite_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme schema_euler_explicite_diffusion_implicite_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file schema_euler_explicite_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file schema_euler_explicite_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file schema_euler_explicite_diffusion_implicite_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_Rationnel_ordre_2"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_Rationnel_ordre_2/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_Rationnel_ordre_2/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_Rationnel_ordre_2/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_Rationnel_ordre_2_diffusion_implicite"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_Rationnel_ordre_2_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_Rationnel_ordre_2_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_Rationnel_ordre_2_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_Rationnel_ordre_2_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_3"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_3/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_3/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_3/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_3_diffusion_implicite"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_3_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_3_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_3_diffusion_implicite/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_3_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_3_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_3_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_3_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_3_diffusion_implicite_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_4_D3P"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_4_D3P/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_4_D3P/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_4_D3P/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_4_D3P_diffusion_implicite"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_4_D3P_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_4_D3P_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_4_D3P_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_4_D3P_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme schema_euler_implicite"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file schema_euler_implicite/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file schema_euler_implicite/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file schema_euler_implicite/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+	
+     Table {
+	     Title "Scheme schema_euler_implicite_dt_fixe"
+     }
+     Figure {
+	     Title_figure "Global kinetic energy"
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     #LogX
+	     Rangey 0 .07500
+	     #LogY
+	     LabelX Time [s] (Vortex turns ~.63661977236758134308 times)
+	     LabelY Kinetic Energy [m2/s2]
+	     Include_Description_Curves 0
+	     Curve {
+		     legend "Analytic solution"
+		     file schema_euler_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_ANALYTIQUE.son
+		     columns 1 2
+		     Style lines
+		     TypeLigne 2
+	     }	     
+	     Curve {
+		     legend "Trio_U on coarse mesh (8*8)"
+		     file schema_euler_implicite_dt_fixe/1_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 1
+	     }
+	     Curve {
+		     legend "Trio_U on finest mesh (32*32)"
+		     file schema_euler_implicite_dt_fixe/4_ENERGIE_CINETIQUE_GLOBALE_TRIOU.son
+		     columns 1 2
+		     Style points
+		     TypeLigne 3
+	     }
+      }
+    
+     Table {
+             Description "\latex_(\newpage\latex_) "
+     }
+     Figure {
+     	     Title_figure "Average Error vs Grid Resolution (all schemes, adjustable time step)"
+	     Width 13cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0   
+      
+  
+ 	     Curve {
+		     legend "schema_euler_explicite"
+		     file schema_euler_explicite/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "schema_euler_explicite_diffusion_implicite"
+		     file schema_euler_explicite_diffusion_implicite/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2"
+		     file Runge_kutta_Rationnel_ordre_2/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2_diffusion_implicite"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3"
+		     file Runge_kutta_ordre_3/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3_diffusion_implicite"
+		     file Runge_kutta_ordre_3_diffusion_implicite/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P"
+		     file Runge_kutta_ordre_4_D3P/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P_diffusion_implicite"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+  
+ 	     Curve {
+		     legend "schema_euler_implicite"
+		     file schema_euler_implicite/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+
+	}
+    
+     Figure {
+	     Title_figure "Average Error vs Grid Resolution (all schemes, fixed time step)"
+	     Width 13cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     LogY
+	     LabelX Mesh refinement
+	     LabelY Error (%)
+	     Include_Description_Curves 0   
+      
+   
+ 	     Curve {
+		     legend "schema_euler_explicite_dt_fixe"
+		     file schema_euler_explicite_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "schema_euler_explicite_diffusion_implicite_dt_fixe"
+		     file schema_euler_explicite_diffusion_implicite_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2_dt_fixe"
+		     file Runge_kutta_Rationnel_ordre_2_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3_dt_fixe"
+		     file Runge_kutta_ordre_3_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3_diffusion_implicite_dt_fixe"
+		     file Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P_dt_fixe"
+		     file Runge_kutta_ordre_4_D3P_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+   
+ 	     Curve {
+		     legend "schema_euler_implicite_dt_fixe"
+		     file schema_euler_implicite_dt_fixe/erreur.dat
+		     columns 1 2
+		     Style linespoints
+		     #TypeLigne 3 
+	     }
+      
+
+	}
+      	Table {
+                	Description "\latex_(\newpage\latex_) "
+		}
+                Table {
+                Title "Numerical comparison (Re=200) with boundary condition: SYMETRIE"
+                Description The average error is given for the coarse (8*8) and the finest (32*32) mesh for adjustable time step.
+		Description  
+                nb_columns 3
+                label "Error[%] | Error[%] | Order"
+	
+     	line {
+                        legend "schema_euler_explicite"
+                        file schema_euler_explicite/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "schema_euler_explicite_diffusion_implicite"
+                        file schema_euler_explicite_diffusion_implicite/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_Rationnel_ordre_2"
+                        file Runge_kutta_Rationnel_ordre_2/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_Rationnel_ordre_2_diffusion_implicite"
+                        file Runge_kutta_Rationnel_ordre_2_diffusion_implicite/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_3"
+                        file Runge_kutta_ordre_3/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_3_diffusion_implicite"
+                        file Runge_kutta_ordre_3_diffusion_implicite/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_4_D3P"
+                        file Runge_kutta_ordre_4_D3P/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_4_D3P_diffusion_implicite"
+                        file Runge_kutta_ordre_4_D3P_diffusion_implicite/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "schema_euler_implicite"
+                        file schema_euler_implicite/order_scheme.dat
+                        last_line
+                }
+    		
+	}
+      	Table {
+                Description The average error is given for the coarse (8*8) and the finest (32*32) mesh for fixed time step.
+		Description  
+                nb_columns 3
+                label "Error[%] | Error[%] | Order"
+	
+     	line {
+                        legend "schema_euler_explicite_dt_fixe"
+                        file schema_euler_explicite_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "schema_euler_explicite_diffusion_implicite_dt_fixe"
+                        file schema_euler_explicite_diffusion_implicite_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_Rationnel_ordre_2_dt_fixe"
+                        file Runge_kutta_Rationnel_ordre_2_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe"
+                        file Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_3_dt_fixe"
+                        file Runge_kutta_ordre_3_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_3_diffusion_implicite_dt_fixe"
+                        file Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_4_D3P_dt_fixe"
+                        file Runge_kutta_ordre_4_D3P_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe"
+                        file Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/order_scheme.dat
+                        last_line
+                }
+     	line {
+                        legend "schema_euler_implicite_dt_fixe"
+                        file schema_euler_implicite_dt_fixe/order_scheme.dat
+                        last_line
+                }
+    		
+	}
+    
+     Table {
+             Description "\latex_(\newpage\latex_) "
+	     }
+     Table {
+	     Title "Resolution time CPU (all schemes)"
+     }
+     Figure {
+	     Description "Test cases with adjustable time step : " 
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     #LogY
+	     LabelX Cells number
+	     LabelY CPU (s/cell)
+      
+     
+ 	     Curve {
+		     legend "schema_euler_explicite"
+		     file schema_euler_explicite/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "schema_euler_explicite_diffusion_implicite"
+		     file schema_euler_explicite_diffusion_implicite/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2"
+		     file Runge_kutta_Rationnel_ordre_2/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2_diffusion_implicite"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3"
+		     file Runge_kutta_ordre_3/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3_diffusion_implicite"
+		     file Runge_kutta_ordre_3_diffusion_implicite/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P"
+		     file Runge_kutta_ordre_4_D3P/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P_diffusion_implicite"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "schema_euler_implicite"
+		     file schema_euler_implicite/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+
+	}
+    
+     Figure {
+             Description "\latex_(\newpage\latex_) "
+             Description "Test cases with fixed time step :  "
+	     Width 12cm
+	     Dimension 2
+	     #Rangex 0.005 0.2 
+	     LogX
+	     #Rangey -0.5 0.0
+	     #LogY
+	     LabelX Cells number
+	     LabelY CPU (s/cell)
+	     legend top left
+      
+     
+ 	     Curve {
+		     legend "schema_euler_explicite_dt_fixe"
+		     file schema_euler_explicite_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "schema_euler_explicite_diffusion_implicite_dt_fixe"
+		     file schema_euler_explicite_diffusion_implicite_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2_dt_fixe"
+		     file Runge_kutta_Rationnel_ordre_2_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe"
+		     file Runge_kutta_Rationnel_ordre_2_diffusion_implicite_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3_dt_fixe"
+		     file Runge_kutta_ordre_3_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_3_diffusion_implicite_dt_fixe"
+		     file Runge_kutta_ordre_3_diffusion_implicite_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P_dt_fixe"
+		     file Runge_kutta_ordre_4_D3P_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe"
+		     file Runge_kutta_ordre_4_D3P_diffusion_implicite_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+     
+ 	     Curve {
+		     legend "schema_euler_implicite_dt_fixe"
+		     file schema_euler_implicite_dt_fixe/cpu.dat
+		     columns 1 2
+		     Style points
+		     #TypeLigne 1
+	     }
+      
+
+	}
+}
+Chapter {
+	Description "\latex_(\newpage\latex_) "
+}
+Chapter {
+	Title "Conclusion"
+	Description "The comparison of test cases with and without the diffusion implicite option shows that the use of this option damage the order of the time schemes and their accuracy. We notice a factor above 2 for order of explicite euler time scheme and Runge Kutta time scheme.\newline "
+	Description "When we study the test cases with a fixed time step, we note that both the accuracy and the order of the time schemes are better (factor 1.5).\newline"
+	Description "So, even if the diffusion implicite option allows to build a scheme favourable compared to the diffusion implicite time scheme, it is advised to consider the degradation of the order of the time scheme which increases the time of resolution."
+	}

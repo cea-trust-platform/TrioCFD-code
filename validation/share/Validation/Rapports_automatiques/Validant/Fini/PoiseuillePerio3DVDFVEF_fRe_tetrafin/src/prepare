@@ -1,0 +1,91 @@
+#!/bin/bash
+
+times="1 01 02 04 05 001 005"
+chmod -R +w *
+for Conv in Amont Muscl EFstab
+  do
+  for time in $times 
+    do
+    mkdir -p vef_${Conv}_0${time} 
+    cd vef_${Conv}_0${time}
+    Conv2=$Conv
+    [ "$Conv" = "EFstab" ] && Conv2="EF_stab { alpha 1 }"
+    sed "s/0.1/0.${time}/;s/Amont/${Conv}/" ../post_run > post_run
+    sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.${time} 0. 0./; s/convection { amont }/convection { ${Conv2} }/" ../canal_lam_vef.data > canal_lam_vef.data
+    cd ..
+  done
+done
+
+
+
+for time in $times 
+  do
+  mkdir -p vdf_Amont_0${time} 
+  cd vdf_Amont_0${time} 
+  sed "s/0.1/0.$time/;s/VEF/VDF/" ../post_run > post_run
+  sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.$time 0. 0./" ../canal_lam_vdf.data > canal_lam_vdf.data 
+  cd ..
+done
+exit
+cd ./vdf_Amont_01
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/VEF/VDF/" post_run > modifie
+mv modifie post_run
+
+cd ../vdf_Amont_001
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.01 0. 0./" canal_lam_vdf.data > modifie.data
+mv modifie.data canal_lam_vdf.data
+sed "s/VEF/VDF/" post_run > modifie
+sed "s/0.1/0.01/" modifie > post_run
+rm modifie
+
+cd ../vdf_Amont_002
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.02 0. 0./" canal_lam_vdf.data > modifie.data
+mv modifie.data canal_lam_vdf.data
+sed "s/VEF/VDF/" post_run > modifie
+sed "s/0.1/0.02/" modifie > post_run
+rm modifie
+
+cd ../vdf_Amont_004
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.04 0. 0./" canal_lam_vdf.data > modifie.data
+mv modifie.data canal_lam_vdf.data
+sed "s/VEF/VDF/" post_run > modifie
+sed "s/0.1/0.04/" modifie > post_run
+rm modifie
+
+cd ../vdf_Amont_005
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.05 0. 0./" canal_lam_vdf.data > modifie.data
+mv modifie.data canal_lam_vdf.data
+sed "s/VEF/VDF/" post_run > modifie
+sed "s/0.1/0.05/" modifie > post_run
+rm modifie
+
+cd ../vdf_Amont_0001
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.001 0. 0./" canal_lam_vdf.data > modifie.data
+mv modifie.data canal_lam_vdf.data
+sed "s/VEF/VDF/" post_run > modifie
+sed "s/0.1/0.001/" modifie > post_run
+rm modifie
+
+cd ../vdf_Amont_0005
+cp ../canal_lam_vdf.data .
+cp ../post_run .
+sed "s/vitesse Champ_Uniforme 3 0.1 0. 0./vitesse Champ_Uniforme 3 0.005 0. 0./" canal_lam_vdf.data > modifie.data
+mv modifie.data canal_lam_vdf.data
+sed "s/VEF/VDF/" post_run > modifie
+sed "s/0.1/0.005/" modifie > post_run
+rm modifie
+
+cd ..
+

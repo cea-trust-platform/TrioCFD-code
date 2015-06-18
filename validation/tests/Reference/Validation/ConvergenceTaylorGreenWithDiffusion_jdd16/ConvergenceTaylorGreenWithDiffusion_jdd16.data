@@ -1,0 +1,149 @@
+# Convergence study #
+dimension 2
+Pb_hydraulique pb
+Domaine dom
+
+# Read the mesh #
+# BEGIN MESH #
+Read_file Mesh1.data ;
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+Runge_kutta_ordre_4_D3P sch
+Read sch
+{
+	tmax 1
+	seuil_statio -1
+	seuil_statio_relatif_deconseille 1
+	dt_impr -1
+	facsec 1. dt_max 0.003 diffusion_implicite 1
+}
+
+Fluide_Incompressible air
+Read air
+{
+	mu  Champ_Uniforme 1 0.01
+	rho Champ_Uniforme 1 1
+}
+
+Associate pb dom
+Associate pb sch
+Associate pb air
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_Standard
+	{
+		solveur_pression petsc cholesky { }
+		convection { muscl }
+		diffusion {  }
+		conditions_initiales 
+		{
+			vitesse 	Champ_Fonc_txyz dom 2 -cos(2*Pi*x)*sin(2*Pi*y)*exp(-8*Pi*Pi*0.01*t) sin(2*Pi*x)*cos(2*Pi*y)*exp(-8*Pi*Pi*0.01*t)
+		}
+		boundary_conditions 
+		{
+			BOUNDARY symetrie
+		}
+	}
+        Postraitement
+	{
+		Definition_champs
+		{
+			# Calcul de u^2+v^2 #
+			u2_plus_v2 transformation
+			{
+				methode produit_scalaire sources { 
+					Champ_Post_refChamp { Pb_champ pb vitesse }  ,
+                         		Champ_Post_refChamp { Pb_champ pb vitesse }
+				}
+                        }
+			# Calcul du champ energie cinetique Ec(x,y) #
+			energie_cinetique transformation
+			{
+				sources_reference { u2_plus_v2 }
+				methode formule	
+				expression 1 0.5*u2_plus_v2
+			}
+			# Ec(x,y) analytique #
+			energie_cinetique_analytique transformation
+			{
+				sources_reference { u2_plus_v2	 }
+				methode formule expression 1 0.5*((cos(2*Pi*x)*sin(2*Pi*y)*exp(-8*Pi*Pi*0.01*t))^2+(sin(2*Pi*x)*cos(2*Pi*y)*exp(-8*Pi*Pi*0.01*t))^2)
+			}		
+			# Calcul d'un champ erreur relative=(EcTrio_U(x,y)-EcAnalytique(x,y))/EcMax #
+			erreur_relative_energie_cinetique transformation
+			{
+				sources_reference { energie_cinetique }
+				methode formule expression 1 100*(energie_cinetique-0.5*((cos(2*Pi*x)*sin(2*Pi*y)*exp(-8*Pi*Pi*0.01*t))^2+(sin(2*Pi*x)*cos(2*Pi*y)*exp(-8*Pi*Pi*0.01*t))^2))/exp(-16*Pi*Pi*0.01*t)				
+			}
+			# Calcul de |erreur_relative_energie_cinetique| #
+			abs_erreur_relative_energie_cinetique transformation
+			{
+				sources_reference  { erreur_relative_energie_cinetique	 }
+				methode formule expression 1 abs(erreur_relative_energie_cinetique)			
+			}
+			# Calcul de la moyenne de la valeur absolue de l'erreur relative sur l'energie cinetique #
+			moyenne_erreur_relative_energie_cinetique reduction_0D
+			{
+				sources_reference { abs_erreur_relative_energie_cinetique }
+				methode moyenne
+			}
+			
+			# Calcul de l'energie cinetique globale par unite de volume #
+			moyenne_energie_cinetique_globale reduction_0D
+			{
+				sources_reference { energie_cinetique }
+				methode moyenne_ponderee
+			}
+			# Calcul de l'energie cinetique globale #
+			energie_cinetique_globale_triou transformation
+			{
+				sources_reference { moyenne_energie_cinetique_globale }
+				methode formule expression 1 moyenne_energie_cinetique_globale*0.5*0.5
+			}
+			# Energie cinetique globale analytique #
+			energie_cinetique_globale_analytique transformation
+			{
+				sources_reference { energie_cinetique }
+				methode formule
+				expression 1 0.25*0.5*0.5*exp(-16*Pi*Pi*0.01*t)		
+			}
+		}
+		Sondes
+		{
+			energie_cinetique_globale_analytique		energie_cinetique_globale_analytique		periode .10000000000000000000 NUMERO_ELEM_SUR_MAITRE 0
+			energie_cinetique_globale_triou 		energie_cinetique_globale_triou 		periode .10000000000000000000 NUMERO_ELEM_SUR_MAITRE 0
+			moyenne_erreur_relative_energie_cinetique	moyenne_erreur_relative_energie_cinetique	periode .10000000000000000000 NUMERO_ELEM_SUR_MAITRE 0
+               }
+
+		Format lml
+                Champs dt_post .10000000000000000000
+		{
+		    pression 				som
+		    vitesse 			
+		   
+		   
+		   
+		   
+		}
+       }
+}
+
+Solve pb
+End

@@ -1,0 +1,137 @@
+
+# Hydraulique 3 #
+
+dimension 3
+
+Domaine DOM_DOM
+
+Read_unsupported_ASCII_file_from_ICEM DOM_DOM trio_DOM_geo.asc
+
+Domaine REC_2D
+Domaine REC_3D
+
+ExtrudeBord { domaine_init DOM_DOM direction -5 0 0
+              domaine_final REC_3D nom_bord in 
+	      nb_tranches 10 }
+
+Extract_2D_from_3D REC_3D left REC_2D
+
+dimension 2
+
+Pb_Hydraulique_Turbulent pb
+
+RegroupeBord REC_2D perio { devant derriere }
+
+VerifierCoin REC_2D { }
+
+Ecrire_fichier REC_2D REC_2D.geom
+
+Corriger_frontiere_periodique { Domaine REC_2D bord perio }
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.0
+	tmax 150.
+	dt_min 1.e-10
+	dt_max 1.5
+	dt_impr 1.0
+	dt_sauv 1000.
+	seuil_statio 1.e-8
+	facsec_max 2000
+	periode_sauvegarde_securite_en_heures 5
+	solveur implicite
+	{		
+		seuil_convergence_solveur 1.e-12
+		solveur gmres { diag seuil 1.e-12 impr controle_residu 1 }
+	}
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 5.7e-5
+	rho Champ_Uniforme 1 1.
+}
+
+Associate pb REC_2D
+Associate pb fluide
+Associate pb sch
+Discretize pb dis
+
+Read pb
+{
+        Navier_Stokes_turbulent
+        {
+          solveur_pression Cholesky { }
+                convection { EF_stab { alpha 0.2 } }
+                diffusion { }
+                conditions_initiales
+                        {
+                                vitesse champ_uniforme 2 1. 0.
+                        }
+                boundary_conditions
+                {
+                            wall paroi_fixe
+                            perio periodique 
+                }
+                Sources { Canal_perio { bord perio } }
+                Modele_turbulence K_Epsilon
+                {
+                        Transport_K_Epsilon
+                            {
+                                convection { EF_stab { alpha 0.2 } }
+                                diffusion { }
+                                boundary_conditions
+                                {
+                                        wall Paroi
+                                        perio periodique 
+                                }
+                                conditions_initiales { k_Eps champ_uniforme 2 1.e-6 1.e-9 }
+                            }
+                     turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet }
+                 }
+		Ecrire_fichier_xyz_valeur k_eps		100. bords 1 perio
+		Ecrire_fichier_xyz_valeur vitesse	100. bords 1 perio
+		
+		Traitement_particulier { Canal
+			{
+       			dt_impr_moy_spat 50.
+       			}
+					}
+
+        }
+
+        Postraitement
+        {
+              
+		Sondes
+                	{ 
+                        sonde_vit  vitesse periode 0.1 segment 20 -14.0 3.7 -14.0 4.7
+			sonde_visc_turb  viscosite_turbulente periode 0.1 segment 20 -14.0 3.7 -14.0 4.7 
+			sonde_k K  periode 0.1 segment 20 -14.0 3.7 -14.0 4.7
+			sonde_eps Eps  periode 0.1 segment 20 -14.0 3.7 -14.0 4.7 
+			}
+
+
+		Format lata
+
+       		Domaine REC_2D
+		Champs dt_post 100.
+			{
+			vitesse faces
+			viscosite_turbulente elem
+			pression elem
+			y_plus elem
+			k elem
+			eps elem
+			}
+		
+        }
+}
+
+Solve pb
+End
+

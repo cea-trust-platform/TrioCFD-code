@@ -1,0 +1,97 @@
+# Test de l'interprete Corriger_coord_perio #
+# PARALLEL OK #
+
+dimension 3
+Pb_Hydraulique_Turbulent pb1
+Domaine dom 
+
+# BEGIN MESH #
+Read_file dom dom_avec_pb_periodicite.geom
+Corriger_frontiere_periodique {
+   domaine dom
+   bord    perioz
+}
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur tranche { tranches 2 1 1 }
+	Larg_joint 2
+	Nom_Zones DOM
+	Periodique 1 perioz
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis 
+
+Sch_CN_EX_iteratif sch
+
+Lire sch 
+{ 
+        tinit 0.
+        tmax 100.
+        dt_min 1.e-7 
+        dt_max 1.e-1 
+	dt_start dt_calc
+        dt_impr 0.000001 
+        dt_sauv 10. 
+        seuil_statio 1.e-8 
+        facsec 1.       
+	nb_pas_dt_max 1
+	seuil 0.01	 
+} 
+
+Fluide_Incompressible fluide
+Lire fluide
+{ 
+	mu Champ_Uniforme       1 2.84e-5
+        rho Champ_Uniforme      1 0.0976
+
+} 
+
+Associate pb1 dom
+Associate pb1 fluide
+
+Associate pb1 sch 
+Discretize pb1 dis 
+
+Lire pb1
+{ 
+ Navier_Stokes_Turbulent 
+ { 
+       solveur_pression Gcp { precond ssor { omega 1.5 } 
+                                             seuil 1.e-14
+                            } 
+       convection { muscl }
+       diffusion  { }
+       Sources
+       {
+       		Canal_perio { bord perioz }
+       }
+       conditions_initiales {  vitesse Champ_fonc_xyz dom 3  0. 0. 2.*(1.-(x*x+y*y)*(x*x+y*y)) }
+       boundary_conditions { 
+			perioz 	periodique 
+		   	paroi	paroi_fixe 
+       } 
+	Modele_turbulence Sous_maille_wale
+	{
+                        turbulence_paroi loi_standard_hydr
+			dt_impr_ustar 0.1
+	}     
+}            
+ Postraitement 
+         {
+            Champs dt_post 0.1 
+            { 
+             vitesse elem
+            } 
+        } 
+} 
+
+Solve pb1
+Fin 

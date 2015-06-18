@@ -1,0 +1,289 @@
+# GR16 : Assemblage sans fil, ecoulement Sodium #
+# La configuration etudiee est un faisceau de 16 tubes chauffes positionnes dans une enceinte #
+# carree et refroidie au sodium. L'experience utilisee pour le calcul est l'experience GR16. #
+# Thermohydraulique 3D : Couplage Boussinesq  #
+
+dimension 3
+
+Pb_Thermohydraulique_Turbulent pb
+
+export Domaine DOM
+
+# Je place le maillage dans le repere des essais #
+# DEBUT MAILLAGE #
+Read_file DOM maillage/With_antivibration_grid_and_inlet_outlet_on_annular_section.bin
+Transformer DOM X*0.001-0.1155 Y*0.001+0.0495 Z*4*0.001-1.02
+# FIN MAILLAGE #
+
+# Calcul parallele sur $NB_PROCS processeurs # 
+# DEBUT DECOUPAGE 
+Decouper DOM
+{
+   Partitionneur Metis { nb_parts $NB_PROCS }
+   Larg_joint 2
+   Nom_Zones GR16
+}
+Fin
+FIN DECOUPAGE #
+
+# DEBUT LECTURE 
+Scatter GR16.Zones DOM
+FIN LECTURE #
+
+VEFPreP1B dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit	1.e-5
+	tmax	$T_FIN
+	dt_impr	1.e-6
+	dt_sauv	1000.
+	seuil_statio	1.e-8
+	facsec	300.
+	facsec_max	1000.
+	solveur implicite
+        {
+              solveur gmres { diag seuil 1.e-20 nb_it_max 5 controle_residu 1 impr }
+        }
+	periode_sauvegarde_securite_en_heures 23
+}
+
+# SODIUM 350°C #
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu	Champ_Uniforme 1 3.08e-4
+	rho	Champ_Uniforme 1 868.09
+	lambda	Champ_Uniforme 1 77.06 
+	Cp	Champ_Uniforme 1 1290.06
+	beta_th	Champ_Uniforme 1 2.74e-4
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0 0 -9.81
+
+Associer fluide gravite
+Associer pb DOM
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+# Je recupere l'ensemble des frontieres du domaine #
+domaine INOUT
+extraire_surface { domaine INOUT probleme pb avec_certains_bords 2 IN OUT }
+domaine WALL
+extraire_surface { domaine WALL probleme pb avec_certains_bords 1 FROID }
+domaine HOT
+extraire_surface { domaine HOT probleme pb avec_certains_bords 1 CHAUD }
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-9 impr }
+		# Schema de convection teste : Muscl, Ef_stab { alpha 0.2 }, Ef_stab { alpha 1. } #
+		convection { $SCHEMA }
+		diffusion { }
+		sources { boussinesq_temperature { T0 350. verif_boussinesq 0 } } # verif_boussinesq is to deactivate the check of T0 compare to initial temperature # 
+		
+		# Conditions initiales & limites #
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 0. $V_MEAN }
+		conditions_limites
+		{
+			IN	frontiere_ouverte_vitesse_imposee	champ_front_Uniforme 3 0. 0. $VITESSE
+			OUT	frontiere_ouverte_pression_imposee	champ_front_Uniforme 1 0.
+			FROID	paroi_fixe
+			CHAUD	paroi_fixe
+		}
+		modele_turbulence K_Epsilon 
+		{
+			Transport_K_Epsilon 
+			{
+				convection { amont }
+				diffusion { }
+				
+				# Conditions initiales & limites : k = 3/2.(I.U)^2, Eps = Cmu.k^(3/2)/(0.07.Dh) #
+				conditions_initiales { k_Eps Champ_Uniforme 2 $K $EPS }
+				conditions_limites
+				{
+					IN	frontiere_ouverte_K_eps_impose	Champ_Front_Uniforme 2 $K_IN $EPS_IN
+					OUT	frontiere_ouverte K_EPS_EXT	Champ_Front_Uniforme 2 $K_IN $EPS_IN
+					FROID	paroi
+					CHAUD	paroi                                            
+				}
+			}
+			turbulence_paroi loi_standard_hydr 
+	       }
+	}
+
+	Convection_Diffusion_Temperature_Turbulent
+	{
+		diffusion { }
+		convection { amont }
+		modele_turbulence Prandtl { turbulence_paroi loi_standard_hydr_scalaire }
+		
+		# Conditions initiales & limites : 302.4 = Convection mixte, 303.3 = Convection forcee #
+		conditions_initiales { Temperature Champ_Uniforme 1 $TEMPERATURE }	
+		conditions_limites 
+		{			        	
+			IN	frontiere_ouverte_temperature_imposee	Champ_front_uniforme 1 $TEMPERATURE
+			OUT	frontiere_ouverte T_ext			Champ_front_uniforme 1 400.
+ 			FROID	paroi_adiabatique 
+	
+			# Flux de paroi teste : 266.0e3 = Convection mixte, 443.0e3 = Convection forcee #
+			CHAUD	paroi_flux_impose			Champ_Front_Uniforme 1 $FLUX
+ 
+		}
+	}
+
+	Postraitements
+	{
+	  Post_total
+	  {
+		Sondes
+		{
+			sonde_T_Y_0.001275	temperature	periode 1e-6 segment 100 -0.1485 0.001275 0.		0. 0.001275 0.
+			sonde_T_Y_0.003825	temperature	periode 1e-6 segment 100 -0.1485 0.003825 0.		0. 0.003825 0.
+			sonde_T_Y_0.006375	temperature	periode 1e-6 segment 100 -0.1485 0.006375 0.		0. 0.006375 0.
+
+			sonde_T_Z1		temperature	periode 1e-6 segment 100 -0.1485 0.      -0.250		0. 0. 	   -0.250
+			sonde_T_Z2		temperature	periode 1e-6 segment 100 -0.1485 0.      -0.500		0. 0. 	   -0.500
+			sonde_T_Z3		temperature	periode 1e-6 segment 100 -0.1485 0.      -0.750		0. 0. 	   -0.750
+
+			sonde_T_Pin_1		temperature	periode 1e-6 points    1 -0.0330 0.       0.
+			sonde_T_Pin_2		temperature	periode 1e-6 points    1 -0.0660 0.       0.
+			sonde_T_Pin_3		temperature	periode 1e-6 points    1 -0.0990 0.       0.
+
+			sonde_V_Pin_1		vitesse		periode 1e-6 points    1 -0.0330 0.       0.
+			sonde_V_Pin_2		vitesse		periode 1e-6 points    1 -0.0660 0.       0.
+			sonde_V_Pin_3		vitesse		periode 1e-6 points    1 -0.0990 0.       0.
+
+			sonde_T_Rod_3	nodes	temperature	periode 1e-6 circle   19 -0.0165 0.0165   0.    2  0.00935  180. 360.
+			sonde_T_Rod_7	nodes	temperature	periode 1e-6 circle   19 -0.0495 0.0165   0.    2  0.00935  180. 360.
+			sonde_T_Rod_11	nodes	temperature	periode 1e-6 circle   19 -0.0825 0.0165   0.    2  0.00935  180. 360.
+			sonde_T_Rod_15	nodes	temperature	periode 1e-6 circle   19 -0.1155 0.0165   0.    2  0.00935  180. 360.
+
+			sonde_Tm_Y_0.001275	Moyenne_temperature	periode 1e-2 segment 100 -0.1485 0.001275 0.		0. 0.001275 0.
+			sonde_Tm_Y_0.003825	Moyenne_temperature	periode 1e-2 segment 100 -0.1485 0.003825 0.		0. 0.003825 0.
+			sonde_Tm_Y_0.006375	Moyenne_temperature	periode 1e-2 segment 100 -0.1485 0.006375 0.		0. 0.006375 0.
+
+			sonde_Tm_Z1		Moyenne_temperature	periode 1e-2 segment 100 -0.1485 0.      -0.250		0. 0. 	   -0.250
+			sonde_Tm_Z2		Moyenne_temperature	periode 1e-2 segment 100 -0.1485 0.      -0.500		0. 0. 	   -0.500
+			sonde_Tm_Z3		Moyenne_temperature	periode 1e-2 segment 100 -0.1485 0.      -0.750		0. 0. 	   -0.750
+
+			sonde_Tm_Pin_1		Moyenne_temperature	periode 1e-2 points    1 -0.0330 0.       0.
+			sonde_Tm_Pin_2		Moyenne_temperature	periode 1e-2 points    1 -0.0660 0.       0.
+			sonde_Tm_Pin_3		Moyenne_temperature	periode 1e-2 points    1 -0.0990 0.       0.
+
+			sonde_Vm_Pin_1		Moyenne_vitesse		periode 1e-2 points    1 -0.0330 0.       0.
+			sonde_Vm_Pin_2		Moyenne_vitesse		periode 1e-2 points    1 -0.0660 0.       0.
+			sonde_Vm_Pin_3		Moyenne_vitesse		periode 1e-2 points    1 -0.0990 0.       0.
+
+			sonde_Tm_Rod_3	nodes	Moyenne_temperature	periode 1e-2 circle   19 -0.0165 0.0165   0.    2  0.00935  180. 360.
+			sonde_Tm_Rod_7	nodes	Moyenne_temperature	periode 1e-2 circle   19 -0.0495 0.0165   0.    2  0.00935  180. 360.
+			sonde_Tm_Rod_11	nodes	Moyenne_temperature	periode 1e-2 circle   19 -0.0825 0.0165   0.    2  0.00935  180. 360.
+			sonde_Tm_Rod_15	nodes	Moyenne_temperature	periode 1e-2 circle   19 -0.1155 0.0165   0.    2  0.00935  180. 360.
+		}
+
+		Format lata
+		fichier Post_TOTAL/Post
+		Champs dt_post 0.5
+		{
+			pression	elem
+			vitesse		faces
+			temperature	faces
+			k		elem
+			eps		elem
+			y_plus		elem
+			viscosite_turbulente elem
+		}
+		Statistiques dt_post 0.5
+		{
+			t_deb $TDEB t_fin 50.
+			moyenne pression
+			moyenne vitesse
+			moyenne temperature
+			moyenne y_plus
+			moyenne Viscosite_turbulente
+			ecart_type pression
+			ecart_type vitesse
+			ecart_type temperature
+			ecart_type y_plus
+			ecart_type Viscosite_turbulente
+		}
+	  }
+
+	  Post_INOUT
+	  {
+		domaine INOUT
+		format lata
+		fichier Post_INOUT/Post
+		Champs dt_post 0.5
+		{
+			pression	elem
+			vitesse		faces
+			temperature	faces
+			k		elem
+			eps		elem
+			viscosite_turbulente elem
+		}
+		Statistiques dt_post 0.5
+		{
+			t_deb $TDEB t_fin 50.
+			moyenne pression
+			moyenne vitesse
+			moyenne temperature
+			moyenne Viscosite_turbulente
+			ecart_type pression
+			ecart_type vitesse
+			ecart_type temperature
+			ecart_type Viscosite_turbulente
+		}
+	  }
+
+	  Post_WALL
+	  {
+		domaine WALL
+		format lata
+		fichier Post_WALL/Post
+		Champs dt_post 0.5
+		{
+			temperature	faces
+			y_plus		elem
+		}
+		Statistiques dt_post 0.5
+		{
+			t_deb $TDEB t_fin 50.
+			moyenne temperature
+			moyenne y_plus
+			ecart_type temperature
+			ecart_type y_plus
+		}
+	  }
+
+	  Post_HOT
+	  {
+		domaine HOT
+		format lata
+		fichier Post_HOT/Post
+		Champs dt_post 0.5
+		{
+			temperature	faces
+			y_plus		elem
+		}
+		Statistiques dt_post 0.5
+		{
+			t_deb $TDEB t_fin 50.
+			moyenne temperature
+			moyenne y_plus
+			ecart_type temperature
+			ecart_type y_plus
+		}
+	  }
+	}
+}
+
+Resoudre pb
+Fin

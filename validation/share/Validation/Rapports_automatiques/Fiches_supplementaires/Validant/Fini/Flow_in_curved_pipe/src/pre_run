@@ -1,0 +1,24 @@
+#!/bin/sh
+# Lance la simulation de la boite de recirculation si necessaire #
+rm -f pb_K_EPS_perio.dat pb_VITESSE_perio.dat
+dat=`ls -rt *.dat 2>/dev/null | tail -1`
+if [ "$dat" != "" ] && [ $dat -nt ../src/box.data ]
+then
+   echo "Boite de recirculation a jour."
+else
+   triou box 1>box.out 2>box.err
+fi
+# On fait un lien vers le dernier .dat genere
+ln -s -f `ls -rt pb_K_EPS*.dat | tail -1` pb_K_EPS_perio.dat
+ln -s -f `ls -rt pb_VITESSE*.dat | tail -1` pb_VITESSE_perio.dat
+
+# Recuperation du nombre de processeurs dans le fichier .prm
+NB_PROCS=`awk '/Castest/ {print $4}' ../*.prm | sort -u`
+if [ "`echo $NB_PROCS | awk '{print NF}'`" != 1 ]
+then
+   echo "Nombre de processeurs multiple dans le prm impossible !"
+   echo "NB_PROCS=$NB_PROCS" 
+   exit -1
+fi
+sed "s/NB_PROCS/$NB_PROCS/" ../template_dec.data > dec.data
+triou dec 1>dec.out 2>dec.err

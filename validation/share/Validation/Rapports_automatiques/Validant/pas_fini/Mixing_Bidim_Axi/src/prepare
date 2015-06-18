@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#Creation des repertoires
+
+RACINE=`pwd`
+#echo "RACINE="$RACINE
+cd $RACINE
+for mail in BURATTI_M1 BURATTI_M2 BURATTI_M3 BURATTI_M4 BURATTI_M5; 
+do
+mkdir -p ./$mail
+done;
+for mail in BURATTI_M1 BURATTI_M2 BURATTI_M3;
+do 
+ cd $RACINE/$mail
+ cp $RACINE/$mail.geom.gz .
+ gunzip -f $mail.geom.gz
+ if [ $mail != BURATTI_M3 ]
+ then
+  cp $RACINE/hydraulique.data .
+  cp $RACINE/melange.data .
+  cp $RACINE/pre_run .
+  if [ $mail == BURATTI_M2 ]
+  then
+   sed "s/BURATTI_M1.geom/BURATTI_M2.geom/" hydraulique.data > modifie.data
+   mv modifie.data hydraulique.data
+   sed "s/BURATTI_M1.geom/BURATTI_M2.geom/" melange.data > modifie.data
+   mv modifie.data melange.data
+  fi
+ fi
+done;
+#
+mail_base=BURATTI_M1
+mail_dest=BURATTI_M3
+for freq in F0.5 F1 F2 ; 
+do
+ cd $RACINE/BURATTI_M3
+ mkdir -p ./$freq
+ cd $freq
+ cp $RACINE/hydraulique.data .
+ cp $RACINE/melange.data .
+ cp $RACINE/pre_run .
+ sed "s~$mail_base.geom~../$mail_dest.geom~" hydraulique.data > modifie.data
+ mv modifie.data hydraulique.data
+ sed "s~$mail_base.geom~../$mail_dest.geom~" melange.data > modifie.data
+ mv modifie.data melange.data
+done;
+#
+cd $RACINE/BURATTI_M3/F1
+cp $RACINE/post_run .
+#
+for F in 0.5 2 ;
+do
+ cd $RACINE/BURATTI_M3/F$F
+ for jdd in hydraulique.data melange.data ;
+ do
+  sed -e "s/PI/$F*PI/g" $jdd > modifie.data
+  mv modifie.data $jdd
+ done;
+ nbperio=5 
+ temps=`echo "scale=0; $nbperio*$F" | bc`
+ sed -e "s/tmax 150./tmax $temps/g" melange.data > modifie.data
+ mv modifie.data melange.data
+done;
+#
+#cas de base : maillage BURATTI_M1 F=1 Hz 
+#
+cd $RACINE/BURATTI_M4
+cp $RACINE/decoupage.data .
+cp $RACINE/BURATTI_M4.geom.gz .
+gunzip -f BURATTI_M4.geom.gz
+cp $RACINE/melange_SONDE_VAR_M4.son melange_SONDE_VAR.son
+#
+cd $RACINE/BURATTI_M5
+# cp $RACINE/hydraulique.data .
+# cp $RACINE/melange_court.data melange.data
+cp $RACINE/decoupage.data .
+cp $RACINE/BURATTI_M5.geom.gz .
+gunzip -f BURATTI_M5.geom.gz
+sed "s/BURATTI_M4.geom/BURATTI_M5.geom/" decoupage.data > modifie.data
+mv modifie.data decoupage.data
+sed "s/tranches 1 12/tranches 2 24/" decoupage.data > modifie.data
+mv modifie.data decoupage.data
+cp $RACINE/melange_SONDE_VAR_M5.son melange_SONDE_VAR.son
+

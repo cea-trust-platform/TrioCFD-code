@@ -1,0 +1,51 @@
+#!/bin/bash
+tar xf Data_Ref.tar
+mkdir -p stable_vef stable_vdf stable_vef_alpha02
+mkdir -p unstable_vef unstable_vdf unstable_vef_alpha02
+cp post_run stable_vdf
+cd stable_vef
+cp ../STABLE.data .
+
+cd ../stable_vef_alpha02
+cp ../stable_vef/STABLE.data .
+sed "s/EF_stab { }/ EF_stab { alpha 0.2 }/" STABLE.data > modifie.data
+mv modifie.data STABLE.data
+
+cd ../stable_vdf
+cp ../stable_vef/STABLE.data .
+sed "s/convection { EF_stab { } }/convection { amont }/g" STABLE.data > modifie.data
+sed "s/Nombre_de_Noeuds 91 21/Nombre_de_Noeuds 141 51/" modifie.data > STABLE.data
+sed "s/Facteurs  1. 0.9 /Facteurs  1. 0.95 /" STABLE.data > modifie.data
+sed "s/Trianguler_H dom//" modifie.data > STABLE.data
+sed "s/VEFPreP1B /VDF /" STABLE.data > modifie.data
+mv modifie.data STABLE.data
+
+cd ../unstable_vef
+cp ../stable_vef/STABLE.data UNSTABLE.data
+sed "s/(0.050175\*(0.1>Y)+0.050175)/(0.1\*(0.1>Y)+0.1)/g" UNSTABLE.data > modifie.data
+sed "s/((y>0.1)\*2.52e-5+(y<0.1)\*1.01e-4)/((y>0.1)\*1.01e-4+(y<0.1)\*4.03e-4)/g" modifie.data > UNSTABLE.data
+sed "s/((y>0.1)\*1.40e-5+(y<0.1)\*1.12e-4)/((y>0.1)\*1.12e-4+(y<0.1)\*8.98e-4)/g" UNSTABLE.data > modifie.data
+sed "s/((y>0.1)\*27.9+(y<0.1)\*12.1)/((y>0.1)\*21.+(y<0.1)\*19.)/g" modifie.data > UNSTABLE.data
+rm modifie.data
+
+cd ../unstable_vef_alpha02
+cp ../stable_vef/STABLE.data UNSTABLE.data
+sed "s/(0.050175\*(0.1>Y)+0.050175)/(0.1\*(0.1>Y)+0.1)/g" UNSTABLE.data > modifie.data
+sed "s/((y>0.1)\*2.52e-5+(y<0.1)\*1.01e-4)/((y>0.1)\*1.01e-4+(y<0.1)\*4.03e-4)/g" modifie.data > UNSTABLE.data
+sed "s/((y>0.1)\*1.40e-5+(y<0.1)\*1.12e-4)/((y>0.1)\*1.12e-4+(y<0.1)\*8.98e-4)/g" UNSTABLE.data > modifie.data
+sed "s/((y>0.1)\*27.9+(y<0.1)\*12.1)/((y>0.1)\*21.+(y<0.1)\*19.)/g" modifie.data > UNSTABLE.data
+sed "s/EF_stab { }/ EF_stab { alpha 0.2 }/" UNSTABLE.data > modifie.data
+mv modifie.data UNSTABLE.data
+
+
+cd ../unstable_vdf
+cp ../unstable_vef/UNSTABLE.data UNSTABLE.data
+sed "s/convection { EF_stab { } }/convection { amont }/g" UNSTABLE.data > modifie.data
+sed "s/Nombre_de_Noeuds 91 21/Nombre_de_Noeuds 141 51/" modifie.data > UNSTABLE.data
+sed "s/Facteurs  1. 0.9 /Facteurs  1. 0.95 /" UNSTABLE.data > modifie.data
+sed "s/Trianguler_H dom//" modifie.data > UNSTABLE.data
+sed "s/VEFPreP1B /VDF /" UNSTABLE.data > modifie.data
+mv modifie.data UNSTABLE.data
+
+cd ..
+

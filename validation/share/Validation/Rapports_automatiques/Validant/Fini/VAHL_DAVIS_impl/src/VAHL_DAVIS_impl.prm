@@ -1,0 +1,1446 @@
+Parameters {
+	Title "Convection Vahl Davis implicite"
+	Description Here the VAHL_DAVIS test case is considered in a 2D laminar regime to assess the implicit time scheme.
+	Description The calculations are performed with the Piso, Implicite and Simple algorithms as well as with the Euler explicit time scheme for VEFPreP1b and VDF discretization.
+	Description The amont convection scheme is considered for the Navier_Stokes and Convection_Diffusion_Temperature equations.
+	Description
+	Description The calculations are compared with explicite resolution
+	
+        ParametersTrio_U Type of problem : Thermal hydraulic         
+        ParametersTrio_U Time scheme : Euler_implicite (Piso - Implicite - Simple) and Euler_explicite
+        ParametersTrio_U Convection scheme :  hydraulic and temperature: amont   
+        ParametersTrio_U Discretization : VEFPreP1B and VDF  
+        ParametersTrio_U Type of boundary conditions : no slip at solid interface
+        ParametersTrio_U Type of fluid : incompressible with boussinesq source terms
+
+
+	Author "M. Elmo"
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_explicite
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_piso
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_implicite /* data set in annex */
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_simple
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_piso_facsecmax500
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_implicite_facsecmax500
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_simple_facsecmax500
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_simple_relax0.2
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_simple_relax0.01
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_simple_relax0.001
+	TestCase VAHL_DAVIS_VEFPreP1B VAHL_DAVIS_VEFPreP1B_piso_nb_proj2
+	
+	
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_explicite
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_piso
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_implicite
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_simple
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_piso_facsecmax500
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_implicite_facsecmax500
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_simple_facsecmax500
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_simple_relax0.2
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_simple_relax0.01
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_simple_relax0.001
+	TestCase VAHL_DAVIS_VDF VAHL_DAVIS_VDF_piso_nb_proj2
+	
+}
+
+Chapter { 
+	Title Tests Description
+
+        visu {
+	Title "mesh VEF"
+	description "Mesh : VEF : (41 x 41) + Trianguler_H" 
+	mesh ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.lata dom
+	operator no_axes
+	#width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+        }
+	
+	visu {
+	Title "mesh VDF"
+	description "Mesh : VDF : (101 x 101)" 
+	mesh ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.lata dom
+	operator no_axes
+	#width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+        }
+	
+	
+	Table {
+	Title "Time schemes parameters" 
+	Description "Notice that value -1 here indicates that the the specified variable has no sense for the algorithm."
+	
+	nb_columns 4
+	label Initial facsec | seuil_solveur | seuil_implicite | seuil_statio
+	
+	line {
+	 values  1 -1 -1 5.3e-8
+	 legend Euler explicite
+	}
+	line {
+	 values 1 1.e-8 1.e6 1.e-5
+	 legend Piso
+	}
+	line {
+	 values 1 1.e-8 1.e6 1.e-5
+	 legend Implicite
+	}
+	line {
+	 values 1 1.e-8 1.e6 1.e-5
+	 legend Simple
+	}
+	
+	}
+	
+}
+
+Chapter {
+	Title "Results for the default case (VEFPreP1B)"
+	Description "For the default case, the value of the facsec_max parameter is fixed to 30 and the value of the relax_pression parameter is set to 0.1 when the Simple algorithm is considered."
+ 
+ 	visu {
+	Description The figure shows the cell convection.
+	pseudocolor ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.lata dom TEMPERATURE SOM
+	blackvector ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.lata dom VITESSE SOM
+	#width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+	}
+
+
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm	
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right	
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 2
+	Logy
+	Include_Description_Curves 0
+	legend right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+
+	Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 2
+	RangeY 0 40
+	Include_Description_Curves 0
+	legend  center right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.dt_ev
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+
+}
+
+Chapter {
+	Title "Influence of the facsec parameter"
+	Description "In this chapter the influence of the facsec parameter is tested. The value retained for the facsec_max is 500 and the results are still compared to the explicit ones."
+	Description "The relax_pression parameter is set to 0.01 when the Simple algorithm is considered."
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right	
+	width 12cm
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_facsecmax500.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite_facsecmax500.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_facsecmax500.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm	
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_facsecmax500.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite_facsecmax500.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_facsecmax500.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 2
+	Logy
+	Include_Description_Curves 0
+	legend right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_facsecmax500.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite_facsecmax500.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_facsecmax500.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+	
+	Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 2
+	RangeY 0 600
+	Include_Description_Curves 0
+	legend left
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_facsecmax500.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_implicite_facsecmax500.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_facsecmax500.dt_ev
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+}
+
+Chapter {
+	Title "Influence of the relax_pression parameter for the Simple algorithm"
+	Description "In this chapter the influence of the relax_pression parameter for the Simple algorithm is tested. The calculations have been performed for the following values of this parameter : 0.2, 0.1, 0.01 and 0.001. The results are compared to the explicit ones."
+	Description "The value of the facsec_max parameter is set to 30."
+
+	
+	Figure {
+	Include_Description_Curves 0
+	legend left
+	width 12cm
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.2"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.2.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.1"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.01"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.01.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.001"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.001.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.2"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.2.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.1"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.01"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.01.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.001"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.001.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 3
+	Logy
+	Include_Description_Curves 0
+	legend  center right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "relax_pression = 0.2"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.2.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "relax_pression = 0.1"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "relax_pression = 0.01"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.01.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.2
+	}
+	Curve {
+		 legend "relax_pression = 0.001"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_simple_relax0.001.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.2
+	}
+	}
+}
+
+Chapter {
+	Title "Influence of the number of corrections for the PISO algorithm"
+	Description "In this chapter the influence of the number of corrections applied in the PISO algorithm is tested. In a first case the maximum number of corrections is set to 21 and in a second case it is fixed to 2."
+	Description "The value of the facsec_max parameter is set to 30."
+
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "nb corrections max = 21"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	
+	Curve  { 
+	   legend "nb corrections max = 2"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_nb_proj2.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.5
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "nb corrections max = 21"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "nb corrections max = 2"
+	   segment ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_nb_proj2.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.5
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 2
+	Logy
+	Include_Description_Curves 0
+	legend right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "nb corrections max = 21"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	
+	Curve {
+		 legend "nb corrections max = 2"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VEFPreP1B/VAHL_DAVIS_VEFPreP1B_piso_nb_proj2.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "It is first observed that the three implicit algorithms lead to identical results in comparison to those obtained with the explicit time scheme."
+	Description "It may also be noticed that the three implicit algorithms reach the stationnarity threshold value when the facsec is allowed to increase to values larger than 30."
+	Description "-PISO : The efficiency of the algorithm is strongly improved when the maximum corrections is reduced to 2. This fact is observed for facsec_max = 30."
+	Description ""
+	Description "-Simple : The relaxation pressure factor affects the residu evolution since for the larger value (0.2) the requested convergency is not reached and moreover the velocity and temperature profiles are strongly affected." 
+ 	Description "Finally the more efficient algorithm to obtain satisfactory results with the requested convergency criteria is the Implicite. The big advantage of this algorithm is that there is no need to provide other parameters, which is more user friendly and gives results which are less user dependant."
+}
+
+
+
+Chapter {
+	Title "Results for the default case (VDF)"
+	Description "For the default case, the value of the facsec_max parameter is fixed to 30 and the value of the relax_pression parameter is set to 0.1 when the Simple algorithm is considered."
+ 
+ 	visu {
+	Description The figure shows the cell convection.
+	pseudocolor ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.lata dom TEMPERATURE SOM
+	blackvector ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.lata dom VITESSE SOM
+	#width 15cm,viewport=0 100 1024 300,clip
+	origin mesh
+ 	}
+
+
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 3
+	Logy
+	Include_Description_Curves 0
+	legend  center right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}	
+	}
+	
+	Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 3
+	RangeY 0 40
+	Include_Description_Curves 0
+	legend  center right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.3
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.dt_ev
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}	
+	}
+}
+
+Chapter {
+	Title "Influence of the facsec parameter"
+	Description "In this chapter the influence of the facsec parameter is tested. The value retained for the facsec_max is 500 and the results are still compared to the explicit ones."
+	Description "The relax_pression parameter is set to 0.01 when the Simple algorithm is considered."
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend right
+	width 12cm	
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_facsecmax500.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite_facsecmax500.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_facsecmax500.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Piso"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_facsecmax500.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "Implicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite_facsecmax500.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "Simple"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_facsecmax500.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 2
+	Logy
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_facsecmax500.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite_facsecmax500.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_facsecmax500.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+	
+	Figure {
+	Title "Time evolution of the facsec"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "facsec"
+	RangeX 0 2
+	Include_Description_Curves 0
+	legend left
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Piso"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_facsecmax500.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "Implicite"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_implicite_facsecmax500.dt_ev
+		 columns $1 $3
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "Simple"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_facsecmax500.dt_ev
+		 columns  $1 $3
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+}
+
+Chapter {
+	Title "Influence of the relax_pression parameter for the Simple algorithm"
+	Description "In this chapter the influence of the relax_pression parameter for the Simple algorithm is tested. The calculations have been performed for the following values of this parameter : 0.2, 0.1, 0.01 and 0.001. The results are compared to the explicit ones."
+	Description "The value of the facsec_max parameter is set to 30."
+
+
+	Figure {
+	Include_Description_Curves 0
+	legend bottom left
+	width 12cm
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.2"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.2.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.1"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.01"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.01.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.001"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.001.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.2"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.2.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "relax_pression = 0.1"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.01"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.01.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	Curve  { 
+	   legend "relax_pression = 0.001"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.001.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.1
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 3
+	Logy
+	Include_Description_Curves 0
+	legend  center right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "relax_pression = 0.2"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.2.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 1
+	}
+	Curve {
+		 legend "relax_pression = 0.1"
+		 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "relax_pression = 0.01"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.01.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	Curve {
+		 legend "relax_pression = 0.001"
+	  	 origin "Trio_U"
+	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_simple_relax0.001.dt_ev
+		 columns  $1 $4
+		 style linespoints
+		 Pointsize 0.1
+	}
+	}
+}
+
+Chapter {
+	Title "Influence of the number of corrections for the PISO algorithm"
+	Description "In this chapter the influence of the number of corrections applied in the PISO algorithm is tested. In a first case the maximum number of corrections is set to 21 and in a second case it is fixed to 2."
+	Description "The value of the facsec_max parameter is set to 30."
+
+	
+	Figure {
+	Include_Description_Curves 0
+	legend right
+	width 12cm
+	Description "" 
+	Title Velocity profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "V (m/s)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "nb corrections max = 21"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 1
+	}
+	
+	Curve  { 
+	   legend "nb corrections max = 2"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_nb_proj2.data SONDE_VITY
+	   columns $1 $3
+	   style linespoints
+	   Pointsize 0.5
+	}
+	}
+	
+	
+	Figure {
+	Include_Description_Curves 0
+	legend  right
+	width 12cm
+	Description "" 
+	Title Temperature profile at y = 0.005 m
+
+	Dimension 2
+	labelx "x (m)"
+	labely "T (°K)"
+	rangex  0 0.01
+	
+	Curve  { 
+	   legend "Euler explicite"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 2
+	}
+	Curve  { 
+	   legend "nb corrections max = 21"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 1
+	}
+	Curve  { 
+	   legend "nb corrections max = 2"
+	   segment ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_nb_proj2.data SONDE_TEMPY
+	   columns $1 $2
+	   style linespoints
+	   Pointsize 0.5
+	}
+	}
+
+
+	Figure {
+	Title "Time evolution of the residu"
+	description ""
+	dimension 2
+	labelx "Time (s)"
+	labely "Residu"
+	RangeX 0 2
+	Logy
+	Include_Description_Curves 0
+	legend right
+	width 12cm
+	
+	Curve {
+		 legend "Euler explicite"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_explicite.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	Curve {
+		 legend "nb corrections max = 21"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.5
+	}
+	
+	Curve {
+		 legend "nb corrections max = 2"
+		 origin "Trio_U"
+ 	  	 file ./VAHL_DAVIS_VDF/VAHL_DAVIS_VDF_piso_nb_proj2.dt_ev
+		 columns $1 $4
+		 style linespoints
+		 Pointsize 0.3
+	}
+	}
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "It is first observed that the three implicit algorithms lead to identical results in comparison to those obtained with the explicit time scheme. Notice that the relaxation pressure factor must be set to 0.01 (or lower) for the Simple algorithm."
+	Description "This observation remains true when the facsec is allowed to increase to values larger than 30 (the relax_pression factor being fixed to 0.01 for the Simple algorithm)."
+	Description "-PISO : The efficiency of the algorithm is strongly improved when the maximum corrections is reduced to 2. This fact is observed for facsec_max = 30."
+	Description ""
+	Description "-Simple : The relaxation pressure factor affects the convergency and the results for the larger values considered (0.2 and 0.1)." 
+ 	Description ""
+ 	Description "Finally the Implicite and Simple algorithms are the more efficient to obtain satisfactory results with the requested convergency criteria and they show indeed some very close performance for this test case. However, the recommended algorithm is the Implicite. The big advantage of this algorithm is that there is no need to provide other parameters, which is more user friendly and give results which are less user dependant."
+
+       
+}
+Chapter {
+	Title " Recommandations for users "
+ 	Description "When making implicit calculations, use the Implicite algorithm. It gives good results and  there is no need to provide other parameters, which is more user friendly and give results which are less user dependant."
+}
+
+Chapter {
+	Title "Computer performance"
+	Description "The performance data indicated in the array below corresponds to the values extracted from the .TU file." 
+	Description "It has to be noticed that by default these data corresponds to the elapsed time to perform each calculation (method gettimeofday used in Statistiques)."
+
+	Tableau_performance {
+	}
+
+}

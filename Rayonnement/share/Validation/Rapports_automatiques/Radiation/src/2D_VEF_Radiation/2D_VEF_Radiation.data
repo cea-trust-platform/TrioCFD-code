@@ -1,0 +1,260 @@
+# Thermohydraulique 2D VEF couplee a conduction 2D avec rayonnement de paroi #
+# PARALLEL OK #
+dimension 2    
+Schema_Euler_implicite sch
+Read sch
+{
+        tinit 0.
+        tmax 10000000
+        dt_min 1.e-9
+        dt_impr 1.
+        dt_sauv 500.
+        seuil_statio 1.e-5
+solveur piso { 
+	no_qdm 
+	Seuil_convergence_solveur 1e-8
+	Seuil_convergence_implicite 1e-1 
+}
+facsec 100.
+}
+
+Schema_Euler_explicite sch2
+Read sch2
+{
+        tinit 0.
+        tmax 20
+        dt_min 1.e-9
+        dt_max 0.5
+        dt_impr 0.1
+        dt_sauv 500.
+        seuil_statio -1.e-5
+}
+
+Pb_conduction pb1
+Pb_Thermohydraulique pb2
+
+Domaine dom_solide
+Domaine dom_fluide
+# BEGIN MESH #
+
+/*
+Read_file dom_fluide Cavite.geom 
+VerifierCoin dom_fluide { }
+
+*/ 
+ Mailler dom_fluide
+{
+        Pave Cavite
+                {
+                Origine 0. 0.
+                Nombre_de_Noeuds 3 6
+                Longueurs 0.05 0.05
+                }
+                {
+                Raccord local homogene Gauche   X = 0.    0. <= Y <= 0.05 
+                Raccord local homogene Droit    X = 0.05  0. <= Y <= 0.05
+                Bord Bas                        Y = 0.    0. <= X <= 0.05
+                Bord Haut                       Y = 0.05  0. <= X <= 0.05
+                }
+} 
+trianguler_h dom_fluide
+
+Mailler dom_solide
+{
+        Pave Solide_Gauche
+                {
+                Origine -0.01 0.
+                Nombre_de_Noeuds 3 6
+                Longueurs 0.01 0.05
+                }
+                {
+                Raccord local homogene Gauche    X = 0.       0. <= Y <= 0.05
+                Bord Gauche_Gauche               X = -0.01    0. <= Y <= 0.05
+                Bord Bas_Gauche                  Y = 0.    -0.01 <= X <= 0.  
+                Bord Haut_Gauche                 Y = 0.05  -0.01 <= X <= 0.
+                } ,
+
+        Pave Solide_Droit
+                {
+                Origine 0.05 0.
+                Nombre_de_Noeuds 3 6
+                Longueurs 0.01 0.05
+                }
+                {
+                Raccord local homogene Droit     X = 0.05     0. <= Y <= 0.05
+                Bord Droit_Droit                 X = 0.06     0. <= Y <= 0.05
+                Bord Bas_Droit                   Y = 0.     0.05 <= X <= 0.06  
+                Bord Haut_Droit                  Y = 0.05   0.05 <= X <= 0.06
+                }
+}
+
+
+
+Trianguler_h dom_solide
+
+
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_solide
+{
+	partitionneur metis
+	{ Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM1
+}
+
+
+
+Partition dom_fluide
+{
+	partitionneur metis
+	{ Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM2
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom_solide
+Scatter DOM2.Zones dom_fluide
+END SCATTER #
+
+VEFPreP1B dis
+
+Fluide_Incompressible fluide
+Read fluide
+{
+        mu Champ_Uniforme 1 1.e-7
+        rho Champ_Uniforme 1 1.
+        lambda Champ_Uniforme 1 0.2
+        Cp Champ_Uniforme 1 1000.
+        beta_th Champ_Uniforme 1 0.
+}
+
+Solide sol
+Read sol
+{
+        rho Champ_Uniforme 1 1000.
+        lambda Champ_Uniforme 1 46.    
+        Cp Champ_Uniforme 1 100.
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81 
+Associate sol gravite
+Associate fluide gravite
+
+Associate pb1 dom_solide
+Associate pb1 sol
+
+Associate pb2 dom_fluide
+Associate pb2 fluide
+
+Pb_Couple_Rayonnement pbc
+Associate pbc pb1
+Associate pbc pb2
+Associate pbc sch
+Discretize pbc dis
+
+Modele_Rayonnement_Milieu_Transparent mod 
+Associate pbc mod
+
+Read mod 
+{
+  fichier_face_rayo 2D_VEF_Radiation.facesrayo
+  fichier_fij 2D_VEF_Radiation.factforme
+  fichier_matrice 2D_VEF_Radiation.mat_inv_ray
+  relaxation 0
+}
+
+Read pb2
+{
+        Navier_Stokes_standard
+        {
+                solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-5 }  
+                convection { negligeable }
+                diffusion {  }
+                conditions_initiales {
+                        vitesse Champ_Uniforme 2 0. 0.
+                        }
+                boundary_conditions {
+                        Droit paroi_fixe
+                        Haut paroi_fixe
+                        Gauche  paroi_fixe
+                        Bas paroi_fixe
+                }
+        }
+        Convection_Diffusion_Temperature
+        {
+                diffusion {  }
+                convection { negligeable  }
+                boundary_conditions 
+                {	
+		 	Droit paroi_contact pb1 Droit
+                        Haut Paroi_flux_impose
+                                Champ_front_Uniforme 1 0.
+                        Gauche paroi_contact  pb1 Gauche
+                        Bas Paroi_flux_impose
+                                Champ_front_Uniforme 1 0.
+                }
+                conditions_initiales { Temperature Champ_Uniforme 1 379.15 }
+        }
+        Postraitement
+        {
+                Sondes
+                { 
+		T_FLUIDE temperature periode 10. segment 5 5.e-3 2.5e-2 4.5e-2 2.5e-2
+		TEST1D_FLUIDE temperature periode 10. segment 5 5.e-3 5.e-3 5.e-3 4.5e-2
+                }
+		format lata
+                Champs dt_post 200.
+                {
+                        pression elem
+                        pression som
+                        vitesse elem
+                        vitesse som
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+Read pb1
+{
+        Conduction
+        {
+                diffusion {  }
+                conditions_initiales { temperature Champ_Uniforme 1 379.15 }
+                boundary_conditions {
+                        Droit paroi_contact pb2 Droit
+                        Droit_Droit paroi_temperature_imposee
+				 Champ_Front_Uniforme 1 323.15
+			Bas_Droit paroi_adiabatique
+			Haut_Droit paroi_adiabatique
+			Gauche paroi_contact  pb2 Gauche
+                        Gauche_Gauche Paroi_flux_impose Champ_front_Uniforme 1 400.
+                        Bas_Gauche paroi_adiabatique
+			Haut_Gauche paroi_adiabatique
+                }
+        }
+        Postraitement
+        {
+                Sondes
+                {
+                T_SOLIDE_GAUCHE temperature periode 10. segment 2 -7.5e-3 2.5e-2 -2.5e-3 2.5e-2
+                T_SOLIDE_DROITE temperature periode 10. segment 2 5.25e-2 2.5e-2 5.75e-2 2.5e-2
+		TEST1D_SOLGAUCH temperature periode 10. segment 2 -2.5e-3 5.e-3 -2.5e-3 4.5e-2
+		TEST1D_SOLDROIT temperature periode 10. segment 2 5.25e-2 5.e-3 5.25e-2 4.5e-2
+                }
+		format lata
+                Champs dt_post 200.
+                {
+                        temperature elem
+                        temperature som
+                }
+        }
+}
+
+Solve pbc
+End

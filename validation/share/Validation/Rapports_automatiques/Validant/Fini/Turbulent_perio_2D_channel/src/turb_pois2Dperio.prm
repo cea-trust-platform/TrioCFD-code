@@ -1,0 +1,616 @@
+Parameters {
+	Title "Turbulent flow comparisons: EF_stab versus Amont and Muscl schemes, with different mesh sizes"
+	Description "Turbulent flow in a 2D-periodic plane channel."
+	Description "Study of the behaviour of 3 convection schemes: Amon, Muscl, and EF_stab, EF_stab (alpha = 0.2) with an Euler explicite time scheme, on the velocity. "
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Dimension: 2D 
+	ParametersTrio_U Discretization: VEFPreP1B
+	ParametersTrio_U Time scheme: Euler explicite
+	ParametersTrio_U Turbulent model: Mixing length
+	ParametersTrio_U Momentum convection scheme: Amont, Muscl, EF_stab with alpha = 1. and alpha = 0.2 
+	ParametersTrio_U Momentum diffusion scheme: standard{}
+	ParametersTrio_U Solving of equations: Navier_Stokes_Turbulent
+	ParametersTrio_U Source term: Source { Canal_perio { bord periox } }
+
+	TestCase N0/Muscl test \*
+	TestCase N0/EF_stab test
+	TestCase N0/EF_stab02 test
+	TestCase N0/Amont test
+
+	TestCase N1/Muscl test
+	TestCase N1/EF_stab test
+	TestCase N1/EF_stab02 test
+	TestCase N1/Amont test
+
+	TestCase N2/Muscl test
+	TestCase N2/EF_stab test
+	TestCase N2/EF_stab02 test
+	TestCase N2/Amont test
+
+	TestCase N3/Muscl test
+	TestCase N3/EF_stab test
+	TestCase N3/EF_stab02 test
+	TestCase N3/Amont test
+
+	TestCase N4/Muscl test
+	TestCase N4/EF_stab test
+	TestCase N4/EF_stab02 test
+	TestCase N4/Amont test
+
+	TestCase N5/Muscl test
+	TestCase N5/EF_stab test
+	TestCase N5/EF_stab02 test
+	TestCase N5/Amont test
+
+
+	
+	Author "E. MOREAU (V.BARTHEL)"
+	IncludeData 2
+
+	Prerequisite sh ./getUtauYplus.sh
+}
+Chapter {
+	Title "Tests Description"
+	Description " Rectangular domain (6m along x, 2m along y)"
+	Description " Hydraulic initial conditions: vitesse Champ_fonc_xyz dom 2 200. 0."
+	Description " Boundary conditions: Periodicity (x), and wall (y) "
+	Description " A source term of pressure force is calculated by the code to maintain the imposed bulk velocity. Several meshes and convection schemes are tested. The velocity profiles will be compared with the analytic one"
+	Description " Validation with Dean's correlation: "
+	Description " \latex_($$ \textrm{Re}_{\tau} = 0.175.(\textrm{Re}_{b})^{7/8}\ \ \Longrightarrow\ \ u_{\tau} = \frac{\textrm{Re}_{\tau}.\nu}{h} $$\latex_) "
+	Description " \latex_($$\textrm{With\ present\  theoretical\ values:}\ \textrm{Re}_{b}=20000\ ;\ \textrm{Re}_{\tau}=1015\ ;\ u_{tau} = 10.15 $$\latex_)
+
+
+	visu {
+		Title "Mesh N0"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh N0/EF_stab/test.lata dom
+		Description "Mesh: 6 triangular cells obtained with option Trianguler"
+	}
+	
+	visu {
+		Title "Mesh N1"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh N1/EF_stab/test.lata dom
+		Description "Mesh: 24 triangular cells obtained with option Trianguler"
+	}
+
+	visu {
+		Title "Mesh N2"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh N2/EF_stab/test.lata dom
+		Description "Mesh: 96 triangular cells obtained with option Trianguler"
+	}
+
+	visu {
+		Title "Mesh N3"
+		Width 10cm, viewport= 0 0 1024 450,clip
+		mesh N3/EF_stab/test.lata dom
+		Description "Mesh: 384 triangular cells obtained with option Trianguler"
+	}
+
+# properties Geometry
+	Table {
+			Title "Physical properties "
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat	
+				nb_columns_file 2
+				columns ($1)
+			}
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat	
+				nb_columns_file 2
+				columns ($2)
+			}
+	}
+#
+
+}
+########################
+########################  Profile with amont scheme
+########################
+Chapter {
+	Title "Presentation of the velocity profiles"
+	Figure {
+		Title " Velocity profile vs mesh refinement (Amont) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 300.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			#Segment N0/Amont/test.data SONDE_VINLET
+			file N0/Amont/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			#Segment N1/Amont/test.data SONDE_VINLET 
+			file N1/Amont/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			#Segment N2/Amont/test.data SONDE_VINLET
+			file N2/Amont/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			#Segment N3/Amont/test.data SONDE_VINLET
+			file N3/Amont/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			#Segment N4/Amont/test.data SONDE_VINLET
+			file N4/Amont/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			#Segment N5/Amont/test.data SONDE_VINLET
+			file N5/Amont/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################
+########################  Profile with Muscl scheme
+########################
+Chapter {
+	Title "Presentation of the velocity profiles"
+	Figure {
+		Title " Velocity profile vs mesh refinement (Muscl) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 300.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			#Segment N0/Muscl/test.data SONDE_VINLET
+			file N0/Muscl/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			#Segment N1/Muscl/test.data SONDE_VINLET 
+			file N1/Muscl/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			#Segment N2/Muscl/test.data SONDE_VINLET
+			file N2/Muscl/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			#Segment N3/Muscl/test.data SONDE_VINLET
+			file N3/Muscl/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			#Segment N4/Muscl/test.data SONDE_VINLET
+			file N4/Muscl/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			#Segment N5/Muscl/test.data SONDE_VINLET
+			file N5/Muscl/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################
+########################  Profile with EF_stab scheme
+########################
+Chapter {
+	Figure {
+		Title " Velocity profile vs mesh refinement (EF_stab) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 300.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			#Segment N0/EF_stab/test.data SONDE_VINLET
+			file N0/EF_stab/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			#Segment N1/EF_stab/test.data SONDE_VINLET
+			file N1/EF_stab/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			#Segment N2/EF_stab/test.data SONDE_VINLET
+			file N2/EF_stab/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			#Segment N3/EF_stab/test.data SONDE_VINLET
+			file N3/EF_stab/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			#Segment N4/EF_stab/test.data SONDE_VINLET
+			file N4/EF_stab/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			#Segment N5/EF_stab/test.data SONDE_VINLET
+			file N5/EF_stab/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+########################
+######################## Profile with EF_stab scheme and alpha = 0.2
+########################
+Chapter {
+	Figure {
+		Title " Velocity profile vs mesh refinement (EF_stab {alpha = 0.2}) "
+		Width 12cm
+		Dimension 2
+		LabelX "y (m)"
+		RangeX 0. 2.
+		LabelY "U (m/s)"
+		RangeY 0. 300.
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend "N0"
+			origin "Trio_U"
+			#Segment N0/EF_stab02/test.data SONDE_VINLET
+			file N0/EF_stab02/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 1
+		}
+
+		Curve {
+			legend "N1"
+			origin "Trio_U"
+			#Segment N1/EF_stab02/test.data SONDE_VINLET
+			file N1/EF_stab02/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+		Curve {
+			legend "N2"
+			origin "Trio_U"
+			#Segment N2/EF_stab02/test.data SONDE_VINLET
+			file N2/EF_stab02/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 3
+		}
+		Curve {
+			legend "N3"
+			origin "Trio_U"
+			#Segment N3/EF_stab02/test.data SONDE_VINLET
+			file N3/EF_stab02/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 4
+		}
+		Curve {
+			legend "N4"
+			origin "Trio_U"
+			#Segment N4/EF_stab02/test.data SONDE_VINLET
+			file N4/EF_stab02/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 5
+		}
+		Curve {
+			legend "N5"
+			origin "Trio_U"
+			#Segment N5/EF_stab02/test.data SONDE_VINLET
+			file N5/EF_stab02/Moyennes_spatiales_vitesse_rho_mu.last
+			columns 1 2
+			Style lines
+			TypeLigne 6
+		}
+	}
+}
+
+########################  
+######################## Table u_tau.dat
+Chapter {
+	Table {
+			Title "Friction velocity and relative errors for meshes N0 to N5 "
+			Description " The following values are given for the schemes Amont (A), EF_stab (EF), EF_stab with alpha = 0.2 (EF02) and Muscl (M), and for the theoretical value (TV). We give successively the friction velocity (m/s) and the relative error in %. "
+			nb_columns 9
+			label A (m/s)|A (%)|M (m/s)|M (%)|EF (m/s)|EF (%)|EF02 (m/s)|EF02 (%)| TV (m/s)
+			line {
+			      	legend " N0 "
+				file N0/utau.dat	
+				nb_columns_file 9
+				columns ($1) ($2) ($3) ($4) ($5) ($6) ($7) ($8) ($9)
+			}
+			line {
+			      	legend " N1 "
+				file N1/utau.dat	
+				nb_columns_file 9
+				columns ($1) ($2) ($3) ($4) ($5) ($6) ($7) ($8) ($9)
+			}
+			line {
+			      	legend " N2 "
+				file N2/utau.dat	
+				nb_columns_file 9
+				columns ($1) ($2) ($3) ($4) ($5) ($6) ($7) ($8) ($9)
+			}
+			line {
+			      	legend " N3 "
+				file N3/utau.dat	
+				nb_columns_file 9
+				columns ($1) ($2) ($3) ($4) ($5) ($6) ($7) ($8) ($9)
+			}
+			line {
+			      	legend " N4 "
+				file N4/utau.dat	
+				nb_columns_file 9
+				columns ($1) ($2) ($3) ($4) ($5) ($6) ($7) ($8) ($9)
+			}
+			line {
+			      	legend " N5 "
+				file N5/utau.dat	
+				nb_columns_file 9
+				columns ($1) ($2) ($3) ($4) ($5) ($6) ($7) ($8) ($9)
+			}
+	}
+#
+	Table {
+			Title "Y+ values for meshes N0 to N5 "
+			Description " The following values are given for the schemes Amont (A), EF_stab (EF), EF_stab with alpha = 0.2 (EF02) and Muscl (M), and for the theoretical value (TV)."
+			nb_columns 4
+			label A |M |EF |EF02
+			line {
+			      	legend " N0 "
+				file N0/yplus.dat	
+				nb_columns_file 4
+				columns ($1) ($2) ($3) ($4)
+			}
+			line {
+			      	legend " N1 "
+				file N1/yplus.dat	
+				nb_columns_file 4
+				columns ($1) ($2) ($3) ($4)
+			}
+			line {
+			      	legend " N2 "
+				file N2/yplus.dat	
+				nb_columns_file 4
+				columns ($1) ($2) ($3) ($4)
+			}
+			line {
+			      	legend " N3 "
+				file N3/yplus.dat	
+				nb_columns_file 4
+				columns ($1) ($2) ($3) ($4)
+			}
+			line {
+			      	legend " N4 "
+				file N4/yplus.dat	
+				nb_columns_file 4
+				columns ($1) ($2) ($3) ($4)
+			}
+			line {
+			      	legend " N5 "
+				file N5/yplus.dat	
+				nb_columns_file 4
+				columns ($1) ($2) ($3) ($4)
+			}
+	}
+#
+}
+##
+## Evolution of friction velocity
+#Amont
+Chapter {
+	Figure {
+		Title " Evolution of friction velocities with meshes N0 to N5: Amont "
+		Width 10cm
+		Dimension 2
+		LabelX " Meshes "
+		RangeX 0 5
+		LabelY " Friction velocity (m/s) "
+		RangeY 8 14
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Theory "
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 9
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Amont"
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 1
+			Style points
+			TypePoints 3
+			TypeLigne 1
+			Pointsize 1.5
+		}
+}
+# EF_stab
+	Figure {
+		Title " Evolution of friction velocities with meshes N0 to N5: EF_stab (alpha=1;0.2) "
+		Width 10cm
+		Dimension 2
+		LabelX " Meshes "
+		RangeX 0 5
+		LabelY " Friction velocity (m/s) "
+		RangeY 8 14
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Theory "
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 9
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "EFStab"
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 5
+			Style points
+			TypePoints 3
+			TypeLigne 1
+			Pointsize 1.5
+		}
+		Curve {
+			legend "EFStab02"
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 7
+			Style points
+			TypePoints 6
+			TypeLigne 2
+			Pointsize 1.5
+		}
+}
+# Muscl
+	Figure {
+		Title " Evolution of friction velocities with meshes N0 to N5: Muscl "
+		Width 10cm
+		Dimension 2
+		LabelX " Meshes "
+		RangeX 0 5
+		LabelY " Friction velocity (m/s) "
+		RangeY 8 14
+		legend below title "Legende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Theory "
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 9
+			Style lines
+			TypeLigne -1
+		}
+		Curve {
+			legend "Muscl"
+			origin "Trio_U"
+			file frictionVelocity.dat
+			columns 0 3
+			Style points
+			TypePoints 3
+			TypeLigne 1
+			Pointsize 1.5
+		}
+	}
+}
+########################  
+########################
+Chapter {
+	Title " Conclusion "
+	Description " We can see that the results depend both on the mesh refinement and on the convection scheme used. Several remarks may be drawn: "
+	Description " - The simulations give satisfactory results for meshes upper than N0 (N1 to N5) "
+	Description " - The results are improved using second order schemes (Muscl and EF_stab) "
+	Description " - For y+ values lower than 42, the Amont results are sligthly deteriorated "
+
+}
+#
+Chapter {
+	Title "Recommendations for users"
+	Description " It is recommanded to use the EF_stab scheme associated to the mesh N2. "
+}
+
+Chapter {
+        Title "Computer performance"
+        tableau_performance {
+        }
+}
+

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+
+utau=`cat *Ustar.face | grep "<u+>" | tail -1 | awk '{print $6;}'`
+
+utau_th=`cat ../utau_analytique.dat | awk '{print $1;}'`
+
+tail -1 u_tau.dat | awk -v utauth=$utau_th -v utau=$utau '{print $1" "$2" "100*(utau-utauth)/utauth;}' > post_utau   
+
+temps=`ls Moyennes_spatiales_vitesse_rho_mu_* | sed -e 's/Moyennes_spatiales_vitesse_rho_mu_//g' | sed -e 's/_adim.dat//g' | sort -g | tail -1`
+#echo $utau
+
+../adim_Stat.sh les_Re405Pr071_T0Q.data "Moyennes_spatiales_vitesse_rho_mu_"$temps  $utau
+cp "Moyennes_spatiales_vitesse_rho_mu_"$temps moy_spat_dim.dat
+mv "Moyennes_spatiales_vitesse_rho_mu_"$temps"_adim.dat" moy_spat.dat
+
+dTdy=`grep -E -v '^(#| )' Moyennes_spatiales_Temp_$temps | head -n 2 | tail -n 1 | awk '{print ($2-0)/$1}'`
+#echo $dTdy
+ttau=`echo "scale=8;1./(0.011928*5193*$utau)" | bc`
+../adim_TStat.sh les_Re405Pr071_T0Q.data "Moyennes_spatiales_Temp_"$temps  $utau $ttau 0
+cp "Moyennes_spatiales_Temp_"$temps moy_tempo_T_dim.dat
+mv "Moyennes_spatiales_Temp_"$temps"_adim.dat" moy_tempo_T.dat

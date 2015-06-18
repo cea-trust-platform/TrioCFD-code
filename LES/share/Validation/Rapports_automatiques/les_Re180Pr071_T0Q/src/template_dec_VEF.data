@@ -1,0 +1,35 @@
+#  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 12 18 16
+		Longueurs  6.4 2. 3.2
+		tanh 0.90180
+		}
+		{
+		Bord periox   X = 0.            0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord periox   X = 6.4   0. <= Y <= 2.0           0. <= Z <= 3.2
+		Bord perioz   Z = 0.            0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord perioz   Z = 3.2   0. <= X <= 6.4   0. <= Y <= 2.0
+		Bord bas      Y = 0.            0. <= X <= 6.4   0. <= Z <= 3.2
+		Bord haut     Y = 2.            0. <= X <= 6.4   0. <= Z <= 3.2
+		}
+	}
+
+tetraedriser_homogene_fin dom
+Reordonner_faces_periodiques dom periox
+Reordonner_faces_periodiques dom perioz
+
+Partition dom
+{
+   periodique 2 periox perioz
+   larg_joint 2
+   partitionneur metis { nb_parts NB_PROCS }
+   Nom_Zones dom
+}
+Postraiter_domaine { domaine dom format lata fichier geom_VEF.lata }

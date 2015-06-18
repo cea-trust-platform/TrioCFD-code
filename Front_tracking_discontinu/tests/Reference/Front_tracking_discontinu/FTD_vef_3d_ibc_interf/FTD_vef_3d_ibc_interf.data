@@ -1,0 +1,203 @@
+#  
+ Cas test Front-tracking discontinu VEF.
+ Interface IBC avec lecture MED
+ Interface fluide_fluide
+ Gravite rho*g
+ Test de la reprise xyz d'une interface IBC + interface fluide-fluide
+ Concentration front-tracking
+
+ Essai de reprise du fichier, puis trois pas de temps
+ PARALLEL OK 4
+#
+
+dimension 3
+Probleme_FT_Disc_gen pb
+
+Domaine DOM
+# BEGIN MESH #
+Lire_fichier_bin DOM cylindre_bin.geom
+# END MESH #
+
+# BEGIN PARTITION
+Partition DOM {
+	partitionneur metis { Nb_parts 2 }
+	larg_joint 2
+	Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones DOM
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 8.856483e-03
+	tmax 0.1
+	dt_min 1.e-3
+	dt_max 0.02
+	dt_impr 10.
+	dt_sauv 100
+	seuil_statio -1
+	nb_pas_dt_max 3
+}
+
+Fluide_Incompressible liquide
+Lire liquide
+{
+	mu  Champ_Uniforme 1 0.282e-3
+ 	rho Champ_Uniforme 1 1000.
+}
+
+Fluide_Incompressible gaz
+Lire gaz
+{
+	mu  Champ_Uniforme 1 0.282e-4
+ 	rho Champ_Uniforme 1 100
+}
+
+Fluide_Diphasique fluide
+Lire fluide
+{
+	fluide0 liquide
+	fluide1 gaz
+	sigma   Champ_Uniforme 1 0.05
+}
+
+Constituant sirop
+Lire sirop
+{
+	coefficient_diffusion Champ_Uniforme 1 0.2e-4
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -10.
+Associate fluide gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+Transport_Interfaces_FT_Disc       body
+Convection_Diffusion_Concentration_FT_Disc concentration
+
+Associate pb hydraulique
+Associate pb interf
+Associate pb body
+Associate pb concentration
+
+Associate pb DOM
+Associate pb sch
+Associate pb fluide
+Associate pb sirop
+
+Discretize pb dis
+# Debog pb seq faces 1.e-5 0 #
+Lire pb
+{
+hydraulique
+{
+	modele_turbulence sous_maille_wale
+        {
+           Cw               1.e-16
+           turbulence_paroi negligeable
+        }
+
+	solveur_pression GCP { precond ssor { omega 1.6 } seuil 1e-14 impr }
+	convection           { amont }
+	diffusion            { }
+	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+	equation_interfaces_proprietes_fluide interf
+	equations_interfaces_vitesse_imposee 1   body
+	boundary_conditions
+	{
+		haut   Sortie_libre_rho_variable champ_front_uniforme 1 0.
+		paroi  paroi_fixe
+		bas    paroi_fixe
+	}
+}
+interf
+{
+	methode_transport vitesse_interpolee hydraulique
+	conditions_initiales {
+		fonction z-0.06
+        }
+        iterations_correction_volume 0
+        n_iterations_distance 2
+	remaillage {
+                pas -1e8
+                pas_lissage -0.000001
+	}
+	boundary_conditions
+	{
+		paroi Paroi_FT_disc symetrie
+		haut  Paroi_FT_disc symetrie
+		bas   Paroi_FT_disc symetrie
+	}
+}
+body
+{
+	conditions_initiales {
+		fonction z-0.05
+	}
+	remaillage {
+		pas -1e8
+		pas_lissage -1
+	}
+	boundary_conditions
+	{
+		haut  Paroi_FT_disc symetrie
+		paroi Paroi_FT_disc symetrie
+		bas   Paroi_FT_disc symetrie
+	}
+	methode_transport vitesse_imposee 0. -(z-0.03)*10. y*10.
+}
+concentration
+{
+	diffusion { }
+	convection { amont }
+	Nom_Inconnue concentration_sirop
+	Sources { 
+		Source_Constituant champ_fonc_xyz DOM 1 1.
+	}
+	conditions_initiales { 
+		concentration_sirop champ_fonc_xyz DOM 1 EXP(-(x*x+y*y+(z-0.06)^2)*400)
+	}
+	boundary_conditions {	
+		haut frontiere_ouverte c_ext champ_front_uniforme 1 0.
+		bas paroi
+		paroi paroi
+	}
+        equation_interface interf
+        phase 0
+        option RAMASSE_MIETTES_SIMPLE
+}
+postraitement {
+	champs dt_post 1. {
+		vitesse elem
+		indicatrice_interf elem
+		indicatrice_body elem
+		concentration_sirop elem
+	}
+}
+liste_postraitements {
+  postraitement_ft_lata post1 { 
+	nom_fichier post
+	interfaces  body { } 
+	champs elements { indicatrice_body indicatrice_interf } 
+	champs faces { vitesse concentration_sirop } 
+  }
+  postraitement_ft_lata post2 { 
+	nom_fichier post2 
+	interfaces  interf { } 
+  }
+}
+
+Reprise xyz prepare.xyz
+Sauvegarde xyz bidon.xyz
+}
+
+Solve pb
+Fin

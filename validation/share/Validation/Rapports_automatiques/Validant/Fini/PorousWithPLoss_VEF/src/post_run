@@ -1,0 +1,6 @@
+#!/bin/bash
+# on recupere les donnes necessaires a la creation auto de la fiche
+python ../propertiesGeometry.py
+# on calcule ici les differentes fonctions analytique pour la pression
+#calculer_Bernouilli.py
+#calculer_PdC_reg.py
