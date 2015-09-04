@@ -1,16 +1,16 @@
 /****************************************************************************
 * Copyright (c) 2015, CEA
 * All rights reserved.
-* 
+*
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 * 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-* 
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
-* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-* 
+*
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -453,9 +453,9 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
               pond1 = la_zone.face_normales(num[0],ori0);
               pond2 = la_zone.face_normales(num[1],ori0);
-	      double tps=vitesse.temps();
+              double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
-		Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1; // val tangentielle
+                               Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1; // val tangentielle
               vit_imp /= pond1+pond2;
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
@@ -511,9 +511,9 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
               pond1 = la_zone.face_normales(num[0],ori0);
               pond2 = la_zone.face_normales(num[1],ori0);
-	      double tps=vitesse.temps();
-	      double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
-		Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1;
+              double tps=vitesse.temps();
+              double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
+                               Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1;
               // val tangentielle
               vit_imp /= pond1+pond2;
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
@@ -625,10 +625,10 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
               pond1 = la_zone.face_normales(num[0],ori0);
               pond2 = la_zone.face_normales(num[1],ori0);
-	      double tps=vitesse.temps();
+              double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
-		Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1; // val tangentielle
-	      // val tangentielle
+                               Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1; // val tangentielle
+              // val tangentielle
               vit_imp /= pond1+pond2;
 
               coef[0] =  0.5*(vit(num[1])-vit(num[0]))/la_zone.dist_face(num[0],num[1],ori1);
@@ -683,11 +683,11 @@ DoubleTab& Modele_Jones_Launder_VDF::calcul_derivees_premieres_croisees(DoubleTa
 
               pond1 = la_zone.face_normales(num[0],ori0);
               pond2 = la_zone.face_normales(num[1],ori0);
-	      double tps=vitesse.temps();
+              double tps=vitesse.temps();
               double vit_imp = pond2*Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[0],ori1,zcl_hydro)+
-		Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1;
-             
-	      // val tangentielle
+                               Champ_Face_get_val_imp_face_bord_sym(vitesse.valeurs(),tps,num[1],ori1,zcl_hydro)*pond1;
+
+              // val tangentielle
               vit_imp /= pond1+pond2;
               //               double vit_imp = 0.5*(vitesse.val_imp_face_bord(num[0],ori1)+
               //                                     vitesse.val_imp_face_bord(num[1],ori1));                // val tangentielle
