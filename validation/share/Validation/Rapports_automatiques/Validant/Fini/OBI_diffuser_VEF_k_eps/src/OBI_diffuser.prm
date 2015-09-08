@@ -108,19 +108,19 @@ Chapter {
 		LabelX "Time (s)"
 		RangeX 0 300.
 		LabelY "Friction velocity"
-		RangeY 0.01 0.03
+		RangeY 0.02 0.07
 		Include_Description_Curves 0
 		legend below
 		Curve {
 			legend "Periodic Box"
 			file ./Calcul_gros/u_tau.dat.perio
-			columns ($1) ($2)
+			columns ($1) ($3)
 			TypeLigne 1
 		}
 		Curve {
-			legend "Main computation (u_tau + 0.03)"
+			legend "Main computation"
 			file ./Calcul_gros/u_tau.dat
-			columns ($1) ($2)+0.03
+			columns ($1) ($3)
 			TypeLigne 2
 		}
 		
@@ -133,19 +133,19 @@ Chapter {
 		LabelX "Time (s)"
 		RangeX 0 300.
 		LabelY "Friction velocity"
-		RangeY 0.01 0.04
+		RangeY 0.02 0.07
 		Include_Description_Curves 0
 		legend below
 		Curve {
 			legend "Periodic Box"
 			file ./Calcul_fin/u_tau.dat.perio
-			columns ($1) ($2)
+			columns ($1) ($3)
 			TypeLigne 1
 		}
 		Curve {
 			legend "Main computation"
 			file ./Calcul_fin/u_tau.dat
-			columns ($1) ($2)+0.03
+			columns ($1) ($3)
 			TypeLigne 2
 		}
 		
