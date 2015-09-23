@@ -1,0 +1,25 @@
+dimension 3
+domaine dom
+Mailler dom 
+{
+Pave oo
+ {
+                Origine -0.22 0  -0.22
+                Nombre_de_Noeuds 89 61 89
+                Longueurs 0.44 .3 .44
+        }
+        {
+                Bord Paroi  X = -0.22     0. <= Y <= .3    -0.22 <= Z <= 0.22
+                Bord Paroi  X =  0.22     0. <= Y <= .3  -0.22 <= Z <= 0.22
+                Bord Paroi   Y = 0.     -0.22 <= X <= 0.22     -0.22 <= Z <= 0.22
+                Bord Haute   Y = 0.3           -0.22 <= X <= 0.22     -0.22 <= Z <= 0.22
+                Bord Paroi   Z = -0.22           -0.22 <= X <= 0.22     0. <= Y <= 0.3
+                Bord Paroi   Z = 0.22           -0.22 <= X <= 0.22     0. <= Y <= 0.3
+                }
+
+}
+remove_elem dom { fonction (x*x+z*z)>0.22*0.22 }
+regroupebord dom Paroi { Paroi newBord }
+Postraiter_domaine { domaine dom format lata }
+ecrire_fichier dom cylindre.geom
+fin
