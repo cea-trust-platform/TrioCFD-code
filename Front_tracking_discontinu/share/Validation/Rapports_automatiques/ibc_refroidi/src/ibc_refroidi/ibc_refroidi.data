@@ -1,5 +1,6 @@
 # cylindre ibc refroidi  #
-# PARALLEL OK #
+# NB : depuis 1.7.2, ce cas n est plus teste en parallele a cause de preconditionnement_diag a 1 #
+# PARALLEL NOT #
 
 dimension 2
 Probleme_FT_Disc_gen pb
