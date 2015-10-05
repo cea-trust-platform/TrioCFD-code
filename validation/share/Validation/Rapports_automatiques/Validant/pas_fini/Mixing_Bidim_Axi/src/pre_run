@@ -1,3 +1,3 @@
 #!/bin/bash
-triou hydraulique 1>hydraulique.out 2>hydraulique.err
+trust hydraulique 1>hydraulique.out 2>hydraulique.err
 

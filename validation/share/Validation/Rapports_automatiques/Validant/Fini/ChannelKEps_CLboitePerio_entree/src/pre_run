@@ -6,7 +6,7 @@ if [ -f Prepare.err ] ;then test_calcul=`grep "Arret des processes." Prepare.err
 if [ "$test_calcul" != "Arret des processes."  ] ;then
 		
 	echo "Execution du calcul de la boite periodique"	
-	triou Prepare 1>Prepare.out 2>Prepare.err
+	trust Prepare 1>Prepare.out 2>Prepare.err
 
 
 	extrait_coupe Prepare.data SONDE_VISC_TURB

@@ -4,5 +4,5 @@ Xprep=$TRUST_ROOT/Outils/PRE_3DVDF/xprepro
 $Xprep boite.prep 2
 cd -
 ln -s prepro/Probleme1/Pb1.geom boite.geom
-triou decoupage
+trust decoupage
 export prod=1

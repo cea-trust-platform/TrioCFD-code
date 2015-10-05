@@ -11,7 +11,7 @@
 ################################################################################
 rm -f *.dat
 NB_PROCS="`ls *.Zones 2>/dev/null | wc -l`" && [ "$NB_PROCS" = 0 ] && NB_PROCS=""
-triou prepare $NB_PROCS 1>prepare.out 2>&1
+trust prepare $NB_PROCS 1>prepare.out 2>&1
 dat=`ls -rt *.dat`
 [ "$dat" = "" ] && echo "Erreur dans prepare" && exit -1
 #################################################################################

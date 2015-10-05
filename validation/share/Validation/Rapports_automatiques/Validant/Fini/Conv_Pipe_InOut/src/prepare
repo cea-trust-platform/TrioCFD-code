@@ -4,7 +4,7 @@ mkdir -p EF_stab Muscl Prt_std
 
 if [ ! -f dom01234.geom ]
 then
-   triou Tuyau 1>Tuyau.out 2>Tuyau.err
+   trust Tuyau 1>Tuyau.out 2>Tuyau.err
 fi
 
 # decoupage du domaine de calcul en 4 proc pour optimisation temps de calcul 
@@ -17,7 +17,7 @@ then
    exit -1
 fi
 sed "s/NB_PROCS/$NB_PROCS/" template_dec.data > dec.data
-triou dec 1>dec.out 2>dec.err
+trust dec 1>dec.out 2>dec.err
 
 # Creation des donnes des repertoires #
 cd EF_stab

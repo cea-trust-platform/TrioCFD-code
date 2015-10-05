@@ -15,7 +15,7 @@ do
       mv PAR_$BOX.data $BOX.data
       # Calcul des boites
       echo "........Calcul de la boite de recirculation."
-      triou $BOX.data 2 1>$BOX.out 2>$BOX.err
+      trust $BOX.data 2 1>$BOX.out 2>$BOX.err
    fi
    # On fait un lien vers le dernier .dat genere
    ln -s -f `ls -rt pb_K_EPS*.dat | tail -1` pb_K_EPS_perio.dat

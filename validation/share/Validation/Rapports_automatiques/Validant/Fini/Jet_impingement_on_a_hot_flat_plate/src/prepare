@@ -36,7 +36,7 @@ then
     Calculer
     sed -e "s?VAL_V?$V?g" -e "s?VAL_RE?$Re?g" -e "s?VAL_K?$K?g" -e "s?VAL_EPS?$EPS?g" ../Prepare.data > Prepare/Prepare.data
     cd Prepare
-      triou Prepare 1>Prepare.out 2>Prepare.err
+      trust Prepare 1>Prepare.out 2>Prepare.err
       fichier_V=`ls -art | grep "pb_VITESSE_PERIO" | tail -1`
       fichier_K=`ls -art | grep "pb_K_EPS_PERIO"   | tail -1`
     cd ../

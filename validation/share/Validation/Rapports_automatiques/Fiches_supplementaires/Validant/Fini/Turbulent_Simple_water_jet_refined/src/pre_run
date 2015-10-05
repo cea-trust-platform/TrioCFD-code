@@ -1,4 +1,4 @@
 #!/bin/bash
 cp ../../dec.data .
-triou dec 1>dec.log 2>&1 || exit -1
+trust dec 1>dec.log 2>&1 || exit -1
 rm -f dec.data

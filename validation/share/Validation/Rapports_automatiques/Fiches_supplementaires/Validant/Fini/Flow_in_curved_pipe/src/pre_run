@@ -6,7 +6,7 @@ if [ "$dat" != "" ] && [ $dat -nt ../src/box.data ]
 then
    echo "Boite de recirculation a jour."
 else
-   triou box 1>box.out 2>box.err
+   trust box 1>box.out 2>box.err
 fi
 # On fait un lien vers le dernier .dat genere
 ln -s -f `ls -rt pb_K_EPS*.dat | tail -1` pb_K_EPS_perio.dat
@@ -21,4 +21,4 @@ then
    exit -1
 fi
 sed "s/NB_PROCS/$NB_PROCS/" ../template_dec.data > dec.data
-triou dec 1>dec.out 2>dec.err
+trust dec 1>dec.out 2>dec.err

@@ -1,6 +1,6 @@
 #!/bin/bash
 # echo $ECHO_OPTS "Build the different meshes...\c"
-# triou BuildMeshes 1>BuildMeshes.out 2>&1
+# trust BuildMeshes 1>BuildMeshes.out 2>&1
 # if [ $? = 0 ]
 # then
 #    echo OK
@@ -10,7 +10,7 @@
 # fi
 
 # echo $ECHO_OPTS "Run the RANS parallel calculation in the box...\c"
-# triou PeriodicBoxRANS 2 1>PeriodicBoxRANS.out 2>&1 || exit -1
+# trust PeriodicBoxRANS 2 1>PeriodicBoxRANS.out 2>&1 || exit -1
 # if [ $? = 0 ]
 # then
 #    echo OK
@@ -19,7 +19,7 @@
 #    exit -1
 # fi
 # echo $ECHO_OPTS "Run the LES parallel calculation in the box...\c"
-# triou PeriodicBoxLES 2 1>PeriodicBoxLES.out 2>&1 || exit -1
+# trust PeriodicBoxLES 2 1>PeriodicBoxLES.out 2>&1 || exit -1
 # if [ $? = 0 ]
 # then
 #    echo OK
