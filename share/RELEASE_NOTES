@@ -1,4 +1,5 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.2 : Enhancements, modifications and corrected bugs since version 1.7.1 :
 --------------------------------------------------------------------------------------------------
+14/10/15 (TrioCFD) Minor change: UtilitairesAssemblages dependency deleted because not used by this baltik
 18/06/15 (TrioCFD) Major change: Trio_U code becomes TRUST platform + TrioCFD baltilk
