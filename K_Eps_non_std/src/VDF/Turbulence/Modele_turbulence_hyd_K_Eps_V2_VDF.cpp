@@ -255,7 +255,7 @@ DoubleTab&  Modele_turbulence_hyd_K_Eps_V2_VDF::Calculer_Echelle_T(const DoubleT
           if (tab_V2(i) > 1.e-10 && S(i) > 1.e-10)
             {
               temp4 = (zerosix*tab_K_Eps(i,0))/(sqrt(six)*Cmu*tab_V2(i)*sqrt(S(i)));
-              T3 =+ temp4;
+              T3 = temp4;
               TT =  min(T(i),T3);
               if (T3 < T(i))
                 {

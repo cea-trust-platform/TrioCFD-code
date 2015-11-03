@@ -6796,6 +6796,7 @@ const Operateur& Transport_Interfaces_FT_Disc::operateur(int i) const
 {
   assert(0);
   exit();
+  throw;
   return operateur(0);
 }
 
@@ -6803,6 +6804,7 @@ Operateur& Transport_Interfaces_FT_Disc::operateur(int i)
 {
   assert(0);
   exit();
+  throw;
   return operateur(0);
 }
 

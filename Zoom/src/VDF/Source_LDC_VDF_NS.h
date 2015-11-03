@@ -63,6 +63,7 @@ inline DoubleTab& Source_LDC_VDF_NS::calculer_residu(Connectivites_base& connect
 {
   Cerr<<"N'est pas codee avec ces arguments dans la classe Source_LDC_VDF_NS !!"<<finl;
   exit();
+  throw;
   return calculer_residu(connect,P,eqG,n);
 }
 

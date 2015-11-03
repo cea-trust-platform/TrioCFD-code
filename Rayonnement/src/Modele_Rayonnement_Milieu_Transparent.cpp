@@ -337,7 +337,7 @@ void Modele_Rayonnement_Milieu_Transparent::lire_fichiers(Nom& nom1, Nom& nom2)
 
 
   //  if ((lire_matrice_inv_ == 0)&&(je_suis_maitre()))
-  if ((lire_matrice_inv_ == 0))
+  if (lire_matrice_inv_ == 0)
     {
       Cerr << "Lecture du fichier : " << nom2 << finl;
       /*if (!fic2){

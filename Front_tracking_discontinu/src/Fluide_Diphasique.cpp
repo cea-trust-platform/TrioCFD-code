@@ -163,6 +163,7 @@ const Champ_Don& Fluide_Diphasique::masse_volumique() const
   Cerr << "Error : Fluide_Diphasique::masse_volumique()" << finl;
   assert(0);
   exit();
+  throw;
   return phase0_.valeur().masse_volumique();
 }
 
@@ -171,6 +172,7 @@ Champ_Don& Fluide_Diphasique::masse_volumique()
   Cerr << "Error : Fluide_Diphasique::masse_volumique()" << finl;
   assert(0);
   exit();
+  throw;
   return masse_volumique();
 }
 
@@ -179,6 +181,7 @@ const Champ_Don& Fluide_Diphasique::diffusivite() const
   Cerr << "Error : Fluide_Diphasique::diffusivite()" << finl;
   assert(0);
   exit();
+  throw;
   return diffusivite();
 }
 
@@ -187,6 +190,7 @@ Champ_Don& Fluide_Diphasique::diffusivite()
   Cerr << "Error : Fluide_Diphasique::diffusivite()" << finl;
   assert(0);
   exit();
+  throw;
   return diffusivite();
 }
 
@@ -195,6 +199,7 @@ const Champ_Don& Fluide_Diphasique::conductivite() const
   Cerr << "Error : Fluide_Diphasique::conductivite()" << finl;
   assert(0);
   exit();
+  throw;
   return conductivite();
 }
 
@@ -203,6 +208,7 @@ Champ_Don& Fluide_Diphasique::conductivite()
   Cerr << "Error : Fluide_Diphasique::conductivite()" << finl;
   assert(0);
   exit();
+  throw;
   return conductivite();
 }
 
@@ -211,6 +217,7 @@ const Champ_Don& Fluide_Diphasique::capacite_calorifique() const
   Cerr << "Error : Fluide_Diphasique::capacite_calorifique()" << finl;
   assert(0);
   exit();
+  throw;
   return capacite_calorifique();
 }
 
@@ -219,6 +226,7 @@ Champ_Don& Fluide_Diphasique::capacite_calorifique()
   Cerr << "Error : Fluide_Diphasique::capacite_calorifique()" << finl;
   assert(0);
   exit();
+  throw;
   return capacite_calorifique();
 }
 
@@ -227,6 +235,7 @@ const Champ_Don& Fluide_Diphasique::beta_t() const
   Cerr << "Error : Fluide_Diphasique::beta_t()" << finl;
   assert(0);
   exit();
+  throw;
   return beta_t();
 }
 
@@ -235,6 +244,7 @@ Champ_Don& Fluide_Diphasique::beta_t()
   Cerr << "Error : Fluide_Diphasique::beta_t()" << finl;
   assert(0);
   exit();
+  throw;
   return beta_t();
 }
 
