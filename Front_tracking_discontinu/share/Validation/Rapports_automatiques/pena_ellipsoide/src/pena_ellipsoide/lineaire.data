@@ -1,6 +1,5 @@
 # Reacteur a bain de verre fondu avec agitateur #
-# NB : depuis 1.7.2, ce cas n est plus teste en parallele a cause de preconditionnement_diag a 1 #
-# PARALLEL NOT #
+# PARALLEL OK #
 dimension 3
 Probleme_FT_Disc_gen pb
 
