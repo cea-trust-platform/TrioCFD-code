@@ -1492,6 +1492,7 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   // de solveur masse.
   discretisation().zone_Cl_dis(zone_dis(), la_zone_Cl_dis);
   la_zone_Cl_dis->associer_eqn(*this);
+  la_zone_Cl_dis->associer_inconnue(inconnue());
 }
 
 // Description:
