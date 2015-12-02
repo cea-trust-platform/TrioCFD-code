@@ -322,7 +322,7 @@ Chapter {
     Visu {
         Cycles -1
         Width           12cm
-        pseudocolor     LATA/Poreux_Boussinesq_VEF_3D.lata dom_magnitude VITESSE ELEM
+        pseudocolor     LATA/Poreux_Boussinesq_VEF_3D.lata dom norme_VITESSE ELEM
         operator        slice2D_z  0 0 0 
         zoom2D          -0.2 1.2 -0.2 1.2
     }

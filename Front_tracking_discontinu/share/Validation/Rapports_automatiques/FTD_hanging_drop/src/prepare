@@ -4,6 +4,8 @@
 cd profil
 tar zxf data_theorie.tgz
 cd ..
+if  [ ! -f  pendante_1p5/Pb1_44_44_43.geom ]
+then
 cd Xprepro/model
 # 2 signifie qu'il faut faire les deux etapes "modeling" et "???" Ca clique automatiquement
 $TRUST_ROOT/Outils/PRE_3DVDF/xprepro goutte_44_44_43.prep 2
@@ -16,3 +18,5 @@ else
    gunzip -c Pb1.geom.gz > pendante_1p5/Pb1_44_44_43.geom
    gunzip -c Pb1.geom.gz > pendante_2p5/Pb1_44_44_43.geom
 fi
+fi
+exit 0

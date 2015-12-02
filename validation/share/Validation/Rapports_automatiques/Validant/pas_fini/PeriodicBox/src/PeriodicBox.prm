@@ -226,24 +226,24 @@ Chapter {
                 Title "Velocity"
 		Description "In 3D"
 		Width 8cm, viewport = 50 0 900 1000,clip
-		pseudocolor 	DomainFlowRANS.lata dom_magnitude VITESSE ELEM
+		pseudocolor 	DomainFlowRANS.lata dom norme_VITESSE ELEM
                 Operator no_bounding_box
         } 
 	visu {
 		Width 8cm, viewport = 50 0 900 1000,clip
-		pseudocolor 	DomainFlowLES.lata dom_magnitude VITESSE ELEM
+		pseudocolor 	DomainFlowLES.lata dom norme_VITESSE ELEM
                 Operator no_bounding_box
         }
 	visu {
 		Description "Slice at z=0.01"
 		Width 8cm, viewport = 50 0 900 1000,clip
-		pseudocolor 	DomainFlowRANS.lata dom_magnitude VITESSE ELEM
+		pseudocolor 	DomainFlowRANS.lata dom norme_VITESSE ELEM
                 Operator no_bounding_box
 		operator_to_all slice2D_z  0. 0. 0.01
         } 
 	visu {
 		Width 8cm, viewport = 50 0 900 1000,clip
-		pseudocolor 	DomainFlowLES.lata dom_magnitude VITESSE ELEM
+		pseudocolor 	DomainFlowLES.lata dom norme_VITESSE ELEM
                 Operator no_bounding_box
 		operator_to_all slice2D_z  0. 0. 0.01
         } 

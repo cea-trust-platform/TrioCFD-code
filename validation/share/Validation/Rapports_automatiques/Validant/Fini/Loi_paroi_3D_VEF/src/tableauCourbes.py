@@ -28,22 +28,10 @@ def properties():
 def Utrio():
 	# ouverture des fichiers
 	nomFicUstar = 'u_tau.dat'
-			
+	# GF on reprend depuis la fin.... pour les reprises
 	ficUstar = open(nomFicUstar,'r')
 	
 	#on prend seulement les lignes entre 20 et 35 secondes
-	seconde=-1
-	while seconde<20:
-		ligne = ficUstar.readline()
-		tLigne = ligne.split()
-		tps = tLigne[0]
-		try:
-		 seconde =float(tps)
-		except:
-		 print "pas un temps",tps
-		 pass
-
-		
 	#lecture de l ensemble des donnees restantes
 	tFic = ficUstar.readlines()
 	
@@ -51,19 +39,19 @@ def Utrio():
 	while tFic[-1]=="" or tFic[-1]=="\n":
 		del tFic [-1]
 	
-	#on ajoute la premiere ligne a 20 secondes
-	tFic.append(ligne)
-
-	i=len(tFic)
+	i=len(tFic)-1
 	cumul=0
 	nbTemps=0
 	
 	while i>0:
-		ligne=tFic[-i]
+		ligne=tFic[i]
 		tLigne=ligne.split()
+                temps=float(tLigne[0])
 		cumul=cumul+float(tLigne[1])
 		nbTemps=nbTemps+1
 		i=i-1
+                if temps<20:
+		    break
 
 	utau=cumul/nbTemps
 	ficUstar.close()
@@ -76,19 +64,7 @@ def forcTrio():
 	nomFic = nomFic[:len(nomFic)-1] # Suppress /n
 			
 	fic = open(nomFic,'r')
-	
 	#on prend seulement les lignes entre 20 et 35 secondes
-	seconde=-1
-	while seconde<20:
-		ligne = fic.readline()
-		tLigne = ligne.split()
-		tps = tLigne[0]
-		try:
-		 seconde =float(tps)
-		except:
-		 print "pas un temps",tps
-		 pass
-		
 	#lecture de l ensemble des donnees restantes
 	tFic = fic.readlines()
 	
@@ -96,19 +72,20 @@ def forcTrio():
 	while tFic[-1]=="" or tFic[-1]=="\n":
 		del tFic [-1]
 	
-	#on ajoute la premiere ligne a 20 secondes
-	tFic.append(ligne)
-
-	i=len(tFic)
+	i=len(tFic)-1
 	cumul=0
 	nbTemps=0
 	
 	while i>0:
-		ligne=tFic[-i]
+		ligne=tFic[i]
 		tLigne=ligne.split()
+                temps=float(tLigne[0])
 		cumul=cumul+float(tLigne[1])
 		nbTemps=nbTemps+1
 		i=i-1
+                if temps<20:
+		    break
+
 
 	forc=cumul/nbTemps
 	fic.close()

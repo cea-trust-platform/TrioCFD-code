@@ -117,7 +117,7 @@ do
 	 transformer lower_dom x -y `[ $MAILLAGE_3D = 1 ] && echo z`
 	 Supprime_Bord upper_dom { BOTTOM }
 	 Supprime_Bord lower_dom { BOTTOM } 
-	 Mesh dom { domain upper_dom , domain lower_dom }
+	 Mailler dom { domain upper_dom , domain lower_dom }
 	    " > dom.geo
 	    ####################################################
 	    # En 2D on extrait la frontiere FRONT du maillage 3D
