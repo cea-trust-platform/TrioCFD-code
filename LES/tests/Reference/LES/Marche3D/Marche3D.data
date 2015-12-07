@@ -11,11 +11,11 @@ Read_file Marche3D.geo ;
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur tranche { tranches 2 1 1 }
+	Partition_tool tranche { tranches 2 1 1 }
 	Larg_joint 1
-	Nom_Zones DOM
+	zones_name DOM
 }
-Fin
+End
 END PARTITION #
 
 # BEGIN SCATTER
@@ -24,8 +24,8 @@ END SCATTER #
 
 VDF dis
 
-schema_Euler_explicite sch
-Lire sch
+Scheme_euler_explicit sch
+Read sch
 {
 	tinit 0
 	tmax 80.
@@ -37,7 +37,7 @@ Lire sch
 }
 
 Fluide_Incompressible fluide
-Lire fluide
+Read fluide
 {
 	mu Champ_Uniforme 1 5e-05
 	rho Champ_Uniforme 1 2
@@ -49,14 +49,14 @@ Associate pb fluide
 
 Discretize pb dis
 
-Lire pb
+Read pb
 {
 	Navier_Stokes_Turbulent
 	{
 		solveur_pression cholesky { }
 		convection { amont }
 		diffusion { }
-		conditions_initiales {
+		initial_conditions {
 			vitesse Champ_Uniforme 3  0. 0. 0.
 			}
 		boundary_conditions {
@@ -86,16 +86,16 @@ Lire pb
 		}
 	}
 
-	Postraitement 
+	Post_processing 
 	{
-		Sondes 
+		Probes 
 		{
 			sonde_pression pression periode 0.5 points 1 7.5 0.9 5.5
 			sonde_vitesse vitesse periode 0.5 points 1 8.0 0.9 5.5
 			sonde_visc viscosite_turbulente periode 0.5 points 2 7.5 0.9 5.5 7.5 1.1 4.5
 			sonde_k k periode 0.5 points 2 7.5 0.9 5.5 7.5 1.1 4.5
 		}
-		Champs dt_post 50.
+		fields dt_post 50.
 		{
 			pression elem
 			pression som
@@ -110,5 +110,5 @@ Lire pb
 }
 
 Solve pb
-Fin
-Fin
+End
+End

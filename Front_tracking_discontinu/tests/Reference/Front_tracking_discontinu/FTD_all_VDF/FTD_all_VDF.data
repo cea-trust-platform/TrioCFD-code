@@ -48,11 +48,11 @@ Mailler DOM
 # BEGIN PARTITION
 Partition DOM
 {
-	Partitionneur tranche { tranches 2 1 1 }
+	Partition_tool tranche { tranches 2 1 1 }
 	Larg_joint 2
-	Nom_Zones DOM
+	zones_name DOM
 }
-Fin
+End
 END PARTITION #
 
 # BEGIN SCATTER
@@ -61,8 +61,8 @@ END SCATTER #
 
 VDF dis
 
-Schema_Euler_explicite  sch
-Lire sch
+Scheme_euler_explicit  sch
+Read sch
 {
 	tinit 0.
 	tmax  0.1
@@ -75,7 +75,7 @@ Lire sch
 
 # First phase: liquid #
 Fluide_Incompressible liquide
-Lire liquide
+Read liquide
 {
 	mu  Champ_Uniforme 1 0.282e-3
  	rho Champ_Uniforme 1 1000.
@@ -83,7 +83,7 @@ Lire liquide
 
 # Second phase: gas #
 Fluide_Incompressible gaz
-Lire gaz
+Read gaz
 {
 	mu  Champ_Uniforme 1 0.282e-3
  	rho Champ_Uniforme 1 100.
@@ -91,7 +91,7 @@ Lire gaz
 
 # Definition of the two phase media #
 Fluide_Diphasique fluide
-Lire fluide
+Read fluide
 {
 	# Give a number for each phase #
 	fluide0 liquide
@@ -102,14 +102,14 @@ Lire fluide
 
 # Add a constituent #
 Constituant constituant
-Lire constituant
+Read constituant
 {
 	coefficient_diffusion Champ_Uniforme 1 1e-6
 }
 
 # Gravity field #
 Champ_Uniforme gravite
-Lire gravite 3 0. 0. -9.81
+Read gravite 3 0. 0. -9.81
 Associate fluide gravite
 
 # Navier Stokes equation #
@@ -137,7 +137,7 @@ Associate pb constituant
 Discretize pb dis
 
 # Define the front tracking problem #
-Lire pb
+Read pb
 {
 hydraulique
 {
@@ -151,7 +151,7 @@ hydraulique
 	solveur_pression GCP { precond ssor { omega 1.5 } seuil 1e-12 impr }
 	convection           { quick }
 	diffusion            { }
-	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+	initial_conditions { vitesse champ_uniforme 3 0. 0. 0. }
 	
 	# Relation beetween Navier Stokes equation and interface equations #
 	equation_interfaces_proprietes_fluide interf # The velocity field moves the gas-liquid interface #
@@ -169,7 +169,7 @@ interf
 	# Definition of the transport method of the interface: velocity from the Navier Stokes equation #
 	methode_transport vitesse_interpolee hydraulique
 	# Initial position of the water-gas interface and a drop of water #
-	conditions_initiales {
+	initial_conditions {
 		fonction z-0.03-((x-0.02)^2+(y-0.02)^2)*10 ,
 		fonction ajout_phase0 (x-0.02)^2+(y-0.02)^2+(z-0.045)^2-(0.01)^2
         }
@@ -208,7 +208,7 @@ interf
 body
 {
 	# Initial position of the moving body #
-	conditions_initiales { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
+	initial_conditions { fonction -(((x-0.02))^2+((y-0.02)/0.6)^2+((z-0.02)/0.6)^2-(0.015^2)) }
 	remaillage {
 		pas 1e8
 		nb_iter_remaillage 5
@@ -236,7 +236,7 @@ concentration
 {
 	diffusion { negligeable }
 	convection { quick }
-	conditions_initiales { concentration champ_fonc_xyz DOM 1 EXP(-((x-0.02)^2+(y-0.02)^2+(z-0.03)^2)/0.03^2) }
+	initial_conditions { concentration champ_fonc_xyz DOM 1 EXP(-((x-0.02)^2+(y-0.02)^2+(z-0.03)^2)/0.03^2) }
 	boundary_conditions {
 		haut  frontiere_ouverte C_ext Champ_Front_Uniforme 1 0.
 		paroi paroi
@@ -244,7 +244,7 @@ concentration
 	}
 }
 
-Postraitement
+Post_processing
 {
 	Definition_champs 
 	{	
@@ -273,14 +273,14 @@ Postraitement
 	     } 
 
 	}
-	Sondes {
+	Probes {
 		vitesse vitesse periode 1.e-7 point 1 0.02 0.02 0.03
 		pression pression periode 1.e-7 point 1 0.02 0.02 0.03
 		indicatrice_interf indicatrice_interf periode 1.e-7 point 1 0.02 0.02 0.03
 		energie_cinetique energie_cinetique_hydro periode 1.e-7 point 1 0.02 0.02 0.03
 	}
 	
-	Champs dt_post 0.05
+	fields dt_post 0.05
 	{
 		indicatrice_interf
 		concentration
@@ -297,11 +297,11 @@ liste_postraitements
 		nom_fichier liquid_gas
 		format binaire
 		print
-		champs sommets
+		fields sommets
 		{
 			vitesse
 		}
-		champs elements
+		fields elements
 		{
 			distance_interface_elem_interf
 			distance_interface_elem_body
@@ -331,4 +331,4 @@ liste_postraitements
 }
 
 Solve pb
-Fin
+End

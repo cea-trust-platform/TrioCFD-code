@@ -67,7 +67,7 @@ Read pb
 		convection { EF_stab { alpha 1. } }
 		diffusion { }
 		# Initial conditions for velocity #
-		conditions_initiales { vitesse Champ_Uniforme 3 0. 10.4 0. } 
+		initial_conditions { vitesse Champ_Uniforme 3 0. 10.4 0. } 
 		# Source term to force a constant flow rate #                
 		sources { Canal_perio { bord perio } }
 		# Boundary conditions #
@@ -95,7 +95,7 @@ Read pb
 		convection { muscl }
 		diffusion { }
 		# Initial conditions for temperature #
-		conditions_initiales { temperature Champ_Uniforme 1 20 }
+		initial_conditions { temperature Champ_Uniforme 1 20 }
                 boundary_conditions {
 			# Periodic boundary condition #
 			perio		periodique
@@ -113,10 +113,10 @@ Read pb
 		}
         }	
 	# Post processing definition #
-	Postraitement
+	Post_processing
 	{
 		# 1D probes to monitor #
-		Sondes
+		Probes
 		{
 			# Define a velocity probe for checking evolution #
 			velocity 	nodes 	vitesse			periode 0.005 point   1 -0.5 -0.1524 0.
@@ -128,7 +128,7 @@ Read pb
 		}
 		# 3D fields post processing with LATA format for VisIt #
 		Format lata
-		Champs dt_post 0.2 
+		fields dt_post 0.2 
 		{
 			vitesse			faces	# velocity at the faces #        
 			viscosite_turbulente	elem	# turbulent viscosity at the elements #

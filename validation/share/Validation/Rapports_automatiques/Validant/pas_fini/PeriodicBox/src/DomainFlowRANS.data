@@ -96,7 +96,7 @@ Read pb_box
 		convection { EF_stab { alpha 1. } }
 		diffusion { }
 		# Initial conditions for velocity read from the .xyz file of the previous box calculation #
-		conditions_initiales { vitesse Champ_Fonc_reprise PeriodicBoxRANS_pb.xyz pb_box vitesse last_time }
+		initial_conditions { vitesse Champ_Fonc_reprise PeriodicBoxRANS_pb.xyz pb_box vitesse last_time }
 		# Source term to force a constant flow rate #                
 		sources { Canal_perio { bord perio } }
 		# Boundary conditions #
@@ -129,7 +129,7 @@ Read pb_box
 					symmetry	symetrie
 				} 
 				# Initial conditions for K and Epsilon #
-                         	conditions_initiales
+                         	initial_conditions
                            	{
 					# k=3/2(U*t)^2 (turbulence rate=5%), eps=Cmu/0.07/D*k^1.5 #
                              		k_Eps Champ_Uniforme 2 0.405 7.73 	
@@ -147,7 +147,7 @@ Read pb_box
 		convection { muscl }
 		diffusion { }
 		# Initial conditions for temperature read from the .xyz file of the previous box calculation #
-		conditions_initiales { temperature Champ_fonc_reprise PeriodicBoxRANS_pb.xyz pb_box temperature last_time }
+		initial_conditions { temperature Champ_fonc_reprise PeriodicBoxRANS_pb.xyz pb_box temperature last_time }
                 boundary_conditions {
 			# Periodic boundary condition #
 			perio		periodique
@@ -165,10 +165,10 @@ Read pb_box
 		}
         }	
 	# Post processing definition #
-	Postraitement
+	Post_processing
 	{
 		# 1D probes to monitor #
-		Sondes
+		Probes
 		{			
 			# Define a velocity probe for checking evolution #
 			velocity 	nodes 	vitesse			periode 0.005 point   1 -0.5 -0.1524 0.
@@ -180,7 +180,7 @@ Read pb_box
 		}
 		# 3D fields post processing with LATA format for VisIt #
 		Format lata
-		Champs dt_post 0.2 # 1000 #
+		fields dt_post 0.2 # 1000 #
 		{
 			vitesse			faces	# velocity at the faces #        
 			viscosite_turbulente	elem	# turbulent viscosity at the elements #
@@ -201,7 +201,7 @@ Read pb_dom
 		convection { EF_stab { alpha 0.2 } }
 		diffusion { }
 		# Initial conditions for velocity #
-		conditions_initiales { vitesse champ_uniforme 3 0 0 0 }
+		initial_conditions { vitesse champ_uniforme 3 0 0 0 }
 		# Boundary conditions #
 		boundary_conditions {
 			# Velocity imposed from the previous problem (box) #
@@ -236,7 +236,7 @@ Read pb_dom
 			     		symmetry 	symetrie
                             	}
 				# Initial conditions for K and Epsilon #
-                         	conditions_initiales
+                         	initial_conditions
                            	{
 					# k=3/2(U*t)^2 (turbulence rate=5%), eps=Cmu/0.07/D*k^1.5 #
                              		k_Eps Champ_Uniforme 2 0.405 7.73 	
@@ -254,7 +254,7 @@ Read pb_dom
 		convection { EF_stab { alpha 1. } }
 		diffusion { }
 		# Initial conditions for temperature #
-		conditions_initiales { temperature Champ_Uniforme 1 20 }
+		initial_conditions { temperature Champ_Uniforme 1 20 }
                 boundary_conditions {
 			# Temperature imposed #
                         wall	paroi_temperature_imposee champ_front_uniforme 1 50
@@ -274,10 +274,10 @@ Read pb_dom
 		}
         }	
 	# Post processing definition #
-	Postraitement
+	Post_processing
 	{
 		# 1D probes to monitor #
-		Sondes
+		Probes
 	       	{
 	       		vitesse_a_teta_22.5		vitesse	periode 1.e-3 point 1 -0.4576 0.1894 0			 	
 	       		vitesse_a_S_sur_D_egal_1 	vitesse	periode 1.e-3 point 1  0.4953 -0.0762 0 
@@ -287,7 +287,7 @@ Read pb_dom
 		}                                                                                            
 		# 3D fields post processing with LATA format for VisIt #
 		format lata                                                                                         
-		Champs dt_post 0.2 # 1000.0 #                                                                    
+		fields dt_post 0.2 # 1000.0 #                                                                    
 		{                                                                                                          
 			vitesse 	elem	# velocity at the elements #                                                                       
 			pression_pa 	elem	# pressure [Pa] at the elements #	                                                      

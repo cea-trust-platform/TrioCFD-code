@@ -23,9 +23,9 @@ Transformer dom x y -z
 # Partition the domain #
 Partition dom
 {
-	partitionneur metis { nb_parts 6 }	# 6 parts for a 6 cores parallel calculation (rule of thumb: elements per part>20000) #
+	Partition_tool metis { nb_parts 6 }	# 6 parts for a 6 cores parallel calculation (rule of thumb: elements per part>20000) #
    	larg_joint 2				# Joint width #
-   	Nom_Zones dom				# Name of the partitioned mesh .Zones files #
+   	zones_name dom				# Name of the partitioned mesh .Zones files #
 }
 
 # Define the box #
@@ -50,9 +50,9 @@ Corriger_frontiere_periodique { domaine box bord perio }
 # Partition the box #
 Partition box
 {
-	partitionneur metis { nb_parts 2 } nb_parts_tot 6	# Divided in 2 parts (rule of thumb: elements per part>20000) and will run for 2-6 cores parallel calculation #			
+	Partition_tool metis { nb_parts 2 } nb_parts_tot 6	# Divided in 2 parts (rule of thumb: elements per part>20000) and will run for 2-6 cores parallel calculation #			
    	larg_joint 2						# Joint width #
-   	Nom_Zones box						# Name of the partitioned mesh .Zones files #
+   	zones_name box						# Name of the partitioned mesh .Zones files #
 	periodique 1 perio					# Partition should care about the periodic boundary #
 }
 
