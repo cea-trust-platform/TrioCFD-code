@@ -32,9 +32,9 @@ VerifierCoin dom { }
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur Metis { Nb_parts 2 }
+	Partition_tool Metis { Nb_parts 2 }
 	Larg_joint 2
-	Nom_Zones DOM
+	zones_name DOM
 }
 End
 END PARTITION #
@@ -85,7 +85,7 @@ Read pb
  	        }
 		convection { EF_stab { }  }
 		diffusion { }
-		conditions_initiales {
+		initial_conditions {
 			vitesse Champ_Uniforme 3 1. 0. 0.
 			}
 		boundary_conditions {
@@ -99,7 +99,7 @@ Read pb
         {
 		convection { EF_stab { }  }
 		diffusion { }
-		conditions_initiales {
+		initial_conditions {
 			temperature Champ_Uniforme 1 1. 
 			}
 		boundary_conditions {
@@ -109,9 +109,9 @@ Read pb
 			Sortie frontiere_ouverte T_ext Champ_Front_Uniforme 1 1.
 		}
 	}
-	Postraitement
+	Post_processing
 	{
-		Sondes
+		Probes
 		{
 		 seg_T temperature periode 0.1 segment 20 0.025 0.5 0.5 0.975 0.5 0.5 seg_P pression periode 0.1 segment 20 0.025 0.5 0.5 0.975 0.5 0.5
 		 seg_U1 vitesse periode 0.1 segment 11 0. 0.5 0.5 1.0 0.5 0.5
@@ -120,7 +120,7 @@ Read pb
 		 sonde_vitesse  vitesse periode 0.1 points 1 0.5 0.5 0.5
 		}
 	format lml
-		Champs dt_post 1.0
+		fields dt_post 1.0
 		{
 			pression elem
 			vitesse elem
