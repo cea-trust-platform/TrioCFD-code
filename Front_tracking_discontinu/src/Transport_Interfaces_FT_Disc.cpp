@@ -6915,17 +6915,20 @@ int Transport_Interfaces_FT_Disc::sauvegarder(Sortie& os) const
   {
     int special, afaire;
     const int format_xyz = EcritureLectureSpecial::is_ecriture_special(special, afaire);
+    double temps=inconnue().temps();
+    Nom mon_ident("variables_internes_transport");
+    mon_ident += Nom(temps,"%e");
     if (format_xyz)
       {
         if (Process::je_suis_maitre())
           {
-            os << "variables_internes_transport" << finl;
+            os << mon_ident << finl;
             os << variables_internes_->que_suis_je() << finl;
           }
       }
     else
       {
-        os << "variables_internes_transport" << finl;
+        os << mon_ident << finl;
         os << variables_internes_->que_suis_je() << finl;
       }
     bytes += variables_internes_->sauvegarder(os);
@@ -6940,8 +6943,8 @@ int Transport_Interfaces_FT_Disc::reprendre(Entree& is)
   {
     Nom id, type_name;
     is >> id >> type_name;
-    if (id != "variables_internes_transport"
-        || type_name != variables_internes_->que_suis_je())
+    if ( (! id.debute_par("variables_internes_transport"))
+         || type_name != variables_internes_->que_suis_je())
       {
         Cerr << "Error for the method Transport_Interfaces_FT_Disc::reprendre" << finl;
         Cerr << variables_internes_->que_suis_je() <<" was expected."<< finl;

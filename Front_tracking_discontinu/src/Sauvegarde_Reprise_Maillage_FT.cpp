@@ -281,7 +281,9 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
       }
   }
 
-  if (Process::mp_sum(erreur_sommets_exterieurs))
+// if (Process::mp_sum(erreur_sommets_exterieurs))
+// GF bloque sinon dans avancer en // de plis c'est inutil
+  if (erreur_sommets_exterieurs)
     {
       Cerr << "Erreur a la lecture d'un maillage front-tracking :\n"
            << " Certains sommets sont a l'exterieur du maillage eulerien.\n"
