@@ -6,7 +6,7 @@ Reordonner_faces_periodiques dom PERZ
 
 Partition dom
 {
-	Partitionneur Metis { nb_parts 12  }
+	Partitionneur Metis { nb_parts 6  }
 	Larg_joint 2
 	Nom_Zones dom
 	periodique 2 PERX PERZ 

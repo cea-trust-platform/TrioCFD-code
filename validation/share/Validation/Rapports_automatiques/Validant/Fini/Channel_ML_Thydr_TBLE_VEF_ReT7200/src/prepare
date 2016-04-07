@@ -1,5 +1,5 @@
-rm -fr  N=150 N=150_EF_stab N=50 N=25 N=10 LP_standard LP_standard_EF_stab
-mkdir N=150 N=150_EF_stab N=50 N=25 N=10 LP_standard LP_standard_EF_stab
+#rm -fr  N=150 N=150_EF_stab N=50 N=25 N=10 LP_standard LP_standard_EF_stab
+mkdir -p  N=150 N=150_EF_stab N=50 N=25 N=10 LP_standard LP_standard_EF_stab
 
 sed -e 's/paroi_TBLE { N _NP_ facteur 1 sonde_tble 1 vitesse_N=_NP_ 0 0 0 sans_source_boussinesq }/loi_standard_hydr/g' Cas.data > tmp
 sed -e 's/paroi_TBLE_scal { N _NP_ facteur 1 sonde_tble 1 temperature_N=_NP_ 0 0 0 }/loi_standard_hydr_scalaire Prdt 0.9/g' tmp > LP_standard/Cas.data

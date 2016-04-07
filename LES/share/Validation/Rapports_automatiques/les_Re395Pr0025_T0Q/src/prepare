@@ -39,8 +39,6 @@ cp ../trio_DOM_geo.asc .
 cp ../geom.data .
 cp ../decoupe.data .
 
-$exec geom 1>geom.out 2>geom.err
-$exec decoupe 1>decoupe.out 2>decoupe.err
 echo fin du prepare
 cd ..
 
