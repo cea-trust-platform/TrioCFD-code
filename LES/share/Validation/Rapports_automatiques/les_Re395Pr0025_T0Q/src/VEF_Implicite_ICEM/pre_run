@@ -1,0 +1,3 @@
+
+$exec geom 1>geom.out 2>geom.err
+$exec decoupe 1>decoupe.out 2>decoupe.err

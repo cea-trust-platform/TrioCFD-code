@@ -104,7 +104,7 @@ Chapter {
                 Title "Velocity"
                 Width 9cm
                 mesh 		PeriodicBoxRANS.lata box
-		pseudocolor 	PeriodicBoxRANS.lata box_dual_magnitude VITESSE FACES
+		pseudocolor 	PeriodicBoxRANS.lata box_dual norme_VITESSE FACES
                 Operator no_bounding_box
                 normal3D 0. 0.5 0.5
 		zoom3D 0 0 0.75
@@ -112,7 +112,7 @@ Chapter {
 	visu {
                 Width 9cm
                 mesh 		PeriodicBoxLES.lata box
-		pseudocolor 	PeriodicBoxLES.lata box_dual_magnitude VITESSE FACES
+		pseudocolor 	PeriodicBoxLES.lata box_dual norme_VITESSE FACES
                 Operator no_bounding_box
                 normal3D 0. 0.5 0.5
 		zoom3D 0 0 0.75
