@@ -1,5 +1,5 @@
 #  SIMULATION D UN CANAL 3D NON TOURNANT    avec la loi de paroi standard logarithmique #
-# PARALLEL ONLY 12 #
+# PARALLEL ONLY 6 #
 dimension 3
 Pb_Thermohydraulique_Turbulent pb
 Domaine dom
