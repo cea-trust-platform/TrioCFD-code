@@ -79,7 +79,7 @@ Lire pb
 	{
 		solveur_pression Petsc GMRES { 
 			seuil 1.0e-15
-			precond ilu { level 1 }
+			precond pilut { level 20 epsilon 0.01 }
 		}
 		convection { quick }
 		diffusion { }

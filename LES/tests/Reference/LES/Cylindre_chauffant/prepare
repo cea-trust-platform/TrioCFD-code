@@ -3,5 +3,5 @@ gunzip -c cylindre.geom.gz > cylindre.geom
 cp -f $TRUST_ROOT/tests/Reference/Cx/Cx.data tmp.data
 sed "s/solveur_pression Petsc Cholesky { impr }/solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-5 }/" tmp.data > Cx.data
 rm -f tmp.data
-make_PAR.data Cx
+#make_PAR.data Cx
 triou Cx
