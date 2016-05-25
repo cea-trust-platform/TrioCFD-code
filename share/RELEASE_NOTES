@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.3 : Enhancements, modifications and corrected bugs since version 1.7.2 :
 --------------------------------------------------------------------------------------------------
+26/05/16 (TrioCFD) Minor change: New CEG dependency: Critere_Entrainement_Gaz
 25/05/16 (TrioCFD) Portability : PETSc upgrated to 3.6.3 (Removed -pc_hypre_type euclid so ILU { level k } preconditionner no longer available)
 03/02/16 (TrioCFD) Bug fixed   : Resume a Front-Tracking calculation is now ok
 --------------------------------------------------------------------------------------------------

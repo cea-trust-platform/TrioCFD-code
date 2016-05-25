@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# medium
+
+mu=`grep "mu" ./cas_test.data| awk '{print $4}' | head -1`
+echo $mu > ./mu.dat
+
+rho=`grep "rho" ./cas_test.data| awk '{print $4}' | head -1`
+echo $rho > ./rho.dat
+
+gravite=`grep "Lire gravite" ./cas_test.data| awk '{print $6}' | head -1`
+echo $gravite > ./gravite.dat
+
+hauteur=`grep "traitement_particulier" ./cas_test.data| awk '{print $12}' | head -1`
+echo $hauteur > ./hauteur.dat
+
+rayon=`grep "0.000e+00" ./cas_test_pb_CEA_JAEA_alpha.csv | awk '{print $5}'`
+echo $rayon > ./rayon.dat
+
+alpha=`grep "0.000e+00" ./cas_test_pb_CEA_JAEA_alpha.csv | awk '{print $6}'`
+echo $alpha > ./alpha.dat
+
+alphaXgamma2=`grep "0.000e+00" ./cas_test_pb_CEA_JAEA_alphaXgamma2.csv | awk '{print $6}'`
+echo $alphaXgamma2 > ./alphaXgamma2.dat
+
+alpha2Xgamma2=`grep "0.000e+00" ./cas_test_pb_CEA_JAEA_alpha2Xgamma2.csv | awk '{print $6}'`
+echo $alpha2Xgamma2 > ./alpha2Xgamma2.dat
+
+AREVA=`grep "0.000e+00" ./cas_test_pb_AREVA.csv | awk '{print $6}'`
+echo $AREVA > ./AREVA.dat
+
+centre_AREVA=`grep "0.000e+00" ./cas_test_pb_AREVA.csv | awk '{print "centre_vortex_max_AREVA",$2,$3,$4}'`
+echo $centre_AREVA > ./centre_AREVA.dat
+
+gamma=`awk "BEGIN{print(($alphaXgamma2/$alpha)^(1/2))}"`
+echo $gamma > ./gamma.dat
+
+gamma_dim=`awk "BEGIN{print($gamma*$mu/$rho)}"`
+echo $gamma_dim > ./gamma_dim.dat
+
+alpha_dim=`awk "BEGIN{print(-($gravite)*$hauteur*$alpha*$rho/$mu)}"`
+echo $alpha_dim > ./alpha_dim.dat
+
+gamma_theorique=`awk "BEGIN{print(exp(-($rayon^2/1.9^2))*$rayon*2*3.1415*$rayon)}"`
+echo $gamma_theorique > ./gamma_theorique.dat
+
+centre_JAEA=`grep "0.000e+00" ./cas_test_pb_CEA_JAEA_alpha.csv | awk '{print "centre_vortex_max_JAEA",$2,$3,$4}'`
+echo $centre_JAEA > ./centre_JAEA.dat
+
