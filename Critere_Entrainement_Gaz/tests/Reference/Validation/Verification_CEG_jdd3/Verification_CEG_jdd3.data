@@ -1,0 +1,176 @@
+dimension 3
+Pb_Hydraulique_Turbulent pb
+domaine dom
+Lire_med family_names_from_group_names dom Mesh_1 cube_vortex_fine.med
+
+# Je choisis une discretisation #
+VEFPreP1B ma_discretisation
+
+Schema_Euler_explicite mon_schema
+Lire mon_schema
+{
+	tinit 0
+	nb_pas_dt_max 2
+	tmax 5
+	dt_min 1e-6
+	dt_max 1e-6
+	dt_impr 1.e-6
+	dt_sauv 100
+	seuil_statio 1.e-8
+	periode_sauvegarde_securite_en_heures 12
+}
+
+# A fluid is defined #
+Fluide_Incompressible milieu
+Lire milieu
+{
+	mu  Champ_Uniforme 1 0.01
+	rho Champ_Uniforme 1 2.
+}
+Champ_Uniforme gravite
+Lire gravite 3 0 0 -9.81
+Associate milieu gravite
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+VerifierCoin dom { } 
+Discretize pb ma_discretisation
+
+Domaine surface_libre
+Extraire_surface { Domaine surface_libre Probleme pb avec_certains_bords 1 Surface }
+
+Lire pb
+{
+	Navier_Stokes_Turbulent
+	{
+		equation_non_resolue 0
+		solveur_pression gcp { precond_nul seuil 1e30 impr }
+		convection { muscl }
+		diffusion { }
+		conditions_initiales {
+			# Vortex de rayon R=0.9, avec un champ de vitesse: u(r)=R, u(x,y,z)=(y,-x,-0.5) on doit trouver: #
+			# gamma = integrale(ut*dl) = v(R)*2PiR = 2PiR^2 ~ 5 #
+			# alpha = 1/S*integrale(-vzdl) = 1/(PiR^2)*(-vz*2PiR) = -2vz/R=1/R~1.11 #
+			# alpha*gamma^2 ~ 28 #
+			# (alpha*gamma)^2 ~ 32 #
+			# AREVA=K.wz.uz/sqrt(g*haspi)=125*2*0.5/sqrt(9.81*2) ~ 28 #
+			# Pas encore parfait sur le test AREVA (vorticite en bordure pas OK #
+			vitesse Champ_fonc_xyz dom 3 (x^2+y^2<1.9^2)*exp(-(x^2+y^2)/1.9^2)*y -(x^2+y^2<1.9^2)*exp(-(x^2+y^2)/1.9^2)*x 0.5*z*(x^2+y^2<1.9^2)*exp(-(x^2+y^2)/1.9^2)
+		}
+		boundary_conditions {
+			Surface 	symetrie
+			Sortie  	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			Paroi		paroi_fixe
+		}
+		traitement_particulier { CEG { debug 1 t_deb 0 frontiere Surface haspi 3 AREVA { } CEA_JAEA { normalise 1 nb_mailles_mini 1 min_critere_Q_sur_max_critere_Q -0.1  } } }
+                modele_turbulence K_Epsilon {
+                        Transport_K_Epsilon
+                        {
+                                convection { amont }
+                                diffusion { }
+                                sources { Source_Transport_K_Eps { C1_eps 1.44 C2_eps 1.92 } }
+                                boundary_conditions {
+ 					Surface 	symetrie
+					Paroi	 	paroi
+					Sortie  	frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 1.e-2 1.e-3
+				}
+                                conditions_initiales {
+                                        k_Eps Champ_Uniforme 2 1.e-2 1.e-3
+                                }
+                         }
+                         turbulence_paroi loi_expert_hydr { kappa 0.415 Erugu 9.11 A_plus 26 } dt_impr_ustar 10. eps_min 1.e-15
+                }
+		
+	}
+	Postraitements
+	{	
+		surfacique_fine
+		{
+			domaine surface_libre
+			format lml
+			fichier surfacique_fine
+			definition_champs
+			{
+				critere_Q_surface_libre extraction { 
+								domaine surface_libre nom_frontiere Surface
+                                                		source Interpolation { 
+									domaine dom localisation elem
+                                                        		source RefChamp { Pb_champ pb critere_Q }
+                                                		}
+				}
+				wz_surface_libre extraction { 
+								domaine surface_libre nom_frontiere Surface
+                                                		source Interpolation { 
+									domaine dom localisation elem
+                                                        		source Transformation { methode composante numero 2 source RefChamp { Pb_champ pb vorticite } }
+                                                		}
+				}
+				vitesse_surface_libre extraction { 
+								domaine surface_libre nom_frontiere Surface
+                                                		source Interpolation { 
+									domaine dom localisation elem
+                                                        		source RefChamp { Pb_champ pb vitesse }
+                                                		}
+				}
+				critere_AREVA extraction {
+						domaine surface_libre nom_frontiere Surface
+						source Transformation {
+							methode formule expression 1 125.*k*abs(wz)/(epsilon+1.e-10)*(0.5*(abs(uz)-uz))/sqrt(9.81*3)
+							sources { 
+								Interpolation { domaine dom localisation elem source Transformation { methode composante numero 2 source RefChamp { Pb_champ pb vitesse } } nom_source uz } ,
+								Transformation { methode composante numero 0 source RefChamp { Pb_champ pb k_eps } nom_source k } ,
+								Transformation { methode composante numero 1 source RefChamp { Pb_champ pb k_eps } nom_source epsilon } ,
+								Transformation { methode composante numero 2 source RefChamp { Pb_champ pb vorticite } nom_source wz }
+							}
+						}
+				}
+			}
+			
+			Champs dt_post 1.e-8
+			{
+				critere_Q_surface_libre
+				wz_surface_libre
+				vitesse_surface_libre
+				critere_AREVA 
+				vitesse elem
+			}
+			# format lml
+			fichier CEG
+			Champs dt_post 1.e-8
+			{
+				critere_Q_surface_libre
+				wz_surface_libre
+				vitesse_surface_libre
+				critere_AREVA
+			} #
+		}
+		volumique_fine
+		{
+			sondes 
+			{
+				pression pression periode 1.e-6 points 1 0 0 0
+			}
+			fichier volumique_fine
+			format lml
+			Champs dt_post 1.e-8
+			{	
+				vitesse elem
+			}	
+		}
+		volumique_lml_fine
+		{
+			sondes 
+			{
+				pression_lml pression periode 1.e-6 points 1 0 0 0
+			}
+			fichier volumique_fine
+			format lml
+			Champs dt_post 1.e-8
+			{	
+				vitesse elem
+			}	
+		}
+	}
+}
+Solve pb
+

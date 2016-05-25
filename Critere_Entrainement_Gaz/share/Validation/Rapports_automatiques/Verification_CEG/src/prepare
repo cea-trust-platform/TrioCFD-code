@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#rm -r coarse
+#rm -r medium
+#rm -r fine
+mkdir -p coarse medium fine
+
+for dir in coarse medium fine
+do 
+	cd $dir ; 
+	cp  ../verifie ../post_run ../cas_test.data ../cube_vortex_$dir.med . ; 
+	#mv cas_test.data cas_test_$dir.data ;
+        
+sed "s/medium/${dir}/g" cas_test.data > modifie.data ; mv modifie.data cas_test.data
+sed "s/medium/${dir}/g" post_run > post_run_modif ; mv post_run_modif post_run
+	cd .. 
+done 
+
+

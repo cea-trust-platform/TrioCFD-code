@@ -1,0 +1,10 @@
+#!/bin/sh
+KO=0
+for ref in `ls *.ref`
+do
+file=`echo $ref |sed "s/cas_test_//;s/.ref//"`
+file=`ls *${file}`
+compare_sonde $file $ref -seuil_erreur 1e-3 >  comp.$file 2>&1
+[ $? -ne 0 ] && KO=1 && cat comp.$file 
+done
+exit $KO

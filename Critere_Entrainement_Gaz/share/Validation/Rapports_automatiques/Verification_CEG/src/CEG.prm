@@ -1,0 +1,350 @@
+Parameters {
+	Title "Vortices detection and calculation of gas entrainment criterias"
+	Author "Antoine Scoliege"
+	VersionTrio_U 1.7.2
+ 	TestCase ./coarse cas_test.data
+	TestCase ./medium cas_test.data
+	TestCase ./fine   cas_test.data
+}
+
+Chapitre {
+	Title "Description of gas entrainment criteria"
+	Description "Réference : Proposal of design criteria for gas entrainment from vortex dimples based on a computational fluid dynamics method"
+	Description "Takaaki Sakai, Yuzuru Eguchi, Hideaki Monji, Kei Ito, Hiroyuki Ohshima (2008)"
+	Description "Heat Transfer Engineering, 29:8, 731,739"
+	Description "AREVA criterion: K = C $\Omega$ $\Lambda$"
+	Description "with $\Omega$ =  k $\omega$z/ $\epsilon$"
+	Description "and $\Lambda$ = max( -vz ; 0 ) / $ \sqrt \text gHaspi $"
+	Description "and C = 125"
+	Description "CEA/JAEA criterion : 3 values are calculated : $\alpha$, $\alpha$$\Gamma$$²$, $\alpha$$²$$\Gamma$$²$"
+	Description "with $\alpha$ = $ \frac1S $ $\int u . n \, \mathrm dl$
+	Description "with \latex_( $\Gamma$ = $\oint u . \, \mathrm dl$ \latex_)
+	Description "C is the contour a circle of radius R confined in a vortex where the Q criterion is greater than zero, the centre of the circle is located at the local maximum of the Q criterion, S is the area of the circle."
+	Description "This vortices detection algorithm only works in 3D VEF."
+
+}
+
+Chapitre {
+	Title "Physical model"
+	Description "Parallelepiped, Lx = 5m, Ly = 5m, Lz = 3m"
+	Description "type of fluid : "
+	Description " - $\rho$ = 2 kg/m$^3$"
+	Description " - $\mu$ = 0.01 Pa.s"
+	Description "Boundary conditions :"
+	Description " - Paroi : paroi_fixe"
+	Description " - Surface : symmetry"
+	Description " - Sortie : fixed-pressure = 0"
+	Description "Initial condition :"
+	Description " - Circle-shaped vortex, centre (0;0), radius R = 1.9m" 
+	Description " - Ur = 0 ; Ut = exp(-r$²$/R$²$)" 
+visu {
+	Title "Coarse mesh"
+	Description "tetrahedral mesh, 3500 elements"
+	mesh ./coarse/volumique_coarse.lata dom
+	normal3D -0.5 0.7 0.4
+	up3D 0.2 -0.3 0.9
+}
+visu {
+	Title "Medium mesh"
+	Description "tetrahedral mesh, 8700 elements"
+	mesh ./medium/volumique_medium.lata dom
+	normal3D -0.5 0.7 0.4
+	up3D 0.2 -0.3 0.9
+}
+visu {
+	Title "Fine mesh"
+	Description "tetrahedral mesh, 15600 elements"
+	mesh ./fine/volumique_fine.lata dom
+	normal3D -0.5 0.7 0.4
+	up3D 0.2 -0.3 0.9
+}
+visu {
+	Title "Velocity on the surface"
+	vector ./medium/surfacique_medium.lata surface_libre VITESSE_ ELEM 
+}
+}
+
+Chapitre {
+	Title "Numerical models"
+	Description "Discretization VEFPreP1B"
+	Description "Time scheme : explicit Euler"
+	Description "1 timestep = 10$^-$$^6$s"
+	Description "Pressure solver : GCP"
+	Description "Convection scheme : muscl"
+	Description "Turbulence model : standard k-epsilon"
+}
+
+Chapitre {
+	Titre "Results"
+visu {
+	Title "AREVA criterion on the surface, coarse mesh"
+	mesh ./coarse/surfacique_coarse.lata surface_libre
+	pseudocolor ./coarse/surfacique_coarse.lata surface_libre CRITERE_AREVA ELEM 
+	query Max ./coarse/Critere_AREVA_max_visit.dat 
+}
+}
+
+Chapitre { 
+	Title "AREVA criterion"
+Tableau {
+	Titre "AREVA criterion, coarse mesh"
+	Description "____"
+	nb_colonnes 1
+	Label Valeur
+	Ligne {
+		Legende "max value detected on Visit"
+		Nb_colonnes_fichier 2
+		fichier ./coarse/Critere_AREVA_max_visit.dat
+		columns $2
+	}
+	Ligne {
+		Legende "max value detected by the algorithm"
+		fichier ./coarse/AREVA.dat
+	}
+}
+Tableau {
+	Titre "Centre of the AREVA criterion, coarse mesh"
+	nb_colonnes 3
+	label X | Y | Z
+	Lignes {
+		Nb_colonnes_fichier 4
+		fichier ./coarse/centre_AREVA.dat
+		columns $1 $2 $3 $4
+	}
+}
+visu {
+	Title "AREVA criterion on the surface, medium mesh"
+	mesh ./medium/surfacique_medium.lata surface_libre
+	pseudocolor ./medium/surfacique_medium.lata surface_libre CRITERE_AREVA ELEM 
+	query Max ./medium/Critere_AREVA_max_visit.dat 
+}
+Tableau {
+	Titre "AREVA criterion, medium mesh"
+	Description "____"
+	nb_colonnes 1
+	Label Valeur
+	Ligne {
+		Legende "max value detected on Visit"
+		Nb_colonnes_fichier 2
+		fichier ./medium/Critere_AREVA_max_visit.dat
+		columns $2
+	}
+	Ligne {
+		Legende "max value detected by the algorithm"
+		fichier ./medium/AREVA.dat
+	}
+}
+Tableau {
+	Titre "Centre of the AREVA criterion, medium mesh"
+	nb_colonnes 3
+	label X | Y | Z
+	Lignes {
+		Nb_colonnes_fichier 4
+		fichier ./medium/centre_AREVA.dat
+		columns $1 $2 $3 $4
+	}
+}
+visu {
+	Title "AREVA criterion on the surface, fine mesh"
+	mesh ./fine/surfacique_fine.lata surface_libre
+	pseudocolor ./fine/surfacique_fine.lata surface_libre CRITERE_AREVA ELEM 
+	query Max ./fine/Critere_AREVA_max_visit.dat 
+}
+Tableau {
+	Titre "AREVA criterion, fine mesh"
+	Description "____"
+	nb_colonnes 1
+	Label Valeur
+	Ligne {
+		Legende "max value detected on Visit"
+		Nb_colonnes_fichier 2
+		fichier ./fine/Critere_AREVA_max_visit.dat
+		columns $2
+	}
+	Ligne {
+		Legende "max value detected by the algorithm"
+		fichier ./fine/AREVA.dat
+	}
+}
+Tableau {
+	Titre "Centre of the AREVA criterion, fine mesh"
+	nb_colonnes 3
+	label X | Y | Z
+	Lignes {
+		Nb_colonnes_fichier 4
+		fichier ./fine/centre_AREVA.dat
+		columns $1 $2 $3 $4
+	}
+}
+}
+
+Chapitre {
+	Title "Conclusion about the AREVA criterion"
+	Description "There is no difference between the AREVA criterion calculated by the algorithm and the one defined in" 
+	Description "the post-processing 'definition_champs'. The biggest criterion is located at the center of the vortex" 
+	Description "for the coarse and	fine mesh. However the local maximum for the medium mesh in slightly off center."
+}
+
+Chapitre {
+	Title "CEA/JAEA criterion"
+Tableau {
+	Titre "CEA/JAEA criterion, coarse mesh"
+	Description "En se basant sur les conditions initiales du vortex, il est possible de calculer :"
+	Description "$\alpha$ théorique = 0"
+	Description "$\Gamma$ théorique = exp(-rayon$²$/RAYON$²$)*2*PI*rayon$²$
+	nb_colonnes 1
+	Label Valeur
+	Ligne {
+		Legende "rayon du vortex detecté"
+		fichier ./coarse/rayon.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ théorique"
+		fichier ./coarse/gamma_theorique.dat
+	}
+	Ligne {
+		Legende "$\alpha$ calculé"
+		fichier ./coarse/alpha_dim.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ calculé"
+		fichier ./coarse/gamma_dim.dat
+	}
+	Ligne {
+		Legende "$\alpha$ adimensionnalisé calculé"
+		fichier ./coarse/alpha.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ adimensionnalisécalculé"
+		fichier ./coarse/gamma.dat
+	}
+	Ligne {
+		Legende "$\alpha$$\Gamma$$²$ adimensionnalisé calculé"
+		fichier ./coarse/alphaXgamma2.dat
+	}
+	Ligne {
+		Legende "$\alpha$$²$$\Gamma$$²$ adimensionnalisé calculé"
+		fichier ./coarse/alpha2Xgamma2.dat
+	}
+
+}
+Tableau {
+	Titre "Centre of the CEA/JAEA criterion, coarse mesh"
+	nb_colonnes 3
+	label X | Y | Z
+	Lignes {
+		Nb_colonnes_fichier 4
+		fichier ./coarse/centre_JAEA.dat
+		columns $1 $2 $3 $4
+	}
+}
+Tableau {
+	Titre "CEA/JAEA criterion, medium mesh"
+	Description "En se basant sur les conditions initiales du vortex, il est possible de calculer :"
+	Description "$\alpha$ théorique = 0"
+	Description "$\Gamma$ théorique = exp(-rayon$²$/RAYON$²$)*2*PI*rayon$²$
+	nb_colonnes 1
+	Label Valeur
+	Ligne {
+		Legende "rayon du vortex detecté"
+		fichier ./medium/rayon.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ théorique"
+		fichier ./medium/gamma_theorique.dat
+	}
+	Ligne {
+		Legende "$\alpha$ calculé"
+		fichier ./medium/alpha_dim.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ calculé"
+		fichier ./medium/gamma_dim.dat
+	}
+	Ligne {
+		Legende "$\alpha$ adimensionnalisé calculé"
+		fichier ./medium/alpha.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ adimensionnalisécalculé"
+		fichier ./medium/gamma.dat
+	}
+	Ligne {
+		Legende "$\alpha$$\Gamma$$²$ adimensionnalisé calculé"
+		fichier ./medium/alphaXgamma2.dat
+	}
+	Ligne {
+		Legende "$\alpha$$²$$\Gamma$$²$ adimensionnalisé calculé"
+		fichier ./medium/alpha2Xgamma2.dat
+	}
+}
+Tableau {
+	Titre "Centre of the CEA/JAEA criterion, medium mesh"
+	nb_colonnes 3
+	label X | Y | Z
+	Lignes {
+		Nb_colonnes_fichier 4
+		fichier ./medium/centre_JAEA.dat
+		columns $1 $2 $3 $4
+	}
+}
+Tableau {
+	Titre "CEA/JAEA criterion, fine mesh"
+	Description "En se basant sur les conditions initiales du vortex, il est possible de calculer :"
+	Description "$\alpha$ théorique = 0"
+	Description "$\Gamma$ théorique = exp(-rayon$²$/RAYON$²$)*2*PI*rayon$²$
+	nb_colonnes 1
+	Label Valeur
+	Ligne {
+		Legende "rayon du vortex detecté"
+		fichier ./fine/rayon.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ théorique"
+		fichier ./fine/gamma_theorique.dat
+	}
+	Ligne {
+		Legende "$\alpha$ calculé"
+		fichier ./fine/alpha_dim.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ calculé"
+		fichier ./fine/gamma_dim.dat
+	}
+	Ligne {
+		Legende "$\alpha$ adimensionnalisé calculé"
+		fichier ./fine/alpha.dat
+	}
+	Ligne {
+		Legende "$\Gamma$ adimensionnalisécalculé"
+		fichier ./fine/gamma.dat
+	}
+	Ligne {
+		Legende "$\alpha$$\Gamma$$²$ adimensionnalisé calculé"
+		fichier ./fine/alphaXgamma2.dat
+	}
+	Ligne {
+		Legende "$\alpha$$²$$\Gamma$$²$ adimensionnalisé calculé"
+		fichier ./fine/alpha2Xgamma2.dat
+	}
+
+}
+Tableau {
+	Titre "Centre of the CEA/JAEA criterion, fine mesh"
+	nb_colonnes 3
+	label X | Y | Z
+	Lignes {
+		Nb_colonnes_fichier 4
+		fichier ./fine/centre_JAEA.dat
+		columns $1 $2 $3 $4
+	}
+}
+}
+Chapitre {
+	Titre "Conclusions pour le critère CEA/JAEA"
+	Description "The vortex radius of the CEA/JAEA criterion calculated by the algorithm fluctuates by 15% between the"
+	Description "different meshes. The detected vortex is located at the center of the acutal vortex defined by the 
+	Description "initial condition. The finer the mesh, the closer to 0, its theoretical value, $\alpha$ gets. The 
+	Description "theroatical value of $\Gamma$ is dependent of the detected vortex radius, which is dependent of the mesh."
+}
+
