@@ -330,7 +330,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
   ArrOfInt Taille(nb_vortex);
   ArrOfDouble centre_vortex(3);  // Tableau de travail
 
-  int nb_dtheta=36; // Angle dtheta=10°
+  int nb_dtheta=36; // Angle dtheta=10deg
   double dtheta=2*Pi/nb_dtheta;
   ArrOfInt elements(nb_dtheta);
   DoubleTab points(nb_dtheta,3);
