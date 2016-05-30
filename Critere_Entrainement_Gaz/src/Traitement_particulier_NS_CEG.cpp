@@ -106,6 +106,7 @@ Entree& Traitement_particulier_NS_CEG::lire(Entree& is)
   t_deb_=DMAXFLOAT;
   t_fin_=DMAXFLOAT;
   min_critere_Q_sur_max_critere_Q_=0;
+  dernier_temps_=-1e9;
   // Verification gravite
   if ( !mon_equation->milieu().a_gravite() ||
        mon_equation->milieu().gravite()(0,0)!=0 ||
@@ -205,6 +206,7 @@ void Traitement_particulier_NS_CEG::post_traitement_particulier()
       statistiques().end_count(m1);
       if (debug_) Cout << "CPU AREVA criterion " << statistiques().last_time(m1) << " s" << finl << finl;
       if (calculer_critere_cea_jaea_) critere_cea_jaea();
+      dernier_temps_ = mon_equation->probleme().schema_temps().temps_courant();
       Cerr << "End of the calculation of the criteria." << finl;
     }
 }
@@ -642,7 +644,6 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           Cerr << "-> CEA_JAEA criterion : The main vortex (largest alpha*gamma^2) was vortex number " << vortex_principal << finl;
         }
     }
-  dernier_temps_ = sch.temps_courant();
 }
 
 void Traitement_particulier_NS_CEG::imprimer(const double& valeur_critere, const Nom& critere, const ArrOfDouble& centre_vortex, const double& rayon_vortex)
