@@ -243,7 +243,7 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
     }
   else
     {
-      autre_front_vf.frontiere().trace_face(flux_radia_fluide,fluxradia);
+      autre_front_vf.frontiere().trace_face_distant(flux_radia_fluide,fluxradia);
     }
   for (int numfa=0; numfa<nb_faces_bord; numfa++)
     {
