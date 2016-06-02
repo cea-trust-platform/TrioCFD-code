@@ -1,0 +1,14 @@
+
+
+if [ "$TRUST_IN_COPIE_CAS_TEST" = "1" ]
+    then
+    echo
+    echo maillage pour NR
+    echo
+    
+
+    trust geom_grossier > geom_grossier.out && exit 0
+else
+    trust geom > geom.out  && exit 0
+fi
+exit -1

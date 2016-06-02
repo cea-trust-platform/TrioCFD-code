@@ -34,6 +34,8 @@
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <DoubleTrav.h>
 #include <Fluide_Quasi_Compressible.h>
+#include <Convection_Diffusion_Temperature_Turbulent.h>
+#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem,"Source_Transport_K_Eps_Bas_Reynolds_VDF_P0_VDF",Source_base);
 
@@ -162,12 +164,14 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::ajouter(DoubleTab& resu
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  /*
+    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+    double visco=-1;
+    if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = max(tab_visco(0,0),DMINFLOAT);
     }
+  */
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes = zone_VDF.volumes();
   const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
@@ -179,17 +183,18 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::ajouter(DoubleTab& resu
   DoubleTrav F1(nb_elem);
   DoubleTrav F2(nb_elem);
 
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
   D.echange_espace_virtuel();
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco,visco_turb);
+  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
   E.echange_espace_virtuel();
-  mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,visco );
+  //mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
+  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re, ch_visco_cin);
 
   // Rq : la distinction entre zone_cl est importante pour les deux equations pour l imposition des conditions aux limites!!!!!!
   if (axi)
     {
       Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
+
       calculer_terme_production_K_Axi(zone_VDF,vitesse,P,K_eps_Bas_Re,visco_turb);
     }
   else
@@ -251,11 +256,21 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::associer_pb(const
       exit();
     }
   Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::associer_pb(pb);
-
-  const Convection_Diffusion_Temperature& eqn_th = ref_cast(Convection_Diffusion_Temperature,eqn);
-  eq_thermique = eqn_th;
-  beta_t = fluide.beta_t();
-  gravite = fluide.gravite();
+  // provisoire a garder ?
+  //correction pour quasi compressible : on utilise pas l'eq_thermique en fait (ce erait une Convection_Diffusion_Enthalpie_Turbulent sinon)
+  if (sub_type(Convection_Diffusion_Temperature_Turbulent,pb.equation(1)))
+    {
+      const Convection_Diffusion_Temperature_Turbulent& eqn_th = ref_cast(Convection_Diffusion_Temperature_Turbulent,pb.equation("Convection_Diffusion_Temperature_Turbulent"));
+      eq_thermique = eqn_th;
+      const Fluide_Incompressible& fluide2=eq_thermique->fluide();
+      if (fluide2.beta_t().non_nul())
+        beta_t=fluide2.beta_t();
+      gravite = fluide2.gravite();
+    }
+  else
+    {
+      gravite = pb.equation(0).milieu().gravite();
+    }
 }
 
 DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(DoubleTab& resu) const
@@ -279,13 +294,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(Dou
   const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
-    {
+  /*  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+      double visco=-1;
+      if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+      {
       visco = max(tab_visco(0,0),DMINFLOAT);
-    }
-
+      }
+  */
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   int nb_elem = zone_VDF.nb_elem();
@@ -299,10 +314,10 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(Dou
   DoubleTrav E(nb_elem_tot);
   DoubleTrav F1(nb_elem_tot);
   DoubleTrav F2(nb_elem_tot);
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco);
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco,visco_turb);
-  mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  //mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
+  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
   if (axi)
     {
@@ -368,7 +383,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_dyn = fluide.viscosite_dynamique();
-  const DoubleTab& tab_visco = ch_visco_dyn->valeurs();
+  //  const DoubleTab& tab_visco = ch_visco_dyn->valeurs();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
 
   int nb_elem_tot = zone_VDF.nb_elem_tot();
@@ -382,17 +397,9 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(
   DoubleTrav P(nb_elem_tot);
   DoubleTrav F1(nb_elem_tot);
   DoubleTrav F2(nb_elem_tot);
-  mon_modele_fonc.Calcul_F1(F1,z);
-  if (sub_type(Champ_Uniforme,ch_visco_dyn.valeur()))
-    {
-      double visco;
-      visco = max(tab_visco(0,0),DMINFLOAT);
-      mon_modele_fonc.Calcul_F2(F2,P,z,K_eps_Bas_Re,visco);
-    }
-  else
-    {
-      mon_modele_fonc.Calcul_F2(F2,P,z,K_eps_Bas_Re,tab_visco);
-    }
+  //mon_modele_fonc.Calcul_F1(F1,z);
+
+  mon_modele_fonc.Calcul_F2(F2,P,z,K_eps_Bas_Re,ch_visco_dyn);
 
   //Calcul du terme de production
   Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
@@ -509,12 +516,14 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajou
   const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  /*
+    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+    double visco=-1;
+    if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = max(tab_visco(0,0),DMINFLOAT);
     }
+  */
   const DoubleVect& volumes = zone_VDF.volumes();
   const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
   int nb_elem = zone_VDF.nb_elem();
@@ -529,11 +538,11 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajou
   DoubleTrav E(nb_elem_tot);
   DoubleTrav F1(nb_elem_tot);
   DoubleTrav F2(nb_elem_tot);
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco);
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco,visco_turb);
-  mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
+  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  //mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
   //  mon_modele_fonc.Calcul_F1(F1,z,K_eps_Bas_Re,visco);
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
   //        double T_durbin, T_kolmo, T_ke;
 

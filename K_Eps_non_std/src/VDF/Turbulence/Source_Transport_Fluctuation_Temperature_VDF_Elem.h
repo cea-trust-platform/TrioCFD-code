@@ -42,6 +42,7 @@
 #include <Transport_K_Eps_Bas_Reynolds.h>
 #include <Transport_Fluctuation_Temperature.h>
 #include <Transport_Flux_Chaleur_Turbulente.h>
+#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 
 class Probleme_base;
 class Champ_Don_base;

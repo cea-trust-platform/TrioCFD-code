@@ -1,0 +1,7 @@
+#!/bin/sh
+#ln -s $1.data 2D.data
+
+extrait_coupe $1 SONDE_U_1
+extrait_coupe $1 SONDE_U_2
+extrait_coupe $1 SONDE_U_3
+extrait_coupe $1 SONDE_U_4

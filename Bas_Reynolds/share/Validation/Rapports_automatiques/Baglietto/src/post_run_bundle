@@ -1,0 +1,5 @@
+#!/bin/sh
+#ln -s $1.data
+extrait_coupe $1 SONDE_VZ_LEFT
+extrait_coupe $1 SONDE_VZ_MIDDLE
+extrait_coupe $1 SONDE_VZ_RIGHT

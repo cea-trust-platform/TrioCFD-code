@@ -38,6 +38,7 @@
 #include <Modele_Fonc_Bas_Reynolds.h>
 #include <Ref_Zone_dis.h>
 #include <Zone_Cl_dis.h>
+#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 
 class Probleme_base;
 class Champ_Don_base;

@@ -1,0 +1,168 @@
+# PARALLEL OK #
+
+dimension 3
+
+domaine dom_pb1
+
+# DEBUT MAILLAGE #
+Mailler dom_pb1
+{
+	Pave Entree 
+	{
+	  Origine 0. 0. 0.
+
+	  Nombre_de_Noeuds 4 201 2
+	  Longueurs 2.0 2.0 1.0
+	  Facteurs 1 1.03 1 symy
+	}
+	{
+	  Bord Entree X = 0.    0. <= Y <= 2.0  0. <= Z <= 1      
+	  Bord WALL   Y = 2.0   0. <= X <= 2.0  0. <= Z <= 1 
+	  Bord WALL    Y = 0.    0. <= X <= 2.0  0. <= Z <= 1 
+	  Bord Entree X = 2.0   0. <= Y <= 2.0  0. <= Z <= 1 
+	  Bord Devant Z = 0.    0. <= X <= 2.0  0. <= Y <= 2 
+	  Bord Devant Z = 1.0   0. <= X <= 2.0  0. <= Y <= 2
+	}
+}
+# FIN MAILLAGE #
+# BEGIN PARTITION
+Partition dom_pb1
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM_PB1
+	Periodique 1 Entree
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM_PB1.Zones dom_pb1
+END SCATTER #
+
+Pb_Hydraulique_Turbulent  pb1
+
+Schema_Euler_explicite sch
+
+Lire sch
+{
+        tinit 0.
+        tmax 10000.
+        dt_start DT_FIXE 1.e-3		
+        dt_min 1.e-6
+        dt_max 100.
+	dt_impr 1.e0
+        seuil_statio 1.e-10
+	facsec 1.
+}
+
+
+VDF dis
+
+Fluide_Incompressible He
+Lire He
+{
+
+	    mu Champ_Uniforme  1 1e-5
+	    rho Champ_Uniforme  1 1.0
+}
+
+Associer pb1 dom_pb1
+Associer pb1 He  
+Associer pb1 sch
+
+Discretiser pb1 dis
+
+Lire pb1
+{
+        Navier_Stokes_Turbulent
+        {
+                solveur_pression petsc Cholesky { } 		
+		convection { amont }
+                diffusion { }
+       		Sources { Canal_perio { bord Entree }  }
+                conditions_initiales 
+		{
+             		vitesse Champ_Uniforme 3 0.05 0. 0.
+                }
+                conditions_limites 
+		{
+                        WALL     paroi_fixe
+                        Devant   symetrie 
+                        Entree   periodique
+                }
+
+		modele_turbulence K_Epsilon
+		{
+			Transport_K_Epsilon
+		    	{
+			with_nu yes
+		        	convection { amont }
+		        	diffusion { }
+				sources { source_transport_K_Eps { C1_eps 1.44 C2_eps 1.92 } }
+		         	conditions_limites 
+				{
+					Devant   symetrie 
+					Entree   periodique 
+					#  WALL       paroi_echange_externe_impose h_imp  champ_front_uniforme 2 1e29 1e29 t_ext champ_front_uniforme 2 0 0 #
+					 WALL       paroi_fixe 
+		         	}
+		         	conditions_initiales { k_eps Champ_Uniforme 2 0.1 1. }
+		    	}
+			Modele_fonc_Bas_Reynolds Launder_Sharma { }
+			turbulence_paroi negligeable  
+		}              
+	Traitement_particulier { Canal
+                        {
+                        dt_impr_moy_spat 1000.
+                        }
+                              }
+	
+        }
+
+        Postraitement {
+	format lata
+                Sondes
+		{
+			sonde_k 		       K periode 1000. segment 200 1.0 0.0 0.5 1.0 2.0 0.5                      	
+			sonde_eps 		       eps periode 1000. segment 200 1.0 0.0 0.5 1.0 2.0 0.5                      	
+	VX vitesseX periode 1. segment 1000 1.5 0. 0.5 1.5 2. 0.5
+      K K  periode 10 position_like VX
+	Eps Eps  periode 1. position_like VX	
+	viscosite_turbulente viscosite_turbulente  periode 1. position_like VX
+
+                }
+                Champs dt_post 5000.
+                {
+		   pression elem
+                   vitesse elem
+                   k elem
+                   eps elem
+                   viscosite_turbulente elem
+                }
+        }
+}
+
+
+
+Resoudre pb1
+Fin
+# 
+
+solveur_pression Cholesky { } 
+solveur_pression GCP {
+                        precond ssor { omega 1.500000 }
+                        seuil 1.000000e-07
+                }
+
+
+Traitement_particulier 
+		{ canal { 
+							debut_stat 9000.
+							fin_  stat 10000.
+							dt_impr_moy_spat 5000.	
+							dt_impr_moy_temp 5000.	
+						} 
+		}
+ #
+

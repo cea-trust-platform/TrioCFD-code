@@ -141,12 +141,15 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco=-1;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  //const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  /*
+    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+    double visco=-1;
+    if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = max(tab_visco(0,0),DMINFLOAT);
     }
+  */
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& vol_ent = zone_VEF.volumes_entrelaces();
 
@@ -158,11 +161,12 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   DoubleTrav F1(nb_faces);
   DoubleTrav F2(nb_faces);
 
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
   D.echange_espace_virtuel();
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco,visco_turb);
-  mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  //const Champ_base& ch_visco_cin_ou_dyn =ref_cast(Op_Diff_K_Eps_base, equation().operateur(0).l_op_base()).diffusivite();
+  //mon_modele_fonc.Calcul_F1(F1,zone_dis_keps,zcl_keps, P, K_eps,ch_visco_cin_ou_dyn);
+  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
   calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb);
   // Ajout des termes sources
@@ -272,19 +276,15 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   const Champ_Don& ch_beta = beta_t.valeur();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  /*
+    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+    double visco;
+    if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = max(tab_visco(0,0),DMINFLOAT);
     }
-  else
-    {
-      visco=-1;
-      assert(0);
-      exit();
-    }
-
+    else {visco=-1;assert(0);exit();}
+  */
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   int nb_faces = zone_VEF.nb_faces();
@@ -298,10 +298,10 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   DoubleTrav F1(nb_faces);
   DoubleTrav F2(nb_faces);
 
-  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco);
-  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,visco,visco_turb);
-  mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
-  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  //mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
+  mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
   calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb);
   //  calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb,ch);
@@ -310,7 +310,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   // qui est utilise dans le calcul de G
 
   // Nous utilisons le modele de fluctuation thermique pour le calcul du terme de destruction G.
-  calculer_terme_destruction_K_gen(zone_VEF,zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g);
+  calculer_terme_destruction_K_gen(zone_VEF,zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
 
   // Ajout des termes sources
   for (int num_face=0; num_face<nb_faces; num_face++)

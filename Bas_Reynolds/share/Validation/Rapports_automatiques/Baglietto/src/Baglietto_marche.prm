@@ -1,0 +1,343 @@
+Parameters {
+	Title "Etude du mod\`ele K-Eps non-lin\'eaire de Baglietto"
+	Author "M.P."
+	VersionTrio_U 1.7.1
+	TestCase ./duct_quart_Baglietto duct_quart_Baglietto.data
+	TestCase ./duct_quart duct_quart.data
+	TestCase ./marche_VEF_efstab_alpha02_amont marche_VEF_efstab_alpha02_amont.data
+	TestCase ./marche_VEF_efstab_alpha02_amont_Baglietto marche_VEF_efstab_alpha02_amont_Baglietto.data
+	TestCase ./bundle bundle.data
+	TestCase ./bundle_Baglietto bundle_Baglietto.data
+
+	Reference " 1: E. Baglietto \latex_({\it et al.}\latex_), CFD and DNS methodologies development for fuel bundle simulaions, Nuclear Engineering and Design, 1503--1510 (236), 2006. "
+
+	Reference " 2: T.-H. Shih and J. Zhu, A realizable Reynolds stress algeabric equation model, NASA technical memorandum, ICOMP-92-27;CMOTT-92-14, 1993. "
+	
+	Reference " 3: S. Nisizima, A numerical study of turbulent square-duct flow using an anisotropic $k - \varepsilon$ model, Theoritical and computational fluid dynamics, 61--71, 1990. 
+
+	Reference " 4: C.G. Speziale, Turbulence modeling in non-inertial frames of references, Technical report 88-18, NASA, 1988.
+}
+
+Chapter { 
+	Title "Description"
+
+	description "Nous validons dans cette fiche un mod\`ele \`a viscosit\'e turbulente non-lin\'eaire qui permet de contourner certains d\'efauts du $k-\varepsilon$ standard comme par exemple l'\'ecoulement \`a travers un canal ayant une section polygonale o\`u le mod\`ele $k-\varepsilon$ ne produit pas d'\'ecoulement secondaire au niveau des coins, ce qui est en contradiction avec l'exp\'erience (Speziale [4]). Plusieurs types de mod\`ele $k-\varepsilon$ non-lin\'eaires existent dans la litt\'erature. Le mod\`ele d\'evelopp\'e dans TrioCFD et valid\'e dans cette fiche est le mod\`ele de Baglietto [1]. Nous le validons ici pour deux cas tests : la marche descendante o\`u la longueur de recirculation est plus grande dans le cas du mod\`ele de Baglietto et le cas d'une conduite carr\'ee o\`u on observe une recirculation secondaire avec le mod\`ele de Baglietto." 
+}
+
+Chapter {
+	Title "R\'esultats pour une configuration de la marche descendante"
+
+	description "On \'etudie dans ce chapitre le mod\`ele de Baglietto en le comparant au K-Eps standard dans le cas de l'\'ecoulement apr\`es une marche descendante. On consid\`ere la configuration \'etudi\'es par Kim, Kline and Johnston (1978) et nous comparons les r\'esultats obtenus avec ceux obtenus par T.-H. Shih and J. Zhu [2]. Ci-dessous les param\`etres de la g\'eometrie (adimensionn\'es) et le maillage utilis\'e. Le nombre de Reynolds calcul\'e par rapport \`a la hauteur de la marche ($h=1$) est \latex_($Re = \frac{U\cdot h}{\nu}=44 700$\latex_)".
+
+	figure {
+	Title G\'eometrie
+	picture Figures/step.png
+	}
+
+	visu {
+		titre "Zoom sur le illage au niveau de la marche"
+		width 15cm,viewport=0 100 1024 300,clip
+		mesh ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.lata dom
+		origine mesh
+		zoom2D -1.0 10.0 -1.0 1.0
+	}
+
+	visu {
+		title "VITESSE FACES pour le mod\`ele K-Eps standard"
+		width 15cm,viewport=0 100 1024 300,clip
+		Cycles -1
+		zoom2D -1.0 10.0 -1.0 1.0
+		vector ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.lata dom VITESSE SOM
+	}
+
+	visu {
+		title "VITESSE FACES pour le mod\`ele non-lin\'eaire de Baglietto"
+		Cycles -1
+		vector ./marche_VEF_efstab_alpha02_amont_Baglietto/marche_VEF_efstab_alpha02_amont_Baglietto.lata dom VITESSE SOM
+		zoom2D -1.0 10.0 -1.0 1.0
+		width 15cm,viewport=0 100 1024 300,clip
+	}
+
+	figure { 
+		title "Ux en fonction de y pour X=2.667"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.data  SONDE_U_1
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont_Baglietto/marche_VEF_efstab_alpha02_amont_Baglietto.data  SONDE_U_1
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Baglietto"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X2667_Keps.txt
+			legend "Ux issu du papier de Shih, mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X2667_EASM.txt
+			legend "Ux issu du papier de Shih, mod\`ele non-linéaire"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Ux en fonction de y pour X=5.333"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.data  SONDE_U_2
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont_Baglietto/marche_VEF_efstab_alpha02_amont_Baglietto.data  SONDE_U_2
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Baglietto"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X5333_Keps.txt
+			legend "Ux issu du papier de Shih, mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X5333_EASM.txt
+			legend "Ux issu du papier de Shih, mod\`ele non-linéaire"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Ux en fonction de y pour X=6.220"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.data  SONDE_U_3
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont_Baglietto/marche_VEF_efstab_alpha02_amont_Baglietto.data  SONDE_U_3
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Baglietto"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X6220_Keps.txt
+			legend "Ux issu du papier de Shih, mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X6220_EASM.txt
+			legend "Ux issu du papier de Shih, mod\`ele non-linéaire"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Ux en fonction de y pour X=8.000"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.data  SONDE_U_4
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./marche_VEF_efstab_alpha02_amont_Baglietto/marche_VEF_efstab_alpha02_amont_Baglietto.data  SONDE_U_4
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Baglietto"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X8000_Keps.txt
+			legend "Ux issu du papier de Shih, mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			file Reference_Marche/./Marche_Shih_X8000_EASM.txt
+			legend "Ux issu du papier de Shih, mod\`ele non-linéaire"
+			style linespoints
+			}
+		}
+
+	figure { 
+		title "Cf"
+		include_description_curves 0
+		labelX "X"
+		labelY "Cf "
+		curve {
+			file ./marche_VEF_efstab_alpha02_amont/./Cf.dat
+			legend "Cf, K-Eps standard"
+			style linespoints
+			}
+		curve {
+			file ./marche_VEF_efstab_alpha02_amont_Baglietto/./Cf.dat
+			legend "Cf, Modele de Baglietto"
+			style linespoints
+			}
+		}
+}
+
+Chapter {
+	Title "Ecoulement dans une conduite carr\'ee"
+
+	Description "Le cas d'un \'ecoulement dans une conduite carr\'ee est \'etudi\'ee qualitativement dans cette partie. Cet \'ecoulement pr\'esente en effet des recirculations secondaires qui ne peuvent pas \^etre reproduites num\'eriquement avec un mod\`ele $k-\epsilon$ standard. Nisizima [3] montre qu'il est possible de retrouver ce ph\'enom\`ene en consid\'erant un mod\`ele $k-\epsilon$ anisotropique similaire \`a celui de Baglietto. Ici, une comparaison qualitative est propos\'ee entre le mod\`ele $k-\epsilon$ standard et le mod\`ele $k-\epsilon$ non-lin\'eaire de Baglietto [1], le but \'etant de mettre en \'evidence ces recirculations secondaires. Le domaine \'etudi\'e prend en compte les sym\'etries d'une conduite carr\'ee. Le Reynolds, bas\'e sur le diam\`etre hydraulique (ici, $2L$) et la vitesse d'entr\'ee, est de 40 800. Le maillage est r\'egulier et la r\'esolution moyenne aux parois est de  $y^+ \sim 40$."
+	figure {
+	       Title "configuration de la conduite \'etudi\'ee."
+	       picture Figures/square_duct.jpg
+	       Width 6cm
+	}
+
+	figure {
+	       Title "maillage utilis\'e. En rouge, condition de paroi adh\'erente; en vert, condition sym\'etrique; en bleu, condition p\'eriodique."
+	       picture Figures/mesh3D_duct.jpeg
+	       Width 6cm
+	}
+
+	visu {
+		title "VITESSE FACES pour le mod\`ele K-Eps standard"
+		Cycles -1
+		vector ./duct_quart/duct_quart.lata dom_centerfaces VITESSE FACES 200
+		operator slice2D 0. 0. 0.07 0. 0. -1.
+	}
+
+	visu {
+		title "VITESSE FACES pour le mod\`ele de Baglietto"
+		Cycles -1
+		vector ./duct_quart_Baglietto/duct_quart_Baglietto.lata dom_centerfaces VITESSE FACES 50
+		operator slice2D 0. 0. 0.07 0. 0. -1.
+	}
+
+}
+
+Chapter {
+	Title "Ecoulement dans un \'el\'ement de sous-canal d'assemblage"
+
+	Description "Ce cas test concerne l'\'ecoulement au sein d'une portion d'assemblage comme le d\'efinit Baglietto et al. [1] sur la figure. Il s'agit du domaine le plus petit mettant en \'evidence une recirculation dans un sous-canal triangulaire d'un assemblage. Baglietto et al. montrent que les comparisons entre les simulations $k - \varepsilon$ et les exp\'erimentations sont plus favorables pour des \'ecoulements \`a Reynolds \'elev\'es que pour des Reynolds plus mod\'er\'es. Le nombre de Reynolds du cas que l'on se propose d'\'etudier est de 181200 sachant de plus que aucun mod\`ele bas-Reynolds n'est utilis\'e en proche paroi dans notre \'etude. Les figures pr\'esentent les conditions limites et le maillage utilis\'es pour ce probl\`eme. Le maillage est r\'ealis\'e avec le logiciel GMSH et la distribution des noeuds est uniforme le long de chaques ar\^etes d\'elimitant le domaine. Les premiers points de maillage se situent de y+ $\approx$ 50 \`a y+ $\approx$ 100 (vers les \'el\'ements les plus d\'eform\'es de la condition limite de droite) de la paroi. Plus d'informations sont pr\'esent\'es par les tableaux  et . "
+
+	figure {
+	Title "Secteur minimal d'un assemblage coeurs montrant des recirculations secondaires (figure extraite de Baglietto \it et al.)"
+	Description Parameters of the geometry can be found in [2].
+	picture Figures/bundle_tot.jpg
+	Width 10cm
+}
+
+	figure {
+	Title "Configuration \'etudi\'ee."
+	picture Figures/bundle.jpg
+	Width 10cm
+}
+	
+	figure {
+	Title "Maillage et conditions limites utilis\'es. En rouge, condition de paroi adh\'erente; en vert, condition sym\'etrique; en bleu, condition p\'eriodique."
+	picture Figures/mesh3D.jpeg
+	Width 10cm
+}
+
+	visu {
+		title "VITESSE FACES pour le mod\`ele K-Eps standard"
+		Cycles -1
+		vector ./bundle/bundle.lata dom_centerfaces VITESSE FACES 200
+		operator slice2D 0. 0. 0.009 0. 0. -1.
+	}
+
+	visu {
+		title "VITESSE FACES pour le mod\`ele K-Eps standard"
+		Cycles -1
+		vector ./bundle_Baglietto/bundle_Baglietto.lata dom_centerfaces VITESSE FACES 200
+		operator slice2D 0. 0. 0.009 0. 0. -1.
+	}
+
+	figure { 
+		title "Uz according to y for theta=0"
+		include_description_curves 0
+		labelX "y"
+		labelY "Uz "
+		curve {
+			segment ./bundle/bundle.data  sonde_VZ_Left
+			legend "linear KEps model"
+			style linespoints
+			}
+		curve {
+			segment ./bundle_Baglietto/bundle_Baglietto.data  sonde_VZ_Left
+			legend "Baglietto model"
+			style linespoints
+			}
+		curve {
+			file ./Figures/bundle_KEps_Uz_theta0.txt
+			legend "linear KEps model from Baglietto's paper"
+			style linespoints
+			}
+		curve {
+			file ./Figures/bundle_Baglietto_Uz_theta0.txt
+			legend "Baglietto model from Baglietto's paper"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Uz according to r=y/cos(theta) for theta=15"
+		include_description_curves 0
+		labelX "r"
+		labelY "Uz "
+		curve {
+			segment ./bundle/bundle.data  sonde_VZ_Middle
+			legend "linear KEps model"
+			style linespoints
+			}
+		curve {
+			segment ./bundle_Baglietto/bundle_Baglietto.data  sonde_VZ_Middle
+			legend "Baglietto model"
+			style linespoints
+			}
+		curve {
+			file ./Figures/bundle_KEps_Uz_theta15.txt
+			legend "linear KEps model from Baglietto's paper"
+			style linespoints
+			}
+		curve {
+			file ./Figures/bundle_Baglietto_Uz_theta15.txt
+			legend "Baglietto model from Baglietto's paper"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Uz according to r=y/cos(theta) for theta=30"
+		include_description_curves 0
+		labelX "r"
+		labelY "Uz "
+		curve {
+			segment ./bundle/bundle.data  sonde_VZ_Right
+			legend "linear KEps model"
+			style linespoints
+			}
+		curve {
+			segment ./bundle_Baglietto/bundle_Baglietto.data  sonde_VZ_Right
+			legend "Baglietto model"
+			style linespoints
+			}
+		curve {
+			file ./Figures/bundle_KEps_Uz_theta30.txt
+			legend "linear KEps model from Baglietto's paper"
+			style linespoints
+			}
+		curve {
+			file ./Figures/bundle_Baglietto_Uz_theta30.txt
+			legend "Baglietto model from Baglietto's paper"
+			style linespoints
+			}
+		}
+
+
+}
+

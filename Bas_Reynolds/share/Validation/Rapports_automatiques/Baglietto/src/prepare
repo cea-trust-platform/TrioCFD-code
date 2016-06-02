@@ -1,0 +1,32 @@
+#!/bin/bash
+sed "s/# Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 } #/Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 }/" marche_VEF_efstab_alpha02_amont.data > marche_VEF_efstab_alpha02_amont_Baglietto.data
+
+sed "s/# Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 } #/Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 }/" duct_quart.data > duct_quart_Baglietto.data
+
+sed "s/# Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 } #/Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 }/" bundle.data > bundle_Baglietto.data
+
+for cas in marche_VEF_efstab_alpha02_amont marche_VEF_efstab_alpha02_amont_Baglietto
+do
+    dir=$cas
+    mkdir -p $dir
+    cp post_run $dir
+    cp Cf.py $dir
+    cp $dir.data $dir
+done
+
+for cas in duct_quart duct_quart_Baglietto
+do
+    dir=$cas
+    mkdir -p $dir
+    cp $dir.data $dir
+done
+
+for cas in bundle bundle_Baglietto
+do
+    dir=$cas
+    mkdir -p $dir
+    cp $dir.data $dir
+    cp bundle2D.geo $dir
+    cp bundle2D.med $dir
+    cp post_run_bundle $dir/post_run
+done

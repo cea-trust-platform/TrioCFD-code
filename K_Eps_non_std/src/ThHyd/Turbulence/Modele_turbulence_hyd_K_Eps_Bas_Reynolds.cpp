@@ -80,29 +80,21 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
 
   const Champ_base& chK_Eps=eqn_transp_K_Eps().inconnue().valeur();
   const Zone_dis& la_zone_dis = eqn_transp_K_Eps().zone_dis();
+  const Zone_Cl_dis& la_zone_Cl_dis = eqn_transp_K_Eps().zone_Cl_dis();
   Nom type=chK_Eps.que_suis_je();
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps",tab_K_Eps);
   DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
   const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_transp_K_Eps().milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  //  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
   double LeEPSMIN = get_LeEPS_MIN();
   // K_Eps(i,0) = K au noeud i
   // K_Eps(i,1) = Epsilon au noeud i
 
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
-    {
-      double visco;
-      visco = max(tab_visco(0,0),DMINFLOAT);
-      mon_modele_fonc.Calcul_Fmu( Fmu,la_zone_dis,tab_K_Eps,visco);
-    }
-  else
-    {
-      mon_modele_fonc.Calcul_Fmu( Fmu,la_zone_dis,tab_K_Eps,tab_visco);
-    }
+  mon_modele_fonc.Calcul_Fmu( Fmu,la_zone_dis,la_zone_Cl_dis,tab_K_Eps,ch_visco_cin);
 
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente Fmu",Fmu);
 
@@ -163,7 +155,14 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
 
 int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::preparer_calcul()
 {
-  return eqn_transp_K_Eps().preparer_calcul();
+  eqn_transp_K_Eps().preparer_calcul();
+  return 1;
+  // provisoire
+  Mod_turb_hyd_RANS::preparer_calcul();
+  calculer_viscosite_turbulente(K_Eps().temps());
+  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+  return 1;
+
 }
 
 void Modele_turbulence_hyd_K_Eps_Bas_Reynolds::mettre_a_jour(double temps)

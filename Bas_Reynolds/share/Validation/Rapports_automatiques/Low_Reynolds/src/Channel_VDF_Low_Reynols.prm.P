@@ -1,0 +1,179 @@
+Parametres {
+	Titre "Channel VDF_Low_Reynolds"
+	Description ""
+	ParametresTrio_U Type of problem : Hydraulique_Turbulent
+	ParametresTrio_U Diffusion scheme : Default{}
+	ParametresTrio_U Discretization : VDF
+	ParametresTrio_U Time scheme : 
+	ParametresTrio_U Solving of equations : "Navier Stokes turbulent" 
+	ParametresTrio_U Convection : quick
+	ParametresTrio_U Turbulence model : 
+	ParametresTrio_U Type of boundary conditions : Periodicity in x  directions, wall for y boundaries
+
+#Pset(list_re_ 20000 80000)
+#Pset(list_castrio_ LS JL )
+#Pset(list_cas_ list_castrio_ Openfoam_LS)
+
+#Pforeach _re_ (list_re_)
+#Pforeach _cas_ (list_castrio_)
+	Castest  _cas___re_ test.data  
+#Pendforeach(_cas_) 	
+#Pendforeach(_re_) 	
+ 
+	Auteur "G.F."
+	InclureData 2
+
+}
+
+
+Chapitre {
+	Titre "Tests Description "
+	Description "Geometry : plane channel"
+#	Description "Dimensions : Ly=2, Lx=6.4"
+#	Description "Mesh : 60x32 (dx+= ; dy+= )"
+#	Description "Initial conditions : Champ_fonc_xyz dom 2  0.8 0." 
+	Description "Boundary conditions : The periodicity conditions need a source term to maintain the flow constant"
+	
+	
+	Tableau {
+		Titre "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho = 0.0976$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\mu$ = 2.84e-5 such as \latex_($Re_\tau = (u_\tau.h) / \nu = 180$\latex_) (h=1 : half-height)"
+	}
+
+	visu {
+		titre "mesh"
+		mesh LS_20000/test.lata dom_pb1
+		operator slice 0 0 1 0 0 1
+		origine mesh
+	}
+}
+
+#Pforeach _re_ (list_re_)
+
+Chapitre {
+	Titre "Results Reynolds _re_"
+	# Description "The results are compared to the DNS of Kim."
+	Figure {
+		Titre "Mean velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		LogX
+		RangeX auto 480
+		LabelY "U+"
+		#LogY
+		 RangeY 0.1 25
+		InclureDescCourbes 0
+		Legende below
+	       #Pforeach _cas_ (list_cas_)
+		Courbe {
+			Legende _cas___re_
+			Fichier ./_cas___re_/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+		#Pendforeach(_cas_)
+			Courbe {
+			Legende "Linear Law"
+			Fonction x
+			TypeLigne 0
+			Style lines
+			origine ana
+		}
+		
+		
+		Courbe {
+			Legende "Log Law"
+			Fonction 1/0.415*log(x)+5.32
+			TypeLigne 0
+			Style lines
+			origine ana
+		}
+		
+	}
+
+	Figure {
+		Titre "Mean velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		
+		RangeX auto 15
+		LabelY "U+"
+		#LogY
+		 
+		InclureDescCourbes 0
+		Legende below
+	       #Pforeach _cas_ (list_cas_)
+		Courbe {
+			Legende _cas___re_
+			Fichier ./_cas___re_/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+		#Pendforeach(_cas_)
+			Courbe {
+			Legende "Linear Law"
+			Fonction x
+			TypeLigne 0
+			Style lines
+			origine ana
+		}
+		
+		
+		
+	}
+}
+
+Chapitre {
+	Titre "Dimensional Results Reynolds _re_"
+	Figure {
+		Titre "Mean velocity profile U"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+	
+		LabelY "U"
+		InclureDescCourbes 0
+		Legende below
+	       #Pforeach _cas_ (list_cas_)
+		Courbe {
+			Legende _cas___re_
+			Fichier ./_cas___re_/courbe_uplus.dat
+			Colonnes ($1) ($3)
+			Style lines
+		}
+		#Pendforeach(_cas_)
+
+	}
+}
+
+
+Chapitre {
+	titre u_tau reynoilds _re_
+	tableau {
+	nb_colonnes 1
+	label u_tau
+
+	
+		
+	ligne {
+	legend theorical
+	values 7.
+	}
+	 #Pforeach _cas_ (list_cas_)
+	ligne {
+	legend _cas___re_
+	fichier _cas___re_/u_tau.dat
+	nb_colonnes_fichier 2
+	colonnes $2
+	derniere_ligne
+       }	
+	#Pendforeach(_cas_)
+	
+ }
+}
+#Pendforeach(_re_)
+
