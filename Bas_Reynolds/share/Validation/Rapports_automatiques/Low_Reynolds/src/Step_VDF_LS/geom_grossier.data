@@ -1,0 +1,90 @@
+dimension 2
+Domaine dom
+Mailler dom
+{
+	Pave Entre1 
+		{
+		Origine -10. 0.
+		Nombre_de_Noeuds 33 40
+		Longueurs 9. 8.
+		Facteurs 0.97 1.09
+		Symy
+		}
+		{
+		Bord Entree X = -10.   0. <= Y <=  8.
+		Bord BasT   Y =   0. -10. <= X <= -1.  
+		Bord HautT  Y =   8. -10. <= X <= -1.
+		
+		} ,
+
+	Pave Entre2 
+		{
+		Origine -1.  0.
+		Nombre_de_Noeuds 12 40
+		Longueurs 1. 8.
+		Facteurs 1.0 1.09
+		Symy
+		}
+		{
+		Bord BasT   Y =   0. -1. <= X <= 0.  
+		Bord HautT  Y =   8. -1. <= X <= 0.
+		
+		} ,
+
+        Pave Haut1
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 20 40 
+		Longueurs 1. 8.
+		Facteurs 1.0 1.09
+		Symy
+		}
+		{
+		Bord Haut  Y = 8.  0. <= X <= 1.
+		} ,
+	
+	Pave Haut2
+		{
+		Origine 1. 0.
+		Nombre_de_Noeuds 73 40
+		Longueurs 39. 8.
+		Facteurs  1.019 1.09
+		Symy
+		}
+		{
+		Bord Haut  Y = 8.   1. <= X <= 40.
+		Bord Sortie X = 40. 0. <= Y <= 8.
+		} ,
+
+	Pave Bas1
+		{
+		Origine 0. -1. 
+		Nombre_de_Noeuds 20 32
+		Longueurs 1. 1.
+		Facteurs 1.0  1.045
+		symy
+		}
+		{
+		Bord Bas   Y = -1.   0. <= X <= 1.
+		Bord Gauche X =  0. -1. <= Y <= 0.
+		} ,	
+	
+		
+	Pave Bas2
+		{
+		Origine 1. -1. 
+		Nombre_de_Noeuds 73 32
+		Longueurs 39. 1.
+		Facteurs 1.019 1.045
+		symy
+		}
+		{
+		Bord Bas   Y = -1.   1. <= X <= 40.
+		Bord Sortie X = 40. -1. <= Y <= 0.
+		} 
+
+	
+	
+}
+ecrire_fichier dom dom.geom
+fin

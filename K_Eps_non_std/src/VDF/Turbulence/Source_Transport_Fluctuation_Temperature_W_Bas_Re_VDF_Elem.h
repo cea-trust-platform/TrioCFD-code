@@ -40,6 +40,7 @@
 #include <Ref_Transport_Fluctuation_Temperature_W_Bas_Re.h>
 #include <Transport_K_Eps_Bas_Reynolds.h>
 #include <Transport_Fluctuation_Temperature_W_Bas_Re.h>
+#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 
 class Probleme_base;
 class Champ_Don_base;

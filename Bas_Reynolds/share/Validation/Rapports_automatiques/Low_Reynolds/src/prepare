@@ -1,0 +1,50 @@
+#!/bin/sh
+
+for mod in LS JL KEPS
+do
+for re in 20000 # 80000
+do 
+  dir=${mod}_$re
+  mkdir -p $dir
+  cp post_run $dir
+  cp canal_80.med $dir
+  cp base.data $dir/test.data
+  [ "$mod" = "JL" ] && sed "s/Launder_Sharma/Jones_Launder/" -i $dir/test.data
+  if [ "$mod" = "KEPS" ]  
+      then
+      sed "s/Modele_fonc_Bas_Reynolds Launder_Sharma { }//;s/turbulence_paroi negligeable/turbulence_paroi loi_standard_hydr/;s/paroi_echange_externe_impose h_imp  champ_front_uniforme 2 1e29 1e29 t_ext champ_front_uniforme 2 0 0 /paroi/;s/Nombre_de_Noeuds 4 201 2/Nombre_de_Noeuds 4 12 2/;s/Facteurs 1 1.03 1 symy/Facteurs 1 1.0 1 symy/" -i $dir/test.data
+  fi
+done
+done
+
+mod=LS_20000
+for yplus in 003 006
+do
+  dir=${mod}_yplus_$yplus
+  mkdir -p $dir
+  cp post_run $dir
+  cp canal_80.med $dir
+  cp base.data $dir/test.data
+  if [ "$yplus" = "003" ]
+      then
+      sed "s/Nombre_de_Noeuds 4 201 2/Nombre_de_Noeuds 4 321 2/" -i $dir/test.data
+      else
+      sed "s/Nombre_de_Noeuds 4 201 2/Nombre_de_Noeuds 4 281 2/" -i $dir/test.data      
+  fi
+done
+#for mod in LS_VEF
+#do
+#for re in 20000
+#do 
+#  dir=${mod}_$re
+#  mkdir -p $dir
+#  cp post_run $dir
+#  cp base_VEF.data $dir/test.data
+#done
+#done
+#python $TRUST_ROOT/bin/KSH/preprocessor.py Channel_VDF_Low_Reynols.prm.P Channel_VDF_Low_Reynols.prm
+cp post_run_step Step_VDF/post_run
+
+cp post_run_step Step_VDF_LS/post_run
+
+cp post_run_step Step_VEF_LS/post_run

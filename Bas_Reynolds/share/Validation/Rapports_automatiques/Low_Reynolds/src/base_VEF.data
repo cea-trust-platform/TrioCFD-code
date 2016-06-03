@@ -1,0 +1,195 @@
+# aaa #
+
+dimension 3
+
+domaine dom_pb1
+
+# BEGIN MESH #
+Mailler dom_pb1
+{
+	Pave Entree 
+	{
+	  Origine 0. 0. 0.
+
+	  Nombre_de_Noeuds 3 22 5
+	  Longueurs 2.0 2.0 1.0
+	  Facteurs 1 1.03 1 symy
+	}
+	{
+	  Bord Entree X = 0.   0. <= Y <= 2 0. <= Z <= 1      
+	  Bord Haut   Y = 2    0. <= X <= 2.0   0. <= Z <= 1 
+	  Bord Bas    Y = 0.   0. <= X <= 2.0   0. <= Z <= 1 
+	  Bord Entree X = 2.0   0. <= Y <= 2 0. <= Z <= 1 
+	  Bord Devant Z = 0.  0. <= X <= 2.0 0. <= Y <= 2 
+	  Bord Devant Z = 1   0. <= X <= 2.0 0. <= Y <= 2
+	}
+}
+
+Tetraedriser_homogene_fin dom_pb1
+
+Corriger_frontiere_periodique { Domaine dom_pb1 Bord Entree }
+Corriger_frontiere_periodique { Domaine dom_pb1 Bord Devant }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_pb1
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM_PB1
+	Periodique 1 Entree
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM_PB1.Zones dom_pb1
+END SCATTER #
+
+
+Pb_Hydraulique_Turbulent  pb1
+
+
+Schema_Euler_implicite sch
+Read sch
+{
+        tinit 0.
+        tmax 3000.
+        dt_start dt_calc		
+        dt_min 1.e-5
+        dt_max 10.
+	dt_impr 100
+        dt_sauv 500
+        dt_impr 1000.
+        seuil_statio 1.e-8
+	facsec 10.
+	facsec_max 50
+	
+	Solveur Implicite
+	{
+		seuil_convergence_solveur 1.e-13
+		solveur gmres { diag seuil 1.e-13 impr controle_residu 1 nb_it_max 5 }
+	}
+
+
+}
+
+
+VEFpreP1b cubesregu
+
+Fluide_Incompressible He
+Read He
+{
+
+	    mu Champ_Uniforme  1 1e-5
+	    rho Champ_Uniforme  1 1.0
+}
+
+Champ_Uniforme gravite
+Read gravite 3 0. 0. 0
+Associate He gravite
+Associate pb1 dom_pb1
+Associate pb1 He  
+Associate pb1 sch
+
+Discretize pb1 cubesregu
+
+Read pb1
+{
+        Navier_Stokes_Turbulent
+        {
+                solveur_pression petsc Cholesky { } 
+		
+		convection { muscl }
+                diffusion { }
+       		Sources { Canal_perio { bord Entree }  }
+                conditions_initiales 
+		{
+             		vitesse Champ_Uniforme 3 0.05 0. 0.
+                }
+                boundary_conditions 
+		{
+                        Haut     paroi_fixe
+                        Bas      paroi_fixe
+                        Devant   symetrie 
+                        Entree   periodique
+                }
+
+		modele_turbulence K_Epsilon 
+		{
+			Transport_K_Epsilon
+		    	{
+			with_nu yes
+		        	convection { muscl }
+		        	diffusion { }
+		         	boundary_conditions 
+				{
+					Devant   symetrie 
+					Entree   periodique 
+					Haut     paroi_fixe
+					Bas      paroi_fixe
+		         	}
+				parametre_equation parametre_implicite 
+				{
+					resolution_explicite
+				}
+		         	conditions_initiales { k_eps Champ_Uniforme 2 0.1 0.05 }
+		    	}
+			Modele_Fonc_Bas_Reynolds Launder_Sharma { }
+		    	turbulence_paroi negligeable
+		}
+
+	Traitement_particulier { Canal
+                        {
+                        dt_impr_moy_spat 1000.
+                        }
+                              }
+        }
+
+        Postraitement {
+	format lata_v2
+                Sondes
+                {
+                        sonde_He_entree_vdebut         vitesse periode 10. points 1  0. 1  0.5
+                        sonde_He_entree_vfin         vitesse periode 10. points 1  1.5 1  0.5
+                        sonde_He_entree_vfinparoi         vitesse periode 10. points 1 1.5 1.9  0.5
+			sonde_k 			K periode 0.1 segment 200 1.0 0.0 0.5 1.0 2.0 0.5                      	
+
+			sonde_eps 		       eps periode 1000. segment 200 1.0 0.0 0.5 1.0 2.0 0.5                      	
+			coupe_He_long_Vxmilieu    vitesse periode 500.   segment 20 0 1 0.5 2.0 1 0.5 
+			coupe_He_long_Vxparoi    vitesse periode 500.   segment 20 0 1.9 0.5 2.0 1.9 0.5
+                        coupe_He_long_P    pression periode 500.   segment 20 0 1 0.5 2.0 1 0.5                   
+                        coupe_He_larg_Vz    vitesse periode 500.   segment 4 1.5 1 0.125 1.5 1 0.875
+			coupe_He_larg_Vy    vitesse periode 500.   segment 10 1.5 0.1 0.5 1.5 1.9 0.5
+	VX vitesseX periode 1. segment 1000 1.5 0. 0.5 1.5 2. 0.5
+	K K  periode 10 position_like VX
+	Eps Eps  periode 1. position_like VX	
+	viscosite_turbulente viscosite_turbulente  periode 1. position_like VX
+	D D periode 1. position_like VX
+	E E periode 1. position_like VX			
+
+                }
+                Champs dt_post 500.
+                {
+		   pression elem
+                   vitesse elem
+		   k faces
+		   eps faces
+		   y_plus elem
+                }
+        }
+}
+
+
+
+Solve pb1
+End
+# solveur_pression Cholesky { } 
+solveur_pression GCP {
+                        precond ssor { omega 1.500000 }
+                        seuil 1.000000e-07
+                }
+
+
+
+#

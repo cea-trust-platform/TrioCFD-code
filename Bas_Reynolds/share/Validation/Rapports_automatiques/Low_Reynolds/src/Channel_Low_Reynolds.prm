@@ -1,0 +1,403 @@
+Parametres {
+	Titre "Low_Reynolds models"
+	Description ""
+	ParametresTrio_U Type of problem : Hydraulique_Turbulent
+	ParametresTrio_U Diffusion scheme : Default{}
+	ParametresTrio_U Discretization : VDF et VEF
+	ParametresTrio_U Time scheme : 
+	ParametresTrio_U Solving of equations : "Navier Stokes turbulent" 
+	ParametresTrio_U Convection : quick or ef_stab
+	ParametresTrio_U Turbulence model : K-Epsilon
+
+	Castest  LS_20000 test.data  
+	Castest  JL_20000 test.data
+	Castest  LS_20000_yplus_003 test.data  
+	Castest  LS_20000_yplus_006 test.data
+	Castest  Step_VDF test.data
+	Castest  Step_VDF_LS test.data
+	Castest  Step_VEF_LS test.data
+
+	Auteur "M.P."
+	InclureData 2
+
+	Reference " 1: Launder, B. E. and Sharma, B. I. (1974), Application of the Energy-Dissipation Model of Turbulence to the Calculation of Flow Near a Spinning Disc, Letters in Heat and Mass Transfer, Vol. 1, No. 2, pp. 131-138." 
+
+	Reference " 2: Jones, W. P. and Launder, B. E. (1972), The prediction of laminarization with a two-equation model of turbulence, Int. J. of Heat and Mass transfer, Vol. 15, pp. 301-314." 
+
+ 	Reference " 3: C.K.G.Lam and K.Bremhorst, A modified form of the k-epsilon model for predicting wall turbulence, ASME J. Fluids Engng., Vol.103, p456, (1981)." 
+
+	Reference " 3: D.M. Driver and H.L. Seegmiller, Features of reattaching turbulent shear layer in divergent channel flow, AIAA journal, 2, p. 163-171, (1985)." 
+}
+
+
+Chapter { 
+	Title "Description"
+
+	description "Les lois de paroi, v\'erifi\'ees \`a partir de r\'esultats empiriques, permettent d'\'eviter de calculer la solution des \'equations de Navier-Stokes et du mod\`ele de turbulence proche de la paroi. Le mod\`ele \latex_($k-\varepsilon$\latex_) permet ainsi de simuler le coeur de l'\'ecoulement en se pr\'eservant d'un co\^ut de calcul trop grand d\^u \`a un maillage trop fin proche de la paroi. Lorsque l'on s'int\'eresse \`a l'ensemble de l'\'ecoulement notamment proche de la paroi (par exemple des effets de recirculation, de d\'ecollement pour des g\'eom\'etries complexes), il peut \^etre pr\'ef\'erable d'utiliser des mod\`eles bas-Reynolds qui font d\'esormais appel \`a des fonctions d'amortissement et des termes d\'ependant de la discr\'etisation. Le mod\`ele $k-\varepsilon$ bas-Reynolds laisse l'\'equation de transport de $k$ inchang\'ee mais modifie celle de $\varepsilon$ par adjonction de termes d'att\'enuation dans la zone proche de la paroi o\`u le nombre de Reynolds est localement plus faible. Du fait d'un maillage de paroi important, ce mod\`ele est donc plus couteux que le $k-\varepsilon$ standard. Il existe plusieurs dizaines de mod\`eles bas-Reynolds dans la litt\'erature. Nous avons d\'evelopp\'e dans TrioCFD les mod\`eles de Launder-Sharma [1], Jones-Launder [2] et Lam-Bremhorst [3]" 
+}
+
+
+Chapitre {
+	Titre "Channel test "
+	Description "Geometry : channel"
+	Description "Dimensions : Lx=2, Ly=2, Lz=1"
+#	Description "Mesh : 60x32 (dx+= ; dy+= )"
+#	Description "Initial conditions : Champ_fonc_xyz dom 2  0.8 0." 
+	Description "Boundary conditions : The periodicity conditions need a source term to maintain the flow constant"
+	
+	
+	Tableau {
+		Titre "Physical properties"
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
+		Description "$\rho = 1$ \latex_($kg.m^{-3}$\latex_)"
+		Description "$\mu$ = 1.e-5 such as \latex_($Re = (u.D_h) / \nu = 20000$\latex_) (h=2 : height)"
+		Description "\latex_($Re_\tau = 0.175*((ub.h/2) / \nu)^{(7/8)} = 300$\latex_) "
+		Description "\latex_($u_\tau = Re_\tau * \nu / (h/2) = 0.003017$\latex_) "
+	}
+
+	visu {
+		titre "mesh"
+		mesh LS_20000/test.lata dom_pb1
+		operator slice 0 0 1 0 0 1
+		origine mesh
+	}
+
+
+
+	Figure {
+		Titre "Mean velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		LogX
+		RangeX auto 480
+		LabelY "U+"
+		#LogY
+		 RangeY 0.1 25
+		InclureDescCourbes 0
+		Legende below
+	       		Courbe {
+			Legende LS_20000
+			Fichier ./LS_20000/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+				Courbe {
+			Legende JL_20000
+			Fichier ./JL_20000/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+				Courbe {
+			Legende Openfoam_LS_20000
+			Fichier ./Openfoam_LS_20000/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+					Courbe {
+			Legende "Linear Law"
+			Fonction x
+			TypeLigne 0
+			Style lines
+			origine ana
+		}
+		
+		
+		Courbe {
+			Legende "Log Law"
+			Fonction 1/0.415*log(x)+5.32
+			TypeLigne 0
+			Style lines
+			origine ana
+		}
+		
+	}
+
+	Figure {
+		Titre "Mean velocity profile U+"
+		Width 12cm
+		Dimension 2
+		LabelX "y+"
+		
+		RangeX auto 15
+		LabelY "U+"
+		#LogY
+		 
+		InclureDescCourbes 0
+		Legende below
+	       		Courbe {
+			Legende LS_20000
+			Fichier ./LS_20000/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+
+				Courbe {
+			Legende JL_20000
+			Fichier ./JL_20000/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+				Courbe {
+			Legende Openfoam_LS_20000
+			Fichier ./Openfoam_LS_20000/courbe_uplus.dat
+			Colonnes ($2) ($4)
+			Style lines
+		}
+					Courbe {
+			Legende "Linear Law"
+			Fonction x
+			TypeLigne 0
+			Style lines
+			origine ana
+		}
+		
+		
+		
+	}
+
+
+	Figure {
+		Titre "Mean velocity profile U"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+	
+		LabelY "U"
+		InclureDescCourbes 0
+		Legende below
+	       		Courbe {
+			Legende LS_20000
+			Fichier ./LS_20000/courbe_uplus.dat
+			Colonnes ($1) ($3)
+			Style lines
+		}
+
+				Courbe {
+			Legende JL_20000
+			Fichier ./JL_20000/courbe_uplus.dat
+			Colonnes ($1) ($3)
+			Style lines
+		}
+				Courbe {
+			Legende Openfoam_LS_20000
+			Fichier ./Openfoam_LS_20000/courbe_uplus.dat
+			Colonnes ($1) ($3)
+			Style lines
+		}
+			}
+	Figure {
+		Titre "K profile"
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+	
+		LabelY "K"
+		InclureDescCourbes 0
+
+		Legende below
+	       		Courbe {
+			segment ./LS_20000/test.data  K
+			legend "LS_20000"
+			style linespoints
+		}
+
+		Courbe {
+			Legende Openfoam_LS_20000
+			Fichier ./Openfoam_LS_20000/k.dat
+			Colonnes ($1) ($2)
+			Style lines
+		}
+	       		Courbe {
+			segment ./LS_20000_yplus_003/test.data  K
+			legend "LS_20000_yplus_003"
+			style linespoints
+		}
+	       		Courbe {
+			segment ./LS_20000_yplus_006/test.data  K
+			legend "LS_20000_yplus_006"
+			style linespoints
+		}
+		 	}
+
+	tableau {
+	nb_colonnes 1
+	label u_tau
+
+	
+		
+	ligne {
+	legend theorical
+	values 0.003017
+	}
+
+	 	ligne {
+	legend LS_20000
+	fichier LS_20000/u_tau.dat
+	nb_colonnes_fichier 2
+	colonnes $2
+	derniere_ligne
+       }	
+
+		ligne {
+	legend JL_20000
+	fichier JL_20000/u_tau.dat
+	nb_colonnes_fichier 2
+	colonnes $2
+	derniere_ligne
+       }	
+		ligne {
+	legend Openfoam_LS_20000
+	fichier Openfoam_LS_20000/u_tau.dat
+	nb_colonnes_fichier 2
+	colonnes $2
+	derniere_ligne
+       }	
+	 	ligne {
+	legend LS_20000_yplus_003
+	fichier LS_20000_yplus_003/u_tau.dat
+	nb_colonnes_fichier 2
+	colonnes $2
+	derniere_ligne
+       }		
+
+	 	ligne {
+	legend LS_20000_yplus_006
+	fichier LS_20000_yplus_006/u_tau.dat
+	nb_colonnes_fichier 2
+	colonnes $2
+	derniere_ligne
+       }		
+ }
+
+
+}
+
+Chapter {
+	Title "R\'esultats pour une configuration de la marche descendante"
+
+	description "On \'etudie dans ce chapitre le mod\`ele Bas-Reynolds de Launder-Sharma en le comparant au K-Eps standard dans le cas de l'\'ecoulement apr\`es une marche descendante. On consid\`ere la configuration \'etudi\'es par Driver et al. [4]. Ci-dessous les param\`etres de la g\'eometrie (adimensionn\'es) et le maillage utilis\'e. Le nombre de Reynolds calcul\'e par rapport \`a la hauteur de la marche ($H=1$) est \latex_($Re = \frac{U\cdot H}{\nu}=33 420$\latex_)".
+
+	figure {
+	Title G\'eometrie
+	picture Figures/marche.png
+	}
+
+	tableau {		
+		nb_colonnes 1
+
+		ligne {
+		legend Lx
+		values 50.
+			}
+		ligne {
+		legend Ly
+		values 9.
+			}
+		ligne {
+		legend H
+		values 1.
+			}
+		ligne {
+		legend Lin
+		values 10.
+			}
+		}
+	
+	figure { 
+		title "Ux en fonction de y pour X=2.667"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./Step_VDF/test.data  SONDE_U_1
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VDF_LS/test.data  SONDE_U_1
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Launder-Sharma en VDF"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VEF_LS/test.data  SONDE_U_1
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Launder-Sharma en VEF"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Ux en fonction de y pour X=5.333"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./Step_VDF/test.data  SONDE_U_2
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VDF_LS/test.data  SONDE_U_2
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Launder-Sharma en VDF"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VEF_LS/test.data  SONDE_U_2
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Launder-Sharma en VEF"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Ux en fonction de y pour X=6.220"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./Step_VDF/test.data  SONDE_U_3
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VDF_LS/test.data  SONDE_U_3
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de  Launder-Sharma en VDF"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VEF_LS/test.data  SONDE_U_3
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de  Launder-Sharma en VEF"
+			style linespoints
+			}
+		}
+	figure { 
+		title "Ux en fonction de y pour X=8.000"
+		include_description_curves 0
+		labelX "Ux"
+		labelY "y "
+		curve {
+			segment ./Step_VDF/test.data  SONDE_U_4
+			columns ($2) ($1)
+			legend "Ux avec mod\`ele K-Eps standard"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VDF_LS/test.data  SONDE_U_4
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Launder-Sharma en VDF"
+			style linespoints
+			}
+		curve {
+			segment ./Step_VEF_LS/test.data  SONDE_U_4
+			columns ($2) ($1)
+			legend "Ux avec le mod\èle de Launder-Sharma en VEF"
+			style linespoints
+			}
+		}
+}

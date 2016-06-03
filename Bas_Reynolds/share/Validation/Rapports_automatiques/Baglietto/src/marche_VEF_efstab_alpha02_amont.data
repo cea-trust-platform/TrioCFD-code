@@ -1,0 +1,240 @@
+# Hydraulique 2D : schema ef_stab #
+# PARALLEL OK #
+dimension 2
+Pb_hydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entre1 
+		{
+		Origine -10. 0.
+		Nombre_de_Noeuds 25 25
+		Longueurs 9. 2.
+		Facteurs 0.93161146 0.95
+		Symy
+		}
+		{
+		Bord Entree X = -10.   0. <= Y <=  2.
+		Bord BasT   Y =   0. -10. <= X <= -1.  
+		Bord HautT  Y =   2. -10. <= X <= -1.
+		
+		} ,
+
+	Pave Entre2 
+		{
+		Origine -1.  0.
+		Nombre_de_Noeuds 9 25
+		Longueurs 1. 2.
+		Facteurs 1.0 0.95
+		Symy
+		}
+		{
+		Bord BasT   Y =   0. -1. <= X <= 0.  
+		Bord HautT  Y =   2. -1. <= X <= 0.
+		
+		} ,
+
+        Pave Haut1
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 9 25 
+		Longueurs 1. 2.
+		Facteurs 1.0 0.95
+		Symy
+		}
+		{
+		Bord Haut  Y = 2.  0. <= X <= 1.
+		} ,
+	
+	Pave Haut2
+		{
+		Origine 1. 0.
+		Nombre_de_Noeuds 55 25
+		Longueurs 39. 2.
+		Facteurs  1.0618839 0.95
+		Symy
+		}
+		{
+		Bord Haut  Y = 2.   1. <= X <= 40.
+		Bord Sortie X = 40. 0. <= Y <= 2.
+		} ,
+
+	Pave Bas1
+		{
+		Origine 0. -1. 
+		Nombre_de_Noeuds 9 12
+		Longueurs 1. 1.
+		Facteurs 1.0  0.92
+		symy
+		}
+		{
+		Bord Bas   Y = -1.   0. <= X <= 1.
+		Bord Gauche X =  0. -1. <= Y <= 0.
+		} ,	
+	
+		
+	Pave Bas2
+		{
+		Origine 1. -1. 
+		Nombre_de_Noeuds 55 12
+		Longueurs 39. 1.
+		Facteurs 1.0618839 0.92
+		symy
+		}
+		{
+		Bord Bas   Y = -1.   1. <= X <= 40.
+		Bord Sortie X = 40. -1. <= Y <= 0.
+		} 
+
+	
+	
+}
+
+Trianguler_H dom
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+
+Schema_Euler_explicite sch
+
+Read sch
+{
+	tinit 0.
+	tmax  80.
+	# nb_pas_dt_max 1 #
+	dt_min 1.e-8
+	dt_max 1.e0
+	dt_impr 10.
+	dt_sauv 10.
+	seuil_statio 1.e-4
+}
+
+Fluide_incompressible fluide
+
+Read fluide
+{	mu Champ_Uniforme  1 0.00002235286228401546
+	rho Champ_uniforme 1 1.
+}
+ 
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression petsc Cholesky { }
+		convection { ef_stab { alpha 0.2 } }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 0. 0.
+					}
+		boundary_conditions {
+			# Entree frontiere_ouverte_vitesse_imposee champ_front_lu dom 2 pb_VITESSE_periox_120.000445_entree.dat #
+			Entree frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 1. 0.
+       			Sortie frontiere_ouverte_pression_imposee
+				champ_front_Uniforme 1 0.
+			HautT paroi_fixe
+			Haut paroi_fixe
+			Gauche paroi_fixe
+			Bas paroi_fixe
+			BasT paroi_fixe
+					}
+
+      		 modele_turbulence K_Epsilon
+                {
+           	   	Transport_K_Epsilon 
+                  		{
+ 			# with_nu yes #
+          		  convection { amont }
+                 	  diffusion { }
+                 	  boundary_conditions
+                	    {
+              			# Entree frontiere_ouverte_k_eps_impose champ_front_lu dom 2 pb_K_EPS_periox_120.000445_entree.dat #
+				Entree frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0.00307921 0.000854531
+              			Sortie frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0.00307921 0.000854531
+              			HautT paroi
+				Haut paroi
+				Gauche paroi
+				Bas paroi
+				BasT paroi                                          
+          	 	    }
+           	 	  conditions_initiales 
+           	 	   {
+              			k_Eps Champ_Uniforme 2 0.00307921 0.000854531
+                           }
+            			}
+		# Modele_Fonc_Bas_Reynolds standard_KEps { Reynolds_stress_isotrope 0 } #
+           	turbulence_paroi loi_standard_hydr dt_impr_ustar 80.
+       	       }
+	}
+	
+
+	Postraitement
+	{
+	        format lata
+		Sondes
+		{     					
+			sonde_U_1 chsom vitesse periode 0.1 segment 30  2.667 -1. 2.667  2.
+			sonde_U_2 chsom vitesse periode 0.1 segment 30  5.333 -1. 5.333  2.
+			sonde_U_3 chsom vitesse periode 0.1 segment 30  6.220 -1. 6.220  2.
+			sonde_U_4 chsom vitesse periode 0.1 segment 30  8.000 -1. 8.000  2.
+
+			sonde_U_x2h vitesse periode 0.1 segment 30  2. -1.  2. 2.
+			sonde_U_x0h vitesse periode 0.1 segment 30  0.0 -1.  0.0 2.
+			
+			s_U_nodesx2h nodes vitesse  periode 0.1 segment 30  2. -1.  2. 2.
+			s_U_nodesx0h nodes vitesse  periode 0.1 segment 30  0.0 -1.  0.0 2.
+			s_U_node_paroi nodes vitesse  periode 0.1 segment 40  0.0 -1.  40. -1.
+			s_U_grav_paroi grav vitesse periode 0.1 segment 40  0.0 -1.  40. -1.
+			s_U_som_paroi chsom vitesse periode 0.1 segment 40  0.0 -1.  40. -1.
+			s_U_gravx2h grav vitesse  periode 0.1 segment 30  2. -1.  2. 2.
+			s_U_gravx0h grav vitesse  periode 0.1 segment 30  0.0 -1.  0.0 2.
+		}
+
+		Format lata
+		Champs dt_post 80.
+		       {
+			pression som
+			vitesse som
+			k
+			eps
+			viscosite_turbulente
+			y_plus
+		       }
+	}
+          
+}
+
+
+
+Solve pb
+End
+reprise formatte marche_pb.sauv
+
+GCP { 
+			precond ssor { omega 1.5 } 
+			seuil 1.e-6 
+			impr 
+					}
+ 
+# reprise formatte first_job_modified.sauv #
+# dt_impr_ustar 100. #
+	nut_max 0.01

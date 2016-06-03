@@ -147,18 +147,15 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::ajouter(DoubleTab& re
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco;
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+  /*
+    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+    double visco;
+    if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = max(tab_visco(0,0),DMINFLOAT);
     }
-  else
-    {
-      assert(0);
-      exit();
-      visco=-1;
-    }
+    else {assert(0);exit();visco=-1;}
+  */
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleVect& volumes = zone_VDF.volumes();
   const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
@@ -171,10 +168,10 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::ajouter(DoubleTab& re
   DoubleTrav F2(nb_elem);
   // Cerr << "le modele fonc est " << mon_modele_fonc.valeur().que_suis_je() << finl;
 
-  mon_modele_fonc.Calcul_D(D,z,zcl,vit,K_eps_Bas_Re,visco);
-  mon_modele_fonc.Calcul_E(E,z,zcl,vit,K_eps_Bas_Re,visco,visco_turb);
-  mon_modele_fonc.Calcul_F1(F1,z);
-  mon_modele_fonc.Calcul_F2(F2,D,z,K_eps_Bas_Re,visco );
+  mon_modele_fonc.Calcul_D(D,z,zcl,vit,K_eps_Bas_Re,ch_visco_cin);
+  mon_modele_fonc.Calcul_E(E,z,zcl,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
+  //mon_modele_fonc.Calcul_F1(F1,z);
+  mon_modele_fonc.Calcul_F2(F2,D,z,K_eps_Bas_Re,ch_visco_cin );
   if (axi)
     {
       Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
@@ -608,21 +605,9 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter(D
   const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-  double visco;
-
-
-  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
-    {
-      visco = max(tab_visco(0,0),DMINFLOAT);
-    }
-  else
-    {
-      assert(0);
-      exit();
-      visco=-1;
-    }
-
+  /*
+    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+  */
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = ref_cast(Modele_Fonc_Bas_Reynolds,mod_turb.associe_modele_fonction());
   int nb_elem = zone_VDF.nb_elem();
@@ -635,13 +620,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter(D
   DoubleTrav E(nb_elem_tot);
   DoubleTrav F1(nb_elem_tot);
   DoubleTrav F2(nb_elem_tot);
-  mon_modele_fonc.Calcul_D(D,z,zcl,vit,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_D(D,z,zcl,vit,K_eps_Bas_Re,ch_visco_cin);
   // Cerr << "D = " << D << finl;
-  mon_modele_fonc.Calcul_E(E,z,zcl, vit,K_eps_Bas_Re,visco,visco_turb);
+  mon_modele_fonc.Calcul_E(E,z,zcl, vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
   // Cerr << "E = " << E << finl;
-  mon_modele_fonc.Calcul_F1(F1,z);
+  //mon_modele_fonc.Calcul_F1(F1,z);
   // Cerr << "F1 = " << F1 << finl;
-  mon_modele_fonc.Calcul_F2(F2,D,z,K_eps_Bas_Re,visco);
+  mon_modele_fonc.Calcul_F2(F2,D,z,K_eps_Bas_Re,ch_visco_cin);
   // Cerr << "F2 = " << F2 << finl;
 
   if (axi)

@@ -1,0 +1,8 @@
+#!/bin/sh
+#ln -s $1.data 2D.data
+python ../propertiesGeometry.py
+python ../courbes_uplus.py Moyennes_spatiales_vitesse_rho_mu
+
+extrait_coupe $1 SONDE_K
+extrait_coupe $1 SONDE_EPS
+python ../courbes_kepsplus.py $1_SONDE_K.coupe $1_SONDE_EPS.coupe
