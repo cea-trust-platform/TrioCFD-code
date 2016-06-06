@@ -268,7 +268,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
   // Parallelisme : Impression par le processeur le plus grand qui possede le vortex
   double K_max_global=mp_max(K_max_local);
   int pe=(K_max_global==K_max_local?Process::me():-1);
-  int pe_max=mp_max(pe);
+  int pe_max=(int)mp_max(pe);
   if (pe==pe_max) imprimer(K_max_global, "AREVA", centre_vortex, 0);
   Cerr << "-> AREVA criterion   : Biggest vortex at (x,y,z)=(" << centre_vortex(0) << "," << centre_vortex(1) << "," << centre_vortex(2) << ")" << finl;
 }
@@ -358,7 +358,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
       double critereQ_mp_max=mp_max(critereQ_max);
       // On traite le cas ou meme Q (on prend alors le processeur de rang le plus eleve)
       int pe=(critereQ_mp_max==critereQ_max?Process::me():-1);
-      int pe_mp_max=mp_max(pe);
+      int pe_mp_max=(int)mp_max(pe);
       int taille_vortex=0;
       // Le centre du vortex est le centre de elem_centre_vortex
       // on le communique a tous les processeurs
