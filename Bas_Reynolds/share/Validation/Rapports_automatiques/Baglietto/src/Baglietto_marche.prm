@@ -177,12 +177,12 @@ Chapter {
 		labelX "X"
 		labelY "Cf "
 		curve {
-			file ./marche_VEF_efstab_alpha02_amont/./Cf.dat
+			file ./marche_VEF_efstab_alpha02_amont/Cf.dat
 			legend "Cf, K-Eps standard"
 			style linespoints
 			}
 		curve {
-			file ./marche_VEF_efstab_alpha02_amont_Baglietto/./Cf.dat
+			file ./marche_VEF_efstab_alpha02_amont_Baglietto/Cf.dat
 			legend "Cf, Modele de Baglietto"
 			style linespoints
 			}
