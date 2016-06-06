@@ -161,12 +161,12 @@ Read pb1
                         coupe_He_long_P    pression periode 500.   segment 20 0 1 0.5 2.0 1 0.5                   
                         coupe_He_larg_Vz    vitesse periode 500.   segment 4 1.5 1 0.125 1.5 1 0.875
 			coupe_He_larg_Vy    vitesse periode 500.   segment 10 1.5 0.1 0.5 1.5 1.9 0.5
-	VX vitesseX periode 1. segment 1000 1.5 0. 0.5 1.5 2. 0.5
+	VX vitesseX periode 10. segment 1000 1.5 0. 0.5 1.5 2. 0.5
 	K K  periode 10 position_like VX
-	Eps Eps  periode 1. position_like VX	
-	viscosite_turbulente viscosite_turbulente  periode 1. position_like VX
-	D D periode 1. position_like VX
-	E E periode 1. position_like VX			
+	Eps Eps  periode 10. position_like VX	
+	viscosite_turbulente viscosite_turbulente  periode 10. position_like VX
+	D D periode 10. position_like VX
+	E E periode 10. position_like VX			
 
                 }
                 Champs dt_post 500.

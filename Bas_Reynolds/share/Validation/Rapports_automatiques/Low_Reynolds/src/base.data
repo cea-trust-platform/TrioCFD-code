@@ -126,10 +126,10 @@ Lire pb1
 		{
 			sonde_k 		       K periode 1000. segment 200 1.0 0.0 0.5 1.0 2.0 0.5                      	
 			sonde_eps 		       eps periode 1000. segment 200 1.0 0.0 0.5 1.0 2.0 0.5                      	
-	VX vitesseX periode 1. segment 1000 1.5 0. 0.5 1.5 2. 0.5
+	VX vitesseX periode 10. segment 1000 1.5 0. 0.5 1.5 2. 0.5
       K K  periode 10 position_like VX
-	Eps Eps  periode 1. position_like VX	
-	viscosite_turbulente viscosite_turbulente  periode 1. position_like VX
+	Eps Eps  periode 10. position_like VX	
+	viscosite_turbulente viscosite_turbulente  periode 10. position_like VX
 
                 }
                 Champs dt_post 5000.

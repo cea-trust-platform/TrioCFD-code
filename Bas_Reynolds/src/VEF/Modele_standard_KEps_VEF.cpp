@@ -35,6 +35,7 @@
 
 Implemente_instanciable(Modele_standard_KEps_VEF,"Modele_standard_KEps_VEF",Modele_Lam_Bremhorst_VEF);
 
+// XD standard_KEps Lam_Bremhorst standard_KEps -1 not_set
 // printOn et readOn
 
 Sortie& Modele_standard_KEps_VEF::printOn(Sortie& s ) const
