@@ -29,7 +29,7 @@
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Modele_Jones_Launder_VDF,"Modele_Jones_Launder_VDF",Modele_Fonc_Bas_Reynolds_Base);
-
+// XD Jones_Launder modele_fonction_bas_reynolds_base Jones_Launder -1 not_set
 // printOn et readOn
 
 Sortie& Modele_Jones_Launder_VDF::printOn(Sortie& s ) const

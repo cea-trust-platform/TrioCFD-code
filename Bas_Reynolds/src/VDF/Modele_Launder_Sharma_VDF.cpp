@@ -25,6 +25,7 @@
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Modele_Launder_Sharma_VDF,"Modele_Launder_Sharma_VDF",Modele_Jones_Launder_VDF);
+// XD Launder_Sharmma modele_fonction_bas_reynolds_base Launder_Sharma -1 not_set
 
 
 

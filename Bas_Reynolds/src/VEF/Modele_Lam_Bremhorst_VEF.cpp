@@ -33,6 +33,7 @@
 #include <EcritureLectureSpecial.h>
 
 Implemente_instanciable(Modele_Lam_Bremhorst_VEF,"Modele_Lam_Bremhorst_VEF",Modele_Fonc_Bas_Reynolds_Base);
+// XD Lam_Bremhorst modele_fonction_bas_reynolds_base Lam_Bremhorst -1 not_set
 
 // printOn et readOn
 
@@ -56,8 +57,8 @@ void Modele_Lam_Bremhorst_VEF::set_param(Param& param)
 
   is_Cmu_constant_ = 1;
   is_Reynolds_stress_isotrope_ = 1;
-  param.ajouter("fichier_distance_paroi",&nom_fic);
-  param.ajouter("Reynolds_stress_isotrope",&is_Reynolds_stress_isotrope_);
+  param.ajouter("fichier_distance_paroi",&nom_fic);    // XD_ADD_P chaine not_set
+  param.ajouter("Reynolds_stress_isotrope",&is_Reynolds_stress_isotrope_); // XD_ADD_P int not_set
 }
 
 int Modele_Lam_Bremhorst_VEF::Calcul_is_Reynolds_stress_isotrope() const
