@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Juares_BS
+
+cas=Juarez
+
+longueur=`grep -i "Origine " ./mesh_*.geo | awk '{print $3}' | head -1`
+echo $longueur > ./longueur.dat
+
+mu=`grep -i "mu " ./$cas.data | awk '{print $4}' | head -1`
+echo $mu > ./mu.dat
+
+rho=`grep -i "rho " ./$cas.data | awk '{print $4}' | head -1`
+echo $rho > ./rho.dat
+
+cp=`grep -i "cp " ./$cas.data | awk '{print $4}' | head -1`
+echo $cp > ./cp.dat
+
+lambda=`grep -i "lambda " ./$cas.data | awk '{print $4}' | head -1`
+echo $lambda > ./lambda.dat
+
+beta_th=`grep -i "beta_th " ./$cas.data | awk '{print $4}' | head -1`
+echo $beta_th > ./beta_th.dat
+
+gravite=`grep -i "gravite" ./$cas.data | grep -i "Read" | awk '{print -$5}' | head -1`
+echo $gravite > ./gravite.dat
+
+T_hot=`grep -i "HOT" ./$cas.data | grep -i "paroi_temperature_imposee" | awk '{print $5}' | head -1`
+echo $T_hot > ./T_hot.dat
+
+T_inf=`grep "COLD1" ./$cas.data | grep -i "frontiere_ouverte" | grep -i "T_ext" | awk '{print $6}' | head -1`
+echo $T_inf > ./T_inf.dat
+
+epsilon=`awk "BEGIN{print(($T_hot-$T_inf)/$T_inf)}"`
+echo $epsilon > ./epsilon.dat
+
+prandtl=`awk "BEGIN{print($mu*$cp/$lambda)}"`
+echo $prandtl > ./prandtl.dat
+
+rayleigh=`awk "BEGIN{print($prandtl*$gravite*$beta_th*($T_hot-$T_inf)*$longueur^3*$rho^2/$mu^2)}"`
+echo $rayleigh > ./rayleigh.dat
+

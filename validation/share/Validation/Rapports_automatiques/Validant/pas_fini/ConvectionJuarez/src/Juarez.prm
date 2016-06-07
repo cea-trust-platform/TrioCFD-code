@@ -1,0 +1,348 @@
+Parameters {
+	Title "Natural convection in an open cavity - Juarez"
+	
+	Author "Antoine Scoliege"
+	
+	VersionTrio_U 1.7.2
+ 	
+	TestCase ./VDF_20 Juarez.data 8
+	TestCase ./VDF_40 Juarez.data 8
+	TestCase ./VDF_80 Juarez.data 8
+ 	TestCase ./VEF_BS Juarez.data 8
+ 	TestCase ./VEF_QC Juarez.data 8
+	
+	IncludeData 0
+	
+	Description "The numerical results of heat transfer calculations in an open cavity considering natural convection and temperature-dependent fluid properties are presented."
+	
+	Reference "Numerical study of natural convection in an open cavity considering temperature-dependant fluid properties. Jose-Octavio Juarez, Jesus-Fernando Hinojosa, Jesus-Perfecto Xaman, Manuel Perez-Tello. International Journal of Thermal Sciences - November 2011."
+
+	ParametersTrio_U Dimension : 2
+	ParametersTrio_U Problem : thermohydraulic (Boussinesq or QC)
+	ParametersTrio_U Discretization : VDF or VEFPreP1B
+	ParametersTrio_U Time scheme : implicit Euler (solver GMRES)
+	ParametersTrio_U Pressure solver : PETSC Cholesky
+	ParametersTrio_U Convection scheme : upwind for VDF or centered for VEF
+}
+
+#########################################################################################################################
+
+Chapter {
+	Title "Test description"
+	Figure {
+		Title "Physical model"
+		Picture ./image/boundaries_bis.png
+		Description "Initial conditions:"
+		Description "- fluid at rest"
+		Description "- temperature at T_inf"
+		Description "Boundary conditions:"
+		Description "- Hot : fixed wall, fixed temperature T_hot"
+		Description "- Cold : fixed null gradient pressure, external temperature T_inf"
+		Description "- Adiab : fixed wall, adiabatic wall"
+	}
+	Table {
+		Description "Fluid properties:"
+		nb_columns 1
+		label "value"
+		line {
+			legend "caracteristic length Lc"
+			file ./VEF_BS/longueur.dat
+		}
+		line {
+			legend "$\mu$"
+			file ./VEF_BS/mu.dat
+		}
+		line {
+			legend "$\rho$"
+			file ./VEF_BS/rho.dat
+		}
+		line {
+			legend "Cp"
+			file ./VEF_BS/cp.dat
+		}
+		line {
+			legend "$\lambda$"
+			file ./VEF_BS/lambda.dat
+		}
+		line {
+			legend "$\beta$th"
+			file ./VEF_BS/beta_th.dat
+		}
+	}
+	Table {
+		Description "Flow properties:"
+		nb_columns 1
+		label "value"
+		line {
+			legend "gravity"
+			file ./VEF_BS/gravite.dat
+		}
+		line {
+			legend "T_hot"
+			file ./VEF_BS/T_hot.dat
+		}
+		line {
+			legend "T_inf"
+			file ./VEF_BS/T_inf.dat
+		}
+		line {
+			legend "$\epsilon$"
+			file ./VEF_BS/epsilon.dat
+		}
+		line {
+			legend "Prandtl number"
+			file ./VEF_BS/prandtl.dat
+		}
+		line {
+			legend "Rayleigh number"
+			file ./VEF_BS/rayleigh.dat
+		}
+	}
+	visu {
+		Title "Meshes"
+		Description "Coarse rectangular mesh, 2974 elements:"
+		mesh ./VDF_20/Juarez_CHAMPDEVOLUME.lata dom
+	}
+	visu {
+		Description "Medium rectangular mesh, 12344 elements:"
+		mesh ./VDF_40/Juarez_CHAMPDEVOLUME.lata dom
+	}
+	visu {
+		Description "Fine rectangular mesh, 50284 elements:"
+		mesh ./VDF_80/Juarez_CHAMPDEVOLUME.lata dom
+	}
+	visu {
+		Description "Tetrahedral mesh, 49376 elements:"
+		mesh ./VEF_BS/Juarez_CHAMPDEVOLUME.lata dom
+	}
+}
+
+#########################################################################################################################
+
+Chapter {
+	Title "VDF calculation results"
+	visu {
+		Title "Temperature"
+		Description "Temperature pseudocolor for medium rectangular mesh:"
+		pseudocolor ./VDF_40/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
+	}
+	visu {
+		Description "Temperature contours for medium rectangular mesh:"
+		isovaleurs ./VDF_40/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
+	}
+	Figure {
+		Description "Comparison of horizontal temperature probes with Juarez data:"
+		Title_figure "T = f(x), y = 1.5 Lc"
+		labelx "X-axis"
+		labely "temperature"
+		curve {
+			legend "VDF, coarse mesh"
+			segment ./VDF_20/Juarez.data SONDE_TEMP_HORIZONTALE
+		}
+		curve {
+			legend "VDF, medium mesh"
+			segment ./VDF_40/Juarez.data SONDE_TEMP_HORIZONTALE
+		}
+		curve {
+			legend "VDF, fine mesh"
+			segment ./VDF_80/Juarez.data SONDE_TEMP_HORIZONTALE
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/T=f(x)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		Description "Comparison of vertical temperature probes with Juarez data:"
+		Title_figure "T = f(y), x = Lc"
+		labelx "Y-axis"
+		labely "temperature"
+		curve {
+			legend "VDF, coarse mesh"
+			segment ./VDF_20/Juarez.data SONDE_TEMP_VERTICALE 
+		}
+		curve {
+			legend "VDF, medium mesh"
+			segment ./VDF_40/Juarez.data SONDE_TEMP_VERTICALE 
+		}
+		curve {
+			legend "VDF, fine mesh"
+			segment ./VDF_80/Juarez.data SONDE_TEMP_VERTICALE 
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/T=f(y)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		Title "Velocity"
+		Description "Comparison of horizontal velocity probes with Juarez data:"
+		Title_figure "V = f(x), y = 1.5 Lc"
+		labelx "X-axis"
+		labely "Y-velocity"
+		curve {
+			legend "VDF, coarse mesh"
+			segment ./VDF_20/Juarez.data SONDE_VITESSE_HORIZONTALE
+		}
+		curve {
+			legend "VDF, medium mesh"
+			segment ./VDF_40/Juarez.data SONDE_VITESSE_HORIZONTALE
+		}
+		curve {
+			legend "VDF, fine mesh"
+			segment ./VDF_80/Juarez.data SONDE_VITESSE_HORIZONTALE
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/V=f(x)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		Description "Comparison of vertical velocity probes with Juarez data:"
+		Title_figure "U = f(y), x = Lc
+		labelx "Y-axis"
+		labely "X-velocity"
+		curve {
+			legend "VDF, coarse mesh"
+			segment ./VDF_20/Juarez.data SONDE_VITESSE_VERTICALE 
+		}
+		curve {
+			legend "VDF, medium mesh"
+			segment ./VDF_40/Juarez.data SONDE_VITESSE_VERTICALE 
+		}
+		curve {
+			legend "VDF, fine mesh"
+			segment ./VDF_80/Juarez.data SONDE_VITESSE_VERTICALE 
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/U=f(y)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		width 0cm
+                picture ./image/nothing.png
+		Title "Conclusion"
+		Description "There is no yet conclusion about the meshing convergence because the validation is not completed."
+	}
+}
+
+#########################################################################################################################
+
+Chapter {
+	Title "VEF calculation results"
+	visu {
+		Title "Temperature"
+		Description "Temperature pseudocolor for Boussinesq hypothesis:"
+		pseudocolor ./VEF_BS/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
+	}
+	visu {
+		Description "Temperature contours for Boussinesq hypothesis:"
+		isovaleurs ./VEF_BS/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
+	}
+	Figure {
+		Description "Comparison of horizontal temperature probes with Juarez data:"
+		Title_figure "T = f(x), y = 1.5 Lc"
+		labelx "X-axis"
+		labely "temperature"
+		curve {
+			legend "VEF, Boussinesq hypothesis"
+			segment ./VEF_BS/Juarez.data SONDE_TEMP_HORIZONTALE
+		}
+		curve {
+			legend "VEF, Quasi-compressible model"
+			segment ./VEF_QC/Juarez.data SONDE_TEMP_HORIZONTALE
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/T=f(x)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		Description "Comparison of vertical temperature probes with Juarez data:"
+		Title_figure "T = f(y), x = Lc"
+		labelx "Y-axis"
+		labely "temperature"
+		curve {
+			legend "VEF, Boussinesq hypothesis"
+			segment ./VEF_BS/Juarez.data SONDE_TEMP_VERTICALE
+		}
+		curve {
+			legend "VEF, Quasi-compressible model"
+			segment ./VEF_QC/Juarez.data SONDE_TEMP_VERTICALE 
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/T=f(y)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		Title "Velocity"
+		Description "Comparison of horizontal velocity probes with Juarez data:"
+		Title_figure "V = f(x), y = 1.5 Lc"
+		labelx "X-axis"
+		labely "Y-velocity"
+		curve {
+			legend "VEF, Boussinesq hypothesis"
+			segment ./VEF_BS/Juarez.data SONDE_VITESSE_HORIZONTALE
+		}
+		curve {
+			legend "VEF, Quasi-compressible model"
+			segment ./VEF_QC/Juarez.data SONDE_VITESSE_HORIZONTALE
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/V=f(x)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		Description "Comparison of vertical velocity probes with Juarez data:"
+		Title_figure "U = f(y), x = Lc
+		labelx "Y-axis"
+		labely "X-velocity"
+		curve {
+			legend "VEF, Boussinesq hypothesis"
+			segment ./VEF_BS/Juarez.data SONDE_VITESSE_VERTICALE 
+		}
+		curve {
+			legend "VEF, Quasi-compressible model"
+			segment ./VEF_QC/Juarez.data SONDE_VITESSE_VERTICALE 
+		}
+		curve {
+			legend "Juarez data"
+			file ./dat/U=f(y)_dim.dat
+		}
+		include_description_curves 0
+	}
+	Figure {
+		width 0cm
+                picture ./image/nothing.png
+		Title "Conclusion"
+		Description "There is no yet conclusion about the comparison between the case with Boussinesq hypothesis and the case with Quasi-compressible model because the validation is not completed."
+	}
+}
+
+#########################################################################################################################
+
+Chapter {
+	Title "Data files"
+	Figure {
+		width 0cm
+                picture ./image/nothing.png
+		Title "Boussinesq hypothesis"
+		Description include_text_file(Juarez_BS.data)
+	}
+	Figure {
+		width 0cm
+                picture ./image/nothing.png
+		Title "Quasi-compressible model"
+		Description include_text_file(Juarez_QC.data)
+	}
+}

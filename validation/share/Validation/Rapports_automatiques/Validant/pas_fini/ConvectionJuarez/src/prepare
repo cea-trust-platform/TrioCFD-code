@@ -1,0 +1,39 @@
+#!/bin/bash
+
+mkdir -p VDF_20 VDF_40 VDF_80 VEF_BS VEF_QC
+
+cas=Juarez_BS
+for dir in VDF_20 VDF_40 VDF_80
+do 
+	cd $dir ; 
+	cp   ../$cas.data Juarez.data ;
+        size=${dir##VDF_}
+	cp   ../mesh/mesh_$size.geo ../pre_run . ;
+        sed "s/mesh_40/mesh_$size/g" Juarez.data > modifie.data ; mv modifie.data Juarez.data
+        sed "s/Trianguler_H dom/ /g" Juarez.data > modifie.data ; mv modifie.data Juarez.data
+	sed 's/VEFPreP1B dis/VDF dis/' Juarez.data > modifie.data ; mv modifie.data Juarez.data
+        sed "s/Read dis { P0 P1 Changement_de_base_P1Bulle 1 Cl_pression_sommet_faible 0 }/ /g" Juarez.data > modifie.data ; mv modifie.data Juarez.data
+	sed 's/centre/amont/' Juarez.data > modifie.data ; mv modifie.data Juarez.data
+	sed 's/frontiere_ouverte_gradient_pression_impose_VEFPreP1B/frontiere_ouverte_gradient_pression_impose/' Juarez.data > modifie.data ; mv modifie.data Juarez.data
+	[ "$size" = "20" ] && sed 's/segment 40/segment 20/' Juarez.data > modifie.data && mv modifie.data Juarez.data
+	cd .. 
+done
+
+cas=Juarez_BS
+for dir in VEF_BS
+do 
+	cd $dir ;
+        cp   ../$cas.data Juarez.data ; 
+        cp   ../mesh/mesh_40.geo ../pre_run ../post_run . ; 
+	cd .. 
+done
+
+cas=Juarez_QC
+for dir in VEF_QC
+do 
+	cd $dir ;
+        cp   ../$cas.data Juarez.data ; 
+        cp   ../mesh/mesh_40.geo ../pre_run . ; 
+	cd .. 
+done
+
