@@ -8,7 +8,7 @@ do
 	cd $dir ; 
 	cp   ../$cas.data Juarez.data ;
         size=${dir##VDF_}
-	cp   ../mesh/mesh_$size.geo ../pre_run . ;
+	cp   ../mesh/mesh_$size.geo . ;
         sed "s/mesh_40/mesh_$size/g" Juarez.data > modifie.data ; mv modifie.data Juarez.data
         sed "s/Trianguler_H dom/ /g" Juarez.data > modifie.data ; mv modifie.data Juarez.data
 	sed 's/VEFPreP1B dis/VDF dis/' Juarez.data > modifie.data ; mv modifie.data Juarez.data
@@ -24,7 +24,7 @@ for dir in VEF_BS
 do 
 	cd $dir ;
         cp   ../$cas.data Juarez.data ; 
-        cp   ../mesh/mesh_40.geo ../pre_run ../post_run . ; 
+        cp   ../mesh/mesh_40.geo ../post_run . ; 
 	cd .. 
 done
 
@@ -33,7 +33,7 @@ for dir in VEF_QC
 do 
 	cd $dir ;
         cp   ../$cas.data Juarez.data ; 
-        cp   ../mesh/mesh_40.geo ../pre_run . ; 
+        cp   ../mesh/mesh_40.geo . ; 
 	cd .. 
 done
 

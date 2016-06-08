@@ -30,6 +30,7 @@ Schema_euler_implicite sch
 Read sch
 {
         tinit 0.
+	nb_pas_dt_max 3
         tmax 50.
         dt_min 1.e-7
         dt_max 0.2
@@ -139,11 +140,11 @@ Read pb
                 sonde_vitesse_horizontale vitesseY    periode 5  segment 40 0.0 0.3519 0.2346 0.3519
                 sonde_vitesse_verticale   vitesseX    periode 5  segment 40 0.2346 0.2346 0.2346 0.4692
               }
-            Format lata
+            Format lml
             Fields dt_post 1.
               {
                 pression som
-                vitesse faces
+                vitesse
                 temperature elem
               }
           }

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-cas=Juarez
-
-make_PAR.data $cas.data 1>/dev/null 2>&1
-mv -f PAR_$cas.data $cas.data
-

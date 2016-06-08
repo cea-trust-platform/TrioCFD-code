@@ -5,11 +5,11 @@ Parameters {
 	
 	VersionTrio_U 1.7.2
  	
-	TestCase ./VDF_20 Juarez.data 8
-	TestCase ./VDF_40 Juarez.data 8
-	TestCase ./VDF_80 Juarez.data 8
- 	TestCase ./VEF_BS Juarez.data 8
- 	TestCase ./VEF_QC Juarez.data 8
+	TestCase ./VDF_20 Juarez.data
+	TestCase ./VDF_40 Juarez.data
+	TestCase ./VDF_80 Juarez.data
+ 	TestCase ./VEF_BS Juarez.data
+ 	TestCase ./VEF_QC Juarez.data
 	
 	IncludeData 0
 	

@@ -119,6 +119,16 @@ Read pb
         initial_conditions { temperature champ_uniforme 1 600. }
       }
 
+    Post_processing
+      { 
+        Format lml
+        Fields dt_post 1.
+          {
+            pression som
+            vitesse elem
+            temperature elem
+          }
+      }
     Post_processings 
       { 
         champdevolume
@@ -136,16 +146,6 @@ Read pb
               {
                 pression som
                 vitesse faces
-                temperature elem
-              }
-          }
-        champdevolume_lml
-          {
-            Format lml
-            Fields dt_post 1.
-              {
-                pression som
-                vitesse elem
                 temperature elem
               }
           }
