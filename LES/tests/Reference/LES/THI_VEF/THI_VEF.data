@@ -41,7 +41,7 @@ Corriger_frontiere_periodique { Domaine dom Bord perioz }
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur metis { use_weights nb_parts 9 }
+	Partitionneur metis { nb_parts 9 }
 	Larg_joint 2
 	Nom_Zones DOM
 	Periodique 3 periox perioy perioz
