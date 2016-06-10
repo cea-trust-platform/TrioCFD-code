@@ -30,6 +30,7 @@ Read sch
 	tinit 0.
 	nb_pas_dt_max 3
 	tmax  100.
+	# GF le calcul diverge apres 50 secondes.... on arrete des le debut #
 	dt_min 1.e-8
 	dt_max 1.e0
 	dt_impr 10.
