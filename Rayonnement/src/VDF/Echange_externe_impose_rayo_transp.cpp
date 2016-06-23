@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Echange_externe_impose_rayo_transp.cpp
-// Directory:   $TRUST_ROOT/src/Rayonnement/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Rayonnement/src/VDF
 // Version:     /main/14
 //
 //////////////////////////////////////////////////////////////////////////////

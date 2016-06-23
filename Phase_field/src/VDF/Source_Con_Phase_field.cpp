@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Con_Phase_field.cpp
-// Directory:   $TRUST_ROOT/src/Phase_field/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
 // Version:     /main/25
 //
 //////////////////////////////////////////////////////////////////////////////

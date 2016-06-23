@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Modele_Launder_Sharma_VDF.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Bas_Reynolds/src/VDF
 // Version:     /main/8
 //
 //////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Algo_Couple_1.h
-// Directory:   $TRUST_ROOT/src/Zoom/Algos
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Zoom/src/Algos
 // Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////

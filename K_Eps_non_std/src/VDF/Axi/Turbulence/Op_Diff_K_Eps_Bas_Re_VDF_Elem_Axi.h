@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi.h
-// Directory:   $TRUST_ROOT/src/VDF/Axi/Turbulence
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/K_Eps_non_std/src/VDF/Axi/Turbulence
 // Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////

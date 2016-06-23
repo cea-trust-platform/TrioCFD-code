@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Neumann_paroi_rayo_semi_transp_VEF.cpp
-// Directory:   $TRUST_ROOT/src/Rayonnement_semi_transp/VEF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Rayonnement_semi_transp/src/VEF
 // Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
