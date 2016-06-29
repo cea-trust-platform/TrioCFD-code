@@ -266,7 +266,10 @@ void Echange_contact_Rayo_transp_VDF::calculer_Teta_paroi(DoubleTab& Teta_equiv,
       //      Teta_equiv(numfa,0)= Teta_i(numfa);
       if (Teta_i(numfa)<=0)
         {
-          Cerr<<"Teta_equiv fin "<<Teta_equiv(numfa,0)<< " Teta_i_old "<<tetisa<<" Teta_i "<< Teta_i(numfa)<<" Teta_equiv avt modif "<<(mon_h(numfa,0)*mon_inco(elem) + lautre_h(numfa,0)*t_autre(numfa)-fluxradia(numfa))/(mon_h(numfa,0)+lautre_h(numfa,0))<<" h "<<mon_h(numfa,0)<<" autreh "<<lautre_h(numfa,0)<<" flux radia "<<fluxradia(numfa)<<" mon T "<<mon_inco(elem)<<" autre T "<< t_autre(numfa)<<finl;
+          Cerr<<"Teta_equiv fin "<<Teta_equiv(numfa,0)<< " Teta_i_old "<<tetisa<<" Teta_i "<< Teta_i(numfa);
+          Cerr<<" Teta_equiv avt modif "<<(mon_h(numfa,0)*mon_inco(elem) + lautre_h(numfa,0)*t_autre(numfa)-fluxradia(numfa))/(mon_h(numfa,0)+lautre_h(numfa,0));
+          Cerr<<" h "<<mon_h(numfa,0)<<" autreh "<<lautre_h(numfa,0)<<" flux radia "<<fluxradia(numfa);
+          Cerr<<" mon T "<<mon_inco(elem)<<" autre T "<< t_autre(numfa)<<finl;
           exit();
         }
       //        assert(Teta_equiv(numfa,0)>0);
