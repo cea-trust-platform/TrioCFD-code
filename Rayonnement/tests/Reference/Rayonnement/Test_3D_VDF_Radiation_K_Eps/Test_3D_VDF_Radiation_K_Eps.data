@@ -158,7 +158,7 @@ Lire pb2
                         Droit	paroi_fixe
                         Haut	frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.0
                         Gauche	paroi_fixe
-                        Bas	frontiere_ouverte_vitesse_imposee  Champ_Front_Uniforme 3 0.0 0.1 0.0
+                        Bas	frontiere_ouverte_vitesse_imposee_sortie Champ_Front_Uniforme 3 0.0 0.1 0.0
 			Avant	symetrie
                         Arriere	symetrie
                 }

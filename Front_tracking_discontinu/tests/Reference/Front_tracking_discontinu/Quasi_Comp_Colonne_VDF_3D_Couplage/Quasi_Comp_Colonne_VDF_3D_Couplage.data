@@ -115,8 +115,8 @@ Lire pb
 	    Droit   paroi_fixe
 	    Avant   paroi_fixe
 	    Arriere paroi_fixe
-	    Haut    frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 3 0. 0. -1
-	    Bas     frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 3 0. 0. -1
+	    Haut    frontiere_ouverte_vitesse_imposee_sortie Champ_front_Uniforme 3 0. 0. -1
+	    Bas     frontiere_ouverte_vitesse_imposee_sortie Champ_front_Uniforme 3 0. 0. -1
           }
       }
     convection_diffusion_chaleur_qc 

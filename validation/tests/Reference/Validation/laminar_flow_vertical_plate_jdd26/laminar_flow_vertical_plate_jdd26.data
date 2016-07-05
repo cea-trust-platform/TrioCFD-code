@@ -79,7 +79,7 @@ Read pb
                 boundary_conditions {
                         Gauche  paroi_fixe
                         Droite  symetrie
-                        Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 22360.7
+                        Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 22360.7
                         Haut    frontiere_ouverte_Pression_imposee Champ_Front_Uniforme 1 0.   
           }
         }

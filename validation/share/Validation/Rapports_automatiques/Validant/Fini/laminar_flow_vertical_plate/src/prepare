@@ -37,19 +37,20 @@ sed "s/dt_impr 1.e1/dt_impr 5.e-4/" modifie.data > MixConv_VEF.data
 sed "s/seuil_statio 1.e-8/seuil_statio 1.e-4/" MixConv_VEF.data > modifie.data
 sed "s/Bas     Frontiere_ouverte_Temperature_imposee Champ_Front_Uniforme 1 0./Bas     Frontiere_ouverte T_ext Champ_Front_Uniforme 1 0/" modifie.data > MixConv_VEF.data
 sed "s/Gauche  paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1  1.  H_imp Champ_Front_Uniforme 1  1.e11/Gauche  paroi_temperature_imposee Champ_Front_Uniforme 1 1./" MixConv_VEF.data > modifie.data
-mv modifie.data MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee /Bas     frontiere_ouverte_vitesse_imposee_sortie /" modifie.data > MixConv_VEF.data
+rm modifie.data
 
 #generation du fichier FC_VDF_Bouss a partir de MixConv
 sed "s/dt_impr 1.e1/dt_impr 1.e-5/" MixConv.data > modifie.data
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0 0/" modifie.data > FC_VDF_Bouss.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0/" FC_VDF_Bouss.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 0/" FC_VDF_Bouss.data > modifie.data
 sed "s/Bas     Frontiere_ouverte_Temperature_imposee Champ_Front_Uniforme 1 0./Bas     Frontiere_ouverte T_ext Champ_Front_Uniforme 1 0/" modifie.data > FC_VDF_Bouss.data
 rm modifie.data
 
 #generation du fichier FC_VEF_Bouss a partir de MixConv_VEF
 sed "s/amont/muscl/g" MixConv_VEF.data > modifie.data
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 0./" modifie.data > FC_VEF_Bouss.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 0./" FC_VEF_Bouss.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 0./" FC_VEF_Bouss.data > modifie.data
 mv modifie.data FC_VEF_Bouss.data
 
 cd FC_VDF_Bouss
@@ -213,7 +214,7 @@ cp ../MixConv_VEF.data .
 cp ../MC_post_run .
 mv MC_post_run post_run
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 70710.7/" MixConv_VEF.data > modifie.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 70710.7/" modifie.data > MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 70710.7/" modifie.data > MixConv_VEF.data
 rm modifie.data
 mv MixConv_VEF.data MixConv.data
 sed "s/VDF/VEF/" post_run > modifie
@@ -227,7 +228,7 @@ cp ../MixConv_VEF.data .
 cp ../MC_post_run .
 mv MC_post_run post_run
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 10000./" MixConv_VEF.data > modifie.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10000./" modifie.data > MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 10000./" modifie.data > MixConv_VEF.data
 rm modifie.data
 mv MixConv_VEF.data MixConv.data
 sed "s/VDF/VEF/" post_run > modifie
@@ -241,7 +242,7 @@ cp ../MixConv_VEF.data .
 cp ../MC_post_run .
 mv MC_post_run post_run
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 22360.7/" MixConv_VEF.data > modifie.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 22360.7/" modifie.data > MixConv_VEF.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 22360.7/" modifie.data > MixConv_VEF.data
 rm modifie.data
 mv MixConv_VEF.data MixConv.data
 sed "s/VDF/VEF/" post_run > modifie
@@ -269,7 +270,7 @@ cp ../MC_post_run .
 mv MC_post_run post_run
 sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 70710.7/" modifie.data > MixConv_VEF.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 70710.7/" MixConv_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 70710.7/" MixConv_VEF.data > modifie.data
 mv modifie.data MixConv_VEF.data
 mv MixConv_VEF.data MixConv.data
 sed "s/VDF/VEF/" post_run > modifie
@@ -284,7 +285,7 @@ cp ../MC_post_run .
 mv MC_post_run post_run
 sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 10000./" modifie.data > MixConv_VEF.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 10000./" MixConv_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 10000./" MixConv_VEF.data > modifie.data
 mv modifie.data MixConv_VEF.data
 mv MixConv_VEF.data MixConv.data
 sed "s/VDF/VEF/" post_run > modifie
@@ -298,7 +299,7 @@ cp ../MC_post_run .
 mv MC_post_run post_run
 sed "s/convection { amont }/convection { muscl }/" MixConv_VEF.data > modifie.data
 sed "s/vitesse Champ_Uniforme 2 0. 100000./vitesse Champ_Uniforme 2 0. 22360.7/" modifie.data > MixConv_VEF.data
-sed "s/Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee champ_front_uniforme 2 0. 22360.7/" MixConv_VEF.data > modifie.data
+sed "s/Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 100000./Bas     frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 2 0. 22360.7/" MixConv_VEF.data > modifie.data
 mv modifie.data MixConv_VEF.data
 mv MixConv_VEF.data MixConv.data
 sed "s/VDF/VEF/" post_run > modifie

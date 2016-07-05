@@ -140,7 +140,7 @@ Lire pb2
                         vitesse Champ_Uniforme 3 0. 0. 0.
                         }
                 boundary_conditions {
-                        Entree frontiere_ouverte_vitesse_imposee
+                        Entree frontiere_ouverte_vitesse_imposee_sortie
                                 Champ_front_Uniforme 3 0. -0.01 0.
                         Sortie frontiere_ouverte_pression_imposee
                                 Champ_front_Uniforme 1 0.

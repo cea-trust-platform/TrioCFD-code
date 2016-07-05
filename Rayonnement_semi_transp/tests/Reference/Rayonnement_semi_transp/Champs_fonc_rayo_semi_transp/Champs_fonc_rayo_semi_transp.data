@@ -146,7 +146,7 @@ Lire pb
                         Droit  frontiere_ouverte_pression_imposee
                               Champ_front_Uniforme 1 0.
                         Z  paroi_fixe
-                        Bas  frontiere_ouverte_vitesse_imposee
+                        Bas  frontiere_ouverte_vitesse_imposee_sortie
                               Champ_front_fonc_pois_ipsn 1.590 3
                                                      0.   +0.3   0.
                                                      8.800 2.095 0.
