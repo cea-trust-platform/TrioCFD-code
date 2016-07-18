@@ -1,16 +1,17 @@
 
 ORG=`pwd`
 
-baltik_build_configure
-./configure
-time make debug dist_clean
-
-for dir in ALE Front_tracking_discontinu LES Phase_field  Rayonnement Rayonnement_semi_transp Zoom validation K_Eps_non_std
+#baltik_build_configure
+#./configure
+#time make debug dist_clean
+prjs=`find . -mindepth 2  -name project.cfg -exec dirname {} \;`
+for dir in $prjs
 #for dir in  LES  Zoom validation
 do
 cd $dir
 baltik_build_configure
 ./configure
-time make check_optim dist_clean
+env PAR_F=0 time make check_all_optim dist_clean
+#time make optim dist_clean
 cd $ORG
 done
