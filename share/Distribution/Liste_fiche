@@ -122,3 +122,7 @@
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/Mixing_Bidim_Axi NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/PeriodicBox STD
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/QC_verifP STD
+./Critere_Entrainement_Gaz/share/Validation/Rapports_automatiques/Verification_CEG STD
+./Bas_Reynolds/share/Validation/Rapports_automatiques/Baglietto STD
+./Bas_Reynolds/share/Validation/Rapports_automatiques/Low_Reynolds STD
+./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/ConvectionJuarez NNR

@@ -18,7 +18,7 @@ baltik_build_configure
 
 
 find . -name '*'.prm |grep src |awk -F/src '{print $1}' | sort  > L1
-awk '{print $1}' $file_liste > L2
+awk '{print $1}' $file_liste | sort > L2
 
 if [ "`diff L1 L2`" != "" ]
 then
