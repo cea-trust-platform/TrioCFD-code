@@ -1,4 +1,7 @@
 [ -f dom_0031.Zones ] && exit 0
+
+env prod=0 trust decoupage
+exit 0
 cd model
 Xprep=$TRUST_ROOT/Outils/PRE_3DVDF/xprepro
 $Xprep boite.prep 2
