@@ -1034,7 +1034,8 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
   //const int nb_connex_components = nb_local_connex_components;
   Cerr << " found " << nb_connex_components << " connex components" << finl;
   // Calcul de la phase a associer a chaque composante:
-  ArrOfInt phase_of_component(nb_connex_components, default_phase);
+  ArrOfInt phase_of_component(nb_connex_components);
+  phase_of_component= default_phase;
   // Pour chaque point ou la phase a ete specifiee, trouver l'element dans
   // lequel il se trouve, puis sa composante connexe et associer cette phase
   // a la composante connexe:
