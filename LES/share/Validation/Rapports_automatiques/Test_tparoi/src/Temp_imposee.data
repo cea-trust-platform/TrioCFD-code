@@ -82,7 +82,7 @@ Read pb
                 conditions_initiales { vitesse Champ_Uniforme 2 1. 0.  }
                 boundary_conditions {
                         Gauche frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 1. 0.
-                        Droite frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 1. 0.
+                        Droite frontiere_ouverte_vitesse_imposee_sortie Champ_front_Uniforme 2 1. 0.
                         Bas    paroi_fixe
                         Haut   symetrie
                 }

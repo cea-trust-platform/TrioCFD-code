@@ -26,7 +26,7 @@
 #include <Fluide_Incompressible.h>
 #include <Probleme_base.h>
 #include <IntTrav.h>
-#include <Les_Cl.h>
+#include <Entree_fluide_temperature_imposee.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VDF.h>
 #include <Champ_Face.h>

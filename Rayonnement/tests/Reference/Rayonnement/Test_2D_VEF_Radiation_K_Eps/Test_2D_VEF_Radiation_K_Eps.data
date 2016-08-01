@@ -139,7 +139,7 @@ Lire pb1
                         Droit	paroi_fixe
                         Haut	frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.0
                         Gauche	paroi_fixe
-                        Bas	frontiere_ouverte_vitesse_imposee  Champ_Front_Uniforme 2 0.0 0.1
+                        Bas	frontiere_ouverte_vitesse_imposee_sortie Champ_Front_Uniforme 2 0.0 0.1
                 }
 		Modele_Turbulence K_Epsilon
 		{

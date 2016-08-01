@@ -24,7 +24,7 @@
 #define Echange_contact_VDF_Zoom_base_included
 
 
-#include <Echange_global_impose.h>
+#include <Echange_externe_impose.h>
 class Front_VF;
 class Zone_VDF;
 class Faces;

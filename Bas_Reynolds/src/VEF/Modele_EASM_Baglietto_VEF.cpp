@@ -23,7 +23,7 @@
 #include <Modele_EASM_Baglietto_VEF.h>
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
-#include <Les_Cl.h>
+#include <Periodique.h>
 #include <Champ_Uniforme.h>
 #include <Scatter.h>
 #include <Champ_P1NC.h>

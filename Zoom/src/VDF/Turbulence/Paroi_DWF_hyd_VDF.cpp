@@ -27,7 +27,6 @@
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Zone_Cl_VDF.h>
-#include <Les_Cl.h>
 #include <Source_DWF_VDF.h>
 #include <EChaine.h>
 #include <Connectivites_DWF.h>

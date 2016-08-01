@@ -23,7 +23,7 @@
 #ifndef Sortie_libre_rho_variable_included
 #define Sortie_libre_rho_variable_included
 
-#include <Neumann_sortie_libre.h>
+#include <Sortie_libre_pression_imposee.h>
 
 //////////////////////////////////////////////////////////////////////
 //

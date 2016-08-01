@@ -26,7 +26,11 @@
 #include <Parser.h>
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
-#include <Les_Cl.h>
+#include <Neumann_sortie_libre.h>
+#include <Symetrie.h>
+#include <Periodique.h>
+#include <Dirichlet.h>
+#include <Dirichlet_homogene.h>
 
 Implemente_instanciable(SourceFiltree_FT_disc_VEF_P1NC,"SourceFiltree_FT_disc_VEF_P1NC",Source_base);
 

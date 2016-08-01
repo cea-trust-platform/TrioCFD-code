@@ -26,7 +26,10 @@
 #include <Champ_Uniforme.h>
 #include <Champ_P1NC.h>
 #include <Zone_VEF.h>
-#include <Les_Cl.h>
+#include <Periodique.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Symetrie.h>
+#include <Neumann_paroi.h>
 #include <DoubleTrav.h>
 
 

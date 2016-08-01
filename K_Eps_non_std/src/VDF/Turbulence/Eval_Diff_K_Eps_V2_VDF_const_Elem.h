@@ -1046,7 +1046,8 @@ inline void Eval_Diff_K_Eps_V2_VDF_const_Elem::flux_faces_interne(const DoubleTa
   double diffu = 0.5*(dv_diffusivite_turbulente(n0)+dv_diffusivite_turbulente(n1));
   flux(0) = (db_diffusivite+diffu/Prdt_K)*coef*(inco(n1,0) - inco(n0,0));
   //  flux(0) = (inco(n1,0) - inco(n0,0))*coef;
-  //        Cerr << "1.visco = " << flux(0) << " " << volume_entrelaces(face)*porosite_surf(face)/dist/dist << " " << surface(face)*porosite(face)/dist << " " << volumes(n0)*porosite_vol(n0) << " " << dv_diffusivite_turbulente(n1) << " " << coef << " " << dist << " " << inco(n1,0) << " " <<  inco(n0,0) << " " << n0 << " " << n1 << finl;
+  //        Cerr << "1.visco = " << flux(0) << " " << volume_entrelaces(face)*porosite_surf(face)/dist/dist << " " << surface(face)*porosite(face)/dist << " " << volumes(n0)*porosite_vol(n0) << finl;
+  //        Cerr << dv_diffusivite_turbulente(n1) << " " << coef << " " << dist << " " << inco(n1,0) << " " <<  inco(n0,0) << " " << n0 << " " << n1 << finl;
   flux(1) = (db_diffusivite+diffu/Prdt_Eps)*coef*(inco(n1,1) - inco(n0,1));
   //Cerr << "1.visco = " << db_diffusivite << finl;
   //Cerr << "1.visco turb = " <<  dv_diffusivite_turbulente(n0) << finl;
