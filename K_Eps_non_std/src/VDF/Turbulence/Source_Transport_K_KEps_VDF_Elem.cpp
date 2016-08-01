@@ -26,7 +26,8 @@
 #include <Modele_turbulence_scal_base.h>
 #include <Fluide_Incompressible.h>
 #include <Probleme_base.h>
-#include <Les_Cl.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Dirichlet_paroi_defilante.h>
 #include <Champ_Uniforme.h>
 #include <Champ_Face.h>
 #include <Zone_Cl_VDF.h>

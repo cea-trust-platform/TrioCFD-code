@@ -23,7 +23,6 @@
 #include <Modele_Jones_Launder_VEF.h>
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
-#include <Les_Cl.h>
 #include <Champ_Uniforme.h>
 #include <Scatter.h>
 #include <Champ_P1NC.h>

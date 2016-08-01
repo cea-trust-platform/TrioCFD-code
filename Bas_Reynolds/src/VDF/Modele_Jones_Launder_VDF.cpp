@@ -24,7 +24,14 @@
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
 #include <IntTrav.h>
-#include <Les_Cl.h>
+#include <Dirichlet.h>
+#include <Dirichlet_homogene.h>
+#include <Dirichlet_paroi_defilante.h>
+#include <Echange_externe_impose.h>
+#include <Periodique.h>
+#include <Symetrie.h>
+#include <Neumann.h>
+#include <Neumann_homogene.h>
 #include <Champ_Face.h>
 #include <Champ_Uniforme.h>
 
