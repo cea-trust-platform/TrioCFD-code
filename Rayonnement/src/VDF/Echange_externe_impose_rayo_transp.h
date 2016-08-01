@@ -23,7 +23,7 @@
 #ifndef Echange_externe_impose_rayo_transp_included
 #define Echange_externe_impose_rayo_transp_included
 
-#include <Echange_global_impose.h>
+#include <Echange_externe_impose.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Conduction.h>
 #include <Ref_Zone_VDF.h>

@@ -24,7 +24,7 @@
 #define Echange_externe_impose_rayo_semi_transp_included
 
 #include <Cond_Lim_rayo_semi_transp.h>
-#include <Echange_global_impose.h>
+#include <Echange_externe_impose.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //

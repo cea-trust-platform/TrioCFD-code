@@ -22,7 +22,7 @@
 
 #include <Source_DC_VDF_NS.h>
 #include <Zone_VDF.h>
-#include <Dirichlet_entree_fluide.h>
+#include <Entree_fluide_vitesse_imposee.h>
 #include <Navier_Stokes_std.h>
 Implemente_instanciable(Source_DC_VDF_NS,"Source_DC_VDF_Face",Source_Correction_Deficitaire);
 

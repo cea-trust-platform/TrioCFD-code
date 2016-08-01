@@ -25,7 +25,7 @@
 
 
 #include <Cond_Lim_Rayo.h>
-#include <Dirichlet_entree_fluide.h>
+#include <Entree_fluide_temperature_imposee.h>
 
 class Frontiere_Ouverte_temperature_imposee_Rayo_transp : public Cond_Lim_Rayo, public Entree_fluide_temperature_imposee
 {
