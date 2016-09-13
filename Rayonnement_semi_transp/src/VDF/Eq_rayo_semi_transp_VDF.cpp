@@ -492,10 +492,10 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
   MBrr.dimensionner(n2,0);
   MBrv.dimensionner(n2,0);
 
-  IntVect& tab1RR=MBrr.tab1_;
-  IntVect& tab2RR=MBrr.tab2_;
-  IntVect& tab1RV=MBrv.tab1_;
-  IntVect& tab2RV=MBrv.tab2_;
+  IntVect& tab1RR=MBrr.get_set_tab1();
+  IntVect& tab2RR=MBrr.get_set_tab2();
+  IntVect& tab1RV=MBrv.get_set_tab1();
+  IntVect& tab2RV=MBrv.get_set_tab2();
 
   // On traite les faces internes: dimensionnement des matrices reelles et virtuelles.
   int ndeb = zone_VDF.premiere_face_int();
@@ -738,10 +738,10 @@ void Eq_rayo_semi_transp_VDF::typer_op_grad()
   MBrr.dimensionner(n2,0);
   MBrv.dimensionner(n2,0);
 
-  IntVect& tab1RR=MBrr.tab1_;
-  IntVect& tab2RR=MBrr.tab2_;
-  IntVect& tab1RV=MBrv.tab1_;
-  IntVect& tab2RV=MBrv.tab2_;
+  IntVect& tab1RR=MBrr.get_set_tab1();
+  IntVect& tab2RR=MBrr.get_set_tab2();
+  IntVect& tab1RV=MBrv.get_set_tab1();
+  IntVect& tab2RV=MBrv.get_set_tab2();
 
   // On traite les faces internes: dimensionnement des matrices reelles et virtuelles.
   int ndeb = zone_VDF.premiere_face_int();
