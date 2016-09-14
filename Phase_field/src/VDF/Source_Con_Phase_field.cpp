@@ -1111,9 +1111,9 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
 
   // Allocation des tableaux specifiques a la matrice morse
   matrice_diffusion_CH.dimensionner(2*nb_elem,dimensionnement);
-  DoubleVect& coeff=matrice_diffusion_CH.coeff_;
-  IntVect& tab2=matrice_diffusion_CH.tab2_;
-  IntVect& tab1=matrice_diffusion_CH.tab1_;
+  DoubleVect& coeff=matrice_diffusion_CH.get_set_coeff();
+  IntVect& tab2=matrice_diffusion_CH.get_set_tab2();
+  IntVect& tab1=matrice_diffusion_CH.get_set_tab1();
 
   // Boucle sur le nombre d'elements
   for(int elem=0; elem<nb_elem; elem++)
