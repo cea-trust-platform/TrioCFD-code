@@ -18,7 +18,7 @@ sed "s/NB_PROCS/$NB_PROCS/" template_dec_VDF.data > dec_VDF.data
 
 cp dec_VDF.data ./mesh_VDF
 cd mesh_VDF
-triou dec_VDF 1>dec_VDF.out 2>dec_VDF.err
+trust dec_VDF 1>dec_VDF.out 2>dec_VDF.err
 cd ../
 
 # geometrie VEF
@@ -35,7 +35,7 @@ sed "s/NB_PROCS/$NB_PROCS/" template_dec_VEF.data > dec_VEF.data
 
 cp dec_VEF.data ./mesh_VEF
 cd mesh_VEF
-triou dec_VEF 1>dec_VEF.out 2>dec_VEF.err
+trust dec_VEF 1>dec_VEF.out 2>dec_VEF.err
 cd ../
 
 mkdir -p VDF_T0Q

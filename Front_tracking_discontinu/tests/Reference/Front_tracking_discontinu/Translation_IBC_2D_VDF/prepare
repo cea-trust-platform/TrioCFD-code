@@ -8,4 +8,4 @@ data=${data%.data}
 echo "Comparaison methode_transport vitesse_imposee et loi_horaire pour $data:"
 # Calcul sequentiel
 rm -f *lml *lata*
-triou ref
+trust ref

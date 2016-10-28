@@ -1,4 +1,4 @@
 jdd=`pwd`
 jdd=`basename $jdd`
 # Appel possible a $TRUST_ROOT/Validation/Modules/QC/modif $jdd
-triou C_$jdd
+trust C_$jdd

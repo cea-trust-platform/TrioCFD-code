@@ -2,6 +2,6 @@ for file in *geom.gz
 do
    gunzip -c $file > ${file%.gz}
 done
-triou Forces_3D_VDF
-triou Forces_NO_IBC_VDF
-triou Forces_Mvt_VDF 1>Forces_Mvt_VDF.out 2>Forces_Mvt_VDF.err
+trust Forces_3D_VDF
+trust Forces_NO_IBC_VDF
+trust Forces_Mvt_VDF 1>Forces_Mvt_VDF.out 2>Forces_Mvt_VDF.err

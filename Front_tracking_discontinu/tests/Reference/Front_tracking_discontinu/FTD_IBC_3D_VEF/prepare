@@ -2,4 +2,4 @@ jdd=`pwd`
 jdd=`basename $jdd`.data
 echo $ECHO_OPTS "1,$ s?methode_transport vitesse_imposee -y\*10. x\*10. 0.?methode_transport loi_horaire rotation?g\nw loi.data" | ed $jdd
 echo $ECHO_OPTS "1,$ s?post1?loi?g\nw loi.data" | ed $jdd
-triou loi
+trust loi

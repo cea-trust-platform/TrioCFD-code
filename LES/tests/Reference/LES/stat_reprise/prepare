@@ -1,4 +1,4 @@
 make_PAR.data calcul_statistiques 
-triou calcul_statistiques
-[ "$TRUST_DISABLE_MPI" != 1 ] && triou PAR_calcul_statistiques 2
+trust calcul_statistiques
+[ "$TRUST_DISABLE_MPI" != 1 ] && trust PAR_calcul_statistiques 2
 exit 0

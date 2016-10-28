@@ -12,7 +12,7 @@ do
    echo $NODES on $CORES
    if [ $CORES = 1 ]
    then 
-      triou tmp 1>PAR_tmp.out 2>PAR_tmp.err
+      trust tmp 1>PAR_tmp.out 2>PAR_tmp.err
       if [ $? = 0 ]
       then
          echo OK         
@@ -21,7 +21,7 @@ do
 	 exit -1
       fi
    else
-      triou PAR_tmp $CORES 1>PAR_tmp.out 2>PAR_tmp.err
+      trust PAR_tmp $CORES 1>PAR_tmp.out 2>PAR_tmp.err
       if [ $? = 0 ]
       then
          echo OK         

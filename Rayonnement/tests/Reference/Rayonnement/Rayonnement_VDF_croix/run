@@ -5,5 +5,5 @@
 echo "Usage ./run nom_du_cas"
 cas=$1
 echo "Lancement du calcul...."
-triou $cas
+trust $cas
 ./verifie

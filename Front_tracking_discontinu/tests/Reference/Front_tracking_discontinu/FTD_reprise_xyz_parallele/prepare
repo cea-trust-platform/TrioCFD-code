@@ -1,4 +1,4 @@
 # Genere le fichier prepare.xyz
 # PARALLEL ONLY #
 make_PAR.data prepare
-triou PAR_prepare 3
+trust PAR_prepare 3

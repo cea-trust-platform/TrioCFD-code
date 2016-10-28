@@ -9,4 +9,4 @@ do
    [ $? != 0 ] && echo "KO, see $file.log" && exit -1
 done
 
-triou Forces_NO_IBC_2D_VEF
+trust Forces_NO_IBC_2D_VEF
