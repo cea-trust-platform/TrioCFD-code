@@ -94,13 +94,9 @@ perioz periodique
         }	      
 	Postraitement
 	{
-		Definition_champs
-		{
-		   Energie_cinetique_fluide predefini { pb_champ pb energie_cinetique }
-		}
 	     	Sondes
 	        {
-			sonde_ec Energie_cinetique_fluide periode 0.001 points 1 0.05 0.15 3.14 
+			sonde_ec energie_cinetique_totale periode 0.001 points 1 0.05 0.15 3.14 
 	           	sonde_pression pression periode 0.001 points 1 0.05 0.15 3.14 
 	        }
 		Champs dt_post 4.0
