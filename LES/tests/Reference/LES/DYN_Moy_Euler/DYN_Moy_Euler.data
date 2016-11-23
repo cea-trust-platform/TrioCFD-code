@@ -85,7 +85,7 @@ Lire pb
 		solveur_pression GCP
 			{
 			precond ssor { omega 1.5 } 
-			seuil 1e-7
+			seuil 1e-8
 			impr
 			}
 		convection { centre }

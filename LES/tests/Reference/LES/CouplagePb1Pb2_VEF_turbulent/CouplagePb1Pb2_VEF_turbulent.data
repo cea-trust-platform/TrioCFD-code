@@ -1,5 +1,5 @@
 # Thermohydraulique 3D couplee a Thermohydraulique 3D #
-# PARALLEL OK #
+# PARALLEL NOT because difference between seq and par with compare_lata --max_delta #
 
 dimension 3
 Domaine dom_jeux
