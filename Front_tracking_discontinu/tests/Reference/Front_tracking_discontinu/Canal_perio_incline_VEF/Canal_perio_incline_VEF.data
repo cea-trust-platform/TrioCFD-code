@@ -17,11 +17,11 @@ RegroupeBord DOM3 WALL { WALL G D }
 Ecrire_fichier_formatte DOM3 tmp.geom
 Read_file DOM3 tmp.geom
 
-ExtrudeBord { domaine_init DOM3 direction -5 0 5 domaine_final DOM1 nom_bord IN_G nb_tranches 20 }
+ExtrudeBord { domaine_init DOM3 direction -5 0 5 domaine_final DOM1 nom_bord IN_G nb_tranches 20  sans_passer_par_le2D 0 }
 RegroupeBord DOM1 perio1 { devant derriere }
 Corriger_frontiere_periodique { domaine DOM1 bord perio1 direction 3 -5 0 5 }
 
-ExtrudeBord { domaine_init DOM3 direction 5 0 5 domaine_final DOM2 nom_bord IN_D nb_tranches 20 }
+ExtrudeBord { domaine_init DOM3 direction 5 0 5 domaine_final DOM2 nom_bord IN_D nb_tranches 20 sans_passer_par_le2D 0 }
 RegroupeBord DOM2 perio2 { devant derriere }
 Corriger_frontiere_periodique { domaine DOM2 bord perio2 direction 3 5 0 5 }
 
