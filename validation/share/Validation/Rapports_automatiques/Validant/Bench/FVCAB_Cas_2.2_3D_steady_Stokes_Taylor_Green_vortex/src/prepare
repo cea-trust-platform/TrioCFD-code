@@ -1,0 +1,11 @@
+#!/bin/sh
+for mail in `ls Maillages/*med`
+do
+cas=`basename $mail .med`
+mkdir -p $cas
+cp $mail $cas
+
+[ -f $cas/Decoupage.data ] && cp pre_run $cas
+done
+
+cp post_run mesh_tetra_6/
