@@ -128,7 +128,7 @@ Chapter {
 	}
 	visu {
 		Description "Temperature contours for medium rectangular mesh:"
-		isovaleurs ./VDF_40/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
+		Isovalues ./VDF_40/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
 	}
 	Figure {
 		Description "Comparison of horizontal temperature probes with Juarez data:"
@@ -242,7 +242,7 @@ Chapter {
 	}
 	visu {
 		Description "Temperature contours for Boussinesq hypothesis:"
-		isovaleurs ./VEF_BS/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
+		Isovalues ./VEF_BS/Juarez_CHAMPDEVOLUME.lata dom TEMPERATURE ELEM
 	}
 	Figure {
 		Description "Comparison of horizontal temperature probes with Juarez data:"

@@ -1,0 +1,308 @@
+Dimension 3
+Pb_hydraulique pb
+
+Domaine dom
+Lire_med family_names_from_group_names dom mesh_tetra_0 mesh_tetra_0.med
+
+VerifierCoin dom { }
+
+VEFPreP1b dis
+# Lire dis { P0 P1 Pa } #
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit 0
+	dt_min 1e-6
+	dt_max 1e+6
+	dt_impr 1e-6
+	facsec 500
+	facsec_max 500
+	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
+	precision_impr 8
+	seuil_statio 1e-6
+}
+
+Fluide_incompressible fluide
+Lire fluide
+{
+	mu champ_uniforme 1 1
+ 	rho champ_uniforme 1 1
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		Solveur_pression	PETSC Cholesky { impr }
+		Convection		{ negligeable }
+		Diffusion		{ }
+		Conditions_initiales	{
+					vitesse champ_fonc_xyz dom 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					}
+		Conditions_limites	{
+					Gauche		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Droite		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Bas		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Haut		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Devant		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Derriere	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					}
+		Sources			{
+					Source_Qdm champ_fonc_xyz dom 3 -36*Pi^2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) 0 0
+					}
+	}
+	Postraitement
+	{
+		Definition_champs	{
+					# norme_L2_norme_uex = norme L2 de la norme de uex (valeur calculée sur le maillage) #				
+					# norme_L2_norme_uex	reduction_0D	{
+										methode norme_L2
+										sources	{
+											transformation	{
+													methode norme
+													localisation Faces
+													sources	{
+														transformation	{
+																methode vecteur
+																expression 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+																nom_source uex
+																localisation Faces
+																}
+														}
+													}
+											}
+										} #
+					# norme_L2_norme_uex = norme L2 de la norme de uex (valeur exacte) #
+					norme_L2_norme_uex	transformation	{
+										methode formule expression 1 valeur_exacte*norme_L2_1
+										localisation Faces
+										sources	{
+											transformation	{
+													methode formule
+													expression 1 sqrt(3)/2
+													localisation Faces
+													nom_source valeur_exacte
+													} ,
+											reduction_0D	{
+													methode norme_L2
+													nom_source norme_L2_1
+													source transformation	{
+																methode formule expression 1 1
+																localisation Faces
+																}
+													}
+											}
+										}
+					# Norme L2 de la norme de u-uex #
+					norme_L2_norme_u_uex	reduction_0D	{
+										methode norme_L2
+										sources	{
+											transformation	{
+													# norme de u-uex #
+													methode norme
+													localisation Faces
+													sources	{
+														# u-uex #
+														transformation	{
+																methode formule expression 1 u-uex
+																nom_source u_uex
+																localisation Faces
+																sources	{
+																	refChamp { Pb_champ pb vitesse nom_source u } ,
+																	# expression de uex #
+																	transformation	{
+																			methode vecteur
+																			expression 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+																			nom_source uex
+																		        localisation Faces
+																			}
+																	}
+																}
+														}
+													}
+											}
+										}
+					# erru = norme_L2_norme_u_uex / norme_L2_norme_uex #
+					erru			transformation	{
+										methode formule
+										expression 1 norme_L2_norme_u_uex/norme_L2_norme_uex
+										sources_reference { norme_L2_norme_u_uex , norme_L2_norme_uex }
+										}
+					# norme_L2_pex = norme L2 de pex (valeur calculée sur le maillage) #
+					# norme_L2_pex		reduction_0D	{
+										methode norme_L2
+										source transformation	{
+													methode formule
+													expression 1 -6*pi*sin(2*pi*x)*sin(2*pi*y)*sin(2*pi*z)
+													nom_source pex
+													localisation som
+													}
+										} #
+					# norme_L2_pex = norme L2 de pex (valeur calculée exacte) #
+					norme_L2_pex		transformation	{
+										methode formule expression 1 valeur_exacte*norme_L2_1
+										localisation som
+										sources	{
+											transformation	{
+													methode formule
+													expression 1 3*pi*sqrt(2)/2
+													localisation som
+													nom_source valeur_exacte
+													} ,
+											reduction_0D	{
+													methode norme_L2
+													nom_source norme_L2_1
+													source transformation	{
+																methode formule expression 1 1
+																localisation som
+																}
+													}
+											}
+										}
+					norme_L2_pex_elem	transformation	{
+										methode formule expression 1 valeur_exacte*norme_L2_1
+										localisation elem
+										sources	{
+											transformation	{
+													methode formule
+													expression 1 3*pi*sqrt(2)/2
+													localisation elem
+													nom_source valeur_exacte
+													} ,
+											reduction_0D	{
+													methode norme_L2
+													nom_source norme_L2_1
+													source transformation	{
+																methode formule expression 1 1
+																localisation elem
+																}
+													}
+											}
+										}
+					# norme_L2_p_pex = norme L2 de (p - integrale de p) - pex #
+					norme_L2_p_pex		reduction_0D	{
+										methode norme_L2
+										source transformation	{
+													methode formule expression 1 psom-pmoy-pex
+													localisation som
+													sources	{
+														interpolation	{
+																localisation som
+																nom_source psom
+																sources {  refChamp { Pb_champ pb pression } }
+																} ,
+														# intégrale de p #
+														reduction_0D	{
+																methode moyenne
+																nom_source pmoy
+																source interpolation	{
+																			localisation som
+																			source refChamp { Pb_champ pb pression }
+																			}
+																} ,
+														# expression de pex #
+														transformation	{
+																methode formule
+																expression 1 -6*pi*sin(2*pi*x)*sin(2*pi*y)*sin(2*pi*z)
+																nom_source pex
+																localisation som
+																}
+														}
+													}
+										}
+					norme_L2_p_pex_elem	reduction_0D	{
+										methode norme_L2
+										source transformation	{
+													methode formule expression 1 pelem-pmoy-pex
+													localisation elem
+													sources	{
+														interpolation	{
+																localisation elem
+																nom_source pelem
+																sources {  refChamp { Pb_champ pb pression } }
+																} ,
+														# intégrale de p #
+														reduction_0D	{
+																methode moyenne
+																nom_source pmoy
+																source interpolation	{
+																			localisation elem
+																			source refChamp { Pb_champ pb pression }
+																			}
+																} ,
+														# expression de pex #
+														transformation	{
+																methode formule
+																expression 1 -6*pi*sin(2*pi*x)*sin(2*pi*y)*sin(2*pi*z)
+																nom_source pex
+																localisation elem
+																}
+														}
+													}
+										}
+					# errp = norme_L2_p_pex / norme_L2_pex #
+					errp			transformation	{
+										methode formule
+										expression 1 norme_L2_p_pex/norme_L2_pex
+										sources_reference { norme_L2_p_pex , norme_L2_pex }
+										}
+					errp_elem		transformation	{
+										methode formule
+										expression 1 norme_L2_p_pex_elem/norme_L2_pex_elem
+										sources_reference { norme_L2_p_pex_elem , norme_L2_pex_elem }
+										}
+					# errdivu = norme L2 de la divergence de u #
+					norme_L2_1		reduction_0D	{
+										methode norme_L2
+										source transformation	{
+													methode formule
+													expression 1 1
+													localisation elem
+													}
+										}
+					norme_L2_divu		reduction_0D	{
+										methode norme_L2
+										sources	{
+											# divergence u #
+											divergence	{
+													source refChamp { Pb_champ pb vitesse }
+													}
+											}
+										}
+					errdivu			transformation	{
+										methode formule
+										expression 1 norme_L2_divu/norme_L2_1
+										localisation elem
+										sources_reference { norme_L2_divu , norme_L2_1 }
+										}
+					}
+		Sondes			{
+					sonde_pression			pression	periode 1e-6 points 1 0.5 0.5 0.5
+					sonde_vitesse			vitesse		periode 1e-6 points 1 0.5 0.5 0.5
+					sonde_diagonale_pression	pression	periode 1e-6 segment 100 0 0 0 1 1 1
+					sonde_diagonale_vitesse		vitesse		periode 1e-6 segment 100 0 0 0 1 1 1
+					erru				erru		periode 1e+6 numero_elem_sur_maitre 0
+					errp				errp		periode 1e+6 numero_elem_sur_maitre 0
+					errp_elem			errp_elem	periode 1e+6 numero_elem_sur_maitre 0
+					errdivu				errdivu		periode 1e+6 numero_elem_sur_maitre 0
+					}
+		Format lata_v2
+		Champs binaire dt_post 1e+6
+					{
+					pression som
+					vitesse elem
+					vitesse faces
+					}
+	}
+	sauvegarde formatte Cas.sauv
+}
+
+Resoudre pb
+Fin

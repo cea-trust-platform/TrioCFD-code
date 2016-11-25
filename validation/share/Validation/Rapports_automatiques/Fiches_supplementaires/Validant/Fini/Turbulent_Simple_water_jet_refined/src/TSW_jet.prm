@@ -1,5 +1,5 @@
-Parametres {
-	Titre " Turbulent_simple_water_jet with refined mesh"
+Parameters {
+	Title " Turbulent_simple_water_jet with refined mesh"
 	Description " Survey of the behaviour of a submerged round jet "
 
 	VersionTrio_U " 1.6.4 "
@@ -26,23 +26,23 @@ Parametres {
 	Reference " $[2]$ L.P. Xia, K.M. Lam, \latex_(\textit{Velocity and concentration measurements in initial region of submerged round jets in stagnant environment and in coflow}\latex_), Journal of Hydro-environment Research 3 (2009), 21-34. "
 
 #
-	Castest v_1/Muscl test 16  /* data set in annex */
-	Castest v_1/Amont test 16
-	Castest v_1/EF_stab_alpha1 test 16
-	Castest v_1/EF_stab_alpha02 test 16
+	TestCase v_1/Muscl test 16  /* data set in annex */
+	TestCase v_1/Amont test 16
+	TestCase v_1/EF_stab_alpha1 test 16
+	TestCase v_1/EF_stab_alpha02 test 16
     
-	Castest v_156/Muscl test 16
-	Castest v_156/Amont test 16
-	Castest v_156/EF_stab_alpha1 test 16
-	Castest v_156/EF_stab_alpha02 test 16 
+	TestCase v_156/Muscl test 16
+	TestCase v_156/Amont test 16
+	TestCase v_156/EF_stab_alpha1 test 16
+	TestCase v_156/EF_stab_alpha02 test 16 
 
 
 	
-	Auteur "K. Samul (S. VANDROUX)"
-	InclureData 2
+	Author "K. Samul (S. VANDROUX)"
+	IncludeData 2
 }
-Chapitre {
-	Titre "Tests Description"
+Chapter {
+	Title "Tests Description"
 #
 	Description " $\bullet$ Navier_Stokes_Turbulent: "
 	Description " - Initial condition for the velocity: Vitesse Champ_Uniforme 3 0. 0. 0. "
@@ -66,26 +66,26 @@ Chapitre {
 	Description " - EF_stab and alpha = 0.2 "
 #
 	Figure {
-		Titre " Schematic diagram of round jet "
+		Title " Schematic diagram of round jet "
 		Description " Schematic diagram of a round jet with diameter $d$ = 0.003m, discharged from a nozzle into a stagnant liquid pool, with jet velocity \latex_($\textrm{U}_{j}$\latex_). "
-		Image geometry.png
+		picture geometry.png
 	}
 ##
 	Figure {
-		Titre " Boundary conditions visualization "
+		Title " Boundary conditions visualization "
 		Description " 1/4 of the whole domain is considered for the analysis "
 		Description "In order to improve the velocity profile of the jet at the entrance of the calculation domain, a small pipe is added upstream the boundary condition CL_43. The length of this pipe is L=30mm, with a diameter of D=3mm. This small pipe has a L/D=10. It is not enough to reach a steady velocity profile, but is enough to avoid a sudden expansion of the jet at the calculation domain entrance, due to an imposed flat velocity profile.
-		Image CL.png
+		picture CL.png
 	}
 	Figure {
-		Titre " Boundary conditions detail "
+		Title " Boundary conditions detail "
 		Description "To these boundaries, a boundary named 'pipe' is added. It corresponds to the wall of the small pipe, upstream of the jet exit.
-		Image TABCL.png
+		picture TABCL.png
 	}
 ##
 	visu {
-		titre " 3D mesh created using ICEM CFD "
-		origine " The grid has been made by Mr. Piotr Prusinski during his calculation for 			test case 4 "
+		Title " 3D mesh created using ICEM CFD "
+		origin " The grid has been made by Mr. Piotr Prusinski during his calculation for 			test case 4 "
 		Width 9cm
 		mesh v_1/Muscl/test.lata dom
 		normal3D -0.330334 -0.599984 0.728628	
@@ -97,8 +97,8 @@ Chapitre {
 	}
 ##
 	visu {
-		titre " View of the sliced mesh "
-		origine " The grid has been made by Mr. Piotr Prusinski during his calculation for test case 4 "		
+		Title " View of the sliced mesh "
+		origin " The grid has been made by Mr. Piotr Prusinski during his calculation for test case 4 "		
 		Width 9cm
 		mesh v_1/Muscl/test.lata dom
 		normal3D 0 -1 0	
@@ -108,8 +108,8 @@ Chapitre {
 		#operator no_axes
 	}
 	visu {
-		titre " Closer view of 3D mesh near centerline region "
-		origine " The grid has been made by Mr. Piotr Prusinski during his calculation for test case 4 "		
+		Title " Closer view of 3D mesh near centerline region "
+		origin " The grid has been made by Mr. Piotr Prusinski during his calculation for test case 4 "		
 		Width 9cm
 		mesh v_1/Muscl/test.lata dom
 		normal3D -0.582404 -0.320732 -0.746951
@@ -119,8 +119,8 @@ Chapitre {
 		operator no_axes
 	}
 	visu {
-		titre " Closer view of 3D mesh near centerline region "
-		origine " The grid has been made by Mr. Piotr Prusinski during his calculation for test case 4 "		
+		Title " Closer view of 3D mesh near centerline region "
+		origin " The grid has been made by Mr. Piotr Prusinski during his calculation for test case 4 "		
 		Width 9cm
 		mesh v_1/Muscl/test.lata dom
 		normal3D 0 -1 0
@@ -130,69 +130,69 @@ Chapitre {
 		operator no_axes
 	}
 ##
-	Tableau {
-			Titre " Initial parameters for axial development of velocity and concentration along centerline "
+	Table {
+			Title " Initial parameters for axial development of velocity and concentration along centerline "
 			Description " "
-			nb_colonnes 1
+			nb_columns 1
 			label Value
-			ligne {
-			      	Legende " Round jet diameter \latex_($d$\latex_)"
-				valeurs 0.003
+			line {
+			      	legend " Round jet diameter \latex_($d$\latex_)"
+				values 0.003
 			}
-			ligne {
-			      	Legende " Velocity decay constant \latex_($C_1$\latex_) "
-				valeurs 5.5
+			line {
+			      	legend " Velocity decay constant \latex_($C_1$\latex_) "
+				values 5.5
 			}
-			ligne {
-			      	Legende " Velocity virtual origin \latex_($z_0/d$\latex_) "
-				valeurs 0.0
+			line {
+			      	legend " Velocity virtual origin \latex_($z_0/d$\latex_) "
+				values 0.0
 			}
-			ligne {
-			      	Legende " Velocity ZFE length \latex_($L/d$\latex_) "
-				valeurs 5.5
+			line {
+			      	legend " Velocity ZFE length \latex_($L/d$\latex_) "
+				values 5.5
 			}
-			ligne {
-			      	Legende " Concentration decay constant \latex_($C_1$\latex_) "
-				valeurs 7.0
+			line {
+			      	legend " Concentration decay constant \latex_($C_1$\latex_) "
+				values 7.0
 			}
-			ligne {
-			      	Legende " Concentration virtual origin \latex_($z_0/d$\latex_) "
-				valeurs -2.5
+			line {
+			      	legend " Concentration virtual origin \latex_($z_0/d$\latex_) "
+				values -2.5
 			}
-			ligne {
-			      	Legende " Concentration ZFE length \latex_($L/d$\latex_) "
-				valeurs 4.5
+			line {
+			      	legend " Concentration ZFE length \latex_($L/d$\latex_) "
+				values 4.5
 			}
 	}
 ##
-	Tableau {
-			Titre " Water physical properties "
+	Table {
+			Title " Water physical properties "
 			Description " "
-			nb_colonnes 1
+			nb_columns 1
 			label Value
-			ligne {
-			      	Legende " $\mu$ (N/$m^2$/s) "
-				fichier v_1/Muscl/propertiesGeometry.dat	
-				nb_colonnes_fichier 6
-				colonnes ($1)
+			line {
+			      	legend " $\mu$ (N/$m^2$/s) "
+				file v_1/Muscl/propertiesGeometry.dat	
+				nb_columns_file 6
+				columns ($1)
 			}
-			ligne {
-			      	Legende " $\rho$ (kg/$m^3$) "
-				fichier v_1/Muscl/propertiesGeometry.dat
-				nb_colonnes_fichier 6
-				colonnes ($2)
+			line {
+			      	legend " $\rho$ (kg/$m^3$) "
+				file v_1/Muscl/propertiesGeometry.dat
+				nb_columns_file 6
+				columns ($2)
 			}
-			ligne {
-			      	Legende " Diffusivity "
-				fichier v_1/Muscl/propertiesGeometry.dat
-				nb_colonnes_fichier 6
-				colonnes ($3)
+			line {
+			      	legend " Diffusivity "
+				file v_1/Muscl/propertiesGeometry.dat
+				nb_columns_file 6
+				columns ($3)
 			}
 	}
 ##
 }
-Chapitre {
-	Titre " Theory "
+Chapter {
+	Title " Theory "
 	Description " This part describes succintly the mechanics of the submerged jets in stagnant liquid pool and in coflow. It is based on various numerical and experimental studies on the round submerged jets [1]. "
 	Description " "
 	Description " The jet Reynolds number \latex_($\textrm{Re}_{j}$\latex_) is defined as "
@@ -218,11 +218,11 @@ Chapitre {
 }
 
 
-Chapitre {
-	Titre " Results: Convergence"
+Chapter {
+	Title " Results: Convergence"
 	Description "Several probes are drawn in order to check the calculation convergence. Their position are (0, 0, 0.15) on the axis, near the domain exit, (0, 0, 0.04) on the axis near the entrance and (0.005, 0.005, 0.04) near the entrance but not in the jet. the convergence is only shown for EF_stab convection scheme with alpha=1.
 	Figure {
-		Titre " Convergence : v = 1 .0 m/s "
+		Title " Convergence : v = 1 .0 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -231,31 +231,31 @@ Chapitre {
 		LabelY "Vz"
 #		RangeY 0.05 2.
 #		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " EF_stab_alpha1 (0 0 0.15)"
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/test_SONDE_CONV1.son
-			Colonnes 1 4
+		Include_Description_Curves 0
+		Curve {
+			legend " EF_stab_alpha1 (0 0 0.15)"
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/test_SONDE_CONV1.son
+			columns 1 4
 			Style lines
 			}
-		Courbe {
-			Legende " EF_stab_alpha1 (0 0 0.04)"
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/test_SONDE_CONV3.son
-			Colonnes 1 4
+		Curve {
+			legend " EF_stab_alpha1 (0 0 0.04)"
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/test_SONDE_CONV3.son
+			columns 1 4
 			Style lines
 			}
-		Courbe {
-			Legende " EF_stab_alpha1 (0.005 0.005 0.04)"
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/test_SONDE_CONV4.son
-			Colonnes 1 4
+		Curve {
+			legend " EF_stab_alpha1 (0.005 0.005 0.04)"
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/test_SONDE_CONV4.son
+			columns 1 4
 			Style lines
 			}
 		}
 	Figure {
-		Titre " Convergence : v = 1 .56 m/s "
+		Title " Convergence : v = 1 .56 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -264,26 +264,26 @@ Chapitre {
 		LabelY "Vz"
 #		RangeY 0.05 2.
 #		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " EF_stab_alpha1 (0 0 0.15)"
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/test_SONDE_CONV1.son
-			Colonnes 1 4
+		Include_Description_Curves 0
+		Curve {
+			legend " EF_stab_alpha1 (0 0 0.15)"
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/test_SONDE_CONV1.son
+			columns 1 4
 			Style lines
 			}
-		Courbe {
-			Legende " EF_stab_alpha1 (0 0 0.04)"
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/test_SONDE_CONV3.son
-			Colonnes 1 4
+		Curve {
+			legend " EF_stab_alpha1 (0 0 0.04)"
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/test_SONDE_CONV3.son
+			columns 1 4
 			Style lines
 			}
-		Courbe {
-			Legende " EF_stab_alpha1 (0.005 0.005 0.04)"
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/test_SONDE_CONV4.son
-			Colonnes 1 4
+		Curve {
+			legend " EF_stab_alpha1 (0.005 0.005 0.04)"
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/test_SONDE_CONV4.son
+			columns 1 4
 			Style lines
 			}
 
@@ -292,10 +292,10 @@ Chapitre {
       }
 
 
-Chapitre {
-	Titre " Results: 3D overviews for velocity 1.0"
+Chapter {
+	Title " Results: 3D overviews for velocity 1.0"
 	visu {
-		titre " Velocity field for the jet with exit velocity 1.0 m/s at t = 4s "
+		Title " Velocity field for the jet with exit velocity 1.0 m/s at t = 4s "
 		width 12cm
 		Pseudocolor v_1/Muscl/test.lata dom norme_VITESSE SOM
 
@@ -307,7 +307,7 @@ Chapitre {
 		cycles -1
       }
  	visu {
-		titre " Concentration for the jet with exit velocity 1.0 m/s at t = 4s "
+		Title " Concentration for the jet with exit velocity 1.0 m/s at t = 4s "
 		
 		Pseudocolor v_1/Muscl/test.lata dom CONCENTRATION SOM
 		normal3D -0.53411 -0.502645 -0.67976	
@@ -319,10 +319,10 @@ Chapitre {
       }
 
 }
-Chapitre {
-	Titre " Results: 3D overviews "
+Chapter {
+	Title " Results: 3D overviews "
 	visu {
-		titre " Velocity field for the jet with exit velocity 1.56 m/s at t = 4s "
+		Title " Velocity field for the jet with exit velocity 1.56 m/s at t = 4s "
 		width 12cm
 		Pseudocolor v_156/Muscl/test.lata dom norme_VITESSE SOM
 
@@ -334,7 +334,7 @@ Chapitre {
 		cycles -1
       }
  	visu {
-		titre " Concentration for the jet with exit velocity 1.56 m/s at t = 4s "
+		Title " Concentration for the jet with exit velocity 1.56 m/s at t = 4s "
 		
 		Pseudocolor v_156/Muscl/test.lata dom CONCENTRATION SOM
 		normal3D -0.53411 -0.502645 -0.67976	
@@ -347,10 +347,10 @@ Chapitre {
 
 }
 ########################################   1.0    ########################################
-Chapitre {
-	Titre " Results: Centerline velocity curves "
+Chapter {
+	Title " Results: Centerline velocity curves "
 	Figure {
-		Titre " Decay of centerline velocity: v = 1 .0 m/s "
+		Title " Decay of centerline velocity: v = 1 .0 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -360,56 +360,56 @@ Chapitre {
 		LabelY "Uc/Uj"
 		RangeY 0.05 2.
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
-			Fichier xia_lam.dat
-			Colonnes 1 2
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 1 2
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_1/Muscl/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_1/Amont/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_1/Amont/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
 	}
 }
 ########################################   1.56   ########################################
-Chapitre {
-	Titre " Results: Centerline velocity curves "
+Chapter {
+	Title " Results: Centerline velocity curves "
 	Figure {
-		Titre " Decay of centerline velocity: v = 1 .56 m/s "
+		Title " Decay of centerline velocity: v = 1 .56 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -419,56 +419,56 @@ Chapitre {
 		LabelY "Uc/Uj"
 		RangeY 0.05 2.
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
-			Fichier xia_lam.dat
-			Colonnes 1 2
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 1 2
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_156/Muscl/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_156/Amont/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_156/Amont/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/uc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/uc.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
 	}
 }
 ##################################### Concentration 1.0 ###############################################################
-Chapitre {
-	Titre " Results: Centerline concentration curves "
+Chapter {
+	Title " Results: Centerline concentration curves "
 	Figure {
-		Titre " Decay of centerline concentration: v = 1 .0 m/s "
+		Title " Decay of centerline concentration: v = 1 .0 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -478,56 +478,56 @@ Chapitre {
 		LabelY "Cc/Cj"
 		RangeY 0.05 2.
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
-			Fichier xia_lam.dat
-			Colonnes 3 4
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 3 4
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_1/Muscl/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_1/Amont/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_1/Amont/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
 	}
 }
 #########################################################   1.56   #######################################################################
-Chapitre {
-	Titre " Results: Centerline concentration curves "
+Chapter {
+	Title " Results: Centerline concentration curves "
 	Figure {
-		Titre " Decay of centerline concentration: v = 1 .56 m/s "
+		Title " Decay of centerline concentration: v = 1 .56 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -537,60 +537,60 @@ Chapitre {
 		LabelY "Cc/Cj"
 		RangeY 0.05 2.
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
-			Fichier xia_lam.dat
-			Colonnes 3 4
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
+			file xia_lam.dat
+			columns 3 4
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_156/Muscl/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_156/Amont/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_156/Amont/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/cc.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/cc.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
 	}
 }
 ############################################################ b_curves ##############################################################################
-Chapitre {
-	Titre " Results: width jet curves "
+Chapter {
+	Title " Results: width jet curves "
 
 	Description "In the calculation of jet width, the values used for Uc and Cc are the calculated values (value at centerline of velocity and concentration field)."
 	
 ###################### velocity 1.0 #######	
 	Figure {
-		Titre " Velocity/Momentum jet width: v = 1.0 m/s "
+		Title " Velocity/Momentum jet width: v = 1.0 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -600,52 +600,52 @@ Chapitre {
 		LabelY " b/d "
 		RangeY 0.4 10
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
 			Fonction 0.107*x
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_1/Muscl/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_1/Amont/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_1/Amont/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
 	}
 ##########################  Velocity 1.56 ###########################
 	Figure {
-		Titre " Velocity/Momentum jet width: v = 1.56 m/s "
+		Title " Velocity/Momentum jet width: v = 1.56 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -655,45 +655,45 @@ Chapitre {
 		LabelY " b/d "
 		RangeY 0.4 10
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
 			Fonction 0.107*x
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_156/Muscl/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_156/Amont/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_156/Amont/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/bvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/bvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
@@ -701,7 +701,7 @@ Chapitre {
 ###################################################### bt_curves ###########################################
 ##################    velocity 1.0   ################
 	Figure {
-		Titre " Concentration jet width: v = 1.0 m/s "
+		Title " Concentration jet width: v = 1.0 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -711,45 +711,45 @@ Chapitre {
 		LabelY " b/d "
 		RangeY 0.4 10
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
 			Fonction 0.120*x
 			Style lines
 			TypeLigne 1
 		}
-			Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/btvalues.dat 
-			Colonnes 1 2
+			Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_1/Muscl/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_1/Amont/btvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_1/Amont/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/btvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/btvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
@@ -757,7 +757,7 @@ Chapitre {
 	}
 ##################    velocity 1.56   ################
 	Figure {
-		Titre " Concentration jet width: v = 1.56 m/s "
+		Title " Concentration jet width: v = 1.56 m/s "
 		#Width 12cm, viewport= 0 0 700 750,clip
 		Width 12cm
 		Dimension 2
@@ -767,53 +767,53 @@ Chapitre {
 		LabelY " b/d "
 		RangeY 0.4 10
 		LogY
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Xia and Lam "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Xia and Lam "
+			origin "Theory"
 			Fonction 0.120*x
 			Style lines
 			TypeLigne 1
 		}
-			Courbe {
-			Legende " MUSCL "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/btvalues.dat 
-			Colonnes 1 2
+			Curve {
+			legend " MUSCL "
+			origin "Trio_U"
+			file v_156/Muscl/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 12
 		}
 
-		Courbe {
-			Legende " AMONT "
-			Origine "Trio_U"
-			Fichier v_156/Amont/btvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " AMONT "
+			origin "Trio_U"
+			file v_156/Amont/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 16
 		}
-		Courbe {
-			Legende " EF_stab with alpha=1 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/btvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=1 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 11
 		}
-		Courbe {
-			Legende " EF_stab with alpha=0.2 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/btvalues.dat 
-			Colonnes 1 2
+		Curve {
+			legend " EF_stab with alpha=0.2 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/btvalues.dat 
+			columns 1 2
 			Style points
 			TypePoints 13
 		}
 	
 	}
 }
-Chapitre {
-	Titre " Results: normalised radial velocity and concentration profiles at different longitudinal distances along the jet "
+Chapter {
+	Title " Results: normalised radial velocity and concentration profiles at different longitudinal distances along the jet "
 	Description "In the graphs below, the normalization values Uc and Cc are the calculated values (values at centerline of velocity and concentration field)."
 #
 ########################  Normalised radial velocity ###############################
@@ -822,792 +822,792 @@ Chapitre {
 ############################## v = 1.0 m/s ################
 	
 	Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (MUSCL) "
+		Title " Normalised radial velocity: v = 1.0 m/s (MUSCL) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/Muscl/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #################################
 	Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (AMONT) "
+		Title " Normalised radial velocity: v = 1.0 m/s (AMONT) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/Amont/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #######################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha 1) "
+		Title " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha 1) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 ##########################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha = 0.2) "
+		Title " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha = 0.2) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #####################################          velocity 1.56    #############################
 Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (MUSCL) "
+		Title " Normalised radial velocity: v = 1.56 m/s (MUSCL) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/Muscl/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #####################################################
 	Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (AMONT) "
+		Title " Normalised radial velocity: v = 1.56 m/s (AMONT) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/Amont/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 ##########################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha 1) "
+		Title " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha 1) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #############################
 Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha = 0.2) "
+		Title " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha = 0.2) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialU_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialU_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
@@ -1618,800 +1618,800 @@ Figure {
 ############################## v = 1.0 m/s ################
 	
 	Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (MUSCL) "
+		Title " Normalised radial velocity: v = 1.0 m/s (MUSCL) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/Muscl/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/Muscl/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #################################
 	Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (AMONT) "
+		Title " Normalised radial velocity: v = 1.0 m/s (AMONT) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/Amont/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/Amont/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #######################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha 1) "
+		Title " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha 1) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha1/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha1/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 ##########################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha = 0.2) "
+		Title " Normalised radial velocity: v = 1.0 m/s (EF_stab with alpha = 0.2) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_1/EF_stab_alpha02/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_1/EF_stab_alpha02/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #####################################          velocity 1.56    #############################
 Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (MUSCL) "
+		Title " Normalised radial velocity: v = 1.56 m/s (MUSCL) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/Muscl/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/Muscl/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 #####################################################
 	Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (AMONT) "
+		Title " Normalised radial velocity: v = 1.56 m/s (AMONT) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/Amont/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/Amont/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 ##########################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha 1) "
+		Title " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha 1) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha1/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha1/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 ############################################
 Figure {
-		Titre " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha = 0.2) "
+		Title " Normalised radial velocity: v = 1.56 m/s (EF_stab with alpha = 0.2) "
 		Width 12cm
 		Dimension 2
 		LabelX " r/b "
 		RangeX 0. 3.
 		LabelY " U/Uc "
 		RangeY -0.1 1.1
-		Legende below title "Légende"
-		InclureDescCourbes 0
-		Courbe {
-			Legende " Gaussian distribution "
-			Origine "Theory"
+		legend below title "Légende"
+		Include_Description_Curves 0
+		Curve {
+			legend " Gaussian distribution "
+			origin "Theory"
 			Fonction exp(-(x**2))
 			Style lines
 			TypeLigne 1
 		}
-		Courbe {
-			Legende " z/d = 5 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.015.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 5 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.015.dat
+			columns 1 2
 			Style points
 			TypePoints 1
 		}
-		Courbe {
-			Legende " z/d = 10 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.030.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 10 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.030.dat
+			columns 1 2
 			Style points
 			TypePoints 2
 		}
-		Courbe {
-			Legende " z/d = 15 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.045.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 15 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.045.dat
+			columns 1 2
 			Style points
 			TypePoints 3
 		}
-		Courbe {
-			Legende " z/d = 20 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.060.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 20 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.060.dat
+			columns 1 2
 			Style points
 			TypePoints 4
 		}
-		Courbe {
-			Legende " z/d = 25 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.075.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 25 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.075.dat
+			columns 1 2
 			Style points
 			TypePoints 5
 		}
-		Courbe {
-			Legende " z/d = 30 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.090.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 30 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.090.dat
+			columns 1 2
 			Style points
 			TypePoints 6
 		}
-		Courbe {
-			Legende " z/d = 35 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.105.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 35 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.105.dat
+			columns 1 2
 			Style points
 			TypePoints 7
 		}
-		Courbe {
-			Legende " z/d = 40 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.120.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 40 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.120.dat
+			columns 1 2
 			Style points
 			TypePoints 8
 		}
-		Courbe {
-			Legende " z/d = 45 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.135.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 45 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.135.dat
+			columns 1 2
 			Style points
 			TypePoints 9
 		}
-		Courbe {
-			Legende " z/d = 50 "
-			Origine "Trio_U"
-			Fichier v_156/EF_stab_alpha02/radialC_0.150.dat
-			Colonnes 1 2
+		Curve {
+			legend " z/d = 50 "
+			origin "Trio_U"
+			file v_156/EF_stab_alpha02/radialC_0.150.dat
+			columns 1 2
 			Style points
 			TypePoints 10
 		}
 	}
 
 }
-Chapitre {
-	Titre "Conclusion"
+Chapter {
+	Title "Conclusion"
 	Description " $\bullet$ Decay of centerline velocity /  concentration:  "
 	Description " \latex_($\rightarrow$\latex_) The Decay of centerline velocity is reproduced very well, for all cases. For the concentration in all cases there is a small deviation. "
 	Description " "
@@ -2426,8 +2426,8 @@ Chapitre {
 	Description " \latex_($\rightarrow$\latex_) For both jet velocities (1m/s and 1.56m/s): good tendancies, values close to the analytical profile. "
 	
 }
-Chapitre {
-	Titre "Computer performance"
+Chapter {
+	Title "Computer performance"
 	tableau_performance {
 	}
 }

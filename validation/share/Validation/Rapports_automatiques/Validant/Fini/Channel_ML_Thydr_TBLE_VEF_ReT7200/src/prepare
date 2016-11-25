@@ -14,7 +14,7 @@ chmod +x LP_standard_EF_stab/Coupes_LP_standard_adimensionnees.sh
 sed -e 's/Coupes_TBLE_adimensionnees/Coupes_LP_standard_adimensionnees/g' post_run > LP_standard/tmp1
 sed -e 's/TBLE/LP_STANDARD/g' LP_standard/tmp1 > LP_standard/tmp2
 sed -e 's/N_NP_/LP_STANDARD/g' LP_standard/tmp2 > LP_standard/tmp3
-sed -e 's/u\\\*/<u\\*>/g' LP_standard/tmp3 > LP_standard/tmp4 # Protéger le / et le * avec un /
+sed -e 's/u\\\*/<u\\*>/g' LP_standard/tmp3 > LP_standard/tmp4 # Proteger le / et le * avec un /
 sed -e 's/tble_post_vitesse_N=_NP_.dat/Cas_pb_Ustar.face/g' LP_standard/tmp4 > LP_standard/tmp5
 sed -e 's/$10/$6/g' LP_standard/tmp5 > LP_standard/post_run
 chmod +x LP_standard/post_run

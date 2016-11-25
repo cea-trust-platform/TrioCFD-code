@@ -1,0 +1,1504 @@
+Parametres {
+	Titre "Verification of vorticity and stream function in a square cavity"
+
+	VersionTrio_U "1.7.2"
+
+	ParametresTrio_U Type of problem: hydraulics (unresolved) and conduction (for Poisson equation)
+	ParametresTrio_U Discretizations: VDF and VEF
+	ParametresTrio_U Type of meshes: squares, quadrangles and triangles
+
+	Castest mesh_cart_1 Cas1 /*jdd en annexe*/
+	Castest mesh_cart_1 Cas2
+	Castest mesh_cart_2 Cas1
+	Castest mesh_cart_2 Cas2
+	Castest mesh_cart_3 Cas1
+	Castest mesh_cart_3 Cas2
+	Castest mesh_cart_4 Cas1
+	Castest mesh_cart_4 Cas2
+	Castest mesh_cart_5 Cas1
+	Castest mesh_cart_5 Cas2
+	Castest mesh_cart_6 Cas1
+	Castest mesh_cart_6 Cas2
+	Castest mesh_cart_7 Cas1
+	Castest mesh_cart_7 Cas2
+	Castest mesh_quad_1 Cas1
+	Castest mesh_quad_1 Cas2
+	Castest mesh_quad_2 Cas1
+	Castest mesh_quad_2 Cas2
+	Castest mesh_quad_3 Cas1
+	Castest mesh_quad_3 Cas2
+	Castest mesh_quad_4 Cas1
+	Castest mesh_quad_4 Cas2
+	Castest mesh_quad_5 Cas1
+	Castest mesh_quad_5 Cas2
+	Castest mesh_quad_6 Cas1
+	Castest mesh_quad_6 Cas2
+	Castest mesh_quad_7 Cas1
+	Castest mesh_quad_7 Cas2
+	Castest mesh_tri_1 Cas1
+	Castest mesh_tri_1 Cas2
+	Castest mesh_tri_2 Cas1
+	Castest mesh_tri_2 Cas2
+	Castest mesh_tri_3 Cas1
+	Castest mesh_tri_3 Cas2
+	Castest mesh_tri_4 Cas1
+	Castest mesh_tri_4 Cas2
+	Castest mesh_tri_5 Cas1
+	Castest mesh_tri_5 Cas2
+	Castest mesh_tri_6 Cas1
+	Castest mesh_tri_6 Cas2
+
+	Auteur "Pierre-Emmanuel Angeli, Gauthier Fauchet"
+	InclureData 2
+}
+
+Chapitre {
+	Titre "Meshes"
+	Description ""
+	Figure {
+		Title "Cartesian meshes"
+		Description "mesh_cart_1: 4 x 4 = 16 elements"
+		Description "mesh_cart_2: 8 x 8 = 64 elements"
+		Description "mesh_cart_3: 16 x 16 = 256 elements"
+		Description "mesh_cart_4: 32 x 32 = 1024 elements"
+		Description "mesh_cart_5: 64 x 64 = 4096 elements"
+		Description "mesh_cart_6: 128 x 128 = 16384 elements"
+		Description "mesh_cart_7: 256 x 256 = 65536 elements"
+		picture Maillages/mesh_cart.png 
+		}
+	Figure {
+		Title "Quadrangular meshes"
+		Description "mesh_quad_1: 16 elements"
+		Description "mesh_quad_2: 64 elements"
+		Description "mesh_quad_3: 256 elements"
+		Description "mesh_quad_4: 1024 elements"
+		Description "mesh_quad_5: 4096 elements"
+		Description "mesh_quad_6: 16384 elements"
+		Description "mesh_quad_7: 65536 elements"
+		picture Maillages/mesh_quad.png 
+		}
+	Figure {
+		Title "Triangular meshes"
+		Description "mesh_tri_1: 40 elements"
+		Description "mesh_tri_2: 224 elements"
+		Description "mesh_tri_3: 934 elements"
+		Description "mesh_tri_4: 6422 elements"
+		Description "mesh_tri_5: 25872 elements"
+		Description "mesh_tri_6: 104420 elements"
+		picture Maillages/mesh_tri.png 
+		}
+}
+
+Chapitre {
+	Titre "Equations"
+	Description "Velocity field: \latex_($\displaystyle{\textbf{u}=(u ; v)^T}$\latex_)"
+	Description "Vorticity: \latex_($\displaystyle{\omega=\frac{\partial v}{\partial x}-\frac{\partial u}{\partial y}}$\latex_)"
+	Description "Stream function: \latex_($\displaystyle{\psi\text{: } u=\frac{\partial \psi}{\partial y} \text{, } v=-\frac{\partial \psi}{\partial x}}$\latex_) with \latex_($\psi=0$\latex_) on boundaries"
+	Description "Stream function solution of: \latex_($\displaystyle{\Delta \psi=-\omega \text{ in } ]0;1[^2 \text{ with } \psi=0}$\latex_) on boundaries"
+	Description "Solution: \latex_($\displaystyle{\psi_\text{ex} = \sum_{i=1}^\infty \sum_{j=1}^\infty A_{ij} \sin (i \pi x) \sin (j \pi y) \text{ with } A_{ij} = \frac{4}{(i^2+j^2) \pi^2} \int_0^1 \int_0^1 \omega(x,y) \sin (i \pi x) \sin (j \pi y) dxdy}$\latex_)"
+	Description "Error in L2 norm: \latex_($\displaystyle{\text{errw2}=\frac{\|\omega_\text{calc}-\omega_\text{ex}\|_2}{\|\omega_\text{ex}\|_2}}$\latex_), \latex_($\displaystyle{\text{errpsi2}=\frac{\|\psi_\text{calc}-\psi_\text{ex}\|_2}{\|\psi_\text{ex}\|_2}}$\latex_) with \latex_($\displaystyle{\|\cdot\|_2 = \left(\int_D | \cdot |^2\right)^{1/2}}$\latex_)"
+	Description "Error in max norm: \latex_($\displaystyle{\text{errwinf}=\frac{\|\omega_\text{calc}-\omega_\text{ex}\|_\infty}{\|\omega_\text{ex}\|_\infty}}$\latex_), \latex_($\displaystyle{\text{errpsiinf}=\frac{\|\psi_\text{calc}-\psi_\text{ex}\|_\infty}{\|\psi_\text{ex}\|_\infty}}$\latex_) with \latex_($\displaystyle{\|\cdot\|_\infty = \max_i (\cdot)}$\latex_)"
+}
+
+Chapitre {
+	Titre "Case of imposed velocity (case 1)"
+	Description "Velocity field: \latex_($\displaystyle{\textbf{u}_\text{ex}=\frac{1}{2}(-y^2 ; x^2)^T}$\latex_)"
+	Description "Vorticity: \latex_($\omega_\text{ex}=x+y$\latex_)"
+	Description "errpsi2 and errpsiinf not plotted (complicated)"
+}
+
+Chapitre {
+	Titre "Case of a single Fourier mode excited (case 2)"
+	Description "For example \latex_($i=1$\latex_), \latex_($j=3$\latex_)"
+	Description "Vorticity field: \latex_($\displaystyle{\omega(x,y)=\sin(\pi x)\sin(3 \pi y)}$\latex_)"
+	Description "Stream function: \latex_($\displaystyle{\psi_\text{ex}(x,y)=\frac{1}{10\pi^2}\sin(\pi x)\sin(3 \pi y)}$\latex_)"
+	Description "Velocity field: \latex_($\displaystyle{\textbf{u}_\text{ex}=\left(\frac{3}{10\pi}\sin(\pi x)\cos(3 \pi y) ; -\frac{1}{10\pi}\cos(\pi x)\sin(3 \pi y)\right)^T}$\latex_)"
+}
+
+Chapitre {
+	Titre "Case 1"
+	Figure {
+		Titre "Diagonal profiles of vorticity"
+		Titre_figure "Cartesian meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sqrt(2)*x
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_cart_1"
+			Fichier ./mesh_cart_1/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_cart_2"
+			Fichier ./mesh_cart_2/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_cart_3"
+			Fichier ./mesh_cart_3/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_cart_4"
+			Fichier ./mesh_cart_4/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_cart_5"
+			Fichier ./mesh_cart_5/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_cart_6"
+			Fichier ./mesh_cart_6/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_cart_7"
+			Fichier ./mesh_cart_7/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Quadrangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sqrt(2)*x
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_quad_1"
+			Fichier ./mesh_quad_1/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_quad_2"
+			Fichier ./mesh_quad_2/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_quad_3"
+			Fichier ./mesh_quad_3/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_quad_4"
+			Fichier ./mesh_quad_4/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_quad_5"
+			Fichier ./mesh_quad_5/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_quad_6"
+			Fichier ./mesh_quad_6/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_quad_7"
+			Fichier ./mesh_quad_7/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Triangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sqrt(2)*x
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_tri_1"
+			Fichier ./mesh_tri_1/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_tri_2"
+			Fichier ./mesh_tri_2/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_tri_3"
+			Fichier ./mesh_tri_3/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_tri_4"
+			Fichier ./mesh_tri_4/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_tri_5"
+			Fichier ./mesh_tri_5/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_tri_6"
+			Fichier ./mesh_tri_6/Cas1_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		}
+	Figure {
+		Titre "Diagonal profiles of vorticity interpolated at vertices"
+		Titre_figure "Cartesian meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity_som"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sqrt(2)*x
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_cart_1"
+			Fichier ./mesh_cart_1/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_cart_2"
+			Fichier ./mesh_cart_2/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_cart_3"
+			Fichier ./mesh_cart_3/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_cart_4"
+			Fichier ./mesh_cart_4/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_cart_5"
+			Fichier ./mesh_cart_5/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_cart_6"
+			Fichier ./mesh_cart_6/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_cart_7"
+			Fichier ./mesh_cart_7/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Quadrangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity_som"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sqrt(2)*x
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_quad_1"
+			Fichier ./mesh_quad_1/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_quad_2"
+			Fichier ./mesh_quad_2/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_quad_3"
+			Fichier ./mesh_quad_3/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_quad_4"
+			Fichier ./mesh_quad_4/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_quad_5"
+			Fichier ./mesh_quad_5/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_quad_6"
+			Fichier ./mesh_quad_6/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_quad_7"
+			Fichier ./mesh_quad_7/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Triangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity_som"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sqrt(2)*x
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_tri_1"
+			Fichier ./mesh_tri_1/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_tri_2"
+			Fichier ./mesh_tri_2/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_tri_3"
+			Fichier ./mesh_tri_3/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_tri_4"
+			Fichier ./mesh_tri_4/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_tri_5"
+			Fichier ./mesh_tri_5/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_tri_6"
+			Fichier ./mesh_tri_6/Cas1_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		}
+	Figure {
+		Titre "Diagonal profiles of stream function interpolated at vertices"
+		Titre_figure "Cartesian meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "psi"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "psi_ex"
+			Fichier ./Psi_ex_cas1.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			}
+		Courbe {
+			Legende "mesh_cart_1"
+			Fichier ./mesh_cart_1/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_cart_2"
+			Fichier ./mesh_cart_2/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_cart_3"
+			Fichier ./mesh_cart_3/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_cart_4"
+			Fichier ./mesh_cart_4/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_cart_5"
+			Fichier ./mesh_cart_5/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_cart_6"
+			Fichier ./mesh_cart_6/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_cart_7"
+			Fichier ./mesh_cart_7/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Quadrangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "psi"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "psi_ex"
+			Fichier ./Psi_ex_cas1.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			}
+		Courbe {
+			Legende "mesh_quad_1"
+			Fichier ./mesh_quad_1/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_quad_2"
+			Fichier ./mesh_quad_2/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_quad_3"
+			Fichier ./mesh_quad_3/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_quad_4"
+			Fichier ./mesh_quad_4/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_quad_5"
+			Fichier ./mesh_quad_5/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_quad_6"
+			Fichier ./mesh_quad_6/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_quad_7"
+			Fichier ./mesh_quad_7/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Triangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "psi"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "psi_ex"
+			Fichier ./Psi_ex_cas1.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			}
+		Courbe {
+			Legende "mesh_tri_1"
+			Fichier ./mesh_tri_1/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_tri_2"
+			Fichier ./mesh_tri_2/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_tri_3"
+			Fichier ./mesh_tri_3/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_tri_4"
+			Fichier ./mesh_tri_4/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_tri_5"
+			Fichier ./mesh_tri_5/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_tri_6"
+			Fichier ./mesh_tri_6/Cas1_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		}
+	Figure {
+		Titre "Error on vorticity"
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "average cell size"
+		LabelY "errw2"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Cartesian meshes"
+			Fichier ./Cas1_errw2_CART
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Quadrangular meshes"
+			Fichier ./Cas1_errw2_QUAD
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Triangular meshes"
+			Fichier ./Cas1_errw2_TRI
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+	Figure {
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "average cell size"
+		LabelY "errwinf"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Cartesian meshes"
+			Fichier ./Cas1_errwinf_CART
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Quadrangular meshes"
+			Fichier ./Cas1_errwinf_QUAD
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Triangular meshes"
+			Fichier ./Cas1_errwinf_TRI
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+}
+
+Chapitre {
+	Titre "Case 2"
+	Figure {
+		Titre "Diagonal profiles of vorticity"
+		Titre_figure "Cartesian meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_cart_1"
+			Fichier ./mesh_cart_1/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_cart_2"
+			Fichier ./mesh_cart_2/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_cart_3"
+			Fichier ./mesh_cart_3/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_cart_4"
+			Fichier ./mesh_cart_4/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_cart_5"
+			Fichier ./mesh_cart_5/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_cart_6"
+			Fichier ./mesh_cart_6/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_cart_7"
+			Fichier ./mesh_cart_7/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Quadrangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_quad_1"
+			Fichier ./mesh_quad_1/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_quad_2"
+			Fichier ./mesh_quad_2/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_quad_3"
+			Fichier ./mesh_quad_3/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_quad_4"
+			Fichier ./mesh_quad_4/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_quad_5"
+			Fichier ./mesh_quad_5/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_quad_6"
+			Fichier ./mesh_quad_6/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_quad_7"
+			Fichier ./mesh_quad_7/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Triangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_tri_1"
+			Fichier ./mesh_tri_1/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_tri_2"
+			Fichier ./mesh_tri_2/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_tri_3"
+			Fichier ./mesh_tri_3/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_tri_4"
+			Fichier ./mesh_tri_4/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_tri_5"
+			Fichier ./mesh_tri_5/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_tri_6"
+			Fichier ./mesh_tri_6/Cas2_DIAGONALE_VORTICITE.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		}
+	Figure {
+		Titre "Diagonal profiles of vorticity interpolated at vertices"
+		Titre_figure "Cartesian meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity_som"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_cart_1"
+			Fichier ./mesh_cart_1/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_cart_2"
+			Fichier ./mesh_cart_2/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_cart_3"
+			Fichier ./mesh_cart_3/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_cart_4"
+			Fichier ./mesh_cart_4/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_cart_5"
+			Fichier ./mesh_cart_5/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_cart_6"
+			Fichier ./mesh_cart_6/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_cart_7"
+			Fichier ./mesh_cart_7/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Quadrangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity_som"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_quad_1"
+			Fichier ./mesh_quad_1/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_quad_2"
+			Fichier ./mesh_quad_2/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_quad_3"
+			Fichier ./mesh_quad_3/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_quad_4"
+			Fichier ./mesh_quad_4/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_quad_5"
+			Fichier ./mesh_quad_5/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_quad_6"
+			Fichier ./mesh_quad_6/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_quad_7"
+			Fichier ./mesh_quad_7/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Triangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "vorticity_som"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_tri_1"
+			Fichier ./mesh_tri_1/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_tri_2"
+			Fichier ./mesh_tri_2/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_tri_3"
+			Fichier ./mesh_tri_3/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_tri_4"
+			Fichier ./mesh_tri_4/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_tri_5"
+			Fichier ./mesh_tri_5/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_tri_6"
+			Fichier ./mesh_tri_6/Cas2_DIAGONALE_VORTICITE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		}
+	Figure {
+		Titre "Diagonal profiles of stream function interpolated at vertices"
+		Titre_figure "Cartesian meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "psi"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction 1/(10*pi*pi)*sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_cart_1"
+			Fichier ./mesh_cart_1/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_cart_2"
+			Fichier ./mesh_cart_2/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_cart_3"
+			Fichier ./mesh_cart_3/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_cart_4"
+			Fichier ./mesh_cart_4/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_cart_5"
+			Fichier ./mesh_cart_5/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_cart_6"
+			Fichier ./mesh_cart_6/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_cart_7"
+			Fichier ./mesh_cart_7/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Quadrangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "psi"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction 1/(10*pi*pi)*sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_quad_1"
+			Fichier ./mesh_quad_1/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_quad_2"
+			Fichier ./mesh_quad_2/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_quad_3"
+			Fichier ./mesh_quad_3/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_quad_4"
+			Fichier ./mesh_quad_4/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_quad_5"
+			Fichier ./mesh_quad_5/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_quad_6"
+			Fichier ./mesh_quad_6/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		Courbe {
+			Legende "mesh_quad_7"
+			Fichier ./mesh_quad_7/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			}
+		}
+	Figure {
+		Titre_figure "Triangular meshes"
+		Width 12cm
+		Dimension 2
+		LabelX "diag"
+		LabelY "psi"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Exact"
+			Fonction 1/(10*pi*pi)*sin(pi*sqrt(2)*x/2)*sin(3*pi*sqrt(2)*x/2)
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "mesh_tri_1"
+			Fichier ./mesh_tri_1/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "mesh_tri_2"
+			Fichier ./mesh_tri_2/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "mesh_tri_3"
+			Fichier ./mesh_tri_3/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		Courbe {
+			Legende "mesh_tri_4"
+			Fichier ./mesh_tri_4/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			}
+		Courbe {
+			Legende "mesh_tri_5"
+			Fichier ./mesh_tri_5/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			}
+		Courbe {
+			Legende "mesh_tri_6"
+			Fichier ./mesh_tri_6/Cas2_DIAGONALE_PSI_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			}
+		}
+	Figure {
+		Titre "Error on vorticity"
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "average cell size"
+		LabelY "errw2"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Cartesian meshes"
+			Fichier ./Cas2_errw2_CART
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Quadrangular meshes"
+			Fichier ./Cas2_errw2_QUAD
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Triangular meshes"
+			Fichier ./Cas2_errw2_TRI
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+	Figure {
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "average cell size"
+		LabelY "errwinf"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Cartesian meshes"
+			Fichier ./Cas2_errwinf_CART
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Quadrangular meshes"
+			Fichier ./Cas2_errwinf_QUAD
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Triangular meshes"
+			Fichier ./Cas2_errwinf_TRI
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+	Figure {
+		Titre "Error on stream function"
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "average cell size"
+		LabelY "errpsi2"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Cartesian meshes"
+			Fichier ./Cas2_errpsi2_CART
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Quadrangular meshes"
+			Fichier ./Cas2_errpsi2_QUAD
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Triangular meshes"
+			Fichier ./Cas2_errpsi2_TRI
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+	Figure {
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "average cell size"
+		LabelY "errpsiinf"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "Cartesian meshes"
+			Fichier ./Cas2_errpsiinf_CART
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Quadrangular meshes"
+			Fichier ./Cas2_errpsiinf_QUAD
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Triangular meshes"
+			Fichier ./Cas2_errpsiinf_TRI
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+}
+
+Chapitre {
+	Titre "Computer performance"
+	Tableau_performance {
+	}
+}

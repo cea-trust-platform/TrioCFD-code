@@ -364,9 +364,9 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
 
 
-  IntVect& tab1 = matrice.tab1_;
-  IntVect& tab2 = matrice.tab2_;
-  DoubleVect& coeff = matrice.coeff_;
+  IntVect& tab1 = matrice.get_set_tab1();
+  IntVect& tab2 = matrice.get_set_tab2();
+  DoubleVect& coeff = matrice.get_set_coeff();
 
   int nb_comp = 1;
   int nb_dim = transporte.nb_dim();

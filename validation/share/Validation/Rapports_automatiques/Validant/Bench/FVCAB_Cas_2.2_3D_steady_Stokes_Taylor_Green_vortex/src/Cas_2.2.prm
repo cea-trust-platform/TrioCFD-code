@@ -1,0 +1,385 @@
+Parametres {
+	Titre "3D Taylor-Green vortex"
+
+	VersionTrio_U "1.7.2"
+
+	ParametresTrio_U Type of problem: steady Stokes with source term
+	ParametresTrio_U Discretizations: VDF and VEF
+	ParametresTrio_U Type of meshes: hexaedra and tetraedra
+	ParametresTrio_U Pressure solver: Cholesky
+	ParametresTrio_U Time schemes: explicit and implicit Euler
+
+	Castest mesh_hexa_1 Cas
+	Castest mesh_hexa_2 Cas
+	Castest mesh_hexa_3 Cas
+	Castest mesh_hexa_4 Cas
+	Castest mesh_hexa_5 Cas 4
+
+	Castest mesh_tetra_0 Cas /*jdd en annexe*/
+	Castest mesh_tetra_1 Cas
+	Castest mesh_tetra_2 Cas
+	Castest mesh_tetra_3 Cas
+	Castest mesh_tetra_4 Cas 2
+	Castest mesh_tetra_5 Cas 4
+	Castest mesh_tetra_6 Cas 6
+
+	Auteur "Pierre-Emmanuel Angeli, Adela Puscas, Gauthier Fauchet"
+	InclureData 2
+}
+
+Chapitre {
+	Titre "Meshes"
+	Description ""
+	Figure {
+		Title "Hexahedral meshes"
+		Description "mesh_hexa_1: 2 x 2 x 2 = 8 elements"
+		Description "mesh_hexa_2: 4 x 4 x 4 = 64 elements"
+		Description "mesh_hexa_3: 8 x 8 x 8 = 512 elements"
+		Description "mesh_hexa_4: 16 x 16 x 16 = 4096 elements"
+		Description "mesh_hexa_5: 32 x 32 x 32 = 32768 elements"
+		picture Maillages/mesh_hexa.png
+		}
+	Figure {
+		Title "Tetrahedral meshes"
+		Description "mesh_tetra_0: 215 elements"
+		Description "mesh_tetra_1: 2003 elements"
+		Description "mesh_tetra_2: 3898 elements"
+		Description "mesh_tetra_3: 7711 elements"
+		Description "mesh_tetra_4: 15266 elements"
+		Description "mesh_tetra_5: 30480 elements"
+		Description "mesh_tetra_6: 61052 elements"
+		picture Maillages/mesh_tetra.png
+		}
+}
+
+Chapitre {
+	Titre "Equations and solution"
+	Description "\latex_($\nabla \cdot \textbf{u} = 0 \text{ on } D = [0;1]^3$\latex_)"
+	Description "\bigskip"
+	Description "\latex_($-\Delta \textbf{u} + \nabla p = \textbf{f} \text{ on } D = [0;1]^3$\latex_)"
+	Description "\bigskip"
+	Description "\latex_($\displaystyle{\int_D p(\textbf{x}) d\textbf{x} = 0}$\latex_)"
+	Description "\bigskip"
+	Description "\latex_($\textbf{u}=\textbf{u}_\text{ex} \text{ on boundaries}$\latex_)"
+	Description "\bigskip"
+	Description "with \latex_($\textbf{f}=\begin{pmatrix} -36 \pi^2 \cos(2 \pi x) \sin(2 \pi y) \sin(2 \pi z) \\\\ 0 \\\\ 0 \end{pmatrix}$\latex_)"
+	Description "\bigskip"
+	Description "Exact solution: \latex_($p_\text{ex} = -6 \pi \sin(2 \pi x) \sin(2 \pi y) \sin(2 \pi z) \text{ and } \textbf{u}_\text{ex}=\begin{pmatrix} -2 \cos(2 \pi x) \sin(2 \pi y) \sin(2 \pi z) \\\\ \sin(2 \pi x) \cos(2 \pi y) \sin(2 \pi z) \\\\ \sin(2 \pi x) \sin(2 \pi y) \cos(2 \pi z) \end{pmatrix}$\latex_)"
+}
+
+Chapitre {
+	Titre "Complexity and accuracy tables"
+		Tableau {
+		Titre "Complexity table"
+		Description "\latex_(\textbf{nuu}\latex_): number of velocity unknowns."
+		Description "\latex_(\textbf{npu}\latex_): number of pressure unknowns."
+		Description "\latex_(\textbf{nnzu}\latex_): number of non-zero terms in the velocity-velocity matrix (only for implicit time schemes)."
+		Description "\latex_(\textbf{nnzp}\latex_): number of non-zero terms in the pressure-pressure matrix."
+		Description "\latex_(\textbf{nnzup}\latex_): number of non-zero terms in the velocity-pressure matrix. Undefined here because no velocity-pressure matrix (use of a projection method)."
+		}
+	Tableau {
+		Nb_colonnes 5
+		label \latex_($\textbf{nuu}$\latex_) | \latex_($\textbf{npu}$\latex_) | \latex_($\textbf{nnzu}$\latex_) | \latex_($\textbf{nnzp}$\latex_) | \latex_($\textbf{nnzup}$\latex_)
+		Ligne {
+			Legende "mesh_hexa_1"
+			fichier ./mesh_hexa_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_hexa_2"
+			fichier ./mesh_hexa_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_hexa_3"
+			fichier ./mesh_hexa_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_hexa_4"
+			fichier ./mesh_hexa_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_hexa_5"
+			fichier ./mesh_hexa_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_0"
+			fichier ./mesh_tetra_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_1"
+			fichier ./mesh_tetra_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_2"
+			fichier ./mesh_tetra_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_3"
+			fichier ./mesh_tetra_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_4"
+			fichier ./mesh_tetra_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_5"
+			fichier ./mesh_tetra_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_6"
+			fichier ./mesh_tetra_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table"
+		Description "- Norms of error:"
+		Description "\medskip"
+		Description "\latex_($\textbf{erru}=\frac{\displaystyle{\Big( \int_D \left\Vert \textbf{u}^\varepsilon \right\Vert^2 \Big)^{1/2}}}{\displaystyle{\Big( \int_D \left\Vert \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}}}$\latex_) where \latex_($\textbf{u}^\varepsilon = \textbf{u} - \textbf{u}_\text{ex}$\latex_) and \latex_($\displaystyle{\left\Vert \textbf{u} \right\Vert^2 = \sum_i \left( u_i \right)^2}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\textbf{errgu}=\frac{\displaystyle{\Big( \int_D \left\Vert \nabla \textbf{u}^\varepsilon \right\Vert^2 \Big)^{1/2}}}{\displaystyle{\Big( \int_D \left\Vert \nabla \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}}}$\latex_) where \latex_($\displaystyle{\left\Vert \nabla \textbf{u} \right\Vert^2 = \sum_{i,j} \left(\frac{\partial u_i}{\partial x_j}\right)^2}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\textbf{errp}=\frac{\displaystyle{\Big( \int_D \left| p^\varepsilon \right|^2 \Big)^{1/2}}}{\displaystyle{\Big( \int_D \left| p_\text{ex} \right|^2 \Big)^{1/2}}}$\latex_) where \latex_($\displaystyle{p^\varepsilon = \left(p - \int_D p dV \right) - p_\text{ex}}$\latex_)""
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{errdivu}=\Big( \int_D \left( \nabla \cdot \textbf{u} \right)^2 \Big)^{1/2}}$\latex_)"
+		Description "\medskip"
+		Description "We have: \latex_($\displaystyle{\Big( \int_D \left\Vert \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}=\frac{\sqrt{3}}{2}}$\latex_), \latex_($\displaystyle{\Big( \int_D \left\Vert \nabla \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}=3\pi}$\latex_) and \latex_($\displaystyle{\Big( \int_D \left| p_\text{ex} \right|^2 \Big)^{1/2}=\frac{3 \pi \sqrt{2}}{2}}$\latex_)"
+		Description "\bigskip"
+		Description "- Orders of convergence:"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{ordgu}=-d \frac{\ln({\textbf{errgu}_i}) - \ln({\textbf{errgu}_{i-1}})}{\ln(\textbf{nuu}_i) - \ln(\textbf{nuu}_{i-1})}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{ordu}=-d \frac{\ln({\textbf{erru}_i}) - \ln({\textbf{erru}_{i-1}})}{\ln(\textbf{nuu}_i) - \ln(\textbf{nuu}_{i-1})}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{ordp}=-d \frac{\ln({\textbf{errp}_i}) - \ln({\textbf{errp}_{i-1}})}{\ln(\textbf{npu}_i) - \ln(\textbf{npu}_{i-1})}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{orddivu}=-d \frac{\ln({\textbf{errdivu}_i}) - \ln({\textbf{errdivu}_{i-1}})}{\ln(\textbf{nuu}_i) - \ln(\textbf{nuu}_{i-1})}}$\latex_) (not meaningful here because \latex_(\textbf{errdivu}\latex_) is zero)."
+		Description "\medskip"
+		Description "where d = 3 is the space dimension and \latex_($i \geq 2 $\latex_) the number of the mesh in the mesh family."
+		}
+	Tableau {
+		Nb_colonnes 8
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_hexa_1"
+			fichier ./mesh_hexa_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_hexa_2"
+			fichier ./mesh_hexa_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_hexa_3"
+			fichier ./mesh_hexa_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_hexa_4"
+			fichier ./mesh_hexa_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_hexa_5"
+			fichier ./mesh_hexa_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_0"
+			fichier ./mesh_tetra_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_1"
+			fichier ./mesh_tetra_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_2"
+			fichier ./mesh_tetra_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_3"
+			fichier ./mesh_tetra_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_4"
+			fichier ./mesh_tetra_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_5"
+			fichier ./mesh_tetra_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_6"
+			fichier ./mesh_tetra_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+}
+
+Chapitre {
+	Titre "Plots of errgu, erru and errp"
+	Figure {
+		Titre_figure "errgu"
+		Width 12cm
+		Dimension 2
+		LabelX "nuu"
+		LabelY "errgu^3"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordgu = 1"
+			Fonction 100*x**(-1)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "Hexahedral meshes"
+			Fichier ./Accuracy_HEXA.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Tetrahedral meshes"
+			Fichier ./Accuracy_TETRA.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+	Figure {
+		Titre_figure "erru"
+		Width 12cm
+		Dimension 2
+		LabelX "nuu"
+		LabelY "erru^3"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordu = 2"
+			Fonction 10000*x**(-2)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "Hexahedral meshes"
+			Fichier ./Accuracy_HEXA.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Tetrahedral meshes"
+			Fichier ./Accuracy_TETRA.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		}
+	Figure {
+		Titre_figure "errp"
+		Width 12cm
+		Dimension 2
+		LabelX "nuu"
+		LabelY "errp^3"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordp = 2"
+			Fonction 100000*x**(-2)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "Hexahedral meshes"
+			Fichier ./Accuracy_HEXA.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Tetrahedral meshes (som)"
+			Fichier ./Accuracy_TETRA.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Tetrahedral meshes (elem)"
+			Fichier ./Accuracy_TETRA_ERRP_ELEM.dat
+			Colonnes ($1) ($2)**3
+			Style linespoints
+			TypeLigne 3
+			TypePoints 7
+			PointSize 2
+			}
+		}
+}
+
+Chapitre {
+	Titre "Computer performance"
+	Tableau_performance {
+	}
+}

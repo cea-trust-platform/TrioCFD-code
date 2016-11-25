@@ -1,5 +1,5 @@
-Parametres {
-	Titre "New wall law treatment for the Large Eddy Simulation of turbulent heat transfer in a periodic channel (\latex_($\mathrm{Re}_\tau = 395$\latex_) and \latex_($\mathrm{Pr} = 0.71$\latex_), T0Q case)"
+Parameters {
+	Title "New wall law treatment for the Large Eddy Simulation of turbulent heat transfer in a periodic channel (\latex_($\mathrm{Re}_\tau = 395$\latex_) and \latex_($\mathrm{Pr} = 0.71$\latex_), T0Q case)"
 
 	Description "\latex_($\bullet$\latex_) Turbulent channel flow with T0Q type conditions."
 	Description "\latex_($\bullet$\latex_) Validated model: Robin boundary condition at walls for L.E.S. with wall function in VEF discretization."
@@ -26,17 +26,17 @@ Parametres {
 	ParametresTrio_U Time schemes: \latex_(\texttt{Runge\_Kutta\_ordre\_3}\latex_) with \latex_(\texttt{facsec}\latex_) = 1 ;
 	ParametresTrio_U Convection schemes: \latex_(\texttt{centre}\latex_) (velocity) and \latex_(\texttt{QUICK}\latex_) (temperature) for VDF simulations ; \latex_(\texttt{EF\_stab}\latex_) for VEF simulations.
 
-	Castest T0Q_VDF Cas
-	Castest T0Q_VEF Cas /*jdd en annexe*/
-	Castest T0Q_VEF_Pironneau Cas /*jdd en annexe*/
-	Castest T0Q_VEF_Pironneau_maillage_decale Cas
+	TestCase T0Q_VDF Cas
+	TestCase T0Q_VEF Cas /*jdd en annexe*/
+	TestCase T0Q_VEF_Pironneau Cas /*jdd en annexe*/
+	TestCase T0Q_VEF_Pironneau_maillage_decale Cas
 
-	Auteur "Pierre-Emmanuel Angeli"
-	InclureData 2
+	Author "Pierre-Emmanuel Angeli"
+	IncludeData 2
 }
 
-Chapitre {
-	Titre "Theoretical features"
+Chapter {
+	Title "Theoretical features"
 	Description "See the technical note [8] for detailed explanations."		
 	Description "\medskip"
 	Description "\latex_($\bullet$\latex_) \latex_(\textit{Standard wall treatment approach in Trio\_U}\latex_):"
@@ -48,13 +48,13 @@ Chapitre {
 	Description "The methodology is briefly described in [6] and is here referred to as the \latex_(\textit{Pironneau}\latex_) approach. The idea is that the fixed walls are replaced by symetries, so that the velocity and temperature gradients appearing in the momentum and energy balances are zero. Formally, the gradients calculated from the wall laws are added then to these balances, instead of replacing wrong values like in the standard approach. Let \latex_($y_1$\latex_) be the distance from the wall of the first calculation point. The wall law results actually in a Robin boundary condition under the form \latex_($\displaystyle{\left.\frac{\partial u}{\partial y}\right|_w = f[u(y_1)]}$\latex_), which is implemented by a source term in the code. The same methodology is applied for temperature. More generally, the Robin condition can be evaluated at a distance $\delta$ from the wall: \latex_($\displaystyle{\frac{\partial u}{\partial n}(\delta) = f[u(\delta)]}$\latex_). Thus the user has to choose the value of $\delta$, such that $\delta$ is located in the logarithmic layer. Here we choose \latex_($\delta=y_1$\latex_)."
 }
 
-Chapitre {
-	Titre "Tests description"
+Chapter {
+	Title "Tests description"
 	Description "The present calculations are L.E.S. of turbulence and heat transport in a 3D biperiodic channel flow with \latex_($Re_\tau = 395$\latex_) and \latex_($\mathrm{Pr} = 0.71$\latex_). Temperature is treated like a passive scalar. Uniformly zero temperature at both walls and uniform volumetric heat source \latex_(Q = 1 W $\cdot$ m$^{-3}$\latex_) on the whole channel are applied. The dimensions of the channel are: \latex_(L$_x$ = 6.4 m , L$_y$ = 2h = 2 m, L$_z$ = 3.2 m\latex_)."
 	Description "\smallskip"
 	Description "Two simulations using the standard methodology are first carried out (one using a VDF discretization and the other using a VEF discretization). Then two others simulations (in VEF) using the new approach are done. In the second one, the upper and lower walls of the channel are displaced from the distance \latex_($\delta$\latex_) toward the centerline of the channel, and a new mesh similar to the previous one is built."
 	Visu {
-		Titre "VDF mesh"
+		Title "VDF mesh"
 		Description "Number of nodes in each direction: \latex_(N$_x$ = 37, N$_y$ = 24, N$_z$ = 23\latex_)."
 		Description "Total number of elements: \latex_((N$_x$-1)(N$_y$-1)(N$_z$-1) = 18216\latex_)."
 		Description "\smallskip"
@@ -67,7 +67,7 @@ Chapitre {
 		Mesh T0Q_VDF/Cas.lata dom
 		}
 	Visu {
-		Titre "VEF mesh (entire channel)"
+		Title "VEF mesh (entire channel)"
 		Description "Number of nodes in each direction: \latex_(N$_x$ = 12, N$_y$ = 8, N$_z$ = 7\latex_)."
 		Description "Total number of elements with \latex_(\texttt{tetraedriser\_homogene\_fin}\latex_): \latex_(48(N$_x$-1)(N$_y$-1)(N$_z$-1) = 22176\latex_)."
 		Description "\smallskip"
@@ -80,7 +80,7 @@ Chapitre {
 		Mesh T0Q_VEF/Cas.lata dom
 		}
 	Visu {
-		Titre "VEF mesh (truncated channel)"
+		Title "VEF mesh (truncated channel)"
 		Description "Number of nodes in each direction: \latex_(N$_x$ = 12, N$_y$ = 8, N$_z$ = 7\latex_)."
 		Description "Total number of elements with \latex_(\texttt{tetraedriser\_homogene\_fin}\latex_): \latex_(48(N$_x$-1)(N$_y$-1)(N$_z$-1) = 22176\latex_)."
 		Description "\smallskip"
@@ -91,8 +91,8 @@ Chapitre {
 		Operator_to_all no_legend
 		Mesh T0Q_VEF_Pironneau_maillage_decale/Cas.lata dom
 		}
-	Tableau {
-		Titre "Physical properties and dimensionless numbers"
+	Table {
+		Title "Physical properties and dimensionless numbers"
 		Description "\latex_(\textit{Physical properties}\latex_):
 		Description "\smallskip"
 		Description "\latex_(\hspace{1cm} $\bullet$\latex_) $\rho$ = 0.011928 \latex_(kg $\cdot$ m$^{-3}$\latex_)"
@@ -107,8 +107,8 @@ Chapitre {
 		Description "\latex_(\hspace{1cm} $\bullet$\latex_) \latex_($\displaystyle{\vphantom{\frac{0}{0}}}\mathrm{Pe}=\mathrm{Re}_b \times \mathrm{Pr}$\latex_) = 4829"
 		Description "\latex_(\hspace{1cm} $\bullet$\latex_) \latex_($\mathrm{Re}_\tau=0.175 \mathrm{Re}_b^{7/8}$\latex_) = 395 (Dean's correlation [7])"
 		}
-	Tableau {
-		Titre "Initial and boundary conditions"
+	Table {
+		Title "Initial and boundary conditions"
 		Description "\latex_(\textit{Initial conditions}\latex_):
 		Description "\latex_(\hspace{1cm} $\bullet$\latex_) Velocity: parabolic mean profile for x-component"
 		Description "\latex_(\hspace{1cm} $\hphantom{\bullet}$\latex_) \latex_(\texttt{Champ\_init\_canal\_sinal 3 \{ Ucent 24.293 h 1 ampli\_sin 0 omega 1 ampli\_bruit 0.5 \}}\latex_)"
@@ -136,8 +136,8 @@ Chapitre {
 		Description "$\smallskip$"
 		Description "\latex_($^{(*)}$\latex_) where \latex_(\texttt{\_delta\_value\_}\latex_) is set according the recommandation of section 2 (\latex_($\delta=y_1$\latex_))."
 		}
-	Tableau {
-		Titre "Numerical schemes"
+	Table {
+		Title "Numerical schemes"
 		Description "\latex_(\textit{VDF discretization}\latex_):"
 		Description "\latex_(\hspace{1cm} $\bullet$\latex_) Time scheme: third order Runge-Kutta method with \latex_(\texttt{facsec}\latex_)=1"
 		Description "\latex_(\hspace{1cm} $\bullet$\latex_) Convection: centered scheme for velocity and \latex_(\texttt{QUICK}\latex_) scheme for temperature"
@@ -148,101 +148,101 @@ Chapitre {
 		}
 }
 
-Chapitre {
-	Titre "Friction velocity and friction Reynolds number calculated"
-	Tableau {
-		Titre "Friction velocity \latex_($u_\tau$\latex_)"
-		Nb_colonnes 3
+Chapter {
+	Title "Friction velocity and friction Reynolds number calculated"
+	Table {
+		Title "Friction velocity \latex_($u_\tau$\latex_)"
+		nb_columns 3
 		label time (s) | \latex_($u_\tau$ (m $\cdot$ s$^{-1}$)\latex_) | Relative error (%)
-		Ligne {
-			Origine "Analytique"
-			Legende "Theoretical \latex_($^{(*)}$\latex_)"
-			fichier u_tau_th.dat
-			Nb_colonnes_fichier 1
-			Colonnes "-" ($1) "-"
+		line {
+			origin "Analytique"
+			legend "Theoretical \latex_($^{(*)}$\latex_)"
+			file u_tau_th.dat
+			nb_columns_file 1
+			columns "-" ($1) "-"
 			}
-		Ligne {
-			Origine "Trio_U"
-			Legende "VDF"
-			Fichier ./T0Q_VDF/post_utau
-			Nb_colonnes_fichier 3
-			Colonnes ($1) ($2) ($3)
+		line {
+			origin "Trio_U"
+			legend "VDF"
+			file ./T0Q_VDF/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
 			}
-		Ligne {
-			Origine "Trio_U"
-			Legende "VEF"
-			Fichier ./T0Q_VEF/post_utau
-			Nb_colonnes_fichier 3
-			Colonnes ($1) ($2) ($3)
+		line {
+			origin "Trio_U"
+			legend "VEF"
+			file ./T0Q_VEF/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
 			}
-		Ligne {
-			Origine "Trio_U"
-			Legende "VEF Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/post_utau
-			Nb_colonnes_fichier 3
-			Colonnes ($1) ($2) ($3)
+		line {
+			origin "Trio_U"
+			legend "VEF Pironneau"
+			file ./T0Q_VEF_Pironneau/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
 			}
-		Ligne {
-			Origine "Trio_U"
-			Legende "VEF Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/post_utau
-			Nb_colonnes_fichier 3
-			Colonnes ($1) ($2) ($3)
+		line {
+			origin "Trio_U"
+			legend "VEF Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/post_utau
+			nb_columns_file 3
+			columns ($1) ($2) ($3)
 			}
 		}
-	Tableau {
+	Table {
 		Description "\latex_($^{(*)}$\latex_) according to Dean's correlation [7]: \latex_($\mathrm{Re}_\tau = 0.175 \mathrm{Re}_b^{7/8}$\latex_), and using \latex_($\displaystyle{\mathrm{Re}_\tau=\frac{\rho u_\tau h}{\mu}}$\latex_)."
 		}
 	Figure {
-		Titre "Friction Reynolds \latex_($\mathrm{Re}_\tau$\latex_)"
-		Titre_figure ""
+		Title "Friction Reynolds \latex_($\mathrm{Re}_\tau$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "time (s)"
 		RangeX 0 150
 		LabelY "Re_tau"
 		RangeY 100 450
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "Re_tau = 395"
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "Re_tau = 395"
 			Fonction 395
 			Style lines
 			Typeligne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/reynolds_tau.dat
-			Colonnes ($1) ($2)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/reynolds_tau.dat
+			columns ($1) ($2)
 			Style lines
 			Typeligne 2
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/reynolds_tau.dat
-			Colonnes ($1) ($2)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/reynolds_tau.dat
+			columns ($1) ($2)
 			Style lines
 			Typeligne 3
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Reynolds_tau_Pironneau.dat
-			Colonnes ($1) ($2)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Reynolds_tau_Pironneau.dat
+			columns ($1) ($2)
 			Style lines
 			Typeligne 4
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Reynolds_tau_Pironneau.dat
-			Colonnes ($1) ($2)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Reynolds_tau_Pironneau.dat
+			columns ($1) ($2)
 			Style lines
 			Typeligne 6
 			}
 		}
 }
 
-Chapitre {
-	Titre "Detailed results"
+Chapter {
+	Title "Detailed results"
 	Description "In the next two sections, different time- and space-averaged profiles are plotted across the channel half-height: the components of velocity (\latex_($u$\latex_) and \latex_($w$\latex_)), the temperature (\latex_($T$\latex_)), the components of the subscale stress tensors (\latex_($T_{ij}$\latex_) and \latex_($Q_i$\latex_)), the root mean square of temperature (\latex_($T_\mathrm{rms}$\latex_)), as well as the adimensional equivalent quantities."
 	Description "$\medskip$"
 	Description "We compare the non-dimensional mean velocity profiles with the Reichardt's law [1]:"
@@ -250,1285 +250,1285 @@ Chapitre {
 	Description "We compare the non-dimensional mean temperature profiles with the Kader's law [2]:"
 	Description "\latex_($\displaystyle{T^+=\mathrm{Pr}y^+e^{-\Gamma} + \left[2.12 \ \mathrm{ln}(1+y^+)+\beta\right]e^{-1/\Gamma}}$\latex_), were \latex_($\beta=\left(3.85 \ \mathrm{Pr}^{1/3}-1.3\right)^2+2.12 \ \mathrm{ln}(\mathrm{Pr})$\latex_) and \latex_($\displaystyle{\Gamma=\frac{0.01(y^+\mathrm{Pr})^4}{1+5 y^+\mathrm{Pr}^3}}$\latex_)."
 	Figure {
-		Titre "Mean $x$-velocity profile \latex_($<u>$\latex_)"
-		Titre_figure ""
+		Title "Mean $x$-velocity profile \latex_($<u>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<u> (m/s)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($1) ($3)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($1) ($3)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($3)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $x$-velocity profile \latex_($<u^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $x$-velocity profile \latex_($<u^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		LogX
 		RangeX 10 366
 		LabelY "<u+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($2) ($4)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($2) ($4)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($4)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "Reichardt's law"
+		Curve {
+			legend "Reichardt's law"
 			Fonction 1/0.415*log(1+0.415*x)+7.44*(1-exp(-x/11)-x/11*exp(-x/3))
 			Style lines
 			TypeLigne 0
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $z$-velocity profile \latex_($<w>$\latex_)"
-		Titre_figure ""
+		Title "Mean $z$-velocity profile \latex_($<w>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<w> (m/s)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($5)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($5)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $z$-velocity profile \latex_($<w^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $z$-velocity profile \latex_($<w^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<w+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($6)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($6)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $xx$-component of subgrid scale tensor \latex_($<T_{11}>$\latex_)"
-		Titre_figure ""
+		Title "Mean $xx$-component of subgrid scale tensor \latex_($<T_{11}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T11> (m2/s2)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($1) ($5)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($1) ($5)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($7)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $xx$-component of subgrid scale tensor \latex_($<T_{11}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $xx$-component of subgrid scale tensor \latex_($<T_{11}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<T11+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($2) ($6)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($2) ($6)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($8)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $yy$-component of subgrid scale tensor \latex_($<T_{22}>$\latex_)"
-		Titre_figure ""
+		Title "Mean $yy$-component of subgrid scale tensor \latex_($<T_{22}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T22> (m2/s2)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($16) ($18)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($16) ($18)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($9)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($11)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($11)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($11)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($11)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($11)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($11)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($11)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($11)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $yy$-component of subgrid scale tensor \latex_($<T_{22}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $yy$-component of subgrid scale tensor \latex_($<T_{22}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<T22+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($17) ($19)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($17) ($19)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($10)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($12)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($12)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($12)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($12)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($12)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($12)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($12)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($12)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $zz$-component of subgrid scale tensor \latex_($<T_{33}>$\latex_)"
-		Titre_figure ""
+		Title "Mean $zz$-component of subgrid scale tensor \latex_($<T_{33}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T33> (m2/s2)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($1) ($7)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($1) ($7)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($11)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($11)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($13)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($13)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($13)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($13)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($13)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($13)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($13)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($13)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $zz$-component of subgrid scale tensor \latex_($<T_{33}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $zz$-component of subgrid scale tensor \latex_($<T_{33}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<T33+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($2) ($8)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($2) ($8)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($12)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($12)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($14)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($14)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($14)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($14)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($14)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($14)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($14)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($14)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $xy$-component of subgrid scale tensor \latex_($<T_{12}>$\latex_)"
-		Titre_figure ""
+		Title "Mean $xy$-component of subgrid scale tensor \latex_($<T_{12}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T12> (m2/s2)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($16) ($20)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($16) ($20)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($13)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($13)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($15)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($15)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($15)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($15)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($15)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($15)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($15)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($15)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $xy$-component of subgrid scale tensor \latex_($<T_{12}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $xy$-component of subgrid scale tensor \latex_($<T_{12}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<T12+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($17) ($21)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($17) ($21)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($14)
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($14)
 			Style lines
 			TypeLigne 1
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($16)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($16)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($16)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($16)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($16)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($16)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($16)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($16)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $xz$-component of subgrid scale tensor \latex_($<T_{13}>$\latex_)"
-		Titre_figure ""
+		Title "Mean $xz$-component of subgrid scale tensor \latex_($<T_{13}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T13> (m2/s2)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($15)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($15)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($17)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($17)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($17)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($17)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($17)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($17)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($17)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($17)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $xz$-component of subgrid scale tensor \latex_($<T_{13}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $xz$-component of subgrid scale tensor \latex_($<T_{13}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<T13+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($16)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($16)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($18)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($18)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($18)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($18)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($18)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($18)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($18)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($18)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean $yz$-component of subgrid scale tensor \latex_($<T_{23}>$\latex_)"
-		Titre_figure ""
+		Title "Mean $yz$-component of subgrid scale tensor \latex_($<T_{23}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T23> (m2/s2)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($1) ($17)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($1) ($17)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($19)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($1) ($19)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($19)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($1) ($19)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($19)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($1) ($19)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($1) ($19)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($1) ($19)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean $yz$-component of subgrid scale tensor \latex_($<T_{23}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean $yz$-component of subgrid scale tensor \latex_($<T_{23}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<T23+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Moser-Kim-Mansour"
-			Fichier ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
-			Colonnes ($2) ($18)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Moser-Kim-Mansour"
+			file ./DNS_Moser_Kim_Mansour_Re395_DIM.dat
+			columns ($2) ($18)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($20)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_hydr_calc.dat
+			columns ($2) ($20)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($20)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_hydr_calc.dat
+			columns ($2) ($20)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($20)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_hydr_calc.dat
+			columns ($2) ($20)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
-			Colonnes ($2) ($20)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_hydr_calc.dat
+			columns ($2) ($20)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Mean temperature profile \latex_($<T>$\latex_)"
-		Titre_figure ""
+		Title "Mean temperature profile \latex_($<T>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<T> (K)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($1) ($9)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($1) ($9)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
 		
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($3)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($1) ($3)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional mean temperature profile \latex_($<T^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional mean temperature profile \latex_($<T^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		LogX
 		RangeX 10 366
 		LabelY "<T+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($2) ($10)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($2) ($10)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "Kader's law"
+		Curve {
+			legend "Kader's law"
 			Fonction 0.71*x*exp(-(0.01*(x*0.71)**4)/(1+5*x*0.71**3))+(2.12*log(1+x)+(3.85*0.71**(1./3.)-1.3)**2+2.12*log(0.71))*exp(-(1+5*x*0.71**3)/(0.01*(x*0.71)**4))
 			Style lines
 			TypeLigne 0
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($4)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($2) ($4)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Quadratic mean of temperature \latex_($<T_{rms}>$\latex_)"
-		Titre_figure ""
+		Title "Quadratic mean of temperature \latex_($<T_{rms}>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<Trms> (K)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($1) ($11)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($1) ($11)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($5)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($1) ($5)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($5)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($1) ($5)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($5)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($1) ($5)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($5)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($1) ($5)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional quadratic mean of temperature \latex_($<T_{rms}^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional quadratic mean of temperature \latex_($<T_{rms}^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<Trms+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($2) ($12)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($2) ($12)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($6)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($2) ($6)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($6)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($2) ($6)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($6)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($2) ($6)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($6)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($2) ($6)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Streamwise turbulent heat flux \latex_($<Q_1>$\latex_)"
-		Titre_figure ""
+		Title "Streamwise turbulent heat flux \latex_($<Q_1>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<Q1> (m.K/s)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($1) ($13)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($1) ($13)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($7)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($1) ($7)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional streamwise turbulent heat flux \latex_($<Q_1^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional streamwise turbulent heat flux \latex_($<Q_1^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<Q1+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($2) ($14)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($2) ($14)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($8)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($2) ($8)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Wall-normal turbulent heat flux \latex_($<Q_2>$\latex_)"
-		Titre_figure ""
+		Title "Wall-normal turbulent heat flux \latex_($<Q_2>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y (m)"
 		LabelY "<Q2> (m.K/s)"
 		RangeX 0 1
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($16) ($22)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($16) ($22)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($1) ($9)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($1) ($9)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
 			}
 		}
 	Figure {
-		Titre "Non-dimensional wall-normal turbulent heat flux \latex_($<Q_2^+>$\latex_)"
-		Titre_figure ""
+		Title "Non-dimensional wall-normal turbulent heat flux \latex_($<Q_2^+>$\latex_)"
+		Title_figure ""
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
 		RangeX 0 366
 		LabelY "<Q2+>"
-		InclureDescCourbes 0
-		Legende below
-		Courbe {
-			Legende "DNS Kawamura"
-			Fichier ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
-			Colonnes ($17) ($23)
+		Include_Description_Curves 0
+		legend below
+		Curve {
+			legend "DNS Kawamura"
+			file ./DNS_Kawamura_T0Q_Re395_Pr0.71_DIM.dat
+			columns ($17) ($23)
 			Style lines
 			TypeLigne 20
 			}
-		Courbe {
-			Legende "VDF"
-			Fichier ./T0Q_VDF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VDF"
+			file ./T0Q_VDF/Moyennes_Thydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 2
 			TypePoints 3
 			}
-		Courbe {
-			Legende "VEF"
-			Fichier ./T0Q_VEF/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VEF"
+			file ./T0Q_VEF/Moyennes_Thydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 3
 			TypePoints 2
 			}
-		Courbe {
-			Legende "VEF_Pironneau"
-			Fichier ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VEF_Pironneau"
+			file ./T0Q_VEF_Pironneau/Moyennes_Thydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 4
 			TypePoints 1
 			}
-		Courbe {
-			Legende "VEF_Pironneau (shifted mesh)"
-			Fichier ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
-			Colonnes ($2) ($10)
+		Curve {
+			legend "VEF_Pironneau (shifted mesh)"
+			file ./T0Q_VEF_Pironneau_maillage_decale/Moyennes_Thydr_calc.dat
+			columns ($2) ($10)
 			Style linespoints
 			TypeLigne 6
 			TypePoints 6
@@ -1536,8 +1536,8 @@ Chapitre {
 		}
 }
 
-Chapitre {
-	Titre "Analysis of the results"
+Chapter {
+	Title "Analysis of the results"
 	Description "- On the whole, the VDF simulation seems to give better results than the VEF simulations. The VEF simulations (standard and new approachs) are relatively similar."
 	Description "- Friction velocity: the best friction velocity in the comparison with the theoretical value is obtained with the VDF simulation. The Pironneau simulations give similar relative errors than the standard approach, but the truncated channel is slightly better whereas the whole channel is not as good than the non-Pironneau simulation."
 	Description "- Velocity: for the non-dimensional mean $x$-velocity profile \latex_($<u>$\latex_), the first calculation points for all simulations are located on the Reichardt's law as expected, except for the VEF Pironneau. In this case, the real first point is not represented on the logarithmic graph because it corresponds to $y=0$. Thus the first represented point of the VEF Pironneau profile (in fact the second calculated point) has no reason to satisfy the Reichardt's law."
@@ -1546,8 +1546,8 @@ Chapitre {
 	Description "- Subscale stress tensor components \latex_($<Q_i>$\latex_): all the simulations are in relatively good agreement with the DNS results of Kawamura."
 }
 
-Chapitre {
-	Titre "Computer performance"
+Chapter {
+	Title "Computer performance"
 	Tableau_performance {
 	}
 }

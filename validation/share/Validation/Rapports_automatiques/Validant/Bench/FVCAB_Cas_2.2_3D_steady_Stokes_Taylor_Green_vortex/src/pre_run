@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [ ! -f dom_0000.Zones ]  
+then
+trust Decoupage 2>Decoupage.out 1 >Decoupage.err
+fi

@@ -35,10 +35,10 @@ Chapter {
 	}
 
 	visu {
-		titre "Zoom sur le illage au niveau de la marche"
+		Title "Zoom sur le illage au niveau de la marche"
 		width 15cm,viewport=0 100 1024 300,clip
 		mesh ./marche_VEF_efstab_alpha02_amont/marche_VEF_efstab_alpha02_amont.lata dom
-		origine mesh
+		origin mesh
 		zoom2D -1.0 10.0 -1.0 1.0
 	}
 
