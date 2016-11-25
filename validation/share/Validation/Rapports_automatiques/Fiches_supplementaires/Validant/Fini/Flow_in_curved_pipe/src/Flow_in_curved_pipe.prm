@@ -1,10 +1,10 @@
-Parametres {
-	Titre "Swirling turbulent flow through a curved pipe"
+Parameters {
+	Title "Swirling turbulent flow through a curved pipe"
 	Description "This document is a study to validate Trio_U CFD code to simulate the swirling turbulent flow through a curved pipe. "
 	Description "The validation of hydraulic behaviour is made from comparison with the experiment of Anwer and So, for two different momentum convection scheme."
-	Auteur "LEDAC P., MALOD C.,REUILLON E."
-	Castest Muscl tube_coude 16 /* jdd attached */
-	Castest EF_stab tube_coude 16 
+	Author "LEDAC P., MALOD C.,REUILLON E."
+	TestCase Muscl tube_coude 16 /* jdd attached */
+	TestCase EF_stab tube_coude 16 
 	ParametresTrio_U Type of problem : Hydraulique_turbulent
 	ParametresTrio_U Discretization : VEFPreP1B
 	ParametresTrio_U Time scheme : Euler_Implicite 
@@ -19,37 +19,37 @@ Parametres {
 	Reference $[2]$ M. Answer, R.M.C.So, Swirling turbulent flow through a curved pipe, Part 2 : Recovery from swirl and bend curvature, Experiments in fluids 14,169-177 (1993)
 	Reference $[3]$ ERCOFTAC \latex_(\url{http://cfd.mace.manchester.ac.uk/ercoftac/}\latex_), case number 4"
 	Reference $[4]$ J. Azzola, J. A. C. Humphrey, Developing turbulent flow in a U-bend of circular cross-section : measurement and Computation, Fluids Engineering, 214/Vol.108 (1986) \newpage	
-	InclureData 2	
+	IncludeData 2	
 }
-Chapitre {
-	Titre "Experimental description"
-	Tableau {
-		Titre "Geometry"
+Chapter {
+	Title "Experimental description"
+	Table {
+		Title "Geometry"
 		Description "Dimension of circular pipe : "
 		Description "\latex_(\hspace*{5mm}\latex_) - Pipe diameter  D = 76.2 mm " 
 		Description "\latex_(\hspace*{5mm}\latex_) - Mean bend radius of curvature : R = 495.3mm "
 		Description "\latex_(\hspace*{5mm}\latex_) - Dimensions of straight pipe  : 49D upstream of the bend entrance and 49D downstream of the bend exit \newline"	
 
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\begin{center}\latex_)"
 	}
 	Figure {
 		Width 9cm
-		Image ./configuration.png
+		picture ./configuration.png
 	}	
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 	}
-	Tableau {
-		Titre "Flow characteristics"
+	Table {
+		Title "Flow characteristics"
 		Description "The circular pipe is filled with air with a known kinematic viscosity of \latex_($1.58~.10^{-5}~m^2.s^{-1}$\latex_)."
 		Description " At the entrance of the curved bend, the turbulent flow is fully developped and characterised by a Reynolds number around 50 000."
 		Description "As described in references [1],[2], the hydraulic behaviour on a such geometry is characterised by a plan of symmetry along the axial direction. "
 		
 	}
-	Tableau {
-		Titre "Measurements description"
+	Table {
+		Title "Measurements description"
 		Description "Measurements of three-dimensional velocity field by PIV (Particle Image Velocimetry) were made according to two planes (horizontal plane (AA) and vertical plane (BB)) and various probes locations distributed both in the straight pipe and in the bend section."   	 
                 Description "For reason of symmetry, AA plane is described by the segment [-0.0381mm; 0.0381mm] whereas the BB plane is reduced to the segment [0; 0.0381mm] "
 		Description "The velocity comparisons with Trio_U are made from 8 locations of probes : "
@@ -59,22 +59,22 @@ Chapitre {
 		Description "The pressure distribution and shear stress distribution are compared with Trio_U along the curved bend, both for the internal wall (\latex_($R_{int}=457.2~mm$\latex_)) and external wall (\latex_($R_{ext}=533.4~mm$\latex_)).\newline"		
 		Description "Furthermore, various comparisons are also made with the observation of flow distribution in section of circular pipe. This study allows notably to enhance the reversal of flow in a bend part of the pipe."   
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \begin{center} \latex_)
 	}
 	Figure {
 		Width 8cm
-		Image ./UVW.jpg
+		picture ./UVW.jpg
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)
 	}	
 }
-Chapitre {	
-	Titre "Test description"	
+Chapter {	
+	Title "Test description"	
 	
-	Tableau {
-		Titre "Meshes"
+	Table {
+		Title "Meshes"
 		Description "As described in references [1],[2], the hydraulic behaviour on a such geometry is characterized by a plan of symmetry. Thus, the mesh of the pipe is built from only one half of the computational domain"
 		Description " In order to reproduce the flow characteristics of the experiment, the entrance of the domain is extruded on two layers, forming a periodic box. Such a box allows to provide the inlet fully-developped turbulent flow that we need at the entrance of the pipe.\newline"
 		Description " Because the turbulent flow is established beforehand, the computational domain is reduced and the straight pipe spreads of the range [-2D; 11D]"
@@ -82,7 +82,7 @@ Chapitre {
 		Description " - near the wall, the mesh is refined on three layers, with a cell mesh size around 2.5 mm "
 		Description " - on the major part of domain, the characteristic size of mesh cell is around 5mm \newline "
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\begin{center} \latex_)
 	}
@@ -95,15 +95,15 @@ Chapitre {
 	        operator_to_all no_legend
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{5mm}\latex_)" 
 	}	
 	Figure {
 		Description "\latex_(\textbf{Zoom on the entrance of computational domain} \latex_)"
 		Width 6.5cm
-		Image ./meshzoom0000.png
+		picture ./meshzoom0000.png
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	visu {
@@ -116,18 +116,18 @@ Chapitre {
 		operator no_databaseinfo	
 		normal3D 0. 0.5 1 	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center} \latex_)
 	}
-	Tableau {
-		Titre "Physical properties"
+	Table {
+		Title "Physical properties"
 		Description "\latex_(\textbf{Incompressible case:}\latex_)"
 		Description " \latex_(\hspace*{10mm} $ \rho=1.205~kg.m^{-3} $\latex_) "
 		Description " \latex_(\hspace*{10mm} $ \mu=1.90.10^{-5}~kg.m^{-1}.s^{-1} $\latex_) "
 		Description "\latex_(\hspace*{10mm}$\nu = 1.58e-5~m^{2}.s^{-1}$\latex_)"	
 	}
-	Tableau {
-		Titre "Initial and boundaries conditions"
+	Table {
+		Title "Initial and boundaries conditions"
 		Description "Initial conditions : \latex_(\hspace*{11mm}\latex_) the velocity field is set to 0 for each component.
 		Description "\latex_(\hspace*{42mm}\latex_) Values of k-eps model are computed by assuming a turbulence rate around 10 percents" 
 		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law on bottom and side of calculation domain,"
@@ -136,7 +136,7 @@ Chapitre {
 		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet of calculation domain,"
 		Description "\latex_(\hspace*{45mm}\latex_)Similar to velocity field, the boundary conditions for values of k-eps model are given by the fields computed in the box.\newline"
 	}
-	Tableau {
+	Table {
 		Description " In order to be able to use the friction law in appropriated conditions, the mesh needs to be characterized by a \latex_($Y^{+}\approx 30$\latex_). For this reason, we can observe this field in the figure below.\newline"
 		Description "\latex_( \begin{center} \latex_)"
 	}
@@ -153,15 +153,15 @@ Chapitre {
 		operator no_databaseinfo		
 		#operator_to_all no_legend
 	}	
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
 }
-Chapitre {
-	Titre "Miscellaneous descriptions"
+Chapter {
+	Title "Miscellaneous descriptions"
 
-	Tableau {
-		Titre "Velocity field"
+	Table {
+		Title "Velocity field"
 		Description "Velocity field is described in toroidal coordinates, with U, V, W which are the mean velocities along the radial, tangential and axial directions, respectively." 
                 Description " Axial component mean velocity is given by :"
 		Description " \latex_( \[ W = (Ux*cos(atan(x/y))-Uy*sin(atan(x/y)))~~ in~ curved ~pipe, \]\latex_)"
@@ -170,36 +170,36 @@ Chapitre {
 		Description "\latex_( \[ V= (-Ux*sin(atan(x/y))-Uy*cos(atan(x/y)))~~ in~ curved ~pipe, \]\latex_)"
 		Description " \latex_( \[ V=\pm U_y~ ~in ~straight ~pipe \] \latex_)  " 
 	}
-	Tableau {
-		Titre "Pipe Reynolds number" 
+	Table {
+		Title "Pipe Reynolds number" 
 		Description "\latex_(\[ Re~=~\frac{W_0~D_h}{\nu}~~,\]\latex_)"
 		Description "where \latex_( $W_0=10.4~m.s^{-1} $\latex_) is the mean bulk velocity"		
 	}	
-	Tableau {
-		Titre "Friction coefficient"
+	Table {
+		Title "Friction coefficient"
 		Description "The mean total wall shear stress \latex_($\tau_\omega$\latex_) is estimated in terms of total skin friction coefficient, with : "
 		Description "\latex_( \[ C_f=\frac{2~\tau_\omega}{\rho~W^2_0}=2~\left( \frac{U^{*}}{W_0}\right)^2 \] \latex_) "
 		Description "where \latex_($U^{*}$ \latex_) is the total wall friction velocity, such as : "
 		Description "\latex_(\[ U^{*}=\sqrt{\frac{\tau_\omega}{\rho}} \]\latex_) "
 	}
-	Tableau { 
-		Titre "Blasius law for a pipe flow"
+	Table { 
+		Title "Blasius law for a pipe flow"
 		Description " \latex_( \[U^{*}=W_0~\sqrt{\frac{1}{2} 0.079~Re^{-0.25}}=W_0~\sqrt{\frac{1}{2} C_f} \] \latex_)"
 		Description "According to the previous formulation, and using experimental flow characteristics, the theoritical value of wall friction velocity is  :" 
 		Description " \latex_( $U^{*}~=~ 10.4~~\sqrt{\frac{1}{2} 0.079~\left(50 000\right)^{-0.25}}~=~ 0.535~m.s^{-1}$\latex_)"
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 }
-Chapitre {
-	Titre "Convergence study of turbulent flow"
+Chapter {
+	Title "Convergence study of turbulent flow"
 
-	Tableau {
-		Titre "Turbulent parameters and velocity field in upstream part of the curved pipe"
+	Table {
+		Title "Turbulent parameters and velocity field in upstream part of the curved pipe"
 		Description "In order to check the establishment of the fully developed turbulent flow in the entrance of the computational domain, the turbulent characteristic parameters and the components of the velocity are plotted in the graphs below, for a probe put on the straight boundary of the box, at y=-2D." 
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\begin{center}\latex_)"
 	}
 	Figure {
@@ -208,17 +208,17 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "k"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "k"
-			Fichier ./Muscl/box_SONDE_KENTREE.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "k"
+			file ./Muscl/box_SONDE_KENTREE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 16
+			columns 1 16
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{6mm}\latex_) 
 	}
 	Figure {
@@ -227,17 +227,17 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "epsilon"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "eps"
-			Fichier ./Muscl/box_SONDE_EPSENTREE.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "eps"
+			file ./Muscl/box_SONDE_EPSENTREE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 16
+			columns 1 16
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -246,18 +246,18 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Kinematic viscosity"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "nu_t"
-			Fichier ./Muscl/box_SONDE_NUTENTREE.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "nu_t"
+			file ./Muscl/box_SONDE_NUTENTREE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 16
+			columns 1 16
 			Style lines
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -267,38 +267,38 @@ Chapitre {
 		#RangeX 0. 15.
 		LabelY "Velocity [m/s]"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "V_x"
-			Fichier ./Muscl/box_SONDE_VENTREE.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "V_x"
+			file ./Muscl/box_SONDE_VENTREE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 47
+			columns 1 47
 			Style lines
 		}
-		Courbe {
-			Legende "V_y"
-			Fichier ./Muscl/box_SONDE_VENTREE.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_y"
+			file ./Muscl/box_SONDE_VENTREE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 48
+			columns 1 48
 			Style lines
 		}
-		Courbe {
-			Legende "V_z"
-			Fichier ./Muscl/box_SONDE_VENTREE.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_z"
+			file ./Muscl/box_SONDE_VENTREE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 49
+			columns 1 49
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 		Description "\newpage"
 	}
-	Tableau {
-		Titre "Convergence study in the curved pipe"
+	Table {
+		Title "Convergence study in the curved pipe"
 		Description "\latex_( \begin{center} \latex_)"
 	}
 	Figure {
@@ -308,61 +308,61 @@ Chapitre {
 		#RangeX 0. 15.
 		LabelY "Velocity [m/s]"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "V_x, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude_VITESSE_A_TETA_22.5.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "V_x, Muscl convection scheme"
+			file ./Muscl/tube_coude_VITESSE_A_TETA_22.5.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "V_x, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude_VITESSE_A_TETA_22.5.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_x, EF_stab convection scheme"
+			file ./EF_stab/tube_coude_VITESSE_A_TETA_22.5.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "V_y, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude_VITESSE_A_TETA_22.5.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_y, Muscl convection scheme"
+			file ./Muscl/tube_coude_VITESSE_A_TETA_22.5.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "V_y, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude_VITESSE_A_TETA_22.5.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_y, EF_stab convection scheme"
+			file ./EF_stab/tube_coude_VITESSE_A_TETA_22.5.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "V_z, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude_VITESSE_A_TETA_22.5.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_z, Muscl convection scheme"
+			file ./Muscl/tube_coude_VITESSE_A_TETA_22.5.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "V_z, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude_VITESSE_A_TETA_22.5.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_z, EF_stab convection scheme"
+			file ./EF_stab/tube_coude_VITESSE_A_TETA_22.5.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 	}
-	Tableau {
-		Titre "Convergence study downstream of the curved pipe"
+	Table {
+		Title "Convergence study downstream of the curved pipe"
 		Description "\latex_( \begin{center} \latex_)"
 	}
 	Figure {
@@ -372,61 +372,61 @@ Chapitre {
 		#RangeX 0. 15.
 		LabelY "Velocity [m/s]"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "V_x, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "V_x, Muscl convection scheme"
+			file ./Muscl/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "V_y, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_y, Muscl convection scheme"
+			file ./Muscl/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "V_z, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_z, Muscl convection scheme"
+			file ./Muscl/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "V_x, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_x, EF_stab convection scheme"
+			file ./EF_stab/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "V_y, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_y, EF_stab convection scheme"
+			file ./EF_stab/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "V_z, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
-			Origine "Trio_U"
+		Curve {
+			legend "V_z, EF_stab convection scheme"
+			file ./EF_stab/tube_coude_VITESSE_A_S_SUR_D_EGAL_1.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 	}
-	Tableau {
-		Titre "Simulation's average time step" 
+	Table {
+		Title "Simulation's average time step" 
         	Description "Evolution of average time step described in the figure below, shows that the simulation computed with EF-stab convection scheme reaches the convergence faster than the other computed with Muscl convection scheme. So, we have only 0.4 s of physical time for the first simulation whereas in the second case we stop the calculation at 0.5 s."
 		Description "\latex_(\begin{center}\latex_)"
 	}
@@ -436,35 +436,35 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Average time step"
 		#RangeY -0.2 0.15
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Triou, Muscl convection scheme"
-			Fichier ./Muscl/tube_coude.dt_ev
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		Curve {
+			legend "Triou, Muscl convection scheme"
+			file ./Muscl/tube_coude.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab convection scheme"
-			Fichier ./EF_stab/tube_coude.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab convection scheme"
+			file ./EF_stab/tube_coude.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 		Description "To conclude, the temporal evolution of each component of velocity field, displays for two probes in the previous graphs, shows that the flow is stable until 0.2 s for the two convection schemes tested.\newline"
 		Description "\newpage"
 	}
 	
 }
-Chapitre {
-	Titre " Hydraulic study : main results"
-	Tableau {
-		Titre "Pression along the curved pipe"
+Chapter {
+	Title " Hydraulic study : main results"
+	Table {
+		Title "Pression along the curved pipe"
 		Description "In the figure below, the pressure along the curved pipe is diplayed both for the internal wall (\latex_($R_{in}=R-\frac{D}{2}$\latex_)) and for the external wall (\latex_($R_{out}=R+\frac{D}{2}$\latex_))."
 		Description "The curvilinear abscissa used to plot this field, is defined in the range [-2 ; 31.42], such as : "
 		Description " - upstream of the curve \latex_(($y=n*D <0$)\latex_) : \latex_( \hspace*{5mm} $\frac{s}{D}= \frac{y}{D}=n $\latex_),"
@@ -477,74 +477,74 @@ Chapitre {
 		LabelX "s/D"
 		RangeX -3. 35.
 		LabelY "(P-P0)/(0.5 rho W0*W0)"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Pression IN, Expe"
-			Fichier ./data/pression_in_out_expe.txt
-			Origine "Trio_U"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Pression IN, Expe"
+			file ./data/pression_in_out_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style points
 		}
-		Courbe {
-			Legende "Pression IN, Triou Muscl"
-			Fichier ./Muscl/PRESSION_ALL_PAROI_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Pression IN, Triou Muscl"
+			file ./Muscl/PRESSION_ALL_PAROI_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)	
+			columns ($1) ($2)	
 			Style lines
 		}
-		Courbe {
-			Legende "Pression IN, Triou EF_stab"
-			Fichier ./EF_stab/PRESSION_ALL_PAROI_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Pression IN, Triou EF_stab"
+			file ./EF_stab/PRESSION_ALL_PAROI_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style lines
 		}		
-		Courbe {
-			Legende "Pression OUT, Expe"
-			Fichier ./data/pression_in_out_expe.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Pression OUT, Expe"
+			file ./data/pression_in_out_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Pression OUT, Triou Muscl"
-			Fichier ./Muscl/PRESSION_ALL_PAROI_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Pression OUT, Triou Muscl"
+			file ./Muscl/PRESSION_ALL_PAROI_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Pression OUT, Triou EF_stab"
-			Fichier ./EF_stab/PRESSION_ALL_PAROI_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Pression OUT, Triou EF_stab"
+			file ./EF_stab/PRESSION_ALL_PAROI_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}	
 		
 	}
-	Tableau {	
+	Table {	
 		Description "The pressure field seems to be correctly reproduced by the Trio_U simulation even if we notice a difference around \latex_($15~\%$ \latex_) between simulation and experiment downstream of the curve."		 
 		Description "Under these conditions, we expect to find the Dean cell and the second cell formed near the pipe center of the curved pipe, which result of a local imbalance of centrifugal force and radial pressure gradient."
 	}
-	Tableau {
-		Titre "Velocity field distribution in the curved pipe"
+	Table {
+		Title "Velocity field distribution in the curved pipe"
 		Description "The next figures show the evolution of velocity field distribution in the curved pipe."
 		Description " In order to investigate the swirling flow characteristics, we have placed 8 probes : "
 		Description "\latex_(\hspace*{5mm}\latex_) - in the straight pipe : S/D=-1; (upstream of the curve)"
 		Description "\latex_(\hspace*{5mm}\latex_) - in the curved pipe : \latex_($\theta=\frac{\pi}{8},~\theta=\frac{3\pi}{8},~\theta=\frac{5\pi}{8},~\theta=\frac{7\pi}{8}~,~with~\theta $ in radian\latex_) "
 		Description "\latex_(\hspace*{5mm}\latex_)- in the straight pipe : S/D=1; S/D=6; S/D=10 ; (downstream of the curve)"
 		}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{30mm}\latex_)" 
 		Description "\latex_(\begin{center} \latex_)"
 	}	
@@ -557,7 +557,7 @@ Chapitre {
 		operator slice2D  0 -0.0762 0  0 -1 0
 		zoom2D -0.54 -0.45 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)"
 	}
 	Visu {
@@ -569,7 +569,7 @@ Chapitre {
 		operator slice2D  0 -0.0762 0  0 -1 0
 		zoom2D -0.54 -0.45 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	} 
 	Visu {	
@@ -587,7 +587,7 @@ Chapitre {
 		operator slice2D  0 -0.0762 0  0 -1 0
 		zoom2D -0.54 -0.45 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{3mm}\latex_)" 
 	}
 	Visu {
@@ -601,7 +601,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D -0.54 -0.45 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_)" 
 	}
@@ -614,7 +614,7 @@ Chapitre {
 		operator slice2D  0 0 0  -0.383 -0.924 0
 		zoom2D -0.54 -0.45 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)" 
 	}
 	Visu {
@@ -625,7 +625,7 @@ Chapitre {
 		operator slice2D  0 0 0  -0.383 -0.924 0
 		zoom2D -0.54 -0.45 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -657,7 +657,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D -0.54 -0.45 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_) "
 	}
@@ -670,7 +670,7 @@ Chapitre {
 		operator slice2D  0 0 0  -0.924 0.383 0
 		zoom2D -0.54 -0.45 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)" 
 	}
 	Visu {
@@ -682,7 +682,7 @@ Chapitre {
 		operator slice2D  0 0 0  -0.924 0.383 0
 		zoom2D -0.54 -0.45 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -714,7 +714,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D -0.54 -0.45 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_)" 
 	}
@@ -727,7 +727,7 @@ Chapitre {
 		operator slice2D  0 0 0  0.924 -0.383 0
 		zoom2D 0.45 0.55 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)" 
 	}
 	Visu {
@@ -738,7 +738,7 @@ Chapitre {
 		operator slice2D  0 0 0  0.924 -0.383 0
 		zoom2D 0.45 0.55 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -770,7 +770,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D 0.45 0.54 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_)" 
 	}
@@ -783,7 +783,7 @@ Chapitre {
 		operator slice2D  0 0 0  0.383 -0.924 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)" 
 	}
 	Visu {
@@ -795,7 +795,7 @@ Chapitre {
 		operator slice2D  0 0 0  0.383 -0.924 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -827,7 +827,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D 0.45 0.54 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_)"
 	}
@@ -840,7 +840,7 @@ Chapitre {
 		operator slice2D  0 -0.0762 0  0 -1 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)" 
 	}
 	Visu {
@@ -852,7 +852,7 @@ Chapitre {
 		operator slice2D  0 -0.0762 0  0 -1 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -884,7 +884,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D 0.45 0.54 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_)" 
 	}
@@ -897,7 +897,7 @@ Chapitre {
 		operator slice2D  0 -0.4572 0  0 -1 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_)" 
 	}
 	Visu {
@@ -909,7 +909,7 @@ Chapitre {
 		operator slice2D 0 -0.4572 0  0 -1 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -941,7 +941,7 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D 0.45 0.54 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\vspace*{30mm}\latex_)" 
 	}
@@ -954,7 +954,7 @@ Chapitre {
 		operator slice2D  0 -0.762 0  0 -1 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{15mm}\latex_) 
 	}
 	Visu {
@@ -965,7 +965,7 @@ Chapitre {
 		operator slice2D 0 -0.762 0  0 -1 0
 		zoom2D 0.45 0.54 0.0 0.04	
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {	
@@ -997,18 +997,18 @@ Chapitre {
         	#Operator no_bounding_box
 		zoom2D 0.45 0.54 0.0 0.04
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
 		Description "Description of secondary flow patterns in the curved pipe"
 		Width 8cm
-		Image ./ecoulement1.png
+		picture ./ecoulement1.png
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_) "
 	}
-	Tableau {
+	Table {
 		Description "According to the review [1], essentially three secondary cells are observed in the cross-stream half plane of a curved pipe flow : "
 		Description " - the Dean cell,"
 		Description " - the second cell near the pipe center,"
@@ -1019,8 +1019,8 @@ Chapitre {
 		Description " - the turbulence driven cell appears in the entrance of the curved bend (\latex_($\theta=\frac{\pi}{8}$\latex_)) and reaches its maximum for (\latex_($\frac{3\pi}{8}\leq \theta \leq\frac{5\pi}{8}$\latex_)). This cells progressively disappears along the curved-pipe, whith the decrease of turbulence intensity.\newline"
 		Description "Otherwise, it should be pointed out that the maximum of radial velocity W shifts from the inner bend to the outer bend."
 	}
-	Tableau {
-		Titre "Axial and tangential component of the velocity"
+	Table {
+		Title "Axial and tangential component of the velocity"
 		Description " The next study makes the comparison beetween simulation and experiment for the projection of radial and tangential velocity profiles on both horizontal plane (AA) and vertical plane (BB)". 
          	Description "In toroidal coordinates, V characterizes the mean velocity along the tangential direction. For reasons of symmetry, this velocity value is near zero on the AA plane. So, the next graphs shows only this value for the BB plane. \newline"
 		Description "The study of radial velocity distribution shows that the W maximum increases as the flow moves through the bend while W decreases near the inner bend. As a result, the W profile along AA is highly asymmetric, while it is symmetric and more uniform along BB."
@@ -1028,7 +1028,7 @@ Chapitre {
 		Description "For tangential velocity V, the experimental data [3] are not consistent with litterature [1]. The calculations are compared with the results given in litterature and are very close from these results. As it is assumed in the litterature, the number of times where V crosses zero allong BB, indicates the number of cells present in the cross-stream half plane, we  can deduce that the simulation is characterized by the presence of three cells (see probe located at \latex_($\theta=\frac{3\pi}{8}$\latex_))."
 
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\begin{center}\latex_)"
 	}
@@ -1039,34 +1039,34 @@ Chapitre {
 		RangeX -1. 1.
 		LabelY "W/W0 "
 		RangeY  0 1.4
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_SDM1_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_SDM1_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_SDM1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_SDM1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_SDM1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_SDM1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1076,34 +1076,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_SDM1_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_SDM1_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_SDM1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_SDM1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_SDM1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_SDM1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1113,35 +1113,35 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_teta22.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_teta22.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_TETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_TETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
 			#Colonnes (((sqrt($1*$1+$2*$2))-0.4953)*(-1./0.0381)) ($4)
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_TETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_TETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1151,34 +1151,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_teta22.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_teta22.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_TETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_TETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_TETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_TETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 		Figure {
@@ -1188,34 +1188,34 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_teta67.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_teta67.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_TETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_TETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_TETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_TETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1225,34 +1225,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_teta67.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_teta67.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_TETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_TETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_TETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_TETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1262,34 +1262,34 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_teta112.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_teta112.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_TETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_TETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_TETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_TETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1299,34 +1299,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_teta112.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_teta112.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_TETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_TETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_TETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_TETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1336,34 +1336,34 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_teta157.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_teta157.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_TETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_TETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_TETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_TETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($4) ($5)
+			columns ($4) ($5)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1373,34 +1373,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_teta157.5_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_teta157.5_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_TETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_TETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_TETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_TETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1410,34 +1410,34 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_SDP1_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_SDP1_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_SDP1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_SDP1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_SDP1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_SDP1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1447,34 +1447,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_SDP1_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_SDP1_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_SDP1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_SDP1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_SDP1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_SDP1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-		Tableau {
+		Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1484,34 +1484,34 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0 "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_SDP6_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_SDP6_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_SDP6_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_SDP6_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_SDP6_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_SDP6_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1521,34 +1521,34 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_SDP6_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_SDP6_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_SDP6_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_SDP6_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_SDP6_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_SDP6_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-		Tableau {
+		Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1558,34 +1558,34 @@ Chapitre {
 		RangeX -1. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planAA_SDP10_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planAA_SDP10_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_AA_SDP10_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_AA_SDP10_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_AA_SDP10_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_AA_SDP10_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($4)
+			columns ($1) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1595,38 +1595,38 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY  0 1.4
 		LabelY "W/W0"
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/vitesse_planBB_SDP10_expe.txt
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/vitesse_planBB_SDP10_expe.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEW_BB_SDP10_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEW_BB_SDP10_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEW_BB_SDP10_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEW_BB_SDP10_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 		Description "\newpage"
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\begin{center}\latex_)"
 	}
 	Figure {
@@ -1636,36 +1636,36 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY -0.25 0.25
 		LabelY "V/W0 "
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
 #			Fichier ./data/vitesse_planBB_SDM1_expe.txt
-			Fichier ./data/s_d_M1_bis.dat
-			Origine "Trio_U"
+			file ./data/s_d_M1_bis.dat
+			origin "Trio_U"
 			Version "1.6.6"
 #			Colonnes ($1) ($4/10.4)
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEV_BB_SDM1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEV_BB_SDM1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEV_BB_SDM1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEV_BB_SDM1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{6mm}\latex_) 
 	}
 	Figure {
@@ -1675,36 +1675,36 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY -0.25 0.25
 		LabelY "V/W0"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
 #			Fichier ./data/vitesse_planBB_teta22.5_expe.txt
-			Fichier ./data/teta_22.dat
-			Origine "Trio_U"
+			file ./data/teta_22.dat
+			origin "Trio_U"
 			Version "1.6.6"
 #			Colonnes ($1) ($4/10.4)
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, muscl"
-			Fichier ./Muscl/VITESSEV_BB_TETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, muscl"
+			file ./Muscl/VITESSEV_BB_TETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEV_BB_TETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEV_BB_TETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1714,36 +1714,36 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY -0.25 0.25
 		LabelY "V/W0"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
 #			Fichier ./data/vitesse_planBB_teta67.5_expe.txt
-			Fichier ./data/teta_67.dat
-			Origine "Trio_U"
+			file ./data/teta_67.dat
+			origin "Trio_U"
 			Version "1.6.6"
 #			Colonnes ($1) ($4/10.4)
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/VITESSEV_BB_TETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/VITESSEV_BB_TETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEV_BB_TETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEV_BB_TETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1753,36 +1753,36 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY -0.25 0.25
 		LabelY "V/W0"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
 #			Fichier ./data/vitesse_planBB_teta112.5_expe.txt
-			Fichier ./data/teta_112.dat
-			Origine "Trio_U"
+			file ./data/teta_112.dat
+			origin "Trio_U"
 			Version "1.6.6"
 #			Colonnes ($1) ($4/10.4)
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/VITESSEV_BB_TETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/VITESSEV_BB_TETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEV_BB_TETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEV_BB_TETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage
 	}
 	Figure {
@@ -1792,36 +1792,36 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY -0.25 0.25
 		LabelY "V/W0"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
 #			Fichier ./data/vitesse_planBB_teta157.5_expe.txt
-			Fichier ./data/teta_157.dat
-			Origine "Trio_U"
+			file ./data/teta_157.dat
+			origin "Trio_U"
 			Version "1.6.6"
 #			Colonnes ($1) ($4/10.4)
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/VITESSEV_BB_TETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/VITESSEV_BB_TETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEV_BB_TETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEV_BB_TETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1831,44 +1831,44 @@ Chapitre {
 		RangeX 0. 1.
 		RangeY -0.25 0.25
 		LabelY "V/W0"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
 #			Fichier ./data/vitesse_planBB_SDP1_expe.txt
-			Fichier ./data/s_d_1.dat
-			Origine "Trio_U"
+			file ./data/s_d_1.dat
+			origin "Trio_U"
 			Version "1.6.6"
 #			Colonnes ($1) ($4/10.4)
-			Colonnes ($1) ($2)
+			columns ($1) ($2)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/VITESSEV_BB_SDP1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/VITESSEV_BB_SDP1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF stab"
-			Fichier ./EF_stab/VITESSEV_BB_SDP1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF stab"
+			file ./EF_stab/VITESSEV_BB_SDP1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($3) ($4)
+			columns ($3) ($4)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "\latex_(\end{center}\latex_)"
 	}
-	Tableau {
-		titre "Shear stress"
+	Table {
+		Title "Shear stress"
 		Description "The next graphs show the wall friction coefficient distribution around the circumference"
 	}
-	Tableau {
+	Table {
 		#Description "\newpage"
 		Description "\latex_(\begin{center}\latex_)"
 	}
@@ -1879,34 +1879,34 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($3/1000)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($3/1000)
 			Style points
 		}		
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_S_SUR_D_EGAL_M1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_S_SUR_D_EGAL_M1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_S_SUR_D_EGAL_M1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_S_SUR_D_EGAL_M1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{6mm}\latex_) 
 	}
 	Figure {
@@ -1916,35 +1916,35 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($4/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($4/1000.)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_THETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_THETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_THETA_22.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_THETA_22.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 		
 		
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1954,34 +1954,34 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($5/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($5/1000.)
 			Style points
 		}		
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_THETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_THETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_THETA_67.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_THETA_67.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -1991,33 +1991,33 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($6/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($6/1000.)
 			Style points
 		}		
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_THETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_THETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_THETA_112.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_THETA_112.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -2027,34 +2027,34 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($7/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($7/1000.)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_THETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_THETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_THETA_157.5_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_THETA_157.5_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}	
 	Figure {
@@ -2064,33 +2064,33 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($8/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($8/1000.)
 			Style points
 		}		
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_S_SUR_D_EGAL_P1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_S_SUR_D_EGAL_P1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_S_SUR_D_EGAL_P1_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_S_SUR_D_EGAL_P1_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -2100,33 +2100,33 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($9/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($9/1000.)
 			Style points
 		}
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_S_SUR_D_EGAL_P6_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_S_SUR_D_EGAL_P6_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}		
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_S_SUR_D_EGAL_P6_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_S_SUR_D_EGAL_P6_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_) 
 	}
 	Figure {
@@ -2136,33 +2136,33 @@ Chapitre {
 		RangeX 0. 180.
 		RangeY 0.001 0.011
 		LabelY "Cf"
-		Legende top right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Expe"
-			Fichier ./data/Coef_frottement_paroi_alldata_expe.txt
-			Origine "Expe"
-			Colonnes ($1) ($10/1000.)
+		legend top right
+		Include_Description_Curves 0
+		Curve {
+			legend "Expe"
+			file ./data/Coef_frottement_paroi_alldata_expe.txt
+			origin "Expe"
+			columns ($1) ($10/1000.)
 			Style points
 		}		
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./Muscl/U_STAR_A_S_SUR_D_EGAL_P10_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./Muscl/U_STAR_A_S_SUR_D_EGAL_P10_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab"
-			Fichier ./EF_stab/U_STAR_A_S_SUR_D_EGAL_P10_triou.txt
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab"
+			file ./EF_stab/U_STAR_A_S_SUR_D_EGAL_P10_triou.txt
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes ($1) ($3)
+			columns ($1) ($3)
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 		Description " As it is expected [1], the friction coefficient Cf decreases from the outer bend (\latex_($\Phi=0$\latex_) degrees) to the inner bend (\latex_($\Phi=180$\latex_) degrees)."
 		Description "In addition, this figures show that Cf increases along the curve bend. This amplification is generated both by the bend curvature and by the secondary motion in the cross stream plane (Dean cells and others secondary cells). \newline"  	
@@ -2171,12 +2171,12 @@ Chapitre {
 	}	
 	
 }	
-Chapitre {
-	Titre "Conclusion"
+Chapter {
+	Title "Conclusion"
 	Description "In summary, it can be said that the Trio_U's simulation is enable to reproduce the three types of secondary cells in the cross-stream half plan of a turbulent curved-pipe flow. The Dean cell and the secondary motion cell near th pipe center, driven by centrifugal force and pressure imbalance and the third cell near the outer bend, driven by the turbulent stresses and their gradients." 
 }
-Chapitre {
-	Titre "Computer performance"
+Chapter {
+	Title "Computer performance"
 	tableau_performance {
 	}
 }

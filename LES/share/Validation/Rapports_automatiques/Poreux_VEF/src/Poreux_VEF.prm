@@ -331,7 +331,7 @@ Chapter {
 Chapter {
     Description "With Trio_U version 1.7.0 (without correction) we had velocity max in order of 1.e-02 and convergence at t=0.2586 s."
     Figure {
-        Image Poreux_Boussinesq_VEF_3D_v170.png
+        picture Poreux_Boussinesq_VEF_3D_v170.png
         Width 12cm
     }
 

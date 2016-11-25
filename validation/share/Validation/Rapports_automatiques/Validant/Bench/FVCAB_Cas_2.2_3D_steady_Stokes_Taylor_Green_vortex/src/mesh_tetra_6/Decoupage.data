@@ -1,0 +1,15 @@
+Dimension 3
+Domaine dom
+Lire_med family_names_from_group_names dom mesh_tetra_6 mesh_tetra_6.med
+
+VerifierCoin dom { }
+
+Decouper dom
+{
+	Partitionneur metis { Nb_parts 6 }
+	Larg_joint 2
+	Nom_Zones dom
+	Nb_parts_tot 6
+}
+
+Fin

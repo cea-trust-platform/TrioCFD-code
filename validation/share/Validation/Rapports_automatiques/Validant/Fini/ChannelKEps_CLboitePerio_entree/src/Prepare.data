@@ -21,7 +21,7 @@ ExtrudeBord
 	domaine_init DOM_BODY direction 0.4 0. 0.
 	domaine_final boxperio nom_bord INLET
 	nb_tranches 2
-
+	sans_passer_par_le2D 0  /* for nr */
 }
 	
 Regroupebord boxperio PERIO { devant derriere }

@@ -1,0 +1,35 @@
+# On exécute le script seulement si le Cas2 a tourné
+if [ -f "Cas2.err" ]
+	then
+	extrait_coupe Cas1 DIAGONALE_VORTICITE
+	extrait_coupe Cas1 DIAGONALE_VORTICITE_SOM
+	extrait_coupe Cas1 DIAGONALE_PSI
+	extrait_coupe Cas1 DIAGONALE_PSI_SOM
+
+	extrait_coupe Cas2 DIAGONALE_VORTICITE
+	extrait_coupe Cas2 DIAGONALE_VORTICITE_SOM
+	extrait_coupe Cas2 DIAGONALE_PSI
+	extrait_coupe Cas2 DIAGONALE_PSI_SOM
+
+	sizeVDF=`grep "mean(volume cells)" Cas1.err | awk '{print $3}'`
+	sizeVEF=`grep "Average cell size" Cas1.err | awk '{print $5}'`
+
+	Cas1_errw2=`cat Cas1_ERRW2.son | tail -1 | awk '{print $2}'`
+	Cas1_errwinf=`cat Cas1_ERRWINF.son | tail -1 | awk '{print $2}'`
+
+	Cas2_errw2=`cat Cas2_ERRW2.son | tail -1 | awk '{print $2}'`
+	Cas2_errwinf=`cat Cas2_ERRWINF.son | tail -1 | awk '{print $2}'`
+
+	Cas2_errpsi2=`cat Cas2_ERRPSI2.son | tail -1 | awk '{print $2}'`
+	Cas2_errpsiinf=`cat Cas2_ERRPSIINF.son | tail -1 | awk '{print $2}'`
+
+	echo $_SIZE_" "$Cas1_errw2 >> ../Cas1_errw2__DIS_
+	echo $_SIZE_" "$Cas1_errwinf >> ../Cas1_errwinf__DIS_
+
+	echo $_SIZE_" "$Cas2_errw2 >> ../Cas2_errw2__DIS_
+	echo $_SIZE_" "$Cas2_errwinf >> ../Cas2_errwinf__DIS_
+
+	echo $_SIZE_" "$Cas2_errpsi2 >> ../Cas2_errpsi2__DIS_
+	echo $_SIZE_" "$Cas2_errpsiinf >> ../Cas2_errpsiinf__DIS_
+	else exit
+fi

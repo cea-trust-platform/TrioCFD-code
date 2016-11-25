@@ -1,5 +1,5 @@
-Parametres {
-	Titre "Low_Reynolds models"
+Parameters {
+	Title "Low_Reynolds models"
 	Description ""
 	ParametresTrio_U Type of problem : Hydraulique_Turbulent
 	ParametresTrio_U Diffusion scheme : Default{}
@@ -9,16 +9,16 @@ Parametres {
 	ParametresTrio_U Convection : quick or ef_stab
 	ParametresTrio_U Turbulence model : K-Epsilon
 
-	Castest  LS_20000 test.data  
-	Castest  JL_20000 test.data
-	Castest  LS_20000_yplus_003 test.data  
-	Castest  LS_20000_yplus_006 test.data
-	Castest  Step_VDF test.data
-	Castest  Step_VDF_LS test.data
-	Castest  Step_VEF_LS test.data
+	TestCase  LS_20000 test.data  
+	TestCase  JL_20000 test.data
+	TestCase  LS_20000_yplus_003 test.data  
+	TestCase  LS_20000_yplus_006 test.data
+	TestCase  Step_VDF test.data
+	TestCase  Step_VDF_LS test.data
+	TestCase  Step_VEF_LS test.data
 
-	Auteur "M.P."
-	InclureData 2
+	Author "M.P."
+	IncludeData 2
 
 	Reference " 1: Launder, B. E. and Sharma, B. I. (1974), Application of the Energy-Dissipation Model of Turbulence to the Calculation of Flow Near a Spinning Disc, Letters in Heat and Mass Transfer, Vol. 1, No. 2, pp. 131-138." 
 
@@ -37,8 +37,8 @@ Chapter {
 }
 
 
-Chapitre {
-	Titre "Channel test "
+Chapter {
+	Title "Channel test "
 	Description "Geometry : channel"
 	Description "Dimensions : Lx=2, Ly=2, Lz=1"
 #	Description "Mesh : 60x32 (dx+= ; dy+= )"
@@ -46,8 +46,8 @@ Chapitre {
 	Description "Boundary conditions : The periodicity conditions need a source term to maintain the flow constant"
 	
 	
-	Tableau {
-		Titre "Physical properties"
+	Table {
+		Title "Physical properties"
 		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
 		Description "$\rho = 1$ \latex_($kg.m^{-3}$\latex_)"
 		Description "$\mu$ = 1.e-5 such as \latex_($Re = (u.D_h) / \nu = 20000$\latex_) (h=2 : height)"
@@ -56,16 +56,16 @@ Chapitre {
 	}
 
 	visu {
-		titre "mesh"
+		Title "mesh"
 		mesh LS_20000/test.lata dom_pb1
 		operator slice 0 0 1 0 0 1
-		origine mesh
+		origin mesh
 	}
 
 
 
 	Figure {
-		Titre "Mean velocity profile U+"
+		Title "Mean velocity profile U+"
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
@@ -74,47 +74,47 @@ Chapitre {
 		LabelY "U+"
 		#LogY
 		 RangeY 0.1 25
-		InclureDescCourbes 0
-		Legende below
-	       		Courbe {
-			Legende LS_20000
-			Fichier ./LS_20000/courbe_uplus.dat
-			Colonnes ($2) ($4)
+		Include_Description_Curves 0
+		legend below
+	       		Curve {
+			legend LS_20000
+			file ./LS_20000/courbe_uplus.dat
+			columns ($2) ($4)
 			Style lines
 		}
-				Courbe {
-			Legende JL_20000
-			Fichier ./JL_20000/courbe_uplus.dat
-			Colonnes ($2) ($4)
+				Curve {
+			legend JL_20000
+			file ./JL_20000/courbe_uplus.dat
+			columns ($2) ($4)
 			Style lines
 		}
-				Courbe {
-			Legende Openfoam_LS_20000
-			Fichier ./Openfoam_LS_20000/courbe_uplus.dat
-			Colonnes ($2) ($4)
+				Curve {
+			legend Openfoam_LS_20000
+			file ./Openfoam_LS_20000/courbe_uplus.dat
+			columns ($2) ($4)
 			Style lines
 		}
-					Courbe {
-			Legende "Linear Law"
+					Curve {
+			legend "Linear Law"
 			Fonction x
 			TypeLigne 0
 			Style lines
-			origine ana
+			origin ana
 		}
 		
 		
-		Courbe {
-			Legende "Log Law"
+		Curve {
+			legend "Log Law"
 			Fonction 1/0.415*log(x)+5.32
 			TypeLigne 0
 			Style lines
-			origine ana
+			origin ana
 		}
 		
 	}
 
 	Figure {
-		Titre "Mean velocity profile U+"
+		Title "Mean velocity profile U+"
 		Width 12cm
 		Dimension 2
 		LabelX "y+"
@@ -123,33 +123,33 @@ Chapitre {
 		LabelY "U+"
 		#LogY
 		 
-		InclureDescCourbes 0
-		Legende below
-	       		Courbe {
-			Legende LS_20000
-			Fichier ./LS_20000/courbe_uplus.dat
-			Colonnes ($2) ($4)
+		Include_Description_Curves 0
+		legend below
+	       		Curve {
+			legend LS_20000
+			file ./LS_20000/courbe_uplus.dat
+			columns ($2) ($4)
 			Style lines
 		}
 
-				Courbe {
-			Legende JL_20000
-			Fichier ./JL_20000/courbe_uplus.dat
-			Colonnes ($2) ($4)
+				Curve {
+			legend JL_20000
+			file ./JL_20000/courbe_uplus.dat
+			columns ($2) ($4)
 			Style lines
 		}
-				Courbe {
-			Legende Openfoam_LS_20000
-			Fichier ./Openfoam_LS_20000/courbe_uplus.dat
-			Colonnes ($2) ($4)
+				Curve {
+			legend Openfoam_LS_20000
+			file ./Openfoam_LS_20000/courbe_uplus.dat
+			columns ($2) ($4)
 			Style lines
 		}
-					Courbe {
-			Legende "Linear Law"
+					Curve {
+			legend "Linear Law"
 			Fonction x
 			TypeLigne 0
 			Style lines
-			origine ana
+			origin ana
 		}
 		
 		
@@ -158,114 +158,114 @@ Chapitre {
 
 
 	Figure {
-		Titre "Mean velocity profile U"
+		Title "Mean velocity profile U"
 		Width 12cm
 		Dimension 2
 		LabelX "y"
 	
 		LabelY "U"
-		InclureDescCourbes 0
-		Legende below
-	       		Courbe {
-			Legende LS_20000
-			Fichier ./LS_20000/courbe_uplus.dat
-			Colonnes ($1) ($3)
+		Include_Description_Curves 0
+		legend below
+	       		Curve {
+			legend LS_20000
+			file ./LS_20000/courbe_uplus.dat
+			columns ($1) ($3)
 			Style lines
 		}
 
-				Courbe {
-			Legende JL_20000
-			Fichier ./JL_20000/courbe_uplus.dat
-			Colonnes ($1) ($3)
+				Curve {
+			legend JL_20000
+			file ./JL_20000/courbe_uplus.dat
+			columns ($1) ($3)
 			Style lines
 		}
-				Courbe {
-			Legende Openfoam_LS_20000
-			Fichier ./Openfoam_LS_20000/courbe_uplus.dat
-			Colonnes ($1) ($3)
+				Curve {
+			legend Openfoam_LS_20000
+			file ./Openfoam_LS_20000/courbe_uplus.dat
+			columns ($1) ($3)
 			Style lines
 		}
 			}
 	Figure {
-		Titre "K profile"
+		Title "K profile"
 		Width 12cm
 		Dimension 2
 		LabelX "y"
 	
 		LabelY "K"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 
-		Legende below
-	       		Courbe {
+		legend below
+	       		Curve {
 			segment ./LS_20000/test.data  K
 			legend "LS_20000"
 			style linespoints
 		}
 
-		Courbe {
-			Legende Openfoam_LS_20000
-			Fichier ./Openfoam_LS_20000/k.dat
-			Colonnes ($1) ($2)
+		Curve {
+			legend Openfoam_LS_20000
+			file ./Openfoam_LS_20000/k.dat
+			columns ($1) ($2)
 			Style lines
 		}
-	       		Courbe {
+	       		Curve {
 			segment ./LS_20000_yplus_003/test.data  K
 			legend "LS_20000_yplus_003"
 			style linespoints
 		}
-	       		Courbe {
+	       		Curve {
 			segment ./LS_20000_yplus_006/test.data  K
 			legend "LS_20000_yplus_006"
 			style linespoints
 		}
 		 	}
 
-	tableau {
-	nb_colonnes 1
+	Table {
+	nb_columns 1
 	label u_tau
 
 	
 		
-	ligne {
+	line {
 	legend theorical
 	values 0.003017
 	}
 
-	 	ligne {
+	 	line {
 	legend LS_20000
-	fichier LS_20000/u_tau.dat
-	nb_colonnes_fichier 2
-	colonnes $2
+	file LS_20000/u_tau.dat
+	nb_columns_file 2
+	columns $2
 	derniere_ligne
        }	
 
-		ligne {
+		line {
 	legend JL_20000
-	fichier JL_20000/u_tau.dat
-	nb_colonnes_fichier 2
-	colonnes $2
+	file JL_20000/u_tau.dat
+	nb_columns_file 2
+	columns $2
 	derniere_ligne
        }	
-		ligne {
+		line {
 	legend Openfoam_LS_20000
-	fichier Openfoam_LS_20000/u_tau.dat
-	nb_colonnes_fichier 2
-	colonnes $2
+	file Openfoam_LS_20000/u_tau.dat
+	nb_columns_file 2
+	columns $2
 	derniere_ligne
        }	
-	 	ligne {
+	 	line {
 	legend LS_20000_yplus_003
-	fichier LS_20000_yplus_003/u_tau.dat
-	nb_colonnes_fichier 2
-	colonnes $2
+	file LS_20000_yplus_003/u_tau.dat
+	nb_columns_file 2
+	columns $2
 	derniere_ligne
        }		
 
-	 	ligne {
+	 	line {
 	legend LS_20000_yplus_006
-	fichier LS_20000_yplus_006/u_tau.dat
-	nb_colonnes_fichier 2
-	colonnes $2
+	file LS_20000_yplus_006/u_tau.dat
+	nb_columns_file 2
+	columns $2
 	derniere_ligne
        }		
  }
@@ -283,22 +283,22 @@ Chapter {
 	picture Figures/marche.png
 	}
 
-	tableau {		
-		nb_colonnes 1
+	Table {		
+		nb_columns 1
 
-		ligne {
+		line {
 		legend Lx
 		values 50.
 			}
-		ligne {
+		line {
 		legend Ly
 		values 9.
 			}
-		ligne {
+		line {
 		legend H
 		values 1.
 			}
-		ligne {
+		line {
 		legend Lin
 		values 10.
 			}

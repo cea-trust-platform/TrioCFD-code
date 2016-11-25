@@ -1,0 +1,5 @@
+Pressure matrix details: 
+ matrice P nb_colonnes = 4755
+ matrice P nb_lignes = 4755
+ matrice P nb coeff total = 22610025
+ matrice P nb elements non null = 60911

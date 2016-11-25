@@ -1,0 +1,209 @@
+Dimension 2
+Pb_hydraulique pb1
+Pb_conduction pb2
+
+Domaine dom
+Lire_med family_names_from_group_names dom mesh_quad_1 mesh_quad_1.med
+
+VEFPreP1B dis Lire dis { P0 }
+
+Schema_Euler_explicite sch1
+Lire sch1
+{
+	tinit 0
+	nb_pas_dt_max 0
+	dt_min 1
+	dt_max 1
+	dt_impr 1
+	facsec 1
+	precision_impr 8
+}
+
+Schema_Euler_implicite sch2
+Lire sch2
+{
+	tinit 0
+	nb_pas_dt_max 0
+	dt_min 1e-6
+	dt_max 1e+6
+	dt_impr 1e-6
+	facsec 10000
+	facsec_max 10000
+	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
+	precision_impr 8
+	seuil_statio 1e-9
+}
+
+Fluide_incompressible fluide
+Lire fluide
+{
+	mu champ_uniforme 1 0.01
+ 	rho champ_uniforme 1 1
+}
+
+Solide sol
+Lire sol
+{
+ 	rho champ_uniforme 1 1
+	lambda champ_uniforme 1 1
+	Cp champ_uniforme 1 1
+}
+
+Associer pb1 dom
+Associer pb1 sch1
+Associer pb1 fluide
+Discretiser pb1 dis
+
+Associer pb2 dom
+Associer pb2 sch2
+Associer pb2 sol
+Discretiser pb2 dis
+
+Lire pb1
+{
+	Navier_Stokes_standard
+	{
+		Projection_initiale	0
+		Equation_non_resolue	(t>0)
+		Solveur_pression	GCP { seuil 1 precond_nul }
+		Convection		{ negligeable }
+		Diffusion		{ negligeable }
+		Conditions_initiales	{
+					vitesse champ_fonc_xyz dom 2 -0.5*y^2 0.5*x^2
+					}
+		Conditions_limites	{
+					Gauche	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 -0.5*y^2 0.5*x^2
+					Droite	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 -0.5*y^2 0.5*x^2
+					Bas	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 -0.5*y^2 0.5*x^2
+					Haut	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 -0.5*y^2 0.5*x^2
+					}
+	}
+	Postraitement
+	{
+		Definition_champs	{
+					vorticite_som	interpolation	{ localisation som source refChamp { pb_champ pb1 vorticite } }
+					# norme_L2_wex = norme L2 de vorticite_exacte #
+					norme_L2_wex	reduction_0D	{
+									methode norme_L2
+									source transformation	{
+												methode formule
+												expression 1 x+y
+												nom_source w_ex
+												localisation elem
+												}
+									}
+					# norme_L2_w_wex = norme L2 de (vorticite - vorticite_exacte) #
+					norme_L2_w_wex	reduction_0D	{
+									methode norme_L2
+									source transformation	{
+												methode formule expression 1 w-w_ex
+												sources	{
+													refChamp { Pb_champ pb1 vorticite nom_source w } ,
+													transformation	{
+															methode formule
+															expression 1 x+y
+															nom_source w_ex
+															localisation elem
+															}
+													}
+												}
+					
+									}
+					errw2		transformation	{
+									methode formule
+									expression 1 norme_L2_w_wex/norme_L2_wex
+									sources_reference { norme_L2_w_wex , norme_L2_wex }
+									}				
+					# norme_inf_wex = norme infini de vorticite_exacte #
+					norme_inf_wex	reduction_0D	{
+									methode max
+									source transformation	{
+												methode formule
+												expression 1 x+y
+												nom_source w_ex
+												localisation elem
+												}
+									}
+					# norme_inf_w_wex = norme L2 de (vorticite - vorticite_exacte) #
+					norme_inf_w_wex	reduction_0D	{
+									methode max
+									source transformation	{
+												methode formule expression 1 w-w_ex
+												sources	{
+													refChamp { Pb_champ pb1 vorticite nom_source w } ,
+													transformation	{
+															methode formule
+															expression 1 x+y
+															nom_source w_ex
+															localisation elem
+															}
+													}
+												}
+					
+									}
+					errwinf		transformation	{
+									methode formule
+									expression 1 norme_inf_w_wex/norme_inf_wex
+									sources_reference { norme_inf_w_wex , norme_inf_wex }
+									}
+					}
+		Sondes			{
+					diagonale_vitesse	grav vitesse		periode 1e-6 segment 101 0 0 1 1
+					diagonale_vorticite	grav vorticite		periode 1e-6 segment 101 0 0 1 1
+					diagonale_vorticite_som	grav vorticite_som	periode 1e-6 segment 101 0 0 1 1
+					errw2			errw2		periode 1e-6 numero_elem_sur_maitre 0
+					errwinf			errwinf		periode 1e-6 numero_elem_sur_maitre 0
+					}
+		Format Lata_v2
+		fichier Vorticite1
+		Champs binaire dt_post 1e+6
+					{
+					vitesse elem
+					vorticite elem
+					vorticite_som elem
+					}
+	}
+	sauvegarde formatte Cas1.sauv
+}
+
+Resoudre pb1
+lata_to_med Vorticite1.lata Vorticite1.med
+
+Lire pb2
+{
+	Conduction
+	{
+		Diffusion		{ }
+		Conditions_initiales	{
+					temperature champ_uniforme 1 0
+					}
+		Conditions_limites	{
+					Gauche	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
+					Droite	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
+					Bas	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
+					Haut	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
+					}
+		Sources			{ puissance_thermique champ_fonc_med last_time Vorticite1_0000.med dom vorticite elem 0 }
+	}
+	Postraitement
+	{
+		Definition_champs	{
+					psi_som		interpolation	{ localisation som source refChamp { pb_champ pb2 temperature } }
+					}
+		Sondes			{
+					diagonale_psi		temperature	periode 1e-6 segment 101 0 0 1 1
+					diagonale_psi_som	psi_som		periode 1e-6 segment 101 0 0 1 1
+					}
+		Format lml
+		Champs binaire dt_post 1e+6
+					{
+					temperature elem
+					temperature som
+					}
+	}
+	sauvegarde formatte Cas1.sauv
+}
+
+Resoudre pb2
+
+Fin

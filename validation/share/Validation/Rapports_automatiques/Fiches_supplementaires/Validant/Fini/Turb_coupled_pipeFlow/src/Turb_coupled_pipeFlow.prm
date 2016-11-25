@@ -1,5 +1,5 @@
-Parametres {
-	Titre "Thermal-hydraulic simulation of turbulent coupled flow in a pipe"
+Parameters {
+	Title "Thermal-hydraulic simulation of turbulent coupled flow in a pipe"
 	Description "This document is a study to validate the capability of the Trio_U CFD code to simulate the thermal coupling between a fluid and a solid domain for a fully turbulent flow in a wall heated circular duct. We notably focus on the investigation of the transport of sodium for several Reynolds numbers (0.5e5, 1e5, 2e5, 5e5, 10e5).\newline"
 	Description "The validated models are the following ones : 
 	Description " - convection scheme : Muscl, Ef_stab with \latex_($\alpha=1$\latex_) and \latex_($\alpha=0.2$\latex_)"
@@ -10,7 +10,7 @@ Parametres {
 	Description "- for the friction coefficient and the loss of pressure, we use the Blasius correlation"
 	Description "- for the 	Nusselt correlation, we use the Notter and Sleicher correlation \newline"
         Description "Concerning the temperature, the velocity and the k-eps fields transport, two convection schemes are tested : Muscl and Ef_stab"
-	Auteur "REUILLON E., LEDAC P"
+	Author "REUILLON E., LEDAC P"
 
 	ParametresTrio_U Type of problem : Thermohydraulique_turbulent
 	ParametresTrio_U Discretization : VEFPreP1B
@@ -30,32 +30,32 @@ Parametres {
 	Reference "1. 'Fiche validation Trio_U : ThermalCoupling_TurbulentFlow_VEF', V. Blind, O. Cioni, U. Bieder  "
 	Reference "2. 'Fiche validation Trio_U : Forced convection with EF_stab and muscl scheme ', V. Barthel"
 	Reference "3. 'Fondamentals of Heat and mass transfer', Incropera, De Witt, Wiley Edition ."
-	InclureData 2
+	IncludeData 2
 	
-	Castest "./50000/muscl" "test.data"  /* datafile attached */
-	Castest "./50000/ef_stab1" "test.data"
-	Castest "./50000/ef_stab0.2" "test.data"
-	Castest "./100000/muscl" "test.data"
-	Castest "./100000/ef_stab1" "test.data"
-	Castest "./100000/ef_stab0.2" "test.data"
-	Castest "./200000/muscl" "test.data"
-	Castest "./200000/ef_stab1" "test.data"
-	Castest "./200000/ef_stab0.2" "test.data"
-	Castest "./500000/muscl" "test.data"
-	Castest "./500000/ef_stab1" "test.data"
-	Castest "./500000/ef_stab0.2" "test.data"
-	Castest "./1000000/muscl" "test.data"
-	Castest "./1000000/ef_stab1" "test.data"
-	Castest "./1000000/ef_stab0.2" "test.data"
+	TestCase "./50000/muscl" "test.data"  /* datafile attached */
+	TestCase "./50000/ef_stab1" "test.data"
+	TestCase "./50000/ef_stab0.2" "test.data"
+	TestCase "./100000/muscl" "test.data"
+	TestCase "./100000/ef_stab1" "test.data"
+	TestCase "./100000/ef_stab0.2" "test.data"
+	TestCase "./200000/muscl" "test.data"
+	TestCase "./200000/ef_stab1" "test.data"
+	TestCase "./200000/ef_stab0.2" "test.data"
+	TestCase "./500000/muscl" "test.data"
+	TestCase "./500000/ef_stab1" "test.data"
+	TestCase "./500000/ef_stab0.2" "test.data"
+	TestCase "./1000000/muscl" "test.data"
+	TestCase "./1000000/ef_stab1" "test.data"
+	TestCase "./1000000/ef_stab0.2" "test.data"
 }
-Chapitre {
-	Titre "Tests Description"
+Chapter {
+	Title "Tests Description"
 	Description "The fluid domain is a circular duct section filled with sodium, on which we solve a thermal-hydraulic problem."
 	Description "The solid domain is uniformly heated by a constant volume thermal power $q$, and linked to a conduction problem."
 	Description "Both problems are thermally coupled by the contact wall. \newline"
 
-	Tableau {
-	 	Titre "Geometry"
+	Table {
+	 	Title "Geometry"
 		Description "The figure below shows the 3D geometry used in this study.\newline"
 		Description "The geometrical dimensions for both domains are described by : "
 		Description "\latex_(\hspace*{8mm}\latex_)" - Pipe length : L=0.2m"
@@ -66,111 +66,111 @@ Chapitre {
 	}
 	Figure {		
 		Width 10cm
-		Image ./schema_geom_pipe.png
+		picture ./schema_geom_pipe.png
 	}	
-	Tableau {
+	Table {
 		Description " \latex_( \end{center} \latex_)"	
 	}	
-	Tableau {
-	 	Titre "Fluid physical properties"
+	Table {
+	 	Title "Fluid physical properties"
 		Description "As we treat an incompressible case (the dilatation coefficient \latex_($\beta$\latex_) is only used by the k-eps equation), the physical properties of sodium are constant and described in the table below.\newline"
 		Description " \latex_( \begin{center} \latex_)"
 		Description "Phyical properties of sodium at 700 Kelvin degrees.\newline"
-		nb_colonnes 1
+		nb_columns 1
 		Label "Value"
-		Ligne {
-			Legende "$\rho$  ($kg/m^3$)"
-			fichier ./50000/ef_stab0.2/rho_f.dat
+		line {
+			legend "$\rho$  ($kg/m^3$)"
+			file ./50000/ef_stab0.2/rho_f.dat
 		}
-		Ligne {
-			Legende "$\mu$  ($kg/m/s$)"
-			fichier ./50000/ef_stab0.2/mu_f.dat
+		line {
+			legend "$\mu$  ($kg/m/s$)"
+			file ./50000/ef_stab0.2/mu_f.dat
 		}
-		Ligne {
-			Legende "Cp  ($J/kg/K$)"
-			fichier ./50000/ef_stab0.2/cp_f.dat
+		line {
+			legend "Cp  ($J/kg/K$)"
+			file ./50000/ef_stab0.2/cp_f.dat
 		}
-		Ligne {
-			Legende "$\lambda$  ($W/m/K$)"
-			fichier ./50000/ef_stab0.2/lambda_fluide.dat
+		line {
+			legend "$\lambda$  ($W/m/K$)"
+			file ./50000/ef_stab0.2/lambda_fluide.dat
 		}
-		Ligne {
-			Legende "$\beta$  ($1/K$)"
-			fichier ./50000/ef_stab0.2/beta_f.dat
+		line {
+			legend "$\beta$  ($1/K$)"
+			file ./50000/ef_stab0.2/beta_f.dat
 		}
-		Ligne {
-			Legende "$Pr$"
-			fichier ./50000/ef_stab0.2/Pr.dat
+		line {
+			legend "$Pr$"
+			file ./50000/ef_stab0.2/Pr.dat
 		}		
 	}
-	Tableau {
+	Table {
 		Description " \latex_( \end{center} \latex_)"	
 	}	
-	Tableau {
-	 	Titre "Solid physical properties"
+	Table {
+	 	Title "Solid physical properties"
 		Description "The physical properties of the solid domain (steel) are constant and described in the table below.\newline"
 		Description " \latex_( \begin{center} \latex_)"
-		nb_colonnes 1
+		nb_columns 1
 		Label Value
-		Ligne {
-			Legende "$\rho$  ($kg/m^3$)"
-			fichier ./50000/ef_stab0.2/rho_solide.dat
+		line {
+			legend "$\rho$  ($kg/m^3$)"
+			file ./50000/ef_stab0.2/rho_solide.dat
 		}
-		Ligne {
-			Legende "Cp  ($J/kg/K$)"
-			fichier ./50000/ef_stab0.2/cp_solide.dat
+		line {
+			legend "Cp  ($J/kg/K$)"
+			file ./50000/ef_stab0.2/cp_solide.dat
 			}
-		Ligne {
-			Legende "$\lambda$  ($W/m/K$)"
-			fichier ./50000/ef_stab0.2/lambda_solide.dat
+		line {
+			legend "$\lambda$  ($W/m/K$)"
+			file ./50000/ef_stab0.2/lambda_solide.dat
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Initial conditions"
+	Table {
+		Title "Initial conditions"
 
 		Description "\latex_( $\bullet$ \textbf{Hydraulic problem} : \latex_)"
 		Description "The velocity field is set to 0 for each component except for the axial component, which is characterized by the average value \latex_($W_0$\latex_) described in the table below."
 		Description "\latex_($W_0$\latex_) is calculated from the objective Reynolds number, with the expression : \latex_( $W_0~=~Re~\left(\frac{\mu}{\rho}\right)~\frac{1}{2.r_1}$\latex_)\newline"			
 		Description " \latex_( \begin{center} \latex_)"
-		nb_colonnes 2
+		nb_columns 2
 		Label $Wo$  ($m/s$) | Re (objective)
-		Ligne {
-			Legende "Test case 1"
-			fichier ./50000/muscl/velocity_vs_Re.txt
-			nb_colonnes_fichier 4
-		        colonnes ($1) ($2)
+		line {
+			legend "Test case 1"
+			file ./50000/muscl/velocity_vs_Re.txt
+			nb_columns_file 4
+		        columns ($1) ($2)
 
 		}
-		Ligne {
-			Legende "Test case 2"
-			fichier ./100000/muscl/velocity_vs_Re.txt
-			nb_colonnes_fichier 4
-		        colonnes ($1) ($2)
+		line {
+			legend "Test case 2"
+			file ./100000/muscl/velocity_vs_Re.txt
+			nb_columns_file 4
+		        columns ($1) ($2)
 		}
-		Ligne {
-			Legende "Test case 3"
-			fichier ./200000/muscl/velocity_vs_Re.txt
-			nb_colonnes_fichier 4
-		        colonnes ($1) ($2)
+		line {
+			legend "Test case 3"
+			file ./200000/muscl/velocity_vs_Re.txt
+			nb_columns_file 4
+		        columns ($1) ($2)
 		}
-		Ligne {
-			Legende "Test case 4"
-			fichier ./500000/muscl/velocity_vs_Re.txt
-			nb_colonnes_fichier 4
-		        colonnes ($1) ($2)
+		line {
+			legend "Test case 4"
+			file ./500000/muscl/velocity_vs_Re.txt
+			nb_columns_file 4
+		        columns ($1) ($2)
 		}
-		Ligne {
-			Legende "Test case 5"
-			fichier ./1000000/muscl/velocity_vs_Re.txt
-			nb_colonnes_fichier 4
-		        colonnes ($1) ($2)
+		line {
+			legend "Test case 5"
+			file ./1000000/muscl/velocity_vs_Re.txt
+			nb_columns_file 4
+		        columns ($1) ($2)
 		}
 
 	}
-	Tableau {
+	Table {
 		Description " \latex_( \end{center} \latex_)"
 		Description " \latex_( $\bullet$ \textbf{Turbulence problem} :\latex_) "
 		Description "The values of k-eps model are computed by assuming a turbulence rate of 5 \latex_($\%$ \latex_). They are computed such as : "
@@ -180,57 +180,57 @@ Chapitre {
 		Description "The initial value of the temperature field is set to 0 °C.\newline"
 		Description "(Note that the solution for Trio_U temperature is determined up to a constant. So for \latex_($T_0=700~K$\latex_), the temperature solution will differ of 700 K).  
 	}
-	Tableau { 
-	 	Titre "Hydraulic boundary conditions"
+	Table { 
+	 	Title "Hydraulic boundary conditions"
 		Description "As a periodicity condition is applied on the inlet and on the outlet boundaries, a source term is defined in order to maintain the flow constant (\latex_(\textit{sources { canal\_perio { direction\_ecoulement 2 }} }\latex_))"
 		Description "The axial velocity profile imposed at the entrance of the computional domain is flat and characterized by the average value \latex_($W_0$\latex_), described in the table of \latex_($\S~2.4 $\latex_)."			
  		Description "For the lateral boundaries, a symmetry condition is applied."
 		Description "A fixed wall condition is used for other boundaries."
 		
 	}
-	 Tableau {
-	 	Titre "Fluid thermal boundary conditions"
+	 Table {
+	 	Title "Fluid thermal boundary conditions"
 		description "Periodicity between inlet and outlet boundaries."
 		description "Lateral boundaries: symmetry."
 		description "The common boundary of both domains is a paroi_contact."
 		
 		}
 		
-	Tableau {
-		Titre "Solid thermal boundary conditions"
+	Table {
+		Title "Solid thermal boundary conditions"
 		Description "Periodicity between inlet and outlet boundaries."
 		description "Lateral boundaries : symmetry." 
 		description "The common boundary of both domains is a paroi_contact."
 		Description "External wall : adiabatic"
 		description "A constant volume thermal power $q$ (given in the table below) is imposed on the solid domain.\newline" 
-		nb_colonnes 1
+		nb_columns 1
 		Label Value
-		Ligne {
-			Legende "$q$  ($W/m^3$)"
-			fichier ./50000/ef_stab0.2/puissance_volumique.dat
+		line {
+			legend "$q$  ($W/m^3$)"
+			file ./50000/ef_stab0.2/puissance_volumique.dat
 		}
 	}
 	
-	Tableau {
-		Titre "Numerical schemes"
+	Table {
+		Title "Numerical schemes"
 		Description "Summary of the numerical schemes tested in this study for each equation of transport \newline" 
-		nb_colonnes 3
+		nb_columns 3
 		Label Hydraulic | Thermal | Turbulence   
-		Ligne { 
-			Legende "Case 1"
-			valeurs "Muscl" "Muscl" "Muscl" 
+		line { 
+			legend "Case 1"
+			values "Muscl" "Muscl" "Muscl" 
 		}
-		Ligne { 
-			Legende "Case 2"
-			valeurs "Ef_stab{1}" "Ef_stab{1}" "Ef_stab{1}"
+		line { 
+			legend "Case 2"
+			values "Ef_stab{1}" "Ef_stab{1}" "Ef_stab{1}"
 		}
-		Ligne { 
-			Legende "Case 3"
-			valeurs "Ef_stab{0.2}" "Ef_stab{0.2}" "Ef_stab{1}"
+		line { 
+			legend "Case 3"
+			values "Ef_stab{0.2}" "Ef_stab{0.2}" "Ef_stab{1}"
 		}
 	}	
-	Tableau {
-		Titre "Calculation method"
+	Table {
+		Title "Calculation method"
 		Description "In this study, after a moment, the heat grows in a linear way in the two domains because of the constant thermal power in the solid domain and as the whole system is closed In this case, the main difficulty consists in solving an unstationary problem with an implicit solver (\latex_(\textit{Euler\_implicite}\latex_))."	
 		Description "In this framework, as only the stationary solution can be interpreted (unlike the transitory solution), it is necessary to adjust the parameters of implicit equation in function of the transport equation solved : "
 		Description " On the one hand, as the velocity field is stationnary, there is no problem with the \latex_(\textit{seuil\_convergence\_implicite}\latex_) and we can keep the default value (\latex_($10^{6}$\latex_))"
@@ -246,31 +246,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Average time step"
 		RangeY 0 130
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./50000/muscl/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./50000/muscl/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=1}"
-			Fichier ./50000/ef_stab1/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=1}"
+			file ./50000/ef_stab1/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=0.2}"
-			Fichier ./50000/ef_stab0.2/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=0.2}"
+			file ./50000/ef_stab0.2/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -280,30 +280,30 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Average time step"
 		RangeY 0 130
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./100000/muscl/test.dt_ev
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Triou, Muscl"
+			file ./100000/muscl/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=1}"
-			Fichier ./100000/ef_stab1/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=1}"
+			file ./100000/ef_stab1/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=0.2}"
-			Fichier ./100000/ef_stab0.2/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=0.2}"
+			file ./100000/ef_stab0.2/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -313,31 +313,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Average time step"
 		RangeY 0 100
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./200000/muscl/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, Muscl"
+			file ./200000/muscl/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=1}"
-			Fichier ./200000/ef_stab1/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=1}"
+			file ./200000/ef_stab1/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=0.2}"
-			Fichier ./200000/ef_stab0.2/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=0.2}"
+			file ./200000/ef_stab0.2/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -347,30 +347,30 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Average time step"
 		RangeY 0 100
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./500000/muscl/test.dt_ev
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Triou, Muscl"
+			file ./500000/muscl/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=1}"
-			Fichier ./500000/ef_stab1/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=1}"
+			file ./500000/ef_stab1/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=0.2}"
-			Fichier ./500000/ef_stab0.2/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=0.2}"
+			file ./500000/ef_stab0.2/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -380,41 +380,41 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Average time step"
 		RangeY 0 50
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Triou, Muscl"
-			Fichier ./1000000/muscl/test.dt_ev
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Triou, Muscl"
+			file ./1000000/muscl/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=1}"
-			Fichier ./1000000/ef_stab1/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=1}"
+			file ./1000000/ef_stab1/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Triou, EF_stab {alpha=0.2}"
-			Fichier ./1000000/ef_stab0.2/test.dt_ev
-			Origine "Trio_U"
+		Curve {
+			legend "Triou, EF_stab {alpha=0.2}"
+			file ./1000000/ef_stab0.2/test.dt_ev
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center}\latex_)"
 		Description "\newpage"
 	}	
 }
 
-Chapitre {
-	Titre "Trio_U mesh"
+Chapter {
+	Title "Trio_U mesh"
 	Description "The VEF mesh of the computational domain is generated both by the mesher GAMBIT (to build CAD and the two meshes) and by the mesher ICEM (to build tetraedrals cells on the refined area) : "
 	Description " Near the wall, the mesh is refined on three layers on the fluid domain, with a cell mesh size around 5 mm.\newline "
 	Description "In the next figures, we show successively :" 
@@ -427,9 +427,9 @@ Chapitre {
 	Figure {
 		Description "Presentation of the computational domain"
 		Width 18cm
-		Image ./global_geom.png
+		picture ./global_geom.png
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Visu {
@@ -441,7 +441,7 @@ Chapitre {
 		normal3d 0.25 -0.5 0.5
 		up3d 0 0 1
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{8mm}\latex_)" 
 	}
 	Visu {
@@ -453,12 +453,12 @@ Chapitre {
 		normal3d 0.25 -0.5 0.5
 		up3d 0 0 1
 	}	
-	Tableau {
+	Table {
 		Description "\latex_( \end{center}\latex_)"
 		Description "\newpage"
 	}
-	Tableau {
-		Titre "Y+ field"
+	Table {
+		Title "Y+ field"
 		Description " In order to use the friction law in appropriated conditions, the cells mesh of the walls need to be characterized by : \latex_($Y^{+}\geq 30$\latex_)."
 		Description "To do this, we have refined the mesh of the fluid domain, near the contact wall."
 		Description " The next figures describe the values of \latex_($Y^{+}$\latex_) field on the computational domain for each simulation (5 Reynolds number simulated combinated with 3 convection schemes). \newline"
@@ -477,7 +477,7 @@ Chapitre {
         	Histogram ./50000/muscl/test.lata dom_fluide Y_PLUS ELEM 15 45 10
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{10mm}\latex_)" 
 	}
 	visu {
@@ -494,7 +494,7 @@ Chapitre {
         	Histogram ./50000/ef_stab0.2/test.lata dom_fluide Y_PLUS ELEM 15 45 10 
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\newpage" 
 	}
 	visu { 
@@ -506,7 +506,7 @@ Chapitre {
         	Histogram ./100000/muscl/test.lata dom_fluide Y_PLUS ELEM 20 65 45
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{10mm}\latex_)" 
 	}
 	visu {
@@ -522,7 +522,7 @@ Chapitre {
         	Histogram ./100000/ef_stab0.2/test.lata dom_fluide Y_PLUS ELEM 20 65 45
 		operator no_databaseinfo		
 	}	
-	Tableau {
+	Table {
 		Description "\newpage" 
 	}
 	visu { 
@@ -534,7 +534,7 @@ Chapitre {
         	Histogram ./200000/muscl/test.lata dom_fluide Y_PLUS ELEM 40 110 70
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{10mm}\latex_)" 
 	}
 	visu {
@@ -550,7 +550,7 @@ Chapitre {
         	Histogram ./200000/ef_stab0.2/test.lata dom_fluide Y_PLUS ELEM 40 110 70
 		operator no_databaseinfo		
 	}	
-	Tableau {
+	Table {
 		Description "\newpage" 
 	}
 	visu { 
@@ -562,7 +562,7 @@ Chapitre {
         	Histogram ./500000/muscl/test.lata dom_fluide Y_PLUS ELEM 100 250 150
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{10mm}\latex_)" 
 	}
 	visu {
@@ -578,7 +578,7 @@ Chapitre {
         	Histogram ./500000/ef_stab0.2/test.lata dom_fluide Y_PLUS ELEM 100 250 150
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\newpage" 
 	}
 	visu { 
@@ -590,7 +590,7 @@ Chapitre {
         	Histogram ./1000000/muscl/test.lata dom_fluide Y_PLUS ELEM 180 480 300
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\vspace*{10mm}\latex_)" 
 	}
 	visu {
@@ -606,7 +606,7 @@ Chapitre {
         	Histogram ./1000000/ef_stab0.2/test.lata dom_fluide Y_PLUS ELEM 180 480 300
 		operator no_databaseinfo		
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 		Description "\newpage" 
 	}
@@ -614,10 +614,10 @@ Chapitre {
 	
 	
 }
-Chapitre {
-	Titre "Miscellaneous descriptions"	
-	Tableau {
-		Titre "Pipe Reynolds number" 
+Chapter {
+	Title "Miscellaneous descriptions"	
+	Table {
+		Title "Pipe Reynolds number" 
 		Description "\latex_(\[ Re~=~\frac{W_0~D_h}{\nu}\] \latex_) where : "
 		Description "\latex_( \hspace*{11mm} - $W_0$~[m/s] \latex_) is the mean inlet velocity in the axial direction ,"
 		Description "\latex_( \hspace*{11mm} - $D_h$~[m] \latex_) is the mean hydraulic diameter of the pipe,"
@@ -626,39 +626,39 @@ Chapitre {
 			
 				
 	}
-	Tableau {
-		Titre "Prandtl number" 
+	Table {
+		Title "Prandtl number" 
 		Description "The formulation of the Prandtl number is : \latex_(\[Pr=\frac{\mu.Cp}{\lambda}=\frac{\nu}{\alpha} \]\latex_)"
 		Description "where \latex_($\nu$\latex_) is the kinematic viscosity and \latex_($\alpha$\latex_) is the thermal diffusivity"  	
 	}
-	Tableau {
-		Titre " Nusselt number"
+	Table {
+		Title " Nusselt number"
 		Description "The adimensional Nusselt number characterizes the ratio between the total heat transfert and the conduction heat transfert in the fluid domain. Its usual formulation is given by :\latex_(\[Nu=\left(\frac{h}{\lambda}\right)~D_h  \]\latex_) where h is the exchange coefficient, Dh is the hydraulic diameter and \latex_($\lambda$\latex_) is the fluid thermal conductivity.\newline"  
 		Description " To estimate this quantity in a turbulent pipe flow, it is possible to use the Notter and Sleicher correlation, described by :  \latex_(\[Nu=6.3+0.0167.Re^{0.85}~.~Pr^{0.93} \]\latex_) "	
 		Description "This correlation is the more appropriate for the liquid metal in the range : \latex_($0.004<Pr<0.1$\latex_) ; \latex_($1e5<Re<100e5$\latex_) (see [2]) "
 	}	
-	Tableau {
-		Titre "Friction coefficient"
+	Table {
+		Title "Friction coefficient"
 		Description The mean total wall shear stress \latex_($\tau_\omega$\latex_) can be estimated in terms of total skin friction coefficient, with : \latex_( \[ C_f=\frac{2~\tau_\omega}{\rho~W^2_0} \] \latex_)"
 		Description "In order to check the results of the pipe flow simulations, we use the Blasius correlation, described by : \latex_( \[ C_f= 0.079.Re^{-0.25} \] \latex_)  "
 	}
-	Tableau { 
-		Titre "Wall friction velocity"
+	Table { 
+		Title "Wall friction velocity"
 		Description "The wall friction velocity is linked to the total skin friction coefficient, with : "
 		Description "\latex_( \[ C_f=2~\left( \frac{U_\tau}{W_0}\right)^2 \] \latex_) "
 		Description "where \latex_($U_\tau$ \latex_) is the total wall friction velocity, such as : \latex_($U_\tau=\sqrt{\frac{\tau_\omega}{\rho}} $\latex_) "
 		Description "Thus, the wall friction velocity is given by :" 
 		Description " \latex_( \[U_\tau=W_0~\sqrt{\frac{1}{2} C_f} \] \latex_) "
 	}
-	Tableau {
-		Titre "Pressure drop"
+	Table {
+		Title "Pressure drop"
 		Description " The usual formulation of the law used to estimate the loss of pressure due to the wall friction in the axial direction is : "
 		Description "\latex_(  \[ \left(\frac{\Delta P}{\rho}\right) = C_{f_D}~\frac{\Delta Z}{D_h}~\frac{W^2_0}{2} \] \latex_)" 
 		Description "where \latex_($ \Delta Z$\latex_) is the axial length of the domain and where \latex_($C_{f_D}$\latex_) is the friction coefficient, defined such as :  \latex_(\[C_f=a~Re_b^{-b}\]\latex_) "
 		Description "In order to check the total loss of pressure computed in Trio_U simulation, we use the Blasius's law, with \latex_( \[ C_{f_D}~=~4.C_f~=~ 0.316~Re^{-0.25} \] \latex_)  "
 	}
-	Tableau {
-		Titre "Thermal theoretical solutions"
+	Table {
+		Title "Thermal theoretical solutions"
 		Description "The theoritical comparison checked in this study are based on the demonstration presented in [1] and [3]"
 		Description "The main hypothesis, necessary to build the theoritical solution of the temperature fied in the solid, consists in assuming a quasi-stationnary flow.\newline"
 		Description "We assume that the quasi-stationary state is reached when the temperature field rises linearly on each point of the domain, i.e when the temporal slope is constante : \latex_( \[\left(\frac{\partial~T}{\partial t}\right)~=~\xi~=~cste   \]\latex_)"
@@ -696,12 +696,12 @@ Chapitre {
 	        Description " \latex_(\[  (T_{r_2}-T_{bulk})=\frac{\left(q-\rho_s~Cp_s~\xi\right)}{4~\lambda_s}\left(r^2_1 -r^2_2\right)+\frac{\left(q-\rho_s~Cp_s~\xi\right)}{2\lambda_s}.r^2_2~ln\left(\frac{r_2}{r_1}\right) + \varphi~\left(\frac{2.r_1}{\lambda_f~Nu}\right) \] \latex_)\newline"
 	}
 }
-Chapitre {
-	Titre "Convergence study"
+Chapter {
+	Title "Convergence study"
 
 	Description " In this part, we investigate the thermal-hydraulic characteristics of the turbulent flow, by a probe located near the middle of the fluid domain (x=-0.4m, y=0.4m, z=0m).\newline"
-	Tableau {
-		Titre "Convergency of the turbulent parameters  "
+	Table {
+		Title "Convergency of the turbulent parameters  "
 		Description "\latex_( \begin{center} \latex_)"
 	}
 	Figure {
@@ -710,31 +710,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "K field"
 		RangeY 0. 5.5e-7
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./50000/muscl/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl convection scheme"
+			file ./50000/muscl/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./50000/ef_stab1/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./50000/ef_stab1/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./50000/ef_stab0.2/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./50000/ef_stab0.2/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -743,30 +743,30 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Epsilon "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./50000/muscl/test_EPS.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl convection scheme"
+			file ./50000/muscl/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./50000/ef_stab1/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./50000/ef_stab1/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./50000/ef_stab0.2/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./50000/ef_stab0.2/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
@@ -778,31 +778,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "K field"
 		RangeY 0. 2e-6
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./100000/muscl/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl convection scheme"
+			file ./100000/muscl/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./100000/ef_stab1/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./100000/ef_stab1/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./100000/ef_stab0.2/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./100000/ef_stab0.2/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -811,30 +811,30 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Epsilon "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./100000/muscl/test_EPS.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl convection scheme"
+			file ./100000/muscl/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./100000/ef_stab1/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./100000/ef_stab1/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./100000/ef_stab0.2/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./100000/ef_stab0.2/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
@@ -846,31 +846,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "K field"
 		RangeY 0. 5e-6
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./200000/muscl/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl convection scheme"
+			file ./200000/muscl/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./200000/ef_stab1/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./200000/ef_stab1/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./200000/ef_stab0.2/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./200000/ef_stab0.2/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -879,30 +879,30 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Epsilon "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./200000/muscl/test_EPS.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl convection scheme"
+			file ./200000/muscl/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./200000/ef_stab1/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./200000/ef_stab1/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./200000/ef_stab0.2/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./200000/ef_stab0.2/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
@@ -914,31 +914,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "K field"
 		RangeY 0. 3e-5
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./500000/muscl/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl convection scheme"
+			file ./500000/muscl/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./500000/ef_stab1/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./500000/ef_stab1/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./500000/ef_stab0.2/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./500000/ef_stab0.2/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -947,30 +947,30 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Epsilon "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./500000/muscl/test_EPS.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl convection scheme"
+			file ./500000/muscl/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./500000/ef_stab1/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./500000/ef_stab1/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./500000/ef_stab0.2/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./500000/ef_stab0.2/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
@@ -982,31 +982,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "K field"
 		RangeY 0. 1.2e-4
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./1000000/muscl/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl convection scheme"
+			file ./1000000/muscl/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./1000000/ef_stab1/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./1000000/ef_stab1/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./1000000/ef_stab0.2/test_K.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./1000000/ef_stab0.2/test_K.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -1015,40 +1015,40 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Epsilon "
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl convection scheme"
-			Fichier ./1000000/muscl/test_EPS.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl convection scheme"
+			file ./1000000/muscl/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./1000000/ef_stab1/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./1000000/ef_stab1/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./1000000/ef_stab0.2/test_EPS.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./1000000/ef_stab0.2/test_EPS.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 		Description "Globally, the turbulent parameters are well converged after 5000s for all the tested convection schemes." 
 	}
-	Tableau {
-		Titre "Convergency of the velocity field "
+	Table {
+		Title "Convergency of the velocity field "
 		Description " The next graphs show the temporal evolution of each component of the velocity field when the Reynolds number increases."
 		Description " The figures on the left display the axial component of the velocity whereas the figures on the right display the transverse components of the velocity."
 		Description "As the cross flow value is near zero, we can see some oscillations with the Ef_stab scheme, even if the flow is stable. This oscillations are observed on very low velocity values (\latex_($10^{-5}$\latex_)), and are thus no significant."   
@@ -1064,31 +1064,31 @@ Chapitre {
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
 		LabelY "Vz [m/s]"
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Vz, Muscl scheme"
-			Fichier 50000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Muscl scheme"
+			file 50000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=1} scheme
-			Fichier 50000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=1} scheme
+			file 50000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=0.2} scheme"
-			Fichier 50000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=0.2} scheme"
+			file 50000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1099,54 +1099,54 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Vt [m/s]"
 		#RangeY -0.2 0.2
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Vx, Muscl scheme"
-			Fichier 50000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Vx, Muscl scheme"
+			file 50000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Muscl scheme"
-			Fichier 50000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Muscl scheme"
+			file 50000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=1} scheme"
-			Fichier 50000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=1} scheme"
+			file 50000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=1} scheme"
-			Fichier 50000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=1} scheme"
+			file 50000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=0.2} scheme"
-			Fichier 50000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=0.2} scheme"
+			file 50000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=0.2} scheme"
-			Fichier 50000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=0.2} scheme"
+			file 50000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
 	}	
@@ -1157,31 +1157,31 @@ Chapitre {
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
 		LabelY "Vz [m/s]"
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Vz, Muscl scheme"
-			Fichier 100000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Muscl scheme"
+			file 100000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=1} scheme
-			Fichier 100000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=1} scheme
+			file 100000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-				Courbe {
-			Legende "Vz, Ef_stab {alpha=0.2} scheme"
-			Fichier 100000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+				Curve {
+			legend "Vz, Ef_stab {alpha=0.2} scheme"
+			file 100000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1192,54 +1192,54 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Vt [m/s]"
 		#RangeY -0.2 0.2
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Vx, Muscl scheme"
-			Fichier 100000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Vx, Muscl scheme"
+			file 100000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Muscl scheme"
-			Fichier 100000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Muscl scheme"
+			file 100000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=1} scheme"
-			Fichier 100000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=1} scheme"
+			file 100000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=1} scheme"
-			Fichier 100000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=1} scheme"
+			file 100000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=0.2} scheme"
-			Fichier 100000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=0.2} scheme"
+			file 100000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=0.2} scheme"
-			Fichier 100000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=0.2} scheme"
+			file 100000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
 	}
@@ -1250,31 +1250,31 @@ Chapitre {
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
 		LabelY "Vz [m/s]"
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Vz, Muscl scheme"
-			Fichier 200000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Muscl scheme"
+			file 200000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=1} scheme
-			Fichier 200000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=1} scheme
+			file 200000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-				Courbe {
-			Legende "Vz, Ef_stab {alpha=0.2} scheme"
-			Fichier 200000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+				Curve {
+			legend "Vz, Ef_stab {alpha=0.2} scheme"
+			file 200000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1285,55 +1285,55 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Vt [m/s]"
 		#RangeY -0.2 0.2
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Vx, Muscl scheme"
-			Fichier 200000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Vx, Muscl scheme"
+			file 200000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Muscl scheme"
-			Fichier 200000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Muscl scheme"
+			file 200000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=1} scheme"
-			Fichier 200000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=1} scheme"
+			file 200000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=1} scheme"
-			Fichier 200000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"		Description "The evolution of the average time step for each simulation is described in the next figures. We see that the lower the Reynolds number, the bigger the average resolution time step (see computer performance). "
+		Curve {
+			legend "Vy, Ef_stab {alpha=1} scheme"
+			file 200000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"		Description "The evolution of the average time step for each simulation is described in the next figures. We see that the lower the Reynolds number, the bigger the average resolution time step (see computer performance). "
 		Description "To conclude, the EF_stab convection scheme reduces the simulation time significantly."	
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=0.2} scheme"
-			Fichier 200000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=0.2} scheme"
+			file 200000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=0.2} scheme"
-			Fichier 200000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=0.2} scheme"
+			file 200000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
 	}			
@@ -1344,31 +1344,31 @@ Chapitre {
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
 		LabelY "Vz [m/s]"
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Vz, Muscl scheme"
-			Fichier 500000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Muscl scheme"
+			file 500000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=1} scheme
-			Fichier 500000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=1} scheme
+			file 500000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=0.2} scheme"
-			Fichier 500000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=0.2} scheme"
+			file 500000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1379,54 +1379,54 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Vt [m/s]"
 		#RangeY -0.2 0.2
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Vx, Muscl scheme"
-			Fichier 500000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Vx, Muscl scheme"
+			file 500000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Muscl scheme"
-			Fichier 500000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Muscl scheme"
+			file 500000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=1} scheme"
-			Fichier 500000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=1} scheme"
+			file 500000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=1} scheme"
-			Fichier 500000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=1} scheme"
+			file 500000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=0.2} scheme"
-			Fichier 200000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=0.2} scheme"
+			file 200000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=0.2} scheme"
-			Fichier 200000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=0.2} scheme"
+			file 200000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
 	}
@@ -1437,31 +1437,31 @@ Chapitre {
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
 		LabelY "Vz [m/s]"
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Vz, Muscl scheme"
-			Fichier 1000000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Muscl scheme"
+			file 1000000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=1} scheme
-			Fichier 1000000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=1} scheme
+			file 1000000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Vz, Ef_stab {alpha=0.2} scheme"
-			Fichier 1000000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vz, Ef_stab {alpha=0.2} scheme"
+			file 1000000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1472,62 +1472,62 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Vt [m/s]"
 		#RangeY -0.2 0.2
-		Legende bottom right
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Vx, Muscl scheme"
-			Fichier 1000000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		legend bottom right
+		Include_Description_Curves 0
+		Curve {
+			legend "Vx, Muscl scheme"
+			file 1000000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Muscl scheme"
-			Fichier 1000000/muscl/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Muscl scheme"
+			file 1000000/muscl/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=1} scheme"
-			Fichier 1000000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=1} scheme"
+			file 1000000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=1} scheme"
-			Fichier 1000000/ef_stab1/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=1} scheme"
+			file 1000000/ef_stab1/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Vx, Ef_stab {alpha=0.2} scheme"
-			Fichier 1000000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vx, Ef_stab {alpha=0.2} scheme"
+			file 1000000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Vy, Ef_stab {alpha=0.2} scheme"
-			Fichier 1000000/ef_stab0.2/test_VITESSE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Vy, Ef_stab {alpha=0.2} scheme"
+			file 1000000/ef_stab0.2/test_VITESSE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Convergency of the temperature in the fluid domain "
+	Table {
+		Title "Convergency of the temperature in the fluid domain "
 		Description "The next figures display the temporal evolution of the temperature in the fluid domain when the bulk velocity increases, for a probe located at coordinates (\latex_($x=-0.4m; y=0.4m, z=0m$\latex_)). \newline" 
 		Description "As a constant heat flux warms the solid domain uniformly, we consider that the quasi-stationnary state is reached when the evolution of temperature is linear.\newline"
 		Description "In the graphs below, we observe that all the convection schemes tend to give a similar evolution of the temperature field. "
@@ -1543,31 +1543,31 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Temperature [°C]"
 		#RangeY 350 650
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		#nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl scheme"
-			Fichier ./50000/muscl/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl scheme"
+			file ./50000/muscl/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./50000/ef_stab1/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./50000/ef_stab1/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./50000/ef_stab0.2/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./50000/ef_stab0.2/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
@@ -1580,36 +1580,36 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Temperature [°C]"
 		#RangeY 350 650
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		#nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl scheme"
-			Fichier ./100000/muscl/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl scheme"
+			file ./100000/muscl/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./100000/ef_stab1/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./100000/ef_stab1/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./100000/ef_stab0.2/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./100000/ef_stab0.2/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 #######Re=200000##################################
@@ -1621,31 +1621,31 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Temperature [°C]"
 		#RangeY 350 650
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		#nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl scheme"
-			Fichier ./200000/muscl/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl scheme"
+			file ./200000/muscl/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./200000/ef_stab1/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./200000/ef_stab1/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./200000/ef_stab0.2/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./200000/ef_stab0.2/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
@@ -1658,36 +1658,36 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Temperature [°C]"
 		#RangeY 350 650
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		#nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl scheme"
-			Fichier ./500000/muscl/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl scheme"
+			file ./500000/muscl/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./500000/ef_stab1/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./500000/ef_stab1/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./500000/ef_stab0.2/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./500000/ef_stab0.2/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 #######Re=1000000##################################
@@ -1699,40 +1699,40 @@ Chapitre {
 		#RangeX 0. 0.65
 		LabelY "Temperature [°C]"
 		#RangeY 350 650
-		Legende bottom right
-		InclureDescCourbes 0
+		legend bottom right
+		Include_Description_Curves 0
 		#nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl scheme"
-			Fichier ./1000000/muscl/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl scheme"
+			file ./1000000/muscl/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=1} scheme"
-			Fichier ./1000000/ef_stab1/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=1} scheme"
+			file ./1000000/ef_stab1/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_stab {alpha=0.2} scheme"
-			Fichier ./1000000/ef_stab0.2/test_TEMPERATURE.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_stab {alpha=0.2} scheme"
+			file ./1000000/ef_stab0.2/test_TEMPERATURE.son
+			origin "Trio_U"
 			Version "1.6.6"
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Convergency of the temperature on the external wall of the solid domain"
+	Table {
+		Title "Convergency of the temperature on the external wall of the solid domain"
 		Description "The next figures display the temporal evolution of the temperature in the solid domain when the bulk velocity increases, for a probe located near the middle, described by the coordinates (in meters):"
 		Description " (\latex_($x=cos(\theta); y=sin(\theta), z=-0.157$\latex_)), with \latex_($\theta=\frac{5 \pi}{6}$\latex_) radians. \newline" 
 		Description "As a constant heat flux warms uniformly the solid domain, we consider that the quasi-stationary state is reached when the evolution of temperature is linear.\newline"
@@ -1745,30 +1745,30 @@ Chapitre {
 	 	Description "Temperature field in the solid domain, Re=0.5e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./50000/muscl/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./50000/muscl/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./50000/ef_stab1/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./50000/ef_stab1/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./50000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./50000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}		
 	}
@@ -1777,34 +1777,34 @@ Chapitre {
 	 	Description "Temperature field in the solid domain, Re=1e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12.5cm
-		Courbe {
-			Legende "TrioU, Muscl"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./100000/muscl/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./100000/muscl/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} "
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} "
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./100000/ef_stab1/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./100000/ef_stab1/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} "
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} "
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./100000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./100000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}  
 	Figure {
@@ -1812,30 +1812,30 @@ Chapitre {
 	 	Description "Temperature field in the solid domain, Re=2e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12.5cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./200000/muscl/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./200000/muscl/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./200000/ef_stab1/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./200000/ef_stab1/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./200000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./200000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}	
 	}
@@ -1844,34 +1844,34 @@ Chapitre {
 	 	Description "Temperature field in the solid domain, Re=5e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./500000/muscl/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./500000/muscl/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} "
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} "
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./500000/ef_stab1/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./500000/ef_stab1/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} "
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} "
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./500000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./500000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}  
 	Figure {
@@ -1879,39 +1879,39 @@ Chapitre {
 	 	Description "Temperature field in the solid domain, Re=10e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./1000000/muscl/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./1000000/muscl/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} "
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} "
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./1000000/ef_stab1/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./1000000/ef_stab1/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} "
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} "
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./1000000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
-			Colonnes 1 2
+			file ./1000000/ef_stab0.2/test_TEMPERATURE_EXTERNE.son
+			columns 1 2
 			Style lines
 		}
 	  }
-	Tableau {
+	Table {
 		Description "\latex_( \end{center}\latex_)"
 		Description "\newpage"
 	} 
-	Tableau {
-		Titre "Convergency of the contact temperature"
+	Table {
+		Title "Convergency of the contact temperature"
 		Description "The next figures display the temporal evolution of the contact temperature (between the solid domain and the fluid domain) when the bulk velocity increases, for a probe located on the contact wall, and described by the coordinates (\latex_($x=-0.689~m; y=0.409~m, z=-0.077~m$\latex_)). \newline" 
 		Description "As a periodicity condition between the inlet and the outlet boundaries is imposed to study the thermal problem of both the fluid and the solid domain, the location of the probe in the axial direction has no impact on this study."    
 		Description "\latex_( \begin{center}\latex_)"
@@ -1921,34 +1921,34 @@ Chapitre {
 	 	Description "Contact temperature field, Re=0.5e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./50000/muscl/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./50000/muscl/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./50000/ef_stab1/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./50000/ef_stab1/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./50000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./50000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -1956,30 +1956,30 @@ Chapitre {
 	 	Description "Contact temperature field, Re=1e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./100000/muscl/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./100000/muscl/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./100000/ef_stab1/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./100000/ef_stab1/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./100000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./100000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
 	}
@@ -1988,34 +1988,34 @@ Chapitre {
 	 	Description "Contact temperature field, Re=2e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./200000/muscl/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./200000/muscl/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./200000/ef_stab1/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./200000/ef_stab1/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./200000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./200000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}   
 	Figure {
@@ -2023,30 +2023,30 @@ Chapitre {
 	 	Description "Contact temperature field, Re=5e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./500000/muscl/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./500000/muscl/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./500000/ef_stab1/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./500000/ef_stab1/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./500000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./500000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
 	}	
@@ -2055,35 +2055,35 @@ Chapitre {
 	 	Description "Contact temperature field, Re=10e5"
 		LabelX "Time (s)"
 		LabelY "Temperature"
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12cm
-		Courbe {
-			Legende "TrioU, Muscl solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Muscl solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./1000000/muscl/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./1000000/muscl/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=1} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=1} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./1000000/ef_stab1/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./1000000/ef_stab1/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
 			
-		Courbe {
-			Legende "TrioU, Ef_stab {alpha=0.2} solid"
-			Origine "Trio_U"
+		Curve {
+			legend "TrioU, Ef_stab {alpha=0.2} solid"
+			origin "Trio_U"
 			Version "1.6.6"
-			Fichier ./1000000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
-			Colonnes 1 2
+			file ./1000000/ef_stab0.2/test_TEMPERATURE_CONTACT.son
+			columns 1 2
 			Style lines
 		}
 	  }
-	Tableau {
+	Table {
 		Description "\latex_( \end{center}\latex_)"
 		Description " \latex_( $\bullet$ \textbf{Summary of convergency study} :\latex_) \newline"
 		Description "The convergency of the temperature field in both fluid and solid domains is quickly reached and does no depend of the convection scheme used in the simulations (temporal linear evolution)." 
@@ -2091,44 +2091,44 @@ Chapitre {
 		Description "\newpage"
 	}
 }
-Chapitre {
-	Titre "Main hydraulic comparisons"
+Chapter {
+	Title "Main hydraulic comparisons"
 	Description "The next table gives the comparison between the objective Reynolds number, defined in \latex_($\S~4.1$\latex_), and the Reynolds calculated from the Trio_U simulations."
 	Description "The difference between these two definitions is on the calculation of the hydraulic diameter : "
 	Description "- to estimate the objective Reynolds, we use \latex_($D_h=2.r_1$\latex_)"
 	Description "- to estimate the calculated Reynolds, we use the mesh geometric parameters, as the area of the exchange surface (S) and the associated perimeter (P), such as :\latex_($D_h=4.S/P$\latex_).\newline "
 	Description "As expected, the Reynolds number calculated by Trio_U is very close to the objective Reynolds number." 
-	Tableau {	
+	Table {	
 		Description "\latex_(\begin{center} \latex_)"
 		Description "Bulk velocity and Reynolds number (objective and calculated)"
-		nb_colonnes 4
+		nb_columns 4
 		Label $Wo$  ($m/s$) | Re (objective) | Re (Trio_U) | Re variation (%)
-		Ligne {
-			Legende "Test case 1"
-			fichier ./50000/muscl/velocity_vs_Re.txt
+		line {
+			legend "Test case 1"
+			file ./50000/muscl/velocity_vs_Re.txt
 		}
-		Ligne {
-			Legende "Test case 2"
-			fichier ./100000/muscl/velocity_vs_Re.txt
+		line {
+			legend "Test case 2"
+			file ./100000/muscl/velocity_vs_Re.txt
 		}
-		Ligne {
-			Legende "Test case 3"
-			fichier ./200000/muscl/velocity_vs_Re.txt
+		line {
+			legend "Test case 3"
+			file ./200000/muscl/velocity_vs_Re.txt
 		}
-		Ligne {
-			Legende "Test case 4"
-			fichier ./500000/muscl/velocity_vs_Re.txt
+		line {
+			legend "Test case 4"
+			file ./500000/muscl/velocity_vs_Re.txt
 		}
-		Ligne {
-			Legende "Test case 5"
-			fichier ./1000000/muscl/velocity_vs_Re.txt
+		line {
+			legend "Test case 5"
+			file ./1000000/muscl/velocity_vs_Re.txt
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Friction velocity  "
+	Table {
+		Title "Friction velocity  "
 		Description "The usual definition of the friction velocity is given in the paragraph \latex_($\S~4.5$\latex_) : "
 		Description "-the analytical value of \latex_($U_\tau$\latex_) is calculated from the Blasius correlation (\latex_($\S~4.4$\latex_))"
 		Description "-the Trio_U value of \latex_($U_\tau$\latex_) is given by the post-processing of the \latex_(\textit{U\_STAR}\latex_) field."
@@ -2137,218 +2137,218 @@ Chapitre {
 		Description  "However, the difference between the analytical value and the value extracted from the simulation made with the muscl convection scheme is more important (\latex_($ \backsimeq 10\% ~-~ 15\% $\latex_))." 
 		Description "It is known fact that the use of the Muscl scheme with usual friction terms don't give very good results as far as the wall friction is concerned.\newline"
 	}
-	Tableau {
+	Table {
 		Description "Re=0.5e5"
-		nb_colonnes 3
+		nb_columns 3
 		label Blasius [m/s] | Trio_U [m/s] | variation (%)
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
-			fichier ./50000/muscl/u_star.txt
+		line {
+			legend "Muscl"
+			origin "Trio_U"
+			file ./50000/muscl/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=1$}"
-			Origine "Trio_U"
-			fichier ./50000/ef_stab1/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=1$}"
+			origin "Trio_U"
+			file ./50000/ef_stab1/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=0.2$} "
-			Origine "Trio_U"
-			fichier ./50000/ef_stab0.2/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=0.2$} "
+			origin "Trio_U"
+			file ./50000/ef_stab0.2/u_star.txt
 		}
 	}
-	Tableau {
+	Table {
 		Description "Re=1e5"
-		nb_colonnes 3
+		nb_columns 3
 		label Blasius [m/s] | Trio_U [m/s] | variation (%)
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
-			fichier ./100000/muscl/u_star.txt
+		line {
+			legend "Muscl"
+			origin "Trio_U"
+			file ./100000/muscl/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=1$}"
-			Origine "Trio_U"
-			fichier ./100000/ef_stab1/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=1$}"
+			origin "Trio_U"
+			file ./100000/ef_stab1/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=0.2$} "
-			Origine "Trio_U"
-			fichier ./100000/ef_stab0.2/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=0.2$} "
+			origin "Trio_U"
+			file ./100000/ef_stab0.2/u_star.txt
 		}
 	}
-	Tableau {
+	Table {
 	Description "\newpage"
 		Description "Re=2e5"
-		nb_colonnes 3
+		nb_columns 3
 		label Blasius [m/s] | Trio_U [m/s] | variation (%)
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
-			fichier ./200000/muscl/u_star.txt
+		line {
+			legend "Muscl"
+			origin "Trio_U"
+			file ./200000/muscl/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=1$}"
-			Origine "Trio_U"
-			fichier ./200000/ef_stab1/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=1$}"
+			origin "Trio_U"
+			file ./200000/ef_stab1/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=0.2$}"
-			Origine "Trio_U"
-			fichier ./200000/ef_stab0.2/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=0.2$}"
+			origin "Trio_U"
+			file ./200000/ef_stab0.2/u_star.txt
 		}
 	}
-	Tableau {
+	Table {
 		Description "Re=5e5"
-		nb_colonnes 3
+		nb_columns 3
 		label Blasius [m/s] | Trio_U [m/s] | variation (%)
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
-			fichier ./500000/muscl/u_star.txt
+		line {
+			legend "Muscl"
+			origin "Trio_U"
+			file ./500000/muscl/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=1$}"
-			Origine "Trio_U"
-			fichier ./500000/ef_stab1/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=1$}"
+			origin "Trio_U"
+			file ./500000/ef_stab1/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=0.2$}"
-			Origine "Trio_U"
-			fichier ./500000/ef_stab0.2/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=0.2$}"
+			origin "Trio_U"
+			file ./500000/ef_stab0.2/u_star.txt
 		}
 	}
-	Tableau {
+	Table {
 		Description "Re=10e5"
-		nb_colonnes 3
+		nb_columns 3
 		label Blasius [m/s] | Trio_U [m/s] | variation (%)
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
-			fichier ./1000000/muscl/u_star.txt
+		line {
+			legend "Muscl"
+			origin "Trio_U"
+			file ./1000000/muscl/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=1$} "
-			Origine "Trio_U"
-			fichier ./1000000/ef_stab1/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=1$} "
+			origin "Trio_U"
+			file ./1000000/ef_stab1/u_star.txt
 		}
-		Ligne {
-			Legende "Ef_stab {$\alpha=0.2$} "
-			Origine "Trio_U"
-			fichier ./1000000/ef_stab0.2/u_star.txt
+		line {
+			legend "Ef_stab {$\alpha=0.2$} "
+			origin "Trio_U"
+			file ./1000000/ef_stab0.2/u_star.txt
 		}
 	}
-	Tableau {
-		Titre "Pressure loss"
+	Table {
+		Title "Pressure loss"
 		Description "The analytical value of the pressure drop is described in (\latex_($\S~4.6$\latex_)) and calculated from the Blasius correlation."
 		Description "The pressure loss given in the Trio_U file Pressure_gradient_Pb corresponds to the source term \latex_($\left(\frac{\nabla P}{\rho}\right)=\frac{\Delta P}{\rho*\Delta Z}$\latex_)\newline"
 		Description "The comparison between these two quantities are shown in the table below."
 		Description " Even if the difference between the theory and the Trio_U results depends on the Reynolds number value, it is the simulation with the Ef_stab {\latex_($\alpha=0.2$\latex_)} convection scheme which generally reproduces the best the analytical results. \newline" 
 	}
-	Tableau {
+	Table {
 		Description "Re=0.5e5"
-		nb_colonnes 3
+		nb_columns 3
 		label "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-			Legende "Muscl "
-			Origine "Trio_U"
-			fichier ./50000/muscl/dP.txt				
+		line {
+			legend "Muscl "
+			origin "Trio_U"
+			file ./50000/muscl/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			fichier ./50000/ef_stab1/dP.txt				
+		line {
+			legend "Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./50000/ef_stab1/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=0.2} "
-			Origine "Trio_U"
-			fichier ./50000/ef_stab0.2/dP.txt				
+		line {
+			legend "Ef_stab {alpha=0.2} "
+			origin "Trio_U"
+			file ./50000/ef_stab0.2/dP.txt				
 		}
 	}
-	Tableau {
+	Table {
 		Description "Re=1e5"
-		nb_colonnes 3
+		nb_columns 3
 		label "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
-			fichier ./100000/muscl/dP.txt				
+		line {
+			legend "Muscl"
+			origin "Trio_U"
+			file ./100000/muscl/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			fichier ./100000/ef_stab1/dP.txt				
+		line {
+			legend "Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./100000/ef_stab1/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			fichier ./100000/ef_stab0.2/dP.txt				
+		line {
+			legend "Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./100000/ef_stab0.2/dP.txt				
 		}
 	}
-	Tableau {
+	Table {
 		Description "Re=2e5"
-		nb_colonnes 3
+		nb_columns 3
 		label "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-			Legende "Muscl "
-			Origine "Trio_U"
-			fichier ./200000/muscl/dP.txt				
+		line {
+			legend "Muscl "
+			origin "Trio_U"
+			file ./200000/muscl/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			fichier ./200000/ef_stab1/dP.txt				
+		line {
+			legend "Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./200000/ef_stab1/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			fichier ./200000/ef_stab0.2/dP.txt				
+		line {
+			legend "Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./200000/ef_stab0.2/dP.txt				
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 		Description "Re=5e5"
-		nb_colonnes 3
+		nb_columns 3
 		label "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-			Legende "Muscl "
-			Origine "Trio_U"
-			fichier ./500000/muscl/dP.txt				
+		line {
+			legend "Muscl "
+			origin "Trio_U"
+			file ./500000/muscl/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			fichier ./500000/ef_stab1/dP.txt				
+		line {
+			legend "Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./500000/ef_stab1/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			fichier ./500000/ef_stab0.2/dP.txt				
+		line {
+			legend "Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./500000/ef_stab0.2/dP.txt				
 		}
 
 	}
-	Tableau {
+	Table {
 		Description "Re=10e5"
-		nb_colonnes 3
+		nb_columns 3
 		label "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-			Legende "Muscl, Re=10e5 "
-			Origine "Trio_U"
-			fichier ./1000000/muscl/dP.txt				
+		line {
+			legend "Muscl, Re=10e5 "
+			origin "Trio_U"
+			file ./1000000/muscl/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=1}, Re=10e5 "
-			Origine "Trio_U"
-			fichier ./1000000/ef_stab1/dP.txt				
+		line {
+			legend "Ef_stab {alpha=1}, Re=10e5 "
+			origin "Trio_U"
+			file ./1000000/ef_stab1/dP.txt				
 		}
-		Ligne {
-			Legende "Ef_stab {alpha=0.2}, Re=10e5 "
-			Origine "Trio_U"
-			fichier ./1000000/ef_stab0.2/dP.txt				
+		line {
+			legend "Ef_stab {alpha=0.2}, Re=10e5 "
+			origin "Trio_U"
+			file ./1000000/ef_stab0.2/dP.txt				
 		}
 	}	
-	Tableau {
-		Titre "Axial velocity profile across the pipe"
+	Table {
+		Title "Axial velocity profile across the pipe"
 		Description "The velocity profile is compared with the law that represents the logarithmic zone of the boundary layer."
 		Description "The adimensional profile \latex_($W^+=f(Y^+)$\latex_) with \latex_($W^+=W/U_\tau $\latex_) and \latex_($Y^+=y*U_\tau/\nu$\latex_) is compared with the logarithmic law : \latex_(\[W^+=\frac{1}{0.415}*ln(y^+)+5.32\]\latex_)"
 		Description "The velocity profiles obtained for each Reynolds number are given in the next graphs.\newline"
@@ -2363,46 +2363,46 @@ Chapitre {
 		LogX
 		LabelY "W+"
 		RangeY 0 50
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		#Courbe {
 			#Legende "Loi Log"
 			#Origine "Trio_U"
 			#Fonction (1/0.415)*log(x)+5.32
 			#Style lines
 		#}
-		Courbe {
-			Legende "Theory"
-			Origine "loi log"
-			Fichier ./50000/muscl/vitesse.txt
-			Colonnes 1 2
+		Curve {
+			legend "Theory"
+			origin "loi log"
+			file ./50000/muscl/vitesse.txt
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Trio_U, muscl"
-			Origine "Trio_U"
-			Fichier ./50000/muscl/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, muscl"
+			origin "Trio_U"
+			file ./50000/muscl/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			Fichier ./50000/ef_stab1/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./50000/ef_stab1/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./50000/ef_stab0.2/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./50000/ef_stab0.2/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}	
 	#######Re=100000##################################
@@ -2414,35 +2414,35 @@ Chapitre {
 		LogX
 		LabelY "W+"
 		RangeY 0 50
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Theory"
-			Origine "loi log"
-			Fichier ./100000/muscl/vitesse.txt
-			Colonnes 1 2
+		Include_Description_Curves 0
+		Curve {
+			legend "Theory"
+			origin "loi log"
+			file ./100000/muscl/vitesse.txt
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Trio_U, muscl"
-			Origine "Trio_U"
-			Fichier ./100000/muscl/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, muscl"
+			origin "Trio_U"
+			file ./100000/muscl/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			Fichier ./100000/ef_stab1/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./100000/ef_stab1/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./100000/ef_stab0.2/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./100000/ef_stab0.2/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
@@ -2457,35 +2457,35 @@ Chapitre {
 		LogX
 		LabelY "W+"
 		RangeY 0 50
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Theory"
-			Origine "loi log"
-			Fichier ./200000/muscl/vitesse.txt
-			Colonnes 1 2
+		Include_Description_Curves 0
+		Curve {
+			legend "Theory"
+			origin "loi log"
+			file ./200000/muscl/vitesse.txt
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Trio_U, muscl"
-			Origine "Trio_U"
-			Fichier ./200000/muscl/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, muscl"
+			origin "Trio_U"
+			file ./200000/muscl/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			Fichier ./200000/ef_stab1/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./200000/ef_stab1/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./200000/ef_stab0.2/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./200000/ef_stab0.2/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
@@ -2500,35 +2500,35 @@ Chapitre {
 		LogX
 		LabelY "W+"
 		RangeY 0 50
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Theory"
-			Origine "loi log"
-			Fichier ./500000/muscl/vitesse.txt
-			Colonnes 1 2
+		Include_Description_Curves 0
+		Curve {
+			legend "Theory"
+			origin "loi log"
+			file ./500000/muscl/vitesse.txt
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Trio_U, muscl"
-			Origine "Trio_U"
-			Fichier ./500000/muscl/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, muscl"
+			origin "Trio_U"
+			file ./500000/muscl/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			Fichier ./500000/ef_stab1/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./500000/ef_stab1/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./500000/ef_stab0.2/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./500000/ef_stab0.2/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
@@ -2543,40 +2543,40 @@ Chapitre {
 		LogX
 		LabelY "W+"
 		RangeY 0 50
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Theory"
-			Origine "loi log"
-			Fichier ./1000000/muscl/vitesse.txt
-			Colonnes 1 2
+		Include_Description_Curves 0
+		Curve {
+			legend "Theory"
+			origin "loi log"
+			file ./1000000/muscl/vitesse.txt
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "Trio_U, muscl"
-			Origine "Trio_U"
-			Fichier ./1000000/muscl/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, muscl"
+			origin "Trio_U"
+			file ./1000000/muscl/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=1}"
-			Origine "Trio_U"
-			Fichier ./1000000/ef_stab1/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=1}"
+			origin "Trio_U"
+			file ./1000000/ef_stab1/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "Trio_U, Ef_stab {alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./1000000/ef_stab0.2/vitesse.txt
-			Colonnes 1 3
+		Curve {
+			legend "Trio_U, Ef_stab {alpha=0.2}"
+			origin "Trio_U"
+			file ./1000000/ef_stab0.2/vitesse.txt
+			columns 1 3
 			Style points
 			PointSize 2
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\end{center} \latex_)"
 		Description "\newpage"
 		Description "Globally, we observe that the difference between the analytical profile and the simulated profile increases with the Reynolds number."
@@ -2588,207 +2588,207 @@ Chapitre {
 
 	}
 }
-Chapitre {
-		Titre "Main thermal comparisons"
+Chapter {
+		Title "Main thermal comparisons"
 		Description "In this part, as the problem solutions are time-dependant, all Trio_U results are given at the final time of the computations (\latex_($t=2.10^5~s$\latex_))."
 		Description "As we can see on the table (2.8), the comparison between analytical results and Trio_U's simulations is made for three different convection schemes." 
-		Tableau {
-			Titre "Temporal slope comparison"
+		Table {
+			Title "Temporal slope comparison"
 			Description "By using the thermal balance on the solid domain and on the fluid domain, we have demonstrated that the temperature fields in both domains increase linearly with a slope equal to:  \latex_( \[ \xi~=~\frac{q}{\rho_s~Cp_s~+~\rho_f~Cp_f~\left(\frac{Vol_f}{Vol_s}\right)}\] \latex_)"
 			Description "In Trio_U's simulations, this slope is estimated from the temporal evolution of the contact temperature (shown in \latex_($\S~5.5 $\latex_))."
 			Description "The next tables compare the temporal slope between computations and theory, when the Reynolds number increases.\newline"
 		}
-		Tableau {
+		Table {
 			Description "Re=0.5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./50000/muscl/pente.txt
+			line {
+                		legend "Muscl"
+                        	file ./50000/muscl/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./50000/ef_stab1/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./50000/ef_stab1/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./50000/ef_stab0.2/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./50000/ef_stab0.2/pente.txt
                         }
 		}		
-		Tableau {
+		Table {
 			Description "Re=1e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./100000/muscl/pente.txt
+			line {
+                		legend "Muscl"
+                        	file ./100000/muscl/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./100000/ef_stab1/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./100000/ef_stab1/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./100000/ef_stab0.2/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./100000/ef_stab0.2/pente.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=2e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./200000/muscl/pente.txt
+			line {
+                		legend "Muscl"
+                        	file ./200000/muscl/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./200000/ef_stab1/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./200000/ef_stab1/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./200000/ef_stab0.2/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./200000/ef_stab0.2/pente.txt
                         }
 		}		
-		Tableau {
+		Table {
 			Description "\newpage"
 			Description "Re=5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./500000/muscl/pente.txt
+			line {
+                		legend "Muscl"
+                        	file ./500000/muscl/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./500000/ef_stab1/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./500000/ef_stab1/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./500000/ef_stab0.2/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./500000/ef_stab0.2/pente.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=10e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./1000000/muscl/pente.txt
+			line {
+                		legend "Muscl"
+                        	file ./1000000/muscl/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./1000000/ef_stab1/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./1000000/ef_stab1/pente.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./1000000/ef_stab0.2/pente.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./1000000/ef_stab0.2/pente.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description " The results on the temporal slope comparison show that the Trio_U's results are very closed to the theory, in all cases. So, the modification of the convection scheme in the simulation of the transport of the temperature has no visible impacts on the temporal slope evolution."
 			Description "It means that the stationary hypothesis is well verified." 
 		}
-		Tableau {
-			Titre "Thermal wall flux"
+		Table {
+			Title "Thermal wall flux"
 			Description "In paragraph \latex_($\S~4.7$\latex_), we have demonstrated that the analytical thermal flux at the joint boundary is obtained from :  \latex_(\[\varphi~=~q\cdot\left( \frac{\rho_f~Cp_f}{\frac{\rho_s~Cp_s}{Vol_f}~+~\frac{\rho_f~Cp_f}{Vol_s}}\right)~\equiv~\xi~\cdot~\rho_f~Cp_f~Vol_f \] \latex_)"
 			Description " where q is the volum thermal power reported in table 2.7.\newline"
 			description "This quantity is compared to the thermal wall flux calculated by Trio_U at the joint boundary, which is extracted from the file \latex_( \textit{Diffusion\_chaleur.out} \latex_)."
 			description "The thermal flux results are shown in the table below, for each Reynolds number investigated."\newline"
 		}
-		Tableau {
+		Table {
 			Description "Re=0.5e5"
-			nb_colonnes 3
+			nb_columns 3
                 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./50000/muscl/flux_paroi.txt
+			line {
+                		legend "Muscl"
+                        	file ./50000/muscl/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./50000/ef_stab1/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./50000/ef_stab1/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./50000/ef_stab0.2/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./50000/ef_stab0.2/flux_paroi.txt
                 	}
 		}		
-		Tableau {
+		Table {
 			Description "Re=1e5"
-			nb_colonnes 3
+			nb_columns 3
                 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./100000/muscl/flux_paroi.txt
+			line {
+                		legend "Muscl"
+                        	file ./100000/muscl/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./100000/ef_stab1/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./100000/ef_stab1/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./100000/ef_stab0.2/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./100000/ef_stab0.2/flux_paroi.txt
                 	}
 		}
-		Tableau {
+		Table {
 			Description "Re=2e5"
-			nb_colonnes 3
+			nb_columns 3
                 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./200000/muscl/flux_paroi.txt
+			line {
+                		legend "Muscl"
+                        	file ./200000/muscl/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./200000/ef_stab1/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./200000/ef_stab1/flux_paroi.txt
                	 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./200000/ef_stab0.2/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./200000/ef_stab0.2/flux_paroi.txt
                		 }
 		}		
-		Tableau {
+		Table {
 			Description "\newpage"
 			Description "Re=5e5"
-			nb_colonnes 3
+			nb_columns 3
                 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./500000/muscl/flux_paroi.txt
+			line {
+                		legend "Muscl"
+                        	file ./500000/muscl/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./500000/ef_stab1/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./500000/ef_stab1/flux_paroi.txt
                	 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./500000/ef_stab0.2/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./500000/ef_stab0.2/flux_paroi.txt
                		 }
 		}
-		Tableau {
+		Table {
 			Description "Re=10e5"
-			nb_colonnes 3
+			nb_columns 3
                		Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./1000000/muscl/flux_paroi.txt
+			line {
+                		legend "Muscl"
+                        	file ./1000000/muscl/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./1000000/ef_stab1/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./1000000/ef_stab1/flux_paroi.txt
                 	}
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./1000000/ef_stab0.2/flux_paroi.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./1000000/ef_stab0.2/flux_paroi.txt
                 	}
 		}
-		Tableau {
+		Table {
 			Description "From the wall thermal flux comparisons at the contact interface, we notice that the simulation results are very good, in particular for the higher Reynolds numbers."
 			Description "So, as it is expected, the behaviour of this difference is similar to those noticed on the temporal slope."  
 			Description "These results show that the quasi-stationary state hypothesis is well verified whatever the parameters of convection scheme tested." 
 		}
 
-		Tableau {
-			Titre "Exchange coefficient expressed with Nusselt number"
+		Table {
+			Title "Exchange coefficient expressed with Nusselt number"
 			Description "As the impact on heat exchange coefficient could be important on the temperature distribution, we begin to investigate this parameter comparison before to study the temperature profile in the fluid (or solid) domain.\newline "
 			Description "The reference value of the Nusselt number is calculated from the Notter and Sleicher correlation (presented in \latex_($\S~4.3$\latex_))."
 			Description "In Trio_U simulations,the Nusselt number is calculated such as  (see \latex_( $\S~4.7$ \latex_)) : \latex_( \[ Nu~=~\varphi_f~\left( \frac{2~r_1}{\lambda_f} \right)~\left( \frac{1}{T_f\left(r_1\right)-T_{bulk} } \right) \] \latex_)"
@@ -2796,198 +2796,198 @@ Chapitre {
 			Description "The next tables give the Nusselt number for each scheme when the Reynolds number increases.\newline"
 
 		}
-		Tableau {
+		Table {
 			Description "Re=0.5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./50000/muscl/nusselt.txt
+			line {
+                		legend "Muscl"
+                        	file ./50000/muscl/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./50000/ef_stab1/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./50000/ef_stab1/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./50000/ef_stab0.2/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./50000/ef_stab0.2/nusselt.txt
                         }
 		}		
-		Tableau {
+		Table {
 			Description "Re=1e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./100000/muscl/nusselt.txt
+			line {
+                		legend "Muscl"
+                        	file ./100000/muscl/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./100000/ef_stab1/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./100000/ef_stab1/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./100000/ef_stab0.2/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./100000/ef_stab0.2/nusselt.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=2e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./200000/muscl/nusselt.txt
+			line {
+                		legend "Muscl"
+                        	file ./200000/muscl/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./200000/ef_stab1/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./200000/ef_stab1/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./200000/ef_stab0.2/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./200000/ef_stab0.2/nusselt.txt
                         }
 		}		
-		Tableau {
+		Table {
 			Description "Re=5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./500000/muscl/nusselt.txt
+			line {
+                		legend "Muscl"
+                        	file ./500000/muscl/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./500000/ef_stab1/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./500000/ef_stab1/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./500000/ef_stab0.2/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./500000/ef_stab0.2/nusselt.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=10e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./1000000/muscl/nusselt.txt
+			line {
+                		legend "Muscl"
+                        	file ./1000000/muscl/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./1000000/ef_stab1/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./1000000/ef_stab1/nusselt.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./1000000/ef_stab0.2/nusselt.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./1000000/ef_stab0.2/nusselt.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "This study shows that there can be an important difference between the analytical and simulated results on the Nusselt number, especially when the Reynolds number is high (\latex_($Re\geq 500 000 $\latex_)) .\newline"
 			Description "At the contrary of the hydraulic study, where the muscl scheme displays the higher difference, the worst results are obtained for the simulations made with the EF_stab {\latex_($\alpha=1 $\latex_)} convection scheme (difference of order of 15\latex_($\%$\latex_) - 30\latex_($\%$\latex_))."
 			Description "It is always the Muscl scheme which allows to obtain the best results although these results are almost equivalent to the Ef_stab results for the lower Reynolds numbers (difference \latex_($\leq5\%$\latex_) for \latex_($Re\leq10^{5}$\latex_))."
 			Description "In conclusion, although the simulation results could be very closed to the analytical results for the lower Reynolds numbers, all convection schemes lead to an overestimation of the Nusselt number."
 		}
-	Tableau {
-		Titre "Contact temperature comparison"
+	Table {
+		Title "Contact temperature comparison"
 		Description "The theoritical wall flux equalization at the contact interface gives :  \latex_( \[T_f\left(r_1\right) - T_{bulk}~=~ \varphi~\left(\frac{2~r_1} {Nu~\lambda_f} \right)\] \latex_)"
 		Description "where the theoretical Nusselt number is given by the correlation and where \latex_($T_{bulk}$\latex_) is the average temperature of the fluid.\newline"
 		Description "The table below compares the contact temperature difference \latex_($\left(T_f\left(r_1\right) - T_{bulk} \right) $\latex_) for all calculations.\newline "
 	}
-        	Tableau {
+        	Table {
 			Description "Re=0.5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./50000/muscl/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Muscl"
+                        	file ./50000/muscl/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./50000/ef_stab1/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./50000/ef_stab1/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./50000/ef_stab0.2/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./50000/ef_stab0.2/Tr1_moins_Tbulk.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "\newpage"
 			Description "Re=1e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./100000/muscl/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Muscl"
+                        	file ./100000/muscl/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./100000/ef_stab1/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./100000/ef_stab1/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./100000/ef_stab0.2/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./100000/ef_stab0.2/Tr1_moins_Tbulk.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=2e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./200000/muscl/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Muscl"
+                        	file ./200000/muscl/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./200000/ef_stab1/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./200000/ef_stab1/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./200000/ef_stab0.2/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./200000/ef_stab0.2/Tr1_moins_Tbulk.txt
                         }
 		}		
-		Tableau {
+		Table {
 			Description "Re=5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./500000/muscl/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Muscl"
+                        	file ./500000/muscl/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./500000/ef_stab1/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./500000/ef_stab1/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./500000/ef_stab0.2/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./500000/ef_stab0.2/Tr1_moins_Tbulk.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=10e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./1000000/muscl/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Muscl"
+                        	file ./1000000/muscl/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./1000000/ef_stab1/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./1000000/ef_stab1/Tr1_moins_Tbulk.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./1000000/ef_stab0.2/Tr1_moins_Tbulk.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./1000000/ef_stab0.2/Tr1_moins_Tbulk.txt
                         }
 		}
 	
-	Tableau {
+	Table {
 		Description "The temperature contact depends on the results obtained for the thermal wall flux, those obtained for the Nusselt number and those obtained for the average temperature."
 		Description "The temperature contact is always underestimated."   
 		Description "As for the previous comparisons, it is the muscl scheme combinated to the lower Reynolds numbers which gives the best results." 
 		Description "Moreover, the Ef_stab convection scheme, used with \latex_($\alpha=1 $\latex_), does not allow to reproduce correctly the analytical results, at the difference of other numerical schemes tested." 
 	}
-	Tableau {
-		Titre "Temperature field at the outer boundary of the solid domain "
+	Table {
+		Title "Temperature field at the outer boundary of the solid domain "
 		Description "In \latex_( \S~4.7\latex_), we have demonstrated that the temperature in the solid domain is theoritically given by : "
 	        Description " \latex_(\[  T\left(r_2\right)-T_{bulk}=\frac{\left(q-\rho_s~Cp_s~\xi\right)}{4~\lambda_s}\left(r^2_1 -r^2_2\right)+\frac{\left(q-\rho_s~Cp_s~\xi\right)}{2\lambda_s}.r^2_2~ln\left(\frac{r_2}{r_1}\right) + \varphi~\left(\frac{2.r_1}{\lambda_f~Nu}\right) \] \latex_)"
 		Description "This is equivalent to : "
@@ -2995,195 +2995,195 @@ Chapitre {
 		Description "The table below compares the temperature difference \latex_($\left(T_s\left(r_2\right) - T_{bulk} \right) $\latex_) for all calculations.\newline"
 		Description "To obtain this quantity in Trio_U calculations, we use the field displays in the paragraph (5.4) and the average temperature \latex_( $T_{bulk}$ \latex_) extracts from the file \latex_( \textit{ Tmoyen\_perio\_fluid } \latex_)\newline "
 	}
-        Tableau {
+        Table {
 		Description "\newpage"
 		Description "Re=0.5e5"
-		nb_colonnes 3
+		nb_columns 3
                	 Label  "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-                	Legende "Muscl"
-                        fichier ./50000/muscl/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Muscl"
+                        file ./50000/muscl/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=1$}"
-                        fichier ./50000/ef_stab1/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=1$}"
+                        file ./50000/ef_stab1/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=0.2$}"
-                        fichier ./50000/ef_stab0.2/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=0.2$}"
+                        file ./50000/ef_stab0.2/Tr2_moins_Tbulk.txt
                 }
 	}        
-	Tableau {
+	Table {
 
 		Description "Re=1e5"
-		nb_colonnes 3
+		nb_columns 3
                	 Label  "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-                	Legende "Muscl"
-                        fichier ./100000/muscl/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Muscl"
+                        file ./100000/muscl/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=1$}"
-                        fichier ./100000/ef_stab1/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=1$}"
+                        file ./100000/ef_stab1/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=0.2$}"
-                        fichier ./100000/ef_stab0.2/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=0.2$}"
+                        file ./100000/ef_stab0.2/Tr2_moins_Tbulk.txt
                 }
 	}	
-	Tableau {
+	Table {
 		Description "Re=2e5"
-		nb_colonnes 3
+		nb_columns 3
                	 Label  "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-                	Legende "Muscl"
-                        fichier ./200000/muscl/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Muscl"
+                        file ./200000/muscl/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=1$}"
-                        fichier ./200000/ef_stab1/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=1$}"
+                        file ./200000/ef_stab1/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=0.2$}"
-                        fichier ./200000/ef_stab0.2/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=0.2$}"
+                        file ./200000/ef_stab0.2/Tr2_moins_Tbulk.txt
                 }
 	}	
-	Tableau {
+	Table {
 		Description "Re=5e5"
-		nb_colonnes 3
+		nb_columns 3
                	 Label  "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-                	Legende "Muscl"
-                        fichier ./500000/muscl/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Muscl"
+                        file ./500000/muscl/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=1$}"
-                        fichier ./500000/ef_stab1/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=1$}"
+                        file ./500000/ef_stab1/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=0.2$}"
-                        fichier ./500000/ef_stab0.2/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=0.2$}"
+                        file ./500000/ef_stab0.2/Tr2_moins_Tbulk.txt
                 }
 	}
-	Tableau {
+	Table {
 		Description "Re=10e5"
-		nb_colonnes 3
+		nb_columns 3
                	 Label  "Theory" | "Calculation" | "Difference (%)"
-		Ligne {
-                	Legende "Muscl"
-                        fichier ./1000000/muscl/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Muscl"
+                        file ./1000000/muscl/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=1$}"
-                        fichier ./1000000/ef_stab1/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=1$}"
+                        file ./1000000/ef_stab1/Tr2_moins_Tbulk.txt
                 }
-		Ligne {
-                	Legende "Ef_stab {$\alpha=0.2$}"
-                        fichier ./1000000/ef_stab0.2/Tr2_moins_Tbulk.txt
+		line {
+                	legend "Ef_stab {$\alpha=0.2$}"
+                        file ./1000000/ef_stab0.2/Tr2_moins_Tbulk.txt
                 }
 	}
-	Tableau {
+	Table {
 		Description " In this study, the temperature in the solid is calculated from the results of the Nusselt number, the thermal flux and also the temporal slope."
 		Description " The error between analytical results and simulation seems to offset : in fact, at the contrary of the previous study on the difference  \latex_($(T_{r_1}-T_{bulk})$\latex_), the error on the calculations is negligible for all simulations ($\latex_( 3\%\latex_)$)."
 	}
-			Tableau {
-			Titre "Difference of temperature in the solid domain"
+			Table {
+			Title "Difference of temperature in the solid domain"
 			Description "The theory gives:\latex_(\[  (T_{r_2}-T_{r_1})=\frac{\left(q-\rho_s~Cp_s~\xi\right)}{4~\lambda_s}\left(r^2_1 -r^2_2\right)+\left(\frac{q-\rho_s~Cp_s~\xi}{2\lambda_s}\right)~r^2_2~ln\left(\frac{r_2}{r_1}\right)\]\latex_)\newline"
 			Description "To build the Trio_U's results, \latex_($T_{r_1}$\latex_) and \latex_($T_{r_2}$\latex_) are given by probes, shown in \latex_( \S~5.4\latex_) and \latex_( \S~5.5\latex_)."
 			Description "In the next tables, this temperature difference is successively compared, for each Reynolds number tested.\newline" 
 		}
-		Tableau {
+		Table {
 			Description "\newpage"
 			Description "Re=0.5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./50000/muscl/Tr2_moins_Tr1.txt
+			line {
+                		legend "Muscl"
+                        	file ./50000/muscl/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./50000/ef_stab1/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./50000/ef_stab1/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./50000/ef_stab0.2/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./50000/ef_stab0.2/Tr2_moins_Tr1.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=1e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./100000/muscl/Tr2_moins_Tr1.txt
+			line {
+                		legend "Muscl"
+                        	file ./100000/muscl/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./100000/ef_stab1/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./100000/ef_stab1/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./100000/ef_stab0.2/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./100000/ef_stab0.2/Tr2_moins_Tr1.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=2e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./200000/muscl/Tr2_moins_Tr1.txt
+			line {
+                		legend "Muscl"
+                        	file ./200000/muscl/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./200000/ef_stab1/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./200000/ef_stab1/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./200000/ef_stab0.2/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./200000/ef_stab0.2/Tr2_moins_Tr1.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=5e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./500000/muscl/Tr2_moins_Tr1.txt
+			line {
+                		legend "Muscl"
+                        	file ./500000/muscl/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./500000/ef_stab1/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./500000/ef_stab1/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./500000/ef_stab0.2/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./500000/ef_stab0.2/Tr2_moins_Tr1.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "Re=10e5"
-			nb_colonnes 3
+			nb_columns 3
                	 	Label  "Theory" | "Calculation" | "Difference (%)"
-			Ligne {
-                		Legende "Muscl"
-                        	fichier ./1000000/muscl/Tr2_moins_Tr1.txt
+			line {
+                		legend "Muscl"
+                        	file ./1000000/muscl/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=1$}"
-                        	fichier ./1000000/ef_stab1/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=1$}"
+                        	file ./1000000/ef_stab1/Tr2_moins_Tr1.txt
                         }
-			Ligne {
-                		Legende "Ef_stab {$\alpha=0.2$}"
-                        	fichier ./1000000/ef_stab0.2/Tr2_moins_Tr1.txt
+			line {
+                		legend "Ef_stab {$\alpha=0.2$}"
+                        	file ./1000000/ef_stab0.2/Tr2_moins_Tr1.txt
                         }
 		}
-		Tableau {
+		Table {
 			Description "The tables show that the spatial evolution of the temperature field in the solid domain is well simulated by Triou and does not depend of the convection scheme tested  : the difference between simulation and results is less than \latex_($3\%$\latex_) for all convection scheme tested." 
 			Description "So, the results show that the conduction is correctly calculated inside the solid in the range of the Reynolds numbers tested."
 		}
-	Tableau {
-	 	Titre "Temperature profile inside the solid domain"
+	Table {
+	 	Title "Temperature profile inside the solid domain"
 		Description "The temperature profile in the solid domain is theoretically given by : \latex_( \[ T_s \left( r \right)~=~-\frac{ \left( q-\rho_s Cp_s \xi \right) }{4 \lambda_s}~\left(r^2_1~-~r^2\right)+~\frac{\left(q-\rho_s~Cp-s~\xi\right)}{2 \lambda_s}~r^2_2~ln\left(\frac{r}{r_1}\right)+\varphi_s~\left(\frac{2~r_1} {Nu~\lambda_f}\right)~+~T_{bulk}\left(t\right) \]\latex_) "
 		Description "For computations, the temperature is given by a probe (segment), and the mixing temperature \latex_($ T_{bulk} $\latex_) is computed by Traitement_particulier and given in the file Tmoyen."
 		Description "The figure below compares the theoretical temperature profile and the calculated profiles."
@@ -3195,35 +3195,35 @@ Chapitre {
 		LabelX "r(m)"
 		LabelY "Temperature"
 		RangeY 0 0.0035
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12.5cm
-		Legende bottom right
-		Courbe {
-			Legende "Theory"
-			Fichier ./50000/muscl/profil_temp_solide.dat
-			Colonnes 1 2
+		legend bottom right
+		Curve {
+			legend "Theory"
+			file ./50000/muscl/profil_temp_solide.dat
+			columns 1 2
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "TrioU,muscl"
-			Origine "Trio_U"
-			Fichier ./50000/muscl/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU,muscl"
+			origin "Trio_U"
+			file ./50000/muscl/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=1}"
-			Origine "Trio_U"
-			Fichier ./50000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=1}"
+			origin "Trio_U"
+			file ./50000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./50000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=0.2}"
+			origin "Trio_U"
+			file ./50000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
 	}	
@@ -3233,35 +3233,35 @@ Chapitre {
 		LabelX "r(m)"
 		LabelY "Temperature"
 		RangeY 0 0.0035
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		Width 12.5cm
-		Legende bottom right
-		Courbe {
-			Legende "Theory"
-			Fichier ./100000/muscl/profil_temp_solide.dat
-			Colonnes 1 2
+		legend bottom right
+		Curve {
+			legend "Theory"
+			file ./100000/muscl/profil_temp_solide.dat
+			columns 1 2
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "TrioU,muscl"
-			Origine "Trio_U"
-			Fichier ./100000/muscl/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU,muscl"
+			origin "Trio_U"
+			file ./100000/muscl/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=1}"
-			Origine "Trio_U"
-			Fichier ./100000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=1}"
+			origin "Trio_U"
+			file ./100000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./100000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=0.2}"
+			origin "Trio_U"
+			file ./100000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
 	}	
@@ -3271,35 +3271,35 @@ Chapitre {
 		LabelX "r(m)"
 		LabelY "Temperature"
 		RangeY 0 0.0035
-		InclureDescCourbes 0
-		Legende bottom right
+		Include_Description_Curves 0
+		legend bottom right
 		Width 12.5cm
-		Courbe {
-			Legende "Theory"
-			Fichier ./200000/muscl/profil_temp_solide.dat
-			Colonnes 1 2
+		Curve {
+			legend "Theory"
+			file ./200000/muscl/profil_temp_solide.dat
+			columns 1 2
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "TrioU,muscl"
-			Origine "Trio_U"
-			Fichier ./200000/muscl/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU,muscl"
+			origin "Trio_U"
+			file ./200000/muscl/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=1}"
-			Origine "Trio_U"
-			Fichier ./200000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=1}"
+			origin "Trio_U"
+			file ./200000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./200000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=0.2}"
+			origin "Trio_U"
+			file ./200000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
 	}	
@@ -3309,35 +3309,35 @@ Chapitre {
 		LabelX "r(m)"
 		LabelY "Temperature"
 		RangeY 0 0.0035
-		InclureDescCourbes 0
-		Legende bottom right
+		Include_Description_Curves 0
+		legend bottom right
 		Width 12.5cm
-		Courbe {
-			Legende "Theory"
-			Fichier ./500000/muscl/profil_temp_solide.dat
-			Colonnes 1 2
+		Curve {
+			legend "Theory"
+			file ./500000/muscl/profil_temp_solide.dat
+			columns 1 2
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "TrioU,muscl"
-			Origine "Trio_U"
-			Fichier ./500000/muscl/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU,muscl"
+			origin "Trio_U"
+			file ./500000/muscl/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=1}"
-			Origine "Trio_U"
-			Fichier ./500000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=1}"
+			origin "Trio_U"
+			file ./500000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./500000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=0.2}"
+			origin "Trio_U"
+			file ./500000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
 	}
@@ -3347,39 +3347,39 @@ Chapitre {
 		LabelX "r(m)"
 		LabelY "Temperature"
 		RangeY 0 0.0035
-		InclureDescCourbes 0
-		Legende bottom right
+		Include_Description_Curves 0
+		legend bottom right
 		Width 12.3cm
-		Courbe {
-			Legende "Theory"
-			Fichier ./1000000/muscl/profil_temp_solide.dat
-			Colonnes 1 2
+		Curve {
+			legend "Theory"
+			file ./1000000/muscl/profil_temp_solide.dat
+			columns 1 2
 			Style points
 			PointSize 2
 		}
-		Courbe {
-			Legende "TrioU,muscl"
-			Origine "Trio_U"
-			Fichier ./1000000/muscl/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU,muscl"
+			origin "Trio_U"
+			file ./1000000/muscl/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=1}"
-			Origine "Trio_U"
-			Fichier ./1000000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=1}"
+			origin "Trio_U"
+			file ./1000000/ef_stab1/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
-		Courbe {
-			Legende "TrioU, Ef_stab {\alpha=0.2}"
-			Origine "Trio_U"
-			Fichier ./1000000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
-			Colonnes $1 ($2)
+		Curve {
+			legend "TrioU, Ef_stab {\alpha=0.2}"
+			origin "Trio_U"
+			file ./1000000/ef_stab0.2/test_TEMPERATURE_PROFIL_triou.txt
+			columns $1 ($2)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_(\hspace*{10mm}\latex_)" 
 		Description "The analytical results are very well fitted by the simulation results, especially for both the muscl convection scheme and the Ef_stab { \latex_($\alpha=0.2$\latex_) } scheme."
 		Description "Once again, the simulations made with the Ef_stab { \latex_($\alpha=1$\latex_) } convection scheme does not allow to reproduce the analytical results with the same precision than the simulations made with the other convection schemes.\newline"
@@ -3387,8 +3387,8 @@ Chapitre {
 	}
 
 }	
-Chapitre {
-	Titre "Conclusion"
+Chapter {
+	Title "Conclusion"
 	Description "We have seen that : "
 	Description " - on the one hand, due to the periodic boudary conditions, 4 layers of cells mesh are enough to simulated properly the behaviour of flow in the solid domain. On the other hand, note that it is advised to have two cells rather than one in the down corner (near the Z-axis) because a cell having two faces with an imposed symmetry condition might not be calculated properly."
 	Description " - thus, as we have seen that the lower the Reynolds number, the bigger the average resolution time step, the EF_stab convection scheme could reduce the simulation time significantly (see computer performance). \newline"	
@@ -3397,8 +3397,8 @@ Chapitre {
 	Description "On the thermal study, note that it is the Ef_stab {\latex_($ \alpha=1 $\latex_) } convection scheme which does not allow to reproduce the results of the Nusselt correlation precisely."
 	Description "For these reasons, it appears that the optimized choice to make an unstationnary implicit simulation with coupling is the Ef_stab {\latex_($ \alpha=0.2 $\latex_) } numerical convection scheme." 
 }
-Chapitre {
-	Titre "Recommendations for users"
+Chapter {
+	Title "Recommendations for users"
 	Description "In the case of an unstationary implicit simulation with coupling (fluid/solid), it is necessary to pay attention to the implicit parameters used to make the Trio_U simulation.\newline"
 	Description " In this particular case, we have a problem on the interpretation of the transitory state, and the solution of a thermal-hydraulic problem may have no physical signification if this implicit parameters are not well fixed (no equalization of thermal flux at the contact wall and a thermal solution which depends on the numerical scheme options).\newline
 	Description "In consequence, it is advised to impose the parameter \latex_(\textit{seuil\_convergence\_implicite}\latex_) as low as possible so that the results of the simulation tend to the theoritical solutions."
@@ -3407,8 +3407,8 @@ Chapitre {
 	Description "Moreover, we have observed that if we impose a value too low with a relatively high Reynolds number, the simulation made with the Ef_stab {\latex_($\alpha=1$\latex_)} convection scheme does not converge."
 
 }
-Chapitre {
-	Titre "Computer performance"
+Chapter {
+	Title "Computer performance"
 	tableau_performance {
 	}
 }

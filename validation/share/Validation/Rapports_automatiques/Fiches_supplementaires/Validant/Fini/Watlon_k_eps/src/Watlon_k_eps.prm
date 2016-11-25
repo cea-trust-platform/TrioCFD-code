@@ -1,15 +1,15 @@
-Parametres {
-	Titre "Watlon mixing-T experiment"
+Parameters {
+	Title "Watlon mixing-T experiment"
 	Description "This document is a study to validate Trio_U CFD code to simulate the watlon experiment, a water facility about fluid mixing in T-pipe with long cycle fluctuations. A cold jet coming from a branch is injected into the main pipe, in which hot water flows.\newline"
 	Description ""
 	Description "The validation of thermal-hydraulic behaviour is made for three different momentum convection schemes and two flow configurations."
-	Auteur "MALOD C., LEDAC P., VANDROUX S., BIEDER U., BARTHEL V"
-	CasTest Impinging_Jet/Muscl		Watlon 32 /* jdd attached */
-	CasTest Impinging_Jet/Ef_Stab1.0	Watlon 32
-	CasTest Impinging_Jet/Ef_Stab0.2	Watlon 32
-	CasTest Wall_Jet/Muscl			Watlon 32 /* jdd attached */
-	CasTest Wall_Jet/Ef_Stab1.0		Watlon 32
-	CasTest Wall_Jet/Ef_Stab0.2		Watlon 32
+	Author "MALOD C., LEDAC P., VANDROUX S., BIEDER U., BARTHEL V"
+	TestCase Impinging_Jet/Muscl		Watlon 32 /* jdd attached */
+	TestCase Impinging_Jet/Ef_Stab1.0	Watlon 32
+	TestCase Impinging_Jet/Ef_Stab0.2	Watlon 32
+	TestCase Wall_Jet/Muscl			Watlon 32 /* jdd attached */
+	TestCase Wall_Jet/Ef_Stab1.0		Watlon 32
+	TestCase Wall_Jet/Ef_Stab0.2		Watlon 32
 	ParametresTrio_U "Type of problem : Turbulent Thermal-Hydraulic"
 	ParametresTrio_U "Discretization : VEFPreP1B"
 	ParametresTrio_U "Time scheme : Euler_implicite"
@@ -18,26 +18,26 @@ Parametres {
 	ParametresTrio_U "Velocity/Temperature coupling : not coupled"
 	ParametresTrio_U "Type of Navier Stokes boundary conditions : Inlet velocity, Outlet pressure, Wall on other"
 	ParametresTrio_U "Type of Temperature boundary conditions : Inlet and Outlet temperature, Adiabatic wall"
-	InclureData 2
+	IncludeData 2
 	Reference $[1]$ P. Coste, Large eddy simulation of the WATLON mixing-T experiment using TRUST VEF 1.4.8,NT SSTH/LMDL/2005-024
 	Reference $[3]$ P. Coste, P. Quemere, P. Roubin, P. Emonot, M. Tanaka, H. Kamide, Large eddy simulation of highly fluctuational temperature and velocity fields observed in a mixing-tee experiment, Nuclear Technology, vol.164, p 76-88, October 2008
-	PreRequis "./Calcul_U_Plus.sh 1>Calcul_U_Plus.log 2>&1"
-	PreRequis "Extract_histogram dom_Walton Impinging_Jet/Muscl/Watlon.err  > Impinging_Jet/Muscl/histo"
+	Prerequisite "./Calcul_U_Plus.sh 1>Calcul_U_Plus.log 2>&1"
+	Prerequisite "Extract_histogram dom_Walton Impinging_Jet/Muscl/Watlon.err  > Impinging_Jet/Muscl/histo"
 }
 
-Chapitre {
-	Titre "Experimental description"
-	Tableau {
-		Titre "Test section"
+Chapter {
+	Title "Experimental description"
+	Table {
+		Title "Test section"
 		Description "WATLON is a Tee junction mixing experiment, which was built to study fluid mixing phenomena for evaluation of thermal stripping. Hot water (48°C) is flowing in a 150 mm inner diameter pipe. Cold water (33°C) is injected in this main pipe from a 50 mm inner diameter branch pipe.\newline\newline"
 	}
 	Figure {
 		Width 14cm
 		nb_img_without_newline 1
-		Image ./Experimental_description.png
+		picture ./Experimental_description.png
 	}
-	Tableau {
-		Titre "Experimental data"
+	Table {
+		Title "Experimental data"
 		Description "A fifteen thermocouples tree is used for temperature measurement, with a time response about 0.03 s and accuracy about $\pm$0.2°C. Velocities are measured by PIV, at 200 Hz."
 		Description "Time-averaged (also called "mean" in this report) and rms values of temperature, T, velocities components on z direction, Vz, and on y direction, Vy, are available. z is defined as the main pipe axis one, and its direction is the flow. y is defined as the branch pipe axis one, and its direction is the branch flow. x is defined from y and z, to form a direct cartesian coordinate.\newline"
 		Description "Measured profiles are provided at following positions :"
@@ -46,59 +46,59 @@ Chapitre {
 		Description "- Vz, Vy: z=0.5D, 1D.\newline"
 		Description "T is normalized by (T-Tb)/(Tm-Tb), where the subscript 'm' denotes the main pipe and 'b' the branch. Vz and Vy are normalized by Vm.\newline" 
 	}
-	Tableau {
-		Titre "Flow configurations"
+	Table {
+		Title "Flow configurations"
 		Description "Depending on momentum ratio between main pipe and branch, the cold jet coming from the branch flows either along the bottom wall (wall jet), or in the central part of the pipe (deflecting jet : not studied here), or to the opposite wall (impinging jet). In any case, branch velocity is 1m/s, Reynolds number is about 6.10$^4$. In the wall jet case (resp. impinging jet case), in the main branch, velocity is 1.46 m/s (resp. 0.23 m/s), Reynolds number is about 4.10$^5$ (resp. 6.10$^4$).\newline\newline"
 	}
 	Figure {
 		Description "\latex_( \[Wall~~jet~~configuration \] \latex_)"
 		Width 7cm
 		nb_img_without_newline 2
-		Image ./Experimental_wall_jet.png
+		picture ./Experimental_wall_jet.png
 	}
 	Figure {
 		Description "\latex_( \[Impinging~~jet~~configuration \] \latex_)"
 		Width 7cm
-		Image ./Experimental_impinging_jet.png
+		picture ./Experimental_impinging_jet.png
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \begin{center} \latex_)"
-		nb_colonnes 3
+		nb_columns 3
 		label Physical property | Wall jet configuration | Impinging jet configuration
-		Ligne {
-			Legende "Branch pipe"
-			valeurs "Inlet$~$temperature$~$(°C)" 33 33
+		line {
+			legend "Branch pipe"
+			values "Inlet$~$temperature$~$(°C)" 33 33
 		}
-		Ligne {
-			Legende "Main pipe"
-			valeurs "Inlet$~$temperature$~$(°C)" 48 48
+		line {
+			legend "Main pipe"
+			values "Inlet$~$temperature$~$(°C)" 48 48
 		}
-		Ligne {
-			Legende "Branch pipe"
-			valeurs "Mean~inlet$~$velocity$~$(m/s)" 1 1
+		line {
+			legend "Branch pipe"
+			values "Mean~inlet$~$velocity$~$(m/s)" 1 1
 		}
-		Ligne {
-			Legende "Main pipe"
-			valeurs "Mean~inlet$~$velocity$~$(m/s)" 1.46 0.23
+		line {
+			legend "Main pipe"
+			values "Mean~inlet$~$velocity$~$(m/s)" 1.46 0.23
 		}
-		Ligne {
-			Legende "Branch pipe"
-			valeurs "Reynolds$~$number" "6.10$^4$" "6.10$^4$"
+		line {
+			legend "Branch pipe"
+			values "Reynolds$~$number" "6.10$^4$" "6.10$^4$"
 		}
-		Ligne {
-			Legende "Main pipe"
-			valeurs "Reynolds$~$number" "4.10$^5$" "6.10$^4$"
+		line {
+			legend "Main pipe"
+			values "Reynolds$~$number" "4.10$^5$" "6.10$^4$"
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)\newpage"
 	}
 }
 
-Chapitre {
-	Titre "Test description"
-	Tableau {
-		Titre "Geometry description"
+Chapter {
+	Title "Test description"
+	Table {
+		Title "Geometry description"
 		Description "The next figures show a representation of the various components of the simulation.\latex_( \begin{center} \latex_)"
 	}
 	Visu {
@@ -141,11 +141,11 @@ Chapitre {
 		Operator no_triad
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Mesh description"
+	Table {
+		Title "Mesh description"
 		Description "The mesh used in this study contains 661.632 tetrahedral cells. The next figures show the mesh, tested in this study, in vertical plan cut and in cross section, near branch pipe and main pipe intersection.\newline\newline\latex_( \begin{center} \latex_)"
 	}
 	Visu {
@@ -179,32 +179,32 @@ Chapitre {
 	}
 	Figure 
 	{
-		Titre_figure "Histogram of angle of the mesh"
+		Title_figure "Histogram of angle of the mesh"
 		dimension 2
-		incluredesccourbes 0
+		Include_Description_Curves 0
 		width 10cm
 		labelx Angle
 		labely % of cells
-		courbe {
-			fichier Impinging_Jet/Muscl/histo
-			Legende ""
+		Curve {
+			file Impinging_Jet/Muscl/histo
+			legend ""
 			style boxes
-			colonnes ($2+$5)/2 11
+			columns ($2+$5)/2 11
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Physical properties"
+	Table {
+		Title "Physical properties"
 		Description "Fluid domain: Water flow at 47°C \latex_(\hspace*{19mm} Density : $\rho = 991.3$ kg/m$^3$\latex_)"
 		Description "\latex_(\hspace*{74mm}Kinematic viscosity : $\mu = 5.86e-4$\latex_) N/m$^2$/s"
 		Description "\latex_(\hspace*{74mm}Thermal conductivity : $\lambda = 0.555$\latex_) W/m/K"
 		Description "\latex_(\hspace*{74mm}Specific heat capacity : $Cp = 4172$\latex_) J/kg/K"
 		Description "\latex_(\hspace*{74mm}Isothermal compressibility : $\beta = 2.74e-4$ K$^{-1}$\latex_)"
 	}
-	Tableau {
-		Titre "Initial and boundaries conditions"
+	Table {
+		Title "Initial and boundaries conditions"
 		Description "\latex_(\textbf {Watlon configuration} \latex_)"
 		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 0 m/s in all directions,"
 		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 47°C."
@@ -239,8 +239,8 @@ Chapitre {
 		Description "The turbulent kinetic energy and turbulence dissipation rate were estimated by using these formulations:"
 		Description "\latex_(\hspace*{1cm} {\large $ k \simeq \frac{3}{2}.(U.I)^2$} \hspace*{1cm}  {\large $ \varepsilon \simeq C_\mu . {k^{3/2} \over {0.07 . D_h}}$} \hspace*{1cm} with I : Turbulence intensity estimated to 10\%\latex_)"
 	}
-	Tableau {
-		Titre "Trio_U parameters tested"
+	Table {
+		Title "Trio_U parameters tested"
 		Description "For the two different flow configurations, only the convection scheme of Navier-Stokes equation varies: It can be defined as Muscl (2nd order upwind scheme), EF_stab with $\alpha$=1 (2nd order mix between upwind and centered scheme), or EF_stab with $\alpha$=0.2 (2nd order almost full centered scheme). For all other equations, the convective scheme is defined as Amont (1er order upwind scheme)."
 		Description "Due to possible physical or numerical ocillations, a specific strategy is implemented for the time management and post processing :"
 		Description "- The calculation is performed from the initial time to the starting time statistics, which corresponds to the time that a fluid particle takes to cross two times the computational domain at the flow mean velocity (Wall jet configuration $\sim$ 1.0 s; Impinging jet configuration $\sim$ 4.5 s),"
@@ -248,10 +248,10 @@ Chapitre {
 	}
 }
 
-Chapitre {
-	Titre "Results on periodic boxes"
-	Tableau {
-		Titre "Convergence of periodic boxes"
+Chapter {
+	Title "Results on periodic boxes"
+	Table {
+		Title "Convergence of periodic boxes"
 		Description "The following figures show a good convergence of calculations on periodic boxes for the three convection schemes and the two flow configurations, which is checked on the instantaneous axial velocity time evolution at center of :"
 		Description "- Main box (mean axial velocity at 0.23 m/s for impinging jet configuration)"
 		Description "- Main box (mean axial velocity at 1.46 m/s for wall jet configuration)"
@@ -262,31 +262,31 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/main0.23_box/main0.23_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -295,30 +295,30 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/main1.46_box/main1.46_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -327,38 +327,38 @@ Chapitre {
 		Width 7cm
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/branch_box/branch_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/branch_box/branch_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/branch_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/branch_box/branch_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/branch_box_SONDE_VCENTRE_BOX.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/branch_box/branch_box_SONDE_VCENTRE_BOX.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 3
+			columns 1 3
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Y+ distribution"
+	Table {
+		Title "Y+ distribution"
 		Description "The next figures present the Y+ distribution on the periodic boxes on the two flow configurations, for values of Y+ between [0:30]."
 		Description "We can observed that the mesh of the main box, for the wall jet configuration (high velocity), has a good cell sizes, to apply standard logarithmic law on walls. But for the impinging jet configuration, the cell sizes of this main box are too small and induce low values of Y+ to apply standard logarithmic law on walls. On the mesh of the branch box, the cell sizes are also too small.\newline\newline"
 	}
@@ -414,8 +414,8 @@ Chapitre {
 		Operator no_triad
 		Operator_to_all no_legend
 	}
-	Tableau {
-		Titre "Dimensionless mean velocity profiles"
+	Table {
+		Title "Dimensionless mean velocity profiles"
 		Description "The next figures present the comparison of the mean velocity profiles (u$^+$ = U/U$\tau$ ; y$^+$ = Y.U$\tau$/$\nu$) of calculations with the standard logarithmic law for the three convection scheme and the two flow configurations."
 		Description "The law of wall is composed by three different formula :"
 		Description "- u$^+$ = y$^+$ in the viscous sublayer (y$^+$ < 5)"
@@ -431,73 +431,73 @@ Chapitre {
 		LogX
 		LabelY "u+"
 		RangeY 0. 40.
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "u+ = f(y+)"
-			Fichier ./Uplus.out
-			Colonnes 1 2
+		Curve {
+			legend "u+ = f(y+)"
+			file ./Uplus.out
+			columns 1 2
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 			TypeLigne rgb "black"
 		}
-		Courbe {
-			Legende ""
-			Fichier ./Uplus.out
-			Colonnes 3 4
+		Curve {
+			legend ""
+			file ./Uplus.out
+			columns 3 4
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 			TypeLigne rgb "black"
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Muscl"
-			Fichier ./Impinging_Jet/Muscl/main0.23_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Muscl"
+			file ./Impinging_Jet/Muscl/main0.23_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/main0.23_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/main0.23_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -509,72 +509,72 @@ Chapitre {
 		LogX
 		LabelY "u+"
 		RangeY 0. 40.
-		InclureDescCourbes 0
-		Courbe {
-			Legende "u+ = f(y+)"
-			Fichier ./Uplus.out
-			Colonnes 1 2
+		Include_Description_Curves 0
+		Curve {
+			legend "u+ = f(y+)"
+			file ./Uplus.out
+			columns 1 2
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 			TypeLigne rgb "black"
 		}
-		Courbe {
-			Legende ""
-			Fichier ./Uplus.out
-			Colonnes 3 4
+		Curve {
+			legend ""
+			file ./Uplus.out
+			columns 3 4
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 			TypeLigne rgb "black"
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Muscl"
-			Fichier ./Wall_Jet/Muscl/main1.46_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Muscl"
+			file ./Wall_Jet/Muscl/main1.46_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/main1.46_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/main1.46_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/main1.46_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/main1.46_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/main1.46_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/main1.46_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
@@ -586,171 +586,171 @@ Chapitre {
 		LogX
 		LabelY "u+"
 		RangeY 0. 40.
-		InclureDescCourbes 0
-		Courbe {
-			Legende "u+ = f(y+)"
-			Fichier ./Uplus.out
-			Colonnes 1 2
+		Include_Description_Curves 0
+		Curve {
+			legend "u+ = f(y+)"
+			file ./Uplus.out
+			columns 1 2
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 			TypeLigne rgb "black"
 		}
-		Courbe {
-			Legende ""
-			Fichier ./Uplus.out
-			Colonnes 3 4
+		Curve {
+			legend ""
+			file ./Uplus.out
+			columns 3 4
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 			TypeLigne rgb "black"
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Muscl"
-			Fichier ./Impinging_Jet/Muscl/branch_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Muscl"
+			file ./Impinging_Jet/Muscl/branch_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/branch_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/branch_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/branch_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/branch_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
-		Courbe {
-			Legende "First point calculated by Trio_U - Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/Uplus_trio.out
-			Origine "Trio_U"
+		Curve {
+			legend "First point calculated by Trio_U - Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/branch_box/Uplus_trio.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			PointSize 2
 			Style points
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/Uplus.out
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/branch_box/Uplus.out
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 2
+			columns 1 2
 			Style lines
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Comparisons of friction velocity"
+	Table {
+		Title "Comparisons of friction velocity"
 		Description "The next table presents the comparison of the friction velocity of each calculation, with the Blasius correlation :"
 		Description "\latex_( \[U\tau=U.\sqrt{\frac{1}{2} C_f}~~~~~with~~~~~C_f=0.079.Re^{-0.25} \] \begin{center} \latex_)"
-		nb_colonnes 3
+		nb_columns 3
 		label "U$\tau$ Blasius" | "U$\tau$ Trio_U" | "Variation ($%$)"
-		Ligne {
-			Legende "Branch box all jet configuration - Muscl"
-			Origine "Trio_U"
+		line {
+			legend "Branch box all jet configuration - Muscl"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Impinging_Jet/Muscl/branch_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Impinging_Jet/Muscl/branch_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Branch box all jet configuration - Ef_Stab1.0"
-			Origine "Trio_U"
+		line {
+			legend "Branch box all jet configuration - Ef_Stab1.0"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Impinging_Jet/Ef_Stab1.0/branch_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Impinging_Jet/Ef_Stab1.0/branch_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Branch box all jet configuration - Ef_Stab0.2"
-			Origine "Trio_U"
+		line {
+			legend "Branch box all jet configuration - Ef_Stab0.2"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Impinging_Jet/Ef_Stab0.2/branch_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Impinging_Jet/Ef_Stab0.2/branch_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Main box impinging jet configuration - Muscl"
-			Origine "Trio_U"
+		line {
+			legend "Main box impinging jet configuration - Muscl"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Impinging_Jet/Muscl/main0.23_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Impinging_Jet/Muscl/main0.23_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Main box impinging jet configuration - Ef_Stab1.0"
-			Origine "Trio_U"
+		line {
+			legend "Main box impinging jet configuration - Ef_Stab1.0"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Impinging_Jet/Ef_Stab1.0/main0.23_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Main box impinging jet configuration - Ef_Stab0.2"
-			Origine "Trio_U"
+		line {
+			legend "Main box impinging jet configuration - Ef_Stab0.2"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Impinging_Jet/Ef_Stab0.2/main0.23_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Main box wall jet configuration - Muscl"
-			Origine "Trio_U"
+		line {
+			legend "Main box wall jet configuration - Muscl"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Wall_Jet/Muscl/main1.46_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Wall_Jet/Muscl/main1.46_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Main box wall jet configuration - Ef_Stab1.0"
-			Origine "Trio_U"
+		line {
+			legend "Main box wall jet configuration - Ef_Stab1.0"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Wall_Jet/Ef_Stab1.0/main1.46_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Wall_Jet/Ef_Stab1.0/main1.46_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
-		Ligne {
-			Legende "Main box wall jet configuration - Ef_Stab0.2"
-			Origine "Trio_U"
+		line {
+			legend "Main box wall jet configuration - Ef_Stab0.2"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier ./Wall_Jet/Ef_Stab0.2/main1.46_box/Utau.txt
-			nb_colonnes_fichier 3
+			file ./Wall_Jet/Ef_Stab0.2/main1.46_box/Utau.txt
+			nb_columns_file 3
 			derniere_ligne
-			colonnes int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
+			columns int($2*1000000)/1000000. int($3*1000000)/1000000. int(($2-$3)*10000/$2)/100.
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Non dimensional mean velocity profiles"
+	Table {
+		Title "Non dimensional mean velocity profiles"
 		Description "The next figures present the comparison of the non dimensional mean velocity profiles (see normalization $\S$2.2) of calculations for the three convection scheme and the two flow configurations."
 		Description "\latex_( \begin{center} \latex_)"
 	}
@@ -761,30 +761,30 @@ Chapitre {
 		RangeX -75 75
 		LabelY "Non dimensional Vz mean"
 		RangeY 0. 1.4
-		InclureDescCourbes 0
+		Include_Description_Curves 0
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment ./Impinging_Jet/Muscl/main0.23_box/main0.23_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($4/0.23)
+			columns ($1*1000) ($4/0.23)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment ./Impinging_Jet/Ef_Stab1.0/main0.23_box/main0.23_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($4/0.23)
+			columns ($1*1000) ($4/0.23)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment ./Impinging_Jet/Ef_Stab0.2/main0.23_box/main0.23_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($4/0.23)
+			columns ($1*1000) ($4/0.23)
 			Style linespoints
 		}
 	}
@@ -795,29 +795,29 @@ Chapitre {
 		RangeX -75 75
 		LabelY "Non dimensional Vz mean"
 		RangeY 0. 1.4
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl"
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl"
 			Segment ./Wall_Jet/Muscl/main1.46_box/main1.46_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($4/1.46)
+			columns ($1*1000) ($4/1.46)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment ./Wall_Jet/Ef_Stab1.0/main1.46_box/main1.46_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($4/1.46)
+			columns ($1*1000) ($4/1.46)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment ./Wall_Jet/Ef_Stab0.2/main1.46_box/main1.46_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($4/1.46)
+			columns ($1*1000) ($4/1.46)
 			Style linespoints
 		}
 	}
@@ -828,46 +828,46 @@ Chapitre {
 		RangeX -25 25
 		LabelY "Non dimensional Vy mean"
 		RangeY 0. 1.4
-		InclureDescCourbes 0
-		Courbe {
-			Legende "Muscl"
+		Include_Description_Curves 0
+		Curve {
+			legend "Muscl"
 			Segment ./Impinging_Jet/Muscl/branch_box/branch_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($3)
+			columns ($1*1000) ($3)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment ./Impinging_Jet/Ef_Stab1.0/branch_box/branch_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($3)
+			columns ($1*1000) ($3)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment ./Impinging_Jet/Ef_Stab0.2/branch_box/branch_box.data SONDE_V_BOX
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($1*1000) ($3)
+			columns ($1*1000) ($3)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
-	Tableau {
-		Titre "Conclusion"
+	Table {
+		Title "Conclusion"
 		Description "As it has been shown in the Y+ distribution, the cell sizes of the main box, for the impinging jet configuration, are too small and induce, due to standard wall law, lower values of dimensionless mean velocity, ie higher values of friction velocity."
 		Description "The cell sizes, in this study, result of the choice to extrude inlet facets of domain, to create periodic boxes, in 14 tetrahedral elements (symmetric mesh) instead of 3 (asymmetric mesh). This allows us to obtain a symmetrical velocity profile.\newpage"
 	}
 }
 	
-Chapitre {
-	Titre "Convergence of Watlon calculation"
-	Tableau {
-		Titre "Convergence of Impinging jet configuration"
+Chapter {
+	Title "Convergence of Watlon calculation"
+	Table {
+		Title "Convergence of Impinging jet configuration"
 	}
 	Figure {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=0.5D"
@@ -875,31 +875,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Temperature [°C]"
 		RangeY 40 50
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_T_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/Watlon_SONDE_T_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
 	}
@@ -909,30 +909,30 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
 		RangeY -0.5 0.5
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_V_0.5D.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/Watlon_SONDE_V_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -942,31 +942,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Temperature [°C]"
 		RangeY 40 50
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_T_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/Watlon_SONDE_T_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
 	}
@@ -976,30 +976,30 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
 		RangeY -0.5 0.5
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_V_1D.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/Watlon_SONDE_V_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1009,31 +1009,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Temperature [°C]"
 		RangeY 40 50
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_T_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/Watlon_SONDE_T_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_T_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_T_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
 	}
@@ -1043,35 +1043,35 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
 		RangeY -0.5 0.5
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Impinging_Jet/Muscl/Watlon_SONDE_V_2D.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Impinging_Jet/Muscl/Watlon_SONDE_V_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Impinging_Jet/Ef_Stab1.0/Watlon_SONDE_V_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Impinging_Jet/Ef_Stab0.2/Watlon_SONDE_V_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
-	Tableau {
-		Titre "Convergence of Wall jet configuration"
+	Table {
+		Title "Convergence of Wall jet configuration"
 	}
 	Figure {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=0.5D"
@@ -1079,31 +1079,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Temperature [°C]"
 		RangeY 47 48.5
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_T_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/Watlon_SONDE_T_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
 	}
@@ -1113,30 +1113,30 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
 		RangeY 1.5 2.1
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_V_0.5D.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/Watlon_SONDE_V_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_0.5D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_0.5D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1146,31 +1146,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Temperature [°C]"
 		RangeY 47 48.5
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_T_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/Watlon_SONDE_T_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
 	}
@@ -1180,30 +1180,30 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
 		RangeY 1.5 2.1
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_V_1D.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/Watlon_SONDE_V_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_1D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_1D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
@@ -1213,31 +1213,31 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Temperature [°C]"
 		RangeY 47 48.5
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_T_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/Watlon_SONDE_T_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_T_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_T_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 ($2-273)
+			columns 1 ($2-273)
 			Style lines
 		}
 	}
@@ -1247,43 +1247,43 @@ Chapitre {
 		LabelX "Time [s]"
 		LabelY "Velocity [m/s]"
 		RangeY 1.5 2.1
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Muscl"
-			Fichier ./Wall_Jet/Muscl/Watlon_SONDE_V_2D.son
-			Origine "Trio_U"
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Muscl"
+			file ./Wall_Jet/Muscl/Watlon_SONDE_V_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
-			Fichier ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab1.0"
+			file ./Wall_Jet/Ef_Stab1.0/Watlon_SONDE_V_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
-			Fichier ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_2D.son
-			Origine "Trio_U"
+		Curve {
+			legend "Ef_Stab0.2"
+			file ./Wall_Jet/Ef_Stab0.2/Watlon_SONDE_V_2D.son
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes 1 4
+			columns 1 4
 			Style lines
 		}
 	}
-	Tableau {
-		Titre "Convergence analysis"
+	Table {
+		Title "Convergence analysis"
 		Description "The curves above, for the impinging jet configuration, show that the instantaneous quantities oscillate around a mean value, after two travels of a fluid particle along the domain ($\sim$4.5s). The convection scheme Ef_Stab, with $\alpha$=0.2, seems to diverge after 15 seconds of physical time.\newline"
 		Description "For the wall jet configuration, the curves show that the instantaneous quantities seem to be very stable and do not vary.\newline"
 		Description "The calculation strategy of averaging the quantities after two travels is, at least for the impinging jet configuration, a good choice and is validated.\newpage"
 	}
 }
 
-Chapitre {
-	Titre "Y+ distribution"
+Chapter {
+	Title "Y+ distribution"
 	Description "The next figures present the Y+ distribution on the two flow configurations, for values of Y+ between [10:100].\newline"
 	Visu {
 		Width 4cm,viewport=45 684 282 920,clip
@@ -1376,49 +1376,49 @@ Chapitre {
 	}
 }
 
-Chapitre {
-	Titre "Results on Impinging jet configuration"
-	Tableau {
-		Titre "Reynolds numbers"
+Chapter {
+	Title "Results on Impinging jet configuration"
+	Table {
+		Title "Reynolds numbers"
 		Description "The next table gives the automatically calculated Reynolds numbers of three convection schemes.\newline \latex_( \begin{center} \latex_)"
-		nb_colonnes 1
-		Ligne {
-			Legende "Impinging jet configuration"
-			valeurs "Reynolds"
+		nb_columns 1
+		line {
+			legend "Impinging jet configuration"
+			values "Reynolds"
 		}
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
+		line {
+			legend "Muscl"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier Impinging_Jet/Muscl/Watlon_pb_Debit.out
-			nb_colonnes_fichier 6
+			file Impinging_Jet/Muscl/Watlon_pb_Debit.out
+			nb_columns_file 6
 			derniere_ligne
-			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+			columns int(($5/0.0176147)*0.15*991.3/5.86e-4)
 		}
-		Ligne {
-			Legende "Ef_Stab1.0"
-			Origine "Trio_U"
+		line {
+			legend "Ef_Stab1.0"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier Impinging_Jet/Ef_Stab1.0/Watlon_pb_Debit.out
-			nb_colonnes_fichier 6
+			file Impinging_Jet/Ef_Stab1.0/Watlon_pb_Debit.out
+			nb_columns_file 6
 			derniere_ligne
-			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+			columns int(($5/0.0176147)*0.15*991.3/5.86e-4)
 		}
-		Ligne {
-			Legende "Ef_Stab0.2"
-			Origine "Trio_U"
+		line {
+			legend "Ef_Stab0.2"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier Impinging_Jet/Ef_Stab0.2/Watlon_pb_Debit.out
-			nb_colonnes_fichier 6
+			file Impinging_Jet/Ef_Stab0.2/Watlon_pb_Debit.out
+			nb_columns_file 6
 			derniere_ligne
-			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+			columns int(($5/0.0176147)*0.15*991.3/5.86e-4)
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
 	Visu {
-		Titre "View of flow"
+		Title "View of flow"
 		Width 16cm,viewport=90 98 996 388,clip
 		Pseudocolor_with_range Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
         	Blackvector Impinging_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM
@@ -1436,13 +1436,13 @@ Chapitre {
 		instruction_visit SetPlotOptions(VectorAttributes)
 # end instruction
 	}
-	Tableau {
+	Table {
 		Description "The measurement lines are located at (D = 0.150mm):"
 		Description "- Z = 0.5D (0.075 mm)"
 		Description "- Z = 1.0D (0.150 mm)\newline\newline"
 	}
-	Tableau {
-		Titre "Comparisons of view of temperature"
+	Table {
+		Title "Comparisons of view of temperature"
 		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized temperature and rms normalized temperature, on sectionnal views :"
 		Description "- at X = 0 mm,"
 		Description "- at Z = 0.5D,"
@@ -1461,7 +1461,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[T~Exp. \] \latex_)"
 		Width 6.25cm
-		Image ./Experimental_data/Exp_Impinging_jet_Tmean_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Tmean_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1476,11 +1476,11 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[Trms~Exp. \] \latex_)"
 		Width 6.25cm
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1496,7 +1496,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1511,7 +1511,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1527,7 +1527,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1542,7 +1542,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1558,7 +1558,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1571,7 +1571,7 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \[\newline \newline \newline X~=~0~mm \] \newpage \latex_)"
 	}
 	Visu {
@@ -1586,7 +1586,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[T~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Impinging_jet_Tmean_Z0_5D.png
+		picture ./Experimental_data/Exp_Impinging_jet_Tmean_Z0_5D.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1601,11 +1601,11 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[Trms~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_Z0_5D.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_Z0_5D.png
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1621,7 +1621,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1636,7 +1636,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1652,7 +1652,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1667,7 +1667,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1683,7 +1683,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1696,7 +1696,7 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \[Z~=~0.5D \] \newpage \latex_)"
 	}
 	Visu {
@@ -1711,7 +1711,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[T~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Impinging_jet_Tmean_Z1_0D.png
+		picture ./Experimental_data/Exp_Impinging_jet_Tmean_Z1_0D.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1726,11 +1726,11 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[Trms~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_Z1_0D.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_Z1_0D.png
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1746,7 +1746,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1761,7 +1761,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1777,7 +1777,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1792,7 +1792,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1808,7 +1808,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Impinging_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -1821,11 +1821,11 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \[Z~=~1.0D \] \newpage \latex_)"
 	}
-	Tableau {
-		Titre "Comparisons of profiles of temperature"
+	Table {
+		Title "Comparisons of profiles of temperature"
 		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized temperature and rms normalized temperature, on profiles :"
 		Description "- at X = 0 mm and Z = 0.5D,"
 		Description "- at X = 0 mm and Z = 1.0D.\newline\newline\newline\newline"
@@ -1837,39 +1837,39 @@ Chapitre {
 		RangeX 0 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_T.txt
-			Origine "Experiment"
-			Colonnes 2 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_T.txt
+			origin "Experiment"
+			columns 2 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -1880,38 +1880,38 @@ Chapitre {
 		RangeX 0 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_T.txt
-			Origine "Experiment"
-			Colonnes 4 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_T.txt
+			origin "Experiment"
+			columns 4 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -1922,39 +1922,39 @@ Chapitre {
 		RangeX 0 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_T.txt
-			Origine "Experiment"
-			Colonnes 3 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_T.txt
+			origin "Experiment"
+			columns 3 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -1965,46 +1965,46 @@ Chapitre {
 		RangeX 0 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_T.txt
-			Origine "Experiment"
-			Colonnes 5 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_T.txt
+			origin "Experiment"
+			columns 5 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_TRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
-	Tableau {
-		Titre "Comparisons of profiles of velocity"
+	Table {
+		Title "Comparisons of profiles of velocity"
 		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized velocity, along Y and Z, and rms normalized velocity, along Y and Z, on profiles :"
 		Description "- at X = 0 mm and Z = 0.5D,"
 		Description "- at X = 0 mm and Z = 1.0D.\newline\newline\newline\newline"
@@ -2016,39 +2016,39 @@ Chapitre {
 		RangeX -0.25 2.5
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 2 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 2 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2059,38 +2059,38 @@ Chapitre {
 		RangeX 0. 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 4 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 4 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2101,39 +2101,39 @@ Chapitre {
 		RangeX -1 4.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 3 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 3 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2144,42 +2144,42 @@ Chapitre {
 		RangeX 0. 1.25
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 5 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 5 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -2189,39 +2189,39 @@ Chapitre {
 		RangeX -0.2 2.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 6 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 6 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2232,38 +2232,38 @@ Chapitre {
 		RangeX 0. 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 8 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 8 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/0.23) ($1*1000)
+			columns ($3/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2274,39 +2274,39 @@ Chapitre {
 		RangeX 0. 4.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 7 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 7 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2317,92 +2317,92 @@ Chapitre {
 		RangeX 0. 1.25
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Impinging_jet_V.txt
-			Origine "Experiment"
-			Colonnes 9 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Impinging_jet_V.txt
+			origin "Experiment"
+			columns 9 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Impinging_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Impinging_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Impinging_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/0.23) ($1*1000)
+			columns ($4/0.23) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
-		Titre "Conclusion of Impinging jet configuration"
+	Table {
+		Title "Conclusion of Impinging jet configuration"
 		Description "The comparisons of mean temperature and velocity profiles, show that the best results are obtained with the Ef_Stab convection scheme.\newline"
 		Description "The profiles of rms quantities show that the k-$\varepsilon$ model fails to model the turbulent fluctuations. Only the Ef_Stab convection scheme, with $\alpha$ = 0.2, seems to be the best. However, it should be reminded that this convection scheme diverges after 15 physical seconds. These results can't therefore be taken into account.\newline"
 		Description "The cut views of temperature confirm that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence.\newpage"
 	}
 }
 
-Chapitre {
-	Titre "Results on Wall jet configuration"
-	Tableau {
-		Titre "Reynolds numbers"
+Chapter {
+	Title "Results on Wall jet configuration"
+	Table {
+		Title "Reynolds numbers"
 		Description "The next table gives the automatically calculated Reynolds numbers of three convection schemes.\newline \latex_( \begin{center} \latex_)"
-		nb_colonnes 1
-		Ligne {
-			Legende "Wall jet configuration"
-			valeurs "Reynolds"
+		nb_columns 1
+		line {
+			legend "Wall jet configuration"
+			values "Reynolds"
 		}
-		Ligne {
-			Legende "Muscl"
-			Origine "Trio_U"
+		line {
+			legend "Muscl"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier Wall_Jet/Muscl/Watlon_pb_Debit.out
-			nb_colonnes_fichier 6
+			file Wall_Jet/Muscl/Watlon_pb_Debit.out
+			nb_columns_file 6
 			derniere_ligne
-			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+			columns int(($5/0.0176147)*0.15*991.3/5.86e-4)
 		}
-		Ligne {
-			Legende "Ef_Stab1.0"
-			Origine "Trio_U"
+		line {
+			legend "Ef_Stab1.0"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier Wall_Jet/Ef_Stab1.0/Watlon_pb_Debit.out
-			nb_colonnes_fichier 6
+			file Wall_Jet/Ef_Stab1.0/Watlon_pb_Debit.out
+			nb_columns_file 6
 			derniere_ligne
-			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+			columns int(($5/0.0176147)*0.15*991.3/5.86e-4)
 		}
-		Ligne {
-			Legende "Ef_Stab0.2"
-			Origine "Trio_U"
+		line {
+			legend "Ef_Stab0.2"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			fichier Wall_Jet/Ef_Stab0.2/Watlon_pb_Debit.out
-			nb_colonnes_fichier 6
+			file Wall_Jet/Ef_Stab0.2/Watlon_pb_Debit.out
+			nb_columns_file 6
 			derniere_ligne
-			colonnes int(($5/0.0176147)*0.15*991.3/5.86e-4)
+			columns int(($5/0.0176147)*0.15*991.3/5.86e-4)
 		}
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \end{center} \latex_)"
 	}
 	Visu {
-		Titre "View of flow"
+		Title "View of flow"
 		Width 16cm,viewport=90 98 996 388,clip
 		Pseudocolor_with_range Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_TEMPERATURE SOM 306. 321.
         	Blackvector Wall_Jet/Muscl/Post/Post.lata dom_Walton MOYENNE_VITESSE SOM
@@ -2420,15 +2420,15 @@ Chapitre {
 		instruction_visit SetPlotOptions(VectorAttributes)
 # end instruction
 	}
-	Tableau {
+	Table {
 		Description "The measurement lines are located at (D = 0.150mm):"
 		Description "- Z = -0.36D (-0.054 mm)"
 		Description "- Z = 0.5D (0.075 mm)"
 		Description "- Z = 1.0D (0.150 mm)"
 		Description "- Z = 2.0D (0.300 mm)\newline"
 	}
-	Tableau {
-		Titre "Comparisons of view of temperature"
+	Table {
+		Title "Comparisons of view of temperature"
 		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized temperature and rms normalized temperature, on sectionnal views :"
 		Description "- at X = 0 mm,"
 		Description "- at Z = 0.5D,"
@@ -2447,7 +2447,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[T~Exp. \] \latex_)"
 		Width 6.25cm
-		Image ./Experimental_data/Exp_Wall_jet_Tmean_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Tmean_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2462,11 +2462,11 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[Trms~Exp. \] \latex_)"
 		Width 6.25cm
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2482,7 +2482,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2497,7 +2497,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2513,7 +2513,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2528,7 +2528,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2544,7 +2544,7 @@ Chapitre {
 	}
 	Figure {
 		Width 0.4cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2557,7 +2557,7 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \[\newline \newline \newline X~=~0~mm \] \newpage \latex_)"
 	}
 	Visu {
@@ -2572,7 +2572,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[T~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Wall_jet_Tmean_Z0_5D.png
+		picture ./Experimental_data/Exp_Wall_jet_Tmean_Z0_5D.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2587,11 +2587,11 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[Trms~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Wall_jet_Trms_Z0_5D.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_Z0_5D.png
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2607,7 +2607,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2622,7 +2622,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2638,7 +2638,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2653,7 +2653,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2669,7 +2669,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2682,7 +2682,7 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \[Z~=~0.5D \] \newpage \latex_)"
 	}
 	Visu {
@@ -2697,7 +2697,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[T~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Wall_jet_Tmean_Z1_0D.png
+		picture ./Experimental_data/Exp_Wall_jet_Tmean_Z1_0D.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2712,11 +2712,11 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[Trms~Exp. \] \latex_)"
 		Width 3.7cm
-		Image ./Experimental_data/Exp_Wall_jet_Trms_Z1_0D.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_Z1_0D.png
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2732,7 +2732,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2747,7 +2747,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2763,7 +2763,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2778,7 +2778,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2794,7 +2794,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-40 -20 -30 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_Trms_X0.png
+		picture ./Experimental_data/Exp_Wall_jet_Trms_X0.png
 		nb_img_without_newline 4
 	}
 	Visu {
@@ -2807,11 +2807,11 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
+	Table {
 		Description "\latex_( \[Z~=~1.0D \] \newpage \latex_)"
 	}
-	Tableau {
-		Titre "Comparisons of view of velocity"
+	Table {
+		Title "Comparisons of view of velocity"
 		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized velocity on sectionnal views at Y = -65 mm.\newline"
 	}
 	Visu {
@@ -2826,7 +2826,7 @@ Chapitre {
 	Figure {
 		Description "\latex_( \[V~Exp. \] \latex_)"
 		Width 3cm
-		Image ./Experimental_data/Exp_Wall_jet_V_Y_65mm.png
+		picture ./Experimental_data/Exp_Wall_jet_V_Y_65mm.png
 		nb_img_without_newline 3
 	}
 	Visu {
@@ -2841,7 +2841,7 @@ Chapitre {
 	}
 	Figure {
 		Width 1.5cm,viewport=-20 -20 -10 -10,clip
-		Image ./Experimental_data/Exp_Wall_jet_V_Y_65mm.png
+		picture ./Experimental_data/Exp_Wall_jet_V_Y_65mm.png
 		nb_img_without_newline 3
 	}
 	Visu {
@@ -2865,8 +2865,8 @@ Chapitre {
 		Operator no_databaseinfo
 		Operator_to_all no_legend
 	}
-	Tableau {
-		Titre "Comparisons of profiles of temperature"
+	Table {
+		Title "Comparisons of profiles of temperature"
 		Description "Comparison of mean and rms normalized temperature on profiles at X=0mm and Z=0.5D, 1.0D or 2.0D.\newline"
 	}
 	Figure {
@@ -2876,39 +2876,39 @@ Chapitre {
 		RangeX 0 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_T.txt
-			Origine "Experiment"
-			Colonnes 2 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_T.txt
+			origin "Experiment"
+			columns 2 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2919,38 +2919,38 @@ Chapitre {
 		RangeX 0 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_T.txt
-			Origine "Experiment"
-			Colonnes 5 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_T.txt
+			origin "Experiment"
+			columns 5 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_TRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -2961,39 +2961,39 @@ Chapitre {
 		RangeX 0 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_T.txt
-			Origine "Experiment"
-			Colonnes 3 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_T.txt
+			origin "Experiment"
+			columns 3 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3004,38 +3004,38 @@ Chapitre {
 		RangeX 0 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_T.txt
-			Origine "Experiment"
-			Colonnes 6 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_T.txt
+			origin "Experiment"
+			columns 6 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_TRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3046,39 +3046,39 @@ Chapitre {
 		RangeX 0 1.
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_T.txt
-			Origine "Experiment"
-			Colonnes 4 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_T.txt
+			origin "Experiment"
+			columns 4 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_TMEAN_Z_2D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TMEAN_Z_2D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TMEAN_Z_2D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes (($2-306)/15) ($1*1000)
+			columns (($2-306)/15) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3089,46 +3089,46 @@ Chapitre {
 		RangeX 0 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_T.txt
-			Origine "Experiment"
-			Colonnes 7 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_T.txt
+			origin "Experiment"
+			columns 7 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_TRMS_Z_2D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_TRMS_Z_2D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_TRMS_Z_2D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($2/15) ($1*1000)
+			columns ($2/15) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
-	Tableau {
-		Titre "Comparisons of profiles of velocity"
+	Table {
+		Title "Comparisons of profiles of velocity"
 		Description "The next figures present the comparison of calculations with the experimental data, of mean normalized velocity, along Y and Z, and rms normalized velocity, along Y and Z, on profiles :"
 		Description "- at X = 0 mm and Z = -0.36D,"
 		Description "- at X = 0 mm and Z = 0.5D,"
@@ -3141,39 +3141,39 @@ Chapitre {
 		RangeX 0.5 1.25
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 2 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 2 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_-0.36D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_-0.36D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_-0.36D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3184,43 +3184,43 @@ Chapitre {
 		RangeX 0. 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 3 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 3 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_-0.36D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_-0.36D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_-0.36D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -3230,39 +3230,39 @@ Chapitre {
 		RangeX -0.05 0.2
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 4 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 4 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3273,38 +3273,38 @@ Chapitre {
 		RangeX 0. 0.3
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 6 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 6 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3315,39 +3315,39 @@ Chapitre {
 		RangeX -0.75 1.5
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 5 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 5 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3358,42 +3358,42 @@ Chapitre {
 		RangeX 0. 0.4
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 7 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 7 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_0.5D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
+	Table {
 		Description "\newpage"
 	}
 	Figure {
@@ -3403,39 +3403,39 @@ Chapitre {
 		RangeX -0.2 0.2
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 8 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 8 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3446,38 +3446,38 @@ Chapitre {
 		RangeX 0. 0.35
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 10 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 10 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($3/1.46) ($1*1000)
+			columns ($3/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3488,39 +3488,39 @@ Chapitre {
 		RangeX 0. 1.5
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
+		Include_Description_Curves 0
+		legend below title
 		nb_img_without_newline 2
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 9 1
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 9 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VMEAN_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
@@ -3531,51 +3531,51 @@ Chapitre {
 		RangeX 0. 0.4
 		LabelY "Distance from axis [mm]"
 		RangeY -75 75
-		InclureDescCourbes 0
-		Legende below title
-		Courbe {
-			Legende "Experiment"
-			Fichier ./Experimental_data/Wall_jet_V.txt
-			Origine "Experiment"
-			Colonnes 11 1
+		Include_Description_Curves 0
+		legend below title
+		Curve {
+			legend "Experiment"
+			file ./Experimental_data/Wall_jet_V.txt
+			origin "Experiment"
+			columns 11 1
 			Style lines
-			LargeurLigne 2
+			linewidth 2
 		}
-		Courbe {
-			Legende "Muscl"
+		Curve {
+			legend "Muscl"
 			Segment Wall_Jet/Muscl/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab1.0"
+		Curve {
+			legend "Ef_Stab1.0"
 			Segment Wall_Jet/Ef_Stab1.0/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
-		Courbe {
-			Legende "Ef_Stab0.2"
+		Curve {
+			legend "Ef_Stab0.2"
 			Segment Wall_Jet/Ef_Stab0.2/Watlon.data SONDE_VRMS_Z_1D
-			Origine "Trio_U"
+			origin "Trio_U"
 			Version 1.6.6_beta
-			Colonnes ($4/1.46) ($1*1000)
+			columns ($4/1.46) ($1*1000)
 			Style linespoints
 		}
 	}
-	Tableau {
-		Titre "Conclusion of Wall jet configuration"
+	Table {
+		Title "Conclusion of Wall jet configuration"
 		Description "The comparisons of mean temperature and velocity profiles, show that the results are not dependent of convection schemes. They all give the same results.\newline"
 		Description "As it was observed on Impinging jet confuguration, the profiles of rms quantities show that the k-$\varepsilon$ model fails to model the turbulent fluctuations.\newline"
 		Description "The cut views confirm that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence.\newpage"
 	}
 }
 
-Chapitre {
-	Titre "Conclusion"
+Chapter {
+	Title "Conclusion"
 	Description "The cell sizes, in this study, result of the choice to extrude inlet facets of domain, to create periodic boxes, in 14 tetrahedral elements (symmetric mesh) instead of 3 (asymmetric mesh). This allows us to obtain a symmetrical velocity profile. However, as it has been shown in the Y+ distribution, the cell sizes of the main box, for the impinging jet configuration, are too small and induce, due to standard wall law, lower values of dimensionless mean velocity, ie higher values of friction velocity.\newline"
 	Description ""
 	Description "The convergence analysis for the impinging jet configuration, shows that the instantaneous quantities oscillate around a mean value, after two travels of a fluid particle along the domain ($\sim$4.5s). The convection scheme Ef_Stab, with $\alpha$=0.2, seems to diverge after 15 seconds of physical time."
@@ -3587,8 +3587,8 @@ Chapitre {
 	Description "The cut views confirm that the turbulence model k-$\varepsilon$ does not permit to capture the fluctuations due to turbulence. This is due to the fact that the k-$\varepsilon$ model, which belongs to the family of statistical models, solves only the mean field parts with a modelisation of effect of turbulence."
 }
 
-Chapitre {
-	Titre "Performances"
+Chapter {
+	Title "Performances"
 	tableau_performance { 
 	}
 }
