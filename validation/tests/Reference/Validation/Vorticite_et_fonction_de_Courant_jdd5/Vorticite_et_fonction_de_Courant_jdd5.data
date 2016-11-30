@@ -1,9 +1,28 @@
+# test vorticite #
+# PARALLEL NOT #
+
 Dimension 2
 Pb_hydraulique pb1
 Pb_conduction pb2
 
 Domaine dom
+
+# BEGIN MESH #
 Lire_med family_names_from_group_names dom mesh_tri_1 mesh_tri_1.med
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+        Partition_tool metis { nb_parts 2  }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
 
 VEFPreP1B dis
 
@@ -11,7 +30,7 @@ Schema_Euler_explicite sch1
 Lire sch1
 {
 	tinit 0
-	nb_pas_dt_max 0
+	nb_pas_dt_max 1
 	dt_min 1
 	dt_max 1
 	dt_impr 1
@@ -23,7 +42,7 @@ Schema_Euler_implicite sch2
 Lire sch2
 {
 	tinit 0
-	nb_pas_dt_max 0
+	nb_pas_dt_max 1
 	dt_min 1e-6
 	dt_max 1e+6
 	dt_impr 1e-6
@@ -183,7 +202,7 @@ Lire pb2
 					Bas	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
 					Haut	frontiere_ouverte_temperature_imposee champ_front_uniforme 1 0
 					}
-		Sources			{ puissance_thermique champ_fonc_med last_time Vorticite1_0000.med dom vorticite elem 0 }
+		Sources			{ puissance_thermique champ_fonc_med use_existing_domain last_time Vorticite1_0000.med dom vorticite elem 0 }
 	}
 	Postraitement
 	{

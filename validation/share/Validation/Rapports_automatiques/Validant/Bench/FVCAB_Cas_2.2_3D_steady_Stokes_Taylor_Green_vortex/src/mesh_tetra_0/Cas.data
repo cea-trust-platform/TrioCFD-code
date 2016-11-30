@@ -1,10 +1,29 @@
+# test FCVAB  #
+# PARALLEL NOT #
+
 Dimension 3
 Pb_hydraulique pb
 
 Domaine dom
+
+# BEGIN MESH #
 Lire_med family_names_from_group_names dom mesh_tetra_0 mesh_tetra_0.med
 
 VerifierCoin dom { }
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+        Partition_tool metis { nb_parts 2  }
+        Larg_joint 2
+        zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
 
 VEFPreP1b dis
 # Lire dis { P0 P1 Pa } #
