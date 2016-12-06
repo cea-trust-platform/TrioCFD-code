@@ -116,23 +116,23 @@ Entree& Traitement_particulier_NS_CEG::lire(Entree& is)
   const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
   if (vitesse.nb_dim()!=2 || vitesse.dimension(1)!=3) error("Error ! Only works in VEF 3D.");
 
-  // XD traitement_particulier_ceg traitement_particulier_base ceg 1 not_set
+  // XD traitement_particulier_ceg traitement_particulier_base ceg 1  Keyword for a CEG ( Gas Entrainment Criteria)  calculation. An objective is deepening gas entrainment on the free surface. Numerical analysis can be performed to predict the hydraulic and geometric conditions that can   handle gas entrainment from the free surface.
 
   Param param("lire_ceg");
-  param.ajouter("frontiere",&la_surface_libre_nom_,Param::REQUIRED); // XD_ADD_P chaine not_set
-  param.ajouter("t_deb",&t_deb_,Param::REQUIRED); // XD_ADD_P double not_set
-  param.ajouter("t_fin",&t_fin_); // XD_ADD_P double not_set
-  param.ajouter("dt_post",&dt_post_); // XD_ADD_P double not_set
-  param.ajouter("haspi",&haspi_,Param::REQUIRED); // XD_ADD_P double not_set
+  param.ajouter("frontiere",&la_surface_libre_nom_,Param::REQUIRED); // XD_ADD_P chaine  To specify the boundaries conditions representing the free surfaces
+  param.ajouter("t_deb",&t_deb_,Param::REQUIRED); // XD_ADD_P double value of the CEG's initial calculation time
+  param.ajouter("t_fin",&t_fin_); // XD_ADD_P double not_set time during which the CEG's calculation was stopped
+  param.ajouter("dt_post",&dt_post_); // XD_ADD_P double periode refers to the printing period, this value is expressed in seconds
+  param.ajouter("haspi",&haspi_,Param::REQUIRED); // XD_ADD_P double The suction height  required to calculate AREVA's criterion
   param.ajouter("debug",&debug_); // XD_ADD_P int not_set
-  Param& param_areva=param.ajouter_param("AREVA"); //XD_ADD_P ceg_areva not_set
+  Param& param_areva=param.ajouter_param("AREVA"); //XD_ADD_P ceg_areva AREVA's criterion
   // 2XD ceg_areva objet_lecture nul -1 not_set
   param_areva.ajouter("C",&C_);  // 2XD_ADD_P double not_set
-  Param& param_cea_jaea =param.ajouter_param("CEA_JAEA"); // XD_ADD_P ceg_cea_jaea not_set
+  Param& param_cea_jaea =param.ajouter_param("CEA_JAEA"); // XD_ADD_P ceg_cea_jaea CEA_JAEA's criterion
   // 2XD ceg_cea_jaea objet_lecture nul -1 not_set
-  param_cea_jaea.ajouter("normalise",&critere_cea_jaea_normalise_);   // 2XD_ADD_P int not_set
-  param_cea_jaea.ajouter("nb_mailles_mini",&nb_mailles_mini_);  // 2XD_ADD_P int not_set
-  param_cea_jaea.ajouter("min_critere_Q_sur_max_critere_Q",&min_critere_Q_sur_max_critere_Q_);  // 2XD_ADD_P double not_set
+  param_cea_jaea.ajouter("normalise",&critere_cea_jaea_normalise_);   // 2XD_ADD_P int renormalize (1) or not (0) values alpha and gamma
+  param_cea_jaea.ajouter("nb_mailles_mini",&nb_mailles_mini_);  // 2XD_ADD_P int Sets the minimum number of cells for the detection of a vortex.
+  param_cea_jaea.ajouter("min_critere_Q_sur_max_critere_Q",&min_critere_Q_sur_max_critere_Q_);  // 2XD_ADD_P double Is an optional keyword used to correct the minimum values of Q's  criterion taken into account in the detection of a vortex
   param.lire_avec_accolades_depuis(is);
 
 

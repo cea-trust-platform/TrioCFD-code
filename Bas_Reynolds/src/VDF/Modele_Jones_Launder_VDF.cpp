@@ -36,7 +36,7 @@
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Modele_Jones_Launder_VDF,"Modele_Jones_Launder_VDF",Modele_Fonc_Bas_Reynolds_Base);
-// XD Jones_Launder modele_fonction_bas_reynolds_base Jones_Launder -1 not_set
+// XD Jones_Launder modele_fonction_bas_reynolds_base Jones_Launder -1 Model described in ' Jones, W. P. and Launder, B. E. (1972), The prediction of laminarization with a two-equation model of turbulence, Int. J. of Heat and Mass transfer, Vol. 15, pp. 301-314.'
 // printOn et readOn
 
 Sortie& Modele_Jones_Launder_VDF::printOn(Sortie& s ) const
