@@ -25,7 +25,7 @@
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Modele_Launder_Sharma_VDF,"Modele_Launder_Sharma_VDF",Modele_Jones_Launder_VDF);
-// XD Launder_Sharmma modele_fonction_bas_reynolds_base Launder_Sharma -1 not_set
+// XD Launder_Sharmma modele_fonction_bas_reynolds_base Launder_Sharma -1 Model described in ' Launder, B. E. and Sharma, B. I. (1974), Application of the Energy-Dissipation Model of Turbulence to the Calculation of Flow Near a Spinning Disc, Letters in Heat and Mass Transfer, Vol. 1, No. 2, pp. 131-138.'
 
 
 

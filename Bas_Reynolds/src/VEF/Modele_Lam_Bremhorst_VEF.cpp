@@ -33,8 +33,7 @@
 #include <EcritureLectureSpecial.h>
 
 Implemente_instanciable(Modele_Lam_Bremhorst_VEF,"Modele_Lam_Bremhorst_VEF",Modele_Fonc_Bas_Reynolds_Base);
-// XD Lam_Bremhorst modele_fonction_bas_reynolds_base Lam_Bremhorst -1 not_set
-
+// XD Lam_Bremhorst modele_fonction_bas_reynolds_base Lam_Bremhorst -1 Model described in ' C.K.G.Lam and K.Bremhorst, A modified form of the k- epsilon model for predicting wall turbulence, ASME J. Fluids Engng., Vol.103, p456, (1981)'. Only in VEF.
 // printOn et readOn
 
 Sortie& Modele_Lam_Bremhorst_VEF::printOn(Sortie& s ) const
@@ -57,8 +56,8 @@ void Modele_Lam_Bremhorst_VEF::set_param(Param& param)
 
   is_Cmu_constant_ = 1;
   is_Reynolds_stress_isotrope_ = 1;
-  param.ajouter("fichier_distance_paroi",&nom_fic);    // XD_ADD_P chaine not_set
-  param.ajouter("Reynolds_stress_isotrope",&is_Reynolds_stress_isotrope_); // XD_ADD_P int not_set
+  param.ajouter("fichier_distance_paroi",&nom_fic);    // XD_ADD_P chaine refer to distance_paroi keyword
+  param.ajouter("Reynolds_stress_isotrope",&is_Reynolds_stress_isotrope_); // XD_ADD_P int keyword for isotropic Reynolds stress
 }
 
 int Modele_Lam_Bremhorst_VEF::Calcul_is_Reynolds_stress_isotrope() const

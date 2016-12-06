@@ -34,7 +34,8 @@
 
 Implemente_instanciable(Modele_standard_KEps_VEF,"Modele_standard_KEps_VEF",Modele_Lam_Bremhorst_VEF);
 
-// XD standard_KEps Lam_Bremhorst standard_KEps -1 not_set
+// XD standard_KEps Lam_Bremhorst standard_KEps -1 Model described in ' E. Baglietto , CFD and DNS methodologies development for fuel bundle simulaions, Nuclear Engineering and Design, 1503--1510 (236), 2006. '
+
 // printOn et readOn
 
 Sortie& Modele_standard_KEps_VEF::printOn(Sortie& s ) const
