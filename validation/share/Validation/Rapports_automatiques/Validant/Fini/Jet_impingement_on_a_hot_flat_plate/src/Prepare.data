@@ -19,6 +19,7 @@ extruder_en3
         direction 0 0 0.0053
         nb_tranches 2
 }
+dimension 3
 transformer dom2D
  x
  y

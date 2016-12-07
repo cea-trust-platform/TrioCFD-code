@@ -2,7 +2,7 @@
 # PARALLEL OK #
 
 dimension 3
-Pb_Hydraulique_Turbulent pb1
+/* Pb_Hydraulique_Turbulent pb1 */
 Domaine dom_long 
 
 # BEGIN MESH #
