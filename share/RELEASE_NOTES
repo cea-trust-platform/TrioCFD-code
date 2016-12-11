@@ -2,13 +2,13 @@
 Release notes version 1.7.4 : Enhancements, modifications and corrected bugs since version 1.7.3 :
 --------------------------------------------------------------------------------------------------
 09/12/16 (Tools)   Announcement: New Documentation Reference Guide
+25/11/16 (TRUST)   Portability : Update with modifications from TRUST 1.7.4
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.3 : Enhancements, modifications and corrected bugs since version 1.7.2 :
 --------------------------------------------------------------------------------------------------
 03/06/16 (TrioCFD) Optimization: New low-Reybolds turbulence model available
 03/06/16 (TrioCFD) New feature : Nonlinear k-epsilon turbulence model added
 26/05/16 (TrioCFD) Minor change: New CEG dependency: Critere_Entrainement_Gaz
-25/05/16 (TrioCFD) Portability : PETSc upgrated to 3.6.3 (Removed -pc_hypre_type euclid so ILU { level k } preconditionner no longer available)
 03/02/16 (TrioCFD) Bug fixed   : Resume a Front-Tracking calculation is now ok
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.2 : Enhancements, modifications and corrected bugs since version 1.7.1 :
