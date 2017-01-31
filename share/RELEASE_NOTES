@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.5 : Enhancements, modifications and corrected bugs since version 1.7.4 :
 --------------------------------------------------------------------------------------------------
+31/01/17 (TrioCFD) Bug fixed   : Backup to the first time step if resumed a Front-Tracking calculation
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.4 : Enhancements, modifications and corrected bugs since version 1.7.3 :
 --------------------------------------------------------------------------------------------------

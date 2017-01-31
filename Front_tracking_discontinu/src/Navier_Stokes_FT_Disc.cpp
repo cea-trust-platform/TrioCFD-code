@@ -733,6 +733,7 @@ void Navier_Stokes_FT_Disc::projeter()
 // Description: methode appelee par Probleme_base::preparer_calcul()
 int Navier_Stokes_FT_Disc::preparer_calcul()
 {
+  Cerr << "Navier_Stokes_FT_Disc::preparer_calcul()" << finl;
   Equation_base::preparer_calcul();
 
   le_modele_turbulence.preparer_calcul();
@@ -804,6 +805,9 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
   secmem *= -1;
   // Il faut faire ceci car on ne resout pas en "increment de pression":
   assembleur_pression_.valeur().modifier_secmem(secmem);
+
+  // Ajout pour la sauvegarde au premier pas de temps si reprise
+  la_pression.changer_temps(schema_temps().temps_courant());
 
   // Resolution du systeme en pression : calcul de la_pression
   solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),
