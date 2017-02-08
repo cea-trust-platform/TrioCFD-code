@@ -104,7 +104,7 @@ Read pb
 	{
 		modele_turbulence sous_maille_wale
         	{
-           	  Cw 1.e-08
+           	  Cw 0.
           	  turbulence_paroi negligeable
         	}
 		

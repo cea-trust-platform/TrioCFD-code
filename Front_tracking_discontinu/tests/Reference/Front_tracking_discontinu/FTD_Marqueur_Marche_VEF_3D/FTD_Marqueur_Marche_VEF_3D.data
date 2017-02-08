@@ -92,7 +92,7 @@ Lire pb
 	{
 		modele_turbulence sous_maille_wale
        		 {
-         	  Cw               1.e-16
+         	  Cw               0.
           	  turbulence_paroi negligeable
        		 }
 		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-10 }

@@ -160,7 +160,7 @@ Lire pb_THI
   
   Modele_turbulence sous_maille_wale
   {
-   Cw 1.e-16
+   Cw 0.
    turbulence_paroi negligeable
   }
  }
@@ -241,7 +241,7 @@ Lire pb_turb
   
   Modele_turbulence sous_maille_wale
    {
-     Cw 1.e-16
+     Cw 0.
      turbulence_paroi negligeable
    }
  }

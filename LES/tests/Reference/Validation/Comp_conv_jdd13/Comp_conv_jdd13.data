@@ -98,7 +98,7 @@ Read pb
 		Modele_turbulence sous_maille_wale
 			{
 			turbulence_paroi negligeable
-			cw 1e-30
+			cw 0.
 			}
 		}
 

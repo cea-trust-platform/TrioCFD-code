@@ -116,7 +116,7 @@ Lire pb
 			bas    paroi_fixe
 		}
 		
-		modele_turbulence sous_maille_wale { Cw 1.e-08  turbulence_paroi negligeable }
+		modele_turbulence sous_maille_wale { Cw 0.  turbulence_paroi negligeable }
 	}
 	
 	interf
