@@ -1,0 +1,42 @@
+Parameters {
+	Title "FTD changement pas de maillage KO"
+	Author "fauchet"
+	VersionTrio_U 1.7.4_beta
+ 	TestCase . OK1.data
+ 	TestCase . OK2.data
+ 	TestCase . KO.data /* include */
+Description Dans le cas (KO) avec un maillage fin en bas et grossier en haut, la bulle se bloque au changement de pas de maillage. Pas de soucis avec un maillage fin partout ou grossier partout.
+}
+
+
+Chapter {
+	Title "Visualization KO" 
+
+
+	visu {
+		title "INDICATRICE_INTERF SOM"
+		mesh KO.lata dom
+		pseudocolor KO.lata dom INDICATRICE_INTERF SOM
+	}
+}
+Chapter {
+	Title "Visualization OK1" 
+
+
+	visu {
+		title "INDICATRICE_INTERF SOM"
+		mesh OK1.lata dom
+		pseudocolor OK1.lata dom INDICATRICE_INTERF SOM
+	}
+
+}
+Chapter {
+	Title "Visualization OK2" 
+
+
+	visu {
+		title "INDICATRICE_INTERF SOM"
+		mesh OK2.lata dom
+		pseudocolor OK2.lata dom INDICATRICE_INTERF SOM
+	}
+}
