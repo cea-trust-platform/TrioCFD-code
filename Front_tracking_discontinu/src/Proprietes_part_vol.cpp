@@ -65,7 +65,7 @@ Entree& Proprietes_part_vol::readOn(Entree& is)
     {
       Cerr<<"Both keyword fichier and distribution have been readen."<<finl;
       Cerr<<"Only one of these keywords can be selected."<<finl;
-      Cerr<<"Please, see the User_Manual_TRUST for more details."<<finl;
+      Cerr<<"Please, see the reference manual for more details."<<finl;
       exit();
     }
   return is;
