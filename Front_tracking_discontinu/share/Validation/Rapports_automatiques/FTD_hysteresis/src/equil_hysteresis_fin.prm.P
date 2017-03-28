@@ -1,0 +1,199 @@
+Parameters {
+	Title "Traitement de la ligne de contact avec hysteresis de l'angle de contact."
+	Author "Guillaume Bois"
+	VersionTrio_U 1.7.4
+	TestCase Sphere/Equilibre_60/Theta60_60/standard/SEQ                         equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/standard/PAR4                        equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/improved/SEQ                         equil_hysteresis_fin.data
+#	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre00/SEQ   equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ   equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ   equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ   equil_hysteresis_fin.data
+	
+	TestCase Sphere/Equilibre_60/Theta30_120/standard/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/improved/SEQ                        equil_hysteresis_fin.data
+#	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre00/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ  equil_hysteresis_fin.data
+	
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ  equil_hysteresis_fin.data
+	
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/standard/PAR4                        PAR_equil_hysteresis_fin.data 4 
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/improved/PAR4                        PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/PAR4  PAR_equil_hysteresis_fin.data 4
+
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ  equil_hysteresis_fin.data
+	
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/standard/PAR4                        PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/improved/PAR4                        PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/PAR4  PAR_equil_hysteresis_fin.data 4
+	
+# 	TestCase Sphere/Equilibre_60/Theta60_60 PAR_equil_hysteresis_fin.data 4
+# 	TestCase Sphere/Equilibre_60/Theta60_60/Liss_IS01_ISR01_coef-0.1 equil_hysteresis_fin.data
+# 	TestCase Sphere/Equilibre_60/Theta30_120 PAR_equil_hysteresis_fin.data 4
+# 	TestCase Sphere/Equilibre_60/Theta30_120/SEQ equil_hysteresis_fin.data
+# 	TestCase Sphere/Equilibre_60/Theta30_120/Liss_IS01_ISR01_coef-0.1 equil_hysteresis_fin.data
+}
+
+Chapter {
+	Title "Convergence" 
+#		Description "At the contact line, the evaluation of the curvature takes into account the prescribed contact angle."
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/equil_hysteresis_fin.dt_ev
+			columns ($1) ($4)
+			style linespoints
+		}
+	}
+}
+
+#Pmacro VISU(_fichier_,_title_)
+	visu {
+	        nb_img_without_newline 2
+
+		Description "_title_"
+		Cycles -1
+		mesh _fichier_/lata/post.lata INTERFACES
+		pseudocolor _fichier_/lata/post.lata INTERFACES COURBURE som
+		mesh _fichier_/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+#Pendmacro(VISU)
+
+#Pmacro FIGURE_R(_head_, _folds_,_suf_)
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Radial position"
+		logY
+#Pforeach _fold_(_folds_)
+		curve {
+			file _head_/_fold_/_suf_compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend _fold_ (_suf_)
+		}
+#Pendforeach(_fold_)
+	}
+#Pendmacro(FIGURE_R)
+
+#Pmacro FIGURE_Z(_head_, _folds_,_suf_)
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Z position (wall-normal)"
+		logY
+#Pforeach _fold_(_folds_)
+		curve {
+			file _head_/_fold_/_suf_compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend _fold_ (_suf_)
+		}
+#Pendforeach(_fold_)
+	}
+#Pendmacro(FIGURE_Z)
+
+#Pmacro VISU_CONTACT(_head_,_folds_)
+#Pforeach _fold_(_folds_)
+	visu {
+	        nb_img_without_newline 2
+		Description "_fold_ (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh _head_/_fold_/SEQ/lata/post.lata INTERFACES black
+		mesh _head_/_fold_/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+#Pendforeach(_fold_)
+#Pendmacro(VISU_CONTACT)
+
+#Pmacro VISU_CONTACT2(_head_, _name_)
+	visu {
+	        nb_img_without_newline 2
+		Description "_name_ standard: black; hysteresis/Npre01: red; hysteresis/Npre05: green; hysteresis/Npre10: blue)"
+		Cycles 1
+		mesh _head_/standard/SEQ/lata/post.lata INTERFACES black
+#		mesh _head_/improved/SEQ/lata/post.lata INTERFACES red
+		mesh _head_/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES red
+		mesh _head_/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES green
+		mesh _head_/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES blue
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+#Pendmacro(VISU_CONTACT2)
+
+Chapter {
+	Title "Sphere/Equilibre_60" 
+	Description "\latex_( \input{../desc1.tex} \latex_)"
+
+#Pforeach _range_(60_60 30_120)
+	Description "Theta_range_"
+#Pforeach _case_(standard improved)
+#Pusemacro(VISU)(Sphere/Equilibre_60/Theta_range_/_case_/SEQ,_range_ _case_)
+#Pendforeach(_case_)
+#Pforeach _sub_(01 05 10)
+#Pusemacro(VISU)(Sphere/Equilibre_60/Theta_range_/hysteresis/It2_coeff2.0_Npre_sub_/SEQ,_range_ hysteresis (liss:_sub_))
+#Pendforeach(_sub_)
+#Pusemacro(FIGURE_R)(Sphere/Equilibre_60/Theta_range_,standard improved hysteresis/It2_coeff2.0_Npre01 hysteresis/It2_coeff2.0_Npre05 hysteresis/It2_coeff2.0_Npre10,SEQ/)
+#Pusemacro(FIGURE_Z)(Sphere/Equilibre_60/Theta_range_,standard improved hysteresis/It2_coeff2.0_Npre01 hysteresis/It2_coeff2.0_Npre05 hysteresis/It2_coeff2.0_Npre10,SEQ/)
+#Pendforeach(_range_)
+
+}
+
+#Pset(_main_ Sphere/Hors_equil_85_120)
+Chapter {
+	Title "_main_" 
+	Description "Hors equilibre, mise en mouvement de l'interface"
+
+#Pforeach _range_(Theta85_120 Reverse_20_60)
+	Description "Theta_range_"
+#Pforeach _case_(standard improved)
+#Pusemacro(VISU)(_main_/_range_/_case_/SEQ,_range_ _case_)
+#Pendforeach(_case_)
+#Pforeach _sub_(01 05 10)
+#Pusemacro(VISU)(_main_/_range_/hysteresis/It2_coeff2.0_Npre_sub_/SEQ,_range_ hysteresis (liss:_sub_))
+#Pendforeach(_sub_)
+#Pusemacro(FIGURE_R)(_main_/_range_,standard improved hysteresis/It2_coeff2.0_Npre01 hysteresis/It2_coeff2.0_Npre05 hysteresis/It2_coeff2.0_Npre10,SEQ/)
+#Pusemacro(FIGURE_Z)(_main_/_range_,standard improved hysteresis/It2_coeff2.0_Npre01 hysteresis/It2_coeff2.0_Npre05 hysteresis/It2_coeff2.0_Npre10,SEQ/)
+#Pendforeach(_range_)
+
+	Description "Pour le deplacement vers l'equilibre... "
+#Pusemacro(VISU_CONTACT2)(Sphere/Hors_equil_85_120/Theta85_120, Theta85_120)
+	Description "Apres la reprise... "
+#Pusemacro(VISU_CONTACT2)(Sphere/Hors_equil_85_120/Reverse_20_60, Reverse_20_60)
+}
+
+Chapter {
+	Title "Parallel/seqential comparison"
+	Description "Pour le deplacement vers l'equilibre... "
+#Pusemacro(VISU_CONTACT)(Sphere/Hors_equil_85_120/Theta85_120,standard improved hysteresis/It2_coeff2.0_Npre01 hysteresis/It2_coeff2.0_Npre05 hysteresis/It2_coeff2.0_Npre10)
+	Description "Apres la reprise... "
+#Pusemacro(VISU_CONTACT)(Sphere/Hors_equil_85_120/Reverse_20_60,standard improved hysteresis/It2_coeff2.0_Npre01 hysteresis/It2_coeff2.0_Npre05 hysteresis/It2_coeff2.0_Npre10)
+}

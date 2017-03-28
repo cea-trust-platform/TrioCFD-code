@@ -61,6 +61,7 @@ protected:
   int phase_;
   //GB : Ajout de variables :
   int stencil_width_;
+  int correction_courbure_ordre_;
   Nom nom_sous_zone_;
   double temp_moy_ini_;
   bool maintien_temperature_;

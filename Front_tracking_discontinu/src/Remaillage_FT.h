@@ -112,7 +112,7 @@ protected:
   double calculer_variation_volume_facette_2D(int fa7, const Maillage_FT_Disc& maillage,const DoubleTab& position_initiale) const;
   double calculer_variation_volume_facette_3D(int fa7, const Maillage_FT_Disc& maillage,const DoubleTab& position_initiale) const;
 
-  double calculer_longueurIdeale2_arete(const Maillage_FT_Disc& maillage, int som0, double x, double y, double z) const;
+  virtual double calculer_longueurIdeale2_arete(const Maillage_FT_Disc& maillage, int som0, double x, double y, double z) const;
   //  double calculer_longueurIdeale2_arete(const Maillage_FT_Disc& maillage, int som0, int som1) const;
   int supprimer_petites_aretes(Maillage_FT_Disc& maillage, ArrOfDouble& varVolume) const;
   int diviser_grandes_aretes(Maillage_FT_Disc& maillage) const;
@@ -150,6 +150,7 @@ protected:
   // L'un de ces deux vaut -1, l'autre doit etre positif:
   double valeur_longueur_fixe_;
   double facteur_longueur_ideale_;
+  int equilateral_;
 
   double variation_volume_;
   double surface_interface_;

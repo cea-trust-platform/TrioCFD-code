@@ -1,0 +1,91 @@
+#!/bin/sh
+# Ce script est execute avant de lancer les cas tests
+cwd=$PWD
+function make_subfolders {
+  #mkdir -p Liss_IS01_ISR01_coef-0.1
+  #sed -e "s/lissage_courbure_iterations_systematique.*$/lissage_courbure_iterations_systematique 1/" \
+  #    -e "s/lissage_courbure_iterations_si_remaillage.*$/lissage_courbure_iterations_si_remaillage 1/" \
+  #    -e "s/lissage_courbure_coeff.*$/lissage_courbure_coeff -0.1/" \
+  #        equil_hysteresis_fin.data > Liss_IS01_ISR01_coef-0.1/equil_hysteresis_fin.data
+  #mkdir -p SEQ && cp -f equil_hysteresis_fin.data SEQ/
+  options="standard mirror improved none weighted hysteresis"
+  for opt in $options
+  do
+    mkdir -p $opt/SEQ $opt/PAR4
+    sed -e "s/methode_calcul_courbure_contact_line.*$/methode_calcul_courbure_contact_line $opt/" \
+        -e "/Resume_last_time/s/@fold@/$opt/g" \
+           equil_hysteresis_fin.data > $opt/equil_hysteresis_fin.data
+    cp -f pre_run post_run $opt/equil_hysteresis_fin.data $opt/SEQ/
+    cp -f pre_run post_run $opt/equil_hysteresis_fin.data $opt/PAR4/
+    if [ $opt != "standard" ] ; then
+      cd $opt
+      for npre in 00 01 05 10
+      do
+         fold=It2_coeff2.0_Npre$npre
+         mkdir -p $fold/SEQ $fold/PAR4
+         sed -e "s/correction_contact_courbure_coeff.*$/correction_contact_courbure_coeff 2.0/" \
+             -e "s/calcul_courbure_iterations.*$/calcul_courbure_iterations 2/" \
+             -e "s/niter_pre_lissage.*$/niter_pre_lissage $npre/" \
+	     -e "/Resume_last_time/s/Resume_last_time.*xyz/Resume_last_time xyz ..\/..\/..\/..\/Theta85_120\/$opt\/$fold\/SEQ\/equil_hysteresis_fin_pb.xyz/" \
+             equil_hysteresis_fin.data > $fold/equil_hysteresis_fin.data
+         cp -f SEQ/pre_run SEQ/post_run $fold/equil_hysteresis_fin.data $fold/SEQ/
+         cp -f SEQ/pre_run SEQ/post_run $fold/equil_hysteresis_fin.data $fold/PAR4/
+      done 
+      cd ..
+    fi
+    if [ $opt == "weighted" ] ; then
+      cd $opt
+      for w in 0.0 0.5 1.0
+      do
+         fold=weight$w
+         mkdir -p $fold/SEQ $fold/PAR4
+         sed -e "s/correction_contact_courbure_coeff.*$/correction_contact_courbure_coeff 2.0/" \
+             -e "s/calcul_courbure_iterations.*$/calcul_courbure_iterations 2/" \
+             -e "s/niter_pre_lissage.*$/niter_pre_lissage 10/" \
+             -e "s/weight_CL.*$/weight_CL $w/" \
+             equil_hysteresis_fin.data > $fold/equil_hysteresis_fin.data
+         cp -f SEQ/pre_run SEQ/post_run $fold/equil_hysteresis_fin.data $fold/SEQ/
+         cp -f SEQ/pre_run SEQ/post_run $fold/equil_hysteresis_fin.data $fold/PAR4/
+      done 
+      cd ..
+    fi
+  done
+      
+}
+
+mkdir -p Sphere/Equilibre_60/Theta60_60  Sphere/Equilibre_60/Theta30_120 \
+         Sphere/Hors_equil_85_120/Theta85_120/ Sphere/Hors_equil_85_120/Reverse_20_60
+# mkdir -p Cylindre/Couche Cylindre/Debout
+# mkdir -p Plan/Incline_45
+			
+# Creation des JDD a partir du modele : 
+# Pour decommenter une ligne contenant FLAG:  -e "/FLAG/s/#//g"
+sed -e "/hysteresis/s/fonc_xyz 2.*$/fonc_xyz 2 60 60/" \
+    equil_hysteresis_fin.data > Sphere/Equilibre_60/Theta60_60/equil_hysteresis_fin.data
+cp -f pre_run post_run Sphere/Equilibre_60/Theta60_60/
+cd Sphere/Equilibre_60/Theta60_60/ 
+    make_subfolders
+cd $cwd
+
+sed -e "/hysteresis/s/fonc_xyz 2.*$/fonc_xyz 2 30 120/" \
+    equil_hysteresis_fin.data > Sphere/Equilibre_60/Theta30_120/equil_hysteresis_fin.data
+cp -f pre_run post_run Sphere/Equilibre_60/Theta30_120/
+cd Sphere/Equilibre_60/Theta30_120/ 
+    make_subfolders
+cd $cwd
+
+sed -e "/hysteresis/s/fonc_xyz 2.*$/fonc_xyz 2 85 120/" \
+    equil_hysteresis_fin.data > Sphere/Hors_equil_85_120/Theta85_120/equil_hysteresis_fin.data
+cp -f pre_run post_run Sphere/Hors_equil_85_120/Theta85_120/
+cd Sphere/Hors_equil_85_120/Theta85_120/ 
+    make_subfolders
+cd $cwd
+
+sed -e "/hysteresis/s/fonc_xyz 2.*$/fonc_xyz 2 20 60/" \
+    -e "/Resume_last_time/s/#//g" \
+    equil_hysteresis_fin.data > Sphere/Hors_equil_85_120/Reverse_20_60/equil_hysteresis_fin.data
+cp -f pre_run post_run Sphere/Hors_equil_85_120/Reverse_20_60
+cd Sphere/Hors_equil_85_120/Reverse_20_60
+    make_subfolders
+cd $cwd
+

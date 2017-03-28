@@ -1,7 +1,10 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.5 : Enhancements, modifications and corrected bugs since version 1.7.4 :
 --------------------------------------------------------------------------------------------------
-31/01/17 (TrioCFD) Bug fixed   : Backup to the first time step if resumed a Front-Tracking calculation
+28/03/17 (TrioCFD) New feature : FTD. Contact angle hysteresis available in test (via #define PATCH_HYSTERESIS_V3)
+28/03/17 (TrioCFD) Minor change: FTD. equilateral option available + preserve FT elements in corners (without remeshing)
+28/03/17 (TrioCFD) New feature : FTD. Thermal coupling : solid + liquid + vapour (with phase-change)
+31/01/17 (TrioCFD) Bug fixed   : FTD. Backup to the first time step if resumed a Front-Tracking calculation
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.4 : Enhancements, modifications and corrected bugs since version 1.7.3 :
 --------------------------------------------------------------------------------------------------

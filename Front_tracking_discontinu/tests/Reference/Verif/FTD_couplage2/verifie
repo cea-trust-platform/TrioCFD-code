@@ -1,0 +1,9 @@
+#!/bin/sh
+
+ko=0
+for f in `ls *.face.ref`
+do
+diff $f $(basename $f .ref)
+[ $? -ne 0 ] && ko=1
+done
+exit $ko

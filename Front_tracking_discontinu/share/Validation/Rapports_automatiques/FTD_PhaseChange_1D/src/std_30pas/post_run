@@ -1,0 +1,23 @@
+#!/bin/bash
+if [ "$1" == "evap_remesh_30_pas" ]
+then
+	echo "We do all the post_run together... "
+	Sur=144.e-10
+	t=9.e-8
+	t2=1.e-8
+	f=100000000
+	rhov=1000
+	cpv=100
+	kv=0.4
+	gradTv=0.
+	rhol=1000
+	cpl=600
+	Lv_l=3
+	kl=0.6
+	gradTl=-2.5e5
+	flux_ent=15.e4
+	L_maille=1.e-5
+	cd ..
+	visit -nowin -cli -s script_post.py $Sur $t $t2 $f $rhov $cpv $kv $gradTv $rhol $cpl $Lv_l $kl $gradTl $flux_ent $L_maille
+	
+fi

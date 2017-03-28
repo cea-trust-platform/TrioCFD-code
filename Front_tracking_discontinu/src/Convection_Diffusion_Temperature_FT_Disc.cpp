@@ -39,6 +39,7 @@ Implemente_ref(Convection_Diffusion_Temperature_FT_Disc);
 Convection_Diffusion_Temperature_FT_Disc::Convection_Diffusion_Temperature_FT_Disc()
 {
   phase_ = -1;
+  correction_courbure_ordre_=0; // Par defaut, pas de prise en compte de la courbure pour corriger le champ etendu delta_vitesse
   stencil_width_ = 8; //GB : Valeur par defaut de stencil_width_
   temp_moy_ini_ = 0.; //GB : Valeur par defaut de la temperature moyenne initiale
   nom_sous_zone_ = "unknown_sous_zone"; //GB : Valeur par defaut de la sous-zone de moyenne
@@ -54,7 +55,18 @@ Sortie& Convection_Diffusion_Temperature_FT_Disc::printOn(Sortie& os) const
 Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
 {
   // Ne pas faire assert(fluide non nul)
-  return Convection_Diffusion_std::readOn(is);
+  Convection_Diffusion_std::readOn(is);
+  Nom num=inconnue().le_nom(); // On prevoir le cas d'equation de scalaires passifs
+  num.suffix("temperature_thermique");
+  Nom nom="Convection_chaleur";
+  nom+=num;
+  terme_convectif.set_fichier(nom);
+  terme_convectif.set_description((Nom)"Convective heat transfer rate=Integral(-rho*cp*T*u*ndS) [W] if SI units used");
+  nom="Diffusion_chaleur";
+  nom+=num;
+  terme_diffusif.set_fichier(nom);
+  terme_diffusif.set_description((Nom)"Conduction heat transfer rate=Integral(lambda*grad(T)*ndS) [W] if SI units used");
+  return is;
 }
 
 void Convection_Diffusion_Temperature_FT_Disc::set_param(Param& param)
@@ -63,6 +75,7 @@ void Convection_Diffusion_Temperature_FT_Disc::set_param(Param& param)
   param.ajouter("phase",&phase_);
   param.ajouter_condition("(value_of_phase_eq_0)_or_(value_of_phase_eq_1)","phase must be set to 0 or 1");
   param.ajouter("stencil_width",&stencil_width_);
+  param.ajouter("correction_courbure_ordre", &correction_courbure_ordre_);
   param.ajouter_non_std("equation_interface",(this),Param::REQUIRED);
   param.ajouter_non_std("maintien_temperature",(this));
   param.ajouter_non_std("equation_navier_stokes",(this),Param::REQUIRED);
@@ -403,7 +416,7 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
 
   // Calcul du champ de vitesse de convection dans la "phase_"
   Navier_Stokes_FT_Disc& ns = ref_cast(Navier_Stokes_FT_Disc, ref_eq_ns_.valeur());
-  ns.calculer_delta_u_interface(vitesse_convection_, phase_, 0 /* ordre de la correction en courbure */);
+  ns.calculer_delta_u_interface(vitesse_convection_, phase_, correction_courbure_ordre_ /* ordre de la correction en courbure */);
   const Champ_Inc& vitesse_ns = ns.inconnue();
   vitesse_convection_.valeurs() += vitesse_ns.valeurs();
 

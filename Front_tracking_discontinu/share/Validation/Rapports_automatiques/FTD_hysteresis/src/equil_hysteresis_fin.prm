@@ -1,0 +1,787 @@
+Parameters {
+	Title "Traitement de la ligne de contact avec hysteresis de l'angle de contact."
+	Author "Guillaume Bois"
+	VersionTrio_U 1.7.4
+	TestCase Sphere/Equilibre_60/Theta60_60/standard/SEQ                         equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/standard/PAR4                        equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/improved/SEQ                         equil_hysteresis_fin.data
+#	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre00/SEQ   equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ   equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ   equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ   equil_hysteresis_fin.data
+	
+	TestCase Sphere/Equilibre_60/Theta30_120/standard/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/improved/SEQ                        equil_hysteresis_fin.data
+#	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre00/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ  equil_hysteresis_fin.data
+	
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ  equil_hysteresis_fin.data
+	
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/standard/PAR4                        PAR_equil_hysteresis_fin.data 4 
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/improved/PAR4                        PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/PAR4  PAR_equil_hysteresis_fin.data 4
+
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ                        equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ  equil_hysteresis_fin.data
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ  equil_hysteresis_fin.data
+	
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/standard/PAR4                        PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/improved/PAR4                        PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/PAR4  PAR_equil_hysteresis_fin.data 4
+	TestCase Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/PAR4  PAR_equil_hysteresis_fin.data 4
+	
+# 	TestCase Sphere/Equilibre_60/Theta60_60 PAR_equil_hysteresis_fin.data 4
+# 	TestCase Sphere/Equilibre_60/Theta60_60/Liss_IS01_ISR01_coef-0.1 equil_hysteresis_fin.data
+# 	TestCase Sphere/Equilibre_60/Theta30_120 PAR_equil_hysteresis_fin.data 4
+# 	TestCase Sphere/Equilibre_60/Theta30_120/SEQ equil_hysteresis_fin.data
+# 	TestCase Sphere/Equilibre_60/Theta30_120/Liss_IS01_ISR01_coef-0.1 equil_hysteresis_fin.data
+}
+
+Chapter {
+	Title "Convergence" 
+#		Description "At the contact line, the evaluation of the curvature takes into account the prescribed contact angle."
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/equil_hysteresis_fin.dt_ev
+			columns ($1) ($4)
+			style linespoints
+		}
+	}
+}
+
+
+
+
+
+
+Chapter {
+	Title "Sphere/Equilibre_60" 
+	Description "\latex_( \input{../desc1.tex} \latex_)"
+
+	Description "Theta60_60"
+	visu {
+	        nb_img_without_newline 2
+
+		Description "60_60 standard"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "60_60 improved"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "60_60 hysteresis (liss:01)"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "60_60 hysteresis (liss:05)"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "60_60 hysteresis (liss:10)"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Radial position"
+		logY
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Z position (wall-normal)"
+		logY
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	Description "Theta30_120"
+	visu {
+	        nb_img_without_newline 2
+
+		Description "30_120 standard"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "30_120 improved"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "30_120 hysteresis (liss:01)"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "30_120 hysteresis (liss:05)"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "30_120 hysteresis (liss:10)"
+		Cycles -1
+		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Radial position"
+		logY
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Z position (wall-normal)"
+		logY
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+}
+
+Chapter {
+	Title "Sphere/Hors_equil_85_120" 
+	Description "Hors equilibre, mise en mouvement de l'interface"
+
+	Description "ThetaTheta85_120"
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Theta85_120 standard"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Theta85_120 improved"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Theta85_120 hysteresis (liss:01)"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Theta85_120 hysteresis (liss:05)"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Theta85_120 hysteresis (liss:10)"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Radial position"
+		logY
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Z position (wall-normal)"
+		logY
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	Description "ThetaReverse_20_60"
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Reverse_20_60 standard"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Reverse_20_60 improved"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Reverse_20_60 hysteresis (liss:01)"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Reverse_20_60 hysteresis (liss:05)"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	visu {
+	        nb_img_without_newline 2
+
+		Description "Reverse_20_60 hysteresis (liss:10)"
+		Cycles -1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
+		Operator slice 0. 0. 0. 0. 0. 1.
+		Normal3D 0.17 -0.95 0.27
+		Up3D     0.03  0.28 0.96
+		Width 5cm
+	}
+
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Radial position"
+		logY
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	figure { 
+		title "Motion of the bubble barycenter"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "Z position (wall-normal)"
+		logY
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend standard (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend improved (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
+		}
+		curve {
+			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
+			columns ($2) (sqrt($6*$6+$7*$7))
+			style linespoints
+			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
+		}
+	}
+	Description "Pour le deplacement vers l'equilibre... "
+	visu {
+	        nb_img_without_newline 2
+		Description " Theta85_120 standard: black; hysteresis/Npre01: red; hysteresis/Npre05: green; hysteresis/Npre10: blue)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES black
+#		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES red
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES red
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES green
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES blue
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	Description "Apres la reprise... "
+	visu {
+	        nb_img_without_newline 2
+		Description " Reverse_20_60 standard: black; hysteresis/Npre01: red; hysteresis/Npre05: green; hysteresis/Npre10: blue)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES black
+#		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES red
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES red
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES green
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES blue
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+}
+
+Chapter {
+	Title "Parallel/seqential comparison"
+	Description "Pour le deplacement vers l'equilibre... "
+	visu {
+	        nb_img_without_newline 2
+		Description "standard (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "improved (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "hysteresis/It2_coeff2.0_Npre01 (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "hysteresis/It2_coeff2.0_Npre05 (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "hysteresis/It2_coeff2.0_Npre10 (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	Description "Apres la reprise... "
+	visu {
+	        nb_img_without_newline 2
+		Description "standard (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "improved (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "hysteresis/It2_coeff2.0_Npre01 (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "hysteresis/It2_coeff2.0_Npre05 (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+	visu {
+	        nb_img_without_newline 2
+		Description "hysteresis/It2_coeff2.0_Npre10 (SEQ: black; PAR4: red)"
+		Cycles 1
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES black
+		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/PAR4/lata/post.lata INTERFACES red
+		Operator_to_all slice2D_z 0. 0. 0.
+		Width 5cm
+	}
+}
