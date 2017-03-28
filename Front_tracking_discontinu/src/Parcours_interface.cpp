@@ -28,6 +28,7 @@
 #include <Param.h>
 #include <Scatter.h>
 #include <Debog.h>
+//#define EXTENSION_TRIANGLE_POUR_CALCUL_INDIC_AVEC_CONSERVATION_FACETTE_COIN
 Implemente_instanciable_sans_constructeur(Parcours_interface,"Parcours_interface",Objet_U);
 
 Implemente_ref(Parcours_interface);
@@ -1960,6 +1961,10 @@ int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
 }
 
 // Description:
+// Methode outil de Maillage_FT_Disc::deplacer_un_point dans le cas d'un marqueur
+// de la ligne de contact.
+// P0 est la position initiale du marqueur en contact (sur la face_bord)
+// P1 est la position finale visee apres le deplacement
 //  Pour un point P0(x0,y0,z0) sur la face "face_bord" et un point P1(x1,y1,z1),
 //  on determine la projection orthogonale p(P1) de P1 sur le plan contenant la
 //  face, et on calcule l'intersection (x,y,z) du segment [P0,p(P1)] avec

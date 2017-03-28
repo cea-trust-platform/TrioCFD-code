@@ -24,6 +24,7 @@
 #include <Deriv_Remaillage_FT.h>
 #include <Motcle.h>
 #include <Zone_VF.h>
+#include <Domaine.h>
 #include <Triangle.h>
 #include <Rectangle.h>
 #include <Rectangle_2D_axi.h>
@@ -56,6 +57,11 @@ Remaillage_FT::Remaillage_FT() :
   impr_(-1),
   valeur_longueur_fixe_(-1.),
   facteur_longueur_ideale_(-1.),
+  equilateral_(0), // Par defaut, on regarde
+  //                  l'orientation de la facette pour ajuster sa taille a l'element eulerien.
+  //                  alors que equilateral=1 utilise la diagonal de l'element comme longueur de reference.
+  //                  Avec equilateral_ = 0, les facettes sont etirees comme le maillage et facteur_longueur vaut
+  //                  1. si l'arete traverse tout l'element dans la direction donnee par l'arrete.
   lissage_courbure_coeff_(-0.05), // valeur typique pour stabilite
   lissage_courbure_iterations_systematique_(0),
   lissage_courbure_iterations_si_remaillage_(0),
@@ -70,6 +76,7 @@ Entree& Remaillage_FT::readOn(Entree& is)
   set_param(p);
   double critere_remaillage_compat=-1;
   p.ajouter("critere_remaillage",& critere_remaillage_compat);
+  p.ajouter("equilateral", &equilateral_);
   facteur_longueur_ideale_ = -1.;
   valeur_longueur_fixe_ = -1.;
   if ( critere_remaillage_compat!=-1)
@@ -247,7 +254,7 @@ void Remaillage_FT::remaillage_local_interface(double temps, Maillage_FT_Disc& m
         maillage.check_mesh();
       if (n > 0)
         {
-          supprimer_doublons_facettes(maillage);
+          supprimer_doublons_facettes(maillage); // Marque les facettes mais ne les supprime pas effectivement.
           if (Comm_Group::check_enabled())
             maillage.check_mesh();
           // On a supprime les petites aretes en deplacant un noeud sur
@@ -1180,6 +1187,53 @@ void Remaillage_FT::barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& mailla
   nettoyer_maillage(maillage);
 }
 
+// POUR DEBUGGER LA CONSERVATION DU VOLUME
+#define DEBUG_CONSERV_VOLUME 0
+#if DEBUG_CONSERV_VOLUME
+static double calculer_volume_mesh(const Maillage_FT_Disc& mesh)
+{
+  const int n = mesh.nb_facettes();
+  double volume = 0.;
+  const ArrOfDouble& surfaces_facettes = mesh.get_update_surface_facettes();
+  const DoubleTab& normales_facettes = mesh.get_update_normale_facettes();
+  const IntTab& facettes = mesh.facettes();
+  const DoubleTab& sommets = mesh.sommets();
+  for (int i = 0; i < n; i++)
+    {
+      if (mesh.facette_virtuelle(i))
+        continue;
+      const double s = surfaces_facettes[i];
+      const double normale_scalaire_direction = normales_facettes(i, 0); // On projette sur x
+      // Coordonnee du centre de gravite de la facette
+      const int i0 = facettes(i,0);
+      const int i1 = facettes(i,1);
+      const int i2 = facettes(i,2);
+      const double coord_centre_gravite_i = (sommets(i0,0) + sommets(i1,0) + sommets(i2,0)) / 3.;
+      //const double coord_centre_gravite_j = (sommets(i0,1) + sommets(i1,1) + sommets(i2,1)) / 3.;
+      //const double coord_centre_gravite_k = (sommets(i0,2) + sommets(i1,2) + sommets(i2,2)) / 3.;
+      const double volume_prisme = coord_centre_gravite_i * s * normale_scalaire_direction;
+      volume += volume_prisme;
+    }
+  volume = Process::mp_sum(volume);
+  return volume;
+}
+static double calculer_somme_dvolume(const Maillage_FT_Disc& mesh, const ArrOfDouble& dvolume)
+{
+  const int n = dvolume.size_array();
+  assert(n == mesh.nb_sommets());
+  double somme = 0.;
+  for (int i = 0; i < n; i++)
+    {
+      if (!mesh.sommet_virtuel(i))
+        {
+          somme += dvolume[i];
+        }
+    }
+  somme = Process::mp_sum(somme);
+  return somme;
+}
+#endif
+
 // Description: Algorithme general de lissage du maillage. Permet de barycentrer,
 //  regulariser la courbure, et d'appliquer une correction de volume en deplacant
 //  les noeuds dans la direction normale.
@@ -1209,12 +1263,33 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
   int iteration_correction_volume = 0;
   for(iteration = 0; 1; iteration++)
     {
+#if DEBUG_CONSERV_VOLUME
+      double volume_initial, volume_final;
+      {
+        double vol = calculer_volume_mesh(maillage);
+        volume_initial = vol;
+        double dvol = calculer_somme_dvolume(maillage, var_volume);
+        Cerr.precision(16);
+        Cerr << "Remaillage_FT::regulariser_maillage iteration " << iteration
+             << " volume= " << vol << " dvolume= " << dvol << finl;
+
+      }
+#endif
+
       if (iteration > 0)
         // Ne pas lisser la variation de volume demandee a la premiere iteration.
         // Ensuite, on repartit la correction de volume sur les noeuds voisins
         // pour eviter les singularites de deplacement des sommets:
         lisser_dvolume(maillage, var_volume, 1);
 
+#if DEBUG_CONSERV_VOLUME
+      {
+        double dvol = calculer_somme_dvolume(maillage, var_volume);
+        Cerr << "Remaillage_FT::regulariser_maillage apres lisser dvolume "
+             <<  " dvolume= " << dvol << finl;
+
+      }
+#endif
       // A la premiere iteration, on ne regularise pas la courbure
       // (maillage risque d'etre vraiment pourri avec petites aretes partout)
       // regulariser_courbure() ne change pas le maillage, cette methode remplit
@@ -1228,6 +1303,17 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
           const int n = var_volume.size_array();
           for (int i = 0; i < n; i++)
             var_volume[i] += dv_courbure[i];
+
+
+#if DEBUG_CONSERV_VOLUME
+          {
+            double dvol = calculer_somme_dvolume(maillage, dv_courbure);
+            Cerr << "Remaillage_FT::regulariser_maillage apres calcul dvcourbure "
+                 <<  " dv courbure= " << dvol << finl;
+
+          }
+#endif
+
         }
 
       // Faut-il barycentrer ?
@@ -1242,8 +1328,31 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
                              1.,    // relaxation_direction_normale
                              var_volume,
                              var_volume_obtenu);
+#if DEBUG_CONSERV_VOLUME
+      {
+        double dvol = calculer_somme_dvolume(maillage, var_volume);
+        Cerr << "Remaillage_FT::regulariser_maillage apres redistribuer_sommets " << iteration
+             << " dvolume avant ajout= " << dvol << finl;
+
+      }
+#endif
+
       // Calcul de la correction de volume a realiser a l'iteration suivante:
       var_volume -= var_volume_obtenu;
+#if DEBUG_CONSERV_VOLUME
+      {
+        double vol = calculer_volume_mesh(maillage);
+        volume_final = vol;
+        double vvol = calculer_somme_dvolume(maillage, var_volume_obtenu);
+        double dvol = calculer_somme_dvolume(maillage, var_volume);
+        Cerr << "Remaillage_FT::regulariser_maillage apres redistribuer_sommets " << iteration
+             << " volume= " << vol
+             << " var_vol obtenu= " << vvol
+             << " dvolume= " << dvol
+             << " variation calculee= " << volume_final-volume_initial << finl;
+
+      }
+#endif
 
       if (iteration >= nb_iter_barycentrage-1 && iteration >= nb_iter_lissage)
         {
@@ -2118,6 +2227,17 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
               const int face1 = elem_faces(elem0,k+dim);
               delta_xv[k] = xv(face1,k) - xv(face0,k);
             }
+          if (equilateral_)
+            {
+              // On calcul la diagonale de l'element eulerien. Puis longueur au carre.
+              norme2 = 0.;
+              for (k = 0; k < dim; k++)
+                norme2 += delta_xv[k] * delta_xv[k];
+            }
+          else
+            {
+              // On calcul la projection de la diagonale de l'element eulerien
+              // sur l'arete de la facette.  Puis longueur au carre.
               if (norme2 == 0)
                 {
                   v[0] = 1.;
@@ -2131,6 +2251,7 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
                 {
                   v[k] *= f * delta_xv[k];
                   norme2 += v[k] * v[k];
+                }
             }
           lgrId2 = norme2;
 

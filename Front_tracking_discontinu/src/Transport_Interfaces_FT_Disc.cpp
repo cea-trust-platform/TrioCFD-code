@@ -1529,7 +1529,9 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
   else
     {
       Cerr << "Initial condition remeshing." << finl;
+      //maillage_interface().nettoyer_maillage(); // GB : Pour supprimer toutes ces facettes nulles...
       remailler_interface();
+      //maillage_interface().nettoyer_maillage(); // GB : Pour supprimer toutes ces facettes nulles...
     }
 
   // Ajout pour la sauvegarde au premier pas de temps si reprise
@@ -7009,13 +7011,14 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
   const Motcle som = "sommets";            //postraitement possible uniquement aux sommets
   const Motcle elem = "elements";          //postraitement possible uniquement aux elements
   const Motcle bi = "elements et sommets"; //postraitement possible aux sommets et aux elements
-  const int nb_champs = 4;
+  const int nb_champs = 5;
   Motcles les_champs(nb_champs);
   {
     les_champs[0] = Postraitement_base::demande_description;
     les_champs[1] = "courbure";
     les_champs[2] = "vitesse";
     les_champs[3] = "vitesse_repere_local";
+    les_champs[4] = "normale_unitaire";
   }
   Motcles localisations(nb_champs);
   {
@@ -7023,6 +7026,7 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
     localisations[1] = som;
     localisations[2] = som;
     localisations[3] = som;
+    localisations[4] = elem;
   }
 
   int rang=les_champs.search(champ), i;
@@ -7127,6 +7131,24 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
                 Cerr << "Error : vitesse_repere_local nodes post-processing : to be developped." << finl;
                 assert(0);
                 exit();
+              }
+            break;
+          }
+        case 4:
+          {
+            if (!ftab) break; // Pointeur nul : ne pas calculer la valeur du champ.
+            const Maillage_FT_Disc& mesh = maillage_interface_pour_post();
+            const DoubleTab& valeurs = mesh.get_update_normale_facettes();
+            const int nb_fa7 = valeurs.dimension(0);
+            const int nb_compo = valeurs.dimension(1);
+            ftab->resize(nb_fa7, nb_compo);
+            int fa7,k;
+            for (fa7=0 ; fa7<nb_fa7 ; fa7++)
+              {
+                for (k=0 ; k<nb_compo ; k++)
+                  {
+                    (*ftab)(fa7,k) = (float) valeurs(fa7,k);
+                  }
               }
             break;
           }

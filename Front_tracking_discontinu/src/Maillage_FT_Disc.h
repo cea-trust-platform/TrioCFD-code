@@ -97,6 +97,7 @@ public:
   // Ces fonctions renvoient 1 si le test est vrai, 0 sinon
   inline int sommet_virtuel(int i) const;
   inline int sommet_ligne_contact(int i) const;
+  inline int sommet_face_bord(int i) const;
   inline int facette_virtuelle(int i) const;
   int        facettes_voisines(int fa70, int fa71, int& iarete0, int& iarete1) const;
 
@@ -457,6 +458,13 @@ inline int Maillage_FT_Disc::sommet_virtuel(int i) const
 inline int Maillage_FT_Disc::sommet_ligne_contact(int i) const
 {
   return (sommet_face_bord_[i] >= 0) ? 1 : 0;
+}
+
+// Description :
+//  Renvoie le numero de la face de bord.
+inline int Maillage_FT_Disc::sommet_face_bord(int i) const
+{
+  return sommet_face_bord_[i];
 }
 
 
