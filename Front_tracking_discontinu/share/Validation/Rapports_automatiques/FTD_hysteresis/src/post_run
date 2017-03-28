@@ -1,0 +1,1 @@
+sed -e "/TEMPS:/d" composantes_connexes.txt > compo_connex.txt

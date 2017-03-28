@@ -1,0 +1,482 @@
+Parameters {
+	Title "Validation Test for the Interface Movement and the Diphasic Heating"
+	Author "J.CHENARD"
+	Description "____Convection Scheme : Schema_Euler_explicite"
+	Description "____VDF Discretisation "
+	VersionTrio_U 1.7.4
+	ParametersTrio_U Type of fluid : imaginary gaseous and liquid fluids with the same properties
+ 	TestCase adiab      adia_remesh.data
+	TestCase same_rho   evevap_remesh_same_rho.data
+	TestCase std_2pas   evap_remesh_2_pas.data
+	TestCase std_30pas  evap_remesh_30_pas.data
+	}
+
+Chapter {
+	Title "Objectives of the application"
+	Description "In this test, we check the capability of the Front Tracking algorithm to describe the movement of the interface when it is subjected to phase change."	
+	Description "The test deals with the presence of rectangular domain (alongside the X axis) with a square" <<EOF
+	section separtated in 2 phases at xmax/2. The liquid is at rest. No gravity forces are taken into
+	account. In both phases, an opposed temperature gradient is initially applied in order to initiate 
+	a movement of the interface. The goal of this test is to check if the interface moves the right distance. 
+	A boundary heat flux is imposed on one boundary face of the domain in order to check the proper increase
+	in temperature in both the fluids.
+	\newpage
+EOF
+	Description "\latex_( $$ \textbf{Description} $$ \latex_)"
+	Description " "
+	Description "In this two-fluid problem, the following notations are introduced to describe the fluids and interface physical and transport properties. The two fluids are considered as non-miscible. They have been defined	with the same properties in order to facilitate the calculation of the interface displacement."
+	Description "\latex_( $$ \text{Heat Flux} \ Q_{d} \ \text{imposed on the ``entree`` boundary:} $$ \latex_) "
+	Description "\latex_( $$ Q_{d}\ =\ 15 \ 000 \ \frac{W}{m^2} $$ \latex_)"
+	Description "With the parameters used, the theoretical displacement of the interface during the first time step should be the following:"
+	Description "\latex_( $$ \Delta x \ = \frac{-1}{\rho}  \stackrel{.}{m} \Delta t \ = \ \frac{-1}{\rho}  \Delta t \frac{k_{l} \nabla T_{l} \ - \ k_{v} \nabla{T_{v}}}{L_{l}} \ = \ \frac{-9.10^{-8} . ( 0.6 . ( -250 \ 000 ) \ - \ 0. } {1000 . (-3))} \ m $$ \latex_)"
+	Description "\latex_( $$ \Delta x \ = \ 1.e-6 \ m $$ \latex_)"
+	Description "Where the subscript $k = l,v$ denotes respectively the liquid or the vapor, " <<EOF
+	$ \rho  $ is the density of both the fluids, $ \Delta t $ is the time step, $ \nabla{T_{k}} $ is the
+	temperature gradient in phase $k$, $k$ is the thermal conductivity and \latex_( $ L_{k} $ \latex_) is 
+	the liquefaction latente heat.
+EOF
+	Description "Interface Position $v$ stands for the interface position calculated thanks to the vapor side of the mix, T Ener Vap stands for \latex_( $ \rho_{v} . Cp_{v} . T_{v} $ \latex_) integratede on the domain, Lat Ener Vap the latent energy resulting from the vaporisation or condensation since \latex_( $ t = 0  $ \latex_) , Ener Conv is \latex_( $ \nabla . (U. \rho_{k} . Cp_{k} . T_{k} ) $ \latex_) integrated on the domain and Flux limite corresponds to the energy brought by the boundary heat flux to the system."
+}	
+	
+
+Chapter {
+	Title "Validation of the movement of the interface without thermal effect"
+	visu {
+		nb_img_without_newline 2
+		Title "Initial and final position of the interface"
+		Mesh adiab/lata/post.lata INTERFACES red
+		Pseudocolor_with_opacity adiab/lata/post.lata dom TEMPERATURE_THERMIQUE ELEM 0
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0. 
+	}
+	visu {
+		nb_img_without_newline 2
+		Title "Liquid Phase Temperature"
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		Pseudocolor adiab/lata/post.lata dom Tl ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Vapor Phase Temperature"
+		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+		Pseudocolor adiab/lata/post.lata dom Tv ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Fluid speed"
+		Pseudocolor adiab/lata/post.lata dom VITESSE_X ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+
+	Table {
+		Title "Validation table Fluid Movement Only"
+		Nb_columns 4
+		Label x at t=0s | x at t=9.e-8  | \latex_( $ \Delta $ \latex_) | Relative Error(%)
+		
+		Line {
+			file Interface_Position_v_vitesse.txt
+			legend "Interface_Position_v"
+			}
+		Line {
+			file Interface_Position_l_vitesse.txt
+			legend "Interface_Position_l"
+			}
+		Line {
+			file T_Ener_Vap_vitesse.txt
+			legend "T_Ener_Vap"
+			}
+		Line {
+			file T_Ener_Liq_vitesse.txt
+			legend "T_Ener_Liq"
+			}
+		Line {
+			file Lat_Ener_Vap_vitesse.txt
+			legend "Lat_Ener_Vap"
+			}
+		Line {
+			file Lat_Ener_Liq_vitesse.txt
+			legend "Lat_Ener_Liq"
+			}
+		Line {
+			file Ener_Conv_vitesse.txt
+			legend "Ener_Conv"
+			}
+		Line {
+			file Flux_limite_vitesse.txt
+			legend "Flux_limite"
+			}
+		Line {
+			file Delta_Energy_Sum_vitesse.txt
+			legend "Energy_Bilan"
+
+			}
+		Line {
+			file Power_Sum_vitesse.txt
+			legend "Power_Sum"
+			}
+		}
+}		
+
+Chapter {
+	Title "Validation of the movement of the interface with the same rho"
+			
+	Visu {
+		nb_img_without_newline 2
+		Title "Initial and final position of the interface"
+		Mesh same_rho/lata/post.lata INTERFACES red
+		Pseudocolor_with_opacity same_rho/lata/post.lata dom TEMPERATURE_THERMIQUE ELEM 0
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	  
+	}
+	
+
+	visu {
+		nb_img_without_newline 2
+		Title "Massic apparition rate of the liquid"
+		instruction_visit DefineScalarExpression("MPOINT_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,0.)")
+		Pseudocolor same_rho/lata/post.lata INTERFACES MPOINT ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 1. 0. 0.
+		up3D 0. 0. 1.
+	}
+	visu {
+		nb_img_without_newline 2
+		Title "Massic disparition rate of the vapor"
+		instruction_visit DefineScalarExpression("MPOINTV_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINTV_ELEM_dom>,INTERFACES,0.)")
+		Pseudocolor same_rho/lata/post.lata INTERFACES MPOINTV ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 1. 0. 0.
+		up3D 0. 0. 1.
+	}
+		visu {
+		nb_img_without_newline 2
+		Title "Liquid Phase Temperature"
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		Pseudocolor same_rho/lata/post.lata dom Tl ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Vapor Phase Temperature"
+		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+		Pseudocolor same_rho/lata/post.lata dom Tv ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Fluid speed"
+		Pseudocolor same_rho/lata/post.lata dom VITESSE_X ELEM
+		width 7.5cm
+		cycles 0 9
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+		
+	Table {
+		Title "Validation table Same Rho"
+		Nb_columns 4
+		Label x at t=0s | x at t=9.e-8 | \latex_( $ \Delta $ \latex_) | Relative Error(%)
+		
+		Line {
+			file Interface_Position_v_same_rho.txt
+			legend "Interface_Position_v"
+			}
+		Line {
+			file Interface_Position_l_same_rho.txt
+			legend "Interface_Position_l"
+			}
+		Line {
+			file T_Ener_Vap_same_rho.txt
+			legend "T_Ener_Vap"
+			}
+		Line {
+			file T_Ener_Liq_same_rho.txt
+			legend "T_Ener_Liq"
+			}
+		Line {
+			file Lat_Ener_Vap_same_rho.txt
+			legend "Lat_Ener_Vap"
+			}
+		Line {
+			file Lat_Ener_Liq_same_rho.txt
+			legend "Lat_Ener_Liq"
+			}
+		Line {
+			file Ener_Conv_same_rho.txt
+			legend "Ener_Conv"
+			}
+		Line {
+			file Flux_limite_same_rho.txt
+			legend "Flux_limite"
+			}
+		Line {
+			file Delta_Energy_Sum_same_rho.txt
+			legend "Energy_Bilan"
+			}
+		Line {
+			file Power_Sum_same_rho.txt
+			legend "Power_Sum"
+			}
+	}
+}
+
+Chapter {
+	Title "Validation of the movement of the interface with different rhos on one timestep"
+	
+	Visu {
+		nb_img_without_newline 2
+		Title "Initial and final position of the interface"
+		Mesh std_2pas/lata/post.lata INTERFACES red
+		Pseudocolor_with_opacity std_2pas/lata/post.lata dom TEMPERATURE_THERMIQUE ELEM 0
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	  
+	}
+	
+
+	visu {
+		nb_img_without_newline 2
+		Title "Massic apparition rate of the liquid"
+		instruction_visit DefineScalarExpression("MPOINT_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,0.)")
+		Pseudocolor std_2pas/lata/post.lata INTERFACES MPOINT ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 1. 0. 0.
+		up3D 0. 0. 1.
+	}
+	visu {
+		nb_img_without_newline 2
+		Title "Massic disparition rate of the vapor"
+		instruction_visit DefineScalarExpression("MPOINTV_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINTV_ELEM_dom>,INTERFACES,0.)")
+		Pseudocolor std_2pas/lata/post.lata INTERFACES MPOINTV ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 1. 0. 0.
+		up3D 0. 0. 1.
+	}
+		visu {
+		nb_img_without_newline 2
+		Title "Liquid Phase Temperature"
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		Pseudocolor std_2pas/lata/post.lata dom Tl ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Vapor Phase Temperature"
+		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+		Pseudocolor std_2pas/lata/post.lata dom Tv ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Fluid speed"
+		Pseudocolor std_2pas/lata/post.lata dom VITESSE_X ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	Table {
+		Title "Validation table Different Rho two Timestep"
+		Nb_columns 4
+		Label x at t=0s | x at t=1.e-8 (first time step) | \latex_( $ \Delta $ \latex_) | Relative Error(%)
+		
+		Line {
+			file Interface_Position_v_2_pas.txt
+			legend "Interface_Position_v"
+			}
+		Line {
+			file Interface_Position_l_2_pas.txt
+			legend "Interface_Position_l"
+			}
+		Line {
+			file T_Ener_Vap_2_pas.txt
+			legend "T_Ener_Vap"
+			}
+		Line {
+			file T_Ener_Liq_2_pas.txt
+			legend "T_Ener_Liq"
+			}
+		Line {
+			file Lat_Ener_Vap_2_pas.txt
+			legend "Lat_Ener_Vap"
+			}
+		Line {
+			file Lat_Ener_Liq_2_pas.txt
+			legend "Lat_Ener_Liq"
+			}
+		Line {
+			file Ener_Conv_2_pas.txt
+			legend "Ener_Conv"
+			}
+		Line {
+			file Flux_limite_2_pas.txt
+			legend "Flux_limite"
+			}
+		Line {
+			file Delta_Energy_Sum_2_pas.txt
+			legend "Energy_Bilan"
+			}
+		Line {
+			file Power_Sum_2_pas.txt
+			legend "Power_Sum"
+			}
+	}
+}
+
+Chapter {
+	Title "Validation of the movement of the interface with different rhos on a hundred timesteps"	
+Visu {
+		nb_img_without_newline 2
+		Title "Initial and final position of the interface"
+		Mesh std_30pas/lata/post.lata INTERFACES red
+		Pseudocolor_with_opacity std_30pas/lata/post.lata dom TEMPERATURE_THERMIQUE ELEM 0
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	  
+	}
+	
+
+	visu {
+		nb_img_without_newline 2
+		Title "Massic apparition rate of the liquid"
+		instruction_visit DefineScalarExpression("MPOINT_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,0.)")
+		Pseudocolor std_30pas/lata/post.lata INTERFACES MPOINT ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 1. 0. 0.
+		up3D 0. 0. 1.
+	}
+	visu {
+		nb_img_without_newline 2
+		Title "Massic disparition rate of the vapor"
+		instruction_visit DefineScalarExpression("MPOINTV_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINTV_ELEM_dom>,INTERFACES,0.)")
+		Pseudocolor std_30pas/lata/post.lata INTERFACES MPOINTV ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 1. 0. 0.
+		up3D 0. 0. 1.
+	}
+		visu {
+		nb_img_without_newline 2
+		Title "Liquid Phase Temperature"
+		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+		Pseudocolor std_30pas/lata/post.lata dom Tl ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Vapor Phase Temperature"
+		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+		Pseudocolor std_30pas/lata/post.lata dom Tv ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	visu {
+		nb_img_without_newline 2
+		Title "Fluid speed"
+		Pseudocolor std_30pas/lata/post.lata dom VITESSE_X ELEM
+		width 7.5cm
+		cycles 0 -1
+		normal3D 0. 1. 0.
+		up3D -1. 0. 0.
+	}
+	
+	Table {
+		Title "Validation table Different Rho 30 Timesteps"
+		Nb_columns 4
+		Label x at t=0s | x at t=30.e-8 (30 time steps) | \latex_( $ \Delta $ \latex_) | Relative Error(%)
+		
+		Line {
+			file Interface_Position_v_30_pas.txt
+			legend "Interface_Position_v"
+			}
+		Line {
+			file Interface_Position_l_30_pas.txt
+			legend "Interface_Position_l"
+			}
+		Line {
+			file T_Ener_Vap_30_pas.txt
+			legend "T_Ener_Vap"
+			}
+		Line {
+			file T_Ener_Liq_30_pas.txt
+			legend "T_Ener_Liq"
+			}
+		Line {
+			file Lat_Ener_Vap_30_pas.txt
+			legend "Lat_Ener_Vap"
+			}
+		Line {
+			file Lat_Ener_Liq_30_pas.txt
+			legend "Lat_Ener_Liq"
+			}
+		Line {
+			file Ener_Conv_30_pas.txt
+			legend "Ener_Conv"
+			}
+		Line {
+			file Flux_limite_30_pas.txt
+			legend "Flux_limite"
+			}
+		Line {
+			file Delta_Energy_Sum_30_pas.txt
+			legend "Energy_Bilan"
+			}
+		Line {
+			file Power_Sum_30_pas.txt
+			legend "Power_Sum"
+			}
+	}
+}
+

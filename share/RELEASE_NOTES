@@ -1,3 +1,10 @@
+(TrioCFD) Bug fixed  : FTD. tolerance 1e-14 versus precision_geom in Parcours_interface::calcul_intersection
+(TrioCFD) Bug fixed  : FTD. Correction of number of neighbours near border in calculer_distance_interface
+(TrioCFD) Bug fixed  : FTD. Correction xyz instead of x in calculer_longueurIdeale2_arete
+(TrioCFD) New feature: FTD. Contact angle hysteresis available in test (via #define PATCH_HYSTERESIS_V3)    (make check_optim OK!!!)
+(TrioCFD) Minor change: FTD. equilateral option available + preserve FT elements in corners (without remeshing)
+(TrioCFD) New feature: FTD. Thermal coupling : solid + liquid + vapour (with phase-change)
+
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.4 : Enhancements, modifications and corrected bugs since version 1.7.3 :
 --------------------------------------------------------------------------------------------------

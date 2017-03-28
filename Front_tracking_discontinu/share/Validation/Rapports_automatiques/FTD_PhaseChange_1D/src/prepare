@@ -1,0 +1,13 @@
+#!/bin/bash
+
+mkdir -p same_rho 
+
+sed "s/nb_pas_dt_max.*$/nb_pas_dt_max 30/" \
+       std_2pas/evap_remesh_2_pas.data > std_30pas/evap_remesh_30_pas.data
+       
+sed    -e "s/rho champ_uniforme      1 500/rho champ_uniforme      1 1000/" \
+       -e "s/nb_pas_dt_max.*$/nb_pas_dt_max 40/" \
+       -e "s/sortie  paroi/entree  paroi/" \
+       -e "s/entree  sortie/sortie  sortie/" \
+       std_2pas/evap_remesh_2_pas.data > same_rho/evevap_remesh_same_rho.data
+

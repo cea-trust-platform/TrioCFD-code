@@ -1532,6 +1532,21 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
       remailler_interface();
     }
 
+  // Ajout pour la sauvegarde au premier pas de temps si reprise
+  indicatrice_.changer_temps(temps);
+  variables_internes_->indicatrice_cache.changer_temps(temps);
+  indicatrice_faces_.changer_temps(temps);
+  variables_internes_->vitesse_filtree.changer_temps(temps);
+  variables_internes_->tmp_flux.changer_temps(temps);
+  variables_internes_->index_element.changer_temps(temps);
+  variables_internes_->nelem_par_direction.changer_temps(temps);
+  variables_internes_->distance_interface.changer_temps(temps);
+  variables_internes_->distance_interface_faces.changer_temps(temps);
+  variables_internes_->distance_interface_faces_corrigee.changer_temps(temps);
+  variables_internes_->distance_interface_faces_difference.changer_temps(temps);
+  vitesse_imp_interp_.changer_temps(temps);
+  variables_internes_->normale_interface.changer_temps(temps);
+  variables_internes_->surface_interface.changer_temps(temps);
   //calcul de l'indicatrice
   indicatrice_.valeurs() = get_update_indicatrice().valeurs();
   get_update_distance_interface();

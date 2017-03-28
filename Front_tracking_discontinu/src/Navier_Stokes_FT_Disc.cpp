@@ -55,6 +55,9 @@ class Navier_Stokes_FT_Disc_interne
 {
 public:
   Navier_Stokes_FT_Disc_interne() :
+    correction_courbure_ordre_(0), // Par defaut, pas de prise en compte de la courbure pour corriger le champ etendu delta_vitesse
+    mpoint_inactif(0),   // Par defaut, mpoint cree un saut de vitesse
+    mpointv_inactif(0),   // Par defaut, mpointv  cree un saut de vitesse
     matrice_pression_invariante(0),   // Par defaut, recalculer la matrice pression
     clipping_courbure_interface(1e40),// Par defaut, pas de clipping
     terme_gravite_(GRAVITE_GRAD_I),   // Par defaut terme gravite ft sans courants parasites
@@ -67,6 +70,9 @@ public:
     y_pfl_imp(-1.e40),
     z_pfl_imp(-1.e40)
   {};
+  int correction_courbure_ordre_;
+  int mpoint_inactif;
+  int mpointv_inactif;
 
   Champ_Fonc second_membre_projection;
   Champ_Fonc derivee_u_etoile;
@@ -83,6 +89,7 @@ public:
   Champ_Inc delta_u_interface;
   Champ_Fonc laplacien_d;
   Champ_Fonc mpoint;
+  Champ_Fonc mpoint_vap;
   // Variation temporelle indicatrice de phase
   Champ_Fonc derivee_temporelle_indicatrice;
 
@@ -102,6 +109,7 @@ public:
   REF(Fluide_Diphasique) ref_fluide_diphasique;
 
   REF(Convection_Diffusion_Temperature_FT_Disc) ref_equation_mpoint_;
+  REF(Convection_Diffusion_Temperature_FT_Disc) ref_equation_mpoint_vap_;
 
   // Valeur maximale de courbure autorisee pour calculer le
   // terme source de tension de surface (clipping si valeur superieur)
@@ -306,10 +314,14 @@ void Navier_Stokes_FT_Disc::set_param(Param& param)
   param.ajouter_non_std("equation_interfaces_proprietes_fluide",(this));
   param.ajouter("clipping_courbure_interface",&variables_internes().clipping_courbure_interface);
   param.ajouter_non_std("equation_temperature_mpoint",(this));
+  param.ajouter_non_std("equation_temperature_mpoint_vapeur",(this));
   param.ajouter_non_std("terme_gravite",(this));
   param.ajouter("equations_concentration_source_vortex",&variables_internes().equations_concentration_source_fluide_);
   param.ajouter_non_std("repulsion_aux_bords",(this));
   param.ajouter_non_std("penalisation_forcage",(this));
+  param.ajouter_flag("mpoint_inactif_sur_qdm",&variables_internes().mpoint_inactif);
+  param.ajouter_flag("mpoint_vapeur_inactif_sur_qdm",&variables_internes().mpointv_inactif);
+  param.ajouter("correction_courbure_ordre", &variables_internes().correction_courbure_ordre_);
 }
 
 int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& is)
@@ -404,6 +416,23 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
           exit();
         }
       variables_internes().ref_equation_mpoint_ =
+        ref_cast(Convection_Diffusion_Temperature_FT_Disc, eq);
+      return 1;
+    }
+  else if (mot=="equation_temperature_mpoint_vapeur")
+    {
+      Nom nom_equation;
+      is >> nom_equation;
+      Cerr << " equation : " << nom_equation << finl;
+      const Equation_base& eq =
+        probleme_ft().get_equation_by_name(nom_equation);
+      if (!sub_type(Convection_Diffusion_Temperature_FT_Disc, eq))
+        {
+          Cerr << " Error : equation is not of type Convection_Diffusion_Temperature_FT_Disc"
+               << finl;
+          Process::exit();
+        }
+      variables_internes().ref_equation_mpoint_vap_ =
         ref_cast(Convection_Diffusion_Temperature_FT_Disc, eq);
       return 1;
     }
@@ -688,6 +717,12 @@ void Navier_Stokes_FT_Disc::discretiser()
                         variables_internes().mpoint);
   champs_compris.add(variables_internes().mpoint.valeur());
   champs_compris_.ajoute_champ(variables_internes().mpoint);
+  dis.discretiser_champ("temperature", ma_zone_dis,
+                        "temperature_mpointv", "",
+                        1 /* composante */, temps,
+                        variables_internes().mpoint_vap);
+  champs_compris.add(variables_internes().mpoint_vap.valeur());
+  champs_compris_.ajoute_champ(variables_internes().mpoint_vap);
   // Pour variation temporelle dI_dt
   dis.discretiser_champ("pression", ma_zone_dis,
                         "derivee_temporelle_indicatrice", "",
@@ -733,6 +768,7 @@ void Navier_Stokes_FT_Disc::projeter()
 // Description: methode appelee par Probleme_base::preparer_calcul()
 int Navier_Stokes_FT_Disc::preparer_calcul()
 {
+  Cerr << "Navier_Stokes_FT_Disc::preparer_calcul()" << finl;
   Equation_base::preparer_calcul();
 
   le_modele_turbulence.preparer_calcul();
@@ -804,6 +840,8 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
   secmem *= -1;
   // Il faut faire ceci car on ne resout pas en "increment de pression":
   assembleur_pression_.valeur().modifier_secmem(secmem);
+  // Ajout pour la sauvegarde au premier pas de temps si reprise
+  la_pression.changer_temps(schema_temps().temps_courant());
 
   // Resolution du systeme en pression : calcul de la_pression
   solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),
@@ -1433,14 +1471,28 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   // GB : Pour ce faire, il suffit de ne pas mettre le mot cle " equation_temperature_mpoint temp" dans le jdd.
   const int nn = phi.dimension(0);
   DoubleTab mpoint;
+  DoubleTab mpoint_vap;
   mpoint.resize(nn);
+  mpoint_vap.resize(nn);
   mpoint=0.; //pour initialiser
+  mpoint_vap=0.; //pour initialiser
   if (variables_internes().ref_equation_mpoint_.non_nul())
     {
       variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
-      mpoint = variables_internes().mpoint.valeur().valeurs();
+      // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
+      if (!variables_internes().mpoint_inactif)
+        mpoint = variables_internes().mpoint.valeur().valeurs();
+    }
+  if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+    {
+      variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
+      // Si inactif, on ne prend pas en compte sa contribution dans le calcul de delta_u:
+      if (!variables_internes().mpointv_inactif)
+        mpoint_vap = variables_internes().mpoint_vap.valeur().valeurs();
     }
   // GB : fin de mon rajout
+  if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+    mpoint +=mpoint_vap;
 
   DoubleTab& u0 = champ_u0.valeurs();
 
@@ -2195,13 +2247,16 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   secmem.echange_espace_virtuel();
 
   // Prise en compte du terme source div(u) du changement de phase
-  if (variables_internes().ref_equation_mpoint_.non_nul())
+  if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
     {
+      // GB2016 : Le calcul de mpoint ci-dessous me semble inutile car il est fait au debut de calculer_delta_u_interface:
+      // GB2016 : Mais si je ne le fais pas, j'ai parfois : 'vx.get_md_vector() == md' dans calculer_delta_u_interface
+      if (variables_internes().ref_equation_mpoint_.non_nul())
+        variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
+      if (variables_internes().ref_equation_mpoint_vap_.non_nul())
+        variables_internes().ref_equation_mpoint_vap_.valeur().calculer_mpoint(variables_internes().mpoint_vap.valeur());
 
-      variables_internes().ref_equation_mpoint_.valeur().calculer_mpoint(variables_internes().mpoint.valeur());
-
-      //   calculer_delta_u_interface(variables_internes().mpoint,variables_internes().delta_u_interface);
-      calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, 0 /* ordre de la correction en courbure */);
+      calculer_delta_u_interface(variables_internes().delta_u_interface, -1 /* vitesse de l'interface */, variables_internes().correction_courbure_ordre_ /* ordre de la correction en courbure */);
 
       const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
       const IntTab& face_voisins = zone_vf.face_voisins();
@@ -2543,7 +2598,7 @@ Navier_Stokes_FT_Disc_interne& Navier_Stokes_FT_Disc::variables_internes()
 //  Si pas de changement de phase, renvoie un pointeur nul.
 const Champ_base *  Navier_Stokes_FT_Disc::get_delta_vitesse_interface() const
 {
-  if (variables_internes().ref_equation_mpoint_.non_nul())
+  if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())
     return & (variables_internes().delta_u_interface.valeur());
   else
     return 0;

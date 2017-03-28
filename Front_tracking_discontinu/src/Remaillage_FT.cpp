@@ -2118,19 +2118,19 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
               const int face1 = elem_faces(elem0,k+dim);
               delta_xv[k] = xv(face1,k) - xv(face0,k);
             }
-          if (norme2 == 0)
-            {
-              v[0] = 1.;
-              v[1] = 1.;
-              v[2] = dim==3 ? 1. : 0.;
-              norme2 = dim;
-            }
-          double f = 1. / sqrt(norme2);
-          norme2 = 0.;
-          for (k = 0; k < dim; k++)
-            {
-              v[k] *= f * delta_xv[k];
-              norme2 += v[k] * v[k];
+              if (norme2 == 0)
+                {
+                  v[0] = 1.;
+                  v[1] = 1.;
+                  v[2] = dim==3 ? 1. : 0.;
+                  norme2 = dim;
+                }
+              double f = 1. / sqrt(norme2);
+              norme2 = 0.;
+              for (k = 0; k < dim; k++)
+                {
+                  v[k] *= f * delta_xv[k];
+                  norme2 += v[k] * v[k];
             }
           lgrId2 = norme2;
 
