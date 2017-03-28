@@ -198,8 +198,15 @@ public:
   void creer_tableau_sommets(Array_base&, Array_base::Resize_Options opt = Array_base::COPY_INIT) const;
   void creer_tableau_elements(Array_base&, Array_base::Resize_Options opt = Array_base::COPY_INIT) const;
   double calcul_normale_3D(int num_facette, double norme[3]) const;
+  virtual void   calculer_costheta_minmax(DoubleTab& costheta) const;
 
 protected:
+  void pre_lissage_courbure(ArrOfDouble& store_courbure_sommets, const int niter) const;
+  void correction_costheta(const double c, const int s0, const int facette,
+                           /* const ArrOfDouble& s0s1, const ArrOfDouble& s0s2, */
+                           double ps) const;
+  double calculer_costheta_objectif(const int som, const int facette, const int call, const double c,
+                                    const DoubleTabFT& tab_cos_theta, ArrOfBit& drapeau_angle_in_range) const;
 
   const Maillage_FT_Disc& operator=(const Maillage_FT_Disc&);   // Interdit !
 
@@ -210,7 +217,7 @@ protected:
   void calculer_voisins();
 
   void calcul_surface_normale(ArrOfDouble& surface, DoubleTab& normale) const;
-  void calcul_courbure_sommets(ArrOfDouble& courbure) const;
+  void calcul_courbure_sommets(ArrOfDouble& courbure, const int call_number) const;
 
   //fonction qui cree un nouveau sommet par copie d'une existant
   //utilise dans Remailleur_Collision_FT_Collision_Seq
@@ -274,8 +281,6 @@ protected:
 
   void construire_noeuds(IntTab& def_noeud,const DoubleTab& soms);
   void calculer_coord_noeuds(const IntTab& def_noeud,const DoubleTab& soms,IntTab& renum);
-
-  virtual void   calculer_costheta_minmax(DoubleTab& costheta) const;
 
   REF(Transport_Interfaces_FT_Disc) refequation_transport_;
   // Pour pouvoir utiliser le maillage_FT_IJK sans equation de transport, j'ajoute une ref
@@ -439,6 +444,14 @@ protected:
   //-1 : aucunes sorties au format gnuplot
   // 1 : 1 sortie par pas de temps (dans mettre_a_jour)
   int niveau_plot_;
+  double correction_contact_courbure_coeff_;
+  int calcul_courbure_iterations_;
+  int niter_pre_lissage_;
+  enum enum_methode_calcul_courbure_contact_line_ { STANDARD=0, MIRROR=1, IMPROVED=2, NONE=3, WEIGHTED=4, HYSTERESIS=5 };
+  int methode_calcul_courbure_contact_line_;
+  double weight_CL_; // Le poids de la CL
+
+
 };
 
 // Description :

@@ -1567,6 +1567,18 @@ int Remaillage_FT::traite_adherence(Maillage_FT_Disc& maillage) const
   return res;
 }
 
+inline double produit_scalaire(const FTd_vecteur3& a, const FTd_vecteur3& b)
+{
+  return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
+
+inline void produit_vectoriel(const FTd_vecteur3& a, const FTd_vecteur3& b, FTd_vecteur3& resu)
+{
+  resu[0] = a[1]*b[2] - a[2]*b[1];
+  resu[1] = a[2]*b[0] - a[0]*b[2];
+  resu[2] = a[0]*b[1] - a[1]*b[0];
+}
+
 // Description:
 //    Cette fonction marque a supprimer les facettes ayant leurs 3 sommets de bord
 //    Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)

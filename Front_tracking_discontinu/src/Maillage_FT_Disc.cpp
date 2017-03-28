@@ -41,6 +41,25 @@
 #include <Dirichlet_homogene.h>
 #include <Debog.h>
 #include <Array_tools.h>
+#include <Param.h>
+
+//#define PATCH_HYSTERESIS_V2
+//#define PATCH_HYSTERESIS_V3
+#include<ArrOfBit.h>
+// //#define DEBUG_HYSTERESIS_V2
+/*
+ * define permettant de post-traiter les triangles et leurs elements miroirs autour d'un point sommet s0.
+ * Pour les tracer :
+\rm xsplit_*
+sed    -e '/Postraitement_ft_lata/d' -e '/^First postprocessing/,/First postprocessing/{//!b};d' err > bb
+sed -i -e '/^Cas de 3 sommets/,/of exiting...$/d' \
+       -e '/^Misma/,/of exiting$/d' -e '/^$/d' -e '/^3[ \t]*$/d' -e 's/TAG/# TAG/' bb
+split -d -l 5 bb xsplit_
+gnuplot -p << EOF
+list=system("ls xsplit_*"); splot for [file in list] file w lp t file
+EOF
+ *
+ */
 
 Implemente_instanciable_sans_constructeur(Maillage_FT_Disc_Data_Cache,"Maillage_FT_Disc_Data_Cache",Objet_U);
 Implemente_deriv(Maillage_FT_Disc_Data_Cache);
@@ -171,7 +190,12 @@ Maillage_FT_Disc::Maillage_FT_Disc() :
   statut_(RESET),
   mesh_state_tag_(0),
   temps_physique_(0.),
-  niveau_plot_(-1)
+  niveau_plot_(-1),
+  correction_contact_courbure_coeff_(2.),
+  calcul_courbure_iterations_(2),
+  niter_pre_lissage_(0),
+  methode_calcul_courbure_contact_line_(STANDARD),
+  weight_CL_(0.5)
 {
   mesh_data_cache_.typer("Maillage_FT_Disc_Data_Cache");
 }
@@ -514,36 +538,21 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
 Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
 {
   Cerr<<"Lecture des parametres de remaillage (Remaillage_FT::lire_param_remaillage)"<<finl;
-  Motcles motcles(1);
-  motcles[0] = "niveau_plot";
 
-  Motcle motlu;
-  is >> motlu;
-  if (motlu != "{")
-    {
-      Cerr << "Erreur dans Remaillage_FT::lire_remaillage\n";
-      Cerr << " On attendait {\n On a trouve " << motlu << finl;
-      exit();
-    }
-  is >> motlu;
-  while (motlu != "}")
-    {
-      int rang = motcles.search(motlu);
-      switch (rang)
-        {
-        case 0:
-          is >> niveau_plot_;
-          Cerr<<" niveau_plot_= "<<niveau_plot_<<finl;
-          break;
-        default:
-          Cerr << "Maillage_FT_Disc::lire_param_maillage :\n";
-          Cerr << " Le mot cle " << motlu << " n'est pas compris ici.\n";
-          Cerr << " Les mot compris sont :\n" << motcles << finl;
-          assert(0==1);
-          exit();
-        }
-      is >> motlu;
-    }
+  Param param("Maillage_FT_Disc::lire_param_maillage");
+  param.ajouter("niveau_plot",&niveau_plot_);
+  param.ajouter("correction_contact_courbure_coeff",&correction_contact_courbure_coeff_);
+  param.ajouter("niter_pre_lissage",&niter_pre_lissage_);
+  param.ajouter("calcul_courbure_iterations",&calcul_courbure_iterations_);
+  param.ajouter("methode_calcul_courbure_contact_line", &methode_calcul_courbure_contact_line_);
+  param.dictionnaire("standard", (int)STANDARD);
+  param.dictionnaire("mirror", (int)MIRROR);
+  param.dictionnaire("improved", (int)IMPROVED);
+  param.dictionnaire("none", (int)NONE);
+  param.dictionnaire("weighted", (int)WEIGHTED);
+  param.dictionnaire("hysteresis", (int)HYSTERESIS);
+  param.ajouter("weight_CL",&weight_CL_);
+  param.lire_avec_accolades(is);
 
   return is;
 }
@@ -1542,7 +1551,13 @@ const ArrOfDouble& Maillage_FT_Disc::get_update_courbure_sommets() const
   if (data_cache.tag_courbure_ != tag)
     {
       data_cache.tag_courbure_ = tag;
-      calcul_courbure_sommets(data_cache.courbure_sommets_);
+      calcul_courbure_sommets(data_cache.courbure_sommets_, 1 /*1st call*/);
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3) )
+      // pour evaluer correctement l'angle de la ligne de contact...
+      int ncalls = calcul_courbure_iterations_; // 2;
+      for (int i=2; i<=ncalls; i++)
+        calcul_courbure_sommets(data_cache.courbure_sommets_, i /*ith call*/);
+#endif
     }
   return data_cache.courbure_sommets_;
 }
@@ -4824,6 +4839,316 @@ void Maillage_FT_Disc::nettoyer_phase(const Nom& nom_eq, const int& phase)
   if (Comm_Group::check_enabled()) check_mesh(1,1,1);
 }
 
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3))
+// From Remaillage_FT : FTd_vecteur3 to ArrOfDouble...
+inline double produit_scalaire(const ArrOfDouble& a, const ArrOfDouble& b)
+{
+  assert(a.size_array()==3);
+  assert(b.size_array()==3);
+  return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
+
+inline void produit_vectoriel(const ArrOfDouble& a, const ArrOfDouble& b, ArrOfDouble& resu)
+{
+  assert(a.size_array()==3);
+  assert(b.size_array()==3);
+  assert(resu.size_array()==3);
+  resu[0] = a[1]*b[2] - a[2]*b[1];
+  resu[1] = a[2]*b[0] - a[0]*b[2];
+  resu[2] = a[0]*b[1] - a[1]*b[0];
+}
+
+void Maillage_FT_Disc::pre_lissage_courbure(ArrOfDouble& store_courbure_sommets, const int nitera) const
+{
+  // Un peu de lissage :
+  const int nsom = nb_sommets();
+  const ArrOfDouble& surface = get_update_surface_facettes();
+  ArrOfDouble tmp_courbure_sommets(store_courbure_sommets);
+  ArrOfDouble surface_autour_sommets(store_courbure_sommets);
+
+  int i_facette;
+  for (int iter = 0; iter < nitera; iter++)
+    {
+      tmp_courbure_sommets = store_courbure_sommets;
+      store_courbure_sommets = 0.;
+      surface_autour_sommets = 0.;
+      for (i_facette = 0; i_facette < nb_facettes(); i_facette++)
+        {
+          // Ne pas calculer de flux pour les facettes virtuelles:
+          if (facette_virtuelle(i_facette))
+            continue;
+
+          //const int s0 = facettes_(i_facette, 0);
+          double moy = 0.;
+          int count =0;
+          for (int i = 0; i < 3; i++)
+            {
+              const int si = facettes_(i_facette, i);
+              if (!sommet_ligne_contact(si))
+                {
+                  moy += tmp_courbure_sommets[si];
+                  count++;
+                }
+            }
+          if (count>0)
+            moy /= count;
+          for (int i = 0; i < 3; i++)
+            {
+              const int s = facettes_(i_facette, i);
+              const double surf = surface(i_facette);
+              store_courbure_sommets[s] += moy*surf;
+              surface_autour_sommets[s] +=surf;
+            }
+        }
+      for (int isom = 0; isom < nsom; isom++)
+        if (surface_autour_sommets[isom]>0)
+          store_courbure_sommets[isom] /=surface_autour_sommets[isom];
+    }
+}
+
+// Correction a la contact line pour prendre en compte que la tangente au cercle n'est pas rigoureusement donnee par la facette
+// Il faut faire une petite correction  (d'angle eps) pour evaluer l'angle de contact au sommet...
+// Pour evaluer cette correction, on a besoin de connaitre la courbure normale kappa_n=1/r...
+// Il faut donc une methode iterative (a 2 passe au moins).
+//    1ere pass : On ne connait pas la courbure, on ne fait pas de correction.
+//    2eme pass (et potentiellement les suivantes) : On utilise l'approximation de la courbure
+//                                                   locale issue de la passe precedente.
+void Maillage_FT_Disc::correction_costheta(const double c, const int s0, const int facette,
+                                           /* const ArrOfDouble& s0s1, const ArrOfDouble& s0s2, */
+                                           double ps) const
+{
+  // Soit l=norme(s0G) ou G est le cdg de la facette.
+  // s0G = 1./3. * (s0s1+s0s2)
+  double l2=0, r=0;
+  /*  for (int j = 0; j < Objet_U::dimension; j++)
+      {
+        double tmp= (s0s1[j]+s0s2[j]);
+        l2 += tmp*tmp;
+      }
+    l2 *= 1./3.;
+  */
+  // Un estimation de la taille de la facette est donnee par sa surface :
+  //const ArrOfDouble& surface = get_update_surface_facettes();
+  //l2 = surface(facette);
+#if 1
+  int ii=0;
+  for (ii=0; ii<3; ii++)
+    {
+      if (facettes_(facette,ii) == s0)
+        {
+          break;
+        }
+
+    }
+  assert(facettes_(facette,ii)==s0);
+  const int s1 = facettes_(facette,(ii+1)%3);
+  const int s2 = facettes_(facette,(ii+2)%3);
+
+  ArrOfDouble som0(3),som1(3),som2(3), s0s1(3), s0s2(3);
+  for (int j=0; j<Objet_U::dimension; j++)
+    {
+      som0[j] = sommets_(s0,j);
+      som1[j] = sommets_(s1,j);
+      som2[j] = sommets_(s2,j);
+      s0s1[j] = som1[j] - som0[j];
+      s0s2[j] = som2[j] - som0[j];
+    }
+
+  /*
+   double tmp1=0,tmp2=0;
+  for (int j = 0; j < Objet_U::dimension; j++)
+    {
+      tmp1 += (s0s1[j]*s0s1[j]);
+      tmp2 += (s0s2[j]*s0s2[j]);
+    }
+  l2 = 0.5*(tmp1+tmp2);
+  */
+  for (int j = 0; j < Objet_U::dimension; j++)
+    {
+      double tmp= (s0s1[j]+s0s2[j]);
+      l2 += tmp*tmp;
+    }
+  l2 *= 1./3.;
+#endif
+
+  // Pour r, on utilise la courbure... Donc iteratif...
+  if (c!=0.)
+    {
+      r = correction_contact_courbure_coeff_/c;
+      //r = 2./c; // Hypothese : localement isotrope : kappa_n=kappa_t=0.5kappa
+      //r = 0.;   // Hypothese : kappa_n=0
+      //r = 1./c; // Hypothese : courbure uniquement normale : kappa_n=kappa
+      double r2 = r*r;
+      if (l2>=r2)
+        {
+          Cerr << "Probleme lors du calcul de la courbure a la ligne de contact. "<< finl;
+          Cerr << "Il semblerait que la courbure au sommet " << s0 << " sur le process "
+               << Process::me() << " soit tres grande (ie un rayon de courbure plus petit"
+               << " que la longueur caracteristique de l'element du Front. " << finl;
+          Cerr << "Une erreur possible est un angle de contact initialement trop loin de la "
+               << "gamme d'angles de contacts fournis dans le jeu de donnees. " << finl;
+          Cerr << "Verifiez votre JDD puis contactez TRUST support." << finl;
+          Process::exit();
+        }
+      //assert(l2<r2);
+      // theta_reel = theta_apparent + eps // x=theta_apparent; eps+alpha= pi/2
+      //            alpha est l'angle entre le plan de la facette et la normale au cercle (vers l'interieur).
+      // cos(x+eps) = cos(x)*cos(eps)-sin(x)sin(eps)
+      // avec :
+      //  o cos(x) = ps
+      //  o sin(x) = sqrt(1-ps^2)
+      //  o cos(eps) = sin(alpha)=sin(pi/2-eps) = sqrt((r^2-l^2)/r^2)
+      //  o sin(eps) = cos(alpha)=cos(pi/2-eps)=l/r
+      ps = ps*sqrt((r2-l2)/r2) - sqrt((1.-ps*ps)*l2/r2);
+    }
+}
+
+// Methode permettant de calculer lors d'une hysterisis l'angle de contact
+// dans la plage des angles autorises qui soit le plus proche de l'angle de
+// contact reel. C'est la premiere fois qu'on a besoin d'un angle de contact
+// reelement mesure sur le maillage (et pas fourni en CL)
+double Maillage_FT_Disc::calculer_costheta_objectif(const int s0, const int facette, const int call, const double c,
+                                                    const DoubleTabFT& tab_cos_theta, ArrOfBit& drapeau_angle_in_range) const
+{
+  const Parcours_interface& parcours = refparcours_interface_.valeur();
+  const DoubleTab& normale = get_update_normale_facettes();
+  const int numface0 = sommet_face_bord_[s0];
+  int j; /*
+    ArrOfDouble som0(3),som1(3),som2(3), s0s1(3), s0s2(3);
+    for (j=0; j<Objet_U::dimension; j++)
+      {
+        som0[j] = sommets_(s0,j);
+        som1[j] = sommets_(s1,j);
+        som2[j] = sommets_(s2,j);
+        s0s1[j] = som1[j] - som0[j];
+        s0s2[j] = som2[j] - som0[j];
+      } */
+  ArrOfDouble nprime(3), vect_base(3), ntheta(3);
+  // Si on prend ntheta egale a nfacette
+  // 				   au lieu d'essayer de determiner le vrai ntheta (qui correspond a l'objectif fixee)
+  // ntheta[0] = normale(facette, 0) ;
+  // ntheta[1] = normale(facette, 1) ;
+  // ntheta[2] = normale(facette, 2) ;
+  //                   Avec cette approximation, on ne tient pas compte de la CL et
+  // 				   C'est comme si la courbure (dans la direction normale au bord) etait nulle!
+  //      			   Dans le cas d'un cylindre comme la courbure tangeante est nulle, on obtient
+  //                   Une courbure totale evaluee a 0 et donc un equilibre impossible quel que soit la CL...
+  //
+  // Ce que l'on veut plutot faire, c'est que ntheta forme un angle theta avec la normale au bord.
+  //                   (ou theta doit etre calcule pour etre la projection de la valeur theta reele sur
+  //                    l'intervalle d'angles authorises)
+  //
+  // Pour calculer la contribution en s0, on a besoin de connaitre l'angle de contact en s0
+  // Au lieu de l'angle reel, on veut connaitre l'angle objectif, cad celui qui
+  // doit etre atteint (si on est hors equilibbre) pour satisfaire la ligne de contact.
+
+  // Pour cela, il faut ici calculer l'angle de contact reel a la paroi et soit :
+  // 1. il est dans la gamme d'angles de contact souhaitee : C'est alors cet angle qu'on utilise
+  //        pour le calcul de la courbure.
+  // 2. il n'est pas dans la gamme des angles authorises : Il faut alors rechercher la borne de
+  // l'intervalle la plus proche de l'angle reel et utiliser celle-ci pour calculer la courbure.
+  // Dans ce second cas, cela aura pour effet de creer une courbure locale (aux sommets de la ligne de contact)
+  // qui n'est pas homogene a celle a l'interieure du dom, ce qui va creer un terme source a divergence non nulle
+  // pour la qdm, qui, via navier stokes va mettre le fluide en mouvement, qui, une fois la vitesse interpolee,
+  // va deplacer le noeud en paroi dans la bonne direction.
+  // C'est donc dans le cas 2 une methode tres indirecte d'imposer l'angle de contact.
+  // Mais qui marche? Voir fiche hysterisis...
+
+  const double costheta0 = tab_cos_theta(s0, 0);
+  const double costheta1 = tab_cos_theta(s0, 1);
+  /*  if (fabs(costheta0-costheta1)<1e-5) {
+  	// Pas besoin de se casser la tete s'il n'y a pas d'hysterisis...
+      return costheta0;
+      }
+  */
+
+  // Normale unitaire a la face de bord (vers l'interieur)
+  double nf0[3] = {0., 0., 0.};
+  parcours.calculer_normale_face_bord(numface0,
+                                      sommets_(s0,0), sommets_(s0,1),  sommets_(s0,2),
+                                      nf0[0], nf0[1], nf0[2]);
+
+  // Calcul du produit scalaire entre la normale au bord et la normale unitaire a la facette
+  // On a besoin ici de celle orientee vers la vapeur pour etre coherent avec la definition de
+  // l'angle de contact (qui est pris du cote liquide). Donc il faut -normale dans le ps :
+  double ps = 0;
+  for (j = 0; j < Objet_U::dimension; j++)
+    ps -= nf0[j]* normale(facette, j);
+  // Le produit scalaire entre les deux normales, c'est comme celui entre les 2 tangentes...
+  // On a donc ps=cos(theta)
+
+  // Correction de l'angle de contact (prise en compte de la tangente au cercle
+  // qui n'est pas rigoureusement donnee par la facette
+  if ((call> 1) && (correction_contact_courbure_coeff_!=0.))
+    correction_costheta(c, s0, facette, ps);
+
+  double costheta=0.;
+  if ((ps-costheta0)*(ps-costheta1) <=0 )
+    {
+      // L'angle reel est dans l'intervalle authorise. On l'utilise pour le calcul de la courbure.
+      costheta = ps;
+    }
+  else
+    {
+      drapeau_angle_in_range.clearbit(s0);
+      // L'angle reel est en dehors de l'intervalle. On retient donc la borne de l'intervalle la
+      // plus proche comme valeur pour utiliser dans le calcul de la courbure.
+      if (fabs(ps-costheta0) <fabs(ps-costheta1))
+        {
+          // On est proche de la borne costheta0. C'est elle qu'on va utiliser.
+          costheta = costheta0;
+        }
+      else
+        {
+          costheta = costheta1;
+        }
+    }
+  return costheta;
+}
+#endif
+
+#ifdef PATCH_HYSTERESIS_V2
+// A: Le point a reflechir.
+// nprime: une normale au plan quelconque! -> devient unitaire en sortie!
+// Ar: La reflexion de A
+static void miroir(const ArrOfDouble& A, ArrOfDouble& nprime,const ArrOfDouble& O, ArrOfDouble& Ar)
+{
+  // Rendre la normale unitaire :
+  const double l = sqrt(nprime[0] * nprime[0] + nprime[1] * nprime[1] + nprime[2] * nprime[2]);
+  if (l != 0.)
+    {
+      double inv_l = 1. / l;
+      nprime[0] *= inv_l;
+      nprime[1] *= inv_l;
+      nprime[2] *= inv_l;
+    }
+
+  const int m=A.size_array();
+  assert(m==3);
+  ArrOfDouble OA(A);
+  OA-=O;// OA=A-O;
+  double ps=produit_scalaire(OA,nprime);
+  //OAr=Ar-O=OA-2.*ps*n => Ar=A-2.*ps*n
+  for (int i=0; i<m; i++)
+    {
+      Ar[i] =A[i]-2.*ps*nprime[i];
+    }
+}
+
+static void normalize(ArrOfDouble& nprime)
+{
+  // Rendre la normale unitaire :
+  const double l = sqrt(nprime[0] * nprime[0] + nprime[1] * nprime[1] + nprime[2] * nprime[2]);
+  if (l != 0.)
+    {
+      double inv_l = 1. / l;
+      nprime[0] *= inv_l;
+      nprime[1] *= inv_l;
+      nprime[2] *= inv_l;
+    }
+}
+#endif
+
 // Description:
 //  Calcul de la courbure discrete du maillage aux sommets.
 //  Methode de calcul : voir these B. Mathieu paragraphe 3.3.3 page 97
@@ -4834,7 +5159,7 @@ void Maillage_FT_Disc::nettoyer_phase(const Nom& nom_eq, const int& phase)
 // Signification: Tableau dans lequel on veut stocker la courbure aux sommets.
 //                La valeur initiale du tableau est perdue.
 //                L'espace virtuel du tableau resultat est a jour.
-void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets) const
+void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, const int call) const
 {
   const DoubleTab& normale = get_update_normale_facettes();
   const ArrOfDouble& surface = get_update_surface_facettes();
@@ -4843,7 +5168,33 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets) co
   const int dim = Objet_U::dimension;
   const int nfaces = nb_facettes();
 
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3))
+  ArrOfBit drapeau_angle_in_range;
+  drapeau_angle_in_range.resize_array(nsom);
+  drapeau_angle_in_range=1; // par defaut on presume que oui. Si pour une seule facette on est en dehors,
+  //                                                          on le met a 0 pour le sommet en question.
+  // coef default value is 2.
+  Cerr << "Your choice of parameters : correction coefficient " << correction_contact_courbure_coeff_
+       << " and iter pre-lissage : " << niter_pre_lissage_ << finl;
+  ArrOfDouble store_courbure_sommets(courbure_sommets);
+  if (call> 1)
+    {
+      if (courbure_sommets.size_array() != nsom)
+        {
+          Cerr << "Erreur dans la seconde passe du calcul de la courbure... Dimensions des tableaux differentes!" << finl;
+          Process::exit();
+        }
+      pre_lissage_courbure(store_courbure_sommets, niter_pre_lissage_);
+    }
+  else
+    {
+      // Lors du premier passage, il faut dimensionner correctement le tableau de courbure...
+      courbure_sommets.resize_array(nsom);
+      store_courbure_sommets.resize_array(nsom); // aaa
+    }
+#else
   courbure_sommets.resize_array(nsom);
+#endif
 
   // Differentielle de la surface d'interface par rapport au deplacement de chaque sommet
   DoubleTab d_surface(nsom, dim);
@@ -4910,7 +5261,35 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets) co
                       if (face < 0) // pas une face de bord
                         continue;
 
+#ifndef PATCH_HYSTERESIS_V2
                       const double costheta = tab_cos_theta(som[i2], 0);
+#else
+                      const double costheta0 = tab_cos_theta(som[i2], 0);
+                      const double costheta1 = tab_cos_theta(som[i2], 1);
+                      // Normale unitaire a la face de bord (vers l'interieur)
+                      double nf1[3] = {0., 0., 0.};
+                      parcours.calculer_normale_face_bord(face, som[i2], som[i2], 0,
+                                                          nf1[0], nf1[1], nf1[2]);
+
+                      // Calcul du produit scalaire entre la normale unitaire a la facette
+                      double ps = 0;
+                      for (j = 0; j < dim; j++)
+                        {
+                          ps += nf1[j]* n[j];
+                        }
+                      // Le produit scalaire entre les deux normales, c'est comme celui entre les 2 tangentes...
+                      // On a donc cos(theta)
+                      // A priori, si l'hysterisis fonctionne bien, il est dans l'intervalle
+                      Nom st;
+                      st = (ps-costheta0)*(ps-costheta1) <=0 ? "YES":"NO";
+                      Cerr << "GB_CALCUL_COURBURE 2D PLAN : ps "
+                           << ps << " in costheta ["<< costheta0 << " ; " << costheta1 << "]? " << st << finl;
+                      const double costheta = ps;
+                      Cerr << "Quelle est le sommet a choisir? Est-ce que i2 " << i2 << "est bien le sommet du bord?" << finl;
+                      Cerr << "GB_CALCUL_COURBURE 2D PLAN: "
+                           << "A valider depuis hysterisis. Le developpement fait en 3D n'a pas ete applique ici!" << finl;
+                      Process::exit();
+#endif
 
                       // Normale unitaire au bord
                       double nx, ny, nz;
@@ -4930,7 +5309,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets) co
                   sommets_loc[0] = facettes_(facette, 0);
                   sommets_loc[1] = facettes_(facette, 1);
                   sommets_loc[2] = facettes_(facette, 2);
-                  double n[3];
+                  ArrOfDouble n(3);// GB mod double[3] to ArrOfDouble
                   n[0] = normale(facette, 0) * 0.5;
                   n[1] = normale(facette, 1) * 0.5;
                   n[2] = normale(facette, 2) * 0.5;
@@ -4944,42 +5323,455 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets) co
                       const int s0 = sommets_loc[ii];
                       const int s1 = sommets_loc[ (ii+1)%3 ];
                       const int s2 = sommets_loc[ (ii+2)%3 ];
-                      double s2s1[3];
+                      ArrOfDouble s2s1(3); // GB mod double[3] to ArrOfDouble
                       s2s1[0] = sommets_(s1,0) - sommets_(s2,0);
                       s2s1[1] = sommets_(s1,1) - sommets_(s2,1);
                       s2s1[2] = sommets_(s1,2) - sommets_(s2,2);
+                      // On calcul la courbure partout de la meme maniere
+                      // meme si on est sur une ligne de contact (ie dans un premier temps, sans tenir compte de
+                      // l'effet de la ligne de contact). On corrige l'effet de la ligne de contact par la suite...
                       d_surface(s0,0) += s2s1[1] * n[2] - s2s1[2] * n[1];
                       d_surface(s0,1) += s2s1[2] * n[0] - s2s1[0] * n[2];
                       d_surface(s0,2) += s2s1[0] * n[1] - s2s1[1] * n[0];
-
-                      // Traitement des lignes de contact: ajout d'une contribution
-                      // cos(theta) * differentielle de la surface de bord mouillee par
-                      // la phase 0
-                      const int numface1 = sommet_face_bord_[s1];
-                      const int numface2 = sommet_face_bord_[s2];
-                      // Le segment s1s2 est une ligne de contact:
-                      if (numface1 >= 0 && numface2 >= 0)
+#ifdef PATCH_HYSTERESIS_V2
+                      if (methode_calcul_courbure_contact_line_ == MIRROR)
                         {
-                          // On prend l'angle de contact au milieu du segment:
-                          const double costheta = (tab_cos_theta(s1, 0) + tab_cos_theta(s2, 0)) * 0.5;
-                          // Normale unitaire au bord
-                          double nx, ny, nz;
-                          parcours.calculer_normale_face_bord(numface1,
-                                                              sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
-                                                              nx, ny, nz);
-                          // produit vectoriel s1s2 vectoriel n
-                          d_surface(s1,0) -= (s2s1[1] * nz - s2s1[2] * ny) * costheta * 0.5;
-                          d_surface(s1,1) -= (s2s1[2] * nx - s2s1[0] * nz) * costheta * 0.5;
-                          d_surface(s1,2) -= (s2s1[0] * ny - s2s1[1] * nx) * costheta * 0.5;
+                          const int numface0 = sommet_face_bord_[s0];
+                          if (numface0>=0)
+                            {
+                              // Le sommet s0 est sur une ligne de contact.
 
-                          parcours.calculer_normale_face_bord(numface2,
-                                                              sommets_(s2,0), sommets_(s2,1),  sommets_(s2,2),
-                                                              nx, ny, nz);
-                          // produit vectoriel s1s2 vectoriel n
-                          d_surface(s2,0) -= (s2s1[1] * nz - s2s1[2] * ny) * costheta * 0.5;
-                          d_surface(s2,1) -= (s2s1[2] * nx - s2s1[0] * nz) * costheta * 0.5;
-                          d_surface(s2,2) -= (s2s1[0] * ny - s2s1[1] * nx) * costheta * 0.5;
+                              // Voila la suite :
+                              ArrOfDouble som0(3),som1(3),som2(3), s0s1(3), s0s2(3);
+                              for (j=0; j<dim; j++)
+                                {
+                                  som0[j] = sommets_(s0,j);
+                                  som1[j] = sommets_(s1,j);
+                                  som2[j] = sommets_(s2,j);
+                                  s0s1[j] = som1[j] - som0[j];
+                                  s0s2[j] = som2[j] - som0[j];
+                                }
+                              ArrOfDouble nprime(3), vect_base(3), ntheta(3);
+                              // Si on prend ntheta egale a nfacette
+                              // 				   au lieu d'essayer de determiner le vrai ntheta (qui correspond a l'objectif fixee)
+                              // ntheta[0] = normale(facette, 0) ;
+                              // ntheta[1] = normale(facette, 1) ;
+                              // ntheta[2] = normale(facette, 2) ;
+                              //                   Avec cette approximation, on ne tient pas compte de la CL et
+                              // 				   C'est comme si la courbure (dans la direction normale au bord) etait nulle!
+                              //      			   Dans le cas d'un cylindre comme la courbure tangeante est nulle, on obtient
+                              //                   Une courbure totale evaluee a 0 et donc un equilibre impossible quel que soit la CL...
+                              //
+                              // Ce que l'on veut plutot faire, c'est que ntheta forme un angle theta avec la normale au bord.
+                              //                   (ou theta doit etre calcule pour etre la projection de la valeur theta reele sur
+                              //                    l'intervalle d'angles authorises)
+                              //
+                              // Pour calculer la contribution en s0, on a besoin de connaitre l'angle de contact en s0
+                              // Au lieu de l'angle reel, on veut connaitre l'angle objectif, cad celui qui
+                              // doit etre atteint (si on est hors equilibbre) pour satisfaire la ligne de contact.
 
+                              // Pour cela, il faut ici calculer l'angle de contact reel a la paroi et soit :
+                              // 1. il est dans la gamme d'angles de contact souhaitee : C'est alors cet angle qu'on utilise
+                              //        pour le calcul de la courbure.
+                              // 2. il n'est pas dans la gamme des angles authorises : Il faut alors rechercher la borne de
+                              // l'intervalle la plus proche de l'angle reel et utiliser celle-ci pour calculer la courbure.
+                              // Dans ce second cas, cela aura pour effet de creer une courbure locale (aux sommets de la ligne de contact)
+                              // qui n'est pas homogene a celle a l'interieure du dom, ce qui va creer un terme source a divergence non nulle
+                              // pour la qdm, qui, via navier stokes va mettre le fluide en mouvement, qui, une fois la vitesse interpolee,
+                              // va deplacer le noeud en paroi dans la bonne direction.
+                              // C'est donc dans le cas 2 une methode tres indirecte d'imposer l'angle de contact.
+                              // Mais qui marche? Voir fiche hysterisis...
+
+                              const double costheta0 = tab_cos_theta(s0, 0);
+                              const double costheta1 = tab_cos_theta(s0, 1);
+
+                              // Normale unitaire a la face de bord (vers l'interieur)
+                              double nf0[3] = {0., 0., 0.};
+                              parcours.calculer_normale_face_bord(numface0,
+                                                                  sommets_(s0,0), sommets_(s0,1),  sommets_(s0,2),
+                                                                  nf0[0], nf0[1], nf0[2]);
+
+                              // Calcul du produit scalaire entre la normale au bord et la normale unitaire a la facette
+                              // On a besoin ici de celle orientee vers la vapeur pour etre coherent avec la definition de
+                              // l'angle de contact (qui est pris du cote liquide). Donc il faut -normale dans le ps :
+                              double ps = 0;
+                              for (j = 0; j < dim; j++)
+                                ps -= nf0[j]* normale(facette, j);
+                              // Le produit scalaire entre les deux normales, c'est comme celui entre les 2 tangentes...
+                              // On a donc ps=cos(theta)
+
+                              // Correction de l'angle de contact (prise en compte de la tangente au cercle
+                              // qui n'est pas rigoureusement donnee par la facette
+                              if ((call> 1) && (correction_contact_courbure_coeff_!=0.))
+                                //correction_costheta(store_courbure_sommets[s0], s0, s0s1, s0s2, ps);
+                                correction_costheta(store_courbure_sommets[s0], s0, facette, ps);
+
+                              double costheta=0.;
+                              if ((ps-costheta0)*(ps-costheta1) <=0 )
+                                {
+                                  // L'angle reel est dans l'intervalle authorise. On l'utilise pour le calcul de la courbure.
+                                  costheta = ps;
+                                }
+                              else
+                                {
+                                  // L'angle reel est en dehors de l'intervalle. On retient donc la borne de l'intervalle la
+                                  // plus proche comme valeur pour utiliser dans le calcul de la courbure.
+                                  if (fabs(ps-costheta0) <fabs(ps-costheta1))
+                                    {
+                                      // On est proche de la borne costheta0. C'est elle qu'on va utiliser.
+                                      costheta = costheta0;
+                                    }
+                                  else
+                                    {
+                                      costheta = costheta1;
+                                    }
+                                }
+                              {
+                                // Pour remplacer une bonne part du bloc precedent :
+                                const double costheta_bis = calculer_costheta_objectif(s0, facette, call, store_courbure_sommets[s0],
+                                                                                       tab_cos_theta, drapeau_angle_in_range);
+                                if (fabs(costheta-costheta_bis)>1e-8)
+                                  {
+                                    Cerr << "Oh oh... les 2 methodes different... " << finl;
+                                    Process::exit();
+                                  }
+                              }
+
+                              // On cherche quel type de contact on a (ponctuel ou lineique).
+                              const int numface1 = sommet_face_bord_[s1];
+                              const int numface2 = sommet_face_bord_[s2];
+
+#ifdef DEBUG_HYSTERESIS_V2
+                              const int inode = 6 ;
+//                          if (facette == 11)
+                              if ( (ii==0) && ((s0 == inode) || (s1 == inode) || (s2 == inode))
+                                   && (!(numface1 >= 0 && numface2 >= 0)))  /* pour ne pas afficher les facettes avec 3 som bords*/
+                                {
+                                  Cerr << "TAG FACETTE "<< facette << " : " << s0 << " " << s1 << " " << s2  << finl;
+                                  Cerr << som0 << finl;
+                                  Cerr << som1 << finl;
+                                  Cerr << som2 << finl;
+                                  Cerr << som0 << finl;
+                                }
+#endif
+
+                              if (numface1 < 0 && numface2 < 0)
+                                {
+                                  // Le contact est ponctuel au sommet s0
+
+                                  // Construction du vecteur tb :
+                                  ArrOfDouble v(3), nb(3), tb(3);
+                                  // Pour cela, on a besoin d'un segment de la facette (v)
+                                  for (j=0; j<dim; j++)
+                                    v[j] = som2[j] - som1[j]; // s1s2
+                                  // et de la normale au bord (nb):
+                                  parcours.calculer_normale_face_bord(numface0,
+                                                                      sommets_(s0,0), sommets_(s0,1),  sommets_(s0,2),
+                                                                      nb[0], nb[1], nb[2]);
+                                  // pour en deduire le vecteur du plan de la face de bord normale a la facette :
+                                  produit_vectoriel(v,nb,tb); // tb non-unitaire
+                                  normalize(tb);
+                                  // D'apres la rotation, le vecteur ntheta se construit comme :
+                                  // (attention, ici, theta est bien l'angle objectif souhaitee en accord avec la CL),
+                                  //  Hors equilibre, c'est different de l'angle de contact reel.
+                                  const double sintheta = sqrt(1.-costheta*costheta);
+                                  for (j=0; j<dim; j++)
+                                    ntheta[j] = sintheta*tb[j] + costheta*nb[j];
+
+                                  // on cree un miroir de s1 et de s2 par rapport au plan parallel a ntheta et s2s1 et contenant s0.
+                                  ArrOfDouble nplan(3); // la normale au plan.
+
+                                  // Seul la direction de nplan compte. Pas son signe ou sa valeur.
+                                  parcours.projeter_vecteur_sur_face(numface0,v[0], v[1],v[2]);
+                                  produit_vectoriel(ntheta,v,nplan);
+
+                                  ArrOfDouble reflexion_som1(dim),reflexion_som2(dim);
+                                  miroir(som1,nplan/* normale_au_plan*/,som0/*pt_du_plan*/, reflexion_som1);
+                                  miroir(som2,nplan/* normale_au_plan*/,som0/*pt_du_plan*/, reflexion_som2);
+
+                                  // remise de points dans l'ordre pour que le miroir tourne dans le meme sens...
+                                  // Il faut donc utiliser les sommets dans l'ordre inverse pour construire
+                                  // la normale de la partie reflechie...
+                                  ArrOfDouble s0s2p(3), s0s1p(3), s1ps2p(3);
+                                  for (j=0; j<dim; j++)
+                                    {
+                                      s0s2p[j] = reflexion_som2[j]-som0[j];
+                                      s0s1p[j] = reflexion_som1[j]-som0[j];
+                                      s1ps2p[j] = reflexion_som2[j]-reflexion_som1[j];
+                                    }
+
+                                  // Calcul de la nouvelle normale... (non-unitaire)
+                                  produit_vectoriel(s0s2p,s0s1p,nprime);
+
+                                  // Le vecteur de base pour calcul de la surface est :
+                                  vect_base=s1ps2p;
+#ifdef DEBUG_HYSTERESIS_V2
+                                  if ( (s0 == inode) || (s1 == inode) || (s2 == inode) )
+                                    {
+                                      Cerr << "TAG REFLEXION s1s2 FACETTE "<< facette << " : " << s0 << " " << s1 << " " << s2  << finl;
+                                      Cerr << som0 << finl;
+                                      Cerr << reflexion_som1 << finl;
+                                      Cerr << reflexion_som2 << finl;
+                                      Cerr << som0 << finl;
+                                    }
+#endif
+                                }
+                              else if (numface1 >= 0 && numface2 >= 0
+                                       && !((s0==s1) &&  (s0==s2)))
+                                {
+                                  // les 3 sommets sont sur des bords...
+                                  //   et la facette n'est pas degeneree (ie 3 sommets identiques...)
+                                  Cerr << "Cas de 3 sommets de la facette "  << facette
+                                       << " (" << s0 << " " << s1 << " " << s2 << " )"
+                                       << " sur process "
+                                       << Process::me() << "  pas prevu pour l'instant!" << finl;
+                                  Cerr << "som0 " << som0 << finl;
+                                  Cerr << "som1 " << som1 << finl;
+                                  Cerr << "som2 " << som2 << finl;
+                                  Cerr << "Do nothing instead of exiting... " << finl;
+                                  nprime *=0.;
+                                  vect_base *=0.;
+                                  //Cerr << "Exiting... " << finl;
+                                  //Process::exit();
+                                }
+                              else if (numface1 >= 0)
+                                {
+                                  // Le segment s0s1 est une ligne de contact:
+
+                                  // Construction du vecteur tb :
+                                  ArrOfDouble v(3), nb(3), tb(3);
+                                  // Pour cela, on a besoin d'un segment de la facette (v)
+                                  for (j=0; j<dim; j++)
+                                    v[j] = som0[j] - som1[j]; // s1s0 // Pour des questions d'orientation..
+                                  // et de la normale au bord (nb):
+                                  parcours.calculer_normale_face_bord(numface0,
+                                                                      sommets_(s0,0), sommets_(s0,1),  sommets_(s0,2),
+                                                                      nb[0], nb[1], nb[2]);
+                                  {
+                                    ArrOfDouble nb1(3);
+                                    parcours.calculer_normale_face_bord(numface1,
+                                                                        sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
+                                                                        nb1[0], nb1[1], nb1[2]);
+                                    if (fabs(nb[0]*nb1[0]+nb[1]*nb1[1]+nb[2]*nb1[2]-1.) > 0.05)
+                                      {
+                                        nb+=nb1;
+                                        normalize(nb);
+                                        Cerr << "Mismatching normals... " << finl;
+                                        Cerr << "nb: " << nb[0] << " " << nb[1] << " " << nb[2] << finl;
+                                        Cerr << "nb1: " << nb1[0] << " " << nb1[1] << " " << nb1[2] << finl;
+                                        Cerr << "Le probleme sera resolu quand on aura conserve les facettes de coins" << finl;
+                                        Cerr << "Skipping for the time being instead of exiting"  << finl;
+                                        //Process::exit();
+                                      }
+
+                                  }
+
+                                  // pour en deduire le vecteur du plan de la face de bord normale a la facette :
+                                  produit_vectoriel(v,nb,tb); // tb non-unitaire
+                                  normalize(tb);
+                                  // D'apres la rotation, le vecteur ntheta se construit comme :
+                                  // (attention, ici, theta est bien l'angle objectif souhaitee en accord avec la CL,
+                                  //  Hors equilibre, c'est different de l'angle de contact reel.
+                                  const double sintheta = sqrt(1.-costheta*costheta);
+                                  for (j=0; j<dim; j++)
+                                    ntheta[j] = sintheta*tb[j] + costheta*nb[j];
+
+                                  // on cree un miroir de s2 par rapport au plan parallel a ntheta et s0s1 et contenant s0.
+                                  ArrOfDouble nplan(3); // la normale au plan.
+                                  produit_vectoriel(s0s1,ntheta,nplan);
+                                  ArrOfDouble reflexion_som2(dim);
+                                  miroir(som2,nplan/* normale_au_plan*/,som0/*pt_du_plan*/, reflexion_som2);
+
+                                  // remise de points dans l'ordre pour que le miroir tourne dans le meme sens...
+                                  // Il faut donc utiliser les sommets dans l'ordre inverse pour la partie reflechie...
+                                  ArrOfDouble s0s2p(3), s2ps1(3);
+                                  for (j=0; j<dim; j++)
+                                    {
+                                      s0s2p[j] = reflexion_som2[j]-som0[j];
+                                      s2ps1[j] = som1[j]-reflexion_som2[j];
+                                    }
+
+                                  // Calcul de la nouvelle normale...(non-unitaire)
+                                  produit_vectoriel(s0s2p,s0s1,nprime);
+
+                                  // Le vecteur de base pour calcul de la surface est :
+                                  vect_base=s2ps1;
+#ifdef DEBUG_HYSTERESIS_V2
+                                  if ( (s0 == inode) || (s1 == inode) || (s2 == inode) )
+                                    {
+                                      Cerr << "TAG REFLEXION s0s1 "<< facette << " : " << s0 << " " << s1 << " " << s2  << finl;
+                                      Cerr << som0 << finl;
+                                      Cerr << som1 << finl;
+                                      Cerr << reflexion_som2 << finl;
+                                      Cerr << som0 << finl;
+                                    }
+#endif
+                                }
+                              else if (numface2 >= 0)
+                                {
+                                  // Le segment s0s2 est une ligne de contact:
+
+                                  // Construction du vecteur tb :
+                                  ArrOfDouble v(3), nb(3), tb(3);
+                                  // Pour cela, on a besoin d'un segment de la facette (v)
+                                  for (j=0; j<dim; j++)
+                                    v[j] = som2[j] - som0[j]; // s0s2 // Pour des questions d'orientation..
+                                  // et de la normale au bord (nb):
+                                  parcours.calculer_normale_face_bord(numface0,
+                                                                      sommets_(s0,0), sommets_(s0,1),  sommets_(s0,2),
+                                                                      nb[0], nb[1], nb[2]);
+                                  {
+                                    ArrOfDouble nb2(3);
+                                    parcours.calculer_normale_face_bord(numface2,
+                                                                        sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
+                                                                        nb2[0], nb2[1], nb2[2]);
+                                    if (fabs(nb[0]*nb2[0]+nb[1]*nb2[1]+nb[2]*nb2[2]-1.) > 0.05)
+                                      {
+                                        nb+=nb2;
+                                        normalize(nb);
+                                        Cerr << "Mismatching normals... " << finl;
+                                        Cerr << "nb: " << nb[0] << " " << nb[1] << " " << nb[2] << finl;
+                                        Cerr << "nb2: " << nb2[0] << " " << nb2[1] << " " << nb2[2] << finl;
+                                        Cerr << "Le probleme sera resolu quand on aura conserve les facettes de coins" << finl;
+                                        Cerr << "Skipping for the time being instead of exiting"  << finl;
+                                        //Process::exit();
+                                      }
+                                  }
+
+                                  // pour en deduire le vecteur du plan de la face de bord normale a la facette :
+                                  produit_vectoriel(v,nb,tb); // tb non-unitaire
+                                  normalize(tb);
+                                  // D'apres la rotation, le vecteur ntheta se construit comme :
+                                  // (attention, ici, theta est bien l'angle objectif souhaitee en accord avec la CL,
+                                  //  Hors equilibre, c'est different de l'angle de contact reel.
+                                  const double sintheta = sqrt(1.-costheta*costheta);
+                                  for (j=0; j<dim; j++)
+                                    ntheta[j] = sintheta*tb[j] + costheta*nb[j];
+
+                                  // on cree un miroir de s1 par rapport au plan parallel a ntheta et s0s2 et contenant s0.
+                                  ArrOfDouble nplan(3); // la normale au plan.
+                                  produit_vectoriel(s0s2,ntheta,nplan);
+                                  ArrOfDouble reflexion_som1(dim);
+                                  miroir(som1,nplan/* normale_au_plan*/,som0/*pt_du_plan*/, reflexion_som1);
+
+                                  // remise de points dans l'ordre pour que le miroir tourne dans le meme sens...
+                                  // Il faut donc utiliser les sommets dans l'ordre inverse pour la partie reflechie...
+                                  ArrOfDouble s0s1p(3), s2s1p(3);
+                                  for (j=0; j<dim; j++)
+                                    {
+                                      s0s1p[j] = reflexion_som1[j]-som0[j];
+                                      s2s1p[j] = reflexion_som1[j]-som2[j];
+                                    }
+
+                                  // Calcul de la nouvelle normale...(non-unitaire)
+                                  produit_vectoriel(s0s2,s0s1,nprime);
+
+                                  // Le vecteur de base pour calcul de la surface est :
+                                  vect_base=s2s1p;
+#ifdef DEBUG_HYSTERESIS_V2
+                                  if ( (s0 == inode) || (s1 == inode) || (s2 == inode) )
+                                    //if (facette == 11)
+                                    {
+                                      Cerr << "TAG REFLEXION s0s2 "<< facette << " : " << s0 << " " << s1 << " " << s2  << finl;
+                                      Cerr << som0 << finl;
+                                      Cerr << reflexion_som1 << finl;
+                                      Cerr << som2 << finl;
+                                      Cerr << som0 << finl;
+                                    }
+#endif
+                                }
+                              else
+                                {
+                                  Cerr << "Cas impossible... WTF!" << finl;
+                                  Process::exit();
+                                }
+
+                              // Rendre la normale unitaire :
+                              normalize(nprime);
+
+                              //Calculer contribution du miroir a d_surface +=
+                              d_surface(s0,0) += (vect_base[1] * nprime[2] - vect_base[2] * nprime[1])*0.5;
+                              d_surface(s0,1) += (vect_base[2] * nprime[0] - vect_base[0] * nprime[2])*0.5;
+                              d_surface(s0,2) += (vect_base[0] * nprime[1] - vect_base[1] * nprime[0])*0.5;
+
+                              //Calculer contribution du miroir a d_volume +=
+                              for (j = 0;
+                                   j < dim;
+                                   j++)
+                                d_volume(s0, j) += nprime[j] * surface_sur_dim;
+                            }
+                        }
+#endif
+#if defined(PATCH_HYSTERESIS_V3)
+                      if ((methode_calcul_courbure_contact_line_ == IMPROVED)
+                          || (methode_calcul_courbure_contact_line_ == HYSTERESIS))
+                        {
+                          // Traitement des lignes de contact: ajout d'une contribution
+                          // cos(theta) * differentielle de la surface de bord mouillee par
+                          // la phase 0
+                          const int numface1 = sommet_face_bord_[s1];
+                          const int numface2 = sommet_face_bord_[s2];
+                          // Le segment s1s2 est une ligne de contact:
+                          if (numface1 >= 0 && numface2 >= 0)
+                            {
+                              // On prend l'angle de contact au milieu du segment,
+                              // a partir des valeurs cibles de l'angle de contact a chaque sommet.
+                              const double costheta_s1 = calculer_costheta_objectif(s1,facette,call,store_courbure_sommets[s1],
+                                                                                    tab_cos_theta, drapeau_angle_in_range);
+                              const double costheta_s2 = calculer_costheta_objectif(s2,facette,call,store_courbure_sommets[s2],
+                                                                                    tab_cos_theta, drapeau_angle_in_range);
+                              //Cerr << "Som0 " << s0 << " cos(theta) en s1 " << costheta_s1 << " et s2 " << costheta_s2 << finl;
+                              const double costheta = (costheta_s1+costheta_s2) * 0.5;
+                              // Normale unitaire au bord
+                              double nx, ny, nz;
+                              parcours.calculer_normale_face_bord(numface1,
+                                                                  sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
+                                                                  nx, ny, nz);
+                              // produit vectoriel s1s2 vectoriel n
+                              d_surface(s1,0) -= (s2s1[1] * nz - s2s1[2] * ny) * costheta * 0.5;
+                              d_surface(s1,1) -= (s2s1[2] * nx - s2s1[0] * nz) * costheta * 0.5;
+                              d_surface(s1,2) -= (s2s1[0] * ny - s2s1[1] * nx) * costheta * 0.5;
+
+                              parcours.calculer_normale_face_bord(numface2,
+                                                                  sommets_(s2,0), sommets_(s2,1),  sommets_(s2,2),
+                                                                  nx, ny, nz);
+                              // produit vectoriel s1s2 vectoriel n
+                              d_surface(s2,0) -= (s2s1[1] * nz - s2s1[2] * ny) * costheta * 0.5;
+                              d_surface(s2,1) -= (s2s1[2] * nx - s2s1[0] * nz) * costheta * 0.5;
+                              d_surface(s2,2) -= (s2s1[0] * ny - s2s1[1] * nx) * costheta * 0.5;
+                            }
+                        }
+#endif
+                      if (methode_calcul_courbure_contact_line_ == STANDARD)
+                        {
+                          // Traitement des lignes de contact: ajout d'une contribution
+                          // cos(theta) * differentielle de la surface de bord mouillee par
+                          // la phase 0
+                          const int numface1 = sommet_face_bord_[s1];
+                          const int numface2 = sommet_face_bord_[s2];
+                          // Le segment s1s2 est une ligne de contact:
+                          if (numface1 >= 0 && numface2 >= 0)
+                            {
+                              // On prend l'angle de contact au milieu du segment:
+                              const double costheta = (tab_cos_theta(s1, 0) + tab_cos_theta(s2, 0)) * 0.5;
+                              // Normale unitaire au bord
+                              double nx, ny, nz;
+                              parcours.calculer_normale_face_bord(numface1,
+                                                                  sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
+                                                                  nx, ny, nz);
+                              // produit vectoriel s1s2 vectoriel n
+                              d_surface(s1,0) -= (s2s1[1] * nz - s2s1[2] * ny) * costheta * 0.5;
+                              d_surface(s1,1) -= (s2s1[2] * nx - s2s1[0] * nz) * costheta * 0.5;
+                              d_surface(s1,2) -= (s2s1[0] * ny - s2s1[1] * nx) * costheta * 0.5;
+
+                              parcours.calculer_normale_face_bord(numface2,
+                                                                  sommets_(s2,0), sommets_(s2,1),  sommets_(s2,2),
+                                                                  nx, ny, nz);
+                              // produit vectoriel s1s2 vectoriel n
+                              d_surface(s2,0) -= (s2s1[1] * nz - s2s1[2] * ny) * costheta * 0.5;
+                              d_surface(s2,1) -= (s2s1[2] * nx - s2s1[0] * nz) * costheta * 0.5;
+                              d_surface(s2,2) -= (s2s1[0] * ny - s2s1[1] * nx) * costheta * 0.5;
+                            }
                         }
                     }
                 }
@@ -5027,40 +5819,147 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets) co
   // Calcul de la courbure :
   //   d_surface * d_volume / norme(d_volume)^2
   double dx[3] = { 0., 0., 0. };
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3) )
+  double norm_L2=0.;
+  double norm_Linf=0.;
+  int count=0;
+  int isom_max_courb=-123456;
+#endif
 
   for (i = 0; i < nsom; i++)
     {
       double c = 0.;
       if (!sommet_virtuel(i))
         {
-          // Calcul du vecteur deplacement :
-          // Si ce n'est pas une ligne de contact, c'est le vecteur normal,
-          // sinon c'est la projection du vecteur normal sur le bord du domaine.
-          dx[0] = d_volume(i, 0);
-          dx[1] = d_volume(i, 1);
-          if (dim == 3)
-            dx[2] = d_volume(i, 2);
-
-          const int face_bord = sommet_face_bord_[i];
-          if (face_bord >= 0)
-            parcours.projeter_vecteur_sur_face(face_bord, dx[0], dx[1], dx[2]);
-
-          double ds_dx = 0.;
-          double dv_dx = 0.;
-          for (j = 0; j < dim; j++)
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3) )
+          if ((methode_calcul_courbure_contact_line_ == STANDARD)
+              || (methode_calcul_courbure_contact_line_ == IMPROVED)
+              || (methode_calcul_courbure_contact_line_ == HYSTERESIS)  )
             {
-              const double ds = d_surface(i, j);
-              const double dv = d_volume(i, j);
-              ds_dx += ds * dx[j];
-              dv_dx += dv * dx[j];
+#endif
+              // Calcul du vecteur deplacement :
+              // Si ce n'est pas une ligne de contact, c'est le vecteur normal,
+              // sinon c'est la projection du vecteur normal sur le bord du domaine.
+              dx[0] = d_volume(i, 0);
+              dx[1] = d_volume(i, 1);
+              if (dim == 3)
+                dx[2] = d_volume(i, 2);
+
+              const int face_bord = sommet_face_bord_[i];
+              if (face_bord >= 0)
+                parcours.projeter_vecteur_sur_face(face_bord, dx[0], dx[1], dx[2]);
+
+              double ds_dx = 0.;
+              double dv_dx = 0.;
+              for (j = 0; j < dim; j++)
+                {
+                  const double ds = d_surface(i, j);
+                  const double dv = d_volume(i, j);
+                  ds_dx += ds * dx[j];
+                  dv_dx += dv * dx[j];
+                }
+              if (dv_dx != 0.)
+                {
+                  c = - ds_dx / dv_dx;
+                }
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3) )
             }
-          if (dv_dx != 0.)
+          if (methode_calcul_courbure_contact_line_ == MIRROR)
             {
-              c = - ds_dx / dv_dx;
+
+              double ds_dv = 0.;
+              double dv_dv = 0.;
+              for (j = 0; j < dim; j++)
+                {
+                  const double ds = d_surface(i, j);
+                  const double dv = d_volume(i, j);
+                  ds_dv += ds * dv;
+                  dv_dv += dv * dv;
+                }
+              if (dv_dv != 0.)
+                {
+                  c = - ds_dv / dv_dv;
+                }
+
+            }
+          // Quelle que soit la methode, on print si on a plus d'une passe :
+          if ((call>1) && (sommet_face_bord_[i]>=0))
+            {
+              double delta=fabs(courbure_sommets[i] - c);
+              norm_L2 += delta*delta;
+              count++;
+              if (delta>norm_Linf)
+                {
+                  norm_Linf = delta;
+                  isom_max_courb = i;
+                }
+            }
+#endif
+        }
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3) )
+#else
+      ArrOfDouble& store_courbure_sommets(courbure_sommets);
+      ArrOfBit drapeau_angle_in_range(courbure_sommets.size_array());
+      drapeau_angle_in_range = 1;
+#endif
+      courbure_sommets[i] = c;
+      if (methode_calcul_courbure_contact_line_ == NONE)
+        {
+          if ((call>1) && (sommet_face_bord_[i]>=0))
+            //if (call>1)
+            courbure_sommets[i] = store_courbure_sommets[i];
+        }
+      if (methode_calcul_courbure_contact_line_ == WEIGHTED)
+        {
+          if ((call>1) && (sommet_face_bord_[i]>=0))
+            {
+              //if (call>1)
+              const double c_in = store_courbure_sommets[i];
+              const double c_bord = c;
+              courbure_sommets[i] = (1-weight_CL_)*c_in+ weight_CL_*c_bord;
             }
         }
-      courbure_sommets[i] = c;
+      if (methode_calcul_courbure_contact_line_ == HYSTERESIS)
+        {
+          if ((call>1) && (sommet_face_bord_[i]>=0))
+            {
+              // Au second passage, la courbure des noeuds de la ligne de contact est :
+              const int contact_angle_inside_range = drapeau_angle_in_range.testsetbit(i);
+              if (contact_angle_inside_range)
+                {
+                  // o Soit fournie par une valeur lissee issue de l'interieur du domaine
+                  //       si le cos(theta) est dans la gamme autorisee.
+                  //       Ainsi, la courbure sera assez reguliere au voisinage de la ligne de contact
+                  //       et il n'y aura pas de force generee pour la faire bouger.
+                  const double c_in = store_courbure_sommets[i];
+                  courbure_sommets[i] = c_in;
+                }
+              else
+                {
+                  // o Soit calculee sur le bord avec la valeur limite de cos(theta) la plus proche du domaine authorise
+                  //     si l'angle est sur un bord de la gamme.
+                  //     Dans ce cas, une inomogeneite de courbure peut conduire a la creation d'un gradient de la
+                  //     force de tension de surface et par suite a la mise en mouvement de la ligne de contact.
+                  const double c_bord = c;
+                  courbure_sommets[i] = c_bord;
+                }
+            }
+        }
     }
+#if (defined(PATCH_HYSTERESIS_V2) || defined(PATCH_HYSTERESIS_V3) )
+  if ((call>1) && ((methode_calcul_courbure_contact_line_ == MIRROR)
+                   || (methode_calcul_courbure_contact_line_ == IMPROVED)
+                   || (methode_calcul_courbure_contact_line_ == HYSTERESIS) ))
+    {
+      norm_Linf = mp_max(norm_Linf);
+      count=mp_sum(count);
+      if (count>0)
+        norm_L2=sqrt(mp_sum(norm_L2))/count;
+      Cerr << "Evaluation de la convergence de la courbure. call= " << call << " norm_Linf= " << norm_Linf
+           << " norm_L2= " << norm_L2 << " nsom_contact= " << count << finl;
+      Journal() << "max_courb on " << isom_max_courb << " value  " << norm_Linf << finl;
+    }
+#endif
   desc_sommets().echange_espace_virtuel(courbure_sommets);
 }
 
