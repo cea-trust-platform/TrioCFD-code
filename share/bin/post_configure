@@ -1,0 +1,3 @@
+mkdir -p share/doc_src
+cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') > share/doc_src/TRAD2_ajout0 2>/dev/null
+exit 0
