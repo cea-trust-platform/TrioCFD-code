@@ -2023,7 +2023,8 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
     case Transport_Interfaces_FT_Disc_interne::VALEUR_A_ELEM:
       {
 
-        Champ champ_scal_interp(champ_scal);
+        Champ champ_scal_interp;
+        champ_scal_interp=champ_scal;
         if (sub_type(Champ_P1NC, champ_scal) || sub_type(Champ_Fonc_P1NC,champ_scal))
           {
 
