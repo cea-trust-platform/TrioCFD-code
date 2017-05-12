@@ -1,0 +1,14 @@
+probleme_couple_rayonnement coupled_problem pb_couple_rayonnement -1 This keyword is used to define a problem coupling several other problems to which radiation coupling is added.
+  ref modele modele_rayonnement_base
+frontiere_ouverte_temperature_imposee_rayo_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_transp -1 Imposed temperature condition for a radiation problem with transparent gas.
+paroi_echange_externe_impose_rayo_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_transp -1 External type exchange condition for a coupled problem with radiation in transparent gas.
+modele_rayonnement_base objet_u modele_rayonnement_base -1 Basic class for wall thermal radiation model.
+modele_rayonnement_milieu_transparent modele_rayonnement_base modele_rayonnement_milieu_transparent -2 Wall thermal radiation model for a transparent gas and resolving a radiation-conduction-thermohydraulics coupled problem in VDF or VEF.\input{{modelerayotransp}}
+  attr bloc bloc_lecture bloc 0 See description.
+paroi_flux_impose_rayo_transp paroi_flux_impose paroi_flux_impose_rayo_transp -1 Normal flux condition at the wall called bord (edge) for a radiation problem in transparent gas.
+paroi_temperature_imposee_rayo_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in transparent gas.
+champ_front_contact_rayo_transp_vef champ_front_contact_vef champ_front_contact_rayo_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in transparent fluid.
+echange_contact_rayo_transp_vdf paroi_echange_contact_vdf echange_contact_rayo_transp_vdf -1 Exchange boundary condition in VDF between the transparent fluid and the solid for a problem coupled with radiation. Without radiation, it is the equivalent of the Paroi_Echange_contact_VDF exchange condition.
+frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with transparent gas.
+frontiere_ouverte_rayo_transp_vdf frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vdf -1 doit disparaitre
+frontiere_ouverte_rayo_transp_vef frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vef -1 doit disparaitre

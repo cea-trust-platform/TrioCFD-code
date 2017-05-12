@@ -1,0 +1,22 @@
+algo_base objet_u algo_base -1 Basic class for multi-grid algorithms.
+algo_couple_1 algo_base algo_couple_1 -1 not_set
+  attr dt_uniforme rien dt_uniforme 1 not_set
+pb_mg pb_gen_base pb_mg -2 Multi-grid problem.
+  ref pb_1 Pb_base
+  ref pb_2 Pb_base
+  ref algo algo_base
+associer_pbmg_pbgglobal associate associer_pbmg_pbgglobal -1 This interpretor allows a global problem to be associated with multi-grid problem.
+associer_pbmg_pbfin associate associer_pbmg_pbfin -1 This interpretor allows a local problem to be associated with multi-grid problem.
+associer_algo associate associer_algo -1 This interpretor allows an algorithm to be associated with multi-grid problem.
+paroi_echange_contact_vdf_zoom_grossier paroi_echange_externe_impose paroi_echange_contact_vdf_zoom_grossier -1 External type exchange condition with a heat exchange coefficient and an imposed external temperature in the case of zoom (coarse).
+paroi_echange_contact_vdf_zoom_fin paroi_echange_externe_impose paroi_echange_contact_vdf_zoom_fin -1 External type exchange condition with a heat exchange coefficient and an imposed external temperature in the case of zoom (fine).
+champ_front_zoom front_field_base champ_front_zoom 0 Basic class for fields at boundaries of two problems (global problem and local problem).
+  attr pbMg ref_pb_mg pbMg 0 Name of multi-grid problem.
+  attr pb_1 ref_Pb_base pb_1 0 Name of first problem.
+  attr pb_2 ref_Pb_base pb_2 0 Name of second problem.
+  attr bord chaine bord 0 Name of bord.
+  attr inco chaine inco 0 Name of field.
+contact_vdf_vef condlim_base contact_vdf_vef 0 Boundary condition in the case of two problems (VDF -> VEF).
+  attr champ front_field_base champ 0 Boundary field type.
+contact_vef_vdf condlim_base contact_vef_vdf 0 Boundary condition in the case of two problems (VEF -> VDF).
+  attr champ front_field_base champ 0 Boundary field type.
