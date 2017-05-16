@@ -34,6 +34,7 @@
 
 
 Implemente_instanciable( Echange_contact_VDF_FT_Disc_solid, "Echange_contact_VDF_FT_Disc_solid", Echange_contact_VDF_FT_Disc ) ;
+// XD echange_contact_vdf_ft_disc_solid condlim_base echange_contact_vdf_ft_disc_solid 1 echange_conatct_vdf en prescisant la phase
 
 Sortie& Echange_contact_VDF_FT_Disc_solid::printOn( Sortie& os ) const
 {
@@ -48,11 +49,11 @@ Entree& Echange_contact_VDF_FT_Disc_solid::readOn( Entree& s )
   Nom nom_pb, nom_bord;
   Motcle nom_champ;
   Param param("Echange_contact_VDF_FT_Disc_solid::readOn");
-  param.ajouter("autre_probleme",&nom_pb);
-  param.ajouter("autre_bord",&nom_bord);
-  param.ajouter("autre_champ_temperature_indic1",&nom_champ);
-  param.ajouter("autre_champ_temperature_indic0",&nom_champ_T2_autre_pb_);
-  param.ajouter("autre_champ_indicatrice",&nom_champ_indicatrice_);
+  param.ajouter("autre_probleme",&nom_pb,Param::REQUIRED); // XD_ADD_P chaine name of other problem
+  param.ajouter("autre_bord",&nom_bord,Param::REQUIRED);  // XD_ADD_P chaine name of other boundary
+  param.ajouter("autre_champ_temperature_indic1",&nom_champ,Param::REQUIRED); // XD_ADD_P chaine name of temperature indic 1
+  param.ajouter("autre_champ_temperature_indic0",&nom_champ_T2_autre_pb_,Param::REQUIRED); // XD_ADD_P chaine name of temperature indic 0
+  param.ajouter("autre_champ_indicatrice",&nom_champ_indicatrice_,Param::REQUIRED); // XD_ADD_P chaine name of indicatrice
   param.lire_avec_accolades(s);
 
   nom_autre_pb_=nom_pb;
