@@ -1,0 +1,233 @@
+# Themohydraulique 2D turbulent K-Eps VEF #
+# Time scheme Implicit_Euler_steady_scheme #
+# Solveur implicit_steady #
+# PARALLEL OK 4 #
+dimension 2
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Entree
+		{
+		Origine 0. 1.
+		Nombre_de_Noeuds 8 6 
+		Longueurs 7. 1.
+		}
+		{
+		Bord Entree X = 0. 1. <= Y <= 2.
+		Bord Haut1  Y = 2. 0. <= X <= 7.
+		Bord Bas1   Y = 1. 0. <= X <= 7.
+		} ,
+	Pave Haut
+		{
+		Origine 7. 1.
+		Nombre_de_Noeuds 11 6 
+		Longueurs 10. 1.
+		}
+		{
+		Bord Haut2  Y = 2.  7. <= X <= 17.
+		} ,
+	Pave SHaute
+		{
+		Origine 17. 1.
+		Nombre_de_Noeuds 14 6 
+		Longueurs 13. 1.
+		}
+		{
+		Bord SortieHaute X = 30.  1. <= Y <= 2.
+		Bord Haut3  Y = 2.  17. <= X <= 30.
+		} ,
+	Pave Bas
+		{
+		Origine 7. 0.
+		Nombre_de_Noeuds 11 6 
+		Longueurs 10. 1.
+		}
+		{
+		Bord Bas2   Y = 0.  7. <= X <= 17.
+		Bord Gauche X = 7.  0. <= Y <= 1.
+		} ,
+	Pave SBasse
+		{
+		Origine 17. 0.
+		Nombre_de_Noeuds 14 6 
+		Longueurs 13. 1.
+		}
+		{
+		Bord SortieBasse X = 30. 0. <= Y <= 1.
+		Bord Bas3   Y = 0. 17. <= X <= 30.
+		}
+}
+Trianguler_H dom
+# END MESH #
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1B dis
+Implicit_Euler_steady_scheme sch
+Read sch
+{
+	tinit 0.
+	dt_min 1.e-12
+	dt_max 1.e+06
+	dt_impr 1
+	dt_sauv 1.e+06
+	seuil_statio 1.e-8
+	facsec 1
+	steady_security_facteur 0.5
+ 	steady_global_dt  10
+	Solveur implicit_steady {
+	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
+}
+}
+Fluide_Incompressible fluide
+Read fluide
+{
+   mu      Champ_Uniforme 1 1.983e-5
+   rho     Champ_Uniforme 1 1.177
+   lambda  Champ_Uniforme 1 2.624e-2
+   Cp      Champ_Uniforme 1 1006.
+   beta_th Champ_Uniforme 1 3.33e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+Discretize pb dis
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression GCP { precond ssor { omega 1.65 } seuil 1.e-8 impr }
+		convection { Amont }
+		diffusion { }
+		sources { boussinesq_temperature { T0 20. } }
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			 Haut1 Paroi_Fixe
+			 Bas1 Paroi_Fixe
+			 Haut2 Paroi_Fixe
+			 Bas2 Paroi_Fixe
+			 Haut3 Paroi_Fixe
+			 Bas3 Paroi_Fixe
+			 Gauche Paroi_Fixe
+			 SortieBasse frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			 SortieHaute frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+			 Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2  1. 0.
+		}
+		modele_turbulence K_Epsilon {
+       			Transport_K_Epsilon 
+			{
+			   	convection { amont }
+				diffusion { }
+				Sources { Source_Transport_K_Eps_anisotherme { C3_eps 0.9 } }
+				boundary_conditions {
+					Haut1 Paroi
+					Bas1 Paroi
+					Haut2 Paroi
+					Bas2 Paroi
+					Haut3 Paroi
+					Bas3 Paroi
+					Gauche Paroi
+		       			Entree frontiere_ouverte_K_eps_impose Champ_Front_Uniforme 2 1.e-2 1.e-3
+		       			SortieBasse frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+		      			SortieHaute frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 0. 0.
+			   	}
+			   	initial_conditions {
+			      		k_Eps Champ_Uniforme 2 1.e-2 1.e-3
+			  	}
+			 }
+			 turbulence_paroi loi_expert_hydr { Kappa 0.415 Erugu 9.11 A_plus 26 methode_calcul_face_keps_impose toutes_les_faces_accrochees } dt_impr_ustar 10. eps_min 1.e-15
+		}
+		# Ecriture de y_plus dans un fichier ASCII pour analyse # 
+		Ecrire_fichier_xyz_valeur y_plus 100. bords 1 Haut1
+	}
+	Convection_Diffusion_Temperature_Turbulent
+	{
+		convection { Amont }
+                diffusion { }
+		initial_conditions {
+                        temperature Champ_Uniforme 1 20.
+                }
+                boundary_conditions {
+                         Haut1 Paroi_Adiabatique
+                         Bas1 Paroi_temperature_imposee Champ_Front_Uniforme 1 30.
+                         Haut2 Paroi_Adiabatique
+                         Bas2 Paroi_temperature_imposee Champ_Front_Uniforme 1 30.
+                         Haut3 Paroi_Adiabatique
+                         Bas3 Paroi_temperature_imposee Champ_Front_Uniforme 1 30.
+                         Gauche Paroi_Adiabatique
+                         SortieBasse frontiere_ouverte T_ext Champ_Front_Uniforme 1 20.
+                         SortieHaute frontiere_ouverte T_ext Champ_Front_Uniforme 1 20.
+                         Entree frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 20.
+                }
+                modele_turbulence Prandtl { Turbulence_paroi loi_expert_scalaire { prdt_sur_kappa 2.1686 } }
+	}
+	Post_processing
+	{
+		Probes
+		{
+		p_a1 pression periode 1e+06 segment 30  0. 1.5  30 1.5
+		vx_a1 vitessex periode 1e+06 segment 30 0. 1.5  30 1.5
+		vy_a1 vitessey periode 1e+06 segment 30 0. 1.5  30 1.5
+		visco_a1 viscosite_turbulente periode 1e+06 segment 30 0. 1.5  30 1.5
+		k_a1 k periode 1e+06 segment 30 0. 1.5  30 1.5
+		eps_a1 eps periode 1e+06 segment 30 0. 1.5  30 1.5
+                temperature_a1 temperature periode 1e+06 segment 30 0. 1.5  30 1.5
+
+		p_a2 pression periode 1e+06 segment 30  7. 0.5  30 0.5
+		vx_a2 vitessex periode 1e+06 segment 30 7. 0.5  30 0.5
+		vy_a2 vitessey periode 1e+06 segment 30 7. 0.5  30 0.5
+		visco_a2 viscosite_turbulente periode 1e+06 segment 30 7. 0.5  30 0.5
+		k_a2 k periode 1e+06 segment 30 7. 0.5  30 0.5
+		eps_a2 eps periode 1e+06 segment 30 7. 0.5  30 0.5
+		temperature_a2 temperature periode 1e+06 segment 30 7. 0.5  30 0.5
+
+		p_a3 pression periode 1e+06 segment 30  10. 0.  10 2
+		vx_a3 vitessex periode 1e+06 segment 30 10. 0.  10 2
+		vy_a3 vitessey periode 1e+06 segment 30 10. 0.  10 2
+		visco_a3 viscosite_turbulente periode 1e+06 segment 30 10. 0.  10 2
+		k_a3 k periode 1e+06 segment 30 10. 0.  10 2
+		eps_a3 eps periode 1e+06 segment 30 10. 0.  10 2
+		temperature_a3 temperature periode 1e+06 segment 30 10. 0.  10 2
+
+		p_a4 pression periode 1e+06 segment 30  15. 0.  15 2
+		vx_a4 vitessex periode 1e+06 segment 30 15. 0.  15 2
+		vy_a4 vitessey periode 1e+06 segment 30 15. 0.  15 2
+		visco_a4 viscosite_turbulente periode 1e+06 segment 30 15. 0.  15 2
+		k_a4 k periode 1e+06 segment 30 15. 0.  15 2
+		eps_a4 eps periode 1e+06 segment 30 15. 0.  15 2
+		temperature_a4 temperature periode 1e+06 segment 30 15. 0.  15 2
+		}
+
+		Format lata
+		fields dt_post 1e+06
+		{
+			pression som
+			vitesse som
+			viscosite_turbulente elem
+			k elem
+			eps elem
+			temperature elem
+		}
+	}
+}
+Solve pb
+End
