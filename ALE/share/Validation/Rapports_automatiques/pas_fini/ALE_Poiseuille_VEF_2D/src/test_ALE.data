@@ -111,9 +111,11 @@ Read pb
 	{
 		Definition_champs {
 			Uy Transformation {
+				localisation Faces
 				methode formule expression 1 10*(1-4*y*y)
 			} 
 			Px Transformation {
+				localisation Faces
 				methode formule expression 1 20*(1-x)
 			} 
   		}
@@ -137,9 +139,11 @@ Read pb
 	        Domaine dom_fixe
 		Definition_champs {
 			Uy_fixe Transformation {
+				localisation Faces
 				methode formule expression 1 10*(1-4*y*y)
 			} 
 			Px_fixe Transformation {
+				localisation Faces
 				methode formule expression 1 20*(1-x)
 			} 
   		}

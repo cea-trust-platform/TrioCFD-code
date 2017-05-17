@@ -167,14 +167,14 @@ Read pb
           {
           L2_norme_Id reduction_0D
           {
-              methode norme_L2 source Transformation {  methode formule expression 1 identite 
-                                  source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite }
+              methode norme_L2 source Transformation {  methode formule expression 1 identite  
+                                  source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite  localisation Faces }
                                                      }
           }
           Max_norme_Id reduction_0D
           {
-              methode max source Transformation {  methode formule expression 1 identite 
-                                  source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite }
+              methode max source Transformation {  methode formule expression 1 identite  
+                                  source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite  localisation Faces }
                                                      }
           }
           L2_norme_div reduction_0D
@@ -197,7 +197,7 @@ Read pb
                        sources { 
                             refChamp { Pb_champ pb vitesse nom_source vitesse } , 
                             Transformation { 
-                                methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution
+                                methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution localisation Faces 
               }
           }
           }
@@ -210,7 +210,7 @@ Read pb
                        sources { 
                             refChamp { Pb_champ pb vitesse nom_source vitesse } , 
                             Transformation { 
-                                methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution
+                                methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution localisation Faces
               }
           }
           }
@@ -220,7 +220,7 @@ Read pb
               methode norme_L2 source Transformation 
               {
                        methode formule expression 1 solution*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
-                       source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution }
+                       source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution localisation Faces }
           }
           }
           Max_norme_solution reduction_0D
@@ -228,7 +228,7 @@ Read pb
               methode max source Transformation 
               {
                        methode formule expression 1 solution*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
-                       source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution }
+                       source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution localisation Faces }
           }
           }
           }

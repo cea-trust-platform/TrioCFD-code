@@ -72,6 +72,7 @@ Lire pb
 	{	
 		Definition_champs {
   			solution Transformation {
+				localisation faces
 				methode formule expression 1 2*0.003/sqrt((x-0.005)*(x-0.005)+(y-0.005)*(y-0.005))-1
 			} 
   		} 	

@@ -1,0 +1,453 @@
+Parameters {
+	Title "Steady 2D Navier-Stokes VEF "
+	Author "mp250145"
+	VersionTrio_U 1.7.3 
+
+	Description Test of the new Time scheme Implicit_Euler_steady_scheme with Solveur implicit_steady using a dual time step for the steady problems
+        Description Comparaison with the exact solution
+
+	ParametresTrio_U Type of problem: Steady Navier-Stokes
+	ParametresTrio_U Discretizations: VEF P0 and VEF P0P1
+	ParametresTrio_U Type of meshes:  Triangles
+	ParametresTrio_U Pressure solver: GCP with SSOR preconditioneur
+	ParametresTrio_U Time scheme: Implicit_Euler_steady_scheme with Solveur implicit_steady
+	ParametresTrio_U Convection scheme: Amont, Muscl, EF_stab alpha = 0.2, EF_stab alpha = 0.7
+
+	TestCase Amont Navier_Stokes_2d_steady.data /*jdd en annexe*/ 
+	TestCase Muscl Navier_Stokes_2d_steady.data 
+	TestCase EF_stab_alpha_0.2 Navier_Stokes_2d_steady.data 
+	TestCase EF_stab_alpha_0.7 Navier_Stokes_2d_steady.data 
+
+	
+
+
+
+
+}
+
+
+
+
+Chapter {
+	Title "Convergence VEF P0" 
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file ./Amont/Navier_Stokes_2d_steady.dt_ev
+			columns ($1) ($4)
+			legend "Amont scheme: residue"
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+		}
+		curve {
+			file ./Muscl/Navier_Stokes_2d_steady.dt_ev
+			columns ($1) ($4)
+			legend "Muscl scheme: residue"
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+		}
+		curve {
+			file ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady.dt_ev
+			columns ($1) ($4)
+			legend "EF_stab_alpha_0.2 scheme: residue"
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+		}
+		curve {
+			file ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady.dt_ev
+			columns ($1) ($4)
+			legend "EF_stab_alpha_0.7 scheme: residue"
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+		}
+	}
+}
+
+Chapitre {
+	Titre "Probes: 1D Plots VEF P0"
+
+	figure { 
+		title "Pressure along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Exact pressure"
+			Fichier ./Amont/Navier_Stokes_2d_steady_PEX_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Amont: Pressure"
+			Fichier ./Amont/Navier_Stokes_2d_steady_P_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Muscl: Pressure"
+			Fichier ./Muscl/Navier_Stokes_2d_steady_P_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.2: Pressure"
+			Fichier ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady_P_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.7: Pressure"
+			Fichier ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady_P_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 2
+			}
+	}
+
+	figure { 
+		title "Pressure along line X=0.5"
+		include_description_curves 0
+		labelX "Y"
+		labelY "Pression"
+		Courbe {
+			Legende "Exact pressure"
+			Fichier ./Amont/Navier_Stokes_2d_steady_PEX_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Amont: Pressure"
+			Fichier ./Amont/Navier_Stokes_2d_steady_P_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Muscl: Pressure"
+			Fichier ./Muscl/Navier_Stokes_2d_steady_P_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+			}
+
+		Courbe {
+			Legende "EF_stab_alpha_0.2: Pressure"
+			Fichier ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady_P_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.7: Pressure"
+			Fichier ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady_P_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 2
+			}
+	}
+
+
+	figure { 
+		title "Velocity along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Exact velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VEX_X_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Amont: Velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VX_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Muscl: Velocity"
+			Fichier ./Muscl/Navier_Stokes_2d_steady_VX_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.2: Velocity"
+			Fichier ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady_VX_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.7: Velocity"
+			Fichier ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady_VX_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 2
+			}
+	}
+
+	figure { 
+		title "Velocity along line X=0.5 "
+		include_description_curves 0
+		labelX "Y"
+		labelY "Vx"
+		Courbe {
+			Legende "Exact velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VEX_X_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende " Amont: Velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VX_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Muscl: Velocity"
+			Fichier ./Muscl/Navier_Stokes_2d_steady_VX_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.2: Velocity"
+			Fichier ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady_VX_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.7: Velocity"
+			Fichier ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady_VX_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 2
+			}
+	}
+
+
+		figure { 
+		title "Velocity along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vy"
+		Courbe {
+			Legende "Exact velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VEX_Y_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Amont: Velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VY_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Muscl: Velocity"
+			Fichier ./Muscl/Navier_Stokes_2d_steady_VY_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.2: Velocity"
+			Fichier ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady_VY_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.7: Velocity"
+			Fichier ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady_VY_A1.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 2
+			}
+	}
+
+	figure { 
+		title "Velocity along line X=0.5 "
+		include_description_curves 0
+		labelX "Y"
+		labelY "Vy"
+		Courbe {
+			Legende "Exact velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VEX_Y_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Amont: Velocity"
+			Fichier ./Amont/Navier_Stokes_2d_steady_VY_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 20
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "Muscl: Velocity"
+			Fichier ./Muscl/Navier_Stokes_2d_steady_VY_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 15
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.2: Velocity"
+			Fichier ./EF_stab_alpha_0.2/Navier_Stokes_2d_steady_VY_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 2
+			}
+		Courbe {
+			Legende "EF_stab_alpha_0.7: Velocity"
+			Fichier ./EF_stab_alpha_0.7/Navier_Stokes_2d_steady_VY_A2.coupe
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 2
+			}
+	}
+	
+}
+
+Chapter {
+	Title "Visualization via VisIt VEF P0"
+
+
+	visu {
+		title "VITESSE_X ELEM"
+		pseudocolor ./Amont/Navier_Stokes_2d_steady.lata dom VITESSE_X ELEM
+	}
+
+	visu {
+		title "VITESSE_SOLUTION_X ELEM"
+		pseudocolor ./Amont/Navier_Stokes_2d_steady.lata dom VITESSE_SOLUTION_X ELEM
+	}
+
+
+}
+
+
+Chapitre {
+	Titre "CPU tables VEF P0"
+
+
+	Tableau {
+		Titre "CPU table "
+		Nb_colonnes 1
+		label  nb_iter 
+		
+		Ligne {
+			Legende "Amont: nb iter"
+			fichier Amont/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)
+			}
+		Ligne {
+			Legende "Muscl: nb iter"
+			fichier Muscl/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)
+			}
+		Ligne {
+			Legende "EF_stab_alpha_0.2: nb iter"
+			fichier EF_stab_alpha_0.2/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)
+			}
+		Ligne {
+			Legende "EF_stab_alpha_0.7: nb iter"
+			fichier EF_stab_alpha_0.7/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)
+			}
+	}
+	
+}

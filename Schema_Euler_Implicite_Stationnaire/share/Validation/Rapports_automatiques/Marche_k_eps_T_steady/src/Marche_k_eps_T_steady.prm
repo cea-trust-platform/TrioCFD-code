@@ -1,0 +1,544 @@
+Parameters {
+	Title "Steady Themohydraulique 2D Turbulent K-Eps VEF"
+	Author "mp250145"
+	VersionTrio_U 1.7.3 
+
+	Description Test of the new Time scheme Implicit_Euler_steady_scheme with Solveur implicit_steady using a dual time step for the steady problems
+        Description Comparaison with a reference solution (obtained with the Time scheme "Euler Implicit with Solveur implicit")
+
+	ParametresTrio_U Type of problem: Navier_Stokes_turbulent
+	ParametresTrio_U Type of problem: Convection_Diffusion_Temperature_Turbulent
+	ParametresTrio_U Turbulence: K_Epsilon
+	ParametresTrio_U Discretizations: VEFPreP1B
+	ParametresTrio_U Type of meshes:  Triangles
+	ParametresTrio_U Pressure solver: GCP with SSOR preconditioneur
+	ParametresTrio_U Time scheme: Implicit_Euler_steady_scheme with Solveur implicit_steady
+	ParametresTrio_U Convection scheme: amont
+
+	TestCase ./ Marche_k_eps_T_steady.data /*jdd en annexe*/ 
+}
+
+Chapter {
+	Title "Convergence" 
+
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file ./Marche_k_eps_T_steady.dt_ev
+			columns ($1) ($4)
+			legend "residue"
+			Style linespoints			
+		}
+	}
+}
+
+Chapitre {
+	Titre "Probes: 1D Plots"
+
+	figure { 
+		title "Pressure along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Pressure"
+			segment ./Marche_k_eps_T_steady P_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_P_A1.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VX_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VX_A1.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VY"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VY_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VY_A1.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Viscosity along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VISCO"
+		Courbe {
+			Legende "Viscosity"
+			segment ./Marche_k_eps_T_steady VISCO_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference viscosity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VISCO_A1.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "K along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "K"
+		Courbe {
+			Legende "K"
+			segment ./Marche_k_eps_T_steady K_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference K solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_K_A1.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "EPS along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "EPS"
+		Courbe {
+			Legende "Eps"
+			segment ./Marche_k_eps_T_steady EPS_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference Eps solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_EPS_A1.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "TEMPERATURE along line (0. 1.5)  (30 1.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "TEMPERATURE"
+		Courbe {
+			Legende "TEMPERATURE"
+			segment ./Marche_k_eps_T_steady TEMPERATURE_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference temperature solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_TEMPERATURE_A1.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "Pressure along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Pressure"
+			segment ./Marche_k_eps_T_steady P_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_P_A2.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VX_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VX_A2.coupe
+			Style linespoints
+			}
+	}
+	figure { 
+		title "Velocity along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VY"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VY_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VY_A2.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Viscosity along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VISCO"
+		Courbe {
+			Legende "Viscosity"
+			segment ./Marche_k_eps_T_steady VISCO_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference viscosity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VISCO_A2.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "K along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "K"
+		Courbe {
+			Legende "K"
+			segment ./Marche_k_eps_T_steady K_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference K solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_K_A2.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "EPS along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "EPS"
+		Courbe {
+			Legende "Eps"
+			segment ./Marche_k_eps_T_steady EPS_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference Eps solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_EPS_A2.coupe
+			Style linespoints			
+			}
+
+	}
+	figure { 
+		title "TEMPERATURE along line (7. 0.5)  (30 0.5)"
+		include_description_curves 0
+		labelX "X"
+		labelY "TEMPERATURE"
+		Courbe {
+			Legende "TEMPERATURE"
+			segment ./Marche_k_eps_T_steady TEMPERATURE_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference temperature solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_TEMPERATURE_A2.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "Pressure along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Pressure"
+			segment ./Marche_k_eps_T_steady P_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_P_A3.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VX_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VX_A3.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VY"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VY_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VY_A3.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Viscosity along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VISCO"
+		Courbe {
+			Legende "Viscosity"
+			segment ./Marche_k_eps_T_steady VISCO_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference viscosity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VISCO_A3.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "K along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "K"
+		Courbe {
+			Legende "K"
+			segment ./Marche_k_eps_T_steady K_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference K solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_K_A3.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "EPS along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "EPS"
+		Courbe {
+			Legende "Eps"
+			segment ./Marche_k_eps_T_steady EPS_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference Eps solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_EPS_A3.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "TEMPERATURE along line (10. 0.)  (10 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "TEMPERATURE"
+		Courbe {
+			Legende "TEMPERATURE"
+			segment ./Marche_k_eps_T_steady TEMPERATURE_A3
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference temperature solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_TEMPERATURE_A3.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Pressure along line (15. 0.)  (15 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Pressure"
+			segment ./Marche_k_eps_T_steady P_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_P_A4.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (15. 0.)  (15 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VX_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VX_A4.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (15. 0.)  (15 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "VY"
+		Courbe {
+			Legende "Velocity"
+			segment ./Marche_k_eps_T_steady VY_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VY_A4.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Viscosity along line (15. 0.)  (15 2))"
+		include_description_curves 0
+		labelX "X"
+		labelY "VISCO"
+		Courbe {
+			Legende "Viscosity"
+			segment ./Marche_k_eps_T_steady VISCO_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference viscosity solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_VISCO_A4.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "K along line (15. 0.)  (15 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "K"
+		Courbe {
+			Legende "K"
+			segment ./Marche_k_eps_T_steady K_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference K solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_K_A4.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "EPS along line (15. 0.)  (15 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "EPS"
+		Courbe {
+			Legende "Eps"
+			segment ./Marche_k_eps_T_steady EPS_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference Eps solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_EPS_A4.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "TEMPERATURE along line (15. 0.)  (15 2)"
+		include_description_curves 0
+		labelX "X"
+		labelY "TEMPERATURE"
+		Courbe {
+			Legende "TEMPERATURE"
+			segment ./Marche_k_eps_T_steady TEMPERATURE_A4
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference temperature solution"
+			Fichier ./Solution_reference/ThHyd_keps_VEF_TEMPERATURE_A4.coupe
+			Style linespoints			
+			}
+	}
+}
+
+Chapter {
+	Title "Visualization via VisIt" 
+	visu {
+		title "MESH"
+		mesh ./Marche_k_eps_T_steady.lata dom
+	}
+
+	visu {
+		title "VITESSE_X SOM"
+		pseudocolor ./Marche_k_eps_T_steady.lata dom TEMPERATURE  ELEM
+	}
+
+}
+
+
+
+
+Chapitre {
+	Titre "CPU tables"
+
+
+	Tableau {
+		Titre "CPU table "
+		Nb_colonnes 1
+		label  nb_iter 
+		
+		Ligne {
+			Legende "New time scheme"
+			fichier CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)  
+			}
+		Ligne {
+			Legende "Reference solution"
+			fichier Solution_reference/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1) 
+			}
+	}
+	
+}
+
+
+

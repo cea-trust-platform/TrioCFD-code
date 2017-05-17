@@ -1,0 +1,220 @@
+Parameters {
+	Title "Steady Thermohydraulique 3D VEF"
+	Author "mp250145"
+	VersionTrio_U 1.7.3 
+
+	Description Test of the new Time scheme Implicit_Euler_steady_scheme with Solveur implicit_steady using a dual time step for the steady problems
+        Description Comparaison with a reference solution (obtained with the Time scheme "Euler Implicit with Solveur implicit")
+
+	ParametresTrio_U Type of problem: Navier_Stokes
+	ParametresTrio_U Type of problem: Convection_Diffusion_Temperature
+	ParametresTrio_U Discretizations: VEFPreP1B
+	ParametresTrio_U Pressure solver: GCP with SSOR preconditioneur
+	ParametresTrio_U Time scheme: Implicit_Euler_steady_scheme with Solveur implicit_steady
+	ParametresTrio_U Convection scheme: amont
+
+
+	TestCase  . ThHyd_3D_VEF_steady.data /*jdd en annexe*/ 
+}
+
+Chapter {
+	Title "Convergence" 
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file ./ThHyd_3D_VEF_steady.dt_ev
+			columns ($1) ($4)
+			legend "column 4"
+			Style linespoints
+			
+		}
+	}
+}
+
+Chapitre {
+	Titre "Probes: 1D Plots"
+
+	figure { 
+		title "TEMPERATURE along line (0.011 0. 0.01,  0.029 0. 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Temperature"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_T_A1.coupe
+			Legende "Reference temperature solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Temperature"
+			segment ./ThHyd_3D_VEF_steady T_A1
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "TEMPERATURE along line (0.011 -0.03 0.01,  0.011 0.03 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Temperature"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_T_A2.coupe
+			Legende "Reference temperature solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Temperature"
+			segment ./ThHyd_3D_VEF_steady T_A2			
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "Pressure along line (0.011 0. 0.01,  0.029 0. 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_P_A1.coupe
+			Legende "Reference pressure solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Pressure"
+			segment ./ThHyd_3D_VEF_steady P_A1			
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Pressure along line (0.011 -0.03 0.01,  0.011 0.03 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_P_A2.coupe
+			Legende "Reference pressure solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Pressure"
+			segment ./ThHyd_3D_VEF_steady P_A2			
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (0.011 0. 0.01,  0.029 0. 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_VX_A1.coupe
+			Legende "Reference velocity solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Velocity"
+			segment ./ThHyd_3D_VEF_steady VX_A1			
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (0.011 -0.03 0.01,  0.011 0.03 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_VX_A2.coupe
+			Legende "Reference velocity solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Velocity"
+			segment ./ThHyd_3D_VEF_steady VX_A2			
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "Velocity along line (0.011 0. 0.01,  0.029 0. 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vy"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_VY_A1.coupe
+			Legende "Reference velocity solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Velocity"
+			segment ./ThHyd_3D_VEF_steady VY_A1			
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (0.011 -0.03 0.01,  0.011 0.03 0.01)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vy"
+		curve {
+			file ./Solution_reference/ThHyd_3D_VEFPreP1B_VY_A2.coupe
+			Legende "Reference velocity solution"
+			Style linespoints			
+		}
+		Courbe {
+			Legende "Velocity"
+			segment ./ThHyd_3D_VEF_steady VY_A2			
+			Style linespoints			
+			}
+	}
+
+	
+}
+
+Chapter {
+	Title "Visualization via VisIt" 
+	visu {
+		title "MESH"
+		mesh ./ThHyd_3D_VEF_steady.lata dom_fluide
+	}
+
+	visu {
+		title "Steady:Temperature SOM"
+		pseudocolor ./ThHyd_3D_VEF_steady.lata dom_fluide TEMPERATURE SOM
+	}
+
+}
+
+
+
+
+Chapitre {
+	Titre "CPU tables"
+
+
+	Tableau {
+		Titre "CPU table "
+		Nb_colonnes 1
+		label  nb_iter 
+		
+		Ligne {
+			Legende "New time scheme"
+			fichier CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)  
+			}
+		Ligne {
+			Legende "Reference solution"
+			fichier ./Solution_reference/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1) 
+			}
+	}
+	
+}
+
+
+

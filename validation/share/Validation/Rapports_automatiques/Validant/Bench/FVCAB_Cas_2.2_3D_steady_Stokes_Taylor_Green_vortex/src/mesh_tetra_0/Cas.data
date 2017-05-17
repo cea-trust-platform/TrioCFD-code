@@ -289,11 +289,15 @@ Lire pb
 					norme_L2_divu		reduction_0D	{
 										methode norme_L2
 										sources	{
+                                                                                         interpolation { localisation elem 
+                                                                                          sources {
 											# divergence u #
 											divergence	{
 													source refChamp { Pb_champ pb vitesse }
 													}
 											}
+											}
+										}
 										}
 					errdivu			transformation	{
 										methode formule

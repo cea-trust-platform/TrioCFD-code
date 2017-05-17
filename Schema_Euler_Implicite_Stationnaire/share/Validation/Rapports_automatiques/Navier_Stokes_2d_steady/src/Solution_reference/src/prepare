@@ -1,0 +1,31 @@
+# Creation des repertoires de calcul #
+mkdir -p Amont Muscl EF_stab_alpha_0.2 EF_stab_alpha_0.7
+cd Amont
+cp ../post_run .
+cp ../mesh_tri_6.med .
+cp ../Navier_Stokes_2d_steady.data .
+cd ..
+
+cd Muscl
+cp ../post_run .
+cp ../mesh_tri_6.med .
+sed "s/Convection { amont }/convection { muscl }/" ../Navier_Stokes_2d_steady.data > Navier_Stokes_2d_steady.data
+cd ..
+
+cd EF_stab_alpha_0.2
+cp ../post_run .
+cp ../mesh_tri_6.med .
+sed "s/Convection { amont }/convection { EF_stab { alpha 0.2 } }/" ../Navier_Stokes_2d_steady.data > Navier_Stokes_2d_steady.data
+cd ..
+
+cd EF_stab_alpha_0.7
+cp ../post_run .
+cp ../mesh_tri_6.med .
+sed "s/Convection { amont }/convection { EF_stab { alpha 0.7 } }/" ../Navier_Stokes_2d_steady.data > Navier_Stokes_2d_steady.data
+cd ..
+
+
+
+
+
+

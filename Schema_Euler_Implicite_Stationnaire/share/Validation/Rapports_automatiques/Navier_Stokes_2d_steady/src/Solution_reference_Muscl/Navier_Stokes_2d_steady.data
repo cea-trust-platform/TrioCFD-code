@@ -1,0 +1,129 @@
+# Hydraulique 2D VEF #
+# Time scheme Implicit_Euler_steady_scheme #
+# Solveur implicit_steady #
+# PARALLEL OK 4 #
+Dimension 2
+Pb_hydraulique pb
+
+Domaine dom
+# BEGIN MESH #
+Lire_med family_names_from_group_names dom mesh_tri_6 mesh_tri_6.med
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+VEFPreP1B dis
+Lire dis { P0 }
+
+Schema_Euler_implicite sch
+Read sch
+{
+	tinit 0.
+	dt_min 1.e-6
+	dt_max 1.e+6
+	dt_impr 1.e-6
+	dt_sauv 1.e+10
+	# nb_pas_dt_max 5 #
+	seuil_statio 1.e-7
+	facsec 1
+	Solveur implicite {
+	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
+}
+}
+Fluide_incompressible fluide
+Lire fluide
+{
+	mu champ_uniforme 1 0.1
+ 	rho champ_uniforme 1 1
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		Solveur_pression	PETSC Cholesky { }
+		convection { muscl } 
+		Diffusion		{ }
+		Conditions_initiales	{
+					vitesse champ_fonc_xyz dom 2 y -x
+					}
+		Conditions_limites	{
+					Gauche	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 y -x
+					Droite	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 y -x
+					Bas	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 y -x
+					Haut	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 y -x
+					}
+	}
+	Postraitement
+	{
+		Definition_champs { 
+			vitesse_solution Transformation {
+				methode vecteur
+				expression 2 y -x
+				localisation Faces
+			}
+			vitesse_solution_x Transformation {
+				methode formule 
+				expression 1 y
+				localisation Faces
+			}
+			vitesse_solution_y Transformation {
+				methode formule 
+				expression 1 -x
+				localisation Faces
+			}
+			pression_solution Transformation {
+				methode formule 
+				expression 1 1/2*(x^2+y^2)-1/3
+				localisation som
+			}
+		
+		}
+
+	Sondes			{
+					vex_x_a1 nodes	vitesse_solution_x		periode 1e+10    segment 10   0 0.5 1 0.5 
+					vex_y_a1 nodes	vitesse_solution_y		periode 1e+10   segment 10   0 0.5 1 0.5 
+					pex_a1	nodes pression_solution		periode 1e+10    segment 10   0 0.5 1 0.5 
+					vx_a1	nodes  vitessex periode 1e+10 segment 10   0 0.5 1 0.5 
+					vy_a1	nodes  vitessey periode 1e+10 segment 10   0 0.5 1 0.5 
+					p_a1	nodes  pression periode 1e+10 segment 10   0 0.5 1 0.5 
+					vex_x_a2 nodes	vitesse_solution_x		periode 1e+10    segment 10   0.5 0. 0.5 1. 
+					vex_y_a2 nodes	vitesse_solution_y		periode 1e+10   segment 10   0.5 0. 0.5 1. 
+					pex_a2 nodes	pression_solution		periode 1e+10    segment 10   0.5 0. 0.5 1. 
+					vx_a2	nodes  vitessex periode 1e+10 segment 10   0.5 0. 0.5 1. 
+					vy_a2	nodes  vitessey periode 1e+10 segment 10   0.5 0. 0.5 1. 
+					p_a2	nodes  pression periode 1e+10 segment 10   0.5 0. 0.5 1. 
+					
+					} 
+		Format lata
+		Champs binaire dt_post 1e+10
+					{
+					pression som
+					vitesse elem
+					vitesse_solution_x elem
+					vitesse_solution_y elem
+					pression_solution som
+					}
+	}
+	sauvegarde_simple binaire Cas.sauv
+}
+
+Resoudre pb
+Fin

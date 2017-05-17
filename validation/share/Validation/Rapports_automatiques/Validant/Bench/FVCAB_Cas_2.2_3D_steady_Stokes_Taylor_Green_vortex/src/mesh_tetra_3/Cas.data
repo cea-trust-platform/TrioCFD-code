@@ -67,13 +67,13 @@ Lire pb
 										sources	{
 											transformation	{
 													methode norme
-													localisation faces
+													localisation Faces
 													sources	{
 														transformation	{
 																methode vecteur
 																expression 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
 																nom_source uex
-																localisation faces
+																localisation Faces
 																}
 														}
 													}
@@ -82,12 +82,12 @@ Lire pb
 					# norme_L2_norme_uex = norme L2 de la norme de uex (valeur exacte) #
 					norme_L2_norme_uex	transformation	{
 										methode formule expression 1 valeur_exacte*norme_L2_1
-										localisation faces
+										localisation Faces
 										sources	{
 											transformation	{
 													methode formule
 													expression 1 sqrt(3)/2
-													localisation faces
+													localisation Faces
 													nom_source valeur_exacte
 													} ,
 											reduction_0D	{
@@ -95,7 +95,7 @@ Lire pb
 													nom_source norme_L2_1
 													source transformation	{
 																methode formule expression 1 1
-																localisation faces
+																localisation Faces
 																}
 													}
 											}
@@ -107,13 +107,13 @@ Lire pb
 											transformation	{
 													# norme de u-uex #
 													methode norme
-													localisation faces
+													localisation Faces
 													sources	{
 														# u-uex #
 														transformation	{
 																methode formule expression 1 u-uex
 																nom_source u_uex
-																localisation faces
+																localisation Faces
 																sources	{
 																	refChamp { Pb_champ pb vitesse nom_source u } ,
 																	# expression de uex #
@@ -121,7 +121,7 @@ Lire pb
 																			methode vecteur
 																			expression 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
 																			nom_source uex
-																		        localisation faces
+																		        localisation Faces
 																			}
 																	}
 																}
@@ -270,11 +270,15 @@ Lire pb
 					norme_L2_divu		reduction_0D	{
 										methode norme_L2
 										sources	{
+                                                                                         interpolation { localisation elem 
+                                                                                          sources {
 											# divergence u #
 											divergence	{
 													source refChamp { Pb_champ pb vitesse }
 													}
 											}
+											}
+										}
 										}
 					errdivu			transformation	{
 										methode formule
