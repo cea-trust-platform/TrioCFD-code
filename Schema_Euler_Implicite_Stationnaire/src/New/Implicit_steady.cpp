@@ -57,7 +57,7 @@ Entree& Implicit_steady::readOn(Entree& is )
 
 
 
-void test_imposer_cond_lim(Equation_base& eqn,DoubleTab& current2,const char * msg,int flag)
+void test_impose_bound_cond(Equation_base& eqn,DoubleTab& current2,const char * msg,int flag)
 {
   return;
   DoubleTab& present = eqn.inconnue().futur();
@@ -123,7 +123,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   //Resolution du systeme A[Un]U* = -BtPn + Sv + Ss
   //current = U*
   le_solveur_.resoudre_systeme(matrice,resu,current);
-  test_imposer_cond_lim(eqn,current,"apres resolution ",0);
+  test_impose_bound_cond(eqn,current,"apres resolution ",0);
   Debog::verifier("Implicit_steady::iterer_NS current apres CL",current);
   /*
   #ifndef NDEBUG
@@ -224,7 +224,7 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
     {
       current.addr()[i] *= dt/(dt+dt_locaux_masse[i]);
     }
-  test_imposer_cond_lim(eqn,current,"apres resolution ",0);
+  test_impose_bound_cond(eqn,current,"apres resolution ",0);
   //current=Un+1
   current.echange_espace_virtuel();
   divergence.calculer(current,secmem);
