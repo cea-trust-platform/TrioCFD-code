@@ -1,6 +1,7 @@
 # Hydraulique turbulent 2D with wall function: Lid driven cavity test #
 # Time scheme Implicit_Euler_steady_scheme #
 # Solveur implicit_steady #
+# Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
 # PARALLEL OK 4 #
 dimension 2
 Pb_Hydraulique_turbulent pb

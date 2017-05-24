@@ -1,6 +1,7 @@
 # Hydraulique 2D VEF #
 # Time scheme Implicit_Euler_steady_scheme #
 # Solveur implicit_steady #
+# Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
 # PARALLEL OK 4 #
 Dimension 2
 Pb_hydraulique pb
