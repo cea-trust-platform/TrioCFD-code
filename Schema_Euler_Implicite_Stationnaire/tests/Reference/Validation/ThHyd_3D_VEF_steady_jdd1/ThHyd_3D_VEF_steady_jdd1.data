@@ -1,6 +1,7 @@
 # Thermohydraulique 3D VEFPreP1B #
 # Time scheme Implicit_Euler_steady_scheme #
 # Solveur implicit_steady #
+# Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
 # PARALLEL OK 5 #
 dimension 3    
 Implicit_Euler_steady_scheme sch 

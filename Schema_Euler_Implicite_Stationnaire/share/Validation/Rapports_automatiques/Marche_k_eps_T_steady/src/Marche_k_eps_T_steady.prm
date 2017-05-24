@@ -3,8 +3,11 @@ Parameters {
 	Author "mp250145"
 	VersionTrio_U 1.7.3 
 
-	Description Test of the new Time scheme Implicit_Euler_steady_scheme with Solveur implicit_steady using a dual time step for the steady problems
-        Description Comparaison with a reference solution (obtained with the Time scheme "Euler Implicit with Solveur implicit")
+	Description Test of the new Time scheme with Solveur implicit_steady using a dual time step for the steady problems
+        Description The time scheme Implicit_Euler_steady_scheme can be seen as a modification of the Euler_Implicit (with Solveur implicit) time scheme in which the time step varies in the domain
+	Description The idea is here to compare the solution obtained with these two time schemes
+        Description Here after the reference solution is the solution obtained with the "Euler_Implicit (with Solveur implicit)"  time scheme
+	Description Warning: this is a numerical test case. We do not look at the physical aspects in detail here.
 
 	ParametresTrio_U Type of problem: Navier_Stokes_turbulent
 	ParametresTrio_U Type of problem: Convection_Diffusion_Temperature_Turbulent
@@ -540,5 +543,8 @@ Chapitre {
 	
 }
 
-
+Chapitre {
+	Titre "Conclusion"
+	Description The time scheme 'Implicit_Euler_steady_scheme' reproduces the stationary solution obtain with the time scheme 'Euler_Implicit' while considerably reducing the number of time steps required during the transitory phase. 
+}
 

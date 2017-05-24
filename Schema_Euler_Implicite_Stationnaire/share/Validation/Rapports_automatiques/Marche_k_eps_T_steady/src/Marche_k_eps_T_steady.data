@@ -1,6 +1,7 @@
 # Themohydraulique 2D turbulent K-Eps VEF #
 # Time scheme Implicit_Euler_steady_scheme #
 # Solveur implicit_steady #
+# Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
 # PARALLEL OK 4 #
 dimension 2
 Pb_Thermohydraulique_Turbulent pb
@@ -86,8 +87,8 @@ Read sch
 	dt_sauv 1.e+06
 	seuil_statio 1.e-8
 	facsec 1
-	steady_security_facteur 0.5
- 	steady_global_dt  10
+	steady_security_facteur 1
+ 	steady_global_dt  1000
 	Solveur implicit_steady {
 	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
 }
