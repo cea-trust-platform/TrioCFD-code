@@ -1,0 +1,59 @@
+Dimension 3
+Pb_hydraulique pb
+
+Domaine dom
+Lire_med family_names_from_group_names dom mesh_tetra_0 mesh_tetra_0.med
+
+VerifierCoin dom { }
+
+VEFPreP1b dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0
+	precision_impr 30
+	nb_pas_dt_max 1
+}
+
+Fluide_incompressible fluide
+Lire fluide
+{
+	mu champ_uniforme 1 1
+ 	rho champ_uniforme 1 1
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		Projection_initiale	0
+		Equation_non_resolue	(t>0)
+		Solveur_pression	GCP { seuil 1 precond_nul }
+		Convection		{ negligeable }
+		Diffusion		{ }
+		Conditions_initiales	{
+					vitesse champ_fonc_xyz dom 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					}
+		Conditions_limites	{
+					Gauche		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Droite		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Bas		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Haut		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Devant		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Derriere	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					}
+		Sources			{
+					Source_Qdm champ_fonc_xyz dom 3 -36*Pi^2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) 0 0
+					}
+	}
+}
+
+Resoudre pb
+Fin

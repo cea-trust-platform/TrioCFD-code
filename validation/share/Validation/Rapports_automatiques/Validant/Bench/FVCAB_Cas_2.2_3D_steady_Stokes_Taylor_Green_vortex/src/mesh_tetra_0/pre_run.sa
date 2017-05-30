@@ -1,0 +1,4 @@
+#!/bin/bash
+trust precalcul_correction_debit 1>precalcul.out 2>precalcul.err
+debit=`tail -1 precalcul_correction_debit_pb_Debit.out | awk '{print $8}'`
+sed -i "s/_CORRECTIONDEBIT_/$debit/g" *.data

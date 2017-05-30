@@ -178,7 +178,7 @@ Lire pb
 			bas   paroi_temperature_imposee Champ_Front_Uniforme 1 150. 
 			haut   paroi_adiabatique
  			obst   paroi_temperature_imposee Champ_Front_Uniforme 1 150.
- 			entree  Frontiere_ouverte T_ext Champ_Front_Uniforme 1 20.  
+ 			entree  Frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 20.  
 			sortie Frontiere_ouverte T_ext Champ_Front_Uniforme 1 20. 
 		}
 		conditions_initiales { Temperature Champ_Uniforme 1 20. }

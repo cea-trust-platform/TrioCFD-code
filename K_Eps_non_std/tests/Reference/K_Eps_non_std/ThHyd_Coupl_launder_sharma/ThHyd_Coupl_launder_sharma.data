@@ -21,7 +21,7 @@ Read sch
         dt_sauv .5
         seuil_statio 1.e-8
         facsec 0.95
-	nb_pas_dt_max 100
+	nb_pas_dt_max 10
 }
 
 # BEGIN MESH #
@@ -186,8 +186,8 @@ Read pb2
                         }
                 boundary_conditions {
                         Droit               symetrie
-                        Bord_entree_canal   frontiere_ouverte T_ext  champ_front_uniforme 1 480.
-                        Bord_entree_CL      frontiere_ouverte T_ext  champ_front_uniforme 1 480.
+                        Bord_entree_canal   frontiere_ouverte_temperature_imposee  champ_front_uniforme 1 480.
+                        Bord_entree_CL      frontiere_ouverte_temperature_imposee  champ_front_uniforme 1 480.
                         Bord_sortie_canal   frontiere_ouverte T_ext champ_front_uniforme 1  800.
                         Bord_sortie_CL      frontiere_ouverte T_ext champ_front_uniforme 1  800.
                         Plaque              paroi_contact  pb1   Plaque
