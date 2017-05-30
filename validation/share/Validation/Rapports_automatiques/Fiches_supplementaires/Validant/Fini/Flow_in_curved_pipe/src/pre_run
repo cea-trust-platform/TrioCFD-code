@@ -13,7 +13,7 @@ ln -s -f `ls -rt pb_K_EPS*.dat | tail -1` pb_K_EPS_perio.dat
 ln -s -f `ls -rt pb_VITESSE*.dat | tail -1` pb_VITESSE_perio.dat
 
 # Recuperation du nombre de processeurs dans le fichier .prm
-NB_PROCS=`awk '/Castest/ {print $4}' ../*.prm | sort -u`
+NB_PROCS=`awk '/TestCase/ {print $4}' ../*.prm | sort -u`
 if [ "`echo $NB_PROCS | awk '{print NF}'`" != 1 ]
 then
    echo "Nombre de processeurs multiple dans le prm impossible !"

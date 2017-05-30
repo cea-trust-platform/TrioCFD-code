@@ -55,6 +55,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Liquid Phase Temperature"
 		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+                origine visit
 		Pseudocolor adiab/lata/post.lata dom Tl ELEM
 		width 7.5cm
 		cycles 0 9
@@ -66,6 +67,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Vapor Phase Temperature"
 		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+                origine visit
 		Pseudocolor adiab/lata/post.lata dom Tv ELEM
 		width 7.5cm
 		cycles 0 9
@@ -153,6 +155,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Massic apparition rate of the liquid"
 		instruction_visit DefineScalarExpression("MPOINT_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,0.)")
+                origine visit
 		Pseudocolor same_rho/lata/post.lata INTERFACES MPOINT ELEM
 		width 7.5cm
 		cycles 0 9
@@ -163,6 +166,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Massic disparition rate of the vapor"
 		instruction_visit DefineScalarExpression("MPOINTV_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINTV_ELEM_dom>,INTERFACES,0.)")
+                origine visit
 		Pseudocolor same_rho/lata/post.lata INTERFACES MPOINTV ELEM
 		width 7.5cm
 		cycles 0 9
@@ -173,6 +177,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Liquid Phase Temperature"
 		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+                origine visit
 		Pseudocolor same_rho/lata/post.lata dom Tl ELEM
 		width 7.5cm
 		cycles 0 9
@@ -184,6 +189,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Vapor Phase Temperature"
 		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+                origine visit
 		Pseudocolor same_rho/lata/post.lata dom Tv ELEM
 		width 7.5cm
 		cycles 0 9
@@ -269,6 +275,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Massic apparition rate of the liquid"
 		instruction_visit DefineScalarExpression("MPOINT_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,0.)")
+                origine visit
 		Pseudocolor std_2pas/lata/post.lata INTERFACES MPOINT ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -279,6 +286,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Massic disparition rate of the vapor"
 		instruction_visit DefineScalarExpression("MPOINTV_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINTV_ELEM_dom>,INTERFACES,0.)")
+                origine visit
 		Pseudocolor std_2pas/lata/post.lata INTERFACES MPOINTV ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -289,6 +297,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Liquid Phase Temperature"
 		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+                origine visit
 		Pseudocolor std_2pas/lata/post.lata dom Tl ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -300,6 +309,7 @@ Chapter {
 		nb_img_without_newline 2
 		Title "Vapor Phase Temperature"
 		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+                origine visit
 		Pseudocolor std_2pas/lata/post.lata dom Tv ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -384,6 +394,7 @@ Visu {
 		nb_img_without_newline 2
 		Title "Massic apparition rate of the liquid"
 		instruction_visit DefineScalarExpression("MPOINT_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINT_ELEM_dom>,INTERFACES,0.)")
+                origine visit
 		Pseudocolor std_30pas/lata/post.lata INTERFACES MPOINT ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -394,6 +405,7 @@ Visu {
 		nb_img_without_newline 2
 		Title "Massic disparition rate of the vapor"
 		instruction_visit DefineScalarExpression("MPOINTV_ELEM_INTERFACES","pos_cmfe(<[0]id:TEMPERATURE_MPOINTV_ELEM_dom>,INTERFACES,0.)")
+                origine visit
 		Pseudocolor std_30pas/lata/post.lata INTERFACES MPOINTV ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -404,6 +416,7 @@ Visu {
 		nb_img_without_newline 2
 		Title "Liquid Phase Temperature"
 		instruction_visit DefineScalarExpression("Tl_ELEM_dom","if(or(INDICATRICE_INTERF_ELEM_dom=1, INDICATRICE_INTERF_ELEM_dom=0), TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom,-(INDICATRICE_INTERF_ELEM_dom)^2/2*TEMPERATURE_GRAD_THERMIQUE_ELEM_dom*1.e-5)")
+                origine visit
 		Pseudocolor std_30pas/lata/post.lata dom Tl ELEM
 		width 7.5cm
 		cycles 0 -1
@@ -415,6 +428,7 @@ Visu {
 		nb_img_without_newline 2
 		Title "Vapor Phase Temperature"
 		instruction_visit DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
+                origine visit
 		Pseudocolor std_30pas/lata/post.lata dom Tv ELEM
 		width 7.5cm
 		cycles 0 -1

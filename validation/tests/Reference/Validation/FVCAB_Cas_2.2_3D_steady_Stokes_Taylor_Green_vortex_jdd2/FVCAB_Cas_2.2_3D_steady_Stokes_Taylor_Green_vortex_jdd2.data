@@ -1,5 +1,5 @@
 # test FCVAB  #
-# PARALLEL NOT #
+# PARALLEL OK  #
 
 Dimension 3
 Pb_hydraulique pb
@@ -67,12 +67,12 @@ Lire pb
 					vitesse champ_fonc_xyz dom 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
 					}
 		Conditions_limites	{
-					Gauche		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
-					Droite		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
-					Bas		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
-					Haut		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
-					Devant		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
-					Derriere	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Gauche		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z)+(-9.826001561982157864183484718978e-03/6) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Droite		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z)-(-9.826001561982157864183484718978e-03/6) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Bas		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z)+(-9.826001561982157864183484718978e-03/6) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Haut		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z)-(-9.826001561982157864183484718978e-03/6) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)
+					Derriere	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)+(-9.826001561982157864183484718978e-03/6)
+					Devant		frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 -2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*cos(2*Pi*y)*sin(2*Pi*z) sin(2*Pi*x)*sin(2*Pi*y)*cos(2*Pi*z)-(-9.826001561982157864183484718978e-03/6)
 					}
 		Sources			{
 					Source_Qdm champ_fonc_xyz dom 3 -36*Pi^2*cos(2*Pi*x)*sin(2*Pi*y)*sin(2*Pi*z) 0 0
