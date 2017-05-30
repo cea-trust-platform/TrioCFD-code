@@ -165,7 +165,7 @@ do
    for SCHEME in $SCHEMEs
    do
       # Je recherche dans la PRM pour chaque cas test le nombre de processeurs du cas test
-      NB_PROCS=`grep "CasTest $ESSAI/$SCHEME" Watlon_k_eps.prm | awk '{print $4}'`
+      NB_PROCS=`grep "TestCase $ESSAI/$SCHEME" Watlon_k_eps.prm | awk '{print $4}'`
       # Je cree les repertoires de travail et calcul les boites de recirculation
       create_box
       create_data
