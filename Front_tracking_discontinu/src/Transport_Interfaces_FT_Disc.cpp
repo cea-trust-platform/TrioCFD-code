@@ -774,8 +774,8 @@ int Transport_Interfaces_FT_Disc::verif_Cl() const
 static void fct_tri_sommet_fa7(const int* in, int* out)
 {
   const int dim = Objet_U::dimension;
-  for(int i=0; i<dim; i++)
-    out[i]=in[i];
+  out[0]=in[0];
+  out[1]=in[1];
 
   if(out[1]<out[0])
     {
@@ -785,6 +785,7 @@ static void fct_tri_sommet_fa7(const int* in, int* out)
     }
   if(dim==3)
     {
+      out[2]=in[2];
       if(out[2]<out[1])
         {
           const int temp=out[2];
@@ -798,6 +799,8 @@ static void fct_tri_sommet_fa7(const int* in, int* out)
           out[0]=temp;
         }
     }
+  else
+    out[2]=-123;
 }
 
 static int fct_tri_facettes(const void *pt1, const void *pt2)
@@ -2098,6 +2101,7 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
       {
 
         exit();
+        break;
       }
     default:
       {
