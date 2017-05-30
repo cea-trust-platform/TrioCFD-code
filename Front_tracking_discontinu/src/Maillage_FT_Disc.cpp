@@ -419,7 +419,7 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
   static int compteur_plot = 0;
   Nom nom_fic=Objet_U::nom_du_cas();
   nom_fic += "_";
-  char str[3];
+  char str[14];
   sprintf(str,"%03d",compteur_plot++);
   nom_fic += Nom(str);
   nom_fic += "_";
