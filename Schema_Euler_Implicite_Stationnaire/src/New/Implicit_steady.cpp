@@ -39,9 +39,9 @@
 #include <Dirichlet.h>
 #include <Probleme_base.h>
 #include <assert.h>
-// #include <Les_Cl.h>
+
 Implemente_instanciable(Implicit_steady,"Implicit_steady",Simpler);
-// XD implicit_steady implicite implicit_steady -1 not_set
+// XD implicit_steady implicite  implicit_steady 1  this is the implicit solver using a dual time step. Remark: this solver can be used only with the Implicit_Euler_Steady_Scheme time scheme.
 
 Sortie& Implicit_steady::printOn(Sortie& os ) const
 {

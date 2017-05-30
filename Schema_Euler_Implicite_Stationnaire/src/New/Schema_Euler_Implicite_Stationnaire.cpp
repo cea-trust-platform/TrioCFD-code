@@ -32,28 +32,22 @@
 #include <Schema_Euler_Implicite_Stationnaire.h>
 
 Implemente_instanciable(Schema_Euler_Implicite_Stationnaire,"Schema_Euler_Implicite_Stationnaire|Implicit_Euler_Steady_Scheme",Schema_Euler_Implicite);
-// XD schema_euler_implicite_stationnaire schema_implicite_base schema_euler_implicite_stationnaire -1
-//     printOn()
-/////
+//XD Implicit_Euler_Steady_Scheme schema_implicite_base schema_euler_implicite_stationnaire 1  This is the Implicit Euler scheme using a dual time step procedure (using local and global dt) for  steady problems. Remark: the only possible solver choice for this scheme is the  implicit_steady solver.
+
 
 Sortie& Schema_Euler_Implicite_Stationnaire::printOn(Sortie& s) const
 {
   return  Schema_Implicite_base::printOn(s);
 }
 
-//// readOn
-//
 
 Entree& Schema_Euler_Implicite_Stationnaire::readOn(Entree& s)
 {
   steady_security_facteur_ = 0.5;
   steady_global_dt_ = 1.e+2;
   max_dt_locaux_=0.;
-  nb_steps_div0_imposed_=1;
-  div0_imposed_=0;
   nb_ite_max=200;
   residu_old_=0;
-  // steady_=1;
   Schema_Implicite_base::readOn(s);
   if(!le_solveur.non_nul())
     {
@@ -76,6 +70,16 @@ Entree& Schema_Euler_Implicite_Stationnaire::readOn(Entree& s)
       exit();
     }
 
+  if(steady_security_facteur_<1.e-08)
+    {
+      Cerr << "steady_security_facteur must be > 1.e-08" << finl;
+      exit();
+    }
+  if(steady_global_dt_<1.e-08)
+    {
+      Cerr << "steady_global_dt  must be > 1.e-08 " << finl;
+      exit();
+    }
 
   return s;
 }
@@ -84,9 +88,9 @@ Entree& Schema_Euler_Implicite_Stationnaire::readOn(Entree& s)
 
 void Schema_Euler_Implicite_Stationnaire::set_param(Param& param)
 {
-  param.ajouter("max_iter_implicite",&nb_ite_max); // XD_ADD_P int not_set
-  param.ajouter( "steady_security_facteur",&steady_security_facteur_); // XD_ADD_P double not_set
-  param.ajouter( "steady_global_dt",&steady_global_dt_);  // XD_ADD_P double not_set
+  param.ajouter("max_iter_implicite",&nb_ite_max);// XD_ADD_P int     Maximum number of iterations allowed for the solver (by default 200)
+  param.ajouter( "steady_security_facteur",&steady_security_facteur_); // XD_ADD_P  double   Parameter used in the local time step calculation procedure in order to  increase or decrease the local dt value (by default 0.5). We expect a strictly positive value
+  param.ajouter( "steady_global_dt",&steady_global_dt_);  // XD_ADD_P double     This is the global time step used in the dual time step algorithm (by default 100). We expect a strictly positive value
 
   Schema_Implicite_base::set_param(param);
 }
@@ -144,7 +148,6 @@ void Schema_Euler_Implicite_Stationnaire::ajouter_inertie(Matrice_Base& mat_mors
 
 void Schema_Euler_Implicite_Stationnaire::calculer_pas_de_temps_local_pb()
 {
-  // pb_base().calculer_pas_de_temps_local(dt_locaux_);
 
   pb_base().equation(0).calculer_pas_de_temps_locaux(dt_locaux_);
   for(int i=1; i< pb_base().nombre_d_equations(); i++)
