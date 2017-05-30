@@ -50,45 +50,11 @@ public :
 
   // pour implicite ajoute l'inertie a la matrice et au scd membre avec pas de temps local
   // virtual void ajouter_inertie_pas_temps_locaux(Matrice_Base& mat_morse,DoubleTab& secmem,const Equation_base& eqn) const;
-  /*
-  inline int steady() const
-  {
-    return steady_;
-  };
-  inline double steady_security_facteur() const
-  {
-    return steady_security_facteur_;
-  };
-  inline double steady_global_dt() const
-  {
-    return steady_global_dt_;
-  };
-  inline void fix_dt_locaux(DoubleVect& dt_locaux)
-  {
-    dt_locaux_= dt_locaux;
-    max_dt_locaux_= dt_locaux.mp_max_abs_vect();
-    dt_locaux_.echange_espace_virtuel();
-  }
-  inline int nb_steps_div0_imposed() const
-  {
-    return nb_steps_div0_imposed_;
-  };
-  inline int div0_imposed() const
-  {
-    return div0_imposed_;
-  };
-  inline void set_div0_imposed(int value)
-  {
-    div0_imposed_ = value;
-  };
-  */
+
 protected:
   double max_dt_locaux_;                     // max  of dt_locaux_
-  //  int steady_;                          // 1 if one wants to use a local time step procedure
   double steady_security_facteur_;  // parameter used in the local time step calculation procedure
   double steady_global_dt_;         // in the local time step procedure, an overall time step is used
-  int nb_steps_div0_imposed_;         //impose div u = 0 each nb_steps_div0_imposed
-  int div0_imposed_;                  // 1 if one wants to impose div u = 0 only every nb_steps_div0_imposed time steps
 };
 
 #endif
