@@ -776,6 +776,8 @@ static void fct_tri_sommet_fa7(const int* in, int* out)
   const int dim = Objet_U::dimension;
   out[0]=in[0];
   out[1]=in[1];
+  for (int i=2; i<dim; i++)
+    out[i]=in[i];
 
   if(out[1]<out[0])
     {

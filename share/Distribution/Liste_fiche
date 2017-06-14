@@ -1,11 +1,14 @@
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/Bullage_Huile_Creuset_Froid NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/Chimie_FT STD
+./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_PhaseChange_1D NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop NNR
+./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hysteresis NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_particles_coupling NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_particles_transfo NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_sloshing NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/IBC_penalisation_poiseuille STD
+./Front_tracking_discontinu/share/Validation/Rapports_automatiques/PB_FT STD
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/ellipsoid_vdf_therm NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/ftd_gravite NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/ftd_remaillage STD
@@ -35,6 +38,12 @@
 ./LES/share/Validation/Rapports_automatiques/les_Re395Pr0025_ToQ_couple NNR
 ./LES/share/Validation/Rapports_automatiques/les_Re395Pr071_T0Q NNR
 ./Rayonnement/share/Validation/Rapports_automatiques/Radiation NNR
+./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/2D_VEF_Cylindre_steady NNR
+./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Cavite_k_eps_2d_steady STD
+./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Marche_k_eps_T_steady NNR
+./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Navier_Stokes_2d_steady STD
+./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Navier_Stokes_3d_steady STD
+./Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/ThHyd_3D_VEF_steady NNR
 ./validation/share/Validation/Rapports_automatiques/Fiches_supplementaires/Validant/Fini/Flow_in_curved_pipe STD
 ./validation/share/Validation/Rapports_automatiques/Fiches_supplementaires/Validant/Fini/GR16_k_eps STD
 ./validation/share/Validation/Rapports_automatiques/Fiches_supplementaires/Validant/Fini/PoiseuillePerio2DVEF_fNcells_prismes STD
@@ -126,3 +135,6 @@
 ./Bas_Reynolds/share/Validation/Rapports_automatiques/Baglietto STD
 ./Bas_Reynolds/share/Validation/Rapports_automatiques/Low_Reynolds STD
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/ConvectionJuarez NNR
+./ALE/share/Validation/Rapports_automatiques/pas_fini/ALE_Poiseuille_VEF_2D NNR
+./validation/share/Validation/Rapports_automatiques/Validant/Bench/FVCAB_Cas_2.2_3D_steady_Stokes_Taylor_Green_vortex STD
+./validation/share/Validation/Rapports_automatiques/Validant/Bench/Vorticite_et_fonction_de_Courant STD
