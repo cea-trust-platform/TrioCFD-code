@@ -34,6 +34,7 @@
 #include <EcritureLectureSpecial.h>
 
 Implemente_instanciable(Modele_EASM_Baglietto_VEF,"Modele_EASM_Baglietto_VEF",Modele_Lam_Bremhorst_VEF);
+// XD EASM_Baglietto Lam_Bremhorst EASM_Baglietto -1 Model described in ' E. Baglietto and H. Ninokata ,  A turbulence model study for simulating flow inside tight lattice rod bundles, Nuclear Engineering and Design, 773--784 (235), 2005. '
 
 // printOn et readOn
 
