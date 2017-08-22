@@ -384,7 +384,7 @@ Echange_contact_rayo_semi_transp_VDF& Echange_contact_rayo_semi_transp_VDF::la_C
         return ref_cast_non_const(Echange_contact_rayo_semi_transp_VDF,lacl.valeur());
     }
 
-  Cerr << "Erreur lors de la recherche de la CL opposee." << endl;
+  Cerr << "Erreur lors de la recherche de la CL opposee." << finl;
   exit();
 
   // Pour le compilo

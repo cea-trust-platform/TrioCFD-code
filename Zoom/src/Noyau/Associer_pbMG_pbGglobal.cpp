@@ -92,7 +92,7 @@ Entree& Associer_pbMG_pbGglobal::interpreter(Entree& is)
   Nom nom1, nom2;
   is >> nom1 >> nom2;
   /*   if(!is){
-       Cerr << "Probleme de lecture dans Associer_pbMG_pbGglobal << endl";
+       Cerr << "Probleme de lecture dans Associer_pbMG_pbGglobal << finl";
        exit();
        } */
   Objet_U& ob1=objet(nom1);

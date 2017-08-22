@@ -479,9 +479,9 @@ void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
           if (num_proc == 0)
             {
               const double temps_sch = schema_temps().temps_courant();
-              cerr << "GB:fac t= " << temps_sch << " f= " << fac << endl;
+              Cerr << "GB:fac t= " << temps_sch << " f= " << fac << finl;
               // ofstream file("fac-maintien-temp.txt");
-              // file << "GB:fac t= " << temps << " f= " << fac << endl;
+              // file << "GB:fac t= " << temps << " f= " << fac << finl;
             }
 
           // Correction du champ de temperature :

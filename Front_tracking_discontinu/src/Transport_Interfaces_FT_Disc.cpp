@@ -765,7 +765,7 @@ int Transport_Interfaces_FT_Disc::verif_Cl() const
     {
       Cerr << "Error in Transport_Interfaces_FT_Disc::verif_Cl():\n"
            << " Boundary conditions for Transport_Interfaces_FT_Disc must be\n"
-           << " of type Paroi_FT_disc (example : \"Paroi_FT_disc symetrie\")" << endl;
+           << " of type Paroi_FT_disc (example : \"Paroi_FT_disc symetrie\")" << finl;
       exit();
     }
   return 1;
@@ -6205,7 +6205,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
         {
           ofstream fout;
           fout.open("composantes_connexes.txt",ios::app);
-          fout << "TEMPS: " << temps << endl;
+          fout << "TEMPS: " << temps << std::endl;
           const int nb_bulles=Positions.dimension(0);
 
           for(int bulle=0; bulle<nb_bulles; bulle++)
@@ -6214,7 +6214,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
               for (int i=0; i <Positions.dimension(1); i++) fout << " " << Positions(bulle,i);
               fout << " vitesse " ;
               for (int i=0; i <Vitesses.dimension(1); i++) fout << " " << Vitesses(bulle,i);
-              fout << endl;
+              fout << std::endl;
             }
           fout.close();
         }

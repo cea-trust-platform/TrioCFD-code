@@ -202,7 +202,7 @@ void Pb_MG::initialiser_champ_front_zoom()
       // Autres types de problemes interdits
       else
         {
-          Cerr << "A Pb_MG can not contain a " << pbF.que_suis_je() << endl;
+          Cerr << "A Pb_MG can not contain a " << pbF.que_suis_je() << finl;
           exit();
         }
     }

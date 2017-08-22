@@ -330,7 +330,7 @@ void Modele_rayo_semi_transp::discretiser(const Discretisation_base& dis)
       exit();
     }
 
-  Cerr << "Modele_rayo_semi_transp::discretiser fin" << endl;
+  Cerr << "Modele_rayo_semi_transp::discretiser fin" << finl;
 }
 
 // On met a jour le flux radiatif pour tous les bords du probleme

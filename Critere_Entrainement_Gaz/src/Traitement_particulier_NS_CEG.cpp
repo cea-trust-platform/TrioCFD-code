@@ -496,7 +496,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               Cerr << "in (x,y,z)=(" << centre_vortex(0) << "," << centre_vortex(1) << "," << centre_vortex(2) << ") ";
               Cerr << "Radius=" << R << " max(critere_Q)=" << critereQ_mp_max;
               //int e = mon_equation->zone_dis().zone().chercher_elements(centre_vortex(0),centre_vortex(1),centre_vortex(2));
-              //if (e>=0) cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << endl;
+              //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }
           // On evalue la vitesse aux points:
           mon_equation->inconnue().valeur().valeur_aux(points,u);

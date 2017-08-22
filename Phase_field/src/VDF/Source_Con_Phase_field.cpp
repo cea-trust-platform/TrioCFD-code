@@ -1842,7 +1842,7 @@ int Source_Con_Phase_field::non_lin_gmres(const DoubleTab& c, const DoubleTab& m
           if(tem<rec_min)
             {
               nk = j+1;
-              // cerr<<"tem="<<tem<<" nk="<<nk<<endl;
+              // Cerr<<"tem="<<tem<<" nk="<<nk<<finl;
               goto l5;
             }
           v0 /= tem;
@@ -1912,7 +1912,7 @@ l5:
       //       Debog::verifier("GMRES Non Lineaire res fin : ",res);
       res = sqrt(res)  ;
 
-      Cerr<<" - At it = "<< it <<", residu scalar = "<< res << endl;
+      Cerr<<" - At it = "<< it <<", residu scalar = "<< res << finl;
 
       if(res<rec_min)
         {

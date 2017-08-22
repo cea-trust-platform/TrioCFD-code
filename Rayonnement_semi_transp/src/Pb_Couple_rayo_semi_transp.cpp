@@ -57,7 +57,7 @@ void Pb_Couple_rayo_semi_transp::initialize( )
           if (sub_type(Source_rayo_semi_transp_base,la_source.valeur()))   // premier cas
             {
               Source_rayo_semi_transp_base& source_rayo=ref_cast(Source_rayo_semi_transp_base,la_source.valeur());
-              Cerr << "Association MODELE a SOURCE" << endl;
+              Cerr << "Association MODELE a SOURCE" << finl;
               source_rayo.associer_modele_rayo(modele());
             }
         }
@@ -100,7 +100,7 @@ void Pb_Couple_rayo_semi_transp::associer_sch_tps_base(Schema_Temps_base& sch)
 
 int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
 {
-  Cerr << "Appel a associer_ "  << ob.que_suis_je() << endl;
+  Cerr << "Appel a associer_ "  << ob.que_suis_je() << finl;
   if(sub_type(Modele_rayo_semi_transp, ob))
     {
       Cerr << "association du modele au pbc" << finl;
@@ -153,7 +153,7 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
 {
   if (le_modele_.non_nul())
     {
-      Cerr << "Attention : on ne peut associer qu'un modele de rayonnement a un Pb_Couple_rayo_semi_transp" << endl;
+      Cerr << "Attention : on ne peut associer qu'un modele de rayonnement a un Pb_Couple_rayo_semi_transp" << finl;
       exit();
     }
   le_modele_ = un_modele_de_rayonnement;
