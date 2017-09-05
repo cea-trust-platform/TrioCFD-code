@@ -159,7 +159,6 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   DoubleVect m_dt(dt_locaux);
   const Nom discr=eqnNS.discretisation().que_suis_je();
   if (discr=="VDF")
-    //eqnNS.solv_masse().get_masse_divide_by_local_dt(m_dt, dt_locaux, 0);
     calcul_mat_masse_diviser_par_dt_vdf(eqnNS, m_dt, dt_locaux);
   else
     calcul_mat_masse_diviser_par_dt_vef(eqnNS, m_dt, dt_locaux);
@@ -279,8 +278,6 @@ void Implicit_steady::calcul_mat_masse_diviser_par_dt_vdf(Navier_Stokes_std& eqn
 {
   const Zone_VDF& la_zone = ref_cast(Zone_VDF,eqnNS.zone_dis().valeur());
   const DoubleVect& volumes_entrelaces=la_zone.volumes_entrelaces();
-
-
   int size=volumes_entrelaces.size_totale();
   // Si rho n'est pas constant
   const DoubleVect& masse_volumique = eqnNS.fluide().masse_volumique().valeurs();

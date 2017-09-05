@@ -1,0 +1,207 @@
+Parameters {
+	Title "Steady hydraulique 2D Turbulent K-Eps VEF: Diffuseur_SKE"
+	Author "mp250145"
+	VersionTrio_U 1.7.5 
+
+	Description Test of the new Time scheme Implicit_Euler_steady_scheme with Solveur implicit_steady using a dual time step for the steady problems
+        Description Comparaison with a reference solution (obtained with the Time scheme "Euler Implicit with Solveur implicit")
+
+	ParametresTrio_U Type of problem: Navier_Stokes_turbulent
+	ParametresTrio_U Turbulence: K_Epsilon
+	ParametresTrio_U Discretizations: VEFPreP1B
+	ParametresTrio_U Type of meshes:  Triangles
+	ParametresTrio_U Pressure solver: PETSC Cholesky
+	ParametresTrio_U Time scheme: Implicit_Euler_steady_scheme with Solveur implicit_steady
+	ParametresTrio_U Convection scheme: amont
+
+	TestCase ./ Cas.data 
+}
+
+Chapitre {
+	Titre "Probes: 1D Plots"
+
+	figure { 
+		title "Pressure along line: P_y10"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Pressure"
+			segment Cas p_y10
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			fichier ./Solution_reference/Cas_P_Y10.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x24"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x24
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X24.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x27"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x27
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X27.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x30"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x30
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X30.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x34"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x34
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X34.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x40"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x40
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X40.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x47"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x47
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X47.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line: U_x53"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment Cas U_x53
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			fichier ./Solution_reference/Cas_U_X53.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Shear rate along line: tauw_y10"
+		include_description_curves 0
+		labelX "X"
+		labelY "Shear rate"
+		Courbe {
+			Legende "Shear rate"
+			segment Cas tauw_y10
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference shear rate solution"
+			fichier ./Solution_reference/Cas_TAUW_Y10.coupe
+			Style linespoints			
+			}
+	}
+}
+
+Chapter {
+	Title "Visualization via VisIt" 
+	visu {
+		title "Steady:VITESSE_X SOM"
+		pseudocolor Cas.lata dom VITESSE_X SOM
+	}
+
+}
+
+Chapitre {
+	Titre "CPU tables"
+
+
+	Tableau {
+		Titre "CPU table "
+		Nb_colonnes 1
+		label  nb_iter 
+		
+		Ligne {
+			Legende "New time scheme"
+			fichier CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)  
+			}
+		Ligne {
+			Legende "Reference solution"
+			fichier ./Solution_reference/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1) 
+			}
+	}
+	
+}
+
+Chapitre {
+	Titre "Conclusion"
+	Description The time scheme 'Implicit_Euler_steady_scheme' reproduces the stationary solution obtain with the time scheme 'Euler_Implicit' while considerably reducing the number of time steps required during the transitory phase. 
+}
+
