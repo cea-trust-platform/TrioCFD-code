@@ -132,6 +132,20 @@ void Schema_Euler_Implicite_Stationnaire::ajouter_inertie(Matrice_Base& mat_mors
           eqn.solv_masse().ajouter_masse_dt_local(dt_locaux_taille_vitesse,secmem,eqn.inconnue().passe(),pen);
           eqn.solv_masse().ajouter_masse_dt_local(dt_locaux_taille_vitesse,mat_morse,pen);
         }
+      else if (dt_locaux.size()*2==secmem.size())
+        {
+          //for (k, eps) en 3d
+          DoubleVect  dt_locaux_taille_vitesse(secmem);
+          int j = 0;
+          for(int i=0; i<dt_locaux_taille_vitesse.size(); i++)
+            {
+              if(i != 0 && i%2 == 0) j++;
+              dt_locaux_taille_vitesse[i]= dt_locaux[j];
+            }
+          dt_locaux_taille_vitesse.echange_espace_virtuel();
+          eqn.solv_masse().ajouter_masse_dt_local(dt_locaux_taille_vitesse,secmem,eqn.inconnue().passe(),pen);
+          eqn.solv_masse().ajouter_masse_dt_local(dt_locaux_taille_vitesse,mat_morse,pen);
+        }
       else
         {
           Cerr<<"The size of the 'dt_locaux' does not match in 'Schema_Temps_base::ajouter_inertie_pas_temps_locaux' !"<<finl;
