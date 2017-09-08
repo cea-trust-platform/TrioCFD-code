@@ -237,20 +237,20 @@ Read pb_solide
                 }
 	     		Definition_champs
         		{
-        		 temperature_max champ_post_reduction_0d
+        		 temperature_max reduction_0d
         		   {
         		     methode max
-			 source Champ_Post_refChamp { Pb_champ pb_solide temperature }
+			 source refChamp { Pb_champ pb_solide temperature }
         		   }
-        		 temperature_min champ_post_reduction_0d
+        		 temperature_min reduction_0d
         		   {
         		     methode min
-			 source Champ_Post_refChamp { Pb_champ pb_solide temperature }
+			 source refChamp { Pb_champ pb_solide temperature }
         		   }	
-         		 temperature_moy champ_post_reduction_0d
+         		 temperature_moy reduction_0d
         		   {
         		     methode moyenne
-			 source Champ_Post_refChamp { Pb_champ pb_solide temperature }
+			 source refChamp { Pb_champ pb_solide temperature }
         		   }	
         		
       			}

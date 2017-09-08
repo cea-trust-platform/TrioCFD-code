@@ -107,27 +107,27 @@ Read pb
  	Definition_champs
 
                         {
-                        Moyenne_U Champ_Post_Statistiques_Moyenne
+                        Moyenne_U Moyenne
 
                                                            {
                                                             t_deb 600.	t_fin 1000.
-                                                           source Champ_Post_refChamp { Pb_champ pb vitesse }
+                                                           source refChamp { Pb_champ pb vitesse }
                                                            }
-                        Ecart_type_U Champ_Post_Statistiques_Ecart_type
+                        Ecart_type_U Ecart_type
                                                            {
                                                             t_deb 600.	t_fin 1000.
-                                                           source Champ_Post_refChamp { Pb_champ pb vitesse }
+                                                           source refChamp { Pb_champ pb vitesse }
                                                            }
-                        Moyenne_temperature Champ_Post_Statistiques_Moyenne
+                        Moyenne_temperature Moyenne
 
                                                            {
                                                             t_deb 600.	t_fin 1000.
-                                                           source Champ_Post_refChamp { Pb_champ pb temperature }
+                                                           source refChamp { Pb_champ pb temperature }
                                                            }
-                        Ecart_type_temperature Champ_Post_Statistiques_Ecart_type
+                        Ecart_type_temperature Ecart_type
                                                            {
                                                             t_deb 600.	t_fin 1000.
-                                                           source Champ_Post_refChamp { Pb_champ pb temperature }
+                                                           source refChamp { Pb_champ pb temperature }
                                                            }
                         } 
 	     format lml

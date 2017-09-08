@@ -325,9 +325,9 @@ definition_champs
 
 Transformation {
                         methode formule expression 1 (2*(I2_natif_dom3+I3m_natif_dom3)/(1e-38+2*(I2_natif_dom3+I3m_natif_dom3)+H3BO3_natif_dom3-0.25))
-                        sources {  Champ_Post_refChamp { Pb_champ pb3 I2 } ,
-			  Champ_Post_refChamp { Pb_champ pb3 I3m } ,
-                         Champ_Post_refChamp { Pb_champ pb3 H3BO3 } }
+                        sources {  refChamp { Pb_champ pb3 I2 } ,
+			  refChamp { Pb_champ pb3 I3m } ,
+                         refChamp { Pb_champ pb3 H3BO3 } }
                 }
 
 
@@ -336,8 +336,8 @@ Transformation {
 
 Transformation {
                         methode formule expression 1 (6.*(IO3m_natif_dom3-0.007)/(6.*(IO3m_natif_dom3-0.007)+(H2BO3m_natif_dom3-0.25)+1e-38))
-                        sources { Champ_Post_refChamp { Pb_champ pb3 IO3m } ,
-                         Champ_Post_refChamp { Pb_champ pb3 H2BO3m } }
+                        sources { refChamp { Pb_champ pb3 IO3m } ,
+                         refChamp { Pb_champ pb3 H2BO3m } }
                 }
 
 

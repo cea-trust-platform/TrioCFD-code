@@ -70,8 +70,8 @@ Read pb
 	{
 
 		Definition_champs {
-			Pmoy Champ_Post_Statistiques_Moyenne {	
-				t_deb 40 t_fin 89 source Champ_Post_refChamp { Pb_champ pb Pression_Pa }
+			Pmoy Moyenne {	
+				t_deb 40 t_fin 89 source refChamp { Pb_champ pb Pression_Pa }
 			}
 		}
 

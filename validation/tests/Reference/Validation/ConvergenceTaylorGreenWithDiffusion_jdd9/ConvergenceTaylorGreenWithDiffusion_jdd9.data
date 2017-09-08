@@ -69,8 +69,8 @@ Read pb
 			u2_plus_v2 transformation
 			{
 				methode produit_scalaire sources { 
-					Champ_Post_refChamp { Pb_champ pb vitesse }  ,
-                         		Champ_Post_refChamp { Pb_champ pb vitesse }
+					refChamp { Pb_champ pb vitesse }  ,
+                         		refChamp { Pb_champ pb vitesse }
 				}
                         }
 			# Calcul du champ energie cinetique Ec(x,y) #

@@ -125,28 +125,28 @@ interf
 }
 	postraitement  {
 		Definition_champs {
-			hauteur1 Champ_Post_Reduction_0D {
+			hauteur1 Reduction_0D {
 				methode moyenne_ponderee
 				source Transformation {
 					methode formule
 					expression 1 exp(-(x*x+z*z)*1000)*(1-indicatrice_interf_natif_dom_pb1)
-					source Champ_Post_refChamp { Pb_champ pb1 indicatrice_interf }
+					source refChamp { Pb_champ pb1 indicatrice_interf }
                         	}
 			}
-			hauteur2 Champ_Post_Reduction_0D {
+			hauteur2 Reduction_0D {
 				methode moyenne_ponderee
 				source Transformation {
 					methode formule
 					expression 1 exp(-(x*x+z*z)*10000)*(1-indicatrice_interf_natif_dom_pb1)
-					source Champ_Post_refChamp { Pb_champ pb1 indicatrice_interf }
+					source refChamp { Pb_champ pb1 indicatrice_interf }
                         	}
 			}
-			hauteur3 Champ_Post_Reduction_0D {
+			hauteur3 Reduction_0D {
 				methode moyenne_ponderee
 				source Transformation {
 					methode formule
 					expression 1 exp(-(x*x+z*z)*100000)*(1-indicatrice_interf_natif_dom_pb1)
-					source Champ_Post_refChamp { Pb_champ pb1 indicatrice_interf }
+					source refChamp { Pb_champ pb1 indicatrice_interf }
                         	}
 			}
 		}
