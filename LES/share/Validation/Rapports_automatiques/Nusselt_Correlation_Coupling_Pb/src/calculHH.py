@@ -74,7 +74,7 @@ def PHI(ficPHI):
 				if (ligne.find('interface')>-1):
 					ligne = f3.readline()
 					ligneT = ligne.strip().split()
-					val_PHI = abs(float(ligneT[10]))
+					val_PHI = abs(float(ligneT[-1]))
 	f3.close()
 	return val_PHI
 

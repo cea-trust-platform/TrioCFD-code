@@ -1,5 +1,5 @@
 # Flux par face sur haut2 au temps 1.000e-05 : 
-# Face a x= 0.000e+00 y= 1.250e-04 z= 1.250e-04 : 2.500e-04 
-# Face a x= 0.000e+00 y= 3.750e-04 z= 1.250e-04 : 0.000e+00 
-# Face a x= 0.000e+00 y= 6.250e-04 z= 1.250e-04 : 0.000e+00 
-# Face a x= 0.000e+00 y= 8.750e-04 z= 1.250e-04 : -5.000e-04 
+# Face a x= 0.000e+00 y= 1.250e-04 z= 1.250e-04 surface_face(m2)= 6.250e-08 flux_par_surface(W/m2)= 4.000e+03 flux(W)= 2.500e-04
+# Face a x= 0.000e+00 y= 3.750e-04 z= 1.250e-04 surface_face(m2)= 6.250e-08 flux_par_surface(W/m2)= 0.000e+00 flux(W)= 0.000e+00
+# Face a x= 0.000e+00 y= 6.250e-04 z= 1.250e-04 surface_face(m2)= 6.250e-08 flux_par_surface(W/m2)= 0.000e+00 flux(W)= 0.000e+00
+# Face a x= 0.000e+00 y= 8.750e-04 z= 1.250e-04 surface_face(m2)= 6.250e-08 flux_par_surface(W/m2)= -8.000e+03 flux(W)= -5.000e-04
