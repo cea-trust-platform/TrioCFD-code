@@ -72,7 +72,8 @@ hydraulique
            turbulence_paroi negligeable
         }
 
-	solveur_pression petsc pipecg { precond ssor { omega 1.6 } seuil 1.e-10 impr }
+	# solveur_pression petsc pipecg { precond ssor { omega 1.6 } seuil 1.e-10 impr } #
+	solveur_pression petsc gcp { precond ssor { omega 1.6 } seuil 1.e-10 impr }
 	convection           { amont }
 	diffusion            { }
 	conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }

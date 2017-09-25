@@ -114,7 +114,8 @@ Lire pb
 {
         Navier_Stokes_turbulent_QC
         {
-                solveur_pression petsc cholesky { }       
+                # solveur_pression petsc cholesky { } #
+                solveur_pression petsc gcp { precond ssor { omega 1.651 } seuil 5.e-11 }
 		convection { amont }
                 diffusion { }
                 Sources 
