@@ -20,7 +20,8 @@ cd EF_stab_alpha_0.2
 cp ../post_run .
 cp ../mesh_tetra_*.med .
 sed "s/Convection { amont }/convection { EF_stab { alpha 0.2 } }/" ../Navier_Stokes_3d_steady.data > Navier_Stokes_3d_steady.data
-sed -i "s/steady_global_dt  500/steady_global_dt  100/"  Navier_Stokes_3d_steady.data
+sed -i "s/steady_global_dt  500/steady_global_dt  50/"  Navier_Stokes_3d_steady.data
+sed -i "s/steady_security_facteur  0.5/steady_security_facteur  0.25/"  Navier_Stokes_3d_steady.data
 cd ..
 
 

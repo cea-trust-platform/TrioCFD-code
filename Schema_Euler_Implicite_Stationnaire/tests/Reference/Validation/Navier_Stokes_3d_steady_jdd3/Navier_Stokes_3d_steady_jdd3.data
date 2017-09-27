@@ -28,7 +28,7 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 VEFPreP1B dis
-# Lire dis { P0 P1 Pa } #
+Lire dis { P0 P1 Pa }
 
 Implicit_Euler_steady_scheme sch
 Read sch
@@ -41,8 +41,8 @@ Read sch
 	dt_sauv 1.e+10
 	seuil_statio 1.e-8
 	facsec 1
-	steady_security_facteur  0.5
- 	steady_global_dt  100
+	steady_security_facteur  0.25
+ 	steady_global_dt  50
 	Solveur implicit_steady {
 	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
 }

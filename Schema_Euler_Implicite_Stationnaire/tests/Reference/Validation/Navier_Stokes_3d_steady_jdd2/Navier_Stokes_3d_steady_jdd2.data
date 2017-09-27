@@ -28,7 +28,7 @@ END PARTITION #
 Scatter DOM.Zones dom
 END SCATTER #
 VEFPreP1B dis
-# Lire dis { P0 P1 Pa } #
+Lire dis { P0 P1 Pa }
 
 Implicit_Euler_steady_scheme sch
 Read sch

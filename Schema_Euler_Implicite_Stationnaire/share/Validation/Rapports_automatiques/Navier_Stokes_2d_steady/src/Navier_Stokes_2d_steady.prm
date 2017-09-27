@@ -22,13 +22,10 @@ Parameters {
 	TestCase P0/EF_stab_alpha_0.2 Navier_Stokes_2d_steady.data 
 	TestCase P0/EF_stab_alpha_0.7 Navier_Stokes_2d_steady.data 
 
-	TestCase P0P1/Amont Navier_Stokes_2d_steady.data 
-	TestCase P0P1/Muscl Navier_Stokes_2d_steady.data 
-	TestCase P0P1/EF_stab_alpha_0.2 Navier_Stokes_2d_steady.data 
-	TestCase P0P1/EF_stab_alpha_0.7 Navier_Stokes_2d_steady.data 
-
-
-
+        TestCase P0P1/Amont Navier_Stokes_2d_steady.data 
+        TestCase P0P1/Muscl Navier_Stokes_2d_steady.data 
+        TestCase P0P1/EF_stab_alpha_0.2 Navier_Stokes_2d_steady.data 
+        TestCase P0P1/EF_stab_alpha_0.7 Navier_Stokes_2d_steady.data 
 
 }
 

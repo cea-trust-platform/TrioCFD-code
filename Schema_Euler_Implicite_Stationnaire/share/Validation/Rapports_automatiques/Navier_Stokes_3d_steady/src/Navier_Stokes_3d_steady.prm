@@ -58,6 +58,474 @@ Chapitre {
 			
 			}
 		Courbe {
+			Legende "Reference pressure solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_P_A1.coupe
+			Style linespoints
+			
+			}
+
+		Courbe {
+			Legende "Pressure: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady P_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference pressure solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_P_A1.coupe
+			Style linespoints
+			
+			}
+
+		Courbe {
+			Legende "Pressure: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady P_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference pressure solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_P_A1.coupe
+			Style linespoints
+			
+			}
+
+		Courbe {
+			Legende "Pressure: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady P_A1
+			Style linespoints
+
+			}
+	}
+
+	figure { 
+		title "Pressure along line X=0.5"
+		include_description_curves 0
+		labelX "Y"
+		labelY "Pression"
+		Courbe {
+			Legende "Exact pressure"
+			segment ./Amont/Navier_Stokes_3d_steady PEX_A2
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference pressure solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_P_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Pressure: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady P_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference pressure solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_P_A2.coupe
+			Style linespoints
+			
+			}
+
+		Courbe {
+			Legende "Pressure: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady P_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference pressure solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_P_A2.coupe
+			Style linespoints
+			
+			}
+
+		Courbe {
+			Legende "Pressure: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady P_A2
+			Style linespoints
+
+			}
+	}
+
+
+	figure { 
+		title "Velocity along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Exact velocity"
+			segment ./Amont/Navier_Stokes_3d_steady VEX_X_A1
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference velocity solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VX_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady VX_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VX_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady VX_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_VX_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady VX_A1
+			Style linespoints
+
+			}
+	}
+
+	figure { 
+		title "Velocity along line X=0.5 "
+		include_description_curves 0
+		labelX "Y"
+		labelY "Vx"
+		Courbe {
+			Legende "Exact velocity"
+			segment ./Amont/Navier_Stokes_3d_steady VEX_X_A2
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference velocity solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VX_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady VX_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VX_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady VX_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_VX_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady VX_A2
+			Style linespoints
+
+			}
+	}
+
+
+		figure { 
+		title "Velocity along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vy"
+		Courbe {
+			Legende "Exact velocity"
+			segment ./Amont/Navier_Stokes_3d_steady VEX_Y_A1
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference velocity solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VY_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady VY_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VY_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady VY_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_VY_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady VY_A1
+			Style linespoints
+
+			}
+
+	}
+
+	figure { 
+		title "Velocity along line X=0.5 "
+		include_description_curves 0
+		labelX "Y"
+		labelY "Vy"
+		Courbe {
+			Legende "Exact velocity"
+			segment ./Amont/Navier_Stokes_3d_steady VEX_Y_A2
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference velocity solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VY_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady VY_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VY_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady VY_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_VY_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady VY_A2
+			Style linespoints
+
+			}
+	}
+
+		figure { 
+		title "Velocity along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vz"
+		Courbe {
+			Legende "Exact velocity"
+			segment ./Amont/Navier_Stokes_3d_steady VEX_Z_A1
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference velocity solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VZ_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady VZ_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VZ_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady VZ_A1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_VZ_A1.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady VZ_A1
+			Style linespoints
+
+			}
+	}
+
+	figure { 
+		title "Velocity along line X=0.5 "
+		include_description_curves 0
+		labelX "Y"
+		labelY "Vz"
+		Courbe {
+			Legende "Exact velocity"
+			segment ./Amont/Navier_Stokes_3d_steady VEX_Z_A2
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Reference velocity solution: Amont"
+			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VZ_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Amont"
+			segment ./Amont/Navier_Stokes_3d_steady VZ_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: Muscl"
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VZ_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: Muscl"
+			segment ./Muscl/Navier_Stokes_3d_steady VZ_A2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Reference velocity solution: EF_stab_alpha_0.2"
+			File ./Solution_reference_EF_stab_alpha_0.2/Navier_Stokes_3d_steady_VZ_A2.coupe
+			Style linespoints
+			
+			}
+		Courbe {
+			Legende "Velocity: EF_stab_alpha_0.2"
+			segment ./EF_stab_alpha_0.2/Navier_Stokes_3d_steady VZ_A2
+			Style linespoints
+
+			}
+	}
+	
+}
+
+Chapter {
+	Title "Visualization via VisIt Convection Amont" 
+
+
+	visu {
+		title "VITESSE_X ELEM"
+		pseudocolor ./Amont/Navier_Stokes_3d_steady.lata dom VITESSE_X ELEM
+	}
+
+	visu {
+		title "VITESSE_SOLUTION_X ELEM"
+		pseudocolor ./Amont/Navier_Stokes_3d_steady.lata dom VITESSE_SOLUTION_X ELEM
+	}
+
+
+}
+
+
+Chapitre {
+	Titre "CPU tables Convection Amont"
+
+
+	Tableau {
+		Titre "CPU table "
+		Nb_colonnes 1
+		label  nb_iter 
+		
+		Ligne {
+			Legende "New time scheme"
+			file ./Amont/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)  
+			}
+		Ligne {
+			Legende "Reference solution"
+			file Solution_reference_Amont/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1) 
+			}
+	}
+	
+}
+Chapter {
+	Title "Convergence Convection Amont" 
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file ./Amont/Navier_Stokes_3d_steady.dt_ev
+			columns ($1) ($4)
+			legend "residue"
+			Style linespoints
+
+		}
+
+	}
+}
+
+Chapitre {
+	Titre "Probes: 1D Plots Convection Amont"
+
+	figure { 
+		title "Pressure along line Y=0.5 "
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Exact pressure"
+			segment ./Amont/Navier_Stokes_3d_steady PEX_A1
+			Style linespoints
+			
+			}
+		Courbe {
 			Legende "Reference pressure solution"
 			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_P_A1.coupe
 			Style linespoints
@@ -156,19 +624,19 @@ Chapitre {
 		labelY "Vy"
 		Courbe {
 			Legende "Exact velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VEX_Y_A1
+			segment ./Muscl/Navier_Stokes_3d_steady VEX_Y_A1
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Reference velocity solution"
-			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VY_A1.coupe
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VY_A1.coupe
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VY_A1
+			segment ./Muscl/Navier_Stokes_3d_steady VY_A1
 			Style linespoints
 
 			}
@@ -181,19 +649,19 @@ Chapitre {
 		labelY "Vy"
 		Courbe {
 			Legende "Exact velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VEX_Y_A2
+			segment ./Muscl/Navier_Stokes_3d_steady VEX_Y_A2
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Reference velocity solution"
-			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VY_A2.coupe
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VY_A2.coupe
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VY_A2
+			segment ./Muscl/Navier_Stokes_3d_steady VY_A2
 			Style linespoints
 
 			}
@@ -206,19 +674,19 @@ Chapitre {
 		labelY "Vz"
 		Courbe {
 			Legende "Exact velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VEX_Z_A1
+			segment ./Muscl/Navier_Stokes_3d_steady VEX_Z_A1
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Reference velocity solution"
-			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VZ_A1.coupe
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VZ_A1.coupe
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VZ_A1
+			segment ./Muscl/Navier_Stokes_3d_steady VZ_A1
 			Style linespoints
 
 			}
@@ -231,64 +699,21 @@ Chapitre {
 		labelY "Vz"
 		Courbe {
 			Legende "Exact velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VEX_Z_A2
+			segment ./Muscl/Navier_Stokes_3d_steady VEX_Z_A2
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Reference velocity solution"
-			File ./Solution_reference_Amont/Navier_Stokes_3d_steady_VZ_A2.coupe
+			File ./Solution_reference_Muscl/Navier_Stokes_3d_steady_VZ_A2.coupe
 			Style linespoints
 			
 			}
 		Courbe {
 			Legende "Velocity"
-			segment ./Amont/Navier_Stokes_3d_steady VZ_A2
+			segment ./Muscl/Navier_Stokes_3d_steady VZ_A2
 			Style linespoints
 
-			}
-	}
-	
-}
-
-Chapter {
-	Title "Visualization via VisIt Convection Amont" 
-
-
-	visu {
-		title "VITESSE_X ELEM"
-		pseudocolor ./Amont/Navier_Stokes_3d_steady.lata dom VITESSE_X ELEM
-	}
-
-	visu {
-		title "VITESSE_SOLUTION_X ELEM"
-		pseudocolor ./Amont/Navier_Stokes_3d_steady.lata dom VITESSE_SOLUTION_X ELEM
-	}
-
-
-}
-
-
-Chapitre {
-	Titre "CPU tables Convection Amont"
-
-
-	Tableau {
-		Titre "CPU table "
-		Nb_colonnes 1
-		label  nb_iter 
-		
-		Ligne {
-			Legende "New time scheme"
-			file ./Amont/CPU_time.dat
-			Nb_colonnes_fichier 2
-			Colonnes ($1)  
-			}
-		Ligne {
-			Legende "Reference solution"
-			file Solution_reference_Amont/CPU_time.dat
-			Nb_colonnes_fichier 2
-			Colonnes ($1) 
 			}
 	}
 	
