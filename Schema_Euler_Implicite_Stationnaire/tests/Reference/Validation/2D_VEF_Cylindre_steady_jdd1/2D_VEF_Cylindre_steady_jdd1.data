@@ -7,15 +7,7 @@ dimension 2
 Pb_hydraulique pb
 Domaine dom
 # BEGIN MESH #
-Read_file dom  keps_2D_VEF_Cyl.geom
-Sous_Zone zone1
-Associate zone1 dom
-Read zone1
-{
-   Rectangle
-   Origine -1. -0.1
-   Cotes 0.2 0.2
-}
+Read_file dom  Cylindre.geom
 # END MESH #
 # BEGIN PARTITION
 Partition dom
@@ -29,9 +21,6 @@ END PARTITION #
 
 # BEGIN SCATTER
 Scatter DOM.Zones dom
-Sous_Zone zone1
-Associate zone1 dom
-Read zone1 { Fichier zone1.ssz }
 END SCATTER #
 
 VEFPreP1B dis
@@ -39,19 +28,19 @@ VEFPreP1B dis
 Implicit_Euler_steady_scheme sch
 Read sch
 {
-	tinit 0.
+    tinit 0.
 	nb_pas_dt_max 3
-	dt_min 1.e-12
-	dt_max 1.e+06
-	dt_impr 1
-	dt_sauv 1.e+06
-	seuil_statio 1.e-12
-	facsec 1
-	steady_security_facteur 30
- 	steady_global_dt  100
-	Solveur implicit_steady {
-	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
-	}
+    dt_min 1.e-12
+    dt_max 1.e+06
+    dt_impr 1
+    dt_sauv 1.e+06
+    seuil_statio 1.e-12
+    facsec 1
+    steady_security_facteur 30
+     steady_global_dt  100
+    Solveur implicit_steady {
+        solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 }
+    }
 }
 
 Fluide_Incompressible fluide
@@ -87,7 +76,7 @@ Read pb
 			}
 		boundary_conditions {
 			CERCLE paroi_fixe
-			INTER frontiere_ouverte_vitesse_imposee champ_front_recyclage { pb_champ_evaluateur pb vitesse 2 }
+			INTER frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 2 y -x
 		} 
 	}
 
