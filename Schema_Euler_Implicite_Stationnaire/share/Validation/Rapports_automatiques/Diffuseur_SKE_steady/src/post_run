@@ -1,8 +1,0 @@
-iter2=`grep -m 1 "Timesteps" Cas.TU | awk '{print $2}'`
-time2=`grep -m 2 "Temps total" Cas.TU | tail -1  | awk '{print $3}'`
-echo "$iter2" "$time2"  > CPU_time.dat
-		
-
-
-
-

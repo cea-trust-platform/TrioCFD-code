@@ -1,3 +1,0 @@
-[ "$TRUST_IN_COPIE_CAS_TEST" = "1" ] && echo on modifie le maillage &&  sed -i "s/50 50/10 10/" cavite.data 
-exit 0
-

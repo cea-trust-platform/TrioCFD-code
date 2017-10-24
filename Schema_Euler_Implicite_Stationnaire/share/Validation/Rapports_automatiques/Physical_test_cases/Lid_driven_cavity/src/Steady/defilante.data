@@ -1,0 +1,117 @@
+# Hydraulique 2D : Paroi defilante #
+# PARALLEL OK 5 #
+dimension 2
+Pb_Hydraulique pb
+Domaine dom
+Lire_med family_names_from_group_names dom square square.med 
+
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFpreP1b dis
+Implicit_Euler_steady_scheme sch
+Read sch
+{
+	tinit 0.
+        nb_pas_dt_max 350
+	dt_min 1.e-16
+	dt_max 1.e+06
+	dt_impr 0.01
+	dt_sauv 1.e+06
+	seuil_statio 1.e-8
+	facsec 1
+	steady_security_facteur 10
+	steady_global_dt  1
+	Solveur implicit_steady {
+	    solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
+}
+}
+
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme 1 0.01
+	rho Champ_Uniforme 1 1.
+}
+
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression GCP { 
+			precond ssor { omega 1.500000 } 
+			seuil 1.000000e-16 
+		}
+		convection { amont }
+		diffusion { }
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			Upper paroi_defilante Champ_Front_Uniforme 2 1. 0.
+			Lower paroi_fixe
+			Outlet paroi_fixe
+			Inlet paroi_fixe
+		}
+               
+	}
+
+	Post_processing
+	{
+		Probes
+		{
+			sonde_pression_1 pression periode 1.e+06 segment 10 0. 0. 1 0.
+			sonde_pression_2 pression periode 1.e+06 segment 10 0. 0.5 1 0.5
+			sonde_pression_3 pression periode 1.e+06 segment 10 0. 1 1 1
+			sonde_pression_4 pression periode 1.e+06 segment 10 0.5 0. 0.5 1 
+
+			sonde_vitesse_x_1 vitessex periode 1.e+06 segment 10 0. 0. 1 0.
+			sonde_vitesse_x_2 vitessex periode 1.e+06 segment 10 0. 0.5 1 0.5
+			sonde_vitesse_x_3 vitessex periode 1.e+06 segment 10 0. 1 1 1
+			sonde_vitesse_x_4 vitessex periode 1.e+06 segment 20 0.5 0. 0.5 1 
+
+			sonde_vitesse_y_1 vitessey periode 1.e+06 segment 10 0. 0. 1 0.
+			sonde_vitesse_y_2 vitessey periode 1.e+06 segment 20 0. 0.5 1 0.5
+			sonde_vitesse_y_3 vitessey periode 1.e+06 segment 10 0. 1 1 1
+			sonde_vitesse_y_4 vitessey periode 1.e+06 segment 10 0.5 0. 0.5 1 
+			
+		}
+                Format lata
+		fields dt_post 1.e+06
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+		}
+	}
+sauvegarde_simple binaire Cas.sauv 
+}
+
+Solve pb
+End
+End

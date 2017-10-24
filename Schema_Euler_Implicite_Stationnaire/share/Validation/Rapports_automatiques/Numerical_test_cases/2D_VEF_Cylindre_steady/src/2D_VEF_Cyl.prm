@@ -1,0 +1,289 @@
+Parameters {
+	Title "Steady Hydraulique 2D VEF Cylindre"
+	Author "mp250145"
+	VersionTrio_U 1.7.3 
+
+	Description Test of the new Time scheme with Solveur implicit_steady using a dual time step for the steady problems
+        Description The time scheme Implicit_Euler_steady_scheme can be seen as a modification of the Euler_Implicit (with Solveur implicit) time scheme in which the time step varies in the domain
+	Description The idea is here to compare the solution obtained with these two time schemes
+        Description Here after the reference solution is the solution obtained with the "Euler_Implicit (with Solveur implicit)"  time scheme
+	Description Warning: this is a numerical test case. We do not look at the physical aspects in detail here.
+
+	ParametresTrio_U Type of problem: Steady Navier-Stokes
+	ParametresTrio_U Discretizations: VEFPreP1B
+	ParametresTrio_U Type of meshes:  Triangles
+	ParametresTrio_U Pressure solver: GCP with SSOR preconditioneur
+	ParametresTrio_U Time scheme: Implicit_Euler_steady_scheme with Solveur implicit_steady
+	ParametresTrio_U Convection scheme: amont
+
+	TestCase . 2D_VEF_Cyl.data /*jdd en annexe*/ 
+}
+
+Chapter {
+	Title "Convergence" 
+
+	figure { 
+		title "Evolution of residue"
+		include_description_curves 0
+		labelX "TIME"
+		labelY "residu=max|Ri|"
+		logX
+		logY
+		curve {
+			file ./2D_VEF_Cyl.dt_ev
+			columns ($1) ($4)
+			legend "residue"
+			Style linespoints
+		}
+	}
+}
+
+Chapitre {
+	Titre "Probes: 1D Plots"
+
+	figure { 
+		title "Pressure along line (-1., -0.75)- (1.,-0.75) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Pressure"
+		Courbe {
+			Legende "Pressure"
+			segment ./2D_VEF_Cyl P_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			fichier ./Solution_reference/2D_VEF_Cyl_P_A1.coupe
+			Style linespoints
+			}
+	}
+
+	figure { 
+		title "Pressure along line (-1. 0.75)  (1. 0.75)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pression"
+		Courbe {
+			Legende "Pression"
+			segment ./2D_VEF_Cyl P_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_P_A2.coupe
+			Style linespoints
+			}
+	}
+	figure { 
+		title "Pressure along line (-0.5, -1)  (-0.5, 1)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pression"
+		Courbe {
+			Legende "Pression"
+			segment ./2D_VEF_Cyl P_B1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_P_B1.coupe
+			Style linespoints
+			}
+	}
+	figure { 
+		title "Pressure along line (0.5, -1)  (0.5, 1)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Pression"
+		Courbe {
+			Legende "Pression"
+			segment ./2D_VEF_Cyl P_B2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference pressure solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_P_B2.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "Velocity along line (-1., -0.75)- (1.,-0.75) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VX_A1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VX_A1.coupe
+			Style linespoints			
+			}
+	}
+
+	figure {
+		title "Velocity along line (-1. 0.75)  (1. 0.75) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VX_A2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VX_A2.coupe
+			Style linespoints
+			}
+	}
+
+	figure { 
+		title "Velocity along line  (-0.5, -1)  (-0.5, 1) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VX_B1
+			Style linespoints			
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VX_B1.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (0.5, -1)  (0.5, 1) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VX_B2
+			Style linespoints			
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VX_B2.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (-1., -0.75)- (1.,-0.75) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VY_A1
+			Style linespoints			
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VY_A1.coupe
+			Style linespoints			
+			}
+	}
+
+	figure { 
+		title "Velocity along line (-1. 0.75)  (1. 0.75)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VY_A2
+			Style linespoints			
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VY_A2.coupe
+			Style linespoints			
+			}
+	}
+	figure { 
+		title "Velocity along line (-0.5, -1)  (-0.5, 1) "
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VY_B1
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VY_B1.coupe
+			Style linespoints
+			}
+	}
+	figure { 
+		title "Velocity along line (0.5, -1)  (0.5, 1)"
+		include_description_curves 0
+		labelX "X"
+		labelY "Vx"
+		Courbe {
+			Legende "Velocity"
+			segment ./2D_VEF_Cyl VY_B2
+			Style linespoints
+			}
+		Courbe {
+			Legende "Reference velocity solution"
+			Fichier ./Solution_reference/2D_VEF_Cyl_VY_B2.coupe
+			Style linespoints
+			}
+	}
+	
+}
+
+Chapter {
+	Title "Visualization via VisIt" 
+	visu {
+		title "MESH"
+		mesh ./2D_VEF_Cyl.lata dom
+	}
+
+	visu {
+		title "VITESSE_X SOM"
+		pseudocolor ./2D_VEF_Cyl.lata dom VITESSE_X SOM
+	}
+
+
+}
+
+
+Chapitre {
+	Titre "CPU tables"
+
+
+	Tableau {
+		Titre "CPU table "
+		Nb_colonnes 1
+		label  nb_iter 
+		
+		Ligne {
+			Legende "New time scheme"
+			fichier CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1)  
+			}
+		Ligne {
+			Legende "Reference solution"
+			fichier Solution_reference/CPU_time.dat
+			Nb_colonnes_fichier 2
+			Colonnes ($1) 
+			}
+	}
+	
+}
+Chapitre {
+	Titre "Conclusion"
+	Description The time scheme 'Implicit_Euler_steady_scheme' reproduces the stationary solution obtain with the time scheme 'Euler_Implicit' while considerably reducing the number of time steps required during the transitory phase. 
+}
+
+

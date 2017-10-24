@@ -1,0 +1,27 @@
+[ "$TRUST_IN_COPIE_CAS_TEST" = "1" ] && echo on modifie le maillage &&  sed -i "s/mesh_tetra_6 mesh_tetra_6.med/mesh_tetra_0 mesh_tetra_0.med/" Navier_Stokes_3d_steady.data 
+
+# Creation des repertoires de calcul #
+mkdir -p Amont Muscl EF_stab_alpha_0.2 
+cd Amont
+cp ../post_run .
+cp ../mesh_tetra_*.med .
+cp ../Navier_Stokes_3d_steady.data .
+cd ..
+
+cd Muscl
+cp ../post_run .
+cp ../mesh_tetra_*.med .
+sed "s/Convection { amont }/convection { muscl }/" ../Navier_Stokes_3d_steady.data > Navier_Stokes_3d_steady.data
+sed -i "s/steady_global_dt  500/steady_global_dt  100/"  Navier_Stokes_3d_steady.data
+sed -i "s/steady_security_facteur  0.5/steady_security_facteur  0.25/"  Navier_Stokes_3d_steady.data
+cd ..
+
+cd EF_stab_alpha_0.2
+cp ../post_run .
+cp ../mesh_tetra_*.med .
+sed "s/Convection { amont }/convection { EF_stab { alpha 0.2 } }/" ../Navier_Stokes_3d_steady.data > Navier_Stokes_3d_steady.data
+sed -i "s/steady_global_dt  500/steady_global_dt  50/"  Navier_Stokes_3d_steady.data
+sed -i "s/steady_security_facteur  0.5/steady_security_facteur  0.25/"  Navier_Stokes_3d_steady.data
+cd ..
+
+
