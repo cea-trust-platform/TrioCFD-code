@@ -1,5 +1,5 @@
 # 2 problemes de Thermohydraulique 2D VEF couplee a 2 problemes de Conduction avec rayonnement de paroi transparent sur un 1 seul probleme fluide #
-# PARALLEL NOT because ERROR with Debog between seq and par #
+# PARALLEL OK #
 dimension 2 
 
 Pb_Thermohydraulique_Turbulent pb1
@@ -202,7 +202,7 @@ Lire pb1
 	{
 		Turbulence_paroi Loi_standard_hydr    
 	}
-	solveur_pression cholesky { }
+	solveur_pression PETSC cholesky { }
 	convection { muscl }
 	diffusion { }
 	sources { boussinesq_temperature { T0 300. } }
@@ -275,7 +275,7 @@ Lire pb3
 {
    Navier_Stokes_standard
    {
-	solveur_pression cholesky { } 
+	solveur_pression PETSC cholesky { } 
 	convection { amont }
 	diffusion { }
 	sources { boussinesq_temperature { T0 200. } }
