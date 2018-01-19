@@ -185,7 +185,6 @@ void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
         tab(face-ndeb,0) = 0;
       else
         tab(face-ndeb,0) = signe*numer_coeff/denum_coeff;
-      //      Cerr<<"tab("<<xv(face,0)<<", "<<xv(face,1)<<") = "<<tab(face-ndeb,0)<<", epsi = "<<epsi<<", nn = "<<nn<<", T = "<<T<<", face = "<<face<<", face-ndeb = "<<face-ndeb<<finl;
     }
   //  Cerr<<"Flux_radiatif_VDF::evaluer_cl_rayonnement() : Fin"<<finl;
   tab.echange_espace_virtuel();
