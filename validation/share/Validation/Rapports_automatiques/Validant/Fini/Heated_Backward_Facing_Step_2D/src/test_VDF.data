@@ -172,8 +172,8 @@ Read pb
 			sonde_T3 temperature periode 0.1 segment 50 0.1634 0.0 0.1634 0.19
 			sonde_T4 temperature periode 0.1 segment 50 0.266 0.0 0.266 0.19
 			sonde_T5 temperature periode 0.1 segment 50 0.57 0.0 0.57 0.19	
-			sonde_TWall temperature_physique periode 0.1 segment 50 0.0 0.0 0.760 0.0
-
+			# temperature_physique=temperature in VDF, changed in V177 #
+			sonde_TWall temperature periode 0.1 segment 50 0.0 0.0 0.760 0.0
 			sonde_V1_longi VitesseX periode 0.1 segment 50 0.038 0.0 0.038 0.19
 			sonde_V2_longi VitesseX periode 0.1 segment 50 0.1216 0.0 0.1216 0.19
 			sonde_V3_longi VitesseX periode 0.1 segment 50 0.171 0.0 0.171 0.19
