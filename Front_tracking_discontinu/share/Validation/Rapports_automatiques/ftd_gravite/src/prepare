@@ -4,5 +4,5 @@
 cd FTD_reprise_xyz_vef_3d && ./prepare 1>prepare.out 2>prepare.err
 export x=`awk '$0~"Backup.*vitesse" && $(NF)>0.0{print $(NF)}' prepare.err`
 echo Instant de reprise $x
-awk '{if ($1=="tinit") printf "	tinit %s", ENVIRON["x"] ; else print}' FTD_reprise_xyz_vef_3d.data >tmp
+awk '{if ($1=="tinit") printf "	tinit %s\n", ENVIRON["x"] ; else print}' FTD_reprise_xyz_vef_3d.data >tmp
 mv tmp FTD_reprise_xyz_vef_3d.data
