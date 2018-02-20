@@ -1,0 +1,1154 @@
+Parametres {
+	Titre "Convergence orders of the EF_stab convection schemes for a 3D steady Navier-Stokes problem"
+
+	ParametresTrio_U Type of problem: steady Navier-Stokes
+	ParametresTrio_U Discretizations: VEF
+	ParametresTrio_U Type of meshes: tetras (divided hexas)
+	ParametresTrio_U Pressure solver: Cholesky
+	ParametresTrio_U Time schemes: explicit Euler
+	ParametresTrio_U Facsec value: at most 1 (in some cases, a value of 0.5, 0.25 or even less is required to reach the stationary treshold of 1e-7 and avoid oscillations of the solution)
+	ParametresTrio_U Diffusion scheme: centered (weak diffusion is required to stabilized the calculations and reach convergence)
+	ParametresTrio_U Convection scheme: EF_stab with varying alpha values (every 0.1 from 0.1 to 1)
+
+	Castest alpha_1/mesh_tetra_trio_0 Cas /*jdd en annexe*/
+	Castest alpha_1/mesh_tetra_trio_1 Cas
+	Castest alpha_1/mesh_tetra_trio_2 Cas
+	Castest alpha_1/mesh_tetra_trio_3 Cas
+	Castest alpha_1/mesh_tetra_trio_4 Cas 2
+	Castest alpha_1/mesh_tetra_trio_5 Cas 4
+	Castest alpha_1/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.9/mesh_tetra_trio_0 Cas
+	Castest alpha_0.9/mesh_tetra_trio_1 Cas
+	Castest alpha_0.9/mesh_tetra_trio_2 Cas
+	Castest alpha_0.9/mesh_tetra_trio_3 Cas
+	Castest alpha_0.9/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.9/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.9/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.8/mesh_tetra_trio_0 Cas
+	Castest alpha_0.8/mesh_tetra_trio_1 Cas
+	Castest alpha_0.8/mesh_tetra_trio_2 Cas
+	Castest alpha_0.8/mesh_tetra_trio_3 Cas
+	Castest alpha_0.8/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.8/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.8/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.7/mesh_tetra_trio_0 Cas
+	Castest alpha_0.7/mesh_tetra_trio_1 Cas
+	Castest alpha_0.7/mesh_tetra_trio_2 Cas
+	Castest alpha_0.7/mesh_tetra_trio_3 Cas
+	Castest alpha_0.7/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.7/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.7/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.6/mesh_tetra_trio_0 Cas
+	Castest alpha_0.6/mesh_tetra_trio_1 Cas
+	Castest alpha_0.6/mesh_tetra_trio_2 Cas
+	Castest alpha_0.6/mesh_tetra_trio_3 Cas
+	Castest alpha_0.6/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.6/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.6/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.5/mesh_tetra_trio_0 Cas
+	Castest alpha_0.5/mesh_tetra_trio_1 Cas
+	Castest alpha_0.5/mesh_tetra_trio_2 Cas
+	Castest alpha_0.5/mesh_tetra_trio_3 Cas
+	Castest alpha_0.5/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.5/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.5/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.4/mesh_tetra_trio_0 Cas
+	Castest alpha_0.4/mesh_tetra_trio_1 Cas
+	Castest alpha_0.4/mesh_tetra_trio_2 Cas
+	Castest alpha_0.4/mesh_tetra_trio_3 Cas
+	Castest alpha_0.4/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.4/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.4/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.3/mesh_tetra_trio_0 Cas
+	Castest alpha_0.3/mesh_tetra_trio_1 Cas
+	Castest alpha_0.3/mesh_tetra_trio_2 Cas
+	Castest alpha_0.3/mesh_tetra_trio_3 Cas
+	Castest alpha_0.3/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.3/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.3/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.2/mesh_tetra_trio_0 Cas
+	Castest alpha_0.2/mesh_tetra_trio_1 Cas
+	Castest alpha_0.2/mesh_tetra_trio_2 Cas
+	Castest alpha_0.2/mesh_tetra_trio_3 Cas
+	Castest alpha_0.2/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.2/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.2/mesh_tetra_trio_6 Cas 6
+
+	Castest alpha_0.1/mesh_tetra_trio_0 Cas
+	Castest alpha_0.1/mesh_tetra_trio_1 Cas
+	Castest alpha_0.1/mesh_tetra_trio_2 Cas
+	Castest alpha_0.1/mesh_tetra_trio_3 Cas
+	Castest alpha_0.1/mesh_tetra_trio_4 Cas 2
+	Castest alpha_0.1/mesh_tetra_trio_5 Cas 4
+	Castest alpha_0.1/mesh_tetra_trio_6 Cas 6
+
+	Auteur "Pierre-Emmanuel Angeli"
+	InclureData 2
+}
+
+Chapitre {
+	Titre "Meshes"
+	Description ""
+	Figure {
+		Title "Tetrahedral meshes (TRIO)"
+		Description "mesh_tetra_trio_0: 384 elements"
+		Description "mesh_tetra_trio_1: 1296 elements"
+		Description "mesh_tetra_trio_2: 3072 elements"
+		Description "mesh_tetra_trio_3: 6000 elements"
+		Description "mesh_tetra_trio_4: 16464 elements"
+		Description "mesh_tetra_trio_5: 34992 elements"
+		Description "mesh_tetra_trio_6: 63888 elements"
+		picture mesh_tetra_trio.png
+		}
+}
+
+Chapitre {
+	Titre "Equations and solution"
+	Description "\latex_($\nabla \cdot \textbf{u} = 0 \text{ on } D = [0;1]^3$\latex_)"
+	Description "\bigskip"
+	Description "\latex_($(\textbf{u} \cdot \nabla) \textbf{u} - \nu \Delta \textbf{u} + \nabla p = 0 \text{ on } D = [0;1]^3$\latex_)"
+	Description "\bigskip"
+	Description "\latex_($\displaystyle{\int_D p(\textbf{x}) d\textbf{x} = 0}$\latex_)"
+	Description "\bigskip"
+	Description "\latex_($\textbf{u}=\textbf{u}_\text{ex} \text{ on boundaries}$\latex_)"
+	Description "\bigskip"
+	Description "Exact solution (independent of viscosity): \latex_($\displaystyle{p_\text{ex} = x^2+y^2+z^2-xy-xz-yz-\frac{1}{4}}$\latex_)"
+	Description "\bigskip"
+	Description "and \latex_($\textbf{u}_\text{ex}=(y-z ; z-x ; x-y)^T$\latex_)"
+	Description "\bigskip"
+	Description "Treated case: \latex_($\nu = 0.001$\latex_)"
+}
+
+Chapitre {
+	Titre "Complexity and accuracy tables"
+	Tableau {
+		Titre "Complexity table"
+		Description "\latex_(\textbf{nuu}\latex_): number of velocity unknowns."
+		Description "\latex_(\textbf{npu}\latex_): number of pressure unknowns."
+		Description "\latex_(\textbf{nnzu}\latex_): number of non-zero terms in the velocity-velocity matrix (only for implicit time schemes)."
+		Description "\latex_(\textbf{nnzp}\latex_): number of non-zero terms in the pressure-pressure matrix."
+		Description "\latex_(\textbf{nnzup}\latex_): number of non-zero terms in the velocity-pressure matrix. Undefined here because no velocity-pressure matrix (use of a projection method)."
+		}
+	Tableau {
+		Nb_colonnes 5
+		label \latex_($\textbf{nuu}$\latex_) | \latex_($\textbf{npu}$\latex_) | \latex_($\textbf{nnzu}$\latex_) | \latex_($\textbf{nnzp}$\latex_) | \latex_($\textbf{nnzup}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_1/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_1/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_1/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_1/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_1/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_1/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_1/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($2) ($3) ($4) ($5) ($6)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table"
+		Description "- Norms of error:"
+		Description "\medskip"
+		Description "\latex_($\textbf{erru}=\frac{\displaystyle{\Big( \int_D \left\Vert \textbf{u}^\varepsilon \right\Vert^2 \Big)^{1/2}}}{\displaystyle{\Big( \int_D \left\Vert \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}}}$\latex_) where \latex_($\textbf{u}^\varepsilon = \textbf{u} - \textbf{u}_\text{ex}$\latex_) and \latex_($\displaystyle{\left\Vert \textbf{u} \right\Vert^2 = \sum_i \left( u_i \right)^2}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\textbf{errgu}=\frac{\displaystyle{\Big( \int_D \left\Vert \nabla \textbf{u}^\varepsilon \right\Vert^2 \Big)^{1/2}}}{\displaystyle{\Big( \int_D \left\Vert \nabla \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}}}$\latex_) where \latex_($\displaystyle{\left\Vert \nabla \textbf{u} \right\Vert^2 = \sum_{i,j} \left(\frac{\partial u_i}{\partial x_j}\right)^2}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\textbf{errp}=\frac{\displaystyle{\Big( \int_D \left| p^\varepsilon \right|^2 \Big)^{1/2}}}{\displaystyle{\Big( \int_D \left| p_\text{ex} \right|^2 \Big)^{1/2}}}$\latex_) where \latex_($\displaystyle{p^\varepsilon = \left(p - \int_D p dV \right) - p_\text{ex}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{errdivu}=\Big( \int_D \left( \nabla \cdot \textbf{u} \right)^2 \Big)^{1/2}}$\latex_)"
+		Description "\medskip"
+		Description "We have: \latex_($\displaystyle{\Big( \int_D \left\Vert \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}=\frac{\sqrt{2}}{2}}$\latex_), \latex_($\displaystyle{\Big( \int_D \left\Vert \nabla \textbf{u}_\text{ex} \right\Vert^2 \Big)^{1/2}=\sqrt{6}}$\latex_) and \latex_($\displaystyle{\Big( \int_D \left| p_\text{ex} \right|^2 \Big)^{1/2}=\frac{\sqrt{15}}{20}}$\latex_)"
+		Description "\bigskip"
+		Description "- Orders of convergence:"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{ordgu}=-d \frac{\ln({\textbf{errgu}_i}) - \ln({\textbf{errgu}_{i-1}})}{\ln(\textbf{nuu}_i) - \ln(\textbf{nuu}_{i-1})}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{ordu}=-d \frac{\ln({\textbf{erru}_i}) - \ln({\textbf{erru}_{i-1}})}{\ln(\textbf{nuu}_i) - \ln(\textbf{nuu}_{i-1})}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{ordp}=-d \frac{\ln({\textbf{errp}_i}) - \ln({\textbf{errp}_{i-1}})}{\ln(\textbf{npu}_i) - \ln(\textbf{npu}_{i-1})}}$\latex_)"
+		Description "\medskip"
+		Description "\latex_($\displaystyle{\textbf{orddivu}=-d \frac{\ln({\textbf{errdivu}_i}) - \ln({\textbf{errdivu}_{i-1}})}{\ln(\textbf{nuu}_i) - \ln(\textbf{nuu}_{i-1})}}$\latex_) (not meaningful here because \latex_(\textbf{errdivu}\latex_) is zero)."
+		Description "\medskip"
+		Description "where d = 3 is the space dimension and \latex_($i \geq 2 $\latex_) the number of the mesh in the mesh family."
+		}
+}
+
+Chapitre {
+	Titre "Orders of convergence in function of the \latex_($\alpha$\latex_) value."
+	Description "Average slope excluding the first two calculations (coarsest meshes)"
+	Tableau {
+		Titre "Table"
+		Nb_colonnes 4
+		label \latex_($\alpha$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{ordp}$\latex_)
+		Ligne {
+			fichier ./ordres0.1.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.2.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.3.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.4.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.5.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.6.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.7.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.8.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres0.9.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		Ligne {
+			fichier ./ordres1.dat
+			Legend ""
+			Nb_colonnes_fichier 4
+			Colonnes ($1) ($2) ($3) ($4)
+			}
+		}
+	Figure {
+		Titre "Graph"
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "alpha"
+		LabelY "order of convergence"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordgu"
+			Fichier ./ordres.dat
+			Colonnes ($1) ($2)
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 1.5
+			}
+		Courbe {
+			Legende "ordu"
+			Fichier ./ordres.dat
+			Colonnes ($1) ($3)
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 1.5
+			}
+		Courbe {
+			Legende "ordp"
+			Fichier ./ordres.dat
+			Colonnes ($1) ($4)
+			Style linespoints
+			TypeLigne 3
+			TypePoints 7
+			PointSize 1.5
+			}
+		}
+	Description "Comment : for velocity (resp. velocity gradient), the order of convergence is strictly decreasing with \latex_($\alpha$\latex_) and is between 1.02 and 1.36 (resp. 0.75 and 0.93). The order of convergence for pressure remains close to unity, in the range [ 0.98 ; 1.08 ]. In all cases, the accuracy is better when decreasing the value of \latex_($\alpha$\latex_) (see graphs and tables below)."
+}
+
+Chapitre {
+	Titre "Plots of errgu, erru and errp"
+	Figure {
+		Titre "errgu"
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "nuu"
+		LabelY "errgu^3"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordgu = 0.5"
+			Fonction 10*x**(-0.5)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "ordgu = 1"
+			Fonction 500*x**(-1)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "alpha = 0.1"
+			Fichier ./alpha_0.1/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.2"
+			Fichier ./alpha_0.2/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.3"
+			Fichier ./alpha_0.3/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 3
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.4"
+			Fichier ./alpha_0.4/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 4
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.5"
+			Fichier ./alpha_0.5/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.6"
+			Fichier ./alpha_0.6/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 6
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.7"
+			Fichier ./alpha_0.7/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 7
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.8"
+			Fichier ./alpha_0.8/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 8
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.9"
+			Fichier ./alpha_0.9/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 9
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 1"
+			Fichier ./alpha_1/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($7)**3
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 1
+			}
+		}
+	Figure {
+		Titre "erru"
+		Titre_figure ""
+		Width 12cm
+		Dimension 2
+		LabelX "nuu"
+		LabelY "erru^3"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordu = 1"
+			Fonction 100*x**(-1)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "ordu = 2"
+			Fonction 500000*x**(-2)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "alpha = 0.1"
+			Fichier ./alpha_0.1/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.2"
+			Fichier ./alpha_0.2/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.3"
+			Fichier ./alpha_0.3/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 3
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.4"
+			Fichier ./alpha_0.4/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 4
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.5"
+			Fichier ./alpha_0.5/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.6"
+			Fichier ./alpha_0.6/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 6
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.7"
+			Fichier ./alpha_0.7/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 7
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.8"
+			Fichier ./alpha_0.8/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 8
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.9"
+			Fichier ./alpha_0.9/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 9
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 1"
+			Fichier ./alpha_1/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($9)**3
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 1
+			}
+		}
+	Figure {
+		Titre "errp"
+		Titre_figure "Interpolation elem"
+		Width 12cm
+		Dimension 2
+		LabelX "npu"
+		LabelY "errp^3"
+		RangeX auto auto
+		LogX
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "ordp = 1"
+			Fonction 1000*x**(-1)
+			Style lines
+			Typeligne 0
+			}
+		Courbe {
+			Legende "alpha = 0.1"
+			Fichier ./alpha_0.1/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 1
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.2"
+			Fichier ./alpha_0.2/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 2
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.3"
+			Fichier ./alpha_0.3/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 3
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.4"
+			Fichier ./alpha_0.4/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 4
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.5"
+			Fichier ./alpha_0.5/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 5
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.6"
+			Fichier ./alpha_0.6/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 6
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.7"
+			Fichier ./alpha_0.7/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 7
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.8"
+			Fichier ./alpha_0.8/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 8
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 0.9"
+			Fichier ./alpha_0.9/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 9
+			TypePoints 7
+			PointSize 1
+			}
+		Courbe {
+			Legende "alpha = 1"
+			Fichier ./alpha_1/Accuracy_TETRA_TRIO.dat
+			Colonnes ($2) ($11)**3
+			Style linespoints
+			TypeLigne 10
+			TypePoints 7
+			PointSize 1
+			}
+		}
+}
+
+Chapitre {
+	Titre "Accuracy tables"
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=1$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_1/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_1/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_1/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_1/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_1/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_1/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_1/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.9$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.9/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.9/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.9/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.9/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.9/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.9/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.9/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.8$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.8/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.8/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.8/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.8/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.8/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.8/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.8/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.7$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.7/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.7/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.7/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.7/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.7/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.7/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.7/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.6$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.6/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.6/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.6/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.6/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.6/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.6/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.6/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.5$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.5/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.5/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.5/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.5/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.5/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.5/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.5/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.4$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.4/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.4/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.4/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.4/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.4/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.4/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.4/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.3$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.3/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.3/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.3/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.3/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.3/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.3/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.3/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.2$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.2/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.2/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.2/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.2/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.2/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.2/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.2/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+	Tableau {
+		Titre "Accuracy table for \latex_($\alpha=0.1$\latex_)"
+		Nb_colonnes 8
+		textsize small
+		label \latex_($\textbf{errgu}$\latex_) | \latex_($\textbf{ordgu}$\latex_) | \latex_($\textbf{erru}$\latex_) | \latex_($\textbf{ordu}$\latex_) | \latex_($\textbf{errp}$\latex_) | \latex_($\textbf{ordp}$\latex_) | \latex_($\textbf{errdivu}$\latex_) | \latex_($\textbf{orddivu}$\latex_)
+		Ligne {
+			Legende "mesh_tetra_trio_0"
+			fichier ./alpha_0.1/mesh_tetra_trio_0/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_1"
+			fichier ./alpha_0.1/mesh_tetra_trio_1/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_2"
+			fichier ./alpha_0.1/mesh_tetra_trio_2/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_3"
+			fichier ./alpha_0.1/mesh_tetra_trio_3/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_4"
+			fichier ./alpha_0.1/mesh_tetra_trio_4/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_5"
+			fichier ./alpha_0.1/mesh_tetra_trio_5/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		Ligne {
+			Legende "mesh_tetra_trio_6"
+			fichier ./alpha_0.1/mesh_tetra_trio_6/Accuracy.dat
+			Nb_colonnes_fichier 14
+			Colonnes ($7) ($8) ($9) ($10) ($11) ($12) ($13) ($14)
+			}
+		}
+}
+
+Chapitre {
+	Titre "Computer performance"
+	Tableau_performance {
+	}
+}

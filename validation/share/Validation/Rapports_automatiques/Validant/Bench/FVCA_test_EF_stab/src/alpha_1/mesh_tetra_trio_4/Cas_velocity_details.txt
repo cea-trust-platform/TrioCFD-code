@@ -1,0 +1,5 @@
+Velocity matrix details: 
+ matrice U nb_colonnes = 102312
+ matrice U nb_lignes = 102312
+ matrice U nb coeff total = 1877810752
+ matrice U nb elements non null = 2085048

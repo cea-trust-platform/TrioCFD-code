@@ -1,0 +1,34 @@
+#!/bin/bash
+
+liste="alpha_0.1  alpha_0.2  alpha_0.3  alpha_0.4  alpha_0.5  alpha_0.6  alpha_0.7  alpha_0.8  alpha_0.9  alpha_1"
+for rep in $liste
+do
+  cp errgu.py $rep
+  cp post_run $rep/mesh_tetra_trio_6
+  cp pre_run $rep/mesh_tetra_trio_4
+  cp pre_run $rep/mesh_tetra_trio_5
+  cp pre_run $rep/mesh_tetra_trio_6
+done
+cp post_run_final alpha_0.1/mesh_tetra_trio_6/post_run
+
+#cp post_run alpha_1/mesh_tetra_trio_6/
+#cp post_run alpha_0.9/mesh_tetra_trio_6/
+#cp post_run alpha_0.8/mesh_tetra_trio_6/
+#cp post_run alpha_0.7/mesh_tetra_trio_6/
+#cp post_run alpha_0.6/mesh_tetra_trio_6/
+#cp post_run alpha_0.5/mesh_tetra_trio_6/
+#cp post_run alpha_0.4/mesh_tetra_trio_6/
+#cp post_run alpha_0.3/mesh_tetra_trio_6/
+#cp post_run alpha_0.2/mesh_tetra_trio_6/
+#cp post_run_final alpha_0.1/mesh_tetra_trio_6/post_run
+
+#cp errgu.py alpha_1/
+#cp errgu.py alpha_0.9/
+#cp errgu.py alpha_0.8/
+#cp errgu.py alpha_0.7/
+#cp errgu.py alpha_0.6/
+#cp errgu.py alpha_0.5/
+#cp errgu.py alpha_0.4/
+#cp errgu.py alpha_0.3/
+#cp errgu.py alpha_0.2/
+#cp errgu.py alpha_0.1/
