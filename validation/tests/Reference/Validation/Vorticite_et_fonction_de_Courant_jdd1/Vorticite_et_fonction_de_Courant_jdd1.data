@@ -101,9 +101,9 @@ Lire pb1
 	{
 		Definition_champs	{
 					vorticite_som	interpolation	{ localisation som source refChamp { pb_champ pb1 vorticite } }
-					# norme_L2_wex = norme L2 de vorticite_exacte #
-					norme_L2_wex	reduction_0D	{
-									methode norme_L2
+					# euclidian_norm_wex = norme L2 de vorticite_exacte #
+					euclidian_norm_wex	reduction_0D	{
+									methode euclidian_norm
 									source transformation	{
 												methode formule
 												expression 1 x+y
@@ -111,9 +111,9 @@ Lire pb1
 												localisation elem
 												}
 									}
-					# norme_L2_w_wex = norme L2 de (vorticite - vorticite_exacte) #
-					norme_L2_w_wex	reduction_0D	{
-									methode norme_L2
+					# euclidian_norm_w_wex = norme L2 de (vorticite - vorticite_exacte) #
+					euclidian_norm_w_wex	reduction_0D	{
+									methode euclidian_norm
 									source transformation	{
 												methode formule expression 1 w-w_ex
 												sources	{
@@ -130,8 +130,8 @@ Lire pb1
 									}
 					errw2		transformation	{
 									methode formule
-									expression 1 norme_L2_w_wex/norme_L2_wex
-									sources_reference { norme_L2_w_wex , norme_L2_wex }
+									expression 1 euclidian_norm_w_wex/euclidian_norm_wex
+									sources_reference { euclidian_norm_w_wex , euclidian_norm_wex }
 									}				
 					# norme_inf_wex = norme infini de vorticite_exacte #
 					norme_inf_wex	reduction_0D	{

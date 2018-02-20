@@ -101,9 +101,9 @@ Lire pb1
 	{
 		Definition_champs	{
 					vorticite_som	interpolation	{ localisation som source refChamp { pb_champ pb1 vorticite } }
-					# norme_L2_wex = norme L2 de vorticite_exacte #
-					norme_L2_wex	reduction_0D	{
-									methode norme_L2
+					# euclidian_norm_wex = norme L2 de vorticite_exacte #
+					euclidian_norm_wex	reduction_0D	{
+									methode euclidian_norm
 									source transformation	{
 												methode formule
 												expression 1 sin(Pi*x)*sin(3*Pi*y)
@@ -111,9 +111,9 @@ Lire pb1
 												localisation elem
 												}
 									}
-					# norme_L2_w_wex = norme L2 de (vorticite - vorticite_exacte) #
-					norme_L2_w_wex	reduction_0D	{
-									methode norme_L2
+					# euclidian_norm_w_wex = norme L2 de (vorticite - vorticite_exacte) #
+					euclidian_norm_w_wex	reduction_0D	{
+									methode euclidian_norm
 									source transformation	{
 												methode formule expression 1 w-w_ex
 												sources	{
@@ -130,8 +130,8 @@ Lire pb1
 									}
 					errw2		transformation	{
 									methode formule
-									expression 1 norme_L2_w_wex/norme_L2_wex
-									sources_reference { norme_L2_w_wex , norme_L2_wex }
+									expression 1 euclidian_norm_w_wex/euclidian_norm_wex
+									sources_reference { euclidian_norm_w_wex , euclidian_norm_wex }
 									}				
 					# norme_inf_wex = norme infini de vorticite_exacte #
 					norme_inf_wex	reduction_0D	{
@@ -208,9 +208,9 @@ Lire pb2
 	{
 		Definition_champs	{
 					psi_som		interpolation	{ localisation som source refChamp { pb_champ pb2 temperature } }
-					# norme_L2_psiex = norme L2 de psi_exacte #
-					norme_L2_psiex	reduction_0D	{
-									methode norme_L2
+					# euclidian_norm_psiex = norme L2 de psi_exacte #
+					euclidian_norm_psiex	reduction_0D	{
+									methode euclidian_norm
 									source transformation	{
 												methode formule
 												expression 1 1/(10*Pi^2)*sin(Pi*x)*sin(3*Pi*y)
@@ -218,10 +218,10 @@ Lire pb2
 												localisation elem
 												}
 									}
-					# norme_L2_psi_psiex = norme L2 de (psi - psi_exacte) #
-					norme_L2_psi_psiex	reduction_0D
+					# euclidian_norm_psi_psiex = norme L2 de (psi - psi_exacte) #
+					euclidian_norm_psi_psiex	reduction_0D
 									{
-									methode norme_L2
+									methode euclidian_norm
 									source transformation	{
 												methode formule expression 1 psi-psiex
 												sources	{
@@ -238,8 +238,8 @@ Lire pb2
 									}
 					errpsi2		transformation	{
 									methode formule
-									expression 1 norme_L2_psi_psiex/norme_L2_psiex
-									sources_reference { norme_L2_psi_psiex , norme_L2_psiex }
+									expression 1 euclidian_norm_psi_psiex/euclidian_norm_psiex
+									sources_reference { euclidian_norm_psi_psiex , euclidian_norm_psiex }
 									}				
 					# norme_inf_psiex = norme infini de psi_exacte #
 					norme_inf_psiex	reduction_0D	{
