@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.7 : Enhancements, modifications and corrected bugs since version 1.7.6 :
 --------------------------------------------------------------------------------------------------
+22/02/18 (TrioCFD) Validation  : Adding prm for the bench FVCA_test_EF_stab
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.6 : Enhancements, modifications and corrected bugs since version 1.7.5 :
 --------------------------------------------------------------------------------------------------

@@ -166,7 +166,7 @@ Read pb
           {
           L2_norme_Id reduction_0D
           {
-              methode norme_L2 source Transformation {  methode formule expression 1 identite  
+              methode euclidian_norm source Transformation {  methode formule expression 1 identite  
                                   source Transformation { methode vecteur expression 2 1.0 0.0 nom_source identite  localisation Faces }
                                                      }
           }
@@ -178,7 +178,7 @@ Read pb
           }
           L2_norme_div reduction_0D
           {
-              methode norme_L2 source Transformation {  methode formule expression 1 divergence 
+              methode euclidian_norm source Transformation {  methode formule expression 1 divergence 
                                 source refChamp { Pb_champ pb divergence_U nom_source divergence } 
 			     }
           }
@@ -190,7 +190,7 @@ Read pb
           }
           L2_norme_err_fluide reduction_0D
           {
-              methode norme_L2 source Transformation 
+              methode euclidian_norm source Transformation 
               {
                        methode formule expression 1 (vitesse-solution)*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
                        sources { 
@@ -216,7 +216,7 @@ Read pb
           }
           L2_norme_solution reduction_0D
           {
-              methode norme_L2 source Transformation 
+              methode euclidian_norm source Transformation 
               {
                        methode formule expression 1 solution*((x-2.)*(x-2.)+(y-2.)*(y-2.)>0.25)*((x-2.)*(x-2.)+(y-2.)*(y-2.)<2.25)
                        source Transformation { methode vecteur expression 2 -(y-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. (x-2.)*(2.25/((x-2.)*(x-2.)+(y-2.)*(y-2.))-5.)/4. nom_source solution localisation Faces }

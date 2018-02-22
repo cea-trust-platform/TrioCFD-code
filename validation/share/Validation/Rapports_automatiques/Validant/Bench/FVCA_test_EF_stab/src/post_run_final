@@ -1,0 +1,180 @@
+# Création des fichiers Accuracy.dat
+# Colonne 1 : taille de mailles
+# Colonne 2 : nuu
+# Colonne 3 : npu
+# Colonne 4 : nnzu
+# Colonne 5 : nnzp
+# Colonne 6 : nnzup
+# Colonne 7 : errgu
+# Colonne 8 : ordgu
+# Colonne 9 : erru
+# Colonne 10 : ordu
+# Colonne 11 : errp
+# Colonne 12 : ordp
+# Colonne 13 : errdivu
+# Colonne 14 : orddivu
+
+# intégrale sur D de norme_gradient_uex_carre (valeur exacte) (4a(1)=pi)
+valex=`echo "scale=20; sqrt(6)" | bc -l`
+
+dim=3
+
+cd ..
+
+visit -cli -s errgu.py -nowin
+
+rm -f */Accuracy.dat
+rm -f Accuracy*.dat
+
+# TETRA (TRIO)
+for i in `seq 0 6`
+do
+
+	if [ $i = 0 ]
+	then
+		size=`grep "mean(volume cells)" mesh_tetra_trio_0/Cas.err | awk '{print $3}'`
+		#elem=`grep "Total number of elements" mesh_tetra_trio_0/Cas.err | awk '{print $6}'`
+		#npu=$elem
+		npu=`grep "matrice P nb_colonnes" mesh_tetra_trio_0/Cas_pressure_details.txt | awk '{print $5}'`
+		faces=`grep "Total number of faces" mesh_tetra_trio_0/Cas.err | awk '{print $6}'`
+		nuu=`echo "$faces * $dim" | bc`
+		nnzp=`grep "matrice P nb elements non null" mesh_tetra_trio_0/Cas_pressure_details.txt | awk '{print $8}'`
+		if [ -f mesh_tetra_trio_0/Cas_velocity_details.txt ] ; then nnzu=`grep "matrice U nb elements non null" mesh_tetra_trio_0/Cas_velocity_details.txt | awk '{print $8}'` ; else nnzu='sch_expl' ; fi
+		#val1=`cat mesh_tetra_trio_0/val.dat | awk '{printf "%.20f", $1}'`	# intégrale sur D de norme_gradient_uex_carre (valeur calculée sur le maillage)
+		val1=$valex
+		val2=`cat mesh_tetra_trio_0/val.dat | awk '{printf "%.20f", $2}'`	# intégrale sur D de norme_gradient_u_uex_carre
+		errgu=`echo "scale=10;sqrt($val2/$val1)" | bc`
+		erru=`cat mesh_tetra_trio_0/Cas_ERRU.son | tail -1 | awk '{printf "%.12f", $2}'`
+		errp_som=`cat mesh_tetra_trio_0/Cas_ERRP.son | tail -1 | awk '{printf "%.12f", $2}'`
+		errp_elem=`cat mesh_tetra_trio_0/Cas_ERRP_ELEM.son | tail -1 | awk '{printf "%.12f", $2}'`
+		#errdivu=`cat mesh_tetra_trio_0/Cas_ERRDIVU.son | tail -1 | awk '{print $2}'`
+		errdivu=`cat mesh_tetra_trio_0/Cas_ERRDIVU.son | tail -1 | awk '{ if ($2 < 0) print -$2; else print $2; fi}'` # valeur absolue de errdivu (peut être négatif si très petit)
+		echo $size" "$nuu" "$npu" "$nnzu" "$nnzp" - "$errgu" - "$erru" - "$errp_elem" - "$errdivu" -" > mesh_tetra_trio_0/Accuracy.dat
+		echo -e $size"\t"$nuu"\t"$npu"\t"$nnzu"\t"$nnzp"\t-\t"$errgu"\t-\t"$erru"\t-\t"$errp_elem"\t-\t"$errdivu"\t-" >> Accuracy_TETRA_TRIO.dat
+		echo -e $npu"\t"$errp_som >> Accuracy_TETRA_TRIO_ERRP_SOM.dat
+	else
+		j=$(($i-1))
+		rep1=mesh_tetra_trio_$j
+		rep2=mesh_tetra_trio_$i
+		size=`grep "mean(volume cells)" $rep2/Cas.err | awk '{print $3}'`
+		#elem1=`grep "Total number of elements" $rep1/Cas.err | awk '{print $6}'`
+		#elem2=`grep "Total number of elements" $rep2/Cas.err | awk '{print $6}'`
+		#npu1=$elem1
+		#npu2=$elem2
+		npu1=`grep "matrice P nb_colonnes" $rep1/Cas_pressure_details.txt | awk '{print $5}'`
+		npu2=`grep "matrice P nb_colonnes" $rep2/Cas_pressure_details.txt | awk '{print $5}'`
+		faces1=`grep "Total number of faces" $rep1/Cas.err | awk '{print $6}'`
+		faces2=`grep "Total number of faces" $rep2/Cas.err | awk '{print $6}'`
+		nuu1=`echo "$faces1 * $dim" | bc`
+		nuu2=`echo "$faces2 * $dim" | bc`
+		nnzp=`grep "matrice P nb elements non null" $rep2/Cas_pressure_details.txt | awk '{print $8}'`
+		#val1_1=`cat $rep1/val.dat | awk '{printf "%.20f", $1}'`	# intégrale sur D de norme_gradient_uex_carre (valeur calculée sur le maillage)
+		val1_1=$valex
+		val2_1=`cat $rep1/val.dat | awk '{printf "%.20f", $2}'`		# intégrale sur D de norme_gradient_u_uex_carre
+		#val1_2=`cat $rep2/val.dat | awk '{printf "%.20f", $1}'`	# intégrale sur D de norme_gradient_uex_carre (valeur calculée sur le maillage)
+		val1_2=$valex
+		val2_2=`cat $rep2/val.dat | awk '{printf "%.20f", $2}'`		# intégrale sur D de norme_gradient_u_uex_carre
+		errgu1=`echo "scale=10;sqrt($val2_1/$val1_1)" | bc`
+		errgu2=`echo "scale=10;sqrt($val2_2/$val1_2)" | bc`
+		if [ -f $rep2/Cas_velocity_details.txt ] ; then nnzu=`grep "matrice U nb elements non null" $rep2/Cas_velocity_details.txt | awk '{print $8}'` ; else nnzu='sch_expl' ; fi
+		erru1=`cat $rep1/Cas_ERRU.son | tail -1 | awk '{printf "%.12f", $2}'`
+		erru2=`cat $rep2/Cas_ERRU.son | tail -1 | awk '{printf "%.12f", $2}'`
+		errp_som1=`cat $rep1/Cas_ERRP.son | tail -1 | awk '{printf "%.12f", $2}'`
+		errp_som2=`cat $rep2/Cas_ERRP.son | tail -1 | awk '{printf "%.12f", $2}'`
+		errp_elem1=`cat $rep1/Cas_ERRP_ELEM.son | tail -1 | awk '{printf "%.12f", $2}'`
+		errp_elem2=`cat $rep2/Cas_ERRP_ELEM.son | tail -1 | awk '{printf "%.12f", $2}'`
+		#errdiv1=`cat $rep1/Cas_ERRDIVU.son | tail -1 | awk '{print $2}'`
+		errdivu1=`cat $rep1/Cas_ERRDIVU.son | tail -1 | awk '{ if ($2 < 0) print -$2; else print $2; fi}'` # valeur absolue de errdivu (peut être négatif si très petit)
+		#errdiv2=`cat $rep2/Cas_ERRDIVU.son | tail -1 | awk '{print $2}'`
+		errdivu2=`cat $rep2/Cas_ERRDIVU.son | tail -1 | awk '{ if ($2 < 0) print -$2; else print $2; fi}'` # valeur absolue de errdivu (peut être négatif si très petit)
+		ordgu=`echo "scale=3;-$dim*(l($errgu2)-l($errgu1))/(l($nuu2)-l($nuu1))" | bc -l`
+		ordu=`echo "scale=3;-$dim*(l($erru2)-l($erru1))/(l($nuu2)-l($nuu1))" | bc -l`
+		ordp=`echo "scale=3;-$dim*(l($errp_elem2)-l($errp_elem1))/(l($npu2)-l($npu1))" | bc -l`
+		echo $size" "$nuu2" "$npu2" "$nnzu" "$nnzp" - "$errgu2" "$ordgu" "$erru2" "$ordu" "$errp_elem2" "$ordp" "$errdivu2" -" > $rep2/Accuracy.dat
+		echo -e $size"\t"$nuu2"\t"$npu2"\t"$nnzu"\t"$nnzp"\t-\t"$errgu2"\t"$ordgu"\t"$erru2"\t"$ordu"\t"$errp_elem2"\t"$ordp"\t"$errdivu2"\t-" >> Accuracy_TETRA_TRIO.dat
+		echo -e $npu2"\t"$errp_som2 >> Accuracy_TETRA_TRIO_ERRP_SOM.dat
+	fi
+done
+
+cd ..
+
+cat alpha_1/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp1
+cat alpha_0.9/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.9
+cat alpha_0.8/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.8
+cat alpha_0.7/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.7
+cat alpha_0.6/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.6
+cat alpha_0.5/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.5
+cat alpha_0.4/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.4
+cat alpha_0.3/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.3
+cat alpha_0.2/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.2
+cat alpha_0.1/Accuracy_TETRA_TRIO.dat | awk '{print $8" "$10" "$12}' > tmp0.1
+
+sed -i '1,3d' tmp1
+sed -i '1,3d' tmp0.9
+sed -i '1,3d' tmp0.8
+sed -i '1,3d' tmp0.7
+sed -i '1,3d' tmp0.6
+sed -i '1,3d' tmp0.5
+sed -i '1,3d' tmp0.4
+sed -i '1,3d' tmp0.3
+sed -i '1,3d' tmp0.2
+sed -i '1,3d' tmp0.1
+
+ordgu1=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp1`
+ordgu09=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.9`
+ordgu08=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.8`
+ordgu07=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.7`
+ordgu06=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.6`
+ordgu05=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.5`
+ordgu04=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.4`
+ordgu03=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.3`
+ordgu02=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.2`
+ordgu01=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$1;} END{print s/n;}' tmp0.1`
+
+ordu1=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp1`
+ordu09=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.9`
+ordu08=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.8`
+ordu07=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.7`
+ordu06=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.6`
+ordu05=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.5`
+ordu04=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.4`
+ordu03=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.3`
+ordu02=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.2`
+ordu01=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$2;} END{print s/n;}' tmp0.1`
+
+ordp1=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp1`
+ordp09=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.9`
+ordp08=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.8`
+ordp07=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.7`
+ordp06=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.6`
+ordp05=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.5`
+ordp04=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.4`
+ordp03=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.3`
+ordp02=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.2`
+ordp01=`awk 'BEGIN{s=0;n=0;} {n++;s=s+$3;} END{print s/n;}' tmp0.1`
+
+rm -f ordres*.dat
+
+echo 0.1" "$ordgu01" "$ordu01" "$ordp01 > ordres0.1.dat
+echo 0.2" "$ordgu02" "$ordu02" "$ordp02 > ordres0.2.dat
+echo 0.3" "$ordgu03" "$ordu03" "$ordp03 > ordres0.3.dat
+echo 0.4" "$ordgu04" "$ordu04" "$ordp04 > ordres0.4.dat
+echo 0.5" "$ordgu05" "$ordu05" "$ordp05 > ordres0.5.dat
+echo 0.6" "$ordgu06" "$ordu06" "$ordp06 > ordres0.6.dat
+echo 0.7" "$ordgu07" "$ordu07" "$ordp07 > ordres0.7.dat
+echo 0.8" "$ordgu08" "$ordu08" "$ordp08 > ordres0.8.dat
+echo 0.9" "$ordgu09" "$ordu09" "$ordp09 > ordres0.9.dat
+echo 1" "$ordgu1" "$ordu1" "$ordp1 > ordres1.dat
+
+echo 0.1" "$ordgu01" "$ordu01" "$ordp01 >> ordres.dat
+echo 0.2" "$ordgu02" "$ordu02" "$ordp02 >> ordres.dat
+echo 0.3" "$ordgu03" "$ordu03" "$ordp03 >> ordres.dat
+echo 0.4" "$ordgu04" "$ordu04" "$ordp04 >> ordres.dat
+echo 0.5" "$ordgu05" "$ordu05" "$ordp05 >> ordres.dat
+echo 0.6" "$ordgu06" "$ordu06" "$ordp06 >> ordres.dat
+echo 0.7" "$ordgu07" "$ordu07" "$ordp07 >> ordres.dat
+echo 0.8" "$ordgu08" "$ordu08" "$ordp08 >> ordres.dat
+echo 0.9" "$ordgu09" "$ordu09" "$ordp09 >> ordres.dat
+echo 1" "$ordgu1" "$ordu1" "$ordp1 >> ordres.dat
+
+rm -f tmp*

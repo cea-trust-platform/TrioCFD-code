@@ -81,9 +81,9 @@ Lire pb
 	Postraitement
 	{
 		Definition_champs	{
-					# norme_L2_norme_uex = norme L2 de la norme de uex (valeur calculée sur le maillage) #				
-					# norme_L2_norme_uex	reduction_0D	{
-										methode norme_L2
+					# euclidian_norm_norme_uex = norme L2 de la norme de uex (valeur calculée sur le maillage) #				
+					# euclidian_norm_norme_uex	reduction_0D	{
+										methode euclidian_norm
 										sources	{
 											transformation	{
 													methode norme
@@ -99,9 +99,9 @@ Lire pb
 													}
 											}
 										} #
-					# norme_L2_norme_uex = norme L2 de la norme de uex (valeur exacte) #
-					norme_L2_norme_uex	transformation	{
-										methode formule expression 1 valeur_exacte*norme_L2_1
+					# euclidian_norm_norme_uex = norme L2 de la norme de uex (valeur exacte) #
+					euclidian_norm_norme_uex	transformation	{
+										methode formule expression 1 valeur_exacte*euclidian_norm_1
 										localisation Faces
 										sources	{
 											transformation	{
@@ -111,8 +111,8 @@ Lire pb
 													nom_source valeur_exacte
 													} ,
 											reduction_0D	{
-													methode norme_L2
-													nom_source norme_L2_1
+													methode euclidian_norm
+													nom_source euclidian_norm_1
 													source transformation	{
 																methode formule expression 1 1
 																localisation Faces
@@ -121,8 +121,8 @@ Lire pb
 											}
 										}
 					# Norme L2 de la norme de u-uex #
-					norme_L2_norme_u_uex	reduction_0D	{
-										methode norme_L2
+					euclidian_norm_norme_u_uex	reduction_0D	{
+										methode euclidian_norm
 										sources	{
 											transformation	{
 													# norme de u-uex #
@@ -149,15 +149,15 @@ Lire pb
 													}
 											}
 										}
-					# erru = norme_L2_norme_u_uex / norme_L2_norme_uex #
+					# erru = euclidian_norm_norme_u_uex / euclidian_norm_norme_uex #
 					erru			transformation	{
 										methode formule
-										expression 1 norme_L2_norme_u_uex/norme_L2_norme_uex
-										sources_reference { norme_L2_norme_u_uex , norme_L2_norme_uex }
+										expression 1 euclidian_norm_norme_u_uex/euclidian_norm_norme_uex
+										sources_reference { euclidian_norm_norme_u_uex , euclidian_norm_norme_uex }
 										}
-					# norme_L2_pex = norme L2 de pex (valeur calculée sur le maillage) #
-					# norme_L2_pex		reduction_0D	{
-										methode norme_L2
+					# euclidian_norm_pex = norme L2 de pex (valeur calculée sur le maillage) #
+					# euclidian_norm_pex		reduction_0D	{
+										methode euclidian_norm
 										source transformation	{
 													methode formule
 													expression 1 -6*pi*sin(2*pi*x)*sin(2*pi*y)*sin(2*pi*z)
@@ -165,9 +165,9 @@ Lire pb
 													localisation som
 													}
 										} #
-					# norme_L2_pex = norme L2 de pex (valeur calculée exacte) #
-					norme_L2_pex		transformation	{
-										methode formule expression 1 valeur_exacte*norme_L2_1
+					# euclidian_norm_pex = norme L2 de pex (valeur calculée exacte) #
+					euclidian_norm_pex		transformation	{
+										methode formule expression 1 valeur_exacte*euclidian_norm_1
 										localisation som
 										sources	{
 											transformation	{
@@ -177,8 +177,8 @@ Lire pb
 													nom_source valeur_exacte
 													} ,
 											reduction_0D	{
-													methode norme_L2
-													nom_source norme_L2_1
+													methode euclidian_norm
+													nom_source euclidian_norm_1
 													source transformation	{
 																methode formule expression 1 1
 																localisation som
@@ -186,8 +186,8 @@ Lire pb
 													}
 											}
 										}
-					norme_L2_pex_elem	transformation	{
-										methode formule expression 1 valeur_exacte*norme_L2_1
+					euclidian_norm_pex_elem	transformation	{
+										methode formule expression 1 valeur_exacte*euclidian_norm_1
 										localisation elem
 										sources	{
 											transformation	{
@@ -197,8 +197,8 @@ Lire pb
 													nom_source valeur_exacte
 													} ,
 											reduction_0D	{
-													methode norme_L2
-													nom_source norme_L2_1
+													methode euclidian_norm
+													nom_source euclidian_norm_1
 													source transformation	{
 																methode formule expression 1 1
 																localisation elem
@@ -206,9 +206,9 @@ Lire pb
 													}
 											}
 										}
-					# norme_L2_p_pex = norme L2 de (p - integrale de p) - pex #
-					norme_L2_p_pex		reduction_0D	{
-										methode norme_L2
+					# euclidian_norm_p_pex = norme L2 de (p - integrale de p) - pex #
+					euclidian_norm_p_pex		reduction_0D	{
+										methode euclidian_norm
 										source transformation	{
 													methode formule expression 1 psom-pmoy-pex
 													localisation som
@@ -237,8 +237,8 @@ Lire pb
 														}
 													}
 										}
-					norme_L2_p_pex_elem	reduction_0D	{
-										methode norme_L2
+					euclidian_norm_p_pex_elem	reduction_0D	{
+										methode euclidian_norm
 										source transformation	{
 													methode formule expression 1 pelem-pmoy-pex
 													localisation elem
@@ -267,28 +267,28 @@ Lire pb
 														}
 													}
 										}
-					# errp = norme_L2_p_pex / norme_L2_pex #
+					# errp = euclidian_norm_p_pex / euclidian_norm_pex #
 					errp			transformation	{
 										methode formule
-										expression 1 norme_L2_p_pex/norme_L2_pex
-										sources_reference { norme_L2_p_pex , norme_L2_pex }
+										expression 1 euclidian_norm_p_pex/euclidian_norm_pex
+										sources_reference { euclidian_norm_p_pex , euclidian_norm_pex }
 										}
 					errp_elem		transformation	{
 										methode formule
-										expression 1 norme_L2_p_pex_elem/norme_L2_pex_elem
-										sources_reference { norme_L2_p_pex_elem , norme_L2_pex_elem }
+										expression 1 euclidian_norm_p_pex_elem/euclidian_norm_pex_elem
+										sources_reference { euclidian_norm_p_pex_elem , euclidian_norm_pex_elem }
 										}
 					# errdivu = norme L2 de la divergence de u #
-					norme_L2_1		reduction_0D	{
-										methode norme_L2
+					euclidian_norm_1		reduction_0D	{
+										methode euclidian_norm
 										source transformation	{
 													methode formule
 													expression 1 1
 													localisation elem
 													}
 										}
-					norme_L2_divu		reduction_0D	{
-										methode norme_L2
+					euclidian_norm_divu		reduction_0D	{
+										methode euclidian_norm
 										sources	{
                                                                                          interpolation { localisation elem 
                                                                                           sources {
@@ -302,9 +302,9 @@ Lire pb
 										}
 					errdivu			transformation	{
 										methode formule
-										expression 1 norme_L2_divu/norme_L2_1
+										expression 1 euclidian_norm_divu/euclidian_norm_1
 										localisation elem
-										sources_reference { norme_L2_divu , norme_L2_1 }
+										sources_reference { euclidian_norm_divu , euclidian_norm_1 }
 										}
 					}
 		Sondes			{
