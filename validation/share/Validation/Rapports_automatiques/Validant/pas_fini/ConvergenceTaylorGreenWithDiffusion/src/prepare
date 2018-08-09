@@ -135,7 +135,7 @@ do
    mkdir -p $rep
    cd $rep
    #rm -f *lata* *.son
-   cp ../post_run ../pre_run .
+   cp ../post_run .
    for REFINE in $REFINES
    do
       if [ $GMSH = 1 ]
@@ -186,8 +186,7 @@ do
       ##########################################
       if [ "$NB_PROCS" != "2" ]
       then
-	 make_PAR.data $REFINE.data
-	 mv -f PAR_$REFINE.data $REFINE.data
+         cp ../pre_run .
       fi
    done
    cd - 1>/dev/null         

@@ -1,9 +1,5 @@
 #!/bin/bash
 
-mkdir -p mesh_VDF
-mkdir -p mesh_VEF
-
-
 # geometrie VDF
 # decoupage du domaine de calcul en 2 proc pour optimisation temps de calcul 
 # Recuperation du nombre de processeurs dans le fichier .prm
@@ -15,11 +11,6 @@ then
    exit -1
 fi
 sed "s/NB_PROCS/$NB_PROCS/" template_dec_VDF.data > dec_VDF.data
-
-cp dec_VDF.data ./mesh_VDF
-cd mesh_VDF
-trust dec_VDF 1>dec_VDF.out 2>dec_VDF.err
-cd ../
 
 # geometrie VEF
 # decoupage du domaine de calcul en 4 proc pour optimisation temps de calcul 
@@ -33,28 +24,26 @@ then
 fi
 sed "s/NB_PROCS/$NB_PROCS/" template_dec_VEF.data > dec_VEF.data
 
-cp dec_VEF.data ./mesh_VEF
-cd mesh_VEF
-trust dec_VEF 1>dec_VEF.out 2>dec_VEF.err
-cd ../
-
 mkdir -p VDF_T0Q
 mkdir -p VEF_RK_Muscl
 mkdir -p VEF_RK_EF_Stab
 
 cd VEF_RK_Muscl
 cp ../post_run .
-ln -s -f ../mesh_VEF/*.Zones .
+cp ../dec_VEF.data .
+cp ../pre_run .
 cd ../
 
 cd VDF_T0Q
 cp ../post_run .
-ln -s -f ../mesh_VDF/*.Zones .
+cp ../dec_VDF.data .
+cp ../pre_run .
 cd ../
 
 cd VEF_RK_EF_Stab
 cp ../post_run .
-ln -s -f ../mesh_VEF/*.Zones .
+cp ../dec_VEF.data .
+cp ../pre_run .
 cd ../
 
 cp les_Re180Pr071_T0Q_VDF.data VDF_T0Q/les_Re180Pr071_T0Q.data

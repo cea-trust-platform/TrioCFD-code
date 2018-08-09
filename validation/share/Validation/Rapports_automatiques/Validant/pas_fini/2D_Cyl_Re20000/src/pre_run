@@ -1,1 +1,3 @@
 #!/bin/bash
+make_PAR.data test.data
+mv -f PAR_test.data test.data

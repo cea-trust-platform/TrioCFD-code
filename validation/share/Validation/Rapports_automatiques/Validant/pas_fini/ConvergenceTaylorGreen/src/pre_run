@@ -1,1 +1,5 @@
 #!/bin/bash
+REFINE=`ls [0-9].data`
+make_PAR.data $REFINE
+mv -f PAR_$REFINE $REFINE
+

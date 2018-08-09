@@ -7,9 +7,9 @@ Calculer()
    EPS=`$TRUST_Awk "BEGIN{printf \"%.3f\", 0.09/0.07/$D*$K^1.5}"`
 }
 
-mkdir -p Re23000/Prepare Re70000/Prepare Decoupage Experimental_data
+mkdir -p Re23000/Prepare Re70000/Prepare Re23000/Decoupage Re70000/Decoupage Experimental_data
 
-gunzip -f Impinging_jet.msh.gz
+gunzip -f Impinging_jet.msh.gz || exit -1
 
 # Caracteristiques de l'air a 20°C
 rho=1.210
@@ -19,29 +19,29 @@ D=0.0265
 Turbulence_rate=0.041
 
 cd Experimental_data
-  tar xvfz ../Experimental_data.tar.gz 1>/dev/null 2>&1
+tar xvfz ../Experimental_data.tar.gz 1>/dev/null 2>&1 || exit -1
 cd ../
 
-cd Decoupage
-  cp -f ../Impinging_jet.data .
-[ ! -f PAR_Impinging_jet.data ] &&   make_PAR.data Impinging_jet.data 1>/dev/null 2>&1
-cd ../
 
 for Re in 23000 70000
 do
   cd Re$Re
-  cp -r ../Decoupage .
- if [ ! -f Impinging_jet.data ] 
-then
-    Calculer
-    sed -e "s?VAL_V?$V?g" -e "s?VAL_RE?$Re?g" -e "s?VAL_K?$K?g" -e "s?VAL_EPS?$EPS?g" ../Prepare.data > Prepare/Prepare.data
-    cd Prepare
-      trust Prepare 1>Prepare.out 2>Prepare.err
-      fichier_V=`ls -art | grep "pb_VITESSE_PERIO" | tail -1`
-      fichier_K=`ls -art | grep "pb_K_EPS_PERIO"   | tail -1`
-    cd ../
-    sed -e "s?VAL_RE?$Re?g" -e "s?VAL_K?$K?g" -e "s?VAL_EPS?$EPS?g" -e "s?FICHIER_PREPARE_V?$fichier_V?g" -e "s?FICHIER_PREPARE_KEPS?$fichier_K?g" ../Decoupage/PAR_Impinging_jet.data > Impinging_jet.data
-    cp -f ../post_run .
-fi
+  cp -f ../Impinging_jet.data Decoupage
+  cp ../Impinging_jet.msh .
+  if [ ! -f Impinging_jet.data ]
+  then
+     cp -f ../Impinging_jet.data .
+     Calculer
+     sed -e "s?VAL_V?$V?g" -e "s?VAL_RE?$Re?g" -e "s?VAL_K?$K?g" -e "s?VAL_EPS?$EPS?g" ../Prepare.data > Prepare/Prepare.data
+     cp ../pre_run .
+     sed -i -e "s?VAL_RE?$Re?g" -e "s?VAL_K?$K?g" -e "s?VAL_EPS?$EPS?g" Decoupage/Impinging_jet.data
+     sed -i -e "s?VAL_RE?$Re?g" -e "s?VAL_K?$K?g" -e "s?VAL_EPS?$EPS?g" Impinging_jet.data
+     sed -i "s/BEGIN SCATTER/BEGIN SCATTER #/; s/END SCATTER/# END SCATTER/ ; s/BEGIN MESH #/BEGIN MESH/ ; s/# END MESH/END MESH/; s/# PARALLEL OK #/# PARALLEL ONLY 10 #/" Impinging_jet.data
+
+
+     sed -i "s/FICHIER_PREPARE_V/pb_VITESSE_PERIO.dat/; s/FICHIER_PREPARE_KEPS/pb_K_EPS_PERIO.dat/" Impinging_jet.data
+
+     cp -f ../post_run .
+  fi
   cd ../
 done

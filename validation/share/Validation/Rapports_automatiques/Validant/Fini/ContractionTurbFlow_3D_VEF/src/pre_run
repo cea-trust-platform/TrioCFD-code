@@ -1,6 +1,11 @@
 #!/bin/bash
+
+make_PAR.data decoupage.data
+
 if [ ! -f pb1_K_EPS_PERIO.dat ]
 then
 tar zxvf box.tgz 
 chmod +w *.dat 
+else
+exit 0
 fi

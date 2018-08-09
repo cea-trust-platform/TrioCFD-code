@@ -23,14 +23,14 @@ done
 
 ## preparation of parallel calculations
 cd MESH_1
-cp ../sudden_contraction_1.asc ../decoupage_4.data .
-make_PAR.data decoupage_4.data
+cp ../sudden_contraction_1.asc .
+cp ../decoupage_4.data decoupage.data
 sed "s/nbproc/4/"  ../sudden_contraction.data  > ./sudden_contraction.data
 cp ../box.mesh1.tgz  box.tgz
 cd ..
 cd REFINED_MESH
-cp ../sudden_contraction_2.asc ../decoupage_12.data .
-make_PAR.data decoupage_12.data
+cp ../sudden_contraction_2.asc .
+cp ../decoupage_12.data decoupage.data
 sed "s/nbproc/12/"  ../sudden_contraction.data  > ./sudden_contraction.data
 cp ../box.refined_mesh.tgz  box.tgz
 cd ..
@@ -40,7 +40,7 @@ for dir in MESH_1/alpha_1 REFINED_MESH/alpha_1 MESH_1/alpha_02 REFINED_MESH/alph
 do
 	cd $dir
 	cp ../../contraction.awk ../../box.awk ../../post_run ../sudden_contraction.data  ../../pre_run ../box.tgz .
-	cp ../*Zones .
+	cp ../decoupage.data ../sudden_contraction_*.asc .
 	cd ../..
 done
 ## modification of the parameter alpha for the contraction

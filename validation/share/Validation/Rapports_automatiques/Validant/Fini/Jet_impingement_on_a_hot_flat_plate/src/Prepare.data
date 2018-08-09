@@ -6,7 +6,7 @@ PrecisionGeom 1e-8
 
 # BEGIN MESH #
 Domaine dom3D
-Lire_Tgrid dom3D ../../Impinging_jet.msh
+Lire_Tgrid dom3D ../Impinging_jet.msh
 VerifierCoin dom3D { }
 
 Domaine dom2D

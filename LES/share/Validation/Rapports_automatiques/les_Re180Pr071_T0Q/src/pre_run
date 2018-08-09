@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "`ls dec_*.data | grep VDF`" != ""  ]
+then
+   trust dec_VDF 1>dec_VDF.out 2>dec_VDF.err || exit -1
+else
+   trust dec_VEF 1>dec_VEF.out 2>dec_VEF.err || exit -1
+fi
