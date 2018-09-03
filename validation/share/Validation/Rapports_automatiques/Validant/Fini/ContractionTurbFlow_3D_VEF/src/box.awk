@@ -118,13 +118,13 @@ awk -v Re=$Re -v yplus=$yplus_calc -v ustar_theo=$ustar_theo -v ustar_calc=$usta
 ### preparation of the inlet profiles for the contration calculations
 tmax=`grep "tmax" $jdd.data| awk '{print $2}' | head -1`
 
-mv pb1_K_EPS_PERIO_"$tmax"*.dat pb1_K_EPS_PERIO.dat
-mv pb1_VITESSE_PERIO_"$tmax"*.dat pb1_VITESSE_PERIO.dat
+mv -f pb1_K_EPS_PERIO_"$tmax"*.dat pb1_K_EPS_PERIO.dat
+mv -f pb1_VITESSE_PERIO_"$tmax"*.dat pb1_VITESSE_PERIO.dat
 
 for dir in ../alpha_1 ../alpha_02
 do
-	cp pb1_K_EPS_PERIO.dat $dir
-	cp pb1_VITESSE_PERIO.dat $dir
+	cp -f pb1_K_EPS_PERIO.dat $dir
+	cp -f pb1_VITESSE_PERIO.dat $dir
 done
 
 exit

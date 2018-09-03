@@ -71,8 +71,8 @@ F=1.10
 mu=0.0000181
 rho=1.15
 # Choix du parallelisme
-NB_PROCS_VDF=""
-NB_PROCS_VEF=""
+NB_PROCS_VDF="" && [ $HOST = castor ] && NB_PROCS_VDF="2"
+NB_PROCS_VEF="" && [ $HOST = castor ] && NB_PROCS_VEF="12"
 # Valeurs calculees
 Reynolds=`echo "$U_IMPOSED*$H/$mu*$rho" | bc -l | awk '{print int($1)}'`
 H_SUR_2=`echo "$H/2" | bc -l`
@@ -201,6 +201,13 @@ read_file dom dom2D.geom" >> dom.geo
    cp ../post_run .
    cp ../pre_run .
    
+   ##########################################
+   # Creation d'un jeu de donnees parallele #
+   ##########################################
+   if [ "$NB_PROCS" != "" ]
+   then
+      cp ../pre_run_castor pre_run
+   fi
    
    ###############################################################
    # Construction d'un jeu de donnees prepare.data pour le pre_run

@@ -9,15 +9,15 @@
 gunzip -c sudden_contraction_2.asc.gz > sudden_contraction_2.asc
 
 ## creation of the different repertories
-mkdir MESH_1
-mkdir REFINED_MESH
+mkdir -p MESH_1
+mkdir -p REFINED_MESH
 
 for dir in MESH_1 REFINED_MESH
 do
 	cd $dir
-	mkdir alpha_1
-	mkdir alpha_02
-	mkdir BOX
+	mkdir -p alpha_1
+	mkdir -p alpha_02
+	mkdir -p BOX
 	cd ..
 done
 
@@ -55,11 +55,13 @@ done
 
 ## preparation of recirculation box
 cd ./MESH_1/BOX
-cp ../../recirculation_box.data ../../sudden_contraction_1.asc ../../box.awk ../../post_run .
+cp ../../recirculation_box.data ../../sudden_contraction_1.asc ../../box.awk .
+cp ../../post_run_box post_run
 cd ../..
 
 cd ./REFINED_MESH/BOX
-cp ../../recirculation_box.data ../../sudden_contraction_2.asc ../../box.awk ../../post_run .
+cp ../../recirculation_box.data ../../sudden_contraction_2.asc ../../box.awk .
+cp ../../post_run_box post_run
 # modification of the mesh
 sed "s/ DOM sudden_contraction_1.asc/ DOM sudden_contraction_2.asc/" recirculation_box.data > modifie.data ; mv modifie.data recirculation_box.data
 cd ../..
