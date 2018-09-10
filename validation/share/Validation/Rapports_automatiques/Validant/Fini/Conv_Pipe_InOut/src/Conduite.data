@@ -4,7 +4,7 @@ dimension 3
 Pb_Thermohydraulique_Turbulent pb
 Domaine dom01234
 
-Scatter ../dom01234.Zones dom01234
+Scatter dom01234.Zones dom01234
 
 VEFPreP1B dis
 

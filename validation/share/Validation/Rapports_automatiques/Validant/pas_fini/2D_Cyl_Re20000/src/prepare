@@ -144,15 +144,13 @@ do
 	    # Copie/create data files
 	    parse ../test.data > test.data
 	    cp ../post_run .
-	    cp ../pre_run .
 
 	    ##########################################
 	    # Creation d'un jeu de donnees parallele #
 	    ##########################################
 	    if [ "$NB_PROCS" != "2" ]
 	    then 
-	       make_PAR.data test.data
-	       mv -f PAR_test.data test.data
+	       cp ../pre_run .
 	    fi
 	    cd - 1>/dev/null 2>&1
 	 done

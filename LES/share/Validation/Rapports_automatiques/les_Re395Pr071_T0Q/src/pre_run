@@ -1,0 +1,4 @@
+#!/bin/bash
+
+$exec geom 1>geom.out 2>geom.err || exit -1
+$exec decoupe 1>decoupe.out 2>decoupe.err

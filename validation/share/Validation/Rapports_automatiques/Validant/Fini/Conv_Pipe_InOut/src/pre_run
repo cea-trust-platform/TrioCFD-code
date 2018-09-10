@@ -1,8 +1,4 @@
 #!/bin/bash
-exit 0
-if [ ! -f ../dom01234.geom ]
-then
-   $exec Tuyau 1>Tuyau.out 2>Tuyau.err
-   mv dom01234.geom ../dom01234.geom
-fi
+$exec Tuyau 1>Tuyau.out 2>Tuyau.err
+trust dec 1>dec.out 2>dec.err
 

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sh ./box.awk recirculation_box
+#sh ./contraction.awk sudden_contraction
+

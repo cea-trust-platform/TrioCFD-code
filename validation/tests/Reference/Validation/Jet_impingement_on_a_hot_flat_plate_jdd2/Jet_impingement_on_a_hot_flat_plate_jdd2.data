@@ -80,7 +80,7 @@ Read pb
 		conditions_initiales { vitesse Champ_Uniforme 3 0. 0. 0. } # Re = 70000 #
 		boundary_conditions
 		{
-			INLET	frontiere_ouverte_vitesse_imposee	Champ_Front_Lu dom 3 Prepare/pb_VITESSE_PERIO_0.150131.dat
+			INLET	frontiere_ouverte_vitesse_imposee	Champ_Front_Lu dom 3 Prepare/pb_VITESSE_PERIO.dat
 			OUTLET	frontiere_ouverte_pression_imposee	Champ_Front_Uniforme 1 0.
 			PIPE	paroi_fixe
 			PLATE	paroi_fixe
@@ -95,7 +95,7 @@ Read pb
 				diffusion { }
 				boundary_conditions
 				{
-					INLET	frontiere_ouverte_K_eps_impose	Champ_Front_Lu dom 2 Prepare/pb_K_EPS_PERIO_0.150131.dat
+					INLET	frontiere_ouverte_K_eps_impose	Champ_Front_Lu dom 2 Prepare/pb_K_EPS_PERIO.dat
 					OUTLET	frontiere_ouverte K_EPS_EXT	Champ_Front_Uniforme 2 1e-4 1e-4
 					PIPE	paroi
 					PLATE	paroi                                             

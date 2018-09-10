@@ -103,7 +103,7 @@ if __name__ == '__main__':
 	#Ligne = lignes[0]
 	#suppression du \n en fin de nom
 	#nomFic = Ligne[:len(Ligne)-1]
-	listFics = glob.glob('*.data')
+	listFics = glob.glob('test.data')
 	if len(listFics)>0:
 		nomFic = listFics[0]
 		properties = readPropertiesData(nomFic)

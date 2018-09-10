@@ -1,0 +1,5 @@
+#!/bin/bash
+
+make_PAR.data TSW_jet.data 4
+exit 0
+

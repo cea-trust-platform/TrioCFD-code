@@ -206,8 +206,7 @@ read_file dom dom2D.geom" >> dom.geo
    ##########################################
    if [ "$NB_PROCS" != "" ]
    then
-      make_PAR.data test.data $NB_PROCS
-      mv -f PAR_test.data test.data
+      cp ../pre_run_castor pre_run
    fi
    
    ###############################################################
