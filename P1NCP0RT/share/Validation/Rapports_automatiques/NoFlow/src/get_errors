@@ -1,0 +1,48 @@
+#!/bin/bash
+# Creates erru_Ra1.dat, erru_Ra100.dat, errp_Ra1.dat and errp_Ra100.dat
+# Each generated file contains 6 columns :
+#   column 1 : total number of elements
+#   column 2 : P0 discretization
+#   column 3 : P1 discretization
+#   column 4 : P0P1 discretization
+#   column 5 : P0RT discretization
+
+Parameter="Ra1 Ra100"
+
+for Ra in $Parameter ; do
+
+   fnameu="erru_"$Ra".dat"
+   fnamep="errp_"$Ra".dat"
+
+   [ -f $fnameu ] && rm $fnameu
+   [ -f $fnamep ] && rm $fnamep
+   
+   printf "# nbelem      P0            P1             P0P1          P0RT\n" >> $fnameu
+   printf "# nbelem      P0            P1             P0P1          P0RT\n" >> $fnamep
+   # Calculs sequentiels 
+   for num in `seq 1 3`; do
+
+        fold1="mesh_"$num"/P0/"$Ra
+        fold2="mesh_"$num"/P1/"$Ra
+        fold3="mesh_"$num"/P0P1/"$Ra
+        fold4="mesh_"$num"/P0RT/"$Ra
+
+        nb=`grep "Total number of elements" $fold1/NoFlow.err | awk '{print $NF}'`
+
+        erru1=`cat $fold1/NoFlow_ERRU.son | tail -1 | awk '{printf "%11.8e", $2}'`
+        erru2=`cat $fold2/NoFlow_ERRU.son | tail -1 | awk '{printf "%11.8e", $2}'`
+        erru3=`cat $fold3/NoFlow_ERRU.son | tail -1 | awk '{printf "%11.8e", $2}'`
+        erru4=`cat $fold4/NoFlow_ERRU.son | tail -1 | awk '{printf "%11.8e", $2}'`
+
+        errp1=`cat $fold1/NoFlow_ERRP.son | tail -1 | awk '{printf "%11.8e", $2}'`
+        errp2=`cat $fold2/NoFlow_ERRP.son | tail -1 | awk '{printf "%11.8e", $2}'`
+        errp3=`cat $fold3/NoFlow_ERRP.son | tail -1 | awk '{printf "%11.8e", $2}'`
+        errp4=`cat $fold4/NoFlow_ERRP.son | tail -1 | awk '{printf "%11.8e", $2}'`
+
+        printf "%6d   %11.8e %11.8e %11.8e %11.8e\n" $nb $erru1 $erru2 $erru3 $erru4 >> $fnameu
+        printf "%6d   %11.8e %11.8e %11.8e %11.8e\n" $nb $errp1 $errp2 $errp3 $errp4 >> $fnamep
+        
+
+  done
+  
+done
