@@ -1,5 +1,5 @@
 # Test case : 2D VEF rotational flow with Nu=0.001 # 
-# P0_RT and P0_RT_B OK #
+# P0_RT OK #
 Dimension 2
 Domaine dom
 

@@ -59,7 +59,7 @@ Parameters {
 
 Chapter {
 	Title "Introduction"
-	Description "This report validates the implementation of two VEF discretizations (called P0 RT and P0 RT_B) in TrioCFD code."
+	Description "This report validates the implementation of two VEF discretizations (called P0 RT) in TrioCFD code."
 	Description "- Usage for P0 RT:"
 	Description " triokeyword(VEFPreP1b) dis"
 	Description " triokeyword(Read) dis  { triokeyword(P0 RT) } "

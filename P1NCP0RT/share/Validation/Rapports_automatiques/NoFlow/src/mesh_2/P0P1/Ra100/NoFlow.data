@@ -1,5 +1,5 @@
-# Test case : 2D VEF Steady state vortex with Re=1 # 
-# P0_RT and P0_RT_B OK #
+# Test case : 2D VEF Steady state vortex with Ra=1 # 
+# P0_RT OK #
 Dimension 2
 Domaine dom
 
@@ -85,7 +85,7 @@ Read pb
         source	transformation
         {
           methode norme
-          localisation faces
+          localisation Faces
           source refChamp { Pb_champ pb vitesse }
         }
 			}
@@ -138,7 +138,6 @@ Read pb
 		{
 			pression som
 			pression elem
-			vitesse som
 			vitesse elem
 			vitesse faces
 		}

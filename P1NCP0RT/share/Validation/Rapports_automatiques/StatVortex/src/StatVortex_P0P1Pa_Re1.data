@@ -1,5 +1,5 @@
 # Test case : 3D VEF Steady state vortex Re=1 # 
-# P0_RT and P0_RT_B OK #
+# P0_RT OK #
 Dimension 3
 Domaine dom
 
