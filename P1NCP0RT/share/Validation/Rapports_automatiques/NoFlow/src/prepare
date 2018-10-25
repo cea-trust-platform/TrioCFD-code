@@ -24,7 +24,12 @@ for Discr in $Discretization ; do
         mkdir -p $fold
 
         MeshFile="Square_h"$num
-        ln -fs $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	if [ $(basename $project_directory) == "P1NCP0RT" ]
+	then
+	    ln -sfn $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	else
+	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	fi
              
         DataFile="NoFlow_"$Discr"_"$Ra".data"
         cp  $DataFile $fold/NoFlow.data

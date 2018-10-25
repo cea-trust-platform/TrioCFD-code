@@ -28,7 +28,12 @@ for Discr in $Discretization ; do
         mkdir -p $fold
 
         MeshFile="mesh_tetra_"$num
-        ln -fs $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	if [ $(basename $project_directory) == "P1NCP0RT" ]
+	then
+	    ln -sfn $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	else
+	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	fi
              
         DataFile="StatVortex_"$Discr"_"$Re".data"
         cp  $DataFile $fold/StatVortex.data
