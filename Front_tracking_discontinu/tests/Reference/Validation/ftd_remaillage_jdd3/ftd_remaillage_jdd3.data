@@ -13,8 +13,7 @@ Dilate DOM 0.0001
 
 # BEGIN PARTITION
 Partition DOM {
-	partitionneur metis { Nb_parts 4 }
-	larg_joint 2
+        partitionneur fichier_decoupage { fichier decoupage }
 	Nom_Zones DOM
 }
 Fin
