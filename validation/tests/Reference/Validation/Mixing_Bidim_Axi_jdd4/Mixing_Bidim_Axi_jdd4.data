@@ -74,7 +74,7 @@ Read pb
 {
 	Navier_Stokes_standard
 	{
-	 	solveur_pression petsc Cholesky { }
+	 	solveur_pression petsc Cholesky_umfpack { }
 		convection { quick }
 		diffusion { }
 		# sources { boussinesq_concentration { C0 Champ_uniforme 1 1. } } #
