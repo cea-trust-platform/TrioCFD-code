@@ -14,7 +14,7 @@ VerifierCoin dom { }
 # BEGIN PARTITION
 Partition dom
 {
-	Partitionneur metis {  Nb_parts 10 }
+	Partitionneur fichier_decoupage { fichier ../decoupage.metis }
 	Larg_joint 2
 	Nom_Zones dom
 	Formatte
