@@ -1,0 +1,362 @@
+Parameters {
+	Title \latex_( $3D$ VEF steady state vortex \latex_)
+	Description \latex_( Validation of the $P_0-RT$ scheme in case of a steady state vortex with $3D$ VEF discretization (see [1]). \latex_)
+	Author "E. Jamelot"
+        TestCase mesh_0/P0/Re1 StatVortex
+        TestCase mesh_1/P0/Re1 StatVortex
+        TestCase mesh_2/P0/Re1 StatVortex
+        TestCase mesh_3/P0/Re1 StatVortex
+        
+        TestCase mesh_0/P1/Re1 StatVortex
+        TestCase mesh_1/P1/Re1 StatVortex
+        TestCase mesh_2/P1/Re1 StatVortex
+        TestCase mesh_3/P1/Re1 StatVortex
+        
+        TestCase mesh_0/P0P1/Re1 StatVortex
+        TestCase mesh_1/P0P1/Re1 StatVortex
+        TestCase mesh_2/P0P1/Re1 StatVortex
+        TestCase mesh_3/P0P1/Re1 StatVortex
+                
+        TestCase mesh_0/P0P1Pa/Re1 StatVortex
+        TestCase mesh_1/P0P1Pa/Re1 StatVortex
+        TestCase mesh_2/P0P1Pa/Re1 StatVortex
+        TestCase mesh_3/P0P1Pa/Re1 StatVortex
+             
+        TestCase mesh_0/P0RT/Re1 StatVortex     
+        TestCase mesh_1/P0RT/Re1 StatVortex
+        TestCase mesh_2/P0RT/Re1 StatVortex
+        TestCase mesh_3/P0RT/Re1 StatVortex
+        
+        TestCase mesh_0/P0/Re100 StatVortex
+        TestCase mesh_1/P0/Re100 StatVortex
+        TestCase mesh_2/P0/Re100 StatVortex
+        TestCase mesh_3/P0/Re100 StatVortex
+        
+        TestCase mesh_0/P1/Re100 StatVortex
+        TestCase mesh_1/P1/Re100 StatVortex
+        TestCase mesh_2/P1/Re100 StatVortex
+        TestCase mesh_3/P1/Re100 StatVortex
+        
+        TestCase mesh_0/P0P1/Re100 StatVortex
+        TestCase mesh_1/P0P1/Re100 StatVortex
+        TestCase mesh_2/P0P1/Re100 StatVortex
+        TestCase mesh_3/P0P1/Re100 StatVortex
+        
+        TestCase mesh_0/P0P1Pa/Re100 StatVortex
+        TestCase mesh_1/P0P1Pa/Re100 StatVortex
+        TestCase mesh_2/P0P1Pa/Re100 StatVortex
+        TestCase mesh_3/P0P1Pa/Re100 StatVortex
+             
+        TestCase mesh_0/P0RT/Re100 StatVortex     
+        TestCase mesh_1/P0RT/Re100 StatVortex
+        TestCase mesh_2/P0RT/Re100 StatVortex
+        TestCase mesh_3/P0RT/Re100 StatVortex
+
+        # Run scripts before building PDF report:
+        Prerequisite sh ./get_errors
+}
+
+
+Chapter {
+	Title "Introduction"
+	Description "This report validates the implementation of two VEF discretizations (called P0 RT) in TrioCFD code."
+	Description "- Usage for P0 RT:"
+	Description " triokeyword(VEFPreP1b) dis"
+	Description " triokeyword(Read) dis  { triokeyword(P0 RT) } "
+	Description "..."
+	Description " triokeyword(Convection) { triokeyword(RT) }"
+} 
+
+
+Chapter {
+     Title \latex_( Equations and analytical solution \latex_)
+     Description \latex_( The problem reads: Find $(\vec{u},p)\in H^1(\Omega)^3\times L^2_0(\Omega)$, $\Omega=[0,1]^3$ such that: \begin{equation}\label{StatVortex} \left\{ \begin{array}{rcl} \displaystyle\frac{\partial\vec{u}}{\partial t}-\Delta\vec{u}+(\vec{u}\cdot\vec{\nabla})\vec{u}+\vec{\nabla}p&=&\vec{f},\\ \vec{\nabla}\cdot\vec{u}&=&0, \end{array} \right. \end{equation} where $\vec{f}$ is the volumic source term given by: $\vec{f}=2(Re-1)\left(2x-y-z,2y-x-z,2z-y-x\right)^t$. \latex_) 
+     Description \latex_( The Dirichlet boundary conditions are given by the exact velocity field: $\vec{u}=(y-z,z-x,x-y)^t$. \latex_) 
+     Description \latex_( The exact pressure solution reads: $p=Re\left(x^2+y^2+z^2-xy-xz-yz-\frac{1}{4}\right)$. \latex_)
+     Description \latex_( We have $||\vec{u}||_0=\displaystyle\frac{1}{\sqrt{2}}$ and $||p||_0=Re\displaystyle\sqrt{\frac{3}{80}}$. \latex_) 
+     Description \latex_( For $P_0$, $P_1$, $P_0P_1$ and $P_0P_1P_a$ approximations, we used the upwind scheme for the convection.\latex_)
+}
+
+
+Chapter {
+	Title \latex_( Errors and convergence with $Re=1$ \latex_)
+  Description \latex_( Let $(\vec{u}_h,p_h)$ be the discrete solution to Equation \eqref{StatVortex}.\latex_)
+	Description \latex_( We consider the following $L^2$-norm errors:\latex_)
+	Description \latex_( $\textbf{erru}=\displaystyle\frac{\left\Vert \vec{u}_h-\vec{u}\right\Vert_0}{\left\Vert \vec{u}\right\Vert_0 }$.\latex_)
+	Description \latex_( $\textbf{errp}=\displaystyle\frac{\left\Vert (p_h-\overline{p}_h)-p \right\Vert_0}{\left\Vert p \right\Vert_0 }$ where $\displaystyle\overline{p}_h=\int_\Omega p_h {\rm d}\vec{x}$.\latex_)
+
+	figure {
+		Titre_figure "erru"
+		labelX "Number of elements"
+		labelY "erru"
+		logX
+		logY
+		include_description_curves 0
+		Width 12cm
+		Legende below
+
+		curve {
+			legend "P0"
+			file erru_Re1.dat
+			columns ($1) ($2)
+			style linespoints
+		}
+		curve {
+			legend "P1"
+			file erru_Re1.dat
+			columns ($1) ($3)
+			style linespoints
+		}
+		curve {
+			legend "P0P1"
+			file erru_Re1.dat
+			columns ($1) ($4)
+			style linespoints
+		}
+		curve {
+			legend "P0P1Pa"
+			file erru_Re1.dat
+			columns ($1) ($5)
+			style linespoints
+		}
+		curve {
+			legend "P0RT"
+			file erru_Re1.dat
+			columns ($1) ($6)
+			style linespoints
+		}
+		Curve {
+			Legende "1st-order"
+			Fonction 0.1*x**(-1)
+			Style lines
+			Typeligne 0
+		}
+	}
+
+
+	figure {
+		Titre_figure "errp"
+		labelX "Number of elements"
+		labelY "errp"
+		logX
+		logY
+		include_description_curves 0
+		Width 12cm
+		Legende below
+		curve {
+			legend "P0"
+			file errp_Re1.dat
+			columns ($1) ($2)
+			style linespoints
+		}
+		curve {
+			legend "P1"
+			file errp_Re1.dat
+			columns ($1) ($3)
+			style linespoints
+		}
+		curve {
+			legend "P0P1"
+			file errp_Re1.dat
+			columns ($1) ($4)
+			style linespoints
+		}
+		curve {
+			legend "P0P1Pa"
+			file errp_Re1.dat
+			columns ($1) ($5)
+			style linespoints
+		}
+		curve {
+			legend "P0RT"
+			file errp_Re1.dat
+			columns ($1) ($6)
+			style linespoints
+		}
+		Curve {
+			Legende "1st-order"
+			Fonction 50*x**(-1)
+			Style lines
+			Typeligne 0
+		}
+	}
+}
+
+
+Chapter {
+	Title \latex_( Errors and convergence with $Re=100$ \latex_)
+  Description \latex_( Let $(\vec{u}_h,p_h)$ be the discrete solution to Equation \eqref{StatVortex}.\latex_)
+	Description \latex_( We consider the following $L^2$-norm errors:\latex_)
+	Description \latex_( $\textbf{erru}=\displaystyle\frac{\left\Vert \vec{u}_h-\vec{u}\right\Vert_0}{\left\Vert \vec{u}\right\Vert_0 }$.\latex_)
+	Description \latex_( $\textbf{errp}=\displaystyle\frac{\left\Vert (p_h-\overline{p}_h)-p \right\Vert_0}{\left\Vert p \right\Vert_0 }$ where $\displaystyle\overline{p}_h=\int_\Omega p_h {\rm d}\vec{x}$.\latex_)
+	
+	figure {
+		Titre_figure "erru"
+		labelX "Number of elements"
+		labelY "erru"
+		logX
+		logY
+		include_description_curves 0
+		Width 12cm
+		Legende below
+		curve {
+			legend "P0"
+			file erru_Re100.dat
+			columns ($1) ($2)
+			style linespoints
+		}
+		curve {
+			legend "P1"
+			file erru_Re100.dat
+			columns ($1) ($3)
+			style linespoints
+		}
+		curve {
+			legend "P0P1"
+			file erru_Re100.dat
+			columns ($1) ($4)
+			style linespoints
+		}
+		curve {
+			legend "P0P1Pa"
+			file erru_Re100.dat
+			columns ($1) ($5)
+			style linespoints
+		}
+		curve {
+			legend "P0RT"
+			file erru_Re100.dat
+			columns ($1) ($6)
+			style linespoints
+		}
+		Curve {
+			Legende "1st-order"
+			Fonction 0.1*x**(-1)
+			Style lines
+			Typeligne 0
+		}
+	}
+
+	figure {
+		Titre_figure "errp"
+		labelX "Number of elements"
+		labelY "errp"
+		logX
+		logY
+		include_description_curves 0
+		Width 12cm
+		Legende below
+		curve {
+			legend "P0"
+			file errp_Re100.dat
+			columns ($1) ($2)
+			style linespoints
+		}
+		curve {
+			legend "P1"
+			file errp_Re100.dat
+			columns ($1) ($3)
+			style linespoints
+		}
+		curve {
+			legend "P0P1"
+			file errp_Re100.dat
+			columns ($1) ($4)
+			style linespoints
+		}
+		curve {
+			legend "P0P1Pa"
+			file errp_Re100.dat
+			columns ($1) ($5)
+			style linespoints
+		}
+		curve {
+			legend "P0RT"
+			file errp_Re100.dat
+			columns ($1) ($6)
+			style linespoints
+		}
+		Curve {
+			Legende "1st-order"
+			Fonction 10*x**(-1)
+			Style lines
+			Typeligne 0
+		}
+	}
+}
+
+
+Chapter {
+	Title \latex_( Pressure profile and velocity vectors on $z=0.5$ plane, $Re=1$ \latex_)
+
+	visu {
+		Title \latex_( $Re=1$, $P_0$, mesh $3$ \latex_)
+		Description "Pressure profile"
+		pseudocolor  mesh_3/P0/Re1/StatVortex.lata dom PRESSION SOM
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "Velocity vectors"
+		vector mesh_3/P0/Re1/StatVortex.lata dom_dual VITESSE FACES
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+	}
+	visu {
+		Title \latex_( $Re=1$, $P_0-RT$, mesh $3$ \latex_)
+		Description "Pressure profile"
+		pseudocolor  mesh_3/P0RT/Re1/StatVortex.lata dom PRESSION SOM
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "Velocity vectors"
+		vector mesh_3/P0RT/Re1/StatVortex.lata dom_dual VITESSE FACES
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+	}
+}
+
+Chapter {
+	
+	Title \latex_( Pressure profile and velocity vectors on $z=0.5$ plane, $Re=100$ \latex_)
+
+	visu {
+		Title \latex_($Re=100$, $P_0$, mesh $3$ \latex_)
+		Description "Pressure profile"
+		pseudocolor  mesh_3/P0/Re100/StatVortex.lata dom PRESSION SOM
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "Velocity vectors"
+		vector mesh_3/P0/Re100/StatVortex.lata dom_dual VITESSE FACES
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+	}
+	Visu {
+		Title \latex_($Re=100$, $P_0-RT$, mesh $3$ \latex_)
+		Description "Pressure profile"
+		pseudocolor  mesh_3/P0RT/Re100/StatVortex.lata dom PRESSION SOM
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+		nb_img_without_newline 2
+	}
+	Visu {
+		Description "Velocity vectors"
+		vector mesh_3/P0RT/Re100/StatVortex.lata dom_dual VITESSE FACES
+		operator slice2d 0. 0. 0.  0. 0. 0.5
+		Width 7.9cm
+	}
+}
+Chapter 
+{
+	Title "References"
+	Description "\latex_( [1] E. Jamelot - A proposal to improve the stability of the $P_1^{NC}-P_0$ scheme in the TrioCFD Code - DEN/DANS/DM2S/STMF/LMSF/NT/2018-62465/A \latex_)"
+}
+	
+
+

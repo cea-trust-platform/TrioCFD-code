@@ -1,0 +1,43 @@
+#!/bin/bash
+echo "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+# P1 #
+sed "s/Read dis { P0 }/Read dis { P1 }/" RotFlow_P0_Mu1.data >   RotFlow_P1_Mu1.data
+sed "s/Read dis { P0 }/Read dis { P1 }/" RotFlow_P0_Mu0001.data > RotFlow_P1_Mu0001.data
+
+# P0P1 #
+sed "s/Read dis { P0 }/Read dis { P0 P1 }/" RotFlow_P0_Mu1.data >   RotFlow_P0P1_Mu1.data
+sed "s/Read dis { P0 }/Read dis { P0 P1 }/" RotFlow_P0_Mu0001.data > RotFlow_P0P1_Mu0001.data
+
+# P0RT #
+sed "s/Read dis { P0 }/Read dis { P0 RT }/;s/Convection { amont }/Convection { RT }/" RotFlow_P0_Mu1.data >   RotFlow_P0RT_Mu1.data
+sed "s/Read dis { P0 }/Read dis { P0 RT }/;s/Convection { amont }/Convection { RT }/" RotFlow_P0_Mu0001.data > RotFlow_P0RT_Mu0001.data
+
+# Folders & Data files generation #
+
+Parameter="Mu1 Mu0001"
+Discretization="P0 P1 P0P1 P0RT"
+for Discr in $Discretization ; do
+  for Mu in $Parameter ; do
+    for num in `seq 1 3`; do
+
+        fold="mesh_"$num"/"$Discr"/"$Mu
+        mkdir -p $fold
+
+        MeshFile="Square_h"$num
+	echo "basename = "$(basename $project_directory)
+	if [ $(basename $project_directory) == "P1NCP0RT" ]
+	then
+	    echo "I recherche de "$MeshFile".med dans "
+	    ls -lrt $project_directory/share/Validation/Rapports_automatiques/mesh/
+	    ln -sfn $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	else
+	    echo "II recherche de "$MeshFile".med dans "
+	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	fi
+             
+        DataFile="RotFlow_"$Discr"_"$Mu".data"
+        cp  $DataFile $fold/RotFlow.data
+        sed -i "s/ Square_h1 Square_h1.med/ $MeshFile $MeshFile.med/" $fold/RotFlow.data
+    done
+  done
+done

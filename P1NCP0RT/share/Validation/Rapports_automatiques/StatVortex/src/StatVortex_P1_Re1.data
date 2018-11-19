@@ -1,0 +1,171 @@
+# Test case : 3D VEF Steady state vortex Re=1 # 
+# P0_RT OK #
+Dimension 3
+Domaine dom
+
+# BEGIN MESH #
+Read_med family_names_from_group_names dom mesh_tetra_0 mesh_tetra_0.med
+VerifierCoin dom { }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER 
+Scatter DOM.Zones dom
+END SCATTER #
+
+VEFPreP1b dis
+Read dis { P1 }
+
+Scheme_euler_implicit sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3000
+	dt_min 1e-6
+	dt_max 1e+10
+	dt_impr 1e-6
+	dt_sauv 1.e+10
+	facsec 500
+	facsec_max 500
+	# Value of the convergence threshold #
+	seuil_statio 1.e-10
+	solveur implicite { Solveur GMRES { diag seuil 1.e-13 controle_residu 1 nb_it_max 5 impr } }
+	precision_impr 8
+}
+
+Fluide_Incompressible fluide
+Read fluide
+{
+	mu Champ_Uniforme   1 1.
+	rho Champ_Uniforme  1 1.
+}
+
+Pb_Hydraulique pb
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+Discretize pb dis
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		Solveur_pression PETSC Cholesky { }
+		Convection { amont }
+		Diffusion { }
+		Initial_Conditions {
+			vitesse champ_fonc_xyz dom 3 y-z z-x x-y
+		}
+		Boundary_Conditions {
+			Gauche   frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
+			Droite   frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y 
+			Bas      frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
+			Haut     frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
+			Derriere frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
+			Devant   frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
+		}
+   		Sources {
+			Source_Qdm champ_fonc_xyz dom 3 0. 0. 0.
+		}
+	}
+
+	Post_processing
+	{
+		Definition_champs
+		{
+			# Norme L2 de la norme de u-uex #
+			norme_L2_norme_u_uex reduction_0D {
+				methode L2_norm
+				source transformation {
+					# norme de u-uex #
+					methode norme
+					localisation Faces
+					source transformation {
+						methode formule expression 1 u-uex
+						nom_source u_uex
+						localisation Faces
+						sources {
+							refChamp { Pb_champ pb vitesse nom_source u } ,
+							# expression de uex #
+							transformation {
+								methode vecteur
+								expression 3 y-z z-x x-y
+								nom_source uex
+								localisation Faces
+							}
+						}
+					}
+				}
+			}
+
+			# erru = norme_L2_norme_u_uex / norme_L2_norme_uex with norme_L2_norme_uex = 1./sqrt(2.) #
+			erru transformation {
+				methode formule
+				expression 1 norme_L2_norme_u_uex*sqrt(2.)
+				sources_reference { norme_L2_norme_u_uex }
+			}
+
+			# norme_L2_p_psi = norme L2 de (p - integrale de p) - psi #
+			norme_L2_p_psi reduction_0D {
+				methode L2_norm
+				source transformation {
+					methode formule expression 1 (pelem-pmoy)-psi
+					localisation elem
+					sources {
+						interpolation {
+							localisation elem
+							nom_source pelem
+							sources { refChamp { Pb_champ pb pression } }
+						} ,
+						# integrale de p #
+						reduction_0D {
+							methode moyenne
+							nom_source pmoy
+							source interpolation {
+								localisation elem
+								source refChamp { Pb_champ pb pression }
+							}
+						} ,
+						# expression de psi #
+						transformation {
+							methode formule
+							expression 1 x^2+y^2+z^2-x*y-x*z-y*z-1./4.
+							nom_source psi
+							localisation elem
+						}
+					}
+				}
+      			}
+			# errp = norme_L2_p_psi / norme_L2_psi with norme_L2_psi = sqrt(3./80.) #
+			errp transformation {
+				methode formule
+				expression 1 norme_L2_p_psi*sqrt(80./3.)
+				sources_reference { norme_L2_p_psi }
+			}
+	  	}
+		Probes
+		{
+			erru erru periode 1e+10 numero_elem_sur_maitre 0
+			errp errp periode 1e+10 numero_elem_sur_maitre 0
+		}
+		format lata
+		Fields dt_post 1e+10
+		{
+			pression som
+			pression elem
+			vitesse elem
+			vitesse faces
+		}
+	}	
+}
+Solve pb
+End

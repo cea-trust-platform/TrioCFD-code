@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# P1 #
+sed "s/Read dis { P0 }/Read dis { P1 }/" StatVortex_P0_Re1.data >   StatVortex_P1_Re1.data
+sed "s/Read dis { P0 }/Read dis { P1 }/" StatVortex_P0_Re100.data > StatVortex_P1_Re100.data
+
+# P0P1 #
+sed "s/Read dis { P0 }/Read dis { P0 P1 }/" StatVortex_P0_Re1.data >   StatVortex_P0P1_Re1.data
+sed "s/Read dis { P0 }/Read dis { P0 P1 }/" StatVortex_P0_Re100.data > StatVortex_P0P1_Re100.data
+
+# P0P1 #
+sed "s/Read dis { P0 }/Read dis { P0 P1 Pa }/" StatVortex_P0_Re1.data >   StatVortex_P0P1Pa_Re1.data
+sed "s/Read dis { P0 }/Read dis { P0 P1 Pa }/" StatVortex_P0_Re100.data > StatVortex_P0P1Pa_Re100.data
+
+# P0RT #
+sed "s/Read dis { P0 }/Read dis { P0 RT }/;s/Convection { amont }/Convection { RT }/" StatVortex_P0_Re1.data >   StatVortex_P0RT_Re1.data
+sed "s/Read dis { P0 }/Read dis { P0 RT }/;s/Convection { amont }/Convection { RT }/" StatVortex_P0_Re100.data > StatVortex_P0RT_Re100.data
+
+# Folders & Data files generation #
+
+Parameter="Re1 Re100"
+Discretization="P0 P1 P0P1 P0P1Pa P0RT"
+for Discr in $Discretization ; do
+  for Re in $Parameter ; do
+    for num in `seq 0 3`; do
+
+        fold="mesh_"$num"/"$Discr"/"$Re
+        mkdir -p $fold
+
+        MeshFile="mesh_tetra_"$num
+	if [ $(basename $project_directory) == "P1NCP0RT" ]
+	then
+	    ln -sfn $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	else
+	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	fi
+             
+        DataFile="StatVortex_"$Discr"_"$Re".data"
+        cp  $DataFile $fold/StatVortex.data
+        sed -i "s/ mesh_tetra_0 mesh_tetra_0.med/ $MeshFile $MeshFile.med/" $fold/StatVortex.data
+    done
+  done
+done

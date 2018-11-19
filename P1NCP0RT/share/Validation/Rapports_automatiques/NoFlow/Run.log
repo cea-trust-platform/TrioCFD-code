@@ -1,0 +1,148 @@
+========================================================
+-> Copy src directory files to the build directory... OK
+========================================================
+===============================================
+-> Run script prepare in the build directory...
+===============================================
+
+-> Binary and version used:
+-> /volatile/ej221912/TrioCFD-1.7.7/P1NCP0RT/P1NCP0RT_opt
+-> 1.7.7
+================================================
+-> Running commands in the ./build/cmds file ...
+================================================
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P0/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P0/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P0/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P1/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P1/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P1/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P0P1/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P0P1/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P0P1/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P0RT/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P0RT/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P0RT/Ra1 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P0/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P0/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P0/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P1/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P1/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P1/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P0P1/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P0P1/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P0P1/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_1/P0RT/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_2/P0RT/Ra100 directory ...
+
+-> Running the calculation of the NoFlow data file in the mesh_3/P0RT/Ra100 directory ...
+==============================
+-> Building PDF report file...
+==============================
+INFO : Running sh ./get_errors
+0
+Running: cli2.12.1 -s ./.tmp/visit_004.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_004.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_004_0.png
+Running: cli2.12.1 -s ./.tmp/visit_005.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_005.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_005_0.png
+Running: cli2.12.1 -s ./.tmp/visit_006.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_006.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_006_0.png
+Running: cli2.12.1 -s ./.tmp/visit_007.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_007.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_007_0.png
+Running: cli2.12.1 -s ./.tmp/visit_008.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_008.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_008_0.png
+Running: cli2.12.1 -s ./.tmp/visit_009.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_009.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_009_0.png
+Running: cli2.12.1 -s ./.tmp/visit_010.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_010.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_010_0.png
+Running: cli2.12.1 -s ./.tmp/visit_011.py -nowin -noconfig
+Running: viewer2.12.1 -nowin -noint -noconfig -host 127.0.0.1 -port 5600
+Running: mdserver2.12.1 -host 127.0.0.1 -port 5600
+Running: engine_ser2.12.1 -host 127.0.0.1 -port 5600
+VisIt: Message - Rendering window 1...
+VisIt: Message - Saving window 1...
+VisIt: Message - Saved visit0000.png
+VisIt: Message - VisIt exported the current session to: visit_011.session.
+visit0000.png
+mv "visit0000.png" ./.tmp/fic_011_0.png
+./.tmp/fic.pdf -> rapport.pdf
+-> The PDF report rapport.pdf is available in the build directory.
