@@ -54,7 +54,7 @@ Reorienter_tetraedres DOM
 # BEGIN PARTITION
 Partition DOM
 {
-	Partitionneur metis { Nb_parts 2 }
+	Partitionneur tranche { tranches 2 1 1 }
 	Nom_Zones DOM
         Larg_joint 2
 }

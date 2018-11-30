@@ -20,7 +20,7 @@ Corriger_frontiere_periodique
 # BEGIN PARTITION
 Partition DOM_DOM
 {
-        Partitionneur Metis { nb_parts 3 }
+        Partitionneur tranche { tranches 1 2 2 }
         Larg_joint 2
         Nom_Zones DOM_DOM
 	periodique 1 perio

@@ -39,7 +39,7 @@ Trianguler_h dom_fluide
 # BEGIN PARTITION
 Partition dom_fluide
 {
-	Partitionneur metis { Nb_parts 2 }
+	Partitionneur tranche { tranches 2 1 }
 	Larg_joint 2
 	Nom_Zones DOM2
 }
