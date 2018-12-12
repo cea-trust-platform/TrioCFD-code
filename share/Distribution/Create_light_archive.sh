@@ -40,6 +40,7 @@ do
   done
 done
 
+rm -rf Critere_Entrainement_Gaz/share/Validation/Rapports_automatiques/Verification_CEG
 rm -rf archives_dependancies
 rm -f share/Distribution/Liste_fiche
 mkdir share 
