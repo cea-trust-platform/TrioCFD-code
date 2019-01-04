@@ -14,34 +14,42 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Conv_ALE_VDF.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/7
+// File:        Op_Conv_ALE.h
+// Directory:   $TRUST_ROOT/src/ThHyd
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Conv_ALE_VDF.h>
+#ifndef Op_Conv_ALE_included
+#define Op_Conv_ALE_included
 
-Implemente_instanciable(Op_Conv_ALE_VDF,"Op_Conv_ALE_VDF",Op_Conv_ALE);
+#include <Operateur_Conv.h>
+#include <Ref_Champ_Inc_base.h>
 
 
-Sortie& Op_Conv_ALE_VDF::printOn(Sortie& os) const
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+class Op_Conv_ALE : public Operateur_Conv_base
 {
-  return os;
-}
+  Declare_base(Op_Conv_ALE);
 
+public :
 
-Entree& Op_Conv_ALE_VDF::readOn(Entree& is)
-{
-  return is>>op_conv;
-}
+  void associer_vitesse(const Champ_base& vit );
+  virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
+  virtual DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const;
+  virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const=0;
+  virtual DoubleTab& supprimerALE(const DoubleTab&, DoubleTab& ) const=0;
+  //    const Domaine_ALE& domaine_ALE() const;
+  //    Domaine_ALE& domaine_ALE();
 
-DoubleTab& Op_Conv_ALE_VDF::ajouterALE(const DoubleTab& inco, DoubleTab& resu) const
-{
-  return resu;
-}
+protected :
+  Operateur_Conv op_conv;
+  virtual void associer(const Zone_dis&,
+                        const Zone_Cl_dis&,
+                        const Champ_Inc& inco) ;//Classe abstraite de Operateur base
+  REF(Domaine) dom;
+  REF(Champ_Inc_base) la_vitesse;
+};
 
-DoubleTab& Op_Conv_ALE_VDF::supprimerALE(const DoubleTab& inco, DoubleTab& resu) const
-{
-  return resu;
-}
+#endif

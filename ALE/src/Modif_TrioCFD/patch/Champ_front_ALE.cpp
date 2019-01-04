@@ -23,8 +23,21 @@
 #include <Champ_front_ALE.h>
 #include <Domaine.h>
 #include <Frontiere_dis_base.h>
+#include <MD_Vector_tools.h>
 
 Implemente_instanciable(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instationnaire_dep);
+//Implemente_instanciable_sans_constructeur(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instationnaire_dep);
+
+
+/*Champ_front_ALE::Champ_front_ALE()
+{
+  const Frontiere& front=la_frontiere_dis->frontiere();
+  const Zone& zone=front.zone();
+  const Domaine& domaine=zone.domaine();
+  vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
+  const MD_Vector& md = zone.domaine().md_vector_sommets();
+  MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
+}*/
 
 // Description:
 //    Impression sur un flot de sortie au format:
@@ -50,6 +63,9 @@ Sortie& Champ_front_ALE::printOn(Sortie& os) const
   //     os << tab(0,i);
   return os;
 }
+
+
+
 
 // Description:
 //    Lecture a partir d'un flot d'entree au format:
@@ -121,7 +137,6 @@ Champ_front_base& Champ_front_ALE::affecter_(const Champ_front_base& ch)
 
 int Champ_front_ALE::initialiser(double temps, const Champ_Inc_base& inco)
 {
-
   if (!Ch_front_var_instationnaire_dep::initialiser(temps,inco))
     return 0;
 
@@ -177,8 +192,7 @@ void Champ_front_ALE::mettre_a_jour(double temps)
 
 void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
 {
-  Cerr << "Champ_front_ALE ::remplir_vit_som_bord_ALE" << finl;
-
+  Cout<<"Champ_front_ALE::remplir_vit_som_bord_ALE"<<finl;
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
@@ -187,9 +201,17 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
-  int nb_som_tot=domaine.nb_som();
+  int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
-  vit_som_bord_ALE=0;
+  /*if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
+    {
+      vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
+      const MD_Vector& md = zone.domaine().md_vector_sommets();
+      MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
+    }*/
+
+  vit_som_bord_ALE=0.;
+
   for( i=0; i<nb_faces; i++)
     {
       x=y=z=0;
@@ -207,8 +229,9 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
               //               fxyt[j].setVar("z",z);
               fxyt[j].setVar("t",tps);
               vit_som_bord_ALE(faces.sommet(i,k),j)=fxyt[j].eval();
-              //Cout << " x y z " << x << " " << y << " " << z << " " << vit_som_bord_ALE(faces.sommet(i,k),j) << finl;
+              //cout << " x y z " << x << " " << y << " " << z << " " << vit_som_bord_ALE(faces.sommet(i,k),j) << endl;
             }
         }
     }
+  //vit_som_bord_ALE.echange_espace_virtuel();
 }

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2015 - 2018, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,34 +14,63 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Conv_ALE_VEF.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/8
+// File:        Ch_front_input_ALE.h
+// Directory:   New class
+// Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Op_Conv_ALE_VEF_included
-#define Op_Conv_ALE_VEF_included
+
+#ifndef Ch_front_input_ALE_included
+#define Ch_front_input_ALE_included
 
 
-#include <Op_Conv_ALE.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Ch_front_input.h>
+#include <IntTab.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-class Op_Conv_ALE_VEF : public Op_Conv_ALE
+//////////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//     class Ch_front_input_ALE
+//
+//     Cette classe represente un champ accessible par setInputField
+//     defini sur une frontiere avec une valeur par face. In case of ALE calculation.
+//
+// .SECTION voir aussi
+//   Champ_Input_Proto
+/////////////////////////////////////////////////////////////////////////////////
+
+class Ch_front_input_ALE : public Ch_front_input
 {
-  Declare_instanciable(Op_Conv_ALE_VEF);
+  Declare_instanciable_sans_constructeur(Ch_front_input_ALE);
 
-public :
-  virtual void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
-  virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const;
-  virtual DoubleTab& supprimerALE(const DoubleTab&, DoubleTab& ) const;
-protected :
-  REF(Zone_VEF) la_zone_vef;
-  REF(Zone_Cl_VEF) la_zcl_vef;
+public:
+
+  Ch_front_input_ALE();
+
+  virtual Champ_front_base& affecter_(const Champ_front_base&)
+  {
+    return *this;
+  }
+  virtual void getTemplate(TrioField& afield) const;
+  virtual void setValue(const TrioField& afield);
+  virtual int initialiser(double temps, const Champ_Inc_base& inco);
+
+  inline DoubleTab& get_vit_som_bord_ALE();
+  virtual void mettre_a_jour(double temps);
+  void remplir_vit_som_bord_ALE(double);
+
+protected:
+
+  DoubleTab vit_som_bord_ALE;
+  bool alreadyInit_;
 
 };
 
+inline DoubleTab& Ch_front_input_ALE::get_vit_som_bord_ALE()
+{
+  return vit_som_bord_ALE;
+}
+
 #endif
+

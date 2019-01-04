@@ -14,50 +14,60 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Champ_front_ALE.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/10
+// File:        Ch_front_input.h
+// Directory:   $TRUST_ROOT/src/Kernel/Champs
+// Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Champ_front_ALE_included
-#define Champ_front_ALE_included
+#ifndef Ch_front_input_included
+#define Ch_front_input_included
+
 
 #include <Ch_front_var_instationnaire_dep.h>
-#include <Parser_U.h>
-#include <Vect_Parser_U.h>
-//////////////////////////////////////////////////////////////////////////////
+#include <Champ_Input_Proto.h>
+#include <IntTab.h>
+
+//////////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Champ_front_ALE
-//     Classe derivee de Champ_front_base qui represente les
-//     champs variables en espace et en temps
+//     class Ch_front_input
+//
+//     Cette classe represente un champ accessible par setInputField
+//     defini sur une frontiere avec une valeur par face.
+//
 // .SECTION voir aussi
-//     Champ_front_base
-//////////////////////////////////////////////////////////////////////////////
-class Champ_front_ALE : public Ch_front_var_instationnaire_dep
+//   Champ_Input_Proto
+/////////////////////////////////////////////////////////////////////////////////
+
+class Ch_front_input : public Ch_front_var_instationnaire_dep, public Champ_Input_Proto
 {
-  Declare_instanciable(Champ_front_ALE);
+  Declare_instanciable(Ch_front_input);
 
 public:
-  inline DoubleTab& get_vit_som_bord_ALE();
-  Champ_front_base& affecter_(const Champ_front_base& ch);
+
+  virtual Champ_front_base& affecter_(const Champ_front_base&)
+  {
+    return *this;
+  }
+  virtual void getTemplate(TrioField& afield) const;
+  virtual void setValue(const TrioField& afield);
+
   virtual int initialiser(double temps, const Champ_Inc_base& inco);
-  virtual void mettre_a_jour(double temps);
-  void remplir_vit_som_bord_ALE(double);
+protected:
 
-protected :
-  DoubleTab vit_som_bord_ALE;
+  // Factorisation function between several input field classes
+  virtual void set_nb_comp(int i); // calls fixer_nb_comp
+  virtual void set_name(const Nom& ); // calls nommer
+  virtual const Nom& get_name() const; // calls le_nom
 
-private:
-  VECT(Parser_U) fxyt;
+  void buildSommetsFaces() const; // const because used in Ch_Front_input_ALE::getTemplate() which is const - actually updates the 2 members below due to ALE mesh movement:
+  mutable DoubleTab sommets_;
+  mutable IntTab faces_;
+
 
 };
 
-inline DoubleTab& Champ_front_ALE::get_vit_som_bord_ALE()
-{
-  return vit_som_bord_ALE;
-}
 #endif
 

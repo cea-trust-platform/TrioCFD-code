@@ -14,83 +14,52 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Domaine_ALE.h
+// File:        Champ_front_ALE.h
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/11
+// Version:     /main/10
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Domaine_ALE_included
-#define Domaine_ALE_included
 
-#include <Domaine.h>
-#include <DoubleLists.h>
-#include <IntLists.h>
-#include <Champs_front.h>
-#include <Champ_P1NC.h>
-class Domaine_dis;
+#ifndef Champ_front_ALE_included
+#define Champ_front_ALE_included
+
+#include <Ch_front_var_instationnaire_dep.h>
+#include <Parser_U.h>
+#include <Vect_Parser_U.h>
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Domaine_ALE
-//    Cette classe est un interprete qui sert a lire l'attribut axi.
-//    Directive:
-//        Domaine_ALE
-//    Cette directive optionelle permets de faire les calculs en
-//    coordonnees cylindriques. En l'absence de cette directive les calculs
-//    se font en coordonnees cartesiennes.
+//     classe Champ_front_ALE
+//     Classe derivee de Champ_front_base qui represente les
+//     champs variables en espace et en temps
 // .SECTION voir aussi
-//    Interprete Objet_U
+//     Champ_front_base
 //////////////////////////////////////////////////////////////////////////////
-class Domaine_ALE : public Domaine
+class Champ_front_ALE : public Ch_front_var_instationnaire_dep
 {
-  Declare_instanciable(Domaine_ALE);
+  Declare_instanciable(Champ_front_ALE);
+  //Declare_instanciable_sans_constructeur(Champ_front_ALE);
 
-public :
+public:
+  //Champ_front_ALE();
+  inline DoubleTab& get_vit_som_bord_ALE();
+  Champ_front_base& affecter_(const Champ_front_base& ch);
+  virtual int initialiser(double temps, const Champ_Inc_base& inco);
+  virtual void mettre_a_jour(double temps);
+  void remplir_vit_som_bord_ALE(double);
 
-  inline const double& get_dt() const;
-  virtual void set_dt(double& dt_);
-  inline const DoubleTab& vitesse() const;
-  inline DoubleTab& vitesse_faces();
-  inline const DoubleTab& vitesse_faces() const;
-  virtual void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&);
-  virtual void initialiser (double temps, Domaine_dis&, Probleme_base&);
-  DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&);
-  DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
-  virtual void lecture_vit_bords_ALE(Entree& is);
-  virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
+protected :
+  DoubleTab vit_som_bord_ALE;
 
+private:
+  VECT(Parser_U) fxyt;
 
-protected:
-
-  double dt;
-  DoubleTab la_vitesse;
-  DoubleTab vf;
-  IntTab som_faces_bords;
-  SolveurSys solv;
-  Matrice_Morse_Sym mat;
-  Champs_front les_champs_front;
-  int nb_bords_ALE;
-  Bords les_bords_ALE;
 };
 
-
-inline const DoubleTab& Domaine_ALE::vitesse() const
+inline DoubleTab& Champ_front_ALE::get_vit_som_bord_ALE()
 {
-  return la_vitesse;
-}
-
-inline const double& Domaine_ALE::get_dt() const
-{
-  return dt;
-}
-
-inline DoubleTab& Domaine_ALE::vitesse_faces()
-{
-  return vf;
-}
-inline const DoubleTab& Domaine_ALE::vitesse_faces() const
-{
-  return vf;
+  return vit_som_bord_ALE;
 }
 #endif
+
