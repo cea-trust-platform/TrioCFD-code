@@ -16,10 +16,7 @@ Chapter {
 		title "VITESSE SOM"
 		vector Obstacle_ALE.lata dom VITESSE SOM
 	}
-	visu {
-		title "VITESSE ELEM"
-		pseudocolor Obstacle_ALE.lata dom VITESSE ELEM
-	}
+
 
 	visu {
 		title "PRESSION SOM"

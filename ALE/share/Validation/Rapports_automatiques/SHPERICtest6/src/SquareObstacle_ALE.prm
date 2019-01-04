@@ -45,10 +45,7 @@ Chapter {
 			style dots
 		}
 	}
-	Visu {
-		title "VITESSE SOM"
-		vector SquareObstacle_ALE.lata dom VITESSE SOM
-	}
+
 	visu {
 		title "VITESSE_X SOM"
 		pseudocolor SquareObstacle_ALE.lata dom VITESSE_X SOM
