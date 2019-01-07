@@ -141,3 +141,7 @@
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/FVCAB_Cas_2.2_3D_steady_Stokes_Taylor_Green_vortex STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/Vorticite_et_fonction_de_Courant STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/FVCA_test_EF_stab STD 
+./P1NCP0RT/share/Validation/Rapports_automatiques/NoFlow NNR
+./P1NCP0RT/share/Validation/Rapports_automatiques/RotFlow NNR
+./P1NCP0RT/share/Validation/Rapports_automatiques/StatVortex NNR
+./P1NCP0RT/share/Validation/Rapports_automatiques/StatVortex2D NNR
