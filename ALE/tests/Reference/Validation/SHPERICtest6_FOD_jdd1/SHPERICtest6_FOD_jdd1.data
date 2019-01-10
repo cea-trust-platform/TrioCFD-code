@@ -1,0 +1,141 @@
+# Hydraulique 2D laminar with Quick scheme #
+# PARALLEL NOT #
+
+dimension 2
+
+Pb_hydraulique pb
+Domaine_ALE dom
+
+# BEGIN MESH #
+Read_MED family_names_from_group_names dom MeshWithSquare0 MeshWithSquare0.med
+# END MESH #
+Imposer_vit_bords_ALE dom
+{
+	4
+	SquareSouth Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+	SquareEast Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+	SquareNorth Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+	SquareWest Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+}
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+
+
+Schema_euler_explicite mon_schema
+Read mon_schema
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 1.0
+	# dt_min=dt_max so dt imposed #
+	# dt_min 5.e-4  #
+	# dt_max 5.e-4 #
+	dt_impr 5.e-1
+	dt_sauv 100
+	seuil_statio 1.e-8 
+        # diffusion_implicite 1 #
+	# By default facsec equals to 1 #
+	# facsec 1 #
+        # max_iter_implicite 200 #
+
+}
+
+# I define a medium #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu Champ_Uniforme 1 0.02
+	rho Champ_Uniforme 1 1
+}
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+
+Domaine_ALE surface_SquareEast
+Domaine_ALE surface_SquareWest
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression petsc cholesky { }
+		# Two operators are defined #
+		convection {  ALE { amont } }
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0.00001 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			SquareSouth frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+			SquareEast frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+			SquareNorth frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+			SquareWest frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
+		      	Wall  	paroi_fixe
+		}
+	}
+	Post_processing
+	{
+		Definition_champs
+		{
+				averaged_pressure_SquareEast Reduction_0D { 
+					methode moyenne 
+					source Extraction { 
+							domaine surface_SquareEast nom_frontiere SquareEast methode trace  
+							source RefChamp { Pb_champ pb pression } 
+                                        }
+                                }
+				averaged_pressure_SquareWest Reduction_0D { 
+					methode moyenne 
+					source Extraction { 
+							domaine surface_SquareWest nom_frontiere SquareWest methode trace  
+							source RefChamp { Pb_champ pb pression } 
+                                        }
+                                }
+				# Calculating drag coef. pressure comp. (rho=1,v=1) #
+				drag_coef_pressure_comp Transformation { 
+					methode formule expression 1 2*(averaged_pressure_SquareEast-averaged_pressure_SquareWest) 
+					sources_reference { averaged_pressure_SquareWest , averaged_pressure_SquareEast }  
+				 } 
+		}
+
+
+		# Probes #
+		Probes
+		{
+			sonde_drag_coef_pressure_comp drag_coef_pressure_comp periode 0.005 numero_elem_sur_maitre 1
+			sonde_averaged_pressure_SquareEast averaged_pressure_SquareEast periode 0.005 numero_elem_sur_maitre 1
+			sonde_averaged_pressure_SquareWest averaged_pressure_SquareWest periode 0.005 numero_elem_sur_maitre 1			
+		}
+		# Fields #
+		format lml 
+		fields dt_post 0.005
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+		}
+		# Statistical fields #
+		Statistiques dt_post 0.005
+		{
+			t_deb 1. t_fin 5.
+			moyenne vitesse
+			ecart_type vitesse
+			moyenne pression
+			ecart_type pression
+		}
+	}
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
