@@ -41,6 +41,7 @@ do
 done
 
 rm -rf Critere_Entrainement_Gaz/share/Validation/Rapports_automatiques/Verification_CEG
+rm -rf Critere_Entrainement_Gaz/tests/Reference/Validation/Verification_CEG_jdd*
 rm -rf archives_dependancies
 rm -f share/Distribution/Liste_fiche
 mkdir share 
