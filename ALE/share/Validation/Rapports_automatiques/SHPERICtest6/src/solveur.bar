@@ -1,0 +1,2 @@
+PETSC GCP { precond ssor { omega 1.5 } seuil 1e-7 impr }
+

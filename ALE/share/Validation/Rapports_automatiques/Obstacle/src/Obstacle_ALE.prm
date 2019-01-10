@@ -1,0 +1,30 @@
+Parameters {
+        Title "verification of validation"
+        Description "Obstacle ALE"
+        Author "A. P"
+        TestCase . Obstacle_ALE.data /*jdd en annexe*/ 
+        }
+
+Chapter {
+Title "Obstacle ALE" 
+}
+
+Chapter {
+	Title "Plots and figures"
+
+	Visu {
+		title "VITESSE SOM"
+		vector Obstacle_ALE.lata dom VITESSE SOM
+	}
+
+
+	visu {
+		title "PRESSION SOM"
+		pseudocolor Obstacle_ALE.lata dom PRESSION SOM
+	}
+	Visu {
+		title "PRESSION ELEM"
+		pseudocolor Obstacle_ALE.lata dom PRESSION ELEM
+	}
+}
+
