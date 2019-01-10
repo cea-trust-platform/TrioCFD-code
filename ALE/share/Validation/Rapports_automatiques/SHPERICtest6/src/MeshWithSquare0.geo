@@ -5,7 +5,7 @@ ly = 5.0;
 
 //First cell size (used when points are defined):
 
-lc = 0.2;
+lc = 0.05;
 
 //Square side length:
 
