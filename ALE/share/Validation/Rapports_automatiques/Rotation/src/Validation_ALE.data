@@ -1,0 +1,124 @@
+# Hydraulique 2D laminar with Amont scheme #
+# PARALLEL NOT #
+
+dimension 2
+
+Pb_hydraulique pb
+Domaine_ALE dom
+
+# BEGIN MESH #
+Read_MED family_names_from_group_names dom MeshWithCylinderInBigDomaine MeshWithCylinderInBigDomaine.med
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Imposer_vit_bords_ALE dom
+{
+	1
+	CircleA Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01
+}
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+
+
+Schema_euler_explicite mon_schema
+Read mon_schema
+{
+	tinit 0
+	tmax 1
+        nb_pas_dt_max 10000000
+	# dt_min=dt_max so dt imposed #
+	# dt_min 5.e-4  #
+	# dt_max 5.e-4 #
+	dt_impr 5.e-1
+	dt_sauv 100
+	seuil_statio 1.e-8 
+        # diffusion_implicite 1 #
+	# By default facsec equals to 1 #
+	# facsec 1 #
+        # max_iter_implicite 200 #
+
+}
+
+# I define a medium #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu Champ_Uniforme 1 0.022
+	rho Champ_Uniforme 1 900
+}
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression petsc cholesky { }
+		# Two operators are defined #
+		convection {  ALE { amont } }
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			CircleA  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01
+			CircleB  paroi_fixe
+		}
+	}
+	Post_processing
+	{
+		# Probes #
+		Probes
+		{
+			sonde_vitxpos nodes vitesse periode 0.005 segment 21 0.04 0.0 0.05 0.0
+			sonde_vitxneg nodes vitesse periode 0.005 segment 21 -0.04 0.0 -0.05 0.0
+			sonde_vitypos nodes vitesse periode 0.005 segment 21 0.0 0.04 0.0 0.05
+			sonde_vityneg nodes vitesse periode 0.005 segment 21 0.0 -0.04 0.0 -0.05			
+		}
+		# Fields #
+		format lata 
+		fields dt_post 0.005
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+		}
+		# Statistical fields #
+		Statistiques dt_post 0.005
+		{
+			t_deb 1. t_fin 5.
+			moyenne vitesse
+			ecart_type vitesse
+			moyenne pression
+			ecart_type pression
+		}
+	} 
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
