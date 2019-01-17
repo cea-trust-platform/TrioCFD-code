@@ -1,5 +1,5 @@
 # Hydraulique 2D laminar with Quick scheme #
-# PARALLEL OK #
+# PARALLEL NOT #
 
 dimension 2
 
@@ -124,28 +124,20 @@ Read pb
 
 
 		# Probes #
-		# Probes
+		Probes
 		{
-			sonde_drag_coef_pressure_comp drag_coef_pressure_comp periode 0.005 numero_elem_sur_maitre 1		
-		} #
+			sonde_drag_coef_pressure_comp drag_coef_pressure_comp periode 0.1 numero_elem_sur_maitre 1		
+		}
 		# Fields #
 		format lml 
-		fields dt_post 0.005
+		fields dt_post 0.5
 		{
 			pression elem
 			pression som
 			vitesse elem
 			vitesse som
 		}
-		# Statistical fields #
-		Statistiques dt_post 0.005
-		{
-			t_deb 1. t_fin 5.
-			moyenne vitesse
-			ecart_type vitesse
-			moyenne pression
-			ecart_type pression
-		}
+
 	}
 }
 # The problem is solved with #

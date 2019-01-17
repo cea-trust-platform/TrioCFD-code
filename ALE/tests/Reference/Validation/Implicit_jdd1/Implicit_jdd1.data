@@ -1,0 +1,116 @@
+# Hydraulique 2D laminar with Quick scheme #
+# PARALLEL NOT #
+
+dimension 2
+
+Pb_hydraulique pb
+Domaine_ALE dom
+
+# BEGIN MESH #
+Read_MED family_names_from_group_names dom MeshWithCylinderInBigDomaine MeshWithCylinderInBigDomaine.med
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 4 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Imposer_vit_bords_ALE dom
+{
+	1
+	CircleA Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01
+}
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+
+
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 10.
+        dt_min 1.e-15
+	dt_start dt_calc
+        dt_impr 5.e-1
+        dt_sauv 100.
+        seuil_statio 1.e-15
+	facsec 1
+        facsec_max 10
+	solveur implicite
+	{
+          solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
+	}
+}
+
+# I define a medium #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu Champ_Uniforme 1 0.022
+	rho Champ_Uniforme 1 900
+}
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+
+Read pb
+{
+	Navier_Stokes_standard
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression petsc cholesky { }
+		# Two operators are defined #
+		convection {  ALE { amont } }
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			CircleA  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01
+			CircleB  paroi_fixe
+		}
+	}
+	Post_processing
+	{
+		# Probes #
+		Probes
+		{
+			sonde_vitxpos nodes vitesse periode 0.5 segment 21 0.04 0.0 0.05 0.0
+			sonde_vitxneg nodes vitesse periode 0.5 segment 21 -0.04 0.0 -0.05 0.0
+			sonde_vitypos nodes vitesse periode 0.5 segment 21 0.0 0.04 0.0 0.05
+			sonde_vityneg nodes vitesse periode 0.5 segment 21 0.0 -0.04 0.0 -0.05			
+		}
+		# Fields #
+		format lml 
+		fields dt_post 1.
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+		}
+	} 
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
