@@ -26,7 +26,7 @@ cd ../
 for Re in 23000 70000
 do
   cd Re$Re
-  cp -f ../Impinging_jet.data Decoupage
+  cp -f ../Impinging_jet.data ../decoupage.metis Decoupage
   cp ../Impinging_jet.msh .
   if [ ! -f Impinging_jet.data ]
   then
