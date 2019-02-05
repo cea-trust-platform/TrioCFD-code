@@ -1,15 +1,15 @@
 # Hydraulique 2D laminar with ALE : rotation validation #
 # Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
-# PARALLEL OK #
+# PARALLEL ONLY 4 #
 
 dimension 2
 
 Pb_hydraulique pb
 Domaine_ALE dom
 
-# BEGIN MESH #
-Read_MED family_names_from_group_names dom MeshWithCylinderInBigDomaine MeshWithCylinderInBigDomaine.med
-# END MESH #
+# BEGIN MESH 
+ Read_MED family_names_from_group_names dom MeshWithCylinderInBigDomaine MeshWithCylinderInBigDomaine.med 
+ END MESH #
 
 
 # BEGIN PARTITION
@@ -22,9 +22,9 @@ Partition dom
 End
 END PARTITION #
 
-# BEGIN SCATTER
+# BEGIN SCATTER #
 Scatter DOM.Zones dom
-END SCATTER #
+# END SCATTER #
 
 Imposer_vit_bords_ALE dom
 {

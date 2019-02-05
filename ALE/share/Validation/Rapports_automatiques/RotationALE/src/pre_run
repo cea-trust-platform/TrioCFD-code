@@ -1,1 +1,1 @@
-make_PAR.data RotationALE 4
+trust decoupage.data 1>decoupage.out 2>decoupage.err

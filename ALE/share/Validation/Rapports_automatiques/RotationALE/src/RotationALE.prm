@@ -13,7 +13,7 @@ Parameters {
 	Description "This is a numerical test case. We do not look at the physical aspects in detail here."
 	IncludeData 1
         Reference "P. R. N. C HILDS : Rotating Flow. Butterworth-Heinemann, 2010."
-	TestCase  . PAR_RotationALE.data  4 /*jdd en annexe*/ 
+	TestCase  . RotationALE.data  4 /*jdd en annexe*/ 
 }
 
 Chapter {
@@ -27,7 +27,7 @@ Chapter {
                 legend below title "Legend"
 		curve {
 			legend "TrioCFD"
-			segment PAR_RotationALE SONDE_VITYNEG
+			segment RotationALE SONDE_VITYNEG
 			style linespoints
 		}
 		Curve {	
@@ -45,15 +45,15 @@ Chapter {
 
 	visu {
 		title "PRESSION SOM"
-		pseudocolor PAR_RotationALE.lata dom PRESSION SOM
+		pseudocolor RotationALE.lata dom PRESSION SOM
 	}
 	visu {
 		title "VITESSE x-component"
-		pseudocolor PAR_RotationALE.lata dom VITESSE_X SOM
+		pseudocolor RotationALE.lata dom VITESSE_X SOM
 	}
 	visu {
 		title "VITESSE y-component"
-		pseudocolor PAR_RotationALE.lata dom VITESSE_Y SOM
+		pseudocolor RotationALE.lata dom VITESSE_Y SOM
 	}
 
 

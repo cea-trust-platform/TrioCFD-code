@@ -14,7 +14,7 @@ Read_MED family_names_from_group_names dom MeshWithSquare0 MeshWithSquare.med
 # BEGIN PARTITION
 Partition dom
 {
-	Partition_tool metis { Nb_parts 4 }
+	Partition_tool metis { Nb_parts 2 }
 	Larg_joint 2
 	zones_name DOM
 }
