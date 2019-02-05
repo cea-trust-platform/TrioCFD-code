@@ -46,7 +46,7 @@ Schema_Euler_Explicite sch
 Lire sch
 {
 	nb_pas_dt_max 10
-        tinit 13.070114
+        tinit 13.07012
         tmax  13.0702
         dt_min 1.e-7
         dt_max 5.
