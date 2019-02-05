@@ -75,7 +75,6 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
                 }
             }
         }
-
       //On recalcule les vitesses aux faces
       Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
       int nb_faces=la_zone_VF.nb_faces();

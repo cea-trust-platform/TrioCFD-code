@@ -1,5 +1,5 @@
-# Hydraulique 2D laminar with Quick scheme #
-# PARALLEL NOT #
+# Hydraulique 2D laminar with ALE #
+# PARALLEL Ok #
 
 dimension 2
 
@@ -164,15 +164,7 @@ Read pb
 			vitesse elem
 			vitesse som
 		}
-		# Statistical fields #
-		Statistiques dt_post 100
-		{
-			t_deb 1. t_fin 5.
-			moyenne vitesse
-			ecart_type vitesse
-			moyenne pression
-			ecart_type pression
-		}
+
 	} 
 }
 # The problem is solved with #
