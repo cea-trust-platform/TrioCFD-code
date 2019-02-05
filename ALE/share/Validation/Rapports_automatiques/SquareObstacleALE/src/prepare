@@ -1,0 +1,27 @@
+# Creation des repertoires de calcul #
+
+mkdir -p Amont Muscl Implicit
+
+cd Amont
+cp ../MeshWithSquare.med .
+cp ../SquareObstacle_ALE.data .
+cp ../solveur.bar .
+cd ..
+
+cd Muscl
+cp ../MeshWithSquare.med .
+cp ../SquareObstacle_ALE.data .
+cp ../solveur.bar .
+sed "s/convection { amont }/convection { muscl }/" ../SquareObstacle_ALE.data > SquareObstacle_ALE.data
+cd ..
+
+cd Implicit 
+cp ../MeshWithSquare.med .
+cp ../SquareObstacle_ALE.data .
+cp ../solveur.bar .
+sed "s/Schema_euler_explicite mon_schema/# Schema_euler_explicite mon_schema #/" ../SquareObstacle_ALE.data > SquareObstacle_ALE.data
+sed -i "s/# Scheme_euler_implicit mon_schema #/Scheme_euler_implicit mon_schema/"  SquareObstacle_ALE.data
+sed -i "s/# facsec 1/facsec 1/"  SquareObstacle_ALE.data
+sed -i "s/for Euler implicit scheme #/ /"  SquareObstacle_ALE.data
+sed -i "s/convection { amont }/convection { muscl }/" SquareObstacle_ALE.data
+cd ..
