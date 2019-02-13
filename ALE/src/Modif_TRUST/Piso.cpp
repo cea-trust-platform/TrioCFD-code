@@ -152,25 +152,6 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
   Operateur_Grad& gradient = eqnNS.operateur_gradient();
   Operateur_Div& divergence = eqnNS.operateur_divergence();
 
-  //Renewing ALE Jacobians
-  if (eqn.probleme().domaine().que_suis_je()=="Domaine_ALE")
-    {
-      int TimeStepNr=eqn.probleme().schema_temps().nb_pas_dt();
-      Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
-
-      DoubleTab New_ALEjacobian_Old=dom_ale.getNewJacobian(); //New  value for ALEjacobian_old
-      DoubleTab New_ALEjacobian_New(New_ALEjacobian_Old);
-      Op_Conv_ALE_VEF& opALEforJacob=ref_cast(Op_Conv_ALE_VEF, eqnNS.get_terme_convectif().valeur());
-      opALEforJacob.calculateALEjacobian(New_ALEjacobian_New); //New  value for ALEjacobian_new
-      dom_ale.update_ALEjacobians(New_ALEjacobian_Old, New_ALEjacobian_New, TimeStepNr); // Update new values of ALEjacobian_old and ALEjacobian_new saved in Domaine_ALE
-    }
-  //End of renewing ALE Jacobians
-
-  //int nb_comp = 1;
-  //int nb_dim = current.nb_dim();
-
-  //  if(nb_dim==2)    nb_comp = current.dimension(1);
-
   //Construction de matrice et resu
   //matrice = A[Un] = M/delta_t + CONV +DIFF
   //resu =  A[Un]Un -(A[Un]Un-Ss) + Sv -BtPn
@@ -180,6 +161,17 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
   //Adding ALE convection term start
   if (eqn.probleme().domaine().que_suis_je()=="Domaine_ALE")
     {
+      //Renewing ALE Jacobians
+      int TimeStepNr=eqn.probleme().schema_temps().nb_pas_dt();
+      Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
+
+      DoubleTab New_ALEjacobian_Old=dom_ale.getNewJacobian(); //New  value for ALEjacobian_old
+      DoubleTab New_ALEjacobian_New(New_ALEjacobian_Old);
+      Op_Conv_ALE_VEF& opALEforJacob=ref_cast(Op_Conv_ALE_VEF, eqnNS.get_terme_convectif().valeur());
+      opALEforJacob.calculateALEjacobian(New_ALEjacobian_New); //New  value for ALEjacobian_new
+      dom_ale.update_ALEjacobians(New_ALEjacobian_Old, New_ALEjacobian_New, TimeStepNr); // Update new values of ALEjacobian_old and ALEjacobian_new saved in Domaine_ALE
+      //End of renewing ALE Jacobians
+
       Cerr << "Adding ALE contribution..." << finl;
       Op_Conv_ALE& opale=ref_cast(Op_Conv_ALE, eqnNS.get_terme_convectif().valeur());
       DoubleTrav ALE(resu); // copie de la structure, initialise a zero
@@ -196,38 +188,21 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
   eqnNS.assembler_avec_inertie(matrice,current,resu);
   le_solveur_.valeur().reinit();
 
-  int nb_faces = resu.size()/dimension;
 
-  // Adding Jacobians to "matrice" start. Jn+1[A[Un]]
   if (eqn.probleme().domaine().que_suis_je()=="Domaine_ALE")
     {
       Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
-      DoubleTab ALEjacobian_New=dom_ale.getNewJacobian();
+      DoubleVect ALEjacobian_New=dom_ale.getNewJacobian();
 
+      //First step
+      // Adding Jacobians to "matrice" start. Jn+1[A[Un]]
       int MatriceNbLines=matrice.nb_lignes();
-      int dim=0;
-      int num_faceJacobian=0;
       for (int num_face=0; num_face<MatriceNbLines; num_face++)
-        {
-          if(num_face % nb_faces == 0 && num_face != 0)
-            {
-              dim++;
-              num_faceJacobian-=nb_faces;
-            }
-          matrice(num_face,num_face)*=ALEjacobian_New(num_faceJacobian,dim);
-          num_faceJacobian++;
-        }
-    }
-  // Adding Jacobians to "matrice" end
+        matrice(num_face,num_face)*=ALEjacobian_New[num_face];
+      // Adding Jacobians to "matrice" end
 
-
-  //Adding ALE Jacobians to "resu" start to obtain Jn+1[-gradP + ALE convective term + Sv + Ss]+Jn[(M/dt)Un].
-  if (eqn.probleme().domaine().que_suis_je()=="Domaine_ALE")
-    {
-      Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
-      DoubleTab ALEjacobian_New=dom_ale.getNewJacobian();
-      DoubleTab ALEjacobian_Old=dom_ale.getOldJacobian();
-
+      //Second step
+      //Adding ALE Jacobians to "resu" start to obtain Jn+1[-gradP + ALE convective term + Sv + Ss]+Jn[(M/dt)Un].
       // Obtaining (M/dt)Un start.
       DoubleTrav deltaJMdtUn(resu); // copie de la structure, initialise a zero. To hold (M/dt)Un.
       double timestep=eqn.probleme().schema_temps().pas_de_temps();
@@ -235,16 +210,21 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
       eqn.solv_masse().ajouter_masse(timestep,deltaJMdtUn,eqn.inconnue().passe(),pen);
       // Obtaining (M/dt)Un end.
 
+      DoubleTab ALEjacobian_Old=dom_ale.getOldJacobian();
+      DoubleTab ALEjacobian=dom_ale.getNewJacobian();
+
+      int nb_faces = resu.size()/dimension;
       for (int num_face=0; num_face<nb_faces; num_face++) // Obtaining Jn+1[-gradP + ALE convective term + (M/dt)Un + Sv + Ss]+(Jn-Jn+1)[(M/dt)Un]=Jn+1[-gradP + ALE convective term + Sv + Ss]+Jn[(M/dt)Un].
         {
           for (int dim=0; dim<dimension; dim++)
             {
-              resu(num_face,dim)=ALEjacobian_New(num_face,dim)*resu(num_face,dim)+(ALEjacobian_Old(num_face,dim)-ALEjacobian_New(num_face,dim))*deltaJMdtUn(num_face,dim);
+              resu(num_face,dim)=ALEjacobian(num_face,dim)*resu(num_face,dim)+(ALEjacobian_Old(num_face,dim)-ALEjacobian(num_face,dim))*deltaJMdtUn(num_face,dim);
             }
         }
       resu.echange_espace_virtuel();
+      // Adding Jacobians to "resu" end
     }
-  // Adding Jacobians to "resu" end
+
 
   //Construction de matrice_en_pression_2 = BD-1Bt[Un]
   //Assemblage reeffectue seulement pour algorithme Piso (avancement_crank_==0)

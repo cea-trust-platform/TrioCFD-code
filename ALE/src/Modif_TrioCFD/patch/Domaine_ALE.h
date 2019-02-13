@@ -59,7 +59,7 @@ public :
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
   virtual void lecture_vit_bords_ALE(Entree& is);
   virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&, ArrOfDouble&);
-  int update_or_not_matrix_coeffs();
+  int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   DoubleTab& getOldJacobian();
   DoubleTab& getNewJacobian();
@@ -99,7 +99,7 @@ inline const DoubleTab& Domaine_ALE::vitesse_faces() const
 {
   return vf;
 }
-int Domaine_ALE::update_or_not_matrix_coeffs()
+inline int Domaine_ALE::update_or_not_matrix_coeffs() const
 {
   return update_or_not_matrix_coeffs_;
 }

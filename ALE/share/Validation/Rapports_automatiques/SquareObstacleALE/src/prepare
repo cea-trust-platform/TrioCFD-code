@@ -23,5 +23,4 @@ sed "s/Schema_euler_explicite mon_schema/# Schema_euler_explicite mon_schema #/"
 sed -i "s/# Scheme_euler_implicit mon_schema #/Scheme_euler_implicit mon_schema/"  SquareObstacle_ALE.data
 sed -i "s/# facsec 1/facsec 1/"  SquareObstacle_ALE.data
 sed -i "s/for Euler implicit scheme #/ /"  SquareObstacle_ALE.data
-sed -i "s/convection { amont }/convection { muscl }/" SquareObstacle_ALE.data
 cd ..

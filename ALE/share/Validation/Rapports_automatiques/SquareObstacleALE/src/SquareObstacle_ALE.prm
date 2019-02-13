@@ -25,7 +25,7 @@ Chapter {
 
 	Figure {
 		Title "Drag coefficient pressure component"
-		Description "The drag coefficient pressure component \latex_( $C_{d}(\text{pressure component})=\Delta p /(0.5 \cdot \rho \cdot U_{max}^{2})$ \latex_), where \latex_( $\rho=1 \frac{kg}{m^{3}}, U_{max}=1 \frac{m}{s} (\text{maximum velocity of the obstacle})$ \latex_), is plotted for the following cases: SPHERIC benchmark, TrioCFD with amont convection scheme and Euler explicit time scheme (TrioCFD Amont/Exp), for TrioCFD with muscl convection scheme and Euler explicit time scheme (TrioCFD Muscl/Exp), and  for TrioCFD with muscl convection scheme and Euler implicit time scheme (TrioCFD Muscl/Imp)."
+		Description "The drag coefficient pressure component \latex_( $C_{d}(\text{pressure component})=\Delta p /(0.5 \cdot \rho \cdot U_{max}^{2})$ \latex_), where \latex_( $\rho=1 \frac{kg}{m^{3}}, U_{max}=1 \frac{m}{s} (\text{maximum velocity of the obstacle})$ \latex_), is plotted for the following cases: SPHERIC benchmark, TrioCFD with amont convection scheme and Euler explicit time scheme (TrioCFD Amont/Exp), for TrioCFD with muscl convection scheme and Euler explicit time scheme (TrioCFD Muscl/Exp), and  for TrioCFD with amont convection scheme and Euler implicit time scheme (TrioCFD Amont/Imp)."
 		LabelX "t"
 		LabelY "Cd (pressure component)"
 		include_description_curves 0
@@ -47,7 +47,7 @@ Chapter {
 
 		}
 		Courbe {
-			legend "TrioCFD Muscl/Imp"
+			legend "TrioCFD Amont/Imp"
 			file ./Implicit/SquareObstacle_ALE_SONDE_DRAG_COEF_PRESSURE_COMP.son
 			Style linespoints
 
@@ -56,7 +56,7 @@ Chapter {
 }
 
 Chapter {
-	Title "Probes: 1D Plots using the Euler explicit time scheme "
+	Title "Probes: 1D Plots using the Euler explicit time scheme with the amont (Amont/Exp) and muscl (Muscl/Exp) convection scheme,  and the Euler implicit time scheme with the amont (Amont/Imp) convection scheme"
 	Description "There is no analysis for the results in this section, that are just non-regression plots. "
 	Figure { 
 		title "Pressure along line Y=1.5 "
@@ -65,320 +65,20 @@ Chapter {
 		labelY "Pressure"
 
 		Courbe {
-			Legende "Pressure: Amont"
+			Legende "Pressure: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H1 
 			Style linespoints
 
 			}
 
 		Courbe {
-			Legende "Pressure: Muscl"
+			Legende "Pressure: Muscl/Exp"
 			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H1 
 			Style linespoints
 
 			}
-	}
-
-	Figure { 
-		title "Pressure along line Y=2.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Pressure"
-
 		Courbe {
-			Legende "Pressure: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H2 
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Pressure: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H2 
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Pressure along line Y=3.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Pressure"
-
-		Courbe {
-			Legende "Pressure: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Pressure: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
-			Style linespoints
-
-			}
-	}
-
-	Figure { 
-		title "Velocity along line X= 0.8 "
-		include_description_curves 0
-		labelX "Y"
-		labelY "Vx"
-
-		Courbe {
-			Legende "Pressure: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V1
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Pressure: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V1
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Pressure along line X= 2.5 "
-		include_description_curves 0
-		labelX "Y"
-		labelY "Pressure"
-
-		Courbe {
-			Legende "Pressure: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V2
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Pressure: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V2
-			Style linespoints
-
-			}
-	}
-
-
-	Figure { 
-		title "Velocity along line Y=1.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Vx"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H1
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H1
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line Y=1.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Vy"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H1
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H1
-			Style linespoints
-
-			}
-	}
-
-	Figure { 
-		title "Velocity along line Y=2.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Vx"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H2
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H2
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line Y=2.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Vy"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H2
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H2
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line Y=3.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Vx"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H3
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H3
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line Y=3.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Vy"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H3
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H3
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line X=0.8 "
-		include_description_curves 0
-		labelX "Y"
-		labelY "Vx"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V1
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V1
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line X=0.8 "
-		include_description_curves 0
-		labelX "Y"
-		labelY "Vy"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V1
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V1
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line X=2.5 "
-		include_description_curves 0
-		labelX "Y"
-		labelY "Vx"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V2
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V2
-			Style linespoints
-
-			}
-	}
-	Figure { 
-		title "Velocity along line X=2.5 "
-		include_description_curves 0
-		labelX "Y"
-		labelY "Vy"
-
-		Courbe {
-			Legende "Velocity: Amont"
-			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V2
-			Style linespoints
-
-			}
-
-		Courbe {
-			Legende "Velocity: Muscl"
-			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V2
-			Style linespoints
-
-			}
-	}
-
-}	
-
-
-
-Chapter {
-	Title "Probes: 1D Plots. Results obtained with the Euler implicit time scheme. The convection scheme is muscl"
-	Description "There is no analysis for the results in this section, that are just non-regression plots. "
-	Figure { 
-		title "Pressure along line Y=1.5 "
-		include_description_curves 0
-		labelX "X"
-		labelY "Pressure"
-
-		Courbe {
-			Legende "Pressure"
+			Legende "Pressure: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H1 
 			Style linespoints
 
@@ -392,7 +92,20 @@ Chapter {
 		labelY "Pressure"
 
 		Courbe {
-			Legende "Pressure"
+			Legende "Pressure: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H2 
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Pressure: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H2 
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Pressure: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H2 
 			Style linespoints
 
@@ -405,12 +118,24 @@ Chapter {
 		labelY "Pressure"
 
 		Courbe {
-			Legende "Pressure"
-			segment ./Implicit/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
+			Legende "Pressure: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
 			Style linespoints
 
 			}
 
+		Courbe {
+			Legende "Pressure: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Pressure: Amont/Imp"
+			segment ./Implicit/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
+			Style linespoints
+
+			}
 	}
 
 	Figure { 
@@ -420,7 +145,20 @@ Chapter {
 		labelY "Vx"
 
 		Courbe {
-			Legende "Pressure"
+			Legende "Pressure: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V1
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Pressure: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Pressure: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V1
 			Style linespoints
 
@@ -433,7 +171,20 @@ Chapter {
 		labelY "Pressure"
 
 		Courbe {
-			Legende "Pressure:"
+			Legende "Pressure: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V2
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Pressure: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Pressure: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V2
 			Style linespoints
 
@@ -448,7 +199,20 @@ Chapter {
 		labelY "Vx"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H1
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H1
 			Style linespoints
 
@@ -461,7 +225,20 @@ Chapter {
 		labelY "Vy"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H1
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H1
 			Style linespoints
 
@@ -475,7 +252,20 @@ Chapter {
 		labelY "Vx"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H2
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H2
 			Style linespoints
 
@@ -488,7 +278,20 @@ Chapter {
 		labelY "Vy"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H2
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H2
 			Style linespoints
 
@@ -501,7 +304,20 @@ Chapter {
 		labelY "Vx"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H3
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H3
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H3
 			Style linespoints
 
@@ -514,7 +330,20 @@ Chapter {
 		labelY "Vy"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H3
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H3
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H3
 			Style linespoints
 
@@ -526,9 +355,21 @@ Chapter {
 		labelX "Y"
 		labelY "Vx"
 
+		Courbe {
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V1
+			Style linespoints
+
+			}
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V1
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V1
 			Style linespoints
 
@@ -540,9 +381,22 @@ Chapter {
 		labelX "Y"
 		labelY "Vy"
 
+		Courbe {
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V1
+			Style linespoints
+
+			}
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V1
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V1
 			Style linespoints
 
@@ -554,9 +408,21 @@ Chapter {
 		labelX "Y"
 		labelY "Vx"
 
+		Courbe {
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V2
+			Style linespoints
+
+			}
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V2
 			Style linespoints
 
@@ -569,7 +435,20 @@ Chapter {
 		labelY "Vy"
 
 		Courbe {
-			Legende "Velocity"
+			Legende "Velocity: Amont/Exp"
+			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V2
+			Style linespoints
+
+			}
+
+		Courbe {
+			Legende "Velocity: Muscl/Exp"
+			segment ./Muscl/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V2
+			Style linespoints
+
+			}
+		Courbe {
+			Legende "Velocity: Amont/Imp"
 			segment ./Implicit/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V2
 			Style linespoints
 
@@ -577,9 +456,6 @@ Chapter {
 	}
 
 }	
-
-
-
 
 Chapter {
 	Title "Visualization via VisIt Convection Amont and Euler explicit time scheme" 
@@ -589,13 +465,14 @@ Chapter {
 		title "PRESSION SOM"
 		pseudocolor ./Amont/SquareObstacle_ALE.lata dom PRESSION SOM
 	}
+
 	visu {
-		title "VITESSE x-component"
-		pseudocolor PAR_RotationALE.lata dom VITESSE_X FACES
+		title "VITESSE_X ELEM"
+		pseudocolor ./Amont/SquareObstacle_ALE.lata dom VITESSE_X ELEM
 	}
 	visu {
-		title "VITESSE y-component"
-		pseudocolor PAR_RotationALE.lata dom VITESSE_Y FACES
+		title "VITESSE_Y ELEM"
+		pseudocolor ./Amont/SquareObstacle_ALE.lata dom VITESSE_Y ELEM
 	}
 
 

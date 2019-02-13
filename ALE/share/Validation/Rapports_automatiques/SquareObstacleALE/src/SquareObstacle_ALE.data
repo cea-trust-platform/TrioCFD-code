@@ -153,8 +153,7 @@ Read pb
 		{
 			pression elem
 			pression som
-			vitessex faces
-			vitessey faces
+			vitesse elem
 		}
 
 	}
