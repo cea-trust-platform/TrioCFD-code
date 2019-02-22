@@ -162,6 +162,11 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zo
   const double nu_phase_0 = tab_nu_phase_0(0,0);
   const double nu_phase_1 = tab_nu_phase_1(0,0);
   const double delta_nu = nu_phase_1 - nu_phase_0;
+  const double mu_phase_0 = nu_phase_0 * rho_phase_0;
+  const double mu_phase_1 = nu_phase_1 * rho_phase_0;
+  const double delta_mu = mu_phase_1 - mu_phase_0;
+  double mu = 0.;
+  const int formule_mu = fluide.formule_mu();
 
   // Calcul de rho, nu, mu aux elements
   {
@@ -176,7 +181,34 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zo
         rho_elem[i] = rho;
         const double nu  = indic * delta_nu  + nu_phase_0;
         nu_elem[i]  = nu;
-        const double mu  = nu * rho;
+        switch(formule_mu)
+          {
+          case 0: // standard default method (will be removed)
+            {
+              Cerr << "standard" << finl;
+              mu  = nu * rho;
+            }
+            break;
+          case 1: // Arithmetic average
+            {
+              Cerr << "arithmetic" << finl;
+              mu  = indic * delta_mu  + mu_phase_0;
+            }
+            break;
+          case 2: // Harmonic average
+            {
+              Cerr << "harmonic" << finl;
+              mu  = (mu_phase_0 * mu_phase_1)/(mu_phase_1 - indic * delta_mu);
+            }
+            break;
+          default:
+            {
+              Cerr << "The method specified for formule_mu in not recognized. \n" << finl;
+              Cerr << "you can choose : standard, arithmetic or harmonic. \n" << finl;
+              //Cerr << "We should not be here Navier_Stokes_FT_Disc::FT_disc_calculer_champs_rho_mu_nu_dipha" << finl;
+              Process::exit();
+            }
+          }
         mu_elem[i]  = mu;
       }
     rho_elem.echange_espace_virtuel();
@@ -184,7 +216,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zo
     nu_elem.echange_espace_virtuel();
   }
 
-  // Calcul de rho aux faces (on suppose que la vitesse est aux faces)
+// Calcul de rho aux faces (on suppose que la vitesse est aux faces)
   {
     assert(rho_elem.size() == zone_dis_base.nb_elem());
     const IntTab& face_voisins = zone_dis_base.face_voisins();
