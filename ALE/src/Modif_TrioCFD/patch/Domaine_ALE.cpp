@@ -32,8 +32,12 @@
 #include <Champ_front_ALE.h>
 #include <Ch_front_input_ALE.h>
 
-Implemente_instanciable(Domaine_ALE,"Domaine_ALE",Domaine);
+Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 
+Domaine_ALE::Domaine_ALE() : nb_bords_ALE(0),update_or_not_matrix_coeffs_(1)
+{
+
+}
 Sortie& Domaine_ALE::printOn(Sortie& os) const
 {
   Domaine::printOn(os);
@@ -56,6 +60,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
   update_or_not_matrix_coeffs_=0;
 
+  Cerr<<"Domaine_ALE::mettre_a_jour"<<finl;
+
   //check_Zero_ALE_Vel_A is used in the following way:
   //check_Zero_ALE_Vel_A(0)= 1.0, ALE boundary velocity is zero, ALE mesh velocity is zero and mettre_a_jour is skipped.
   //check_Zero_ALE_Vel_A(1...3)= 1.0, ALE boundary velocity is zero in the specific direction and mesh coordinate in this direction is not updated.
@@ -71,7 +77,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
             {
               if(check_Zero_ALE_Vel_A(k+1) != 1.0)
                 {
-                  coord(i,k)+=ALE_mesh_velocity(i,k)*dt;
+                  coord(i,k)+=ALE_mesh_velocity(i,k)*dt_;
                 }
             }
         }
@@ -317,7 +323,7 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
   return vf;
 }
 
-void Domaine_ALE::lecture_vit_bords_ALE(Entree& is)
+void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
 {
   Motcle accolade_ouverte("{");
   Motcle accolade_fermee("}");
@@ -351,6 +357,35 @@ void Domaine_ALE::lecture_vit_bords_ALE(Entree& is)
     }
 }
 
+//  Read the solver used to solve the system giving the moving mesh velocity
+void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error while reading the solveur_moving_mesh_ALE \n";
+      Cerr << "We were waiting for a " << accolade_ouverte << " instead of \n"
+           << motlu;
+      exit();
+    }
+  is >>  solv;
+  solv.nommer("ALE_solver");
+  Cerr << "ALE solver: " << finl;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+    }
+}
+
+
 DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som ,ArrOfDouble& check_Zero_ALE_Vel_B)
 {
   Cerr << "Domaine_ALE::laplacien" << finl;
@@ -378,9 +413,9 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
   int elem;
   int n_bord;
   {
-    EFichier fic("solveur.bar");
-    fic >> solv;
-    solv.nommer("ALE_solver");
+    //EFichier fic("solveur.bar");
+    // fic >> solv;
+    //solv.nommer("ALE_solver");
     int rang;
     int nnz=0;
     IntLists voisins(nbsom);
@@ -485,20 +520,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
                 }
             }
         }
-      /*      Process::barrier();
-            for(int i= 0; i<secmem.size_totale(); i++)
-              {
-                cout<<" secmem ("<<i<<") = "<<secmem(i)<<endl;;
-              }
-            Process::barrier();
-            secmem.echange_espace_virtuel();
 
-            Process::barrier();
-            for(int i= 0; i<secmem.size_totale(); i++)
-              {
-                cout<<" secmem apres ("<<i<<") = "<<secmem(i)<<endl;;
-              }
-            Process::barrier();*/
       secmem.echange_espace_virtuel();
       Debog::verifier("Domaine_ALE::laplacien -secmem", secmem);
       // If secmem is zero, then it is zero solution. Otherwise system is solved.
@@ -516,12 +538,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
             ch_som(som,comp)=0.0;
           check_Zero_ALE_Vel_B(comp)=1.0;
         }
-      /* Cout<<" composante "<<comp<<finl;
-       Cout<<" solution size "<<solution.size()<<finl;
-       Cout<<" solution size totale "<<solution.size_totale()<<finl;
-       for (int i=0; i<solution.size(); i++)
-         Cout<<" solution[ " <<  i<< " ] = "<<solution[i]<<finl;
-       // getchar();*/
     }
   // Calcul de la norme du vecteur distribue
   {
@@ -533,9 +549,9 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
   return ch_som;
 }
 
-void Domaine_ALE::set_dt(double& dt_)
+void Domaine_ALE::set_dt(double& dt)
 {
-  dt=dt_;
+  dt_=dt;
 }
 
 void Domaine_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,DoubleTab& NewValueOf_ALEjacobian_new, int TimeStepNr)

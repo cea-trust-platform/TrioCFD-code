@@ -32,6 +32,9 @@ Imposer_vit_bords_ALE dom
 	CircleA Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01
 }
 
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { Petsc Cholesky {  } } 
+
 # I select a discretization #
 VEFPreP1B ma_discretisation
 

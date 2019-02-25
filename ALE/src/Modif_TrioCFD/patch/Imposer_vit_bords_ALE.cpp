@@ -95,6 +95,6 @@ Entree& Imposer_vit_bords_ALE::interpreter_(Entree& is)
 {
   associer_domaine(is);
   Domaine_ALE& dom=ref_cast(Domaine_ALE, domaine());
-  dom.lecture_vit_bords_ALE(is);
+  dom.reading_vit_bords_ALE(is);
   return is;
 }

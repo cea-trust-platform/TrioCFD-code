@@ -23,7 +23,6 @@
 #include <Navier_Stokes_std.h>
 #include <Probleme_base.h>
 #include <Domaine.h>
-#include <Domaine_ALE.h>
 #include <Fluide_Incompressible.h>
 #include <Discret_Thyd.h>
 #include <Avanc.h>
@@ -1273,7 +1272,7 @@ void Navier_Stokes_std::mettre_a_jour(double temps)
 
   if (le_traitement_particulier.non_nul())
     le_traitement_particulier.post_traitement_particulier();
-
+  Debog::verifier("Navier_Stokes_std::mettre_a_jour : pression",  la_pression.valeurs());
   Debog::verifier("Navier_Stokes_std::mettre_a_jour : vitesse", la_vitesse.valeurs());
 }
 
@@ -1295,7 +1294,7 @@ bool Navier_Stokes_std::initTimeStep(double dt)
     {
       //In case of zero ALE mesh velocity (..._coeffs()=1), BM-1Bt matrix stays unchanged.
       Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
-      if(dom_ale.update_or_not_matrix_coeffs() == 0) //
+      if(dom_ale.update_or_not_matrix_coeffs() == 0)
         {
           assembleur_pression_.assembler(matrice_pression_); // Here B M-1 Bt is assembled.
           solveur_pression_->reinit();

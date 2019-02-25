@@ -158,7 +158,7 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
   gradient.calculer(pression,gradP);
   resu -= gradP;
 
-  //Adding ALE convection term start
+  //Adding ALE convection term
   if (eqn.probleme().domaine().que_suis_je()=="Domaine_ALE")
     {
       //Renewing ALE Jacobians
@@ -194,8 +194,10 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
       Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, eqn.probleme().domaine());
       DoubleVect ALEjacobian_New=dom_ale.getNewJacobian();
 
+      Debog::verifier(" Test ALE Jacobian New", ALEjacobian_New );
+
       //First step
-      // Adding Jacobians to "matrice" start. Jn+1[A[Un]]
+      // Adding Jacobians to "matrice"  Jn+1[A[Un]]
       int MatriceNbLines=matrice.nb_lignes();
       for (int num_face=0; num_face<MatriceNbLines; num_face++)
         matrice(num_face,num_face)*=ALEjacobian_New[num_face];
@@ -243,7 +245,6 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
 
   test_imposer_cond_lim(eqn,current,"apres resolution ",0);
   current.echange_espace_virtuel();
-  Debog::verifier("Piso::iterer_NS current apres solveur",current);
 
   //Calcul de secmem = BU* (en incompressible) BU* -drho/dt (en quasi-compressible)
   if (is_QC)
@@ -273,24 +274,25 @@ void Piso::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression,
   solveur_pression_.resoudre_systeme(matrice_en_pression_2.valeur(),
                                      secmem,correction_en_pression);
   correction_en_pression.echange_espace_virtuel();
-  Debog::verifier("Piso::iterer_NS arpes correction_pression",correction_en_pression);
+  Debog::verifier("Piso::iterer_NS apres correction_pression",correction_en_pression);
 
   if (avancement_crank_==1)
     {
       //Calcul de Bt(delta_t*delta_P)
       gradient.valeur().multvect(correction_en_pression,gradP);
       eqn.solv_masse().appliquer(gradP);
-
       //Calcul de Un+1 = U* -delta_t*delta_P
       current -= gradP;
       current.echange_espace_virtuel();
       divergence.calculer(current,secmem);
-
       //Calcul de Pn+1 = Pn + (delta_t*delta_P)/delat_t
+      Debog::verifier("Piso::iterer_NS correction avant dt",correction_en_pression);
       correction_en_pression /= dt;
       pression += correction_en_pression;
       eqnNS.assembleur_pression().valeur().modifier_solution(pression);
       pression.echange_espace_virtuel();
+      Debog::verifier("Piso::iterer_NS pression finale",pression);
+      Debog::verifier("Piso::iterer_NS current final",current);
       if (is_QC)
         {
           // on redivise par rho_np_1 avant de sortir

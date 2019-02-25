@@ -28,6 +28,7 @@
 #include <IntLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
+
 class Domaine_dis;
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -44,12 +45,12 @@ class Domaine_dis;
 //////////////////////////////////////////////////////////////////////////////
 class Domaine_ALE : public Domaine
 {
-  Declare_instanciable(Domaine_ALE);
+  Declare_instanciable_sans_constructeur(Domaine_ALE);
 
 public :
-
+  Domaine_ALE();
   inline const double& get_dt() const;
-  virtual void set_dt(double& dt_);
+  virtual void set_dt(double& dt);
   inline const DoubleTab& vitesse() const;
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
@@ -57,7 +58,8 @@ public :
   virtual void initialiser (double temps, Domaine_dis&, Probleme_base&);
   DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, ArrOfDouble&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
-  virtual void lecture_vit_bords_ALE(Entree& is);
+  void reading_vit_bords_ALE(Entree& is);
+  void reading_solver_moving_mesh_ALE(Entree& is);
   virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&, ArrOfDouble&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
@@ -66,7 +68,7 @@ public :
 
 protected:
 
-  double dt;
+  double dt_;
   DoubleTab ALE_mesh_velocity;
   DoubleTab vf; //faces velocity
   IntTab som_faces_bords;
@@ -88,7 +90,7 @@ inline const DoubleTab& Domaine_ALE::vitesse() const
 
 inline const double& Domaine_ALE::get_dt() const
 {
-  return dt;
+  return dt_;
 }
 
 inline DoubleTab& Domaine_ALE::vitesse_faces()
