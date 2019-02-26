@@ -27,9 +27,10 @@ for Discr in $Discretization ; do
 	echo "basename = "$(basename $project_directory)
 	if [ $(basename $project_directory) == "P1NCP0RT" ]
 	then
-	    echo "I recherche de "$MeshFile".med dans "
-	    ls -lrt $project_directory/share/Validation/Rapports_automatiques/mesh/
 	    ln -sfn $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	elif [ $(basename $project_directory) == "Super_Build" ]
+	then
+	    ln -sfn $project_directory/../triocfd-code/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
 	else
 	    echo "II recherche de "$MeshFile".med dans "
 	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
