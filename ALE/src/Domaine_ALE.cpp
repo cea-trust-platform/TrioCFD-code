@@ -47,12 +47,11 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 {
   zone(0).invalide_octree();
   //Modification des coordonnees du maillage
-  int i,k;
   int N_som=nb_som();
   la_vitesse = calculer_vitesse(temps,le_domaine_dis,pb);
-  for (i=0; i<N_som; i++)
+  for (int i=0; i<N_som; i++)
     {
-      for (k=0; k<dimension; k++)
+      for (int k=0; k<dimension; k++)
         {
           coord(i,k)+=la_vitesse(i,k)*dt;
         }
@@ -96,10 +95,24 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       IntVect& rang_elem_non_standard=la_zone_VEF.rang_elem_non_std();
       la_zone_VF.volumes_entrelaces()=0;
       la_zone_VEF.calculer_volumes_entrelaces();
+      // Recalcul des surfaces avec les normales:
+      // PL: je trouve etonnant que le calcul des surfaces se fasse AVANT le calcul des normales
+      // PL: il devrait se faire APRES
+      int nb_faces_tot=face_sommets.dimension_tot(0);
+      DoubleVect face_surfaces_(nb_faces_tot);
+      for (int i=0; i<nb_faces_tot; i++)
+        {
+          double surf=0;
+          for (int k=0; k<dimension; k++)
+            surf += (la_zone_VF.face_normales(i,k)*la_zone_VF.face_normales(i,k));
+          face_surfaces_(i) = sqrt(surf);
+        }
+      la_zone_VF.calculer_face_surfaces(face_surfaces_);
 
       la_zone_VEF.calculer_h_carre();
       const Elem_VEF& type_elem=la_zone_VEF.type_elem();
-      int nb_faces_tot=face_sommets.dimension_tot(0);
+      //int nb_faces_tot=face_sommets.dimension_tot(0);
+      // Recalcul des normales
       normales=0;
       for (int num_face=0; num_face<nb_faces_tot; num_face++)
         type_elem.normale(num_face,normales, face_sommets,
