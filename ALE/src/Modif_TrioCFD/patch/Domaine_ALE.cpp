@@ -323,69 +323,6 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
   return vf;
 }
 
-void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
-{
-  Motcle accolade_ouverte("{");
-  Motcle accolade_fermee("}");
-  Motcle motlu;
-  Nom nomlu;
-  is >> motlu;
-  if (motlu != accolade_ouverte)
-    {
-      Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
-      Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
-           << motlu;
-      exit();
-    }
-  is >> nb_bords_ALE;
-  Cerr << "nombre de bords ALE : " <<  nb_bords_ALE << finl;
-  les_champs_front.dimensionner(nb_bords_ALE);
-  int compteur=0;
-  while(1)
-    {
-      // lecture d'un nom de bord ou de }
-      is >> nomlu;
-      motlu=nomlu;
-      if (motlu == accolade_fermee)
-        break;
-      Cerr << "Lecture des vitesses "
-           << "imposees a " << nomlu << "....." << finl;
-      int rang=les_zones(0).rang_frontiere(nomlu);
-      les_bords_ALE.add(les_zones(0).faces_bord()(rang));
-      is >> les_champs_front[compteur];
-      compteur++;
-    }
-}
-
-//  Read the solver used to solve the system giving the moving mesh velocity
-void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
-{
-  Motcle accolade_ouverte("{");
-  Motcle accolade_fermee("}");
-  Motcle motlu;
-  Nom nomlu;
-  is >> motlu;
-  if (motlu != accolade_ouverte)
-    {
-      Cerr << "Error while reading the solveur_moving_mesh_ALE \n";
-      Cerr << "We were waiting for a " << accolade_ouverte << " instead of \n"
-           << motlu;
-      exit();
-    }
-  is >>  solv;
-  solv.nommer("ALE_solver");
-  Cerr << "ALE solver: " << finl;
-  while(1)
-    {
-      // lecture d'un nom de bord ou de }
-      is >> nomlu;
-      motlu=nomlu;
-      if (motlu == accolade_fermee)
-        break;
-    }
-}
-
-
 DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som ,ArrOfDouble& check_Zero_ALE_Vel_B)
 {
   Cerr << "Domaine_ALE::laplacien" << finl;
@@ -571,13 +508,64 @@ void Domaine_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,Doub
       ALEjacobian_new=NewValueOf_ALEjacobian_new;
     }
 }
-
-DoubleTab& Domaine_ALE::getOldJacobian()
+void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
 {
-  return ALEjacobian_old;
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Erreur a la lecture des vitesses ALE aux bords\n";
+      Cerr << "On attendait une " << accolade_ouverte << " a la place de \n"
+           << motlu;
+      exit();
+    }
+  is >> nb_bords_ALE;
+  Cerr << "nombre de bords ALE : " <<  nb_bords_ALE << finl;
+  les_champs_front.dimensionner(nb_bords_ALE);
+  int compteur=0;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+      Cerr << "Lecture des vitesses "
+           << "imposees a " << nomlu << "....." << finl;
+      int rang=les_zones(0).rang_frontiere(nomlu);
+      les_bords_ALE.add(les_zones(0).faces_bord()(rang));
+      is >> les_champs_front[compteur];
+      compteur++;
+    }
 }
 
-DoubleTab& Domaine_ALE::getNewJacobian()
+//  Read the solver used to solve the system giving the moving mesh velocity
+void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
 {
-  return ALEjacobian_new;
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error while reading the solveur_moving_mesh_ALE \n";
+      Cerr << "We were waiting for a " << accolade_ouverte << " instead of \n"
+           << motlu;
+      exit();
+    }
+  is >>  solv;
+  solv.nommer("ALE_solver");
+  Cerr << "ALE solver: " << finl;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+    }
 }

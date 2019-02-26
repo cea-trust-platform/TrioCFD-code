@@ -63,8 +63,8 @@ public :
   virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&, ArrOfDouble&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
-  DoubleTab& getOldJacobian();
-  DoubleTab& getNewJacobian();
+  inline const DoubleTab& getOldJacobian();
+  inline const DoubleTab& getNewJacobian();
 
 protected:
 
@@ -104,5 +104,14 @@ inline const DoubleTab& Domaine_ALE::vitesse_faces() const
 inline int Domaine_ALE::update_or_not_matrix_coeffs() const
 {
   return update_or_not_matrix_coeffs_;
+}
+inline const DoubleTab& Domaine_ALE::getOldJacobian()
+{
+  return ALEjacobian_old;
+}
+
+inline const DoubleTab& Domaine_ALE::getNewJacobian()
+{
+  return ALEjacobian_new;
 }
 #endif

@@ -1668,7 +1668,8 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
     {
       for (num_face=0; num_face<nb_faces_tot; num_face++)
         {
-          jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0))*(1+ALEmeshVelocityGradient(num_face,1,1))-ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0);
+          jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0))*(1+ALEmeshVelocityGradient(num_face,1,1))
+        		                                                       -ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0);
           jacobianALE(num_face,1)=jacobianALE(num_face,0);
         }
     }
@@ -1676,7 +1677,12 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
     {
       for (num_face=0; num_face<nb_faces_tot; num_face++)
         {
-          jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0))*(1+ALEmeshVelocityGradient(num_face,1,1))*(1+ALEmeshVelocityGradient(num_face,2,2))+ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,0)+ALEmeshVelocityGradient(num_face,0,2)*ALEmeshVelocityGradient(num_face,1,0)*ALEmeshVelocityGradient(num_face,2,1)-ALEmeshVelocityGradient(num_face,0,2)*(1+ALEmeshVelocityGradient(num_face,1,1))*ALEmeshVelocityGradient(num_face,2,0)-ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0)*(1*ALEmeshVelocityGradient(num_face,2,2))-(1+ALEmeshVelocityGradient(num_face,0,0))*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,1);
+          jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0))*(1+ALEmeshVelocityGradient(num_face,1,1))*(1+ALEmeshVelocityGradient(num_face,2,2))
+        		                                                      +ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,0)
+																	  +ALEmeshVelocityGradient(num_face,0,2)*ALEmeshVelocityGradient(num_face,1,0)*ALEmeshVelocityGradient(num_face,2,1)
+																	  -ALEmeshVelocityGradient(num_face,0,2)*(1+ALEmeshVelocityGradient(num_face,1,1))*ALEmeshVelocityGradient(num_face,2,0)
+																	  -ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0)*(1+ALEmeshVelocityGradient(num_face,2,2))
+																	  -(1+ALEmeshVelocityGradient(num_face,0,0))*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,1);
           jacobianALE(num_face,1)=jacobianALE(num_face,0);
           jacobianALE(num_face,2)=jacobianALE(num_face,0);
         }
