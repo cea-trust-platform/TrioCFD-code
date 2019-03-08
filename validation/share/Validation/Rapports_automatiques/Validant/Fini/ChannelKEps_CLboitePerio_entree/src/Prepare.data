@@ -64,8 +64,8 @@ Read sch
         Solveur
            Implicite
            {
-                seuil_convergence_solveur 1.e-8
-		
+               # seuil_convergence_solveur 1.e-8 #
+		       solveur gmres { diag seuil 1.e-12 }
            }
 }
 
@@ -90,8 +90,7 @@ Read pb
 	{
 	Navier_Stokes_Turbulent
 		{
-		solveur_pression GCP {
-			 precond ssor { omega 1.5 } seuil 1e-9   
+		solveur_pression petsc cholesky {
 		}
                 convection { EF_stab { } }
                 diffusion  {  }
