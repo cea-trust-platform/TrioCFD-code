@@ -805,6 +805,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi(DoubleTab& Cmu,
         Cmu[face] = (2./3.)/(A1+sqrt(0.5)*Snorme_face[face]*K_Eps(face,0)/K_Eps(face,1));
     }
 
-  Cerr<<Cmu.mp_min_vect()<<" Cmuuuuuuuuuuuuuuuuuuuu " <<Cmu.mp_max_vect()<<finl;
+  // TMA nettoyage de restes de debug
+  // Cerr<<Cmu.mp_min_vect()<<" Cmuuuuuuuuuuuuuuuuuuuu " <<Cmu.mp_max_vect()<<finl;
   return Cmu;
 }
