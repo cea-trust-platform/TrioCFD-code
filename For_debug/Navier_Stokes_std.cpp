@@ -797,9 +797,9 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   // B dU/dt = 0
   // with F explicit terms: sum(operators)+sources
   // In:  derivee = M-1(F - BtP(n))
-  // Out: derivee = M-1(F - BtP(n+1)) P(n+1)=P(n)+Cp
+  // Out: derivee = M-1(F - BtP(n+1))    P(n+1)=P(n)+Cp
 
-  DoubleTab& tab_pression=la_pression.valeurs();
+  DoubleTab& tab_pression=la_pression.valeurs(); // P(n)
   DoubleTab& gradP=gradient_P.valeurs();
   DoubleTrav secmemP(tab_pression);
 
