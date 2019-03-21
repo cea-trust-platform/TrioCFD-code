@@ -40,13 +40,14 @@ class Navier_Stokes_std_sensibility : public Navier_Stokes_std
 public :
   void set_param(Param& param);
   int lire_motcle_non_standard(const Motcle& mot, Entree& is);
-  void associer_champ_evaluateur(const Nom& un_nom_pb1,const Motcle& un_nom_inco1);
+  void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
+  void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
   virtual  void mettre_a_jour(double temps);
 
 protected :
-  REF(Champ_Inc_base) l_inconnue_etat;  //Reference au champ inconnu du pb etat
-  Nom nom_pb_etat;                      //nom du probleme evaluateur  du pb etat
-  Motcle nom_inco_etat;                 //nom du champ inconnu evaluateur  du pb etat
+  REF(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem
+  Nom name_state_pb;                      //name of the problem state
+  Motcle name_state_field;                 //name of the unknown field of the state problem
 
 };
 

@@ -770,7 +770,9 @@ Fluide_Incompressible& Navier_Stokes_std::fluide()
 
 // Description:
 // Add a specific term for Navier Stokes (-gradP(n)) if necessary
-//
+// In:  derivee = M-1 F
+//with F explicit terms: sum(operators)+sources
+// Out: derivee = M-1(F - BtP(n))
 DoubleTab& Navier_Stokes_std::corriger_derivee_expl(DoubleTab& derivee)
 {
   if (assembleur_pression_.valeur().get_resoudre_increment_pression())
@@ -797,12 +799,11 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   // B dU/dt = 0
   // with F explicit terms: sum(operators)+sources
   // In:  derivee = M-1(F - BtP(n))
-  // Out: derivee = M-1(F - BtP(n+1))    P(n+1)=P(n)+Cp
+  // Out: derivee = M-1(F - BtP(n+1)) P(n+1)=P(n)+Cp
 
-  DoubleTab& tab_pression=la_pression.valeurs(); // P(n)
+  DoubleTab& tab_pression=la_pression.valeurs();
   DoubleTab& gradP=gradient_P.valeurs();
   DoubleTrav secmemP(tab_pression);
-
   if (div_u_nul_et_non_dsurdt_divu_)
     {
       // on veut div u =0 et non d/dt (div u)=0 pour eviter de cumuler les erreurs
@@ -812,11 +813,11 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
       derivee2*=dt;
       derivee2+=la_vitesse.passe();
       derivee2/=dt;
-      divergence.calculer(derivee2, secmemP); // Div(M-1(F - BtP))
+      divergence.calculer(derivee2, secmemP); // Div( U(n) + M-1(F - BtP(n)))/dt
 
     }
   else
-    divergence.calculer(derivee, secmemP); // Div(M-1(F - BtP))
+    divergence.calculer(derivee, secmemP); // Div(M-1(F - BtP(n)))
 
   secmemP *= -1; // car div =-B
 
@@ -828,7 +829,7 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
 
   if (assembleur_pression_.valeur().get_resoudre_increment_pression())
     {
-      // Solve B M-1 Bt Cp = M-1(F - BtP)
+      // Solve B M-1 Bt Cp = Div( U(n) + M-1(F - BtP(n)))/dt
       DoubleTrav Cp(tab_pression);
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, Cp);
 
@@ -836,13 +837,13 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
       tab_pression += Cp;
       assembleur_pression_.modifier_solution(tab_pression);
 
-      // M-1 Bt P(n+1)
+      // M-1 Bt P(n)
       solveur_masse.appliquer(gradP);
       derivee += gradP; // M-1 F
     }
   else
     {
-      // Solve B M-1 Bt P(n+1) = B M-1 F
+      // Solve B M-1 Bt P(n+1) = B M-1 (F- BtP(n))
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, tab_pression);
       assembleur_pression_.modifier_solution(tab_pression);
       // It is not done anymore cause:

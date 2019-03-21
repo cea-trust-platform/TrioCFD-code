@@ -69,9 +69,9 @@ int Navier_Stokes_std_sensibility::lire_motcle_non_standard(const Motcle& mot, E
       Cerr<<"word read="<<motlu<<finl;
       if(motlu=="pb_champ_evaluateur")
         {
-          is >> nom_pb_etat >> nom_inco_etat;
+          is >> name_state_pb >>name_state_field;
           lu_info_evaluateur = 1;
-          if( nom_pb_etat  ==   accolade_fermee  || nom_pb_etat  ==  accolade_ouverte   ||  nom_inco_etat  ==   accolade_fermee  || nom_inco_etat  ==  accolade_ouverte )
+          if( name_state_pb  ==   accolade_fermee  || name_state_pb  ==  accolade_ouverte   || name_state_field  ==   accolade_fermee  ||name_state_field  ==  accolade_ouverte )
             {
               Cerr<<"We expected the name of a problem and a fluid fild while reading of "<<motlu<< finl;
               Cerr << "and not : " <<accolade_ouverte << " or "<<  accolade_fermee << finl;
@@ -97,23 +97,23 @@ int Navier_Stokes_std_sensibility::lire_motcle_non_standard(const Motcle& mot, E
           Cerr<<"when Navier_Stokes_std_sensibility is used."<<finl;
           exit();
         }
-      associer_champ_evaluateur( nom_pb_etat, nom_inco_etat);
+      associate_evaluator_field( name_state_pb,name_state_field);
       return 1;
     }
   else
     return Navier_Stokes_std::lire_motcle_non_standard(mot, is);
 }
 
-//Initialisation de la reference au champ evaluateur (l_inconnue_etat)
-void Navier_Stokes_std_sensibility::associer_champ_evaluateur(const Nom& un_nom_pb_etat,const Motcle& un_nom_inco_etat)
+//Initialization of the reference to the evaluator field (state_field)
+void Navier_Stokes_std_sensibility::associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field)
 {
-  Cerr <<"Navier_Stokes_std_sensibility: recoup state from "<<un_nom_pb_etat<< finl;
-  if(probleme().le_nom() ==un_nom_pb_etat )
+  Cerr <<"Navier_Stokes_std_sensibility: recoup state from "<<one_name_state_pb<< finl;
+  if(probleme().le_nom() ==one_name_state_pb )
     {
       Cerr <<"Navier_Stokes_std_sensibility: we expect here the nom of the state problem and not the name of the sensibility problem"<< finl;
       exit();
     }
-  Objet_U& ob= Interprete::objet(un_nom_pb_etat);
+  Objet_U& ob= Interprete::objet(one_name_state_pb);
   REF(Probleme_base) pb;
   REF(Champ_base) rch;
 
@@ -123,29 +123,42 @@ void Navier_Stokes_std_sensibility::associer_champ_evaluateur(const Nom& un_nom_
     }
   else
     {
-      Cerr <<"No problem named "<< un_nom_pb_etat <<" has been found."<< finl;
+      Cerr <<"No problem named "<< one_name_state_pb <<" has been found."<< finl;
       exit();
     }
-  rch = pb->get_champ(un_nom_inco_etat);
+  rch = pb->get_champ(one_name_state_field);
 
   if(sub_type(Champ_Inc_base,rch.valeur()))
-    l_inconnue_etat = ref_cast(Champ_Inc_base,rch.valeur()) ;
+    state_field = ref_cast(Champ_Inc_base,rch.valeur()) ;
   else
     {
-      Cerr<<pb->le_nom()<<" has no unknown field named "<<un_nom_inco_etat<<finl;
+      Cerr<<pb->le_nom()<<" has no unknown field named "<<one_name_state_field<<finl;
       exit();
     }
-  Cerr <<"  l_inconnue_etat.que_suis_je() = "<<l_inconnue_etat->valeurs().que_suis_je()<<finl; //DoubleTab
-  Cerr <<"  l_inconnue_etat nb comp = "<<l_inconnue_etat->nb_comp()<<finl;// nb_composants vitesse (2,3) ou 1 pour la pression
-  Cerr <<"  l_inconnue_etat nom = "<<l_inconnue_etat->le_nom()<<finl;//vitesse ou pression
-  Cerr<<" innconue valeurs  =  "<<l_inconnue_etat->valeurs()<<finl;// les valeurs
 }
+//Update the reference to the evaluator field (state_field)
+void Navier_Stokes_std_sensibility::update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field)
+{
+  Cerr <<"Navier_Stokes_std_sensibility: update  state from "<<one_name_state_pb<< finl;
 
+  Objet_U& ob= Interprete::objet(one_name_state_pb);
+  REF(Probleme_base) pb;
+  REF(Champ_base) rch;
+
+  pb = ref_cast(Probleme_base,ob);
+  rch = pb->get_champ(one_name_state_field);
+  state_field = ref_cast(Champ_Inc_base,rch.valeur()) ;
+
+  //Cerr <<"  state_field.que_suis_je() = "<<state_field->valeurs().que_suis_je()<<finl; //DoubleTab
+  //Cerr <<"  state_field nb comp = "<<state_field->nb_comp()<<finl;// nb_composants vitesse (2,3) ou 1 pour la pression
+  //Cerr <<"  state_field nom = "<<state_field->le_nom()<<finl;//vitesse ou pression
+  //Cerr<<" innconue valeurs  =  "<<state_field->valeurs()<<finl;// les valeurs
+}
 void Navier_Stokes_std_sensibility::mettre_a_jour(double temps)
 {
   // Mise a jour de la classe mere (on tourne la roue).
   Navier_Stokes_std::mettre_a_jour(temps);
-  associer_champ_evaluateur( nom_pb_etat, nom_inco_etat);
+  update_evaluator_field( name_state_pb,name_state_field);
 }
 
 
