@@ -21,6 +21,7 @@
 
 #include <Navier_Stokes_std_sensibility.h>
 #include <Probleme_base.h>
+#include <Schema_Temps.h>
 #include <Param.h>
 #include <Debog.h>
 #include <LecFicDiffuse.h>
@@ -47,6 +48,18 @@ void Navier_Stokes_std_sensibility::set_param(Param& param)
   Navier_Stokes_std::set_param(param);
   param.ajouter_non_std("state",(this),Param::REQUIRED);
 
+  if (schema_temps().diffusion_implicite())
+    {
+      Cerr<<"diffusion implicite forbidden within Navier_Stokes_std_sensibility  "<<finl;
+      exit();
+    }
+  if( schema_temps().que_suis_je() != "Schema_euler_explicite" )
+    {
+      Cerr<<"Time  scheme: "<<schema_temps().que_suis_je() <<finl;
+      Cerr<<"Only  Scheme_euler_explicit time scheme within Navier_Stokes_std_sensibility  "<<finl;
+      exit();
+    }
+
 }
 
 
@@ -71,7 +84,8 @@ int Navier_Stokes_std_sensibility::lire_motcle_non_standard(const Motcle& mot, E
         {
           is >> name_state_pb >>name_state_field;
           lu_info_evaluateur = 1;
-          if( name_state_pb  ==   accolade_fermee  || name_state_pb  ==  accolade_ouverte   || name_state_field  ==   accolade_fermee  ||name_state_field  ==  accolade_ouverte )
+          if( (name_state_pb  ==   accolade_fermee)  || (name_state_pb  ==  accolade_ouverte)   || (name_state_field  ==   accolade_fermee)
+              || (name_state_field  ==  accolade_ouverte) )
             {
               Cerr<<"We expected the name of a problem and a fluid fild while reading of "<<motlu<< finl;
               Cerr << "and not : " <<accolade_ouverte << " or "<<  accolade_fermee << finl;
@@ -149,7 +163,7 @@ void Navier_Stokes_std_sensibility::update_evaluator_field(const Nom& one_name_s
   rch = pb->get_champ(one_name_state_field);
   state_field = ref_cast(Champ_Inc_base,rch.valeur()) ;
 
-  //Cerr <<"  state_field.que_suis_je() = "<<state_field->valeurs().que_suis_je()<<finl; //DoubleTab
+// Cerr <<"  state_field.que_suis_je() = "<<state_field->valeurs().que_suis_je()<<finl; //DoubleTab
   //Cerr <<"  state_field nb comp = "<<state_field->nb_comp()<<finl;// nb_composants vitesse (2,3) ou 1 pour la pression
   //Cerr <<"  state_field nom = "<<state_field->le_nom()<<finl;//vitesse ou pression
   //Cerr<<" innconue valeurs  =  "<<state_field->valeurs()<<finl;// les valeurs

@@ -165,7 +165,6 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
       type_op = amont;
       ordre = 1;
     }
-
   return s ;
 }
 
@@ -824,6 +823,8 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
 
   modifier_flux(*this);
   //statistiques().end_count(m3);
+  resu.echange_espace_virtuel();
+  Debog::verifier("Op_Conv_VEF_Face::ajouter - resu", resu);
   return resu;
 }
 
@@ -1421,4 +1422,22 @@ void  Op_Conv_VEF_Face::remplir_fluent(DoubleVect& tab_fluent) const
             }
         }
     }
+}
+
+void Op_Conv_VEF_Face::get_ordre(int& ord) const
+{
+  ord=ordre;
+}
+void Op_Conv_VEF_Face::get_type_lim(Motcle& typelim) const
+{
+  typelim=type_lim;
+}
+void Op_Conv_VEF_Face::get_alpha(double& alp) const
+{
+  alp=alpha_;
+}
+
+void Op_Conv_VEF_Face::get_type_op(int& typeop) const
+{
+  typeop=type_op;
 }

@@ -58,6 +58,11 @@ public:
   void contribue_au_second_membre(DoubleTab& ) const;
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
+  void get_ordre(int& ) const;
+  void get_type_lim(Motcle& ) const;
+  void get_alpha(double& ) const;
+  void get_type_op(int& )const;
+
 protected:
   Motcle type_lim;
 
