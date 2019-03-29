@@ -47,7 +47,7 @@ class Op_Conv_VEF_Face : public Op_Conv_VEF_base
   Declare_instanciable_sans_constructeur(Op_Conv_VEF_Face);
 
 public:
-  Op_Conv_VEF_Face() : alpha_(1) {};
+  Op_Conv_VEF_Face() : alpha_(1), type_op(amont) {};
   DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const;
   virtual void remplir_fluent(DoubleVect& ) const;
   // Methodes pour l implicite.
