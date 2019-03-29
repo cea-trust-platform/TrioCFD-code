@@ -43,6 +43,7 @@ public :
   void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
   void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
   virtual  void mettre_a_jour(double temps);
+  const DoubleTab& get_state_field() const;
 
 protected :
   REF(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem

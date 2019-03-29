@@ -174,5 +174,9 @@ void Navier_Stokes_std_sensibility::mettre_a_jour(double temps)
   Navier_Stokes_std::mettre_a_jour(temps);
   update_evaluator_field( name_state_pb,name_state_field);
 }
+const DoubleTab& Navier_Stokes_std_sensibility::get_state_field() const
+{
+  return state_field->valeurs();
+}
 
 

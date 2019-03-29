@@ -21,6 +21,7 @@
 
 #include <Operateur_Conv_sensibility_VEF.h>
 #include <Op_Conv_VEF_base.h>
+#include <Navier_Stokes_std_sensibility.h>
 #include <DoubleTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
@@ -74,8 +75,10 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   if(convectionSchemeDiscrType==0) // Convection scheme discr "amont".
     {
       Cerr << "Operateur_Conv_sensibility_VEF:: Scheme Conv AMONT" << finl;
-      ajouter_Lstate_sensibility_Amont(inco, inco, resu);
-      ajouter_Lsensibility_state_Amont(inco, inco, resu);
+      const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
+      const DoubleTab& state = eq. get_state_field();
+      ajouter_Lstate_sensibility_Amont(state, inco, resu);
+      ajouter_Lsensibility_state_Amont(inco, state, resu);
       opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
     }
   else
@@ -89,11 +92,12 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   return resu;
 }
 
-void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const DoubleTab& state, const DoubleTab& inco, DoubleTab& resu ) const
+void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const DoubleTab& state_field, const DoubleTab& inco, DoubleTab& resu ) const
 {
 
+
 }
-void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const DoubleTab& inco, const DoubleTab& state, DoubleTab& resu ) const
+void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const DoubleTab& inco, const DoubleTab& state_field, DoubleTab& resu ) const
 {
 
 }
