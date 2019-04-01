@@ -85,7 +85,7 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
 {
   if (mot=="equation_interface")
     {
-      const Probleme_FT_Disc_gen pb = ref_cast(Probleme_FT_Disc_gen,probleme());
+      const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
       Motcle nom_eq;
       is >> nom_eq;
       if (Process::je_suis_maitre())
@@ -132,7 +132,7 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
     }
   else if (mot=="equation_navier_stokes")
     {
-      const Probleme_FT_Disc_gen pb = ref_cast(Probleme_FT_Disc_gen,probleme());
+      const Probleme_FT_Disc_gen& pb = ref_cast(Probleme_FT_Disc_gen,probleme());
       Motcle nom_eq;
       is >> nom_eq;
       if (Process::je_suis_maitre())
