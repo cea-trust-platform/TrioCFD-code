@@ -26,7 +26,6 @@
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
-#include <Porosites_champ.h>
 #include <Debog.h>
 
 
@@ -86,7 +85,6 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
       Cout << "Sensibility cannot use currently convection scheme " << op_conv.type() <<". Try available Sensibility amont convection scheme." << finl;
       exit();
     }
-
   resu.echange_espace_virtuel();
   Debog::verifier("resu dansOperateur_Conv_sensibility_VEF::ajouter", resu);
   return resu;
@@ -94,10 +92,883 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
 void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const DoubleTab& state_field, const DoubleTab& inco, DoubleTab& resu ) const
 {
+  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const DoubleTab& facenormales = zone_VEF.face_normales();
+  const DoubleTab& facette_normales = zone_VEF.facette_normales();
+  const Zone& zone = zone_VEF.zone();
+  const int nfa7 = zone_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
+  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
+  int nfac = zone.nb_faces_elem();
+  int nsom = zone.nb_som_elem();
+  int nb_bord = zone_VEF.nb_front_Cl();
+  const IntTab& les_elems=zone.les_elems();
 
 
+  // Definition d'un tableau pour un traitement special des schemas pres des bords
+  if (traitement_pres_bord_.size_array()!=nb_elem_tot)
+    {
+      traitement_pres_bord_.resize_array(nb_elem_tot);
+      traitement_pres_bord_=0;
+      ArrOfInt est_un_sommet_de_bord_(zone_VEF.nb_som_tot());
+      for (int n_bord=0; n_bord<nb_bord; n_bord++)
+        {
+          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nb_faces_tot = le_bord.nb_faces_tot();
+              int size = zone_VEF.face_sommets().dimension(1);
+              for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
+                for (int som=0; som<size; som++)
+                  {
+                    int face = le_bord.num_face(ind_face);
+                    est_un_sommet_de_bord_(zone_VEF.face_sommets(face,som))=1;
+                  }
+            }
+        }
+      for (int elem=0; elem<nb_elem_tot; elem++)
+        {
+          if (rang_elem_non_std(elem)!=-1)
+            traitement_pres_bord_(elem)=1;
+          else
+            {
+              for (int n_som=0; n_som<nsom; n_som++)
+                if (est_un_sommet_de_bord_(les_elems(elem,n_som)))
+                  traitement_pres_bord_(elem)=1;
+            }
+        }
+      // Construction du tableau est_une_face_de_dirichlet_
+      est_une_face_de_dirichlet_.resize_array(zone_VEF.nb_faces_tot());
+      est_une_face_de_dirichlet_=0;
+      for (int n_bord=0; n_bord<nb_bord; n_bord++)
+        {
+          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nb_faces_tot = le_bord.nb_faces_tot();
+              for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
+                {
+                  int num_face = le_bord.num_face(ind_face);
+                  est_une_face_de_dirichlet_(num_face) = 1;
+                }
+            }
+        }
+    }
+
+  // Pour le traitement de la convection on distingue les polyedres
+  // standard qui ne "voient" pas les conditions aux limites et les
+  // polyedres non standard qui ont au moins une face sur le bord.
+  // Un polyedre standard a n facettes sur lesquelles on applique le
+  // schema de convection.
+  // Pour un polyedre non standard qui porte des conditions aux limites
+  // de Dirichlet, une partie des facettes sont portees par les faces.
+  // En bref pour un polyedre le traitement de la convection depend
+  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+
+  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  int istetra=0;
+  Nom nom_elem=type_elemvef.que_suis_je();
+  if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
+    istetra=1;
+
+  double psc;
+  int poly,face_adj,fa7,i,j,n_bord;
+  int num_face, rang;
+  int num10,num20;
+  int ncomp_ch_transporte=(inco.nb_dim() == 1?1:inco.dimension(1));
+
+  // Traitement particulier pour les faces de periodicite
+  int nb_faces_perio = 0;
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          nb_faces_perio+=le_bord.nb_faces();
+        }
+    }
+
+  DoubleTab tab;
+  if (ncomp_ch_transporte == 1)
+    tab.resize(nb_faces_perio);
+  else
+    tab.resize(nb_faces_perio,ncomp_ch_transporte);
+
+  nb_faces_perio=0;
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1 = le_bord.num_premiere_face();
+          int num2 = num1 + le_bord.nb_faces();
+          for (num_face=num1; num_face<num2; num_face++)
+            {
+              if (ncomp_ch_transporte == 1)
+                tab(nb_faces_perio) = resu(num_face);
+              else
+                for (int comp=0; comp<ncomp_ch_transporte; comp++)
+                  tab(nb_faces_perio,comp) = resu(num_face,comp);
+              nb_faces_perio++;
+            }
+        }
+    }
+
+  int comp0;
+  int nb_faces_ = zone_VEF.nb_faces();
+  ArrOfInt face(nfac);
+  ArrOfDouble vs(dimension);
+  ArrOfDouble vc(dimension);
+  ArrOfDouble cc(dimension);
+  DoubleVect xc(dimension);
+  DoubleTab vsom(nsom,dimension);
+  DoubleTab xsom(nsom,dimension);
+
+  const IntTab& KEL=type_elemvef.KEL();
+
+
+
+  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  //  - polyedres bords et joints
+  //  - polyedres bords et non joints
+  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
+  // dans la zone
+  // boucle sur les polys
+
+  for (poly=0; poly<nb_elem_tot; poly++)
+    {
+      int contrib = 0;
+      // calcul des numeros des faces du polyedre
+      for (face_adj=0; face_adj<nfac; face_adj++)
+        {
+          int face_ = elem_faces(poly,face_adj);
+          face(face_adj)= face_;
+          if (face_<nb_faces_) contrib=1; // Une face reelle sur l'element virtuel
+        }
+      //
+      if (contrib)
+        {
+          for (j=0; j<dimension; j++)
+            {
+              vs(j) = state_field(face(0),j);
+              for (i=1; i<nfac; i++)
+                vs(j)+= state_field(face(i),j);
+            }
+          // calcul de la vitesse aux sommets des polyedres
+          if (istetra==1)
+            {
+              for (i=0; i<nsom; i++)
+                for (j=0; j<dimension; j++)
+                  vsom(i,j) = (vs(j) - dimension*state_field(face(i),j));
+            }
+          else
+            {
+              Cout << "Sensibility is currently working only with Tetra_VEF (3D) or Tri_VEF (2D)." << finl;
+              exit();
+            }
+
+          // Determination du type de CL selon le rang
+          rang = rang_elem_non_std(poly);
+          int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
+
+          // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
+          calcul_vc(face,vc,vs,vsom,state_field,itypcl);
+
+
+          // Boucle sur les facettes du polyedre non standard:
+          for (fa7=0; fa7<nfa7; fa7++)
+            {
+              num10 = face(KEL(0,fa7));
+              num20 = face(KEL(1,fa7));
+
+              // normales aux facettes
+              if (rang==-1)
+                for (i=0; i<dimension; i++)
+                  cc[i] = facette_normales(poly, fa7, i);
+              else
+                for (i=0; i<dimension; i++)
+                  cc[i] = normales_facettes_Cl(rang,fa7,i);
+
+              // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
+              double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+              if (dimension==2)
+                {
+                  for (i=0; i<2; i++)
+                    {
+                      psc_c+=vc[i]*cc[i];
+                      psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                    }
+                  psc_m=(psc_c+psc_s)/2.;
+                }
+              else
+                {
+                  for (i=0; i<3; i++)
+                    {
+                      psc_c+=vc[i]*cc[i];
+                      psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                      psc_s2+=vsom(KEL(3,fa7),i)*cc[i];
+                    }
+                  psc_m=(psc_c+psc_s+psc_s2)/3.;
+                }
+              // On applique les CL de Dirichlet si num1 ou num2 est une face avec CL de Dirichlet
+              // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
+              int appliquer_cl_dirichlet=0;
+
+
+              // Determination de la face amont pour M
+              int face_amont_m;
+              if (psc_m >= 0)
+                {
+                  face_amont_m = num10;
+                }
+              else
+                {
+                  face_amont_m = num20;
+                }
+
+              for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
+                {
+                  double flux;
+                  double inco_m = (ncomp_ch_transporte==1?inco(face_amont_m):inco(face_amont_m,comp0));
+
+                  if (true || appliquer_cl_dirichlet)
+                    {
+                      flux = inco_m*psc_m;
+                    }
+                  if (ncomp_ch_transporte == 1)
+                    {
+                      resu(num10) += flux;
+                      resu(num20) -= flux;
+                    }
+                  else
+                    {
+                      resu(num10,comp0) += flux;
+                      resu(num20,comp0) -= flux;
+                    }
+
+                }// boucle sur comp
+            } // fin de la boucle sur les facettes
+        }
+    } // fin de la boucle
+  resu.echange_espace_virtuel();
+  int voisine;
+  nb_faces_perio = 0;
+  double diff1,diff2;
+
+  // Boucle sur les bords pour traiter les conditions aux limites
+  // il y a prise en compte d'un terme de convection pour les
+  // conditions aux limites de Neumann_sortie_libre seulement
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+
+      if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
+        {
+          const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1 = le_bord.num_premiere_face();
+          int num2 = num1 + le_bord.nb_faces();
+          for (num_face=num1; num_face<num2; num_face++)
+            {
+              psc =0;
+              for (i=0; i<dimension; i++)
+                psc += state_field(num_face,i)*facenormales(num_face,i);
+              if (psc>0)
+                if (ncomp_ch_transporte == 1)
+                  {
+                    resu(num_face) += psc*inco(num_face);
+                  }
+                else
+                  for (i=0; i<ncomp_ch_transporte; i++)
+                    {
+                      resu(num_face,i) += psc*inco(num_face,i);
+                    }
+              else
+                {
+                  if (ncomp_ch_transporte == 1)
+                    {
+                      resu(num_face) += psc*la_sortie_libre.val_ext(num_face-num1);
+                    }
+                  else
+                    for (i=0; i<ncomp_ch_transporte; i++)
+                      {
+                        resu(num_face,i) += psc*la_sortie_libre.val_ext(num_face-num1,i);
+                      }
+                }
+            }
+        }
+      else if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1 = le_bord.num_premiere_face();
+          int num2 = num1 + le_bord.nb_faces();
+          ArrOfInt fait(le_bord.nb_faces());
+          fait = 0;
+          for (num_face=num1; num_face<num2; num_face++)
+            {
+              if (fait[num_face-num1] == 0)
+                {
+                  voisine = la_cl_perio.face_associee(num_face-num1) + num1;
+
+                  if (ncomp_ch_transporte == 1)
+                    {
+                      diff1 = resu(num_face)-tab(nb_faces_perio);
+                      diff2 = resu(voisine)-tab(nb_faces_perio+voisine-num_face);
+                      resu(voisine)  -= diff1;
+                      resu(num_face) -= diff2;
+                    }
+                  else
+                    for (int comp=0; comp<ncomp_ch_transporte; comp++)
+                      {
+                        diff1 = resu(num_face,comp)-tab(nb_faces_perio,comp);
+                        diff2 = resu(voisine,comp)-tab(nb_faces_perio+voisine-num_face,comp);
+                        resu(voisine,comp)  -= diff1;
+                        resu(num_face,comp) -= diff2;
+                      }
+
+                  fait[num_face-num1]= 1;
+                  fait[voisine-num1] = 1;
+                }
+              nb_faces_perio++;
+            }
+        }
+    }
 }
 void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const DoubleTab& inco, const DoubleTab& state_field, DoubleTab& resu ) const
 {
+  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const DoubleTab& facenormales = zone_VEF.face_normales();
+  const DoubleTab& facette_normales = zone_VEF.facette_normales();
+  const Zone& zone = zone_VEF.zone();
+  const int nfa7 = zone_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
+  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
+  int nfac = zone.nb_faces_elem();
+  int nsom = zone.nb_som_elem();
+  int nb_bord = zone_VEF.nb_front_Cl();
+  const IntTab& les_elems=zone.les_elems();
 
+
+  // Definition d'un tableau pour un traitement special des schemas pres des bords
+  if (traitement_pres_bord_.size_array()!=nb_elem_tot)
+    {
+      traitement_pres_bord_.resize_array(nb_elem_tot);
+      traitement_pres_bord_=0;
+      ArrOfInt est_un_sommet_de_bord_(zone_VEF.nb_som_tot());
+      for (int n_bord=0; n_bord<nb_bord; n_bord++)
+        {
+          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nb_faces_tot = le_bord.nb_faces_tot();
+              int size = zone_VEF.face_sommets().dimension(1);
+              for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
+                for (int som=0; som<size; som++)
+                  {
+                    int face = le_bord.num_face(ind_face);
+                    est_un_sommet_de_bord_(zone_VEF.face_sommets(face,som))=1;
+                  }
+            }
+        }
+      for (int elem=0; elem<nb_elem_tot; elem++)
+        {
+          if (rang_elem_non_std(elem)!=-1)
+            traitement_pres_bord_(elem)=1;
+          else
+            {
+              for (int n_som=0; n_som<nsom; n_som++)
+                if (est_un_sommet_de_bord_(les_elems(elem,n_som)))
+                  traitement_pres_bord_(elem)=1;
+            }
+        }
+
+      // Construction du tableau est_une_face_de_dirichlet_
+      est_une_face_de_dirichlet_.resize_array(zone_VEF.nb_faces_tot());
+      est_une_face_de_dirichlet_=0;
+      for (int n_bord=0; n_bord<nb_bord; n_bord++)
+        {
+          const Cond_lim_base& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord).valeur();
+          if ( sub_type(Dirichlet,la_cl) || sub_type(Dirichlet_homogene,la_cl) )
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nb_faces_tot = le_bord.nb_faces_tot();
+              for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
+                {
+                  int num_face = le_bord.num_face(ind_face);
+                  est_une_face_de_dirichlet_(num_face) = 1;
+                }
+            }
+        }
+    }
+
+  // Pour le traitement de la convection on distingue les polyedres
+  // standard qui ne "voient" pas les conditions aux limites et les
+  // polyedres non standard qui ont au moins une face sur le bord.
+  // Un polyedre standard a n facettes sur lesquelles on applique le
+  // schema de convection.
+  // Pour un polyedre non standard qui porte des conditions aux limites
+  // de Dirichlet, une partie des facettes sont portees par les faces.
+  // En bref pour un polyedre le traitement de la convection depend
+  // du type (triangle, tetraedre ...) et du nombre de faces de Dirichlet.
+
+  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  int istetra=0;
+  Nom nom_elem=type_elemvef.que_suis_je();
+  if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
+    istetra=1;
+
+  double psc;
+  int poly,face_adj,fa7,i,j,n_bord;
+  int num_face, rang;
+  int num10,num20;
+  int ncomp_ch_transporte=(state_field.nb_dim() == 1?1:state_field.dimension(1));
+
+  // Traitement particulier pour les faces de periodicite
+  int nb_faces_perio = 0;
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          nb_faces_perio+=le_bord.nb_faces();
+        }
+    }
+
+  DoubleTab tab;
+  if (ncomp_ch_transporte == 1)
+    tab.resize(nb_faces_perio);
+  else
+    tab.resize(nb_faces_perio,ncomp_ch_transporte);
+
+  nb_faces_perio=0;
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1 = le_bord.num_premiere_face();
+          int num2 = num1 + le_bord.nb_faces();
+          for (num_face=num1; num_face<num2; num_face++)
+            {
+              if (ncomp_ch_transporte == 1)
+                tab(nb_faces_perio) = resu(num_face);
+              else
+                for (int comp=0; comp<ncomp_ch_transporte; comp++)
+                  tab(nb_faces_perio,comp) = resu(num_face,comp);
+              nb_faces_perio++;
+            }
+        }
+    }
+
+  int comp0;
+  int nb_faces_ = zone_VEF.nb_faces();
+  ArrOfInt face(nfac);
+  ArrOfDouble vs(dimension);
+  ArrOfDouble vc(dimension);
+  ArrOfDouble cc(dimension);
+  DoubleVect xc(dimension);
+  DoubleTab vsom(nsom,dimension);
+  DoubleTab xsom(nsom,dimension);
+
+  const IntTab& KEL=type_elemvef.KEL();
+
+  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  //  - polyedres bords et joints
+  //  - polyedres bords et non joints
+  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
+  // dans la zone
+  // boucle sur les polys
+
+  for (poly=0; poly<nb_elem_tot; poly++)
+    {
+      int contrib = 0;
+      // calcul des numeros des faces du polyedre
+      for (face_adj=0; face_adj<nfac; face_adj++)
+        {
+          int face_ = elem_faces(poly,face_adj);
+          face(face_adj)= face_;
+          if (face_<nb_faces_) contrib=1; // Une face reelle sur l'element virtuel
+        }
+      //
+      if (contrib)
+        {
+          for (j=0; j<dimension; j++)
+            {
+              vs(j) = inco(face(0),j);
+              for (i=1; i<nfac; i++)
+                vs(j)+= inco(face(i),j);
+            }
+          // calcul de la vitesse aux sommets des polyedres
+          if (istetra==1)
+            {
+              for (i=0; i<nsom; i++)
+                for (j=0; j<dimension; j++)
+                  vsom(i,j) = (vs(j) - dimension*inco(face(i),j));
+            }
+          else
+            {
+              Cout << "Sensibility is currently working only with Tetra_VEF (3D) or Tri_VEF (2D)." << finl;
+              exit();
+            }
+
+          // Determination du type de CL selon le rang
+          rang = rang_elem_non_std(poly);
+          int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
+
+          // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
+          calcul_vc(face,vc,vs,vsom,inco,itypcl);
+
+          // Boucle sur les facettes du polyedre non standard:
+          for (fa7=0; fa7<nfa7; fa7++)
+            {
+              num10 = face(KEL(0,fa7));
+              num20 = face(KEL(1,fa7));
+
+              // normales aux facettes
+              if (rang==-1)
+                for (i=0; i<dimension; i++)
+                  cc[i] = facette_normales(poly, fa7, i);
+              else
+                for (i=0; i<dimension; i++)
+                  cc[i] = normales_facettes_Cl(rang,fa7,i);
+
+              // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
+              double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+              if (dimension==2)
+                {
+                  for (i=0; i<2; i++)
+                    {
+                      psc_c+=vc[i]*cc[i];
+                      psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                    }
+                  psc_m=(psc_c+psc_s)/2.;
+                }
+              else
+                {
+                  for (i=0; i<3; i++)
+                    {
+                      psc_c+=vc[i]*cc[i];
+                      psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                      psc_s2+=vsom(KEL(3,fa7),i)*cc[i];
+                    }
+                  psc_m=(psc_c+psc_s+psc_s2)/3.;
+                }
+              // On applique les CL de Dirichlet si num1 ou num2 est une face avec CL de Dirichlet
+              // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
+              int appliquer_cl_dirichlet=0;
+
+
+              // Determination de la face amont pour M
+              int face_amont_m;
+              if (psc_m >= 0)
+                {
+                  face_amont_m = num10;
+                }
+              else
+                {
+                  face_amont_m = num20;
+                }
+
+              for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
+                {
+                  double flux;
+                  double inco_m = (ncomp_ch_transporte==1?state_field(face_amont_m):state_field(face_amont_m,comp0));
+
+                  if (true || appliquer_cl_dirichlet)
+                    {
+                      flux = inco_m*psc_m;
+                    }
+                  if (ncomp_ch_transporte == 1)
+                    {
+                      resu(num10) += flux;
+                      resu(num20) -= flux;
+                    }
+                  else
+                    {
+                      resu(num10,comp0) += flux;
+                      resu(num20,comp0) -= flux;
+                    }
+
+                }// boucle sur comp
+            } // fin de la boucle sur les facettes
+        }
+    } // fin de la boucle
+  resu.echange_espace_virtuel();
+  int voisine;
+  nb_faces_perio = 0;
+  double diff1,diff2;
+
+  // Boucle sur les bords pour traiter les conditions aux limites
+  // il y a prise en compte d'un terme de convection pour les
+  // conditions aux limites de Neumann_sortie_libre seulement
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+
+      if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
+        {
+          const Neumann_sortie_libre& la_sortie_libre = ref_cast(Neumann_sortie_libre, la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1 = le_bord.num_premiere_face();
+          int num2 = num1 + le_bord.nb_faces();
+          for (num_face=num1; num_face<num2; num_face++)
+            {
+              psc =0;
+              for (i=0; i<dimension; i++)
+                psc += inco(num_face,i)*facenormales(num_face,i);
+              if (psc>0)
+                if (ncomp_ch_transporte == 1)
+                  {
+                    resu(num_face) += psc*state_field(num_face);
+                  }
+                else
+                  for (i=0; i<ncomp_ch_transporte; i++)
+                    {
+                      resu(num_face,i) += psc*state_field(num_face,i);
+                    }
+              else
+                {
+                  if (ncomp_ch_transporte == 1)
+                    {
+                      resu(num_face) += psc*la_sortie_libre.val_ext(num_face-num1);
+                    }
+                  else
+                    for (i=0; i<ncomp_ch_transporte; i++)
+                      {
+                        resu(num_face,i) += psc*la_sortie_libre.val_ext(num_face-num1,i);
+                      }
+                }
+            }
+        }
+      else if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Periodique& la_cl_perio = ref_cast(Periodique, la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1 = le_bord.num_premiere_face();
+          int num2 = num1 + le_bord.nb_faces();
+          ArrOfInt fait(le_bord.nb_faces());
+          fait = 0;
+          for (num_face=num1; num_face<num2; num_face++)
+            {
+              if (fait[num_face-num1] == 0)
+                {
+                  voisine = la_cl_perio.face_associee(num_face-num1) + num1;
+
+                  if (ncomp_ch_transporte == 1)
+                    {
+                      diff1 = resu(num_face)-tab(nb_faces_perio);
+                      diff2 = resu(voisine)-tab(nb_faces_perio+voisine-num_face);
+                      resu(voisine)  -= diff1;
+                      resu(num_face) -= diff2;
+                    }
+                  else
+                    for (int comp=0; comp<ncomp_ch_transporte; comp++)
+                      {
+                        diff1 = resu(num_face,comp)-tab(nb_faces_perio,comp);
+                        diff2 = resu(voisine,comp)-tab(nb_faces_perio+voisine-num_face,comp);
+                        resu(voisine,comp)  -= diff1;
+                        resu(num_face,comp) -= diff2;
+                      }
+
+                  fait[num_face-num1]= 1;
+                  fait[voisine-num1] = 1;
+                }
+              nb_faces_perio++;
+            }
+        }
+    }
+}
+
+
+void Operateur_Conv_sensibility_VEF::calcul_vc(const ArrOfInt& Face, ArrOfDouble& vc, const ArrOfDouble& vs, const DoubleTab& vsom,
+                                               const DoubleTab& vitesse_face,int type_cl) const
+{
+// Operateur_Conv_sensibility_VEF::calcul_vc(...) is based on Tetra_VEF::calcul_vc(...) and on Tri_VEF::calcul_vc(...).
+  if (dimension == 2) //Tri_VEF
+    {
+
+      switch(type_cl)
+        {
+        case 0: // le triangle n'a pas de Face de Dirichlet
+          {
+            vc[0] = vs[0]/3;
+            vc[1] = vs[1]/3;
+            break;
+          }
+
+        case 1: // le triangle a une Face de Dirichlet :la Face 2
+          {
+            vc[0]= vitesse_face(Face[2],0);
+            vc[1]= vitesse_face(Face[2],1);
+            break;
+          }
+
+        case 2: // le triangle a une Face de Dirichlet :la Face 1
+          {
+            vc[0]= vitesse_face(Face[1],0);
+            vc[1]= vitesse_face(Face[1],1);
+            break;
+          }
+
+        case 4: // le triangle a une Face de Dirichlet :la Face 0
+          {
+            vc[0]= vitesse_face(Face[0],0);
+            vc[1]= vitesse_face(Face[0],1);
+            break;
+          }
+
+        case 3: // le triangle a deux faces de Dirichlet :les faces 1 et 2
+          {
+            vc[0]= vsom(0,0);
+            vc[1]= vsom(0,1);
+            break;
+          }
+
+        case 5: // le triangle a deux faces de Dirichlet :les faces 0 et 2
+          {
+            vc[0]= vsom(1,0);
+            vc[1]= vsom(1,1);
+            break;
+          }
+
+        case 6: // le triangle a deux faces de Dirichlet :les faces 0 et 1
+          {
+            vc[0]= vsom(2,0);
+            vc[1]= vsom(2,1);
+            break;
+          }
+
+        } // switch end
+
+    } // 2D end
+
+  else if (dimension == 3) //Tetra_VEF
+    {
+
+      int comp;
+      switch(type_cl)
+        {
+
+        case 0: // le tetraedre n'a pas de Face de Dirichlet
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.25*vs[comp];
+            break;
+          }
+
+        case 1: // le tetraedre a une Face de Dirichlet : KEL3
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vitesse_face(Face[3],comp);
+            break;
+          }
+
+        case 2: // le tetraedre a une Face de Dirichlet : KEL2
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vitesse_face(Face[2],comp);
+            break;
+          }
+
+        case 4: // le tetraedre a une Face de Dirichlet : KEL1
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vitesse_face(Face[1],comp);
+            break;
+          }
+
+        case 8: // le tetraedre a une Face de Dirichlet : KEL0
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vitesse_face(Face[0],comp);
+            break;
+          }
+
+        case 3: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL2
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.5* (vsom(0,comp) + vsom(1,comp));
+            break;
+          }
+
+        case 5: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL1
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.5* (vsom(0,comp) + vsom(2,comp));
+            break;
+          }
+
+        case 6: // le tetraedre a deux faces de Dirichlet : KEL1 et KEL2
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.5* (vsom(0,comp) + vsom(3,comp));
+            break;
+          }
+
+        case 9: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL3
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.5* (vsom(1,comp) + vsom(2,comp));
+            break;
+          }
+
+        case 10: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL2
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.5* (vsom(1,comp) + vsom(3,comp));
+            break;
+          }
+
+        case 12: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL1
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = 0.5*(vsom(2,comp) + vsom(3,comp));
+            break;
+          }
+
+        case 7: // le tetraedre a trois faces de Dirichlet : KEL1, KEL2 et KEL3
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vsom(0,comp);
+            break;
+          }
+
+        case 11: // le tetraedre a trois faces de Dirichlet : KEL0,KEL2 et KEL3
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vsom(1,comp);
+            break;
+          }
+
+        case 13: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL3
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vsom(2,comp);
+            break;
+          }
+
+        case 14: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL2
+          {
+            for (comp=0; comp<3; comp++)
+              vc[comp] = vsom(3,comp);
+            break;
+          }
+
+        } // switch end
+
+    } // 3D end
 }
