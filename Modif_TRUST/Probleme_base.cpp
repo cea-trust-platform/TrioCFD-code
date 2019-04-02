@@ -43,6 +43,11 @@
 #include <sys/stat.h>
 #include <Loi_Fermeture_base.h>
 
+
+#include <Navier_Stokes_std.h>
+#include <Zone_VEF.h>
+
+
 #define CHECK_ALLOCATE 0
 #ifdef CHECK_ALLOCATE
 #include <unistd.h> // Pour acces a int close(int fd); avec PGI
@@ -1058,6 +1063,35 @@ void Probleme_base::finir()
   // alors on effectue la sauvegarde finale xyz
   if (Motcle(format_sauv)!="xyz" && (EcritureLectureSpecial::Active))
     sauver_xyz(1);
+
+  //add for validation  (projet Sensibility )
+  Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std,equation(0));
+  const  DoubleTab& vitesse=  eqnNS.inconnue().valeur();
+  if( equation(0).que_suis_je() == "Navier_Stokes_standard")
+    {
+      Nom   nom_fichier_vitesse("Velocity_state.txt");
+      SFichier file_vitesse(nom_fichier_vitesse);
+      Nom   nom_fichier_centre_faces("Center_gravity_faces.txt");
+      SFichier file_c_faces(nom_fichier_centre_faces);
+      const Zone_VEF& la_zone = ref_cast(Zone_VEF,eqnNS.zone_dis().valeur());
+      const DoubleTab& xv= la_zone.xv();
+      assert(xv.dimension(0)==vitesse.dimension(0));
+      for(int face=0; face<vitesse.dimension(0); face++)
+        {
+          file_vitesse<<vitesse(face, 0)<<"  "<<vitesse(face, 1)<<finl;
+          file_c_faces<<xv(face, 0)<<"  "<<xv(face, 1)<<finl;
+        }
+    }
+  else  if( equation(0).que_suis_je() == "Navier_Stokes_standard_sensibility")
+    {
+      Nom   nom_fichier_vitesse("Velocity_sensibility.txt");
+      SFichier file_vitesse(nom_fichier_vitesse);
+      for(int face=0; face<vitesse.dimension(0); face++)
+        {
+          file_vitesse<<vitesse(face, 0)<<"  "<<vitesse(face, 1)<<finl;
+        }
+    }
+  //end add for validation (projet Sensibility )
 }
 
 // Description:
