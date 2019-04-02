@@ -43,6 +43,14 @@ public :
   void associer_vitesse(const Champ_base& vit );
   virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
   virtual DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const;
+  inline const Champ_Inc_base& vitesse() const
+  {
+    return  la_vitesse.valeur();
+  };
+  inline       Champ_Inc_base& vitesse()
+  {
+    return  la_vitesse.valeur();
+  };
 
 protected :
   Operateur_Conv op_conv;

@@ -46,10 +46,12 @@ public :
   void ajouter_Lstate_sensibility_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const; //L(U0)U1
   void ajouter_Lsensibility_state_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const;//L(U1)U0
   void calcul_vc(const ArrOfInt&, ArrOfDouble& , const ArrOfDouble& s, const DoubleTab& , const DoubleTab& ,int  ) const;
-
+  virtual void remplir_fluent(DoubleVect& ) const;
+  double calculer_dt_stab() const;
 protected :
   REF(Zone_VEF) la_zone_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
+  mutable DoubleVect fluent;           // tableau qui sert pour le calcul du pas de temps de stabilite
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;
 

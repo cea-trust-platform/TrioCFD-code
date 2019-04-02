@@ -58,6 +58,7 @@ void  Operateur_Conv_sensibility_VEF::associer (const Zone_dis& zone_dis ,
 
   la_zone_vef = zvef;
   la_zcl_vef = zclvef;
+  la_zone_vef.valeur().creer_tableau_faces(fluent);
   Operateur_Conv_sensibility::associer(zone_dis,zone_cl_dis,inco);
 }
 
@@ -73,7 +74,6 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
   if(convectionSchemeDiscrType==0) // Convection scheme discr "amont".
     {
-      Cerr << "Operateur_Conv_sensibility_VEF:: Scheme Conv AMONT" << finl;
       const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
       const DoubleTab& state = eq. get_state_field();
       ajouter_Lstate_sensibility_Amont(state, inco, resu);
@@ -971,4 +971,240 @@ void Operateur_Conv_sensibility_VEF::calcul_vc(const ArrOfInt& Face, ArrOfDouble
         } // switch end
 
     } // 3D end
+}
+void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) const
+{
+
+  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
+  const Champ_Inc_base& velocity=vitesse();
+  const DoubleTab& vitesse_face=velocity.valeurs();
+  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const DoubleTab& face_normales = zone_VEF.face_normales();
+  const DoubleTab& facette_normales = zone_VEF.facette_normales();
+  const Zone& zone = zone_VEF.zone();
+  const int nfa7 = zone_VEF.type_elem().nb_facette();
+  const int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
+  const DoubleTab& normales_facettes_Cl = zone_Cl_VEF.normales_facettes_Cl();
+  int nfac = zone.nb_faces_elem();
+  int nsom = zone.nb_som_elem();
+  const IntTab& sommet_elem = zone.les_elems();
+  DoubleVect& fluent_ = ref_cast(DoubleVect, tab_fluent);
+
+
+  const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
+  int istetra=0;
+  Nom nom_elem=type_elemvef.que_suis_je();
+  if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
+    istetra=1;
+
+
+  double psc;
+  int poly,face_adj,fa7,i,j,n_bord;
+  int num_face, rang ,itypcl;
+  int num1,num2,num_som;
+
+  ArrOfInt face(nfac);
+  ArrOfDouble vs(dimension);
+  ArrOfDouble vc(dimension);
+  DoubleTab vsom(nsom,dimension);
+  ArrOfDouble cc(dimension);
+
+  // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
+  const IntTab& KEL=type_elemvef.KEL();
+
+  // On remet a zero le tableau qui sert pour
+  // le calcul du pas de temps de stabilite
+  fluent_ = 0;
+
+  // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
+  //  - polyedres bords et joints
+  //  - polyedres bords et non joints
+  // On traite les polyedres en suivant l'ordre dans lequel ils figurent
+  // dans la zone
+
+  // boucle sur les polys
+  for (poly=0; poly<nb_elem_tot; poly++)
+    {
+      rang = rang_elem_non_std(poly);
+      // On cherche, pour un elem qui n'est pas de bord (rang==-1),
+      // si un des sommets est sur un bord (tableau des sommets) (C MALOD 17/07/2007)
+
+      if (rang==-1)
+        itypcl=0;
+      else
+        itypcl=zone_Cl_VEF.type_elem_Cl(rang);
+
+      // calcul des numeros des faces du polyedre
+      for (face_adj=0; face_adj<nfac; face_adj++)
+        face(face_adj)= elem_faces(poly,face_adj);
+
+      for (j=0; j<dimension; j++)
+        {
+          vs(j) = vitesse_face(face(0),j);
+          for (i=1; i<nfac; i++)
+            vs(j)+= vitesse_face(face(i),j);
+        }
+      // calcul de la vitesse aux sommets des polyedres
+      if (istetra==1)
+        {
+          for (i=0; i<nsom; i++)
+            for (j=0; j<dimension; j++)
+              vsom(i,j) = (vs(j) - dimension*vitesse_face(face(i),j));
+        }
+      else
+        {
+          // pour que cela soit valide avec les hexa (c'est + lent a calculer...)
+          int ncomp;
+          for (j=0; j<nsom; j++)
+            {
+              num_som = sommet_elem(poly,j);
+              for (ncomp=0; ncomp<dimension; ncomp++)
+                vsom(j,ncomp) =velocity.valeur_a_sommet_compo(num_som,poly,ncomp);
+            }
+        }
+
+      // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la prosite
+      calcul_vc(face,vc,vs,vsom,vitesse(),itypcl);
+      // Boucle sur les facettes du polyedre non standard:
+      for (fa7=0; fa7<nfa7; fa7++)
+        {
+          num1 = face(KEL(0,fa7));
+          num2 = face(KEL(1,fa7));
+          // normales aux facettes
+          if (rang==-1)
+            {
+              for (i=0; i<dimension; i++)
+                cc[i] = facette_normales(poly, fa7, i);
+            }
+          else
+            {
+              for (i=0; i<dimension; i++)
+                cc[i] = normales_facettes_Cl(rang,fa7,i);
+            }
+          // On applique le schema de convection a chaque sommet de la facette
+
+          double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+          if (dimension==2)
+            {
+              for (i=0; i<dimension; i++)
+                {
+                  psc_c+=vc[i]*cc[i];
+                  psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                }
+              psc_m=(psc_c+psc_s)/2.;
+            }
+          else
+            {
+              for (i=0; i<dimension; i++)
+                {
+                  psc_c+=vc[i]*cc[i];
+                  psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                  psc_s2+=vsom(KEL(3,fa7),i)*cc[i];
+                }
+              psc_m=(psc_c+psc_s+psc_s2)/3.;
+            }
+
+          // int amont,dir;
+          if (psc_m >= 0)
+            {
+              // amont = num1;
+              fluent_(num2)  += psc_m;
+              //dir=0;
+            }
+          else
+            {
+              //amont = num2;
+              fluent_(num1)  -= psc_m;
+              //dir=1;
+            }
+
+        } // fin de la boucle sur les facettes
+    } // fin de la boucle
+
+  // Boucle sur les bords pour traiter les conditions aux limites
+  // il y a prise en compte d'un terme de convection pour les
+  // conditions aux limites de Neumann_sortie_libre seulement
+  int nb_bord = zone_VEF.nb_front_Cl();
+  for (n_bord=0; n_bord<nb_bord; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int num1b = le_bord.num_premiere_face();
+          int num2b = num1b + le_bord.nb_faces();
+          for (num_face=num1b; num_face<num2b; num_face++)
+            {
+              psc = 0;
+              for (i=0; i<dimension; i++)
+                psc += vitesse_face(num_face,i)*face_normales(num_face,i);
+              if (psc>0)
+                ;
+              else
+                fluent_(num_face) -= psc;
+            }
+        }
+    }
+}
+double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
+{
+  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
+  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const DoubleVect& volumes_entrelaces_Cl = zone_Cl_VEF.volumes_entrelaces_Cl();
+  remplir_fluent(fluent);
+  double dt_face,dt_stab =1.e30;
+
+  // On traite les conditions aux limites
+  // Si une face porte une condition de Dirichlet on n'en tient pas compte
+  // dans le calcul de dt_stab
+  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if ( (sub_type(Dirichlet,la_cl.valeur()))
+           ||
+           (sub_type(Dirichlet_homogene,la_cl.valeur()))
+         )
+        ;
+      else
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          for (int num_face=ndeb; num_face<nfin; num_face++)
+            {
+              dt_face = volumes_entrelaces_Cl(num_face)/(fluent[num_face]+1.e-30);
+              dt_stab = (dt_face < dt_stab) ? dt_face : dt_stab;
+            }
+        }
+    }
+
+  // On traite les faces internes non standard
+  int ndeb = zone_VEF.premiere_face_int();
+  int nfin = zone_VEF.premiere_face_std();
+
+  for (int num_face=ndeb; num_face<nfin; num_face++)
+    {
+      dt_face = volumes_entrelaces_Cl(num_face)/(fluent[num_face]+DMINFLOAT);
+      dt_stab =(dt_face < dt_stab) ? dt_face : dt_stab;
+    }
+
+  // On traite les faces internes standard
+  ndeb = nfin;
+  nfin = zone_VEF.nb_faces();
+  for (int num_face=ndeb; num_face<nfin; num_face++)
+    {
+      dt_face = volumes_entrelaces(num_face)/(fluent[num_face]+DMINFLOAT);
+      dt_stab =(dt_face < dt_stab) ? dt_face : dt_stab;
+    }
+
+  dt_stab = Process::mp_min(dt_stab);
+  // astuce pour contourner le type const de la methode
+  Operateur_Conv_sensibility_VEF& op = ref_cast_non_const(Operateur_Conv_sensibility_VEF,*this);
+  op.fixer_dt_stab_conv(dt_stab);
+
+
+  return dt_stab;
 }
