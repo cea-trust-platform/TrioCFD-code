@@ -1,1 +1,9 @@
-../Translation_IBC_3D_VDF/loi_horaire_3D.data
+# Translation sans rotation #
+export Loi_horaire loi
+Lire loi
+{
+	position  		3 0.1*t 0.1*t 0.1*t
+	vitesse			3 0.1   0.1   0.1
+	rotation		9 1. 0. 0. 0. 1. 0. 0. 0. 1.
+	derivee_rotation	9 0. 0. 0. 0. 0. 0. 0. 0. 0.
+} 

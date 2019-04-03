@@ -1,1 +1,10 @@
-../Rotation_IBC_2D_VDF/loi_horaire_2D.data
+# Rotation #
+export Loi_horaire loi
+Lire loi
+{
+	position   	 	2 0. 0.
+	vitesse	           	2 0. 0.
+	rotation		4 cos(t) -sin(t) sin(t) cos(t)
+	derivee_rotation	4 -sin(t) -cos(t) cos(t) -sin(t)
+} 
+ 

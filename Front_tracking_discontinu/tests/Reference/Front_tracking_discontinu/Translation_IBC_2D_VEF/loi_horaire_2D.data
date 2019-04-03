@@ -1,1 +1,9 @@
-../Translation_IBC_2D_VDF/loi_horaire_2D.data
+# Translation sans rotation #
+export Loi_horaire loi
+Lire loi
+{
+	position	 	2 0.1*t 0.1*t
+	vitesse			2 0.1   0.1  
+	rotation		4 1  0. 0. 1.
+	derivee_rotation	4 0. 0. 0. 0.
+} 

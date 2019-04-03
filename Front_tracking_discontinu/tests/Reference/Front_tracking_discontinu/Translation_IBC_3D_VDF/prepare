@@ -1,1 +1,11 @@
-../Translation_IBC_2D_VEF/prepare
+#!/bin/bash
+data=`pwd`
+data=`basename $data`.data
+vitesse_imposee="vitesse_imposee 0.1 0.1"
+[ "`grep 'dimension 3' $data`" != "" ] && vitesse_imposee="vitesse_imposee 0.1 0.1 0.1"
+echo $ECHO_OPTS "1,$ s?methode_transport loi_horaire loi?methode_transport $vitesse_imposee?g\nw ref.data" | ed $data 1>/dev/null 2>&1
+data=${data%.data}
+echo "Comparaison methode_transport vitesse_imposee et loi_horaire pour $data:"
+# Calcul sequentiel
+rm -f *lml *lata*
+trust ref

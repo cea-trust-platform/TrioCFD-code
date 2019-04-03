@@ -1,1 +1,10 @@
-../Rotation_IBC_3D_VDF/loi_horaire_3D.data
+# Rotation #
+export Loi_horaire loi
+Lire loi
+{
+	position		3 0. 0. 0.
+	vitesse			3 0. 0. 0.
+	rotation		9 cos(t) -sin(t) 0. sin(t) cos(t) 0. 0. 0. 1.
+	derivee_rotation	9 -sin(t) -cos(t) 0. cos(t) -sin(t) 0. 0. 0. 0.
+} 
+ 
