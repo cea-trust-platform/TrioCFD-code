@@ -34,6 +34,9 @@ Imposer_vit_bords_ALE dom
 	SquareWest Champ_front_ALE 2 5332.1060948531*t^14-32298.6022288094*t^13+82536.4975918952*t^12-113601.598522952*t^11+87092.7829977197*t^10-30701.3161138279*t^9-4149.8806731801*t^8+9018.0763311767*t^7-4116.7644578227*t^6+1021.4242442502*t^5-143.2563722683*t^4+11.9491505207*t^3-0.4279584487*t^2+0.009455793*t 0.
 }
 
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-7 impr }  } 
+
 # I select a discretization #
 VEFPreP1B ma_discretisation
 

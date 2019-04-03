@@ -28,9 +28,6 @@
 #include <Frontiere_dis_base.h>
 #include <communications.h>
 #include <Convert_ICoCoTrioField.h>
-#include <Zone_dis.h>
-#include <Zone_VF.h>
-#include <Zone_VEF.h>
 
 Implemente_instanciable(Ch_front_input,"Ch_front_input",Ch_front_var_instationnaire_dep);
 

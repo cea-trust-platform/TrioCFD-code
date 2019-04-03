@@ -968,11 +968,11 @@ void Op_Conv_ALE_VEF::ajouterALE_Muscl(const DoubleTab& inco,DoubleTab& resu) co
     } // fin du for faces
   gradient.echange_espace_virtuel();
 
-  ArrOfDouble vs(dimension); //somme des vitesse aux faces dans un element
-  ArrOfDouble vc(dimension); //vitesse au centre de l'element
-  ArrOfDouble cc(dimension);// normales aux facettes
+  ArrOfDouble vs(dimension);
+  ArrOfDouble vc(dimension);
+  ArrOfDouble cc(dimension);
   DoubleVect xc(dimension);
-  DoubleTab vsom(nsom,dimension); //vitesse aux somments de l'element
+  DoubleTab vsom(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
   const IntTab& KEL=type_elemvef.KEL();
@@ -1669,7 +1669,7 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
       for (num_face=0; num_face<nb_faces_tot; num_face++)
         {
           jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0))*(1+ALEmeshVelocityGradient(num_face,1,1))
-                                  -ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0);
+        		                                                       -ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0);
           jacobianALE(num_face,1)=jacobianALE(num_face,0);
         }
     }
@@ -1678,11 +1678,11 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
       for (num_face=0; num_face<nb_faces_tot; num_face++)
         {
           jacobianALE(num_face,0)=(1+ALEmeshVelocityGradient(num_face,0,0))*(1+ALEmeshVelocityGradient(num_face,1,1))*(1+ALEmeshVelocityGradient(num_face,2,2))
-                                  +ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,0)
-                                  +ALEmeshVelocityGradient(num_face,0,2)*ALEmeshVelocityGradient(num_face,1,0)*ALEmeshVelocityGradient(num_face,2,1)
-                                  -ALEmeshVelocityGradient(num_face,0,2)*(1+ALEmeshVelocityGradient(num_face,1,1))*ALEmeshVelocityGradient(num_face,2,0)
-                                  -ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0)*(1+ALEmeshVelocityGradient(num_face,2,2))
-                                  -(1+ALEmeshVelocityGradient(num_face,0,0))*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,1);
+        		                                                      +ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,0)
+																	  +ALEmeshVelocityGradient(num_face,0,2)*ALEmeshVelocityGradient(num_face,1,0)*ALEmeshVelocityGradient(num_face,2,1)
+																	  -ALEmeshVelocityGradient(num_face,0,2)*(1+ALEmeshVelocityGradient(num_face,1,1))*ALEmeshVelocityGradient(num_face,2,0)
+																	  -ALEmeshVelocityGradient(num_face,0,1)*ALEmeshVelocityGradient(num_face,1,0)*(1+ALEmeshVelocityGradient(num_face,2,2))
+																	  -(1+ALEmeshVelocityGradient(num_face,0,0))*ALEmeshVelocityGradient(num_face,1,2)*ALEmeshVelocityGradient(num_face,2,1);
           jacobianALE(num_face,1)=jacobianALE(num_face,0);
           jacobianALE(num_face,2)=jacobianALE(num_face,0);
         }
@@ -1698,11 +1698,9 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
   return jacobianALE;
 }
 
-void Op_Conv_ALE_VEF::calcul_vc_ALE(const ArrOfInt& Face, ArrOfDouble& vc, const ArrOfDouble& vs, const DoubleTab& vsom,
-                                    const DoubleTab& vitesse_face_absolue_ALE,int type_cl, const DoubleVect& porosite_face) const
+void Op_Conv_ALE_VEF::calcul_vc_ALE(const ArrOfInt& Face, ArrOfDouble& vc, const ArrOfDouble& vs, const DoubleTab& vsom, const DoubleTab& vitesse_face_absolue_ALE,int type_cl, const DoubleVect& porosite_face) const
 {
-// Op_Conv_ALE_VEF::calcul_vc_ALE(...) is based on Tetra_VEF::calcul_vc(...) and on Tri_VEF::calcul_vc(...).
-//It was created in order to have vitesse_face_absolue_ALE input as DoubleTab& compared to the original Champ_Inc_base& .
+// Op_Conv_ALE_VEF::calcul_vc_ALE(...) is based on Tetra_VEF::calcul_vc(...) and on Tri_VEF::calcul_vc(...). It was created in order to have vitesse_face_absolue_ALE input as DoubleTab& compared to the original Champ_Inc_base& .
   if (dimension == 2) //Tri_VEF
     {
 

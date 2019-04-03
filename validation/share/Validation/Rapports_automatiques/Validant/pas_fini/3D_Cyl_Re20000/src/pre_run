@@ -1,3 +1,1 @@
-#!/bin/bash
-make_PAR.data test.data
-mv -f PAR_test.data test.data
+../../2D_Cyl_Re20000/src/pre_run
