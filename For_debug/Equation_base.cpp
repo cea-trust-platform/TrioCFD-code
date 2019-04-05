@@ -806,6 +806,7 @@ DoubleTab& Equation_base::derivee_en_temps_inco(DoubleTab& derivee)
     }
   les_sources.ajouter(secmem);
 
+
   if (calculate_time_derivative())
     {
       // Store dI/dt(n) = M-1 secmem :

@@ -75,7 +75,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   if(convectionSchemeDiscrType==0) // Convection scheme discr "amont".
     {
       const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
-      const DoubleTab& state = eq. get_state_field();
+      const DoubleTab& state = eq.get_state_field();
       ajouter_Lstate_sensibility_Amont(state, inco, resu);
       ajouter_Lsensibility_state_Amont(inco, state, resu);
       opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
@@ -92,6 +92,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
 void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const DoubleTab& state_field, const DoubleTab& inco, DoubleTab& resu ) const
 {
+  Cout<<"ajouter_Lstate_sensibility "<<finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
   const IntTab& elem_faces = zone_VEF.elem_faces();
@@ -106,7 +107,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   int nsom = zone.nb_som_elem();
   int nb_bord = zone_VEF.nb_front_Cl();
   const IntTab& les_elems=zone.les_elems();
-
+  int option_appliquer_cl_dirichlet = 0 ;
 
   // Definition d'un tableau pour un traitement special des schemas pres des bords
   if (traitement_pres_bord_.size_array()!=nb_elem_tot)
@@ -176,7 +177,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   if ((nom_elem=="Tetra_VEF")||(nom_elem=="Tri_VEF"))
     istetra=1;
 
-  double psc;
+  double psc, psc_inco;
   int poly,face_adj,fa7,i,j,n_bord;
   int num_face, rang;
   int num10,num20;
@@ -231,6 +232,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   DoubleTab vsom(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
+
+  ArrOfDouble vs_inco(dimension);
+  ArrOfDouble vc_inco(dimension);
+  DoubleTab vsom_inco(nsom,dimension);
+
   const IntTab& KEL=type_elemvef.KEL();
 
 
@@ -258,15 +264,22 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
           for (j=0; j<dimension; j++)
             {
               vs(j) = state_field(face(0),j);
+              vs_inco(j) = inco(face(0),j);
               for (i=1; i<nfac; i++)
-                vs(j)+= state_field(face(i),j);
+                {
+                  vs(j)+= state_field(face(i),j);
+                  vs_inco(j)+= inco(face(i),j);
+                }
             }
           // calcul de la vitesse aux sommets des polyedres
           if (istetra==1)
             {
               for (i=0; i<nsom; i++)
                 for (j=0; j<dimension; j++)
-                  vsom(i,j) = (vs(j) - dimension*state_field(face(i),j));
+                  {
+                    vsom(i,j) = (vs(j) - dimension*state_field(face(i),j));
+                    vsom_inco(i,j) = (vs_inco(j) - dimension*inco(face(i),j));
+                  }
             }
           else
             {
@@ -280,6 +293,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,state_field,itypcl);
+          calcul_vc(face,vc_inco,vs_inco,vsom_inco,inco,itypcl);
 
 
           // Boucle sur les facettes du polyedre non standard:
@@ -298,14 +312,18 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
               // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
               double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+              double psc_c_inco=0,psc_s_inco=0,psc_m_inco;
               if (dimension==2)
                 {
                   for (i=0; i<2; i++)
                     {
                       psc_c+=vc[i]*cc[i];
                       psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                      psc_c_inco+=vc_inco[i]*cc[i];
+                      psc_s_inco+=vsom_inco(KEL(2,fa7),i)*cc[i];
                     }
                   psc_m=(psc_c+psc_s)/2.;
+                  psc_m_inco=(psc_c_inco+psc_s_inco)/2.;
                 }
               else
                 {
@@ -319,11 +337,17 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 }
               // On applique les CL de Dirichlet si num1 ou num2 est une face avec CL de Dirichlet
               // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
-              int appliquer_cl_dirichlet=0;
-
-
+              //int appliquer_cl_dirichlet=0;
+              if (option_appliquer_cl_dirichlet)
+                if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
+                  {
+                    //appliquer_cl_dirichlet = 1;
+                    psc_m = psc_c;
+                    psc_m_inco = psc_c_inco;
+                  }
               // Determination de la face amont pour M
               int face_amont_m;
+              Cout<<"psc_m_inco =  "<<psc_m_inco<<finl;
               if (psc_m >= 0)
                 {
                   face_amont_m = num10;
@@ -337,11 +361,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 {
                   double flux;
                   double inco_m = (ncomp_ch_transporte==1?inco(face_amont_m):inco(face_amont_m,comp0));
+                  flux = inco_m*psc_m;
 
-                  if (true || appliquer_cl_dirichlet)
-                    {
-                      flux = inco_m*psc_m;
-                    }
                   if (ncomp_ch_transporte == 1)
                     {
                       resu(num10) += flux;
@@ -377,9 +398,13 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
           int num2 = num1 + le_bord.nb_faces();
           for (num_face=num1; num_face<num2; num_face++)
             {
-              psc =0;
+              psc =0.;
+              psc_inco = 0.;
               for (i=0; i<dimension; i++)
-                psc += state_field(num_face,i)*facenormales(num_face,i);
+                {
+                  psc += state_field(num_face,i)*facenormales(num_face,i);
+                  psc_inco += inco(num_face,i)*facenormales(num_face,i);
+                }
               if (psc>0)
                 if (ncomp_ch_transporte == 1)
                   {
@@ -394,12 +419,12 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 {
                   if (ncomp_ch_transporte == 1)
                     {
-                      resu(num_face) += psc*la_sortie_libre.val_ext(num_face-num1);
+                      resu(num_face) += psc_inco*la_sortie_libre.val_ext(num_face-num1);
                     }
                   else
                     for (i=0; i<ncomp_ch_transporte; i++)
                       {
-                        resu(num_face,i) += psc*la_sortie_libre.val_ext(num_face-num1,i);
+                        resu(num_face,i) += psc_inco*la_sortie_libre.val_ext(num_face-num1,i);
                       }
                 }
             }
@@ -444,6 +469,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 }
 void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const DoubleTab& inco, const DoubleTab& state_field, DoubleTab& resu ) const
 {
+  Cout<<"ajouter_Lstate_sensibility "<<finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
   const IntTab& elem_faces = zone_VEF.elem_faces();
@@ -458,6 +484,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   int nsom = zone.nb_som_elem();
   int nb_bord = zone_VEF.nb_front_Cl();
   const IntTab& les_elems=zone.les_elems();
+  int option_appliquer_cl_dirichlet = 0 ;
 
 
   // Definition d'un tableau pour un traitement special des schemas pres des bords
@@ -584,6 +611,10 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   DoubleTab vsom(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
+  ArrOfDouble vs_state(dimension);
+  ArrOfDouble vc_state(dimension);
+  DoubleTab vsom_state(nsom,dimension);
+
   const IntTab& KEL=type_elemvef.KEL();
 
   // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
@@ -609,15 +640,22 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
           for (j=0; j<dimension; j++)
             {
               vs(j) = inco(face(0),j);
+              vs_state(j) = state_field(face(0),j);
               for (i=1; i<nfac; i++)
-                vs(j)+= inco(face(i),j);
+                {
+                  vs(j)+= inco(face(i),j);
+                  vs_state(j) += state_field(face(i),j);
+                }
             }
           // calcul de la vitesse aux sommets des polyedres
           if (istetra==1)
             {
               for (i=0; i<nsom; i++)
                 for (j=0; j<dimension; j++)
-                  vsom(i,j) = (vs(j) - dimension*inco(face(i),j));
+                  {
+                    vsom(i,j) = (vs(j) - dimension*inco(face(i),j));
+                    vsom_state(i,j) = (vs_state(j) - dimension*state_field(face(i),j));
+                  }
             }
           else
             {
@@ -631,6 +669,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,inco,itypcl);
+          calcul_vc(face,vc_state,vs_state,vsom_state,state_field,itypcl);
 
           // Boucle sur les facettes du polyedre non standard:
           for (fa7=0; fa7<nfa7; fa7++)
@@ -648,14 +687,18 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
               // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
               double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+              double psc_c_state=0,psc_s_state=0,psc_m_state;
               if (dimension==2)
                 {
                   for (i=0; i<2; i++)
                     {
                       psc_c+=vc[i]*cc[i];
                       psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                      psc_c_state+=vc_state[i]*cc[i];
+                      psc_s_state+=vsom_state(KEL(2,fa7),i)*cc[i];
                     }
                   psc_m=(psc_c+psc_s)/2.;
+                  psc_m_state=(psc_c_state+psc_s_state)/2.;
                 }
               else
                 {
@@ -669,12 +712,19 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                 }
               // On applique les CL de Dirichlet si num1 ou num2 est une face avec CL de Dirichlet
               // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
-              int appliquer_cl_dirichlet=0;
-
+              //int appliquer_cl_dirichlet=0;
+              if (option_appliquer_cl_dirichlet)
+                if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
+                  {
+                    //appliquer_cl_dirichlet = 1;
+                    psc_m = psc_c;
+                    psc_m_state = psc_c_state;
+                  }
 
               // Determination de la face amont pour M
               int face_amont_m;
-              if (psc_m >= 0)
+              Cout<<"psc_m_state = "<<psc_m_state<<finl;
+              if (psc_m_state >= 0)
                 {
                   face_amont_m = num10;
                 }
@@ -688,10 +738,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                   double flux;
                   double inco_m = (ncomp_ch_transporte==1?state_field(face_amont_m):state_field(face_amont_m,comp0));
 
-                  if (true || appliquer_cl_dirichlet)
-                    {
-                      flux = inco_m*psc_m;
-                    }
+                  flux = inco_m*psc_m;
+
                   if (ncomp_ch_transporte == 1)
                     {
                       resu(num10) += flux;
