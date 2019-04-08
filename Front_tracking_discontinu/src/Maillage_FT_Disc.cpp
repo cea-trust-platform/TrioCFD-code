@@ -1012,7 +1012,12 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
             somme += indicatrice[elem_voisin];
             count++;
           }
-        // Si count==1 l'algo n'est pas pertinent...
+        // Si count==1 l'algo etait considere non pertinent... pas toujours correction du bug
+        // Correction testee en VDF mais deux cas test VEF ont fait des ecarts
+        if(count == 1)
+          {
+            elems_to_change.append_line(elem, somme);
+          }
         if (count > 1)
           {
             int indic;
