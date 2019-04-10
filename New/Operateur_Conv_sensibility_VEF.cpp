@@ -351,7 +351,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                   }
               // Determination de la face amont pour M
               int face_amont_m;
-              Cout<<"psc_m_inco =  "<<psc_m_inco<<finl;
+              if (option_appliquer_cl_dirichlet)  Cout<<"psc_m_inco =  "<<psc_m_inco<<finl;
               if (psc_m >= 0)
                 {
                   face_amont_m = num10;
@@ -741,7 +741,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
               // Determination de la face amont pour M
               int face_amont_m;
-              Cout<<"psc_m_state = "<<psc_m_state<<finl;
+              if (option_appliquer_cl_dirichlet)  Cout<<"psc_m_state = "<<psc_m_state<<finl;
               if (psc_m >= 0)
                 {
                   face_amont_m = num10;
