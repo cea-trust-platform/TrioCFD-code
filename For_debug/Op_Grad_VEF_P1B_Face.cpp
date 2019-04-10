@@ -802,7 +802,6 @@ int Op_Grad_VEF_P1B_Face::impr(Sortie& os) const
             }
         }
     } // fin for n_bord
-  getchar();
 
   // On somme les contributions de chaque processeur
   mp_sum_for_each_item(tab_flux_bords);

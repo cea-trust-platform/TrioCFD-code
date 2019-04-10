@@ -237,6 +237,12 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   ArrOfDouble vc_inco(dimension);
   DoubleTab vsom_inco(nsom,dimension);
 
+  // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
+  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+  int nb_faces_bord=zone_VEF.nb_faces_bord();
+  flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
+  flux_b = 0.;
+
   const IntTab& KEL=type_elemvef.KEL();
 
 
@@ -337,11 +343,9 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 }
               // On applique les CL de Dirichlet si num1 ou num2 est une face avec CL de Dirichlet
               // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
-              //int appliquer_cl_dirichlet=0;
               if (option_appliquer_cl_dirichlet)
                 if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
                   {
-                    //appliquer_cl_dirichlet = 1;
                     psc_m = psc_c;
                     psc_m_inco = psc_c_inco;
                   }
@@ -365,13 +369,17 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
                   if (ncomp_ch_transporte == 1)
                     {
-                      resu(num10) += flux;
-                      resu(num20) -= flux;
+                      resu(num10) -= flux;
+                      resu(num20) += flux;
+                      if (num10<nb_faces_bord) flux_b(num10,0) += flux;
+                      if (num20<nb_faces_bord) flux_b(num20,0) -= flux;
                     }
                   else
                     {
-                      resu(num10,comp0) += flux;
-                      resu(num20,comp0) -= flux;
+                      resu(num10,comp0) -= flux;
+                      resu(num20,comp0) += flux;
+                      if (num10<nb_faces_bord) flux_b(num10,comp0) += flux;
+                      if (num20<nb_faces_bord) flux_b(num20,comp0) -= flux;
                     }
 
                 }// boucle sur comp
@@ -408,23 +416,27 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
               if (psc>0)
                 if (ncomp_ch_transporte == 1)
                   {
-                    resu(num_face) += psc*inco(num_face);
+                    resu(num_face) -= psc*inco(num_face);
+                    flux_b(num_face,0) -= psc*inco(num_face);
                   }
                 else
                   for (i=0; i<ncomp_ch_transporte; i++)
                     {
-                      resu(num_face,i) += psc*inco(num_face,i);
+                      resu(num_face,i) -= psc*inco(num_face,i);
+                      flux_b(num_face,i) -= psc*inco(num_face,i);
                     }
               else
                 {
                   if (ncomp_ch_transporte == 1)
                     {
-                      resu(num_face) += psc_inco*la_sortie_libre.val_ext(num_face-num1);
+                      resu(num_face) -= psc_inco*la_sortie_libre.val_ext(num_face-num1);
+                      flux_b(num_face,0) -= psc_inco*la_sortie_libre.val_ext(num_face-num1);
                     }
                   else
                     for (i=0; i<ncomp_ch_transporte; i++)
                       {
-                        resu(num_face,i) += psc_inco*la_sortie_libre.val_ext(num_face-num1,i);
+                        resu(num_face,i) -= psc_inco*la_sortie_libre.val_ext(num_face-num1,i);
+                        flux_b(num_face,i) -= psc_inco*la_sortie_libre.val_ext(num_face-num1,i);
                       }
                 }
             }
@@ -447,16 +459,16 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                     {
                       diff1 = resu(num_face)-tab(nb_faces_perio);
                       diff2 = resu(voisine)-tab(nb_faces_perio+voisine-num_face);
-                      resu(voisine)  -= diff1;
-                      resu(num_face) -= diff2;
+                      resu(voisine)  += diff1;
+                      resu(num_face) += diff2;
                     }
                   else
                     for (int comp=0; comp<ncomp_ch_transporte; comp++)
                       {
                         diff1 = resu(num_face,comp)-tab(nb_faces_perio,comp);
                         diff2 = resu(voisine,comp)-tab(nb_faces_perio+voisine-num_face,comp);
-                        resu(voisine,comp)  -= diff1;
-                        resu(num_face,comp) -= diff2;
+                        resu(voisine,comp)  += diff1;
+                        resu(num_face,comp) += diff2;
                       }
 
                   fait[num_face-num1]= 1;
@@ -615,6 +627,12 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   ArrOfDouble vc_state(dimension);
   DoubleTab vsom_state(nsom,dimension);
 
+  // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
+  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+  int nb_faces_bord=zone_VEF.nb_faces_bord();
+  flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
+  flux_b = 0.;
+
   const IntTab& KEL=type_elemvef.KEL();
 
   // Les polyedres non standard sont ranges en 2 groupes dans la Zone_VEF:
@@ -724,7 +742,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
               // Determination de la face amont pour M
               int face_amont_m;
               Cout<<"psc_m_state = "<<psc_m_state<<finl;
-              if (psc_m_state >= 0)
+              if (psc_m >= 0)
                 {
                   face_amont_m = num10;
                 }
@@ -742,13 +760,17 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
                   if (ncomp_ch_transporte == 1)
                     {
-                      resu(num10) += flux;
-                      resu(num20) -= flux;
+                      resu(num10) -= flux;
+                      resu(num20) += flux;
+                      if (num10<nb_faces_bord) flux_b(num10,0) += flux;
+                      if (num20<nb_faces_bord) flux_b(num20,0) -= flux;
                     }
                   else
                     {
-                      resu(num10,comp0) += flux;
-                      resu(num20,comp0) -= flux;
+                      resu(num10,comp0) -= flux;
+                      resu(num20,comp0) += flux;
+                      if (num10<nb_faces_bord) flux_b(num10,0) += flux;
+                      if (num20<nb_faces_bord) flux_b(num20,0) -= flux;
                     }
 
                 }// boucle sur comp
@@ -781,23 +803,27 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
               if (psc>0)
                 if (ncomp_ch_transporte == 1)
                   {
-                    resu(num_face) += psc*state_field(num_face);
+                    resu(num_face) -= psc*state_field(num_face);
+                    flux_b(num_face,0) -= psc*state_field(num_face);
                   }
                 else
                   for (i=0; i<ncomp_ch_transporte; i++)
                     {
-                      resu(num_face,i) += psc*state_field(num_face,i);
+                      resu(num_face,i) -= psc*state_field(num_face,i);
+                      flux_b(num_face,i) -= psc*state_field(num_face,i);
                     }
               else
                 {
                   if (ncomp_ch_transporte == 1)
                     {
-                      resu(num_face) += psc*la_sortie_libre.val_ext(num_face-num1);
+                      resu(num_face) -= psc*la_sortie_libre.val_ext(num_face-num1);
+                      flux_b(num_face) -= psc*la_sortie_libre.val_ext(num_face-num1);
                     }
                   else
                     for (i=0; i<ncomp_ch_transporte; i++)
                       {
-                        resu(num_face,i) += psc*la_sortie_libre.val_ext(num_face-num1,i);
+                        resu(num_face,i) -= psc*la_sortie_libre.val_ext(num_face-num1,i);
+                        flux_b(num_face,i) -= psc*la_sortie_libre.val_ext(num_face-num1,i);
                       }
                 }
             }
@@ -820,16 +846,16 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                     {
                       diff1 = resu(num_face)-tab(nb_faces_perio);
                       diff2 = resu(voisine)-tab(nb_faces_perio+voisine-num_face);
-                      resu(voisine)  -= diff1;
-                      resu(num_face) -= diff2;
+                      resu(voisine)  += diff1;
+                      resu(num_face) += diff2;
                     }
                   else
                     for (int comp=0; comp<ncomp_ch_transporte; comp++)
                       {
                         diff1 = resu(num_face,comp)-tab(nb_faces_perio,comp);
                         diff2 = resu(voisine,comp)-tab(nb_faces_perio+voisine-num_face,comp);
-                        resu(voisine,comp)  -= diff1;
-                        resu(num_face,comp) -= diff2;
+                        resu(voisine,comp)  += diff1;
+                        resu(num_face,comp) += diff2;
                       }
 
                   fait[num_face-num1]= 1;
