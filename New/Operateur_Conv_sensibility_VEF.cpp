@@ -233,10 +233,6 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   DoubleTab xsom(nsom,dimension);
 
 
-  ArrOfDouble vs_inco(dimension);
-  ArrOfDouble vc_inco(dimension);
-  DoubleTab vsom_inco(nsom,dimension);
-
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
   DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
   int nb_faces_bord=zone_VEF.nb_faces_bord();
@@ -270,11 +266,9 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
           for (j=0; j<dimension; j++)
             {
               vs(j) = state_field(face(0),j);
-              vs_inco(j) = inco(face(0),j);
               for (i=1; i<nfac; i++)
                 {
                   vs(j)+= state_field(face(i),j);
-                  vs_inco(j)+= inco(face(i),j);
                 }
             }
           // calcul de la vitesse aux sommets des polyedres
@@ -284,7 +278,6 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 for (j=0; j<dimension; j++)
                   {
                     vsom(i,j) = (vs(j) - dimension*state_field(face(i),j));
-                    vsom_inco(i,j) = (vs_inco(j) - dimension*inco(face(i),j));
                   }
             }
           else
@@ -299,7 +292,6 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,state_field,itypcl);
-          calcul_vc(face,vc_inco,vs_inco,vsom_inco,inco,itypcl);
 
 
           // Boucle sur les facettes du polyedre non standard:
@@ -318,18 +310,15 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
               // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
               double psc_c=0,psc_s=0,psc_m,psc_s2=0;
-              double psc_c_inco=0,psc_s_inco=0,psc_m_inco;
               if (dimension==2)
                 {
                   for (i=0; i<2; i++)
                     {
                       psc_c+=vc[i]*cc[i];
                       psc_s+=vsom(KEL(2,fa7),i)*cc[i];
-                      psc_c_inco+=vc_inco[i]*cc[i];
-                      psc_s_inco+=vsom_inco(KEL(2,fa7),i)*cc[i];
+
                     }
                   psc_m=(psc_c+psc_s)/2.;
-                  psc_m_inco=(psc_c_inco+psc_s_inco)/2.;
                 }
               else
                 {
@@ -347,11 +336,9 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
                   {
                     psc_m = psc_c;
-                    psc_m_inco = psc_c_inco;
                   }
               // Determination de la face amont pour M
               int face_amont_m;
-              if (option_appliquer_cl_dirichlet)  Cout<<"psc_m_inco =  "<<psc_m_inco<<finl;
               if (psc_m >= 0)
                 {
                   face_amont_m = num10;
@@ -623,9 +610,6 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   DoubleTab vsom(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
-  ArrOfDouble vs_state(dimension);
-  ArrOfDouble vc_state(dimension);
-  DoubleTab vsom_state(nsom,dimension);
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
   DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
@@ -658,11 +642,9 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
           for (j=0; j<dimension; j++)
             {
               vs(j) = inco(face(0),j);
-              vs_state(j) = state_field(face(0),j);
               for (i=1; i<nfac; i++)
                 {
                   vs(j)+= inco(face(i),j);
-                  vs_state(j) += state_field(face(i),j);
                 }
             }
           // calcul de la vitesse aux sommets des polyedres
@@ -672,7 +654,6 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                 for (j=0; j<dimension; j++)
                   {
                     vsom(i,j) = (vs(j) - dimension*inco(face(i),j));
-                    vsom_state(i,j) = (vs_state(j) - dimension*state_field(face(i),j));
                   }
             }
           else
@@ -687,7 +668,6 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,inco,itypcl);
-          calcul_vc(face,vc_state,vs_state,vsom_state,state_field,itypcl);
 
           // Boucle sur les facettes du polyedre non standard:
           for (fa7=0; fa7<nfa7; fa7++)
@@ -705,18 +685,15 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
               // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
               double psc_c=0,psc_s=0,psc_m,psc_s2=0;
-              double psc_c_state=0,psc_s_state=0,psc_m_state;
               if (dimension==2)
                 {
                   for (i=0; i<2; i++)
                     {
                       psc_c+=vc[i]*cc[i];
                       psc_s+=vsom(KEL(2,fa7),i)*cc[i];
-                      psc_c_state+=vc_state[i]*cc[i];
-                      psc_s_state+=vsom_state(KEL(2,fa7),i)*cc[i];
+
                     }
                   psc_m=(psc_c+psc_s)/2.;
-                  psc_m_state=(psc_c_state+psc_s_state)/2.;
                 }
               else
                 {
@@ -736,12 +713,10 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                   {
                     //appliquer_cl_dirichlet = 1;
                     psc_m = psc_c;
-                    psc_m_state = psc_c_state;
                   }
 
               // Determination de la face amont pour M
               int face_amont_m;
-              if (option_appliquer_cl_dirichlet)  Cout<<"psc_m_state = "<<psc_m_state<<finl;
               if (psc_m >= 0)
                 {
                   face_amont_m = num10;
