@@ -16,7 +16,7 @@ Mailler dom
                 Origine 0. 0. 0.
                 Nombre_de_Noeuds 15 15 6
                 Longueurs 12.56637061 2. 1.5
-                tanh 0.93
+                ytanh 0.93
 		}
         	{
                 Bord  entree    X = 0.            	0. <= Y <= 2.0 			0. <= Z <= 1.5
