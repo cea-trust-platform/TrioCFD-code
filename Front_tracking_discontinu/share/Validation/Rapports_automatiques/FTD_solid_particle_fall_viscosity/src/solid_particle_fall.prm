@@ -1,0 +1,67 @@
+Parameters {
+	Title "Fall of a solid particle in viscous fluid followed by FTD. "
+	Author "A.L."
+	description "Compare different methods to calculate viscosity average : standard (wrong), arithmetic or harmonic"
+	TestCase ./standard solid_particle_fall.data 
+	TestCase ./arithmetic solid_particle_fall_arithmetic.data 
+	TestCase ./harmonic solid_particle_fall_harmonic.data
+        Reference "[1] W.N. Bond M.A. D.Sc. F.Inst.P. \& Dorothy A. Newton B.Sc. (1928) LXXXII. Bubbles, drops, and Stokes' law. (Paperi 2) , The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science: Series 7, 5:30, 794-800"
+        Reference "[2] Dietrich, N., Mayoufi N., Poncin S. \& Li H. (2013). Experimental investigation of bubble and drop formation at submerged orifices. Chemical Papers. 67(3), 313-325."
+        Reference "[3] Clift, R., Grace, J. R., \& Weber, M. E. (1978). Bubbles, drops and particles. New York, NY, USA: Academic Press"
+        Prerequisite "./extraire_vitesse.sh"
+}
+Chapter {
+        Title "Description of the case"
+Description "At a very low Reynolds number (\latex_($Re << 1$\latex_)) the behavior of a fluid drop is very close to that of a solid particle of the same diameter and of the same density, the terminal velocity of falling follows the stokes law."
+
+Description " The configuration studied in this validation form is a drop of a lubricant \latex_($HV45 (65 mass\%)$\latex_) in free fall in silicone oil 5. The properties of these two fluids are given in [2]. We compare the the theorical velocity of the drop center of gravity to the one given by the code." 
+
+Description "With a drop diameter equal to \latex_($ 0.2 mm $\latex_), the Reynolds number should be close to 0.011 (valid stokes hypothesis), the target terminal velocity is \latex_($U = 3.6 \times 10^{-4} m / s $\latex_), see [3] :"
+
+        Description "\latex_($$ R_{\rho} = \frac{\rho_0}{\rho_1} = 1.105 \qquad  R_{\mu} = \frac{\mu_0}{\mu_1} = 8.0583\times 10 \qquad k=\frac{\frac{2}{3}+R_{\mu}}{1+R_{\mu}}   \qquad  \frac{1}{k} = 1.004 $$\latex_)"
+
+        Description " - For a drop :"
+        Description "\latex_($$ U_d = \frac{1}{k} \frac{2}{9} \frac{\Delta \rho g r^2}{\mu_1} = 3.64733 \times 10^{-4} m/s \qquad  Re_d = \frac{2 r \rho_1 U_d}{\mu_1} = 0.01155 $$\latex_)"
+
+        Description " - For a solid particule of the same mass :"
+        Description "\latex_($$ U_p = \frac{2}{9} \frac{\Delta \rho g r^2}{\mu_1} = 3.633 \times 10^{-4} m/s \qquad  Re_d = \frac{2 r \rho_1 U_p}{\mu_1} = 0.01151 $$\latex_)"
+
+        }
+
+Chapter {
+        Title "Results "
+        # definition figure 0
+        Figure {
+                Title "Time evolution of the fluid particle vertical velocity"
+                Title_figure "Time evolution of the fluid particle vertical velocity "
+                labelX Time[s]
+                labelY Velocity[m/s]
+                Include_Description_Curves 0
+                width 10cm
+                Curve {
+                        legend "standard"
+                        file resultat.data
+                        columns 1 ($2)
+                        style lines
+                }
+                Curve {
+                        legend "arithmetic"
+                        file resultat.data
+                        columns 1 ($3)
+                        style lines
+                }
+                Curve {
+                        legend "harmonic"
+                        file resultat.data
+                        columns 1 ($4)
+                        style lines
+                }
+                Curve {
+                        legend "theoric_ref"
+                        #origin ana
+                        fonction (-3.64733e-4)
+                        style lines
+                }
+        }
+        Description "The difference observed between the simulated velocity and the theoretical velocity could be due to the confinement effects and mesh convergence which is not reached with the data set provided in this validation form."
+}

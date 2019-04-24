@@ -1,0 +1,195 @@
+# PARALLEL OK #
+
+dimension 3
+domaine dom
+Probleme_FT_Disc_gen pb
+# bidim_axi #
+
+# BEGIN MESH #
+Mailler dom
+{
+	Pave Cavite 
+		{
+		Origine 0  0. 0
+     	Nombre_de_Noeuds 51 51 51
+		Longueurs 1e-3 1e-3 1e-3
+		}
+		{
+		Bord Gauche	        X =  0.	   	        0. <= Y <= 1e-3 		    0. <= Z <= 1e-3
+		Bord Haut	        Y =  1e-3 	        0. <= X <= 1e-3	            0. <= Z <= 1e-3
+		Bord Bas	        Y =  0.	            0. <= X <= 1e-3	            0. <= Z <= 1e-3
+		Bord Droit	        X =  1e-3	        0. <= Y <= 1e-3 		    0. <= Z <= 1e-3
+		Bord Devant	        Z =  0.	    	    0. <= X <= 1e-3	            0. <= Y <= 1e-3
+		Bord Derriere	    Z =  1e-3	        0. <= X <= 1e-3	            0. <= Y <= 1e-3
+		}
+}
+
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+        Partitionneur tranche { tranches 2 1 2 }
+        Larg_joint 2
+        Nom_Zones DOM
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+
+	tinit 0.
+	tmax 0.2
+	nb_pas_dt_max 400
+	dt_min 1e-6
+	dt_max 1e-5
+
+
+	diffusion_implicite 1
+        seuil_diffusion_implicite 1e-6
+        impr_diffusion_implicite 1
+	dt_impr 0.01
+	dt_sauv 100
+	seuil_statio -1
+
+
+
+}
+system "mkdir -p lata"
+
+Fluide_Incompressible inclusion
+Lire inclusion
+{
+
+	mu  Champ_Uniforme 1 515e-3
+ 	rho Champ_Uniforme 1 1050
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu  Champ_Uniforme 1 6e-3
+ 	rho Champ_Uniforme 1 950
+}
+
+Fluide_Diphasique fluidediph
+Lire fluidediph
+{
+	fluide0 inclusion
+	fluide1 fluide
+	sigma   Champ_Uniforme 1 18.2e-3
+	formule_mu standard
+}
+
+Champ_Uniforme gravite
+Lire gravite 3 0. -9.81 0 
+Associate fluidediph gravite
+
+Navier_Stokes_FT_Disc              hydraulique
+Transport_Interfaces_FT_Disc       interf
+
+Associate pb hydraulique
+Associate pb interf
+
+Associate pb dom
+Associate pb sch
+Associate pb fluidediph
+
+Discretize pb dis
+
+Lire pb
+{
+	hydraulique
+	{
+		modele_turbulence sous_maille_wale
+		{
+			Cw               0.
+			turbulence_paroi negligeable
+		}
+		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-8 impr }
+		convection           { QUICK }
+		diffusion            { }
+		clipping_courbure_interface 100
+		conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }
+		equation_interfaces_proprietes_fluide interf
+		boundary_conditions
+		{
+			Haut	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0
+			Bas 	paroi_fixe 
+			Gauche	paroi_fixe
+			Droit	paroi_fixe
+			Devant	paroi_fixe
+			Derriere paroi_fixe
+		}
+	}
+	interf
+	{
+		interpolation_repere_local
+		methode_transport vitesse_interpolee hydraulique
+		conditions_initiales
+		{
+			fonction (+1*((x-0.5e-3)^2+(y-0.5e-3)^2+(z-0.5e-3)^2-(0.1e-3)^2))
+       		}
+        iterations_correction_volume 1
+        n_iterations_distance 2
+		remaillage
+		{
+	 pas 2.50000000000000005e-04
+     nb_iter_barycentrage 1
+     relax_barycentrage 1.00000000000000000e+00
+     critere_arete 3.49999999999999978e-01
+     seuil_dvolume_residuel 0.00000000000000000e+00
+     nb_iter_correction_volume 6
+     nb_iter_remaillage 6
+     facteur_longueur_ideale 7.50000000000000000e-01
+     lissage_courbure_coeff -2.50000000000000014e-02
+     lissage_courbure_iterations_systematique 1
+     lissage_courbure_iterations_si_remaillage 10
+
+
+		}
+		collisions
+		{
+                	active
+                	juric_pour_tout
+                	type_remaillage Juric { source_isovaleur indicatrice }
+		}
+		boundary_conditions
+		{
+			Haut	Paroi_FT_disc symetrie
+			Bas 	Paroi_FT_disc symetrie
+			Gauche	Paroi_FT_disc symetrie
+			Droit	Paroi_FT_disc symetrie
+			Devant	Paroi_FT_disc symetrie
+			Derriere Paroi_FT_disc symetrie
+		}
+	}
+
+	
+	liste_postraitements
+	{
+		Postraitement_ft_lata post2
+		{
+			dt_post 5e-5
+			nom_fichier lata/post_dom
+			format binaire
+			print
+			champs sommets { indicatrice_interf vitesse pression masse_volumique }
+			champs elements { indicatrice_interf }
+			interfaces interf
+			{
+			champs sommets { courbure vitesse }
+			}
+		}
+	}
+}
+Solve pb
+Fin
