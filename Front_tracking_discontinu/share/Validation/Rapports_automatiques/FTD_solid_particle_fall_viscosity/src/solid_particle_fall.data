@@ -173,6 +173,12 @@ Lire pb
 		}
 	}
 
+	postraitement  {
+		champs dt_post 5e5
+		{
+		indicatrice_interf elem
+		}
+	}
 	
 	liste_postraitements
 	{
