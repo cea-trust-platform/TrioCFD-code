@@ -37,6 +37,8 @@ public:
   const Fluide_Incompressible& fluide_phase(int la_phase) const;
   double sigma() const;
   double chaleur_latente() const;
+  int formule_mu() const;
+  // Methode utilisee pour le calcul du mu du domaine
 
   // Surcharge des methodes standard du milieu_base :
   void set_param(Param& param);
@@ -61,7 +63,6 @@ public:
 
 protected:
 
-
 private:
 
   REF(Fluide_Incompressible) phase0_;
@@ -70,6 +71,7 @@ private:
   Champ_Don sigma_;
   // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)
   Champ_Don chaleur_latente_;
+  // Formule utilisee pour le calcul de la moyenne de mu
+  Motcle formule_mu_;
 };
-
 #endif

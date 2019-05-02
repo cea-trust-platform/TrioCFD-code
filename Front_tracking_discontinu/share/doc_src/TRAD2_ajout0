@@ -7,9 +7,6 @@ paroi_ft_disc_constant paroi_ft_disc_deriv constant 0 condition contact angle fi
   attr ch front_field_base ch 0 Boundary field type.
 paroi_echange_contact_vdf_ft paroi_echange_contact_vdf paroi_echange_contact_vdf_ft -1 This boundary condition is used between a conduction problem and a thermohydraulic problem with two phases flow (Front-Tracking method) to modelize heat exchange.
 milieu_v2_base objet_u milieu_v2_base -1 Basic class for medium (physics properties of medium) composed of constituents (fluids and solids).
-fluide_diphasique milieu_v2_base fluide_diphasique 0 Two-phase fluid.
-  attr bloc bloc_lecture bloc 0 Two-phase fluid description.
-  ref gravite field_base
 vitesse_imposee methode_transport_deriv vitesse_imposee -1 Class to specify that the speed of displacement of the nodes of the interfaces is imposed with an analytical formula.
   attr val listchainef val 0 Analytical formula.
 vitesse_interpolee methode_transport_deriv vitesse_interpolee -1 Class to specify that the interpolation will use the velocity field of the Navier-Stokes equation named val to compute the speed of displacement of the nodes of the interfaces.

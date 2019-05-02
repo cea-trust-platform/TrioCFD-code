@@ -1,0 +1,9 @@
+sed "s/formule_mu standard/formule_mu arithmetic/" solid_particle_fall.data  >solid_particle_fall_arithmetic.data
+sed "s/formule_mu standard/formule_mu harmonic/" solid_particle_fall.data  >solid_particle_fall_harmonic.data
+mkdir -p standard arithmetic harmonic
+mv solid_particle_fall.data standard/
+mv solid_particle_fall_arithmetic.data arithmetic/
+mv solid_particle_fall_harmonic.data harmonic/
+cp pre_run standard/
+cp pre_run arithmetic/
+cp pre_run harmonic/

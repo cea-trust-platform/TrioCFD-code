@@ -30,6 +30,7 @@
 Implemente_instanciable_sans_constructeur(Fluide_Diphasique,"Fluide_Diphasique",Milieu_base);
 
 Implemente_ref(Fluide_Diphasique);
+// XD fluide_diphasique milieu_v2_base fluide_diphasique 1 Two-phase fluid.
 
 Fluide_Diphasique::Fluide_Diphasique()
 {
@@ -44,21 +45,23 @@ Sortie& Fluide_Diphasique::printOn(Sortie& os) const
 // cf Milieu_base::readOn
 Entree& Fluide_Diphasique::readOn(Entree& is)
 {
+  // Default value for formule_mu_
+  formule_mu_="standard";
   Milieu_base::readOn(is);
   return is;
 }
 
 void Fluide_Diphasique::set_param(Param& param)
 {
-  param.ajouter("sigma",&sigma_,Param::REQUIRED);
-  param.ajouter_non_std("fluide0",(this),Param::REQUIRED);
-  param.ajouter_non_std("fluide1",(this),Param::REQUIRED);
-  param.ajouter("chaleur_latente",&chaleur_latente_);
+  param.ajouter("sigma",&sigma_,Param::REQUIRED); // XD_ADD_P champ_don_base surfacic tension (J/m2)
+  param.ajouter_non_std("fluide0",(this),Param::REQUIRED); // XD_ADD_P chaine first phase fluid
+  param.ajouter_non_std("fluide1",(this),Param::REQUIRED); // XD_ADD_P chaine second phase fluid
+  param.ajouter("chaleur_latente",&chaleur_latente_); // XD_ADD_P champ_don_base phase changement enthalpy h(phase1_) - h(phase0_) (J/kg/K)
+  param.ajouter("formule_mu",&formule_mu_); // XD_ADD_P chaine(into=["standard","arithmetic","harmonic"]) formula used to calculate average
 }
 
 int Fluide_Diphasique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
-  Motcle motlu;
   if ((mot=="fluide0") || (mot=="fluide1"))
     {
       Nom nom_objet;
@@ -101,7 +104,6 @@ void Fluide_Diphasique::verifier_coherence_champs(int& err,Nom& msg)
           err = 1;
         }
     }
-
   Milieu_base::verifier_coherence_champs(err,msg);
 }
 
@@ -130,6 +132,20 @@ double Fluide_Diphasique::chaleur_latente() const
     }
   return chaleur_latente_(0,0);
 }
+
+int Fluide_Diphasique::formule_mu() const
+// These values are used in the switch of Navier_Stokes_FT_Disc::FT_disc_calculer_champs_rho_mu_nu_dipha
+{
+  if (formule_mu_ == "standard")
+    return 0;
+  else if ((formule_mu_ == "arithmetique") or (formule_mu_ == "arithmetic"))
+    return 1;
+  else if ((formule_mu_ == "harmonique") or (formule_mu_ == "harmonic"))
+    return 2;
+  else
+    return -1;
+}
+
 
 int Fluide_Diphasique::initialiser(const double& temps)
 {
