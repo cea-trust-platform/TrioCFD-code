@@ -48,6 +48,8 @@ public :
   void calcul_vc(const ArrOfInt&, ArrOfDouble& , const ArrOfDouble& s, const DoubleTab& , const DoubleTab& ,int  ) const;
   virtual void remplir_fluent(DoubleVect& ) const;
   double calculer_dt_stab() const;
+  void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
+  inline double viscA(int face_i, int face_j, int num_elem) const;
 protected :
   REF(Zone_VEF) la_zone_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
@@ -56,5 +58,6 @@ protected :
   mutable ArrOfInt est_une_face_de_dirichlet_;
 
 };
+
 
 #endif /* Operateur_Conv_sensibility_VEF_included */

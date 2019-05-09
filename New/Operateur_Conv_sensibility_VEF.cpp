@@ -72,12 +72,15 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   int convectionSchemeDiscrType; // amont=0, muscl=1, centre=2
   opConvVEFFace.get_type_op(convectionSchemeDiscrType);
 
+
   if(convectionSchemeDiscrType==0) // Convection scheme discr "amont".
     {
       const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
       const DoubleTab& state = eq.get_state_field();
       ajouter_Lstate_sensibility_Amont(state, inco, resu);
       ajouter_Lsensibility_state_Amont(inco, state, resu);
+      if(true) // a remplacer
+        add_diffusion_term(state, resu);
       opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
     }
   else
@@ -1256,4 +1259,188 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
 
 
   return dt_stab;
+}
+
+
+
+void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state, DoubleTab& resu) const
+{
+  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
+  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+
+  int nb_comp = 1;
+  int nb_dim = resu.nb_dim();
+  if(nb_dim==2)
+    nb_comp=resu.dimension(1);
+
+  DoubleTab& tab_flux_bords = flux_bords_;
+
+  const IntTab& elemfaces = zone_VEF.elem_faces();
+  const IntTab& face_voisins = zone_VEF.face_voisins();
+  int i0,j,num_face;
+  int nb_faces = zone_VEF.nb_faces();
+  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  int n_bord0;
+  double valA;//,flux;
+  DoubleVect n(Objet_U::dimension);
+  DoubleTrav Tgrad(Objet_U::dimension,Objet_U::dimension);
+
+  // On dimensionne et initialise le tableau des bilans de flux:
+  tab_flux_bords.resize(zone_VEF.nb_faces_bord(),nb_comp);
+  tab_flux_bords=0.;
+
+  assert(nb_comp>1);
+  int nb_bords=zone_VEF.nb_front_Cl();
+  int ind_face;
+
+  for (n_bord0=0; n_bord0<nb_bords; n_bord0++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord0);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      // const IntTab& elemfaces = zone_VEF.elem_faces();
+      int num1 = 0;
+      int num2 = le_bord.nb_faces_tot();
+      int nb_faces_bord_reel = le_bord.nb_faces();
+
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
+          int fac_asso;
+          for (ind_face=num1; ind_face<nb_faces_bord_reel; ind_face++)
+            {
+              fac_asso = la_cl_perio.face_associee(ind_face);
+              fac_asso = le_bord.num_face(fac_asso);
+              num_face = le_bord.num_face(ind_face);
+              for (int kk=0; kk<2; kk++)
+                {
+                  int elem = face_voisins(num_face, kk);
+                  for (i0=0; i0<nb_faces_elem; i0++)
+                    {
+                      if ( ( (j= elemfaces(elem,i0)) > num_face ) && (j != fac_asso ) )
+                        {
+                          valA = viscA(num_face,j,elem);
+                          for (int nc=0; nc<nb_comp; nc++)
+                            {
+                              resu(num_face,nc)+=valA*state(j,nc);
+                              resu(num_face,nc)-=valA*state(num_face,nc);
+                              if(j<nb_faces) // face reelle
+                                {
+                                  resu(j,nc)+=0.5*valA*state(num_face,nc);
+                                  resu(j,nc)-=0.5*valA*state(j,nc);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }// fin if periodique
+      else
+        {
+          for (ind_face=num1; ind_face<num2; ind_face++)
+            {
+              num_face = le_bord.num_face(ind_face);
+              int elem=face_voisins(num_face,0);
+
+              // Boucle sur les faces :
+              for (int i=0; i<nb_faces_elem; i++)
+                if (( (j= elemfaces(elem,i)) > num_face ) || (ind_face>=nb_faces_bord_reel))
+                  {
+                    valA = viscA(num_face,j,elem);
+                    for (int nc=0; nc<nb_comp; nc++)
+                      {
+                        double flux=valA*(state(j,nc)-state(num_face,nc));
+                        if (ind_face<nb_faces_bord_reel)
+                          {
+                            resu(num_face,nc)+=flux;
+                            tab_flux_bords(num_face,nc)+=flux;
+                          }
+
+                        if(j<nb_faces) // face reelle
+                          {
+                            resu(j,nc)-=flux;
+                          }
+                      }
+                  }
+            }
+        }
+    }//Fin for n_bord
+
+  // On traite les faces internes
+
+  for (num_face=zone_VEF.premiere_face_int(); num_face<nb_faces; num_face++)
+    {
+      for (int k=0; k<2; k++)
+        {
+          int elem = face_voisins(num_face,k);
+          for (i0=0; i0<nb_faces_elem; i0++)
+            {
+              if ( (j= elemfaces(elem,i0)) > num_face )
+                {
+                  int el1,el2;
+                  int contrib=1;
+                  if(j>=nb_faces) // C'est une face virtuelle
+                    {
+                      el1 = face_voisins(j,0);
+                      el2 = face_voisins(j,1);
+                      if((el1==-1)||(el2==-1))
+                        contrib=0;
+                    }
+                  if(contrib)
+                    {
+                      valA = viscA(num_face,j,elem);
+                      for (int nc=0; nc<nb_comp; nc++)
+                        {
+                          resu(num_face,nc)+=valA*state(j,nc);
+                          resu(num_face,nc)-=valA*state(num_face,nc);
+                          if(j<nb_faces) // On traite les faces reelles
+                            {
+                              resu(j,nc)+=valA*state(num_face,nc);
+                              resu(j,nc)-=valA*state(j,nc);
+                            }
+                          else
+                            {
+                              // La face j est virtuelle
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }// Fin faces internes
+
+  for (int n_bord=0; n_bord<nb_bords; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      if (sub_type(Symetrie,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          for (int face=ndeb; face<nfin; face++)
+            tab_flux_bords(face,0) = 0.;
+        }
+    }
+
+
+}
+
+
+inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem) const
+{
+  const Zone_VEF& zone=la_zone_vef.valeur();
+  const IntTab& face_voisins=zone.face_voisins();
+  const DoubleTab& face_normales=zone.face_normales();
+  const DoubleVect& inverse_volumes=zone.inverse_volumes();
+  double pscal = face_normales(i,0)*face_normales(j,0)
+                 + face_normales(i,1)*face_normales(j,1);
+  if (Objet_U::dimension == 3)
+    pscal += face_normales(i,2)*face_normales(j,2);
+
+
+  if ( (face_voisins(i,0) == face_voisins(j,0)) ||
+       (face_voisins(i,1) == face_voisins(j,1)) )
+    return -pscal*inverse_volumes(num_elem);
+  else
+    return pscal*inverse_volumes(num_elem);
 }
