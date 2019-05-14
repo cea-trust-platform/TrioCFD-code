@@ -47,6 +47,7 @@ void Navier_Stokes_std_sensibility::set_param(Param& param)
 
   Navier_Stokes_std::set_param(param);
   param.ajouter_non_std("state",(this),Param::REQUIRED);
+  param.ajouter_non_std("uncertain_variable",(this),Param::REQUIRED);
 
   if (schema_temps().diffusion_implicite())
     {
@@ -114,6 +115,31 @@ int Navier_Stokes_std_sensibility::lire_motcle_non_standard(const Motcle& mot, E
       associate_evaluator_field( name_state_pb,name_state_field);
       return 1;
     }
+  else  if (mot=="uncertain_variable")
+    {
+
+      Cerr << "Reading and typing of the  uncertain variable: " << finl;
+      Motcle motlu, accolade_fermee="}", accolade_ouverte="{";
+      is >> motlu;
+      if(motlu!=accolade_ouverte)
+        {
+          Cerr << "We expected a { while reading of " << que_suis_je() << finl;
+          Cerr << "and not : " << motlu << finl;
+          exit();
+        }
+
+      is >> motlu;
+      Cerr<<"word read="<<motlu<<finl;
+      uncertain_var =  motlu;
+      is>>motlu;
+      if(motlu != accolade_fermee)
+        {
+          Cerr << "We expected a } while reading of " << que_suis_je() << finl;
+          Cerr << "and not : " << motlu << finl;
+          exit();
+        }
+      return 1;
+    }
   else
     return Navier_Stokes_std::lire_motcle_non_standard(mot, is);
 }
@@ -153,7 +179,7 @@ void Navier_Stokes_std_sensibility::associate_evaluator_field(const Nom& one_nam
 //Update the reference to the evaluator field (state_field)
 void Navier_Stokes_std_sensibility::update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field)
 {
-  Cerr <<"Navier_Stokes_std_sensibility: update  state from"<<one_name_state_pb<< finl;
+  Cerr <<"Navier_Stokes_std_sensibility: update  state from "<<one_name_state_pb<< finl;
 
   Objet_U& ob= Interprete::objet(one_name_state_pb);
   REF(Probleme_base) pb;
@@ -179,4 +205,7 @@ const DoubleTab& Navier_Stokes_std_sensibility::get_state_field() const
   return state_field->valeurs();
 }
 
-
+const Motcle& Navier_Stokes_std_sensibility::get_uncertain_variable_name() const
+{
+  return uncertain_var;
+}

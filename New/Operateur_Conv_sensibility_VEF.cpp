@@ -77,9 +77,10 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
     {
       const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
       const DoubleTab& state = eq.get_state_field();
+      const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
       ajouter_Lstate_sensibility_Amont(state, inco, resu);
       ajouter_Lsensibility_state_Amont(inco, state, resu);
-      if(true) // a remplacer
+      if(uncertain_var=="MU")
         add_diffusion_term(state, resu);
       opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
     }
@@ -1265,6 +1266,7 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
 
 void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state, DoubleTab& resu) const
 {
+  Cerr << "add_diffusion_term" << finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
 

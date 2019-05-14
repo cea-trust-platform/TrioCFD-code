@@ -44,11 +44,13 @@ public :
   void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
   virtual  void mettre_a_jour(double temps);
   const DoubleTab& get_state_field() const;
+  const Motcle& get_uncertain_variable_name() const;
 
 protected :
   REF(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem
   Nom name_state_pb;                      //name of the problem state
   Motcle name_state_field;                 //name of the unknown field of the state problem
+  Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
 
 };
 
