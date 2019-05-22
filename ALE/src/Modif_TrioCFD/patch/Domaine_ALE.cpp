@@ -62,24 +62,16 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
   Cerr<<"Domaine_ALE::mettre_a_jour"<<finl;
 
-  //check_Zero_ALE_Vel_A is used in the following way:
-  //check_Zero_ALE_Vel_A(0)= 1.0, ALE boundary velocity is zero, ALE mesh velocity is zero and mettre_a_jour is skipped.
-  //check_Zero_ALE_Vel_A(1...3)= 1.0, ALE boundary velocity is zero in the specific direction and mesh coordinate in this direction is not updated.
-  ArrOfDouble check_Zero_ALE_Vel_A(dimension+1);
+  bool  check_NoZero_ALE=true; //  if ALE boundary velocity is zero, ALE mesh velocity is zero and mettre_a_jour is skipped.
 
-  ALE_mesh_velocity = calculer_vitesse(temps,le_domaine_dis,pb, check_Zero_ALE_Vel_A);
+  ALE_mesh_velocity = calculer_vitesse(temps,le_domaine_dis,pb, check_NoZero_ALE);
 
-  if(check_Zero_ALE_Vel_A(0) != 1.0)
+  if(check_NoZero_ALE)
     {
       for (i=0; i<N_som; i++)
         {
           for (k=0; k<dimension; k++)
-            {
-              if(check_Zero_ALE_Vel_A(k+1) != 1.0)
-                {
-                  coord(i,k)+=ALE_mesh_velocity(i,k)*dt_;
-                }
-            }
+            coord(i,k)+=ALE_mesh_velocity(i,k)*dt_;
         }
       //On recalcule les vitesses aux faces
       Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
@@ -109,7 +101,6 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           Zone_VDF& la_zone_VDF=ref_cast(Zone_VDF,le_domaine_dis.zone_dis(0).valeur());
           la_zone_VF.volumes_entrelaces()=0;
           la_zone_VDF.calculer_volumes_entrelaces();
-
         }
       else if(sub_type(Zone_VEF, la_zone_VF))
         {
@@ -129,7 +120,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
                               face_voisins,elem_faces,
                               la_zone) ;
           type_elem.creer_facette_normales(la_zone, facette_normales_, rang_elem_non_standard);
-          Cerr << "carre_pas_du_maillage : " << la_zone_VEF.carre_pas_du_maillage() << finl;
+          //Cerr << "carre_pas_du_maillage : " << la_zone_VEF.carre_pas_du_maillage() << finl;
           int nb_eqn=pb.nombre_d_equations();
 
           for(int num_eq=0; num_eq<nb_eqn; num_eq++)
@@ -153,13 +144,8 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
 
   deformable_=1;
   zone(0).invalide_octree();
-
-  //check_Zero_ALE_Vel_InInit is used in the following way:
-  //check_Zero_ALE_Vel_InInit= 1.0, ALE boundary velocity is zero, ALE mesh velocity is zero and mettre_a_jour is skipped.
-  //check_Zero_ALE_Vel_InInit(1...3)= 1.0, ALE boundary velocity is zero in the specific direction and mesh coordinate in this direction is not updated.
-  ArrOfDouble check_Zero_ALE_Vel_InInit(dimension+1);
-
-  ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,check_Zero_ALE_Vel_InInit);
+  bool  check_NoZero_ALE= true;
+  ALE_mesh_velocity=calculer_vitesse(temps,le_domaine_dis,pb,  check_NoZero_ALE);
 
   //On initialise les vitesses aux faces
   Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
@@ -193,7 +179,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   //End of initializing Ch_front_input_ALE
 }
 
-DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, ArrOfDouble& check_Zero_ALE_Vel_A)
+DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
 {
   int n; // A activer ou desactiver si on utilise le laplacien ou non
   int N_som=nb_som_tot(); //A activer ou desactiver si on utilise le laplacien ou non
@@ -283,14 +269,12 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
   //If ALE boundary velocity is zero, then ALE mesh velocity is directly zero (= default initialization value). Otherwise laplacien() is used.
   if(vit_bords.mp_max_abs_vect() >=1.e-12)
     {
-      ArrOfDouble check_Zero_ALE_Vel_B(dimension);
-      laplacien(le_domaine_dis, pb, vit_bords, vit_maillage, check_Zero_ALE_Vel_B);
-      for(int i=0; i<dimension; i++)
-        check_Zero_ALE_Vel_A(i+1)=check_Zero_ALE_Vel_B(i);
+      laplacien(le_domaine_dis, pb, vit_bords, vit_maillage);
+      check_NoZero_ALE = true;
     }
   else
     {
-      check_Zero_ALE_Vel_A(0)=1.0;
+      check_NoZero_ALE = false;
       update_or_not_matrix_coeffs_=1;
     }
   Debog::verifier("Domaine_ALE::calculer_vitesse -vit_maillage", vit_maillage);
@@ -323,7 +307,7 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
   return vf;
 }
 
-DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som ,ArrOfDouble& check_Zero_ALE_Vel_B)
+DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
   Cerr << "Domaine_ALE::laplacien" << finl;
   const Zone& lazone = les_zones(0);
@@ -350,9 +334,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
   int elem;
   int n_bord;
   {
-    //EFichier fic("solveur.bar");
-    // fic >> solv;
-    //solv.nommer("ALE_solver");
     int rang;
     int nnz=0;
     IntLists voisins(nbsom);
@@ -473,7 +454,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
         {
           for(int som=0; som<nbsom; som++)
             ch_som(som,comp)=0.0;
-          check_Zero_ALE_Vel_B(comp)=1.0;
         }
     }
   // Calcul de la norme du vecteur distribue

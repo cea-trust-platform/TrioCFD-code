@@ -56,11 +56,11 @@ public :
   inline const DoubleTab& vitesse_faces() const;
   virtual void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&);
   virtual void initialiser (double temps, Domaine_dis&, Probleme_base&);
-  DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, ArrOfDouble&);
+  DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
   void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
-  virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&, ArrOfDouble&);
+  virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   inline const DoubleTab& getOldJacobian();
