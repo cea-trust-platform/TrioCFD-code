@@ -68,18 +68,4 @@ void Op_Conv_ALE::associer(const Zone_dis& zdis,
   op_conv.l_op_base().associer(zdis, zcl_dis, inco);//rendu public en checkout
 }
 
-//DoubleTab& OpConvALE::ajouterALE(const DoubleTab& inco, DoubleTab& resu) const
-//{
-//  return resu;
-//}
-/*
-  const Domaine_ALE& Op_Conv_ALE::domaine_ALE() const
-  {
-  return ref_cast(Domaine_ALE, dom.valeur());
-  }
 
-  Domaine_ALE& Op_Conv_ALE::domaine_ALE()
-  {
-  return ref_cast(Domaine_ALE, dom.valeur());
-  }
-*/

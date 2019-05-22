@@ -40,8 +40,7 @@ public :
   virtual DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const;
   virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const=0;
   virtual DoubleTab& supprimerALE(const DoubleTab&, DoubleTab& ) const=0;
-  //    const Domaine_ALE& domaine_ALE() const;
-  //    Domaine_ALE& domaine_ALE();
+
 
 protected :
   Operateur_Conv op_conv;

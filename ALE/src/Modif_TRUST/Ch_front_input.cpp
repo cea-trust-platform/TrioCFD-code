@@ -101,7 +101,8 @@ void Ch_front_input::getTemplate(TrioField& afield) const
   affecte_int_avec_inttab(&afield._connectivity,faces);
 }
 
-void Ch_front_input::buildSommetsFaces() const   //Initially these lines were in Ch_front_input::initialiser
+// In the case of a mobile mesh (ALE frame) we need to call this function after each displacement of the mesh
+void Ch_front_input::buildSommetsFaces() const
 {
   const DoubleTab& sommets_org=(mon_pb->domaine().les_sommets());
   DoubleTab& sommets=sommets_;

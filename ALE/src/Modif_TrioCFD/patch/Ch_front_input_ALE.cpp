@@ -94,11 +94,8 @@ void Ch_front_input_ALE::mettre_a_jour(double temps)
   int i,j,k;
 
   DoubleTab& tab=valeurs_au_temps(temps);
-  //tab=0.; Located here in Ch_front_input_ALE::mettre_a_jour
-
   remplir_vit_som_bord_ALE(temps);
-
-  tab=0.; // Located here in Ch_front_input_ALE::mettre_a_jour
+  tab=0.;
 
   for( i=0; i<nb_faces; i++)
     {

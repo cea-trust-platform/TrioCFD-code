@@ -44,7 +44,6 @@
 #include <Param.h>
 #include <Op_Conv_ALE_VEF.h>
 #include <Domaine_ALE.h>
-#include <Probleme_base.h>
 #include <Zone_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Navier_Stokes_std,"Navier_Stokes_standard",Equation_base);
@@ -914,8 +913,6 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
           assembleur_pression_.modifier_secmem(secmemP);
           secmemP.echange_espace_virtuel();
           Debog::verifier("secmemP Navier_Stokes_std::corriger_derivee_impl",secmemP);
-
-
         }
 
       // Solve B M-1 Bt Cp = M-1(F - BtP) or in ALE case (BM-1Bt)Cp=B((J_{n}/J_{n+1})*(U_{n}/timestep)+derivee_withALEconvectiveTerm)

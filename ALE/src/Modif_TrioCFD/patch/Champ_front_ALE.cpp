@@ -229,7 +229,7 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
               //               fxyt[j].setVar("z",z);
               fxyt[j].setVar("t",tps);
               vit_som_bord_ALE(faces.sommet(i,k),j)=fxyt[j].eval();
-              //cout << " x y z " << x << " " << y << " " << z << " " << vit_som_bord_ALE(faces.sommet(i,k),j) << endl;
+              //cout << " x y  " << x << " " << y << " " << z << " " << vit_som_bord_ALE(faces.sommet(i,k),j) << endl;
             }
         }
     }
