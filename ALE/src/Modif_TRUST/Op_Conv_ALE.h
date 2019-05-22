@@ -39,7 +39,6 @@ public :
   virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
   virtual DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const;
   virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const=0;
-  virtual DoubleTab& supprimerALE(const DoubleTab&, DoubleTab& ) const=0;
 
 
 protected :

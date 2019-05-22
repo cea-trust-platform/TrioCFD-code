@@ -47,10 +47,6 @@ public :
   void ajouterALE_Centre(const DoubleTab&, DoubleTab&) const;
   void ajouterALE_Amont(const DoubleTab&, DoubleTab&) const;
   void ajouterALE_Muscl(const DoubleTab&, DoubleTab&) const;
-  virtual DoubleTab& supprimerALE(const DoubleTab&, DoubleTab& ) const;
-  void supprimerALE_Centre(const DoubleTab&, DoubleTab&) const;
-  void supprimerALE_Amont(const DoubleTab&, DoubleTab&) const;
-  void supprimerALE_Muscl(const DoubleTab&, DoubleTab&) const;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
   void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const;
 

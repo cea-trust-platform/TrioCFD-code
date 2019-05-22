@@ -34,7 +34,6 @@ class Op_Conv_ALE_VDF : public Op_Conv_ALE
 public :
 
   virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const;
-  virtual DoubleTab& supprimerALE(const DoubleTab&, DoubleTab& ) const;
 protected :
 
 };

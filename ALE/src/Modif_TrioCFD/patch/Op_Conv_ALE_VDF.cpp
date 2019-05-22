@@ -39,13 +39,10 @@ Entree& Op_Conv_ALE_VDF::readOn(Entree& is)
   exit();
   return is>>op_conv;
 }
-
 DoubleTab& Op_Conv_ALE_VDF::ajouterALE(const DoubleTab& inco, DoubleTab& resu) const
 {
-  return resu;
-}
-
-DoubleTab& Op_Conv_ALE_VDF::supprimerALE(const DoubleTab& inco, DoubleTab& resu) const
-{
+  Cerr<<" The VDF discrtisation is not working with the ALE module"<<finl;
+  Cerr<<" Please contact the TrioCFD team"<<finl;
+  exit();
   return resu;
 }
