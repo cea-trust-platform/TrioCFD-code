@@ -30,7 +30,8 @@
 Implemente_instanciable_sans_constructeur(Fluide_Diphasique,"Fluide_Diphasique",Milieu_base);
 
 Implemente_ref(Fluide_Diphasique);
-// XD fluide_diphasique milieu_v2_base fluide_diphasique 1 Two-phase fluid.
+//////////// XD fluide_diphasique milieu_v2_base fluide_diphasique -1 Two-phase fluid.
+// XD fluide_diphasique milieu_base fluide_diphasique -1 Two-phase fluid.
 
 Fluide_Diphasique::Fluide_Diphasique()
 {
@@ -57,7 +58,7 @@ void Fluide_Diphasique::set_param(Param& param)
   param.ajouter_non_std("fluide0",(this),Param::REQUIRED); // XD_ADD_P chaine first phase fluid
   param.ajouter_non_std("fluide1",(this),Param::REQUIRED); // XD_ADD_P chaine second phase fluid
   param.ajouter("chaleur_latente",&chaleur_latente_); // XD_ADD_P champ_don_base phase changement enthalpy h(phase1_) - h(phase0_) (J/kg/K)
-  param.ajouter("formule_mu",&formule_mu_); // XD_ADD_P chaine(into=["standard","arithmetic","harmonic"]) formula used to calculate average
+  param.ajouter("formule_mu",&formule_mu_); // XD_ADD_P chaine (into=[standard,arithmetic,harmonic]) formula used to calculate average
 }
 
 int Fluide_Diphasique::lire_motcle_non_standard(const Motcle& mot, Entree& is)
