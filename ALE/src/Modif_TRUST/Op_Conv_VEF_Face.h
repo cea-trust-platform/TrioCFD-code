@@ -76,11 +76,6 @@ protected:
   mutable ArrOfInt est_une_face_de_dirichlet_;
 };
 
-double minmod(double, double);
-double vanleer(double, double);
-double vanalbada(double, double);
-double chakravarthy(double, double);
-double superbee(double, double);
 
 // Description:
 // on dimensionne notre matrice au moyen de la methode dimensionner de la classe

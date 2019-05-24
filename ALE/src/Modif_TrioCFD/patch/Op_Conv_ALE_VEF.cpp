@@ -1462,15 +1462,15 @@ double Op_Conv_ALE_VEF::application_LIMITEUR(double grad1, double grad2, Motcle&
 {
   double gradlim=0.;
   if (type_limit=="minmod")
-    gradlim=Convection_tools::minmod(grad1,grad2);
+    gradlim=minmod(grad1,grad2);
   else  if (type_limit=="vanleer")
-    gradlim=Convection_tools::vanleer(grad1,grad2);
+    gradlim=vanleer(grad1,grad2);
   else  if (type_limit=="vanalbada")
-    gradlim=Convection_tools::vanalbada(grad1,grad2);
+    gradlim=vanalbada(grad1,grad2);
   else  if (type_limit=="chakravarthy")
-    gradlim=Convection_tools::chakravarthy(grad1,grad2);
+    gradlim=chakravarthy(grad1,grad2);
   else if (type_limit=="superbee")
-    gradlim=Convection_tools::superbee(grad1,grad2);
+    gradlim=superbee(grad1,grad2);
   else
     {
       Cerr << type_limit << " is not implemented. " << finl;

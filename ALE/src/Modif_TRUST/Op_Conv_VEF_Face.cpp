@@ -29,65 +29,6 @@
 Implemente_instanciable_sans_constructeur(Op_Conv_VEF_Face,"Op_Conv_Generic_VEF_P1NC",Op_Conv_VEF_base);
 
 
-
-//////////////////////////////////////////////////////////////
-//   Fonctions limiteurs de MUSCL
-////////////////////////////////////////////////////////////////
-// Inlining inutile car ces fonctions sont appelees dynamiquement
-// Pour optimiser, passer par une macro ?
-
-double minmod(double grad1, double grad2)
-{
-  double gradlim=0.;
-  if(grad1*grad2>0.) (dabs(grad1)<dabs(grad2)) ? gradlim=grad1 : gradlim=grad2 ;
-  return gradlim;
-}
-
-double vanleer(double grad1, double grad2)
-{
-  double gradlim=0.;
-  if(grad1*grad2>0.) gradlim=2.*grad1*grad2/(grad1+grad2) ;
-  return gradlim;
-}
-
-double vanalbada(double grad1, double grad2)
-{
-  double gradlim=0.;
-  if(grad1*grad2>0.) gradlim=grad1*grad2*(grad1+grad2)/(grad1*grad1+grad2*grad2) ;
-  return gradlim;
-}
-
-
-double chakravarthy(double grad1, double grad2)
-{
-
-
-  double gradlim=0.;
-  if ((grad1*grad2)>0)
-    {
-      gradlim=dmin(grad1/grad2,1.8); // 1<<beta<<2
-      gradlim=dmax(gradlim,0.);
-      gradlim*=grad2;
-    }
-  return gradlim;
-}
-
-double superbee(double grad1, double grad2)
-{
-
-  double gradlim=0.;
-  if ((grad1*grad2)>0)
-    {
-      double gradlim1,gradlim2;
-      gradlim1=dmin(2*(grad1/grad2),1);
-      gradlim2=dmin(grad1/grad2,2);
-      gradlim=dmax(gradlim1,gradlim2);
-      gradlim=dmax(gradlim,0.);
-      gradlim*=grad2;
-    }
-  return gradlim;
-}
-
 //// printOn
 //
 Sortie& Op_Conv_VEF_Face::printOn(Sortie& s ) const
@@ -121,13 +62,6 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
           Cerr << " choisir parmi : minmod - vanleer - vanalbada - chakravarthy - superbee " << finl;
           exit();
         }
-
-
-      /*   if (type_lim=="minmod") LIMITEUR=&(Convection_tools::minmod);
-         if (type_lim=="vanleer") LIMITEUR=&(Convection_tools::vanleer);
-         if (type_lim=="vanalbada") LIMITEUR=&(Convection_tools::vanalbada);
-         if (type_lim=="chakravarthy") LIMITEUR=&(Convection_tools::chakravarthy);
-         if (type_lim=="superbee") LIMITEUR=&(Convection_tools::superbee);*/
 
       if (type_lim=="minmod") LIMITEUR=&minmod;
       if (type_lim=="vanleer") LIMITEUR=&vanleer;
