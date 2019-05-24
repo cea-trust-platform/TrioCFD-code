@@ -28,8 +28,8 @@
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Porosites_champ.h>
+#include <Convection_tools.h>
 #include <Debog.h>
-
 
 Implemente_instanciable(Op_Conv_ALE_VEF,"Op_Conv_ALE_VEF",Op_Conv_ALE);
 
@@ -260,8 +260,9 @@ void Op_Conv_ALE_VEF::ajouterALE_Amont(const DoubleTab& inco, DoubleTab& resu) c
           rang = rang_elem_non_std(poly);
           int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
 
-          // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la porosite
-          calcul_vc_ALE(face,vc,vs,vsom,vitesse_face_absolue_ALE,itypcl,porosite_face);
+          Champ_Inc vit_maillage_ALE=equation().inconnue();
+          vit_maillage_ALE.valeurs() =  vitesse_face_absolue_ALE;
+          type_elemvef.calcul_vc(face,vc,vs,vsom,vit_maillage_ALE,itypcl,porosite_face);
 
           // Gestion de la porosite
           if (marq==0)
@@ -775,8 +776,9 @@ void Op_Conv_ALE_VEF::ajouterALE_Muscl(const DoubleTab& inco,DoubleTab& resu) co
               rang = rang_elem_non_std(poly);
               int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
 
-              // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la porosite
-              calcul_vc_ALE(face,vc,vs,vsom,vitesse_face_absolue_ALE,itypcl,porosite_face);
+              Champ_Inc vit_maillage_ALE=equation().inconnue();
+              vit_maillage_ALE.valeurs() =  vitesse_face_absolue_ALE;
+              type_elemvef.calcul_vc(face,vc,vs,vsom,vit_maillage_ALE,itypcl,porosite_face);
 
               // calcul de xc (a l'intersection des 3 facettes) necessaire pour muscl3
               if (ordre==3)
@@ -1436,247 +1438,6 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
   return jacobianALE;
 }
 
-void Op_Conv_ALE_VEF::calcul_vc_ALE(const ArrOfInt& Face, ArrOfDouble& vc, const ArrOfDouble& vs, const DoubleTab& vsom, const DoubleTab& vitesse_face_absolue_ALE,int type_cl, const DoubleVect& porosite_face) const
-{
-// Op_Conv_ALE_VEF::calcul_vc_ALE(...) is based on Tetra_VEF::calcul_vc(...) and on Tri_VEF::calcul_vc(...). It was created in order to have vitesse_face_absolue_ALE input as DoubleTab& compared to the original Champ_Inc_base& .
-  if (dimension == 2) //Tri_VEF
-    {
-
-      switch(type_cl)
-        {
-        case 0: // le triangle n'a pas de Face de Dirichlet
-          {
-            vc[0] = vs[0]/3;
-            vc[1] = vs[1]/3;
-            break;
-          }
-
-        case 1: // le triangle a une Face de Dirichlet :la Face 2
-          {
-            vc[0]= vitesse_face_absolue_ALE(Face[2],0)*porosite_face(Face[2]);
-            vc[1]= vitesse_face_absolue_ALE(Face[2],1)*porosite_face(Face[2]);
-            break;
-          }
-
-        case 2: // le triangle a une Face de Dirichlet :la Face 1
-          {
-            vc[0]= vitesse_face_absolue_ALE(Face[1],0)*porosite_face(Face[1]);
-            vc[1]= vitesse_face_absolue_ALE(Face[1],1)*porosite_face(Face[1]);;
-            break;
-          }
-
-        case 4: // le triangle a une Face de Dirichlet :la Face 0
-          {
-            vc[0]= vitesse_face_absolue_ALE(Face[0],0)*porosite_face(Face[0]);
-            vc[1]= vitesse_face_absolue_ALE(Face[0],1)*porosite_face(Face[0]);
-            break;
-          }
-
-        case 3: // le triangle a deux faces de Dirichlet :les faces 1 et 2
-          {
-            vc[0]= vsom(0,0);
-            vc[1]= vsom(0,1);
-            break;
-          }
-
-        case 5: // le triangle a deux faces de Dirichlet :les faces 0 et 2
-          {
-            vc[0]= vsom(1,0);
-            vc[1]= vsom(1,1);
-            break;
-          }
-
-        case 6: // le triangle a deux faces de Dirichlet :les faces 0 et 1
-          {
-            vc[0]= vsom(2,0);
-            vc[1]= vsom(2,1);
-            break;
-          }
-
-        } // switch end
-
-    } // 2D end
-
-  else if (dimension == 3) //Tetra_VEF
-    {
-
-      int comp;
-      switch(type_cl)
-        {
-
-        case 0: // le tetraedre n'a pas de Face de Dirichlet
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.25*vs[comp];
-            break;
-          }
-
-        case 1: // le tetraedre a une Face de Dirichlet : KEL3
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vitesse_face_absolue_ALE(Face[3],comp)*porosite_face(Face[3]);
-            break;
-          }
-
-        case 2: // le tetraedre a une Face de Dirichlet : KEL2
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vitesse_face_absolue_ALE(Face[2],comp)*porosite_face(Face[2]);
-            break;
-          }
-
-        case 4: // le tetraedre a une Face de Dirichlet : KEL1
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vitesse_face_absolue_ALE(Face[1],comp)*porosite_face(Face[1]);
-            break;
-          }
-
-        case 8: // le tetraedre a une Face de Dirichlet : KEL0
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vitesse_face_absolue_ALE(Face[0],comp)*porosite_face(Face[0]);
-            break;
-          }
-
-        case 3: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL2
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.5* (vsom(0,comp) + vsom(1,comp));
-            break;
-          }
-
-        case 5: // le tetraedre a deux faces de Dirichlet : KEL3 et KEL1
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.5* (vsom(0,comp) + vsom(2,comp));
-            break;
-          }
-
-        case 6: // le tetraedre a deux faces de Dirichlet : KEL1 et KEL2
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.5* (vsom(0,comp) + vsom(3,comp));
-            break;
-          }
-
-        case 9: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL3
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.5* (vsom(1,comp) + vsom(2,comp));
-            break;
-          }
-
-        case 10: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL2
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.5* (vsom(1,comp) + vsom(3,comp));
-            break;
-          }
-
-        case 12: // le tetraedre a deux faces de Dirichlet : KEL0 et KEL1
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = 0.5*(vsom(2,comp) + vsom(3,comp));
-            break;
-          }
-
-        case 7: // le tetraedre a trois faces de Dirichlet : KEL1, KEL2 et KEL3
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vsom(0,comp);
-            break;
-          }
-
-        case 11: // le tetraedre a trois faces de Dirichlet : KEL0,KEL2 et KEL3
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vsom(1,comp);
-            break;
-          }
-
-        case 13: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL3
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vsom(2,comp);
-            break;
-          }
-
-        case 14: // le tetraedre a trois faces de Dirichlet : KEL0, KEL1 et KEL2
-          {
-            for (comp=0; comp<3; comp++)
-              vc[comp] = vsom(3,comp);
-            break;
-          }
-
-        } // switch end
-
-    } // 3D end
-}
-
-
-double Op_Conv_ALE_VEF::application_LIMITEUR(double grad1, double grad2, Motcle& type_limit) const
-{
-  //////////////////////////////////////////////////////////////
-  //   Fonctions limiteurs de MUSCL
-  ////////////////////////////////////////////////////////////////
-  // Inlining inutile car ces fonctions sont appelees dynamiquement
-  // Pour optimiser, passer par une macro ?
-  if ( !(type_limit=="minmod") && !(type_limit=="vanleer") && !(type_limit=="vanalbada")
-       &&  !(type_limit=="chakravarthy") && !(type_limit=="superbee") )
-    {
-      Cerr << type_limit << " is not implemented. " << finl;
-      Cerr << " Choose from: minmod - vanleer - vanalbada - chakravarthy - superbee " << finl;
-      exit();
-    }
-  double gradlim=0.;
-  if (type_limit=="minmod")
-    {
-      if(grad1*grad2>0.) (dabs(grad1)<dabs(grad2)) ? gradlim=grad1 : gradlim=grad2 ;
-    }
-  if (type_limit=="vanleer")
-    {
-      if(grad1*grad2>0.) gradlim=2.*grad1*grad2/(grad1+grad2) ;
-    }
-  if (type_limit=="vanalbada")
-    {
-      if(grad1*grad2>0.) gradlim=grad1*grad2*(grad1+grad2)/(grad1*grad1+grad2*grad2) ;
-    }
-  if (type_limit=="chakravarthy")
-    {
-      /*
-        Cerr << " limiteur chakavarthy non preconise (non symetrique) " << finl;
-        exit();
-        return 0;
-      */
-      if ((grad1*grad2)>0)
-        {
-          gradlim=dmin(grad1/grad2,1.8); // 1<<beta<<2
-          gradlim=dmax(gradlim,0.);
-          gradlim*=grad2;
-        }
-    }
-  if (type_limit=="superbee")
-    {
-      /*
-        Cerr << " limiteur superbee non preconise (source d'instabilites) " << finl;
-        exit();
-        return 0;
-      */
-      if ((grad1*grad2)>0)
-        {
-          double gradlim1,gradlim2;
-          gradlim1=dmin(2*(grad1/grad2),1);
-          gradlim2=dmin(grad1/grad2,2);
-          gradlim=dmax(gradlim1,gradlim2);
-          gradlim=dmax(gradlim,0.);
-          gradlim*=grad2;
-        }
-    }
-  return gradlim;
-}
-
-
 // contribuer_a_avec() and modifier_pour_Cl() are needed when using Scheme_euler_implicit time scheme.
 
 //Description:
@@ -1695,3 +1456,30 @@ void Op_Conv_ALE_VEF::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
   opConvVEFFace.modifier_pour_Cl(matrice, secmem);
 }
+
+
+double Op_Conv_ALE_VEF::application_LIMITEUR(double grad1, double grad2, Motcle& type_limit) const
+{
+  double gradlim=0.;
+  if (type_limit=="minmod")
+    gradlim=Convection_tools::minmod(grad1,grad2);
+  else  if (type_limit=="vanleer")
+    gradlim=Convection_tools::vanleer(grad1,grad2);
+  else  if (type_limit=="vanalbada")
+    gradlim=Convection_tools::vanalbada(grad1,grad2);
+  else  if (type_limit=="chakravarthy")
+    gradlim=Convection_tools::chakravarthy(grad1,grad2);
+  else if (type_limit=="superbee")
+    gradlim=Convection_tools::superbee(grad1,grad2);
+  else
+    {
+      Cerr << type_limit << " is not implemented. " << finl;
+      Cerr << " Choose from: minmod - vanleer - vanalbada - chakravarthy - superbee " << finl;
+      exit();
+    }
+
+  return gradlim;
+}
+
+
+

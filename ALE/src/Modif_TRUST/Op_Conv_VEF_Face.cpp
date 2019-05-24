@@ -25,6 +25,7 @@
 #include <Porosites_champ.h>
 #include <Debog.h>
 #include <stat_counters.h>
+#include <Convection_tools.h>
 Implemente_instanciable_sans_constructeur(Op_Conv_VEF_Face,"Op_Conv_Generic_VEF_P1NC",Op_Conv_VEF_base);
 
 
@@ -59,11 +60,8 @@ double vanalbada(double grad1, double grad2)
 
 double chakravarthy(double grad1, double grad2)
 {
-  /*
-    Cerr << " limiteur chakavarthy non preconise (non symetrique) " << finl;
-    exit();
-    return 0;
-  */
+
+
   double gradlim=0.;
   if ((grad1*grad2)>0)
     {
@@ -76,11 +74,7 @@ double chakravarthy(double grad1, double grad2)
 
 double superbee(double grad1, double grad2)
 {
-  /*
-    Cerr << " limiteur superbee non preconise (source d'instabilites) " << finl;
-    exit();
-    return 0;
-  */
+
   double gradlim=0.;
   if ((grad1*grad2)>0)
     {
@@ -127,6 +121,13 @@ Entree& Op_Conv_VEF_Face::readOn(Entree& s )
           Cerr << " choisir parmi : minmod - vanleer - vanalbada - chakravarthy - superbee " << finl;
           exit();
         }
+
+
+      /*   if (type_lim=="minmod") LIMITEUR=&(Convection_tools::minmod);
+         if (type_lim=="vanleer") LIMITEUR=&(Convection_tools::vanleer);
+         if (type_lim=="vanalbada") LIMITEUR=&(Convection_tools::vanalbada);
+         if (type_lim=="chakravarthy") LIMITEUR=&(Convection_tools::chakravarthy);
+         if (type_lim=="superbee") LIMITEUR=&(Convection_tools::superbee);*/
 
       if (type_lim=="minmod") LIMITEUR=&minmod;
       if (type_lim=="vanleer") LIMITEUR=&vanleer;
@@ -382,7 +383,6 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
     }
   else if(type_op==muscl)
     {
-      //  application du limiteur
       gradient.resize(0, ncomp_ch_transporte, dimension);     // (du/dx du/dy dv/dx dv/dy) pour une face
       zone_VEF.creer_tableau_faces(gradient);
       for (n_bord=0; n_bord<nb_bord; n_bord++)
