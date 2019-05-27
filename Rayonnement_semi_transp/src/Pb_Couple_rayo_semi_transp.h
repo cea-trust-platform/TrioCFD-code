@@ -63,8 +63,6 @@ public:
   virtual int associer_(Objet_U&);
   virtual void associer_sch_tps_base(Schema_Temps_base&);
 
-  void discretiser(const Discretisation_base&);
-
   inline Modele_rayo_semi_transp& modele();
   inline const Modele_rayo_semi_transp& modele() const;
 

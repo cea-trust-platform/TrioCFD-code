@@ -212,9 +212,3 @@ void Pb_Couple_rayo_semi_transp::le_modele_rayo_associe(const Modele_rayo_semi_t
 //   modele().validateTimeStep();
 // }
 
-
-void Pb_Couple_rayo_semi_transp::discretiser(const Discretisation_base& dis)
-{
-  Probleme_Couple::discretiser(dis);
-  modele().discretiser(dis);
-}
