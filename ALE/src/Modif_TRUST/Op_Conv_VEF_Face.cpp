@@ -758,8 +758,6 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
 
   modifier_flux(*this);
   //statistiques().end_count(m3);
-  resu.echange_espace_virtuel();
-  Debog::verifier("Op_Conv_VEF_Face::ajouter - resu", resu);
   return resu;
 }
 

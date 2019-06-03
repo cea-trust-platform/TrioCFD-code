@@ -137,14 +137,10 @@ int Schema_Euler_explicite::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
   eqn.inconnue().avancer();
   eqn.derivee_en_temps_inco(dudt);
   eqn.inconnue().reculer();
-  dudt.echange_espace_virtuel();
-  Debog::verifier("Schema_Euler_explicite::faire_un_pas_de_temps_eqn_base -dudt", dudt);
 
   // Un+1=Un+dt_*dU/dt
   futur=dudt;
   futur*=dt_;
-  futur.echange_espace_virtuel();
-  Debog::verifier("Schema_Euler_explicite::faire_un_pas_de_temps_eqn_base -futur apres", futur);
 
   //Adding ALE Jacobians. Jacobians are renewed in Navier_Stokes_std::corriger_derivee_impl().
   // In ALE Un+1=(Jn/Jn+1)*Un+dt_*dU/dt

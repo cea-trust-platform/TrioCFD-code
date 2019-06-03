@@ -917,16 +917,12 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
 
       // Solve B M-1 Bt Cp = M-1(F - BtP) or in ALE case (BM-1Bt)Cp=B((J_{n}/J_{n+1})*(U_{n}/timestep)+derivee_withALEconvectiveTerm)
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, Cp);
-      Cp.echange_espace_virtuel();
-      //Debog::verifier("Cp_pression Navier_Stokes_std::corriger_derivee_impl",Cp);
       // P(n+1) = P(n) + Cp
       tab_pression += Cp;
       assembleur_pression_.modifier_solution(tab_pression);
       // M-1 Bt P(n+1)
       solveur_masse.appliquer(gradP);
-      gradP.echange_espace_virtuel();
       derivee += gradP; // M-1 F
-      derivee.echange_espace_virtuel();
     }
   else
     {
@@ -951,7 +947,6 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
 
   // dU/dt = M-1(F-Bt P(n+1))
   derivee -= Mmoins1gradP;
-  derivee.echange_espace_virtuel();
   return derivee;
 }
 
