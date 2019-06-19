@@ -49,11 +49,11 @@ void Navier_Stokes_std_sensibility::set_param(Param& param)
   param.ajouter_non_std("state",(this),Param::REQUIRED);
   param.ajouter_non_std("uncertain_variable",(this),Param::REQUIRED);
 
-  if (schema_temps().diffusion_implicite())
-    {
-      Cerr<<"diffusion implicite forbidden within Navier_Stokes_std_sensibility  "<<finl;
-      exit();
-    }
+  /* if (schema_temps().diffusion_implicite())
+     {
+       Cerr<<"diffusion implicite forbidden within Navier_Stokes_std_sensibility  "<<finl;
+       exit();
+     }*/
   if( schema_temps().que_suis_je() != "Schema_euler_explicite" )
     {
       Cerr<<"Time  scheme: "<<schema_temps().que_suis_je() <<finl;
