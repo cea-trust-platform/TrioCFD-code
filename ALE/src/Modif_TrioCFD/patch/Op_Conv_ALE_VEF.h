@@ -23,7 +23,7 @@
 #ifndef Op_Conv_ALE_VEF_included
 #define Op_Conv_ALE_VEF_included
 
-
+#include <Op_VEF_Face.h>
 #include <Op_Conv_ALE.h>
 #include <Ref_Zone_VEF.h>
 #include <Ref_Zone_Cl_VEF.h>
@@ -31,7 +31,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-class Op_Conv_ALE_VEF : public Op_Conv_ALE
+class Op_Conv_ALE_VEF : public Op_Conv_ALE, public Op_VEF_Face
 {
   Declare_instanciable(Op_Conv_ALE_VEF);
 
@@ -50,12 +50,19 @@ public :
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
   void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const;
 
+  inline void dimensionner(Matrice_Morse& ) const;
+
 protected :
   REF(Zone_VEF) la_zone_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
   mutable ArrOfInt traitement_pres_bord_;
   mutable ArrOfInt est_une_face_de_dirichlet_;
 };
+
+inline  void Op_Conv_ALE_VEF::dimensionner(Matrice_Morse& matrice) const
+{
+  Op_VEF_Face::dimensionner(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice);
+}
 
 
 #endif
