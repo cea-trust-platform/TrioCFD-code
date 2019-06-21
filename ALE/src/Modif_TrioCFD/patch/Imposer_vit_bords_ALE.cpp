@@ -25,6 +25,12 @@
 
 
 Implemente_instanciable(Imposer_vit_bords_ALE,"Imposer_vit_bords_ALE",Interprete_geometrique_base);
+//XD  imposer_vit_bords_ale interprete imposer_vit_bords_ale 0 For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile boundaries of the domain and specify the speed that must be imposed on them.
+//XD  attr dom ref_domaine dom 0 Name of domain.
+//XD attr bloc bloc_lecture bloc 0 between the braces, you must specify the numbers of the mobile borders of the domain then list these mobile borders and indicate the speed which must be imposed on them  NL2 Example:  Imposer_vit_bords_ALE dom_name  { 1  boundary_name  Champ_front_ALE 2 -(y-0.1)*0.01 (x-0.1)*0.01 }
+
+
+
 
 
 // Description:

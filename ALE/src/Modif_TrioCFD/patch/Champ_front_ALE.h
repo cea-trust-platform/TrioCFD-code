@@ -27,22 +27,21 @@
 #include <Ch_front_var_instationnaire_dep.h>
 #include <Parser_U.h>
 #include <Vect_Parser_U.h>
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Champ_front_ALE
-//     Classe derivee de Champ_front_base qui represente les
-//     champs variables en espace et en temps
+//     class Champ_front_ALE
+//
+//     Cette classe represente un champ sur une frontiere in case of ALE calculation.
+//
 // .SECTION voir aussi
-//     Champ_front_base
-//////////////////////////////////////////////////////////////////////////////
+//   Champ_Input_Proto
+/////////////////////////////////////////////////////////////////////////////////
 class Champ_front_ALE : public Ch_front_var_instationnaire_dep
 {
   Declare_instanciable(Champ_front_ALE);
-  //Declare_instanciable_sans_constructeur(Champ_front_ALE);
 
 public:
-  //Champ_front_ALE();
   inline DoubleTab& get_vit_som_bord_ALE();
   Champ_front_base& affecter_(const Champ_front_base& ch);
   virtual int initialiser(double temps, const Champ_Inc_base& inco);

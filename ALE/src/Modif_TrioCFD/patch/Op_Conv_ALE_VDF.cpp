@@ -24,7 +24,6 @@
 
 Implemente_instanciable(Op_Conv_ALE_VDF,"Op_Conv_ALE_VDF",Op_Conv_ALE);
 
-
 Sortie& Op_Conv_ALE_VDF::printOn(Sortie& os) const
 {
   return os;

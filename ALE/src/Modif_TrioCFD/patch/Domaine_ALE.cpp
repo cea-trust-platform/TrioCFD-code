@@ -33,7 +33,7 @@
 #include <Ch_front_input_ALE.h>
 
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
-
+//XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
 Domaine_ALE::Domaine_ALE() : nb_bords_ALE(0),update_or_not_matrix_coeffs_(1)
 {
 

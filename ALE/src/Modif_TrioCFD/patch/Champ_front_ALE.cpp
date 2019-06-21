@@ -26,8 +26,8 @@
 #include <MD_Vector_tools.h>
 
 Implemente_instanciable(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instationnaire_dep);
-//Implemente_instanciable_sans_constructeur(Champ_front_ALE,"Champ_front_ALE",Ch_front_var_instationnaire_dep);
-
+//XD Champ_front_ale front_field_base Champ_front_ale 0 Class to define a boundary condition on a moving boundary of a mesh (only for the Arbitrary Lagrangian-Eulerian framework ).
+//XD attr val listchaine val 0 NL2 Example:  2 -y*0.01 x*0.01
 
 /*Champ_front_ALE::Champ_front_ALE()
 {

@@ -33,7 +33,6 @@
 
 Implemente_instanciable(Op_Conv_ALE_VEF,"Op_Conv_ALE_VEF",Op_Conv_ALE);
 
-
 Sortie& Op_Conv_ALE_VEF::printOn(Sortie& os) const
 {
   return os;
