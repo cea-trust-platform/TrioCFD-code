@@ -28,12 +28,8 @@ for Discr in $Discretization ; do
 	if [ $(basename $project_directory) == "P1NCP0RT" ]
 	then
 	    ln -sfn $project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
-	elif [ $(basename $project_directory) == "Super_Build" ]
-	then
-	    ln -sfn $project_directory/../triocfd-code/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
 	else
-	    echo "II recherche de "$MeshFile".med dans "
-	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	    ln -sfn $P1NCP0RT_project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
 	fi
              
         DataFile="RotFlow_"$Discr"_"$Mu".data"
