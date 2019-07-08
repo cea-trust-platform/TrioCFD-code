@@ -4,7 +4,7 @@
 
 dimension 2
 
-Pb_hydraulique pb
+Pb_hydraulique_ALE pb
 Domaine_ALE dom
 
 # BEGIN MESH #
@@ -42,7 +42,7 @@ VEFPreP1B ma_discretisation
 
 
 
-Schema_euler_explicite mon_schema
+Schema_euler_explicite_ALE mon_schema
 # Scheme_euler_implicit mon_schema #
 Read mon_schema
 {
@@ -53,7 +53,7 @@ Read mon_schema
 	seuil_statio 1.e-8 
         # facsec 1
         facsec_max 10
-	solveur implicite
+	solveur implicite_ALE
 	{
           solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
 	} for Euler implicit scheme # 
@@ -79,7 +79,7 @@ Domaine_ALE surface_SquareWest
 
 Read pb
 {
-	Navier_Stokes_standard
+	Navier_Stokes_standard_ALE
 	{
 		# Pressure matrix solved with #
  		solveur_pression petsc cholesky { }

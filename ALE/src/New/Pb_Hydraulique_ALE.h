@@ -14,84 +14,47 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Conv_Muscl3_VEF_Face.cpp
-// Directory:   $TRUST_ROOT/src/VEF/Operateurs
-// Version:     /main/5
+// File:        Pb_Hydraulique_ALE.h
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/New
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Conv_Muscl3_VEF_Face.h>
-#include <Convection_tools.h>
 
-Implemente_instanciable_sans_constructeur(Op_Conv_Muscl3_VEF_Face,"Op_Conv_Muscl3_VEF_P1NC",Op_Conv_VEF_Face);
+#ifndef Pb_Hydraulique_ALE_included
+#define Pb_Hydraulique_ALE_included
+
+#include <Pb_qdm_fluide.h>
+#include <Champ_Don.h>
+#include <Navier_Stokes_std_ALE.h>
 
 
-//// printOn
+//////////////////////////////////////////////////////////////////////////////
 //
-Sortie& Op_Conv_Muscl3_VEF_Face::printOn(Sortie& s ) const
+// .DESCRIPTION
+//     classe Pb_Hydraulique_ALE
+//     Cette classe represente un probleme hydraulique standard pour ALE dans lequel
+//     on resout les equations de Navier Stokes en regime laminaire
+//     pour un fluide incompressible
+//     La formulation est de type vitesse pression
+// .SECTION voir aussi
+//      Navier_Stokes_std Pb_qdm_fluide Fluide_Incompressible
+//////////////////////////////////////////////////////////////////////////////
+class Pb_Hydraulique_ALE : public Pb_qdm_fluide
 {
-  return s << que_suis_je() ;
-}
+  Declare_instanciable(Pb_Hydraulique_ALE);
 
-//// readOn
-//
-Entree& Op_Conv_Muscl3_VEF_Face::readOn(Entree& s )
-{
+public :
 
-  type_op=muscl;
-  LIMITEUR=&vanleer;
-  ordre=3;
-  alpha_=1;
-  // Lecture eventuelle de alpha_
-  Motcle motlu, accouverte = "{" , accfermee = "}" ;
-  Motcles les_mots(6);
-  {
-    les_mots[0] = "alpha";
-    les_mots[1] = "minmod";
-    les_mots[2] = "vanleer";
-    les_mots[3] = "vanalbada";
-    les_mots[4] = "chakravarthy";
-    les_mots[5] = "superbee";
-  }
-  s >> motlu;
-  if (motlu!=accouverte)
-    {
-      Cerr << "We wait for a { after reading muscl3 keyword." << finl;
-      Process::exit();
-    }
-  s >> motlu;
-  while(motlu!=accfermee)
-    {
-      int rang=les_mots.search(motlu);
+  int nombre_d_equations() const;
+  const Equation_base& equation(int) const;
+  Equation_base& equation(int);
+  void associer_milieu_base(const Milieu_base& );
 
-      switch(rang)
-        {
-        case 0 :
-          s >> alpha_;
-          break;
-        case 1 :
-          LIMITEUR=&minmod;
-          break;
-        case 2 :
-          LIMITEUR=&vanleer;
-          break;
-        case 3 :
-          LIMITEUR=&vanalbada;
-          break;
-        case 4 :
-          LIMITEUR=&chakravarthy;
-          break;
-        case 5 :
-          LIMITEUR=&superbee;
-          break;
-        default:
-          Cerr << "Keyword " << motlu << " not recognized. List of keywords available:" << finl;
-          Cerr << les_mots << finl;
-          exit();
-          break;
-        }
-      s >> motlu;
-    }
-  return s ;
-}
+protected :
 
+  Navier_Stokes_std_ALE eq_hydraulique_ale;
+
+};
+
+
+#endif

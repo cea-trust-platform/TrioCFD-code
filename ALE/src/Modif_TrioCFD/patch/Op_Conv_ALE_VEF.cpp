@@ -30,6 +30,7 @@
 #include <Porosites_champ.h>
 #include <Convection_tools.h>
 #include <Debog.h>
+#include <Champ_P1NC.h>
 
 Implemente_instanciable(Op_Conv_ALE_VEF,"Op_Conv_ALE_VEF",Op_Conv_ALE);
 
@@ -1205,7 +1206,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
 
 }
 
-DoubleTab& Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& ALE_Mesh_Velocity_Gradient) const
+void Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& ALE_Mesh_Velocity_Gradient) const
 {
 
   const DoubleTab& vitesse_faces_ALE = ref_cast(Domaine_ALE, dom.valeur()).vitesse_faces();
@@ -1381,16 +1382,14 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEMeshVelocityGradientOnFaces( DoubleTab& 
 
         }
     }
-
-  return ALE_Mesh_Velocity_Gradient;
 }
 
-DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
+void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
 {
-//////////////////////////////////////////////////////////////////////////////////
-//Jacobian determinant in the case when the mesh is moved as x_new=x_old+dt*v_ALE
-//////////////////////////////////////////////////////////////////////////////////
-//Case with periodic boundary conditions are not implemented yet!
+  //////////////////////////////////////////////////////////////////////////////////
+  //Jacobian determinant in the case when the mesh is moved as x_new=x_old+dt*v_ALE
+  //////////////////////////////////////////////////////////////////////////////////
+  //Case with periodic boundary conditions are not implemented yet!
 
   int num_face;
   double timestep=equation().probleme().schema_temps().pas_de_temps();
@@ -1434,7 +1433,6 @@ DoubleTab& Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
         }
     }
 
-  return jacobianALE;
 }
 
 // contribuer_a_avec() and modifier_pour_Cl() are needed when using Scheme_euler_implicit time scheme.

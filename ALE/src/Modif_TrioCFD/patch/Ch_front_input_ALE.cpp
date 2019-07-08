@@ -51,25 +51,25 @@ Sortie& Ch_front_input_ALE::printOn(Sortie& os) const
 
 void Ch_front_input_ALE::getTemplate(TrioField& afield) const
 {
-	buildSommetsFaces(); //From Ch_front_input in order to update mesh
-	Ch_front_input::getTemplate(afield);
+  buildSommetsFaces(); //From Ch_front_input in order to update mesh
+  Ch_front_input::getTemplate(afield);
 }
 
 void Ch_front_input_ALE::setValue(const TrioField& afield)
 {
 
-	  int NrOfFacesIn_les_valeurs=les_valeurs[1].valeurs().size()/nb_comp();
+  int NrOfFacesIn_les_valeurs=les_valeurs[1].valeurs().size()/nb_comp();
 
-		for(int i=0; i<NrOfFacesIn_les_valeurs; i++)
-		          {
-		            for(int j=0; j<afield._nb_field_components; j++)
-		              {
-		            	les_valeurs[1].valeurs()(i,j)=afield._field[afield._nb_field_components*i+j]; //Values to faces.
-		             }
-		         }
+  for(int i=0; i<NrOfFacesIn_les_valeurs; i++)
+    {
+      for(int j=0; j<afield._nb_field_components; j++)
+	{
+	  les_valeurs[1].valeurs()(i,j)=afield._field[afield._nb_field_components*i+j]; //Values to faces.
+	}
+    }
 }
 
-int  Ch_front_input_ALE::initialiser(double temps, const Champ_Inc_base& inco)
+int Ch_front_input_ALE::initialiser(double temps, const Champ_Inc_base& inco)
 {
   if (alreadyInit_)
     return 1;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,60 +14,28 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Conv_ALE.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd
-// Version:     /main/11
+// File:        Navier_Stokes_std_ALE.h
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/New
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Conv_ALE.h>
 
-Implemente_base(Op_Conv_ALE,"Operateur_Conv_ALE",Operateur_Conv_base);
-// XD convection_ale convection_deriv ale 0 A convective scheme for ALE (Arbitrary Lagrangian-Eulerian)  framework.
-// XD  attr opconv bloc_convection opconv 0 Choice between: amont and muscl   NL2 Example: convection {  ALE { amont } }
+#ifndef Navier_Stokes_std_ALE_included
+#define Navier_Stokes_std_ALE_included
 
-Sortie& Op_Conv_ALE::printOn(Sortie& os) const
+
+#include <Navier_Stokes_std.h>
+
+class Navier_Stokes_std_ALE: public Navier_Stokes_std
 {
-  return os;
-}
 
-Entree& Op_Conv_ALE::readOn(Entree& is)
-{
-  return is;
-}
+  Declare_instanciable(Navier_Stokes_std_ALE);
 
-void Op_Conv_ALE::associer_vitesse(const Champ_base& vit)
-{
-  la_vitesse = ref_cast(Champ_Inc_base,vit);
-}
+public :
 
-DoubleTab& Op_Conv_ALE::ajouter(const DoubleTab& inco, DoubleTab& resu) const
-{
-  op_conv.ajouter(inco, resu);
-  Cerr << "equation : " << equation().le_nom() << finl;
-  Motcle le_nom_eqn=equation().le_nom();
-  if (le_nom_eqn!="pbNavier_Stokes_standard")
-    {
-      ajouterALE(inco,resu);
-    }
-  //si ajout ALE ici, pas besoin de redimensionner resu dans ajouterALE
-  //ajouterALE(inco,resu);
-  //ajouterALE(inco,resu);
-  return resu;
-}
-DoubleTab& Op_Conv_ALE::calculer(const DoubleTab& inco, DoubleTab& resu) const
-{
-  //Cerr << "Op_Conv_ALE::calculer" << finl;
-  op_conv.calculer(inco, resu);
-  return resu;
-}
-void Op_Conv_ALE::associer(const Zone_dis& zdis,
-                           const Zone_Cl_dis& zcl_dis,
-                           const Champ_Inc& inco)
-{
-  //Cerr << "Op_Conv_ALE::associer" << finl;
-  dom=inco->domaine();
-  op_conv.l_op_base().associer(zdis, zcl_dis, inco);//rendu public en checkout
-}
+  virtual void renewing_jacobians( DoubleTab& derivee );
+  virtual void div_ale_derivative( DoubleTrav& deriveeALE, double timestep, DoubleTab& derivee, DoubleTrav& secmemP );
+  virtual void update_pressure_matrix( void );
+};
 
-
+#endif

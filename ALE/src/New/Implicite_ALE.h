@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,33 +14,32 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Conv_Muscl_VEF_Face.cpp
-// Directory:   $TRUST_ROOT/src/VEF/Operateurs
-// Version:     /main/1
+// File:        Implicite_ALE.h
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/New
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Conv_Muscl_VEF_Face.h>
-#include <Convection_tools.h>
 
-Implemente_instanciable_sans_constructeur(Op_Conv_Muscl_VEF_Face,"Op_Conv_Muscl_VEF_P1NC",Op_Conv_VEF_Face);
+#ifndef Implicite_ALE_included
+#define Implicite_ALE_included
 
+#include <Piso.h>
+#include <Equation_base.h>
+#include <DoubleTab.h>
+#include <DoubleTrav.h>
+#include <Navier_Stokes_std.h>
 
-//// printOn
-//
-Sortie& Op_Conv_Muscl_VEF_Face::printOn(Sortie& s ) const
-{
-  return s << que_suis_je() ;
-}
-
-//// readOn
-//
-Entree& Op_Conv_Muscl_VEF_Face::readOn(Entree& s )
+class Implicite_ALE: public Implicite
 {
 
-  type_op=muscl;
-  LIMITEUR=&vanleer;
-  ordre=2;
-  return s ;
-}
+  Declare_instanciable(Implicite_ALE);
+
+public :
+
+  virtual void first_special_treatment(Equation_base&, Navier_Stokes_std& eqnNS, DoubleTab& current, double dt, DoubleTrav& resu);
+  virtual void second_special_treatment(Equation_base& eqn, DoubleTab& current, DoubleTrav& resu, Matrice_Morse& matrice);
+
+};
+
+#endif
 

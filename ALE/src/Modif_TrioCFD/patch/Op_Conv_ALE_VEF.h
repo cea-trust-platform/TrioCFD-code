@@ -39,8 +39,8 @@ public :
   virtual void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
   double calculer_dt_stab() const ;
   virtual void remplir_fluent_ALEincluded(DoubleVect& ) const;
-  virtual DoubleTab& calculateALEMeshVelocityGradientOnFaces( DoubleTab& ) const;
-  virtual DoubleTab& calculateALEjacobian( DoubleTab& ) const;
+  virtual void calculateALEMeshVelocityGradientOnFaces( DoubleTab& ) const;
+  virtual void calculateALEjacobian(DoubleTab& jacobianALE) const;
   void calcul_vc_ALE(const ArrOfInt& ,ArrOfDouble& ,const ArrOfDouble& ,const DoubleTab& ,const DoubleTab& ,int, const DoubleVect& ) const ;
   double application_LIMITEUR(double, double, Motcle&) const;
   virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const;

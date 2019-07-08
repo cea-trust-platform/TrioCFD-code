@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019 , CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,60 +14,35 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Ch_front_input.h
-// Directory:   $TRUST_ROOT/src/Kernel/Champs
-// Version:     /main/9
+// File:        Schema_Euler_explicite_ALE.cpp
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/New
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef Schema_Euler_explicite_ALE_included
+#define Schema_Euler_explicite_ALE_included
 
-#ifndef Ch_front_input_included
-#define Ch_front_input_included
+#include <Schema_Euler_explicite.h>
 
-
-#include <Ch_front_var_instationnaire_dep.h>
-#include <Champ_Input_Proto.h>
-#include <IntTab.h>
-
-//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     class Ch_front_input
-//
-//     Cette classe represente un champ accessible par setInputField
-//     defini sur une frontiere avec une valeur par face.
-//
+//     classe Schema_Euler_explicite_ALE
+//     Cette classe represente un schema en temps d'Euler explicite pour l'ALE
 // .SECTION voir aussi
-//   Champ_Input_Proto
-/////////////////////////////////////////////////////////////////////////////////
+//     Schema_Euler_explicite
+//////////////////////////////////////////////////////////////////////////////
 
-class Ch_front_input : public Ch_front_var_instationnaire_dep, public Champ_Input_Proto
+class Schema_Euler_explicite_ALE: public Schema_Euler_explicite
 {
-  Declare_instanciable(Ch_front_input);
 
-public:
+  Declare_instanciable(Schema_Euler_explicite_ALE);
 
-  virtual Champ_front_base& affecter_(const Champ_front_base&)
-  {
-    return *this;
-  }
-  virtual void getTemplate(TrioField& afield) const;
-  virtual void setValue(const TrioField& afield);
+public :
 
-  virtual int initialiser(double temps, const Champ_Inc_base& inco);
-protected:
-
-  // Factorisation function between several input field classes
-  virtual void set_nb_comp(int i); // calls fixer_nb_comp
-  virtual void set_name(const Nom& ); // calls nommer
-  virtual const Nom& get_name() const; // calls le_nom
-
-  void buildSommetsFaces() const; // const because used in Ch_Front_input_ALE::getTemplate() which is const - actually updates the 2 members below due to ALE mesh movement:
-  mutable DoubleTab sommets_;
-  mutable IntTab faces_;
-
+  virtual int faire_un_pas_de_temps_eqn_base(Equation_base&);
 
 };
 
-#endif
 
+#endif
