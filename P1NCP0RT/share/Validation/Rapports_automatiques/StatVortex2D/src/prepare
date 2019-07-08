@@ -31,7 +31,7 @@ for Discr in $Discretization ; do
 	then
 	    ln -sfn $project_directory/../triocfd-code/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
 	else
-	    ln -sfn $project_directory/P1NCP0RT/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
+	    ln -sfn $P1NCP0RT_project_directory/share/Validation/Rapports_automatiques/mesh/$MeshFile".med" $fold/.
 	fi
              
         DataFile="StatVortex2D_"$Discr"_"$Re".data"
