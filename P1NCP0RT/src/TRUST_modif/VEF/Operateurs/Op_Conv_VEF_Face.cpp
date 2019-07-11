@@ -26,74 +26,11 @@
 #include <Debog.h>
 #include <stat_counters.h>
 #include <Zone_VEF_PreP1b.h>
+#include <Convection_tools.h>
 
 extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Zone_Cl_VEF& zcl, const Zone_VEF& zone_VEF);
 Implemente_instanciable_sans_constructeur(Op_Conv_VEF_Face,"Op_Conv_Generic_VEF_P1NC",Op_Conv_VEF_base);
 
-//////////////////////////////////////////////////////////////
-//   Fonctions limiteurs de MUSCL
-////////////////////////////////////////////////////////////////
-// Inlining inutile car ces fonctions sont appelees dynamiquement
-// Pour optimiser, passer par une macro ?
-
-double minmod(double grad1, double grad2)
-{
-  double gradlim=0.;
-  if(grad1*grad2>0.) (dabs(grad1)<dabs(grad2)) ? gradlim=grad1 : gradlim=grad2 ;
-  return gradlim;
-}
-
-double vanleer(double grad1, double grad2)
-{
-  double gradlim=0.;
-  if(grad1*grad2>0.) gradlim=2.*grad1*grad2/(grad1+grad2) ;
-  return gradlim;
-}
-
-double vanalbada(double grad1, double grad2)
-{
-  double gradlim=0.;
-  if(grad1*grad2>0.) gradlim=grad1*grad2*(grad1+grad2)/(grad1*grad1+grad2*grad2) ;
-  return gradlim;
-}
-
-
-double chakravarthy(double grad1, double grad2)
-{
-  /*
-    Cerr << " limiteur chakavarthy non preconise (non symetrique) " << finl;
-    exit();
-    return 0;
-  */
-  double gradlim=0.;
-  if ((grad1*grad2)>0)
-    {
-      gradlim=dmin(grad1/grad2,1.8); // 1<<beta<<2
-      gradlim=dmax(gradlim,0.);
-      gradlim*=grad2;
-    }
-  return gradlim;
-}
-
-double superbee(double grad1, double grad2)
-{
-  /*
-    Cerr << " limiteur superbee non preconise (source d'instabilites) " << finl;
-    exit();
-    return 0;
-  */
-  double gradlim=0.;
-  if ((grad1*grad2)>0)
-    {
-      double gradlim1,gradlim2;
-      gradlim1=dmin(2*(grad1/grad2),1);
-      gradlim2=dmin(grad1/grad2,2);
-      gradlim=dmax(gradlim1,gradlim2);
-      gradlim=dmax(gradlim,0.);
-      gradlim*=grad2;
-    }
-  return gradlim;
-}
 
 //// printOn
 //
@@ -2003,4 +1940,22 @@ void  Op_Conv_VEF_Face::remplir_fluent(DoubleVect& tab_fluent) const
             }
         }
     }
+}
+
+void Op_Conv_VEF_Face::get_ordre(int& ord) const
+{
+  ord=ordre;
+}
+void Op_Conv_VEF_Face::get_type_lim(Motcle& typelim) const
+{
+  typelim=type_lim;
+}
+void Op_Conv_VEF_Face::get_alpha(double& alp) const
+{
+  alp=alpha_;
+}
+
+void Op_Conv_VEF_Face::get_type_op(int& typeop) const
+{
+  typeop=type_op;
 }

@@ -1,0 +1,131 @@
+# Hydraulique 2D laminar with ALE : rotation validation #
+# Warning: this is a numerical test case. We do not look at the physical aspects in detail here #
+# PARALLEL ONLY 4 #
+
+dimension 2
+
+Pb_hydraulique_ALE pb
+Domaine_ALE dom
+
+# BEGIN MESH 
+ Read_MED family_names_from_group_names dom MeshWithCylinderInBigDomaine MeshWithCylinderInBigDomaine.med 
+ END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 4 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER #
+Scatter DOM.Zones dom
+# END SCATTER #
+
+# For the Arbitrary Lagrangian-Eulerian framework: block to indicate the number of mobile 
+boundaries of the domain and specify the speed that must be imposed on them #
+Imposer_vit_bords_ALE dom
+{
+	1 # number of mobile boundaries  #
+	CircleA Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01  # name and speed of the border #
+}
+
+# Solver used to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { Petsc Cholesky {  } } 
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+
+# Time scheme, choice between: explicit or implicit #
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0.
+	# Min time step #
+        dt_min 1.e-15
+	dt_start dt_calc
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-1
+	# .sauv files printing period #
+        dt_sauv 100.
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 1
+        facsec_max 10
+	solveur implicite_ALE
+	{
+          solveur gmres { diag seuil 1.e-13 controle_residu 1 nb_it_max 3 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] #
+	tmax 10.
+	# Max number of time steps #
+        # nb_pas_dt_max 1 #
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+# I define a medium #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu Champ_Uniforme 1 0.022
+	rho Champ_Uniforme 1 900
+}
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+
+Read pb
+{
+	Navier_Stokes_standard_ALE
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression petsc cholesky { }
+		# Two operators are defined #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			CircleA  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 -(y-0.0)*0.01 (x-0.0)*0.01 # mobile bord in ALE framework #
+			CircleB  paroi_fixe
+		}
+	}
+	Post_processing
+	{
+		# Probes #
+		Probes
+		{
+			sonde_vitxpos nodes vitesse periode 5 segment 21 0.04 0.0 0.05 0.0
+			sonde_vitxneg nodes vitesse periode 5 segment 21 -0.04 0.0 -0.05 0.0
+			sonde_vitypos nodes vitesse periode 5 segment 21 0.0 0.04 0.0 0.05
+			sonde_vityneg nodes vitesse periode 5 segment 21 0.0 -0.04 0.0 -0.05			
+		}
+		# Fields #
+		format lata 
+		fields dt_post 5.
+		{
+			pression som
+			vitesse som
+		}
+	} 
+}
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End
