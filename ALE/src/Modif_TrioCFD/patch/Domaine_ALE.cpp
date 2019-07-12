@@ -176,7 +176,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
 
   // Initializing Ch_front_input_ALE (needed if Ch_front_input_ALE is used in Imposer_vit_bords_ALE block within data-file)
   int Nr_of_vit_bords_ALE=les_champs_front.size();
-  if(!Nr_of_vit_bords_ALE==0)
+  if(Nr_of_vit_bords_ALE!=0)
     {
       for(int i=0; i<Nr_of_vit_bords_ALE; i++)
         {
