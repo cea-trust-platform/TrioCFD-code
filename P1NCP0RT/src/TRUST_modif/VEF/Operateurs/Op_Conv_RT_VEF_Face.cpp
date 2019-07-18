@@ -23,7 +23,7 @@
 #include <Op_Conv_RT_VEF_Face.h>
 
 Implemente_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face,"Op_Conv_RT_VEF_P1NC",Op_Conv_VEF_Face);
-
+// XD convection_RT convection_deriv RT 0 Keyword to use RT projection for P1NCP0RT discretization
 
 //// printOn
 //
