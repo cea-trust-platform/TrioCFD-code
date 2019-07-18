@@ -27,7 +27,7 @@
 #include <Debog.h>
 
 Implemente_instanciable(Implicite_ALE,"Implicite_ALE",Implicite);
-
+// XD implicite_ALE implicite implicite_ALE -1 Implicite solver used for ALE problem
 Sortie& Implicite_ALE::printOn(Sortie& os ) const
 {
   return Implicite::printOn(os);

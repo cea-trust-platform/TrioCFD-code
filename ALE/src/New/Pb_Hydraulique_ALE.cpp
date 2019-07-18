@@ -23,7 +23,7 @@
 #include <Fluide_Ostwald.h>
 
 Implemente_instanciable(Pb_Hydraulique_ALE,"Pb_Hydraulique_ALE",Pb_qdm_fluide);
-
+// XD pb_hydraulique_ALE Pb_base pb_hydraulique_ALE -1 Resolution of hydraulic problems for ALE
 
 // Description:
 //    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)
