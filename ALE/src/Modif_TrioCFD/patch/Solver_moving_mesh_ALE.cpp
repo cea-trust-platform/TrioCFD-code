@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Domaine_ALE.h>
-#include "Solver_moving_mesh_ALE.h"
+#include <Solver_moving_mesh_ALE.h>
 
 
 Implemente_instanciable(Solver_moving_mesh_ALE,"Solver_moving_mesh_ALE",Interprete_geometrique_base);
