@@ -24,6 +24,7 @@
 
 Implemente_instanciable(Pb_Hydraulique_ALE,"Pb_Hydraulique_ALE",Pb_qdm_fluide);
 // XD pb_hydraulique_ALE Pb_base pb_hydraulique_ALE -1 Resolution of hydraulic problems for ALE
+// XD  attr navier_stokes_standard_ALE navier_stokes_standard navier_stokes_standard_ALE 0 Navier-Stokes equations for ALE problems
 
 // Description:
 //    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)

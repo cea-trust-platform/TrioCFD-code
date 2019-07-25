@@ -28,7 +28,7 @@
 #include <Domaine_ALE.h>
 
 Implemente_instanciable(Schema_Euler_explicite_ALE,"Schema_euler_explicite_ALE|Scheme_euler_explicit_ALE",Schema_Euler_explicite);
-
+// XD scheme_euler_explicite_ALE schema_temps_base schema_euler_explicite_ALE -1 This is the Euler explicit scheme used for ALE problems.
 
 Sortie& Schema_Euler_explicite_ALE::printOn(Sortie& s) const
 {
