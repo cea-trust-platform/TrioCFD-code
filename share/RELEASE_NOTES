@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.9 : Enhancements, modifications and corrected bugs since version 1.7.8 :
 --------------------------------------------------------------------------------------------------
-11/07/19 (TrioCFD) Enhancement : Arbitrary Lagrangian Eulerian frame of the NS equations (nodes displacement in function of the mesh borders)
+11/07/19 (TrioCFD) Enhancement : Arbitrary Lagrangian Eulerian frame of the NS equations (mesh moves along moving boundaries)
 02/05/19 (TrioCFD) Minor change: FTD. New key word for mu average calculation : standard, arithmetic or harmonic
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.8 : Enhancements, modifications and corrected bugs since version 1.7.7 :
