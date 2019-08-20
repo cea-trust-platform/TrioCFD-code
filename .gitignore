@@ -1,0 +1,11 @@
+*.log
+build/
+.check_sources.ok
+configure
+env_TrioCFD.sh
+full_env_TrioCFD.sh
+TrioCFD
+TrioCFD_opt
+Makefile
+README.BALTIK
+.test*
