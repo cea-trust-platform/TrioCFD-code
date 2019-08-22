@@ -52,6 +52,7 @@ class Descripteur_FT : public Objet_U
 public:
   // Constructeur
   Descripteur_FT();
+  Descripteur_FT(const Descripteur_FT&) = default;
   Descripteur_FT& operator=(const Descripteur_FT&);
   void reset();
 

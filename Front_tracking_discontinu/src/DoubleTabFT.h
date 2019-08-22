@@ -30,6 +30,7 @@ public:
   {
     set_smart_resize(1);
   }
+  DoubleTabFT(const DoubleTabFT&) = default;
   DoubleTabFT(int i, int j)
   {
     set_smart_resize(1);
@@ -64,6 +65,7 @@ public:
   {
     set_smart_resize(1);
   }
+  IntTabFT(const IntTabFT&) = default;
   IntTabFT(int i, int j)
   {
     set_smart_resize(1);
@@ -123,6 +125,7 @@ public:
   {
     set_smart_resize(1);
   }
+  ArrOfIntFT(const ArrOfIntFT&) = default;
   ArrOfIntFT(int n)
   {
     set_smart_resize(1);
