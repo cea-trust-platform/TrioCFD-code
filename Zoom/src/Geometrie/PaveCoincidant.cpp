@@ -291,7 +291,7 @@ Entree& PaveCoincidant::readOn(Entree& is)
       desc_pave+=" <= Y <= " ;
       desc_pave+= (Nom)ymax ;
 
-      desc_pave= desc_pave;
+      //desc_pave= desc_pave;
       desc_pave+=" bord " ;
       desc_pave+= (Nom)bb ;
       desc_pave+= "    Z = " ;

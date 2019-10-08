@@ -522,7 +522,7 @@ int RK3_FT::faire_un_pas_de_temps_pb_couple(Probleme_Couple& pbc)
                                                         qIi,
                                                         1);
           qIj *= -1.*a3;
-          qIi -= qIi;
+          qIi = 0.;
           equ_int.transporter_sans_changement_topologie(qIi,b3*dt_,temps_courant_);
         }
     }

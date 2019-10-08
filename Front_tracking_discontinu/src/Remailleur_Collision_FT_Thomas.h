@@ -124,7 +124,7 @@ private :
 
   int plus_grande_distance_interface_element_eulerien_;
   int distance_utilisateur_;
-  int conservation_volume_autorisee_;
+  //int conservation_volume_autorisee_;
   int tester_;
   int est_dimensionne_;
 
