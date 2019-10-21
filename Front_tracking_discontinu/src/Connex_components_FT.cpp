@@ -78,7 +78,8 @@ int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& nu
   liste_elems.set_smart_resize(1);
   ArrOfInt tmp_liste;
   tmp_liste.set_smart_resize(1);
-  const int nb_som_elem=dimension-1;
+  //const int nb_som_elem=dimension-1;
+  const int nb_som_elem=dimension;
 
   do
     {
