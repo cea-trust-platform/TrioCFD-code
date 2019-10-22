@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,7 @@
 #include <Champ_Fonc.h>
 #include <Mod_turb_hyd_base.h>
 #include <Mod_turb_hyd_RANS.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Turbulence_hyd_sous_maille_VEF.h>
 #include <Modele_turbulence_scal_Prandtl.h>
 #include <Transport_K_Eps_base.h>
@@ -50,14 +51,20 @@ void Op_Dift_VEF_base::associer_modele_turbulence(const Mod_turb_hyd_base& mod)
 {
   // On remplit la reference au modele de turbulence et le tableau k:
 
-  le_modele_turbulence = mod;
-  indic_bas_Re_ = 0;
+  le_modele_turbulence    = mod;
+  indic_bas_Re_           = 0;
+  indice_keps_realisable_ = 0;
 
   if (sub_type(Mod_turb_hyd_RANS,le_modele_turbulence.valeur()))
     {
       const Mod_turb_hyd_RANS& mod_K_eps =
         ref_cast(Mod_turb_hyd_RANS, le_modele_turbulence.valeur());
       k.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
+
+      if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
+        {
+          indice_keps_realisable_ = 1;
+        }
     }
   else if (sub_type(Mod_turb_hyd_ss_maille,le_modele_turbulence.valeur()))
     {

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2018, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -534,6 +534,7 @@ void Op_Dift_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
                                              const DoubleTab& tau_tan,
                                              const int indic_lp_neg,
                                              const int indic_bas_Re,
+                                             const int indice_keps_realisable,
                                              int nbr_comp, DoubleTab& grad) const
 {
   const IntTab& face_voisins = zone_VEF.face_voisins();
@@ -1009,7 +1010,7 @@ DoubleTab& Op_Dift_VEF_Face::ajouter(const DoubleTab& inconnue_org,
   if(nature_champ==scalaire)
     ajouter_cas_scalaire(inconnue, resu, flux_bords_, nu, nu_turb_m, zone_Cl_VEF, zone_VEF);
   else if (nature_champ==vectoriel)
-    ajouter_cas_vectoriel(inconnue, resu, flux_bords_, nu, nu_turb_m, zone_Cl_VEF, zone_VEF, k, tau_tan_,indic_lp_neg_,indic_bas_Re_,nb_comp,grad_);
+    ajouter_cas_vectoriel(inconnue, resu, flux_bords_, nu, nu_turb_m, zone_Cl_VEF, zone_VEF, k, tau_tan_,indic_lp_neg_,indic_bas_Re_,indice_keps_realisable_,nb_comp,grad_);
   else if (nature_champ==multi_scalaire)
     ajouter_cas_multi_scalaire(inconnue, resu, flux_bords_, nu, nu_turb_m, zone_Cl_VEF, zone_VEF, nb_comp);
   modifier_flux(*this);

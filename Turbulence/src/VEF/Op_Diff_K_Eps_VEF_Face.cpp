@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,6 +22,7 @@
 
 #include <Op_Diff_K_Eps_VEF_Face.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Champ_P1NC.h>
 #include <Periodique.h>
 #include <Neumann_paroi.h>
@@ -57,10 +58,21 @@ void Op_Diff_K_Eps_VEF_Face::associer(const Zone_dis& zone_dis,
 void Op_Diff_K_Eps_VEF_Face::associer_diffusivite_turbulente()
 {
   assert(mon_equation.non_nul());
-  const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
-  const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-  const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
-  Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
+
+  if ( sub_type( Transport_K_Eps,mon_equation.valeur() ) )
+    {
+      const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
+      const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
+      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
+    }
+  else if ( sub_type( Transport_K_Eps_Realisable,mon_equation.valeur() ) )
+    {
+      const Transport_K_Eps_Realisable& eqn_transport = ref_cast(Transport_K_Eps_Realisable,mon_equation.valeur());
+      const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence());
+      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+      Op_Diff_K_Eps_VEF_base::associer_diffusivite_turbulente(diff_turb);
+    }
 }
 
 
@@ -444,37 +456,77 @@ void Op_Diff_K_Eps_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) const
 void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
   // on recupere le tableau
-  const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
-  const DoubleTab& val=equation().inconnue().valeurs();
-  const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
-  const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
-  const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
-  int size=secmem.dimension(0);
-  const IntVect& tab1=matrice.get_tab1();
-  DoubleVect& coeff = matrice.get_set_coeff();
-  int nb_comp=2;
+  if ( sub_type( Transport_K_Eps,equation() ) )
+    {
+      const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
+      const DoubleTab& val=equation().inconnue().valeurs();
+      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
+      int size=secmem.dimension(0);
+      const IntVect& tab1=matrice.get_tab1();
+      DoubleVect& coeff = matrice.get_set_coeff();
+      int nb_comp=2;
 
-  Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
-  if (face_keps_imposee.size_array()>0)
-    // en plus des dirichlets ????
-    // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
-    for (int face=0; face<size; face++)
-      {
-        if (face_keps_imposee(face)!=-2)
+      Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+      if (face_keps_imposee.size_array()>0)
+        // en plus des dirichlets ????
+        // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
+        for (int face=0; face<size; face++)
           {
-            for (int comp=0; comp<nb_comp; comp++)
+            if (face_keps_imposee(face)!=-2)
               {
-                // on doit remettre la ligne a l'identite et le secmem a l'inconnue
-                int idiag = tab1[face*nb_comp+comp]-1;
-                coeff[idiag]=1;
-                // pour les voisins
-                int nbvois = tab1[face*nb_comp+1+comp] - tab1[face*nb_comp+comp];
-                for (int k=1; k < nbvois; k++)
+                for (int comp=0; comp<nb_comp; comp++)
                   {
-                    coeff[idiag+k]=0;
+                    // on doit remettre la ligne a l'identite et le secmem a l'inconnue
+                    int idiag = tab1[face*nb_comp+comp]-1;
+                    coeff[idiag]=1;
+                    // pour les voisins
+                    int nbvois = tab1[face*nb_comp+1+comp] - tab1[face*nb_comp+comp];
+                    for (int k=1; k < nbvois; k++)
+                      {
+                        coeff[idiag+k]=0;
+                      }
+                    secmem(face,comp)=val(face,comp);
                   }
-                secmem(face,comp)=val(face,comp);
               }
           }
-      }
+
+    }
+  else if ( sub_type( Transport_K_Eps_Realisable,equation() ) )
+    {
+      const Transport_K_Eps_Realisable& eqn_k_eps=ref_cast(Transport_K_Eps_Realisable,equation());
+      const DoubleTab& val=equation().inconnue().valeurs();
+      const Turbulence_paroi& mod=eqn_k_eps.modele_turbulence().loi_paroi();
+      const Paroi_hyd_base_VEF& paroi=ref_cast(Paroi_hyd_base_VEF,mod.valeur());
+      const ArrOfInt& face_keps_imposee=paroi.face_keps_imposee();
+      int size=secmem.dimension(0);
+      const IntVect& tab1=matrice.get_tab1();
+      DoubleVect& coeff = matrice.get_set_coeff();
+      int nb_comp=2;
+
+      Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+      if (face_keps_imposee.size_array()>0)
+        // en plus des dirichlets ????
+        // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
+        for (int face=0; face<size; face++)
+          {
+            if (face_keps_imposee(face)!=-2)
+              {
+                for (int comp=0; comp<nb_comp; comp++)
+                  {
+                    // on doit remettre la ligne a l'identite et le secmem a l'inconnue
+                    int idiag = tab1[face*nb_comp+comp]-1;
+                    coeff[idiag]=1;
+                    // pour les voisins
+                    int nbvois = tab1[face*nb_comp+1+comp] - tab1[face*nb_comp+comp];
+                    for (int k=1; k < nbvois; k++)
+                      {
+                        coeff[idiag+k]=0;
+                      }
+                    secmem(face,comp)=val(face,comp);
+                  }
+              }
+          }
+    }
 }

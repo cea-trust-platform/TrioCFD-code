@@ -1,0 +1,280 @@
+/****************************************************************************
+* Copyright (c) 2019, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+//
+// File:        Modele_turbulence_hyd_K_Eps_Realisable.cpp
+// Directory:   $TRUST_ROOT/src/VEF/Turbulence
+// Version:     /main/34
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
+#include <Probleme_base.h>
+#include <Schema_Temps_base.h>
+#include <Fluide_Incompressible.h>
+#include <Champ_Uniforme.h>
+#include <Schema_Temps.h>
+#include <Debog.h>
+#include <stat_counters.h>
+#include <Param.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
+#include <Modele_Shih_Zhu_Lumley_VEF.h>
+#include <Modifier_nut_pour_QC.h>
+#include <Modele_turbulence_scal_base.h>
+#include <DoubleTrav.h>
+#include <communications.h>
+
+Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS);
+
+// XD Modele_turbulence_hyd_K_Eps_Realisable Mod_turb_hyd_RANS Modele_turbulence_hyd_K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
+
+
+//
+// printOn et readOn
+
+Sortie& Modele_turbulence_hyd_K_Eps_Realisable::printOn(Sortie& s ) const
+{
+  return s << que_suis_je() << " " << le_nom();
+}
+
+// Description:
+// Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
+Entree& Modele_turbulence_hyd_K_Eps_Realisable::readOn(Entree& is)
+{
+  return Mod_turb_hyd_RANS::readOn(is);
+}
+
+void Modele_turbulence_hyd_K_Eps_Realisable::set_param(Param& param)
+{
+  Mod_turb_hyd_RANS::set_param(param);
+  param.ajouter_non_std("Transport_K_Epsilon_Realisable",(this),Param::REQUIRED);
+  param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED);
+  param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED);
+  param.ajouter("PRANDTL_EPS",&Prandtl_Eps,Param::REQUIRED);
+}
+
+int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+{
+  if (mot=="Transport_K_Epsilon_Realisable")
+    {
+      eqn_transp_K_Eps().associer_modele_turbulence(*this);
+      is >> eqn_transp_K_Eps();
+      Cerr << "Realizable K_Epsilon equation type " <<  eqn_transp_K_Eps().que_suis_je() << finl;
+      return 1;
+    }
+  else if (mot=="Modele_Fonc_Realisable")
+    {
+      get_modele_fonction().associer_eqn(eqn_transp_K_Eps());
+      is >> mon_modele_fonc;
+      get_modele_fonction().discretiser();
+      Cerr << "Realizable K_Epsilon model type " << get_modele_fonction().que_suis_je() << finl;
+      return 1;
+    }
+  else
+    return Mod_turb_hyd_RANS::lire_motcle_non_standard(mot,is);
+  return 1;
+}
+
+Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente(double temps)
+{
+  const Champ_base& chK_Eps=eqn_transp_K_Eps().inconnue().valeur();
+  Nom type=chK_Eps.que_suis_je();
+  const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente K_Eps",tab_K_Eps);
+  DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
+
+  int n = tab_K_Eps.dimension(0);
+
+  const DoubleTab& Cmu = get_modele_fonction().get_Cmu(); // attention : il faut qu'il soit deja calcule!
+
+  double LeEPSMIN = get_LeEPS_MIN();
+  // K_Eps(i,0) = K au noeud i
+  // K_Eps(i,1) = Epsilon au noeud i
+
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente Cmu",Cmu);
+
+  // dans le cas d'une zone nulle on doit effectuer le dimensionnement
+  double non_prepare=1;
+  if (visco_turb.size() == n)
+    non_prepare=0.;
+  non_prepare=mp_max(non_prepare);
+
+  if (non_prepare==1)
+    {
+      Champ_Inc visco_turb_au_format_K_eps_Rea;
+      visco_turb_au_format_K_eps_Rea.typer(type);
+      Champ_Inc_base& ch_visco_turb_K_eps_Rea=visco_turb_au_format_K_eps_Rea.valeur();
+      ch_visco_turb_K_eps_Rea.associer_zone_dis_base(eqn_transp_K_Eps().zone_dis().valeur());
+      ch_visco_turb_K_eps_Rea.nommer("diffusivite_turbulente");
+      ch_visco_turb_K_eps_Rea.fixer_nb_comp(1);
+      ch_visco_turb_K_eps_Rea.fixer_nb_valeurs_nodales(n);
+      ch_visco_turb_K_eps_Rea.fixer_unite("inconnue");
+      ch_visco_turb_K_eps_Rea.changer_temps(0.);
+
+      DoubleTab& visco_turb_K_eps_Rea =  ch_visco_turb_K_eps_Rea.valeurs();
+      if(visco_turb_K_eps_Rea.size() != n)
+        {
+          Cerr << "visco_turb_K_eps_Rea size is " << visco_turb_K_eps_Rea.size()
+               << " instead of " << n << finl;
+          exit();
+        }
+
+      for (int i=0; i<n; i++)
+        {
+          if (tab_K_Eps(i,1) <= LeEPSMIN)
+            visco_turb_K_eps_Rea[i] = 0;
+          else
+            visco_turb_K_eps_Rea[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
+
+        }
+
+      la_viscosite_turbulente->affecter(visco_turb_au_format_K_eps_Rea.valeur());
+
+    }
+  else
+    {
+      for (int i=0; i<n; i++)
+        {
+          if (inf_ou_egal(tab_K_Eps(i,1),LeEPSMIN))
+            visco_turb[i] = 0;
+          else
+            visco_turb[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
+        }
+    }
+  la_viscosite_turbulente.changer_temps(temps);
+  return la_viscosite_turbulente;
+}
+
+int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
+{
+  eqn_transp_K_Eps().preparer_calcul();
+  Mod_turb_hyd_base::preparer_calcul();
+  // GF pour initialiser la loi de paroi thermique en TBLE
+//   if (equation().probleme().nombre_d_equations()>1)
+//     {
+//       const RefObjU& modele_turbulence = equation().probleme().equation(1).get_modele(TURBULENCE);
+//       if (sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
+//         {
+//           Turbulence_paroi_scal& loi_paroi_T = ref_cast_non_const(Modele_turbulence_scal_base,modele_turbulence.valeur()).loi_paroi();
+//           loi_paroi_T.init_lois_paroi();
+//         }
+//     }
+  // GF quand on demarre un calcul il est bon d'utliser la ldp
+  // encore plus quand on fait une reprise !!!!!!!!
+  Champ_Inc& ch_K_Eps = K_Eps();
+
+  const Milieu_base& mil=equation().probleme().milieu();
+  diviser_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  loipar.calculer_hyd(ch_K_Eps);
+  eqn_transp_K_Eps().controler_K_Eps();
+  calculer_viscosite_turbulente(K_Eps().temps());
+  limiter_viscosite_turbulente();
+  // on remultiplie K_eps par rho
+  multiplier_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+
+  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+  return 1;
+
+}
+
+void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
+{
+  Champ_Inc& ch_K_Eps = K_Eps();
+  Schema_Temps_base& sch = eqn_transp_K_Eps().schema_temps();
+  // Voir Schema_Temps_base::faire_un_pas_de_temps_pb_base
+  eqn_transp_K_Eps().zone_Cl_dis().mettre_a_jour(temps);
+  if (!eqn_transp_K_Eps().equation_non_resolue())
+    sch.faire_un_pas_de_temps_eqn_base(eqn_transp_K_Eps());
+  eqn_transp_K_Eps().mettre_a_jour(temps);
+
+  statistiques().begin_count(nut_counter_);
+  const Milieu_base& mil=equation().probleme().milieu();
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
+  // on divise K_eps par rho en QC pour revenir a K et Eps
+  diviser_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  loipar.calculer_hyd(ch_K_Eps);
+  eqn_transp_K_Eps().controler_K_Eps();
+  calculer_viscosite_turbulente(ch_K_Eps.temps());
+  limiter_viscosite_turbulente();
+  // on remultiplie K_eps par rho
+  multiplier_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  la_viscosite_turbulente.valeurs().echange_espace_virtuel();
+  Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
+  statistiques().end_count(nut_counter_);
+}
+
+bool Modele_turbulence_hyd_K_Eps_Realisable::initTimeStep(double dt)
+{
+  return eqn_transport_K_Eps_Rea.initTimeStep(dt);
+}
+
+const Equation_base& Modele_turbulence_hyd_K_Eps_Realisable::equation_k_eps(int i) const
+{
+  assert ((i==0));
+  return eqn_transport_K_Eps_Rea;
+}
+
+const Champ_base& Modele_turbulence_hyd_K_Eps_Realisable::get_champ(const Motcle& nom) const
+{
+  REF(Champ_base) ref_champ;
+  try
+    {
+      return Mod_turb_hyd_RANS::get_champ(nom);
+    }
+  catch (Champs_compris_erreur)
+    {
+    }
+
+  if (mon_modele_fonc.non_nul())
+    {
+      try
+        {
+          return mon_modele_fonc->get_champ(nom);
+        }
+      catch (Champs_compris_erreur)
+        {
+        }
+    }
+
+  throw Champs_compris_erreur();
+  return ref_champ;
+}
+
+void Modele_turbulence_hyd_K_Eps_Realisable::get_noms_champs_postraitables(Noms& nom,Option opt) const
+{
+  Mod_turb_hyd_RANS::get_noms_champs_postraitables(nom,opt);
+  if (mon_modele_fonc.non_nul())
+    mon_modele_fonc->get_noms_champs_postraitables(nom,opt);
+}
+
+void Modele_turbulence_hyd_K_Eps_Realisable::verifie_loi_paroi()
+{
+  Nom lp=loipar.valeur().que_suis_je();
+  if (lp=="negligeable_VEF" || lp=="negligeable_VDF")
+    if (!associe_modele_fonction().non_nul())
+      {
+        Cerr<<"The turbulence model of type "<<que_suis_je()<<finl;
+        Cerr<<"must not be used with a wall law of type negligeable or with a modele_function."<<finl;
+        Cerr<<"Another wall law must be selected with this kind of turbulence model."<<finl;
+      }
+}
+
+void Modele_turbulence_hyd_K_Eps_Realisable::completer()
+{
+  eqn_transp_K_Eps().completer();
+  verifie_loi_paroi();
+}

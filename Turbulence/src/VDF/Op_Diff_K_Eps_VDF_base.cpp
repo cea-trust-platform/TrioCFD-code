@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,6 +22,7 @@
 
 #include <Op_Diff_K_Eps_VDF_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Champ_P0_VDF.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Navier_Stokes_Turbulent.h>
@@ -69,6 +70,16 @@ void Op_Diff_K_Eps_VDF_base::completer()
       if(sub_type( Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence()))
         {
           const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
+          Eval_Diff_K_Eps_VDF_Elem& eval_diff = (Eval_Diff_K_Eps_VDF_Elem&) iter.evaluateur();
+          eval_diff.associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+        }
+    }
+  else if(sub_type(Transport_K_Eps_Realisable,mon_equation.valeur()))
+    {
+      const Transport_K_Eps_Realisable& eqn_transport = ref_cast(Transport_K_Eps_Realisable,mon_equation.valeur());
+      if(sub_type( Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence()))
+        {
+          const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence());
           Eval_Diff_K_Eps_VDF_Elem& eval_diff = (Eval_Diff_K_Eps_VDF_Elem&) iter.evaluateur();
           eval_diff.associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
         }
@@ -169,49 +180,104 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
 
       const IntTab& face_voisins = iter.zone().face_voisins();
 
-      const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
-      const DoubleTab& val=eqn_k_eps.inconnue().valeurs();
 
-      const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
-
-      const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
-      int nb_cl=les_cl.size();
-      for (int num_cl=0; num_cl<nb_cl; num_cl++)
+      if(sub_type(Transport_K_Eps,mon_equation.valeur()))
         {
-          //Boucle sur les bords
-          const Cond_lim& la_cl = les_cl[num_cl];
-          const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
-          int nbfaces = la_front_dis.nb_faces();
-          int ndeb = la_front_dis.num_premiere_face();
-          int nfin = ndeb + nbfaces;
+          const Transport_K_Eps& eqn_k_eps=ref_cast(Transport_K_Eps,equation());
+          const DoubleTab& val=eqn_k_eps.inconnue().valeurs();
 
-          if ((sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))||(sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
-            for (int num_face=ndeb; num_face<nfin; num_face++)
+          const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
 
-              {
+          const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
+          int nb_cl=les_cl.size();
+          for (int num_cl=0; num_cl<nb_cl; num_cl++)
+            {
+              //Boucle sur les bords
+              const Cond_lim& la_cl = les_cl[num_cl];
+              const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nbfaces = la_front_dis.nb_faces();
+              int ndeb = la_front_dis.num_premiere_face();
+              int nfin = ndeb + nbfaces;
 
-                int elem= face_voisins(num_face,0);
-                if (elem==-1) elem= face_voisins(num_face,1);
-                int nb_comp=2;
-                for (int comp=0; comp<nb_comp; comp++)
+              if ((sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))||(sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
+                for (int num_face=ndeb; num_face<nfin; num_face++)
+
                   {
-                    // on doit remettre la ligne a l'identite et le secmem a l'inconnue
-                    int idiag = tab1[elem*nb_comp+comp]-1;
-                    coeff[idiag]=1;
-                    // pour les voisins
 
-                    int nbvois = tab1[elem*nb_comp+1+comp] - tab1[elem*nb_comp+comp];
-                    for (int k=1; k < nbvois; k++)
+                    int elem= face_voisins(num_face,0);
+                    if (elem==-1) elem= face_voisins(num_face,1);
+                    int nb_comp=2;
+                    for (int comp=0; comp<nb_comp; comp++)
                       {
-                        coeff[idiag+k]=0;
+                        // on doit remettre la ligne a l'identite et le secmem a l'inconnue
+                        int idiag = tab1[elem*nb_comp+comp]-1;
+                        coeff[idiag]=1;
+                        // pour les voisins
+
+                        int nbvois = tab1[elem*nb_comp+1+comp] - tab1[elem*nb_comp+comp];
+                        for (int k=1; k < nbvois; k++)
+                          {
+                            coeff[idiag+k]=0;
+                          }
+
+                        secmem(elem,comp)=val(elem,comp);
+
                       }
-
-                    secmem(elem,comp)=val(elem,comp);
-
                   }
-              }
 
+            }
         }
+      else if(sub_type(Transport_K_Eps_Realisable,mon_equation.valeur()))
+        {
+          const Transport_K_Eps_Realisable& eqn_k_eps=ref_cast(Transport_K_Eps_Realisable,equation());
+          const DoubleTab& val=eqn_k_eps.inconnue().valeurs();
+
+          const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
+
+          const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
+          int nb_cl=les_cl.size();
+          for (int num_cl=0; num_cl<nb_cl; num_cl++)
+            {
+              //Boucle sur les bords
+              const Cond_lim& la_cl = les_cl[num_cl];
+              const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nbfaces = la_front_dis.nb_faces();
+              int ndeb = la_front_dis.num_premiere_face();
+              int nfin = ndeb + nbfaces;
+
+              if ((sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))||(sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
+                for (int num_face=ndeb; num_face<nfin; num_face++)
+
+                  {
+
+                    int elem= face_voisins(num_face,0);
+                    if (elem==-1) elem= face_voisins(num_face,1);
+                    int nb_comp=2;
+                    for (int comp=0; comp<nb_comp; comp++)
+                      {
+                        // on doit remettre la ligne a l'identite et le secmem a l'inconnue
+                        int idiag = tab1[elem*nb_comp+comp]-1;
+                        coeff[idiag]=1;
+                        // pour les voisins
+
+                        int nbvois = tab1[elem*nb_comp+1+comp] - tab1[elem*nb_comp+comp];
+                        for (int k=1; k < nbvois; k++)
+                          {
+                            coeff[idiag+k]=0;
+                          }
+
+                        secmem(elem,comp)=val(elem,comp);
+
+                      }
+                  }
+            }
+        }
+      else
+        {
+          Cerr<<" erreur dans Op_Diff_K_Eps_VDF_base::modifier_pour_Cl ... cas non prevu "<<finl;
+          exit();
+        }
+
     }
 }
 

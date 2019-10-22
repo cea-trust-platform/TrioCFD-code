@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2017, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,6 +23,7 @@
 #include <Eval_Dift_VDF_var_Face.h>
 #include <Turbulence_hyd_sous_maille_VDF.h>
 #include <Mod_turb_hyd_RANS_0_eq.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Paroi_negligeable_VDF.h>
 #include <Transport_K_Eps_base.h>
 #include <Modele_turbulence_hyd_nul.h>
@@ -31,13 +32,20 @@
 void Eval_Dift_VDF_var_Face::associer_modele_turbulence(const Mod_turb_hyd_base& mod)
 {
   // On remplit la reference au modele de turbulence et le tableau k:
-  le_modele_turbulence = mod;
-  indic_bas_Re=0;
-  indic_lp_neg=0;
+  le_modele_turbulence    = mod;
+  indic_bas_Re            = 0;
+  indic_lp_neg            = 0;
+  indice_keps_realisable_ = 0;
+
   if (sub_type(Mod_turb_hyd_RANS,le_modele_turbulence.valeur()))
     {
       const Mod_turb_hyd_RANS& mod_K_eps = ref_cast(Mod_turb_hyd_RANS,le_modele_turbulence.valeur());
       k_.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
+
+      if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
+        {
+          indice_keps_realisable_ = 1;
+        }
     }
   else if (sub_type(Mod_turb_hyd_ss_maille,le_modele_turbulence.valeur()))
     {
@@ -70,7 +78,12 @@ void Eval_Dift_VDF_var_Face::associer_modele_turbulence(const Mod_turb_hyd_base&
         indic_lp_neg = 1;
     }
   else
-    indic_bas_Re=1;
+    {
+      if ( indice_keps_realisable_ == 0 )
+        {
+          indic_bas_Re = 1;
+        }
+    }
 }
 
 //// mettre_a_jour

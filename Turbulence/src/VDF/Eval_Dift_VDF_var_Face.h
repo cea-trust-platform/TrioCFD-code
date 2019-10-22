@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2018, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -173,7 +173,7 @@ private:
   REF(Turbulence_paroi_base) loipar;
   DoubleTab tau_tan_;
   DoubleTab k_;
-  int indic_bas_Re, indic_lp_neg;
+  int indic_bas_Re, indic_lp_neg, indice_keps_realisable_;
 };
 
 //
@@ -568,7 +568,7 @@ inline double Eval_Dift_VDF_var_Face::flux_arete_paroi(const DoubleTab& inco, in
   double vit_imp = 0.5*(Champ_Face_get_val_imp_face_bord(inconnue->temps(),rang1,ori,la_zcl)+
                         Champ_Face_get_val_imp_face_bord(inconnue->temps(),rang2,ori,la_zcl));
 
-  if ( (indic_bas_Re==1) || (indic_lp_neg==1) )
+  if ( (indic_bas_Re==1) || (indic_lp_neg==1) || (indice_keps_realisable_==1) )
     {
       int elem1 = elem_(fac3,0);
       int elem2 = elem_(fac3,1);
@@ -611,7 +611,7 @@ inline double Eval_Dift_VDF_var_Face::flux_arete_paroi(const DoubleTab& inco, in
 
 inline void Eval_Dift_VDF_var_Face::coeffs_arete_paroi(int fac1, int fac2, int fac3, int signe, double& aii1_2, double& aii3_4, double& ajj1_2) const
 {
-  if ( (indic_bas_Re==1) || (indic_lp_neg==1) )
+  if ( (indic_bas_Re==1) || (indic_lp_neg==1) || (indice_keps_realisable_==1) )
     {
       int elem1 = elem_(fac3,0);
       int elem2 = elem_(fac3,1);
@@ -658,7 +658,7 @@ inline double Eval_Dift_VDF_var_Face::secmem_arete_paroi(int fac1, int fac2, int
   double visc_turb = 0.5*(dv_diffusivite_turbulente(elem1)
                           + dv_diffusivite_turbulente(elem2));
 
-  if ( (indic_bas_Re==1) || (indic_lp_neg==1) )
+  if ( (indic_bas_Re==1) || (indic_lp_neg==1) || (indice_keps_realisable_==1) )
     {
       double dist = dist_norm_bord(fac1);
       double tau  = signe*(vit_imp - inco[fac3])/dist;
@@ -1055,7 +1055,7 @@ inline double Eval_Dift_VDF_var_Face::flux_arete_symetrie_paroi(const DoubleTab&
   //  double vit = inco(fac3);
   double vit_imp = 0.5*(Champ_Face_get_val_imp_face_bord_sym(inco,inconnue->temps(),rang1,ori,la_zcl)+
                         Champ_Face_get_val_imp_face_bord_sym(inco,inconnue->temps(),rang2,ori,la_zcl));
-  if ((indic_bas_Re==1) || (indic_lp_neg==1))
+  if ((indic_bas_Re==1) || (indic_lp_neg==1) || (indice_keps_realisable_==1))
     {
       double dist = dist_norm_bord(fac1);
       double tau  = signe*(vit_imp - inco[fac3])/dist;
@@ -1082,7 +1082,7 @@ inline void Eval_Dift_VDF_var_Face::coeffs_arete_symetrie_paroi(int fac1, int fa
                                                                 int fac3, int signe,
                                                                 double& aii1_2, double& aii3_4, double& ajj1_2) const
 {
-  if ( (indic_bas_Re==1) || (indic_lp_neg==1) )
+  if ( (indic_bas_Re==1) || (indic_lp_neg==1) || (indice_keps_realisable_==1) )
     {
       int elem1 = elem_(fac3,0);
       int elem2 = elem_(fac3,1);
@@ -1121,7 +1121,7 @@ inline double Eval_Dift_VDF_var_Face::secmem_arete_symetrie_paroi(int fac1, int 
                           + dv_diffusivite_turbulente(elem2));
   double vit_imp = 0.5*(Champ_Face_get_val_imp_face_bord(inconnue->temps(),rang1,ori,la_zcl)+
                         Champ_Face_get_val_imp_face_bord(inconnue->temps(),rang2,ori,la_zcl));
-  if ( (indic_bas_Re==1) || (indic_lp_neg==1) )
+  if ( (indic_bas_Re==1) || (indic_lp_neg==1) || (indice_keps_realisable_==1) )
     {
       const DoubleTab& inco = inconnue->valeurs();
       double dist = dist_norm_bord(fac1);

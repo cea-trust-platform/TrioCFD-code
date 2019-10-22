@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -58,6 +58,7 @@ protected:
   DoubleTab k;
   int indic_lp_neg_;
   int indic_bas_Re_;
+  int indice_keps_realisable_;
   int indic_Pr;  // mod turb temp de Prandtl Oui = 1
 };
 

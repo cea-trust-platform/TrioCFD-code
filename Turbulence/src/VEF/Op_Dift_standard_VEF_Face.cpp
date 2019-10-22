@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -100,6 +100,7 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse,
                                                       const DoubleTab& tau_tan,
                                                       const int indic_lp_neg,
                                                       const int indic_bas_Re,
+                                                      const int indice_keps_realisable,
                                                       int nbr_comp) const
 {
   // on cast grad et grad_transp pour pouvoir les modifier
@@ -345,7 +346,7 @@ DoubleTab& Op_Dift_standard_VEF_Face::ajouter(const DoubleTab& inconnue,
   //  if(nb_comp==1)
   //    ajouter_cas_scalaire(inconnue, resu,ref_cast(DoubleTab,flux_bords, nu, nu_turb, zone_Cl_VEF, zone_VEF);
   //  else
-  ajouter_cas_vectoriel(inconnue, resu, flux_bords_,nu, nu_turb, zone_Cl_VEF, zone_VEF, k, tau_tan_,indic_lp_neg_,indic_bas_Re_,nb_comp);
+  ajouter_cas_vectoriel(inconnue, resu, flux_bords_,nu, nu_turb, zone_Cl_VEF, zone_VEF, k, tau_tan_,indic_lp_neg_,indic_bas_Re_,indice_keps_realisable_,nb_comp);
   modifier_flux(*this);
   return resu;
 }
