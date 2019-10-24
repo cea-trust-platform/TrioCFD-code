@@ -23,6 +23,7 @@
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
 #include <Les_mod_turb.h>
 #include <Verif_Cl.h>
+#include <Verif_Cl_Turb.h>
 #include <Modifier_nut_pour_QC.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_Turbulent_QC,"Pb_Thermohydraulique_Turbulent_QC",Pb_QC_base);

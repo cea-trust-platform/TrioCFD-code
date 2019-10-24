@@ -24,6 +24,7 @@
 #include <Fluide_Incompressible.h>
 #include <Constituant.h>
 #include <Verif_Cl.h>
+#include <Verif_Cl_Turb.h>
 #include <Les_mod_turb.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_Concentration_Turbulent,"Pb_Thermohydraulique_Concentration_Turbulent",Pb_qdm_fluide);
