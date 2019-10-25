@@ -12,14 +12,26 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+#include <Cond_lim.h>
+
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Ref_Turbulence_paroi_base.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Modele_turbulence_base
-// Version:     /main/4
-//
+// .DESCRIPTION
+//    Interface du module ThHyd.
+//    Contient 1 fonction:
+//      int tester_compatibilite_hydr_turb(const Zone_Cl_dis& , const Zone_Cl_dis& )
+//    qui servent a tester la coherence des conditions aux limites
+//    et la fonction
+//      int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& )
+//    qui affiche un message d'erreur pour la compatibilite hyd/turb
+// .SECTION voir aussi
+//    Fonction de librairie hors classe
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Ref_Turbulence_paroi_base.h>
-#include <Turbulence_paroi.h>
-Implemente_ref(Turbulence_paroi_base);
+class Zone_Cl_dis;
+
+// Fonctions qui servent a tester la coherence des conditions aux limites
+
+int tester_compatibilite_hydr_turb(const Zone_Cl_dis& , const Zone_Cl_dis& );
+
+int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& );

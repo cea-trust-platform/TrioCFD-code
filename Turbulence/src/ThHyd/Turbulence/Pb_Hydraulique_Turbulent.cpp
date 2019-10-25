@@ -23,6 +23,7 @@
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Fluide_Incompressible.h>
 #include <Verif_Cl.h>
+#include <Verif_Cl_Turb.h>
 #include <Les_mod_turb.h>
 #include <Mod_turb_hyd_RANS.h>
 
