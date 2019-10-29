@@ -1,7 +1,7 @@
 #!/bin/bash
-copie_cas_test cpu_3D || exit -1
-mv cpu_3D/cpu_3D.data .
-sed "s/precond/save_matrice precond/" cpu_3D.data > mod.data 
+copie_cas_test cpu_3D_turbulence || exit -1
+mv cpu_3D_turbulence/cpu_3D_turbulence.data .
+sed "s/precond/save_matrice precond/" cpu_3D_turbulence.data > mod.data 
 
 if [ "$TRUST_DISABLE_MPI" != 1 ]
 then
