@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -296,7 +296,7 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,
         else if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
                  sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
           {
-            if ((indic_lp_neg_!=1)&&(indic_bas_Re_!=1))
+            if ((indic_lp_neg_!=1)&&(indic_bas_Re_!=1)&&(indice_keps_realisable_!=1))
               {
                 if (dimension == 2 )
                   {

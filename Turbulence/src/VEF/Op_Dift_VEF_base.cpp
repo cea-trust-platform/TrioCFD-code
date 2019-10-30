@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,7 @@
 #include <Champ_Fonc.h>
 #include <Mod_turb_hyd_base.h>
 #include <Mod_turb_hyd_RANS.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Turbulence_hyd_sous_maille_VEF.h>
 #include <Modele_turbulence_scal_Prandtl.h>
 #include <Transport_K_Eps_base.h>
@@ -50,26 +51,32 @@ void Op_Dift_VEF_base::associer_modele_turbulence(const Mod_turb_hyd_base& mod)
 {
   // On remplit la reference au modele de turbulence et le tableau k:
 
-  le_modele_turbulence = mod;
-  indic_bas_Re_ = 0;
+  le_modele_turbulence    = mod;
+  indic_bas_Re_           = 0;
+  indice_keps_realisable_ = 0;
 
   if (sub_type(Mod_turb_hyd_RANS,le_modele_turbulence.valeur()))
     {
       const Mod_turb_hyd_RANS& mod_K_eps =
         ref_cast(Mod_turb_hyd_RANS, le_modele_turbulence.valeur());
-      k.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
+      k_.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
+
+      if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
+        {
+          indice_keps_realisable_ = 1;
+        }
     }
   else if (sub_type(Mod_turb_hyd_ss_maille,le_modele_turbulence.valeur()))
     {
       const Mod_turb_hyd_ss_maille& mod_ss_maille =
         ref_cast(Mod_turb_hyd_ss_maille, le_modele_turbulence.valeur());
-      k.ref(mod_ss_maille.energie_cinetique_turbulente().valeurs());
+      k_.ref(mod_ss_maille.energie_cinetique_turbulente().valeurs());
     }
   else if (sub_type(Mod_turb_hyd_RANS_0_eq,le_modele_turbulence.valeur()))
     {
       const Mod_turb_hyd_RANS_0_eq& mod_RANS_O_eq =
         ref_cast(Mod_turb_hyd_RANS_0_eq, le_modele_turbulence.valeur());
-      k.ref(mod_RANS_O_eq.energie_cinetique_turbulente().valeurs());
+      k_.ref(mod_RANS_O_eq.energie_cinetique_turbulente().valeurs());
 
       Cerr<<"On associe pas d energie cinetique pour un modele longueur de melange"<<finl;
 
@@ -105,7 +112,7 @@ void Op_Dift_VEF_base::mettre_a_jour(double )
         {
           const Mod_turb_hyd_RANS& mod_K_eps =
             ref_cast(Mod_turb_hyd_RANS, le_modele_turbulence.valeur());
-          k.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
+          k_.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
         }
       if ( le_modele_turbulence->loi_paroi().non_nul())
         if (le_modele_turbulence->loi_paroi()->use_shear())

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -55,9 +55,10 @@ protected:
   REF(Mod_turb_hyd_base) le_modele_turbulence; // A deplacer dans Op_Diff_turb ?
   REF(Modele_turbulence_scal_base) le_modele_turb_temp;  // A deplacer dans Op_Diff_turb ?
   DoubleTab tau_tan_;
-  DoubleTab k;
+  DoubleTab k_;
   int indic_lp_neg_;
   int indic_bas_Re_;
+  int indice_keps_realisable_;
   int indic_Pr;  // mod turb temp de Prandtl Oui = 1
 };
 

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -22,6 +22,7 @@
 
 #include <Op_Diff_K_Eps_VEF_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Champ_P1NC.h>
 #include <Paroi_hyd_base_VEF.h>
 
@@ -48,11 +49,23 @@ Entree& Op_Diff_K_Eps_VEF_base::readOn(Entree& s )
 void Op_Diff_K_Eps_VEF_base::completer()
 {
   Operateur_base::completer();
-  const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
-  const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-  const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
-  associer_diffusivite_turbulente(visc_turb);
-  Op_Diff_K_Eps_VEF_base::associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+
+  if ( sub_type( Transport_K_Eps,mon_equation.valeur() ) )
+    {
+      const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
+      const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
+      const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
+      associer_diffusivite_turbulente(visc_turb);
+      Op_Diff_K_Eps_VEF_base::associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+    }
+  else if ( sub_type( Transport_K_Eps_Realisable,mon_equation.valeur() ) )
+    {
+      const Transport_K_Eps_Realisable& eqn_transport = ref_cast(Transport_K_Eps_Realisable,mon_equation.valeur());
+      const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence());
+      const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
+      associer_diffusivite_turbulente(visc_turb);
+      Op_Diff_K_Eps_VEF_base::associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+    }
 }
 
 

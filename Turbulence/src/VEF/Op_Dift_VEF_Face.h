@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -80,11 +80,7 @@ public:
                              const DoubleTab& nu_turb,
                              const Zone_Cl_VEF& zone_Cl_VEF,
                              const Zone_VEF& zone_VEF,
-                             const DoubleTab& k,
-                             const DoubleTab& tau_tan,
-                             const int indic_lp_neg,
-                             const int indic_bas_Re,
-                             int nb_comp, DoubleTab& cgrad) const;
+                             int nb_comp) const;
   void ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
                                   DoubleTab& resu, DoubleTab& flux_bords,
                                   const DoubleTab& nu,
