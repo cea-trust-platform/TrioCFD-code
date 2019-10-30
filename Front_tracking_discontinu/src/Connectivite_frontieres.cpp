@@ -44,8 +44,8 @@ Sortie& Connectivite_frontieres::printOn(Sortie& is) const
   return is;
 }
 
-static int fonction_tri_lexicographique_3_colonnes(const void *ptr1,
-                                                   const void *ptr2)
+static True_int fonction_tri_lexicographique_3_colonnes(const void *ptr1,
+                                                        const void *ptr2)
 {
   const int * tab1 = (const int *) ptr1;
   const int * tab2 = (const int *) ptr2;

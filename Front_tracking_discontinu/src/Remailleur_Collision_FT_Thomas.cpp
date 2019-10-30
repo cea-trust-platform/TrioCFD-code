@@ -1103,9 +1103,9 @@ void  Remailleur_Collision_FT_Thomas::tester_interface(const Maillage_FT_Disc& m
                   assert(sommet<maillage.nb_sommets());
 
                   if (sommet_elem[sommet]==elem)
-                    fichier_elements_euleriens << "{" << sommet << "," << 1 << "} ";
+                    fichier_elements_euleriens << "{" << (int) sommet << "," << (int) 1 << "} ";
                   else
-                    fichier_elements_euleriens << "{" << sommet << "," << 0 << "} ";
+                    fichier_elements_euleriens << "{" << (int) sommet << "," << (int) 0 << "} ";
 
                 }//fin du for sur "som_loc"
 
