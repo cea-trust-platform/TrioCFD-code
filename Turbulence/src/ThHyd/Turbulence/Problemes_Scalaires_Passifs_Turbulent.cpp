@@ -20,14 +20,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Problemes_Scalaires_Passifs.h>
+#include <Problemes_Scalaires_Passifs_Turbulent.h>
 implemente_pb_eq_sup(Pb_Thermohydraulique_Turbulent_Scalaires_Passifs,"Pb_Thermohydraulique_Turbulent_Scalaires_Passifs",Pb_Thermohydraulique_Turbulent,2)
-implemente_pb_eq_sup(Pb_Thermohydraulique_Scalaires_Passifs,"Pb_Thermohydraulique_Scalaires_Passifs",Pb_Thermohydraulique,2)
-implemente_pb_eq_sup(Pb_Conduction_Scalaires_Passifs,"Pb_Conduction_Scalaires_Passifs",Pb_Conduction,1)
-implemente_pb_eq_sup(Pb_Thermohydraulique_QC_fraction_massique,"Pb_Thermohydraulique_QC_fraction_massique",Pb_Thermohydraulique_QC,2)
 implemente_pb_eq_sup(Pb_Thermohydraulique_Turbulent_QC_fraction_massique,"Pb_Thermohydraulique_Turbulent_QC_fraction_massique",Pb_Thermohydraulique_Turbulent_QC,2)
 
-implemente_pb_eq_sup(Pb_Hydraulique_Concentration_Scalaires_Passifs,"Pb_Hydraulique_Concentration_Scalaires_Passifs",Pb_Hydraulique_Concentration,2)
 implemente_pb_eq_sup(Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs,"Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs",Pb_Hydraulique_Concentration_Turbulent,2)
-implemente_pb_eq_sup(Pb_Thermohydraulique_Concentration_Scalaires_Passifs,"Pb_Thermohydraulique_Concentration_Scalaires_Passifs",Pb_Thermohydraulique_Concentration,3)
 implemente_pb_eq_sup(Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs,"Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs",Pb_Thermohydraulique_Concentration_Turbulent,3)

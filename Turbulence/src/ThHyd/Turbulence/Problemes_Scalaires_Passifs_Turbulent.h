@@ -12,40 +12,22 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Problemes_Scalaires_Passifs.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
-// Version:     /main/7
-//
-//////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef Problemes_Scalaires_Passifs_inclus
-#define Problemes_Scalaires_Passifs_inclus
+#ifndef Problemes_Scalaires_Passifs_Turbulent_inclus
+#define Problemes_Scalaires_Passifs_Turbulent_inclus
 
 #include <MacPbeqsup.h>
 
 #include <Pb_Thermohydraulique_Turbulent.h>
-#include <Pb_Thermohydraulique.h>
-#include <Pb_Conduction.h>
-#include <Pb_Thermohydraulique_QC.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
 
-#include <Pb_Hydraulique_Concentration.h>
-#include <Pb_Thermohydraulique_Concentration.h>
 #include <Pb_Hydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Concentration_Turbulent.h>
 
 declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Turbulent_Scalaires_Passifs,Pb_Thermohydraulique_Turbulent)
-declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Scalaires_Passifs,Pb_Thermohydraulique)
-declare_instanciable_pb_eq_sup(Pb_Conduction_Scalaires_Passifs,Pb_Conduction)
-declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_QC_fraction_massique,Pb_Thermohydraulique_QC)
 declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Turbulent_QC_fraction_massique,Pb_Thermohydraulique_Turbulent_QC)
 
-declare_instanciable_pb_eq_sup(Pb_Hydraulique_Concentration_Scalaires_Passifs,Pb_Hydraulique_Concentration)
 declare_instanciable_pb_eq_sup(Pb_Hydraulique_Concentration_Turbulent_Scalaires_Passifs,Pb_Hydraulique_Concentration_Turbulent)
-declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Concentration_Scalaires_Passifs,Pb_Thermohydraulique_Concentration)
 declare_instanciable_pb_eq_sup(Pb_Thermohydraulique_Concentration_Turbulent_Scalaires_Passifs,Pb_Thermohydraulique_Concentration_Turbulent)
 
 #endif
