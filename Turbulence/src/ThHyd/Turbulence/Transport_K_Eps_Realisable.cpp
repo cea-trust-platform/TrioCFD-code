@@ -27,7 +27,7 @@
 
 Implemente_instanciable(Transport_K_Eps_Realisable,"Transport_K_Eps_Realisable",Transport_K_Eps_base);
 
-// XD Transport_K_Eps_Realisable Transport_K_Eps_base Transport_K_Eps_Realisable -1 Realizable K-Epsilon Turbulence Model Transport Equations for K and Epsilon.
+// XD Transport_K_Eps_Realisable eqn_base Transport_K_Eps_Realisable -1 Realizable K-Epsilon Turbulence Model Transport Equations for K and Epsilon.
 
 // printOn et readOn
 

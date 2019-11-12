@@ -28,7 +28,7 @@
 
 Implemente_base(Modele_Fonc_Realisable_base,"Modele_Fonc_Realisable_base",Objet_U);
 
-// XD Modele_Fonc_Realisable class_generic Modele_Fonc_Realisable 1 Base class for Functions necessary to Realizable K-Epsilon Turbulence Model
+// XD Modele_Fonc_Realisable_base class_generic Modele_Fonc_Realisable_base 1 Base class for Functions necessary to Realizable K-Epsilon Turbulence Model
 
 // printOn et readOn
 
