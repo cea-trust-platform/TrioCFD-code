@@ -38,8 +38,7 @@
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS);
 
-// XD Modele_turbulence_hyd_K_Eps_Realisable Mod_turb_hyd_RANS Modele_turbulence_hyd_K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
-
+// XD Modele_turbulence_hyd_K_Eps_Realisable mod_turb_hyd_rans Modele_turbulence_hyd_K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
 
 //
 // printOn et readOn

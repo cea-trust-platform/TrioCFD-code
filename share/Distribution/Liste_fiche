@@ -18,6 +18,7 @@
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/pena_couette STD
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/pena_ellipsoide NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/tubeY NNR
+./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_solid_particle_fall_viscosity NNR
 ./LES/share/Validation/Rapports_automatiques/Boussinesq_VEF NNR
 ./LES/share/Validation/Rapports_automatiques/CHANNEL_LES_VEF_RE_TAU_1110 NNR
 ./LES/share/Validation/Rapports_automatiques/Channel_LES_Re_tau405_Pr071_T0Q NNR
@@ -137,7 +138,8 @@
 ./Bas_Reynolds/share/Validation/Rapports_automatiques/Baglietto STD
 ./Bas_Reynolds/share/Validation/Rapports_automatiques/Low_Reynolds STD
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/ConvectionJuarez NNR
-./ALE/share/Validation/Rapports_automatiques/pas_fini/ALE_Poiseuille_VEF_2D NNR
+./ALE/share/Validation/Rapports_automatiques/RotationALE NNR
+./ALE/share/Validation/Rapports_automatiques/SquareObstacleALE NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/FVCAB_Cas_2.2_3D_steady_Stokes_Taylor_Green_vortex STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/Vorticite_et_fonction_de_Courant STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/FVCA_test_EF_stab STD 
