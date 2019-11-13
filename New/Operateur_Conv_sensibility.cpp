@@ -54,3 +54,5 @@ DoubleTab& Operateur_Conv_sensibility::calculer(const DoubleTab& inco, DoubleTab
   op_conv.calculer(inco, resu);
   return resu;
 }
+
+

@@ -1,5 +1,4 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -1203,6 +1202,9 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
 }
 double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
 {
+
+  return DMAXFLOAT; //on resout la sensibilite avec le meme dt que l'etat
+
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
@@ -1257,8 +1259,6 @@ double Operateur_Conv_sensibility_VEF::calculer_dt_stab() const
   // astuce pour contourner le type const de la methode
   Operateur_Conv_sensibility_VEF& op = ref_cast_non_const(Operateur_Conv_sensibility_VEF,*this);
   op.fixer_dt_stab_conv(dt_stab);
-
-
   return dt_stab;
 }
 

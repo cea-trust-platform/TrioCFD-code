@@ -50,6 +50,10 @@ public :
   double calculer_dt_stab() const;
   void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
   inline double viscA(int face_i, int face_j, int num_elem) const;
+  /*inline double calculer_dt_stab() const
+  {
+    return DMAXFLOAT;
+  }*/
 protected :
   REF(Zone_VEF) la_zone_vef;
   REF(Zone_Cl_VEF) la_zcl_vef;
