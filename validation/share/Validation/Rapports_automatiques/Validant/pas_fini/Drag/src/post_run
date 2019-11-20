@@ -39,8 +39,10 @@ echo $fp $fv | awk '{drag=($1+$2);print "Drag(g/m): "int(drag/9.81*1000)}'
 # Affichage du Cx
 Cd=`awk -v cas=$cas '($4==cas) && /Cx / {print $NF}' forme.geo`
 echo $fp $fv | awk -v A=$D -v V=$V -v rho=$rho -v jdd=$jdd -v Cd=$Cd -v dat=../$cas.dat '{Cx=($1+$2)/(0.5*rho*A*V*V);\
-if (jdd=="keps") print "Hoerner \tK_Eps \t% \tLM \t%" > dat;\
+if (jdd=="keps") print "Hoerner \tK_Eps \t% \tLM \t% \tK_Eps_R \t% \tK_Eps_R_alt \t%" > dat;\
 if (jdd=="keps") printf("%4.2f %4.2f %4.1f ",Cd,Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
-if (jdd=="lm") 	printf("%4.2f %4.1f\n",Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
+if (jdd=="lm") 	printf("%4.2f %4.1f ",Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
+if (jdd=="k3r") printf("%4.2f %4.1f ",Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
+if (jdd=="k3r_alt") printf("%4.2f %4.1f\n",Cx,(Cx-Cd)/(Cd+Cx)*2*100) >> dat;\
 }'
 

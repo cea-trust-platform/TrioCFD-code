@@ -1,7 +1,7 @@
 Parameters {
 	Title "Calculation of 2D drag coefficients on different bluff bodies at Re=30239"
 	Description ""
-	Author "Pierre LEDAC (CS)"
+	Author "Pierre LEDAC (CS), N. Leterrier"
 	Reference "[1] 'Resistance a l'avancement dans les fluides' SF. Hoerner, page 54"
 	Reference "[2] http://www.aerospaceweb.org/question/aerodynamics/q0231.shtml"
 	
@@ -11,24 +11,36 @@ Parameters {
 	ParametersTrio_U Discretization : VEFPreP1B
         ParametersTrio_U Time scheme : Euler_implicite (Implicite solver)
         ParametersTrio_U Convection schemes muscl (Hydraulic) and amont (K-Eps model if used)
-        ParametersTrio_U Turbulence model : K-Epsilon or Mixing length model (with standard wall law function)
+        ParametersTrio_U Turbulence model : K-Epsilon, K-Epsilon Realizable (A0=4 or A0=3.2) or Mixing length model (with standard wall law function)
         ParametersTrio_U Kind of boundary conditions : symmetry at the top edge and on the axis (half a mesh is considered)
 	ParametersTrio_U No-slip on the shape
-        ParametersTrio_U Imposed velocity (and K and Eps with 10% turbulence rate if K-Eps model is used) at the inlet
+        ParametersTrio_U Imposed velocity (and K and Eps with 10% turbulence rate if K-Eps or K-Eps-R model is used) at the inlet
 	ParametersTrio_U Imposed pressure at the outlet
 		
         TestCase Carre keps.data Voir exemple en fin de fiche.
 	TestCase Carre lm.data
+	TestCase Carre k3r.data
+	TestCase Carre k3r_alt.data
         TestCase Cercle keps.data
         TestCase Cercle lm.data
+        TestCase Cercle k3r.data
+        TestCase Cercle k3r_alt.data
         TestCase Triangle1 keps.data
 	TestCase Triangle1 lm.data
+	TestCase Triangle1 k3r.data
+	TestCase Triangle1 k3r_alt.data
 	TestCase Plaque keps.data
 	TestCase Plaque lm.data
+	TestCase Plaque k3r.data
+	TestCase Plaque k3r_alt.data
 	TestCase Triangle2 keps.data
 	TestCase Triangle2 lm.data
+	TestCase Triangle2 k3r.data
+	TestCase Triangle2 k3r_alt.data
 	TestCase DemiCercle keps.data
 	TestCase DemiCercle lm.data
+	TestCase DemiCercle k3r.data
+	TestCase DemiCercle k3r_alt.data
 	IncludeData 2
 }
 
@@ -63,7 +75,7 @@ Chapter {
 	Title "1D graphical results"
 	Figure {
 		Title "Convergence of the pressure drag"
-		Description "Wa plot the following curves in order to check if the implicit scheme is converged for each calculation."
+		Description "We plot the following curves in order to check if the implicit scheme is converged for each calculation."
 		LabelX "Time [s]"
 		LabelY "Pressure drag [N]"
 		RangeY 0. 8.
@@ -72,6 +84,16 @@ Chapter {
 			legend "Carre (K-Eps)"
 			Style lines
 			file Carre/keps_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Carre (K-Eps-R-A0=4)"
+			Style lines
+			file Carre/k3r_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Carre (K-Eps-R-A0=3.2)"
+			Style lines
+			file Carre/k3r_alt_pb_Force_pression.out
 		}
 		Curve { 
 			legend "Carre (ML)"
@@ -84,6 +106,16 @@ Chapter {
 			file Cercle/keps_pb_Force_pression.out
 		}
 		Curve { 
+			legend "Cercle (K-Eps-R-A0=4)"
+			Style lines
+			file Cercle/k3r_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Cercle (K-Eps-R-A0=3.2)"
+			Style lines
+			file Cercle/k3r_alt_pb_Force_pression.out
+		}
+		Curve { 
 			legend "Cercle (ML)"
 			Style lines
 			file Cercle/lm_pb_Force_pression.out
@@ -92,6 +124,16 @@ Chapter {
 			legend "Triangle1 (K-Eps)"
 			Style lines
 			file Triangle1/keps_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Triangle1 (K-Eps-R_A0=4)"
+			Style lines
+			file Triangle1/k3r_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Triangle1 (K-Eps-R_A0=3.2)"
+			Style lines
+			file Triangle1/k3r_alt_pb_Force_pression.out
 		}
 		Curve { 
 			legend "Triangle1 (ML)"
@@ -104,6 +146,16 @@ Chapter {
 			file Plaque/keps_pb_Force_pression.out
 		}
 		Curve { 
+			legend "Plaque (K-Eps-R-A0=4)"
+			Style lines
+			file Plaque/k3r_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Plaque (K-Eps-R-A0=3.2)"
+			Style lines
+			file Plaque/k3r_alt_pb_Force_pression.out
+		}
+		Curve { 
 			legend "Plaque (ML)"
 			Style lines
 			file Plaque/lm_pb_Force_pression.out
@@ -114,6 +166,16 @@ Chapter {
 			file Triangle2/keps_pb_Force_pression.out
 		}
 		Curve { 
+			legend "Triangle2 (K-Eps-R-A0=4)"
+			Style lines
+			file Triangle2/k3r_pb_Force_pression.out
+		}
+		Curve { 
+			legend "Triangle2 (K-Eps-R-A0=3.2)"
+			Style lines
+			file Triangle2/k3r_alt_pb_Force_pression.out
+		}
+		Curve { 
 			legend "Triangle2 (ML)"
 			Style lines
 			file Triangle2/lm_pb_Force_pression.out
@@ -122,6 +184,16 @@ Chapter {
 			legend "DemiCercle (K-Eps)"
 			Style lines
 			file DemiCercle/keps_pb_Force_pression.out
+		}
+		Curve { 
+			legend "DemiCercle (K-Eps-R-A0=4)"
+			Style lines
+			file DemiCercle/k3r_pb_Force_pression.out
+		}
+		Curve { 
+			legend "DemiCercle (K-Eps-R-A0=3.2)"
+			Style lines
+			file DemiCercle/k3r_alt_pb_Force_pression.out
 		}
 		Curve { 
 			legend "DemiCercle (ML)"
@@ -144,6 +216,18 @@ Chapter {
 			columns $1 $4
 		}
 		Curve { 
+			legend "Carre (K-Eps-R-A0=4)"
+			Style points
+			file Carre/k3r.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Carre (K-Eps-R-A0=3.2)"
+			Style points
+			file Carre/k3r_alt.dt_ev
+			columns $1 $4
+		}
+		Curve { 
 			legend "Carre (ML)"
 			Style points
 			file Carre/lm.dt_ev
@@ -153,6 +237,18 @@ Chapter {
 			legend "Cercle (K-Eps)"
 			Style points
 			file Cercle/keps.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Cercle (K-Eps-R-A0=4)"
+			Style points
+			file Cercle/k3r.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Cercle (K-Eps-R-A0=3.2)"
+			Style points
+			file Cercle/k3r_alt.dt_ev
 			columns $1 $4
 		}
 		Curve { 
@@ -168,6 +264,18 @@ Chapter {
 			columns $1 $4
 		}
 		Curve { 
+			legend "Triangle1 (K-Eps-R-A0=4)"
+			Style points
+			file Triangle1/k3r.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Triangle1 (K-Eps-R-A0=3.2)"
+			Style points
+			file Triangle1/k3r_alt.dt_ev
+			columns $1 $4
+		}
+		Curve { 
 			legend "Triangle1 (ML)"
 			Style points
 			file Triangle1/lm.dt_ev
@@ -177,6 +285,18 @@ Chapter {
 			legend "Plaque (K-Eps)"
 			Style points
 			file Plaque/keps.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Plaque (K-Eps-R-A0=4)"
+			Style points
+			file Plaque/k3r.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Plaque (K-Eps-R-A0=3.2)"
+			Style points
+			file Plaque/k3r_alt.dt_ev
 			columns $1 $4
 		}
 		Curve { 
@@ -192,6 +312,18 @@ Chapter {
 			columns $1 $4
 		}
 		Curve { 
+			legend "Triangle2 (K-Eps-R-A0=4)"
+			Style points
+			file Triangle2/k3r.dt_ev
+			columns $1 $4
+		}
+		Curve { 
+			legend "Triangle2 (K-Eps-R-A0=3.2)"
+			Style points
+			file Triangle2/k3r_alt.dt_ev
+			columns $1 $4
+		}
+		Curve { 
 			legend "Triangle2 (ML)"
 			Style points
 			file Triangle2/lm.dt_ev
@@ -201,6 +333,18 @@ Chapter {
 			legend "DemiCercle (K-Eps)"
 			Style points
 			file DemiCercle/keps.dt_ev
+			columns $1 $4	
+		}
+		Curve { 
+			legend "DemiCercle (K-Eps-R-A0=4)"
+			Style points
+			file DemiCercle/k3r.dt_ev
+			columns $1 $4	
+		}
+		Curve { 
+			legend "DemiCercle (K-Eps-R-A0=3.2)"
+			Style points
+			file DemiCercle/k3r_alt.dt_ev
 			columns $1 $4	
 		}
 		Curve { 
@@ -220,6 +364,24 @@ Chapter {
 		cycles -1
                 blackvector Carre/keps.lata dom VITESSE ELEM 0.1
 		pseudocolor Carre/keps.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }
+	visu {
+		Description "K-Eps-R-A0=4"
+		cycles -1
+                blackvector Carre/k3r.lata dom VITESSE ELEM 0.1
+		pseudocolor Carre/k3r.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }
+	visu {
+		Description "K-Eps-R-A0=3.2"
+		cycles -1
+                blackvector Carre/k3r_alt.lata dom VITESSE ELEM 0.1
+		pseudocolor Carre/k3r_alt.lata dom PRESSION_PA ELEM
 		Zoom2D 0.19 0.34 0 0.05
 		Width 7cm
 		nb_img_without_newline 2 
@@ -243,6 +405,24 @@ Chapter {
 		nb_img_without_newline 2 
         }	
 	visu {
+		Description "K-Eps-R-A0=4"
+		cycles -1
+                blackvector Cercle/k3r.lata dom VITESSE ELEM 0.1
+		pseudocolor Cercle/k3r.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
+		Description "K-Eps-R-A0=3.2"
+		cycles -1
+                blackvector Cercle/k3r_alt.lata dom VITESSE ELEM 0.1
+		pseudocolor Cercle/k3r_alt.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
 	        Description "Mixing Length"
 		cycles -1
                 blackvector Cercle/lm.lata dom VITESSE ELEM 0.1
@@ -256,6 +436,24 @@ Chapter {
 		cycles -1
                 blackvector Triangle1/keps.lata dom VITESSE ELEM 0.1
 		pseudocolor Triangle1/keps.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }		
+	visu {
+		Description "K-Eps-R-A0=4"
+		cycles -1
+                blackvector Triangle1/k3r.lata dom VITESSE ELEM 0.1
+		pseudocolor Triangle1/k3r.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }		
+	visu {
+		Description "K-Eps-R-A0=3.2"
+		cycles -1
+                blackvector Triangle1/k3r_alt.lata dom VITESSE ELEM 0.1
+		pseudocolor Triangle1/k3r_alt.lata dom PRESSION_PA ELEM
 		Zoom2D 0.19 0.34 0 0.05
 		Width 7cm
 		nb_img_without_newline 2 
@@ -279,6 +477,24 @@ Chapter {
 		nb_img_without_newline 2 
         }	
 	visu {
+		Description "K-Eps-R-A0=4"
+		cycles -1
+                blackvector Plaque/k3r.lata dom VITESSE ELEM 0.1
+		pseudocolor Plaque/k3r.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
+		Description "K-Eps-R-A0=3.2"
+		cycles -1
+                blackvector Plaque/k3r_alt.lata dom VITESSE ELEM 0.1
+		pseudocolor Plaque/k3r_alt.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
 	        Description "Mixing Length"
 		cycles -1
                 blackvector Plaque/lm.lata dom VITESSE ELEM 0.1
@@ -292,6 +508,24 @@ Chapter {
 		cycles -1
                 blackvector Triangle2/keps.lata dom VITESSE ELEM 0.1
 		pseudocolor Triangle2/keps.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
+		Description "K-Eps-R-A0=4"
+		cycles -1
+                blackvector Triangle2/k3r.lata dom VITESSE ELEM 0.1
+		pseudocolor Triangle2/k3r.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
+		Description "K-Eps-R-A0=3.2"
+		cycles -1
+                blackvector Triangle2/k3r_alt.lata dom VITESSE ELEM 0.1
+		pseudocolor Triangle2/k3r_alt.lata dom PRESSION_PA ELEM
 		Zoom2D 0.19 0.34 0 0.05
 		Width 7cm
 		nb_img_without_newline 2 
@@ -315,6 +549,26 @@ Chapter {
 		nb_img_without_newline 2 
         }	
 	visu {
+                Title "DemiCercle"
+		Description "K-Eps-R-A0=4"
+		cycles -1
+                blackvector DemiCercle/k3r.lata dom VITESSE ELEM 0.1
+		pseudocolor DemiCercle/k3r.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
+                Title "DemiCercle"
+		Description "K-Eps-R-A0=3.2"
+		cycles -1
+                blackvector DemiCercle/k3r_alt.lata dom VITESSE ELEM 0.1
+		pseudocolor DemiCercle/k3r_alt.lata dom PRESSION_PA ELEM
+		Zoom2D 0.19 0.34 0 0.05
+		Width 7cm
+		nb_img_without_newline 2 
+        }	
+	visu {
 	        Description "Mixing Length"
 		cycles -1
                 blackvector DemiCercle/lm.lata dom VITESSE ELEM 0.1
@@ -330,8 +584,8 @@ Chapter {
 	{
 		Title "Drag coefficient calculation"
 		Description "The drag coefficient Cx has been calculated with Trio_U for different bodies and compared to measured values:"
-		nb_columns 5
-		label 	Hoerner | K-Eps | Error [%] | Mixing Length | Error [%] 
+		nb_columns 9
+		label 	Hoerner | KEps | Err [%]  | ML | Err [%] | KEpsR(A0=4) | Err [%] | KEpsR(A0=3.2) | Err [%] 
 		line {
 			legend "Carre"
 			file Carre.dat
@@ -382,7 +636,7 @@ Chapter {
 
 Chapter {	
 	Title "Conclusion"
-	Description "The K-Eps model on the two first shapes (Square and Cylinder) can't give good results because of the adverse pressure gradient on the top of the shape (well known limitation of this model)."
+	Description "The K-Eps model on the two first shapes (Square and Cylinder) can't give good results because of the adverse pressure gradient on the top of the shape (well known limitation of this model). The K-Epsilon-Realizable model with A=4.04 does not improve results. The K-Epsilon-Realizable model with A0=6.5 degrades results. 4.04 and 6.5 are the values given by the litterature. The value A0=3.2 provides overall better results, but lacks a solid basis."
 	Description "Mere coincidence or not, the drag calculated by the mixing length model at Re~3e4 is good."
 	Description "At the contrary, the drag for bodies containing fixed separation points, is better calculated by the K-Eps model (no adverse pressure gradient there) than the mixing length model." 
 	Description "2D calculation with implicit scheme converges quickly (the CPU time is less than few minutes) which enables parametric calculations."

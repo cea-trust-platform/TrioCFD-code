@@ -22,7 +22,7 @@ do
       CHECKIN $src/$cas.med
    fi
    # Boucle sur 2 modeles
-   for modele in keps lm
+   for modele in keps k3r k3r_alt lm
    do
        # Creation du jeu de donnee
        cat ../seul.data > $modele.data
@@ -53,7 +53,57 @@ do
                              conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
                       }
                       turbulence_paroi loi_standard_hydr
+                }" >> $modele.data  
+       elif [ $modele = k3r ]
+       then
+          echo $ECHO_OPTS "1,$ s?Distance_paroi??g\nw" | ed $modele.data 1>/dev/null 2>&1
+          echo "
+               modele_turbulence K_Epsilon_Realisable {
+                     Transport_K_Epsilon_Realisable
+                     {
+
+                             convection { amont }
+                             diffusion { }
+			     sources { Source_Transport_K_Eps_Realisable { C2_eps 1.92 } }
+                             boundary_conditions {
+                                    Haut        symetrie
+                                    Axe         symetrie
+                                    Forme       Paroi
+                                    Sortie      frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 1.44 43
+                                    Entree      frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 1.44 43
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
+                      }
+			 Prandtl_K 1
+			 Prandtl_Eps 1.2
+                         turbulence_paroi loi_standard_hydr
+			 Modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
                 }" >> $modele.data    
+       elif [ $modele = k3r_alt ]
+       then
+          echo $ECHO_OPTS "1,$ s?Distance_paroi??g\nw" | ed $modele.data 1>/dev/null 2>&1
+          echo "
+               modele_turbulence K_Epsilon_Realisable {
+                     Transport_K_Epsilon_Realisable
+                     {
+
+                             convection { amont }
+                             diffusion { }
+			     sources { Source_Transport_K_Eps_Realisable { C2_eps 1.92 } }
+                             boundary_conditions {
+                                    Haut        symetrie
+                                    Axe         symetrie
+                                    Forme       Paroi
+                                    Sortie      frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 1.44 43
+                                    Entree      frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 1.44 43
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
+                      }
+			 Prandtl_K 1
+			 Prandtl_Eps 1.2
+                         turbulence_paroi loi_standard_hydr
+			 Modele_fonc_realisable Shih_Zhu_Lumley { A0 3.2 }
+                }" >> $modele.data                    
        fi
        echo "        }
 	Postraitement
