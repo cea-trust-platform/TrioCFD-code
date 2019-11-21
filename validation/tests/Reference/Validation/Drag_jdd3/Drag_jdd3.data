@@ -80,12 +80,13 @@ Read pb
 			Entree 	frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 12. 0.
 		}
 
-               modele_turbulence K_Epsilon {
-                     Transport_K_Epsilon
+               modele_turbulence K_Epsilon_Realisable {
+                     Transport_K_Epsilon_Realisable
                      {
 
                              convection { amont }
                              diffusion { }
+			     sources { Source_Transport_K_Eps_Realisable { C2_eps 1.92 } }
                              boundary_conditions {
                                     Haut        symetrie
                                     Axe         symetrie
@@ -95,7 +96,10 @@ Read pb
                              }
                              conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
                       }
-                      turbulence_paroi loi_standard_hydr
+			 Prandtl_K 1
+			 Prandtl_Eps 1.2
+                         turbulence_paroi loi_standard_hydr
+			 Modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
                 }
         }
 	Postraitement

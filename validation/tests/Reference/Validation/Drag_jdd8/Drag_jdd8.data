@@ -13,7 +13,7 @@ Domaine dom
 Read_file_binary dom forme_bin.geom
 Dilate dom 0.3
 Postraiter_domaine { domaine dom format lml fichier forme }
-Distance_paroi dom 1 Forme binaire
+
 # END MESH #
 
 # BEGIN PARTITION
@@ -80,7 +80,27 @@ Read pb
 			Entree 	frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 12. 0.
 		}
 
-	       modele_turbulence longueur_melange { dmax 1000 fichier dom_Wall_length.xyz turbulence_paroi loi_standard_hydr }
+               modele_turbulence K_Epsilon_Realisable {
+                     Transport_K_Epsilon_Realisable
+                     {
+
+                             convection { amont }
+                             diffusion { }
+			     sources { Source_Transport_K_Eps_Realisable { C2_eps 1.92 } }
+                             boundary_conditions {
+                                    Haut        symetrie
+                                    Axe         symetrie
+                                    Forme       Paroi
+                                    Sortie      frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 1.44 43
+                                    Entree      frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 1.44 43
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
+                      }
+			 Prandtl_K 1
+			 Prandtl_Eps 1.2
+                         turbulence_paroi loi_standard_hydr
+			 Modele_fonc_realisable Shih_Zhu_Lumley { A0 3.2 }
+                }
         }
 	Postraitement
 	{
