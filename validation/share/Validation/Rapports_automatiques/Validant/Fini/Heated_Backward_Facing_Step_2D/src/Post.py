@@ -196,7 +196,7 @@ def ecrire_xr(fichier,h):
 
     if i==2:
         xr=0
-        print 'attention: pas de point de reattachement trouve, il semble ne pas y avoir de zone de recirculation'
+        print('attention: pas de point de reattachement trouve, il semble ne pas y avoir de zone de recirculation')
     else:
         xr = x1 - (V1*((x2-x1)/(V2-V1)))
 

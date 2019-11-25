@@ -48,7 +48,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=2:
-        print 'Erreur sur le nb d\'arguments fournis : Usage  python wall_strength nomFichier.out'
+        print('Erreur sur le nb d\'arguments fournis : Usage  python wall_strength nomFichier.out')
         sys.exit()
 
     nomFic = args[1]

@@ -82,4 +82,4 @@ if __name__ == '__main__':
         #ecriture du fichier
         ecritureFichier(properties)
     else:
-        print 'Erreur propertiesGeometry : pas de fichier data trouve !'
+        print('Erreur propertiesGeometry : pas de fichier data trouve !')

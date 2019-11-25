@@ -101,7 +101,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=5:
-        print 'Erreur sur le nb d\'arguments fournis : Usage\npython f1 f2 f3 f4'
+        print('Erreur sur le nb d\'arguments fournis : Usage\npython f1 f2 f3 f4')
         sys.exit()
 #
     ficTS = args[1]

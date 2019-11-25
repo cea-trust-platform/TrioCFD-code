@@ -17,7 +17,7 @@ def getNormePression(nomFichier, numPoint, fromTime):
                     temps.append(valtemps)
                     pression.append(valpression)
     else:
-        print 'Erreur : fichier non trouve %s' % (nomFichier)
+        print('Erreur : fichier non trouve %s' % (nomFichier))
     return temps, pression
 
 def calculerMediane(tabOrig):
@@ -69,7 +69,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=4:
-        print 'Erreur sur le nb d\'arguments fournis : Usage\npython calculerFrequence nomFichier.sonde numPoint fromTime'
+        print('Erreur sur le nb d\'arguments fournis : Usage\npython calculerFrequence nomFichier.sonde numPoint fromTime')
         sys.exit()
 
     nomFic = args[1]
@@ -83,4 +83,4 @@ if __name__=='__main__':
     #print 'Periodes=%s, moyenne=%f' % (periodes, periodeMoy)
 
     frequence = 1./periodeMoy
-    print '%f' % (frequence)
+    print('%f' % (frequence))

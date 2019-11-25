@@ -17,7 +17,7 @@ def getNormePression(nomFichier, numPoint, fromTime):
                     temps.append(valtemps)
                     pression.append(valpression)
     else:
-        print 'Erreur : fichier non trouve %s' % (nomFichier)
+        print('Erreur : fichier non trouve %s' % (nomFichier))
     return temps, pression
 
 def calculerMediane(tabOrig):
@@ -52,7 +52,7 @@ def getPeriodes(temps, tab, mediane):
         if etati!=etatip1:
             #on vient de traverser la mediane
             nbCoupes += 1
-            print 'coupe mediane a temps= %f (%d)' % (temps[i], nbCoupes)
+            print('coupe mediane a temps= %f (%d)' % (temps[i], nbCoupes))
             if nbCoupes==0:
                 temps0 = temps[i]
             else:
@@ -69,7 +69,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=4:
-        print 'Erreur sur le nb d\'arguments fournis : Usage\npython calculerFrequence nomFichier.sonde numPoint fromTime'
+        print('Erreur sur le nb d\'arguments fournis : Usage\npython calculerFrequence nomFichier.sonde numPoint fromTime')
         sys.exit()
 
     nomFic = args[1]
@@ -77,13 +77,13 @@ if __name__=='__main__':
     fromTime = float(args[3])
     temps, pression = getNormePression(nomFic,numPoint, fromTime)
     mediane = calculerMediane(pression)
-    print 'mediane = %f' % (mediane)
+    print('mediane = %f' % (mediane))
 
     periodes, periodeMoy = getPeriodes(temps, pression, mediane)
-    print 'Periodes=%s, moyenne=%f' % (periodes, periodeMoy)
+    print('Periodes=%s, moyenne=%f' % (periodes, periodeMoy))
 
     frequence = 1./periodeMoy
-    print 'freq=%f' % (frequence)
+    print('freq=%f' % (frequence))
 
     St = 0.64516 * frequence
 
@@ -91,8 +91,8 @@ if __name__=='__main__':
     ref2 = ['Roshko', 0.167]
     err1 = 100 * abs(St - ref1[1]) / max(St, ref1[1])
     err2 = 100 * abs(St - ref2[1]) / max(St, ref2[1])
-    print 'Erreur relative (ref1 %s = %f) = %f%%' % (ref1[0], ref1[1], err1)
-    print 'Erreur relative (ref2 %s = %f) = %f%%' % (ref2[0], ref2[1], err2)
+    print('Erreur relative (ref1 %s = %f) = %f%%' % (ref1[0], ref1[1], err1))
+    print('Erreur relative (ref2 %s = %f) = %f%%' % (ref2[0], ref2[1], err2))
     fic = open('strouhal.dat', 'w')
     fic.write('#Frequence  St  Err1 Err2%\n')
     fic.write('%18.3f %18.3f %18.3f %18.3f\n' % (frequence, St, err1, err2))

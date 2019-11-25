@@ -41,7 +41,7 @@ def utau():
     tLigne = ligne.split()
     utau=float(tLigne[3])
     ficUstar.close()
-    print "utau",utau
+    print("utau",utau)
     return utau
 
 

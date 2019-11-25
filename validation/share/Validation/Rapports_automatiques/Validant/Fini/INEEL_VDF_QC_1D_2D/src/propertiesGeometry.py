@@ -69,7 +69,7 @@ def getPropertiesFromdat():
         lignes = f.readlines()
         f.close()
     else:
-        print 'Erreur getPropertiesFromdat : fichier %s non trouve !' % (nomFichier)
+        print('Erreur getPropertiesFromdat : fichier %s non trouve !' % (nomFichier))
         sys.exit()
     ligne = (lignes[0]).strip()
     tabLigne = ligne.split()
@@ -101,10 +101,10 @@ def getPropertiesFromdat():
         ind += 1
         properties['Q'] = float(tabLigne[ind])
     except IndexError:
-        print 'Erreur getPropertiesFromdat : lecture element %d pour 0-%d elements...' % (ind, len(tabLigne)-1)
+        print('Erreur getPropertiesFromdat : lecture element %d pour 0-%d elements...' % (ind, len(tabLigne)-1))
         sys.exit()
     except ValueError:
-        print 'Erreur getPropertiesFromdat : lecture element %d n\'est pas un float (%s)...' % (ind, tabLigne[ind])
+        print('Erreur getPropertiesFromdat : lecture element %d n\'est pas un float (%s)...' % (ind, tabLigne[ind]))
         sys.exit()
     return properties
 
@@ -128,4 +128,4 @@ if __name__ == '__main__':
         #ecriture du fichier
         ecritureFichier(properties)
     else:
-        print 'Erreur propertiesGeometry : pas de fichier data trouve !'
+        print('Erreur propertiesGeometry : pas de fichier data trouve !')

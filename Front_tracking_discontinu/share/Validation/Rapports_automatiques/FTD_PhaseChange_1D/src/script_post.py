@@ -23,19 +23,19 @@ def getValueFromFic_triou(fic, key):
          break
       pass
    if i == nb- 1 :
-      print "On a rien trouvee??"
+      print("On a rien trouvee??")
       raise Exception("Etonnant, non?")
       pass
    return val
 
 
 if (1):	
-	print "gogogo...", os.getcwd()
+	print("gogogo...", os.getcwd())
 	Sur=144.e-10
 	dt_sauv=9.e-8
 	dt2=1.e-8
 	aa = getValueFromFic_triou("adiab/adia_remesh.data", "dt_max")
-	print aa==dt2
+	print(aa==dt2)
 	f=100000000.
 	rhov=1000.
 	cpv=100.
@@ -50,28 +50,28 @@ if (1):
 	L_maille=1.e-5
 
 	dt=dt_sauv
-	print("Sur=",Sur)
-	print("dt=",dt)
-	print("dt2=",dt2)
-	print("f=",f)
-	print("rhov=",rhov)
-	print("cpv=",cpv)
-	print("kv=",kv)
-	print("gradTv=",gradTv)
-	print("rhol=",rhol)
-	print("cpl=",cpl)
-	print("Lv_l=",Lv_l)
-	print("kl=",kl)
-	print("gradTl=",gradTl)
-	print("flux_ent=",flux_ent)
-	print("L_maille=",L_maille)
+	print(("Sur=",Sur))
+	print(("dt=",dt))
+	print(("dt2=",dt2))
+	print(("f=",f))
+	print(("rhov=",rhov))
+	print(("cpv=",cpv))
+	print(("kv=",kv))
+	print(("gradTv=",gradTv))
+	print(("rhol=",rhol))
+	print(("cpl=",cpl))
+	print(("Lv_l=",Lv_l))
+	print(("kl=",kl))
+	print(("gradTl=",gradTl))
+	print(("flux_ent=",flux_ent))
+	print(("L_maille=",L_maille))
 
 	OpenDatabase("adiab/lata/post.lata")
 
 	ts_start=0
 	ts_end = TimeSliderGetNStates()
 	nb_ts=1
-	list_ts = range(ts_start,ts_end,nb_ts) 
+	list_ts = list(range(ts_start,ts_end,nb_ts)) 
 
 	DefineScalarExpression("Tv_ELEM_dom","TEMPERATURE_THERMIQUE_VAPEUR_ELEM_dom*(1-INDICATRICE_INTERF_ELEM_dom)")
 	#DefineScalarExpression("Tl_ELEM_dom","TEMPERATURE_THERMIQUE_ELEM_dom*INDICATRICE_INTERF_ELEM_dom")
@@ -124,7 +124,7 @@ if (1):
 	ChangeActivePlotsVar("VITESSE_X_ELEM_dom")
 	Query("Average value")
 	U_cine=GetQueryOutputValue()
-	print((U_cine**2)*200.e-6*Sur/2*(rhol+rhov)/2)
+	print(((U_cine**2)*200.e-6*Sur/2*(rhol+rhov)/2))
 
 	ChangeActivePlotsVar("Tv_ELEM_dom")
 	AddOperator("Slice", 1)

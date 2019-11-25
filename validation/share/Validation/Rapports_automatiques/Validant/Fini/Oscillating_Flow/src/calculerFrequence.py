@@ -19,7 +19,7 @@ def getNormeVitesse(nomFichier, numPoint, fromTime):
                     temps.append(valtemps)
                     vitesse.append(valvitesse)
     else:
-        print 'Erreur : fichier non trouve %s' % (nomFichier)
+        print('Erreur : fichier non trouve %s' % (nomFichier))
     return temps, vitesse
 
 def calculerMediane(tabOrig):
@@ -54,7 +54,7 @@ def getPeriodes(temps, tab, mediane):
         if etati!=etatip1:
             #on vient de traverser la mediane
             nbCoupes += 1
-            print 'coupe mediane a temps= %f (%d)' % (temps[i], nbCoupes)
+            print('coupe mediane a temps= %f (%d)' % (temps[i], nbCoupes))
             if nbCoupes==0:
                 temps0 = temps[i]
             else:
@@ -71,7 +71,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=5:
-        print 'Erreur sur le nb d\'arguments fournis : Usage\npython calculerFrequence nomFichier.sonde numPoint fromTime Lcarac'
+        print('Erreur sur le nb d\'arguments fournis : Usage\npython calculerFrequence nomFichier.sonde numPoint fromTime Lcarac')
         sys.exit()
 
     nomFic = args[1]
@@ -80,26 +80,26 @@ if __name__=='__main__':
     Lcarac = float(args[4])
     temps, vitesse = getNormeVitesse(nomFic,numPoint, fromTime)
     mediane = calculerMediane(vitesse)
-    print 'mediane = %f' % (mediane)
+    print('mediane = %f' % (mediane))
 
     periodes, periodeMoy = getPeriodes(temps, vitesse, mediane)
-    print 'Periodes=%s, moyenne=%f' % (periodes, periodeMoy)
+    print('Periodes=%s, moyenne=%f' % (periodes, periodeMoy))
 
     frequence = 1./periodeMoy
-    print 'freq=%f' % (frequence)
+    print('freq=%f' % (frequence))
 
     import propertiesGeometry
     #lecture des donnees geometrique
     properties = propertiesGeometry.readPropertiesData('test.data')
-    print 'Properties = %s' % (properties)
+    print('Properties = %s' % (properties))
 
     #calcul adim
     frequenceAdim = frequence * (Lcarac*Lcarac/(properties['mu']/properties['rho']))
-    print 'freqAdim=%f' % (frequenceAdim)
+    print('freqAdim=%f' % (frequenceAdim))
 
     ref = ['Behnia', 17.87]
     err = 100 * abs(frequenceAdim - ref[1]) / max(frequenceAdim, ref[1])
-    print 'Erreur relative (ref %s = %f) = %f%%' % (ref[0], ref[1], err)
+    print('Erreur relative (ref %s = %f) = %f%%' % (ref[0], ref[1], err))
 
     fic = open('calculerFrequence.dat', 'w')
     fic.write('#PeriodeMoy  Frequence  FrequenceAdim  refFrequenceBehnia  ErreurRel%\n')

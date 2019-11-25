@@ -142,7 +142,7 @@ if __name__ == '__main__':
     discr = args[0]
     scheme = args[1]
     U = args[2]
-    print discr+' '+scheme+' '+U
+    print(discr+' '+scheme+' '+U)
     mu,rho,h,L = properties()
     reh = Re(mu,h,U,rho)
     Uth = Utheo(reh,U)

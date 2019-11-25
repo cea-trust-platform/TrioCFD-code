@@ -76,7 +76,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=4:
-        print 'Erreur sur le nb d\'arguments fournis : Usage\npython ustar gradP sonde_velocity'
+        print('Erreur sur le nb d\'arguments fournis : Usage\npython ustar gradP sonde_velocity')
         sys.exit()
 #
     USTAR = args[1]

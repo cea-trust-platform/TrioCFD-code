@@ -130,9 +130,9 @@ def calculerBz(z, type, valJet, valDecayConstante, valOrigin, diametreJet):
                     valadim.append([r/b, val/valCCalc])
                     #print '    r=',r, '  val=', val, '  ==>> adim=',r/b,val/valCCalc
         else:
-            print 'Erreur : fichier %s non trouve !' % (nomFic)
+            print('Erreur : fichier %s non trouve !' % (nomFic))
     else:
-        print 'Erreur : type %s non reconnu (U ou C)' % (type)
+        print('Erreur : type %s non reconnu (U ou C)' % (type))
 
     return b, valadim
 
@@ -164,7 +164,7 @@ if __name__=='__main__':
     #recuperation des parametres passes en ligne de commande
     args = sys.argv
     if len(args)!=4:
-        print 'Erreur sur le nb d\'arguments fournis : Usage\npython sondeVitesse.coupe sondeConcentration.coupe propertiesGeometry.dat'
+        print('Erreur sur le nb d\'arguments fournis : Usage\npython sondeVitesse.coupe sondeConcentration.coupe propertiesGeometry.dat')
         sys.exit()
 #
     sondeVitesseFile = args[1]

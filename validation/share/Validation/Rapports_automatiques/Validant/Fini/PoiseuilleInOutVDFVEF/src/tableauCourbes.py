@@ -29,22 +29,22 @@ def properties():
 def Umean(Pint,Pout,h,L,mu):
     dPdX=(Pout-Pin)/L
     Umax=-0.5*float(dPdX)*float(h)*float(h)/float(mu)
-    print 'Umax:%f' %Umax
+    print('Umax:%f' %Umax)
     Umean=2.0*Umax/3.0
-    print 'Umean:%f' %Umean
+    print('Umean:%f' %Umean)
     return Umean
 
 #CALCUL DU REYNOLDS GRACE A LA VITESSE MOYENNE DANS LE CANAL. FORMULE ANALYTIQUE
 def Re(Umean,mu,h,rho):
 
     reh=4*rho*Umean*h/mu
-    print 'Re:%f' %reh
+    print('Re:%f' %reh)
     return reh
 
 def Utheo(reh,Umean):
 
     utau = float(Umean)*math.sqrt(12/reh)
-    print 'UtauTheo:%f' %utau
+    print('UtauTheo:%f' %utau)
     return utau
 
 def Utrio():
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     mu,rho,h,L,Pin,Pout = properties()
 
-    print 'Pin: %f' %Pin
+    print('Pin: %f' %Pin)
     U0=Umean(Pin,Pout,h,L,mu)
 
     reh = Re(U0,mu,h,rho)

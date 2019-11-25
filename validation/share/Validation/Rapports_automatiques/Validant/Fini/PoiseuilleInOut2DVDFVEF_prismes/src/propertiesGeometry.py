@@ -30,7 +30,7 @@ def readPropertiesData():
                     rho=float(tLigne[3])
                 if chaine=="Entree frontiere_ouverte_pression_imposee Champ_Front_Uniforme":
                     Pin=float(tLigne[4])
-                    print 'Pin:%f' %Pin
+                    print('Pin:%f' %Pin)
                 if chaine=="Sortie frontiere_ouverte_pression_imposee Champ_Front_Uniforme":
                     Pout=float(tLigne[4])
 

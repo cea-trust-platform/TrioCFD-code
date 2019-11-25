@@ -13,26 +13,26 @@ def properties():
                "mu Champ_Uniforme",
                "rho Champ_Uniforme",
                "vitesse Champ_fonc_xyz"] # Texte a rechercher
-    print '*2'
+    print('*2')
     for ligne in fic:
         for chaine in chaines:
             if chaine in ligne:
                 tLigne = ligne.split()
                 if chaine=="Longueurs":
                     h1=float(tLigne[2])
-                    print 'h1:%f' %h1
+                    print('h1:%f' %h1)
                     L1=float(tLigne[1])
-                    print 'L1:%f' %L1
+                    print('L1:%f' %L1)
                 if chaine=="mu Champ_Uniforme":
                     mu1=float(tLigne[3])
-                    print 'mu1:%f' %mu1
+                    print('mu1:%f' %mu1)
                 if chaine=="rho Champ_Uniforme":
                     rho1=float(tLigne[3])
-                    print 'rho1:%f' %rho1
+                    print('rho1:%f' %rho1)
                 if chaine=="vitesse Champ_fonc_xyz":
                     U01=float(tLigne[4])
-                    print 'U01:%f' %U01
-    print 'indice'
+                    print('U01:%f' %U01)
+    print('indice')
     fic.close()
     return mu1,rho1,h1,L1,U01
 
@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
     mu,rho,h,L,U0 = properties()
 
-    print 'mu:%f' %mu
+    print('mu:%f' %mu)
 
-    print '*1'
+    print('*1')
     #ecriture du fichier
     ecritureFichier(mu,rho,h,L,U0)
