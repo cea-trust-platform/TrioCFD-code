@@ -21,7 +21,7 @@ Parameters {
 	ParametersTrio_U Convection scheme: EF_Stab.
 	ParametersTrio_U Turbulent model: $k-\varepsilon$.
 
-	Reference "1. 'Coefficient de pertes de charges singulieres et de perte de charge par frottement', I.E. Idel'Cik, Direction des etudes et recherches d'Électricite de France, 1986"
+	Reference "1. 'Coefficient de pertes de charges singulieres et de perte de charge par frottement', I.E. Idel'Cik, Direction des etudes et recherches d'Ã‰lectricite de France, 1986"
 
 
 	}	
@@ -32,7 +32,7 @@ Chapter {
 	Figure {
 		Title "Geometry"
 		description "The geometry is a 3D pipe with a sudden contraction."
-		description "The geometry is a 30° axial section."
+		description "The geometry is a 30Â° axial section."
 		description "Dimensions of the pipe upstream: diameter: \latex_($D_1=2 \, m $\latex_); length: \latex_($L_1=2.5.D_1$\latex_)"
 		description "Dimensions of the pipe downstream: diameter: \latex_($D_2=1 \, m $\latex_); length: \latex_($L_2=10.D_2$\latex_)."
 		description "The figure below is a schema of the geometry."

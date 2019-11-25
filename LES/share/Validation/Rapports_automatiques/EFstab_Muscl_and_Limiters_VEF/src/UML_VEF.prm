@@ -168,7 +168,7 @@ Chapter {
 ################
 ### 
 	Figure {
-		Title " Profiles of temperature after a rotation of 180° of the spot "
+		Title " Profiles of temperature after a rotation of 180Â° of the spot "
 		Description " The results for the different EF_stab and Muscl schemes with different limiters are presented on the graphic for comparison with the referent profile. "
 #		Width 12cm, viewport = 0 0 924 400,clip
 		Width 12cm

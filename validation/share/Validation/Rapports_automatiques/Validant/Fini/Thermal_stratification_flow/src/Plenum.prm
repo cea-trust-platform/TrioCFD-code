@@ -25,8 +25,8 @@ Parameters {
 	ParametersTrio_U "Diffusion scheme : default for all equations"
 	ParametersTrio_U "Boundary condition : Velocity inlet, Pressure outlet, Symmetry and Wall"
 	ParametersTrio_U "Wall condition : Imposed heat flux (for test cases 2D_H and 3D_H) or temperature (for test cases 2D_T and 3D_T)"
-	Reference "H. Kamide, J. Kobayashi, Y. Leda, H. Ninokata : Benchmark exercise for multi-dimensional thermohydraulic analysis codes. Journal of Hydraulic research vol.34, 1996, n°3."
-	Reference "E. Krepper, H-G Willschutz, F-P Weiß : Solution of a mixed convection flow benchmark using computational fluid dynamic codes. 47-55."
+	Reference "H. Kamide, J. Kobayashi, Y. Leda, H. Ninokata : Benchmark exercise for multi-dimensional thermohydraulic analysis codes. Journal of Hydraulic research vol.34, 1996, nÂ°3."
+	Reference "E. Krepper, H-G Willschutz, F-P WeiÃŸ : Solution of a mixed convection flow benchmark using computational fluid dynamic codes. 47-55."
 	Prerequisite "Extract_histogram dom_2D 2D_H/Plenum.err  > histo2D_H"
 	Prerequisite "Extract_histogram dom_3D 3D_H/Plenum.err  > histo3D_H"
 	IncludeData 2
@@ -109,7 +109,7 @@ Chapter {
 	}
 	Table {
 		Title "Physical properties"
-		Description "\latex_(\textbf{Water at 48.9°C:}\latex_)"	
+		Description "\latex_(\textbf{Water at 48.9Â°C:}\latex_)"	
 		Description "$\rho$ = 988.03 kg/m$^3$"
 		Description "$\mu$ = 5.49e-4 kg/m/s"
 		Description "$\lambda$ = 0.59 W/m/K"

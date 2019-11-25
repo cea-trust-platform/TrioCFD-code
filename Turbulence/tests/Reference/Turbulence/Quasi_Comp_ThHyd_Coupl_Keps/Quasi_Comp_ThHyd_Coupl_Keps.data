@@ -24,7 +24,7 @@ Read sch
 
 Pb_conduction pb_combustible
 Pb_conduction pb_revetement
-# On prend le modele Quasi compressible, temperature variant de +200° #
+# On prend le modele Quasi compressible, temperature variant de +200Â° #
 # Regime turbulent #
 Pb_thermohydraulique_turbulent_QC pb_lame
 # Regime laminaire #

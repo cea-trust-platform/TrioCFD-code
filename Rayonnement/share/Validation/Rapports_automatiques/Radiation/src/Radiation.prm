@@ -47,8 +47,8 @@ Chapter {
 	{
 	Description Initial Conditions:
 	Description - Fluid : Velocity: 0 m-1 s-1
-	Description - Fluid  Temperature : constant equal to 50 °C (323,15 K) 
-	Description - Solid : Temperature : constant equal to 50 °C (323,15 K)
+	Description - Fluid  Temperature : constant equal to 50 Â°C (323,15 K) 
+	Description - Solid : Temperature : constant equal to 50 Â°C (323,15 K)
 	Description
 	Description Boundary Conditions:
 	Description - Fluid Momentum Balance :
@@ -90,7 +90,7 @@ Figure {
  
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide"
@@ -121,7 +121,7 @@ Figure {
  
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide"
@@ -177,7 +177,7 @@ Figure {
 	Title "3D_VDF_Radiation"
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide"
@@ -205,7 +205,7 @@ Figure {
 	Title "3D_VEF_Radiation"
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide"
@@ -262,7 +262,7 @@ Figure {
 	Title "3D_VDF_flux_imp_Radiation"
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide"
@@ -280,7 +280,7 @@ Figure {
 	Title "3D_VEF_flux_imp_Radiation"
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide"
@@ -327,7 +327,7 @@ Figure {
 	Title "Cylindre_2D_Axi_VDF_Radiation Cylindre_3D_VEF_Radiation"
 	Dimension 2
 	LabelX "y"
-	LabelY "°"
+	LabelY "Â°"
 	Include_Description_Curves 0
 	Curve {
 		legend "T fluide Z=0.005 m"

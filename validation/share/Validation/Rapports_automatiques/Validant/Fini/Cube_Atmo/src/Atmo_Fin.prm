@@ -85,28 +85,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Standard wall function with mesh n°1"
+			legend "Standard wall function with mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Standard wall function with mesh n°2"
+			legend "Standard wall function with mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "TBLE with mesh n°1"
+			legend "TBLE with mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0
 			columns ($2/6) ($1/0.125)
 			Style points
 		}
 		Curve {
-			legend "TBLE with mesh n°2"
+			legend "TBLE with mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0
 			columns ($2/6) ($1/0.125)
@@ -114,7 +114,7 @@ Chapter {
 		}
 	}
 	Table {
-		Description "We can observe that the profile is not that good with the coarser mesh n°1. The mesh n°2 gives a rather good corresponding profile."
+		Description "We can observe that the profile is not that good with the coarser mesh nÂ°1. The mesh nÂ°2 gives a rather good corresponding profile."
 		}
 	
 	Figure {
@@ -140,28 +140,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U values with standard wf upwind the cube mesh n°1"
+			legend "Trio_U values with standard wf upwind the cube mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_5
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U values with TBLE upwind the cube mesh n°1"
+			legend "Trio_U values with TBLE upwind the cube mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_5
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U values with standard wf upwind the cube mesh n°2"
+			legend "Trio_U values with standard wf upwind the cube mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_5
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U values with TBLE upwind the cube mesh n°2"
+			legend "Trio_U values with TBLE upwind the cube mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_5
 			columns ($2/6) ($1/0.125)
@@ -196,28 +196,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_5625
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_5625
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_5625
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_5625
 			columns ($2/6) ($1/0.125)
@@ -254,28 +254,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_5625
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_5625
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_5625
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_5625
 			columns ($4/6) ($1/0.125)
@@ -311,28 +311,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_5625
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_5625
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_5625
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_5625
 			columns ($2/36) ($1/0.125)
@@ -374,28 +374,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_609375
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_609375
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_609375
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_609375
 			columns ($2/6) ($1/0.125)
@@ -432,28 +432,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_609375
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_609375
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_609375
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_609375
 			columns ($4/6) ($1/0.125)
@@ -489,28 +489,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_609375
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_609375
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_609375
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_609375
 			columns ($2/36) ($1/0.125)
@@ -553,28 +553,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_6875
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_6875
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_6875
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_6875
 			columns ($2/6) ($1/0.125)
@@ -610,28 +610,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_6875
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_6875
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_6875
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_6875
 			columns ($4/6) ($1/0.125)
@@ -729,28 +729,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_765625
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_765625
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_765625
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_765625
 			columns ($2/6) ($1/0.125)
@@ -786,28 +786,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_765625
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_765625
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_765625
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_765625
 			columns ($4/6) ($1/0.125)
@@ -843,28 +843,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_765625
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_765625
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_765625
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_765625
 			columns ($2/36) ($1/0.125)
@@ -905,28 +905,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_875
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_875
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_875
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_875
 			columns ($2/6) ($1/0.125)
@@ -962,28 +962,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX0_875
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX0_875
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX0_875
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX0_875
 			columns ($4/6) ($1/0.125)
@@ -1019,28 +1019,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX0_875
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_KX0_875
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX0_875
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_KX0_875
 			columns ($2/36) ($1/0.125)
@@ -1081,28 +1081,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX1
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX1
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX1
 			columns ($2/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX1
 			columns ($2/6) ($1/0.125)
@@ -1138,28 +1138,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_VITESSEX1
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_VITESSEX1
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_VITESSEX1
 			columns ($4/6) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_VITESSEX1
 			columns ($4/6) ($1/0.125)
@@ -1195,28 +1195,28 @@ Chapter {
 			PointSize 2
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°1"
+			legend "Trio_U with std WF mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_LPSTD/Cube.data SONDE_KX1
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°1"
+			legend "Trio_U with TBLE mesh nÂ°1"
 			origin "Trio_U"
 			Segment ./cube_gros_TBLE/Cube.data SONDE_KX1
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with std WF mesh n°2"
+			legend "Trio_U with std WF mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_LPSTD/Cube.data SONDE_KX1
 			columns ($2/36) ($1/0.125)
 			Style linespoints
 		}
 		Curve {
-			legend "Trio_U with TBLE mesh n°2"
+			legend "Trio_U with TBLE mesh nÂ°2"
 			origin "Trio_U"
 			Segment ./cube_fin_TBLE/Cube.data SONDE_KX1
 			columns ($2/36) ($1/0.125)
@@ -1233,7 +1233,7 @@ Chapter {
 	}
 	Table {
 		Description "The different profiles given by Trio_U and shown before are in coherence with each others."
-		Description "The refined mesh (n°2) corrects some probe effects due to the tetraedra skewness."
+		Description "The refined mesh (nÂ°2) corrects some probe effects due to the tetraedra skewness."
 		Description "The TBLE model gives a kinetic energy level a little more important than the standard wall function. But neither the shape, neither the effect on the velocity profiles is great."
 		Description "Globally the velocity profiles do not describe the experimental recirculation flows near the cube. Higher and far behind, they are much better."
 		Description "If we compare with the CFX-tascflow results, this has the opposite comportment : a little better near the cube but a little less good far from it."
