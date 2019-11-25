@@ -1,4 +1,4 @@
 #!/bin/bash
 extrait_coupe 3d_vdf_rect SONDE_PRESSION
 sh ../first.awk 3d_vdf_rect
-cat delta_p.dat >> deltap_courbe.dat
+cat delta_p.dat > deltap_courbe.dat
