@@ -1,1 +1,3 @@
-sed -e "/TEMPS:/d" composantes_connexes.txt > compo_connex.txt
+#sed -e "/TEMPS:/d" composantes_connexes.txt > compo_connex.txt
+
+sed 'N;s/\n/ /' composantes_connexes.txt > compo_connex.txt
