@@ -24,7 +24,7 @@ Read sch
        Solveur
            implicite
            {
-                seuil_convergence_solveur 1.e-12
+                seuil_convergence_solveur 1.e-8
            }
 nb_pas_dt_max 3
 }
@@ -62,7 +62,7 @@ Read pb
 {
 	Navier_Stokes_Turbulent	
 	{
-		solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-8 }	
+		solveur_pression GCP { precond ssor { omega 1.6 } seuil 1.e-6 }	
 		convection { EF_stab { } }
 		diffusion { }
 		conditions_initiales {
