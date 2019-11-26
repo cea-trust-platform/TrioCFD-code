@@ -10,6 +10,9 @@ mkdir -p 3d_vef_rect_5
 mkdir -p 3d_vef_rect_7_5
 mkdir -p 3d_vef_rect_10
 
+# pour corriger les courbe gnuplot
+[ -f deltap_courbe.dat ]  && rm deltap_courbe.dat
+[ -f deltap_courbe_vef.dat ] && rm deltap_courbe_vef.dat
 
 
 cd 3d_vdf_rect_1
