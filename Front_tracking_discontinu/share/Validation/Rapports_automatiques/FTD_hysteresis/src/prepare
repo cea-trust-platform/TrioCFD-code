@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Ce script est execute avant de lancer les cas tests
 cwd=$PWD
 function make_subfolders {

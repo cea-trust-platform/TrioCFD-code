@@ -63,6 +63,7 @@ Chapter {
 			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/equil_hysteresis_fin.dt_ev
 			columns ($1) ($4)
 			style linespoints
+			legend "residu=max|Ri|"
 		}
 	}
 }
@@ -112,7 +113,7 @@ Chapter {
 #Pforeach _fold_(_folds_)
 		curve {
 			file _head_/_fold_/_suf_compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend _fold_ (_suf_)
 		}

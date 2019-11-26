@@ -63,6 +63,7 @@ Chapter {
 			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/equil_hysteresis_fin.dt_ev
 			columns ($1) ($4)
 			style linespoints
+			legend "residu=max|Ri|"
 		}
 	}
 }
@@ -192,31 +193,31 @@ Chapter {
 		logY
 		curve {
 			file Sphere/Equilibre_60/Theta60_60/standard/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend standard (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta60_60/improved/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend improved (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
 		}
@@ -337,31 +338,31 @@ Chapter {
 		logY
 		curve {
 			file Sphere/Equilibre_60/Theta30_120/standard/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend standard (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta30_120/improved/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend improved (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
 		}
 		curve {
 			file Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
 		}
@@ -488,31 +489,31 @@ Chapter {
 		logY
 		curve {
 			file Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend standard (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend improved (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
 		}
@@ -633,31 +634,31 @@ Chapter {
 		logY
 		curve {
 			file Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend standard (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend improved (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre01 (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre05 (SEQ/)
 		}
 		curve {
 			file Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/compo_connex.txt
-			columns ($2) (sqrt($6*$6+$7*$7))
+			columns ($2) ($8)
 			style linespoints
 			Legend hysteresis/It2_coeff2.0_Npre10 (SEQ/)
 		}
