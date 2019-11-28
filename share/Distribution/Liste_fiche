@@ -147,3 +147,16 @@
 ./P1NCP0RT/share/Validation/Rapports_automatiques/RotFlow NNR
 ./P1NCP0RT/share/Validation/Rapports_automatiques/StatVortex NNR
 ./P1NCP0RT/share/Validation/Rapports_automatiques/StatVortex2D NNR
+./Turbulence/share/Validation/Rapports_automatiques/Problemes_en_cours/Coupled_plane_channel_VEF NNR
+./Turbulence/share/Validation/Rapports_automatiques/Problemes_en_cours/Loi_paroi2D_VEF NNR
+./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/Marche_incline STD
+./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/Test_ghost_visit STD
+./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/Uniform_keps_front_field_from_ud NNR
+./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/decroissance_keps STD
+./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/test_div_grad_Prep1b STD
+./Turbulence/share/Validation/Rapports_automatiques/pas_fini/Couplage_Implicite_Instationnaire STD
+./Turbulence/share/Validation/Rapports_automatiques/pas_fini/k_eps_vef_perio STD
+./Turbulence/share/Validation/Rapports_automatiques/pas_fini/wl_vef_analytic NNR
+./Turbulence/share/Validation/Rapports_automatiques/pas_fini/wl_vef_correlation NNR
+./Turbulence/share/Validation/Rapports_automatiques/pas_fini/wl_vef_coupling NNR
+./Turbulence/share/Validation/Rapports_automatiques/pas_fini/wl_vef_laminar STD
