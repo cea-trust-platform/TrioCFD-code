@@ -35,7 +35,7 @@
 Implemente_instanciable(Modele_Shih_Zhu_Lumley_VEF,"Modele_Shih_Zhu_Lumley_VEF",Modele_Fonc_Realisable_base);
 
 
-// XD Modele_Shih_Zhu_Lumley_VEF Modele_Fonc_Realisable_base Modele_Shih_Zhu_Lumley_VEF -1 Functions necessary to Realizable K-Epsilon Turbulence Model in VEF
+// XD Shih_Zhu_Lumley Modele_Fonc_Realisable_base Shih_Zhu_Lumley -1 Functions necessary to Realizable K-Epsilon Turbulence Model in VEF
 
 
 ///////////////////////////////////////////////////////////////

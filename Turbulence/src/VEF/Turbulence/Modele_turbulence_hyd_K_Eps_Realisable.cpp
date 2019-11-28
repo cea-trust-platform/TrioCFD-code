@@ -38,7 +38,7 @@
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS);
 
-// XD Modele_turbulence_hyd_K_Eps_Realisable mod_turb_hyd_rans Modele_turbulence_hyd_K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
+// XD K_Eps_Realisable mod_turb_hyd_rans K_Epsilon_Realisable -1 Realizable K-Epsilon Turbulence Model.
 
 //
 // printOn et readOn
@@ -58,10 +58,10 @@ Entree& Modele_turbulence_hyd_K_Eps_Realisable::readOn(Entree& is)
 void Modele_turbulence_hyd_K_Eps_Realisable::set_param(Param& param)
 {
   Mod_turb_hyd_RANS::set_param(param);
-  param.ajouter_non_std("Transport_K_Epsilon_Realisable",(this),Param::REQUIRED);
-  param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED);
-  param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED);
-  param.ajouter("PRANDTL_EPS",&Prandtl_Eps,Param::REQUIRED);
+  param.ajouter_non_std("Transport_K_Epsilon_Realisable",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k-eps) transportation equation.
+  param.ajouter_non_std("Modele_Fonc_Realisable",(this),Param::REQUIRED); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
+  param.ajouter("PRANDTL_K",&Prandtl_K,Param::REQUIRED); // XD_ADD_P double Keyword to change the Prk value (default 1.0).
+  param.ajouter("PRANDTL_EPS",&Prandtl_Eps,Param::REQUIRED); // XD_ADD_P double Keyword to change the Pre value (default 1.3)
 }
 
 int Modele_turbulence_hyd_K_Eps_Realisable::lire_motcle_non_standard(const Motcle& mot, Entree& is)
