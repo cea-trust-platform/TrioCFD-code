@@ -66,9 +66,14 @@ public:
   inline const Mod_turb_hyd_RANS& modele_turbulence() const;
   inline Mod_turb_hyd_RANS& modele_turbulence();
 
+  const Champ_base& get_champ( const Motcle& nom ) const;
+  void creer_champ( const Motcle& motlu );
+
+
 protected:
 
   Champ_Inc le_champ_K_Eps;
+  Champ_Fonc K_Eps_residu;
 
   REF(Milieu_base) le_fluide;
   REF(Champ_Inc_base) la_vitesse_transportante;

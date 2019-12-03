@@ -154,6 +154,7 @@ perioz periodique
 		{
 			vitesse elem
 			temperature elem
+			K_Eps_residu elem
 		}
 	}
 
