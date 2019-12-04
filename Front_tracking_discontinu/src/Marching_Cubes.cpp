@@ -495,7 +495,7 @@ void Marching_Cubes::remplir_data_marching_cubes(const Zone& zone)
   assert(facettes[i] == -1); // Signature de fin de tableau...
 }
 
-int fonction_tri_mcubes_renum_virt_loc(const void *pt1, const void *pt2)
+True_int fonction_tri_mcubes_renum_virt_loc(const void *pt1, const void *pt2)
 {
   int x = *(const int *) pt1;
   int y = *(const int *) pt2;
@@ -965,7 +965,7 @@ void Marching_Cubes::construire_noeuds_joints(const ArrOfBit& signe,
 // Tri par ordre croissant de premiere colonne,
 // puis deuxieme, puis troisieme colonne.
 
-int fct_compar_mcubes_noeuds(const void *pt1, const void *pt2)
+True_int fct_compar_mcubes_noeuds(const void *pt1, const void *pt2)
 {
   const int * const p1 = (const int *) pt1;
   const int * const p2 = (const int *) pt2;
