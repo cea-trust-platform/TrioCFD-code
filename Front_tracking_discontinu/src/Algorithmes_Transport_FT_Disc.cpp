@@ -129,23 +129,23 @@ void eval_vitesse(double x, double y, double z, double t,
                   Parser& px, Parser& py, Parser& pz,
                   double& vx, double& vy, double& vz)
 {
-  int i0=0;
+  int i0=0, i1=1, i2=2, i3=3;
   px.setVar(i0,x);
-  px.setVar(i0++,y);
-  px.setVar(i0++,z);
-  px.setVar(i0++,t);
-  i0=0;
+  px.setVar(i1,y);
+  px.setVar(i2,z);
+  px.setVar(i3,t);
+
   vx = px.eval();
   py.setVar(i0,x);
-  py.setVar(i0++,y);
-  py.setVar(i0++,z);
-  py.setVar(i0++,t);
-  i0=0;
+  py.setVar(i1,y);
+  py.setVar(i2,z);
+  py.setVar(i3,t);
+
   vy = py.eval();
   pz.setVar(i0,x);
-  pz.setVar(i0++,y);
-  pz.setVar(i0++,z);
-  pz.setVar(i0++,t);
+  pz.setVar(i1,y);
+  pz.setVar(i2,z);
+  pz.setVar(i3,t);
   vz = pz.eval();
 }
 
