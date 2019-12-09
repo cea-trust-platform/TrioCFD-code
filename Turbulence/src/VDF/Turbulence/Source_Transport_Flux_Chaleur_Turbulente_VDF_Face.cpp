@@ -592,7 +592,7 @@ DoubleTab& Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::ajouter(DoubleTab&
       // On recupere l'orientation de la face n+1
       // est ce que l'on cherche ????
 
-      Cerr<<"(1+2)%2 " <<(1+2)%2<< " (1+3)%3 "<<(1+3)%3<<finl;
+      Cerr<<"(1+2)%2 " << (int) (1+2)%2<< " (1+3)%3 "<< (int) (1+3)%3<<finl;
       Cerr<<" Si vous utilisiez "<<que_suis_je()<<" priere de contacter l'assistance TRUST"<<finl;
       Cerr<<" un gros bug a ete trouve ...."<<finl;
       assert(0);
