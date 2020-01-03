@@ -253,7 +253,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
     Eval_Diff_K_Eps_VDF& eval_diff = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
 
     const Fluide_Incompressible& mil = ref_cast(Fluide_Incompressible,mon_equation->milieu());
-    const Champ_Don& mvol = mil.masse_volumique();
+    const Champ_base& mvol = mil.masse_volumique();
     //
     eval_diff.associer_mvolumique(mvol);
   }

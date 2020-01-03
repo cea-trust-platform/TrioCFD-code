@@ -806,7 +806,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                       if (l_unif)
                         d_visco = visco;
                       else
-                        d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                        d_visco = tab_visco(elem,0);
 
                       u_plus_d_plus = norm_v*dist/d_visco;
                       u_plus = calculer_u_plus(nf,u_plus_d_plus,erugu);
@@ -901,7 +901,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 
@@ -1035,7 +1035,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
           if (l_unif)
             d_visco = visco;
           else
-            d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+            d_visco = tab_visco(elem,0);
 
           u_plus_d_plus = norm_v*distb/d_visco;
           u_plus = calculer_u_plus(face,u_plus_d_plus,stock_erugu[num_face]);
@@ -1173,7 +1173,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 
@@ -1271,7 +1271,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 

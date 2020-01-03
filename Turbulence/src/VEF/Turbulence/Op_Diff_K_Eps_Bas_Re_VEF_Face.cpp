@@ -368,12 +368,7 @@ void Op_Diff_K_Eps_Bas_Re_VEF_Face::ajouter_contribution(const DoubleTab& transp
   IntVect& tab2 = matrice.get_set_tab2();
   DoubleVect& coeff = matrice.get_set_coeff();
 
-  int nb_comp = 1;
-  int nb_dim = transporte.nb_dim();
-
-  if(nb_dim==2)
-    nb_comp=transporte.dimension(1);
-
+  const int nb_comp = transporte.line_size();
 
   // On traite les faces bord
   for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)

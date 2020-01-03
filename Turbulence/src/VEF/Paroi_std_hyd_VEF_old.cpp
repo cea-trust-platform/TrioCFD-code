@@ -87,7 +87,7 @@ int Paroi_std_hyd_VEF_old::init_lois_paroi_hydraulique()
 
 int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
 {
-  int nb_dim = tab.nb_dim();
+  const int nb_comp = tab.line_size();
   const IntTab& face_voisins = la_zone_VEF->face_voisins();
 
   // Boucle sur les bords
@@ -110,22 +110,13 @@ int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
-          if (nb_dim == 1)
+          if (tab.nb_dim() == 2)
             for (int num_face=ndeb; num_face<nfin; num_face++)
               {
                 elem = face_voisins(num_face,0);
-                tab(elem) = 0;
+                for (int k=0; k<nb_comp; k++)
+                  tab(elem,k) = 0;
               }
-          else if (nb_dim == 2)
-            {
-              int nb_comp= tab.dimension(1);
-              for (int num_face=ndeb; num_face<nfin; num_face++)
-                {
-                  elem = face_voisins(num_face,0);
-                  for (int k=0; k<nb_comp; k++)
-                    tab(elem,k) = 0;
-                }
-            }
           else
             {
               Cerr << "Erreur TRUST dans Paroi_std_hyd_VEF_old::preparer_calculer_hyd" << finl;

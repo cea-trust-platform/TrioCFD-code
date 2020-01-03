@@ -206,7 +206,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                 dist = zone_VDF.dist_norm_bord(num_face);
 
               double u_star = tab_u_star(num_face);
-              double d_alpha = (alpha_uniforme ? alpha(0,0) : (alpha.valeurs().nb_dim()==1 ? alpha(elem) : alpha(elem,0)) );
+              double d_alpha = (alpha_uniforme ? alpha(0,0) : alpha(elem,0) );
 
               int global_face=num_face;
               int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
@@ -219,7 +219,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               else
                 {
                   // calcul de la viscosite en y+
-                  double d_visco = (l_unif ? visco : (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0)));
+                  double d_visco = (l_unif ? visco : tab_visco(elem,0));
                   double Pr = d_visco/d_alpha;
                   double y_plus = dist*u_star/d_visco;
                   // L'expression de d_equiv ne tient pas compte de alpha_t comme en VEF

@@ -75,7 +75,7 @@ DoubleTab& Op_Diff_K_Eps_QC_VEF_Face::ajouter(const DoubleTab& inconnue, DoubleT
   DoubleTrav KEps_divided_by_rho(inconnue);
   const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
   const Fluide_Quasi_Compressible& mil = ref_cast(Fluide_Quasi_Compressible,eqn_transport.milieu());
-  const DoubleTab& rho=mil.masse_volumique();
+  const DoubleTab& rho=mil.masse_volumique().valeurs();
   int size = inconnue.dimension_tot(0);
   for (int i=0; i<size; i++)
     {
@@ -94,7 +94,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
 {
   const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
   const Fluide_Quasi_Compressible& mil = ref_cast(Fluide_Quasi_Compressible,eqn_transport.milieu());
-  const DoubleTab& mvol=mil.masse_volumique();
+  const DoubleTab& mvol=mil.masse_volumique().valeurs();
 
   modifier_matrice_pour_periodique_avant_contribuer(matrice,equation());
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
@@ -111,11 +111,7 @@ void Op_Diff_K_Eps_QC_VEF_Face::ajouter_contribution(const DoubleTab& transporte
   Prdt[0]=Prdt_K;
   Prdt[1]=Prdt_Eps;
   const DoubleTab& mu_turb=diffusivite_turbulente_->valeurs();
-  int nb_comp = 1;
-  int nb_dim = transporte.nb_dim();
-
-  if(nb_dim==2)
-    nb_comp=transporte.dimension(1);
+  const int nb_comp = transporte.line_size();
   assert(nb_comp==2);
 
   // On traite les faces bord

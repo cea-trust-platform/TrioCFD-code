@@ -272,7 +272,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 

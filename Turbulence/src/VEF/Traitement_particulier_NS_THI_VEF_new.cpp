@@ -439,9 +439,7 @@ void Traitement_particulier_NS_THI_VEF_new::ch_vit_pour_fft_VEF_s(DoubleTab& vit
   //int nb_faces=vitesse.dimension(0);
   Champ_P1NC& chp=ref_cast_non_const(Champ_P1NC, mon_equation->inconnue().valeur());
   DoubleTab vit_fac(chp.valeurs());
-  int nb_comp=1;
-  if(vitesse.nb_dim()!=1)
-    nb_comp=vitesse.dimension(1);
+  const int nb_comp = vitesse.line_size();
   DoubleTab vit_som(nb_som, nb_comp);
   vit_som=valeur_P1_L2(chp, chp.domaine());
 
