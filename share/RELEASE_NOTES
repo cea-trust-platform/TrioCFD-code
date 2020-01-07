@@ -1,11 +1,12 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.1_beta : Enhancements, modifications and corrected bugs since version 1.8.0 :
 --------------------------------------------------------------------------------------------------
-xx/xx/19 (TriCFD) Portability : Add 64 bits integers possibility to configure (experimental)
+XX/XX/20 (TrioCFD) Validation  : Add DirectionalPressureLoss validation sheet
+XX/XX/19 (TrioCFD) Portability : Add 64 bits integers possibility to configure (experimental)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.0 : Enhancements, modifications and corrected bugs since version 1.7.9 :
 --------------------------------------------------------------------------------------------------
-25/10/19 (TriCFD) Major change: Turbulence features (turbulent problems, wall laws, turbulence models and associated boundary conditions) are moved from TRUST to TrioCFD baltik.
+25/10/19 (TrioCFD) Major change: Turbulence features (turbulent problems, wall laws, turbulence models and associated boundary conditions) are moved from TRUST to TrioCFD baltik.
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.9 : Enhancements, modifications and corrected bugs since version 1.7.8 :
 --------------------------------------------------------------------------------------------------
