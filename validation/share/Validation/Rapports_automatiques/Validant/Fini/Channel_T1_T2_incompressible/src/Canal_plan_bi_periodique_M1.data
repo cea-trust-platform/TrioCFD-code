@@ -15,7 +15,7 @@ Transformer dom x y z
 Partition dom
 {
         Partitionneur metis { Nb_parts 2 }
-        Larg_joint 2 
+        Larg_joint 2
 	Nom_Zones DOM
 }
 End
@@ -42,7 +42,7 @@ Read sch
         Solveur
            Implicite
            {
-                seuil_convergence_solveur 1.e-12
+                seuil_convergence_solveur 1.e-10
            }
 }
 
@@ -77,25 +77,25 @@ Read pb
 		conditions_initiales { vitesse champ_uniforme 3 80. 0. 0. }
 		boundary_conditions
 		{
-			Periox	periodique 
-			Perioz	periodique 
+			Periox	periodique
+			Perioz	periodique
 			Bas	Paroi_fixe
 			Haut	Paroi_fixe
 		}
                 Modele_turbulence K_Epsilon
 		{
-			Transport_K_Epsilon 
+			Transport_K_Epsilon
 			{
 				convection { EF_stab { } }
                                 diffusion { }
                                 boundary_conditions
 				{
-					Periox	periodique 
-					Perioz	periodique 
+					Periox	periodique
+					Perioz	periodique
 					Bas	Paroi
 					Haut	Paroi
 				}
-				 parametre_equation parametre_implicite 
+				 parametre_equation parametre_implicite
 				{
 				resolution_explicite
 				}
@@ -109,22 +109,22 @@ Read pb
 	{
 		diffusion { }
 		convection {  EF_stab { alpha 0.2 } }
-		boundary_conditions 
+		boundary_conditions
 		{
-			Periox	periodique 
-			Perioz	periodique 
+			Periox	periodique
+			Perioz	periodique
 			Bas	paroi_temperature_imposee Champ_Front_Uniforme 1 673.
 			Haut	paroi_temperature_imposee Champ_Front_Uniforme 1 680.
 		}
 		conditions_initiales { Temperature Champ_fonc_xyz dom 1 1750.*y+673. }
 		Modele_turbulence Prandtl
-		{   
+		{
                         Turbulence_paroi loi_standard_hydr_scalaire  dt_impr_nusselt 0.001
  		}
 	}
 
 	Postraitement
-        {       
+        {
 		Sondes
                 {
 		  sonde_pression		pression		periode 0.0001 segment 50  0.00025 0.0 0.00025	0.00025 0.004 0.00025
@@ -155,6 +155,6 @@ Read pb
 	}
 }
 
-Solve pb 
+Solve pb
 End
 
