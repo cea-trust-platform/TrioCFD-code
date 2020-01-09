@@ -1,7 +1,7 @@
 # Visit 2.9.1 log file
 ScriptVersion = "2.9.1"
 if ScriptVersion != Version():
-    print "This script is for VisIt %s. It may not work with version %s" % (ScriptVersion, Version())
+    print("This script is for VisIt %s. It may not work with version %s" % (ScriptVersion, Version()))
 ShowAllWindows()
 RenderingAtts = RenderingAttributes()
 RenderingAtts.antialiasing = 1

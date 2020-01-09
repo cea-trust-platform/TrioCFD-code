@@ -74,12 +74,12 @@ Chapter {
 		Description "A stable and an unstable stratifications are calculated. The Reynolds number Reh = u1 h /$\nu$ and the Froude number \latex_(Fr = (u2 - u1) / [g$\beta(T1 - T2)h]^{1/2} $\latex_) have been chosen to respect the experimental values."
          	Description "The stable two layers stratified flow is obtained with :"
 		Description "u1=0,05m.s-1 and u2=0,1m.s-1"
-		Description "T1=27,9°C    and T2=12,1°C "
+		Description "T1=27,9Â°C    and T2=12,1Â°C "
 		Description "which corresponds to Reh = 5.10$^3$ and Fr = 0.9"
 		Description " "
          	Description "The unstable two layers stratified flow is obtained with :"
 		Description "u1=0,1m.s-1  and u2=0,2m.s-1"
-		Description "T1=21°C      and T2=19°C"
+		Description "T1=21Â°C      and T2=19Â°C"
 		Description "which respond to Reh = 10$^4$ and Fr = 5."
 		Description " "
 		Description "We will compare velocity and temperature profiles obtained at different distances from the inlet to those obtained by Viollet [1] in his experiments. We don't know the experimental values very well, especially the top thermal condition is not so clear. The free surface is modelized in the Trio_U calculations by a symmetry condition, this is not very satisfying."
@@ -90,15 +90,15 @@ Chapter {
 
 	Table {
         Title "Physical properties"
-        Description "Fluid domain: water at 20°C"
+        Description "Fluid domain: water at 20Â°C"
         nb_columns 1
                 Label Valeur
                 line {
-                        legend "$\rho$ en kg/m$³$"
+                        legend "$\rho$ en kg/m$Â³$"
                         file ./rho.dat
                 }
                 line {
-                        legend "$\mu$ en N/m$²$/s"
+                        legend "$\mu$ en N/m$Â²$/s"
                         file ./mu.dat
                 }
                 line {
@@ -113,7 +113,7 @@ Chapter {
 }
 
 Chapter {
-	Title "Calculation in stable regime : temperature gradient of 15.54°C"
+	Title "Calculation in stable regime : temperature gradient of 15.54Â°C"
         visu {
                 Title "VEF Mesh"
                 Width 9cm
@@ -825,7 +825,7 @@ Chapter {
 }
 
 Chapter {
-	Title "Calculation in unstable regime : temperature gradient of 2°C"
+	Title "Calculation in unstable regime : temperature gradient of 2Â°C"
         Description "The VDF and VEF meshes are the same than in the stable case. But due to the different bottom velocity the friction velocity is different too."
 	Description " VEF Mesh :  7 200 meshes , Y+ ~= 40.1, u*=1.05e-2 "
 	Description " VDF Mesh :  7 000 meshes , Y+ ~= 32.6, u*=9.45-3 "

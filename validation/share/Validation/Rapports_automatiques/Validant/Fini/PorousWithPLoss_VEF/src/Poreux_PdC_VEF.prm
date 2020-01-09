@@ -224,12 +224,12 @@ Chapter {
 
 	   Figure {
 	   Title "Temperature profile in case 1)
-	   Description "The temperature is given constant and equal to 1캜"
+	   Description "The temperature is given constant and equal to 1째C"
 	   Dimension 2
 	   Width 12cm
 	   Include_Description_Curves 0
 	   LabelX "x (m)"
-	   LabelY "Temperature (캜)"
+	   LabelY "Temperature (째C)"
 	   RangeY 0.99 1.01
 	   Curve {
 	   	   legend "convection { amont } 2D"
@@ -302,12 +302,12 @@ Chapter {
 
 	Figure {
 	Title "Temperature profile in case 1 and EF_stab scheme"
-	Description "The temperature is constant and equal to 1캜"
+	Description "The temperature is constant and equal to 1째C"
 	Dimension 2
 	Width 12cm
 	Include_Description_Curves 0
 	LabelX "x (m)"
-	LabelY "Temperature (캜)"
+	LabelY "Temperature (째C)"
 	RangeY 0.99 1.01
 	Curve {
 		legend "convection { EF_stab } 3D"
@@ -393,12 +393,12 @@ Chapter {
 
 	  Figure {
 	  Title "Temperature profile in case 2"
-	  Description "The temperature is constant and equal to 1캜."
+	  Description "The temperature is constant and equal to 1째C."
 	  Dimension 2
 	  Width 12cm
 	  Include_Description_Curves 0
 	  LabelX "x (m)"
-	  LabelY "Temperature (캜)"
+	  LabelY "Temperature (째C)"
 	  RangeY 0.99 1.01
 	  Curve {
 		  legend "convection { amont } 2D"

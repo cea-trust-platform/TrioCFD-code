@@ -65,7 +65,7 @@ Chapter {
 		Title "Boundary conditions" 
 		Description "Hydraulic : Periodicity in X and Z directions"
 		Description "Temperature : Imposed wall temperature in Y direction." 
-		Description " T1 = 673 K (400°C); T2 = 1073 K (800°C)."
+		Description " T1 = 673 K (400Â°C); T2 = 1073 K (800Â°C)."
 	}
 	
 	

@@ -22,9 +22,9 @@ Parameters {
 	ParametersTrio_U "Diffusion scheme : default for all equations"
 	ParametersTrio_U "Boundary condition : Velocity inlet, Pressure outlet, Symmetry and Wall"
 	ParametersTrio_U "Wall condition : Imposed temperature"
-#	ParametersTrio_U "Type of fluid : air at 20캜 and 1e5 Pa"
+#	ParametersTrio_U "Type of fluid : air at 20째C and 1e5 Pa"
 	Reference "1. J.W. Baughn, S. Shimizu : Heat transfer measurement from a surface with uniform heat flux and an impinging jet. ASME Journal of Heat Transfer vol 111, 1096-1098 (1989)."
-	Reference "2. D. Cooper, D.C. Jackson, B.E. Launder, G.X. Liao : Impinging jet studies for turbulence model assesment - I. Flow-field experiments. International journal of heat and mass transfer vol 36 n�10, 2675-2684 (1993)."
+	Reference "2. D. Cooper, D.C. Jackson, B.E. Launder, G.X. Liao : Impinging jet studies for turbulence model assesment - I. Flow-field experiments. International journal of heat and mass transfer vol 36 n째10, 2675-2684 (1993)."
 	Reference "3. European Research Community On Flow, Turbulance and Combustion : Normally-Impinging Jet from a Circular Nozzle. http://cfd.mace.manchester.ac.uk/ercoftac, case 25."
 	IncludeData 2
 	Prerequisite "Extract_histogram dom Re23000/Impinging_jet.err  > histo23000"
@@ -38,8 +38,8 @@ Chapter {
 	Description "- Jet diameter D = 0.0265 m"
 	Description "- Jet height H = 2 x D"
 	Description "- Jet Reynolds number = 23000 or 70000"
-	Description "- Jet temperature = 293 K (20캜)"
-	Description "- Plate temperature = 323 K (50캜)"
+	Description "- Jet temperature = 293 K (20째C)"
+	Description "- Plate temperature = 323 K (50째C)"
 	Figure {
 		Width 11cm, viewport=-300 0 460 326, clip
 		picture ./Geom.png
@@ -151,7 +151,7 @@ Chapter {
 	}
 	Table {
 		Title "Physical properties"
-		Description "\latex_(\textbf{Air at 20캜 and 1e5 Pa:}\latex_)"	
+		Description "\latex_(\textbf{Air at 20째C and 1e5 Pa:}\latex_)"	
 		Description "$\rho$ = 1.210 kg/m$^3$"
 		Description "$\mu$ = 1.815e-5 kg/m/s"
 		Description "$\lambda$ = 0.02565 W/m/K"

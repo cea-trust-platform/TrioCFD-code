@@ -17,10 +17,10 @@ Parameters {
 	ParametresTrio_U "Type of Navier Stokes boundary conditions : Inlet velocity, Outlet pressure, Wall on other"
 	ParametresTrio_U "Type of Temperature boundary conditions : Inlet and Outlet temperature, Imposed flux on heated rod, Adiabatic wall on other"
 	IncludeData 2
-	Reference $[1]$ A. Marechal, D. Andreolety, G. Berrebi, F. Girard,Compte rendu d'essais GR16 (2ème campagne d'essais) - NT STT/LTHI/90/184, juillet 1990
+	Reference $[1]$ A. Marechal, D. Andreolety, G. Berrebi, F. Girard,Compte rendu d'essais GR16 (2Ã¨me campagne d'essais) - NT STT/LTHI/90/184, juillet 1990
 	Reference $[2]$ M. Berthoux, Interpretation of sodium tests in GR16 tube bundle using TRIO_VF Thermalhydraulic code. 8th IAHR Working group meeting on advanced Nuclear Reactors Thermalhydraulics, June 13-15 1995
-	Reference $[3]$ M. Berthoux, Synthèse des essais réalisés sur le dispositif en sodium GR16,NT STR/LES/92-069, Mars 1992
-	Reference $[4]$ U. Bieder, V. Barthel, F. Ducros, P. Quéméré, S. Vandroux,CFD calculations of wire wrapped fuel bundles : modelling and validation strategy ; CFD4NRS, 14-16 September 2010, Washington DC
+	Reference $[3]$ M. Berthoux, SynthÃ¨se des essais rÃ©alisÃ©s sur le dispositif en sodium GR16,NT STR/LES/92-069, Mars 1992
+	Reference $[4]$ U. Bieder, V. Barthel, F. Ducros, P. QuÃ©mÃ©rÃ©, S. Vandroux,CFD calculations of wire wrapped fuel bundles : modelling and validation strategy ; CFD4NRS, 14-16 September 2010, Washington DC
 	Prerequisite "Extract_histogram DOM G900/Ef_Stab1.0/GR16.err  > G900/Ef_Stab1.0/histo"
 }
 
@@ -50,7 +50,7 @@ Chapter {
 			values 266	433
 		}
 		line {
-			legend "Inlet temperature (°C)"
+			legend "Inlet temperature (Â°C)"
 			values 302.4	303.3
 		}
 		line {
@@ -120,7 +120,7 @@ Chapter {
 	}
 	Table {
 		Title "Physical properties"
-		Description "Fluid domain: Liquid sodium flow at 350°C \latex_(\hspace*{5mm} Density : $\rho = 868.09$ kg/m$^3$\latex_)"
+		Description "Fluid domain: Liquid sodium flow at 350Â°C \latex_(\hspace*{5mm} Density : $\rho = 868.09$ kg/m$^3$\latex_)"
 		Description "\latex_(\hspace*{74mm}Kinematic viscosity : $\mu = 3.08e-4$\latex_) N/m$^2$/s"
 		Description "\latex_(\hspace*{74mm}Thermal conductivity : $\lambda = 77.06$\latex_) W/m/K"
 		Description "\latex_(\hspace*{74mm}Specific heat capacity : $Cp = 1290.06$\latex_) J/kg/K"
@@ -130,7 +130,7 @@ Chapter {
 		Title "Initial and boundaries conditions"
 		Description "\latex_(\textbf {G900 : Forced convection} \latex_)"
 		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 1.36639 m/s in Z direction,"
-		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 303.3 °C."
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 303.3 Â°C."
 		Description ""
 		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
 		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet,"
@@ -140,14 +140,14 @@ Chapter {
 		Description ""
 		Description "\latex_(\textbf {G1100 : Mixed convection} \latex_)"
 		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 0.170491 m/s in Z direction,"
-		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 302.4 °C."
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 302.4 Â°C."
 		Description ""
 		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
 		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet,"
 		Description "\latex_(\hspace*{45mm}\latex_)Uniform velocity set to 0.527873 m/s in Z direction on inlet."
 		Description "\latex_(\hspace*{45mm}\latex_)Uniform heat flux set to 266 kW/m$^2$ on heated rods, adiabatic otherwise.\newline"
 		Description ""
-		Description "Values of inlet velocity differs from the values of initial condition because the inlet of the domain is made by an annular section (see §3.1)."
+		Description "Values of inlet velocity differs from the values of initial condition because the inlet of the domain is made by an annular section (see Â§3.1)."
 		Description "The turbulent kinetic energy and turbulence dissipation rate were estimated by using these formulations:"
 		Description "\latex_(\hspace*{4.5cm} {\Large $ k \simeq \frac{3}{2}.(U.I)^2$} \hspace*{1cm} I : Turbulence intensity estimated to 10\%\latex_)"
 		Description "\latex_(\hspace*{4.5cm} {\Large $ \varepsilon \simeq C_\mu . {k^{3/2} \over {0.07 . D_h}}$}\latex_)"
@@ -245,14 +245,14 @@ Chapter {
 	Description "- The calculation is performed from the initial time to the starting time statistics, which corresponds to the time that takes a fluid particle to cross the computational domain at the mean velocity of flow,"
 	Description "- The principal quantities are averaged from the starting time statistics to the final time = starting time statistics + 2 physical seconds."
 	Description "The convergence is checked on :"
-	Description "- The X, Y and Z instantaneous velocity time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m , z=0.m)"
-	Description "- The X, Y and Z mean velocity time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m , z=0.m)"
-	Description "- The instantaneous temperature time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m, z=0.m)"
-	Description "- The mean temperature time evolution on the center of subchannel S1 (see §2.1) at Z0 level (x=-0.0330m, y=0.m, z=0.m)"
-	Description "- The instantaneous temperature time evolution on the center of subchannel S3 (see §2.1) at Z3 level (x=-0.0990m, y=0.m, z=-0.750m)"
-	Description "- The mean temperature time evolution on the center of subchannel S3 (see §2.1) at Z3 level (x=-0.0990m, y=0.m, z=-0.750m)"
-	Description "- The instantaneous temperature time evolution on the rod R3 (see §2.1) at Z0 level (x=-0.00715m, y=0.00715m, z=0.m"
-	Description "- The mean temperature time evolution on the rod R3 (see §2.1) at Z0 level (x=-0.00715m, y=0.00715m, z=0.m"
+	Description "- The X, Y and Z instantaneous velocity time evolution on the center of subchannel S1 (see Â§2.1) at Z0 level (x=-0.0330m, y=0.m , z=0.m)"
+	Description "- The X, Y and Z mean velocity time evolution on the center of subchannel S1 (see Â§2.1) at Z0 level (x=-0.0330m, y=0.m , z=0.m)"
+	Description "- The instantaneous temperature time evolution on the center of subchannel S1 (see Â§2.1) at Z0 level (x=-0.0330m, y=0.m, z=0.m)"
+	Description "- The mean temperature time evolution on the center of subchannel S1 (see Â§2.1) at Z0 level (x=-0.0330m, y=0.m, z=0.m)"
+	Description "- The instantaneous temperature time evolution on the center of subchannel S3 (see Â§2.1) at Z3 level (x=-0.0990m, y=0.m, z=-0.750m)"
+	Description "- The mean temperature time evolution on the center of subchannel S3 (see Â§2.1) at Z3 level (x=-0.0990m, y=0.m, z=-0.750m)"
+	Description "- The instantaneous temperature time evolution on the rod R3 (see Â§2.1) at Z0 level (x=-0.00715m, y=0.00715m, z=0.m"
+	Description "- The mean temperature time evolution on the rod R3 (see Â§2.1) at Z0 level (x=-0.00715m, y=0.00715m, z=0.m"
 	Table {
 		Title "Convergence of mixed convection calculations (G1100)"
 	}
@@ -375,7 +375,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution on the center of subchannel S1 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 25
 		RangeY 300 400
 		Include_Description_Curves 0
@@ -401,7 +401,7 @@ Chapter {
 		Description "Mean temperature time evolution on the center of subchannel S1 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 15 25
 		RangeY 300 400
 		Include_Description_Curves 0
@@ -426,7 +426,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution on the rod R3 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 25
 		RangeY 300 400
 		Include_Description_Curves 0
@@ -452,7 +452,7 @@ Chapter {
 		Description "Mean temperature time evolution on the rod R3 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 15 25
 		RangeY 300 400
 		Include_Description_Curves 0
@@ -477,7 +477,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution on the center of subchannel S3 at Z3 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 25
 		RangeY 300 325
 		Include_Description_Curves 0
@@ -503,7 +503,7 @@ Chapter {
 		Description "Mean temperature time evolution on the center of subchannel S3 at Z3 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 15 25
 		RangeY 300 325
 		Include_Description_Curves 0
@@ -646,7 +646,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution on the center of subchannel S1 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 5
 		RangeY 300 330
 		Include_Description_Curves 0
@@ -672,7 +672,7 @@ Chapter {
 		Description "Mean temperature time evolution on the center of subchannel S1 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 5
 		RangeY 300 330
 		Include_Description_Curves 0
@@ -697,7 +697,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution on the rod R3 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 5
 		RangeY 300 340
 		Include_Description_Curves 0
@@ -723,7 +723,7 @@ Chapter {
 		Description "Mean temperature time evolution on the rod R3 at Z0 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 5
 		RangeY 300 340
 		Include_Description_Curves 0
@@ -748,7 +748,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution on the center of subchannel S3 at Z3 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 5
 		RangeY 300 310
 		Include_Description_Curves 0
@@ -774,7 +774,7 @@ Chapter {
 		Description "Mean temperature time evolution on the center of subchannel S3 at Z3 level"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeX 0 5
 		RangeY 300 310
 		Include_Description_Curves 0
@@ -958,7 +958,7 @@ Chapter {
 		Description "Mean temperature profile along the line y=0.001275m at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 360 400
 		Include_Description_Curves 0
 		Curve {
@@ -988,7 +988,7 @@ Chapter {
 		Description "\newpage Mean temperature profile along the line y=0.003825m at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 360 400
 		Include_Description_Curves 0
 		Curve {
@@ -1018,7 +1018,7 @@ Chapter {
 		Description "Mean temperature profile along the line y=0.006375m at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 360 400
 		Include_Description_Curves 0
 		Curve {
@@ -1048,7 +1048,7 @@ Chapter {
 		Description "\newpage Mean temperature profile along the line y=0.m at Z1 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 340 380
 		Include_Description_Curves 0
 		Curve {
@@ -1078,7 +1078,7 @@ Chapter {
 		Description "Mean temperature profile along the line y=0.m at Z2 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 320 360
 		Include_Description_Curves 0
 		Curve {
@@ -1108,7 +1108,7 @@ Chapter {
 		Description "\newpage Mean temperature profile along the line y=0.m at Z3 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1138,7 +1138,7 @@ Chapter {
 		Description "Mean temperature profile on the rod surface 3, 7, 11 and 15 at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 380 420
 		Include_Description_Curves 0
 		legend below
@@ -1326,7 +1326,7 @@ Chapter {
 		Description ""
 		Description "The comparison of temperature profiles confirms that there is no significative difference between the two schemes of convection. All profiles have a good agreement between GR16 experiment and Trio_U calculations. The only two things that can be noted, is that we observed :"
 		Description "- a slight 'desynchronization' between experiment and calculation on profiles that are lower level than Z0,"
-		Description "- that the calculations underestimate the temperature of rods by 2 or 3 °C.\newpage"
+		Description "- that the calculations underestimate the temperature of rods by 2 or 3 Â°C.\newpage"
 	}	
 }
 
@@ -1380,7 +1380,7 @@ Chapter {
 		Description "Mean temperature profile along the line y=0.001275m at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1410,7 +1410,7 @@ Chapter {
 		Description "\newpage Mean temperature profile along the line y=0.003825m at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1440,7 +1440,7 @@ Chapter {
 		Description "Mean temperature profile along the line y=0.006375m at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1470,7 +1470,7 @@ Chapter {
 		Description "\newpage Mean temperature profile along the line y=0.m at Z1 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1500,7 +1500,7 @@ Chapter {
 		Description "Mean temperature profile along the line y=0.m at Z2 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1530,7 +1530,7 @@ Chapter {
 		Description "\newpage Mean temperature profile along the line y=0.m at Z3 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		Curve {
@@ -1560,7 +1560,7 @@ Chapter {
 		Description "Mean temperature profile on the rod surface 3, 7, 11 and 15 at Z0 level"
 		Width 13cm
 		LabelX "X [m]"
-		LabelY "Temperature [°C]"
+		LabelY "Temperature [Â°C]"
 		RangeY 300 340
 		Include_Description_Curves 0
 		legend below
@@ -1747,7 +1747,7 @@ Chapter {
 		Description "The comparison of dimensionless numbers show that there is no significative difference between the two schemes of convection. All two have differences with experiment, on the Reynolds and Peclet numbers, which are not understood. The comparison of the Richardson number, presents less relative difference than in mixed convection flow. This is probably du to the larger range of temperature.\newline"
 		Description ""
 		Description "The comparison of temperature profiles confirms that there is no significative difference between the two schemes of convection. The profiles at bottom level have a good agreement between GR16 experiment and Trio_U calculations, but the higher level profiles differ more."
-		Description "The calculations underestimate the temperature of rods by 5 °C.\newpage"
+		Description "The calculations underestimate the temperature of rods by 5 Â°C.\newpage"
 	}	
 }
 

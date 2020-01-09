@@ -5,7 +5,7 @@ dimension 2
 Pb_Hydraulique_Turbulent pb
 Domaine dom
 # on ne postraite pas directement v pour faire des rotations #
-# on tourne le domaine de 45° #
+# on tourne le domaine de 45Â° #
 
 # BEGIN MESH #
 Mailler dom

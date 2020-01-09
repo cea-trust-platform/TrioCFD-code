@@ -177,7 +177,7 @@ Chapter {
 		Description "\latex_(\[ k=\frac{3}{2}~\tau^2~W^2_0\]\latex_) where \latex_($\tau $\latex_) is the turbulence rate and \latex_($W_0 $\latex_) is the mean velocity in the axial direction. "
 		Description "\latex_(\[ \epsilon=\frac{k^{3/2}}{l}\]\latex_) where l is the characteristic length, such as \latex_($l=2 r_1$\latex_) \newline"
 		Description "\latex_( $\bullet$ \textbf{Thermal problem} : \latex_) "
-		Description "The initial value of the temperature field is set to 0 캜.\newline"
+		Description "The initial value of the temperature field is set to 0 째C.\newline"
 		Description "(Note that the solution for Trio_U temperature is determined up to a constant. So for \latex_($T_0=700~K$\latex_), the temperature solution will differ of 700 K).  
 	}
 	Table { 
@@ -1541,7 +1541,7 @@ Chapter {
 		Width 12.cm
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		#RangeY 350 650
 		legend bottom right
 		Include_Description_Curves 0
@@ -1578,7 +1578,7 @@ Chapter {
 		Width 12.cm
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		#RangeY 350 650
 		legend bottom right
 		Include_Description_Curves 0
@@ -1619,7 +1619,7 @@ Chapter {
 		Width 12cm
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		#RangeY 350 650
 		legend bottom right
 		Include_Description_Curves 0
@@ -1656,7 +1656,7 @@ Chapter {
 		Width 12cm
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		#RangeY 350 650
 		legend bottom right
 		Include_Description_Curves 0
@@ -1697,7 +1697,7 @@ Chapter {
 		Width 12cm
 		LabelX "Time [s]"
 		#RangeX 0. 0.65
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		#RangeY 350 650
 		legend bottom right
 		Include_Description_Curves 0

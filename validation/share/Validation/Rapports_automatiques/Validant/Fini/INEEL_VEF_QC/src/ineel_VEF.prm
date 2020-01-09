@@ -158,22 +158,22 @@ Chapter {
 			nb_columns 4 
 			label Condition at the wall | Scheme | Cell type | Cell number
 			line {
-			      	legend " Run n°1 "
+			      	legend " Run nÂ°1 "
 				file data_set/run_1.dat
 				columns 
 			}
 			line {
-			      	legend " Run n°2 "
+			      	legend " Run nÂ°2 "
 				file data_set/run_2.dat
 				columns 
 			}
 			line {
-			      	legend " Run n°3 "
+			      	legend " Run nÂ°3 "
 				file data_set/run_3.dat
 				columns 
 			}
 			line {
-			      	legend " Run n°4 "
+			      	legend " Run nÂ°4 "
 				file data_set/run_4.dat
 				columns 
 			}
@@ -184,22 +184,22 @@ Chapter {
 			nb_columns 4 
 			label Condition at the wall | Scheme | Cell type | Cell number
 			line {
-			      	legend " Run n°11 "
+			      	legend " Run nÂ°11 "
 				file data_set/run_11.dat
 				columns 
 			}
 			line {
-			      	legend " Run n°12 "
+			      	legend " Run nÂ°12 "
 				file data_set/run_12.dat
 				columns 
 			}
 			line {
-			      	legend " Run n°18 "
+			      	legend " Run nÂ°18 "
 				file data_set/run_18.dat
 				columns 
 			}
 			line {
-			      	legend " Run n°22 "
+			      	legend " Run nÂ°22 "
 				file data_set/run_22.dat
 				columns 
 			}
@@ -222,7 +222,7 @@ Chapter {
 	Description " $\bullet$ (3) \latex_(\textbf{Energy conservation:}\latex_) \latex_($T(y)=T_{\textrm{inlet}} + \frac{P_{\textrm{vol}}. D. P. y}{\rho(y).U(y). S. C_{\textrm{p}}}$\latex_), where \latex_($P_{\textrm{vol}}= 618156\; \textrm{W.m}^{-3}$\latex_) is the volumetric heating. "
 	Description " "
 	Description " $\bullet$ (4) \latex_(\textbf{Momentum conservation (conservative forces):}\latex_) \latex_($\rho(y). U^{2}(y)+P_{\textrm{hyd}}(y) = \rho_{\textrm{inlet}}. U^{2}_{\textrm{inlet}}+P_{\textrm{hyd\ inlet}}$\latex_)
-# values based on the INEEL experiment n°635 
+# values based on the INEEL experiment nÂ°635 
 	Table {
 			Title "INEEL values"
 			Description "The different values are based on the INEEL experiment 635 (see $[1]$): "
@@ -619,7 +619,7 @@ Chapter {
 	Description " With non slip conditions at the walls and a parabolic velocity profile at the entry, the different profiles in the tube are not flat any more. The different bulk values must be calculated by averages on the cross section of the flow. For the bulk values, the analytical mass conservation equation, perfect gas equation and energy conservation equation are still verified. Thus, the bulk temperature, density and velocity are still fitting perfectly the analytical calculation (see below curves). Due to the parabolic profile induced by wall friction, the analytical momentum conservation equation is not verified any more. This leads to a higher calculated pressure loss, as seen below. "
 	Description " "
 	Description " Moreover, the method used yields approximate results since distance between probes are taken equidistant for convenience.  In order to get accurate values, the probes ought to be located exactly at the position where the fields are discretized by Triou_U. For example in the VEF case, the fields are discretized at the gravity center of the tetrahedrical faces. "
-	Description " A Muscl scheme employed for the run 3 might lead to results closer to those of the run 1. In the present case, the run 3 presents lower values of radial temperature near the walls (about 20 °C), and lower values of axial velocities along the tube (about 0.1 m/s). "
+	Description " A Muscl scheme employed for the run 3 might lead to results closer to those of the run 1. In the present case, the run 3 presents lower values of radial temperature near the walls (about 20 Â°C), and lower values of axial velocities along the tube (about 0.1 m/s). "
 	Description " "
 	Description " When the wall friction is added in the analytical solution, the calculation and the analytical results fit quite well at the entrance of the tube. At the exit of the tube, as the effects of compressibility are not taken into account in the friction correlations, some differences between analytical and calculated values are observed. "
 
@@ -1454,7 +1454,7 @@ Chapter {
 			nb_columns 1
 			label " % "
 			line {
-				legend " Run n°1 "
+				legend " Run nÂ°1 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1462,7 +1462,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°2 "
+				legend " Run nÂ°2 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1470,7 +1470,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°3 "
+				legend " Run nÂ°3 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1478,7 +1478,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°4 "
+				legend " Run nÂ°4 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1486,7 +1486,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°11 "
+				legend " Run nÂ°11 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1494,7 +1494,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°12 "
+				legend " Run nÂ°12 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1502,7 +1502,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°18 "
+				legend " Run nÂ°18 "
 				origin "Trio_U"
 				nb_columns_file 1
 				last_line
@@ -1510,7 +1510,7 @@ Chapter {
 				columns
 			}
 			line {
-				legend " Run n°22 "
+				legend " Run nÂ°22 "
 				origin "Trio_U"
 				nb_columns_file 4
 				nb_columns_file 1
