@@ -72,11 +72,13 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           for (int k=0; k<dimension; k++)
             coord(i,k)+=ALE_mesh_velocity(i,k)*dt_;
         }
+
       //On recalcule les vitesses aux faces
       Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
       int nb_faces=la_zone_VF.nb_faces();
       int nb_som_face=la_zone_VF.nb_som_face();
       IntTab& face_sommets=la_zone_VF.face_sommets();
+      creer_mes_domaines_frontieres(la_zone_VF);//update the boundary surface domain
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
       //On recalcule les metriques
@@ -110,20 +112,11 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           la_zone_VF.volumes_entrelaces()=0;
           la_zone_VEF.calculer_volumes_entrelaces();
 
-          // Recalcul des surfaces avec les normales:
+
           // PL: je trouve etonnant que le calcul des surfaces se fasse AVANT le calcul des normales
           // PL: il devrait se faire APRES
-          int nb_faces_tot=face_sommets.dimension_tot(0);
-          DoubleVect face_surfaces_(nb_faces_tot);
-          for (int i=0; i<nb_faces_tot; i++)
-            {
-              double surf=0;
-              for (int k=0; k<dimension; k++)
-                surf += (la_zone_VF.face_normales(i,k)*la_zone_VF.face_normales(i,k));
-              face_surfaces_(i) = sqrt(surf);
-            }
-          la_zone_VF.calculer_face_surfaces(face_surfaces_);
 
+          int nb_faces_tot=face_sommets.dimension_tot(0);
           la_zone_VEF.calculer_h_carre();
           const Elem_VEF& type_elem=la_zone_VEF.type_elem();
 
@@ -144,6 +137,19 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
               la_zcl_VEF.remplir_volumes_entrelaces_Cl(la_zone_VEF);
               la_zcl_VEF.remplir_normales_facettes_Cl(la_zone_VEF );
             }
+
+          // Recalcul des surfaces avec les normales:
+          DoubleVect face_surfaces_(nb_faces_tot);
+          for (int i=0; i<nb_faces_tot; i++)
+            {
+              double surf=0;
+              for (int k=0; k<dimension; k++)
+                surf += (la_zone_VF.face_normales(i,k)*la_zone_VF.face_normales(i,k));
+              face_surfaces_(i) = sqrt(surf);
+            }
+          la_zone_VF.calculer_face_surfaces(face_surfaces_);
+
+
         }
       else
         {
