@@ -29,6 +29,7 @@
 #include <Fluide_Incompressible.h>
 #include <Domaine.h>
 #include <Param.h>
+#include <Champ_Uniforme.h>
 
 static const double TSAT_CONSTANTE = 0.;
 
@@ -56,6 +57,7 @@ Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
 {
   // Ne pas faire assert(fluide non nul)
   Convection_Diffusion_std::readOn(is);
+  solveur_masse->set_name_of_coefficient_temporel("rho_cp_comme_T");
   Nom num=inconnue().le_nom(); // On prevoir le cas d'equation de scalaires passifs
   num.suffix("temperature_thermique");
   Nom nom="Convection_chaleur";
@@ -422,13 +424,45 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
 
   //  static const Stat_Counter_Id count3 = statistiques().new_counter(1, "convection_T", 0);
   //  statistiques().begin_count(count3);
-  terme_convectif.ajouter(temperature, derivee);
+  {
+    const double temps = schema_temps().temps_courant();
+    update_rho_cp(temps);
+    const DoubleTab& rhoCp = get_champ("rho_cp_comme_T").valeurs();
+    DoubleTab derivee_tmp(derivee);
+    derivee_tmp = 0.;
+    terme_convectif.ajouter(temperature, derivee_tmp);
+    derivee_tmp *= rhoCp;
+    derivee += derivee_tmp;
+  }
   //  statistiques().end_count(count3);
 
 
   solveur_masse.appliquer(derivee);
 
   return derivee;
+}
+
+void Convection_Diffusion_Temperature_FT_Disc::update_rho_cp(double temps)
+{
+  rho_cp_comme_T_.changer_temps(temps);
+  rho_cp_comme_T_.valeur().changer_temps(temps);
+  DoubleTab& rho_cp = rho_cp_comme_T_.valeurs();
+  rho_cp = 0.;
+
+  const Champ_Don& ch_rho = fluide_dipha_.valeur().fluide_phase(phase_).masse_volumique(),
+                   &ch_cp = fluide_dipha_.valeur().fluide_phase(phase_).capacite_calorifique();
+  if (sub_type(Champ_Uniforme, ch_rho.valeur()))
+    rho_cp = ch_rho.valeurs()(0, 0);
+  else
+    {
+      // AB: rho_cp = rho.valeurs() turns rho_cp into a 2 dimensional array with 1 compo. We want to stay mono-dim:
+      rho_cp = 1.;
+      tab_multiply_any_shape(rho_cp, ch_rho.valeurs());
+    }
+  if (sub_type(Champ_Uniforme, ch_cp.valeur()))
+    rho_cp *= ch_cp.valeurs()(0, 0);
+  else
+    tab_multiply_any_shape(rho_cp, ch_cp.valeurs());
 }
 
 void Convection_Diffusion_Temperature_FT_Disc::mettre_a_jour (double temps)
@@ -517,6 +551,10 @@ void Convection_Diffusion_Temperature_FT_Disc::discretiser()
   dis.discretiser_champ("vitesse", une_zone_dis, nom, "m/s", -1 /* nb composantes par defaut */, 1 /* valeur temporelle */, temps, vitesse_convection_);
   champs_compris.add(vitesse_convection_.valeur());
   champs_compris_.ajoute_champ(vitesse_convection_);
+  dis.discretiser_champ("temperature", une_zone_dis, "rho_cp_comme_T", "J/m^3/K", 1, temps, rho_cp_comme_T_);
+  dis.discretiser_champ( "champ_elem", une_zone_dis,    "rho_cp_elem", "J/m^3/K", 1, temps,    rho_cp_elem_);
+  champs_compris_.ajoute_champ(rho_cp_comme_T_);
+
   Equation_base::discretiser();
 }
 
