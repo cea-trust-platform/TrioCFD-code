@@ -17,7 +17,7 @@ Read dis { P0 P1 Changement_de_base_P1bulle 1  Modif_div_face_dirichlet 1 }
 
 Schema_Euler_implicite sch
 
-Read sch 
+Read sch
 {
         tinit 0.
 	nb_pas_dt_max 3
@@ -27,14 +27,14 @@ Read sch
 	dt_start dt_calc
         dt_impr 0.1
         dt_sauv 1.
-        seuil_statio 1.e-12  
+        seuil_statio 1.e-12
 	facsec 5
         facsec_max 500
         Solveur
            Implicite
            {
-                seuil_convergence_solveur 1.e-8
-		
+                seuil_convergence_solveur 1.e-11
+
            }
 }
 
@@ -58,21 +58,21 @@ Read pb
 	Navier_Stokes_Turbulent
 		{
 		solveur_pression GCP {
-			 precond ssor { omega 1.5 } seuil 1e-9   
+			 precond ssor { omega 1.5 } seuil 1e-9
 		}
                 convection { EF_stab { } }
                 diffusion  {  }
-               
+
 		conditions_initiales
 			{
                         vitesse Champ_fonc_xyz DOM_BODY 3  10. 0.  0.
 			}
 		boundary_conditions
 			{
-			
-			INLET    frontiere_ouverte_vitesse_imposee Champ_front_recyclage { 
-											pb_champ_evaluateur pb vitesse 3 
-											moyenne_imposee connexion_approchee fichier FICHIER_V_PREPARE 
+
+			INLET    frontiere_ouverte_vitesse_imposee Champ_front_recyclage {
+											pb_champ_evaluateur pb vitesse 3
+											moyenne_imposee connexion_approchee fichier FICHIER_V_PREPARE
 											ampli_moyenne_imposee 3 1. 1. 1.
 											ampli_moyenne_recyclee 3 0. 0. 0.
 											ampli_fluctuation 3 0. 0. 0.
@@ -80,7 +80,7 @@ Read pb
 
 			OUTLE    frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
 			FRONT    symetrie
-			BACK     symetrie 			 
+			BACK     symetrie
 			HAUT     paroi_fixe
 			BAS      paroi_fixe
 			}
@@ -90,23 +90,23 @@ Read pb
 		         convection { EF_stab { } }
 		         diffusion { }
 		         boundary_conditions {
-				 
+
 				FRONT	 symetrie
-				BACK     symetrie 
+				BACK     symetrie
 				HAUT     paroi
 				BAS      paroi
-				INLET    frontiere_ouverte_K_eps_impose Champ_front_recyclage { 
-											pb_champ_evaluateur pb k_eps 2 
-											moyenne_imposee connexion_approchee fichier FICHIER_K_PREPARE 
-											ampli_moyenne_imposee 2 1. 1. 
-											ampli_moyenne_recyclee 2 0. 0. 
-											ampli_fluctuation 2 0. 0. 
+				INLET    frontiere_ouverte_K_eps_impose Champ_front_recyclage {
+											pb_champ_evaluateur pb k_eps 2
+											moyenne_imposee connexion_approchee fichier FICHIER_K_PREPARE
+											ampli_moyenne_imposee 2 1. 1.
+											ampli_moyenne_recyclee 2 0. 0.
+											ampli_fluctuation 2 0. 0.
 											 }
 
 				OUTLE    frontiere_ouverte k_eps_ext Champ_Front_Uniforme 2 0.375 0.2296
 		         }
 
-			 parametre_equation parametre_implicite 
+			 parametre_equation parametre_implicite
 			{
 				resolution_explicite
 			}
@@ -122,9 +122,9 @@ Read pb
 	}
 
 	Postraitement
-        	{       
+        	{
                 Sondes
-                	{ 
+                	{
                         sonde_vit  vitesse periode 0.1 segment 20 1.0 0. 0.4 1.0 2.0 0.4
 			sonde_vit2 vitesse periode 0.1 segment 20 2.0 0. 0.4 2.0 2.0 0.4
 			sonde_vit3 vitesse periode 0.1 segment 20 8.0 0. 0.4 8.0 2.0 0.4
