@@ -141,6 +141,8 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
+  const Fluide_Incompressible& le_fluide   = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
 
   if (!sub_type(ParoiVDF_TBLE,loi.valeur()))
     {
@@ -184,6 +186,7 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
+  termes_sources /= rhoCp;
 
   double T0=0.;// temperature de paroi
 
@@ -261,10 +264,11 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const double& tps = eqn_temp.schema_temps().temps_courant();
   const double& dt = eqn_temp.schema_temps().pas_de_temps();
   const double& dt_min = eqn_temp.schema_temps().pas_temps_min();
-
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
+  termes_sources /= rhoCp;
 
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());

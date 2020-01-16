@@ -153,10 +153,11 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
       loipar->calculer_scal(la_diffusivite_turbulente);
     }
   const Probleme_base& mon_pb = mon_equation->probleme();
+  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
+  const DoubleTab& tab_Cp = mon_pb.milieu().capacite_calorifique().valeurs();
+  const DoubleTab& tab_rho = mon_pb.milieu().masse_volumique().valeurs();
   if (sub_type(Pb_Thermohydraulique_Turbulent_QC,mon_pb))
     {
-      DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-      const DoubleTab& tab_Cp = mon_pb.milieu().capacite_calorifique().valeurs();
       double cp=-1;
       if (tab_Cp.nb_dim()==2)
         {
@@ -171,6 +172,7 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
         }
       multiplier_par_rho_si_qc(alpha_t,mil);
     }
+  else alpha_t *= tab_rho(0, 0) * tab_Cp(0, 0);
   la_diffusivite_turbulente->valeurs().echange_espace_virtuel();
 }
 

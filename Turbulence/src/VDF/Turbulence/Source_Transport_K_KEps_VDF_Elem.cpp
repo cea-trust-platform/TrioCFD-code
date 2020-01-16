@@ -470,7 +470,9 @@ DoubleTab& Source_Transport_K_KEps_anisotherme_VDF_Elem::ajouter(DoubleTab& resu
   const DoubleTab& visco_turb = mon_eq_transport_K_Eps->modele_turbulence().viscosite_turbulente().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire =
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
+  DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
+  double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
+  alpha_turb /= rhocp;
   const DoubleTab& g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   const DoubleVect& volumes = zone_VDF.volumes();

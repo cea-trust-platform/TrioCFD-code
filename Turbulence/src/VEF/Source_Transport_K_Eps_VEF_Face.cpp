@@ -391,7 +391,9 @@ DoubleTab& Source_Transport_K_Eps_anisotherme_VEF_Face::ajouter(DoubleTab& resu)
   const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
+  DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
+  double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
+  alpha_turb /= rhocp;
   const DoubleTab& g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
@@ -481,7 +483,9 @@ DoubleTab& Source_Transport_K_Eps_aniso_therm_concen_VEF_Face::ajouter(DoubleTab
   const DoubleTab& concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire =
     ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
+  DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
+  double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
+  alpha_turb /= rhocp;
   const DoubleVect& g = gravite->valeurs();
   const Champ_Don& ch_beta_temper = beta_t.valeur();
   const Champ_Don& ch_beta_concen = beta_c.valeur();

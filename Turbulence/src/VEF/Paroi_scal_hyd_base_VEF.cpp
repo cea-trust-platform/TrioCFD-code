@@ -195,9 +195,6 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
 
   const Champ_Fonc& la_diffusivite_turbulente = mon_modele_turb_scal->diffusivite_turbulente();
   DoubleTab alpha_t = la_diffusivite_turbulente.valeurs();
-  diviser_par_rho_si_qc(alpha_t,le_fluide);
-  const Champ_Don& masse_volumique = le_fluide.masse_volumique();
-  const Champ_Don& capacite_calorifique = le_fluide.capacite_calorifique();
 
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
@@ -263,7 +260,6 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
               double x=zone_VEF.xv(num_face,0);
               double y=zone_VEF.xv(num_face,1);
               double lambda,lambda_t;
-              double rho,Cp;
               elem = face_voisins(num_face,0);
               if (elem == -1)
                 elem = face_voisins(num_face,1);
@@ -276,27 +272,8 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
                   else
                     lambda = conductivite(elem,0);
                 }
-              if (sub_type(Champ_Uniforme,masse_volumique.valeur()))
-                rho = masse_volumique(0,0);
-              else
-                {
-                  if (masse_volumique.nb_comp()==1)
-                    rho = masse_volumique(elem);
-                  else
-                    rho = masse_volumique(elem,0);
-                }
-              if (sub_type(Champ_Uniforme,capacite_calorifique.valeur()))
-                Cp = capacite_calorifique(0,0);
-              else
-                {
-                  if (capacite_calorifique.nb_comp()==1)
-                    Cp = capacite_calorifique(elem);
-                  else
-                    Cp = capacite_calorifique(elem,0);
-                }
-              if (sub_type(Fluide_Quasi_Compressible,le_fluide))
-                alpha_t(elem) /= Cp;
-              lambda_t=alpha_t(elem)*rho*Cp;
+
+              lambda_t=alpha_t(elem);
               if (dimension == 2)
                 Nusselt << x << "\t| " << y;
               if (dimension == 3)
@@ -330,7 +307,7 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
                   // dans ce cas on va imprimer Tfluide (moyenne premiere maille), Tface et on Tparoi recalcule avec d_equiv
                   const Neumann_paroi& la_cl_neum = ref_cast(Neumann_paroi,la_cl_th.valeur());
                   double tparoi = temperature(num_face);
-                  double flux = la_cl_neum.flux_impose(num_face-ndeb)*rho*Cp;
+                  double flux = la_cl_neum.flux_impose(num_face-ndeb);
                   double tparoi_equiv = tfluide+flux/(lambda+lambda_t)*d_equiv;
                   Nusselt << "\t| " << d_equiv << "\t| " << (lambda+lambda_t)/lambda*tab_d_reel_[num_face]/d_equiv << "\t| " << (lambda+lambda_t)/d_equiv << "\t| " << tfluide << "\t| " << tparoi << "\t| " << tparoi_equiv << finl;
                 }

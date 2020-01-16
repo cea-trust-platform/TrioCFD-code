@@ -75,10 +75,6 @@ Entree& Neumann_paroi_rayo_semi_transp_VDF::readOn(Entree& is)
 
 double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
 {
-  const Milieu_base& le_milieu=ma_zone_cl_dis->equation().milieu();
-  const DoubleTab& rho = le_milieu.masse_volumique().valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
-
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
@@ -88,36 +84,13 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
   if (elem == -1)
     elem = face_voisins(ndeb+i,1);
 
-  double d_rho;
-  assert(le_milieu.masse_volumique().nb_comp() == 1);
-  if(sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
-    d_rho = rho(0,0);
-  else if (rho.nb_dim() == 1)
-    d_rho = rho(elem);
-  else
-    d_rho = rho(elem,0);
-
-  double d_Cp;
-  assert(le_milieu.capacite_calorifique().nb_comp() == 1);
-  if(sub_type(Champ_Uniforme,le_milieu.capacite_calorifique().valeur()))
-    d_Cp = Cp(0,0);
-  else if (rho.nb_dim() == 1)
-    d_Cp = Cp(elem);
-  else
-    d_Cp = Cp(elem,0);
-  // dans le cas non incompressible on ne doit pas diviser par rhocp
-  if (!sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
-    {
-      d_rho=1;
-      d_Cp=1;
-    }
   double signe = 1;
   const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   if (le_champ_front.valeurs().size()==1)
-    return signe*(le_champ_front(0,0)-flux_radiatif(i,0))/(d_rho*d_Cp);
+    return signe * le_champ_front(0,0)-flux_radiatif(i,0);
   else if (le_champ_front.valeurs().dimension(1)==1)
-    return signe*(le_champ_front(i,0)-flux_radiatif(i,0))/(d_rho*d_Cp);
+    return signe * (le_champ_front(i,0) - flux_radiatif(i,0));
   else
     Cerr << "Neumann_paroi_rayo_semi_transp_VDF::flux_impose erreur" << finl;
 
@@ -127,10 +100,6 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i) const
 
 double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i,int j) const
 {
-  const Milieu_base& le_milieu=ma_zone_cl_dis->equation().milieu();
-  const DoubleTab& rho = le_milieu.masse_volumique().valeurs();
-  const DoubleTab& Cp = le_milieu.capacite_calorifique().valeurs();
-
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_Cl_dis().zone_dis().valeur());
   const IntTab& face_voisins = zvdf.face_voisins();
   const Front_VF& front_vf = ref_cast(Front_VF,frontiere_dis());
@@ -140,36 +109,12 @@ double Neumann_paroi_rayo_semi_transp_VDF::flux_impose(int i,int j) const
   if (elem == -1)
     elem = face_voisins(ndeb+i,1);
 
-  double d_rho;
-  assert(le_milieu.masse_volumique().nb_comp() == 1);
-  if(sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
-    d_rho = rho(0,0);
-  else if (rho.nb_dim() == 1)
-    d_rho = rho(elem);
-  else
-    d_rho = rho(elem,0);
-
-  double d_Cp;
-  assert(le_milieu.capacite_calorifique().nb_comp() == 1);
-  if(sub_type(Champ_Uniforme,le_milieu.capacite_calorifique().valeur()))
-    d_Cp = Cp(0,0);
-  else if (rho.nb_dim() == 1)
-    d_Cp = Cp(elem);
-  else
-    d_Cp = Cp(elem,0);
-  // dans le cas non incompressible on ne doit pas diviser par rhocp
-  if (!sub_type(Champ_Uniforme,le_milieu.masse_volumique().valeur()))
-    {
-      d_rho=1;
-      d_Cp=1;
-    }
-
   const DoubleTab& flux_radiatif = modele().flux_radiatif(frontiere_dis().le_nom()).valeurs();
 
   if (le_champ_front.valeurs().dimension(0)==1)
-    return (le_champ_front(0,j)-flux_radiatif(i))/(d_rho*d_Cp);
+    return le_champ_front(0,j)-flux_radiatif(i);
   else
-    return (le_champ_front(i,j)-flux_radiatif(i))/(d_rho*d_Cp);
+    return le_champ_front(i,j)-flux_radiatif(i);
 
   return 0;
 }

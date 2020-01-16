@@ -60,47 +60,7 @@ DoubleTab& Source_rayo_semi_transp_QC_VEF_P1NC::calculer(DoubleTab& resu) const
 
 DoubleTab& Source_rayo_semi_transp_QC_VEF_P1NC::ajouter(DoubleTab& resu) const
 {
-  Debog::verifier("Source_rayo_semi_transp_QC_VEF_P1NC::ajouter resu debut ",resu);
-  DoubleTab resu_tmp(resu);
-  le_source_rayo.calculer(resu_tmp);
-  // C'est la que l'on multiplie le terme source par rho*cp
-
-  const Zone_VEF& zvef = ref_cast(Zone_VEF,equation().zone_dis().valeur());
-  int nb_faces = zvef.nb_faces();
-  const Milieu_base& fluide = equation().milieu();
-  const DoubleTab& rho = fluide.masse_volumique().valeurs();
-  const DoubleTab& cp = fluide.capacite_calorifique().valeurs();
-
-  int face;
-  for (face=0; face<nb_faces; face++)
-    {
-      double val_rho;
-      assert(fluide.masse_volumique().nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.masse_volumique().valeur()))
-        val_rho = rho(0,0);
-      else if (rho.nb_dim() == 1)
-        val_rho = rho(face);
-      else
-        val_rho = rho(face,0);
-
-      double val_cp;
-      assert(fluide.capacite_calorifique().nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.capacite_calorifique().valeur()))
-        val_cp = cp(0,0);
-      else
-        ////val_cp = cp(face,0);
-        if (cp.nb_dim() == 1)
-          val_cp = cp(face);
-        else
-          val_cp = cp(face,0);
-
-      resu_tmp(face) *= val_rho*val_cp;
-    }
-
-  resu+=resu_tmp;
-  resu.echange_espace_virtuel();
-  Debog::verifier("Source_rayo_semi_transp_QC_VEF_P1NC::ajouter resu fin ",resu);
-  return resu;
+  return le_source_rayo.ajouter(resu);
 }
 
 

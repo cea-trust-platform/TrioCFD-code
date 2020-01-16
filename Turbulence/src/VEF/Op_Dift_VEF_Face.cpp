@@ -93,11 +93,16 @@ double Op_Dift_VEF_Face::calculer_dt_stab() const
   const Zone_VEF& la_zone_VEF = la_zone_vef.valeur();
   //const DoubleVect& porosite_elem = la_zone_VEF.porosite_elem();
 
-
-
   const Zone& la_zone= la_zone_VEF.zone();
 
-  const DoubleVect& diffu_turb=la_diffusivite_turbulente->valeurs();
+  DoubleVect diffu_turb(la_diffusivite_turbulente->valeurs());
+  DoubleTab diffu(nu_);
+  if (equation().que_suis_je().debute_par("Convection_Diffusion_Temp"))
+    {
+      double rhocp = mon_equation->milieu().capacite_calorifique().valeurs()(0, 0) * mon_equation->milieu().masse_volumique().valeurs()(0, 0);
+      diffu_turb /= rhocp;
+      diffu /= rhocp;
+    }
   double alpha;
 
   int la_zone_nb_elem=la_zone.nb_elem();
@@ -107,7 +112,7 @@ double Op_Dift_VEF_Face::calculer_dt_stab() const
       assert(rho_elem.size_array()==la_zone_VEF.nb_elem_tot());
       for (int num_elem=0; num_elem<la_zone_nb_elem; num_elem++)
         {
-          alpha = nu_[num_elem] + diffu_turb[num_elem]; // PQ : 06/03
+          alpha = diffu[num_elem] + diffu_turb[num_elem]; // PQ : 06/03
           alpha/=rho_elem[num_elem];
           // dt=1/(dimension/(pas*pas))/(2*alpha)
 
@@ -138,10 +143,10 @@ double Op_Dift_VEF_Face::calculer_dt_stab() const
           int nb_dim = valeurs_diffusivite.nb_dim();
           for (int num_elem=0; num_elem<la_zone_nb_elem; num_elem++)
             {
-              alpha =  nu_[num_elem] + diffu_turb[num_elem]; // PQ : 06/03
+              alpha =  diffu[num_elem] + diffu_turb[num_elem]; // PQ : 06/03
               if(unif_diffu_dt==0)
                 valeurs_diffusivite_dt=(nb_dim==1?valeurs_diffusivite(num_elem):valeurs_diffusivite(num_elem,0));
-              alpha*=valeurs_diffusivite_dt/(nu_[num_elem]+DMINFLOAT);
+              alpha*=valeurs_diffusivite_dt/(diffu[num_elem]+DMINFLOAT);
               // dt=1/(dimension/(pas*pas))/(2*alpha)
               coef=la_zone_VEF.carre_pas_maille(num_elem)/(2.*dimension*(alpha+DMINFLOAT));
               assert(coef>=0);
@@ -156,10 +161,10 @@ double Op_Dift_VEF_Face::calculer_dt_stab() const
             {
               for (int num_elem=0; num_elem<la_zone_nb_elem; num_elem++)
                 {
-                  alpha =  nu_(num_elem,nc) + diffu_turb[num_elem];
+                  alpha =  diffu(num_elem,nc) + diffu_turb[num_elem];
                   //if(unif_diffu_dt==0)
                   valeurs_diffusivite_dt=valeurs_diffusivite(0,nc);
-                  alpha*=valeurs_diffusivite_dt/(nu_(num_elem,nc)+DMINFLOAT);
+                  alpha*=valeurs_diffusivite_dt/(diffu(num_elem,nc)+DMINFLOAT);
                   coef=la_zone_VEF.carre_pas_maille(num_elem)/(2.*dimension*(alpha+DMINFLOAT));
 
                   if (coef<dt_stab) dt_stab = coef;

@@ -328,10 +328,12 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const Milieu_base& le_milieu_fluide      = eqn_hydr.milieu();
   const DoubleTab& lambda_f                = le_milieu_fluide.conductivite().valeurs();
+  const double rhoCp = le_milieu_fluide.capacite_calorifique().valeurs()(0, 0) * le_milieu_fluide.masse_volumique().valeurs()(0, 0);
 
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
+  termes_sources /= rhoCp;
 
   // TEMP
   const DoubleTab& xv = zone_VDF.xv();

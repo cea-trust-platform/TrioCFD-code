@@ -93,7 +93,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
   const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
   const DoubleTab& temperature = equation().inconnue().valeurs();
   const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,equation().milieu());
-  const Champ_Don& alpha = fluide.diffusivite();
+  const Champ_Don& alpha = fluide.conductivite();
   int alpha_uniforme = (sub_type(Champ_Uniforme,alpha.valeur()) ? 1 : 0);
   const Convection_Diffusion_Temperature& eq_th = ref_cast(Convection_Diffusion_Temperature,equation());
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_th.get_modele(TURBULENCE).valeur());

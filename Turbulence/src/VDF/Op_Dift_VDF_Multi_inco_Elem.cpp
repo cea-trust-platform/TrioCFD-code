@@ -118,12 +118,19 @@ void Op_Dift_VDF_Multi_inco_Elem::completer()
 
 double Op_Dift_VDF_Multi_inco_Elem::calculer_dt_stab() const
 {
-  double dt_stab;
-  double coef;
+  double coef = -1e10;
   const Zone_VDF& zone_VDF = iter.zone();
   const IntTab& elem_faces = zone_VDF.elem_faces();
-  const DoubleVect& alpha = diffusivite().valeurs();
+  const DoubleVect& alpha = diffusivite_pour_pas_de_temps().valeurs();
   const DoubleVect& alpha_t = la_diffusivite_turbulente->valeurs();
+  int is_QC = mon_equation->probleme().is_QC();
+  bool is_concentration = (equation().que_suis_je().debute_par("Convection_Diffusion_Concentration") || equation().que_suis_je().debute_par("Convection_Diffusion_fraction"));
+  const double alpha_lam = max_array(alpha);
+  if (!sub_type(Champ_Uniforme, diffusivite()))
+    {
+      Cerr << "Error in Op_Dift_VDF_Multi_inco_Elem::calculer_dt_stab(): diffusivity must be of type Champ_Uniforme" << finl;
+      exit();
+    }
 
   // Calcul du pas de temps de stabilite :
   //
@@ -140,48 +147,28 @@ double Op_Dift_VDF_Multi_inco_Elem::calculer_dt_stab() const
   //            i decrivant l'ensemble des elements du maillage
   //
 
-  coef= -1.e10;
-  double alpha_local,h_x,h_y,h_z;
-  if (!sub_type(Champ_Uniforme, diffusivite()))
+  for (int elem = 0; elem < zone_VDF.nb_elem(); elem++)
     {
-      Cerr << "Error in Op_Dift_VDF_Multi_inco_Elem::calculer_dt_stab(): diffusivity must be of type Champ_Uniforme" << finl;
-      exit();
-    }
-  double alpha_lam = max_array(alpha);
-
-  if (dimension == 2)
-    {
-      int numfa[4];
-      for (int elem=0; elem<zone_VDF.nb_elem(); elem++)
+      // choix du facteur
+      double rcp = 0.;
+      if (is_concentration) rcp = 1.;
+      else if (is_QC)
         {
-          for (int i=0; i<4; i++)
-            numfa[i] = elem_faces(elem,i);
-          h_x = zone_VDF.dist_face(numfa[0],numfa[2],0);
-          h_y = zone_VDF.dist_face(numfa[1],numfa[3],1);
-          alpha_local = (alpha_lam + alpha_t(elem))
-                        *(1/(h_x*h_x) + 1/(h_y*h_y));
-          coef = max(coef,alpha_local);
+          const DoubleTab& tab_Cp = mon_equation->milieu().capacite_calorifique().valeurs();
+          rcp = mon_equation->milieu().masse_volumique()(elem) * ((tab_Cp.nb_dim()==2) ? tab_Cp(0,0) : tab_Cp(elem));
         }
-    }
+      else rcp = mon_equation->milieu().capacite_calorifique().valeurs()(0, 0) * mon_equation->milieu().masse_volumique().valeurs()(0, 0);
 
-  else if (dimension == 3)
-    {
+      double moy = 0.;
       int numfa[6];
-      for (int elem=0; elem<zone_VDF.nb_elem(); elem++)
-        {
-          for (int i=0; i<6; i++)
-            numfa[i] = elem_faces(elem,i);
-          h_x = zone_VDF.dist_face(numfa[0],numfa[3],0);
-          h_y = zone_VDF.dist_face(numfa[1],numfa[4],1);
-          h_z = zone_VDF.dist_face(numfa[2],numfa[5],2);
-          alpha_local = (alpha_lam + alpha_t(elem))
-                        *(1/(h_x*h_x) + 1/(h_y*h_y) + 1/(h_z*h_z));
-          coef = max(coef,alpha_local);
-        }
+      for (int i = 0; i < 2 * dimension; i++) numfa[i] = elem_faces(elem, i);
+      for (int d = 0; d < dimension; ++d) moy += 1. / (zone_VDF.dist_face(numfa[d], numfa[dimension + d], d));
+      const double alpha_local = (alpha_lam + alpha_t(elem)) / rcp * moy;
+      coef = max(coef, alpha_local);
     }
 
   coef = Process::mp_max(coef);
-  dt_stab = 1/(2*(coef+DMINFLOAT));
+  double dt_stab = 1. / (2. * (coef + DMINFLOAT));
 
   return dt_stab;
 }

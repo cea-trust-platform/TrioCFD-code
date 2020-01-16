@@ -160,6 +160,11 @@ int Modele_turb_scal_sm_dyn_VDF::lire_motcle_non_standard(
 void Modele_turb_scal_sm_dyn_VDF::mettre_a_jour(double )
 {
   calculer_diffusivite_turbulente();
+  const Milieu_base& le_milieu=equation().probleme().milieu();
+  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
+  const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
+  const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
+  alpha_t *= tab_rho(0, 0) * tab_Cp(0, 0);
   la_diffusivite_turbulente->valeurs().echange_espace_virtuel();
 }
 
