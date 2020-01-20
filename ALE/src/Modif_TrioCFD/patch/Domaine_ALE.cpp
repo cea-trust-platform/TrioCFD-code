@@ -160,7 +160,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 }
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
-  Cerr << "Domaine_ALE::initialiser  " << finl;
+  //Cerr << "Domaine_ALE::initialiser  " << finl;
 
   deformable_=1;
   zone(0).invalide_octree();
@@ -329,7 +329,7 @@ DoubleTab& Domaine_ALE::calculer_vitesse_faces(DoubleTab& vit_maillage,int nb_fa
 
 DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb, const DoubleTab& vit_bords, DoubleTab& ch_som)
 {
-  Cerr << "Domaine_ALE::laplacien" << finl;
+  //Cerr << "Domaine_ALE::laplacien" << finl;
   const Zone& lazone = les_zones(0);
   int nb_elem_tot = lazone.nb_elem_tot();
   //int nbsom = lazone.nb_som();
@@ -426,8 +426,8 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
     mat.remplir(voisins, coeffs, diag) ;
     mat.compacte() ;
     mat.set_est_definie(1);
-    Cerr << "Matrice de filtrage OK" << finl;
-    Cerr << "Matrice de Laplacien P1 : " << finl;
+    //Cerr << "Matrice de filtrage OK" << finl;
+    //Cerr << "Matrice de Laplacien P1 : " << finl;
   }
   //Debog::verifier_Mat_elems("Matrice de Laplacien", mat);
   DoubleVect secmem(lazone.nb_som());
@@ -464,7 +464,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
       // If secmem is zero, then it is zero solution. Otherwise system is solved.
       if (secmem.mp_max_abs_vect() >=1.e-15)
         {
-          Cerr << "Resolution du systeme de filtrage: ALE" << finl;
+          //Cerr << "Resolution du systeme de filtrage: ALE" << finl;
           solv.resoudre_systeme(mat, secmem, solution);
           solution.echange_espace_virtuel();
           for(int som=0; som<nbsom; som++)
@@ -476,12 +476,10 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
             ch_som(som,comp)=0.0;
         }
     }
-  // Calcul de la norme du vecteur distribue
-  {
-    ch_som.echange_espace_virtuel();
-    double x = mp_norme_vect(ch_som);
-    Cerr << "norme(c) = " << x << finl;
-  }
+
+  ch_som.echange_espace_virtuel();
+  //double x = mp_norme_vect(ch_som);
+  //Cerr << "norme(c) = " << x << finl;
   Debog::verifier("Domaine_ALE::laplacien -ch_som", ch_som);
   return ch_som;
 }
@@ -559,7 +557,7 @@ void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
     }
   is >>  solv;
   solv.nommer("ALE_solver");
-  Cerr << "ALE solver: " << finl;
+  //Cerr << "ALE solver: " << finl;
   while(1)
     {
       // lecture d'un nom de bord ou de }

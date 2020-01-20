@@ -113,7 +113,7 @@ void Ch_front_input_ALE::mettre_a_jour(double temps)
 
 void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
 {
-  Cerr<<"Champ_front_input_ALE::remplir_vit_som_bord_ALE"<<finl;
+  //Cerr<<"Champ_front_input_ALE::remplir_vit_som_bord_ALE"<<finl;
 
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
