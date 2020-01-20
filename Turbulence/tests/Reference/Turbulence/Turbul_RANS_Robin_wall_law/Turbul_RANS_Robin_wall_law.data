@@ -143,9 +143,10 @@ Read pb
 		Sources			{ source_Robin_scalaire 2 Haut 0 Bas 0 # 0.005 # }
 	}
 
-	Post_processing
+	Post_processings
 	{
-		Definition_champs	{
+        	lml {   
+		      Definition_champs	{
 					moyenne_vitesse		Moyenne { t_deb 600 t_fin 1000 source refChamp { Pb_champ pb vitesse } }
 					moyenne_temperature	Moyenne { t_deb 600 t_fin 1000 source refChamp { Pb_champ pb temperature } }
 					ecart_type_vitesse	Ecart_type { t_deb 600 t_fin 1000 source refChamp { Pb_champ pb vitesse } }
@@ -153,8 +154,7 @@ Read pb
 					min_temperature		Reduction_0D { methode min source refChamp { Pb_champ pb temperature } }
 					max_temperature		Reduction_0D { methode max source refChamp { Pb_champ pb temperature } }
 					}
-		#
-		Probes			{
+			# Probes			{
 					sonde_vitesse			nodes	vitesse			periode 0.5 points 1 3.2 1 1.6
 					sonde_temperature		nodes	temperature		periode 0.5 points 1 3.2 1 1.6
 					sonde_moyenne_vitesse		nodes	moyenne_vitesse		periode 0.5 points 1 3.2 1 1.6
@@ -168,23 +168,34 @@ Read pb
 					coupe_moyenne_temperature	nodes	moyenne_temperature	periode 5 segment 9 0.213333 0 0.177778	0.213333 2 0.177778
 					coupe_ecart_type_vitesse	nodes	ecart_type_vitesse	periode 5 segment 9 0.213333 0 0.177778	0.213333 2 0.177778
 					coupe_ecart_type_temperature	nodes	ecart_type_temperature	periode 5 segment 9 0.213333 0 0.177778	0.213333 2 0.177778
-					}
-		#
-		Format lml
-		fields dt_post 200	{
-					vitesse som
-					temperature som
-					min_temperature som
-					max_temperature som
-					}
-		Statistiques dt_post 200
-					{
-					t_deb 600 t_fin 1000
-					moyenne vitesse
-					moyenne temperature
-					ecart_type vitesse
-					ecart_type temperature
-					}
+					} #
+
+
+			Statistiques dt_post 200
+			{
+				t_deb 600 t_fin 1000
+				moyenne vitesse
+				moyenne temperature
+				ecart_type vitesse
+				ecart_type temperature
+			}
+	        	fichier Turbul_RANS_Robin_wall_law
+			format lml fields dt_post 200
+			{
+
+				vitesse som
+				temperature som
+				min_temperature som
+				max_temperature som
+				k_eps_residu som
+			}
+		}
+
+		lata {  
+			fichier Turbul_RANS_Robin_wall_law	        
+			format lata fields dt_post 100	{ k_eps_residu faces }
+		}
+		
 	}
 	sauvegarde formatte pb.sauv
 }
