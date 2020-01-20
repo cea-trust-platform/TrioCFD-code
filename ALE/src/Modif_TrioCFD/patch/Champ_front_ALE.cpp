@@ -163,7 +163,7 @@ int Champ_front_ALE::initialiser(double temps, const Champ_Inc_base& inco)
 // Postcondition:
 void Champ_front_ALE::mettre_a_jour(double temps)
 {
-  Cerr << "Champ_front_ALE ::mettre_a_jour" << finl;
+  //Cerr << "Champ_front_ALE ::mettre_a_jour" << finl;
 
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
@@ -192,7 +192,7 @@ void Champ_front_ALE::mettre_a_jour(double temps)
 
 void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
 {
-  Cerr<<"Champ_front_ALE::remplir_vit_som_bord_ALE"<<finl;
+  //Cerr<<"Champ_front_ALE::remplir_vit_som_bord_ALE"<<finl;
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();

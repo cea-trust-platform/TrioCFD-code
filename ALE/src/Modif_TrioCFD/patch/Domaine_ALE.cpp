@@ -59,7 +59,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
   update_or_not_matrix_coeffs_=0;
 
-  Cerr<<"Domaine_ALE::mettre_a_jour"<<finl;
+  //Cerr<<"Domaine_ALE::mettre_a_jour"<<finl;
 
   bool  check_NoZero_ALE=true; //  if ALE boundary velocity is zero, ALE mesh velocity is zero and mettre_a_jour is skipped.
 

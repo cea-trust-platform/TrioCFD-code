@@ -85,7 +85,7 @@ int Ch_front_input_ALE::initialiser(double temps, const Champ_Inc_base& inco)
 
 void Ch_front_input_ALE::mettre_a_jour(double temps)
 {
-  Cerr << "Champ_front_input_ALE ::mettre_a_jour" << finl;
+  //Cerr << "Champ_front_input_ALE ::mettre_a_jour" << finl;
 
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
