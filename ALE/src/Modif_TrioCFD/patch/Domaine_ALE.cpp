@@ -462,7 +462,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
       secmem.echange_espace_virtuel();
       Debog::verifier("Domaine_ALE::laplacien -secmem", secmem);
       // If secmem is zero, then it is zero solution. Otherwise system is solved.
-      if (secmem.mp_max_abs_vect() >=1.e-12)
+      if (secmem.mp_max_abs_vect() >=1.e-15)
         {
           Cerr << "Resolution du systeme de filtrage: ALE" << finl;
           solv.resoudre_systeme(mat, secmem, solution);
