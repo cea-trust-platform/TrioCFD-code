@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2018, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,63 +14,50 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Ch_front_input_ALE.h
-// Directory:   New class
-// Version:     /main/9
+// File:        Ch_front_input_P1.h
+// Directory:   $TRUST_ROOT/src/Kernel/Champs_dis
+// Version:     /main/6
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Ch_front_input_ALE_included
-#define Ch_front_input_ALE_included
+#ifndef Ch_front_input_P1_included
+#define Ch_front_input_P1_included
 
 
-#include <Ch_front_input_P1.h>
+#include <Ch_front_input.h>
 #include <IntTab.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     class Ch_front_input_ALE
+//     class Ch_front_input
 //
 //     Cette classe represente un champ accessible par setInputField
-//     defini sur une frontiere avec une valeur par face. In case of ALE calculation.
+//     defini sur une frontiere avec une valeur par face.
 //
 // .SECTION voir aussi
 //   Champ_Input_Proto
 /////////////////////////////////////////////////////////////////////////////////
 
-class Ch_front_input_ALE : public Ch_front_input_P1
+
+class Ch_front_input_P1 : public Ch_front_input
 {
-  Declare_instanciable_sans_constructeur(Ch_front_input_ALE);
+  Declare_instanciable(Ch_front_input_P1);
 
 public:
 
-  Ch_front_input_ALE();
-
-  virtual Champ_front_base& affecter_(const Champ_front_base&)
+  virtual double valeur_au_temps_et_au_point(double temps,int som, double x,double y, double z,int comp) const;
+  inline virtual int valeur_au_temps_et_au_point_disponible() const
   {
-    return *this;
-  }
-  virtual void getTemplate(TrioField& afield) const;
-  virtual void setValue(const TrioField& afield);
+    return 1;
+  };
+  void setValue(const TrioField& afield);
+  void getTemplate(TrioField& afield) const ;
   virtual int initialiser(double temps, const Champ_Inc_base& inco);
-
-  inline DoubleTab& get_vit_som_bord_ALE();
-  virtual void mettre_a_jour(double temps);
-  void remplir_vit_som_bord_ALE(double);
-
 protected:
 
-  DoubleTab vit_som_bord_ALE;
-  bool alreadyInit_;
-
+  Roue_ptr les_valeurs_som;
 };
 
-inline DoubleTab& Ch_front_input_ALE::get_vit_som_bord_ALE()
-{
-  return vit_som_bord_ALE;
-}
-
 #endif
-

@@ -31,7 +31,7 @@
 #include <MD_Vector_tools.h>
 #include <Roue.h>
 
-Implemente_instanciable_sans_constructeur(Ch_front_input_ALE,"Ch_front_input_ALE",Ch_front_input);
+Implemente_instanciable_sans_constructeur(Ch_front_input_ALE,"Ch_front_input_ALE",Ch_front_input_P1);
 // XD Ch_front_input_ALE  front_field_base  Ch_front_input_ALE  -1 Class to define a boundary condition on a moving boundary of a mesh (only for the Arbitrary Lagrangian-Eulerian  framework ) .  NL2  Example:  Ch_front_input_ALE { nb_comp 3 nom VITESSE_IN_ALE probleme pb initial_value 3 1. 0. 0. }
 
 Ch_front_input_ALE::Ch_front_input_ALE():
@@ -52,29 +52,29 @@ Sortie& Ch_front_input_ALE::printOn(Sortie& os) const
 void Ch_front_input_ALE::getTemplate(TrioField& afield) const
 {
   buildSommetsFaces(); //From Ch_front_input in order to update mesh
-  Ch_front_input::getTemplate(afield);
+  Ch_front_input_P1::getTemplate(afield);
 }
 
 void Ch_front_input_ALE::setValue(const TrioField& afield)
 {
-
-  int NrOfFacesIn_les_valeurs=les_valeurs[1].valeurs().size()/nb_comp();
-
-  for(int i=0; i<NrOfFacesIn_les_valeurs; i++)
+  int NrOfNodesIn_les_valeurs_som=les_valeurs_som[1].valeurs().size()/nb_comp();
+  for(int i=0; i<NrOfNodesIn_les_valeurs_som; i++)
     {
       for(int j=0; j<afield._nb_field_components; j++)
 	{
-	  les_valeurs[1].valeurs()(i,j)=afield._field[afield._nb_field_components*i+j]; //Values to faces.
+	  les_valeurs_som[1].valeurs()(i,j)=afield._field[afield._nb_field_components*i+j]; //Values to nodes.
 	}
     }
+  les_valeurs_som[1].valeurs().echange_espace_virtuel() ;
 }
 
 int Ch_front_input_ALE::initialiser(double temps, const Champ_Inc_base& inco)
 {
+  Cout << "initialiser Ch_front_input_ALE" << finl ;
   if (alreadyInit_)
     return 1;
   alreadyInit_ = true;
-  if (!Ch_front_input::initialiser(temps,inco))
+  if (!Ch_front_input_P1::initialiser(temps,inco))
     return 0;
 
   //ALE part:
@@ -85,7 +85,7 @@ int Ch_front_input_ALE::initialiser(double temps, const Champ_Inc_base& inco)
 
 void Ch_front_input_ALE::mettre_a_jour(double temps)
 {
-  //Cerr << "Champ_front_input_ALE ::mettre_a_jour" << finl;
+  Cerr << "Champ_front_input_ALE ::mettre_a_jour" << finl;
 
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
@@ -113,66 +113,75 @@ void Ch_front_input_ALE::mettre_a_jour(double temps)
 
 void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
 {
-  //Cerr<<"Champ_front_input_ALE::remplir_vit_som_bord_ALE"<<finl;
+  Cout<<"Champ_front_input_ALE::remplir_vit_som_bord_ALE"<<finl;
 
   const Frontiere& front=la_frontiere_dis->frontiere();
-  int nb_faces=front.nb_faces();
+  //int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
   const Domaine& domaine=zone.domaine();
-  int nbsf=faces.nb_som_faces();
-  int i,j,k;
+  //int nbsf=faces.nb_som_faces();
+  int i,j;
   int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
-  /*if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
-    {
-      vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
-      const MD_Vector& md = zone.domaine().md_vector_sommets();
-      MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
-    }*/
+  //int nb_som=domaine.nb_som();
+  //if (vit_som_bord_ALE.dimension(0) != domaine.nb_som())
+  //  {
+  //    vit_som_bord_ALE.resize(domaine.nb_som(),nb_comp());
+  //    const MD_Vector& md = zone.domaine().md_vector_sommets();
+  //    MD_Vector_tools::creer_tableau_distribue(md, vit_som_bord_ALE);
+  //  }
 
 
-  DoubleTab DenominatorValues(nb_som_tot); //To hold number of faces connected to each node.
   vit_som_bord_ALE=0.;
   double InitialTimeValue=mon_pb->schema_temps().temps_init();
 
-  if(tps==InitialTimeValue){ //Initial values.
-      for( i=0; i<nb_faces; i++)
+  // Construction de la liste des sommets
+  int nn=0;
+  ArrOfInt liste_sommets(nb_som_tot);
+  ArrOfInt marqueur(domaine.les_sommets().dimension(0));
+  const IntTab& ffaces=faces.les_sommets() ;
+  marqueur=-1;
+  for (int f=0; f<ffaces.dimension(0); f++)
+    {
+      for (int s=0; s<ffaces.dimension(1); s++)
         {
-          for( k=0; k<nbsf; k++)
+          int som=ffaces(f,s);
+          if (som >= 0 && marqueur(som)==-1)
             {
-              for( j=0; j<nb_comp(); j++)
-                {
-                  if (initial_value_.size_array()==0)
-                    vit_som_bord_ALE(faces.sommet(i,k),j)=0; // By default initializes to zero.
-                  else
-                    vit_som_bord_ALE(faces.sommet(i,k),j)=initial_value_(j);
-                }
+
+              marqueur(som)=nn;
+              liste_sommets(nn)=som ;
+              nn++;
+            }
+        }
+    }
+
+  /*Cout << "nb_sommets " << sommets_.size() << finl ;
+  Cout << "Sommets: " ;
+  for (i=0 ; i < nn ; i++)
+  { Cout << liste_sommets(i) << ", " ;}
+  Cout << finl ;*/
+
+  if(tps==InitialTimeValue){ //Initial values.
+  //    for( i=0; i<nb_som; i++)
+      for( i=0; i<nn; i++)
+        {
+          for( j=0; j<nb_comp(); j++)
+            {
+              vit_som_bord_ALE(liste_sommets(i),j)=initial_value_(j);
             }
         }
   }
-  else{ //Nodes will have the average value from the faces connected to it.
-      for( i=0; i<nb_faces; i++)
+  else{
+  //    for( i=0; i<nb_som; i++)
+      for( i=0; i<nn; i++)
         {
-          for( k=0; k<nbsf; k++)
+          for( j=0; j<nb_comp(); j++)
             {
-        	  DenominatorValues(faces.sommet(i,k))=DenominatorValues(faces.sommet(i,k))+1.0;
-              for( j=0; j<nb_comp(); j++)
-                {
-                  double val =les_valeurs[1].valeurs()(i,j);
-                  vit_som_bord_ALE(faces.sommet(i,k),j)+=val; //Sum up velocity values from the connected faces.
-                }
+              vit_som_bord_ALE(liste_sommets(i),j)=les_valeurs_som[1].valeurs()(i,j);
+              std::cout << "i : " << i << ", j: " << j << ",  les_valeurs_som: " << les_valeurs_som[1].valeurs()(i,j)  << std::endl ;
             }
-        }
-
-      for( i=0; i<nb_som_tot; i++)
-        {
-    	  if(DenominatorValues(i)>=1.e-12){
-    		  for( j=0; j<nb_comp(); j++)
-    		                  {
-    			  	  			vit_som_bord_ALE(i,j)=vit_som_bord_ALE(i,j)/DenominatorValues(i); //Divide by the number of connected faces.
-    		                  }
-    	  }
         }
   }
   //vit_som_bord_ALE.echange_espace_virtuel();

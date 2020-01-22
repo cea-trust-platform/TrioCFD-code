@@ -148,7 +148,10 @@ void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
               ALEMeshVelocity_dt(i, dim) *= dt;
             }
         }
+      ALEMeshVelocity_dt.echange_espace_virtuel();
       ALEMeshTotalDisplacement_.valeurs() +=ALEMeshVelocity_dt;
+      //ALEMeshTotalDisplacement_.valeurs().echange_espace_virtuel();
+      //ALEMeshVelocity_.valeurs().echange_espace_virtuel();
       ALEMeshVelocity_.mettre_a_jour(temps);
       ALEMeshTotalDisplacement_.mettre_a_jour(temps);
 
