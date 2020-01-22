@@ -27,6 +27,7 @@
 #include <Discretisation_base.h>
 #include <DoubleTrav.h>
 #include <Debog.h>
+#include <Discret_Thyd.h>
 
 Implemente_instanciable(Navier_Stokes_std_ALE,"Navier_Stokes_standard_ALE",Navier_Stokes_std);
 
@@ -40,6 +41,7 @@ Entree& Navier_Stokes_std_ALE::readOn(Entree& is )
   Navier_Stokes_std::readOn(is);
   return is;
 }
+
 
 
 void Navier_Stokes_std_ALE::renewing_jacobians( DoubleTab& derivee )
@@ -116,3 +118,42 @@ void Navier_Stokes_std_ALE::update_pressure_matrix( void )
       solveur_pression_->reinit();
     }
 }
+
+void Navier_Stokes_std_ALE::discretiser()
+{
+  Navier_Stokes_std::discretiser();
+  const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+  dis.vitesse_mesh_ale(schema_temps(), zone_dis(), ALEMeshVelocity_);
+  champs_compris_.ajoute_champ(ALEMeshVelocity_);
+  ALEMeshVelocity_.valeur().add_synonymous(Nom("ALEMeshVelocity"));
+  dis.deplacement_mesh_ale(schema_temps(), zone_dis(), ALEMeshTotalDisplacement_);
+  champs_compris_.ajoute_champ(ALEMeshTotalDisplacement_);
+  ALEMeshTotalDisplacement_.valeur().add_synonymous(Nom("ALEMeshTotalDisplacement"));
+}
+
+void Navier_Stokes_std_ALE::mettre_a_jour(double temps)
+{
+  Navier_Stokes_std::mettre_a_jour(temps);
+  if(temps>0.)
+    {
+      const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+      const DoubleTab& ALEMeshVelocity= dom_ale.vitesse_faces();//we access the mesh speed
+      ALEMeshVelocity_.valeurs()= ALEMeshVelocity;
+      double dt = schema_temps().pas_de_temps();
+      DoubleTab ALEMeshVelocity_dt= ALEMeshVelocity;
+      for(int dim=0; dim<dimension; dim++)
+        {
+          for(int i=0; i<(ALEMeshVelocity.size()/dimension); i++)
+            {
+              ALEMeshVelocity_dt(i, dim) *= dt;
+            }
+        }
+      ALEMeshTotalDisplacement_.valeurs() +=ALEMeshVelocity_dt;
+      ALEMeshVelocity_.mettre_a_jour(temps);
+      ALEMeshTotalDisplacement_.mettre_a_jour(temps);
+
+    }
+
+
+}
+
