@@ -180,7 +180,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
           for( j=0; j<nb_comp(); j++)
             {
               vit_som_bord_ALE(liste_sommets(i),j)=les_valeurs_som[1].valeurs()(i,j);
-              std::cout << "i : " << i << ", j: " << j << ",  les_valeurs_som: " << les_valeurs_som[1].valeurs()(i,j)  << std::endl ;
+              //std::cout << "i : " << i << ", j: " << j << ",  les_valeurs_som: " << les_valeurs_som[1].valeurs()(i,j)  << std::endl ;
             }
         }
   }
