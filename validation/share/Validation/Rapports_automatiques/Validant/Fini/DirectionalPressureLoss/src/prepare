@@ -1,0 +1,6 @@
+for cas in `ls */Cas.data`
+do
+   cd `dirname $cas`
+   ln -s -f ../post_run
+   cd - 1>/dev/null
+done
