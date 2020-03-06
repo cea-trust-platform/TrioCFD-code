@@ -161,22 +161,19 @@ void Modele_turb_scal_sm_dyn_VDF::mettre_a_jour(double )
 {
   calculer_diffusivite_turbulente();
 
-  // ici je pense que ca devrait etre aussi multiplie par rho cp en QC
-  if (!(equation().probleme().is_QC()))
-    {
-      const Milieu_base& le_milieu = equation().probleme().milieu();
-      DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-      const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
-      const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
-      alpha_t *= tab_rho(0, 0) * tab_Cp(0, 0);
-    }
-  la_diffusivite_turbulente->valeurs().echange_espace_virtuel();
+  const Milieu_base& le_milieu = equation().probleme().milieu();
+  const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
+  const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
+  DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
+  lambda_t = diffusivite_turbulente_.valeurs();
+  lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
+  lambda_t.echange_espace_virtuel();
 }
 
 //////////////////////////////////////////////////////////////////////
 Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
 {
-  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
+  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
   Equation_base& eq_NS_turb = equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_NS_turb.get_modele(TURBULENCE);
   const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
@@ -224,9 +221,9 @@ Champ_Fonc& Modele_turb_scal_sm_dyn_VDF::calculer_diffusivite_turbulente()
   for (int element_number=0; element_number<nb_elem_tot; element_number++)
     alpha_t(element_number) = model_coeff(element_number)*l(element_number)*l(element_number)*S_grid_scale_norme(element_number);
 
-  la_diffusivite_turbulente.changer_temps(temps);
-  Debog::verifier("la_diffusivite_turbulente",la_diffusivite_turbulente.valeurs());
-  return la_diffusivite_turbulente;
+  diffusivite_turbulente_.changer_temps(temps);
+  Debog::verifier("la_diffusivite_turbulente",diffusivite_turbulente_.valeurs());
+  return diffusivite_turbulente_;
 }
 
 //////////////////////////////////////////////////////////////////////

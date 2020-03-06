@@ -193,8 +193,7 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
   const Champ_Don& conductivite = le_fluide.conductivite();
   const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 
-  const Champ_Fonc& la_diffusivite_turbulente = mon_modele_turb_scal->diffusivite_turbulente();
-  DoubleTab alpha_t = la_diffusivite_turbulente.valeurs();
+  const DoubleTab& conductivite_turbulente = mon_modele_turb_scal->conductivite_turbulente().valeurs();
 
   EcrFicPartage Nusselt;
   ouvrir_fichier_partage(Nusselt,"Nusselt");
@@ -273,7 +272,7 @@ void Paroi_scal_hyd_base_VEF::imprimer_nusselt(Sortie& os) const
                     lambda = conductivite(elem,0);
                 }
 
-              lambda_t=alpha_t(elem);
+              lambda_t=conductivite_turbulente(elem);
               if (dimension == 2)
                 Nusselt << x << "\t| " << y;
               if (dimension == 3)

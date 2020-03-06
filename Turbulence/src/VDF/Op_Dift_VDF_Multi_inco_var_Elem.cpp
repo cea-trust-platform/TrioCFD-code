@@ -90,7 +90,7 @@ const Champ_base& Op_Dift_VDF_Multi_inco_var_Elem::diffusivite() const
 
 void Op_Dift_VDF_Multi_inco_var_Elem::associer_diffusivite_turbulente(const Champ_Fonc& diff_turb)
 {
-  la_diffusivite_turbulente = diff_turb;
+  Op_Diff_Turbulent_base::associer_diffusivite_turbulente(diff_turb);
   Evaluateur_VDF& eval = iter.evaluateur();
   Eval_Dift_VDF_Multi_inco_var_Elem& eval_diff_turb =
     (Eval_Dift_VDF_Multi_inco_var_Elem&) eval;
@@ -112,8 +112,8 @@ void Op_Dift_VDF_Multi_inco_var_Elem::completer()
   Op_Dift_VDF_base::completer();
   const RefObjU& modele_turbulence = equation().get_modele(TURBULENCE);
   const Modele_turbulence_scal_base& mod_turb = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
-  const Champ_Fonc& alpha_t = mod_turb.diffusivite_turbulente();
-  associer_diffusivite_turbulente(alpha_t);
+  const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
+  associer_diffusivite_turbulente(lambda_t);
   const Turbulence_paroi_scal& loipar = mod_turb.loi_paroi();
   associer_loipar(loipar);
 }
@@ -124,7 +124,7 @@ double Op_Dift_VDF_Multi_inco_var_Elem::calculer_dt_stab() const
   const Zone_VDF& zone_VDF = iter.zone();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const DoubleTab& alpha = diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleVect& alpha_t = la_diffusivite_turbulente->valeurs();
+  const DoubleVect& alpha_t = diffusivite_turbulente()->valeurs();
   int is_QC = mon_equation->probleme().is_QC();
   bool is_concentration = (equation().que_suis_je().debute_par("Convection_Diffusion_Concentration") || equation().que_suis_je().debute_par("Convection_Diffusion_fraction"));
 

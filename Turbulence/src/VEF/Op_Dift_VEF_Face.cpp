@@ -95,7 +95,7 @@ double Op_Dift_VEF_Face::calculer_dt_stab() const
 
   const Zone& la_zone= la_zone_VEF.zone();
 
-  DoubleVect diffu_turb(la_diffusivite_turbulente->valeurs());
+  DoubleVect diffu_turb(diffusivite_turbulente()->valeurs());
   DoubleTab diffu(nu_);
   if (equation().que_suis_je().debute_par("Convection_Diffusion_Temp"))
     {
@@ -192,7 +192,7 @@ void Op_Dift_VEF_Face::calculer_pour_post(Champ& espace_stockage,const Nom& opti
           double coef;
           const Zone_VEF& la_zone_VEF = la_zone_vef.valeur();
           const Zone& la_zone= la_zone_VEF.zone();
-          const DoubleVect& diffu_turb=la_diffusivite_turbulente->valeurs();
+          const DoubleVect& diffu_turb=diffusivite_turbulente()->valeurs();
           double alpha;
 
           int la_zone_nb_elem=la_zone.nb_elem();
@@ -978,7 +978,7 @@ DoubleTab& Op_Dift_VEF_Face::ajouter(const DoubleTab& inconnue_org,
   remplir_nu(nu_);
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
-  const DoubleTab& nu_turb=la_diffusivite_turbulente->valeurs();
+  const DoubleTab& nu_turb=diffusivite_turbulente()->valeurs();
   int nb_comp = 1;
   int nb_dim = resu.nb_dim();
   if(nb_dim==2)
@@ -1305,7 +1305,7 @@ void Op_Dift_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Matrice
 
   int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
 
-  const DoubleTab& nu_turb_=la_diffusivite_turbulente->valeurs();
+  const DoubleTab& nu_turb_=diffusivite_turbulente()->valeurs();
   const DoubleTab& face_normale = zone_VEF.face_normales();
   const DoubleVect& volumes = zone_VEF.volumes();
   DoubleVect n(dimension);
@@ -1422,7 +1422,7 @@ void Op_Dift_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tran
   int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
 
   double valA, d_nu;
-  const DoubleTab& nu_turb_=la_diffusivite_turbulente->valeurs();
+  const DoubleTab& nu_turb_=diffusivite_turbulente()->valeurs();
   DoubleVect n(dimension);
 
   DoubleTab nu,nu_turb;
@@ -1720,7 +1720,7 @@ void Op_Dift_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) const
     {
       //  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
       //const Zone_VEF& zone_VEF = la_zone_vef.valeur();
-      const DoubleTab& nu_turb=la_diffusivite_turbulente->valeurs();
+      const DoubleTab& nu_turb=diffusivite_turbulente()->valeurs();
       const DoubleTab& inconnue_org=equation().inconnue().valeurs();
       DoubleTab nu,nu_turb_m;
       DoubleTab tab_inconnue;

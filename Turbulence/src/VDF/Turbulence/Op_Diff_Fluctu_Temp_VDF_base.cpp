@@ -97,9 +97,9 @@ void Op_Diff_Fluctu_Temp_VDF_Elem::associer_diffusivite_turbulente()
       const Transport_Fluctuation_Temperature& eqn_transport_Fluctu_Temp = ref_cast(Transport_Fluctuation_Temperature,mon_equation.valeur());
 
       const Modele_turbulence_scal_Fluctuation_Temperature& mod_turb = eqn_transport_Fluctu_Temp.modele_turbulence();
-      const Champ_Fonc& diff_turb = mod_turb.diffusivite_turbulente();
+      const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
       Eval_Diff_Fluctu_Temp_VDF_Elem& eval_diff = (Eval_Diff_Fluctu_Temp_VDF_Elem&) iter.evaluateur();
-      eval_diff.associer_diff_turb(diff_turb);
+      eval_diff.associer_diff_turb(lambda_t);
     }
   else if ( sub_type(Transport_Fluctuation_Temperature_W_Bas_Re,mon_equation.valeur()) )
     {
@@ -107,7 +107,7 @@ void Op_Diff_Fluctu_Temp_VDF_Elem::associer_diffusivite_turbulente()
       //    const Transport_Fluctuation_Temperature_W_Bas_Re& eqn_transport_Fluctu_Temp = ref_cast(Transport_Fluctuation_Temperature_W_Bas_Re,mon_equation.valeur());
 
       //    const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& mod_turb = eqn_transport_Fluctu_Temp.modele_turbulence();
-      //    const Champ_Fonc& diff_turb = mod_turb.diffusivite_turbulente();
+      //    const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
       Eval_Diff_Fluctu_Temp_VDF_Elem& eval_diff = (Eval_Diff_Fluctu_Temp_VDF_Elem&) iter.evaluateur();
       eval_diff.associer_diff_turb(diff_tot);
     }
@@ -119,9 +119,9 @@ void Op_Diff_Fluctu_Temp_VDF_Elem::associer_diffusivite_turbulente()
       const Transport_Fluctuation_Temperature_W& eqn_transport_Fluctu_Temp = ref_cast(Transport_Fluctuation_Temperature_W,mon_equation.valeur());
 
       const Modele_turbulence_scal_Fluctuation_Temperature_W& mod_turb = eqn_transport_Fluctu_Temp.modele_turbulence();
-      const Champ_Fonc& diff_turb = mod_turb.diffusivite_turbulente();
+      const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
       Eval_Diff_Fluctu_Temp_VDF_Elem& eval_diff = (Eval_Diff_Fluctu_Temp_VDF_Elem&) iter.evaluateur();
-      eval_diff.associer_diff_turb(diff_turb);
+      eval_diff.associer_diff_turb(lambda_t);
     }
 
 
@@ -141,7 +141,7 @@ void Op_Diff_Fluctu_Temp_VDF_Elem::mettre_a_jour_diffusivite() const
     {
       const Transport_Fluctuation_Temperature_W_Bas_Re& eqn_transport = ref_cast(Transport_Fluctuation_Temperature_W_Bas_Re,mon_equation.valeur());
       const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& mod_turb = eqn_transport.modele_turbulence();
-      const Champ_Fonc& diff_turb = mod_turb.diffusivite_turbulente();
+      const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
       const Fluide_Incompressible& mil = ref_cast(Fluide_Incompressible,eqn_transport.milieu());
       const Champ_Don& diff_cinematique = mil.diffusivite();
 
@@ -152,10 +152,10 @@ void Op_Diff_Fluctu_Temp_VDF_Elem::mettre_a_jour_diffusivite() const
       if (!verrue.non_nul())
         {
           // juste pour typer le champ, on s'en fiche des valeurs...
-          verrue = diff_turb;
+          verrue = lambda_t;
         }
       verrue.valeur().affecter(diff_cinematique.valeur());
-      verrue.valeur().valeurs() += diff_turb.valeur().valeurs();
+      verrue.valeur().valeurs() += lambda_t.valeur().valeurs();
       verrue.valeur().valeurs().echange_espace_virtuel();
     }
 }

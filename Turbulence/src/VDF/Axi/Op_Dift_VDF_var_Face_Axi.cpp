@@ -99,7 +99,7 @@ const Champ_base& Op_Dift_VDF_var_Face_Axi::diffusivite() const
 
 void Op_Dift_VDF_var_Face_Axi::associer_diffusivite_turbulente(const Champ_Fonc& visc_turb)
 {
-  la_diffusivite_turbulente=visc_turb;
+  Op_Diff_Turbulent_base::associer_diffusivite_turbulente(visc_turb);
 }
 
 void Op_Dift_VDF_var_Face_Axi::associer_loipar(const Turbulence_paroi& loi_paroi)
@@ -168,7 +168,7 @@ DoubleTab& Op_Dift_VDF_var_Face_Axi::ajouter(const DoubleTab& inco, DoubleTab& r
   //  int nb_aretes = zvdf.nb_aretes();
 
   const DoubleVect& visco_lam = diffusivite_->valeurs();
-  const DoubleVect& visco_turb = la_diffusivite_turbulente->valeurs();
+  const DoubleVect& visco_turb = diffusivite_turbulente()->valeurs();
   double d_visco_turb,d_visco_lam;
 
   const DoubleTab& tau_diag = inconnue->tau_diag();
@@ -741,7 +741,7 @@ void Op_Dift_VDF_var_Face_Axi::ajouter_contribution(const DoubleTab& inco,      
   DoubleVect& coeff = matrice.get_set_coeff();
 
   const DoubleVect& visco_lam = diffusivite_->valeurs();
-  const DoubleVect& visco_turb = la_diffusivite_turbulente->valeurs();
+  const DoubleVect& visco_turb = diffusivite_turbulente()->valeurs();
   double d_visco_turb,d_visco_lam;
 
   const DoubleTab& tau_diag = inconnue->tau_diag();
@@ -1368,7 +1368,7 @@ void Op_Dift_VDF_var_Face_Axi::contribue_au_second_membre(DoubleTab& resu ) cons
   //  int nb_aretes = zvdf.nb_aretes();
 
   //  const DoubleVect& visco_lam = diffusivite_->valeurs();
-  //  const DoubleVect& visco_turb = la_diffusivite_turbulente->valeurs();
+  //  const DoubleVect& visco_turb = diffusivite_turbulente()->valeurs();
 
   // Boucle sur les elements pour traiter les facettes situees
   // a l'interieur des elements

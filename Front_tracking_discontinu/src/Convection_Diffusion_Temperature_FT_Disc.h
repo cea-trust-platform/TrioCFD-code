@@ -57,7 +57,6 @@ public:
   void    discretiser(void);
 
 protected:
-  void update_rho_cp(double temps);
   // Quelle phase cette equation concerne-t-elle ? 0 ou 1
   int phase_;
   //GB : Ajout de variables :
@@ -82,8 +81,5 @@ protected:
   //  vers la phase 1)
   Champ_Fonc grad_t_;
   Champ_Inc vitesse_convection_;
-  Champ_Fonc rho_cp_elem_,rho_cp_comme_T_;
-
-
 };
 #endif
