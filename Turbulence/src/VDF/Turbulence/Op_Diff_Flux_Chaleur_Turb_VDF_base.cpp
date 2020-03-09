@@ -89,9 +89,9 @@ void Op_Diff_Flux_Chaleur_Turb_VDF_Face::associer_diffusivite_turbulente()
   assert(mon_equation.non_nul());
   const Transport_Flux_Chaleur_Turbulente& eqn_transport_Flux_Chaleur_Turb = ref_cast(Transport_Flux_Chaleur_Turbulente,mon_equation.valeur());
   const Modele_turbulence_scal_Fluctuation_Temperature& mod_turb = eqn_transport_Flux_Chaleur_Turb.modele_turbulence();
-  const Champ_Fonc& diff_turb = mod_turb.diffusivite_turbulente();
+  const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
   Eval_Diff_Flux_Chaleur_Turb_VDF_Face& eval_diff = (Eval_Diff_Flux_Chaleur_Turb_VDF_Face&) iter.evaluateur();
-  eval_diff.associer_diff_turb(diff_turb);
+  eval_diff.associer_diff_turb(lambda_t);
 }
 
 const Champ_Fonc& Op_Diff_Flux_Chaleur_Turb_VDF_Face::diffusivite_turbulente() const

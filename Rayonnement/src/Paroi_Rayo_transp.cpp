@@ -44,24 +44,13 @@ Entree& Paroi_Rayo_transp::readOn(Entree& is )
 
 double Paroi_Rayo_transp::flux_impose(int i) const
 {
-  const Milieu_base& mil=ma_zone_cl_dis->equation().milieu();
-  double d_Cp = 1;
-  double d_rho= 1;
-  // si on est en QC on n'a pas a diviser le flux par rho*cp
-  if (!sub_type(Fluide_Quasi_Compressible,mil))
-    {
-      const Champ_Uniforme& rho=ref_cast(Champ_Uniforme,mil.masse_volumique().valeur());
-      const Champ_Uniforme& Cp=ref_cast(Champ_Uniforme,mil.capacite_calorifique().valeur());
-      d_Cp = Cp(0,0);
-      d_rho= rho(0,0);
-    }
   const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
   int ndeb = la_frontiere_VF.num_premiere_face();
   double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
   if (le_champ_front.valeurs().size()==1)
-    return (le_champ_front(0,0)-flux_radia)/(d_rho*d_Cp);
+    return le_champ_front(0,0)-flux_radia;
   else if (le_champ_front.valeurs().dimension(1)==1)
-    return (le_champ_front(i,0)-flux_radia)/(d_rho*d_Cp);
+    return le_champ_front(i,0)-flux_radia;
   else
     Cerr << "Paroi_Rayo_transp::flux_impose erreur" << finl;
   exit();

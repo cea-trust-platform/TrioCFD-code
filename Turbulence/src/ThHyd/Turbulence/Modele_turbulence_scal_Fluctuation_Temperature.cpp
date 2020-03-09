@@ -112,43 +112,16 @@ bool Modele_turbulence_scal_Fluctuation_Temperature::initTimeStep(double dt)
 
 Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite_turbulente()
 {
-  // DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-  //   const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
-  //   double temps = la_viscosite_turbulente->temps();
-  //   const Champ_base& chFluctuTemp = eqn_transport_Fluctu_Temp.inconnue().valeur();
-  //   const Probleme_base& mon_pb = mon_equation->probleme();
-  //   const Navier_Stokes_Turbulent& eqn_hydr = ref_cast(Navier_Stokes_Turbulent
-  //     mon_pb.equation("Navier_Stokes_Turbulent");
-  //   const  Mod_turb_hyd_base& mod_turb_hydr = eqn_hydr.modele_turbulence();
-  //   //const Mod_turb_hyd_base& le_modele = eq_hydraulique->modele_turbulence();
-  //   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& modele_bas_Re = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,mod_turb_hydr);
-  //   const Transport_K_Eps_Bas_Reynolds& mon_eq_transport_K_Eps_Bas_Re = modele_bas_Re.equation_transp();
-  //   const DoubleTab& K_eps_Bas_Re = mon_eq_transport_K_Eps_Bas_Re.inconnue().valeurs();
-  //   if (temps != la_diffusivite_turbulente.temps())
-  //     {
-  //       static const double C_Lambda = 0.11;
-  //       int n= alpha_t.size();
-  //       if (mu_t.size() != n) {
-  //         Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
-  //         Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
-  //         exit();
-  //       }
-
-  //       for (int i=0; i<n; i++)
-  //         alpha_t[i] =C_Lambda*K_eps_Bas_Re(i,0)*sqrt((K_eps_Bas_Re(i,0)/K_eps_Bas_Re(i,1))*(chFluctuTemp(i,0)/(2*chFluctuTemp(i,1))));
-
-  //       la_diffusivite_turbulente.changer_temps(temps);
-  //     }
-  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-  const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
+  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
+  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
 
-  if (temps != la_diffusivite_turbulente.temps())
+  if (temps != diffusivite_turbulente_.temps())
     {
       static const double Prdt_turbulent = 0.9;
 
       int n= alpha_t.size();
-      if (mu_t.size() != n)
+      if (nu_t.size() != n)
         {
           Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
           Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
@@ -156,11 +129,11 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature::calculer_diffusivite
         }
 
       for (int i=0; i<n; i++)
-        alpha_t[i] = mu_t[i]/Prdt_turbulent;
+        alpha_t[i] = nu_t[i]/Prdt_turbulent;
 
-      la_diffusivite_turbulente.changer_temps(temps);
+      diffusivite_turbulente_.changer_temps(temps);
     }
-  return la_diffusivite_turbulente;
+  return diffusivite_turbulente_;
 }
 
 void Modele_turbulence_scal_Fluctuation_Temperature::mettre_a_jour(double temps)

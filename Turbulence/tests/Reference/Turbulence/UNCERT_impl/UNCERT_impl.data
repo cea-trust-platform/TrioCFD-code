@@ -34,7 +34,7 @@ Read sch
 	facsec_max 10
 	Solveur PISO
 	{
-		seuil_convergence_solveur 1.e-8
+		seuil_convergence_solveur 5.e-6
 	}
 }
 

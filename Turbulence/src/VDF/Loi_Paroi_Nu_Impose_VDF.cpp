@@ -284,8 +284,6 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
   const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
   const Champ_Don& conductivite = le_fluide.conductivite();
-  const Champ_Don& masse_volumique = le_fluide.masse_volumique();
-  const Champ_Don& capacite_calorifique = le_fluide.capacite_calorifique();
   const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 
   EcrFicPartage Nusselt;
@@ -352,7 +350,6 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                   double x=zone_VDF.xv(num_face,0);
                   double y=zone_VDF.xv(num_face,1);
                   double lambda;
-                  double rho,Cp;
 
                   elem = face_voisins(num_face,0);
                   if (elem == -1)
@@ -366,24 +363,6 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                       else
                         lambda = conductivite(elem,0);
                     }
-                  if (sub_type(Champ_Uniforme,masse_volumique.valeur()))
-                    rho = masse_volumique(0,0);
-                  else
-                    {
-                      if (masse_volumique.nb_comp()==1)
-                        rho = masse_volumique(elem);
-                      else
-                        rho = masse_volumique(elem,0);
-                    }
-                  if (sub_type(Champ_Uniforme,capacite_calorifique.valeur()))
-                    Cp = capacite_calorifique(0,0);
-                  else
-                    {
-                      if (capacite_calorifique.nb_comp()==1)
-                        Cp = capacite_calorifique(elem);
-                      else
-                        Cp = capacite_calorifique(elem,0);
-                    }
 
                   if (dimension == 2)
                     Nusselt << x << "\t| " << y;
@@ -396,7 +375,7 @@ void Loi_Paroi_Nu_Impose_VDF::imprimer_nusselt(Sortie&) const
                   int global_face=num_face;
                   int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
 
-                  double flux = la_cl_neum.flux_impose(num_face-ndeb)*rho*Cp;
+                  double flux = la_cl_neum.flux_impose(num_face-ndeb);
                   double tparoi = temperature(elem)+flux/lambda*equivalent_distance_[boundary_index](local_face);
 
                   Nusselt << "\t| " << equivalent_distance_[boundary_index](local_face) << "\t| " << dh_valeur/equivalent_distance_[boundary_index](local_face) << "\t| "

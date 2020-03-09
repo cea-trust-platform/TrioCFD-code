@@ -113,9 +113,9 @@ Fluide_Diphasique::fluide_phase(int phase) const
 {
   assert(phase == 0 || phase == 1);
   if (phase == 0)
-    return phase0_.valeur();
+    return phase0_;
   else
-    return phase1_.valeur();
+    return phase1_;
 }
 
 double Fluide_Diphasique::sigma() const
@@ -150,8 +150,8 @@ int Fluide_Diphasique::formule_mu() const
 
 int Fluide_Diphasique::initialiser(const double& temps)
 {
-  phase0_.valeur().initialiser(temps);
-  phase1_.valeur().initialiser(temps);
+  phase0_.initialiser(temps);
+  phase1_.initialiser(temps);
   return 1;
 }
 
@@ -159,14 +159,14 @@ void Fluide_Diphasique::mettre_a_jour(double temps)
 {
   // en particulier, mise a jour de g qui peut dependre de t...
   Milieu_base::mettre_a_jour(temps);
-  phase0_.valeur().mettre_a_jour(temps);
-  phase1_.valeur().mettre_a_jour(temps);
+  phase0_.mettre_a_jour(temps);
+  phase1_.mettre_a_jour(temps);
 }
 void Fluide_Diphasique::discretiser(const Probleme_base& pb, const  Discretisation_base& dis)
 {
   // sigma chaleur latente phase_0 phase_1  diffusivite revoir
-  phase0_.valeur().discretiser(pb,dis);
-  phase1_.valeur().discretiser(pb,dis);
+  phase0_.discretiser(pb,dis);
+  phase1_.discretiser(pb,dis);
   //Milieu_base::discretiser(pb,dis);
 }
 
@@ -181,7 +181,7 @@ const Champ_Don& Fluide_Diphasique::masse_volumique() const
   assert(0);
   exit();
   throw;
-  return phase0_.valeur().masse_volumique();
+  return phase0_.masse_volumique();
 }
 
 Champ_Don& Fluide_Diphasique::masse_volumique()
