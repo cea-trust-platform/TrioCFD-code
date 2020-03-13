@@ -147,6 +147,7 @@ double Op_Dift_VDF_Multi_inco_Elem::calculer_dt_stab() const
   //            i decrivant l'ensemble des elements du maillage
   //
 
+  ArrOfInt numfa(2*dimension);
   for (int elem = 0; elem < zone_VDF.nb_elem(); elem++)
     {
       // choix du facteur
@@ -160,9 +161,8 @@ double Op_Dift_VDF_Multi_inco_Elem::calculer_dt_stab() const
       else rcp = mon_equation->milieu().capacite_calorifique().valeurs()(0, 0) * mon_equation->milieu().masse_volumique().valeurs()(0, 0);
 
       double moy = 0.;
-      int numfa[6];
       for (int i = 0; i < 2 * dimension; i++) numfa[i] = elem_faces(elem, i);
-      for (int d = 0; d < dimension; ++d) moy += 1. / (zone_VDF.dist_face(numfa[d], numfa[dimension + d], d));
+      for (int d = 0; d < dimension; d++) moy += 1. / (zone_VDF.dist_face(numfa[d], numfa[dimension + d], d));
       const double alpha_local = (alpha_lam + alpha_t(elem)) / rcp * moy;
       coef = max(coef, alpha_local);
     }
