@@ -74,7 +74,6 @@ Entree& Operateur_Conv::readOn(Entree& is)
       //Op_Conv_ALE_VEF& mon_op_conv_ALE_VEF=ref_cast(Op_Conv_ALE_VEF, valeur());
       //valeur().lire_op_conv(is);
     }
-
   if ((mon_equation.le_nom() ==  "pb_sensibiliteNavier_Stokes_standard_sensibility")  && (valeur().que_suis_je()!="Op_Conv_sensibility_VEF_P1NC"))
     {
       Cerr<<" You should use the sensibility convection operator within Navier_Stokes_standard_sensibility equation "<<finl;

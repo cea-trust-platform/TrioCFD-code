@@ -21,6 +21,7 @@
 #include <Operateur_Conv_sensibility_VEF.h>
 #include <Op_Conv_VEF_base.h>
 #include <Navier_Stokes_std_sensibility.h>
+#include <Convection_Diffusion_Temperature_sensibility.h>
 #include <DoubleTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
@@ -74,14 +75,41 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
 
   if(convectionSchemeDiscrType==0) // Convection scheme discr "amont".
     {
-      const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
-      const DoubleTab& state = eq.get_state_field();
-      const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
-      ajouter_Lstate_sensibility_Amont(state, inco, resu);
-      ajouter_Lsensibility_state_Amont(inco, state, resu);
-      if(uncertain_var=="MU")
-        add_diffusion_term(state, resu);
+      if(equation().que_suis_je()=="Navier_Stokes_standard_sensibility")
+        {
+          const Navier_Stokes_std_sensibility& eq = ref_cast(Navier_Stokes_std_sensibility, equation());
+          const DoubleTab& state = eq.get_state_field();
+          const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
+          ajouter_Lstate_sensibility_Amont(state, inco, resu);
+          ajouter_Lsensibility_state_Amont(inco, state, resu);
+          if(uncertain_var=="MU")
+            add_diffusion_term(state, resu);
+        }
+      else if (equation().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
+        {
+          const Convection_Diffusion_Temperature_sensibility& eq = ref_cast(Convection_Diffusion_Temperature_sensibility, equation());
+          const DoubleTab& velocity_state = eq.get_velocity_state_field();
+          const DoubleTab& temperature_state = eq.get_temperature_state_field();
+          const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
+          const DoubleTab& velocity= vitesse().valeurs();
+          ajouter_Lstate_sensibility_Amont(velocity_state, inco, resu);
+          ajouter_Lsensibility_state_Amont(velocity,temperature_state, resu);
+
+          if(uncertain_var!="TEMPERATURE")
+            {
+              Cout << "Variable "<<uncertain_var<<" Is not available yet."<<" Try available TEMPERATURE variable." << finl;
+              exit();
+            }
+
+        }
+      else
+        {
+          Cout << "Operateur_Conv_sensibility_VEF::ajouter() =>  Sensibility cannot use currently equation " << equation().que_suis_je()
+               <<". Try available Navier_Stokes_standard_sensibility or Convection_Diffusion_Temperature_sensibility." << finl;
+          exit();
+        }
       opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
+
     }
   else
     {
@@ -92,7 +120,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   Debog::verifier("resu dansOperateur_Conv_sensibility_VEF::ajouter", resu);
   return resu;
 }
-
+//state_field grad_inco
 void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const DoubleTab& state_field, const DoubleTab& inco, DoubleTab& resu ) const
 {
   Cout<<"ajouter_Lstate_sensibility "<<finl;
@@ -469,9 +497,10 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
         }
     }
 }
+//inco grad_state_field
 void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const DoubleTab& inco, const DoubleTab& state_field, DoubleTab& resu ) const
 {
-  Cout<<"ajouter_Lstate_sensibility "<<finl;
+  Cout<<"ajouter_Lsensibility_state "<<finl;
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
   const IntTab& elem_faces = zone_VEF.elem_faces();
