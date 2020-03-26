@@ -45,6 +45,7 @@
 
 
 #include <Navier_Stokes_std.h>
+#include <Convection_Diffusion_Temperature.h>
 #include <Zone_VEF.h>
 
 
@@ -1091,6 +1092,29 @@ void Probleme_base::finir()
           file_vitesse<<vitesse(face, 0)<<"  "<<vitesse(face, 1)<<finl;
         }
     }
+  Convection_Diffusion_Temperature& eqnCDT = ref_cast(Convection_Diffusion_Temperature,equation(1));
+  const  DoubleTab& temperature=  eqnCDT.inconnue().valeur();
+  if (equation(1).que_suis_je() == "Convection_Diffusion_Temperature")
+    {
+      Nom   nom_fichier_temp("Temperature_state.txt");
+      SFichier file_temp(nom_fichier_temp);
+      for(int face=0; face<temperature.size(); face++)
+        {
+          file_temp<<temperature(face)<<finl;
+        }
+
+    }
+  else if (equation(1).que_suis_je() == "Convection_Diffusion_Temperature_sensibility")
+    {
+      Nom   nom_fichier_temp("Temperature_sensibility.txt");
+      SFichier file_temp(nom_fichier_temp);
+      for(int face=0; face<temperature.size(); face++)
+        {
+          file_temp<<temperature(face)<<finl;
+        }
+    }
+
+
   //end add for validation (projet Sensibility )
 }
 

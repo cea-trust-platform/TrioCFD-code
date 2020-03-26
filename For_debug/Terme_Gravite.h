@@ -14,61 +14,59 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Schema_Euler_explicite.h
-// Directory:   $TRUST_ROOT/src/Kernel/Schemas_Temps
-// Version:     /main/18
+// File:        Terme_Gravite.h
+// Directory:   $TRUST_ROOT/src/ThHyd
+// Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Schema_Euler_explicite_included
-#define Schema_Euler_explicite_included
+#ifndef Terme_Gravite_included
+#define Terme_Gravite_included
 
 
+#include <Ref_Champ_Don_base.h>
 
-
-
-#include <Schema_Temps_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Schema_Euler_explicite
-//     Cette classe represente un schema en temps d'Euler explicite:
-//     U(n+1) = U(n) + dt*(dU/dt)(n)
+//    Classe Terme_Gravite
+//    Cette represente un terme de gravite. Elle contient
+//    une reference sur champ donne qui represente une gravite.
 // .SECTION voir aussi
-//     Schema_Temps_base
+//    Champ_Don_base
+//    Classe hors hierarchie TrioU
 //////////////////////////////////////////////////////////////////////////////
-class Schema_Euler_explicite: public Schema_Temps_base
+class Terme_Gravite
 {
-
-  Declare_instanciable(Schema_Euler_explicite);
-
 public :
 
-  ////////////////////////////////
-  //                            //
-  // Caracteristiques du schema //
-  //                            //
-  ////////////////////////////////
+  inline Terme_Gravite() {}
+  inline void associer_gravite(const Champ_Don_base& );
 
-  virtual int nb_valeurs_temporelles() const;
-  virtual int nb_valeurs_futures() const;
-  virtual double temps_futur(int i) const;
-  virtual double temps_defaut() const;
+protected:
 
-  /////////////////////////////////////////
-  //                                     //
-  // Fin des caracteristiques du schema  //
-  //                                     //
-  /////////////////////////////////////////
-
-  virtual int faire_un_pas_de_temps_eqn_base(Equation_base&);
-  inline void completer();
+  REF(Champ_Don_base) gravite;
 };
 
-inline void Schema_Euler_explicite::completer()
+
+// Description:
+//    Associe un champ representant la gravite a l'objet Gravite.
+// Precondition:
+// Parametre: Champ_Don_base& g
+//    Signification: un champ donne representant une gravite
+//    Valeurs par defaut:
+//    Contraintes: reference constante
+//    Acces: entree
+// Retour:
+//    Signification:
+//    Contraintes:
+// Exception:
+// Effets de bord:
+// Postcondition:
+inline void Terme_Gravite::associer_gravite(const Champ_Don_base& g)
 {
-  /*   Cerr << "Here is : Euler_Explicite::completer()" << finl; */
+  gravite=g;
 }
 
 #endif

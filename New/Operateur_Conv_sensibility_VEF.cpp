@@ -109,7 +109,6 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           exit();
         }
       opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
-
     }
   else
     {
