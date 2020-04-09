@@ -15,8 +15,8 @@ dz+= 50 #
 
 
 # Read_file dom dom.geom
-Reordonner_faces_periodiques dom PERX
-Reordonner_faces_periodiques dom PERZ #
+Corriger_frontiere_periodique { domaine dom bord PERX }
+Corriger_frontiere_periodique { domaine dom bord PERZ } #
 
 
 

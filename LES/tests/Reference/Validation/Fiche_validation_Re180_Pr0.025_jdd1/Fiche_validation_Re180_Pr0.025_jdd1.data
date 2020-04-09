@@ -23,8 +23,8 @@ Mailler dom
 	}
 }
 
-Reordonner_faces_periodiques dom PerioX
-Reordonner_faces_periodiques dom PerioZ
+Corriger_frontiere_periodique { domaine dom bord PerioX }
+Corriger_frontiere_periodique { domaine dom bord PerioZ }
 # END MESH #
 
 # BEGIN PARTITION

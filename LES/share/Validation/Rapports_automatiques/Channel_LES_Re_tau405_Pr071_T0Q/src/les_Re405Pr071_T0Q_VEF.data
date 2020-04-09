@@ -25,8 +25,8 @@ Mailler dom
 	
 
 Tetraedriser_homogene_fin dom
-Reordonner_faces_periodiques dom periox
-Reordonner_faces_periodiques dom perioz
+Corriger_frontiere_periodique { domaine dom bord periox }
+Corriger_frontiere_periodique { domaine dom bord perioz }
 
 VEFPreP1b dis
 

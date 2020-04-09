@@ -25,8 +25,8 @@ Pave Cavite
 }
 
 Tetraedriser_homogene dom
-# Reordonner_Faces_Periodiques dom periox #
-Reordonner_Faces_Periodiques dom perioz
+# Corriger_frontiere_periodique { domaine dom bord periox } #
+Corriger_frontiere_periodique { domaine dom bord perioz }
 # END MESH #
 # BEGIN PARTITION
 Partition dom

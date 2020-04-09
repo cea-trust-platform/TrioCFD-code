@@ -23,7 +23,7 @@ Pave Cavite
                 }
 } 
 Trianguler_fin dom
-Reordonner_faces_periodiques dom periox
+Corriger_frontiere_periodique { domaine dom bord periox }
 Ecrire_fichier dom dom.geom
 # END MESH #
 # BEGIN PARTITION
