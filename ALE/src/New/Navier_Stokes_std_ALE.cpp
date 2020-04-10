@@ -105,8 +105,10 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
   // Correction du second membre d'apres les conditions aux limites :
   assembleur_pression_.modifier_secmem(secmemP);
   secmemP.echange_espace_virtuel();
+
   Debog::verifier("secmemP Navier_Stokes_std::corriger_derivee_impl",secmemP);
 }
+
 
 void Navier_Stokes_std_ALE::update_pressure_matrix( void )
 {
