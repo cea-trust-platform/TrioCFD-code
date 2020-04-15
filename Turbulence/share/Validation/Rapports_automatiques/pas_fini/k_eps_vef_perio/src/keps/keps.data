@@ -24,8 +24,8 @@ Pb_Hydraulique_Turbulent pb
 VEFPreP1b dis 
 Tetraedriser_homogene_compact dom0 
 
-Reordonner_faces_periodiques dom0 perio
-Reordonner_faces_periodiques dom0 perioz
+Corriger_frontiere_periodique { domaine dom0 bord perio }
+Corriger_frontiere_periodique { domaine dom0 bord perioz }
 Scheme_euler_explicit sch
 Read sch 
 { 

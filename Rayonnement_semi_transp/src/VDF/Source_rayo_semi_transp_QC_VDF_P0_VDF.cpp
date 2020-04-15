@@ -59,44 +59,7 @@ DoubleTab& Source_rayo_semi_transp_QC_VDF_P0_VDF::calculer(DoubleTab& resu) cons
 
 DoubleTab& Source_rayo_semi_transp_QC_VDF_P0_VDF::ajouter(DoubleTab& resu) const
 {
-  DoubleTab resu_tmp(resu);
-  le_source_rayo.calculer(resu_tmp);
-  // C'est la que l'on multiplie le terme source par rho*cp
-
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,equation().zone_dis().valeur());
-  int nb_elem = zvdf.nb_elem();
-  const Milieu_base& fluide = equation().milieu();
-  const DoubleTab& rho = fluide.masse_volumique().valeurs();
-  const DoubleTab& cp = fluide.capacite_calorifique().valeurs();
-
-  int elem;
-  for (elem=0; elem<nb_elem; elem++)
-    {
-      double val_rho;
-      assert(fluide.masse_volumique().nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.masse_volumique().valeur()))
-        val_rho = rho(0,0);
-      else if (rho.nb_dim() == 1)
-        val_rho = rho(elem);
-      else
-        val_rho = rho(elem,0);
-
-      double val_cp;
-      assert(fluide.capacite_calorifique().nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.capacite_calorifique().valeur()))
-        val_cp = cp(0,0);
-      else
-        ////val_cp = cp(elem,0);
-        if (cp.nb_dim() == 1)
-          val_cp = cp(elem);
-        else
-          val_cp = cp(elem,0);
-
-      resu_tmp(elem) *= val_rho*val_cp;
-    }
-
-  resu+=resu_tmp;
-  return resu;
+  return le_source_rayo.ajouter(resu);
 }
 
 

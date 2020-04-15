@@ -59,8 +59,6 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
   const Fluide_Incompressible& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa().valeurs();
   const DoubleTab& indice = fluide.indice().valeurs();
-  const DoubleTab& rho = fluide.masse_volumique().valeurs();
-  const DoubleTab& cp = fluide.capacite_calorifique().valeurs();
   const DoubleTab& G = eq_rayo.inconnue().valeurs();
 
   const DoubleVect& volumes_entrelaces =  zvef.volumes_entrelaces();
@@ -86,29 +84,9 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
       else
         k = kappa(face,0);
 
-      double val_rho;
-      assert(fluide.masse_volumique().nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.masse_volumique().valeur()))
-        val_rho = rho(0,0);
-      else if (rho.nb_dim() == 1)
-        val_rho = rho(face);
-      else
-        val_rho = rho(face,0);
-
-      double val_cp;
-      assert(fluide.capacite_calorifique().nb_comp() == 1);
-      if(sub_type(Champ_Uniforme,fluide.capacite_calorifique().valeur()))
-        val_cp = cp(0,0);
-      else
-        ////val_cp = cp(face,0);
-        if (cp.nb_dim() == 1)
-          val_cp= cp(face);
-        else
-          val_cp = cp(face,0);
-
       double T = temperature(face);
       double vol =  volumes_entrelaces(face);
-      resu[face] += (k*(G(face) - 4*n*n*sigma*pow(T,4))*vol)/(val_rho*val_cp);
+      resu[face] += k*(G(face) - 4*n*n*sigma*pow(T,4))*vol;
     }
   return resu;
 }

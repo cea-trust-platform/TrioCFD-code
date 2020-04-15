@@ -27,9 +27,9 @@ Mailler dom
 }
 Tetraedriser_par_prisme dom
 
-Reordonner_faces_periodiques dom periox
-Reordonner_faces_periodiques dom perioy
-Reordonner_faces_periodiques dom perioz
+Corriger_frontiere_periodique { domaine dom bord periox }
+Corriger_frontiere_periodique { domaine dom bord perioy }
+Corriger_frontiere_periodique { domaine dom bord perioz }
 # END MESH #
 
 # Ecrire_fic_meshtv dom verif_domaine.meshtv #

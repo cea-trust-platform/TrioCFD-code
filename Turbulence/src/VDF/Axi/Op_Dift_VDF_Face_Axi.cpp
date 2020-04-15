@@ -99,7 +99,7 @@ const Champ_base& Op_Dift_VDF_Face_Axi::diffusivite() const
 
 void Op_Dift_VDF_Face_Axi::associer_diffusivite_turbulente(const Champ_Fonc& visc_turb)
 {
-  la_diffusivite_turbulente=visc_turb;
+  Op_Diff_Turbulent_base::associer_diffusivite_turbulente(visc_turb);
 }
 
 void Op_Dift_VDF_Face_Axi::associer_loipar(const Turbulence_paroi& loi_paroi)
@@ -168,7 +168,7 @@ DoubleTab& Op_Dift_VDF_Face_Axi::ajouter(const DoubleTab& inco, DoubleTab& resu)
 
   const Champ_Uniforme& viscosite_lam = diffusivite_;
   double visco_lam = viscosite_lam(0,0);
-  const DoubleVect& visco_turb = la_diffusivite_turbulente->valeurs();
+  const DoubleVect& visco_turb = diffusivite_turbulente()->valeurs();
   double d_visco_turb;
 
   const DoubleTab& tau_diag = inconnue->tau_diag();
@@ -712,7 +712,7 @@ void Op_Dift_VDF_Face_Axi::ajouter_contribution(const DoubleTab& inco,          
 
   const Champ_Uniforme& viscosite_lam = diffusivite_;
   double visco_lam = viscosite_lam(0,0);
-  const DoubleVect& visco_turb = la_diffusivite_turbulente->valeurs();
+  const DoubleVect& visco_turb = diffusivite_turbulente()->valeurs();
   double d_visco_turb;
 
   //  DoubleTab& tau_diag = inconnue->tau_diag();
@@ -1312,7 +1312,7 @@ void Op_Dift_VDF_Face_Axi::contribue_au_second_membre(DoubleTab& resu ) const
 
   //  const Champ_Uniforme& viscosite_lam = diffusivite_;
   //  double visco_lam = viscosite_lam(0,0);
-  //  const DoubleVect& visco_turb = la_diffusivite_turbulente->valeurs();
+  //  const DoubleVect& visco_turb = diffusivite_turbulente()->valeurs();
 
   // Boucle sur les bord pour traiter les faces de type sortie_libre
 

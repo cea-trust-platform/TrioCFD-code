@@ -146,32 +146,35 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
 {
   calculer_diffusivite_turbulente();
   const Milieu_base& mil=equation().probleme().milieu();
-  diviser_par_rho_si_qc(la_diffusivite_turbulente.valeurs(),mil);
   const Turbulence_paroi_scal& lp = loi_paroi();
   if (lp.non_nul())
     {
-      loipar->calculer_scal(la_diffusivite_turbulente);
+      loipar->calculer_scal(diffusivite_turbulente_);
     }
   const Probleme_base& mon_pb = mon_equation->probleme();
+  DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
+  lambda_t = diffusivite_turbulente_.valeurs();
+  const DoubleTab& tab_Cp = mon_pb.milieu().capacite_calorifique().valeurs();
+  const DoubleTab& tab_rho = mon_pb.milieu().masse_volumique().valeurs();
   if (sub_type(Pb_Thermohydraulique_Turbulent_QC,mon_pb))
     {
-      DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-      const DoubleTab& tab_Cp = mon_pb.milieu().capacite_calorifique().valeurs();
       double cp=-1;
       if (tab_Cp.nb_dim()==2)
         {
           cp=tab_Cp(0,0);
-          alpha_t*=cp;
+          lambda_t*=cp;
         }
       else
         {
-          int taille=alpha_t.size();
+          int taille=lambda_t.size();
           for (int i=0; i<taille; i++)
-            alpha_t(i)*=tab_Cp(i);
+            lambda_t(i)*=tab_Cp(i);
         }
-      multiplier_par_rho_si_qc(alpha_t,mil);
+      multiplier_par_rho_si_qc(lambda_t,mil);
     }
-  la_diffusivite_turbulente->valeurs().echange_espace_virtuel();
+  else lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
+  lambda_t.echange_espace_virtuel();
+  diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
 
@@ -193,8 +196,8 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
 // Postcondition:
 Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
 {
-  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-  const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
+  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
+  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
 
   //Zone& zone = mon_equation->zone_dis().zone();
@@ -204,7 +207,7 @@ Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
   // if (temps != la_diffusivite_turbulente.temps())
   {
     int n= alpha_t.size();
-    if (mu_t.size() != n)
+    if (nu_t.size() != n)
       {
         Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
         Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
@@ -238,7 +241,7 @@ Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
           {
             if (!is_alpha_unif)
               fonction.setVar("alpha",alpha(i));
-            fonction.setVar("nu_t",mu_t[i]);
+            fonction.setVar("nu_t",nu_t[i]);
 
             alpha_t[i] = fonction.eval();
           }
@@ -259,17 +262,17 @@ Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
               fonction1.setVar("y",y);
               fonction1.setVar("z",z);
               double NbPrandtlCell = fonction1.eval();
-              alpha_t[i] = mu_t[i]/NbPrandtlCell;
+              alpha_t[i] = nu_t[i]/NbPrandtlCell;
             }
           else
             {
-              alpha_t[i] = mu_t[i]/LePrdt;
+              alpha_t[i] = nu_t[i]/LePrdt;
             }
         }
 
-    la_diffusivite_turbulente.changer_temps(temps);
+    diffusivite_turbulente_.changer_temps(temps);
   }
-
-  return la_diffusivite_turbulente;
+  diviser_par_rho_si_qc(diffusivite_turbulente_.valeurs(), equation().probleme().milieu());
+  return diffusivite_turbulente_;
 }
 

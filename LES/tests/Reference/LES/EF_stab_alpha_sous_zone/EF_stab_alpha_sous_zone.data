@@ -24,8 +24,8 @@ Mailler dom
 		}
 	}
 Tetraedriser_homogene_fin dom
-Reordonner_faces_periodiques dom periox
-Reordonner_faces_periodiques dom perioz
+Corriger_frontiere_periodique { domaine dom bord periox }
+Corriger_frontiere_periodique { domaine dom bord perioz }
 # END MESH #
 # dx+ = 100, dy+min = 1,6 dy+max = 31 et dz+ = 35  #
 	

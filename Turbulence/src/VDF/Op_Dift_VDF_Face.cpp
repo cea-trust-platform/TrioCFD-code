@@ -55,7 +55,7 @@ Entree& Op_Dift_VDF_Face::readOn(Entree& s )
 
 void Op_Dift_VDF_Face::associer_diffusivite_turbulente(const Champ_Fonc& visc_turb)
 {
-  la_diffusivite_turbulente=visc_turb;
+  Op_Diff_Turbulent_base::associer_diffusivite_turbulente(visc_turb);
   Evaluateur_VDF& eval = iter.evaluateur();
   Eval_Dift_VDF_const_Face& eval_diff_turb = (Eval_Dift_VDF_const_Face&) eval;
   eval_diff_turb.associer_diff_turb(visc_turb);

@@ -301,12 +301,17 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const DoubleVect& Temp = eqn_temp.inconnue().valeurs();
   int elem;
 
+  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_temp.probleme().equation(0).milieu());
+  const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
+  const Champ_Don& alpha = le_fluide.diffusivite();
+  DoubleTab alpha_t = diffusivite_turb.valeurs();
+
   int itmax=0,itmax_loc;
 
   DoubleTab termes_sources;
   termes_sources.resize(nb_faces);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
-
+  termes_sources /= rhoCp;
 
   double surf2;
   // double dist; //distance du centre de la maille a la paroi
@@ -322,10 +327,6 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const double& tps = eqn_temp.schema_temps().temps_courant();
   const double& dt = eqn_temp.schema_temps().pas_de_temps();
   const double& dt_min = eqn_temp.schema_temps().pas_temps_min();
-
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_temp.probleme().equation(0).milieu());
-  const Champ_Don& alpha = le_fluide.diffusivite();
-  DoubleTab alpha_t = diffusivite_turb.valeurs();
 
   int compteur_faces_paroi = 0;
 

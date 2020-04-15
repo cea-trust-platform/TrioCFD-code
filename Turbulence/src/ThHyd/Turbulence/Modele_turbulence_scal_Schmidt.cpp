@@ -154,7 +154,7 @@ int Modele_turbulence_scal_Schmidt::a_pour_Champ_Fonc(const Motcle& mot,
 {
   if (mot == Motcle("diffusion_turbulente"))
     {
-      ch_ref = la_diffusivite_turbulente.valeur();
+      ch_ref = diffusivite_turbulente_.valeur();
       return 1;
     }
   return 0;
@@ -180,15 +180,16 @@ void Modele_turbulence_scal_Schmidt::mettre_a_jour(double )
 {
   calculer_diffusion_turbulente();
   const Milieu_base& mil=equation().probleme().milieu();
-  diviser_par_rho_si_qc(la_diffusivite_turbulente.valeurs(),mil);
   const Turbulence_paroi_scal& lp = loi_paroi();
   if (lp.non_nul())
     {
-      loipar->calculer_scal(la_diffusivite_turbulente);
+      loipar->calculer_scal(diffusivite_turbulente_);
     }
-  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-  multiplier_par_rho_si_qc(alpha_t,mil);
-  la_diffusivite_turbulente->valeurs().echange_espace_virtuel();
+  DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
+  lambda_t = diffusivite_turbulente_.valeurs();
+  multiplier_par_rho_si_qc(lambda_t,mil);
+  conductivite_turbulente_->valeurs().echange_espace_virtuel();
+  diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
 // Description:
@@ -209,11 +210,11 @@ void Modele_turbulence_scal_Schmidt::mettre_a_jour(double )
 // Postcondition:
 Champ_Fonc& Modele_turbulence_scal_Schmidt::calculer_diffusion_turbulente()
 {
-  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-  const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
+  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
+  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
   int n= alpha_t.size();
-  if (mu_t.size() != n)
+  if (nu_t.size() != n)
     {
       Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
       Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
@@ -221,7 +222,8 @@ Champ_Fonc& Modele_turbulence_scal_Schmidt::calculer_diffusion_turbulente()
     }
 
   for (int i=0; i<n; i++)
-    alpha_t[i] = mu_t[i]/LeScturb;
-  la_diffusivite_turbulente.changer_temps(temps);
-  return la_diffusivite_turbulente;
+    alpha_t[i] = nu_t[i]/LeScturb;
+  diffusivite_turbulente_.changer_temps(temps);
+  diviser_par_rho_si_qc(diffusivite_turbulente_.valeurs(), equation().probleme().milieu());
+  return diffusivite_turbulente_;
 }

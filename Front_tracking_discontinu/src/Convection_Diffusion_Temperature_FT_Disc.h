@@ -81,8 +81,5 @@ protected:
   //  vers la phase 1)
   Champ_Fonc grad_t_;
   Champ_Inc vitesse_convection_;
-
-
-
 };
 #endif

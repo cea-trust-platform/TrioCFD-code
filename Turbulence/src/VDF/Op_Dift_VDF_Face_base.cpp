@@ -104,7 +104,7 @@ double Op_Dift_VDF_Face_base::calculer_dt_stab(const Zone_VDF& zone_VDF) const
   double dt_stab;
   double coef;
   const DoubleTab& diffu = diffusivite().valeurs();
-  const DoubleTab& diffu_turb = la_diffusivite_turbulente->valeurs();
+  const DoubleTab& diffu_turb = diffusivite_turbulente()->valeurs();
 
   // Calcul du pas de temps de stabilite :
   //
