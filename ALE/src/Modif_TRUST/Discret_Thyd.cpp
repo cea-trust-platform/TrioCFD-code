@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2017, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -78,6 +78,7 @@ void Discret_Thyd::vitesse(const Schema_Temps_base& sch,
 
 
 }
+
 void Discret_Thyd::vitesse_mesh_ale(const Schema_Temps_base& sch,
                                     Zone_dis& z,
                                     Champ_Inc& ch) const
@@ -98,7 +99,6 @@ void Discret_Thyd::deplacement_mesh_ale(const Schema_Temps_base& sch,
 
 
 }
-
 void Discret_Thyd::translation(const Schema_Temps_base& sch,
                                Zone_dis& z,
                                Champ_Fonc& ch) const
@@ -292,6 +292,12 @@ void Discret_Thyd::h_conv(const Zone_dis& z,const Zone_Cl_dis& zcl, const Champ_
   exit();
 }
 
+void Discret_Thyd::K_Eps_residu(const Zone_dis& , const Champ_Inc&, Champ_Fonc& ) const
+{
+  Cerr << "\nDiscret_Thyd::K_Eps_residu() does nothing" << finl;
+  Cerr <<  que_suis_je() << " needs to overload it !" << finl;
+  exit();
+}
 
 
 // Description:
@@ -361,3 +367,5 @@ void Discret_Thyd::concentration(const Schema_Temps_base& sch,
         }
     }
 }
+
+

@@ -21,7 +21,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Transport_K_Eps.h>
-
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Les_Pb_Turb.h>
 #include <Param.h>
@@ -31,6 +30,7 @@
 #include <DoubleTrav.h>
 #include <Debog.h>
 #include <Discretisation_base.h>
+
 
 Implemente_instanciable(Transport_K_Eps,"Transport_K_Eps",Transport_K_Eps_base);
 
@@ -324,7 +324,6 @@ DoubleTab& Transport_K_Eps::corriger_derivee_impl(DoubleTab& d)
       Debog::verifier("Transport_K_Eps::corriger_derivee_impl",d);
     }
   // ALE part finished
-
   const Turbulence_paroi_base& loi_paroi=modele_turbulence().loi_paroi().valeur();
   loi_paroi.corriger_derivee_impl(d);
   return Transport_K_Eps_base::corriger_derivee_impl(d);
