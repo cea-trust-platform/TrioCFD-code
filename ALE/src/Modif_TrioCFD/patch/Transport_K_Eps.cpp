@@ -97,6 +97,12 @@ Entree& Transport_K_Eps::readOn(Entree& s )
           Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
           so.typer(typ,*this);
         }
+      else if (sub_type(Pb_Hydraulique_Turbulent_ALE,pb))
+        {
+          Nom typ = "Source_Transport_K_Eps";
+          Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
+          so.typer(typ,*this);
+        }
       else if (sub_type(Pb_Thermohydraulique_Turbulent,pb))
         {
           Nom typ = "Source_Transport_K_Eps_anisotherme";
