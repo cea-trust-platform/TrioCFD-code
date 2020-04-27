@@ -36,7 +36,7 @@ class Champ_Fonc;
 //     classe Pb_Hydraulique_Turbulent_ALE
 //     Cette classe represente un probleme d'hydraulique turbulent dans
 //     lequel on resout les equations de Navier Stokes en regime turbulent
-//     pour un fluide incompressible
+//     pour un fluide incompressible et en maillage mobile (ALE)
 //     La formulation est de type vitesse pression
 // .SECTION voir aussi
 //     Pb_qdm_fluide Navier_Stokes_Turbulent_ALE Pb_Hydraulique

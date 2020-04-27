@@ -35,7 +35,7 @@ class Champ_Fonc;
 //     classe Navier_Stokes_Turbulent_ALE
 //     Cette classe represente l'equation de la dynamique pour un fluide
 //     visqueux verifiant la condition d'incompressibilite div U = 0 avec
-//     modelisation de la turbulence.
+//     modelisation de la turbulence pour un maillage mobile (ALE).
 //     Un membre de type Mod_turb_hyd representera le modele de turbulence.
 // .SECTION voir aussi
 //      Navier_Stokes_std_ALE Mod_turb_hyd Pb_Hydraulique_Turbulent
