@@ -30,6 +30,7 @@
 #include <Discret_Thyd.h>
 
 Implemente_instanciable(Navier_Stokes_std_ALE,"Navier_Stokes_standard_ALE",Navier_Stokes_std);
+// XD Navier_Stokes_std_ALE eqn_base Navier_Stokes_std_ALE -1 Resolution of hydraulic Navier-Stokes eq. on mobile domain (ALE)
 
 Sortie& Navier_Stokes_std_ALE::printOn(Sortie& os ) const
 {

@@ -36,6 +36,9 @@
 #include <Param.h>
 
 Implemente_instanciable(Navier_Stokes_Turbulent_ALE,"Navier_Stokes_Turbulent_ALE",Navier_Stokes_std_ALE);
+// XD Navier_Stokes_Turbulent_ALE Navier_Stokes_std_ALE Navier_Stokes_Turbulent_ALE -1 Resolution of hydraulic turbulent Navier-Stokes eq. on mobile domain (ALE)
+// XD  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
+
 
 // Description:
 //    Impression de l'equation sur un flot de sortie.
