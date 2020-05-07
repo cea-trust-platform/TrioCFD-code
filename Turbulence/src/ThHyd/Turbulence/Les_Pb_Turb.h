@@ -21,6 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Pb_Hydraulique_Turbulent.h>
+#include <Pb_Hydraulique_Turbulent_ALE.h>
 #include <Pb_Thermohydraulique_Turbulent.h>
 #include <Pb_Thermohydraulique_Concentration_Turbulent.h>
 #include <Pb_Hydraulique_Concentration_Turbulent.h>
