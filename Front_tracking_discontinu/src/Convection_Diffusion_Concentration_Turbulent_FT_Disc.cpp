@@ -14,12 +14,12 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_Concentration_FT_Disc.cpp
+// File:        Convection_Diffusion_Concentration_Turbulent_FT_Disc.cpp
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
-#include <Convection_Diffusion_Concentration_FT_Disc.h>
+#include <Convection_Diffusion_Concentration_Turbulent_FT_Disc.h>
 #include <Champ_P1NC.h>
 #include <Probleme_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
@@ -31,12 +31,13 @@
 #include <SFichier.h>
 #include <Param.h>
 #include <Constituant.h>
+#include <Modele_turbulence_scal_Schmidt.h>
 #include <Fluide_Diphasique.h>
 #include <Fluide_Incompressible.h>
 
-Implemente_instanciable_sans_constructeur(Convection_Diffusion_Concentration_FT_Disc,"Convection_Diffusion_Concentration_FT_Disc",Convection_Diffusion_Concentration);
+Implemente_instanciable_sans_constructeur(Convection_Diffusion_Concentration_Turbulent_FT_Disc,"Convection_Diffusion_Concentration_Turbulent_FT_Disc",Convection_Diffusion_Concentration_Turbulent);
 
-Convection_Diffusion_Concentration_FT_Disc::Convection_Diffusion_Concentration_FT_Disc()
+Convection_Diffusion_Concentration_Turbulent_FT_Disc::Convection_Diffusion_Concentration_Turbulent_FT_Disc()
 {
   option_ = RIEN;
   phase_a_conserver_ = -1;
@@ -48,9 +49,9 @@ Convection_Diffusion_Concentration_FT_Disc::Convection_Diffusion_Concentration_F
 
 // Description:
 //  cf Convection_Diffusion_Concentration::readOn(is)
-Entree& Convection_Diffusion_Concentration_FT_Disc::readOn(Entree& is)
+Entree& Convection_Diffusion_Concentration_Turbulent_FT_Disc::readOn(Entree& is)
 {
-  Convection_Diffusion_Concentration::readOn(is);
+  Convection_Diffusion_Concentration_Turbulent::readOn(is);
   if (equations_source_chimie_.size() > 0)
     {
       Cerr << "Chemical reaction using these equations:" << equations_source_chimie_ << finl;
@@ -83,15 +84,15 @@ Entree& Convection_Diffusion_Concentration_FT_Disc::readOn(Entree& is)
   return is;
 }
 
-Sortie& Convection_Diffusion_Concentration_FT_Disc::printOn(Sortie& os) const
+Sortie& Convection_Diffusion_Concentration_Turbulent_FT_Disc::printOn(Sortie& os) const
 {
-  Convection_Diffusion_Concentration::printOn(os);
+  Convection_Diffusion_Concentration_Turbulent::printOn(os);
   return os;
 }
 
-void Convection_Diffusion_Concentration_FT_Disc::set_param(Param& param)
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::set_param(Param& param)
 {
-  Convection_Diffusion_Concentration::set_param(param);
+  Convection_Diffusion_Concentration_Turbulent::set_param(param);
   param.ajouter("constante_cinetique",&constante_cinetique_);
   param.ajouter("equations_source_chimie",&equations_source_chimie_);
   param.ajouter("modele_cinetique",&modele_cinetique_);
@@ -104,7 +105,7 @@ void Convection_Diffusion_Concentration_FT_Disc::set_param(Param& param)
   param.ajouter_non_std("option",(this));
 }
 
-int Convection_Diffusion_Concentration_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+int Convection_Diffusion_Concentration_Turbulent_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   if (mot=="equation_interface")
     {
@@ -137,7 +138,7 @@ int Convection_Diffusion_Concentration_FT_Disc::lire_motcle_non_standard(const M
       return 1;
     }
   else
-    return Convection_Diffusion_Concentration::lire_motcle_non_standard(mot,is);
+    return Convection_Diffusion_Concentration_Turbulent::lire_motcle_non_standard(mot,is);
   return 1;
 }
 
@@ -210,7 +211,7 @@ static void calculer_indicatrice_comme(const Champ_base& src, DoubleTab& dest, c
 //  Annule la concentration dans la phase qui n'est pas a conserver et
 //  rescale celle de la phase a conserver pour que l'integrale soit conservee.
 //  La concentration est discontinue a l'interface liquide-vapeur.
-void Convection_Diffusion_Concentration_FT_Disc::ramasse_miette_simple(double temps)
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::ramasse_miette_simple(double temps)
 {
   const Transport_Interfaces_FT_Disc& eq = ref_cast(Transport_Interfaces_FT_Disc, ref_eq_transport_.valeur());
   DoubleTab tmp;
@@ -251,12 +252,12 @@ void Convection_Diffusion_Concentration_FT_Disc::ramasse_miette_simple(double te
   inco.echange_espace_virtuel();
 }
 
-void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie()
 {
   // On va ecraser les inconnues des equations de chimie:
   if (equations_source_chimie_.size() != 2)
     {
-      Cerr << "Error for method Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()\n"
+      Cerr << "Error for method Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie()\n"
            << "It implies two equations_source_chimie" << finl;
       barrier();
       exit();
@@ -279,6 +280,15 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
       champ_nu_t = &(le_modele.viscosite_turbulente().valeurs());
     }
+
+  const Equation_base& eq_scal =pb.get_equation_by_name(equations_source_chimie_[0]);
+  const RefObjU& modele_turbulence_scal = eq_scal.get_modele(TURBULENCE);
+  const Modele_turbulence_scal_base& le_modele_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence_scal.valeur());
+  const Modele_turbulence_scal_Schmidt& le_modele_scal_sc = ref_cast(Modele_turbulence_scal_Schmidt,le_modele_scal);
+
+  double sc_t = le_modele_scal_sc.get_Scturb();
+  if (modele_cinetique_ == 2)
+    Cerr << "Reaction model dependent of the turbulent Schmidt number which is defined as " << sc_t << finl;
 
   const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant().valeur().valeurs();
   double coeff_diffusivite = tab_diffusivite(0,0);
@@ -313,9 +323,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       double c2 = max(0., champ2(face));
       double c3 = max(0., champ3(face));
 
-      // ES243900
-      // Modele 1 classique
-      // Finite rate formulation.
+      // Modele 1 classique rapport B. Zoppe
       if (modele_cinetique_ == 1)
         {
           double omega = constante_cinetique_ * (1. + constante_cinetique_nu_t_ * nu_t) * c1 * c2;
@@ -332,11 +340,18 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       // traitement particuliere pour n'avoir pas de c < 0
       else if (modele_cinetique_ == 2)
         {
-          // Besoin de la modele LES !!!!
-          Cerr << "MODELE_CINETIQUE 2 requires a turbulent Concentration problem" << finl;
-          Cerr << "Replace Convection_Diffusion_Concentration_FT_Disc by Convection_Diffusion_Concentration_Turbulent_FT_Disc" << finl;
-          barrier();
-          Process::exit(-1);
+          // On recalcule la longueur caracteristique de maille
+          double l_carac = 2.0*pow(6.*volumes_entrelaces(face),1./double(dim)) ;
+          double tm = l_carac*l_carac/(coeff_diffusivite + nu_t/sc_t);
+
+          double omega = min(c1,c2);
+          omega = omega/max(dt,tm);
+          double Rdt = omega * dt;
+
+          /* Modif des concentrations */
+          champ1(face) = c1 - Rdt;
+          champ2(face) = c2 - Rdt;
+          champ3(face) = c3 + Rdt;
         }
 
       // Modele 3 : eddy disspertion concept (EDC) Bertrand et al. 2016 Cemical Engineering Journal
@@ -399,7 +414,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
 
 // Multiplie les valeurs des faces marquees par facteur
 //  et calcule l'integrale des valeurs avant modifications
-void Convection_Diffusion_Concentration_FT_Disc::multiplier_valeurs_faces(const ArrOfBit marqueurs_faces, double facteur, double& integrale_avant, DoubleTab& tab)
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::multiplier_valeurs_faces(const ArrOfBit marqueurs_faces, double facteur, double& integrale_avant, DoubleTab& tab)
 {
   const Zone_VEF&     zone_vef = ref_cast(Zone_VEF, zone_dis().valeur());
   const DoubleVect& volumes = zone_vef.volumes_entrelaces();
@@ -424,9 +439,9 @@ void Convection_Diffusion_Concentration_FT_Disc::multiplier_valeurs_faces(const 
   integrale_avant = mp_sum(integrale);
 }
 
-void Convection_Diffusion_Concentration_FT_Disc::marquer_faces_sous_zone(const Nom& nom_sous_zone,
-                                                                         ArrOfBit& marqueur,
-                                                                         int sans_faces_non_std_volume_nul) const
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::marquer_faces_sous_zone(const Nom& nom_sous_zone,
+                                                                                   ArrOfBit& marqueur,
+                                                                                   int sans_faces_non_std_volume_nul) const
 {
   const Zone_VEF& zone_vef = ref_cast(Zone_VEF, zone_dis().valeur());
   const IntTab& elem_faces = zone_vef.elem_faces();
@@ -458,10 +473,10 @@ void Convection_Diffusion_Concentration_FT_Disc::marquer_faces_sous_zone(const N
 
 // Description: appel a mettre_a_jour() de l'ancetre et application de l' "option_" choisie
 //   pour traiter la presence d'une interface.
-void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
+void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour(double temps)
 {
-  Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c1", inconnue().valeur().valeurs());
-  Convection_Diffusion_Concentration::mettre_a_jour(temps);
+  Debog::verifier("Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour c1", inconnue().valeur().valeurs());
+  Convection_Diffusion_Concentration_Turbulent::mettre_a_jour(temps);
 
   switch(option_)
     {
@@ -471,7 +486,7 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
       ramasse_miette_simple(temps);
       break;
     default:
-      Cerr << "Internal error for method Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour" << finl;
+      Cerr << "Internal error for method Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour" << finl;
       barrier();
       exit();
     }
@@ -531,5 +546,5 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
               integrale_sortie / dt);
       f << s << finl;
     }
-  Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c2", inconnue().valeur().valeurs());
+  Debog::verifier("Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour c2", inconnue().valeur().valeurs());
 }

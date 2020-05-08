@@ -14,16 +14,16 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_Concentration_FT_Disc.h
+// File:        Convection_Diffusion_Concentration_Turbulent_FT_Disc.h
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
 // Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Convection_Diffusion_Concentration_FT_Disc_included
-#define Convection_Diffusion_Concentration_FT_Disc_included
+#ifndef Convection_Diffusion_Concentration_Turbulent_FT_Disc_included
+#define Convection_Diffusion_Concentration_Turbulent_FT_Disc_included
 
-#include <Convection_Diffusion_Concentration.h>
+#include <Convection_Diffusion_Concentration_Turbulent.h>
 #include <Ref_Equation_base.h>
 
 class ArrOfBit;
@@ -35,12 +35,12 @@ class ArrOfBit;
 // .SECTION voir aussi
 //      Convection_Diffusion_Concentration
 //////////////////////////////////////////////////////////////////////////////
-class Convection_Diffusion_Concentration_FT_Disc : public Convection_Diffusion_Concentration
+class Convection_Diffusion_Concentration_Turbulent_FT_Disc : public Convection_Diffusion_Concentration_Turbulent
 {
-  Declare_instanciable_sans_constructeur(Convection_Diffusion_Concentration_FT_Disc);
+  Declare_instanciable_sans_constructeur(Convection_Diffusion_Concentration_Turbulent_FT_Disc);
 public:
 
-  Convection_Diffusion_Concentration_FT_Disc();
+  Convection_Diffusion_Concentration_Turbulent_FT_Disc();
   void set_param(Param& titi);
   int lire_motcle_non_standard(const Motcle&, Entree&);
   void     mettre_a_jour(double temps);

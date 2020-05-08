@@ -14,64 +14,63 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_Concentration_FT_Disc.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
-// Version:     /main/9
+// File:        Mod_turb_hyd_ss_maille.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
+// Version:     /main/19
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Convection_Diffusion_Concentration_FT_Disc_included
-#define Convection_Diffusion_Concentration_FT_Disc_included
+#ifndef Mod_turb_hyd_ss_maille_included
+#define Mod_turb_hyd_ss_maille_included
 
-#include <Convection_Diffusion_Concentration.h>
-#include <Ref_Equation_base.h>
+#define CSM1 0.063        // Constante viscosite turbulente modele sous maille
+#define CSMS1 0.112        // Constante viscosite turbulente modele sous maille selectif
+#define CSM2 0.37       // Constante energie cinetique turbulente modele sous maille
 
-class ArrOfBit;
+#include <Mod_turb_hyd_base.h>
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//   Cette equation corrige le champ de concentration pour tenir compte de la
-//   presence d'une interface.
+//    Classe Mod_turb_hyd_ss_maille
+//    Classe representant le modele de turbulence sous maille pour les
+//    equations de Navier-Stokes.
 // .SECTION voir aussi
-//      Convection_Diffusion_Concentration
+//    Mod_turb_hyd_base Modele_turbulence_hyd_K_Eps
 //////////////////////////////////////////////////////////////////////////////
-class Convection_Diffusion_Concentration_FT_Disc : public Convection_Diffusion_Concentration
+class Mod_turb_hyd_ss_maille : public Mod_turb_hyd_base
 {
-  Declare_instanciable_sans_constructeur(Convection_Diffusion_Concentration_FT_Disc);
+
+  Declare_base_sans_constructeur(Mod_turb_hyd_ss_maille);
+
 public:
 
-  Convection_Diffusion_Concentration_FT_Disc();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void     mettre_a_jour(double temps);
+  Mod_turb_hyd_ss_maille();
+  void set_param(Param& param);
+  virtual void discretiser();
+  void verifie_loi_paroi_diphasique();
+  int preparer_calcul();
+  virtual void completer();
+  void mettre_a_jour(double );
+  inline virtual Champ_Fonc& energie_cinetique_turbulente()
+  {
+    return energie_cinetique_turb_;
+  };
+  inline virtual const Champ_Fonc& energie_cinetique_turbulente() const
+  {
+    return energie_cinetique_turb_;
+  };
+  virtual void calculer_longueurs_caracteristiques()=0;
+  virtual Champ_Fonc& calculer_viscosite_turbulente()=0;
+  virtual void calculer_energie_cinetique_turb();
 
 protected:
-  void ramasse_miette_simple(double temps);
-  void mettre_a_jour_chimie();
-  void multiplier_valeurs_faces(const ArrOfBit marqueurs_faces, double facteur, double& integrale_avant, DoubleTab& tab);
-  void marquer_faces_sous_zone(const Nom& nom_sous_zone,
-                               ArrOfBit& marqueur,
-                               int sans_faces_non_std_volume_nul) const;
 
-  // Algorithme a utiliser pour tenir compte des interfaces:
-  enum Options { RIEN = 0, RAMASSE_MIETTES_SIMPLE = 1 };
-  Options option_;
-  // Dans quelle phase la masse du constituant se trouve-t-elle (RAMASSE_MIETTES_SIMPLE)
-  int phase_a_conserver_;
+  Champ_Fonc energie_cinetique_turb_;
+  DoubleVect l_;
+  Motcle methode;
 
-  // Quelle equation du probleme fournit l'indicatrice de phase ?
-  REF(Equation_base) ref_eq_transport_;
 
-  // Liste non vide => cette equation modelise le produit de la reaction avec les equations
-  //  dont la liste contient les noms:
-  Noms equations_source_chimie_;
-  // Constantes cinetiques
-  double constante_cinetique_;
-  double constante_cinetique_nu_t_;
-  Nom nom_equation_nu_t_;
-  // Modele pour taux de reactions
-  int modele_cinetique_;
-  // Zone de sortie ou on annule la concentration
-  Nom nom_zone_sortie_;
 };
+
 #endif
