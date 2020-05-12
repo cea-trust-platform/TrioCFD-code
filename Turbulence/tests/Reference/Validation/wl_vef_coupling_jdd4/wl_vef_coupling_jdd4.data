@@ -48,6 +48,10 @@ Tetraedriser_homogene dom_fluide
 
 Corriger_frontiere_periodique { domaine dom_solide bord perioz1 }
 Corriger_frontiere_periodique { domaine dom_fluide bord perioz2 }
+
+Modif_bord_to_raccord dom_solide contact
+Modif_bord_to_raccord dom_fluide contact
+
 # END MESH #
 # BEGIN PARTITION
 
