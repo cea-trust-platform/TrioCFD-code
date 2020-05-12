@@ -161,6 +161,8 @@ Read pb
 			pression elem
 			pression som
 			vitesse elem
+                        ALEMeshVelocity som
+			ALEMeshTotalDisplacement som
 		}
 
 	}
