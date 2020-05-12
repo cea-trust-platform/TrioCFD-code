@@ -3,8 +3,10 @@
 dimension 2
 Pb_Hydraulique pb
 Domaine dom
-Lire_med family_names_from_group_names dom square square.med 
 
+# BEGIN MESH #
+Lire_med family_names_from_group_names dom square square.med 
+# END MESH #
 
 # BEGIN PARTITION
 Partition dom
