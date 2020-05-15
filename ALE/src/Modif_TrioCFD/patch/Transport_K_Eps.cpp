@@ -26,6 +26,12 @@
 #include <Param.h>
 #include <EChaine.h>
 
+#include <Pb_Hydraulique_Turbulent_ALE.h>
+#include <Op_Conv_ALE.h>
+#include <DoubleTrav.h>
+#include <Debog.h>
+#include <Discretisation_base.h>
+
 
 Implemente_instanciable(Transport_K_Eps,"Transport_K_Eps",Transport_K_Eps_base);
 
@@ -87,6 +93,12 @@ Entree& Transport_K_Eps::readOn(Entree& s )
       Cerr << "Construction and typing for the source term of the Transport_K_Eps equation." << finl;
       REF(Champ_base) ch;
       if (sub_type(Pb_Hydraulique_Turbulent,pb) || milieu().que_suis_je()=="Fluide_Quasi_Compressible")
+        {
+          Nom typ = "Source_Transport_K_Eps";
+          Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
+          so.typer(typ,*this);
+        }
+      else if (sub_type(Pb_Hydraulique_Turbulent_ALE,pb))
         {
           Nom typ = "Source_Transport_K_Eps";
           Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
@@ -296,6 +308,29 @@ const Motcle& Transport_K_Eps::domaine_application() const
 
 DoubleTab& Transport_K_Eps::corriger_derivee_impl(DoubleTab& d)
 {
+  // ALE part start
+  if( sub_type(Op_Conv_ALE, terme_convectif.valeur()) )
+    {
+      Nom discr=discretisation().que_suis_je();
+      if (discr != "VEFPreP1B")
+        {
+          Cerr<<"volume_entrelace_Cl used in the mass matrix is wrong for the ALE treatment on the boundaries"<<finl;
+          Cerr<<"(vol_entrelace_Cl=0 for some of the boundaries indeed a correction is necessary) :"<<finl;
+          Cerr<<"the VEFPreP1B discretization must be used to avoid this problem. "<<finl;
+          exit();
+        }
+      Cerr << "Adding ALE contribution to K Eps..." << finl;
+      Op_Conv_ALE& opale=ref_cast(Op_Conv_ALE, terme_convectif.valeur());
+      DoubleTrav ALE(d); // copie de la structure, initialise a zero
+      opale.ajouterALE(inconnue().valeurs(), ALE);
+      ALE.echange_espace_virtuel();
+      solveur_masse.appliquer(ALE);
+      ALE.echange_espace_virtuel();
+      d+=ALE;
+      d.echange_espace_virtuel();
+      Debog::verifier("Transport_K_Eps::corriger_derivee_impl",d);
+    }
+  // ALE part finished
   const Turbulence_paroi_base& loi_paroi=modele_turbulence().loi_paroi().valeur();
   loi_paroi.corriger_derivee_impl(d);
   return Transport_K_Eps_base::corriger_derivee_impl(d);
