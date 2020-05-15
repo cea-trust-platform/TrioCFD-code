@@ -1,14 +1,14 @@
 Parameters {
         Title "TrioCFD ALE rotation validation"
-        Author "R. P. and M. A. P"
-	ParametersTRUST Problem : Pb_hydraulique
+        Author "R. Pegonen. and M. A. Puscas"
+	ParametersTRUST Problem : Pb_hydraulique_ALE
 	ParametersTRUST Dimension : 2D
 	ParametersTRUST Domain : Domaine_ALE
 	ParametersTRUST Discretization : VEFPre1B
-	ParametersTRUST Time scheme : Scheme_euler_implicit
+	ParametersTRUST Time scheme : Scheme_euler_implicit with solver implicite_ALE
 	ParametersTRUST Medium : Fluide_Incompressible
-	ParametersTRUST Hydraulic problem : Navier_Stokes_standard
-        ParametersTRUST Convection scheme: muscl
+	ParametersTRUST Hydraulic problem : Navier_Stokes_standard_ALE
+        ParametersTRUST Convection scheme: ALE muscl
         Description "This validation test case was created to compare TrioCFD ALE results with the analytical solution. For this case 2D annulus with the inner wall turning with a constant angular velocity and outer wall fixed was chosen. Tangential velocity analytical solution is in a simple form [1] and for this specific case it is equal to \latex_( $u_{tang}=-4r/225+0.0000444444/r$ \latex_), where r is the radius. Next, the analytical solution is compared with the results of TrioCFD (tmax 10 s)." 
 	Description "This is a numerical test case. We do not look at the physical aspects in detail here."
 	IncludeData 1
@@ -54,6 +54,14 @@ Chapter {
 	visu {
 		title "VITESSE y-component"
 		pseudocolor RotationALE.lata dom VITESSE_Y SOM
+	}
+	Visu {
+		Title "TrioCFD Mesh velocity SOM"
+		pseudocolor RotationALE.lata dom_magnitude ALEMESHVELOCITY SOM
+	}
+	Visu {
+		Title "TrioCFD Total displacement of the mesh SOM"
+		pseudocolor RotationALE.lata dom_magnitude ALEMESHTOTALDISPLACEMENT SOM
 	}
 
 

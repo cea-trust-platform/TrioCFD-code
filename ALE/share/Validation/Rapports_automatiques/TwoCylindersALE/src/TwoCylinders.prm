@@ -1,0 +1,151 @@
+Parameters {
+	Title "Single-phase flow around a vibrating cylindrical tube"	
+	Author "D. Panunzio and M. A. Puscas"
+	
+	Description "A 2D fluid annulus region, confined between an inner wall moving with an harmonic motion and an outer wall fixed, has been numerically simulated."
+	Description "This validation test case has been created to compare TrioCFD ALE results with the analytical solution of such a problem [1]."
+	Description "We investigate the force exerted by the fluid on the cylindrical tube subjected to a transverse excitation. We will seek, in particular, on the characteristics of the fluid force, represented by the added mass and damping coefficients."
+        
+	TestCase  . TwoCylinders.data 4   /*jdd en annexe*/ 
+
+
+	ParametersTRUST Problem: Pb_hydraulique_ALE
+	ParametersTRUST Dimension: 2D
+	ParametersTRUST Domain: Domaine_ALE
+	ParametersTRUST Pressure solver: Solver_moving_mesh_ALE PETSC Cholesky
+	ParametersTRUST Discretization: VEFPre1B
+	ParametersTRUST Time scheme: Scheme_euler_implicit with solver implicite_ALE GMRES
+	ParametersTRUST Medium: Fluide_Incompressible
+	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
+        ParametersTRUST Convection scheme: ALE muscl
+        
+	Code TrioCFD
+	
+	IncludeData 0
+
+        Reference "1. S. S. Chen, M. W. Wambsganss, and J. A. Jendrzejczyk. Added Mass and Damping of a Vibrating Rod in Confined Viscous Fluids, 1976."	
+}
+
+Chapter {
+	Title "Mesh"
+	Description "In this section is reported the mesh used during the simulations. The main properties are summarized in the table below."
+	Visu {
+		Title "Mesh"
+		Mesh TwoCylinders.lata dom
+	}
+	
+
+	Table {
+		Title "Meshes properties"
+		Description "Numerical simulations have been carried out on a set of adaptive meshes. Two local sizes have been defined: a smaller one at the inner wall (min_size) and a larger one at the outer wall (max_size)."		
+		
+			
+		nb_columns 4		
+		label Nb_elements | Nb_processors | max_size | min_size 
+		include_description_lines 0
+
+	
+		Line {
+			legend "Mesh"		
+			values 110466 4 0.015 0.003			
+		}
+
+	}
+}
+
+Chapter {
+	Title "Numerical results"
+	Description "In this section the analytcal solution [1] for the force per unit length exerted by the fluid over the inner cylinder and the added coefficients are compared with the TrioCFD results."
+	Figure {
+		Title "Force per unit length of cylinder"
+		Description "According to Chen et al. [1], the analytical solution of the fluid force per unit length acting on the inner cylinder is: \latex_( \begin{equation} \textbf{F} = \rho \pi \bigg(\dfrac{D_1}{2}\bigg)^2 u D_1 \omega^2 \bigg[m_{self} \sin(\omega t) - c_{self} \cos(\omega t)\bigg] \textbf{e}_x \end{equation} \latex_) where \latex_( $\rho=1~kg/m^3$ \latex_), \latex_( $D_1=1~m$ \latex_) (diameter of the inner cylinder), \latex_( $u=10^{-2}$ \latex_) (dimensionless displacement respect to \latex_( $D_1$ \latex_)), \latex_( $\omega=0.06327~rad/s$ \latex_) (angular frequency of motion) and \latex_( $m_{self}$ \latex_) and \latex_( $c_{self}$ \latex_) the added mass and damping coefficients, respectively."
+Description "The analytical solution (Chen et al. [1]) is here depicted and compared with the numerical one, obtained by the sum of the pressure and viscous force acting on the inner cylinder along x. Simulations have been performed for \latex_( $t = [0, 5T]$ \latex_) where \latex_( $T = 2\pi/\omega$ \latex_)."
+		
+		LabelX "t [s]"
+		LabelY "F [N/m]"
+		legend outside
+		include_description_curves 0
+		
+		Courbe {			
+			legend "Chen et al. [1]"
+			Fichier Theoretical_force.txt
+			Style lines		
+		}
+
+		Courbe {
+			legend "TrioCFD"
+			file Numerical_force.txt
+			columns $1 $2
+			Style linespoints
+		}
+
+	}
+	
+	Table {
+		Title "Added mass and damping coefficients"	
+		Description "For the analytical calculation of the added coefficients, the reader is referred to [1]. Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m_{self} &= \dfrac{\langle\sin(\omega t), F(t)\rangle}{\rho \pi (D_1/2)^2 u D_1 \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F(t) dt\\c_{self} &= \dfrac{\langle\cos(\omega t), F(t)\rangle}{\rho \pi (D_1/2)^2 u D_1 \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F(t) dt \end{split} \end{equation}\latex_) and are reported in the following table: " 
+	
+		nb_columns 2		
+		label \latex_($m_{self}$\latex_) | \latex_($c_{self}$\latex_)
+		include_description_lines 0
+
+		Line {
+			legend "Chen et al. [1]"		
+			values 1.7118 0.046036
+		}
+		
+		Line {
+			legend "TrioCFD"		
+			file Numerical_coefficients.txt				
+		}
+
+	}
+}
+
+Chapter {
+	Title "Residual over iterations"
+	Figure {
+		Title "Residual over iterations"
+		Description "The max residual is plotted in function of the number of iterations."	
+                LabelX "Iterations"
+		LabelY "residu=max|Ri|"
+		include_description_curves 0
+
+		Courbe {
+			legend "TrioCFD"
+			file TwoCylinders.dt_ev
+			columns ($0+1) $4
+			Style linespoints
+		}
+	}
+}
+
+Chapter {
+	Title "Visualization via VisIt"
+	Description "Pressure and velocity fields are reported at final time in order to investigate such distributions. The mesh velocity and the total displacement of the mesh are also plotted."
+	
+	Visu {
+		Title "TrioCFD PRESSION SOM"
+		pseudocolor TwoCylinders.lata dom PRESSION_PA SOM
+	}
+
+	
+	Visu {
+		Title "TrioCFD VITESSE_magnitude SOM"
+		pseudocolor TwoCylinders.lata dom_magnitude VITESSE SOM
+	}
+	Visu {
+		Title "TrioCFD Mesh velocity SOM"
+		pseudocolor TwoCylinders.lata dom_magnitude ALEMESHVELOCITY SOM
+	}
+	Visu {
+		Title "TrioCFD Total displacement of the mesh SOM"
+		pseudocolor TwoCylinders.lata dom_magnitude ALEMESHTOTALDISPLACEMENT SOM
+	}
+		
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "The harmonic motion of a circular wall in a quiescent viscous fluid, enclosed by a concentric fixed wall, has been  numerically simulated. A FEV method is applied to solve such a problem in conjunction with the ALE approach. The numerical results for the fluid force and the added coefficients successfully confirmed the analytical solution [1]. Remark: in order to reduce the numerical error a much more refined mesh must be used!
+}

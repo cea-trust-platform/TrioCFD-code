@@ -1,14 +1,14 @@
 Parameters {
         Title "Translating square cylinder"
-        Author "R. P. and M. A. P"
-	ParametersTRUST Problem : Pb_hydraulique
+        Author "R. Pegonen. and M. A. Puscas"
+	ParametersTRUST Problem : Pb_hydraulique_ALE
 	ParametersTRUST Dimension : 2D
 	ParametersTRUST Domain : Domaine_ALE
 	ParametersTRUST Discretization : VEFPre1B
-	ParametersTRUST Time scheme : Scheme_euler_explicit and Scheme_euler_implicit
+	ParametersTRUST Time scheme : Scheme_euler_explicit and Scheme_euler_implicit with solver implicite_ALE
 	ParametersTRUST Medium : Fluide_Incompressible
-	ParametersTRUST Hydraulic problem : Navier_Stokes_standard
-        ParametersTRUST Convection scheme: amont and muscl
+	ParametersTRUST Hydraulic problem : Navier_Stokes_standard_ALE
+        ParametersTRUST Convection scheme: ALE amont and ALE muscl
         Description This test case was created to validate TrioCFD with ALE discretization through the SPHERIC benchmark[1]. The geometry is taken from [1] and the test case with Reynolds number equal to 50 was chosen.
 	Description In this test a flow across a horizontally moving square is investigated in a tank. The initial square is not moving and it reaches its maximum velocity within one second.
 	IncludeData 1
@@ -473,6 +473,14 @@ Chapter {
 	visu {
 		title "VITESSE_Y ELEM"
 		pseudocolor ./Amont/SquareObstacle_ALE.lata dom VITESSE_Y ELEM
+	}
+	Visu {
+		Title "TrioCFD Mesh velocity SOM"
+		pseudocolor  ./Amont/SquareObstacle_ALE dom_magnitude ALEMESHVELOCITY SOM
+	}
+	Visu {
+		Title "TrioCFD Total displacement of the mesh SOM"
+		pseudocolor  ./Amont/SquareObstacle_ALE.lata dom_magnitude ALEMESHTOTALDISPLACEMENT SOM
 	}
 
 
