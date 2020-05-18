@@ -3,12 +3,12 @@
 	<name>Baltik_couplage</name>
 	<comment></comment>
 	<projects>
-		<project>TRUST</project>
+		<project>Trust</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
-			<triggers>clean,full,incremental,</triggers>
+			<triggers>full,incremental,</triggers>
 			<arguments>
 			</arguments>
 		</buildCommand>
