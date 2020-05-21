@@ -21,6 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Terme_Boussinesq_VEFPreP1B_Face.h>
+#include <Convection_Diffusion_Temperature_sensibility.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Periodique.h>
@@ -66,7 +67,13 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   const DoubleTab& coord_sommets=zone_VEF.zone().domaine().les_sommets();
   ArrOfDouble T0 = getScalaire0();
   if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
-    T0=0.;
+    {
+      const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
+      if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BOUSSINESQ_TEMPERATURE")
+        T0=1.;
+      else
+        T0=0.;
+    }
   // Verifie la validite de T0:
   check();
 
