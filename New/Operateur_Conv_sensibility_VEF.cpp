@@ -95,9 +95,9 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           ajouter_Lstate_sensibility_Amont(velocity_state, inco, resu);
           ajouter_Lsensibility_state_Amont(velocity,temperature_state, resu);
 
-          if(uncertain_var!="TEMPERATURE" && uncertain_var!="BOUSSINESQ_TEMPERATURE")
+          if(uncertain_var!="TEMPERATURE" && uncertain_var!="BOUSSINESQ_TEMPERATURE" && uncertain_var!="BETA_TH")
             {
-              Cout << "Variable "<<uncertain_var<<" Is not available yet."<<" Try available TEMPERATURE or BOUSSINESQ_TEMPERATURE variable." << finl;
+              Cout << "Variable "<<uncertain_var<<" Is not available yet."<<" Try available TEMPERATURE or BOUSSINESQ_TEMPERATURE or BETA_TH variable." << finl;
               exit();
             }
 

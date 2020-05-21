@@ -66,6 +66,11 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const DoubleTab& coord_sommets=zone_VEF.zone().domaine().les_sommets();
   ArrOfDouble T0 = getScalaire0();
+  // Verifie la validite de T0:
+  check();
+  ArrOfDouble T0_etat=T0;
+  DoubleTab T_etat(le_scalaire.valeurs().size());
+  T_etat=0.;
   if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
     {
       const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
@@ -73,9 +78,16 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
         T0=1.;
       else
         T0=0.;
+      if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BETA_TH")
+        {
+          const DoubleTab& val_T_etat = eqn_conv_diff_temp_sens.get_temperature_state_field();
+          T_etat=val_T_etat;
+        }
+      else
+        T0_etat=0.;
+
     }
-  // Verifie la validite de T0:
-  check();
+
 
   int nbpts=-1; // nombre de points d'integration
 
@@ -234,7 +246,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
                 {
                   double contrib=0;
                   for (int comp=0; comp<nb_comp; comp++)
-                    contrib+=Poids(pt)*volume*(T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
+                    contrib+=Poids(pt)*volume*(T0_etat(comp)- T_etat(pt,comp) + T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
                   resu(num_face,dim)+=contrib;
                   somme(dim)+=contrib;
                   if (modif_traitement_diri)
