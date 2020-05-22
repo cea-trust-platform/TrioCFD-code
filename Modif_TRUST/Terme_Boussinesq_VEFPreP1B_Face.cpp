@@ -69,8 +69,8 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   // Verifie la validite de T0:
   check();
   ArrOfDouble T0_etat=T0;
-  DoubleTab T_etat(le_scalaire.valeurs().size());
-  T_etat=0.;
+  Champ_Inc T_etat(le_scalaire);
+  T_etat.valeurs()=0.;
   if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
     {
       const Convection_Diffusion_Temperature_sensibility& eqn_conv_diff_temp_sens=ref_cast(Convection_Diffusion_Temperature_sensibility,equation_scalaire());
@@ -81,12 +81,17 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
       if (eqn_conv_diff_temp_sens.get_uncertain_variable_name()=="BETA_TH")
         {
           const DoubleTab& val_T_etat = eqn_conv_diff_temp_sens.get_temperature_state_field();
-          T_etat=val_T_etat;
+          T_etat.valeurs()=val_T_etat;
         }
       else
         T0_etat=0.;
 
     }
+  else
+    {
+      T0_etat=0.;
+    }
+
 
 
   int nbpts=-1; // nombre de points d'integration
@@ -158,6 +163,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   IntVect les_polygones(nbpts);
   DoubleTab les_positions(nbpts,dimension);
   DoubleTab valeurs_scalaire(nbpts,nb_comp);
+  DoubleTab valeurs_scalaire_etat(nbpts,nb_comp);
   DoubleTab valeurs_beta(nbpts,nb_comp);
   DoubleVect valeurs_Psi(nbpts);
   ArrOfDouble somme(dimension);
@@ -227,6 +233,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
 
       // Calcul du terme source aux points d'integration :
       le_scalaire.valeur().valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire);
+      T_etat.valeur().valeur_aux_elems(les_positions,les_polygones,valeurs_scalaire_etat);
       beta().valeur().valeur_aux_elems(les_positions,les_polygones,valeurs_beta);
 
       // Boucle sur les faces de l'element:
@@ -246,7 +253,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
                 {
                   double contrib=0;
                   for (int comp=0; comp<nb_comp; comp++)
-                    contrib+=Poids(pt)*volume*(T0_etat(comp)- T_etat(pt,comp) + T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
+                    contrib+=Poids(pt)*volume*(T0_etat(comp)- valeurs_scalaire_etat(pt,comp) + T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
                   resu(num_face,dim)+=contrib;
                   somme(dim)+=contrib;
                   if (modif_traitement_diri)
