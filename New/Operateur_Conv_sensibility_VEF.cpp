@@ -22,6 +22,7 @@
 #include <Op_Conv_VEF_base.h>
 #include <Navier_Stokes_std_sensibility.h>
 #include <Convection_Diffusion_Temperature_sensibility.h>
+#include <Fluide_Incompressible.h>
 #include <DoubleTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
@@ -101,16 +102,26 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           ajouter_Lstate_sensibility_Amont(velocity_state, inco, resu);
           ajouter_Lsensibility_state_Amont(velocity,temperature_state, resu);
           if(uncertain_var=="LAMBDA")
-            add_diffusion_scalar_term(temperature_state, resu);
+            {
+              add_diffusion_scalar_term(temperature_state, resu);
+            }
+          if(uncertain_var=="CP")
+            {
+              double lambda_div_Cp=-1.;
+              const double Cp = eq.fluide().capacite_calorifique().valeurs()(0, 0);
+              const double lambda = eq.fluide().conductivite().valeurs()(0, 0);
+              lambda_div_Cp*=(lambda/Cp);
+              add_diffusion_scalar_term(temperature_state, resu,lambda_div_Cp);
+            }
+
 
           if(uncertain_var!="TEMPERATURE" && uncertain_var!="BOUSSINESQ_TEMPERATURE"
-              && uncertain_var!="BETA_TH"  && uncertain_var!="LAMBDA")
+              && uncertain_var!="BETA_TH"  && uncertain_var!="LAMBDA" && uncertain_var!="CP")
             {
               Cout << "Variable "<<uncertain_var<<" Is not available yet."<<" "
-                   "Try available TEMPERATURE or BOUSSINESQ_TEMPERATURE or BETA_TH or LAMBDA variable." << finl;
+                   "Try available TEMPERATURE or BOUSSINESQ_TEMPERATURE or BETA_TH or LAMBDA or CP variable." << finl;
               exit();
             }
-//const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
 
 
         }
@@ -1468,7 +1479,7 @@ void  Operateur_Conv_sensibility_VEF::add_diffusion_term(const DoubleTab& state,
 }
 
 
-inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem) const
+inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem, double diffu) const
 {
   const Zone_VEF& zone=la_zone_vef.valeur();
   const IntTab& face_voisins=zone.face_voisins();
@@ -1482,12 +1493,12 @@ inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem) 
 
   if ( (face_voisins(i,0) == face_voisins(j,0)) ||
        (face_voisins(i,1) == face_voisins(j,1)) )
-    return -pscal*inverse_volumes(num_elem);
+    return -(pscal*diffu)*inverse_volumes(num_elem);
   else
-    return pscal*inverse_volumes(num_elem);
+    return (pscal*diffu)*inverse_volumes(num_elem);
 }
 
-void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& inconnue, DoubleTab& resu) const
+void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& inconnue, DoubleTab& resu, double diffu) const
 {
 
   Cerr << "add_diffusion_scalar_term" << finl;
@@ -1534,7 +1545,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
                     {
                       if ( ( (j= elemfaces(elem,i)) > num_face ) && (j != fac_asso) )
                         {
-                          valA = viscA(num_face,j,elem);
+                          valA = viscA(num_face,j,elem, diffu);
                           resu(num_face)+=valA*inconnue(j);
                           resu(num_face)-=valA*inconnue(num_face);
                           if(j<nb_faces) // face reelle
@@ -1561,7 +1572,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
                 {
                   if (( (j= elemfaces(elem,i)) > num_face ) || (ind_face>=nb_faces_bord_reel))
                     {
-                      valA = viscA(num_face,j,elem);
+                      valA = viscA(num_face,j,elem,diffu);
 
                       if (ind_face<nb_faces_bord_reel)
                         {
@@ -1609,7 +1620,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
                       }
                     if(contrib)
                       {
-                        valA = viscA(num_face,j,elem);
+                        valA = viscA(num_face,j,elem,diffu);
                         resu(num_face)+=valA*inconnue(j);
                         resu(num_face)-=valA*inconnue(num_face);
                         if(j<nb_faces) // On traite les faces reelles

@@ -48,8 +48,8 @@ public :
   virtual void remplir_fluent(DoubleVect& ) const;
   double calculer_dt_stab() const;
   void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
-  void add_diffusion_scalar_term(const DoubleTab&, DoubleTab&) const;
-  inline double viscA(int face_i, int face_j, int num_elem) const;
+  void add_diffusion_scalar_term(const DoubleTab&, DoubleTab&, double diffu=1.) const;
+  inline double viscA(int face_i, int face_j, int num_elem, double diffu=1.) const;
 
 protected :
   REF(Zone_VEF) la_zone_vef;
