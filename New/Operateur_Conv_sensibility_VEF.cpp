@@ -26,6 +26,12 @@
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
+#include <Periodique.h>
+#include <Symetrie.h>
+#include <Neumann_homogene.h>
+#include <Neumann_paroi.h>
+#include <Echange_externe_impose.h>
+#include <Neumann_sortie_libre.h>
 #include <Debog.h>
 
 
@@ -94,12 +100,18 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const DoubleTab& velocity= vitesse().valeurs();
           ajouter_Lstate_sensibility_Amont(velocity_state, inco, resu);
           ajouter_Lsensibility_state_Amont(velocity,temperature_state, resu);
+          if(uncertain_var=="LAMBDA")
+            add_diffusion_scalar_term(temperature_state, resu);
 
-          if(uncertain_var!="TEMPERATURE" && uncertain_var!="BOUSSINESQ_TEMPERATURE" && uncertain_var!="BETA_TH")
+          if(uncertain_var!="TEMPERATURE" && uncertain_var!="BOUSSINESQ_TEMPERATURE"
+              && uncertain_var!="BETA_TH"  && uncertain_var!="LAMBDA")
             {
-              Cout << "Variable "<<uncertain_var<<" Is not available yet."<<" Try available TEMPERATURE or BOUSSINESQ_TEMPERATURE or BETA_TH variable." << finl;
+              Cout << "Variable "<<uncertain_var<<" Is not available yet."<<" "
+                   "Try available TEMPERATURE or BOUSSINESQ_TEMPERATURE or BETA_TH or LAMBDA variable." << finl;
               exit();
             }
+//const double rhoCp = le_fluide->capacite_calorifique().valeurs()(0, 0) * le_fluide->masse_volumique().valeurs()(0, 0);
+
 
         }
       else
@@ -1474,3 +1486,185 @@ inline double Operateur_Conv_sensibility_VEF::viscA(int i, int j, int num_elem) 
   else
     return pscal*inverse_volumes(num_elem);
 }
+
+void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& inconnue, DoubleTab& resu) const
+{
+
+  Cerr << "add_diffusion_scalar_term" << finl;
+  const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
+  const Zone_VEF& zone_VEF = la_zone_vef.valeur();
+  DoubleTab& tab_flux_bords = flux_bords_;
+
+  const IntTab& elemfaces = zone_VEF.elem_faces();
+  const IntTab& face_voisins = zone_VEF.face_voisins();
+  int i,j,num_face;
+  int nb_faces = zone_VEF.nb_faces();
+  int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
+  double valA,flux;
+  int n_bord, ind_face;
+  int nb_bords=zone_VEF.nb_front_Cl();
+  // On dimensionne et initialise le tableau des bilans de flux:
+  tab_flux_bords.resize(zone_VEF.nb_faces_bord(),1);
+  tab_flux_bords=0.;
+  const int& premiere_face_int=zone_VEF.premiere_face_int();
+
+  // On traite les faces bord
+  for (n_bord=0; n_bord<nb_bords; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      //const IntTab& elemfaces = zone_VEF.elem_faces();
+      int num1=0;
+      int num2=le_bord.nb_faces_tot();
+      int nb_faces_bord_reel = le_bord.nb_faces();
+
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Periodique& la_cl_perio = ref_cast(Periodique,la_cl.valeur());
+          int fac_asso;
+          for (ind_face=num1; ind_face<nb_faces_bord_reel; ind_face++)
+            {
+              num_face = le_bord.num_face(ind_face);
+              fac_asso = la_cl_perio.face_associee(ind_face);
+              fac_asso = le_bord.num_face(fac_asso);
+              for (int kk=0; kk<2; kk++)
+                {
+                  int elem = face_voisins(num_face,kk);
+                  for (i=0; i<nb_faces_elem; i++)
+                    {
+                      if ( ( (j= elemfaces(elem,i)) > num_face ) && (j != fac_asso) )
+                        {
+                          valA = viscA(num_face,j,elem);
+                          resu(num_face)+=valA*inconnue(j);
+                          resu(num_face)-=valA*inconnue(num_face);
+                          if(j<nb_faces) // face reelle
+                            {
+                              resu(j)+=0.5*valA*inconnue(num_face);
+                              resu(j)-=0.5*valA*inconnue(j);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+      else   // Il n'y a qu'une seule composante, donc on traite
+        // une equation scalaire (pas la vitesse) on a pas a utiliser
+        // le tau tangentiel (les lois de paroi thermiques ne calculent pas
+        // d'echange turbulent a la paroi pour l'instant
+        {
+          for (ind_face=num1; ind_face<num2; ind_face++)
+            {
+              num_face = le_bord.num_face(ind_face);
+              int elem = face_voisins(num_face,0);
+
+              for (i=0; i<nb_faces_elem; i++)
+                {
+                  if (( (j= elemfaces(elem,i)) > num_face ) || (ind_face>=nb_faces_bord_reel))
+                    {
+                      valA = viscA(num_face,j,elem);
+
+                      if (ind_face<nb_faces_bord_reel)
+                        {
+                          flux=valA*(inconnue(j)-inconnue(num_face));
+                          // PL : c'est bien un - ici pour flux_bords. Cette valeur est ensuite
+                          // ecrasee pour les bords avec Neumann et ne sert donc que pour les bords
+                          // avec Dirichlet ou le volume de controle est nul
+                          tab_flux_bords(num_face,0)-=flux;
+                          resu(num_face)+=flux;
+                        }
+
+                      if(j<nb_faces) // face reelle
+                        {
+                          flux=valA*(inconnue(num_face)-inconnue(j));
+                          if (j<premiere_face_int)
+                            tab_flux_bords(j,0)-=flux;
+                          resu(j)+=flux;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+  // Faces internes :
+  for (num_face=premiere_face_int; num_face<nb_faces; num_face++)
+    {
+      for (int k=0; k<2; k++)
+        {
+          int elem = face_voisins(num_face,k);
+          {
+            for (i=0; i<nb_faces_elem; i++)
+              {
+                j=elemfaces(elem,i);
+                if ( j  > num_face )
+                  {
+                    int el1,el2;
+                    int contrib=1;
+                    if(j>=nb_faces) // C'est une face virtuelle
+                      {
+                        el1 = face_voisins(j,0);
+                        el2 = face_voisins(j,1);
+                        if((el1==-1)||(el2==-1))
+                          contrib=0;
+                      }
+                    if(contrib)
+                      {
+                        valA = viscA(num_face,j,elem);
+                        resu(num_face)+=valA*inconnue(j);
+                        resu(num_face)-=valA*inconnue(num_face);
+                        if(j<nb_faces) // On traite les faces reelles
+                          {
+                            resu(j)+=valA*inconnue(num_face);
+                            resu(j)-=valA*inconnue(j);
+                          }
+                      }
+                  }
+              }
+          }
+        }
+    }
+
+  // Neumann :
+  for (n_bord=0; n_bord<nb_bords; n_bord++)
+    {
+      const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
+
+      if (sub_type(Neumann_paroi,la_cl.valeur()))
+        {
+          const Neumann_paroi& la_cl_paroi = ref_cast(Neumann_paroi, la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          for (int face=ndeb; face<nfin; face++)
+            {
+              flux=la_cl_paroi.flux_impose(face-ndeb)*zone_VEF.surface(face);
+              resu[face] += flux;
+              tab_flux_bords(face,0) = flux;
+            }
+        }
+      else if (sub_type(Echange_externe_impose,la_cl.valeur()))
+        {
+          const Echange_externe_impose& la_cl_paroi = ref_cast(Echange_externe_impose, la_cl.valeur());
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          for (int face=ndeb; face<nfin; face++)
+            {
+              flux=la_cl_paroi.h_imp(face-ndeb)*(la_cl_paroi.T_ext(face-ndeb)-inconnue(face))*zone_VEF.surface(face);
+              resu[face] += flux;
+              tab_flux_bords(face,0) = flux;
+            }
+        }
+      else if (sub_type(Neumann_homogene,la_cl.valeur())
+               || sub_type(Symetrie,la_cl.valeur())
+               || sub_type(Neumann_sortie_libre,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          for (int face=ndeb; face<nfin; face++)
+            tab_flux_bords(face,0) = 0.;
+        }
+    }
+}
+
