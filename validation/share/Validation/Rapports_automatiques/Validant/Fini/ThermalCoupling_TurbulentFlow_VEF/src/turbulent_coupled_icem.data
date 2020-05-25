@@ -91,6 +91,9 @@ Regroupebord DOMS SYMS2 { SYMF2 }
 VerifierCoin DOMS { }
 Reorienter_tetraedres DOMS
 
+Modif_bord_to_raccord DOMF JOINT
+Modif_bord_to_raccord DOMS JOINT
+
 VEFPRep1B dis
 
 Schema_Euler_implicite sch
