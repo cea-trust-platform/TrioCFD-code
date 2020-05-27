@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Mod_turb_hyd_ss_maille.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
+// Directory:   $TrioCFD_ROOT/Front_tracking_discontinu/src/patch
 // Version:     /main/24
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ void Mod_turb_hyd_ss_maille::discretiser()
 }
 
 // E.Saikali
-// In the current version of TrioCFD and the FT part in particular, it is possible only to use LES WALE (Smago ?? TODO : check me)
+// In the current version of TrioCFD and the FT part in particular, it is possible only to use LES WALE (Smagorinsky,1963,Mon.Weather Rev. 91,99)
 // For this reason, associating the wall laws of multi-phase flows is done in this method Mod_turb_hyd_ss_maille::completer()
 // We only go inside if the user defines the wall law as loi_standard_hydr, for both discretizations VEF and VDF
 // Otherwise, in the case of negligeable, the multiphase wall law is not used

@@ -44,18 +44,26 @@ void Y_plus_Champ_P1NC::associer_champ(const Champ_P1NC& un_champ)
 
 void Y_plus_Champ_P1NC::me_calculer(double tps)
 {
-  const Milieu_base& mil = mon_champ ().equation().milieu(); // returns Fluide_Diphasique or Fluide_Incompressible
-  const RefObjU& modele_turbulence = mon_champ ().equation().get_modele(TURBULENCE);
-  const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base,modele_turbulence.valeur());
-  const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
-  const Nom& nom_loipar = loipar.que_suis_je();
+
   const Nom& nom_eq = mon_champ ().equation().que_suis_je();
+  const Milieu_base& mil = mon_champ ().equation().milieu(); // returns Fluide_Diphasique or Fluide_Incompressible
   const Nom& nom_mil = mil.que_suis_je();
 
-  if ( nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique" && nom_loipar =="loi_standard_hydr_diphasique_VEF")
-    mon_champ_->calcul_y_plus_diphasique(la_zone_Cl_VEF.valeur(),valeurs());
+  if ( nom_eq == "Navier_Stokes_FT_Disc" && nom_mil == "Fluide_Diphasique" )
+    {
+      const RefObjU& modele_turbulence = mon_champ ().equation().get_modele(TURBULENCE);
+      const Mod_turb_hyd_base& mod_turb = ref_cast(Mod_turb_hyd_base,modele_turbulence.valeur());
+      const Turbulence_paroi_base& loipar = mod_turb.loi_paroi();
+      const Nom& nom_loipar = loipar.que_suis_je();
+
+      if ( nom_loipar =="loi_standard_hydr_diphasique_VEF")
+        mon_champ_->calcul_y_plus_diphasique(la_zone_Cl_VEF.valeur(),valeurs());
+    }
   else
-    mon_champ_->calcul_y_plus(la_zone_Cl_VEF.valeur(),valeurs());
+    {
+      mon_champ_->calcul_y_plus(la_zone_Cl_VEF.valeur(),valeurs());
+    }
+
 }
 
 const Zone_Cl_dis_base& Y_plus_Champ_P1NC::zone_Cl_dis_base() const

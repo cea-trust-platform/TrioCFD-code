@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Concentration_Turbulent_FT_Disc.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
+// Directory:   $TrioCFD_ROOT/Front_tracking_discontinu/src
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -336,8 +336,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
           champ3(face) = c3 + Rdt;
         }
 
-      // Modele 2 : eddy disspertion concept (EDC) Bertrand et al. 2016 Cemical Engineering Journal
-      // traitement particuliere pour n'avoir pas de c < 0
+      // Modele 2 : eddy disspertion concept (EDC) Bertrand et al. 2016 Chemical Engineering Journal
+      // traitement particulier pour n'avoir pas de c < 0
       else if (modele_cinetique_ == 2)
         {
           // On recalcule la longueur caracteristique de maille
@@ -354,8 +354,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
           champ3(face) = c3 + Rdt;
         }
 
-      // Modele 3 : eddy disspertion concept (EDC) Bertrand et al. 2016 Cemical Engineering Journal
-      // traitement particuliere pour n'avoir pas de c < 0
+      // Modele 3 : eddy disspertion concept (EDC) Bertrand et al. 2016 Chemical Engineering Journal
+      // traitement particulier pour n'avoir pas de c < 0
       else if (modele_cinetique_ == 3)
         {
           const double indic = indic_faces[face];
@@ -379,9 +379,9 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
           champ3(face) = c3 + Rdt;
         }
 
-      // Modele 4 : eddy disspertion concept (EDC) Bertrand et al. 2016 Cemical Engineering Journal
-      // traitement particuliere pour n'avoir pas de c < 0
-      // conclusion ==> formulation pour que modele 2 et 3 soit equivalents
+      // Modele 4 : eddy disspertion concept (EDC) Bertrand et al. 2016 Chemical Engineering Journal
+      // traitement particulier pour n'avoir pas de c < 0
+      // conclusion ==> formulation pour que modeles 2 et 3 soient equivalents
       else if (modele_cinetique_ == 4)
         {
           // On recalcule la longueur caracteristique de maille

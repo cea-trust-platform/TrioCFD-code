@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Concentration_Turbulent_FT_Disc.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
+// Directory:   $TrioCFD_ROOT/Front_tracking_discontinu/src
 // Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
