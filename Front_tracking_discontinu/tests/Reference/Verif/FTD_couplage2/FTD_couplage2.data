@@ -342,6 +342,7 @@ Post_processing
 
 imprimer_flux dom_solide  { haut2 }
 imprimer_flux dom_fluide  { bas1 }
-Solve pbc
+ecriturelecturespecial 0
 
+Solve pbc
 FIN		     

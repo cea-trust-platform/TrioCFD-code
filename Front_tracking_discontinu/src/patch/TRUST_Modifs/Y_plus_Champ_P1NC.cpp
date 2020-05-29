@@ -27,20 +27,28 @@
 
 Implemente_instanciable(Y_plus_Champ_P1NC,"Y_plus_Champ_P1NC",Champ_Fonc_P0_VEF);
 
+
+
 Sortie& Y_plus_Champ_P1NC::printOn(Sortie& s) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
+
+
 
 Entree& Y_plus_Champ_P1NC::readOn(Entree& s)
 {
   return s ;
 }
 
+
+
 void Y_plus_Champ_P1NC::associer_champ(const Champ_P1NC& un_champ)
 {
   mon_champ_= un_champ;
 }
+
+
 
 void Y_plus_Champ_P1NC::me_calculer(double tps)
 {
