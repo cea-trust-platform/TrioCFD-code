@@ -439,6 +439,6 @@ Entree& Ecr_fic_Ansys::interpreter(Entree& is)
   Cerr << "Fin Ecr_fic_Ansys::interpreter" << finl;
   Cerr << "Lancement d'Ansys." << finl;
   Cerr << "Cela peut prendre du temps..." << finl;
-  Cerr << system("./.run_ansys") << finl;
+  Cerr << (int) system("./.run_ansys") << finl;
   return is;
 }

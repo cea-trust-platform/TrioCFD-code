@@ -2426,7 +2426,7 @@ static const IntTabFT* static_tab_sort;
 // Note : la fonction utilise non pas les donnees du tableau passe en parametre,
 //   mais les donnees du tableau static_tab_sort pour la comparaison.
 // Tri par ordre croissant de 2e colonne, puis 3e, puis 4e colonne.
-int fct_compare_tab_aretes(const void *pt1, const void *pt2)
+True_int fct_compare_tab_aretes(const void *pt1, const void *pt2)
 {
   const int index1 = *(const int *) pt1;
   const int index2 = *(const int *) pt2;

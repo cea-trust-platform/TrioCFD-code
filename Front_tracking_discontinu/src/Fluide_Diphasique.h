@@ -22,7 +22,7 @@
 #ifndef Fluide_Diphasique_included
 #define Fluide_Diphasique_included
 #include <Objet_U.h>
-#include <Ref_Fluide_Incompressible.h>
+#include <Fluide_Incompressible.h>
 #include <Milieu_base.h>
 
 class Entree;
@@ -65,8 +65,8 @@ protected:
 
 private:
 
-  REF(Fluide_Incompressible) phase0_;
-  REF(Fluide_Incompressible) phase1_;
+  Fluide_Incompressible phase0_;
+  Fluide_Incompressible phase1_;
   // Tension de surface (J/m^2)
   Champ_Don sigma_;
   // Enthalpie de changement de phase h(phase1_) - h(phase0_) (J/kg/K)

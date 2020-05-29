@@ -29,6 +29,7 @@
 #include <Fluide_Incompressible.h>
 #include <Domaine.h>
 #include <Param.h>
+#include <Champ_Uniforme.h>
 
 static const double TSAT_CONSTANTE = 0.;
 
@@ -56,6 +57,7 @@ Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
 {
   // Ne pas faire assert(fluide non nul)
   Convection_Diffusion_std::readOn(is);
+  solveur_masse->set_name_of_coefficient_temporel("rho_cp_comme_T");
   Nom num=inconnue().le_nom(); // On prevoir le cas d'equation de scalaires passifs
   num.suffix("temperature_thermique");
   Nom nom="Convection_chaleur";
@@ -422,7 +424,14 @@ DoubleTab& Convection_Diffusion_Temperature_FT_Disc::derivee_en_temps_inco(Doubl
 
   //  static const Stat_Counter_Id count3 = statistiques().new_counter(1, "convection_T", 0);
   //  statistiques().begin_count(count3);
-  terme_convectif.ajouter(temperature, derivee);
+  {
+    const DoubleTab& rhoCp = get_champ("rho_cp_comme_T").valeurs();
+    DoubleTab derivee_tmp(derivee);
+    derivee_tmp = 0.;
+    terme_convectif.ajouter(temperature, derivee_tmp);
+    derivee_tmp *= rhoCp;
+    derivee += derivee_tmp;
+  }
   //  statistiques().end_count(count3);
 
 

@@ -29,7 +29,7 @@ Chapter {
 	Title "Experimental description"
 	Table {
 		Title "Test section"
-		Description "WATLON is a Tee junction mixing experiment, which was built to study fluid mixing phenomena for evaluation of thermal stripping. Hot water (48캜) is flowing in a 150 mm inner diameter pipe. Cold water (33캜) is injected in this main pipe from a 50 mm inner diameter branch pipe.\newline\newline"
+		Description "WATLON is a Tee junction mixing experiment, which was built to study fluid mixing phenomena for evaluation of thermal stripping. Hot water (48째C) is flowing in a 150 mm inner diameter pipe. Cold water (33째C) is injected in this main pipe from a 50 mm inner diameter branch pipe.\newline\newline"
 	}
 	Figure {
 		Width 14cm
@@ -38,7 +38,7 @@ Chapter {
 	}
 	Table {
 		Title "Experimental data"
-		Description "A fifteen thermocouples tree is used for temperature measurement, with a time response about 0.03 s and accuracy about $\pm$0.2캜. Velocities are measured by PIV, at 200 Hz."
+		Description "A fifteen thermocouples tree is used for temperature measurement, with a time response about 0.03 s and accuracy about $\pm$0.2째C. Velocities are measured by PIV, at 200 Hz."
 		Description "Time-averaged (also called "mean" in this report) and rms values of temperature, T, velocities components on z direction, Vz, and on y direction, Vy, are available. z is defined as the main pipe axis one, and its direction is the flow. y is defined as the branch pipe axis one, and its direction is the branch flow. x is defined from y and z, to form a direct cartesian coordinate.\newline"
 		Description "Measured profiles are provided at following positions :"
 		Description "- T: z= 0.5D, 1D, 2D,"
@@ -67,11 +67,11 @@ Chapter {
 		label Physical property | Wall jet configuration | Impinging jet configuration
 		line {
 			legend "Branch pipe"
-			values "Inlet$~$temperature$~$(캜)" 33 33
+			values "Inlet$~$temperature$~$(째C)" 33 33
 		}
 		line {
 			legend "Main pipe"
-			values "Inlet$~$temperature$~$(캜)" 48 48
+			values "Inlet$~$temperature$~$(째C)" 48 48
 		}
 		line {
 			legend "Branch pipe"
@@ -197,7 +197,7 @@ Chapter {
 	}
 	Table {
 		Title "Physical properties"
-		Description "Fluid domain: Water flow at 47캜 \latex_(\hspace*{19mm} Density : $\rho = 991.3$ kg/m$^3$\latex_)"
+		Description "Fluid domain: Water flow at 47째C \latex_(\hspace*{19mm} Density : $\rho = 991.3$ kg/m$^3$\latex_)"
 		Description "\latex_(\hspace*{74mm}Kinematic viscosity : $\mu = 5.86e-4$\latex_) N/m$^2$/s"
 		Description "\latex_(\hspace*{74mm}Thermal conductivity : $\lambda = 0.555$\latex_) W/m/K"
 		Description "\latex_(\hspace*{74mm}Specific heat capacity : $Cp = 4172$\latex_) J/kg/K"
@@ -207,13 +207,13 @@ Chapter {
 		Title "Initial and boundaries conditions"
 		Description "\latex_(\textbf {Watlon configuration} \latex_)"
 		Description "Initial conditions :\latex_(\hspace*{17mm}\latex_)Uniform velocity set to 0 m/s in all directions,"
-		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 47캜."
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 47째C."
 		Description "Boundary conditions :\latex_(\hspace*{11mm}\latex_)Walls with standard wall law,"
 		Description "\latex_(\hspace*{45mm}\latex_)Pressure reference set to 0 Pa on outlet,"
 		Description "\latex_(\hspace*{45mm}\latex_)Velocity profile given by a periodic box calculation on main pipe inlet,"
 		Description "\latex_(\hspace*{45mm}\latex_)Velocity profile given by a periodic box calculation on branch pipe inlet,"
-		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 48캜 on main pipe inlet,"
-		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 33캜 on branch pipe inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 48째C on main pipe inlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)Uniform temperature set to 33째C on branch pipe inlet,"
 		Description "\latex_(\hspace*{45mm}\latex_)Adiabatic walls.\newline"
 		Description ""
 		Description "\latex_(\textbf {Wall jet periodic box configuration} \latex_)"
@@ -873,7 +873,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=0.5D"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		RangeY 40 50
 		Include_Description_Curves 0
 		legend below title
@@ -940,7 +940,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=1.0D"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		RangeY 40 50
 		Include_Description_Curves 0
 		legend below title
@@ -1007,7 +1007,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=2.0D"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		RangeY 40 50
 		Include_Description_Curves 0
 		legend below title
@@ -1077,7 +1077,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=0.5D"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		RangeY 47 48.5
 		Include_Description_Curves 0
 		legend below title
@@ -1144,7 +1144,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=1.0D"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		RangeY 47 48.5
 		Include_Description_Curves 0
 		legend below title
@@ -1211,7 +1211,7 @@ Chapter {
 		Description "Instantaneous temperature time evolution at center of the main pipe for z=2.0D"
 		Width 7cm
 		LabelX "Time [s]"
-		LabelY "Temperature [캜]"
+		LabelY "Temperature [째C]"
 		RangeY 47 48.5
 		Include_Description_Curves 0
 		legend below title

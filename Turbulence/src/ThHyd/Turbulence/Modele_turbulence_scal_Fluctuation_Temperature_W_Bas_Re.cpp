@@ -99,15 +99,15 @@ int Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::preparer_calcul()
   eqn_transport_Fluctu_Temp->preparer_calcul();
   Modele_turbulence_scal_base::preparer_calcul();
   calculer_diffusivite_turbulente();
-  la_diffusivite_turbulente.valeurs().echange_espace_virtuel();
+  diffusivite_turbulente_.valeurs().echange_espace_virtuel();
   return 1;
 }
 
 Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_diffusivite_turbulente()
 {
 
-  DoubleTab& alpha_t = la_diffusivite_turbulente.valeurs();
-  const DoubleTab& mu_t = la_viscosite_turbulente->valeurs();
+  DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();
+  const DoubleTab& nu_t = la_viscosite_turbulente->valeurs();
   double temps = la_viscosite_turbulente->temps();
   const DoubleTab& chFluctuTemp = eqn_transport_Fluctu_Temp->inconnue().valeurs();
   const Zone_dis& la_zone_dis = eqn_transport_Fluctu_Temp->zone_dis();
@@ -153,11 +153,11 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   DoubleTab Flambda(nb_elem);
   mon_modele_fonc.Calcul_Flambda( Flambda,la_zone_dis,K_eps_Bas_Re,chFluctuTemp,visco,diffu);
 
-  if (temps != la_diffusivite_turbulente.temps())
+  if (temps != diffusivite_turbulente_.temps())
     {
       static const double C_Lambda = 0.11;
       int n= alpha_t.size();
-      if (mu_t.size() != n)
+      if (nu_t.size() != n)
         {
           Cerr << "Les DoubleTab des champs diffusivite_turbulente et viscosite_turbulente" << finl;
           Cerr << "doivent avoir le meme nombre de valeurs nodales" << finl;
@@ -173,10 +173,10 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
               alpha_t[i] = 0.0000001;
             }
         }
-      la_diffusivite_turbulente.changer_temps(temps);
+      diffusivite_turbulente_.changer_temps(temps);
     }
 
-  return la_diffusivite_turbulente;
+  return diffusivite_turbulente_;
 }
 
 
@@ -200,7 +200,7 @@ void Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::mettre_a_jour(doub
   eqn_transport_Fluctu_Temp->mettre_a_jour(temps);
   eqn_transport_Fluctu_Temp->controler_grandeur();
   calculer_diffusivite_turbulente();
-  la_diffusivite_turbulente.valeurs().echange_espace_virtuel();
+  diffusivite_turbulente_.valeurs().echange_espace_virtuel();
 }
 
 const Champ_base& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::get_champ(const Motcle& nom) const

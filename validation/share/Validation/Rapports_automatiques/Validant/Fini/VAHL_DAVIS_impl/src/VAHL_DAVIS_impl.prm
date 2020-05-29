@@ -157,7 +157,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -343,7 +343,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -535,7 +535,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -683,7 +683,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -827,7 +827,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -1012,7 +1012,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -1203,7 +1203,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 
@@ -1351,7 +1351,7 @@ Chapter {
 
 	Dimension 2
 	labelx "x (m)"
-	labely "T (캩)"
+	labely "T (째K)"
 	rangex  0 0.01
 	
 	Curve  { 

@@ -34,6 +34,7 @@ Implemente_base_sans_constructeur(Transport_K_Eps_base,"Transport_K_Eps_base",Eq
 
 Transport_K_Eps_base::Transport_K_Eps_base()
 {
+  champs_compris_.ajoute_nom_compris("K_Eps_residu");
   /*
     Noms& nom=champs_compris_.liste_noms_compris();
     nom.dimensionner(3);
@@ -111,6 +112,7 @@ void Transport_K_Eps_base::discretiser()
       Cerr<<"Discretization "<<discretisation().que_suis_je()<<" not recognized."<<finl;
       exit();
     }
+  creer_champ( "K_Eps_residu" );
 
 }
 
@@ -129,6 +131,22 @@ void Transport_K_Eps_base::discretiser_K_Eps(const Schema_Temps_base& sch,
   dis.discretiser_champ("temperature",z.valeur(),multi_scalaire,noms,unit,2,sch.nb_valeurs_temporelles(),sch.temps_courant(),ch);
   ch.valeur().nommer("K_Eps");
 }
+
+void Transport_K_Eps_base::creer_champ( const Motcle& motlu )
+{
+  Equation_base::creer_champ( motlu );
+  if( motlu == "K_Eps_residu" )
+    {
+      if( !K_Eps_residu.non_nul() )
+        {
+          const Discret_Thyd& dis=ref_cast( Discret_Thyd, discretisation() );
+          dis.K_Eps_residu( zone_dis(), le_champ_K_Eps , K_Eps_residu );
+          champs_compris_.ajoute_champ( K_Eps_residu );
+        }
+    }
+}
+
+
 
 
 // Description:
@@ -490,4 +508,33 @@ double Transport_K_Eps_base::calculer_pas_de_temps() const
 {
   // on prend le pas de temps de l'eq de NS.
   return probleme().equation(0).calculer_pas_de_temps();
+}
+
+const Champ_base& Transport_K_Eps_base::get_champ( const Motcle& nom ) const
+{
+  REF( Champ_base ) ref_champ;
+
+  double temps_init = schema_temps().temps_init();
+
+  if (nom=="K_Eps_residu")
+    {
+      Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,K_Eps_residu.valeur());
+      if ( (( ch.temps()!=le_champ_K_Eps->temps() ) || ( ch.temps()==temps_init))  )
+        {
+          ch.mettre_a_jour( le_champ_K_Eps->temps() );
+        }
+      return champs_compris_.get_champ( nom );
+    }
+
+  try
+    {
+      return Equation_base::get_champ(nom);
+    }
+  catch (Champs_compris_erreur)
+    {
+    }
+
+  throw Champs_compris_erreur();
+
+  return ref_champ;
 }

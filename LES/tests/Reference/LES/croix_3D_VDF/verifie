@@ -5,7 +5,7 @@ jdd=`pwd`
 jdd=`basename $jdd`
 for file in $jdd"_"*.out
 do
-   awk 'BEGIN {n=1} /Fx/ {n=3} !/# / && (NR>6) { \
+   awk 'BEGIN {n=1} /_X/ {n=3} /Fx/ {n=3} !/# / && (NR>6) { \
        if (n==1) {v=$2;if ($3!=v || $4!=v || $5!=v || $6!=v || $7!=v) 	{print "Ligne "NR": "$2" = "$3" = "$4" = "$5" = "$6" = "$7" ?";exit 1}}; \
        if (n==3) {v=$4;if ($7!=-v || $9!=-v || $12!=v || $14!=v || $17!=-v) {print "Ligne "NR": "$4" = "$7*-1" = "$9*-1" = "$12" = "$14" = "$17*-1" ?";exit 1}}; \
    }' $file

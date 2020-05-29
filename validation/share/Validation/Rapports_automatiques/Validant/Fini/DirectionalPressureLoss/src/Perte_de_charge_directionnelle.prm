@@ -1,0 +1,237 @@
+Parametres {
+	Titre "Verification of pressure loss source term"
+
+	VersionTrio_U "1.8.0"
+
+	ParametresTrio_U Type of problem: hydraulics (Navier-Stokes)
+	ParametresTrio_U Discretization: VEF
+	ParametresTrio_U Type of meshes: tetrahedra
+	ParametresTrio_U Convection schemes: upwind, muscl, efstab (alpha=0.2)
+	ParametresTrio_U Test of the keyword \latex_(\texttt{perte\_charge\_directionnelle}\latex_)
+
+	Castest Mesh1_muscl Cas /*jdd en annexe*/
+	Castest Mesh2_muscl Cas
+	Castest Mesh2_muscl_wall Cas
+	Castest Mesh2_upwind Cas
+	Castest Mesh2_efstab Cas
+	Castest Mesh3_muscl Cas
+
+	Auteur "Pierre-Emmanuel Angeli"
+	InclureData 2
+}
+
+Chapitre {
+	Titre "Description of the test-case and meshes"
+	Description ""
+	Figure {
+		Description "The test case is a square channel of section HxH and of height 10*H, with H=1. The hydraulic diameter is \latex_($D_h=H$\latex_). The main flow is in z-direction. The pressure loss source term applies in the domain in red, of extension L=3H. The reference pressure P=0 is prescribed at the outlet of the channel (z=10H). We aim at imposing a pressure loss of \latex_($\Delta P=30$\latex_) Pa between z=7H and z=10H. We use the keyword \latex_(\texttt{perte\_charge\_directionnelle}\latex_), where \latex_(\texttt{diam\_hydr}\latex_) is the hydraulic diameter \latex_($D_h$\latex_), and \latex_(\texttt{lambda}\latex_) the regular friction coefficient \latex_($\lambda$\latex_). These parameters are linked by:"
+		Description "\latex_($$\lambda = \frac{D_h}{L} \frac{\Delta P}{\displaystyle{\frac{1}{2} \rho U_b^2}}$$\latex_)"
+		Description "In our example, we have L=3m, \latex_($\rho=2$ $kg/m^3$\latex_), \latex_($\Delta P=30$\latex_) Pa and \latex_($U_b=1$\latex_) m/s (the bulk velocity in the channel). We find \latex_($\lambda=10$\latex_). The red domain has to be defined using the \latex_(\texttt{sous\_zone}\latex_) keyword. In this domain, we have to substitute the wall boundary conditions by symmetries, otherwise an additional pressure loss appears. The verification is made by examining the field \latex_(\texttt{pression\_pa}\latex_) (instead of \latex_(\texttt{pression}\latex_), which is \latex_($P/\rho$\latex_))."
+		Description "Three meshes are created using the \latex_(\texttt{tetraedriser\_homogene\_fin}\latex_) keyword:\medskip"
+		Description "Mesh 1: 3x3x5 (black domain) + 3x3x3 (red domain) nodes => 1152 tetrahedra"
+		Description "Mesh 2: 5x5x9 (black domain) + 5x5x5 (red domain) nodes => 9216 tetrahedra"
+		Description "Mesh 3: 9x9x17 (black domain) + 9x9x9 (red domain) nodes => 73728 tetrahedra"
+		picture domain.png
+		}
+}
+
+Chapitre {
+	Titre "Verification of pressure loss"
+	Figure {
+		Titre "Mesh sensitivity"
+		Titre_figure "Pressure along the center of the channel (0<z<10)"
+		Width 12cm
+		Dimension 2
+		LabelX "z [m]"
+		LabelY "Pressure [Pa]"
+		RangeX auto auto
+		RangeY 0 60
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "P = 30 Pa"
+			Fonction 30
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "Mesh1 (muscl)"
+			Fichier ./Mesh1_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "Mesh2 (muscl)"
+			Fichier ./Mesh2_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "Mesh3 (muscl)"
+			Fichier ./Mesh3_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		}
+	Figure {
+		Titre_figure "Pressure along the center of the channel (zoom 7<z<10)"
+		Width 12cm
+		Dimension 2
+		LabelX "z [m]"
+		LabelY "Pressure [Pa]"
+		RangeX 6 8
+		RangeY auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "P = 30 Pa"
+			Fonction 30
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "Mesh1 (muscl)"
+			Fichier ./Mesh1_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "Mesh2 (muscl)"
+			Fichier ./Mesh2_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "Mesh3 (muscl)"
+			Fichier ./Mesh3_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		}
+	Figure {
+		Titre "Convection schemes"
+		Titre_figure "Pressure along the center of the channel (0<z<10)"
+		Width 12cm
+		Dimension 2
+		LabelX "z [m]"
+		LabelY "Pressure [Pa]"
+		RangeX auto auto
+		RangeY 0 60
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "P = 30 Pa"
+			Fonction 30
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "Mesh2 (upwind)"
+			Fichier ./Mesh2_upwind/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "Mesh2 (muscl)"
+			Fichier ./Mesh2_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "Mesh2 (efstab 0.2)"
+			Fichier ./Mesh2_efstab/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		}
+	Figure {
+		Titre_figure "Pressure along the center of the channel (zoom 7<z<10)"
+		Width 12cm
+		Dimension 2
+		LabelX "z [m]"
+		LabelY "Pressure [Pa]"
+		RangeX 6 8
+		RangeY auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "P = 30 Pa"
+			Fonction 30
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "Mesh2 (upwind)"
+			Fichier ./Mesh2_upwind/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "Mesh2 (muscl)"
+			Fichier ./Mesh2_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		Courbe {
+			Legende "Mesh2 (efstab 0.2)"
+			Fichier ./Mesh2_efstab/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			}
+		}
+	Figure {
+		Titre "Symmetry vs. wall boundary condition"
+		Titre_figure "Pressure along the center of the channel (0<z<10)"
+		Width 12cm
+		Dimension 2
+		LabelX "z [m]"
+		LabelY "Pressure [Pa]"
+		RangeX auto auto
+		RangeY 0 auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "P = 30 Pa"
+			Fonction 30
+			Style lines
+			Typeligne 20
+			}
+		Courbe {
+			Legende "Mesh2 (muscl) with symmetries"
+			Fichier ./Mesh2_muscl/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			}
+		Courbe {
+			Legende "Mesh2 (muscl) with walls"
+			Fichier ./Mesh2_muscl_wall/Cas_SONDE_AXE_PRESSION_PA.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			}
+		}
+}
+
+Chapitre {
+	Titre "Conclusions"
+	Description "The pressure loss in the red domain is weakly sensitive to the mesh size and to the convection scheme. However, a symmetry boundary condition is required instead of a wall boundary condition.
+}
+
+Chapitre {
+	Titre "Computer performance"
+	Tableau_performance {
+	}
+}

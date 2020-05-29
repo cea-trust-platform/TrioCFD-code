@@ -15,7 +15,7 @@ Figure  {
 	Title "Geometry, Mesh and Boundary Conditions"
 	Description "Dimensions : h=200 mm, L=30 mm "
 	Description "7 x 10 rectangular mesh cut with "'trianguler' option"
-	Description "Velocity inlet = 10 m/s ; Temperature inlet = 0°C"
+	Description "Velocity inlet = 10 m/s ; Temperature inlet = 0Â°C"
 	Description "Lateral Heat flux = 2285 W/m2"
 	Description "Outlet, pressure = 0"
         Width 8cm
@@ -29,11 +29,11 @@ Table {
 	nb_columns 1
 		Label Valeur
                 line {
-	        	legend "$\rho$ en kg/m$³$"
+	        	legend "$\rho$ en kg/m$Â³$"
                         file ./rho.dat
                 }
                 line {
-	        	legend "$\mu$ en N/m$²$/s"
+	        	legend "$\mu$ en N/m$Â²$/s"
                         file ./mu.dat
                 }
                 line {

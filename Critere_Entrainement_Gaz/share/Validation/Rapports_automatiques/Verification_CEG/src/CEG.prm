@@ -16,7 +16,7 @@ Parameters {
 	Description "with $\Omega$ =  k $\omega$z/ $\epsilon$"
 	Description "and $\Lambda$ = max( -vz ; 0 ) / $ \sqrt \text gHaspi $"
 	Description "and C = 125"
-	Description "CEA/JAEA criterion: 3 values are calculated : $\alpha$, $\alpha$$\Gamma$$²$, $\alpha$$²$$\Gamma$$²$"
+	Description "CEA/JAEA criterion: 3 values are calculated : $\alpha$, $\alpha$$\Gamma$$Â²$, $\alpha$$Â²$$\Gamma$$Â²$"
 	Description "with $\alpha$ = $ \frac1S $ $\int u . n \, \mathrm dl$
 	Description "and \latex_( $\Gamma$ = $\oint u . \, \mathrm dl$ \latex_)
 	Description "C is the contour a circle of radius R confined in a vortex where the Q criterion is greater than zero, the centre of the circle is located at the local maximum of the Q criterion, S is the area of the circle."
@@ -51,7 +51,7 @@ Chapter {
 		Description " - Sortie: fixed-pressure = 0"
 		Description "Initial conditions:"
 		Description " - Circle-shaped vortex, centre (0;0), radius R = 1.9m" 
-		Description " - Ur = 0 ; Ut = exp(-r$²$/R$²$)"
+		Description " - Ur = 0 ; Ut = exp(-r$Â²$/R$Â²$)"
 		Description "Velocity on the surface:"
 	}
 	visu {
@@ -196,7 +196,7 @@ Chapter {
 		Title "Coarse mesh"
 		Description "Based on the initial conditions of the vortex, it is possible to calculate:"
 		Description "- $\alpha$ theoretical = 0"
-		Description "- $\Gamma$ theoretical = exp(-radius$²$/R$²$)*2*PI*radius$²$
+		Description "- $\Gamma$ theoretical = exp(-radius$Â²$/R$Â²$)*2*PI*radius$Â²$
 		nb_columns 1
 		label "CEA/JAEA criterion"
 		line {
@@ -224,11 +224,11 @@ Chapter {
 			file ./coarse/gamma.dat
 		}
 		line {
-			legend "$\alpha$$\Gamma$$²$ dimensionless calculated"
+			legend "$\alpha$$\Gamma$$Â²$ dimensionless calculated"
 			file ./coarse/alphaXgamma2.dat
 		}
 		line {
-			legend "$\alpha$$²$$\Gamma$$²$ dimensionless calculated"
+			legend "$\alpha$$Â²$$\Gamma$$Â²$ dimensionless calculated"
 			file ./coarse/alpha2Xgamma2.dat
 		}
 	}
@@ -247,7 +247,7 @@ Chapter {
 		Title "Medium mesh"
 		Description "Based on the initial conditions of the vortex, it is possible to calculate:"
 		Description "- $\alpha$ theoretical = 0"
-		Description "- $\Gamma$ theoretical = exp(-radius$²$/R$²$)*2*PI*radius$²$
+		Description "- $\Gamma$ theoretical = exp(-radius$Â²$/R$Â²$)*2*PI*radius$Â²$
 		nb_columns 1
 		label "CEA/JAEA criterion"
 		line {
@@ -275,11 +275,11 @@ Chapter {
 			file ./medium/gamma.dat
 		}
 		line {
-			legend "$\alpha$$\Gamma$$²$ dimensionless calculated"
+			legend "$\alpha$$\Gamma$$Â²$ dimensionless calculated"
 			file ./medium/alphaXgamma2.dat
 		}
 		line {
-			legend "$\alpha$$²$$\Gamma$$²$ dimensionless calculated"
+			legend "$\alpha$$Â²$$\Gamma$$Â²$ dimensionless calculated"
 			file ./medium/alpha2Xgamma2.dat
 		}
 	}
@@ -298,7 +298,7 @@ Chapter {
 		Title "Fine mesh"
 		Description "Based on the initial conditions of the vortex, it is possible to calculate:"
 		Description "- $\alpha$ theoretical = 0"
-		Description "- $\Gamma$ theoretical = exp(-radius$²$/R$²$)*2*PI*radius$²$
+		Description "- $\Gamma$ theoretical = exp(-radius$Â²$/R$Â²$)*2*PI*radius$Â²$
 		nb_columns 1
 		label "CEA/JAEA criterion"
 		line {
@@ -326,11 +326,11 @@ Chapter {
 			file ./fine/gamma.dat
 		}
 		line {
-			legend "$\alpha$$\Gamma$$²$ dimensionless calculated"
+			legend "$\alpha$$\Gamma$$Â²$ dimensionless calculated"
 			file ./fine/alphaXgamma2.dat
 		}
 		line {
-			legend "$\alpha$$²$$\Gamma$$²$ dimensionless calculated"
+			legend "$\alpha$$Â²$$\Gamma$$Â²$ dimensionless calculated"
 			file ./fine/alpha2Xgamma2.dat
 		}
 	}

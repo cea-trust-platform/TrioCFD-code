@@ -17,13 +17,12 @@ Partition dom
 	Partitionneur fichier_decoupage { fichier decoupage.metis }
 	Larg_joint 2
 	Nom_Zones dom
-	Formatte
 }
 End
 END PARTITION #
 
 # BEGIN SCATTER #
-ScatterFormatte Decoupage/dom.Zones dom
+Scatter Decoupage/dom.Zones dom
 # END SCATTER #
 
 VEFPreP1B dis

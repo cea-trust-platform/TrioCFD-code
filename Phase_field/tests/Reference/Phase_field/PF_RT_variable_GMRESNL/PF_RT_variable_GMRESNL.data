@@ -221,6 +221,6 @@ Fin
 	masse volumique de la phase 2
 - potentiel_chimique_generalise
 	sans_energie_cinetique -> potentiel chimique generalise classique
-	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u²/2 drho/dphi
+	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en uÂ²/2 drho/dphi
 
 #

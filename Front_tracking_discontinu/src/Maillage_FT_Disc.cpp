@@ -420,7 +420,11 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
   Nom nom_fic=Objet_U::nom_du_cas();
   nom_fic += "_";
   char str[14];
+#ifndef INT_is_64_
   sprintf(str,"%03d",compteur_plot++);
+#else
+  sprintf(str,"%03ld",compteur_plot++);
+#endif
   nom_fic += Nom(str);
   nom_fic += "_";
   if (nom!="")
@@ -430,12 +434,21 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
     }
   if (Process::nproc()>1)
     {
+#ifndef INT_is_64_
       if (Process::nproc()<=1000)
         sprintf(str,"%03d_",me());
       else if (Process::nproc()<=10000)
         sprintf(str,"%04d_",me());
       else if (Process::nproc()<=100000)
         sprintf(str,"%05d_",me());
+#else
+      if (Process::nproc()<=1000)
+        sprintf(str,"%03ld_",me());
+      else if (Process::nproc()<=10000)
+        sprintf(str,"%04ld_",me());
+      else if (Process::nproc()<=100000)
+        sprintf(str,"%05ld_",me());
+#endif
       else
         {
           Cerr << "Error in Maillage_FT_Disc::ecrire_plot." << finl;
@@ -1790,7 +1803,7 @@ int Maillage_FT_Disc::facettes_voisines(int fa70, int fa71,
                   Process::Journal()<<"   somsCommuns0="<<somsCommuns0[0]<<" "<<somsCommuns0[1]<<" "<<somsCommuns0[2]<<finl;
                   Process::Journal()<<"   somsCommuns1="<<somsCommuns1[0]<<" "<<somsCommuns1[1]<<" "<<somsCommuns1[2]<<finl;
                   Process::Journal()<<"   aretes  voisines iarete0="<<iarete0<<" iarete1="<<iarete1<<finl;
-                  Process::Journal()<<"     test = "<<(facettes_(fa70,iarete0)==facettes_(fa71,iarete1)?1:0)<<" res="<<res<<finl;
+                  Process::Journal()<<"     test = "<< (int) (facettes_(fa70,iarete0)==facettes_(fa71,iarete1)?1:0)<<" res="<<res<<finl;
                 }
               assert( facettes_(fa70,iarete0) == facettes_(fa71,(iarete1+1)%nb_som_par_fa7) );
               assert( facettes_(fa71,iarete1) == facettes_(fa70,(iarete0+1)%nb_som_par_fa7) );
@@ -3897,7 +3910,7 @@ int Maillage_FT_Disc::check_sommets(int error_is_fatal) const
   return 0;
 }
 
-static int fct_tri_facettes(const void *pt1, const void *pt2)
+static True_int fct_tri_facettes(const void *pt1, const void *pt2)
 {
   const int *a = (const int *) pt1;
   const int *b = (const int *) pt2;

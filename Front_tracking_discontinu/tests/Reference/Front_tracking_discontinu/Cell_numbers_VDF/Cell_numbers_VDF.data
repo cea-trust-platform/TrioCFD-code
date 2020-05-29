@@ -1,5 +1,5 @@
 # Reacteur a bain de verre fondu avec agitateur #
-# PARALLEL OK #
+# PARALLEL RUNS #
 dimension 3
 Probleme_FT_Disc_gen pb
 
@@ -63,6 +63,7 @@ Lire sch
 	dt_start dt_fixe 4.5e-3
 	dt_max  1
 	dt_impr 1.e-10
+	precision_impr 3
 	dt_sauv 3
 	seuil_statio -1
 	facsec 4
@@ -102,7 +103,7 @@ Lire pb
     eq_hydraulique
     {
 	    modele_turbulence nul
-	    solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-12 impr }
+	    solveur_pression petsc cholesky { }
 	    convection           { quick }
 	    diffusion            { }
 	    conditions_initiales { vitesse champ_uniforme 3 0. 0. 0. }

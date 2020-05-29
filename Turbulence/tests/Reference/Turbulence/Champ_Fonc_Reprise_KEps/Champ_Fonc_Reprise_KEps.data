@@ -61,7 +61,7 @@ Discretize pb dis
 # Exemple ou l'on change d'unites: on passe de m en mm #
 # La vitesse est multipliee par 1000 #
 # rho et k sont multiples par 1000 #
-# T est passe °C en K #
+# T est passe Â°C en K #
 Read pb
 {
 	Navier_Stokes_turbulent

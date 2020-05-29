@@ -40,7 +40,7 @@ Chapter {
 	Description "Initial conditions : the turbulent flow is chosen in order to have Reh=Wbulk*D/v=200000"
 	Description "...Hydraulic : Flat profil with bulk velocity of 0.0276m/s"
 	Description "		    Turbulent values k_Eps Champ_Uniforme 2 7.56e-6 2.8e-7"
-	Description "...Temperature : T=0$°$C"
+	Description "...Temperature : T=0$Â°$C"
 	Description "Boundary conditions :"
 	Description "...Velocity, k, and eps and temperature fields are the same than initial conditions"
 	Description "...A constant heat flux is imposed on the wall paroi paroi_flux_impose Champ_Front_Uniforme 1 1."

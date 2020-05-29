@@ -46,8 +46,12 @@ Pave Cavite
 Tetraedriser_homogene dom_solide
 Tetraedriser_homogene dom_fluide
 
-Reordonner_Faces_Periodiques dom_solide perioz1
-Reordonner_Faces_Periodiques dom_fluide perioz2
+Corriger_frontiere_periodique { domaine dom_solide bord perioz1 }
+Corriger_frontiere_periodique { domaine dom_fluide bord perioz2 }
+
+Modif_bord_to_raccord dom_solide contact
+Modif_bord_to_raccord dom_fluide contact
+
 # END MESH #
 # BEGIN PARTITION
 

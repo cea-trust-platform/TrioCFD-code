@@ -101,7 +101,7 @@ calculer_dt_stab() const
   //const DoubleTab& xp=la_zone_VEF.xp();
   int nb_faces_elem = la_zone.nb_faces_elem();
   double diffu = (diffusivite_.valeur())(0,0);
-  const DoubleVect& diffu_turb=la_diffusivite_turbulente->valeurs();
+  const DoubleVect& diffu_turb=diffusivite_turbulente()->valeurs();
   double diffu2_;
   //diffu_turb=1.;
   // for( int j=0;j<nb_elem;j++)
@@ -549,7 +549,7 @@ DoubleTab& Op_Dift_VEF_P1NCP1B_Face::ajouter(const DoubleTab& inconnue,
   int nb_elem_tot=zone.nb_elem_tot();
   int nb_som_tot=dom.nb_som_tot();
 
-  const DoubleTab& nu_turb=la_diffusivite_turbulente->valeurs();
+  const DoubleTab& nu_turb=diffusivite_turbulente()->valeurs();
   double nu=(diffusivite_.valeur())(0,0);
 
   DoubleTab gradient(nb_elem_tot+nb_som_tot, dimension, dimension);
