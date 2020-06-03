@@ -89,12 +89,7 @@ Lire pb
 	{
 	Navier_Stokes_Turbulent
 		{
-		solveur_pression GCP
-			{
-			precond ssor { omega 1.5 } 
-			seuil 1e-9
-			impr
-			}
+		solveur_pression petsc cholesky { }
 		convection { amont }
 		diffusion { }
 		Sources
