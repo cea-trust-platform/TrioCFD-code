@@ -50,6 +50,8 @@ public :
   void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
   void add_diffusion_scalar_term(const DoubleTab&, DoubleTab&, double diffu=1.) const;
   inline double viscA(int face_i, int face_j, int num_elem, double diffu=1.) const;
+  void ajouter_conv_term(const Champ_Inc_base&, const DoubleTab&, DoubleTab& ) const;
+  double application_LIMITEUR(double, double, Motcle&) const;
 
 protected :
   REF(Zone_VEF) la_zone_vef;

@@ -264,6 +264,15 @@ const DoubleTab& Convection_Diffusion_Temperature_sensibility::get_temperature_s
   return temperature_state_field->valeurs();
 }
 
+const Champ_Inc_base& Convection_Diffusion_Temperature_sensibility::get_velocity_state() const
+{
+  return velocity_state_field;
+}
+const Champ_Inc_base& Convection_Diffusion_Temperature_sensibility::get_temperature_state() const
+{
+  return temperature_state_field;
+}
+
 const Motcle& Convection_Diffusion_Temperature_sensibility::get_uncertain_variable_name() const
 {
   return uncertain_var;

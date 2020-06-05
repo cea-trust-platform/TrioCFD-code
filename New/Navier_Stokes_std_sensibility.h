@@ -44,6 +44,7 @@ public :
   void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
   virtual  void mettre_a_jour(double temps);
   const DoubleTab& get_state_field() const;
+  const Champ_Inc_base& get_state() const;
   const Motcle& get_uncertain_variable_name() const;
 
 protected :

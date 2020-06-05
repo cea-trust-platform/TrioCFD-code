@@ -204,6 +204,10 @@ const DoubleTab& Navier_Stokes_std_sensibility::get_state_field() const
 {
   return state_field->valeurs();
 }
+const Champ_Inc_base& Navier_Stokes_std_sensibility::get_state() const
+{
+  return state_field;
+}
 
 const Motcle& Navier_Stokes_std_sensibility::get_uncertain_variable_name() const
 {

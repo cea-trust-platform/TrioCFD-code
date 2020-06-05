@@ -45,6 +45,8 @@ public :
   virtual  void mettre_a_jour(double temps);
   const DoubleTab& get_velocity_state_field() const;
   const DoubleTab& get_temperature_state_field() const;
+  const Champ_Inc_base& get_velocity_state() const;
+  const Champ_Inc_base& get_temperature_state() const;
   const Motcle& get_uncertain_variable_name() const;
 
 protected :
