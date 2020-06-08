@@ -41,12 +41,8 @@ public :
   virtual void remplir_fluent_ALEincluded(DoubleVect& ) const;
   virtual void calculateALEMeshVelocityGradientOnFaces( DoubleTab& ) const;
   virtual void calculateALEjacobian(DoubleTab& jacobianALE) const;
-  void calcul_vc_ALE(const ArrOfInt& ,ArrOfDouble& ,const ArrOfDouble& ,const DoubleTab& ,const DoubleTab& ,int, const DoubleVect& ) const ;
   double application_LIMITEUR(double, double, Motcle&) const;
   virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const;
-  void ajouterALE_Centre(const DoubleTab&, DoubleTab&) const;
-  void ajouterALE_Amont(const DoubleTab&, DoubleTab&) const;
-  void ajouterALE_Muscl(const DoubleTab&, DoubleTab&) const;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
   void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const;
 

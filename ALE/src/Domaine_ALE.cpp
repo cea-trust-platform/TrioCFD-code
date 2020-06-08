@@ -298,6 +298,7 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
       check_NoZero_ALE = false;
       update_or_not_matrix_coeffs_=1;
     }
+
   Debog::verifier("Domaine_ALE::calculer_vitesse -vit_maillage", vit_maillage);
   return vit_maillage;
 
@@ -458,7 +459,6 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
                 }
             }
         }
-
       secmem.echange_espace_virtuel();
       Debog::verifier("Domaine_ALE::laplacien -secmem", secmem);
       // If secmem is zero, then it is zero solution. Otherwise system is solved.
