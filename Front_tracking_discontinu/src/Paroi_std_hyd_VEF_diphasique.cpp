@@ -47,6 +47,8 @@ Entree& Paroi_std_hyd_VEF_diphasique::readOn( Entree& is )
   return is;
 }
 
+extern double norm_vit_lp(const ArrOfDouble& vit,int face,const Zone_VEF& zone,ArrOfDouble& val);
+/* Codee classe mere
 double norm_vit_lp(const ArrOfDouble& vit,int face,const Zone_VEF& zone,ArrOfDouble& val)
 {
   // A reverser dans VEF/Zone (?)
@@ -67,7 +69,7 @@ double norm_vit_lp(const ArrOfDouble& vit,int face,const Zone_VEF& zone,ArrOfDou
   for(int i=0; i<dim; i++) val[i]=(vit[i]-psc*r[i])/(norm_vit+DMINFLOAT);
 
   return norm_vit;
-}
+} */
 
 
 int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
