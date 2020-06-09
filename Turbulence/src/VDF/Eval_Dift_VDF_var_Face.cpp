@@ -99,6 +99,10 @@ void Eval_Dift_VDF_var_Face::mettre_a_jour( )
     }
   if (le_modele_turbulence->loi_paroi().non_nul())
     {
-      tau_tan_.ref(loipar->Cisaillement_paroi());
+      // Modif E. Saikali : on fait le ref seulement si le tableau a ete initialise, sinon pointeur nulle
+      const DoubleTab& tab = le_modele_turbulence->loi_paroi().valeur().Cisaillement_paroi();
+      if (tab.size_array() > 0)
+        tau_tan_.ref(tab);
+      //tau_tan_.ref(loipar->Cisaillement_paroi());
     }
 }
