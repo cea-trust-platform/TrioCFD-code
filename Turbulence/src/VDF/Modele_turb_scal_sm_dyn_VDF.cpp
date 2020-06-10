@@ -28,6 +28,8 @@
 #include <Champ_Don.h>
 #include <Champ_Uniforme.h>
 #include <Turbulence_hyd_sous_maille_SMAGO_DYN_VDF.h>
+#include <Pb_Thermohydraulique_Turbulent_QC.h>
+#include <Modifier_pour_QC.h>
 #include <Param.h>
 #include <Debog.h>
 
@@ -164,9 +166,26 @@ void Modele_turb_scal_sm_dyn_VDF::mettre_a_jour(double )
   const Milieu_base& le_milieu = equation().probleme().milieu();
   const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
   const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
+  const Probleme_base& mon_pb = mon_equation->probleme();
   DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
   lambda_t = diffusivite_turbulente_.valeurs();
-  lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
+  if (sub_type(Pb_Thermohydraulique_Turbulent_QC,mon_pb))
+    {
+      double cp=-1;
+      if (tab_Cp.nb_dim()==2)
+        {
+          cp=tab_Cp(0,0);
+          lambda_t*=cp;
+        }
+      else
+        {
+          int taille=lambda_t.size();
+          for (int i=0; i<taille; i++)
+            lambda_t(i)*=tab_Cp(i);
+        }
+      multiplier_par_rho_si_qc(lambda_t,le_milieu);
+    }
+  else lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
   lambda_t.echange_espace_virtuel();
 }
 
