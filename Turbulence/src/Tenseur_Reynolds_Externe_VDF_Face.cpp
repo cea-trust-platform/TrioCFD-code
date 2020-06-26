@@ -601,9 +601,9 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_bij_TBNN(DoubleTab& resu) c
 {
   vector<double> b,lambda;
   vector<vector<double>> T;
-  string path_NN = "/volatile/triou/files/";
-  string model_NN_file = path_NN + "Lu_a=0.5_b=0.5_Tf_seuil=1e-12_[0, 1].tbnn";
-  string ppp_NN_file = path_NN + "ppp.dat";
+  string path_NN = string(getenv("project_directory")) + "/share/reseaux_neurones/";
+  string model_NN_file = path_NN + "canal_plan.keras";
+  string ppp_NN_file = path_NN + "canal_plan.ppp";
 
   cout << "Chargement du reseau de neurones: " + model_NN_file << endl;
   TBNN *tbnn = new TBNN(model_NN_file,ppp_NN_file);
