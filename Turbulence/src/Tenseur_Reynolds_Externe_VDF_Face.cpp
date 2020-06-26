@@ -76,10 +76,9 @@ Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& is )
   is >> motlu;
   if (motlu != accolade_ouverte)
     {
-      Cerr << "On attendait { pour commencer a lire les constantes de Source_Transport_K_Eps_Realisable" << finl;
+      Cerr << "On attendait { pour commencer a lire les constantes de Tenseur_Reynolds_Externe" << finl;
       exit();
     }
-  Cerr << "read file name of neural network" << finl;
   Motcles les_mots(1);
   {
     les_mots[0] = "nom_fichier";
