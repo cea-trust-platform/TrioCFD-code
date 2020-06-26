@@ -52,6 +52,10 @@ PrePostNN::PrePostNN(string filename)
     }
     f.close();
   }
+  else{
+    cerr << "fichier: " << filename << " inexistant!" << endl;
+    exit(1);
+  }
 }
 
 PrePostNN::~PrePostNN()

@@ -7,6 +7,7 @@
 #include "keras_model.h"
 
 #include <cmath>
+#include <iostream>
 #include <fstream>
 #include <limits>
 #include <stdio.h>
@@ -611,7 +612,11 @@ bool KerasLayerLSTM::Step(Tensor* x, Tensor* out, Tensor* ht_1, Tensor* ct_1) {
 
 bool KerasModel::LoadModel(const std::string& filename) {
     std::ifstream file(filename.c_str(), std::ios::binary);
-    KASSERT(file.is_open(), "Unable to open file %s", filename.c_str());
+    if(!file.is_open()){
+      std::cerr << "fichier: " << filename << " inexistant!" << std::endl;
+      exit(1);
+    }
+    //KASSERT(file.is_open(), "Unable to open file %s", filename.c_str());
 
     unsigned int num_layers = 0;
     KASSERT(ReadUnsignedInt(&file, &num_layers), "Expected number of layers");
