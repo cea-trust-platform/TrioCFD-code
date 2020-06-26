@@ -27,32 +27,41 @@ vector<double> TBNN::predict(vector<double> lambda, vector<vector<double>> T)
 
 void TBNN::process_lambda(vector<double> lambda)
 {
-  vector<double> lc;                 // lambda centré
-  vector<double> lcr;                // lambda centré réduit
+  vector<double> lc;                 // lambda centre
+  vector<double> lcr;                // lambda centre reduit
   unsigned int nbl = lambda.size();  // nombre d'invariants lambda
-  
+
   lc.resize(nbl);
   lcr.resize(nbl);
   _plambda.resize(nbl);
-    
+
   switch(_ppNN->get_ppl())
   {
   case LNORM:
     // centrage des lambda
-    for(unsigned int i=0;i<nbl;i++)
-      lc[i] = lambda[i] - _ppNN->get_lmean()[i];
-    // réduction des lambda
+    if( _ppNN->get_lmean().size() == nbl )
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = lambda[i] - _ppNN->get_lmean()[i];
+    else
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = lambda[i];
+    // reduction des lambda
     for(unsigned int i=0;i<nbl;i++)
       _plambda[i] = lc[i] / _ppNN->get_lmax()[i];
     break;
   case LU:
     // puissance alpha
-    for(unsigned int i=0;i<nbl;i++)
-      lc[i] = sgn(lambda[i]) * pow(fabs(lambda[i]),_ppNN->get_alpha()[i]);
+    if( _ppNN->get_alpha().size() == nbl )
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = sgn(lambda[i]) * pow(fabs(lambda[i]),_ppNN->get_alpha()[i]);
+    else
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = lambda[i];
     // centrage des lambda
-    for(unsigned int i=0;i<nbl;i++)
-      lc[i] = lc[i] - _ppNN->get_lmean()[i];
-    // réduction des lambda
+    if( _ppNN->get_lmean().size() == nbl )
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = lc[i] - _ppNN->get_lmean()[i];
+    // reduction des lambda
     for(unsigned int i=0;i<nbl;i++)
       lcr[i] = lc[i] / _ppNN->get_lmax()[i];
     // multiplication par transpose(au)
@@ -64,12 +73,17 @@ void TBNN::process_lambda(vector<double> lambda)
     break;
   case LUS:
     // puissance alpha
-    for(unsigned int i=0;i<nbl;i++)
-      lc[i] = sgn(lambda[i]) * pow(fabs(lambda[i]),_ppNN->get_alpha()[i]);
+    if( _ppNN->get_alpha().size() == nbl )
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = sgn(lambda[i]) * pow(fabs(lambda[i]),_ppNN->get_alpha()[i]);
+    else
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = lambda[i];
     // centrage des lambda
-    for(unsigned int i=0;i<nbl;i++)
-      lc[i] = lc[i] - _ppNN->get_lmean()[i];
-    // réduction des lambda
+    if( _ppNN->get_lmean().size() == nbl )
+      for(unsigned int i=0;i<nbl;i++)
+        lc[i] = lc[i] - _ppNN->get_lmean()[i];
+    // reduction des lambda
     for(unsigned int i=0;i<nbl;i++)
       lcr[i] = lc[i] / _ppNN->get_lmax()[i];
     // multiplication par transpose(as)
@@ -81,7 +95,7 @@ void TBNN::process_lambda(vector<double> lambda)
     break;
   default:
     // on lance une exception
-    cerr << "Mauvaise méthode de pré traitement des lambda" << endl;
+    cerr << "Mauvaise methode de pre traitement des lambda" << endl;
     break;
   }
 }
@@ -95,10 +109,10 @@ void TBNN::process_T(vector<vector<double>> T)
   for(unsigned i=0;i<nbt;i++)
     _pT[i].resize(nbb);
 
-  // le premier tenseur T0 reste inchangé
+  // le premier tenseur T0 reste inchange
   for(unsigned int j=0;j<nbb;j++)
     _pT[0][j] = T[0][j];
-      
+
   // pre process de T
   switch(_ppNN->get_ppt())
   {
@@ -121,7 +135,7 @@ void TBNN::process_T(vector<vector<double>> T)
     break;
   default:
     // on lance une exception
-    cerr << "Mauvaise méthode de pré traitement des tenseurs T" << endl;
+    cerr << "Mauvaise methode de pre traitement des tenseurs T" << endl;
     break;
   }
 }
@@ -131,15 +145,15 @@ void TBNN::process_b()
   vector<int> iT = _ppNN->get_iT();
   unsigned int nbt = iT.size();
   unsigned int nbb = _pT[0].size();
-  
-  // calcul de _pb à partir de _g et de _pT
+
+  // calcul de _pb a partir de _g et de _pT
   _pb.resize(nbb);
   for(unsigned int i=0;i<nbb;i++){
     _pb[i] = 0;
     for(unsigned int j=0;j<nbt;j++)
       _pb[i] += _g[j] * _pT[iT[j]][i];
   }
-  
+
   // post process de b
   _b.resize(nbb);
   for(unsigned int i=0;i<nbb;i++)
@@ -156,11 +170,11 @@ void TBNN::applyNN()
 
   _g.resize(nbt);
 
-  // l'entrée du réseau est déterminée par les indices des lambdas définis dans le vecteur il
+  // l'entree du reseau est determinee par les indices des lambdas definis dans le vecteur il
   for(unsigned int i=0;i<il.size();i++)
     in.data_[i] = (float)_plambda[il[i]];
 
-  // on fait la prédiction à l'aide du réseau de neurones
+  // on fait la prediction a l'aide du reseau de neurones
   _model.Apply(&in,&out);
 
   // on stocke les sorties dans _g
