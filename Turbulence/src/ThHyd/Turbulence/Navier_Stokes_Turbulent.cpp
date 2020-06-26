@@ -198,6 +198,18 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       if ( motbidon != accfermee)
         Cerr << " On ne peut plus entrer d option apres negligeable "<< finl;
     }
+  else if (motbidon=="tenseur_Reynolds_externe")
+    {
+      terme_diffusif.typer(type);
+      terme_diffusif.l_op_base().associer_eqn(*this);
+      Cerr << terme_diffusif.valeur().que_suis_je() << finl;
+      terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
+      terme_diffusif.valeur().Oublie_Tenseur_Reynolds();
+      is >> motbidon;
+      //on lit la fin de diffusion { }
+      if ( motbidon != accfermee)
+        Cerr << " On ne peut plus entrer d option apres tenseur_Reynolds_externe "<< finl;
+    }
   else if (motbidon=="standard")
     {
       type+="_standard";
