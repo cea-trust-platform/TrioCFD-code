@@ -60,8 +60,44 @@ Sortie& Tenseur_Reynolds_Externe_VDF_Face::printOn(Sortie& s ) const
 //// readOn
 //
 
-Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& s )
+Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& is )
 {
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "On attendait { pour commencer a lire les constantes de Source_Transport_K_Eps_Realisable" << finl;
+      exit();
+    }
+  Cerr << "read file name of neural network" << finl;
+  Motcles les_mots(1);
+  {
+    les_mots[0] = "nom_fichier";
+  }
+  is >> motlu;
+  while (motlu != accolade_fermee)
+    {
+      int rang=les_mots.search(motlu);
+      switch(rang)
+        {
+        case 0 :
+          {
+            is >> nn_casename;
+            break;
+          }
+        default :
+          {
+            Cerr << "On ne comprend pas le mot cle : " << motlu << " dans Tenseur_Reynolds_Externe" << finl;
+            exit();
+          }
+        }
+
+      is >> motlu;
+    }
+  return is;
 //   s >> la_source;
 //   if (la_source->nb_comp() != dimension)
 //     {
@@ -69,7 +105,7 @@ Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& s )
 //       Cerr << "le champ source doit avoir " << dimension << " composantes" << finl;
 //       exit();
 //     }
-  return s ;
+//  return s ;
 }
 
 void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
@@ -602,8 +638,8 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_bij_TBNN(DoubleTab& resu) c
   vector<double> b,lambda;
   vector<vector<double>> T;
   string path_NN = string(getenv("project_directory")) + "/share/reseaux_neurones/";
-  string model_NN_file = path_NN + "canal_plan.keras";
-  string ppp_NN_file = path_NN + "canal_plan.ppp";
+  string model_NN_file = path_NN + string(nn_casename) + ".keras";
+  string ppp_NN_file = path_NN + string(nn_casename) + ".ppp";
 
   cout << "Chargement du reseau de neurones: " + model_NN_file << endl;
   TBNN *tbnn = new TBNN(model_NN_file,ppp_NN_file);

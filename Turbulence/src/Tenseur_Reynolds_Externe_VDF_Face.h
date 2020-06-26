@@ -89,6 +89,8 @@ protected:
   DoubleTab T10_etoile_;
 
   int nelem_;
+
+  Nom nn_casename;                  // nom du reseau de neurones a charger
 };
 
 #endif
