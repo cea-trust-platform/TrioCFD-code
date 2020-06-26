@@ -32,6 +32,7 @@
 #include <Ref_Modele_turbulence_hyd_K_Eps.h>
 #include <Ref_Navier_Stokes_Turbulent.h>
 #include <Ref_Transport_K_Eps.h>
+#include "TBNN.h"
 class Probleme_base;
 
 //
@@ -46,9 +47,11 @@ class Probleme_base;
 class Tenseur_Reynolds_Externe_VDF_Face : public Source_base, public Terme_Source_Qdm
 {
 
-  Declare_instanciable(Tenseur_Reynolds_Externe_VDF_Face);
+  Declare_instanciable_sans_constructeur_ni_destructeur(Tenseur_Reynolds_Externe_VDF_Face);
 
 public:
+  Tenseur_Reynolds_Externe_VDF_Face();
+  ~Tenseur_Reynolds_Externe_VDF_Face();
 
   void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
@@ -57,6 +60,7 @@ public:
   void completer();
 
 protected:
+  void readNN();
 
   REF(Navier_Stokes_Turbulent)           eqn_NS_;
   REF(Modele_turbulence_hyd_K_Eps)       modele_K_Eps_;
@@ -91,6 +95,7 @@ protected:
   int nelem_;
 
   Nom nn_casename;                  // nom du reseau de neurones a charger
+  TBNN *tbnn;                       // objet reseau de neurones
 };
 
 #endif

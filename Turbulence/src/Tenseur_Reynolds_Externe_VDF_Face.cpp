@@ -42,10 +42,17 @@
 #include <Neumann_homogene.h>
 #include <Champ_Face.h>
 #include <Transport_K_Eps.h>
-#include "TBNN.h"
 
-Implemente_instanciable(Tenseur_Reynolds_Externe_VDF_Face,"Tenseur_Reynolds_Externe_VDF_Face",Source_base);
+Implemente_instanciable_sans_constructeur_ni_destructeur(Tenseur_Reynolds_Externe_VDF_Face,"Tenseur_Reynolds_Externe_VDF_Face",Source_base);
 
+Tenseur_Reynolds_Externe_VDF_Face::Tenseur_Reynolds_Externe_VDF_Face()
+{
+}
+
+Tenseur_Reynolds_Externe_VDF_Face::~Tenseur_Reynolds_Externe_VDF_Face()
+{
+  delete tbnn;
+}
 
 
 //// printOn
@@ -97,6 +104,9 @@ Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& is )
 
       is >> motlu;
     }
+
+  readNN();
+
   return is;
 //   s >> la_source;
 //   if (la_source->nb_comp() != dimension)
@@ -106,6 +116,16 @@ Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& is )
 //       exit();
 //     }
 //  return s ;
+}
+
+void Tenseur_Reynolds_Externe_VDF_Face::readNN()
+{
+  string path_NN = string(getenv("project_directory")) + "/share/reseaux_neurones/";
+  string model_NN_file = path_NN + string(nn_casename) + ".keras";
+  string ppp_NN_file = path_NN + string(nn_casename) + ".ppp";
+
+  cout << "Chargement du reseau de neurones: " + model_NN_file << endl;
+  tbnn = new TBNN(model_NN_file,ppp_NN_file);
 }
 
 void Tenseur_Reynolds_Externe_VDF_Face::associer_pb(const Probleme_base& pb)
@@ -637,12 +657,6 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_bij_TBNN(DoubleTab& resu) c
 {
   vector<double> b,lambda;
   vector<vector<double>> T;
-  string path_NN = string(getenv("project_directory")) + "/share/reseaux_neurones/";
-  string model_NN_file = path_NN + string(nn_casename) + ".keras";
-  string ppp_NN_file = path_NN + string(nn_casename) + ".ppp";
-
-  cout << "Chargement du reseau de neurones: " + model_NN_file << endl;
-  TBNN *tbnn = new TBNN(model_NN_file,ppp_NN_file);
 
   lambda.resize(5);
   T.resize(11);
@@ -691,6 +705,5 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::Calcul_bij_TBNN(DoubleTab& resu) c
       resu(elem,2,2) = b[5];
     }
 
-  delete tbnn;
   return resu;
 }
