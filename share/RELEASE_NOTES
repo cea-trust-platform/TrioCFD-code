@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.8.1_beta : Enhancements, modifications and corrected bugs since version 1.8.0 :
+Release notes version 1.8.1 : Enhancements, modifications and corrected bugs since version 1.8.0 :
 --------------------------------------------------------------------------------------------------
 01/04/20 (TrioCFD) Enhancement : ALE improvements
 30/01/20 (TrioCFD) Validation  : Add DirectionalPressureLoss validation sheet
