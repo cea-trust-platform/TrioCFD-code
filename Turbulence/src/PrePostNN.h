@@ -31,6 +31,7 @@ private:
   void display(string tag,vector<double> vec);
   void display(string tag,vector<int> vec);
   void display(string tag,vector<vector<double>> mat);
+  string trim(const std::string& str, const std::string& whitespace = " \t");
   vector<double> ReadDataFromLine(string buffer,string tag,size_t npos);
   double ReadOneDataFromLine(string buffer,string tag,size_t npos);
   enum pp_T ReadPPTFromLine(string buffer,string tag,size_t npos);

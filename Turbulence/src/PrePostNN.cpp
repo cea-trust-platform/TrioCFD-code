@@ -13,6 +13,7 @@ PrePostNN::PrePostNN(string filename)
 
   if(f){
     while(getline(f, buffer)){
+      buffer = trim(buffer);
       tag = "ALPHA:";
       npos = buffer.find(tag);
       if(npos != string::npos) alpha = ReadDataFromLine(buffer,tag,npos);
@@ -86,6 +87,18 @@ void PrePostNN::display(string tag,vector<vector<double>> mat)
       cout << mat[i][j] << " ";
     cout << endl;
   }
+}
+
+string PrePostNN::trim(const std::string& str, const std::string& whitespace)
+{
+    const auto strBegin = str.find_first_not_of(whitespace);
+    if (strBegin == std::string::npos)
+        return ""; // no content
+
+    const auto strEnd = str.find_last_not_of(whitespace);
+    const auto strRange = strEnd - strBegin + 1;
+
+    return str.substr(strBegin, strRange);
 }
 
 vector<double> PrePostNN::ReadDataFromLine(string buffer,string tag,size_t npos)
