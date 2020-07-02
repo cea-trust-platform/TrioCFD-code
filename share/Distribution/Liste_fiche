@@ -1,5 +1,6 @@
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/Bullage_Huile_Creuset_Froid NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/Chimie_FT STD
+./ALE/share/Validation/Rapports_automatiques/TwoCylindersALE STD
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_PhaseChange_1D NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop NNR
 ./Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hysteresis NNR
@@ -109,6 +110,7 @@
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuilleperio2D NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/PorousWithPLoss_VEF STD
+./validation/share/Validation/Rapports_automatiques/Validant/Fini/DirectionalPressureLoss STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/ThermalCoupling_TurbulentFlow_VEF STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Thermal_stratification_flow NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Tube_turb_perio_EF_stab NNR
