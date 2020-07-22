@@ -81,7 +81,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
   int convectionSchemeDiscrType; // amont=0, muscl=1, centre=2
   opConvVEFFace.get_type_op(convectionSchemeDiscrType);
-
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
 
   if(convectionSchemeDiscrType==0 || convectionSchemeDiscrType==1 || convectionSchemeDiscrType==2) // Convection scheme discr "amont".
     {
@@ -91,12 +91,20 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Champ_Inc_base& state = eq.get_state();
           const DoubleTab& state_field = eq.get_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
+          // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
+          DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+          int nb_faces_bord=zone_VEF.nb_faces_bord();
+          flux_b.resize(nb_faces_bord,inco.dimension(1));
+          flux_b = 0.;
+          ajouter_conv_term(state,inco ,resu, flux_b);
+          ajouter_conv_term(la_vitesse,state_field ,resu, flux_b);
+
           //ajouter_Lstate_sensibility_Amont(state, inco, resu);
           //ajouter_Lsensibility_state_Amont(inco, state, resu);
-          ajouter_conv_term(state,inco ,resu);
-          ajouter_conv_term(la_vitesse,state_field ,resu);
           if(uncertain_var=="MU")
             add_diffusion_term(state, resu);
+          opConvVEFbase.modifier_flux(*this); // Multiplication by rho
+
         }
       else if (equation().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
         {
@@ -104,12 +112,15 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const Champ_Inc_base& velocity_state = eq.get_velocity_state();
           const DoubleTab& temperature_state = eq.get_temperature_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
-          //const DoubleTab& velocity_state = eq.get_velocity_state_field();
-          //const DoubleTab& velocity= vitesse().valeurs();
-          //ajouter_Lstate_sensibility_Amont(velocity_state, inco, resu);
-          //ajouter_Lsensibility_state_Amont(velocity,temperature_state, resu);
-          ajouter_conv_term(velocity_state,inco ,resu);
-          ajouter_conv_term(vitesse(), temperature_state,resu);
+
+          DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+          int nb_faces_bord=zone_VEF.nb_faces_bord();
+          flux_b.resize(nb_faces_bord,inco.dimension(0));
+          flux_b = 0.;
+
+          ajouter_conv_term(velocity_state,inco ,resu, flux_b);
+          ajouter_conv_term(vitesse(), temperature_state,resu, flux_b);
+          opConvVEFbase.modifier_flux(*this); // Multiplication by rhoCp
           if(uncertain_var=="LAMBDA")
             {
               add_diffusion_scalar_term(temperature_state, resu);
@@ -140,7 +151,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
                <<". Try available Navier_Stokes_standard_sensibility or Convection_Diffusion_Temperature_sensibility." << finl;
           exit();
         }
-      opConvVEFbase.modifier_flux(*this); // Multiplication by density in case of incompressible Navier Stokes
+
     }
   else
     {
@@ -152,7 +163,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
   return resu;
 }
 
-void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& velocity, const DoubleTab& transporte, DoubleTab& resu) const
+void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& velocity, const DoubleTab& transporte, DoubleTab& resu,  DoubleTab& flux_b) const
 {
   const Zone_Cl_VEF& zone_Cl_VEF = la_zcl_vef.valeur();
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, la_zone_vef.valeur());
@@ -166,11 +177,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   opConvVEFFace.get_alpha(alpha_);
 
   Motcle type_limit;
-  if(op_conv.type()=="MUSCL") //In case of: "convection {  ALE { muscl } }" , type_lumit has default value set in Op_Conv_Muscl_VEF_Face.cpp .
+  if(op_conv.type()=="MUSCL") //type_lumit has default value set in Op_Conv_Muscl_VEF_Face.cpp .
     {
       type_limit="vanleer";
     }
-  else // In case of: "convection {  ALE { generic muscl [limiter] [order of accuracy] [alpha] } }". op_conv.type()=="GENERIC" .
+  else // In case of: "convection {  { generic muscl [limiter] [order of accuracy] [alpha] } }". op_conv.type()=="GENERIC" .
     {
       opConvVEFFace.get_type_lim(type_limit);
     }
@@ -450,12 +461,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
   DoubleTab vsom(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
-  // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
-  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
-  int nb_faces_bord=zone_VEF.nb_faces_bord();
-  flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
-  flux_b = 0.;
 
+  int nb_faces_bord=zone_VEF.nb_faces_bord();
   const IntTab& KEL=type_elemvef.KEL();
   const DoubleTab& xv=zone_VEF.xv();
   const Domaine& domaine=zone.domaine();
@@ -952,10 +959,13 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
   int nb_faces_ = zone_VEF.nb_faces();
   ArrOfInt face(nfac);
   ArrOfDouble vs(dimension);
+  ArrOfDouble vs_inco(dimension);
   ArrOfDouble vc(dimension);
+  ArrOfDouble vc_inco(dimension);
   ArrOfDouble cc(dimension);
   DoubleVect xc(dimension);
   DoubleTab vsom(nsom,dimension);
+  DoubleTab vsom_inco(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
 
@@ -992,9 +1002,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
           for (j=0; j<dimension; j++)
             {
               vs(j) = state_field(face(0),j);
+              vs_inco(j) = inco(face(0),j);
               for (i=1; i<nfac; i++)
                 {
                   vs(j)+= state_field(face(i),j);
+                  vs_inco(j) = inco(face(i),j);
                 }
             }
           // calcul de la vitesse aux sommets des polyedres
@@ -1004,6 +1016,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 for (j=0; j<dimension; j++)
                   {
                     vsom(i,j) = (vs(j) - dimension*state_field(face(i),j));
+                    vsom_inco(i,j) = (vs_inco(j) - dimension*inco(face(i),j));
                   }
             }
           else
@@ -1018,6 +1031,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,state_field,itypcl);
+          calcul_vc(face,vc_inco,vs_inco,vsom_inco,inco,itypcl);
 
 
           // Boucle sur les facettes du polyedre non standard:
@@ -1036,15 +1050,19 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
               // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
               double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+              double psc_c_inco=0,psc_s_inco=0,psc_m_inco=0;
               if (dimension==2)
                 {
                   for (i=0; i<2; i++)
                     {
                       psc_c+=vc[i]*cc[i];
                       psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                      psc_c_inco+=vc_inco[i]*cc[i];
+                      psc_s_inco+=vsom_inco(KEL(2,fa7),i)*cc[i];
 
                     }
                   psc_m=(psc_c+psc_s)/2.;
+                  psc_m_inco=(psc_c_inco+psc_s_inco)/2.;
                 }
               else
                 {
@@ -1062,10 +1080,13 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
                   {
                     psc_m = psc_c;
+                    psc_m_inco = psc_c_inco;
                   }
               // Determination de la face amont pour M
               int face_amont_m;
+              if(false) Cout<<psc_m_inco<<finl;
               if (psc_m >= 0)
+                //if (psc_m_inco >= 0)
                 {
                   face_amont_m = num10;
                 }
@@ -1331,10 +1352,13 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
   int nb_faces_ = zone_VEF.nb_faces();
   ArrOfInt face(nfac);
   ArrOfDouble vs(dimension);
+  ArrOfDouble vs_state(dimension);
   ArrOfDouble vc(dimension);
+  ArrOfDouble vc_state(dimension);
   ArrOfDouble cc(dimension);
   DoubleVect xc(dimension);
   DoubleTab vsom(nsom,dimension);
+  DoubleTab vsom_state(nsom,dimension);
   DoubleTab xsom(nsom,dimension);
 
 
@@ -1369,9 +1393,11 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
           for (j=0; j<dimension; j++)
             {
               vs(j) = inco(face(0),j);
+              vs_state(j) = state_field(face(0),j);
               for (i=1; i<nfac; i++)
                 {
                   vs(j)+= inco(face(i),j);
+                  vs_state(j) = state_field(face(i),j);
                 }
             }
           // calcul de la vitesse aux sommets des polyedres
@@ -1381,6 +1407,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                 for (j=0; j<dimension; j++)
                   {
                     vsom(i,j) = (vs(j) - dimension*inco(face(i),j));
+                    vsom_state(i,j) = (vs_state(j) - dimension*state_field(face(i),j));
                   }
             }
           else
@@ -1395,6 +1422,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
           // calcul de vc (a l'intersection des 3 facettes) vc vs vsom
           calcul_vc(face,vc,vs,vsom,inco,itypcl);
+          calcul_vc(face,vc_state,vs_state,vsom_state,state_field,itypcl);
 
           // Boucle sur les facettes du polyedre non standard:
           for (fa7=0; fa7<nfa7; fa7++)
@@ -1412,15 +1440,19 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
               // Calcul des vitesses en C,S,S2 les 3 extremites de la fa7 et M le centre de la fa7
               double psc_c=0,psc_s=0,psc_m,psc_s2=0;
+              double psc_m_state=0.,psc_c_state=0.,psc_s_state=0.;
               if (dimension==2)
                 {
                   for (i=0; i<2; i++)
                     {
                       psc_c+=vc[i]*cc[i];
                       psc_s+=vsom(KEL(2,fa7),i)*cc[i];
+                      psc_c_state+=vc_state[i]*cc[i];
+                      psc_s_state+=vsom_state(KEL(2,fa7),i)*cc[i];
 
                     }
                   psc_m=(psc_c+psc_s)/2.;
+                  psc_m_state=(psc_c_state+psc_s_state)/2.;
                 }
               else
                 {
@@ -1440,11 +1472,14 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                   {
                     //appliquer_cl_dirichlet = 1;
                     psc_m = psc_c;
+                    psc_m_state = psc_c_state;
                   }
 
               // Determination de la face amont pour M
               int face_amont_m;
+              if(false) Cout<<psc_m_state<<finl;
               if (psc_m >= 0)
+                //if (psc_m_state >= 0)
                 {
                   face_amont_m = num10;
                 }
