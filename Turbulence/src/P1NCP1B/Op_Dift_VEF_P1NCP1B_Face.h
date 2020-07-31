@@ -61,7 +61,6 @@ public:
   };
 
   void associer_modele_turbulence(const Mod_turb_hyd_base& );
-  void associer_modele_turbulence_temp(const Modele_turbulence_scal_base& );
 
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
   DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;

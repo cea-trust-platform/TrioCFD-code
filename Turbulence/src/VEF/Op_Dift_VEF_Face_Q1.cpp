@@ -33,6 +33,7 @@
 #include <Debog.h>
 #include <DoubleTrav.h>
 #include <Modele_turbulence_scal_Prandtl.h>
+#include <Mod_turb_hyd_base.h>
 
 Implemente_instanciable(Op_Dift_VEF_Face_Q1,"Op_Dift_VEF_Q1NC",Op_Dift_VEF_base);
 
@@ -296,7 +297,7 @@ DoubleTab& Op_Dift_VEF_Face_Q1::ajouter(const DoubleTab& inconnue,
         else if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
                  sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
           {
-            if ((indic_lp_neg_!=1)&&(indic_bas_Re_!=1)&&(indice_keps_realisable_!=1))
+            if (le_modele_turbulence.valeur().utiliser_loi_paroi())
               {
                 if (dimension == 2 )
                   {

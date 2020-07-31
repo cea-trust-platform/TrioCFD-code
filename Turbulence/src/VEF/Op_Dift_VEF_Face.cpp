@@ -31,7 +31,6 @@
 #include <Neumann_sortie_libre.h>
 #include <Champ_Uniforme.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
-#include <Turbulence_hyd_sous_maille_VEF.h>
 #include <Mod_turb_hyd_RANS_0_eq.h>
 #include <Paroi_negligeable_VEF.h>
 #include <Paroi_negligeable_scal_VEF.h>
@@ -567,7 +566,8 @@ void Op_Dift_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
   int nb_cl=les_cl.size();
 
   Champ_P1NC::calcul_gradient(inconnue,grad_,zone_Cl_VEF);
-  Champ_P1NC::calcul_duidxj_paroi(grad_,nu,nu_turb,tau_tan_,indic_lp_neg_,indic_bas_Re_,zone_Cl_VEF);
+  if (le_modele_turbulence.valeur().utiliser_loi_paroi())
+    Champ_P1NC::calcul_duidxj_paroi(grad_,nu,nu_turb,tau_tan_,0,0,zone_Cl_VEF);
 
   grad_.echange_espace_virtuel();
 
@@ -1744,7 +1744,8 @@ void Op_Dift_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) const
 
       Champ_P1NC::calcul_gradient(inconnue,grad,zone_Cl_VEF);
       DoubleTab gradsa(grad);
-      Champ_P1NC::calcul_duidxj_paroi(grad,nu,nu_turb,tau_tan_,indic_lp_neg_,indic_bas_Re_,zone_Cl_VEF);
+      if (le_modele_turbulence.valeur().utiliser_loi_paroi())
+        Champ_P1NC::calcul_duidxj_paroi(grad,nu,nu_turb,tau_tan_,0,0,zone_Cl_VEF);
       grad-=gradsa;
       grad.echange_espace_virtuel();
       for (int num_face=0; num_face<nb_faces; num_face++)

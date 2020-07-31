@@ -27,7 +27,7 @@
 
 #include <Op_Diff_VEF_base.h>
 #include <Op_Diff_Turbulent_base.h>
-#include <Ref_Mod_turb_hyd_base.h>
+#include <Mod_turb_hyd_base.h>
 #include <Ref_Modele_turbulence_scal_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -38,28 +38,19 @@
 
 class Op_Dift_VEF_base : public Op_Diff_VEF_base, public Op_Diff_Turbulent_base
 {
-
-
   Declare_base(Op_Dift_VEF_base);
 
 public:
 
   virtual void calculer_borne_locale(DoubleVect& ,double ,double ) const;
   void associer_modele_turbulence(const Mod_turb_hyd_base& );
-  void associer_modele_turbulence_temp(const Modele_turbulence_scal_base& );
   void mettre_a_jour(double temps);
   void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc& );
   void completer();
 
 protected:
   REF(Mod_turb_hyd_base) le_modele_turbulence; // A deplacer dans Op_Diff_turb ?
-  REF(Modele_turbulence_scal_base) le_modele_turb_temp;  // A deplacer dans Op_Diff_turb ?
   DoubleTab tau_tan_;
-  DoubleTab k_;
-  int indic_lp_neg_;
-  int indic_bas_Re_;
-  int indice_keps_realisable_;
-  int indic_Pr;  // mod turb temp de Prandtl Oui = 1
 };
 
 #endif

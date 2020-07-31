@@ -41,7 +41,7 @@ public:
 
   DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
   void calcul_divergence(DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Zone_Cl_VEF&,const Zone_VEF&,DoubleTab&,int) const;
-  void ajouter_cas_vectoriel(const DoubleTab&, DoubleTab& , DoubleTab& ,const DoubleTab& , const DoubleTab& ,const Zone_Cl_VEF& ,const Zone_VEF& ,const DoubleTab& ,const DoubleTab& ,const int ,const int ,const int ,int ) const;
+  void ajouter_cas_vectoriel(const DoubleTab&, DoubleTab& , DoubleTab& ,const DoubleTab& , const DoubleTab& ,const Zone_Cl_VEF& ,const Zone_VEF& ,const DoubleTab& ,int ) const;
 
 
 protected :

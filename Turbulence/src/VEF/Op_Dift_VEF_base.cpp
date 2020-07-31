@@ -23,16 +23,9 @@
 #include <Op_Dift_VEF_base.h>
 #include <Champ_Fonc.h>
 #include <Mod_turb_hyd_base.h>
-#include <Mod_turb_hyd_RANS.h>
-#include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Turbulence_hyd_sous_maille_VEF.h>
-#include <Modele_turbulence_scal_Prandtl.h>
-#include <Transport_K_Eps_base.h>
-#include <Paroi_negligeable_VEF.h>
 #include <Modele_turbulence_scal.h>
-#include <Mod_turb_hyd_RANS_0_eq.h>
-#include <Mod_turb_hyd_combin.h>
 #include <Navier_Stokes_std.h>
+#include <Zone_Cl_VEF.h>
 
 Implemente_base(Op_Dift_VEF_base,"Op_Dift_VEF_base",Op_Diff_VEF_base);
 
@@ -49,58 +42,8 @@ Entree& Op_Dift_VEF_base::readOn(Entree& is)
 
 void Op_Dift_VEF_base::associer_modele_turbulence(const Mod_turb_hyd_base& mod)
 {
-  // On remplit la reference au modele de turbulence et le tableau k:
-
   le_modele_turbulence    = mod;
-  indic_bas_Re_           = 0;
-  indice_keps_realisable_ = 0;
-
-  if (sub_type(Mod_turb_hyd_RANS,le_modele_turbulence.valeur()))
-    {
-      const Mod_turb_hyd_RANS& mod_K_eps =
-        ref_cast(Mod_turb_hyd_RANS, le_modele_turbulence.valeur());
-      k_.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
-
-      if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
-        {
-          indice_keps_realisable_ = 1;
-        }
-    }
-  else if (sub_type(Mod_turb_hyd_ss_maille,le_modele_turbulence.valeur()))
-    {
-      const Mod_turb_hyd_ss_maille& mod_ss_maille =
-        ref_cast(Mod_turb_hyd_ss_maille, le_modele_turbulence.valeur());
-      k_.ref(mod_ss_maille.energie_cinetique_turbulente().valeurs());
-    }
-  else if (sub_type(Mod_turb_hyd_RANS_0_eq,le_modele_turbulence.valeur()))
-    {
-      const Mod_turb_hyd_RANS_0_eq& mod_RANS_O_eq =
-        ref_cast(Mod_turb_hyd_RANS_0_eq, le_modele_turbulence.valeur());
-      k_.ref(mod_RANS_O_eq.energie_cinetique_turbulente().valeurs());
-
-      Cerr<<"On associe pas d energie cinetique pour un modele longueur de melange"<<finl;
-
-    }
-  else if (sub_type(Mod_turb_hyd_combin,le_modele_turbulence.valeur()))
-    {
-    }
-  else
-    {
-      Cerr<<"Op_Dift_VEF_base::associer_modele_turbulence :"<<finl;
-      Cerr<<"modele "<<le_modele_turbulence->que_suis_je()<<" non reconnu."<<finl;
-      exit();
-    }
 }
-
-void Op_Dift_VEF_base::associer_modele_turbulence_temp(const Modele_turbulence_scal_base& mod)
-{
-  indic_Pr = 0;
-  // On remplit la reference au modele de turbulence :
-  le_modele_turb_temp = mod;
-  if (sub_type(Modele_turbulence_scal_Prandtl,le_modele_turb_temp.valeur()))
-    indic_Pr = 1;
-}
-
 
 //
 
@@ -108,12 +51,6 @@ void Op_Dift_VEF_base::mettre_a_jour(double )
 {
   if (sub_type(Navier_Stokes_std,equation())) // on traite l'hydraulique
     {
-      if (sub_type(Mod_turb_hyd_RANS,le_modele_turbulence.valeur()))
-        {
-          const Mod_turb_hyd_RANS& mod_K_eps =
-            ref_cast(Mod_turb_hyd_RANS, le_modele_turbulence.valeur());
-          k_.ref(mod_K_eps.eqn_transp_K_Eps().inconnue().valeurs());
-        }
       if ( le_modele_turbulence->loi_paroi().non_nul())
         if (le_modele_turbulence->loi_paroi()->use_shear())
           {
@@ -140,7 +77,6 @@ void Op_Dift_VEF_base::associer(const Zone_dis& zone_dis,
 void Op_Dift_VEF_base::completer()
 {
   Operateur_base::completer();
-  indic_lp_neg_ = 0;
 
   const RefObjU& modele_turbulence = equation().get_modele(TURBULENCE);
   if (modele_turbulence.non_nul() && sub_type(Mod_turb_hyd_base,modele_turbulence.valeur()))
@@ -149,16 +85,12 @@ void Op_Dift_VEF_base::completer()
       const Champ_Fonc& viscosite_turbulente = mod_turb.viscosite_turbulente();
       associer_diffusivite_turbulente(viscosite_turbulente);
       associer_modele_turbulence(mod_turb);
-      if (mod_turb.loi_paroi().non_nul())
-        if (sub_type(Paroi_negligeable_VEF,mod_turb.loi_paroi().valeur()))
-          indic_lp_neg_ = 1;
     }
   else if (sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
     {
       const Modele_turbulence_scal_base& modele_turbulence_scalaire = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
       const Champ_Fonc& conductivite_turbulente = modele_turbulence_scalaire.conductivite_turbulente();
       associer_diffusivite_turbulente(conductivite_turbulente);
-      associer_modele_turbulence_temp(modele_turbulence_scalaire);
     }
   else
     {
