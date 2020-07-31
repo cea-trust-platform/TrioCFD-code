@@ -77,7 +77,7 @@ public:
                                       const DoubleTab& ,const int,
                                       const DoubleTab&, const DoubleTab&,
                                       const double) const;
-  virtual DoubleTab calcul_tenseur_Re(const Discretisation_base& dis, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const Champ_base& K_Eps) const;
+  virtual bool calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
   virtual void creer_champ(const Motcle& motlu);

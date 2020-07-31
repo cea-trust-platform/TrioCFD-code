@@ -25,7 +25,7 @@
 #define Mod_turb_hyd_RANS_included
 
 #include <Mod_turb_hyd_base.h>
-
+#include <Modele_Fonc_Bas_Reynolds.h>
 class Equation_base;
 class Transport_K_Eps_base;
 
@@ -73,8 +73,17 @@ public:
   virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
   /////////////////////////////////////////////////////
 
+  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
+  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
+  virtual bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const
+  {
+    if (associe_modele_fonction().non_nul() && associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
+      return associe_modele_fonction().valeur().calcul_tenseur_Re(nu_turb, grad, Re);
+    else
+      return false;
+  };
 protected:
-
+  Modele_Fonc_Bas_Reynolds mon_modele_fonc;
   double Prandtl_K, Prandtl_Eps;
   double LeEPS_MIN, LeEPS_MAX, LeK_MIN;
   int lquiet;
@@ -111,4 +120,13 @@ inline int Mod_turb_hyd_RANS::get_lquiet() const
   return lquiet;
 }
 
+inline Modele_Fonc_Bas_Reynolds& Mod_turb_hyd_RANS::associe_modele_fonction()
+{
+  return mon_modele_fonc;
+}
+
+inline const Modele_Fonc_Bas_Reynolds& Mod_turb_hyd_RANS::associe_modele_fonction() const
+{
+  return  mon_modele_fonc;
+}
 #endif

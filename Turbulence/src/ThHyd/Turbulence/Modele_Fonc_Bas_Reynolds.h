@@ -56,7 +56,6 @@ public:
                                      const DoubleTab& ,const int,
                                      const DoubleTab&, const DoubleTab&,
                                      const double) const;
-  inline DoubleTab calcul_tenseur_Re(const Discretisation_base& dis, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,  const DoubleTab&, const Champ_base& K_Eps) const;
   inline void lire_distance_paroi();
 private :
 
@@ -149,13 +148,6 @@ inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_Paroi(DoubleTab& Cmu,
                                                              const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN) const
 {
   return valeur().Calcul_Cmu_Paroi(Cmu,zone_dis,zone_Cl_dis, visco,visco_turb,loi_paroi,idt,vitesse,K_Eps,EPS_MIN);
-}
-inline DoubleTab  Modele_Fonc_Bas_Reynolds::calcul_tenseur_Re(const Discretisation_base& dis,
-                                                              const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
-                                                              const DoubleTab& grad, const DoubleTab& visco_elem,
-                                                              const Champ_base& K_Eps) const
-{
-  return valeur().calcul_tenseur_Re(dis,zone_dis,zone_Cl_dis,grad,visco_elem,K_Eps);
 }
 
 inline void Modele_Fonc_Bas_Reynolds::lire_distance_paroi()

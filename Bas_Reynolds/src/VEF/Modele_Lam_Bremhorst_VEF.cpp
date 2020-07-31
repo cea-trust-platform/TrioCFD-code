@@ -475,13 +475,10 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::calcul_tenseur_face(DoubleTab& Tenseur_face
   return Tenseur_face;
 }
 
-DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re(const Discretisation_base& dis,
-                                                      const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
-                                                      const DoubleTab& G, const DoubleTab& visco_elem,
-                                                      const Champ_base& K_Eps) const
+bool Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& G, DoubleTab& Re) const
 {
-
-  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Zone_dis& zone_dis = mon_equation->zone_dis();
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
   int nelem = G.dimension(0);
 
   DoubleTab S, R;
@@ -498,16 +495,15 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re(const Discretisation_base&
 
   DoubleTab Sn = calcul_norme_elem(zone_VEF,S);
 
-  DoubleTab ReNL = calcul_tenseur_Re_elem(dis,zone_dis,G,S,R,Sn,visco_elem,K_Eps);
+  Re = calcul_tenseur_Re_elem(mon_equation->discretisation(),zone_dis,G,S,R,Sn,mon_equation->inconnue());
 
-  return ReNL;
+  return true;
 }
 
 DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem(const Discretisation_base& dis,
                                                            const Zone_dis& zone_dis,
                                                            const DoubleTab& G, const DoubleTab& S,
                                                            const DoubleTab& R, const DoubleTab& Sn,
-                                                           const DoubleTab& visco_elem,
                                                            const Champ_base& K_Eps) const
 {
   int nelem = G.dimension(0);
@@ -565,7 +561,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem(const Discretisation_
 
 DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_shih(const Discretisation_base& dis,
                                                            const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
-                                                           const DoubleTab& G, const DoubleTab& visco_elem,
+                                                           const DoubleTab& G,
                                                            const Champ_base& K_Eps) const
 {
 
@@ -593,7 +589,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_shih(const Discretisation_
 
   DoubleTab Rn = calcul_norme_elem(zone_VEF,R);
 
-  DoubleTab ReNL = calcul_tenseur_Re_elem_shih(dis,zone_dis,G,S,R,Sn,Rn,visco_elem,K_Eps);
+  DoubleTab ReNL = calcul_tenseur_Re_elem_shih(dis,zone_dis,G,S,R,Sn,Rn,K_Eps);
 
   return ReNL;
 }
@@ -602,7 +598,6 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_shih(const Discretisa
                                                                 const Zone_dis& zone_dis,
                                                                 const DoubleTab& G, const DoubleTab& S,
                                                                 const DoubleTab& R, const DoubleTab& Sn,const DoubleTab& Rn,
-                                                                const DoubleTab& visco_elem,
                                                                 const Champ_base& K_Eps) const
 {
   int nelem = G.dimension(0);

@@ -553,12 +553,6 @@ void Op_Dift_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
     }
   grad_=0.;
 
-  const Equation_base& eqn_base = equation();
-  const Zone_dis& zone_dis = equation().zone_dis();
-  const Zone_Cl_dis& zone_Cl_dis = equation().zone_Cl_dis();
-  const Discretisation_base& dis = eqn_base.discretisation();
-  //  const DoubleTab& vit = eqn_base.inconnue().valeurs();
-
   const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
 
@@ -573,33 +567,21 @@ void Op_Dift_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& inconnue,
   zone_VEF.zone().creer_tableau_elements(Re);
   Re = 0.;
 
-  if sub_type(Modele_turbulence_hyd_K_Eps, le_modele_turbulence.valeur())
+  if (le_modele_turbulence.valeur().calcul_tenseur_Re(nu_turb, grad_, Re))
     {
-      const Modele_turbulence_hyd_K_Eps& mod = ref_cast(Modele_turbulence_hyd_K_Eps, le_modele_turbulence.valeur());
-      if (mod.associe_modele_fonction().non_nul() && mod.associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
-        {
-          Cerr << "On utilise une diffusion turbulente non linaire dans NS" << finl;
-          const Champ_base& K_Eps = mod.eqn_transp_K_Eps().inconnue().valeur();
-          Re = mod.associe_modele_fonction().calcul_tenseur_Re(dis,zone_dis,zone_Cl_dis,grad_,nu_turb,K_Eps);
-          for (int elem=0; elem<nb_elem; elem++)
-            for (int i=0; i<nbr_comp; i++)
-              for (int j=0; j<nbr_comp; j++)
-                Re(elem,i,j) *= nu_turb[elem];
-        }
-      else
-        {
-          for (int elem=0; elem<nb_elem; elem++)
-            for (int i=0; i<nbr_comp; i++)
-              for (int j=0; j<nbr_comp; j++)
-                Re(elem,i,j) = nu_turb[elem]*(grad_(elem,i,j) + grad_(elem,j,i));
-        }
+      Cerr << "On utilise une diffusion turbulente non linaire dans NS" << finl;
+      for (int elem=0; elem<nb_elem; elem++)
+        for (int i=0; i<nbr_comp; i++)
+          for (int j=0; j<nbr_comp; j++)
+            Re(elem,i,j) *= nu_turb[elem];
     }
   else
-    for (int elem=0; elem<nb_elem; elem++)
-      for (int i=0; i<nbr_comp; i++)
-        for (int j=0; j<nbr_comp; j++)
-          Re(elem,i,j) = nu_turb[elem]*(grad_(elem,i,j) + grad_(elem,j,i));
-
+    {
+      for (int elem=0; elem<nb_elem; elem++)
+        for (int i=0; i<nbr_comp; i++)
+          for (int j=0; j<nbr_comp; j++)
+            Re(elem,i,j) = nu_turb[elem]*(grad_(elem,i,j) + grad_(elem,j,i));
+    }
   Re.echange_espace_virtuel();
 
 
