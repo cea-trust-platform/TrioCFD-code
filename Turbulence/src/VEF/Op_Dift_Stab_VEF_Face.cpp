@@ -31,13 +31,11 @@
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
 #include <Scalaire_impose_paroi.h>
-#include <Pb_Thermohydraulique_Turbulent.h>
 #include <Debog.h>
 #include <DoubleTrav.h>
 #include <Check_espace_virtuel.h>
 #include <Porosites_champ.h>
-#include <Paroi_negligeable_VEF.h>
-#include <Paroi_negligeable_scal_VEF.h>
+#include <Modele_turbulence_scal_base.h>
 
 Implemente_instanciable(Op_Dift_Stab_VEF_Face,"Op_Dift_VEF_P1NC_stab",Op_Dift_VEF_Face);
 
@@ -1551,8 +1549,7 @@ void Op_Dift_Stab_VEF_Face::ajouter_contribution_cl(const DoubleTab& transporte,
                     {
                       const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
                       const Turbulence_paroi_scal& loiparth = mod_turb_scal.loi_paroi();
-
-                      if (!sub_type(Paroi_negligeable_scal_VEF,loiparth.valeur()))
+                      if (loiparth->use_equivalent_distance())
                         {
                           //Comme on ne doit pas utiliser cet operateur sans la loi Pironneau,
                           //on ne doit jamais passer ici
@@ -1885,15 +1882,11 @@ void Op_Dift_Stab_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab&
                     {
                       const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
                       const Turbulence_paroi_scal& loiparth = mod_turb_scal.loi_paroi();
-
-
-                      if (!sub_type(Paroi_negligeable_scal_VEF,loiparth.valeur()))
+                      if (loiparth->use_equivalent_distance())
                         {
                           const DoubleTab& face_normale = zone_VEF.face_normales();
                           const DoubleVect& vol = zone_VEF.volumes();
-
-                          const Paroi_scal_hyd_base_VEF& paroi_scal_vef = ref_cast(Paroi_scal_hyd_base_VEF,loiparth.valeur());
-                          const DoubleVect& d_equiv=paroi_scal_vef.equivalent_distance(n_bord);
+                          const DoubleVect& d_equiv=loiparth->equivalent_distance(n_bord);
                           int nb_dim_pb=Objet_U::dimension;
 
                           DoubleVect le_mauvais_gradient(nb_dim_pb);

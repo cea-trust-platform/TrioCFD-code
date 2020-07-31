@@ -30,17 +30,15 @@
 #include <Symetrie.h>
 #include <Neumann_sortie_libre.h>
 #include <Champ_Uniforme.h>
-#include <Modele_turbulence_hyd_K_Eps.h>
-#include <Mod_turb_hyd_RANS_0_eq.h>
-#include <Paroi_negligeable_VEF.h>
-#include <Paroi_negligeable_scal_VEF.h>
 #include <Debog.h>
 #include <DoubleTrav.h>
-#include <Modele_turbulence_scal_Prandtl.h>
+#include <Modele_turbulence_scal_base.h>
 #include <Porosites_champ.h>
 #include <Discretisation_base.h>
 #include <Champ.h>
 #include <Check_espace_virtuel.h>
+#include <Milieu_base.h>
+#include <Modele_turbulence_hyd_K_Eps.h>
 
 Implemente_instanciable_sans_constructeur(Op_Dift_VEF_Face,"Op_Dift_VEF_P1NC",Op_Dift_VEF_base);
 
@@ -325,10 +323,9 @@ void Op_Dift_VEF_Face::ajouter_cas_scalaire(const DoubleVect& inconnue,
             {
               const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
               const Turbulence_paroi_scal& loiparth = mod_turb_scal.loi_paroi();
-              if (!sub_type(Paroi_negligeable_scal_VEF,loiparth.valeur()))
+              if (loiparth->use_equivalent_distance())
                 {
-                  const Paroi_scal_hyd_base_VEF& paroi_scal_vef = ref_cast(Paroi_scal_hyd_base_VEF,loiparth.valeur());
-                  const DoubleVect& d_equiv=paroi_scal_vef.equivalent_distance(n_bord);
+                  const DoubleVect& d_equiv=loiparth->equivalent_distance(n_bord);
                   // d_equiv contient la distance equivalente pour le bord
                   // Dans d_equiv, pour les faces qui ne sont pas paroi_fixe (eg periodique, symetrie, etc...)
                   // il y a la distance geometrique grace a l'initialisation du tableau dans la loi de paroi.
@@ -341,7 +338,7 @@ void Op_Dift_VEF_Face::ajouter_cas_scalaire(const DoubleVect& inconnue,
                   int ldp_appli=0;
                   if (sub_type(Scalaire_impose_paroi,cl_base))
                     ldp_appli=1;
-                  else if (paroi_scal_vef.get_flag_calcul_ldp_en_flux_impose() )
+                  else if (loiparth->get_flag_calcul_ldp_en_flux_impose() )
                     {
                       if ((sub_type(Neumann_paroi,cl_base))||(sub_type(Neumann_homogene,cl_base)))
                         ldp_appli=1;
@@ -763,10 +760,9 @@ void Op_Dift_VEF_Face::ajouter_cas_multi_scalaire(const DoubleTab& inconnue,
             {
               const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
               const Turbulence_paroi_scal& loiparth = mod_turb_scal.loi_paroi();
-              if (!sub_type(Paroi_negligeable_scal_VEF,loiparth.valeur()))
+              if (loiparth->use_equivalent_distance())
                 {
-                  const Paroi_scal_hyd_base_VEF& paroi_scal_vef = ref_cast(Paroi_scal_hyd_base_VEF,loiparth.valeur());
-                  const DoubleVect& d_equiv=paroi_scal_vef.equivalent_distance(n_bord);
+                  const DoubleVect& d_equiv=loiparth->equivalent_distance(n_bord);
                   // d_equiv contient la distance equivalente pour le bord
                   // Dans d_equiv, pour les faces qui ne sont pas paroi_fixe (eg periodique, symetrie, etc...)
                   // il y a la distance geometrique grace a l'initialisation du tableau dans la loi de paroi.
@@ -1147,13 +1143,11 @@ void Op_Dift_VEF_Face::ajouter_contribution_cl(const DoubleTab& transporte, Matr
                 {
                   const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
                   const Turbulence_paroi_scal& loiparth = mod_turb_scal.loi_paroi();
-                  if (!sub_type(Paroi_negligeable_scal_VEF,loiparth.valeur()))
+                  if (loiparth->use_equivalent_distance())
                     {
                       //const DoubleTab& face_normale = zone_VEF.face_normales();
                       const DoubleVect& vol = zone_VEF.volumes();
-
-                      const Paroi_scal_hyd_base_VEF& paroi_scal_vef = ref_cast(Paroi_scal_hyd_base_VEF,loiparth.valeur());
-                      const DoubleVect& d_equiv=paroi_scal_vef.equivalent_distance(n_bord);
+                      const DoubleVect& d_equiv=loiparth->equivalent_distance(n_bord);
                       int nb_dim_pb=Objet_U::dimension;
 
                       DoubleVect le_mauvais_gradient(nb_dim_pb);
@@ -1530,15 +1524,11 @@ void Op_Dift_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab& tran
                 {
                   const Modele_turbulence_scal_base& mod_turb_scal = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
                   const Turbulence_paroi_scal& loiparth = mod_turb_scal.loi_paroi();
-
-
-                  if (!sub_type(Paroi_negligeable_scal_VEF,loiparth.valeur()))
+                  if (loiparth->use_equivalent_distance())
                     {
                       const DoubleTab& face_normale = zone_VEF.face_normales();
                       const DoubleVect& vol = zone_VEF.volumes();
-
-                      const Paroi_scal_hyd_base_VEF& paroi_scal_vef = ref_cast(Paroi_scal_hyd_base_VEF,loiparth.valeur());
-                      const DoubleVect& d_equiv=paroi_scal_vef.equivalent_distance(n_bord);
+                      const DoubleVect& d_equiv=loiparth->equivalent_distance(n_bord);
                       int nb_dim_pb=Objet_U::dimension;
 
                       DoubleVect le_mauvais_gradient(nb_dim_pb);

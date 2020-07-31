@@ -27,8 +27,6 @@
 #include <Symetrie.h>
 #include <Neumann_sortie_libre.h>
 #include <Champ_Uniforme.h>
-#include <Modele_turbulence_hyd_K_Eps.h>
-#include <Turbulence_hyd_sous_maille_VEF.h>
 #include <Domaine.h>
 #include <IntLists.h>
 #include <DoubleLists.h>
@@ -36,9 +34,6 @@
 #include <SSOR.h>
 
 Implemente_instanciable(Op_Dift_VEF_P1NCP1B_Face,"Op_Dift_VEF_P1NCP1B_const_P1NC",Op_Dift_VEF_base);
-
-
-
 
 Sortie& Op_Dift_VEF_P1NCP1B_Face::printOn(Sortie& s ) const
 {

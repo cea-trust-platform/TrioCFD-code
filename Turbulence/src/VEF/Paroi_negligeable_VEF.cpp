@@ -150,6 +150,5 @@ int Paroi_negligeable_VEF::calculer_scal(Champ_Fonc_base& )
 //
 bool Paroi_negligeable_VEF::use_shear() const
 {
-  Process::Journal()<<"Paroi_negligeable_VEF::use_shear() return false"<<finl;
   return false;
 }

@@ -29,11 +29,10 @@
 #include <Neumann_paroi.h>
 #include <Echange_externe_impose.h>
 #include <Champ_Uniforme.h>
-#include <Paroi_negligeable_VEF.h>
 #include <Debog.h>
 #include <DoubleTrav.h>
-#include <Modele_turbulence_scal_Prandtl.h>
-#include <Mod_turb_hyd_base.h>
+#include <Milieu_base.h>
+#include <Zone_Cl_VEF.h>
 
 Implemente_instanciable(Op_Dift_VEF_Face_Q1,"Op_Dift_VEF_Q1NC",Op_Dift_VEF_base);
 
