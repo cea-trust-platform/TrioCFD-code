@@ -131,7 +131,7 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse,
 
   Champ_P1NC::calcul_gradient(ubar,grad,zone_Cl_VEF);
   if (le_modele_turbulence.valeur().utiliser_loi_paroi())
-    Champ_P1NC::calcul_duidxj_paroi(grad,nu,nu_turb,tau_tan,0,0,zone_Cl_VEF);
+    Champ_P1NC::calcul_duidxj_paroi(grad,nu,nu_turb,tau_tan,zone_Cl_VEF);
 
   grad.echange_espace_virtuel();
 

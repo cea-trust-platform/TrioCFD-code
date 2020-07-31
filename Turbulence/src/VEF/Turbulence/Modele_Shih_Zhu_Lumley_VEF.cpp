@@ -122,7 +122,7 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_Tenseurs_S_et_R_elem_Paroi(const Zone_di
   Champ_P1NC::calcul_gradient(vitesse,gradient_elem,zone_Cl_VEF);
 
   if (idt>0)
-    Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab_paroi,0,0,zone_Cl_VEF);
+    Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab_paroi,zone_Cl_VEF);
 
   int nelem = S_elem_.dimension(0);
 

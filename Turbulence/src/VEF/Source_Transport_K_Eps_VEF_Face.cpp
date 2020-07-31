@@ -344,7 +344,7 @@ DoubleTab& Source_Transport_K_Eps_VEF_Face::ajouter(DoubleTab& resu) const
           if (lp!="negligeable_VEF")
             {
               if (mon_equation->schema_temps().nb_pas_dt()>0)
-                Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab,0,0,zone_Cl_VEF);
+                Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab,zone_Cl_VEF);
             }
           gradient_elem.echange_espace_virtuel();
           DoubleTab Re(gradient_elem);

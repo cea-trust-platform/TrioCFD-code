@@ -763,7 +763,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_Cmu_Paroi(DoubleTab& Cmu,
   Champ_P1NC::calcul_gradient(vitesse,gradient_elem,zone_Cl_VEF);
 
   if (idt>0)
-    Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco,visco_turb,loi_paroi,0,0,zone_Cl_VEF);
+    Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco,visco_turb,loi_paroi,zone_Cl_VEF);
   DoubleTab S_elem;
   init_tenseur_elem(S_elem,zone_VEF,2);
   int nelem = S_elem.dimension(0);
