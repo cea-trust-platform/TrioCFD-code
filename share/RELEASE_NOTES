@@ -1,4 +1,10 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.0 :
+--------------------------------------------------------------------------------------------------
+XX/XX/20 (TrioCFD) Change      : Add a missing term in the deformation tensor for non-uniform viscosity in VDF (laminar or turbulent flow)
+XX/XX/20 (TrioCFD) Change      : Remove -2/3*k remaining terms in the previous operators to be conform for all diffusive operators (VDF, VEF, uniform or not, axi or not) 
+XX/XX/20 (TrioCFD) Conception  : Diffusive operators coding turbulent shear stress come back from TrioCFD to TRUST
+--------------------------------------------------------------------------------------------------
 Release notes version 1.8.1 : Enhancements, modifications and corrected bugs since version 1.8.0 :
 --------------------------------------------------------------------------------------------------
 01/04/20 (TrioCFD) Enhancement : ALE improvements
