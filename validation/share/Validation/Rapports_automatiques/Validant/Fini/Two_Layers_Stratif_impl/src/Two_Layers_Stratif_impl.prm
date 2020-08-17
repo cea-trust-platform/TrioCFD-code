@@ -104,12 +104,12 @@ Chapter {
 		Description "A stable and an unstable stratifications are calculated. The Reynolds number Reh = u1 h /$\nu$ and the Froude number \latex_(Fr = (u2 - u1) / [g$\beta(T1 - T2)h]^{1/2} $\latex_) have been chosen to respect the experimental values."
          	Description "The stable two layers stratified flow is obtained with :"
 		Description "u1=0,05m.s-1 and u2=0,1m.s-1"
-		Description "T1=27,9°C    and T2=12,1°C "
+		Description "T1=27,9$^{\circ}$C    and T2=12,1$^{\circ}$C "
 		Description "which corresponds to Reh = 5.10$^3$ and Fr = 0.9"
 		Description " "
          	Description "The unstable two layers stratified flow is obtained with :"
 		Description "u1=0,1m.s-1  and u2=0,2m.s-1"
-		Description "T1=21°C      and T2=19°C"
+		Description "T1=21$^{\circ}$C      and T2=19$^{\circ}$C"
 		Description "which respond to Reh = 10$^4$ and Fr = 5."
 		Description " "
 		Description "The velocity and temperature profiles obtained at different distances from the inlet are compared to those obtained by Viollet [1] in his experiment. The experimental values are not very well known, especially the top thermal condition is not so clear. A symetry condition models the free surface for the Trio_U calculations which is not very satisfying."
@@ -120,15 +120,15 @@ Chapter {
 
 	Table {
         Title "Physical properties"
-        Description "Fluid domain: water at 20°C"
+        Description "Fluid domain: water at 20$^{\circ}$C"
         nb_columns 1
                 Label Valeur
                 line {
-                        legend "$\rho$ en kg/m$³$"
+                        legend "$\rho$ en kg/m$^3$"
                         file ./rho.dat
                 }
                 line {
-                        legend "$\mu$ en N/m$²$/s"
+                        legend "$\mu$ en N/m$^2$/s"
                         file ./mu.dat
                 }
                 line {
@@ -169,7 +169,7 @@ Chapter {
 }
 
 Chapter {
-	Title "Stable regime (temperature gradient of 15.54°C) : default case"
+	Title "Stable regime (temperature gradient of 15.54$^{\circ}$C) : default case"
         
 	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the stable stratified flow are compared to the experimental data."
 	Description "The results are presented here for the default case : facsec_max = 30 and relax_pression = 0.1 for the Simple algorithm." 
@@ -1737,7 +1737,7 @@ Chapter {
 
 
 Chapter {
-	Title "Unstable regime (temperature gradient of 2°C) : default case"
+	Title "Unstable regime (temperature gradient of 2$^{\circ}$C) : default case"
 	Description "The non dimensional velocity transversal profiles u/u1 and the non-dimensional temperature (T-T2)/(T2-T1) at x=0.5 m, x=1.5 m and x=4 m calculated for the unstable stratified flow are compared to the experimental data."
 	Description "The results are presented here for the default case : facsec_max = 30 and relax_pression = 0.1 for the Simple algorithm." 	
 

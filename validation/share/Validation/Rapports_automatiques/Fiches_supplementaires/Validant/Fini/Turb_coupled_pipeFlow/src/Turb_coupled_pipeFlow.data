@@ -14,6 +14,8 @@ Corriger_frontiere_periodique { Domaine dom_fluide Bord perio_fluid }
 Corriger_frontiere_periodique { Domaine dom_solide Bord perio_solid }
 # FIN MAILLAGE #
 
+Modif_bord_to_raccord dom_fluide paroi_fluid
+Modif_bord_to_raccord dom_solide paroi_solid
 
 VEFPREP1B dis
 
@@ -29,7 +31,7 @@ Lire sch
 	solveur implicite
 	{
 		seuil_convergence_implicite 0.001 					# Necessaire sinon pas egalite des flux entre solide et fluide #
-		solveur gmres { diag seuil 1e-20 nb_it_max 5 impr controle_residu 1 } 	# QDM stationnaire, dV/dt->0, on itère au minimum pour ne pas grever le CPU #
+		solveur gmres { diag seuil 1e-20 nb_it_max 5 impr controle_residu 1 } 	# QDM stationnaire, dV/dt->0, on itere au minimum pour ne pas grever le CPU #
 	}
 	max_iter_implicite 100
 }

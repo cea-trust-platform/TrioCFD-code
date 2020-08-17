@@ -30,12 +30,12 @@ def getValueFromFic_triou(fic, key):
 
 
 if (1):	
-	print("gogogo...", os.getcwd())
+	print(("gogogo...", os.getcwd()))
 	Sur=144.e-10
 	dt_sauv=9.e-8
 	dt2=1.e-8
 	aa = getValueFromFic_triou("adiab/adia_remesh.data", "dt_max")
-	print(aa==dt2)
+	print((aa==dt2))
 	f=100000000.
 	rhov=1000.
 	cpv=100.
