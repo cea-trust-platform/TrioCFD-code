@@ -21,35 +21,35 @@ def test_cas(file,angle,nl):
 	sina=sin(ang)
 	a=f.readline()
 	marq=eval(a.split()[0])
-	print marq
+	print (marq)
 	finisom=0
 	for i in range(nl-1):
 		a=f.readline()
 		if finisom:
-			print a
+			print (a)
 		else:
 			x=eval(a.split()[0])
 			if (x==marq):
-				print a
+				print (a)
 				finisom=1
 			else:
 				y=eval(a.split()[1])
 				try:
 				 z=eval(a.split()[2])
 				 xx,yy,zz=rotate(x,y,z,cosa,sina)
-				 print xx,yy,zz
+				 print (xx,yy,zz)
 				except:
 				 z=0
 				 xx,yy,zz=rotate(x,y,z,cosa,sina)
-				 print xx,yy
+				 print (xx,yy)
 				pass
 			pass
 		pass
 	
 if __name__ == '__main__':
 	import sys
-        test_cas(sys.argv[1],eval(sys.argv[2]),eval(sys.argv[3]))
-        pass
+	test_cas(sys.argv[1],eval(sys.argv[2]),eval(sys.argv[3]))
+	pass
 
 "
 

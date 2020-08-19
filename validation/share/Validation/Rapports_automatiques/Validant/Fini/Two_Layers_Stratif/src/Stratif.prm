@@ -74,12 +74,12 @@ Chapter {
 		Description "A stable and an unstable stratifications are calculated. The Reynolds number Reh = u1 h /$\nu$ and the Froude number \latex_(Fr = (u2 - u1) / [g$\beta(T1 - T2)h]^{1/2} $\latex_) have been chosen to respect the experimental values."
          	Description "The stable two layers stratified flow is obtained with :"
 		Description "u1=0,05m.s-1 and u2=0,1m.s-1"
-		Description "T1=27,9°C    and T2=12,1°C "
+		Description "T1=27,9°C    and T2=12,1$^{\circ}$C "
 		Description "which corresponds to Reh = 5.10$^3$ and Fr = 0.9"
 		Description " "
          	Description "The unstable two layers stratified flow is obtained with :"
 		Description "u1=0,1m.s-1  and u2=0,2m.s-1"
-		Description "T1=21°C      and T2=19°C"
+		Description "T1=21°C      and T2=19$^{\circ}$C"
 		Description "which respond to Reh = 10$^4$ and Fr = 5."
 		Description " "
 		Description "We will compare velocity and temperature profiles obtained at different distances from the inlet to those obtained by Viollet [1] in his experiments. We don't know the experimental values very well, especially the top thermal condition is not so clear. The free surface is modelized in the Trio_U calculations by a symmetry condition, this is not very satisfying."
@@ -90,15 +90,15 @@ Chapter {
 
 	Table {
         Title "Physical properties"
-        Description "Fluid domain: water at 20°C"
+        Description "Fluid domain: water at 20$^{\circ}$C"
         nb_columns 1
                 Label Valeur
                 line {
-                        legend "$\rho$ en kg/m$³$"
+                        legend "$\rho$ en kg/m$^3$"
                         file ./rho.dat
                 }
                 line {
-                        legend "$\mu$ en N/m$²$/s"
+                        legend "$\mu$ en N/m$^2$/s"
                         file ./mu.dat
                 }
                 line {
@@ -113,7 +113,7 @@ Chapter {
 }
 
 Chapter {
-	Title "Calculation in stable regime : temperature gradient of 15.54°C"
+	Title "Calculation in stable regime : temperature gradient of 15.54$^{\circ}$C"
         visu {
                 Title "VEF Mesh"
                 Width 9cm
@@ -816,7 +816,7 @@ Chapter {
                    Description "This is especially true near the inlet, so we can say that the boundary conditions seem to be well modelized. But when we go more and more downstream the differences are greater."
                    Description "The bottom wall condition in Trio_U leads to U=0 but in VDF discretization, the last value is given at the cell center so it is not zero."
                    Description " We can see the greatest differences between the experimental and the calculated profiles at the top of the flow. The symmetry condition is not a so good model for free surface. For the temperature profile, perhaps that a heat exchange coefficient would be better to represent the boundary condition. In fact, the temperature seems to be lower in this part of the experimental curves."
-                  Description " Thus we see that the two layers channel velocity profiles are less similar near the outlet."
+                   Description " Thus we see that the two layers channel velocity profiles are less similar near the outlet."
                    Description "However we observe in the experimental profiles that the mass flow is not so constant along the channel... At the inlet we have estimated that the mean adimensionnal velocity is around 1.44 and at the outlet about 1.33 (with xmgr options). In Trio_U the mean velocity given with the same method is 1.4 and is constant at the outlet. But the mean value given by the code is 1.505, so the error induced by the graphical method is of about 7%"
                    Description "The great variation in the experimental mass flow can be explained by the scanning of the curves from an old paper. It is difficult to measure the reality of this observation." 
                    Description "The use of alpha=0.2 instead of 1 (standard) for the EF_stab convection scheme has little impact on the results. This more precise convection scheme gives results closer to the VDF results."
@@ -825,7 +825,7 @@ Chapter {
 }
 
 Chapter {
-	Title "Calculation in unstable regime : temperature gradient of 2°C"
+	Title "Calculation in unstable regime : temperature gradient of 2$^{\circ}$C"
         Description "The VDF and VEF meshes are the same than in the stable case. But due to the different bottom velocity the friction velocity is different too."
 	Description " VEF Mesh :  7 200 meshes , Y+ ~= 40.1, u*=1.05e-2 "
 	Description " VDF Mesh :  7 000 meshes , Y+ ~= 32.6, u*=9.45-3 "

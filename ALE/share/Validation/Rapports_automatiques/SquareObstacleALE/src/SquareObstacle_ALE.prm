@@ -476,11 +476,11 @@ Chapter {
 	}
 	Visu {
 		Title "TrioCFD Mesh velocity SOM"
-		pseudocolor  ./Amont/SquareObstacle_ALE dom_magnitude ALEMESHVELOCITY SOM
+		pseudocolor  ./Amont/SquareObstacle_ALE.lata dom norme_ALEMESHVELOCITY SOM
 	}
 	Visu {
 		Title "TrioCFD Total displacement of the mesh SOM"
-		pseudocolor  ./Amont/SquareObstacle_ALE.lata dom_magnitude ALEMESHTOTALDISPLACEMENT SOM
+		pseudocolor  ./Amont/SquareObstacle_ALE.lata dom norme_ALEMESHTOTALDISPLACEMENT SOM
 	}
 
 

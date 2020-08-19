@@ -57,11 +57,11 @@ Chapter {
 	}
 	Visu {
 		Title "TrioCFD Mesh velocity SOM"
-		pseudocolor RotationALE.lata dom_magnitude ALEMESHVELOCITY SOM
+		pseudocolor RotationALE.lata dom norme_ALEMESHVELOCITY SOM
 	}
 	Visu {
 		Title "TrioCFD Total displacement of the mesh SOM"
-		pseudocolor RotationALE.lata dom_magnitude ALEMESHTOTALDISPLACEMENT SOM
+		pseudocolor RotationALE.lata dom norme_ALEMESHTOTALDISPLACEMENT SOM
 	}
 
 
