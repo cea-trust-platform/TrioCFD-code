@@ -81,7 +81,7 @@ Lire pb
 	Postraitement
 	{
 		Definition_champs	{
-					# euclidian_norm_norme_uex = norme L2 de la norme de uex (valeur calculee sur le maillage) #				
+					# euclidian_norm_norme_uex = norme L2 de la norme de uex (valeur calculee sur le maillage) #
 					# euclidian_norm_norme_uex	reduction_0D	{
 										methode euclidian_norm
 										sources	{
