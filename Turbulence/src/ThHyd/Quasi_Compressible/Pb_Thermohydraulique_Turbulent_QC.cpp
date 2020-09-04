@@ -211,41 +211,6 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
   return 1;
 }
 
-
-// Description:
-//    Effectue le postraitement si un postraitement a ete
-//    demande. Ne tient pas compte des frequences de postraitement.
-//    Le postraitement est mis a jour et les traitements eventuels
-//    sur les sondes, champs et statistiques sont effectues.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: ??? (renvoie toujours 1)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-int Pb_Thermohydraulique_Turbulent_QC::postraiter(int force)
-{
-  if (schema_temps().nb_pas_dt()!=0)
-    imprimer(Cout);
-  if (force)
-    {
-
-      les_postraitements.mettre_a_jour(schema_temps().temps_courant());
-      les_postraitements.postraiter();
-    }
-  else
-    {
-      les_postraitements.traiter_postraitement();
-    }
-  return 1;
-}
-
 int Pb_Thermohydraulique_Turbulent_QC::expression_predefini(const Motcle& motlu, Nom& expression)
 {
   if (motlu=="VISCOSITE_TURBULENTE")

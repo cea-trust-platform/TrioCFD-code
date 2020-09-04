@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
+XX/XX/20 (TrioCFD) Bug fixed   : Tasks when post-processing turbulent Quasi-compressible problem could be incomplete
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.1 : Enhancements, modifications and corrected bugs since version 1.8.0 :
 --------------------------------------------------------------------------------------------------
