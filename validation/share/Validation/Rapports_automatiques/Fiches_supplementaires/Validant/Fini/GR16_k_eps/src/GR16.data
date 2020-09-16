@@ -49,7 +49,7 @@ Lire sch
 	periode_sauvegarde_securite_en_heures 23
 }
 
-# SODIUM 350°C #
+# SODIUM 350Â°C #
 Fluide_Incompressible fluide
 Lire fluide
 {

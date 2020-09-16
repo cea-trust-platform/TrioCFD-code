@@ -64,7 +64,7 @@ Chapter {
 	Description "...............$\epsilon$=k$^($$^3$$^/$$^2$$^)$/lm"
 	Description "...............lm=0.075.R/2 for the tube"
 	Description " "
-	Description "...Temperature : T=0$°$C"
+	Description "...Temperature : T=0$Â°$C"
 	Description " "
 	Description "Boundary conditions :"
 	Description "...The periodicity conditions need a source term to maintain the flow constant Canal_perio{ bord sortie }"
@@ -670,7 +670,7 @@ Chapter {
 		Description "  "
 		Description "On the following pictures, it can be observed that with alpha=1 instead of 0.2, the wall temperature of the duct is not fully homogeneous unlike the calculation with alpha=0.2. This observation can be made also for the stretched case (not presented here). Those results are in favour of the use of alpha=0.2.  "
 		Description "  "
-		Description "For the deteriorated mesh and the two icem meshes, the use of alpha=0.2 or 1 give the same kind of temperature discrepancy at the wall (about 8°C between maximum and minimum value). "
+		Description "For the deteriorated mesh and the two icem meshes, the use of alpha=0.2 or 1 give the same kind of temperature discrepancy at the wall (about 8Â°C between maximum and minimum value). "
 
 	}
 	visu {

@@ -156,8 +156,8 @@ void Op_Dift_VEF_base::completer()
   else if (sub_type(Modele_turbulence_scal_base,modele_turbulence.valeur()))
     {
       const Modele_turbulence_scal_base& modele_turbulence_scalaire = ref_cast(Modele_turbulence_scal_base,modele_turbulence.valeur());
-      const Champ_Fonc& diffusivite_turbulente = modele_turbulence_scalaire.diffusivite_turbulente();
-      associer_diffusivite_turbulente(diffusivite_turbulente);
+      const Champ_Fonc& conductivite_turbulente = modele_turbulence_scalaire.conductivite_turbulente();
+      associer_diffusivite_turbulente(conductivite_turbulente);
       associer_modele_turbulence_temp(modele_turbulence_scalaire);
     }
   else

@@ -168,7 +168,7 @@ Chapter {
 	Description " "
 	Description " \latex_(\textcolor{white}{.}$\ \ \ \ \ $\latex_) \latex_(\textbf{  VEF and VDF discretization}\latex_) "
 	Description " \latex_(\underline{Temperatures}\latex_)  "
-	Description " The horizontal profiles of temperatures are shown at fixed Y coordinate: Y = 0.10m, 0.52m, 0.90m. At the borders of the square cavity, the temperature of the wall is fixed to 14캜. "
+	Description " The horizontal profiles of temperatures are shown at fixed Y coordinate: Y = 0.10m, 0.52m, 0.90m. At the borders of the square cavity, the temperature of the wall is fixed to 14째C. "
 	Description " The vertical profiles of temperatures are shown at fixed X coordinate : X = 0.10m, 0.52m, 0.90m. "
 	Description " "
 	Description " \latex_(\underline{Velocities}\latex_)  "
@@ -185,7 +185,7 @@ Chapter {
 		Dimension 2			
 		LabelX "X(m)"
 		RangeX 0. 1.05
-		LabelY "T(캜)"
+		LabelY "T(째C)"
 		RangeY 15 35
  #		legend below title "Legende"
 		Include_Description_Curves 0			
@@ -247,7 +247,7 @@ Chapter {
 		Dimension 2			
 		LabelX "X(m)"
 		RangeX 0. 1.05
-		LabelY "T(캜)"
+		LabelY "T(째C)"
 		RangeY 15 35
  #		legend below title "Legende"
 		Include_Description_Curves 0			
@@ -309,7 +309,7 @@ Chapter {
 		Dimension 2			
 		LabelX "X(m)"
 		RangeX 0. 1.05
-		LabelY "T(캜)"
+		LabelY "T(째C)"
 		RangeY 15 35
  #		legend below title "Legende"
 		Include_Description_Curves 0			
@@ -373,7 +373,7 @@ Chapter {
 		Dimension 2			
 		LabelX "Y(m)"
 		RangeX 0. 1.05
-		LabelY "T(캜)"
+		LabelY "T(째C)"
 		RangeY 15 35
  #		legend below title "Legende"
 		Include_Description_Curves 0			
@@ -435,7 +435,7 @@ Chapter {
 		Dimension 2			
 		LabelX "Y(m)"
 		RangeX 0. 1.05
-		LabelY "T(캜)"
+		LabelY "T(째C)"
 		RangeY 15 35
  #		legend below title "Legende"
 		Include_Description_Curves 0			
@@ -497,7 +497,7 @@ Chapter {
 		Dimension 2			
 		LabelX "Y(m)"
 		RangeX 0. 1.05
-		LabelY "T(캜)"
+		LabelY "T(째C)"
 		RangeY 15 35
  #		legend below title "Legende"
 		Include_Description_Curves 0			
@@ -934,10 +934,10 @@ Chapter {
 Chapter {
 	Title "Conclusion"
 	Description " $\bullet$ Results for the temperatures: "
-	Description " - The calculated profiles of temperature do not show globaly good agreements with experimental data. In all cases, the hightest values are obtained with a VDF discretization, and the lowest values with a VEF discretization associated with a Muscl convection scheme. The extremum are located about $\pm$2캜 with respect to the experience. "
+	Description " - The calculated profiles of temperature do not show globaly good agreements with experimental data. In all cases, the hightest values are obtained with a VDF discretization, and the lowest values with a VEF discretization associated with a Muscl convection scheme. The extremum are located about $\pm$2째C with respect to the experience. "
 	Description " - For these calculations, a pressure of \latex_(1.01 $10^5$\latex_) Pa have been taken instead of \latex_(1. $10^5$\latex_) for experimental data $[2]$. Nevertheless, this higher value (1%) does not affect the thermodynamic since the simulations give similar results for VDF QC and VDF NQC (with a Quick scheme). "
 	Description " - The simulations give slightly different results with an Amont scheme, in particular at the vicinity of the walls. "
-	Description " - VEF and VDF discretizations present differences of about 4-5캜." 
+	Description " - VEF and VDF discretizations present differences of about 4-5째C." 
 	Description " "
 	Description " $\bullet$ Results for the velocities: "
 	Description " - The horizontal profiles of velocities show good agreements with experimental data, in particular in the midlle of the channel (X or Y = 0.52), but in addition are more close to each others than the profiles of temperatures. Nevertheless, we can notice that the velocity values are underestimate at small X for Y = 0.9m. Concerning the vertical velocity profiles, for each position of X, velocity values are a little overestimate for hight values of Y and a little underestimate for the low values (except for VDF Amont and VDF Quick at X = 0.1m). This due to phenomenon occuring near the walls. "

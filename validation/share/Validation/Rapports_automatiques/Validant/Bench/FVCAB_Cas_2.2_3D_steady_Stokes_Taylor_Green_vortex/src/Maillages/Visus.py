@@ -1,19 +1,19 @@
 #visit -cli -s Visus.py -nowin
 
-Maillages =	[
-		'mesh_hexa_1',
-		'mesh_hexa_2',
-		'mesh_hexa_3',
-		'mesh_hexa_4',
-		'mesh_hexa_5',
-		'mesh_tetra_0',
-		'mesh_tetra_1',
-		'mesh_tetra_2',
-		'mesh_tetra_3',
-		'mesh_tetra_4',
-		'mesh_tetra_5',
-		'mesh_tetra_6'
-		]
+Maillages =     [
+                'mesh_hexa_1',
+                'mesh_hexa_2',
+                'mesh_hexa_3',
+                'mesh_hexa_4',
+                'mesh_hexa_5',
+                'mesh_tetra_0',
+                'mesh_tetra_1',
+                'mesh_tetra_2',
+                'mesh_tetra_3',
+                'mesh_tetra_4',
+                'mesh_tetra_5',
+                'mesh_tetra_6'
+                ]
 
 
 N=len(Maillages)
@@ -106,14 +106,14 @@ SetSaveWindowAttributes(sw)
 #--------------------
 
 for j in range(N):
-	dom=Maillages[j]
-	maillage=dom+'.med'
-	OpenDatabase(maillage)
-	AddPlot("Mesh",dom)
-	DrawPlots()
-	sw.fileName = dom
-	SetSaveWindowAttributes(sw)
-	SaveWindow()
-	DeleteActivePlots()
+    dom=Maillages[j]
+    maillage=dom+'.med'
+    OpenDatabase(maillage)
+    AddPlot("Mesh",dom)
+    DrawPlots()
+    sw.fileName = dom
+    SetSaveWindowAttributes(sw)
+    SaveWindow()
+    DeleteActivePlots()
 
 exit()

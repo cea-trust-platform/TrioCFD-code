@@ -9,7 +9,7 @@ Parameters {
 }
 
 Chapter {
-	Title "Case of a uniform mean temperature gradient T1=500 캩, T2=505 캩"
+	Title "Case of a uniform mean temperature gradient T1=500 째K, T2=505 째K"
 	Description "See validation paper Wall_law_VEF_validation_1"
 Figure {
 	Title "Temperature profile for section x=0.1"
@@ -121,7 +121,7 @@ Table {
 }
 
 Chapter {
-	Title "Case of a linear temperature gradient T1=500+x 캩, T2=505 캩"
+	Title "Case of a linear temperature gradient T1=500+x 째K, T2=505 째K"
 	Description "See validation paper Wall_law_VEF_validation_1"
 Figure {
 	Title "Temperature profile for section x=0.1"

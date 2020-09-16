@@ -11,7 +11,7 @@ Parameters {
 }
 
 Chapter {
-	Title "Case of a uniform mean temperature gradient T1=500 °K, T2=505 °K"
+	Title "Case of a uniform mean temperature gradient T1=500 Â°K, T2=505 Â°K"
 	Description "See validation paper Wall_law_VEF_validation_2"
 	
 	

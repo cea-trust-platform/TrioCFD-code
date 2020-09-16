@@ -1,27 +1,27 @@
 #visit -cli -s Visus.py -nowin
 
-Maillages =	[
-		'mesh_cart_1',
-		'mesh_cart_2',
-		'mesh_cart_3',
-		'mesh_cart_4',
-		'mesh_cart_5',
-		'mesh_cart_6',
-		'mesh_cart_7',
-		'mesh_quad_1',
-		'mesh_quad_2',
-		'mesh_quad_3',
-		'mesh_quad_4',
-		'mesh_quad_5',
-		'mesh_quad_6',
-		'mesh_quad_7',
-		'mesh_tri_1',
-		'mesh_tri_2',
-		'mesh_tri_3',
-		'mesh_tri_4',
-		'mesh_tri_5',
-		'mesh_tri_6'
-		]
+Maillages =     [
+                'mesh_cart_1',
+                'mesh_cart_2',
+                'mesh_cart_3',
+                'mesh_cart_4',
+                'mesh_cart_5',
+                'mesh_cart_6',
+                'mesh_cart_7',
+                'mesh_quad_1',
+                'mesh_quad_2',
+                'mesh_quad_3',
+                'mesh_quad_4',
+                'mesh_quad_5',
+                'mesh_quad_6',
+                'mesh_quad_7',
+                'mesh_tri_1',
+                'mesh_tri_2',
+                'mesh_tri_3',
+                'mesh_tri_4',
+                'mesh_tri_5',
+                'mesh_tri_6'
+                ]
 
 
 N=len(Maillages)
@@ -92,14 +92,14 @@ SetSaveWindowAttributes(sw)
 #--------------------
 
 for j in range(N):
-	dom=Maillages[j]
-	maillage=dom+'.med'
-	OpenDatabase(maillage)
-	AddPlot("Mesh",dom)
-	DrawPlots()
-	sw.fileName = dom
-	SetSaveWindowAttributes(sw)
-	SaveWindow()
-	DeleteActivePlots()
+    dom=Maillages[j]
+    maillage=dom+'.med'
+    OpenDatabase(maillage)
+    AddPlot("Mesh",dom)
+    DrawPlots()
+    sw.fileName = dom
+    SetSaveWindowAttributes(sw)
+    SaveWindow()
+    DeleteActivePlots()
 
 exit()

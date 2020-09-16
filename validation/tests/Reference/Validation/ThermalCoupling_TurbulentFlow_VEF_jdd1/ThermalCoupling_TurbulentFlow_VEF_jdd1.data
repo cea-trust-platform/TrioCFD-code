@@ -56,7 +56,6 @@ Reorienter_tetraedres dom_fluide
 VerifierCoin dom_solide { }
 Reorienter_tetraedres dom_solide
 
-
 VEFPRep1B dis
 
 Corriger_frontiere_periodique 

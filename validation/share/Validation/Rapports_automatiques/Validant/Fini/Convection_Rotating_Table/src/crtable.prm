@@ -75,7 +75,7 @@ Chapter {
 ##	
 	Figure {
 		Title "Flow configuration: spot and gaussian initial condition"
-		Description " The initial imposed profile undergoes a rotation of 360° such as indicated in the following scheme "
+		Description " The initial imposed profile undergoes a rotation of 360Â° such as indicated in the following scheme "
 		Description ""
 		picture flow_configuration.png 
 ##
@@ -125,7 +125,7 @@ Chapter {
 	Description "$\bullet$ Comparison of the 4 convection schemes for each time scheme"
 	Description "$\bullet$ Comparison of the 4 time schemes for each convection scheme (except for the Euler explicite case with a facsec value of 0.2 where simulations are performed only for the Muscl and the Ef_stab convection schemes)"
 	Description ""
-	Description "Time calculation (about 6.3 seconds of physical time): corresponds to the horizontal and vertical temperature profiles after a rotation of 360° of the spot. The following curves are taken after a complete 360° of rotation, i.e at time $t = 2\pi$ s "
+	Description "Time calculation (about 6.3 seconds of physical time): corresponds to the horizontal and vertical temperature profiles after a rotation of 360Â° of the spot. The following curves are taken after a complete 360Â° of rotation, i.e at time $t = 2\pi$ s "
 ########################
 ######################## Amont: horizontal
 ########################

@@ -56,7 +56,7 @@ END SCATTER #
 
 VDF cubesregu
 
-# Proprietes He vers 700°C #
+# Proprietes He vers 700Â°C #
 # Prandtl = 0.672 #
 Fluide_Incompressible He
 Read He

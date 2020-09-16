@@ -59,8 +59,8 @@ Pave Cavite2
 }
 
 tetraedriser_homogene_fin dom
-Reordonner_faces_periodiques dom periox
-Reordonner_faces_periodiques dom perioz
+Corriger_frontiere_periodique { domaine dom bord periox }
+Corriger_frontiere_periodique { domaine dom bord perioz }
 tetraedriser_homogene_fin dom_solide
 VEFPreP1b dis
 

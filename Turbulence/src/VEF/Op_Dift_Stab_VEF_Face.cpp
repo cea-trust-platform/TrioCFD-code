@@ -173,7 +173,7 @@ DoubleTab& Op_Dift_Stab_VEF_Face::ajouter(const DoubleTab& inconnue_org,DoubleTa
 {
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
 
-  const DoubleTab& nu_turb=la_diffusivite_turbulente->valeurs();
+  const DoubleTab& nu_turb=diffusivite_turbulente()->valeurs();
   const DoubleVect& porosite_face = zone_VEF.porosite_face();
   const DoubleVect& porosite_elem = zone_VEF.porosite_elem();
 
@@ -1653,7 +1653,7 @@ void Op_Dift_Stab_VEF_Face::ajouter_contribution(const DoubleTab& transporte, Ma
 
       int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
 
-      const DoubleTab& nu_turb_=la_diffusivite_turbulente->valeurs();
+      const DoubleTab& nu_turb_=diffusivite_turbulente()->valeurs();
       //       const DoubleTab& face_normale = zone_VEF.face_normales();
       //      const DoubleVect& volumes = zone_VEF.volumes();
       DoubleVect n(dimension);
@@ -1777,7 +1777,7 @@ void Op_Dift_Stab_VEF_Face::ajouter_contribution_multi_scalaire(const DoubleTab&
       int nb_faces_elem = zone_VEF.zone().nb_faces_elem();
 
       double valA, d_nu;
-      const DoubleTab& nu_turb_=la_diffusivite_turbulente->valeurs();
+      const DoubleTab& nu_turb_=diffusivite_turbulente()->valeurs();
       DoubleVect n(dimension);
 
       DoubleTab nu,nu_turb;

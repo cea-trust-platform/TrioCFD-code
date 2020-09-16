@@ -71,7 +71,7 @@ Lire pb
 	Postraitement
 	{
 		Definition_champs	{
-					# L2_norm_norme_uex = norme L2 de la norme de uex (valeur calculée sur le maillage) #				
+					# L2_norm_norme_uex = norme L2 de la norme de uex (valeur calculÃ©e sur le maillage) #				
 					# L2_norm_norme_uex	reduction_0D	{
 										methode L2_norm
 										sources	{
@@ -145,7 +145,7 @@ Lire pb
 										expression 1 L2_norm_norme_u_uex/L2_norm_norme_uex
 										sources_reference { L2_norm_norme_u_uex , L2_norm_norme_uex }
 										}
-					# L2_norm_pex = norme L2 de pex (valeur calculée sur le maillage) #
+					# L2_norm_pex = norme L2 de pex (valeur calculÃ©e sur le maillage) #
 					# L2_norm_pex		reduction_0D	{
 										methode L2_norm
 										source transformation	{
@@ -155,7 +155,7 @@ Lire pb
 													localisation som
 													}
 										} #
-					# L2_norm_pex = norme L2 de pex (valeur calculée exacte) #
+					# L2_norm_pex = norme L2 de pex (valeur calculÃ©e exacte) #
 					L2_norm_pex		transformation	{
 										methode formule expression 1 valeur_exacte*L2_norm_1
 										localisation som
@@ -208,7 +208,7 @@ Lire pb
 																nom_source psom
 																sources {  refChamp { Pb_champ pb pression } }
 																} ,
-														# intégrale de p #
+														# intÃ©grale de p #
 														reduction_0D	{
 																methode moyenne
 																nom_source pmoy
@@ -238,7 +238,7 @@ Lire pb
 																nom_source pelem
 																sources {  refChamp { Pb_champ pb pression } }
 																} ,
-														# intégrale de p #
+														# intÃ©grale de p #
 														reduction_0D	{
 																methode moyenne
 																nom_source pmoy

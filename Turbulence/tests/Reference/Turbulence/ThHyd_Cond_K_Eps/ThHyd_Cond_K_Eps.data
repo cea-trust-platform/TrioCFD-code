@@ -1,6 +1,6 @@
 # COPPEC_45 Pb thermohydraulique turbulent #
 # PARALLEL OK 8 #
-# calcul uniquement sur la zone chauffee ; mod…le k-epsilon standard #
+# calcul uniquement sur la zone chauffee ; mod√âle k-epsilon standard #
 # condition limite vitesse entree = 1.84 m/s uniforme #
 # calcul du flux thermique avec 1 maille solide #
 # 1ere maille fluide a environ y+=30 #

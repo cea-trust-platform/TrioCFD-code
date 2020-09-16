@@ -66,15 +66,15 @@ Chapter {
 	}
 	
 	Table {
-		Title "Physical properties of air at 20°C"
+		Title "Physical properties of air at 20Â°C"
                 nb_columns 1
                 Label Value
                 line {
-                        legend "$\rho$ en kg/m$³$"
+                        legend "$\rho$ en kg/m$Â³$"
                         file ./Re200000/rho.dat
                 }
                 line {
-                        legend "$\mu$ en N/m$²$/s"
+                        legend "$\mu$ en N/m$Â²$/s"
                         file ./Re200000/mu.dat
                 }
         }

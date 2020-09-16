@@ -270,7 +270,7 @@ visu {
 		Description " The distribution of the mean pressure along the cylinder surface (averaged from 40s up to 90s) is shown and compared to values of N3S $[1]$ and Braza $[2]$ " 
 #		Width 10cm, viewport= 0 0 1024 400,clip
 		Dimension 2
-		LabelX " Angle (°)"
+		LabelX " Angle (Â°)"
 		RangeX 180 0
 		LabelY "Mean Pressure (Pa)"
 		RangeY -0.0015 0.0015

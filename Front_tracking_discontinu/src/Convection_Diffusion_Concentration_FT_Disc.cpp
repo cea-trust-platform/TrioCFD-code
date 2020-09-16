@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Concentration_FT_Disc.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
+// Directory:   $TrioCFD_ROOT/Front_tracking_discontinu/src
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -30,6 +30,9 @@
 #include <Domaine.h>
 #include <SFichier.h>
 #include <Param.h>
+#include <Constituant.h>
+#include <Fluide_Diphasique.h>
+#include <Fluide_Incompressible.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Concentration_FT_Disc,"Convection_Diffusion_Concentration_FT_Disc",Convection_Diffusion_Concentration);
 
@@ -39,6 +42,8 @@ Convection_Diffusion_Concentration_FT_Disc::Convection_Diffusion_Concentration_F
   phase_a_conserver_ = -1;
   constante_cinetique_ = 0.;
   constante_cinetique_nu_t_ = 0.;
+  // default kinematic model is 1
+  modele_cinetique_ = 1;
 }
 
 // Description:
@@ -54,9 +59,10 @@ Entree& Convection_Diffusion_Concentration_FT_Disc::readOn(Entree& is)
           if (nom_equation_nu_t_ == "??")
             {
               Cerr << "Missing EQUATION_NU_T" << finl;
-              exit();
+              Process::exit(-1);
             }
         }
+      Cerr << "The kinematic model used is : modele_cinetique " << modele_cinetique_ << finl;
     }
 
   if (je_suis_maitre())
@@ -88,6 +94,7 @@ void Convection_Diffusion_Concentration_FT_Disc::set_param(Param& param)
   Convection_Diffusion_Concentration::set_param(param);
   param.ajouter("constante_cinetique",&constante_cinetique_);
   param.ajouter("equations_source_chimie",&equations_source_chimie_);
+  param.ajouter("modele_cinetique",&modele_cinetique_);
   param.ajouter("constante_cinetique_nu_t",&constante_cinetique_nu_t_);
   param.ajouter("equation_nu_t",&nom_equation_nu_t_);
   param.ajouter("zone_sortie",&nom_zone_sortie_);
@@ -273,6 +280,24 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       champ_nu_t = &(le_modele.viscosite_turbulente().valeurs());
     }
 
+  const DoubleTab& tab_diffusivite = constituant().diffusivite_constituant().valeur().valeurs();
+  double coeff_diffusivite = tab_diffusivite(0,0);
+  const DoubleVect& volumes_entrelaces = ref_cast(Zone_VF, zone_dis().valeur()).volumes_entrelaces();
+  const int dim = Objet_U::dimension;
+
+  const Fluide_Diphasique& fluide = ref_cast(Fluide_Diphasique, pb.milieu());
+  const Fluide_Incompressible& phase_0 = fluide.fluide_phase(0);
+  const Fluide_Incompressible& phase_1 = fluide.fluide_phase(1);
+  const DoubleTab& tab_nu_phase_0 = phase_0.viscosite_cinematique().valeur().valeurs();
+  const DoubleTab& tab_nu_phase_1 = phase_1.viscosite_cinematique().valeur().valeurs();
+  const double nu_phase_0 = tab_nu_phase_0(0,0);
+  const double nu_phase_1 = tab_nu_phase_1(0,0);
+  const double delta_nu = nu_phase_1 - nu_phase_0;
+
+  DoubleTab indic_faces;
+  calculer_indicatrice_comme(ref_eq_transport_.valeur().inconnue().valeur(),
+                             indic_faces, inconnue().valeur());
+
   for (int face = 0; face < nb_faces; face++)
     {
       double nu_t = 0.;
@@ -287,14 +312,85 @@ void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour_chimie()
       double c1 = max(0., champ1(face));
       double c2 = max(0., champ2(face));
       double c3 = max(0., champ3(face));
-      double omega = constante_cinetique_ * (1. + constante_cinetique_nu_t_ * nu_t) * c1 * c2;
-      double Rdt = min(omega * dt, c1);
-      Rdt = min(Rdt, c2);
 
-      /* Modif des concentrations */
-      champ1(face) = c1 - Rdt;
-      champ2(face) = c2 - Rdt;
-      champ3(face) = c3 + Rdt;
+      // ES243900
+      // Modele 1 classique
+      // Finite rate formulation.
+      if (modele_cinetique_ == 1)
+        {
+          double omega = constante_cinetique_ * (1. + constante_cinetique_nu_t_ * nu_t) * c1 * c2;
+          double Rdt = min(omega * dt, c1);
+          Rdt = min(Rdt, c2);
+
+          /* Modif des concentrations */
+          champ1(face) = c1 - Rdt;
+          champ2(face) = c2 - Rdt;
+          champ3(face) = c3 + Rdt;
+        }
+
+      // Modele 2 : eddy disspertion concept (EDC) Bertrand et al. 2016 Chemical Engineering Journal
+      // traitement particulier pour n'avoir pas de c < 0
+      else if (modele_cinetique_ == 2)
+        {
+          // Besoin du modele LES !!!!
+          Cerr << "MODELE_CINETIQUE 2 requires a turbulent Concentration problem" << finl;
+          Cerr << "Replace Convection_Diffusion_Concentration_FT_Disc by Convection_Diffusion_Concentration_Turbulent_FT_Disc" << finl;
+          barrier();
+          Process::exit(-1);
+        }
+
+      // Modele 3 : eddy disspertion concept (EDC) Bertrand et al. 2016 Chemical Engineering Journal
+      // traitement particulier pour n'avoir pas de c < 0
+      else if (modele_cinetique_ == 3)
+        {
+          const double indic = indic_faces[face];
+          const double nu = indic * delta_nu + nu_phase_0;
+
+          // On recalcule la longueur caracteristique de maille
+          double l_carac = 2.0*pow(6.*volumes_entrelaces(face),1./double(dim)) ;
+
+          const double Ci = 0.07; // from Yoshizawa's model
+          double schm = nu/coeff_diffusivite;
+
+          double tm = l_carac*l_carac*Ci*schm/(nu + nu_t);
+
+          double omega = min(c1,c2);
+          omega = omega/max(dt,tm);
+          double Rdt = omega * dt;
+
+          /* Modif des concentrations */
+          champ1(face) = c1 - Rdt;
+          champ2(face) = c2 - Rdt;
+          champ3(face) = c3 + Rdt;
+        }
+
+      // Modele 4 : eddy disspertion concept (EDC) Bertrand et al. 2016 Chemical Engineering Journal
+      // traitement particulier pour n'avoir pas de c < 0
+      // conclusion ==> formulation pour que modeles 2 et 3 soient equivalents
+      else if (modele_cinetique_ == 4)
+        {
+          // On recalcule la longueur caracteristique de maille
+          double l_carac = 2.0*pow(6.*volumes_entrelaces(face),1./double(dim)) ;
+          // merge de modele 2 et 3  ......
+          double tm = l_carac*l_carac/nu_t;
+
+          double omega = min(c1,c2);
+          omega = omega/max(dt,tm);
+          double Rdt = omega * dt;
+
+          /* Modif des concentrations */
+          champ1(face) = c1 - Rdt;
+          champ2(face) = c2 - Rdt;
+          champ3(face) = c3 + Rdt;
+        }
+
+      else
+        {
+          Cerr << "MODELE_CINETIQUE not implemented ==> Please specify model 1 -- 4" << finl;
+          barrier();
+          Process::exit(-1);
+        }
+
     }
   champ1.echange_espace_virtuel();
   champ2.echange_espace_virtuel();

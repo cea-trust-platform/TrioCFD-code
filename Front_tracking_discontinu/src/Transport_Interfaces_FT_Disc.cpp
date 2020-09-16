@@ -78,20 +78,23 @@ static void eval_vitesse(double x, double y, double z, double t,
                          Parser& px, Parser& py, Parser& pz,
                          double& vx, double& vy, double& vz)
 {
-  px.setVar(0,x);
-  px.setVar(1,y);
-  px.setVar(2,z);
-  px.setVar(3,t);
+  int i0=0, i1=1, i2=2, i3=3;
+  px.setVar(i0,x);
+  px.setVar(i1,y);
+  px.setVar(i2,z);
+  px.setVar(i3,t);
+
   vx = px.eval();
-  py.setVar(0,x);
-  py.setVar(1,y);
-  py.setVar(2,z);
-  py.setVar(3,t);
+  py.setVar(i0,x);
+  py.setVar(i1,y);
+  py.setVar(i2,z);
+  py.setVar(i3,t);
+
   vy = py.eval();
-  pz.setVar(0,x);
-  pz.setVar(1,y);
-  pz.setVar(2,z);
-  pz.setVar(3,t);
+  pz.setVar(i0,x);
+  pz.setVar(i1,y);
+  pz.setVar(i2,z);
+  pz.setVar(i3,t);
   vz = pz.eval();
 }
 static void integrer_vitesse_imposee(
@@ -805,7 +808,7 @@ static void fct_tri_sommet_fa7(const int* in, int* out)
     out[2]=-123;
 }
 
-static int fct_tri_facettes(const void *pt1, const void *pt2)
+static True_int fct_tri_facettes(const void *pt1, const void *pt2)
 {
   const int *a = (const int *) pt1;
   const int *b = (const int *) pt2;
@@ -3156,30 +3159,22 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_faces(
     }
   // Division par le nombre d'elements voisins
   const double valeur_invalide = distance_faces_invalides * 1.1;
+#ifdef __INTEL_COMPILER
+#pragma novector // Desactive vectorisation sur Intel car crash sinon
+#endif
   for (i = 0; i < nb_faces; i++)
     {
       const int n = ncontrib[i];
       if (n > 0)
-        {
-          // const double x = 1. / (double) n;  // Fixed bug: Arithmetic exception
-          // dist_face(i) *= x;
-          const double dn = (double) n;
-          if (dabs(dn)>=DMINFLOAT)
-            {
-              const double x = 1. / dn;
-              dist_face(i) *= x;
-            }
-        }
+        dist_face(i) /= n;
       else
-        {
-          dist_face(i) = valeur_invalide;
-        }
+        dist_face(i) = valeur_invalide;
     }
   dist_face.echange_espace_virtuel();
 }
 
 
-const Champ_base&   Transport_Interfaces_FT_Disc::get_update_distance_interface_faces() const
+const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface_faces() const
 {
   // Si le tag du maillage et le tag du champ sont identiques, inutile de recalculer:
   const int tag = maillage_interface().get_mesh_tag();
@@ -7452,24 +7447,16 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
     }
   // Division par le nombre d'elements voisins
   const double valeur_invalide = distance_sommets_invalides * 1.1;
+#ifdef __INTEL_COMPILER
+#pragma novector // Desactive vectorisation sur Intel car crash sinon
+#endif
   for (i = 0; i < nb_sommets; i++)
     {
       const int n = ncontrib[i];
       if (n > 0)
-        {
-          // const double x = 1. / (double) n; // Fixed bug: Arithmetic exception
-          // dist_som(i) *= x;
-          const double dn = (double) n;
-          if (dabs(dn)>=DMINFLOAT)
-            {
-              const double x = 1. / dn;
-              dist_som(i) *= x;
-            }
-        }
+        dist_som(i) /= n;
       else
-        {
-          dist_som(i) = valeur_invalide;
-        }
+        dist_som(i) = valeur_invalide;
     }
   dist_som.echange_espace_virtuel();
   Debog::verifier("Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets",dist_som);

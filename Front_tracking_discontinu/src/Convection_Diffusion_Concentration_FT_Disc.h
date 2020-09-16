@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Concentration_FT_Disc.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
+// Directory:   $TrioCFD_ROOT/Front_tracking_discontinu/src
 // Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,8 @@ protected:
   double constante_cinetique_;
   double constante_cinetique_nu_t_;
   Nom nom_equation_nu_t_;
-
+  // Modele pour taux de reactions
+  int modele_cinetique_;
   // Zone de sortie ou on annule la concentration
   Nom nom_zone_sortie_;
 };

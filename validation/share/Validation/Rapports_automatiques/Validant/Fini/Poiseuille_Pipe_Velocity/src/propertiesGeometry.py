@@ -3,88 +3,88 @@
 import os, sys, math
 
 def readPropertiesData(nomFic):
-	#initialisation
-	properties = {}
-	properties['mu'] = -1
-	properties['rho'] = -1
-	properties['rayon'] = -1
-	properties['longueur'] = -1
-	properties['vitesse'] = -1
-	# ouverture des fichiers
-	fic = open(nomFic,'r')
-	
+    #initialisation
+    properties = {}
+    properties['mu'] = -1
+    properties['rho'] = -1
+    properties['rayon'] = -1
+    properties['longueur'] = -1
+    properties['vitesse'] = -1
+    # ouverture des fichiers
+    fic = open(nomFic,'r')
+
 #
-	
-	for ligne in fic:
-		ligne = ligne.strip().lower()
-		tLigne = ligne.split()
-		if ligne.find('champ_uniforme')>-1:
-			if ligne.startswith('mu'):
-				properties['mu'] = float(tLigne[-1])
-			elif ligne.startswith('rho'):
-				properties['rho'] = float(tLigne[-1])
-			elif ligne.startswith('vitesse champ_uniforme'):
-				properties['vitesse'] = float(tLigne[-1])
-		else:
-			if ligne.startswith('rayon'):
-				properties['rayon'] = float(tLigne[-1])
-			elif ligne.startswith('longueur'):
-				properties['longueur'] = float(tLigne[-1])
-	fic.close()
-	return properties
+
+    for ligne in fic:
+        ligne = ligne.strip().lower()
+        tLigne = ligne.split()
+        if ligne.find('champ_uniforme')>-1:
+            if ligne.startswith('mu'):
+                properties['mu'] = float(tLigne[-1])
+            elif ligne.startswith('rho'):
+                properties['rho'] = float(tLigne[-1])
+            elif ligne.startswith('vitesse champ_uniforme'):
+                properties['vitesse'] = float(tLigne[-1])
+        else:
+            if ligne.startswith('rayon'):
+                properties['rayon'] = float(tLigne[-1])
+            elif ligne.startswith('longueur'):
+                properties['longueur'] = float(tLigne[-1])
+    fic.close()
+    return properties
 
 
 def ecritureFichier(properties):
-	#ecriture du fichier
-	nomFic = 'propertiesGeometry.dat'
-	fichier = open(nomFic, 'w')
-	fichier.write('%18.3f %18.3f %18.3f %18.3f %18.3f\n' % ( properties['rho'], properties['mu'], properties['rayon'], properties['longueur'], properties['vitesse']))
-	fichier.close()
+    #ecriture du fichier
+    nomFic = 'propertiesGeometry.dat'
+    fichier = open(nomFic, 'w')
+    fichier.write('%18.3f %18.3f %18.3f %18.3f %18.3f\n' % ( properties['rho'], properties['mu'], properties['rayon'], properties['longueur'], properties['vitesse']))
+    fichier.close()
 
 def getPropertiesFromdat():
-	properties = {}
-	nomFichier = 'propertiesGeometry.dat'
-	if os.path.isfile(nomFichier):
-		#recupere les donnees du fichier
-		f = open(nomFichier, 'r')
-		lignes = f.readlines()
-		f.close()
-	else:
-		print 'Erreur getPropertiesFromdat : fichier %s non trouve !' % (nomFichier)
-		sys.exit()
-	ligne = (lignes[0]).strip()
-	tabLigne = ligne.split()
-	ind = 0
-	try:
-		properties['rho'] = float(tabLigne[ind])
-		ind += 1
-		properties['mu'] = float(tabLigne[ind])
-	except IndexError:
-		print 'Erreur getPropertiesFromdat : lecture element %d pour 0-%d elements...' % (ind, len(tabLigne)-1)
-		sys.exit()
-	except ValueError:
-		print 'Erreur getPropertiesFromdat : lecture element %d n\'est pas un float (%s)...' % (ind, tabLigne[ind])
-		sys.exit()
-	return properties
+    properties = {}
+    nomFichier = 'propertiesGeometry.dat'
+    if os.path.isfile(nomFichier):
+        #recupere les donnees du fichier
+        f = open(nomFichier, 'r')
+        lignes = f.readlines()
+        f.close()
+    else:
+        print('Erreur getPropertiesFromdat : fichier %s non trouve !' % (nomFichier))
+        sys.exit()
+    ligne = (lignes[0]).strip()
+    tabLigne = ligne.split()
+    ind = 0
+    try:
+        properties['rho'] = float(tabLigne[ind])
+        ind += 1
+        properties['mu'] = float(tabLigne[ind])
+    except IndexError:
+        print('Erreur getPropertiesFromdat : lecture element %d pour 0-%d elements...' % (ind, len(tabLigne)-1))
+        sys.exit()
+    except ValueError:
+        print('Erreur getPropertiesFromdat : lecture element %d n\'est pas un float (%s)...' % (ind, tabLigne[ind]))
+        sys.exit()
+    return properties
 
 
 
 if __name__ == '__main__':
-	
-	#recuperation du fichier data
-	import glob
-	#derniere ligne du ls
-	#ficLS = os.popen('ls *.data')
-	#lignes = ficLS.readlines()
-	#Ligne = lignes[0]
-	#suppression du \n en fin de nom
-	#nomFic = Ligne[:len(Ligne)-1]
-	listFics = glob.glob('*.data')
-	if len(listFics)>0:
-		nomFic = listFics[0]
-		properties = readPropertiesData(nomFic)
-	
-		#ecriture du fichier
-		ecritureFichier(properties)
-	else:
-		print 'Erreur propertiesGeometry : pas de fichier data trouve !'
+
+    #recuperation du fichier data
+    import glob
+    #derniere ligne du ls
+    #ficLS = os.popen('ls *.data')
+    #lignes = ficLS.readlines()
+    #Ligne = lignes[0]
+    #suppression du \n en fin de nom
+    #nomFic = Ligne[:len(Ligne)-1]
+    listFics = glob.glob('*.data')
+    if len(listFics)>0:
+        nomFic = listFics[0]
+        properties = readPropertiesData(nomFic)
+
+        #ecriture du fichier
+        ecritureFichier(properties)
+    else:
+        print('Erreur propertiesGeometry : pas de fichier data trouve !')
