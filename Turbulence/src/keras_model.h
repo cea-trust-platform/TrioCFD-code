@@ -34,7 +34,7 @@
         printf("%s(%d): ", __FILE__, __LINE__);                                \
         printf(__VA_ARGS__);                                                   \
         printf("\n");                                                          \
-        exit(-1);                                                              \
+        Process::exit();                                                              \
     }
 #else
 #define KDEBUG(x, ...) ;

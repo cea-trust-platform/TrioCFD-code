@@ -4,7 +4,7 @@
  * MIT License, see LICENSE file.
  */
 
-#include "keras_model.h"
+#include <keras_model.h>
 
 #include <cmath>
 #include <iostream>
@@ -12,6 +12,7 @@
 #include <limits>
 #include <stdio.h>
 #include <utility>
+#include <Process.h>
 
 bool ReadUnsignedInt(std::ifstream* file, unsigned int* i) {
     KASSERT(file, "Invalid file stream");
@@ -614,7 +615,7 @@ bool KerasModel::LoadModel(const std::string& filename) {
     std::ifstream file(filename.c_str(), std::ios::binary);
     if(!file.is_open()){
       std::cerr << "fichier: " << filename << " inexistant!" << std::endl;
-      exit(1);
+      Process::exit();
     }
     //KASSERT(file.is_open(), "Unable to open file %s", filename.c_str());
 

@@ -32,7 +32,7 @@
 #include <Ref_Modele_turbulence_hyd_K_Eps.h>
 #include <Ref_Navier_Stokes_Turbulent.h>
 #include <Ref_Transport_K_Eps.h>
-#include "TBNN.h"
+#include <TBNN.h>
 class Probleme_base;
 
 //

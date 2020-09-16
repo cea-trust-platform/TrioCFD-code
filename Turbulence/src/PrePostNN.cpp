@@ -2,8 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <Process.h>
 
-#include "PrePostNN.h"
+#include <PrePostNN.h>
 
 PrePostNN::PrePostNN(string filename)
 {
@@ -55,7 +56,7 @@ PrePostNN::PrePostNN(string filename)
   }
   else{
     cerr << "fichier: " << filename << " inexistant!" << endl;
-    exit(1);
+    Process::exit();
   }
 }
 

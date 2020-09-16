@@ -1,4 +1,4 @@
-#include "TBNN.h"
+#include <TBNN.h>
 #include <iostream>
 
 int sgn(double v) {
