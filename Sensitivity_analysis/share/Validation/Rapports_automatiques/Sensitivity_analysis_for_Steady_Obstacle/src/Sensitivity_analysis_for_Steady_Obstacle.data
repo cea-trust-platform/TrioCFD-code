@@ -1,0 +1,192 @@
+# Hydraulique 2D laminar with ALE : Sensitivity equation method for the Navier-Stokes #
+# Estimate of the variance of the velocity field when the
+inflow condition is uncertain #
+dimension 2    
+
+# Time scheme explicit or implicit #
+Scheme_euler_explicit mon_schema
+Read mon_schema
+{
+        # Time step #
+          # Initial time [s] #
+	tinit 0
+          # Min time step #
+	# dt_min 5.e-3 #
+          # Max time step #
+	dt_max 5 # dt_min=dt_max so dt imposed #
+          # facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 1.
+          # make the diffusion term in NS equation implicit : disable(0) or enable(1) #
+        diffusion_implicite 1
+
+        # Output criteria #
+          # .out files printing period #
+        dt_impr 5.e-3 # Note: small value to print at each time step #
+          # .sauv files printing period #
+	dt_sauv 100
+        periode_sauvegarde_securite_en_heures 23
+
+        # Stop if one of thefollowing criteria is checked: #
+          # End time [s] #
+	tmax 15
+          # Max number of time steps #
+        # nb_pas_dt_max 10 #
+          # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-7
+}
+
+Pb_Hydraulique pb_etat
+Pb_Hydraulique_sensibility pb_sensibilite
+
+
+Domaine dom
+
+# BEGIN MESH #
+Read_MED family_names_from_group_names dom MeshWithSquare0 MeshWithSquare1.med 
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM1
+}
+End
+END PARTITION #
+
+
+
+# BEGIN SCATTER #
+# Scatter DOM1.Zones dom #
+# END SCATTER #
+
+VEFPreP1B dis
+
+Fluide_Incompressible etat
+Read etat
+{
+        mu Champ_Uniforme 1 0.001
+        rho Champ_Uniforme 1 1.
+}
+
+Fluide_Incompressible sensibilite
+Read sensibilite
+{
+        mu Champ_Uniforme 1 0.001
+        rho Champ_Uniforme 1 1.
+}
+
+Associate pb_etat dom
+Associate pb_etat etat
+
+Associate pb_sensibilite dom
+Associate pb_sensibilite sensibilite
+
+Probleme_Couple pbc
+Associate pbc pb_etat
+Associate pbc pb_sensibilite
+Associate pbc mon_schema
+Discretize pbc dis
+
+
+Read pb_etat
+{
+        Navier_Stokes_standard
+        {       
+		
+      		solveur_pression gcp  { precond ssor { omega 1.5 } seuil 1.e-10 }
+                # solveur_pression PETSc Cholesky { }       #
+                convection { amont }
+                diffusion { }
+                initial_conditions {
+                        vitesse Champ_Uniforme 2 0. 0.
+                        }
+                boundary_conditions {
+                        Upper paroi_fixe
+                        Lower paroi_fixe
+                        Obstacle paroi_fixe
+                        Inlet frontiere_ouverte_vitesse_imposee Champ_Front_fonc_xyz 2 0.25*Y*(0.7-Y)/0.35/0.35 0.
+			Outlet 	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+                }
+        }
+	Post_processing
+	{
+   	  Probes
+		{
+		  U_H2 nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
+                  P_H2 grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
+		  U_H3 nodes vitesse periode 0.01 segment 350 0 0.35 2.0 0.35 
+                  P_H3 grav pression periode 0.01 segment 350 0 0.35 2.0 0.35 
+		  U_V6 nodes vitesse periode 0.01 segment 90 0.6 0 0.6 0.7  
+                  P_V6 grav pression periode 0.01 segment 90 0.6 0 0.6 0.7 
+		  U_V1 nodes vitesse periode 0.01 segment 90 1.0 0 1.0 0.7 
+                  P_V1 grav pression periode 0.01 segment 90 1.0 0 1.0 0.7    
+		}
+		# Fields #
+		fichier etat
+                format lata # lata for VisIt tool #
+		fields dt_post 1  # Note: Warning to memory space if dt_post too small #
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+			vitesse faces
+		}
+	}
+}
+
+
+Read pb_sensibilite
+{
+        Navier_Stokes_standard_sensibility
+        {       
+                uncertain_variable { vitesse }
+		state { pb_champ_evaluateur pb_etat  vitesse } 
+      		solveur_pression gcp  { precond ssor { omega 1.5 } seuil 1.e-10 }  
+		# solveur_pression PETSc Cholesky { } #
+                convection { Sensibility { amont } }
+                diffusion { }
+                initial_conditions {
+                        vitesse Champ_Uniforme 2 0. 0.
+                        }
+                boundary_conditions {
+                        Upper paroi_fixe
+                        Lower paroi_fixe
+                        Obstacle paroi_fixe
+                        Inlet frontiere_ouverte_vitesse_imposee Champ_Front_fonc_xyz 2 Y*(0.7-Y)/0.35/0.35 0.
+                        Outlet frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.
+                }
+        }
+	Post_processing
+	{
+   	  Probes
+		{
+		  U_H2_sens nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
+                  P_H2_sens grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
+		  U_H3_sens nodes vitesse periode 0.01 segment 350 0 0.35 2.0 0.35 
+                  P_H3_sens grav pression periode 0.01 segment 350 0 0.35 2.0 0.35 
+		  U_V6_sens nodes vitesse periode 0.01 segment 90 0.6 0 0.6 0.7  
+                  P_V6_sens grav pression periode 0.01 segment 90 0.6 0 0.6 0.7 
+		  U_V1_sens nodes vitesse periode 0.01 segment 90 1.0 0 1.0 0.7 
+                  P_V1_sens grav pression periode 0.01 segment 90 1.0 0 1.0 0.7   
+		}
+		# Fields #
+		fichier sensibilite
+                format lata # lata for VisIt tool #
+		fields dt_post 1  # Note: Warning to memory space if dt_post too small #
+		{
+			pression elem
+			pression som
+			vitesse elem
+			vitesse som
+			vitesse faces
+		}
+	}	
+
+}
+
+
+Solve pbc
+End
