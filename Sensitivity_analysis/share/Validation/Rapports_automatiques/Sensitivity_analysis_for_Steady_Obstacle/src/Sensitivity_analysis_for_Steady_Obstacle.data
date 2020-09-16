@@ -128,11 +128,8 @@ Read pb_etat
                 format lata # lata for VisIt tool #
 		fields dt_post 1  # Note: Warning to memory space if dt_post too small #
 		{
-			pression elem
-			pression som
-			vitesse elem
 			vitesse som
-			vitesse faces
+
 		}
 	}
 }
@@ -177,11 +174,7 @@ Read pb_sensibilite
                 format lata # lata for VisIt tool #
 		fields dt_post 1  # Note: Warning to memory space if dt_post too small #
 		{
-			pression elem
-			pression som
-			vitesse elem
 			vitesse som
-			vitesse faces
 		}
 	}	
 
