@@ -383,7 +383,7 @@ void Postraitement_ft_lata::ecrire_maillage(Fichier_Lata& file,
                               ? liste_champs_i_aux_sommets
                               : liste_champs_i_aux_elements);
 
-      const char * som_elem = (loc == SOMMETS ? "som" : "elem");
+      const char * som_elem = (loc == SOMMETS ? "SOM" : "ELEM");
 
       const int nb_champs = liste.size();
       if (nb_champs == 0)
