@@ -561,7 +561,7 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   param.dictionnaire("standard", (int)STANDARD);
   param.dictionnaire("mirror", (int)MIRROR);
   param.dictionnaire("improved", (int)IMPROVED);
-  param.dictionnaire("none", (int)NONE);
+  param.dictionnaire("none", (int)none);
   param.dictionnaire("weighted", (int)WEIGHTED);
   param.dictionnaire("hysteresis", (int)HYSTERESIS);
   param.ajouter("weight_CL",&weight_CL_);
@@ -5921,7 +5921,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
       drapeau_angle_in_range = 1;
 #endif
       courbure_sommets[i] = c;
-      if (methode_calcul_courbure_contact_line_ == NONE)
+      if (methode_calcul_courbure_contact_line_ == none)
         {
           if ((call>1) && (sommet_face_bord_[i]>=0))
             //if (call>1)
