@@ -208,7 +208,7 @@ Chapter {
 	}
 	visu {
 		title "Sensitivity of the horizontal velocity"
-		pseudocolor ./Output/sensibilite.lata dom VITESSE_X SOM
+		pseudocolor ./Output/Sensitivity_analysis_for_Steady_Obstacle.lata dom VITESSE_X SOM
 	}
 }
 

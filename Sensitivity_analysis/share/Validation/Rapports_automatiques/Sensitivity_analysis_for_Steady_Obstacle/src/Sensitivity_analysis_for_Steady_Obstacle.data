@@ -30,7 +30,7 @@ Read mon_schema
           # End time [s] #
 	tmax 15
           # Max number of time steps #
-        # nb_pas_dt_max 10 #
+        nb_pas_dt_max 10 
           # Convergence threshold (see .dt_ev file) #
 	seuil_statio 1.e-7
 }
@@ -114,24 +114,24 @@ Read pb_etat
 	{
    	  Probes
 		{
-		  U_H2 nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
-                  P_H2 grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
-		  U_H3 nodes vitesse periode 0.01 segment 350 0 0.35 2.0 0.35 
-                  P_H3 grav pression periode 0.01 segment 350 0 0.35 2.0 0.35 
-		  U_V6 nodes vitesse periode 0.01 segment 90 0.6 0 0.6 0.7  
-                  P_V6 grav pression periode 0.01 segment 90 0.6 0 0.6 0.7 
-		  U_V1 nodes vitesse periode 0.01 segment 90 1.0 0 1.0 0.7 
-                  P_V1 grav pression periode 0.01 segment 90 1.0 0 1.0 0.7    
+		 U_H2 nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
+                 P_H2 grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
+		 U_H3 nodes vitesse periode 0.01 segment 350 0 0.35 2.0 0.35 
+                 P_H3 grav pression periode 0.01 segment 350 0 0.35 2.0 0.35 
+		 U_V6 nodes vitesse periode 0.01 segment 90 0.6 0 0.6 0.7  
+                 P_V6 grav pression periode 0.01 segment 90 0.6 0 0.6 0.7 
+		 U_V1 nodes vitesse periode 0.01 segment 90 1.0 0 1.0 0.7 
+                 P_V1 grav pression periode 0.01 segment 90 1.0 0 1.0 0.7    
 		}
-		# Fields #
-		fichier etat
-                format lata # lata for VisIt tool #
-		fields dt_post 1  # Note: Warning to memory space if dt_post too small #
-		{
-			vitesse som
+	# Fields #
+	fichier etat
+        format Lata # lata for VisIt tool #
+	fields dt_post 1  # Note: Warning to memory space if dt_post too small #
+	{
+	  vitesse som
 
-		}
 	}
+    }
 }
 
 
@@ -158,24 +158,22 @@ Read pb_sensibilite
         }
 	Post_processing
 	{
-   	  Probes
-		{
-		  U_H2_sens nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
-                  P_H2_sens grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
-		  U_H3_sens nodes vitesse periode 0.01 segment 350 0 0.35 2.0 0.35 
-                  P_H3_sens grav pression periode 0.01 segment 350 0 0.35 2.0 0.35 
-		  U_V6_sens nodes vitesse periode 0.01 segment 90 0.6 0 0.6 0.7  
-                  P_V6_sens grav pression periode 0.01 segment 90 0.6 0 0.6 0.7 
-		  U_V1_sens nodes vitesse periode 0.01 segment 90 1.0 0 1.0 0.7 
-                  P_V1_sens grav pression periode 0.01 segment 90 1.0 0 1.0 0.7   
-		}
-		# Fields #
-		fichier sensibilite
-                format lata # lata for VisIt tool #
-		fields dt_post 1  # Note: Warning to memory space if dt_post too small #
-		{
-			vitesse som
-		}
+	  Probes {
+			  U_H2_sens nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
+		          P_H2_sens grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
+			  U_H3_sens nodes vitesse periode 0.01 segment 350 0 0.35 2.0 0.35 
+		          P_H3_sens grav pression periode 0.01 segment 350 0 0.35 2.0 0.35 
+			  U_V6_sens nodes vitesse periode 0.01 segment 90 0.6 0 0.6 0.7  
+		          P_V6_sens grav pression periode 0.01 segment 90 0.6 0 0.6 0.7 
+			  U_V1_sens nodes vitesse periode 0.01 segment 90 1.0 0 1.0 0.7 
+		          P_V1_sens grav pression periode 0.01 segment 90 1.0 0 1.0 0.7   
+			}
+			# Fields #
+		        format lata # lata for VisIt tool #
+			fields dt_post 1  # Note: Warning to memory space if dt_post too small #
+			{
+			  vitesse som
+			}
 	}	
 
 }
