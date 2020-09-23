@@ -1,0 +1,16 @@
+# Added test to compare computation latafile with reference latafile
+if [ -f u_star.lata ] ; then
+   #gunzip -k ref_u_star.lata.gz
+   tar xzvf ref_u_star_lata.tar.gz 1>tar_ref_u_star_lata.tar.log
+   compare_lata Reference_LATAFILES/ref_u_star.lata u_star.lata 1>compare_lata.log 2>compara_lata.err
+   if [ $? -eq 0 ] ; then
+     echo "Latafile and reference latafile match. Everything is OK"
+     exit 0
+   else
+     echo "Latafile and reference latafile DOES NOT match !"
+     exit 1
+   fi
+else
+   echo "Computation have not been yet performed"
+   exit 0
+fi
