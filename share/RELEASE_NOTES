@@ -1,4 +1,8 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.8.2 : Enhancements, modifications and corrected bugs since version 1.8.1 :
+--------------------------------------------------------------------------------------------------
+XX/XX/XX (TrioCFD) Keyword     : Add tenseur_Reynolds_externe option into Navier Stokes source and diffusion (viscosity) terms to enable a turbulence model built by a machine learning method
+--------------------------------------------------------------------------------------------------
 Release notes version 1.8.1 : Enhancements, modifications and corrected bugs since version 1.8.0 :
 --------------------------------------------------------------------------------------------------
 01/04/20 (TrioCFD) Enhancement : ALE improvements
