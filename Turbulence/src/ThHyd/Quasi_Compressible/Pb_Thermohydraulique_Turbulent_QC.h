@@ -57,7 +57,6 @@ public:
   Equation_base& equation(int);
   inline const Champ_Fonc& viscosite_turbulente() const;
   int verifier();
-  int postraiter(int force=1);
   virtual int expression_predefini(const Motcle& motlu, Nom& expression);
 
 protected:
