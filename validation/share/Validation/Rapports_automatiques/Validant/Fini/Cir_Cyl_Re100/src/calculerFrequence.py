@@ -37,7 +37,7 @@ def calculerMediane(tabOrig):
                 tab[j] = tmp
             j += 1
         i += 1
-    mediane = tab[(n+1)/2]
+    mediane = tab[(n+1)//2]
     return mediane
 
 def getPeriodes(temps, tab, mediane):

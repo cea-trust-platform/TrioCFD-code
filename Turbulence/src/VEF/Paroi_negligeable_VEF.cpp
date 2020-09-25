@@ -23,6 +23,14 @@
 #include <Paroi_negligeable_VEF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <DoubleTrav.h>
+#include <Mod_turb_hyd_base.h>
+#include <Operateur.h>
+#include <Operateur_base.h>
+#include <Milieu_base.h>
+#include <Fluide_Incompressible.h>
+#include <Champ_Uniforme.h>
+#include <distances_VEF.h>
+#include <Champ_P1NC.h>
 
 Implemente_instanciable_sans_constructeur(Paroi_negligeable_VEF,"negligeable_VEF",Paroi_hyd_base_VEF);
 
@@ -115,14 +123,201 @@ int Paroi_negligeable_VEF::init_lois_paroi()
 
 int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 {
-  // Cerr << "Dans Paroi_negligeable_VEF::calculer_hyd ne fait rien." << finl;
+
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+    {
+
+      int ndeb,nfin,elem,l_unif;
+      double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
+      IntVect num(dimension);
+
+      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+      const IntTab& face_voisins = zone_VEF.face_voisins();
+      const IntTab& elem_faces = zone_VEF.elem_faces();
+      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+      const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+      const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+
+      if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+        {
+          if(tab_visco(0,0)>DMINFLOAT) visco = tab_visco(0,0);
+          else visco = DMINFLOAT;
+          l_unif = 1;
+        }
+      else
+        l_unif = 0;
+      if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+        {
+          Cerr<<" visco <=0 ?"<<finl;
+          exit();
+        }
+
+      for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+        {
+          const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+
+          if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+
+              for (int num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  elem =face_voisins(num_face,0);
+                  if (dimension == 2 )
+                    {
+
+                      num[0]=elem_faces(elem,0);
+                      num[1]=elem_faces(elem,1);
+
+                      if (num[0]==num_face) num[0]=elem_faces(elem,2);
+                      else if (num[1]==num_face) num[1]=elem_faces(elem,2);
+
+                      dist = distance_2D(num_face,elem,zone_VEF);
+                      dist *= 3./2.;// pour se ramener a distance paroi / milieu de num[0]-num[1]
+                      //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],zone_VEF,val1,val2);
+                      norm_v=norm_2D_vit1(vit,num[0],num[1],num_face, zone_VEF,val1,val2);
+
+                    } // dim 2
+                  else if (dimension == 3)
+                    {
+
+                      num[0]=elem_faces(elem,0);
+                      num[1]=elem_faces(elem,1);
+                      num[2]=elem_faces(elem,2);
+
+                      if (num[0]==num_face) num[0]=elem_faces(elem,3);
+                      else if (num[1]==num_face) num[1]=elem_faces(elem,3);
+                      else if (num[2]==num_face) num[2]=elem_faces(elem,3);
+
+                      dist = distance_3D(num_face,elem,zone_VEF);
+                      dist *= 4./3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
+                      //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      norm_v=norm_3D_vit1(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+
+                    }// dim 3
+
+                  if (l_unif)
+                    d_visco = visco;
+                  else
+                    d_visco = tab_visco[elem];
+
+                  norm_tau = d_visco*norm_v/dist;
+                  u_etoile = sqrt(norm_tau);
+                  tab_u_star_(num_face) = u_etoile;
+
+
+                }// loop on faces
+
+            }// Fin de paroi fixe
+
+        }// Fin boucle sur les bords
+
+    }
+
+
+
   return 1;
 }
 
 // C est celle la qui nous interesse!!!
 int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  // Cerr << "Dans Paroi_negligeable_VEF::calculer_hyd ne fait rien." << finl;
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+    {
+      int ndeb,nfin,elem,l_unif;
+      double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
+      IntVect num(dimension);
+
+      const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+      const IntTab& face_voisins = zone_VEF.face_voisins();
+      const IntTab& elem_faces = zone_VEF.elem_faces();
+      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+      const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+      const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+
+      if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+        {
+          if(tab_visco(0,0)>DMINFLOAT) visco = tab_visco(0,0);
+          else visco = DMINFLOAT;
+          l_unif = 1;
+        }
+      else
+        l_unif = 0;
+      if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+        {
+          Cerr<<" visco <=0 ?"<<finl;
+          exit();
+        }
+
+      for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+        {
+          const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+
+          if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+
+              for (int num_face=ndeb; num_face<nfin; num_face++)
+                {
+                  elem =face_voisins(num_face,0);
+                  if (dimension == 2 )
+                    {
+
+                      num[0]=elem_faces(elem,0);
+                      num[1]=elem_faces(elem,1);
+
+                      if (num[0]==num_face) num[0]=elem_faces(elem,2);
+                      else if (num[1]==num_face) num[1]=elem_faces(elem,2);
+
+                      dist = distance_2D(num_face,elem,zone_VEF);
+                      dist *= 3./2.;// pour se ramener a distance paroi / milieu de num[0]-num[1]
+                      //norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],zone_VEF,val1,val2);
+                      norm_v=norm_2D_vit1(vit,num[0],num[1],num_face, zone_VEF,val1,val2);
+
+                    } // dim 2
+                  else if (dimension == 3)
+                    {
+
+                      num[0]=elem_faces(elem,0);
+                      num[1]=elem_faces(elem,1);
+                      num[2]=elem_faces(elem,2);
+
+                      if (num[0]==num_face) num[0]=elem_faces(elem,3);
+                      else if (num[1]==num_face) num[1]=elem_faces(elem,3);
+                      else if (num[2]==num_face) num[2]=elem_faces(elem,3);
+
+                      dist = distance_3D(num_face,elem,zone_VEF);
+                      dist *= 4./3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
+                      //norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      norm_v=norm_3D_vit1(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+
+                    }// dim 3
+
+                  if (l_unif)
+                    d_visco = visco;
+                  else
+                    d_visco = tab_visco[elem];
+
+                  norm_tau = d_visco*norm_v/dist;
+                  u_etoile = sqrt(norm_tau);
+                  tab_u_star_(num_face) = u_etoile;
+
+
+                }// loop on faces
+
+            }// Fin de paroi fixe
+
+        }// Fin boucle sur les bords
+
+    }
   return 1;
 }
 

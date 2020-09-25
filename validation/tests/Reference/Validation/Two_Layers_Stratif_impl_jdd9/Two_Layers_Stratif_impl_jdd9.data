@@ -65,7 +65,7 @@ Read sch_imp
 }
 
 
-# proprietes physiques de l'eau a 20°C #
+# proprietes physiques de l'eau a 20$^{\circ}$C #
 
 Fluide_Incompressible fluide
 Read fluide

@@ -447,7 +447,7 @@ protected:
   double correction_contact_courbure_coeff_;
   int calcul_courbure_iterations_;
   int niter_pre_lissage_;
-  enum enum_methode_calcul_courbure_contact_line_ { STANDARD=0, MIRROR=1, IMPROVED=2, NONE=3, WEIGHTED=4, HYSTERESIS=5 };
+  enum enum_methode_calcul_courbure_contact_line_ { STANDARD=0, MIRROR=1, IMPROVED=2, none=3, WEIGHTED=4, HYSTERESIS=5 };
   int methode_calcul_courbure_contact_line_;
   double weight_CL_; // Le poids de la CL
 
