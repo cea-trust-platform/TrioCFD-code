@@ -93,16 +93,32 @@ DoubleTab& Op_Dift_VDF_base::ajouter(const DoubleTab& inco,  DoubleTab& resu) co
                   const Eval_Dift_VDF_const& eval_dift = (const Eval_Dift_VDF_const&) eval;
                   const Champ_Fonc& ch_diff_turb = eval_dift.diffusivite_turbulente();
                   const DoubleVect& diffusivite_turb = ch_diff_turb.valeurs();
-                  for (int i=0; i<size; i++)
-                    diffu_tot[i] = db_diffusivite+diffusivite_turb[i];
+                  if ( Tenseur_Reynolds_Externe( ) == 1 )
+                    {
+                      for (int i=0; i<size; i++)
+                        diffu_tot[i] = db_diffusivite;
+                    }
+                  else
+                    {
+                      for (int i=0; i<size; i++)
+                        diffu_tot[i] = db_diffusivite+diffusivite_turb[i];
+                    }
                 }
               else
                 {
                   const Eval_Dift_VDF_var& eval_dift = (const Eval_Dift_VDF_var&) eval;
                   const Champ_Fonc& ch_diff_turb = eval_dift.diffusivite_turbulente();
                   const DoubleVect& diffusivite_turb = ch_diff_turb.valeurs();
-                  for (int i=0; i<size; i++)
-                    diffu_tot[i] = tab_diffusivite[i]+diffusivite_turb[i];
+                  if ( Tenseur_Reynolds_Externe( ) == 1 )
+                    {
+                      for (int i=0; i<size; i++)
+                        diffu_tot[i] = tab_diffusivite[i];
+                    }
+                  else
+                    {
+                      for (int i=0; i<size; i++)
+                        diffu_tot[i] = tab_diffusivite[i]+diffusivite_turb[i];
+                    }
                 }
             }
           else
