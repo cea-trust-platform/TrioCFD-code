@@ -22,7 +22,8 @@
 #include <Operateur_Conv_sensibility.h>
 
 Implemente_base( Operateur_Conv_sensibility, "Operateur_Conv_sensibility", Operateur_Conv_base ) ;
-
+// XD convection_sensibility convection_deriv sensibility 0 A convective scheme for the sensibility problem.
+// XD  attr opconv bloc_convection opconv 0 Choice between: amont and muscl   NL2 Example: convection {  Sensibility { amont } }
 
 Sortie& Operateur_Conv_sensibility::printOn( Sortie& os ) const
 {

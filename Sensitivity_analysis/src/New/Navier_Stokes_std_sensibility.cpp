@@ -29,6 +29,12 @@
 #include <Interprete.h>
 
 Implemente_instanciable( Navier_Stokes_std_sensibility, "Navier_Stokes_standard_sensibility", Navier_Stokes_std) ;
+// XD Navier_Stokes_standard_sensibility navier_stokes_standard Navier_Stokes_standard_sensibility -1 Resolution of Navier-Stokes sensitivity problem
+//XD attr state interprete state 0 Block to indicate the state problem. Between the braces, you must specify the key word 'pb_champ_evaluateur' then the name of the state problem and the velocity unknown  NL2 Example:  state { pb_champ_evaluateur pb_state  velocity }
+//XD attr uncertain_variable interprete uncertain_variable 0 Block to indicate the name of the uncertain variable. Between the braces, you must specify the name of the unknown variable. Choice between velocity and mu.  NL2 Example: uncertain_variable { velocity }
+// XD  attr convection_sensibility convection_deriv sensibility 0 Choice between: amont and muscl   NL2 Example: convection {  Sensibility { amont } }
+
+
 
 Sortie& Navier_Stokes_std_sensibility::printOn( Sortie& os ) const
 {

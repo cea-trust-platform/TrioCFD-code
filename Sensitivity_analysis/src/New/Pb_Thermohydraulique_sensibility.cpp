@@ -24,6 +24,10 @@
 #include <Verif_Cl.h>
 
 Implemente_instanciable( Pb_Thermohydraulique_sensibility, "Pb_Thermohydraulique_sensibility", Pb_qdm_fluide ) ;
+// XD Pb_Thermohydraulique_sensibility pb_thermohydraulique Pb_Thermohydraulique_sensibility -1 Resolution of Resolution of thermohydraulic sensitivity problem
+// XD  attr Convection_Diffusion_Temperature_Sensibility Convection_Diffusion_Temperature_sensibility convection_diffusion_temperature 0  Convection diffusion temperature sensitivity equation
+// XD  attr Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility 0   Navier Stokes sensitivity equation
+
 
 // Description:
 //    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)

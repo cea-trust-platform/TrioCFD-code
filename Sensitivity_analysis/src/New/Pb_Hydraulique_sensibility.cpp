@@ -23,6 +23,8 @@
 #include <Fluide_Incompressible.h>
 
 Implemente_instanciable(Pb_Hydraulique_sensibility,"Pb_Hydraulique_sensibility",Pb_qdm_fluide);
+// XD Pb_Hydraulique_sensibility Pb_base Pb_Hydraulique_sensibility -1 Resolution of hydraulic sensibility problems
+// XD  attr Navier_Stokes_std_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_std_sensibility 0 Navier-Stokes sensibility equations
 
 
 // Description:
