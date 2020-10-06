@@ -3,7 +3,6 @@ Release notes version 1.8.2_beta : Enhancements, modifications and corrected bug
 --------------------------------------------------------------------------------------------------
 25/09/20 (TrioCFD) New feature : Add tenseur_Reynolds_externe option into Navier Stokes source and diffusion (viscosity) terms to enable a turbulence model built by a machine learning method
 24/09/20 (TrioCFD) Bug fixed   : Tasks when post-processing turbulent Quasi-compressible problem could be incomplete
-23/09/20 (TrioCFD) Bug fixed   : Crash with lata_to_med applied to a LATA file including a Lagrangian mesh
 01/09/20 (TrioCFD) New feature : Add possibility to post-process ustar with negligeable wall law in VEF discretization
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.1 : Enhancements, modifications and corrected bugs since version 1.8.0 :
