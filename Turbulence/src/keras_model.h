@@ -13,6 +13,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <arch.h>
 
 #define KASSERT(x, ...)                                                        \
     if (!(x)) {                                                                \
@@ -257,7 +258,11 @@ class Tensor {
     void PrintShape() {
         printf("(");
         for (unsigned int i = 0; i < dims_.size(); i++) {
+#ifndef INT_is_64_
             printf("%d ", dims_[i]);
+#else
+            printf("%ld ", dims_[i]);
+#endif
         }
         printf(")\n");
     }
