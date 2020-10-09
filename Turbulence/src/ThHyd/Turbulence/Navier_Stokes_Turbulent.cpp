@@ -397,6 +397,12 @@ void Navier_Stokes_Turbulent::creer_champ(const Motcle& motlu)
 
   if (le_modele_turbulence.non_nul())
     le_modele_turbulence->creer_champ(motlu);
+
+  if (sub_type(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()))
+    ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
+  else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
+    ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().creer_champ(motlu);
+
 }
 
 const Champ_base& Navier_Stokes_Turbulent::get_champ(const Motcle& nom) const
