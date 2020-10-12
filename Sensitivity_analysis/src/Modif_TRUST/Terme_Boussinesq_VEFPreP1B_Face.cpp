@@ -253,7 +253,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
                 {
                   double contrib=0;
                   for (int comp=0; comp<nb_comp; comp++)
-                    contrib+=Poids(pt)*volume*(T0_etat(comp)- valeurs_scalaire_etat(pt,comp) + T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
+                    contrib+=Poids(pt)*volume*(T0_etat(comp)- valeurs_scalaire_etat(pt,comp) + (T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp))*g(dim)*valeurs_Psi(pt);
                   resu(num_face,dim)+=contrib;
                   somme(dim)+=contrib;
                   if (modif_traitement_diri)
