@@ -188,12 +188,19 @@ Read pb
 				min_temperature som
 				max_temperature som
 				k_eps_residu som
+				temperature_residu som
+				vitesse_residu som
 			}
 		}
 
 		lata {  
 			fichier Turbul_RANS_Robin_wall_law	        
-			format lata fields dt_post 100	{ k_eps_residu faces }
+			format lata fields dt_post 100
+			{
+				k_eps_residu faces
+				vitesse_residu faces
+				temperature_residu faces
+			}
 		}
 		
 	}
