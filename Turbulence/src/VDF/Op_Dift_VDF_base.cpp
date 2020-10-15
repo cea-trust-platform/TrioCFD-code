@@ -30,6 +30,8 @@
 
 Implemente_base(Op_Dift_VDF_base,"Op_Dift_VDF_base",Op_Diff_VDF_base);
 
+// XD diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
+
 Sortie& Op_Dift_VDF_base::printOn(Sortie& is) const
 {
   return Op_Diff_VDF_base::printOn(is);
