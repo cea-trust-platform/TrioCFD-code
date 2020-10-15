@@ -1,8 +1,67 @@
+# PARALLEL RUNS #
 Dimension 3
 Pb_hydraulique_turbulent pb
 
 Domaine dom
-lire_fichier dom maillage_LP.geom
+
+# domA : bloc proche paroi, domB : bloc hors paroi #
+# BEGIN MESH #
+domaine domA
+mailler domA
+{
+	pave bloc
+	{
+		origine 0 0 0
+		longueurs 1 0.156 1
+		nombre_de_noeuds 4 2 4
+		}
+		{
+		bord periox	X = 0		0 <= Y <= 0.156	0 <= Z <= 1
+		bord periox	X = 1		0 <= Y <= 0.156	0 <= Z <= 1
+		bord wall	Y = 0		0 <= X <= 1	0 <= Z <= 1
+		bord perioz	Z = 0		0 <= X <= 1	0 <= Y <= 0.156
+		bord perioz	Z = 1		0 <= X <= 1	0 <= Y <= 0.156
+		}
+}
+
+domaine domB
+mailler domB
+{
+	pave bloc
+	{
+		origine 0 0.156 0
+		longueurs 1 0.844 1
+		nombre_de_noeuds 4 92 4
+		}
+		{
+		bord periox	X = 0		0.156 <= Y <= 1	0 <= Z <= 1
+		bord periox	X = 1		0.156 <= Y <= 1	0 <= Z <= 1
+		bord sym	Y = 1		0 <= X <= 1	0 <= Z <= 1
+		bord perioz	Z = 0		0 <= X <= 1	0.156 <= Y <= 1
+		bord perioz	Z = 1		0 <= X <= 1	0.156 <= Y <= 1
+		}
+}
+
+mailler dom { domain domA , domain domB }
+corriger_frontiere_periodique { domaine dom bord periox }
+corriger_frontiere_periodique { domaine dom bord perioz }
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+          Partition_tool metis { nb_parts 2 }
+          Larg_joint 2
+	  periodique 2 periox perioz
+          Nom_Zones DOM
+}
+FIN
+END PARTITION #
+
+# BEGIN SCATTER
+scatter DOM.Zones dom
+END SCATTER #
+
 
 VDF dis
 
@@ -65,7 +124,6 @@ Lire pb
 					turbulence_paroi loi_standard_hydr dt_impr_ustar 1e6
 					}
 		Sources			{ canal_perio { bord periox } , Tenseur_Reynolds_Externe { nom_fichier canal_plan } }
-
 	}
 
 	Postraitement
