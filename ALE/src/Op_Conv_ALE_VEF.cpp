@@ -404,6 +404,8 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       // On traite les polyedres en suivant l'ordre dans lequel ils figurent
       // dans la zone
       // boucle sur les polys
+      Champ_Inc vit_maillage_ALE = equation().inconnue();
+      vit_maillage_ALE.valeurs() = vitesse_face_absolue;
       for (poly=0; poly<nb_elem_tot; poly++)
         {
           int contrib = 0;
@@ -449,8 +451,6 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
               int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
 
               // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la porosite
-              Champ_Inc vit_maillage_ALE=equation().inconnue();
-              vit_maillage_ALE.valeurs() =  vitesse_face_absolue;
               type_elemvef.calcul_vc(face,vc,vs,vsom,vit_maillage_ALE,itypcl,porosite_face);
 
               // calcul de xc (a l'intersection des 3 facettes) necessaire pour muscl3
