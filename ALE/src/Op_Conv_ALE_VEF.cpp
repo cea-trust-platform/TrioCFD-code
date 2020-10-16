@@ -382,6 +382,8 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   // Si alpha<1, la boucle se compose de 2 passes:
   //                         -la premiere avec le schema choisi et une ponderation de alpha
   //                         -la seconde avec le schema centre et une ponderation de 1-alpha
+  Champ_Inc vit_maillage_ALE = equation().inconnue();
+  vit_maillage_ALE.valeurs() = vitesse_face_absolue;
   double alpha = alpha_;
   int nombre_passes = (alpha==1 ? 1 : 2);
   for (int passe=1; passe<=nombre_passes; passe++)
@@ -404,8 +406,6 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
       // On traite les polyedres en suivant l'ordre dans lequel ils figurent
       // dans la zone
       // boucle sur les polys
-      Champ_Inc vit_maillage_ALE = equation().inconnue();
-      vit_maillage_ALE.valeurs() = vitesse_face_absolue;
       for (poly=0; poly<nb_elem_tot; poly++)
         {
           int contrib = 0;
