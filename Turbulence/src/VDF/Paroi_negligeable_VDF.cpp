@@ -22,6 +22,15 @@
 
 #include <Paroi_negligeable_VDF.h>
 #include <Zone_Cl_dis.h>
+#include <Champ_Face.h>
+#include <Champ_Uniforme.h>
+#include <Zone_Cl_VDF.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Fluide_Incompressible.h>
+#include <Equation_base.h>
+#include <Mod_turb_hyd_base.h>
+#include <distances_VDF.h>
+
 //
 // printOn et readOn
 
@@ -55,14 +64,156 @@ Entree& Paroi_negligeable_VDF::readOn(Entree& s)
 
 int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 {
-  //Cerr << "Dans Paroi_negligeable_VDF::calculer_hyd ne fait rien!!" << finl;
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+    {
+      int ndeb,nfin,elem,ori,l_unif;
+      double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
+
+      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const IntTab& face_voisins = zone_VDF.face_voisins();
+      const IntVect& orientation = zone_VDF.orientation();
+      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+      const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+      const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+
+      if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
+        {
+          visco = tab_visco(0,0);
+          l_unif = 1;
+        }
+      else
+        l_unif = 0;
+
+      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+        {
+          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+
+          if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+
+
+              for (int num_face=ndeb; num_face<nfin; num_face++)
+                {
+
+                  if( face_voisins( num_face, 0 ) != -1 )
+                    elem = face_voisins( num_face, 0 ) ;
+                  else
+                    elem = face_voisins( num_face, 1 ) ;
+
+                  if ( dimension == 2 )
+                    {
+                      ori = orientation(num_face);
+                      norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val0);
+                    }
+                  else if ( dimension == 3)
+                    {
+                      ori = orientation(num_face);
+                      norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                    }
+
+                  if ( axi )
+                    dist=zone_VDF.dist_norm_bord_axi(num_face);
+                  else
+                    dist=zone_VDF.dist_norm_bord(num_face);
+                  if ( l_unif )
+                    d_visco = visco;
+                  else
+                    d_visco = tab_visco[elem];
+
+                  norm_tau = d_visco*norm_v/dist;
+                  u_etoile = sqrt(norm_tau);
+                  tab_u_star_(num_face) = u_etoile;
+
+                } // loop on faces
+
+            } // Fin paroi fixe
+
+        } // Fin boucle sur les bords
+
+    }
   return 1;
 }
 
 
 int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
-  //Cerr << "Dans Paroi_negligeable_VDF::calculer_hyd ne fait rien!!" << finl;
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+    {
+      int ndeb,nfin,elem,ori,l_unif;
+      double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
+
+      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const IntTab& face_voisins = zone_VDF.face_voisins();
+      const IntVect& orientation = zone_VDF.orientation();
+      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+      const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+      const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+
+      if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
+        {
+          visco = tab_visco(0,0);
+          l_unif = 1;
+        }
+      else
+        l_unif = 0;
+
+      for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+        {
+          const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+
+          if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
+            {
+              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+              ndeb = le_bord.num_premiere_face();
+              nfin = ndeb + le_bord.nb_faces();
+
+
+              for (int num_face=ndeb; num_face<nfin; num_face++)
+                {
+
+                  if( face_voisins( num_face, 0 ) != -1 )
+                    elem = face_voisins( num_face, 0 ) ;
+                  else
+                    elem = face_voisins( num_face, 1 ) ;
+
+                  if ( dimension == 2 )
+                    {
+                      ori = orientation(num_face);
+                      norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val0);
+                    }
+                  else if ( dimension == 3)
+                    {
+                      ori = orientation(num_face);
+                      norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                    }
+
+                  if ( axi )
+                    dist=zone_VDF.dist_norm_bord_axi(num_face);
+                  else
+                    dist=zone_VDF.dist_norm_bord(num_face);
+                  if ( l_unif )
+                    d_visco = visco;
+                  else
+                    d_visco = tab_visco[elem];
+
+                  norm_tau = d_visco*norm_v/dist;
+                  u_etoile = sqrt(norm_tau);
+                  tab_u_star_(num_face) = u_etoile;
+
+                } // loop on faces
+
+            } // Fin paroi fixe
+
+        } // Fin boucle sur les bords
+
+    }
   return 1;
 }
 
