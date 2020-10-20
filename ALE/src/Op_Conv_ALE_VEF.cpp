@@ -382,6 +382,8 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   // Si alpha<1, la boucle se compose de 2 passes:
   //                         -la premiere avec le schema choisi et une ponderation de alpha
   //                         -la seconde avec le schema centre et une ponderation de 1-alpha
+  Champ_Inc vit_maillage_ALE = equation().inconnue();
+  vit_maillage_ALE.valeurs() = vitesse_face_absolue;
   double alpha = alpha_;
   int nombre_passes = (alpha==1 ? 1 : 2);
   for (int passe=1; passe<=nombre_passes; passe++)
@@ -449,8 +451,6 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
               int itypcl = (rang==-1 ? 0 : zone_Cl_VEF.type_elem_Cl(rang));
 
               // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la porosite
-              Champ_Inc vit_maillage_ALE=equation().inconnue();
-              vit_maillage_ALE.valeurs() =  vitesse_face_absolue;
               type_elemvef.calcul_vc(face,vc,vs,vsom,vit_maillage_ALE,itypcl,porosite_face);
 
               // calcul de xc (a l'intersection des 3 facettes) necessaire pour muscl3
