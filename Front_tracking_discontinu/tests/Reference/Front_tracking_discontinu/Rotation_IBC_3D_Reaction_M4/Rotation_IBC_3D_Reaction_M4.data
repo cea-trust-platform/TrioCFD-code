@@ -61,6 +61,10 @@ Lire liquide
  	rho Champ_Uniforme 1 1000.
 }
 
+Champ_Uniforme gravite
+Lire gravite 3 0. 0. -9.81
+Associate liquide gravite
+
 Fluide_Incompressible vapeur
 Lire vapeur
 {
@@ -81,10 +85,6 @@ Lire constituant
 {
 	coefficient_diffusion Champ_Uniforme 1 1e-6
 }
-
-Champ_Uniforme gravite
-Lire gravite 3 0. 0. -9.81
-Associate liquide gravite
 
 Navier_Stokes_FT_Disc              hydraulique
 Transport_Interfaces_FT_Disc 	   interf
