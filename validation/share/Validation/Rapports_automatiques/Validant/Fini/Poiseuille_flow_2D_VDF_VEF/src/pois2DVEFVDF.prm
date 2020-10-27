@@ -1,6 +1,6 @@
 Parameters {
 	newvalidTrio
-	Title "Poiseuille flow 2D with VDF and VEF mesh"
+	Title "Poiseuille flow 2D with VDF and VEF meshes"
 
 	VersionTrio_U "1.6.1"
 
@@ -81,12 +81,12 @@ Casesetup {
 		Description "The calculations are carried out by using two meshes: the first mesh one for VDF and the second one for VEF. For the VDF mesh, the 2D grid is composed of 200 cells (20\latex_($\times$\latex_)10) and for the VEF mesh, the grid is composed of 400 cells (20\latex_($\times$\latex_)10\latex_($\times$\latex_)2). Both meshes are presented on Fig. 2 (VDF) and Fig. 3 (VEF)."
 		visu {
 			Title "VDF Mesh"
-			Width 12cm, trim= 100 50 10 400,clip
+			Width 12cm, trim= 100 105 20 450,clip
 			mesh VDF/Amont/test.lata dom
 		}
 		visu {
 			Title "VEF Mesh"
-			Width 12cm, trim= 100 50 10 400,clip
+			Width 12cm, trim= 100 105 20 450,clip
 			mesh VEF/Amont/test.lata dom
 		}
 	}
