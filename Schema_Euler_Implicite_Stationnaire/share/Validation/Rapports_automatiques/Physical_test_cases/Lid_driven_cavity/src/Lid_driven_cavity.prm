@@ -1,19 +1,11 @@
 Parameters {
+	newvalidTrio
 	Title "2D Lid driven cavity test"
-
-        Author "mp250145"
-	VersionTrio_U 1.7.3 
-
-        Description Test of the new Time scheme with Solveur implicit_steady using a dual time step for the steady problems
-        Description The time scheme Implicit_Euler_steady_scheme can be seen as a modification of the Euler_Implicit (with Solveur implicit) time scheme in which the time step varies in the domain
-	Description The idea is here to compare the solution obtained with these two time schemes
-        Description Here after the "reference solution TrioCFD" is the solution obtained with the "Euler_Implicit (with Solveur implicit)"  time scheme
-        Description We also compared these two TrioCFD solutions with the Fluent solution and with the solutions given in references 1 and 2.
-
-
-        IncludeData 1
-        Reference "1. U. Ghia, and K. N. Ghia, and C. Shin, 'High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method', Journal of the Brazilian Society of Mechanical Sciences and Engineering, 3:387-411, 1982"
-        Reference "2. C. H. Marchi,  and R. Suero,  and L. K. Araki, 'The lid-driven square cavity flow: numerical solution with a 1024 x 1024 grid', Journal of the Brazilian Society of Mechanical Sciences and Engineering, 3:186--198, 2009." 
+	Author "MA PUSCAS"
+	VersionTrio_U 1.7.3
+	IncludeData 1
+	Reference "[1] U. Ghia, and K. N. Ghia, and C. Shin, 'High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method',  Journal of Computational Physics, 48, pp. 387-411, 1982."
+	Reference "[2] C. H. Marchi,  and R. Suero,  and L. K. Araki, 'The lid-driven square cavity flow: numerical solution with a 1024 x 1024 grid', Journal of the Brazilian Society of Mechanical Sciences and Engineering, 3:186--198, 2009." 
 
 	ParametresTrio_U Type of problem: Steady Navier-Stokes
 	ParametresTrio_U Discretizations: VEFPreP1B
@@ -22,14 +14,53 @@ Parameters {
 	ParametresTrio_U Time scheme: Implicit_Euler_steady_scheme with Solveur implicit_steady
 	ParametresTrio_U Convection scheme: amont
 
-
 	TestCase Steady defilante.data /*jdd en annexe*/ 
 }
-
-Chapter {
-	Title "Convergence" 
+#
+Objectif {
+	Description "The purpose is to check a new time scheme implementation with the 'implicit_steady' solver using a dual time step in order to reach faster the steady state solution. The new time scheme 'Implicit_Euler_steady_scheme' can be seen as a modification of the 'Euler_Implicit' option (i.e. implicit solver) but with a time step varying inside the domain. The velocity profiles that are obtained with those two time schemes of TrioCFD are superimposed with the Fluent solution and the solutions of references [1] and [2]."
+}
+#
+Pb_description {
+	Description "The lid-driven cavity test is a well-kown benchmark test for checking the incompressible Navier-Stokes solvers in laminar condition."
+	geometrie {
+		Description "The cavity is a two-dimensional square of size 1m."
+	}
+	CICL {
+		Description "At initial time, the fluid is at rest inside the cavity (i.e. \latex_($\mathbf{V}=\mathbf{0}$\latex_)). The upper horizontal wall has a non zero $x$-velocity whereas the 'no-slip boundary condition' is imposed for the three other walls (i.e. the lower horizontal wall and the two vertical ones."
+	}
+	Propfluide {
+		Description "Only two parameters are involved in the simulation: the density $\rho=1$ and the dynamic viscosity $\mu=0.01$".
+	}
+	Phyecou {
+		Description "Under the combined influence of the moving upper horizontal wall and the fluid viscosity, the fluid starts to flow inside the cavity. The direction of rotation is clockwise. When the steady state is reached, the \latex_($V_{x}$\latex_) and \latex_($V_{y}$\latex_) profiles are compared with the reference solutions."
+	}
+}
+#
+Casesetup {
+	Maillage {
+		Description "The mesh is presented on Fig. 4 (with Visit)."
+		visu {
+			title "MESH"
+			width 11cm, trim = 10 105 50 85,clip
+			mesh ./Steady/defilante.lata dom
+		}
+		visu {
+			title "VITESSE_X SOM"
+			width 11cm, trim = 10 105 50 85,clip
+			pseudocolor ./Steady/defilante.lata dom VITESSE_X SOM
+		}
+	}
+	Autres_options {
+		Description "TrioCFD is run with the numerical options that are summarized in Section 4.1."
+	}
+}
+#
+Results {
+	Description "$\bullet$ \latex_(\textbf{Convergence}\latex_)"
 	figure { 
 		title "Evolution of residue"
+		width 12cm
 		include_description_curves 0
 		labelX "TIME"
 		labelY "residu=max|Ri|"
@@ -42,13 +73,12 @@ Chapter {
 			Style linespoints
 		}
 	}
-}
-
-Chapitre {
-	Titre "Probes: 1D Plots"
-
+	Description "\latex_(\medskip\latex_)"
+	Description "$\bullet$ \latex_(\textbf{$V_{x}$- and $V_{y}$-profiles}\latex_)"
+	Description "The \latex_($V_{x}$- and $V_{y}$\latex_)-profiles are plotted respectively with respect to the $y$- and $x$-positions on Figs. 4 and 5. Here after the 'reference solution TrioCFD' is the 'Euler_Implicit' solution."
 	figure { 
 		title "Velocity along line x=0.5"
+		width 12cm
 		include_description_curves 0
 		labelX "y"
 		labelY "Vx"
@@ -90,7 +120,7 @@ Chapitre {
 		}
 		Courbe {
 			Legende "Velocity"
-                        segment ./Steady/defilante SONDE_VITESSE_X_4
+			segment ./Steady/defilante SONDE_VITESSE_X_4
 			Colonnes ($1) ($2)
 			Style linespoints
 			TypeLigne 1
@@ -100,8 +130,9 @@ Chapitre {
 
 	}
 
-	figure { 
+	figure {
 		title "Velocity along line y=0.5"
+		width 12cm
 		include_description_curves 0
 		labelX "x"
 		labelY "Vy"
@@ -153,36 +184,12 @@ Chapitre {
 			}
 
 
-}
-
-}
-
-
-
-Chapter {
-	Title "Visualization via VisIt" 
-	visu {
-		title "MESH"
-		mesh ./Steady/defilante.lata dom
-	}
-	visu {
-		title "VITESSE_X SOM"
-		pseudocolor ./Steady/defilante.lata dom VITESSE_X SOM
-	}
-
-}
-
-
-
-Chapitre {
-	Titre "CPU tables"
-
-
+		}
+	Description "$\bullet$ \latex_(\textbf{CPU table}\latex_)"
 	Tableau {
-		Titre "CPU table "
+		title " CPU informations for new and reference solutions"
 		Nb_colonnes 1
 		label  nb_iter 
-		
 		Ligne {
 			Legende "New time scheme"
 			fichier Steady/CPU_time.dat
@@ -196,15 +203,9 @@ Chapitre {
 			Colonnes ($1) 
 			}
 	}
-	
 }
-
-Chapitre {
-	Titre "Conclusion"
-	Description The time scheme 'Implicit_Euler_steady_scheme' reproduces the stationary solution obtain with the time scheme 'Euler_Implicit' while considerably reducing the number of time steps required during the transitory phase. 
-Description These solutions are in perfect agreement with the Fluent solution and with the two literary reference solutions.
-Description The observed time CPU in seconds for these test case was for the 'Euler_Implicit' scheme equal to 42269, for the 'Implicit_Euler_steady_scheme' scheme equal to 6241, and for the Fluent equal to 5196.
-        
+#
+Conclusion {
+	Description "The time scheme option 'Implicit_Euler_steady_scheme' of TrioCFD reproduces the steady state solution that is obtained with the original time scheme 'Euler_Implicit' but by considerably decreasing the number of time steps required for the transient phase. The both TrioCFD solutions are in perfect agreement with the Fluent solution and with the solutions from two references of the literature. For this test case, the CPU times (in seconds) were equal to 1) 42269s for the 'Euler_Implicit' scheme, 2) 6241s for the 'Implicit_Euler_steady_scheme', and 5196s for Fluent."
 }
-
 
