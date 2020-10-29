@@ -30,7 +30,7 @@ Read mon_schema
           # End time [s] #
 	tmax 15
           # Max number of time steps #
-        nb_pas_dt_max 10 
+       # nb_pas_dt_max 10 #
           # Convergence threshold (see .dt_ev file) #
 	seuil_statio 1.e-7
 }
