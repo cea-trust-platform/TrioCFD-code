@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
+30/10/20 (TrioCFD) Change      : Add a missing term in the deformation tensor for non-uniform viscosity in VDF (laminar or turbulent flow)
+30/10/20 (TrioCFD) Change      : Remove -2/3*k remaining terms in the previous operators to be conform for all diffusive operators (VDF, VEF, uniform or not, axi or not) 
+30/10/20 (TrioCFD) Conception  : Diffusive operators coding turbulent shear stress come back from TrioCFD to TRUST
 16/10/20 (TrioCFD) New feature : Add possibility to post-process ustar with negligeable wall law in VDF discretization
 25/09/20 (TrioCFD) New feature : Add tenseur_Reynolds_externe option into Navier Stokes source and diffusion (viscosity) terms to enable a turbulence model built by a machine learning method
 24/09/20 (TrioCFD) Bug fixed   : Tasks when post-processing turbulent Quasi-compressible problem could be incomplete

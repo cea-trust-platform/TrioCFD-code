@@ -91,7 +91,7 @@ Lire pb
 {
         Navier_Stokes_turbulent_QC
         {
-                solveur_pression gcp { precond ssor { omega 1.7 } seuil 1e-9 impr }
+                solveur_pression petsc cholesky { }
                 projection_initiale 1
 		convection { quick }
                 diffusion { }

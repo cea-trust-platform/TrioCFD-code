@@ -57,13 +57,11 @@ public:
   const Equation_base& equation_k_eps(int) const ;
 
 
-  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
-  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
 
   virtual const Champ_base& get_champ(const Motcle& nom) const;
   virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+
 protected:
-  Modele_Fonc_Bas_Reynolds mon_modele_fonc;
   Transport_K_Eps  eqn_transport_K_Eps;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
@@ -153,15 +151,6 @@ inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps()
 inline const Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps::eqn_transp_K_Eps() const
 {
   return eqn_transport_K_Eps;
-}
-inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps::associe_modele_fonction()
-{
-  return mon_modele_fonc;
-}
-
-inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps::associe_modele_fonction() const
-{
-  return  mon_modele_fonc;
 }
 inline int Modele_turbulence_hyd_K_Eps::nombre_d_equations() const
 {

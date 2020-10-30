@@ -326,9 +326,7 @@ DoubleTab& Source_Transport_K_Eps_VEF_Face::ajouter(DoubleTab& resu) const
       mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps, ch_visco_cin_ou_dyn  );
 
       // Pour modele EASM
-      const Zone_dis& zone_dis = eq_hydraulique->zone_dis();
       int nb_elem_tot = zone_VEF.nb_elem_tot();
-      const Zone_Cl_dis& zone_Cl_dis = eq_hydraulique->zone_Cl_dis();
 
       int is_Reynolds_stress_isotrope = mon_modele_fonc.Calcul_is_Reynolds_stress_isotrope();
       if (is_Reynolds_stress_isotrope==0)
@@ -340,18 +338,17 @@ DoubleTab& Source_Transport_K_Eps_VEF_Face::ajouter(DoubleTab& resu) const
           visco_tab = visco_scal(0,0);
           DoubleTab gradient_elem(nb_elem_tot,Objet_U::dimension,Objet_U::dimension);
           gradient_elem=0.;
-          const Discretisation_base& dis = eq_hydraulique->discretisation();
-          const Champ_base& K_Eps = mon_eq_transport_K_Eps->inconnue().valeur();
           Champ_P1NC::calcul_gradient(vit,gradient_elem,zone_Cl_VEF);
           /*Paroi*/
           Nom lp=mod.loi_paroi().valeur().que_suis_je();
           if (lp!="negligeable_VEF")
             {
               if (mon_equation->schema_temps().nb_pas_dt()>0)
-                Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab,0,0,zone_Cl_VEF);
+                Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab,zone_Cl_VEF);
             }
           gradient_elem.echange_espace_virtuel();
-          DoubleTab Re = mon_modele_fonc.calcul_tenseur_Re(dis,zone_dis,zone_Cl_dis,gradient_elem,visco_turb,K_Eps);
+          DoubleTab Re(gradient_elem);
+          mon_modele_fonc.valeur().calcul_tenseur_Re(visco_turb, gradient_elem, Re);
           Re.echange_espace_virtuel();
 
           calculer_terme_production_K_EASM(zone_VEF,zone_Cl_VEF,P,K_eps,gradient_elem,visco_turb,Re);

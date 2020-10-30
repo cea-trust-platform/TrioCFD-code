@@ -96,11 +96,7 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse,
                                                       const DoubleTab& nu_turb,
                                                       const Zone_Cl_VEF& zone_Cl_VEF,
                                                       const Zone_VEF& zone_VEF,
-                                                      const DoubleTab& tab_k,
                                                       const DoubleTab& tau_tan,
-                                                      const int indic_lp_neg,
-                                                      const int indic_bas_Re,
-                                                      const int indice_keps_realisable,
                                                       int nbr_comp) const
 {
   // on cast grad et grad_transp pour pouvoir les modifier
@@ -134,7 +130,8 @@ void Op_Dift_standard_VEF_Face::ajouter_cas_vectoriel(const DoubleTab& vitesse,
     ref_cast(Champ_P1NC,inconnue_.valeur()).filtrer_L2(ubar);
 
   Champ_P1NC::calcul_gradient(ubar,grad,zone_Cl_VEF);
-  Champ_P1NC::calcul_duidxj_paroi(grad,nu,nu_turb,tau_tan,indic_lp_neg,indic_bas_Re,zone_Cl_VEF);
+  if (le_modele_turbulence.valeur().utiliser_loi_paroi())
+    Champ_P1NC::calcul_duidxj_paroi(grad,nu,nu_turb,tau_tan,zone_Cl_VEF);
 
   grad.echange_espace_virtuel();
 
@@ -346,7 +343,7 @@ DoubleTab& Op_Dift_standard_VEF_Face::ajouter(const DoubleTab& inconnue,
   //  if(nb_comp==1)
   //    ajouter_cas_scalaire(inconnue, resu,ref_cast(DoubleTab,flux_bords, nu, nu_turb, zone_Cl_VEF, zone_VEF);
   //  else
-  ajouter_cas_vectoriel(inconnue, resu, flux_bords_,nu, nu_turb, zone_Cl_VEF, zone_VEF, k_, tau_tan_,indic_lp_neg_,indic_bas_Re_,indice_keps_realisable_,nb_comp);
+  ajouter_cas_vectoriel(inconnue, resu, flux_bords_,nu, nu_turb, zone_Cl_VEF, zone_VEF, tau_tan_,nb_comp);
   modifier_flux(*this);
   return resu;
 }
