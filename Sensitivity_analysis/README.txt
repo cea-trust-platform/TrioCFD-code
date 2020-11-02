@@ -1,3 +1,3 @@
 The sensitivity equations and strategy is detailed in the following article: 'Sensitivity equation method for the Navier-Stokes equations applied to uncertainty propagation, C. Fiorini, B. Després, and M. A. Puscas, IJNMF, 2020'
 As detail in the article cited above, the problem of sensitivity uses at each time step the solution of the problem of state. Thus, in the data file, two problems must be defined: the state (Pb_Hydraulique with its Navier_Stokes_standard equation) as well as the sensitivity problem (Pb_Hydraulique_sensibility with its Navier_Stokes_standard_sensibility equation). Then we define the coupled state-sensitivity problem.
-!!!! Warning: currently only the velocity, the pressure and the viscosity can be considered as a variable presenting an uncertainty. !!!!
+!!!! Warning: currently only the velocity and the viscosity can be considered as a variable presenting an uncertainty. !!!!
