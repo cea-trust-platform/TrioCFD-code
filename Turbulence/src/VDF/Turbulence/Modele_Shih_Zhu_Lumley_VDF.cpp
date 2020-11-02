@@ -115,6 +115,9 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_S(const Zone_dis& zone_dis, const Zone_C
 
 void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1 (const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN)
 {
+#ifdef __INTEL_COMPILER
+#pragma novector // Desactive vectorisation sur Intel car crash sinon
+#endif
   for (int elem=0; elem<nelem_; elem++)
     {
       double eta;
