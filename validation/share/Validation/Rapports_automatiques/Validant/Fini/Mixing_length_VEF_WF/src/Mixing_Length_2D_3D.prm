@@ -1,11 +1,6 @@
 Parameters {
+	newvalidTrio
 	Title "Mixing length in 2D and 3D VEF-plane channel"
-	Description "Turbulent flow in a bi-periodic plane channel"
-	Description "Validated Model"
-	Description "	Wall function in VEF discretisation"
-	Description "	Mixing length modelling (+ k-$\epsilon$ comparison)"
-	Description "Validation with : analytical laws"
-
 	VersionTrio_U "1.5.5"
 
 	ParametersTrio_U Type of problem : Hydraulique_Turbulent
@@ -17,6 +12,8 @@ Parameters {
 	ParametersTrio_U Convection : EF_stab
 	ParametersTrio_U Turbulence model : Mixing Length (compared with k-$\epsilon$)
 	ParametersTrio_U Type of boundary conditions : Periodicity in x (and z for 3D) direction, wall for y boundaries
+	ParametersTrio_U Location: /validation/share/Validation/Rapports_automatiques/Validant/Fini/Mixing_length_VEF_WF
+	ParametersTrio_U Master Test case: 2D.data - 3D.data - 3D_keps.data
 
 	TestCase 2D_100000_11 2D 
 	TestCase 2D_100000_21 2D   
@@ -33,55 +30,72 @@ Parameters {
 	TestCase 3D_6 3D /**/
 	TestCase 3D_6_keps 3D_keps /**/
 
-	Reference "Reichardt H. : Vollstaendige Darstellung der turbulenten Geschwindigkeitsverteliung in glatten Leitungen. ZAMM 31, 208-219 (1951)"
-	Reference "http://www.sla.maschinenbau.tu-darmstadt.de/lehre/tms/Turbulence-TUDarmstadt-Pt2-6.pdf"
+	Reference "$[1]$ Reichardt H. : Vollstaendige Darstellung der turbulenten Geschwindigkeitsverteliung in glatten Leitungen. ZAMM 31, 208-219 (1951)"
+	Reference "$[2]$ http://www.sla.maschinenbau.tu-darmstadt.de/lehre/tms/Turbulence-TUDarmstadt-Pt2-6.pdf"
 	
 	Author "R. PAILLE"
 	IncludeData 2
 }
-Chapter {
-	Title "Tests Description"
-	Description "Geometry : plane channel"
-	Description "Dimensions : h=2, Lx=0.2 or 0.8 (same for Lz in 3D)"
-	Description "Mesh : Ny=6 - 11 - 21 - 41, Nx=3 (Nz=3 in 3D) and trianguler_fin (2D) or tetraedriser_homogene_fin (3D)"
-	Description "Initial conditions : Ux=10"
-	Description "Boundary conditions : The periodicity conditions need a source term to maintain the flow constant"
-	Description "Canal_perio { bord periox }"
-	visu {
-		Title "3 x 6"
-		mesh 2D_100000_6/2D.lata dom
+#
+Objectif {
+	 Description "The purpose is to validate one particular model of turbulence in TrioCFD, the 'mixing length' model. Comparisons are carried out in two and three dimensions with the analytical law of Reichardt $[1]$ on several VEF meshes. The system is a plane channel in 2D and a parallelepipedal box in 3D, with periodic boundary conditions except in $y$-direction. The wall function of Reichardt is applied for the TrioCFD computations. The relative errors of the \latex_($Re_{\tau}$\latex_) number are given for two values of the \latex_($Re_b$\latex_) number, where the reference is obtained from the Dean's correlation. The comparisons are also carried out with TrioCFD simulations with the $k-\epsilon$ model."
+}
+#
+Pb_description {
+	geometrie {
+		Description "The geometry is a two-dimensional plane channel of dimensions \latex_($L_y=h=2$\latex_), \latex_($L_x=0.2$\latex_) or 0.8. For three-dimensional simulations, the geometry is a parallelepipedal box of same dimensions with \latex_($L_z=L_x$\latex_)."
 	}
-	visu {
-		Title "3 x 41"
-		mesh 2D_100000_41/2D.lata dom
+	CICL {
+		Description "A non-null velocity \latex_($U_x$\latex_)=10 is initialized inside the domain. Periodic boundary conditions are applied in $x$- and $z$-directions and no-slip boundary conditions are applied on top and bottom $y$-walls. A source term is added in order to maintain a constant flow."
 	}
-	visu {
-		Title "3 x 6 x 3"
-		mesh 3D_6/3D.lata dom
-		normal3D 0.2 0.3 0.9
-		up3D -0.1 1 -0.3
-	}
-	visu {
-		Title "3 x 41 x 6"
-		mesh 3D_41/3D.lata dom
-		normal3D 0.2 0.3 0.9
-		up3D -0.1 1 -0.3
-	}
-	Figure {
-		Title "Physical properties"
-		Description "\latex_(\textbf{Incompressible case:}\latex_)"	
-		Description "$\rho$ = 1"
-		Description "$\mu$ = 0.001 or 0.0001 such as Reb = (Ub.h) / v = 10 000 or 100 000 (h=1 : half-height)"
-		Width 0cm
-		picture ./nothing.png
+	Propfluide {
+		Description "\latex_(\textbf{Incompressible case:}\latex_)"
+		Description "The fluid is incompressible of constant density $\rho=1$. Two values of viscosity are used for simulations: $\mu$ = 0.001 or 0.0001 such as \latex_($Re_{b}=(U_{b}l) / \nu$\latex_) = 10 000 or 100 000 where $l=1$ is the half-height $h/2$."
 	}
 }
-Chapter {
-	Title "Results : 2D - Reb = 10 000"
+#
+Casesetup {
+	Maillage {
+		Description "Four VEF meshes are used for the simulations: two 2D meshes (Figs 1 and 2) with option 'trianguler_fin' and two 3D meshes (Fig 3 and 4) with option 'tetraedriser_homogene_fin' (3D). The number of cells are \latex_($N_y=$\latex_) 6 - 11 - 21 - 41, and \latex_($N_x=N_z=$\latex_) 3 with options 'trianguler_fin' (2D) or 'tetraedriser_homogene_fin' (3D)"
+		Description "Canal_perio { bord periox }"
+		visu {
+			Title "3 x 6 in 2D geometry"
+			Width 5cm, trim= 35 120 500 10,clip
+			mesh 2D_100000_6/2D.lata dom
+		}
+		visu {
+			Title "3 x 41 in 2D geometry"
+			Width 5cm, trim= 35 120 500 10,clip
+			mesh 2D_100000_41/2D.lata dom
+		}
+		visu {
+			Title "3 x 6 x 3 in 3D geometry"
+			mesh 3D_6/3D.lata dom
+			normal3D 0.2 0.3 0.9
+			up3D -0.1 1 -0.3
+		}
+		visu {
+			Title "3 x 41 x 6 in 3D geometry"
+			mesh 3D_41/3D.lata dom
+			normal3D 0.2 0.3 0.9
+			up3D -0.1 1 -0.3
+		}
+	}
+	Options_modele {
+		Description "The 'mixing length' model of turbulence is applied inside a double-periodic plane channel. The flow is forced by adding a source term in the impulsion balance equation."
+	}
+	Autres_options {
+		Description "The convection scheme is 'EF_stab'. All other numerical options are summarized in section 4.1."
+	}
+}
+#
+Results {
+	Description "$\bullet$ \latex_(\textbf{2D results for $Re_b=10^4$}\latex_)"
+	Description "The \latex_($Re_{\tau}$\latex_) number of TrioCFD is compared to the Dean's correlation (\latex_($Re_{\tau} = 0.175(Re_{b})^{7/8}$\latex_)) for two values of \latex_($Re_b$\latex_). For 2D simulations the relative errors are given in Table 2 for \latex_($Re_b=10^4$\latex_) and Table 3 for \latex_($Re_b=10^5$\latex_). For \latex_($Re_b=10^4$\latex_) the velocity profiles along the $y$-direction are presented on Fig. 5 for four values of \latex_($N_y$\latex_) and the comparison with the Reichardt analytical solution (red line) is presented on a graph $U+$ with respect to $y+$ in logscale (Fig. 6). The $y$-profile of \latex_($\nu_t$\latex_) is presented on Fig. 7."
 	Table {
-		Title "2D - Reb = 10 000"
+		Title "2D - \latex_($Re_b = 10 000$\latex_)"
 		nb_columns 4
-		label Ny | y+ | Re$\tau$ | Relative error
+		label Ny | y+ | \latex_($Re_{\tau}$\latex_) | Relative error
 		line {
 			origin "analytique"
 			legend " "
@@ -118,11 +132,7 @@ Chapter {
 			columns ($1) ($2) ($3) ($4)
 		}
 	}
-	Figure {
-		Description "(*) : according to Dean's correlation : Re$\tau$ = 0.175.(Reb)7/8 "	
-		Width 0cm
-		picture ./nothing.png
-	}
+
 	Figure {
 		Title "Velocity profile"
 		Width 12cm
@@ -157,6 +167,7 @@ Chapter {
 			TypeLigne 4
 		}
 	}
+
 	Figure {
 		Title "Velocity profile U+"
 		Width 12cm
@@ -197,6 +208,7 @@ Chapter {
 			TypeLigne 5
 		}
 	}
+
 	Figure {
 		Title "Turbulent viscosity"
 		Width 12cm
@@ -231,13 +243,13 @@ Chapter {
 			TypeLigne 4
 		}
 	}
-}
-Chapter {
-	Title "Results : 2D - Reb = 100 000"
+
+	Description "$\bullet$ \latex_(\textbf{2D results for $Re_b=10^5$}\latex_)"
+	Description "For the two-dimensional simulation with \latex_($Re_b=10^5$\latex_), the relative errors on the \latex_($Re_{\tau}$\latex_) number (still compared to the Dean's correlation) are given in Table 3 and the same graphs are presented respectively on Fig. 8 for $U$, on Fig. 9 for $U+$ and Fig. 10 for \latex_($\nu_t$\latex_). The Reichardt law is compared on Fig. 9."
 	Table {
-		Title "2D - Reb = 100 000"
+		Title "2D - \latex_($Re_b=10^5$\latex_)"
 		nb_columns 4
-		label Ny | y+ | Re$\tau$ | Relative error
+		label Ny | y+ | \latex_($Re_{\tau}$\latex_) | Relative error
 		line {
 			origin "analytique"
 			legend " "
@@ -274,11 +286,8 @@ Chapter {
 			columns ($1) ($2) ($3) ($4)
 		}
 	}
-	Figure {
-		Description "(*) : according to Dean's correlation : Re$\tau$ = 0.175.(Reb)7/8 "	
-		Width 0cm
-		picture ./nothing.png
-	}
+
+
 	Figure {
 		Title "Velocity profile"
 		Width 12cm
@@ -313,6 +322,7 @@ Chapter {
 			TypeLigne 4
 		}
 	}
+
 	Figure {
 		Title "Velocity profile U+"
 		Width 12cm
@@ -353,6 +363,7 @@ Chapter {
 			TypeLigne 5
 		}
 	}
+
 	Figure {
 		Title "Turbulent viscosity"
 		Width 12cm
@@ -387,13 +398,13 @@ Chapter {
 			TypeLigne 4
 		}
 	}
-}
-Chapter {
-	Title "Results : 3D - Reb = 100 000"
+
+	Description "$\bullet$ \latex_(\textbf{3D results for $Re_b = 10^5$}\latex_)"
+	Description "For 3D simulation, the relative errors are given in Table 4 for \latex_($Re_b=10^5$\latex_). The profiles of $U$, $U+$ and \latex_($\nu_t$\latex_) are presented on Figs 11, 12 and 13. For the same physical quantities, three additional graphs appear for comparing the TrioCFD profiles of 'Mixing length'-model and '$k-\epsilon$'-model for several meshes (Figs 14, 15 and 16)."
 	Table {
 		Title "3D - Reb = 100 000"
 		nb_columns 4
-		label Ny | y+ | Re$\tau$ | Relative error
+		label Ny | y+ | \latex_($Re_{\tau}$\latex_) | Relative error
 		line {
 			origin "analytique"
 			legend " "
@@ -444,16 +455,9 @@ Chapter {
 			columns ($1) ($2) ($3) ($4)
 		}
 	}
-	Figure {
-		Description "(*) : according to Dean's correlation : Re$\tau$ = 0.175.(Reb)7/8 "	
-		Width 0cm
-		picture ./nothing.png
-	}
-	Figure {
-		Description "NB : The use of 'tetraedriser_homogene mesh' for Ny=21 and k-eps model leads to higher relative error"	
-		Width 0cm
-		picture ./nothing.png
-	}
+
+	Description "NB : The use of 'tetraedriser_homogene mesh' for Ny=21 and k-eps model leads to higher relative error"
+
 	Figure {
 		Title "Velocity profile"
 		Width 12cm
@@ -488,6 +492,7 @@ Chapter {
 			TypeLigne 4
 		}
 	}
+
 	Figure {
 		Title "Velocity profile U+"
 		Width 12cm
@@ -528,6 +533,7 @@ Chapter {
 			TypeLigne 5
 		}
 	}
+
 	Figure {
 		Title "Turbulent viscosity"
 		Width 12cm
@@ -562,6 +568,7 @@ Chapter {
 			TypeLigne 4
 		}
 	}
+
 	Figure {
 		Title "Velocity profile comparison with keps"
 		Width 12cm
@@ -596,6 +603,7 @@ Chapter {
 			TypeLigne 4
 		}
 	}
+
 	Figure {
 		Title "Velocity profile U+ comparison with keps"
 		Width 12cm
@@ -636,6 +644,7 @@ Chapter {
 			TypeLigne 5
 		}
 	}
+
 	Figure {
 		Title "Turbulent viscosity comparison with keps"
 		Width 12cm
@@ -670,16 +679,9 @@ Chapter {
 			TypeLigne 4
 		}
 	}
-	Figure {
-		Title "Conclusion"
-		Description "By using mixing length model, the relative error for the friction in a plane channel is about 10$%$ for a "
-		Description "fully 3D turbulent (Reb=100000) modelisation."
-		Width 0cm
-		picture ./nothing.png
-	}
 }
-Chapter {
-	Title "Computer performance"
-	tableau_performance {
-	}
+#
+Conclusion {
+		Description "With the 'Mixing length'-model, compared to the Dean's correlation, the 2D relative errors on \latex_($Re_{\tau}$\latex_) is about 2% when \latex_($Re_b=10^4$\latex_) and 6% when \latex_($Re_b=10^5$\latex_). For the 3D simulations with \latex_($Re_b=10^5$\latex_), the relative error is about 10% with the 'Mixing length'-model whereas better results are obtained with the '$k-\epsilon$'-model (near 2%). Most of comparisons with the Reichardt anaytical law are well-fitted except for the 2D case with \latex_($N_y=41$\latex_) and \latex_($Re_b=10^5$\latex_)."
 }
+
