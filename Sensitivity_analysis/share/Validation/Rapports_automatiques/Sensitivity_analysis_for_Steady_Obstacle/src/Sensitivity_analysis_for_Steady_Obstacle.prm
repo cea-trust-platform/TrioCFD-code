@@ -32,12 +32,12 @@ Description The domain used for the numerical simulations is the one in Figure 1
 	  	}
 
 
-Description Finally, we consider the following parabolic inflow condition: $g(y) = y(y-l) 4A/l^2$ on $\Gamma_{In}$, where $A$ is the maximal value of the inflow velocity, and it is the uncertain parameter (i.e. $a=A$). $A$ is a Gaussian random variable of average $\mu_A$ and variance $\sigma_A^2$. 
+Description Finally, we consider the following parabolic inflow condition: \latex_($g(y) = y(y-l) 4A/l^2$\latex_) on \latex_($\Gamma_{In}$\latex_), where \latex_($A$\latex_) is the maximal value of the inflow velocity, and it is the uncertain parameter (i.e. \latex_($a=A$\latex_)). \latex_($A$\latex_) is a Gaussian random variable of average \latex_($\mu_A$\latex_) and variance \latex_($\sigma_A^2$\latex_). 
 
-Description In this test case, we consider a small inflow velocity, $\mu_A = 0.25$, which corresponds to $Re = 25$ and leads to a stationary solution. The probability density function of $A$ is shown in Figure 2 below the standard deviation $\sigma_A = 7.5 10^-3$ is small enough to apply the sensitivity method described above to compute the variance of the output. For more details see~[1].
+Description In this test case, we consider a small inflow velocity, $\latex_(\mu_A = 0.25$\latex_), which corresponds to \latex_($Re = 25$\latex_) and leads to a stationary solution. The probability density function of \latex_($A$\latex_) is shown in Figure 2 below the standard deviation \latex_($\sigma_A = 7.5 10^{-3}$\latex_) is small enough to apply the sensitivity method described above to compute the variance of the output. For more details see~[1].
 
 	 Figure {
-	 	Title "Figure 2: Probability density function of the uncertain parameter A."
+	 	Title "Figure 2: Probability density function of the uncertain parameter \latex_($A$\latex_)."
 		Width 12cm
 		picture Png/pdf.png 
 	  	}
@@ -51,146 +51,146 @@ Description In Figures 3.13-3.24, we compare the standard deviation estimated us
 Description As one can see, the two strategies give very similar results.
 
 	 Figure {
-	 	Title "Average of the pressure on the horizontal cross section $y = 0.2$."
+	 	Title "Average of the pressure on the horizontal cross section \latex_($y = 0.2$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Average_P_H2.png 
 	  	}
 	 Figure {
-	 	Title "Average of the pressure on the horizontal cross section $y = 0.35$."
+	 	Title "Average of the pressure on the horizontal cross section \latex_($y = 0.35$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Average_P_H3.png
 	  	}
 	 Figure {
-	 	Title "Average of the pressure on the vertical cross section $x = 1$."
+	 	Title "Average of the pressure on the vertical cross section \latex_($x = 1$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Average_P_V1.png 
 	  	}
 	 Figure {
-	 	Title "Average of the pressure on the vertical cross section $x = 0.6$."
+	 	Title "Average of the pressure on the vertical cross section \latex_($x = 0.6$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Average_P_V6.png
 	  	}
 	 Figure {
-	 	Title "Average of the horizontal velocity on the horizontal cross section $y = 0.2$."
+	 	Title "Average of the horizontal velocity on the horizontal cross section \latex_($y = 0.2$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Average_Ux_H2.png 
 	  	}
 	 Figure {
-	 	Title "Average of the vertical velocity on the horizontal cross section $y = 0.2$."
+	 	Title "Average of the vertical velocity on the horizontal cross section \latex_($y = 0.2$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Average_Uy_H2.png 
 	  	}
 	 Figure {
-	 	Title "Average of the horizontal velocity on the horizontal cross section $y = 0.35$."
+	 	Title "Average of the horizontal velocity on the horizontal cross section \latex_($y = 0.35$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Average_Ux_H3.png
 	  	}
 	 Figure {
-	 	Title "Average of the vertical velocity on the horizontal cross section $y = 0.35$."
+	 	Title "Average of the vertical velocity on the horizontal cross section \latex_($y = 0.35$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Average_Uy_H3.png
 	  	}
 	 Figure {
-	 	Title "Average of the horizontal velocity on the vertical cross section $x = 1$."
+	 	Title "Average of the horizontal velocity on the vertical cross section \latex_($x = 1$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Average_Ux_V1.png 
 	  	}
 	 Figure {
-	 	Title "Average of the vertical velocity on the vertical cross section $x = 1$."
+	 	Title "Average of the vertical velocity on the vertical cross section \latex_($x = 1$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Average_Uy_V1.png 
 	  	}
 	 Figure {
-	 	Title "Average of the horizontal velocity on the vertical cross section $x = 0.6$."
+	 	Title "Average of the horizontal velocity on the vertical cross section \latex_($x = 0.6$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Average_Ux_V6.png
 	  	}
 	 Figure {
-	 	Title "Average of the vertical velocity on the vertical cross section $x = 0.6$."
+	 	Title "Average of the vertical velocity on the vertical cross section \latex_($x = 0.6$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Average_Uy_V6.png
 	  	}
 
 	 Figure {
-	 	Title "Standard deviation of the pressure on the horizontal cross section $y = 0.2$."
+	 	Title "Standard deviation of the pressure on the horizontal cross section \latex_($y = 0.2$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Variance_P_H2.png 
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the pressure on the horizontal cross section $y = 0.35$."
+	 	Title "Standard deviation of the pressure on the horizontal cross section \latex_($y = 0.35$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Variance_P_H3.png
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the pressure on the vertical cross section $x = 1$."
+	 	Title "Standard deviation of the pressure on the vertical cross section \latex_($x = 1$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Variance_P_V1.png 
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the pressure on the vertical cross section $x = 0.6$."
+	 	Title "Standard deviation of the pressure on the vertical cross section \latex_($x = 0.6$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Variance_P_V6.png
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the horizontal velocity on the horizontal cross section $y = 0.2$."
+	 	Title "Standard deviation of the horizontal velocity on the horizontal cross section \latex_($y = 0.2$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Variance_Ux_H2.png 
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the vertical velocity on the horizontal cross section $y = 0.2$."
+	 	Title "Standard deviation of the vertical velocity on the horizontal cross section \latex_($y = 0.2$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Variance_Uy_H2.png 
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the horizontal velocity on the horizontal cross section $y = 0.35$."
+	 	Title "Standard deviation of the horizontal velocity on the horizontal cross section \latex_($y = 0.35$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Variance_Ux_H3.png
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the vertical velocity on the horizontal cross section $y = 0.35$."
+	 	Title "Standard deviation of the vertical velocity on the horizontal cross section \latex_($y = 0.35$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Variance_Uy_H3.png
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the horizontal velocity on the vertical cross section $x = 1$."
+	 	Title "Standard deviation of the horizontal velocity on the vertical cross section \latex_($x = 1$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Variance_Ux_V1.png 
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the vertical velocity on the vertical cross section $x = 1$."
+	 	Title "Standard deviation of the vertical velocity on the vertical cross section \latex_($x = 1$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
 		picture Resultats_MC/Variance_Uy_V1.png 
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the horizontal velocity on the vertical cross section $x = 0.6$."
+	 	Title "Standard deviation of the horizontal velocity on the vertical cross section \latex_($x = 0.6$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Variance_Ux_V6.png
 	  	}
 	 Figure {
-	 	Title "Standard deviation of the vertical velocity on the vertical cross section $x = 0.6$."
+	 	Title "Standard deviation of the vertical velocity on the vertical cross section \latex_($x = 0.6$\latex_)."
 		description "Comparison between Monte Carlo (MC) and the SA estimate."
 		Width 8cm
                 picture Resultats_MC/Variance_Uy_V6.png
