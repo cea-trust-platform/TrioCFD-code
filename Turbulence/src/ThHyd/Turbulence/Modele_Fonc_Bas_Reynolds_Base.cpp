@@ -124,14 +124,11 @@ DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_Paroi(DoubleTab& Cmu,
   return Cmu;
 }
 
-DoubleTab Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re(const Discretisation_base& dis,
-                                                           const Zone_dis&, const Zone_Cl_dis&,
-                                                           const DoubleTab&, const DoubleTab&,
-                                                           const Champ_base& K_Eps) const
+bool Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab& ) const
 {
   Cerr << "La viscosite anisotrope n'a pas ete developpe dans ce modele fonc" << finl;
   exit();
-  return 0;
+  return false;
 }
 
 const Champ_base& Modele_Fonc_Bas_Reynolds_Base::get_champ(const Motcle& nom) const

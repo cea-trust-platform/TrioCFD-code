@@ -148,22 +148,3 @@ Lire pb1
 
 Resoudre pb1
 Fin
-# 
-
-solveur_pression Cholesky { } 
-solveur_pression GCP {
-                        precond ssor { omega 1.500000 }
-                        seuil 1.000000e-07
-                }
-
-
-Traitement_particulier 
-		{ canal { 
-							debut_stat 9000.
-							fin_  stat 10000.
-							dt_impr_moy_spat 5000.	
-							dt_impr_moy_temp 5000.	
-						} 
-		}
- #
-

@@ -58,9 +58,6 @@ public:
   inline const Transport_K_Eps_base& eqn_transp_K_Eps() const;
   const Equation_base& equation_k_eps(int) const ;
 
-  inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
-  inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
-
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
   //Methode creer_champ pas codde a surcharger
@@ -71,8 +68,6 @@ public:
 
   void imprimer(Sortie&) const;
 private :
-
-  Modele_Fonc_Bas_Reynolds mon_modele_fonc;
   Transport_K_Eps_Bas_Reynolds  eqn_transport_K_Eps_Bas_Re;
   virtual Champ_Fonc& calculer_viscosite_turbulente(double temps);
 
@@ -100,16 +95,6 @@ inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::K_Eps() const
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::K_Eps()
 {
   return eqn_transport_K_Eps_Bas_Re.inconnue();
-}
-
-inline Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::associe_modele_fonction()
-{
-  return mon_modele_fonc;
-}
-
-inline const Modele_Fonc_Bas_Reynolds& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::associe_modele_fonction() const
-{
-  return  mon_modele_fonc;
 }
 
 inline int Modele_turbulence_hyd_K_Eps_Bas_Reynolds::nombre_d_equations() const

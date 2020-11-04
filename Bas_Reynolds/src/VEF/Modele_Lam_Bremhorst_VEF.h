@@ -81,11 +81,10 @@ public :
   virtual DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&,
                                          const Zone_VEF&, const Zone_Cl_VEF&) const;
 
-  virtual DoubleTab calcul_tenseur_Re(const Discretisation_base& dis, const Zone_dis&, const Zone_Cl_dis&,
-                                      const DoubleTab&, const DoubleTab&, const Champ_base&) const;
+  virtual bool calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   virtual DoubleTab calcul_tenseur_Re_elem(const Discretisation_base& dis,
                                            const Zone_dis&,const DoubleTab&, const DoubleTab&, const DoubleTab&,
-                                           const DoubleTab&,  const DoubleTab&, const Champ_base& K_Eps) const;
+                                           const DoubleTab&, const Champ_base& K_Eps) const;
   virtual DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base&) const ;
   virtual DoubleTab& Calcul_Fmu ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don& )const ;
   Entree& lire(const Motcle&, Entree&);
@@ -97,11 +96,10 @@ public :
                                         const Zone_dis&,
                                         const DoubleTab&, const DoubleTab&,
                                         const DoubleTab&, const DoubleTab& ,const DoubleTab& ,
-                                        const DoubleTab&,
                                         const Champ_base& K_Eps) const;
   DoubleTab calcul_tenseur_Re_shih(const Discretisation_base& dis,
                                    const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
-                                   const DoubleTab& G, const DoubleTab& visco_elem,
+                                   const DoubleTab& G,
                                    const Champ_base& K_Eps) const;
 protected:
 
