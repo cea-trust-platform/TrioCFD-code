@@ -23,7 +23,7 @@ Parameters {
 	
 	IncludeData 0
 
-        Reference "R. Lagrange and Yann Fraigneau. New estimations of the added mass and damping of two cylinders vibrating in a viscous fluid, from theoretical and numerical approaches. Journal of Fluids and Structures, 2020."	
+        Reference "New estimations of the added mass and damping of two cylinders vibrating in a viscous fluid, from theoretical and numerical approaches. R. Lagrange and Y. Fraigneau, Journal of Fluids and Structures, 2020."	
 }
 
 Chapter {

@@ -64,7 +64,7 @@ Read mon_schema
         # End time [s] ; T = 2*pi/R2*R2*OMEGA = 6933 (period in s) ; 5 periods #
 	tmax 34664
 	# Max number of time steps #
-         nb_pas_dt_max 2
+        # nb_pas_dt_max 2 #
         # Convergence threshold (see .dt_ev file) #
 	seuil_statio 1.e-15
 }

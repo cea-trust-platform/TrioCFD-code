@@ -1,0 +1,131 @@
+# Hydraulique 2D laminar with ALE : interaction of two cylinders subjected to small oscillations #
+# PARALLEL ONLY 10 # 
+
+
+dimension 2
+
+Pb_hydraulique_ALE pb
+Domaine_ALE dom 
+
+# BEGIN MESH #
+# Read_med family_names_from_group_names dom TwoOscillatingCylinders TwoOscillatingCylinders.med #
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+ END PARTITION #
+
+# BEGIN SCATTER #
+Scatter DOM.Zones dom 
+# END SCATTER #
+
+imposer_vit_bords_ale dom
+{
+	1 # number of mobile boundaries  #
+	CylinderRight Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # name and speed of the border ; KC = 0.01 so we have u = KC * R2 ; OMEGA = Sk * nu / (R2*R2) = 900 * 1.007e-6 = 9.063e-4 rad/s ; we have an oscillation position : g(t) = u*sin(OMEGA*t) --> derivative for velocity  #
+}
+
+# Solver used in order to solve the system giving the moving mesh velocity #
+Solver_moving_mesh_ALE dom { Petsc Cholesky {  } } 
+
+# I select a discretization #
+VEFPreP1B ma_discretisation
+
+# Time scheme, choice between: explicit or implicit #
+Scheme_euler_implicit mon_schema
+Read mon_schema
+{
+ 	# Time step #
+        # Initial time [s] #
+        tinit 0.
+	nb_pas_dt_max 3
+	# Min time step #
+        dt_min 1.e-15
+	# Output criteria #
+        # .out files printing period #
+        dt_impr 5.e-6
+	# .sauv files printing period #
+	# tcpumax 47.5 #
+	# .sauv files printing period #
+        periode_sauvegarde_securite_en_heures 23
+ 	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
+	facsec 1.
+        facsec_max 1.
+	solveur implicite_ALE
+	{
+          solveur gmres { diag seuil 1.e-12 nb_it_max 3 } 
+	}
+	# Stop if one of the following criteria is checked: #
+        # End time [s] ; T = 2*pi/R2*R2*OMEGA = 6933 (period in s) ; 5 periods #
+	tmax 34664
+	# Max number of time steps #
+        # Convergence threshold (see .dt_ev file) #
+	seuil_statio 1.e-15
+}
+
+# I define a medium #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu Champ_Uniforme 1 1.007e-3
+	rho Champ_Uniforme 1 1000
+}
+
+# Gravity vector definition 
+Uniform_field my_gravity
+Read my_gravity 2 0.0 0.0 #
+
+# Association between the different objects #
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+
+Read pb
+{
+	Navier_Stokes_standard_ALE
+	{
+		# Pressure matrix solved with #
+ 		solveur_pression petsc cholesky { }
+		# Two operators are defined #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		diffusion { }
+		# Uniform initial condition for velocity #
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		# Boundary conditions #
+		boundary_conditions {
+			CylinderRight  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # mobile bord in ALE framework ; KC = 0.01 so we have u = KC * R2 ; OMEGA = Sk * nu / (R2*R2) = 900 * 1.007e-7 = 9.063e-4 rad/s ; we have an oscillation position : g(t) = u*sin(OMEGA*t) --> derivative for velocity # 
+			CylinderLeft  paroi_fixe
+			RectangularBox paroi_fixe
+		}
+	}
+	Post_processing
+	{
+          
+		# Fields #
+		format lml 
+		fields dt_post 3000
+		{
+			pression_pa som
+			vitesse som
+			ALEMeshVelocity som
+		}
+} 
+
+# resume_last_time binaire TwoOscillatingCylinders_pb.sauv #
+
+}
+
+# The problem is solved with #
+Solve pb
+
+# Not necessary keyword to finish #
+End

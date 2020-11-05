@@ -1,4 +1,7 @@
-# Hydraulique 2D laminar with ALE : DIVA #
+# Hydraulique 2D laminar with ALE : DIVA configuration #
+# Set of circular cylinders, arranged in a square configuration. The central cylinders moves with an harmonic motion while the others are fixed  #
+# Moving domain #
+# SEQUENTIAL CALCULATION #
 
 dimension 2
 
