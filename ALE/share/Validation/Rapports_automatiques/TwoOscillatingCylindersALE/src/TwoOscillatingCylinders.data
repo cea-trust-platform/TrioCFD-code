@@ -1,6 +1,5 @@
 # Hydraulique 2D laminar with ALE : interaction of two cylinders subjected to small oscillations #
-# Warning : this is a numerical test case, we do not look at physical aspects in detail here #
-# PARALLEL ONLY 4 # 
+# PARALLEL ONLY 10 # 
 
 
 dimension 2
@@ -65,7 +64,7 @@ Read mon_schema
         # End time [s] ; T = 2*pi/R2*R2*OMEGA = 6933 (period in s) ; 5 periods #
 	tmax 34664
 	# Max number of time steps #
-        # nb_pas_dt_max 3 #
+         nb_pas_dt_max 2
         # Convergence threshold (see .dt_ev file) #
 	seuil_statio 1.e-15
 }
