@@ -18,13 +18,13 @@ Read sch
 	dt_max 1.e+2
 	dt_impr 1000.
 	dt_sauv 600.0
-	seuil_statio 1.e-8
+	seuil_statio 1.e-5
 	facsec 20
         facsec_max 200
        Solveur
            implicite
            {
-                seuil_convergence_solveur 1.e-8
+                seuil_convergence_solveur 1.e-5
            }
 }
 
