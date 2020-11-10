@@ -41,7 +41,7 @@ Chapter {
 	Description "...Hydraulic : Parabolic laminar profil with bulk velocity of 0.0276m/s"
 	Description "		    vitesse_champ_fonc_xyz dom01234 3 0. 0. 0.0552*(1-x*x-y*y)"
 	Description "		    Turbulent values k_Eps Champ_Uniforme 2 7.56e-6 2.8e-7"
-	Description "...Temperature : T=0${\circ}$C"
+	Description "...Temperature : T=0$^\circ$C"
 	Description "Boundary conditions :"
 	Description "...The periodicity conditions need a source term to maintain the flow constant Canal_perio{bord sortie}"
 	Description "...A constant heat flux is imposed on the wall paroi paroi_flux_impose Champ_Front_Uniforme 1 1."
