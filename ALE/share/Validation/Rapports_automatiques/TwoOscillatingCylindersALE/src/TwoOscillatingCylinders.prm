@@ -1,0 +1,117 @@
+Parameters {
+	Title "Hydrodynamic interaction of two cylinders subjected to small oscillations"	
+	Author "M. A. Puscas"
+	
+	Description "The domain used for the numerical simulations is the one in Figure 1. As we can see from Figure 1., we have a 2-dimensional domain \latex_($\mathcal{D}$\latex_), with arbitrarily large length and width. In this domain, we have a homogeneous Newtonian incompressible fluid at rest, characterized by its volume mass density \latex_($\rho$\latex_) and its kinematic viscosity \latex_($\nu$\latex_). In fact, we have two cylinders, with radius \latex_($R_j$\latex_) and center \latex_($O_j$\latex_), oscillating at an \latex_($\Omega$\latex_) angular frequency."
+	Description "This validation test case has been created to compare TrioCFD ALE results with the theoretical solution of such a problem [1]."
+	Description "We investigate the force exerted by the fluid on the cylindrical tube subjected to a transverse excitation. We will seek, in particular, on the characteristics of the fluid force, represented by the added mass and damping coefficients."
+	Description "A detailed analysis of the present test case  is presented in [1]." 
+        
+	TestCase  . TwoOscillatingCylinders.data 10   /*jdd en annexe*/ 
+
+
+	ParametersTRUST Problem: Pb_hydraulique_ALE
+	ParametersTRUST Dimension: 2D
+	ParametersTRUST Domain: Domaine_ALE
+	ParametersTRUST Pressure solver: Solver_moving_mesh_ALE PETSC Cholesky
+	ParametersTRUST Discretization: VEFPre1B
+	ParametersTRUST Time scheme: Scheme_euler_implicit with solver implicite_ALE GMRES
+	ParametersTRUST Medium: Fluide_Incompressible
+	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
+        ParametersTRUST Convection scheme: ALE muscl
+        
+	
+	IncludeData 0
+
+        Reference "New estimations of the added mass and damping of two cylinders vibrating in a viscous fluid, from theoretical and numerical approaches. R. Lagrange and Y. Fraigneau, Journal of Fluids and Structures, 2020."	
+}
+
+Chapter {
+	Title "Numerical setup" 
+        Description "The domain used for the numerical simulations is the one in Figure 1. The values of the parameters considered here are E = 2, Sk = 900, r = 1. The left cylinder (\latex_($C_1$\latex_)) is fixed and the right one (\latex_($C_2$\latex_)) moves with an harmonic motion alongside the $x$-axis:  \latex_(${\bf U_2}(T) = u\sin(\omega T) {\bf e_x}$\latex_), where $\latex_(u= 0.01$\latex_)." 
+	 Figure {
+	 	Title "Figure 1: The domain"
+		Width 12cm
+		picture pb_scheme.png
+	  	}
+}
+
+Chapter {
+	Title "Numerical results"
+	Description "In this section the Least Squares (LS) and Collocation (COL) methods (theoretical approximation solutions) presented in [1] for the force per unit length exerted by the fluid over the cylinders and the added coefficients are compared with the TrioCFD results."
+	Figure {
+		Title "Force per unit length of cylinder"
+		picture FluidForcesTwoOscillatingCylinders.pdf	  
+
+	}
+	
+	Table {
+		Title "Added mass and damping coefficients"	
+		Description "For the theoretical calculation of the added coefficients, the reader is referred to [1]. Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m_{self} &= \dfrac{\langle\sin(\omega t), F_{C_2}(t)\rangle}{\rho u (R_2)^2 \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F_{C_2}(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F_{C_2}(t) dt\\c_{self} &= \dfrac{\langle\cos(\omega t), F_{C_2}(t)\rangle}{\rho u (R_2)^2 \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F_{C_2}(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F_{C_2}(t) dt \\ m_{cross} &= \dfrac{\langle\sin(\omega t), F_{C_1}(t)\rangle}{\rho u (R_2)^2 \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F_{C_1}(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F_{C_1}(t) dt\\c_{cross} &= \dfrac{\langle\cos(\omega t), F_{C_1}(t)\rangle}{\rho u (R_2)^2 \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F_{C_1}(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F_{C_1}(t) dt \end{split} \end{equation}\latex_), where  \latex_($F_{C_1}$\latex_) represents the fluid force acting on the left cylinder (the static one) and \latex_($F_{C_2}$\latex_) represents the fluid force acting on the right cylinder (the moving one), and are reported in the following table: " 
+	
+		nb_columns 4		
+		label \latex_($m_{self}$\latex_) | \latex_($c_{self}$\latex_) | \latex_($m_{cross}$\latex_) | \latex_($c_{cross}$\latex_)
+		include_description_lines 0
+
+		Line {
+			legend "COL theory[1]"		
+			file COL_coefficients.txt
+		}
+		Line {
+			legend "LS theory[1]"		
+			file LS_coefficients.txt
+		}
+		
+		Line {
+			legend "TrioCFD"		
+			file Numerical_coefficients.txt				
+		}
+
+	}
+}
+
+Chapter {
+	Title "Residual over iterations"
+	Figure {
+		Title "Residual over iterations"
+		Description "The max residual is plotted in function of the number of iterations."	
+                LabelX "Iterations"
+		LabelY "residu=max|Ri|"
+		include_description_curves 0
+
+		Courbe {
+			legend "TrioCFD"
+			file TwoOscillatingCylinders.dt_ev
+			columns ($0+1) $4
+			Style linespoints
+		}
+	}
+}
+
+Chapter {
+	Title "Visualization via VisIt"
+	Description "Pressure and velocity fields are reported at final time in order to investigate such distributions. The mesh velocity and the total displacement of the mesh are also plotted."
+	
+	Visu {
+		Title "TrioCFD PRESSION SOM"
+		pseudocolor TwoOscillatingCylinders.lata dom PRESSION_PA SOM
+	}
+
+	
+	Visu {
+		Title "TrioCFD VITESSE_magnitude SOM"
+		pseudocolor TwoOscillatingCylinders.lata dom_magnitude VITESSE SOM
+	}
+	Visu {
+		Title "TrioCFD Mesh velocity SOM"
+		pseudocolor TwoOscillatingCylinders.lata dom_magnitude ALEMESHVELOCITY SOM
+	}
+
+		
+}
+
+Chapter {
+	Title "Conclusion"
+	Description "The harmonic motion of a circular wall in a quiescent viscous fluid, has been  numerically simulated. A FEV method is applied to solve such a problem in conjunction with the ALE approach. The numerical results for the fluid force and the added coefficients are in good agreement with the theoretical COL and LS approximation solution [1]."
+Description "Remark: in order to reduce the numerical error a much more refined mesh must be used!!!" 
+}
