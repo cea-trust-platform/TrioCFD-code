@@ -267,6 +267,7 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 floatentier objet_lecture nul 0 A real and an integer.
   attr the_float floattant the_float 0 Real.
   attr the_int entier the_int 0 Integer.
@@ -454,6 +455,7 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 schema_phase_field schema_temps_base schema_phase_field -1 Keyword for the only available Scheme for time discretization of the Phase Field problem.
   attr schema_ch schema_temps_base schema_ch 1 Time scheme for the Cahn-Hilliard equation.
   attr schema_ns schema_temps_base schema_ns 1 Time scheme for the Navier-Stokes equation.
@@ -650,6 +652,7 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 frontiere_ouverte_temperature_imposee_rayo_semi_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition for a radiation problem with semi transparent gas.
 paroi_echange_externe_impose_rayo_semi_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_semi_transp -1 External type exchange condition for a coupled problem with radiation in semi transparent gas.
 paroi_flux_impose_rayo_semi_transp_vdf paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vdf -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VDF).
@@ -820,6 +823,7 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 algo_base objet_u algo_base -1 Basic class for multi-grid algorithms.
 algo_couple_1 algo_base algo_couple_1 -1 not_set
   attr dt_uniforme rien dt_uniforme 1 not_set
@@ -987,6 +991,7 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
 pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
@@ -1131,7 +1136,7 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
-
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 
 pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
@@ -1277,5 +1282,5 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
-
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 

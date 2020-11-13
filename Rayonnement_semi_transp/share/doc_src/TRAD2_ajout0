@@ -168,3 +168,4 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
   attr delta floattant delta 0 not_set
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
