@@ -1,0 +1,14 @@
+# This is a prepare script for the validation test case Sensitivity_analysis_for_Steady_Obstacle #
+
+mkdir -p Output
+
+cd Output
+mv ../MeshWithSquare1.med .
+mv ../*.data .
+mv ../post_run .
+mv ../post_processing_MC.py .
+cd ..
+
+
+
+
