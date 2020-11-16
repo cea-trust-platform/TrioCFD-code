@@ -68,7 +68,7 @@ Fluide_Incompressible fluide
 Lire fluide
 {
    mu       Champ_Uniforme 1 4.9488e-5
-   lambda  Champ_Fonc_fonction 1 temperature
+   lambda  champ_fonc_fonction temperature 1
     (val[800.)*7.0464E-02+(val>800.)*(val[1300.)*(7.0464E-02+(0.1388-7.0464E-02)/500.*(val-800.))+(val>1300.)*(val[1500.)*(0.1388+(0.1666-0.1388)/200.*(val-1300.))+(val>1300.)*0.1666
        
    Cp      Champ_Uniforme 1 2460.13

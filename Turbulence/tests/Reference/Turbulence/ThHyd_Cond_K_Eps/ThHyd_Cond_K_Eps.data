@@ -117,7 +117,7 @@ Read sol
 Fluide_Incompressible air
 Read air
 {
-	mu Champ_Fonc_Tabule 1 Temperature 
+	mu champ_fonc_tabule Temperature 1 
 		{
 		4
 		20 40 60 80
@@ -125,7 +125,7 @@ Read air
 		}
 	rho Champ_Uniforme 1 1.205
 	
-	lambda Champ_Fonc_Tabule 1 temperature
+	lambda champ_fonc_tabule temperature 1
 		{
 		4
 		20 40 60 80
