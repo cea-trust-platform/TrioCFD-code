@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
+16/11/20 (TrioCFD) New feature : New baltik Sensitivity_analysis : provide an estimate of the variance of the velocity field in NS
 01/09/20 (TrioCFD) New feature : Add possibility to post-process ustar with negligeable wall law in VEF discretization
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.1 : Enhancements, modifications and corrected bugs since version 1.8.0 :
