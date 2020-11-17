@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
+17/11/20 (TrioCFD) New feature : triocfd -index gives now access to html index of TrioCFD.
+17/11/20 (TrioCFD) New feature : Adding triocfd script that overloads trust script.
 16/11/20 (TrioCFD) New feature : New baltik Sensitivity_analysis : provide an estimate of the variance of the velocity field in NS
 10/11/20 (TrioCFD) Validation  : Add 2 validation sheets for ALE Baltik : DIVA and TwoOscillatingCylindersALE
 05/11/20 (TrioCFD) New feature : Adding postprocessing the residues of all the unknown factors of the problem
