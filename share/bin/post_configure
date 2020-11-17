@@ -9,7 +9,7 @@ Doxygen documentation is not yet generated!<BR><BR>
 To generate it, run :<BR>
  make doxygen" > build/html/index.html
 fi
-sed "s/TRUSTV/$TRUST_VERSION/" share/doc/index.html.in > index.html
+sed "s/TRUSTV/$TRUST_VERSION/" share/doc_src/index.html.in > index.html
 sed -i "s?TRUSTR?$TRUST_ROOT?g" index.html
 echo "#!/bin/bash
 # Surcharge du script trust pour plusieurs actions:
