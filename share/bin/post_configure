@@ -1,4 +1,29 @@
 mkdir -p share/doc_src
 cat /dev/null > share/doc_src/TRAD2_ajout0
 cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') > share/doc_src/TRAD2_ajout0 2>/dev/null
+if [ ! -f build/html/index.html ]
+then
+ mkdir -p build/html/
+ echo "<BR><BR>
+Doxygen documentation is not yet generated!<BR><BR>
+To generate it, run :<BR>
+ make doxygen" > build/html/index.html
+fi
+sed "s/TRUSTV/$TRUST_VERSION/" share/doc/index.html.in > index.html
+sed -i "s?TRUSTR?$TRUST_ROOT?g" index.html
+echo "#!/bin/bash
+# Surcharge du script trust pour plusieurs actions:
+
+# Exemple, lancement de l'index:
+if [ \"\$1\" = -index ]
+then
+   \$TRUST_WEBBROWSER \$project_directory/index.html &
+else
+   trust \$*
+fi" > share/bin/triocfd
+chmod ugo+x share/bin/triocfd
+echo "export PATH=\${project_directory}/share/bin:\$PATH
+complete -F _trust triocfd" >> env_TrioCFD.sh
+echo "export PATH=\${project_directory}/share/bin:\$PATH
+complete -F _trust triocfd" >> full_env_TrioCFD.sh
 exit 0
