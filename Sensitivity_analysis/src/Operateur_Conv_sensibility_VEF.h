@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,49 +14,53 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Convection_Diffusion_Temperature_sensibility.h
-// Directory : $BALTIK_SENSIBILITY_ROOT/src/New
+// File      : Operateur_Conv_sensibility_VEF.h
+// Directory : $$Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Convection_Diffusion_Temperature_sensibility_included
-#define Convection_Diffusion_Temperature_sensibility_included
+#ifndef Operateur_Conv_sensibility_VEF_included
+#define Operateur_Conv_sensibility_VEF_included
 
-#include <Convection_Diffusion_Temperature.h>
+#include <Operateur_Conv_sensibility.h>
+#include <Ref_Zone_VEF.h>
+#include <Ref_Zone_Cl_VEF.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class Convection_Diffusion_Temperature_sensibility
+// .DESCRIPTION : class Operateur_Conv_sensibility_VEF
 //
-// <Description of class Convection_Diffusion_Temperature_sensibility>
+// <Description of class Operateur_Conv_sensibility_VEF>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Convection_Diffusion_Temperature_sensibility : public Convection_Diffusion_Temperature
+class Operateur_Conv_sensibility_VEF : public Operateur_Conv_sensibility
 {
 
-  Declare_instanciable( Convection_Diffusion_Temperature_sensibility ) ;
+  Declare_instanciable( Operateur_Conv_sensibility_VEF ) ;
 
 public :
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle& mot, Entree& is);
-  void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
-  void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
-  virtual  void mettre_a_jour(double temps);
-  const DoubleTab& get_velocity_state_field() const;
-  const DoubleTab& get_temperature_state_field() const;
-  const Champ_Inc_base& get_velocity_state() const;
-  const Champ_Inc_base& get_temperature_state() const;
-  const Motcle& get_uncertain_variable_name() const;
+  virtual void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
+  virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
+  void ajouter_Lstate_sensibility_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const; //L(U0)U1
+  void ajouter_Lsensibility_state_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const;//L(U1)U0
+  void calcul_vc(const ArrOfInt&, ArrOfDouble& , const ArrOfDouble& s, const DoubleTab& , const DoubleTab& ,int  ) const;
+  virtual void remplir_fluent(DoubleVect& ) const;
+  double calculer_dt_stab() const;
+  void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
+  void add_diffusion_scalar_term(const DoubleTab&, DoubleTab&, double diffu=1.) const;
+  inline double viscA(int face_i, int face_j, int num_elem, double diffu=1.) const;
+  void ajouter_conv_term(const Champ_Inc_base&, const DoubleTab&, DoubleTab&, DoubleTab& ) const;
+  double application_LIMITEUR(double, double, Motcle&) const;
 
 protected :
-  REF(Champ_Inc_base) velocity_state_field;  //Reference to the unknown velocity field of the state problem
-  REF(Champ_Inc_base) temperature_state_field;  //Reference to the unknown temperature field of the state problem
-  Nom name_state_pb;                      //name of the problem state
-  Motcle name_velocity_state_field;         //name of the unknown velocity field of the state problem
-  Motcle name_temperature_state_field;      //name of the unknown temperature field of the state problem
-  Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
+  REF(Zone_VEF) la_zone_vef;
+  REF(Zone_Cl_VEF) la_zcl_vef;
+  mutable DoubleVect fluent;           // tableau qui sert pour le calcul du pas de temps de stabilite
+  mutable ArrOfInt traitement_pres_bord_;
+  mutable ArrOfInt est_une_face_de_dirichlet_;
 
 };
 
-#endif /* Convection_Diffusion_Temperature_sensibility_included */
+
+#endif /* Operateur_Conv_sensibility_VEF_included */

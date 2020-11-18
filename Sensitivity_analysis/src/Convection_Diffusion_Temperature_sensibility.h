@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,51 +14,49 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Pb_Thermohydraulique_sensibility.h
-// Directory : $BALTIK_SENSIBILITY_ROOT/src/New
+// File      : Convection_Diffusion_Temperature_sensibility.h
+// Directory : $Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Pb_Thermohydraulique_sensibility_included
-#define Pb_Thermohydraulique_sensibility_included
+#ifndef Convection_Diffusion_Temperature_sensibility_included
+#define Convection_Diffusion_Temperature_sensibility_included
 
-#include <Pb_qdm_fluide.h>
-#include <Navier_Stokes_std_sensibility.h>
-#include <Convection_Diffusion_Temperature_sensibility.h>
+#include <Convection_Diffusion_Temperature.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class Pb_Thermohydraulique_sensibility
+// .DESCRIPTION : class Convection_Diffusion_Temperature_sensibility
 //
-// <Description of class Pb_Thermohydraulique_sensibility>
-//  Cette classe represente un probleme de sensibilite thermohydraulique :
-//      - Equations de Navier_Stokes_sensibility en regime laminaire
-//        pour un fluide incompressible
-//      - Equation sensibilite d'energie en regime laminaire
-// .SECTION voir aussi
-//     class Pb_Thermohydraulique, class Navier_Stokes_sensibility, class Convection_Diffusion_Temperature_sensibility
+// <Description of class Convection_Diffusion_Temperature_sensibility>
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Pb_Thermohydraulique_sensibility : public Pb_qdm_fluide
+class Convection_Diffusion_Temperature_sensibility : public Convection_Diffusion_Temperature
 {
 
-  Declare_instanciable( Pb_Thermohydraulique_sensibility ) ;
+  Declare_instanciable( Convection_Diffusion_Temperature_sensibility ) ;
 
-public:
+public :
+  void set_param(Param& param);
+  int lire_motcle_non_standard(const Motcle& mot, Entree& is);
+  void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
+  void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
+  virtual  void mettre_a_jour(double temps);
+  const DoubleTab& get_velocity_state_field() const;
+  const DoubleTab& get_temperature_state_field() const;
+  const Champ_Inc_base& get_velocity_state() const;
+  const Champ_Inc_base& get_temperature_state() const;
+  const Motcle& get_uncertain_variable_name() const;
 
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const ;
-  Equation_base& equation(int);
-  void associer_milieu_base(const Milieu_base& );
-  int verifier();
-
-protected:
-
-  Navier_Stokes_std_sensibility eq_hydraulique;
-  Convection_Diffusion_Temperature_sensibility eq_thermique;
-
+protected :
+  REF(Champ_Inc_base) velocity_state_field;  //Reference to the unknown velocity field of the state problem
+  REF(Champ_Inc_base) temperature_state_field;  //Reference to the unknown temperature field of the state problem
+  Nom name_state_pb;                      //name of the problem state
+  Motcle name_velocity_state_field;         //name of the unknown velocity field of the state problem
+  Motcle name_temperature_state_field;      //name of the unknown temperature field of the state problem
+  Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
 
 };
 
-#endif /* Pb_Thermohydraulique_sensibility_included */
+#endif /* Convection_Diffusion_Temperature_sensibility_included */
