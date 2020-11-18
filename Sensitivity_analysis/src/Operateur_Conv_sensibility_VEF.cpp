@@ -1,4 +1,5 @@
 /****************************************************************************
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,7 +15,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // File      : Operateur_Conv_sensibility_VEF.cpp
-// Directory : $BALTIK_COUPLAGE_ROOT/src/New
+// Directory : $$Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 

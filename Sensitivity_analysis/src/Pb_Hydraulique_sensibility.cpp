@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // File      : Pb_Hydraulique_sensibility.cpp
-// Directory : $BALTIK_COUPLAGE_ROOT/src/New
+// Directory : $Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -24,7 +24,7 @@
 
 Implemente_instanciable(Pb_Hydraulique_sensibility,"Pb_Hydraulique_sensibility",Pb_qdm_fluide);
 // XD Pb_Hydraulique_sensibility Pb_base Pb_Hydraulique_sensibility -1 Resolution of hydraulic sensibility problems
-// XD  attr Navier_Stokes_std_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_std_sensibility 0 Navier-Stokes sensibility equations
+// XD  attr Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility 0 Navier-Stokes sensibility equations
 
 
 // Description:

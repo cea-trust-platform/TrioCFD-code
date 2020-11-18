@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,53 +14,51 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Operateur_Conv_sensibility_VEF.h
-// Directory : $BALTIK_COUPLAGE_ROOT/src/New
+// File      : Pb_Thermohydraulique_sensibility.h
+// Directory : $Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Operateur_Conv_sensibility_VEF_included
-#define Operateur_Conv_sensibility_VEF_included
+#ifndef Pb_Thermohydraulique_sensibility_included
+#define Pb_Thermohydraulique_sensibility_included
 
-#include <Operateur_Conv_sensibility.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Zone_Cl_VEF.h>
+#include <Pb_qdm_fluide.h>
+#include <Navier_Stokes_std_sensibility.h>
+#include <Convection_Diffusion_Temperature_sensibility.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class Operateur_Conv_sensibility_VEF
+// .DESCRIPTION : class Pb_Thermohydraulique_sensibility
 //
-// <Description of class Operateur_Conv_sensibility_VEF>
+// <Description of class Pb_Thermohydraulique_sensibility>
+//  Cette classe represente un probleme de sensibilite thermohydraulique :
+//      - Equations de Navier_Stokes_sensibility en regime laminaire
+//        pour un fluide incompressible
+//      - Equation sensibilite d'energie en regime laminaire
+// .SECTION voir aussi
+//     class Pb_Thermohydraulique, class Navier_Stokes_sensibility, class Convection_Diffusion_Temperature_sensibility
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Operateur_Conv_sensibility_VEF : public Operateur_Conv_sensibility
+class Pb_Thermohydraulique_sensibility : public Pb_qdm_fluide
 {
 
-  Declare_instanciable( Operateur_Conv_sensibility_VEF ) ;
+  Declare_instanciable( Pb_Thermohydraulique_sensibility ) ;
 
-public :
-  virtual void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
-  virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
-  void ajouter_Lstate_sensibility_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const; //L(U0)U1
-  void ajouter_Lsensibility_state_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const;//L(U1)U0
-  void calcul_vc(const ArrOfInt&, ArrOfDouble& , const ArrOfDouble& s, const DoubleTab& , const DoubleTab& ,int  ) const;
-  virtual void remplir_fluent(DoubleVect& ) const;
-  double calculer_dt_stab() const;
-  void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
-  void add_diffusion_scalar_term(const DoubleTab&, DoubleTab&, double diffu=1.) const;
-  inline double viscA(int face_i, int face_j, int num_elem, double diffu=1.) const;
-  void ajouter_conv_term(const Champ_Inc_base&, const DoubleTab&, DoubleTab&, DoubleTab& ) const;
-  double application_LIMITEUR(double, double, Motcle&) const;
+public:
 
-protected :
-  REF(Zone_VEF) la_zone_vef;
-  REF(Zone_Cl_VEF) la_zcl_vef;
-  mutable DoubleVect fluent;           // tableau qui sert pour le calcul du pas de temps de stabilite
-  mutable ArrOfInt traitement_pres_bord_;
-  mutable ArrOfInt est_une_face_de_dirichlet_;
+  int nombre_d_equations() const;
+  const Equation_base& equation(int) const ;
+  Equation_base& equation(int);
+  void associer_milieu_base(const Milieu_base& );
+  int verifier();
+
+protected:
+
+  Navier_Stokes_std_sensibility eq_hydraulique;
+  Convection_Diffusion_Temperature_sensibility eq_thermique;
+
 
 };
 
-
-#endif /* Operateur_Conv_sensibility_VEF_included */
+#endif /* Pb_Thermohydraulique_sensibility_included */

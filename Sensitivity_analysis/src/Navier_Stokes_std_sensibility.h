@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,44 +14,45 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Pb_Hydraulique_sensibility.h
-// Directory : $BALTIK_COUPLAGE_ROOT/src/New
+// File      : Navier_Stokes_std_sensibility.h
+// Directory : $Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Pb_Hydraulique_sensibility_included
-#define Pb_Hydraulique_sensibility_included
+#ifndef Navier_Stokes_std_sensibility_included
+#define Navier_Stokes_std_sensibility_included
 
-#include <Pb_qdm_fluide.h>
-#include <Champ_Don.h>
-#include <Navier_Stokes_std_sensibility.h>
+#include <Navier_Stokes_std.h>
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION
-//     classe Pb_Hydraulique_sensibility
-//     Cette classe represente un probleme hydraulique standard dans lequel
-//     on resout les equations de Navier Stokes en regime laminaire
-//     pour un fluide incompressible
-//     La formulation est de type vitesse pression
-// .SECTION voir aussi
-//      Navier_Stokes_std Pb_qdm_fluide Fluide_Incompressible
-//////////////////////////////////////////////////////////////////////////////
-class Pb_Hydraulique_sensibility : public Pb_qdm_fluide
+// .DESCRIPTION : class Navier_Stokes_std_sensibility
+//
+// <Description of class Navier_Stokes_std_sensibility>
+//
+/////////////////////////////////////////////////////////////////////////////
+
+class Navier_Stokes_std_sensibility : public Navier_Stokes_std
 {
-  Declare_instanciable(Pb_Hydraulique_sensibility);
+
+  Declare_instanciable( Navier_Stokes_std_sensibility ) ;
 
 public :
-
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const;
-  Equation_base& equation(int);
-  void associer_milieu_base(const Milieu_base& );
+  void set_param(Param& param);
+  int lire_motcle_non_standard(const Motcle& mot, Entree& is);
+  void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
+  void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
+  virtual  void mettre_a_jour(double temps);
+  const DoubleTab& get_state_field() const;
+  const Champ_Inc_base& get_state() const;
+  const Motcle& get_uncertain_variable_name() const;
 
 protected :
-
-  Navier_Stokes_std_sensibility  eq_hydraulique;
+  REF(Champ_Inc_base) state_field;  //Reference to the unknown field of the state problem
+  Nom name_state_pb;                      //name of the problem state
+  Motcle name_state_field;                 //name of the unknown field of the state problem
+  Motcle uncertain_var;     				//name of the unknown field of the uncertain variable
 
 };
 
-#endif /* Pb_Hydraulique_sensibility_included */
+#endif /* Navier_Stokes_std_sensibility_included */

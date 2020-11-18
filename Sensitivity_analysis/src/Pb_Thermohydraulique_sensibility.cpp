@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2020, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //
 // File      : Pb_Thermohydraulique_sensibility.cpp
-// Directory : $BALTIK_SENSIBILITY_ROOT/src/New
+// Directory : $Sensitivity_analysis/src
 //
 /////////////////////////////////////////////////////////////////////////////
 
