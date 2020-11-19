@@ -1,0 +1,10 @@
+#!/bin/bash
+# Surcharge du script trust pour plusieurs actions:
+
+# Exemple, lancement de l'index:
+if [ "$1" = -index ]
+then
+   $TRUST_WEBBROWSER $project_directory/index.html &
+else
+   trust $*
+fi
