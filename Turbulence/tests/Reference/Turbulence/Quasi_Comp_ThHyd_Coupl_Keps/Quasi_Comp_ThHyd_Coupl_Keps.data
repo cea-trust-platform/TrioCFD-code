@@ -57,7 +57,7 @@ Solide combustible
 Read combustible
 {
 	rho Champ_Uniforme 1 8000.
-	lambda Champ_Fonc_fonction 1 temperature 12.76+0.00871*(val-273)-0.00000188*(val-273)*(val-273)
+	lambda champ_fonc_fonction temperature 1 12.76+0.00871*(val-273)-0.00000188*(val-273)*(val-273)
 	Cp Champ_Uniforme 1 2296.
 }
 
