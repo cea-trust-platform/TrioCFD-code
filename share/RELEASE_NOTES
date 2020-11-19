@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
-10/11/20 (TrioCFD) Validation : Add 2 validation sheets for ALE Baltik : DIVA and TwoOscillatingCylindersALE
+19/11/20 (TrioCFD) Validation  : Update test cases after syntax change for Champ_Fonc_Fonction, Champ_Fonc_Fonction_txyz, Champ_Fonc_Tabule,Champ_Fonc_Fonction_txyz_Morceaux in TRUST
+10/11/20 (TrioCFD) Validation  : Add 2 validation sheets for ALE Baltik : DIVA and TwoOscillatingCylindersALE
 05/11/20 (TrioCFD) New feature : Adding postprocessing the residues of all the unknown factors of the problem
 03/11/20 (TrioCFD) Bug fixed   : Disabling a loop vectorization in Shih_Zhu_Lumley_VDF model to avoid crash on intel compilers
 30/10/20 (TrioCFD) Change      : Add a missing term in the deformation tensor for non-uniform viscosity in VDF (laminar or turbulent flow)
