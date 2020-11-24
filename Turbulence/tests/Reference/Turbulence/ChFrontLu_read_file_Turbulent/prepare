@@ -1,8 +1,10 @@
 #!/bin/bash
 
+trust -copy ChFrontLu_gen_file_Turbulent
 jdd=ChFrontLu_gen_file_Turbulent.data
-cp -f $Turbulence_project_directory/tests/Reference/Turbulence/ChFrontLu_gen_file_Turbulent/*.geom .
-cp -f $Turbulence_project_directory/tests/Reference/Turbulence/ChFrontLu_gen_file_Turbulent/$jdd .
+cp -f ChFrontLu_gen_file_Turbulent/*.geom .
+cp -f ChFrontLu_gen_file_Turbulent/$jdd .
+rm -rf ChFrontLu_gen_file_Turbulent
 
 chmod +w $jdd
 echo $ECHO_OPTS "1,$ s?nb_pas_dt_max 10?nb_pas_dt_max 1?g\nw" | ed $jdd
