@@ -160,7 +160,6 @@
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/Drag STD
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/Mixing_Bidim_Axi NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/PeriodicBox STD
-./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/QC_verifP STD
 ./validation/share/Validation/Rapports_automatiques/Validant/pas_fini/ConvectionJuarez NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/FVCAB_Cas_2.2_3D_steady_Stokes_Taylor_Green_vortex STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Bench/Vorticite_et_fonction_de_Courant STD
