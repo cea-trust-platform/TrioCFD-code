@@ -122,7 +122,13 @@ Entree& Tenseur_Reynolds_Externe_VDF_Face::readOn(Entree& is )
 
 void Tenseur_Reynolds_Externe_VDF_Face::readNN()
 {
-  string path_NN = string(getenv("project_directory")) + "/share/reseaux_neurones/";
+  string path_NN;
+  // Si on est dans un baltik qui utilise la turbulence (par exemple TrioCFD)
+  if (getenv("Turbulence_project_directory")!= NULL)
+    path_NN = string(getenv("Turbulence_project_directory")) + "/share/reseaux_neurones/";
+  // Si on est dans Turbulence (je crois qu'on ne peut pas avoir d'autres configuration)
+  else
+    path_NN = string(getenv("project_directory")) + "/share/reseaux_neurones/";
   string model_NN_file = path_NN + string(nn_casename) + ".keras";
   string ppp_NN_file = path_NN + string(nn_casename) + ".ppp";
 
