@@ -42,6 +42,7 @@
 #include <Debog.h>
 #include <Array_tools.h>
 #include <Param.h>
+#include <stat_counters.h>
 
 //#define PATCH_HYSTERESIS_V2
 //#define PATCH_HYSTERESIS_V3
