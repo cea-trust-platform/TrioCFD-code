@@ -46,7 +46,7 @@ Pb_description {
 		Description "The initial velocity is set equal to 0 m/s in all the domain. Symmetry is applied in $z$-direction The boundary conditions are velocity imposed at inlet to 0.0415 m/s, and pressure imposed to 0 Pa at outlet. The turbulent kinetic energy is set to 1.6e-7\latex_( $ m^2/s^2 $ \latex_) on intlet and outlet, and the turbulent dissipation rate set to 1.6e-8\latex_( $ m^3/s^2 $ \latex_) on intlet and outlet. Thin boundary layer equations model are solved on all wall boundaries with 50 nodes in the TBLE grid and a stretching ratio equal to 1."
 	}
 	Propfluide {
-		Description "The physical properties of water at 48.9$^{\circ}$C are set equal to $\rho$ = 988.03 kg/m$^3$ for denstiy, $\mu$ = 5.49e-4 kg/m/s for dynamic viscosity, $\lambda$ = 0.59 W/m/K for thermal conductivity, \latex_($C_p$\latex_) = 4180 J/kg/K for specific heat, and $\beta$ = 3.9e-4 1/K for thermal expansion coefficient."
+		Description "The physical properties of water at 48.9$^\circ$C are set equal to $\rho$ = 988.03 kg/m$^3$ for denstiy, $\mu$ = 5.49e-4 kg/m/s for dynamic viscosity, $\lambda$ = 0.59 W/m/K for thermal conductivity, \latex_($C_p$\latex_) = 4180 J/kg/K for specific heat, and $\beta$ = 3.9e-4 1/K for thermal expansion coefficient."
 	}
 	Phyecou {
 		Description "It is expected to observe a thermal stratification of flow and the establishment of natural convection phenomenon in the upper plenum. A turbulence model is taken into account as well as buoyancy force with the Boussinesq approximation and wall function."
@@ -497,7 +497,7 @@ Results {
 			}
 		}
 	Description "$\bullet$ \latex_(\textbf{Temperature profiles}\latex_)"
-	Description "The temperature profiles are plotted on Fig. 13 (P1 line) and Fig. 14 (P4 line). On both graphs we can observe that the temperatures are over-estimated for height 0mm. The experimental temperature is about 40$^{\circ}$C wheras the numerical temperatures are near 44$^{\circ}$C. When the height increases (\latex_($H>100$\latex_) mm) the numerical temperatures are under-estimated compared to the experimental profile."
+	Description "The temperature profiles are plotted on Fig. 13 (P1 line) and Fig. 14 (P4 line). On both graphs we can observe that the temperatures are over-estimated for height 0mm. The experimental temperature is about 40$^\circ$C wheras the numerical temperatures are near 44$^\circ$C. When the height increases (\latex_($H>100$\latex_) mm) the numerical temperatures are under-estimated compared to the experimental profile."
 	Figure {
 		Title "Temperature profiles along P1 line"
 		Width 12cm

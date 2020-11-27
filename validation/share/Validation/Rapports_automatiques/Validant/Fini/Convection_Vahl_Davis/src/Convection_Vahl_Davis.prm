@@ -36,13 +36,13 @@ Parameters {
 }
 #
 Objectif {
-	Description "The Vahl Davis benchmark is one of the most known test case for checking the coupling between flow and thermics in laminar condition. The coupling between the Navier-Stokes equations and the temperature one is carried out with the Boussinesq approximation."
-	Description "The validations are presented for three meshes: the first one for the VDF scheme and the two other for the VEF scheme (one coarse and another one fine)."
+	Description "The Vahl Davis benchmark is one of the well known test case for checking the coupling between flow and thermics in laminar condition. The coupling between the Navier-Stokes equations and the temperature one is carried out with the Boussinesq approximation."
+	Description "The validations are presented for three meshes: the first one for the VDF discretization and the two other for the VEF discretization (one coarse and another one fine)."
 }
 #
 Pb_description {
 	geometrie {
-		Description "The system geometry is a square domain of dimension 1mx1m."
+		Description "The geometry is a square domain of dimensions 1mx1m."
 	}
 	CICL {
 		Description "The initial and boundary conditions must be imposed for temperature equations and fluid flow equations:"
@@ -50,7 +50,7 @@ Pb_description {
 		Description "$\bullet$ For fluid flow equations, the initial condition is a uniform velocity \latex_($\mathbf{V}=\mathbf{0}$\latex_) m/s and no-slip boundary conditions (walls) are applied on all boundaries."
 	}
 	Propfluide {
-		Description "In the incompressible Navier-Stokes model, the parameters in the equation of impulsion balance equation are the dynamic viscosity $\mu$, the density $\rho$ and the thermal expansion coefficient \latex_($\beta_{th}$\latex_). In the temperature equation, the parameters are the thermal conductivity and the specific heat \latex_($C_{p}$\latex_). For physical problem involving a coupling between fluid flow and thermics, a dimensionless number, the Rayleigh is defined such as: \latex_($Ra=\frac{g\beta_{th}}{\nu\mathcal{D}}(T_{\Gamma_{1}}-T_{\Gamma_{3}})H^{3}$\latex_) where $\nu$ is the kinematic viscosity, \latex_($\mathcal{D}$\latex_) is thermal diffusivity and $H$ is the domain size. The values of those parameters are indicated in Table 1."
+		Description "In the incompressible Navier-Stokes model, the parameters in the equation of impulsion balance equation are the dynamic viscosity $\mu$, the density $\rho$ and the thermal expansion coefficient \latex_($\beta_{th}$\latex_). In the temperature equation, the parameters are the thermal conductivity and the specific heat \latex_($C_{p}$\latex_). For physical problem involving a coupling between fluid flow and thermics, a dimensionless number, the Rayleigh is defined such as: \latex_($Ra=\frac{g\beta_{th}}{\nu\mathcal{D}}(T_{\Gamma_{1}}-T_{\Gamma_{3}})H^{3}$\latex_) where $\nu$ is the kinematic viscosity, \latex_($\mathcal{D}$\latex_) is thermal diffusivity and $H$ is the domain size. The values of those parameters are summarized in Table 1."
 		Table {
 			Title "Physical properties"
 			Description " "
@@ -101,19 +101,19 @@ Pb_description {
 #
 Casesetup {
 	Maillage {
-		Description "The simulattions with TrioCFD are run for three two-dimensional meshes: the first one for the VDF scheme and the two other ones for the VEF scheme (one coarse and another one fine). The VDF mesh, presented on Fig. 1 is composed of 4761 square cells for an area of 1m by 1m. The VEF meshes are respectively composed of 1444 triangular cells, (coarse mesh obtained with option Trianguler_H) and  6084 triangular cells (fine mesh, obtained with option Trianguler_H) for the same area. They are both presented on Figs. 2 and 3."
+		Description "The simulattions with TrioCFD are run for three two-dimensional meshes: the first one for the VDF discretization and the two other ones for the VEF discretization (one coarse and another one fine). The VDF mesh, presented on Fig. 1 is composed of 4761 square cells for an area of 1m by 1m. The VEF meshes are respectively composed of 1444 triangular cells, (coarse mesh obtained with option Trianguler_H) and  6084 triangular cells (fine mesh, obtained with option Trianguler_H) for the same area. They are both presented on Figs. 1 and 2."
 		visu {
-			Title "2D Mesh VDF"
+			Title "2D VDF Mesh"
 			Width 10cm,trim = 100 105 20 100,clip
 			mesh VDF/Amont/test.lata dom
 		}
 		visu {
-			Title "2D coarse Mesh VEF"
+			Title "2D coarse VEF Mesh"
 			Width 10cm,trim = 100 105 20 100,clip
 			mesh VEF_CoarseMesh/Amont/test.lata dom
 		}
 		visu {
-			Title "2D fine Mesh VEF"
+			Title "2D fine VEF Mesh "
 			Width 10cm,trim = 100 105 20 100,clip
 			mesh VEF_FineMesh/Amont/test.lata dom
 		}
@@ -122,7 +122,7 @@ Casesetup {
 		Description "The gravity is downward."
 	}
 	Autres_options {
-		Description "TrioCFD simulations are performed with several numerical options for the VDF and VEF schemes. When plotting the temperature and velocity profiles, several curves will be presented, each one of them corresponding to the options 'Amont' or 'Quick' for VDF and 'Muscl', 'Amont', 'EF_stab' (alpha=1) and 'EF_stab (alpha=0.2)' for VEF (for each mesh Coarse/Fine). The options are summarized in section 4.1. "
+		Description "TrioCFD simulations are performed with several numerical options for the VDF and VEF discretization. When plotting the temperature and velocity profiles, several curves will be presented, each one of them corresponding to the options 'Amont' or 'Quick' for VDF and 'Muscl', 'Amont', 'EF_stab' (alpha=1) and 'EF_stab (alpha=0.2)' for VEF (for each mesh Coarse/Fine). The options are summarized in section 4.1. "
 	}
 }
 #

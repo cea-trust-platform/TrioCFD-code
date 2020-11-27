@@ -7,11 +7,11 @@ Parameters {
 #
 	ParametersTrio_U Type of problem: 2D laminar hydraulic_problem
 	ParametersTrio_U Discretization: VEFPreP1B
-	ParametersTrio_U Time scheme: Euler Explicite for VDF and VEF
+	ParametersTrio_U Time scheme: Explicit Euler for VDF and VEF
 	ParametersTrio_U Momentum convection scheme: EF_stab with \latex_($\alpha = 0.2$\latex_) or Muscl
 	ParametersTrio_U Solving of equations: Navier_Stokes_standard
 	ParametersTrio_U Master Test case: cc_re100.data
-	ParametersTrio_U Location: /validation/share/Validation/Rapports_automatiques/Validant/Fini/Cir_Cyl_Re100
+	ParametersTrio_U Location: validation/share/Validation/Rapports_automatiques/Validant/Fini/Cir_Cyl_Re100
 #
 	Reference " $[1]$ Chabard J.P, Lalanne P., Metivet B., Projet N3S de Mecanique des fluides. Cahier de Validation 2D. EDF/DER HE-41/88.08 1988. "
 	Reference " $[2]$ Braza P., Chassaing P., H. Ha Minh, Numerical study and physical analysis of pressure and velocity fields in the near wake of a circular cylinder. J. Fluid Mech. 165, 79-130, 1986 "
@@ -29,9 +29,9 @@ Parameters {
 	IncludeData 2
 }
 Objectif {
-	Description "The purpose of the validation is to compare numerical values of an oscillating flow behind a circular cylinder perpendicular to the flow with whose obtanined by calculations and experiments. "
+	Description "The purpose of the validation is to compare numerical values of an oscillating flow behind a circular cylinder perpendicular to the flow with those obtanined by calculations and experiments. "
 	Description " \latex_(\underline{Validated model:}\latex_)
-	Description "	- No-slip at the wall "
+	Description "	- No-slip wall "
 	Description "	- 2D channel "
 	Description "	- Disturbance of a laminar flow "
 	Description " "
@@ -51,7 +51,7 @@ Pb_description {
 	CICL {
 		Description "Hydraulic initial conditions: quiescent fluid U = V = 0 m/s "
 		Description "Hydraulic boundary condition: "
-		Description " $\bullet$ The velocity is fixed in order to obtain U = 0.03937m/s in such a kind that Re = Ud/$\nu$ = 100 "
+		Description " $\bullet$ The X-velocity is imposed in order to obtain U = 0.03937m/s so that Re = Ud/$\nu$ = 100 "
 		Description " $\bullet$ CERCLE : paroi_fixe "
 		Description " $\bullet$ PAROI1 : symetrie "
 		Description " $\bullet$ PAROI2 : symetrie "
@@ -86,13 +86,13 @@ Pb_description {
 		}
 	}
 	Phyecou {
-		Description "At the beginning of the transient, fluid flow is completely laminar with the Reynolds number defined at 100. In view of the characteristics defined for the fluid, this flow will be quickly disturbed by the obstacle present in the center of the channel. "
+		Description "At the beginning of the transient, fluid flow is completely laminar with the Reynolds number equal to 100. In view of the characteristics defined for the fluid, this flow will be quickly disturbed by the obstacle present in the mid-hight of the channel. "
 	}
 }
 #
 Casesetup {
 	Maillage {
-		Description " The mesh was built with Gmesh and has 9668 elements. It is a tetraidric mesh, homogeneous over most of the domain with a refinement around the central obstacle in order to capture the formation of the boundary layer around the cylinder induced by the adverse pressure gradient. This refinement will optimize the good simulation of recirculation phenomena around the cylinder and reveal the development of turbulence in an initially laminar flow. "
+		Description " The mesh was built with gmesh and has 9668 elements. It is a tetraedric mesh, homogeneous over most of the domain with a refinement around the central obstacle in order to capture the formation of the boundary layer around the cylinder induced by the adverse pressure gradient. This refinement will optimize the recirculation phenomena around the cylinder and reveal the development of turbulence in an initially laminar flow. "
 		visu {
 			Title "Mesh overview"
 			Width 14cm, trim= 100 100 50 650,clip
@@ -108,13 +108,13 @@ Casesetup {
 	}
 #
 	Options_modele {
-		Description " $\bullet$ The case modeled here being a laminar hydraulic problem, the equations solved are those of standard Navier-Stockes. "
+		Description " $\bullet$ The case modeled here being a laminar hydraulic problem, the equations solved are those of standard Navier-Stokes. "
 		Description " $\bullet$ \latex_(\underline{Momentum convection scheme:}\latex_) EF_stab with \latex_($\alpha = 0.2$\latex_) or Muscl."
 		Description " $\bullet$ \latex_(\underline{Diffusion scheme:}\latex_) default
 	}
 #
 	Autres_options {
-		Description " $\bullet$ The time scheme defined in this test case is the Explicit Euler with implicit diffusion. Indeed, \latex_(\textbf{the Euler implicite scheme is not recommanded}\latex_) because, as the calculation presents oscillations, the value of the facsec coefficient must remain small. The calculation time is then increased instead of being improved. "
+		Description " $\bullet$ The time scheme defined in this test case is the Explicit Euler with implicit diffusion. Indeed, \latex_(\textbf{the Euler implicit scheme is not recommanded}\latex_) because, as the calculation presents oscillations, the value of the facsec coefficient must remain small. The calculation time is then increased instead of being improved. "
 		Description " $\bullet$ The pressure variable to be employed in the data file is not 'Pression' but 'Pression_Pa', that gives the pressure in Pa. "
 	}
 
@@ -122,7 +122,7 @@ Casesetup {
 #
 Results {
 # Validation specific informations automatically generate
-	Description " The temporal pressure course at two probes located on the cylinder surface (y = -0.5d and  y = +0.5d) is shown in the following figure for each convection scheme. The simulations have been perfomed up to 90s of physical time in order to get sufficient cycles allowing the calculation of a frequency. "
+	Description " The temporal pressure evolution at two probes located on the cylinder surface (y = -0.5d and  y = +0.5d) is shown in the following figure for each convection scheme. The simulations have been perfomed up to 90s of physical time in order to get sufficient cycles allowing the calculation of a frequency. "
 	Description " \latex_(\medskip \latex_) 
 	Description "$\bullet$ \latex_(\textbf{Von Karman vortices}\latex_) "
 	Description " When a viscous Newtonian fluid flows around a cylinder, the latter is subjected to forces from the surrounding fluid and complex Reynolds number-dependent phenomena appear. Near the surface of the cylinder wall in contact with the flow, a thin layer of viscous fluid (boundary layer) forms. In this, a speed gradient is established due to viscous stresses which are not negligible. The closer the fluid is to the wall, the more braked, the speed being zero at the surface of the cylinder to satisfy the condition grip. This redistribution in the velocity field leads to a diffusion of the momentum, either by a viscous mechanism or by turbulent movements induced by vortex detachment. "
@@ -207,7 +207,7 @@ Results {
 #
 	Description " The two following figures represent a zoom of the two previous figures from 40 up to 50s. We can notice that oscillations are well established in this time range. "
 	Figure {
-		Title " Zoom of the pressure course at the cylinder surface (Muscl) "
+		Title " Zoom of the pressure evolution at the cylinder surface (Muscl) "
 		Width 11.5cm
 		Dimension 2
 
@@ -235,7 +235,7 @@ Results {
 	}
 #
 	Figure {
-		Title " Zoom of the pressure course at the cylinder surface (EF_stab with alpha = 0.2) "
+		Title " Zoom of the pressure evolution at the cylinder surface (EF_stab with alpha = 0.2) "
 		Width 11.5cm
 		Dimension 2
 
@@ -262,7 +262,7 @@ Results {
 		}
 	}
 	Description "$\bullet$ \latex_(\textbf{Comparison of Strouhal numbers}\latex_) "
-	Description " The temporal pressure course in the media allows the determination of the Strouhal number \latex_($S_{t}$\latex_) defined as \latex_($S_{t}=\frac{f.d}{U}$\latex_), where $f$ stands for the vortices emission frequency, $U$ the undisturbed velocity (in our case the inlet velocity), and $d$ the cylinder diameter. We can in this way compare the simulation values with those of Tritton and Roshko collected by Chabard $[1]$. "
+	Description " The temporal pressure evolution in the media allows the determination of the Strouhal number \latex_($S_{t}$\latex_) defined as \latex_($S_{t}=\frac{f.d}{U}$\latex_), where $f$ stands for the vortices emission frequency, $U$ the undisturbed velocity (in our case the inlet velocity), and $d$ the cylinder diameter. We can in this way compare the simulation values with those of Tritton and Roshko collected by Chabard $[1]$. "
 	Table {
 		Title " Comparison of Strouhal numbers "
 		nb_columns 4
@@ -340,7 +340,7 @@ Results {
 }
 #
 Conclusion {
-	Description " The computation of this test with Trio-CFD is satisfactory with a good agreement between calculated results with others calculated results by Chabard $[1]$ and experimental results described by Braza $[2]$. "
+	Description " The computation of this test with TrioCFD is satisfactory with a good agreement between calculated results with others numerical results by Chabard $[1]$ and experimental results described by Braza $[2]$. "
 	Description " The calculation ends normally without any particular numerical troubles. "
 	Description " This simulation enables the validation of laminar calculations with Trio-CFD of an oscillating flow behind a cylinder with isothermal fluid and VEF grids. "
 

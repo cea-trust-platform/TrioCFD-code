@@ -39,7 +39,7 @@ Pb_description {
 #
 Casesetup {
 	Maillage {
-		Description "The mesh is presented on Fig. 4 (with Visit)."
+		Description "The mesh is presented on Fig. 1 (with Visit)."
 		visu {
 			title "MESH"
 			width 11cm, trim = 10 105 50 85,clip

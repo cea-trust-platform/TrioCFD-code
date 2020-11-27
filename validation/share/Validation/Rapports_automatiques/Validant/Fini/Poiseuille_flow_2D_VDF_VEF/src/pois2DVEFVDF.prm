@@ -6,12 +6,12 @@ Parameters {
 
 	ParametersTrio_U Type of probem: 2D hydraulic
 	ParametersTrio_U Discretization: VEFPreP1B and VDF 
-	ParametersTrio_U Time scheme: Euler explicite
+	ParametersTrio_U Time scheme: Explicit Euler
 	ParametersTrio_U VDF convection scheme: Quick or Amont
 	ParametersTrio_U VEFPreP1B convection scheme: Muscl or Amont or EF_stab (alpha = 1)
 	ParametersTrio_U Turbulence model: none
 	ParametersTrio_U Type of boundary condition: inlet ; outlet
-	ParametersTrio_U Solving of equations: Navier_Stokes_standard
+	ParametersTrio_U Equations being solved: Navier_Stokes_standard
 	ParametersTrio_U Master Test case: poiseuille.data
 	ParametersTrio_U Location: /validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF
 #
@@ -78,7 +78,7 @@ Pb_description {
 #
 Casesetup {
 	Maillage {
-		Description "The calculations are carried out by using two meshes: the first mesh one for VDF and the second one for VEF. For the VDF mesh, the 2D grid is composed of 200 cells (20\latex_($\times$\latex_)10) and for the VEF mesh, the grid is composed of 400 cells (20\latex_($\times$\latex_)10\latex_($\times$\latex_)2). Both meshes are presented on Fig. 2 (VDF) and Fig. 3 (VEF)."
+		Description "The calculations are carried out by using two meshes: the first mesh in VDF and the second one in VEF. For the VDF mesh, the 2D grid is composed of 200 cells (20\latex_($\times$\latex_)10) and for the VEF mesh, the grid is composed of 400 cells (20\latex_($\times$\latex_)10\latex_($\times$\latex_)2). Both meshes are presented on Fig. 2 (VDF) and Fig. 3 (VEF)."
 		visu {
 			Title "VDF Mesh"
 			Width 12cm, trim= 100 105 20 450,clip
@@ -94,7 +94,7 @@ Casesetup {
 		Description "The case modeled here being a laminar hydraulic problem in 2D, the equations solved are those of standard Navier-Stockes. "
 		}
 	Autres_options {
-		Description "The numerical results are compared with the analytical solution for five numerical options of TrioCFD: 'Amont' and 'Quick' for 'VDF' and 'Amont', 'Muscl' and 'stab' for VEF."
+		Description "The numerical results are compared with the analytical solution for five spatial discretization schemes implemented in TrioCFD: 'Amont' and 'Quick' for 'VDF' and 'Amont', 'Muscl' and 'stab' for VEF."
 	}
 }
 #
@@ -165,10 +165,10 @@ Results {
 }
 #
 Conclusion {
-	Description "In VEFPreP1B discretization (greatest refinement), the analytical solution is well-fitted with TrioCFD, in particular with the EF_stab scheme. The simulations give slightly lower results in VDF discretization (less than 3%)."
+	Description "In VEFPreP1B discretization (greatest refinement), the analytical solution is well-fitted with TrioCFD, in particular with the EF_stab scheme. The simulations give slightly different results in VDF discretization (less than 3%)."
 	Description "\latex_(\smallskip\latex_)"
 	Description "$\bullet$  \latex_(\textbf{Recommendations for users}\latex_)"
 	Description "\latex_(\smallskip\latex_)"
-	Description " The VEFPreP1B discretization associated to an EF_stab scheme gives the closest results on the whole domain. "
+	Description " The VEFPreP1B discretization associated to an EF_stab scheme gives the best results on the whole domain. "
 }
 
