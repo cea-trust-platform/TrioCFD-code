@@ -1,10 +1,6 @@
 Parameters {
-	Title "Periodic box on a turbulent flow in a 2D diffuser with k-$\epsilon$ model."
-	Description "This case test aims to validate the use of Trio_U code for the simulation of a turbulent flow in a 2D diffuser, with the use of a periodic box."
-	Description "k-$\epsilon$ modelling with wall function."
-	Description "Validation with comparison between experimental and computational profiles. Experimental results are obtained from the ERCOFTAC experiment data base. The CFD results are obtained from several papers that are listed below."
-	Description "The test case computation grid is generated with ICEM. From this VEF mesh, two different meshes for periodic box computations are generated. The purpose of those two periodic computations is to provide the main computations with established inlet boundary conditions. There are two main computations in this test case since there are two periodic boxes."
-
+	newvalidTrio
+	Title "Turbulent flow in a 2D diffuser with the $k-\epsilon$ model"
 	VersionTrio_U "1.6.3"
 
 	ParametersTrio_U Type of problem : Hydraulique_Turbulent
@@ -15,94 +11,105 @@ Parameters {
 	ParametersTrio_U Convection : EF_stab { alpha 0.2 }
 	ParametersTrio_U Turbulence model : "k-$\epsilon$ model"
 	ParametersTrio_U Wall law : "turbulence_paroi loi_expert_hydr { methode_calcul_face_keps_impose que_les_faces_des_elts_dirichlet }, which is the default option for 3D calculations"
-	ParametersTrio_U Type of boundary conditions : Periodic box: periodicity in the x direction, walls in the y directions. Main computation domain (diffuser): Velocity field and K-Epsilon field (from periodic box) for the inlet, outlet pressure, walls.
+	ParametersTrio_U Type of boundary conditions : Periodic box: periodicity in the $x$-direction, walls in the $y$-direction. Main computation domain (diffuser): Velocity field and $k-\epsilon$ field (from periodic box) for the inlet, outlet pressure, walls.
+	ParametersTrio_U Location : /validation/share/Validation/Rapports_automatiques/Validant/Fini/OBI_diffuser_VEF_k_eps
+	ParametersTrio_U Master Test case : Calcul.data - Prepare_extract.data - Prepare_extrude.data
 	
-	Reference "[1] A Comparative Study of Turbulence Models Performance for Turbulent Flow in a Planar Asymmetric Diffuser, Samy M. El-Behery and Mofreh H. Hamed. International Journal of Aerospace and Mechanical Engineering 5:2 2001."
-	Reference "[2] Advanced Turbulence Modelling of Separated Flow in a Diffuser, D.D Apsley and M.A Leschziner. Flow, Turbulence and Combustion 63:81-112,1999."
-	Reference "[3] Ten Years of Industrial Experience with the SST Turbulence Model, F.R Menter and M. Kuntz and R. Langtry. Turbulence, Heat and Mass Transfer 4. K. Hanjalic, Y. Nagano and M. Tummers (Editors), Begell House, Inc. 2003."
-	
+	Reference "$[1]$ A Comparative Study of Turbulence Models Performance for Turbulent Flow in a Planar Asymmetric Diffuser, Samy M. El-Behery and Mofreh H. Hamed. International Journal of Aerospace and Mechanical Engineering 5:2 2001."
+	Reference "$[2]$ Advanced Turbulence Modelling of Separated Flow in a Diffuser, D.D Apsley and M.A Leschziner. Flow, Turbulence and Combustion 63:81-112,1999."
+	Reference "$[3]$ Ten Years of Industrial Experience with the SST Turbulence Model, F.R Menter and M. Kuntz and R. Langtry. Turbulence, Heat and Mass Transfer 4. K. Hanjalic, Y. Nagano and M. Tummers (Editors), Begell House, Inc. 2003."
 
 	TestCase Calcul_fin Calcul.data /*see data set in the appendix*/
 	TestCase Calcul_gros Calcul.data
 
-	
-	
 	Author "A.AUROUSSEAU (S.VANDROUX)"
 	IncludeData 2
 }
-
-Chapter {
-	Title "Test Description"
-	
-	Figure  {
-		Title "Geometry, Mesh and Boundary Conditions"
-		width 12cm		
-		Description "Dimensions :     H = 1m"
-		Description "Velocity inlet:  U = 1 m/s "
-		Description "Outlet pressure: P = 0"
-       		picture ./Eaton.jpg
+#
+Objectif {
+	Description "This test case aims at validating TrioCFD for a turbulent flow inside a two-dimensional diffuser with the $k-\epsilon$ model and wall functions. The validation are carried out by comparing experimental data and several computational profiles. Experimental results are taken from the ERCOFTAC experiment data base and the CFD profiles are obtained from Fluent and other publications that are listed below. For the test case, the diffuser mesh is generated with ICEM and a fictitious periodic rectangular box is used to provide boundary conditions for the main computational domain (the diffuser). Two different meshes are generated for the periodic box. The goal of the fictitious periodic box is to provide well established values of velocity and $k-\epsilon$ at the inlet boundary conditions of the diffuser. There are two main computations with TrioCFD in this test case since there are two periodic boxes."
+}
+#
+Pb_description {
+	geometrie {
+		Description "The diffuser geometry is presented on Fig. 1. All dimensions are expressed by a factor $H$ which is equal to $H=1$m. "
+		Figure  {
+			Title "Diffuser geometry."
+			width 11cm
+			picture ./Eaton.jpg
+			}
 	}
-	
-	Table {
-		Title "Physical properties"        	
-		Description "Fluid domain: Fictive fluid which lead to Re = 20000"
-        	Description "No Gravity effect"
-		nb_columns 1
-		Label Valeur
-                line {
-	        	legend "Fluid density"                        
-			file Calcul_fin/properties.dat
-			nb_columns_file 2
-			columns $1
-                }
-                line {
-	        	legend "Fluid dynamic viscosity"
-                        file Calcul_fin/properties.dat
-			nb_columns_file 2
-			columns $2
-                }
-	
-		
+	CICL {
+			Description "$\bullet$ \latex_(\textbf{Modeling: use of a periodic box}\latex_)"
+			Description "A periodic rectangular box is introduced for computations on a fictitious periodic domain. That plane channel is used to generate an established velocity and $k-\epsilon$ fields in order to be applied at the inlet of the diffuser (i.e. the main computational domain). Boundary conditions are imposed separately for the periodic box and the main computational domain. For the rectangular box, the periodicity is applied in the $x$-direction, and no-slip boundary conditions hold in the $y$-direction. For the diffuser, the values of the periodic box are applied for the $k-\epsilon$ fields and the velocity at inlet and an uniform pressure is applied at outlet. All other boundaries are no-slip conditions. The numerical values of bulk velocity and outlet pressure are given below:"
+			Description "$\bullet$ Velocity inlet:  $U = 1$ m/s "
+			Description "$\bullet$ Outlet pressure: $P = 0$"
 	}
-
-	visu {
-        	Title "Periodic box: mesh 1 (1104 cells)" 
-
-        	Description Mesh: Extruder en 3 of the inlet face of 3D ICEM mesh 
-        	mesh Calcul_gros/Prepare.lata REC_2D
-		width 15cm,viewport=0 0 1024 600,clip
-       	 	origin mesh
+	Propfluide {
+		Table {
+			Title "Physical properties"
+			Description "Fluid domain: Fictitious fluid for which \latex_($Re=20000$\latex_)."
+			nb_columns 1
+			Label Valeur
+			line {
+				legend "Fluid density $\rho$ (kg/m\latex_($^3$\latex_))"
+				file Calcul_fin/properties.dat
+				nb_columns_file 2
+				columns $1
+			}
+			line {
+				legend "Fluid dynamic viscosity $\mu$ (Pa.s)"
+				file Calcul_fin/properties.dat
+				nb_columns_file 2
+				columns $2
+			}
+		 }
 	}
-	
-	visu {
-        	Title "Periodic box: mesh 2 (440 cells)"
-
-        	Description Mesh: Extruder_bord of the inlet face of 3D ICEM mesh 
-        	mesh Calcul_fin/Prepare.lata REC_2D
- 		width 15cm,viewport=0 0 1024 600,clip
-       	 	origin mesh
-	}	
-
-	visu {
-        	Title "Diffuser Mesh (36644 cells)"
-        	Description Mesh: 2D from 3D of ICEM mesh. This figure only shows the divergent part of the diffuser, but the actual domain lies betwen x=-10 and x=56.
-        	mesh Calcul_fin/Calcul.lata DOM_2D
-		zoom2D -1 23 0 5
-        	width 17cm,viewport=0 100 1024 350,clip
-       	 	origin mesh
+	Phyecou {
+		Description "The objective is to validate the '$k-\epsilon$ model' with wall function inside a diffuser."
 	}
 }
-
-
-Chapter {
-		
-	Title "Results"
-	
-	Description "The next two figures show the computations convergence by plotting the computed friction evolution vs time. The two curves on both figures show the friction evolution in the periodic box computation and in the main computation. The periodic box is a computation in a fictive periodic domain (shaped as a planned channel) that is used to generate an established velocity and K-Eps fields to be applied on the main domain inlet, the main domain being the diffuser. The two domains are different so the friction velocity is computed on different surfaces, Reynolds numbers are different, and the ways the friction velocity is averaged are different too. That is why the values of utau are different."	
-
+#
+Casesetup {
+	Maillage {
+		Description "Three meshes are presented: two for the periodic box and one additional for the diffuser. The fine mesh of periodic box is presented on Fig. 2 (1104 cells) and the coarse one is pressented on Fig.3 (440 cells). For both meshes the dimensions are \latex_($[-16, -11]\times [3.7, 4.7]$\latex_). The diffuser mesh is presented on Fig. 4 where $x$ varies between $0$ and $20$. For the actual dimension of the diffuser, $x$ varies between $[-11, 56]$."
+		Description Mesh: Extruder en 3 of the inlet face of 3D ICEM mesh
+		visu {
+			Title "Periodic box: mesh 1 (1104 cells)" 
+			mesh Calcul_gros/Prepare.lata REC_2D
+			width 17cm,viewport=0 100 1024 350,clip
+			origin mesh
+		}
+		Description "\latex_(\bigskip\latex_)"
+		Description Mesh: Extruder_bord of the inlet face of 3D ICEM mesh
+		visu {
+			Title "Periodic box: mesh 2 (440 cells)"
+			mesh Calcul_fin/Prepare.lata REC_2D
+			width 17cm,viewport=0 100 1024 350,clip
+			origin mesh
+		}	
+		Description Mesh: 2D from 3D of ICEM mesh. This figure only shows the divergent part of the diffuser, but the actual domain lies betwen x=-10 and x=56.
+		visu {
+			Title "Diffuser Mesh (36644 cells)"
+			mesh Calcul_fin/Calcul.lata DOM_2D
+			zoom2D -1 23 0 5
+			width 17cm,viewport=0 100 1024 350,clip
+			origin mesh
+		}
+	}
+	Options_modele {
+		Description "The Reichardt law is applied near the wall boundary and without gravity effect for this test."
+	}
+	Autres_options {
+		Description "The 'EF_stab' scheme is applied for convective terms with 'alpha=0.2'. The time scheme is implicit. All numerical options are summarized in Section 4.1."
+	}
+}
+#
+Results {
+	Description "The next two figures (Figs 5 and 6) show the computations convergence by plotting the evolution of friction velocity versus time for both periodic meshes. The two curves on both figures show the friction evolution in the periodic box computation (red curve) and in the main computation (green curve). The two domains are different so the friction velocity is computed on different surfaces, Reynolds numbers are different, and the ways the friction velocity is averaged are different too. That is why the values of \latex_($U_{\tau}$\latex_) are different. For both meshes, the main computation reaches convergence after about 250s of physical time, and the periodic computation after 75s. The periodic computation stops around 200s since the convergence criteria (seuil_statio) is met."
+	Description "Main computation values are increased on purpose to allow plotting both curves on the same figure"
 	Figure {
-		Title "Mesh 1 computations convergence: friction velocity evolution"
-		Description "Main computation values are increased on purpose to allow plotting both curves on the same figure"		
+		Title "Mesh 1 computations convergence: friction velocity evolution."
 		Width 12cm
 		Dimension 2
 		LabelX "Time (s)"
@@ -125,9 +132,9 @@ Chapter {
 		}
 		
 	}
+	Description "The convergence criteria on the periodic computation is met after 200s"
 	Figure {
 		Title "Mesh 2 computations convergence: friction velocity evolution"
-		Description "The convergence criteria on the periodic computation is met after 200s"		
 		Width 12cm
 		Dimension 2
 		LabelX "Time (s)"
@@ -150,101 +157,96 @@ Chapter {
 		}
 		
 	}
-	
+	Description "$\bullet$ \latex_(\textbf{Fields of pressure, velocity and $Y+$}\latex_)"
+	Description "For each periodic mesh, the pressure field in the diffuser is presented on Figs. 8 and 9 (Fig. 7 is for the color scale) the velocity field in the diffuser is presented on Figs. 11 and 12 (Fig. 10 for the color scale). Finaly the $Y+$ fields are prensented on Figs. 14 and 15 (color scale on Fig. 13)."
+
 	visu {
 		Title "Pressure field in the diffuser, Legend"
-                width 15cm,viewport=0 700 1024 950,clip 
-                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
-       		Operator no_databaseinfo
+		width 15cm,viewport=0 700 1024 950,clip 
+		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
+		Operator no_databaseinfo
 		Operator no_bounding_box
 		zoom2D -11.0 56.0 0. 5.
-       	 
 	}	
 		
 	visu {
 		Title "Pressure field in the diffuser, mesh1."
-                width 15cm,viewport=0 100 1024 250, clip 
-                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
-       		Operator no_databaseinfo
+		width 15cm,viewport=0 100 1024 250, clip 
+		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
+		Operator no_databaseinfo
 		Operator no_bounding_box
 		zoom2D -11.0 56.0 0. 5.
-       	 
 	}
+
 	visu {
 		Title "Pressure field in the diffuser, mesh2."
-                width 15cm, viewport=0 100 1024 250,clip
-                pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
-       		Operator no_databaseinfo
+		width 15cm, viewport=0 100 1024 250,clip
+		pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D PRESSION_PA ELEM -0.4582 0.002332
+		Operator no_databaseinfo
 		Operator no_bounding_box
-       	 	zoom2D -11.0 56.0 0. 5.
+		zoom2D -11.0 56.0 0. 5.
 	}
 	
 	visu {
-		Title "Velocity field in the diffuser, Legend."        	     
+		Title "Velocity field in the diffuser, Legend."
 		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D_dual norme_VITESSE FACES 0. 1.134
-        	width 15cm,viewport=0 700 1024 950,clip
+		width 15cm,viewport=0 700 1024 950,clip
 		zoom2D -11.0 56.0 0. 5.
 		Operator no_databaseinfo
 		Operator no_bounding_box
-     
 	}
 
 	visu {
-		Title "Velocity field in the diffuser, mesh 1."        	     
+		Title "Velocity field in the diffuser, mesh 1."
 		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D_dual norme_VITESSE FACES 0. 1.134
-        	width 15cm,viewport=0 100 1024 250,clip
+		width 15cm,viewport=0 100 1024 250,clip
 		zoom2D -11.0 56.0 0. 5.
 		Operator no_databaseinfo
 		Operator no_bounding_box
-     
 	}
 
 	visu {
-		Title "Velocity field in the diffuser, mesh 2."        	             		
+		Title "Velocity field in the diffuser, mesh 2."
 		width 15cm,viewport=0 100 1024 250,clip
 		pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D_dual norme_VITESSE FACES 0. 1.134
-        	zoom2D -11.0 56.0 0. 5.
+		zoom2D -11.0 56.0 0. 5.
 		Operator no_databaseinfo
-		Operator no_bounding_box
-   
-	}	
+	}
 
 	visu {
 		Title "Y+ field in the diffuser, Legend."
-                width 15cm,viewport=0 700 1024 950,clip
-                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
-		zoom2D -11.0 56.0 0. 5.       		
+		width 15cm,viewport=0 700 1024 950,clip
+		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
+		zoom2D -11.0 56.0 0. 5.
 		Operator no_databaseinfo
 		Operator no_bounding_box
-       	 
 	}
 
 
 	visu {
 		Title "Y+ field in the diffuser, mesh1."
-                width 15cm,viewport=0 100 1024 250,clip
-                pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
-		zoom2D -11.0 56.0 0. 5.       		
+		width 15cm,viewport=0 100 1024 250,clip
+		pseudocolor_with_range Calcul_gros/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
+		zoom2D -11.0 56.0 0. 5.
 		Operator no_databaseinfo
 		Operator no_bounding_box
-       	 
 	}
+
 	visu {
 		Title "Y+ field in the diffuser, mesh2."
-                width 15cm,viewport=0 100 1024 250,clip
-                pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
-		zoom2D -11.0 56.0 0. 5.       		
+		width 15cm,viewport=0 100 1024 250,clip
+		pseudocolor_with_range Calcul_fin/Calcul.lata DOM_2D Y_PLUS ELEM -1.0 43.71
+		zoom2D -11.0 56.0 0. 5.
 		Operator no_databaseinfo
 		Operator no_bounding_box
 	}
 
-	
-	Description "The velocity profiles are given at several longitudinal positions in the diffuser. x=0 is the longitudinal position where the divergent part of the diffuser begins. x=20 is the end of the divergent part. Beyond this point, the domain is a plane channel"
-
+	Description "$\bullet$ \latex_(\textbf{Comparisons of TrioCFD profiles}\latex_)"
+	Description "The $y$-profiles of velocity are compared at several $x$-positions in the diffuser. The position $x=0$ corresponds to the point where the divergent part of the diffuser begins. The position $x=20$ is the end of the divergent part. Beyond this point, the domain is a plane channel. The $y$-profiles are presented for $x=6$ (Fig. 16), $x=17$ (Fig. 17), $x=20$ (Fig. 18), $x=27$ (Fig. 19) and $x=34$ (Fig. 20). For those graphs, the red curve is the experimental one and the cyan curve is the 'standard $k-\epsilon$ model of Fluent'. The TrioCFD results are colored in blue (mesh 1) and magenta (mesh2)."
 
 	Figure {
 		Title "Longitudinal velocity profile at x=6"
-		width 12cm		
+		width 12cm
 		Dimension 2
 		LabelX "y/H"
 		LabelY "u/U"
@@ -261,9 +263,9 @@ Chapter {
 			TypeLigne 1
 			TypePoints 2
 		}
-				
+
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 1"
+			legend "TrioCFD K-Epsilon model, mesh 1"
 			Segment  Calcul_gros/Calcul.data SONDE_V06
 			columns 1 2
 			Style linespoints
@@ -271,7 +273,7 @@ Chapter {
 			TypePoints 2
 		}
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 2"
+			legend "TrioCFD K-Epsilon model, mesh 2"
 			Segment  Calcul_fin/Calcul.data SONDE_V06
 			columns 1 2
 			Style linespoints
@@ -291,7 +293,7 @@ Chapter {
 
 	Figure {
 		Title "Longitudinal velocity profile at x=17"
-		width 12cm		
+		width 12cm
 		Dimension 2
 		LabelX "y/H"
 		LabelY "u/U"
@@ -308,9 +310,9 @@ Chapter {
 			TypeLigne 1
 			TypePoints 2
 		}
-				
+
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 1"
+			legend "TrioCFD K-Epsilon model, mesh 1"
 			Segment  Calcul_gros/Calcul.data SONDE_V17
 			columns 1 2
 			Style linespoints
@@ -318,7 +320,7 @@ Chapter {
 			TypePoints 2
 		}
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 2"
+			legend "TrioCFD K-Epsilon model, mesh 2"
 			Segment  Calcul_fin/Calcul.data SONDE_V17
 			columns 1 2
 			Style linespoints
@@ -370,9 +372,8 @@ Chapter {
 			TypeLigne 1
 			TypePoints 2
 		}
-				
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 1"
+			legend "TrioCFD K-Epsilon model, mesh 1"
 			Segment  Calcul_gros/Calcul.data SONDE_V21
 			columns 1 2
 			Style linespoints
@@ -380,7 +381,7 @@ Chapter {
 			TypePoints 2
 		}
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 2"
+			legend "TrioCFD K-Epsilon model, mesh 2"
 			Segment  Calcul_fin/Calcul.data SONDE_V21
 			columns 1 2
 			Style linespoints
@@ -403,12 +404,11 @@ Chapter {
 			TypeLigne 7
 			TypePoints 3
 		}
-	
 	}
 
 	Figure {
 		Title "Longitudinal velocity profile at x=27"
-		width 12cm		
+		width 12cm
 		Dimension 2
 		LabelX "y/H"
 		LabelY "u/U"
@@ -425,9 +425,8 @@ Chapter {
 			TypeLigne 1
 			TypePoints 2
 		}
-				
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 1"
+			legend "TrioCFD K-Epsilon model, mesh 1"
 			Segment  Calcul_gros/Calcul.data SONDE_V27
 			columns 1 2
 			Style linespoints
@@ -435,7 +434,7 @@ Chapter {
 			TypePoints 2
 		}
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 2"
+			legend "TrioCFD K-Epsilon model, mesh 2"
 			Segment  Calcul_fin/Calcul.data SONDE_V27
 			columns 1 2
 			Style linespoints
@@ -450,13 +449,11 @@ Chapter {
 			TypeLigne 5
 			TypePoints 3
 		}
-	
 	}
-
 
 	Figure {
 		Title "Longitudinal velocity profile at x=34"
-		width 12cm		
+		width 12cm
 		Dimension 2
 		LabelX "y/H"
 		LabelY "u/U"
@@ -473,9 +470,8 @@ Chapter {
 			TypeLigne 1
 			TypePoints 2
 		}
-				
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 1"
+			legend "TrioCFD K-Epsilon model, mesh 1"
 			Segment  Calcul_gros/Calcul.data SONDE_V34
 			columns 1 2
 			Style linespoints
@@ -483,7 +479,7 @@ Chapter {
 			TypePoints 2
 		}
 		Curve {
-			legend "Trio_U K-Epsilon model, mesh 2"
+			legend "TrioCFD K-Epsilon model, mesh 2"
 			Segment  Calcul_fin/Calcul.data SONDE_V34
 			columns 1 2
 			Style linespoints
@@ -501,31 +497,14 @@ Chapter {
 	
 	}
 }
-
-Chapter {
-	Title "Conclusions"
-	Table {
-		Description "For both meshes, the main computation reaches convergence after about 250s of physical time, and the periodic computation after 75s. The periodic computation stops around 200s since the convergence criteria (seuil_statio) is met."
-		
-		Description "The pressure fields given by both computations are similar. There is a low pressure zone at the beginning of the diffuser divergent part."
-	
-		Description "The velocity fields are also similar in both computations.The divergent part of the diffuser is a low velocity zone."
-
-	 	Description "The longitudinal velocity vertical profiles are plotted for several values of x in the domain. Comparisons are made between the Trio_U K-Epsilon model, the Fluent Standard K-Epsilon model and the experimental results from Ercoftac experiment. For certain x values, other results are available to compare with."
-
-		Description "At x=6 (beginning of the divergent part) the profiles are relatively similar, with the Fluent SKE results being the closest to the experimental curve. This experimental profile is a little shifted toward larger y/H values, but it's at that x position that computational results are the closest to it."
-
-		Description "For the other velocity profiles (larger x values: 17,20,27,34) all the computational results are relatively similar but far from the experimental results. The experimental profiles are not symmetric, whereas the CFD profiles have a near symmetrical behavior."
-		
-		Description "We note that the Trio_U profiles are very close to each other, which shows that the method used to generate the periodic mesh has little influence on the final computation result."
-
-		Description "In conclusion, if it is known in the CFD field that K-Epsilon turbulence models give bad results for such a configuration, the Trio_U code is not a exception as it gives similar results. It is therefore recommended to use another model than K-Epsilon to simulate such a flow configuration." 
-
-		}
+#
+Conclusion {
+	Description "$\bullet$ The pressure fields that are obtained by both meshes are similar. There is a low pressure zone at the beginning of the diffuser divergent part. The velocity fields are also similar in both computations. The divergent part of the diffuser is a low velocity zone."
+	Description "\latex_(\smallskip\latex_)"
+	Description "$\bullet$ Comparisons of several $y$-profiles of velocity are carried out between 1) the $k-\epsilon$ model of TrioCFD, 2) the 'Standard $k-\epsilon$ model' of Fluent and 3) the experimental results from Ercoftac experiment. For few $x$ values, other results are also available in the literature and used for comparisons."
+	Description "\latex_(\smallskip\latex_)"
+	Description "At $x$=6 (beginning of the divergent part), the profiles are relatively similar. The Fluent results are slightly closest to the experimental curve. This experimental profile is a little shifted toward larger y/H values. The computational curves are closest to the experimental one for that $x$-position. For other velocity profiles (larger $x$ values: 17, 20, 27 and 34) all computational results are relatively similar but far from the experimental results. The experimental profiles are not symmetric, whereas the CFD profiles have a near symmetrical behavior."
+	Description "\latex_(\smallskip\latex_)"
+	Description "$\bullet$ We note that the TrioCFD profiles are very close to each other, showing that the method used to generate the periodic mesh has a little influence on the final computation results. In conclusion, it is well-known that the $k-\epsilon$ model of turbulence yields bad results for such a configuration, the TrioCFD results are not an exception and give similar results. A more promising $k-\epsilon$ model, better suited for simulating this type of phenomenon will be proposed in a future version of this validation sheet."
 }
 
-Chapter {
-	Title "Computer performance"
-	tableau_performance {
-	}
-}

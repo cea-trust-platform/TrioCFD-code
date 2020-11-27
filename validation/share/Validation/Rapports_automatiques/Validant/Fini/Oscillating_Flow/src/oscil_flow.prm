@@ -1,7 +1,6 @@
 Parameters {
-	Title "Osclillating Flow"
-	Description "A 2D laminar oscillating flow in a non symmetrical heated cavity is studied"
-
+	newvalidTrio
+	Title "Oscillatory convection flow"
 	VersionTrio_U "1.6.1"
 
 	ParametersTrio_U Dimension: 2D 
@@ -9,7 +8,7 @@ Parameters {
 	ParametersTrio_U Thermal hydraulic problem
 	ParametersTrio_U Momentum characteristic: Navier_stokes_standard
 	ParametersTrio_U Thermal characteristic: Source_Boussinesq_temperature
- 	ParametersTrio_U Convection_diffusion_temperature not solved (analytical solution known)
+	ParametersTrio_U Convection_diffusion_temperature not solved (analytical solution known)
 	ParametersTrio_U Time scheme: Euler explicite
 	ParametersTrio_U VDF Momentum convection scheme: Centre, Quick or Muscl
 	ParametersTrio_U VEF Momentum convection scheme: Muscl, EF_stab or EF_stab with alpha = 0.2
@@ -17,8 +16,10 @@ Parameters {
 	ParametersTrio_U Type of fluid: incompressible
 	ParametersTrio_U Fluid boundary condition: adhesion on the wall 
 	ParametersTrio_U Thermal boundary condition: imposed temperature and adiabatic walls
+	ParametersTrio_U Location: /validation/share/Validation/Rapports_automatiques/Validant/Fini/Oscillating_Flow
+	ParametersTrio_U Master Test case: test_osc_flow.data
 #
-	Reference " $[1]$ Roux B., Numerical Simulation of Oscillatory Convection in Low-Pr Flow, Notes in Numerical Fluid Dynamics, vol 27, p 285-303, Vieweg, Braunschweig 1990."
+	Reference " $[1]$ Numerical Simulation of Oscillatory Convection in Low-Pr Flow, Notes in Numerical Fluid Dynamics, A GAMM Workshop, Vol 27, Ed. Bernard ROUX, doi: 10.1007/978-3-322-87877-9, Publisher: Vieweg+Teubner Verlag, 365 p., 1990."
 #
 	TestCase VDF/Quick test \*
 	TestCase VDF/Centre test 
@@ -30,122 +31,134 @@ Parameters {
 	IncludeData 2
 
 }
-##
-##
-##
-Chapter {
-	Title "Tests Description"
-	visu {
-		Title "VDF Mesh"
-		Width 10cm, viewport= 0 0 1024 400,clip
-		mesh VDF/Quick/test.lata dom
-		Description "Geometry test: 2D rectangular cavity "
-		Description "Dimensions test: 1m along Y, 4m along X "
-		Description "Characteristics: 2500 cells obtained with option pave"
-	}
 #
-	visu {
-		Title "VEF Mesh"
-		Width 10cm, viewport= 0 0 1024 400,clip
-		mesh VEF/Muscl/test.lata dom
-		Description "Geometry test: 2D rectangular cavity "
-		Description "Dimensions test: 1m along Y, 4m along X "
-		Description "Mesh characteristic: 5040 triangular cells obtained with option trianguler_H"
-		Description "Mesh characteristic: symmetric exepnsion factors 1.02 along x axis, and 1.05 along y direction"
+Objectif {
+	 Description "A two-dimensional 'oscillatory convection flow' is studied inside a rectangular heated cavity. The physical test is similar to the previous one, i.e. the 'Convection Vahl Davis' in laminar condition, but the cavity is now non-symmetric. The results are compared with the benchmark of Behnia et al. that is published in the book of reference $[1]$. The TrioCFD simulations run on VDF and VEF meshes for several options of the convection scheme."
+}
+#
+Pb_description {
+	geometrie {
+		Description "The test case geometry is a two-dimensional rectangular cavity of dimensions L=4mxH=1m which is presented on Fig. 1 with the boundary conditions for temperature equation. On that figure the hot wall is on the left side and the cold wall is on the right side."
+		Figure {
+			Title "Dimensions of the domain and boundary conditions for temperature equation. "
+			picture geometry.png
+		}
 	}
-##
-	Description " $\bullet$ Hydraulic initial condition: U (horizontal velocity) = V (vertical velocity) = 0 "
-	Description " $\bullet$ Thermal initial condition (zero Prandtl fluid): linear temperature field: \latex_($T(x) = 1 - x\frac{H}{L}$\latex_) "
-	description " $\bullet$ Hydraulic boundary condition type: paroi_fixe "
-	Description " $\bullet$ The thermal boundary conditons types are as follow: "
-	Description " - Y = 0 (bottom) and Y = 1 (top): Paroi_adiabatique "
-	Description " - T = 1 K (hot side: left) and T = 0 (cold side: right) "
-	Description " "
-	Description " $\bullet$ For VDF calculation: "
-	Description " ENTREE paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 1.00 H_imp Champ_Front_Uniforme 1 1.e11 "
-	Description " SORTIE paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 0.00 H_imp Champ_Front_Uniforme 1 1.e11 "
-	Description " $\bullet$ For VEF calculation: "
-	description " ENTREE paroi_temperature_imposee Champ_Front_Uniforme 1 1.00 "
-	description " SORTIE paroi_temperature_imposee Champ_Front_Uniforme 1 0.00 "
-##
-##	
-	Figure {
-		Title "Geometry: "
-		Description " Dimensions and boundary conditions"
-		picture geometry.png 
-##
+	CICL {
+		Description "The initial velocity is U = V = 0 where U and V are respectively the x-component (horizontal) and the y-component (vertical) of the velocity. At t=0, a linear temperature is applied \latex_($T(x) = 1 - x\frac{H}{L}$\latex_) in the horizontal direction (zero Prandtl fluid). No-slip boundary conditions are applied for Navier-Stokes equations. For temperature equation, zero flux holds on horizontal walls and Dirichlet boundary conditions hold for vertical ones. The boundary conditions are summarized below with the TrioCFD keywords:"
+		Description " $\bullet$ Hydraulic boundary condition type: 'paroi_fixe'"
+		Description " $\bullet$ The thermal boundary conditons types are as follow: "
+		Description "         - Y = 0 (bottom) and Y = 1 (top): 'Paroi_adiabatique'"
+		Description "         - T = 1 K (hot side: left) and T = 0 (cold side: right) "
+		Description "The TrioCFD options for the thermal boundary conditions are (respectively for VDF and VEF):"
+		Description "\latex_(\smallskip\latex_)"
+		Description " $\bullet$ For VDF calculation: "
+		Description "\latex_(\smallskip\latex_)"
+		Description " ENTREE paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 1.00 H_imp Champ_Front_Uniforme 1 1.e11 "
+		Description " SORTIE paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 0.00 H_imp Champ_Front_Uniforme 1 1.e11 "
+		Description "\latex_(\smallskip\latex_)"
+		Description " $\bullet$ For VEF calculation: "
+		Description "\latex_(\smallskip\latex_)"
+		Description " ENTREE paroi_temperature_imposee Champ_Front_Uniforme 1 1.00 "
+		Description " SORTIE paroi_temperature_imposee Champ_Front_Uniforme 1 0.00 "
 	}
-##
-	Table {
+	Propfluide {
+		Description "The physical parameters are set such as the Grashof number is equal to \latex_($3.10^4$\latex_). Hence, although the Prandtl number is equal to 200, the fluid may be considered as a "zero Prandtl fluid" because of a negligible thermal convection scheme. The values of parameters are given in Table 1, where $\rho$ is the density, $\mu$ is the dynamic viscosity, $\lambda$ is the thermal conductivity, \latex_($C_{p}$\latex_) is the specific heat and \latex_($\beta_{th}$\latex_) is the thermal expansion coefficient."
+		Table {
 			Title "Physical properties"
-			Description "The physical properties do not correspond to any existing fluid but are taken in order to impose a Grashof number of about \latex_($3.10^4$\latex_). Consequently, although the Prandtl number is equal to 200, the fluid may be considered as a "zero Prandtl fluid" because of a negligeable thermal convection scheme. "
+			
 			nb_columns 1
 			label Value
 			line {
-			      	legend " $\rho$ (kg/$m^3$) "
-				file propertiesGeometry.dat	
+				legend " $\rho$ (kg/$m^3$) "
+				file propertiesGeometry.dat
 				nb_columns_file 7
 				columns ($4)
 			}
 			line {
-			      	legend " $\mu$ (N/$m^2$/s) "
-				file propertiesGeometry.dat	
+				legend " $\mu$ (N/$m^2$/s) "
+				file propertiesGeometry.dat
 				nb_columns_file 7
 				columns ($1)
 			}
 			line {
-			      	legend " $\lambda$ (W/m/K) "
-				file propertiesGeometry.dat	
+				legend " $\lambda$ (W/m/K) "
+				file propertiesGeometry.dat
 				nb_columns_file 7
 				columns ($2)
 			}
 			line {
-			      	legend "Cp (J/kg/K) "
-				file propertiesGeometry.dat	
+				legend "\latex_($C_{p}$\latex_) (J/kg/K) "
+				file propertiesGeometry.dat
 				nb_columns_file 7
 				columns ($3)
 			}
 			line {
-			      	legend " $\beta$_th "
-				file propertiesGeometry.dat	
+				legend "\latex_($\beta_{th}$\latex_)"
+				file propertiesGeometry.dat
 				nb_columns_file 7
 				columns ($5)
 			}
 	}
-#
+	}
+	Phyecou {
+		Description "Under the influence of the temperature gradient and the Boussinesq approximation, the fluid starts swirling inside the rectangular cavity in the clockwise direction."
+	}
 }
-###
-###
-###
-Chapter {
-	Title "Results"
-	Description " As a consequence of a zero Prandtl fluid, the temperature field can be determined analytically as the time invariant pure conduction solution. Using the thermal boundary conditions shown above, this solution is given by the function \latex_($T(x) = 1 - x\frac{H}{L}$\latex_)"
-	Description " "
-	Description " The desired Grasshof Number Gr of about \latex_($3.10^4$\latex_) with:"
-	Description " \latex_($$Gr=\frac{g.\rho^2.\beta.\Delta T.H^4}{L.\mu^2}$$\latex_) "
-	Description " is obtained by adjusting the different physical parameters. The temperature scale $\Delta T$ is expressed as \latex_($\Delta T=(T_h - T_c)=1 K$\latex_) and the reference temperature is chosen such as \latex_($T_0 =(T_h - T_c) / 2 = 0.5 K$\latex_). "
+#
+Casesetup {
+	Maillage {
+		Description "The VDF and VEF meshes are presented on Figs 2 and 3. The VDF mesh contains 2500 cells which are generated with the 'Pave' option of TrioCFD."
+		visu {
+			Title "VDF Mesh"
+			Width 12cm, trim= 100 100 50 650,clip
+			mesh VDF/Quick/test.lata dom
+		}
+		Description "For VEF mesh contains 5040 triangular cells which are obtained with the 'trianguler_H' option of TrioCFD. An expansion has been applied with factors 1.02 along the x-axis, and 1.05 along the y-direction"
+		visu {
+			Title "VEF Mesh"
+			Width 12cm, trim= 100 100 50 650,clip
+			mesh VEF/Muscl/test.lata dom
+		}
+	}
+	Options_modele {
+		Description "The gravity is downward."
+	}
+	Autres_options {
+		Description "For the VDF scheme, the convection option is 'Quick' or 'Centre' and for the VEF scheme the convection option is 'Muscl', 'EF_stab=0.2' and 'EF_stab=1'. All other numerical options are summarized in Section 4.1."
+	}
+}
+#
+Results {
+	Description "$\bullet$ \latex_(\textbf{Grashof number}\latex_)"
+	Description "\latex_(\smallskip\latex_)"
+	Description " As a consequence of a zero Prandtl fluid, the temperature field can be determined analytically as the time invariant of a pure conduction solution. Using the thermal boundary conditions shown above, this solution is given by the function \latex_($T(x) = 1 - x\frac{H}{L}$\latex_). The Grashof number (Gr) is defined by:"
+	Description " \latex_($$Gr=\frac{g\rho^2\beta\Delta TH^4}{L\mu^2}$$\latex_)"
+	Description "Let us notice the presence of the factor \latex_($H^4/L$\latex_) in the definition (and not \latex_($L^3$\latex_)) because the domain is rectangular. The desired value of the Grashof Number, \latex_($3.10^4$\latex_), is obtained by tuning the different parameters of its definition. The temperature scale $\Delta T$ is expressed as \latex_($\Delta T=(T_h - T_c)=1 K$\latex_) and the reference temperature is chosen such as \latex_($T_0 =(T_h - T_c) / 2 = 0.5 K$\latex_). "
+	Description "\latex_(\medskip\latex_)"
+	Description "$\bullet$ \latex_(\textbf{Velocity and temperature profiles}\latex_)"
+	Description "\latex_(\smallskip\latex_)"
+	Description "The velocity vectors are presented on Fig. 4 at the end of simulation. The profiles of the y-component of the velocity are plotted of Fig. 5 at the end of the simulation $t=800$s. The profiles are presented for VDF and VEF along a horizontal profile for y=0.5 (centre of the cavity) i.e. 0<x<4 and y=0.5. We can observe that the three-cells structure of the vortices is calculated correctly for both discretization methods (VDF and VEF)."
+
 ####
 #### Visu: velocity vectors taken a t = 400s
 #### 
 
-visu {
-	Title "Velocity vectors at t = 800s for VEF mesh (Muscl)"
-	Description " Tis figure shows velocity vectors at the end of the calculation in the enclosure.
-	width 12cm
-#	nb_img_without_newline 1
-#	Pseudocolor VEF/Muscl/test.lata dom VITESSE ELEM
-#	BlackVector VEF/Muscl/test.lata dom VITESSE ELEM 0.25
-	Vector VEF/Muscl/test.lata dom VITESSE ELEM 0.25
-	cycles -1
-      }
+	visu {
+		Title "Velocity vectors at t = 800s for VEF mesh (Muscl)"
+		width 12cm
+#		nb_img_without_newline 1
+#		Pseudocolor VEF/Muscl/test.lata dom VITESSE ELEM
+#		BlackVector VEF/Muscl/test.lata dom VITESSE ELEM 0.25
+		Vector VEF/Muscl/test.lata dom VITESSE ELEM 0.25
+		cycles -1
+	}
 ####
 #### Velocity profile
 ####
-
 #
 	Figure {
-		Title "Velocity profile along y axis at y = 0.5m, and t = 800s"
-		Description " The profiles of the vertical velocity component (y direction) along a horizontal cut in the centre of the cavity (0<x<4, y=0.5) is shown for the instant 800s. The results derived for structured grid (VDF) as well as for the discretisation methods VEF are compared. As we can see, the three-cell structure of the vortices is calculated correctly for all discretisation methods (VDF and VEF)."
+		Title "y-component of the velocity along the x-axis at y = 0.5m, and t = 800s"
 		Width 8cm
 		Dimension 2
 		LabelX "X"
@@ -197,12 +210,11 @@ visu {
 #### Temperature: simulation vs analytical profile
 ####
 #
+	Description "All temperature profiles of TrioCFD, are superimposed to the analytical profile (see Fig. 6)."
 	Figure {
 		Title "Temperature profile along x axis: y = 0.5m "
-		Description "The results are quite supersposed to the analytical profile "
 		Width 8cm
 		Dimension 2
-
 		LabelX " x (m)"
 		RangeX 0 4
 		LabelY "T (K)"
@@ -260,9 +272,9 @@ visu {
 #### evolution of the velocity
 ####
 #
+	Description "For a Grashof number equal to \latex_($3.10^4$\latex_), the flow is known to be periodic. In our case, the periodicity is well established near 300s (see Fig. 7). This time is the starting point for the calculation of the oscillation frequency.  "
 	Figure {
 		Title " Time evolution of the velocity (Muscl scheme)"
-		Description " For a Grasshof number of \latex_($3.10^4$\latex_) the flow is known to be periodic. In our case, the periodicity is well established from about 300s. This instant serves as a starting point for the calculation of the oscillation frequency. "
 		Width 8cm
 		Dimension 2
 		LabelX " time (s)"
@@ -282,86 +294,58 @@ visu {
 #
 #  oscillation frequency
 #
+	Description " A comparison with the results of Behnia and Vahl Davis (in ref $[1]$) may be done for a non-dimensional frequency that is scaled with \latex_($t_{ref}= H^{2}/\nu$\latex_). The values of the five TrioCFD simulations are presented in Table 3, where the average frequencies are calculated in the range $[300s; 800s]$."
 	Table {
 			Title "Oscillation frequency "
-			Description " A comparison to the benchmark results of Behnia and Vahl Davis $[1]$ may be done for a non-dimensional frequency scaled with \latex_($t_{\rm{ref}}= H^{2}/\nu$\latex_). "
-			Description " The values of the simulations presented here stand for average frequencies calculated in the range [300s ; 800s] "
 			nb_columns 3
 			label Period (s)| Non dimensional frequency | Relative error %
 			line {
-			      	legend " Behnia "
+				legend " Behnia "
 				values 105.98 17.87 0
 			}
 			line {
-			      	legend " VDF (Quick) "
+				legend " VDF (Quick) "
 				file ./VDF/Quick/calculerFrequence.dat
 				nb_columns_file 5
 				last_line
 				columns ($1) ($3) ($5)
 			}
 			line {
-			      	legend " VDF (Centered) "
+				legend " VDF (Centered) "
 				file ./VDF/Centre/calculerFrequence.dat
 				nb_columns_file 5
 				last_line
 				columns ($1) ($3) ($5)
 			}
 			line {
-			      	legend " VEF (Muscl) "
+				legend " VEF (Muscl) "
 				file ./VEF/Muscl/calculerFrequence.dat
 				nb_columns_file 5
 				last_line
 				columns ($1) ($3) ($5)
 			}
 			line {
-			      	legend " VEF (EF_stab) "
+				legend " VEF (EF_stab) "
 				file ./VEF/EF_stab/calculerFrequence.dat
 				nb_columns_file 5
 				last_line
 				columns ($1) ($3) ($5)
 			}
 			line {
-			      	legend " VEF (EF_stab alpha = 0.2) "
+				legend " VEF (EF_stab alpha = 0.2) "
 				file ./VEF/EF_stab02/calculerFrequence.dat
 				nb_columns_file 5
 				last_line
 				columns ($1) ($3) ($5)
 			}
 	}
+}
 #
+Conclusion {
+	Description "The simulations validate the laminar fluid flow coupled with the temperature equation with Boussinesq approximation. The TrioCFD simulations are performed in 2D on VDF and VEF grids with several options of convective schemes. The results are in good agreement with those obtained by Behnia, except for the VEF scheme with the 'EF_stab alpha=1' option. For other numerical schemes of TrioCFD, the relative errors vary from 0.22% for 'VEF/Muscl', up to 2.54% for VEF/'EF_stab alpha = 0.2'."
+	Description "\latex_(\smallskip\latex_)"
+	Description "$\bullet$ \latex_(\textbf{Recommendations for users}\latex_)"
+	Description "\latex_(\smallskip\latex_)"
+	Description " The results obtained with the 'EF_stab' scheme are less good than the other ones. However the use of alpha=0.2 instead of alpha=1 improves the result significantly."
 }
-#####
-Chapter {
-	Title "Conclusion"
-	Description " The simulations enable the validation of laminar 2D thermal-hydraulic problems in an enclosure with VDF and VEF grids. In this case, the simulations are rather in good agreement with those obtained by Behnia, except for the VEF/EF_stab calculation. Without this last case, the relative errors is varying from 0.22% for VEF/Muscl, up to 2.54% for VEF/EF_stab (alpha = 0.2). "
-}
-#####
-Chapter {
-	Title "Recommendations for users"
-	Description " The results obtained with the EF_stab scheme are less good than the others. However the use of alpha=0.2 instead of 1 improves the result significantly with respect to Behnia $[1]$."
-}
-#####
-Chapter {
-	Title "Computer performance"
-		tableau_performance {
-		}
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

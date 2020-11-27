@@ -1,702 +1,525 @@
 Parameters {
-	Title Drop hanged at the ceiling
-	Description VDF discretisation
-	ParametersTrio_U Type of fluid : air and water at 293K
+	newvalidTrio
+
+	Title "Drop hanged at the ceiling"
+
+	VersionTrio_U "1.6.1"
+
+	ParametersTrio_U Type of problem: Front Tracking problem
+	ParametersTrio_U Discretization: VDF
+	ParametersTrio_U Convection scheme: Schema_Euler_explicite
+	ParametersTrio_U Type of fluid: air and water at 293K
+	ParametersTrio_U Location: Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop
+
 	Author S.Pigny
-	TestCase pendante_1p5 goutte.data /* data set in annex */
-	TestCase pendante_2p5 goutte.data /* data set in annex */
+
+	TestCase pendante_1p5 goutte.data \* /* data file in annex */
+	TestCase pendante_2p5 goutte.data \* /* data file in annex */
+}
+Objectif {
+	Description "The aim of this test is to check the capability of the Front Tracking algorithm to model the deformations of the free surface of a drop hanging in the air."
+	Description "In the current state, this sheet is not really a validation sheet strictly speaking. Indeed, no advanced comparison, whether whit other CFD codes or analytical results, is made. Some comparisons are nevertheless made on the evolution of the profile of the drop during the calculation with theoretical values but no reference is given."
+	Description "By version v1.8.4, validation will be redone on this sheet in order  to improve the stability of the test case as well as the validation of this phenomenon with other codes, theoretical and/or analytical results."
 }
 
-Chapter {
-	Title "Objectives of the application"
-}
-Chapter {
-	Title "Description of the case"
+Pb_description {
 	Description "A water drop is present at the upper frontier of a closed box. Despite the presence of gravity effects, its position can be maintained hanged close to a solid wall, by the action of surface tension forces. Phenomena related to the contact angle close to the solid wall play an important role. The contact angle is the angle between the surface where is hanged the drop and the tangent at the meridians of the drop close to thesolid wall. It is measured on the external face of the drop. Its value leads to the determination of the amount of water that can be present in the drop, before it falls. The present test case is useful to analyse the way the surface tension forces are taken into account in the presence of contact angle. An emphasis is lain on the importance of parasitic currents. During the calculation, the bubble grows due to low velocity water injection. Water is injected at the center of the drop, via a boundary condition located in the wall. The surface involved in the boundary condition is much lower than the surface wettet by the drop. At the beginning of the process, the volume of the drop has a small value. Its shape tends to be a part of a sphere. Thereafter, it changes, due to hydrostatic pressure. The computationally obtained profile of the drop is compared to an analytical reference solution. Its shape is supposed to follow a cylindrical symetry. It is given by the integration of the following equation :" 	
 	Description "\latex_($$ -\frac{\partial \theta }{\partial s} - \frac{\sin \theta}{x}\ =\ \frac{g\left(\rho_{l} - \rho_{g}\right)}{\sigma}\left( y - y_{0}\right)$$\latex_)."
-	Description "The parameter \latex_($y_{0}$\latex_) is determinated so that the contact angle at the top frontier keeps a fixed, constant, given value. The entire profile of the drop is determined via a classical iteration Runge-Kutta method. In figure 1.1 to 1.5, we show theoretical profiles of a water drop in air, for different sizes, i.e for different amounts of water involved in it. Different contact angles with solid wall are also presented. The numerical accuracy is satisfactory, since the curvature and the contact angle are second order calculated."
-	Description "In TRUST calculations, one can notice that the accuracy does not depend on the eulerian mesh only : the equilibrium profile is fully determinated via the geometrical curvature of interfaces and the gravity potentiel, which is evaluated at the interfacial nodes. It does not depend on discretised quantities related to the fixed mesh. As one can see in the figures of the patterns 2, 3, 4, 5, which show the growth of the drop and the profile of its shape, that parasitic currents do not play an important role. Comparing figures 3 and 5, one can notice that for low values of contact angle, the profile is less stable in time. Some spurious oscillations of the interface take place."
-	}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}
-Chapter {
+	Description "The parameter \latex_($y_{0}$\latex_) is determinated so that the contact angle at the top frontier keeps a fixed, constant, given value. The entire profile of the drop is determined via a classical iteration Runge-Kutta method."
+	Description "In the case modeled here, the following assumptions are taken: \latex_(\smallskip \latex_)
+	Description " \latex_($\hookrightarrow$\latex_) The drop is hanged close to a solid support;"
+	Description " \latex_($\hookrightarrow$\latex_) The gravity is upwardly oriented;"
+	Description " \latex_($\hookrightarrow$\latex_) The y-axis is the axis of symmetry of the drop."
+	Description " Solving the integral of the above equation with the previously mentioned hypotheses makes it possible to predict the theoretical profiles of a water drop in air, for different sizes, i.e for different amounts of water involved in it. Different contact angles with solid wall are also presented. Contact angle values are accounted in the air. The numerical accuracy is satisfactory, since the curvature and the contact angle are second order calculated.
+	Description " \latex_(\smallskip \latex_) "
 	Figure {
-	Title "Figure 1.1 : profile of the drop : theoretical data"
-	Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 1 radian. This value is accounted in the air."
-	Width 15cm
-#        picture profils_1_0.png
-        dimension 2
-        labelx " "
-	labely " "
-	legend off
-	Include_Description_Curves 0
-	Curve {
-    file profil/profils_1.0.brut
-    columns  ($1*0.00268) ($2*0.00268)
-    style lines
-	origin theorie
+		Title "Profiles of the drop : theoretical data for different amount of water and a contact angle between the tangential curve at the drop close to the wall of 1 radian."
+#		Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 1 radian. This value is accounted in the air."
+		Width 8cm
+#		picture profils_1_0.png
+		dimension 2
+		labelx " "
+		labely " "
+		legend off
+		Include_Description_Curves 0
+		Curve {
+			file profil/profils_1.0.brut
+			columns  ($1*0.00268) ($2*0.00268)
+			style lines
+			origin theorie
+		}
 	}
-	}
-	}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}
-Chapter {
 	Figure {
-	Title "Figure 1.2 : profile of the drop : theoretical data"
-	Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 1.5 radian. This value is accounted in the air."
-	Width 15cm
-        dimension 2
-        labelx " "
-	labely " "
-	legend off
-	Include_Description_Curves 0
-	Curve {
-    file profil/profils_1.5.brut
-    columns  ($1*0.00268) ($2*0.00268)
-    style lines
-	origin theorie
+		Title "Profiles of the drop : theoretical data for different amount of water and a contact angle between the tangential curve at the drop close to the wall of 1.5 radian."
+#		Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 1.5 radian. This value is accounted in the air."
+		Width 8cm
+		dimension 2
+		labelx " "
+		labely " "
+		legend off
+		Include_Description_Curves 0
+		Curve {
+			file profil/profils_1.5.brut
+			columns  ($1*0.00268) ($2*0.00268)
+			style lines
+			origin theorie
+		}
 	}
-	}
-	}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}
-Chapter {
 	Figure {
-	Title "Figure 1.3 : profile of the drop : theoretical data"
-	Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 2 radian. This value is accounted in the air."
-	Width 15cm
-        dimension 2
-        labelx " "
-	labely " "
-	legend off
-	Include_Description_Curves 0
-	Curve {
-    file profil/profils_2.0.brut
-    columns  ($1*0.00268) ($2*0.00268)
-    style lines
-	origin theorie
+		Title "Profiles of the drop : theoretical data for different amount of water and a contact angle between the tangential curve at the drop close to the wall of 2 radian."
+#		Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 2 radian. This value is accounted in the air."
+		Width 8cm
+		dimension 2
+		labelx " "
+		labely " "
+		legend off
+		Include_Description_Curves 0
+#		nb_img_without_newline 2
+		Curve {
+			file profil/profils_2.0.brut
+			columns  ($1*0.00268) ($2*0.00268)
+			style lines
+			origin theorie
+		}
 	}
-	}
-	}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}
-Chapter {
 	Figure {
-	Title "Figure 1.4 : profile of the drop : theoretical data"
-	Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 2.5 radian. This value is accounted in the air."
-	Width 15cm
-        dimension 2
-        labelx " "
-	labely " "
-	legend off
-	Include_Description_Curves 0
-	Curve {
-    file profil/profils_2.5.brut
-    columns  ($1*0.00268) ($2*0.00268)
-    style lines
-	origin theorie
+		Title "Profiles of the drop : theoretical data for different amount of water and a contact angle between the tangential curve at the drop close to the wall of 2.5 radian."
+#		Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 2.5 radian. This value is accounted in the air."
+		Width 8cm
+		dimension 2
+		labelx " "
+		labely " "
+		RangeY 0 0.006
+		legend off
+		Include_Description_Curves 0
+		Curve {
+			file profil/profils_2.5.brut
+			columns  ($1*0.00268) ($2*0.00268)
+			style lines
+			origin theorie
+		}
 	}
-	}
-	}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}
-Chapter {
 	Figure {
-	Title "Figure 1.5 : profile of the drop : theoretical data"
-	Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 3 radian. This value is accounted in the air."
-	Width 15cm
-        dimension 2
-        labelx " "
-	labely " "
-	legend off
-	Include_Description_Curves 0
-	Curve {
-    file profil/profils_3.0.brut
-    columns  ($1*0.00268) ($2*0.00268)
-    style lines
-	origin theorie
+		Title "Profiles of the drop : theoretical data for different amount of water and a contact angle between the tangential curve at the drop close to the wall of 3 radian."
+#		Description "The drop is hanged close to a solid support. The gravity is upwardly oriented. The left limit of the picture is the axis of symmetry of the drop. The different curves correspond to different amount of water. For all the curves, the contact angle between the tangential curve at the drop close to the wall is 3 radian. This value is accounted in the air."
+		Width 8cm
+		dimension 2
+		labelx " "
+		labely " "
+		RangeY 0 0.008
+		legend off
+		Include_Description_Curves 0
+		Curve {
+			file profil/profils_3.0.brut
+			columns  ($1*0.00268) ($2*0.00268)
+			style lines
+			origin theorie
+		}
 	}
+	Description " Two calculations are made in this sheet. The differences between them relate only to the contact angle between the tangential curve at the drop close to the wall. In the first case, this one measures 1.5 radian and 2.5 radians in the second case (these values are accounted in the air). This value will be defined in the boundary conditions of the testcase (see sub-section 2.2)."
+	geometry {
+		Description "The problem is solved in a cuboid field with dimensions \latex_(0.021 x 0.012 x 0.021\latex_) meter according X, Y and Z directions. A drop initially hangs in the center of the top face of the cuboid. The angle formed between the free surface of the drop and the upper face of the domain is 1.5 radian (first case - accounted in the air) or 2.5 radians (second case - accounted in the air)."
 	}
-        }
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	icbc {
+		Description "Different initial and boundary conditions are applied between the domain and the water-air interface."
+		Description " \latex_(\medskip \latex_) "
+		Description "$\bullet$ \latex_(\textbf{For the domain}\latex_):"
+		Description " \latex_(\smallskip \latex_) "
+		Description " \latex_($\hookrightarrow$ \textit{Initial condition}\latex_): zero uniform velocity field for the 3 directions"
+		Description " \latex_($\hookrightarrow$ \textit{Boundary conditions}\latex_): at the top of the domaine, a velocity boundary condition of -0.1m.s is applied to give a boost to the drop. At the top of the domain, an outlet boundary condition is defined with an uniform fiels for P/$\rho$ equal to 0 (Pa/kg.$m^3$). For the 4 vertical borders, a situation of adherence is defined."
+		Description " \latex_(\medskip \latex_) "
+		Description "$\bullet$ \latex_(\textbf{For the interface}\latex_):"
+		Description " \latex_(\smallskip \latex_) "
+		Description " \latex_($\hookrightarrow$ \textit{Initial condition}\latex_): the following function is applied to define the initial shape and position of the bubble : \latex_( $-(x-0.0105)*(x-0.0105)-(z-0.0105)*(z-0.0105)-(y-0.012)*(y-0.012)+0.0005*0.0005$\latex_)"
+		Description " \latex_($\hookrightarrow$ \textit{Boundary conditions}\latex_): a specific boundary condition for discountinuous Front_Tracking problem is defined \latex_(\textit{paroi\_ft\_disc} \latex_). The boundary condition is used to define the initial contact angle formed by the drop on the upper wall. The defined function is of the form \latex_( $\alpha+sqrt(((x-0.0105)*(x-0.0105)+(z-0.0105)*(z-0.0105)))*1000.$\latex_) where $\alpha$ represents the contact angle on the liquid side. This value of $\alpha$ will therefore be different for the 2 calculations: 94$^\circ$ in the liquid part to represent 1.5 radians in air (1st case) and 37$^\circ$ in the liquid part to represent 2.5 radians in air (2nd case)."
 	}
-Chapter {	
-visu {
-	Title "Figure 2.1 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 1
-	normal3D 0. 0.141 -0.99
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 2.2 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 0
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	Propfluide {
+		Description "In order to construct the diphasic fluid, two incompressible fluids, water and air, are defined by the usual keyword \latex_(\textit{Fluide\_Incompressible} \latex_). Then, they are associated to create the two-phase fluid via the keyword \latex_(\textit{Fluide\_Diphasique} \latex_)."
 	}
-Chapter {	
-visu {
-	Title "Figure 2.3 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 5
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
 }
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+Casesetup {
+	Maillage {
+		Description "Regarding the interface between air and water (drop surface), a specific mesh adapted to Front-Tracking problem has been defined."
+		Description "The re-meshing criteria defined to model this phenomenon are relatively high with \latex_($lissage\_courbure\_iterations = 20$ \latex_), \latex_($lissage\_courbure\_coeff = -0.05$ \latex_) and \latex_($facteur\_longueur\_ideale = 1$ \latex_)."
+		Description "Indeed, in Front-Tracking calculations, one can notice that the accuracy does not depend on the eulerian mesh only : the equilibrium profile is fully determinated via the geometrical curvature of interfaces and the gravity potentiel, which is evaluated at the interfacial nodes. It does not depend on discretised quantities related to the fixed mesh but to discretized quantities at the interface.  Thus, to properly capture the profile of the drop, it is necessary to define an effective remeshing.
+		Description "In the next version of this sheet, a study will be carried out on these parameters and recommendations adapted to the modeling of this phenomenon will be given to reach a good compromise between the CPU time and the fineness of the results."
 	}
-Chapter {	
-visu {
-	Title "Figure 2.4 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 10
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	Options_modele {
+		Description "This sheet deals with a generic Front-Tracking problem in the discontinuous version. It differs from others TrioCFD test cases : The problem does not state the number of equations that are enclosed in the problem.
+		Description "Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not predefined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword.
 	}
-Chapter {	
-visu {
-	Title "Figure 2.5 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 15
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
 }
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+Results {
+	Description "$\bullet$ \latex_(\textbf{First Calculation: contact angle of 1.5 radian between the tangential curve at the drop close to the wall}\latex_)"
+	Description " \latex_(\medskip \latex_) "
+	Description "The following figures show the growth of the hanging drop at the top of the box for different times."
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0s"
+#		description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 0
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 2.6 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 20
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.01s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 1
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 2.7 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 35
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 2.8 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 50
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 2.9 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 75
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 2.10 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 100
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.05s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 5
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 2.11 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 150
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.1s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 10
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 2.12 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 200
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.15s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 15
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.2s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 20
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 2.13 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 250
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.35s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 35
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 2.14 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 1.5 radian. This value is accounted in the air."
-        
-	mesh pendante_1p5/lata/post.lata INTERFACES
-        mesh pendante_1p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 300
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.5s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 50
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {
-Figure {
-        Title "Profils 1.5 radians"
-        Description "Figure 3 : Comparizons of positions of nodes of lagrangian mesh points and theoretical profiles"
-        Dimension 2
-        LabelX "m"
-        LabelY "m"
-        Curve {
-                legend "file1"
-                origin "Trio_U"
-                file ./pendante_1p5/profil_trio_u_t1.txt
-                Style points
-        }
-        Curve {
-                legend "theorique"
-                file ./profil/nouv_1.5_0.737
-                Style lines
-        }
-        Curve {
-                legend "file1"
-                origin "Trio_U"
-                file ./pendante_1p5/profil_trio_u_t2.txt
-                Style points
-        }
-        Curve {
-                legend "theorique"
-                file ./profil/nouv_1.5_1.146
-                Style lines
-        }
-       Curve {
-                legend "file1"
-                origin "Trio_U"
-                file ./pendante_1p5/profil_trio_u_t3.txt
-                Style points
-        }
-        Curve {
-                legend "theorique"
-                file ./profil/nouv_1.5_1.9
-                Style lines
-        }
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=0.75s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 75
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.1 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 1
-	normal3D 0. 0.141 -0.99
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 4.2 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 0
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=1s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 100
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.3 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 5
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=1.5s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 150
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.4 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 10
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=2s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 200
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.5 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 15
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=2.5s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 250
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.6 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 20
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 1.5 radian - t=3s"
+		mesh pendante_1p5/lata/post.lata INTERFACES
+		mesh pendante_1p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 300
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.7 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 35
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 4.8 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 50
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 4.9 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 75
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
-	}	
-Chapter {	
-visu {
-	Title "Figure 4.10 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 100
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	Description "The following graph represents the profile of the drop at different moment : t1 = 0.45s, t2 = 1.15s and t3= 2.05s and comparizons of positions of nodes of lagrangian mesh points and theoretical profiles. The contact angle of the drop become quickly greated than 90$^\circ$ and one can notice that the numerical accuracy degrades for high contact angle values."
+	Figure {
+		Title "Profils 1.5 radians"
+		Dimension 2
+		LabelX "m"
+		LabelY "m"
+		Curve {
+			legend "file1"
+			origin "Trio_U"
+			file ./pendante_1p5/profil_trio_u_t1.txt
+			Style points
+		}
+		Curve {
+			legend "theorique"
+			file ./profil/nouv_1.5_0.737
+			Style lines
+		}
+		Curve {
+			legend "file1"
+			origin "Trio_U"
+			file ./pendante_1p5/profil_trio_u_t2.txt
+			Style points
+		}
+		Curve {
+			legend "theorique"
+			file ./profil/nouv_1.5_1.146
+			Style lines
+		}
+		Curve {
+			legend "file1"
+			origin "Trio_U"
+			file ./pendante_1p5/profil_trio_u_t3.txt
+			Style points
+		}
+		Curve {
+			legend "theorique"
+			file ./profil/nouv_1.5_1.9
+			Style lines
+		}
 	}
-Chapter {	
-visu {
-	Title "Figure 4.11 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 125
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	Description "$\bullet$ \latex_(\textbf{Second Calculation: contact angle of 2.5 radian between the tangential curve at the drop close to the wall}\latex_)"
+	Description " \latex_(\medskip \latex_) "
+	Description "The following figures show the growth of the hanging drop at the top of the box for different times."
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 0
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.12 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 150
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.01s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 1
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.13 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 175
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.05s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 5
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {	
-visu {
-	Title "Figure 4.14 : Growing of drop"
-	description "Drop hanged at the top of the box. The contact angle is 2.5 radian. This value is accounted in the air."
-        
-	mesh pendante_2p5/lata/post.lata INTERFACES
-        mesh pendante_2p5/lata/post.lata dom_pb1
-        operator slice 0. 0. 0. 0. -1. 0.
-	cycles 200
-	normal3D 0. 0.4 -0.917
-	up3D 0. 0. 1.   
-	width 18cm  
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.1s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 10
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {
-Figure {
-        Title "Profils 2.5 radians"
-        Description "Figure 5 : Comparizons of positions of nodes of lagrangian mesh points and theoretical profiles"
-        Dimension 2
-        LabelX "m"
-        LabelY "m"
-        Curve {
-                legend "file1"
-                origin "Trio_U"
-                file ./pendante_2p5/profil_trio_u_t1.txt
-                Style points
-        }
-        Curve {
-                legend "theorique"
-                file ./profil/nouv_2.5_0.715
-                Style lines
-        }
-        Curve {
-                legend "file1"
-                origin "Trio_U"
-                file ./pendante_2p5/profil_trio_u_t2.txt
-                Style points
-        }
-        Curve {
-                legend "theorique"
-                file ./profil/nouv_2.5_0.887
-                Style lines
-        }
-       Curve {
-                legend "file1"
-                origin "Trio_U"
-                file ./pendante_2p5/profil_trio_u_t3.txt
-                Style points
-        }
-        Curve {
-                legend "theorique"
-                file ./profil/nouv_2.5_1.279
-                Style lines
-        }
-}
-}
-Chapter {
-	Description "\latex_(\newpage\latex_)"	
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.15s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 15
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
 	}
-Chapter {
-        Title "Computer performance"
-        tableau_performance {
-        }
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.2s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 20
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.35s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 35
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.5s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 50
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=0.75s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 75
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=1s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 100
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=1.25s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 125
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=1.5s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 150
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=1.75s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 175
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	visu {
+		Title "Drop hanged at the top of the box with a contact angle of 2.5 radian - t=2s"
+		mesh pendante_2p5/lata/post.lata INTERFACES
+		mesh pendante_2p5/lata/post.lata dom_pb1
+		operator slice 0. 0. 0. 0. -1. 0.
+		cycles 200
+		normal3D 0. 0.4 -0.917
+		up3D 0. 0. 1.   
+		width 11cm, trim= 80 140 80 200, clip
+	}
+	Description "The following graph the profile of the drop at different moment : t1 = 2.4s, t2 = 3.65s and t3= 6.45s and comparizons of positions of nodes of lagrangian mesh points and theoretical profiles."
+	Description "Regarding profiles for 1.5 and 2.5 radians, one can notice that for low values of contact angle, the profile is less stable in time. Some spurious oscillations of the interface take place."
+	Figure {
+		Title "Profils 2.5 radians"
+		Dimension 2
+		LabelX "m"
+		LabelY "m"
+		Curve {
+			legend "file1"
+			origin "Trio_U"
+			file ./pendante_2p5/profil_trio_u_t1.txt
+			Style points
+		}
+		Curve {
+			legend "theorique"
+			file ./profil/nouv_2.5_0.715
+			Style lines
+		}
+		Curve {
+			legend "file1"
+			origin "Trio_U"
+			file ./pendante_2p5/profil_trio_u_t2.txt
+			Style points
+		}
+		Curve {
+			legend "theorique"
+			file ./profil/nouv_2.5_0.887
+			Style lines
+		}
+		Curve {
+			legend "file1"
+			origin "Trio_U"
+			file ./pendante_2p5/profil_trio_u_t3.txt
+			Style points
+		}
+		Curve {
+			legend "theorique"
+			file ./profil/nouv_2.5_1.279
+			Style lines
+		}
+	}
+}
+
+Conclusion {
+	Description "This sheet demonstrate the capabilities of TrioCFD for the modeling of this type of phenomenon. A first comparison with the theory shows a good prediction of the shape of the drop over time. However, for drop contact angles greater than 90$^\circ$, the accuracy is deteriorated. A study will be carried out between now and v1.8.4 in order to understand the origin of these oscillations, reduce them and give recommendations for a good parameterization of Front-Tracking remeshing.""
 }

@@ -1,22 +1,19 @@
 Parameters {
-	Title "Poiseuille_flow_2D_VDF_VEF"
-	Description "Study of Poiseuille flow in a plane chanel"
-	Description " "
-	Description " \latex_(\underline{Validated model:}\latex_) Hydraulic with pressure drop "
-	Description " "
-	Description " \latex_(\underline{Validation with:}\latex_) Analytical solution "
+	newvalidTrio
+	Title "Poiseuille flow 2D with VDF and VEF meshes"
 
 	VersionTrio_U "1.6.1"
 
 	ParametersTrio_U Type of probem: 2D hydraulic
 	ParametersTrio_U Discretization: VEFPreP1B and VDF 
-	ParametersTrio_U Time scheme: Euler explicite
+	ParametersTrio_U Time scheme: Explicit Euler
 	ParametersTrio_U VDF convection scheme: Quick or Amont
 	ParametersTrio_U VEFPreP1B convection scheme: Muscl or Amont or EF_stab (alpha = 1)
 	ParametersTrio_U Turbulence model: none
 	ParametersTrio_U Type of boundary condition: inlet ; outlet
-	ParametersTrio_U Type of fluid: pure numerical properties
-	ParametersTrio_U Solving of equations: Navier_Stokes_standard
+	ParametersTrio_U Equations being solved: Navier_Stokes_standard
+	ParametersTrio_U Master Test case: poiseuille.data
+	ParametersTrio_U Location: /validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF
 #
 	TestCase VDF/Amont test \*
 	TestCase VDF/Quick test
@@ -26,88 +23,96 @@ Parameters {
 
 	Author "E.MOREAU (V.BARTHEL)"
 	IncludeData 2
-
 }
-##################################################
-Chapter {
-	Title "Tests Description"
-##
-	Figure {
-		Title "Geometry: Dimensions and domain overview"
-		picture geometry.png
-	}
-##
-	visu {
-		Title "VDF Mesh"
-		Width 10cm, viewport= 0 0 1000 1000,clip
-		mesh VDF/Amont/test.lata dom
-		Description "Geometry of the test: 2D plane chanel"
-		Description "Dimensions of the test: 0.5m \latex_($\times$\latex_) 1m"
-		Description "Mesh 2D: 200 cells (20\latex_($\times$\latex_)10)"
-	}
-		visu {
-		Title "VEF Mesh"
-		Width 10cm, viewport= 0 0 1000 1000,clip
-		mesh VEF/Amont/test.lata dom
-		Description "Geometry of the test: 2D plane chanel"
-		Description "Dimensions of the test: 0.5m \latex_($\times$\latex_) 1m"
-		Description "Mesh 2D: 400 cells (20\latex_($\times$\latex_)10\latex_($\times$\latex_)2)"
-	}
-##
-	Description " $\bullet$ Dimensions: H = 0.5m ; L = 1m "
-	Description " $\bullet$ Initial conditions: velocity = 0 "
-	Description " $\bullet$ Hydraulic boundary conditions: "
-	Description " \latex_($\ \ \ \ \ $\latex_) - INLET pressure imposed: P = 1 bar "
-	Description " \latex_($\ \ \ \ \ $\latex_) - OUTLET pressure imposed: P = 0 bar "
-	Description " \latex_($\ \ \ \ \ $\latex_) - Top wall: fixed wall " 
-	Description " \latex_($\ \ \ \ \ $\latex_) - Symmetry: symmetry "
-	Description " "
-	Description " $\bullet$ Comparison with the analytical solution: V($x$)=\latex_($-\frac{1}{2}x^2$\latex_) + 0.125
 #
-	Table {
+Objectif {
+	Description "The purpose is to validate the incompressible laminar module of TrioCFD on the well-known analytical solution of Poiseuille flow in a plane channel. Thirteen test cases of Poiseuille flow exist in the TrioCFD database (poiseuille_3D, Poiseuille_flow_2D_VDF_VEF, PoiseuilleInOut2DVDFVEF_prismes, PoiseuilleInOut2DVDFVEF_trianfin, PoiseuilleInOutVDFVEF, Poiseuilleperio2D, and so on ...). Here we present the test corresponding to the "Poiseuille_flow_2D_VDF_VEF", for which the analytical solution writes:"
+	Description " \latex_(\begin{center} $V_{x}(H)$=$-\frac{1}{2}H^2$ + 0.125 \end{center} \latex_)
+	Description "\latex_(\smallskip\latex_)"
+	Description "when a pressure drop is applied at inlet and outlet."
+}
+#
+Pb_description {
+	geometrie {
+		Description "The geometry is a two-dimensional plane channel of dimensions H = 0.5m and L = 1m (see Figure)"
+		Figure {
+			Title "Geometry: Dimensions and domain overview"
+			picture geometry.png
+			}
+		}
+	CICL {
+		Description "At the beginning of the simulation, the fluid is at rest \latex_($V_x=0$\latex_) inside a rectangular domain where the top boundary is a fixed wall, the lower boundary is a symmetry condition and a two different values of pressure are applied at the left and the right boundaries. The initial and boundary conditions are summarized below:" 
+		Description " $\bullet$ Initial conditions: \latex_($V_x=0$\latex_)"
+		Description " $\bullet$ Hydraulic boundary conditions: "
+		Description " \latex_($\ \ \ \ \ $\latex_) - INLET pressure imposed: P = 1 bar "
+		Description " \latex_($\ \ \ \ \ $\latex_) - OUTLET pressure imposed: P = 0 bar "
+		Description " \latex_($\ \ \ \ \ $\latex_) - Top wall: fixed wall " 
+		Description " \latex_($\ \ \ \ \ $\latex_) - Symmetry: symmetry "
+		Description " "
+	}
+	Propfluide {
+		Description "The fluid used in this test is fictive. The two parameters of the model are the dynamic viscosity $\mu$ and the density $\rho$. Their values are summarized in Table 1."
+		Table {
 			Title " Physical properties "
 			Description " "
 			nb_columns 1
 			label Value
 			line {
-			      	legend " $\mu$ (N/$m^2$/s) "
+				legend " $\mu$ (N/$m^2$/s) "
 				file propertiesGeometry.dat	
 				nb_columns_file 2
 				columns ($1)
 			}
 			line {
-			      	legend " $\rho$ (kg/$m^3$) "
+				legend " $\rho$ (kg/$m^3$) "
 				file propertiesGeometry.dat
 				nb_columns_file 2
 				columns ($2)
 			}
+		}
 	}
+	Phyecou {
+		Description "At the steady state, the profile of the \latex_($V_x$\latex_) component must fit the analytical solution (parabolic profile) with a maximum velocity for $H=0$  and 0 for $H=0.5$."
+	}
+}
 #
-} 
-#Chapitre {
-#	Title " "
-#	Description " \latex_(\newpage\latex_) "
-#}
-#############
-############# RESULTS
-#############
-Chapter {
-	Title "RESULTS"
+Casesetup {
+	Maillage {
+		Description "The calculations are carried out by using two meshes: the first mesh in VDF and the second one in VEF. For the VDF mesh, the 2D grid is composed of 200 cells (20\latex_($\times$\latex_)10) and for the VEF mesh, the grid is composed of 400 cells (20\latex_($\times$\latex_)10\latex_($\times$\latex_)2). Both meshes are presented on Fig. 2 (VDF) and Fig. 3 (VEF)."
+		visu {
+			Title "VDF Mesh"
+			Width 12cm, trim= 100 105 20 450,clip
+			mesh VDF/Amont/test.lata dom
+		}
+		visu {
+			Title "VEF Mesh"
+			Width 12cm, trim= 100 105 20 450,clip
+			mesh VEF/Amont/test.lata dom
+		}
+	}
+	Options_modele {
+		Description "The case modeled here being a laminar hydraulic problem in 2D, the equations solved are those of standard Navier-Stockes. "
+		}
+	Autres_options {
+		Description "The numerical results are compared with the analytical solution for five spatial discretization schemes implemented in TrioCFD: 'Amont' and 'Quick' for 'VDF' and 'Amont', 'Muscl' and 'stab' for VEF."
+	}
+}
+#
+Results {
 	Description " $\bullet$ Transitory calculation time: about 2s of physical time (transitory calculation until a stationnary flow is reached).  "
 	Description " $\bullet$ Average time step: \latex_(6.2 $10^{-4}$\latex_)s in VDF and \latex_(7.8 $10^{-5}$\latex_)s in VEFPreP1B. "
+
 #
 ###
 ### T_Y01
 	Figure {
 		Title "Transverse velocity profile"
-#		Width 12cm, viewport = 0 0 924 400,clip
-		Width 10cm
+		Width 14cm
 		Dimension 2			
 		LabelX "Plane channel height (m)"
 		RangeX 0. 0.5
 		LabelY "Vx (m/s)"
 		RangeY 0 0.15
- #		legend below title "Legende"
 		Include_Description_Curves 0			
 		Curve {
 			legend "analytical solution"
@@ -115,7 +120,7 @@ Chapter {
 			Fonction -0.5*x*x + 0.125
 			Style points
 			TypeLigne -1
-		}
+			}
 		Curve {
 			legend "VDF Amont"
 			origin "Trio_U"
@@ -123,7 +128,7 @@ Chapter {
 			columns ($1) ($2)
 			Style lines
 			TypeLigne 1
-		}
+			}
 		Curve {
 			legend "VDF Quick"
 			origin "Trio_U"
@@ -131,7 +136,7 @@ Chapter {
 			columns ($1) ($2)
 			Style points
 			TypeLigne 2
-		}
+			}
 		Curve {
 			legend "VEFPreP1B Amont"
 			origin "Trio_U"
@@ -139,7 +144,7 @@ Chapter {
 			columns ($1) ($2)
 			Style lines
 			TypeLigne 3
-		}
+			}
 		Curve {
 			legend "VEFPreP1B Muscl"
 			origin "Trio_U"
@@ -147,7 +152,7 @@ Chapter {
 			columns ($1) ($2)
 			Style points
 			TypeLigne 4
-		}
+			}
 		Curve {
 			legend "VEFPreP1B EF_stab"
 			origin "Trio_U"
@@ -155,30 +160,15 @@ Chapter {
 			columns ($1) ($2)
 			Style points
 			TypeLigne 5
-		}
-
+			}
 	}
 }
-###
-#####
-Chapter {
-	Title " Conclusion "
- 	Description " $\bullet$ In VEFPreP1B discretization (greatest refinement), the Trio_U results are fitting the analytical solution, in particular with the EF_stab scheme. "
- 	Description " $\bullet$ The simulations give slightly lower results in VDF discretization (less than 3%). " 
-
+#
+Conclusion {
+	Description "In VEFPreP1B discretization (greatest refinement), the analytical solution is well-fitted with TrioCFD, in particular with the EF_stab scheme. The simulations give slightly different results in VDF discretization (less than 3%)."
+	Description "\latex_(\smallskip\latex_)"
+	Description "$\bullet$  \latex_(\textbf{Recommendations for users}\latex_)"
+	Description "\latex_(\smallskip\latex_)"
+	Description " The VEFPreP1B discretization associated to an EF_stab scheme gives the best results on the whole domain. "
 }
-#####
-Chapter {
-	Title "Recommendations for users"
-	Description " The VEFPreP1B discretization associated to an EF_stab schem give the closest results on the whole domain. "
-}
-###
-
-Chapter {
-	Title "Computer performance"
-		tableau_performance {
-		}
-}
-
-
 
