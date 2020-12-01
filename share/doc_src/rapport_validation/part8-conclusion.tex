@@ -1,0 +1,76 @@
+%% LyX 2.2.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+%%\documentclass[english]{article}
+%%\usepackage[T1]{fontenc}
+%%\usepackage[latin9]{inputenc}
+%%\usepackage{geometry}
+%%\geometry{verbose,tmargin=2cm,bmargin=3cm,lmargin=2.5cm,rmargin=2.5cm}
+%%\usepackage{babel}
+%%\begin{document}
+
+%%\section*{Conclusion}
+
+This document is a very first version of a \texttt{TrioCFD} validation
+report resulting of an analysis and a sorting work that have been
+done on its database. First, an important inventory job was carried
+out in order to sort the test cases for targeting quickly the use
+of \texttt{TrioCFD} in different CFD configurations. The inventory
+resulted in a single table with plenty information (LibreOffice format),
+where the test cases are classified into several subdomains of fluid
+flows. In this document, some of them have been selected and detailed
+because 1) they are well-known in the literature, 2) they present
+comparisons with other academic or commercial CFD codes and 3) they
+present comparisons with experimental data. In this report, the test
+cases are representative of five subdomains: ``Laminar flow'' (Part
+III), ``Thermal laminar flow'' (Part IV), ``Turbulent flow'' (Part
+V), ``Thermal turbulent flow'' (Part VI) and ``Front Tracking''
+(Part VII). The first four parts gather the test cases of single phase
+flow, coupled or not with turbulence model and temperature equation.
+The last part is dedicated to two-phase flow with interface tracking.
+The corresponding datafiles of those test cases were run with the
+\texttt{1.8.2} version of \texttt{TrioCFD} for checking the achievement
+of computations. Meanwhile, an important work was carried out for
+updating a new \texttt{PRM} template in order to standardize all validation
+sheets. For each one of them, let us remind that the PDF file is generated
+by running a bash script (command \texttt{Run\_fiche -not\_run}) which
+acts on a \texttt{PRM} file. A \texttt{PRM} file is a set of specific
+instructions for interfacing the \LaTeX ~commands with the \texttt{TrioCFD}
+results post-processed with \texttt{Gnuplot} or \texttt{Visit}. Its
+content can be freely chosen by authors which has the consequence
+that the number and titles of sections differ from one sheet to another
+one. The goal of the new \texttt{PRM} template is to harmonize their
+contents for a more homogeneous rendering of this report. The seven
+sections of the new \texttt{PRM} template detail the main stages of
+CFD modeling and describe the comparisons. All validation sheets of
+this report have been revised and enhanced by taking into account
+this new \texttt{PRM} template.
+
+\section*{Perspective}
+
+Numerous other validation sheets already exist in the \texttt{TrioCFD}
+database and the job must be pursued. Hence, this document does not
+present an exhaustive list of what \texttt{TrioCFD} can do for CFD
+applications. It can be viewed as a simple ``snapshot'' that will
+be improved and increased in its future versions. The improvement
+will be simplified by the methodology and the tools which have been
+developped for \texttt{PRM} files. After checking and updating the
+validation sheets, they will be added in the future versions of this
+report. Among the available test cases, the sort will be pursued to
+separate those currently ``in progress'' and the others that lack
+quantitative comparisons. Multiple variations of the same test case
+appear in the database (e.g. ``Poiseuille flow''). Some of them
+are simply a 3D extension of the same test case, or an extension with
+temperature equation or turbulence model. For instance, the laminar
+test case of ``flow with a cylinder'' (Chapter III.3) exists in
+turbulent version in two and three dimensions. Another example is
+given by the test case named ``Backward facing step'' which appears
+in four different versions: the first one is ``two-dimensional'',
+the second one is ``implicit'', the third one is ``three-dimensional''
+and the last one is ``heated in two dimensions''. More test cases
+of turbulent flow are also available, such as ``Baglietto'' and
+``Flow in curved pipe''. An effort will be done for extending the
+number of CFD subdomains such as ``Quasi-compressible flow'', ``Flow
+in porous media'' and ``fluid-structure interaction''. Finally
+several tests are dedicated to the ``grid convergence'' or ``Miscellaneous
+tests'' of numerical options.
+\end{document}

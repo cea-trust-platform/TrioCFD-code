@@ -1,0 +1,315 @@
+#!/bin/bash
+#definition des chemins
+cd ../../..
+version=$(pwd)
+echo 'emplacement version: '$version
+cd $version/share/doc_src/rapport_validation
+rapport=$(pwd)
+echo 'emplactement rapport: ' $rapport
+##################################################
+#           nettoyage avant lancement
+##################################################
+rm -rf fiches
+mkdir fiches
+cd fiches
+##################################################
+#           fiches laminaires
+##################################################
+########### Poiseuille_flow_2D_VDF_VEF ###########
+mkdir Poiseuille_flow_2D_VDF_VEF
+cd Poiseuille_flow_2D_VDF_VEF
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Poiseuille_flow_2D_VDF_VEF/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### Lid_driven_cavity ########################
+cd $rapport/fiches
+mkdir Lid_driven_cavity
+cd Lid_driven_cavity
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Physical_test_cases/Lid_driven_cavity/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_automatiques/Physical_test_cases/Lid_driven_cavity/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Lid_driven_cavity/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### Cir_Cyl_Re100 ########################
+cd $rapport/fiches
+mkdir Cir_Cyl_Re100
+cd Cir_Cyl_Re100
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Cir_Cyl_Re100/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Cir_Cyl_Re100/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Cir_Cyl_Re100/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+##################################################
+#           fiches thermique + laminaire
+##################################################
+########### Convection Vahl Davis ################
+cd $rapport/fiches
+mkdir Convection_Vahl_Davis
+cd Convection_Vahl_Davis
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Convection_Vahl_Davis/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Convection_Vahl_Davis/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Convection_Vahl_Davis/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### Oscillatory convection flow ################
+cd $rapport/fiches
+mkdir Oscillating_Flow
+cd Oscillating_Flow
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Oscillating_Flow/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Oscillating_Flow/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Oscillating_Flow/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+##################################################
+#           fiches turbulent
+##################################################
+########### OBI_diffuser_VEF_k_eps ################
+cd $rapport/fiches
+mkdir OBI_diffuser_VEF_k_eps
+cd OBI_diffuser_VEF_k_eps
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/OBI_diffuser_VEF_k_eps/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/OBI_diffuser_VEF_k_eps/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/OBI_diffuser_VEF_k_eps/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### Mixing_length_VEF_WF ################
+cd $rapport/fiches
+mkdir Mixing_length_VEF_WF
+cd Mixing_length_VEF_WF
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Mixing_length_VEF_WF/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Mixing_length_VEF_WF/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Mixing_length_VEF_WF/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+##################################################
+#           fiches thermique + laminaire
+##################################################
+########### Thermal_stratification_flow  ################
+cd $rapport/fiches
+mkdir Thermal_stratification_flow
+cd Thermal_stratification_flow
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Thermal_stratification_flow/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Thermal_stratification_flow/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Thermal_stratification_flow/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### Channel_T1_T2_incompressible ################
+cd $rapport/fiches
+mkdir Channel_T1_T2_incompressible
+cd Channel_T1_T2_incompressible
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Channel_T1_T2_incompressible/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Channel_T1_T2_incompressible/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/Channel_T1_T2_incompressible/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+sed -i "109 s@Incompressible/Canal\_plan\_bi\_periodique\_M1/Canal\_plan\_bi\_periodique\_M1@M1@" corps.tex
+sed -i "110 s@Incompressible/Canal\_plan\_bi\_periodique\_M10/Canal\_plan\_bi\_periodique\_M10@M10@" corps.tex
+sed -i "111 s@Incompressible/Canal\_plan\_bi\_periodique\_M100/Canal\_plan\_bi\_periodique\_M100@M100@" corps.tex
+sed -i "112 s@Incompressible/Canal\_plan\_bi\_periodique\_M1\_tetraedrise/Canal\_plan\_bi\_periodique\_M1\_tetraedrise@M1\_tetraedrise@" corps.tex
+sed -i "113 s@Incompressible/Canal\_plan\_bi\_periodique\_M1bis\_tetraedrise/Canal\_plan\_bi\_periodique\_M1bis\_tetraedrise@M1bis\_tetraedrise@" corps.tex
+##################################################
+#           fiches Front_Tracking
+##################################################
+########### FTD_oscillating_bubble ################
+cd $rapport/fiches
+mkdir FTD_oscillating_bubble
+cd FTD_oscillating_bubble
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/FTD_oscillating_bubble/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### FTD_hanging_drop ################
+cd $rapport/fiches
+mkdir FTD_hanging_drop
+cd FTD_hanging_drop
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/FTD_hanging_drop/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+##################################################
+#           Generation document final
+##################################################
+cd $rapport
+
+pdflatex validation_report_TrioCFD.tex
+okular validation_report_TrioCFD.pdf&
