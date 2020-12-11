@@ -1,0 +1,20 @@
+Parameters {
+	newvalidTrio
+	Title "Turbulent flow inside a double-periodic plane channel with heated walls"
+	TestCase "Incompressible/Canal_plan_bi_periodique_M1" "Canal_plan_bi_periodique_M1.data" /**/
+	TestCase "Incompressible/Canal_plan_bi_periodique_M10" "Canal_plan_bi_periodique_M10.data"
+	TestCase "Incompressible/Canal_plan_bi_periodique_M100" "Canal_plan_bi_periodique_M100.data"
+	
+	TestCase "Incompressible/Canal_plan_bi_periodique_M1_tetraedrise" ...
+	TestCase "Incompressible/Canal_plan_bi_periodique_M1bis_tetraedrise" ...
+	
+	ParametersTrio_U "Bi-periodic plane channel in X and Z"
+	ParametersTrio_U "Convection scheme = EF_stab "
+	ParametersTrio_U "k-$\varepsilon$ modelling of turbulence"
+	ParametersTrio_U "Wall law = loi_standard_hydr ..."
+	ParametersTrio_U "Heat transfer with imposed temperatures"
+	ParametersTrio_U "No-slip at the wall"
+	Reference "$[1]$ Stanislav N. Danov, Norio Arai and Stuart ..."
+	Author "FOURNIER C"
+	IncludeData 2
+}

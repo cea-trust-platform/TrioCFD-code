@@ -1,0 +1,86 @@
+\lettrine[lines=2,slope=0pt,nindent=4pt]{\textbf{T}}{he} \texttt{TrioCFD}
+database contains currently around 160 test cases of validation which
+are called in this document ``validation sheets''. The present
+report is the result of an inventory work of the most important of these validation
+sheets to know (non exhaustive list): What type of flow do they simulate?
+What is the degree of maturity of each validation? What sort of
+comparison do they exhibit? and so on ... \smallskip\newline
+
+This validation report has several objectives:
+\begin{itemize}
+\item Help users to identify application areas of \texttt{TrioCFD} code;
+\item Give users examples of modeling (\texttt{TrioCFD} keywords and boundary
+conditions) on specific cases;
+\item Inform users of changes/improvements on the code validation;
+\item Make an inventory of the code validation for each delivered version;
+\item Account for physical and/or numerical impacts observed resulting from
+implementation, corrections or modifications of test cases that have
+been made between each version;
+\item Update the validation status of the code.
+\end{itemize}
+
+In previous versions of \texttt{TrioCFD}, each validation sheet was
+been written by different authors who using their own approach. In order
+to improve the readability of this report, the content of all these validation
+sheets has been harmonized by using identical titles and same general
+organisation. For this purpose, a new \texttt{PRM} template has been
+updated in \texttt{TrioCFD} (\texttt{v1.8.2}). The update has required
+modifying the \texttt{Python} script and revising all \texttt{PRM}
+files with the same content. More precisely, new tags have been added
+and new keywords must be used by authors when writing the \texttt{PRM}
+file. Details this new \texttt{PRM} template and keywords are presented
+in Part II. This new template will be helpful for future versions
+of this document when a specific study using \texttt{TrioCFD} will
+lead to write a new \texttt{PRM} sheet or to update an old one. The Part II
+will also describe the methodology for making this report.\smallskip\newline
+
+Moreover, until now, all the validation sheets were placed in various
+folders of the \texttt{TrioCFD} package. Hence, some of them could not
+be found quickly by users who had to browse all the directories. This
+report gathers in one single document some of these sheets classified according
+the type of flow or physics investigated. The selected
+test cases are representative of five subdomains summarized in Table
+\ref{tab:Type-of-flows} and successively presented for flows
+of increasing complexity: \textquotedblleft Laminar flow\textquotedblright{}
+(Part III), \textquotedblleft Thermal laminar flow\textquotedblright{}
+(Part IV), \textquotedblleft Turbulent flow\textquotedblright{} (Part
+V), \textquotedblleft Thermal turbulent flow\textquotedblright{} (Part
+VI) and \textquotedblleft Front Tracking\textquotedblright{} (Part
+VII). The first four parts gather the test cases for single phase flow,
+coupled or not with turbulence and thermal modeling. The
+last part is dedicated to two-phase flows with interface tracking.
+Finally Part VIII concludes this report and perspectives will be sketched.
+\newpage
+\vspace{2cm}
+\begin{table}[H]
+\begin{centering}
+\begin{tabular}{lll}
+\hline 
+\textbf{Parts} & $\qquad$ & \textbf{Type of flows}\tabularnewline
+\hline 
+Part III &  & Laminar Flow\tabularnewline
+Part IV &  & Thermal Laminar Flow\tabularnewline
+Part V &  & Turbulent Flow\tabularnewline
+Part VI &  & Thermal Turbulent Flow\tabularnewline
+Part VII &  & Two-phase Flows with Front Tracking\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+\caption{\label{tab:Type-of-flows}Type of flow investigated to each Part.}
+\end{table}
+
+The sheets appearing in those parts are selected because they separately
+simulate a particular flow well-known in the CFD literature,
+such as the ``\emph{Poiseuille flow}'' and ``\emph{lid-driven cavity
+flow}'' which are two examples of ``Laminar Flows''. For ``Thermal
+Laminar Flows'' the ``\emph{Vahl Davis convection flow}'' is a
+standard test case. Other sheets were selected because they compare
+\texttt{TrioCFD} with other CFD results using alternative academic
+or commercial codes (e.g. \texttt{Fluent} or other benchmarks) such
+as ``\emph{OBI diffuser}'' (Turbulent flow). When available and
+representative of flows, experimental data measured on facility tests
+were included for comparisons and appear on the graphs (e.g. ``\emph{Thermal
+stratification flow in a plenum}''). The number of tests presented in this
+report will be gradually increased at each new version release of \texttt{TrioCFD}.\medskip\newline
+
+

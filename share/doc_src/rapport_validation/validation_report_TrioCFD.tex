@@ -1,0 +1,304 @@
+\documentclass[10pt,twoside,a4paper]{memoir}
+\usepackage[ascii]{}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{lettrine}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,amsfonts,textcomp}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{fancybox}
+\usepackage{fancyvrb}
+\usepackage[open=true]{bookmark}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{array,multirow,multicol}
+\usepackage{lastpage}
+\usepackage{cellspace}
+\usepackage{enumitem}
+\usepackage{babel}
+\usepackage{float}
+\usepackage{chngcntr}
+% espacement table des matieres et des figures entre numero et titre
+\usepackage{tocloft}
+\renewcommand{\cftpartnumwidth}{3em}
+\cftsetindents{figure}{0em}{4em}
+\cftsetindents{table}{0em}{4em}
+%
+% Pour supprimer les encadres rouges des liens et definir leur fonte en bleu
+\usepackage{makeidx}
+\usepackage{hyperref}
+\hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
+%
+\setlength\hoffset{0cm}
+\setlength\voffset{0cm}
+\setlength\oddsidemargin{0cm}
+\setlength\evensidemargin{0cm}
+\setlength\topmargin{0cm}
+\setlength\headheight{0.45cm}
+\setlength\headsep{0.6cm}
+\setlength\marginparsep{0cm}
+\setlength\marginparwidth{0cm}
+\setlength\footskip{1.4cm}
+\setlength{\textheight}{670pt} 
+\setlength\textwidth{16.4cm}
+\setlength{\cellspacebottomlimit}{5pt}
+\setlength{\cellspacetoplimit}{5pt}
+\setlength{\parindent}{0pt}
+\setcounter{tocdepth}{2}
+\setsecnumdepth{section}
+% espacement corps de texte
+\baselineskip=14pt
+%
+% redefinition de la numerotation des figures et des tableaux
+\renewcommand{\thefigure}{\Roman{part}.\arabic{chapter}.\arabic{figure}}
+\renewcommand{\thetable}{\Roman{part}.\arabic{chapter}.\arabic{table}}
+%
+\makeatletter
+%% Because html converters don't know tabularnewline
+\floatstyle{ruled}\providecommand{\tabularnewline}{\\}
+%% nouvelle commande algorithm pour des zones de code
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}[chapter]
+\providecommand{\algorithmname}{Algorithm}
+\floatname{algorithm}{\protect\algorithmname}
+%
+\makeatother
+%
+\fancypagestyle{part}{%
+\fancyhead[L]{}
+\fancyhead[R]{\textit{\rightmark}}
+\lfoot{\textit{TRUST/TRIOCFD Validation, v1.8.2}}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}}
+%
+\fancypagestyle{chapter}{%
+\fancyhead[L]{\textit{\rightmark}}
+\fancyhead[R]{}
+\lfoot{\textit{TRUST/TRIOCFD Validation, v1.8.2}}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}}
+%
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+\lhead{\leftmark}
+\chead{}
+\rhead{\rightmark}
+\lfoot{\textit{TRUST/TRIOCFD Validation, v1.8.2}}
+\cfoot{}
+\rfoot{\thepage}
+%
+% definition du style des parties
+\usepackage{indentfirst}
+\renewcommand{\beforepartskip}{\null\vskip 5pt plus 1.8fil \newpage}
+\renewcommand{\afterpartskip}{\vskip 0pt plus 0.7fil }
+\renewcommand*{\partnumfont}{\normalfont\HUGE\sffamily}
+\renewcommand*{\parttitlefont}{\normalfont\Huge\sffamily}
+\renewcommand{\part}[1]{%
+  \phantomsection
+  \refstepcounter{part}%
+  \addcontentsline{toc}{part}%
+    {\protect\partnumberline{\thepart}#1}
+  \pagestyle{part}
+  \beforepartskip
+  \printpartnum. \space \printparttitle{#1}
+  \afterpartskip
+  }
+% definition du style des chapitres
+%
+\renewcommand{\clearforchapter}{\null\vskip 1pt}
+
+\makechapterstyle{customchapstyle}{%
+  \pagestyle{chapter}
+  \clearforchapter
+  \renewcommand*{\chapnumfont}{\normalfont\HUGE\sffamily}
+  \renewcommand*{\chaptitlefont}{\normalfont\huge\sffamily}
+  \settowidth{\chapindent}{\chapnumfont 111}
+  \renewcommand*{\chapterheadstart}{\begingroup
+    \vspace*{\beforechapskip}%
+    \begin{adjustwidth}{}{}%
+    \hrulefill
+    \smash{\rule{0.4pt}{15mm}}
+    \end{adjustwidth}\endgroup}
+  \renewcommand*{\printchaptername}{}
+  \renewcommand*{\chapternamenum}{}
+  \renewcommand*{\printchapternum}{%
+    \begin{adjustwidth}{}{}
+    \hfill
+    \raisebox{10mm}[0pt][0pt]{\chapnumfont \Roman{part}.\thechapter}%
+                              \hspace*{1em}
+    \end{adjustwidth}\vspace*{-3.0\onelineskip}}
+  \renewcommand*{\printchaptertitle}[1]{%
+    \vskip\onelineskip
+    \raggedleft {\chaptitlefont ##1}\par\nobreak}}
+%
+\counterwithin*{chapter}{part}
+%
+\makeindex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% debut du document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%
+% 1ere page
+\thispagestyle{empty}
+%\cfoot{}
+%\renewcommand{\headrulewidth}{0pt}
+%\renewcommand{\footrulewidth}{0pt}
+\begin{multicols}{2}
+\includegraphics[scale=0.75]{tools/cea-logo.png}
+\begin{flushright}\Ovalbox{\begin{minipage}{8cm} \begin{center} \vspace{0.4cm}\Large{DES/ISAS/DM2S/STMF/LMSF}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
+\begin{flushright}\Ovalbox{\begin{minipage}{4cm} \begin{center} \vspace{0.4cm}\Large{\thepage/\pageref{LastPage}}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
+\end{multicols}
+\cornersize{.2}
+\Ovalbox{\begin{minipage}{16.2cm}
+\begin{center} \vspace{2cm}
+\parbox[t]{12cm}{\hspace{1cm}\huge{\textbf{USER DOCUMENTATION :}}
+\newline
+\hspace{3cm}\LARGE{\textbf{Validation Report TrioCFD v1.8.2}}} \end{center}
+\vspace{0.4cm}
+\begin{center}\includegraphics[scale=0.65]{tools/Trio-CFD.png} \end{center}
+\vspace{0.4cm}
+\begin{center}\includegraphics[scale=0.65]{tools/DM2S.png} \end{center}
+\vspace{0.4cm}
+\setlength{\tabcolsep}{0.5cm}
+\begin{tabular}{ Sc|Sc|Sc|Sc }
+\hline
+Code Version & Date & Code manager & Authors \\
+ & & J. DARONA & \\ \hline
+ & & & J.DARONA \\
+v1.8.2 & \today & & P.E. ANGELI\\
+ & & & A. CARTALADE \\ \hline
+\multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } validation\_report\_TrioCFD.tex } \\
+\multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
+\multicolumn{2}{c|}{\textbf{CEA SACLAY} } & \multicolumn{2}{c}{ } \\
+\cline{3-4}
+\multicolumn{2}{c|}{\textbf{91191 GIF-SUR-YVETTE CEDEX} } & \multicolumn{2}{c}{ } \\
+\multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sc}{\large{\textbf{DES/ISAS/DM2S/STMF/LMSF/UD}} } \\
+\multicolumn{2}{c|}{ } & \multicolumn{2}{c}{ } \\
+\end{tabular}
+\end{minipage}}
+\newpage
+%
+%
+% Style chapitres
+\chapterstyle{customchapstyle}
+%
+\tableofcontents
+\clearpage
+%
+\listoffigures
+%
+\vspace{6cm}
+\listoftables
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Introduction}
+\markright{INTRODUCTION}
+\normalsize \normalfont
+\vspace{4.5cm}
+\input{./part1-introduction.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Methodology for building the validation report}
+\markright{METHODOLOGY}
+\normalsize \normalfont
+\input{./part2-methodology.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Laminar Flow}
+\rhead{LAMINAR FLOW}
+\normalsize \normalfont
+\input{./part3-laminar.tex}
+\newpage
+\chapter{Poiseuille flow 2D with VDF and VEF meshes}
+\lhead{Poiseuille flow 2D with VDF and VEF meshes}
+\rhead{LAMINAR FLOW}
+\input{./fiches/Poiseuille_flow_2D_VDF_VEF/build/.tmp/fic.tex}
+\newpage
+\chapter{2D Lid driven cavity test}
+\lhead{2D Lid driven cavity test}
+\rhead{LAMINAR FLOW}
+\input{./fiches/Lid_driven_cavity/build/.tmp/fic.tex}
+\newpage
+\chapter{Cylinder in Laminar Cross Flow}
+\lhead{Cylinder in Laminar Cross Flow - Cir Cyl Re100}
+\rhead{LAMINAR FLOW}
+\input{./fiches/Cir_Cyl_Re100/build/.tmp/fic.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Thermal Laminar Flow}
+\markright{THERMAL LAMINAR FLOW}
+\normalsize \normalfont
+\input{./part4-thermallaminar.tex}
+\newpage
+\chapter{Convection Vahl Davis}
+\markboth{Convection Vahl Davis}{}
+\input{./fiches/Convection_Vahl_Davis/build/.tmp/fic.tex}
+\newpage
+\chapter{Oscillatory convection flow}
+\markboth{Oscillatory convection flow}{}
+\input{./fiches/Oscillating_Flow/build/.tmp/fic.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Turbulent Flow}
+\markright{TURBULENT FLOW}
+\normalsize \normalfont
+\input{./part5-turbulent.tex}
+\newpage
+\chapter{Turbulent flow in a 2D diffuser with the $k-\epsilon$ model}
+\markboth{Turbulent flow in a 2D diffuser with the $k-\epsilon$ model}{}
+\input{./fiches/OBI_diffuser_VEF_k_eps/build/.tmp/fic.tex}
+\newpage
+\chapter{Mixing length in 2D and 3D VEF-plane channel}
+\markboth{Mixing length in 2D and 3D VEF-plane channel}{}
+\input{./fiches/Mixing_length_VEF_WF/build/.tmp/fic.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Thermal Turbulent Flow}
+\markright{THERMAL TURBULENT FLOW}
+\normalsize \normalfont
+\input{./part6-thermalturbulent.tex}
+\newpage
+\chapter{Thermal stratification flow in a plenum}
+\markboth{Thermal stratification flow in a plenum}{}
+\input{./fiches/Thermal_stratification_flow/build/.tmp/fic.tex}
+\newpage
+\chapter{Turbulent flow inside a double-periodic plane channel with heated walls}
+\markboth{Turbulent flow inside a double-periodic plane channel with heated walls}{}
+\input{./fiches/Channel_T1_T2_incompressible/build/.tmp/fic.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Two-phase Flows with Front-Tracking}
+\markright{TWO-PHASE FLOWS WITH FRONT-TRACKING}
+\normalsize \normalfont
+\input{./part7-FT.tex}
+\newpage
+\chapter{Oscillation of a bubble}
+\markboth{Oscillation of a bubble}{}
+\input{./fiches/FTD_oscillating_bubble/build/.tmp/fic.tex}
+\newpage
+\chapter{Drop hanged at the ceiling}
+\markboth{Drop hanged at the ceiling}{}
+\input{./fiches/FTD_hanging_drop/build/.tmp/fic.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Conclusion}
+\markboth{}{CONCLUSION}
+\normalsize \normalfont
+\input{./part8-conclusion.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section*{Annexe A: One example of \texttt{PRM} file}
+%\rhead{Annexe A: One example of \texttt{PRM} file}
+%\addcontentsline{toc}{part}{Annexe A: One example of \texttt{PRM} file}
+%\begin{center}
+%\begin{algorithm}[H]
+%{\footnotesize{}\VerbatimInput{AnnexeA.txt}}{\footnotesize\par}
+%\end{algorithm}\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
