@@ -28,6 +28,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/P
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{LAMINAR FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -53,6 +54,7 @@ cp -R $version/Schema_Euler_Implicite_Stationnaire/share/Validation/Rapports_aut
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{LAMINAR FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -78,6 +80,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/C
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{LAMINAR FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -106,6 +109,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/C
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{THERMAL LAMINAR FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -131,6 +135,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/O
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{THERMAL LAMINAR FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -159,6 +164,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/O
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{TURBULENT FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -184,6 +190,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/M
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{TURBULENT FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -212,6 +219,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/T
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{THERMAL TURBULENT FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -237,6 +245,7 @@ cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/C
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{THERMAL TURBULENT FLOW}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -270,6 +279,7 @@ cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{FRONT-TRACKING}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -295,6 +305,7 @@ cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/
 cd .tmp
 echo 'traitement ' $(pwd)
 sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{FRONT-TRACKING}@g" fic.tex
 sed -i '/documentclass/d' fic.tex
 sed -i '/usepackage/d' fic.tex
 sed -i '/setlength/d' fic.tex
@@ -312,4 +323,6 @@ sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 cd $rapport
 
 pdflatex validation_report_TrioCFD.tex
+mv validation_report_TrioCFD.pdf $version/share/doc/.
+cd $version/share/doc
 okular validation_report_TrioCFD.pdf&

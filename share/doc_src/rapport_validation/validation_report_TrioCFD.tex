@@ -4,13 +4,16 @@
 \usepackage{longtable}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\usepackage{lettrine}
 \usepackage{geometry}
 \usepackage{amsmath,amssymb,amsfonts,textcomp}
 \usepackage{color}
-\usepackage[table]{xcolor}
+\usepackage{xcolor}
+\usepackage{colortbl}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
 \usepackage{fancybox}
+\usepackage{fancyvrb}
 \usepackage[open=true]{bookmark}
 \usepackage{caption}
 \usepackage{listings}
@@ -20,15 +23,17 @@
 \usepackage{enumitem}
 \usepackage{babel}
 \usepackage{float}
-%espacement table des matières et des figures entre numero et titre
+\usepackage{chngcntr}
+% espacement table des matieres et des figures entre numero et titre
 \usepackage{tocloft}
 \renewcommand{\cftpartnumwidth}{3em}
 \cftsetindents{figure}{0em}{4em}
 \cftsetindents{table}{0em}{4em}
 %
-% Pour supprimer les encadres rouges des liens et definir leur fonte en noir
+% Pour supprimer les encadres rouges des liens et definir leur fonte en bleu
+\usepackage{makeidx}
 \usepackage{hyperref}
-\hypersetup{linkcolor=black,colorlinks=true}
+\hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
 %
 \setlength\hoffset{0cm}
 \setlength\voffset{0cm}
@@ -41,7 +46,7 @@
 \setlength\marginparwidth{0cm}
 \setlength\footskip{1.4cm}
 \setlength{\textheight}{670pt} 
-\setlength\textwidth{16cm}
+\setlength\textwidth{16.4cm}
 \setlength{\cellspacebottomlimit}{5pt}
 \setlength{\cellspacetoplimit}{5pt}
 \setlength{\parindent}{0pt}
@@ -56,7 +61,13 @@
 %
 \makeatletter
 %% Because html converters don't know tabularnewline
-\providecommand{\tabularnewline}{\\}
+\floatstyle{ruled}\providecommand{\tabularnewline}{\\}
+%% nouvelle commande algorithm pour des zones de code
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}[chapter]
+\providecommand{\algorithmname}{Algorithm}
+\floatname{algorithm}{\protect\algorithmname}
+%
 \makeatother
 %
 \fancypagestyle{part}{%
@@ -100,7 +111,6 @@
   \refstepcounter{part}%
   \addcontentsline{toc}{part}%
     {\protect\partnumberline{\thepart}#1}
-%%    \mempartinfo{\thepart}{#1}
   \pagestyle{part}
   \beforepartskip
   \printpartnum. \space \printparttitle{#1}
@@ -108,14 +118,9 @@
   }
 % definition du style des chapitres
 %
-%\makeatletter
 \renewcommand{\clearforchapter}{\null\vskip 1pt}
 
 \makechapterstyle{customchapstyle}{%
-%%  \phantomsection
-%%  \refstepcounter{chapter}%
-%%  \addcontentsline{toc}{chapter}%
-%%      {\protect\chapternumberline{\thechapter}#1}%
   \pagestyle{chapter}
   \clearforchapter
   \renewcommand*{\chapnumfont}{\normalfont\HUGE\sffamily}
@@ -123,14 +128,14 @@
   \settowidth{\chapindent}{\chapnumfont 111}
   \renewcommand*{\chapterheadstart}{\begingroup
     \vspace*{\beforechapskip}%
-    \begin{adjustwidth}{}{-\chapindent}%
+    \begin{adjustwidth}{}{}%
     \hrulefill
     \smash{\rule{0.4pt}{15mm}}
     \end{adjustwidth}\endgroup}
   \renewcommand*{\printchaptername}{}
   \renewcommand*{\chapternamenum}{}
   \renewcommand*{\printchapternum}{%
-    \begin{adjustwidth}{}{-\chapindent}
+    \begin{adjustwidth}{}{}
     \hfill
     \raisebox{10mm}[0pt][0pt]{\chapnumfont \Roman{part}.\thechapter}%
                               \hspace*{1em}
@@ -139,6 +144,7 @@
     \vskip\onelineskip
     \raggedleft {\chaptitlefont ##1}\par\nobreak}}
 %
+\counterwithin*{chapter}{part}
 %
 \makeindex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -202,46 +208,34 @@ v1.8.2 & \today & & P.E. ANGELI\\
 \part{Introduction}
 \markright{INTRODUCTION}
 \normalsize \normalfont
+\vspace{4.5cm}
 \input{./part1-introduction.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setcounter{chapter}{0}
-\part{Methodology for making the validation report}
+\part{Methodology for building the validation report}
 \markright{METHODOLOGY}
 \normalsize \normalfont
 \input{./part2-methodology.tex}
-%
-%\chapter{Introduction}
-%\markboth{Introduction}{}
-%\input{./chap2-1-intro.tex}
-%
-%\chapter{Overview of a new PRM template}
-%\markboth{Overview of a new PRM template}{}
-%\input{./chap2-2-overview.tex}
-%
-%\chapter{Validation Report Generation}
-%\markboth{Validation Report Generation}{}
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setcounter{chapter}{0}
 \part{Laminar Flow}
-\markright{LAMINAR FLOW}
+\rhead{LAMINAR FLOW}
 \normalsize \normalfont
 \input{./part3-laminar.tex}
 \newpage
 \chapter{Poiseuille flow 2D with VDF and VEF meshes}
-\markboth{Poiseuille flow 2D with VDF and VEF meshes}{}
+\lhead{Poiseuille flow 2D with VDF and VEF meshes}
+\rhead{LAMINAR FLOW}
 \input{./fiches/Poiseuille_flow_2D_VDF_VEF/build/.tmp/fic.tex}
 \newpage
 \chapter{2D Lid driven cavity test}
-\markboth{2D Lid driven cavity test}{}
+\lhead{2D Lid driven cavity test}
+\rhead{LAMINAR FLOW}
 \input{./fiches/Lid_driven_cavity/build/.tmp/fic.tex}
 \newpage
 \chapter{Cylinder in Laminar Cross Flow}
-\markboth{Cylinder in Laminar Cross Flow - Cir Cyl Re100}{}
+\lhead{Cylinder in Laminar Cross Flow - Cir Cyl Re100}
+\rhead{LAMINAR FLOW}
 \input{./fiches/Cir_Cyl_Re100/build/.tmp/fic.tex}
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setcounter{chapter}{0}
 \part{Thermal Laminar Flow}
 \markright{THERMAL LAMINAR FLOW}
 \normalsize \normalfont
@@ -255,7 +249,6 @@ v1.8.2 & \today & & P.E. ANGELI\\
 \markboth{Oscillatory convection flow}{}
 \input{./fiches/Oscillating_Flow/build/.tmp/fic.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setcounter{chapter}{0}
 \part{Turbulent Flow}
 \markright{TURBULENT FLOW}
 \normalsize \normalfont
@@ -269,7 +262,6 @@ v1.8.2 & \today & & P.E. ANGELI\\
 \markboth{Mixing length in 2D and 3D VEF-plane channel}{}
 \input{./fiches/Mixing_length_VEF_WF/build/.tmp/fic.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setcounter{chapter}{0}
 \part{Thermal Turbulent Flow}
 \markright{THERMAL TURBULENT FLOW}
 \normalsize \normalfont
@@ -283,7 +275,6 @@ v1.8.2 & \today & & P.E. ANGELI\\
 \markboth{Turbulent flow inside a double-periodic plane channel with heated walls}{}
 \input{./fiches/Channel_T1_T2_incompressible/build/.tmp/fic.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setcounter{chapter}{0}
 \part{Two-phase Flows with Front-Tracking}
 \markright{TWO-PHASE FLOWS WITH FRONT-TRACKING}
 \normalsize \normalfont
@@ -301,6 +292,13 @@ v1.8.2 & \today & & P.E. ANGELI\\
 \markboth{}{CONCLUSION}
 \normalsize \normalfont
 \input{./part8-conclusion.tex}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Annexe A: One example of \texttt{PRM} file}
+\rhead{Annexe A: One example of \texttt{PRM} file}
+\addcontentsline{toc}{part}{Annexe A: One example of \texttt{PRM} file}
+\begin{center}
+\begin{algorithm}[H]
+{\footnotesize{}\VerbatimInput{AnnexeA.txt}}{\footnotesize\par}
+\end{algorithm}\end{center}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
