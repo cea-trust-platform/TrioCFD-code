@@ -63,7 +63,7 @@ file. A \texttt{PRM} file is a set of specific instructions for interfacing
 the \LaTeX ~commands with the \texttt{TrioCFD} results post-processed
 with \texttt{Gnuplot} or \texttt{Visit}. As its content differs following
 the test cases, the generated PDF reports may be structured differently,
-making them hard to read and to undersand. Consequently, a new PRM template
+making them hard to read and to undersand. Consequently, a new \texttt{PRM} template
 has been implemented in the present report to harmonize their content
 for a more homogeneous rendering. Differences
 between the old and new versions of the \texttt{PRM} template are detailed
@@ -121,7 +121,7 @@ and other unavoidable details. Each validation sheet included in this document
 has been revised and improved with this new \texttt{PRM} template.
 For some test cases, the physical content has been enriched with an extended
 analysis and discussion. In subsection \ref{sec:Old-PRM-syntax},
-we remind the structure of an old \textsf{PRM} syntax
+we remind the structure of an old \texttt{PRM} syntax
 (until version \textsf{v1.8.1}). The new syntax available with version \textsf{v1.8.2}
 is then detail in subsection \ref{sec:New-PRM-syntax}.
 
@@ -129,32 +129,32 @@ is then detail in subsection \ref{sec:New-PRM-syntax}.
 \section{\label{sec:Old-PRM-syntax}Old \texttt{PRM} syntax}
 \lhead{\textit{Old-PRM-syntax}}
 \rhead{\textit{METHODOLOGY}}
-In the previous versions of TrioCFD, the formalism of a PRM was left to the hand of the writer of the file. 
+In the previous versions of \texttt{TrioCFD}, the formalism of a \texttt{PRM} was left to the hand of the writer of the file. 
 The general structure was made up of a first part called \texttt{Parameters}. Then the writer could define as many chapters as he wanted via the keyword \textit{Chapter}.
 The titles of the chapters were left to the discretion of the editor.
-The methodology for writing the PRM as well as the keywords are explained in the \textcolor{blue}{\underline{PRM syntax}} section after launching \verb "trust -index".\newline \newline
+The methodology for writing the \texttt{PRM} as well as the keywords are explained in the \textcolor{blue}{\underline{PRM syntax}} section after launching \verb "trust -index".\newline \newline
 
-In order to better understand the old structure, we will take the example of the PRM present in Chapter III.3 of
+In order to better understand the old structure, we will take the example of the \texttt{PRM} present in Chapter III.3 of
 this report on a Cylinder in Laminar Cross Flow. The first keyword \textit{Parameters} was structured as follows:\newline
 \begin{center}\includegraphics[width=16cm]{tools/parameters_PRM_1.png}\end{center}
-\begin{center}\captionof{figure}{Original PRM syntax version - Parameters part}\end{center}
+\begin{center}\captionof{figure}{Original \texttt{PRM} syntax version - Parameters part}\end{center}
 
-This part generates the first section of the PRM pdf entiteled \textit{1. Introduction} as follows:\newline
+This part generates the first section of the \texttt{PRM} pdf entiteled \textit{1. Introduction} as follows:\newline
 \setlength{\columnseprule}{0.5pt}
 \begin{multicols}{2}
 \begin{flushleft}\includegraphics[width=8cm]{tools/parameters_PRM_1_pdf.png}\end{flushleft}
 \columnbreak
 \vspace{0.5cm}\begin{flushright}\includegraphics[width=8cm]{tools/parameters_PRM_2_pdf.png}\end{flushright}
 \end{multicols}
-\begin{center}\captionof{figure}{Original PRM syntax version - Generated introduction}\end{center}
+\begin{center}\captionof{figure}{Original \texttt{PRM} syntax version - Generated introduction}\end{center}
 
 After this first part, chapters can be freely added via the keword \verb"Chapter{ ... }" as follows:\newline
 \begin{center}\includegraphics[width=12cm]{tools/chapter_PRM_1.png}\end{center}
-\begin{center}\captionof{figure}{Original PRM syntax version - Chapter part}\end{center}
+\begin{center}\captionof{figure}{Original \texttt{PRM} syntax version - Chapter part}\end{center}
 
-This part generates the second section of the PRM pdf entiteled \textit{2. Tests Description} as follows:\newline
+This part generates the second section of the \texttt{PRM} pdf entiteled \textit{2. Tests Description} as follows:\newline
 \begin{center}\includegraphics[width=15cm]{tools/chapter_PRM_1_pdf.png}\end{center}
-\begin{center}\captionof{figure}{Original PRM syntax version - Generated chapter}\end{center}
+\begin{center}\captionof{figure}{Original \texttt{PRM} syntax version - Generated chapter}\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{sec:New-PRM-syntax}New \textsf{PRM} syntax}
