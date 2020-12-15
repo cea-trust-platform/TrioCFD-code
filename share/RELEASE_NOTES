@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
+Release notes version 1.8.2 : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
 11/12/20 (TrioCFD) New feature : New documentation available: validation report - first version
 19/11/20 (TrioCFD) Validation  : Update test cases after syntax change for Champ_Fonc_Fonction, Champ_Fonc_Fonction_txyz, Champ_Fonc_Tabule,Champ_Fonc_Fonction_txyz_Morceaux in TRUST
