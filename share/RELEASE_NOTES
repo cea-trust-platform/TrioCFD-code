@@ -1,3 +1,4 @@
+XX/XX/20 (TrioCFD) New keyword : Boundary_field_keps_from_ud to specify a K-Eps inlet field with hydraulic diameter, speed, and turbulence intensity (VDF only)
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2_beta : Enhancements, modifications and corrected bugs since version 1.8.1 :
 --------------------------------------------------------------------------------------------------
