@@ -38,12 +38,13 @@ Sortie& Boundary_field_keps_from_ud::printOn(Sortie& os) const
   return (os);
 }
 
+// XD Boundary_field_keps_from_ud front_field_base Boundary_field_keps_from_ud 1 To specify a K-Eps inlet field with hydraulic diameter, speed, and turbulence intensity (VDF only)
 Entree& Boundary_field_keps_from_ud::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("U", &vitesse_, Param::REQUIRED); //initial velocity magnitude
-  param.ajouter("D", &d, Param::REQUIRED); //hydraulic diameter
-  param.ajouter("I", &I, Param::REQUIRED); //turbulence intensity
+  param.ajouter("U", &vitesse_, Param::REQUIRED); 	// XD_ADD_P front_field_base U 0 Initial velocity magnitude
+  param.ajouter("D", &d, Param::REQUIRED); 		// XD_ADD_P double Hydraulic diameter
+  param.ajouter("I", &I, Param::REQUIRED); 		// XD_ADD_P double Turbulence intensity [%]
   param.lire_avec_accolades(is);
   if (I<=0 || I>=1)
     {
