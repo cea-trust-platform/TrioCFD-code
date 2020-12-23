@@ -66,6 +66,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const DoubleTab& coord_sommets=zone_VEF.zone().domaine().les_sommets();
   ArrOfDouble T0 = getScalaire0();
+  double beta_a=0;
   // Verifie la validite de T0:
   check();
   ArrOfDouble T0_etat=T0;
@@ -82,6 +83,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
         {
           const DoubleTab& val_T_etat = eqn_conv_diff_temp_sens.get_temperature_state_field();
           T_etat.valeurs()=val_T_etat;
+          beta_a=1.;
         }
       else
         T0_etat=0.;
@@ -253,7 +255,10 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
                 {
                   double contrib=0;
                   for (int comp=0; comp<nb_comp; comp++)
-                    contrib+=Poids(pt)*volume*(T0_etat(comp)- valeurs_scalaire_etat(pt,comp) + (T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp))*g(dim)*valeurs_Psi(pt);
+                    {
+                      contrib+=Poids(pt)*volume*(T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
+                      contrib+=Poids(pt)*volume*(T0_etat(comp)- valeurs_scalaire_etat(pt,comp))*beta_a*g(dim)*valeurs_Psi(pt);
+                    }
                   resu(num_face,dim)+=contrib;
                   somme(dim)+=contrib;
                   if (modif_traitement_diri)
