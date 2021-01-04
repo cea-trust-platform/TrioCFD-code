@@ -57,7 +57,7 @@ Read mon_schema
 	# Output criteria #
         # .out files printing period #
         dt_impr 5.e-6
-	tcpumax 47.5
+	# tcpumax 47.5 #
 	# .sauv files printing period #
         dt_sauv 100.
  	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
@@ -71,7 +71,7 @@ Read mon_schema
         # End time [s] #
 	tmax 0.25
 	# Max number of time steps #
-        nb_pas_dt_max 5
+        # nb_pas_dt_max 5 #
         # Convergence threshold (see .dt_ev file) #
 	seuil_statio 1.e-15
 }
