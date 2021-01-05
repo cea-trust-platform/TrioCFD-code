@@ -100,11 +100,11 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD VITESSE_magnitude SOM"
-		pseudocolor TwoOscillatingCylinders.lata dom_magnitude VITESSE SOM
+		pseudocolor TwoOscillatingCylinders.lata dom norme_VITESSE SOM
 	}
 	Visu {
 		Title "TrioCFD Mesh velocity SOM"
-		pseudocolor TwoOscillatingCylinders.lata dom_magnitude ALEMESHVELOCITY SOM
+		pseudocolor TwoOscillatingCylinders.lata dom norme_ALEMESHVELOCITY SOM
 	}
 
 		

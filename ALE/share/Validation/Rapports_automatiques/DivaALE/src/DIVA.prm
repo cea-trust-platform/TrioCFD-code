@@ -434,7 +434,7 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD Mesh_1 VITESSE_magnitude SOM"
-		pseudocolor ./Mesh_1/DIVA.lata dom_magnitude VITESSE SOM
+		pseudocolor ./Mesh_1/DIVA.lata dom norme_VITESSE SOM
 	}
 	Visu {
 		Title "TrioCFD Mesh_2 PRESSION SOM"
@@ -443,7 +443,7 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD Mesh_2 VITESSE_magnitude SOM"
-		pseudocolor ./Mesh_2/DIVA.lata dom_magnitude VITESSE SOM
+		pseudocolor ./Mesh_2/DIVA.lata dom norme_VITESSE SOM
 	}
 	Visu {
 		Title "TrioCFD Mesh_3 PRESSION SOM"
@@ -452,7 +452,7 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD Mesh_3 VITESSE_magnitude SOM"
-		pseudocolor ./Mesh_3/DIVA.lata dom_magnitude VITESSE SOM
+		pseudocolor ./Mesh_3/DIVA.lata dom norme_VITESSE SOM
 	}
 }
 
