@@ -18,10 +18,8 @@ Parameters {
 	ParametersTRUST Medium: Fluide_Incompressible
 	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
         ParametersTRUST Convection scheme: ALE muscl
-        
-	Code TrioCFD
-	
-	
+
+        IncludeData 2
 
         Reference "1. Chen, S S. Flow-induced vibration of circular cylindrical structures, 1987."
 	Reference "2. CFD numerical simulation of a single-phase flow around a vibrating cylindrical tube, D. Panunzio, DES/ISAS/DM2S/SEMT/DYN/RS/2020-67015/A"
@@ -41,6 +39,7 @@ Pb_description {
 	geometry {
 		Figure {
 			Title "DIVA geometry"
+			Width 12cm
 			picture geometry.pdf
 			}
 		}
