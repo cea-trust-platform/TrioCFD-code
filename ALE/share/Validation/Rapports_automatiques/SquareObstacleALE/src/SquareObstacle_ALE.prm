@@ -488,23 +488,28 @@ Results {
 	visu {
 		title "PRESSION SOM"
 		pseudocolor ./Amont/SquareObstacle_ALE.lata dom PRESSION SOM
+		Width 12cm
 	}
 
 	visu {
 		title "VITESSE_X ELEM"
 		pseudocolor ./Amont/SquareObstacle_ALE.lata dom VITESSE_X ELEM
+		Width 12cm
 	}
 	visu {
 		title "VITESSE_Y ELEM"
 		pseudocolor ./Amont/SquareObstacle_ALE.lata dom VITESSE_Y ELEM
+		Width 12cm
 	}
 	Visu {
 		Title "TrioCFD Mesh velocity SOM"
 		pseudocolor  ./Amont/SquareObstacle_ALE.lata dom norme_ALEMESHVELOCITY SOM
+		Width 12cm
 	}
 	Visu {
 		Title "TrioCFD Total displacement of the mesh SOM"
 		pseudocolor  ./Amont/SquareObstacle_ALE.lata dom norme_ALEMESHTOTALDISPLACEMENT SOM
+		Width 12cm
 	}
 
 
