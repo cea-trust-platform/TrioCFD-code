@@ -42,6 +42,7 @@
 #include <Debog.h>
 #include <Array_tools.h>
 #include <Param.h>
+#include <stat_counters.h>
 
 //#define PATCH_HYSTERESIS_V2
 //#define PATCH_HYSTERESIS_V3
@@ -818,13 +819,10 @@ void Maillage_FT_Disc::parcourir_maillage()
   // ajoute des facettes sur les processeurs "pauvres"
   const Parcours_interface& p = refparcours_interface_.valeur();
 
-  static const Stat_Counter_Id counter =
-    statistiques().new_counter(3, "Parcours de l'interface", "FrontTracking");
-  statistiques().begin_count(counter);
+  statistiques().begin_count(parcours_maillage_counter_);
   p.parcourir(*this);
-  statistiques().end_count(counter);
-
   maillage_modifie(PARCOURU);
+  statistiques().end_count(parcours_maillage_counter_);
 }
 
 // Description: Complete les structures de donnees du maillage.
@@ -863,9 +861,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 {
   assert(statut_ >= PARCOURU);
 
-  static const Stat_Counter_Id stat_counter =
-    statistiques().new_counter(3, "Calcul_indicatrice", "FrontTracking");
-  statistiques().begin_count(stat_counter);
+  statistiques().begin_count(calculer_indicatrice_counter_);
   const Zone_dis& zone_dis = refzone_dis_.valeur();
   const Zone& lazone = zone_dis.zone();
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
@@ -1063,7 +1059,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 
   Debog::verifier("Maillage_FT_Disc::calcul_indicatrice indicatrice=",indicatrice);
   elements_calcules.resize_array(0);
-  statistiques().end_count(stat_counter);
+  statistiques().end_count(calculer_indicatrice_counter_);
 }
 
 // Description:

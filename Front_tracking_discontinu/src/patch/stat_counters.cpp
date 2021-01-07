@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -75,6 +75,9 @@ Stat_Counter_Id interprete_scatter_counter_;
 Stat_Counter_Id temps_total_execution_counter_;
 Stat_Counter_Id initialisation_calcul_counter_;
 
+Stat_Counter_Id IO_EcrireFicPartageMPIIO_counter_;
+Stat_Counter_Id IO_EcrireFicPartageBin_counter_;
+
 Stat_Counter_Id m1;
 Stat_Counter_Id m2;
 Stat_Counter_Id m3;
@@ -116,6 +119,8 @@ Stat_Counter_Id redistribute_tot_counter_;
 // SVP : mettez une courte description de ce que mesure exactement
 //       le compteur (quelles operations) et quelle est la signification
 //       de la quantite sommee (quand elle n'est pas nulle).
+//
+
 void declare_stat_counters()
 {
   // Creation de l'objet statistiques
@@ -207,10 +212,10 @@ void declare_stat_counters()
   mpi_maxint_counter_    = statistiques().new_counter(2, "MPI_maxint",    "MPI_allreduce", 1);
   mpi_barrier_counter_   = statistiques().new_counter(2, "MPI_barrier",   "MPI_allreduce", 1);
 
-  // Compte le temps de communication dans *_Fic_Par*
-  // nombre = approx le nombre de synchro fichiers
-  // quantity = nombre d'octets recus + nombre d'octets envoyes
-  mpi_sendrecv_io_counter_ = statistiques().new_counter(2, "MPI_send_recv_io", "io", 1);
+  // Compte le temps d'ecriture dans EcrireFicPartageXXX (gros volumes de donnees dans fichiers XYZ ou LATA)
+  // quantity = nombre d'octets ecrits
+  IO_EcrireFicPartageMPIIO_counter_ = statistiques().new_counter(2, "MPI_File_write_all", "IO", 0); // Appels sur chaque process
+  IO_EcrireFicPartageBin_counter_ = statistiques().new_counter(2, "write", "IO", 0); // Appel uniquement sur maitre, appels plus souvents car bufferise
 
   // Execution de Scatter::interpreter
   interprete_scatter_counter_ = statistiques().new_counter(2, "Scatter", 0);
@@ -247,7 +252,9 @@ void end_stat_counters()
 
   delete  les_statistiques_trio_U_nom_long_pour_decourager_l_utilisation_directe;
   les_statistiques_trio_U_nom_long_pour_decourager_l_utilisation_directe=0;
+
 }
+
 // Estimation du temps de latence MPI_allreduce
 static double estimate_allreduce(double max_bench_time)
 {
@@ -328,6 +335,7 @@ void print_statistics_analyse(const char * message, int mode_append)
   Stat_Results marqueur3;
   Stat_Results pb_fluide;
   Stat_Results pb_combustible;
+  Stat_Results IO_seq, IO_par;
 
   // Stop the counters
   statistiques().stop_counters();
@@ -342,10 +350,12 @@ void print_statistics_analyse(const char * message, int mode_append)
   if (Process::je_suis_maitre())
     {
       // Ouverture du fichier principal (pour tous les processeurs)
-      SFichier stat_file(TU, mode_append ? (ios::out | ios::app) : (ios::out));
+      SFichier stat_file(TU,
+                         mode_append ? (ios::out | ios::app) : (ios::out));
 
       stat_file << message << "\n\n";
-      stat_file << "Temps total                       " << temps_total.max_time << "\n";
+      stat_file << "Temps total                       "
+                << temps_total.max_time << "\n";
       stat_file << finl;
     }
 
@@ -354,7 +364,8 @@ void print_statistics_analyse(const char * message, int mode_append)
     {
       statistiques().get_stats(solv_sys_counter_, solveur);
       statistiques().get_stats(solv_sys_petsc_counter_, solveur_petsc);
-      statistiques().get_stats(diffusion_implicite_counter_, diffusion_implicite);
+      statistiques().get_stats(diffusion_implicite_counter_,
+                               diffusion_implicite);
       statistiques().get_stats(dt_counter_, dt);
       statistiques().get_stats(nut_counter_, nut);
       statistiques().get_stats(convection_counter_, convection);
@@ -367,6 +378,7 @@ void print_statistics_analyse(const char * message, int mode_append)
       statistiques().get_stats(source_counter_, source);
       statistiques().get_stats(postraitement_counter_, postraitement);
       statistiques().get_stats(sauvegarde_counter_, sauvegarde);
+
       statistiques().get_stats(temporary_counter_, temporary);
       statistiques().get_stats(assemblage_sys_counter_, assemblage);
       statistiques().get_stats(update_vars_counter_, update_vars);
@@ -381,6 +393,8 @@ void print_statistics_analyse(const char * message, int mode_append)
       statistiques().get_stats(divers_counter_, divers);
       statistiques().get_stats(probleme_fluide_, pb_fluide);
       statistiques().get_stats(probleme_combustible_, pb_combustible);
+      statistiques().get_stats(IO_EcrireFicPartageBin_counter_, IO_seq);
+      statistiques().get_stats(IO_EcrireFicPartageMPIIO_counter_, IO_par);
 
       if (GET_COMM_DETAILS)
         {
@@ -438,6 +452,7 @@ void print_statistics_analyse(const char * message, int mode_append)
 
       // Estimation de la bande passante reseau (basee uniquement sur les operations
       //  send_recv_start / send_recv_finish)
+
       double bandwidth = 1.1e30;
       if (sendrecv.time > 0)
         bandwidth = sendrecv.quantity / (sendrecv.time + DMINFLOAT);
@@ -484,16 +499,17 @@ void print_statistics_analyse(const char * message, int mode_append)
       double avg_wait_fraction = Process::mp_sum(wait_fraction)
                                  / Process::nproc();
 
-      double total_quantity = Process::mp_sum(sauvegarde.max_quantity);
+      double total_quantity = Process::mp_sum(sauvegarde.quantity);
+      int debit_seq = IO_seq.max_time>0 ? (int) (Process::mp_sum(IO_seq.quantity) / (1024 * 1024) / IO_seq.max_time) : 0;
+      int debit_par = IO_par.max_time>0 ? (int) (Process::mp_sum(IO_par.quantity) / (1024 * 1024) / IO_par.max_time) : 0;
+
       // Print into .TU file
 
       if (Process::je_suis_maitre())
         {
-          SFichier stat_file(TU,
-                             mode_append ? (ios::out | ios::app) : (ios::out));
-
-          write_stat_file("probleme thermohydraulique  ", pb_fluide             , temps_total, stat_file);
-          write_stat_file("probleme combustible        ", pb_combustible        , temps_total, stat_file);
+          SFichier stat_file(TU, mode_append ? (ios::out | ios::app) : (ios::out));
+          write_stat_file("probleme thermohydraulique  ", pb_fluide, temps_total, stat_file);
+          write_stat_file("probleme combustible        ", pb_combustible, temps_total, stat_file);
           stat_file << "\n";
 
           stat_file << "Timesteps                         "
@@ -547,17 +563,24 @@ void print_statistics_analyse(const char * message, int mode_append)
 
           if (echange_espace_virtuel.max_count > 0)
             {
-              stat_file << "Nb echange_espace_virtuel / pas de temps " << echange_espace_virtuel.max_count / pas_de_temps.max_count << "\n";
+              stat_file << "Nb echange_espace_virtuel / pas de temps "
+                        << echange_espace_virtuel.max_count / pas_de_temps.max_count << "\n";
             }
           if (comm_allreduce.max_count > 0)
             {
               double tmp = comm_allreduce.max_count / pas_de_temps.max_count;
               stat_file << "Nb MPI_allreduce / pas de temps " << tmp << "\n";
-              if (tmp>30)
+              if (tmp > 30)
                 {
-                  stat_file << "-----------------------------------------------------------------------------------------------------------------------------------------" << finl;
-                  stat_file << "Warning: The number of MPI_allreduce calls per time step is high. Contact TRUST support if you plan to run massive parallel calculation." << finl;
-                  stat_file << "-----------------------------------------------------------------------------------------------------------------------------------------" << finl;
+                  stat_file
+                      << "-----------------------------------------------------------------------------------------------------------------------------------------"
+                      << finl;
+                  stat_file
+                      << "Warning: The number of MPI_allreduce calls per time step is high. Contact TRUST support if you plan to run massive parallel calculation."
+                      << finl;
+                  stat_file
+                      << "-----------------------------------------------------------------------------------------------------------------------------------------"
+                      << finl;
                 }
             }
 
@@ -573,18 +596,20 @@ void print_statistics_analyse(const char * message, int mode_append)
             }
           if (sauvegarde.max_count > 0)
             {
-              stat_file << "I/O:" << finl;
               char s[20] = "";
               stat_file << "Nb sauvegardes         : " << sauvegarde.max_count
                         << "\n";
-              stat_file << "Secondes / sauvegarde  : "
-                        << sauvegarde.max_time / sauvegarde.max_count << "\n";
-              sprintf(s, "%2.2f", total_quantity / (1024 * 1024));
-              stat_file << "Donnees ecrites [Mo]   : " << s << "\n";
-              stat_file << "Debit           [Mo/s] : "
+              /*              stat_file << "Secondes / sauvegarde  : "
+                                      << sauvegarde.max_time / sauvegarde.max_count << "\n"; */
+              sprintf(s, "%2.2f", total_quantity / (sauvegarde.max_count * 1024 * 1024));
+              stat_file << "Data / sauvegarde [Mo] : " << s << "\n";
+              /* stat_file << "Debit           [Mo/s] : "
                         << (int) (total_quantity / (1024 * 1024)
-                                  / sauvegarde.max_time) << "\n";
+                                  / sauvegarde.max_time) << "\n"; */
             }
+          stat_file << "I/O:" << finl;
+          if (debit_seq>0) stat_file << "Debit write seq [Mo/s] : " << debit_seq << "\n";
+          if (debit_par>0) stat_file << "Debit write par [Mo/s] : " << debit_par << "\n";
 
           if (comm_sendrecv.max_count > 0)
             {

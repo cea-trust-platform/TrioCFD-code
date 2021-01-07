@@ -61,6 +61,7 @@
 #include <IntList.h>
 #include <Domaine.h>
 #include <DoubleTrav.h>
+#include <stat_counters.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT_Disc,"Transport_Interfaces_FT_Disc",Transport_Interfaces_base);
 
@@ -1601,6 +1602,7 @@ double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
 //  a partir de ce champ dans mettre_a_jour.
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
 {
+  statistiques().begin_count(calculer_rho_mu_indicatrice_counter_);
   const int tag = maillage_interface().get_mesh_tag();
   if (tag != variables_internes_->indicatrice_cache_tag)
     {
@@ -1610,6 +1612,7 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
                                               valeurs_indicatrice);
       variables_internes_->indicatrice_cache_tag = tag;
     }
+  statistiques().end_count(calculer_rho_mu_indicatrice_counter_);
   return variables_internes_->indicatrice_cache.valeur();
 }
 
@@ -6445,6 +6448,7 @@ void Transport_Interfaces_FT_Disc::integrer_ensemble_lagrange(const double temps
 
 void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
 {
+  statistiques().begin_count(deplacement_interf_counter_);
   Process::Journal() << "Transport_Interfaces_FT_Disc::mettre_a_jour " << le_nom() << " temps= "<< temps << finl;
   Maillage_FT_Disc& maillage = maillage_interface();
 
@@ -6737,6 +6741,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
   //TF : Gestion de l avancee en temps de la derivee
   if (calculate_time_derivative()) derivee_en_temps().changer_temps(temps);
   //Fin de TF
+  statistiques().end_count(deplacement_interf_counter_);
 }
 
 // Deplace les sommets de l'interface du deplacement prescrit (vitesse * coeff)
