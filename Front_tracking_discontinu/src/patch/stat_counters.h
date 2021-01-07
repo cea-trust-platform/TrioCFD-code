@@ -40,7 +40,9 @@ extern Stat_Counter_Id mpi_minint_counter_;
 extern Stat_Counter_Id mpi_maxint_counter_;
 extern Stat_Counter_Id mpi_barrier_counter_;
 
-extern Stat_Counter_Id mpi_sendrecv_io_counter_;
+extern Stat_Counter_Id IO_EcrireFicPartageMPIIO_counter_;
+extern Stat_Counter_Id IO_EcrireFicPartageBin_counter_;
+
 extern Stat_Counter_Id echange_vect_counter_;
 extern Stat_Counter_Id solv_sys_counter_;
 extern Stat_Counter_Id solv_sys_petsc_counter_;
