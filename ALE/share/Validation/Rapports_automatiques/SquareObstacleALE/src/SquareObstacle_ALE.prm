@@ -17,7 +17,7 @@ Parameters {
 	 IncludeData 2
 
         Reference "1. A. Colagrossi, 'SPHERIC benchmark 6: 2D Incompressible flow around a moving square inside a rectangular box. - 2D SPH Validation.', SPHERIC, [Online]. Available: http://spheric-sph.org/tests/test-6. [Accessed Sept. 29, 2017]."
-	 Reference "2. Postdoctoral internship progress report: Coupling a CFD code (TrioCFD) with ALE modeling and a structural dynamics code (EUROPLEXUS). R. Pegonen. and M. A. Puscas, DEN/DANS/DM2S/STMF/LMSF/NT/2018-64017/A"
+	 Reference "2. Fluid-structure interaction for the PWR fuel assembly under axial flow and seismic loading. Coupling a CFD program (TrioCFD) with ALE representation and a structural dynamics program. R. Pegonen. and M. A. Puscas, DEN/DANS/DM2S/STMF/LMSF/RT/2017-62296/A"
 
 	 
 }
