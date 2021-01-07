@@ -1,4 +1,5 @@
 Parameters {
+	newvalidTrio
         Title "Translating square cylinder"
         Author "R. Pegonen. and M. A. Puscas"
 	ParametersTRUST Problem : Pb_hydraulique_ALE
@@ -9,26 +10,54 @@ Parameters {
 	ParametersTRUST Medium : Fluide_Incompressible
 	ParametersTRUST Hydraulic problem : Navier_Stokes_standard_ALE
         ParametersTRUST Convection scheme: ALE amont and ALE muscl
-        Description This test case was created to validate TrioCFD with ALE discretization through the SPHERIC benchmark[1]. The geometry is taken from [1] and the test case with Reynolds number equal to 50 was chosen.
-	Description In this test a flow across a horizontally moving square is investigated in a tank. The initial square is not moving and it reaches its maximum velocity within one second.
-	IncludeData 1
-        Reference "1. A. Colagrossi, 'SPHERIC benchmark 6: 2D Incompressible flow around a moving square inside a rectangular box. - 2D SPH Validation.', SPHERIC, [Online]. Available: http://spheric-sph.org/tests/test-6. [Accessed Sept. 29, 2017]."
       
 	 TestCase  Amont SquareObstacle_ALE.data 
 	 TestCase  Muscl SquareObstacle_ALE.data
 	 TestCase  Implicit SquareObstacle_ALE.data   /*jdd en annexe*/ 
+	 IncludeData 2
+
+        Reference "1. A. Colagrossi, 'SPHERIC benchmark 6: 2D Incompressible flow around a moving square inside a rectangular box. - 2D SPH Validation.', SPHERIC, [Online]. Available: http://spheric-sph.org/tests/test-6. [Accessed Sept. 29, 2017]."
+	 Reference "2. Postdoctoral internship progress report: Coupling a CFD code (TrioCFD) with ALE modeling and a structural dynamics code (EUROPLEXUS). R. Pegonen. and M. A. Puscas, DEN/DANS/DM2S/STMF/LMSF/NT/2018-64017/A"
+
 	 
 }
 
-Chapter {
-	Title "Drag coefficient pressure component"
+Purpose {
+        Description "This test case was created to validate TrioCFD with ALE discretization through the SPHERIC benchmark[1]. The geometry is taken from [1] and the test case with Reynolds number equal to 50 was chosen."
+	Description "In this test a flow across a horizontally moving square is investigated in a tank. The initial square is not moving and it reaches its maximum velocity within one second."
+}
 
+Pb_description {
+	Description "The domain used for the numerical simulations is the one in Figure 1.  
+	geometry {
+		Figure {
+			Title "The domain"
+			Width 10cm
+			picture geometry.jpg
+			}
+		}
+	icbc {
+		Description "The square is moving and it reaches its maximum velocity within one second, as ploted below."
+		Figure {
+			Title "Square velocity"
+			Width 10cm
+			picture mesh_velocity.pdf
+			}
+
+		Description "The left, right, upper and lower boundaries are fixed."
+		Description "Initially, the fluid is at rest."
+	}
+}
+
+Results {
+
+	Description "The drag coefficient pressure component \latex_( $C_{d}(\text{pressure component})=\Delta p /(0.5 \cdot \rho \cdot U_{max}^{2})$ \latex_), where \latex_( $\rho = 1\, Kg/m^{3}, U_{max}= 1\, m/s (\text{maximum velocity of the obstacle})$ \latex_), is plotted for the following cases: SPHERIC benchmark, TrioCFD with amont convection scheme and Euler explicit time scheme (TrioCFD Amont/Exp), for TrioCFD with muscl convection scheme and Euler explicit time scheme (TrioCFD Muscl/Exp), and  for TrioCFD with amont convection scheme and Euler implicit time scheme (TrioCFD Amont/Imp)."
 	Figure {
 		Title "Drag coefficient pressure component"
-		Description "The drag coefficient pressure component \latex_( $C_{d}(\text{pressure component})=\Delta p /(0.5 \cdot \rho \cdot U_{max}^{2})$ \latex_), where \latex_( $\rho=1 \frac{kg}{m^{3}}, U_{max}=1 \frac{m}{s} (\text{maximum velocity of the obstacle})$ \latex_), is plotted for the following cases: SPHERIC benchmark, TrioCFD with amont convection scheme and Euler explicit time scheme (TrioCFD Amont/Exp), for TrioCFD with muscl convection scheme and Euler explicit time scheme (TrioCFD Muscl/Exp), and  for TrioCFD with amont convection scheme and Euler implicit time scheme (TrioCFD Amont/Imp)."
 		LabelX "t"
 		LabelY "Cd (pressure component)"
 		include_description_curves 0
+		Width 10cm
 		Courbe {
 			legend "SPHERIC benchmark"
 			Fichier ReferenceSolution.csv
@@ -53,17 +82,14 @@ Chapter {
 
 		}
 	}
-}
 
-Chapter {
-	Title "Probes: 1D Plots using the Euler explicit time scheme with the amont (Amont/Exp) and muscl (Muscl/Exp) convection scheme,  and the Euler implicit time scheme with the amont (Amont/Imp) convection scheme"
-	Description "There is no analysis for the results in this section, that are just non-regression plots. "
+	Description "We plot below some 1D plots using the Euler explicit time scheme with the amont (Amont/Exp) and muscl (Muscl/Exp) convection scheme,  and the Euler implicit time scheme with the amont (Amont/Imp) convection scheme. There is no analysis for the results in this section, that are just non-regression plots. "
 	Figure { 
 		title "Pressure along line Y=1.5 "
 		include_description_curves 0
 		labelX "X"
 		labelY "Pressure"
-
+		Width 10cm
 		Courbe {
 			Legende "Pressure: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H1 
@@ -90,7 +116,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Pressure"
-
+		Width 10cm
 		Courbe {
 			Legende "Pressure: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H2 
@@ -116,7 +142,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Pressure"
-
+		Width 10cm
 		Courbe {
 			Legende "Pressure: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_H3 
@@ -143,7 +169,7 @@ Chapter {
 		include_description_curves 0
 		labelX "Y"
 		labelY "Vx"
-
+		Width 10cm
 		Courbe {
 			Legende "Pressure: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V1
@@ -169,7 +195,7 @@ Chapter {
 		include_description_curves 0
 		labelX "Y"
 		labelY "Pressure"
-
+		Width 10cm
 		Courbe {
 			Legende "Pressure: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_PRESSION_SEGMENT_V2
@@ -197,7 +223,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Vx"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H1
@@ -223,7 +249,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Vy"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H1
@@ -250,7 +276,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Vx"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H2
@@ -276,7 +302,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Vy"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H2
@@ -302,7 +328,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Vx"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_H3
@@ -328,7 +354,7 @@ Chapter {
 		include_description_curves 0
 		labelX "X"
 		labelY "Vy"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_H3
@@ -354,7 +380,7 @@ Chapter {
 		include_description_curves 0
 		labelX "Y"
 		labelY "Vx"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V1
@@ -380,7 +406,7 @@ Chapter {
 		include_description_curves 0
 		labelX "Y"
 		labelY "Vy"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V1
@@ -407,7 +433,7 @@ Chapter {
 		include_description_curves 0
 		labelX "Y"
 		labelY "Vx"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEX_SEGMENT_V2
@@ -433,7 +459,7 @@ Chapter {
 		include_description_curves 0
 		labelX "Y"
 		labelY "Vy"
-
+		Width 10cm
 		Courbe {
 			Legende "Velocity: Amont/Exp"
 			segment ./Amont/SquareObstacle_ALE SONDE_VITESSEY_SEGMENT_V2
@@ -455,10 +481,8 @@ Chapter {
 			}
 	}
 
-}	
 
-Chapter {
-	Title "Visualization via VisIt Convection Amont and Euler explicit time scheme" 
+	Description "Visualization via VisIt Convection Amont and Euler explicit time scheme" 
 
 
 	visu {
@@ -489,7 +513,7 @@ Chapter {
 
 
 
-Chapitre {
-	Titre "Conclusion"
+Conclusion {
+
 	Description The 2D SPHERIC benchmark [1] reference results were compared with the ALE results. ALE simulations with the same mesh size ($\Delta x$ =0.0167) as used in the benchmark  can not be used. ALE method is usable with relatively small movements. Combining small mesh size with relatively big movement would produce low quality mesh at the end of this movement. Therefore ALE results are obtained from cases having nearly 3 times bigger mesh size ($\Delta x$=0.05).  By comparing solutions obtained with the reference solution it can be concluded that the former gives slightly lower values.
 }
