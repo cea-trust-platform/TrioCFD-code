@@ -318,6 +318,87 @@ sed -i '/end{document}/d' fic.tex
 sed -i "s@orig{..}@orig{./fiches/FTD_hanging_drop/build}@g" fic.tex
 sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ##################################################
+#           fiches ALE
+##################################################
+########### DivaALE ################
+cd $rapport/fiches
+mkdir DivaALE
+cd DivaALE
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/ALE/share/Validation/Rapports_automatiques/DivaALE/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/ALE/share/Validation/Rapports_automatiques/DivaALE/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{ALE}@g" fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/DivaALE/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### TwoCylindersALE ################
+cd $rapport/fiches
+mkdir TwoCylindersALE
+cd TwoCylindersALE
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoCylindersALE/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoCylindersALE/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{ALE}@g" fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/TwoCylindersALE/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+########### TwoOscillatingCylindersALE ################
+cd $rapport/fiches
+mkdir TwoOscillatingCylindersALE
+cd TwoOscillatingCylindersALE
+mkdir build
+cd build
+#copie de tous les fichiers
+cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/* .
+#copie supplementaire des fichiers et repertoires caches
+cp -R $version/ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE/build/.[!.]* .
+#nettoyage des fichiers tex
+cd .tmp
+echo 'traitement ' $(pwd)
+sed -i '45d' fic.tex
+sed -i "s@rhead{}@rhead{ALE}@g" fic.tex
+sed -i '/documentclass/d' fic.tex
+sed -i '/usepackage/d' fic.tex
+sed -i '/setlength/d' fic.tex
+sed -i '/renewcommand/d' fic.tex
+sed -i '/pagestyle/d' fic.tex
+sed -i '/makeindex/d' fic.tex
+sed -i '/begin{document}/d' fic.tex
+sed -i '/huge/d' fic.tex
+sed -i '/end{document}/d' fic.tex
+sed -i "s@orig{..}@orig{./fiches/TwoOscillatingCylindersALE/build}@g" fic.tex
+sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+##################################################
 #           Generation document final
 ##################################################
 cd $rapport

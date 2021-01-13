@@ -14,13 +14,13 @@ Parameters {
 	ParametersTRUST Time scheme: Scheme_euler_implicit with solver implicite_ALE GMRES
 	ParametersTRUST Medium: Fluide_Incompressible
 	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
-        ParametersTRUST Convection scheme: ALE muscl
-        
+	ParametersTRUST Convection scheme: ALE muscl
+	ParametersTRUST Location: ALE/share/Validation/Rapports_automatiques/TwoCylindersALE
 
 	
 	IncludeData 2
 
-        Reference "1. S. S. Chen, M. W. Wambsganss, and J. A. Jendrzejczyk. Added Mass and Damping of a Vibrating Rod in Confined Viscous Fluids, 1976."	
+	Reference "1. S. S. Chen, M. W. Wambsganss, and J. A. Jendrzejczyk. Added Mass and Damping of a Vibrating Rod in Confined Viscous Fluids, 1976."	
 	Reference "2. CFD numerical simulation of a single-phase flow around a vibrating cylindrical tube, D. Panunzio, DES/ISAS/DM2S/SEMT/DYN/RS/2020-67015/A"
 }
 
@@ -42,7 +42,6 @@ Pb_description {
 	icbc {
 		Description " The inner moves with an harmonic motion: \latex_($\textbf{u} = U*sin(\omega*t) \textbf{e}_x $\latex_), where \latex_($ U $\latex_) : amplitude of displacement and \latex_($ \omega $\latex_) : angular frequency of displacement.
 
-
 		Description "The outer cylinder fixed."
 		Description "Initially, the fluid is at rest."
 	}
@@ -59,20 +58,20 @@ Casesetup {
 	grid_mesh {
 		Visu {
 			Title "Mesh"
+			Width 13cm, trim= 10 100 50 100,clip
 			Mesh TwoCylinders.lata dom
 		}
 	
 		Table {
 			Title "Meshes properties"
-					
-			nb_columns 4		
+			nb_columns 4
 			label Nb_elements | Nb_processors | max_size | min_size 
 			include_description_lines 0
 
 	
 			Line {
-				legend "Mesh"		
-				values 110466 4 0.015 0.003			
+				legend "Mesh"
+				values 110466 4 0.015 0.003
 			}
 		 }
 
@@ -95,10 +94,10 @@ Description "The analytical solution (Chen et al. [1]) is here depicted and comp
 		legend outside
 		include_description_curves 0
 		
-		Courbe {			
+		Courbe {
 			legend "Chen et al. [1]"
 			Fichier Theoretical_force.txt
-			Style lines		
+			Style lines
 		}
 
 		Courbe {
@@ -111,20 +110,20 @@ Description "The analytical solution (Chen et al. [1]) is here depicted and comp
 	}
 			Description "For the analytical calculation of the added coefficients, the reader is referred to [1]. Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m_{self} &= \dfrac{\langle\sin(\omega t), F(t)\rangle}{\rho \pi (D_1/2)^2 u D_1 \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F(t) dt\\c_{self} &= \dfrac{\langle\cos(\omega t), F(t)\rangle}{\rho \pi (D_1/2)^2 u D_1 \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F(t) dt \end{split} \end{equation}\latex_) and are reported in the following table: " 
 	Table {
-		Title "Added mass and damping coefficients"	
+		Title "Added mass and damping coefficients"
 	
-		nb_columns 2		
+		nb_columns 2
 		label \latex_($m_{self}$\latex_) | \latex_($c_{self}$\latex_)
 		include_description_lines 0
 
 		Line {
-			legend "Chen et al. [1]"		
+			legend "Chen et al. [1]"
 			values 1.7118 0.046036
 		}
 		
 		Line {
-			legend "TrioCFD"		
-			file Numerical_coefficients.txt				
+			legend "TrioCFD"
+			file Numerical_coefficients.txt
 		}
 
 	}
@@ -133,20 +132,22 @@ Description "The analytical solution (Chen et al. [1]) is here depicted and comp
 	
 	Visu {
 		Title "TrioCFD PRESSION SOM"
+		Width 12cm, trim= 10 100 50 100,clip
 		pseudocolor TwoCylinders.lata dom PRESSION_PA SOM
 	}
-
-	
 	Visu {
 		Title "TrioCFD VITESSE_magnitude SOM"
+		Width 12cm, trim= 10 100 50 100,clip
 		pseudocolor TwoCylinders.lata dom norme_VITESSE SOM
 	}
 	Visu {
 		Title "TrioCFD Mesh velocity SOM"
+		Width 12cm, trim= 10 100 50 100,clip
 		pseudocolor TwoCylinders.lata dom norme_ALEMESHVELOCITY SOM
 	}
 	Visu {
 		Title "TrioCFD Total displacement of the mesh SOM"
+		Width 12cm, trim= 10 100 50 100,clip
 		pseudocolor TwoCylinders.lata dom norme_ALEMESHTOTALDISPLACEMENT SOM
 	}
 		

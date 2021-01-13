@@ -41,7 +41,7 @@ Pb_description {
 		  	}
 	}
 	icbc {
-		Description " The left cylinder (\latex_($C_1$\latex_)) is fixed and the right one (\latex_($C_2$\latex_)) moves with an harmonic motion alongside the $x$-axis:  \latex_(${\bf U_2}(T) = u\sin(\omega T) {\bf e_x}$\latex_), where $\latex_(u= 0.01$\latex_)." 
+		Description " The left cylinder (\latex_($C_1$\latex_)) is fixed and the right one (\latex_($C_2$\latex_)) moves with an harmonic motion alongside the $x$-axis: \latex_(${\textbf U_2}(T) = u\sin(\omega T) {\textbf e_x}$\latex_), where $\latex_(u= 0.01$\latex_)." 
 
 		Description "The left, right, upper and lower boundaries are fixed. "
 		Description "Initially, the fluid is at rest."
