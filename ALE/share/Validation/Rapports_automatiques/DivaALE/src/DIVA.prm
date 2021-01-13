@@ -1,16 +1,13 @@
 Parameters {
-	Title "TrioCFD ALE: DIVA configuration"	
-	Author "D. Panunzio and M. A. Puscas"
+	newvalidTrio
+	Title "Vibrations of a cylinder in a square tube bundle immersed in a viscous fluid"	
+	Author "M. A. Puscas and D. Panunzio"	
 	
-	Description "A 2D fluid in a set of circular cylinders, arranged in a square configuration (DIVA configuration), has been numerically simulated. Such a pattern is made up of three rows of three cylinders and a set of half cylinders for each square-side. The pitch between the cylinders is \latex_( $P = 1.5 D$ \latex_), for both directions, where \latex_( $D$ \latex_) is the diameter. The central cylinders moves with an harmonic motion while the others (half and quarter cylinders included) are fixed. The left, right, upper and lower boundaries are fixed."
-	Description "This validation test case has been created to compare TrioCFD ALE results with the experimental results obtained by the CEA/DYN laboratory for such a problem."
-	Description "A mesh sensitivity analysis has been carried out, and it is here reported, to detect the best results from both a physical and numerical point of view."	
-	
-	TestCase Mesh_1 DIVA.data 1
+	TestCase Mesh_1 DIVA.data 1 /*jdd en annexe*/ 
 	TestCase Mesh_2 DIVA.data 2  
         TestCase Mesh_3 DIVA.data 4
 
-	VersionTRUST 1.8.0	
+	VersionTRUST 1.8.2	
 
 	ParametersTRUST Problem: Pb_hydraulique_ALE
 	ParametersTRUST Dimension: 2D
@@ -21,60 +18,93 @@ Parameters {
 	ParametersTRUST Medium: Fluide_Incompressible
 	ParametersTRUST Hydraulic problem: Navier_Stokes_standard_ALE
         ParametersTRUST Convection scheme: ALE muscl
-        
-	Code TrioCFD
-	
-	IncludeData 0
+
+        IncludeData 2
 
         Reference "1. Chen, S S. Flow-induced vibration of circular cylindrical structures, 1987."
 	Reference "2. CFD numerical simulation of a single-phase flow around a vibrating cylindrical tube, D. Panunzio, DES/ISAS/DM2S/SEMT/DYN/RS/2020-67015/A"
 			
 }
+Purpose {
+	Description "The importance of fluid-elastic forces in tube bundle vibrations can hardly be over-emphasized, in view of their damaging potential. In the last decades, advanced models for representing fluid-elastic coupling through added-coefficients have therefore been developed by the community of the domain."	
+Description "In what follows, we aim to determine numerically the fluid added-coefficients (mass and damping), considering the case of a square tube bundle immersed in a viscous fluid at rest.
+	Description "This validation test case has been created to compare TrioCFD ALE results with the experimental results obtained by the CEA/DYN laboratory for such a problem."
+	Description "A mesh sensitivity analysis has been carried out, and it is here reported, to detect the best results from both a physical and numerical point of view."
 
-Chapter {
-	Title "Mesh"
-	Description "In this section are reported the adaptive meshes used during the simulations. Fictitious lines have been added in the design of the geometry of these meshes in order to divide the calculation domain into blocks and ensure a symmetrical discretization by the mesh module MG_CADSURF of SALOME. The main properties are summarized in the table below."
+}
+
+Pb_description {
+	Description "A 2D fluid in a set of circular cylinders, arranged in a square configuration (DIVA configuration), has been numerically simulated. Such a pattern is made up of three rows of three cylinders and a set of half cylinders for each square-side. The pitch between the cylinders is \latex_( $P = 1.5 D$ \latex_), for both directions, where \latex_( $D$ \latex_) is the diameter. "
+
+	geometry {
+		Figure {
+			Title "DIVA geometry"
+			Width 12cm
+			picture geometry.pdf
+			}
+		}
+	icbc {
+		Description " The central cylinders moves with an harmonic motion: \latex_($\textbf{u} = U*sin(\omega*t) \textbf{e}_x $\latex_), where \latex_($ U $\latex_) : amplitude of displacement and \latex_($ \omega $\latex_) : angular frequency of displacement.
+
+
+		Description "The others cylinders (half and quarter cylinders included) are fixed. The left, right, upper and lower boundaries are fixed. "
+		Description "Initially, the fluid is at rest."
+	}
 	
-	Visu {
-		Title "Mesh_1"
-		Mesh ./Mesh_1/DIVA.lata dom
-	}
-	Visu {
-		Title "Mesh_2"
-		Mesh ./Mesh_2/DIVA.lata dom
-	}
-	Visu {
-		Title "Mesh_3"
-		Mesh ./Mesh_3/DIVA.lata dom
-	}
-
-	Table {
-		Title "Meshes properties"
-		Description "Numerical simulations have been carried out on a set of adaptive meshes. The global size and two local sizes have been defined: a smaller one at the center and immediately adjacent cylinders (min_local_size) and a larger one (max_local_size) at the other boundaries (right and left walls, upper and lower borders, other cylinders)."		
-		Description "Calculation has been partitioned on a number of processors such that each processor worked with 20000-30000 elements."
-		Description "
-			
-		nb_columns 5		
-		label Nb_elements | Nb_processors | global_size | max_local_size | min_local_size 
-		include_description_lines 0
-
-		Line {
-			legend "Mesh_1"		
-			values 25806 1 0.0012 0.00080 0.00060				
-		}	
-		Line {
-			legend "Mesh_2"		
-			values 51146 2 0.0011 0.00070 0.00055				
-		}
-		Line {
-			legend "Mesh_3"		
-			values 102080 4 0.0008 0.00050 0.00030				
-		}
+	fluidprop {
+		Description "The tube bundle is immersed in a Newtonian and homogeneous fluid, with mass density \latex_($\rho \,(1000 \,Kg/m^3 )$\latex_) and kinematic viscosity \latex_($\nu \,(1.007*10^{-6}\, m^2/s)$\latex_). The fluid flow generated by the oscillation of the central cylinder is assumed as incompressible and two-dimensional.
 	}
 }
 
-Chapter {
-	Title "Numerical results"
+Casesetup {
+	Description "In this section are reported the adaptive meshes used during the simulations. Fictitious lines have been added in the design of the geometry of these meshes in order to divide the calculation domain into blocks and ensure a symmetrical discretization by the mesh module MG_CADSURF of SALOME."
+	Description "Numerical simulations have been carried out on a set of adaptive meshes. The global size and two local sizes have been defined: a smaller one at the center and immediately adjacent cylinders (min_local_size) and a larger one (max_local_size) at the other boundaries (right and left walls, upper and lower borders, other cylinders). "	
+	Description "By this way, a refined mesh is used in the regions with large gradient fields whereas a loose mesh is used in the areas with low gradient fields. "	
+	Description "The main properties are summarized in the table below. Calculation has been partitioned on a number of processors such that each processor worked with 20000-30000 elements."
+
+	grid_mesh {	
+			Visu {
+				Title "Mesh_1"
+				Mesh ./Mesh_1/DIVA.lata dom
+			}
+			Visu {
+				Title "Mesh_2"
+				Mesh ./Mesh_2/DIVA.lata dom
+			}
+			Visu {
+				Title "Mesh_3"
+				Mesh ./Mesh_3/DIVA.lata dom
+			}
+
+
+			Table {
+				Title "Meshes properties"
+				nb_columns 5		
+				label Nb_elements | Nb_processors | global_size | max_local_size | min_local_size 
+				include_description_lines 0
+
+				Line {
+					legend "Mesh_1"		
+					values 25806 1 0.0012 0.00080 0.00060				
+				}	
+				Line {
+					legend "Mesh_2"		
+					values 51146 2 0.0011 0.00070 0.00055				
+				}
+				Line {
+					legend "Mesh_3"		
+					values 102080 4 0.0008 0.00050 0.00030				
+				}
+			}
+	}
+
+	model_options {
+		Description "The fluid problem with moving boundaries is handled by the Arbitrary Lagrangian-Eulerian (ALE) method."
+		Description "In the ALE approach, the fluid flow is computed in a domain that is deformed in order to follow the movement of the fluid-solid interface. It provides a hybrid description not associated with the fluid particles and the laboratory coordinates. We associate the description with a moving imaginary mesh that follows the fluid domain."
+	}
+}
+
+Results {
 	Description "In this section the experimental results for the force per unit length exerted by the fluid over the center cylinder and the added coefficients are compared with the TrioCFD results. The numerical results are also given for the added coefficients for the North, South, East, West cylinders."
 	Figure {
 		Title "Force per unit length of cylinder"
@@ -111,11 +141,10 @@ Description "The experimental solution is here depicted and compared with the nu
 			Style linespoints
 		}
 	}
+	Description "The experimental calculation of the coefficients has been carried out on the test bench of the CEA/DYN laboratory. For the Center cylinder, numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m_{i,self} &= \dfrac{\langle\sin(\omega t), F_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F_i(t) dt\\c_{i,self} &= \dfrac{\langle\cos(\omega t), F_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 
 	
 	Table {
-		Title "Added mass and damping coefficients for the Center cylinder"
-		Description "The experimental calculation of the coefficients has been carried out on the test bench of the CEA/DYN laboratory. Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m_{i,self} &= \dfrac{\langle\sin(\omega t), F_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F_i(t) dt\\c_{i,self} &= \dfrac{\langle\cos(\omega t), F_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 	
-
+		Title "Added mass coefficients for the Center cylinder"
 		nb_columns 2		
 		label \latex_($m_{x,self}$\latex_) | \latex_($m_{y,self}$\latex_)
 		include_description_lines 0
@@ -146,6 +175,7 @@ Description "The experimental solution is here depicted and compared with the nu
 		}
 	}
 	Table {
+                Title "Added damping coefficients for the Center cylinder"
 		nb_columns 2		
 		label \latex_($c_{x,self}$\latex_) | \latex_($c_{y,self}$\latex_) 
 		include_description_lines 0
@@ -176,10 +206,9 @@ Description "The experimental solution is here depicted and compared with the nu
 		}
 	}
 
+	Description "For the Nord cylinder, numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(N)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(N)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(N)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(N)}_i(t) dt\\c^{(N)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(N)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(N)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(N)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 
 	Table {
-		Title "Added mass and damping coefficients for the Nord cylinder"
-		Description "Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(N)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(N)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(N)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(N)}_i(t) dt\\c^{(N)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(N)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(N)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(N)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 	
-		
+		Title "Added mass coefficients for the Nord cylinder"
 		nb_columns 2		
 		label \latex_($m^{(N)}_{x,cross}$\latex_) | \latex_($m^{(N)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -205,6 +234,7 @@ Description "The experimental solution is here depicted and compared with the nu
 		}
 	}
 	Table {
+ 		Title "Added damping coefficients for the Nord cylinder"
 		nb_columns 2		
 		label \latex_($c^{(N)}_{x,cross}$\latex_) | \latex_($c^{(N)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -229,11 +259,9 @@ Description "The experimental solution is here depicted and compared with the nu
 			columns $2 $4  								
 		}
 	}
-
+	Description "For the Sud cylinder, numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(S)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(S)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(S)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(S)}_i(t) dt\\c^{(S)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(S)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(S)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(S)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 	
 	Table {
-		Title "Added mass and damping coefficients for the Sud cylinder"
-		Description "Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(S)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(S)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(S)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(S)}_i(t) dt\\c^{(S)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(S)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(S)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(S)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 	
-		
+		Title "Added mass coefficients for the Sud cylinder"
 		nb_columns 2		
 		label \latex_($m^{(S)}_{x,cross}$\latex_) | \latex_($m^{(S)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -259,6 +287,7 @@ Description "The experimental solution is here depicted and compared with the nu
 		}
 	}
 	Table {
+ 		Title "Added damping coefficients for the Sud cylinder"
 		nb_columns 2		
 		label \latex_($c^{(S)}_{x,cross}$\latex_) | \latex_($c^{(S)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -283,11 +312,9 @@ Description "The experimental solution is here depicted and compared with the nu
 			columns $2 $4  								
 		}
 	}
-	
+	Description "For the Est cylinder, numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(E)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(E)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(E)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(E)}_i(t) dt\\c^{(E)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(E)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(E)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(E)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 		
 	Table {
-		Title "Added mass and damping coefficients for the Est cylinder"
-		Description "Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(E)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(E)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(E)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(E)}_i(t) dt\\c^{(E)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(E)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(E)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(E)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 	
-		
+		Title "Added mass coefficients for the Est cylinder"
 		nb_columns 2		
 		label \latex_($m^{(E)}_{x,cross}$\latex_) | \latex_($m^{(E)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -313,6 +340,7 @@ Description "The experimental solution is here depicted and compared with the nu
 		}
 	}
 	Table {
+		Title "Added damping coefficients for the Est cylinder"
 		nb_columns 2		
 		label \latex_($c^{(E)}_{x,cross}$\latex_) | \latex_($c^{(E)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -337,11 +365,9 @@ Description "The experimental solution is here depicted and compared with the nu
 			columns $2 $4  								
 		}
 	}
-
+	Description "For the West cylinder, numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(W)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(W)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(W)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(W)}_i(t) dt\\c^{(W)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(W)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(W)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(W)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 		
 	Table {
-		Title "Added mass and damping coefficients for the West cylinder"
-		Description "Numerically, the added coefficients are computed with a Fourier product as: \latex_( \begin{equation}\begin{split}m^{(W)}_{i,cross} &= \dfrac{\langle\sin(\omega t), F^{(W)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\sin(\omega t), F^{(W)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}sin(\omega t) F^{(W)}_i(t) dt\\c^{(W)}_{i,cross} &= \dfrac{\langle\cos(\omega t), F^{(W)}_i(t)\rangle}{\rho \pi (D/2)^2 U \omega^2}~~~~~\text{with}~~~~~\langle\cos(\omega t), F^{(W)}_i(t)\rangle = \dfrac{2}{5T}\int_{0}^{5T}cos(\omega t) F^{(W)}_i(t) dt \end{split} \end{equation}\latex_) and are reported in the following tables: " 		
-		
+		Title "Added mass coefficients for the West cylinder"
 		nb_columns 2		
 		label \latex_($m^{(W)}_{x,cross}$\latex_) | \latex_($m^{(W)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -367,6 +393,7 @@ Description "The experimental solution is here depicted and compared with the nu
 		}
 	}
 	Table {
+		Title "Added damping coefficients for the West cylinder"
 		nb_columns 2		
 		label \latex_($c^{(W)}_{x,cross}$\latex_) | \latex_($c^{(W)}_{y,cross}$\latex_)
 		include_description_lines 0
@@ -391,40 +418,8 @@ Description "The experimental solution is here depicted and compared with the nu
 			columns $2 $4  								
 		}
 	}
-}
-	
-Chapter {
-	Title "Residual over iterations"
-	Figure {
-		Title "Residual over iterations"
-		Description "The max residual is plotted in function of the number of iterations for the following cases: TrioCFD with Mesh_1 (TrioCFD Mesh_1), TrioCFD with Mesh_2 (TrioCFD Mesh_2) and TrioCFD with Mesh_3 (TrioCFD Mesh_3)."	
-                LabelX "Iterations"
-		LabelY "residu=max|Ri|"
-		include_description_curves 0
 
-		Courbe {
-			legend "TrioCFD Mesh\_1"
-			file ./Mesh_1/DIVA.dt_ev
-			columns ($0+1) $4
-			Style linespoints
-		}
-		Courbe {
-			legend "TrioCFD Mesh\_2"
-			file ./Mesh_2/DIVA.dt_ev
-			columns ($0+1) $4
-			Style linespoints
-		}
-		Courbe {
-			legend "TrioCFD Mesh\_3"
-			file ./Mesh_3/DIVA.dt_ev
-			columns ($0+1) $4
-			Style linespoints
-		}
-	}
-}
 
-Chapter {
-	Title "Visualization via VisIt"
 	Description "Pressure and velocity fields are reported at final time in order to investigate such distributions for the following numerical cases: TrioCFD with Mesh_1 (TrioCFD Mesh_1), TrioCFD with Mesh_2 (TrioCFD Mesh_2) and TrioCFD with Mesh_3 (TrioCFD Mesh_3)."
 	
 	Visu {
@@ -434,7 +429,7 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD Mesh_1 VITESSE_magnitude SOM"
-		pseudocolor ./Mesh_1/DIVA.lata dom_magnitude VITESSE SOM
+		pseudocolor ./Mesh_1/DIVA.lata dom norme_VITESSE SOM
 	}
 	Visu {
 		Title "TrioCFD Mesh_2 PRESSION SOM"
@@ -443,7 +438,7 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD Mesh_2 VITESSE_magnitude SOM"
-		pseudocolor ./Mesh_2/DIVA.lata dom_magnitude VITESSE SOM
+		pseudocolor ./Mesh_2/DIVA.lata dom norme_VITESSE SOM
 	}
 	Visu {
 		Title "TrioCFD Mesh_3 PRESSION SOM"
@@ -452,11 +447,11 @@ Chapter {
 	
 	Visu {
 		Title "TrioCFD Mesh_3 VITESSE_magnitude SOM"
-		pseudocolor ./Mesh_3/DIVA.lata dom_magnitude VITESSE SOM
+		pseudocolor ./Mesh_3/DIVA.lata dom norme_VITESSE SOM
 	}
 }
 
-Chapter {
-	Title "Conclusion"
+Conclusion {
 	Description "The harmonic motion of a cylinder in a quiescent viscous fluid, surrounded by a set of cylinders arranged in a square configuration, has been numerically simulated. A FEV method is applied to solve such a problem in conjunction with the ALE scheme. The numerical results for the fluid force and the added coefficients of the center cylinder are in good agreement with the experimental results. As theoretically expected, moreover, the coefficients along the y-axis are zero and the coefficients along x are symmetrical for the North-South and East-West cylinders respectively. This further shows the robustness of our numerical results."
 }
+

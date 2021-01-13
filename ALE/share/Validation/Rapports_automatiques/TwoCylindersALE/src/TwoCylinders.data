@@ -30,7 +30,7 @@ Scatter DOM.Zones dom
 boundaries of the domain and specify the speed that must be imposed on them #
 Imposer_vit_bords_ALE dom
 {
-	1 # number of mobile boundaries  #
+	1 # number of mobile boundaries #
 	CircleA Champ_front_ALE 2 0.01*0.06327167604329844*cos(0.06327167604329844*t) 0.0 # name and speed of the border #
 }
 
@@ -96,7 +96,7 @@ Read pb
 		# Pressure matrix solved with #
  		solveur_pression petsc cholesky { }
 		# Two operators are defined #
-		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework. Choice between: amont and muscl #
 		diffusion { }
 		# Uniform initial condition for velocity #
 		initial_conditions {
@@ -104,7 +104,7 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			CircleA  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*0.06327167604329844*cos(0.06327167604329844*t) 0.0 # mobile bord in ALE framework #
+			CircleA  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*0.06327167604329844*cos(0.06327167604329844*t) 0.0 # mobile bord in ALE framework # 
 			CircleB  paroi_fixe
 		}
 	}
