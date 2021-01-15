@@ -1,0 +1,208 @@
+\documentclass[11pt,a4paper,lmsf,nt,twoside]{docDM2S}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[francais]{babel}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{amsthm}
+\usepackage{dsfont}
+\usepackage{rotating}
+\usepackage{tabularx}
+\usepackage{array,multirow,makecell}
+\usepackage{eurosym}
+
+\setcellgapes{4pt}
+%\makegapedcells
+\usepackage[table]{xcolor}
+\usepackage[toc]{appendix}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}b{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}b{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}b{#1}}
+
+\usepackage{hyperref}
+\usepackage{tikz} 
+\usepackage{longtable}
+
+\definecolor{souris}{gray}{0.65}
+\definecolor{orange}{rgb}{1,0.5,0}
+\definecolor{lavendergray}{rgb}{0.77, 0.76, 0.82}
+\definecolor{lavenderblue}{rgb}{0.8, 0.8, 1.0}
+\definecolor{lavenderblush}{rgb}{1.0, 0.94, 0.96}
+\definecolor{dandelion}{rgb}{0.94, 0.88, 0.19}
+\definecolor{coquelicot}{rgb}{1.0, 0.22, 0.0}
+\definecolor{internationalorange}{rgb}{1.0, 0.31, 0.0}
+
+
+\definecolor{plus}{rgb}{0.74, 0.83, 0.9} %beaublue
+\definecolor{moins}{rgb}{0.97, 0.91, 0.81} %champagne
+\definecolor{alerte}{rgb}{1.0, 0.63, 0.48} %lightsalmon
+\definecolor{couleur1}{rgb}{0.77, 0.76, 0.82}
+\definecolor{couleur2}{rgb}{0.8, 0.8, 1.0}
+\definecolor{couleur3}{rgb}{1.0, 0.94, 0.96}
+\definecolor{babypink}{rgb}{0.96, 0.76, 0.76}
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+\definecolor{alizarin}{rgb}{0.82, 0.1, 0.26}
+\definecolor{classicrose}{rgb}{0.98, 0.8, 0.91}
+\definecolor{champagne}{rgb}{0.97, 0.91, 0.81}
+\definecolor{flavescent}{rgb}{0.97, 0.91, 0.56}
+\definecolor{celadon}{rgb}{0.67, 0.88, 0.69}
+\definecolor{gray(x11gray)}{rgb}{0.75, 0.75, 0.75}
+\definecolor{iceberg}{rgb}{0.44, 0.65, 0.82}
+\definecolor{lavenderblue}{rgb}{0.8, 0.8, 1.0}
+\definecolor{lavenderblush}{rgb}{1.0, 0.94, 0.96}
+\definecolor{lavendergray}{rgb}{0.77, 0.76, 0.82}
+\definecolor{lemonchiffon}{rgb}{1.0, 0.98, 0.8}
+\definecolor{lavenderpink}{rgb}{0.98, 0.68, 0.82}
+\definecolor{lightapricot}{rgb}{0.99, 0.84, 0.69}
+\definecolor{lightblue}{rgb}{0.68, 0.85, 0.9}
+\definecolor{bluebell}{rgb}{0.64, 0.64, 0.82}
+\definecolor{silver}{rgb}{0.75, 0.75, 0.75}
+\definecolor{coral}{rgb}{1.0, 0.5, 0.31}
+\definecolor{babyblueeyes}{rgb}{0.63, 0.79, 0.95}
+\definecolor{bisque}{rgb}{1.0, 0.89, 0.77}
+\definecolor{brightlavender}{rgb}{0.75, 0.58, 0.89}
+\definecolor{beige}{rgb}{0.96, 0.96, 0.86}
+	\definecolor{etonblue}{rgb}{0.59, 0.78, 0.64}
+\definecolor{gray(x11gray)}{rgb}{0.75, 0.75, 0.75}
+\definecolor{almond}{rgb}{0.94, 0.87, 0.8}
+	\definecolor{pastelgray}{rgb}{0.81, 0.81, 0.77}
+
+
+%%%%%%%%%%%%
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\ttlh@hang}{\parindent\z@}{\parindent\z@\leavevmode}{}{}
+\patchcmd{\ttlh@hang}{\noindent}{}{}{}
+\makeatother
+%\usepackage{mdwlist}
+%\usepackage{supertabular} 
+\usepackage{longtable}
+
+%%%%%%%%%%%%%%%
+% \unitlength=1cm
+%\input{header.tex}
+%%%%%%%%%%%%%%%%
+% \graphicspath{{./PLOTS/}{./FIGS/}{./XFig/}{./FigsSalome/}}
+
+\settitre{Plan de d\'eveloppement du code TrioCFD.  P\'eriode 2020-2025}
+
+
+
+\newcommand{\dpar}[2]{\displaystyle{\frac{\partial #1}{\partial #2}}}
+\newcommand{\gras}[1]{\displaystyle{\bf #1}}
+\newcommand{\ds}[1] {\displaystyle{#1}}
+\newcommand{\mbf}[1] {\mathbf{#1}}
+\newcommand{\itemb}{\item[$ \bullet$]}
+\newcommand{\vect}[1]{\vec{#1}}
+\newcommand{\dbar}[1]{\overline{\overline{{#1}}}}
+\newtheorem{thm}{Theorem}[section] 
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{proposition}[thm]{Proposition}
+\renewcommand{\div}{\mathrm{div}}
+\newcommand{\velocity}{\vec{ u}}
+\newcommand{\vale}{\vec{u}_{\text{ALE}}} 
+\newcommand{\normal}{\vec{ n}}
+\newcommand{\point}{x}
+\newcommand{\dist}{\mbox{dist}}
+\newcommand{\distance}[1]{d_{#1}}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\renewcommand{\refname}{\begin{center}\normalsize \bf REFERENCES\end{center}}
+
+
+\usepackage[parfill]{parskip}
+\usepackage{indentfirst}
+\usepackage{algorithm}
+%\usepackage{algpseudocode}
+
+\usepackage{amsmath, amscd, amstext, amsbsy, amsopn, amsthm, upref}
+\usepackage{amsfonts, amssymb, euscript, eufrak}
+\usepackage{footnote}
+\usepackage{multirow}
+
+\setauteurfonction{Pierre-Emmanuel Angeli}{Ing\'enieur-Chercheur}
+\setauteurfonction{Ulrich Bieder}{Ing\'enieur-Chercheur}
+\setauteurfonction{Erell Jamelot}{Ing\'enieur-Chercheur}
+\setauteurfonction{Nikos Leterrier}{Ing\'enieur-Chercheur}
+\setauteurfonction{Pascal Omnes}{Ing\'enieur-Chercheur}
+\setauteurfonction{Maria Adela Puscas}{Ing\'enieur-Chercheur}
+
+
+ \setnumero{2019-65759}
+% \setdiffusion{restreinte}
+%\setresumeDO{
+%\input{resumeDO.tex}
+%}
+\setresume{%
+\input{resumeDO.tex}
+}
+%  \setresume{
+% % 
+% }
+
+\input{list_diffu.tex}
+
+
+
+
+ \setmotscles{Plan de d\'eveloppement, TrioCFD, thermohydraulique, monophasique, m\'ecanique des fluides}
+%  \setreferencesaction{}{}{}
+ \setreferencesinterne{DISN}{SIMULATION}{SITHY}{A-SITHY-03-03-05 }
+ \setjalon{SEL}{Plan de d\'eveloppement du code TrioCFD.}
+
+
+%  \setrelecteur{Anne Charmeau}
+ %\setapprobateur{Pierre Gavoille}{Chef de Service}
+ \setvisa{Sylvie Naury}{Chef de Projet SITHY}
+ \setapprobateur{Nicolas Dorville}{Chef de laboratoire}
+ \setverificateur{J\'er\^ome Garcin}{Ing\'enieur-Chercheur}
+ \setindiceAdate{27/11/2019}
+  %\setindiceBdate{15/12/2018}
+
+
+
+\numberwithin{equation}{section}
+
+\begin{document} 
+%\theoremstyle{remark} % plain / definition / remark
+\newtheorem{rque}{Remarque}
+%\nocite{*}
+
+\renewcommand{\labelitemi}{$\bullet$}
+\graphicspath{{FIGS/}}
+
+\input{intro-pres.tex}
+\input{actions.tex}
+
+\clearpage
+
+\addcontentsline{toc}{section}{R\'ef\'erences}
+%\bibliographystyle{abbrvnat-fr-simpl}
+\bibliographystyle{plain}
+%\bibliographystyle{unsrt}
+%\bibliographystyle{apa}
+
+\begin{center}
+\bibliography{biblio}
+\end{center}
+
+
+ \appendix
+ \appendixpageoff
+\addcontentsline{toc}{section}{Annexes}
+\include{annexe}
+
+
+\end{document}
+
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{c}
+\includegraphics[scale=0.95]{}
+\end{tabular}
+\end{center}
+\caption{ }
+\end{figure}

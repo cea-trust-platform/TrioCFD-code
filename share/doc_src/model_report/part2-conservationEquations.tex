@@ -1,0 +1,516 @@
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+\chapter{Rappel des \'equations fondamentales de la dynamique des fluides}
+
+Dans cette section on rappelle les \'equations fondamentales de la dynamique
+des fluides. Elle permet d'introduire les principales notations et
+les \'equations aux d\'eriv\'ees partielles fondamentales sans hypoth\`eses
+physiques simplificatrices. Les d\'emonstrations peuvent \^etre trouv\'ees
+dans les r\'ef\'erences classiques. Dans la section \ref{sub:ConservMasse},
+on rappelle l'\'equation de conservation de la masse (encore appel\'ee
+\'equation de continuit\'e) et dans la section \ref{sub:QDM} on rappelle
+l'\'equation de conservation de la quantit\'e de mouvement. Plusieurs
+formes math\'ematiques \'equivalentes entre elles existent dans la litt\'erature
+: forme locale, forme locale notation vectorielle, forme locale conservative,
+forme locale conservative en notation vectorielle, formes macroscopiques,
+etc ... Ici on choisit la forme locale conservative avec notations
+vectorielles.
+
+
+\chapter{\label{sub:ConservMasse}Conservation de la masse}
+\lhead{Conservation de la masse}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+\begin{equation}
+\frac{\partial\rho}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u})=0\label{eq:ConvMasse}
+\end{equation}
+o\`u $\rho\equiv\rho(\mathbf{x},\,t)$ est la densit\'e avec $\mathbf{x}$
+la position et $t$ le temps, et $\mathbf{u}\equiv\mathbf{u}(\mathbf{x},\,t)$
+la vitesse. D'autres formes \'equivalentes de cette \'equation peuvent
+\^etre rencontr\'ees en appliquant l'identit\'e vectorielle $\boldsymbol{\nabla}\cdot(\rho\mathbf{u})=\rho\boldsymbol{\nabla}\cdot\mathbf{u}+\mathbf{u}\cdot\boldsymbol{\nabla}\rho$
+et en faisant appara\^itre la d\'eriv\'ee mat\'erielle $d\rho/dt=\partial\rho/\partial t+\mathbf{u}\cdot\boldsymbol{\nabla}\rho$.
+
+
+\chapter{\label{sub:QDM}Conservation de la quantit\'e de mouvement}
+\lhead{Conservation de la quantit\'e de mouvement}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+L'\'equation de conservation de la Quantit\'e De Mouvement (QDM) traduit
+le principe fondamental de la dynamique qui indique que la variation
+de quantit\'e de mouvement \`a l'int\'erieur d'un volume de contr\^ole est
+\'egale \`a la somme de toutes les forces ext\'erieures qui lui sont appliqu\'ees.
+Les forces qui s'appliquent sur le volume \'el\'ementaires peuvent \^etre
+s\'epar\'ees en forces de volume et forces de surface. Ces derni\`eres s'expriment
+comme un vecteur contrainte qui agit sur une surface, et ce vecteur
+contrainte s'exprime \`a son tour comme le produit scalaire d'un tenseur
+des contraintes $\mathbf{T}$ (de composante $T_{ij}$) et du vecteur
+normal \`a la surface $\mathbf{n}$. La contrainte totale est d\'ecompos\'ee
+en deux parties : $T_{ij}=-p\delta_{ij}+\tau_{ij}$. La premi\`ere est
+le tenseur des contraintes associ\'ees \`a la pression $-p\delta_{ij}$
+o\`u $p\equiv p(\mathbf{x},\,t)$ est la pression et $\delta_{ij}$
+est le symbole de Kronecker qui vaut un si $i=j$ et z\'ero sinon. La
+seconde, not\'ee $\tau_{ij}$ est associ\'ee aux contraintes visqueuses.
+La pression agit de fa\c con isotrope et sa valeur d\'epend de l'\'etat thermodynamique
+du fluide. Les contraintes visqueuses sont li\'ees \`a l'\'etat de d\'eformation
+du fluide
+
+Comme pour l'\'equation de conservation de la masse, plusieurs formes
+math\'ematiques et \'equivalentes entre elles peuvent \^etre d\'eduites. Son
+\'ecriture sous forme locale conservative est :
+\begin{equation}
+\frac{\partial(\rho\mathbf{u})}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}\mathbf{u})=-\boldsymbol{\nabla}p+\boldsymbol{\nabla}\cdot\boldsymbol{\tau}+\mathbf{F}_{v}\label{eq:QDM}
+\end{equation}
+
+
+Dans l'\'equation (\ref{eq:QDM}), le membre de gauche de l'\'equation
+repr\'esente la quantit\'e d'acc\'el\'eration par unit\'e de volume. Les termes
+du membre de droite repr\'esentent respectivement (\emph{i}) les forces
+associ\'ees \`a la pression par unit\'e de volume, (\emph{ii}) les contraintes
+visqueuses par unit\'e de volume et (\emph{iii}) la force externes par
+unit\'e de volume. Lorsqu'on ne consid\`ere que la gravit\'e elle s'exprime
+sous la forme : $\mathbf{F}_{v}=\rho\mathbf{g}$.
+
+
+\chapter{Forme du tenseur des contraintes visqueuses}
+\lhead{Forme du tenseur des contraintes visqueuses}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+Le tenseur des contraintes visqueuses $\mathbf{\tau}$ est g\'en\'eralement
+exprim\'e en fonction des taux de d\'eformation dans l'\'ecoulement. On
+rappelle ci-dessous les d\'efinitions des tenseurs des taux de d\'eformation
+et des taux de rotation \`a partir desquels sera exprim\'e le tenseur
+des contraintes visqueuses.
+
+
+\subsection*{Rappel du tenseur des taux de d\'eformation}
+
+L'accroissement de vitesse de deux particules fluides positionn\'ees
+respectivement en $\mathbf{r}$ et $\mathbf{r}+d\mathbf{r}$ et de
+vitesse $\mathbf{u}$ et $\mathbf{u}+d\mathbf{u}$ s'exprime sous
+la forme $du_{i}=\sum_{j=1}^{3}(\partial u_{i}/\partial x_{j})dx_{j}$
+au premier ordre par rapport aux composantes $dx_{j}$ (pour $j=1,2,3$).
+Dans cette expression, les quantit\'es $G_{ij}=\partial u_{i}/\partial x_{j}$
+sont les \'el\'ements d'un tenseur de rang deux, le tenseur des taux de
+d\'eformation du fluide (ou des gradients de vitesse). En trois dimensions,
+il s'\'ecrit sous la forme d'une matrice $3\times3$ qui peut \^etre d\'ecompos\'ee
+en une partie sym\'etrique et une partie antisym\'etrique :
+
+\begin{equation}
+G_{ij}=\frac{\partial u_{i}}{\partial x_{j}}=\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)+\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}-\frac{\partial u_{j}}{\partial x_{i}}\right)\label{eq:TauxDeformation}
+\end{equation}
+
+
+Le premier terme est le tenseur des taux des d\'eformations :
+
+\begin{equation}
+S_{ij}=\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)\label{eq:TenseurDeformations}
+\end{equation}
+et il est sym\'etrique ($S_{ij}=S_{ji}$). Le second terme est le tenseur
+des taux de rotation :
+
+\begin{equation}
+\Omega_{ij}=\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}-\frac{\partial u_{j}}{\partial x_{i}}\right)\label{eq:TenseurRotations}
+\end{equation}
+et ce tenseur est antisym\'etrique ($\Omega_{ij}=-\Omega_{ji}$).
+
+
+\subsection*{Forme du tenseur des contraintes visqueuses pour un fluide newtonien}
+
+Lorsque les fluides sont newtoniens la relation contrainte-d\'eformation
+est lin\'eaire et isotrope. La relation g\'en\'erale s'\'ecrit :
+
+\begin{equation}
+\tau_{ij}=\eta\left(2S_{ij}-\frac{2}{3}S_{kk}\delta_{ij}\right)+\zeta S_{kk}\delta_{ij}\label{eq:Contraintes-Newtonien}
+\end{equation}
+qui fait appara\^itre deux viscosit\'es, la viscosit\'e dynamique $\eta\equiv\eta(\mathbf{x},\,t)$
+et la viscosit\'e de volume $\zeta$ (ou deuxi\`eme viscosit\'e). Le premier
+terme correspond \`a une d\'eformation sans changement de volume tandis
+que le second terme correspond \`a une dilatation isotrope. Dans la
+majeure partie des applications on ne tient pas compte de la viscosit\'e
+en volume ($\zeta=0$) et le tenseur des contraintes s'\'ecrit $\tau_{ij}=2\eta S_{ij}-(2/3)\eta S_{kk}\delta_{ij}$,
+soit en utilisant la relation (\ref{eq:TenseurDeformations}) :
+
+\begin{equation}
+\tau_{ij}=\eta\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)-\frac{2}{3}\eta\left(\frac{\partial u_{k}}{\partial x_{k}}\right)\delta_{ij}\label{eq:Contraintes}
+\end{equation}
+ou encore en notations vectorielles :
+
+\begin{equation}
+\boldsymbol{\tau}=\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})-\frac{2}{3}\eta(\boldsymbol{\nabla}\cdot\mathbf{u})\mathbf{I}\label{eq:Contraintes-Deformations_Newtonien}
+\end{equation}
+o\`u $\mathbf{I}$ est la matrice diagonale unit\'e.
+
+
+\subsection*{Fluide newtonien de viscosit\'e constante}
+
+Lorsque la viscosit\'e du fluide $\eta$ est constante (i.e. $\eta(\mathbf{x},\,t)=\eta_{0}=\mbox{Cte}$),
+le terme des contraintes visqueuses $\boldsymbol{\nabla}\cdot\boldsymbol{\tau}$
+dans l'\'equation (\ref{eq:QDM}) s'exprime sous la forme :
+
+\begin{eqnarray*}
+\frac{\partial\tau_{ij}}{\partial x_{j}} & = & \eta_{0}\left[\frac{\partial^{2}u_{i}}{\partial x_{j}\partial x_{j}}+\frac{\partial}{\partial x_{j}}\left(\frac{\partial u_{j}}{\partial x_{i}}\right)\right]-\frac{2}{3}\eta_{0}\frac{\partial}{\partial x_{j}}(\boldsymbol{\nabla}\cdot\mathbf{u})\delta_{ij}\\
+ & = & \eta_{0}\left[\frac{\partial^{2}u_{i}}{\partial x_{j}\partial x_{j}}+\frac{\partial}{\partial x_{i}}(\boldsymbol{\nabla}\cdot\mathbf{u})\right]-\frac{2}{3}\eta_{0}\frac{\partial}{\partial x_{i}}(\boldsymbol{\nabla}\cdot\mathbf{u})\\
+ & = & \eta_{0}\boldsymbol{\nabla}^{2}u_{i}+\frac{\eta_{0}}{3}\frac{\partial}{\partial x_{i}}(\boldsymbol{\nabla}\cdot\mathbf{u})
+\end{eqnarray*}
+
+
+C'est-\`a-dire en notations vectorielles :
+
+\begin{equation}
+\boldsymbol{\nabla}\cdot\boldsymbol{\tau}=\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\frac{\eta_{0}}{3}\boldsymbol{\nabla}(\boldsymbol{\nabla}\cdot\mathbf{u})\label{eq:ContraintVisq-constante}
+\end{equation}
+
+
+
+\chapter{R\'esum\'e}
+\lhead{R\'esum\'e}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+
+\section{Cas g\'en\'eral pour un fluide newtonien}
+
+Les \'equations de conservation de la masse et de la quantit\'e de mouvement
+s'\'ecrivent sous la forme g\'en\'erale :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\rho}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}) & = & 0\label{eq:Bilan_ConservMasse}\\
+\frac{\partial(\rho\mathbf{u})}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}\mathbf{u}) & = & -\boldsymbol{\nabla}p+\boldsymbol{\nabla}\cdot\boldsymbol{\tau}+\rho\mathbf{F}_{v}\label{eq:Bilan_QDM}
+\end{eqnarray}
+o\`u $\rho\equiv\rho(\mathbf{x},\,t)$ et $\mathbf{u}\equiv\mathbf{u}(\mathbf{x},\,t)$
+sont les inconnues du syst\`eme d'\'equations. La loi d'\'etat sur la pression
+et l'hypoth\`ese de fluide newtonien pour le tenseur des contraintes
+permettent de fermer le syst\`eme. La loi d'\'etat sur la pression et
+les mod\`eles de type \og bas Mach \fg{} qui s\'eparent la pression
+en une pression thermodynamique et une pression hydrodynamique sont
+pr\'esent\'es dans le chapitre suivant. Pour un fluide newtonien, le tenseur
+des contraintes $\mathbf{\tau}$ est reli\'e \`a celui des d\'eformations
+$\mathbf{D}$ par la relation :
+
+\end{subequations}
+
+\begin{equation}
+\boldsymbol{\tau}=\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})-\frac{2}{3}\eta(\boldsymbol{\nabla}\cdot\mathbf{u})\mathbf{I}\label{eq:Bilan_TenseurContrainte}
+\end{equation}
+o\`u la viscosit\'e dynamique est not\'ee $\eta\equiv\eta(\mathbf{x},\,t)$
+et la viscosit\'e de volume $\zeta$ a \'et\'e n\'eglig\'ee.
+
+
+\section{Cas particulier d'une viscosit\'e constante}
+
+Lorsque la viscosit\'e est consid\'er\'ee constante (i.e. $\eta(\mathbf{x},\,t)=\eta_{0}=\mbox{Cte}$),
+le terme de divergence du tenseur des contraintes $\boldsymbol{\nabla}\cdot\boldsymbol{\tau}$
+se simplifie \`a l'aide de la relation (\ref{eq:ContraintVisq-constante})
+et le syst\`eme d'\'equations devient :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\rho}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}) & = & 0\label{eq:Bilan_ConservMasse-1}\\
+\frac{\partial(\rho\mathbf{u})}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}\mathbf{u}) & = & -\boldsymbol{\nabla}p+\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\frac{\eta_{0}}{3}\boldsymbol{\nabla}(\boldsymbol{\nabla}\cdot\mathbf{u})+\rho\mathbf{F}_{v}\label{eq:Bilan_QDM-1}
+\end{eqnarray}
+
+
+\end{subequations}
+
+
+\section{Cas particulier des \'ecoulements incompressibles avec viscosit\'e variable}
+
+Lorsque le fluide est consid\'er\'e incompressible (i.e. $\rho(\mathbf{x},\,t)=\rho_{0}=\mbox{Cte})$
+alors l'\'equation de conservation de la masse devient $\boldsymbol{\nabla}\cdot\mathbf{u}=0$
+(car $\partial\rho_{0}/\partial t=0$ et $\boldsymbol{\nabla}\rho_{0}=\mathbf{0}$),
+le terme non lin\'eaire s'\'ecrit $\boldsymbol{\nabla}\cdot(\rho_{0}\mathbf{u}\mathbf{u})=\rho_{0}\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u}$
+et le tenseur des contraintes visqueuses (Eq. (\ref{eq:ContraintVisq-constante}))
+se simplifie lui aussi en $\boldsymbol{\tau}=\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})$. 
+
+\begin{subequations}
+
+\begin{align}
+\boldsymbol{\nabla}\cdot\mathbf{u} & =0,\label{eq:ContinuiteMP-1}\\
+\rho_{0}\frac{\partial\mathbf{u}}{\partial t}+\rho_{0}\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u} & =-\boldsymbol{\nabla}p+\boldsymbol{\nabla}\cdot\left[\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})\right]+\rho_{0}\mathbf{F}_{v}\label{eq:DBF-1-1}
+\end{align}
+
+
+\end{subequations}
+
+Dans cette formulation, la viscosit\'e dynamique $\eta$ reste dans
+le terme entre crochets car il peut d\'ependre de la position comme
+dans les mod\`eles de turbulence.
+
+
+\section{Cas particulier des \'ecoulements incompressibles avec viscosit\'e constante}
+
+Enfin, lorsque le fluide est consid\'er\'e incompressible et de viscosit\'e
+dynamique $\eta_{0}$ constante, le tenseur des contraintes visqueuses
+(Eq. (\ref{eq:ContraintVisq-constante})) se simplifie une nouvelle
+fois en $\boldsymbol{\nabla}\cdot\boldsymbol{\tau}=\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}$
+et le syst\`eme d'\'equations devient :
+
+\begin{subequations}
+
+\begin{align}
+\boldsymbol{\nabla}\cdot\mathbf{u} & =0,\label{eq:ContinuiteMP}\\
+\rho_{0}\frac{\partial\mathbf{u}}{\partial t}+\rho_{0}\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u} & =-\boldsymbol{\nabla}p+\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\rho_{0}\mathbf{F}_{v}\label{eq:DBF-1}
+\end{align}
+
+
+\end{subequations}
+
+\newpage
+\chapter{Conservation de l'\'energie}
+\lhead{Conservation de l'\'energie}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+Plusieurs formes de l'\'equation de bilan de l'\'energie sont possibles
+selon que l'on consid\`ere la conservation de l'\'energie totale, l'\'energie
+interne, l'enthalpie totale ou l'enthalpie. Des formulations peuvent
+\^etre d\'eduites sur la temp\'erature ou m\^eme l'entropie. Dans la suite,
+on restreint la pr\'esentation \`a l'\'ecriture de la conservation de l'\'energie
+interne qui sera \'ecrite sous forme \'equivalente sur l'\'equation de la
+temp\'erature.
+
+L'\'equation de bilan de l'\'energie interne $e$ s'\'ecrit \cite[p. 126]{Book_Candel}
+:
+
+\begin{equation}
+\frac{\partial\rho e}{\partial t}+\boldsymbol{\nabla}\cdot(\rho e\mathbf{u})=-\boldsymbol{\nabla}\cdot\mathbf{q}-p\boldsymbol{\nabla}\cdot\mathbf{u}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}\label{eq:Energie}
+\end{equation}
+Dans cette \'equation, le membre de gauche repr\'esente le taux de variation
+de l'\'energie interne par unit\'e de volume. Dans le membre de droite,
+le premier terme repr\'esente le flux de chaleur par unit\'e de volume
+; le second terme repr\'esente la puissance des forces de pression par
+unit\'e de volume ; et le dernier terme repr\'esente la puissance des
+forces visqueuses par unit\'e de volume. Ce dernier est la fonction
+de dissipation visqueuse qui est toujours positive ou nulle. Ainsi
+les forces visqueuses entra\^inent toujours un accroissement de l'\'energie
+interne du fluide et donc de sa temp\'erature.
+
+L'\'equation de conservation de l'\'energie interne peut se reformuler
+en une \'equation sur la temp\'erature $T$. Cette \'equation prend deux
+formes diff\'erentes selon que l'on utilise la chaleur sp\'ecifique \`a
+volume constant $C_{v}$ ou bien \`a pression constante $C_{p}$. Formul\'ee
+en $C_{v}$, elle s'\'ecrit :
+
+\begin{subequations}
+
+\begin{equation}
+\frac{\partial(\rho C_{v}T)}{\partial t}+\boldsymbol{\nabla}\cdot(\rho C_{v}T\mathbf{u})=-\boldsymbol{\nabla}\cdot\mathbf{q}-T\left(\frac{\partial p}{\partial T}\right)_{\rho}\boldsymbol{\nabla}\cdot\mathbf{u}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}+\rho T\frac{dC_{v}}{dt}\label{eq:Energie_Cv}
+\end{equation}
+Formul\'ee en $C_{p}$ elle s'\'ecrit :
+
+\begin{equation}
+\frac{\partial(\rho C_{p}T)}{\partial t}+\boldsymbol{\nabla}\cdot(\rho C_{p}T\mathbf{u})=-\boldsymbol{\nabla}\cdot\mathbf{q}-\left(\frac{\partial\ln\rho}{\partial\ln T}\right)\frac{dp}{dt}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}+\rho T\frac{dC_{p}}{dt}\label{eq:Energie_Cp}
+\end{equation}
+
+
+\end{subequations}
+\begin{description}
+\item [{Remarque}] : lorsque le gaz est consid\'er\'e parfait, i.e. $\rho=p_{th}/(RT)$
+o\`u $R$ est la constante des gaz parfaits et $p_{th}$ est la pression
+thermodynamique, le coefficient $(\partial\ln\rho/\partial\ln T)$
+vaut $(\partial\ln\rho/\partial\ln T)=-1$. En supposant que le flux
+de chaleur est d\'efini par la loi de Fourier $\mathbf{q}=-\lambda\boldsymbol{\nabla}T$
+o\`u $\lambda$ est la conductivit\'e thermique, l'Eq. (\ref{eq:Energie_Cp})
+devient :
+\end{description}
+\begin{equation}
+\frac{\partial(\rho C_{p}T)}{\partial t}+\boldsymbol{\nabla}\cdot(\rho C_{p}T\mathbf{u})=\boldsymbol{\nabla}\cdot(\lambda\boldsymbol{\nabla}T)+\frac{dp_{th}}{dt}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}+\rho T\frac{dC_{p}}{dt}\label{eq:Energie_Cp-1}
+\end{equation}
+
+
+L'introduction de la pression thermodynamique $p_{th}$ sera utile
+pour les mod\`eles \og bas Mach \fg{}.
+
+\newpage
+\chapter{Approximation de Boussinesq en incompressible}
+\lhead{Approximation de Boussinesq en incompressible}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+Pour des \'ecoulements incompressibles, lorsque la densit\'e est suppos\'ee
+constante $\rho=\rho_{0}=\mbox{Cte}$, la densit\'e n'est ni une fonction
+de la temp\'erature ni de la composition du fluide (pour les m\'elanges
+miscibles). Dans ce cas, les effets de flottabilit\'e sont uniquement
+pris en compte par les forces gravitationnelles. Cette simplification
+est connue comme l'\og approximation de Boussinesq \fg{} et valable
+en consid\'erant que la variation de densit\'e $\Delta\rho\ll\rho_{0}$.
+Dans ce cas, le terme force s'\'ecrit dans les \'equations (\ref{eq:ContinuiteMP-1})--(\ref{eq:DBF-1-1})
+ou (\ref{eq:ContinuiteMP})--(\ref{eq:DBF-1}) :
+
+\begin{equation}
+\mathbf{F}_{v}=-\mathbf{g}\beta_{T}(T-T_{0})\label{eq:ApproxBoussinesq}
+\end{equation}
+o\`u $\beta_{T}$ est le coefficient de dilatation thermique et $T_{0}$
+une temp\'erature de r\'ef\'erence. Dans cette relation, le signe n\'egatif
+indique que si la diff\'erence de temp\'erature est positive $\Delta T=T-T_{0}>0$
+(i.e. pr\`es de la paroi chaude en convection naturelle), alors la force
+est dirig\'ee dans le sens oppos\'e \`a la gravit\'e $\mathbf{g}$.
+
+
+\chapter{\label{sub:Numerique-dans-TrioCFD}Num\'erique dans \texttt{TrioCFD}}
+\lhead{Num\'erique dans \texttt{TrioCFD}}
+\rhead{\'EQUATIONS DE CONSERVATIONS}
+Dans ce document on d\'etaille les m\'ethodes num\'eriques mises en \oe uvre
+dans \texttt{TrioCFD} pour le mod\`ele incompressible d\'efini par les
+\'equations (\ref{eq:ContinuiteMP-1})--(\ref{eq:DBF-1-1}). Deux m\'ethodes
+de discr\'etisation spatiales sont possibles dans l'outil de calculs
+: la m\'ethode des Volume-El\'ements Finis (VEF) et celle des Volumes
+Diff\'erences Finies (VDF) mais on ne d\'ecrit que la partie VEF. Dans
+la suite, le domaine de calcul est not\'e $\Omega$.
+
+
+\section{Sch\'ema en temps (valable en VEF et VDF)}
+
+Apr\`es discr\'etisation, le syst\`eme matrice-vecteur r\'esolu s'\'ecrit :
+
+\begin{equation}
+\left\{ \begin{array}{rcl}
+\delta t^{-1}\mathbf{M}U^{n+1}+\mathbf{A}U^{n+1}+\mathbf{L}(U^{n})U^{n+1}+\mathbf{B}^{T}P^{n+1} & = & F^{n}+\delta t^{-1}\mathbf{M}U^{n},\\
+\mathbf{B}U^{n+1} & = & 0.
+\end{array}\right.\label{eq:NavierStokes-dis-FV}
+\end{equation}
+o\`u $U^{n+1}\in\mathbb{R^{N_{\mathbf{u}}}}$ repr\'esente le vecteur
+vitesse discr\'etis\'e au temps $(n+1)\delta t$ o\`u $\delta t$ est le
+pas de temps et $N_{\mathbf{u}}$ est le nombre de degr\'es de libert\'e
+pour discr\'etiser spatialement la vitesse. Les matrices en gras seront
+d\'efinies ci-dessous car d\'ependantes de la discr\'etisation en espace.
+$P^{n+1}\in\mathbb{R}^{N_{p}}$ repr\'esente la pression discr\'etis\'ee
+au temps $(n+1)\delta t$ et $N_{p}$ est le nombre de degr\'es de libert\'e
+pour discr\'etiser spatialement la pression.
+
+Afin de d\'ecoupler la vitesse et la pression, la r\'esolution des \'equations
+(\ref{eq:ContinuiteMP-1})--(\ref{eq:DBF-1-1}) est r\'ealis\'ee en trois
+\'etapes \cite{Chor68,Tema68}: 
+\begin{itemize}
+\item \textbf{\'etape de pr\'ediction :} calculer $U^{*}$ solution de 
+\[
+{\delta t}^{-1}\mathbf{M}U^{*}+\mathbf{A}U^{*}+\mathbf{L}(U^{n})U^{*}+\mathbf{B}^{T}P^{n}=F^{n}+\delta t^{-1}\mathbf{M}U^{n}.
+\]
+\`a cette \'etape $\mathbf{B}U^{*}\neq0$. 
+\item \textbf{Calcul de la pression :} calculer $P'$ solution de 
+\[
+\mathbf{B}\mathbf{M}^{-1}\mathbf{B}^{T}P'={\delta t}^{-1}\mathbf{B}U^{*},\quad P^{n+1}=P'+P^{n}.
+\]
+
+\item \textbf{\'etape de correction :} calculer $U^{n+1}$ solution de 
+\[
+\mathbf{M}U^{n+1}=\mathbf{M}U^{*}-{\delta t}\mathbf{B}^{T}P'.
+\]
+\end{itemize}
+\begin{description}
+\item [{Remarque}] : plusieurs solveurs ont \'et\'e test\'es (SIMPLE, SIMPLER,
+PISO) qui, selon les probl\`emes ont montr\'e une convergence relativement
+faible. Le solveur utilis\'e \`a ce jour est inspir\'e de la r\'ef\'erence \cite{Guermond-Quartapelle_IJNMF1998}.
+\end{description}
+
+\section{Sch\'ema en espace VEF }
+
+La m\'ethode num\'erique est bas\'ee sur la m\'ethode des \'el\'ements finis de
+Crouzeix-Raviart non conformes \cite{CrRa73}, et d\'etaill\'es dans \cite{Emon92,Heib03,Fort06,Angeli_etal_FVCA2017}.
+Pour ($d=2$) (resp. $d=3$), on consid\`ere l'espace $xy$ de $\mathbb{R}^{2}$
+(resp. l'espace $xyz$ de $\mathbb{R}^{3}$) d'origine $O$. On note
+($\mathbf{e}_{x},\,\mathbf{e}_{y},\,\mathbf{e}_{z})$ ($\mathbf{e}_{1},\,\mathbf{e}_{2},\,\mathbf{e}_{3})$
+les vecteurs de la base canonique. On consid\`ere $\mathcal{T}_{h}:={\displaystyle \cup}{}_{\ell=1}^{N_{T}}T_{\ell}$,
+un maillage r\'egulier du domaine $\Omega$ constitu\'e de simplexes (triangles
+en 2D et t\'etra\`edres en 3D), de sommets $(S_{i})_{i=1}^{N_{S}}$, o\`u
+$i$ est l'indice de $N_{s}$ sommets. Le nombre de simplexes (sommets)
+est not\'e par $N_{T}$ (resp. $N_{S}$). Soit $T_{\ell}\in\mathcal{T}_{h},$la
+fronti\`ere de $T_{\ell}$ est constitu\'ee d'ar\^etes en 2D ou de faces
+en 3D, mais on les appellera \og face \fg{} dans tous les cas. Soit
+$\overline{\mathcal{F}}_{h}=\cup_{k=1}^{\overline{N}_{F}}F_{k}$ l'ensemble
+des faces du maillage, et $\mathcal{F}_{h}=\cup_{k=1}^{N_{F}}F_{k}$
+l'ensemble des faces int\'erieures, o\`u $\overline{N}_{F}$ (resp. $N_{F}$)
+est le nombre total (resp. interne) de faces. On note $M_{k}$ le
+barycentre de la face $F_{k}$, et $\mathbf{n}_{k}$ le vecteur normal
+unitaire sortant \`a $F_{k}$.
+
+Soit $P_{1}(T)$ l'ensemble des polyn\^omes d'ordre 1 d\'efinis sur $T$.
+L'espace de discr\'etisation des vitesses est :
+
+\begin{equation}
+X_{h}:=\{\mathbf{v}_{h}\,|\,\forall T\in\mathcal{T}_{h},\,\mathbf{v}_{h}\in P_{1}(T)^{d}\,\mbox{et}\,\forall\,F\in\mathcal{F}{}_{h}:\,[\mathbf{v}_{h}](\mathbf{x}_{F})=\mathbf{0}\,\},\label{eq:CrRa}
+\end{equation}
+o\`u $\mathbf{x}_{F}$ repr\'esente le barycentre de la face $F$, et
+$[\mathbf{v}_{h}](\mathbf{x}_{F})$ est le saut de $\mathbf{v}_{h}$
+sur la face $F$. On suppose que $\overline{F}=\overline{T}\cap\overline{T'}$,
+telle que $\mathbf{n}_{F}=\mathbf{n}_{T,F}$. Le saut $[\mathbf{v}_{h}](\mathbf{x}_{F})$
+est d\'efini par : 
+\[
+[\mathbf{v}_{h}](\mathbf{x}_{F}):=\mathbf{v}_{h|T_{\ell}}(\mathbf{x}_{F})-\mathbf{v}_{h|T_{\ell'}}(\mathbf{x}_{F})\mbox{ if }\overline{F}=\overline{T}_{\ell}\cap\overline{T}_{\ell'},\mbox{ et }\mathbf{n}_{F}=\mathbf{n}_{T_{\ell}|F}.
+\]
+L'espace $X_{h}$ est muni de la semi-norme $||\mathbf{v}_{h}||_{h}=\left(\sum_{\ell=1}^{T_{\ell}}|\mathbf{v}_{h|T_{\ell}}|_{1,T_{\ell}}^{2}\right)^{1/2}$,
+o\`u $|\mathbf{v}_{h|T_{\ell}}|_{1,T_{\ell}}$ est la semi-norme de
+$\mathbf{v}_{h|T_{\ell}}\in H^{1}(T_{\ell})$. On note $X_{0,h}:=\{\mathbf{v}_{h}\in X_{h}\,|\,\mathbf{u}_{h|\partial\Omega}=0\}$. 
+
+Soit $\lambda_{i}|_{T}$ la coordonn\'ees barycentrique associ\'ee au
+sommet $S_{i}|_{T}$ et $\left(\mathbf{e}^{\beta}\right)_{\beta=1}^{d}$
+les vecteurs de la base canonique. Les fonctions de base associ\'ees
+\`a l'espace $X_{h}$ sont les vecteurs $\left(\left(\boldsymbol{\varphi}_{i}^{\beta}\right)_{i=1}^{N_{F}}\right)_{\beta=1}^{d}$
+tels que $\boldsymbol{\varphi}_{i}^{\beta}|_{T}=\left(1-d\lambda_{i}|_{T}\right)\mathbf{e}^{\beta}$.
+On appelle $\psi_{j}$ la fonction caract\'eristique associ\'ee au triangle
+$T_{j}$.
+
+
+\section{Matrices volume-\'el\'ements finis pour l'approximation P1NC/P0}
+
+Soit $(\mathbf{u}{}_{h}^{n},\,p_{h}^{n})\in X_{h}\times L_{h}$ l'approximation
+spatiale de $(\mathbf{u}^{n},\,p^{n})$ dans $X_{h}\times L_{h}$
+telle que : 
+\[
+\mathbf{u}_{h}^{n}:=\sum_{\beta=1}^{d}\sum_{i=1}^{N_{F}}\left(U_{i}^{\beta}\right)^{n}\boldsymbol{\varphi}{}_{i}^{\beta},\quad p_{h}^{n}:=\sum_{\ell=1}^{N_{T}}P_{\ell}^{n}\psi_{\ell}.
+\]
+Posons : $U_{n}=(\,(U_{i}^{\beta})^{n}\,)_{\beta,i}\in\mathbb{R}^{N_{\mathbf{u}}}$,
+$F^{n}=(\,(\mathbf{f}^{n+1},\boldsymbol{\varphi}_{i}^{\beta})_{0}\,)_{\beta,i}\in\mathbb{R}^{N_{\mathbf{u}}}$,
+avec $N_{\mathbf{u}}:=d\,N_{F}$, et $p_{h}^{n}=(P_{\ell}^{n})_{\ell}\in\mathbb{R}^{N_{T}}$. 
+\begin{itemize}
+\item La matrice de masse $\mathbf{M}\in\mathbb{R}^{N_{\mathbf{u}}\times N_{\mathbf{u}}}$
+est compos\'ee de $d$ blocs diagonaux \'egaux \`a $\mathbf{M}_{F}\in\mathbb{R}^{N_{F}\times N_{F}}$
+tels que $\left(\mathbf{M}_{F}\right)_{i,j}=(\phi_{i},\phi_{j})_{0}$
+avec $\phi_{i}|_{T}=\left(1-d\lambda_{i}|_{T}\right)$. 
+
+
+Pour $d=2$, on obtient que la matrice de masse $2D$ est diagonale
+: 
+\[
+\left(\mathbf{M}_{F}\right)_{i,j}=\delta_{ij}\sum_{\ell\,|\,M_{i}\in T_{\ell}}\frac{|T_{\ell}|}{3}.
+\]
+La matrice de masse 2D de la m\'ethode des \'el\'ements finis non conformes
+de Crouzeix-Raviart est \'egale \`a la matrice de masse 2D obtenue par
+la m\'ethode des volumes finis d\'ecrite dans la th\`ese de Emonot \cite{Emon92}.
+Ce n'est plus le cas en 3D, mais dans le code \texttt{TrioCFD} c'est
+la la matrice de masse de la discr\'etisation en volumes finis qui est
+impl\'ement\'ee pour laquelle
+
+\end{itemize}
+\[
+\left(\mathbf{M}_{F}\right)_{i,j}=\delta_{ij}\sum_{\ell\,|\,M_{i}\in T_{\ell}}\frac{|T_{\ell}|}{4}.
+\]
+
+\begin{itemize}
+\item La matrice de rigidit\'e $\mathbf{A}\in\mathbb{R}^{N_{\mathbf{u}}\times N_{\mathbf{u}}}$
+est compos\'ee de $d$ blocs diagonaux \'egaux \`a $\mathbf{A}_{F}\in\mathbb{R}^{N_{F}\times N_{F}}$tels
+que $\left(\mathbf{A}_{F}\right)_{i,j}=(\nabla\phi_{i},\nabla\phi_{j})_{0}$.
+On obtient : 
+\[
+\left(\mathbf{A}_{F}\right)_{i,j}=\sum_{\ell\,|\,M_{i},M_{j}\in T_{\ell}}|T_{\ell}|^{-1}\mathbf{S}_{i,\ell}\cdot\mathbf{S}_{j,\ell},
+\]
+o\`u $\mathbf{S}_{i,\ell}$ est le vecteur \og face normale \fg{}
+associ\'e \`a la face oppos\'ee au sommet $S_{i}$ dans le triangle $T_{\ell}$.
+
+
+La matrice de rigidit\'e de la m\'ethode des \'el\'ements finis non conformes
+de Crouzeix-Raviart est \'egale \`a la matrice de rigidit\'e obtenue par
+la m\'ethode des volumes finis d\'ecrite dans la th\`ese de Emonot.
+
+\item La matrice de couplage $\mathbf{B}\in\mathbb{R}^{N_{T}\times N_{\mathbf{u}}}$
+est compos\'ee de $d$ blocs tels que $\mathbf{B}=(\mathbf{B}^{\beta})_{\beta=1}^{d}$,
+$\mathbf{B}^{\beta}\in\mathbb{R}^{N_{T}\times N_{F}}$ et :
+
+
+\[
+(\mathbf{B}^{\beta})_{\ell,j}=-\mathbf{S}_{j,\ell}\cdot\mathbf{e}^{\beta}
+\]
+
+
+\item Dans le cas o\`u la pression est $P_{1}$, on a $p_{h}^{n}=(P_{i}^{n})_{i}\in\mathbb{R}^{N_{S}}$
+et la matrice de couplage $\mathbf{B}\in\mathbb{R}^{N_{S}\times N_{\mathbf{u}}}$
+est telle que : 
+\[
+\begin{array}{rcl}
+(\mathbf{B}^{\beta})_{i,k} & = & -\sum_{\ell\,|\,M_{k},S_{i}\in T_{\ell}}(\,(d+1)d\,)^{-1}\mathbf{S}_{i,\ell}\cdot\mathbf{e}^{\beta}\end{array}.
+\]
+
+\end{itemize}

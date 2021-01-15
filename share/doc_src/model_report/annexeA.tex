@@ -1,0 +1,328 @@
+\lhead{Liste des fiches de validation dans \texttt{TrioCFD}}
+\rhead{ANNEXE A}
+
+Cette annexe pr\'esente deux tables qui regroupent l'ensemble des fiches
+de validation disponibles dans TrioCFD. Ce travail de synth\`ese a \'et\'e
+r\'ealis\'e sur la version 1.7.5. Le fichier \texttt{Excel} est accessible
+dans le r\'epertoire \texttt{/data/tmptrust/validation/main\_Validation175}
+qui contient \'egalement le fichier PDF \texttt{Synthese\_fiches\_validation\_V2.pdf}
+dont les deux tables ci-dessous en sont une synth\`ese. Dans la derni\`ere
+colonne des deux tables, les mots cl\'es suivants sont utilis\'es :
+
+\begin{table}[H]
+\begin{centering}
+\begin{tabular}{lll}
+\hline 
+\textbf{\footnotesize{}Mot cl\'e} &  & \textbf{\footnotesize{}Correspondance}\tabularnewline
+\hline 
+\texttt{\footnotesize{}C\_d\_t} &  & \texttt{\footnotesize{}Convection\_diffusion\_temperature}\tabularnewline
+\texttt{\footnotesize{}C\_d\_t\_t} &  & \texttt{\footnotesize{}Convection\_diffusion\_temperature\_turbulent}\tabularnewline
+\texttt{\footnotesize{}C\_d\_c\_t} &  & \texttt{\footnotesize{}Convection\_diffusion\_concentration\_turbulent}\tabularnewline
+\texttt{\footnotesize{}C\_d\_ch\_QC} &  & \texttt{\footnotesize{}Convection\_diffusion\_chaleur\_QC}\tabularnewline
+\texttt{\footnotesize{}C\_d\_ch\_t\_QC} &  & \texttt{\footnotesize{}Convection\_diffusion\_chaleur\_turbulent\_QC}\tabularnewline
+\texttt{\footnotesize{}pb\_thermohyd\_t\_s\_p} &  & \texttt{\footnotesize{}pb\_thermohydraulique\_turbulent\_scalaires\_passifs}\tabularnewline
+\texttt{\footnotesize{}pb\_thermohyd\_t\_QC} &  & \texttt{\footnotesize{}pb\_thermohydraulique\_turbulent\_QC}\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\protect\caption{Correspondance des mots cl\'es utilis\'es dans les tables \ref{tab:FichesValid1}
+et \ref{tab:FichesValid2}.}
+
+
+\end{table}
+
+
+\begin{sidewaystable}
+\protect\caption{\label{tab:FichesValid1}Liste des cas tests et des fiches de validations
+regroup\'ees par th\`emes}
+
+
+\begin{centering}
+\texttt{\scriptsize{}}%
+\begin{tabular}{|l|l|l|l|l|}
+\hline 
+ & \texttt{\textbf{\scriptsize{}Th\`emes}} & \texttt{\textbf{\scriptsize{}Nb}} & \texttt{\textbf{\scriptsize{}Problem}} & \texttt{\textbf{\scriptsize{}Equations}}\tabularnewline
+\hline 
+\hline 
+\texttt{\scriptsize{}1.} & \texttt{\scriptsize{}Conduction} & \texttt{\scriptsize{}3} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_conduction} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}~~~+ pb\_thermohydraulique} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}~~~+ pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Conduction +} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_standard}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}2.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Incompressible laminar}\tabularnewline
+\texttt{\scriptsize{}pipe and channel flow}\tabularnewline
+\end{tabular}\texttt{\scriptsize{} } & \texttt{\scriptsize{}3} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}~~~+ pb\_conduction} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_standard}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}~~~+ Conduction}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}2}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}3.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Incompressible turbulent}\tabularnewline
+\texttt{\scriptsize{}pipe and channel flow}\tabularnewline
+\end{tabular}\texttt{\scriptsize{} } & \texttt{\scriptsize{}45} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}19}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}22}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}4}\tabularnewline
+\texttt{\scriptsize{}~~~~~+ pb\_conduction} & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}45}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}24}\tabularnewline
+\texttt{\scriptsize{}+ Conduction} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}4.} & \texttt{\scriptsize{}Flow through curved pipes} & \texttt{\scriptsize{}2} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}5.} & \texttt{\scriptsize{}Impinging or submerged jet} & \texttt{\scriptsize{}6} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_concentration\_turbulent} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}5}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_c\_t} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}6.} & \texttt{\scriptsize{}Thermal stratification} & \texttt{\scriptsize{}5} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_standard}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}7.} & \texttt{\scriptsize{}Natural/mixed convection} & \texttt{\scriptsize{}7} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1 (+1)}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique} & \texttt{\scriptsize{}3 (+1)}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_QC} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}pb\_thermohydraulique}\tabularnewline
+\texttt{\scriptsize{}~~~~+ pb\_conduction }\tabularnewline
+\texttt{\scriptsize{}~~~~+ pb\_couple\_rayonnement}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_standard} & \texttt{\scriptsize{}4 (+1)}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}1 (+1)}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_QC} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t} & \texttt{\scriptsize{}3 (+1)}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}1 (+1)}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_ch\_QC} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}{\scriptsize \par}
+
+\pagebreak
+\end{sidewaystable}
+
+
+\begin{sidewaystable}
+\protect\caption{\label{tab:FichesValid2}Liste des cas tests et des fiches de validations
+regroup\'ees par th\`emes (suite)}
+
+
+\centering{}\texttt{\scriptsize{}}%
+\begin{tabular}{|l|l|l|l|l|}
+\hline 
+ & \texttt{\textbf{\scriptsize{}Th\`emes}} & \texttt{\textbf{\scriptsize{}Nb}} & \texttt{\textbf{\scriptsize{}Problem}} & \texttt{\textbf{\scriptsize{}Equations}}\tabularnewline
+\hline 
+\hline 
+\texttt{\scriptsize{}8.} & \texttt{\scriptsize{}Obstacles in axial or cross flow} & \texttt{\scriptsize{}9} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}5}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}2}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_standard} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}5}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}2}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}9.} & \texttt{\scriptsize{}Diffusor} & \texttt{\scriptsize{}1} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}10.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Channel or pipe flow with abrupt}\tabularnewline
+\texttt{\scriptsize{}changing cross section}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}7} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}11.} & \texttt{\scriptsize{}Poiseuille flow} & \texttt{\scriptsize{}16} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}12.} & \texttt{\scriptsize{}Isotropic Homogenous Turbulence} & \texttt{\scriptsize{}2} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohyd\_t\_s\_p} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}13.} & \texttt{\scriptsize{}Flow through porous media} & \texttt{\scriptsize{}3} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}14.} & \texttt{\scriptsize{}Quasi-compressible flow} & \texttt{\scriptsize{}9} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_QC} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohyd\_t\_QC} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}~~~~+ pb\_conduction} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_QC}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_ch\_QC}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent\_QC}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_ch\_t\_QC}\tabularnewline
+\texttt{\scriptsize{}+ Conduction}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent\_QC}\tabularnewline
+\texttt{\scriptsize{}C\_d\_t\_t}\tabularnewline
+\texttt{\scriptsize{}C\_d\_ch\_t\_QC}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}15.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Advection of passive scalars using}\tabularnewline
+\texttt{\scriptsize{}different convection schemes}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}3} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}16.} & \texttt{\scriptsize{}Test of grid convergence} & \texttt{\scriptsize{}4} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}17.} & \texttt{\scriptsize{}Miscellaneous tests} & \texttt{\scriptsize{}14} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}18.} & \texttt{\scriptsize{}Front-Tracking} & \texttt{\scriptsize{}21} &  & \tabularnewline
+\hline 
+\texttt{\textbf{\scriptsize{}Total}} &  & \texttt{\textbf{\scriptsize{}160}} &  & \tabularnewline
+\hline 
+\end{tabular}{\scriptsize \par}
+\end{sidewaystable}
