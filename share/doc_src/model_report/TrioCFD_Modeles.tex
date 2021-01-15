@@ -1,0 +1,1519 @@
+\section{Introduction}
+
+Le code de calcul \texttt{TrioCFD} est un logiciel open-source \cite{TrioCFD}
+pour les simulations en m\'ecanique des fluides, adapt\'e en particulier
+aux calculs massivement parall\`eles d\textquoteright \'ecoulements turbulents
+dans des configurations industrielles. Cette note technique est une
+documentation des mod\`eles physiques de ce code qui existe depuis plus
+de vingt-cinq ans (depuis les travaux sur les Volumes-El\'ements Finis
+dans \cite{Emon92}) et qui a trouv\'e des applications dans plusieurs
+sous-domaines de la m\'ecanique des fluides. De nombreuses r\'ef\'erences
+accessibles dans la litt\'erature (dont 28 th\`eses) d\'ecrivent les m\'ethodes
+num\'eriques du code ou des applications originales. Ces r\'ef\'erences
+(th\`eses et articles) peuvent \^etre retrouv\'ees au format \texttt{PDF}
+sur le site internet \cite{TrioCFD}. Cette note technique compl\`ete
+la description qualitative du site web en pr\'ecisant les mod\`eles math\'ematiques
+qui sont utilis\'es dans les simulations. Compte tenu de la diversification
+des applications depuis 1992, on restreint la description aux \'ecoulements
+monophasiques newtoniens, incompressibles et turbulents. Pour ce type
+d'\'ecoulements de nombreux d\'etails sont d\'ej\`a disponibles dans plusieurs
+r\'ef\'erences dont \cite[etc ...]{Angeli_etal_NURETH2015,Angeli_etal_FVCA2017,TrioCFD}.
+Cette note technique initie une documentation en faisant un effort
+de synth\`ese de la litt\'erature existante, mais aussi d'homog\'en\'eisation
+des notations aussi bien entre les \og mod\`eles physiques \fg{} et
+la partie \og m\'ethodes num\'eriques \fg{} qui font souvent l'objet
+de notations diff\'erentes entre les documents. Ici la partie num\'erique
+n'appara\^it que dans la section \ref{sub:Num=0000E9rique-dans-TrioCFD}
+mais plusieurs nouvelles sections apparaitront dans les versions ult\'erieures
+de la mise \`a jour de cette documentation.
+
+Deux principales m\'ethodes de discr\'etisation peuvent \^etre utilis\'ees
+dans \texttt{TrioCFD} : la m\'ethode des Volume-El\'ements Finis (VEF)
+et celle des Volume-Diff\'erence Finies (VDF). Pour les VEF, les maillages
+associ\'es \`a cette m\'ethode doivent n\'ecessairement \^etre triangulaires
+(en 2D) ou t\'etra\'edriques (en 3D). Le code est programm\'e en langage
+\texttt{C++} et est bas\'e sur la base logicielle \texttt{TRUST} (\texttt{TR}io\_\texttt{U}
+\texttt{S}oftware for \texttt{T}hermalhydraulics), dans lequel sont
+notamment programm\'e l\textquoteright ensemble des m\'ethodes num\'eriques
+et des sch\'emas de discr\'etisation utilis\'es dans \texttt{TrioCFD}. La
+base \texttt{TRUST} est aussi le noyau d'autres applications du service
+STMF. Il est possible de r\'ealiser des impl\'ementations locales dans
+le code via le concept de \texttt{BALTIK} (\texttt{B}uilding an \texttt{A}pplication
+\texttt{L}inked to \texttt{T}r\texttt{I}o\_U \texttt{K}ernel), qui
+correspond \`a une brique de code (un ensemble de fichiers \texttt{.cpp}
+et \texttt{.h}) \`a modifier, puis de les int\'egrer \'eventuellement dans
+le code source une fois les d\'eveloppements v\'erifi\'es et valid\'es. Pour
+r\'esumer, \texttt{TrioCFD} s'appuie sur \texttt{TRUST} mais cette documentation
+ne concerne que la partie \texttt{TrioCFD}.
+
+Afin de pr\'eciser les mod\`eles math\'ematiques ainsi que leur domaine
+de validit\'e, il est n\'ecessaire de faire un rappel des \'equations de
+conservation de masse, de quantit\'e de mouvement et d'\'energie sans
+consid\'eration d'hypoth\`ese simplificatrice. C'est l'objet de la section
+\ref{sec:Equations-de-conservations} dans laquelle les \'equations
+seront pr\'esent\'ees sous leur forme la plus g\'en\'erale. Dans la mesure
+du possible, les mod\`eles math\'ematiques sont \'ecrits aussi bien en notations
+vectorielles qu'en notations indicielles. En notation vectorielle,
+les vecteurs, les tenseurs et les matrices sont \'ecrits en gras. Dans
+cette section, des rappels sont \'egalement effectu\'es sur les d\'efinitions
+des tenseurs du taux de d\'eformation et celui de rotation car ceux-ci
+sont utilis\'es dans la section suivante d\'edi\'ee aux mod\`eles de turbulence.
+Les mod\`eles de turbulence en m\'ecanique des fluides sont nombreux et
+plusieurs livres et publications de synth\`ese existent d\'ej\`a (e.g. \cite{Book_Chassaing,Argyropoulos-Markatos_ReviewTurbulence_AMM2015}).
+Dans \texttt{TrioCFD}, les mod\`eles qui sont d\'evelopp\'es sont ceux qui
+sont les plus couramment utilis\'es dans la litt\'erature et qui font
+l'objet d'un consensus dans le domaine tels que la LES (Smagorinski
+et WALE) et les diff\'erentes d\'eclinaisons du RANS $\overline{k}-\overline{\epsilon}$.
+Ils seront d\'etaill\'es dans la section \ref{sec:Modeles-de-turbulence}.
+Une base de cas tests d'environ 160 fiches de validations existe d\'ej\`a
+pour \texttt{TrioCFD}. La liste de ces fiches est \`a ce jour regroup\'ee
+dans un fichier \texttt{Excel} dont la version \texttt{PDF} est accessible
+en interne CEA. L'ensemble des cas tests de validation est synth\'etis\'e
+dans les deux tables \ref{tab:FichesValid1} et \ref{tab:FichesValid2}
+dans l'annexe \ref{sec:Annexe_ListeValid} de ce document. Dans les
+versions ult\'erieures de cette documentation, les mod\`eles d\'ecrits seront
+illustr\'es par quelques fiches de validation de liste en Annexe. Plusieurs
+mises \`a jour de cette documentation sont \`a pr\'evoir pour l'\'elargir
+petit \`a petit \`a l'ensemble des mod\`eles accessibles dans le code.
+
+
+\section{\label{sec:Equations-de-conservations}\'equations de conservations
+: masse, quantit\'e de mouvement et \'energie}
+
+
+\subsection{Rappel des \'equations fondamentales de la dynamique des fluides}
+
+Dans cette section on rappelle les \'equations fondamentales de la dynamique
+des fluides. Elle permet d'introduire les principales notations et
+les \'equations aux d\'eriv\'ees partielles fondamentales sans hypoth\`eses
+physiques simplificatrices. Les d\'emonstrations peuvent \^etre trouv\'ees
+dans les r\'ef\'erences classiques. Dans la section \ref{sub:ConservMasse},
+on rappelle l'\'equation de conservation de la masse (encore appel\'ee
+\'equation de continuit\'e) et dans la section \ref{sub:QDM} on rappelle
+l'\'equation de conservation de la quantit\'e de mouvement. Plusieurs
+formes math\'ematiques \'equivalentes entre elles existent dans la litt\'erature
+: forme locale, forme locale notation vectorielle, forme locale conservative,
+forme locale conservative en notation vectorielle, formes macroscopiques,
+etc ... Ici on choisit la forme locale conservative avec notations
+vectorielles.
+
+
+\subsection{\label{sub:ConservMasse}Conservation de la masse}
+
+\begin{equation}
+\frac{\partial\rho}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u})=0\label{eq:ConvMasse}
+\end{equation}
+o\`u $\rho\equiv\rho(\mathbf{x},\,t)$ est la densit\'e avec $\mathbf{x}$
+la position et $t$ le temps, et $\mathbf{u}\equiv\mathbf{u}(\mathbf{x},\,t)$
+la vitesse. D'autres formes \'equivalentes de cette \'equation peuvent
+\^etre rencontr\'ees en appliquant l'identit\'e vectorielle $\boldsymbol{\nabla}\cdot(\rho\mathbf{u})=\rho\boldsymbol{\nabla}\cdot\mathbf{u}+\mathbf{u}\cdot\boldsymbol{\nabla}\rho$
+et en faisant appara\^itre la d\'eriv\'ee mat\'erielle $d\rho/dt=\partial\rho/\partial t+\mathbf{u}\cdot\boldsymbol{\nabla}\rho$.
+
+
+\subsection{\label{sub:QDM}Conservation de la quantit\'e de mouvement}
+
+L'\'equation de conservation de la Quantit\'e De Mouvement (QDM) traduit
+le principe fondamental de la dynamique qui indique que la variation
+de quantit\'e de mouvement \`a l'int\'erieur d'un volume de contr\^ole est
+\'egale \`a la somme de toutes les forces ext\'erieures qui lui sont appliqu\'ees.
+Les forces qui s'appliquent sur le volume \'el\'ementaires peuvent \^etre
+s\'epar\'ees en forces de volume et forces de surface. Ces derni\`eres s'expriment
+comme un vecteur contrainte qui agit sur une surface, et ce vecteur
+contrainte s'exprime \`a son tour comme le produit scalaire d'un tenseur
+des contraintes $\mathbf{T}$ (de composante $T_{ij}$) et du vecteur
+normal \`a la surface $\mathbf{n}$. La contrainte totale est d\'ecompos\'ee
+en deux parties : $T_{ij}=-p\delta_{ij}+\tau_{ij}$. La premi\`ere est
+le tenseur des contraintes associ\'ees \`a la pression $-p\delta_{ij}$
+o\`u $p\equiv p(\mathbf{x},\,t)$ est la pression et $\delta_{ij}$
+est le symbole de Kronecker qui vaut un si $i=j$ et z\'ero sinon. La
+seconde, not\'ee $\tau_{ij}$ est associ\'ee aux contraintes visqueuses.
+La pression agit de fa\c con isotrope et sa valeur d\'epend de l'\'etat thermodynamique
+du fluide. Les contraintes visqueuses sont li\'ees \`a l'\'etat de d\'eformation
+du fluide
+
+Comme pour l'\'equation de conservation de la masse, plusieurs formes
+math\'ematiques et \'equivalentes entre elles peuvent \^etre d\'eduites. Son
+\'ecriture sous forme locale conservative est :
+\begin{equation}
+\frac{\partial(\rho\mathbf{u})}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}\mathbf{u})=-\boldsymbol{\nabla}p+\boldsymbol{\nabla}\cdot\boldsymbol{\tau}+\mathbf{F}_{v}\label{eq:QDM}
+\end{equation}
+
+
+Dans l'\'equation (\ref{eq:QDM}), le membre de gauche de l'\'equation
+repr\'esente la quantit\'e d'acc\'el\'eration par unit\'e de volume. Les termes
+du membre de droite repr\'esentent respectivement (\emph{i}) les forces
+associ\'ees \`a la pression par unit\'e de volume, (\emph{ii}) les contraintes
+visqueuses par unit\'e de volume et (\emph{iii}) la force externes par
+unit\'e de volume. Lorsqu'on ne consid\`ere que la gravit\'e elle s'exprime
+sous la forme : $\mathbf{F}_{v}=\rho\mathbf{g}$.
+
+
+\subsection{Forme du tenseur des contraintes visqueuses}
+
+Le tenseur des contraintes visqueuses $\mathbf{\tau}$ est g\'en\'eralement
+exprim\'e en fonction des taux de d\'eformation dans l'\'ecoulement. On
+rappelle ci-dessous les d\'efinitions des tenseurs des taux de d\'eformation
+et des taux de rotation \`a partir desquels sera exprim\'e le tenseur
+des contraintes visqueuses.
+
+
+\subsubsection*{Rappel du tenseur des taux de d\'eformation}
+
+L'accroissement de vitesse de deux particules fluides positionn\'ees
+respectivement en $\mathbf{r}$ et $\mathbf{r}+d\mathbf{r}$ et de
+vitesse $\mathbf{u}$ et $\mathbf{u}+d\mathbf{u}$ s'exprime sous
+la forme $du_{i}=\sum_{j=1}^{3}(\partial u_{i}/\partial x_{j})dx_{j}$
+au premier ordre par rapport aux composantes $dx_{j}$ (pour $j=1,2,3$).
+Dans cette expression, les quantit\'es $G_{ij}=\partial u_{i}/\partial x_{j}$
+sont les \'el\'ements d'un tenseur de rang deux, le tenseur des taux de
+d\'eformation du fluide (ou des gradients de vitesse). En trois dimensions,
+il s'\'ecrit sous la forme d'une matrice $3\times3$ qui peut \^etre d\'ecompos\'ee
+en une partie sym\'etrique et une partie antisym\'etrique :
+
+\begin{equation}
+G_{ij}=\frac{\partial u_{i}}{\partial x_{j}}=\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)+\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}-\frac{\partial u_{j}}{\partial x_{i}}\right)\label{eq:TauxDeformation}
+\end{equation}
+
+
+Le premier terme est le tenseur des taux des d\'eformations :
+
+\begin{equation}
+S_{ij}=\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)\label{eq:TenseurDeformations}
+\end{equation}
+et il est sym\'etrique ($S_{ij}=S_{ji}$). Le second terme est le tenseur
+des taux de rotation :
+
+\begin{equation}
+\Omega_{ij}=\frac{1}{2}\left(\frac{\partial u_{i}}{\partial x_{j}}-\frac{\partial u_{j}}{\partial x_{i}}\right)\label{eq:TenseurRotations}
+\end{equation}
+et ce tenseur est antisym\'etrique ($\Omega_{ij}=-\Omega_{ji}$).
+
+
+\subsubsection*{Forme du tenseur des contraintes visqueuses pour un fluide newtonien}
+
+Lorsque les fluides sont newtoniens la relation contrainte-d\'eformation
+est lin\'eaire et isotrope. La relation g\'en\'erale s'\'ecrit :
+
+\begin{equation}
+\tau_{ij}=\eta\left(2S_{ij}-\frac{2}{3}S_{kk}\delta_{ij}\right)+\zeta S_{kk}\delta_{ij}\label{eq:Contraintes-Newtonien}
+\end{equation}
+qui fait appara\^itre deux viscosit\'es, la viscosit\'e dynamique $\eta\equiv\eta(\mathbf{x},\,t)$
+et la viscosit\'e de volume $\zeta$ (ou deuxi\`eme viscosit\'e). Le premier
+terme correspond \`a une d\'eformation sans changement de volume tandis
+que le second terme correspond \`a une dilatation isotrope. Dans la
+majeure partie des applications on ne tient pas compte de la viscosit\'e
+en volume ($\zeta=0$) et le tenseur des contraintes s'\'ecrit $\tau_{ij}=2\eta S_{ij}-(2/3)\eta S_{kk}\delta_{ij}$,
+soit en utilisant la relation (\ref{eq:TenseurDeformations}) :
+
+\begin{equation}
+\tau_{ij}=\eta\left(\frac{\partial u_{i}}{\partial x_{j}}+\frac{\partial u_{j}}{\partial x_{i}}\right)-\frac{2}{3}\eta\left(\frac{\partial u_{k}}{\partial x_{k}}\right)\delta_{ij}\label{eq:Contraintes}
+\end{equation}
+ou encore en notations vectorielles :
+
+\begin{equation}
+\boldsymbol{\tau}=\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})-\frac{2}{3}\eta(\boldsymbol{\nabla}\cdot\mathbf{u})\mathbf{I}\label{eq:Contraintes-Deformations_Newtonien}
+\end{equation}
+o\`u $\mathbf{I}$ est la matrice diagonale unit\'e.
+
+
+\subsubsection*{Fluide newtonien de viscosit\'e constante}
+
+Lorsque la viscosit\'e du fluide $\eta$ est constante (i.e. $\eta(\mathbf{x},\,t)=\eta_{0}=\mbox{Cte}$),
+le terme des contraintes visqueuses $\boldsymbol{\nabla}\cdot\boldsymbol{\tau}$
+dans l'\'equation (\ref{eq:QDM}) s'exprime sous la forme :
+
+\begin{eqnarray*}
+\frac{\partial\tau_{ij}}{\partial x_{j}} & = & \eta_{0}\left[\frac{\partial^{2}u_{i}}{\partial x_{j}\partial x_{j}}+\frac{\partial}{\partial x_{j}}\left(\frac{\partial u_{j}}{\partial x_{i}}\right)\right]-\frac{2}{3}\eta_{0}\frac{\partial}{\partial x_{j}}(\boldsymbol{\nabla}\cdot\mathbf{u})\delta_{ij}\\
+ & = & \eta_{0}\left[\frac{\partial^{2}u_{i}}{\partial x_{j}\partial x_{j}}+\frac{\partial}{\partial x_{i}}(\boldsymbol{\nabla}\cdot\mathbf{u})\right]-\frac{2}{3}\eta_{0}\frac{\partial}{\partial x_{i}}(\boldsymbol{\nabla}\cdot\mathbf{u})\\
+ & = & \eta_{0}\boldsymbol{\nabla}^{2}u_{i}+\frac{\eta_{0}}{3}\frac{\partial}{\partial x_{i}}(\boldsymbol{\nabla}\cdot\mathbf{u})
+\end{eqnarray*}
+
+
+C'est-\`a-dire en notations vectorielles :
+
+\begin{equation}
+\boldsymbol{\nabla}\cdot\boldsymbol{\tau}=\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\frac{\eta_{0}}{3}\boldsymbol{\nabla}(\boldsymbol{\nabla}\cdot\mathbf{u})\label{eq:ContraintVisq-constante}
+\end{equation}
+
+
+
+\subsection{R\'esum\'e}
+
+
+\subsubsection{Cas g\'en\'eral pour un fluide newtonien}
+
+Les \'equations de conservation de la masse et de la quantit\'e de mouvement
+s'\'ecrivent sous la forme g\'en\'erale :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\rho}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}) & = & 0\label{eq:Bilan_ConservMasse}\\
+\frac{\partial(\rho\mathbf{u})}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}\mathbf{u}) & = & -\boldsymbol{\nabla}p+\boldsymbol{\nabla}\cdot\boldsymbol{\tau}+\rho\mathbf{F}_{v}\label{eq:Bilan_QDM}
+\end{eqnarray}
+o\`u $\rho\equiv\rho(\mathbf{x},\,t)$ et $\mathbf{u}\equiv\mathbf{u}(\mathbf{x},\,t)$
+sont les inconnues du syst\`eme d'\'equations. La loi d'\'etat sur la pression
+et l'hypoth\`ese de fluide newtonien pour le tenseur des contraintes
+permettent de fermer le syst\`eme. La loi d'\'etat sur la pression et
+les mod\`eles de type \og bas Mach \fg{} qui s\'eparent la pression
+en une pression thermodynamique et une pression hydrodynamique sont
+pr\'esent\'es dans le chapitre suivant. Pour un fluide newtonien, le tenseur
+des contraintes $\mathbf{\tau}$ est reli\'e \`a celui des d\'eformations
+$\mathbf{D}$ par la relation :
+
+\end{subequations}
+
+\begin{equation}
+\boldsymbol{\tau}=\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})-\frac{2}{3}\eta(\boldsymbol{\nabla}\cdot\mathbf{u})\mathbf{I}\label{eq:Bilan_TenseurContrainte}
+\end{equation}
+o\`u la viscosit\'e dynamique est not\'ee $\eta\equiv\eta(\mathbf{x},\,t)$
+et la viscosit\'e de volume $\zeta$ a \'et\'e n\'eglig\'ee.
+
+
+\subsubsection{Cas particulier d'une viscosit\'e constante}
+
+Lorsque la viscosit\'e est consid\'er\'ee constante (i.e. $\eta(\mathbf{x},\,t)=\eta_{0}=\mbox{Cte}$),
+le terme de divergence du tenseur des contraintes $\boldsymbol{\nabla}\cdot\boldsymbol{\tau}$
+se simplifie \`a l'aide de la relation (\ref{eq:ContraintVisq-constante})
+et le syst\`eme d'\'equations devient :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\rho}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}) & = & 0\label{eq:Bilan_ConservMasse-1}\\
+\frac{\partial(\rho\mathbf{u})}{\partial t}+\boldsymbol{\nabla}\cdot(\rho\mathbf{u}\mathbf{u}) & = & -\boldsymbol{\nabla}p+\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\frac{\eta_{0}}{3}\boldsymbol{\nabla}(\boldsymbol{\nabla}\cdot\mathbf{u})+\rho\mathbf{F}_{v}\label{eq:Bilan_QDM-1}
+\end{eqnarray}
+
+
+\end{subequations}
+
+
+\subsubsection{Cas particulier des \'ecoulements incompressibles avec viscosit\'e variable}
+
+Lorsque le fluide est consid\'er\'e incompressible (i.e. $\rho(\mathbf{x},\,t)=\rho_{0}=\mbox{Cte})$
+alors l'\'equation de conservation de la masse devient $\boldsymbol{\nabla}\cdot\mathbf{u}=0$
+(car $\partial\rho_{0}/\partial t=0$ et $\boldsymbol{\nabla}\rho_{0}=\mathbf{0}$),
+le terme non lin\'eaire s'\'ecrit $\boldsymbol{\nabla}\cdot(\rho_{0}\mathbf{u}\mathbf{u})=\rho_{0}\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u}$
+et le tenseur des contraintes visqueuses (Eq. (\ref{eq:ContraintVisq-constante}))
+se simplifie lui aussi en $\boldsymbol{\tau}=\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})$. 
+
+\begin{subequations}
+
+\begin{align}
+\boldsymbol{\nabla}\cdot\mathbf{u} & =0,\label{eq:ContinuiteMP-1}\\
+\rho_{0}\frac{\partial\mathbf{u}}{\partial t}+\rho_{0}\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u} & =-\boldsymbol{\nabla}p+\boldsymbol{\nabla}\cdot\left[\eta(\boldsymbol{\nabla}\mathbf{u}+\boldsymbol{\nabla}^{T}\mathbf{u})\right]+\rho_{0}\mathbf{F}_{v}\label{eq:DBF-1-1}
+\end{align}
+
+
+\end{subequations}
+
+Dans cette formulation, la viscosit\'e dynamique $\eta$ reste dans
+le terme entre crochets car il peut d\'ependre de la position comme
+dans les mod\`eles de turbulence.
+
+
+\subsubsection{Cas particulier des \'ecoulements incompressibles avec viscosit\'e constante}
+
+Enfin, lorsque le fluide est consid\'er\'e incompressible et de viscosit\'e
+dynamique $\eta_{0}$ constante, le tenseur des contraintes visqueuses
+(Eq. (\ref{eq:ContraintVisq-constante})) se simplifie une nouvelle
+fois en $\boldsymbol{\nabla}\cdot\boldsymbol{\tau}=\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}$
+et le syst\`eme d'\'equations devient :
+
+\begin{subequations}
+
+\begin{align}
+\boldsymbol{\nabla}\cdot\mathbf{u} & =0,\label{eq:ContinuiteMP}\\
+\rho_{0}\frac{\partial\mathbf{u}}{\partial t}+\rho_{0}\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u} & =-\boldsymbol{\nabla}p+\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\rho_{0}\mathbf{F}_{v}\label{eq:DBF-1}
+\end{align}
+
+
+\end{subequations}
+
+
+\subsection{Conservation de l'\'energie}
+
+Plusieurs formes de l'\'equation de bilan de l'\'energie sont possibles
+selon que l'on consid\`ere la conservation de l'\'energie totale, l'\'energie
+interne, l'enthalpie totale ou l'enthalpie. Des formulations peuvent
+\^etre d\'eduites sur la temp\'erature ou m\^eme l'entropie. Dans la suite,
+on restreint la pr\'esentation \`a l'\'ecriture de la conservation de l'\'energie
+interne qui sera \'ecrite sous forme \'equivalente sur l'\'equation de la
+temp\'erature.
+
+L'\'equation de bilan de l'\'energie interne $e$ s'\'ecrit \cite[p. 126]{Book_Candel}
+:
+
+\begin{equation}
+\frac{\partial\rho e}{\partial t}+\boldsymbol{\nabla}\cdot(\rho e\mathbf{u})=-\boldsymbol{\nabla}\cdot\mathbf{q}-p\boldsymbol{\nabla}\cdot\mathbf{u}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}\label{eq:Energie}
+\end{equation}
+Dans cette \'equation, le membre de gauche repr\'esente le taux de variation
+de l'\'energie interne par unit\'e de volume. Dans le membre de droite,
+le premier terme repr\'esente le flux de chaleur par unit\'e de volume
+; le second terme repr\'esente la puissance des forces de pression par
+unit\'e de volume ; et le dernier terme repr\'esente la puissance des
+forces visqueuses par unit\'e de volume. Ce dernier est la fonction
+de dissipation visqueuse qui est toujours positive ou nulle. Ainsi
+les forces visqueuses entra\^inent toujours un accroissement de l'\'energie
+interne du fluide et donc de sa temp\'erature.
+
+L'\'equation de conservation de l'\'energie interne peut se reformuler
+en une \'equation sur la temp\'erature $T$. Cette \'equation prend deux
+formes diff\'erentes selon que l'on utilise la chaleur sp\'ecifique \`a
+volume constant $C_{v}$ ou bien \`a pression constante $C_{p}$. Formul\'ee
+en $C_{v}$, elle s'\'ecrit :
+
+\begin{subequations}
+
+\begin{equation}
+\frac{\partial(\rho C_{v}T)}{\partial t}+\boldsymbol{\nabla}\cdot(\rho C_{v}T\mathbf{u})=-\boldsymbol{\nabla}\cdot\mathbf{q}-T\left(\frac{\partial p}{\partial T}\right)_{\rho}\boldsymbol{\nabla}\cdot\mathbf{u}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}+\rho T\frac{dC_{v}}{dt}\label{eq:Energie_Cv}
+\end{equation}
+Formul\'ee en $C_{p}$ elle s'\'ecrit :
+
+\begin{equation}
+\frac{\partial(\rho C_{p}T)}{\partial t}+\boldsymbol{\nabla}\cdot(\rho C_{p}T\mathbf{u})=-\boldsymbol{\nabla}\cdot\mathbf{q}-\left(\frac{\partial\ln\rho}{\partial\ln T}\right)\frac{dp}{dt}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}+\rho T\frac{dC_{p}}{dt}\label{eq:Energie_Cp}
+\end{equation}
+
+
+\end{subequations}
+\begin{description}
+\item [{Remarque}] : lorsque le gaz est consid\'er\'e parfait, i.e. $\rho=p_{th}/(RT)$
+o\`u $R$ est la constante des gaz parfaits et $p_{th}$ est la pression
+thermodynamique, le coefficient $(\partial\ln\rho/\partial\ln T)$
+vaut $(\partial\ln\rho/\partial\ln T)=-1$. En supposant que le flux
+de chaleur est d\'efini par la loi de Fourier $\mathbf{q}=-\lambda\boldsymbol{\nabla}T$
+o\`u $\lambda$ est la conductivit\'e thermique, l'Eq. (\ref{eq:Energie_Cp})
+devient :
+\end{description}
+\begin{equation}
+\frac{\partial(\rho C_{p}T)}{\partial t}+\boldsymbol{\nabla}\cdot(\rho C_{p}T\mathbf{u})=\boldsymbol{\nabla}\cdot(\lambda\boldsymbol{\nabla}T)+\frac{dp_{th}}{dt}+\boldsymbol{\tau}:\boldsymbol{\nabla}\mathbf{u}+\rho T\frac{dC_{p}}{dt}\label{eq:Energie_Cp-1}
+\end{equation}
+
+
+L'introduction de la pression thermodynamique $p_{th}$ sera utile
+pour les mod\`eles \og bas Mach \fg{}.
+
+
+\subsection{Approximation de Boussinesq en incompressible}
+
+Pour des \'ecoulements incompressibles, lorsque la densit\'e est suppos\'ee
+constante $\rho=\rho_{0}=\mbox{Cte}$, la densit\'e n'est ni une fonction
+de la temp\'erature ni de la composition du fluide (pour les m\'elanges
+miscibles). Dans ce cas, les effets de flottabilit\'e sont uniquement
+pris en compte par les forces gravitationnelles. Cette simplification
+est connue comme l'\og approximation de Boussinesq \fg{} et valable
+en consid\'erant que la variation de densit\'e $\Delta\rho\ll\rho_{0}$.
+Dans ce cas, le terme force s'\'ecrit dans les \'equations (\ref{eq:ContinuiteMP-1})--(\ref{eq:DBF-1-1})
+ou (\ref{eq:ContinuiteMP})--(\ref{eq:DBF-1}) :
+
+\begin{equation}
+\mathbf{F}_{v}=-\mathbf{g}\beta_{T}(T-T_{0})\label{eq:ApproxBoussinesq}
+\end{equation}
+o\`u $\beta_{T}$ est le coefficient de dilatation thermique et $T_{0}$
+une temp\'erature de r\'ef\'erence. Dans cette relation, le signe n\'egatif
+indique que si la diff\'erence de temp\'erature est positive $\Delta T=T-T_{0}>0$
+(i.e. pr\`es de la paroi chaude en convection naturelle), alors la force
+est dirig\'ee dans le sens oppos\'e \`a la gravit\'e $\mathbf{g}$.
+
+
+\subsection{\label{sub:Num=0000E9rique-dans-TrioCFD}Num\'erique dans \texttt{TrioCFD}}
+
+Dans ce document on d\'etaille les m\'ethodes num\'eriques mises en \oe uvre
+dans \texttt{TrioCFD} pour le mod\`ele incompressible d\'efini par les
+\'equations (\ref{eq:ContinuiteMP-1})--(\ref{eq:DBF-1-1}). Deux m\'ethodes
+de discr\'etisation spatiales sont possibles dans l'outil de calculs
+: la m\'ethode des Volume-El\'ements Finis (VEF) et celle des Volumes
+Diff\'erences Finies (VDF) mais on ne d\'ecrit que la partie VEF. Dans
+la suite, le domaine de calcul est not\'e $\Omega$.
+
+
+\subsubsection{Sch\'ema en temps (valable en VEF et VDF)}
+
+Apr\`es discr\'etisation, le syst\`eme matrice-vecteur r\'esolu s'\'ecrit :
+
+\begin{equation}
+\left\{ \begin{array}{rcl}
+\delta t^{-1}\mathbf{M}U^{n+1}+\mathbf{A}U^{n+1}+\mathbf{L}(U^{n})U^{n+1}+\mathbf{B}^{T}P^{n+1} & = & F^{n}+\delta t^{-1}\mathbf{M}U^{n},\\
+\mathbf{B}U^{n+1} & = & 0.
+\end{array}\right.\label{eq:NavierStokes-dis-FV}
+\end{equation}
+o\`u $U^{n+1}\in\mathbb{R^{N_{\mathbf{u}}}}$ repr\'esente le vecteur
+vitesse discr\'etis\'e au temps $(n+1)\delta t$ o\`u $\delta t$ est le
+pas de temps et $N_{\mathbf{u}}$ est le nombre de degr\'es de libert\'e
+pour discr\'etiser spatialement la vitesse. Les matrices en gras seront
+d\'efinies ci-dessous car d\'ependantes de la discr\'etisation en espace.
+$P^{n+1}\in\mathbb{R}^{N_{p}}$ repr\'esente la pression discr\'etis\'ee
+au temps $(n+1)\delta t$ et $N_{p}$ est le nombre de degr\'es de libert\'e
+pour discr\'etiser spatialement la pression.
+
+Afin de d\'ecoupler la vitesse et la pression, la r\'esolution des \'equations
+(\ref{eq:ContinuiteMP-1})--(\ref{eq:DBF-1-1}) est r\'ealis\'ee en trois
+\'etapes \cite{Chor68,Tema68}: 
+\begin{itemize}
+\item \textbf{\'etape de pr\'ediction :} calculer $U^{*}$ solution de 
+\[
+{\delta t}^{-1}\mathbf{M}U^{*}+\mathbf{A}U^{*}+\mathbf{L}(U^{n})U^{*}+\mathbf{B}^{T}P^{n}=F^{n}+\delta t^{-1}\mathbf{M}U^{n}.
+\]
+\`a cette \'etape $\mathbf{B}U^{*}\neq0$. 
+\item \textbf{Calcul de la pression :} calculer $P'$ solution de 
+\[
+\mathbf{B}\mathbf{M}^{-1}\mathbf{B}^{T}P'={\delta t}^{-1}\mathbf{B}U^{*},\quad P^{n+1}=P'+P^{n}.
+\]
+
+\item \textbf{\'etape de correction :} calculer $U^{n+1}$ solution de 
+\[
+\mathbf{M}U^{n+1}=\mathbf{M}U^{*}-{\delta t}\mathbf{B}^{T}P'.
+\]
+\end{itemize}
+\begin{description}
+\item [{Remarque}] : plusieurs solveurs ont \'et\'e test\'es (SIMPLE, SIMPLER,
+PISO) qui, selon les probl\`emes ont montr\'e une convergence relativement
+faible. Le solveur utilis\'e \`a ce jour est inspir\'e de la r\'ef\'erence \cite{Guermond-Quartapelle_IJNMF1998}.
+\end{description}
+
+\subsubsection{Sch\'ema en espace VEF }
+
+La m\'ethode num\'erique est bas\'ee sur la m\'ethode des \'el\'ements finis de
+Crouzeix-Raviart non conformes \cite{CrRa73}, et d\'etaill\'es dans \cite{Emon92,Heib03,Fort06,Angeli_etal_FVCA2017}.
+Pour ($d=2$) (resp. $d=3$), on consid\`ere l'espace $xy$ de $\mathbb{R}^{2}$
+(resp. l'espace $xyz$ de $\mathbb{R}^{3}$) d'origine $O$. On note
+($\mathbf{e}_{x},\,\mathbf{e}_{y},\,\mathbf{e}_{z})$ ($\mathbf{e}_{1},\,\mathbf{e}_{2},\,\mathbf{e}_{3})$
+les vecteurs de la base canonique. On consid\`ere $\mathcal{T}_{h}:={\displaystyle \cup}{}_{\ell=1}^{N_{T}}T_{\ell}$,
+un maillage r\'egulier du domaine $\Omega$ constitu\'e de simplexes (triangles
+en 2D et t\'etra\`edres en 3D), de sommets $(S_{i})_{i=1}^{N_{S}}$, o\`u
+$i$ est l'indice de $N_{s}$ sommets. Le nombre de simplexes (sommets)
+est not\'e par $N_{T}$ (resp. $N_{S}$). Soit $T_{\ell}\in\mathcal{T}_{h},$la
+fronti\`ere de $T_{\ell}$ est constitu\'ee d'ar\^etes en 2D ou de faces
+en 3D, mais on les appellera \og face \fg{} dans tous les cas. Soit
+$\overline{\mathcal{F}}_{h}=\cup_{k=1}^{\overline{N}_{F}}F_{k}$ l'ensemble
+des faces du maillage, et $\mathcal{F}_{h}=\cup_{k=1}^{N_{F}}F_{k}$
+l'ensemble des faces int\'erieures, o\`u $\overline{N}_{F}$ (resp. $N_{F}$)
+est le nombre total (resp. interne) de faces. On note $M_{k}$ le
+barycentre de la face $F_{k}$, et $\mathbf{n}_{k}$ le vecteur normal
+unitaire sortant \`a $F_{k}$.
+
+Soit $P_{1}(T)$ l'ensemble des polyn\^omes d'ordre 1 d\'efinis sur $T$.
+L'espace de discr\'etisation des vitesses est :
+
+\begin{equation}
+X_{h}:=\{\mathbf{v}_{h}\,|\,\forall T\in\mathcal{T}_{h},\,\mathbf{v}_{h}\in P_{1}(T)^{d}\,\mbox{et}\,\forall\,F\in\mathcal{F}{}_{h}:\,[\mathbf{v}_{h}](\mathbf{x}_{F})=\mathbf{0}\,\},\label{eq:CrRa}
+\end{equation}
+o\`u $\mathbf{x}_{F}$ repr\'esente le barycentre de la face $F$, et
+$[\mathbf{v}_{h}](\mathbf{x}_{F})$ est le saut de $\mathbf{v}_{h}$
+sur la face $F$. On suppose que $\overline{F}=\overline{T}\cap\overline{T'}$,
+telle que $\mathbf{n}_{F}=\mathbf{n}_{T,F}$. Le saut $[\mathbf{v}_{h}](\mathbf{x}_{F})$
+est d\'efini par : 
+\[
+[\mathbf{v}_{h}](\mathbf{x}_{F}):=\mathbf{v}_{h|T_{\ell}}(\mathbf{x}_{F})-\mathbf{v}_{h|T_{\ell'}}(\mathbf{x}_{F})\mbox{ if }\overline{F}=\overline{T}_{\ell}\cap\overline{T}_{\ell'},\mbox{ et }\mathbf{n}_{F}=\mathbf{n}_{T_{\ell}|F}.
+\]
+L'espace $X_{h}$ est muni de la semi-norme $||\mathbf{v}_{h}||_{h}=\left(\sum_{\ell=1}^{T_{\ell}}|\mathbf{v}_{h|T_{\ell}}|_{1,T_{\ell}}^{2}\right)^{1/2}$,
+o\`u $|\mathbf{v}_{h|T_{\ell}}|_{1,T_{\ell}}$ est la semi-norme de
+$\mathbf{v}_{h|T_{\ell}}\in H^{1}(T_{\ell})$. On note $X_{0,h}:=\{\mathbf{v}_{h}\in X_{h}\,|\,\mathbf{u}_{h|\partial\Omega}=0\}$. 
+
+Soit $\lambda_{i}|_{T}$ la coordonn\'ees barycentrique associ\'ee au
+sommet $S_{i}|_{T}$ et $\left(\mathbf{e}^{\beta}\right)_{\beta=1}^{d}$
+les vecteurs de la base canonique. Les fonctions de base associ\'ees
+\`a l'espace $X_{h}$ sont les vecteurs $\left(\left(\boldsymbol{\varphi}_{i}^{\beta}\right)_{i=1}^{N_{F}}\right)_{\beta=1}^{d}$
+tels que $\boldsymbol{\varphi}_{i}^{\beta}|_{T}=\left(1-d\lambda_{i}|_{T}\right)\mathbf{e}^{\beta}$.
+On appelle $\psi_{j}$ la fonction caract\'eristique associ\'ee au triangle
+$T_{j}$.
+
+
+\subsubsection{Matrices volume-\'el\'ements finis pour l'approximation P1NC/P0}
+
+Soit $(\mathbf{u}{}_{h}^{n},\,p_{h}^{n})\in X_{h}\times L_{h}$ l'approximation
+spatiale de $(\mathbf{u}^{n},\,p^{n})$ dans $X_{h}\times L_{h}$
+telle que : 
+\[
+\mathbf{u}_{h}^{n}:=\sum_{\beta=1}^{d}\sum_{i=1}^{N_{F}}\left(U_{i}^{\beta}\right)^{n}\boldsymbol{\varphi}{}_{i}^{\beta},\quad p_{h}^{n}:=\sum_{\ell=1}^{N_{T}}P_{\ell}^{n}\psi_{\ell}.
+\]
+Posons : $U_{n}=(\,(U_{i}^{\beta})^{n}\,)_{\beta,i}\in\mathbb{R}^{N_{\mathbf{u}}}$,
+$F^{n}=(\,(\mathbf{f}^{n+1},\boldsymbol{\varphi}_{i}^{\beta})_{0}\,)_{\beta,i}\in\mathbb{R}^{N_{\mathbf{u}}}$,
+avec $N_{\mathbf{u}}:=d\,N_{F}$, et $p_{h}^{n}=(P_{\ell}^{n})_{\ell}\in\mathbb{R}^{N_{T}}$. 
+\begin{itemize}
+\item La matrice de masse $\mathbf{M}\in\mathbb{R}^{N_{\mathbf{u}}\times N_{\mathbf{u}}}$
+est compos\'ee de $d$ blocs diagonaux \'egaux \`a $\mathbf{M}_{F}\in\mathbb{R}^{N_{F}\times N_{F}}$
+tels que $\left(\mathbf{M}_{F}\right)_{i,j}=(\phi_{i},\phi_{j})_{0}$
+avec $\phi_{i}|_{T}=\left(1-d\lambda_{i}|_{T}\right)$. 
+
+
+Pour $d=2$, on obtient que la matrice de masse $2D$ est diagonale
+: 
+\[
+\left(\mathbf{M}_{F}\right)_{i,j}=\delta_{ij}\sum_{\ell\,|\,M_{i}\in T_{\ell}}\frac{|T_{\ell}|}{3}.
+\]
+La matrice de masse 2D de la m\'ethode des \'el\'ements finis non conformes
+de Crouzeix-Raviart est \'egale \`a la matrice de masse 2D obtenue par
+la m\'ethode des volumes finis d\'ecrite dans la th\`ese de Emonot \cite{Emon92}.
+Ce n'est plus le cas en 3D, mais dans le code \texttt{TrioCFD} c'est
+la la matrice de masse de la discr\'etisation en volumes finis qui est
+impl\'ement\'ee pour laquelle
+
+\end{itemize}
+\[
+\left(\mathbf{M}_{F}\right)_{i,j}=\delta_{ij}\sum_{\ell\,|\,M_{i}\in T_{\ell}}\frac{|T_{\ell}|}{4}.
+\]
+
+\begin{itemize}
+\item La matrice de rigidit\'e $\mathbf{A}\in\mathbb{R}^{N_{\mathbf{u}}\times N_{\mathbf{u}}}$
+est compos\'ee de $d$ blocs diagonaux \'egaux \`a $\mathbf{A}_{F}\in\mathbb{R}^{N_{F}\times N_{F}}$tels
+que $\left(\mathbf{A}_{F}\right)_{i,j}=(\nabla\phi_{i},\nabla\phi_{j})_{0}$.
+On obtient : 
+\[
+\left(\mathbf{A}_{F}\right)_{i,j}=\sum_{\ell\,|\,M_{i},M_{j}\in T_{\ell}}|T_{\ell}|^{-1}\mathbf{S}_{i,\ell}\cdot\mathbf{S}_{j,\ell},
+\]
+o\`u $\mathbf{S}_{i,\ell}$ est le vecteur \og face normale \fg{}
+associ\'e \`a la face oppos\'ee au sommet $S_{i}$ dans le triangle $T_{\ell}$.
+
+
+La matrice de rigidit\'e de la m\'ethode des \'el\'ements finis non conformes
+de Crouzeix-Raviart est \'egale \`a la matrice de rigidit\'e obtenue par
+la m\'ethode des volumes finis d\'ecrite dans la th\`ese de Emonot.
+
+\item La matrice de couplage $\mathbf{B}\in\mathbb{R}^{N_{T}\times N_{\mathbf{u}}}$
+est compos\'ee de $d$ blocs tels que $\mathbf{B}=(\mathbf{B}^{\beta})_{\beta=1}^{d}$,
+$\mathbf{B}^{\beta}\in\mathbb{R}^{N_{T}\times N_{F}}$ et :
+
+
+\[
+(\mathbf{B}^{\beta})_{\ell,j}=-\mathbf{S}_{j,\ell}\cdot\mathbf{e}^{\beta}
+\]
+
+
+\item Dans le cas o\`u la pression est $P_{1}$, on a $p_{h}^{n}=(P_{i}^{n})_{i}\in\mathbb{R}^{N_{S}}$
+et la matrice de couplage $\mathbf{B}\in\mathbb{R}^{N_{S}\times N_{\mathbf{u}}}$
+est telle que : 
+\[
+\begin{array}{rcl}
+(\mathbf{B}^{\beta})_{i,k} & = & -\sum_{\ell\,|\,M_{k},S_{i}\in T_{\ell}}(\,(d+1)d\,)^{-1}\mathbf{S}_{i,\ell}\cdot\mathbf{e}^{\beta}\end{array}.
+\]
+
+\end{itemize}
+
+\section{\label{sec:Modeles-de-turbulence}Mod\`eles de turbulence}
+
+
+\subsection{Introduction}
+
+Les mod\`eles et m\'ethodes num\'eriques de turbulence peuvent \^etre class\'ees
+en trois cat\'egories selon les \'echelles r\'esolues : (1) la m\'ethode de
+simulation num\'erique directe (Direct Numerical Simulation -- DNS),
+(2) la simulation des grandes \'echelles (Large Eddy Simulation -- LES)
+et (3) la m\'ethode des \'equations de Navier-Stokes moyenn\'ees (Reynolds-Averaged
+Navier-Stokes -- RANS). La DNS r\'esout les \'equations de Navier-Stokes
+sans mod\`ele de turbulence et toutes les \'echelles spatiales et temporelles
+de la turbulence sont r\'esolues. Par cons\'equent, le maillage en DNS
+doit \^etre suffisamment fin pour capturer les tourbillons de tailles
+s'\'etendant de la plus petite \'echelle de dissipation (\'echelle de Kolmogorov)
+jusqu'\`a l'\'echelle de longueur caract\'eristique de la taille du domaine.
+La th\'eorie de la turbulence montre que le nombre de points du maillage
+en DNS 3D est de l'ordre de $O(\mbox{Re}^{9/4})$ o\`u $\mbox{Re}$
+est le nombre de Reynolds turbulent. Les co\^uts de calcul de la DNS
+sont par cons\'equent tr\`es importants pour des forts nombres de Reynolds.
+
+Contrairement \`a la DNS, la LES r\'esout seulement les grandes structures
+des \'ecoulements en filtrant les \'equations de Navier-Stokes avec un
+filtre spatial et la petite \'echelle non r\'esolue est mod\'elis\'ee en utilisant
+des mod\`eles de sous-grille. La gamme des \'echelles r\'esolues en LES
+est beaucoup plus petite qu'en DNS et par cons\'equent les co\^uts de
+calcul sont r\'eduits de fa\c con significative. On pr\'esentera les deux
+principaux mod\`eles LES dans la section \ref{sec:LES}.
+
+Enfin, les mod\`eles RANS sont compos\'es d'un ensemble d'\'equations de
+Navier-Stokes moyenn\'ees, avec des mod\`eles de turbulence pour fermer
+le tenseur de Reynolds suppl\'ementaire qui est induit par les fluctuations.
+Les mod\`eles RANS r\'esolvent seulement l'\'ecoulement moyen aux \'echelles
+macroscopiques et il s'agit de la m\'ethode la plus \'economique pour
+la simulation de la turbulence. Dans la suite on pr\'esente un des mod\`eles
+RANS dans la section \ref{sec:Mod=0000E8le-RANS}.
+
+
+\subsection{\label{sec:LES}Simulations des grandes \'echelles}
+
+L'approche de la turbulence bas\'ee sur la Simulation des Grandes Echelles
+(SGE, ou Large Eddy Simulation -- LES) consiste \`a obtenir par r\'esolution
+directe des \'equations de Navier-Stokes, les caract\'eristiques de grande
+taille de la turbulence pour n'avoir \`a mod\'eliser que les mouvements
+de \og petite taille \fg{}. Les contributions des grandes \'echelles
+sont isol\'ees en introduisant un op\'erateur de moyenne spatiale filtr\'ee
+: $\tilde{f}(\mathbf{x},\,t)=\int_{V}G(\mathbf{x},\,\mathbf{x}')f(\mathbf{x}',\,t)dV$
+et toute fonction du champ de l'\'ecoulement est d\'ecompos\'ee en $f(\mathbf{x},\,t)=\tilde{f}(\mathbf{x},\,t)+f'(\mathbf{x},\,t)$
+o\`u $f'(\mathbf{x},\,t)$ est la fluctuation de sous-maille.
+
+En appliquant l'op\'erateur de moyenne filtr\'ee aux \'equations du mouvement
+on obtient :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\tilde{u}_{j}}{\partial x_{j}} & = & 0\label{eq:divu_LES}\\
+\frac{\partial\tilde{u}_{i}}{\partial t}+\frac{\partial}{\partial x_{j}}(\widetilde{u_{i}u_{j}}) & = & \frac{1}{\rho_{0}}\frac{\partial\tilde{p}}{\partial x_{i}}+\nu\frac{\partial^{2}\tilde{u}_{i}}{\partial x_{j}\partial x_{j}}\label{eq:QDM_LES}
+\end{eqnarray}
+
+
+\end{subequations}
+
+La moyenne spatiale filtr\'ee du produit $\widetilde{u_{i}u_{j}}$ est
+r\'e\'ecrite sous la forme :
+
+\[
+\widetilde{u_{i}u_{j}}=\tilde{u}_{i}\tilde{u}_{j}+\tilde{L}_{ij}+\tilde{R}_{ij}
+\]
+o\`u :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\tilde{L}_{ij} & = & \widetilde{\tilde{u}_{i}\tilde{u}_{j}}-\tilde{u}_{i}\tilde{u}_{j}\label{eq:Tension-Leonard}\\
+\tilde{R}_{ij} & = & \widetilde{\tilde{u}_{i}u_{j}'}+\widetilde{\tilde{u}_{j}u_{i}'}+\widetilde{u_{i}'u_{j}'}\label{eq:Tension-Reynolds}
+\end{eqnarray}
+
+
+\end{subequations}
+
+La relation (\ref{eq:Tension-Leonard}) caract\'erise les tensions de
+Leonard tandis que la relation (\ref{eq:Tension-Reynolds}) caract\'erise
+les tensions de Reynolds de sous-maille. Le probl\`eme de fermeture
+de la proc\'edure SGE consiste \`a d\'eterminer une relation de $\tilde{R}_{ij}$
+pour obtenir la solution d'une r\'ealisation de l'\'ecoulement.
+
+
+\subsubsection{Smagorinski}
+
+Le tenseur des contraintes de sous-maille $\tilde{R}_{ij}$ peut \^etre
+repris sous la forme :
+
+\[
+\tilde{R}_{ij}=\tilde{T}_{ij}+\frac{1}{3}\tilde{R}_{kk}\delta_{ij}
+\]
+
+
+Un des mod\`eles de sous-maille tr\`es r\'epandu est celui de Smagorinsky
+qui suppose une relation lin\'eaire du tenseur anisotrope $\tilde{T}_{ij}$
+avec le champ des d\'eformations filtr\'e $\tilde{S}_{ij}$ telle que
+:
+
+\[
+\tilde{T}_{ij}=-2\nu_{T}\tilde{S}_{ij}
+\]
+
+
+La viscosit\'e tourbillonnaire des structures de sous-maille $\nu_{T}$
+est choisie telle que :
+
+\begin{equation}
+\nu_{T}=(C_{S}\Delta)^{2}\sqrt{\sum_{ij}\tilde{S}_{ij}\tilde{S}_{ij}}\label{eq:nu_T_smago}
+\end{equation}
+o\`u $\Delta$ est l'\'epaisseur du filtre et $C_{S}$ est une constante
+positive qui peut varier selon les applications. Dans \cite[p. 2203]{Weickert_etal_CAMWA2009}
+les auteurs disent que la valeur peut varier de $C_{S}=0.05$ \`a $C_{S}=0.16$.
+Dans \texttt{TrioCFD} la valeur peut \^etre sp\'ecifi\'ee dans le fichier
+de donn\'ees d'entr\'ee. Par d\'efaut, elle est fix\'ee \`a $C_{S}=0.18$ si
+elle n'est pas.
+
+
+\subsubsection{LES-WALE}
+
+Le mod\`ele alternatif est le mod\`ele LES-WALE (Wall Adaptative Local
+Eddy-viscosity) \cite{Nicoud-Ducros_LES-WALE_FTC1999} :
+
+\begin{equation}
+\nu_{T}=(C_{W}\Delta)^{2}\frac{(\tilde{S}_{ij}^{d}\tilde{S}_{ij}^{d})^{3/2}}{(\tilde{S}_{ij}\tilde{S}_{ij})^{5/2}+(\tilde{S}_{ij}^{d}\tilde{S}_{ij}^{d})^{5/4}}\label{eq:nu_WALE}
+\end{equation}
+avec
+
+\[
+\tilde{S}_{ij}^{d}=\tilde{S}_{ik}\tilde{S}_{kj}+\tilde{\Omega}_{ik}\tilde{\Omega}_{kj}-\frac{1}{3}\delta_{ij}\left(\tilde{S}_{mn}\tilde{S}_{mn}-\tilde{\Omega}_{mn}\tilde{\Omega}_{mn}\right)
+\]
+o\`u $\tilde{\Omega}{}_{ij}$ est d\'efini par 
+
+\[
+\tilde{\Omega}_{ij}=\frac{1}{2}\left(\frac{\partial\tilde{u}_{i}}{\partial x_{j}}-\frac{\partial\tilde{u}_{j}}{\partial x_{i}}\right)
+\]
+
+
+Dans l'Eq. (\ref{eq:nu_WALE}), $\Delta$ est choisi \`a la taille de
+maille. Lorsque la valeur $C_{S}$ est \'egale \`a 0.18, une valeur appropri\'ee
+de $C_{w}$ est comprise entre $0.55\leq C_{w}\leq0.6$ \cite[p. 170]{Nicoud-Ducros_LES-WALE_FTC1999}.
+Dans certaines conditions d'\'ecoulements d\'ecrites dans \cite[sec 3.1]{Nicoud-Ducros_LES-WALE_FTC1999},
+la valeur la plus adapt\'ee est $C_{w}=0.5$, et c'ewst celle choisie
+dans les simulations (\cite[pp. 191 and 192]{Nicoud-Ducros_LES-WALE_FTC1999}).
+
+
+\subsection{\label{sec:Mod=0000E8le-RANS}Mod\`ele RANS}
+
+
+\subsubsection{\'equations de Reynolds}
+
+La vitesse $\mathbf{u}(\mathbf{x},\,t)$ et la pression $p(\mathbf{x},\,t)$
+du champ d'\'ecoulement d'un fluide incompressible sont r\'egies ind\'ependamment
+de la temp\'erature par les \'equations de continuit\'e et de la quantit\'e
+de mouvement :
+
+\begin{align}
+\boldsymbol{\nabla}\cdot\mathbf{u} & =0,\label{eq:ContinuiteMP-2}\\
+\rho_{0}\left[\frac{\partial\mathbf{u}}{\partial t}+\mathbf{u}\cdot\boldsymbol{\nabla}\mathbf{u}\right] & =-\boldsymbol{\nabla}p+\eta_{0}\boldsymbol{\nabla}^{2}\mathbf{u}+\rho_{0}\mathbf{F}_{v}\label{eq:DBF-1-2}
+\end{align}
+
+
+Lorsque la vitesse et la pression sont trait\'ees comme des fonctions
+al\'eatoires de l'espace et du temps dont on d\'ecompose les valeurs instantan\'ees
+en :
+
+\begin{eqnarray*}
+\mathbf{u}(\mathbf{x},\,t) & = & \overline{\mathbf{U}}(\mathbf{x},\,t)+\tilde{\mathbf{u}}(\mathbf{x},\,t)\\
+p(\mathbf{x},\,t) & = & \overline{P}(\mathbf{x},\,t)+\tilde{p}(\mathbf{x},\,t)
+\end{eqnarray*}
+o\`u le symbole $\overline{()}$ indique l'op\'erateur de moyenne statistique
+(ou moyenne d'ensemble) et le symbole $\tilde{()}$ les fluctuations
+(ou \'ecarts par rapport \`a ces moyennes), les \'equations moyenn\'ees de
+masse et de quantit\'e de mouvement se traduisent par \cite[sec 4 p 73--76]{Book_Chassaing}
+:
+
+\begin{align}
+\boldsymbol{\nabla}\cdot\overline{\mathbf{U}} & =0,\label{eq:ContinuiteMasse_Moyennee}\\
+\rho_{0}\left[\frac{\partial\overline{\mathbf{U}}}{\partial t}+\overline{\mathbf{U}}\cdot\boldsymbol{\nabla}\overline{\mathbf{U}}\right] & =\boldsymbol{\nabla}\cdot\overline{\boldsymbol{\Sigma}}+\rho_{0}\overline{\mathbf{F}}_{v}\label{eq:QDM_Moyennee}
+\end{align}
+avec :
+
+\begin{equation}
+\overline{\boldsymbol{\Sigma}}=-\overline{P}\mathbf{I}+2\eta_{0}\overline{\mathbf{S}}-\rho_{0}\overline{\tilde{\mathbf{u}}\tilde{\mathbf{u}}}\qquad\mbox{et}\qquad\overline{\mathbf{S}}=\frac{1}{2}(\boldsymbol{\nabla}\overline{\mathbf{U}}+\boldsymbol{\nabla}^{T}\overline{\mathbf{U}})\label{eq:TenseurReynolds}
+\end{equation}
+
+
+Le bilan de quantit\'e de mouvement moyenne est appel\'ee l'\'equation de
+Reynolds. Dans cette \'equation, les forces de surface font appara\^itre
+un terme suppl\'ementaire $-\rho_{0}\overline{\tilde{\mathbf{u}}\tilde{\mathbf{u}}}$
+qui repr\'esente l'agitation turbulente. Le syst\`eme d'\'equations est
+ouvert en raison de la pr\'esence des corr\'elations des vitesses fluctuantes
+$\overline{\tilde{\mathbf{u}}\tilde{\mathbf{u}}}$.
+
+
+\subsubsection{Mod\`ele $(\overline{k},\,\overline{\epsilon})$}
+
+De nombreuses mod\'elisations du tenseur de Reynolds sont possibles,
+mais nous nous int\'eressons ici \`a la plus classique, bas\'ee sur l\textquoteright hypoth\`ese
+de Boussinesq : 
+
+\begin{equation}
+\overline{\tilde{\mathbf{u}}\tilde{\mathbf{u}}}=-\nu_{T}2\mathbf{\overline{S}}+\frac{2}{3}\overline{k}\mathbf{I}\label{eq:Hyp_Boussinesq}
+\end{equation}
+o\`u $\nu_{T}$ est une viscosit\'e turbulente scalaire qui traduit les
+effets d\textquoteright agitation turbulente. Le terme en $\overline{k}$
+au second membre s\textquoteright apparente \`a une pression par agitation
+turbulente et est int\'egr\'e dans la pression $\overline{P}$. On obtient
+ainsi une \'equation ferm\'ee pour la vitesse moyenne. Dans le cadre du
+mod\`ele \`a deux \'equations $\overline{k}$--$\overline{\epsilon}$ qui
+nous int\'eresse, une analyse dimensionnelle donne pour la viscosit\'e
+turbulente :
+
+\begin{equation}
+\nu_{T}=C'_{\eta}\frac{\overline{k}^{2}}{\overline{\epsilon}}\label{eq:nu_T_RANS}
+\end{equation}
+
+
+Le mod\`ele $\overline{k}$--$\overline{\epsilon}$ permet de fermer
+le syst\`eme d'\'equations (\ref{eq:ContinuiteMasse_Moyennee})--(\ref{eq:TenseurReynolds})
+en r\'esolvant deux \'equations suppl\'ementaires, une sur l'\'energie cin\'etique
+turbulente $\overline{k}$ et l'autre sur le taux de dissipation $\overline{\epsilon}$
+suivantes \cite[p. 469]{Book_Chassaing} (repris de \cite[Eq. (2.2-1 et 2.2-2)]{Launder-Spalding_NumCompTurbFlow1974})
+:
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\overline{k}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{k}}{\partial x_{j}} & = & \nu_{T}\left(\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial\overline{U}_{j}}{\partial x_{i}}\right)\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial}{\partial x_{j}}\left[\frac{\nu_{T}}{\sigma_{k}}\frac{\partial\overline{k}}{\partial x_{j}}\right]-\overline{\epsilon}\label{eq:EnerCinTurb_k}\\
+\frac{\partial\overline{\epsilon}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{\epsilon}}{\partial x_{j}} & = & C_{\epsilon_{1}}\nu_{T}\frac{\overline{\epsilon}}{\overline{k}}\left(\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial\overline{U}_{j}}{\partial x_{i}}\right)\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial}{\partial x_{j}}\left[\frac{\nu_{T}}{\sigma_{\epsilon}}\frac{\partial\overline{\epsilon}}{\partial x_{j}}\right]-C_{\epsilon_{2}}\frac{\overline{\epsilon}^{2}}{\overline{k}}\label{eq:TauxDissip_eps}
+\end{eqnarray}
+
+
+\end{subequations}
+
+Les \'equations (\ref{eq:EnerCinTurb_k}) et (\ref{eq:TauxDissip_eps})
+sont des \'equations de type advection-diffusion avec des termes source.
+Le terme de production d\textquoteright \'energie cin\'etique turbulente
+(premier terme du membre de droite) joue un r\^ole important dans les
+mod\'elisations pari\'etales. Les valeurs standards des cinq constantes
+du mod\`ele $C'_{\eta}$, $C_{\epsilon_{1}}$, $C_{\epsilon_{2}}$,
+$\sigma_{k}$ et $\sigma_{\epsilon}$ sont fix\'ees par d\'efaut \`a : $C'_{\eta}=0.09$,
+$C_{\epsilon_{1}}=1.44$, $C_{\epsilon_{2}}=1.92$, $\sigma_{k}=1.0$
+et $\sigma_{\epsilon}=1.3$. Certaines d'entre elles peuvent aussi
+varier selon le type d'\'ecoulement consid\'er\'e (voir table \ref{tab:Synthese-valeurs_Coeffkeps})
+:
+
+\begin{table}
+\begin{centering}
+\begin{tabular}{ccccccc}
+\hline 
+R\'ef\'erence & $C_{\eta}'$ & $\sigma_{k}$ & $\sigma_{\epsilon}$ & $C_{\epsilon_{1}}$ & $C_{\epsilon_{2}}$ & \'ecoulement\tabularnewline
+\hline 
+\cite{Jones-Launder_IJHMT1972} & 0.09 & 1.0 & 1.3 & 1.55 & 2.00 & Haut Reynolds\tabularnewline
+\cite{Launder-Sharma_LettHMT1974} & 0.09 & 1.0 & 1.3 & 1.44 & 1.92 & Tourbillonnant\tabularnewline
+\cite{Chien_AIAA1982} & 0.09 & 1.0 & 1.3 & 1.35 & 1.92 & Bas Reynolds\tabularnewline
+\cite{Fan_etal_AIAA1993} & 0.09 & 1.0 & 1.3 & 1.39 & 1.80 & Bas Reynolds\tabularnewline
+\cite{Morgans-etal_Conf1999} & 0.09 & 1.0 & 1.3 & 1.60 & 1.92 & Jet\tabularnewline
+\cite{Bahari-Hejazi_IJPMS2009} & 0.09 & 1.0 & 1.3 & 1.40 & 1.92 & Flottabilit\'e\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\protect\caption{\label{tab:Synthese-valeurs_Coeffkeps}Synth\`ese des valeurs des param\`etres
+du mod\`ele $\overline{k}-\overline{\epsilon}$ (repris de \cite{Genty_RapportCEA_2019}).}
+\end{table}
+
+
+
+\subsubsection{Autres mod\`eles \`a deux \'equations}
+
+
+\subsubsection*{Mod\`ele $(\overline{k},\,\overline{\epsilon})$-\og r\'ealisable \fg{}}
+
+Alternativement au mod\`ele $(\overline{k},\,\overline{\epsilon})$,
+d'autres mod\`eles de fermeture \`a deux \'equations existent dans la litt\'erature
+: les mod\`eles $(\overline{k},\,\overline{\epsilon})$ modifi\'es (parmi
+eux le $(\overline{k},\,\overline{\epsilon})$-\og r\'ealisable \fg{}
+, mod\`ele pour lequel les validations sont en cours). Le mod\`ele $(\overline{k},\,\overline{\epsilon})$-\og r\'ealisable \fg{}
+s'\'ecrit \cite[Eq. (22) et (23) p. 233]{Shi_etal_keps-realisable_CF1995}
+:
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\overline{k}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{k}}{\partial x_{j}} & = & \frac{\partial}{\partial x_{j}}\left(\frac{\nu_{T}}{\sigma_{k}}\frac{\partial\overline{k}}{\partial x_{j}}\right)+\left(2\nu_{T}S_{ij}-\frac{2}{3}\overline{k}\delta_{ij}\right)\frac{\partial\overline{U}_{i}}{\partial x_{j}}-\overline{\epsilon}\label{eq:Eq_k_real}\\
+\frac{\partial\overline{\epsilon}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{\epsilon}}{\partial x_{j}} & = & \frac{\partial}{\partial x_{j}}\left[\frac{\nu_{T}}{\sigma_{\epsilon}}\frac{\partial\overline{\epsilon}}{\partial x_{j}}\right]+C_{1}S\epsilon-C_{2}\frac{\overline{\epsilon}^{2}}{\overline{k}+\sqrt{\nu\overline{\epsilon}}}\label{eq:Eq_eps_real}
+\end{eqnarray}
+avec
+
+\end{subequations}
+
+\begin{subequations}
+
+\begin{equation}
+S=\sqrt{2S_{ij}S_{ij}},\quad C_{1}=\max\left\{ 0.43,\,\frac{\eta}{5+\eta}\right\} ,\quad\eta=\frac{S\overline{k}}{\overline{\epsilon}}\label{eq:Coeff1_real}
+\end{equation}
+et \cite[Eq. (19) p. 232 et (21) p. 233]{Shi_etal_keps-realisable_CF1995}
+:
+
+\begin{equation}
+C_{\eta}=\frac{1}{A_{0}+A_{s}U^{(*)}\frac{\overline{k}}{\overline{\epsilon}}},\quad\mbox{o\`u }A_{0}=4,\quad A_{s}=\sqrt{6}\cos\phi,\quad\phi=\frac{1}{3}\arccos\left(\sqrt{6}W\right),\quad W=\frac{S_{ij}S_{jk}S_{ki}}{(S_{ij}S_{ij})^{3/2}}\label{eq:Coeff2_real}
+\end{equation}
+et une vitesse $U^{(*)}$ calcul\'ee par \cite[Eq. (20) p. 232]{Shi_etal_keps-realisable_CF1995}
+
+\begin{equation}
+U^{(*)}=\sqrt{S_{ij}S_{ij}+\tilde{\Omega}_{ij}\tilde{\Omega}_{ij}},\quad\tilde{\Omega}_{ij}=\Omega_{ij}-2\epsilon_{ijk}\omega_{k},\quad\Omega_{ij}=\overline{\Omega}_{ij}\epsilon_{ijk}\omega_{k}\label{eq:Coeff3_real}
+\end{equation}
+o\`u $\overline{\Omega}_{ij}$ est le taux de rotation moyen dans un
+rep\`ere de r\'ef\'erence en rotation de vitesse angulaire $\omega_{k}$.
+
+\end{subequations}
+
+Dans \texttt{TrioCFD}, ce mod\`ele $(\overline{k},\,\overline{\epsilon})$-\og r\'ealisable \fg{}
+a \'et\'e d\'evelopp\'e et valid\'e dans \cite{Angeli_Leterrier_keps-real_NT2018}.
+
+
+\subsubsection{Mod\`ele \og bas Reynolds \fg{}}
+
+Les lois de paroi, \'etablies \`a partir de r\'esultats exp\'erimentaux, permettent
+d\textquoteright \'eviter de calculer la solution des \'equations de Navier-Stokes
+et du mod\`ele de turbulence proche de la paroi. Le mod\`ele $(\overline{k},\,\overline{\epsilon})$,
+coupl\'e \`a une loi de paroi, permet ainsi de simuler le c\oe ur de
+l\textquoteright \'ecoulement en se pr\'eservant d\textquoteright un co\^ut
+de calcul trop grand d\^u \`a un maillage trop fin proche de la paroi.
+Cependant, ce type de mod\`ele est inadapt\'e lorsque le premier point
+du maillage se trouve dans la sous-couche visqueuse ($y^{+}<+30$).
+Plus le nombre de Reynolds est haut plus cette sous-couche visqueuse
+est d'\'epaisseur n\'egligeable, ce qui rend le mod\`ele $(\overline{k},\,\overline{\epsilon})$
+avec loi de paroi bien adapt\'e aux \'ecoulements avec de grand nombre
+de Reynolds. C\textquoteright est pourquoi ce mod\`ele est appel\'e \'egalement
+mod\`ele $(\overline{k},\,\overline{\epsilon})$ \og haut-Reynolds \fg{}.
+Lorsque l\textquoteright on \'etudie des \'ecoulements \`a faible nombre
+de Reynolds, la sous-couche visqueuse devient plus importante, ce
+qui rend l\textquoteright utilisation d'une loi de paroi inadapt\'ee.
+\`a faible nombre de Reynolds, il peut \^etre pr\'ef\'erable d\textquoteright utiliser
+des mod\`eles, appel\'es ainsi \og bas-Reynolds \fg{}, qui font d\'esormais
+appel \`a des fonctions d\textquoteright amortissement et des termes
+d\'ependants de la discr\'etisation pour prendre en compte la r\'esolution
+num\'erique de la sous-couche visqueuse. Ces mod\`eles permettent \'egalement
+d\textquoteright \'etudier l\textquoteright ensemble de l\textquoteright \'ecoulement
+notamment proche de la paroi (par exemple \`a des effets de recirculation,
+de d\'ecollement pour des g\'eom\'etries complexes). Le mod\`ele $(\overline{k},\,\overline{\epsilon})$
+bas-Reynolds laisse l\textquoteright \'equation de transport de $\overline{k}$
+du mod\`ele $(\overline{k},\,\overline{\epsilon})$ de base inchang\'ee
+mais modifie celle de $\overline{\epsilon}$ par adjonction de termes
+d\textquoteright att\'enuation dans la zone proche de la paroi o\`u le
+nombre de Reynolds est localement plus faible. Du fait d\textquoteright un
+maillage de paroi important, ce mod\`ele est donc plus co\^uteux que le
+mod\`ele $(\overline{k},\,\overline{\epsilon})$ standard. Il existe
+plusieurs mod\`eles bas-Reynolds dans la litt\'erature \cite{Launder-Sharma_LettHMT1974,Launder-Spalding_NumCompTurbFlow1974,Jones-Launder_IJHMT1972,Lam-Bremhorst_JFE1981}.
+La forme g\'en\'erale de ces mod\`eles peut s'\'ecrire sous la forme (\'ecriture
+inspir\'ee de \cite{Jones-Launder_IJHMT1972}) :
+
+\begin{subequations}
+
+\begin{eqnarray}
+\frac{\partial\overline{k}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{k}}{\partial x_{j}} & = & \nu_{T}\left(\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial\overline{U}_{j}}{\partial x_{i}}\right)\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial}{\partial x_{j}}\left[\left(\nu+\frac{\nu_{T}}{\sigma_{k}}\right)\frac{\partial\overline{k}}{\partial x_{j}}\right]-\overline{\epsilon}-\overline{\mathcal{K}}\label{eq:EnerCinTurb_k_LowRe}\\
+\frac{\partial\overline{\epsilon}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{\epsilon}}{\partial x_{j}} & = & C_{\epsilon_{1}}\nu_{T}\frac{\overline{\epsilon}}{\overline{k}}f_{\epsilon_{1}}\left(\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial\overline{U}_{j}}{\partial x_{i}}\right)\frac{\partial\overline{U}_{i}}{\partial x_{j}}+\frac{\partial}{\partial x_{j}}\left[\left(\nu+\frac{\nu_{T}}{\sigma_{\epsilon}}\right)\frac{\partial\overline{\epsilon}}{\partial x_{j}}\right]-C_{\epsilon_{2}}f_{\epsilon_{2}}\frac{\overline{\epsilon}^{2}}{\overline{k}}+\overline{\mathcal{E}}\label{eq:TauxDissip_eps_LowRe}\\
+\nu_{T} & = & C_{\eta}f_{\eta}\frac{\overline{k}^{2}}{\overline{\epsilon}}\label{eq:Nu_T_LowRe}
+\end{eqnarray}
+
+
+\end{subequations}
+
+
+\subsubsection*{Mod\`ele \og bas-Reynolds \fg{} de Launder \& Spalding \cite{Launder-Spalding_NumCompTurbFlow1974}}
+
+Pour ce mod\`ele, les termes $\overline{\mathcal{K}}$ et $\overline{\mathcal{E}}$
+s'\'ecrivent \cite[Eqs. (2.3-4) et (2.3-5)]{Launder-Spalding_NumCompTurbFlow1974}
+:
+
+\begin{equation}
+\overline{\mathcal{K}}=2\nu\left(\frac{\partial\overline{k}^{1/2}}{\partial x_{j}}\right)^{2},\quad\overline{\mathcal{E}}=2.0\nu\nu_{T}\left(\frac{\partial^{2}\overline{U}_{i}}{\partial x_{j}\partial x_{l}}\right)\label{eq:K-E_Model1}
+\end{equation}
+et les fonctions $f_{\epsilon_{1}}$, $f_{\epsilon_{2}}$, $f_{\eta}$
+sont donn\'ees par \cite[Eqs. (2.3-6) et (2.3-7)]{Launder-Spalding_NumCompTurbFlow1974}
+:
+
+\[
+f_{\epsilon_{1}}=1,\quad f_{\epsilon_{2}}=1.0-0.3e^{-Re_{t}^{2}},\quad f_{\eta}=e^{-2.5/(1+Re_{t}/50)}
+\]
+o\`u $Re_{t}$ est le nombre de Reynolds turbulent d\'efini par $Re_{t}=\overline{k}^{2}/\nu\overline{\epsilon}$.
+Les valeurs des coefficients empiriques sont $C_{\eta}=0.09$, $C_{\epsilon_{1}}=1.44$,
+$C_{\epsilon_{2}}=1.92$, $\sigma_{k}=1.0$ et $\sigma_{\epsilon}=1.3$.
+
+
+\subsubsection*{Mod\`ele de Jones \& Launder \cite{Jones-Launder_IJHMT1972}}
+
+Ce mod\`ele est formul\'e dans la r\'ef\'erence originale \cite{Jones-Launder_IJHMT1972}
+en ne consid\'erant qu'une seule d\'eriv\'ee spatiale $\partial/\partial y$
+dans les \'equations (\ref{eq:EnerCinTurb_k_LowRe}) et (\ref{eq:TauxDissip_eps_LowRe}).
+Dans ce cas, les termes $\overline{\mathcal{K}}$ et $\overline{\mathcal{E}}$
+de ce mod\`ele s'\'ecrivent \cite[Eqs. (8) et (9)]{Jones-Launder_IJHMT1972}
+:
+
+\[
+\overline{\mathcal{K}}=2\nu\left(\frac{\partial\overline{k}^{1/2}}{\partial y}\right)^{2},\quad\overline{\mathcal{E}}=2.0\nu\nu_{T}\left(\frac{\partial^{2}\overline{U}_{i}}{\partial y^{2}}\right)
+\]
+qui, en 3D s'\'ecrivent de mani\`ere identique aux deux relations de l'\'equation
+(\ref{eq:K-E_Model1}). les fonctions $f_{\epsilon_{1}}$, $f_{\epsilon_{2}}$,
+$f_{\eta}$ sont donn\'ees par \cite[Eq. (12)]{Jones-Launder_IJHMT1972}
+:
+
+\[
+f_{\epsilon_{1}}=1,\quad f_{\epsilon_{2}}=1.0-0.3e^{-Re_{t}^{2}},\quad f_{\eta}=e^{-2.5/(1+Re_{t}/50)}
+\]
+
+
+Les param\`etres empiriques du mod\`ele sont donn\'es par \cite[Table 1]{Jones-Launder_IJHMT1972}
+: $C_{\eta}=0.09$, $C_{\epsilon_{1}}=1.55$, $C_{\epsilon_{2}}=2$,
+$\sigma_{k}=1.0$ et $\sigma_{\epsilon}=1.3$. Ce mod\`ele ne se diff\'erencie
+du pr\'ec\'edent (celui de Launder \& Spalding) que par les valeurs des
+param\`etres $C_{\epsilon_{1}}$et $C_{\epsilon_{2}}$.
+
+
+\subsubsection*{Mod\`ele de Lam \& Bremhorst \cite{Lam-Bremhorst_JFE1981}}
+
+Dans ce mod\`ele les termes $\overline{\mathcal{K}}$ et $\overline{\mathcal{E}}$
+dans les \'equations (\ref{eq:EnerCinTurb_k_LowRe}) et (\ref{eq:TauxDissip_eps_LowRe})
+sont nuls et les fonctions $f_{\epsilon_{1}}$, $f_{\epsilon_{2}}$,
+$f_{\eta}$ sont donn\'ees par \cite[Eq. (11), (12) et (13)]{Lam-Bremhorst_JFE1981}
+:
+
+\[
+f_{\epsilon_{1}}=1+\left(\frac{A_{c}}{f_{\eta}}\right)^{3},\quad f_{\epsilon_{2}}=1-e^{-Re_{t}^{2}},\quad f_{\eta}=(1-e^{-A_{\eta}Re_{y}})^{2}\left(1+\frac{A_{t}}{Re_{t}}\right)
+\]
+o\`u $Re_{y}$ est le nombre de Reynolds turbulent qui varie avec la
+distance $y$ \`a la paroi et qui est d\'efini par $Re_{y}=\overline{k}^{1/2}y/\nu$.
+Les coefficients $A_{\eta}$, $A_{t}$ et $A_{c}$ sont cal\'es en comparant
+les r\'esultats num\'eriques \`a des mesures exp\'erimentales. Les valeurs
+obtenues sont (\cite[sec. 3.1]{Lam-Bremhorst_JFE1981}) $A_{\eta}=0.0165$,
+$A_{t}=20.5$, et $A_{c}=0.05$. Les valeurs des autres coefficients
+sont $C_{\epsilon_{1}}=1.44$ et $C_{\epsilon_{2}}=1.92$.
+
+
+\subsubsection*{Mod\`ele de Launder \& Sharma \cite{Launder-Sharma_LettHMT1974}}
+
+Ce mod\`ele est formul\'e pour les \'ecoulements tourbillonnants (disque
+en rotation) pour lesquels les coordonn\'ees ind\'ependantes sont $r$
+et $y$ o\`u $r$ est la distance radiale \`a l'axe du disque et $y$
+est la distance normale \`a la surface du disque. Dans ce cas, des termes
+suppl\'ementaires qui impliquent le gradient de $V_{\theta}/r$ apparaissent
+dans les \'equations de $\overline{k}$ et de $\overline{\epsilon}$.
+Les fonctions $f_{\epsilon_{2}}$ et $f_{\eta}$ et les constantes
+sont l\'eg\`erement diff\'erentes \cite[Eqs. (5), (6)]{Launder-Sharma_LettHMT1974}
+:
+
+\[
+f_{\epsilon_{2}}=1.0-0.3e^{-Re_{t}^{2}},\quad f_{\eta}=e^{-3.4/(1+Re_{t}/50)^{2}}
+\]
+et \cite[Eqs. (5), (6) et valeurs au-dessous]{Launder-Sharma_LettHMT1974}
+$C_{\eta}=0.09$, $C_{\epsilon_{1}}=1.44$, $C_{\epsilon_{2}}=1.92$,
+$\sigma_{k}=1.0$ et $\sigma_{\epsilon}=1.3$.
+
+
+\subsubsection*{Dans \texttt{TrioCFD}}
+
+Dans \texttt{TrioCFD}, les mod\`eles de turbulence en $(\overline{k},\,\overline{\epsilon})$
+\og bas Reynolds \fg{} de Jones \& Launder \cite{Jones-Launder_IJHMT1972}
+et celui de Lam \& Bremhorst \cite{Lam-Bremhorst_JFE1981} ont \'et\'e
+mis en \oe uvre dans \cite{Peybernes_LowReynolds_NT2016}. Les fonctions
+et param\`etres de Launder \& Sharma \cite{Launder-Sharma_LettHMT1974}
+sont \'egalement disponibles.
+
+
+\subsection{Lois de parois}
+
+Dans le cadre des \'etudes de turbulence, en particulier pour des cas
+avec des g\'eom\'etries complexes, la r\'esolution des ph\'enom\`enes physiques
+ayant lieu en proche paroi est g\'en\'eralement co\^uteuse en terme de temps
+de calcul car elle demande un maillage tr\`es fin dans ces zones o\`u
+les gradients de vitesse et de temp\'erature sont tr\`es \'elev\'es. Or il
+est primordial de pr\'edire correctement ces ph\'enom\`enes car par simple
+conservation du d\'ebit, une mauvaise description pari\'etale de la vitesse
+entrainera une mauvaise description au c\oe ur de l\textquoteright \'ecoulement.
+Plut\^ot que de faire porter l\textquoteright effort sur une r\'esolution
+fine, il est alors classique de faire porter l\textquoteright effort
+sur une mod\'elisation du gradient de vitesse pari\'etal, qui permet de
+conserver un maillage relativement grossier \`a la paroi. Ces approches
+sont connues sous le nom de " lois de paroi " ou " traitement de paroi
+" (on rencontre tr\`es souvent les termes anglais de " wall functions
+" et " wall treatment ") et permettent une diminution notable des
+temps de simulation. Elles sont depuis longtemps int\'egr\'ees \`a la plupart
+des codes de calcul industriels.
+
+Les lois disponibles avec le mod\`ele $\overline{k}$--$\overline{\epsilon}$
+dans \texttt{TrioCFD} sont formul\'ees de mani\`ere \`a d\'ecrire contin\^ument
+toute la couche limite. Pour la vitesse adimensionn\'ee, la loi de paroi
+de Reichardt est utilis\'ee \cite{Reichardt1940} :
+
+\[
+U^{+}=\frac{1}{\kappa}\ln(1+\kappa y^{+})+A\left(1-e^{-y^{+}/11}-\frac{y^{+}}{11}e^{-y^{+}/3}\right)
+\]
+avec
+
+\[
+A=\frac{1}{\kappa}\ln\left(\frac{E}{\kappa}\right)
+\]
+
+
+Les valeurs des constantes sont $\kappa=0.415$ et $E=9.11$. Asymptotiquement,
+on retrouve le comportement lin\'eaire lorsque $y^{+}$ tend vers z\'ero,
+et le comportement logarithmique lorsque $y^{+}$ devient " grand
+". De plus, cette loi donne une description raisonnable de la zone
+tampon. Les quantit\'es $\overline{k}$ et $\overline{\epsilon}$ sont
+d\'ecrites, pour tout $y^{+}$, par :
+
+\begin{eqnarray*}
+\overline{k}^{+} & = & 0.07y^{+2}e^{-y^{+}/9}+\frac{1}{\sqrt{C_{\eta}}}\left(1-e^{-y^{+}/20}\right)^{2}\\
+\overline{\epsilon}^{+} & = & \frac{1}{\kappa(y^{+4}+15^{4})^{1/4}}
+\end{eqnarray*}
+
+
+Ces formulations respectent le comportement g\'en\'eralement admis \`a la
+paroi, \`a savoir :
+
+\[
+\overline{k}(y=0)=0\,;\qquad\frac{d\overline{k}}{dy}(y=0)=0\,;\qquad\frac{d\overline{\epsilon}}{dy}(y=0)=0
+\]
+
+
+
+\subsubsection{Autres mod\`eles de turbulence dans \texttt{TrioCFD}}
+
+Signalons que la loi d\'evelopp\'ee par Ciofalo et Collins \cite{Ciofalo-Collins_NHTB1989}
+est \'egalement disponible mais uniquement pour la discr\'etisation VDF
+de \texttt{TrioCFD} (maillages cart\'esiens). Il est \'egalement possible
+de modifier la valeur des constantes de la loi logarithmique, ou d\textquoteright imposer
+la vitesse de frottement, mais cela semble assez peu utile dans les
+\'etudes industrielles. Concernant la LES, la loi de Werner et Wengle
+est \'egalement impl\'ement\'ee \cite{Werner-Wengle_Proc1991} ainsi que
+l\textquoteright approche TBLE (Thin Boundary Layer Equation).
+
+
+\subsubsection*{Mod\`ele $(\overline{k},\,\overline{\omega})$ \`a venir}
+
+D'autres mod\`eles de type $(\overline{k},\,\overline{\omega})$ existent
+dans la litt\'erature tels que les mod\`eles $(\overline{k},\,\overline{\omega})$
+et $(\overline{k},\,\overline{\epsilon})$-SST (Shear Stress Transport).
+Les syst\`emes d'\'equations de ces mod\`eles sont pr\'esent\'es dans la r\'ef\'erence
+\cite[sec 2.3.6 pp. 701--705]{Argyropoulos-Markatos_ReviewTurbulence_AMM2015}
+de laquelle on reprend le mod\`ele $(\overline{k},\,\omega)$ pour lequel
+la viscosit\'e turbulence est :
+
+\[
+\nu_{T}=\frac{\overline{k}}{\tilde{\omega}},\qquad\tilde{\omega}=\max\left\{ \omega,\,C_{lim}\sqrt{\frac{2S_{ij}S_{ij}}{\beta^{*}}}\right\} ,\qquad\mbox{avec }C_{lim}=\frac{7}{8}
+\]
+
+
+Le mod\`ele s'\'ecrit \cite[p. 702]{Argyropoulos-Markatos_ReviewTurbulence_AMM2015}
+(repris de \cite{Wilcox_AIAA1988}) :
+
+\begin{eqnarray*}
+\frac{\partial\overline{k}}{\partial t}+\overline{U}_{j}\frac{\partial\overline{k}}{\partial x_{j}} & = & \frac{\partial}{\partial x_{j}}\left[\left(\nu+\sigma^{*}\frac{\overline{k}}{\omega}\right)\frac{\partial\overline{k}}{\partial x_{j}}\right]-\beta^{*}\overline{k}\omega+\tau_{ij}\frac{\partial\overline{U}_{i}}{\partial x_{j}}\\
+\frac{\partial\omega}{\partial t}+\overline{U}_{j}\frac{\partial\omega}{\partial x_{j}} & = & \frac{\partial}{\partial x_{j}}\left[\left(\nu+\sigma\frac{\overline{k}}{\omega}\right)\frac{\partial\omega}{\partial x_{j}}\right]-\beta\omega^{2}+\frac{\sigma_{d}}{\omega}\frac{\partial\overline{k}}{\partial x_{j}}\frac{\partial\omega}{\partial x_{j}}+a\frac{\omega}{\overline{k}}\tau_{ij}\frac{\partial\overline{U}_{i}}{\partial x_{j}}
+\end{eqnarray*}
+avec :
+
+\[
+\sigma_{d}=\begin{cases}
+0 & \mbox{si }\frac{\partial\overline{k}}{\partial x_{j}}\frac{\partial\omega}{\partial x_{j}}\leq0\\
+\sigma_{d0} & \mbox{si }\frac{\partial\overline{k}}{\partial x_{j}}\frac{\partial\omega}{\partial x_{j}}>0
+\end{cases},\qquad f_{\beta}=\frac{1+85\chi_{\omega}}{1+100\chi_{\omega}},\qquad\chi_{\omega}=\left|\frac{\Omega_{ij}\Omega_{jk}S_{ki}}{(\beta^{*}\omega)^{3}}\right|,\qquad\Omega_{ij}=\frac{1}{2}\left(\frac{\partial\overline{U}_{i}}{\partial x_{j}}-\frac{\partial\overline{U}_{j}}{\partial x_{i}}\right)
+\]
+
+
+Les coefficients sont les suivants :
+
+\[
+a=0.52,\quad\beta=\beta_{0}f_{\beta},\quad\beta_{0}=0.0708,\quad\beta^{*}=0.09,\quad\sigma=0.5,\quad\sigma^{*}=0.6,\quad\sigma_{d0}=0.125
+\]
+
+
+
+\section{Perspectives}
+
+Plusieurs perspectives d'am\'elioration de ce document initial sont
+d'ores et d\'ej\`a \`a pr\'evoir. D'une part, il s'agit de compl\'eter et de
+d\'etailler les mod\`eles physiques des cas tests de validation d\'ej\`a existants
+tels que les mod\`eles d'\'ecoulement quasi-compressibles (mod\`eles de
+type \og bas Mach \fg{}) ou encore les mod\`eles qui impliquent des
+couplages avec les \'equations du transport d'esp\`eces. D'autre part,
+les sections seront compl\'et\'ees avec les m\'ethodes num\'eriques d\'edi\'ees
+\`a la r\'esolution des mod\`eles physiques.
+
+\appendix
+
+\section{\label{sec:Annexe_ListeValid}Annexe : liste des fiches de validation
+dans \texttt{TrioCFD}}
+
+Cette annexe pr\'esente deux tables qui regroupent l'ensemble des fiches
+de validation disponibles dans TrioCFD. Ce travail de synth\`ese a \'et\'e
+r\'ealis\'e sur la version 1.7.5. Le fichier \texttt{Excel} est accessible
+dans le r\'epertoire \texttt{/data/tmptrust/validation/main\_Validation175}
+qui contient \'egalement le fichier PDF \texttt{Synthese\_fiches\_validation\_V2.pdf}
+dont les deux tables ci-dessous en sont une synth\`ese. Dans la derni\`ere
+colonne des deux tables, les mots cl\'es suivants sont utilis\'es :
+
+\begin{table}[H]
+\begin{centering}
+\begin{tabular}{lll}
+\hline 
+\textbf{\footnotesize{}Mot cl\'e} &  & \textbf{\footnotesize{}Correspondance}\tabularnewline
+\hline 
+\texttt{\footnotesize{}C\_d\_t} &  & \texttt{\footnotesize{}Convection\_diffusion\_temperature}\tabularnewline
+\texttt{\footnotesize{}C\_d\_t\_t} &  & \texttt{\footnotesize{}Convection\_diffusion\_temperature\_turbulent}\tabularnewline
+\texttt{\footnotesize{}C\_d\_c\_t} &  & \texttt{\footnotesize{}Convection\_diffusion\_concentration\_turbulent}\tabularnewline
+\texttt{\footnotesize{}C\_d\_ch\_QC} &  & \texttt{\footnotesize{}Convection\_diffusion\_chaleur\_QC}\tabularnewline
+\texttt{\footnotesize{}C\_d\_ch\_t\_QC} &  & \texttt{\footnotesize{}Convection\_diffusion\_chaleur\_turbulent\_QC}\tabularnewline
+\texttt{\footnotesize{}pb\_thermohyd\_t\_s\_p} &  & \texttt{\footnotesize{}pb\_thermohydraulique\_turbulent\_scalaires\_passifs}\tabularnewline
+\texttt{\footnotesize{}pb\_thermohyd\_t\_QC} &  & \texttt{\footnotesize{}pb\_thermohydraulique\_turbulent\_QC}\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\protect\caption{Correspondance des mots cl\'es utilis\'es dans les tables \ref{tab:FichesValid1}
+et \ref{tab:FichesValid2}.}
+
+
+\end{table}
+
+
+\begin{sidewaystable}
+\protect\caption{\label{tab:FichesValid1}Liste des cas tests et des fiches de validations
+regroup\'ees par th\`emes}
+
+
+\begin{centering}
+\texttt{\scriptsize{}}%
+\begin{tabular}{|l|l|l|l|l|}
+\hline 
+ & \texttt{\textbf{\scriptsize{}Th\`emes}} & \texttt{\textbf{\scriptsize{}Nb}} & \texttt{\textbf{\scriptsize{}Problem}} & \texttt{\textbf{\scriptsize{}Equations}}\tabularnewline
+\hline 
+\hline 
+\texttt{\scriptsize{}1.} & \texttt{\scriptsize{}Conduction} & \texttt{\scriptsize{}3} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_conduction} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}~~~+ pb\_thermohydraulique} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}~~~+ pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Conduction +} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_standard}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}2.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Incompressible laminar}\tabularnewline
+\texttt{\scriptsize{}pipe and channel flow}\tabularnewline
+\end{tabular}\texttt{\scriptsize{} } & \texttt{\scriptsize{}3} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}~~~+ pb\_conduction} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_standard}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}~~~+ Conduction}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}2}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}3.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Incompressible turbulent}\tabularnewline
+\texttt{\scriptsize{}pipe and channel flow}\tabularnewline
+\end{tabular}\texttt{\scriptsize{} } & \texttt{\scriptsize{}45} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}19}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}22}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}4}\tabularnewline
+\texttt{\scriptsize{}~~~~~+ pb\_conduction} & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}45}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}24}\tabularnewline
+\texttt{\scriptsize{}+ Conduction} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}4.} & \texttt{\scriptsize{}Flow through curved pipes} & \texttt{\scriptsize{}2} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}5.} & \texttt{\scriptsize{}Impinging or submerged jet} & \texttt{\scriptsize{}6} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_concentration\_turbulent} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}5}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_c\_t} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}6.} & \texttt{\scriptsize{}Thermal stratification} & \texttt{\scriptsize{}5} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique} & \texttt{\scriptsize{}2}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_standard}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}~~~+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}7.} & \texttt{\scriptsize{}Natural/mixed convection} & \texttt{\scriptsize{}7} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1 (+1)}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique} & \texttt{\scriptsize{}3 (+1)}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_QC} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}pb\_thermohydraulique}\tabularnewline
+\texttt{\scriptsize{}~~~~+ pb\_conduction }\tabularnewline
+\texttt{\scriptsize{}~~~~+ pb\_couple\_rayonnement}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_standard} & \texttt{\scriptsize{}4 (+1)}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}1 (+1)}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_QC} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t} & \texttt{\scriptsize{}3 (+1)}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}1 (+1)}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_ch\_QC} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}{\scriptsize \par}
+
+\pagebreak
+\end{sidewaystable}
+
+
+\begin{sidewaystable}
+\protect\caption{\label{tab:FichesValid2}Liste des cas tests et des fiches de validations
+regroup\'ees par th\`emes (suite)}
+
+
+\centering{}\texttt{\scriptsize{}}%
+\begin{tabular}{|l|l|l|l|l|}
+\hline 
+ & \texttt{\textbf{\scriptsize{}Th\`emes}} & \texttt{\textbf{\scriptsize{}Nb}} & \texttt{\textbf{\scriptsize{}Problem}} & \texttt{\textbf{\scriptsize{}Equations}}\tabularnewline
+\hline 
+\hline 
+\texttt{\scriptsize{}8.} & \texttt{\scriptsize{}Obstacles in axial or cross flow} & \texttt{\scriptsize{}9} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}5}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}2}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_standard} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}5}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}??} & \texttt{\scriptsize{}2}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}9.} & \texttt{\scriptsize{}Diffusor} & \texttt{\scriptsize{}1} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}10.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Channel or pipe flow with abrupt}\tabularnewline
+\texttt{\scriptsize{}changing cross section}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}7} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}11.} & \texttt{\scriptsize{}Poiseuille flow} & \texttt{\scriptsize{}16} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}12.} & \texttt{\scriptsize{}Isotropic Homogenous Turbulence} & \texttt{\scriptsize{}2} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohyd\_t\_s\_p} & \texttt{\scriptsize{}1}\tabularnewline
+\texttt{\scriptsize{}pb\_hydraulique\_turbulent} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_t\_t} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}13.} & \texttt{\scriptsize{}Flow through porous media} & \texttt{\scriptsize{}3} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}14.} & \texttt{\scriptsize{}Quasi-compressible flow} & \texttt{\scriptsize{}9} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohydraulique\_QC} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}pb\_thermohyd\_t\_QC} & \texttt{\scriptsize{}3}\tabularnewline
+\texttt{\scriptsize{}~~~~+ pb\_conduction} & \texttt{\scriptsize{}1}\tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+ & \tabularnewline
+\end{tabular} & \texttt{\scriptsize{}}%
+\begin{tabular}{ll}
+\texttt{\scriptsize{}Keyword} & \texttt{\scriptsize{}Nb}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_QC}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_ch\_QC}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}6}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent\_QC}\tabularnewline
+\texttt{\scriptsize{}+ C\_d\_ch\_t\_QC}\tabularnewline
+\texttt{\scriptsize{}+ Conduction}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}2}\tabularnewline
+\texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent}\tabularnewline
+\texttt{\scriptsize{}Navier\_Stokes\_turbulent\_QC}\tabularnewline
+\texttt{\scriptsize{}C\_d\_t\_t}\tabularnewline
+\texttt{\scriptsize{}C\_d\_ch\_t\_QC}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}1}\tabularnewline
+\end{tabular}\tabularnewline
+\hline 
+\texttt{\scriptsize{}15.} & \texttt{\scriptsize{}}%
+\begin{tabular}{l}
+\texttt{\scriptsize{}Advection of passive scalars using}\tabularnewline
+\texttt{\scriptsize{}different convection schemes}\tabularnewline
+\end{tabular} & \texttt{\scriptsize{}3} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}16.} & \texttt{\scriptsize{}Test of grid convergence} & \texttt{\scriptsize{}4} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}17.} & \texttt{\scriptsize{}Miscellaneous tests} & \texttt{\scriptsize{}14} &  & \tabularnewline
+\hline 
+\texttt{\scriptsize{}18.} & \texttt{\scriptsize{}Front-Tracking} & \texttt{\scriptsize{}21} &  & \tabularnewline
+\hline 
+\texttt{\textbf{\scriptsize{}Total}} &  & \texttt{\textbf{\scriptsize{}160}} &  & \tabularnewline
+\hline 
+\end{tabular}{\scriptsize \par}
+\end{sidewaystable}
+
+
+\pagebreak
+
+\bibliographystyle{plain}
+\bibliography{BibTeX_TrioCFD,18-Stokes_bib}
+

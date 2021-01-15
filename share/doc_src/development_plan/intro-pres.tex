@@ -1,0 +1,613 @@
+
+
+\section*{Glossaire}
+
+\begin{tabular}{ll}
+{\it{ALE}} & Arbitrary Lagrangian Eulerian \\
+{\it{EDP}} & \'Equation aux D\'eriv\'ees Partielles \\
+{\it{DD}}  & D\'ecomposition de Domaine \\
+{\it{DNS}}  & Direct Numerical Simulation \\
+{\it{GD}}  & Galerkin Discontinu \\
+{\it{LES}} & Large Eddy Simulation \\
+{\it{RANS}}& Reynolds Averaged Navier Stokes \\
+{\it{URANS}}& Unstationary RANS \\
+{\it{VDF }} & Volumes Diff\'erences Finies \\
+{\it{VEF }} & Volumes El\'ements Finis \\
+{\it{QI }} & Quantification des incertitudes \\
+{\it{VER }} & Volumes \'el\'ementaires Repr\'esentatifs \\
+
+%{\it{ }} &  \\
+\end{tabular}
+
+\section{Strat\'egie de d\'eveloppement}
+
+
+Le code TrioCFD est le code de thermohydraulique monophasique de la DEN~\cite{OpenSourceTrio}. Depuis 2015, TrioCFD est adoss\'e \`a la base logicielle {\sc{TRUST}}~\cite{TRUST} dans la plateforme logicielle thermohydraulique multi\'echelles MeTaPHor
+(Multi ThermAl HydRaulics)~\cite{Metaphor} d\'evelopp\'ee au STMF. 
+
+Ce plan de d\'eveloppement, qui fait suite au plan de d\'eveloppement \'etabli en 2016~\cite{Plan_dev_Trio_indiceB},  d\'ecrit le programme technique \`a r\'ealiser et les ressources associ\'ees. Il concerne le code de CFD monophasique aux \'echelles RANS et
+LES et non pas le module de CFD diphasique moyenn\'ee d\'ecrit dans~\cite{Metaphor}, ni les baltiks FT et $(i,j,k)$ qui feront l'objet de documents s\'epar\'es.
+
+Cela ne pr\'ejuge pas des moyens qui seront allou\'es annuellement. Dans le cas o\`u toutes les ressources n\'ecessaires ne seraient pas disponibles sur tout ou partie de la p\'eriode le contenu technique du pr\'esent plan de d\'eveloppement sera revu en cons\'equence et mis \`a jour. 
+
+La section~\ref{Pres-Trio} pr\'esente le code TrioCFD. La section~\ref{section-strat\'egie} d\'ecrit la strat\'egie de d\'eveloppement. Les ressources ainsi que les \'ech\'eances sont pr\'esent\'ees dans la section~\ref{section-ressource}.
+Les d\'eveloppements \`a r\'ealiser sont pr\'ecis\'es dans les sections~\ref{section-VEF-am\'eliorations} \`a \ref{section-vvdoc}. 
+
+Enfin, une synth\`ese du programme de travail est pr\'esent\'ee dans la section~\ref{synthese_programme_travail}.
+
+
+\subsection{Pr\'esentation du code TrioCFD}
+\label{Pres-Trio}
+
+On rappelle succinctement les mod\`eles disponibles ainsi que les \'equations qui sont r\'esolues. La pr\'esentation du sch\'ema VEF utilis\'e pour les maillages non structur\'es est d\'etaill\'ee en Annexe~\ref{section-VEF}.
+
+\subsubsection{Mod\`eles}
+
+Les mod\`eles disponibles dans le code sont les suivants :
+
+\begin{itemize}
+\itemb {\bf{Pour les milieux d\'ecrits : }}
+\begin{itemize}
+\item[-]
+les fluides newtoniens incompressibles (hypoth\`ese de Boussinesq),
+\item[-]
+les fluides newtoniens dilatables (mod\`eles asymptotiques, gaz parfait, gaz r\'eel),
+\item[-]
+les fluides non newtoniens incompressibles,
+\item[-]
+les milieux solides,
+\item[-]
+les milieux poreux (mod\`eles de Darcy, de Forchheimer, Ergun).\\
+Notons qu'il est possible de r\'esoudre des probl\`emes coupl\'es entre domaines fluides et solides et \`a l'int\'erieur des domaines poreux.\\
+\end{itemize}
+\itemb {\bf{Pour les \'el\'ements de discr\'etisation en 2D : }}
+\begin{itemize}
+\item[-]
+les Volumes Diff\'erences Finies structur\'es (VDF) en coordonn\'ees cart\'esiennes, cylindriques et axi-sym\'etriques;
+\item[-]
+les Volumes El\'ements Finis (VEF) non structur\'es en coordonn\'ees cart\'esiennes en triangles;\\
+\end{itemize}
+\itemb {\bf{Pour les \'el\'ements de discr\'etisation en 3D : }}
+\begin{itemize}
+\item[-]
+les Volumes Diff\'erences Finies structur\'es (VDF) en coordonn\'ees cart\'esiennes et cylindriques;
+\item[-]
+les Volumes El\'ements Finis (VEF) non structur\'es en coordonn\'ees cart\'esiennes en t\'etra\`edres\footnote{Une version VEF pour les hexa\`edres a \'et\'e impl\'ement\'ee par le pass\'e mais ce travail n'a pas \'et\'e valid\'e.};\\
+\end{itemize}
+\itemb {\bf{Pour les mod\`eles de turbulence : }}
+\begin{itemize}
+\item[-]
+les mod\`eles RANS et URANS :
+\begin{itemize}
+\item[$\circ$]
+le mod\`ele $(k,\epsilon)$ standard ;
+\item[$\circ$]
+le mod\`ele $(k,\epsilon)$ bas Reynolds ;
+\end{itemize}
+\item[-]
+les mod\`eles LES :
+\begin{itemize}
+\item[$\circ$]
+Smagorinsky ;
+\item[$\circ$]
+WALE
+\end{itemize}
+\end{itemize}
+\itemb {\bf{Pour le sch\'ema de convection : }}
+\begin{itemize}
+\item[-]
+sch\'ema amont (ordre 1) ;
+\item[-]
+sch\'ema centr\'e (VDF), de type Mac-Cormak (VEF), MUSCL (VEF), EFstab (VEF);
+\item[-]
+sch\'ema QUICK d'ordre 3 ;
+\item[-]
+sch\'ema centr\'e d'ordre 4 (VDF) ;\\
+\end{itemize}
+\itemb {\bf{Pour les sch\'emas en temps :}}
+\begin{itemize}
+\item[-]
+sch\'emas semi-implicites (SIMPLE, SIMPLER, PISO, Uzawa, Crank-Nicholson it\'eratif) ;
+\item[-]
+sch\'emas explicites (Euler d'ordre 1, Runge-Kutta et pr\'edicteur-correcteur d'ordre 2, Adams-Bashforth d'ordre 2, Runge-Kutta d'ordre 3) ;\\
+\end{itemize}
+\itemb {\bf{Pour la r\'esolution du solveur en pression : }}
+\begin{itemize}
+\item[-]
+m\'ethode directe de Cholesky ;
+\item[-]
+m\'ethode it\'erative du Gradient Conjugu\'e (avec pr\'e-conditionnement SSOR);\\
+\end{itemize}
+\itemb {\bf{Mod\`ele de rayonnement :}}
+\begin{itemize}
+\item[-]
+mod\`ele simplifi\'e de rayonnement dans un milieu transparent ;
+\item[-]
+mod\`ele de rayonnement dans un milieu semi - transparent ;\\
+\end{itemize}
+\itemb {\bf{Pour le couplage fluide-structure : }}
+\begin{itemize}
+\item[-]
+couplage thermique (via des flux de chaleur \`a l'interface) ;
+\item[-]
+couplage m\'ecanique (via des forces de pression \`a l'interface).
+\end{itemize}
+\end{itemize}
+
+
+ 
+
+\subsubsection{\'Equations}
+
+Les \'equations r\'esolues dans le code TrioCFD sont les \'equations de Navier-Stokes incompressibles. Notons que le code offre la possibilit\'e de traiter des \'ecoulements faiblement dilatables mais il n'en sera pas fait mention dans cette section.\\
+Les inconnues du probl\`eme sont la vitesse $\mbf u$, la pression $P$ et la temp\'erature $T$. On peut \'eventuellement mod\'eliser la pr\'esence de certaines esp\`eces dans l'\'ecoulement en introduisant une \'equation pour leur fraction massique. On note $Y_k$ la fraction massique de l'esp\`ece $k$.
+
+$ \bullet $ {\bf{Hypoth\`eses :}}
+
+ La masse volumique est constante $\rho = \rho _0$. On consid\`ere l'approximation de Boussinesq, valable pour de faibles variations de densit\'e. La force gravitationnelle est \'ecrite pour un m\'elange d'esp\`eces non isotherme  comme
+ 
+\begin{equation}
+ \ds{
+ {\mbf{F}} = \rho _0\mbf g +\rho _0 \beta _{th}(T-T_0)\mbf g + \rho _0 \beta _Y (Y- Y_0)\mbf g \equiv \rho _0\mbf g + 
+ {\mbf{f},}}
+\end{equation}
+
+avec $\beta _{th}$ le coefficient de dilatation thermique, $\beta _Y$ le coefficient de dilatation massique, $\mbf g$ la gravit\'e, $T_0$ et $Y_0$ des temp\'erature et fraction massique de r\'ef\'erence.
+
+$ \bullet $ {\bf{\'equations r\'esolues pour un \'ecoulement laminaire ou pour une simulation num\'erique directe de la turbulence}}
+
+\paragraph{Conservation de la masse :}
+
+
+\begin{equation}
+\label{NS-masse}
+\ds{\nabla\cdot\mathbf{u}=0}
+\end{equation}
+
+\paragraph{Conservation de la quantit\'e de mouvement :}
+
+\begin{equation}
+\label{NS-QDM}
+\displaystyle{
+\frac{\partial \mathbf{u}}{\partial t}+ \nabla \cdot (u \otimes u) =-\nabla P_0 +\nabla \cdot \tau +{\mbf f}.
+}
+\end{equation}
+
+La pression calcul\'ee prend en compte la gravit\'e~:
+\begin{equation}
+\ds{P_0=\frac{P}{\rho _0}-\mbf g \cdot \mbf z }
+\end{equation}
+
+ et $\tau=  \nu  \left( \nabla \mbf u +\nabla ^T \mbf u \right)$ d\'esigne le tenseur des contraintes visqueuses, avec $\nu$ la viscosit\'e cin\'ematique du fluide.
+
+
+\paragraph{Conservation de l'\'energie}
+
+\begin{equation}
+\label{NS-T}
+\ds{
+\frac{\partial T}{\partial t}+\nabla\cdot \left( \mbf{u}T\right) = \nabla \cdot \left( \alpha \nabla T\right) + \frac{S_e}{\rho _0C_P},
+}
+\end{equation}
+
+avec $\alpha=\frac{\lambda}{\rho _0 C_P}$, $\lambda$ la conductivit\'e thermique, $C_p$ la capacit\'e thermique \`a pression constante et $S_e$ un terme source (typiquement
+un d\'ep\^ot de puissance).
+
+\paragraph{Conservation des esp\`eces :} 
+
+Il est possible de compl\'eter ce syst\`eme par des \'equations de conservation des esp\`eces :
+
+\begin{equation}
+\label{NS-T}
+\ds{
+\frac{\partial \rho Y_k}{\partial t}+ \nabla \cdot\left( \rho \mbf u Y_k \right) =  \nabla \cdot \left( \rho  D_k \nabla Y_k\right) +S_{Y_k},
+}
+\end{equation}
+
+o\`u $Y_k$ est la fraction massique de la k$^ {i\`eme}$ esp\`ece et $D_k$ le coefficient de diffusion binaire de la k$^ {i\`eme}$ esp\`ece.
+
+$ \bullet $ {\bf {\'equations r\'esolues pour un \'ecoulement turbulent }}
+
+On pr\'ecise ici les \'equations r\'esolues lorsque l'on utilise un mod\`ele de turbulence. Celui-ci peut-\^etre de type RANS ou de type LES (voir
+section~\ref{section-turbulence}). Le formalisme des \'equations est le m\^eme dans les deux cas. Seuls diff\`erent la d\'efinition de la quantit\'e calcul\'ee (not\'ee dans ce qui suit $\widetilde{\cdot }$ et d\'efinie plus loin) et les termes \`a mod\'eliser pour fermer le syst\`eme. Soit donc le syst\`eme~: 
+
+\begin{equation}
+\left\lbrace
+\begin{array}{ll}
+\nabla\cdot{\widetilde{\mathbf{u}}}&=0\\
+\\
+{\ds{\frac{\partial {\widetilde{\mathbf{u}}}}{\partial t}+\nabla \left( {\widetilde{\mathbf{u}}}{\widetilde{\mathbf{u}}}\right)}} &=-\nabla {\widetilde{P}}_0 +\nabla \cdot {\widetilde{\tau}} +\nabla \cdot \dbar T+ {\widetilde{{\mbf f}}} \\
+\\
+{\ds{\frac{\partial{\widetilde{ T}}}{\partial t}+\nabla\cdot \left( {\widetilde{\mbf{u}}}{\widetilde{T}}\right)}}& = \nabla \cdot \left( \alpha\nabla {\widetilde{T}}\right) + \nabla\cdot \Theta
+\end{array}\right.
+\end{equation}
+
+$$ {\widetilde{\tau}} =   \nu  \left( \nabla {\widetilde{\mbf u }} +\nabla ^T {\widetilde{\mbf u}} \right) $$ 
+
+\paragraph{Approche RANS :}
+On d\'ecompose le champ instantan\'e $\Phi$ comme 
+
+\begin{equation}
+\Phi (x_i,t)=\langle \Phi (x_i) \rangle + {\Phi}^{\prime}  (x_i,t),
+\end{equation}
+
+avec 
+
+\begin{equation}
+\langle \Phi (x_i) \rangle=\lim _{T\rightarrow +\infty}\frac{1}{T}\int _{t}^{t+T} \Phi (x_i,\alpha)d\alpha
+\end{equation}
+
+On calcule donc une moyenne en temps de la solution $ \widetilde \Phi=\widetilde \Phi (x_i) =\langle \Phi (x_i) \rangle$. Le champ  moyenn\'e est insensible aux conditions aux limites et initiales. Les termes \`a fermer sont $$\dbar T ^{RANS}_{ij}=-\langle u_i^{\prime} u_j^{\prime} \rangle $$ et $$ \Theta ^{RANS}_i=-\langle T^{\prime} u_i^{\prime} \rangle. $$
+
+%\alpha _t=\frac{\lambda _t}{\rho _0 C_P}
+
+\paragraph{Approche LES :} elle repose sur une s\'eparation entre les grandes et petites \'echelles. Formellement, la s\'eparation d'\'echelles s'exprime sous la forme d'un filtre. Ainsi, on d\'ecompose le champ instantan\'e $\Phi$ comme
+
+\begin{equation}
+\Phi (x_i,t)=\overline \Phi (x_i,t)  + \Phi ^{\prime\prime} (x_i,t),
+\end{equation}
+
+avec
+
+\begin{equation}
+\label{filtre-LES}
+\overline{\Phi}(x_i,t) = \int \int _{-\infty}^{+\infty}F\left(\overline \Delta (x_i,t),x_i-\gamma , t-\alpha  \right)\Phi(x_i,t)d\gamma d\alpha .
+\end{equation}
+
+Dans (\ref{filtre-LES}), $F$ est le noyau de convolution caract\'eristique du filtre utilis\'e, qui est associ\'e \`a l'\'echelle de coupure $\overline \Delta$.
+On calcule donc une partie du contenu spectral  de la solution $ \widetilde \Phi=\widetilde \Phi (x_i) =\overline{\Phi}(x_i,t)$, qui d\'epend des conditions initiales et aux limites. Les termes \`a fermer sont $$\dbar T ^{LES}_{ij}=\overline u_i\overline u_j-\overline{u_i u_j} $$ et $$ \Theta ^{LES}_i=\overline T \overline u_i-\overline{Tu_i}. $$
+
+
+\subsubsection{M\'ethode de r\'esolution}
+\label{Trio-r\'esolution}
+Pour un probl\`eme instationnaire, il convient de rajouter l'\'evolution en temps de la solution. Les \'equations semi-discr\'etis\'ees en espace s'\'ecrivent sous la forme matricielle :
+
+\begin{equation}
+\label{Sys-a-inverser}
+\begin{array}{l}
+\ds{
+M\frac{dU}{dt}=AU-L(U)U-B^T P+S}\\
+\ds{BU=0},
+\end{array}
+\end{equation}
+
+avec :
+
+\begin{itemize}
+\itemb
+$M$ la matrice de masse,
+\itemb
+$U$ le vecteur inconnu contenant les degr\'es de libert\'e en vitesse,
+\itemb
+$A$ l'op\'erateur discret de diffusion,
+\itemb
+$L(U)$ l'op\'erateur discret de convection non lin\'eaire,
+\itemb
+$B^T$ l'op\'erateur de gradient discret,
+\itemb
+$B$ l'op\'erateur de divergence discret.
+\end{itemize}
+
+Diff\'erents sch\'emas en temps sont disponibles dans TrioCFD (explicite, semi-implicite,...). La pression n'\'etant r\'egie par aucune \'equation, elle est obtenue \`a
+partir de la contrainte d' incompressibilit\'e. Cela implique que le champ de pression s'\'etablit instantan\'ement et doit n\'ecessairement \^etre int\'egr\'e implicitement en temps.\\
+D\'ecrivons la m\'ethode de r\'esolution, pour le syst\`eme suivant:
+
+\begin{equation}
+\label{schema-implicit}
+  \left\{
+\begin{array}{ll}
+\ds{M \frac{U^{n+1} - U^{n}}{\Delta t}} & =\ds{ A U^{n+1} - L(U^n)U^{n+1} - B^T P^{n+1} + S^n},\\
+\ds{B U^{n+1} = 0}.
+\end{array}
+\right.
+\end{equation}
+
+ Elle est bas\'ee sur un d\'ecouplage entre l'\'equation sur la vitesse et l'\'equation de continuit\'e. On utilise une m\'ethode de projection, qui consiste \`a pr\'edire un champ de vitesse, puis \`a le corriger pour imposer la contrainte d'incompressibilit\'e.
+ 
+ \begin{enumerate}
+ 
+ \item {\bf{Etape de pr\'ediction: }} calcul d'une vitesse $U^{\star}$ solution de 
+ 
+ \begin{equation}
+ \label{prediction}
+ \ds{
+ M\frac {U^{\star}-U^n}{\Delta t}=AU^{\star} -L(U^n)U^{\star} - B^T P^n +S^n.
+ }
+ \end{equation}
+
+
+\item {\bf{Etape de correction : } }\\
+
+La vitesse en fin de pas de temps v\'erifie les \'equations suivantes : 
+
+\begin{eqnarray}
+\label{corr1}
+\ds{ M\frac {U^{n+1}-U^{\star}}{\Delta t}+B^T \left( P^{n+1}-P^n\right) = 0}\\
+%
+\label{corr2}
+BU^{n+1}=0.
+\end{eqnarray}
+
+En appliquant l'op\'erateur de divergence discret \`a l'\'equation (\ref{corr1}) et en injectant la contrainte d'incompressibilit\'e (\ref{corr2}) on obtient une \'equation de Poisson discr\`ete qui nous permet de calculer $ P^{\prime} = 
+P^{n+1}-P^n$ : 
+
+\begin{equation}
+\ds{
+BM^{-1}B^T P^{\prime} = \frac{1}{\Delta t}BU^{\star}.
+}
+\end{equation}
+
+\item {\bf{Mise \`a jour des champs : }} finalement $\ds{ P^{n+1}=P^n +P^{\prime} , \ U^{n+1}= U^{\star} - \Delta t M^{-1} B^T P^{\prime}}$. 
+\end{enumerate}
+
+Une m\'ethode it\'erative doit \^etre introduite car le champ de vitesse $ U ^{n+1}$ obtenu ne satisfait pas n\'ecessairement le syst\`eme (\ref{schema-implicit}). Elle se r\'esume ainsi :\\
+
+
+Initialisation: $k=0$, $U^0=U^n$, $P^0=P^n$;
+
+\begin{eqnarray*}
+\ds{
+\frac{U^{\star, k+1}-U^{k}}{\Delta t}=AU^{k+1}-L(U^n)U^{k+1}-B^T P^{k} +S^n ,
+}\\
+\\
+\ds{\frac{U^{k+1}-U^{\star, k+1}}{\Delta t}+B^T (P^{k+1}-P^k)=0,\ BU^{k+1}=0 ,
+}\\
+\\
+\ds{BM^{-1}B^T(P^{k+1}-P^k)=\frac{1}{\Delta t}B U^{\star, k+1}.
+}
+\end{eqnarray*}
+
+
+
+\subsection{Axes de progr\`es}
+\label{section-strat\'egie}
+
+Les missions, les objectifs, les ambitions et les attentes autour du code TrioCFD sont les suivantes: 
+
+\begin{itemize}
+
+\item Continuer \`a d\'evelopper des comp\'etences d'experts en calcul scientifique pour la thermohydraulique monophasique 
+
+\item Progresser significativement dans notre compr\'ehension de la physique mise en jeu dans la thermohydraulique monophasique des r\'eacteurs
+
+\item Garder la ma\^itrise des mod\`eles physiques et num\'eriques et mener des activit\'es de recherche
+
+\item Revisiter les m\'ethodes de r\'esolution pour am\'eliorer les performances du code
+
+\item Positionner la CFD dans une d\'emarche de sûret\'e 
+
+\item \'etendre l'utilisation du logiciel en g\'en\'eral et au sein du CEA en particulier
+
+\item \'elargir le champ d'applications, en introduisant de nouvelles m\'ethodes de discr\'etisation et de nouveaux mod\`eles physiques
+
+\item \^etre en mesure de r\'epondre aux besoins actuels et futurs des programmes du CEA, de la DAM et des partenaires externes au CEA.
+
+\item \^etre coh\'erent avec la strat\'egie du STMF en thermohydraulique~\cite{Metaphor} et la strat\'egie de la DEN autour d'un syst\`eme int\'egr\'e de l'\'energie. 
+
+\end{itemize}
+
+C'est selon ce point de vue que la strat\'egie du pr\'esent plan de d\'eveloppement a \'et\'e pens\'ee. Nous d\'ecrivons ci-dessous, les principaux axes de progr\`es identifi\'es et retenus afin de r\'epondre aux attentes list\'ees ci-dessus : 
+
+\begin{itemize}
+\item[$\bullet$]
+{\bf{Am\'elioration de la robustesse et de la pr\'ecision :}}\\
+Il n'existe pas de code de calcul d\'epourvu de probl\`emes de robustesse. Un travail continu doit permettre d'am\'eliorer la pr\'ecision et la stabilit\'e des sch\'emas num\'eriques. Il doit s'appuyer sur les travaux de la litt\'erature ouverte et des collaborations scientifiques.\\
+\item[$\bullet$]
+{\bf{Am\'elioration des performances :}}\\
+Il s'agit d'un axe de progr\`es majeur, \`a mettre en regard du coût tr\`es \'elev\'e des calculs CFD\footnote{La notion de performance concerne ici le temps de restitution du r\'esultat.}. Deux leviers, utilis\'es conjointement, peuvent am\'eliorer la performance du code : une meilleure exploitation de l'architecture informatique et l'optimisation des sch\'emas num\'eriques et solveurs.\\
+\item[$\bullet$]
+{\bf{Permettre une plus grande souplesse au niveau du maillage : }}\\
+Les ph\'enom\`enes de m\'elanges turbulents seront d'autant mieux d\'ecrits que 
+\begin{itemize}
+\item
+le calcul prendra en compte la g\'eom\'etrie r\'eelle (par exemple les courbures des crayons combustibles cylindriques), avec une description des structures  la plus pr\'ecise possible ;
+\item
+le maillage sera localement adapt\'e \`a l'\'ecoulement (par exemple en adoptant des hexa\`edres ou des prismes en proche paroi) ;
+\end{itemize}
+Les maillages \`a r\'ealiser sont d'une grande complexit\'e, et les \'echelles \`a consid\'erer varient fortement. L'\'elaboration du maillage sera grandement facilit\'ee par la possibilit\'e d'utiliser des mailles de topologies quelconques, des maillages hybrides, avec \'eventuellement des non-conformit\'es.\\
+Un effort important doit porter sur le d\'eveloppement d'un sch\'ema num\'erique adapt\'e \`a ces maillages. \\
+\item[$\bullet$]
+{\bf{L'am\'elioration de la mod\'elisation des ph\'enom\`enes  turbulents }}\\
+La mod\'elisation de la turbulence (en proche paroi, en pr\'esence d'obstacles, dans des coudes, avec effets thermiques) n\'ecessite d'\^etre am\'elior\'ee. Il s'agit d'un axe de progr\`es hautement prioritaire eu \'egard aux probl\`emes physiques \'etudi\'es. Elle passe :
+\begin{itemize}
+\item
+par la mise en {\oe}uvre de nouveaux mod\`eles de turbulence,
+\item
+par l'am\'elioration des m\'ethodes num\'eriques. \\
+\end{itemize}
+
+\item[$\bullet$]
+{\bf{Mod\'elisation de l'interaction fluide-structure :}}\\
+Pour certaines configurations (typiquement les \'ecoulements dans les assemblages), on souhaite mod\'eliser finement les interactions entre le fluide et la structure.
+Actuellement, la m\'ethode adopt\'ee consiste \`a cha\^iner le calcul thermohydraulique et le calcul solide. A terme, on souhaiterait 
+prendre en compte le d\'eplacement des crayons ou plaques combustibles dans le code TrioCFD afin d'acc\'eder directement \`a l'effet que produit le d\'eplacement du solide sur le fluide.\\
+\item[$\bullet$]
+{\bf{Am\'elioration de la mod\'elisation du c{\oe}ur : }}\\
+La mod\'elisation du c{\oe}ur \`a l'\'echelle CFD, en maillant les structures explicitement (raisonnablement d'une partie du c{\oe}ur) pourra fournir des solutions de r\'ef\'erence comme aide \`a la validation des codes poreux.\\ 
+\item[$\bullet$]
+{\bf{Prise en compte des \'echanges thermohydrauliques \`a l'interface libre/poreux : }}\\
+L'interface entre un milieu libre mod\'elis\'e en CFD et un milieu poreux \footnote{On introduit "artificiellement" une interface dans les mod\'elisations multi\'echelles couplant deux niveaux de mod\'elisation (microscopique et macroscopique).} doit permettre les bons \'echanges thermohydrauliques.\\
+\item[$\bullet$] {\bf{ Pr\'ediction des incertitudes : }}\\
+Il est n\'ecessaire de mettre en place un cadre m\'ethodologique rigoureux permettant d'\'evaluer la cr\'edibilit\'e de r\'esultats de simulations.
+Le volet pr\'ediction des incertitudes concerne diff\'erents aspects, parmi lesquels  l'estimation des erreurs, l'analyse de sensibilit\'e, et est couvert en grande partie par la plateforme URANIE.\\
+\item [$\bullet$]
+{\bf{D\'ecomposition de domaine : }}\\
+Par la mise en place d'une m\'ethode de d\'ecomposition de domaine dans TrioCFD, un double objectif est vis\'e: l'am\'elioration des performances du code et la mise en {\oe}uvre d'une m\'ethode de parall\'elisme hybride adapt\'ee aux futures architectures des ordinateurs.\\
+\item [$\bullet$]
+{\bf{ Nouvelles fonctionnalit\'es : }}\\
+Afin d'\'etendre le domaine d'applications du code, des nouvelles fonctionnalit\'es doivent \^etre mise en place, telles que: un mod\`ele Lagrangien de suivi de particules d'abord sous une forme monodisperse puis polydisperse, le d\'eveloppement d'un mod\`ele compressible et le couplage avec la chimie.\\
+\item [$\bullet$]
+{\bf{ V\&V et documentation : }}\\
+La V\&V fait partie int\'egrante du projet de d\'eveloppement d'un code. Elle repose sur une base de tests unitaires et int\'egraux, qui doivent couvrir le domaine d'applications du code du point de vue de la physique et des options de calculs, \'egalement une documentation compl\`ete du code. 
+
+\end{itemize}
+
+
+Les deux options VEF et VDF ne poss\`edent pas les m\^emes mod\`eles de turbulence, un effort plus important a \'et\'e port\'e par le pass\'e sur le VDF qui dispose d'une plus grande vari\'et\'e de mod\`eles. \\
+Le pr\'esent plan de d\'eveloppement concerne principalement le VEF. 
+Cependant, il peut \^etre int\'eressant de commencer par tester une nouvelle m\'ethode num\'erique ou un mod\`ele de turbulence en VDF. En effet, l'utilisation d'un maillage constitu\'e de parall\'el\'epip\`edes rectangles permet en g\'en\'eral de nombreuses simplifications au niveau du sch\'ema et facilite l'analyse. 
+
+Les axes de progr\`es ayant \'et\'e rappel\'es, il s'agit maintenant de sp\'ecifier les m\'ethodes et mod\`eles \`a mettre en {\oe}uvre et l'\'etat d'avancement de leur
+impl\'ementation au moment de cette version r\'evis\'ee.  \textbf{Notons que pour un objectif donn\'e, diff\'erentes voies pourront \^etre \'etudi\'ees et r\'eorient\'ees si les r\'esultats s'av\'eraient d\'ecevants ou au contraire tr\`es encourageants}. 
+
+La strat\'egie de d\'eveloppement repose sur les ressources et les comp\'etences disponibles et les \'ech\'eances que l'on se fixe pour l'obtention de r\'esultats. L'\'ech\'eancier des d\'eveloppements \`a r\'ealiser repose, outre sur les besoins identifi\'es dans la feuille de route,  sur une veille bibliographique dans la litt\'erature ouverte et sur les comp\'etences disponibles au sein du laboratoire.
+
+Par ailleurs en 2019, une IHM pour le code TrioCFD a \'et\'e r\'ealis\'ee et le site internet a \'et\'e mis \`a jour. Des actions en continu, pr\'evues pour r\'epondre aux besoins des utilisateurs, ne sont pas reprises dans ce document. Seuls les besoins utilisateurs en terme de d\'eveloppement ou de V\&V sont pr\'ecis\'es au fil des diff\'erentes sections.
+
+\subsection{Ressources et charge de travail}
+\label{section-ressource}
+
+Le LMSF dispose de cinq personnes ayant la capacit\'e de participer au d\'eveloppement du code \footnote{On mentionne ici les  {\underline{ ressources disponibles}}, ind\'ependamment du budget attribu\'e au projet.} et trois personnes \`a sa validation. A elles huit, ces personnes r\'eunissent 
+\begin{itemize}
+\item
+des comp\'etences d'expert\footnote{Cette \'equipe est constitu\'ee d'ing\'enieurs-chercheurs qui b\'en\'eficient tous d'une th\`ese et d'une exp\'erience de plusieurs ann\'ees dans le calcul scientifique.} en analyse num\'erique et d\'eveloppement de codes de calculs ;
+\item
+des comp\'etences dans les nouveaux axes de d\'eveloppement identifi\'es.
+\end{itemize}
+
+Bien que ce plan soit \'etabli sur cinq ans, toutes les actions ne seront pas termin\'ees \`a cette \'ech\'eance. En effet, afin d'anticiper l'avenir, certaines \'etudes
+doivent \^etre initi\'ees aujourd'hui mais n'aboutiront \`a une exploitation en production qu'\`a long terme. Ainsi, on distingue quatre types d'actions :
+\begin{enumerate}
+\item
+{ \bf{D\'eveloppement et R\&D court terme}}~: \\
+ces actions visent \`a am\'eliorer le sch\'ema de calcul actuel utilis\'e en production, du point de vue de sa pr\'ecision, sa robustesse et ses performances. Leur dur\'ee de r\'ealisation est relativement courte (environ six mois-un an). Les d\'eveloppements informatiques \`a r\'ealiser sont modestes et les m\'ethodes \`a impl\'ementer bien document\'ees dans la litt\'erature.
+\item
+{\bf{R\&D moyen terme}}~: \\
+ces actions visent \`a introduire dans le code de nouvelles options, en particulier de nouveaux sch\'emas num\'eriques. Leur dur\'ee de r\'ealisation est de deux \`a trois ans pour arriver \`a une m\'ethode mature, sachant que des th\`eses pourront contribuer \`a leur r\'ealisation. Les d\'eveloppements \`a entreprendre sont cons\'equents mais sans impact majeur sur l'architecture logicielle.
+\item
+{\bf{R\&D long terme}}~: \\
+ces actions visent \`a se pr\'eparer aux futures architectures informatiques et \`a introduire plus de flexibilit\'e et de pr\'ecision au niveau des m\'ethodes. Elles n\'ecessitent des d\'eveloppements majeurs qui auront vraisemblablement beaucoup d'impacts sur l'architecture logicielle. Ces d\'eveloppements profiteront aux autres applications adoss\'ees \`a {\sc{TRUST}}.
+\item
+{\bf{Continu}}~: ces actions doivent \^etre poursuivies en continu. \\
+\end{enumerate}
+
+{\bf{Il est difficile de chiffrer des activit\'es de R\&D. Les \'ech\'eances donn\'ees dans le pr\'esent document seront \`a revoir chaque ann\'ee, en fonction des r\'esultats obtenus, des travaux de la litt\'erature ouverte, et des ressources humaines et financements disponibles. \\ 
+}}
+
+
+\subsection{Synth\`ese du programme de travail}
+\label{synthese_programme_travail}
+
+
+Nous avons prioris\'e les t\^aches suivant la classification suivante :
+\begin{itemize}
+ \item A: t\^aches incontournables \`a mener
+ \item B: t\^aches qui sont essentielles, dont le niveau de priorit\'e est juste inf\'erieur au t\^aches identifi\'ees en priorit\'e A
+ \item C: t\^aches qu'il faudrait aussi id\'ealement mener
+\end{itemize}
+
+Cette classification est \`a revoir chaque ann\'ee en fonction des r\'esultats obtenus, des diff\'erentes collaborations et des ressources humaines et financements disponibles. 
+
+\begin{center}
+\begin{longtable}{|c|c|c|c|c|c|} 
+\hline
+\rowcolor{almond} \multicolumn{3}{|c|}{Lot} & Num\'ero de  t\^ache & \'etat/Priorit\'e & Perspective\\
+\hline  
+ &  & Compressibilit\'e artificielle & T\^ache 1.1  & C & Envisag\'e en 2021 \\
+\cline{3-6}
+& &  & T\^ache 1.2.a & R\'ealis\'ee partiellement & Finalisation en 2021\\
+\cline{4-6}
+& & Stabilit\'e du sch\'ema & T\^ache 1.2.b & C & Lot 1.2.a achev\'e\\
+\cline{4-6}
+& &  & T\^ache 1.2.c & C & Lot 1.2.a achev\'e\\
+\cline{3-6}
+& & Convection non-lin\'eaire & T\^ache 1.3 & C  & Lot 3.1 achev\'e\\
+\cline{3-6}
+& & Conservation & T\^ache 1.4 & C  & Lot 3.1 achev\'e \\
+1& Sch\'ema VEF & \'energie cin\'etique &  &   & \\
+\cline{3-6}
+& & Sch\'ema de diffusion & T\^ache 1.5.a & C  & Lot 3.1 achev\'e\\
+\cline{4-6}
+& &  & T\^ache 1.5.b & C  & Lot 3.1 achev\'e\\
+\cline{3-6}
+& & & T\^ache 1.6.a & En cours  & Int\'egration en 2020\\
+\cline{4-6}
+& & Mod\`ele QC  & T\^ache 1.6.b & A  &  Lot 1.6.a achev\'e\\
+\cline{4-6}
+& &  & T\^ache 1.6.c & A  & Lot 1.6.a  achev\'e\\
+\cline{3-6}
+& & Discr\'etisation temporelle & T\^ache 1.7 & B & Lot 1.6 achev\'e\\
+\cline{3-6}
+& & Couplage fluide-solide & T\^ache 1.8 & B & Lot 1.7 achev\'e\\
+\cline{3-6}
+& & Post-traitement & T\^ache 1.9 & C & Lot 1.8 achev\'e \\
+\hline
+ &    &  & T\^ache 2.1.a & A  &  Finalisation en 2020 \\
+\cline{4-6}
+&  &   & T\^ache 2.1.b &  A &  Lot 2.1.a achev\'e \\
+\cline{4-6}
+&Mod\'elisation & RANS & T\^ache 2.1.c & B  &  Lot 2.1.a achev\'e\\
+\cline{4-6}
+2&de  la turbulence & & T\^ache 2.1.d & En cours  & Finalisation en 2020 \\
+\cline{4-6}
+& & & T\^ache 2.1.e & En cours  & Poursuivre en 2020 \\
+\cline{3-6}
+&  &    & T\^ache 2.2.a &  B &   Envisag\'e en 2021\\
+\cline{4-6}
+& &Mod\`eles de& T\^ache 2.2.b & En cours  & Finalisation en 2019 \\
+\cline{4-6}
+& & sous-maille& T\^ache 2.2.c & B  &  Envisag\'e en 2021 \\
+\hline
+
+&Discr\'etisation  & Poly\`edres quelconques  &T\^ache 3.1 & En cours  & Finalisation en 2025 \\
+\cline{3-6}
+3 & spatiale& EF Multi\'echelles & T\^ache 3.2 & R\'ealis\'ee partiellement  & Poursuivre en 2020\\
+\hline
+&  &Estimation d'erreurs &  T\^ache 4.1.a & En cours  & Poursuivre en 2020 \\
+\cline{4-6}
+& Maillage adaptatif, &\it{a posteriori} &  T\^ache 4.1.b & En cours  & Poursuivre en 2020 \\
+\cline{3-6}
+&  &D\'ecomposition & T\^ache 4.2.a  & C  &  Lot 4.2.b achev\'e \\
+\cline{4-6}
+4& HPC,&de domaine & T\^ache 4.2.b  &  En cours &  Poursuivre en 2020 \\
+\cline{4-6}
+& & & T\^ache 4.2.c  &  C &  Lot 4.2.b achev\'e \\
+\cline{3-6}
+& & Analyse & T\^ache 4.3.a & En cours  & Int\'egration en 2020 \\
+\cline{4-6}
+& QI&de sensibilit\'e & T\^ache 4.3.b & B  & Envisag\'e en 2020 \\
+\cline{4-6}
+& & & T\^ache 4.3.c & B  & Lot 4.3.b achev\'e \\
+\hline
+&&   &  T\^ache 5.1.b & En cours  &  Finalisation en 2019 \\
+\cline{4-6}
+&  &M\'ethode ALE  & T\^ache 5.1.c & En cours  & Int\'egration en 2020 \\
+\cline{4-6}
+&& pour ISF  &  T\^ache 5.1.d & B  &  Lot 5.1.c achev\'e \\
+\cline{4-6}
+& &  &  T\^ache 5.1.e & B  &  Lot 5.1.g achev\'e \\
+\cline{4-6}
+&&   &  T\^ache 5.1.f & A  &  Envisag\'e en 2020 \\
+\cline{4-6}
+&&   &  T\^ache 5.1.g & A  &  Envisag\'e en 2020\\
+\cline{3-6}
+5&Nouvelles &Mod\'elisation  &   &   &   \\
+&fonctionnalit\'es &polydisperse & T\^ache 5.2 & En cours  & Finalisation en 2020    \\
+& &de particules solides & &   &     \\
+\cline{3-6}
+& & \'ecoulements   & T\^ache 5.3.a  & C  & - \\
+\cline{4-6}
+& & compressibles  & T\^ache 5.3.b &  C & - \\
+\cline{3-6}
+& & Couplage avec &  & Pr\'eliminaires  &     \\
+& & SCORPIO & T\^ache 5.4 &  en cours  &  Poursuivre en 2020  \\
+\hline
+ & V\&V et &  &  T\^ache 6.1.a & Continu  & Continu  \\
+\cline{4-6}
+6& domaine de & V\&V & T\^ache 6.1.b & Continu  & Continu  \\
+\cline{3-6}
+& validation & Documentation &  T\^ache 6.2 & Continu  & Continu  \\
+\cline{3-6}
+& du code & Domaine de validation & T\^ache 6.3 & Continu  & Continu \\
+\hline
+\end{longtable}
+\end{center}
+
+Le rythme des sorties des versions de TrioCFD est de $1$ \`a $2$ par an, associ\'ees aux sorties de la base logicielle TRUST. Les versions de 2020 et 2021 se verront enrichis principalement : 
+\begin{itemize}
+\item de la documentation
+\item des travaux sur le mod\`ele quasi compressible
+\item d'am\'eliorations des mod\`eles de turbulence \`a l'\'echelle RANS
+\item de la possibilit\'e de r\'ealiser les premiers calculs RANS sur maillage mobile (ALE)
+\end{itemize}
+Les travaux de R\&D moyen et long termes (discr\'etisation spatiales, maillage adaptatif et am\'elioration du sch\'ema VEF) seront disponibles dans les versions suivantes.

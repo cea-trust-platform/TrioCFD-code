@@ -1,0 +1,249 @@
+\documentclass[10pt,twoside,a4paper]{memoir}
+\usepackage[ascii]{}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{lettrine}
+\usepackage{geometry}
+\usepackage{amsmath,amssymb,amsfonts,textcomp}
+\usepackage{amsthm}
+\usepackage{textcomp}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{fancybox}
+\usepackage{fancyvrb}
+\usepackage[open=true]{bookmark}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{array,multirow,multicol}
+\usepackage{lastpage}
+\usepackage{cellspace}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{xspace}
+\usepackage{layout}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{pifont}
+\usepackage{ulem}
+\usepackage{url}
+\usepackage{rotating}
+\usepackage{chngcntr}
+% espacement table des matieres et des figures entre numero et titre
+\usepackage{tocloft}
+\newcommand{\DF}{\displaystyle\frac}
+\renewcommand{\cftpartnumwidth}{3em}
+\cftsetindents{figure}{0em}{4em}
+\cftsetindents{table}{0em}{4em}
+%
+% Pour supprimer les encadres rouges des liens et definir leur fonte en bleu
+\usepackage{makeidx}
+\usepackage{hyperref}
+\hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
+%
+\setlength\hoffset{0cm}
+\setlength\voffset{0cm}
+\setlength\oddsidemargin{0cm}
+\setlength\evensidemargin{0cm}
+\setlength\topmargin{0cm}
+\setlength\headheight{0.45cm}
+\setlength\headsep{0.6cm}
+\setlength\marginparsep{0cm}
+\setlength\marginparwidth{0cm}
+\setlength\footskip{1.4cm}
+\setlength{\textheight}{670pt} 
+\setlength\textwidth{16.4cm}
+\setlength{\cellspacebottomlimit}{5pt}
+\setlength{\cellspacetoplimit}{5pt}
+\setlength{\parindent}{0pt}
+\setcounter{tocdepth}{2}
+\setsecnumdepth{section}
+% espacement corps de texte
+\baselineskip=14pt
+%
+% redefinition de la numerotation des figures et des tableaux
+\renewcommand{\thefigure}{\Roman{part}.\arabic{chapter}.\arabic{figure}}
+\renewcommand{\thetable}{\Roman{part}.\arabic{chapter}.\arabic{table}}
+%
+\makeatletter
+%% Because html converters don't know tabularnewline
+\floatstyle{ruled}\providecommand{\tabularnewline}{\\}
+%% nouvelle commande algorithm pour des zones de code
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}[chapter]
+\providecommand{\algorithmname}{Algorithm}
+\floatname{algorithm}{\protect\algorithmname}
+%
+\makeatother
+%
+\fancypagestyle{part}{%
+%%\fancyhead[L]{}
+%%\fancyhead[R]{\textit{\rightmark}}
+\lfoot{\textit{TrioCFD Models Documentation}}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}}
+%
+\fancypagestyle{chapter}{%
+%%\fancyhead[L]{\textit{\rightmark}}
+%%\fancyhead[R]{}
+\lfoot{\textit{TrioCFD Models Documentation}}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}}
+%
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.3pt}
+%%\lhead{\leftmark}
+\chead{}
+%%\rhead{\rightmark}
+\lfoot{\textit{TrioCFD Models Documentation}}
+\cfoot{}
+\rfoot{\thepage}
+%
+% definition du style des parties
+\usepackage{indentfirst}
+\renewcommand{\beforepartskip}{\null\vskip 5pt plus 1.8fil \newpage}
+\renewcommand{\afterpartskip}{\vskip 0pt plus 0.0fil }
+\renewcommand*{\partnumfont}{\normalfont\HUGE\sffamily}
+\renewcommand*{\parttitlefont}{\normalfont\Huge\sffamily}
+\renewcommand{\part}[1]{%
+  \phantomsection
+  \refstepcounter{part}%
+  \addcontentsline{toc}{part}%
+    {\protect\partnumberline{\thepart}#1}
+  \pagestyle{part}
+  \beforepartskip
+  \begin{adjustwidth}{}{10mm}\printpartnum. \space \printparttitle{#1}\end{adjustwidth}
+  \afterpartskip
+  }
+% definition du style des chapitres
+%
+\renewcommand{\clearforchapter}{\null\vskip 1pt}
+
+\makechapterstyle{customchapstyle}{%
+  \pagestyle{chapter}
+  \clearforchapter
+  \renewcommand*{\chapnumfont}{\normalfont\HUGE\sffamily}
+  \renewcommand*{\chaptitlefont}{\normalfont\huge\sffamily}
+  \settowidth{\chapindent}{\chapnumfont 111}
+  \renewcommand*{\chapterheadstart}{\begingroup
+    \vspace*{\beforechapskip}%
+    \begin{adjustwidth}{}{}%
+    \hrulefill
+    \smash{\rule{0.4pt}{15mm}}
+    \end{adjustwidth}\endgroup}
+  \renewcommand*{\printchaptername}{}
+  \renewcommand*{\chapternamenum}{}
+  \renewcommand*{\printchapternum}{%
+    \begin{adjustwidth}{}{}
+    \hfill
+    \raisebox{10mm}[0pt][0pt]{\chapnumfont \Roman{part}.\thechapter}%
+                              \hspace*{1em}
+    \end{adjustwidth}\vspace*{-3.0\onelineskip}}
+  \renewcommand*{\printchaptertitle}[1]{%
+    \vskip\onelineskip
+    \raggedleft {\chaptitlefont ##1}\par\nobreak}}
+%
+\counterwithin*{chapter}{part}
+%
+\makeindex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% debut du document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%
+% 1ere page
+\thispagestyle{empty}
+%\cfoot{}
+%\renewcommand{\headrulewidth}{0pt}
+%\renewcommand{\footrulewidth}{0pt}
+\begin{multicols}{2}
+\includegraphics[scale=0.75]{../pictures/cealogo.png}
+\begin{flushright}\Ovalbox{\begin{minipage}{8cm} \begin{center} \vspace{0.4cm}\Large{DES/ISAS/DM2S/STMF/LMSF}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
+\begin{flushright}\Ovalbox{\begin{minipage}{4cm} \begin{center} \vspace{0.4cm}\Large{\thepage/\pageref{LastPage}}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
+\end{multicols}
+\cornersize{.2}
+\Ovalbox{\begin{minipage}{16.2cm}
+\begin{center} \vspace{2cm}
+\parbox[t]{12cm}{\hspace{1cm}\huge{\textbf{USER DOCUMENTATION :}}
+\newline
+\hspace{3cm}\LARGE{\textbf{Models Documentation TrioCFD}}} \end{center}
+\vspace{0.4cm}
+\begin{center}\includegraphics[scale=0.5]{../pictures/TrioCFD.png} \end{center}
+\vspace{0.4cm}
+\begin{center}\includegraphics[scale=0.35]{../pictures/logo_DM2S.png} \end{center}
+\vspace{0.4cm}
+\setlength{\tabcolsep}{0.5cm}
+\begin{tabular}{ Sc|Sc|Sc|Sc }
+\hline
+Code Version & Date & Code manager & Authors \\
+ & & J. DARONA & \\ \hline
+ & &\multirow{3}{*}{\includegraphics[scale=0.65]{../validation_report/tools/sign_JD.png}} & P.E. ANGELI \\
+v1.8.2 & \today && A. CARTALADE\\
+ & && E. JAMELOT \\ \hline
+\multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } models\_report\_TrioCFD.tex } \\
+\multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
+\multicolumn{2}{c|}{\textbf{CEA SACLAY} } & \multicolumn{2}{c}{ } \\
+\cline{3-4}
+\multicolumn{2}{c|}{\textbf{91191 GIF-SUR-YVETTE CEDEX} } & \multicolumn{2}{c}{ } \\
+\multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sc}{\large{\textbf{DES/ISAS/DM2S/STMF/LMSF/UD}} } \\
+\multicolumn{2}{c|}{ } & \multicolumn{2}{c}{ } \\
+\end{tabular}
+\end{minipage}}
+\newpage
+%
+%
+% Style chapitres
+\chapterstyle{customchapstyle}
+%
+\tableofcontents
+\clearpage
+%
+%\listoffigures
+%
+%\vspace{6cm}
+\listoftables
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Introduction}
+\normalsize \normalfont
+\vspace{3.5cm}
+\input{./part1-introduction.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\label{sec:Equations-de-conservations}\'Equations de conservations : masse, quantit\'e de mouvement et \'energie}
+\normalsize \normalfont
+\input{./part2-conservationEquations.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\label{sec:Modeles-de-turbulence}Mod\`eles de turbulence}
+\normalsize \normalfont
+\input{./part3-turbulence.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{Perspectives}
+\normalsize \normalfont
+\vspace{4.5cm}
+\input{./part4-perspectives.tex}
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\Huge
+\section*{\label{sec:Annexe_ListeValid}Annexe A : liste des fiches de validation dans \texttt{TrioCFD}}
+\addcontentsline{toc}{part}{Annexe A: liste des fiches de validation dans \texttt{TrioCFD}}
+\normalsize \normalfont
+\input{./annexeA.tex}
+\pagebreak
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{plain}
+\bibliography{BibTeX_TrioCFD,18-Stokes_bib}
+\end{document}

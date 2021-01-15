@@ -1,0 +1,13 @@
+##generation documentation des modeles format note CEA
+#pdflatex TrioCFD_Modeles_clsDM2S.tex
+#bibtex TrioCFD_Modeles_clsDM2S
+#pdflatex TrioCFD_Modeles_clsDM2S.tex
+#pdflatex TrioCFD_Modeles_clsDM2S.tex
+#mv TrioCFD_Modeles_clsDM2S.pdf ../../doc/.
+
+#generation documentation des modeles format document utilisateur
+pdflatex models_report_TrioCFD.tex
+bibtex models_report_TrioCFD
+pdflatex models_report_TrioCFD.tex
+pdflatex models_report_TrioCFD.tex
+mv models_report_TrioCFD.pdf ../../doc/.

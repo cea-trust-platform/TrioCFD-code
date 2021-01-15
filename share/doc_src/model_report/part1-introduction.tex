@@ -1,0 +1,75 @@
+Le code de calcul \texttt{TrioCFD} est un logiciel open-source \cite{TrioCFD}
+pour les simulations en m\'ecanique des fluides, adapt\'e en particulier
+aux calculs massivement parall\`eles d\textquoteright \'ecoulements turbulents
+dans des configurations industrielles. Cette note technique est une
+documentation des mod\`eles physiques de ce code qui existe depuis plus
+de vingt-cinq ans (depuis les travaux sur les Volumes-El\'ements Finis
+dans \cite{Emon92}) et qui a trouv\'e des applications dans plusieurs
+sous-domaines de la m\'ecanique des fluides. De nombreuses r\'ef\'erences
+accessibles dans la litt\'erature (dont 28 th\`eses) d\'ecrivent les m\'ethodes
+num\'eriques du code ou des applications originales. Ces r\'ef\'erences
+(th\`eses et articles) peuvent \^etre retrouv\'ees au format \texttt{PDF}
+sur le site internet \cite{TrioCFD}. Cette note technique compl\`ete
+la description qualitative du site web en pr\'ecisant les mod\`eles math\'ematiques
+qui sont utilis\'es dans les simulations. Compte tenu de la diversification
+des applications depuis 1992, on restreint la description aux \'ecoulements
+monophasiques newtoniens, incompressibles et turbulents. Pour ce type
+d'\'ecoulements de nombreux d\'etails sont d\'ej\`a disponibles dans plusieurs
+r\'ef\'erences dont \cite[etc ...]{Angeli_etal_NURETH2015,Angeli_etal_FVCA2017,TrioCFD}.
+Cette note technique initie une documentation en faisant un effort
+de synth\`ese de la litt\'erature existante, mais aussi d'homog\'en\'eisation
+des notations aussi bien entre les \og mod\`eles physiques \fg{} et
+la partie \og m\'ethodes num\'eriques \fg{} qui font souvent l'objet
+de notations diff\'erentes entre les documents. Ici la partie num\'erique
+n'appara\^it que dans la section \ref{sub:Numerique-dans-TrioCFD}
+mais plusieurs nouvelles sections apparaitront dans les versions ult\'erieures
+de la mise \`a jour de cette documentation.
+
+Deux principales m\'ethodes de discr\'etisation peuvent \^etre utilis\'ees
+dans \texttt{TrioCFD} : la m\'ethode des Volume-El\'ements Finis (VEF)
+et celle des Volume-Diff\'erence Finies (VDF). Pour les VEF, les maillages
+associ\'es \`a cette m\'ethode doivent n\'ecessairement \^etre triangulaires
+(en 2D) ou t\'etra\'edriques (en 3D). Le code est programm\'e en langage
+\texttt{C++} et est bas\'e sur la base logicielle \texttt{TRUST} (\texttt{TR}io\_\texttt{U}
+\texttt{S}oftware for \texttt{T}hermalhydraulics), dans lequel sont
+notamment programm\'e l\textquoteright ensemble des m\'ethodes num\'eriques
+et des sch\'emas de discr\'etisation utilis\'es dans \texttt{TrioCFD}. La
+base \texttt{TRUST} est aussi le noyau d'autres applications du service
+STMF. Il est possible de r\'ealiser des impl\'ementations locales dans
+le code via le concept de \texttt{BALTIK} (\texttt{B}uilding an \texttt{A}pplication
+\texttt{L}inked to \texttt{T}r\texttt{I}o\_U \texttt{K}ernel), qui
+correspond \`a une brique de code (un ensemble de fichiers \texttt{.cpp}
+et \texttt{.h}) \`a modifier, puis de les int\'egrer \'eventuellement dans
+le code source une fois les d\'eveloppements v\'erifi\'es et valid\'es. Pour
+r\'esumer, \texttt{TrioCFD} s'appuie sur \texttt{TRUST} mais cette documentation
+ne concerne que la partie \texttt{TrioCFD}.
+
+Afin de pr\'eciser les mod\`eles math\'ematiques ainsi que leur domaine
+de validit\'e, il est n\'ecessaire de faire un rappel des \'equations de
+conservation de masse, de quantit\'e de mouvement et d'\'energie sans
+consid\'eration d'hypoth\`ese simplificatrice. C'est l'objet de la section
+\ref{sec:Equations-de-conservations} dans laquelle les \'equations
+seront pr\'esent\'ees sous leur forme la plus g\'en\'erale. Dans la mesure
+du possible, les mod\`eles math\'ematiques sont \'ecrits aussi bien en notations
+vectorielles qu'en notations indicielles. En notation vectorielle,
+les vecteurs, les tenseurs et les matrices sont \'ecrits en gras. Dans
+cette section, des rappels sont \'egalement effectu\'es sur les d\'efinitions
+des tenseurs du taux de d\'eformation et celui de rotation car ceux-ci
+sont utilis\'es dans la section suivante d\'edi\'ee aux mod\`eles de turbulence.
+Les mod\`eles de turbulence en m\'ecanique des fluides sont nombreux et
+plusieurs livres et publications de synth\`ese existent d\'ej\`a (e.g. \cite{Book_Chassaing,Argyropoulos-Markatos_ReviewTurbulence_AMM2015}).
+Dans \texttt{TrioCFD}, les mod\`eles qui sont d\'evelopp\'es sont ceux qui
+sont les plus couramment utilis\'es dans la litt\'erature et qui font
+l'objet d'un consensus dans le domaine tels que la LES (Smagorinski
+et WALE) et les diff\'erentes d\'eclinaisons du RANS $\overline{k}-\overline{\epsilon}$.
+Ils seront d\'etaill\'es dans la section \ref{sec:Modeles-de-turbulence}.
+Une base de cas tests d'environ 160 fiches de validations existe d\'ej\`a
+pour \texttt{TrioCFD}. La liste de ces fiches est \`a ce jour regroup\'ee
+dans un fichier \texttt{Excel} dont la version \texttt{PDF} est accessible
+en interne CEA. L'ensemble des cas tests de validation est synth\'etis\'e
+dans les deux tables \ref{tab:FichesValid1} et \ref{tab:FichesValid2}
+dans l'annexe \ref{sec:Annexe_ListeValid} de ce document. Dans les
+versions ult\'erieures de cette documentation, les mod\`eles d\'ecrits seront
+illustr\'es par quelques fiches de validation de liste en Annexe. Plusieurs
+mises \`a jour de cette documentation sont \`a pr\'evoir pour l'\'elargir
+petit \`a petit \`a l'ensemble des mod\`eles accessibles dans le code.
