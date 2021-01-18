@@ -5,6 +5,8 @@ Parameters {
 	TestCase . Temp_imposee
 	TestCase . flux_impose
 	TestCase . ldp_flux_impose
+	
+	ExtraUsedFile Temp_imposee.lata.TEMPERATURE_PHYSIQUE*
 }
 Chapter {
 
