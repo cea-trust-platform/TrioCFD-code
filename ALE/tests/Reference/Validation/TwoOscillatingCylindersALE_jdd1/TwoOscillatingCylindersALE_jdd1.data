@@ -27,8 +27,8 @@ Scatter DOM.Zones dom
 
 imposer_vit_bords_ale dom
 {
-	1 # number of mobile boundaries  #
-	CylinderRight Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # name and speed of the border ; KC = 0.01 so we have u = KC * R2 ; OMEGA = Sk * nu / (R2*R2) = 900 * 1.007e-6 = 9.063e-4 rad/s ; we have an oscillation position : g(t) = u*sin(OMEGA*t) --> derivative for velocity  #
+	1 # number of mobile boundaries #
+	CylinderRight Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # name and speed of the border ; KC = 0.01 so we have u=KC*R2. OMEGA = Sk * nu / (R2*R2) = 900 * 1.007e-6 = 9.063e-4 rad/s.  We have an oscillation position : g(t) = u*sin(OMEGA*t) --> derivative for velocity  #
 }
 
 # Solver used in order to solve the system giving the moving mesh velocity #
@@ -94,7 +94,7 @@ Read pb
 		# Pressure matrix solved with #
  		solveur_pression petsc cholesky { }
 		# Two operators are defined #
-		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework. Choice between: amont and muscl #
 		diffusion { }
 		# Uniform initial condition for velocity #
 		initial_conditions {
@@ -102,7 +102,7 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			CylinderRight  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # mobile bord in ALE framework ; KC = 0.01 so we have u = KC * R2 ; OMEGA = Sk * nu / (R2*R2) = 900 * 1.007e-7 = 9.063e-4 rad/s ; we have an oscillation position : g(t) = u*sin(OMEGA*t) --> derivative for velocity # 
+			CylinderRight  frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.01*(9.063e-4)*cos((9.063e-4)*t) 0.0 # mobile bord in ALE framework # 
 			CylinderLeft  paroi_fixe
 			RectangularBox paroi_fixe
 		}

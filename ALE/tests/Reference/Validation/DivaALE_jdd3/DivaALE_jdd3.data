@@ -32,7 +32,7 @@ Scatter DOM.Zones dom
 boundaries of the domain and specify the speed that must be imposed on them #
 Imposer_vit_bords_ALE dom
 {
-	1 # number of mobile boundaries  #
+	1 # number of mobile boundaries #
 	Cylindre_Centre Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # name and speed of the border #
 }
 
@@ -58,7 +58,7 @@ Read mon_schema
 	# Output criteria #
         # .out files printing period #
         dt_impr 5.e-6
-	tcpumax 47.5
+	# tcpumax 47.5 #
 	# .sauv files printing period #
         dt_sauv 100.
  	# facsec such as dt = facsec * min(dt(CFL),dt_max) ; for explicit scheme facsec <= 1. By default facsec equals to 1 #
@@ -101,7 +101,7 @@ Read pb
 		# Pressure matrix solved with #
  		solveur_pression	PETSC GCP { precond ssor { omega 1.5 } seuil 1e-9 impr }
 		# Two operators are defined #
-		convection {  ALE { muscl } } # A convective scheme for ALE framework : choice between: amont and muscl  #
+		convection {  ALE { muscl } } # A convective scheme for ALE framework. Choice between: amont and muscl #
 		diffusion { }
 		# Uniform initial condition for velocity #
 		initial_conditions {
@@ -109,7 +109,7 @@ Read pb
 			}
 		# Boundary conditions #
 		boundary_conditions {
-			Cylindre_Centre frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # mobile bord in ALE framework #
+			Cylindre_Centre frontiere_ouverte_vitesse_imposee Champ_front_ALE 2 0.003*125.66*cos(125.66*t) 0.0 # mobile bord in ALE framework #
 			Cylindre_Nord paroi_fixe
 			Cylindre_Sud paroi_fixe
 			Cylindre_Est paroi_fixe
