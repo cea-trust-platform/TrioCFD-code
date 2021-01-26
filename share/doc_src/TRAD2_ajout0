@@ -451,337 +451,6 @@ pb_phase_field Pb_base pb_phase_field -1 Problem to solve local instantaneous in
   attr navier_stokes_phase_field navier_stokes_phase_field navier_stokes_phase_field 1 Navier Stokes equation for the Phase Field problem.
   attr convection_diffusion_phase_field convection_diffusion_phase_field convection_diffusion_phase_field 1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
   ref constituant constituant
-probleme_couple_rayonnement coupled_problem pb_couple_rayonnement -1 This keyword is used to define a problem coupling several other problems to which radiation coupling is added.
-  ref modele modele_rayonnement_base
-frontiere_ouverte_temperature_imposee_rayo_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_transp -1 Imposed temperature condition for a radiation problem with transparent gas.
-paroi_echange_externe_impose_rayo_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_transp -1 External type exchange condition for a coupled problem with radiation in transparent gas.
-modele_rayonnement_base objet_u modele_rayonnement_base -1 Basic class for wall thermal radiation model.
-modele_rayonnement_milieu_transparent modele_rayonnement_base modele_rayonnement_milieu_transparent -2 Wall thermal radiation model for a transparent gas and resolving a radiation-conduction-thermohydraulics coupled problem in VDF or VEF.\input{{modelerayotransp}}
-  attr bloc bloc_lecture bloc 0 See description.
-paroi_flux_impose_rayo_transp paroi_flux_impose paroi_flux_impose_rayo_transp -1 Normal flux condition at the wall called bord (edge) for a radiation problem in transparent gas.
-paroi_temperature_imposee_rayo_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in transparent gas.
-champ_front_contact_rayo_transp_vef champ_front_contact_vef champ_front_contact_rayo_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in transparent fluid.
-echange_contact_rayo_transp_vdf paroi_echange_contact_vdf echange_contact_rayo_transp_vdf -1 Exchange boundary condition in VDF between the transparent fluid and the solid for a problem coupled with radiation. Without radiation, it is the equivalent of the Paroi_Echange_contact_VDF exchange condition.
-frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with transparent gas.
-frontiere_ouverte_rayo_transp_vdf frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vdf -1 doit disparaitre
-frontiere_ouverte_rayo_transp_vef frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vef -1 doit disparaitre
-
-pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
-pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 0 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_concentration_turbulent Pb_base pb_thermohydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_turbulent_qc Pb_base pb_thermohydraulique_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number. NL2 Warning : Available for VDF and VEF P0/P1NC discretization only.
-  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
-pb_thermohydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_turbulent_scalaires_passifs -1 Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_turbulent_qc_fraction_massique pb_avec_passif pb_thermohydraulique_turbulent_qc_fraction_massique -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
-  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
-navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
-navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_qc convection_diffusion_chaleur_turbulent_qc -1 Energy equation under low Mach number as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
-convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
-  attr espece espece espece 0 not_set
-modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
-mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
-  attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
-  attr longueur_maille chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) longueur_maille 1 different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.
-sous_maille_wale mod_turb_hyd_ss_maille sous_maille_wale -1 This is the WALE-model. It is a new sub-grid scale model for eddy-viscosity in LES that has the following properties : NL2 - it goes naturally to 0 at the wall (it doesn\'t need any information on the wall position or geometry) NL2 - it has the proper wall scaling in o(y3) in the vicinity of the wall NL2 - it reproduces correctly the laminar to turbulent transition.
-  attr cw floattant cw 1 The unique parameter (constant) of the WALE-model (by default value 0.5).
-sous_maille_smago mod_turb_hyd_ss_maille sous_maille_smago -1 Smagorinsky sub-grid turbulence model. NL2 Nut=Cs1*Cs1*l*l*sqrt(2*S*S) NL2 K=Cs2*Cs2*l*l*2*S
-  attr cs floattant cs 1 This is an optional keyword and the value is used to set the constant used in the Smagorinsky model (This is currently only valid for Smagorinsky models and it is set to 0.18 by default) .
-combinaison mod_turb_hyd_ss_maille combinaison -1 This keyword specifies a turbulent viscosity model where the turbulent viscosity is user-defined.
-  attr nb_var listchaine nb_var 1 Number and names of variables which will be used in the turbulent viscosity definition (by default 0)
-  attr fonction chaine fonction 1 Fonction for turbulent viscosity. X,Y,Z and variables defined previously can be used.
-longueur_melange mod_turb_hyd_ss_maille longueur_melange -1 This model is based on mixing length modelling. For a non academic configuration, formulation used in the code can be expressed basically as : NL2 $nu_t=(Kappa.y)^2$.dU/dy NL2 Till a maximum distance (dmax) set by the user in the data file, y is set equal to the distance from the wall (dist_w) calculated previously and saved in file Wall_length.xyz. [see Distance_paroi keyword] NL2 Then (from y=dmax), y decreases as an exponential function : y=dmax*exp[-2.*(dist_w-dmax)/dmax]
-  attr canalx floattant canalx 1 [height] : plane channel according to Ox direction (for the moment, formulation in the code relies on fixed heigh : H=2).
-  attr tuyauz floattant tuyauz 1 [diameter] : pipe according to Oz direction (for the moment, formulation in the code relies on fixed diameter : D=2).
-  attr verif_dparoi chaine verif_dparoi 1 not_set
-  attr dmax floattant dmax 1 Maximum distance.
-  attr fichier chaine fichier 1 not_set
-  attr fichier_ecriture_K_Eps chaine fichier_ecriture_K_Eps 1 When a resume with k-epsilon model is envisaged, this keyword allows to generate external MED-format file with evaluation of k and epsilon quantities (based on eddy turbulent viscosity and turbulent characteristic length returned by mixing length model). The frequency of the MED file print is set equal to dt_impr_ustar. Moreover, k-eps MED field is automatically saved at the last time step. MED file is then used for resuming a K-Epsilon calculation with the Champ_Fonc_Med keyword.
-sous_maille mod_turb_hyd_ss_maille sous_maille -1 Structure sub-grid function model.
-prandtl modele_turbulence_scal_base prandtl -1 The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
-  attr prdt chaine prdt 1 Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
-  attr prandt_turbulent_fonction_nu_t_alpha chaine prandt_turbulent_fonction_nu_t_alpha 1 Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha is the thermal diffusivity.
-schmidt modele_turbulence_scal_base schmidt -1 The Schmidt model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
-  attr scturb floattant scturb 1 Keyword to modify the constant (Sct) of Schmlidt model : Dt=Nut/Sct Default value is 0.7.
-modele_fonction_bas_reynolds_base objet_lecture modele_fonction_bas_reynolds_base -1 not_set
-transport_k_epsilon eqn_base transport_k_epsilon -1 The (k-eps) transport equation. To resume from a previous mixing length calculation, an external MED-format file containing reconstructed K and Epsilon quantities can be read (see fichier_ecriture_k_eps) thanks to the Champ_fonc_MED keyword. NL2 Warning, When used with the Quasi-compressible model, k and eps should be viewed as rho k and rho epsilon when defining initial and boundary conditions or when visualizing values for k and eps. This bug will be fixed in a future version.
-  attr with_nu chaine(into=["yes","no"]) with_nu 1 yes/no
-mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
-  attr eps_min floattant eps_min 1 Lower limitation of epsilon (default value 1.e-10).
-  attr eps_max floattant eps_max 1 Upper limitation of epsilon (default value 1.e+10).
-  attr k_min floattant k_min 1 Lower limitation of k (default value 1.e-10).
-  attr quiet rien quiet 1 To disable printing of information about k and epsilon.
-k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
-  attr cmu floattant cmu 1 Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
-  attr transport_k_epsilon transport_k_epsilon transport_k_epsilon 0 Keyword to define the (k-eps) transport equation.
-  attr modele_fonc_bas_reynolds modele_fonction_bas_reynolds_base modele_fonc_bas_reynolds 1 This keyword is used to set the bas Reynolds model used.
-loi_standard_hydr_old turbulence_paroi_base loi_standard_hydr_old 0 not_set
-loi_standard_hydr turbulence_paroi_base loi_standard_hydr 0 Keyword for the logarithmic wall law for a hydraulic problem. Loi_standard_hydr refers to first cell rank eddy-viscosity defined from continuous analytical functions, whereas Loi_standard_hydr_3couches from functions separataly defined for each sub-layer
-loi_expert_hydr loi_standard_hydr loi_expert_hydr 1 This keyword is similar to the previous keyword Loi_standard_hydr but has several additional options into brackets.
-  attr u_star_impose floattant u_star_impose 1 The value of the friction velocity (u*) is not calculated but given by the user.
-  attr methode_calcul_face_keps_impose chaine(into=["toutes_les_faces_accrochees","que_les_faces_des_elts_dirichlet"]) methode_calcul_face_keps_impose 1 The available options select the algorithm to apply K and Eps boundaries condition (the algorithms differ according to the faces).NL2 toutes_les_faces_accrochees : Default option in 2D (the algorithm is the same than the algorithm used in Loi_standard_hydr) NL2 que_les_faces_des_elts_dirichlet : Default option in 3D (another algorithm where less faces are concerned when applying K-Eps boundary condition).
-  attr kappa floattant kappa 1 The value can be changed from the default one (0.415)
-  attr Erugu floattant Erugu 1 The value of E can be changed from the default one for a smooth wall (9.11). It is also possible to change the value for one boundary wall only with paroi_rugueuse keyword/
-  attr A_plus floattant A_plus 1 The value can can be changed from the default one (26.0)
-loi_standard_hydr_scalaire turbulence_paroi_scalaire_base loi_standard_hydr_scalaire 0 Keyword for the law of the wall.
-loi_expert_scalaire loi_standard_hydr_scalaire loi_expert_scalaire 1 Keyword similar to keyword Loi_standard_hydr_scalaire but with additional option.
-  attr prdt_sur_kappa floattant prdt_sur_kappa 1 This option is to change the default value of 2.12 in the scalable wall function.
-  attr calcul_ldp_en_flux_impose entier(into=[0,1]) calcul_ldp_en_flux_impose 1 By default (value set to 0), the law of the wall is not applied for a wall with a Neumann condition. With value set to 1, the law is applied even on a wall with Neumann condition.
-loi_analytique_scalaire turbulence_paroi_scalaire_base loi_analytique_scalaire 0 not_set
-paroi_tble turbulence_paroi_base paroi_tble 1 Keyword for the Thin Boundary Layer Equation wall-model (a more complete description of the model can be found into this PDF file). The wall shear stress is evaluated thanks to boundary layer equations applied in a one-dimensional fine grid in the near-wall region.
-  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
-  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
-  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
-  attr stats twofloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 2 values are required : the starting time and ending time of the statistics computation.
-  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
-  attr restart rien restart 1 not_set
-  attr stationnaire entierfloat stationnaire 1 not_set
-  attr lambda chaine lambda_u 1 not_set
-  attr mu chaine mu 1 not_set
-  attr sans_source_boussinesq rien sans_source_boussinesq 1 not_set
-  attr alpha floattant alpha 1 not_set
-  attr kappa floattant kappa 1 not_set
-paroi_tble_scal turbulence_paroi_scalaire_base paroi_tble_scal 1 Keyword for the Thin Boundary Layer Equation thermal wall-model.
-  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
-  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
-  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
-  attr nb_comp entier nb_comp 1 Number of component to solve in the fine grid (1 if 2D simulation (2D not available yet), 2 if 3D simulation).
-  attr stats fourfloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 4 values are required : the starting time of velocity averaging, the starting time of the RMS fluctuations, the ending time of the statistics computation and finally the print time period for the statistics.
-  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
-  attr prandtl floattant prandtl 1 not_set
-loi_paroi_nu_impose turbulence_paroi_scalaire_base loi_paroi_nu_impose 1 Keyword to impose Nusselt numbers on the wall for the thermohydraulic problems. To use this option, it is necessary to give in the data file the value of the hydraulic diameter and the expression of the Nusselt number.
-  attr nusselt chaine nusselt 0 The Nusselt number. This expression can be a function of x, y, z, Re (Reynolds number), Pr (Prandtl number).
-  attr diam_hydr field_base diam_hydr 0 The hydraulic diameter.
-negligeable turbulence_paroi_base negligeable 0 Keyword to suppress the calculation of a law of the wall with a turbulence model. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall (tau_tan /rho= nu dU/dy). NL2 Warning: This keyword is not available for k-epsilon models. In that case you must choose a wall law.
-negligeable_scalaire turbulence_paroi_scalaire_base negligeable_scalaire 0 Keyword to suppress the calculation of a law of the wall with a turbulence model for thermohydraulic problems. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall.
-utau_imp turbulence_paroi_base utau_imp 1 Keyword to impose the friction velocity on the wall with a turbulence model for thermohydraulic problems. There are two possibilities to use this keyword : NL2 1 - we can impose directly the value of the friction velocity u_star. NL2 2 - we can also give the friction coefficient and hydraulic diameter. So, TRUST determines the friction velocity by : u_star = U*sqrt(lambda_c/8).
-  attr u_tau field_base u_tau 1 Field type.
-  attr lambda_c chaine lambda_c 1 The friction coefficient. It can be function of the spatial coordinates x,y,z, the Reynolds number Re, and the hydraulic diameter.
-  attr diam_hydr field_base diam_hydr 1 The hydraulic diameter.
-source_transport_k_eps source_base source_transport_k_eps -1 Keyword to alter the source term constants in the standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92
-  attr c1_eps floattant c1_eps 1 First constant.
-  attr c2_eps floattant c2_eps 1 Second constant.
-Source_Transport_K_Eps_anisotherme source_transport_k_eps Source_Transport_K_Eps_anisotherme -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
-  attr c3_eps floattant c3_eps 1 Third constant.
-source_transport_k_eps_aniso_concen source_transport_k_eps source_transport_k_eps_aniso_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
-  attr c3_eps floattant c3_eps 1 Third constant.
-source_transport_k_eps_aniso_therm_concen source_transport_k_eps source_transport_k_eps_aniso_therm_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
-  attr c3_eps floattant c3_eps 1 Third constant.
-frontiere_ouverte_k_eps_impose condlim_base frontiere_ouverte_k_eps_impose -1 Turbulence condition imposed on an open boundary called bord (edge) (this situation corresponds to a fluid inlet). This condition must be associated with an imposed inlet velocity condition.
-  attr ch front_field_base ch 0 Boundary field type.
-boundary_field_uniform_keps_from_ud front_field_base boundary_field_uniform_keps_from_ud 1 field which allows to impose on a boundary K and EPS values derived from U velocity and D hydraulic diameter
-  attr u floattant u 0 value of velocity
-  attr d floattant d 0 value of hydraulic diameter
-field_uniform_keps_from_ud field_base field_uniform_keps_from_ud 1 field which allows to impose on a domain K and EPS values derived from U velocity and D hydraulic diameter
-  attr u floattant u 0 value of velocity specified in boundary condition.
-  attr d floattant d 0 value of hydraulic diameter specified in boundary condition
-paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to designate a Robin boundary condition (a.u+b.du/dn=c) associated with the Pironneau methodology for the wall laws. The value of given by the delta option is the distance between the mesh (where symmetry boundary condition is applied) and the fictious wall. This boundary condition needs the definition of the dedicated source terms (Source_Robin or Source_Robin_Scalaire) according the equations used.
-  attr delta floattant delta 0 not_set
-paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
-  attr erugu floattant erugu 0 Constant value for roughness
-diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
-frontiere_ouverte_temperature_imposee_rayo_semi_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition for a radiation problem with semi transparent gas.
-paroi_echange_externe_impose_rayo_semi_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_semi_transp -1 External type exchange condition for a coupled problem with radiation in semi transparent gas.
-paroi_flux_impose_rayo_semi_transp_vdf paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vdf -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VDF).
-paroi_flux_impose_rayo_semi_transp_vef paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vef -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VEF).
-paroi_temperature_imposee_rayo_semi_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in semi transparent gas.
-champ_front_contact_rayo_semi_transp_vef champ_front_contact_vef champ_front_contact_rayo_semi_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in semi transparent fluid.
-paroi_echange_contact_rayo_semi_transp_vdf paroi_echange_contact_vdf paroi_echange_contact_rayo_semi_transp_vdf -1 Exchange boundary condition in VDF between the semi transparent fluid and the solid for a problem coupled with radiation.
-frontiere_ouverte_rayo_semi_transp frontiere_ouverte frontiere_ouverte_rayo_semi_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with semi transparent gas.
-eq_rayo_semi_transp objet_lecture nul -1 Irradiancy equation.
-  attr solveur solveur_sys_base solveur 0 Solver of the irradiancy equation.
-  attr conditions_limites|boundary_conditions condlims conditions_limites 1 Boundary conditions.
-modele_rayo_semi_transp Pb_base modele_rayo_semi_transp -3 Radiation model for semi transparent gas. The model should be associated to the coupling problem BEFORE the time scheme.
-  attr eq_rayo_semi_transp eq_rayo_semi_transp eq_rayo_semi_transp 1 Irradiancy G equation. Radiative flux equals -grad(G)/3/kappa.
-pb_couple_rayo_semi_transp coupled_problem pb_couple_rayo_semi_transp -1 Problem coupling several other problems to which radiation coupling is added (for semi transparent gas). NL2 You have to associate a modele_rayo_semi_transpNL2 You have to add a radiative term source in energy equation NL2 Warning: Calculation with semi transparent gas model may lead to divergence when high temperature differences are used. Indeed, the calculation of the stability time step of the equation does not take in account the source term. In semi transparent gas model, energy equation source term depends strongly of temperature via irradiance and stability is not guaranteed by the calculated time step. Reducing the facsec of the time scheme is a good tip to reach convergence when divergence is encountered.
-  ref modele modele_rayo_semi_transp
-  ref scheme schema_temps_base
-  ref scheme_2 schema_temps_base
-source_rayo_semi_transp source_base source_rayo_semi_transp 0 Radiative term source in energy equation.
-flux_radiatif condlim_base flux_radiatif 0 Boundary condition for radiation equation.
-  attr na chaine(into=["A"]) na 0 Keyword for constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
-  attr a floattant a 0 Value of constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
-  attr ne chaine(into=["emissivite"]) ne 0 Keyword for wall emissivity.
-  attr emissivite front_field_base emissivite 0 Wall emissivity, value between 0 and 1.
-flux_radiatif_vdf flux_radiatif flux_radiatif_vdf -1 Boundary condition for radiation equation in VDF.
-flux_radiatif_vef flux_radiatif flux_radiatif_vef -1 Boundary condition for radiation equation in VEF.
-
-pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
-pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 0 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_concentration_turbulent Pb_base pb_thermohydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_turbulent_qc Pb_base pb_thermohydraulique_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number. NL2 Warning : Available for VDF and VEF P0/P1NC discretization only.
-  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
-pb_thermohydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_turbulent_scalaires_passifs -1 Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
-pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
-  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  ref constituant constituant
-pb_thermohydraulique_turbulent_qc_fraction_massique pb_avec_passif pb_thermohydraulique_turbulent_qc_fraction_massique -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
-  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
-navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
-navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
-convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_qc convection_diffusion_chaleur_turbulent_qc -1 Energy equation under low Mach number as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
-convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
-  attr espece espece espece 0 not_set
-modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
-mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
-  attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
-  attr longueur_maille chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) longueur_maille 1 different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.
-sous_maille_wale mod_turb_hyd_ss_maille sous_maille_wale -1 This is the WALE-model. It is a new sub-grid scale model for eddy-viscosity in LES that has the following properties : NL2 - it goes naturally to 0 at the wall (it doesn\'t need any information on the wall position or geometry) NL2 - it has the proper wall scaling in o(y3) in the vicinity of the wall NL2 - it reproduces correctly the laminar to turbulent transition.
-  attr cw floattant cw 1 The unique parameter (constant) of the WALE-model (by default value 0.5).
-sous_maille_smago mod_turb_hyd_ss_maille sous_maille_smago -1 Smagorinsky sub-grid turbulence model. NL2 Nut=Cs1*Cs1*l*l*sqrt(2*S*S) NL2 K=Cs2*Cs2*l*l*2*S
-  attr cs floattant cs 1 This is an optional keyword and the value is used to set the constant used in the Smagorinsky model (This is currently only valid for Smagorinsky models and it is set to 0.18 by default) .
-combinaison mod_turb_hyd_ss_maille combinaison -1 This keyword specifies a turbulent viscosity model where the turbulent viscosity is user-defined.
-  attr nb_var listchaine nb_var 1 Number and names of variables which will be used in the turbulent viscosity definition (by default 0)
-  attr fonction chaine fonction 1 Fonction for turbulent viscosity. X,Y,Z and variables defined previously can be used.
-longueur_melange mod_turb_hyd_ss_maille longueur_melange -1 This model is based on mixing length modelling. For a non academic configuration, formulation used in the code can be expressed basically as : NL2 $nu_t=(Kappa.y)^2$.dU/dy NL2 Till a maximum distance (dmax) set by the user in the data file, y is set equal to the distance from the wall (dist_w) calculated previously and saved in file Wall_length.xyz. [see Distance_paroi keyword] NL2 Then (from y=dmax), y decreases as an exponential function : y=dmax*exp[-2.*(dist_w-dmax)/dmax]
-  attr canalx floattant canalx 1 [height] : plane channel according to Ox direction (for the moment, formulation in the code relies on fixed heigh : H=2).
-  attr tuyauz floattant tuyauz 1 [diameter] : pipe according to Oz direction (for the moment, formulation in the code relies on fixed diameter : D=2).
-  attr verif_dparoi chaine verif_dparoi 1 not_set
-  attr dmax floattant dmax 1 Maximum distance.
-  attr fichier chaine fichier 1 not_set
-  attr fichier_ecriture_K_Eps chaine fichier_ecriture_K_Eps 1 When a resume with k-epsilon model is envisaged, this keyword allows to generate external MED-format file with evaluation of k and epsilon quantities (based on eddy turbulent viscosity and turbulent characteristic length returned by mixing length model). The frequency of the MED file print is set equal to dt_impr_ustar. Moreover, k-eps MED field is automatically saved at the last time step. MED file is then used for resuming a K-Epsilon calculation with the Champ_Fonc_Med keyword.
-sous_maille mod_turb_hyd_ss_maille sous_maille -1 Structure sub-grid function model.
-prandtl modele_turbulence_scal_base prandtl -1 The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
-  attr prdt chaine prdt 1 Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
-  attr prandt_turbulent_fonction_nu_t_alpha chaine prandt_turbulent_fonction_nu_t_alpha 1 Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha is the thermal diffusivity.
-schmidt modele_turbulence_scal_base schmidt -1 The Schmidt model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
-  attr scturb floattant scturb 1 Keyword to modify the constant (Sct) of Schmlidt model : Dt=Nut/Sct Default value is 0.7.
-modele_fonction_bas_reynolds_base objet_lecture modele_fonction_bas_reynolds_base -1 not_set
-transport_k_epsilon eqn_base transport_k_epsilon -1 The (k-eps) transport equation. To resume from a previous mixing length calculation, an external MED-format file containing reconstructed K and Epsilon quantities can be read (see fichier_ecriture_k_eps) thanks to the Champ_fonc_MED keyword. NL2 Warning, When used with the Quasi-compressible model, k and eps should be viewed as rho k and rho epsilon when defining initial and boundary conditions or when visualizing values for k and eps. This bug will be fixed in a future version.
-  attr with_nu chaine(into=["yes","no"]) with_nu 1 yes/no
-mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
-  attr eps_min floattant eps_min 1 Lower limitation of epsilon (default value 1.e-10).
-  attr eps_max floattant eps_max 1 Upper limitation of epsilon (default value 1.e+10).
-  attr k_min floattant k_min 1 Lower limitation of k (default value 1.e-10).
-  attr quiet rien quiet 1 To disable printing of information about k and epsilon.
-k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
-  attr cmu floattant cmu 1 Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
-  attr transport_k_epsilon transport_k_epsilon transport_k_epsilon 0 Keyword to define the (k-eps) transport equation.
-  attr modele_fonc_bas_reynolds modele_fonction_bas_reynolds_base modele_fonc_bas_reynolds 1 This keyword is used to set the bas Reynolds model used.
-loi_standard_hydr_old turbulence_paroi_base loi_standard_hydr_old 0 not_set
-loi_standard_hydr turbulence_paroi_base loi_standard_hydr 0 Keyword for the logarithmic wall law for a hydraulic problem. Loi_standard_hydr refers to first cell rank eddy-viscosity defined from continuous analytical functions, whereas Loi_standard_hydr_3couches from functions separataly defined for each sub-layer
-loi_expert_hydr loi_standard_hydr loi_expert_hydr 1 This keyword is similar to the previous keyword Loi_standard_hydr but has several additional options into brackets.
-  attr u_star_impose floattant u_star_impose 1 The value of the friction velocity (u*) is not calculated but given by the user.
-  attr methode_calcul_face_keps_impose chaine(into=["toutes_les_faces_accrochees","que_les_faces_des_elts_dirichlet"]) methode_calcul_face_keps_impose 1 The available options select the algorithm to apply K and Eps boundaries condition (the algorithms differ according to the faces).NL2 toutes_les_faces_accrochees : Default option in 2D (the algorithm is the same than the algorithm used in Loi_standard_hydr) NL2 que_les_faces_des_elts_dirichlet : Default option in 3D (another algorithm where less faces are concerned when applying K-Eps boundary condition).
-  attr kappa floattant kappa 1 The value can be changed from the default one (0.415)
-  attr Erugu floattant Erugu 1 The value of E can be changed from the default one for a smooth wall (9.11). It is also possible to change the value for one boundary wall only with paroi_rugueuse keyword/
-  attr A_plus floattant A_plus 1 The value can can be changed from the default one (26.0)
-loi_standard_hydr_scalaire turbulence_paroi_scalaire_base loi_standard_hydr_scalaire 0 Keyword for the law of the wall.
-loi_expert_scalaire loi_standard_hydr_scalaire loi_expert_scalaire 1 Keyword similar to keyword Loi_standard_hydr_scalaire but with additional option.
-  attr prdt_sur_kappa floattant prdt_sur_kappa 1 This option is to change the default value of 2.12 in the scalable wall function.
-  attr calcul_ldp_en_flux_impose entier(into=[0,1]) calcul_ldp_en_flux_impose 1 By default (value set to 0), the law of the wall is not applied for a wall with a Neumann condition. With value set to 1, the law is applied even on a wall with Neumann condition.
-loi_analytique_scalaire turbulence_paroi_scalaire_base loi_analytique_scalaire 0 not_set
-paroi_tble turbulence_paroi_base paroi_tble 1 Keyword for the Thin Boundary Layer Equation wall-model (a more complete description of the model can be found into this PDF file). The wall shear stress is evaluated thanks to boundary layer equations applied in a one-dimensional fine grid in the near-wall region.
-  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
-  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
-  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
-  attr stats twofloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 2 values are required : the starting time and ending time of the statistics computation.
-  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
-  attr restart rien restart 1 not_set
-  attr stationnaire entierfloat stationnaire 1 not_set
-  attr lambda chaine lambda_u 1 not_set
-  attr mu chaine mu 1 not_set
-  attr sans_source_boussinesq rien sans_source_boussinesq 1 not_set
-  attr alpha floattant alpha 1 not_set
-  attr kappa floattant kappa 1 not_set
-paroi_tble_scal turbulence_paroi_scalaire_base paroi_tble_scal 1 Keyword for the Thin Boundary Layer Equation thermal wall-model.
-  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
-  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
-  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
-  attr nb_comp entier nb_comp 1 Number of component to solve in the fine grid (1 if 2D simulation (2D not available yet), 2 if 3D simulation).
-  attr stats fourfloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 4 values are required : the starting time of velocity averaging, the starting time of the RMS fluctuations, the ending time of the statistics computation and finally the print time period for the statistics.
-  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
-  attr prandtl floattant prandtl 1 not_set
-loi_paroi_nu_impose turbulence_paroi_scalaire_base loi_paroi_nu_impose 1 Keyword to impose Nusselt numbers on the wall for the thermohydraulic problems. To use this option, it is necessary to give in the data file the value of the hydraulic diameter and the expression of the Nusselt number.
-  attr nusselt chaine nusselt 0 The Nusselt number. This expression can be a function of x, y, z, Re (Reynolds number), Pr (Prandtl number).
-  attr diam_hydr field_base diam_hydr 0 The hydraulic diameter.
-negligeable turbulence_paroi_base negligeable 0 Keyword to suppress the calculation of a law of the wall with a turbulence model. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall (tau_tan /rho= nu dU/dy). NL2 Warning: This keyword is not available for k-epsilon models. In that case you must choose a wall law.
-negligeable_scalaire turbulence_paroi_scalaire_base negligeable_scalaire 0 Keyword to suppress the calculation of a law of the wall with a turbulence model for thermohydraulic problems. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall.
-utau_imp turbulence_paroi_base utau_imp 1 Keyword to impose the friction velocity on the wall with a turbulence model for thermohydraulic problems. There are two possibilities to use this keyword : NL2 1 - we can impose directly the value of the friction velocity u_star. NL2 2 - we can also give the friction coefficient and hydraulic diameter. So, TRUST determines the friction velocity by : u_star = U*sqrt(lambda_c/8).
-  attr u_tau field_base u_tau 1 Field type.
-  attr lambda_c chaine lambda_c 1 The friction coefficient. It can be function of the spatial coordinates x,y,z, the Reynolds number Re, and the hydraulic diameter.
-  attr diam_hydr field_base diam_hydr 1 The hydraulic diameter.
-source_transport_k_eps source_base source_transport_k_eps -1 Keyword to alter the source term constants in the standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92
-  attr c1_eps floattant c1_eps 1 First constant.
-  attr c2_eps floattant c2_eps 1 Second constant.
-Source_Transport_K_Eps_anisotherme source_transport_k_eps Source_Transport_K_Eps_anisotherme -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
-  attr c3_eps floattant c3_eps 1 Third constant.
-source_transport_k_eps_aniso_concen source_transport_k_eps source_transport_k_eps_aniso_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
-  attr c3_eps floattant c3_eps 1 Third constant.
-source_transport_k_eps_aniso_therm_concen source_transport_k_eps source_transport_k_eps_aniso_therm_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
-  attr c3_eps floattant c3_eps 1 Third constant.
-frontiere_ouverte_k_eps_impose condlim_base frontiere_ouverte_k_eps_impose -1 Turbulence condition imposed on an open boundary called bord (edge) (this situation corresponds to a fluid inlet). This condition must be associated with an imposed inlet velocity condition.
-  attr ch front_field_base ch 0 Boundary field type.
-boundary_field_uniform_keps_from_ud front_field_base boundary_field_uniform_keps_from_ud 1 field which allows to impose on a boundary K and EPS values derived from U velocity and D hydraulic diameter
-  attr u floattant u 0 value of velocity
-  attr d floattant d 0 value of hydraulic diameter
-field_uniform_keps_from_ud field_base field_uniform_keps_from_ud 1 field which allows to impose on a domain K and EPS values derived from U velocity and D hydraulic diameter
-  attr u floattant u 0 value of velocity specified in boundary condition.
-  attr d floattant d 0 value of hydraulic diameter specified in boundary condition
-paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to designate a Robin boundary condition (a.u+b.du/dn=c) associated with the Pironneau methodology for the wall laws. The value of given by the delta option is the distance between the mesh (where symmetry boundary condition is applied) and the fictious wall. This boundary condition needs the definition of the dedicated source terms (Source_Robin or Source_Robin_Scalaire) according the equations used.
-  attr delta floattant delta 0 not_set
-paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
-  attr erugu floattant erugu 0 Constant value for roughness
-diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
 floatentier objet_lecture nul 0 A real and an integer.
   attr the_float floattant the_float 0 Real.
   attr the_int entier the_int 0 Integer.
@@ -1139,6 +808,337 @@ contact_vdf_vef condlim_base contact_vdf_vef 0 Boundary condition in the case of
   attr champ front_field_base champ 0 Boundary field type.
 contact_vef_vdf condlim_base contact_vef_vdf 0 Boundary condition in the case of two problems (VEF -> VDF).
   attr champ front_field_base champ 0 Boundary field type.
+
+pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
+pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 0 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_concentration_turbulent Pb_base pb_thermohydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_turbulent_qc Pb_base pb_thermohydraulique_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number. NL2 Warning : Available for VDF and VEF P0/P1NC discretization only.
+  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
+pb_thermohydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_turbulent_scalaires_passifs -1 Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
+pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_turbulent_qc_fraction_massique pb_avec_passif pb_thermohydraulique_turbulent_qc_fraction_massique -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
+  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
+navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
+navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
+convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_qc convection_diffusion_chaleur_turbulent_qc -1 Energy equation under low Mach number as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
+convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
+convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
+  attr espece espece espece 0 not_set
+modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
+mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
+  attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
+  attr longueur_maille chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) longueur_maille 1 different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.
+sous_maille_wale mod_turb_hyd_ss_maille sous_maille_wale -1 This is the WALE-model. It is a new sub-grid scale model for eddy-viscosity in LES that has the following properties : NL2 - it goes naturally to 0 at the wall (it doesn\'t need any information on the wall position or geometry) NL2 - it has the proper wall scaling in o(y3) in the vicinity of the wall NL2 - it reproduces correctly the laminar to turbulent transition.
+  attr cw floattant cw 1 The unique parameter (constant) of the WALE-model (by default value 0.5).
+sous_maille_smago mod_turb_hyd_ss_maille sous_maille_smago -1 Smagorinsky sub-grid turbulence model. NL2 Nut=Cs1*Cs1*l*l*sqrt(2*S*S) NL2 K=Cs2*Cs2*l*l*2*S
+  attr cs floattant cs 1 This is an optional keyword and the value is used to set the constant used in the Smagorinsky model (This is currently only valid for Smagorinsky models and it is set to 0.18 by default) .
+combinaison mod_turb_hyd_ss_maille combinaison -1 This keyword specifies a turbulent viscosity model where the turbulent viscosity is user-defined.
+  attr nb_var listchaine nb_var 1 Number and names of variables which will be used in the turbulent viscosity definition (by default 0)
+  attr fonction chaine fonction 1 Fonction for turbulent viscosity. X,Y,Z and variables defined previously can be used.
+longueur_melange mod_turb_hyd_ss_maille longueur_melange -1 This model is based on mixing length modelling. For a non academic configuration, formulation used in the code can be expressed basically as : NL2 $nu_t=(Kappa.y)^2$.dU/dy NL2 Till a maximum distance (dmax) set by the user in the data file, y is set equal to the distance from the wall (dist_w) calculated previously and saved in file Wall_length.xyz. [see Distance_paroi keyword] NL2 Then (from y=dmax), y decreases as an exponential function : y=dmax*exp[-2.*(dist_w-dmax)/dmax]
+  attr canalx floattant canalx 1 [height] : plane channel according to Ox direction (for the moment, formulation in the code relies on fixed heigh : H=2).
+  attr tuyauz floattant tuyauz 1 [diameter] : pipe according to Oz direction (for the moment, formulation in the code relies on fixed diameter : D=2).
+  attr verif_dparoi chaine verif_dparoi 1 not_set
+  attr dmax floattant dmax 1 Maximum distance.
+  attr fichier chaine fichier 1 not_set
+  attr fichier_ecriture_K_Eps chaine fichier_ecriture_K_Eps 1 When a resume with k-epsilon model is envisaged, this keyword allows to generate external MED-format file with evaluation of k and epsilon quantities (based on eddy turbulent viscosity and turbulent characteristic length returned by mixing length model). The frequency of the MED file print is set equal to dt_impr_ustar. Moreover, k-eps MED field is automatically saved at the last time step. MED file is then used for resuming a K-Epsilon calculation with the Champ_Fonc_Med keyword.
+sous_maille mod_turb_hyd_ss_maille sous_maille -1 Structure sub-grid function model.
+prandtl modele_turbulence_scal_base prandtl -1 The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+  attr prdt chaine prdt 1 Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
+  attr prandt_turbulent_fonction_nu_t_alpha chaine prandt_turbulent_fonction_nu_t_alpha 1 Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha is the thermal diffusivity.
+schmidt modele_turbulence_scal_base schmidt -1 The Schmidt model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+  attr scturb floattant scturb 1 Keyword to modify the constant (Sct) of Schmlidt model : Dt=Nut/Sct Default value is 0.7.
+modele_fonction_bas_reynolds_base objet_lecture modele_fonction_bas_reynolds_base -1 not_set
+transport_k_epsilon eqn_base transport_k_epsilon -1 The (k-eps) transport equation. To resume from a previous mixing length calculation, an external MED-format file containing reconstructed K and Epsilon quantities can be read (see fichier_ecriture_k_eps) thanks to the Champ_fonc_MED keyword. NL2 Warning, When used with the Quasi-compressible model, k and eps should be viewed as rho k and rho epsilon when defining initial and boundary conditions or when visualizing values for k and eps. This bug will be fixed in a future version.
+  attr with_nu chaine(into=["yes","no"]) with_nu 1 yes/no
+mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
+  attr eps_min floattant eps_min 1 Lower limitation of epsilon (default value 1.e-10).
+  attr eps_max floattant eps_max 1 Upper limitation of epsilon (default value 1.e+10).
+  attr k_min floattant k_min 1 Lower limitation of k (default value 1.e-10).
+  attr quiet rien quiet 1 To disable printing of information about k and epsilon.
+k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
+  attr cmu floattant cmu 1 Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
+  attr transport_k_epsilon transport_k_epsilon transport_k_epsilon 0 Keyword to define the (k-eps) transport equation.
+  attr modele_fonc_bas_reynolds modele_fonction_bas_reynolds_base modele_fonc_bas_reynolds 1 This keyword is used to set the bas Reynolds model used.
+loi_standard_hydr_old turbulence_paroi_base loi_standard_hydr_old 0 not_set
+loi_standard_hydr turbulence_paroi_base loi_standard_hydr 0 Keyword for the logarithmic wall law for a hydraulic problem. Loi_standard_hydr refers to first cell rank eddy-viscosity defined from continuous analytical functions, whereas Loi_standard_hydr_3couches from functions separataly defined for each sub-layer
+loi_expert_hydr loi_standard_hydr loi_expert_hydr 1 This keyword is similar to the previous keyword Loi_standard_hydr but has several additional options into brackets.
+  attr u_star_impose floattant u_star_impose 1 The value of the friction velocity (u*) is not calculated but given by the user.
+  attr methode_calcul_face_keps_impose chaine(into=["toutes_les_faces_accrochees","que_les_faces_des_elts_dirichlet"]) methode_calcul_face_keps_impose 1 The available options select the algorithm to apply K and Eps boundaries condition (the algorithms differ according to the faces).NL2 toutes_les_faces_accrochees : Default option in 2D (the algorithm is the same than the algorithm used in Loi_standard_hydr) NL2 que_les_faces_des_elts_dirichlet : Default option in 3D (another algorithm where less faces are concerned when applying K-Eps boundary condition).
+  attr kappa floattant kappa 1 The value can be changed from the default one (0.415)
+  attr Erugu floattant Erugu 1 The value of E can be changed from the default one for a smooth wall (9.11). It is also possible to change the value for one boundary wall only with paroi_rugueuse keyword/
+  attr A_plus floattant A_plus 1 The value can can be changed from the default one (26.0)
+loi_standard_hydr_scalaire turbulence_paroi_scalaire_base loi_standard_hydr_scalaire 0 Keyword for the law of the wall.
+loi_expert_scalaire loi_standard_hydr_scalaire loi_expert_scalaire 1 Keyword similar to keyword Loi_standard_hydr_scalaire but with additional option.
+  attr prdt_sur_kappa floattant prdt_sur_kappa 1 This option is to change the default value of 2.12 in the scalable wall function.
+  attr calcul_ldp_en_flux_impose entier(into=[0,1]) calcul_ldp_en_flux_impose 1 By default (value set to 0), the law of the wall is not applied for a wall with a Neumann condition. With value set to 1, the law is applied even on a wall with Neumann condition.
+loi_analytique_scalaire turbulence_paroi_scalaire_base loi_analytique_scalaire 0 not_set
+paroi_tble turbulence_paroi_base paroi_tble 1 Keyword for the Thin Boundary Layer Equation wall-model (a more complete description of the model can be found into this PDF file). The wall shear stress is evaluated thanks to boundary layer equations applied in a one-dimensional fine grid in the near-wall region.
+  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
+  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
+  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
+  attr stats twofloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 2 values are required : the starting time and ending time of the statistics computation.
+  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
+  attr restart rien restart 1 not_set
+  attr stationnaire entierfloat stationnaire 1 not_set
+  attr lambda chaine lambda_u 1 not_set
+  attr mu chaine mu 1 not_set
+  attr sans_source_boussinesq rien sans_source_boussinesq 1 not_set
+  attr alpha floattant alpha 1 not_set
+  attr kappa floattant kappa 1 not_set
+paroi_tble_scal turbulence_paroi_scalaire_base paroi_tble_scal 1 Keyword for the Thin Boundary Layer Equation thermal wall-model.
+  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
+  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
+  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
+  attr nb_comp entier nb_comp 1 Number of component to solve in the fine grid (1 if 2D simulation (2D not available yet), 2 if 3D simulation).
+  attr stats fourfloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 4 values are required : the starting time of velocity averaging, the starting time of the RMS fluctuations, the ending time of the statistics computation and finally the print time period for the statistics.
+  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
+  attr prandtl floattant prandtl 1 not_set
+loi_paroi_nu_impose turbulence_paroi_scalaire_base loi_paroi_nu_impose 1 Keyword to impose Nusselt numbers on the wall for the thermohydraulic problems. To use this option, it is necessary to give in the data file the value of the hydraulic diameter and the expression of the Nusselt number.
+  attr nusselt chaine nusselt 0 The Nusselt number. This expression can be a function of x, y, z, Re (Reynolds number), Pr (Prandtl number).
+  attr diam_hydr field_base diam_hydr 0 The hydraulic diameter.
+negligeable turbulence_paroi_base negligeable 0 Keyword to suppress the calculation of a law of the wall with a turbulence model. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall (tau_tan /rho= nu dU/dy). NL2 Warning: This keyword is not available for k-epsilon models. In that case you must choose a wall law.
+negligeable_scalaire turbulence_paroi_scalaire_base negligeable_scalaire 0 Keyword to suppress the calculation of a law of the wall with a turbulence model for thermohydraulic problems. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall.
+utau_imp turbulence_paroi_base utau_imp 1 Keyword to impose the friction velocity on the wall with a turbulence model for thermohydraulic problems. There are two possibilities to use this keyword : NL2 1 - we can impose directly the value of the friction velocity u_star. NL2 2 - we can also give the friction coefficient and hydraulic diameter. So, TRUST determines the friction velocity by : u_star = U*sqrt(lambda_c/8).
+  attr u_tau field_base u_tau 1 Field type.
+  attr lambda_c chaine lambda_c 1 The friction coefficient. It can be function of the spatial coordinates x,y,z, the Reynolds number Re, and the hydraulic diameter.
+  attr diam_hydr field_base diam_hydr 1 The hydraulic diameter.
+source_transport_k_eps source_base source_transport_k_eps -1 Keyword to alter the source term constants in the standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92
+  attr c1_eps floattant c1_eps 1 First constant.
+  attr c2_eps floattant c2_eps 1 Second constant.
+Source_Transport_K_Eps_anisotherme source_transport_k_eps Source_Transport_K_Eps_anisotherme -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
+  attr c3_eps floattant c3_eps 1 Third constant.
+source_transport_k_eps_aniso_concen source_transport_k_eps source_transport_k_eps_aniso_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
+  attr c3_eps floattant c3_eps 1 Third constant.
+source_transport_k_eps_aniso_therm_concen source_transport_k_eps source_transport_k_eps_aniso_therm_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
+  attr c3_eps floattant c3_eps 1 Third constant.
+frontiere_ouverte_k_eps_impose condlim_base frontiere_ouverte_k_eps_impose -1 Turbulence condition imposed on an open boundary called bord (edge) (this situation corresponds to a fluid inlet). This condition must be associated with an imposed inlet velocity condition.
+  attr ch front_field_base ch 0 Boundary field type.
+boundary_field_uniform_keps_from_ud front_field_base boundary_field_uniform_keps_from_ud 1 field which allows to impose on a boundary K and EPS values derived from U velocity and D hydraulic diameter
+  attr u floattant u 0 value of velocity
+  attr d floattant d 0 value of hydraulic diameter
+field_uniform_keps_from_ud field_base field_uniform_keps_from_ud 1 field which allows to impose on a domain K and EPS values derived from U velocity and D hydraulic diameter
+  attr u floattant u 0 value of velocity specified in boundary condition.
+  attr d floattant d 0 value of hydraulic diameter specified in boundary condition
+paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to designate a Robin boundary condition (a.u+b.du/dn=c) associated with the Pironneau methodology for the wall laws. The value of given by the delta option is the distance between the mesh (where symmetry boundary condition is applied) and the fictious wall. This boundary condition needs the definition of the dedicated source terms (Source_Robin or Source_Robin_Scalaire) according the equations used.
+  attr delta floattant delta 0 not_set
+paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
+  attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
+probleme_couple_rayonnement coupled_problem pb_couple_rayonnement -1 This keyword is used to define a problem coupling several other problems to which radiation coupling is added.
+  ref modele modele_rayonnement_base
+frontiere_ouverte_temperature_imposee_rayo_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_transp -1 Imposed temperature condition for a radiation problem with transparent gas.
+paroi_echange_externe_impose_rayo_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_transp -1 External type exchange condition for a coupled problem with radiation in transparent gas.
+modele_rayonnement_base objet_u modele_rayonnement_base -1 Basic class for wall thermal radiation model.
+modele_rayonnement_milieu_transparent modele_rayonnement_base modele_rayonnement_milieu_transparent -2 Wall thermal radiation model for a transparent gas and resolving a radiation-conduction-thermohydraulics coupled problem in VDF or VEF.\input{{modelerayotransp}}
+  attr bloc bloc_lecture bloc 0 See description.
+paroi_flux_impose_rayo_transp paroi_flux_impose paroi_flux_impose_rayo_transp -1 Normal flux condition at the wall called bord (edge) for a radiation problem in transparent gas.
+paroi_temperature_imposee_rayo_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in transparent gas.
+champ_front_contact_rayo_transp_vef champ_front_contact_vef champ_front_contact_rayo_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in transparent fluid.
+echange_contact_rayo_transp_vdf paroi_echange_contact_vdf echange_contact_rayo_transp_vdf -1 Exchange boundary condition in VDF between the transparent fluid and the solid for a problem coupled with radiation. Without radiation, it is the equivalent of the Paroi_Echange_contact_VDF exchange condition.
+frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with transparent gas.
+frontiere_ouverte_rayo_transp_vdf frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vdf -1 doit disparaitre
+frontiere_ouverte_rayo_transp_vef frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vef -1 doit disparaitre
+
+pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
+pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 0 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+pb_hydraulique_concentration_turbulent Pb_base pb_hydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_concentration_turbulent Pb_base pb_thermohydraulique_concentration_turbulent -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_turbulent_qc Pb_base pb_thermohydraulique_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number. NL2 Warning : Available for VDF and VEF P0/P1NC discretization only.
+  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
+pb_thermohydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/energy/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_turbulent_scalaires_passifs pb_avec_passif pb_thermohydraulique_turbulent_scalaires_passifs -1 Resolution of thermohydraulic problem, with turbulence modelling and with the additional passive scalar equations.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent convection_diffusion_temperature_turbulent 1 Energy equations (temperature diffusion convection) as well as the associated turbulence model equations.
+pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydraulique_concentration_turbulent_scalaires_passifs -1 Resolution of Navier-Stokes/multiple constituent transport equations, with turbulence modelling and with the additional passive scalar equations.
+  attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  ref constituant constituant
+pb_thermohydraulique_turbulent_qc_fraction_massique pb_avec_passif pb_thermohydraulique_turbulent_qc_fraction_massique -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
+  attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+  attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
+navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_hyd_deriv modele_turbulence 1 Turbulence model for Navier-Stokes equations.
+navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
+convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_qc convection_diffusion_chaleur_turbulent_qc -1 Energy equation under low Mach number as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
+convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
+convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
+  attr espece espece espece 0 not_set
+modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
+mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
+  attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
+  attr longueur_maille chaine(into=["volume","volume_sans_lissage","scotti","arrete"]) longueur_maille 1 different ways to calculate the characteristic length may be specified : NL2 volume : It is the default option. Characteristic length is based on the cubic root of the volume cells. A smoothing procedure is applied to avoid discontinuities of this quantity in VEF from a cell to another. NL2 volume_sans_lissage : For VEF only. Characteristic length is based on the cubic root of the volume cells (without smoothing procedure).NL2 scotti : Characteristic length is based on the cubic root of the volume cells and the Scotti correction is applied to take into account the stretching of the cell in the case of anisotropic meshes. NL2 arete : For VEF only. Characteristic length relies on the max edge (+ smoothing procedure) is taken into account.
+sous_maille_wale mod_turb_hyd_ss_maille sous_maille_wale -1 This is the WALE-model. It is a new sub-grid scale model for eddy-viscosity in LES that has the following properties : NL2 - it goes naturally to 0 at the wall (it doesn\'t need any information on the wall position or geometry) NL2 - it has the proper wall scaling in o(y3) in the vicinity of the wall NL2 - it reproduces correctly the laminar to turbulent transition.
+  attr cw floattant cw 1 The unique parameter (constant) of the WALE-model (by default value 0.5).
+sous_maille_smago mod_turb_hyd_ss_maille sous_maille_smago -1 Smagorinsky sub-grid turbulence model. NL2 Nut=Cs1*Cs1*l*l*sqrt(2*S*S) NL2 K=Cs2*Cs2*l*l*2*S
+  attr cs floattant cs 1 This is an optional keyword and the value is used to set the constant used in the Smagorinsky model (This is currently only valid for Smagorinsky models and it is set to 0.18 by default) .
+combinaison mod_turb_hyd_ss_maille combinaison -1 This keyword specifies a turbulent viscosity model where the turbulent viscosity is user-defined.
+  attr nb_var listchaine nb_var 1 Number and names of variables which will be used in the turbulent viscosity definition (by default 0)
+  attr fonction chaine fonction 1 Fonction for turbulent viscosity. X,Y,Z and variables defined previously can be used.
+longueur_melange mod_turb_hyd_ss_maille longueur_melange -1 This model is based on mixing length modelling. For a non academic configuration, formulation used in the code can be expressed basically as : NL2 $nu_t=(Kappa.y)^2$.dU/dy NL2 Till a maximum distance (dmax) set by the user in the data file, y is set equal to the distance from the wall (dist_w) calculated previously and saved in file Wall_length.xyz. [see Distance_paroi keyword] NL2 Then (from y=dmax), y decreases as an exponential function : y=dmax*exp[-2.*(dist_w-dmax)/dmax]
+  attr canalx floattant canalx 1 [height] : plane channel according to Ox direction (for the moment, formulation in the code relies on fixed heigh : H=2).
+  attr tuyauz floattant tuyauz 1 [diameter] : pipe according to Oz direction (for the moment, formulation in the code relies on fixed diameter : D=2).
+  attr verif_dparoi chaine verif_dparoi 1 not_set
+  attr dmax floattant dmax 1 Maximum distance.
+  attr fichier chaine fichier 1 not_set
+  attr fichier_ecriture_K_Eps chaine fichier_ecriture_K_Eps 1 When a resume with k-epsilon model is envisaged, this keyword allows to generate external MED-format file with evaluation of k and epsilon quantities (based on eddy turbulent viscosity and turbulent characteristic length returned by mixing length model). The frequency of the MED file print is set equal to dt_impr_ustar. Moreover, k-eps MED field is automatically saved at the last time step. MED file is then used for resuming a K-Epsilon calculation with the Champ_Fonc_Med keyword.
+sous_maille mod_turb_hyd_ss_maille sous_maille -1 Structure sub-grid function model.
+prandtl modele_turbulence_scal_base prandtl -1 The Prandtl model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+  attr prdt chaine prdt 1 Keyword to modify the constant (Prdt) of Prandtl model : Alphat=Nut/Prdt Default value is 0.9
+  attr prandt_turbulent_fonction_nu_t_alpha chaine prandt_turbulent_fonction_nu_t_alpha 1 Optional keyword to specify turbulent diffusivity (by default, alpha_t=nu_t/Prt) with another formulae, for example: alpha_t=nu_t2/(0,7*alpha+0,85*nu_tt) with the string nu_t*nu_t/(0,7*alpha+0,85*nu_t) where alpha is the thermal diffusivity.
+schmidt modele_turbulence_scal_base schmidt -1 The Schmidt model. For the scalar equations, only the model based on Reynolds analogy is available. If K_Epsilon was selected in the hydraulic equation, Prandtl must be selected for the convection-diffusion temperature equation coupled to the hydraulic equation and Schmidt for the concentration equations.
+  attr scturb floattant scturb 1 Keyword to modify the constant (Sct) of Schmlidt model : Dt=Nut/Sct Default value is 0.7.
+modele_fonction_bas_reynolds_base objet_lecture modele_fonction_bas_reynolds_base -1 not_set
+transport_k_epsilon eqn_base transport_k_epsilon -1 The (k-eps) transport equation. To resume from a previous mixing length calculation, an external MED-format file containing reconstructed K and Epsilon quantities can be read (see fichier_ecriture_k_eps) thanks to the Champ_fonc_MED keyword. NL2 Warning, When used with the Quasi-compressible model, k and eps should be viewed as rho k and rho epsilon when defining initial and boundary conditions or when visualizing values for k and eps. This bug will be fixed in a future version.
+  attr with_nu chaine(into=["yes","no"]) with_nu 1 yes/no
+mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
+  attr eps_min floattant eps_min 1 Lower limitation of epsilon (default value 1.e-10).
+  attr eps_max floattant eps_max 1 Upper limitation of epsilon (default value 1.e+10).
+  attr k_min floattant k_min 1 Lower limitation of k (default value 1.e-10).
+  attr quiet rien quiet 1 To disable printing of information about k and epsilon.
+k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
+  attr cmu floattant cmu 1 Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
+  attr transport_k_epsilon transport_k_epsilon transport_k_epsilon 0 Keyword to define the (k-eps) transport equation.
+  attr modele_fonc_bas_reynolds modele_fonction_bas_reynolds_base modele_fonc_bas_reynolds 1 This keyword is used to set the bas Reynolds model used.
+loi_standard_hydr_old turbulence_paroi_base loi_standard_hydr_old 0 not_set
+loi_standard_hydr turbulence_paroi_base loi_standard_hydr 0 Keyword for the logarithmic wall law for a hydraulic problem. Loi_standard_hydr refers to first cell rank eddy-viscosity defined from continuous analytical functions, whereas Loi_standard_hydr_3couches from functions separataly defined for each sub-layer
+loi_expert_hydr loi_standard_hydr loi_expert_hydr 1 This keyword is similar to the previous keyword Loi_standard_hydr but has several additional options into brackets.
+  attr u_star_impose floattant u_star_impose 1 The value of the friction velocity (u*) is not calculated but given by the user.
+  attr methode_calcul_face_keps_impose chaine(into=["toutes_les_faces_accrochees","que_les_faces_des_elts_dirichlet"]) methode_calcul_face_keps_impose 1 The available options select the algorithm to apply K and Eps boundaries condition (the algorithms differ according to the faces).NL2 toutes_les_faces_accrochees : Default option in 2D (the algorithm is the same than the algorithm used in Loi_standard_hydr) NL2 que_les_faces_des_elts_dirichlet : Default option in 3D (another algorithm where less faces are concerned when applying K-Eps boundary condition).
+  attr kappa floattant kappa 1 The value can be changed from the default one (0.415)
+  attr Erugu floattant Erugu 1 The value of E can be changed from the default one for a smooth wall (9.11). It is also possible to change the value for one boundary wall only with paroi_rugueuse keyword/
+  attr A_plus floattant A_plus 1 The value can can be changed from the default one (26.0)
+loi_standard_hydr_scalaire turbulence_paroi_scalaire_base loi_standard_hydr_scalaire 0 Keyword for the law of the wall.
+loi_expert_scalaire loi_standard_hydr_scalaire loi_expert_scalaire 1 Keyword similar to keyword Loi_standard_hydr_scalaire but with additional option.
+  attr prdt_sur_kappa floattant prdt_sur_kappa 1 This option is to change the default value of 2.12 in the scalable wall function.
+  attr calcul_ldp_en_flux_impose entier(into=[0,1]) calcul_ldp_en_flux_impose 1 By default (value set to 0), the law of the wall is not applied for a wall with a Neumann condition. With value set to 1, the law is applied even on a wall with Neumann condition.
+loi_analytique_scalaire turbulence_paroi_scalaire_base loi_analytique_scalaire 0 not_set
+paroi_tble turbulence_paroi_base paroi_tble 1 Keyword for the Thin Boundary Layer Equation wall-model (a more complete description of the model can be found into this PDF file). The wall shear stress is evaluated thanks to boundary layer equations applied in a one-dimensional fine grid in the near-wall region.
+  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
+  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
+  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
+  attr stats twofloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 2 values are required : the starting time and ending time of the statistics computation.
+  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
+  attr restart rien restart 1 not_set
+  attr stationnaire entierfloat stationnaire 1 not_set
+  attr lambda chaine lambda_u 1 not_set
+  attr mu chaine mu 1 not_set
+  attr sans_source_boussinesq rien sans_source_boussinesq 1 not_set
+  attr alpha floattant alpha 1 not_set
+  attr kappa floattant kappa 1 not_set
+paroi_tble_scal turbulence_paroi_scalaire_base paroi_tble_scal 1 Keyword for the Thin Boundary Layer Equation thermal wall-model.
+  attr n entier n 1 Number of nodes in the TBLE grid (mandatory option).
+  attr facteur floattant facteur 1 Stretching ratio for the TBLE grid (to refine, the TBLE facteur must be greater than 1).
+  attr modele_visco chaine modele_visco 1 File name containing the description of the eddy viscosity model.
+  attr nb_comp entier nb_comp 1 Number of component to solve in the fine grid (1 if 2D simulation (2D not available yet), 2 if 3D simulation).
+  attr stats fourfloat stats 1 Statistics of the TBLE velocity and turbulent viscosity profiles. 4 values are required : the starting time of velocity averaging, the starting time of the RMS fluctuations, the ending time of the statistics computation and finally the print time period for the statistics.
+  attr sonde_tble liste_sonde_tble sonde_tble 1 not_set
+  attr prandtl floattant prandtl 1 not_set
+loi_paroi_nu_impose turbulence_paroi_scalaire_base loi_paroi_nu_impose 1 Keyword to impose Nusselt numbers on the wall for the thermohydraulic problems. To use this option, it is necessary to give in the data file the value of the hydraulic diameter and the expression of the Nusselt number.
+  attr nusselt chaine nusselt 0 The Nusselt number. This expression can be a function of x, y, z, Re (Reynolds number), Pr (Prandtl number).
+  attr diam_hydr field_base diam_hydr 0 The hydraulic diameter.
+negligeable turbulence_paroi_base negligeable 0 Keyword to suppress the calculation of a law of the wall with a turbulence model. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall (tau_tan /rho= nu dU/dy). NL2 Warning: This keyword is not available for k-epsilon models. In that case you must choose a wall law.
+negligeable_scalaire turbulence_paroi_scalaire_base negligeable_scalaire 0 Keyword to suppress the calculation of a law of the wall with a turbulence model for thermohydraulic problems. The wall stress is directly calculated with the derivative of the velocity, in the direction perpendicular to the wall.
+utau_imp turbulence_paroi_base utau_imp 1 Keyword to impose the friction velocity on the wall with a turbulence model for thermohydraulic problems. There are two possibilities to use this keyword : NL2 1 - we can impose directly the value of the friction velocity u_star. NL2 2 - we can also give the friction coefficient and hydraulic diameter. So, TRUST determines the friction velocity by : u_star = U*sqrt(lambda_c/8).
+  attr u_tau field_base u_tau 1 Field type.
+  attr lambda_c chaine lambda_c 1 The friction coefficient. It can be function of the spatial coordinates x,y,z, the Reynolds number Re, and the hydraulic diameter.
+  attr diam_hydr field_base diam_hydr 1 The hydraulic diameter.
+source_transport_k_eps source_base source_transport_k_eps -1 Keyword to alter the source term constants in the standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92
+  attr c1_eps floattant c1_eps 1 First constant.
+  attr c2_eps floattant c2_eps 1 Second constant.
+Source_Transport_K_Eps_anisotherme source_transport_k_eps Source_Transport_K_Eps_anisotherme -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
+  attr c3_eps floattant c3_eps 1 Third constant.
+source_transport_k_eps_aniso_concen source_transport_k_eps source_transport_k_eps_aniso_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
+  attr c3_eps floattant c3_eps 1 Third constant.
+source_transport_k_eps_aniso_therm_concen source_transport_k_eps source_transport_k_eps_aniso_therm_concen -1 Keywords to modify the source term constants in the anisotherm standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92 C3_eps=1.0
+  attr c3_eps floattant c3_eps 1 Third constant.
+frontiere_ouverte_k_eps_impose condlim_base frontiere_ouverte_k_eps_impose -1 Turbulence condition imposed on an open boundary called bord (edge) (this situation corresponds to a fluid inlet). This condition must be associated with an imposed inlet velocity condition.
+  attr ch front_field_base ch 0 Boundary field type.
+boundary_field_uniform_keps_from_ud front_field_base boundary_field_uniform_keps_from_ud 1 field which allows to impose on a boundary K and EPS values derived from U velocity and D hydraulic diameter
+  attr u floattant u 0 value of velocity
+  attr d floattant d 0 value of hydraulic diameter
+field_uniform_keps_from_ud field_base field_uniform_keps_from_ud 1 field which allows to impose on a domain K and EPS values derived from U velocity and D hydraulic diameter
+  attr u floattant u 0 value of velocity specified in boundary condition.
+  attr d floattant d 0 value of hydraulic diameter specified in boundary condition
+paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to designate a Robin boundary condition (a.u+b.du/dn=c) associated with the Pironneau methodology for the wall laws. The value of given by the delta option is the distance between the mesh (where symmetry boundary condition is applied) and the fictious wall. This boundary condition needs the definition of the dedicated source terms (Source_Robin or Source_Robin_Scalaire) according the equations used.
+  attr delta floattant delta 0 not_set
+paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
+  attr erugu floattant erugu 0 Constant value for roughness
+diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
+frontiere_ouverte_temperature_imposee_rayo_semi_transp frontiere_ouverte_temperature_imposee frontiere_ouverte_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition for a radiation problem with semi transparent gas.
+paroi_echange_externe_impose_rayo_semi_transp paroi_echange_externe_impose paroi_echange_externe_impose_rayo_semi_transp -1 External type exchange condition for a coupled problem with radiation in semi transparent gas.
+paroi_flux_impose_rayo_semi_transp_vdf paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vdf -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VDF).
+paroi_flux_impose_rayo_semi_transp_vef paroi_flux_impose paroi_flux_impose_rayo_semi_transp_vef -1 Normal flux condition at the wall called bord (edge) for a radiation problem in semi transparent gas (in VEF).
+paroi_temperature_imposee_rayo_semi_transp paroi_temperature_imposee paroi_temperature_imposee_rayo_semi_transp -1 Imposed temperature condition at the wall called bord (edge) for a radiation problem in semi transparent gas.
+champ_front_contact_rayo_semi_transp_vef champ_front_contact_vef champ_front_contact_rayo_semi_transp_vef -1 This field is used on a boundary between a solid and fluid domain to exchange a calculated temperature at the contact face of the two domains according to the flux of the two problems with radiation in semi transparent fluid.
+paroi_echange_contact_rayo_semi_transp_vdf paroi_echange_contact_vdf paroi_echange_contact_rayo_semi_transp_vdf -1 Exchange boundary condition in VDF between the semi transparent fluid and the solid for a problem coupled with radiation.
+frontiere_ouverte_rayo_semi_transp frontiere_ouverte frontiere_ouverte_rayo_semi_transp -1 Keyword to set a boundary outlet temperature condition on the boundary called bord (edge) (diffusion flux zero) for a radiation problem with semi transparent gas.
+eq_rayo_semi_transp objet_lecture nul -1 Irradiancy equation.
+  attr solveur solveur_sys_base solveur 0 Solver of the irradiancy equation.
+  attr conditions_limites|boundary_conditions condlims conditions_limites 1 Boundary conditions.
+modele_rayo_semi_transp Pb_base modele_rayo_semi_transp -3 Radiation model for semi transparent gas. The model should be associated to the coupling problem BEFORE the time scheme.
+  attr eq_rayo_semi_transp eq_rayo_semi_transp eq_rayo_semi_transp 1 Irradiancy G equation. Radiative flux equals -grad(G)/3/kappa.
+pb_couple_rayo_semi_transp coupled_problem pb_couple_rayo_semi_transp -1 Problem coupling several other problems to which radiation coupling is added (for semi transparent gas). NL2 You have to associate a modele_rayo_semi_transpNL2 You have to add a radiative term source in energy equation NL2 Warning: Calculation with semi transparent gas model may lead to divergence when high temperature differences are used. Indeed, the calculation of the stability time step of the equation does not take in account the source term. In semi transparent gas model, energy equation source term depends strongly of temperature via irradiance and stability is not guaranteed by the calculated time step. Reducing the facsec of the time scheme is a good tip to reach convergence when divergence is encountered.
+  ref modele modele_rayo_semi_transp
+  ref scheme schema_temps_base
+  ref scheme_2 schema_temps_base
+source_rayo_semi_transp source_base source_rayo_semi_transp 0 Radiative term source in energy equation.
+flux_radiatif condlim_base flux_radiatif 0 Boundary condition for radiation equation.
+  attr na chaine(into=["A"]) na 0 Keyword for constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
+  attr a floattant a 0 Value of constant in boundary condition for irradiancy (sqrt(3) for half-infinite domain or 2 in closed domain).
+  attr ne chaine(into=["emissivite"]) ne 0 Keyword for wall emissivity.
+  attr emissivite front_field_base emissivite 0 Wall emissivity, value between 0 and 1.
+flux_radiatif_vdf flux_radiatif flux_radiatif_vdf -1 Boundary condition for radiation equation in VDF.
+flux_radiatif_vef flux_radiatif flux_radiatif_vef -1 Boundary condition for radiation equation in VEF.
 
 pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
