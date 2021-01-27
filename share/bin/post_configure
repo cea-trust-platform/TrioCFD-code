@@ -4,6 +4,9 @@ cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') >> shar
 cd Rayonnement
 cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') >> ../share/doc_src/TRAD2_ajout0 2>>/dev/null
 cd ..
+cd Multiphase
+cat $(cat project.cfg  | awk '{print $NF"/share/doc_src/TRAD2_ajout0"}') >> ../share/doc_src/TRAD2_ajout0 2>>/dev/null
+cd ..
 
 if [ ! -f build/html/index.html ]
 then
