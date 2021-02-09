@@ -68,10 +68,10 @@ Results {
 	Description "According to Chen et al. [1], the analytical solution of the fluid force per unit length acting on the inner cylinder is: \latex_( \begin{equation} \textbf{F} = \rho \pi  U R_{int}^2 L_{int} \omega^2 \bigg[m_{self} \sin(\omega t) - c_{self} \cos(\omega t)\bigg] \textbf{e}_y \end{equation} \latex_) where \latex_( $\rho=1~kg/m^3$ \latex_), \latex_($C_{int}= 0.02 m$\latex_) (diameter of the inner cylinder), \latex_($L_{int}=0.7 $\latex_) m (the length of the inner cylinder), \latex_( $U=0.5*10^{-4}$ \latex_) (displacement amplitude), \latex_( $\omega=1000.9~rad/s$ \latex_) (angular frequency of motion) and \latex_( $m_{self}$ \latex_) and \latex_( $c_{self}$ \latex_) the added mass and damping coefficients, respectively."
 Description "The analytical solution (Chen et al. [1]) is here depicted and compared with the numerical one, obtained by the sum of the pressure and viscous force acting on the inner cylinder along y. Simulations have been performed for \latex_( $t = [0, T]$ \latex_) where \latex_( $T = 2\pi/\omega$ \latex_)."
 	Figure {
-		Title "Force per unit length of cylinder"
+		Title "Fluid force exerted on the inner cylindrical beam"
 		
 		LabelX "t [s]"
-		LabelY "F [N/m]"
+		LabelY "F [N]"
 		legend outside
 		include_description_curves 0
 		
