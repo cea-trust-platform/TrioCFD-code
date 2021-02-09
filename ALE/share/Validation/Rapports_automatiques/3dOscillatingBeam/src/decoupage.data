@@ -1,0 +1,19 @@
+# Partition for the validation test case TwoCylinders #
+
+dimension 3
+
+Domaine_ALE dom
+
+# BEGIN MESH #
+Read_MED family_names_from_group_names dom Poutre Poutre.med
+# END MESH #
+
+# BEGIN PARTITION #
+Partition dom
+{
+    Partition_tool metis { Nb_parts 35 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+# END PARTITION #
