@@ -52,7 +52,7 @@ protected :
   DoubleTab vit_som_bord_ALE;
 
 private:
-  VECT(Parser_U) fxyt;
+  VECT(Parser_U) fxyzt;
 
 };
 
