@@ -11,7 +11,7 @@ Read_MED family_names_from_group_names dom Poutre Poutre.med
 # BEGIN PARTITION #
 Partition dom
 {
-    Partition_tool metis { Nb_parts 35 }
+    Partition_tool metis { Nb_parts 40 }
     Larg_joint 2
     zones_name DOM
 }
