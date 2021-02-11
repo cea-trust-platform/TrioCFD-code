@@ -53,7 +53,7 @@ np.savetxt('Numerical_coefficients.txt', DataOut1)
 # Save DataOut in .txt file
 
 Cm=10.16
-Cv=0.6
+Cv=0.
 F = -rho*np.pi*Lmax*Ri**2.*u*w**2.*(-Cm*np.sin(w*t) + Cv*np.cos(w*t)) #Force vector
 DataOut = np.column_stack((t,F))
 np.savetxt('Theoretical_force.txt', DataOut) #this command overwrite the previus .txt file
