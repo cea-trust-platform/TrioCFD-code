@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.3_beta : Enhancements, modifications and corrected bugs since version 1.8.2 :
 --------------------------------------------------------------------------------------------------
+xx/xx/21 (TrioCFD) New feature : Add possibility to post-process k-eps source terms in definition_champs block
 05/02/21 (TrioCFD) New keyword : Boundary_field_keps_from_ud to specify a K-Eps inlet field with hydraulic diameter, speed, and turbulence intensity (VDF only)
 15/01/21 (TrioCFD) New feature : New documentation available: development plan and models description
 --------------------------------------------------------------------------------------------------
