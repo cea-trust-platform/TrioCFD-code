@@ -1,0 +1,182 @@
+\rhead{ALE METHOD}
+\chapter{The Arbitrary Lagrangian-Eulerian Method}
+\lhead{The Arbitrary Lagrangian-Eulerian Method}
+To determine the flow of a fluid, it is necessary to describe the kinematics of all its material particles throughout time. To do so, one can adopt either an Euler description of motion, in which a fluid particle is identified by its initial position, or a Lagrange description of motion, in which a fluid particle is identified by its instantaneous position. 
+Both descriptions are totally equivalent, leading to different forms of the Navier-Stokes equations that can be discretized on a stationary mesh grid (Euler) or a mesh grid that follows the motion of the fluid particles (Lagrange). In both cases, the mesh grids do not account for the motion of the boundaries, which makes the numerical simulations of the related Navier-Stokes equations delicate. To overpass this problem, several approaches, such as the immersed boundary methods~\cite{puscas2015three, puscas2015time, puscas2015conservative}, or the Arbitrary Lagrangian-Eulerian (ALE) method~\cite{donea2004arbitrary, fourestey2004second, koobus2000computation} have been developed.
+
+Here, we rely on the ALE method. In the ALE approach, the fluid flow is computed in a domain that is deformed in order to follow the movement of the fluid-solid interface. It provides a hybrid description not associated with the fluid particles and the laboratory coordinates. We associate the description with a moving imaginary mesh that follows the fluid domain.  The motion of the ALE computational mesh is independent of the material motion, the approach treats the mesh as a frame that moves with the arbitrary velocity $\mathbf{v}_{ALE}$. In the Eulerian approach, this velocity is zero, whereas it is equal to the velocity of the fluid particles in the Lagrangian approach. But in the ALE method, this velocity is equal to neither zero nor the velocity of the fluid particles; it varies smoothly and arbitrarily between both of them.  This method is a Lagrangian description in zones and directions near solid, and Eulerian elsewhere. 
+
+\section{ALE kinematic description}
+In the ALE kinematic description, neither the Lagrangian (material frame) configuration ${R}_{\mathbf{X}}$ 
+(coordinates are denoted by $ \mathbf{X}$), nor Eulerian (spatial frame) configuration $R_{\mathbf{x}}$ 
+(coordinates are denoted $ \mathbf{x} $) is taken as the reference. A third domain is consider, 
+the referential configuration (ALE frame) $R_{\boldsymbol{\xi}}$ in which the reference coordinates 
+(also called mixed coordinates) $\boldsymbol{\xi}$ allows the identification of the grid 
+points~\cite{donea2004arbitrary}. 
+\begin{figure}[ht!]
+\begin{centering}
+\begin{tikzpicture}[scale=0.7, axis/.style={thick,->}]
+    \coordinate (O) at (-0.8, -0.8);
+    \draw[axis] (O) -- +(0.5, 0) ;
+    \draw[axis] (O) -- +(0, 0.5) ;
+    \draw[axis] (O) -- +(-0.25, -0.5);
+    \draw (0.6, 0.5) node[right] {$R_{\boldsymbol{\xi}}$};
+    \draw (-0.8, -0.3) node[right] {$\boldsymbol{\xi}$};
+    
+    \draw[axis] (-5., -5.5) -- (-5., -5.) ;
+    \draw[axis] (-5., -5.5) -- (-4.5, -5.5) ;
+    \draw[axis] (-5., -5.5) -- (-5.25, -6) ;
+    \draw (-4., -4.) node[right] {$R_{\mathbf{X}}$};
+    \draw (-5.1, -5.1) node[right] {$\mathbf{X}$};
+    
+    \draw[axis] (3., -5.5) -- (3., -5.) ;
+    \draw[axis] (3., -5.5) -- (3.5, -5.5) ;
+    \draw[axis] (3., -5.5) -- (2.75, -6) ;
+    \draw (4.5, -4.) node[right] {$R_{\mathbf{x}}$};
+    \draw (3., -5.2) node[right] {$\mathbf{x}$};
+    
+    \coordinate (c) at (0,0);
+    \coordinate (d) at (-4,-5);
+    \coordinate (e) at (4,-5);
+    \draw[rounded corners=1mm] (c) \irregularcircle{2cm}{1mm};
+    \draw[rounded corners=1mm] (d) \irregularcircle{2cm}{1mm};  
+    \draw[rounded corners=1mm] (e) \irregularcircle{2cm}{1mm}; 
+
+    \draw[-stealth,thick] (2.1, 0)to[bend left](3.5, -3.);
+    \node[fill=white]  at (-3.5,-1) {$\mathbf{\Psi}$};
+    \draw[-stealth,thick] (-2.1, 0)to[bend right](-3.5, -3.);
+    \node[fill=white]  at (3.8,-1.2) {$\mathbf{\Phi}$};
+    \draw[-stealth,thick] (-2.1, -6)to[bend right](2.2, -6.);
+    \node[fill=white]  at (0.,-7.4) {$\boldsymbol{\varphi}$};
+    
+\end{tikzpicture}
+\par\end{centering}
+\protect\caption{\label{fig:ALE_frame}  Lagrangian~$\mathbf{X}$, Eulerian~$\mathbf{x}$, ALE~$\boldsymbol{\xi}$ frame references and transformations relating them.}
+\end{figure}
+
+Fig.~\ref{fig:ALE_frame} illustrates this configurations and the transformations which relate them. The referential domain is mapped into the material domain by $\mathbf{\Psi}$ and into the spatial domain by $\mathbf{\Phi}$.
+The mapping from the material domain to the referential domain, is representing by: 
+\begin{equation}\label{eq:Psi}
+\begin{aligned}
+\mathbf{\Psi}^{-1}: R_{\mathbf{X}} \times \left[t_0, t_{end}\right[ & \longrightarrow  R_{\boldsymbol{\xi}} \times \left[t_0, t_{end}\right[, \\
+ (\mathbf{X}, t) & \longmapsto  \mathbf{\Psi}^{-1} (\mathbf{X}, t) = (\boldsymbol{\xi}, t),
+\end{aligned}
+\end{equation}
+and his gradient is: 
+\begin{equation}
+\frac{\partial \mathbf{\Psi}^{-1}}{\partial (\mathbf{X}, t)} =
+\begin{pmatrix}
+\dfrac{\partial \boldsymbol{\xi}}{\partial \mathbf{X}}  & \mathbf{v}_{ALE}\\
+\\
+\mathbf{0}^{\operatorname{T}} & {1}
+\end{pmatrix}, 
+\end{equation}
+where $\mathbf{0}^{\operatorname{T}}$ is a null row-vector and the velocity $\mathbf{v}_{ALE}$ is defined as:
+\begin{equation}
+\mathbf{v}_{ALE}(\mathbf{X},t) =  \left.\dfrac{\partial \boldsymbol{\xi}}{\partial t}\right|_{\mathbf{X}}  (\mathbf{X},t),
+\end{equation}
+where the index in the partial derivatives indicates the variables that remain constant during the derivation. The Jacobian $J$  determinant: 
+\begin{equation}
+J (\mathbf{X},t) = \det \left(  \left.\dfrac{\partial \boldsymbol{\xi}}{\partial \mathbf{X}}\right|_{t} \right) (\mathbf{X},t),
+\end{equation}
+provides a link between the referential coordinates $\boldsymbol{\xi}$ and the material coordinates $\mathbf{X}$. It also relates the current volume element $dV$ in the reference frame and the associated volume element $dV_0$ in the initial configuration: 
+\begin{equation}
+d V (\boldsymbol{\xi}, t) = J (\mathbf{X}, t) dV_0(\boldsymbol{\xi}, t).
+\end{equation}
+The time rate of change of the Jacobien is given by~\cite{donea1982arbitrary}:
+\begin{equation}\label{eq:jacobien_time_deriv}
+\left.\dfrac{\partial J}{\partial t}\right|_{\mathbf{X}}  (\mathbf{X},t) = J (\mathbf{X},t) \nabla \cdot \mathbf{v}_{ALE} (\boldsymbol{\xi}, t ).
+\end{equation}
+
+\section{ALE form of governing equations}
+In order to relate the time derivative in the material and referential domains, let a scalar physical quantity be described by $ f (\mathbf{X},t) $  in the material description and by $f^{*} (\boldsymbol{\xi}, t)$ in the referential domain. Using the mapping $\mathbf{\Psi}^{-1}$~(\ref{eq:Psi}), the transformation from 
+the material  description $f$  of the scalar physical quantity to the referential description $f^{*}$ can be related as:
+\begin{equation}
+f(\mathbf{X},t) = f^{*}(\mathbf{\Psi}^{-1}(\mathbf{X},t), t) \quad \text{or}  \quad  f = f^* \circ \mathbf{\Psi}^{-1},
+\end{equation}
+and its gradient is given by: 
+\begin{equation}
+\dfrac{\partial f}{\partial (\mathbf{X},t) }(\mathbf{X},t) = \dfrac{\partial f^*}{\partial (\boldsymbol{\xi},t) }(\boldsymbol{\xi},t) \dfrac{\partial \mathbf{\Psi}^{-1}}{\partial (\mathbf{X},t) }(\mathbf{X},t),
+\end{equation}
+which is amenable to the matrix form: 
+\begin{equation}
+\begin{pmatrix} \dfrac{\partial f}{\partial \mathbf{X}}   \quad  \left.\dfrac{\partial f}{\partial t}\right|_{\mathbf{X}}\end{pmatrix}  = \begin{pmatrix} \dfrac{\partial f^*}{\partial \boldsymbol{\xi}}   \quad  \left.\dfrac{\partial f^*}{\partial t}\right|_{\boldsymbol{\xi}}\end{pmatrix} 
+\begin{pmatrix}
+\dfrac{\partial \boldsymbol{\xi}}{\partial \mathbf{X}}  & \mathbf{v}_{ALE}
+\\
+\\
+\mathbf{0}^{\operatorname{T}} & {1}
+\end{pmatrix}, 
+\end{equation}
+after block multiplication, it leads to the fundamental ALE relation between 
+the material and the referential time derivatives:
+\begin{equation}
+\left.\dfrac{\partial f}{\partial t}\right|_{\mathbf{X}} (\mathbf{X},t) = \left.\dfrac{\partial f^*}{\partial t}\right|_{\boldsymbol{\xi}} (\boldsymbol{\xi},t) + \mathbf{v}_{ALE} \dfrac{\partial f^*}{\partial \boldsymbol{\xi}} (\boldsymbol{\xi},t)
+\label{eq:time_deriv_transformation}
+\end{equation}
+Using the identity $ \nabla \cdot (f^* \otimes \mathbf{v}_{ALE}) = f^* \nabla \cdot \mathbf{v}_{ALE} + \mathbf{v}_{ALE} \nabla f^*$, equation~(\ref{eq:jacobien_time_deriv}) results is:
+\begin{equation}
+J  \nabla \cdot (f^* \otimes \mathbf{v}_{ALE}) =  f^*\left.\frac{\partial J}{ \partial t} \right|_{\boldsymbol{\xi}} +  J \mathbf{v}_{ALE} \cdot \nabla f^*.
+\label{eq:time_deriv}
+\end{equation}
+Finally, from equation~(\ref{eq:time_deriv}), results:
+\begin{equation}
+\left.\frac{\partial (J  f)}{ \partial t} \right|_{\mathbf{X}}  (\mathbf{X},t) =  J(\mathbf{X},t) \left( \left.\frac{\partial f^*}{ \partial t}\right|_{\boldsymbol{\xi}} +  \nabla \cdot (f^* \otimes \mathbf{v}_{ALE}) \right) (\boldsymbol{\xi}, t ).
+\label{eq:transformation}
+\end{equation}
+ 
+By applying~(\ref{eq:transformation}) to the Navier-Stokes equations, we obtain the local form of the Navier-Stokes equations in a reference frame moving at an arbitrary velocity $\mathbf{v}_{ALE}$:
+\begin{equation}\label{eq:NS_ALE}
+\left\{
+\begin{aligned}
+\left.\frac{\partial (J \mathbf{v})}{\partial t} \right|_{\mathbf{X}} (\mathbf{X},t) &=  J(\mathbf{X},t)  \left(\nu\Delta \mathbf{v}   - \nabla \cdot  \left( (\mathbf{v} - \mathbf{v}_{ALE}) \otimes \mathbf{v} \right)  - \dfrac{1}{\rho}\nabla p\right) (\boldsymbol{\xi}, t ), \\
+\nabla \cdot   \mathbf{v} \, (\boldsymbol{\xi}, t ) &= 0.
+\end{aligned}
+\right.
+\end{equation}
+The ALE method gives a formulation of the Navier-Stokes equations in a conservative form with a modification of the transport velocity by the grid's velocity.
+Furthermore, we can remark that both purely Lagrangian or Eulerian mesh description are contained in the ALE form as particular cases. Chosen $\mathbf{\Psi} = \textbf{\textit{I}}$ it implies $\mathbf{X} = \boldsymbol{\xi} $ and $\mathbf{v} = \mathbf{v}_{ALE}$ which results into a Lagrangian description; the Eulerian  description corresponds to $\mathbf{\Phi} = \textbf{\textit{I}}$ which is equivalent to $\mathbf{x} = \boldsymbol{\xi} $ and it implies $\mathbf{v}_{ALE} = \mathbf{0}$.
+
+In the ALE framework, the choice of appropriate fluid mesh
+velocity is important. This arbitrary mesh velocity keeps the movement of the meshes under control according to the physical problem, and it depends on the numerical simulations. In general, a new elasticity equation is solved. For moderate deformations, one can pose an auxiliary Laplace problem that is known as harmonic mesh motion~\cite{duarte2004arbitrary}:
+
+\begin{equation}
+  \left\{
+\begin{aligned}
+\Delta \mathbf{v}_{ALE} &= \mathbf{0} \;\;\;\;\; \text{in the fluid domain,}\\
+\mathbf{v}_{ALE} &= \mathbf{v}_{S} \;\;\; \text{at a solid interface,}\\
+\mathbf{v}_{ALE} &= \mathbf{0} \;\;\;\;\; \text{at a free surface,} 
+\end{aligned}
+\right.
+\end{equation}
+from which the kinematics of the mesh grid is updated, i.e. ${\textbf{x}}^{new}={\textbf{x}}^{old} + \Delta t{\textbf{v}}_{ALE}$.
+
+\rhead{ALE METHOD}
+\chapter{Principle of the ALE numerical method}
+\lhead{Principle of the ALE numerical method}
+To determine the flow of a fluid, it is necessary to describe the kinematics of all its material particles throughout time. To do so, one can adopt either an Euler description of motion, in which a fluid particle is identified by its instantaneous position, or a Lagrange description of motion, in which a fluid particle is identified by its initial position. 
+Both descriptions are totally equivalent, leading to different forms of the Navier-Stokes equations that can be discretized on a stationary mesh grid (Euler) or a mesh grid that follows the motion of the fluid particles (Lagrange). In both cases, the mesh grids do not account for the motion of the boundaries, which makes the numerical simulations of the related Navier-Stokes equations delicate. 
+
+To overpass this problem, several approaches, such as the immersed boundary methods~\cite{puscas2015three, puscas2015time, puscas2015conservative}, or the Arbitrary Lagrangian-Eulerian (ALE) method~\cite{donea2004arbitrary, fourestey2004second, koobus2000computation} have been developed. 
+In the ALE approach, a fluid particle is identified by its position relative to a frame moving with a nonuniform velocity ${\textbf{v}}_{ALE}$. In this new frame of reference, the Navier-Stokes equations write
+\begin{subequations}\label{eq:NS_ALE}
+\begin{align}
+\nabla \cdot   \textbf{v} &= 0, \\
+\frac{\partial J {\textbf{v}}}{\partial t}  &=  J \left(\nu\Delta {\textbf{v}}   - \nabla \cdot  ( ({\textbf{v}} - {\textbf{v}}_{ALE}) \otimes {\textbf{v}} )  - \frac{1}{\rho}\nabla p\right),
+\end{align}
+\end{subequations}
+with $J$ the Jacobian of the transformation between the ALE and the Lagrange descriptions. The ALE method is actually a hybrid description between the Euler and the Lagrange descriptions, both of them corresponding to the particular cases ${\textbf{v}}_{ALE}={\textbf{0}}$ and ${\textbf{v}}_{ALE}={\textbf{v}}_{particle}$, respectively. 
+
+In the ALE framework, the choice of ${\textbf{v}}_{ALE}$ is arbitrary as long as the deformation of the mesh grid remains under control. For moderate deformations, ${\textbf{v}}_{ALE}$ is usually defined as the solution of an auxiliary Laplace problem, see~\cite{duarte2004arbitrary}:
+\begin{subequations}
+\begin{align}
+\Delta {\textbf{v}}_{ALE} &= {\textbf{0}} \;\;\;\;\;\;\;\;\;\;\;\; \text{in the fluid domain,}\\
+{\textbf{v}}_{ALE} &= {\textbf{v}}_{solid} \;\;\;\;\;\; \text{at a solid interface,}\\
+{\textbf{v}}_{ALE} &= {\textbf{0}} \;\;\;\;\;\;\;\;\;\;\;\;\text{at a free surface,} 
+\end{align}
+\end{subequations}
+from which the kinematics of the mesh grid is updated, i.e. ${\textbf{x}}^{new}={\textbf{x}}^{old} + \Delta t{\textbf{v}}_{ALE}$.
+
+%\bibliographystyle{alpha}
+
+
