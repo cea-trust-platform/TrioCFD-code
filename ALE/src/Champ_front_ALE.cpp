@@ -91,7 +91,7 @@ Entree& Champ_front_ALE::readOn(Entree& is)
   is >> dim;
   fixer_nb_comp(dim);
 
-  fxyt.dimensionner(dim);
+  fxyzt.dimensionner(dim);
 
 
   //        Cout << "dim = " << dim << finl;
@@ -102,13 +102,13 @@ Entree& Champ_front_ALE::readOn(Entree& is)
       is >> tmp;
       //Cout << "fonc = " << tmp << finl;
       Cerr << "Lecture et interpretation de la fonction " << tmp << finl;
-      fxyt[i].setNbVar(3);
-      fxyt[i].setString(tmp);
-      fxyt[i].addVar("x");
-      fxyt[i].addVar("y");
-      //         fxyt[i].addVar("z");
-      fxyt[i].addVar("t");
-      fxyt[i].parseString();
+      fxyzt[i].setNbVar(4);
+      fxyzt[i].setString(tmp);
+      fxyzt[i].addVar("x");
+      fxyzt[i].addVar("y");
+      fxyzt[i].addVar("z");
+      fxyzt[i].addVar("t");
+      fxyzt[i].parseString();
       Cerr << "Interpretation de la fonction " << tmp << " Ok" << finl;
       //        Cout << "end = " << tmp << finl;
     }
@@ -173,7 +173,7 @@ void Champ_front_ALE::mettre_a_jour(double temps)
   DoubleTab& tab=valeurs_au_temps(temps);
   tab=0.;
 
-  // PQ : 13/06/13 appel systematique a remplir_vit_som_bord_ALE() sinon pas bon !!
+  // appel systematique a remplir_vit_som_bord_ALE()
   remplir_vit_som_bord_ALE(temps);
 
   for( i=0; i<nb_faces; i++)
@@ -224,11 +224,11 @@ void Champ_front_ALE::remplir_vit_som_bord_ALE(double tps)
             z=domaine.coord(faces.sommet(i,k),2);
           for( j=0; j<nb_comp(); j++)
             {
-              fxyt[j].setVar("x",x);
-              fxyt[j].setVar("y",y);
-              //               fxyt[j].setVar("z",z);
-              fxyt[j].setVar("t",tps);
-              vit_som_bord_ALE(faces.sommet(i,k),j)=fxyt[j].eval();
+              fxyzt[j].setVar("x",x);
+              fxyzt[j].setVar("y",y);
+              fxyzt[j].setVar("z",z);
+              fxyzt[j].setVar("t",tps);
+              vit_som_bord_ALE(faces.sommet(i,k),j)=fxyzt[j].eval();
               //cout << " x y  " << x << " " << y << " " << z << " " << vit_som_bord_ALE(faces.sommet(i,k),j) << endl;
             }
         }
