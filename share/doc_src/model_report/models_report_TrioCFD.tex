@@ -7,7 +7,7 @@
 \usepackage{lmodern}
 \usepackage{lettrine}
 \usepackage{geometry}
-\usepackage{amsmath,amssymb,amsfonts,textcomp}
+\usepackage{amsmath,amssymb,amsfonts,amsgen,amsbsy,textcomp}
 \usepackage{amsthm}
 \usepackage{textcomp}
 \usepackage{color}
@@ -35,6 +35,34 @@
 \usepackage{url}
 \usepackage{rotating}
 \usepackage{chngcntr}
+%ALE
+\usepackage{microtype}
+\usepackage{tabularx}
+\usepackage{stmaryrd}
+\usepackage{cleveref}
+\usepackage{empheq,etoolbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\newcommand\irregularcircle[2]{% radius, irregularity
+  \pgfextra {\pgfmathsetmacro\len{(#1)+rand*(#2)}}
+  +(0:\len pt)
+  \foreach \a in {10,20,...,350}{
+    \pgfextra {\pgfmathsetmacro\len{(#1)+rand*(#2)}}
+    -- +(\a:\len pt)
+  } -- cycle
+}
+\def\b_v{\mathbf{v}}
+\def\U{\mathbf{U}}
+\def\V{\mathbf{V}}
+\renewcommand{\div}{\mathrm{div}}
+\newcommand{\velocity}{\vec{u}}
+\newcommand{\vale}{\vec{u}_{\text{ALE}}} 
+\newcommand{\normal}{\vec{ n}}
+\newcommand{\point}{x}
+
+%SENSITIVITY
+\def\b_u{\mathbf{u}}
+
 % espacement table des matieres et des figures entre numero et titre
 \usepackage{tocloft}
 \newcommand{\DF}{\displaystyle\frac}
@@ -43,7 +71,7 @@
 \cftsetindents{table}{0em}{4em}
 %
 % Pour supprimer les encadres rouges des liens et definir leur fonte en bleu
-\usepackage{makeidx}
+\usepackage{imakeidx}
 \usepackage{hyperref}
 \hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
 %
@@ -105,6 +133,8 @@
 \renewcommand{\sectionmark}[1]{\markright{#1}}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.3pt}
+%numerotation equation
+\renewcommand{\theequation}{\thepart.\thesection~~eq\arabic{equation}}
 %%\lhead{\leftmark}
 \chead{}
 %%\rhead{\rightmark}
@@ -190,9 +220,9 @@
 \hline
 Code Version & Date & Code manager & Authors \\
  & & J. DARONA & \\ \hline
- & &\multirow{3}{*}{\includegraphics[scale=0.65]{../validation_report/tools/sign_JD.png}} & P.E. ANGELI \\
-v1.8.2 & \today && A. CARTALADE\\
- & && E. JAMELOT \\ \hline
+ & &\multirow{3}{*}{\includegraphics[scale=0.65]{../validation_report/tools/sign_JD.png}} &  \\
+v1.8.2 & \today && TrioCFD Team\\
+ & &&  \\ \hline
 \multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } models\_report\_TrioCFD.tex } \\
 \multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
 \multicolumn{2}{c|}{\textbf{CEA SACLAY} } & \multicolumn{2}{c}{ } \\
@@ -230,10 +260,23 @@ v1.8.2 & \today && A. CARTALADE\\
 \normalsize \normalfont
 \input{./part3-turbulence.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\label{sec:Diphasique}Mod\`eles des \'ecoulement diphasiques}
+\normalsize \normalfont
+%\input{./part41-FT.tex}
+\input{./part42-Phase_field.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\label{sec:ALE}The Arbitrary Lagrangian-Eulerian Method}
+\normalsize \normalfont
+\input{./part5-ALE.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\part{\label{sec:Sensitivity}Sensitivity equation method for the Navier--Stokes equations applied to uncertainty propagation}
+\normalsize \normalfont
+\input{./part6-sensitivity.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Perspectives}
 \normalsize \normalfont
 \vspace{4.5cm}
-\input{./part4-perspectives.tex}
+\input{./part7-perspectives.tex}
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
@@ -244,6 +287,8 @@ v1.8.2 & \today && A. CARTALADE\\
 \input{./annexeA.tex}
 \pagebreak
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{BIBLIOGRAPHIE}
 \bibliographystyle{plain}
-\bibliography{BibTeX_TrioCFD,18-Stokes_bib}
+\bibliography{BibTeX_TrioCFD,18-Stokes_bib,bibALE,bibSENSITIVITY.bib}
 \end{document}

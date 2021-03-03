@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.3_beta : Enhancements, modifications and corrected bugs since version 1.8.2 :
 --------------------------------------------------------------------------------------------------
+03/03/21 (TrioCFD) Doc         : Update of models description (Phase Field, ALE and Sensitivity Analysis)
 15/01/21 (TrioCFD) New feature : New documentation available: development plan and models description
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.2 : Enhancements, modifications and corrected bugs since version 1.8.1 :
