@@ -20,14 +20,13 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Op_DiffF22_VDF_Elem_included
 #define Op_DiffF22_VDF_Elem_included
 
 #include <Op_Diff_VDF_base.h>
 #include <ItVDFEl.h>
-#include <Eval_DiffF22_VDF_const_Elem.h>
 #include <Op_VDF_Elem.h>
+class Eval_DiffF22_VDF_const_Elem;
 
 //
 // .DESCRIPTION class Op_DiffF22_VDF_Elem
@@ -60,10 +59,8 @@ class Op_DiffF22_VDF_Elem : public Op_Diff_VDF_base, public Op_VDF_Elem
 public:
 
   Op_DiffF22_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
+  void associer(const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
   void associer_diffusivite(const Champ_base& );
-
   const Champ_base& diffusivite() const;
   inline  void dimensionner(Matrice_Morse& ) const;
   inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;

@@ -23,23 +23,15 @@
 #include <Op_DiffF22_VDF_Elem.h>
 #include <Champ_P0_VDF.h>
 #include <Modele_turbulence_hyd_K_Eps_V2.h>
+#include <Eval_DiffF22_VDF_const_Elem.h>
 
 Implemente_instanciable_sans_constructeur(Op_DiffF22_VDF_Elem,"Op_DiffF22_VDF_const_P0_VDF",Op_Diff_VDF_base);
-
 implemente_It_VDF_Elem(Eval_DiffF22_VDF_const_Elem)
-
-
-//// printOn
-//
 
 Sortie& Op_DiffF22_VDF_Elem::printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
 }
-
-
-//// readOn
-//
 
 Entree& Op_DiffF22_VDF_Elem::readOn(Entree& s )
 {
@@ -94,7 +86,7 @@ void Op_DiffF22_VDF_Elem::associer(const Zone_dis& zone_dis,
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
   iter.associer(zvdf, zclvdf, *this);
 
-  Eval_DiffF22_VDF_const_Elem& eval_diff = (Eval_DiffF22_VDF_const_Elem&) iter.evaluateur();
+  Eval_DiffF22_VDF_const_Elem& eval_diff = dynamic_cast<Eval_DiffF22_VDF_const_Elem&> (iter.evaluateur());
   eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
   eval_diff.associer_inconnue(inco );        // Eval_VDF_Elem::associer_inconnue
 }
@@ -104,7 +96,7 @@ void Op_DiffF22_VDF_Elem::associer(const Zone_dis& zone_dis,
 // associe le champ de diffusivite a l'evaluateur
 void Op_DiffF22_VDF_Elem::associer_diffusivite(const Champ_base& ch_diff)
 {
-  Eval_DiffF22_VDF_const_Elem& eval_diff = (Eval_DiffF22_VDF_const_Elem&) iter.evaluateur();
+  Eval_DiffF22_VDF_const_Elem& eval_diff = dynamic_cast<Eval_DiffF22_VDF_const_Elem&> (iter.evaluateur());
   eval_diff.associer(ch_diff);                // Eval_DiffF22_VDF::associer
   const EqnF22base& mon_eqn = ref_cast(EqnF22base,equation());
 
@@ -113,12 +105,10 @@ void Op_DiffF22_VDF_Elem::associer_diffusivite(const Champ_base& ch_diff)
   eval_diff.associer_keps(K_eps,v2);
 }
 
-
-
 const Champ_base& Op_DiffF22_VDF_Elem::diffusivite() const
 {
-  const Eval_DiffF22_VDF_const_Elem& eval_diff = (const Eval_DiffF22_VDF_const_Elem&) iter.evaluateur();
-  return eval_diff.diffusivite();
+  const Eval_DiffF22_VDF_const_Elem& eval_diff = dynamic_cast<const Eval_DiffF22_VDF_const_Elem&> (iter.evaluateur());
+  return eval_diff.get_diffusivite();
 }
 
 //
