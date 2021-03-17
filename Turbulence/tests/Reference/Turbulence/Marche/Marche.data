@@ -146,6 +146,13 @@ Read pb
 	}
 Post_processing 
 {
+	Definition_champs
+	{
+		source_keps operateur_eqn {
+				numero_source 0
+				sources { refChamp { pb_champ pb K_EPS } }
+		}
+	}
 	Probes 
 	{
 		sonde_vitesse vitesse periode 0.01 points 1 10. 0.5
@@ -167,6 +174,7 @@ Post_processing
 			eps som
 			viscosite_turbulente elem
 			viscosite_turbulente som
+			source_keps elem
 	}
 }
 }

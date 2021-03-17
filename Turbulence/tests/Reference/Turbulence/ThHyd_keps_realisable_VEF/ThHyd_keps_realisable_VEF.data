@@ -1,0 +1,126 @@
+# PARALLEL OK 4 #
+# Hydraulique 2D, fluide air #
+# Reynolds=0.14*12*1.2/0.00002~1e5 sans dilatation #
+# Lecture du 1/2 maillage #
+
+dimension 2
+Pb_hydraulique_turbulent pb
+Domaine dom
+
+# BEGIN MESH #
+Lire_med family_names_from_group_names dom forme forme.med
+VerifierCoin dom { }
+Dilate dom 0.3
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partitionneur metis { Nb_parts 4 }
+	Larg_joint 2
+	Nom_Zones DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+# Je choisis une discretisation #
+VEFPreP1B ma_discretisation
+
+Schema_Euler_implicite mon_schema
+Read mon_schema
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 0.2
+	dt_min 1.e-10
+	dt_max 1.e+10
+	dt_impr 1.e-6
+	dt_sauv 100
+	seuil_statio 1.e-4
+	seuil_statio_relatif_deconseille 1
+	facsec 20
+	facsec_max 30
+	solveur implicite { solveur gmres { diag nb_it_max 5 seuil 1.e-20 impr } }
+}
+
+# Je definis un milieu #
+Fluide_Incompressible milieu
+Read milieu
+{
+	mu  Champ_Uniforme 1 0.00002
+	rho Champ_Uniforme 1 1.2
+}
+
+Associate pb dom
+Associate pb mon_schema
+Associate pb milieu
+Discretize pb ma_discretisation
+Read pb
+{
+	Navier_Stokes_turbulent
+	{
+		solveur_pression petsc cholesky { } 
+		convection { muscl }
+		diffusion { }
+		conditions_initiales {
+			vitesse Champ_Uniforme 2 12. 0.
+			}
+		boundary_conditions {
+			Haut  	symetrie
+		      	Axe  	symetrie
+			Forme 	paroi_fixe
+			Sortie 	frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 0.
+			Entree 	frontiere_ouverte_vitesse_imposee Champ_front_Uniforme 2 12. 0.
+		}
+
+               modele_turbulence K_Epsilon_Realisable {
+                     Transport_K_Epsilon_Realisable
+                     {
+
+                             convection { amont }
+                             diffusion { }
+			     sources { Source_Transport_K_Eps_Realisable { C2_eps 1.92 } }
+                             boundary_conditions {
+                                    Haut        symetrie
+                                    Axe         symetrie
+                                    Forme       Paroi
+                                    Sortie      frontiere_ouverte K_EPS_EXT Champ_Front_Uniforme 2 1.44 43
+                                    Entree      frontiere_ouverte_K_eps_impose Champ_front_Uniforme 2 1.44 43
+                             }
+                             conditions_initiales { k_Eps Champ_Uniforme 2 1.44 43 }
+                      }
+			 Prandtl_K 1
+			 Prandtl_Eps 1.2
+                         turbulence_paroi loi_standard_hydr
+			 Modele_fonc_realisable Shih_Zhu_Lumley { A0 4.04 }
+                }
+        }
+	Postraitement
+	{
+	    Definition_champs
+	    {
+		   # we cannot post-process k-eps sources on faces on LML format, we interpolate to elements #
+		    source_keps_elem Interpolation {
+                                        localisation elem
+                                        source  operateur_eqn {
+					    numero_source 0
+					    sources { refChamp { pb_champ pb k_eps } }
+					}
+		   }
+	    }
+	    format lml
+	    Champs dt_post 1
+	    { 
+		    vitesse elem
+		    pression_pa elem
+		    y_plus elem
+		    source_keps_elem
+	    }
+	}
+}
+Solve pb
+End
