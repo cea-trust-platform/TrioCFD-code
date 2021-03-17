@@ -377,7 +377,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
 
     }
   //E=0;
-  Cerr<<E.mp_min_vect()<<" EEEEEEEEEEEEEEEEEEEEEEEE "<<E.mp_max_vect()<<finl;
+//  Cerr<<E.mp_min_vect()<<" EEEEEEEEEEEEEEEEEEEEEEEE "<<E.mp_max_vect()<<finl;
 
   return E;
 }

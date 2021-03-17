@@ -85,7 +85,7 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
         Fmu[elem]=1.;
     }
   //Fmu=1;
-  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
+//  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
 
 
   return Fmu;

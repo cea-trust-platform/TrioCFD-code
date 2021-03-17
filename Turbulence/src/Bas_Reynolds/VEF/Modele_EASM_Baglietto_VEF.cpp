@@ -324,7 +324,7 @@ DoubleTab&  Modele_EASM_Baglietto_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
       int elem1 = la_zone.face_voisins(num_face,1);
       wall_length_face(num_face) = 0.5*wall_length(elem0)+0.5*wall_length(elem1);
     }
-  Cerr<<wall_length_face.mp_min_vect()<<" wall_length " <<wall_length_face.mp_max_vect()<<finl;
+//  Cerr<<wall_length_face.mp_min_vect()<<" wall_length " <<wall_length_face.mp_max_vect()<<finl;
   /*for (num_face=0; num_face< la_zone.premiere_face_int(); num_face++)
    {
     int elem0 = la_zone.face_voisins(num_face,0);

@@ -117,7 +117,7 @@ inline DoubleTab& Op_Diff_K_Eps_VDF_base::ajouter(const DoubleTab& inco,  Double
 inline void Op_Diff_K_Eps_VDF_base::contribuer_a_avec(const DoubleTab& inco,
                                                       Matrice_Morse& matrice) const
 {
-  Cerr << "dans Op_Diff_K_Eps_VDF_base::contribuer_a_avec" << finl;
+//  Cerr << "dans Op_Diff_K_Eps_VDF_base::contribuer_a_avec" << finl;
   iter.ajouter_contribution(inco, matrice);
 }
 
