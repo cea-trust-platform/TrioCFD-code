@@ -1,7 +1,8 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.3_beta : Enhancements, modifications and corrected bugs since version 1.8.2 :
 --------------------------------------------------------------------------------------------------
-17/03/21 (TrioCFD) New feature : Possible to post-process k-eps source terms in definition_champs block with "operateur_eqn { numero_source 0 sources { refChamp { pb_champ pb K_EPS } }"
+31/03/21 (TrioCFD) New feature : Add possibility to post-process k-eps diffusive and convective terms in definition_champs block
+17/03/21 (TrioCFD) New feature : Add possibility to post-process k-eps source terms in definition_champs block with "operateur_eqn { numero_source 0 sources { refChamp { pb_champ pb K_EPS } }"
 03/03/21 (TrioCFD) Doc         : Update of models description (Phase Field, ALE and Sensitivity Analysis)
 05/02/21 (TrioCFD) New keyword : Boundary_field_keps_from_ud to specify a K-Eps inlet field with hydraulic diameter, speed, and turbulence intensity (VDF only)
 27/01/21 (TrioCFD) Major change: Restructuration - Rayonnement contains now Rayonnement (milieu transparent) + Rayonnement_semi_transparent
