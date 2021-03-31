@@ -8,4 +8,5 @@ TrioCFD
 TrioCFD_opt
 Makefile
 README.BALTIK
+index.html
 .test*

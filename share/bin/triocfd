@@ -1,10 +1,38 @@
 #!/bin/bash
 # Surcharge du script trust pour plusieurs actions:
 
-# Exemple, lancement de l'index:
+# Exemple, lancement de l'index ou verification de la syntaxe d'un jdd :
 if [ "$1" = -index ]
 then
    $TRUST_WEBBROWSER $project_directory/index.html &
+elif [ "$1" = -xcheck ]
+then
+   #######################################
+   # Verify datafile's syntax with xdata #
+   #######################################
+   if [ ! -f $project_directory/build/xdata/VerifData ]
+   then
+      echo "XDATA for TrioCFD was not built, build it with:"
+      echo "make gui"
+      exit -1
+   fi
+   shift
+   ###################
+   # datafile's name #
+   ###################
+   NOM=$1 && NOM=${NOM%.data}
+   [ "${NOM:0:1}" = "-" ] && echo "Error: option not included" && trust -help && exit -1
+   [ ! -f $NOM.data ] && echo "Error: datafile $NOM.data not found!!" && exit -1
+   $project_directory/build/xdata/VerifData $NOM".data"
+elif [ "$1" = -baltik ]
+then
+ shift
+ baltik_name=$1
+ trust -baltik $baltik_name
+ echo "TrioCFD: $project_directory" >> ./$baltik_name/project.cfg
+ mkdir -p ./$baltik_name/src/patch
+ echo ""
+ echo "TIP: if you want to edit TrioCFD sources, put the modified sources in ./$baltik_name/src/patch folder"
 else
    trust $*
 fi
