@@ -359,7 +359,7 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone
 
     }
   //E=0;
-  Cerr<<E.mp_min_vect()<<" EEEEEEEEEEEEEEEEEEEEEEEE "<<E.mp_max_vect()<<finl;
+//  Cerr<<E.mp_min_vect()<<" EEEEEEEEEEEEEEEEEEEEEEEE "<<E.mp_max_vect()<<finl;
 
   return E;
 }
@@ -455,6 +455,6 @@ DoubleTab&  Modele_Launder_Sharma_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
           Fmu[num_face] = 1.;
         }
     }
-  Cerr<<Fmu.mp_min_vect()<<" Fmu " <<Fmu.mp_max_vect()<<finl;
+//  Cerr<<Fmu.mp_min_vect()<<" Fmu " <<Fmu.mp_max_vect()<<finl;
   return Fmu;
 }

@@ -58,7 +58,7 @@ void  Modele_F1F2FMU_unitaire_VDF::associer(const Zone_dis& zone_dis,
 DoubleTab&  Modele_F1F2FMU_unitaire_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_eps_Bas_Re,const Champ_Don& ch_visco ) const
 {
   Fmu=1;
-  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
+//  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
   return Fmu;
 }
 DoubleTab& Modele_F1F2FMU_unitaire_VDF::Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const

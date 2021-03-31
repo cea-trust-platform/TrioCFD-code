@@ -179,7 +179,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
       int is_Cmu_constant = mon_modele_fonc.Calcul_is_Cmu_constant();
       if (is_Cmu_constant==0)
         {
-          Cerr<< " On utilise un Cmu non constant "<< finl;
+//          Cerr<< " On utilise un Cmu non constant "<< finl;
           const DoubleTab& vitesse = mon_equation->inconnue().valeurs();
           mon_modele_fonc.Calcul_Cmu(Cmu, la_zone_dis, la_zone_Cl_dis,
                                      vitesse, tab_K_Eps, LeEPS_MIN);
@@ -197,8 +197,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
                                                vitesse, tab_K_Eps, LeEPS_MIN);
             }
         }
-      else
-        Cerr<< " On utilise un Cmu constant "<< finl;
+//      else
+//        Cerr<< " On utilise un Cmu constant "<< finl;
 
     }
 

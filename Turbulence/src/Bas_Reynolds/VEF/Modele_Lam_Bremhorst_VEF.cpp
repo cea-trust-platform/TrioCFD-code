@@ -215,7 +215,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& z
           //exit();
         }
     }
-  Cerr<< Fmu_loc.mp_min_vect()<< " Fmu_loc "<<Fmu_loc.mp_max_vect()<<finl;
+//  Cerr<< Fmu_loc.mp_min_vect()<< " Fmu_loc "<<Fmu_loc.mp_max_vect()<<finl;
 
   // Calcul de F1
   for (num_face=0; num_face <nb_faces; num_face ++ )
@@ -225,7 +225,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F1( DoubleTab& F1, const Zone_dis& z
       else
         F1[num_face] = 1.;
     }
-  Cerr<< F1.mp_min_vect()<< " F1 "<<F1.mp_max_vect()<<finl;
+//  Cerr<< F1.mp_min_vect()<< " F1 "<<F1.mp_max_vect()<<finl;
   return F1;
 }
 
@@ -265,7 +265,7 @@ DoubleTab& Modele_Lam_Bremhorst_VEF::Calcul_F2( DoubleTab& F2, DoubleTab& Deb, c
         F2[num_face] = 1.;
 
     }
-  Cerr<<F2.mp_min_vect()<<" F2 "<<F2.mp_max_vect()<<finl;
+//  Cerr<<F2.mp_min_vect()<<" F2 "<<F2.mp_max_vect()<<finl;
   return F2;
 }
 
@@ -378,7 +378,7 @@ DoubleTab&  Modele_Lam_Bremhorst_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
           //exit();
         }
     }
-  Cerr<< Fmu.mp_min_vect()<< " Fmu "<<Fmu.mp_max_vect()<<finl;
+//  Cerr<< Fmu.mp_min_vect()<< " Fmu "<<Fmu.mp_max_vect()<<finl;
 
   return Fmu;
 }
