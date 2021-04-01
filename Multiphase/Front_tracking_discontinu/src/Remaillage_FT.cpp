@@ -236,7 +236,9 @@ int Remaillage_FT::a_lisser(double temps) const
 // Postcondition: Amene le maillage dans l'etat MINIMAL
 void Remaillage_FT::remaillage_local_interface(double temps, Maillage_FT_Disc& maillage)
 {
-  statistiques().begin_count(remaillage_loc_interf_counter_);
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Remaillage_local_interface", "FrontTracking");
+  statistiques().begin_count(stat_counter);
+
   temps_dernier_remaillage_ = temps_dernier_lissage_ = temps_ = temps;
 
   maillage.nettoyer_elements_virtuels();
@@ -281,7 +283,7 @@ void Remaillage_FT::remaillage_local_interface(double temps, Maillage_FT_Disc& m
         Journal() << "remaillage_local_interface t= " << temps << " suppressions: " << n << " divisions: " << m << finl;
     }
   nettoyer_maillage(maillage);
-  statistiques().end_count(remaillage_loc_interf_counter_);
+  statistiques().end_count(stat_counter);
 }
 
 
@@ -1157,7 +1159,9 @@ void Remaillage_FT::corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var
 //  Precondition: pas de facettes virtuelles
 void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage)
 {
-  statistiques().begin_count(barycentre_lissage_sys_counter_);
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Barycentrer_lisser_systematique", "FrontTracking");
+  statistiques().begin_count(stat_counter);
+
   if (Process::je_suis_maitre())
     Journal() << "barycentrer_lisser_systematique" << finl;
   temps_dernier_lissage_ = temps;
@@ -1172,14 +1176,15 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
                        seuil_dvolume_residuel_);
   supprimer_facettes_bord(maillage);
   nettoyer_maillage(maillage);
-  statistiques().end_count(barycentre_lissage_sys_counter_);
+  statistiques().end_count(stat_counter);
 }
 
 // Description: idem mais avec le nombre d'iterations de lissage si remaillage
 // Precondition: pas d'elements virtuels (on doit avoir appele nettoyer_elements_virtuels())
 void Remaillage_FT::barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume)
 {
-  statistiques().begin_count(barycentre_lissage_apres_counter_);
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Barycentrer_lisser_apres_rem");
+  statistiques().begin_count(stat_counter);
   if (Process::je_suis_maitre())
     Journal() << "barycentrer_lisser_apres_remaillage" << finl;
   regulariser_maillage(maillage, var_volume,
@@ -1191,7 +1196,7 @@ void Remaillage_FT::barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& mailla
                        seuil_dvolume_residuel_);
   supprimer_facettes_bord(maillage);
   nettoyer_maillage(maillage);
-  statistiques().end_count(barycentre_lissage_apres_counter_);
+  statistiques().end_count(stat_counter);
 }
 
 // POUR DEBUGGER LA CONSERVATION DU VOLUME
@@ -1816,7 +1821,9 @@ static void SPA_choisir_sommets_remplacement(const Maillage_FT_Disc& maillage,
 int Remaillage_FT::supprimer_petites_aretes(Maillage_FT_Disc& maillage,
                                             ArrOfDouble& varVolume) const
 {
-  statistiques().begin_count(sup_div_aretes_counter_);
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Supprimer_petites_aretes");
+  statistiques().begin_count(stat_counter);
+
   int nb_sommets_supprimes_tot = 0;
   int nb_sommets_supprimes = 0;
   do
@@ -2035,7 +2042,7 @@ int Remaillage_FT::supprimer_petites_aretes(Maillage_FT_Disc& maillage,
   maillage.desc_sommets().echange_espace_virtuel(varVolume);
 
   maillage.maillage_modifie(Maillage_FT_Disc::MINIMAL);
-  statistiques().end_count(sup_div_aretes_counter_);
+  statistiques().end_count(stat_counter);
   return nb_sommets_supprimes_tot;
 }
 
@@ -2465,7 +2472,9 @@ True_int fct_compare_tab_aretes(const void *pt1, const void *pt2)
 // Postcondition:
 int Remaillage_FT::diviser_grandes_aretes(Maillage_FT_Disc& maillage) const
 {
-  statistiques().begin_count(sup_div_aretes_counter_);
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Diviser_grandes_aretes");
+  statistiques().begin_count(stat_counter);
+
   static int compteur = 0;
   static int test_val = -1;
 
@@ -2694,7 +2703,7 @@ int Remaillage_FT::diviser_grandes_aretes(Maillage_FT_Disc& maillage) const
   Process::Journal()<<"FIN Remaillage_FT::diviser_grandes_aretes " <<"  nb_aretes_divisees_tot="<< nb_aretes_divis_tot<<finl;
 
   maillage.maillage_modifie(Maillage_FT_Disc::MINIMAL);
-  statistiques().end_count(sup_div_aretes_counter_);
+  statistiques().end_count(stat_counter);
   //  return res;
   return 1;
 }
