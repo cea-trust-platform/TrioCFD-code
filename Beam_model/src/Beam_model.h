@@ -60,7 +60,7 @@ public :
   void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
   void readInputAbscFiles (Nom& absc_file_name);
   void readInputModalDeformation(Nom& modal_deformation_file_name);
-  void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
+  //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
 protected :
   int nb_modes_;
@@ -73,7 +73,7 @@ protected :
   DoubleVect abscissa_;
   DoubleTab u_;
   DoubleTab R_;
-  DoubleTab phi3D_;
+  //DoubleTab phi3D_;
 
 };
 inline const int& Beam_model::getNbModes() const

@@ -165,7 +165,71 @@ void Beam_model::readInputModalDeformation(Nom& modal_deformation_file_name)
     }
 }
 
-void Beam_model::interpolationOnThe3DSurface(const Bords& les_bords_ALE)
+
+
+DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
+{
+  DoubleVect phi(3);
+  phi=0.;
+  double h = abscissa_[1] -abscissa_[0]; //1d mesh pitch
+  int abscissa_size = abscissa_.size();
+  double s=0.;
+  double xs=x;
+  double ys=y;
+  double zs=z;
+  if (direction_== 0)
+    {
+      s = x;
+      xs=0.;
+    }
+  else if (direction_== 1)
+    {
+      s = y;
+      ys=0.;
+    }
+
+  else
+    {
+      s = z;
+      zs=0.;
+    }
+
+  int i, j ;
+  i = s/h;
+  if((i+1) < abscissa_size)
+    {
+      j= i+1;
+    }
+  else
+    {
+      j=i;
+    }
+  double ux, uy, uz, Rx, Ry, Rz;
+
+  //linear interpolation between points i and j
+  double	alpha = (abscissa_[j] - s)/h;
+  double	betha = (s - abscissa_[i])/h;
+
+  ux=alpha*u_(i, 0) + betha*u_(j, 0);
+  uy=alpha*u_(i, 1) + betha*u_(j, 1);
+  uz=alpha*u_(i, 2) + betha*u_(j, 2);
+  Rx=alpha*R_(i, 0) + betha*R_(j, 0);
+  Ry=alpha*R_(i, 1) + betha*R_(j, 1);
+  Rz=alpha*R_(i, 2) + betha*R_(j, 2);
+
+  phi[0] =ux + Ry*zs -Rz*ys;
+  phi[1] =uy + Rz*xs -Rx*zs;
+  phi[2] =uz + Rx*ys -Ry*xs;
+
+  /*if(abs(phi[1] - 0.22*sin(PI*s/0.7))>1.e-3)
+    {
+      Cerr<<" Depalcement: phi[1] "<<phi[1] - 0.22*sin(PI*s/0.7)<<finl;
+      getchar();
+    }*/
+
+  return phi;
+}
+/*void Beam_model::interpolationOnThe3DSurface(const Bords& les_bords_ALE)
 {
   Cerr<<"Interpolation of the 1d modal deformation to the 3d surface"<<finl;
 
@@ -236,68 +300,4 @@ void Beam_model::interpolationOnThe3DSurface(const Bords& les_bords_ALE)
         }
 
     }
-}
-
-DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
-{
-  DoubleVect phi(3);
-  phi=0.;
-  double h = abscissa_[1] -abscissa_[0]; //1d mesh pitch
-  int abscissa_size = abscissa_.size();
-  double s=0.;
-  double xs=x;
-  double ys=y;
-  double zs=z;
-  if (direction_== 0)
-    {
-      s = x;
-      xs=0.;
-    }
-  else if (direction_== 1)
-    {
-      s = y;
-      ys=0.;
-    }
-
-  else
-    {
-      s = z;
-      zs=0.;
-    }
-
-  int i, j ;
-  i = s/h;
-  if((i+1) < abscissa_size)
-    {
-      j= i+1;
-    }
-  else
-    {
-      j=i;
-    }
-  double ux, uy, uz, Rx, Ry, Rz;
-
-  //linear interpolation between points i and j
-  double	alpha = (abscissa_[j] - s)/h;
-  double	betha = (s - abscissa_[i])/h;
-
-  ux=alpha*u_(i, 0) + betha*u_(j, 0);
-  uy=alpha*u_(i, 1) + betha*u_(j, 1);
-  uz=alpha*u_(i, 2) + betha*u_(j, 2);
-  Rx=alpha*R_(i, 0) + betha*R_(j, 0);
-  Ry=alpha*R_(i, 1) + betha*R_(j, 1);
-  Rz=alpha*R_(i, 2) + betha*R_(j, 2);
-
-  phi[0] =ux + Ry*zs -Rz*ys;
-  phi[1] =uy + Rz*xs -Rx*zs;
-  phi[2] =uz + Rx*ys -Ry*xs;
-
-  /*if(abs(phi[1] - 0.22*sin(PI*s/0.7))>1.e-3)
-    {
-      Cerr<<" Depalcement: phi[1] "<<phi[1] - 0.22*sin(PI*s/0.7)<<finl;
-      getchar();
-    }*/
-
-  return phi;
-}
-
+}*/
