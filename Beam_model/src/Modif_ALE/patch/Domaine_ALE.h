@@ -67,7 +67,7 @@ public :
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   inline const DoubleTab& getOldJacobian();
   inline const DoubleTab& getNewJacobian();
-
+  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
 protected:
 
   double dt_;

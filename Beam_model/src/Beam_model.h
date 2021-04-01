@@ -24,6 +24,9 @@
 
 #include <Interprete_geometrique_base.h>
 #include <Nom.h>
+#include <Bords.h>
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -54,14 +57,23 @@ public :
   inline void setFileName(const Nom&) ;
   inline const bool& getActivate() const;
   inline void setActivate(const bool&) ;
+  void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
+  void readInputAbscFiles (Nom& absc_file_name);
+  void readInputModalDeformation(Nom& modal_deformation_file_name);
+  void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
+  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
 protected :
   int nb_modes_;
-  int direction_; //x=1, y=2, z=3
+  int direction_; //x=0, y=1, z=2
   double young_; // Young module
   double rho_; // solid density
-  Nom name_of_beam_;
-  Nom masse_and_phi_file_name_;
   bool activate_=false;
+  DoubleVect mass_;
+  DoubleVect stiffness_;
+  DoubleVect abscissa_;
+  DoubleTab u_;
+  DoubleTab R_;
+  DoubleTab phi3D_;
 
 };
 inline const int& Beam_model::getNbModes() const
@@ -95,24 +107,6 @@ inline const double& Beam_model::getRhoBeam() const
 inline void Beam_model::setRhoBeam(const double& rho)
 {
   rho_=rho;
-}
-
-inline const Nom& Beam_model::getBeamName() const
-{
-  return name_of_beam_;
-}
-
-inline void Beam_model::setBeamName(const Nom& name)
-{
-  name_of_beam_= name;
-}
-inline const Nom& Beam_model::getFileName() const
-{
-  return masse_and_phi_file_name_;
-}
-inline void Beam_model::setFileName(const Nom& name)
-{
-  masse_and_phi_file_name_=name;
 }
 
 inline const bool& Beam_model::getActivate() const

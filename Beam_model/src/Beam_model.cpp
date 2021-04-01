@@ -21,6 +21,21 @@
 
 #include <Beam_model.h>
 #include <Domaine_ALE.h>
+#include <DoubleVect.h>
+#include <IntTab.h>
+#include <Probleme_base.h>
+#include <Zone_VEF.h>
+#include <Zone_Cl_VEF.h>
+#include <Frontiere.h>
+#include <MD_Vector_tools.h>
+#include <MD_Vector_std.h>
+#include <Ref_Zone.h>
+#include <Faces.h>
+#include <fstream>
+#include <math.h>       /* sin */
+#define PI 3.14159265
+
+using namespace std;
 
 Implemente_instanciable( Beam_model, "Beam_model", Interprete_geometrique_base ) ;
 
@@ -41,3 +56,248 @@ Entree&  Beam_model::interpreter_(Entree& is)
   dom.reading_beam_model(is);
   return is;
 }
+
+void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
+{
+  Cerr << "Read beam model coefficients from "<< masse_and_stiffness_file_name <<" files " << finl;
+  mass_.resize(nb_modes_);
+  stiffness_.resize(nb_modes_);
+  string const nomFichier(masse_and_stiffness_file_name);
+
+  ifstream monFlux(nomFichier.c_str());
+
+  if(monFlux)
+    {
+      string line;  // read the first line
+      getline(monFlux, line);
+      monFlux.ignore();
+      double mass;
+      double stiffness;
+      for(int i=0; i<nb_modes_; i++)
+        {
+          monFlux >> mass >> stiffness;
+          if(abs(mass) > 1.e-16 && abs(stiffness)> 1.e-16)
+            {
+              mass_[i]=mass;
+              stiffness_[i]=stiffness;
+            }
+          else
+            {
+              Cerr<<" Beam_model::read_input_files values ​​of mass and stiffness are wrong in the file "<<masse_and_stiffness_file_name<<finl;
+              Cerr<<" Value ​​of mass = "<< mass<< " and value of stiffness = "<<stiffness<<finl;
+              exit();
+            }
+        }
+
+      monFlux.close();
+    }
+  else
+    {
+      Cerr<< "ERROR: Unable to open the file." <<masse_and_stiffness_file_name<<finl;
+    }
+
+}
+void Beam_model::readInputAbscFiles(Nom& absc_file_name)
+{
+  Cerr << "Read beam coordinates from "<< absc_file_name <<" files " << finl;
+
+  string const nomFichier(absc_file_name);
+  ifstream monFlux(nomFichier.c_str());
+  if(monFlux)
+    {
+      string line;  // read the first line
+      getline(monFlux, line);
+      monFlux.ignore();
+      double abscissa;
+      int i=0;
+      while(monFlux)
+        {
+          monFlux >> abscissa;
+          abscissa_.resize(i+1);
+          abscissa_[i]=abscissa;
+          i++;
+        }
+
+      monFlux.close();
+    }
+  else
+    {
+      Cerr<< "ERROR: Unable to open the file." <<absc_file_name<<finl;
+    }
+}
+
+
+
+void Beam_model::readInputModalDeformation(Nom& modal_deformation_file_name)
+{
+
+  Cerr << "Read beam modal deformation coefficients from "<< modal_deformation_file_name <<" files " << finl;
+
+  string const nomFichier(modal_deformation_file_name);
+
+  ifstream monFlux(nomFichier.c_str());
+  int size = abscissa_.size();
+  u_.resize(size, 3);
+  R_.resize(size, 3);
+
+  if(monFlux)
+    {
+      string line;  // read the first line
+      getline(monFlux, line);
+      monFlux.ignore();
+      double  ux, uy, uz, rx, ry, rz;
+      for(int i=0; i<size; i++)
+        {
+          monFlux >> ux>> uy>> uz>> rx>> ry>> rz;
+          u_(i, 0)=ux;
+          u_(i, 1)=uy;
+          u_(i, 2)=uz;
+          R_(i, 0)=rx;
+          R_(i, 1)=ry;
+          R_(i, 2)=ry;
+
+        }
+      monFlux.close();
+    }
+  else
+    {
+      Cerr<< "ERROR: Unable to open the file." <<modal_deformation_file_name<<finl;
+    }
+}
+
+void Beam_model::interpolationOnThe3DSurface(const Bords& les_bords_ALE)
+{
+  Cerr<<"Interpolation of the 1d modal deformation to the 3d surface"<<finl;
+
+  if(les_bords_ALE.size()!= 1)
+    {
+      Cerr<<"Too many beams. For the moment one can treat only a beam with the Beam module!"<<finl;
+      exit();
+    }
+  if(dimension != 3)
+    {
+      Cerr<<"The dimension of the problem is different from 3"<<finl;
+      exit();
+    }
+
+  Cerr<<" Interpolation on the "<<les_bords_ALE(0).le_nom()<<" boundary"<<finl;
+
+  const Faces& faces = les_bords_ALE(0).faces();
+  int size=faces.nb_faces_tot();
+  phi3D_.resize(size, dimension);
+  phi3D_ = 0.;
+  DoubleTab coord_cg(size, dimension);
+  faces.calculer_centres_gravite(coord_cg);
+  double h = abscissa_[1] -abscissa_[0]; //1d mesh pitch
+  int abscissa_size = abscissa_.size();
+  for(int face= 0; face<size; face++)
+    {
+      if(abs(phi3D_(face, direction_)) <1.e-16) //this node has not yet been treated
+        {
+          double s = coord_cg(face,direction_);
+          double xs= coord_cg(face,0);
+          double ys= coord_cg(face,1);
+          double zs= coord_cg(face,2);
+          if (direction_==0)
+            xs=0.;
+          else if (direction_==1)
+            ys=0.;
+          else
+            zs=0.;
+          //double test = 0.22*sin(PI*s/0.7);
+          int i, j ;
+          i = s/h;
+          if((i+1) < abscissa_size)
+            {
+              j= i+1;
+            }
+          else
+            {
+              j=i;
+            }
+          double ux, uy, uz, Rx, Ry, Rz;
+
+          //linear interpolation between points i and j
+          double	alpha = (abscissa_[j] - s)/h;
+          double	betha = (s - abscissa_[i])/h;
+
+          ux=alpha*u_(i, 0) + betha*u_(j, 0);
+          uy=alpha*u_(i, 1) + betha*u_(j, 1);
+          uz=alpha*u_(i, 2) + betha*u_(j, 2);
+          Rx=alpha*R_(i, 0) + betha*R_(j, 0);
+          Ry=alpha*R_(i, 1) + betha*R_(j, 1);
+          Rz=alpha*R_(i, 2) + betha*R_(j, 2);
+
+          //Cerr<<" test apres interpolation = "<<uy - test<<finl;
+          phi3D_(face, 0) =ux + Ry*zs -Rz*ys;
+          phi3D_(face, 1) =uy + Rz*xs -Rx*zs;
+          phi3D_(face, 2) =uz + Rx*ys -Ry*xs;
+
+        }
+
+    }
+}
+
+DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
+{
+  DoubleVect phi(3);
+  phi=0.;
+  double h = abscissa_[1] -abscissa_[0]; //1d mesh pitch
+  int abscissa_size = abscissa_.size();
+  double s=0.;
+  double xs=x;
+  double ys=y;
+  double zs=z;
+  if (direction_== 0)
+    {
+      s = x;
+      xs=0.;
+    }
+  else if (direction_== 1)
+    {
+      s = y;
+      ys=0.;
+    }
+
+  else
+    {
+      s = z;
+      zs=0.;
+    }
+
+  int i, j ;
+  i = s/h;
+  if((i+1) < abscissa_size)
+    {
+      j= i+1;
+    }
+  else
+    {
+      j=i;
+    }
+  double ux, uy, uz, Rx, Ry, Rz;
+
+  //linear interpolation between points i and j
+  double	alpha = (abscissa_[j] - s)/h;
+  double	betha = (s - abscissa_[i])/h;
+
+  ux=alpha*u_(i, 0) + betha*u_(j, 0);
+  uy=alpha*u_(i, 1) + betha*u_(j, 1);
+  uz=alpha*u_(i, 2) + betha*u_(j, 2);
+  Rx=alpha*R_(i, 0) + betha*R_(j, 0);
+  Ry=alpha*R_(i, 1) + betha*R_(j, 1);
+  Rz=alpha*R_(i, 2) + betha*R_(j, 2);
+
+  phi[0] =ux + Ry*zs -Rz*ys;
+  phi[1] =uy + Rz*xs -Rx*zs;
+  phi[2] =uz + Rx*ys -Ry*xs;
+
+  /*if(abs(phi[1] - 0.22*sin(PI*s/0.7))>1.e-3)
+    {
+      Cerr<<" Depalcement: phi[1] "<<phi[1] - 0.22*sin(PI*s/0.7)<<finl;
+      getchar();
+    }*/
+
+  return phi;
+}
+

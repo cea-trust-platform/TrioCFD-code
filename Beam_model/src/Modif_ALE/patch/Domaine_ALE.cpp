@@ -31,7 +31,7 @@
 #include <EFichier.h>
 #include <Champ_front_ALE.h>
 #include <Ch_front_input_ALE.h>
-
+#include <Champ_front_ALE_Beam.h>
 
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
@@ -198,6 +198,10 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
         }
     }
   //End of initializing Ch_front_input_ALE
+  if (beam.getActivate())
+    {
+      beam.interpolationOnThe3DSurface(les_bords_ALE);
+    }
 }
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
@@ -274,6 +278,19 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                       if(vit_bords(i, dim) == 0.)
                         vit_bords(i, dim) += vit_bord_ale(i, dim);
                     }
+                }
+            }
+        }
+      else if (le_nom_ch_front_courant == "Champ_front_ALE_Beam")
+        {
+          ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
+          DoubleTab vit_bord_ale = ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).get_vit_som_bord_ALE();
+
+          for(int dim=0; dim<dimension; dim++)
+            {
+              for(int i=0; i<N_som; i++)
+                {
+                  vit_bords(i, dim) += vit_bord_ale(i, dim);
                 }
             }
         }
@@ -576,6 +593,9 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Motcle accolade_fermee("}");
   Motcle motlu;
   Nom nomlu;
+  Nom masse_and_stiffness_file_name;
+  Nom phi_file_name;
+  Nom absc_file_name ;
   int var_int;
   double var_double;
   is >> motlu;
@@ -615,20 +635,33 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           beam.setRhoBeam(var_double);
           Cerr << "Rho beam : " <<  beam.getRhoBeam() << finl;
         }
-      if(motlu=="Beam_name_bord")
+      if(motlu=="Mass_and_stiffness_file_name")
         {
           is >> nomlu;
-          beam.setBeamName(nomlu);
-          Cerr << "Beam name bord : " <<  beam.getBeamName() << finl;
+          masse_and_stiffness_file_name=nomlu;
         }
-      if(motlu=="Csv_file_name")
+      if(motlu=="Absc_file_name")
         {
           is >> nomlu;
-          beam.setFileName(nomlu);
-          Cerr << "Csv file name : " <<  beam.getFileName() << finl;
+          absc_file_name=nomlu;
+        }
+
+      if(motlu=="Modal_deformation_file_name")
+        {
+          is >> nomlu;
+          phi_file_name=nomlu;
         }
 
       if (motlu == accolade_fermee)
         break;
     }
+  beam.readInputMassStiffnessFiles(masse_and_stiffness_file_name);
+  beam.readInputAbscFiles(absc_file_name);
+  beam.readInputModalDeformation(phi_file_name);
+
+
+}
+DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
+{
+  return beam.interpolationOnThe3DSurface(x,y,z);
 }
