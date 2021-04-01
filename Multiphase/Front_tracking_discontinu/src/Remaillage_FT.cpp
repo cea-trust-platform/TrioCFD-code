@@ -1159,9 +1159,6 @@ void Remaillage_FT::corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var
 //  Precondition: pas de facettes virtuelles
 void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage)
 {
-  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Barycentrer_lisser_systematique", "FrontTracking");
-  statistiques().begin_count(stat_counter);
-
   if (Process::je_suis_maitre())
     Journal() << "barycentrer_lisser_systematique" << finl;
   temps_dernier_lissage_ = temps;
@@ -1176,7 +1173,6 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
                        seuil_dvolume_residuel_);
   supprimer_facettes_bord(maillage);
   nettoyer_maillage(maillage);
-  statistiques().end_count(stat_counter);
 }
 
 // Description: idem mais avec le nombre d'iterations de lissage si remaillage

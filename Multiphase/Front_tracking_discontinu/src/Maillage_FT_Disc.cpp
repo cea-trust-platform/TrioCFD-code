@@ -1076,7 +1076,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 //  Les deplacements des sommets virtuels sont ignores.
 void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
 {
-  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Transporter");
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Transporter_maillage", "FrontTracking");
   statistiques().begin_count(stat_counter);
 
   assert(deplacement.dimension(0) == sommets_.dimension(0));
