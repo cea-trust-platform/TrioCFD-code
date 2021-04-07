@@ -3,6 +3,7 @@
 ./ALE/share/Validation/Rapports_automatiques/TwoOscillatingCylindersALE STD
 ./ALE/share/Validation/Rapports_automatiques/RotationALE NNR
 ./ALE/share/Validation/Rapports_automatiques/SquareObstacleALE NNR
+./ALE/share/Validation/Rapports_automatiques/3dOscillatingBeam NNR
 ./Critere_Entrainement_Gaz/share/Validation/Rapports_automatiques/Verification_CEG STD
 ./Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/Bullage_Huile_Creuset_Froid NNR
 ./Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/Chimie_FT STD
