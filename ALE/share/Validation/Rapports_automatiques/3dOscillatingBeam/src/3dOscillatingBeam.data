@@ -1,4 +1,5 @@
 # 3D oscillating cylindrical beam into a confined space  #
+# PARALLEL ONLY 40 #
 
 dimension 3
 
