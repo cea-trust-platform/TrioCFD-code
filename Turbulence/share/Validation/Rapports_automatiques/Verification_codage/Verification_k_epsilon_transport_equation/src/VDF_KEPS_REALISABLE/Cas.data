@@ -106,39 +106,12 @@ Lire pb
 					diff_keps	grav	diff_keps		periode 1 position_like keps
 					conv_keps # grav #	conv_keps		periode 1 position_like keps
 					}
-		format Lata
+		format lata
 		champs binaire dt_post 1e6
 					{
-					viscosite_turbulente elem
-					vitesse faces
-					k_eps elem
 					sources_keps elem
 					diff_keps elem
 					conv_keps elem
-					}
-	}
-	Postraitement
-	{
-		format lml
-		Definition_champs	{
-					sources_keps_lml operateur_eqn	{
-									numero_source 0
-									sources { refChamp { pb_champ pb k_eps } }
-									}
-					diff_keps_lml	 operateur_eqn	{
-									numero_op 0
-									sources { refChamp { pb_champ pb k_eps } }
-									}
-					conv_keps_lml	 operateur_eqn	{
-									numero_op 1
-									sources { refChamp { pb_champ pb k_eps } }
-									}
-					}
-		champs binaire dt_post 1e6
-					{
-					sources_keps_lml elem
-					diff_keps_lml    elem
-					conv_keps_lml    elem
 					}
 	}
 }
