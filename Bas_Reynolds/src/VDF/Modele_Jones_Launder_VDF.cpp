@@ -1251,3 +1251,250 @@ void  Modele_Jones_Launder_VDF::mettre_a_jour(double temps)
 {
   ;
 }
+
+DoubleTab&  Modele_Jones_Launder_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  Fmu = 0;
+  int nb_elem = la_zone.nb_elem();
+  double Re;
+  int elem;
+  //  Cerr << " Calc Fmu " << finl;
+  for (elem=0; elem< nb_elem ; elem++)
+    {
+      if (!is_visco_const)
+        visco=tab_visco[elem];
+      if (visco>0)
+        {
+          Re = K_Bas_Re(elem)*K_Bas_Re(elem)/(eps_Bas_Re(elem)+DMINFLOAT)/visco;
+          Fmu[elem] = exp(-2.5/(1.+Re/50.));
+        }
+      else
+        Fmu[elem] = 1;
+      // provisoire
+      //        Fmu[elem] = exp(-3.4/((1.+Re/50.)*(1.+Re/50.)));
+    }
+  //Cerr<<Fmu.mp_min_vect()<<" fmuuuuuuuuuuuuuuu " <<Fmu.mp_max_vect()<<finl;
+  /*
+    Cerr<<K_eps_Bas_Re(0,0)<<" ke "<<K_eps_Bas_Re(0,1)<<finl;
+    Cerr<<"re "<< K_eps_Bas_Re(0,0)*K_eps_Bas_Re(0,0)/K_eps_Bas_Re(0,1)/visco;
+    Cerr<<"visco "<<visco<<finl;
+  */
+  // Fmu=1;
+  return Fmu;
+}
+
+
+DoubleTab& Modele_Jones_Launder_VDF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = la_zone.nb_elem();
+  double Re;
+  int elem;
+
+  for (elem=0; elem< nb_elem ; elem++)
+    {
+      if (!is_visco_const)
+        visco=tab_visco[elem];
+      if (visco>0)
+        {
+          Re = K_Bas_Re(elem)*K_Bas_Re(elem)/(eps_Bas_Re(elem)+DMINFLOAT)/visco;
+          F2[elem] = 1. - (0.3*exp(-1.*carre(Re)));
+        }
+      else
+        F2[elem] = 1.;
+    }
+  // F2=1;
+//  Cerr<<F2.mp_min_vect()<<" F2 "<<F2.mp_max_vect()<<finl;
+  return F2;
+}
+
+
+
+DoubleTab& Modele_Jones_Launder_VDF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+{
+  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  int nb_elem = la_zone.nb_elem();
+  for (int elem=0; elem <nb_elem; elem ++ )
+    F1[elem] = 1.;
+  return F1;
+}
+
+
+DoubleTab& Modele_Jones_Launder_VDF::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vit,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+{
+  return Calcul_E( E, zone_dis, zone_Cl_dis, vit, K_Bas_Re, ch_visco, visco_turb );
+}
+
+
+DoubleTab& Modele_Jones_Launder_VDF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                  const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+
+  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& la_zone_Cl = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
+  D = 0;
+  //  return D;
+  //  const DoubleVect& volumes = la_zone.volumes();
+  const DoubleVect& porosite_surf = la_zone.porosite_face();
+  const DoubleVect& volume_entrelaces = la_zone.volumes_entrelaces();
+  //  int nb_elem = la_zone.nb_elem();
+  int nb_elem_tot = la_zone.nb_elem_tot();
+  const Zone& zone=la_zone.zone();
+
+  int nb_faces_elem = zone.nb_faces_elem();
+  IntTrav numfa(nb_faces_elem);
+  double coef;
+  //  const IntTab& elem_faces = la_zone.elem_faces();
+  const IntTab& face_voisins = la_zone.face_voisins();
+  int nb_faces = la_zone.nb_faces();
+
+  double gradk;
+  int num_face,poly1,poly2,ori, ndeb, nfin;
+
+  // Calcul de Gradient de racine de K.
+  if (mp_min_vect(K_Bas_Re)<0)
+    {
+      Cerr << "Il y'a des valeurs negatives dans les valeurs de K" << finl;
+      Cerr << "dans Modele_Jones_Launder_VDF::Calcul_D" << finl;
+      Cerr << "On arrete le calcul." << finl;
+      exit();
+    }
+  // Boucle sur les bords pour traiter les conditions aux limites
+  for (int n_bord=0; n_bord<la_zone.nb_front_Cl(); n_bord++)
+
+    {
+      const Cond_lim& la_cl = la_zone_Cl.les_conditions_limites(n_bord);
+
+      if ( sub_type(Dirichlet,la_cl.valeur())||
+           sub_type(Dirichlet_homogene,la_cl.valeur()) ||
+           sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ||
+           sub_type(Echange_externe_impose,la_cl.valeur())
+         )
+
+
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          ndeb = le_bord.num_premiere_face();
+          nfin = ndeb + le_bord.nb_faces();
+
+          for (num_face=ndeb; num_face<nfin; num_face++)
+            {
+              gradk = 0;
+              poly1 =  face_voisins(num_face,0);
+              if (poly1 != -1)
+                {
+                  // coef = 0.5;
+                  coef = volume_entrelaces(num_face)*porosite_surf(num_face)*0.5;
+                  gradk = ( - sqrt(K_Bas_Re(poly1)))/la_zone.dist_norm_bord(num_face);
+                  if (!is_visco_const)
+                    visco=tab_visco[poly1];
+                  D[poly1] += 2*visco*(gradk*gradk)*coef;
+                }
+              else
+                {
+                  poly2 = face_voisins(num_face,1);
+                  // coef = 0.5;
+                  coef = volume_entrelaces(num_face)*porosite_surf(num_face)*0.5;
+                  gradk = ((sqrt(K_Bas_Re(poly2)) ))/la_zone.dist_norm_bord(num_face);
+                  //
+                  if (!is_visco_const)
+                    visco=tab_visco[poly2];
+                  D[poly2] += 2*visco*(gradk*gradk)*coef;
+                }
+            }
+        }
+      else if (sub_type(Periodique,la_cl.valeur()))
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          ndeb = le_bord.num_premiere_face();
+          nfin = ndeb + le_bord.nb_faces();
+
+          for (num_face=ndeb; num_face<nfin; num_face++)
+            {
+              gradk = 0;
+              poly1 = face_voisins(num_face,0);
+              poly2 = face_voisins(num_face,1);
+              ori = la_zone.orientation(num_face);
+              // coef = 0.5;
+
+              coef = volume_entrelaces(num_face)*porosite_surf(num_face);
+
+
+              gradk =  (sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/la_zone.dist_elem_period(poly1,poly2,ori);
+              if (!is_visco_const)
+                visco=tab_visco[poly1];
+              D[poly1] += 2*visco*(gradk*gradk)*coef;
+              if (!is_visco_const)
+                visco=tab_visco[poly2];
+              D[poly2] += 2*visco*(gradk*gradk)*coef;
+            }
+
+        }
+      else if (sub_type(Symetrie,la_cl.valeur()))
+        ;
+      else if ( (sub_type(Neumann,la_cl.valeur()))
+                ||
+                (sub_type(Neumann_homogene,la_cl.valeur()))
+              )
+        {
+          // do nothing
+          ;
+        }
+      else
+        {
+          Cerr<<la_cl.valeur().que_suis_je()<< "not implemented in calculer_D"<<finl;
+          exit();
+        }
+    }
+
+  // Traitement des faces internes
+  for (num_face=la_zone.premiere_face_int(); num_face<nb_faces; num_face++)
+    {
+      poly1 = face_voisins(num_face,0);
+      poly2 = face_voisins(num_face,1);
+      ori = la_zone.orientation(num_face);
+      // coef = 0.5;
+
+      coef = volume_entrelaces(num_face)*porosite_surf(num_face);
+
+      gradk =  (sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/(la_zone.xp(poly2,ori)- la_zone.xp(poly1,ori));
+      //      Cerr<<" ici "<< num_face<< " "<<gradk*gradk/K_eps_Bas_Re(poly2,0)<<" K "<<K_eps_Bas_Re(poly2,0)/K_eps_Bas_Re(0,0)<<finl;
+      if (num_face==-396)
+        Cerr << "K_eps_Bas_Re(poly2,0)=" << K_Bas_Re(poly2)/K_Bas_Re(0) << " K_eps_Bas_Re(poly1,0)=" << K_Bas_Re(poly1)/K_Bas_Re(0) << " test "<<sqrt(  K_Bas_Re(poly2,0))/sqrt( K_Bas_Re(0))<<" "<<sqrt(  K_Bas_Re(poly1))/sqrt( K_Bas_Re(0))<< " "<<(sqrt(K_Bas_Re(poly2))-sqrt(K_Bas_Re(poly1)))/sqrt( K_Bas_Re(0))<<" "<< K_Bas_Re(0)<<finl;
+      if (!is_visco_const)
+        visco=tab_visco[poly1];
+      D[poly1] += 2*visco*(gradk*gradk)*coef;
+      if (!is_visco_const)
+        visco=tab_visco[poly2];
+      D[poly2] += 2*visco*(gradk*gradk)*coef;
+    }
+  // GF on a nb_face_elem contributions par elem ....
+  // mais 2 contributions dans chaque direction
+
+  // provisoire
+  D/=2;
+  const DoubleVect& volumes= la_zone.volumes();
+  for (int i=0; i<nb_elem_tot; i++)
+    D(i)/=volumes(i);
+  //Cerr<<D.mp_min_vect()<<" DDDDDDDDDDDDDD "<<D.mp_max_vect()<<finl;
+  //D=0;
+  return D;
+  // D abord sans le 1/3 2/3
+}
+

@@ -14,47 +14,51 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modele_F1F2FMU_unitaire_VDF.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Bas_Reynolds/src/VDF
-// Version:     /main/8
+// File:        Transport_K_ou_Eps_non_std.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
+// Version:     /main/6
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Modele_F1F2FMU_unitaire_VDF_included
-#define Modele_F1F2FMU_unitaire_VDF_included
 
-#include <Modele_Jones_Launder_VDF.h>
+#ifndef Transport_K_ou_Eps_non_std_included
+#define Transport_K_ou_Eps_non_std_included
 
-class Zone_dis;
-class Zone_Cl_dis;
-class DoubleVect;
-class DoubleTab;
-class Zone_Cl_VDF;
-class Champ_Face;
+#include <Transport_K_ou_Eps_base.h>
+#include <Op_Diff_K_Eps_Bas_Re_base.h>
+#include <Operateur_Conv.h>
 
-class Modele_F1F2FMU_unitaire_VDF : public Modele_Jones_Launder_VDF
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//    Classe Transport_K_ou_Eps_non_std
+//    Classe de base pour les equations de transport
+//    des modeles k_Epsilon non standard en formulation bicephale.
+// .SECTION voir aussi
+//
+//////////////////////////////////////////////////////////////////////////////
+class Transport_K_ou_Eps_non_std : public Transport_K_ou_Eps_base
 {
 
-  Declare_instanciable(Modele_F1F2FMU_unitaire_VDF);
+  Declare_base(Transport_K_ou_Eps_non_std);
 
-public :
+public:
 
-  DoubleTab& Calcul_Fmu (DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don&) const;
-  DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const Champ_base& ) const ;
-  DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base&) const ;
-
-  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const;
-  DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const ;
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const ;
-
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
-  Entree& lire(const Motcle&, Entree&);
+  void set_param(Param& titi);
+  int lire_motcle_non_standard(const Motcle&, Entree&);
+  virtual const Champ_Don& diffusivite_pour_transport();
+  virtual const Champ_base& vitesse_pour_transport();
+  int nombre_d_operateurs() const;
+  const Operateur& operateur(int) const;
+  Operateur& operateur(int);
 
 protected:
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
+  Op_Diff_K_Eps_Bas_Re terme_diffusif;
+  Operateur_Conv terme_convectif;
+
+private :
+
 };
 
 #endif
-

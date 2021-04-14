@@ -122,3 +122,63 @@ DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis&
 
   return Fmu;
 }
+
+DoubleTab&  Modele_standard_KEps_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+{
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = la_zone.nb_faces();
+  int num_face;
+
+  for (num_face=0; num_face <nb_faces; num_face ++ )
+    {
+      Fmu(num_face) = 1.;
+    }
+
+  return Fmu;
+}
+
+DoubleTab& Modele_standard_KEps_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+{
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = la_zone.nb_faces();
+  int num_face;
+
+  for (num_face=0; num_face<nb_faces  ; num_face++)
+    {
+      F2[num_face] = 1.;
+    }
+  //Cerr<<F2.mp_min_vect()<<" F2 "<<F2.mp_max_vect()<<finl;
+  return F2;
+}
+
+DoubleTab& Modele_standard_KEps_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+{
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = la_zone.nb_faces();
+  int num_face;
+  // Calcul de F1
+  for (num_face=0; num_face <nb_faces; num_face ++ )
+    {
+      F1[num_face] = 1.;
+    }
+  return F1;
+}
+
+DoubleTab& Modele_standard_KEps_VEF::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+{
+  E = 0;
+  return E;
+}
+
+DoubleTab& Modele_standard_KEps_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                  const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
+{
+  D = 0;
+  return D;
+}
+
+
+
+
+
+

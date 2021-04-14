@@ -22,6 +22,7 @@
 
 #include <Op_Diff_K_Eps_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
+#include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Discretisation_base.h>
 #include <stat_counters.h>
 #include <Champ_Uniforme.h>
@@ -226,37 +227,89 @@ void Op_Diff_K_Eps::typer()
       // les operateurs de diffusion sont communs aux discretisations VEF et VEFP1B
       if(discr=="VEFPreP1B") discr="VEF";
       //Cerr <<" >>>>>>>>>>>>>>>>>>>>>>>>>>>" <<  equation().que_suis_je() << finl;
-      Transport_K_Eps_base& leq = ref_cast(Transport_K_Eps_base,equation());
-      Nom qc = leq.modele_turbulence().equation().que_suis_je();
-      Cerr << ">>>>>>> Nom eq = " << qc << finl;
-      if (qc=="Navier_Stokes_QC" || qc == "Navier_Stokes_Turbulent_QC")
-        {
-          nom_type+="QC_";
-        }
 
-      if (!sub_type(Champ_Uniforme,diffusivite()))
+      if ( sub_type(Transport_K_ou_Eps_base,equation()) )
         {
-          if (discr!="VEF")
+          Transport_K_ou_Eps_base& leq = ref_cast(Transport_K_ou_Eps_base,equation());
+
+          if (discr=="VDF")
             {
-              nom_type+="var_";
+              if ( leq.transporte_t_il_K( ) )
+                {
+                  nom_type="Op_Diff_K_";
+                }
+              else
+                {
+                  nom_type="Op_Diff_Eps_";
+                }
             }
-        }
 
-      nom_type +=discr;
-      Cerr << " >>>>>> Operateur = " << nom_type << finl;
-      if (discr!="VDF_Hyper")
-        {
-          nom_type += "_";
-          Nom type_inco=equation().inconnue()->que_suis_je();
-          nom_type+=(type_inco.suffix("Champ_"));
-          if (axi)
-            nom_type += "_Axi";
+          Nom qc = leq.modele_turbulence().equation().que_suis_je();
+          Cerr << ">>>>>>> Nom eq = " << qc << finl;
+          if (qc=="Navier_Stokes_QC" || qc == "Navier_Stokes_Turbulent_QC")
+            {
+              Cerr << "Mode Bicephale non disponible en QC pour l'instant... Nous en sommes fort marris." << finl;
+              Process::exit();
+            }
+
+          if (!sub_type(Champ_Uniforme,diffusivite()))
+            {
+              if (discr!="VEF")
+                {
+                  nom_type+="var_";
+                }
+            }
+
+          nom_type +=discr;
+          Cerr << " >>>>>> Operateur = " << nom_type << finl;
+          if (discr!="VDF_Hyper")
+            {
+              nom_type += "_";
+              Nom type_inco=equation().inconnue()->que_suis_je();
+              nom_type+=(type_inco.suffix("Champ_"));
+              if (axi)
+                nom_type += "_Axi";
+            }
+          DERIV(Op_Diff_K_Eps_base)::typer(nom_type);
+          valeur().associer_eqn(equation());
+          valeur().associer_diffusivite_turbulente();
+          valeur().associer_diffusivite(diffusivite());
+          Cerr << valeur().que_suis_je() << finl;
         }
-      DERIV(Op_Diff_K_Eps_base)::typer(nom_type);
-      valeur().associer_eqn(equation());
-      valeur().associer_diffusivite_turbulente();
-      valeur().associer_diffusivite(diffusivite());
-      Cerr << valeur().que_suis_je() << finl;
+      else
+        {
+          Transport_K_Eps_base& leq = ref_cast(Transport_K_Eps_base,equation());
+          Nom qc = leq.modele_turbulence().equation().que_suis_je();
+          Cerr << ">>>>>>> Nom eq = " << qc << finl;
+          if (qc=="Navier_Stokes_QC" || qc == "Navier_Stokes_Turbulent_QC")
+            {
+              nom_type+="QC_";
+            }
+
+          if (!sub_type(Champ_Uniforme,diffusivite()))
+            {
+              if (discr!="VEF")
+                {
+                  nom_type+="var_";
+                }
+            }
+
+          nom_type +=discr;
+          Cerr << " >>>>>> Operateur = " << nom_type << finl;
+          if (discr!="VDF_Hyper")
+            {
+              nom_type += "_";
+              Nom type_inco=equation().inconnue()->que_suis_je();
+              nom_type+=(type_inco.suffix("Champ_"));
+              if (axi)
+                nom_type += "_Axi";
+            }
+          DERIV(Op_Diff_K_Eps_base)::typer(nom_type);
+          valeur().associer_eqn(equation());
+          valeur().associer_diffusivite_turbulente();
+          valeur().associer_diffusivite(diffusivite());
+          Cerr << valeur().que_suis_je() << finl;
+        }
     }
 }
 

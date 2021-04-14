@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,47 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modele_F1F2FMU_unitaire_VDF.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Bas_Reynolds/src/VDF
-// Version:     /main/8
+// File:        Ref_Transport_K_ou_Eps.cpp
+// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
+// Version:     /main/4
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Modele_F1F2FMU_unitaire_VDF_included
-#define Modele_F1F2FMU_unitaire_VDF_included
+#include <Ref_Transport_K_ou_Eps.h>
+#include <Transport_K_ou_Eps.h>
 
-#include <Modele_Jones_Launder_VDF.h>
-
-class Zone_dis;
-class Zone_Cl_dis;
-class DoubleVect;
-class DoubleTab;
-class Zone_Cl_VDF;
-class Champ_Face;
-
-class Modele_F1F2FMU_unitaire_VDF : public Modele_Jones_Launder_VDF
-{
-
-  Declare_instanciable(Modele_F1F2FMU_unitaire_VDF);
-
-public :
-
-  DoubleTab& Calcul_Fmu (DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don&) const;
-  DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const Champ_base& ) const ;
-  DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base&) const ;
-
-  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const;
-  DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const ;
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const ;
-
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
-  Entree& lire(const Motcle&, Entree&);
-
-protected:
-
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-};
-
-#endif
-
+Implemente_ref(Transport_K_ou_Eps);

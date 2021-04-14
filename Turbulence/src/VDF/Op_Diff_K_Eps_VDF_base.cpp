@@ -23,15 +23,21 @@
 #include <Op_Diff_K_Eps_VDF_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
+#include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Champ_P0_VDF.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Navier_Stokes_Turbulent.h>
+#include <Operateur_base.h>
 
 Implemente_base(Op_Diff_K_Eps_VDF_base,"Op_Diff_K_Eps_VDF_base",Op_Diff_K_Eps_base);
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem,"Op_Diff_K_Eps_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
+Implemente_instanciable_sans_constructeur(Op_Diff_K_VDF_Elem,"Op_Diff_K_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
+Implemente_instanciable_sans_constructeur(Op_Diff_Eps_VDF_Elem,"Op_Diff_Eps_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
 
 implemente_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)
+implemente_It_VDF_Elem(Eval_Diff_K_VDF_Elem)
+implemente_It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)
 
 ////  printOn
 //
@@ -42,6 +48,16 @@ Sortie& Op_Diff_K_Eps_VDF_base::printOn(Sortie& s ) const
 }
 
 Sortie& Op_Diff_K_Eps_VDF_Elem::printOn(Sortie& s ) const
+{
+  return s << que_suis_je() ;
+}
+
+Sortie& Op_Diff_K_VDF_Elem::printOn(Sortie& s ) const
+{
+  return s << que_suis_je() ;
+}
+
+Sortie& Op_Diff_Eps_VDF_Elem::printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
 }
@@ -59,11 +75,25 @@ Entree& Op_Diff_K_Eps_VDF_Elem::readOn(Entree& s )
   return s ;
 }
 
+Entree& Op_Diff_K_VDF_Elem::readOn(Entree& s )
+{
+  return s ;
+}
+
+Entree& Op_Diff_Eps_VDF_Elem::readOn(Entree& s )
+{
+  return s ;
+}
+
 
 void Op_Diff_K_Eps_VDF_base::completer()
 {
   Operateur_base::completer();
   iter.completer_();
+
+  diffuse_k_seul   = false;
+  diffuse_eps_seul = false;
+
   if(sub_type(Transport_K_Eps,mon_equation.valeur()))
     {
       const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
@@ -84,6 +114,35 @@ void Op_Diff_K_Eps_VDF_base::completer()
           eval_diff.associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
         }
     }
+  else if(sub_type(Transport_K_ou_Eps,mon_equation.valeur()))
+    {
+      const Transport_K_ou_Eps& eqn_transport = ref_cast(Transport_K_ou_Eps,mon_equation.valeur());
+
+      if ( eqn_transport.transporte_t_il_K( ) )
+        {
+          diffuse_k_seul   = true;
+        }
+      else
+        {
+          diffuse_eps_seul = true;
+        }
+
+      if(sub_type( Modele_turbulence_hyd_K_Eps_Bicephale,eqn_transport.modele_turbulence()))
+        {
+          const Modele_turbulence_hyd_K_Eps_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,eqn_transport.modele_turbulence());
+
+          if ( diffuse_k_seul )
+            {
+              Eval_Diff_K_VDF_Elem& eval_diff = (Eval_Diff_K_VDF_Elem&) iter.evaluateur();
+              eval_diff.associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+            }
+          else
+            {
+              Eval_Diff_Eps_VDF_Elem& eval_diff = (Eval_Diff_Eps_VDF_Elem&) iter.evaluateur();
+              eval_diff.associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+            }
+        }
+    }
 }
 void Op_Diff_K_Eps_VDF_base::associer_diffusivite(const Champ_base& ch_diff)
 {
@@ -96,6 +155,8 @@ const Champ_base& Op_Diff_K_Eps_VDF_base::diffusivite() const
   Eval_Diff_K_Eps_VDF& eval_diff_turb = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
   return eval_diff_turb.diffusivite();
 }
+
+
 // Description:
 // complete l'iterateur et l'evaluateur
 void Op_Diff_K_Eps_VDF_Elem::associer(const Zone_dis& zone_dis,
@@ -108,6 +169,38 @@ void Op_Diff_K_Eps_VDF_Elem::associer(const Zone_dis& zone_dis,
   iter.associer(zvdf, zclvdf, *this);
 
   Eval_Diff_K_Eps_VDF_Elem& eval_diff = (Eval_Diff_K_Eps_VDF_Elem&) iter.evaluateur();
+  eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
+  eval_diff.associer_inconnue(inco );        // Eval_VDF_::associer_inconnue
+}
+
+// Description:
+// complete l'iterateur et l'evaluateur
+void Op_Diff_K_VDF_Elem::associer( const Zone_dis& zone_dis,
+                                   const Zone_Cl_dis& zone_cl_dis,
+                                   const Champ_Inc& ch_diffuse)
+{
+  const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
+  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+  iter.associer(zvdf, zclvdf, *this);
+
+  Eval_Diff_K_VDF_Elem& eval_diff = (Eval_Diff_K_VDF_Elem&) iter.evaluateur();
+  eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
+  eval_diff.associer_inconnue(inco );        // Eval_VDF_::associer_inconnue
+}
+
+// Description:
+// complete l'iterateur et l'evaluateur
+void Op_Diff_Eps_VDF_Elem::associer( const Zone_dis& zone_dis,
+                                     const Zone_Cl_dis& zone_cl_dis,
+                                     const Champ_Inc& ch_diffuse)
+{
+  const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
+  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
+  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+  iter.associer(zvdf, zclvdf, *this);
+
+  Eval_Diff_Eps_VDF_Elem& eval_diff = (Eval_Diff_Eps_VDF_Elem&) iter.evaluateur();
   eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
   eval_diff.associer_inconnue(inco );        // Eval_VDF_::associer_inconnue
 }
@@ -128,6 +221,26 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
         const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
         Eval_Diff_K_Eps_VDF& eval_diff = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
         eval_diff.associer_diff_turb(diff_turb);
+      }
+    }
+  else if(sub_type(Transport_K_ou_Eps_base,mon_equation.valeur()))
+    {
+      const Transport_K_ou_Eps_base& eqn_transport = ref_cast(Transport_K_ou_Eps_base,mon_equation.valeur());
+      {
+
+        const Mod_turb_hyd_RANS_Bicephale& mod_turb = ref_cast(Mod_turb_hyd_RANS_Bicephale,eqn_transport.modele_turbulence());
+        const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
+
+        if ( eqn_transport.transporte_t_il_K( ) )
+          {
+            Eval_Diff_K_VDF_Elem& eval_diff = (Eval_Diff_K_VDF_Elem&) iter.evaluateur();
+            eval_diff.associer_diff_turb(diff_turb);
+          }
+        else
+          {
+            Eval_Diff_Eps_VDF_Elem& eval_diff = (Eval_Diff_Eps_VDF_Elem&) iter.evaluateur();
+            eval_diff.associer_diff_turb(diff_turb);
+          }
       }
     }
   else
@@ -272,6 +385,50 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
                   }
             }
         }
+      else if(sub_type(Transport_K_ou_Eps,mon_equation.valeur()))
+        {
+          const Transport_K_ou_Eps& eqn=ref_cast(Transport_K_ou_Eps,equation());
+          const DoubleTab& val=eqn.inconnue().valeurs();
+
+          const Zone_Cl_dis_base& zone_Cl_dis_base = ref_cast(Zone_Cl_dis_base,eqn_hydr.zone_Cl_dis().valeur());
+
+          const Conds_lim& les_cl = zone_Cl_dis_base.les_conditions_limites();
+          int nb_cl=les_cl.size();
+          for (int num_cl=0; num_cl<nb_cl; num_cl++)
+            {
+              //Boucle sur les bords
+              const Cond_lim& la_cl = les_cl[num_cl];
+              const Front_VF& la_front_dis = ref_cast(Front_VF,la_cl.frontiere_dis());
+              int nbfaces = la_front_dis.nb_faces();
+              int ndeb = la_front_dis.num_premiere_face();
+              int nfin = ndeb + nbfaces;
+
+              if ((sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))||(sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
+                for (int num_face=ndeb; num_face<nfin; num_face++)
+
+                  {
+
+                    int elem= face_voisins(num_face,0);
+                    if (elem==-1) elem= face_voisins(num_face,1);
+
+                    // on doit remettre la ligne a l'identite et le secmem a l'inconnue
+                    int idiag = tab1[elem]-1;
+                    coeff[idiag]=1;
+                    // pour les voisins
+
+                    int nbvois = tab1[elem+1] - tab1[elem];
+                    for (int k=1; k < nbvois; k++)
+                      {
+                        coeff[idiag+k]=0;
+                      }
+
+                    secmem(elem)=val(elem);
+
+
+                  }
+
+            }
+        }
       else
         {
           Cerr<<" erreur dans Op_Diff_K_Eps_VDF_base::modifier_pour_Cl ... cas non prevu "<<finl;
@@ -286,5 +443,21 @@ void Op_Diff_K_Eps_VDF_base::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
 //
 Op_Diff_K_Eps_VDF_Elem::Op_Diff_K_Eps_VDF_Elem() :
   Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)())
+{
+}
+
+//
+// Fonctions inline de la classe Op_Diff_K_VDF_Elem
+//
+Op_Diff_K_VDF_Elem::Op_Diff_K_VDF_Elem() :
+  Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_VDF_Elem)())
+{
+}
+
+//
+// Fonctions inline de la classe Op_Diff_Eps_VDF_Elem
+//
+Op_Diff_Eps_VDF_Elem::Op_Diff_Eps_VDF_Elem() :
+  Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)())
 {
 }
