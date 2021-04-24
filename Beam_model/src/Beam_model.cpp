@@ -154,7 +154,7 @@ void Beam_model::readInputModalDeformation(Nom& modal_deformation_file_name)
           u_(i, 2)=uz;
           R_(i, 0)=rx;
           R_(i, 1)=ry;
-          R_(i, 2)=ry;
+          R_(i, 2)=rz;
 
         }
       monFlux.close();
@@ -207,8 +207,27 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
   double ux, uy, uz, Rx, Ry, Rz;
 
   //linear interpolation between points i and j
-  double	alpha = (abscissa_[j] - s)/h;
-  double	betha = (s - abscissa_[i])/h;
+  double alpha, betha ;
+  if (i==j)
+    {
+      alpha=1.;
+      betha=0.;
+    }
+  else if(abs(abscissa_[i] - s)< 1.e-5 )
+    {
+      alpha=1.;
+      betha=0.;
+    }
+  else if (abs(abscissa_[j] - s)< 1.e-5 )
+    {
+      alpha=0.;
+      betha=1.;
+    }
+  else
+    {
+      alpha = (abscissa_[j] - s)/h;
+      betha = (s - abscissa_[i])/h;
+    }
 
   ux=alpha*u_(i, 0) + betha*u_(j, 0);
   uy=alpha*u_(i, 1) + betha*u_(j, 1);
@@ -221,12 +240,19 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
   phi[1] =uy + Rz*xs -Rx*zs;
   phi[2] =uz + Rx*ys -Ry*xs;
 
-  /*if(abs(phi[1] - 0.22*sin(PI*s/0.7))>1.e-3)
+  /*if(abs(phi[0] -0.22281692032865347*(PI/0.7)*cos(PI*x/0.7)*y)> 1.e-3)
     {
-      Cerr<<" Depalcement: phi[1] "<<phi[1] - 0.22*sin(PI*s/0.7)<<finl;
-      getchar();
-    }*/
+      Cerr<<"ys = "<<ys<<finl;
+      Cerr<<"Rz = "<<-Rz<<" Ri "<< R_(i,2)<<" Rj " <<R_(j,2)<<finl;
+      Cerr<<"alpha "<<alpha<<" betha"<<betha<<finl;
+      Cerr<<"phi = "<<phi[0]<<finl;
+      Cerr<<"value = "<<0.22281692032865347*(PI/0.7)*cos(PI*x/0.7)*y<<finl;
+      Cerr<<"h = "<<h<<finl;
+      Cerr<<"s = "<<s<<finl;
+      Cerr<<"abscissa_[j] = "<<abscissa_[j]<<finl;
+      Cerr<<"abscissa_[i]= "<<abscissa_[i]<<finl;
 
+    }*/
   return phi;
 }
 /*void Beam_model::interpolationOnThe3DSurface(const Bords& les_bords_ALE)

@@ -69,12 +69,6 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
             z=domaine.coord(faces.sommet(i,k),2);
           DoubleVect phi(3);
           phi=dom_ale.interpolationOnThe3DSurface(x,y,z);
-          /*if(abs(phi[0] - (-1.*0.22*(pi/0.7)*cos(pi*x/0.7)*y))>1.e-2)
-            Cerr<<"difference phi x= "<<phi[0] - (-1.*0.22*(pi/0.7)*cos(pi*x/0.7)*y)<<finl;
-          if(abs(phi[1] - (0.22*sin(pi*x/0.7)))>1.e-2)
-            Cerr<<"difference phi y= "<<phi[1] - (0.22*sin(pi*x/0.7))<<finl;
-          if (abs(phi[2]) > 1.e-8)
-            Cerr<<"difference phi z= "<<phi[2]<<finl;*/
           for( j=0; j<nb_comp(); j++)
             {
               fxyzt[j].setVar("x",x);
@@ -83,7 +77,28 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               fxyzt[j].setVar("t",tps);
               vit_som_bord_ALE(faces.sommet(i,k),j)=fxyzt[j].eval()*phi[j];
             }
+          /* double test= -0.22281692032865347*1000.9*cos(1000.9*tps)*sin(pi*x/0.7)*0.5*1.e-4;
+           if ((vit_som_bord_ALE(faces.sommet(i,k),1) - test) > 1.e-4)
+             {
+               Cerr<<" vit_som_bord_ALE 1 vit:"<<vit_som_bord_ALE(faces.sommet(i,k),1) <<finl;
+               Cerr<<" vit_som_bord_ALE 1 f:"<<fxyzt[1].eval() <<finl;
+               Cerr<<" vit_som_bord_ALE 1 phi:"<<phi[1] <<finl;
+               getchar();
+             }
 
+           double test_fxyzt=1000.9*cos(1000.9*tps)*0.5*1.e-4;
+           if((fxyzt[1].eval() - test_fxyzt) > 1.e-8)
+             Cerr<<" vit_som_bord_ALE 1 diff fxyzt:" <<fxyzt[1].eval() - test_fxyzt <<finl;
+           double test_phi=-0.22281692032865347*sin(pi*x/0.7);
+           if((phi[1] - test_phi )> 1.e-4)
+             Cerr<<" vit_som_bord_ALE 1 diff test_phi:" <<phi[1] - test_phi<<finl;
+          */
+          /* double test_phi=0.22281692032865347*(pi/0.7)*cos(pi*x/0.7)*y;
+           if((phi[0] - test_phi )> 1.e-4)
+             {
+               Cerr<<" vit_som_bord_ALE 0 diff phi:" <<phi[0] <<finl;
+               Cerr<<" vit_som_bord_ALE 0 diff test:" <<test_phi<<finl;
+             }*/
         }
     }
 }

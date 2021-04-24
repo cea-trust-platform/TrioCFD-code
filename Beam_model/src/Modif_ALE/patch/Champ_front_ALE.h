@@ -46,7 +46,7 @@ public:
   Champ_front_base& affecter_(const Champ_front_base& ch);
   virtual int initialiser(double temps, const Champ_Inc_base& inco);
   virtual void mettre_a_jour(double temps);
-  void remplir_vit_som_bord_ALE(double);
+  virtual void remplir_vit_som_bord_ALE(double);
 
 protected :
   DoubleTab vit_som_bord_ALE;

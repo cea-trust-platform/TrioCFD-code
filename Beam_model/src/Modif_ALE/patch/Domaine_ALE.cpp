@@ -220,7 +220,6 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
       const Frontiere_dis_base& la_fr_dis=le_domaine_dis.zone_dis(0).frontiere_dis(rang);
       les_champs_front[n].valeur().associer_fr_dis_base(la_fr_dis);
       const Nom& le_nom_ch_front_courant=les_champs_front[n].valeur().que_suis_je();
-
       if (le_nom_ch_front_courant == "Champ_front_ALE")
         {
           ref_cast(Champ_front_ALE, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
@@ -281,12 +280,25 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
         {
           ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
           DoubleTab vit_bord_ale = ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).get_vit_som_bord_ALE();
-
-          for(int dim=0; dim<dimension; dim++)
+          if (nb_bords_ALE==1)
             {
-              for(int i=0; i<N_som; i++)
+              for(int dim=0; dim<dimension; dim++)
                 {
-                  vit_bords(i, dim) += vit_bord_ale(i, dim);
+                  for(int i=0; i<N_som; i++)
+                    {
+                      vit_bords(i, dim) += vit_bord_ale(i, dim);
+                    }
+                }
+            }
+          else
+            {
+              for(int dim=0; dim<dimension; dim++)
+                {
+                  for(int i=0; i<N_som; i++)
+                    {
+                      if(vit_bords(i, dim) == 0.)
+                        vit_bords(i, dim) += vit_bord_ale(i, dim);
+                    }
                 }
             }
         }
