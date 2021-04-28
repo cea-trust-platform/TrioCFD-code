@@ -37,6 +37,8 @@
 
 using namespace std;
 
+Implemente_liste(DoubleTab);
+
 Implemente_instanciable( Beam_model, "Beam_model", Interprete_geometrique_base ) ;
 
 Sortie& Beam_model::printOn( Sortie& os ) const
@@ -60,8 +62,9 @@ Entree&  Beam_model::interpreter_(Entree& is)
 void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
 {
   Cerr << "Read beam model coefficients from "<< masse_and_stiffness_file_name <<" files " << finl;
-  mass_.resize(nb_modes_);
-  stiffness_.resize(nb_modes_);
+  mass_.resize(nbModes_);
+  stiffness_.resize(nbModes_);
+  damping_.resize(nbModes_);
   string const nomFichier(masse_and_stiffness_file_name);
 
   ifstream monFlux(nomFichier.c_str());
@@ -71,15 +74,15 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
       string line;  // read the first line
       getline(monFlux, line);
       monFlux.ignore();
-      double mass;
-      double stiffness;
-      for(int i=0; i<nb_modes_; i++)
+      double mass, stiffness, damping;
+      for(int i=0; i<nbModes_; i++)
         {
-          monFlux >> mass >> stiffness;
+          monFlux >> mass >> stiffness >> damping;
           if(abs(mass) > 1.e-16 && abs(stiffness)> 1.e-16)
             {
               mass_[i]=mass;
               stiffness_[i]=stiffness;
+              damping_[i]=damping;
             }
           else
             {
@@ -95,7 +98,6 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
     {
       Cerr<< "ERROR: Unable to open the file." <<masse_and_stiffness_file_name<<finl;
     }
-
 }
 void Beam_model::readInputAbscFiles(Nom& absc_file_name)
 {
@@ -165,7 +167,35 @@ void Beam_model::readInputModalDeformation(Nom& modal_deformation_file_name)
     }
 }
 
+void Beam_model::initialization(double velocity)
+{
 
+  qSpeed_.resize(nbModes_);
+  qAcceleration_.resize(nbModes_);
+  qDisplacement_.resize(nbModes_);
+  qHalfSpeed_.resize(nbModes_);
+  qSpeed_=velocity;
+  qHalfSpeed_=velocity;
+  qAcceleration_=0.;
+  qDisplacement_=0.;
+}
+
+DoubleVect Beam_model::NewmarkScheme (double dt, double fluidForce)
+{
+
+  double halfDt=dt/2;
+  for(int j=0; j < nbModes_; j++)
+    {
+      qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
+      qDisplacement_[j] += dt*qHalfSpeed_[j];
+      qAcceleration_[j]= (fluidForce - damping_[j]*qHalfSpeed_[j] - stiffness_[j]*qDisplacement_[j])/(mass_[j] + halfDt*damping_[j]);
+      qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
+      //Cout<<" qHalfSpeed_[j] "<<qHalfSpeed_[j]<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
+      //getchar();
+    }
+
+  return qHalfSpeed_;
+}
 
 DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
 {
@@ -240,19 +270,6 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
   phi[1] =uy + Rz*xs -Rx*zs;
   phi[2] =uz + Rx*ys -Ry*xs;
 
-  /*if(abs(phi[0] -0.22281692032865347*(PI/0.7)*cos(PI*x/0.7)*y)> 1.e-3)
-    {
-      Cerr<<"ys = "<<ys<<finl;
-      Cerr<<"Rz = "<<-Rz<<" Ri "<< R_(i,2)<<" Rj " <<R_(j,2)<<finl;
-      Cerr<<"alpha "<<alpha<<" betha"<<betha<<finl;
-      Cerr<<"phi = "<<phi[0]<<finl;
-      Cerr<<"value = "<<0.22281692032865347*(PI/0.7)*cos(PI*x/0.7)*y<<finl;
-      Cerr<<"h = "<<h<<finl;
-      Cerr<<"s = "<<s<<finl;
-      Cerr<<"abscissa_[j] = "<<abscissa_[j]<<finl;
-      Cerr<<"abscissa_[i]= "<<abscissa_[i]<<finl;
-
-    }*/
   return phi;
 }
 /*void Beam_model::interpolationOnThe3DSurface(const Bords& les_bords_ALE)

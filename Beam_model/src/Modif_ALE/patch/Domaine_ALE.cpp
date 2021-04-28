@@ -673,3 +673,8 @@ DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const doubl
 {
   return beam.interpolationOnThe3DSurface(x,y,z);
 }
+
+void Domaine_ALE::initializationBeam (double velocity)
+{
+  beam.initialization(velocity);
+}

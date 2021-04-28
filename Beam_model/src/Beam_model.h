@@ -22,12 +22,12 @@
 #ifndef Beam_model_included
 #define Beam_model_included
 
+#include <List.h>
 #include <Interprete_geometrique_base.h>
 #include <Nom.h>
 #include <Bords.h>
 
-
-
+Declare_liste(DoubleTab);
 /////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION : class Beam_model
@@ -62,27 +62,35 @@ public :
   void readInputModalDeformation(Nom& modal_deformation_file_name);
   //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
+  void initialization(double velocity);
+  DoubleVect NewmarkScheme (double dt, double fluidForce);
 protected :
-  int nb_modes_;
+  int nbModes_;
   int direction_; //x=0, y=1, z=2
   double young_; // Young module
   double rho_; // solid density
   bool activate_=false;
   DoubleVect mass_;
   DoubleVect stiffness_;
+  DoubleVect damping_;
   DoubleVect abscissa_;
   DoubleTab u_;
   DoubleTab R_;
+  LIST(DoubleTab) phi_;
+  DoubleVect qSpeed_;
+  DoubleVect qHalfSpeed_;
+  DoubleVect qAcceleration_;
+  DoubleVect qDisplacement_;
   //DoubleTab phi3D_;
 
 };
 inline const int& Beam_model::getNbModes() const
 {
-  return nb_modes_;
+  return nbModes_;
 }
 inline void Beam_model::setNbModes(const int& modes)
 {
-  nb_modes_=modes;
+  nbModes_=modes;
 }
 inline const int& Beam_model::getDirection() const
 {

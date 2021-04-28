@@ -51,6 +51,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const Faces& faces=front.faces();
   const Domaine& domaine=zone.domaine();
   const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, zone.domaine());
+  //Domaine_ALE dom_ale_test=ref_cast(Domaine_ALE, zone.domaine());
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
@@ -77,28 +78,8 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               fxyzt[j].setVar("t",tps);
               vit_som_bord_ALE(faces.sommet(i,k),j)=fxyzt[j].eval()*phi[j];
             }
-          /* double test= -0.22281692032865347*1000.9*cos(1000.9*tps)*sin(pi*x/0.7)*0.5*1.e-4;
-           if ((vit_som_bord_ALE(faces.sommet(i,k),1) - test) > 1.e-4)
-             {
-               Cerr<<" vit_som_bord_ALE 1 vit:"<<vit_som_bord_ALE(faces.sommet(i,k),1) <<finl;
-               Cerr<<" vit_som_bord_ALE 1 f:"<<fxyzt[1].eval() <<finl;
-               Cerr<<" vit_som_bord_ALE 1 phi:"<<phi[1] <<finl;
-               getchar();
-             }
-
-           double test_fxyzt=1000.9*cos(1000.9*tps)*0.5*1.e-4;
-           if((fxyzt[1].eval() - test_fxyzt) > 1.e-8)
-             Cerr<<" vit_som_bord_ALE 1 diff fxyzt:" <<fxyzt[1].eval() - test_fxyzt <<finl;
-           double test_phi=-0.22281692032865347*sin(pi*x/0.7);
-           if((phi[1] - test_phi )> 1.e-4)
-             Cerr<<" vit_som_bord_ALE 1 diff test_phi:" <<phi[1] - test_phi<<finl;
-          */
-          /* double test_phi=0.22281692032865347*(pi/0.7)*cos(pi*x/0.7)*y;
-           if((phi[0] - test_phi )> 1.e-4)
-             {
-               Cerr<<" vit_som_bord_ALE 0 diff phi:" <<phi[0] <<finl;
-               Cerr<<" vit_som_bord_ALE 0 diff test:" <<test_phi<<finl;
-             }*/
         }
+      //double test= fxyzt[1].eval();
+      //dom_ale_test.initializationBeam(test);
     }
 }

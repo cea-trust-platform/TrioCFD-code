@@ -68,6 +68,7 @@ public :
   inline const DoubleTab& getOldJacobian();
   inline const DoubleTab& getNewJacobian();
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
+  void initializationBeam (double velocity) ;
 protected:
 
   double dt_;
