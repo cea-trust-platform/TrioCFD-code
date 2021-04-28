@@ -26,6 +26,7 @@
 #include <Interprete_geometrique_base.h>
 #include <Nom.h>
 #include <Bords.h>
+#include <Motcle.h>
 
 Declare_liste(DoubleTab);
 /////////////////////////////////////////////////////////////////////////////
@@ -64,6 +65,10 @@ public :
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
   void initialization(double velocity);
   DoubleVect NewmarkScheme (double dt, double fluidForce);
+  inline double soundSpeed();
+  inline  double getMass(int i);
+  inline  double getStiffness(int i);
+
 protected :
   int nbModes_;
   int direction_; //x=0, y=1, z=2
@@ -124,6 +129,21 @@ inline const bool& Beam_model::getActivate() const
 inline void Beam_model::setActivate(const bool& activate)
 {
   activate_=activate;
+}
+inline double Beam_model::soundSpeed()
+{
+  return sqrt(young_/rho_);
+}
+
+inline double  Beam_model::getMass(int i)
+{
+  assert(i<nbModes_);
+  return mass_[i];
+}
+inline double  Beam_model::getStiffness(int i)
+{
+  assert(i<nbModes_);
+  return stiffness_[i];
 }
 
 #endif /* Beam_model_included */

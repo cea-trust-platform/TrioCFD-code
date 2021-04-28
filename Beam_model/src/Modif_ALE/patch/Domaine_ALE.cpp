@@ -301,6 +301,9 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                     }
                 }
             }
+          double dt_beam = computeDtBeam(le_domaine_dis);
+          Cerr << " dt: "<< dt_beam << endl;
+          getchar();
         }
       else
         {
@@ -677,4 +680,22 @@ DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const doubl
 void Domaine_ALE::initializationBeam (double velocity)
 {
   beam.initialization(velocity);
+}
+double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
+{
+
+  double dt = 0;
+  const Zone_VEF& zone_VEF=ref_cast(Zone_VEF,le_domaine_dis.zone_dis(0).valeur());
+  const DoubleVect& surfaces = zone_VEF.face_surfaces();
+  double minSurf = mp_min_vect(surfaces);
+  minSurf = Process::mp_min(minSurf);
+  Cerr << " Surface min: "<< minSurf << endl;
+  double soundSpeed=beam.soundSpeed();
+  Cerr << " soundSpeed: "<< soundSpeed << endl;
+  dt = 0.5*(minSurf/soundSpeed);
+  /*Cerr << " dt: "<< dt << endl;
+  double massBeam=beam.getMass(0);
+  double stiffBeam=beam.getStiffness(0);
+  dt = 0.5 * (minSurf * sqrt(massBeam)) / sqrt(stiffBeam);*/
+  return dt;
 }
