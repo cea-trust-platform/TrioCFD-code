@@ -180,7 +180,7 @@ void Beam_model::initialization(double velocity)
   qDisplacement_=0.;
 }
 
-DoubleVect Beam_model::NewmarkScheme (double dt, double fluidForce)
+DoubleVect Beam_model::NewmarkSchemeFD (double dt, double fluidForce)
 {
 
   double halfDt=dt/2;
@@ -195,6 +195,24 @@ DoubleVect Beam_model::NewmarkScheme (double dt, double fluidForce)
     }
 
   return qHalfSpeed_;
+}
+
+DoubleVect Beam_model::NewmarkSchemeMA (double dt, double fluidForce)
+{
+  double halfDt=dt/2;
+  double squareHalfDt= halfDt*halfDt;
+  for(int j=0; j < nbModes_; j++)
+    {
+      double PreviousqAcceleration= qAcceleration_[j];
+      double coeff1 = mass_[j] + halfDt*damping_[j] + squareHalfDt*stiffness_[j];
+      double coeff2 = damping_[j]*(qSpeed_[j] + halfDt*qAcceleration_[j]) + stiffness_[j]*(qDisplacement_[j] + dt*qSpeed_[j] + squareHalfDt*qAcceleration_[j]);
+      qAcceleration_[j]=(fluidForce - coeff2)/coeff1;
+      qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
+      qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
+      //Cout<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
+      //getchar();
+    }
+  return qSpeed_;
 }
 
 DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const

@@ -51,7 +51,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const Faces& faces=front.faces();
   const Domaine& domaine=zone.domaine();
   const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, zone.domaine());
-  //Domaine_ALE dom_ale_test=ref_cast(Domaine_ALE, zone.domaine());
+  Domaine_ALE dom_ale_test=ref_cast(Domaine_ALE, zone.domaine());
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
@@ -79,7 +79,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               vit_som_bord_ALE(faces.sommet(i,k),j)=fxyzt[j].eval()*phi[j];
             }
         }
-      //double test= fxyzt[1].eval();
-      //dom_ale_test.initializationBeam(test);
+      double test= fxyzt[1].eval();
+      dom_ale_test.initializationBeam(test);
     }
 }

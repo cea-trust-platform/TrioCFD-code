@@ -301,9 +301,9 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                     }
                 }
             }
-          double dt_beam = computeDtBeam(le_domaine_dis);
-          Cerr << " dt: "<< dt_beam << endl;
-          getchar();
+          //double dt_beam = computeDtBeam(le_domaine_dis);
+          //Cerr << " dt: "<< dt_beam << endl;
+          //getchar();
         }
       else
         {
@@ -661,6 +661,23 @@ void Domaine_ALE::reading_beam_model(Entree& is)
         {
           is >> nomlu;
           phi_file_name=nomlu;
+        }
+      if(motlu=="NewmarkTimeScheme")
+        {
+          is >> nomlu;
+          bool scheme=true;
+          if(nomlu=="FD")
+            scheme=true;
+          else if(nomlu=="MA")
+            scheme=false;
+          else
+            {
+              Cerr << "NewmarkTimeScheme wrong: choose between FD and MA" <<finl;
+              exit();
+            }
+
+          beam.setTimeScheme(scheme);
+          Cerr << "TimeScheme: " <<  beam.getTimeScheme() << finl;
         }
 
       if (motlu == accolade_fermee)

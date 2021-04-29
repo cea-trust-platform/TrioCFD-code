@@ -58,13 +58,16 @@ public :
   inline void setFileName(const Nom&) ;
   inline const bool& getActivate() const;
   inline void setActivate(const bool&) ;
+  inline const bool& getTimeScheme() const;
+  inline void setTimeScheme(const bool&) ;
   void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
   void readInputAbscFiles (Nom& absc_file_name);
   void readInputModalDeformation(Nom& modal_deformation_file_name);
   //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
   void initialization(double velocity);
-  DoubleVect NewmarkScheme (double dt, double fluidForce);
+  DoubleVect NewmarkSchemeFD (double dt, double fluidForce);
+  DoubleVect NewmarkSchemeMA (double dt, double fluidForce);
   inline double soundSpeed();
   inline  double getMass(int i);
   inline  double getStiffness(int i);
@@ -86,6 +89,7 @@ protected :
   DoubleVect qHalfSpeed_;
   DoubleVect qAcceleration_;
   DoubleVect qDisplacement_;
+  bool timeScheme_=true;
   //DoubleTab phi3D_;
 
 };
@@ -129,6 +133,14 @@ inline const bool& Beam_model::getActivate() const
 inline void Beam_model::setActivate(const bool& activate)
 {
   activate_=activate;
+}
+inline const bool& Beam_model::getTimeScheme() const
+{
+  return timeScheme_;
+}
+inline void Beam_model::setTimeScheme(const bool& timeScheme)
+{
+  timeScheme_=timeScheme;
 }
 inline double Beam_model::soundSpeed()
 {
