@@ -62,15 +62,18 @@ public :
   inline void setTimeScheme(const bool&) ;
   void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
   void readInputAbscFiles (Nom& absc_file_name);
-  void readInputModalDeformation(Nom& modal_deformation_file_name);
+  void readInputModalDeformation(Noms& modal_deformation_file_name);
   //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
-  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
+  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
   void initialization(double velocity);
-  DoubleVect NewmarkSchemeFD (double dt, double fluidForce);
-  DoubleVect NewmarkSchemeMA (double dt, double fluidForce);
+  DoubleVect& NewmarkSchemeFD (const double& dt, const double& fluidForce);
+  DoubleVect& NewmarkSchemeMA (const double& dt, const double& fluidForce);
+  DoubleVect& getVelocity(const double& dt, const double& fluidForce);
   inline double soundSpeed();
   inline  double getMass(int i);
   inline  double getStiffness(int i);
+  inline  const DoubleTab& getDisplacement(int i) const;
+  inline  const DoubleTab& getRotation(int i) const;
 
 protected :
   int nbModes_;
@@ -82,9 +85,8 @@ protected :
   DoubleVect stiffness_;
   DoubleVect damping_;
   DoubleVect abscissa_;
-  DoubleTab u_;
-  DoubleTab R_;
-  LIST(DoubleTab) phi_;
+  LIST(DoubleTab) u_;
+  LIST(DoubleTab) R_;
   DoubleVect qSpeed_;
   DoubleVect qHalfSpeed_;
   DoubleVect qAcceleration_;
@@ -157,5 +159,18 @@ inline double  Beam_model::getStiffness(int i)
   assert(i<nbModes_);
   return stiffness_[i];
 }
+
+const DoubleTab& Beam_model::getDisplacement(int i) const
+{
+  assert(i<nbModes_);
+  return u_(i);
+}
+const DoubleTab& Beam_model::getRotation(int i) const
+{
+  assert(i<nbModes_);
+  return R_(i);
+
+}
+
 
 #endif /* Beam_model_included */

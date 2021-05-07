@@ -32,6 +32,7 @@
 #include <Champ_front_ALE.h>
 #include <Ch_front_input_ALE.h>
 #include <Champ_front_ALE_Beam.h>
+#include <Noms.h>
 
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
@@ -301,9 +302,6 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
                     }
                 }
             }
-          //double dt_beam = computeDtBeam(le_domaine_dis);
-          //Cerr << " dt: "<< dt_beam << endl;
-          //getchar();
         }
       else
         {
@@ -605,9 +603,10 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Motcle motlu;
   Nom nomlu;
   Nom masse_and_stiffness_file_name;
-  Nom phi_file_name;
-  Nom absc_file_name ;
+  Noms phi_file_name;
+  Nom absc_file_name;
   int var_int;
+  int nb_modes;
   double var_double;
   is >> motlu;
   if (motlu != accolade_ouverte)
@@ -624,8 +623,8 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       motlu=nomlu;
       if(motlu=="nb_modes")
         {
-          is >> var_int;
-          beam.setNbModes(var_int);
+          is >> nb_modes;
+          beam.setNbModes(nb_modes);
           Cerr << "Number of modes : " <<  beam.getNbModes() << finl;
         }
       if(motlu=="direction")
@@ -650,26 +649,32 @@ void Domaine_ALE::reading_beam_model(Entree& is)
         {
           is >> nomlu;
           masse_and_stiffness_file_name=nomlu;
+
         }
       if(motlu=="Absc_file_name")
         {
           is >> nomlu;
           absc_file_name=nomlu;
+
         }
 
       if(motlu=="Modal_deformation_file_name")
         {
-          is >> nomlu;
-          phi_file_name=nomlu;
+          is >> var_int;
+          for (int i=0; i< var_int; i ++)
+            {
+              is >>nomlu;
+              phi_file_name.add(nomlu);
+            }
         }
       if(motlu=="NewmarkTimeScheme")
         {
           is >> nomlu;
           bool scheme=true;
           if(nomlu=="FD")
-            scheme=true;
-          else if(nomlu=="MA")
             scheme=false;
+          else if(nomlu=="MA")
+            scheme=true;
           else
             {
               Cerr << "NewmarkTimeScheme wrong: choose between FD and MA" <<finl;
@@ -685,13 +690,12 @@ void Domaine_ALE::reading_beam_model(Entree& is)
     }
   beam.readInputMassStiffnessFiles(masse_and_stiffness_file_name);
   beam.readInputAbscFiles(absc_file_name);
+  assert(nb_modes==phi_file_name.size());
   beam.readInputModalDeformation(phi_file_name);
-
-
 }
-DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
+DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
-  return beam.interpolationOnThe3DSurface(x,y,z);
+  return beam.interpolationOnThe3DSurface(x,y,z, u, R);
 }
 
 void Domaine_ALE::initializationBeam (double velocity)
@@ -706,13 +710,27 @@ double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
   const DoubleVect& surfaces = zone_VEF.face_surfaces();
   double minSurf = mp_min_vect(surfaces);
   minSurf = Process::mp_min(minSurf);
-  Cerr << " Surface min: "<< minSurf << endl;
+  //Cerr << " Surface min: "<< minSurf << endl;
   double soundSpeed=beam.soundSpeed();
-  Cerr << " soundSpeed: "<< soundSpeed << endl;
+  //Cerr << " soundSpeed: "<< soundSpeed << endl;
   dt = 0.5*(minSurf/soundSpeed);
-  /*Cerr << " dt: "<< dt << endl;
-  double massBeam=beam.getMass(0);
-  double stiffBeam=beam.getStiffness(0);
-  dt = 0.5 * (minSurf * sqrt(massBeam)) / sqrt(stiffBeam);*/
   return dt;
+}
+
+const DoubleTab& Domaine_ALE::getBeamDisplacement(int i) const
+{
+  return beam.getDisplacement(i);
+}
+const DoubleTab& Domaine_ALE::getBeamRotation(int i) const
+{
+  return beam.getRotation(i);
+
+}
+const int& Domaine_ALE::getBeamDirection() const
+{
+  return beam.getDirection();
+}
+DoubleVect&  Domaine_ALE::getBeamVelocity(const double& dt, const double& fluidForce)
+{
+  return beam.getVelocity(dt, fluidForce);
 }

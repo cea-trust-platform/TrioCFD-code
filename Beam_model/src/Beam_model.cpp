@@ -98,6 +98,7 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
     {
       Cerr<< "ERROR: Unable to open the file." <<masse_and_stiffness_file_name<<finl;
     }
+  Cerr<<"mass = "<<mass_<<" stiffnes "<<stiffness_<<finl;
 }
 void Beam_model::readInputAbscFiles(Nom& absc_file_name)
 {
@@ -129,41 +130,46 @@ void Beam_model::readInputAbscFiles(Nom& absc_file_name)
 }
 
 
-
-void Beam_model::readInputModalDeformation(Nom& modal_deformation_file_name)
+void Beam_model::readInputModalDeformation(Noms& modal_deformation_file_name)
 {
 
   Cerr << "Read beam modal deformation coefficients from "<< modal_deformation_file_name <<" files " << finl;
 
-  string const nomFichier(modal_deformation_file_name);
-
-  ifstream monFlux(nomFichier.c_str());
-  int size = abscissa_.size();
-  u_.resize(size, 3);
-  R_.resize(size, 3);
-
-  if(monFlux)
+  for(int count=0; count<nbModes_; count++)
     {
-      string line;  // read the first line
-      getline(monFlux, line);
-      monFlux.ignore();
-      double  ux, uy, uz, rx, ry, rz;
-      for(int i=0; i<size; i++)
+      string const nomFichier(modal_deformation_file_name[count]);
+
+      ifstream monFlux(nomFichier.c_str());
+      int size = abscissa_.size();
+      DoubleTab u(size, 3);
+      DoubleTab R(size, 3);
+
+      if(monFlux)
         {
-          monFlux >> ux>> uy>> uz>> rx>> ry>> rz;
-          u_(i, 0)=ux;
-          u_(i, 1)=uy;
-          u_(i, 2)=uz;
-          R_(i, 0)=rx;
-          R_(i, 1)=ry;
-          R_(i, 2)=rz;
+          string line;  // read the first line
+          getline(monFlux, line);
+          monFlux.ignore();
+          double  ux, uy, uz, rx, ry, rz;
+          for(int i=0; i<size; i++)
+            {
+              monFlux >> ux>> uy>> uz>> rx>> ry>> rz;
+              u(i, 0)=ux;
+              u(i, 1)=uy;
+              u(i, 2)=uz;
+              R(i, 0)=rx;
+              R(i, 1)=ry;
+              R(i, 2)=rz;
 
+            }
+          monFlux.close();
+          u_.add(u);
+          R_.add(R);
         }
-      monFlux.close();
-    }
-  else
-    {
-      Cerr<< "ERROR: Unable to open the file." <<modal_deformation_file_name<<finl;
+
+      else
+        {
+          Cerr<< "ERROR: Unable to open the file." <<modal_deformation_file_name[count]<<finl;
+        }
     }
 }
 
@@ -180,15 +186,18 @@ void Beam_model::initialization(double velocity)
   qDisplacement_=0.;
 }
 
-DoubleVect Beam_model::NewmarkSchemeFD (double dt, double fluidForce)
+DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const double& fluidForce)
 {
-
+  Cerr<<" dt = "<<dt<<finl;
   double halfDt=dt/2;
   for(int j=0; j < nbModes_; j++)
     {
       qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
       qDisplacement_[j] += dt*qHalfSpeed_[j];
-      qAcceleration_[j]= (fluidForce - damping_[j]*qHalfSpeed_[j] - stiffness_[j]*qDisplacement_[j])/(mass_[j] + halfDt*damping_[j]);
+      double coeff1 = mass_[j] + halfDt*damping_[j];
+      Cerr<<" coeff1 = "<<coeff1<<finl;
+      double coeff2 =	damping_[j]*qHalfSpeed_[j] - stiffness_[j]*qDisplacement_[j];
+      qAcceleration_[j]= (fluidForce - coeff2)/coeff1;
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
       //Cout<<" qHalfSpeed_[j] "<<qHalfSpeed_[j]<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
       //getchar();
@@ -197,7 +206,7 @@ DoubleVect Beam_model::NewmarkSchemeFD (double dt, double fluidForce)
   return qHalfSpeed_;
 }
 
-DoubleVect Beam_model::NewmarkSchemeMA (double dt, double fluidForce)
+DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const double& fluidForce)
 {
   double halfDt=dt/2;
   double squareHalfDt= halfDt*halfDt;
@@ -215,7 +224,18 @@ DoubleVect Beam_model::NewmarkSchemeMA (double dt, double fluidForce)
   return qSpeed_;
 }
 
-DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const
+DoubleVect& Beam_model::getVelocity(const double& dt, const double& fluidForce)
+{
+
+  if(dt == 0.)
+    return qSpeed_;
+  else if(timeScheme_)
+    return NewmarkSchemeMA(dt, fluidForce);
+  else
+    return NewmarkSchemeFD(dt, fluidForce);
+}
+
+DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
   DoubleVect phi(3);
   phi=0.;
@@ -277,12 +297,12 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
       betha = (s - abscissa_[i])/h;
     }
 
-  ux=alpha*u_(i, 0) + betha*u_(j, 0);
-  uy=alpha*u_(i, 1) + betha*u_(j, 1);
-  uz=alpha*u_(i, 2) + betha*u_(j, 2);
-  Rx=alpha*R_(i, 0) + betha*R_(j, 0);
-  Ry=alpha*R_(i, 1) + betha*R_(j, 1);
-  Rz=alpha*R_(i, 2) + betha*R_(j, 2);
+  ux=alpha*u(i, 0) + betha*u(j, 0);
+  uy=alpha*u(i, 1) + betha*u(j, 1);
+  uz=alpha*u(i, 2) + betha*u(j, 2);
+  Rx=alpha*R(i, 0) + betha*R(j, 0);
+  Ry=alpha*R(i, 1) + betha*R(j, 1);
+  Rz=alpha*R(i, 2) + betha*R(j, 2);
 
   phi[0] =ux + Ry*zs -Rz*ys;
   phi[1] =uy + Rz*xs -Rx*zs;

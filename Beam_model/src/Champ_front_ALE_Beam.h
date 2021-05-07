@@ -40,8 +40,10 @@ class Champ_front_ALE_Beam : public Champ_front_ALE
 
 public :
   virtual void remplir_vit_som_bord_ALE(double);
+  void initializationBeam(double);
 
 protected :
+  bool init_=false;
 
 
 };

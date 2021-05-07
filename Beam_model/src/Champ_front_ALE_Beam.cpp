@@ -42,22 +42,45 @@ Entree& Champ_front_ALE_Beam::readOn(Entree& is)
 {
   return Champ_front_ALE::readOn(is);
 }
+void Champ_front_ALE_Beam::initializationBeam(double tps)
+{
+  Cerr<<"Champ_front_ALE_Beam::initializationBeam"<<finl;
+  const Frontiere& front=la_frontiere_dis->frontiere();
+  const Zone& zone=front.zone();
+  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
+  double x=0,y=0,z=0;
+  double velocity=0.;
+  int dir=dom_ale.getBeamDirection();
+  fxyzt[dir].setVar("x",x);
+  fxyzt[dir].setVar("y",y);
+  fxyzt[dir].setVar("z",z);
+  fxyzt[dir].setVar("t",tps);
+  velocity=fxyzt[dir].eval();
+  dom_ale.initializationBeam(velocity);
+}
 void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 {
-  //Cerr<<"Champ_front_ALE::remplir_vit_som_bord_ALE"<<finl;
+  Cerr<<"Champ_front_ALE_Beam::remplir_vit_som_bord_ALE "<<finl;
   const Frontiere& front=la_frontiere_dis->frontiere();
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
   const Domaine& domaine=zone.domaine();
-  const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, zone.domaine());
-  Domaine_ALE dom_ale_test=ref_cast(Domaine_ALE, zone.domaine());
+  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
+  double dt = dom_ale.get_dt();
+  if(init_!=true)
+    {
+      initializationBeam(tps);
+      init_=true;
+    }
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
   int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
+  double fluidForce=0.;
+  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(dt, fluidForce);
   for( i=0; i<nb_faces; i++)
     {
       x=y=z=0;
@@ -69,17 +92,29 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
           if(dimension>2)
             z=domaine.coord(faces.sommet(i,k),2);
           DoubleVect phi(3);
-          phi=dom_ale.interpolationOnThe3DSurface(x,y,z);
+          DoubleVect value(3);
+          value=0.;
+          for(int count=0; count<beamVelocity.size(); count++ )
+            {
+              const DoubleTab& u=dom_ale.getBeamDisplacement(count);
+              const DoubleTab& R=dom_ale.getBeamRotation(count);
+              phi=dom_ale.interpolationOnThe3DSurface(x,y,z, u, R);
+
+              for(int comp=0; comp<nb_comp(); comp++)
+                {
+                  value[comp] +=beamVelocity[count]*phi[comp];
+                }
+            }
+
           for( j=0; j<nb_comp(); j++)
             {
               fxyzt[j].setVar("x",x);
               fxyzt[j].setVar("y",y);
               fxyzt[j].setVar("z",z);
               fxyzt[j].setVar("t",tps);
-              vit_som_bord_ALE(faces.sommet(i,k),j)=fxyzt[j].eval()*phi[j];
+              vit_som_bord_ALE(faces.sommet(i,k),j)=value[j];
             }
         }
-      double test= fxyzt[1].eval();
-      dom_ale_test.initializationBeam(test);
+
     }
 }

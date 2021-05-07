@@ -67,12 +67,16 @@ public :
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
   inline const DoubleTab& getOldJacobian();
   inline const DoubleTab& getNewJacobian();
-  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z) const;
+  DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
   void initializationBeam (double velocity) ;
   double computeDtBeam(Domaine_dis&);
+  const DoubleTab& getBeamDisplacement(int i) const;
+  const DoubleTab& getBeamRotation(int i) const;
+  const int& getBeamDirection() const;
+  DoubleVect& getBeamVelocity(const double& dt, const double& fluidForce);
 protected:
 
-  double dt_;
+  double dt_=0.;
   DoubleTab ALE_mesh_velocity;
   DoubleTab vf; //faces velocity
   IntTab som_faces_bords;
