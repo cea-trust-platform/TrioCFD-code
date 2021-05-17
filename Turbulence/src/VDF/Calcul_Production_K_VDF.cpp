@@ -585,3 +585,170 @@ DoubleVect& Calcul_Production_K_VDF::calculer_terme_destruction_K(const Zone_VDF
   G.echange_espace_virtuel();
   return G;
 }
+
+DoubleVect& Calcul_Production_K_VDF::
+calculer_terme_production_K_BiK(const Zone_VDF& zone_VDF, const Zone_Cl_VDF& zone_Cl_VDF , DoubleVect& S,  const DoubleTab& K,
+                                const DoubleTab& vitesse,const Champ_Face& vit,  const DoubleTab& visco_turb )  const
+{
+  int nb_elem = zone_VDF.zone().nb_elem();
+  const IntTab& elem_faces = zone_VDF.elem_faces();
+  const IntVect& orientation = zone_VDF.orientation();
+
+  int elem;
+  IntVect element(4);
+
+  S = 0. ;
+
+  // Apres la factorisation du calcul de Sij*Sij (v1.4.6) il est apparu que pour
+  // le terme de production de K la contribution des parois ne doit pas etre
+  // pris en compte, car K et Eps sont ensuite imposes par la loi de paroi,
+  // Si l'on prend en compte la contribution de la paroi les viscosites
+  // turbulentes a la paroi sont tres fortes, et les pas de temps tres faibles
+  // Pour la v1.4.8, on revient a la modelisation de la 1.4.5 qui ne
+  // n'ajoutait pas a Sij*Sij la contribution des parois
+  //Dans la methode calcul_S_barre_sans_contrib_paroi, contribution_paroi
+  //est fixe a 0 par defaut
+
+  vit.calcul_S_barre_sans_contrib_paroi(vitesse,S,zone_Cl_VDF);
+
+  double coef;
+
+  Debog::verifier("Source_Transport_K_Eps_VDF_P0_VDF:: calculer_terme_production_K_BiK ",S);
+  for ( elem=0; elem<nb_elem; elem++)
+    {
+
+      //P= 2*nut*Sij*Sij
+      S(elem) *= visco_turb(elem) ;
+      coef = 0. ;
+      for (int i=0; i<Objet_U::dimension; i++)
+        {
+          coef +=  (vitesse[elem_faces(elem,i)]  - vitesse[elem_faces(elem,i+Objet_U::dimension)]) /zone_VDF.dim_elem(elem,orientation(elem_faces(elem,i)));
+        }
+      //Corrections pour prendre en compte la divergence de u
+      //non nulle en Quasi-Compressible
+
+      S(elem) += -(2./3.)*visco_turb(elem)*coef * coef;
+      S(elem) += -(2./3.)*K(elem) * coef ;
+
+    }
+
+  Debog::verifier("Source_Transport_K_Eps_VDF_P0_VDF:: calculer_terme_production_K_BiK ",S);
+  return S ;
+}
+
+DoubleVect& Calcul_Production_K_VDF::
+calculer_terme_production_K_BiK_Axi(const Zone_VDF& zone_VDF,
+                                    const Champ_Face& vitesse,
+                                    DoubleVect& P,
+                                    const DoubleTab& K,
+                                    const DoubleTab& visco_turb) const
+{
+  // P est discretise comme K et Eps i.e au centre des elements
+  //
+  // P(elem) = - (    Rey11*tau11 + Rey22*tau22 + Rey33*tau33
+  //                    +  Rey12*(tau12+tau21) + Rey13*(tau13 + tau31)
+  //                    +  Rey23*(tau23+tau32) )
+  //
+  //
+
+  P= 0;
+
+  int nb_elem = zone_VDF.nb_elem();
+  int nb_aretes = zone_VDF.nb_aretes();
+  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const IntTab& Qdm = zone_VDF.Qdm();
+  const DoubleTab& tau_diag = vitesse.tau_diag();
+  const DoubleTab& tau_croises = vitesse.tau_croises();
+  double d_visco_turb,k_elem,P_arete;
+
+  // Calcul des composantes du tenseur de Reynolds a partir du tenseur GradU
+
+  DoubleTrav Rey_diag(nb_elem,Objet_U::dimension);
+  DoubleTrav Rey_croises(nb_aretes);
+
+  Rey_croises = 0;
+  int num_elem;
+  for (num_elem=0; num_elem<nb_elem; num_elem++)
+    {
+      k_elem = K(num_elem);
+      for (int i=0; i<Objet_U::dimension; i++)
+        Rey_diag(num_elem,i) = -2*visco_turb(num_elem)*tau_diag(num_elem,i)
+                               + 2./3.*k_elem;
+    }
+
+  // Boucle sur les aretes bord
+
+  int ndeb,nfin,n_arete;
+  ndeb = zone_VDF.premiere_arete_bord();
+  nfin = ndeb + zone_VDF.nb_aretes_bord();
+  int fac1,fac2,fac3,fac4;
+
+  for (n_arete=ndeb; n_arete<nfin; n_arete++)
+    {
+      fac3 = Qdm(n_arete,2);
+
+      d_visco_turb = 0.5*(visco_turb(face_voisins(fac3,0))
+                          + visco_turb(face_voisins(fac3,1)));
+      Rey_croises(n_arete) = - d_visco_turb*(tau_croises(n_arete,0) + tau_croises(n_arete,1));
+
+    }
+
+  // Pas de boucle sur les aretes mixtes: les composantes croisees
+  // du tenseur de Reynolds sont prises nulles sur les aretes mixtes
+
+  // Boucle sur les aretes internes
+
+  ndeb = zone_VDF.premiere_arete_interne();
+  nfin = zone_VDF.nb_aretes();
+
+  for (n_arete=ndeb; n_arete<nfin; n_arete++)
+    {
+      fac1=Qdm(n_arete,0);
+      fac2=Qdm(n_arete,1);
+      fac3=Qdm(n_arete,2);
+      fac4=Qdm(n_arete,3);
+
+      d_visco_turb = 0.25*(visco_turb(face_voisins(fac3,0)) + visco_turb(face_voisins(fac3,1))
+                           + visco_turb(face_voisins(fac4,0)) + visco_turb(face_voisins(fac4,1)));
+      Rey_croises(n_arete) = - d_visco_turb*(tau_croises(n_arete,0) + tau_croises(n_arete,1));
+    }
+
+  // Calcul du terme de production P
+
+  for (num_elem=0; num_elem<nb_elem; num_elem++)
+    {
+      for (int i=0; i<Objet_U::dimension; i++)
+        P(num_elem) -= Rey_diag(num_elem,i)*tau_diag(num_elem,i);
+    }
+
+  ndeb = zone_VDF.premiere_arete_bord();
+  nfin = ndeb + zone_VDF.nb_aretes_bord();
+
+  for (n_arete=ndeb; n_arete<nfin; n_arete++)
+    {
+      fac3=Qdm(n_arete,2);
+
+      P_arete = - Rey_croises(n_arete)*(tau_croises(n_arete,0)+tau_croises(n_arete,1));
+      P[face_voisins(fac3,0)] += 0.25*P_arete;
+      P[face_voisins(fac3,1)] += 0.25*P_arete;
+    }
+
+  ndeb = zone_VDF.premiere_arete_interne();
+  nfin = zone_VDF.nb_aretes();
+
+  for (n_arete=ndeb; n_arete<nfin; n_arete++)
+    {
+      fac1=Qdm(n_arete,0);
+      fac2=Qdm(n_arete,1);
+
+      P_arete = - Rey_croises(n_arete)*(tau_croises(n_arete,0)+tau_croises(n_arete,1));
+      P[face_voisins(fac1,0)] += 0.25*P_arete;
+      P[face_voisins(fac1,1)] += 0.25*P_arete;
+      P[face_voisins(fac2,0)] += 0.25*P_arete;
+      P[face_voisins(fac2,1)] += 0.25*P_arete;
+    }
+  P.echange_espace_virtuel();
+  return P;
+}
+
+

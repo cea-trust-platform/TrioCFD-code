@@ -41,6 +41,8 @@ public :
 
   DoubleTab& Calcul_Fmu (DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don&) const;
 
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const ;
+
   void associer(const Zone_dis& , const Zone_Cl_dis& );
   Entree& lire(const Motcle&, Entree&);
 

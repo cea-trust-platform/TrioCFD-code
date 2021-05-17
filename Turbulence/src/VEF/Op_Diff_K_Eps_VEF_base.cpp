@@ -23,6 +23,7 @@
 #include <Op_Diff_K_Eps_VEF_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
+#include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Champ_P1NC.h>
 #include <Paroi_hyd_base_VEF.h>
 
@@ -50,6 +51,9 @@ void Op_Diff_K_Eps_VEF_base::completer()
 {
   Operateur_base::completer();
 
+  diffuse_k_seul   = false;
+  diffuse_eps_seul = false;
+
   if ( sub_type( Transport_K_Eps,mon_equation.valeur() ) )
     {
       const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
@@ -62,6 +66,24 @@ void Op_Diff_K_Eps_VEF_base::completer()
     {
       const Transport_K_Eps_Realisable& eqn_transport = ref_cast(Transport_K_Eps_Realisable,mon_equation.valeur());
       const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_transport.modele_turbulence());
+      const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
+      associer_diffusivite_turbulente(visc_turb);
+      Op_Diff_K_Eps_VEF_base::associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
+    }
+  else if ( sub_type( Transport_K_ou_Eps,mon_equation.valeur() ) )
+    {
+      const Transport_K_ou_Eps& eqn_transport = ref_cast(Transport_K_ou_Eps,mon_equation.valeur());
+
+      if ( eqn_transport.transporte_t_il_K( ) )
+        {
+          diffuse_k_seul = true;
+        }
+      else
+        {
+          diffuse_eps_seul = true;
+        }
+
+      const Modele_turbulence_hyd_K_Eps_Bicephale& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,eqn_transport.modele_turbulence());
       const Champ_Fonc& visc_turb = mod_turb.viscosite_turbulente();
       associer_diffusivite_turbulente(visc_turb);
       Op_Diff_K_Eps_VEF_base::associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
