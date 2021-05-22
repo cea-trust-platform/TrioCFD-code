@@ -28,6 +28,9 @@
 
 Implemente_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC,"Pb_Hydraulique_Melange_Binaire_Turbulent_QC",Pb_QC_base);
 
+// XD pb_hydraulique_melange_binaire_turbulent_qc Pb_base pb_hydraulique_melange_binaire_turbulent_qc -1 Resolution of turbulent binary mixture problem under low Mach number.
+// XD attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
+// XD attr convection_diffusion_fraction_massique_mb_turbulent_qc convection_diffusion_fraction_massique_mb_turbulent_qc convection_diffusion_fraction_massique_mb_turbulent_qc 0 Species conservation equation under low Mach number as well as the associated turbulence model equations.
 
 // Description:
 //    Simple appel a: Probleme_base::printOn(Sortie&)

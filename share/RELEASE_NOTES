@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.3_beta : Enhancements, modifications and corrected bugs since version 1.8.2 :
 --------------------------------------------------------------------------------------------------
+22/05/21 (TrioCFD) New feature : New problem added which allows simulating binary mixture flows at iso-bar and iso-thermal conditions using a low Mach number approximation 
 17/05/21 (TrioCFD) New feature : k-epsilon Bicephale model : New decoupled management of the evolution equations of k and epsilon for the Bas-Reynolds models - WARNING model under validation
 31/03/21 (TrioCFD) New feature : triocfd -baltik BALTIK_NAME creates an empty baltik that depends on TrioCFD.
 31/03/21 (TrioCFD) New feature : triocfd -xcheck allows now to check the syntaxe of triocfd datafiles using XDATA.

@@ -25,6 +25,9 @@
 
 Implemente_instanciable(Convection_Diffusion_fraction_massique_MB_Turbulent_QC,"Convection_Diffusion_fraction_massique_MB_Turbulent_QC",Convection_Diffusion_fraction_massique_MB_QC);
 
+// XD convection_diffusion_fraction_massique_mb_turbulent_qc convection_diffusion_fraction_massique_mb_qc convection_diffusion_fraction_massique_mb_turbulent_qc -1 Species conservation equation under low Mach number as well as the associated turbulence model equations.
+// XD attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the species conservation equation.
+
 // Description:
 //    Simple appel a Convection_Diffusion_fraction_massique_MB_QC::printOn(Sortie&)
 // Precondition:
