@@ -10,3 +10,8 @@ Makefile
 README.BALTIK
 index.html
 .test*
+
+# Eclipse
+.cproject
+.project
+.settings/
