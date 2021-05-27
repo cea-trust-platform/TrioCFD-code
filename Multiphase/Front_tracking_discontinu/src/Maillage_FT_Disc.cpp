@@ -819,10 +819,12 @@ void Maillage_FT_Disc::parcourir_maillage()
   // ajoute des facettes sur les processeurs "pauvres"
   const Parcours_interface& p = refparcours_interface_.valeur();
 
-  statistiques().begin_count(parcours_maillage_counter_);
+  static const Stat_Counter_Id counter = statistiques().new_counter(3, "Parcours de l'interface", "FrontTracking");
+  statistiques().begin_count(counter);
   p.parcourir(*this);
+  statistiques().end_count(counter);
   maillage_modifie(PARCOURU);
-  statistiques().end_count(parcours_maillage_counter_);
+
 }
 
 // Description: Complete les structures de donnees du maillage.
@@ -861,7 +863,9 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 {
   assert(statut_ >= PARCOURU);
 
-  statistiques().begin_count(calculer_indicatrice_counter_);
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Calculer_Indicatrice", "FrontTracking");
+  statistiques().begin_count(stat_counter);
+
   const Zone_dis& zone_dis = refzone_dis_.valeur();
   const Zone& lazone = zone_dis.zone();
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
@@ -1059,7 +1063,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 
   Debog::verifier("Maillage_FT_Disc::calcul_indicatrice indicatrice=",indicatrice);
   elements_calcules.resize_array(0);
-  statistiques().end_count(calculer_indicatrice_counter_);
+  statistiques().end_count(stat_counter);
 }
 
 // Description:
@@ -1072,6 +1076,9 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 //  Les deplacements des sommets virtuels sont ignores.
 void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
 {
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Transporter_maillage", "FrontTracking");
+  statistiques().begin_count(stat_counter);
+
   assert(deplacement.dimension(0) == sommets_.dimension(0));
   assert(deplacement.dimension(1) == sommets_.dimension(1));
 
@@ -1115,6 +1122,7 @@ void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
   corriger_proprietaires_facettes();
 
   maillage_modifie(MINIMAL);
+  statistiques().end_count(stat_counter);
 }
 
 //-Remplit un tableau temporaire sommets_tmp de positions
@@ -3934,8 +3942,7 @@ static True_int fct_tri_facettes(const void *pt1, const void *pt2)
 
 int Maillage_FT_Disc::check_mesh(int error_is_fatal, int skip_facette_pe, int skip_facettes) const
 {
-  static const Stat_Counter_Id stat_counter =
-    statistiques().new_counter(3, "Check_mesh", "FrontTracking");
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Check_mesh", "FrontTracking");
   statistiques().begin_count(stat_counter);
 
   const double invalid_value = DMAXFLOAT*0.9;
