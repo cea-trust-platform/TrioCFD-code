@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,70 +14,108 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_DiffF22_VDF_Elem.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/9
+// File:        Cal_std.h
+// Directory:   $TRUST_ROOT/src/VDF/Operateurs/Evaluateurs
+// Version:     /main/5
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Op_DiffF22_VDF_Elem_included
-#define Op_DiffF22_VDF_Elem_included
 
-#include <Op_Diff_VDF_base.h>
-#include <ItVDFEl.h>
-#include <Op_VDF_Elem.h>
-class Eval_DiffF22_VDF_const_Elem;
-
-//
-// .DESCRIPTION class Op_DiffF22_VDF_Elem
-//
-//  Cette classe represente l'operateur de diffusion associe a l'equation de la quantite F22 dans le modele V2F
-//  La discretisation est VDF
-//  Le champ diffuse est scalaire
-//  Le champ de diffusivite est uniforme
-//  L'iterateur associe est de type Iterateur_VDF_Elem
-//  L'evaluateur associe est de type Eval_DiffF22_VDF_const_Elem
-
-//
-// .SECTION voir aussi
-//
+//// calculer_flux_faces_echange_externe_impose
 //
 
-declare_It_VDF_Elem(Eval_DiffF22_VDF_const_Elem)
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Op_DiffF22_VDF_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Op_DiffF22_VDF_Elem : public Op_Diff_VDF_base, public Op_VDF_Elem
+inline int CLASSNAME::calculer_flux_faces_echange_externe_impose() const
 {
-
-  Declare_instanciable_sans_constructeur(Op_DiffF22_VDF_Elem);
-
-public:
-
-  Op_DiffF22_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
-  void associer_diffusivite(const Champ_base& );
-  const Champ_base& diffusivite() const;
-  inline  void dimensionner(Matrice_Morse& ) const;
-  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
-  double calculer_dt_stab() const;
-
-};
-
-// Description:
-// on dimensionne notre matrice.
-inline  void Op_DiffF22_VDF_Elem::dimensionner(Matrice_Morse& matrice) const
-{
-  Op_VDF_Elem::dimensionner(iter.zone(), iter.zone_Cl(), matrice);
+  return 1;
 }
 
-inline void Op_DiffF22_VDF_Elem::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
+
+//// calculer_flux_faces_echange_global_impose
+//
+
+inline int CLASSNAME::calculer_flux_faces_echange_global_impose() const
 {
-  Op_VDF_Elem::modifier_pour_Cl(iter.zone(), iter.zone_Cl(), matrice, secmem);
+  return 1;
 }
 
-#endif
+
+//// calculer_flux_faces_entree_fluide
+//
+
+inline int CLASSNAME::calculer_flux_faces_entree_fluide() const
+{
+  return 1;
+}
+
+
+//// calculer_flux_faces_paroi
+//
+
+inline int CLASSNAME::calculer_flux_faces_paroi() const
+{
+  return 1;
+}
+
+
+//// calculer_flux_faces_paroi_adiabatique
+//
+
+inline int CLASSNAME::calculer_flux_faces_paroi_adiabatique() const
+{
+  return 0;
+}
+
+
+//// calculer_flux_faces_paroi_defilante
+//
+
+inline int CLASSNAME::calculer_flux_faces_paroi_defilante() const
+{
+  return 0;
+}
+
+
+//// calculer_flux_faces_paroi_fixe
+//
+
+inline int CLASSNAME::calculer_flux_faces_paroi_fixe() const
+{
+  return 1;
+}
+
+
+//// calculer_flux_faces_sortie_libre
+//
+
+inline int CLASSNAME::calculer_flux_faces_sortie_libre() const
+{
+  return 0;
+}
+
+
+//// calculer_flux_faces_symetrie
+//
+
+inline int CLASSNAME::calculer_flux_faces_symetrie() const
+{
+  return 0;
+}
+
+
+//// calculer_flux_faces_periodique
+//
+
+inline int CLASSNAME::calculer_flux_faces_periodique() const
+{
+  return 1;
+}
+
+//// calculer_flux_faces_NSCBC
+//
+
+inline int CLASSNAME::calculer_flux_faces_NSCBC() const
+{
+  return 0;
+}
+
+
