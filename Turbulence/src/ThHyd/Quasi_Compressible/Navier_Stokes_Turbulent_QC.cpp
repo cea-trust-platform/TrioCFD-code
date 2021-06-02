@@ -90,7 +90,10 @@ const Champ_Don& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport()
 void Navier_Stokes_Turbulent_QC::mettre_a_jour(double temps)
 {
   Navier_Stokes_Turbulent::mettre_a_jour(temps);
-  ref_cast(Convection_Diffusion_Chaleur_Turbulent_QC,probleme().equation(1)).mettre_a_jour_modele(temps);
+  // Elie Saikali
+  // for Pb_Hydraulique_Melange_Binaire_Turbulent_QC we do all in mettre_a_jour(temps) !
+  if (probleme().que_suis_je() != "Pb_Hydraulique_Melange_Binaire_Turbulent_QC")
+    ref_cast(Convection_Diffusion_Chaleur_Turbulent_QC,probleme().equation(1)).mettre_a_jour_modele(temps);
 }
 
 int Navier_Stokes_Turbulent_QC::impr(Sortie& os) const
