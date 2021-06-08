@@ -49,8 +49,8 @@ public:
   virtual void discretiser(const Probleme_base& pb, const  Discretisation_base& dis);
 
   // L'appel a ces methodes est invalide et genere une erreur
-  const Champ_Don& masse_volumique() const;
-  Champ_Don&       masse_volumique();
+  const Champ_base& masse_volumique() const;
+  Champ_base&       masse_volumique();
   const Champ_Don& diffusivite() const;
   Champ_Don&       diffusivite();
   const Champ_Don& conductivite() const;
