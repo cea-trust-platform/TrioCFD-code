@@ -1,0 +1,10 @@
+#!/bin/bash
+#construction tableau recapitulatif
+
+cp VDF/*FRACTION*.son .
+cp VDF/*MASSE*.son .
+cp VEF/*FRACTION*.son .
+cp VEF/*MASSE*.son .
+python ./ligneTableau-specie1.py
+python ./ligneTableau-specie2.py
+python ./ligneTableau-density.py
