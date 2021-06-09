@@ -121,6 +121,7 @@
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/KEps_Meshing_VEF NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Loi_paroi_3D_VEF NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Mixing_length_VEF_WF NNR
+./validation/share/Validation/Rapports_automatiques/Validant/Fini/NoFlow-lami-espece STD
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/OBI_diffuser_VEF_k_eps NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Oscillating_Flow NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Pb_couple_2D STD

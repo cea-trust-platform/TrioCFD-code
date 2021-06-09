@@ -47,7 +47,7 @@ Read sch
         tinit 0
         tmax .2
         nb_pas_dt_max 10
-        dt_min 1.e-9
+        dt_min 1.e-10
         dt_max 5.
         dt_impr 1.e-7
         dt_sauv 100
