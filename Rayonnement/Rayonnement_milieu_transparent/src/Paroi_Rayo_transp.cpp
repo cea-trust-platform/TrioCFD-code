@@ -59,8 +59,11 @@ double Paroi_Rayo_transp::flux_impose(int i) const
 
 double Paroi_Rayo_transp::flux_impose(int i,int j) const
 {
-  Cerr << "Paroi_Rayo_transp::flux_impose(i,j)  erreur" << finl;
-  exit();
-  return 0;
+  const Front_VF& la_frontiere_VF = ref_cast(Front_VF,frontiere_dis());
+  int ndeb = la_frontiere_VF.num_premiere_face();
+  double flux_radia=le_modele_rayo->flux_radiatif(i+ndeb);
+  const int k = (le_champ_front.valeurs().size() == 1) ? 0 : i;
+  return le_champ_front(k, j)-flux_radia;
+  return 0.;
 
 }
