@@ -23,8 +23,17 @@
 #include <Beam_model.h>
 #include <Domaine.h>
 #include <Frontiere_dis_base.h>
+#include <Zone_Cl_dis_base.h>
+#include <Front_VF.h>
 #include <Domaine_ALE.h>
 #include <Domaine.h>
+#include <Zone_VEF.h>
+#include <Cond_lim.h>
+#include <Navier_Stokes_std.h>
+#include <Equation_base.h>
+#include <Operateur_Diff.h>
+#include <Operateur_Grad.h>
+#include <DoubleVect.h>
 #include <math.h>
 #define pi 3.14159265
 
@@ -65,21 +74,29 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
+
   const Domaine& domaine=zone.domaine();
   Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
+
   double dt = dom_ale.get_dt();
-  if(init_!=true)
+  /*if(init_!=true)
     {
       initializationBeam(tps);
       init_=true;
-    }
+    }*/
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
   int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
-  double fluidForce=0.;
+  const int nbModes=dom_ale.getBeamNbModes();
+  DoubleVect fluidForce(nbModes);
+  fluidForce=0.;
+  /* if(tps>0)
+     {
+       computeFluidForce(fluidForce);
+     }*/
   const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(dt, fluidForce);
   for( i=0; i<nb_faces; i++)
     {
@@ -91,10 +108,11 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
             y=domaine.coord(faces.sommet(i,k),1);
           if(dimension>2)
             z=domaine.coord(faces.sommet(i,k),2);
+
           DoubleVect phi(3);
           DoubleVect value(3);
           value=0.;
-          for(int count=0; count<beamVelocity.size(); count++ )
+          for(int count=0; count<nbModes; count++ )
             {
               const DoubleTab& u=dom_ale.getBeamDisplacement(count);
               const DoubleTab& R=dom_ale.getBeamRotation(count);
@@ -108,13 +126,61 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 
           for( j=0; j<nb_comp(); j++)
             {
-              fxyzt[j].setVar("x",x);
-              fxyzt[j].setVar("y",y);
-              fxyzt[j].setVar("z",z);
-              fxyzt[j].setVar("t",tps);
               vit_som_bord_ALE(faces.sommet(i,k),j)=value[j];
+
+            }
+          /* if(front.le_nom()=="Out_poutre" && i==0 && k==1)
+             {
+               Cout<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<finl;
+               //getchar();
+             }*/
+        }
+
+    }
+}
+void  Champ_front_ALE_Beam::computeFluidForce(DoubleVect& fluidForce)
+{
+
+  const Frontiere& front=la_frontiere_dis->frontiere();
+  const Zone& zone=front.zone();
+  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
+  const Equation_base& eqn =  dom_ale.getEquation();
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,eqn);
+  int ndeb = front.num_premiere_face();
+  int nfin = ndeb + front.nb_faces();
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+  DoubleVect force(3);
+
+
+
+  if(flux_bords_grad.size() == flux_bords_diff.size())
+    {
+      for(int nbmodes=0; nbmodes<fluidForce.size(); nbmodes++)
+        {
+          for (int face=ndeb; face<nfin; face++)
+            {
+              DoubleVect phi(3);
+              const DoubleTab& u=dom_ale.getBeamDisplacement(nbmodes);
+              const DoubleTab& R=dom_ale.getBeamRotation(nbmodes);
+              phi=dom_ale.interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
+              for(int comp=0; comp<3; comp++)
+                {
+                  force[comp] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
+                }
+            }
+          for(int comp=0; comp<3; comp++)
+            {
+              fluidForce[nbmodes] += force[comp];
             }
         }
 
     }
+
+
 }

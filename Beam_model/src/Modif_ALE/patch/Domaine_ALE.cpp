@@ -77,6 +77,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
 
       //On recalcule les vitesses aux faces
       Zone_VF& la_zone_VF=ref_cast(Zone_VF,le_domaine_dis.zone_dis(0).valeur());
+
       int nb_faces=la_zone_VF.nb_faces();
       int nb_som_face=la_zone_VF.nb_som_face();
       IntTab& face_sommets=la_zone_VF.face_sommets();
@@ -175,6 +176,9 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   int nb_faces_tot=la_zone_VF.nb_faces_tot();
   int nb_som_face=la_zone_VF.nb_som_face();
   IntTab& face_sommets=la_zone_VF.face_sommets();
+
+  const Equation_base& equation=pb.equation(0);
+  associer_equation(equation);
 
   vf.resize(nb_faces, dimension);
   const MD_Vector& md = la_zone_VF.md_vector_faces();
@@ -605,6 +609,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Nom masse_and_stiffness_file_name;
   Noms phi_file_name;
   Nom absc_file_name;
+  Nom CI_file_name;
   int var_int;
   int nb_modes;
   double var_double;
@@ -657,6 +662,12 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           absc_file_name=nomlu;
 
         }
+      if(motlu=="CI_file_name")
+        {
+          is >> nomlu;
+          CI_file_name=nomlu;
+
+        }
 
       if(motlu=="Modal_deformation_file_name")
         {
@@ -692,6 +703,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   beam.readInputAbscFiles(absc_file_name);
   assert(nb_modes==phi_file_name.size());
   beam.readInputModalDeformation(phi_file_name);
+  beam.readInputCIFile(CI_file_name);
 }
 DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
@@ -730,7 +742,16 @@ const int& Domaine_ALE::getBeamDirection() const
 {
   return beam.getDirection();
 }
-DoubleVect&  Domaine_ALE::getBeamVelocity(const double& dt, const double& fluidForce)
+DoubleVect&  Domaine_ALE::getBeamVelocity(const double& dt, const DoubleVect& fluidForce)
 {
   return beam.getVelocity(dt, fluidForce);
 }
+const int& Domaine_ALE::getBeamNbModes()
+{
+  return beam.getNbModes();
+}
+Equation_base& Domaine_ALE::getEquation()
+{
+  return eq;
+}
+

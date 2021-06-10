@@ -129,6 +129,45 @@ void Beam_model::readInputAbscFiles(Nom& absc_file_name)
     }
 }
 
+void Beam_model::readInputCIFile(Nom& CI_file_name)
+{
+
+  Cerr << "Read initial condition beam from "<< CI_file_name <<" file " << finl;
+
+  qSpeed_.resize(nbModes_);
+  qAcceleration_.resize(nbModes_);
+  qDisplacement_.resize(nbModes_);
+  qHalfSpeed_.resize(nbModes_);
+  qSpeed_=0.;
+  qHalfSpeed_=0.;
+  qAcceleration_=0.;
+  qDisplacement_=0.;
+
+  string const nomFichier(CI_file_name);
+
+  ifstream monFlux(nomFichier.c_str());
+
+  if(monFlux)
+    {
+      /*string line;  // read the first line
+      getline(monFlux, line);
+      monFlux.ignore();*/
+      double displacement;
+      for(int i=0; i<nbModes_; i++)
+        {
+          monFlux >> displacement;
+          qDisplacement_[i]=displacement;
+        }
+
+      monFlux.close();
+    }
+  else
+    {
+      Cerr<< "ERROR: Unable to open the file." <<CI_file_name<<finl;
+    }
+  Cerr<<"CI = "<<qDisplacement_<<finl;
+}
+
 
 void Beam_model::readInputModalDeformation(Noms& modal_deformation_file_name)
 {
@@ -180,13 +219,13 @@ void Beam_model::initialization(double velocity)
   qAcceleration_.resize(nbModes_);
   qDisplacement_.resize(nbModes_);
   qHalfSpeed_.resize(nbModes_);
-  qSpeed_=velocity;
-  qHalfSpeed_=velocity;
+  qSpeed_=0.;
+  qHalfSpeed_=0.;
   qAcceleration_=0.;
-  qDisplacement_=0.;
+  qDisplacement_=velocity;
 }
 
-DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const double& fluidForce)
+DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce)
 {
   Cerr<<" dt = "<<dt<<finl;
   double halfDt=dt/2;
@@ -197,7 +236,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const double& fluidFo
       double coeff1 = mass_[j] + halfDt*damping_[j];
       Cerr<<" coeff1 = "<<coeff1<<finl;
       double coeff2 =	damping_[j]*qHalfSpeed_[j] - stiffness_[j]*qDisplacement_[j];
-      qAcceleration_[j]= (fluidForce - coeff2)/coeff1;
+      qAcceleration_[j]= (fluidForce[j] - coeff2)/coeff1;
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
       //Cout<<" qHalfSpeed_[j] "<<qHalfSpeed_[j]<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
       //getchar();
@@ -206,7 +245,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const double& fluidFo
   return qHalfSpeed_;
 }
 
-DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const double& fluidForce)
+DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce)
 {
   double halfDt=dt/2;
   double squareHalfDt= halfDt*halfDt;
@@ -215,7 +254,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const double& fluidFo
       double PreviousqAcceleration= qAcceleration_[j];
       double coeff1 = mass_[j] + halfDt*damping_[j] + squareHalfDt*stiffness_[j];
       double coeff2 = damping_[j]*(qSpeed_[j] + halfDt*qAcceleration_[j]) + stiffness_[j]*(qDisplacement_[j] + dt*qSpeed_[j] + squareHalfDt*qAcceleration_[j]);
-      qAcceleration_[j]=(fluidForce - coeff2)/coeff1;
+      qAcceleration_[j]=(fluidForce[j] - coeff2)/coeff1;
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
       //Cout<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
@@ -224,7 +263,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const double& fluidFo
   return qSpeed_;
 }
 
-DoubleVect& Beam_model::getVelocity(const double& dt, const double& fluidForce)
+DoubleVect& Beam_model::getVelocity(const double& dt, const DoubleVect& fluidForce)
 {
 
   if(dt == 0.)

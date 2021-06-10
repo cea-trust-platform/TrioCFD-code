@@ -63,12 +63,13 @@ public :
   void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
   void readInputAbscFiles (Nom& absc_file_name);
   void readInputModalDeformation(Noms& modal_deformation_file_name);
+  void readInputCIFile(Nom& CI_file_name);
   //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
   void initialization(double velocity);
-  DoubleVect& NewmarkSchemeFD (const double& dt, const double& fluidForce);
-  DoubleVect& NewmarkSchemeMA (const double& dt, const double& fluidForce);
-  DoubleVect& getVelocity(const double& dt, const double& fluidForce);
+  DoubleVect& NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce);
+  DoubleVect& NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce);
+  DoubleVect& getVelocity(const double& dt, const DoubleVect& fluidForce);
   inline double soundSpeed();
   inline  double getMass(int i);
   inline  double getStiffness(int i);

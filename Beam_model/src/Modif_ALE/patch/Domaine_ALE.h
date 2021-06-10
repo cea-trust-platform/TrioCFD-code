@@ -29,6 +29,7 @@
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
 #include <Beam_model.h>
+#include <Ref_Equation_base.h>
 
 class Domaine_dis;
 //////////////////////////////////////////////////////////////////////////////
@@ -73,7 +74,10 @@ public :
   const DoubleTab& getBeamDisplacement(int i) const;
   const DoubleTab& getBeamRotation(int i) const;
   const int& getBeamDirection() const;
-  DoubleVect& getBeamVelocity(const double& dt, const double& fluidForce);
+  DoubleVect& getBeamVelocity(const double& dt, const DoubleVect& fluidForce);
+  const int& getBeamNbModes();
+  Equation_base& getEquation();
+  inline void associer_equation(const Equation_base& une_eq);
 protected:
 
   double dt_=0.;
@@ -89,6 +93,7 @@ protected:
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
   Beam_model beam;
+  REF(Equation_base) eq;
 };
 
 
@@ -122,5 +127,9 @@ inline const DoubleTab& Domaine_ALE::getOldJacobian()
 inline const DoubleTab& Domaine_ALE::getNewJacobian()
 {
   return ALEjacobian_new;
+}
+inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
+{
+  eq = une_eq;
 }
 #endif

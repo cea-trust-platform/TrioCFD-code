@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,41 +12,41 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
-// File      : Champ_front_ALE_Beam.h
-// Directory : $BEAM_MODEL_ROOT/src
+// File:        Op_VEF_Face.h
+// Directory:   $TRUST_ROOT/src/VEF/Operateurs
+// Version:     /main/12
 //
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
-#ifndef Champ_front_ALE_Beam_included
-#define Champ_front_ALE_Beam_included
+#ifndef Op_VEF_Face_included
+#define Op_VEF_Face_included
 
-#include <Champ_front_ALE.h>
+#include <DoubleTab.h>
+class Matrice_Morse;
+class Zone_VEF;
+class Zone_Cl_VEF;
+class DoubleTab;
+class Equation_base;
+class Sortie;
+class Operateur_base;
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Champ_front_ALE_Beam
-//
-// <Description of class Champ_front_ALE_Beam>
-//
-/////////////////////////////////////////////////////////////////////////////
-
-class Champ_front_ALE_Beam : public Champ_front_ALE
+class Op_VEF_Face
 {
-
-  Declare_instanciable( Champ_front_ALE_Beam ) ;
-
 public :
-  virtual void remplir_vit_som_bord_ALE(double);
-  void initializationBeam(double);
-  void computeFluidForce(DoubleVect&);
-
-protected :
-  bool init_=false;
-
-
+  inline Op_VEF_Face():controle_modifier_flux_(0) { };
+  void dimensionner(const Zone_VEF&, const Zone_Cl_VEF&, Matrice_Morse&) const;
+  void modifier_pour_Cl(const Zone_VEF&, const Zone_Cl_VEF&, Matrice_Morse&, DoubleTab&)const ;
+  int impr(Sortie&, const Operateur_base&) const;
+  void modifier_flux(const Operateur_base&) const;
+  void modifier_matrice_pour_periodique_avant_contribuer(Matrice_Morse& matrice, const Equation_base& ) const;
+  void modifier_matrice_pour_periodique_apres_contribuer(Matrice_Morse& matrice, const Equation_base&) const ;
+private:
+  mutable int controle_modifier_flux_;
 };
 
-#endif /* Champ_front_ALE_Beam_included */
+#endif
+
+
+
