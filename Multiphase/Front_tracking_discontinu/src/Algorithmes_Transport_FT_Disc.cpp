@@ -72,7 +72,7 @@ void Algorithmes_Transport_FT_Disc::calculer_moments_indicatrice(
   ArrOfDouble& barycentre_phase_1)
 {
   const DoubleTab& xp = zone_vf.xp();
-  const int dim = xp.dimension(1);
+  const int dim = xp.line_size();
   assert(barycentre.size_array() == dim);
   assert(barycentre_phase_1.size_array() == dim);
   // Volumes des elements

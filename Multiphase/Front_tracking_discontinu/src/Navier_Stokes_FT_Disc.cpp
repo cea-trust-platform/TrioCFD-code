@@ -890,23 +890,12 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
       int i, j;
       const DoubleTab& rho_faces = champ_rho_faces_.valeur().valeurs();
       const int n = tab_vitesse.dimension(0);
-      if (tab_vitesse.nb_dim() == 1)
-        {
-          for (i = 0; i < n; i++)
-            tab_vitesse(i) -= gradP(i) / rho_faces(i);
-        }
-      else
-        {
-          const int m = tab_vitesse.dimension(1);
-          for (i = 0; i < n; i++)
-            {
-              double x = rho_faces(i);
-              for (j = 0; j < m; j++)
-                {
-                  tab_vitesse(i,j) -= gradP(i,j) / x;
-                }
-            }
-        }
+      const int m = tab_vitesse.line_size();
+
+      for (i = 0; i < n; i++)
+        for (j = 0; j < m; j++)
+          tab_vitesse(i,j) -= gradP(i,j) / rho_faces(i);
+
       tab_vitesse.echange_espace_virtuel();
     }
 
@@ -1026,7 +1015,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
 
             // Pour l'instant : gravite uniforme g => phi(s) = - x scalaire g
             const DoubleTab& gravite = milieu().gravite().valeurs();
-            if (gravite.nb_dim() != 2 || gravite.dimension(1) != dim)
+            if (gravite.nb_dim() != 2 || gravite.line_size() != dim)
               {
                 Cerr << "Error for the method calculer_champ_forces_superficielles\n";
                 Cerr << "gravite.dimension(1) != Objet_U::dimension" << finl;
@@ -1072,7 +1061,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
     const IntTab& facettes = maillage.facettes();
     // Tableau des faces des elements :
     const IntTab& elem_faces = zone_vf.elem_faces();
-    const int nb_faces_par_element = elem_faces.dimension(1);
+    const int nb_faces_par_element = elem_faces.line_size();
     // Le tableau "potentiel aux faces" a remplir :
     DoubleTab& valeurs_potentiel_faces = potentiel_faces.valeurs();
     valeurs_potentiel_faces = 0.;
@@ -1184,7 +1173,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
       }
     valeurs_potentiel_elements.echange_espace_virtuel();
     poids.echange_espace_virtuel();
-    if (champ.valeurs().nb_dim() > 1)   // VEF ?
+    if (champ.valeurs().line_size() > 1)   // VEF ?
       {
         // Compute a potential on elements that are neighbours of
         // elements containing an interface :
@@ -1195,7 +1184,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
         const IntTab& face_voisins = la_zone_dis.valeur().valeur().face_voisins();
         const Zone_VF& zonevf = ref_cast(Zone_VF, la_zone_dis.valeur().valeur());
         const IntTab& elem_faces = zonevf.elem_faces();
-        const int nb_faces_par_element = elem_faces.dimension(1);
+        const int nb_faces_par_element = elem_faces.line_size();
         DoubleVect copie_valeurs_potentiel_elements(valeurs_potentiel_elements);
         DoubleVect copie_poids(poids);
         for (element = 0; element < nb_elements; element++)
@@ -1247,8 +1236,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
         double p = 0.; // Somme des poids des deux elements voisins
         double pot = 0.; // Somme des potentiels
         // Boucle sur les deux elements voisins de la face
-        int i;
-        for (i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
           {
             int element = face_voisins(face, i);
             if (element >= 0)
@@ -1259,9 +1247,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
               }
           }
         if (p > 0.)
-          {
-            valeurs_potentiel_faces(face) = pot / p;
-          }
+          valeurs_potentiel_faces(face) = pot / p;
       }
     valeurs_potentiel_faces.echange_espace_virtuel();
     Debog::verifier("Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles valeurs_potentiel_faces:",valeurs_potentiel_faces);
@@ -1273,27 +1259,15 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
     const DoubleTab& valeurs_potentiel_faces = potentiel_faces.valeurs();
     const DoubleTab& valeurs_gradient_i = gradient_indicatrice.valeurs();
     DoubleTab& valeurs_champ = champ.valeurs();
-    if (valeurs_champ.nb_dim() == 1)   // VDF (1 composante par face)
-      {
-        for (int face = 0; face < nb_faces; face++)
-          {
-            const double p = valeurs_potentiel_faces(face);
-            valeurs_champ(face) = valeurs_gradient_i(face) * p;
+    const int nb_compo = valeurs_champ.line_size(); // 1 for VDF, 3 for VEF
 
-          }
-      }
-    else     // VEF
+    for (int face = 0; face < nb_faces; face++)
       {
-        const int nb_compo = valeurs_champ.dimension(1);
-        for (int face = 0; face < nb_faces; face++)
-          {
-            const double p = valeurs_potentiel_faces(face);
-            for (int i = 0; i < nb_compo; i++)
-              {
-                valeurs_champ(face, i) = valeurs_gradient_i(face, i) * p;
-              }
-          }
+        const double p = valeurs_potentiel_faces(face);
+        for (int i = 0; i < nb_compo; i++)
+          valeurs_champ(face, i) = valeurs_gradient_i(face, i) * p;
       }
+
     valeurs_champ.echange_espace_virtuel();
     Debog::verifier("Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles valeurs_champ:",valeurs_champ);
   }
@@ -1491,8 +1465,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   //   const DoubleTab & mpoint = variables_internes().mpoint.valeur().valeurs();
   // PAR  (voir un peu plus bas)
 
-  REF(Transport_Interfaces_FT_Disc) & refeq_transport =
-    variables_internes().ref_eq_interf_proprietes_fluide;
+  REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
   // Distance a l'interface discretisee aux elements:
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();
@@ -1657,7 +1630,6 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
     rho_0_delta_rho = rho_0 / delta_rho;
 
   const DoubleTab& tab_vitesse = inconnue().valeurs();
-  const int vef = (tab_vitesse.nb_dim() == 2);
   const IntTab& face_voisins = zone_dis().valeur().face_voisins();
   const DoubleTab& indic = variables_internes().ref_eq_interf_proprietes_fluide.valeur().inconnue().valeur().valeurs();
   DoubleTab tmp(tab_vitesse); // copie du tableau des vitesses
@@ -1677,11 +1649,10 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
         indic_0 = indic_1;
       const double indic_face = (indic_0 + indic_1) * 0.5;
       const double x = rho_0_delta_rho - indic_face;
-      if (vef)
-        for (int j = 0; j < dim; j++)
-          tmp(i,j) *= x;
-      else
-        tmp(i) *= x;
+
+      for (int j = 0; j < dim; j++)
+        tmp(i,j) *= x;
+
     }
 
   // Question: il y a un assert_espace_virtuel_vect dans divergence.calculer,
@@ -1706,19 +1677,16 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
   // Extraction des valeurs
   const int nb_elem = zone_dis().valeur().nb_elem();
   assert(nb_elem == dI_dt.size());
-  if (!vef)
-    {
-      // Simple copie
-      dI_dt.inject_array(resu, nb_elem);
-    }
-  else
-    {
-      // L'integrale de div sur l'element est dimension * la valeur aux elements
-      //  renvoyee par l'operateur.
-      // Les valeurs aux elements sont au debut du tableau resu.
-      dI_dt.inject_array(resu, nb_elem);
-      dI_dt *= dimension;
-    }
+
+  // Simple copie
+  dI_dt.inject_array(resu, nb_elem);
+
+  // L'integrale de div sur l'element est dimension * la valeur aux elements
+  //  renvoyee par l'operateur.
+  // Les valeurs aux elements sont au debut du tableau resu.
+  if(tab_vitesse.line_size() > 1) // i.e. VEF
+    dI_dt *= dimension;
+
 }
 
 // Description:
@@ -1729,8 +1697,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   // S'il n'y a pas d'equation de transport des interfaces entre phases fluides,
   // on ne recalcule pas les proprietes.
   {
-    REF(Transport_Interfaces_FT_Disc) & refeq_transport =
-      variables_internes().ref_eq_interf_proprietes_fluide;
+    REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
     if (refeq_transport.non_nul())
       {
         FT_disc_calculer_champs_rho_mu_nu_dipha(zone_dis().valeur(),
@@ -1850,8 +1817,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   const DoubleTab& termes_sources = variables_internes().terme_source.valeur().valeurs();
   const DoubleTab& tab_convection = variables_internes().terme_convection.valeur().valeurs();
   const int n = vpoint.dimension(0);
-  const int nbdim1 = (vpoint.nb_dim() == 1);
-  const int m = (nbdim1 ? 0 : vpoint.dimension(1));
+  const int nbdim1 = (vpoint.line_size() == 1);
+  const int m =  vpoint.line_size();
 
   DoubleTab gravite_face(inconnue().valeurs());
   if (variables_internes().terme_gravite_ == Navier_Stokes_FT_Disc_interne::GRAVITE_RHO_G
@@ -1860,10 +1827,10 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       ArrOfDouble g(dimension);
       // Pour l'instant : gravite uniforme g => phi(s) = - x scalaire g
       const DoubleTab& gravite = milieu().gravite().valeurs();
-      if (gravite.nb_dim() != 2 || gravite.dimension(1) != dimension)
+      if (gravite.nb_dim() != 2 || gravite.line_size() != dimension)
         {
           Cerr << "Error for calculer_champ_forces_superficielles\n";
-          Cerr << " gravite.dimension(1) != Objet_U::dimension" << finl;
+          Cerr << " gravite.line_size() != Objet_U::dimension" << finl;
           Process::exit();
         }
       for (int j = 0; j < dimension; j++)
@@ -1875,7 +1842,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         {
           const IntVect& orientation = ref_cast(Zone_VDF, zone_dis().valeur()).orientation();
           for (int face=0; face<n; face++)
-            gravite_face(face)=volumes_entrelaces(face)*g(orientation[face]);
+            gravite_face(face,0)=volumes_entrelaces(face)*g(orientation[face]);
         }
       else
         {
@@ -1947,7 +1914,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       const IntTab& face_voisins = zone_vf.face_voisins();
       const IntTab& elem_faces = zone_vf.elem_faces();
       const IntVect& orientation = zone_vdf.orientation();
-      const int   nb_faces_elem = elem_faces.dimension(1);
+      const int   nb_faces_elem = elem_faces.line_size();
       for (int k=0; k<nb_eqs; k++)
         {
           REF(Transport_Interfaces_FT_Disc) & refeq_transport =
@@ -1997,15 +1964,10 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   for (int i = 0; i < n; i++)
     {
       const double rho_face = tab_rho_faces(i);
-      if (nbdim1)
-        vpoint(i) = ( - flag_gradP(i) * gradP(i) + flag_diff * tab_diffusion(i) + coef_TSF(i) * termes_sources_interf(i) ) / rho_face
-                    + tab_convection(i) + termes_sources(i) + gravite_face(i);
-      else
-        {
-          for (int j = 0; j < m; j++)
-            vpoint(i, j) = ( - flag_gradP(i) * gradP(i,j) + flag_diff * tab_diffusion(i,j) + coef_TSF(i) * termes_sources_interf(i,j) ) / rho_face
-                           + tab_convection(i,j) + termes_sources(i,j) + gravite_face(i,j);
-        }
+
+      for (int j = 0; j < m; j++)
+        vpoint(i, j) = ( - flag_gradP(i) * gradP(i,j) + flag_diff * tab_diffusion(i,j) + coef_TSF(i) * termes_sources_interf(i,j) ) / rho_face
+                       + tab_convection(i,j) + termes_sources(i,j) + gravite_face(i,j);
     }
   vpoint.echange_espace_virtuel();
 
@@ -2026,14 +1988,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       vpoint=derivee;
       // on retire le gradient si on ne penalise pas:
       for (int i = 0; i < n; i++)
-        {
-          const double rho_face = tab_rho_faces(i);
-          if (nbdim1)
-            vpoint(i) += gradP(i) / rho_face ;
-          else
-            for (int j = 0; j < m; j++)
-              vpoint(i, j) += gradP(i,j) / rho_face ;
-        }
+        for (int j = 0; j < m; j++)
+          vpoint(i, j) += gradP(i,j) / tab_rho_faces(i) ;
     }
 
   const int nfaces = vpoint.dimension_tot(0);
@@ -2093,20 +2049,9 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
               const DoubleTab& diffusion = variables_internes().terme_diffusion.valeur().valeurs();
 
               for (int i = 0; i < vpoint.dimension(0); i++)
-                {
-                  const double rho_face = rho_faces(i);
-                  if (vpoint.nb_dim() == 1)
-                    {
-                      vpoint(i) -= diffusion(i) / rho_face ;
-                    }
-                  else
-                    {
-                      for (int j = 0; j < vpoint.dimension(1); j++)
-                        {
-                          vpoint(i,j) -= diffusion(i,j) / rho_face ;
-                        }
-                    }
-                }
+                for (int j = 0; j < vpoint.line_size(); j++)
+                  vpoint(i,j) -= diffusion(i,j) / rho_faces(i) ;
+
               vpoint.echange_espace_virtuel() ;
               DoubleTab derivee(la_vitesse.valeurs());
               // on indique au solveur masse de diviser par rho en plus du volume car l'operateur de diffusion renvoit qqqc en rho d u/dt
@@ -2123,23 +2068,10 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 
               // on retire le gradient
               const int nbis = vpoint.dimension(0);
-              const int nbdim1bis = (vpoint.nb_dim() == 1);
-              const int mbis = (nbdim1bis ? 0 : vpoint.dimension(1));
+              const int mbis = vpoint.line_size();
               for (int i = 0; i < nbis; i++)
-                {
-                  const double rho_face = rho_faces(i);
-                  if (nbdim1bis)
-                    {
-                      vpoint(i) += ( flag_gradP(i)*gradP(i) ) / rho_face ;
-                    }
-                  else
-                    {
-                      for (int j = 0; j < mbis; j++)
-                        {
-                          vpoint(i, j) += ( flag_gradP(i)*gradP(i,j)  ) / rho_face ;
-                        }
-                    }
-                }
+                for (int j = 0; j < mbis; j++)
+                  vpoint(i, j) += ( flag_gradP(i)*gradP(i,j)  ) / rho_faces(i) ;
             }
           vpoint.echange_espace_virtuel() ;
         }
@@ -2149,23 +2081,12 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           // On divise vpoint par le terme multiplicatif calcule avant
           if ( !variables_internes().is_explicite )
             {
-              const int nbdim1bis = (vpoint.nb_dim() == 1);
-              const int mbis = (nbdim1bis ? 0 : vpoint.dimension(1));
+              const int mbis = vpoint.line_size();
               // calcul de vpoint : vpoint / (1 + somme Xs/eta )
               for (int i = 0; i < nfaces; i++)
-                {
-                  if (nbdim1bis)
-                    {
-                      vpoint(i) /= terme_mul(i);
-                    }
-                  else
-                    {
-                      for (int j = 0; j < mbis; j++)
-                        {
-                          vpoint(i,j) /= terme_mul(i);
-                        }
-                    }
-                }
+                for (int j = 0; j < mbis; j++)
+                  vpoint(i,j) /= terme_mul(i);
+
               vpoint.echange_espace_virtuel();
             }
 
@@ -2209,8 +2130,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           const DoubleTab& tab_rho_facesbis = champ_rho_faces_.valeur().valeurs();
           for (int k=0; k<nb_eqs_bis; k++)
             {
-              REF(Transport_Interfaces_FT_Disc) & refeq_transport =
-                variables_internes().ref_eq_interf_vitesse_imposee[k];
+              REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
               Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
               eq_transport.calcul_effort_fluide_interface(vpoint,tab_rho_facesbis,forces_tot,variables_internes().is_explicite,variables_internes().eta);
               forces_tot.echange_espace_virtuel();
@@ -2292,9 +2212,8 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
       const IntTab& face_voisins = zone_vf.face_voisins();
       const IntTab& elem_faces = zone_vf.elem_faces();
-      const int   nb_faces_elem = elem_faces.dimension(1);
-      REF(Transport_Interfaces_FT_Disc) & refeq_transport =
-        variables_internes().ref_eq_interf_proprietes_fluide;
+      const int   nb_faces_elem = elem_faces.line_size();
+      REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_proprietes_fluide;
       const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
       // Distance a l'interface discretisee aux elements:
       const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
@@ -2395,7 +2314,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       if (modif_rho_true == 1 && variables_internes().p_ref_pena != -1.e40)
         {
           // On se base sur le nombre de composantes par faces pour la discretisation
-          Matrice_Morse_Sym& matrice_valeurs = (vpoint.nb_dim() == 1
+          Matrice_Morse_Sym& matrice_valeurs = (vpoint.line_size() == 1
                                                 ? ref_cast(Matrice_Morse_Sym, (ref_cast(Matrice_Bloc, matrice_pression_.valeur())).get_bloc(0,0).valeur()) // VDF (1)
                                                 : ref_cast(Matrice_Morse_Sym, matrice_pression_.valeur())) ;                                              // VEF (>1)
           DoubleTab& pressu = la_pression.valeurs();
@@ -2403,7 +2322,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
           const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
           const Zone& ma_zone = zone_dis().zone ();
           const IntTab& elem_faces = zone_vf.elem_faces();
-          const int   nb_faces_elem = elem_faces.dimension(1);
+          const int   nb_faces_elem = elem_faces.line_size();
           const int   nb_sommet = ma_zone.nb_som_elem();
           int numero_global_som, ligne_mat;
           int point_fluide_dirichlet=-1;
@@ -2451,7 +2370,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                   matrice_valeurs(e,e) += 1.0 / variables_internes().eta;
                   secmem(e) +=  variables_internes().p_ref_pena / variables_internes().eta;
                   pressu(e) = variables_internes().p_ref_pena ;
-                  if (vpoint.nb_dim() != 1) // VEF
+                  if (vpoint.line_size() > 1) // VEF
                     {
                       for (int somloc = 0; somloc < nb_sommet; somloc ++)
                         {
@@ -2504,21 +2423,11 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   if (projection_a_faire()) // Temporaire pour permettre de ne pas resoudre NS avec mettant operateurs nuls et projection_initiale 0
     {
       const int nbis = vpoint.dimension(0);
-      if (vpoint.nb_dim() == 1)
-        {
-          for (int i = 0; i < nbis; i++)
-            vpoint(i) -= gradP(i) / rho_faces_modifie(i);
-        }
-      else
-        {
-          const int mbis = vpoint.dimension(1);
-          for (int i = 0; i < nbis; i++)
-            {
-              double x = rho_faces_modifie(i);
-              for (int j = 0; j < mbis; j++)
-                vpoint(i,j) -= gradP(i,j) / x;
-            }
-        }
+      const int mbis = vpoint.line_size();
+      for (int i = 0; i < nbis; i++)
+        for (int j = 0; j < mbis; j++)
+          vpoint(i,j) -= gradP(i,j) / rho_faces_modifie(i);
+
       vpoint.echange_espace_virtuel();
     }
 
@@ -2547,45 +2456,21 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       variables_internes().terme_convection.valeur().valeurs()=trav;
       solveur_masse.appliquer(variables_internes().terme_convection.valeur().valeurs());
       const DoubleTab& convection = variables_internes().terme_convection.valeur().valeurs();
-
       const int nbis = vpoint.dimension(0);
-      const int nbdim1bis = (vpoint.nb_dim() == 1);
-      const int mbis = (nbdim1bis ? 0 : vpoint.dimension(1));
-      const Zone_dis_base& la_zone_disbis = zone_dis().valeur();
-      int is_VDF=0;
-      if (la_zone_disbis.que_suis_je().debute_par("Zone_VDF"))
-        is_VDF=1;
-      else if (la_zone_disbis.que_suis_je().debute_par("Zone_VEF"))
-        is_VDF=0;
-      else
-        {
-          Cerr<<"La zone discretisee "<<la_zone_disbis.que_suis_je()<<" n est pas reconnue"<<finl;
-          exit();
-        }
+      const int mbis = vpoint.line_size();
+
       for (int i = 0; i<nbis; i++)
-        {
-          if (is_VDF)
-            {
-              pressure_part(i) = gradP(i) ;
-              diffusion_part(i) = -rho(i) * convection(i) - diffusion(i) ;
-              forces_tot_2(i) = pressure_part(i) + diffusion_part(i) ;
-            }
-          else
-            {
-              //is_VEF
-              for (int j = 0; j < mbis; j++)
-                {
-                  pressure_part(i,j) = gradP(i,j) ;
-                  diffusion_part(i,j) = -rho(i) * convection(i,j) - diffusion(i,j) ;
-                  forces_tot_2(i,j) = pressure_part(i,j) + diffusion_part(i,j) ;
-                }
-            }
-        }
+        for (int j = 0; j < mbis; j++)
+          {
+            pressure_part(i,j) = gradP(i,j) ;
+            diffusion_part(i,j) = -rho(i) * convection(i,j) - diffusion(i,j) ;
+            forces_tot_2(i,j) = pressure_part(i,j) + diffusion_part(i,j) ;
+          }
+
       int nb_eqs_bis = variables_internes().ref_eq_interf_vitesse_imposee.size();
       for (int k=0; k<nb_eqs_bis; k++)
         {
-          REF(Transport_Interfaces_FT_Disc) & refeq_transport =
-            variables_internes().ref_eq_interf_vitesse_imposee[k];
+          REF(Transport_Interfaces_FT_Disc) & refeq_transport = variables_internes().ref_eq_interf_vitesse_imposee[k];
           Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
           // Impression des efforts
           eq_transport.impr_effort_fluide_interface( forces_tot_2, pressure_part, diffusion_part ) ;
@@ -2638,8 +2523,7 @@ const Champ_base *  Navier_Stokes_FT_Disc::get_delta_vitesse_interface() const
 //  Faudrait deplacer cette methode dans transport interfaces...
 const Champ_base& Navier_Stokes_FT_Disc::calculer_div_normale_interface()
 {
-  REF(Transport_Interfaces_FT_Disc) & refeq_transport =
-    variables_internes().ref_eq_interf_proprietes_fluide;
+  REF(Transport_Interfaces_FT_Disc) & refeq_transport =  variables_internes().ref_eq_interf_proprietes_fluide;
   const Transport_Interfaces_FT_Disc& eq_transport = refeq_transport.valeur();
   // Distance a l'interface discretisee aux elements:
   const DoubleTab& dist = eq_transport.get_update_distance_interface().valeurs();

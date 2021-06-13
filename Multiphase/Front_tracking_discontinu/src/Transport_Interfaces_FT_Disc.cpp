@@ -187,12 +187,11 @@ static void calculer_normale_sommets_interface(const Maillage_FT_Disc& maillage,
 {
   const int nsom = maillage.nb_sommets();
   const int nfaces = maillage.nb_facettes();
-  const int dim  = maillage.sommets().dimension(1);
-
+  const int dim  = maillage.sommets().line_size();
   const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
   const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
   const IntTab& facettes         = maillage.facettes();
-  const int nsommets_faces = facettes.dimension(1);
+  const int nsommets_faces = facettes.line_size();
 
   normale.resize(nsom, dim);
   normale = 0.;
@@ -960,7 +959,7 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
       Zone& zone = ref_dom.valeur().zone(0);
       IntTab& elems = zone.les_elems();
       const int nb_elem = elems.dimension(0);
-      const int nb_som_elem = elems.dimension(1);
+      const int nb_som_elem = elems.line_size();
       if (nb_som_elem != 2 && nb_som_elem != 3)
         {
           Cerr << "Error: mesh has wrong dimension (must be segments in 2D, triangles in 3D)" << finl;
@@ -987,8 +986,8 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
     // tri du tableau
     int * data = fa7.addr();
     const int nb_facettes = fa7.dimension(0);
-    assert(Objet_U::dimension == fa7.dimension(1));
-    qsort(data, nb_facettes, fa7.dimension(1)*sizeof(int),
+    assert(Objet_U::dimension == fa7.line_size());
+    qsort(data, nb_facettes, fa7.line_size()*sizeof(int),
           fct_tri_facettes);
 
     // recherche et suppression des doublons
@@ -1572,7 +1571,7 @@ int Transport_Interfaces_FT_Disc::preparer_calcul(void)
            << "The transport method has not indicated for the equation\n"
            << le_nom() << finl;
       assert(0);
-      exit();
+      Process::exit();
     }
 
   // Pour le premier postraitement :
@@ -2068,7 +2067,7 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
             Cerr << " The interpolation from a field " << champ_scal.que_suis_je();
             Cerr << " is not developped." << finl;
             assert(0); // a coder...
-            exit();
+            Process::exit();
           }
 
         // Calcul de la vitesse interpolee a partir du champ P1
@@ -2222,8 +2221,10 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
         is_VDF=0;
       else
         {
+          // E. Saikali
+          // TODO : FIXME : Should allow for poly/covi-mac ...
           Cerr<<"The discretized zone"<<ma_zone_dis.que_suis_je()<<"is not recognized"<<finl;
-          exit();
+          Process::exit();
         }
 
       // Etape 2.2 : determiniation du systeme d'equations a resoudre
@@ -2246,8 +2247,7 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
       // En penalise, pas de regularisation pendant l etape implicite
       // (pour regulariser en penalise, on ajoute une etape explicite)
       const int n = vpoint.dimension(0);
-      const int nbdim1 = (vpoint.nb_dim() == 1);
-      const int m = (nbdim1 ? 0 : vpoint.dimension(1));
+      const int m = vpoint.line_size();
       if(variables_internes_->vimp_regul && is_explicite)
         {
 
@@ -2260,25 +2260,16 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
               if (indicatrice_faces(i) > 0. )
                 {
                   double f = indicatrice_faces(i);
-                  if (nbdim1)
+                  for (int j = 0; j < m; j++)
                     {
                       if (!is_QC)
-                        vit_imposee(i) = f*vit_imposee(i) + (1.-f)*vitesse(i);
+                        vit_imposee(i,j) = f*vit_imposee(i,j) + (1.-f)*vitesse(i,j);
                       else
-                        vit_imposee(i) = f*vit_imposee(i) + (1.-f)*vitesse(i)/rho_faces(i);
-                      vitesse_imp_interp_.valeur().valeurs()(i)= vit_imposee( i ) ;
+                        vit_imposee(i,j) = f*vit_imposee(i,j) + (1.-f)*vitesse(i,j)/rho_faces(i);
+
+                      vitesse_imp_interp_.valeur().valeurs()(i,j)= vit_imposee( i,j ) ;
                     }
-                  else
-                    {
-                      for (int j = 0; j < m; j++)
-                        {
-                          if (!is_QC)
-                            vit_imposee(i,j) = f*vit_imposee(i,j) + (1.-f)*vitesse(i,j);
-                          else
-                            vit_imposee(i,j) = f*vit_imposee(i,j) + (1.-f)*vitesse(i,j)/rho_faces(i);
-                          vitesse_imp_interp_.valeur().valeurs()(i,j)= vit_imposee( i,j ) ;
-                        }
-                    }
+
                 }
             }
         }
@@ -2297,13 +2288,8 @@ void Transport_Interfaces_FT_Disc::modifier_vpoint_pour_imposer_vit(const Double
       termes_sources_face.echange_espace_virtuel() ; // CI
 
       for (i = 0; i < n; i++)
-        {
-          if (nbdim1)
-            vpoint(i) += termes_sources_face(i);
-          else
-            for (j = 0; j < m; j++)
-              vpoint(i, j) += termes_sources_face(i,j);
-        }
+        for (j = 0; j < m; j++)
+          vpoint(i, j) += termes_sources_face(i,j);
     }
   else if (sub_type(Transport_Marqueur_FT,*this))
     {
@@ -2433,29 +2419,17 @@ void Transport_Interfaces_FT_Disc::calcul_source(const DoubleTab& inco_val,
           if (variables_internes_->vimp_regul && !is_explicite ) indic = (indicatrice_faces(i) ==1. ? 1.0 : 0.0);
           double tsource;
           double rho_face = rho_faces(i);
-          if (is_VDF)
-            {
-              double increment_inco =  inco_val(i) + terme_explicite(i);
+          const int dim = inco_val.line_size(); // > 1 => VEF, =1 => VDF
 
+          for (int j = 0; j < dim; j++)
+            {
+              double increment_inco = inco_val(i,j) + terme_explicite(i,j);
               if (!is_QC)
-                tsource = (vit_imposee(i) - increment_inco) / dt * indic * rho_face * c ;
+                tsource = (vit_imposee(i,j) - increment_inco) / dt * indic * rho_face * c;
               else
-                tsource = (vit_imposee(i) * rho_face - increment_inco) / dt * indic * c ;
-              source_val(i) = tsource;
-            }
-          else     //is_VEF
-            {
-              const int dim = inco_val.dimension(1);
+                tsource = (vit_imposee(i,j) * rho_face - increment_inco) / dt * indic * c;
 
-              for (int j = 0; j < dim; j++)
-                {
-                  double increment_inco = inco_val(i,j) + terme_explicite(i,j);
-                  if (!is_QC)
-                    tsource = (vit_imposee(i,j) - increment_inco) / dt * indic * rho_face * c;
-                  else
-                    tsource = (vit_imposee(i,j) * rho_face - increment_inco) / dt * indic * c;
-                  source_val(i,j) = tsource;
-                }
+              source_val(i,j) = tsource;
             }
         }
     }
@@ -2534,17 +2508,11 @@ void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face
                                                   const int& n,const int& m, const int& is_QC,
                                                   const DoubleVect& vol_entrelaces,const Solveur_Masse& un_solv_masse)
 {
-  if (!m)
-    {
-      for (int face=0; face<n; face++)
-        termes_sources_face(face)=vol_entrelaces(face)*source_val(face);
-    }
-  else
-    {
-      for (int face=0; face<n; face++)
-        for (int dim=0; dim<m; dim++)
-          termes_sources_face(face,dim)=vol_entrelaces(face)*source_val(face,dim);
-    }
+
+  for (int face=0; face<n; face++)
+    for (int dim=0; dim<m; dim++)
+      termes_sources_face(face,dim)=vol_entrelaces(face)*source_val(face,dim);
+
   termes_sources_face.echange_espace_virtuel() ; // CI
   un_solv_masse.appliquer(termes_sources_face);
 
@@ -2553,13 +2521,9 @@ void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face
       for (int i = 0; i < n; i++)
         {
           const double rho_face = rho_faces(i);
-          if (!m)
-            termes_sources_face(i) = termes_sources_face(i) / rho_face;
-          else
-            {
-              for (int j = 0; j < m; j++)
-                termes_sources_face(i,j) = termes_sources_face(i,j) / rho_face;
-            }
+
+          for (int j = 0; j < m; j++)
+            termes_sources_face(i,j) = termes_sources_face(i,j) / rho_face;
         }
     }
 }
@@ -2568,78 +2532,52 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
 {
   const DoubleTab& indicatrice_faces = get_indicatrice_faces().valeurs();
   const int n = source_val.dimension(0);
-  const int nbdim1 = (source_val.nb_dim() == 1);
-  const int m = (nbdim1 ? 0 : source_val.dimension(1));
+  const int nbdim1 = source_val.line_size() == 1; // VDF
+  const int m = source_val.line_size();
 
   const Zone_dis_base& ma_zone_dis = zone_dis().valeur();
   const Zone_VDF * zvdf = 0;
-  if (sub_type(Zone_VDF, zone_dis().valeur()))
-    zvdf = &ref_cast(Zone_VDF, zone_dis().valeur());
+  if (sub_type(Zone_VDF, zone_dis().valeur())) zvdf = &ref_cast(Zone_VDF, zone_dis().valeur());
 
   DoubleTab termes_sources_face(source_val);
   DoubleTab termes_pressure_face(pressure_part);
   DoubleTab termes_friction_face(friction_part);
-//  ArrOfDouble dforce(dimension);
-//  dforce = 0;
-//  ArrOfDouble pressure(dimension);
-//  pressure = 0. ;
-//  ArrOfDouble friction(dimension);
-//  friction = 0. ;
+
   DoubleTrav values(3,dimension);
   values=0.;
-  /*
-     dforce(k)        ->     values(0,num_cl,k)
-     pressure(k)      ->     values(1,num_cl,k)
-     friction(k)      ->     values(2,num_cl,k)
-  */
+
   const DoubleVect& vol_entrelaces = ref_cast(Zone_VF,ma_zone_dis).volumes_entrelaces();
   // Construction d'un tableau des items reels non communs
   ArrOfInt sequential_items_flags;
   MD_Vector_tools::get_sequential_items_flags(source_val.get_md_vector(), sequential_items_flags);
-  if (!m)
+
+
+  for (int face=0; face<n; face++)
     {
-      for (int face=0; face<n; face++)
+      double indic = (indicatrice_faces(face) > 0. ? 1.0 : 0.0);
+      double coef = vol_entrelaces(face)*indic;
+      for (int dim=0; dim<m; dim++)
         {
-          double indic = (indicatrice_faces(face) > 0. ? 1.0 : 0.0);
-          double coef = vol_entrelaces(face)*indic;
-          termes_sources_face(face)=source_val(face)*coef;
-          termes_pressure_face(face)=pressure_part(face)*coef;
-          termes_friction_face(face)=friction_part(face)*coef;
-          // Calcul de dforce contribution de la force du fluide sur la face i
-          // si ce n'est pas une face commune a plusieurs processeurs
-          if (sequential_items_flags(face))
+          termes_sources_face(face,dim)=source_val(face,dim)*coef;
+          termes_pressure_face(face,dim)=pressure_part(face,dim)*coef;
+          termes_friction_face(face,dim)=friction_part(face,dim)*coef;
+        }
+      // Calcul de dforce contribution de la force du fluide sur la face i
+      // si ce n'est pas une face commune a plusieurs processeurs
+      if (sequential_items_flags(face))
+        {
+          if (nbdim1) // VDF
             {
               int j = zvdf->orientation(face);
-//              dforce(j) -= termes_sources_face(face);
-//              pressure(j) -= termes_pressure_face(face);
-//              friction(j) -= termes_friction_face(face);
-              values(0,j) -= termes_sources_face(face);
-              values(1,j) -= termes_pressure_face(face);
-              values(2,j) -= termes_friction_face(face);
+
+              values(0,j) -= termes_sources_face(face,0);
+              values(1,j) -= termes_pressure_face(face,0);
+              values(2,j) -= termes_friction_face(face,0);
             }
-        }
-    }
-  else
-    {
-      for (int face=0; face<n; face++)
-        {
-          double indic = (indicatrice_faces(face) > 0. ? 1.0 : 0.0);
-          double coef = vol_entrelaces(face)*indic;
-          for (int dim=0; dim<m; dim++)
-            {
-              termes_sources_face(face,dim)=source_val(face,dim)*coef;
-              termes_pressure_face(face,dim)=pressure_part(face,dim)*coef;
-              termes_friction_face(face,dim)=friction_part(face,dim)*coef;
-            }
-          // Calcul de dforce contribution de la force du fluide sur la face i
-          // si ce n'est pas une face commune a plusieurs processeurs
-          if (sequential_items_flags(face))
+          else // VEF
             {
               for (int j = 0; j < dimension; j++)
                 {
-//                  dforce(j) -= termes_sources_face(face,j);
-//                  pressure(j) -= termes_pressure_face(face,j);
-//                  friction(j) -= termes_friction_face(face,j);
                   values(0,j) -= termes_sources_face(face,j);
                   values(1,j) -= termes_pressure_face(face,j);
                   values(2,j) -= termes_friction_face(face,j);
@@ -2652,12 +2590,7 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
   {
     // Ajout des differents processeurs en //
     mp_sum_for_each_item(values);
-    /*      for (int j = 0; j < dimension; j++)
-            {
-              dforce(j) = mp_sum(dforce(j));
-              pressure(j) = mp_sum(pressure(j)) ;
-              friction(j) = mp_sum(friction(j)) ;
-            } */
+
     // Impression dans les fichiers
     if (Process::je_suis_maitre())
       {
@@ -2965,7 +2898,7 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
     zvdf = &ref_cast(Zone_VDF, ma_zone_dis);
 
   if (zvdf)
-    vitesse_imp.resize(nfaces);
+    vitesse_imp.resize(nfaces,1);
   else
     vitesse_imp.resize(nfaces,dim);
 
@@ -2981,7 +2914,7 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
           v_imp = variables_internes_->loi_horaire_->vitesse(temps+dt,coord);
 
           if (zvdf)
-            vitesse_imp(i) = v_imp(zvdf->orientation(i));
+            vitesse_imp(i,0) = v_imp(zvdf->orientation(i));
           else
             for (int j = 0; j < dim; j++)
               vitesse_imp(i,j) = v_imp(j);
@@ -3014,13 +2947,13 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
                     switch(zvdf->orientation(i))
                       {
                       case 0:
-                        vitesse_imp(i) = parser_x.eval();
+                        vitesse_imp(i,0) = parser_x.eval();
                         break;
                       case 1:
-                        vitesse_imp(i) = parser_y.eval();
+                        vitesse_imp(i,0) = parser_y.eval();
                         break;
                       case 2:
-                        vitesse_imp(i) = parser_z.eval();
+                        vitesse_imp(i,0) = parser_z.eval();
                         break;
                       }
 
