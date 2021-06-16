@@ -207,7 +207,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::ajouter(DoubleTab& resu
 
   for (int elem=0; elem<nb_elem; elem++)
     {
-      if (K_eps_Bas_Re(elem,0) > 1.e-10 && K_eps_Bas_Re(elem,1) > 1.e-10)
+      if (K_eps_Bas_Re(elem,0) > 1.e-20 && K_eps_Bas_Re(elem,1) > 1.e-20)
         {
           resu(elem,0) += (P(elem)-K_eps_Bas_Re(elem,1)-D(elem))*volumes(elem)*porosite_vol(elem);
           resu(elem,1) += ((C1*F1(elem)*P(elem)- C2*F2(elem)*K_eps_Bas_Re(elem,1))*K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0)+E(elem))*volumes(elem)*porosite_vol(elem);
@@ -347,10 +347,10 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(Dou
   for (int elem=0; elem<nb_elem; elem++)
     {
       resu(elem,0) += (P(elem)-K_eps_Bas_Re(elem,1)-D(elem))*volumes(elem)*porosite_vol(elem);
-      if (K_eps_Bas_Re(elem,0) >= 1.e-10)
+      if (K_eps_Bas_Re(elem,0) >= 1.e-20)
         resu(elem,1) += (C1*F1(elem)*P(elem)- C2*F2(elem)*K_eps_Bas_Re(elem,1))*K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0)*volumes(elem)*porosite_vol(elem)  + E(elem)*volumes(elem)*porosite_vol(elem);
 
-      if ( (G1(elem)>0) && (K_eps_Bas_Re(elem,1) >= 10.e-10) )
+      if ( (G1(elem)>0) && (K_eps_Bas_Re(elem,1) >= 1.e-20) )
         {
           resu(elem,0) += G(elem)*volumes(elem)*porosite_vol(elem);
           resu(elem,1) += C1*F1(elem)*G(elem)*volumes(elem)*porosite_vol(elem)*K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0);
@@ -437,7 +437,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(
     {
       resu(elem,0) += (P(elem)-K_eps_Bas_Re(elem,1))*volumes(elem)*porosite_vol(elem);
       //     resu(elem,0) += (P(elem)-K_eps_Bas_Re(elem,1)-D(elem))*volumes(elem)*porosite_vol(elem);
-      if (K_eps_Bas_Re(elem,0) >= 1.e-10)
+      if (K_eps_Bas_Re(elem,0) >= 1.e-20)
         {
           resu(elem,1) += (C1*F1(elem)*P(elem)- C2*F2(elem)*K_eps_Bas_Re(elem,1)) * volumes(elem)*porosite_vol(elem) *(K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0));
           //       resu(elem,1) += (C1*F1(elem)*P(elem)- C2*F2(elem)*K_eps_Bas_Re(elem,1)+E(elem)) * volumes(elem)*porosite_vol(elem) *(K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0));
@@ -582,10 +582,10 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajou
     {
       resu(elem,0) += (P(elem)-K_eps_Bas_Re(elem,1)-D(elem))*volumes(elem)*porosite_vol(elem);
 
-      if (K_eps_Bas_Re(elem,0) >= 1.e-10)
+      if (K_eps_Bas_Re(elem,0) >= 1.e-20)
         resu(elem,1) += (C1*F1(elem)*P(elem)- C2*F2(elem)*K_eps_Bas_Re(elem,1))*volumes(elem)*porosite_vol(elem) *K_eps_Bas_Re(elem,0)/K_eps_Bas_Re(elem,1) + E(elem)*volumes(elem)*porosite_vol(elem);
 
-      if ( ((G_t(elem)+G_c(elem))>0 ) && (K_eps_Bas_Re(elem,1) >= 1.e-10) )
+      if ( ((G_t(elem)+G_c(elem))>0 ) && (K_eps_Bas_Re(elem,1) >= 1.e-20) )
         {
           resu(elem,0) += (G_t(elem)+G_c(elem))*volumes(elem)*porosite_vol(elem);
           resu(elem,1) += C1*F1(elem)*(G_t(elem)+G_c(elem))*volumes(elem)*porosite_vol(elem)

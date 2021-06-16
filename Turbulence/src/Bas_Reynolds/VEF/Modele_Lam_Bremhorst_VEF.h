@@ -42,7 +42,7 @@ Boundary Layer Flows Characteristic
 of Gas Turbine Blades
 Rodney C. Schmidt and Suhas V. Patankar
 */
-#define BR_EPS 1.e-10
+#define BR_EPS 1.e-20
 
 class Zone_dis;
 class Zone_Cl_dis;

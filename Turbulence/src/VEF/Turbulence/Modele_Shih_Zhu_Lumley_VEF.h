@@ -29,7 +29,7 @@
 #include <Zone_Cl_dis.h>
 #include <Param.h>
 
-#define BR_EPS 1.e-10
+#define BR_EPS 1.e-20
 
 class Zone_dis;
 class Zone_Cl_dis;
