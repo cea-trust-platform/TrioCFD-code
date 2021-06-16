@@ -13,6 +13,7 @@ cp $RACINE/NoFlow-lami-espece.data NoFlow-lami-espece_VDF.data
 
 # VEF (amont)
 cd $RACINE/VEF
+cp $RACINE/post_run .
 cp $RACINE/NoFlow-lami-espece.data NoFlow-lami-espece_VEF.data
 sed "s/Nombre_de_Noeuds 21 21 11/Nombre_de_Noeuds 11 11 6/" NoFlow-lami-espece_VEF.data > modifie.data
 mv modifie.data NoFlow-lami-espece_VEF.data
