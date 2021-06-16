@@ -98,10 +98,6 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
 
   const DoubleTab& Cmu = get_modele_fonction().get_Cmu(); // attention : il faut qu'il soit deja calcule!
 
-  double LeEPSMIN = get_LeEPS_MIN();
-  // K_Eps(i,0) = K au noeud i
-  // K_Eps(i,1) = Epsilon au noeud i
-
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulente Cmu",Cmu);
 
   // dans le cas d'une zone nulle on doit effectuer le dimensionnement
@@ -132,7 +128,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
 
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= LeEPSMIN)
+          if (tab_K_Eps(i,1) <= DMINFLOAT)
             visco_turb_K_eps_Rea[i] = 0;
           else
             visco_turb_K_eps_Rea[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -146,7 +142,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Realisable::calculer_viscosite_turbulent
     {
       for (int i=0; i<n; i++)
         {
-          if (inf_ou_egal(tab_K_Eps(i,1),LeEPSMIN))
+          if (tab_K_Eps(i,1) <= DMINFLOAT)
             visco_turb[i] = 0;
           else
             visco_turb[i] = Cmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
