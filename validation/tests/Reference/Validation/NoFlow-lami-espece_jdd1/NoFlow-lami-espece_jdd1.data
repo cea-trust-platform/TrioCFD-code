@@ -1,5 +1,5 @@
 # ThermoHydraulique 3D : conduite chauffee quasi compressible gaz parfait VDF turbulent #
-# PARALLEL OK 8 #
+# PARALLEL OK 4 #
 dimension 3
 
 Pb_Thermohydraulique_QC_fraction_massique pb
@@ -30,8 +30,8 @@ Regroupebord dom WALL { FRON BACK LEFT RIGH BAS COND }
 # BEGIN PARTITION
 Partition dom
 {
-        Partition_tool tranche { tranches 2 1 1 }
-        Larg_joint 1
+        Partition_tool Metis { nb_parts 2 }
+        Larg_joint 2
         zones_name DOM
 }
 End
