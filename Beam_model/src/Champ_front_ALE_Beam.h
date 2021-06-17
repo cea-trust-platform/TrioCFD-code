@@ -41,7 +41,7 @@ class Champ_front_ALE_Beam : public Champ_front_ALE
 public :
   virtual void remplir_vit_som_bord_ALE(double);
   void initializationBeam(double);
-  void computeFluidForce(DoubleVect&);
+  void computeFluidForce(const double, DoubleVect&);
 
 protected :
   bool init_=false;

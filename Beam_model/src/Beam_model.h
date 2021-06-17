@@ -69,7 +69,7 @@ public :
   void initialization(double velocity);
   DoubleVect& NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce);
   DoubleVect& NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce);
-  DoubleVect& getVelocity(const double& dt, const DoubleVect& fluidForce);
+  DoubleVect& getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce);
   inline double soundSpeed();
   inline  double getMass(int i);
   inline  double getStiffness(int i);
@@ -94,6 +94,7 @@ protected :
   DoubleVect qDisplacement_;
   bool timeScheme_=true;
   //DoubleTab phi3D_;
+  double temps_;
 
 };
 inline const int& Beam_model::getNbModes() const

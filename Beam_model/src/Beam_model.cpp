@@ -71,9 +71,9 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
 
   if(monFlux)
     {
-      string line;  // read the first line
+      /*string line;  // read the first line
       getline(monFlux, line);
-      monFlux.ignore();
+      monFlux.ignore();*/
       double mass, stiffness, damping;
       for(int i=0; i<nbModes_; i++)
         {
@@ -98,7 +98,7 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
     {
       Cerr<< "ERROR: Unable to open the file." <<masse_and_stiffness_file_name<<finl;
     }
-  Cerr<<"mass = "<<mass_<<" stiffnes "<<stiffness_<<finl;
+  //Cerr<<"mass = "<<mass_<<" stiffnes "<<stiffness_<<" damp = "<<damping_<<finl;
 }
 void Beam_model::readInputAbscFiles(Nom& absc_file_name)
 {
@@ -108,9 +108,9 @@ void Beam_model::readInputAbscFiles(Nom& absc_file_name)
   ifstream monFlux(nomFichier.c_str());
   if(monFlux)
     {
-      string line;  // read the first line
+      /*string line;  // read the first line
       getline(monFlux, line);
-      monFlux.ignore();
+      monFlux.ignore();*/
       double abscissa;
       int i=0;
       while(monFlux)
@@ -165,7 +165,7 @@ void Beam_model::readInputCIFile(Nom& CI_file_name)
     {
       Cerr<< "ERROR: Unable to open the file." <<CI_file_name<<finl;
     }
-  Cerr<<"CI = "<<qDisplacement_<<finl;
+
 }
 
 
@@ -185,9 +185,9 @@ void Beam_model::readInputModalDeformation(Noms& modal_deformation_file_name)
 
       if(monFlux)
         {
-          string line;  // read the first line
+          /*string line;  // read the first line
           getline(monFlux, line);
-          monFlux.ignore();
+          monFlux.ignore();*/
           double  ux, uy, uz, rx, ry, rz;
           for(int i=0; i<size; i++)
             {
@@ -227,20 +227,43 @@ void Beam_model::initialization(double velocity)
 
 DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& fluidForce)
 {
-  Cerr<<" dt = "<<dt<<finl;
-  double halfDt=dt/2;
+  double halfDt=dt/2.;
   for(int j=0; j < nbModes_; j++)
     {
       qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
       qDisplacement_[j] += dt*qHalfSpeed_[j];
       double coeff1 = mass_[j] + halfDt*damping_[j];
-      Cerr<<" coeff1 = "<<coeff1<<finl;
-      double coeff2 =	damping_[j]*qHalfSpeed_[j] - stiffness_[j]*qDisplacement_[j];
+      double coeff2 =	damping_[j]*qHalfSpeed_[j] + stiffness_[j]*qDisplacement_[j];
       qAcceleration_[j]= (fluidForce[j] - coeff2)/coeff1;
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
-      //Cout<<" qHalfSpeed_[j] "<<qHalfSpeed_[j]<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
-      //getchar();
+      qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
     }
+
+  //test beam:
+  DoubleVect deplacement(3);
+  DoubleVect velo(3);
+  deplacement=0.;
+  velo=0.;
+  int size = abscissa_.size();
+  for(int j=0; j < nbModes_; j++)
+    {
+      const DoubleTab& u=u_(j);
+      for(int i=0; i<3; i++)
+        {
+          deplacement[i] += qDisplacement_[j]*u(size-1,i);
+          velo[i] += qSpeed_[j]*u(size-1,i);
+        }
+    }
+
+  std::ofstream ofs_1;
+  ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
+  std::ofstream ofs_2;
+  ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
+  ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
+  ofs_1.close();
+  ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
+  ofs_2.close();
+  //fin test beam
 
   return qHalfSpeed_;
 }
@@ -257,21 +280,58 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       qAcceleration_[j]=(fluidForce[j] - coeff2)/coeff1;
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
-      //Cout<<"qDisplacement_[j] "<<qDisplacement_[j]<<"qAcceleration_[j] "<<qAcceleration_[j]<<"qSpeed_[j] "<<qSpeed_[j]<<finl;
-      //getchar();
     }
+  //test beam:
+  DoubleVect deplacement(3);
+  DoubleVect velo(3);
+  deplacement=0.;
+  velo=0.;
+  int size = abscissa_.size();
+  for(int j=0; j < nbModes_; j++)
+    {
+      const DoubleTab& u=u_(j);
+      for(int i=0; i<3; i++)
+        {
+          deplacement[i] += qDisplacement_[j]*u(size-1,i);
+          velo[i] += qSpeed_[j]*u(size-1,i);
+        }
+    }
+
+  std::ofstream ofs_1;
+  ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
+  std::ofstream ofs_2;
+  ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
+  ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
+  ofs_1.close();
+  ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
+  ofs_2.close();
+  //fin test beam
   return qSpeed_;
 }
 
-DoubleVect& Beam_model::getVelocity(const double& dt, const DoubleVect& fluidForce)
+DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
 {
 
   if(dt == 0.)
-    return qSpeed_;
-  else if(timeScheme_)
-    return NewmarkSchemeMA(dt, fluidForce);
+    {
+      temps_=0.;
+      return qSpeed_;
+    }
+  else if(temps_!=tps) // mise à jours du qSpeed_ une seule fois par pas de temps!
+    {
+      temps_=tps;
+      if(timeScheme_)
+        return NewmarkSchemeMA(dt, fluidForce);
+      else
+        return NewmarkSchemeFD(dt, fluidForce);
+    }
   else
-    return NewmarkSchemeFD(dt, fluidForce);
+    {
+      if(timeScheme_)
+        return qSpeed_;
+      else
+        return qHalfSpeed_;
+    }
 }
 
 DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const

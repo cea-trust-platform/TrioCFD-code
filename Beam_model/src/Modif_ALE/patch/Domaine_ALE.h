@@ -74,7 +74,7 @@ public :
   const DoubleTab& getBeamDisplacement(int i) const;
   const DoubleTab& getBeamRotation(int i) const;
   const int& getBeamDirection() const;
-  DoubleVect& getBeamVelocity(const double& dt, const DoubleVect& fluidForce);
+  DoubleVect& getBeamVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce);
   const int& getBeamNbModes();
   Equation_base& getEquation();
   inline void associer_equation(const Equation_base& une_eq);

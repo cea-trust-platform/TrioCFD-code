@@ -34,6 +34,7 @@
 #include <Operateur_Diff.h>
 #include <Operateur_Grad.h>
 #include <DoubleVect.h>
+#include <fstream>
 #include <math.h>
 #define pi 3.14159265
 
@@ -71,6 +72,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 {
   Cerr<<"Champ_front_ALE_Beam::remplir_vit_som_bord_ALE "<<finl;
   const Frontiere& front=la_frontiere_dis->frontiere();
+  Cerr<<" front nom := "<<front.le_nom()<<finl;
   int nb_faces=front.nb_faces();
   const Zone& zone=front.zone();
   const Faces& faces=front.faces();
@@ -93,11 +95,11 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   const int nbModes=dom_ale.getBeamNbModes();
   DoubleVect fluidForce(nbModes);
   fluidForce=0.;
-  /* if(tps>0)
-     {
-       computeFluidForce(fluidForce);
-     }*/
-  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(dt, fluidForce);
+  if(tps>0 && front.le_nom()=="Poutre")
+    {
+      computeFluidForce(tps, fluidForce);
+    }
+  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt, fluidForce);
   for( i=0; i<nb_faces; i++)
     {
       x=y=z=0;
@@ -109,15 +111,15 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
           if(dimension>2)
             z=domaine.coord(faces.sommet(i,k),2);
 
-          DoubleVect phi(3);
+
           DoubleVect value(3);
           value=0.;
           for(int count=0; count<nbModes; count++ )
             {
               const DoubleTab& u=dom_ale.getBeamDisplacement(count);
               const DoubleTab& R=dom_ale.getBeamRotation(count);
+              DoubleVect phi(3);
               phi=dom_ale.interpolationOnThe3DSurface(x,y,z, u, R);
-
               for(int comp=0; comp<nb_comp(); comp++)
                 {
                   value[comp] +=beamVelocity[count]*phi[comp];
@@ -129,16 +131,70 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               vit_som_bord_ALE(faces.sommet(i,k),j)=value[j];
 
             }
-          /* if(front.le_nom()=="Out_poutre" && i==0 && k==1)
+
+
+
+          if(front.le_nom()=="Poutre")
+            {
+              if(i ==2713 && k==1)
+                {
+                  std::ofstream ofs_k0;
+                  ofs_k0.open ("beam_vel_P_0.5_h.txt", std::ofstream::out | std::ofstream::app);
+                  ofs_k0<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
+                  ofs_k0.close();
+                  //Cout<<"time = "<<tps <<" velocity beam Poutre= "<<beamVelocity<<finl;
+                  //getchar();
+
+                }
+            }
+
+          /* if(front.le_nom()=="Poutre")
              {
-               Cout<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<finl;
-               //getchar();
+               if(i ==130 && k==0)
+                 {
+                   std::ofstream ofs_k0;
+                   ofs_k0.open ("beam_vel_P_k0.txt", std::ofstream::out | std::ofstream::app);
+                   ofs_k0<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
+                   ofs_k0.close();
+                   //Cout<<"time = "<<tps <<" velocity beam Poutre= "<<beamVelocity<<finl;
+                   //getchar();
+
+                 }
+
+               if(i==462 && k==1)
+                 {
+                   std::ofstream ofs_k1;
+                   ofs_k1.open ("beam_vel_P_k1.txt", std::ofstream::out | std::ofstream::app);
+                   ofs_k1<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
+                   ofs_k1.close();
+                 }
+             }
+           if(front.le_nom()=="Out_poutre")
+             {
+               if(i==28 && k==1)
+                 {
+                   std::ofstream ofs_i8;
+                   ofs_i8.open ("beam_vel_O_k1.txt", std::ofstream::out | std::ofstream::app);
+                   ofs_i8<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
+                   ofs_i8.close();
+                   //Cout<<"time = "<<tps <<" velocity beam Out_Poutre= "<<beamVelocity<<finl;
+                   //getchar();
+                 }
+
+               if(i==32 && k ==0)
+                 {
+                   std::ofstream ofs_i9;
+                   ofs_i9.open ("beam_vel_O_k0.txt", std::ofstream::out | std::ofstream::app);
+                   ofs_i9<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
+                   ofs_i9.close();
+                 }
+
              }*/
         }
 
     }
 }
-void  Champ_front_ALE_Beam::computeFluidForce(DoubleVect& fluidForce)
+void  Champ_front_ALE_Beam::computeFluidForce(const double tps, DoubleVect& fluidForce)
 {
 
   const Frontiere& front=la_frontiere_dis->frontiere();
@@ -156,8 +212,31 @@ void  Champ_front_ALE_Beam::computeFluidForce(DoubleVect& fluidForce)
   DoubleTab& flux_bords_grad=op_grad.flux_bords();
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
   DoubleVect force(3);
+  DoubleVect force_p(3);
+  DoubleVect force_v(3);
+  std::ofstream ofs_k0;
+  ofs_k0.open ("force_p.txt", std::ofstream::out | std::ofstream::app);
 
+  std::ofstream ofs_k1;
+  ofs_k1.open ("force_v.txt", std::ofstream::out | std::ofstream::app);
 
+  if(flux_bords_grad.size() == flux_bords_diff.size())
+    {
+
+      for (int face=ndeb; face<nfin; face++)
+        {
+          //double surface=la_zone_vef.face_surfaces(face);
+          for(int comp=0; comp<3; comp++)
+            {
+              force_p[comp] += (flux_bords_grad(face, comp));
+              force_v[comp] += (flux_bords_diff(face, comp));
+            }
+        }
+      ofs_k0<<tps<<" "<<force_p[0]<<" "<<force_p[1]<<" "<<force_p[2]<<endl;
+      ofs_k0.close();
+      ofs_k1<<tps<<" "<<force_v[0]<<" "<<force_v[1]<<" "<<force_v[2]<<endl;
+      ofs_k1.close();
+    }
 
   if(flux_bords_grad.size() == flux_bords_diff.size())
     {
@@ -182,5 +261,5 @@ void  Champ_front_ALE_Beam::computeFluidForce(DoubleVect& fluidForce)
 
     }
 
-
+  fluidForce=0.;
 }

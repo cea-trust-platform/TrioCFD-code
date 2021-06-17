@@ -742,9 +742,9 @@ const int& Domaine_ALE::getBeamDirection() const
 {
   return beam.getDirection();
 }
-DoubleVect&  Domaine_ALE::getBeamVelocity(const double& dt, const DoubleVect& fluidForce)
+DoubleVect&  Domaine_ALE::getBeamVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
 {
-  return beam.getVelocity(dt, fluidForce);
+  return beam.getVelocity(tps, dt, fluidForce);
 }
 const int& Domaine_ALE::getBeamNbModes()
 {
