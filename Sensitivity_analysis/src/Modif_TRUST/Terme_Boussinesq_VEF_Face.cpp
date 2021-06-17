@@ -66,8 +66,7 @@ DoubleTab& Terme_Boussinesq_VEF_Face::ajouter(DoubleTab& resu) const
   if(equation_scalaire().que_suis_je()=="Convection_Diffusion_Temperature_sensibility")
     T0=0.;
 
-  int nb_dim = param.nb_dim();
-  int nbcomp = resu.dimension(1);
+  int nb_dim = param.line_size(), nbcomp = resu.line_size();
   // Verifie la validite de T0:
   check();
 
@@ -75,11 +74,10 @@ DoubleTab& Terme_Boussinesq_VEF_Face::ajouter(DoubleTab& resu) const
   int nb_faces = zone_VEF.nb_faces();
   for (int face=0; face<nb_faces; face++)
     {
-      int elem1 = face_voisins(face,0);
-      int elem2 = face_voisins(face,1);
+      int elem1 = face_voisins(face,0), elem2 = face_voisins(face,1);
       double delta_param = 0;
       for (int dim=0; dim<nb_dim; dim++)
-        delta_param += valeur(beta_valeurs,elem1,elem2,dim)*(T0(dim)-(nb_dim==1 ? param(face) : param(face,dim)));
+        delta_param += valeur(beta_valeurs,elem1,elem2,dim)*(Scalaire0(dim)-param(face,dim));
 
       for (int comp=0; comp<dimension; comp++)
         {
