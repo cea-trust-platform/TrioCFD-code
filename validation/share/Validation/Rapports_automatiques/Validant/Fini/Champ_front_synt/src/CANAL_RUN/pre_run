@@ -1,0 +1,1 @@
+trust CANAL_ZONES.data 1>domaine.out 2>domaine.err

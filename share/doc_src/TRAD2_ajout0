@@ -1285,3 +1285,14 @@ pb_phase_field Pb_base pb_phase_field -1 Problem to solve local instantaneous in
   attr navier_stokes_phase_field navier_stokes_phase_field navier_stokes_phase_field 1 Navier Stokes equation for the Phase Field problem.
   attr convection_diffusion_phase_field convection_diffusion_phase_field convection_diffusion_phase_field 1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
   ref constituant constituant
+Champ_front_synt front_field_base Champ_front_synt 0 Boundary condition to create the synthetic fluctuations as inlet boundary. Available only for 3D configurations.
+  attr dim entier dim 0 Number of field components. It should be 3!
+  attr bloc bloc_lecture_turb_synt bloc 0 bloc containing the parameters of the synthetic turbulence
+bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the synthetic turbulence
+  attr moyenne listf moyenne 0 Mean Velocity
+  attr lenghtScale floattant lengthScale 0 Integral length scale
+  attr nbModes entier nbModes 0 Number of Fourier coefficients
+  attr turbKinEn floattant turbKinEn 0 Turbulent kinetic energy
+  attr p floattant p 0 Wave number factor
+  attr timeScale floattant timeScale 0 Integral time scale
+  attr dir_fluct listf dir_fluct 0 direction of fluctuations

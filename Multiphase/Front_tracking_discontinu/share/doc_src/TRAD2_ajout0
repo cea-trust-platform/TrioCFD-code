@@ -268,3 +268,15 @@ paroi_decalee_robin condlim_base paroi_decalee_robin 1 This keyword is used to d
 paroi_rugueuse dirichlet paroi_rugueuse 1 Rough wall boundary
   attr erugu floattant erugu 0 Constant value for roughness
 diffusion_tenseur_Reynolds_externe diffusion_deriv tenseur_Reynolds_externe 0 Estimate the values of the Reynolds tensor.
+Champ_front_synt front_field_base Champ_front_synt 0 Boundary condition to create the synthetic fluctuations as inlet boundary. Available only for 3D configurations.
+  attr dim entier dim 0 Number of field components. It should be 3!
+  attr bloc bloc_lecture_turb_synt bloc 0 bloc containing the parameters of the synthetic turbulence
+bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the synthetic turbulence
+  attr moyenne listf moyenne 0 Mean Velocity
+  attr lenghtScale floattant lengthScale 0 Integral length scale
+  attr nbModes entier nbModes 0 Number of Fourier coefficients
+  attr turbKinEn floattant turbKinEn 0 Turbulent kinetic energy
+  attr p floattant p 0 Wave number factor
+  attr timeScale floattant timeScale 0 Integral time scale
+  attr dir_fluct listf dir_fluct 0 direction of fluctuations
+
