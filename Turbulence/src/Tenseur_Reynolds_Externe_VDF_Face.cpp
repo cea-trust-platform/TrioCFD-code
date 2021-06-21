@@ -388,13 +388,10 @@ void Tenseur_Reynolds_Externe_VDF_Face::mettre_a_jour(double temps)
           }
     }
 
-
   const IntTab& elem_faces   = la_zone_VDF.valeur().elem_faces();
   const IntTab& face_voisins = la_zone_VDF.valeur().face_voisins();
-
   const DoubleVect& inverse_vol  = la_zone_VDF.valeur().inverse_volumes();
-
-  const int nb_faces_elem=elem_faces.dimension(1);
+  const int nb_faces_elem=elem_faces.line_size();
 
   int facei;
   double signe=0.;

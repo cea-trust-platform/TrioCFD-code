@@ -137,8 +137,8 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       if (alpha_uniforme)
         {
           double d_alpha = alpha(0,0);
-          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha.valeurs().dimension(1));
-          for (int nc=0; nc<alpha.valeurs().dimension(1); nc++)
+          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha.valeurs().line_size());
+          for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
             {
               if (d_alpha!=alpha(0,nc))
                 {
@@ -153,7 +153,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
           for (int elem=0; elem<alpha.valeurs().dimension(0); elem++)
             {
               double d_alpha = alpha(elem,0);
-              for (int nc=0; nc<alpha.valeurs().dimension(1); nc++)
+              for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
                 {
                   if (d_alpha!=alpha(elem,nc))
                     {

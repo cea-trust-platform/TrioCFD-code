@@ -101,6 +101,7 @@ int Paroi_std_hyd_VDF::init_lois_paroi_hydraulique()
 int Paroi_std_hyd_VDF::preparer_calcul_hyd(DoubleTab& tab)
 {
   int nb_dim = tab.nb_dim();
+  const int nb_comp= tab.line_size();
   const IntTab& face_voisins = la_zone_VDF->face_voisins();
   //  const IntVect& orientation = la_zone_VDF->orientation();
   // Boucle sur les bords
@@ -123,18 +124,14 @@ int Paroi_std_hyd_VDF::preparer_calcul_hyd(DoubleTab& tab)
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
-          if (nb_dim == 1)
-            for (int num_face=ndeb; num_face<nfin; num_face++)
-              if ( (elem = face_voisins(num_face,0)) != -1)
-                tab(elem) = 0;
-              else
-                {
-                  elem = face_voisins(num_face,1);
-                  tab(elem) = 0;
-                }
-          else if (nb_dim == 2)
+          if (nb_dim > 2)
             {
-              int nb_comp= tab.dimension(1);
+              Cerr << "Erreur TRUST dans Paroi_std_hyd_VDF::preparer_calculer_hyd" << finl;
+              Cerr << "Le DoubleTab tab ne peut pas avoir plus de 2 entrees" << finl;
+              exit();
+            }
+          else
+            {
               for (int num_face=ndeb; num_face<nfin; num_face++)
                 if ( (elem = face_voisins(num_face,0)) != -1)
                   for (int k=0; k<nb_comp; k++)
@@ -145,12 +142,6 @@ int Paroi_std_hyd_VDF::preparer_calcul_hyd(DoubleTab& tab)
                     for (int k=0; k<nb_comp; k++)
                       tab(elem,k) = 0;
                   }
-            }
-          else
-            {
-              Cerr << "Erreur TRUST dans Paroi_std_hyd_VDF::preparer_calculer_hyd" << finl;
-              Cerr << "Le DoubleTab tab ne peut pas avoir plus de 2 entrees" << finl;
-              exit();
             }
         }
     }

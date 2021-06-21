@@ -182,7 +182,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
       // les sommets appartenant a une face de bord avec une CL Dirichlet
       ArrOfInt is_sommet_sur_bord(zone_VEF.nb_som_tot());
       const IntTab& face_sommets=zone_VEF.face_sommets();
-      int nb_som_face=face_sommets.dimension(1);
+      int nb_som_face=face_sommets.line_size();
       for (int fac=0; fac<compt; fac++)
         {
           int face=face_bords_diri[fac];

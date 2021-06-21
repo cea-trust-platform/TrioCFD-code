@@ -321,7 +321,7 @@ int Transport_K_ou_Eps_base::controler_variable()
           // On impose une valeur plus physique (moyenne des elements voisins)
           var = 0;
           int nvar = 0;
-          int nb_faces_elem = elem_faces.dimension(1);
+          int nb_faces_elem = elem_faces.line_size();
           if (size==face_voisins.dimension(0))
             {
               // K or Eps on faces (eg:VEF)

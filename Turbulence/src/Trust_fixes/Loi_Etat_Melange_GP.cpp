@@ -433,7 +433,7 @@ void Loi_Etat_Melange_GP::calculer_alpha()
     {
       const IntTab& elem_faces=ref_cast(Zone_VF,le_fluide->vitesse().zone_dis_base()).elem_faces();
       double rhoelem,Cpelem;
-      int nfe=elem_faces.dimension(1),face;
+      int nfe=elem_faces.line_size(),face;
       if (sub_type(Champ_Uniforme,lambda.valeur()))
         {
           double lambda0 = tab_lambda(0,0);
@@ -616,7 +616,7 @@ void Loi_Etat_Melange_GP::calculer_mu0()
     {
       // VEF (average on elem from values on face);
       const IntTab& elem_faces=ref_cast(Zone_VF,le_fluide->vitesse().zone_dis_base()).elem_faces();
-      int nfe=elem_faces.dimension(1);
+      const int nfe=elem_faces.line_size();
       tab_mu = 0;
       for (int elem=0; elem<nb_elem; elem++)
         {

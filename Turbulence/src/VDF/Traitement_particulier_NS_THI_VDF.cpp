@@ -196,7 +196,7 @@ void Traitement_particulier_NS_THI_VDF::calcul_Ec_D(double& Ec, double& D)
 
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const DoubleVect& volumes_elem = zone_VDF.volumes();
-  const int nb_faces_elem = elem_faces.dimension(1);
+  const int nb_faces_elem = elem_faces.line_size();
   int elem;
   double somme_v2 = 0.;
   double somme_v_elem = 0.;
