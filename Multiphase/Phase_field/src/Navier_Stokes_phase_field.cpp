@@ -429,7 +429,7 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       const DoubleTab& c = eq_c.inconnue().futur(i);
       DoubleTab& rhoTab = rho_.valeur().valeurs();
       DoubleTab& drhodcTab = drhodc_.valeur().valeurs();
-      DoubleTab& betacTab = betac_.valeur().valeurs();
+      // DoubleTab& betacTab = betac_.valeur().valeurs();
       //      rho_.valeur().affecter_(betac_.valeur());
       drhodcTab=rho0_;
       tab_multiply_any_shape(drhodcTab, betac_.valeur().valeurs());
@@ -466,7 +466,7 @@ void Navier_Stokes_phase_field::calculer_mu(const bool init)
 double Navier_Stokes_phase_field::calculer_pas_de_temps() const
 {
   const  Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,probleme().equation(0));
-  Convection_Diffusion_Phase_field& eq_c=ref_cast_non_const(Convection_Diffusion_Phase_field,probleme().equation(1));
+  // Convection_Diffusion_Phase_field& eq_c=ref_cast_non_const(Convection_Diffusion_Phase_field,probleme().equation(1));
   // RLT: plutot que de multiplier dt(diff) par rho ici comme c'est fait dans TrioCFD 1.8.0 (cf. coeff ci-dessous)
   // (en considerant qu'il a ete evalue dans l'operateur de diffusion (Op_Diff_VDF_Face_base) avec la viscosite dynamique - ce qui n'est vrai que pour boussi_==0)
   // on associe le champ masse volumique a l'operateur de diffusion dans le cas boussi_==0 pour que le calcul de son dt soit correct directement

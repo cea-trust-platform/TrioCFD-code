@@ -1990,7 +1990,7 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
   const DoubleTab& c=eq_c.inconnue().valeurs();
   const DoubleTab& div_alpha_gradC=eq_c.get_div_alpha_gradC();
 
-  const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
+  // const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
   // Calcul de mutilde
 
