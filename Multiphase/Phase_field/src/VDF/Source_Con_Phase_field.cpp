@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Con_Phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src/VDF
 // Version:     /main/25
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -30,6 +30,8 @@
 #include <Source_Qdm_VDF_Phase_field.h>
 #include <Check_espace_virtuel.h>
 #include <Convection_Diffusion_Phase_field.h>
+#include <Champ_Fonc_Tabule.h>
+#include <Champ_Uniforme.h>
 
 Implemente_instanciable(Source_Con_Phase_field,"Source_Con_Phase_field_VDF_P0_VDF",Source_Con_Phase_field_base);
 
@@ -87,6 +89,33 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
 
   is>>motlu;
   Cerr << motlu << finl;
+  if (motlu!="potentiel_chimique")
+    {
+      Cerr<<"On attendait potentiel_chimique dans Source_Con_Phase_field::readOn"<<finl;
+      exit();
+    }
+  else
+    {
+      Motcle temp_potentiel_chimique_;
+      is >> temp_potentiel_chimique_;
+      if (temp_potentiel_chimique_=="defaut")
+        {
+          dWdc=&Source_Con_Phase_field::dWdc_defaut;
+        }
+      else if (temp_potentiel_chimique_=="fonction")
+        {
+          potentiel_chimique_expr_.lire_f(is,1);
+          dWdc=&Source_Con_Phase_field::dWdc_general;
+        }
+      else
+        {
+          Cerr<<temp_potentiel_chimique_<<" n'est pas un mot-cle apres potentiel_chimique dans Source_Con_Phase_field::readOn"<<finl;
+          exit();
+        }
+    }
+
+  is>>motlu;
+  Cerr << motlu << finl;
   if (motlu!="beta")
     {
       Cerr<<"On attendait beta dans Source_Con_Phase_field::readOn"<<finl;
@@ -116,13 +145,27 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
     {
       Motcle temp_type_kappa_;
       is >> temp_type_kappa_;
-      if(temp_type_kappa_=="oui")
+      if(temp_type_kappa_=="non")
         {
-          type_kappa_=1;
+          type_kappa_=0;
         }
       else
         {
-          type_kappa_=0;
+          type_kappa_=1;
+          if (temp_type_kappa_=="defaut")
+            {
+              kappa_func_c=&Source_Con_Phase_field::kappa_func_c_defaut;
+            }
+          else if (temp_type_kappa_=="fonction")
+            {
+              kappa_forme_expr_.lire_f(is,1);
+              kappa_func_c=&Source_Con_Phase_field::kappa_func_c_general;
+            }
+          else
+            {
+              Cerr<<temp_type_kappa_<<" n'est pas un mot-cle apres kappa_variable dans Source_Con_Phase_field::readOn"<<finl;
+              exit();
+            }
         }
     }
 
@@ -316,29 +359,8 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
 
   Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& rho=eq_ns.milieu().masse_volumique().valeurs();
-  int dim=rho.nb_dim();
-  switch(dim)
-    {
-    case 1:
-      rho0=rho(0);
-      break;
-    case 2:
-      rho0=rho(0,0);
-      break;
-    case 3:
-      rho0=rho(0,0,0);
-      break;
-    default:
-      Cerr <<"Sou_Con_Phase_field : Pb avec la dimension de rho :"<<dim<<finl;
-      exit();
-      break;
-    }
-  rho1 = eq_c.rho1();
-  rho2 = eq_c.rho2();
-  mu1 = eq_c.mu1();
-  mu2 = eq_c.mu2();
-  drhodc();
+  rho0 = eq_ns.rho0();
+  drhodc_ = eq_ns.drhodc();
   // Dans le modele cette derivee est constante - On la calcule au debut.
 
   boussi_=eq_ns.get_boussi_();
@@ -528,8 +550,6 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
   Cerr << "  - approximation de Boussinesq                     : " << choix_boussi << finl;
   if(boussi_==0)
     {
-      Cerr << "  - masse volumique de la phase 1                   : " << rho1 << " kg/m3" << finl;
-      Cerr << "  - masse volumique de la phase 2                   : " << rho2 << " kg/m3" << finl;
       Cerr << "  - approximation de Boussinesq dans la diffusion   : " << choix_diff_boussi << finl;
     }
   else
@@ -537,8 +557,6 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
       Cerr << "  - masse volumique de reference                    : " << rho0 << " kg/m3" << finl;
     }
   Cerr << "  Dans le cas ou la viscosite dynamique est variable : " << finl;
-  Cerr << "  - viscosite dynamique de la phase 1               : " << mu1 << " kg/m/s" << finl;
-  Cerr << "  - viscosite dynamique de la phase 2               : " << mu2 << " kg/m/s" << finl;
   Cerr << "  - terme source                                    : " << choix_source << finl;
   Cerr << "  - intensite du champ de gravite                   : " << norme_array(g_)  << " m/s^2" << finl;
   Cerr << "" << finl;
@@ -580,7 +598,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
 
   Nom tps_sleep="sleep ";
   tps_sleep+=Nom(tpsaff);
-  Cerr << (int) system(tps_sleep) << finl;
+  Cerr << system(tps_sleep) << finl;
 }
 
 void Source_Con_Phase_field::associer_zones(const Zone_dis& zone_dis,
@@ -762,7 +780,9 @@ void Source_Con_Phase_field::premier_demi_dt()
   DoubleTab& alpha_gradC_carre=eq_c.set_alpha_gradC_carre();
   calculer_alpha_gradC_carre(alpha_gradC_carre);
   DoubleTab& div_alpha_rho_gradC=eq_c.set_div_alpha_rho_gradC();
+  //
   calculer_div_alpha_rho_gradC(div_alpha_rho_gradC);
+  //
   // ---
 
   DoubleTab& div_alpha_gradC=eq_c.set_div_alpha_gradC();
@@ -873,13 +893,12 @@ void Source_Con_Phase_field::premier_demi_dt()
       if (prov_elem.size()==0)
         prov_elem=mutilde;
 
-      DoubleTab kappa_var(prov_elem);
-      kappa_var=0.;
-
       if(kappa_ind==1)
         {
+          DoubleTab kappa_var(prov_elem);
+          kappa_var=0.;
           for(int ikappa=0; ikappa<nb_elem; ikappa++)
-            kappa_var(ikappa)=dmax(-mult_kappa*kappa*(c(ikappa)-0.5)*(c(ikappa)+0.5),0);
+            kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
           // Div(Kappa*Grad(mutilde))
           div_kappa_grad(mutilde, kappa_var, prov_elem);
         }
@@ -1088,7 +1107,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
           // Cerr << "---" << finl;
           // Cerr << "Calcul de kappa variable pour le point fixe" << finl;
           // Cerr << "---" << finl;
-          kappa_var(ikappa)=dmax(-mult_kappa*kappa*(c(ikappa)-0.5)*(c(ikappa)+0.5),0);
+          kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
         }
     }
 
@@ -1441,9 +1460,10 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
           term_cin(n_elem)=0.;
           if (mutype_==1)
             {
-              term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc_;
+              term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc(n_elem);
             }
-          second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*dpsidc(Phi(n_elem));
+
+          second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*(this->*dWdc)(Phi(n_elem));
         }
 
       // Inversion de la matrice morse
@@ -1524,10 +1544,10 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
       term_cin(n_elem)=0.;
       if (mutype_==1)
         {
-          term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc_;
+          term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc(n_elem);
         }
 
-      second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*dpsidc(x1(n_elem));
+      second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*(this->*dWdc)(x1(n_elem));
     }
   //   // Ajoute par DJ pour Debog
   //   //-------------------------
@@ -1971,7 +1991,6 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
   const DoubleTab& div_alpha_gradC=eq_c.get_div_alpha_gradC();
 
   const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
-  const DoubleTab rhoPF=eq_ns.rho().valeurs();
 
   // Calcul de mutilde
 
@@ -1981,10 +2000,10 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
   const int taille=mutilde.size();
   for (int i=0; i<taille; i++)
     {
-      mutilde(i)+=beta*dpsidc(c(i));
+      mutilde(i)+=beta*(this->*dWdc)(c(i));
       if(mutype_==1)
         {
-          mutilde(i)+=(0.5*u_carre_(i))*drhodc_;
+          mutilde(i)+=(0.5*u_carre_(i))*drhodc(i);
         }
     }
   // L'espace virtuel n'est pas a jour
@@ -2227,48 +2246,40 @@ void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo
 }
 
 
-// Description:
-//     Derivee de rho par rapport a c = rho2-rho1 car on prend rho = rho1+(rho2-rho1)*c
-// Precondition:
-// Parametre: const doubleTab& rho
-//    Signification: valeur de drho/dc
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-void Source_Con_Phase_field::drhodc()
+void Source_Con_Phase_field::calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
 {
-  drhodc_=rho2-rho1;
+  if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
+    {
+      const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
+      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Table& table = ch_champ_fonc_c.table();
+      const int& isfct = table.isfonction();
+      DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();
+      // code ci-dessous adapte de Champ_Fonc_Tabule_P0_VDF.mettre_a_jour
+      if (!(val_c.nb_dim() == mes_valeurs.nb_dim()))
+        {
+          Cerr << "Erreur a l'initialisation d'un Champ_Fonc_Tabule" << finl;
+          Cerr << "Le champ parametre et le champ a initialiser ne sont pas compatibles" << finl;
+          exit();
+        }
+      if (isfct!=2)
+        {
+          int nb_elems = zone_VDF.nb_elem();
+          if (val_c.nb_dim() == 1)
+            for (int num_elem=0; num_elem<nb_elems; num_elem++)
+              mes_valeurs(num_elem) = table.val(val_c(num_elem));
+          else
+            {
+              int nb_comps = val_c.nb_dim();
+              for (int num_elem=0; num_elem<nb_elems; num_elem++)
+                for (int ncomp=0; ncomp<nb_comps; ncomp++)
+                  mes_valeurs(num_elem,ncomp) = table.val(val_c(num_elem,ncomp));
+            }
+        }
+      else
+        {
+          const DoubleTab& centres_de_gravites = zone_VDF.xp();
+          table.valeurs(val_c,centres_de_gravites,t,mes_valeurs);
+        }
+    }
 }
-
-// Description:
-//     Valeur de mu (potentiel chimique)
-//     W=(1-c^2)c^2
-//     Derivee de W par rapport a c = rho2-rho1 car on prend rho = rho1+(rho2-rho1)*c
-// Precondition:
-// Parametre: const double& c
-//    Signification: concentration
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: double
-//    Signification: valeur de dW/dc
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-double Source_Con_Phase_field::dpsidc(const double& c) const
-{
-  return (4.*c*(c+0.5)*(c-0.5));
-  //   if (c<=-0.5 || c>=0.5)
-  //     return(0.);
-  //   else
-  //     return (-1.*c);
-}
-
-

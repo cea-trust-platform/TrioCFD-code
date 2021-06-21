@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
 // Version:     /main/27
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -32,13 +32,16 @@
 #include <Zone_VF.h>
 #include <Domaine.h>
 #include <Param.h>
+#include <Champ_Fonc_Tabule.h>
+#include <EChaine.h>
+#include <Source_Con_Phase_field_base.h>
+#include <Operateur_Diff_base.h>
 
 extern Stat_Counter_Id temps_total_execution_counter_;
 Implemente_instanciable_sans_constructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
 
 Navier_Stokes_phase_field::Navier_Stokes_phase_field()
 {
-
   // On initialise les attributs de la classe
   boussi_=-1;
   diff_boussi_=-1;
@@ -120,24 +123,71 @@ Entree& Navier_Stokes_phase_field::readOn(Entree& is)
 void Navier_Stokes_phase_field::set_param(Param& param)
 {
   param.ajouter_non_std("approximation_de_boussinesq",(this),Param::REQUIRED);
-  param.ajouter_non_std("viscosite_dynamique_constante",(this),Param::REQUIRED);
+  param.ajouter_non_std("viscosite_dynamique_constante",(this),Param::OPTIONAL);
   param.ajouter("gravite",&g_);
   Navier_Stokes_std::set_param(param);
 }
 
 int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
+  Motcle motlu;
   if (mot=="approximation_de_boussinesq")
     {
       Motcle temp_boussi_;
       is >> temp_boussi_;
+      bool fonctionsALire = false;
       if(temp_boussi_=="oui")
         {
           boussi_=1;
+          diff_boussi_=0;
+          if (!betac_.valeur().non_nul())
+            {
+              fonctionsALire = true;
+              Cerr << "Approximation de Boussinesq utilisee mais betac non defini comme propriete du fluide"<< finl;
+              Cerr << "On s'attend donc a lire les fonctions rho(c) et drho/dc"<< finl;
+            }
         }
       else
         {
           boussi_=0;
+          fonctionsALire = true;
+        }
+      if (fonctionsALire)
+        {
+          is >> motlu ;
+          assert(motlu=="{");
+          is >> motlu ;
+          if (motlu=="rho_fonc_c")
+            {
+              Cerr << motlu << finl;
+              is >> rho_;
+              is >> drhodc_;
+              is >> motlu;
+            }
+          else
+            {
+              double rho1,rho2;
+              while(motlu!="}")
+                {
+                  if (motlu=="rho_1") is >> rho1;
+                  if (motlu=="rho_2") is >> rho2;
+                  is >> motlu;
+                }
+              Nom chaine("Champ_Fonc_Fonction 1 concentration ");
+              Nom rhoM(0.5*(rho1+rho2));
+              Nom drho(rho2-rho1);
+              chaine+=rhoM;
+              chaine+="+val*";
+              chaine+=drho;
+              EChaine echaine(chaine);
+              echaine >> rho_;
+              Nom chaine2("Champ_Uniforme 1 ");
+              chaine2+=drho;
+              EChaine echaine2(chaine2);
+              Cerr << "@@@ " << chaine2 << finl;
+              echaine2 >> drhodc_;
+            }
+          assert(motlu=="}");
         }
       return 1;
     }
@@ -152,9 +202,42 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
       else
         {
           diff_boussi_=0;
+          is >> motlu ;
+          assert(motlu=="{");
+          is >> motlu ;
+          if (motlu=="mu_fonc_c")
+            {
+              Cerr << motlu << finl;
+              is >> mu_;
+              is >> motlu;
+            }
+          else
+            {
+              double mu1,mu2;
+              while(motlu!="}")
+                {
+                  if (motlu=="mu_1") is >> mu1;
+                  if (motlu=="mu_2") is >> mu2;
+                  is >> motlu;
+                }
+              Nom chaine("Champ_Fonc_Fonction 1 concentration ");
+              Nom muM(0.5*(mu1+mu2));
+              Nom dmu(mu2-mu1);
+              chaine+=muM;
+              chaine+="+val*";
+              chaine+=dmu;
+              EChaine echaine(chaine);
+              echaine >> mu_;
+            }
+          assert(motlu=="}");
+          const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+          dis.nommer_completer_champ_physique(zone_dis().valeur(),"viscosite_dynamique","Pa.s",mu_,probleme());
+          champs_compris_.ajoute_champ(mu_);
         }
       if(diff_boussi_==1)
         {
+          // RLT: pas sur de tout a fait comprendre si c'est encore d'actualite mais, en tout cas, en lien avec modification
+          // commentee dans Navier_Stokes_phase_field::calculer_pas_de_temps
           Cerr << "LE PAS DE TEMPS DE STABILITE (DE DIFFUSION) DOIT ETRE FORCE DANS VDF/Operateurs/OpDifVDFFaCs.cpp : ligne 115" << finl;
           Cerr << "ATTENTION : LE PAS DE TEMPS DE DIFFUSION SERA ALORS FORCE A LA VALEUR DE 1 SECONDE !!!" << finl;
           // Ceci est utile car normalement dans ce cas le pas de temps de diffusion ne depend pas de rho
@@ -173,7 +256,7 @@ const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport()
   if(boussi_==0)
     {
       if (diff_boussi_==0)
-        return mu();
+        return mu_;
       else if (diff_boussi_==1)
         return le_fluide->viscosite_dynamique();
       else
@@ -225,27 +308,169 @@ void Navier_Stokes_phase_field::discretiser()
   assembleur_pression_.typer(type);
   assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
   assembleur_pression_.valeur().set_resoudre_increment_pression(1);
+  // la discretisation du champ associe
+  // - a la masse volumique est "retardee" a la methode creer_champ/completer
+  // - a la viscosite dynamique est "retardee" a la methode lire_motcle_non_standard
+  //   (et non pas creer_champ/completer comme pour la masse volumique sinon probleme dans terme_diffusif.associer_diffusivite dans Navier_Stokes_std::lire_motcle_non_standard)
+  // afin que les options boussi_ et diff_boussi_ soient connues
 
-  assert(sub_type(Discret_Thyd, discretisation()));
-  const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+  const DoubleTab& rho0Tab=le_fluide.valeur().masse_volumique().valeurs();
+  int dim=rho0Tab.nb_dim();
+  switch(dim)
+    {
+    case 1:
+      rho0_=rho0Tab(0);
+      break;
+    case 2:
+      rho0_=rho0Tab(0,0);
+      break;
+    case 3:
+      rho0_=rho0Tab(0,0,0);
+      break;
+    default:
+      Cerr <<"N_S_Phase_field : Problem with rho0 dimension:"<<dim<<finl;
+      exit();
+      break;
+    }
+  betac_ = le_fluide.valeur().beta_c();
+}
 
-  Cerr << "Density discretization" << finl;
-  double temps=schema_temps().temps_courant();
-  dis.discretiser_champ("temperature",zone_dis().valeur(),"masse_volumique","kg/m3",1,temps,rho());
-  champs_compris_.ajoute_champ(rho_);
-  Cerr << "Dynamical viscosity discretization" << finl;
+void Navier_Stokes_phase_field::completer()
+{
+  Navier_Stokes_std::completer();
+  creer_champ("masse_volumique");
+  // RLT: cf. commentaire dans Navier_Stokes_phase_field::calculer_pas_de_temps
+  /*if (boussi_==0)
+    {
+      if (diff_boussi_==0)
+        {
+          terme_diffusif.valeur().associer_champ_masse_volumique(rho_);
+        }
+      else
+        {
+          Cout << "Navier_Stokes_phase_field::completer rho=" << le_fluide.valeur().masse_volumique() << finl;
+          terme_diffusif.valeur().associer_champ_masse_volumique(le_fluide.valeur().masse_volumique());
+        }
+    }*/
+}
 
-  dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"viscosite dynamique","m2/s",1,temps,mu());
-  champs_compris_.ajoute_champ(mu_);
 
-  //   Cerr << "Navier_Stokes_phase_field::discretiser() ok" << finl;
+void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
+{
+  Navier_Stokes_std::creer_champ(motlu);
+  if (motlu == "masse_volumique")
+    {
+      Cerr << "Navier_Stokes_phase_field::creer_champ " << motlu << " " << rho_.non_nul() << " " << rho_.le_nom() << finl;
+      const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+      if (!rho_.non_nul())
+        {
+          if (boussi_ != 1)
+            {
+              Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (1)"<< finl;
+              exit();
+            }
+          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
+          champs_compris_.ajoute_champ(rho_);
+          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"derivee_masse_volumique","kg/m3",1,0.,drhodc_);
+          champs_compris_.ajoute_champ(drhodc_);
+        }
+      if (rho_.le_nom()=="anonyme")
+        {
+          if (boussi_ == 1 && betac_.valeur().non_nul())
+            {
+              Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (2)"<< finl;
+              exit();
+            }
+          dis.nommer_completer_champ_physique(zone_dis().valeur(),"masse_volumique","kg/m3",rho_,probleme());
+          champs_compris_.ajoute_champ(rho_);
+          dis.nommer_completer_champ_physique(zone_dis().valeur(),"derivee_masse_volumique","kg/m3",drhodc_,probleme());
+          champs_compris_.ajoute_champ(drhodc_);
+        }
+    }
+}
+
+// Description:
+//    Calcule rho_n+1 pour utilisation dans la pression
+// Precondition:
+// Parametre:
+//    Signification:
+//    Valeurs par defaut:
+//    Contraintes:
+//    Acces:
+// Retour:
+//    Signification:
+//    Contraintes:
+// Exception:
+// Effets de bord:
+// Postcondition:
+void Navier_Stokes_phase_field::calculer_rho(const bool init)
+{
+  const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme.valeur().equation(1));
+  int i = 1;
+  double temps = schema_temps().temps_futur(i);
+  if (init)
+    {
+      i = 0;
+      temps = schema_temps().temps_courant();
+    }
+  if (boussi_==0 || !betac_.valeur().non_nul())
+    {
+      // normalement, quelque chose comme 'rho_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
+      // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
+      // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
+      Sources list_sources = eq_c.sources();
+      Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
+      source_pf.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue().futur(i));
+      source_pf.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue().futur(i));
+      //Cerr << "rho = " << rho_.valeur().valeurs()[14*48+24] << finl;
+    }
+  else
+    {
+      const DoubleTab& c = eq_c.inconnue().futur(i);
+      DoubleTab& rhoTab = rho_.valeur().valeurs();
+      DoubleTab& drhodcTab = drhodc_.valeur().valeurs();
+      DoubleTab& betacTab = betac_.valeur().valeurs();
+      //      rho_.valeur().affecter_(betac_.valeur());
+      drhodcTab=rho0_;
+      tab_multiply_any_shape(drhodcTab, betac_.valeur().valeurs());
+      rhoTab=c;
+      tab_multiply_any_shape(rhoTab, drhodcTab);
+      rhoTab+=rho0_;
+    }
+  rho_.valeur().valeurs().echange_espace_virtuel();
+  drhodc_.valeur().valeurs().echange_espace_virtuel();
+}
+
+void Navier_Stokes_phase_field::calculer_mu(const bool init)
+{
+  if (boussi_==0 && diff_boussi_==0)
+    {
+      const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme.valeur().equation(1));
+      int i = 1;
+      double temps = schema_temps().temps_futur(i);
+      if (init)
+        {
+          i = 0;
+          temps = schema_temps().temps_courant();
+        }
+      // normalement, quelque chose comme 'mu_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
+      // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
+      // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
+      Sources list_sources = eq_c.sources();
+      Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
+      source_pf.calculer_champ_fonc_c(temps, mu_, eq_c.inconnue().futur(i));
+      mu_.valeur().valeurs().echange_espace_virtuel();
+    }
 }
 
 double Navier_Stokes_phase_field::calculer_pas_de_temps() const
 {
   const  Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,probleme().equation(0));
   Convection_Diffusion_Phase_field& eq_c=ref_cast_non_const(Convection_Diffusion_Phase_field,probleme().equation(1));
-  double coeff = eq_c.rho1(); // voir d'apres le FT
+  // RLT: plutot que de multiplier dt(diff) par rho ici comme c'est fait dans TrioCFD 1.8.0 (cf. coeff ci-dessous)
+  // (en considerant qu'il a ete evalue dans l'operateur de diffusion (Op_Diff_VDF_Face_base) avec la viscosite dynamique - ce qui n'est vrai que pour boussi_==0)
+  // on associe le champ masse volumique a l'operateur de diffusion dans le cas boussi_==0 pour que le calcul de son dt soit correct directement
+  double coeff = mp_min_vect(eq_ns.rho()); // eq_c.rho1(); // voir d'apres le FT
 
   double dt=0;
   double dt_op;
@@ -365,14 +590,20 @@ void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Do
 // Postcondition: l'equation est discretisee
 int Navier_Stokes_phase_field::preparer_calcul()
 {
-  //   Cerr << "** Navier_Stokes_phase_field::preparer_calcul **" << finl;
+  Cerr << "** Navier_Stokes_phase_field::preparer_calcul **" << finl;
   //   Cerr << " - Copie via le Front_Tracking et modifie pour le Phase_field -" << finl;
   Equation_base::preparer_calcul();
 
   // Calcul de la masse volumique
-  Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,probleme().equation(1));
-  eq_c.calculer_rho();
-  eq_c.calculer_mu();
+  rho_.valeur().initialiser(schema_temps().temps_courant());
+  drhodc_.valeur().initialiser(schema_temps().temps_courant());
+  calculer_rho(true); // RLT: cette minitialisation etait incorrecte dans TrioCFD 1.8.0 car on utilisait c.futur()
+  // Calcul de la viscosite dynamique dans le cas boussi_==0 et diff_boussi_==0
+  if (mu_.non_nul())
+    {
+      mu_.valeur().initialiser(schema_temps().temps_courant());
+      calculer_mu(true); // RLT: cette minitialisation etait incorrecte dans dans TrioCFD 1.8.0 car on utilisait c.futur()
+    }
 
   if(boussi_==0)
     {
@@ -395,7 +626,11 @@ int Navier_Stokes_phase_field::preparer_calcul()
   //  la_pression.valeurs()=0.;
   la_pression.changer_temps(schema_temps().temps_courant());
   rho_->changer_temps(schema_temps().temps_courant());
-  mu_->changer_temps(schema_temps().temps_courant());
+  drhodc_->changer_temps(schema_temps().temps_courant());
+  if (mu_.non_nul())
+    {
+      mu_->changer_temps(schema_temps().temps_courant());
+    }
 
   la_pression.valeurs().echange_espace_virtuel();
 
@@ -431,8 +666,14 @@ int Navier_Stokes_phase_field::preparer_calcul()
 void Navier_Stokes_phase_field::mettre_a_jour(double temps)
 {
   Navier_Stokes_std::mettre_a_jour(temps);
-  rho_.mettre_a_jour(temps);
-  mu_.mettre_a_jour(temps);
+  calculer_rho();
+  rho_.valeur().changer_temps(temps);
+  drhodc_.valeur().changer_temps(temps);
+  if (mu_.non_nul())
+    {
+      calculer_mu(); // RLT: cette mise a jour etait manquante dans TrioCFD 1.8.0
+      mu_.valeur().changer_temps(temps);
+    }
 
   if(boussi_==0)
     {
@@ -685,24 +926,6 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       //     Cerr<<"terme_diffusif.ajouter : attention, partie FT de la diffusion non implementee en 3D !!"<<finl;
       // Ajout de Div(tau_d), terme diffusif
       DoubleTrav diff(vpoint);
-      const DoubleTab& rho0=milieu().masse_volumique().valeurs();
-      int dim=rho0.nb_dim();
-      switch(dim)
-        {
-        case 1:
-          rho0_=rho0(0);
-          break;
-        case 2:
-          rho0_=rho0(0,0);
-          break;
-        case 3:
-          rho0_=rho0(0,0,0);
-          break;
-        default:
-          Cerr <<"N_S_Phase_field : Problem with rho0 dimension:"<<dim<<finl;
-          exit();
-          break;
-        }
       terme_diffusif.ajouter(la_vitesse.valeurs(), diff);
 
       if(diff_boussi_==1)

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Con_Phase_field_base.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
 // Version:     /main/8
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -27,6 +27,7 @@
 
 #include <Source_base.h>
 #include <DoubleTab.h>
+#include <Champ_Don.h>
 
 #include <Ref_Probleme_base.h>
 
@@ -47,7 +48,7 @@ class Source_Con_Phase_field_base : public Source_base
 public:
   virtual void premier_demi_dt()=0;
   virtual const DoubleVect& get_u_carre()=0;
-  virtual const double& get_drhodc()=0;
+  virtual void calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const = 0;
 };
 
 #endif

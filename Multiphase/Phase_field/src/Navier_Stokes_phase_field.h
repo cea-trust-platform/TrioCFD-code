@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_phase_field.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
 // Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -26,6 +26,7 @@
 #include <Navier_Stokes_std.h>
 #include <Champ_Don.h>
 #include <time.h>
+#include <Ref_Champ_Don.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -69,10 +70,12 @@ public :
   void set_param(Param& titi);
   int lire_motcle_non_standard(const Motcle&, Entree&);
   virtual void discretiser();
+  void completer();
   virtual int preparer_calcul();
   virtual void rho_aux_faces(const DoubleTab&, Champ_Don&);
-  inline Champ_Don& rho();
   inline const Champ_Don& rho() const;
+  inline const Champ_Don& drhodc() const;
+  inline const double& rho0() const;
   inline Champ_Don& mu();
   inline const Champ_Don& mu() const;
   inline int& get_boussi_();
@@ -82,8 +85,12 @@ public :
   virtual void mettre_a_jour(double );
   const Champ_Don& diffusivite_pour_transport();
 
+  void creer_champ(const Motcle& motlu);
 
   /////////////////////////////////////////////////////
+
+  virtual void calculer_rho(const bool init=false);
+  virtual void calculer_mu(const bool init=false);
 
   double calculer_pas_de_temps() const;
 
@@ -93,12 +100,17 @@ public :
 
 protected :
 
-  Champ_Don rho_;
-  Champ_Don mu_;
+  Champ_Don rho_; // soit lu dans le jdd (boussi_==0)
+  // soit construit comme rho0_*(1+betac_*c) (boussi_==1)
+  Champ_Don drhodc_; // soit lu dans le jdd (boussi_==0)
+  // soit construit comme rho0_*betac_ (boussi_==1 mais attention strictement valide seulement si betac_= Champs_Uniforme)
+  double rho0_;
+  REF(Champ_Don) betac_;
+  Champ_Don mu_;// lu dans le jdd (boussi_==0) seulement pour boussi_==0 && diff_boussi_==0
+
   int boussi_;
   int diff_boussi_;
   DoubleVect g_;
-  double rho0_;
   int terme_source_;
   int compressible_;
 
@@ -109,14 +121,28 @@ protected :
 
 };
 
-inline Champ_Don& Navier_Stokes_phase_field::rho()
+// Methode de calcul de la valeur sur un champ aux elements d'un champ uniforme ou non a plusieurs composantes
+inline double& valeur(DoubleTab& valeurs, const int& elem, const int& dim)
 {
-  return rho_;
+  if(valeurs.nb_dim()==1)
+    return valeurs(elem);
+  else
+    return valeurs(elem,dim);
 }
 
 inline const Champ_Don& Navier_Stokes_phase_field::rho() const
 {
   return rho_;
+}
+
+inline const Champ_Don& Navier_Stokes_phase_field::drhodc() const
+{
+  return drhodc_;
+}
+
+inline const double& Navier_Stokes_phase_field::rho0() const
+{
+  return rho0_;
 }
 
 inline Champ_Don& Navier_Stokes_phase_field::mu()

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Qdm_VDF_Phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src/VDF
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@
 #include <Probleme_base.h>
 #include <Milieu_base.h>
 #include <Navier_Stokes_phase_field.h>
-#include <Source_Con_Phase_field_base.h>
+#include <Source_Con_Phase_field.h>
 #include <SFichier.h>
 
 Implemente_instanciable(Source_Qdm_VDF_Phase_field,"Source_Qdm_Phase_field_VDF_Face",Source_base);
@@ -120,37 +120,13 @@ void Source_Qdm_VDF_Phase_field::associer_pb(const Probleme_base& pb)
 {
   le_probleme2=pb;
   Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
-  Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& rho =eq_ns.milieu().masse_volumique().valeurs();
-  int dim=rho.nb_dim();
-  Cerr << "Dimension : dim = " << dim << finl;
-  switch(dim)
-    {
-    case 1:
-      rho0=rho(0);
-      break;
-    case 2:
-      rho0=rho(0,0);
-      break;
-    case 3:
-      rho0=rho(0,0,0);
-      break;
-    default:
-      Cerr <<"Pb avec la dimension de rho :"<<dim<<finl;
-      exit();
-      break;
-    }
-  //   Cerr <<"rho0 "<<rho0<<finl;
-
+  rho0=eq_ns.rho0();
   boussi_=eq_ns.get_boussi_();
   if (boussi_!=1 && boussi_!=0)
     {
       Cerr << "Erreur dans le choix du parametre boussi_" << finl;
       exit();
     }
-
-  rho1 = eq_c.rho1();
-  rho2 = eq_c.rho2();
 
   eq_ns.getset_terme_source_()=terme_source;
   eq_ns.getset_compressible_()=compressible;
@@ -191,21 +167,19 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
 
   DoubleVect u_carre;
   DoubleTab mutilde_NS;
-  double drhodc_;
   Sources list_sources = eq_c.sources();
-  Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
+  Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
 
   const DoubleTab& mutilde=eq_c.get_mutilde_();
   mutilde_NS=mutilde;
   u_carre=source_pf.get_u_carre();
-  drhodc_=source_pf.get_drhodc();
 
   if (eq_c.get_mutype_())
     {
       int taille=mutilde.size_totale();
       for (int i=0; i<taille; i++)
         {
-          mutilde_NS(i)-=(0.5*u_carre(i))*drhodc_;
+          mutilde_NS(i)-=(0.5*u_carre(i))*source_pf.drhodc(i);
         }
     }
   // Dans le cas mutype_==1, on utilise mutilde_d dans CH, mais mutilde dans NS
