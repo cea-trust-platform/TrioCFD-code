@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Con_Phase_field.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src/VDF
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -29,6 +29,9 @@
 #include <Matrice_Morse.h>
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
+#include <Champ_Don.h>
+#include <Ref_Champ_Don.h>
+#include <Table.h>
 //class Probleme_base;
 
 //
@@ -53,17 +56,28 @@ public:
   void premier_demi_dt();
 
   inline const DoubleVect& get_u_carre();
-  inline const double& get_drhodc();
+
+  inline double drhodc(const int& n_elem) const;
+
+  void calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const;
 
 protected:
   int tpsaff;
   double rho0;
+  REF(Champ_Don) drhodc_;
   DoubleTab accr;
   DoubleVect u_carre_;
-  double drhodc_;
   DoubleTab prov_face_,prov_elem_;
-  double alpha, beta, kappa;
-  double rho1, rho2;
+  double alpha, beta;
+  Table potentiel_chimique_expr_;
+  double (Source_Con_Phase_field::*dWdc)(const double&) const;
+  double kappa;
+  int kappa_ind;
+  int type_kappa_;
+  int kappa_moy_;
+  double mult_kappa;
+  Table kappa_forme_expr_;
+  double (Source_Con_Phase_field::*kappa_func_c)(const double&) const;
   double mu1, mu2;
   int implicitation_;
   int gmres_;
@@ -74,10 +88,6 @@ protected:
   DoubleTab g_;
   int mutype_;
   int couplage_;
-  int kappa_ind;
-  int type_kappa_;
-  int kappa_moy_;
-  double mult_kappa;
   int nkr, nit;
   double rec_min, rec_max, epsGMRES;
 
@@ -92,8 +102,10 @@ protected:
   virtual void calculer_point_fixe(const DoubleTab&, const DoubleTab&, const Matrice_Morse&, DoubleTab&, DoubleTab&);
   virtual void calculer_u2_elem(DoubleVect&);
   virtual void calculer_mutilde(DoubleTab&) const;
-  virtual double dpsidc(const double&) const;
-  virtual void drhodc();
+  double dWdc_defaut(const double&) const;
+  double kappa_func_c_defaut(const double&) const;
+  double dWdc_general(const double&) const;
+  double kappa_func_c_general(const double&) const;
 
   virtual void construire_systeme(const DoubleTab&, const Matrice_Morse&, DoubleTab&, const DoubleTab&);
   virtual void matvect(const DoubleTab&, const Matrice_Morse&, const DoubleTab&, const DoubleTab&, DoubleTab&);
@@ -113,9 +125,55 @@ inline const DoubleVect& Source_Con_Phase_field::get_u_carre()
   return u_carre_;
 }
 
-inline const double& Source_Con_Phase_field::get_drhodc()
+inline double Source_Con_Phase_field::drhodc(const int& n_elem) const
 {
-  return drhodc_;
+  const DoubleTab& tab = drhodc_.valeur().valeurs();
+  if (tab.dimension(0)==1)
+    {
+      int dim = tab.nb_dim();
+      double value = 0.0;
+      switch(dim)
+        {
+        case 1:
+          value = tab(0);
+          break;
+        case 2:
+          value = tab(0,0);
+          break;
+        case 3:
+          value = tab(0,0,0);
+          break;
+        default:
+          Cerr <<"Source_Con_Phase_field::drhodc : Problem with drhodc_ dimension:"<<dim<<finl;
+          exit();
+          break;
+        }
+      return value;
+    }
+  else
+    {
+      return tab(n_elem);
+    }
+}
+
+inline double Source_Con_Phase_field::dWdc_defaut(const double& c) const
+{
+  return (4.*c*(c+0.5)*(c-0.5));
+}
+
+inline double Source_Con_Phase_field::kappa_func_c_defaut(const double& c) const
+{
+  return dmax(mult_kappa*kappa*(c+0.5)*(0.5-c),0);
+}
+
+inline double Source_Con_Phase_field::dWdc_general(const double& c) const
+{
+  return potentiel_chimique_expr_.val(c,0);
+}
+
+inline double Source_Con_Phase_field::kappa_func_c_general(const double& c) const
+{
+  return dmax(mult_kappa*kappa*kappa_forme_expr_.val(c,0),0);
 }
 
 #endif

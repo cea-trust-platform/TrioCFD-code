@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Qdm_VDF_Phase_field.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Mutliphase/Phase_field/src/VDF
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,6 @@ protected:
   DoubleTab grad_div_alpha_rho_gradC_;
   DoubleTab grad_alpha_gradC_carre_;
   DoubleTab gradC_;
-  double rho1, rho2;
   int boussi_;
 
   REF(Zone_VDF) la_zone_VDF;

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Schema_Phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
 // Version:     /main/19
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -25,6 +25,7 @@
 #include <Probleme_base.h>
 #include <Source_Con_Phase_field_base.h>
 #include <Param.h>
+#include <Navier_Stokes_phase_field.h>
 
 Implemente_instanciable(Schema_Phase_field,"Schema_Phase_field",Schema_Temps_base);
 
@@ -424,6 +425,8 @@ int Schema_Phase_field::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
     }
   else
     {
+      Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,eqn);
+      eq_ns.calculer_rho();
       sch3.valeur().set_dt()=pas_de_temps();
       sch3.valeur().faire_un_pas_de_temps_eqn_base(eqn);
       set_stationnaire_atteint()=sch3.valeur().isStationary();
@@ -501,7 +504,6 @@ int Schema_Phase_field::faire_un_pas_de_temps_C_D_Phase_field(Convection_Diffusi
 {
   premier_dt(eq_c);
   deuxieme_dt(eq_c);
-  eq_c.calculer_rho();
 
   return 1;
 }

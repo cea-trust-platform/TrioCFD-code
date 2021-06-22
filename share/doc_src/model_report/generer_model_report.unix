@@ -10,4 +10,4 @@ pdflatex models_report_TrioCFD.tex
 bibtex models_report_TrioCFD
 pdflatex models_report_TrioCFD.tex
 pdflatex models_report_TrioCFD.tex
-mv models_report_TrioCFD.pdf ../../doc/.
+mv models_report_TrioCFD.pdf ../../doc/TrioCFD_models_report.pdf

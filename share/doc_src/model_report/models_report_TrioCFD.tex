@@ -7,7 +7,7 @@
 \usepackage{lmodern}
 \usepackage{lettrine}
 \usepackage{geometry}
-\usepackage{amsmath,amssymb,amsfonts,amsgen,amsbsy,textcomp}
+\usepackage{amsmath,amssymb,amsfonts,amsgen,amsbsy,textcomp,pifont}
 \usepackage{amsthm}
 \usepackage{textcomp}
 \usepackage{color}
@@ -35,7 +35,7 @@
 \usepackage{url}
 \usepackage{rotating}
 \usepackage{chngcntr}
-%ALE
+%%%%%   ALE   %%%%%
 \usepackage{microtype}
 \usepackage{tabularx}
 \usepackage{stmaryrd}
@@ -60,9 +60,44 @@
 \newcommand{\normal}{\vec{ n}}
 \newcommand{\point}{x}
 
-%SENSITIVITY
+%%%%%   SENSITIVITY   %%%%%
 \def\b_u{\mathbf{u}}
 
+%%%%%   Phase_field   %%%%%
+\usetikzlibrary{trees}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{arrows,shapes,patterns}
+\usetikzlibrary{fpu}
+\usepackage{pdflscape}
+\usepackage{footmisc}
+\usepackage[mathscr]{eucal}
+\usepackage{framed,verbatim,alltt}
+
+\newenvironment{disarray}%
+ {\everymath{\displaystyle\everymath{}}\array}%
+ {\endarray}
+
+\lstset{upquote=true,
+        columns=fullflexible,
+        keepspaces=true,
+        breaklines,
+        breakindent=0pt,
+        basicstyle=\ttfamily\small
+        }
+% \definecolor{blizzardblue}{rgb}{0.67, 0.9, 0.93}
+\makeatletter
+\newsavebox{\lstb@x}
+\lstnewenvironment{inputfile}
+  {\setbox\lstb@x\hbox\bgroup\color@setgroup}
+  {\color@endgroup\egroup\colorbox{gray!25}{\usebox{\lstb@x}}}
+\makeatother
+
+% \definecolor{blizzardblue}{rgb}{0.67, 0.9, 0.93}
+%\lstnewenvironment{inputfile}
+%{\lstset{backgroundcolor=\color{blizzardblue},mathescape=true,basicstyle=\ttfamily, columns=fullflexible, keepspaces=true}}{}
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % espacement table des matieres et des figures entre numero et titre
 \usepackage{tocloft}
 \newcommand{\DF}{\displaystyle\frac}
@@ -220,7 +255,7 @@
 \hline
 Code Version & Date & Code manager & Authors \\
  & & J. DARONA & \\ \hline
- & &\multirow{3}{*}{\includegraphics[scale=0.65]{../validation_report/tools/sign_JD.png}} &  \\
+ & &\multirow{3}{*}{\includegraphics[scale=0.6]{../validation_report/tools/sign_JD.png}} &  \\
 v1.8.2 & \today && TrioCFD Team\\
  & &&  \\ \hline
 \multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } models\_report\_TrioCFD.tex } \\

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Gravite_PF_VDF.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src/VDF
 // Version:     /main/8
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -28,6 +28,9 @@
 #include <Dirichlet_homogene.h>
 #include <Zone_Cl_dis.h>
 #include <Navier_Stokes_phase_field.h>
+#include <Convection_Diffusion_Phase_field.h>
+#include <Probleme_base.h>
+#include <Fluide_Incompressible.h>
 
 Implemente_instanciable(Source_Gravite_PF_VDF,"Source_Gravite_PF_VDF",Source_base);
 
@@ -116,29 +119,71 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
   const DoubleVect& volumes_entrelaces = la_zone->volumes_entrelaces();
   DoubleVect porosite_surf ;          // porosites surfaciques
   porosite_surf.ref(la_zone->porosite_face());
-  const Navier_Stokes_phase_field& eq_NS_PF = ref_cast(Navier_Stokes_phase_field,equation());
+  Navier_Stokes_phase_field& eq_NS_PF = ref_cast_non_const(Navier_Stokes_phase_field, equation());
   const DoubleVect& g = eq_NS_PF.get_g_();
 
   int num_cl;
-  for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
-    {
-      const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
-      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-      int ndeb = le_bord.num_premiere_face();
-      int nfin = ndeb + le_bord.nb_faces();
-      if (sub_type(Dirichlet,la_cl.valeur()) || sub_type(Dirichlet_homogene,la_cl.valeur()))
-        ;
-      else
-        for (face=ndeb ; face<nfin ; face++)
-          {
-            resu(face) += g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
 
-          }
+  const int& boussi = eq_NS_PF.get_boussi_();
+
+  if (boussi == 0)
+    {
+      for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
+        {
+          const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          if (sub_type(Dirichlet,la_cl.valeur()) || sub_type(Dirichlet_homogene,la_cl.valeur()))
+            ;
+          else
+            for (face=ndeb ; face<nfin ; face++)
+              {
+                resu(face) += g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
+              }
+        }
+
+      for (face=premiere_face_interne ; face<nb_faces; face++)
+        {
+          resu(face) += g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
+        }
     }
-
-  for (face=premiere_face_interne ; face<nb_faces; face++)
+  else if (boussi == 1)
     {
-      resu(face) += g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
+      const DoubleTab& rho = eq_NS_PF.rho().valeur().valeurs();
+      double rho0 = eq_NS_PF.rho0();
+      const IntTab& face_voisins = la_zone->face_voisins();
+      const DoubleVect& volumes = la_zone->volumes();
+
+      for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
+        {
+          const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int ndeb = le_bord.num_premiere_face();
+          int nfin = ndeb + le_bord.nb_faces();
+          if (sub_type(Dirichlet,la_cl.valeur()) || sub_type(Dirichlet_homogene,la_cl.valeur()))
+            ;
+          else
+            for (face=ndeb ; face<nfin ; face++)
+              {
+                int el0=face_voisins(face,0);
+                int el1=face_voisins(face,1);
+                double vol0=volumes(el0);
+                double vol1=volumes(el1);
+                double cbetaface=(vol0*(rho(el0)/rho0-1.0)+vol1*(rho(el1)/rho0-1.0))/(vol0+vol1);
+                resu(face) += cbetaface * g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
+              }
+        }
+
+      for (face=premiere_face_interne ; face<nb_faces; face++)
+        {
+          int el0=face_voisins(face,0);
+          int el1=face_voisins(face,1);
+          double vol0=volumes(el0);
+          double vol1=volumes(el1);
+          double cbetaface=(vol0*(rho(el0)/rho0-1.0)+vol1*(rho(el1)/rho0-1.0))/(vol0+vol1);
+          resu(face) += cbetaface * g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
+        }
     }
 
 

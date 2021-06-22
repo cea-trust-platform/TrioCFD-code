@@ -134,7 +134,7 @@ La premi\`ere forme (\'equation \ref{eq:bilanQDM2}) est en g\'en\'eral pr\'ef\'e
 effet l'avantage num\'erique d'avoir un terme source nul \`a l'\'equilibre, ce dernier \'etant en partticulier caract\'eris\'e par la condition
 $\tilde{\mu}=cste$. En revanche, la "pression" $(P-\tilde{\mu}c$ est constante \`a la travers\'ee d'une interface courbe \`a l'\'equilibre, ce
 qui ne correspond pas \`a la pression habituelle des physiciens ; la pression habituelle du physicien est en fait, $P$.
-
+\bigskip
 \section{R\'esolution num\'erique}
 Le syst\`eme d'\'equations \ref{eq:Cahn-Hilliard} \`a \ref{eq:kappa} est r\'esolu num\'eriquement en deux \'etapes principales :\smallskip\newline
 1. r\'esolution de l'\'equation de \texttt{Cahn-Hilliard} (\'equation \ref{eq:Cahn-Hilliard}), ce qui permet de d\'eterminer $varphi^{n+1}$ et $\tilde{\mu}^{n+1}$;\smallskip\newline
@@ -175,6 +175,7 @@ lin\'eaire). A noter que, pour des raisons de simplification du syst\`eme non li
 temps $n$ et non pas au pas de temps $(n+1)$.
 
 \subsection{Equation de bilan de quantit\'e de mouvement}\label{subsec:EQ_bilan_QDM}
+\medskip
 L'\'equation de bilan de quantit\'e de mouvement, coupl\'ee \`a la contrainte de divergence nulle de la vitesse, est r\'esolue par une m\'ethode
 de projection dont on rappelle ici les grandes \'etapes. Pour simplifier ici, on consid\`ere uniquement un sch\`ema d'Euler explicite et l'on met
 l'\'equation de bilan de quantit\'e de mouvement sous la forme suivante :
@@ -195,6 +196,327 @@ sur la pression suivante :
 \end{equation}
 La matrice en pression associ\'ee \`a la discr\'etisation de cette \'equation d\'epend du champ $\rho^n$ et doit par cons\'equent \^etre
 assembl\'ee \`a chaque pas de temps. C'est la raison pour laquelle les m\'ethodes li\'ees aux assembleurs ont dues \^etre modifi\'ees.
+\bigskip
 
 
+\section{Modification of the \texttt{Phase\_field} baltik: generalization of the closure laws for the Navier-Stokes/Cahn-Hilliard binary model}
+\medskip
+Since version v1.8.3, the baltik Phase Field has had changes
+in order  to generalize the thermodynamic landscape, the density law and
+so on of this binary Cahn-Hilliard model coupled with the Navier-Stokes
+equations (isothermal).
+\medskip
+\subsection{Chemical potential function $\frac{dW}{dc}$} 
 
+The chemical potential function $\frac{dW}{dc}$ is associated with the homogeneous contribution $W$ (so-called ``thermodynamic landscape'') function of $c=\varphi - \frac{1}{2}$ to the energy density $E$.
+ 
+\begin{description}
+ \item[TrioCFD v1.8.2:] the potential has the following prescribed form 
+ \begin{equation}
+  \frac{dW}{dc} = \beta \left( 4 c \left(c-\frac{1}{2}\right) \left(c+\frac{1}{2}\right)\right)
+ \end{equation} 
+
+ \item[Modification since 1.8.3:] the potential is written as:
+ \begin{equation}
+ \frac{dW}{dc} = \beta \times \left\{\begin{disarray}{lrcl} 
+                                 4 c \left(c-\frac{1}{2}\right) \left(c+\frac{1}{2}\right) & \text{if } \texttt{Op}_W & = & \texttt{defaut} \\
+                                 \texttt{f}_W & \text{if } \texttt{Op}_W & = & \texttt{fonction}~\texttt{f}_W \\
+                             \end{disarray}\right.
+ \end{equation}
+where \texttt{f}$_W$ is a univariate function (as read by the \texttt{lire\_f} of the \texttt{Table} class of TRUST) whose variable $c$ should be referred as \texttt{var} e.g. \texttt{(4.*val*(val+0.5)*(val-0.5))}.
+\medskip
+ \item[Syntax evolution:]
+~\newline
+\end{description}
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      beta $\beta$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile} &
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      beta $\beta$
+      potentiel_chimique Op$_W$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}
+
+\subsection{Kinetic parameter (so-called ``mobility'') $\kappa$} 
+The kinetic parameter (so-called ``mobility'') $\kappa$ that is either a constant or a function of $c$ in the Cahn-Hilliard equation.
+
+
+\begin{description}
+ \item[TrioCFD v1.8.2:] the mobility is written as:
+ \begin{equation}
+  \kappa = \kappa_0 \times \left\{\begin{disarray}{lrcl} 
+                                 1 & \text{if } \texttt{Op}_K & = & \texttt{non} \\
+                                 a \left(\frac{1}{2}+c\right) \left(\frac{1}{2}-c\right) & \text{if } \texttt{Op}_K & = & \texttt{oui} 
+                             \end{disarray}\right.
+ \end{equation}
+
+ \item[Modification since v1.8.3:] the mobility is written as:
+ \begin{equation}
+ \kappa = \kappa_0 \times \left\{\begin{disarray}{lrcl} 
+                                 1 & \text{if } \texttt{Op}_K & = & \texttt{non} \\
+                                 a \left(\frac{1}{2}+c\right) \left(\frac{1}{2}-c\right) & \text{if } \texttt{Op}_K & = & \texttt{defaut} \\
+                                 a \texttt{f}_K & \text{if } \texttt{Op}_K & = & \texttt{fonction}~\texttt{f}_K
+                             \end{disarray}\right.
+ \end{equation}
+where \texttt{f}$_K$ is a univariate function (as read by the \texttt{lire\_f} of the \texttt{Table} class of TRUST) whose variable $c$ should be referred as \texttt{var}.
+\medskip
+ \item[Syntax evolution:]
+~\newline
+\end{description}
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      kappa $\kappa_0$
+      kappa_variable Op$_K$
+      multiplicateur_de_kappa $a$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile}&
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      kappa $\kappa_0$
+      kappa_variable Op$_K$
+      multiplicateur_de_kappa $a$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ù
+\subsection{Mass density $\rho$} 
+The mass density $\rho$ is described as a function of $c$.
+
+\begin{description}
+ \item[TrioCFD v1.8.2:] the mass density has the following prescribed form:
+ \begin{equation}
+  \displaystyle \rho = \frac{\rho_1+\rho_2}{2}+c\frac{\rho_2-\rho_1}{2}
+ \end{equation}
+
+ \item[Modification since v1.8.3:] different mass density formulation are available depending if the Boussinesq approximation (input parameter \texttt{Op$_{\text{Boussinesq}}$}) is made (\texttt{Op$_{\text{Boussinesq}}$ = oui}) or not (\texttt{Op$_{\text{Boussinesq}}$ = non})
+ 
+ \begin{itemize}
+ 
+ \item if \texttt{Op$_{\text{Boussinesq}}$ = oui}, it can be written in terms of the fluid properties as:
+  \begin{equation}
+   \rho = \rho_0 \left( 1 + \beta_c c\right)
+  \end{equation}
+
+  \item otherwise, for both \texttt{Op$_{\text{Boussinesq}}$ = oui}  and \texttt{Op$_{\text{Boussinesq}}$ = non}, it can take the following prescribed form:
+  \begin{equation}
+   \rho = \frac{\rho_1+\rho_2}{2}+c\frac{\rho_2-\rho_1}{2}
+  \end{equation}
+
+ \item or be of the general form:
+  \begin{equation}
+  \rho = \texttt{F}_\rho
+  \end{equation}
+  where \texttt{F}$_\rho$ is a TRUST input field giving $\frac{d\rho}{dc}$.
+ \end{itemize}
+
+ \item[Syntax evolution:]
+\end{description}
+~\newline
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = oui}}\\
+\hline
+Not available &
+\begin{inputfile}
+Lire fluide
+{
+  ...
+  rho Champ_Uniforme 1 $\rho_0$
+  beta_co Champ_Uniforme 1 $\beta_c$
+  ...
+}
+...
+Navier_Stokes_phase_field {
+  ... 
+  approximation_de_boussinesq oui 
+  ...
+}
+\end{inputfile}\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = oui}  and \texttt{Op$_{\text{Boussinesq}}$ = non}}\\
+\hline
+ \begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  rho_1 $\rho_1$
+  rho_2 $\rho_2$
+  ...
+} \end{inputfile} &
+ \begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  rho_1 $\rho_1$
+  rho_2 $\rho_2$
+  ...
+} \end{inputfile} \\
+\hline
+\multicolumn{2}{|Sc|}{- if $\rho$ has a general form}\\
+\hline
+Not available & 
+\begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  approximation_de_boussinesq Op$_{\text{Boussinesq}}$ {
+    rho_fonc_c F$_\rho$ F$_{\rho'}$
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}
+
+\subsection{Dynamic viscosity $\mu$ function of $c$} 
+The dynamic viscosity $\mu$ is either constant or described as a function of $c$. The dynamic viscosity (and actually the kinematic viscosity $\nu$) is treated differently depending on the input parameters \texttt{Op$_{\text{Boussinesq}}$} (Boussinesq approximation) and the \texttt{Op$_{\text{constant }\mu}$} (constant dynamic viscosity approximation) that can both be set to \texttt{oui} (activated) or \texttt{non} (deactivated):
+
+ \begin{minipage}[t]{\textwidth}
+ \begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  approximation_de_boussinesq Op$_{\text{Boussinesq}}$ 
+  viscosite_dynamique_constante Op$_{\text{constant }\mu}$
+  ...
+}
+\end{inputfile}
+ \end{minipage}
+\begin{description}
+ \item[TrioCFD v1.8.2:] ~
+ \begin{itemize}
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = oui} or  \texttt{Op$_{\text{constant }\mu}$ = oui}, the dynamic viscosity is constant and given by:
+  \begin{equation}
+   \mu = \mu_0
+  \end{equation}
+
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = non} and \texttt{Op$_{\text{constant }\mu}$ = non}, the dynamic viscosity has the following prescribed form:
+ \begin{equation}
+  \mu = \frac{\mu_1+\mu_2}{2}+c\frac{\mu_2-\mu_1}{2}
+ \end{equation}
+ \end{itemize}
+
+ \item[Modification since v1.8.3:] ~
+ \begin{itemize}
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = oui} or  \texttt{Op$_{\text{constant }\mu}$ = oui}, the dynamic viscosity is constant and given by:
+  \begin{equation}
+   \mu = \mu_0
+  \end{equation}
+
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = non} and \texttt{Op$_{\text{constant }\mu}$ = non}, the dynamic viscosity can take the following prescribed form:
+ \begin{equation}
+  \mu = \frac{\mu_1+\mu_2}{2}+c\frac{\mu_2-\mu_1}{2}
+ \end{equation}
+
+ \item or be of the general form:
+ \begin{equation}
+  \mu = \texttt{F}_\mu
+ \end{equation}
+where \texttt{F}$_\mu$ is a TRUST input field associated1. \\ 
+ \end{itemize}
+
+\item[Syntax evolution:] ~
+\end{description} 
+~\newline
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = oui} or \texttt{Op$_{\text{constant }\mu}$ = oui}}\\
+\hline
+\begin{inputfile}
+Lire fluide
+{
+  ...
+  mu Champ_Uniforme 1 $\mu_0$
+  ...
+}
+\end{inputfile} &
+\begin{inputfile}
+Lire fluide
+{
+  ...
+  mu Champ_Uniforme 1 $\mu_0$
+  ...
+}
+\end{inputfile}\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = non} and \texttt{Op$_{\text{constant }\mu}$ = non}}\\
+\hline
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  mu_1 $\mu_1$
+  mu_2 $\mu_2$
+  ...
+}
+\end{inputfile} &
+\begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  viscosite_dynamique_constante non {
+    mu_1 $\mu_1$
+    mu_2 $\mu_2$
+  }
+  ...
+}\end{inputfile}\\
+\hline
+\multicolumn{2}{|Sc|}{- if $\mu$ has a general form}\\
+\hline
+Not available &
+\begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  viscosite_dynamique_constante non {
+    rho_fonc_c F$_\mu$
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}

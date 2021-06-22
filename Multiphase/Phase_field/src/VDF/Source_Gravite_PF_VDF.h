@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Gravite_PF_VDF.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src/VDF
 // Version:     /main/10
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -27,6 +27,7 @@
 #include <Source_base.h>
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Probleme_base.h>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -59,11 +60,12 @@ protected :
   void associer_zones(const Zone_dis& zone,const Zone_Cl_dis& );
   REF(Zone_VDF) la_zone;
   REF(Zone_Cl_VDF) la_zone_Cl;
+  REF(Probleme_base) le_probleme;
 };
 
-inline void Source_Gravite_PF_VDF::associer_pb(const Probleme_base& )
+inline void Source_Gravite_PF_VDF::associer_pb(const Probleme_base& pb )
 {
-  //Ne fait rien; surcharge la methode declaree en virtuelle pure dans Source_base
+  le_probleme=pb;
 }
 
 #endif
