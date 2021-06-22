@@ -94,7 +94,7 @@ Lire pb
 		approximation_de_boussinesq		   oui {
 		#	rho_1 550 
 			rho_2 1450 #
-			rho_fonc_c Champ_Fonc_Fonction 1 concentration 1000.0+val*1000.0 
+			rho_fonc_c Champ_Fonc_Fonction concentration 1 1000.0+val*1000.0 
 			           Champ_Uniforme 1 1000.0
 		}
 		diffusion { }

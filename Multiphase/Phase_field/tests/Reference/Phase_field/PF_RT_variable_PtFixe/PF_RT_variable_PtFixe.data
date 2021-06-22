@@ -64,7 +64,7 @@ Lire fluide
 {
 	mu Champ_Uniforme 1 1.e-1
 	rho Champ_Uniforme 1 1000.
-	beta_co Champ_Fonc_Fonction 1 concentration 0.9
+	beta_co Champ_Fonc_Fonction concentration 1 0.9
 #	beta_co Champ_Uniforme 1 1. #
 }
 
@@ -97,13 +97,13 @@ Lire pb
 		approximation_de_boussinesq		   non {
 		#	rho_1 550 
 			rho_2 1450 #
-			rho_fonc_c Champ_Fonc_Fonction 1 concentration 1000.0+val*900.0 
+			rho_fonc_c Champ_Fonc_Fonction concentration 1 1000.0+val*900.0 
 			           Champ_Uniforme 1 900.0
 		}
 		viscosite_dynamique_constante		   non {
 		#	mu_1				   1.e-2
 			mu_2				   1.e-1 #
-			mu_fonc_c Champ_Fonc_Fonction 1 concentration 0.5*(1.e-2+1.e-1)+val*(1.e-1-1.e-2)
+			mu_fonc_c Champ_Fonc_Fonction concentration 1 0.5*(1.e-2+1.e-1)+val*(1.e-1-1.e-2)
 		}
 		diffusion { }
                 sources {
