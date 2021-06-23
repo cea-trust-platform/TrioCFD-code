@@ -252,7 +252,7 @@ Convection_diffusion_Phase_field {
     Source_Con_Phase_field {
       ...
       beta $\beta$
-      potentiel_chimique Op$_W$
+      potentiel_chimique { Op$_W$ }
       ...
     }
   }
@@ -314,7 +314,7 @@ Convection_diffusion_Phase_field {
     Source_Con_Phase_field {
       ...
       kappa $\kappa_0$
-      kappa_variable Op$_K$
+      kappa_variable { Op$_K$ }
       multiplicateur_de_kappa $a$
       ...
     }
@@ -325,7 +325,6 @@ Convection_diffusion_Phase_field {
 \hline
 \end{tabular}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ù
 \subsection{Mass density $\rho$} 
 The mass density $\rho$ is described as a function of $c$.
 
@@ -377,12 +376,12 @@ Lire fluide
 ...
 Navier_Stokes_phase_field {
   ... 
-  approximation_de_boussinesq oui 
+  approximation_de_boussinesq oui { }
   ...
 }
 \end{inputfile}\\
 \hline
-\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = oui}  and \texttt{Op$_{\text{Boussinesq}}$ = non}}\\
+\multicolumn{2}{|Sc|}{- whatever the value of \texttt{Op$_{\text{Boussinesq}}$}}\\
 \hline
  \begin{inputfile}
 Convection_diffusion_Phase_field {

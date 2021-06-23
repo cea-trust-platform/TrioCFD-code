@@ -94,7 +94,7 @@ Lire pb
 				seuil 1.e-15
 		}
 		convection { quick }
-		approximation_de_boussinesq		   oui
+		approximation_de_boussinesq		   oui { }
 		diffusion { }
                 sources {
  			Source_Qdm_Phase_field {
@@ -119,10 +119,10 @@ Lire pb
 			Source_Con_Phase_field {
 				Temps_d_affichage	   0
 				alpha                      .1406250000e-3
-				potentiel_chimique 	   defaut
+				potentiel_chimique 	   { defaut }
 				beta                       115.2000000
 				kappa                      20.e-7
-				kappa_variable             defaut
+				kappa_variable             { defaut }
 				moyenne_de_kappa           harmonique
 				multiplicateur_de_kappa    6.
 				couplage_NS_CH             mutilde(n+1/2)
@@ -221,6 +221,6 @@ Fin
 	masse volumique de la phase 2
 - potentiel_chimique_generalise
 	sans_energie_cinetique -> potentiel chimique generalise classique
-	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u²/2 drho/dphi
+	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u^2/2 drho/dphi
 
 #
