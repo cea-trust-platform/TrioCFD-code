@@ -36,24 +36,24 @@ Parameters {
 
 Chapter {
 	Title "Test description"
-        Figure {
-                width 0cm
-                picture ./nothing.png
-		Title "Physical model"
-		Description "Parallelepiped:"
-		Description " - Lx = 5m, Ly = 5m, Lz = 3m"
-		Description "Type of fluid:"
-		Description " - $\rho$ = 2 kg/m$^3$"
-		Description " - $\mu$ = 0.01 Pa.s"
-		Description "Boundary conditions:"
-		Description " - Paroi: fixed-wall"
-		Description " - Surface: symmetry"
-		Description " - Sortie: fixed-pressure = 0"
-		Description "Initial conditions:"
-		Description " - Circle-shaped vortex, centre (0;0), radius R = 1.9m" 
-		Description " - Ur = 0 ; Ut = exp(-r$²$/R$²$)"
-		Description "Velocity on the surface:"
-	}
+	Description " \latex_(\subsection{Physical model:}\latex_)
+	Description "Parallelepiped:"
+	Description " - Lx = 5m, Ly = 5m, Lz = 3m"
+	Description " \latex_(\smallskip\latex_)
+	Description "Type of fluid:"
+	Description " - $\rho$ = 2 kg/m$^3$"
+	Description " - $\mu$ = 0.01 Pa.s"
+	Description " \latex_(\smallskip\latex_)
+	Description "Boundary conditions:"
+	Description " - Paroi: fixed-wall"
+	Description " - Surface: symmetry"
+	Description " - Sortie: fixed-pressure = 0"
+	Description " \latex_(\smallskip\latex_)
+	Description "Initial conditions:"
+	Description " - Circle-shaped vortex, centre (0;0), radius R = 1.9m" 
+	Description " - Ur = 0 ; Ut = exp(-r$^2$/R$^2$)"
+	Description " \latex_(\smallskip\latex_)
+	Description "Velocity on the surface:"
 	visu {
 		vector ./medium/surfacique_medium.lata surface_libre VITESSE_ ELEM 
 	}
