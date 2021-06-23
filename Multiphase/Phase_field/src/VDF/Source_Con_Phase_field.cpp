@@ -52,302 +52,282 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
 {
   Cerr<<"Source_Con_Phase_field::readOn"<<finl;
 
-  Motcle motlu;
+  Motcles les_mots(18);
+  les_mots[0]="Temps_d_affichage";
+  les_mots[1]="alpha";
+  les_mots[2]="potentiel_chimique";
+  les_mots[3]="beta";
+  les_mots[4]="kappa";
+  les_mots[5]="kappa_variable";
+  les_mots[6]="moyenne_de_kappa";
+  les_mots[7]="multiplicateur_de_kappa";
+  les_mots[8]="couplage_NS_CH";
+  les_mots[9]="implicitation_CH";
+  les_mots[10]="gmres_non_lineaire";
+  les_mots[11]="seuil_cv_iterations_ptfixe";
+  les_mots[12]="seuil_residu_ptfixe";
+  les_mots[13]="seuil_residu_gmresnl";
+  les_mots[14]="dimension_espace_de_krylov";
+  les_mots[15]="nb_iterations_gmresnl";
+  les_mots[16]="residu_min_gmresnl";
+  les_mots[17]="residu_max_gmresnl";
 
+
+  Motcle motlu;
   is >> motlu;
-  Cerr << motlu << finl;
   if (motlu!="{")
     {
-      Cerr<<"On attendait { dans Source_Con_Phase_field::readOn"<<finl;
+      Cerr<<"Source_Con_Phase_field::readOn: We are expecting { at the bigening of Source_Con_Phase_field block instead of " << motlu <<finl;
       exit();
     }
-
+  int cpt = 0;
   is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="Temps_d_affichage")
+  while (motlu!="}")
     {
-      Cerr<<"On attendait Temps_d_affichage dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> tpsaff;
-  if(tpsaff<0. || tpsaff >100.)
-    {
-      Cerr << "Le temps d'affichage doit etre compris entre 0 et 100 secondes." << finl;
-      exit();
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="alpha")
-    {
-      Cerr<<"On attendait alpha dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> alpha;
-
-  is>>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="potentiel_chimique")
-    {
-      Cerr<<"On attendait potentiel_chimique dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_potentiel_chimique_;
-      is >> temp_potentiel_chimique_;
-      if (temp_potentiel_chimique_=="defaut")
+      int rang=les_mots.search(motlu);
+      switch(rang)
         {
-          dWdc=&Source_Con_Phase_field::dWdc_defaut;
+        case 0:
+          {
+            cpt++;
+            is >> tpsaff;
+            if(tpsaff<0. || tpsaff >100.)
+              {
+                Cerr << "Source_Con_Phase_field::readOn: Temps_d_affichage should be in the range 0 - 100 seconds." << finl;
+                exit();
+              }
+            break;
+          }
+        case 1:
+          {
+            cpt++;
+            is >> alpha;
+            break;
+          }
+        case 2:
+          {
+            cpt++;
+            is >> motlu;
+            if (motlu!="{")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after potentiel_chimique instead of "<< motlu <<finl;
+                exit();
+              }
+            Motcle temp_potentiel_chimique_;
+            is >> temp_potentiel_chimique_;
+            if (temp_potentiel_chimique_=="defaut")
+              {
+                dWdc=&Source_Con_Phase_field::dWdc_defaut;
+              }
+            else if (temp_potentiel_chimique_=="fonction")
+              {
+                potentiel_chimique_expr_.lire_f(is,1);
+                dWdc=&Source_Con_Phase_field::dWdc_general;
+              }
+            else
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: "<<temp_potentiel_chimique_<<" is not a valid keyword in potentiel_chimique block"<<finl;
+                exit();
+              }
+            is >> motlu;
+            if (motlu!="}")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are exprcting } at the end of potentiel_chimique block instead of "<< motlu <<finl;
+                exit();
+              }
+            break;
+          }
+        case 3:
+          {
+            cpt++;
+            is >> beta;
+            break;
+          }
+        case 4:
+          {
+            cpt++;
+            is >> kappa;
+            break;
+          }
+        case 5:
+          {
+            cpt++;
+            is >> motlu;
+            if (motlu!="{")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are expecting { at the end of kappa_variable block instead of " << motlu <<finl;
+                exit();
+              }
+            Motcle temp_type_kappa_;
+            is >> temp_type_kappa_;
+            if(temp_type_kappa_=="non")
+              {
+                type_kappa_=0;
+              }
+            else
+              {
+                type_kappa_=1;
+                if (temp_type_kappa_=="defaut")
+                  {
+                    kappa_func_c=&Source_Con_Phase_field::kappa_func_c_defaut;
+                  }
+                else if (temp_type_kappa_=="fonction")
+                  {
+                    kappa_forme_expr_.lire_f(is,1);
+                    kappa_func_c=&Source_Con_Phase_field::kappa_func_c_general;
+                  }
+                else
+                  {
+                    Cerr<<"Source_Con_Phase_field::readOn: "<<temp_type_kappa_<<" is not a valid keyword in kappa_variable block"<<finl;
+                    Cerr<<"You can specify only non, defaut or fonction expression for kappa_variable"<<finl;
+                    exit();
+                  }
+              }
+            is >> motlu;
+            if (motlu!="}")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are expecting } at the end of kappa_variable block instead of " << motlu <<finl;
+                exit();
+              }
+            break;
+          }
+        case 6:
+          {
+            cpt++;
+
+            Motcle temp_kappa_moy_;
+            is >> temp_kappa_moy_;
+            if(temp_kappa_moy_=="arithmetique")
+              {
+                kappa_moy_=0;
+              }
+            else if(temp_kappa_moy_=="harmonique")
+              {
+                kappa_moy_=1;
+              }
+            else
+              {
+                kappa_moy_=2;
+              }
+            break;
+          }
+        case 7:
+          {
+            cpt++;
+            is >> mult_kappa;
+            break;
+          }
+        case 8:
+          {
+            cpt++;
+            Motcle temp_couplage_;
+            is >> temp_couplage_;
+            if(temp_couplage_=="mutilde(n)")
+              {
+                couplage_=0;
+              }
+            else
+              {
+                couplage_=1;
+              }
+            break;
+          }
+        case 9:
+          {
+            cpt++;
+            Motcle temp_implicitation_;
+            is >> temp_implicitation_;
+            if(temp_implicitation_=="oui")
+              {
+                implicitation_=1;
+              }
+            else
+              {
+                implicitation_=0;
+              }
+            break;
+          }
+        case 10:
+          {
+            cpt++;
+
+            Motcle temp_gmres_;
+            is >> temp_gmres_;
+            if(temp_gmres_=="oui")
+              {
+                gmres_=1;
+              }
+            else
+              {
+                gmres_=0;
+              }
+            break;
+          }
+        case 11:
+          {
+            cpt++;
+
+            is >> epsilon_;
+            break;
+          }
+        case 12:
+          {
+            cpt++;
+            is >> eps_;
+            break;
+          }
+        case 13:
+          {
+            cpt++;
+            is >> epsGMRES;
+            break;
+          }
+        case 14:
+          {
+            cpt++;
+            is >> nkr;
+            break;
+          }
+        case 15:
+          {
+            cpt++;
+            is >> nit;
+            break;
+          }
+
+        case 16:
+          {
+            cpt++;
+            is >> rec_min;
+            break;
+          }
+        case 17:
+          {
+            cpt++;
+            is >> rec_max;
+            break;
+          }
+        default :
+          {
+            Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field" << finl;
+            Cerr << motlu << " is not understood."<< finl;
+            Cerr << "We are expecting a keyword among " << les_mots << finl;
+            exit();
+          }
         }
-      else if (temp_potentiel_chimique_=="fonction")
-        {
-          potentiel_chimique_expr_.lire_f(is,1);
-          dWdc=&Source_Con_Phase_field::dWdc_general;
-        }
-      else
-        {
-          Cerr<<temp_potentiel_chimique_<<" n'est pas un mot-cle apres potentiel_chimique dans Source_Con_Phase_field::readOn"<<finl;
-          exit();
-        }
+      is>>motlu;
     }
-
-  is>>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="beta")
+  if(cpt != 18)
     {
-      Cerr<<"On attendait beta dans Source_Con_Phase_field::readOn"<<finl;
+      Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+      Cerr << "You should specify all these parameters: " << les_mots << finl;
       exit();
     }
-  else
-    is >> beta;
 
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="kappa")
-    {
-      Cerr<<"On attendait kappa dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> kappa;
-
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="kappa_variable")
-    {
-      Cerr<<"On attendait kappa_variable dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_type_kappa_;
-      is >> temp_type_kappa_;
-      if(temp_type_kappa_=="non")
-        {
-          type_kappa_=0;
-        }
-      else
-        {
-          type_kappa_=1;
-          if (temp_type_kappa_=="defaut")
-            {
-              kappa_func_c=&Source_Con_Phase_field::kappa_func_c_defaut;
-            }
-          else if (temp_type_kappa_=="fonction")
-            {
-              kappa_forme_expr_.lire_f(is,1);
-              kappa_func_c=&Source_Con_Phase_field::kappa_func_c_general;
-            }
-          else
-            {
-              Cerr<<temp_type_kappa_<<" n'est pas un mot-cle apres kappa_variable dans Source_Con_Phase_field::readOn"<<finl;
-              exit();
-            }
-        }
-    }
-
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="moyenne_de_kappa")
-    {
-      Cerr<<"On attendait moyenne_de_kappa dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_kappa_moy_;
-      is >> temp_kappa_moy_;
-      if(temp_kappa_moy_=="arithmetique")
-        {
-          kappa_moy_=0;
-        }
-      else if(temp_kappa_moy_=="harmonique")
-        {
-          kappa_moy_=1;
-        }
-      else
-        {
-          kappa_moy_=2;
-        }
-    }
-
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="multiplicateur_de_kappa")
-    {
-      Cerr<<"On attendait multiplicateur_de_kappa dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> mult_kappa;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="couplage_NS_CH")
-    {
-      Cerr<<"On attendait couplage_NS_CH dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_couplage_;
-      is >> temp_couplage_;
-      if(temp_couplage_=="mutilde(n)")
-        {
-          couplage_=0;
-        }
-      else
-        {
-          couplage_=1;
-        }
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="implicitation_CH")
-    {
-      Cerr<<"On attendait implicitation_CH dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_implicitation_;
-      is >> temp_implicitation_;
-      if(temp_implicitation_=="oui")
-        {
-          implicitation_=1;
-        }
-      else
-        {
-          implicitation_=0;
-        }
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="gmres_non_lineaire")
-    {
-      Cerr<<"On attendait gmres_non_lineaire dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_gmres_;
-      is >> temp_gmres_;
-      if(temp_gmres_=="oui")
-        {
-          gmres_=1;
-        }
-      else
-        {
-          gmres_=0;
-        }
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="seuil_cv_iterations_ptfixe")
-    {
-      Cerr<<"On attendait seuil_cv_iterations_ptfixe dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> epsilon_;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="seuil_residu_ptfixe")
-    {
-      Cerr<<"On attendait seuil_residu_ptfixe dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> eps_;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="seuil_residu_gmresnl")
-    {
-      Cerr<<"On attendait seuil_residu_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> epsGMRES;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="dimension_espace_de_krylov")
-    {
-      Cerr<<"On attendait dimension_espace_de_krylov dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> nkr;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="nb_iterations_gmresnl")
-    {
-      Cerr<<"On attendait nb_iterations_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> nit;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="residu_min_gmresnl")
-    {
-      Cerr<<"On attendait residu_min_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> rec_min;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="residu_max_gmresnl")
-    {
-      Cerr<<"On attendait residu_max_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> rec_max;
-
-  is>>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="}")
-    {
-      Cerr<<"On attendait }  dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
 
   if(kappa>0)
     {
-      Cerr <<" pas de temps theorique = ?     dx4*"<< 1./alpha/kappa/2.<<" dx2*"<<1./2./kappa/beta<<finl;
+      Cerr <<" theoretical time step = ?     dx4*"<< 1./alpha/kappa/2.<<" dx2*"<<1./2./kappa/beta<<finl;
     }
   return is ;
 

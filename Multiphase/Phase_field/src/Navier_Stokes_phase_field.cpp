@@ -143,7 +143,7 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           if (!betac_.valeur().non_nul())
             {
               fonctionsALire = true;
-              Cerr << "Approximation de Boussinesq utilisee mais betac non defini comme propriete du fluide"<< finl;
+              Cerr << "Approximation de Boussinesq utilisee mais beta_co non defini comme propriete du fluide"<< finl;
               Cerr << "On s'attend donc a lire les fonctions rho(c) et drho/dc"<< finl;
             }
         }
@@ -152,11 +152,16 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           boussi_=0;
           fonctionsALire = true;
         }
+      is >> motlu ;
+      if (motlu != "{")
+        {
+          Cerr << "Error while reading approximation_de_boussinesq" << finl;
+          Cerr << "We expected a { instead of " << motlu << finl;
+          exit();
+        }
+      is >> motlu ;
       if (fonctionsALire)
         {
-          is >> motlu ;
-          assert(motlu=="{");
-          is >> motlu ;
           if (motlu=="rho_fonc_c")
             {
               Cerr << motlu << finl;
@@ -187,7 +192,12 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
               Cerr << "@@@ " << chaine2 << finl;
               echaine2 >> drhodc_;
             }
-          assert(motlu=="}");
+        }
+      if (motlu != "}")
+        {
+          Cerr << "Error while reading approximation_de_boussinesq" << finl;
+          Cerr << "We expected a } instead of " << motlu << finl;
+          exit();
         }
       return 1;
     }

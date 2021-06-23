@@ -94,7 +94,7 @@ Lire pb
 				seuil 1.e-15
 		}
 		convection { quick }
-		approximation_de_boussinesq		   oui
+		approximation_de_boussinesq		   oui { }
 		diffusion { }
                 sources {
  			Source_Qdm_Phase_field {
@@ -119,10 +119,10 @@ Lire pb
 			Source_Con_Phase_field {
 				Temps_d_affichage	   0
 				alpha                      .1406250000e-3
-				potentiel_chimique         fonction (4.*val*(val+0.5)*(val-0.5))
+				potentiel_chimique         { fonction (4.*val*(val+0.5)*(val-0.5)) }
 				beta                       115.2000000
 				kappa                      20.e-7
-				kappa_variable             fonction (val+0.5)*(0.5-val)
+				kappa_variable             { fonction (val+0.5)*(0.5-val) }
 				moyenne_de_kappa           harmonique
 				multiplicateur_de_kappa    6.
 				couplage_NS_CH             mutilde(n+1/2)
