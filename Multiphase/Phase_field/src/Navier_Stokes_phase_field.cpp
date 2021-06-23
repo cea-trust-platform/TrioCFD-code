@@ -38,7 +38,7 @@
 #include <Operateur_Diff_base.h>
 
 extern Stat_Counter_Id temps_total_execution_counter_;
-Implemente_instanciable_sans_constructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
+Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
 
 Navier_Stokes_phase_field::Navier_Stokes_phase_field()
 {
@@ -53,6 +53,9 @@ Navier_Stokes_phase_field::Navier_Stokes_phase_field()
     nom[1]="viscosite_dynamique";
   */
 }
+
+Navier_Stokes_phase_field::~Navier_Stokes_phase_field() {}
+
 // Description:
 //    Simple appel a: Navier_Stokes_std::printOn(Sortie&)
 //    Ecrit l'equation sur un flot de sortie.
@@ -328,9 +331,6 @@ void Navier_Stokes_phase_field::discretiser()
   int dim=rho0Tab.nb_dim();
   switch(dim)
     {
-    case 1:
-      rho0_=rho0Tab(0);
-      break;
     case 2:
       rho0_=rho0Tab(0,0);
       break;
@@ -941,12 +941,12 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       if(diff_boussi_==1)
         {
           // on multiplie par rho :
-          if (diff.nb_dim()==1)
+          if (diff.line_size()==1)
             {
               for (face=0 ; face<nbfaces ; face++)
                 {
-                  diff[face] *= rho_face[face];
-                  diff[face] /= rho0_;
+                  diff(face,0) *= rho_face[face];
+                  diff(face,0) /= rho0_;
                 }
             }
           else
@@ -979,11 +979,11 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       terme_convectif.ajouter(la_vitesse.valeurs(), conv);
 
       // on multiplie par rho :
-      if (conv.nb_dim()==1)
+      if (conv.line_size()==1)
         {
           for (face=0 ; face<nbfaces ; face++)
             {
-              conv[face] *= rho_face[face];
+              conv(face,0) *= rho_face[face];
             }
         }
       else
@@ -1008,11 +1008,11 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       // #endif
 
       // on divise vpoint par rho :
-      if (vpoint.nb_dim()==1)
+      if (vpoint.line_size()==1)
         {
           for (face=0 ; face<nbfaces ; face++)
             {
-              vpoint[face] /= rho_face[face];
+              vpoint(face,0) /= rho_face[face];
             }
         }
       else
@@ -1159,11 +1159,11 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       // #endif
 
       // Pression a diviser par rho :
-      if (gradP.nb_dim()==1)
+      if (gradP.line_size()==1)
         {
           for (face=0 ; face<nbfaces ; face++)
             {
-              gradP[face] /= rho_face[face];
+              gradP(face,0) /= rho_face[face];
             }
         }
       else
