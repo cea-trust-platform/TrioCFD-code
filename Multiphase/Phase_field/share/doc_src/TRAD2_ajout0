@@ -3,14 +3,14 @@ schema_phase_field schema_temps_base schema_phase_field -1 Keyword for the only 
   attr schema_ns schema_temps_base schema_ns 1 Time scheme for the Navier-Stokes equation.
 source_qdm_phase_field source_base source_qdm_phase_field 1 Keyword to define the capillary force into the Navier Stokes equation for the Phase Field problem.
   attr forme_du_terme_source entier forme_du_terme_source 0 Kind of the source term (1, 2, 3 or 4).
-approx_boussinesq objet_lecture nul 0 ttoto
+approx_boussinesq objet_lecture nul 0 different mass density formulation are available depending if the Boussinesq approximation is made or not
  attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the Boussinesq approximation.
- attr bloc_bouss bloc_boussinesq bloc_bouss 0 toto
-bloc_boussinesq objet_lecture nul 1 toto
+ attr bloc_bouss bloc_boussinesq bloc_bouss 0 to choose the rho formulation
+bloc_boussinesq objet_lecture nul 1 choice of rho formulation
   attr rho_1 floattant rho_1 1 value of rho
   attr rho_2 floattant rho_2 1 value of rho 
-  attr rho_fonc_c bloc_rho_fonc_c rho_fonc_c_ 1 toto
-bloc_rho_fonc_c objet_lecture nul 0 toto
+  attr rho_fonc_c bloc_rho_fonc_c rho_fonc_c_ 1 to use for define a general form for rho
+bloc_rho_fonc_c objet_lecture nul 0 if rho has a general form
   attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
   attr concentration chaine(into=["concentration"]) concentration 1 concentration
   attr dim entier dim 1 dimension of the problem
@@ -19,14 +19,14 @@ bloc_rho_fonc_c objet_lecture nul 0 toto
   attr fielddim entier fielddim 1 dimension of the problem
   attr val2 chaine val2 1 function of rho
 
-visco_dyn_cons objet_lecture nul 0 ttoto
+visco_dyn_cons objet_lecture nul 0 different treatment of the kinematic viscosity could be done depending of the use of the Boussinesq approximation or the constant dynamic viscosity approximation
  attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the constant dynamic viscosity
- attr bloc_visco bloc_visco2 bloc_visco 0 toto
-bloc_visco2 objet_lecture nul 1 toto
+ attr bloc_visco bloc_visco2 bloc_visco 0 to choose the mu formulation
+bloc_visco2 objet_lecture nul 1 choice of mu formulation
   attr mu_1 floattant mu_1 1 value of mu
   attr mu_2 floattant mu_2 1 value of mu 
-  attr mu_fonc_c bloc_mu_fonc_c mu_fonc_c_ 1 toto
-bloc_mu_fonc_c objet_lecture nul 0 toto
+  attr mu_fonc_c bloc_mu_fonc_c mu_fonc_c_ 1 to use for define a general form for mu
+bloc_mu_fonc_c objet_lecture nul 0 if mu has a general form
   attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
   attr concentration chaine(into=["concentration"]) concentration 1 concentration
   attr dim entier dim 1 dimension of the problem
@@ -54,10 +54,10 @@ source_con_phase_field source_base source_con_phase_field 1 Keyword to define th
   attr nb_iterations_gmresnl entier nb_iterations_gmresnl 0 Maximal iteration (an option of the Newton-Krylov method).
   attr residu_min_gmresnl floattant residu_min_gmresnl 0 Minimal convergence threshold (an option of the Newton-Krylov method).
   attr residu_max_gmresnl floattant residu_max_gmresnl 0 Maximal convergence threshold (an option of the Newton-Krylov method).
-  attr potentiel_chimique bloc_potentiel_chim potentiel_chimique 1 toto 
-bloc_kappa_variable objet_lecture nul 0 toto
+  attr potentiel_chimique bloc_potentiel_chim potentiel_chimique 1 chemical potential function
+bloc_kappa_variable objet_lecture nul 0 if the parameter of the mobility, kappa, depends on C
   attr expr bloc_lecture expr 0 choice for kappa_variable
-bloc_potentiel_chim objet_lecture nul 0 toto
+bloc_potentiel_chim objet_lecture nul 0 if the chemical potential function is an univariate function
   attr expr bloc_lecture expr 0 choice for potentiel_chimique
 convection_diffusion_phase_field convection_diffusion_concentration convection_diffusion_phase_field -1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
   attr mu_1 floattant mu_1 1 Dynamic viscosity of the first phase.
