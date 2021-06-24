@@ -323,3 +323,74 @@ bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the syn
   attr timeScale floattant timeScale 0 Integral time scale
   attr dir_fluct listf dir_fluct 0 direction of fluctuations
 
+schema_phase_field schema_temps_base schema_phase_field -1 Keyword for the only available Scheme for time discretization of the Phase Field problem.
+  attr schema_ch schema_temps_base schema_ch 1 Time scheme for the Cahn-Hilliard equation.
+  attr schema_ns schema_temps_base schema_ns 1 Time scheme for the Navier-Stokes equation.
+source_qdm_phase_field source_base source_qdm_phase_field 1 Keyword to define the capillary force into the Navier Stokes equation for the Phase Field problem.
+  attr forme_du_terme_source entier forme_du_terme_source 0 Kind of the source term (1, 2, 3 or 4).
+approx_boussinesq objet_lecture nul 0 different mass density formulation are available depending if the Boussinesq approximation is made or not
+ attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the Boussinesq approximation.
+ attr bloc_bouss bloc_boussinesq bloc_bouss 0 to choose the rho formulation
+bloc_boussinesq objet_lecture nul 1 choice of rho formulation
+  attr rho_1 floattant rho_1 1 value of rho
+  attr rho_2 floattant rho_2 1 value of rho 
+  attr rho_fonc_c bloc_rho_fonc_c rho_fonc_c_ 1 to use for define a general form for rho
+bloc_rho_fonc_c objet_lecture nul 0 if rho has a general form
+  attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
+  attr concentration chaine(into=["concentration"]) concentration 1 concentration
+  attr dim entier dim 1 dimension of the problem
+  attr val chaine val 1 function of rho
+  attr Champ_Uniforme chaine(into=["Champ_Uniforme"]) Champ_Uniforme 1 Champ_Uniforme
+  attr fielddim entier fielddim 1 dimension of the problem
+  attr val2 chaine val2 1 function of rho
+
+visco_dyn_cons objet_lecture nul 0 different treatment of the kinematic viscosity could be done depending of the use of the Boussinesq approximation or the constant dynamic viscosity approximation
+ attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the constant dynamic viscosity
+ attr bloc_visco bloc_visco2 bloc_visco 0 to choose the mu formulation
+bloc_visco2 objet_lecture nul 1 choice of mu formulation
+  attr mu_1 floattant mu_1 1 value of mu
+  attr mu_2 floattant mu_2 1 value of mu 
+  attr mu_fonc_c bloc_mu_fonc_c mu_fonc_c_ 1 to use for define a general form for mu
+bloc_mu_fonc_c objet_lecture nul 0 if mu has a general form
+  attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
+  attr concentration chaine(into=["concentration"]) concentration 1 concentration
+  attr dim entier dim 1 dimension of the problem
+  attr val chaine val 1 function of mu
+
+navier_stokes_phase_field navier_stokes_standard navier_stokes_phase_field -1 Navier Stokes equation for the Phase Field problem.
+  attr approximation_de_boussinesq approx_boussinesq approximation_de_boussinesq 0 To use or not the Boussinesq approximation.
+  attr viscosite_dynamique_constante visco_dyn_cons viscosite_dynamique_constante 1 To use or not a viscosity which will depends on concentration C (in fact, C is the unknown of Cahn-Hilliard equation).
+  attr gravite list gravite 0 Keyword to define gravity in the case Boussinesq approximation is not used.
+source_con_phase_field source_base source_con_phase_field 1 Keyword to define the source term of the Cahn-Hilliard equation.
+  attr temps_d_affichage entier temps_d_affichage 0 Time during the caracteristics of the problem are shown before calculation.
+  attr alpha floattant alpha 0 Internal capillary coefficient alfa.
+  attr beta floattant beta 0 Parameter beta of the model.
+  attr kappa floattant kappa 0 Mobility coefficient kappa0.
+  attr kappa_variable bloc_kappa_variable kappa_variable 0 To define a mobility which depends on concentration C.
+  attr moyenne_de_kappa chaine moyenne_de_kappa 0 To define how mobility kappa is calculated on faces of the mesh according to cell-centered values (chaine is arithmetique/harmonique/geometrique).
+  attr multiplicateur_de_kappa floattant multiplicateur_de_kappa 0 To define the parameter of the mobility expression when mobility depends on C.
+  attr couplage_NS_CH chaine couplage_NS_CH 0 Evaluating time choosen for the term source calculation into the Navier Stokes equation (chaine is mutilde(n+1/2)/mutilde(n), in order to be conservative, the first choice seems better).
+  attr implicitation_CH chaine(into=["oui","non"]) implicitation_CH 0 To define if the Cahn-Hilliard will be solved using a implicit algorithm or not.
+  attr gmres_non_lineaire chaine(into=["oui","non"]) gmres_non_lineaire 0 To define the algorithm to solve Cahn-Hilliard equation (oui: Newton-Krylov method, non: fixed point method).
+  attr seuil_cv_iterations_ptfixe floattant seuil_cv_iterations_ptfixe 0 Convergence threshold (an option of the fixed point method).
+  attr seuil_residu_ptfixe floattant seuil_residu_ptfixe 0 Threshold for the matrix inversion used in the method (an option of the fixed point method).
+  attr seuil_residu_gmresnl floattant seuil_residu_gmresnl 0 Convergence threshold (an option of the Newton-Krylov method).
+  attr dimension_espace_de_krylov entier dimension_espace_de_krylov 0 Vector numbers used in the method (an option of the Newton-Krylov method).
+  attr nb_iterations_gmresnl entier nb_iterations_gmresnl 0 Maximal iteration (an option of the Newton-Krylov method).
+  attr residu_min_gmresnl floattant residu_min_gmresnl 0 Minimal convergence threshold (an option of the Newton-Krylov method).
+  attr residu_max_gmresnl floattant residu_max_gmresnl 0 Maximal convergence threshold (an option of the Newton-Krylov method).
+  attr potentiel_chimique bloc_potentiel_chim potentiel_chimique 1 chemical potential function
+bloc_kappa_variable objet_lecture nul 0 if the parameter of the mobility, kappa, depends on C
+  attr expr bloc_lecture expr 0 choice for kappa_variable
+bloc_potentiel_chim objet_lecture nul 0 if the chemical potential function is an univariate function
+  attr expr bloc_lecture expr 0 choice for potentiel_chimique
+convection_diffusion_phase_field convection_diffusion_concentration convection_diffusion_phase_field -1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
+  attr mu_1 floattant mu_1 1 Dynamic viscosity of the first phase.
+  attr mu_2 floattant mu_2 1 Dynamic viscosity of the second phase.
+  attr rho_1 floattant rho_1 1 Density of the first phase.
+  attr rho_2 floattant rho_2 1 Density of the second phase.
+  attr potentiel_chimique_generalise chaine(into=["avec_energie_cinetique","sans_energie_cinetique"]) potentiel_chimique_generalise 0 To define (chaine set to avec_energie_cinetique) or not (chaine set to sans_energie_cinetique) if the Cahn-Hilliard equation contains the cinetic energy term.
+pb_phase_field Pb_base pb_phase_field -1 Problem to solve local instantaneous incompressible-two-phase-flows. Complete description of the Phase Field model for incompressible and immiscible fluids can be found into this PDF: TRUST_ROOT/doc/TRUST/phase_field_non_miscible_manuel.pdf
+  attr navier_stokes_phase_field navier_stokes_phase_field navier_stokes_phase_field 1 Navier Stokes equation for the Phase Field problem.
+  attr convection_diffusion_phase_field convection_diffusion_phase_field convection_diffusion_phase_field 1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
+  ref constituant constituant

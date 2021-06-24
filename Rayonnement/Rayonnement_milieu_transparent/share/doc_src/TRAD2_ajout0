@@ -13,6 +13,49 @@ frontiere_ouverte_rayo_transp frontiere_ouverte frontiere_ouverte_rayo_transp -1
 frontiere_ouverte_rayo_transp_vdf frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vdf -1 doit disparaitre
 frontiere_ouverte_rayo_transp_vef frontiere_ouverte_rayo_transp frontiere_ouverte_rayo_transp_vef -1 doit disparaitre
 
+floatentier objet_lecture nul 0 A real and an integer.
+  attr the_float floattant the_float 0 Real.
+  attr the_int entier the_int 0 Integer.
+sous_maille_selectif_mod mod_turb_hyd_ss_maille sous_maille_selectif_mod -1 Selective structure sub-grid function model (modified).
+  attr thi deuxentiers thi 1 For homogeneous isotropic turbulence (THI), two integers ki and kc are needed in VDF (not in VEF).
+  attr canal floatentier canal 1 h dir_faces_paroi: For a channel flow, the half width h and the orientation of the wall dir_faces_paroi are needed.
+sous_maille_selectif mod_turb_hyd_ss_maille sous_maille_selectif -1 Selective structure sub-grid function model (a filter is applied to the structure function).
+sous_maille_1elt mod_turb_hyd_ss_maille sous_maille_1elt -1 Turbulence model sous_maille_1elt.
+sous_maille_1elt_selectif_mod sous_maille_1elt sous_maille_1elt_selectif_mod -1 Turbulence model sous_maille_1elt_selectif_mod.
+sous_maille_axi mod_turb_hyd_ss_maille sous_maille_axi -1 Structure sub-grid function turbulence model available in cylindrical co-ordinates.
+sous_maille_smago_filtre mod_turb_hyd_ss_maille sous_maille_smago_filtre -1 Smagorinsky sub-grid turbulence model should be used with low-filter.
+sous_maille_smago_dyn mod_turb_hyd_ss_maille sous_maille_smago_dyn -1 Dynamic Smagorinsky sub-grid turbulence model (available in VDF discretization only).
+  attr stabilise chaine(into=["6_points","moy_euler","plans_paralleles"]) stabilise 1 not_set
+  attr nb_points entier nb_points 1 not_set
+sous_maille_dyn modele_turbulence_scal_base sous_maille_dyn -1 Dynamic sub-grid turbulence modele. NL2 Warning : Available in VDF only. Not coded in VEF yet.
+  attr stabilise chaine(into=["6_points","moy_euler","plans_paralleles"]) stabilise 1 not_set
+  attr nb_points entier nb_points 1 not_set
+loi_odvm turbulence_paroi_scalaire_base loi_odvm 1 Thermal wall-function based on the simultaneous 1D resolution of a turbulent thermal boundary-layer and a variance transport equation, adapted to conjugate heat-transfer problems with fluid/solid thermal interaction (where a specific boundary condition should be used : Paroi_Echange_Contact_OVDM_VDF). This law is also available with isothermal walls.
+  attr n entier n 0 Number of points per face in the 1D uniform meshes. n should be choosen in order to have the first point situated near $\Delta$ y+=1/3.
+  attr gamma floattant gamma 0 Smoothing parameter of the signal between 10e-5 (no smoothing) and 10e-1 (high averaging).
+  attr stats floatfloat stats 1 value_t0 value_dt : Only for plane channel flow, it gives mean and root mean square profiles in the fine meshes, since value_t0 and every value_dt seconds. The values are printed into files named ODVM_fields*.dat.
+  attr check_files rien check_files 1 It gives for one boundary face a historical view of local instantaneous and filtered values, as well as the calculated variance profiles from the resolution of the equation. The printed values are into the file Suivi_ndeb.dat.
+loi_WW_scalaire turbulence_paroi_scalaire_base loi_WW_scalaire 0 not_set
+loi_puissance_hydr turbulence_paroi_base loi_puissance_hydr 1 A Loi_puissance_hydr law for wall turbulence for NAVIER STOKES equations.
+loi_odvm turbulence_paroi_scalaire_base loi_odvm 1 Thermal wall-function based on the simultaneous 1D resolution of a turbulent thermal boundary-layer and a variance transport equation, adapted to conjugate heat-transfer problems with fluid/solid thermal interaction (where a specific boundary condition should be used : Paroi_Echange_Contact_OVDM_VDF). This law is also available with isothermal walls.
+  attr n entier n 0 Number of points per face in the 1D uniform meshes. n should be choosen in order to have the first point situated near $\Delta$ y+=1/3.
+  attr gamma floattant gamma 0 Smoothing parameter of the signal between 10e-5 (no smoothing) and 10e-1 (high averaging).
+  attr stats floatfloat stats 1 value_t0 value_dt : Only for plane channel flow, it gives mean and root mean square profiles in the fine meshes, since value_t0 and every value_dt seconds. The values are printed into files named ODVM_fields*.dat.
+  attr check_files rien check_files 1 It gives for one boundary face a historical view of local instantaneous and filtered values, as well as the calculated variance profiles from the resolution of the equation. The printed values are into the file Suivi_ndeb.dat.
+loi_ww_hydr loi_standard_hydr loi_ww_hydr 1 laws have been qualified on channel calculation
+loi_ciofalo_hydr loi_standard_hydr loi_ciofalo_hydr -1 A Loi_ciofalo_hydr law for wall turbulence for NAVIER STOKES equations.
+paroi_echange_contact_odvm_vdf paroi_echange_contact_vdf paroi_echange_contact_odvm_vdf -1 not_set
+champ_front_vortex front_field_base champ_front_vortex 0 not_set
+  attr dom ref_domaine dom 0 Name of domain.
+  attr geom chaine geom 0 not_set
+  attr nu floattant nu 0 not_set
+  attr utau floattant utau 0 not_set
+thi_thermo thi thi_thermo -1 Treatment for the temperature field. NL2 It offers the possibility to : NL2 - evaluate the probability density function on temperature field, NL2 - give in a file the temperature field for a future spectral analysis, NL2 - monitor the evolution of the max and min temperature on the whole domain.
+profils_thermo traitement_particulier_base profils_thermo 0 non documente
+  attr bloc bloc_lecture bloc 0 not_set
+brech traitement_particulier_base brech 0 non documente
+  attr bloc bloc_lecture bloc 0 not_set
+
 pb_hydraulique_turbulent Pb_base pb_hydraulique_turbulent -1 Resolution of Navier-Stokes equations with turbulence modelling.
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 0 Navier-Stokes equations as well as the associated turbulence model equations.
 pb_thermohydraulique_turbulent Pb_base pb_thermohydraulique_turbulent -1 Resolution of thermohydraulic problem, with turbulence modelling.
@@ -169,3 +212,4 @@ bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the syn
   attr p floattant p 0 Wave number factor
   attr timeScale floattant timeScale 0 Integral time scale
   attr dir_fluct listf dir_fluct 0 direction of fluctuations
+
