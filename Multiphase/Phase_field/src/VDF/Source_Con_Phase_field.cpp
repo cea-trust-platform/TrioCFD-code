@@ -578,7 +578,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
 
   Nom tps_sleep="sleep ";
   tps_sleep+=Nom(tpsaff);
-  Cerr << system(tps_sleep) << finl;
+  Cerr << (int) system(tps_sleep) << finl;
 }
 
 void Source_Con_Phase_field::associer_zones(const Zone_dis& zone_dis,
