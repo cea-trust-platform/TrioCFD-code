@@ -5,14 +5,14 @@
 \lettrine[lines=2,slope=0pt,nindent=4pt]{\textbf{I}}{n} this chapter,
 the three-stage methodology to build this report is developed as following:
 1) inventory and sort of the \textsf{TrioCFD} database ; 2) development of a
-new \texttt{PRM} template ; 3) running the \textsf{v1.8.2} of \textsf{TrioCFD} and description of \LaTeX~files.
+new \texttt{PRM} template ; 3) running the \textsf{v1.8.3} of \textsf{TrioCFD} and description of \LaTeX~files.
 In this first section we present a summary of those three stages before
 giving accurate instructions and commands in next sections.
 
 \section{Inventory and sort}
 \lhead{\textit{Inventory and sort}}
 \rhead{\textit{METHODOLOGY}}
-Currently, the \texttt{TrioCFD} database contains about 160 test
+Currently, the \texttt{TrioCFD} database contains 162 test
 cases archived in different folders (see Table \ref{tab:List-of-folders}).
 First, an important inventory work was carried out to sort the test
 cases for targeting quickly the use of \texttt{TrioCFD} in different
@@ -72,14 +72,17 @@ report have been revised and enhanced by taking into account the new
 \texttt{PRM} template.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Running with \textsf{v1.8.2} and \LaTeX~files}
-\lhead{\textit{Running with \textsf{v1.8.2} and \LaTeX~files}}
+\section{Running with \textsf{v1.8.3} and \LaTeX~files}
+\lhead{\textit{Running with \textsf{v1.8.3} and \LaTeX~files}}
 \rhead{\textit{METHODOLOGY}}
-For all test cases, the datafiles were run with the version \texttt{1.8.2}
-of \texttt{TrioCFD} for checking the achievement of computations.
+For all test cases, the datafiles were run with the version \texttt{1.8.3}
+of \texttt{TrioCFD} for checking the achievement of computations. The validation
+database is launched on a new computer (PEGASI2). This is more efficient than
+the previous one (is223288) since the validation database now runs in about 
+3 days against more than 11 days with the previous one. 
 The CPU time required to 1) compile \texttt{TRUST} and \texttt{TrioCFD}
-and 2) run the 160 validation sheets is 11 days and 12 hours on
-the computer of characteristics given in Table \ref{tab:Computer-characteristics}.
+and 2) run the 162 validation sheets.
+The characteristics of the previous and new computer are given in Table \ref{tab:Computer-characteristics}.
 For each validation sheet, the full documentation is automatically
 generated via the \texttt{Run\_fiche} procedure. The validation
 sheets associated with the daily elementary tests that run daily (not discussed
@@ -98,6 +101,10 @@ in Section \ref{chap:Validation-report-generation}.
 PC Linux Intel(R) Xeon(R) CPU E5-2620 0@2.00GHz & LINUX Fedora 26 & \textsf{GCC7.1.1}\tabularnewline
 2 CPU - 6 physical cores per CPU & Kernel \textsf{gcc 7.1.1} & \textsf{MPICH3.2}\tabularnewline
 \hline 
+\rowcolor{lightgray}\multicolumn{3}{Sc}{pegasi2@intra.cea.fr} \tabularnewline \hline
+PC Linux Intel(R) Xeon(R) Gold 5120 CPU @2.20GHz & CentOS 7.9.2009 & \textsf{GCC4.8.5}\tabularnewline
+2 CPU - 14 physical cores per CPU & Kernel \textsf{gcc 4.8.5} & \textsf{MPICH3.2}\tabularnewline
+\hline
 \end{tabular}
 \par\end{centering}
 \caption{\label{tab:Computer-characteristics}Computer characteristics for
@@ -122,7 +129,7 @@ has been revised and improved with this new \texttt{PRM} template.
 For some test cases, the physical content has been enriched with an extended
 analysis and discussion. In subsection \ref{sec:Old-PRM-syntax},
 we remind the structure of an old \texttt{PRM} syntax
-(until version \textsf{v1.8.1}). The new syntax available with version \textsf{v1.8.2}
+(until version \textsf{v1.8.1}). The new syntax available since version \textsf{v1.8.2}
 is then detail in subsection \ref{sec:New-PRM-syntax}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

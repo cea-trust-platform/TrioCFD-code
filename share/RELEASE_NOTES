@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.8.3_beta : Enhancements, modifications and corrected bugs since version 1.8.2 :
+Release notes version 1.8.3 : Enhancements, modifications and corrected bugs since version 1.8.2 :
 --------------------------------------------------------------------------------------------------
 22/06/21 (TrioCFD) New feature : PHASE_FIELD: generalization of the thermodynamic landscape, the density law and so on of this binary Cahn-Hilliard model coupled with the Navier-Stokes equations (isothermal)
 18/06/21 (TrioCFD) Validation  : Add a validation sheets for a new BC which create synthetic fluctuations as inlet boundary
