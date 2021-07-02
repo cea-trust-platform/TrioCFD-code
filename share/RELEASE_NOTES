@@ -1,4 +1,7 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.8.4_beta : Enhancements, modifications and corrected bugs since version 1.8.3 :
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 Release notes version 1.8.3 : Enhancements, modifications and corrected bugs since version 1.8.2 :
 --------------------------------------------------------------------------------------------------
 22/06/21 (TrioCFD) New feature : PHASE_FIELD: generalization of the thermodynamic landscape, the density law and so on of this binary Cahn-Hilliard model coupled with the Navier-Stokes equations (isothermal)
@@ -78,7 +81,7 @@ Release notes version 1.7.4 : Enhancements, modifications and corrected bugs sin
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.3 : Enhancements, modifications and corrected bugs since version 1.7.2 :
 --------------------------------------------------------------------------------------------------
-03/06/16 (TrioCFD) Optimization: New low-Reybolds turbulence model available
+03/06/16 (TrioCFD) Optimization: New low-Reynolds turbulence model available
 03/06/16 (TrioCFD) New feature : Nonlinear k-epsilon turbulence model added
 26/05/16 (TrioCFD) Minor change: New CEG dependency: Critere_Entrainement_Gaz
 03/02/16 (TrioCFD) Bug fixed   : Resume a Front-Tracking calculation is now ok
