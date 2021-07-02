@@ -265,6 +265,8 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
   ofs_2.close();
   //fin test beam
 
+
+
   return qHalfSpeed_;
 }
 
@@ -306,11 +308,16 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
   ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
   ofs_2.close();
   //fin test beam
+
   return qSpeed_;
 }
 
 DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
 {
+  std::ofstream ofs_k0;
+  ofs_k0.open ("force.txt", std::ofstream::out | std::ofstream::app);
+  ofs_k0<<tps<<" "<< fluidForce[0] <<"  "<<fluidForce[1]<<endl;
+  ofs_k0.close();
 
   if(dt == 0.)
     {

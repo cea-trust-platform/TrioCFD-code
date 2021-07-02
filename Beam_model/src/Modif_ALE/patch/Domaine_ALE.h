@@ -74,8 +74,10 @@ public :
   const DoubleTab& getBeamDisplacement(int i) const;
   const DoubleTab& getBeamRotation(int i) const;
   const int& getBeamDirection() const;
-  DoubleVect& getBeamVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce);
+  DoubleVect& getBeamVelocity(const double& tps, const double& dt);
   const int& getBeamNbModes();
+  void computeFluidForceOnBeam();
+  const DoubleVect& getFluidForceOnBeam();
   Equation_base& getEquation();
   inline void associer_equation(const Equation_base& une_eq);
 protected:
@@ -94,6 +96,8 @@ protected:
   DoubleTab ALEjacobian_new; // n+1
   Beam_model beam;
   REF(Equation_base) eq;
+  DoubleVect fluidForceOnBeam;
+  double tempsComputeForceOnBeam;
 };
 
 

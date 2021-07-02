@@ -52,7 +52,7 @@ Entree& Champ_front_ALE_Beam::readOn(Entree& is)
 {
   return Champ_front_ALE::readOn(is);
 }
-void Champ_front_ALE_Beam::initializationBeam(double tps)
+void Champ_front_ALE_Beam::initializationBeam_bis(double tps)
 {
   Cerr<<"Champ_front_ALE_Beam::initializationBeam"<<finl;
   const Frontiere& front=la_frontiere_dis->frontiere();
@@ -68,6 +68,9 @@ void Champ_front_ALE_Beam::initializationBeam(double tps)
   velocity=fxyzt[dir].eval();
   dom_ale.initializationBeam(velocity);
 }
+
+
+
 void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 {
   Cerr<<"Champ_front_ALE_Beam::remplir_vit_som_bord_ALE "<<finl;
@@ -81,25 +84,15 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
 
   double dt = dom_ale.get_dt();
-  /*if(init_!=true)
-    {
-      initializationBeam(tps);
-      init_=true;
-    }*/
+  const int nbModes=dom_ale.getBeamNbModes();
+
   double x,y,z;
   int nbsf=faces.nb_som_faces();
   int i,j,k;
   int nb_som_tot=domaine.nb_som_tot();
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
-  const int nbModes=dom_ale.getBeamNbModes();
-  DoubleVect fluidForce(nbModes);
-  fluidForce=0.;
-  if(tps>0 && front.le_nom()=="Poutre")
-    {
-      computeFluidForce(tps, fluidForce);
-    }
-  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt, fluidForce);
+  const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt);
   for( i=0; i<nb_faces; i++)
     {
       x=y=z=0;
@@ -138,58 +131,15 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
             {
               if(i ==2713 && k==1)
                 {
-                  std::ofstream ofs_k0;
-                  ofs_k0.open ("beam_vel_P_0.5_h.txt", std::ofstream::out | std::ofstream::app);
-                  ofs_k0<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
-                  ofs_k0.close();
+                  std::ofstream ofs_P;
+                  ofs_P.open ("beam_vel_P_0.5_h.txt", std::ofstream::out | std::ofstream::app);
+                  ofs_P<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
+                  ofs_P.close();
                   //Cout<<"time = "<<tps <<" velocity beam Poutre= "<<beamVelocity<<finl;
                   //getchar();
 
                 }
             }
-
-          /* if(front.le_nom()=="Poutre")
-             {
-               if(i ==130 && k==0)
-                 {
-                   std::ofstream ofs_k0;
-                   ofs_k0.open ("beam_vel_P_k0.txt", std::ofstream::out | std::ofstream::app);
-                   ofs_k0<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
-                   ofs_k0.close();
-                   //Cout<<"time = "<<tps <<" velocity beam Poutre= "<<beamVelocity<<finl;
-                   //getchar();
-
-                 }
-
-               if(i==462 && k==1)
-                 {
-                   std::ofstream ofs_k1;
-                   ofs_k1.open ("beam_vel_P_k1.txt", std::ofstream::out | std::ofstream::app);
-                   ofs_k1<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
-                   ofs_k1.close();
-                 }
-             }
-           if(front.le_nom()=="Out_poutre")
-             {
-               if(i==28 && k==1)
-                 {
-                   std::ofstream ofs_i8;
-                   ofs_i8.open ("beam_vel_O_k1.txt", std::ofstream::out | std::ofstream::app);
-                   ofs_i8<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
-                   ofs_i8.close();
-                   //Cout<<"time = "<<tps <<" velocity beam Out_Poutre= "<<beamVelocity<<finl;
-                   //getchar();
-                 }
-
-               if(i==32 && k ==0)
-                 {
-                   std::ofstream ofs_i9;
-                   ofs_i9.open ("beam_vel_O_k0.txt", std::ofstream::out | std::ofstream::app);
-                   ofs_i9<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
-                   ofs_i9.close();
-                 }
-
-             }*/
         }
 
     }
@@ -219,13 +169,13 @@ void  Champ_front_ALE_Beam::computeFluidForce(const double tps, DoubleVect& flui
 
   std::ofstream ofs_k1;
   ofs_k1.open ("force_v.txt", std::ofstream::out | std::ofstream::app);
-
+  Cout<<" BEAM! ndeb= "<<ndeb<<" nfin = "<<nfin<<finl;
+  getchar();
   if(flux_bords_grad.size() == flux_bords_diff.size())
     {
 
       for (int face=ndeb; face<nfin; face++)
         {
-          //double surface=la_zone_vef.face_surfaces(face);
           for(int comp=0; comp<3; comp++)
             {
               force_p[comp] += (flux_bords_grad(face, comp));
@@ -236,6 +186,9 @@ void  Champ_front_ALE_Beam::computeFluidForce(const double tps, DoubleVect& flui
       ofs_k0.close();
       ofs_k1<<tps<<" "<<force_v[0]<<" "<<force_v[1]<<" "<<force_v[2]<<endl;
       ofs_k1.close();
+
+      Cout<<"ALE BEAM: temps:= "<<tps<<" force v =  "<<force_v[1]<<finl;
+      getchar();
     }
 
   if(flux_bords_grad.size() == flux_bords_diff.size())

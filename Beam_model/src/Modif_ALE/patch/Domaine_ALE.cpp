@@ -25,6 +25,7 @@
 #include <Debog.h>
 #include <Domaine_ALE.h>
 #include <Probleme_base.h>
+#include <Schema_Temps_base.h>
 #include <Zone_VDF.h>
 #include <Zone_VEF.h>
 #include <Motcle.h>
@@ -33,6 +34,10 @@
 #include <Ch_front_input_ALE.h>
 #include <Champ_front_ALE_Beam.h>
 #include <Noms.h>
+#include <Navier_Stokes_std.h>
+#include <Equation_base.h>
+#include <Operateur_Diff.h>
+#include <Operateur_Grad.h>
 
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
@@ -55,6 +60,7 @@ Entree& Domaine_ALE::readOn(Entree& is)
 
 void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Probleme_base& pb)
 {
+
   zone(0).invalide_octree();
   //Modification des coordonnees du maillage
   int N_som=nb_som_tot();
@@ -159,7 +165,9 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           Cerr << "Discretisation non reconnue par ALE!" << finl;
           exit();
         }
+
     }
+
 }
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
@@ -207,6 +215,7 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
 
 DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb, bool& check_NoZero_ALE)
 {
+
   int n; // A activer ou desactiver si on utilise le laplacien ou non
   int N_som=nb_som_tot(); //A activer ou desactiver si on utilise le laplacien ou non
 
@@ -704,6 +713,9 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   assert(nb_modes==phi_file_name.size());
   beam.readInputModalDeformation(phi_file_name);
   beam.readInputCIFile(CI_file_name);
+  fluidForceOnBeam.resize(nb_modes);
+  fluidForceOnBeam=0.;
+  tempsComputeForceOnBeam=0.;
 }
 DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
@@ -742,9 +754,14 @@ const int& Domaine_ALE::getBeamDirection() const
 {
   return beam.getDirection();
 }
-DoubleVect&  Domaine_ALE::getBeamVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
+DoubleVect&  Domaine_ALE::getBeamVelocity(const double& tps, const double& dt)
 {
-  return beam.getVelocity(tps, dt, fluidForce);
+  if(tps!=tempsComputeForceOnBeam)
+    {
+      computeFluidForceOnBeam();
+      tempsComputeForceOnBeam = tps;
+    }
+  return beam.getVelocity(tps, dt, fluidForceOnBeam);
 }
 const int& Domaine_ALE::getBeamNbModes()
 {
@@ -755,3 +772,54 @@ Equation_base& Domaine_ALE::getEquation()
   return eq;
 }
 
+const DoubleVect& Domaine_ALE::getFluidForceOnBeam()
+{
+
+  return fluidForceOnBeam;
+}
+
+void  Domaine_ALE::computeFluidForceOnBeam()
+{
+
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+  const int nbModes=fluidForceOnBeam.size();
+
+
+  if(flux_bords_grad.size() == flux_bords_diff.size())
+    {
+      fluidForceOnBeam=0.;
+      for (int n=0; n<nb_bords_ALE; n++)
+        {
+          int ndeb = les_bords_ALE(n).num_premiere_face();
+          int nfin = ndeb + les_bords_ALE(n).nb_faces();
+          for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+            {
+              double force=0.;
+              for (int face=ndeb; face<nfin; face++)
+                {
+                  for(int comp=0; comp<3; comp++)
+                    {
+                      DoubleVect phi(3);
+                      const DoubleTab& u=getBeamDisplacement(nbmodes);
+                      const DoubleTab& R=getBeamRotation(nbmodes);
+                      phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
+                      fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
+                    }
+                }
+              fluidForceOnBeam[nbmodes] += Process::mp_sum(force);
+
+            }
+
+        }
+      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+        {
+          fluidForceOnBeam[nbmodes] = Process::mp_sum(fluidForceOnBeam[nbmodes]);
+        }
+    }
+}
