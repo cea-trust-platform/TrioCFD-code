@@ -173,7 +173,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
 
   // for (int num_face=0; num_face<nb_faces; num_face++)
   //     {
-  //       resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)+D(num_face))*vol_ent(num_face);
+  //       resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)-D(num_face))*vol_ent(num_face);
   //        if (K_eps_Bas_Re(num_face,0) >= 1.e-10)
   //          resu(num_face,1) += ((C1*F1(num_face)*P(num_face)- C2*F2(num_face)*K_eps_Bas_Re(num_face,1))*K_eps_Bas_Re(num_face,1)/K_eps_Bas_Re(num_face,0)+E(num_face))*vol_ent(num_face);
   //     }
@@ -188,9 +188,9 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
 
   for (int num_face=0; num_face<nb_faces; num_face++)
     {
-      if (K_eps_Bas_Re(num_face,0) >= 1.e-10 && K_eps_Bas_Re(num_face,1) > 1.e-10)
+      if (K_eps_Bas_Re(num_face,0) >= 1.e-20 && K_eps_Bas_Re(num_face,1) > 1.e-20)
         {
-          resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)+D(num_face))*vol_ent(num_face);
+          resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)-D(num_face))*vol_ent(num_face);
 
           resu(num_face,1) += ((C1*F1(num_face)*P(num_face)- C2*F2(num_face)*K_eps_Bas_Re(num_face,1))*K_eps_Bas_Re(num_face,1)/K_eps_Bas_Re(num_face,0)+E(num_face))*vol_ent(num_face);
         }
@@ -315,11 +315,11 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   // Ajout des termes sources
   for (int num_face=0; num_face<nb_faces; num_face++)
     {
-      resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)+D(num_face))*vol_ent(num_face);
-      if (K_eps_Bas_Re(num_face,0) >= 1.e-10)
+      resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)-D(num_face))*vol_ent(num_face);
+      if (K_eps_Bas_Re(num_face,0) >= 1.e-20)
         resu(num_face,1) += ((C1*F1(num_face)*P(num_face)- C2*F2(num_face)*K_eps_Bas_Re(num_face,1))*K_eps_Bas_Re(num_face,1)/K_eps_Bas_Re(num_face,0)+E(num_face))*vol_ent(num_face);
 
-      if ( (G(num_face)>0) && (K_eps_Bas_Re(num_face,1) >= 10.e-10) )
+      if ( (G(num_face)>0) && (K_eps_Bas_Re(num_face,1) >= 1.e-20) )
         {
           resu(num_face,0) += G(num_face)*vol_ent(num_face);
           resu(num_face,1) += C1*F1(num_face)*G(num_face)*vol_ent(num_face)*K_eps_Bas_Re(num_face,1)/K_eps_Bas_Re(num_face,0);

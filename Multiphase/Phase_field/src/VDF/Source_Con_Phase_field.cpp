@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_Con_Phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src/VDF
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src/VDF
 // Version:     /main/25
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -30,6 +30,8 @@
 #include <Source_Qdm_VDF_Phase_field.h>
 #include <Check_espace_virtuel.h>
 #include <Convection_Diffusion_Phase_field.h>
+#include <Champ_Fonc_Tabule.h>
+#include <Champ_Uniforme.h>
 
 Implemente_instanciable(Source_Con_Phase_field,"Source_Con_Phase_field_VDF_P0_VDF",Source_Con_Phase_field_base);
 
@@ -50,261 +52,282 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
 {
   Cerr<<"Source_Con_Phase_field::readOn"<<finl;
 
-  Motcle motlu;
+  Motcles les_mots(18);
+  les_mots[0]="Temps_d_affichage";
+  les_mots[1]="alpha";
+  les_mots[2]="potentiel_chimique";
+  les_mots[3]="beta";
+  les_mots[4]="kappa";
+  les_mots[5]="kappa_variable";
+  les_mots[6]="moyenne_de_kappa";
+  les_mots[7]="multiplicateur_de_kappa";
+  les_mots[8]="couplage_NS_CH";
+  les_mots[9]="implicitation_CH";
+  les_mots[10]="gmres_non_lineaire";
+  les_mots[11]="seuil_cv_iterations_ptfixe";
+  les_mots[12]="seuil_residu_ptfixe";
+  les_mots[13]="seuil_residu_gmresnl";
+  les_mots[14]="dimension_espace_de_krylov";
+  les_mots[15]="nb_iterations_gmresnl";
+  les_mots[16]="residu_min_gmresnl";
+  les_mots[17]="residu_max_gmresnl";
 
+
+  Motcle motlu;
   is >> motlu;
-  Cerr << motlu << finl;
   if (motlu!="{")
     {
-      Cerr<<"On attendait { dans Source_Con_Phase_field::readOn"<<finl;
+      Cerr<<"Source_Con_Phase_field::readOn: We are expecting { at the bigening of Source_Con_Phase_field block instead of " << motlu <<finl;
       exit();
     }
-
+  int cpt = 0;
   is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="Temps_d_affichage")
+  while (motlu!="}")
     {
-      Cerr<<"On attendait Temps_d_affichage dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> tpsaff;
-  if(tpsaff<0. || tpsaff >100.)
-    {
-      Cerr << "Le temps d'affichage doit etre compris entre 0 et 100 secondes." << finl;
-      exit();
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="alpha")
-    {
-      Cerr<<"On attendait alpha dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> alpha;
-
-  is>>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="beta")
-    {
-      Cerr<<"On attendait beta dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> beta;
-
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="kappa")
-    {
-      Cerr<<"On attendait kappa dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> kappa;
-
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="kappa_variable")
-    {
-      Cerr<<"On attendait kappa_variable dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_type_kappa_;
-      is >> temp_type_kappa_;
-      if(temp_type_kappa_=="oui")
+      int rang=les_mots.search(motlu);
+      switch(rang)
         {
-          type_kappa_=1;
+        case 0:
+          {
+            cpt++;
+            is >> tpsaff;
+            if(tpsaff<0. || tpsaff >100.)
+              {
+                Cerr << "Source_Con_Phase_field::readOn: Temps_d_affichage should be in the range 0 - 100 seconds." << finl;
+                exit();
+              }
+            break;
+          }
+        case 1:
+          {
+            cpt++;
+            is >> alpha;
+            break;
+          }
+        case 2:
+          {
+            cpt++;
+            is >> motlu;
+            if (motlu!="{")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after potentiel_chimique instead of "<< motlu <<finl;
+                exit();
+              }
+            Motcle temp_potentiel_chimique_;
+            is >> temp_potentiel_chimique_;
+            if (temp_potentiel_chimique_=="defaut")
+              {
+                dWdc=&Source_Con_Phase_field::dWdc_defaut;
+              }
+            else if (temp_potentiel_chimique_=="fonction")
+              {
+                potentiel_chimique_expr_.lire_f(is,1);
+                dWdc=&Source_Con_Phase_field::dWdc_general;
+              }
+            else
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: "<<temp_potentiel_chimique_<<" is not a valid keyword in potentiel_chimique block"<<finl;
+                exit();
+              }
+            is >> motlu;
+            if (motlu!="}")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are exprcting } at the end of potentiel_chimique block instead of "<< motlu <<finl;
+                exit();
+              }
+            break;
+          }
+        case 3:
+          {
+            cpt++;
+            is >> beta;
+            break;
+          }
+        case 4:
+          {
+            cpt++;
+            is >> kappa;
+            break;
+          }
+        case 5:
+          {
+            cpt++;
+            is >> motlu;
+            if (motlu!="{")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are expecting { at the end of kappa_variable block instead of " << motlu <<finl;
+                exit();
+              }
+            Motcle temp_type_kappa_;
+            is >> temp_type_kappa_;
+            if(temp_type_kappa_=="non")
+              {
+                type_kappa_=0;
+              }
+            else
+              {
+                type_kappa_=1;
+                if (temp_type_kappa_=="defaut")
+                  {
+                    kappa_func_c=&Source_Con_Phase_field::kappa_func_c_defaut;
+                  }
+                else if (temp_type_kappa_=="fonction")
+                  {
+                    kappa_forme_expr_.lire_f(is,1);
+                    kappa_func_c=&Source_Con_Phase_field::kappa_func_c_general;
+                  }
+                else
+                  {
+                    Cerr<<"Source_Con_Phase_field::readOn: "<<temp_type_kappa_<<" is not a valid keyword in kappa_variable block"<<finl;
+                    Cerr<<"You can specify only non, defaut or fonction expression for kappa_variable"<<finl;
+                    exit();
+                  }
+              }
+            is >> motlu;
+            if (motlu!="}")
+              {
+                Cerr<<"Source_Con_Phase_field::readOn: We are expecting } at the end of kappa_variable block instead of " << motlu <<finl;
+                exit();
+              }
+            break;
+          }
+        case 6:
+          {
+            cpt++;
+
+            Motcle temp_kappa_moy_;
+            is >> temp_kappa_moy_;
+            if(temp_kappa_moy_=="arithmetique")
+              {
+                kappa_moy_=0;
+              }
+            else if(temp_kappa_moy_=="harmonique")
+              {
+                kappa_moy_=1;
+              }
+            else
+              {
+                kappa_moy_=2;
+              }
+            break;
+          }
+        case 7:
+          {
+            cpt++;
+            is >> mult_kappa;
+            break;
+          }
+        case 8:
+          {
+            cpt++;
+            Motcle temp_couplage_;
+            is >> temp_couplage_;
+            if(temp_couplage_=="mutilde(n)")
+              {
+                couplage_=0;
+              }
+            else
+              {
+                couplage_=1;
+              }
+            break;
+          }
+        case 9:
+          {
+            cpt++;
+            Motcle temp_implicitation_;
+            is >> temp_implicitation_;
+            if(temp_implicitation_=="oui")
+              {
+                implicitation_=1;
+              }
+            else
+              {
+                implicitation_=0;
+              }
+            break;
+          }
+        case 10:
+          {
+            cpt++;
+
+            Motcle temp_gmres_;
+            is >> temp_gmres_;
+            if(temp_gmres_=="oui")
+              {
+                gmres_=1;
+              }
+            else
+              {
+                gmres_=0;
+              }
+            break;
+          }
+        case 11:
+          {
+            cpt++;
+
+            is >> epsilon_;
+            break;
+          }
+        case 12:
+          {
+            cpt++;
+            is >> eps_;
+            break;
+          }
+        case 13:
+          {
+            cpt++;
+            is >> epsGMRES;
+            break;
+          }
+        case 14:
+          {
+            cpt++;
+            is >> nkr;
+            break;
+          }
+        case 15:
+          {
+            cpt++;
+            is >> nit;
+            break;
+          }
+
+        case 16:
+          {
+            cpt++;
+            is >> rec_min;
+            break;
+          }
+        case 17:
+          {
+            cpt++;
+            is >> rec_max;
+            break;
+          }
+        default :
+          {
+            Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field" << finl;
+            Cerr << motlu << " is not understood."<< finl;
+            Cerr << "We are expecting a keyword among " << les_mots << finl;
+            exit();
+          }
         }
-      else
-        {
-          type_kappa_=0;
-        }
+      is>>motlu;
     }
-
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="moyenne_de_kappa")
+  if(cpt != 18)
     {
-      Cerr<<"On attendait moyenne_de_kappa dans Source_Con_Phase_field::readOn"<<finl;
+      Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+      Cerr << "You should specify all these parameters: " << les_mots << finl;
       exit();
     }
-  else
-    {
-      Motcle temp_kappa_moy_;
-      is >> temp_kappa_moy_;
-      if(temp_kappa_moy_=="arithmetique")
-        {
-          kappa_moy_=0;
-        }
-      else if(temp_kappa_moy_=="harmonique")
-        {
-          kappa_moy_=1;
-        }
-      else
-        {
-          kappa_moy_=2;
-        }
-    }
 
-  is >>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="multiplicateur_de_kappa")
-    {
-      Cerr<<"On attendait multiplicateur_de_kappa dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> mult_kappa;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="couplage_NS_CH")
-    {
-      Cerr<<"On attendait couplage_NS_CH dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_couplage_;
-      is >> temp_couplage_;
-      if(temp_couplage_=="mutilde(n)")
-        {
-          couplage_=0;
-        }
-      else
-        {
-          couplage_=1;
-        }
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="implicitation_CH")
-    {
-      Cerr<<"On attendait implicitation_CH dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_implicitation_;
-      is >> temp_implicitation_;
-      if(temp_implicitation_=="oui")
-        {
-          implicitation_=1;
-        }
-      else
-        {
-          implicitation_=0;
-        }
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="gmres_non_lineaire")
-    {
-      Cerr<<"On attendait gmres_non_lineaire dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    {
-      Motcle temp_gmres_;
-      is >> temp_gmres_;
-      if(temp_gmres_=="oui")
-        {
-          gmres_=1;
-        }
-      else
-        {
-          gmres_=0;
-        }
-    }
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="seuil_cv_iterations_ptfixe")
-    {
-      Cerr<<"On attendait seuil_cv_iterations_ptfixe dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> epsilon_;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="seuil_residu_ptfixe")
-    {
-      Cerr<<"On attendait seuil_residu_ptfixe dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> eps_;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="seuil_residu_gmresnl")
-    {
-      Cerr<<"On attendait seuil_residu_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> epsGMRES;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="dimension_espace_de_krylov")
-    {
-      Cerr<<"On attendait dimension_espace_de_krylov dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> nkr;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="nb_iterations_gmresnl")
-    {
-      Cerr<<"On attendait nb_iterations_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> nit;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="residu_min_gmresnl")
-    {
-      Cerr<<"On attendait residu_min_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> rec_min;
-
-  is >> motlu;
-  Cerr << motlu << finl;
-  if (motlu!="residu_max_gmresnl")
-    {
-      Cerr<<"On attendait residu_max_gmresnl dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
-  else
-    is >> rec_max;
-
-  is>>motlu;
-  Cerr << motlu << finl;
-  if (motlu!="}")
-    {
-      Cerr<<"On attendait }  dans Source_Con_Phase_field::readOn"<<finl;
-      exit();
-    }
 
   if(kappa>0)
     {
-      Cerr <<" pas de temps theorique = ?     dx4*"<< 1./alpha/kappa/2.<<" dx2*"<<1./2./kappa/beta<<finl;
+      Cerr <<" theoretical time step = ?     dx4*"<< 1./alpha/kappa/2.<<" dx2*"<<1./2./kappa/beta<<finl;
     }
   return is ;
 
@@ -316,29 +339,8 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
 
   Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  const DoubleTab& rho=eq_ns.milieu().masse_volumique().valeurs();
-  int dim=rho.nb_dim();
-  switch(dim)
-    {
-    case 1:
-      rho0=rho(0);
-      break;
-    case 2:
-      rho0=rho(0,0);
-      break;
-    case 3:
-      rho0=rho(0,0,0);
-      break;
-    default:
-      Cerr <<"Sou_Con_Phase_field : Pb avec la dimension de rho :"<<dim<<finl;
-      exit();
-      break;
-    }
-  rho1 = eq_c.rho1();
-  rho2 = eq_c.rho2();
-  mu1 = eq_c.mu1();
-  mu2 = eq_c.mu2();
-  drhodc();
+  rho0 = eq_ns.rho0();
+  drhodc_ = eq_ns.drhodc();
   // Dans le modele cette derivee est constante - On la calcule au debut.
 
   boussi_=eq_ns.get_boussi_();
@@ -528,8 +530,6 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
   Cerr << "  - approximation de Boussinesq                     : " << choix_boussi << finl;
   if(boussi_==0)
     {
-      Cerr << "  - masse volumique de la phase 1                   : " << rho1 << " kg/m3" << finl;
-      Cerr << "  - masse volumique de la phase 2                   : " << rho2 << " kg/m3" << finl;
       Cerr << "  - approximation de Boussinesq dans la diffusion   : " << choix_diff_boussi << finl;
     }
   else
@@ -537,8 +537,6 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
       Cerr << "  - masse volumique de reference                    : " << rho0 << " kg/m3" << finl;
     }
   Cerr << "  Dans le cas ou la viscosite dynamique est variable : " << finl;
-  Cerr << "  - viscosite dynamique de la phase 1               : " << mu1 << " kg/m/s" << finl;
-  Cerr << "  - viscosite dynamique de la phase 2               : " << mu2 << " kg/m/s" << finl;
   Cerr << "  - terme source                                    : " << choix_source << finl;
   Cerr << "  - intensite du champ de gravite                   : " << norme_array(g_)  << " m/s^2" << finl;
   Cerr << "" << finl;
@@ -762,7 +760,9 @@ void Source_Con_Phase_field::premier_demi_dt()
   DoubleTab& alpha_gradC_carre=eq_c.set_alpha_gradC_carre();
   calculer_alpha_gradC_carre(alpha_gradC_carre);
   DoubleTab& div_alpha_rho_gradC=eq_c.set_div_alpha_rho_gradC();
+  //
   calculer_div_alpha_rho_gradC(div_alpha_rho_gradC);
+  //
   // ---
 
   DoubleTab& div_alpha_gradC=eq_c.set_div_alpha_gradC();
@@ -873,13 +873,12 @@ void Source_Con_Phase_field::premier_demi_dt()
       if (prov_elem.size()==0)
         prov_elem=mutilde;
 
-      DoubleTab kappa_var(prov_elem);
-      kappa_var=0.;
-
       if(kappa_ind==1)
         {
+          DoubleTab kappa_var(prov_elem);
+          kappa_var=0.;
           for(int ikappa=0; ikappa<nb_elem; ikappa++)
-            kappa_var(ikappa)=dmax(-mult_kappa*kappa*(c(ikappa)-0.5)*(c(ikappa)+0.5),0);
+            kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
           // Div(Kappa*Grad(mutilde))
           div_kappa_grad(mutilde, kappa_var, prov_elem);
         }
@@ -1088,7 +1087,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
           // Cerr << "---" << finl;
           // Cerr << "Calcul de kappa variable pour le point fixe" << finl;
           // Cerr << "---" << finl;
-          kappa_var(ikappa)=dmax(-mult_kappa*kappa*(c(ikappa)-0.5)*(c(ikappa)+0.5),0);
+          kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
         }
     }
 
@@ -1441,9 +1440,10 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
           term_cin(n_elem)=0.;
           if (mutype_==1)
             {
-              term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc_;
+              term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc(n_elem);
             }
-          second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*dpsidc(Phi(n_elem));
+
+          second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*(this->*dWdc)(Phi(n_elem));
         }
 
       // Inversion de la matrice morse
@@ -1524,10 +1524,10 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
       term_cin(n_elem)=0.;
       if (mutype_==1)
         {
-          term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc_;
+          term_cin(n_elem)+=(0.5*u_carre_(n_elem))*drhodc(n_elem);
         }
 
-      second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*dpsidc(x1(n_elem));
+      second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*(this->*dWdc)(x1(n_elem));
     }
   //   // Ajoute par DJ pour Debog
   //   //-------------------------
@@ -1970,8 +1970,7 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
   const DoubleTab& c=eq_c.inconnue().valeurs();
   const DoubleTab& div_alpha_gradC=eq_c.get_div_alpha_gradC();
 
-  const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
-  const DoubleTab rhoPF=eq_ns.rho().valeurs();
+  // const Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
 
   // Calcul de mutilde
 
@@ -1981,10 +1980,10 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
   const int taille=mutilde.size();
   for (int i=0; i<taille; i++)
     {
-      mutilde(i)+=beta*dpsidc(c(i));
+      mutilde(i)+=beta*(this->*dWdc)(c(i));
       if(mutype_==1)
         {
-          mutilde(i)+=(0.5*u_carre_(i))*drhodc_;
+          mutilde(i)+=(0.5*u_carre_(i))*drhodc(i);
         }
     }
   // L'espace virtuel n'est pas a jour
@@ -2227,48 +2226,40 @@ void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo
 }
 
 
-// Description:
-//     Derivee de rho par rapport a c = rho2-rho1 car on prend rho = rho1+(rho2-rho1)*c
-// Precondition:
-// Parametre: const doubleTab& rho
-//    Signification: valeur de drho/dc
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-void Source_Con_Phase_field::drhodc()
+void Source_Con_Phase_field::calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
 {
-  drhodc_=rho2-rho1;
+  if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
+    {
+      const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
+      const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+      const Table& table = ch_champ_fonc_c.table();
+      const int& isfct = table.isfonction();
+      DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();
+      // code ci-dessous adapte de Champ_Fonc_Tabule_P0_VDF.mettre_a_jour
+      if (!(val_c.nb_dim() == mes_valeurs.nb_dim()))
+        {
+          Cerr << "Erreur a l'initialisation d'un Champ_Fonc_Tabule" << finl;
+          Cerr << "Le champ parametre et le champ a initialiser ne sont pas compatibles" << finl;
+          exit();
+        }
+      if (isfct!=2)
+        {
+          int nb_elems = zone_VDF.nb_elem();
+          if (val_c.nb_dim() == 1)
+            for (int num_elem=0; num_elem<nb_elems; num_elem++)
+              mes_valeurs(num_elem) = table.val(val_c(num_elem));
+          else
+            {
+              int nb_comps = val_c.nb_dim();
+              for (int num_elem=0; num_elem<nb_elems; num_elem++)
+                for (int ncomp=0; ncomp<nb_comps; ncomp++)
+                  mes_valeurs(num_elem,ncomp) = table.val(val_c(num_elem,ncomp));
+            }
+        }
+      else
+        {
+          const DoubleTab& centres_de_gravites = zone_VDF.xp();
+          table.valeurs(val_c,centres_de_gravites,t,mes_valeurs);
+        }
+    }
 }
-
-// Description:
-//     Valeur de mu (potentiel chimique)
-//     W=(1-c^2)c^2
-//     Derivee de W par rapport a c = rho2-rho1 car on prend rho = rho1+(rho2-rho1)*c
-// Precondition:
-// Parametre: const double& c
-//    Signification: concentration
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: double
-//    Signification: valeur de dW/dc
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-double Source_Con_Phase_field::dpsidc(const double& c) const
-{
-  return (4.*c*(c+0.5)*(c-0.5));
-  //   if (c<=-0.5 || c>=0.5)
-  //     return(0.);
-  //   else
-  //     return (-1.*c);
-}
-
-

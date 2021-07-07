@@ -1,6 +1,18 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.8.3_beta : Enhancements, modifications and corrected bugs since version 1.8.2 :
+Release notes version 1.8.4_beta : Enhancements, modifications and corrected bugs since version 1.8.3 :
 --------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
+Release notes version 1.8.3 : Enhancements, modifications and corrected bugs since version 1.8.2 :
+--------------------------------------------------------------------------------------------------
+22/06/21 (TrioCFD) New feature : PHASE_FIELD: generalization of the thermodynamic landscape, the density law and so on of this binary Cahn-Hilliard model coupled with the Navier-Stokes equations (isothermal)
+18/06/21 (TrioCFD) Validation  : Add a validation sheets for a new BC which create synthetic fluctuations as inlet boundary
+09/06/21 (TrioCFD) Bug fixed   : Trust fix to globally conserve the mass of constituents by accepting small local erros in QC (ex baltik GRAINS)
+02/06/21 (TrioCFD) New feature : New problem added which allows simulating binary mixture flows at iso-bar and iso-thermal conditions using a low Mach number approximation 
+17/05/21 (TrioCFD) New feature : k-epsilon Bicephale model : New decoupled management of the evolution equations of k and epsilon for the Bas-Reynolds models - WARNING model under validation
+31/03/21 (TrioCFD) New feature : triocfd -baltik BALTIK_NAME creates an empty baltik that depends on TrioCFD.
+31/03/21 (TrioCFD) New feature : triocfd -xcheck allows now to check the syntaxe of triocfd datafiles using XDATA.
+31/03/21 (TrioCFD) New feature : Add possibility to post-process k-eps diffusive and convective terms in definition_champs block
+17/03/21 (TrioCFD) New feature : Add possibility to post-process k-eps source terms in definition_champs block with "operateur_eqn { numero_source 0 sources { refChamp { pb_champ pb K_EPS } }"
 03/03/21 (TrioCFD) Doc         : Update of models description (Phase Field, ALE and Sensitivity Analysis)
 05/02/21 (TrioCFD) New keyword : Boundary_field_keps_from_ud to specify a K-Eps inlet field with hydraulic diameter, speed, and turbulence intensity (VDF only)
 27/01/21 (TrioCFD) Major change: Restructuration - Rayonnement contains now Rayonnement (milieu transparent) + Rayonnement_semi_transparent
@@ -11,7 +23,7 @@ Release notes version 1.8.2 : Enhancements, modifications and corrected bugs sin
 --------------------------------------------------------------------------------------------------
 11/12/20 (TrioCFD) New feature : New documentation available: validation report - first version
 19/11/20 (TrioCFD) Validation  : Update test cases after syntax change for Champ_Fonc_Fonction, Champ_Fonc_Fonction_txyz, Champ_Fonc_Tabule,Champ_Fonc_Fonction_txyz_Morceaux in TRUST
-17/11/20 (TrioCFD) New feature : Triocfd -index gives now access to html index of TrioCFD.
+17/11/20 (TrioCFD) New feature : triocfd -index gives now access to html index of TrioCFD.
 17/11/20 (TrioCFD) New feature : Adding triocfd script that overloads trust script.
 16/11/20 (TrioCFD) New feature : New baltik Sensitivity_analysis : provide an estimate of the variance of the velocity field in NS
 10/11/20 (TrioCFD) Validation  : Add 2 validation sheets for ALE Baltik : DIVA and TwoOscillatingCylindersALE
@@ -69,7 +81,7 @@ Release notes version 1.7.4 : Enhancements, modifications and corrected bugs sin
 --------------------------------------------------------------------------------------------------
 Release notes version 1.7.3 : Enhancements, modifications and corrected bugs since version 1.7.2 :
 --------------------------------------------------------------------------------------------------
-03/06/16 (TrioCFD) Optimization: New low-Reybolds turbulence model available
+03/06/16 (TrioCFD) Optimization: New low-Reynolds turbulence model available
 03/06/16 (TrioCFD) New feature : Nonlinear k-epsilon turbulence model added
 26/05/16 (TrioCFD) Minor change: New CEG dependency: Critere_Entrainement_Gaz
 03/02/16 (TrioCFD) Bug fixed   : Resume a Front-Tracking calculation is now ok

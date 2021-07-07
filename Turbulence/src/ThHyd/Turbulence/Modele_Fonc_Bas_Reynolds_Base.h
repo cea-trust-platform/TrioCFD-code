@@ -53,12 +53,15 @@ public:
 
   inline const Equation_base& equation() const;
   inline  Equation_base& equation();
+  inline const Equation_base& seconde_equation() const;
+  inline  Equation_base& seconde_equation();
   virtual int preparer_calcul();
   virtual void mettre_a_jour(double ) =0;
   virtual void discretiser();
   virtual void completer();
   virtual void associer_pb(const Probleme_base& ) ;
   virtual void associer_eqn(const Equation_base& );
+  virtual void associer_eqn_2(const Equation_base& );
   virtual void associer(const Zone_dis& , const Zone_Cl_dis& )= 0;
   virtual int sauvegarder(Sortie& ) const;
   virtual int reprendre(Entree& );
@@ -77,7 +80,23 @@ public:
                                       const DoubleTab& ,const int,
                                       const DoubleTab&, const DoubleTab&,
                                       const double) const;
+
   virtual bool calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+
+  virtual DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const=0;
+  virtual DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const =0 ;
+
+  virtual DoubleTab& Calcul_F1_BiK( DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_base&) const=0;
+  virtual DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const =0 ;
+  virtual DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const =0 ;
+  virtual DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
+  virtual DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+                                          const DoubleTab& , const DoubleTab& ,
+                                          const DoubleTab& ,const int,
+                                          const DoubleTab&, const DoubleTab&, const DoubleTab&,
+                                          const double) const;
+  virtual bool calcul_tenseur_Re_BiK(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
   virtual void creer_champ(const Motcle& motlu);
@@ -85,8 +104,11 @@ public:
   virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
   /////////////////////////////////////////////////////
   virtual void lire_distance_paroi( );
-protected :
 
+public:
+  REF(Equation_base) ma_seconde_equation;
+
+protected :
   REF(Equation_base) mon_equation;
   REF(Fluide_Incompressible) le_fluide;
   REF(Champ_Inc) la_vitesse_transportante;
@@ -128,6 +150,26 @@ inline Equation_base& Modele_Fonc_Bas_Reynolds_Base::equation()
       Process::exit();
     }
   return mon_equation.valeur();
+}
+
+inline const Equation_base& Modele_Fonc_Bas_Reynolds_Base::seconde_equation() const
+{
+  if (ma_seconde_equation.non_nul()==0)
+    {
+      Cerr << "\nError in Modele_Fonc_Bas_Reynolds_Base::seconde_equation() : The equation is unknown !" << finl;
+      Process::exit();
+    }
+  return ma_seconde_equation.valeur();
+}
+
+inline Equation_base& Modele_Fonc_Bas_Reynolds_Base::seconde_equation()
+{
+  if (ma_seconde_equation.non_nul()==0)
+    {
+      Cerr << "\nError in Modele_Fonc_Bas_Reynolds_Base::seconde_equation() : The equation is unknown !" << finl;
+      Process::exit();
+    }
+  return ma_seconde_equation.valeur();
 }
 
 #endif

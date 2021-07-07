@@ -10,11 +10,6 @@ mkdir -p 3d_vef_rect_5
 mkdir -p 3d_vef_rect_7_5
 mkdir -p 3d_vef_rect_10
 
-# pour corriger les courbe gnuplot
-[ -f deltap_courbe.dat ]  && rm deltap_courbe.dat
-[ -f deltap_courbe_vef.dat ] && rm deltap_courbe_vef.dat
-
-
 cd 3d_vdf_rect_1
 cp ../3d_vdf_rect.data ./generique.data
 sed "s/Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3  1. 0. 0./Entree frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 3 1. 0. 0./" generique.data > 3d_vdf_rect.data

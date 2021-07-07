@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Phase_field.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
 // Version:     /main/22
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -84,10 +84,7 @@ Entree& Convection_Diffusion_Phase_field::readOn(Entree& is)
 void Convection_Diffusion_Phase_field::set_param(Param& param)
 {
   Convection_Diffusion_Concentration::set_param(param);
-  param.ajouter("rho_1",&rho1_,Param::REQUIRED);
-  param.ajouter("rho_2",&rho2_,Param::REQUIRED);
-  param.ajouter("mu_1",&mu1_,Param::REQUIRED);
-  param.ajouter("mu_2",&mu2_,Param::REQUIRED);
+  //
   param.ajouter_non_std("potentiel_chimique_generalise",(this),Param::REQUIRED);
 }
 
@@ -158,11 +155,6 @@ void Convection_Diffusion_Phase_field::completer()
 {
   Equation_base::completer();
   gradient.completer();
-
-  const Navier_Stokes_phase_field& eqNS=ref_cast(Navier_Stokes_phase_field,probleme().equation(0));
-  Cerr<<"Convection_Diffusion_Phase_field::completer"<<finl;
-  rho_ = eqNS.rho();
-  mu_ = eqNS.mu();
 }
 
 Operateur_Grad& Convection_Diffusion_Phase_field::operateur_gradient()
@@ -200,49 +192,7 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
   alpha_gradC_carre = div_alpha_gradC;
   pression_thermo = div_alpha_gradC;
 
-  sources().mettre_a_jour(0.);
+  sources().mettre_a_jour(schema_temps().temps_courant());
 
   return 1;
-}
-
-
-// Description:
-//    Calcule rho_n+1 pour utilisation dans la pression
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-void Convection_Diffusion_Phase_field::calculer_rho()
-{
-  const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,mon_probleme.valeur().equation(1));
-
-  const DoubleTab& c=eq_c.inconnue().futur();
-
-  rho_.valeur().valeurs()=c;
-  rho_.valeur().valeurs()*=(rho2_-rho1_);
-  rho_.valeur().valeurs()+=(rho1_+rho2_)/2.;
-
-  rho_.valeur().valeurs().echange_espace_virtuel();
-}
-
-void Convection_Diffusion_Phase_field::calculer_mu()
-{
-  const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,mon_probleme.valeur().equation(1));
-
-  const DoubleTab& c=eq_c.inconnue().futur();
-
-  mu_.valeur().valeurs()=c;
-  mu_.valeur().valeurs()*=(mu2_-mu1_);
-  mu_.valeur().valeurs()+=(mu1_+mu2_)/2.;
-
-  mu_.valeur().valeurs().echange_espace_virtuel();
-
 }

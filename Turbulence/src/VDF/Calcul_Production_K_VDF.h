@@ -55,6 +55,12 @@ protected:
   DoubleVect& calculer_terme_production_K_Axi(const Zone_VDF& , const Champ_Face& , DoubleVect& ,
                                               const DoubleTab& , const DoubleTab& ) const;
 
+  DoubleVect& calculer_terme_production_K_BiK(const Zone_VDF& ,const Zone_Cl_VDF&, DoubleVect& , const DoubleTab& ,
+                                              const DoubleTab& , const Champ_Face& , const DoubleTab& ) const;
+
+  DoubleVect& calculer_terme_production_K_BiK_Axi(const Zone_VDF& , const Champ_Face& , DoubleVect& ,
+                                                  const DoubleTab& , const DoubleTab& ) const;
+
   DoubleVect& calculer_terme_destruction_K(const Zone_VDF& , const Zone_Cl_VDF& , DoubleVect& ,
                                            const DoubleTab& , const DoubleTab& ,
                                            const DoubleTab& ,const DoubleVect&   ) const;

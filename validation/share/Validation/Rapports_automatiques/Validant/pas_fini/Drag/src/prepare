@@ -16,7 +16,7 @@ do
    then      
       gmsh -2 forme.geo -format med 1>gmsh.log 2>&1 || exit -1
       echo "Update of the mesh $cas.med..."
-      src=$TRUST_ROOT/Validation/Rapports_automatiques/Validant/pas_fini/Drag/src
+      src=$project_directory/validation/share/Validation/Rapports_automatiques/Validant/pas_fini/Drag/src
       CHECKOUT $src/$cas.med 
       cp -f forme.med $src/$cas.med 
       CHECKIN $src/$cas.med

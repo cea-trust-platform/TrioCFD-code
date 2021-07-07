@@ -1,0 +1,377 @@
+Parametres 
+{
+	newvalidTrio
+#
+	Titre "Test of the conservation of the mass of a species"
+#
+#	Description "Mixing of species without chemical reactions"
+	VersionTrio_U "1.8.3"
+#
+	ParametersTrio_U Type of problem: 3D Turbulent - conservation of the mass of a species
+	ParametersTrio_U Discretization: VDF and VEFPreP1B
+	ParametersTrio_U Time scheme: Explicit Euler
+	ParametersTrio_U Momentum convection scheme: Convection Diffusion Chaleur Quasi Compressible
+	ParametersTrio_U Equations Scalaires Passifs with 2 species
+	ParametersTrio_U Solving of equations: Navier Stokes Quasi Compressible
+	ParametersTrio_U Master Test case: NoFlow-lami-espece.data
+	ParametersTrio_U Location: Turbulence/share/Validation/Rapports_automatiques/Verification_codage/NoFlow-lami-espece
+
+	Auteur "U. BIEDER"
+	TestCase VDF NoFlow-lami-espece_VDF \*
+	TestCase VEF NoFlow-lami-espece_VEF
+}
+Objectif {
+	Description "The purpose of this validation sheet is to check the mixing of species without chemical reactions."
+	Description "Once convergence is reached, the mass fraction of the two species as well as the density of the mixture will be compared with the expected analytical results."
+	Description "For that, one models a heated pipe in which one considers that the flow is quasi-compressible, turbulent and the gas, perfect."
+	Description "This validation sheet has been established after the correction of convection-diffusion equation for mass fraction of species (in v1.8.3). The differences obtained on the mass fractions before and after the correction will be observed."
+}
+
+Pb_description {
+	Description "In a heated pipe, two species of very different molar mass mix by density difference until a stationary state is reached where the mixture will be uniform. The final mass fractions of each of the 2 species obtained with TrioCFD can then be compared with the analytical values."
+	Description "The analytical solution is calculated as follows."
+	Description "Let \latex_($y_{1f}$\latex_) and \latex_($y_{2f}$\latex_) be the final mass fractions of the two species:"
+	Description "\latex_(\hspace{2cm} $y_{1f}=\displaystyle{\frac{m_{1U}+m_{1L}}{m_{1U}+m_{1L}+m_{1U}+m_{1L}}}$\latex_)"
+	Description "$\smallskip$"
+	Description "The gases being considered as perfect, we have:"
+	Description "$\smallskip$"
+	Description "\latex_(\hspace{2cm} $m_{ij}=M_{i} x_{ij} \displaystyle{\frac{PV}{RT}}=M_{i} \displaystyle{\frac{y_{ij}/M_{i}}{\sum_{i}y_{ij}/M_{i}}} \displaystyle{\frac{PV}{RT}}=\displaystyle{\frac{y_{ij}}{\sum_{i}y_{ij}/M_{i}}} \displaystyle{\frac{PV}{RT}}$\latex_)"
+	Description "$\smallskip$"
+	Description "with \latex_($x_{ij}$\latex_) the mole fraction of species i in part j of the cavity."
+	Description "$\smallskip$"
+	Description "By multiplying the first equation by \latex_($\displaystyle{\frac{RT}{PV}}$\latex_) in the numerator and in the denominator, we then have:"
+	Description "$\smallskip$"
+	Description "\latex_(\hspace{2cm} $y_{1f}$=$\displaystyle{\frac{\frac{y_{1U}}{\frac{y_{1U}}{M_1}+\frac{y_{2U}}{M_2}}+\frac{y_{1L}}{\frac{y_{1L}}{M_1}+\frac{y_{2L}}{M_2}}}{\frac{y_{1U}}{\frac{y_{1U}}{M_1}+\frac{y_{2U}}{M_2}}+\frac{y_{1L}}{\frac{y_{1L}}{M_1}+\frac{y_{2L}}{M_2}}+\frac{y_{2U}}{\frac{y_{1U}}{M_1}+\frac{y_{2U}}{M_2}}+\frac{y_{2L}}{\frac{y_{1L}}{M_1}+\frac{y_{2L}}{M_2}}}}$\latex_)"
+	Description "$\smallskip$"
+	Description "\latex_(\hspace{2cm} $y_{1f}$=$\left(1+\displaystyle{\frac{y_{2U}\left(\frac{y_{1L}}{M_1}+\frac{y_{2L}}{M_2}\right)+y_{2L}\left(\frac{y_{1U}}{M_1}+\frac{y_{2U}}{M_2}\right)}{y_{1U}\left(\frac{y_{1L}}{M_1}+\frac{y_{2L}}{M_2}\right)+y_{1L}\left(\frac{y_{1U}}{M_1}+\frac{y_{2U}}{M_2}\right)}}\right)^{-1}$\latex_)
+	Description "$\smallskip$"
+	Description "Which give"
+	Description "\latex_(\begin{center}\textbf{$y_{1f}$=0.311} \end{center}\latex_)
+	Description "\latex_(\begin{center}\textbf{$y_{2f}$=0.689} \end{center}\latex_)
+	Geometrie {
+	Description "The pipe is modeled by a cube of 1m x 1m x 1m."
+	}
+	CICL {
+		Description "$\bullet$ \latex_(\hspace{0.5cm}\textbf{Boundary conditions}\latex_)"
+		Description "The boundary condition is a wall law for the velocity. All the walls are adiabatic and impermeable to constituents."
+		Description "$\bullet$ \latex_(\hspace{0.5cm}\textbf{Initial conditions}\latex_)"
+		Description "Two fictitious gaseous species of very different molar masses are present in the closed cavity and initially distributed in two separate spaces of identical volumes but with different molar fractions as shown in the following figures. "
+		Description "We consider the following initial distribution in the cavity for the 2 species:"
+		Description " \latex_(\smallskip \latex_)"
+		Description "$\bullet$\latex_(\hspace{0.5cm}\textbf{Upper half}\latex_): mass fraction species 1 \latex_($y_{1U}$\latex_) = 0.2 mass fraction species 2 \latex_($y_{2U}$\latex_) = 0.8"
+		Description "$\bullet$\latex_(\hspace{0.5cm}\textbf{Lower half}\latex_): mass fraction species 1 \latex_($y_{1L}$\latex_) = 0.7 mass fraction species 2 \latex_($y_{2L}$\latex_) = 0.3"
+		Description " \latex_(\smallskip \latex_)"
+		Description "\latex_(\textbf{molar mass species 1}\latex_) = 0.01 kg/mol"
+		Description "\latex_(\textbf{molar mass species 2}\latex_) = 10 kg/mol"
+		Description " \latex_(\smallskip \latex_)"
+		visu
+		{
+			Titre "Mass fraction species 1 at initial state"
+			Width 7.9cm
+			cycles 0
+			up3d         0.0 +0.0 0.0
+			normal3D     0.60 0.60 0.60
+			zoom3D       0.01 0.01 0.8
+			pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE0 ELEM
+			nb_img_without_newline 2
+		}
+		visu
+		{
+			Titre "Mass fraction species 2 at initial state"
+			Width 7.9cm
+			cycles 0
+			up3d         0.0 +0.0 0.0
+			normal3D     0.60 0.60 0.60
+			zoom3D       0.01 0.01 0.8
+			pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE1 ELEM
+		}
+		Description "The fluid is initially heated uniformly to 323 K."
+	}
+	Propfluide {
+		Description "The 2 fluids considered here are fictitious gases for which the molar masses are extremely different. This strong difference makes it easier to see the mixing effect. The characteristics taken for the 2 gaseous species are as follows:"
+		Table {
+			Title "Physical properties of the fictitious gases"
+			nb_columns 2
+			label species 1 | species 2
+			line {
+				legend " Cp (J/kg/K) "
+				values 1000 1000
+			}
+			line {
+				legend " $\mu$ (N/$m^2$/s) "
+				values 0.001 0.001
+			}
+			line {
+				legend " M (kg/Mol)"
+				values 0.01 10
+			}
+		}
+	}
+}
+
+Casesetup {
+	Maillage {
+		Description "For VDF, the mesh distribution is as follows: 21 meshes in the X and Y directions and 11 meshes in the Z directions."
+		Description "For VEF, the mesh distribution is as follows: 11 meshes in the X and Y directions and 6 meshes in the Z directions.
+		Description "These discretizations generate the following meshes comprising 4000 cells in VDF and 24 000 cells for VEF."
+		Description " \latex_(\medskip \latex_)"
+		visu {
+			Title "VDF Mesh overview - 4000 cells"
+			Width 7.9cm
+			mesh VDF/NoFlow-lami-espece_VDF.lata dom
+			Normal3d 0.5 0.5 0.5
+			nb_img_without_newline 2
+		}
+		visu {
+			Title "VEF Mesh overview - 24 000 cells"
+			Width 7.9cm
+			mesh VEF/NoFlow-lami-espece_VEF.lata dom
+			Normal3d 0.5 0.5 0.5
+		}
+	}
+	Options_modele {
+		Description "The equations solved in this test-case are:"
+		Description "$\bullet$ \latex_(\hspace{0.5cm}\latex_)Navier-Stokes in Quasi-Compressible"
+		Description "$\bullet$ \latex_(\hspace{0.5cm}\latex_)Heat convection and diffusion in Quasi-Compressible with an upwind schem for convection"
+		Description "$\bullet$ \latex_(\hspace{0.5cm}\latex_)2 passive scalar equations for the convection and the diffusion of the 2 species"
+	}
+	Autres_options {
+		Description "For both discretizations, the Euler schem is resolved in the explicit way."
+	}
+}
+
+Results {
+	Description "We will be interested in the results obtained for each of the 2 species present and then, in the mixture."
+	Description " \latex_(\medskip \latex_)"
+	Description "$\bullet$ \latex_(\hspace{0.5cm}\textbf{SPECIES 1}\latex_)"
+	Description " \latex_(\medskip \latex_)"
+	Description "After a period of oscillations, the mass fraction of the species stabilizes. For both discretizations, stabilization is rapid and the value reached is very close to the analytical value."
+	Figure
+	{ 
+		Titre "Temporal variation of the mass fraction species 1 in the center of the cavity"
+		Dimension 2
+		Width 13.5cm
+		LabelX "Time ( in s )"
+		LabelY "Mass fraction ( - )"
+		Include_Description_Curves 0
+		Courbe 
+		{ 
+			Legende "TrioCFD - mass fraction species 1 - VDF discretization"
+			Origine "TrioCFD"
+			file ./VDF/NoFlow-lami-espece_VDF_FRACTION_MASSIQUE0.son
+			Style lines
+			columns 1 2 
+		}
+		Courbe 
+		{ 
+			Legende "TrioCFD - mass fraction species 1 - VEF discretization"
+			Origine "TrioCFD"
+			file ./VEF/NoFlow-lami-espece_VEF_FRACTION_MASSIQUE0.son
+			Style lines
+			columns 1 2 
+		}
+		Courbe
+		{
+			legend "Analytic value for mass fraction of species 1"
+			fonction 0.311
+			Style lines
+		}
+	}
+	Description "The results have been clearly improved by the correction made in the code."
+	Description "Before the correction on convection-diffusion equation for mass fraction of species, the mass fraction of each species obtained with TrioCFD showed a significant difference with the analytical value (more than \latex_(6\%\latex_)) as well as a much slower stabilization time."
+	Description "This correction consisted in globally conserving the mass of constituents by accepting small local errors. The results obtained before the correction are presented in the following graph."
+	Figure {
+		Title "Mass fraction of species 1 before code correction"
+		Width 13.5cm
+		picture specie1-origine.png
+	}
+	Description "By being interested in the dynamics of the mixture, one notes that at the first moments (between 0 and 4 seconds) the convection is the dominant phenomenon. Indeed, the gas of the lower part of the cavity being initially lighter than the gas of the upper part, the latter will rise giving its place to the heavier gas. However, we can see that they are starting to mix at the interface level."
+	Description "Then, from 8 seconds, diffusion dominates. The two gases gradually mix by diffusion of the species and there is no more convective movement."
+	Description " \latex_(\medskip \latex_)"
+	visu
+	{
+		Titre "Mass fraction species 1 at initial state for VDF discretization"
+		Width 7.9cm
+		cycles 0
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE0 ELEM
+		nb_img_without_newline 2
+	}
+	visu
+	{
+		Titre "Mass fraction species 1 at t=4sec for VDF discretization"
+		Width 7.9cm
+		cycles 1
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE0 ELEM
+	}
+	visu
+	{
+		Titre "Mass fraction species 1 at t=8s for VDF discretization"
+		Width 7.9cm
+		cycles 2
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE0 ELEM
+		nb_img_without_newline 2
+	}
+	visu
+	{
+		Titre "Mass fraction species 1 at final for VDF discretization"
+		Width 7.9cm
+		cycles 25
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE0 ELEM
+	}
+	Description "This same dynamic is also observed in VEF discretization."
+	Description " \latex_(\medskip \latex_)"
+	visu
+	{
+		Titre "Mass fraction species 1 at t=4sec for VDF discretization"
+		Width 7.9cm
+		cycles 1
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE0 ELEM
+		nb_img_without_newline 2
+	}
+	visu
+	{
+		Titre "Mass fraction species 1 at final state for VEF discretization"
+		Width 7.9cm
+		cycles 25
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VEF/NoFlow-lami-espece_VEF.lata dom FRACTION_MASSIQUE0 ELEM
+	}
+
+	Description "$\bullet$ \latex_(\hspace{0.5cm}\textbf{SPECIES 2}\latex_)"
+	Description " \latex_(\medskip \latex_)"
+	Description "As for species 1, the results obtained with TrioCFD in VDF and VEF for species 2 are in excellent adequacy with the analytical."
+	Figure
+	{ 
+		Titre "Temporal variation of the mass fraction species 2 in the center of the cavity"
+		Dimension 2
+		Width 14cm
+		LabelX "Time ( in s )"
+		LabelY "Mass fraction ( - )"
+		Include_Description_Curves 0
+		Courbe
+		{
+			Legende "TrioCFD - mass fraction species 2 - VDF discretization"
+			Origine "TrioCFD"
+			file ./VDF/NoFlow-lami-espece_VDF_FRACTION_MASSIQUE1.son
+			Style lines
+			columns 1 2 
+		}
+		Courbe 
+		{
+			Legende "TrioCFD - mass fraction species 2 - VEF discretization"
+			Origine "TrioCFD"
+			file ./VEF/NoFlow-lami-espece_VEF_FRACTION_MASSIQUE1.son
+			Style lines
+			columns 1 2 
+		}
+		Courbe
+		{
+			legend "Analytic value for mass fraction of species 2"
+			fonction 0.688
+			Style lines
+		}
+	}
+	Description "As for species 1, the correction of the code greatly increases the stabilization of the mass fraction as well as the value obtained numerically for species 2."
+	Figure {
+		Title "Mass fraction of species 2 before code correction"
+		Width 14cm
+		picture specie2-origine.png
+	}
+	Description "This same dynamic is also observed for species 2 in VDF and VEF discretization."
+	Description " \latex_(\medskip \latex_)"
+	visu
+	{
+		Titre "Mass fraction species 2 at final state for VDF discretization"
+		Width 7.9cm
+		cycles 25
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom FRACTION_MASSIQUE1 ELEM
+		nb_img_without_newline 2
+	}
+	visu
+	{
+		Titre "Mass fraction species 2 at final state for VEF discretization"
+		Width 7.9cm
+		cycles 25
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VEF/NoFlow-lami-espece_VEF.lata dom FRACTION_MASSIQUE1 ELEM
+	}
+	Description "$\bullet$ \latex_(\hspace{0.5cm}\textbf{THE MIXTURE}\latex_)"
+	Description " \latex_(\medskip \latex_)"
+	Description "After stabilization, the analytically expected density of the mixture is \latex_(\textbf{1.193}\latex_). For the two discretizations, the value obtained with TrioCFD is in good agreement with the analytics. With the correction made to the code, TrioCFD is able to correctly calculate the mixture of two species."
+	Description " \latex_(\medskip \latex_)"
+	visu
+	{
+		Titre "Density at final state for VDF discretization"
+		Width 7.9cm
+		cycles 25
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VDF/NoFlow-lami-espece_VDF.lata dom MASSE_VOLUMIQUE ELEM
+		nb_img_without_newline 2
+	}
+	visu
+	{
+		Titre "Density at final state for VEF discretization"
+		Width 7.9cm
+		cycles 25
+		up3d         0.0 +0.0 0.0
+		normal3D     0.60 0.60 0.60
+		zoom3D       0.01 0.01 0.8
+		pseudocolor VEF/NoFlow-lami-espece_VEF.lata dom MASSE_VOLUMIQUE ELEM
+	}
+	Description "$\bullet$ \latex_(\hspace{0.5cm}\textbf{RESULTS REPORT}\latex_)"
+	Description " \latex_(\medskip \latex_)"
+	Description "By comparing more precisely the results after stabilization of the mass fraction of each of the two species and the density of the mixture, it is noted that the maximum error obtained between numerical and analytical results is less than 0.5\%." As a reminder (see Figures 6 and 14), the error before correction of the code for the mass fraction of the species between numerical and analytical was of the order of 6\%."
+	Description "By this correction, the numerical results have therefore been significantly improved and TrioCFD correctly calculates the mixture of two species and keeps the mass of each of them well."
+	Table {
+		Title "Comparison between VDF, VEF and analytic results after stabilization"
+		nb_columns 5
+		label VDF | VEF | Analytic value | ErrorVDF \latex_(in \%\latex_) | ErrorVEF \latex_(in \%\latex_)
+		line {
+			file ./ligneTableau-specie1.dat
+			nb_columns_file 5
+			legend " Mass fraction species 1 "
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			file ./ligneTableau-specie2.dat
+			nb_columns_file 5
+			legend " Mass fraction species 2 "
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+		line {
+			file ./ligneTableau-density.dat
+			nb_columns_file 5
+			legend " Density of the mixture"
+			columns ($1) ($2) ($3) ($4) ($5)
+		}
+	}
+
+}
+Conclusion {
+	Description "The results obtained with TrioCFD are in excellent agreement with the analytical results for mass fraction of the 2 species but also for the density of the mixture at the end of the calculation. Indeed, the error between the numerical and analytical results on the mass fraction of each of the species and the density of the mixture at the end of the transient is less than 0.5%."
+	Description "This validation sheet therefore makes it possible to validate the very good behavior of TrioCFD on the calculation of the mixture of two species of different molar mass."
+}

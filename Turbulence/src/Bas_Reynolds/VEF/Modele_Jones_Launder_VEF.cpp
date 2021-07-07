@@ -377,7 +377,7 @@ DoubleTab& Modele_Jones_Launder_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone_
 
     }
   //E=0;
-  Cerr<<E.mp_min_vect()<<" EEEEEEEEEEEEEEEEEEEEEEEE "<<E.mp_max_vect()<<finl;
+//  Cerr<<E.mp_min_vect()<<" EEEEEEEEEEEEEEEEEEEEEEEE "<<E.mp_max_vect()<<finl;
 
   return E;
 }
@@ -548,3 +548,181 @@ void  Modele_Jones_Launder_VEF::mettre_a_jour(double temps)
 {
   ;
 }
+
+DoubleTab&  Modele_Jones_Launder_VEF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = la_zone.nb_faces();
+  int num_face;
+  double Re;
+  Fmu = 0;
+
+  for (num_face=0; num_face<nb_faces  ; num_face++)
+    {
+      if (1) //   if (eps_Bas_Re(num_face)>0)
+        {
+          if (!is_visco_const)
+            {
+              int elem0 = la_zone.face_voisins(num_face,0);
+              int elem1 = la_zone.face_voisins(num_face,1);
+              if (elem1!=-1)
+                {
+                  visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
+                  visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+                }
+              else
+                visco =  tab_visco(elem0);
+            }
+          Re = (K_Bas_Re(num_face)*K_Bas_Re(num_face))/(visco*(eps_Bas_Re(num_face)+DMINFLOAT));
+          Fmu[num_face] = exp(-2.5/(1.+Re/50));
+        }
+      else
+        {
+          Fmu[num_face] = 0.;
+        }
+    }
+
+  return Fmu;
+}
+
+
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_F2_BiK( DoubleTab& F2, DoubleTab& Deb, const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco);
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = la_zone.nb_faces();
+  int num_face;
+  double Re;
+
+  for (num_face=0; num_face<nb_faces  ; num_face++)
+    {
+      if (eps_Bas_Re(num_face)>0)
+        {
+          if (!is_visco_const)
+            {
+              int elem0 = la_zone.face_voisins(num_face,0);
+              int elem1 = la_zone.face_voisins(num_face,1);
+              if (elem1!=-1)
+                {
+                  visco = tab_visco(elem0)*la_zone.volumes(elem0)+tab_visco(elem1)*la_zone.volumes(elem1);
+                  visco /= la_zone.volumes(elem0) + la_zone.volumes(elem1);
+                }
+              else
+                visco =  tab_visco(elem0);
+
+            }
+          if (visco>0)
+            {
+              Re = (K_Bas_Re(num_face)*K_Bas_Re(num_face))/(visco*eps_Bas_Re(num_face));
+              F2[num_face] = 1. - (0.3*exp(-Re*Re));
+            }
+        }
+      else
+        {
+          F2[num_face] = 1.;
+        }
+    }
+  //Cerr<<F2.mp_min_vect()<<" F2 "<<F2.mp_max_vect()<<finl;
+  return F2;
+}
+
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+{
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  int nb_faces = la_zone.nb_faces();
+  for (int num_face=0; num_face <nb_faces; num_face ++ )
+    F1[num_face] = 1.;
+  return F1;
+}
+
+
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& transporte,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco, const DoubleTab& visco_turb ) const
+{
+  return Calcul_E( E, zone_dis, zone_Cl_dis, transporte, K_Bas_Re, ch_visco, visco_turb );
+}
+
+DoubleTab& Modele_Jones_Launder_VEF::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                  const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re, const Champ_Don& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+  const Zone_VEF& la_zone = ref_cast(Zone_VEF,zone_dis.valeur());
+  //  const Zone_Cl_VEF& la_zone_Cl = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+  const DoubleVect& volumes = la_zone.volumes();
+  //  int nb_faces = la_zone.nb_faces();
+  int nb_faces_tot = la_zone.nb_faces();
+  //  int nb_elem = la_zone.nb_elem();
+  int nb_elem_tot = la_zone.nb_elem_tot();
+  //  int nb_elem_tot = la_zone.nb_elem_tot();
+  const Zone& zone=la_zone.zone();
+  const IntTab& elem_faces = la_zone.elem_faces();
+  const int nb_faces_elem = zone.nb_faces_elem();
+  const DoubleTab& face_normales = la_zone.face_normales();
+  const DoubleVect& vol_ent = la_zone.volumes_entrelaces();
+
+  D = 0;
+  //return D;
+  int num_elem,i,face_loc,face_glob,num_face;
+  double deriv,Vol;
+
+  // Algo :
+  //   * Boucle sur les elements
+  //      * boucle locale dans l'element sur les faces -> calcul du gradient de racine de k
+  //      * distribution de la valeur de l'integrale sur les faces de l'element
+  //  Cela doit etre OK!!!
+  // Rq : k et epsilon sont definis comme la vitesse P1NC.
+
+  // ET le // ????? nb_elem ou nb_elem_tot
+  // Pbls des C.L. en paroi???? non car on impose epsilon-D = 0!!
+  for (num_elem=0; num_elem<nb_elem_tot; num_elem++)
+    {
+      Vol = volumes(num_elem);
+      for(i=0; i<dimension; i++)
+        {
+          deriv = 0;
+          for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
+            {
+              face_glob = elem_faces(num_elem,face_loc);
+              deriv += sqrt(K_Bas_Re(face_glob))*face_normales(face_glob,i)*la_zone.oriente_normale(face_glob,num_elem);
+            }
+          deriv /= Vol;
+          for(face_loc=0; face_loc<nb_faces_elem; face_loc++)
+            {
+              face_glob = elem_faces(num_elem,face_loc);
+              /*              Cerr<<"face_glob = "<<face_glob<<finl;
+                              Cerr<<"K_eps_Bas_Re(face_glob,0) = "<<K_eps_Bas_Re(face_glob,0)<<finl;
+                              Cerr<<"deriv = "<<deriv<<", Vol = "<<Vol<<", nb_faces_elem = "<<nb_faces_elem<<finl;*/
+              if (!is_visco_const)
+                visco=tab_visco(num_elem);
+              // on divise par nb_faces_elem pour dire que chaque elem
+              // contribue pour 1/3 de son volume en 2D.
+              D(face_glob) += visco*deriv*deriv*Vol/nb_faces_elem;
+            }
+        }
+    }
+  // on divise par vol_ent car en 2d c 2/3 du volume. Donc en tout en 2D
+  // chaque face recoit en tout 2 * (1/3) * vol / (vol * (2/3))=1 !
+  for (num_face=0; num_face<nb_faces_tot; num_face++)
+    D(num_face) *= 2./vol_ent(num_face);
+
+  // RQ : il faut diviser par le volume entrelace car ce que nous calculons c est l integrale en V
+  // Par contre dans les termes sources on multiplie par le volume entrelace daonc pour rester coherent avec le reste....
+  //D=0;
+  //  D*=0.5;
+  return D;
+}
+
+
+

@@ -57,6 +57,23 @@ public:
                                      const DoubleTab&, const DoubleTab&,
                                      const double) const;
   inline void lire_distance_paroi();
+
+  inline DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
+  inline DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&,const DoubleTab& ) const;
+  inline DoubleTab& Calcul_F1_BiK( DoubleTab&, const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
+  inline DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base& ) const;
+  inline DoubleTab& Calcul_Fmu_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& ) const;
+
+  inline DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
+  inline DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+                                         const DoubleTab& , const DoubleTab& ,
+                                         const DoubleTab& ,const int,
+                                         const DoubleTab&, const DoubleTab&, const DoubleTab&,
+                                         const double) const;
+
+  inline const Equation_base& seconde_equation() const;
+  inline  Equation_base& seconde_equation();
+  inline void associer_eqn_2(const Equation_base& );
 private :
 
 };
@@ -153,6 +170,62 @@ inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_Paroi(DoubleTab& Cmu,
 inline void Modele_Fonc_Bas_Reynolds::lire_distance_paroi()
 {
   return valeur().lire_distance_paroi();
+}
+
+
+inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_D_BiK(DoubleTab& D,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco ) const
+{
+  return valeur().Calcul_D_BiK(D, zone_dis,zone_Cl_dis,  vitesse,K_Bas_Re,eps_Bas_Re,visco );
+}
+
+inline  DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_E_BiK(DoubleTab& E,const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& vitesse,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco, const DoubleTab& visco_turb ) const
+{
+  return valeur().Calcul_E_BiK(E, zone_dis,zone_Cl_dis,  vitesse,K_Bas_Re,eps_Bas_Re,visco,visco_turb );
+}
+
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F1_BiK(DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P, const DoubleTab& K_Bas_Re, const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const
+{
+  return valeur().Calcul_F1_BiK( F1, zone_dis, zone_Cl_dis, P, K_Bas_Re, eps_Bas_Re,ch_visco);
+}
+
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_F2_BiK(DoubleTab& F2, DoubleTab& D,const Zone_dis& zone_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& visco ) const
+{
+  return valeur().Calcul_F2_BiK(F2, D, zone_dis,K_Bas_Re,eps_Bas_Re,visco );
+}
+inline DoubleTab&  Modele_Fonc_Bas_Reynolds::Calcul_Fmu_BiK(DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& visco ) const
+{
+  return valeur().Calcul_Fmu_BiK( Fmu, zone_dis, zone_Cl_dis, K_Bas_Re, eps_Bas_Re, visco );
+}
+
+inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_BiK(DoubleTab& Cmu,
+                                                           const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                           const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
+{
+  return valeur().Calcul_Cmu_BiK(Cmu, zone_dis, zone_Cl_dis, vitesse, K, Eps, EPS_MIN);
+}
+inline DoubleTab& Modele_Fonc_Bas_Reynolds::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
+                                                                 const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                                 const DoubleTab& visco, const DoubleTab& visco_turb,
+                                                                 const DoubleTab& loi_paroi,const int idt,
+                                                                 const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
+{
+  return valeur().Calcul_Cmu_Paroi_BiK(Cmu,zone_dis,zone_Cl_dis, visco,visco_turb,loi_paroi,idt,vitesse,K, Eps,EPS_MIN);
+}
+
+inline const Equation_base& Modele_Fonc_Bas_Reynolds::seconde_equation() const
+{
+  return valeur().seconde_equation();
+}
+
+inline  Equation_base& Modele_Fonc_Bas_Reynolds::seconde_equation()
+{
+  return valeur().seconde_equation();
+}
+
+
+inline void Modele_Fonc_Bas_Reynolds::associer_eqn_2(const Equation_base& eqn)
+{
+  valeur().associer_eqn_2( eqn ) ;
 }
 
 #endif

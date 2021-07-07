@@ -64,7 +64,8 @@ Lire fluide
 {
 	mu Champ_Uniforme 1 1.e-1
 	rho Champ_Uniforme 1 1000.
-	beta_co Champ_Uniforme 1 1.
+	beta_co Champ_Fonc_Fonction concentration 1 0.9
+#	beta_co Champ_Uniforme 1 1. #
 }
 
 Champ_Uniforme gravite
@@ -93,8 +94,17 @@ Lire pb
 				seuil 1.e-15
 		}
 		convection { quick }
-		approximation_de_boussinesq		   non
-		viscosite_dynamique_constante		   non
+		approximation_de_boussinesq		   non {
+		#	rho_1 550 
+			rho_2 1450 #
+			rho_fonc_c Champ_Fonc_Fonction concentration 1 1000.0+val*900.0 
+			           Champ_Uniforme 1 900.0
+		}
+		viscosite_dynamique_constante		   non {
+		#	mu_1				   1.e-2
+			mu_2				   1.e-1 #
+			mu_fonc_c Champ_Fonc_Fonction concentration 1 0.5*(1.e-2+1.e-1)+val*(1.e-1-1.e-2)
+		}
 		diffusion { }
                 sources {
  			Source_Qdm_Phase_field {
@@ -119,9 +129,10 @@ Lire pb
 			Source_Con_Phase_field {
 				Temps_d_affichage	   0
 				alpha                      .1406250000e-3
+				potentiel_chimique         { defaut }
 				beta                       115.2000000
 				kappa                      20.e-7
-				kappa_variable             oui
+				kappa_variable             { defaut }
 				moyenne_de_kappa           harmonique
 				multiplicateur_de_kappa    6.
 				couplage_NS_CH             mutilde(n+1/2)
@@ -136,10 +147,6 @@ Lire pb
 				residu_max_gmresnl         1.e-4
 			}
 		}
-		mu_1					   1.e-2
-		mu_2					   1.e-1
-		rho_1					   550
-		rho_2					   1450
 		potentiel_chimique_generalise 		   avec_energie_cinetique
 		boundary_conditions {
 			Haut paroi
@@ -153,16 +160,19 @@ Lire pb
 	}
 	Postraitement
 	{
-	 	format lml
+	 	format lata
 		Champs dt_post 1.e-2
 		{
+			masse_volumique elem
 			vitesse elem
 			concentration elem
+			potentiel_chimique_generalise elem
 		}
 	}
 }
 
 Solve pb
+lata_to_other lml NOM_DU_CAS NOM_DU_CAS
 
 Fin
 
@@ -221,6 +231,6 @@ Fin
 	masse volumique de la phase 2
 - potentiel_chimique_generalise
 	sans_energie_cinetique -> potentiel chimique generalise classique
-	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u²/2 drho/dphi
+	avec_energie_cinetique -> potentiel chimique generalise incluant le terme en u^2/2 drho/dphi
 
 #

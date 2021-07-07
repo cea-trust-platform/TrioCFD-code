@@ -123,6 +123,13 @@ Read pb
 		}
 		lata
 		{
+			Definition_champs
+			{
+				source_keps operateur_eqn {
+					numero_source 0
+					sources { refChamp { pb_champ pb K_EPS } }
+				}
+			}
 			format lata
 			fichier Cx_impl
 			fields dt_post 1.
@@ -132,6 +139,7 @@ Read pb
 				viscosite_turbulente elem
 				k elem
 				eps elem
+				source_keps faces
 			}
 		}		
 	}

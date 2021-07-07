@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#Creation des repertoires
+mkdir ./VDF
+mkdir ./VEF
+
+###########
+RACINE=`pwd`
+
+# Cas de base VDF amont
+cd $RACINE/VDF
+cp $RACINE/NoFlow-lami-espece.data NoFlow-lami-espece_VDF.data
+
+# VEF (amont)
+cd $RACINE/VEF
+cp $RACINE/post_run .
+cp $RACINE/NoFlow-lami-espece.data NoFlow-lami-espece_VEF.data
+sed "s/Nombre_de_Noeuds 21 21 11/Nombre_de_Noeuds 11 11 6/" NoFlow-lami-espece_VEF.data > modifie.data
+mv modifie.data NoFlow-lami-espece_VEF.data
+sed "s/VDF dis/VEFPreP1B dis/" NoFlow-lami-espece_VEF.data > modifie.data
+mv modifie.data NoFlow-lami-espece_VEF.data
+sed "26a\Tetraedriser_homogene_fin dom" NoFlow-lami-espece_VEF.data > modifie.data
+mv modifie.data NoFlow-lami-espece_VEF.data
+sed "s/dt_min 1.e-9/dt_min 1.e-12/" NoFlow-lami-espece_VEF.data > modifie.data
+mv modifie.data NoFlow-lami-espece_VEF.data

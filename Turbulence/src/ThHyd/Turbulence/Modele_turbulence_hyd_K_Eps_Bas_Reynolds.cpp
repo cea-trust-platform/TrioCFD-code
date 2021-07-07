@@ -90,9 +90,6 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
   //  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int n = tab_K_Eps.dimension(0);
   DoubleTab Fmu(n);
-  double LeEPSMIN = get_LeEPS_MIN();
-  // K_Eps(i,0) = K au noeud i
-  // K_Eps(i,1) = Epsilon au noeud i
 
   mon_modele_fonc.Calcul_Fmu( Fmu,la_zone_dis,la_zone_Cl_dis,tab_K_Eps,ch_visco_cin);
 
@@ -130,7 +127,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
 
       for (int i=0; i<n; i++)
         {
-          if (tab_K_Eps(i,1) <= LeEPSMIN)
+          if (tab_K_Eps(i,1) <= DMINFLOAT)
             visco_turb_K_eps_Bas_Re[i] = 0;
           else
             visco_turb_K_eps_Bas_Re[i] = CMU*Fmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);
@@ -143,7 +140,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
     {
       for (int i=0; i<n; i++)
         {
-          if (inf_ou_egal(tab_K_Eps(i,1),LeEPSMIN))
+          if (tab_K_Eps(i,1) <= DMINFLOAT)
             visco_turb[i] = 0;
           else
             visco_turb[i] = CMU*Fmu(i)*tab_K_Eps(i,0)*tab_K_Eps(i,0)/tab_K_Eps(i,1);

@@ -28,6 +28,8 @@
 #include <Op_Diff_K_Eps_base.h>
 #include <ItVDFEl.h>
 #include <Eval_Diff_K_Eps_VDF_Elem.h>
+#include <Eval_Diff_K_VDF_Elem.h>
+#include <Eval_Diff_Eps_VDF_Elem.h>
 #include <Op_VDF_Elem.h>
 
 class Zone_dis;
@@ -71,6 +73,8 @@ protected:
 };
 
 declare_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)
+declare_It_VDF_Elem(Eval_Diff_K_VDF_Elem)
+declare_It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -86,6 +90,42 @@ class Op_Diff_K_Eps_VDF_Elem : public Op_Diff_K_Eps_VDF_base
 public:
 
   Op_Diff_K_Eps_VDF_Elem();
+  void associer(const Zone_dis& , const Zone_Cl_dis& ,
+                const Champ_Inc& );
+};
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// CLASS: Op_Diff_K_VDF_Elem
+//
+//////////////////////////////////////////////////////////////////////////////
+
+class Op_Diff_K_VDF_Elem : public Op_Diff_K_Eps_VDF_base
+{
+
+  Declare_instanciable_sans_constructeur(Op_Diff_K_VDF_Elem);
+
+public:
+
+  Op_Diff_K_VDF_Elem();
+  void associer(const Zone_dis& , const Zone_Cl_dis& ,
+                const Champ_Inc& );
+};
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// CLASS: Op_Diff_Eps_VDF_Elem
+//
+//////////////////////////////////////////////////////////////////////////////
+
+class Op_Diff_Eps_VDF_Elem : public Op_Diff_K_Eps_VDF_base
+{
+
+  Declare_instanciable_sans_constructeur(Op_Diff_Eps_VDF_Elem);
+
+public:
+
+  Op_Diff_Eps_VDF_Elem();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
                 const Champ_Inc& );
 };
@@ -117,7 +157,7 @@ inline DoubleTab& Op_Diff_K_Eps_VDF_base::ajouter(const DoubleTab& inco,  Double
 inline void Op_Diff_K_Eps_VDF_base::contribuer_a_avec(const DoubleTab& inco,
                                                       Matrice_Morse& matrice) const
 {
-  Cerr << "dans Op_Diff_K_Eps_VDF_base::contribuer_a_avec" << finl;
+//  Cerr << "dans Op_Diff_K_Eps_VDF_base::contribuer_a_avec" << finl;
   iter.ajouter_contribution(inco, matrice);
 }
 

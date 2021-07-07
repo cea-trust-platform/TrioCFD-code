@@ -1602,7 +1602,6 @@ double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
 //  a partir de ce champ dans mettre_a_jour.
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
 {
-  statistiques().begin_count(calculer_rho_mu_indicatrice_counter_);
   const int tag = maillage_interface().get_mesh_tag();
   if (tag != variables_internes_->indicatrice_cache_tag)
     {
@@ -1612,7 +1611,6 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
                                               valeurs_indicatrice);
       variables_internes_->indicatrice_cache_tag = tag;
     }
-  statistiques().end_count(calculer_rho_mu_indicatrice_counter_);
   return variables_internes_->indicatrice_cache.valeur();
 }
 
@@ -3109,6 +3107,9 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_faces(
   const DoubleTab& normale_elem,
   DoubleTab&        dist_face) const
 {
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Calculer_distance_interface");
+  statistiques().begin_count(stat_counter);
+
   static const double distance_faces_invalides = -1.e30;
 
   const Zone_VF&    zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
@@ -3174,6 +3175,7 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_faces(
         dist_face(i) = valeur_invalide;
     }
   dist_face.echange_espace_virtuel();
+  statistiques().end_count(stat_counter);
 }
 
 
@@ -6448,7 +6450,6 @@ void Transport_Interfaces_FT_Disc::integrer_ensemble_lagrange(const double temps
 
 void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
 {
-  statistiques().begin_count(deplacement_interf_counter_);
   Process::Journal() << "Transport_Interfaces_FT_Disc::mettre_a_jour " << le_nom() << " temps= "<< temps << finl;
   Maillage_FT_Disc& maillage = maillage_interface();
 
@@ -6741,7 +6742,6 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
   //TF : Gestion de l avancee en temps de la derivee
   if (calculate_time_derivative()) derivee_en_temps().changer_temps(temps);
   //Fin de TF
-  statistiques().end_count(deplacement_interf_counter_);
 }
 
 // Deplace les sommets de l'interface du deplacement prescrit (vitesse * coeff)
@@ -7486,8 +7486,7 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   DoubleTab& normale_elements,
   const int n_iter) const
 {
-  static const Stat_Counter_Id stat_counter =
-    statistiques().new_counter(3, "Calculer_distance_interface", "FrontTracking");
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Calculer_distance_interface");
   statistiques().begin_count(stat_counter);
 
   static const double distance_sommets_invalides = -1.e30;

@@ -74,6 +74,11 @@ public:
 
   }
 
+protected:
+
+  bool diffuse_k_seul;
+  bool diffuse_eps_seul;
+
 };
 
 

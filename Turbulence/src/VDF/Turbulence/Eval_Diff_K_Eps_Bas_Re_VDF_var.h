@@ -27,11 +27,11 @@
 #define PRDT_K_DEFAUT 1
 #define PRDT_EPS_DEFAUT 1.3
 
-#include <Eval_Diff_VDF_var.h>
+#include <Eval_Diff_VDF_var_old.h>
 #include <Ref_Champ_Fonc.h>
 #include <Ref_Champ_Uniforme.h>
 
-class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF_var
+class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF_var_old
 {
 
 public:

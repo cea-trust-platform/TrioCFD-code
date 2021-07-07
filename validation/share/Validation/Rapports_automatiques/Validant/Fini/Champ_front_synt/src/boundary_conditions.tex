@@ -1,0 +1,28 @@
+We decompose the border $\partial \Omega$ in four parts. The first part is $\Gamma_y$ (up and down), the second $\Gamma_z$ (left and right), the third $\Gamma_{x_i}$ (inlet of flow) and the fourth $\Gamma_{x_o}$ (outlet of flow). We have :
+\begin{align*}
+\Gamma_z &= \{ (x,y,z) \in \Omega | z = 0, L_z \}\\
+\Gamma_y &= \{ (x,y,z) \in \Omega | y = 0, L_y \}\\
+\Gamma_{x_i} &= \{ (x,y,z) \in \Omega | x = 0\}\\
+\Gamma_{x_o} &= \{ (x,y,z) \in \Omega | x = L_x \}\\
+\end{align*}
+The velocity field $U$ and the pressure $p$ have the following conditions :
+\begin{itemize}
+    \item \textbf{Dirichlet boundary condition} on the walls, $\Gamma_y$ for the velocity :
+    \[
+     \forall (x,y,z) \in \Gamma_y, \ U(x,y,z) = 0
+    \]
+    \item \textbf{Periodic condition} on left and right, $\Gamma_z$ :
+    \[
+     \forall (x,y,z) \in \Gamma_z, \ U(x,y,0) = U(x, y, L_z)
+    \]
+    \item \textbf{Dirichlet boundary condition} at the outlet $\Gamma_{x_o}$ for the pressure :
+    \[
+     \forall (x,y,z) \in \Gamma_{x_o}, \ p(L_x,y,z) = p_c
+    \]
+    With $p_c$ is a variable entered by the user.
+    \item \textbf{Dirichlet boundary condition} at the inlet $\Gamma_{x_i}$. We use the Kraichnan method to give a valu at $U$. We have 
+    \[
+     \forall (x,y,z) \in \Gamma_{x_i} \ U(0,y,z) = U_{mean} + (dir\_fluct) \ 2\sum_{l=1}^{N} A^l \cos\big(\kappa^l \cdot (0,y,z)+ \psi^l \big) \sigma^l
+    \]
+With $U_{mean} \in \mathbb{R}^3$ the mean velocity field, vector entered by the user.
+\end{itemize}

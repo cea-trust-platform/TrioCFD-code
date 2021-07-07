@@ -85,7 +85,7 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
         Fmu[elem]=1.;
     }
   //Fmu=1;
-  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
+//  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
 
 
   return Fmu;
@@ -108,3 +108,39 @@ DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu( DoubleTab& Fmu,const Zone_dis
   return Fmu;
   }
 */
+
+
+
+DoubleTab&  Modele_Launder_Sharma_VDF::Calcul_Fmu_BiK( DoubleTab& Fmu,const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_Don& ch_visco ) const
+{
+  double visco=-1;
+  const DoubleTab& tab_visco=ch_visco.valeurs();
+  int is_visco_const=sub_type(Champ_Uniforme,ch_visco.valeur());
+  if (is_visco_const)
+    visco=tab_visco(0,0);
+  // Cerr << " dans Jones Sharma Calc Fmu " << finl;
+  const Zone_VDF& la_zone = ref_cast(Zone_VDF,zone_dis.valeur());
+  Fmu = 0;
+  int nb_elem = la_zone.nb_elem();
+  double Re;
+  int elem;
+  for (elem=0; elem< nb_elem ; elem++)
+    {
+      if (!is_visco_const)
+        visco=tab_visco[elem];
+      if (visco>0)
+        {
+          Re = K_Bas_Re(elem)*K_Bas_Re(elem)/(eps_Bas_Re(elem)+DMINFLOAT)/visco;
+          //Fmu[elem] = exp(-3.4/((1.+Re/50.)*(1.+Re/50.)*(1+Re/50.)));
+          Fmu[elem] = exp(-3.4/((1.+Re/50.)*(1.+Re/50.)));
+        }
+      else
+        Fmu[elem]=1.;
+    }
+  //Fmu=1;
+  Cerr<<Fmu.mp_min_vect()<<" Fmu "<<Fmu.mp_max_vect()<<finl;
+
+
+  return Fmu;
+}
+

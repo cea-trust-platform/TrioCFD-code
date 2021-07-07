@@ -56,6 +56,11 @@ void Modele_Fonc_Bas_Reynolds_Base::associer_eqn( const Equation_base& eqn)
   mon_equation = eqn;
 }
 
+void Modele_Fonc_Bas_Reynolds_Base::associer_eqn_2( const Equation_base& eqn)
+{
+  ma_seconde_equation = eqn;
+}
+
 void Modele_Fonc_Bas_Reynolds_Base::discretiser()
 {
   const Discretisation_base& dis=mon_equation->discretisation();
@@ -71,6 +76,7 @@ void Modele_Fonc_Bas_Reynolds_Base::discretiser()
   champs_compris_.ajoute_champ(F2_);
   dis.discretiser_champ("champ_elem", mon_equation->zone_dis(),"distance_paroi","m",1,temps,BR_wall_length_);
   champs_compris_.ajoute_champ(BR_wall_length_);
+
 
   Cerr << "Discretisation du modele Bas Reynolds terminee" << finl;
 }
@@ -131,6 +137,32 @@ bool Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re(const DoubleTab&, const Do
   return false;
 }
 
+
+DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_BiK(DoubleTab& Cmu,
+                                                         const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                         const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
+{
+  return Cmu;
+}
+
+DoubleTab& Modele_Fonc_Bas_Reynolds_Base::Calcul_Cmu_Paroi_BiK(DoubleTab& Cmu,
+                                                               const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
+                                                               const DoubleTab& visco, const DoubleTab& visco_turb,
+                                                               const DoubleTab& loi_paroi,const int idt,
+                                                               const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) const
+{
+  return Cmu;
+}
+
+bool Modele_Fonc_Bas_Reynolds_Base::calcul_tenseur_Re_BiK(const DoubleTab&, const DoubleTab&, DoubleTab& ) const
+{
+  Cerr << "La viscosite anisotrope n'a pas ete developpe dans ce modele fonc" << finl;
+  exit();
+  return false;
+}
+
+
+
 const Champ_base& Modele_Fonc_Bas_Reynolds_Base::get_champ(const Motcle& nom) const
 {
   return champs_compris_.get_champ(nom);
@@ -146,7 +178,7 @@ void Modele_Fonc_Bas_Reynolds_Base::get_noms_champs_postraitables(Noms& nom,Opti
 
 void Modele_Fonc_Bas_Reynolds_Base::lire_distance_paroi( )
 {
-  //Cerr << " Le calcul de la dsitance a la paroi n'est pas implemente avec le modele fonc que vous avez donnez " << finl;
+  //Cerr << " Le calcul de la distance a la paroi n'est pas implemente avec le modele fonc que vous avez donnez " << finl;
   //exit();
 
 }

@@ -149,6 +149,10 @@ Lire pb
 
         Postraitement
 	{
+		champs dt_post 100
+		{
+			pression
+		}
 	        Sondes 
 		{
 			# Sonde de vitesse horizontale #

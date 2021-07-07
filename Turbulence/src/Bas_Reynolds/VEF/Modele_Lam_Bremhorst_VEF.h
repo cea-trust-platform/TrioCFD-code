@@ -42,7 +42,7 @@ Boundary Layer Flows Characteristic
 of Gas Turbine Blades
 Rodney C. Schmidt and Suhas V. Patankar
 */
-#define BR_EPS 1.e-10
+#define BR_EPS 1.e-20
 
 class Zone_dis;
 class Zone_Cl_dis;
@@ -101,6 +101,26 @@ public :
                                    const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,
                                    const DoubleTab& G,
                                    const Champ_base& K_Eps) const;
+
+
+
+  virtual DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
+  virtual DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+                                          const DoubleTab& , const DoubleTab& ,
+                                          const DoubleTab& ,const int,
+                                          const DoubleTab&, const DoubleTab&, const DoubleTab&,
+                                          const double) const;
+  virtual bool calcul_tenseur_Re_BiK(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+  virtual DoubleTab calcul_tenseur_Re_elem_BiK(const Discretisation_base& dis,
+                                               const Zone_dis&,const DoubleTab&, const DoubleTab&, const DoubleTab&,
+                                               const DoubleTab&, const Champ_base& K, const Champ_base& Eps) const;
+
+  virtual DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
+  virtual DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const ;
+  virtual DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const;
+  virtual DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const ;
+  virtual DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const ;
+
 protected:
 
   REF(Zone_VEF) la_zone_VEF;

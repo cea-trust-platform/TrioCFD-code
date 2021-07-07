@@ -32,9 +32,9 @@ Mod_turb_hyd_RANS::Mod_turb_hyd_RANS()
 {
   Prandtl_K = 1.;
   Prandtl_Eps = 1.3;
-  LeEPS_MIN = 1.e-10  ;
+  LeEPS_MIN = 1.e-20  ;
   LeEPS_MAX = 1.e+10;
-  LeK_MIN = 1.e-10;
+  LeK_MIN = 1.e-20;
   lquiet = 0;
 }
 // Description:

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Phase_field.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Phase_field/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Phase_field/src
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -122,12 +122,6 @@ public :
 
   /////////////////////////////////////////////////////
 
-  virtual void calculer_rho();
-  virtual void calculer_mu();
-  inline double& rho1();
-  inline double& rho2();
-  inline double& mu1();
-  inline double& mu2();
   inline int& get_mutype_()
   {
     return mutype_;
@@ -148,47 +142,8 @@ protected :
   DoubleTab c_demi;
   DoubleTab mutilde_demi;
 
-  double rho1_;
-  double rho2_;
-  double mu1_;
-  double mu2_;
   int mutype_;
 
-  REF(Champ_Don) rho_;
-  REF(Champ_Don) mu_;
-
 };
-
-// Description:
-//    Renvoie le champ du potentiel chimique generalise
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ inconnue representant le potentiel chimique generalise
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
-inline double& Convection_Diffusion_Phase_field::rho1()
-{
-  return rho1_;
-}
-inline double& Convection_Diffusion_Phase_field::rho2()
-{
-  return rho2_;
-}
-inline double& Convection_Diffusion_Phase_field::mu1()
-{
-  return mu1_;
-}
-inline double& Convection_Diffusion_Phase_field::mu2()
-{
-  return mu2_;
-}
 
 #endif
