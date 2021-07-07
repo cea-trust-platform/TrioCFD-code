@@ -280,6 +280,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       double coeff1 = mass_[j] + halfDt*damping_[j] + squareHalfDt*stiffness_[j];
       double coeff2 = damping_[j]*(qSpeed_[j] + halfDt*qAcceleration_[j]) + stiffness_[j]*(qDisplacement_[j] + dt*qSpeed_[j] + squareHalfDt*qAcceleration_[j]);
       qAcceleration_[j]=(fluidForce[j] - coeff2)/coeff1;
+      //qAcceleration_[j]=(0. - coeff2)/coeff1;
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
