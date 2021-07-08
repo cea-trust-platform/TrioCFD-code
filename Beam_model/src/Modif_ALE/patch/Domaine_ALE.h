@@ -28,8 +28,8 @@
 #include <IntLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
-#include <Beam_model.h>
 #include <Ref_Equation_base.h>
+#include <Beam_model.h>
 
 class Domaine_dis;
 //////////////////////////////////////////////////////////////////////////////
