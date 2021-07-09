@@ -32,6 +32,7 @@
 #include <Beam_model.h>
 
 class Domaine_dis;
+class Beam_model;
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
@@ -82,7 +83,7 @@ public :
   inline void associer_equation(const Equation_base& une_eq);
 protected:
 
-  double dt_=0.;
+  double dt_;
   DoubleTab ALE_mesh_velocity;
   DoubleTab vf; //faces velocity
   IntTab som_faces_bords;
@@ -136,4 +137,5 @@ inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;
 }
+
 #endif

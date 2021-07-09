@@ -20,8 +20,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_front_ALE_Beam.h>
-#include <Beam_model.h>
-#include <Domaine.h>
 #include <Frontiere_dis_base.h>
 #include <Zone_Cl_dis_base.h>
 #include <Front_VF.h>
@@ -29,10 +27,6 @@
 #include <Domaine.h>
 #include <Zone_VEF.h>
 #include <Cond_lim.h>
-#include <Navier_Stokes_std.h>
-#include <Equation_base.h>
-#include <Operateur_Diff.h>
-#include <Operateur_Grad.h>
 #include <DoubleVect.h>
 #include <fstream>
 #include <math.h>
@@ -52,24 +46,6 @@ Entree& Champ_front_ALE_Beam::readOn(Entree& is)
 {
   return Champ_front_ALE::readOn(is);
 }
-void Champ_front_ALE_Beam::initializationBeam_bis(double tps)
-{
-  Cerr<<"Champ_front_ALE_Beam::initializationBeam"<<finl;
-  const Frontiere& front=la_frontiere_dis->frontiere();
-  const Zone& zone=front.zone();
-  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
-  double x=0,y=0,z=0;
-  double velocity=0.;
-  int dir=dom_ale.getBeamDirection();
-  fxyzt[dir].setVar("x",x);
-  fxyzt[dir].setVar("y",y);
-  fxyzt[dir].setVar("z",z);
-  fxyzt[dir].setVar("t",tps);
-  velocity=fxyzt[dir].eval();
-  dom_ale.initializationBeam(velocity);
-}
-
-
 
 void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 {
@@ -144,75 +120,4 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 
     }
 }
-void  Champ_front_ALE_Beam::computeFluidForce(const double tps, DoubleVect& fluidForce)
-{
 
-  const Frontiere& front=la_frontiere_dis->frontiere();
-  const Zone& zone=front.zone();
-  Domaine_ALE& dom_ale=ref_cast_non_const(Domaine_ALE, zone.domaine());
-  const Equation_base& eqn =  dom_ale.getEquation();
-  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,eqn);
-  int ndeb = front.num_premiere_face();
-  int nfin = ndeb + front.nb_faces();
-  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
-  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
-  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
-  const DoubleTab& xv=la_zone_vef.xv();
-
-  DoubleTab& flux_bords_grad=op_grad.flux_bords();
-  DoubleTab& flux_bords_diff=op_diff.flux_bords();
-  DoubleVect force(3);
-  DoubleVect force_p(3);
-  DoubleVect force_v(3);
-  std::ofstream ofs_k0;
-  ofs_k0.open ("force_p.txt", std::ofstream::out | std::ofstream::app);
-
-  std::ofstream ofs_k1;
-  ofs_k1.open ("force_v.txt", std::ofstream::out | std::ofstream::app);
-  Cout<<" BEAM! ndeb= "<<ndeb<<" nfin = "<<nfin<<finl;
-  getchar();
-  if(flux_bords_grad.size() == flux_bords_diff.size())
-    {
-
-      for (int face=ndeb; face<nfin; face++)
-        {
-          for(int comp=0; comp<3; comp++)
-            {
-              force_p[comp] += (flux_bords_grad(face, comp));
-              force_v[comp] += (flux_bords_diff(face, comp));
-            }
-        }
-      ofs_k0<<tps<<" "<<force_p[0]<<" "<<force_p[1]<<" "<<force_p[2]<<endl;
-      ofs_k0.close();
-      ofs_k1<<tps<<" "<<force_v[0]<<" "<<force_v[1]<<" "<<force_v[2]<<endl;
-      ofs_k1.close();
-
-      Cout<<"ALE BEAM: temps:= "<<tps<<" force v =  "<<force_v[1]<<finl;
-      getchar();
-    }
-
-  if(flux_bords_grad.size() == flux_bords_diff.size())
-    {
-      for(int nbmodes=0; nbmodes<fluidForce.size(); nbmodes++)
-        {
-          for (int face=ndeb; face<nfin; face++)
-            {
-              DoubleVect phi(3);
-              const DoubleTab& u=dom_ale.getBeamDisplacement(nbmodes);
-              const DoubleTab& R=dom_ale.getBeamRotation(nbmodes);
-              phi=dom_ale.interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
-              for(int comp=0; comp<3; comp++)
-                {
-                  force[comp] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
-                }
-            }
-          for(int comp=0; comp<3; comp++)
-            {
-              fluidForce[nbmodes] += force[comp];
-            }
-        }
-
-    }
-
-  fluidForce=0.;
-}

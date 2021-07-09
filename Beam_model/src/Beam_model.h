@@ -40,9 +40,10 @@ Declare_liste(DoubleTab);
 class Beam_model : public Interprete_geometrique_base
 {
 
-  Declare_instanciable( Beam_model ) ;
+  Declare_instanciable_sans_constructeur( Beam_model ) ;
 
 public :
+  Beam_model ();
   Entree& interpreter_(Entree&);
   inline const int& getNbModes() const;
   inline void setNbModes(const int&) ;
@@ -81,7 +82,7 @@ protected :
   int direction_; //x=0, y=1, z=2
   double young_; // Young module
   double rho_; // solid density
-  bool activate_=false;
+  bool activate_;
   DoubleVect mass_;
   DoubleVect stiffness_;
   DoubleVect damping_;
@@ -92,7 +93,7 @@ protected :
   DoubleVect qHalfSpeed_;
   DoubleVect qAcceleration_;
   DoubleVect qDisplacement_;
-  bool timeScheme_=true;
+  bool timeScheme_;
   //DoubleTab phi3D_;
   double temps_;
 

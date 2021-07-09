@@ -39,7 +39,19 @@ using namespace std;
 
 Implemente_liste(DoubleTab);
 
-Implemente_instanciable( Beam_model, "Beam_model", Interprete_geometrique_base ) ;
+Implemente_instanciable_sans_constructeur( Beam_model, "Beam_model", Interprete_geometrique_base ) ;
+
+Beam_model::Beam_model()
+{
+
+  nbModes_=0;;
+  direction_=0;
+  young_=200.e+9;
+  rho_ = 8100.;
+  activate_=false;
+  timeScheme_=true;
+  temps_ =0.;
+}
 
 Sortie& Beam_model::printOn( Sortie& os ) const
 {
