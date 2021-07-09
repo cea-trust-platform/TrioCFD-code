@@ -48,10 +48,11 @@ class Beam_model;
 //////////////////////////////////////////////////////////////////////////////
 class Domaine_ALE : public Domaine
 {
-  Declare_instanciable_sans_constructeur(Domaine_ALE);
+  Declare_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE);
 
 public :
   Domaine_ALE();
+  ~Domaine_ALE();
   inline const double& get_dt() const;
   virtual void set_dt(double& dt);
   inline const DoubleTab& vitesse() const;
@@ -95,7 +96,7 @@ protected:
   int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
-  Beam_model beam;
+  Beam_model *beam;
   REF(Equation_base) eq;
   DoubleVect fluidForceOnBeam;
   double tempsComputeForceOnBeam;

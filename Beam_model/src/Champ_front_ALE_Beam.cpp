@@ -89,6 +89,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               const DoubleTab& R=dom_ale.getBeamRotation(count);
               DoubleVect phi(3);
               phi=dom_ale.interpolationOnThe3DSurface(x,y,z, u, R);
+              phi=0.;
               for(int comp=0; comp<nb_comp(); comp++)
                 {
                   value[comp] +=beamVelocity[count]*phi[comp];
@@ -99,22 +100,6 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
             {
               vit_som_bord_ALE(faces.sommet(i,k),j)=value[j];
 
-            }
-
-
-
-          if(front.le_nom()=="Poutre")
-            {
-              if(i ==2713 && k==1)
-                {
-                  std::ofstream ofs_P;
-                  ofs_P.open ("beam_vel_P_0.5_h.txt", std::ofstream::out | std::ofstream::app);
-                  ofs_P<<tps<<" "<<value[0]<<" "<<value[1]<<" "<<value[2]<<endl;
-                  ofs_P.close();
-                  //Cout<<"time = "<<tps <<" velocity beam Poutre= "<<beamVelocity<<finl;
-                  //getchar();
-
-                }
             }
         }
 

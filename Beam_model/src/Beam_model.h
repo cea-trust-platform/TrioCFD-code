@@ -40,10 +40,11 @@ Declare_liste(DoubleTab);
 class Beam_model : public Interprete_geometrique_base
 {
 
-  Declare_instanciable_sans_constructeur( Beam_model ) ;
+  Declare_instanciable_sans_constructeur_ni_destructeur( Beam_model ) ;
 
 public :
-  Beam_model ();
+  Beam_model();
+  ~Beam_model();
   Entree& interpreter_(Entree&);
   inline const int& getNbModes() const;
   inline void setNbModes(const int&) ;

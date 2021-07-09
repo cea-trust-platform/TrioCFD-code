@@ -39,7 +39,7 @@ using namespace std;
 
 Implemente_liste(DoubleTab);
 
-Implemente_instanciable_sans_constructeur( Beam_model, "Beam_model", Interprete_geometrique_base ) ;
+Implemente_instanciable_sans_constructeur_ni_destructeur(Beam_model, "Beam_model", Interprete_geometrique_base ) ;
 
 Beam_model::Beam_model()
 {
@@ -51,6 +51,10 @@ Beam_model::Beam_model()
   activate_=false;
   timeScheme_=true;
   temps_ =0.;
+}
+Beam_model::~Beam_model()
+{
+
 }
 
 Sortie& Beam_model::printOn( Sortie& os ) const
@@ -197,9 +201,6 @@ void Beam_model::readInputModalDeformation(Noms& modal_deformation_file_name)
 
       if(monFlux)
         {
-          /*string line;  // read the first line
-          getline(monFlux, line);
-          monFlux.ignore();*/
           double  ux, uy, uz, rx, ry, rz;
           for(int i=0; i<size; i++)
             {
@@ -251,7 +252,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
     }
 
-  //test beam:
+  /*//test beam:
   DoubleVect deplacement(3);
   DoubleVect velo(3);
   deplacement=0.;
@@ -275,7 +276,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
   ofs_1.close();
   ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
   ofs_2.close();
-  //fin test beam
+  //fin test beam */
 
 
 
@@ -296,7 +297,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
-  //test beam:
+  /*  //test beam:
   DoubleVect deplacement(3);
   DoubleVect velo(3);
   deplacement=0.;
@@ -312,25 +313,25 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
         }
     }
 
-  std::ofstream ofs_1;
-  ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
-  std::ofstream ofs_2;
-  ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
-  ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
-  ofs_1.close();
-  ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
-  ofs_2.close();
-  //fin test beam
+   std::ofstream ofs_1;
+   ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
+   std::ofstream ofs_2;
+   ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
+   ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
+   ofs_1.close();
+   ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
+   ofs_2.close();
+   //fin test beam*/
 
   return qSpeed_;
 }
 
 DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
 {
-  std::ofstream ofs_k0;
+  /*std::ofstream ofs_k0;
   ofs_k0.open ("force.txt", std::ofstream::out | std::ofstream::app);
   ofs_k0<<tps<<" "<< fluidForce[0] <<"  "<<fluidForce[1]<<endl;
-  ofs_k0.close();
+  ofs_k0.close();*/
 
   if(dt == 0.)
     {
