@@ -125,10 +125,6 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
           la_zone_VF.volumes_entrelaces()=0;
           la_zone_VEF.calculer_volumes_entrelaces();
 
-
-          // PL: je trouve etonnant que le calcul des surfaces se fasse AVANT le calcul des normales
-          // PL: il devrait se faire APRES
-
           int nb_faces_tot=face_sommets.dimension_tot(0);
           la_zone_VEF.calculer_h_carre();
           const Elem_VEF& type_elem=la_zone_VEF.type_elem();

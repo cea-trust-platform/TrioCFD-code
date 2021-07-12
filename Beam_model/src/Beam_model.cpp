@@ -251,35 +251,6 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
       qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
     }
-
-  /*//test beam:
-  DoubleVect deplacement(3);
-  DoubleVect velo(3);
-  deplacement=0.;
-  velo=0.;
-  int size = abscissa_.size();
-  for(int j=0; j < nbModes_; j++)
-    {
-      const DoubleTab& u=u_(j);
-      for(int i=0; i<3; i++)
-        {
-          deplacement[i] += qDisplacement_[j]*u(size-1,i);
-          velo[i] += qSpeed_[j]*u(size-1,i);
-        }
-    }
-
-  std::ofstream ofs_1;
-  ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
-  std::ofstream ofs_2;
-  ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
-  ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
-  ofs_1.close();
-  ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
-  ofs_2.close();
-  //fin test beam */
-
-
-
   return qHalfSpeed_;
 }
 
@@ -297,31 +268,36 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
-  /*  //test beam:
-  DoubleVect deplacement(3);
-  DoubleVect velo(3);
-  deplacement=0.;
-  velo=0.;
-  int size = abscissa_.size();
-  for(int j=0; j < nbModes_; j++)
+  //test beam:
+  if (je_suis_maitre())
     {
-      const DoubleTab& u=u_(j);
-      for(int i=0; i<3; i++)
+      DoubleVect deplacement(3);
+      DoubleVect velo(3);
+      deplacement=0.;
+      velo=0.;
+      int size = abscissa_.size();
+      for(int j=0; j < nbModes_; j++)
         {
-          deplacement[i] += qDisplacement_[j]*u(size-1,i);
-          velo[i] += qSpeed_[j]*u(size-1,i);
+          const DoubleTab& u=u_(j);
+          for(int i=0; i<3; i++)
+            {
+              deplacement[i] += qDisplacement_[j]*u(size-1,i);
+              velo[i] += qSpeed_[j]*u(size-1,i);
+            }
         }
-    }
 
-   std::ofstream ofs_1;
-   ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
-   std::ofstream ofs_2;
-   ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
-   ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
-   ofs_1.close();
-   ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
-   ofs_2.close();
-   //fin test beam*/
+      std::ofstream ofs_1;
+      ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_2;
+      ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
+
+      ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
+      ofs_1.close();
+      ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
+      ofs_2.close();
+    }
+  //fin test beam
+
 
   return qSpeed_;
 }

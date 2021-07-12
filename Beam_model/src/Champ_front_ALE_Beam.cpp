@@ -89,7 +89,6 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               const DoubleTab& R=dom_ale.getBeamRotation(count);
               DoubleVect phi(3);
               phi=dom_ale.interpolationOnThe3DSurface(x,y,z, u, R);
-              phi=0.;
               for(int comp=0; comp<nb_comp(); comp++)
                 {
                   value[comp] +=beamVelocity[count]*phi[comp];
