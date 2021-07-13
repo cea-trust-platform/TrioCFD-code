@@ -63,7 +63,6 @@ public:
 protected:
 
   Champ_Fonc energie_cinetique_turb_;
-  Champ_Fonc wall_length_;
   mutable Champ_Inc K_eps_sortie_;
   Nom fichier_K_eps_sortie_;
 };
