@@ -800,7 +800,6 @@ void  Domaine_ALE::computeFluidForceOnBeam()
           int nfin = ndeb + les_bords_ALE(n).nb_faces();
           for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
             {
-              double force=0.;
               for (int face=ndeb; face<nfin; face++)
                 {
                   for(int comp=0; comp<3; comp++)
@@ -813,8 +812,6 @@ void  Domaine_ALE::computeFluidForceOnBeam()
                       fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
                     }
                 }
-              fluidForceOnBeam[nbmodes] += Process::mp_sum(force);
-
             }
 
         }
@@ -823,4 +820,12 @@ void  Domaine_ALE::computeFluidForceOnBeam()
           fluidForceOnBeam[nbmodes] = Process::mp_sum(fluidForceOnBeam[nbmodes]);
         }
     }
+  /* if (je_suis_maitre())
+     {
+       std::ofstream ofs_1;
+       ofs_1.open ("forcefluide.txt", std::ofstream::out | std::ofstream::app);
+       ofs_1<<tempsComputeForceOnBeam<<" "<<fluidForceOnBeam[0]<<" "<<fluidForceOnBeam[1]<<endl;
+       ofs_1.close();
+
+     }*/
 }

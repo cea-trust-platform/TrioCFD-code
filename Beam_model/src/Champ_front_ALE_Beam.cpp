@@ -92,7 +92,9 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
               for(int comp=0; comp<nb_comp(); comp++)
                 {
                   value[comp] +=beamVelocity[count]*phi[comp];
+
                 }
+
             }
 
           for( j=0; j<nb_comp(); j++)
@@ -103,5 +105,6 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
         }
 
     }
+  vit_som_bord_ALE.echange_espace_virtuel();
 }
 
