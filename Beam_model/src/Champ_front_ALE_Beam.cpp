@@ -83,11 +83,11 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 
           DoubleVect value(3);
           value=0.;
+          DoubleVect phi(3);
           for(int count=0; count<nbModes; count++ )
             {
               const DoubleTab& u=dom_ale.getBeamDisplacement(count);
               const DoubleTab& R=dom_ale.getBeamRotation(count);
-              DoubleVect phi(3);
               phi=dom_ale.interpolationOnThe3DSurface(x,y,z, u, R);
               for(int comp=0; comp<nb_comp(); comp++)
                 {

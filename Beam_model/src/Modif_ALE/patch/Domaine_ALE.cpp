@@ -38,6 +38,7 @@
 #include <Equation_base.h>
 #include <Operateur_Diff.h>
 #include <Operateur_Grad.h>
+#include <communications.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
@@ -791,23 +792,25 @@ void  Domaine_ALE::computeFluidForceOnBeam()
   const int nbModes=fluidForceOnBeam.size();
 
 
-  if(flux_bords_grad.size() == flux_bords_diff.size())
+  fluidForceOnBeam=0.;
+  if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
-      fluidForceOnBeam=0.;
+
+      DoubleVect phi(3);
+      phi=0.;
       for (int n=0; n<nb_bords_ALE; n++)
         {
           int ndeb = les_bords_ALE(n).num_premiere_face();
           int nfin = ndeb + les_bords_ALE(n).nb_faces();
-          for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+
+          for (int face=ndeb; face<nfin; face++)
             {
-              for (int face=ndeb; face<nfin; face++)
+              for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
                 {
+                  const DoubleTab& u=getBeamDisplacement(nbmodes);
+                  const DoubleTab& R=getBeamRotation(nbmodes);
                   for(int comp=0; comp<3; comp++)
                     {
-                      DoubleVect phi(3);
-                      phi=0.;
-                      const DoubleTab& u=getBeamDisplacement(nbmodes);
-                      const DoubleTab& R=getBeamRotation(nbmodes);
                       phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
                       fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
                     }
@@ -815,17 +818,15 @@ void  Domaine_ALE::computeFluidForceOnBeam()
             }
 
         }
-      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
-        {
-          fluidForceOnBeam[nbmodes] = Process::mp_sum(fluidForceOnBeam[nbmodes]);
-        }
     }
-  /* if (je_suis_maitre())
-     {
-       std::ofstream ofs_1;
-       ofs_1.open ("forcefluide.txt", std::ofstream::out | std::ofstream::app);
-       ofs_1<<tempsComputeForceOnBeam<<" "<<fluidForceOnBeam[0]<<" "<<fluidForceOnBeam[1]<<endl;
-       ofs_1.close();
+  mp_sum_for_each_item(fluidForceOnBeam);
 
-     }*/
+  /*if (je_suis_maitre())
+    {
+      std::ofstream ofs_1;
+      ofs_1.open ("forcefluide.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1<<tempsComputeForceOnBeam<<" "<<fluidForceOnBeam[0]<<" "<<fluidForceOnBeam[1]<<endl;
+      ofs_1.close();
+
+    }*/
 }
