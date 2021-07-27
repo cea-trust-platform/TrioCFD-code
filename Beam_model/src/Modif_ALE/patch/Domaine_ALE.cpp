@@ -622,6 +622,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Nom CI_file_name;
   int var_int;
   int nb_modes;
+  int output;
   double var_double;
   is >> motlu;
   if (motlu != accolade_ouverte)
@@ -704,6 +705,11 @@ void Domaine_ALE::reading_beam_model(Entree& is)
 
           beam->setTimeScheme(scheme);
           Cerr << "TimeScheme: " <<  beam->getTimeScheme() << finl;
+        }
+      if(motlu=="Output_position")
+        {
+          is>>output;
+          beam->setOutputPosition(output);
         }
 
       if (motlu == accolade_fermee)
@@ -821,12 +827,14 @@ void  Domaine_ALE::computeFluidForceOnBeam()
     }
   mp_sum_for_each_item(fluidForceOnBeam);
 
-  /*if (je_suis_maitre())
+  if (je_suis_maitre())
     {
       std::ofstream ofs_1;
-      ofs_1.open ("forcefluide.txt", std::ofstream::out | std::ofstream::app);
-      ofs_1<<tempsComputeForceOnBeam<<" "<<fluidForceOnBeam[0]<<" "<<fluidForceOnBeam[1]<<endl;
+      ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1<<tempsComputeForceOnBeam<<" ";
+      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
+      ofs_1<<endl;
       ofs_1.close();
-
-    }*/
+    }
 }

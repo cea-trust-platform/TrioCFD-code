@@ -51,6 +51,7 @@ Beam_model::Beam_model()
   activate_=false;
   timeScheme_=true;
   temps_ =0.;
+  output_position_=0;
 }
 Beam_model::~Beam_model()
 {
@@ -264,39 +265,36 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       double coeff1 = mass_[j] + halfDt*damping_[j] + squareHalfDt*stiffness_[j];
       double coeff2 = damping_[j]*(qSpeed_[j] + halfDt*qAcceleration_[j]) + stiffness_[j]*(qDisplacement_[j] + dt*qSpeed_[j] + squareHalfDt*qAcceleration_[j]);
       qAcceleration_[j]=(fluidForce[j] - coeff2)/coeff1;
-      //qAcceleration_[j]=(0. - coeff2)/coeff1;
       qDisplacement_[j] += dt*qSpeed_[j] + squareHalfDt*(PreviousqAcceleration + qAcceleration_[j]);
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
-  //test beam:
+
   if (je_suis_maitre())
     {
-      DoubleVect deplacement(3);
-      DoubleVect velo(3);
-      deplacement=0.;
-      velo=0.;
-      int size = abscissa_.size();
+      DoubleVect displacement(3);
+      DoubleVect velocity(3);
+      displacement=0.;
+      velocity=0.;
       for(int j=0; j < nbModes_; j++)
         {
           const DoubleTab& u=u_(j);
           for(int i=0; i<3; i++)
             {
-              deplacement[i] += qDisplacement_[j]*u(size-1,i);
-              velo[i] += qSpeed_[j]*u(size-1,i);
+              displacement[i] += qDisplacement_[j]*u(output_position_,i);
+              velocity[i] += qSpeed_[j]*u(output_position_,i);
             }
         }
 
       std::ofstream ofs_1;
-      ofs_1.open ("beam1D_deplacement.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_2;
-      ofs_2.open ("beam1D_velo.txt", std::ofstream::out | std::ofstream::app);
+      ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
 
-      ofs_1<<temps_<<" "<<deplacement[0]<<" "<<deplacement[1]<<" "<<deplacement[2]<<endl;
+      ofs_1<<temps_<<" "<<displacement[0]<<" "<<displacement[1]<<" "<<displacement[2]<<endl;
       ofs_1.close();
-      ofs_2<<temps_<<" "<< velo[0]<<" "<< velo[1]<<" "<< velo[2]<<endl;
+      ofs_2<<temps_<<" "<< velocity[0]<<" "<< velocity[1]<<" "<< velocity[2]<<endl;
       ofs_2.close();
     }
-  //fin test beam
 
 
   return qSpeed_;
