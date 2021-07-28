@@ -100,6 +100,7 @@ protected:
   REF(Equation_base) eq;
   DoubleVect fluidForceOnBeam;
   double tempsComputeForceOnBeam;
+  bool associate_eq;
 };
 
 

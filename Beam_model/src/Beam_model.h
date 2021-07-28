@@ -47,6 +47,7 @@ public :
   ~Beam_model();
   Entree& interpreter_(Entree&);
   inline const int& getNbModes() const;
+  inline double getTime() const;
   inline void setNbModes(const int&) ;
   inline const int& getDirection() const;
   inline void setDirection(const int&) ;
@@ -67,6 +68,7 @@ public :
   void readInputAbscFiles (Nom& absc_file_name);
   void readInputModalDeformation(Noms& modal_deformation_file_name);
   void readInputCIFile(Nom& CI_file_name);
+  void readRestartFile(Nom& Restart_file_name);
   //void interpolationOnThe3DSurface(const Bords& les_bords_ALE);
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
   void initialization(double velocity);
@@ -104,6 +106,10 @@ protected :
 inline const int& Beam_model::getNbModes() const
 {
   return nbModes_;
+}
+inline double Beam_model::getTime() const
+{
+  return temps_;
 }
 inline void Beam_model::setNbModes(const int& modes)
 {

@@ -32,6 +32,7 @@
 #include <Ref_Zone.h>
 #include <Faces.h>
 #include <fstream>
+#include <iostream>
 #include <math.h>       /* sin */
 #define PI 3.14159265
 
@@ -185,6 +186,34 @@ void Beam_model::readInputCIFile(Nom& CI_file_name)
 
 }
 
+void Beam_model::readRestartFile(Nom& Restart_file_name)
+{
+
+  Cerr << "Read restart "<< Restart_file_name <<" file " << finl;
+  string const nomFichier(Restart_file_name);
+
+  ifstream monFlux(nomFichier.c_str());
+
+  if(monFlux)
+    {
+      double temps, displacement, speed, acceleration, force;
+      for(int i=0; i<nbModes_; i++)
+        {
+          monFlux >> temps >> displacement >> speed >>acceleration>>force;
+          temps_= temps;
+          qDisplacement_[i]=displacement;
+          qSpeed_[i] = speed;
+          qAcceleration_[i] = acceleration;
+        }
+
+      monFlux.close();
+    }
+  else
+    {
+      Cerr<< "ERROR: Unable to open the file." <<Restart_file_name<<finl;
+    }
+}
+
 
 void Beam_model::readInputModalDeformation(Noms& modal_deformation_file_name)
 {
@@ -252,6 +281,46 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
       qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
     }
+
+
+  if (je_suis_maitre())
+    {
+      DoubleVect displacement(3);
+      DoubleVect velocity(3);
+      displacement=0.;
+      velocity=0.;
+      for(int j=0; j < nbModes_; j++)
+        {
+          const DoubleTab& u=u_(j);
+          for(int i=0; i<3; i++)
+            {
+              displacement[i] += qDisplacement_[j]*u(output_position_,i);
+              velocity[i] += qSpeed_[j]*u(output_position_,i);
+            }
+        }
+
+      std::ofstream ofs_1;
+      ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_2;
+      ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+
+      ofs_1<<temps_<<" "<<displacement[0]<<" "<<displacement[1]<<" "<<displacement[2]<<endl;
+      ofs_1.close();
+      ofs_2<<temps_<<" "<< velocity[0]<<" "<< velocity[1]<<" "<< velocity[2]<<endl;
+      ofs_2.close();
+    }
+
+  if (je_suis_maitre())
+    {
+      std::ofstream ofs_sauve;
+      ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
+      for(int j=0; j < nbModes_; j++)
+        {
+          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<fluidForce[j]<<endl;
+        }
+      ofs_sauve.close();
+    }
+
   return qHalfSpeed_;
 }
 
@@ -296,16 +365,22 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       ofs_2.close();
     }
 
+  if (je_suis_maitre())
+    {
+      std::ofstream ofs_sauve;
+      ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
+      for(int j=0; j < nbModes_; j++)
+        {
+          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<fluidForce[j]<<endl;
+        }
+      ofs_sauve.close();
+    }
 
   return qSpeed_;
 }
 
 DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const DoubleVect& fluidForce)
 {
-  /*std::ofstream ofs_k0;
-  ofs_k0.open ("force.txt", std::ofstream::out | std::ofstream::app);
-  ofs_k0<<tps<<" "<< fluidForce[0] <<"  "<<fluidForce[1]<<endl;
-  ofs_k0.close();*/
 
   if(dt == 0.)
     {

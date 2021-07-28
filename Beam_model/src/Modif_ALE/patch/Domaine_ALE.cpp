@@ -42,7 +42,7 @@
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), tempsComputeForceOnBeam(0.)
+Domaine_ALE::Domaine_ALE() : dt_(0.), nb_bords_ALE(0), update_or_not_matrix_coeffs_(1), tempsComputeForceOnBeam(0.), associate_eq(false)
 {
   beam = new Beam_model();
 }
@@ -186,8 +186,12 @@ void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Problem
   int nb_som_face=la_zone_VF.nb_som_face();
   IntTab& face_sommets=la_zone_VF.face_sommets();
 
-  const Equation_base& equation=pb.equation(0);
-  associer_equation(equation);
+  if(!associate_eq)
+    {
+      const Equation_base& equation=pb.equation(0);
+      associer_equation(equation);
+      associate_eq=true;
+    }
 
   vf.resize(nb_faces, dimension);
   const MD_Vector& md = la_zone_VF.md_vector_faces();
@@ -293,6 +297,12 @@ DoubleTab Domaine_ALE::calculer_vitesse(double temps, Domaine_dis& le_domaine_di
         }
       else if (le_nom_ch_front_courant == "Champ_front_ALE_Beam")
         {
+          if(!associate_eq)
+            {
+              const Equation_base& equation=pb.equation(0);
+              associer_equation(equation);
+              associate_eq=true;
+            }
           ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).remplir_vit_som_bord_ALE(temps);
           DoubleTab vit_bord_ale = ref_cast(Champ_front_ALE_Beam, les_champs_front[n].valeur()).get_vit_som_bord_ALE();
           if (nb_bords_ALE==1)
@@ -620,6 +630,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Noms phi_file_name;
   Nom absc_file_name;
   Nom CI_file_name;
+  Nom Restart_file_name="none";
   int var_int;
   int nb_modes;
   int output;
@@ -711,6 +722,11 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           is>>output;
           beam->setOutputPosition(output);
         }
+      if (motlu=="Restart_file_name")
+        {
+          is >> nomlu;
+          Restart_file_name=nomlu;
+        }
 
       if (motlu == accolade_fermee)
         break;
@@ -723,6 +739,30 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   fluidForceOnBeam.resize(nb_modes);
   fluidForceOnBeam=0.;
   tempsComputeForceOnBeam=0.;
+  if(Restart_file_name!="none")
+    {
+      beam->readRestartFile(Restart_file_name);
+      tempsComputeForceOnBeam=beam->getTime();
+
+      std::string const nomFichier(Restart_file_name);
+      ifstream monFlux(nomFichier.c_str());
+
+      if(monFlux)
+        {
+          double temps, displacement, speed, acceleration, force;
+          for(int i=0; i<nb_modes; i++)
+            {
+              monFlux >> temps >> displacement >> speed >>acceleration>>force;
+              fluidForceOnBeam[i]=force;
+            }
+
+          monFlux.close();
+        }
+      else
+        {
+          Cerr<< "ERROR: Unable to open the file." <<Restart_file_name<<finl;
+        }
+    }
 }
 DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
@@ -787,7 +827,6 @@ Equation_base& Domaine_ALE::getEquation()
 }
 void  Domaine_ALE::computeFluidForceOnBeam()
 {
-
   const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
   const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
   const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
@@ -798,10 +837,9 @@ void  Domaine_ALE::computeFluidForceOnBeam()
   const int nbModes=fluidForceOnBeam.size();
 
 
-  fluidForceOnBeam=0.;
   if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
-
+      fluidForceOnBeam=0.;
       DoubleVect phi(3);
       phi=0.;
       for (int n=0; n<nb_bords_ALE; n++)
@@ -824,17 +862,17 @@ void  Domaine_ALE::computeFluidForceOnBeam()
             }
 
         }
+
+      if (je_suis_maitre())
+        {
+          std::ofstream ofs_1;
+          ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+          ofs_1<<tempsComputeForceOnBeam<<" ";
+          for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+            ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
+          ofs_1<<endl;
+          ofs_1.close();
+        }
     }
   mp_sum_for_each_item(fluidForceOnBeam);
-
-  if (je_suis_maitre())
-    {
-      std::ofstream ofs_1;
-      ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-      ofs_1<<tempsComputeForceOnBeam<<" ";
-      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
-        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
-      ofs_1<<endl;
-      ofs_1.close();
-    }
 }
