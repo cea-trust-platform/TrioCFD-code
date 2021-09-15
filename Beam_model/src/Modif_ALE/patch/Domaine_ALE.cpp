@@ -836,10 +836,9 @@ void  Domaine_ALE::computeFluidForceOnBeam()
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
   const int nbModes=fluidForceOnBeam.size();
 
-
+  fluidForceOnBeam=0.;
   if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
     {
-      fluidForceOnBeam=0.;
       DoubleVect phi(3);
       phi=0.;
       for (int n=0; n<nb_bords_ALE; n++)
@@ -863,16 +862,17 @@ void  Domaine_ALE::computeFluidForceOnBeam()
 
         }
 
-      if (je_suis_maitre())
-        {
-          std::ofstream ofs_1;
-          ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
-          ofs_1<<tempsComputeForceOnBeam<<" ";
-          for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
-            ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
-          ofs_1<<endl;
-          ofs_1.close();
-        }
+
     }
   mp_sum_for_each_item(fluidForceOnBeam);
+  if (je_suis_maitre())
+    {
+      std::ofstream ofs_1;
+      ofs_1.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs_1<<tempsComputeForceOnBeam<<" ";
+      for(int nbmodes=0; nbmodes<nbModes; nbmodes++)
+        ofs_1<<fluidForceOnBeam[nbmodes]<<" ";
+      ofs_1<<endl;
+      ofs_1.close();
+    }
 }
