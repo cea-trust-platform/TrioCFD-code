@@ -33,6 +33,7 @@
 #include <Champ_front_ALE.h>
 #include <Ch_front_input_ALE.h>
 #include <Champ_front_ALE_Beam.h>
+#include <Champ_front_ALE_projection.h>
 #include <Noms.h>
 #include <Navier_Stokes_std.h>
 #include <Equation_base.h>
@@ -168,8 +169,67 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
         }
 
     }
+  //compute the fluid force projected within the requested boundaries
+  if(field_ALE_projection_.size()>0)
+    {
+      for(int i=0; i<field_ALE_projection_.size(); i++)
+        update_ALE_projection(temps, name_ALE_boundary_projection_[i], field_ALE_projection_[i], i+1);
+    }
 
 }
+void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
+{
+  Cerr<<"update_ALE_projection "<<finl;
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+  double modalForce = 0.;
+
+  for (int n=0; n<nb_bords_ALE; n++)
+    {
+      const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
+      if(name_ALE_boundary_projection==le_nom_bord_ALE)
+        {
+          if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
+            {
+              double phi=0.;
+              modalForce=0.;
+              int ndeb = les_bords_ALE(n).num_premiere_face();
+              int nfin = ndeb + les_bords_ALE(n).nb_faces();
+
+              for (int face=ndeb; face<nfin; face++)
+                {
+                  for(int comp=0; comp<3; comp++)
+                    {
+                      phi=field_ALE_projection.evaluate(temps, xv(face,0),xv(face,1),xv(face,2), comp);
+                      modalForce += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
+                    }
+                }
+            }
+
+
+        }
+
+    }
+  mp_sum(modalForce);
+  std::string nom="ModalForce_";
+  std::string index(std::to_string(nb_mode));
+  nom +=index;
+  nom+=".txt";
+  if (je_suis_maitre())
+    {
+      std::ofstream ofs_1;
+      ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
+      ofs_1<<temps<<" "<<modalForce;
+      ofs_1<<endl;
+      ofs_1.close();
+    }
+}
+
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
 {
   //Cerr << "Domaine_ALE::initialiser  " << finl;
@@ -590,6 +650,38 @@ void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
     }
 }
 
+void Domaine_ALE::reading_projection_ALE_boundary(Entree& is)
+{
+  Motcle accolade_ouverte("{");
+  Motcle accolade_fermee("}");
+  Motcle motlu;
+  Nom nomlu;
+  int nb_projection;
+  is >> motlu;
+  if (motlu != accolade_ouverte)
+    {
+      Cerr << "Error when reading the 'Projection_ALE_boundary' \n";
+      Cerr << "We were waiting for " << accolade_ouverte << " instead of \n"
+           << motlu;
+      exit();
+    }
+  is >> nb_projection;
+  Cerr << "Number of ALE projection boundary : " <<  nb_projection << finl;
+  field_ALE_projection_.dimensionner(nb_projection);
+  int compteur=0;
+  while(1)
+    {
+      // lecture d'un nom de bord ou de }
+      is >> nomlu;
+      motlu=nomlu;
+      if (motlu == accolade_fermee)
+        break;
+      name_ALE_boundary_projection_.add(nomlu);
+      is >> field_ALE_projection_[compteur];
+      compteur++;
+    }
+}
+
 //  Read the solver used to solve the system giving the moving mesh velocity
 void Domaine_ALE::reading_solver_moving_mesh_ALE(Entree& is)
 {
@@ -852,9 +944,9 @@ void  Domaine_ALE::computeFluidForceOnBeam()
                 {
                   const DoubleTab& u=getBeamDisplacement(nbmodes);
                   const DoubleTab& R=getBeamRotation(nbmodes);
+                  phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
                   for(int comp=0; comp<3; comp++)
                     {
-                      phi=interpolationOnThe3DSurface(xv(face,0),xv(face,1),xv(face,2), u, R);
                       fluidForceOnBeam[nbmodes] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi[comp];
                     }
                 }
