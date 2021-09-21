@@ -496,7 +496,6 @@ void Op_Diff_K_Eps_VEF_Face::ajouter_contribution(const DoubleTab& transporte, M
   int is_mu_unif=sub_type(Champ_Uniforme,diffusivite_.valeur());
   const DoubleTab& mu=diffusivite_->valeurs();
   int nb_comp = 1;
-  int nb_dim = transporte.nb_dim();
 
   if ( diffuse_k_seul )
     {
@@ -790,8 +789,7 @@ void Op_Diff_K_Eps_VEF_Face::ajouter_contribution(const DoubleTab& transporte, M
     }
   else
     {
-      if(nb_dim==2)
-        nb_comp=transporte.dimension(1);
+      nb_comp=transporte.line_size();
       assert(nb_comp==2);
 
       // On traite les faces bord

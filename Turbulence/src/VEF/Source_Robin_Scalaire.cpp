@@ -120,7 +120,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
             {
               int elem = zone_VEF.face_voisins(face,0);
               if (elem==-1) elem = zone_VEF.face_voisins(face,1);
-              double d_lambda = (lambda_uniforme ? lambda(0,0) : (lambda.valeurs().nb_dim()==1 ? lambda(elem) : lambda(elem,0)));
+              double d_lambda = (lambda_uniforme ? lambda(0,0) : lambda(elem,0));
               double acc_loc = - (d_lambda + lambda_t(elem)) * (temperature(face) - Tw) / dist_equiv[face-ndeb] * surfaces_face(face);
               acc_loc_tot += acc_loc;
               resu(face) += acc_loc;

@@ -182,7 +182,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
       // les sommets appartenant a une face de bord avec une CL Dirichlet
       ArrOfInt is_sommet_sur_bord(zone_VEF.nb_som_tot());
       const IntTab& face_sommets=zone_VEF.face_sommets();
-      int nb_som_face=face_sommets.dimension(1);
+      int nb_som_face=face_sommets.line_size();
       for (int fac=0; fac<compt; fac++)
         {
           int face=face_bords_diri[fac];
@@ -806,7 +806,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                       if (l_unif)
                         d_visco = visco;
                       else
-                        d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                        d_visco = tab_visco(elem,0);
 
                       u_plus_d_plus = norm_v*dist/d_visco;
                       u_plus = calculer_u_plus(nf,u_plus_d_plus,erugu);
@@ -901,7 +901,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 
@@ -1035,7 +1035,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
           if (l_unif)
             d_visco = visco;
           else
-            d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+            d_visco = tab_visco(elem,0);
 
           u_plus_d_plus = norm_v*distb/d_visco;
           u_plus = calculer_u_plus(face,u_plus_d_plus,stock_erugu[num_face]);
@@ -1173,7 +1173,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 
@@ -1271,7 +1271,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
               if (l_unif)
                 d_visco = visco;
               else
-                d_visco = (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0));
+                d_visco = tab_visco(elem,0);
 
               u_plus_d_plus = norm_v*dist/d_visco;
 

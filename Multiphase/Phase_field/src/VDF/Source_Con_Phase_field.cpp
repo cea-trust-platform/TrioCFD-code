@@ -770,7 +770,6 @@ void Source_Con_Phase_field::premier_demi_dt()
   DoubleTab& pression_thermo=eq_c.set_pression_thermo();
   calculer_pression_thermo(pression_thermo);
 
-
   accr = c;
   accr = 0.;
   c_demi = c;
@@ -1400,19 +1399,17 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
   const double theta=0.6;
   DoubleVect residu1(nb_elem);
   DoubleVect residu2(nb_elem);
-
   DoubleVect term_cin(nb_elem);
   // Ceci correspond a u2/2*drhodc=mutilde_dyn-mutilde
 
   DoubleVect second_membre(2*nb_elem);
-  DoubleVect Phi(nb_elem);
   DoubleVect M(nb_elem);
   DoubleVect old_Phi(nb_elem);
   DoubleVect old_M(nb_elem);
   DoubleVect Solu_temp(2*nb_elem);
+  DoubleTab Phi(c);
 
   // Initialisation des variables
-  Phi=c;
   M=mutilde;
   old_Phi=0.;
   old_M=0.;
@@ -1467,6 +1464,7 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
 
     }
 
+
   // Ecriture de c et mutilde au temps n+1/2, cf le theta-schema:
   // Phi=theta*c_demi+(1.-theta)*c
   // M=theta*mutilde_demi+(1.-theta)*mutilde
@@ -1486,7 +1484,6 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
       c_demi=c;
       mutilde_demi=mutilde;
     }
-
 }
 
 
@@ -2034,18 +2031,10 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
   const Zone& zone_geom = zone_VDF.zone();
   const Domaine& dom=zone_geom.domaine();
   const int nb_elem = zone_VDF.nb_elem_tot();
-  int nb_compo_;
-  int f0,f1;
-  int som0,som1;
+  int f0,f1, som0,som1;
   double psi,val0,val1;
-
   DoubleTab u2_elem(nb_elem,dimension);
-
-  // Nombre de composantes du vecteur u2
-  if(u2_elem.nb_dim()==1)
-    nb_compo_ = 1;
-  else
-    nb_compo_ = u2_elem.dimension(1);
+  const int nb_compo_ = u2_elem.line_size();
 
   // Boucle sur le nombre d'elements
   for(int elem=0; elem<nb_elem; elem++)
@@ -2133,19 +2122,13 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
   const Zone& zone_geom = zone_VDF.zone();
   const Domaine& dom=zone_geom.domaine();
   const int nb_elem = zone_VDF.nb_elem();
-  int nb_compo_;
   int elem;
   int f0,f1;
   int som0,som1;
   double psi,val0,val1;
 
   DoubleTab gradc2_elem(nb_elem,dimension);
-
-  // Nombre de composantes du vecteur gradc2
-  if(gradc2_elem.nb_dim()==1)
-    nb_compo_ = 1;
-  else
-    nb_compo_ = gradc2_elem.dimension(1);
+  const int nb_compo_ = gradc2_elem.line_size();
 
   // Boucle sur le nombre d'elements
   for(elem=0; elem<nb_elem; elem++)
@@ -2240,14 +2223,14 @@ void Source_Con_Phase_field::calculer_champ_fonc_c(const double& t, Champ_Don& c
         {
           Cerr << "Erreur a l'initialisation d'un Champ_Fonc_Tabule" << finl;
           Cerr << "Le champ parametre et le champ a initialiser ne sont pas compatibles" << finl;
-          exit();
+          Process::exit();
         }
       if (isfct!=2)
         {
           int nb_elems = zone_VDF.nb_elem();
-          if (val_c.nb_dim() == 1)
+          if (val_c.line_size() == 1)
             for (int num_elem=0; num_elem<nb_elems; num_elem++)
-              mes_valeurs(num_elem) = table.val(val_c(num_elem));
+              mes_valeurs(num_elem,0) = table.val(val_c(num_elem));
           else
             {
               int nb_comps = val_c.nb_dim();

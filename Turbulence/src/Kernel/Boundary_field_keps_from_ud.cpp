@@ -93,13 +93,8 @@ void Boundary_field_keps_from_ud::mettre_a_jour(double tps)
   for (int face=0; face<nb_faces; face++)
     {
       int i = (vit.dimension(0)==1 ? 0 : face); // Uniform field
-      double u;
-      if (vit.nb_dim() == 1)
-        u = dabs(vit(i));
-      else if (vit.dimension(1) == 1)
-        u = dabs(vit(i, 0));
-      else
-        u = sqrt(vit(i, 0)*vit(i, 0)+vit(i, 1)*vit(i, 1));
+      double u = (vit.line_size() == 1) ? dabs(vit(i, 0)) : sqrt(vit(i, 0)*vit(i, 0)+vit(i, 1)*vit(i, 1));
+
       pair val = k_eps_from_udi(u, d, I, dimension);
       keps(face, 0) = val.k;
       keps(face, 1) = val.eps;

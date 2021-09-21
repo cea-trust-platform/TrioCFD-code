@@ -134,9 +134,6 @@ inline double Source_Con_Phase_field::drhodc(const int& n_elem) const
       double value = 0.0;
       switch(dim)
         {
-        case 1:
-          value = tab(0);
-          break;
         case 2:
           value = tab(0,0);
           break;

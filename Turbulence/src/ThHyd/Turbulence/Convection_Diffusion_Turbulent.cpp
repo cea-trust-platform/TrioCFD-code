@@ -142,12 +142,13 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
       if (Objet_U::axi)
         type+="_Axi";
 
+      if (motbidon != accfermee) type += Nom("_") + motbidon, is >> motbidon;
+      assert (motbidon == accfermee);
+
       terme_diffusif.typer(type);
       terme_diffusif.l_op_base().associer_eqn(eqn);
       Cerr << terme_diffusif.valeur().que_suis_je() << finl;
       terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
-
-      assert(motbidon == accfermee);
     }
   return is;
 }

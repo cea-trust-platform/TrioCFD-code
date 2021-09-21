@@ -146,7 +146,6 @@ public:
                      DoubleTab& source_val,
                      const DoubleTab& vit_imposee,
                      const DoubleTab& indicatrice_faces,
-                     const int is_VDF,
                      const int is_QC,
                      const double dt,
                      const int is_explicite,

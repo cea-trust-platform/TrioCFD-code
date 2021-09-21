@@ -62,11 +62,12 @@
 //////////////////////////////////////////////////////////////////////////////
 class Navier_Stokes_phase_field : public Navier_Stokes_std
 {
-  Declare_instanciable_sans_constructeur(Navier_Stokes_phase_field);
+  Declare_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field);
 
 public :
 
   Navier_Stokes_phase_field();
+  ~Navier_Stokes_phase_field();
   void set_param(Param& titi);
   int lire_motcle_non_standard(const Motcle&, Entree&);
   virtual void discretiser();
@@ -124,10 +125,7 @@ protected :
 // Methode de calcul de la valeur sur un champ aux elements d'un champ uniforme ou non a plusieurs composantes
 inline double& valeur(DoubleTab& valeurs, const int& elem, const int& dim)
 {
-  if(valeurs.nb_dim()==1)
-    return valeurs(elem);
-  else
-    return valeurs(elem,dim);
+  return valeurs(elem,dim);
 }
 
 inline const Champ_Don& Navier_Stokes_phase_field::rho() const

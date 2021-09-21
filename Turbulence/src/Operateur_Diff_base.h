@@ -55,6 +55,10 @@ public:
   virtual inline int Tenseur_Reynolds_Externe( void ) const ;
   virtual inline void Oublie_Tenseur_Reynolds( void ) ;
   virtual inline void Garde_Tenseur_Reynolds( void ) ;
+
+  //liste d'Op_Diff de problemes resolus simultanement (thermique monolithique)
+  mutable std::vector<const Operateur_Diff_base *> op_ext;
+
 protected:
   virtual const Champ_base& diffusivite_pour_pas_de_temps() const;
 

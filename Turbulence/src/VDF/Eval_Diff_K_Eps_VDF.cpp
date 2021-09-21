@@ -47,9 +47,9 @@ void Eval_Diff_K_Eps_VDF::mettre_a_jour( )
     db_diffusivite = diffusivite_.valeur()(0,0);
 }
 
-void Eval_Diff_K_Eps_VDF::associer_mvolumique(const Champ_Don& mvol)
+void Eval_Diff_K_Eps_VDF::associer_mvolumique(const Champ_base& mvol)
 {
-  masse_volumique_ = mvol.valeur();
+  masse_volumique_ = mvol;
   dv_mvol.ref(mvol.valeurs());
 }
 

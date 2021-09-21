@@ -1001,7 +1001,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
     // Liste des elements a mettre a changer (colonne 0) et valeur a mettre (colonne 1)
     IntTab elems_to_change(0,2);
     elems_to_change.set_smart_resize(1);
-    const int nb_faces_elem = elem_faces.dimension(1);
+    const int nb_faces_elem = elem_faces.line_size();
     const ArrOfInt& index_elem = intersections_elem_facettes_.index_elem();
     for (int elem = 0; elem < nb_elem; elem++)
       {

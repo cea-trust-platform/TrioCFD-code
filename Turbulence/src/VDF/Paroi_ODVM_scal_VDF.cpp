@@ -156,7 +156,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const Milieu_base& le_milieu_fluide = eqn_hydr.milieu();
   const Champ_Don& ch_lambda = le_milieu_fluide.conductivite();
   const Champ_Don& ch_Cp = le_milieu_fluide.capacite_calorifique();
-  const Champ_Don& ch_rho = le_milieu_fluide.masse_volumique();
+  const Champ_base& ch_rho = le_milieu_fluide.masse_volumique();
   const DoubleTab& lambda_f = ch_lambda.valeurs();
   const DoubleTab& Cp_f     = ch_Cp.valeurs();
   const DoubleTab& rho_f    = ch_rho.valeurs();
@@ -178,7 +178,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
       Cp_unif = 1;
       Cp_f_loc = max(Cp_f(0,0),DMINFLOAT);
     }
-  if (sub_type(Champ_Uniforme,ch_rho.valeur()))
+  if (sub_type(Champ_Uniforme,ch_rho))
     {
       rho_unif = 1;
       rho_f_loc = max(rho_f(0,0),DMINFLOAT);

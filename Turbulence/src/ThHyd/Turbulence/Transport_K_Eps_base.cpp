@@ -295,7 +295,7 @@ int Transport_K_Eps_base::controler_K_Eps()
           eps = 0;
           int nk = 0;
           int neps = 0;
-          int nb_faces_elem = elem_faces.dimension(1);
+          int nb_faces_elem = elem_faces.line_size();
           if (size==face_voisins.dimension(0))
             {
               // K-Eps on faces (eg:VEF)
