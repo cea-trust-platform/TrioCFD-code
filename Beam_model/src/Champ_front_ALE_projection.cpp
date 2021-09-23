@@ -60,43 +60,6 @@ Entree& Champ_front_ALE_projection::readOn( Entree& is )
   return is;
 }
 
-void Champ_front_ALE_projection::mettre_a_jour(double temps)
-{
-  Cout << "Champ_front_ALE_projection ::mettre_a_jour" << finl;
-
-  //const Frontiere& front=la_frontiere_dis->frontiere();
-  //Cout<<" frontiere "<<front.que_suis_je()<<finl;
-  /*  int nb_faces=front.nb_faces();
-    const Zone& zone=front.zone();
-    const Faces& faces=front.faces();
-    const Domaine& domaine=zone.domaine();
-    double x,y,z;
-    int nbsf=faces.nb_som_faces();
-    int i,j,k;
-
-    for( i=0; i<nb_faces; i++)
-      {
-        x=y=z=0;
-        for( k=0; k<nbsf; k++)
-          {
-            x=domaine.coord(faces.sommet(i,k),0);
-            if(dimension>1)
-              y=domaine.coord(faces.sommet(i,k),1);
-            if(dimension>2)
-              z=domaine.coord(faces.sommet(i,k),2);
-            for( j=0; j<nb_comp(); j++)
-              {
-                fxyzt[j].setVar("x",x);
-                fxyzt[j].setVar("y",y);
-                fxyzt[j].setVar("z",z);
-                fxyzt[j].setVar("t",temps);
-                Cout << " x y  " << x << " " << y << " " << z << " " << fxyzt[j].eval() << finl;
-              }
-          }
-      }*/
-
-  getchar();
-}
 
 double Champ_front_ALE_projection::evaluate(double temps, double x, double y, int dir)
 {

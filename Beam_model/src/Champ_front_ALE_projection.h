@@ -40,7 +40,6 @@ class Champ_front_ALE_projection : public Ch_front_var_instationnaire_dep
   Declare_instanciable( Champ_front_ALE_projection ) ;
 
 public :
-  virtual void mettre_a_jour(double temps);
   double evaluate(double, double, double, int);
   double evaluate(double, double, double, double, int);
 

@@ -33,7 +33,7 @@
 #include <Champ_front_ALE.h>
 #include <Ch_front_input_ALE.h>
 #include <Champ_front_ALE_Beam.h>
-#include <Champ_front_ALE_projection.h>
+#include <Champs_front_ALE_projection.h>
 #include <Noms.h>
 #include <Navier_Stokes_std.h>
 #include <Equation_base.h>
@@ -169,14 +169,8 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
         }
 
     }
-  //compute the fluid force projected within the requested boundaries
-  if(field_ALE_projection_.size()>0)
-    {
-      for(int i=0; i<field_ALE_projection_.size(); i++)
-        update_ALE_projection(temps, name_ALE_boundary_projection_[i], field_ALE_projection_[i], i+1);
-    }
-
 }
+//compute the fluid force projected within the requested boundaries
 void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_projection, Champ_front_ALE_projection& field_ALE_projection, int nb_mode)
 {
   Cerr<<"update_ALE_projection "<<finl;
@@ -217,6 +211,8 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
     }
   mp_sum(modalForce);
   std::string nom="ModalForce_";
+  nom += name_ALE_boundary_projection;
+  nom +="_";
   std::string index(std::to_string(nb_mode));
   nom +=index;
   nom+=".txt";
@@ -228,6 +224,71 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
       ofs_1<<endl;
       ofs_1.close();
     }
+}
+//compute the fluid force projected within the requested boundaries
+void  Domaine_ALE::update_ALE_projection(const double temps)
+{
+
+  if(field_ALE_projection_.size()==0)
+    {
+      return;
+    }
+  Cerr<<"update_ALE_projection "<<finl;
+  const Navier_Stokes_std& eqn_hydr = ref_cast(Navier_Stokes_std,getEquation());
+  const Operateur_base& op_grad= eqn_hydr.operateur_gradient().l_op_base();
+  const Operateur_base& op_diff= eqn_hydr.operateur_diff().l_op_base();
+  const Zone_VEF& la_zone_vef=ref_cast(Zone_VEF,op_grad.equation().zone_dis().valeur());
+  const DoubleTab& xv=la_zone_vef.xv();
+  DoubleTab& flux_bords_grad=op_grad.flux_bords();
+  DoubleTab& flux_bords_diff=op_diff.flux_bords();
+
+  for (int n=0; n<nb_bords_ALE; n++)
+    {
+      const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
+      for(int i=0; i<field_ALE_projection_.size(); i++)
+        {
+          if(name_ALE_boundary_projection_[i]==le_nom_bord_ALE)
+            {
+
+              double modalForce = 0.;
+              if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
+                {
+                  double phi=0.;
+                  modalForce=0.;
+                  int ndeb = les_bords_ALE(n).num_premiere_face();
+                  int nfin = ndeb + les_bords_ALE(n).nb_faces();
+
+                  for (int face=ndeb; face<nfin; face++)
+                    {
+                      for(int comp=0; comp<3; comp++)
+                        {
+                          phi=field_ALE_projection_[i].evaluate(temps, xv(face,0),xv(face,1),xv(face,2), comp);
+                          modalForce += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
+                        }
+                    }
+                }
+
+              mp_sum(modalForce);
+              std::string nom="ModalForce_";
+              nom += le_nom_bord_ALE;
+              nom +="_";
+              std::string index(std::to_string(i+1));
+              nom +=index;
+              nom+=".txt";
+              if (je_suis_maitre())
+                {
+                  std::ofstream ofs_1;
+                  ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
+                  ofs_1<<temps<<" "<<modalForce;
+                  ofs_1<<endl;
+                  ofs_1.close();
+                }
+
+            }
+        }
+
+    }
+
 }
 
 void Domaine_ALE::initialiser (double temps, Domaine_dis& le_domaine_dis,Probleme_base& pb)
