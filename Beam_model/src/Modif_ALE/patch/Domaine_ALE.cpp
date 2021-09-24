@@ -197,7 +197,7 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 
               for (int face=ndeb; face<nfin; face++)
                 {
-                  for(int comp=0; comp<3; comp++)
+                  for(int comp=0; comp<dimension; comp++)
                     {
                       phi=field_ALE_projection.evaluate(temps, xv(face,0),xv(face,1),xv(face,2), comp);
                       modalForce += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
@@ -210,14 +210,14 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 
     }
   mp_sum(modalForce);
-  std::string nom="ModalForce_";
-  nom += name_ALE_boundary_projection;
-  nom +="_";
-  std::string index(std::to_string(nb_mode));
-  nom +=index;
-  nom+=".txt";
   if (je_suis_maitre())
     {
+      std::string nom="ModalForce_";
+      nom += name_ALE_boundary_projection;
+      nom +="_";
+      std::string index(std::to_string(nb_mode));
+      nom +=index;
+      nom+=".txt";
       std::ofstream ofs_1;
       ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
       ofs_1<<temps<<" "<<modalForce;
@@ -229,7 +229,8 @@ void Domaine_ALE::update_ALE_projection(double temps,  Nom& name_ALE_boundary_pr
 void  Domaine_ALE::update_ALE_projection(const double temps)
 {
 
-  if(field_ALE_projection_.size()==0)
+  int size_projection_boundaries=field_ALE_projection_.size();
+  if(size_projection_boundaries==0)
     {
       return;
     }
@@ -241,52 +242,54 @@ void  Domaine_ALE::update_ALE_projection(const double temps)
   const DoubleTab& xv=la_zone_vef.xv();
   DoubleTab& flux_bords_grad=op_grad.flux_bords();
   DoubleTab& flux_bords_diff=op_diff.flux_bords();
-
+  DoubleVect modalForce(size_projection_boundaries);
+  modalForce=0.;
   for (int n=0; n<nb_bords_ALE; n++)
     {
       const Nom& le_nom_bord_ALE=les_bords_ALE(n).le_nom();
-      for(int i=0; i<field_ALE_projection_.size(); i++)
+      for(int i=0; i<size_projection_boundaries; i++)
         {
           if(name_ALE_boundary_projection_[i]==le_nom_bord_ALE)
             {
-
-              double modalForce = 0.;
               if((flux_bords_grad.size() == flux_bords_diff.size()) && (flux_bords_grad.size() >0) )
                 {
                   double phi=0.;
-                  modalForce=0.;
+                  modalForce[i]=0.;
                   int ndeb = les_bords_ALE(n).num_premiere_face();
                   int nfin = ndeb + les_bords_ALE(n).nb_faces();
 
                   for (int face=ndeb; face<nfin; face++)
                     {
-                      for(int comp=0; comp<3; comp++)
+                      for(int comp=0; comp<dimension; comp++)
                         {
                           phi=field_ALE_projection_[i].evaluate(temps, xv(face,0),xv(face,1),xv(face,2), comp);
-                          modalForce += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
+                          modalForce[i] += (flux_bords_grad(face, comp)+ flux_bords_diff(face, comp))*phi;
                         }
                     }
                 }
-
-              mp_sum(modalForce);
-              std::string nom="ModalForce_";
-              nom += le_nom_bord_ALE;
-              nom +="_";
-              std::string index(std::to_string(i+1));
-              nom +=index;
-              nom+=".txt";
-              if (je_suis_maitre())
-                {
-                  std::ofstream ofs_1;
-                  ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
-                  ofs_1<<temps<<" "<<modalForce;
-                  ofs_1<<endl;
-                  ofs_1.close();
-                }
-
             }
         }
 
+    }
+
+
+  mp_sum_for_each_item(modalForce);
+  if (je_suis_maitre())
+    {
+      for(int i=0; i<size_projection_boundaries; i++)
+        {
+          std::string nom="ModalForce_";
+          nom += name_ALE_boundary_projection_[i];
+          nom +="_";
+          std::string index(std::to_string(i+1));
+          nom +=index;
+          nom+=".txt";
+          std::ofstream ofs_1;
+          ofs_1.open (nom, std::ofstream::out | std::ofstream::app);
+          ofs_1<<temps<<" "<<modalForce[i];
+          ofs_1<<endl;
+          ofs_1.close();
+        }
     }
 
 }
