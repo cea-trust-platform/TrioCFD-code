@@ -26,7 +26,7 @@
 #include <Zone_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_base.h>
 #include <SFichier.h>
 #include <Schema_Temps_base.h>
 #include <EcrFicPartage.h>
@@ -171,7 +171,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const IntVect& orientation = zone_VDF.orientation();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
@@ -893,7 +893,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
   const IntVect& orientation = zone_VDF.orientation();

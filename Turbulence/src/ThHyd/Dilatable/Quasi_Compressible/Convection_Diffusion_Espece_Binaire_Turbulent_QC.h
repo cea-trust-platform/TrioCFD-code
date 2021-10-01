@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2018, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,84 +14,62 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Loi_Etat_Melange_GP.h
+// File:        Convection_Diffusion_Espece_Binaire_Turbulent_QC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
-// Version:     /main/9
+// Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Loi_Etat_Melange_GP_included
-#define Loi_Etat_Melange_GP_included
 
-#include <Loi_Etat_GP.h>
-#include <Champ_Inc_base.h>
-#include <List.h>
-#include <Ref_Champ_Inc_base.h>
-#include <Convection_Diffusion_fraction_massique_QC.h>
-#include <Ref_Espece.h>
-#include <DoubleTab.h>
+#ifndef Convection_Diffusion_Espece_Binaire_Turbulent_QC_included
+#define Convection_Diffusion_Espece_Binaire_Turbulent_QC_included
+
+#include <Convection_Diffusion_Turbulent.h>
+#include <Convection_Diffusion_Espece_Binaire_QC.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Loi_Etat_Melange_GP
-//     Cette classe represente la loi d'etat pour un melange de gaz parfaits.
-//
+//     classe Convection_Diffusion_Espece_Binaire_Turbulent_QC
+//     Cette classe represente le cas particulier de
+//     convection diffusion turbulente lorsque
+//     le fluide est quasi compressible. L'inconnue est
+//       la fraction massique
+//     Cette classe herite de Convection_Diffusion_Turbulent qui contient
+//     le modele de turbulence et de Convection_Diffusion_Espece_Binaire_QC
+//     qui modelise l'equation non turbulente associe a un fluide quasi compressible
+//     iso-therme et iso-bar
 // .SECTION voir aussi
-//     Fluide_Quasi_Compressible Loi_Etat_base Loi_Etat_GP
+//     Convection_Diffusion_Turbulent Convection_Diffusion_Espece_Binaire_QC
 //////////////////////////////////////////////////////////////////////////////
 
-Declare_liste(REF(Champ_Inc_base));
-Declare_liste(REF(Espece));
-
-class Loi_Etat_Melange_GP : public Loi_Etat_GP
+class Convection_Diffusion_Espece_Binaire_Turbulent_QC : public Convection_Diffusion_Turbulent,
+  public Convection_Diffusion_Espece_Binaire_QC
 {
-  Declare_instanciable_sans_constructeur(Loi_Etat_Melange_GP);
+  Declare_instanciable(Convection_Diffusion_Espece_Binaire_Turbulent_QC);
 
 public :
 
-  Loi_Etat_Melange_GP();
-  virtual void set_param(Param& param);
-  void associer_fluide(const Fluide_Quasi_Compressible&);
-  virtual void associer_inconnue(const Champ_Inc_base& inconnue);
-  void associer_espece(const Convection_Diffusion_fraction_massique_QC& eq);
-  void calculer_Cp();
-  virtual void calculer_tab_Cp(DoubleTab& cp) const;
-  void calculer_lambda();
-  void calculer_alpha();
-  void calculer_mu();
-  void calculer_mu_sur_Sc();
-  void calculer_mu0();
+  void set_param(Param& titi);
+  int lire_motcle_non_standard(const Motcle&, Entree&);
+  virtual bool initTimeStep(double dt);
+  const RefObjU& get_modele(Type_modele type) const;
 
-  void calculer_masse_volumique();
-  double calculer_masse_volumique(double,double) const;
-  virtual double calculer_masse_volumique_case(double P,double T,double r, int som) const;
+  //Methodes de l interface des champs postraitables
+  /////////////////////////////////////////////////////
+  virtual void creer_champ(const Motcle& motlu);
+  virtual const Champ_base& get_champ(const Motcle& nom) const;
+  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  /////////////////////////////////////////////////////
 
-  virtual void initialiser_inco_ch();
-  void calculer_masse_molaire();
-  void calculer_masse_molaire(DoubleTab& M) const;
-  virtual void rabot(int futur=0);
-  inline const DoubleTab& masse_molaire() const;
-  inline DoubleTab& masse_molaire();
+private:
 
-protected :
-  int correction_fraction_,ignore_check_fraction_;
-  double Sc_,dtol_fraction_;
-  DoubleTab Masse_mol_mel;
-
-  LIST(REF(Champ_Inc_base)) liste_Y;
-  LIST(REF(Espece)) liste_especes;
+  void completer();
+  int sauvegarder(Sortie&) const;
+  int reprendre(Entree&);
+  void mettre_a_jour(double );
+  int preparer_calcul();
+  void imprimer(Sortie& os) const;
 };
 
-
-inline const DoubleTab& Loi_Etat_Melange_GP::masse_molaire() const
-{
-  return Masse_mol_mel;
-}
-
-inline DoubleTab& Loi_Etat_Melange_GP::masse_molaire()
-{
-  return Masse_mol_mel;
-}
-
-#endif
+#endif /* Convection_Diffusion_Espece_Binaire_Turbulent_QC_included */

@@ -14,54 +14,58 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_fraction_massique_Turbulent_QC.h
+// File:        Navier_Stokes_Turbulent_QC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/15
+// Version:     /main/19
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Convection_Diffusion_fraction_massique_Turbulent_QC_included
-#define Convection_Diffusion_fraction_massique_Turbulent_QC_included
+#ifndef Navier_Stokes_Turbulent_QC_included
+#define Navier_Stokes_Turbulent_QC_included
 
-#include <Convection_Diffusion_fraction_massique_QC.h>
-#include <Convection_Diffusion_Turbulent.h>
+#include <Navier_Stokes_Turbulent.h>
+#include <Navier_Stokes_Fluide_Dilatable_Proto.h>
+class Champ_Fonc;
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Convection_Diffusion_fraction_massique_Turbulent_QC
+//     classe Navier_Stokes_Turbulent
+//     Cette classe represente l'equation de la dynamique pour un fluide
+//     visqueux verifiant la condition d'incompressibilite div U = 0 avec
+//     modelisation de la turbulence.
+//     Un membre de type Mod_turb_hyd representera le modele de turbulence.
 // .SECTION voir aussi
-//     Convection_Diffusion_fraction_massique_QC Convection_Diffusion_Turbulent
+//     Navier_Stokes_Turbulent Mod_turb_hyd Pb_Thermohydraulique_Turbulent_QC
 //////////////////////////////////////////////////////////////////////////////
-class Convection_Diffusion_fraction_massique_Turbulent_QC :
-  public Convection_Diffusion_Turbulent,
-  public Convection_Diffusion_fraction_massique_QC
+class Navier_Stokes_Turbulent_QC : public Navier_Stokes_Turbulent,public Navier_Stokes_Fluide_Dilatable_Proto
 {
-  Declare_instanciable(Convection_Diffusion_fraction_massique_Turbulent_QC);
+  Declare_instanciable(Navier_Stokes_Turbulent_QC);
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  //Methodes de l interface des champs postraitables
-  /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
-  /////////////////////////////////////////////////////
-
-  const RefObjU& get_modele(Type_modele type) const;
-
-protected :
-
-private:
-
   void completer();
-  int sauvegarder(Sortie&) const;
-  int reprendre(Entree&);
   void mettre_a_jour(double );
+  virtual bool initTimeStep(double dt);
+
   int preparer_calcul();
+  int impr(Sortie&) const;
+  void imprimer(Sortie& os) const;
+
+  DoubleTab& derivee_en_temps_inco(DoubleTab& );
+  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
+  void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
+  inline const Champ_Inc& rho_la_vitesse() const;
+  void discretiser();
+  virtual const Champ_base& get_champ(const Motcle& nom) const;
+  const Champ_Don& diffusivite_pour_transport();
+
+protected:
 
 };
+inline const Champ_Inc& Navier_Stokes_Turbulent_QC::rho_la_vitesse() const
+{
+  return rho_la_vitesse_;
+}
 
 #endif

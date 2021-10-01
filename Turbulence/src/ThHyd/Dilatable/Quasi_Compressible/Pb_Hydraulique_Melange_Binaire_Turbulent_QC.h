@@ -26,7 +26,7 @@
 
 #include <Pb_QC_base.h>
 #include <Navier_Stokes_Turbulent_QC.h>
-#include <Convection_Diffusion_fraction_massique_MB_Turbulent_QC.h>
+#include <Convection_Diffusion_Espece_Binaire_Turbulent_QC.h>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ public:
 protected:
 
   Navier_Stokes_Turbulent_QC eq_hydraulique;
-  Convection_Diffusion_fraction_massique_MB_Turbulent_QC eq_frac_mass;
+  Convection_Diffusion_Espece_Binaire_Turbulent_QC eq_frac_mass;
 };
 
 // Description:

@@ -21,6 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Navier_Stokes_Turbulent_QC.h>
+#include <Fluide_Quasi_Compressible.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
 #include <Discret_Thyd.h>
 #include <Assembleur_base.h>
@@ -29,43 +30,11 @@
 Implemente_instanciable(Navier_Stokes_Turbulent_QC,"Navier_Stokes_Turbulent_QC",Navier_Stokes_Turbulent);
 
 
-// Description:
-//    Impression de l'equation sur un flot de sortie.
-//    Simple appel a Equation_base::printOn(Sortie&).
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
 Sortie& Navier_Stokes_Turbulent_QC::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
-
-// Description:
-//    Lit les specifications de l'equation de Navier Stokes a
-//    partir d'un flot d'entree.
-//    Simple appel a Navier_Stokes_std::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: pas de modele de turbulence speficie
-// Effets de bord:
-// Postcondition: un modele de turbulence doit avoir ete specifie
 Entree& Navier_Stokes_Turbulent_QC::readOn(Entree& is)
 {
   assert(le_fluide.non_nul());
@@ -98,7 +67,7 @@ void Navier_Stokes_Turbulent_QC::mettre_a_jour(double temps)
 
 int Navier_Stokes_Turbulent_QC::impr(Sortie& os) const
 {
-  Navier_Stokes_QC_impl::impr_impl((*this), os);
+  Navier_Stokes_Fluide_Dilatable_Proto::impr_impl(*this,os);
   return Navier_Stokes_Turbulent::impr(os);
 }
 
@@ -181,7 +150,7 @@ void Navier_Stokes_Turbulent_QC::completer()
 int Navier_Stokes_Turbulent_QC::preparer_calcul()
 {
   return Navier_Stokes_Turbulent::preparer_calcul();
-  // Cerr << "Navier_Stokes_QC::preparer_calcul()" << finl;
+  // Cerr << "Navier_Stokes_Fluide_Dilatable_Proto::preparer_calcul()" << finl;
   Equation_base::preparer_calcul();
   //solveur_pression->assembler_QC(le_fluide->masse_volumique().valeurs());
   assembleur_pression_->assembler_QC(le_fluide->masse_volumique().valeurs(),matrice_pression_);
@@ -250,16 +219,17 @@ const Champ_base& Navier_Stokes_Turbulent_QC::get_champ(const Motcle& nom) const
 // Postcondition:
 DoubleTab& Navier_Stokes_Turbulent_QC::derivee_en_temps_inco(DoubleTab& vpoint)
 {
-  return Navier_Stokes_QC_impl::derivee_en_temps_inco((*this),vpoint,le_fluide.valeur(),matrice_pression_,assembleur_pression_,schema_temps().diffusion_implicite());
+  return Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(*this,vpoint,le_fluide.valeur(),matrice_pression_,
+                                                                          assembleur_pression_,schema_temps().diffusion_implicite());
 }
 
 void Navier_Stokes_Turbulent_QC::assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem)
 {
-  return assembler_impl((*this),mat_morse,present,secmem);
+  return Navier_Stokes_Fluide_Dilatable_Proto::assembler_impl(mat_morse,present,secmem);
 }
 void Navier_Stokes_Turbulent_QC::assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem)
 {
-  return assembler_avec_inertie_impl((*this),mat_morse,present,secmem);
+  return Navier_Stokes_Fluide_Dilatable_Proto::assembler_avec_inertie_impl(*this,mat_morse,present,secmem);
 }
 
 
@@ -274,7 +244,7 @@ bool Navier_Stokes_Turbulent_QC::initTimeStep(double dt)
   const DoubleTab& tab_rho = fluide_QC.rho_discvit();
 
   DoubleTab& rhovitesse = rho_la_vitesse_.valeurs();
-  rho_vitesse_impl(tab_rho,tab_vitesse,rhovitesse);
+  Navier_Stokes_Fluide_Dilatable_Proto::rho_vitesse_impl(tab_rho,tab_vitesse,rhovitesse);
 
   return  Navier_Stokes_Turbulent::initTimeStep(dt);
 }

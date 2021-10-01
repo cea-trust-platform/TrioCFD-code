@@ -26,7 +26,7 @@
 #include <Zone_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_Dilatable_base.h>
 #include <Equation_base.h>
 #include <Mod_turb_hyd_base.h>
 
@@ -90,7 +90,7 @@ int Paroi_UTAU_IMP_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& xv=zone_VDF.xv() ;                   // centres de gravite des faces
   DoubleVect pos(dimension);
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());

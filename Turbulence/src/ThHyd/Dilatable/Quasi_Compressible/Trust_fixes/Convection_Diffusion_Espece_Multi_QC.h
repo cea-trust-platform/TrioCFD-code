@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,58 +14,47 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Navier_Stokes_Turbulent_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/19
+// File:        Convection_Diffusion_Espece_Multi_QC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
+// Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Navier_Stokes_Turbulent_QC_included
-#define Navier_Stokes_Turbulent_QC_included
+#ifndef Convection_Diffusion_Espece_Multi_QC_included
+#define Convection_Diffusion_Espece_Multi_QC_included
 
-#include <Navier_Stokes_Turbulent.h>
-#include <Navier_Stokes_QC_impl.h>
-class Champ_Fonc;
+#include <Convection_Diffusion_Espece_Multi_base.h>
+#include <Espece.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Navier_Stokes_Turbulent
-//     Cette classe represente l'equation de la dynamique pour un fluide
-//     visqueux verifiant la condition d'incompressibilite div U = 0 avec
-//     modelisation de la turbulence.
-//     Un membre de type Mod_turb_hyd representera le modele de turbulence.
+//     classe Convection_Diffusion_Espece_Multi_QC
+//     Cas particulier de Convection_Diffusion_Espece_Multi_base
+//     pour un fluide quasi conpressible quand le scalaire subissant le transport est
+//     la fraction massique
 // .SECTION voir aussi
-//     Navier_Stokes_Turbulent Mod_turb_hyd Pb_Thermohydraulique_Turbulent_QC
+//     Convection_Diffusion_Espece_Multi_base
 //////////////////////////////////////////////////////////////////////////////
-class Navier_Stokes_Turbulent_QC : public Navier_Stokes_Turbulent,public Navier_Stokes_QC_impl
+
+class Convection_Diffusion_Espece_Multi_QC : public Convection_Diffusion_Espece_Multi_base
 {
-  Declare_instanciable(Navier_Stokes_Turbulent_QC);
+  Declare_instanciable(Convection_Diffusion_Espece_Multi_QC);
 
 public :
-
+  void set_param(Param& titi);
   void completer();
-  void mettre_a_jour(double );
-  virtual bool initTimeStep(double dt);
-
-  int preparer_calcul();
-  int impr(Sortie&) const;
-  void imprimer(Sortie& os) const;
-
-  DoubleTab& derivee_en_temps_inco(DoubleTab& );
   void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  inline const Champ_Inc& rho_la_vitesse() const;
-  void discretiser();
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  const Champ_Don& diffusivite_pour_transport();
+  int lire_motcle_non_standard(const Motcle&, Entree&);
+  const Champ_base& diffusivite_pour_pas_de_temps();
+  DoubleTab& derivee_en_temps_inco(DoubleTab& );
 
-protected:
+  // Methodes inlines
+  inline const Espece& espece() const { return mon_espece_; }
+  inline Espece& espece() { return mon_espece_; }
 
+protected :
+  Espece mon_espece_;
 };
-inline const Champ_Inc& Navier_Stokes_Turbulent_QC::rho_la_vitesse() const
-{
-  return rho_la_vitesse_;
-}
 
-#endif
+#endif /* Convection_Diffusion_Espece_Multi_QC_included */

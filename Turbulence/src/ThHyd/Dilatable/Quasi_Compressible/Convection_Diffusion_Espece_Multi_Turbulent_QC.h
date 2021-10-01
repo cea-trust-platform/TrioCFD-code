@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,53 +14,44 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_fraction_massique_MB_Turbulent_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
+// File:        Convection_Diffusion_Espece_Multi_Turbulent_QC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
 // Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef Convection_Diffusion_Espece_Multi_Turbulent_QC_included
+#define Convection_Diffusion_Espece_Multi_Turbulent_QC_included
 
-#ifndef Convection_Diffusion_fraction_massique_MB_Turbulent_QC_included
-#define Convection_Diffusion_fraction_massique_MB_Turbulent_QC_included
-
+#include <Convection_Diffusion_Espece_Multi_QC.h>
 #include <Convection_Diffusion_Turbulent.h>
-#include <Convection_Diffusion_fraction_massique_MB_QC.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Convection_Diffusion_fraction_massique_MB_Turbulent_QC
-//     Cette classe represente le cas particulier de
-//     convection diffusion turbulente lorsque
-//     le fluide est quasi compressible. L'inconnue est
-//       la fraction massique
-//     Cette classe herite de Convection_Diffusion_Turbulent qui contient
-//     le modele de turbulence et de Convection_Diffusion_fraction_massique_MB_QC
-//     qui modelise l'equation non turbulente associe a un fluide quasi compressible
-//     iso-therme et iso-bar
+//     classe Convection_Diffusion_Espece_Multi_Turbulent_QC
 // .SECTION voir aussi
-//     Convection_Diffusion_Turbulent Convection_Diffusion_fraction_massique_MB_QC
+//     Convection_Diffusion_Espece_Multi_QC Convection_Diffusion_Turbulent
 //////////////////////////////////////////////////////////////////////////////
-
-class Convection_Diffusion_fraction_massique_MB_Turbulent_QC : public Convection_Diffusion_Turbulent,
-  public Convection_Diffusion_fraction_massique_MB_QC
+class Convection_Diffusion_Espece_Multi_Turbulent_QC :
+  public Convection_Diffusion_Turbulent, public Convection_Diffusion_Espece_Multi_QC
 {
-  Declare_instanciable(Convection_Diffusion_fraction_massique_MB_Turbulent_QC);
+  Declare_instanciable(Convection_Diffusion_Espece_Multi_Turbulent_QC);
 
 public :
 
   void set_param(Param& titi);
   int lire_motcle_non_standard(const Motcle&, Entree&);
-  virtual bool initTimeStep(double dt);
-  const RefObjU& get_modele(Type_modele type) const;
-
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
   virtual void creer_champ(const Motcle& motlu);
   virtual const Champ_base& get_champ(const Motcle& nom) const;
   virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
   /////////////////////////////////////////////////////
+
+  const RefObjU& get_modele(Type_modele type) const;
+
+protected :
 
 private:
 
@@ -69,7 +60,7 @@ private:
   int reprendre(Entree&);
   void mettre_a_jour(double );
   int preparer_calcul();
-  void imprimer(Sortie& os) const;
+
 };
 
-#endif /* Convection_Diffusion_fraction_massique_MB_Turbulent_QC_included */
+#endif

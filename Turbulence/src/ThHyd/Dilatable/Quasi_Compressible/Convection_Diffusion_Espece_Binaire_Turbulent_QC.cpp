@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,69 +14,46 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_Chaleur_Turbulent_QC.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/29
+// File:        Convection_Diffusion_Espece_Binaire_QC.cpp
+// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
+// Version:     /main/27
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Convection_Diffusion_Chaleur_Turbulent_QC.h>
+#include <Convection_Diffusion_Espece_Binaire_Turbulent_QC.h>
+#include <Fluide_Quasi_Compressible.h>
+#include <Probleme_base.h>
 #include <Param.h>
 
-Implemente_instanciable(Convection_Diffusion_Chaleur_Turbulent_QC,"Convection_Diffusion_Chaleur_Turbulent_QC",Convection_Diffusion_Chaleur_QC);
+Implemente_instanciable(Convection_Diffusion_Espece_Binaire_Turbulent_QC,"Convection_Diffusion_Espece_Binaire_Turbulent_QC",Convection_Diffusion_Espece_Binaire_QC);
 
-// Description:
-//    Simple appel a Equation_base::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-Sortie& Convection_Diffusion_Chaleur_Turbulent_QC::printOn(Sortie& is) const
+// XD Convection_Diffusion_Espece_Binaire_Turbulent_QC Convection_Diffusion_Espece_Binaire_QC Convection_Diffusion_Espece_Binaire_Turbulent_QC -1 Species conservation equation under low Mach number as well as the associated turbulence model equations.
+// XD attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the species conservation equation.
+
+Sortie& Convection_Diffusion_Espece_Binaire_Turbulent_QC::printOn(Sortie& is) const
 {
-  return Equation_base::printOn(is);
+  return Convection_Diffusion_Espece_Binaire_QC::printOn(is);
 }
 
-// Description:
-//    Appelle Convection_Diffusion_Chaleur_QC::readOn(Entree&)
-//    et verifie qu'un modele de turbulence a ete lu.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: il faut specifier un modele de turbulence
-// Effets de bord:
-// Postcondition:
-Entree& Convection_Diffusion_Chaleur_Turbulent_QC::readOn(Entree& is)
+Entree& Convection_Diffusion_Espece_Binaire_Turbulent_QC::readOn(Entree& is)
 {
-  Convection_Diffusion_Chaleur_QC::readOn(is);
+  Convection_Diffusion_Espece_Binaire_QC::readOn(is);
   return is;
 }
 
-void Convection_Diffusion_Chaleur_Turbulent_QC::set_param(Param& param)
+void Convection_Diffusion_Espece_Binaire_Turbulent_QC::set_param(Param& param)
 {
-  Convection_Diffusion_Chaleur_QC::set_param(param);
+  Convection_Diffusion_Espece_Binaire_QC::set_param(param);
   param.ajouter_non_std("modele_turbulence",(this),Param::REQUIRED);
 }
 
-int Convection_Diffusion_Chaleur_Turbulent_QC::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+int Convection_Diffusion_Espece_Binaire_Turbulent_QC::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   if (mot=="diffusion")
     {
       Cerr << "Reading and typing of the diffusion operator : " << finl;
-      terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
+      terme_diffusif.associer_diffusivite(le_fluide->mu_sur_Schmidt());
+      ref_cast_non_const(Champ_base,terme_diffusif.diffusivite()).nommer("mu_sur_Schmidt");
       lire_op_diff_turbulent(is, *this, terme_diffusif);
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
@@ -90,13 +67,12 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::lire_motcle_non_standard(const Mo
       return 1;
     }
   else
-    return Convection_Diffusion_Chaleur_QC::lire_motcle_non_standard(mot,is);
-  return 1;
+    return Convection_Diffusion_Espece_Binaire_QC::lire_motcle_non_standard(mot,is);
 }
 
 // Description:
 //    Sauvegarde sur un flot de sortie, double appel a:
-//      Convection_Diffusion_Temperature::sauvegarder(Sortie& );
+//      Convection_Diffusion_Espece_Binaire_QC::sauvegarder(Sortie& );
 //      Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
 // Precondition:
 // Parametre: Sortie& os
@@ -110,10 +86,10 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::lire_motcle_non_standard(const Mo
 // Exception:
 // Effets de bord:
 // Postcondition: la methode ne modifie pas l'objet
-int Convection_Diffusion_Chaleur_Turbulent_QC::sauvegarder(Sortie& os) const
+int Convection_Diffusion_Espece_Binaire_Turbulent_QC::sauvegarder(Sortie& os) const
 {
   int bytes = 0;
-  bytes += Convection_Diffusion_Chaleur_QC::sauvegarder(os);
+  bytes += Convection_Diffusion_Espece_Binaire_QC::sauvegarder(os);
   bytes += Convection_Diffusion_Turbulent::sauvegarder(os);
   return bytes;
 }
@@ -121,7 +97,7 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::sauvegarder(Sortie& os) const
 
 // Description:
 //    Reprise a partir d'un flot d'entree, double appel a:
-//      Convection_Diffusion_Temperature::reprendre(Entree& );
+//      Convection_Diffusion_Espece_Binaire_QC::reprendre(Entree& );
 //      Convection_Diffusion_Turbulent::reprendre(Entree&);
 // Precondition:
 // Parametre: Entree& is
@@ -135,9 +111,9 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::sauvegarder(Sortie& os) const
 // Exception:
 // Effets de bord:
 // Postcondition:
-int Convection_Diffusion_Chaleur_Turbulent_QC::reprendre(Entree& is)
+int Convection_Diffusion_Espece_Binaire_Turbulent_QC::reprendre(Entree& is)
 {
-  Convection_Diffusion_Chaleur_QC::reprendre(is);
+  Convection_Diffusion_Espece_Binaire_QC::reprendre(is);
   Convection_Diffusion_Turbulent::reprendre(is);
   return 1;
 }
@@ -146,7 +122,7 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::reprendre(Entree& is)
 // Description:
 //    Double appel a:
 //     Convection_Diffusion_Turbulent::completer()
-//     Convection_Diffusion_Temperature::completer()
+//     Convection_Diffusion_Espece_Binaire_QC::completer()
 // Precondition:
 // Parametre:
 //    Signification:
@@ -159,16 +135,16 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::reprendre(Entree& is)
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Convection_Diffusion_Chaleur_Turbulent_QC::completer()
+void Convection_Diffusion_Espece_Binaire_Turbulent_QC::completer()
 {
   Convection_Diffusion_Turbulent::completer();
-  Convection_Diffusion_Chaleur_QC::completer();
+  Convection_Diffusion_Espece_Binaire_QC::completer();
 }
 
 
 // Description:
 //    Mise a jour en temps de l'equation, double appel a:
-//      Convection_Diffusion_Temperature::mettre_a_jour(double );
+//      Convection_Diffusion_Espece_Binaire_QC::mettre_a_jour(double );
 //      Convection_Diffusion_Turbulent::mettre_a_jour(double );
 // Precondition:
 // Parametre: double temps
@@ -182,29 +158,25 @@ void Convection_Diffusion_Chaleur_Turbulent_QC::completer()
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour(double temps)
+void Convection_Diffusion_Espece_Binaire_Turbulent_QC::mettre_a_jour(double temps)
 {
-  Convection_Diffusion_Chaleur_QC::mettre_a_jour(temps);
-}
-void Convection_Diffusion_Chaleur_Turbulent_QC::mettre_a_jour_modele(double temps)
-{
+  Convection_Diffusion_Espece_Binaire_QC::mettre_a_jour(temps);
   Convection_Diffusion_Turbulent::mettre_a_jour(temps);
-
 }
 
-void Convection_Diffusion_Chaleur_Turbulent_QC::creer_champ(const Motcle& motlu)
+void Convection_Diffusion_Espece_Binaire_Turbulent_QC::creer_champ(const Motcle& motlu)
 {
-  Convection_Diffusion_Chaleur_QC::creer_champ(motlu);
+  Convection_Diffusion_Espece_Binaire_QC::creer_champ(motlu);
 
   if (le_modele_turbulence.non_nul())
     le_modele_turbulence->creer_champ(motlu);
 }
 
-const Champ_base& Convection_Diffusion_Chaleur_Turbulent_QC::get_champ(const Motcle& nom) const
+const Champ_base& Convection_Diffusion_Espece_Binaire_Turbulent_QC::get_champ(const Motcle& nom) const
 {
   try
     {
-      return Convection_Diffusion_Chaleur_QC::get_champ(nom);
+      return Convection_Diffusion_Espece_Binaire_QC::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -224,9 +196,9 @@ const Champ_base& Convection_Diffusion_Chaleur_Turbulent_QC::get_champ(const Mot
   return ref_champ;
 }
 
-void Convection_Diffusion_Chaleur_Turbulent_QC::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Convection_Diffusion_Espece_Binaire_Turbulent_QC::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
-  Convection_Diffusion_Chaleur_QC::get_noms_champs_postraitables(nom,opt);
+  Convection_Diffusion_Espece_Binaire_QC::get_noms_champs_postraitables(nom,opt);
 
   if (le_modele_turbulence.non_nul())
     le_modele_turbulence->get_noms_champs_postraitables(nom,opt);
@@ -236,7 +208,7 @@ void Convection_Diffusion_Chaleur_Turbulent_QC::get_noms_champs_postraitables(No
 // Description:
 //    Double appel a:
 //      Convection_Diffusion_Turbulent::preparer_calcul()
-//      Convection_Diffusion_Temperature::preparer_calcul()
+//      Convection_Diffusion_Espece_Binaire_QC::preparer_calcul()
 // Precondition:
 // Parametre:
 //    Signification:
@@ -249,27 +221,28 @@ void Convection_Diffusion_Chaleur_Turbulent_QC::get_noms_champs_postraitables(No
 // Exception:
 // Effets de bord:
 // Postcondition:
-int Convection_Diffusion_Chaleur_Turbulent_QC::preparer_calcul()
+int Convection_Diffusion_Espece_Binaire_Turbulent_QC::preparer_calcul()
 {
-  Convection_Diffusion_Chaleur_QC::preparer_calcul();
+  Convection_Diffusion_Espece_Binaire_QC::preparer_calcul();
   Convection_Diffusion_Turbulent::preparer_calcul();
 
   return 1;
 }
-void Convection_Diffusion_Chaleur_Turbulent_QC::imprimer(Sortie& os) const
+
+void Convection_Diffusion_Espece_Binaire_Turbulent_QC::imprimer(Sortie& os) const
 {
-  Convection_Diffusion_Chaleur_QC::imprimer(os);
+  Convection_Diffusion_Espece_Binaire_QC::imprimer(os);
   le_modele_turbulence->imprimer(os);
 }
 
-bool Convection_Diffusion_Chaleur_Turbulent_QC::initTimeStep(double dt)
+bool Convection_Diffusion_Espece_Binaire_Turbulent_QC::initTimeStep(double dt)
 {
   bool ok = Convection_Diffusion_Turbulent::initTimeStep(dt);
-  ok = ok && Convection_Diffusion_Chaleur_QC::initTimeStep(dt);
+  ok = ok && Convection_Diffusion_Espece_Binaire_QC::initTimeStep(dt);
   return ok;
 }
 
-const RefObjU& Convection_Diffusion_Chaleur_Turbulent_QC::get_modele(Type_modele type) const
+const RefObjU& Convection_Diffusion_Espece_Binaire_Turbulent_QC::get_modele(Type_modele type) const
 {
   CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
   while(curseur)
@@ -282,3 +255,4 @@ const RefObjU& Convection_Diffusion_Chaleur_Turbulent_QC::get_modele(Type_modele
     }
   return Equation_base::get_modele(type);
 }
+
