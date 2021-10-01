@@ -24,7 +24,7 @@
 #include <Source_Transport_Fluctuation_Temperature_W_VDF_Elem.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <IntTrav.h>
 #include <Entree_fluide_temperature_imposee.h>
@@ -115,7 +115,7 @@ void Source_Transport_Fluctuation_Temperature_W_VDF_Elem::associer_pb(const Prob
     ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
   eq_thermique = eqn_th;
   mon_eq_transport_Fluctu_Temp = ref_cast(Transport_Fluctuation_Temperature_W,equation());
-  const Fluide_Incompressible& fluide = eq_thermique->fluide();
+  const Fluide_base& fluide = eq_thermique->fluide();
   beta_t = fluide.beta_t();
   gravite_ = fluide.gravite();
 }

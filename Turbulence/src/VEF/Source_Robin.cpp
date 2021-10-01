@@ -26,7 +26,7 @@
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
 #include <Equation_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <distances_VEF.h>
 #include <Navier_Stokes_Turbulent.h>
 #include <SFichier.h>
@@ -79,7 +79,7 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 //  const DoubleVect& u_star             = eq_ns.modele_turbulence().loi_paroi().valeur().tab_u_star();
 //  double temps = mon_equation->inconnue().temps();
 //  static double temps_dernier_post = -1;
-//  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,equation().milieu());
+//  const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
 //  double nu = fluide.viscosite_cinematique().valeurs()(0,0);
 //  double utaumoy = 0.;
 //  int compt = 0;

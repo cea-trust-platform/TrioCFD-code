@@ -25,7 +25,7 @@
 #include <Modele_turbulence_scal_Fluctuation_Temperature.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Convection_Diffusion_Temperature.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <IntTrav.h>
 #include <Champ_Uniforme.h>
@@ -107,7 +107,7 @@ void Source_Transport_Flux_Chaleur_Turbulente_VDF_Face::associer_pb(const Proble
   const Convection_Diffusion_Temperature& eqn_th =
     ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
   eq_thermique = eqn_th;
-  const Fluide_Incompressible& fluide = eq_thermique->fluide();
+  const Fluide_base& fluide = eq_thermique->fluide();
   beta_t = fluide.beta_t();
   gravite_ = fluide.gravite();
 }

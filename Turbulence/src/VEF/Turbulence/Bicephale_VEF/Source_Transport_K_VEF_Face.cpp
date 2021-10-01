@@ -27,7 +27,7 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VEF.h>
@@ -142,7 +142,7 @@ void Source_Transport_K_anisotherme_VEF_Face::associer_pb(const Probleme_base& p
     }
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = eqn.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -167,7 +167,7 @@ void Source_Transport_K_aniso_concen_VEF_Face::associer_pb(const Probleme_base& 
 
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = pb.equation(0).milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -201,7 +201,7 @@ void Source_Transport_K_aniso_therm_concen_VEF_Face::associer_pb(const Probleme_
   const Equation_base& eqn_therm = pb.equation(1);
   const Equation_base& eqn_conc = pb.equation(2);
   const Milieu_base& milieu = eqn_therm.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -286,7 +286,7 @@ DoubleTab& Source_Transport_K_VEF_Face::ajouter(DoubleTab& resu) const
       DoubleTrav F2(nb_faces_); */
       DoubleTab& D=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("D").valeurs());
 
-      const Fluide_Incompressible& fluide=ref_cast(Fluide_Incompressible,eq_hydraulique.valeur().milieu());
+      const Fluide_base& fluide=ref_cast(Fluide_base,eq_hydraulique.valeur().milieu());
       const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
       // const DoubleTab& tab_visco = ch_visco_cin->valeurs();
       const Zone_Cl_dis& zcl_keps=mon_eq_transport_K->zone_Cl_dis();

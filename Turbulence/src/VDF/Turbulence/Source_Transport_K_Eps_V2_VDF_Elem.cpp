@@ -25,7 +25,7 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VDF.h>
@@ -275,7 +275,7 @@ DoubleTab& Source_Transport_K_Eps_V2_VDF_Elem::ajouter(DoubleTab& resu) const
 
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   DoubleTab& tab_visco = ref_cast_non_const(DoubleTab,ch_visco_cin->valeurs());
   double visco=-1;
@@ -346,7 +346,7 @@ void Source_Transport_K_Eps_V2_anisotherme_VDF_Elem::associer_pb(const Probleme_
   const Convection_Diffusion_Temperature& eqn_th =
     ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
   eq_thermique = eqn_th;
-  const Fluide_Incompressible& fluide = eq_thermique->fluide();
+  const Fluide_base& fluide = eq_thermique->fluide();
   beta_t = fluide.beta_t();
   gravite = fluide.gravite();
 }
@@ -393,7 +393,7 @@ DoubleTab& Source_Transport_K_Eps_V2_anisotherme_VDF_Elem::ajouter(DoubleTab& re
     }
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1;
@@ -468,7 +468,7 @@ void Source_Transport_K_Eps_V2_aniso_therm_concen_VDF_Elem::associer_pb(const Pr
   const Convection_Diffusion_Concentration& eqn_c =
     ref_cast(Convection_Diffusion_Concentration,pb.equation(2));
   eq_concentration = eqn_c;
-  const Fluide_Incompressible& fluide = eq_thermique->fluide();
+  const Fluide_base& fluide = eq_thermique->fluide();
   beta_t = fluide.beta_t();
   beta_c = fluide.beta_c();
   gravite = fluide.gravite();
@@ -526,7 +526,7 @@ DoubleTab& Source_Transport_K_Eps_V2_aniso_therm_concen_VDF_Elem::ajouter(Double
     }
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1;

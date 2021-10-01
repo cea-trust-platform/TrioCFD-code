@@ -27,7 +27,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Symetrie.h>
 #include <Neumann_paroi.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Convection_Diffusion_std.h>
 #include <Modele_turbulence_scal_base.h>
@@ -132,7 +132,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
   const DoubleTab& xv=zone_VEF.xv() ;                   // centres de gravite des faces
@@ -260,7 +260,7 @@ void Loi_Paroi_Nu_Impose_VEF::imprimer_nusselt(Sortie&) const
   int ndeb,nfin,elem;
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& conductivite = le_fluide.conductivite();
   const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 

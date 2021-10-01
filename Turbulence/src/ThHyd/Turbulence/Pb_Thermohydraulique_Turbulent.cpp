@@ -175,7 +175,7 @@ void Pb_Thermohydraulique_Turbulent::associer_milieu_base(const Milieu_base& mil
 {
   if sub_type(Fluide_Incompressible,mil)
     {
-      const Fluide_Incompressible& mi = ref_cast(Fluide_Incompressible,mil);
+      const Fluide_base& mi = ref_cast(Fluide_base,mil);
       eq_hydraulique.associer_milieu_base(mi);
       eq_thermique.associer_milieu_base(mi);
     }

@@ -33,7 +33,7 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Constituant.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <EFichier.h>
 #include <Mod_turb_hyd_base.h>
 #include <Probleme_base.h>
@@ -324,7 +324,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const Fluide_Incompressible& le_fluide   = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide   = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const Milieu_base& le_milieu_fluide      = eqn_hydr.milieu();
   const DoubleTab& lambda_f                = le_milieu_fluide.conductivite().valeurs();

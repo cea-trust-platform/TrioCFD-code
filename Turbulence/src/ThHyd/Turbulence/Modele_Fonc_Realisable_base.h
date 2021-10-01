@@ -26,7 +26,7 @@
 
 #include <Ref_Champ_base.h>
 #include <Champ_Fonc.h>
-#include <Ref_Fluide_Incompressible.h>
+#include <Ref_Fluide_base.h>
 #include <Ref_Champ_Inc.h>
 #include <Ref_Equation_base.h>
 #include <Ref_Champ_Don.h>
@@ -98,7 +98,7 @@ protected :
 
   REF(Equation_base) mon_equation;
 
-  REF(Fluide_Incompressible) le_fluide;
+  REF(Fluide_base) le_fluide;
   REF(Champ_Inc) la_vitesse_transportante;
   REF(Equation_base) eq_hydraulique;
   REF(Champ_Don) visco_;

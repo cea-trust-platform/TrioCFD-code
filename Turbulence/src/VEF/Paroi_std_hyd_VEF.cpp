@@ -23,7 +23,7 @@
 #include <Paroi_std_hyd_VEF.h>
 #include <Champ_Q1NC.h>
 #include <Champ_P1NC.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
@@ -681,7 +681,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
@@ -1090,7 +1090,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());

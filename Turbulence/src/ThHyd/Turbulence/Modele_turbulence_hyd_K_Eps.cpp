@@ -30,7 +30,7 @@
 #include <Modele_turbulence_scal_base.h>
 #include <Param.h>
 #include <communications.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <DoubleTrav.h>
 #include <Champ_Uniforme.h>
 #include <ConstDoubleTab_parts.h>
@@ -160,8 +160,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
       // pour avoir nu en incompressible et mu en QC
       // et non comme on a divise K et eps par rho (si on est en QC)
       // on veut toujours nu
-      const Champ_Don ch_visco=ref_cast(Fluide_Incompressible,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
-      const Champ_Don& ch_visco_cin =ref_cast(Fluide_Incompressible,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
+      const Champ_Don ch_visco=ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
+      const Champ_Don& ch_visco_cin =ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
       // const Champ_Don& ch_visco_cin_ou_dyn =((const Op_Diff_K_Eps&) eqn_transp_K_Eps().operateur(0)).diffusivite();
 
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();

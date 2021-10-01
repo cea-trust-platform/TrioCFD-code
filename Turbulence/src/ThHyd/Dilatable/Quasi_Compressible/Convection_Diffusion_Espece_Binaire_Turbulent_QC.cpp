@@ -52,7 +52,7 @@ int Convection_Diffusion_Espece_Binaire_Turbulent_QC::lire_motcle_non_standard(c
   if (mot=="diffusion")
     {
       Cerr << "Reading and typing of the diffusion operator : " << finl;
-      terme_diffusif.associer_diffusivite(le_fluide->mu_sur_Schmidt());
+      terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       ref_cast_non_const(Champ_base,terme_diffusif.diffusivite()).nommer("mu_sur_Schmidt");
       lire_op_diff_turbulent(is, *this, terme_diffusif);
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());

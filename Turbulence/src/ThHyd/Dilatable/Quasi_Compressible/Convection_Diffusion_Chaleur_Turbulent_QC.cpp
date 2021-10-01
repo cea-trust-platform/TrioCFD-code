@@ -49,7 +49,7 @@ int Convection_Diffusion_Chaleur_Turbulent_QC::lire_motcle_non_standard(const Mo
   if (mot=="diffusion")
     {
       Cerr << "Reading and typing of the diffusion operator : " << finl;
-      terme_diffusif.associer_diffusivite(milieu().conductivite());
+      terme_diffusif.associer_diffusivite(diffusivite_pour_transport());
       lire_op_diff_turbulent(is, *this, terme_diffusif);
       terme_diffusif.associer_diffusivite_pour_pas_de_temps(diffusivite_pour_pas_de_temps());
       return 1;
