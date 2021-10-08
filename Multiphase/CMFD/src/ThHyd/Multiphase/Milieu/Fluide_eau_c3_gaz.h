@@ -36,11 +36,12 @@ class Fluide_eau_c3_gaz: public Fluide_reel_base
 {
   Declare_instanciable(Fluide_eau_c3_gaz);
 
+  /* bornes (p, T_g) de H2OPROP.H */
   virtual std::map<std::string, std::array<double, 2>> unknown_range() const
   {
-    return { { "temperature", { 371 - 273.15, 2503.7 - 273.15 } }, //de la temperature de solidification au pt tricritique
-      { "pression", { 4.127e-6, 260e5 } }
-    };                // Psat() des temperatures ci-dessus
+    return { { "pression"   , { 0.01e5, 260e5 } },
+      { "temperature", {   -250, 2000  } }
+    };
   }
 
 protected :

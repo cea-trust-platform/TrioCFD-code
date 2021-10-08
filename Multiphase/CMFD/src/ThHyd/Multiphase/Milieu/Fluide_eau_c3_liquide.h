@@ -36,9 +36,12 @@ class Fluide_eau_c3_liquide: public Fluide_reel_base
 {
   Declare_instanciable(Fluide_eau_c3_liquide);
 
+  /* bornes (p, T_l) de H2OPROP.H */
   virtual std::map<std::string, std::array<double, 2>> unknown_range() const
   {
-    return { { "temperature", { 371 - 273.15, 2503.7 - 273.15 } } }; //de la temperature de solidification au pt tricritique
+    return { { "pression"   , { 0.01e5, 260e5 } },
+      { "temperature", {      0, 400   } }
+    };
   }
 
 protected :
