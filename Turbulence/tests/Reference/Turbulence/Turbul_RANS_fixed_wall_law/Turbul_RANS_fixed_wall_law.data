@@ -87,7 +87,7 @@ Read pb
 {
 	Navier_Stokes_turbulent
 	{
-		Solveur_pression	petsc Cholesky { }
+		Solveur_pression	petsc gcp { precond ssor { omega 1.6 } rtol 1.e-8 }
 		Convection		{ EF_stab { volumes_etendus alpha 0.2 } }
 		Diffusion		{ }
 		initial_conditions	{ vitesse champ_init_canal_sinal 3 { Ucent 9.8945 h 1 ampli_sin 0 omega 1 ampli_bruit 0.0 } }
