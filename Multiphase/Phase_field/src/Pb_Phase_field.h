@@ -46,9 +46,9 @@
 //         en compte de petites variations de la masse volumique en fonction
 //         du ou des constituants
 // .SECTION voir aussi
-//     Pb_qdm_fluide
+//     Pb_Fluide_base
 //////////////////////////////////////////////////////////////////////////////
-class Pb_Phase_field : public Pb_qdm_fluide
+class Pb_Phase_field : public Pb_Fluide_base
 {
 
   Declare_instanciable(Pb_Phase_field);

@@ -23,7 +23,7 @@
 #ifndef Pb_Hydraulique_Turbulent_ALE_included
 #define Pb_Hydraulique_Turbulent_ALE_included
 
-#include <Pb_qdm_fluide.h>
+#include <Pb_Fluide_base.h>
 #include <Navier_Stokes_Turbulent_ALE.h>
 
 class Champ_Fonc;
@@ -39,9 +39,9 @@ class Champ_Fonc;
 //     pour un fluide incompressible et en maillage mobile (ALE)
 //     La formulation est de type vitesse pression
 // .SECTION voir aussi
-//     Pb_qdm_fluide Navier_Stokes_Turbulent_ALE Pb_Hydraulique
+//     Pb_Fluide_base Navier_Stokes_Turbulent_ALE Pb_Hydraulique
 //////////////////////////////////////////////////////////////////////////////
-class Pb_Hydraulique_Turbulent_ALE : public Pb_qdm_fluide
+class Pb_Hydraulique_Turbulent_ALE : public Pb_Fluide_base
 {
   Declare_instanciable(Pb_Hydraulique_Turbulent_ALE);
 

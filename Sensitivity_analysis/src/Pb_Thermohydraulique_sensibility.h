@@ -22,7 +22,7 @@
 #ifndef Pb_Thermohydraulique_sensibility_included
 #define Pb_Thermohydraulique_sensibility_included
 
-#include <Pb_qdm_fluide.h>
+#include <Pb_Fluide_base.h>
 #include <Navier_Stokes_std_sensibility.h>
 #include <Convection_Diffusion_Temperature_sensibility.h>
 
@@ -40,7 +40,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class Pb_Thermohydraulique_sensibility : public Pb_qdm_fluide
+class Pb_Thermohydraulique_sensibility : public Pb_Fluide_base
 {
 
   Declare_instanciable( Pb_Thermohydraulique_sensibility ) ;

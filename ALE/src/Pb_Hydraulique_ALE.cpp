@@ -22,12 +22,12 @@
 #include <Pb_Hydraulique_ALE.h>
 #include <Fluide_Ostwald.h>
 
-Implemente_instanciable(Pb_Hydraulique_ALE,"Pb_Hydraulique_ALE",Pb_qdm_fluide);
+Implemente_instanciable(Pb_Hydraulique_ALE,"Pb_Hydraulique_ALE",Pb_Fluide_base);
 // XD pb_hydraulique_ALE Pb_base pb_hydraulique_ALE -1 Resolution of hydraulic problems for ALE
 // XD  attr navier_stokes_standard_ALE navier_stokes_standard navier_stokes_standard_ALE 0 Navier-Stokes equations for ALE problems
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)
+//    Simple appel a: Pb_Fluide_base::printOn(Sortie&)
 //    Ecrit le probleme sur un flot de sortie.
 // Precondition:
 // Parametre: Sortie& os
@@ -43,12 +43,12 @@ Implemente_instanciable(Pb_Hydraulique_ALE,"Pb_Hydraulique_ALE",Pb_qdm_fluide);
 // Postcondition: la methode ne modifie pas l'objet
 Sortie& Pb_Hydraulique_ALE::printOn(Sortie& os) const
 {
-  return Pb_qdm_fluide::printOn(os);
+  return Pb_Fluide_base::printOn(os);
 }
 
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::readOn(Entree&)
+//    Simple appel a: Pb_Fluide_base::readOn(Entree&)
 //    Lit le probleme a partir d'un flot d'entree.
 // Precondition:
 // Parametre: Entree& is
@@ -64,7 +64,7 @@ Sortie& Pb_Hydraulique_ALE::printOn(Sortie& os) const
 // Postcondition:
 Entree& Pb_Hydraulique_ALE::readOn(Entree& is)
 {
-  return Pb_qdm_fluide::readOn(is);
+  return Pb_Fluide_base::readOn(is);
 }
 
 // Description:

@@ -23,14 +23,14 @@
 #include <Fluide_Ostwald.h>
 #include <Verif_Cl.h>
 
-Implemente_instanciable( Pb_Thermohydraulique_sensibility, "Pb_Thermohydraulique_sensibility", Pb_qdm_fluide ) ;
+Implemente_instanciable( Pb_Thermohydraulique_sensibility, "Pb_Thermohydraulique_sensibility", Pb_Fluide_base ) ;
 // XD Pb_Thermohydraulique_sensibility pb_thermohydraulique Pb_Thermohydraulique_sensibility -1 Resolution of Resolution of thermohydraulic sensitivity problem
 // XD  attr Convection_Diffusion_Temperature_Sensibility Convection_Diffusion_Temperature_sensibility convection_diffusion_temperature 0  Convection diffusion temperature sensitivity equation
 // XD  attr Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility 0   Navier Stokes sensitivity equation
 
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)
+//    Simple appel a: Pb_Fluide_base::printOn(Sortie&)
 //    Ecrit le probleme sur un flot de sortie.
 // Precondition:
 // Parametre: Sortie& os
@@ -47,13 +47,13 @@ Implemente_instanciable( Pb_Thermohydraulique_sensibility, "Pb_Thermohydraulique
 
 Sortie& Pb_Thermohydraulique_sensibility::printOn( Sortie& os ) const
 {
-  Pb_qdm_fluide::printOn( os );
+  Pb_Fluide_base::printOn( os );
   return os;
 }
 
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::readOn(Entree&)
+//    Simple appel a: Pb_Fluide_base::readOn(Entree&)
 //    Lit le probleme a partir d'un flot d'entree.
 // Precondition:
 // Parametre: Entree& is
@@ -69,7 +69,7 @@ Sortie& Pb_Thermohydraulique_sensibility::printOn( Sortie& os ) const
 // Postcondition:
 Entree& Pb_Thermohydraulique_sensibility::readOn( Entree& is )
 {
-  Pb_qdm_fluide::readOn( is );
+  Pb_Fluide_base::readOn( is );
   return is;
 }
 
