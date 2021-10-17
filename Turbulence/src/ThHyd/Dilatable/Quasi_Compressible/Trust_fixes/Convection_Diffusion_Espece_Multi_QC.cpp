@@ -24,6 +24,7 @@
 #include <Fluide_Quasi_Compressible.h>
 #include <Loi_Etat_Multi_GP_QC.h>
 #include <Neumann_sortie_libre.h>
+#include <Navier_Stokes_Turbulent_QC.h>
 #include <Navier_Stokes_QC.h>
 #include <Probleme_base.h>
 #include <DoubleTrav.h>
@@ -67,8 +68,8 @@ int Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(const Motcle&
   else if (mot=="convection")
     {
       const Probleme_base& pb = probleme();
-      const Navier_Stokes_QC& eqn_hydr = ref_cast(Navier_Stokes_QC,pb.equation(0));
-      const Champ_Inc& vit_transportante =eqn_hydr.rho_la_vitesse();
+      const Champ_Inc& vit_transportante = (pb.que_suis_je() == "Pb_Thermohydraulique_Turbulent_QC_fraction_massique") ? ref_cast(Navier_Stokes_Turbulent_QC,pb.equation(0)).rho_la_vitesse() :
+                                           ref_cast(Navier_Stokes_QC,pb.equation(0)).rho_la_vitesse();
       associer_vitesse(vit_transportante);
       terme_convectif.associer_vitesse(vit_transportante);
       is >> terme_convectif;

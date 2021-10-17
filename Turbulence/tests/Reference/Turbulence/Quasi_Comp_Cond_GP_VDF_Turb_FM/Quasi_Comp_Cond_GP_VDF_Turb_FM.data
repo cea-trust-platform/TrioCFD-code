@@ -59,7 +59,7 @@ Fluide_Quasi_Compressible fluide
 Read fluide
 {
         pression 140000.	
-        loi_etat Melange_gaz_parfait {
+        loi_etat multi_gaz_parfait_qc {
                 Prandtl 0.71034351145038165942
                 Sc 0.8
                 dtol_fraction 1.e-5
@@ -134,7 +134,7 @@ Read pb
 
 	Equations_Scalaires_Passifs
 	{
-	 Convection_Diffusion_fraction_massique_Turbulent_QC {
+	 Convection_Diffusion_Espece_Multi_Turbulent_QC {
 	  
 			diffusion { }
 			convection { amont }
@@ -161,7 +161,7 @@ Read pb
 			
 		}
 		
-	  Convection_Diffusion_fraction_massique_Turbulent_QC {
+	  Convection_Diffusion_Espece_Multi_Turbulent_QC {
 	  
 			diffusion { }
 			convection { amont }
