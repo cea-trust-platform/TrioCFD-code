@@ -22,16 +22,16 @@
 
 #include <Modifier_nut_pour_QC.h>
 #include <Mod_turb_hyd_base.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_Dilatable_base.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
 
 void Correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod)
 {
   // on recgarde si on a un fluide QC
-  if (sub_type(Fluide_Quasi_Compressible,mod.equation().probleme().milieu()))
+  if (sub_type(Fluide_Dilatable_base,mod.equation().probleme().milieu()))
     {
-      const  Fluide_Quasi_Compressible& le_fluide = ref_cast(Fluide_Quasi_Compressible,mod.equation().probleme().milieu());
+      const  Fluide_Dilatable_base& le_fluide = ref_cast(Fluide_Dilatable_base,mod.equation().probleme().milieu());
       // 1 on multiplie nu_t par rho
 
       DoubleTab& nut=ref_cast_non_const(DoubleTab, mod.viscosite_turbulente().valeurs());

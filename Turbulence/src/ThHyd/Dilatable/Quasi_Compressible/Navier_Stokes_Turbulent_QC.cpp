@@ -219,8 +219,7 @@ const Champ_base& Navier_Stokes_Turbulent_QC::get_champ(const Motcle& nom) const
 // Postcondition:
 DoubleTab& Navier_Stokes_Turbulent_QC::derivee_en_temps_inco(DoubleTab& vpoint)
 {
-  return Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(*this,vpoint,le_fluide.valeur(),matrice_pression_,
-                                                                          assembleur_pression_,schema_temps().diffusion_implicite());
+  return Navier_Stokes_Fluide_Dilatable_Proto::derivee_en_temps_inco_impl(*this,vpoint);
 }
 
 void Navier_Stokes_Turbulent_QC::assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem)

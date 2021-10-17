@@ -461,7 +461,7 @@ int Transport_K_ou_Eps_base::controler_variable()
                   Cerr
                       << "respectively for boudnaries and initial conditions, TRUST will determine automatically values for k and eps."
                       << finl;
-                  if (probleme().is_QC() == 1)
+                  if (probleme().is_dilatable() == 1)
                     {
                       Cerr
                           << "Please, don't forget (sorry for this TRUST syntax weakness) that when using Quasi-Compressible module"

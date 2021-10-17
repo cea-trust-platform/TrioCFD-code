@@ -33,7 +33,7 @@
 #include <Neumann_paroi.h>
 #include <Probleme_base.h>
 #include <SFichier.h>
-#include <Modifier_pour_QC.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Paroi_decalee_Robin.h>
 
 Implemente_base(Paroi_scal_hyd_base_VEF,"Paroi_scal_hyd_base_VEF",Turbulence_paroi_scal_base);

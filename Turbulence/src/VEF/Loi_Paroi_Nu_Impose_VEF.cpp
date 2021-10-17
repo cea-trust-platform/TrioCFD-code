@@ -34,7 +34,7 @@
 #include <Probleme_base.h>
 #include <EcrFicPartage.h>
 #include <SFichier.h>
-#include <Modifier_pour_QC.h>
+#include <Modifier_pour_fluide_dilatable.h>
 
 Implemente_instanciable(Loi_Paroi_Nu_Impose_VEF,"Loi_Paroi_Nu_Impose_VEF",Paroi_scal_hyd_base_VEF);
 

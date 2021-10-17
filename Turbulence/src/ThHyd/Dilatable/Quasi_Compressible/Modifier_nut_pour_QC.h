@@ -41,7 +41,7 @@
 // .SECTION
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modifier_pour_QC.h>
+#include <Modifier_pour_fluide_dilatable.h>
 class Mod_turb_hyd_base;
 
 void Correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod);

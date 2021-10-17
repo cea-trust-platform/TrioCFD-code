@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Modele_turbulence_scal_Schmidt.h>
-#include <Modifier_pour_QC.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Param.h>
 #include <Convection_Diffusion_std.h>
 
@@ -187,7 +187,7 @@ void Modele_turbulence_scal_Schmidt::mettre_a_jour(double )
     }
   DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
   lambda_t = diffusivite_turbulente_.valeurs();
-  multiplier_par_rho_si_qc(lambda_t,mil);
+  if (equation().probleme().is_dilatable()) multiplier_par_rho_si_dilatable(lambda_t,mil);
   conductivite_turbulente_->valeurs().echange_espace_virtuel();
   diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
@@ -224,6 +224,6 @@ Champ_Fonc& Modele_turbulence_scal_Schmidt::calculer_diffusion_turbulente()
   for (int i=0; i<n; i++)
     alpha_t[i] = nu_t[i]/LeScturb;
   diffusivite_turbulente_.changer_temps(temps);
-  diviser_par_rho_si_qc(diffusivite_turbulente_.valeurs(), equation().probleme().milieu());
+  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(diffusivite_turbulente_.valeurs(), equation().probleme().milieu());
   return diffusivite_turbulente_;
 }
