@@ -76,7 +76,7 @@ fluide_quasi_compressible eau
 Lire eau
   { 
     pression 171428.571429
-    loi_etat gaz_parfait 
+    loi_etat gaz_parfait_qc
       { 
         Cp 1000.0
         gamma 1.4
@@ -93,7 +93,7 @@ champ_uniforme gravite
 Lire gravite 3 0. 0. -9.81
 Associate eau gravite
 
-pb_thermohydraulique_qc_fraction_massique pb 
+Pb_Thermohydraulique_Especes_QC pb 
 
 Associate pb dom
 Associate pb sch

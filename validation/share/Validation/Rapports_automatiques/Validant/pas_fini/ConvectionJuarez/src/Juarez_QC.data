@@ -48,7 +48,7 @@ Read milieu
 { 
         sutherland mu0 1.716e-5 T0 273.15 Slambda 1.4579e-6 C 110.4
         pression 100000
-        loi_etat gaz_parfait { Prandtl 0.70999966608084363884 Cp 1004.5 gamma 1.4 }
+        loi_etat gaz_parfait_qc { Prandtl 0.70999966608084363884 Cp 1004.5 gamma 1.4 }
         traitement_pth constant
 }
 
