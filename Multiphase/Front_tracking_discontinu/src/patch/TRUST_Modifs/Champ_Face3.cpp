@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Zone_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Fluide_Diphasique.h>
 #include <Equation_base.h>
 #include <Mod_turb_hyd_base.h>
@@ -571,7 +571,7 @@ void Champ_Face::calcul_y_plus(DoubleTab& y_plus, const Zone_Cl_VDF& zone_Cl_VDF
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntVect& orientation = zone_VDF.orientation();
   const Equation_base& eqn_hydr = equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
   //DoubleTab& tab_visco = ch_visco_cin.valeur().valeurs();
@@ -694,8 +694,8 @@ void Champ_Face::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_VDF& 
 
   // Physical properties of both phases
   const Fluide_Diphasique& le_fluide = ref_cast(Fluide_Diphasique, eqn_hydr.milieu());
-  const Fluide_Incompressible& phase_1 = le_fluide.fluide_phase(1);
-  const Fluide_Incompressible& phase_0 = le_fluide.fluide_phase(0);
+  const Fluide_base& phase_1 = le_fluide.fluide_phase(1);
+  const Fluide_base& phase_0 = le_fluide.fluide_phase(0);
   const Champ_Don& ch_visco_cin_ph1 = phase_1.viscosite_cinematique();
   const Champ_Don& ch_visco_cin_ph0 = phase_0.viscosite_cinematique();
   const DoubleTab& tab_visco_ph1 = phase_1.viscosite_cinematique().valeur().valeurs();

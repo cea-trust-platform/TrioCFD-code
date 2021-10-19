@@ -25,12 +25,12 @@
 
 #include <Operateur_Diff.h>
 #include <Matrice_Morse.h>
-#include <Ref_Fluide_Incompressible.h>
+#include <Ref_Fluide_base.h>
 #include <Ref_Modele_rayo_semi_transp.h>
 #include <Operateur_Grad.h>
 class Motcle;
 class Milieu_base;
-class Fluide_Incompressible;
+class Fluide_base;
 
 class Equation_rayonnement_base: public Equation_base
 {
@@ -43,7 +43,7 @@ public:
   virtual bool initTimeStep(double dt);
   virtual bool solve();
   void associer_milieu_base(const Milieu_base&);
-  inline void associer_fluide(const Fluide_Incompressible&);
+  inline void associer_fluide(const Fluide_base&);
   void associer_modele_rayonnement(const Modele_rayo_semi_transp&);
   Milieu_base& milieu();
   const Milieu_base& milieu() const;
@@ -55,8 +55,8 @@ public:
   virtual const Champ_Inc& inconnue() const;
   virtual Champ_Inc& inconnue();
   void discretiser();
-  inline Fluide_Incompressible& fluide();
-  inline const Fluide_Incompressible& fluide() const;
+  inline Fluide_base& fluide();
+  inline const Fluide_base& fluide() const;
 
   // pas de flux calcule correctement par les operateurs...
   inline int impr(Sortie& os) const
@@ -91,7 +91,7 @@ public:
 
 protected:
 
-  REF(Fluide_Incompressible) le_fluide;
+  REF(Fluide_base) le_fluide;
   REF(Modele_rayo_semi_transp) le_modele;
 
   Operateur_Diff terme_diffusif;
@@ -149,7 +149,7 @@ inline const Modele_rayo_semi_transp& Equation_rayonnement_base::Modele() const
 // Description:
 //    Associe un fluide incompressible semi transparent a l'equation.
 // Precondition:
-// Parametre: Fluide_Incompressible& un_fluide
+// Parametre: Fluide_base& un_fluide
 //    Signification: le fluide incompressible semi transparent a associer
 //    Valeurs par defaut:
 //    Contraintes: reference constante
@@ -161,7 +161,7 @@ inline const Modele_rayo_semi_transp& Equation_rayonnement_base::Modele() const
 // Effets de bord:
 // Postcondition: la methode ne modifie pas l'objet
 // Postcondition: l'equation a un fluide associe
-inline void Equation_rayonnement_base::associer_fluide(const Fluide_Incompressible& un_fluide)
+inline void Equation_rayonnement_base::associer_fluide(const Fluide_base& un_fluide)
 {
   le_fluide = un_fluide;
 }
@@ -181,7 +181,7 @@ inline void Equation_rayonnement_base::associer_fluide(const Fluide_Incompressib
 // Exception:
 // Effets de bord:
 // Postcondition: la methode ne modifie pas l'objet
-inline const Fluide_Incompressible& Equation_rayonnement_base::fluide() const
+inline const Fluide_base& Equation_rayonnement_base::fluide() const
 {
   return le_fluide.valeur();
 }
@@ -201,7 +201,7 @@ inline const Fluide_Incompressible& Equation_rayonnement_base::fluide() const
 // Exception:
 // Effets de bord:
 // Postcondition:
-inline Fluide_Incompressible& Equation_rayonnement_base::fluide()
+inline Fluide_base& Equation_rayonnement_base::fluide()
 {
   return le_fluide.valeur();
 }

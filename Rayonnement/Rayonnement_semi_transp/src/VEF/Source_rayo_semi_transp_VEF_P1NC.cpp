@@ -23,7 +23,7 @@
 #include <Source_rayo_semi_transp_VEF_P1NC.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Zone_VEF.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Source_rayo_semi_transp_VEF_P1NC,"Source_rayo_semi_transp_VEF_P1NC",Source_rayo_semi_transp_base);
@@ -56,7 +56,7 @@ DoubleTab& Source_rayo_semi_transp_VEF_P1NC::ajouter(DoubleTab& resu) const
   const Zone_VEF& zvef = ref_cast(Zone_VEF,eq_rayo.zone_dis().valeur());
   int nb_faces = zvef.nb_faces();
 
-  const Fluide_Incompressible& fluide = eq_rayo.fluide();
+  const Fluide_base& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa().valeurs();
   const DoubleTab& indice = fluide.indice().valeurs();
   const DoubleTab& G = eq_rayo.inconnue().valeurs();

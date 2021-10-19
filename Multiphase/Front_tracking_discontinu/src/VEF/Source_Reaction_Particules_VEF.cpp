@@ -86,7 +86,7 @@ DoubleTab& Source_Reaction_Particules_VEF::ajouter(DoubleTab& resu) const
   dom.creer_tableau_sommets(source_som);
 
   //is_QC=0 le terme source est homogne a dv/dt sinon homogene a d(rho*v)/dt
-  is_QC = equation().probleme().is_QC();
+  is_QC = equation().probleme().is_dilatable();
   if (sub_type(Navier_Stokes_FT_Disc,equation()))
     is_FT = 1;
 

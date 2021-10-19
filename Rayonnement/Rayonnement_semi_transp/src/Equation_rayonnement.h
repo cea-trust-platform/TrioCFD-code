@@ -37,7 +37,7 @@ public :
 
   inline void associer_zone_dis(const Zone_dis& Zd);
   inline void associer_milieu_base(const Milieu_base&);
-  inline void associer_fluide(const Fluide_Incompressible&);
+  inline void associer_fluide(const Fluide_base&);
   inline void associer_modele_rayonnement(const Modele_rayo_semi_transp&);
   inline void associer_pb_base(const Probleme_base&);
   inline void associer_sch_tps_base( const Schema_Temps_base&);
@@ -52,8 +52,8 @@ public :
   inline const Champ_Inc& inconnue() const;
   inline Champ_Inc& inconnue();
   inline void discretiser();
-  inline Fluide_Incompressible& fluide();
-  inline const Fluide_Incompressible& fluide() const;
+  inline Fluide_base& fluide();
+  inline const Fluide_base& fluide() const;
   inline Operateur_Grad& operateur_gradient();
   inline const Operateur_Grad& operateur_gradient() const;
 
@@ -123,12 +123,12 @@ inline void Equation_rayonnement::associer_pb_base(const Probleme_base& pb)
 }
 
 
-inline Fluide_Incompressible& Equation_rayonnement::fluide()
+inline Fluide_base& Equation_rayonnement::fluide()
 {
   return valeur().fluide();
 }
 
-inline const Fluide_Incompressible& Equation_rayonnement::fluide() const
+inline const Fluide_base& Equation_rayonnement::fluide() const
 {
   return valeur().fluide();
 }
@@ -139,7 +139,7 @@ inline void Equation_rayonnement::associer_milieu_base(const Milieu_base& un_mil
   valeur().associer_milieu_base(un_milieu);
 }
 
-inline void Equation_rayonnement::associer_fluide(const Fluide_Incompressible& un_fluide)
+inline void Equation_rayonnement::associer_fluide(const Fluide_base& un_fluide)
 {
   valeur().associer_fluide(un_fluide);
 }

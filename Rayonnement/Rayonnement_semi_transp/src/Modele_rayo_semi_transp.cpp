@@ -26,7 +26,7 @@
 #include <Schema_Temps_base.h>
 #include <Symetrie.h>
 #include <Frontiere_dis_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Frontiere_ouverte_rayo_semi_transp.h>
 #include <Frontiere_ouverte_temperature_imposee_rayo_semi_transp.h>
 #include <Neumann_paroi_rayo_semi_transp_VEF.h>
@@ -276,10 +276,10 @@ void Modele_rayo_semi_transp::discretiser(const Discretisation_base& dis)
 
   // Association du fluide + diverses operations
 
-  if (sub_type(Fluide_Incompressible,probleme().milieu()))
+  if (sub_type(Fluide_base,probleme().milieu()))
     {
 
-      Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,probleme().milieu());
+      Fluide_base& fluide = ref_cast(Fluide_base,probleme().milieu());
       Eq_rayo_.associer_fluide(fluide);
 
       if (fluide.is_rayo_semi_transp())
@@ -326,7 +326,7 @@ void Modele_rayo_semi_transp::discretiser(const Discretisation_base& dis)
     {
       Cerr<<"Erreur dans Modele_rayo_semi_transp::readOn "<<finl;
       Cerr<<"Le modele de rayonnement semi transparent ne peut etre utilise"<<finl;
-      Cerr<<"qu'avec un Fluide_Incompressible et non "<< probleme().milieu().que_suis_je()<<finl;
+      Cerr<<"qu'avec un Fluide_base et non "<< probleme().milieu().que_suis_je()<<finl;
       exit();
     }
 
