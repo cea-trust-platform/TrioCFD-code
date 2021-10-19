@@ -31,7 +31,7 @@
 #include <Param.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Modele_turbulence_scal_base.h>
 #include <DoubleTrav.h>
 #include <communications.h>
@@ -177,9 +177,11 @@ int Modele_turbulence_hyd_K_Eps_Realisable::preparer_calcul()
   calculer_viscosite_turbulente(K_Eps().temps());
   limiter_viscosite_turbulente();
   // on remultiplie K_eps par rho
-  if (equation().probleme().is_dilatable()) multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
-
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   return 1;
 
@@ -205,8 +207,11 @@ void Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour(double temps)
   calculer_viscosite_turbulente(ch_K_Eps.temps());
   limiter_viscosite_turbulente();
   // on remultiplie K_eps par rho
-  if (equation().probleme().is_dilatable()) multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Realisable::mettre_a_jour apres calculer_viscosite_turbulente la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
   statistiques().end_count(nut_counter_);

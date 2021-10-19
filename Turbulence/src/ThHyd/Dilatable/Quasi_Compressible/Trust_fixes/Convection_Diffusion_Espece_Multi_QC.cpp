@@ -33,6 +33,7 @@
 #include <Param.h>
 
 Implemente_instanciable(Convection_Diffusion_Espece_Multi_QC,"Convection_Diffusion_Espece_Multi_QC",Convection_Diffusion_Espece_Multi_base);
+// XD convection_diffusion_espece_multi_QC eqn_base convection_diffusion_espece_multi_QC -1 Species conservation equation for a multi-species quasi-compressible fluid.
 
 Sortie& Convection_Diffusion_Espece_Multi_QC::printOn(Sortie& is) const
 {
@@ -47,7 +48,7 @@ Entree& Convection_Diffusion_Espece_Multi_QC::readOn(Entree& is)
 void Convection_Diffusion_Espece_Multi_QC::set_param(Param& param)
 {
   Convection_Diffusion_Espece_Multi_base::set_param(param);
-  param.ajouter("espece",&mon_espece_);
+  param.ajouter("espece",&mon_espece_); // XD_ADD_P espece Assosciate a species (with its properties) to the equation
 }
 
 
@@ -68,7 +69,7 @@ int Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(const Motcle&
   else if (mot=="convection")
     {
       const Probleme_base& pb = probleme();
-      const Champ_Inc& vit_transportante = (pb.que_suis_je() == "Pb_Thermohydraulique_Turbulent_QC_fraction_massique") ? ref_cast(Navier_Stokes_Turbulent_QC,pb.equation(0)).rho_la_vitesse() :
+      const Champ_Inc& vit_transportante = (pb.que_suis_je() == "Pb_Thermohydraulique_Especes_Turbulent_QC") ? ref_cast(Navier_Stokes_Turbulent_QC,pb.equation(0)).rho_la_vitesse() :
                                            ref_cast(Navier_Stokes_QC,pb.equation(0)).rho_la_vitesse();
       associer_vitesse(vit_transportante);
       terme_convectif.associer_vitesse(vit_transportante);
@@ -273,10 +274,5 @@ void Convection_Diffusion_Espece_Multi_QC::assembler( Matrice_Morse& matrice, co
         }
     }
   matrice.ajouter_multvect(inco,resu);
-  /*
-     Cerr<<" Convection_Diffusion_fraction_massique_QC::assembler non code "<<finl;
-     Cerr<<"vous ne pouvez pas faire d'implicite avec des fracions massiques "<<finl;
-     exit();
-   */
 }
 

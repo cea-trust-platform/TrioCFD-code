@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,36 +14,48 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modifier_nut_pour_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/9
+// File:        Pb_Hydraulique_Melange_Binaire_Turbulent_QC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
+// Version:     /main/11
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Modifier_nut_pour_QC
-#define Modifier_nut_pour_QC
+#ifndef Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
+#define Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
+
+#include <Convection_Diffusion_Espece_Binaire_Turbulent_QC.h>
+#include <Navier_Stokes_Turbulent_QC.h>
+#include <Pb_Dilatable_Proto.h>
+#include <Pb_QC_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Modifier_nut_pour_QC
-//     Cette classe permet de faire la conversion de la viscosite cinematique turbulente nu_t
-//       en viscosite dynamique turbulente mu_t dans le cas des equations compressibles.
-//     Pour cela il suffit de tester si l'on est dans un cas quasi-compressible :
-//       Si c'est le cas, on multiplie nu_t par rho.
-//     Cette conversion ne doit etre faite que dans le cas ou l'on utilise un modele sous-maille
-//       type LES puisque dans ce cas on renvoit un nu_t.
-//       Par contre en simulation RANS, puisque l'on rentre les bonnes grandeurs turbulentes
-//       multipliee par rho, on obtient bien au final un mu_t et l'on n'a pas besoin de faire
-//       de conversion.
-//
-// .SECTION
+//    classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC
+//     Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
+//     avec modelisation de la turbulence:
+//      - Equations de Navier_Stokes en regime turbulent
+//      - Equation de conv/diff fraction massique en regime turbulent
+// .SECTION voir aussi
+//     Probleme_base Pb_QC_base Fluide_Quasi_Compressible
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modifier_pour_fluide_dilatable.h>
-class Mod_turb_hyd_base;
+class Pb_Hydraulique_Melange_Binaire_Turbulent_QC : public Pb_QC_base, public Pb_Dilatable_Proto
+{
+  Declare_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC);
 
-void Correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod);
+public:
+  int verifier();
+  int nombre_d_equations() const;
+  const Equation_base& equation(int) const ;
+  Equation_base& equation(int);
+  virtual int expression_predefini(const Motcle& motlu, Nom& expression);
+  inline const Champ_Fonc& viscosite_turbulente() const { return eq_hydraulique.viscosite_turbulente(); }
 
-#endif
+protected:
+  Navier_Stokes_Turbulent_QC eq_hydraulique;
+  Convection_Diffusion_Espece_Binaire_Turbulent_QC eq_frac_mass;
+};
+
+#endif /* Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included */

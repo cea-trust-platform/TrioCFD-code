@@ -140,7 +140,7 @@ Champ_Uniforme gravite
 Read gravite 2 0 -9.81
 
 # Association between the different objects #
-Pb_Thermohydraulique_Turbulent_QC_fraction_massique pb 
+Pb_Thermohydraulique_Especes_Turbulent_QC pb 
 Associer milieu gravite
 Associer pb dom
 Associer pb mon_schema

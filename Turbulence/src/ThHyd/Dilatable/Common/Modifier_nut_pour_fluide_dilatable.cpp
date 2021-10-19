@@ -14,19 +14,19 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modifier_nut_pour_QC.cpp
+// File:        Modifier_nut_pour_fluide_dilatable.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
 // Version:     /main/21
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modifier_nut_pour_QC.h>
-#include <Mod_turb_hyd_base.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Fluide_Dilatable_base.h>
+#include <Mod_turb_hyd_base.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
 
-void Correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod)
+void correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod)
 {
   // on recgarde si on a un fluide QC
   if (sub_type(Fluide_Dilatable_base,mod.equation().probleme().milieu()))
@@ -42,5 +42,10 @@ void Correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod)
       DoubleTab& cisaillement=ref_cast_non_const(DoubleTab, cisaillement_paroi);
       multiplier_diviser_rho(cisaillement, le_fluide, 0 /* multiplier */);
       cisaillement.echange_espace_virtuel();
+    }
+  else
+    {
+      Cerr << "What ?? The method Correction_nut_et_cisaillement_paroi_si_qc should not be called since your fluid is not dilatable !!" << finl;
+      Process::exit();
     }
 }

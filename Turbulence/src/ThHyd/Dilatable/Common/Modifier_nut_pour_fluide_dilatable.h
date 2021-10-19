@@ -14,76 +14,36 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Pb_Thermohydraulique_Turbulent_QC.h
+// File:        Modifier_nut_pour_fluide_dilatable.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/15
+// Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Pb_Thermohydraulique_Turbulent_QC_included
-#define Pb_Thermohydraulique_Turbulent_QC_included
-
-#include <Pb_QC_base.h>
-#include <Navier_Stokes_Turbulent_QC.h>
-#include <Convection_Diffusion_Chaleur_Turbulent_QC.h>
-class Champ_Fonc;
-
-
+#ifndef Modifier_nut_pour_fluide_dilatable
+#define Modifier_nut_pour_fluide_dilatable
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Pb_Thermohydraulique_Turbulent
-//    Cette classe represente un probleme de thermohydraulique
-//    avec modelisation de la turbulence:
-//     - Equations de Navier_Stokes en regime turbulent
-//       pour un fluide incompressible
-//     - Equation d'energie en regime turbulent, sous forme generique
-//       (equation de la chaleur)
-//    Le fluide est quasi compressible
-// .SECTION voir aussi
-//    Probleme_base Pb_Thermohydraulique_QC Fluide_Quasi_Compressible
+//     classe Modifier_nut_pour_fluide_dilatable
+//     Cette classe permet de faire la conversion de la viscosite cinematique turbulente nu_t
+//       en viscosite dynamique turbulente mu_t dans le cas des equations compressibles.
+//     Pour cela il suffit de tester si l'on est dans un cas quasi-compressible :
+//       Si c'est le cas, on multiplie nu_t par rho.
+//     Cette conversion ne doit etre faite que dans le cas ou l'on utilise un modele sous-maille
+//       type LES puisque dans ce cas on renvoit un nu_t.
+//       Par contre en simulation RANS, puisque l'on rentre les bonnes grandeurs turbulentes
+//       multipliee par rho, on obtient bien au final un mu_t et l'on n'a pas besoin de faire
+//       de conversion.
+//
+// .SECTION
 //////////////////////////////////////////////////////////////////////////////
-class Pb_Thermohydraulique_Turbulent_QC : public Pb_QC_base
-{
 
-  Declare_instanciable(Pb_Thermohydraulique_Turbulent_QC);
+#include <Modifier_pour_fluide_dilatable.h>
+class Mod_turb_hyd_base;
 
-public:
+void correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod);
 
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const ;
-  Equation_base& equation(int);
-  inline const Champ_Fonc& viscosite_turbulente() const;
-  int verifier();
-  virtual int expression_predefini(const Motcle& motlu, Nom& expression);
-
-protected:
-
-  Navier_Stokes_Turbulent_QC eq_hydraulique;
-  Convection_Diffusion_Chaleur_Turbulent_QC eq_thermique;
-
-};
-
-
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-inline const Champ_Fonc& Pb_Thermohydraulique_Turbulent_QC::viscosite_turbulente() const
-{
-  return eq_hydraulique.viscosite_turbulente();
-}
-
-#endif
+#endif /* Modifier_nut_pour_fluide_dilatable */

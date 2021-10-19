@@ -2,7 +2,7 @@
 # PARALLEL OK 8 #
 dimension 3
 
-Pb_Thermohydraulique_Turbulent_QC_fraction_massique pb
+Pb_Thermohydraulique_Especes_Turbulent_QC pb
 
 Domaine dom
 # BEGIN MESH #

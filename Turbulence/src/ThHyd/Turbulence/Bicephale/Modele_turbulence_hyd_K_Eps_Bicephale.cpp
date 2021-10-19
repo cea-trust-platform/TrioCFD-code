@@ -23,7 +23,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
@@ -469,8 +469,8 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
     {
       multiplier_par_rho_si_dilatable(ch_K.valeurs(),mil);
       multiplier_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,0);
@@ -537,8 +537,8 @@ void Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour(double temps)
     {
       multiplier_par_rho_si_dilatable(ch_K.valeurs(),mil);
       multiplier_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
     }
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour la_viscosite_turbulente after",la_viscosite_turbulente.valeurs());
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,0);

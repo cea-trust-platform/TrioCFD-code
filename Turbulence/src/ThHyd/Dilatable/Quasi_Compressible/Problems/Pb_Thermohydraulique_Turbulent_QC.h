@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2015 - 2016, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,72 +14,48 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Pb_Hydraulique_Melange_Binaire_Turbulent_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
-// Version:     /main/11
+// File:        Pb_Thermohydraulique_Turbulent_QC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
+// Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
-#define Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
+#ifndef Pb_Thermohydraulique_Turbulent_QC_included
+#define Pb_Thermohydraulique_Turbulent_QC_included
 
-#include <Pb_QC_base.h>
+#include <Convection_Diffusion_Chaleur_Turbulent_QC.h>
 #include <Navier_Stokes_Turbulent_QC.h>
-#include <Convection_Diffusion_Espece_Binaire_Turbulent_QC.h>
-
+#include <Pb_Dilatable_Proto.h>
+#include <Pb_QC_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC
-//     Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
-//     avec modelisation de la turbulence:
-//      - Equations de Navier_Stokes en regime turbulent
-//        pour un fluide quasi compressible
-//      - Equation de conv/diff fraction massique en regime turbulent
-//        pour un fluide quasi compressible
+//    classe Pb_Thermohydraulique_Turbulent
+//    Cette classe represente un probleme de thermohydraulique en fluide quasi compressible
+//    avec modelisation de la turbulence:
+//     - Equations de Navier_Stokes en regime turbulent
+//     - Equation d'energie en regime turbulent, sous forme generique (equation de la chaleur)
 // .SECTION voir aussi
-//     Probleme_base Pb_QC_base Fluide_Quasi_Compressible
+//    Probleme_base Pb_Thermohydraulique_QC Fluide_Quasi_Compressible
 //////////////////////////////////////////////////////////////////////////////
 
-class Pb_Hydraulique_Melange_Binaire_Turbulent_QC : public Pb_QC_base
+class Pb_Thermohydraulique_Turbulent_QC : public Pb_QC_base, public Pb_Dilatable_Proto
 {
-
-  Declare_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC);
+  Declare_instanciable(Pb_Thermohydraulique_Turbulent_QC);
 
 public:
-
+  int verifier();
   int nombre_d_equations() const;
   const Equation_base& equation(int) const ;
   Equation_base& equation(int);
-  inline const Champ_Fonc& viscosite_turbulente() const;
-  int verifier();
   virtual int expression_predefini(const Motcle& motlu, Nom& expression);
+  inline const Champ_Fonc& viscosite_turbulente() const { return eq_hydraulique.viscosite_turbulente(); }
 
 protected:
-
   Navier_Stokes_Turbulent_QC eq_hydraulique;
-  Convection_Diffusion_Espece_Binaire_Turbulent_QC eq_frac_mass;
+  Convection_Diffusion_Chaleur_Turbulent_QC eq_thermique;
 };
 
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-inline const Champ_Fonc& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::viscosite_turbulente() const
-{
-  return eq_hydraulique.viscosite_turbulente();
-}
-
-#endif /* Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included */
+#endif /* Pb_Thermohydraulique_Turbulent_QC_included */

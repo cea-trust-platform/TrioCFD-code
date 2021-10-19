@@ -24,156 +24,33 @@
 #include <Les_mod_turb.h>
 #include <Verif_Cl.h>
 #include <Verif_Cl_Turb.h>
-#include <Modifier_nut_pour_QC.h>
 
 Implemente_instanciable(Pb_Thermohydraulique_Turbulent_QC,"Pb_Thermohydraulique_Turbulent_QC",Pb_QC_base);
 
-// Description:
-//    Simple appel a: Probleme_base::printOn(Sortie&)
-//    Ecrit le probleme sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-Sortie& Pb_Thermohydraulique_Turbulent_QC::printOn(Sortie& os) const
-{
-  return Probleme_base::printOn(os);
-}
+Sortie& Pb_Thermohydraulique_Turbulent_QC::printOn(Sortie& os) const { return Probleme_base::printOn(os); }
 
+Entree& Pb_Thermohydraulique_Turbulent_QC::readOn(Entree& is) { return Probleme_base::readOn(is); }
 
 // Description:
-//    Simple appel a: Probleme_base::readOn(Entree&)
-//    Lit le probleme a partir d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-Entree& Pb_Thermohydraulique_Turbulent_QC::readOn(Entree& is)
-{
-  return Probleme_base::readOn(is);
-}
-
-// Description:
-//    Renvoie le nombre d'equation,
-//    Renvoie 2 car il y a 2 equations a un probleme de
-//    thermo-hydraulique turbulent:
-//     - l'equation de Navier Stokes
-//     - l'equation de la thermique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre d'equation
-//    Contraintes: toujours 2 car il y a 2 equations au probleme
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-int Pb_Thermohydraulique_Turbulent_QC::nombre_d_equations() const
-{
-  return 2;
-}
+//    Renvoie 2 car il y a 2 equations : Navier_Stokes_Turbulent_QC et Convection_Diffusion_Chaleur_Turbulent_QC
+int Pb_Thermohydraulique_Turbulent_QC::nombre_d_equations() const { return 2; }
 
 // Description:
 //    Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent_QC si i=0
-//    Renvoie l'equation de la thermique de type
-//    Convection_Diffusion_Enthalpie_Turbulent_QC si i=1
-//    (version const)
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'equation a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: 0 <= i <= 1
-//    Acces:
-// Retour: Equation_base&
-//    Signification: l'equation correspondante a l'index
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+//    Renvoie l'equation de chaleur de type Convection_Diffusion_Chaleur_Turbulent_QC si i=1
 const Equation_base& Pb_Thermohydraulique_Turbulent_QC::equation(int i) const
 {
-  if ( !( i==0 || i==1 ) )
-    {
-      Cerr << "\nError in Pb_Thermohydraulique_Turbulent_QC::equation() : Wrong number of equation !" << finl;
-      Process::exit();
-    }
-  if (i == 0)
-    return eq_hydraulique;
-  else
-    return eq_thermique;
-
+  return equation_impl(i,eq_hydraulique,eq_thermique);
 }
 
-// Description:
-//    Renvoie l'equation d'hydraulique de type Navier_Stokes_Turbulent_QC si i=0
-//    Renvoie l'equation de la thermique de type
-//    Convection_Diffusion_Enthalpie_Turbulent_QC si i=1
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'equation a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: 0 <= i <= 1
-//    Acces:
-// Retour: Equation_base&
-//    Signification: l'equation correspondante a l'index
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
 Equation_base& Pb_Thermohydraulique_Turbulent_QC::equation(int i)
 {
-  if ( !( i==0 || i==1 ) )
-    {
-      Cerr << "\nError in Pb_Thermohydraulique_Turbulent_QC::equation() : Wrong number of equation !" << finl;
-      Process::exit();
-    }
-  if (i == 0)
-    return eq_hydraulique;
-  else
-    return eq_thermique;
+  return equation_impl(i,eq_hydraulique,eq_thermique);
 }
 
 // Description:
-//    Teste la compatibilite des equations de la thermique
-//    et de l'hydraulique. Les tests se font sur les conditions
-//    aux limites discretisees de chaque equation et sur les
-//    modeles de turbulences respectifs des equations
-//    de l'hydraulique et de la thermique (qui doivent etre de la meme famille).
-//    Appel la fonction de librairie hors classe:
-//      tester_compatibilite_hydr_thermique(const Zone_Cl_dis&,const Zone_Cl_dis&)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception: modeles de turbulence de famille differente pour
-//            l'hydraulique et la thermique
-// Effets de bord:
-// Postcondition:
-
+//    Teste la compatibilite des equations de la fraction massique et de l'hydraulique.
+//    Teste la compatibilite des modeles de turbulence
 int Pb_Thermohydraulique_Turbulent_QC::verifier()
 {
   const Zone_Cl_dis& zone_Cl_hydr = eq_hydraulique.zone_Cl_dis();
@@ -192,13 +69,7 @@ int Pb_Thermohydraulique_Turbulent_QC::verifier()
   // Verification de la compatibilite des modeles de turbulence:
   const Mod_turb_hyd& le_mod_turb_hyd = eq_hydraulique.modele_turbulence();
   const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eq_thermique.get_modele(TURBULENCE).valeur());
-  /*
-    if (sub_type(Modele_turbulence_scal_Fluctuation_Temperature,le_mod_turb_th))
-      {
-        Cerr<<"Le quasi compressible ne prend pas de modele thermique Modele_turbulence_scal_Fluctuation_Temperature"<<finl;
-        exit();
-      }
-  */
+
   if  (sub_type(Modele_turbulence_hyd_K_Eps,le_mod_turb_hyd.valeur()))
     {
       if (!sub_type(Modele_turbulence_scal_Prandtl,le_mod_turb_th))

@@ -1288,7 +1288,7 @@ void Transport_Interfaces_FT_Disc::associer_pb_base(const Probleme_base& un_prob
       Cerr << " The Transport_Interfaces_FT_Disc equation must be associated to a problem\n";
       Cerr << " of type Probleme_FT_Disc_gen" << finl;
       Cerr << " or type Pb_Thermohydraulique_Especes_QC" << finl;
-      Cerr << " or type Pb_Thermohydraulique_Turbulent_QC_fraction_massique" << finl;
+      Cerr << " or type Pb_Thermohydraulique_Especes_Turbulent_QC" << finl;
       Process::exit();
     }
   probleme_base_ = un_probleme;
