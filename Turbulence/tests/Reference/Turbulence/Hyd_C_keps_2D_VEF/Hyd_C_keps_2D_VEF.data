@@ -127,7 +127,7 @@ Read pb
 		initial_conditions {
 			concentration Champ_Fonc_xyz dom 1 x*x+y*y
 		}
-		sources { source_Constituant champ_fonc_fonction concentration 1 val }
+		sources { source_Constituant champ_fonc_fonction pb concentration 1 val }
 	}
 	Post_processing
 	{

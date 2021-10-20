@@ -41,8 +41,8 @@ Lire sch
 Fluide_Quasi_Compressible fluide
 Lire fluide
 {
-        mu champ_fonc_fonction temperature 1 (1.461e-6*(val^1.5)/(val+111.))
-        lambda champ_fonc_fonction temperature 1 (1.93198026315789000e-3*(val^1.5)/(val+111.))
+        mu champ_fonc_fonction pb temperature 1 (1.461e-6*(val^1.5)/(val+111.))
+        lambda champ_fonc_fonction pb temperature 1 (1.93198026315789000e-3*(val^1.5)/(val+111.))
         pression 100000.
         loi_etat gaz_parfait_qc 	{
                 		Prandtl 0.76
