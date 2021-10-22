@@ -175,18 +175,23 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           else
             {
               double rho1,rho2;
+              Nom prob;
               while(motlu!="}")
                 {
+                  if (motlu=="probleme") is >> prob;
                   if (motlu=="rho_1") is >> rho1;
                   if (motlu=="rho_2") is >> rho2;
                   is >> motlu;
                 }
-              Nom chaine("Champ_Fonc_Fonction concentration 1 ");
+              Nom chaine("Champ_Fonc_Fonction ");
+              chaine+=prob;
+              chaine+=" concentration 1 ";
               Nom rhoM(0.5*(rho1+rho2));
               Nom drho(rho2-rho1);
               chaine+=rhoM;
-              chaine+="+val*";
+              chaine+="+val*(";
               chaine+=drho;
+              chaine+=")";
               EChaine echaine(chaine);
               echaine >> rho_;
               Nom chaine2("Champ_Uniforme 1 ");
@@ -227,18 +232,23 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           else
             {
               double mu1,mu2;
+              Nom prob;
               while(motlu!="}")
                 {
+                  if (motlu=="probleme") is >> prob;
                   if (motlu=="mu_1") is >> mu1;
                   if (motlu=="mu_2") is >> mu2;
                   is >> motlu;
                 }
-              Nom chaine("Champ_Fonc_Fonction concentration 1 ");
+              Nom chaine("Champ_Fonc_Fonction ");
+              chaine+=prob;
+              chaine+=" concentration 1 ";
               Nom muM(0.5*(mu1+mu2));
               Nom dmu(mu2-mu1);
               chaine+=muM;
-              chaine+="+val*";
+              chaine+="+val*(";
               chaine+=dmu;
+              chaine+=")";
               EChaine echaine(chaine);
               echaine >> mu_;
             }
