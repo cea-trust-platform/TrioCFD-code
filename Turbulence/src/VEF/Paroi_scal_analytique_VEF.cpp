@@ -26,7 +26,7 @@
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Mod_turb_hyd_base.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
@@ -52,7 +52,7 @@ int Paroi_scal_analytique_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const IntTab& face_voisins = zone_VEF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const DoubleVect& volumes_maille = zone_VEF.volumes();
   const DoubleVect& surfaces_face = zone_VEF.face_surfaces();
 

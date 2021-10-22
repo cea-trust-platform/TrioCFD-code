@@ -30,7 +30,7 @@
 #include <Eq_rayo_semi_transp_VDF.h>
 #include <Ref_Champ_front.h>
 #include <Modele_rayo_semi_transp.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Champ_front_uniforme.h>
 #include <Zone_VDF.h>
@@ -263,7 +263,7 @@ void Flux_radiatif_VDF::calculer_flux_radiatif(const Equation_base& eq_temp)
   DoubleTab& Flux = flux_radiatif_.valeurs();
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VDF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VDF,zone_Cl_dis().equation());
-  Fluide_Incompressible& fluide = eq_rayo.fluide();
+  Fluide_base& fluide = eq_rayo.fluide();
   DoubleTab& kappa = fluide.kappa().valeurs();
   DoubleTab& indice = fluide.indice().valeurs();
 

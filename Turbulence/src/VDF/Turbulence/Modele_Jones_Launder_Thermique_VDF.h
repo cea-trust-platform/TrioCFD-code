@@ -28,6 +28,7 @@
 #include <Ref_Transport_K_Eps_Bas_Reynolds.h>
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
+#include <Ref_Fluide_base.h>
 
 class Transport_Fluctuation_Temperature_W_Bas_Re;
 class Zone_dis;
@@ -61,7 +62,7 @@ protected:
 
   REF(Zone_VDF) la_zone_VDF;
   REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  REF(Fluide_Incompressible) le_fluide;
+  REF(Fluide_base) le_fluide;
   REF(Champ_Inc) la_vitesse_transportante;
   REF(Transport_Fluctuation_Temperature_W_Bas_Re) eq_transport_Fluctu_Temp_Bas_Re;
 

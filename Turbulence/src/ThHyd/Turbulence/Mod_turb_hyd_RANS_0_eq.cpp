@@ -22,9 +22,10 @@
 
 #include <Mod_turb_hyd_RANS_0_eq.h>
 #include <Discretisation_base.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Motcle.h>
 #include <Equation_base.h>
+#include <Probleme_base.h>
 #include <EcrMED.h>
 #include <Domaine.h>
 #include <Schema_Temps_base.h>
@@ -206,7 +207,7 @@ void Mod_turb_hyd_RANS_0_eq::mettre_a_jour(double )
   calculer_energie_cinetique_turb();
   loipar.calculer_hyd(la_viscosite_turbulente,energie_cinetique_turbulente());
   limiter_viscosite_turbulente();
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (mon_equation->probleme().is_dilatable()) correction_nut_et_cisaillement_paroi_si_qc(*this);
   energie_cinetique_turb_.valeurs().echange_espace_virtuel();
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   statistiques().end_count(nut_counter_);

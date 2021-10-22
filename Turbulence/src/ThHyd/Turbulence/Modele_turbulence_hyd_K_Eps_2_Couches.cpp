@@ -22,7 +22,7 @@
 
 #include <Modele_turbulence_hyd_K_Eps_2_Couches.h>
 #include <Schema_Temps_base.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Probleme_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
@@ -205,13 +205,16 @@ void Modele_turbulence_hyd_K_Eps_2_Couches::mettre_a_jour(double temps)
   eqn_transport_K_Eps.controler_K_Eps();
   const Milieu_base& mil=equation().probleme().milieu();
   // on divise K_eps par rho en QC pour revenir a K et Eps
-  diviser_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
   calculer_viscosite_turbulente(ch_K_Eps.temps());
   loipar->calculer_hyd(visco_turb,ch_K_Eps.valeurs());
   limiter_viscosite_turbulente();
   // on remultiplie K_eps par rho
-  multiplier_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   statistiques().end_count(nut_counter_);
 }

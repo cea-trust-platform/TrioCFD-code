@@ -29,7 +29,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Champ_Don.h>
 #include <Champ_Uniforme.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <EFichier.h>
 #include <SFichier.h>
 #include <Diffu_k.h>
@@ -202,7 +202,7 @@ int ParoiVDF_TBLE_LRM::init_lois_paroi()
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
   //  eq_k_U_W.dimensionner(la_zone_VDF->nb_faces_bord());
   int compteur_faces_paroi = 0;
@@ -506,7 +506,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const DoubleVect& volumes_entrelaces = zone_VDF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
   Mod_echelle_LRM_base& le_mod_ech= mod_ech.valeur();

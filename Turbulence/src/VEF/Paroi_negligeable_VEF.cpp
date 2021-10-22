@@ -27,7 +27,7 @@
 #include <Operateur.h>
 #include <Operateur_base.h>
 #include <Milieu_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <distances_VEF.h>
 #include <Champ_P1NC.h>
@@ -125,7 +125,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 {
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+  if(sub_type(Fluide_base, eqn_hydr.milieu()))
     {
 
       int ndeb,nfin,elem,l_unif;
@@ -135,7 +135,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
       const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
       const IntTab& face_voisins = zone_VEF.face_voisins();
       const IntTab& elem_faces = zone_VEF.elem_faces();
-      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
       const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
@@ -227,7 +227,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+  if(sub_type(Fluide_base, eqn_hydr.milieu()))
     {
       int ndeb,nfin,elem,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist=0, val1, val2, val3, d_visco, visco=1.;
@@ -236,7 +236,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
       const IntTab& face_voisins = zone_VEF.face_voisins();
       const IntTab& elem_faces = zone_VEF.elem_faces();
-      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
       const DoubleTab& vit = eqn_hydr.inconnue().valeurs();

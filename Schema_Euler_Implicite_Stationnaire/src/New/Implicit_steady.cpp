@@ -134,11 +134,11 @@ void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab&
   current.echange_espace_virtuel();
 
   //Calcul de secmem = BU*
-  if (eqn.probleme().is_QC())
+  if (eqn.probleme().is_dilatable())
     {
-      Cerr<<"Steady option is not compatible with the quasi-compressible model!"<<finl;
+      Cerr<<"Steady option is not compatible with the quasi/weakly compressible models !"<<finl;
       Cerr << "Please, contact TRUST support." << finl;
-      exit();
+      Process::exit();
     }
   else
     {

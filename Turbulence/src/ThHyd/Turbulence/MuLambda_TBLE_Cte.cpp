@@ -49,7 +49,7 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
       exit();
     }
 
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,milieu);
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const Champ_Don& ch_alpha = le_fluide.diffusivite();
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))

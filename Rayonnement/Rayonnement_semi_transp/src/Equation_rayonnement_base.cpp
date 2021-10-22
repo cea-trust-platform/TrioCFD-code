@@ -25,7 +25,7 @@
 #include <Modele_rayo_semi_transp.h>
 #include <Operateur_Diff_base.h>
 #include <Schema_Temps_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Matrice_Bloc.h>
 #include <Matrice_Morse_Sym.h>
@@ -93,7 +93,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
 {
   Equation_base::readOn(is);
   // typage de l'operateur de diffusion
-  if (sub_type(Fluide_Incompressible,fluide()))
+  if (sub_type(Fluide_base,fluide()))
     if (fluide().is_rayo_semi_transp())
       {
         if (fluide().longueur_rayo_is_discretised())
@@ -123,7 +123,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
     {
       Cerr << "Error while reading the Radiation equation." << finl;
       Cerr << "Your fluid is of type " <<fluide().que_suis_je()<< finl;
-      Cerr << "Currently only fluid of type Fluide_Incompressible can be considered "<< finl;
+      Cerr << "Currently only fluid of type Fluide_base can be considered "<< finl;
       Cerr << "with the semi transparent radiation model."<<finl;
       exit();
     }
@@ -161,7 +161,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
   terme_diffusif.valeur().dimensionner(la_matrice);
 
 
-  if (sub_type(Fluide_Incompressible,fluide()))
+  if (sub_type(Fluide_base,fluide()))
     if (fluide().kappa().non_nul())
       {
         const Champ_Don& long_rayo = fluide().longueur_rayo();
@@ -179,7 +179,7 @@ Entree& Equation_rayonnement_base::readOn(Entree& is)
     {
       Cerr << "Error while reading the Radiation equation." << finl;
       Cerr << "Your fluid is of type " <<fluide().que_suis_je()<< finl;
-      Cerr << "Currently only fluid of type Fluide_Incompressible can be considered "<< finl;
+      Cerr << "Currently only fluid of type Fluide_base can be considered "<< finl;
       Cerr << "with the semi transparent radiation model."<<finl;
       exit();
     }
@@ -238,10 +238,10 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
 // Postcondition:
 void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  if (sub_type(Fluide_Incompressible,un_milieu))
+  if (sub_type(Fluide_base,un_milieu))
     if (fluide().kappa().non_nul())
       {
-        const Fluide_Incompressible& un_fluide = ref_cast(Fluide_Incompressible,un_milieu);
+        const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
         associer_fluide(un_fluide);
         le_fluide = un_fluide;
       }
@@ -257,7 +257,7 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
     {
       Cerr << "Error for the method Equation_rayonnement_base::associer_milieu_base" << finl;
       Cerr << "Your fluid is of type " <<un_milieu.que_suis_je()<< finl;
-      Cerr << "Currently only fluid of type Fluide_Incompressible can be considered "<< finl;
+      Cerr << "Currently only fluid of type Fluide_base can be considered "<< finl;
       Cerr << "with the semi transparent radiation model."<<finl;
       exit();
     }
@@ -285,7 +285,7 @@ void Equation_rayonnement_base::associer_modele_rayonnement(const Modele_rayo_se
 
 // Description:
 //    Renvoie le milieu physique de l'equation
-//    (le Fluide_Incompressible upcaste en Milieu_base)
+//    (le Fluide_base upcaste en Milieu_base)
 // Precondition:
 // Parametre:
 //    Signification:
@@ -293,7 +293,7 @@ void Equation_rayonnement_base::associer_modele_rayonnement(const Modele_rayo_se
 //    Contraintes:
 //    Acces:
 // Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible de l'equation upcaste en Milieu_base
+//    Signification: le Fluide_base de l'equation upcaste en Milieu_base
 //    Contraintes:
 // Exception:
 // Effets de bord:
@@ -311,7 +311,7 @@ const Milieu_base& Equation_rayonnement_base::milieu() const
 
 // Description:
 //    Renvoie le milieu physique de l'equation
-//    (le Fluide_Incompressible upcaste en Milieu_base)
+//    (le Fluide_base upcaste en Milieu_base)
 //    (version const)
 // Precondition:
 // Parametre:
@@ -320,7 +320,7 @@ const Milieu_base& Equation_rayonnement_base::milieu() const
 //    Contraintes:
 //    Acces:
 // Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible de l'equation upcaste en Milieu_base
+//    Signification: le Fluide_base de l'equation upcaste en Milieu_base
 //    Contraintes: reference constante
 // Exception:
 // Effets de bord:

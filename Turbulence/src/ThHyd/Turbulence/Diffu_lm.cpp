@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Diffu_lm.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <MuLambda_TBLE_base.h>
 
 Implemente_instanciable(Diffu_lm,"Diffu_lm",Diffu_totale_hyd_base);
@@ -148,7 +148,7 @@ double Diffu_lm::calculer_D_local(int ind)
 
   Eq_couch_lim& leq = eq_couch_lim.valeur();
   const Milieu_base& le_milieu = leq.get_milieu();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, le_milieu);
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, le_milieu);
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 

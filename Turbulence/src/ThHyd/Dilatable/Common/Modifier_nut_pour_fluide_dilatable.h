@@ -14,54 +14,36 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_fraction_massique_Turbulent_QC.h
+// File:        Modifier_nut_pour_fluide_dilatable.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/15
+// Version:     /main/9
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Convection_Diffusion_fraction_massique_Turbulent_QC_included
-#define Convection_Diffusion_fraction_massique_Turbulent_QC_included
 
-#include <Convection_Diffusion_fraction_massique_QC.h>
-#include <Convection_Diffusion_Turbulent.h>
+#ifndef Modifier_nut_pour_fluide_dilatable
+#define Modifier_nut_pour_fluide_dilatable
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Convection_Diffusion_fraction_massique_Turbulent_QC
-// .SECTION voir aussi
-//     Convection_Diffusion_fraction_massique_QC Convection_Diffusion_Turbulent
+//     classe Modifier_nut_pour_fluide_dilatable
+//     Cette classe permet de faire la conversion de la viscosite cinematique turbulente nu_t
+//       en viscosite dynamique turbulente mu_t dans le cas des equations compressibles.
+//     Pour cela il suffit de tester si l'on est dans un cas quasi-compressible :
+//       Si c'est le cas, on multiplie nu_t par rho.
+//     Cette conversion ne doit etre faite que dans le cas ou l'on utilise un modele sous-maille
+//       type LES puisque dans ce cas on renvoit un nu_t.
+//       Par contre en simulation RANS, puisque l'on rentre les bonnes grandeurs turbulentes
+//       multipliee par rho, on obtient bien au final un mu_t et l'on n'a pas besoin de faire
+//       de conversion.
+//
+// .SECTION
 //////////////////////////////////////////////////////////////////////////////
-class Convection_Diffusion_fraction_massique_Turbulent_QC :
-  public Convection_Diffusion_Turbulent,
-  public Convection_Diffusion_fraction_massique_QC
-{
-  Declare_instanciable(Convection_Diffusion_fraction_massique_Turbulent_QC);
 
-public :
+#include <Modifier_pour_fluide_dilatable.h>
+class Mod_turb_hyd_base;
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  //Methodes de l interface des champs postraitables
-  /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
-  /////////////////////////////////////////////////////
+void correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod);
 
-  const RefObjU& get_modele(Type_modele type) const;
-
-protected :
-
-private:
-
-  void completer();
-  int sauvegarder(Sortie&) const;
-  int reprendre(Entree&);
-  void mettre_a_jour(double );
-  int preparer_calcul();
-
-};
-
-#endif
+#endif /* Modifier_nut_pour_fluide_dilatable */

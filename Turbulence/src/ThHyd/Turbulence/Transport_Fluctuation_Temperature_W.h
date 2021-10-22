@@ -27,7 +27,7 @@
 
 #include <Convection_Diffusion_std.h>
 #include <Op_Diff_Fluctu_Temp_Base.h>
-#include <Ref_Fluide_Incompressible.h>
+#include <Ref_Fluide_base.h>
 #include <Ref_Modele_turbulence_scal_Fluctuation_Temperature_W.h>
 
 class Motcle;
@@ -66,7 +66,7 @@ protected :
   Champ_Inc le_champ_Fluctu_Temperature;
   Op_Diff_Fluctu_Temp terme_diffusif;
 
-  REF(Fluide_Incompressible)le_fluide;
+  REF(Fluide_base)le_fluide;
   REF(Modele_turbulence_scal_Fluctuation_Temperature_W) mon_modele_Fluctu_Temp;
 
 

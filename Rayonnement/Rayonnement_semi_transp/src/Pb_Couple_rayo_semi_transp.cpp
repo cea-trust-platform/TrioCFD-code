@@ -25,7 +25,7 @@
 #include <Interprete.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Source_rayo_semi_transp_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <verif_cast.h>
 #include <Interprete_bloc.h>
@@ -137,9 +137,9 @@ int Pb_Couple_rayo_semi_transp::associer_(Objet_U& ob)
       if (sub_type(Probleme_base,ob))
         {
           Probleme_base& pb=ref_cast(Probleme_base,ob);
-          if (sub_type(Fluide_Incompressible,pb.milieu()))
+          if (sub_type(Fluide_base,pb.milieu()))
             {
-              Fluide_Incompressible& fluide=ref_cast(Fluide_Incompressible,pb.milieu());
+              Fluide_base& fluide=ref_cast(Fluide_base,pb.milieu());
               fluide.fixer_type_rayo();
             }
         }

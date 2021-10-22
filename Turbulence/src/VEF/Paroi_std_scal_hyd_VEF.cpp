@@ -29,7 +29,7 @@
 #include <Champ_Uniforme_Morceaux.h>
 #include <Champ_Fonc_Tabule.h>
 #include <Champ_Fonc_Tabule_P0_VEF.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_base.h>
 #include <Mod_turb_hyd_base.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
@@ -96,7 +96,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const IntTab& face_voisins = zone_VEF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
   const DoubleVect& volumes_maille = zone_VEF.volumes();

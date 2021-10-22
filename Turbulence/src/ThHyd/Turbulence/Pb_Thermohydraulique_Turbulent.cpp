@@ -27,11 +27,11 @@
 #include <Verif_Cl_Turb.h>
 #include <Mod_turb_hyd_RANS.h>
 
-Implemente_instanciable(Pb_Thermohydraulique_Turbulent,"Pb_Thermohydraulique_Turbulent",Pb_qdm_fluide);
+Implemente_instanciable(Pb_Thermohydraulique_Turbulent,"Pb_Thermohydraulique_Turbulent",Pb_Fluide_base);
 
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)
+//    Simple appel a: Pb_Fluide_base::printOn(Sortie&)
 //    Ecrit le probleme sur un flot de sortie.
 // Precondition:
 // Parametre: Sortie& os
@@ -47,12 +47,12 @@ Implemente_instanciable(Pb_Thermohydraulique_Turbulent,"Pb_Thermohydraulique_Tur
 // Postcondition: la methode ne modifie pas l'objet
 Sortie& Pb_Thermohydraulique_Turbulent::printOn(Sortie& os) const
 {
-  return Pb_qdm_fluide::printOn(os);
+  return Pb_Fluide_base::printOn(os);
 }
 
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::readOn(Entree&)
+//    Simple appel a: Pb_Fluide_base::readOn(Entree&)
 //    Lit le probleme a partir d'un flot d'entree.
 // Precondition:
 // Parametre: Entree& is
@@ -68,7 +68,7 @@ Sortie& Pb_Thermohydraulique_Turbulent::printOn(Sortie& os) const
 // Postcondition:
 Entree& Pb_Thermohydraulique_Turbulent::readOn(Entree& is)
 {
-  return Pb_qdm_fluide::readOn(is);
+  return Pb_Fluide_base::readOn(is);
 }
 
 // Description:
@@ -175,7 +175,7 @@ void Pb_Thermohydraulique_Turbulent::associer_milieu_base(const Milieu_base& mil
 {
   if sub_type(Fluide_Incompressible,mil)
     {
-      const Fluide_Incompressible& mi = ref_cast(Fluide_Incompressible,mil);
+      const Fluide_base& mi = ref_cast(Fluide_base,mil);
       eq_hydraulique.associer_milieu_base(mi);
       eq_thermique.associer_milieu_base(mi);
     }

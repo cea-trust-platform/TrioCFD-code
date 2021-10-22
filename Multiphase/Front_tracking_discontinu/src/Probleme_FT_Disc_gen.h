@@ -23,7 +23,7 @@
 #ifndef Probleme_FT_Disc_gen_included
 #define Probleme_FT_Disc_gen_included
 
-#include <Pb_qdm_fluide.h>
+#include <Pb_Fluide_base.h>
 #include <Vect_Ref_Equation_base.h>
 #include <Ref_Chimie.h>
 
@@ -31,7 +31,7 @@ class Milieu_base;
 class Navier_Stokes_FT_Disc;
 class Transport_Interfaces_FT_Disc;
 
-class Probleme_FT_Disc_gen : public Pb_qdm_fluide
+class Probleme_FT_Disc_gen : public Pb_Fluide_base
 {
   Declare_instanciable(Probleme_FT_Disc_gen);
 public:

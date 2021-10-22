@@ -29,7 +29,7 @@
 #include <Motcle.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Param.h>
 
@@ -334,7 +334,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
   int nb_face_elem = zone_VEF.zone().nb_faces_elem();
   const IntTab& elem_faces = zone_VEF.elem_faces();
 
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, mon_equation->milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, mon_equation->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
   const DoubleTab& vit = mon_equation->inconnue().valeurs();

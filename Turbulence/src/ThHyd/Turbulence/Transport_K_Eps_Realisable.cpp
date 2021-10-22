@@ -24,6 +24,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Les_Pb_Turb.h>
 #include <Param.h>
+#include <Fluide_base.h>
 
 Implemente_instanciable(Transport_K_Eps_Realisable,"Transport_K_Eps_Realisable",Transport_K_Eps_base);
 
@@ -129,7 +130,7 @@ Operateur& Transport_K_Eps_Realisable::operateur(int i)
 
 const Champ_Don& Transport_K_Eps_Realisable::diffusivite_pour_transport()
 {
-  Fluide_Incompressible& fluide_inc = ref_cast(Fluide_Incompressible,le_fluide.valeur());
+  Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
   return fluide_inc.viscosite_cinematique();
 }
 
@@ -191,7 +192,7 @@ void Transport_K_Eps_Realisable::associer_modele_turbulence(const Mod_turb_hyd_R
 
 void Transport_K_Eps_Realisable::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  le_fluide = ref_cast(Fluide_Incompressible, un_milieu);
+  le_fluide = ref_cast(Fluide_base, un_milieu);
 }
 
 const Motcle& Transport_K_Eps_Realisable::domaine_application() const

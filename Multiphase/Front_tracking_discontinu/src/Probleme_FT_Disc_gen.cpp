@@ -28,13 +28,13 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Chimie.h>
 
-Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_qdm_fluide);
+Implemente_instanciable(Probleme_FT_Disc_gen,"Probleme_FT_Disc_gen",Pb_Fluide_base);
 
 Implemente_ref(Probleme_FT_Disc_gen);
 
 Entree& Probleme_FT_Disc_gen::readOn(Entree& is)
 {
-  return Pb_qdm_fluide::readOn(is);
+  return Pb_Fluide_base::readOn(is);
 }
 
 Sortie& Probleme_FT_Disc_gen::printOn(Sortie& os) const
@@ -68,7 +68,7 @@ int Probleme_FT_Disc_gen::associer_(Objet_U& ob)
       la_chimie_=ref_cast(Chimie,ob);
       return 1;
     }
-  return Pb_qdm_fluide::associer_(ob);
+  return Pb_Fluide_base::associer_(ob);
 }
 
 void Probleme_FT_Disc_gen::associer_equation(Equation_base& eq)
@@ -269,7 +269,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
   //  mon_equation_thermique->preparer_pas_de_temps();
 
   // prend le min des pas de temps de chaque equation
-  double dt = Pb_qdm_fluide::calculer_pas_de_temps();
+  double dt = Pb_Fluide_base::calculer_pas_de_temps();
 
   // calcul delta_h et limite le pas de temps si evaporation
   //if (mon_equation_thermique.non_nul())
@@ -286,7 +286,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
 
 void Probleme_FT_Disc_gen::discretiser(const Discretisation_base& dis)
 {
-  Pb_qdm_fluide::discretiser(dis);
+  Pb_Fluide_base::discretiser(dis);
   if (la_chimie_.non_nul())
     la_chimie_.valeur().discretiser(*this);
 }
@@ -302,7 +302,7 @@ void Probleme_FT_Disc_gen::mettre_a_jour(double temps)
     }
   else
     {
-      Pb_qdm_fluide::mettre_a_jour(temps);
+      Pb_Fluide_base::mettre_a_jour(temps);
     }
   if (la_chimie_.non_nul())
     la_chimie_.valeur().mettre_a_jour(temps);
@@ -321,18 +321,18 @@ void Probleme_FT_Disc_gen::preparer_mise_a_jour(void)
 
 void Probleme_FT_Disc_gen::completer(void)
 {
-  Pb_qdm_fluide::completer();
+  Pb_Fluide_base::completer();
   if (la_chimie_.non_nul())
     la_chimie_.valeur().completer(*this);
 }
 
 int Probleme_FT_Disc_gen::verifier(void)
 {
-  return Pb_qdm_fluide::verifier();
+  return Pb_Fluide_base::verifier();
 }
 
 void Probleme_FT_Disc_gen::preparer_calcul(void)
 {
   Cerr<<"Probleme_FT_Disc_gen::preparer_calcul"<<finl;
-  Pb_qdm_fluide::preparer_calcul();
+  Pb_Fluide_base::preparer_calcul();
 }

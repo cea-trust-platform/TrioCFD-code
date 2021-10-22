@@ -14,72 +14,62 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Pb_Hydraulique_Melange_Binaire_Turbulent_QC.h
+// File:        Convection_Diffusion_Espece_Binaire_Turbulent_QC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
-// Version:     /main/11
+// Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
-#define Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
+#ifndef Convection_Diffusion_Espece_Binaire_Turbulent_QC_included
+#define Convection_Diffusion_Espece_Binaire_Turbulent_QC_included
 
-#include <Pb_QC_base.h>
-#include <Navier_Stokes_Turbulent_QC.h>
-#include <Convection_Diffusion_fraction_massique_MB_Turbulent_QC.h>
-
+#include <Convection_Diffusion_Turbulent.h>
+#include <Convection_Diffusion_Espece_Binaire_QC.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC
-//     Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
-//     avec modelisation de la turbulence:
-//      - Equations de Navier_Stokes en regime turbulent
-//        pour un fluide quasi compressible
-//      - Equation de conv/diff fraction massique en regime turbulent
-//        pour un fluide quasi compressible
+//     classe Convection_Diffusion_Espece_Binaire_Turbulent_QC
+//     Cette classe represente le cas particulier de
+//     convection diffusion turbulente lorsque
+//     le fluide est quasi compressible. L'inconnue est
+//       la fraction massique
+//     Cette classe herite de Convection_Diffusion_Turbulent qui contient
+//     le modele de turbulence et de Convection_Diffusion_Espece_Binaire_QC
+//     qui modelise l'equation non turbulente associe a un fluide quasi compressible
+//     iso-therme et iso-bar
 // .SECTION voir aussi
-//     Probleme_base Pb_QC_base Fluide_Quasi_Compressible
+//     Convection_Diffusion_Turbulent Convection_Diffusion_Espece_Binaire_QC
 //////////////////////////////////////////////////////////////////////////////
 
-class Pb_Hydraulique_Melange_Binaire_Turbulent_QC : public Pb_QC_base
+class Convection_Diffusion_Espece_Binaire_Turbulent_QC : public Convection_Diffusion_Turbulent,
+  public Convection_Diffusion_Espece_Binaire_QC
 {
+  Declare_instanciable(Convection_Diffusion_Espece_Binaire_Turbulent_QC);
 
-  Declare_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC);
+public :
 
-public:
+  void set_param(Param& titi);
+  int lire_motcle_non_standard(const Motcle&, Entree&);
+  virtual bool initTimeStep(double dt);
+  const RefObjU& get_modele(Type_modele type) const;
 
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const ;
-  Equation_base& equation(int);
-  inline const Champ_Fonc& viscosite_turbulente() const;
-  int verifier();
-  virtual int expression_predefini(const Motcle& motlu, Nom& expression);
+  //Methodes de l interface des champs postraitables
+  /////////////////////////////////////////////////////
+  virtual void creer_champ(const Motcle& motlu);
+  virtual const Champ_base& get_champ(const Motcle& nom) const;
+  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  /////////////////////////////////////////////////////
 
-protected:
+private:
 
-  Navier_Stokes_Turbulent_QC eq_hydraulique;
-  Convection_Diffusion_fraction_massique_MB_Turbulent_QC eq_frac_mass;
+  void completer();
+  int sauvegarder(Sortie&) const;
+  int reprendre(Entree&);
+  void mettre_a_jour(double );
+  int preparer_calcul();
+  void imprimer(Sortie& os) const;
 };
 
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-inline const Champ_Fonc& Pb_Hydraulique_Melange_Binaire_Turbulent_QC::viscosite_turbulente() const
-{
-  return eq_hydraulique.viscosite_turbulente();
-}
-
-#endif /* Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included */
+#endif /* Convection_Diffusion_Espece_Binaire_Turbulent_QC_included */

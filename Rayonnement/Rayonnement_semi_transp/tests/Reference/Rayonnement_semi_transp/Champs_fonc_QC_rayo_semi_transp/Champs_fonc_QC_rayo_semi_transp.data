@@ -64,7 +64,7 @@ Lire fluide
 	lambda  champ_fonc_tabule temperature 1
         { 3  800.        1300.    1500.
              7.0464E-02  0.1388   0.1666 }
-	loi_etat gaz_parfait {
+	loi_etat gaz_parfait_qc {
 		Prandtl 0.71034351145038165942
 		Cp 2460.13
 		gamma 1.4

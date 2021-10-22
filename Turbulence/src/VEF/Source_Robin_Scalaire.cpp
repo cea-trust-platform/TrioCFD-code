@@ -26,7 +26,7 @@
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
 #include <Equation_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <distances_VEF.h>
 #include <Navier_Stokes_Turbulent.h>
 #include <Source_Robin.h>
@@ -92,7 +92,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
   const Zone_Cl_VEF& zone_Cl_VEF = la_zone_Cl_VEF.valeur();
   const DoubleTab& temperature = equation().inconnue().valeurs();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,equation().milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base,equation().milieu());
   const Champ_Don& lambda = fluide.conductivite();
   int lambda_uniforme = (sub_type(Champ_Uniforme,lambda.valeur()) ? 1 : 0);
   const Convection_Diffusion_Temperature& eq_th = ref_cast(Convection_Diffusion_Temperature,equation());

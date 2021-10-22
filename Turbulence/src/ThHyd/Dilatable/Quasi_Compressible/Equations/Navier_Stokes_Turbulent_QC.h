@@ -14,76 +14,58 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Pb_Thermohydraulique_Turbulent_QC.h
+// File:        Navier_Stokes_Turbulent_QC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/15
+// Version:     /main/19
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef Navier_Stokes_Turbulent_QC_included
+#define Navier_Stokes_Turbulent_QC_included
 
-#ifndef Pb_Thermohydraulique_Turbulent_QC_included
-#define Pb_Thermohydraulique_Turbulent_QC_included
-
-#include <Pb_QC_base.h>
-#include <Navier_Stokes_Turbulent_QC.h>
-#include <Convection_Diffusion_Chaleur_Turbulent_QC.h>
+#include <Navier_Stokes_Turbulent.h>
+#include <Navier_Stokes_Fluide_Dilatable_Proto.h>
 class Champ_Fonc;
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Pb_Thermohydraulique_Turbulent
-//    Cette classe represente un probleme de thermohydraulique
-//    avec modelisation de la turbulence:
-//     - Equations de Navier_Stokes en regime turbulent
-//       pour un fluide incompressible
-//     - Equation d'energie en regime turbulent, sous forme generique
-//       (equation de la chaleur)
-//    Le fluide est quasi compressible
+//     classe Navier_Stokes_Turbulent
+//     Cette classe represente l'equation de la dynamique pour un fluide
+//     visqueux verifiant la condition d'incompressibilite div U = 0 avec
+//     modelisation de la turbulence.
+//     Un membre de type Mod_turb_hyd representera le modele de turbulence.
 // .SECTION voir aussi
-//    Probleme_base Pb_Thermohydraulique_QC Fluide_Quasi_Compressible
+//     Navier_Stokes_Turbulent Mod_turb_hyd Pb_Thermohydraulique_Turbulent_QC
 //////////////////////////////////////////////////////////////////////////////
-class Pb_Thermohydraulique_Turbulent_QC : public Pb_QC_base
+class Navier_Stokes_Turbulent_QC : public Navier_Stokes_Turbulent,public Navier_Stokes_Fluide_Dilatable_Proto
 {
+  Declare_instanciable(Navier_Stokes_Turbulent_QC);
 
-  Declare_instanciable(Pb_Thermohydraulique_Turbulent_QC);
+public :
 
-public:
+  void completer();
+  void mettre_a_jour(double );
+  virtual bool initTimeStep(double dt);
 
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const ;
-  Equation_base& equation(int);
-  inline const Champ_Fonc& viscosite_turbulente() const;
-  int verifier();
-  virtual int expression_predefini(const Motcle& motlu, Nom& expression);
+  int preparer_calcul();
+  int impr(Sortie&) const;
+  void imprimer(Sortie& os) const;
+
+  DoubleTab& derivee_en_temps_inco(DoubleTab& );
+  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
+  void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
+  inline const Champ_Inc& rho_la_vitesse() const;
+  void discretiser();
+  virtual const Champ_base& get_champ(const Motcle& nom) const;
+  const Champ_Don& diffusivite_pour_transport();
 
 protected:
 
-  Navier_Stokes_Turbulent_QC eq_hydraulique;
-  Convection_Diffusion_Chaleur_Turbulent_QC eq_thermique;
-
 };
-
-
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-inline const Champ_Fonc& Pb_Thermohydraulique_Turbulent_QC::viscosite_turbulente() const
+inline const Champ_Inc& Navier_Stokes_Turbulent_QC::rho_la_vitesse() const
 {
-  return eq_hydraulique.viscosite_turbulente();
+  return rho_la_vitesse_;
 }
 
 #endif

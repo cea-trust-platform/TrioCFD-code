@@ -24,6 +24,7 @@
 #include <Modele_turbulence_hyd_K_Eps_V2.h>
 #include <Les_Pb_Turb.h>
 #include <Param.h>
+#include <Fluide_base.h>
 
 Implemente_instanciable(Transport_K_Eps_V2,"Transport_K_Eps_V2",Transport_K_Eps_non_std);
 
@@ -144,7 +145,7 @@ void Transport_K_Eps_V2::associer_modele_turbulence(const Mod_turb_hyd_RANS& mod
 // Postcondition:
 void Transport_K_Eps_V2::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  le_fluide = ref_cast(Fluide_Incompressible, un_milieu);
+  le_fluide = ref_cast(Fluide_base, un_milieu);
 }
 
 

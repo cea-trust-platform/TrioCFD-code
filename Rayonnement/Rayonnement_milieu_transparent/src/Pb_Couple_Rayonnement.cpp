@@ -97,7 +97,7 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
 
           Probleme_base& pb = ref_cast(Probleme_base,probleme(l));
 
-          if (sub_type(Fluide_Incompressible,pb.milieu()))
+          if (sub_type(Fluide_base,pb.milieu()))
             nb_pb_fluide++;
         }
 
@@ -106,9 +106,9 @@ int Pb_Couple_Rayonnement::associer_(Objet_U& ob)
 
           Probleme_base& pb = ref_cast(Probleme_base,probleme(l));
 
-          if (sub_type(Fluide_Incompressible,pb.milieu()))
+          if (sub_type(Fluide_base,pb.milieu()))
             {
-              Fluide_Incompressible& fluide=ref_cast(Fluide_Incompressible,pb.milieu());
+              Fluide_base& fluide=ref_cast(Fluide_base,pb.milieu());
               if (nb_pb_fluide==1)
                 fluide.fixer_type_rayo();
               else
@@ -210,7 +210,7 @@ void Pb_Couple_Rayonnement::completer()
   for(l=0; l< nb_problemes(); l++)
     {
       Probleme_base& le_pb = ref_cast(Probleme_base,probleme(l));
-      if (sub_type(Fluide_Incompressible,le_pb.milieu()))
+      if (sub_type(Fluide_base,le_pb.milieu()))
         {
           nb_pb_fluide++;
           pb_fluide=l;
@@ -246,7 +246,7 @@ void Pb_Couple_Rayonnement::completer()
         {
           // normalement deja fait
           assert(le_pb.milieu().is_rayo_transp()==1);
-          //          ref_cast(Fluide_Incompressible,le_pb.milieu()).fixer_type_rayo();
+          //          ref_cast(Fluide_base,le_pb.milieu()).fixer_type_rayo();
           Cerr << "Le probleme rayonnant trouve est : " << le_pb.le_nom() << finl;
         }
       for (int j=0; j<le_pb.nombre_d_equations(); j++)

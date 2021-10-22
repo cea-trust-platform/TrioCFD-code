@@ -22,7 +22,7 @@
 
 #include <Modele_turbulence_scal_Prandtl.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
-#include <Modifier_pour_QC.h>
+#include <Modifier_pour_fluide_dilatable.h>
 #include <Param.h>
 #include <Champ_Uniforme.h>
 #include <Motcle.h>
@@ -159,9 +159,8 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
   const DoubleTab& tab_rho = mon_pb.milieu().masse_volumique().valeurs();
   if (sub_type(Pb_Thermohydraulique_Turbulent_QC,mon_pb))
     {
-      for (int i = 0; i < lambda_t.size(); i++)
-        lambda_t(i) *= tab_Cp(Ccp ? 0 : i);
-      multiplier_par_rho_si_qc(lambda_t,mil);
+      for (int i = 0; i < lambda_t.size(); i++)  lambda_t(i) *= tab_Cp(Ccp ? 0 : i);
+      if (equation().probleme().is_dilatable()) multiplier_par_rho_si_dilatable(lambda_t,mil);
     }
   else lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
   lambda_t.echange_espace_virtuel();
@@ -263,7 +262,7 @@ Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
 
     diffusivite_turbulente_.changer_temps(temps);
   }
-  diviser_par_rho_si_qc(diffusivite_turbulente_.valeurs(), equation().probleme().milieu());
+  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(diffusivite_turbulente_.valeurs(), equation().probleme().milieu());
   return diffusivite_turbulente_;
 }
 

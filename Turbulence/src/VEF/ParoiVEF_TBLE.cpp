@@ -26,7 +26,7 @@
 #include <Champ_Q1NC.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Champ_Uniforme.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <EFichier.h>
 #include <Diffu_lm.h>
 #include <Schema_Temps.h>
@@ -113,7 +113,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
   const DoubleTab& face_normale = zone_VEF.face_normales();
   const int& nfac = zone.nb_faces_elem();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
 
   // OC: Je ne comprends pas pourquoi dans les autres LP VEF on resize a nb_faces_tot le cisaillement et le tab_u_star
@@ -329,7 +329,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
 

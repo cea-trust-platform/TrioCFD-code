@@ -22,7 +22,7 @@
 
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Schema_Temps_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Schema_Temps.h>
 #include <Debog.h>
@@ -85,7 +85,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbule
   const DoubleTab& tab_K_Eps = chK_Eps.valeurs();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bas_Reynolds::calculer_viscosite_turbulente K_Eps",tab_K_Eps);
   DoubleTab& visco_turb =  la_viscosite_turbulente.valeurs();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_transp_K_Eps().milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_transp_K_Eps().milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   //  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int n = tab_K_Eps.dimension(0);

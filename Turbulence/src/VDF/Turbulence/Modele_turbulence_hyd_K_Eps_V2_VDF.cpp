@@ -24,7 +24,7 @@
 #include <Champ_Uniforme.h>
 #include <Zone_Cl_VDF.h>
 #include <Zone_VDF.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Schema_Temps_base.h>
 #include <stat_counters.h>
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_V2_VDF,"Modele_turbulence_hyd_K_Epsilon_V2_VDF",Modele_turbulence_hyd_K_Eps_V2);
@@ -146,9 +146,9 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_V2_VDF::calculer_viscosite_turbulente(do
 
   calculer_Sij(zone_VDF,zone_Cl_VDF,S,vit,vit_bord);
 
-  if ( sub_type(Fluide_Incompressible,eqn_transport_V2.milieu()))
+  if ( sub_type(Fluide_base,eqn_transport_V2.milieu()))
     {
-      Fluide_Incompressible& fluide_inc = ref_cast(Fluide_Incompressible,eqn_transport_V2.milieu());
+      Fluide_base& fluide_inc = ref_cast(Fluide_base,eqn_transport_V2.milieu());
       const Champ_Don& ch_visco_cin = fluide_inc.viscosite_cinematique();
       DoubleTab& tab_visco = ref_cast_non_const(DoubleTab,ch_visco_cin->valeurs());
 

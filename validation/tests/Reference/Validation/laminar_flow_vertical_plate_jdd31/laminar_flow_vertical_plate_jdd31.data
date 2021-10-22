@@ -48,7 +48,7 @@ Fluide_Quasi_compressible fluide
 Read fluide
 {	pression   1.e5
 	mu Champ_Uniforme     1 2.9e-5
-	loi_etat gaz_parfait
+	loi_etat gaz_parfait_qc
 	{ 
 	Prandtl 1.
 	Cp  1006.4

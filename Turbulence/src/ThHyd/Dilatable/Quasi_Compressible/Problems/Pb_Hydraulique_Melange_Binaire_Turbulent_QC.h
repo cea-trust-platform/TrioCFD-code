@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2018, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,84 +14,48 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Loi_Etat_Melange_GP.h
+// File:        Pb_Hydraulique_Melange_Binaire_Turbulent_QC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
-// Version:     /main/9
+// Version:     /main/11
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Loi_Etat_Melange_GP_included
-#define Loi_Etat_Melange_GP_included
 
-#include <Loi_Etat_GP.h>
-#include <Champ_Inc_base.h>
-#include <List.h>
-#include <Ref_Champ_Inc_base.h>
-#include <Convection_Diffusion_fraction_massique_QC.h>
-#include <Ref_Espece.h>
-#include <DoubleTab.h>
+#ifndef Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
+#define Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included
+
+#include <Convection_Diffusion_Espece_Binaire_Turbulent_QC.h>
+#include <Navier_Stokes_Turbulent_QC.h>
+#include <Pb_Dilatable_Proto.h>
+#include <Pb_QC_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Loi_Etat_Melange_GP
-//     Cette classe represente la loi d'etat pour un melange de gaz parfaits.
-//
+//    classe Pb_Hydraulique_Melange_Binaire_Turbulent_QC
+//     Cette classe represente un probleme de hydraulique binaire en fluide quasi compressible
+//     avec modelisation de la turbulence:
+//      - Equations de Navier_Stokes en regime turbulent
+//      - Equation de conv/diff fraction massique en regime turbulent
 // .SECTION voir aussi
-//     Fluide_Quasi_Compressible Loi_Etat_base Loi_Etat_GP
+//     Probleme_base Pb_QC_base Fluide_Quasi_Compressible
 //////////////////////////////////////////////////////////////////////////////
 
-Declare_liste(REF(Champ_Inc_base));
-Declare_liste(REF(Espece));
-
-class Loi_Etat_Melange_GP : public Loi_Etat_GP
+class Pb_Hydraulique_Melange_Binaire_Turbulent_QC : public Pb_QC_base, public Pb_Dilatable_Proto
 {
-  Declare_instanciable_sans_constructeur(Loi_Etat_Melange_GP);
+  Declare_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC);
 
-public :
+public:
+  int verifier();
+  int nombre_d_equations() const;
+  const Equation_base& equation(int) const ;
+  Equation_base& equation(int);
+  virtual int expression_predefini(const Motcle& motlu, Nom& expression);
+  inline const Champ_Fonc& viscosite_turbulente() const { return eq_hydraulique.viscosite_turbulente(); }
 
-  Loi_Etat_Melange_GP();
-  virtual void set_param(Param& param);
-  void associer_fluide(const Fluide_Quasi_Compressible&);
-  virtual void associer_inconnue(const Champ_Inc_base& inconnue);
-  void associer_espece(const Convection_Diffusion_fraction_massique_QC& eq);
-  void calculer_Cp();
-  virtual void calculer_tab_Cp(DoubleTab& cp) const;
-  void calculer_lambda();
-  void calculer_alpha();
-  void calculer_mu();
-  void calculer_mu_sur_Sc();
-  void calculer_mu0();
-
-  void calculer_masse_volumique();
-  double calculer_masse_volumique(double,double) const;
-  virtual double calculer_masse_volumique_case(double P,double T,double r, int som) const;
-
-  virtual void initialiser_inco_ch();
-  void calculer_masse_molaire();
-  void calculer_masse_molaire(DoubleTab& M) const;
-  virtual void rabot(int futur=0);
-  inline const DoubleTab& masse_molaire() const;
-  inline DoubleTab& masse_molaire();
-
-protected :
-  int correction_fraction_,ignore_check_fraction_;
-  double Sc_,dtol_fraction_;
-  DoubleTab Masse_mol_mel;
-
-  LIST(REF(Champ_Inc_base)) liste_Y;
-  LIST(REF(Espece)) liste_especes;
+protected:
+  Navier_Stokes_Turbulent_QC eq_hydraulique;
+  Convection_Diffusion_Espece_Binaire_Turbulent_QC eq_frac_mass;
 };
 
-
-inline const DoubleTab& Loi_Etat_Melange_GP::masse_molaire() const
-{
-  return Masse_mol_mel;
-}
-
-inline DoubleTab& Loi_Etat_Melange_GP::masse_molaire()
-{
-  return Masse_mol_mel;
-}
-
-#endif
+#endif /* Pb_Hydraulique_Melange_Binaire_Turbulent_QC_included */

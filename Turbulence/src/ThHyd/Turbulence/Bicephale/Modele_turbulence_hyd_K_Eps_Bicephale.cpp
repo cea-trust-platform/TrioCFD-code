@@ -23,14 +23,14 @@
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Param.h>
 #include <communications.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <DoubleTrav.h>
 #include <Champ_Uniforme.h>
 #include <ConstDoubleTab_parts.h>
@@ -178,8 +178,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_Bicephale::calculer_viscosite_turbulente
       // pour avoir nu en incompressible et mu en QC
       // et non comme on a divise K et eps par rho (si on est en QC)
       // on veut toujours nu
-      const Champ_Don ch_visco=ref_cast(Fluide_Incompressible,eqn_transp_K().milieu()).viscosite_cinematique();
-      const Champ_Don& ch_visco_cin =ref_cast(Fluide_Incompressible,eqn_transp_K().milieu()).viscosite_cinematique();
+      const Champ_Don ch_visco=ref_cast(Fluide_base,eqn_transp_K().milieu()).viscosite_cinematique();
+      const Champ_Don& ch_visco_cin =ref_cast(Fluide_base,eqn_transp_K().milieu()).viscosite_cinematique();
 
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
@@ -450,8 +450,11 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
   Champ_Inc& ch_Eps = Eps();
 
   const Milieu_base& mil=equation().probleme().milieu();
-  diviser_par_rho_si_qc(ch_K.valeurs(),mil);
-  diviser_par_rho_si_qc(ch_Eps.valeurs(),mil);
+  if (equation().probleme().is_dilatable())
+    {
+      diviser_par_rho_si_dilatable(ch_K.valeurs(),mil);
+      diviser_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
+    }
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,1);
 
   // pas de loi de paroi dans ce modele pour l'instant
@@ -462,9 +465,12 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
   limiter_viscosite_turbulente();
 
   // on remultiplie K et eps par rho
-  multiplier_par_rho_si_qc(ch_K.valeurs(),mil);
-  multiplier_par_rho_si_qc(ch_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K.valeurs(),mil);
+      multiplier_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,0);
@@ -513,8 +519,11 @@ void Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour(double temps)
   const Milieu_base& mil=equation().probleme().milieu();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
-  diviser_par_rho_si_qc(ch_K.valeurs(),mil);
-  diviser_par_rho_si_qc(ch_Eps.valeurs(),mil);
+  if (equation().probleme().is_dilatable())
+    {
+      diviser_par_rho_si_dilatable(ch_K.valeurs(),mil);
+      diviser_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
+    }
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,1);
 
   // loipar.calculer_hyd(ch_K_Eps); loi de paroi forcement negligeable pour l'instant
@@ -524,9 +533,12 @@ void Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour(double temps)
   calculer_viscosite_turbulente(ch_K.temps());
   limiter_viscosite_turbulente();
   // on remultiplie Ket eps par rho
-  multiplier_par_rho_si_qc(ch_K.valeurs(),mil);
-  multiplier_par_rho_si_qc(ch_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K.valeurs(),mil);
+      multiplier_par_rho_si_dilatable(ch_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour la_viscosite_turbulente after",la_viscosite_turbulente.valeurs());
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,0);

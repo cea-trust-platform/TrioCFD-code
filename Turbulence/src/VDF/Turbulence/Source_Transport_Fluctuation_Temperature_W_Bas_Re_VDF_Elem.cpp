@@ -114,7 +114,7 @@ void Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::associer_pb(con
     ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
   eq_thermique = eqn_th;
   mon_eq_transport_Fluctu_Temp = ref_cast(Transport_Fluctuation_Temperature_W_Bas_Re,equation());
-  const Fluide_Incompressible& fluide = eq_thermique->fluide();
+  const Fluide_base& fluide = eq_thermique->fluide();
   beta_t = fluide.beta_t();
   gravite_ = fluide.gravite();
 }
@@ -613,7 +613,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   //on recupere les proprietes physiques du fluide : viscosite cinematique et diffusivite
 
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Champ_Don& ch_diffu = fluide.diffusivite();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();

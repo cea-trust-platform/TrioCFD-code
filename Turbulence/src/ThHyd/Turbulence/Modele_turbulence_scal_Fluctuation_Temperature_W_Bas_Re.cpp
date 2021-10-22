@@ -120,7 +120,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
   const DoubleTab& K_eps_Bas_Re = eqBasRe.inconnue().valeurs();
 
   //on recupere les proprietes physiques du fluide : viscosite cinematique et diffusivite
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const Champ_Don& ch_diffu = fluide.diffusivite();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();

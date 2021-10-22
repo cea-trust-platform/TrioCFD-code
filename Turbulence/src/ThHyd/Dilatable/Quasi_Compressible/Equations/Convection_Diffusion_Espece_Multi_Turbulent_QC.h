@@ -14,33 +14,53 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modifier_nut_pour_QC.cpp
+// File:        Convection_Diffusion_Espece_Multi_Turbulent_QC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/21
+// Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modifier_nut_pour_QC.h>
-#include <Mod_turb_hyd_base.h>
-#include <Fluide_Quasi_Compressible.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
+#ifndef Convection_Diffusion_Espece_Multi_Turbulent_QC_included
+#define Convection_Diffusion_Espece_Multi_Turbulent_QC_included
 
-void Correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod)
+#include <Convection_Diffusion_Espece_Multi_QC.h>
+#include <Convection_Diffusion_Turbulent.h>
+
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//     classe Convection_Diffusion_Espece_Multi_Turbulent_QC
+// .SECTION voir aussi
+//     Convection_Diffusion_Espece_Multi_QC Convection_Diffusion_Turbulent
+//////////////////////////////////////////////////////////////////////////////
+class Convection_Diffusion_Espece_Multi_Turbulent_QC :
+  public Convection_Diffusion_Turbulent, public Convection_Diffusion_Espece_Multi_QC
 {
-  // on recgarde si on a un fluide QC
-  if (sub_type(Fluide_Quasi_Compressible,mod.equation().probleme().milieu()))
-    {
-      const  Fluide_Quasi_Compressible& le_fluide = ref_cast(Fluide_Quasi_Compressible,mod.equation().probleme().milieu());
-      // 1 on multiplie nu_t par rho
+  Declare_instanciable(Convection_Diffusion_Espece_Multi_Turbulent_QC);
 
-      DoubleTab& nut=ref_cast_non_const(DoubleTab, mod.viscosite_turbulente().valeurs());
-      multiplier_diviser_rho(nut, le_fluide, 0 /* multiplier */);
+public :
 
-      // 2  On modifie le ciasaillement paroi
-      const DoubleTab& cisaillement_paroi=mod.loi_paroi().valeur().Cisaillement_paroi();
-      DoubleTab& cisaillement=ref_cast_non_const(DoubleTab, cisaillement_paroi);
-      multiplier_diviser_rho(cisaillement, le_fluide, 0 /* multiplier */);
-      cisaillement.echange_espace_virtuel();
-    }
-}
+  void set_param(Param& titi);
+  int lire_motcle_non_standard(const Motcle&, Entree&);
+  //Methodes de l interface des champs postraitables
+  /////////////////////////////////////////////////////
+  virtual void creer_champ(const Motcle& motlu);
+  virtual const Champ_base& get_champ(const Motcle& nom) const;
+  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  /////////////////////////////////////////////////////
+
+  const RefObjU& get_modele(Type_modele type) const;
+
+protected :
+
+private:
+
+  void completer();
+  int sauvegarder(Sortie&) const;
+  int reprendre(Entree&);
+  void mettre_a_jour(double );
+  int preparer_calcul();
+
+};
+
+#endif

@@ -14,67 +14,38 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_fraction_massique_Turbulent_QC.cpp
+// File:        Convection_Diffusion_Espece_Multi_Turbulent_QC.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
 // Version:     /main/21
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Convection_Diffusion_fraction_massique_Turbulent_QC.h>
+#include <Convection_Diffusion_Espece_Multi_Turbulent_QC.h>
 #include <Probleme_base.h>
 #include <Debog.h>
 #include <DoubleTrav.h>
 #include <Param.h>
 
-Implemente_instanciable(Convection_Diffusion_fraction_massique_Turbulent_QC,"Convection_Diffusion_fraction_massique_Turbulent_QC",Convection_Diffusion_fraction_massique_QC);
+Implemente_instanciable(Convection_Diffusion_Espece_Multi_Turbulent_QC,"Convection_Diffusion_Espece_Multi_Turbulent_QC",Convection_Diffusion_Espece_Multi_QC);
 
-// Description:
-//    Simple appel a: Convection_Diffusion_fraction_massique_QC::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-Sortie& Convection_Diffusion_fraction_massique_Turbulent_QC::printOn(Sortie& is) const
+Sortie& Convection_Diffusion_Espece_Multi_Turbulent_QC::printOn(Sortie& is) const
 {
-  return Convection_Diffusion_fraction_massique_QC::printOn(is);
+  return Convection_Diffusion_Espece_Multi_QC::printOn(is);
 }
 
-// Description:
-//  cf Convection_Diffusion_fraction_massique_QC::readOn(Entree&)
-// Precondition: l'objet a une inconnue associee
-// Precondition: l'objet a un fluide associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& is
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-Entree& Convection_Diffusion_fraction_massique_Turbulent_QC::readOn(Entree& is)
+Entree& Convection_Diffusion_Espece_Multi_Turbulent_QC::readOn(Entree& is)
 {
-  Convection_Diffusion_fraction_massique_QC::readOn(is);
+  Convection_Diffusion_Espece_Multi_QC::readOn(is);
   return is;
 }
 
-void Convection_Diffusion_fraction_massique_Turbulent_QC::set_param(Param& param)
+void Convection_Diffusion_Espece_Multi_Turbulent_QC::set_param(Param& param)
 {
-  Convection_Diffusion_fraction_massique_QC::set_param(param);
+  Convection_Diffusion_Espece_Multi_QC::set_param(param);
   param.ajouter_non_std("modele_turbulence",(this),Param::REQUIRED);
 }
 
-int Convection_Diffusion_fraction_massique_Turbulent_QC::lire_motcle_non_standard(const Motcle& mot, Entree& is)
+int Convection_Diffusion_Espece_Multi_Turbulent_QC::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
   if (mot=="diffusion")
     {
@@ -96,14 +67,14 @@ int Convection_Diffusion_fraction_massique_Turbulent_QC::lire_motcle_non_standar
       return 1;
     }
   else
-    return Convection_Diffusion_fraction_massique_QC::lire_motcle_non_standard(mot,is);
+    return Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(mot,is);
   return 1;
 }
 
 // Description:
 //    Double appel a:
 //     Convection_Diffusion_Turbulent::completer()
-//     Convection_Diffusion_fraction_massique_QC::completer()
+//     Convection_Diffusion_Espece_Multi_QC::completer()
 // Precondition:
 // Parametre:
 //    Signification:
@@ -116,26 +87,26 @@ int Convection_Diffusion_fraction_massique_Turbulent_QC::lire_motcle_non_standar
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Convection_Diffusion_fraction_massique_Turbulent_QC::completer()
+void Convection_Diffusion_Espece_Multi_Turbulent_QC::completer()
 {
   Convection_Diffusion_Turbulent::completer();
-  Convection_Diffusion_fraction_massique_QC::completer();
+  Convection_Diffusion_Espece_Multi_QC::completer();
 }
 
 
-void Convection_Diffusion_fraction_massique_Turbulent_QC::creer_champ(const Motcle& motlu)
+void Convection_Diffusion_Espece_Multi_Turbulent_QC::creer_champ(const Motcle& motlu)
 {
-  Convection_Diffusion_fraction_massique_QC::creer_champ(motlu);
+  Convection_Diffusion_Espece_Multi_QC::creer_champ(motlu);
 
   if (le_modele_turbulence.non_nul())
     le_modele_turbulence->creer_champ(motlu);
 }
 
-const Champ_base& Convection_Diffusion_fraction_massique_Turbulent_QC::get_champ(const Motcle& nom) const
+const Champ_base& Convection_Diffusion_Espece_Multi_Turbulent_QC::get_champ(const Motcle& nom) const
 {
   try
     {
-      return Convection_Diffusion_fraction_massique_QC::get_champ(nom);
+      return Convection_Diffusion_Espece_Multi_QC::get_champ(nom);
     }
   catch (Champs_compris_erreur)
     {
@@ -155,16 +126,16 @@ const Champ_base& Convection_Diffusion_fraction_massique_Turbulent_QC::get_champ
   return ref_champ;
 }
 
-void Convection_Diffusion_fraction_massique_Turbulent_QC::get_noms_champs_postraitables(Noms& nom,Option opt) const
+void Convection_Diffusion_Espece_Multi_Turbulent_QC::get_noms_champs_postraitables(Noms& nom,Option opt) const
 {
-  Convection_Diffusion_fraction_massique_QC::get_noms_champs_postraitables(nom,opt);
+  Convection_Diffusion_Espece_Multi_QC::get_noms_champs_postraitables(nom,opt);
 
   if (le_modele_turbulence.non_nul())
     le_modele_turbulence->get_noms_champs_postraitables(nom,opt);
 }
 // Description:
 //    Mise a jour en temps de l'equation, double appel a:
-//      Convection_Diffusion_fraction_massique_QC::mettre_a_jour(double );
+//      Convection_Diffusion_Espece_Multi_QC::mettre_a_jour(double );
 //      Convection_Diffusion_Turbulent::mettre_a_jour(double );
 // Precondition:
 // Parametre: double temps
@@ -178,15 +149,15 @@ void Convection_Diffusion_fraction_massique_Turbulent_QC::get_noms_champs_postra
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Convection_Diffusion_fraction_massique_Turbulent_QC::mettre_a_jour(double temps)
+void Convection_Diffusion_Espece_Multi_Turbulent_QC::mettre_a_jour(double temps)
 {
-  Convection_Diffusion_fraction_massique_QC::mettre_a_jour(temps);
+  Convection_Diffusion_Espece_Multi_QC::mettre_a_jour(temps);
   Convection_Diffusion_Turbulent::mettre_a_jour(temps);
 }
 // Description:
 //    Double appel a:
 //      Convection_Diffusion_Turbulent::preparer_calcul()
-//      Convection_Diffusion_fraction_massique_QC::preparer_calcul()
+//      Convection_Diffusion_Espece_Multi_QC::preparer_calcul()
 // Precondition:
 // Parametre:
 //    Signification:
@@ -199,16 +170,16 @@ void Convection_Diffusion_fraction_massique_Turbulent_QC::mettre_a_jour(double t
 // Exception:
 // Effets de bord:
 // Postcondition:
-int Convection_Diffusion_fraction_massique_Turbulent_QC::preparer_calcul()
+int Convection_Diffusion_Espece_Multi_Turbulent_QC::preparer_calcul()
 {
   Convection_Diffusion_Turbulent::preparer_calcul();
-  Convection_Diffusion_fraction_massique_QC::preparer_calcul();
+  Convection_Diffusion_Espece_Multi_QC::preparer_calcul();
   return 1;
 }
 
 // Description:
 //    Sauvegarde sur un flot de sortie, double appel a:
-//      Convection_Diffusion_fraction_massique_QC::sauvegarder(Sortie& );
+//      Convection_Diffusion_Espece_Multi_QC::sauvegarder(Sortie& );
 //      Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
 // Precondition:
 // Parametre: Sortie& os
@@ -222,17 +193,17 @@ int Convection_Diffusion_fraction_massique_Turbulent_QC::preparer_calcul()
 // Exception:
 // Effets de bord:
 // Postcondition: la methode ne modifie pas l'objet
-int Convection_Diffusion_fraction_massique_Turbulent_QC::sauvegarder(Sortie& os) const
+int Convection_Diffusion_Espece_Multi_Turbulent_QC::sauvegarder(Sortie& os) const
 {
   int bytes=0;
-  bytes += Convection_Diffusion_fraction_massique_QC::sauvegarder(os);
+  bytes += Convection_Diffusion_Espece_Multi_QC::sauvegarder(os);
   bytes += Convection_Diffusion_Turbulent::sauvegarder(os);
   return bytes;
 }
 
 // Description:
 //    Reprise a partir d'un flot d'entree, double appel a:
-//      Convection_Diffusion_fraction_massique_QC::reprendre(Entree& );
+//      Convection_Diffusion_Espece_Multi_QC::reprendre(Entree& );
 //      Convection_Diffusion_Turbulent::reprendre(Entree&);
 // Precondition:
 // Parametre: Entree& is
@@ -246,14 +217,14 @@ int Convection_Diffusion_fraction_massique_Turbulent_QC::sauvegarder(Sortie& os)
 // Exception:
 // Effets de bord:
 // Postcondition:
-int Convection_Diffusion_fraction_massique_Turbulent_QC::reprendre(Entree& is)
+int Convection_Diffusion_Espece_Multi_Turbulent_QC::reprendre(Entree& is)
 {
-  Convection_Diffusion_fraction_massique_QC::reprendre(is);
+  Convection_Diffusion_Espece_Multi_QC::reprendre(is);
   Convection_Diffusion_Turbulent::reprendre(is);
   return 1;
 }
 
-const RefObjU& Convection_Diffusion_fraction_massique_Turbulent_QC::get_modele(Type_modele type) const
+const RefObjU& Convection_Diffusion_Espece_Multi_Turbulent_QC::get_modele(Type_modele type) const
 {
   CONST_LIST_CURSEUR(RefObjU) curseur = liste_modeles_;
   while(curseur)

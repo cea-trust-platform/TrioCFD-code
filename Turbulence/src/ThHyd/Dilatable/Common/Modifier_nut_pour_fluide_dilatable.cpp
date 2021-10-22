@@ -14,58 +14,38 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Navier_Stokes_Turbulent_QC.h
+// File:        Modifier_nut_pour_fluide_dilatable.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/19
+// Version:     /main/21
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Navier_Stokes_Turbulent_QC_included
-#define Navier_Stokes_Turbulent_QC_included
+#include <Modifier_nut_pour_fluide_dilatable.h>
+#include <Fluide_Dilatable_base.h>
+#include <Mod_turb_hyd_base.h>
+#include <Equation_base.h>
+#include <Probleme_base.h>
 
-#include <Navier_Stokes_Turbulent.h>
-#include <Navier_Stokes_QC_impl.h>
-class Champ_Fonc;
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Navier_Stokes_Turbulent
-//     Cette classe represente l'equation de la dynamique pour un fluide
-//     visqueux verifiant la condition d'incompressibilite div U = 0 avec
-//     modelisation de la turbulence.
-//     Un membre de type Mod_turb_hyd representera le modele de turbulence.
-// .SECTION voir aussi
-//     Navier_Stokes_Turbulent Mod_turb_hyd Pb_Thermohydraulique_Turbulent_QC
-//////////////////////////////////////////////////////////////////////////////
-class Navier_Stokes_Turbulent_QC : public Navier_Stokes_Turbulent,public Navier_Stokes_QC_impl
+void correction_nut_et_cisaillement_paroi_si_qc(Mod_turb_hyd_base& mod)
 {
-  Declare_instanciable(Navier_Stokes_Turbulent_QC);
+  // on recgarde si on a un fluide QC
+  if (sub_type(Fluide_Dilatable_base,mod.equation().probleme().milieu()))
+    {
+      const  Fluide_Dilatable_base& le_fluide = ref_cast(Fluide_Dilatable_base,mod.equation().probleme().milieu());
+      // 1 on multiplie nu_t par rho
 
-public :
+      DoubleTab& nut=ref_cast_non_const(DoubleTab, mod.viscosite_turbulente().valeurs());
+      multiplier_diviser_rho(nut, le_fluide, 0 /* multiplier */);
 
-  void completer();
-  void mettre_a_jour(double );
-  virtual bool initTimeStep(double dt);
-
-  int preparer_calcul();
-  int impr(Sortie&) const;
-  void imprimer(Sortie& os) const;
-
-  DoubleTab& derivee_en_temps_inco(DoubleTab& );
-  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  inline const Champ_Inc& rho_la_vitesse() const;
-  void discretiser();
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  const Champ_Don& diffusivite_pour_transport();
-
-protected:
-
-};
-inline const Champ_Inc& Navier_Stokes_Turbulent_QC::rho_la_vitesse() const
-{
-  return rho_la_vitesse_;
+      // 2  On modifie le ciasaillement paroi
+      const DoubleTab& cisaillement_paroi=mod.loi_paroi().valeur().Cisaillement_paroi();
+      DoubleTab& cisaillement=ref_cast_non_const(DoubleTab, cisaillement_paroi);
+      multiplier_diviser_rho(cisaillement, le_fluide, 0 /* multiplier */);
+      cisaillement.echange_espace_virtuel();
+    }
+  else
+    {
+      Cerr << "What ?? The method Correction_nut_et_cisaillement_paroi_si_qc should not be called since your fluid is not dilatable !!" << finl;
+      Process::exit();
+    }
 }
-
-#endif

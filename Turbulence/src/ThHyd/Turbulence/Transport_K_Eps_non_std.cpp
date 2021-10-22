@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Transport_K_Eps_non_std.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <Param.h>
 
@@ -148,7 +148,7 @@ Operateur& Transport_K_Eps_non_std::operateur(int i)
 
 const Champ_Don& Transport_K_Eps_non_std::diffusivite_pour_transport()
 {
-  Fluide_Incompressible& fluide_inc = ref_cast(Fluide_Incompressible,le_fluide.valeur());
+  Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
   return fluide_inc.viscosite_cinematique();
 }
 
