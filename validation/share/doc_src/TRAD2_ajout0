@@ -78,8 +78,6 @@ navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier
 navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
 convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_qc convection_diffusion_chaleur_turbulent_qc -1 Energy equation under low Mach number as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
 convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
 convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
