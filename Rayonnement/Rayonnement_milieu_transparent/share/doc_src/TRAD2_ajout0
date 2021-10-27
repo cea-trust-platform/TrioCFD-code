@@ -85,7 +85,7 @@ pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydra
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   ref constituant constituant
-pb_thermohydraulique_turbulent_qc_fraction_massique pb_avec_passif pb_thermohydraulique_turbulent_qc_fraction_massique -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
+pb_thermohydraulique_especes_turbulent_qc pb_avec_passif pb_thermohydraulique_especes_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
   attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
   attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
 navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
@@ -95,9 +95,6 @@ convection_diffusion_temperature_turbulent eqn_base convection_diffusion_tempera
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
 convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
-convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
-  attr espece espece espece 0 not_set
 modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
 mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
   attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
