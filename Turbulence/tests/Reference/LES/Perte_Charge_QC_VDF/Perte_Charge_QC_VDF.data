@@ -85,7 +85,7 @@ Lire sch
 Fluide_Quasi_Compressible fluide
 Lire fluide
 {
-	sutherland mu0 1.716e-5 T0 273.15 Slambda 194.4 C 110.6
+	sutherland pb mu0 1.716e-5 T0 273.15 Slambda 194.4 C 110.6
 	pression 100000.
 	loi_etat gaz_parfait_qc 
 	{ 

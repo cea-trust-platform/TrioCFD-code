@@ -79,7 +79,7 @@ void test_impose_bound_cond(Equation_base& eqn,DoubleTab& current2,const char * 
 //Use of a variable time step with the IMPLICITE algorithm
 //replaces the global time step with a local time step
 void Implicit_steady::iterer_NS(Equation_base& eqn,DoubleTab& current,DoubleTab& pression, double dt,
-                                Matrice_Morse& matrice,double seuil_resol,DoubleTrav& secmem,int nb_iter,int& converge)
+                                Matrice_Morse& matrice,double seuil_resol,DoubleTrav& secmem,int nb_iter,int& converge, int& ok)
 {
   Schema_Temps_base& sch = eqn.probleme().schema_temps();
   Parametre_implicite& param_eqn = get_and_set_parametre_implicite(eqn);

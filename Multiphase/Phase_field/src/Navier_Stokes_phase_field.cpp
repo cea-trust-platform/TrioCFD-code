@@ -175,18 +175,23 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           else
             {
               double rho1,rho2;
+              Nom prob;
               while(motlu!="}")
                 {
+                  if (motlu=="probleme") is >> prob;
                   if (motlu=="rho_1") is >> rho1;
                   if (motlu=="rho_2") is >> rho2;
                   is >> motlu;
                 }
-              Nom chaine("Champ_Fonc_Fonction concentration 1 ");
+              Nom chaine("Champ_Fonc_Fonction ");
+              chaine+=prob;
+              chaine+=" concentration 1 ";
               Nom rhoM(0.5*(rho1+rho2));
               Nom drho(rho2-rho1);
               chaine+=rhoM;
-              chaine+="+val*";
+              chaine+="+val*(";
               chaine+=drho;
+              chaine+=")";
               EChaine echaine(chaine);
               echaine >> rho_;
               Nom chaine2("Champ_Uniforme 1 ");
@@ -227,24 +232,29 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           else
             {
               double mu1,mu2;
+              Nom prob;
               while(motlu!="}")
                 {
+                  if (motlu=="probleme") is >> prob;
                   if (motlu=="mu_1") is >> mu1;
                   if (motlu=="mu_2") is >> mu2;
                   is >> motlu;
                 }
-              Nom chaine("Champ_Fonc_Fonction concentration 1 ");
+              Nom chaine("Champ_Fonc_Fonction ");
+              chaine+=prob;
+              chaine+=" concentration 1 ";
               Nom muM(0.5*(mu1+mu2));
               Nom dmu(mu2-mu1);
               chaine+=muM;
-              chaine+="+val*";
+              chaine+="+val*(";
               chaine+=dmu;
+              chaine+=")";
               EChaine echaine(chaine);
               echaine >> mu_;
             }
           assert(motlu=="}");
           const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-          dis.nommer_completer_champ_physique(zone_dis().valeur(),"viscosite_dynamique","Pa.s",mu_,probleme());
+          dis.nommer_completer_champ_physique(zone_dis().valeur(),"viscosite_dynamique","Pa.s",mu_);
           champs_compris_.ajoute_champ(mu_);
         }
       if(diff_boussi_==1)
@@ -391,9 +401,9 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
               Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (2)"<< finl;
               exit();
             }
-          dis.nommer_completer_champ_physique(zone_dis().valeur(),"masse_volumique","kg/m3",rho_,probleme());
+          dis.nommer_completer_champ_physique(zone_dis().valeur(),"masse_volumique","kg/m3",rho_);
           champs_compris_.ajoute_champ(rho_);
-          dis.nommer_completer_champ_physique(zone_dis().valeur(),"derivee_masse_volumique","kg/m3",drhodc_,probleme());
+          dis.nommer_completer_champ_physique(zone_dis().valeur(),"derivee_masse_volumique","kg/m3",drhodc_);
           champs_compris_.ajoute_champ(drhodc_);
         }
     }

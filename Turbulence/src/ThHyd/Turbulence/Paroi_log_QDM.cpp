@@ -40,7 +40,7 @@ void Paroi_log_QDM::set_param(Param& param)
 void Paroi_log_QDM::init_lois_paroi_hydraulique_()
 {
   double (*pf)(double,double,double);
-  DoubleVect les_valeurs(40);
+  DoubleTab les_valeurs(40,1);
   DoubleVect les_params(40);
   double val=0;
   int i;
@@ -52,7 +52,7 @@ void Paroi_log_QDM::init_lois_paroi_hydraulique_()
   for (i=0; i<40; i++)
     {
       val += integrale(les_params[i]-1,les_params[i],Kappa,A_plus,pf);
-      les_valeurs[i] = val*les_params[i];
+      les_valeurs(i,0) = val*les_params[i];
     }
 
   table_hyd.remplir(les_params,les_valeurs);

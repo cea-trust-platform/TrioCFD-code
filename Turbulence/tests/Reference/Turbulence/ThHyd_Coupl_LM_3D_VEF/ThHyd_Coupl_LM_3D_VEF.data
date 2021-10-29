@@ -226,7 +226,7 @@ Read pb2
 				Puissance_Thermique champ_uniforme_morceaux_tabule_temps dom 1
 				{
 					defaut 0
-					sous_zone1 { 2 0. 0. 0.001 0.127 }
+					sous_zone1 { 2 0. 0.0000001 0.001 0.127 }
 				}
 			}
 		boundary_conditions 

@@ -59,8 +59,8 @@ Lire sch
 Fluide_Quasi_Compressible fluide
 Lire fluide
 {
-        sutherland mu0 1.68e-5 T0 273 C 110.5
-        lambda champ_fonc_fonction temperature 1 ((3.937e-7*val^(2.5))+(0.00189*val^(1.5)))/(val+110.5)
+        sutherland pb mu0 1.68e-5 T0 273 C 110.5
+        lambda champ_fonc_fonction pb temperature 1 ((3.937e-7*val^(2.5))+(0.00189*val^(1.5)))/(val+110.5)
         pression 100000.
         loi_etat gaz_parfait_qc {
                 Prandtl 0.71
