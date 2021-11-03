@@ -103,6 +103,9 @@ convection_diffusion_temperature_turbulent eqn_base convection_diffusion_tempera
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
 convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
+convection_diffusion_espece_multi_turbulent_qc eqn_base convection_diffusion_espece_multi_turbulent_qc -1 not_set
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
+  attr espece espece espece 0 not_set
 modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
 mod_turb_hyd_ss_maille modele_turbulence_hyd_deriv mod_turb_hyd_ss_maille -1 Class for sub-grid turbulence model for Navier-Stokes equations.
   attr formulation_a_nb_points form_a_nb_points formulation_a_nb_points 1 The structure fonction is calculated on nb points and we should add the 2 directions (0:OX, 1:OY, 2:OZ) constituting the homegeneity planes. Example for channel flows, planes parallel to the walls.
