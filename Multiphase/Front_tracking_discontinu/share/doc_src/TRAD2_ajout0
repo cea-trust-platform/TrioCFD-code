@@ -191,6 +191,9 @@ convection_diffusion_temperature_turbulent eqn_base convection_diffusion_tempera
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
 convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
+convection_diffusion_espece_multi_turbulent_qc eqn_base convection_diffusion_espece_multi_turbulent_qc -1 not_set
+  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
+  attr espece espece espece 0 not_set
 Convection_Diffusion_Concentration_Turbulent_FT_Disc convection_diffusion_concentration_turbulent Convection_Diffusion_Concentration_Turbulent_FT_Disc -1 equation_non_resolue
   attr equation_interface chaine equation_interface 1 his is the name of the interface tracking equation to watch. The scalar will not diffuse through the interface of this equation.
   attr phase entier(into=[0,1]) phase 0 tells whether the scalar must be confined in phase 0 or in phase 1

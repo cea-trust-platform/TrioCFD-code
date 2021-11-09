@@ -39,6 +39,7 @@
 
 extern Stat_Counter_Id temps_total_execution_counter_;
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
+// XD navier_stokes_phase_field navier_stokes_standard navier_stokes_phase_field -1 Navier Stokes equation for the Phase Field problem.
 
 Navier_Stokes_phase_field::Navier_Stokes_phase_field()
 {
@@ -125,11 +126,44 @@ Entree& Navier_Stokes_phase_field::readOn(Entree& is)
 
 void Navier_Stokes_phase_field::set_param(Param& param)
 {
-  param.ajouter_non_std("approximation_de_boussinesq",(this),Param::REQUIRED);
-  param.ajouter_non_std("viscosite_dynamique_constante",(this),Param::OPTIONAL);
-  param.ajouter("gravite",&g_);
+  param.ajouter_non_std("approximation_de_boussinesq",(this),Param::REQUIRED); // XD_ADD_P approx_boussinesq To use or not the Boussinesq approximation.
+  param.ajouter_non_std("viscosite_dynamique_constante",(this),Param::OPTIONAL); // XD_ADD_P visco_dyn_cons To use or not a viscosity which will depends on concentration C (in fact, C is the unknown of Cahn-Hilliard equation).
+  param.ajouter("gravite",&g_); // XD_ADD_P list Keyword to define gravity in the case Boussinesq approximation is not used.
   Navier_Stokes_std::set_param(param);
 }
+
+// XD approx_boussinesq objet_lecture nul 0 different mass density formulation are available depending if the Boussinesq approximation is made or not
+// XD attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the Boussinesq approximation.
+// XD attr bloc_bouss bloc_boussinesq bloc_bouss 0 to choose the rho formulation
+// XD bloc_boussinesq objet_lecture nul 1 choice of rho formulation
+// XD attr probleme ref_Pb_base probleme 1 Name of problem.
+// XD attr rho_1 floattant rho_1 1 value of rho
+// XD attr rho_2 floattant rho_2 1 value of rho
+// XD attr rho_fonc_c bloc_rho_fonc_c rho_fonc_c_ 1 to use for define a general form for rho
+// XD bloc_rho_fonc_c objet_lecture nul 0 if rho has a general form
+// XD attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
+// XD attr problem_name ref_Pb_base problem_name 1 Name of problem.
+// XD attr concentration chaine(into=["concentration"]) concentration 1 concentration
+// XD attr dim entier dim 1 dimension of the problem
+// XD attr val chaine val 1 function of rho
+// XD attr Champ_Uniforme chaine(into=["Champ_Uniforme"]) Champ_Uniforme 1 Champ_Uniforme
+// XD attr fielddim entier fielddim 1 dimension of the problem
+// XD attr val2 chaine val2 1 function of rho
+
+// XD visco_dyn_cons objet_lecture nul 0 different treatment of the kinematic viscosity could be done depending of the use of the Boussinesq approximation or the constant dynamic viscosity approximation
+// XD attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the constant dynamic viscosity
+// XD attr bloc_visco bloc_visco2 bloc_visco 0 to choose the mu formulation
+// XD bloc_visco2 objet_lecture nul 1 choice of mu formulation
+// XD attr probleme ref_Pb_base probleme 1 Name of problem.
+// XD attr mu_1 floattant mu_1 1 value of mu
+// XD attr mu_2 floattant mu_2 1 value of mu
+// XD attr mu_fonc_c bloc_mu_fonc_c mu_fonc_c_ 1 to use for define a general form for mu
+// XD bloc_mu_fonc_c objet_lecture nul 0 if mu has a general form
+// XD attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
+// XD attr problem_name ref_Pb_base problem_name 1 Name of problem.
+// XD attr concentration chaine(into=["concentration"]) concentration 1 concentration
+// XD attr dim entier dim 1 dimension of the problem
+// XD attr val chaine val 1 function of mu
 
 int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {

@@ -31,7 +31,8 @@
 #include <SFichier.h>
 
 Implemente_instanciable(Source_Qdm_VDF_Phase_field,"Source_Qdm_Phase_field_VDF_Face",Source_base);
-
+// XD source_qdm_phase_field source_base source_qdm_phase_field 1 Keyword to define the capillary force into the Navier Stokes equation for the Phase Field problem.
+// XD attr forme_du_terme_source entier forme_du_terme_source 0 Kind of the source term (1, 2, 3 or 4).
 
 
 //// printOn
