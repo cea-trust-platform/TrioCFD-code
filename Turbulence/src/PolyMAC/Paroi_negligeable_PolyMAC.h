@@ -40,6 +40,7 @@ public:
   void associer(const Zone_dis&, const Zone_Cl_dis&);
   int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   int calculer_hyd(DoubleTab& , DoubleTab& );
   virtual bool use_shear() const;
 

@@ -87,6 +87,12 @@ int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_k_eps)
   return 1;
 }
 
+int Paroi_2couches_VDF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  Cerr << "Paroi_2couches_VDF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps) : Erreur on ne devrait pas etre ici!!!" << finl;
+  return 1;
+}
+
 int Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k_eps)
 {
   //Cerr << "Dans Paroi_2couches_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k) : Ok ! " << finl;

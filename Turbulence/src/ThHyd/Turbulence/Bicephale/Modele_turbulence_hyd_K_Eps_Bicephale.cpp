@@ -458,7 +458,7 @@ int Modele_turbulence_hyd_K_Eps_Bicephale::preparer_calcul()
     }
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,1);
 
-  // pas de loi de paroi dans ce modele pour l'instant
+  loipar.calculer_hyd_BiK(ch_K,ch_Eps);
 
   eqn_transp_K().controler_variable();
   eqn_transp_Eps().controler_variable();
@@ -486,7 +486,7 @@ bool Modele_turbulence_hyd_K_Eps_Bicephale::initTimeStep(double dt)
 // Description:
 //    Effectue une mise a jour en temps du modele de turbulence.
 //    Met a jour les equations de transport de K et epsilon,
-//    calcule la viscosite turbulente (loi de paroi forcement negligeable pour l'instant)
+//    calcule la viscosite turbulente
 //    au nouveau temps.
 // Precondition:
 // Parametre: double temps
@@ -527,7 +527,7 @@ void Modele_turbulence_hyd_K_Eps_Bicephale::mettre_a_jour(double temps)
     }
   imprimer_evolution_keps(ch_K,ch_Eps,eqn_transp_K().schema_temps(),LeCmu,1);
 
-  // loipar.calculer_hyd(ch_K_Eps); loi de paroi forcement negligeable pour l'instant
+  loipar.calculer_hyd_BiK(ch_K,ch_Eps);
 
   eqn_transp_Eps().controler_variable();
   eqn_transp_K().controler_variable();

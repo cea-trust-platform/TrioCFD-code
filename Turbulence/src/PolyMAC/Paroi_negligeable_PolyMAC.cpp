@@ -67,6 +67,12 @@ int Paroi_negligeable_PolyMAC::calculer_hyd(DoubleTab& tab_k_eps)
   return 1;
 }
 
+int Paroi_negligeable_PolyMAC::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  //Cerr << "Dans Paroi_negligeable_PolyMAC::calculer_hyd_BiK ne fait rien!!" << finl;
+  return 1;
+}
+
 
 int Paroi_negligeable_PolyMAC::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {

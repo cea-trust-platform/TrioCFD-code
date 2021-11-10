@@ -676,6 +676,394 @@ void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_f
   // des legers ecarts en sequentiel et parallele
 }
 
+int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
+  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const Zone& zone = zone_VEF.zone();
+  int nfac = zone.nb_faces_elem();
+
+  double visco=-1;
+  int l_unif;
+  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+    {
+      visco = max(tab_visco(0,0),DMINFLOAT);
+      l_unif = 1;
+    }
+  else
+    l_unif = 0;
+  if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+    //   on ne doit pas changer tab_visco ici !
+    {
+      Cerr<<" visco <=0 ?"<<finl;
+      exit();
+    }
+  // tab_visco+=DMINFLOAT;
+
+  double norm_v=-1;
+  double dist=-1,d_visco=-1;
+  double u_plus_d_plus,u_plus,d_plus,u_star;
+  ArrOfDouble val(dimension);
+  Cisaillement_paroi_=0;
+
+  int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
+  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_keps_impose_, face_keps_imposee_, zone_VEF, la_zone_Cl_VEF, !is_champ_Q1NC);
+
+  IntVect num(nfac);
+  ArrOfDouble stock_erugu(zone_VEF.nb_faces_tot());
+  ArrOfInt is_defilante_face(zone_VEF.nb_faces_tot());
+
+  // Loop on boundaries
+  int nb_bords=zone_VEF.nb_front_Cl();
+  for (int n_bord=0; n_bord<nb_bords; n_bord++)
+    {
+      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+
+      // Only Dirichlet conditions:
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
+        {
+          int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
+
+          // Recuperation de la valeur Erugu
+          double erugu=Erugu;
+          if (sub_type(Paroi_rugueuse,la_cl.valeur()))
+            erugu=ref_cast(Paroi_rugueuse,la_cl.valeur()).get_erugu();
+
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const IntTab& elem_faces = zone_VEF.elem_faces();
+
+          // Loop on real faces
+          int ndeb = 0;
+          int nfin = le_bord.nb_faces_tot();
+          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+            {
+              int num_face=le_bord.num_face(ind_face);
+              int elem=face_voisins(num_face,0);
+
+              is_defilante_face[num_face]=is_defilante;
+              stock_erugu[num_face]=erugu;
+
+              // on determine les faces de l'element qui sont autres que le num_face traite
+              for (int nf2=0; nf2<nfac; nf2++)
+                num[nf2] = elem_faces(elem,nf2);
+
+              // Maintenant on place le num_face en fin de tableau
+              for (int nf2=0; nf2<nfac-1; nf2++)
+                {
+                  num[nf2] = elem_faces(elem,nf2);
+                  if (num[nf2] == num_face)
+                    {
+                      num[nf2] = num[nfac-1];
+                      num[nfac-1] = num_face;
+                    }
+                }
+
+              int nfc=0;
+              // Boucle sur les faces :
+              for (int nf=0; nf<nfac; nf++)
+                {
+                  if (num[nf]==num_face)
+                    {
+                      // Strategie pour les tetras :
+                      // On impose k et eps a la paroi :
+                      // approximation: d(k)/d(n) = 0 a la paroi
+                      // c'est faux mais ca marche
+                      tab_k(num[nf])  =0.;
+                      tab_eps(num[nf])=0.;
+                      int nk=0;
+
+                      for (int k=0; k<nfac; k++)
+                        //if ( (num[k] >= ndebint) && (k != nf))
+                        if ( (face_keps_imposee_[num[k]]>-1) && (k != nf))
+                          {
+
+                            tab_k(num[nf])  += tab_k(num[k]);
+                            tab_eps(num[nf])+= tab_eps(num[k]);
+                            nk++;
+                          }
+                      if (nk != 0 )
+                        {
+                          tab_k(num[nf])  /=nk;
+                          tab_eps(num[nf])/=nk;
+                        }
+                    }
+
+                  // On verifie si num[nf] n'est pas une face de bord :
+                  else if ( (face_keps_imposee_[num[nf]]>-1))//if (num[nf]>=ndebint)
+                    {
+                      nfc++;
+                      norm_v=norm_vit_lp_k(vitesse,num[nf],num_face,zone_VEF,val,is_defilante);
+                      if (!is_champ_Q1NC)
+                        dist=distance_face(num_face,num[nf],zone_VEF);
+                      else
+                        dist=distance_face_elem(num_face,elem,zone_VEF);
+
+                      if (l_unif)
+                        d_visco = visco;
+                      else
+                        d_visco = tab_visco(elem,0);
+
+                      u_plus_d_plus = norm_v*dist/d_visco;
+                      u_plus = calculer_u_plus(nf,u_plus_d_plus,erugu);
+
+                      if (!is_u_star_impose_)
+                        {
+                          if(u_plus)
+                            {
+                              u_star = norm_v/u_plus ;
+                              d_plus = u_plus_d_plus/u_plus ;
+                            }
+                          else
+                            {
+                              u_star = 0.;
+                              d_plus = 0.;
+                            }
+                        }
+                      else
+                        {
+                          u_star = u_star_impose_  ;
+                          d_plus = 0.;
+                        }
+                      calculer_k_eps(tab_k(num[nf]),tab_eps(num[nf]),d_plus,u_star,d_visco,dist);
+
+                      // Calcul de la contrainte tangentielle
+                      for (int dir=0; dir<dimension; dir++)
+                        Cisaillement_paroi_(num_face,dir) += u_star*u_star*val[dir];
+                      // Fin de la strategie du calcul generalise de la loi de paroi
+                    }
+                }
+
+              // A voir si juste :
+              if (nfc != 0 )
+                for (int dir=0; dir<dimension; dir++)
+                  Cisaillement_paroi_(num_face,dir)/=nfc;
+
+              double u_starbis=0;
+              for (int dir=0; dir<dimension; dir++)
+                u_starbis+=Cisaillement_paroi_(num_face,dir)*Cisaillement_paroi_(num_face,dir);
+
+              u_starbis=sqrt(sqrt(u_starbis));
+              tab_u_star_(num_face)=u_starbis;
+              tab_d_plus_(num_face)=u_starbis*dist/d_visco;
+              if (u_starbis != 0) uplus_(num_face)=norm_v/u_starbis;
+
+            } // End loop on real faces
+
+        } // End Dirichlet conditions
+
+      // Robin condition:
+      else if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
+        {
+          // Recuperation de la valeur Erugu
+          double erugu=Erugu;
+
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const Paroi_decalee_Robin& Paroi = ref_cast(Paroi_decalee_Robin,la_cl.valeur());
+          const DoubleTab& normales = zone_VEF.face_normales();
+          double delta = Paroi.get_delta();
+
+          // Loop on real faces
+          int ndeb = 0;
+          int nfin = le_bord.nb_faces_tot();
+          for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+            {
+              int num_face=le_bord.num_face(ind_face);
+              int elem=face_voisins(num_face,0);
+
+              double psc=0, norm=0;
+              norm_v=0;
+
+              for(int comp=0; comp<dimension; comp++)
+                {
+                  psc += vitesse(num_face,comp)*normales(num_face,comp);
+                  norm += normales(num_face,comp)*normales(num_face,comp);
+                }
+              // psc /= norm; // Fixed bug: Arithmetic exception
+              if (dabs(norm)>=DMINFLOAT) psc/=norm;
+
+              for(int comp=0; comp<dimension; comp++)
+                {
+                  val[comp]=vitesse(num_face,comp)-psc*normales(num_face,comp);
+                  norm_v += val[comp]*val[comp];
+                }
+
+              norm_v = sqrt(norm_v);
+              val /= norm_v;
+              dist = delta;
+
+              // Common to Dirichlet
+
+              if (l_unif)
+                d_visco = visco;
+              else
+                d_visco = tab_visco(elem,0);
+
+              u_plus_d_plus = norm_v*dist/d_visco;
+
+              u_plus = calculer_u_plus(ind_face,u_plus_d_plus,erugu);
+
+              if (!is_u_star_impose_)
+                {
+                  if(u_plus)
+                    {
+                      u_star = norm_v/u_plus ;
+                      d_plus = u_plus_d_plus/u_plus ;
+                    }
+                  else
+                    {
+                      u_star = 0.;
+                      d_plus = 0.;
+                    }
+                }
+              else
+                {
+                  u_star = u_star_impose_;
+                  d_plus = 0.;
+                }
+
+              calculer_k_eps(tab_k(num_face),tab_eps(num_face),d_plus,u_star,d_visco,dist);
+
+              // Calcul de la contrainte tangentielle
+              for (int j=0; j<dimension; j++)
+                Cisaillement_paroi_(num_face,j) = u_star*u_star*val[j];
+
+              double u_starbis=0;
+              for (int dir=0; dir<dimension; dir++)
+                u_starbis+=Cisaillement_paroi_(num_face,dir)*Cisaillement_paroi_(num_face,dir);
+              u_starbis=sqrt(sqrt(u_starbis));
+
+              tab_u_star_(num_face)=u_starbis;
+              tab_d_plus_(num_face)=u_starbis*dist/d_visco;
+              if (u_starbis != 0) uplus_(num_face)=norm_v/u_starbis;
+
+              // End common to Dirichlet
+
+            } // End loop on real faces
+
+        } // End Robin condition
+
+    } // End loop on boundaries
+
+
+#ifdef CONTROL
+  if ((flag_face_keps_imposee_)&&(!is_champ_Q1NC))
+    {
+      if (0)
+        {
+          int nb_faces_tot=zone_VEF.nb_faces_tot();
+          DoubleVect toto(nb_faces_tot);
+          const ArrOfInt& renum=Debog::renum_faces();
+          for (int i=0; i<nb_faces_tot; i++)
+            if ((face_keps_imposee_(i)>-1)&&(Debog::mode_db==1))
+              {
+                if (i>1000) Cerr<<me()<<" face_virt "<<i<<finl;
+                toto(i)=renum(face_keps_imposee_(i));
+              }
+            else toto(i)=face_keps_imposee_(i);
+          barrier();
+          Debog::verifier("face_keps ",toto);
+        }
+      int tutu=0;
+      ArrOfInt test;
+      remplir_face_keps_imposee_gen( tutu, test, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+      test-=face_keps_imposee_;
+      if (max(test)>0|| min(test)<0)
+        {
+          const DoubleTab& xv=zone_VEF.xv();
+          Cerr<<"TEST "<<finl;
+          int compteur=0,compteur2=0;
+          for (int i=0; i<test.size_array(); i++)
+            {
+              test(i)+=face_keps_imposee_(i);
+              if (test(i)!=face_keps_imposee_(i))
+                {
+
+                  Cerr<<me()<<" face "<<i<<" : " <<face_keps_imposee_(i)<<" "<<test(i)<<" pos "<<xv(i,0)<<" "<<xv(i,1);
+                  if (dimension==3) Cerr<<" "<<xv(i,2);
+
+                  if (face_keps_imposee_(i)!=-2)
+                    {
+                      Cerr<<" pos trouve "<<xv(face_keps_imposee_(i),0)<<" "<<xv(face_keps_imposee_(i),1);
+                      if (dimension==3) Cerr<<" "<<xv(face_keps_imposee_(i),2);
+                    }
+                  if (test(i)!=-2)
+                    {
+                      Cerr<<" pos test "<<xv(test(i),0)<<" "<<xv(test(i),1);
+                      if (dimension==3) Cerr<<" "<<xv(test(i),2);
+                    }
+                  Cerr<<finl;
+                }
+              if (test(i)>-1) compteur++;
+              if (face_keps_imposee_(i)>-1) compteur2++;
+            }
+          Cerr<<"compteurs "<<compteur2<<" "<<compteur<<finl;
+          exit();
+        }
+    }
+#endif
+
+  // on recalcule partout ou c'est impose
+  int nb_faces_tot=zone_VEF.nb_faces_tot();
+  for (int face=0; face<nb_faces_tot; face++)
+    {
+      int num_face=face_keps_imposee_[face];
+      if (num_face>-1)
+        {
+          // int elem_voisin;
+          int elem=face_voisins(num_face,0);
+          //if (face_voisins(face,0)!=elem) elem_voisin=face_voisins(face,0);
+          //else elem_voisin=face_voisins(face,1);
+          //int elem_voisin=face_voisins(num_face,0);
+          // ce n'est pas le bon voisin!!!!
+          double distb;
+          if (!is_champ_Q1NC)
+            {
+              distb=distance_face(num_face,face,zone_VEF);
+            }
+          else
+            {
+              assert(sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur())) ;
+              distb=distance_face_elem(num_face,elem,zone_VEF);
+            }
+
+          norm_v=norm_vit_lp_k(vitesse,face,num_face,zone_VEF,val,is_defilante_face[num_face]);
+          if (l_unif)
+            d_visco = visco;
+          else
+            d_visco = tab_visco(elem,0);
+
+          u_plus_d_plus = norm_v*distb/d_visco;
+          u_plus = calculer_u_plus(face,u_plus_d_plus,stock_erugu[num_face]);
+
+          if(u_plus)
+            {
+              u_star = norm_v/u_plus ;
+              d_plus = u_plus_d_plus/u_plus ;
+            }
+          else
+            {
+              u_star = 0.            ;
+              d_plus = 0.                   ;
+            }
+
+          calculer_k_eps(tab_k(face),tab_eps(face),d_plus,u_star,d_visco,distb);
+        }
+    }
+
+  Cisaillement_paroi_.echange_espace_virtuel();
+  tab_k.echange_espace_virtuel();
+  tab_eps.echange_espace_virtuel();
+  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd tab_k",tab_k);
+  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd tab_eps",tab_eps);
+  Debog::verifier("Paroi_std_hyd_VEF::calculer_hyd Cisaillement_paroi_",Cisaillement_paroi_);
+  return 1;
+}  // fin de calcul_hyd_BiK (K-eps bicephale)
+
 int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 {
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();

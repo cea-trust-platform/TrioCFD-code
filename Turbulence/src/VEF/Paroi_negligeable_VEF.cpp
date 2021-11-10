@@ -121,6 +121,11 @@ int Paroi_negligeable_VEF::init_lois_paroi()
 }
 
 
+int Paroi_negligeable_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  return calculer_hyd(tab_k); // the value in argument is not used anyway
+}
+
 int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
 {
 

@@ -51,6 +51,7 @@ public:
   virtual void set_param(Param& param);
   virtual int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   int calculer_hyd(DoubleTab& , DoubleTab& );
 
   inline const DoubleVect& tab_u_plus() const;
@@ -66,14 +67,18 @@ protected:
   int preparer_calcul_hyd(DoubleTab& );
   double calculer_u_star_sous_couche_visq(double ,double ,double ,int );
   int calculer_sous_couche_visq(DoubleTab& ,int );
+  int calculer_sous_couche_visq_BiK(DoubleTab& ,DoubleTab& ,int );
   int calculer_sous_couche_visq(DoubleTab& ,DoubleTab& , int );
   double calculer_u_star_sous_couche_tampon(double& ,double ,double,double ,int );
   int calculer_sous_couche_tampon(double, DoubleTab& ,double ,double ,int ,int  );
+  int calculer_sous_couche_tampon_BiK(double, DoubleTab& , DoubleTab& ,double ,double ,int ,int  );
   int calculer_sous_couche_tampon(double, DoubleTab& ,DoubleTab& , double ,double ,int ,int );
   double calculer_u_star_sous_couche_log(double ,double ,double ,int );
   int calculer_sous_couche_log(double, DoubleTab& ,double ,int ,int );
+  int calculer_sous_couche_log_BiK(double, DoubleTab& , DoubleTab& ,double ,int ,int );
   int calculer_sous_couche_log(double, DoubleTab& ,DoubleTab& , double ,int ,int );
   double calculer_local(double ,double, DoubleTab&  ,double ,double ,int ,int );
+  double calculer_local_BiK(double ,double, DoubleTab&  , DoubleTab&  ,double ,double ,int ,int );
   double calculer_local(double ,double, DoubleTab&  ,DoubleTab& , double ,double ,int ,int );
 };
 
