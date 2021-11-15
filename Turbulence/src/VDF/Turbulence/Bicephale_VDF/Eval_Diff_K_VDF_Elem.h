@@ -179,19 +179,16 @@ inline Eval_Diff_K_VDF_Elem::Eval_Diff_K_VDF_Elem()
   : Eval_Diff_K_Eps_VDF() {}
 // DEBUT DES DEFINES
 #define CLASSNAME Eval_Diff_K_VDF_Elem
-#define nu_1(i) (db_diffusivite+dv_diffusivite_turbulente(i)/Prdt[0])
-//#define nu_1(i,k) dv_diffusivite_turbulente(i)/Prdt[k]
-// normalement nu2 ne sert pas!!
-//#define nu_2(i,k) 1.;assert(0);Process::exit();
-#define nu_2(i) nu_1(i)
-#define f_heq(d0,i,d1,j) heq=0.5*(nu_1(i) + nu_1(j))/(d1+d0);
+#define nu_1(i,k) dv_diffusivite_turbulente(i)/Prdt[k]
+#define nu_2(i,k)  dv_diffusivite_turbulente(i)
+#define f_heq(d0,i,d1,j,k) heq=0.5*(nu_1(i,k) + nu_1(j,k))/(d1+d0);
 #undef D_AXI
 #undef DEQUIV
 #undef MULTD
-//#define MULTD 1*
+//#define MULTD
 #include <Cal_std.h>
-#include <Scal_corps_base.h>
-#include <Vect_corps_base_inut.h>
+#include <Scal_corps_base_inut.h>
+#include <Vect_corps_base.h>
 #undef CLASSNAME
 #undef f_heq
 #undef nu_1
