@@ -30,7 +30,7 @@
 // .DESCRIPTION
 //    Classe Modele_turbulence_hyd_K_Eps_Bicephale
 //    Cette classe represente le modele de turbulence (k,eps) pour les
-//    equations de Navier-Stokes.
+//    equations de Navier-Stokes ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
 // .SECTION voir aussi
 //    Mod_turb_hyd_base Mod_turb_hyd_ss_maille
 //////////////////////////////////////////////////////////////////////////////
