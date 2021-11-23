@@ -893,7 +893,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                 }
 
               norm_v = sqrt(norm_v);
-              val /= norm_v;
+              if (dabs(norm_v)>=DMINFLOAT) val /= norm_v;
               dist = delta;
 
               // Common to Dirichlet
