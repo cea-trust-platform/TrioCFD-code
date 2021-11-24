@@ -14,54 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Modele_Fonc_Realisable.cpp
+// File:        Ref_Transport_K_ou_Eps_Realisable.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
-// Version:     /main/14
+// Version:     /main/4
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Modele_Fonc_Realisable.h>
-#include <Motcle.h>
-#include <Equation_base.h>
-#include <Discretisation_base.h>
+#include <Ref_Transport_K_ou_Eps_Realisable.h>
+#include <Transport_K_ou_Eps_Realisable.h>
 
-Implemente_deriv(Modele_Fonc_Realisable_base);
-Implemente_instanciable(Modele_Fonc_Realisable,"Modele_Fonc_Realisable",DERIV(Modele_Fonc_Realisable_base));
-
-// XD Modele_Fonc_Realisable Modele_Fonc_Realisable_base Modele_Fonc_Realisable -1 Deriv for instanciation of functions necessary to Realizable K-Epsilon Turbulence Model
-
-//
-// printOn et readOn
-
-Sortie& Modele_Fonc_Realisable::printOn(Sortie& s ) const
-{
-  return  s << valeur().que_suis_je() << finl;
-}
-
-Entree& Modele_Fonc_Realisable::readOn(Entree& is )
-{
-  Motcle typ;
-  is >> typ;
-  Motcle nom1("Modele_");
-
-  nom1 += typ;
-
-  {
-    nom1 += "_";
-    Cerr << nom1 << finl;
-    Nom discr = equation().discretisation().que_suis_je();
-    if (discr=="VEFPreP1B") discr = "VEF";
-    nom1 += discr;
-  }
-  DERIV(Modele_Fonc_Realisable_base)::typer(nom1);
-  valeur().associer_eqn(equation());
-  valeur().associer(equation().zone_dis(), equation().zone_Cl_dis());
-  if ( valeur().ma_seconde_equation.non_nul() )
-    {
-      valeur().associer_eqn_2(seconde_equation());
-      valeur().associer(seconde_equation().zone_dis(), seconde_equation().zone_Cl_dis());
-    }
-  valeur().associer_pb(equation().probleme());
-  is >> valeur();
-  return is;
-}
+Implemente_ref(Transport_K_ou_Eps_Realisable);

@@ -246,6 +246,216 @@ calculer_terme_production_K(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
   return P;
 }
 
+
+DoubleTab& Calcul_Production_K_VEF::
+calculer_terme_production_K_BiK(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
+                                DoubleTab& P,const DoubleTab& K,const DoubleTab& eps,
+                                const DoubleTab& vit,const DoubleTab& visco_turb) const
+{
+  // P est discretise comme K et Eps i.e au centre des faces
+  //
+  // P(elem) = -(2/3)*k(i)*div_U(i) + nu_t(i) * F(u,v,w)
+  //
+  //                          2          2          2
+  //    avec F(u,v,w) = 2[(du/dx)  + (dv/dy)  + (dw/dz) ] +
+  //
+  //                               2               2               2
+  //                  (du/dy+dv/dx) + (du/dz+dw/dx) + (dw/dy+dv/dz)
+  //
+  // Rqs: On se place dans le cadre incompressible donc on neglige
+  //      le terme (2/3)*k(i)*div_U(i)
+
+  P= 0;
+
+  // Calcul de F(u,v,w):
+  int nb_elem_tot = zone_VEF.nb_elem_tot();
+  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const DoubleVect& volumes = zone_VEF.volumes();
+  int premiere_face_int = zone_VEF.premiere_face_int();
+  //  const IntTab& les_Polys = zone.les_elems();
+  int fac=0;
+  int poly1, poly2;
+  int nb_faces_ = zone_VEF.nb_faces();
+  int dimension=Objet_U::dimension;
+  //  const DoubleTab& xp = zone_VEF.xp();    // centre de gravite des elements
+  //  const DoubleTab& xv = zone_VEF.xv();    // centre de gravite des faces
+
+  DoubleTab gradient_elem(nb_elem_tot,dimension,dimension);
+  // (du/dx du/dy dv/dx dv/dy ...) pour un poly
+  gradient_elem=0.;
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////
+  //                        <
+  // calcul des gradients;  < [ Ujp*np/vol(j) ]
+  //                         j
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  ////////////////////////////////////////////////////////////////////////////////
+  //On remplace le calcul precedent par un appel a calcul_duidxj
+  ////////////////////////////////////////////////////////////////////////////////
+
+  int n_bord;
+  Champ_P1NC::calcul_gradient(vit,gradient_elem,zcl_VEF);
+
+  ///////////////////////////////////////////////
+  // On a les gradient_elem par elements
+  ///////////////////////////////////////////////
+
+  double du_dx;
+  double du_dy;
+  double du_dz;
+  double dv_dx;
+  double dv_dy;
+  double dv_dz;
+  double dw_dx;
+  double dw_dy;
+  double dw_dz;
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Calcul des du/dx dv/dy et des derivees croisees sur les faces de chaque elements dans le cas 2D
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Boucle sur les bords pour traiter les faces de bord
+  // en distinguant le cas periodicite
+  for (n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+    {
+      const Cond_lim& la_cl = zcl_VEF.les_conditions_limites(n_bord);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      int ndeb = le_bord.num_premiere_face();
+      int nfin = ndeb + le_bord.nb_faces();
+
+      if (sub_type(Periodique,la_cl.valeur()))
+        {
+          for (fac=ndeb; fac<nfin; fac++)
+            {
+              poly1 = face_voisins(fac,0);
+              poly2 = face_voisins(fac,1);
+              double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
+              double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
+              double visco_face;
+              visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
+              //Formule au dessus + proche du VDF mais si instable remettre ca :
+              //if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
+              //         visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
+
+              du_dx=a*gradient_elem(poly1,0,0) + b*gradient_elem(poly2,0,0);
+              du_dy=a*gradient_elem(poly1,0,1) + b*gradient_elem(poly2,0,1);
+              dv_dx=a*gradient_elem(poly1,1,0) + b*gradient_elem(poly2,1,0);
+              dv_dy=a*gradient_elem(poly1,1,1) + b*gradient_elem(poly2,1,1);
+
+              // Determination du terme de production
+
+              P(fac) = visco_face*( 2*(du_dx*du_dx + dv_dy*dv_dy)
+                                    + ((du_dy+dv_dx)*(du_dy+dv_dx) ) );
+
+              if (dimension == 3)
+                {
+                  du_dz=a*gradient_elem(poly1,0,2) + b*gradient_elem(poly2,0,2);
+                  dv_dz=a*gradient_elem(poly1,1,2) + b*gradient_elem(poly2,1,2);
+                  dw_dx=a*gradient_elem(poly1,2,0) + b*gradient_elem(poly2,2,0);
+                  dw_dy=a*gradient_elem(poly1,2,1) + b*gradient_elem(poly2,2,1);
+                  dw_dz=a*gradient_elem(poly1,2,2) + b*gradient_elem(poly2,2,2);
+
+                  // Determination du terme de production
+
+                  P(fac) = visco_face*(2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
+                                       + (   (du_dy+dv_dx)*(du_dy+dv_dx)
+                                             + (du_dz+dw_dx)*(du_dz+dw_dx)
+                                             + (dw_dy+dv_dz)*(dw_dy+dv_dz) ));
+                }
+            }
+        }
+      /*   else if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()))
+           {
+           for (fac=ndeb; fac<nfin; fac++)
+           {
+           poly1 = face_voisins(fac,0);
+           // double visco_face=0.;
+           //if (K_eps(fac,1)>1.e-10) visco_face=visco_turb(poly1);
+
+           // Determination du terme de production
+           P(fac) = 0.;
+           }
+           } */
+      else
+        {
+          for (fac=ndeb; fac<nfin; fac++)
+            {
+              poly1 = face_voisins(fac,0);
+              double visco_face;
+              visco_face=visco_turb(poly1);
+              // Cerr << "visco_face autres parois " << visco_face << finl;
+
+              du_dx=gradient_elem(poly1,0,0);
+              du_dy=gradient_elem(poly1,0,1);
+              dv_dx=gradient_elem(poly1,1,0);
+              dv_dy=gradient_elem(poly1,1,1);
+
+              // Determination du terme de production
+              P(fac) = visco_face*( 2*(du_dx*du_dx + dv_dy*dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
+
+
+              if (dimension == 3)
+                {
+                  du_dz=gradient_elem(poly1,0,2);
+                  dv_dz=gradient_elem(poly1,1,2);
+                  dw_dx=gradient_elem(poly1,2,0);
+                  dw_dy=gradient_elem(poly1,2,1);
+                  dw_dz=gradient_elem(poly1,2,2);
+
+                  // Determination du terme de production
+
+                  P(fac) = visco_face*(2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
+                                       + ( (du_dy+dv_dx)*(du_dy+dv_dx)
+                                           + (du_dz+dw_dx)*(du_dz+dw_dx)
+                                           + (dw_dy+dv_dz)*(dw_dy+dv_dz)));
+
+                }
+            }
+        }
+    }
+
+  // Traitement des faces internes
+
+  for (fac = premiere_face_int; fac<nb_faces_; fac++)
+    {
+      poly1 = face_voisins(fac,0);
+      poly2 = face_voisins(fac,1);
+      double a=volumes(poly1)/(volumes(poly1)+volumes(poly2));
+      double b=volumes(poly2)/(volumes(poly1)+volumes(poly2));
+      double visco_face;
+      visco_face=0.5*(visco_turb(poly1)+visco_turb(poly2));
+      //Formule au dessus + proche du VDF mais si instable remettre ca :
+      // if (visco_turb(poly1) > 1.e-10 && visco_turb(poly2) > 1.e-10)
+      //                visco_face=1./(1./visco_turb(poly1)+1./visco_turb(poly2));
+
+      du_dx=a*gradient_elem(poly1,0,0) + b*gradient_elem(poly2,0,0);
+      du_dy=a*gradient_elem(poly1,0,1) + b*gradient_elem(poly2,0,1);
+      dv_dx=a*gradient_elem(poly1,1,0) + b*gradient_elem(poly2,1,0);
+      dv_dy=a*gradient_elem(poly1,1,1) + b*gradient_elem(poly2,1,1);
+
+      // Determination du terme de production
+      P(fac) = visco_face*( 2*(du_dx*du_dx + dv_dy*dv_dy) + ((du_dy+dv_dx)*(du_dy+dv_dx)));
+      if (dimension == 3)
+        {
+          du_dz=a*gradient_elem(poly1,0,2) + b*gradient_elem(poly2,0,2);
+          dv_dz=a*gradient_elem(poly1,1,2) + b*gradient_elem(poly2,1,2);
+          dw_dx=a*gradient_elem(poly1,2,0) + b*gradient_elem(poly2,2,0);
+          dw_dy=a*gradient_elem(poly1,2,1) + b*gradient_elem(poly2,2,1);
+          dw_dz=a*gradient_elem(poly1,2,2) + b*gradient_elem(poly2,2,2);
+
+          // Determination du terme de production
+
+          P(fac) = visco_face*(2*( du_dx*du_dx + dv_dy*dv_dy + dw_dz*dw_dz )
+                               + (   (du_dy+dv_dx)*(du_dy+dv_dx)
+                                     + (du_dz+dw_dx)*(du_dz+dw_dx)
+                                     + (dw_dy+dv_dz)*(dw_dy+dv_dz) ));
+        }
+    }
+  return P;
+}
+
 DoubleTab& Calcul_Production_K_VEF::
 calculer_terme_production_K_EASM(const Zone_VEF& zone_VEF,const Zone_Cl_VEF& zcl_VEF,
                                  DoubleTab& P,const DoubleTab& K_eps,
