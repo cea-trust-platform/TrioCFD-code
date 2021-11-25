@@ -1,0 +1,162 @@
+# Test du solveur diffusion_implicite #
+# PARALLEL OK #
+dimension 3
+pb_thermohydraulique_turbulent pb_fluide
+Domaine dom_fluide
+
+# BEGIN MESH #
+Mailler dom_fluide
+{
+    Pave Cavite
+    {
+        Origine 0. 0. 0.
+/*       Nombre_de_Noeuds 150 200 60 */
+      	Nombre_de_Noeuds 150 6 2 
+        Longueurs 1.524  1.6764 0.889
+        Facteurs 0.95 1 1
+    }
+    {
+        bord frontf     Z = 0.                 0. <= X <= 1.524                 0. <= Y <= 1.6764
+        bord wallheat   X = 1.524             0. <= Y <= 1.2192                  0. <= Z <= 0.889
+        bord wall       X = 1.524             1.2191 <= Y <= 1.6764            0. <= Z <= 0.889
+        bord bas        Y = 0.                  0. <= X <= 1.524                0. <= Z <= 0.889
+        bord haut  	Y = 1.6764              0. <= X <= 1.524                0. <= Z <= 0.889
+        bord back       Z = 0.889               0. <= X <= 1.524                  0. <= Y <= 1.6764
+        bord left       X = 0.                  0. <= Y <= 1.6764                 0. <= Z <= 0.889
+    }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_fluide
+{
+    Partition_tool metis { Nb_parts 4 }
+    Larg_joint 2
+    zones_name DOM2
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM2.Zones dom_fluide
+END SCATTER #
+
+VDF dis
+
+# Scheme_euler_explicit sch #
+Runge_Kutta_ordre_3 sch
+
+Read sch
+{
+nb_pas_dt_max 10
+    tinit 0
+    tmax 9
+    tcpumax 18.0
+    dt_min 1e-14
+    dt_max 0.1
+    dt_start dt_fixe 1e-4
+    dt_impr 1.e-8
+    dt_sauv 50
+    seuil_statio 1.e-18
+    diffusion_implicite 1
+    seuil_diffusion_implicite 1.e-10
+    Facsec 0.8
+    periode_sauvegarde_securite_en_heures 5
+}
+
+Fluide_Incompressible fluide
+/* H2o T=297K et P=1e5Pa */
+Read fluide
+{
+    mu Champ_Uniforme 1  0.00089
+    rho Champ_Uniforme 1 997.05
+    lambda Champ_Uniforme 1 0.6071
+    Cp Champ_Uniforme 1 4181.6
+    beta_th Champ_Uniforme 1 0.000257
+}
+
+Champ_Uniforme gravite
+Lire gravite 3  0. -9.81 0
+
+Associate fluide gravite
+Associate pb_fluide dom_fluide
+Associate pb_fluide fluide
+Associate  pb_fluide sch
+Discretize pb_fluide dis
+
+Read pb_fluide
+{
+    Navier_Stokes_Turbulent
+    {
+       solveur_pression petsc Cholesky { }                 
+        parametre_equation parametre_diffusion_implicite { solveur petsc gcp { precond diag { } rtol 1.e-10 impr } }
+        convection { centre }
+        diffusion { }
+        initial_conditions { vitesse champ_uniforme 3 0 0 0 }
+        sources { Boussinesq_temperature { T0 24 verif_boussinesq 0 } }
+        boundary_conditions
+        {
+            frontf    paroi_fixe
+            wallheat  paroi_fixe
+            wall      paroi_fixe
+            bas	      paroi_fixe
+            haut      paroi_fixe
+            back      paroi_fixe
+            left      paroi_fixe
+        }
+        modele_turbulence sous_maille_wale  {
+
+            cw   0.5
+            turbulence_paroi negligeable
+        }
+    }
+
+    Convection_Diffusion_Temperature_Turbulent
+    {
+        Modele_Turbulence prandtl { turbulence_paroi negligeable_scalaire dt_impr_nusselt 10 }
+        diffusion { }
+        convection { amont }
+        boundary_conditions
+        {
+            frontf   Paroi_temperature_imposee champ_front_uniforme 1 24
+            back     Paroi_temperature_imposee champ_front_uniforme 1 24
+            left     Paroi_temperature_imposee champ_front_uniforme 1 24
+            haut     Paroi_temperature_imposee champ_front_uniforme 1 24
+            bas       Paroi_temperature_imposee champ_front_uniforme 1 24
+            wall      Paroi_temperature_imposee champ_front_uniforme 1 24
+            wallheat  Paroi_flux_impose champ_front_uniforme 1 1976.035
+        }
+        initial_conditions { temperature champ_uniforme  1 24      }
+    }
+
+    Post_processing
+    {
+        definition_champs
+        {
+            Moy_temp_fluide Reduction_0D { methode moyenne_ponderee sources { refChamp { Pb_champ pb_fluide temperature } } }
+        }
+
+        Sondes {
+            /* Points au centre pour rep\ufffdrer le d\ufffdbut des stats */
+            sonde_Temp_Paroi  temperature periode 1e-7 segment 100   1.52395  0.  0.45  1.52395  1.22  0.45
+            sonde_yplus_Paroi  y_plus periode 1e-7 segment 100       1.52395  0.  0.45  1.52395  1.22  0.45
+            sonde_muturb_Paroi  viscosite_turbulente periode 1e-7 segment 100 1.52395  0.  0.45  1.52395  1.6764 0.45
+        }
+
+        format lml
+        Champs dt_post 40
+        {
+		vitesse elem
+            temperature elem
+        }
+
+
+    }
+
+    sauvegarde_simple binaire cavity_3.sauv
+# Resume_last_time binaire cavity_2.sauv #
+}
+
+# EcritureLectureSpecial EcrFicPartageBin #
+Solve pb_fluide
+
