@@ -549,7 +549,7 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
       Cout << "NS_PF : pas de temps de diffusion : " << dt_op << finl;
     }
   dt=dt+1./dt_op;
-  dt=min(1./dt,le_schema_en_temps->pas_temps_max());
+  dt=std::min(1./dt,le_schema_en_temps->pas_temps_max());
   if (le_schema_en_temps->limpr())
     {
       Cout << "NS_PF : pas de temps de calcul : " << dt << finl;

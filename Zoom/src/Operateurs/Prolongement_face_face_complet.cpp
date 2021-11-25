@@ -120,7 +120,7 @@ void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
           double tab_depart = tab(i);
           //pour ne pas prolonger 2 fois sur une meme face fine
           //Si la valeur est != 0, on a deja prolonger...
-          if (fabs(tab_depart)<1.e-20) // test bidon si les valeurs prolongees sont petites !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          if (std::fabs(tab_depart)<1.e-20) // test bidon si les valeurs prolongees sont petites !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             {
               // A voir !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               if (dimension == 2)
@@ -151,7 +151,7 @@ void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
                       //                      Cerr<<"det= "<<det<<finl;
 
 
-                      if(fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
+                      if(std::fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
                         {
                           sign = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1))/(som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
                           //                          Cerr<<"sign if = "<< sign << finl;
@@ -162,7 +162,7 @@ void Prolongement_face_face_complet::prolonger(Zone_VF& zone_VFG,
                           //                      Cerr <<"sign else = "<< sign << finl;
                         }
                       ///////////
-                      if ((fabs(det) < epsilon)  &&  ((sign >0 ) && (sign <1)))
+                      if ((std::fabs(det) < epsilon)  &&  ((sign >0 ) && (sign <1)))
                         {
                           //on met directement la valG dans la valF
                           tab(i) = valG(j);

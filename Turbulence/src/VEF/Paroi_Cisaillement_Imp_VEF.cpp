@@ -102,7 +102,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else

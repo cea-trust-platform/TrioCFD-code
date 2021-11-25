@@ -147,7 +147,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
     double visco=-1;
     if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-    visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   */
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
@@ -281,7 +281,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
     double visco;
     if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-    visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
     else {visco=-1;assert(0);exit();}
   */

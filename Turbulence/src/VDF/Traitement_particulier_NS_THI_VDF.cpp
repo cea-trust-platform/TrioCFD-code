@@ -536,7 +536,7 @@ void Traitement_particulier_NS_THI_VDF::calcul_spectre_operateur(int nb_op, Doub
   SFichier fic7 (fichier,ios::app);
 
   for (j=0; j<nb_som_dir; j++)
-    if (dabs(E_ap[j]-E_av[j])>1.e-30)
+    if (std::fabs(E_ap[j]-E_av[j])>1.e-30)
       {
         fic7 << j+1 << "   " << (E_ap[j]-E_av[j])/dt  << finl;
       }

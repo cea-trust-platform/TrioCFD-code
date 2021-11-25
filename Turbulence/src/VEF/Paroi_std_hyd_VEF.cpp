@@ -692,7 +692,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -884,7 +884,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
                   norm += normales(num_face,comp)*normales(num_face,comp);
                 }
               // psc /= norm; // Fixed bug: Arithmetic exception
-              if (dabs(norm)>=DMINFLOAT) psc/=norm;
+              if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
 
               for(int comp=0; comp<dimension; comp++)
                 {
@@ -1080,7 +1080,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -1272,7 +1272,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                   norm += normales(num_face,comp)*normales(num_face,comp);
                 }
               // psc /= norm; // Fixed bug: Arithmetic exception
-              if (dabs(norm)>=DMINFLOAT) psc/=norm;
+              if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
 
               for(int comp=0; comp<dimension; comp++)
                 {
@@ -1281,7 +1281,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
                 }
 
               norm_v = sqrt(norm_v);
-              if (dabs(norm_v)>=DMINFLOAT) val /= norm_v;
+              if (std::fabs(norm_v)>=DMINFLOAT) val /= norm_v;
               dist = delta;
 
               // Common to Dirichlet
@@ -1360,7 +1360,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
       ArrOfInt test;
       remplir_face_keps_imposee_gen( tutu, test, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
       test-=face_keps_imposee_;
-      if (max(test)>0|| min(test)<0)
+      if (std::max(test)>0|| std::min(test)<0)
         {
           const DoubleTab& xv=zone_VEF.xv();
           Cerr<<"TEST "<<finl;
@@ -1489,7 +1489,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -1642,7 +1642,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
                   norm += normales(num_face,comp)*normales(num_face,comp);
                 }
               // psc /= norm; // Fixed bug: Arithmetic exception
-              if (dabs(norm)>=DMINFLOAT) psc/=norm;
+              if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
 
               for(int comp=0; comp<dimension; comp++)
                 {
@@ -1764,7 +1764,7 @@ double Paroi_std_hyd_VEF::calculer_u_plus(const int& ind_face,const double& u_pl
       d_plus  = u_plus_d_plus/ u_plus ;
       u_plus2 = ((1./Kappa)*log(1.+Kappa*d_plus))+A*(1.-exp(-d_plus/11.)-exp(-d_plus/3.)*d_plus/11.); // Equation de Reichardt
       u_plus  = 0.5*(u_plus+u_plus2);
-      r       = dabs(u_plus-u_plus2)/u_plus;
+      r       = std::fabs(u_plus-u_plus2)/u_plus;
     }
 
   seuil_LP(ind_face) = r;

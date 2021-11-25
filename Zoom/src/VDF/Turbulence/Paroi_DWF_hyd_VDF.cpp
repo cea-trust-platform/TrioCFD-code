@@ -429,7 +429,7 @@ int Paroi_DWF_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       // On monitore le maximum de divergence
       // const DoubleTab& div =eqF_typee.div().valeurs();
       //       for (int ii=0;ii<div.size_array();ii++)
-      //         if (dabs(div(ii))>1e-3) Cerr<<" Pb en "<<ii<<" : "<<div(ii)<<finl;
+      //         if (std::fabs(div(ii))>1e-3) Cerr<<" Pb en "<<ii<<" : "<<div(ii)<<finl;
       //      double divU = max_abs(eqF_typee.div().valeurs());
       //      fic << temps_courant << "     " << divU << finl;
       /******************************************************/

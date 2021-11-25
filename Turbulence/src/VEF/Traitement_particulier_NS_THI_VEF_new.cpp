@@ -188,7 +188,7 @@ void Traitement_particulier_NS_THI_VEF_new::calcul_spectre(void)
 
 
   static double temps_dern_post_inst = -100.;
-  if (dabs(temps_crt-temps_dern_post_inst)>=dt_post_inst)
+  if (std::fabs(temps_crt-temps_dern_post_inst)>=dt_post_inst)
     {
 
 

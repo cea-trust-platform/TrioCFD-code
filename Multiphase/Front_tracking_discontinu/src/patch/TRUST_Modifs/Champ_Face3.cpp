@@ -711,7 +711,7 @@ void Champ_Face::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_VDF& 
 
   if (sub_type(Champ_Uniforme,ch_visco_cin_ph1.valeur()) && sub_type(Champ_Uniforme,ch_visco_cin_ph0.valeur()) )
     {
-      visco_ph0 = max(tab_visco_ph0(0,0),DMINFLOAT);
+      visco_ph0 = std::max(tab_visco_ph0(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else

@@ -160,7 +160,7 @@ inline double Source_Con_Phase_field::dWdc_defaut(const double& c) const
 
 inline double Source_Con_Phase_field::kappa_func_c_defaut(const double& c) const
 {
-  return dmax(mult_kappa*kappa*(c+0.5)*(0.5-c),0);
+  return std::max(mult_kappa*kappa*(c+0.5)*(0.5-c),0.);
 }
 
 inline double Source_Con_Phase_field::dWdc_general(const double& c) const
@@ -170,7 +170,7 @@ inline double Source_Con_Phase_field::dWdc_general(const double& c) const
 
 inline double Source_Con_Phase_field::kappa_func_c_general(const double& c) const
 {
-  return dmax(mult_kappa*kappa*kappa_forme_expr_.val(c,0),0);
+  return std::max(mult_kappa*kappa*kappa_forme_expr_.val(c,0),0.);
 }
 
 #endif

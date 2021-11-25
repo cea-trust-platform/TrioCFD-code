@@ -407,22 +407,22 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K,const Champ_Inc& le_cha
       if (Process::je_suis_maitre())
         {
           Cout << finl << "K_Eps evolution (" << (avant?"before":"after") << " law of the wall applies) at time " << le_champ_K.temps() << ":" << finl;
-          Cout << "min(k)=" << k_min;
+          Cout << "std::min(k)=" << k_min;
           if (Process::nproc()==1) Cout << " located at node " << loc_k_min;
           Cout << finl;
-          Cout << "min(eps)=" << eps_min;
+          Cout << "std::min(eps)=" << eps_min;
           if (Process::nproc()==1) Cout << " located at node " << loc_eps_min;
           Cout << finl;
-          Cout << "min(nut)=" << nut_min;
+          Cout << "std::min(nut)=" << nut_min;
           if (Process::nproc()==1) Cout << " located at node " << loc_nut_min;
           Cout << finl;
-          Cout << "max(k)=" << k_max;
+          Cout << "std::max(k)=" << k_max;
           if (Process::nproc()==1) Cout << " located at node " << loc_k_max;
           Cout << finl;
-          Cout << "max(eps)=" << eps_max;
+          Cout << "std::max(eps)=" << eps_max;
           if (Process::nproc()==1) Cout << " located at node " << loc_eps_max;
           Cout << finl;
-          Cout << "max(nut)=" << nut_max;
+          Cout << "std::max(nut)=" << nut_max;
           if (Process::nproc()==1) Cout << " located at node " << loc_nut_max;
           Cout << finl;
         }

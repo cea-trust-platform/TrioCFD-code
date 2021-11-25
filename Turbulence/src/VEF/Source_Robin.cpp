@@ -117,7 +117,7 @@ DoubleTab& Source_Robin::ajouter(DoubleTab& resu) const
 // NB: desormais fait dans src/ThHyd/Turbulence/Traitement_particulier_NS_canal.cpp avec la bonne valeur de h
 //  if (je_suis_maitre())
 //    {
-//      if (dabs(temps-temps_dernier_post)>=dt_post)
+//      if (std::fabs(temps-temps_dernier_post)>=dt_post)
 //        {
 //          SFichier fic1("u_tau_robin_old.dat",ios::app);
 //          fic1 << temps << "\t" << utaumoy/compt << finl;

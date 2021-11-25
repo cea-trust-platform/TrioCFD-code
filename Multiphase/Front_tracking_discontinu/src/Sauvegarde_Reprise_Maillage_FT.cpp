@@ -202,7 +202,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
     const int nb_elements_reels = (zone_vf ? zone->nb_elem() : 0);
     while (i < nb_som_tot)
       {
-        const int n_to_read = min(chunk_size, nb_som_tot - i);
+        const int n_to_read = std::min(chunk_size, nb_som_tot - i);
         tmp.resize(n_to_read, dim);
         tmp2.resize_array(n_to_read);
         tmp3.resize_array(n_to_read);
@@ -306,7 +306,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
     mesh.sommets_.resize(nb_sommets_locaux, dim);
     while (i < nb_som_tot)
       {
-        const int n_to_read = min(chunk_size, nb_som_tot - i);
+        const int n_to_read = std::min(chunk_size, nb_som_tot - i);
         tmp.resize(n_to_read, dim);
         if (fichier)
           {
@@ -350,7 +350,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
       const int nb_faces_bord = (zone ? zone->nb_faces_frontiere() : 0);
       while (i < nb_som_tot)
         {
-          const int n_to_read = min(chunk_size, nb_som_tot - i);
+          const int n_to_read = std::min(chunk_size, nb_som_tot - i);
           tmp.resize_array(n_to_read);
           fichier->get(tmp.addr(), tmp.size_array());
           if (zone_vf)
@@ -416,7 +416,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
     facettes.set_smart_resize(1);
     while (i < nb_faces_tot)
       {
-        const int n_to_read = min(chunk_size, nb_faces_tot - i);
+        const int n_to_read = std::min(chunk_size, nb_faces_tot - i);
         tmp.resize(n_to_read, dim);
         if (fichier)
           fichier->get(tmp.addr(), tmp.size_array());

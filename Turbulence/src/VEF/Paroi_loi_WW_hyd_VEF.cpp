@@ -101,7 +101,7 @@ int Paroi_loi_WW_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -481,9 +481,9 @@ double distance_2D(int fac,int elem,const Zone_VEF& zone, double& signe) //dista
   double y2=y0-y1;
 
   signe = x2*r[0]+y2*r[1];
-  signe /= dabs(signe);
+  signe /= std::fabs(signe);
 
-  return dabs(r[0]*(x1-x0)+r[1]*(y1-y0))/norme_array(r);
+  return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0))/norme_array(r);
 }
 
 double distance_3D(int fac,int elem,const Zone_VEF& zone, double& signe) //distance centre de gravite -> face 2D
@@ -503,7 +503,7 @@ double distance_3D(int fac,int elem,const Zone_VEF& zone, double& signe) //dista
   double y1=xp(elem,1);
   double z1=xp(elem,2);
 
-  return dabs(r[0]*(x1-x0)+r[1]*(y1-y0)+r[2]*(z1-z0))/norme_array(r);
+  return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0)+r[2]*(z1-z0))/norme_array(r);
 }
 
 double distance_2D_som(int fac,int elem,const Zone_VEF& zone ) //distance sommet -> face 2D
@@ -540,7 +540,7 @@ double distance_2D_som(int fac,int elem,const Zone_VEF& zone ) //distance sommet
   double x1=coord(sommet,0);
   double y1=coord(sommet,1);
 
-  return dabs(r[0]*(x1-x0)+r[1]*(y1-y0))/norme_array(r);
+  return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0))/norme_array(r);
 }
 
 double distance_3D_som(int fac,int elem,const Zone_VEF& zone) //distance sommet -> face en 3D
@@ -611,5 +611,5 @@ double distance_3D_som(int fac,int elem,const Zone_VEF& zone) //distance sommet 
   double y1=coord(sommet,1);
   double z1=coord(sommet,2);
 
-  return dabs(r[0]*(x1-x0)+r[1]*(y1-y0)+r[2]*(z1-z0))/norme_array(r);
+  return std::fabs(r[0]*(x1-x0)+r[1]*(y1-y0)+r[2]*(z1-z0))/norme_array(r);
 }

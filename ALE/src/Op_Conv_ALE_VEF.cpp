@@ -828,7 +828,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
           psc=0.;
           for (int i=0; i<dimension; i++)
             psc+=tab_vitesse(num_face,i)*face_normales(num_face,i);
-          tab_fluent(num_face)=dabs(psc);
+          tab_fluent(num_face)=std::fabs(psc);
         }
     }
 
@@ -840,7 +840,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
           psc=0.;
           for (int i=0; i<dimension; i++)
             psc+=(tab_vitesse(num_face,i)-tab_vitesse_faces_ALE(num_face,i))*face_normales(num_face,i);
-          tab_fluent(num_face)=dabs(psc);
+          tab_fluent(num_face)=std::fabs(psc);
         }
     }
 

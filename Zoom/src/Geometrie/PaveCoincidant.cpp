@@ -376,14 +376,14 @@ void PaveCoincidant::determine_bornes()
 
 
           // init
-          dxm = dabs(xmin-les_coord(leselems(0,0),0));
-          dxM = dabs(xmin-les_coord(leselems(0,0),0));
-          dym = dabs(xmin-les_coord(leselems(0,0),1));
-          dyM = dabs(xmin-les_coord(leselems(0,0),1));
+          dxm = std::fabs(xmin-les_coord(leselems(0,0),0));
+          dxM = std::fabs(xmin-les_coord(leselems(0,0),0));
+          dym = std::fabs(xmin-les_coord(leselems(0,0),1));
+          dyM = std::fabs(xmin-les_coord(leselems(0,0),1));
           if (dimension == 3)
             {
-              dzm = dabs(xmin-les_coord(leselems(0,0),2));
-              dzM = dabs(xmin-les_coord(leselems(0,0),2));
+              dzm = std::fabs(xmin-les_coord(leselems(0,0),2));
+              dzM = std::fabs(xmin-les_coord(leselems(0,0),2));
             }
 
           // Determination du nouveau nb d'elements
@@ -397,36 +397,36 @@ void PaveCoincidant::determine_bornes()
 
               if (xg(0) > xmin && xg(0) < xmax && xg(1) < ymax && xg(1) > ymin ) // si le centre de gravite de l element est dans la zone a zoomer ...
                 {
-                  if ( dxm > dabs(xmin-les_coord(leselems(i,0),0)) )
+                  if ( dxm > std::fabs(xmin-les_coord(leselems(i,0),0)) )
                     {
-                      dxm = dabs(xmin-les_coord(leselems(i,0),0));
+                      dxm = std::fabs(xmin-les_coord(leselems(i,0),0));
                       xm = les_coord(leselems(i,0),0);
                     }
-                  if ( dxM > dabs(xmax-les_coord(leselems(i,3),0)) )
+                  if ( dxM > std::fabs(xmax-les_coord(leselems(i,3),0)) )
                     {
-                      dxM = dabs(xmax-les_coord(leselems(i,3),0));
+                      dxM = std::fabs(xmax-les_coord(leselems(i,3),0));
                       xM = les_coord(leselems(i,3),0);
                     }
-                  if ( dym > dabs(ymin-les_coord(leselems(i,0),1)) )
+                  if ( dym > std::fabs(ymin-les_coord(leselems(i,0),1)) )
                     {
-                      dym = dabs(ymin-les_coord(leselems(i,0),1));
+                      dym = std::fabs(ymin-les_coord(leselems(i,0),1));
                       ym = les_coord(leselems(i,0),1);
                     }
-                  if ( dyM > dabs(ymax-les_coord(leselems(i,3),1)) )
+                  if ( dyM > std::fabs(ymax-les_coord(leselems(i,3),1)) )
                     {
-                      dyM = dabs(ymax-les_coord(leselems(i,3),1));
+                      dyM = std::fabs(ymax-les_coord(leselems(i,3),1));
                       yM = les_coord(leselems(i,3),1);
                     }
                   if (dimension == 3)
                     {
-                      if ( dzm > dabs(zmin-les_coord(leselems(i,0),2)) )
+                      if ( dzm > std::fabs(zmin-les_coord(leselems(i,0),2)) )
                         {
-                          dzm = dabs(zmin-les_coord(leselems(i,0),2));
+                          dzm = std::fabs(zmin-les_coord(leselems(i,0),2));
                           zm = les_coord(leselems(i,0),2);
                         }
-                      if ( dzM > dabs(zmax-les_coord(leselems(i,3),2)) )
+                      if ( dzM > std::fabs(zmax-les_coord(leselems(i,3),2)) )
                         {
-                          dzM = dabs(zmax-les_coord(leselems(i,3),2));
+                          dzM = std::fabs(zmax-les_coord(leselems(i,3),2));
                           zM = les_coord(leselems(i,3),2);
                         }
                     }

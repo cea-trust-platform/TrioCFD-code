@@ -149,7 +149,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -469,7 +469,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -680,7 +680,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
       int  methode_calcul_face_bloquee=1;
       remplir_face_keps_imposee( tutu, test,methode_calcul_face_bloquee, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
       test-=face_keps_imposee_;
-      if (max(test)>0|| min(test)<0)
+      if (std::max(test)>0|| std::min(test)<0)
         {
           const DoubleTab& xv=zone_VEF.xv();
           Cerr<<"TEST "<<finl;
@@ -792,7 +792,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   //   face_voisins.ecrit(Process::Journal());
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -1492,7 +1492,7 @@ double Paroi_std_hyd_VEF_old::calculer_u_star_sous_couche_tampon(double& d_plus,
           deriv = (droite-gauche)/(d_plus_max-d_plus_min);
           d_plus = d_plus_min + (u_plus_d_plus - gauche)/deriv;
           valeur = table_hyd.val(d_plus);
-          if(dabs(valeur-u_plus_d_plus) < epsilon)
+          if(std::fabs(valeur-u_plus_d_plus) < epsilon)
             {
               return (d_visco*d_plus)/dist;
             }
@@ -1531,9 +1531,9 @@ int Paroi_std_hyd_VEF_old::calculer_sous_couche_tampon(double u_star, DoubleTab&
   //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
   //
 
-  //   K_eps(face,0) = max( K_eps(face,0) , x*x/sqrt(Cmu) );
+  //   K_eps(face,0) = std::max( K_eps(face,0) , x*x/sqrt(Cmu) );
 
-  //K_eps(face,1) = max( K_eps(face,1) , (K_eps(face,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco );
+  //K_eps(face,1) = std::max( K_eps(face,1) , (K_eps(face,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco );
 
   K_eps(face,0) = x*x/sqrt(Cmu) ;
 
@@ -1612,7 +1612,7 @@ double Paroi_std_hyd_VEF_old::calculer_u_star_sous_couche_log(double norm_vit,do
   int iter = 0;
   u_star1 = 1;
 
-  //  while (( fabs((u_star-u_star1)/u_star1) > seuil ) && (iter++ < itmax ) )
+  //  while (( std::fabs((u_star-u_star1)/u_star1) > seuil ) && (iter++ < itmax ) )
   //     {
   //       u_star=u_star1 ;
   //       //Cout << "iter=" << iter << "\n" ;
@@ -1623,7 +1623,7 @@ double Paroi_std_hyd_VEF_old::calculer_u_star_sous_couche_log(double norm_vit,do
   //     }
   //   u_star=u_star1 ;
 
-  while ((iter++<itmax) && (dabs(u_star1) > seuil))
+  while ((iter++<itmax) && (std::fabs(u_star1) > seuil))
     {
       u_star1 = (c1-u_star*(log(u_star) + c2))/(c1 + u_star);
       u_star = (1+u_star1)*u_star;

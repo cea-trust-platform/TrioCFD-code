@@ -1683,7 +1683,7 @@ void  Remailleur_Collision_FT_Thomas::tester_transport_complet(const Maillage_FT
 
                   surface_totale += surface_dans_elem_voisin;
                   surface_par_element[elem_loc] += surface_dans_elem_voisin;
-                  assert (dabs(surface_dans_elem_voisin-surface_interface_elements_voisins_[elem_voisin])<=1.e-15);
+                  assert (std::fabs(surface_dans_elem_voisin-surface_interface_elements_voisins_[elem_voisin])<=1.e-15);
 
                   fichier_transport << "l'element " << elem_voisin
                                     << " traverse par l'interface de surface : "
@@ -1696,7 +1696,7 @@ void  Remailleur_Collision_FT_Thomas::tester_transport_complet(const Maillage_FT
                                 << " ou " << surface_interface_elements_voisins_[elem]
                                 << finl;
 
-              assert(dabs(surface_totale-surface_interface_elements_voisins_[elem])<=1.e-14);
+              assert(std::fabs(surface_totale-surface_interface_elements_voisins_[elem])<=1.e-14);
 
               //Repartition du volume selon les principes enonces.
               for (int elem_loc=0; elem_loc<nb_voisins_a_distance_plus_petite; elem_loc++)

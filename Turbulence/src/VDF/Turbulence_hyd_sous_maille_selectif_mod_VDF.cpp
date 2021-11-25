@@ -254,17 +254,17 @@ void Turbulence_hyd_sous_maille_selectif_mod_VDF::cutoff()
             dz1 += zone_VDF.dist_elem_period(num_elem,elz1,i)*zone_VDF.dist_elem_period(num_elem,elz1,i);
         }
 
-      if (dabs(dx0)>DMINFLOAT)
+      if (std::fabs(dx0)>DMINFLOAT)
         dx0 = 1./sqrt(dx0);
-      if (dabs(dx1)>DMINFLOAT)
+      if (std::fabs(dx1)>DMINFLOAT)
         dx1 = 1./sqrt(dx1);
-      if (dabs(dy0)>DMINFLOAT)
+      if (std::fabs(dy0)>DMINFLOAT)
         dy0 = 1./sqrt(dy0);
-      if (dabs(dy1)>DMINFLOAT)
+      if (std::fabs(dy1)>DMINFLOAT)
         dy1 = 1./sqrt(dy1);
-      if (dabs(dz0)>DMINFLOAT)
+      if (std::fabs(dz0)>DMINFLOAT)
         dz0 = 1./sqrt(dz0);
-      if (dabs(dz1)>DMINFLOAT)
+      if (std::fabs(dz1)>DMINFLOAT)
         dz1 = 1./sqrt(dz1);
 
 

@@ -24,7 +24,7 @@
     }
 
 #define KASSERT_EQ(x, y, eps)                                                  \
-    if (fabs(x - y) > eps) {                                                   \
+    if (std::fabs(x - y) > eps) {                                                   \
         printf("KASSERT: Expected %f, got %f\n", y, x);                        \
         return false;                                                          \
     }

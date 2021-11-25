@@ -897,7 +897,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_6_points(
   // Evaluate the dynamic model coeficient C
   for (element_number=0; element_number<nb_elem_tot; element_number++)
     {
-      if(dabs(bas(element_number)) < 1.e-12)
+      if(std::fabs(bas(element_number)) < 1.e-12)
         model_coeff[element_number]=0.;
       else
         model_coeff[element_number]=haut[element_number]/bas[element_number];
@@ -1004,7 +1004,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_plans_parallele
   // Evaluate the dynamic model coeficient C
   for (int element_number=0; element_number<nb_elem_tot; element_number++)
     {
-      if(dabs(bas(element_number)) < 1.e-12)
+      if(std::fabs(bas(element_number)) < 1.e-12)
         model_coeff[element_number]=0.;
       else
         model_coeff[element_number]=haut[element_number]/bas[element_number];

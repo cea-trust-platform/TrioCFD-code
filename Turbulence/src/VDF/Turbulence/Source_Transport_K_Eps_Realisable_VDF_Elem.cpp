@@ -289,7 +289,7 @@ DoubleTab& Source_Transport_K_Eps_Realisable_VDF_Elem::ajouter(DoubleTab& resu) 
   double visco=-1;
   if (is_visco_const)
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
 
   const DoubleVect& volumes = zone_VDF.volumes();
@@ -380,7 +380,7 @@ void  Source_Transport_K_Eps_Realisable_VDF_Elem::contribuer_a_avec(const Double
   double visco=-1;
   if (is_visco_const)
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
 
   // on implicite le -eps et le -eps^2/k

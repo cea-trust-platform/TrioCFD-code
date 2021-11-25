@@ -462,7 +462,7 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               /////   distance equivalente a la paroi  //////
               ///////////////////////////////////////////////
 
-              if(dabs(equation_temp.get_Unp1(0,1) - T0)<1e-10)
+              if(std::fabs(equation_temp.get_Unp1(0,1) - T0)<1e-10)
                 equivalent_distance_[n_bord](ind_face) = 1e10;
               else
                 equivalent_distance_[n_bord](ind_face) =  (d_alpha+alpha_t(elem))/d_alpha*(T1-T0)*(equation_temp.get_y(1)-equation_temp.get_y(0))

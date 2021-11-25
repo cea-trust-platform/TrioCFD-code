@@ -519,7 +519,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -840,7 +840,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                           const DoubleTab& tab_champ_beta_t = ch_beta_t->valeurs();
                           if (sub_type(Champ_Uniforme,ch_beta_t.valeur()))
                             {
-                              beta_t = max(tab_champ_beta_t(0,0),DMINFLOAT);
+                              beta_t = std::max(tab_champ_beta_t(0,0),DMINFLOAT);
                             }
                           else
                             {
@@ -1212,7 +1212,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
                           const DoubleTab& tab_champ_beta_t = ch_beta_t->valeurs();
                           if (sub_type(Champ_Uniforme,ch_beta_t.valeur()))
                             {
-                              beta_t = max(tab_champ_beta_t(0,0),DMINFLOAT);
+                              beta_t = std::max(tab_champ_beta_t(0,0),DMINFLOAT);
                             }
                           else
                             {
@@ -1441,7 +1441,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -1770,7 +1770,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
                           const DoubleTab& tab_champ_beta_t = ch_beta_t->valeurs();
                           if (sub_type(Champ_Uniforme,ch_beta_t.valeur()))
                             {
-                              beta_t = max(tab_champ_beta_t(0,0),DMINFLOAT);
+                              beta_t = std::max(tab_champ_beta_t(0,0),DMINFLOAT);
                             }
                           else
                             {
@@ -2142,7 +2142,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
                           const DoubleTab& tab_champ_beta_t = ch_beta_t->valeurs();
                           if (sub_type(Champ_Uniforme,ch_beta_t.valeur()))
                             {
-                              beta_t = max(tab_champ_beta_t(0,0),DMINFLOAT);
+                              beta_t = std::max(tab_champ_beta_t(0,0),DMINFLOAT);
                             }
                           else
                             {

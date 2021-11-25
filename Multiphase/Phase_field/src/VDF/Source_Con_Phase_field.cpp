@@ -616,14 +616,14 @@ inline double mobilite(const double& c)
   return (1.);
   //   return (c*c);
   //   return (0.5+2*c*c);
-  //  return (min(1.,4.*c*c));
+  //  return (std::min(1.,4.*c*c));
   //   return(0.);
   //   const double clim1 = -0.4;
   //   const double clim2 =  0.4;
   //   if (c<=clim1)
-  //     return(min(1.,-(c-clim1)/(0.5+clim1)));
+  //     return(std::min(1.,-(c-clim1)/(0.5+clim1)));
   //   else if (c>=clim2)
-  //     return(min(1.,(c-clim2)/(0.5-clim2)));
+  //     return(std::min(1.,(c-clim2)/(0.5-clim2)));
   //   else return(0.);
 }
 
@@ -1185,7 +1185,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                   dvar2=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
                   if(kappa_moy_==2)
                     {
-                      kappa_interpolee=pow(dabs(kappa_var(elem)*kappa_var(voisin)),0.5);    // Moyenne geometrique
+                      kappa_interpolee=pow(std::fabs(kappa_var(elem)*kappa_var(voisin)),0.5);    // Moyenne geometrique
                     }
                   else if(kappa_moy_==1)
                     {
@@ -1206,7 +1206,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
               if (voisin>old_tri)
                 {
-                  min_tri=min(min_tri,voisin);
+                  min_tri=std::min(min_tri,voisin);
                   if(min_tri==voisin)
                     {
                       dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -1226,7 +1226,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
           // On complete les tableaux avec les valeurs dans les voisins non aux bords du domaine
           if (kappa_moy_==2)
             {
-              kappa_interpolee=pow(dabs(kappa_var(elem)*kappa_var(min_tri)),0.5);    // Moyenne geometrique
+              kappa_interpolee=pow(std::fabs(kappa_var(elem)*kappa_var(min_tri)),0.5);    // Moyenne geometrique
             }
           else if(kappa_moy_==1)
             {
@@ -1307,7 +1307,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
               if (voisin>old_tri)
                 {
-                  min_tri=min(min_tri,voisin);
+                  min_tri=std::min(min_tri,voisin);
                   if(min_tri==voisin)
                     {
                       dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -2076,9 +2076,9 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
           psi = ( positions(elem,ncomp) - dom.coord(som0,ncomp) )
                 / ( dom.coord(som1,ncomp) - dom.coord(som0,ncomp) ) ;
 
-          if (dabs(psi) < 1.e-12)
+          if (std::fabs(psi) < 1.e-12)
             u2_elem(elem,ncomp) = val0 ;
-          else if (dabs(1.-psi) < 1.e-12)
+          else if (std::fabs(1.-psi) < 1.e-12)
             u2_elem(elem,ncomp) = val1 ;
           else
             u2_elem(elem,ncomp) = val0 + psi * (val1-val0) ;
@@ -2170,9 +2170,9 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
           psi = ( positions(elem,ncomp) - dom.coord(som0,ncomp) )
                 / ( dom.coord(som1,ncomp) - dom.coord(som0,ncomp) ) ;
 
-          if (dabs(psi) < 1.e-12)
+          if (std::fabs(psi) < 1.e-12)
             gradc2_elem(elem,ncomp) = val0 ;
-          else if (dabs(1.-psi) < 1.e-12)
+          else if (std::fabs(1.-psi) < 1.e-12)
             gradc2_elem(elem,ncomp) = val1 ;
           else
             gradc2_elem(elem,ncomp) = val0 + psi * (val1-val0) ;

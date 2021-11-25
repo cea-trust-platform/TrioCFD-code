@@ -186,7 +186,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 
 
   Debog::verifier("Eq_rayo_semi_transp_VEF::resoudre irradiance",irradiance_.valeurs());
-  //Cerr<<"irradiance.max() = "<<irradiance_.max()<<", irradiance.min() = "<<irradiance_.min()<<finl;
+  //Cerr<<"irradiance.std::max() = "<<irradiance_.std::max()<<", irradiance.std::min() = "<<irradiance_.std::min()<<finl;
   //Cerr<<"Eq_rayo_semi_transp_VEF::resoudre : Fin"<<finl;
 }
 

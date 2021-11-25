@@ -249,16 +249,16 @@ void Traitement_particulier_NS_CEG::critere_areva()
       epsilon*=0.25;
 
       // Calcul de K
-      double wz = dabs(vorticite(elem,2));
+      double wz = std::fabs(vorticite(elem,2));
       double omega;
       if (epsilon>0)
         omega = k * wz / epsilon;			// Rotation de l'ecoulement
       else
         omega = 0;
-      double lambda = max(-vz,0.) / sqrt(-gz*haspi_); 	// Aspiration de l'ecoulement
+      double lambda = std::max(-vz,0.) / sqrt(-gz*haspi_); 	// Aspiration de l'ecoulement
       double K = C_ * omega * lambda;			// C_ pour une normalisation
 
-      // On cherche le vortex (max(K) et son centre)
+      // On cherche le vortex (std::max(K) et son centre)
       if (K>K_max_local)
         {
           K_max_local=K;
@@ -489,12 +489,12 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
       taille_maxi = (taille_vortex_mailles > taille_maxi ? taille_vortex_mailles : taille_maxi);
       if (points_trouves==nb_dtheta && taille_vortex_mailles>nb_mailles_mini_)
         {
-          //Cerr << printf("-> Critere CEA_JAEA: Vortex de %d mailles en (x,y,z)=(%.4f,%.4f,%.4f) Rayon=%.2f max(critere_Q)=%.2f\n",taille_vortex_mailles,centre_vortex(0),centre_vortex(1),centre_vortex(2),R,critereQ_mp_max);
+          //Cerr << printf("-> Critere CEA_JAEA: Vortex de %d mailles en (x,y,z)=(%.4f,%.4f,%.4f) Rayon=%.2f std::max(critere_Q)=%.2f\n",taille_vortex_mailles,centre_vortex(0),centre_vortex(1),centre_vortex(2),R,critereQ_mp_max);
           if (debug_)
             {
               Cerr << "-> CEA_JAEA criterion : Vortex " << nb_vortex << " de " << taille_vortex_mailles << " elements ";
               Cerr << "in (x,y,z)=(" << centre_vortex(0) << "," << centre_vortex(1) << "," << centre_vortex(2) << ") ";
-              Cerr << "Radius=" << R << " max(critere_Q)=" << critereQ_mp_max;
+              Cerr << "Radius=" << R << " std::max(critere_Q)=" << critereQ_mp_max;
               //int e = mon_equation->zone_dis().zone().chercher_elements(centre_vortex(0),centre_vortex(1),centre_vortex(2));
               //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }

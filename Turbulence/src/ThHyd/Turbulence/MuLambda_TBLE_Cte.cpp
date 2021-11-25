@@ -56,7 +56,7 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
     {
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
-      nu = max(tab_visco(0,0),DMINFLOAT);//visco cinematique supposee cste
+      nu = std::max(tab_visco(0,0),DMINFLOAT);//visco cinematique supposee cste
     }
   else
     {
@@ -68,7 +68,7 @@ void MuLambda_TBLE_Cte::initialiser(const Milieu_base& milieu)
       if (sub_type(Champ_Uniforme,ch_alpha.valeur()))
         {
           const DoubleTab& tab_lambda = ch_alpha->valeurs();
-          alpha = max(tab_lambda(0,0),DMINFLOAT);//lambda supposee cste
+          alpha = std::max(tab_lambda(0,0),DMINFLOAT);//lambda supposee cste
         }
       else
         {

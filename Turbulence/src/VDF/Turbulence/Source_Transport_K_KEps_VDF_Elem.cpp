@@ -219,7 +219,7 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -507,7 +507,7 @@ DoubleTab& Source_Transport_K_KEps_anisotherme_VDF_Elem::ajouter(DoubleTab& resu
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else

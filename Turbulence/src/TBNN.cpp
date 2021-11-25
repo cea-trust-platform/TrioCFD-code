@@ -53,7 +53,7 @@ void TBNN::process_lambda(vector<double> lambda)
     // puissance alpha
     if( _ppNN->get_alpha().size() == nbl )
       for(unsigned int i=0;i<nbl;i++)
-        lc[i] = sgn(lambda[i]) * pow(fabs(lambda[i]),_ppNN->get_alpha()[i]);
+        lc[i] = sgn(lambda[i]) * pow(std::fabs(lambda[i]),_ppNN->get_alpha()[i]);
     else
       for(unsigned int i=0;i<nbl;i++)
         lc[i] = lambda[i];
@@ -75,7 +75,7 @@ void TBNN::process_lambda(vector<double> lambda)
     // puissance alpha
     if( _ppNN->get_alpha().size() == nbl )
       for(unsigned int i=0;i<nbl;i++)
-        lc[i] = sgn(lambda[i]) * pow(fabs(lambda[i]),_ppNN->get_alpha()[i]);
+        lc[i] = sgn(lambda[i]) * pow(std::fabs(lambda[i]),_ppNN->get_alpha()[i]);
     else
       for(unsigned int i=0;i<nbl;i++)
         lc[i] = lambda[i];

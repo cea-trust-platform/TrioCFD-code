@@ -171,17 +171,17 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   if (sub_type(Champ_Uniforme,ch_lambda.valeur()))
     {
       lambda_unif = 1;
-      lambda_f_loc = max(lambda_f(0,0),DMINFLOAT);
+      lambda_f_loc = std::max(lambda_f(0,0),DMINFLOAT);
     }
   if (sub_type(Champ_Uniforme,ch_Cp.valeur()))
     {
       Cp_unif = 1;
-      Cp_f_loc = max(Cp_f(0,0),DMINFLOAT);
+      Cp_f_loc = std::max(Cp_f(0,0),DMINFLOAT);
     }
   if (sub_type(Champ_Uniforme,ch_rho))
     {
       rho_unif = 1;
-      rho_f_loc = max(rho_f(0,0),DMINFLOAT);
+      rho_f_loc = std::max(rho_f(0,0),DMINFLOAT);
     }
 
   if(stats)
@@ -371,7 +371,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
       l_unif = 1;
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   else
     l_unif = 0;
@@ -625,7 +625,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
             }
         }
-      if (dabs(tps-temps_dern_post_inst)>=dt_impr)
+      if (std::fabs(tps-temps_dern_post_inst)>=dt_impr)
         {
           Nom nom_fic = "ODVM_fields_";
           Nom temps = Nom(tps);

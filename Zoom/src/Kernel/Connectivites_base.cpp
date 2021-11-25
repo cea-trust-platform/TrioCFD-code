@@ -142,7 +142,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                 {
                   //On regarde si le centre de gravite fin est un sommet grossier
                   //d'une face grossiere de bord
-                  if(((fabs(cg_face_fine(i,0)-som_gros(faces_som(j,0),0))<PRECISION) && (fabs(cg_face_fine(i,1)-som_gros(faces_som(j,0),1))<PRECISION)) || ((fabs(cg_face_fine(i,0)-som_gros(faces_som(j,1),0))<PRECISION) && (fabs(cg_face_fine(i,1)-som_gros(faces_som(j,1),1))<PRECISION)))
+                  if(((std::fabs(cg_face_fine(i,0)-som_gros(faces_som(j,0),0))<PRECISION) && (std::fabs(cg_face_fine(i,1)-som_gros(faces_som(j,0),1))<PRECISION)) || ((std::fabs(cg_face_fine(i,0)-som_gros(faces_som(j,1),0))<PRECISION) && (std::fabs(cg_face_fine(i,1)-som_gros(faces_som(j,1),1))<PRECISION)))
                     {
                       trouve = 1;
                       connect_faceF_faceG(i)=j;
@@ -160,7 +160,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                     {
                       //On regarde si le centre de gravite fin est un sommet grossier
                       //d'une face grossiere interne
-                      if(((fabs(cg_face_fine(i,0)-som_gros(faces_som(j,0),0))<PRECISION) && (fabs(cg_face_fine(i,1)-som_gros(faces_som(j,0),1))<PRECISION)) || ((fabs(cg_face_fine(i,0)-som_gros(faces_som(j,1),0))<PRECISION) && (fabs(cg_face_fine(i,1)-som_gros(faces_som(j,1),1))<PRECISION)))
+                      if(((std::fabs(cg_face_fine(i,0)-som_gros(faces_som(j,0),0))<PRECISION) && (std::fabs(cg_face_fine(i,1)-som_gros(faces_som(j,0),1))<PRECISION)) || ((std::fabs(cg_face_fine(i,0)-som_gros(faces_som(j,1),0))<PRECISION) && (std::fabs(cg_face_fine(i,1)-som_gros(faces_som(j,1),1))<PRECISION)))
                         {
                           trouve = 1;
                           connect_faceF_faceG(i)=j;
@@ -177,7 +177,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                     {
                       det = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1)) * (som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0)) - (cg_face_fine(i,0)-som_gros(faces_som(j,0),0)) * (som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
 
-                      if(fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
+                      if(std::fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
                         {
                           sign = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1))/(som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
                         }
@@ -186,7 +186,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                           sign = (cg_face_fine(i,0)-som_gros(faces_som(j,0),0))/(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0));
                         }
                       ///////////
-                      if (fabs(det) < epsilon  &&  sign >0  && sign <1)
+                      if (std::fabs(det) < epsilon  &&  sign >0  && sign <1)
                         {
                           connect_faceF_faceG(i)=j;
                           trouve = 1;
@@ -200,7 +200,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                         {
                           det = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1)) * (som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0)) - (cg_face_fine(i,0)-som_gros(faces_som(j,0),0)) * (som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
 
-                          if(fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
+                          if(std::fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
                             {
                               sign = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1))/(som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
                             }
@@ -209,7 +209,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                               sign = (cg_face_fine(i,0)-som_gros(faces_som(j,0),0))/(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0));
                             }
                           ////////
-                          if (fabs(det) < epsilon  &&  sign >0  && sign <1)
+                          if (std::fabs(det) < epsilon  &&  sign >0  && sign <1)
                             {
                               connect_faceF_faceG(i)=j;
                               trouve = 1;
@@ -239,7 +239,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                   // On regarde tout d'abord si le point cherche n'est pas un des
                   // sommets du triangle
 
-                  if( ((fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
+                  if( ((std::fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
                     {
                       connect_faceF_faceG(i)=j;
                       trouve = 1;
@@ -254,10 +254,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 
 
                       //si les z sont les memes :
-                      if((fabs(som_gros(som0,2)-som_gros(som1,2))<PRECISION) && (fabs(som_gros(som1,2)-som_gros(som2,2))<PRECISION))
+                      if((std::fabs(som_gros(som0,2)-som_gros(som1,2))<PRECISION) && (std::fabs(som_gros(som1,2)-som_gros(som2,2))<PRECISION))
                         {
                           //si le centre de gravite est dans le plan forme des 3 sommets
-                          if(fabs(cg_face_fine(i,2)- som_gros(som0,2))<PRECISION)
+                          if(std::fabs(cg_face_fine(i,2)- som_gros(som0,2))<PRECISION)
                             {
                               // Calcul de prod = 01 vectoriel 02 selon z
                               // prod > 0 : sens trigo
@@ -289,11 +289,11 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                         }
                       else
                         //si les y sont les memes :
-                        if((fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
+                        if((std::fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (std::fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
                           {
                             //Cerr<<"les y sont les memes"<<finl;
                             //si le centre de gravite est dans le plan forme des 3 sommets
-                            if(fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
+                            if(std::fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
                               {
                                 // Calcul de prod = 01 vectoriel 02 selon y
                                 // prod > 0 : sens trigo
@@ -325,15 +325,15 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                           }
                         else
                           //si les x sont les memes :
-                          if((fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
+                          if((std::fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (std::fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
                             {
                               //si le centre de gravite est dans le plan forme des 3 sommets
-                              /*                           if(fabs(cg_face_fine(i,0)-0.6) < 0.01)
+                              /*                           if(std::fabs(cg_face_fine(i,0)-0.6) < 0.01)
                                                            {
                                                            Cerr<<"center of gravity "<<cg_face_fine(i,0) <<  finl;
                                                            Cerr<<"som gros "<<som_gros(som0,0) <<  finl;
                                                            }
-                              */                          if(fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
+                              */                          if(std::fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
                                 {
                                   //          Cerr<<"le centre de gravite est dans le plan"<<finl;
                                   // Calcul de prod = 01 vectoriel 02 selon x
@@ -396,7 +396,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 
                           // On regarde tout d'abord si le point cherche n'est pas un des
                           // sommets du triangle
-                          if( ((fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
+                          if( ((std::fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
                             {
                               connect_faceF_faceG(i)=j;
                               trouve = 1;
@@ -411,10 +411,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 
 
                               //si les z sont les memes et si le centre de gravite est dans le plan forme des 3 sommets:
-                              if((fabs(som_gros(som0,2) - som_gros(som1,2))<PRECISION) && (fabs(som_gros(som1,2) - som_gros(som2,2))<PRECISION))
+                              if((std::fabs(som_gros(som0,2) - som_gros(som1,2))<PRECISION) && (std::fabs(som_gros(som1,2) - som_gros(som2,2))<PRECISION))
                                 {
                                   //si le centre de gravite fin est dans le plan forme des 3 sommets
-                                  if(fabs(cg_face_fine(i,2) - som_gros(som0,2))<PRECISION)
+                                  if(std::fabs(cg_face_fine(i,2) - som_gros(som0,2))<PRECISION)
                                     {
                                       //Cerr<<" z sont les memes et centre de gravite fin est dans le plan forme des 3 sommets"<<finl;
                                       // Calcul de prod = 01 vectoriel 02 selon z
@@ -447,10 +447,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                 }
                               else
                                 //si les y sont les memes :
-                                if((fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
+                                if((std::fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (std::fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
                                   {
                                     //si le centre de gravite fin est dans le plan forme des 3 sommets
-                                    if(fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
+                                    if(std::fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
                                       {
                                         //Cerr<<" y sont les memes et centre de gravite fin est dans le plan forme des 3 sommets"<<finl;
                                         // Calcul de prod = 01 vectoriel 02 selon y
@@ -483,10 +483,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                   }
                                 else
                                   //si les x sont les memes :
-                                  if((fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
+                                  if((std::fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (std::fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
                                     {
                                       //si le centre de gravite fin est dans le plan forme des 3 sommets
-                                      if(fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
+                                      if(std::fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
                                         {
                                           //Cerr<<" x sont les memes et centre de gravite fin est dans le plan forme des 3 sommets"<<finl;
                                           // Calcul de prod = 01 vectoriel 02 selon x
@@ -553,7 +553,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 
                       // On regarde tout d'abord si le point cherche n'est pas un des
                       // sommets du triangle
-                      if( ((fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
+                      if( ((std::fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
                         {
                           connect_faceF_faceG(i)=j;
                           trouve = 1;
@@ -569,11 +569,11 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 
 
                           //si les z sont les memes :
-                          if((fabs(som_gros(som0,2) - som_gros(som1,2))<PRECISION) && (fabs(som_gros(som1,2) - som_gros(som2,2))<PRECISION))
+                          if((std::fabs(som_gros(som0,2) - som_gros(som1,2))<PRECISION) && (std::fabs(som_gros(som1,2) - som_gros(som2,2))<PRECISION))
                             {
                               //Cerr<<" z sont les memes"<<finl;
                               //si le centre de gravite est dans le plan forme par les 3 sommets
-                              if(fabs(cg_face_fine(i,2) - som_gros(som0,2))<PRECISION)
+                              if(std::fabs(cg_face_fine(i,2) - som_gros(som0,2))<PRECISION)
                                 {
                                   //Cerr<<" z sont les memes et centre de gravite fin est dans le plan forme des 3 sommets"<<finl;
                                   // Calcul de prod = 01 vectoriel 02 selon z
@@ -606,11 +606,11 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                             }
                           else
                             //si les y sont les memes :
-                            if((fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
+                            if((std::fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (std::fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
                               {
                                 //Cerr<<" y sont les memes"<<finl;
                                 //si le centre de gravite est dans le plan forme par les 3 sommets
-                                if(fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
+                                if(std::fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
                                   {
                                     //Cerr<<" y sont les memes et centre de gravite fin est dans le plan forme des 3 sommets"<<finl;
                                     // Calcul de prod = 01 vectoriel 02 selon y
@@ -643,11 +643,11 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                               }
                             else
                               //si les x sont les memes :
-                              if((fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
+                              if((std::fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (std::fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
                                 {
                                   //Cerr<<" x sont les memes"<<finl;
                                   //si le centre de gravite est dans le plan forme par les 3 sommets
-                                  if(fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
+                                  if(std::fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
                                     {
                                       //Cerr<<" x sont les memes et centre de gravite fin est dans le plan forme des 3 sommets"<<finl;
                                       // Calcul de prod = 01 vectoriel 02 selon x
@@ -705,7 +705,7 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                               //Cerr<<"est-il dans le deuxieme triangle?"<<finl;
                               // On regarde tout d'abord si le point cherche n'est pas un des
                               // sommets du triangle
-                              if( ((fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
+                              if( ((std::fabs(som_gros(som0,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som0,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som0,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som1,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som1,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som1,2)-cg_face_fine(i,2))<PRECISION)) || ((std::fabs(som_gros(som2,0)-cg_face_fine(i,0))<PRECISION) && (std::fabs(som_gros(som2,1)-cg_face_fine(i,1))<PRECISION) && (std::fabs(som_gros(som2,2)-cg_face_fine(i,2))<PRECISION)) )
                                 {
                                   connect_faceF_faceG(i)=j;
                                   trouve = 1;
@@ -720,10 +720,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 
 
                                   //si les z sont les memes :
-                                  if((fabs(som_gros(som0,2) - som_gros(som1,2))<PRECISION) && (fabs(som_gros(som1,2) - som_gros(som2,2))<PRECISION))
+                                  if((std::fabs(som_gros(som0,2) - som_gros(som1,2))<PRECISION) && (std::fabs(som_gros(som1,2) - som_gros(som2,2))<PRECISION))
                                     {
                                       //si le centre de gravite est dans le plan defini par les 3 sommets
-                                      if(fabs(cg_face_fine(i,2) - som_gros(som0,2))<PRECISION)
+                                      if(std::fabs(cg_face_fine(i,2) - som_gros(som0,2))<PRECISION)
                                         {
                                           // Calcul de prod = 01 vectoriel 02 selon z
                                           // prod > 0 : sens trigo
@@ -755,10 +755,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                     }
                                   else
                                     //si les y sont les memes :
-                                    if((fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
+                                    if((std::fabs(som_gros(som0,1) - som_gros(som1,1))<PRECISION) && (std::fabs(som_gros(som1,1) - som_gros(som2,1))<PRECISION))
                                       {
                                         //si le centre de gravite est dans le plan defini par les 3 sommets
-                                        if(fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
+                                        if(std::fabs(cg_face_fine(i,1) - som_gros(som0,1))<PRECISION)
                                           {
                                             // Calcul de prod = 01 vectoriel 02 selon y
                                             // prod > 0 : sens trigo
@@ -790,10 +790,10 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                       }
                                     else
                                       //si les x sont les memes :
-                                      if((fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
+                                      if((std::fabs(som_gros(som0,0) - som_gros(som1,0))<PRECISION) && (std::fabs(som_gros(som1,0) - som_gros(som2,0))<PRECISION))
                                         {
                                           //si le centre de gravite est dans le plan defini par les 3 sommets
-                                          if(fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
+                                          if(std::fabs(cg_face_fine(i,0) - som_gros(som0,0))<PRECISION)
                                             {
                                               // Calcul de prod = 01 vectoriel 02 selon x
                                               // prod > 0 : sens trigo

@@ -283,7 +283,7 @@ DoubleTab& Source_Transport_K_Eps_V2_VDF_Elem::ajouter(DoubleTab& resu) const
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -400,7 +400,7 @@ DoubleTab& Source_Transport_K_Eps_V2_anisotherme_VDF_Elem::ajouter(DoubleTab& re
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -419,13 +419,13 @@ DoubleTab& Source_Transport_K_Eps_V2_anisotherme_VDF_Elem::ajouter(DoubleTab& re
       if ( l_unif == 1)
         {
           if ( K_eps(elem,1)>1.e-10)
-            T = max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(visco/K_eps(elem,1)));
+            T = std::max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(visco/K_eps(elem,1)));
           else T = 1.;
         }
       else
         {
           if ( K_eps(elem,1)>1.e-10)
-            T = max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(tab_visco[elem]/K_eps(elem,1)));
+            T = std::max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(tab_visco[elem]/K_eps(elem,1)));
           else T = 1.;
         }
       resu(elem,0) += (P(elem)-K_eps(elem,1))*volumes(elem)*porosite_vol(elem);
@@ -533,7 +533,7 @@ DoubleTab& Source_Transport_K_Eps_V2_aniso_therm_concen_VDF_Elem::ajouter(Double
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -564,13 +564,13 @@ DoubleTab& Source_Transport_K_Eps_V2_aniso_therm_concen_VDF_Elem::ajouter(Double
       if ( l_unif == 1)
         {
           if ( K_eps(elem,1)>1.e-10)
-            T = max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(visco/K_eps(elem,1)));
+            T = std::max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(visco/K_eps(elem,1)));
           else T = 1.;
         }
       else
         {
           if ( K_eps(elem,1)>1.e-10)
-            T = max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(tab_visco[elem]/K_eps(elem,1)));
+            T = std::max(K_eps(elem,0)/K_eps(elem,1),6*sqrt(tab_visco[elem]/K_eps(elem,1)));
           else T = 1.;
         }
       resu(elem,0) += (P(elem)-K_eps(elem,1))*volumes(elem)*porosite_vol(elem);

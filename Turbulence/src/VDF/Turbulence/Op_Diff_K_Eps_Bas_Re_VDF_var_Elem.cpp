@@ -163,7 +163,7 @@ double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
           h_y = zone_VDF.dist_face(numfa[1],numfa[3],1);
           alpha_local = (alpha(elem)+alpha_t(elem))
                         *(1/(h_x*h_x) + 1/(h_y*h_y));
-          coef = max(coef,alpha_local);
+          coef = std::max(coef,alpha_local);
         }
     }
 
@@ -179,7 +179,7 @@ double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
           h_z = zone_VDF.dist_face(numfa[2],numfa[5],2);
           alpha_local = (alpha(elem)+alpha_t(elem))
                         *(1/(h_x*h_x) + 1/(h_y*h_y) + 1/(h_z*h_z));
-          coef = max(coef,alpha_local);
+          coef = std::max(coef,alpha_local);
         }
     }
 

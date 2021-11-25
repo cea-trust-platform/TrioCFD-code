@@ -989,7 +989,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
           // Clipping de la courbure: si la courbure est superieure a la
           // valeur maxi autorisee, on limite (permet de ne pas plomber le
           // pas de temps s'il y a une singularite geometrique dans le maillage)
-          if (fabs(c) > clipping_courbure_max)
+          if (std::fabs(c) > clipping_courbure_max)
             {
               clip_counter++;
               c = ((c > 0) ? 1. : -1.) * clipping_courbure_max;

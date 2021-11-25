@@ -294,7 +294,7 @@ DoubleTab& Source_Transport_Eps_Realisable_VEF_Face::ajouter(DoubleTab& resu) co
   double visco=-1;
   if (is_visco_const)
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
 
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
@@ -409,7 +409,7 @@ void Source_Transport_Eps_Realisable_VEF_Face::contribuer_a_avec(const DoubleTab
   double visco=-1;
   if (is_visco_const)
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
 
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();

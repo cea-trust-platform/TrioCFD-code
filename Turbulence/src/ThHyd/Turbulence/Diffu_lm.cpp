@@ -152,7 +152,7 @@ double Diffu_lm::calculer_D_local(int ind)
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
-  double visco_cin = max(tab_visco(0,0),DMINFLOAT);//visco cinematique supposee cste
+  double visco_cin = std::max(tab_visco(0,0),DMINFLOAT);//visco cinematique supposee cste
 
   yw = 0.5*(leq.get_y(ind+1)+leq.get_y(ind));
   y_plus = yw*leq.get_utau_old()/visco_cin;

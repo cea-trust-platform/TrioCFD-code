@@ -193,7 +193,7 @@ void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
                           }
                         double temp=dd2(i,j)=sqrt(m);
                         if(temp>1.e-24)
-                          petit = min(petit,temp);
+                          petit = std::min(petit,temp);
                       }
 
                   else
@@ -206,14 +206,14 @@ void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
                           {
                             if (z == la_cl_perio.direction_periodicite())
                               {
-                                m+=carre(dabs(xv(faces_elem_loc[i],z)-xv(fac,z)) - la_cl_perio.distance());
+                                m+=carre(std::fabs(xv(faces_elem_loc[i],z)-xv(fac,z)) - la_cl_perio.distance());
                               }
                             else
                               m+=carre(xv(faces_elem_loc[i],z)-xv(fac,z));
                           }
                         double temp=dd2(i,j)=sqrt(m);
                         if(temp>1.e-24)
-                          petit = min(petit,temp);
+                          petit = std::min(petit,temp);
                       }
                 }
               r(fac) = petit ;
@@ -276,7 +276,7 @@ void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
                     }
                   double temp=d2(i)=sqrt(m);
                   if(temp>1.e-24)
-                    petit = min(petit,temp);
+                    petit = std::min(petit,temp);
                 }
               r(fac) = petit ;
               if(petit<0.)
@@ -342,7 +342,7 @@ void Turbulence_hyd_sous_maille_VEF::calculer_fonction_structure()
                 }
               double temp=dd2(i,j)=sqrt(m);
               if(temp>1.e-24)
-                petit = min(petit,temp);
+                petit = std::min(petit,temp);
             }
         }
 

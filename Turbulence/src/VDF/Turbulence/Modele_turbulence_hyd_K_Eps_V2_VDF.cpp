@@ -155,7 +155,7 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps_V2_VDF::calculer_viscosite_turbulente(do
 
       if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
         {
-          visco = max(tab_visco(0,0),DMINFLOAT);
+          visco = std::max(tab_visco(0,0),DMINFLOAT);
           visco_unif =1;
         }
       else
@@ -250,13 +250,13 @@ DoubleTab&  Modele_turbulence_hyd_K_Eps_V2_VDF::Calculer_Echelle_T(const DoubleT
           double kolmo = six*sqrt(visco/tab_K_Eps(i,1));
           T1 += k_sur_eps;
           T2 += kolmo;
-          T(i) = max(T1,T2);
-          //  T(i) = max(tab_K_Eps(i,0)/tab_K_Eps(i,1),6*sqrt(visco/tab_K_Eps(i,1)));
+          T(i) = std::max(T1,T2);
+          //  T(i) = std::max(tab_K_Eps(i,0)/tab_K_Eps(i,1),6*sqrt(visco/tab_K_Eps(i,1)));
           if (tab_V2(i) > 1.e-10 && S(i) > 1.e-10)
             {
               temp4 = (zerosix*tab_K_Eps(i,0))/(sqrt(six)*Cmu*tab_V2(i)*sqrt(S(i)));
               T3 = temp4;
-              TT =  min(T(i),T3);
+              TT =  std::min(T(i),T3);
               if (T3 < T(i))
                 {
                   compteur_cmu_v2 ++;
@@ -316,12 +316,12 @@ DoubleTab&  Modele_turbulence_hyd_K_Eps_V2_VDF::Calculer_Echelle_L(const DoubleT
       if ( v2(j) > 1.e-10 && S(j) > 1.e-10 )
         {
           temp2 = (k*k*k)/(six*Cmu*Cmu*v2(j)*v2(j)*S(j));
-          T1 = min(temp1,temp2);
-          L(j) = CL*CL*max(T1,temp3);
+          T1 = std::min(temp1,temp2);
+          L(j) = CL*CL*std::max(T1,temp3);
         }
       else
         {
-          L(j) = CL*CL*max(temp3,temp1);
+          L(j) = CL*CL*std::max(temp3,temp1);
         }
 
     }

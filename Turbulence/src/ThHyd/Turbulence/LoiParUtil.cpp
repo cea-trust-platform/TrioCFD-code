@@ -51,7 +51,7 @@ static double fn_uplus_dplus_inv(double uplusdplus)
   double x=(uplusdplus-a)/b;
   double err=uplusdplus-fn_uplus_dplus(x);
   double fx=fn_uplus_dplus(x);
-  while(dabs(err/b)>seuil*x)
+  while(std::fabs(err/b)>seuil*x)
     {
       b=fn_uplus_dplus(x+1)-fx;
       x+=err/b;

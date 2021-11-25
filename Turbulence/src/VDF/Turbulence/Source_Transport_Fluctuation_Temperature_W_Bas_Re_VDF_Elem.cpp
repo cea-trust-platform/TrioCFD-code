@@ -622,7 +622,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   else
     {
@@ -633,7 +633,7 @@ DoubleTab& Source_Transport_Fluctuation_Temperature_W_Bas_Re_VDF_Elem::ajouter(D
 
   if (sub_type(Champ_Uniforme,ch_diffu.valeur()))
     {
-      diffu = max(tab_diffu(0,0),DMINFLOAT);
+      diffu = std::max(tab_diffu(0,0),DMINFLOAT);
     }
   else
     {

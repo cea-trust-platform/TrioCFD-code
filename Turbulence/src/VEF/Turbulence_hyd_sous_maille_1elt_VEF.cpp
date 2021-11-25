@@ -120,7 +120,7 @@ void Turbulence_hyd_sous_maille_1elt_VEF::calculer_fonction_structure()
           dist1 = (xp(num_elem,0)-xv(num_face,0))*(xp(num_elem,0)-xv(num_face,0));
           dist1 += (xp(num_elem,1)-xv(num_face,1))*(xp(num_elem,1)-xv(num_face,1));
           dist1 += (xp(num_elem,2)-xv(num_face,2))*(xp(num_elem,2)-xv(num_face,2));
-          delta_c_calc = min(delta_c_calc,dist1);
+          delta_c_calc = std::min(delta_c_calc,dist1);
         }
       vit_x_elem /= (nfac*1.);
       vit_y_elem /= (nfac*1.);

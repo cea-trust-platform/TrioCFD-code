@@ -632,7 +632,7 @@ void Turbulence_hyd_sous_maille_DSGS_VDF::calculer_model_coefficient(const Doubl
             temp1+=Lij(elem,i,j)*Mij(elem,i,j);
             temp2+=Mij(elem,i,j)*Mij(elem,i,j);
           }
-      if(dabs(temp2) < 1.e-12)
+      if(std::fabs(temp2) < 1.e-12)
         model_coeff[elem]=0.;
       else
         model_coeff[elem]=-0.5*temp1/temp2;

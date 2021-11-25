@@ -627,7 +627,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
 
           for (int jj=0; jj<nb_coord_zone(dim); jj++)
             {
-              if (dabs(coord - coord_zone(jj,dim)) < epsilon)
+              if (std::fabs(coord - coord_zone(jj,dim)) < epsilon)
                 {
                   // cette valeur de "coord" a deja ete trouvee dans la zone
                   trouve_coord = 1;
@@ -675,7 +675,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
         {
           for (int ii=0; ii<nb_coord_zone(dim); ii++)
             {
-              if ( dabs(coord_centre(num_face,dim) - coord_zone(ii,dim)) < epsilon )
+              if ( std::fabs(coord_centre(num_face,dim) - coord_zone(ii,dim)) < epsilon )
                 {
                   index(dim) = ii;
                   break ;
@@ -782,7 +782,7 @@ void Traitement_particulier_NS_THI_VEF::determine_tab_fft_VEF_3D(IntTab& tab_zon
                   double ratio_double =
                     ( coord_zone(ii,dim)-coord_centre(hexa(num_face),dim) ) / pas;
                   int ratio_int = (int)(ratio_double + 0.5);
-                  if ( dabs(ratio_double - ratio_int) < epsilon )
+                  if ( std::fabs(ratio_double - ratio_int) < epsilon )
                     {
                       coord_zone_ok(ii,dim) = 1;
                     }

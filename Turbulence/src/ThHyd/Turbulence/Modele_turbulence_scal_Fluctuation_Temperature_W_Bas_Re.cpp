@@ -129,7 +129,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   else
     {
@@ -140,7 +140,7 @@ Champ_Fonc& Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re::calculer_di
 
   if (sub_type(Champ_Uniforme,ch_diffu.valeur()))
     {
-      diffu = max(tab_diffu(0,0),DMINFLOAT);
+      diffu = std::max(tab_diffu(0,0),DMINFLOAT);
     }
   else
     {

@@ -297,7 +297,7 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1 (const Zone_dis& zone_dis, const Zone
 
       eta = S_(face) * K_Eps(face,0)/( K_Eps(face,1) + BR_EPS );
 
-      C1_[face] = max( 0.43 , eta / ( 5. + eta ) );
+      C1_[face] = std::max( 0.43 , eta / ( 5. + eta ) );
     }
 
 }
@@ -310,7 +310,7 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1_BiK (const Zone_dis& zone_dis, const 
 
       eta = S_(face) * K(face)/( Eps(face) + BR_EPS );
 
-      C1_[face] = max( 0.43 , eta / ( 5. + eta ) );
+      C1_[face] = std::max( 0.43 , eta / ( 5. + eta ) );
     }
 
 }

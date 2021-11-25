@@ -146,7 +146,7 @@ int  Loi_Paroi_Nu_Impose_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
       l_unif = 1;
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   else
     l_unif = 0;

@@ -127,7 +127,7 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1 (const Zone_dis& zone_dis, const Zone
       else
         eta = S_(elem) * K_Eps(elem,0)/K_Eps(elem,1);
 
-      C1_[elem] = max( 0.43 , eta / ( 5. + eta ) );
+      C1_[elem] = std::max( 0.43 , eta / ( 5. + eta ) );
     }
 
 }
@@ -148,7 +148,7 @@ void Modele_Shih_Zhu_Lumley_VDF::Calcul_C1_BiK (const Zone_dis& zone_dis, const 
       else
         eta = S_(elem) * K(elem)/Eps(elem);
 
-      C1_[elem] = max( 0.43 , eta / ( 5. + eta ) );
+      C1_[elem] = std::max( 0.43 , eta / ( 5. + eta ) );
     }
 
 }

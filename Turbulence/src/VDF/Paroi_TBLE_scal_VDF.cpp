@@ -277,7 +277,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
       l_unif = 1;
-      //  visco = max(tab_visco(0,0),DMINFLOAT);
+      //  visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   else
     l_unif = 0;
@@ -419,7 +419,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               // au niveau des parois contacts entre plusieurs problemes (alpha_t pas recuperable !).
               int global_face=num_face;
               int local_face=zone_VDF.front_VF(boundary_index).num_local_face(global_face);
-              if(dabs(eq_temp[compteur_faces_paroi].get_Unp1(0,1) - T0)<1e-10)
+              if(std::fabs(eq_temp[compteur_faces_paroi].get_Unp1(0,1) - T0)<1e-10)
                 equivalent_distance_[boundary_index][local_face] = 1e10;
               else
                 equivalent_distance_[boundary_index][local_face] =  (Temp(elem)-T0)*(eq_temp[compteur_faces_paroi].get_y(1)-eq_temp[compteur_faces_paroi].get_y(0))

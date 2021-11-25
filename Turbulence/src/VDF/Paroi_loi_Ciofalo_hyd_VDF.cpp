@@ -103,7 +103,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
   // l_unif=1 la viscosite est uniforme
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -195,7 +195,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
                   num_elem = zone_VDF.elem_faces(num_face,1);
                 //            double diff =  zone_VDF.xp(num_elem,ori)- zone_VDF.xv(num_face,ori);
                 //              Cerr << "diff=" << diff << finl;
-                //            double signe = diff / dabs(diff);
+                //            double signe = diff / std::fabs(diff);
                 //              Cerr << "signe=" << signe << finl;
 
                 // Calcul de la contrainte tangentielle
@@ -246,7 +246,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k
                   num_elem = zone_VDF.elem_faces(num_face,1);
                 //              double diff =  zone_VDF.xp(num_elem,ori)- zone_VDF.xv(num_face,ori);
                 //              Cerr << "diff=" << diff << finl;
-                //              double signe = diff / dabs(diff);
+                //              double signe = diff / std::fabs(diff);
                 //              Cerr << "signe=" << signe << finl;
 
                 if (ori == 0)
@@ -471,7 +471,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_local(double u_plus_d_plus,double d_visc
           u_star= 2. ;
 
           // processus iteratif de calcul de u*
-          while (( fabs((u_star-u_star1)/u_star1) > seuil ) && (iter < itmax ) )
+          while (( std::fabs((u_star-u_star1)/u_star1) > seuil ) && (iter < itmax ) )
             {
               u_star=u_star1 ;
               iter++ ;
@@ -554,7 +554,7 @@ int Paroi_loi_Ciofalo_hyd_VDF::calculer_u_star_couche_log(double norm_vit,double
   u_star1 = 1.;
   u_star= 2. ;
 
-  while (( fabs((u_star-u_star1)/u_star1) > seuil ) && (iter < itmax ) )
+  while (( std::fabs((u_star-u_star1)/u_star1) > seuil ) && (iter < itmax ) )
     {
       u_star=u_star1 ;
       iter++ ;

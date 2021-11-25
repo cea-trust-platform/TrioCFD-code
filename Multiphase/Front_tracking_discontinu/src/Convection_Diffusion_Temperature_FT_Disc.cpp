@@ -204,7 +204,7 @@ static void extrapoler_champ_elem(const Zone_VF&    zone_vf,
           // fonction distance dans les mailles voisines des mailles traversees
           // par l'interface. On sait que la distance est superieure a delta_x/2
           // A faire: calculer distance_min = delta_x/2
-          //       if (fabs(d) < distance_min) {
+          //       if (std::fabs(d) < distance_min) {
           //         d = (d>0) ? distance_min : -distance_min;
           //         err_count++;
           //       }
@@ -241,7 +241,7 @@ static void extrapoler_champ_elem(const Zone_VF&    zone_vf,
           // centre de ses faces.  Le signe de la distance est determine en fonction de la phase
           // de l'element (la distance etant fausse, son signe a toutes les chances de l'etre
           // aussi).
-          if (fabs(d) < dist_elem_face_min)
+          if (std::fabs(d) < dist_elem_face_min)
             {
               Cerr << "Time = " << temps << "; extrapoler_champ_elem: distance lower than dx/2" << finl;
               Cerr << "        Element position:" << finl;

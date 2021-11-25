@@ -147,7 +147,7 @@ int  Loi_Paroi_Nu_Impose_PolyMAC::calculer_scal(Champ_Fonc_base& diffusivite_tur
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
       l_unif = 1;
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   else
     l_unif = 0;
@@ -226,7 +226,7 @@ int  Loi_Paroi_Nu_Impose_PolyMAC::calculer_scal(Champ_Fonc_base& diffusivite_tur
 
               //norme de la vitesse tangentielle a la face de bord
               double vn = zone.dot(&ve(elem, 0), &nf(num_face, 0)) / fs(num_face),
-                     Ud = sqrt(max(zone.dot(&ve(elem, 0), &ve(elem, 0)) - vn * vn, 0.));
+                     Ud = sqrt(std::max(zone.dot(&ve(elem, 0), &ve(elem, 0)) - vn * vn, 0.));
 
               // Calcul de la position
               for (int i=0; i<dimension; i++)
@@ -239,7 +239,7 @@ int  Loi_Paroi_Nu_Impose_PolyMAC::calculer_scal(Champ_Fonc_base& diffusivite_tur
                 }
               if (!dh_valeur)
                 dh_valeur = sqrt(zone.dot(&xv(num_face, 0), &xv(num_face, 0), &xp(elem, 0), &xp(elem, 0)));
-              double Re=max(Ud*dh_valeur/d_visco, 1e-8);
+              double Re=std::max(Ud*dh_valeur/d_visco, 1e-8);
 
               nusselt.setVar("Re",Re);
               nusselt.setVar("Pr",Pr);

@@ -179,7 +179,7 @@ int Paroi_std_hyd_VDF::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -592,7 +592,7 @@ int Paroi_std_hyd_VDF::calculer_u_star_sous_couche_tampon(double& d_plus,double 
           deriv = (droite-gauche)/(d_plus_max-d_plus_min);
           d_plus = d_plus_min + (u_plus_d_plus - gauche)/deriv;
           valeur = table_hyd.val(d_plus);
-          if(dabs(valeur-u_plus_d_plus) < epsilon)
+          if(std::fabs(valeur-u_plus_d_plus) < epsilon)
             {
               u_star = (d_visco*d_plus)/dist;
               tab_u_star_(face) = u_star;
@@ -632,9 +632,9 @@ int Paroi_std_hyd_VDF::calculer_sous_couche_tampon(DoubleTab& K_eps,double d_vis
   //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
   //
 
-  //   K_eps(elem,0) = max( K_eps(elem,0) , x*x/sqrt(Cmu) );
+  //   K_eps(elem,0) = std::max( K_eps(elem,0) , x*x/sqrt(Cmu) );
 
-  //K_eps(elem,1) = max( K_eps(elem,1) , (K_eps(elem,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco );
+  //K_eps(elem,1) = std::max( K_eps(elem,1) , (K_eps(elem,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco );
 
 
   K_eps(elem,0) = x*x/sqrt(Cmu) ;
@@ -696,7 +696,7 @@ double Paroi_std_hyd_VDF::calculer_u_star_sous_couche_tampon(double u_plus_d_plu
           deriv = (droite-gauche)/(d_plus_max-d_plus_min);
           d_plus = d_plus_min + (u_plus_d_plus - gauche)/deriv;
           valeur = table_hyd.val(d_plus);
-          if(dabs(valeur-u_plus_d_plus) < epsilon)
+          if(std::fabs(valeur-u_plus_d_plus) < epsilon)
             {
               u_star = (d_visco*d_plus)/dist;
               atteint = 1;
@@ -735,12 +735,12 @@ int Paroi_std_hyd_VDF::calculer_u_star_sous_couche_log(double norm_vit,double d_
 
   int iter = 0;
   u_star1 = 1;
-  while ((iter++<itmax) && (dabs(u_star1) > seuil))
+  while ((iter++<itmax) && (std::fabs(u_star1) > seuil))
     {
       u_star1 = (c1-u_star*(log(u_star) + c2))/(c1 + u_star);
       u_star = (1+u_star1)*u_star;
     }
-  if (dabs(u_star1) >= seuil) erreur_non_convergence();
+  if (std::fabs(u_star1) >= seuil) erreur_non_convergence();
   tab_u_star_(face)= u_star;
   return 1;
 }
@@ -922,7 +922,7 @@ void Paroi_std_hyd_VDF::calculer_moyennes_parois(double& U_moy_1,
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -1118,7 +1118,7 @@ int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   int l_unif;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else

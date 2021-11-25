@@ -212,7 +212,7 @@ void Eq_couch_lim::aller_au_temps(double t_final)
         DoubleVect Vect_carre(N_comp);
         DoubleVect Vect_carre_old(N_comp);
         Vect_carre_old=0;
-        IntVect itmax(N_comp);
+        IntVect itstd::max(N_comp);
 
         for(int k=0 ; k < N_comp ; k++)
         {
@@ -234,9 +234,9 @@ void Eq_couch_lim::aller_au_temps(double t_final)
         else
         criterion1=(Vect_carre(k)/(Vect_carre_old(k)+DMINFLOAT));
 
-        criterion=max(criterion,criterion1);
+        criterion=std::max(criterion,criterion1);
 
-        itmax(k)+=it;
+        itstd::max(k)+=it;
         } */
 
       double frottement=0.;
@@ -254,7 +254,7 @@ void Eq_couch_lim::aller_au_temps(double t_final)
 
       utau = sqrt(sqrt(frottement));
 
-      criterion = (dabs(utau_old-utau))/(dabs(utau)+DMINFLOAT);
+      criterion = (std::fabs(utau_old-utau))/(std::fabs(utau)+DMINFLOAT);
 
       utau_old = utau;
 
@@ -282,7 +282,7 @@ void Eq_couch_lim::aller_jusqu_a_convergence(int itmax, double erreur)
   while (ite<itmax && critere>erreur)
     {
       aller_au_temps(1.);
-      critere = (dabs(utau_nm1-utau))/(dabs(utau)+DMINFLOAT);
+      critere = (std::fabs(utau_nm1-utau))/(std::fabs(utau)+DMINFLOAT);
       utau_nm1 = utau;
       ite++;
     }

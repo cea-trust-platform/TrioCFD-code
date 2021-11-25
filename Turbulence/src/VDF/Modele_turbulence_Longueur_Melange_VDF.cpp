@@ -105,7 +105,7 @@ void Modele_turbulence_Longueur_Melange_VDF::associer(
 
 Champ_Fonc& Modele_turbulence_Longueur_Melange_VDF::calculer_viscosite_turbulente()
 {
-  double hauteur = dabs(alt_max-alt_min); // test alt_max>alt_min a faire, plutot que de prendre dabs ??
+  double hauteur = std::fabs(alt_max-alt_min); // test alt_max>alt_min a faire, plutot que de prendre fabs ??
   //Attention, ici "hauteur" est la hauteur reelle du canal (pas la demi-hauteur)
   const double Kappa = 0.415;
   double Cmu = CMU;
@@ -141,8 +141,8 @@ Champ_Fonc& Modele_turbulence_Longueur_Melange_VDF::calculer_viscosite_turbulent
   for(int elem=0 ; elem<nb_elem ; elem ++)
     {
       double y = xp(elem,direction);
-      y = dabs(y-alt_min);
-      if(y>(hauteur/2.)) y=dabs(alt_max-y);
+      y = std::fabs(y-alt_min);
+      if(y>(hauteur/2.)) y=std::fabs(alt_max-y);
 
       visco_turb(elem) = Kappa*Kappa*y*y*(1.-2*y/hauteur)*sqrt(2.*Sij2(elem));
       k(elem)=pow(visco_turb(elem)/(Cmu*y),2);

@@ -138,7 +138,7 @@ void EqnF22VDF::resoudre()
 
   if (sub_type(Champ_Uniforme,ch_viscocin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else

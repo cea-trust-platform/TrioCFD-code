@@ -353,7 +353,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -404,7 +404,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
               dp  = u_plus_d_plus/ up1 ;
               up2 = ((1/Kappa)*log(1+Kappa*dp))+7.8*(1-exp(-dp/11.)-exp(-dp/3.)*dp/11.); // Equation de Reichardt
               up1 = 0.5*(up1+up2);
-              r   = dabs(up1-up2)/up1;
+              r   = std::fabs(up1-up2)/up1;
             }
           if (iter >= itmax) erreur_non_convergence();
 

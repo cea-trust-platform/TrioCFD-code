@@ -169,7 +169,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::ajouter(DoubleTab& resu
     double visco=-1;
     if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-    visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   */
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
@@ -298,7 +298,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(Dou
       double visco=-1;
       if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
       {
-      visco = max(tab_visco(0,0),DMINFLOAT);
+      visco = std::max(tab_visco(0,0),DMINFLOAT);
       }
   */
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
@@ -410,7 +410,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(
   //   DoubleTrav D(nb_elem_tot);
   //   if (sub_type(Champ_Uniforme,ch_visco_dyn.valeur())) {
   //     double visco;
-  //     visco = max(tab_visco(0,0),DMINFLOAT);
+  //     visco = std::max(tab_visco(0,0),DMINFLOAT);
   //     mon_modele_fonc.Calcul_D(D,z,zcl,vit,K_eps_Bas_Re,visco);
   //   } else {
   //     Cerr<<"Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem visco non const non implemente"<<finl;
@@ -420,7 +420,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(
   //   DoubleTrav E(nb_elem);
   //   if (sub_type(Champ_Uniforme,ch_visco_dyn.valeur())) {
   //     double visco;
-  //     visco = max(tab_visco(0,0),DMINFLOAT);
+  //     visco = std::max(tab_visco(0,0),DMINFLOAT);
   //     mon_modele_fonc.Calcul_E(E,z,zcl, vit,K_eps_Bas_Re,visco,visco_turb);
   //   } else {
   //     Cerr<<"Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem visco non const non implemente"<<finl;
@@ -521,7 +521,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajou
     double visco=-1;
     if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
-    visco = max(tab_visco(0,0),DMINFLOAT);
+    visco = std::max(tab_visco(0,0),DMINFLOAT);
     }
   */
   const DoubleVect& volumes = zone_VDF.volumes();
