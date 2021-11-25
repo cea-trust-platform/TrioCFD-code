@@ -97,7 +97,7 @@ visu {
 	description "particle location and fluid velocity (VDF)"
 	
 	vector reverse_way_VDF/reverse_way_VDF.lata dom VITESSE SOM
-	molecule reverse_way_VDF/marqueurs.lata PARTICULES DIAMETRE som 0.01
+	molecule reverse_way_VDF/marqueurs.lata PARTICULES DIAMETRE SOM 0.01
 	normal3D 0. 1. 0.
 	up3D 0. 0. 1. 
 	zoom3D -0.00578704 0.0180124 3.72685
@@ -108,7 +108,7 @@ visu {
 	description "particle location and fluid velocity (VEF)"
 	
 	vector reverse_way_VEF/reverse_way_VEF.lata  dom VITESSE SOM
-	molecule reverse_way_VEF/marqueurs.lata PARTICULES DIAMETRE som 0.01
+	molecule reverse_way_VEF/marqueurs.lata PARTICULES DIAMETRE SOM 0.01
 	#operator_to_all slice2d 0.105 0.105 0.5  0. 1. 0. 
 	normal3D 0. 1. 0.
 	up3D 0. 0. 1. 
@@ -141,7 +141,7 @@ visu {
       
         mesh two_way_VEF/marqueurs.lata PARTICULES
 	pseudocolor_with_opacity two_way_VEF/two_way_VEF.lata dom DENSITE_PARTICULES ELEM 1e-4
-	#blackvector two_way_VEF/marqueurs.lata dom VITESSE som
+	#blackvector two_way_VEF/marqueurs.lata dom VITESSE SOM
 	cycles -16
 	normal3D 0. 1. 0.
 	up3D 0. 0. 1.
