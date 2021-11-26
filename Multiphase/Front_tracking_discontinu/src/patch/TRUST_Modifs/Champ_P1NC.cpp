@@ -1142,6 +1142,13 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& gij, const DoubleTab& nu, 
   //        DoubleTrav part1_int(Objet_U::dimension), part1(Objet_U::dimension,Objet_U::dimension), part2(Objet_U::dimension,Objet_U::dimension);
   DoubleTab P(dimension,dimension);
 
+  // tau_tan could be uninitialized at this point. In such a case,
+  // we can skip the function because the value of gij won't change
+  if (tau_tan.dimension_tot(0)==0)
+    {
+      return gij;
+    }
+
   for ( int num_cl=0; num_cl<nb_cl; num_cl++)
     {
       //Boucle sur les bords
