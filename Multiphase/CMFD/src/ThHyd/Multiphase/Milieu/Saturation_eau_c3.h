@@ -40,7 +40,7 @@ public:
   virtual double  dP_Hls_(const double P) const;
   virtual double     Hvs_(const double P) const;
   virtual double  dP_Hvs_(const double P) const;
-
+  virtual double   sigma_(const double T, const double P) const;
 };
 
 #endif
