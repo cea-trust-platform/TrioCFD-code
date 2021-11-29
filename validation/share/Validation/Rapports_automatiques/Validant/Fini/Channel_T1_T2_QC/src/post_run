@@ -38,10 +38,10 @@ T_bas=`grep paroi_temperature_imposee $fichier.data| grep Bas | awk '{print $5}'
 T_haut=`grep paroi_temperature_imposee $fichier.data| grep Haut | awk '{print $5}'`
 U_bulk=`grep champ_uniforme $fichier.data| grep vitesse | awk '{print $6}'`
 
-coefmu1=`grep mu $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?*? ?g"|awk '{print $1}'`
-coefmu2=`grep mu $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?l^? ?g"|awk '{print $2}'`
-coefla1=`grep lambda $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?*? ?g"|awk '{print $1}'`
-coefla2=`grep lambda $fichier.data|grep Champ_Fonc_fonction|awk '{print $5}'|sed "s?l^? ?g"|awk '{print $2}'`
+coefmu1=`grep mu $fichier.data | grep -i Champ_Fonc_fonction| awk '{print $6}' | sed "s?*? ?g" | awk '{print $1}'`
+coefmu2=`grep mu $fichier.data | grep -i Champ_Fonc_fonction | awk '{print $6}' | sed "s?l^? ?g" | awk '{print $2}'`
+coefla1=`grep lambda $fichier.data | grep -i Champ_Fonc_fonction | awk '{print $6}' | sed "s?*? ?g" | awk '{print $1}'`
+coefla2=`grep lambda $fichier.data | grep -i Champ_Fonc_fonction | awk '{print $6}' | sed "s?l^? ?g" | awk '{print $2}'`
 
 #echo coefmu1=$coefmu1  coefmu2=$coefmu2
 #echo coefla1=$coefla1  coefmu2=$coefla2
@@ -65,22 +65,36 @@ extrait_coupe $fichier SONDE_VITESSE
 
 # Parametre d'adimensionnalisation
 # Calcul du numero des colonnes sur les frontires Bas et Haut dans ls fichier *pb_Contrainte_visqueuse.out et *pb_Diffusion_chaleur.out
-Colonnes=`grep -E "# Bord:|# Boundary:" $fichier\_pb_Contrainte_visqueuse.out | sed "s?# Bord:??g" | sed "s?# Boundary:??g" | sed "s?Total??g"`
+Colonnes=`grep -E "# * Time " $fichier\_pb_Contrainte_visqueuse.out | sed "s?# * Time??g" | sed "s?Total_[X-Z]??g"`
 nb_colonnes=`echo $Colonnes | wc -w`
 i=1
 while (( i <= nb_colonnes ))
 do
 	Col=`echo $Colonnes | awk '{print $'$i'}'`
+	if [ "$Col" == "Bas_Y" ]
+	then
+		Col_PhyQDM_bas=`awk "BEGIN{print $i}"`
+	fi
+	if [ "$Col" == "Haut_Y" ]
+	then
+		Col_PhyQDM_haut=`awk "BEGIN{print $i}"`
 
+	fi
+	((i=i+1))
+done
+Colonnes=`grep -E "# * Time " $fichier\_pb_Diffusion_chaleur.out | sed "s?# * Time??g" | sed "s?Total_[X-Z]??g"`
+nb_colonnes=`echo $Colonnes | wc -w`
+i=1
+while (( i <= nb_colonnes ))
+do
+	Col=`echo $Colonnes | awk '{print $'$i'}'`
 	if [ "$Col" == "Bas" ]
 	then
-		Col_PhyQDM_bas=`awk "BEGIN{print ($i+$jta-1)*3+2}"`
-		Col_PhyNRJ_bas=`awk "BEGIN{print $i+$j+1}"`
+		Col_PhyNRJ_bas=`awk "BEGIN{print $i+1}"`
 	fi
 	if [ "$Col" == "Haut" ]
 	then
-		Col_PhyQDM_haut=`awk "BEGIN{print ($i+$j-1)*3+2}"`
-		Col_PhyNRJ_haut=`awk "BEGIN{print $i+$j+1}"`
+		Col_PhyNRJ_haut=`awk "BEGIN{print $i+1}"`
 
 	fi
 	((i=i+1))
