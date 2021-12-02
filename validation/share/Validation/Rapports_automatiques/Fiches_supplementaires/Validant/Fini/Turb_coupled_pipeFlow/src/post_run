@@ -99,10 +99,10 @@ print dp[Pa] dP.txt
 #####################
 # Nu=6.3+0.0167*Re^0.85*Pr^0.93
 
-debit=`         	awk '{print $3}' test_pb_fluide_Debit.out 		| tail -1`
-flux_chaleur=`  	awk '{print $3}' test_pb_fluide_Convection_chaleur.out 	| tail -1`
-flux_paroi_fluide=`    	awk '{print $4}' test_pb_fluide_Diffusion_chaleur.out 	| tail -1`
-flux_paroi_solide=`    	awk '{print -$4}' test_pb_solide_Diffusion_chaleur.out 	| tail -1`
+debit=`         	awk '{print $4}' test_pb_fluide_Debit.out 		| tail -1`
+flux_chaleur=`  	awk '{print $4}' test_pb_fluide_Convection_chaleur.out 	| tail -1`
+flux_paroi_fluide=`    	awk '{print $5}' test_pb_fluide_Diffusion_chaleur.out 	| tail -1`
+flux_paroi_solide=`    	awk '{print -$5}' test_pb_solide_Diffusion_chaleur.out 	| tail -1`
 echo flux_paroi_fluide=$flux_paroi_fluide
 echo flux_paroi_solide=$flux_paroi_solide
 if [ `awk "BEGIN {if (($flux_paroi_fluide-$flux_paroi_fluide)/$flux_paroi_fluide>0.01) print 1;else print 0}"` = 1 ]
