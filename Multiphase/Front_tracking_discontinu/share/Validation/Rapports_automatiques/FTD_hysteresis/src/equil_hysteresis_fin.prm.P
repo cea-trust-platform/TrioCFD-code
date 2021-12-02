@@ -75,7 +75,7 @@ Chapter {
 		Description "_title_"
 		Cycles -1
 		mesh _fichier_/lata/post.lata INTERFACES
-		pseudocolor _fichier_/lata/post.lata INTERFACES COURBURE som
+		pseudocolor _fichier_/lata/post.lata INTERFACES COURBURE SOM
 		mesh _fichier_/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
