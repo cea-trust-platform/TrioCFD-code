@@ -1100,3 +1100,207 @@ double Paroi_std_hyd_VDF::calculer_u_star(
   exit();
   return 1;
 }
+
+
+int Paroi_std_hyd_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
+{
+
+// keps
+  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
+  const IntVect& orientation = zone_VDF.orientation();
+  const IntTab& face_voisins = zone_VDF.face_voisins();
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
+  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleVect& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  double visco=-1;
+  int l_unif;
+  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+    {
+      visco = max(tab_visco(0,0),DMINFLOAT);
+      l_unif = 1;
+    }
+  else
+    l_unif = 0;
+
+  // preparer_calcul_hyd(tab);
+  if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+    //   on ne doit pas changer tab_visco ici !
+    {
+      Cerr<<" visco <=0 ?"<<finl;
+      exit();
+    }
+  int ndeb,nfin;
+  int elem,ori;
+  double norm_v;
+  double dist;
+  double u_plus_d_plus,d_visco;
+  //double val,val1,val2;
+
+  //****************************************************************
+  // Modifs du 19/10 pour etre coherent avec la diffusion turbulente
+  double signe;
+  //****************************************************************
+
+  // Boucle sur les bords
+
+  for (int n_bord=0; n_bord<zone_VDF.nb_front_Cl(); n_bord++)
+    {
+
+      // pour chaque condition limite on regarde son type
+      // On applique les lois de paroi uniquement
+      // aux voisinages des parois
+
+      const Cond_lim& la_cl = la_zone_Cl_VDF->les_conditions_limites(n_bord);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      ndeb = le_bord.num_premiere_face();
+      nfin = ndeb + le_bord.nb_faces();
+
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur() ))
+        {
+          int isdiri=0;
+          DoubleTab vitesse_imposee_face_bord(le_bord.nb_faces(),dimension);
+          if (sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
+            {
+              isdiri=1;
+              const Dirichlet_paroi_defilante& cl_diri = ref_cast(Dirichlet_paroi_defilante,la_cl.valeur());
+              for (int face=ndeb; face<nfin; face++)
+                for (int k=0; k<dimension; k++)
+                  vitesse_imposee_face_bord(face-ndeb,k) = cl_diri.val_imp(face-ndeb,k);
+            }
+          ArrOfDouble vit_paroi(dimension);
+          ArrOfDouble val(dimension-1);
+
+
+          for (int num_face=ndeb; num_face<nfin; num_face++)
+            {
+              if (isdiri)
+                {
+                  int rang = num_face-ndeb;
+                  for (int k=0; k<dimension; k++)
+                    vit_paroi[k]=vitesse_imposee_face_bord(rang,k);
+                }
+              ori = orientation(num_face);
+              if ( (elem =face_voisins(num_face,0)) != -1)
+                {
+                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  signe = -1.;
+                }
+              else
+                {
+                  elem = face_voisins(num_face,1);
+                  //norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val);
+                  norm_v=norm_vit(vit,elem,ori,zone_VDF,vit_paroi,val);
+                  signe = 1.;
+                }
+              if (axi)
+                dist=zone_VDF.dist_norm_bord_axi(num_face);
+              else
+                dist=zone_VDF.dist_norm_bord(num_face);
+              if (l_unif)
+                d_visco = visco;
+              else
+                d_visco = tab_visco(elem,0);
+
+              u_plus_d_plus = norm_v*dist/d_visco;
+
+              // Calcul de u* et des grandeurs turbulentes:
+
+              double valmin = table_hyd.val(5);
+              double valmax = table_hyd.val(30);
+
+              if (u_plus_d_plus <= valmin)
+                {
+                  calculer_u_star_sous_couche_visq(norm_v,d_visco,dist,num_face);
+
+                  // Dans la sous couche visqueuse: k = eps = 0
+
+                  tab_k(elem)     = 0.;
+                  tab_eps(elem,1) = 0.;
+                }
+
+              else if ((u_plus_d_plus > valmin) && (u_plus_d_plus < valmax))
+                {
+                  double d_plus;
+                  calculer_u_star_sous_couche_tampon(d_plus,u_plus_d_plus,d_visco,dist,num_face);
+
+                  // Calcul des grandeurs turbulentes a partir de d_plus et de u_star
+                  double u_star = tab_u_star(num_face);
+                  double lm_plus = calcul_lm_plus(d_plus);
+                  double  deriv = Fdypar_direct(lm_plus);
+                  double x= lm_plus*u_star*deriv;
+
+                  // Dans la sous couche tampon :
+                  //
+                  //  k = lm+ * u* * derivee(u+d+(d+))/sqrt(Cmu)
+                  //
+                  //              2
+                  //  eps = k * u* * derivee(u+d+(d+))*sqrt(Cmu)/nu
+                  //
+
+
+                  tab_k(elem,0) = x*x/sqrt(Cmu) ;
+                  tab_eps(elem,1) = (tab_k(elem)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+
+                }
+
+              else  // if (u_plus_d_plus >= valmax)
+                {
+                  calculer_u_star_sous_couche_log(norm_v,d_visco,dist,num_face);
+
+                  // K et Eps sont donnes par les formules suivantes:
+                  //
+                  //          2                      3
+                  //    k = u*/sqrt(Cmu)  et eps = u* / Kd
+                  //
+
+                  double u_star= tab_u_star(num_face);
+                  double u_star_carre = u_star*u_star;
+
+                  tab_k(elem)   = u_star_carre/sqrt(Cmu);
+                  tab_eps(elem) = u_star_carre*u_star/(Kappa*dist);
+                }
+
+              // Calcul de la contrainte tangentielle
+
+              double vit_frot = tab_u_star(num_face)*tab_u_star(num_face);
+
+              if (ori == 0)
+                {
+                  Cisaillement_paroi_(num_face,1) = vit_frot*val[0]*signe;
+                  if (dimension==3)
+                    Cisaillement_paroi_(num_face,2) = vit_frot*val[1]*signe;
+                  Cisaillement_paroi_(num_face,0) = 0.;
+                }
+              else if (ori == 1)
+                {
+                  Cisaillement_paroi_(num_face,0) = vit_frot*val[0]*signe;
+                  if (dimension==3)
+                    Cisaillement_paroi_(num_face,2) = vit_frot*val[1]*signe;
+                  Cisaillement_paroi_(num_face,1) = 0.;
+                }
+              else
+                {
+                  Cisaillement_paroi_(num_face,0) = vit_frot*val[0]*signe;
+                  Cisaillement_paroi_(num_face,1) = vit_frot*val[1]*signe;
+                  Cisaillement_paroi_(num_face,2) = 0.;
+                }
+
+              // Calcul de u+ d+
+              calculer_uplus_dplus(uplus_, tab_d_plus_, tab_u_star_, num_face, dist, d_visco, norm_v) ;
+            }
+
+
+        }
+    }
+  Cisaillement_paroi_.echange_espace_virtuel();
+  tab_k.echange_espace_virtuel();
+  tab_eps.echange_espace_virtuel();
+  return 1;
+}
+
+
+
+

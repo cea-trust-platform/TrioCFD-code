@@ -50,6 +50,11 @@ Entree& Paroi_TAU_NUL_VDF::readOn(Entree& s)
 /////////////////////////////////////////////////////////////////////
 
 
+int Paroi_TAU_NUL_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
+{
+  //Cerr << "Dans Paroi_TAU_NUL_VDF::calculer_hyd_BiK ne fait rien!!" << finl;
+  return 1;
+}
 
 int Paroi_TAU_NUL_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 {

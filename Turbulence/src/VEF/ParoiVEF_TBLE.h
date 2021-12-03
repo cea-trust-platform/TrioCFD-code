@@ -53,6 +53,7 @@ public:
   virtual int lire_motcle_non_standard(const Motcle&, Entree&);
   virtual int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   int calculer_hyd(DoubleTab& , DoubleTab&);
   int calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2);
 
@@ -70,6 +71,8 @@ private:
 
   void traitement_keps(DoubleTab& tab_k_eps, int num_face, const IntTab& face_voisins,
                        const IntTab& elem_faces, int nfac, double dist, double d_plus, double d_visco, double u_star);
+  void traitement_keps_BiK(DoubleTab& tab_k, DoubleTab& tab_eps, int num_face, const IntTab& face_voisins,
+                           const IntTab& elem_faces, int nfac, double dist, double d_plus, double d_visco, double u_star);
   virtual int calculer_k_eps(double& , double& , double , double , double , double);
 
   int calculer_stats();

@@ -58,6 +58,7 @@ public:
   virtual void set_param(Param& param);
   virtual int init_lois_paroi();
   virtual int calculer_hyd(DoubleTab& );
+  virtual int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   virtual int calculer_hyd(DoubleTab& , DoubleTab& );
 
   void imprimer_ustar(Sortie& ) const;

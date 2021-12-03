@@ -51,6 +51,7 @@ public:
   virtual int lire_motcle_non_standard(const Motcle&, Entree&);
   virtual int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   int calculer_hyd(DoubleTab& , DoubleTab&);
   int calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2);
 

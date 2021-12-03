@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.4_beta : Enhancements, modifications and corrected bugs since version 1.8.3 :
 --------------------------------------------------------------------------------------------------
+03/12/21 (TrioCFD) Enhancement : Improvement of the k-epsilon Bicephale model
 22/10/21 (TrioCFD) New feature : New model for weakly compressible flow
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.3 : Enhancements, modifications and corrected bugs since version 1.8.2 :

@@ -25,6 +25,7 @@
 #include <Zone_VEF.h>
 #include <Zone_dis.h>
 #include <Zone_Cl_dis.h>
+#include <LoiParoiHybride.h>
 
 Implemente_instanciable(LoiParoiHybride_VEF,"Loi_Paroi_Hybride_VEF",Paroi_hyd_base_VEF);
 
@@ -76,3 +77,12 @@ int LoiParoiHybride_VEF::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
 
   return 1;
 }
+
+int LoiParoiHybride_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  LoiParoiHybride::calculer_hyd_BiK(tab_k, tab_eps, la_zone_VEF.valeur(), la_zone_Cl_VEF.valeur(), Cisaillement_paroi_);
+
+  return 1;
+}
+
+

@@ -58,6 +58,11 @@ void Modele_Fonc_Realisable_base::associer_eqn( const Equation_base& eqn)
   mon_equation = eqn;
 }
 
+void Modele_Fonc_Realisable_base::associer_eqn_2( const Equation_base& eqn)
+{
+  ma_seconde_equation = eqn;
+}
+
 void Modele_Fonc_Realisable_base::discretiser()
 {
   const Discretisation_base& dis=mon_equation->discretisation();

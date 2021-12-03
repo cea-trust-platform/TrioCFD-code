@@ -1,0 +1,23 @@
+cd ../K_EPS_STANDARD_VDF_2D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_BICEPHALE_VDF_2D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_STANDARD_VEF_2D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_BICEPHALE_VEF_2D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_STANDARD_VDF_3D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_BICEPHALE_VDF_3D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_STANDARD_VEF_3D/
+./extrait_coupe.sh > extrait_coupe.out
+
+cd ../K_EPS_BICEPHALE_VEF_3D/
+./extrait_coupe.sh > extrait_coupe.out

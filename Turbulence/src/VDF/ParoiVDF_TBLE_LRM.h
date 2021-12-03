@@ -54,6 +54,7 @@ public:
 
   virtual int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab&);
   int calculer_hyd(DoubleTab& , DoubleTab&);
   int calculer_sous_couche_log(DoubleTab& ,double ,int ,int );
   Eq_couch_lim& get_eq_couch_lim(int i)
