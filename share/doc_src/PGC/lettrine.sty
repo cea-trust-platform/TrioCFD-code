@@ -1,0 +1,282 @@
+%%
+%% This is file `lettrine.sty' v2.1.
+%%
+%% IMPORTANT NOTICE:
+%%
+%% For the copyright see the source file `lettrine.dtx'.
+%%
+%% This file can be distributed and/or modified under the terms
+%% of the LaTeX Project Public License either version 1.3c of this
+%% license or (at your option) any later version.
+%% The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% This work has the LPPL maintenance status "maintained".
+%%
+%% The Current Maintainer of this work is Daniel Flipo.
+%%
+%% Please report errors to: <daniel (dot) flipo (at) free (dot) fr>
+%%
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\ProvidesFile{lettrine.sty}
+             [2018/08/18 v2.1 (Daniel Flipo)]
+\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+\RequirePackage{keyval,minifp}
+\newcounter{DefaultLines}
+\setcounter{DefaultLines}{2}
+\newcounter{DefaultDepth}
+\newcommand*{\DefaultOptionsFile}{\relax}
+\newcommand*{\DefaultLoversize}{0}
+\newcommand*{\DefaultLraise}{0}
+\newcommand*{\DefaultLhang}{0}
+\newdimen\DefaultFindent
+\setlength{\DefaultFindent}{\z@}
+\newdimen\DefaultNindent
+\setlength{\DefaultNindent}{0.5em}
+\newdimen\DefaultSlope
+\setlength{\DefaultSlope}{\z@}
+\newdimen\DiscardVskip
+\setlength{\DiscardVskip}{0.2\p@}
+\newif\ifLettrineImage
+\newif\ifLettrineOnGrid
+\newif\ifLettrineRealHeight
+\newif\ifLettrineVone
+\newif\ifLettrineSelfRef
+\newsavebox{\L@lbox}
+\newsavebox{\L@tbox}
+\newcounter{L@lines}
+\newcounter{L@depth}
+\newdimen\L@Pindent
+\newdimen\L@Findent
+\newdimen\L@Nindent
+\newdimen\L@lraise
+\newdimen\L@first
+\newdimen\L@next
+\newdimen\L@slope
+\newdimen\L@height
+\newdimen\L@novskip
+\newdimen\L@target@ht
+\newdimen\L@target@dp
+\newdimen\L@target@tht
+\newdimen\LettrineWidth
+\newdimen\LettrineHeight
+\newdimen\LettrineDepth
+\newcommand*{\L@file}{}
+\newcommand*{\L@hang}{}
+\newcommand*{\L@oversize}{}
+\newcommand*{\L@raise}{}
+\newcommand*{\L@ante}{}
+\newif\ifL@image
+\newif\ifL@grid
+\newif\ifL@realh
+\newif\ifL@vone
+\newif\ifL@selfref
+\newcommand*{\LettrineTextFont}{\scshape}
+\newcommand*{\LettrineTestString}{EFTZ}
+\newcommand*{\LettrineSecondString}{x}
+\def\Lettrine@height{%
+   \setlength{\L@target@ht}{\ht\L@tbox}%
+   \@tempdima=\baselineskip
+   \setlength{\L@target@dp}{\value{L@lines}\@tempdima}%
+   \ifnum\value{L@lines}>1
+     \addtolength{\L@target@dp}{-\@tempdima}%
+   \else
+     \addtolength{\L@target@ht}{\L@target@dp}%
+     \setlength{\L@target@dp}{0pt}%
+   \fi
+   \setlength{\L@target@tht}{\L@target@ht}%
+   \addtolength{\L@target@tht}{\L@target@dp}%
+   \setlength{\L@height}{\L@target@tht}%
+   \addtolength{\L@height}{\L@oversize\L@target@tht}%
+   \ifL@image
+   \else
+     \ifL@selfref
+       \def\Lettrine@RefString{\l@refstring}%
+     \else
+       \def\Lettrine@RefString{\LettrineTestString}%
+     \fi
+     \sbox{\@tempboxa}{\LettrineFontHook
+                       \fontsize{\L@height}{\L@height}\selectfont
+                       \Lettrine@RefString}%
+     \@tempcnta=\ht\@tempboxa
+     \@tempcntb=\L@height
+     \ifL@vone
+       \multiply\@tempcntb by 100
+       \divide\@tempcnta by 100
+       \divide\@tempcntb by \@tempcnta
+       \advance\@tempcntb by -9999
+       \ifnum\@tempcntb>0
+         \def\L@factor{1.\the\@tempcntb}%
+       \else
+         \def\L@factor{1}%
+       \fi
+     \else
+       \MFPdiv{\the\@tempcntb}{\the\@tempcnta}\L@factor
+     \fi
+   \fi
+}
+\newcommand*{\LettrineFontHook}{}
+\newcommand*{\LettrineFont}{%
+   \LettrineFontHook
+   \fontsize{\L@factor\L@height}{\L@factor\L@height}%
+   \selectfont
+}
+\newcommand*{\LettrineFontEPS}{%
+   \LettrineFontHook\includegraphics[height=\L@height]%
+}
+\define@key{L}{lines}{\setcounter{L@lines}{#1}}
+\define@key{L}{depth}{\setcounter{L@depth}{#1}}
+\define@key{L}{lhang}{\renewcommand*{\L@hang}{#1}}
+\define@key{L}{loversize}{\renewcommand*{\L@oversize}{#1}}
+\define@key{L}{lraise}{\renewcommand*{\L@raise}{#1}}
+\define@key{L}{ante}{\renewcommand*{\L@ante}{#1}}
+\define@key{L}{findent}{\setlength{\L@Findent}{#1}}
+\define@key{L}{nindent}{\setlength{\L@Nindent}{#1}}
+\define@key{L}{slope}{\setlength{\L@slope}{#1}}
+\define@key{L}{image}[true]{\csname L@image#1\endcsname}
+\define@key{L}{grid}[true]{\csname L@grid#1\endcsname}
+\define@key{L}{realheight}[true]{\csname L@realh#1\endcsname}
+\define@key{L}{novskip}{\setlength{\L@novskip}{#1}}
+\define@key{L}{refstring}[\l@initial]{\L@selfreftrue
+                                      \def\l@refstring{#1}}
+\define@key{L}{Vone}[true]{\csname L@vone#1\endcsname}
+\newcommand*{\LettrineOptionsFor}[2]{\@namedef{l@#1-keys}{#2}}
+\def\lettrine{\@ifnextchar[\@lettrine{\@lettrine[]}}
+\def\@lettrine[#1]#2#3{%
+  \def\l@initial{#2}\let\l@refstring\l@initial
+  \setcounter{L@lines}{\value{DefaultLines}}%
+  \setcounter{L@depth}{\value{DefaultDepth}}%
+  \renewcommand*{\L@hang}{\DefaultLhang}%
+  \renewcommand*{\L@oversize}{\DefaultLoversize}%
+  \renewcommand*{\L@raise}{\DefaultLraise}%
+  \renewcommand*{\L@ante}{}%
+  \setlength{\L@Findent}{\DefaultFindent}%
+  \setlength{\L@Nindent}{\DefaultNindent}%
+  \setlength{\L@slope}{\DefaultSlope}%
+  \setlength{\L@novskip}{\DiscardVskip}%
+  \ifLettrineImage\L@imagetrue\else\L@imagefalse\fi
+  \ifLettrineOnGrid\L@gridtrue\else\L@gridfalse\fi
+  \ifLettrineRealHeight\L@realhtrue\else\L@realhfalse\fi
+  \ifLettrineVone\L@vonetrue\else\L@vonefalse\fi
+  \ifLettrineSelfRef\L@selfreftrue\else\L@selfreffalse\fi
+  \setkeys{L}{#1}%
+  \sbox{\L@tbox}{\LettrineTextFont{\LettrineSecondString}}%
+  \ifL@realh
+    \def\@tempa{#3}
+    \ifx\@tempa\@empty
+      \PackageWarning{lettrine.sty}%
+        {Empty second argument,\MessageBreak
+         ignoring option `realheight';}%
+    \else
+      \sbox{\L@tbox}{\LettrineTextFont{#3}}%
+    \fi
+  \fi
+  \if\DefaultOptionsFile\relax
+  \else
+    \begingroup
+    \InputIfFileExists{\DefaultOptionsFile}%
+      {}%
+      {\PackageWarning{lettrine.sty}%
+         {File \DefaultOptionsFile\space not found}%
+      }%
+    \def\color##1##{\l@color{##1}}%
+    \let\l@color\@gobbletwo
+    \def\textcolor##1##{\l@textcolor{##1}}%
+    \def\l@textcolor##1##2##3{##3}%
+    \expandafter\ifx\csname l@#2-keys\endcsname\relax
+                  \gdef\l@LOKeys{}%
+                \else
+                  \xdef\l@LOKeys{\csname l@#2-keys\endcsname}%
+                \fi
+    \endgroup
+    \def\KV@prefix{KV@L@}%
+    \let\@tempc\relax
+    \expandafter\KV@do\l@LOKeys,\relax,
+    \Lettrine@height
+    \sbox{\L@lbox}{\LettrineFont #2}%
+    \setlength{\LettrineWidth}{\wd\L@lbox}%
+    \def\KV@prefix{KV@L@}%
+    \let\@tempc\relax
+    \expandafter\KV@do\l@LOKeys,\relax,
+    \setkeys{L}{#1}%
+  \fi
+  \Lettrine@height
+  \ifL@image
+    \sbox{\L@lbox}{\LettrineFontEPS{#2}}%
+  \else
+    \sbox{\L@lbox}{\LettrineFont #2}%
+  \fi
+  \setlength{\LettrineWidth}{\wd\L@lbox}%
+  \setlength{\LettrineHeight}{\ht\L@lbox}%
+  \setlength{\LettrineDepth}{\dp\L@lbox}%
+  \begingroup
+  \def\IeC##1{##1}%
+  \@tempdima=\L@oversize pt\relax
+  \PackageInfo{lettrine.sty}%
+    {Targeted height = \the\L@target@tht\MessageBreak
+     (no accent, loversize=0),\MessageBreak
+     Lettrine height = \the\LettrineHeight\space (#2)%
+     \ifdim\@tempdima=\z@\else\space loversize=\L@oversize\fi;%
+     \MessageBreak reported}%
+  \endgroup
+  \sbox{\L@tbox}{\LettrineTextFont{#3}}%
+  \setlength{\L@first}{\LettrineHeight}%
+  \setlength{\L@lraise}{\L@raise\L@target@tht}%
+  \addtolength{\L@first}{\L@lraise}%
+  \ifnum\value{L@lines}=1
+    \addtolength{\L@first}{-\ht\L@tbox}%
+  \else
+    \addtolength{\L@first}{-\L@target@tht}%
+    \addtolength{\L@lraise}{-\L@target@dp}%
+  \fi
+  \par
+  \ifdim\L@first>\L@novskip
+    \ifL@grid
+      \@tempdima=\baselineskip
+      \@tempdimb=\@tempdima
+      \advance\@tempdimb by \L@novskip
+      \@tempcnta=1
+      \loop\ifdim\L@first>\@tempdimb
+         \advance\@tempcnta by 1
+         \advance\L@first by -\@tempdima
+      \repeat
+      \L@first=\@tempcnta\baselineskip
+    \fi
+    \vskip\L@first
+  \fi
+  \setlength{\L@Pindent}{\wd\L@lbox}%
+  \addtolength{\L@Pindent}{-\L@hang\wd\L@lbox}%
+  \settowidth{\L@first}{\L@ante}%
+  \addtolength{\L@Pindent}{\L@first}%
+  \addtolength{\L@Pindent}{\L@Findent}%
+  \setlength{\L@first}{\linewidth}%
+  \addtolength{\L@first}{-\L@Pindent}%
+  \addtolength{\L@Nindent}{\L@Pindent}%
+  \setlength{\L@next}{\linewidth}%
+  \addtolength{\L@next}{-\L@Nindent}%
+  \addtolength{\L@Pindent}{\rightmargin}%
+  \addtolength{\L@Nindent}{\rightmargin}%
+  \addtocounter{L@lines}{1}%
+  \addtocounter{L@lines}{\value{L@depth}}%
+  \def\L@parshape{\c@L@lines \the\L@Pindent \the\L@first}%
+  \@tempcnta=\tw@
+  \@whilenum \@tempcnta<\c@L@lines\do{%
+     \edef\L@parshape{\L@parshape \the\L@Nindent \the\L@next}%
+     \addtolength{\L@Nindent}{\L@slope}%
+     \addtolength{\L@next}{-\L@slope}%
+     \advance\@tempcnta\@ne}%
+  \edef\L@parshape{\L@parshape \rightmargin \the\linewidth}%
+  \noindent
+  \parshape=\L@parshape\relax
+  \smash{\llap{\mbox{\L@ante}\raisebox{\L@lraise}{\usebox{\L@lbox}}%
+         \hskip \the\L@Findent}}%
+  \usebox{\L@tbox}%
+}
+\InputIfFileExists{lettrine.cfg}
+   {\typeout{Loading lettrine.cfg}}
+   {\typeout{lettrine.cfg not found, using default values}}
+\endinput
+%%
+%% End of file `lettrine.sty'.

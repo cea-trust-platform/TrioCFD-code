@@ -1,0 +1,6 @@
+#generation PGC format document utilisateur
+pdflatex PGC_TrioCFD.tex
+bibtex PGC_TrioCFD
+pdflatex PGC_TrioCFD.tex
+pdflatex PGC_TrioCFD.tex
+mv PGC_TrioCFD.pdf ../../doc/TrioCFD_PGC.pdf
