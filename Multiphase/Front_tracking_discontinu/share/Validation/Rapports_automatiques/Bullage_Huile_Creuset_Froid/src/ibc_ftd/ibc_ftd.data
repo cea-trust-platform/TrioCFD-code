@@ -27,7 +27,7 @@ Mailler DOM
 	}
 }
 
-# End MESH #
+# END MESH #
 # Calcul parallele pour 2 processeurs # 
 # BEGIN PARTITION 
 Partition DOM
@@ -37,11 +37,11 @@ Partition DOM
    Nom_Zones DOM
 }
 End
-End PARTITION #
+END PARTITION #
 
 # BEGIN SCATTER 
 Scatter DOM.Zones DOM
-End SCATTER #
+END SCATTER #
 
 export domaine ANCRE 
 

@@ -1,5 +1,7 @@
 # Reacteur avec agitateur CFD et bullage #
-# PARALLEL RUNS #
+# PARALLEL NOT #
+# VALGRIND NOT #
+
 dimension 3
 Probleme_FT_Disc_gen pb
 
@@ -25,7 +27,7 @@ Mailler DOM
 	}
 }
 
-# End MAILLAGE #
+# END MESH #
 # Calcul parallele pour 2 processeurs # 
 # BEGIN PARTITION 
 Partition DOM
@@ -35,11 +37,11 @@ Partition DOM
    Nom_Zones DOM
 }
 End
-End DECOUPAGE #
+END PARTITION #
 
 # BEGIN SCATTER 
 Scatter DOM.Zones DOM
-End LECTURE #
+END SCATTER #
 
 export domaine ANCRE 
 
