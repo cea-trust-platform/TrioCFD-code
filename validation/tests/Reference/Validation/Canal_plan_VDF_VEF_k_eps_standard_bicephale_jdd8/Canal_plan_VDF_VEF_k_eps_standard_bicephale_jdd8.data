@@ -1,0 +1,146 @@
+Dimension 3
+Pb_hydraulique_turbulent pb
+
+domaine dom1
+mailler dom1
+{
+	pave bloc
+	{
+		origine 0 0 0
+		longueurs 0.1 0.156 0.1
+		nombre_de_noeuds 4 2 4
+		}
+		{
+		bord periox	X = 0		0 <= Y <= 0.156	0 <= Z <= 0.1
+		bord periox	X = 0.1		0 <= Y <= 0.156	0 <= Z <= 0.1
+		bord wall	Y = 0		0 <= X <= 0.1	0 <= Z <= 0.1
+		bord perioz	Z = 0		0 <= X <= 0.1	0 <= Y <= 0.156
+		bord perioz	Z = 0.1		0 <= X <= 0.1	0 <= Y <= 0.156
+		}
+}
+
+tetraedriser dom1
+
+domaine dom2
+mailler dom2
+{
+	pave bloc
+	{
+		origine 0 0.156 0
+		longueurs 0.1 .844 0.1
+		nombre_de_noeuds 4 44 4
+		}
+		{
+		bord periox	X = 0		0.156 <= Y <= 1	0 <= Z <= 0.1
+		bord periox	X = 0.1		0.156 <= Y <= 1	0 <= Z <= 0.1
+		bord sym	Y = 1		0 <= X <= 0.1	0 <= Z <= 0.1
+		bord perioz	Z = 0		0 <= X <= 0.1	0.156 <= Y <= 1
+		bord perioz	Z = 0.1		0 <= X <= 0.1	0.156 <= Y <= 1
+		}
+}
+
+tetraedriser dom2
+
+domaine dom
+mailler dom { domain dom1 , domain dom2 }
+
+corriger_frontiere_periodique { domaine dom bord periox }
+corriger_frontiere_periodique { domaine dom bord perioz }
+
+VEFPreP1b dis
+
+Schema_Euler_implicite sch
+Lire sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	dt_impr 1e+6
+	facsec 20
+	facsec_max 20
+	solveur implicite { solveur gmres { diag nb_it_max 3 seuil 1e-12 impr } }
+	seuil_statio 1e-30
+	tmax 1e5
+}
+
+Fluide_incompressible fluide
+Lire fluide
+{
+	mu champ_uniforme 1 0.001
+ 	rho champ_uniforme 1 1000
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+	{
+		Solveur_pression	PETSC Cholesky { }
+		Convection		{ amont }
+		Diffusion		{ }
+		Conditions_initiales	{ vitesse champ_uniforme 3 0.01 0 0 }
+		Conditions_limites	{
+					periox	periodique
+					perioz	periodique
+					wall	paroi_fixe
+					sym	symetrie
+					}
+		Modele_turbulence k_epsilon_bicephale
+					{
+					transport_k
+					{
+						convection		{ amont }
+						diffusion		{ }
+						conditions_initiales 	{ k champ_uniforme 1 1e-6 }
+						conditions_limites	{
+									periox	periodique
+									perioz	periodique
+									wall	paroi
+									sym	symetrie
+									}
+						sources			{ source_transport_k { } }
+					}
+					transport_epsilon
+					{
+						convection		{ amont }
+						diffusion		{ }
+						conditions_initiales 	{ eps champ_uniforme 1 1e-8 }
+						conditions_limites	{
+									periox	periodique
+									perioz	periodique
+									wall	paroi
+									sym	symetrie
+									}
+						sources			{ source_transport_eps { C1_eps 1.44 C2_eps 1.92 } }
+					}
+					Prandtl_K 1
+					Prandtl_Eps 1.2
+					turbulence_paroi loi_standard_hydr dt_impr_ustar_mean_only { dt_impr 1e-6 }
+					}
+		Sources			{ canal_perio { bord periox } }
+	}
+
+	Postraitement
+	{
+		sondes			{
+					vitesse		vitesse		periode 1e-6 segment 44 0 0.156 0 0 1 0
+					tke		k		periode 1e-6 position_like vitesse
+					epsilon		eps		periode 1e-6 position_like vitesse
+					}
+		format lml
+		champs binaire dt_post 1e6
+					{
+					vitesse elem
+					}		
+	}
+}
+
+EcritureLectureSpecial 0
+
+Resoudre pb
+
+Fin
