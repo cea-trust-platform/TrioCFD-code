@@ -37,8 +37,7 @@
 #include <Champ_Inc_P0_base.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Bicephale,"Modele_turbulence_hyd_K_Epsilon_Bicephale",Mod_turb_hyd_RANS_Bicephale);
-// XD Modele_turbulence_hyd_K_Eps_Bicephale mod_turb_hyd_rans Modele_turbulence_hyd_K_Eps_Bicephale -1 Turbulence model (k-eps) en formalisation bicephale.
-// TODO : FIXME : add attr ....
+// XD K_Epsilon_Bicephale mod_turb_hyd_rans K_Epsilon_Bicephale -1 Turbulence model (k-eps) en formalisation bicephale.
 
 // Description:
 //    Ecrit le type de l'objet sur un flot de sortie.
@@ -82,10 +81,10 @@ Entree& Modele_turbulence_hyd_K_Eps_Bicephale::readOn(Entree& s )
 void Modele_turbulence_hyd_K_Eps_Bicephale::set_param(Param& param)
 {
   Mod_turb_hyd_RANS_Bicephale::set_param(param);
-  param.ajouter_non_std("Transport_K",(this),Param::REQUIRED);
-  param.ajouter_non_std("Transport_Epsilon",(this),Param::REQUIRED);
-  param.ajouter_non_std("Modele_Fonc_Bas_Reynolds",(this));
-  param.ajouter("CMU",&LeCmu);
+  param.ajouter_non_std("Transport_K",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (k) transportation equation.
+  param.ajouter_non_std("Transport_Epsilon",(this),Param::REQUIRED); // XD_ADD_P chaine Keyword to define the realisable (eps) transportation equation.
+  param.ajouter_non_std("Modele_Fonc_Bas_Reynolds",(this)); // XD_ADD_P Modele_Fonc_Realisable_base This keyword is used to set the model used
+  param.ajouter("CMU",&LeCmu); // XD_ADD_P double Keyword to modify the Cmu constant of k-eps model : Nut=Cmu*k*k/eps Default value is 0.09
 }
 
 int Modele_turbulence_hyd_K_Eps_Bicephale::lire_motcle_non_standard(const Motcle& mot, Entree& is)
