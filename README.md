@@ -29,6 +29,7 @@ This software is OpenSource (BSD license).
 
     $> git clone https://github.com/cea-trust-platform/TrioCFD-code.git TrioCFD-next
     $> cd TrioCFD-next
+    $> git checkout next
     $> source PathToTRUST-next/env_TRUST.sh
     $> baltik_build_configure -execute
     $> make optim debug
@@ -58,7 +59,7 @@ If you are a CEA worker, it is possible to use a TMA preinstalled version of Tri
 
       $> source /home/trust_trio/env_TrioCFD-1.8.4.sh
 
-- for CCRT-TGCC supercomputers (cobalt & irene-ccrt):
+- for CCRT-TGCC supercomputers (topaze & irene-ccrt):
 
       $> source /ccc/cont002/home/den/triou/env_TrioCFD-1.8.4.sh
 
