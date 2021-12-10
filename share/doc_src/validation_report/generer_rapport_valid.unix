@@ -406,6 +406,6 @@ echo 'emplactement rapport: ' $rapport
 echo 'generation ' $(pwd)
 pdflatex validation_report_TrioCFD.tex
 pdflatex validation_report_TrioCFD.tex
-mv validation_report_TrioCFD.pdf $version/share/doc/.
+mv validation_report_TrioCFD.pdf $version/share/doc/TrioCFD_validation_report.pdf
 cd $version/share/doc
-okular validation_report_TrioCFD.pdf&
+okular TrioCFD_validation_report.pdf&
