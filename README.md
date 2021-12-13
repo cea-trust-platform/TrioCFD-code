@@ -41,33 +41,3 @@ This software is OpenSource (BSD license).
 To check:
 
     $> make check_all_optim
-
-
-# **How to run a TrioCFD preinstalled version**
-
-If you are a CEA worker, it is possible to use a TMA preinstalled version of TrioCFD. Here is the list of the machines and the paths that can be used to source the TRUST environment
-
-- for a local machine at CEA Saclay
-
-      $> source /home/triou/env_TrioCFD_1.8.4.sh
-
-      or
-
-      $> source /home/trust_trio-public/env_TrioCFD-1.8.4.sh
-
-- for CEA Saclay cluster (orcus):
-
-      $> source /home/trust_trio/env_TrioCFD-1.8.4.sh
-
-- for CCRT-TGCC supercomputers (topaze & irene-ccrt):
-
-      $> source /ccc/cont002/home/den/triou/env_TrioCFD-1.8.4.sh
-
-- for CCRT-TGCC supercomputers (irene-amd int64):
-
-      $> source /ccc/cont002/home/den/triou/env_TrioCFD-1.8.4-int64.sh
-
-- for CINES supercomputer (occigen):
-
-      $> source /panfs/panasas/softs/applications/trio_u/TrioCFD/env_TrioCFD-1.8.4.sh
-
