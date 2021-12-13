@@ -26,7 +26,7 @@
 #include <Champ_Q1NC.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Champ_Uniforme.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <EFichier.h>
 #include <Diffu_lm.h>
 #include <Schema_Temps.h>
@@ -113,7 +113,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
   const DoubleTab& face_normale = zone_VEF.face_normales();
   const int& nfac = zone.nb_faces_elem();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
 
   // OC: Je ne comprends pas pourquoi dans les autres LP VEF on resize a nb_faces_tot le cisaillement et le tab_u_star
@@ -314,6 +314,384 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab_k_eps)
 
 }
 
+int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  // on est en K-eps
+  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const IntTab& elem_faces = zone_VEF.elem_faces();
+  const Zone& zone = zone_VEF.zone();
+  const DoubleTab& face_normale = zone_VEF.face_normales();
+  const int& nfac = zone.nb_faces_elem();
+  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
+  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+
+  if (source_boussinesq==1)
+    {
+      const Champ_Don_base& ch_gravite=le_fluide.gravite();
+
+      if (!sub_type(Champ_Uniforme,ch_gravite))
+        {
+          Cerr << " On ne sait pas traiter la gravite non uniforme dans TBLE !!!"<< finl;
+          exit();
+        }
+    }
+
+  int methode=-1;
+  int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
+  remplir_face_keps_imposee( flag_face_keps_imposee_, methode, face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+
+  double visco=-1;
+  int l_unif;
+  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+    {
+      visco = max(tab_visco(0,0),DMINFLOAT);
+      l_unif = 1;
+    }
+  else
+    l_unif = 0;
+
+  // preparer_calcul_hyd(tab);
+  if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+    //   on ne doit pas changer tab_visco ici !
+    {
+      Cerr<<" visco <=0 ?"<<finl;
+      exit();
+    }
+  //tab_visco+=DMINFLOAT;
+
+  int elem;
+
+  int itmax=0,itmax_loc;
+
+  const DoubleTab& vit = eqn_hydr.inconnue().valeurs(); //vitesse
+
+  const Navier_Stokes_std& eqnNS = ref_cast(Navier_Stokes_std, eqn_hydr);
+
+  // Calcul du gradient de pression
+  DoubleTab grad_p(vit);
+  const DoubleTab& p = eqnNS.pression().valeurs();
+  const Operateur_Grad& gradient = eqnNS.operateur_gradient();
+  gradient.calculer(p, grad_p);
+
+  const DoubleTab& visco_turb = mon_modele_turb_hyd->viscosite_turbulente().valeurs();
+
+
+  DoubleTab termes_sources(vit);
+  termes_sources=0;
+  // On calcule les termes sources, sauf celui de lambda_uprime et de Boussinesq (TBLE recalcule par lui meme ce terme s'il est demande)
+
+  const double& tps = eqnNS.schema_temps().temps_courant();
+  const double& dt = eqnNS.schema_temps().pas_de_temps();
+  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+
+  int compteur_faces_paroi = 0;
+
+  double surf2;
+  double dist; //distance du centre de la maille a la paroi
+
+  IntVect num(nfac);
+  DoubleVect n(dimension), t1(dimension), t2(dimension); // vecteurs orthonomes du repere local associe a la face paroi
+  DoubleVect F(dimension);
+  DoubleVect v_tang(nb_comp),F_tang(nb_comp);
+  DoubleTab ts_boussi(nb_comp, nb_pts+1);
+  ts_boussi=0.;
+
+  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+    {
+      // pour chaque condition limite on regarde son type
+      // On applique les lois de paroi uniquement
+      // aux voisinages des parois
+
+      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) )
+        {
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          int size=le_bord.nb_faces();
+
+          //Boucle sur les faces des bords parietaux
+          for (int ind_face=0; ind_face<size; ind_face++)
+            {
+              Eq_couch_lim& equation_vitesse = eq_vit[compteur_faces_paroi];
+              int num_face = le_bord.num_face(ind_face);
+              elem = face_voisins(num_face,0);
+
+              surf2=0.;
+
+              for(int i=0; i<dimension; i++)
+                {
+                  surf2 += face_normale(num_face,i)*face_normale(num_face,i);
+                }
+
+              if (dimension == 2)
+                {
+                  num[0]=elem_faces(elem,0);
+                  num[1]=elem_faces(elem,1);
+
+                  if         (num[0]==num_face) num[0]=elem_faces(elem,2);
+                  else if (num[1]==num_face) num[1]=elem_faces(elem,2);
+
+                  n[0] = face_normale(num_face,0)/sqrt(surf2);
+                  n[1] = face_normale(num_face,1)/sqrt(surf2);
+
+                  t1[0] = -n[1];
+                  t1[1] =  n[0];
+
+                  dist = distance_2D(num_face,elem,zone_VEF)*3./2.;
+
+                  v_tang[0] = ((vit(num[0],0)+vit(num[1],0))*t1[0]
+                               +(vit(num[0],1)+vit(num[1],1))*t1[1])/2.;
+
+                  // Terme source de Boussinesq si demande
+                  if (source_boussinesq==1)
+                    {
+                      ts_boussi = 0.;
+                      const Champ_Don_base& ch_gravite=le_fluide.gravite();
+                      const DoubleVect& gravite = ch_gravite.valeurs();
+                      const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
+                      const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      ParoiVEF_TBLE_scal& loi_tble_T = ref_cast_non_const(ParoiVEF_TBLE_scal,loi);
+                      if (loi_tble_T.est_initialise())
+                        {
+
+                          double gt = 0.;
+                          for (int idim=0; idim<dimension; idim++)
+                            gt += gravite(idim)*t1[idim];
+                          for(int i=0; i<nb_pts+1; i++)
+                            ts_boussi(0, i) = -gt*beta_t*(loi_tble_T.get_eq_couche_lim_T(compteur_faces_paroi).get_Unp1(0,i)-T0);
+                        }
+                    }
+
+
+                  F[0] =  ((termes_sources(num[0],0)-grad_p(num[0],0))/volumes_entrelaces(num[0])
+                           +(termes_sources(num[1],0)-grad_p(num[1],0))/volumes_entrelaces(num[1]))/2. ;
+
+                  F[1] =  ((termes_sources(num[0],1)-grad_p(num[0],1))/volumes_entrelaces(num[0])
+                           +(termes_sources(num[1],1)-grad_p(num[1],1))/volumes_entrelaces(num[1]))/2. ;
+
+                  F_tang[0]  = F[0]*t1[0] + F[1]*t1[1] ; // projection de F suivant l'axe tangentiel_1
+                  f_tang_moy(compteur_faces_paroi,0) = alpha*F_tang[0] +(1-alpha)*f_tang_moy(compteur_faces_paroi,0);
+                }
+              else
+                {
+                  num[0]=elem_faces(elem,0);
+                  num[1]=elem_faces(elem,1);
+                  num[2]=elem_faces(elem,2);
+
+                  if         (num[0]==num_face) num[0]=elem_faces(elem,3);
+                  else if (num[1]==num_face) num[1]=elem_faces(elem,3);
+                  else if (num[2]==num_face) num[2]=elem_faces(elem,3);
+
+                  n[0]  = face_normale(num_face,0)/sqrt(surf2);
+                  n[1]  = face_normale(num_face,1)/sqrt(surf2);
+                  n[2]  = face_normale(num_face,2)/sqrt(surf2);
+
+
+                  if( est_egal(n[0],0.) && est_egal(n[1],0.) )
+                    {
+                      t1[0] = 0.;
+                      t1[1] = 1;
+                      t1[2] = 0;
+                    }
+                  else
+                    {
+                      t1[0] = -n[1]/sqrt(n[0]*n[0]+n[1]*n[1]);
+                      t1[1] =  n[0]/sqrt(n[0]*n[0]+n[1]*n[1]);
+                      t1[2] =  0.;
+                    }
+
+                  t2[0] =  n[1]*t1[2] - n[2]*t1[1];
+                  t2[1] =  n[2]*t1[0] - n[0]*t1[2];
+                  t2[2] =  n[0]*t1[1] - n[1]*t1[0];
+
+                  dist = distance_3D(num_face,elem,zone_VEF)*4./3.;
+
+                  v_tang[0] = ((vit(num[0],0)+vit(num[1],0)+vit(num[2],0))*t1[0]
+                               +(vit(num[0],1)+vit(num[1],1)+vit(num[2],1))*t1[1]
+                               +(vit(num[0],2)+vit(num[1],2)+vit(num[2],2))*t1[2])/3.;
+
+                  v_tang[1] = ((vit(num[0],0)+vit(num[1],0)+vit(num[2],0))*t2[0]
+                               +(vit(num[0],1)+vit(num[1],1)+vit(num[2],1))*t2[1]
+                               +(vit(num[0],2)+vit(num[1],2)+vit(num[2],2))*t2[2])/3.;
+
+                  F[0] =  ((termes_sources(num[0],0)-grad_p(num[0],0))/volumes_entrelaces(num[0])
+                           +(termes_sources(num[1],0)-grad_p(num[1],0))/volumes_entrelaces(num[1])
+                           +(termes_sources(num[2],0)-grad_p(num[2],0))/volumes_entrelaces(num[2]))/3.;
+
+                  F[1] =  ((termes_sources(num[0],1)-grad_p(num[0],1))/volumes_entrelaces(num[0])
+                           +(termes_sources(num[1],1)-grad_p(num[1],1))/volumes_entrelaces(num[1])
+                           +(termes_sources(num[2],1)-grad_p(num[2],1))/volumes_entrelaces(num[2]))/3.;
+
+                  F[2] =  ((termes_sources(num[0],2)-grad_p(num[0],2))/volumes_entrelaces(num[0])
+                           +(termes_sources(num[1],2)-grad_p(num[1],2))/volumes_entrelaces(num[1])
+                           +(termes_sources(num[2],2)-grad_p(num[2],2))/volumes_entrelaces(num[2]))/3.;
+
+
+                  F_tang[0]  = F[0]*t1[0] + F[1]*t1[1] + F[2]*t1[2] ; // projection de F suivant l'axe tangentiel_1
+                  F_tang[1] =  F[0]*t2[0] + F[1]*t2[1] + F[2]*t2[2] ; // projection de F suivant l'axe tangentiel_2
+                  f_tang_moy(compteur_faces_paroi,0) = alpha*F_tang[0] +(1-alpha)*f_tang_moy(compteur_faces_paroi,0);
+                  f_tang_moy(compteur_faces_paroi,1) = alpha*F_tang[1] +(1-alpha)*f_tang_moy(compteur_faces_paroi,1);
+
+                  // Terme source de Boussinesq si demande
+                  if (source_boussinesq==1)
+                    {
+                      ts_boussi = 0.;
+                      const Champ_Don_base& ch_gravite=le_fluide.gravite();
+                      const DoubleVect& gravite = ch_gravite.valeurs();
+                      const Equation_base& eqn_th = mon_modele_turb_hyd->equation().probleme().equation(1);
+                      const Modele_turbulence_scal_base& le_mod_turb_th = ref_cast(Modele_turbulence_scal_base,eqn_th.get_modele(TURBULENCE).valeur());
+                      const Turbulence_paroi_scal_base& loi = le_mod_turb_th.loi_paroi().valeur();
+                      ParoiVEF_TBLE_scal& loi_tble_T = ref_cast_non_const(ParoiVEF_TBLE_scal,loi);
+                      if (loi_tble_T.est_initialise())
+                        {
+
+                          double gt1 = 0.;
+                          double gt2 = 0.;
+                          for (int idim=0; idim<dimension; idim++)
+                            {
+                              gt1 += gravite(idim)*t1[idim];
+                              gt2 += gravite(idim)*t2[idim];
+                            }
+
+                          for(int i=0; i<nb_pts+1; i++)
+                            {
+                              double tmp = beta_t*(loi_tble_T.get_eq_couche_lim_T(compteur_faces_paroi).get_Unp1(0,i)-T0);
+                              ts_boussi(0, i) = -gt1*tmp;
+                              ts_boussi(1, i) = -gt2*tmp;
+                            }
+                          /*Cout << "gt1 " << gt1 << finl;
+                            Cout << "gt2 " << gt2 << finl;
+                            Cout << "T0 " << T0 << finl;
+                            Cout << "beta_t " << beta_t << finl;*/
+                        }
+                    }
+                }
+
+
+              if(tps<=dt_min)
+                {
+                  visco_turb_moy(elem)=visco_turb(elem);
+                }
+              else if(tps>tps_start_stat_nu_t_dyn)
+                {
+                  visco_turb_moy(elem) = (dt/tps)*visco_turb(elem)+(1-(dt/tps))*visco_turb_moy(elem);
+                }
+
+
+              // au premier appel, dt ne vaut pas dt_min mais 0. car un appel a mettre_a_jour dans le preparer_calcul des modeles de turb
+              // precede l'initialisation du schema en temps.
+              if(dt<dt_min) equation_vitesse.set_dt(1.e12);
+              else            equation_vitesse.set_dt(dt);
+
+
+              for (int i=0; i<nb_comp; i++)
+                {
+                  equation_vitesse.set_u_y0(i,0.);          // vitesse a la paroi
+                  equation_vitesse.set_u_yn(i,v_tang[i]); // vitesse en yn
+
+                  //equation_vitesse.set_F(i, F_tang[i]);
+                  for(int ipts=0 ; ipts<nb_pts+1; ipts++)
+                    equation_vitesse.set_F(i, ipts, f_tang_moy(compteur_faces_paroi,i)+ts_boussi(i,ipts));
+                }
+
+
+              /////////////////////////////////////////////////////
+              // On resout les equations aux limites simplifiees //
+              //   pendant un pas de temps du maillage grossier  //
+              /////////////////////////////////////////////////////
+
+
+              if (statio==0)
+                equation_vitesse.aller_au_temps(tps);
+              else
+                equation_vitesse.aller_jusqu_a_convergence(max_it_statio, eps_statio);
+
+
+              itmax_loc = equation_vitesse.get_it();
+
+              if(itmax_loc>max_it) Cerr << "WARNING : TOO MANY ITERATIONS ARE NEEDED IN THE TBLE MESH" << finl;
+
+              if(itmax_loc>itmax) itmax=itmax_loc;
+
+
+              ///////////////////////////////////////////////
+              /////   Determination des  composantes   //////
+              /////     du cisaillement a la paroi     //////
+              ///////////////////////////////////////////////
+
+
+              double d_visco;
+
+              if (l_unif==1)
+                d_visco = visco;
+              else
+                d_visco = tab_visco[elem];
+
+              if (dimension == 2)
+                {
+                  double C0 = equation_vitesse.get_cis(0);
+
+                  double Cx = t1[0]*C0  ;
+                  double Cy = t1[1]*C0  ;
+
+                  Cisaillement_paroi_(num_face,0) =  Cx;
+                  Cisaillement_paroi_(num_face,1) =  Cy;
+
+                  tab_u_star_(num_face) = pow(Cx*Cx+Cy*Cy,0.25);
+                  tab_d_plus_(num_face) = dist*tab_u_star(num_face)/d_visco;
+                }
+              else
+                {
+                  double C0 = equation_vitesse.get_cis(0);
+                  double C1 = equation_vitesse.get_cis(1);
+
+                  double Cx = t1[0]*C0 + t2[0]*C1 ;
+                  double Cy = t1[1]*C0 + t2[1]*C1 ;
+                  double Cz = t1[2]*C0 + t2[2]*C1 ;
+
+                  Cisaillement_paroi_(num_face,0) =  Cx;
+                  Cisaillement_paroi_(num_face,1) =  Cy;
+                  Cisaillement_paroi_(num_face,2) =  Cz;
+
+                  tab_u_star_(num_face) = pow(Cx*Cx+Cy*Cy+Cz*Cz,0.25);
+                  tab_d_plus_(num_face) = dist*tab_u_star(num_face)/d_visco;
+                }
+
+
+              //////////////////////////////////////////////////
+              ///// Mise a jour des grandeurs turbulentes //////
+              /////           nu_t - k - eps              //////
+              //////////////////////////////////////////////////
+
+
+
+              traitement_keps_BiK(tab_k, tab_eps, num_face, face_voisins, elem_faces, nfac, dist, tab_d_plus(num_face), d_visco, tab_u_star(num_face));
+
+              compteur_faces_paroi++;
+
+            }//Fin boucle sur num_face
+        }//Fin if Paroi_fixe
+    }//Fin boucle sur les bords parietaux
+
+
+  if (Process::je_suis_maitre())
+    {
+      SFichier fic("iter.dat",ios::app); // ouverture du fichier iter.dat
+      fic << tps << " " << itmax << finl;
+    }
+
+  if(oui_stats==1)
+    calculer_stats();
+
+  return 1;
+}
+
 int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 {
   // Certains modeles de turbulence appelle cette methode avant le debut du calcul
@@ -329,7 +707,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
 
@@ -724,6 +1102,73 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
   return 1;
 
+}
+
+void ParoiVEF_TBLE::traitement_keps_BiK(DoubleTab& tab_k,DoubleTab& tab_eps, int num_face, const IntTab& face_voisins,
+                                        const IntTab& elem_faces, int nfac, double dist, double d_plus, double d_visco, double u_star)
+{
+  IntVect num(nfac);
+  int elem=face_voisins(num_face,0);
+  int nf2;
+
+  // on determine les face de l'elements qui sont autres que le num_face traite
+  for (nf2=0; nf2<nfac; nf2++)
+    {
+      num[nf2] = elem_faces(elem,nf2);
+    }
+  // Maintenant on place le num_face en fin de tableau
+  for (nf2=0; nf2<nfac-1; nf2++)
+    {
+      num[nf2] = elem_faces(elem,nf2);
+      if (num[nf2] == num_face)
+        {
+          num[nf2] = num[nfac-1];
+          num[nfac-1] = num_face;
+        }
+    }
+
+  // Boucle sur les faces :
+  for (int nf=0; nf<nfac; nf++)
+    {
+      if (num[nf]==num_face)
+        {
+
+
+          //      if (sub_type(Champ_P1NC,eqn_hydr.inconnue().valeur()))
+          // Strategie pour les tetras :
+          // On impose k et eps a la paroi :
+          // approximation: d(k)/d(n) = 0 a la paroi
+          // c'est faux mais ca marche
+          tab_k(num[nf])  =0.;
+          tab_eps(num[nf])=0.;
+          int nk=0;
+
+          for (int k=0; k<nfac; k++)
+            //if ( (num[k] >= ndebint) && (k != nf))
+            if ( (face_keps_imposee_[num[k]]>-1) && (k != nf))
+              {
+
+                tab_k(num[nf])  += tab_k(num[k]);
+                tab_eps(num[nf])+= tab_eps(num[k]);
+                nk++;
+              }
+
+          if (nk != 0 )
+            {
+              tab_k(num[nf])  /=nk;
+              tab_eps(num[nf])/=nk;
+            }
+
+        }
+
+
+      // On verifie si num[nf] n'est pas une face de bord :
+
+      else  if ( (face_keps_imposee_[num[nf]]>-1))//if (num[nf]>=ndebint)
+        {
+          calculer_k_eps(tab_k(num[nf]),tab_eps(num[nf]),d_plus,u_star,d_visco,dist);
+        }
+    }
 }
 
 void ParoiVEF_TBLE::traitement_keps(DoubleTab& tab_k_eps, int num_face, const IntTab& face_voisins,

@@ -29,7 +29,7 @@
 #include <Frontiere_dis_base.h>
 #include <communications.h>
 #include <Probleme_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Interprete.h>
 
 Implemente_instanciable_sans_constructeur(Modele_Rayonnement_Milieu_Transparent,"Modele_Rayonnement_Milieu_Transparent",Modele_Rayonnement_base);
@@ -207,9 +207,9 @@ Entree& Modele_Rayonnement_Milieu_Transparent::readOn(Entree& is)
   if (nom_pb_rayonnant_!="non_donne")
     {
       Probleme_base& pb=ref_cast(Probleme_base, interprete().objet(nom_pb_rayonnant_));
-      if (sub_type(Fluide_Incompressible,pb.milieu()))
+      if (sub_type(Fluide_base,pb.milieu()))
         {
-          Fluide_Incompressible& fluide=ref_cast(Fluide_Incompressible,pb.milieu());
+          Fluide_base& fluide=ref_cast(Fluide_base,pb.milieu());
           fluide.fixer_type_rayo();
 
         }

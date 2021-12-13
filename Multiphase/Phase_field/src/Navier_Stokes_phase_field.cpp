@@ -38,7 +38,8 @@
 #include <Operateur_Diff_base.h>
 
 extern Stat_Counter_Id temps_total_execution_counter_;
-Implemente_instanciable_sans_constructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
+Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
+// XD navier_stokes_phase_field navier_stokes_standard navier_stokes_phase_field -1 Navier Stokes equation for the Phase Field problem.
 
 Navier_Stokes_phase_field::Navier_Stokes_phase_field()
 {
@@ -53,6 +54,9 @@ Navier_Stokes_phase_field::Navier_Stokes_phase_field()
     nom[1]="viscosite_dynamique";
   */
 }
+
+Navier_Stokes_phase_field::~Navier_Stokes_phase_field() {}
+
 // Description:
 //    Simple appel a: Navier_Stokes_std::printOn(Sortie&)
 //    Ecrit l'equation sur un flot de sortie.
@@ -122,11 +126,44 @@ Entree& Navier_Stokes_phase_field::readOn(Entree& is)
 
 void Navier_Stokes_phase_field::set_param(Param& param)
 {
-  param.ajouter_non_std("approximation_de_boussinesq",(this),Param::REQUIRED);
-  param.ajouter_non_std("viscosite_dynamique_constante",(this),Param::OPTIONAL);
-  param.ajouter("gravite",&g_);
+  param.ajouter_non_std("approximation_de_boussinesq",(this),Param::REQUIRED); // XD_ADD_P approx_boussinesq To use or not the Boussinesq approximation.
+  param.ajouter_non_std("viscosite_dynamique_constante",(this),Param::OPTIONAL); // XD_ADD_P visco_dyn_cons To use or not a viscosity which will depends on concentration C (in fact, C is the unknown of Cahn-Hilliard equation).
+  param.ajouter("gravite",&g_); // XD_ADD_P list Keyword to define gravity in the case Boussinesq approximation is not used.
   Navier_Stokes_std::set_param(param);
 }
+
+// XD approx_boussinesq objet_lecture nul 0 different mass density formulation are available depending if the Boussinesq approximation is made or not
+// XD attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the Boussinesq approximation.
+// XD attr bloc_bouss bloc_boussinesq bloc_bouss 0 to choose the rho formulation
+// XD bloc_boussinesq objet_lecture nul 1 choice of rho formulation
+// XD attr probleme ref_Pb_base probleme 1 Name of problem.
+// XD attr rho_1 floattant rho_1 1 value of rho
+// XD attr rho_2 floattant rho_2 1 value of rho
+// XD attr rho_fonc_c bloc_rho_fonc_c rho_fonc_c_ 1 to use for define a general form for rho
+// XD bloc_rho_fonc_c objet_lecture nul 0 if rho has a general form
+// XD attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
+// XD attr problem_name ref_Pb_base problem_name 1 Name of problem.
+// XD attr concentration chaine(into=["concentration"]) concentration 1 concentration
+// XD attr dim entier dim 1 dimension of the problem
+// XD attr val chaine val 1 function of rho
+// XD attr Champ_Uniforme chaine(into=["Champ_Uniforme"]) Champ_Uniforme 1 Champ_Uniforme
+// XD attr fielddim entier fielddim 1 dimension of the problem
+// XD attr val2 chaine val2 1 function of rho
+
+// XD visco_dyn_cons objet_lecture nul 0 different treatment of the kinematic viscosity could be done depending of the use of the Boussinesq approximation or the constant dynamic viscosity approximation
+// XD attr yes_or_no chaine(into=["oui","non"]) yes_or_no 0 To use or not the constant dynamic viscosity
+// XD attr bloc_visco bloc_visco2 bloc_visco 0 to choose the mu formulation
+// XD bloc_visco2 objet_lecture nul 1 choice of mu formulation
+// XD attr probleme ref_Pb_base probleme 1 Name of problem.
+// XD attr mu_1 floattant mu_1 1 value of mu
+// XD attr mu_2 floattant mu_2 1 value of mu
+// XD attr mu_fonc_c bloc_mu_fonc_c mu_fonc_c_ 1 to use for define a general form for mu
+// XD bloc_mu_fonc_c objet_lecture nul 0 if mu has a general form
+// XD attr Champ_Fonc_Fonction chaine(into=["Champ_Fonc_Fonction"]) Champ_Fonc_Fonction 1 Champ_Fonc_Fonction
+// XD attr problem_name ref_Pb_base problem_name 1 Name of problem.
+// XD attr concentration chaine(into=["concentration"]) concentration 1 concentration
+// XD attr dim entier dim 1 dimension of the problem
+// XD attr val chaine val 1 function of mu
 
 int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 {
@@ -172,18 +209,23 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           else
             {
               double rho1,rho2;
+              Nom prob;
               while(motlu!="}")
                 {
+                  if (motlu=="probleme") is >> prob;
                   if (motlu=="rho_1") is >> rho1;
                   if (motlu=="rho_2") is >> rho2;
                   is >> motlu;
                 }
-              Nom chaine("Champ_Fonc_Fonction concentration 1 ");
+              Nom chaine("Champ_Fonc_Fonction ");
+              chaine+=prob;
+              chaine+=" concentration 1 ";
               Nom rhoM(0.5*(rho1+rho2));
               Nom drho(rho2-rho1);
               chaine+=rhoM;
-              chaine+="+val*";
+              chaine+="+val*(";
               chaine+=drho;
+              chaine+=")";
               EChaine echaine(chaine);
               echaine >> rho_;
               Nom chaine2("Champ_Uniforme 1 ");
@@ -224,18 +266,23 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
           else
             {
               double mu1,mu2;
+              Nom prob;
               while(motlu!="}")
                 {
+                  if (motlu=="probleme") is >> prob;
                   if (motlu=="mu_1") is >> mu1;
                   if (motlu=="mu_2") is >> mu2;
                   is >> motlu;
                 }
-              Nom chaine("Champ_Fonc_Fonction concentration 1 ");
+              Nom chaine("Champ_Fonc_Fonction ");
+              chaine+=prob;
+              chaine+=" concentration 1 ";
               Nom muM(0.5*(mu1+mu2));
               Nom dmu(mu2-mu1);
               chaine+=muM;
-              chaine+="+val*";
+              chaine+="+val*(";
               chaine+=dmu;
+              chaine+=")";
               EChaine echaine(chaine);
               echaine >> mu_;
             }
@@ -328,9 +375,6 @@ void Navier_Stokes_phase_field::discretiser()
   int dim=rho0Tab.nb_dim();
   switch(dim)
     {
-    case 1:
-      rho0_=rho0Tab(0);
-      break;
     case 2:
       rho0_=rho0Tab(0,0);
       break;
@@ -941,12 +985,12 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       if(diff_boussi_==1)
         {
           // on multiplie par rho :
-          if (diff.nb_dim()==1)
+          if (diff.line_size()==1)
             {
               for (face=0 ; face<nbfaces ; face++)
                 {
-                  diff[face] *= rho_face[face];
-                  diff[face] /= rho0_;
+                  diff(face,0) *= rho_face[face];
+                  diff(face,0) /= rho0_;
                 }
             }
           else
@@ -979,11 +1023,11 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       terme_convectif.ajouter(la_vitesse.valeurs(), conv);
 
       // on multiplie par rho :
-      if (conv.nb_dim()==1)
+      if (conv.line_size()==1)
         {
           for (face=0 ; face<nbfaces ; face++)
             {
-              conv[face] *= rho_face[face];
+              conv(face,0) *= rho_face[face];
             }
         }
       else
@@ -1008,11 +1052,11 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       // #endif
 
       // on divise vpoint par rho :
-      if (vpoint.nb_dim()==1)
+      if (vpoint.line_size()==1)
         {
           for (face=0 ; face<nbfaces ; face++)
             {
-              vpoint[face] /= rho_face[face];
+              vpoint(face,0) /= rho_face[face];
             }
         }
       else
@@ -1159,11 +1203,11 @@ DoubleTab& Navier_Stokes_phase_field::derivee_en_temps_inco(DoubleTab& vpoint)
       // #endif
 
       // Pression a diviser par rho :
-      if (gradP.nb_dim()==1)
+      if (gradP.line_size()==1)
         {
           for (face=0 ; face<nbfaces ; face++)
             {
-              gradP[face] /= rho_face[face];
+              gradP(face,0) /= rho_face[face];
             }
         }
       else

@@ -79,7 +79,7 @@ Lire fluide
 	mu Champ_Uniforme 1 1.85e-5
         pression 162.68457148045
         lambda Champ_Uniforme 1 0.0262
-        loi_etat gaz_parfait {
+        loi_etat gaz_parfait_qc {
                 Prandtl 0.00071034351145038171927
                 Cp 1.006
                 gamma 1.4

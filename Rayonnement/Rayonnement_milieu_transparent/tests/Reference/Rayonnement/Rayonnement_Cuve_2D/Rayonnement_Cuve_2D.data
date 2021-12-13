@@ -202,7 +202,7 @@ Lire pb1
 	{
 		Turbulence_paroi Loi_standard_hydr    
 	}
-	solveur_pression PETSC cholesky { }
+	solveur_pression PETSC gcp { precond ssor { omega 1.6 } rtol 1.e-8 impr } 
 	convection { muscl }
 	diffusion { }
 	sources { boussinesq_temperature { T0 300. } }
@@ -275,7 +275,7 @@ Lire pb3
 {
    Navier_Stokes_standard
    {
-	solveur_pression PETSC cholesky { } 
+	solveur_pression PETSC gcp { precond ssor { omega 1.6 } rtol 1.e-8 impr } 
 	convection { amont }
 	diffusion { }
 	sources { boussinesq_temperature { T0 200. } }

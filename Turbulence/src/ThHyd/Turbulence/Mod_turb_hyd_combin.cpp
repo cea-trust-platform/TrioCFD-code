@@ -25,7 +25,7 @@
 #include <Probleme_base.h>
 #include <Zone_VF.h>
 #include <DoubleTabs.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <stat_counters.h>
 #include <Param.h>
 
@@ -131,7 +131,7 @@ void Mod_turb_hyd_combin::mettre_a_jour(double temps)
   calculer_viscosite_turbulente();
   loipar->calculer_hyd(la_viscosite_turbulente,energie_cinetique_turbulente());
   limiter_viscosite_turbulente();
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable()) correction_nut_et_cisaillement_paroi_si_qc(*this);
   la_viscosite_turbulente->valeurs().echange_espace_virtuel();
   statistiques().end_count(nut_counter_);
 }

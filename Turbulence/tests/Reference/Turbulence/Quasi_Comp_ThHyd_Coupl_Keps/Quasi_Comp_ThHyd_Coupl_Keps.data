@@ -45,7 +45,7 @@ Read helium
         mu Champ_Uniforme 1 4.e-5 
 	pression 70.e5	
 	lambda Champ_Uniforme 1 0.325
-        loi_etat gaz_parfait {
+        loi_etat gaz_parfait_qc {
                 Prandtl 0.63876923076923086686
                 Cp 5190.
                 gamma 1.7
@@ -57,7 +57,7 @@ Solide combustible
 Read combustible
 {
 	rho Champ_Uniforme 1 8000.
-	lambda champ_fonc_fonction temperature 1 12.76+0.00871*(val-273)-0.00000188*(val-273)*(val-273)
+	lambda champ_fonc_fonction pb_combustible temperature 1 12.76+0.00871*(val-273)-0.00000188*(val-273)*(val-273)
 	Cp Champ_Uniforme 1 2296.
 }
 

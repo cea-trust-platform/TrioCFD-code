@@ -31,7 +31,7 @@
 #include <MuLambda_TBLE_Fcts_T.h>
 #include <SFichier.h>
 #include <Champ_Fonc_Fonction.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Param.h>
 
 Paroi_TBLE_QDM::Paroi_TBLE_QDM()
@@ -274,7 +274,7 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_b
       lambda_fonction =1;
       lambda_chaine=ref_cast(Champ_Fonc_Fonction,getPbBase().milieu().conductivite().valeur()).table().parser(0).getString().toChar();
     }
-  const Champ_base& mu=ref_cast(Fluide_Incompressible,getPbBase().milieu()).viscosite_dynamique().valeur();
+  const Champ_base& mu=ref_cast(Fluide_base,getPbBase().milieu()).viscosite_dynamique().valeur();
   if (sub_type(Champ_Fonc_Fonction,mu))
     {
       mu_fonction =1;

@@ -26,6 +26,7 @@
 #include <Les_Pb_Turb.h>
 #include <Param.h>
 
+#include <Fluide_base.h>
 Implemente_instanciable_sans_constructeur(Transport_Flux_Chaleur_Turbulente,"Transport_Flux_Chaleur_Turbulente",Convection_Diffusion_std);
 
 Transport_Flux_Chaleur_Turbulente::Transport_Flux_Chaleur_Turbulente()
@@ -174,7 +175,7 @@ void Transport_Flux_Chaleur_Turbulente::discretiser()
 
 void Transport_Flux_Chaleur_Turbulente::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  le_fluide = ref_cast(Fluide_Incompressible, un_milieu) ;
+  le_fluide = ref_cast(Fluide_base, un_milieu) ;
 }
 
 const Milieu_base& Transport_Flux_Chaleur_Turbulente::milieu() const

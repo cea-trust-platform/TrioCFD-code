@@ -34,6 +34,7 @@
 #include <Discret_Thyd.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
+#include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Param.h>
 
 Implemente_instanciable(Navier_Stokes_Turbulent,"Navier_Stokes_Turbulent",Navier_Stokes_std);
@@ -470,6 +471,11 @@ void Navier_Stokes_Turbulent::imprime_residu(SFichier& fic)
     ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().imprime_residu(fic);
   else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
     ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().imprime_residu(fic);
+  else if (sub_type(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()))
+    {
+      ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_K().imprime_residu(fic);
+      ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_Eps().imprime_residu(fic);
+    }
 }
 
 // Retourne l'expression du residu (de meme peut etre surcharge)
@@ -480,6 +486,11 @@ Nom Navier_Stokes_Turbulent::expression_residu()
     tmp+=ref_cast(Modele_turbulence_hyd_K_Eps,le_modele_turbulence.valeur()).eqn_transp_K_Eps().expression_residu();
   else if (sub_type(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()))
     tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,le_modele_turbulence.valeur()).eqn_transp_K_Eps().expression_residu();
+  else if (sub_type(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()))
+    {
+      tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_K().expression_residu();
+      tmp+=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,le_modele_turbulence.valeur()).eqn_transp_Eps().expression_residu();
+    }
   return tmp;
 }
 

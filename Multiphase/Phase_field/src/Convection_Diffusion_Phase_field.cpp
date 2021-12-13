@@ -30,6 +30,12 @@
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Phase_field,"Convection_Diffusion_Phase_field",Convection_Diffusion_Concentration);
+// XD convection_diffusion_phase_field convection_diffusion_concentration convection_diffusion_phase_field -1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
+// XD attr mu_1 floattant mu_1 1 Dynamic viscosity of the first phase.
+// XD attr mu_2 floattant mu_2 1 Dynamic viscosity of the second phase.
+// XD attr rho_1 floattant rho_1 1 Density of the first phase.
+// XD attr rho_2 floattant rho_2 1 Density of the second phase.
+// XD attr potentiel_chimique_generalise chaine(into=["avec_energie_cinetique","sans_energie_cinetique"]) potentiel_chimique_generalise 0 To define (chaine set to avec_energie_cinetique) or not (chaine set to sans_energie_cinetique) if the Cahn-Hilliard equation contains the cinetic energy term.
 
 Convection_Diffusion_Phase_field::Convection_Diffusion_Phase_field()
 {

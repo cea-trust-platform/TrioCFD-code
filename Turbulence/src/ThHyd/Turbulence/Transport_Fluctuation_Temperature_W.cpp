@@ -25,6 +25,7 @@
 #include <Discret_Thermique.h>
 #include <Les_Pb_Turb.h>
 #include <Param.h>
+#include <Fluide_base.h>
 
 Implemente_instanciable_sans_constructeur(Transport_Fluctuation_Temperature_W,"Transport_Fluctuation_Temperature_W",Convection_Diffusion_std);
 
@@ -171,7 +172,7 @@ Operateur& Transport_Fluctuation_Temperature_W::operateur(int i)
 // affecte le_Milieu_base.
 void Transport_Fluctuation_Temperature_W::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  le_fluide = ref_cast(Fluide_Incompressible, un_milieu) ;
+  le_fluide = ref_cast(Fluide_base, un_milieu) ;
 }
 
 const Milieu_base& Transport_Fluctuation_Temperature_W::milieu() const

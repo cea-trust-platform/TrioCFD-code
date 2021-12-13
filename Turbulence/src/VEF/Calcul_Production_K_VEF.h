@@ -50,6 +50,10 @@ protected:
                                           DoubleTab& ,const DoubleTab& ,
                                           const DoubleTab& ,const DoubleTab& ) const;
 
+  DoubleTab&  calculer_terme_production_K_BiK(const Zone_VEF& ,const Zone_Cl_VEF& ,
+                                              DoubleTab& ,const DoubleTab& ,const DoubleTab& ,
+                                              const DoubleTab& ,const DoubleTab& ) const;
+
   DoubleTab&  calculer_terme_production_K_EASM(const Zone_VEF& ,const Zone_Cl_VEF& ,
                                                DoubleTab& ,const DoubleTab& ,
                                                const DoubleTab& , const DoubleTab&,

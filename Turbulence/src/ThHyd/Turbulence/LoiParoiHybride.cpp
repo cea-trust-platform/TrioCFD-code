@@ -231,3 +231,51 @@ int LoiParoiHybride::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2, const Zone_d
   return 1;
 }
 
+
+int LoiParoiHybride::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
+{
+  int size = vect_lp.size();
+  for (int ilp=0; ilp<size; ilp++)
+    {
+      vect_lp[ilp]->calculer_hyd(tab_k,tab_eps);
+    }
+
+  //Remplissage du tableau Cisaillement en fonction du choix de la LP par bord
+
+
+  return 1;
+}
+
+int LoiParoiHybride::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps, Zone_dis_base const& zd, Zone_Cl_dis_base const& zcl, DoubleTab& tab_cis)
+{
+  int size = vect_lp.size();
+  for (int ilp=0; ilp<size; ilp++)
+    {
+      vect_lp[ilp]->calculer_hyd(tab_k,tab_eps);
+    }
+
+  //Remplissage du tableau Cisaillement en fonction du choix de la LP par bord
+  for (int n_bord=0; n_bord<zd.nb_front_Cl(); n_bord++)
+    {
+      const Cond_lim& la_cl = zcl.les_conditions_limites(n_bord);
+      const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+      int ndeb = le_bord.num_premiere_face();
+      int nfin = ndeb + le_bord.nb_faces();
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur() ))
+        {
+          const DoubleTab& tau = vect_lp[lp_bord(n_bord)]->Cisaillement_paroi();
+
+          for (int num_face=ndeb; num_face<nfin; num_face++)
+            {
+              for (int idim=0; idim<Objet_U::dimension; idim++)
+                tab_cis(num_face,idim) = tau(num_face,idim);
+            }
+        }
+    }
+
+  tab_cis.echange_espace_virtuel();
+
+
+  return 1;
+}
+

@@ -184,11 +184,7 @@ DoubleTab& Modele_Launder_Sharma_VEF::Calcul_E(DoubleTab& E,const Zone_dis& zone
 
   //  double val;
 
-  int ncomp_ch_transporte;
-  if (transporte.nb_dim() == 1)
-    ncomp_ch_transporte=1;
-  else
-    ncomp_ch_transporte= transporte.dimension(1);
+  const int ncomp_ch_transporte = transporte.line_size();
 
   DoubleTab gradient(0, ncomp_ch_transporte, dimension);
   zone_VEF.creer_tableau_faces(gradient);

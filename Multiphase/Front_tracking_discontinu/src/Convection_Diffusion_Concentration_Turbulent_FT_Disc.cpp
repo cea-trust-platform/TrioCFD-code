@@ -151,7 +151,7 @@ static double integrale(const Champ_base& ch)
     {
       const Zone_VF& zone_vf = ref_cast(Zone_VF, ch.zone_dis_base());
       const DoubleTab& val = ch.valeurs();
-      assert(val.nb_dim() == 1);
+      assert(val.line_size() == 1);
       const int sz = val.dimension(0);
       const DoubleVect& volumes = zone_vf.volumes_entrelaces();
       const ArrOfInt& faces_doubles = zone_vf.faces_doubles();

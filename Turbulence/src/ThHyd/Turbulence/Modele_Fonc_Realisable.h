@@ -59,6 +59,9 @@ public:
   inline void Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                           const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt) ;
 
+  inline const Equation_base& seconde_equation() const;
+  inline  Equation_base& seconde_equation();
+  inline void associer_eqn_2(const Equation_base& );
 };
 
 ///
@@ -158,6 +161,22 @@ inline void Modele_Fonc_Realisable::Contributions_Sources(const Zone_dis& zone_d
 inline void Modele_Fonc_Realisable::Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt)
 {
   valeur().Contributions_Sources_Paroi( zone_dis, zone_Cl_dis, vitesse, K_Eps, EPS_MIN,visco,visco_turb,loi_paroi,idt);
+}
+
+inline const Equation_base& Modele_Fonc_Realisable::seconde_equation() const
+{
+  return valeur().seconde_equation();
+}
+
+inline  Equation_base& Modele_Fonc_Realisable::seconde_equation()
+{
+  return valeur().seconde_equation();
+}
+
+
+inline void Modele_Fonc_Realisable::associer_eqn_2(const Equation_base& eqn)
+{
+  valeur().associer_eqn_2( eqn ) ;
 }
 
 #endif

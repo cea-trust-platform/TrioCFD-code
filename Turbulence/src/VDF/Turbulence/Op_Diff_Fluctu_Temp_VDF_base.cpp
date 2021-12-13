@@ -142,7 +142,7 @@ void Op_Diff_Fluctu_Temp_VDF_Elem::mettre_a_jour_diffusivite() const
       const Transport_Fluctuation_Temperature_W_Bas_Re& eqn_transport = ref_cast(Transport_Fluctuation_Temperature_W_Bas_Re,mon_equation.valeur());
       const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& mod_turb = eqn_transport.modele_turbulence();
       const Champ_Fonc& lambda_t = mod_turb.conductivite_turbulente();
-      const Fluide_Incompressible& mil = ref_cast(Fluide_Incompressible,eqn_transport.milieu());
+      const Fluide_base& mil = ref_cast(Fluide_base,eqn_transport.milieu());
       const Champ_Don& diff_cinematique = mil.diffusivite();
 
       //        Cerr << "alpha = " <<         diff_cinematique->valeurs() << finl;

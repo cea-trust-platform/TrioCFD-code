@@ -192,38 +192,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
 
 const Champ_base& Champ_Post_Operateur_Eqn::get_champ_without_evaluation(Champ& espace_stockage) const
 {
-
-  Champ_Fonc espace_stockage_fonc;
-  Champ source_espace_stockage;
-  //const Champ_base& source = get_source(0).get_champ(source_espace_stockage);
-
-  //  const Champ_Inc_base& ch_inc=ref_cast(Champ_Inc_base,source);
-  double temps=0.;
-  Nom directive;
-// directive=ref_eq_->inconnue().le_nom();
-  // bidouille EF
-  //if (directive=="enthalpie") directive="temperature";
-  switch (localisation_inco_)
-    {
-    case ELEMENT:
-      directive="CHAMP_ELEM";
-      break;
-    case NODE:
-      directive="CHAMP_SOMMETS";
-      break;
-    case FACE:
-      directive="CHAMP_FACE";
-      break;
-    default:
-      Cerr<<"error in Champ_Post_Operateur_Eqn::get_champ"<<finl;
-      exit();
-
-    }
-  int nb_comp=ref_eq_.valeur().inconnue().valeur().nb_comp();
-  ref_eq_.valeur().discretisation().discretiser_champ(directive,ref_eq_->zone_dis().valeur(),"oooo","unit", nb_comp,temps,espace_stockage_fonc);
-  espace_stockage=espace_stockage_fonc;
-  espace_stockage.valeur().fixer_nature_du_champ( ref_eq_.valeur().inconnue().valeur().nature_du_champ());
-
+  espace_stockage = ref_eq_.valeur().inconnue();
   return espace_stockage;
 }
 
@@ -279,6 +248,15 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
       ref_eq_->sources()(numero_source_).calculer(es);
     if (!sans_solveur_masse_)
       ref_eq_->solv_masse().valeur().appliquer_impl(es);
+    // Hack: car Masse_PolyMAC_Face::appliquer_impl ne divise par le volume (matrice de masse)....
+    if (ref_eq_->solv_masse().valeur().que_suis_je()=="Masse_PolyMAC_Face")
+      {
+        //Cerr << "Volumic source terms on faces with PolyMAC can't be post-processed yet." << finl;
+        Cerr << "Warning, source terms on faces with PolyMAC are post-processed as S*dV not as volumic source terms S." << finl;
+        Cerr << "Cause Masse_PolyMAC_Face::appliquer_impl do not divide per volume." << finl;
+        //Process::exit();
+      }
+
   }
   es.echange_espace_virtuel();
   // apres je recupere juste la composante si elle est demandee

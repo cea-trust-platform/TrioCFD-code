@@ -64,7 +64,7 @@ Lire fluide
 {
 	mu Champ_Uniforme 1 1.e-1
 	rho Champ_Uniforme 1 1000.
-	beta_co Champ_Fonc_Fonction concentration 1 1.0
+	beta_co Champ_Fonc_Fonction pb concentration 1 1.0
 #	beta_co Champ_Uniforme 1 1. #
 }
 

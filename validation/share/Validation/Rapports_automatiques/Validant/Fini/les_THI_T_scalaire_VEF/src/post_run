@@ -14,9 +14,9 @@ dt_moyen=`cat thi.dt_ev | awk 'BEGIN{m=0;n=0;}{if ($1>20) {n++;m+=$2;}}END{print
 fs_moyen20=`tail -20 thi.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$3;}END{print m/n;}'`
 dt_moyen20=`tail -20 thi.dt_ev | awk 'BEGIN{m=0;n=0;}{n++;m+=$2;}END{print m/n;}'`
 
-dt_conv=`grep -A 2 "Printing of the time steps for the equation: Navier_Stokes_Turbulent" thi.out | grep convective | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
-dt_diffNS=`grep -A 2 "Printing of the time steps for the equation: Navier_Stokes_Turbulent" thi.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
-dt_diffT=`grep -A 2 "Printing of the time steps for the equation: Convection_Diffusion_Temperature_Turbulent" thi.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_conv=`grep -A 2 "Printing of the next provisional time steps for the equation: Navier_Stokes_Turbulent" thi.out | grep convective | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffNS=`grep -A 2 "Printing of the next provisional time steps for the equation: Navier_Stokes_Turbulent" thi.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
+dt_diffT=`grep -A 2 "Printing of the next provisional time steps for the equation: Convection_Diffusion_Temperature_Turbulent" thi.out | grep diffusive | tail -20|  awk 'BEGIN{m=0;n=0;}{n++;m+=$5;}END{print m/n;}'`
 
 fs_conv=`echo "scale=8;$dt_moyen20/$dt_conv" | bc`
 fs_diffNS=`echo "scale=8;$dt_moyen20/$dt_diffNS" | bc`

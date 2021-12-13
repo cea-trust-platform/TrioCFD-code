@@ -78,3 +78,10 @@ int LoiParoiHybride_VDF::calculer_hyd(DoubleTab& tab1, DoubleTab& tab2)
 
   return 1;
 }
+
+int LoiParoiHybride_VDF::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
+{
+  LoiParoiHybride::calculer_hyd_BiK(tab_k, tab_eps, la_zone_VDF.valeur(), la_zone_Cl_VDF.valeur(), Cisaillement_paroi_);
+
+  return 1;
+}

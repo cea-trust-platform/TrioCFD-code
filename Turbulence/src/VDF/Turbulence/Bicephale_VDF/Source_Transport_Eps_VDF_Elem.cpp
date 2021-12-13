@@ -201,7 +201,7 @@ DoubleTab& Source_Transport_Eps_VDF_Elem::ajouter(DoubleTab& resu) const
       DoubleTab& E=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("E").valeurs());
       DoubleTab& F1=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("F1").valeurs());
       DoubleTab& F2=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("F2").valeurs());
-      const Fluide_Incompressible& fluide=ref_cast(Fluide_Incompressible,eq_hydraulique.valeur().milieu());
+      const Fluide_base& fluide=ref_cast(Fluide_base,eq_hydraulique.valeur().milieu());
       const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
       // const DoubleTab& tab_visco = ch_visco_cin->valeurs();
       const Zone_Cl_dis& zcl_eps=mon_eq_transport_Eps->zone_Cl_dis();
@@ -288,7 +288,7 @@ void Source_Transport_Eps_anisotherme_VDF_Elem::associer_pb(const Probleme_base&
     }
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = eqn.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -390,7 +390,7 @@ void Source_Transport_Eps_concen_VDF_Elem::associer_pb(const Probleme_base& pb)
 
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = pb.equation(0).milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -496,7 +496,7 @@ void Source_Transport_Eps_aniso_therm_concen_VDF_Elem::associer_pb(const Problem
   const Equation_base& eqn_therm = pb.equation(1);
   const Equation_base& eqn_conc = pb.equation(2);
   const Milieu_base& milieu = eqn_therm.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {

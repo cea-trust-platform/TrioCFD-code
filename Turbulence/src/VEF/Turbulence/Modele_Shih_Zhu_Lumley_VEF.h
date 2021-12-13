@@ -57,6 +57,12 @@ public :
   virtual void Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                            const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt) ;
 
+  virtual void Calcul_C1_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) ;
+  virtual void Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)  ;
+  virtual void Contributions_Sources_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) ;
+  virtual void Contributions_Sources_Paroi_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+                                               const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) ;
+
   void associer(const Zone_dis& , const Zone_Cl_dis& );
   void init_tenseur_elem(DoubleTab&, const Zone_VEF&, const int) const;
   void init_tenseur_face(DoubleTab&, const Zone_VEF&, const int) const;

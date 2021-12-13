@@ -25,11 +25,14 @@
 #include <Constituant.h>
 #include <Verif_Cl.h>
 
-Implemente_instanciable(Pb_Phase_field,"Pb_Phase_field",Pb_qdm_fluide);
-
+Implemente_instanciable(Pb_Phase_field,"Pb_Phase_field",Pb_Fluide_base);
+// XD pb_phase_field Pb_base pb_phase_field -1 Problem to solve local instantaneous incompressible-two-phase-flows. Complete description of the Phase Field model for incompressible and immiscible fluids can be found into this PDF: TRUST_ROOT/doc/TRUST/phase_field_non_miscible_manuel.pdf
+// XD attr navier_stokes_phase_field navier_stokes_phase_field navier_stokes_phase_field 1 Navier Stokes equation for the Phase Field problem.
+// XD attr convection_diffusion_phase_field convection_diffusion_phase_field convection_diffusion_phase_field 1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
+// XD ref constituant constituant
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::printOn(Sortie&)
+//    Simple appel a: Pb_Fluide_base::printOn(Sortie&)
 //    Ecrit le probleme sur un flot de sortie.
 // Precondition:
 // Parametre: Sortie& os
@@ -45,12 +48,12 @@ Implemente_instanciable(Pb_Phase_field,"Pb_Phase_field",Pb_qdm_fluide);
 // Postcondition: la methode ne modifie pas l'objet
 Sortie& Pb_Phase_field::printOn(Sortie& os) const
 {
-  return Pb_qdm_fluide::printOn(os);
+  return Pb_Fluide_base::printOn(os);
 }
 
 
 // Description:
-//    Simple appel a: Pb_qdm_fluide::readOn(Entree&)
+//    Simple appel a: Pb_Fluide_base::readOn(Entree&)
 //    Lit le probleme a partir d'un flot d'entree.
 // Precondition:
 // Parametre: Entree& is
@@ -66,7 +69,7 @@ Sortie& Pb_Phase_field::printOn(Sortie& os) const
 // Postcondition:
 Entree& Pb_Phase_field::readOn(Entree& is)
 {
-  return Pb_qdm_fluide::readOn(is);
+  return Pb_Fluide_base::readOn(is);
 }
 
 // Description:

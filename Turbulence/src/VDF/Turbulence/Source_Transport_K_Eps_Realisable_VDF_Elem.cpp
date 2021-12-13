@@ -25,7 +25,7 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <Champ_Uniforme.h>
 #include <Champ_Face.h>
@@ -278,7 +278,7 @@ DoubleTab& Source_Transport_K_Eps_Realisable_VDF_Elem::ajouter(DoubleTab& resu) 
   const Modele_turbulence_hyd_K_Eps_Realisable& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Realisable,eqn_keps_Rea->modele_turbulence());
   const DoubleTab&                            visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const Modele_Fonc_Realisable_base&     mon_modele_fonc = mod_turb.associe_modele_fonction();
-  const Fluide_Incompressible&                    fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base&                    fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const DoubleTab&                                  vit  = eq_hydraulique->inconnue().valeurs();
 
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
@@ -371,7 +371,7 @@ void  Source_Transport_K_Eps_Realisable_VDF_Elem::contribuer_a_avec(const Double
   const Zone_VDF&   zone_VDF = la_zone_VDF.valeur();
   const DoubleVect& porosite = zone_VDF.porosite_elem();
 
-  const Fluide_Incompressible&  fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base&  fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don&        ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab&           tab_visco = ch_visco_cin->valeurs();
 
@@ -431,7 +431,7 @@ void Source_Transport_K_Eps_Realisable_anisotherme_VDF_Elem::associer_pb(const P
     }
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = eqn.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -535,7 +535,7 @@ void Source_Transport_K_Eps_Realisable_aniso_concen_VDF_Elem::associer_pb(const 
 
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = pb.equation(0).milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -647,7 +647,7 @@ void Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem::associer_pb(
   const Equation_base& eqn_therm = pb.equation(1);
   const Equation_base& eqn_conc = pb.equation(2);
   const Milieu_base& milieu = eqn_therm.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {

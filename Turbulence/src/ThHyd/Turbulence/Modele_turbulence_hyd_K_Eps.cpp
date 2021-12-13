@@ -23,14 +23,14 @@
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Schema_Temps_base.h>
 #include <Schema_Temps.h>
 #include <stat_counters.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Param.h>
 #include <communications.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <DoubleTrav.h>
 #include <Champ_Uniforme.h>
 #include <ConstDoubleTab_parts.h>
@@ -160,8 +160,8 @@ Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double te
       // pour avoir nu en incompressible et mu en QC
       // et non comme on a divise K et eps par rho (si on est en QC)
       // on veut toujours nu
-      const Champ_Don ch_visco=ref_cast(Fluide_Incompressible,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
-      const Champ_Don& ch_visco_cin =ref_cast(Fluide_Incompressible,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
+      const Champ_Don ch_visco=ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
+      const Champ_Don& ch_visco_cin =ref_cast(Fluide_base,eqn_transp_K_Eps().milieu()).viscosite_cinematique();
       // const Champ_Don& ch_visco_cin_ou_dyn =((const Op_Diff_K_Eps&) eqn_transp_K_Eps().operateur(0)).diffusivite();
 
       const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -427,15 +427,18 @@ int Modele_turbulence_hyd_K_Eps::preparer_calcul()
   Champ_Inc& ch_K_Eps = K_Eps();
 
   const Milieu_base& mil=equation().probleme().milieu();
-  diviser_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
   imprimer_evolution_keps(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(ch_K_Eps.temps());
   limiter_viscosite_turbulente();
   // on remultiplie K_eps par rho
-  multiplier_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps::preparer_calcul la_viscosite_turbulente",la_viscosite_turbulente.valeurs());
   imprimer_evolution_keps(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,0);
@@ -478,15 +481,18 @@ void Modele_turbulence_hyd_K_Eps::mettre_a_jour(double temps)
   const Milieu_base& mil=equation().probleme().milieu();
   Debog::verifier("Modele_turbulence_hyd_K_Eps::mettre_a_jour la_viscosite_turbulente before",la_viscosite_turbulente.valeurs());
   // on divise K_eps par rho en QC pour revenir a K et Eps
-  diviser_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
+  if (equation().probleme().is_dilatable()) diviser_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
   imprimer_evolution_keps(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,1);
   loipar.calculer_hyd(ch_K_Eps);
   eqn_transp_K_Eps().controler_K_Eps();
   calculer_viscosite_turbulente(ch_K_Eps.temps());
   limiter_viscosite_turbulente();
   // on remultiplie K_eps par rho
-  multiplier_par_rho_si_qc(ch_K_Eps.valeurs(),mil);
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+  if (equation().probleme().is_dilatable())
+    {
+      multiplier_par_rho_si_dilatable(ch_K_Eps.valeurs(),mil);
+      correction_nut_et_cisaillement_paroi_si_qc(*this);
+    }
   la_viscosite_turbulente.valeurs().echange_espace_virtuel();
   Debog::verifier("Modele_turbulence_hyd_K_Eps::mettre_a_jour la_viscosite_turbulente after",la_viscosite_turbulente.valeurs());
   imprimer_evolution_keps(ch_K_Eps,eqn_transp_K_Eps().schema_temps(),LeCmu,0);

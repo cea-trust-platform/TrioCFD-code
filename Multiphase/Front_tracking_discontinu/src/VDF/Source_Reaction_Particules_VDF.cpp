@@ -83,11 +83,11 @@ DoubleTab& Source_Reaction_Particules_VDF::ajouter(DoubleTab& resu) const
   dom.creer_tableau_sommets(source_som);
 
   //is_QC=0 le terme source est homogne a dv/dt sinon homogene a d(rho*v)/dt
-  is_QC = equation().probleme().is_QC();
+  is_QC = equation().probleme().is_dilatable();
   if (sub_type(Navier_Stokes_FT_Disc,equation()))
     is_FT = 1;
 
-  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique().valeur());
+  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique());
   const DoubleTab& rho_faces = champ_rho.valeurs();
 
   //Remplissage de source_som (interpolation de source_stockage aux sommets)

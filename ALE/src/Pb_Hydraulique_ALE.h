@@ -23,7 +23,7 @@
 #ifndef Pb_Hydraulique_ALE_included
 #define Pb_Hydraulique_ALE_included
 
-#include <Pb_qdm_fluide.h>
+#include <Pb_Fluide_base.h>
 #include <Champ_Don.h>
 #include <Navier_Stokes_std_ALE.h>
 
@@ -37,9 +37,9 @@
 //     pour un fluide incompressible
 //     La formulation est de type vitesse pression
 // .SECTION voir aussi
-//      Navier_Stokes_std Pb_qdm_fluide Fluide_Incompressible
+//      Navier_Stokes_std Pb_Fluide_base Fluide_Incompressible
 //////////////////////////////////////////////////////////////////////////////
-class Pb_Hydraulique_ALE : public Pb_qdm_fluide
+class Pb_Hydraulique_ALE : public Pb_Fluide_base
 {
   Declare_instanciable(Pb_Hydraulique_ALE);
 

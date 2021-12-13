@@ -108,7 +108,7 @@ int Transport_V2::lire_motcle_non_standard(const Motcle& mot, Entree& is)
       Cerr << "Reading and typing of the diffusion operator : " << finl;
       if ( sub_type(Fluide_Incompressible,le_fluide.valeur()))
         {
-          Fluide_Incompressible& fluide_inc = ref_cast(Fluide_Incompressible,le_fluide.valeur());
+          Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
           terme_diffusif.associer_diffusivite(fluide_inc.viscosite_cinematique());
         }
       //  is >> terme_diffusif;

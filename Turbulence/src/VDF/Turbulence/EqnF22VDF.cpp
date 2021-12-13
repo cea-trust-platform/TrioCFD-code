@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <EqnF22VDF.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Modele_turbulence_hyd_K_Eps_V2_VDF.h>
 #include <Zone_Cl_VDF.h>
@@ -71,7 +71,7 @@ Entree& EqnF22VDF::readOn(Entree& s )
   KEps=mon_modele->K_Eps();
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,le_fluide.valeur());
+  const Fluide_base& fluide = ref_cast(Fluide_base,le_fluide.valeur());
   ch_visco_cin = fluide.viscosite_cinematique();
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur().valeur()))
@@ -130,7 +130,7 @@ void EqnF22VDF::resoudre()
 
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& le_fluide_inc = ref_cast(Fluide_Incompressible, eq_hydraulique.milieu());
+  const Fluide_base& le_fluide_inc = ref_cast(Fluide_base, eq_hydraulique.milieu());
   const Champ_Don& ch_viscocin = le_fluide_inc.viscosite_cinematique();
   DoubleTab& tab_visco = ref_cast_non_const(DoubleTab,ch_viscocin->valeurs());
   double visco=-1;

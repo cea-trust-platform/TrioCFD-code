@@ -29,9 +29,10 @@
 #include <Champ_Uniforme.h>
 #include <Turbulence_hyd_sous_maille_SMAGO_DYN_VDF.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
-#include <Modifier_pour_QC.h>
+#include <Fluide_Dilatable_base.h>
 #include <Param.h>
 #include <Debog.h>
+#include <Modifier_pour_fluide_dilatable.h>
 
 Implemente_instanciable(Modele_turb_scal_sm_dyn_VDF,"Modele_turbulence_scal_sous_maille_dyn_VDF",Modele_turbulence_scal_base);
 
@@ -165,25 +166,15 @@ void Modele_turb_scal_sm_dyn_VDF::mettre_a_jour(double )
 
   const Milieu_base& le_milieu = equation().probleme().milieu();
   const DoubleTab& tab_Cp = le_milieu.capacite_calorifique().valeurs();
+  const bool Ccp = sub_type(Champ_Uniforme, le_milieu.capacite_calorifique().valeur());
   const DoubleTab& tab_rho = le_milieu.masse_volumique().valeurs();
   const Probleme_base& mon_pb = mon_equation->probleme();
   DoubleTab& lambda_t = conductivite_turbulente_.valeurs();
   lambda_t = diffusivite_turbulente_.valeurs();
   if (sub_type(Pb_Thermohydraulique_Turbulent_QC,mon_pb))
     {
-      double cp=-1;
-      if (tab_Cp.nb_dim()==2)
-        {
-          cp=tab_Cp(0,0);
-          lambda_t*=cp;
-        }
-      else
-        {
-          int taille=lambda_t.size();
-          for (int i=0; i<taille; i++)
-            lambda_t(i)*=tab_Cp(i);
-        }
-      multiplier_par_rho_si_qc(lambda_t,le_milieu);
+      for (int i = 0; i < lambda_t.size(); i++) lambda_t(i) *= tab_Cp(Ccp ? 0 : i);
+      if (equation().probleme().is_dilatable()) multiplier_par_rho_si_dilatable(lambda_t,le_milieu);
     }
   else lambda_t *= tab_rho(0, 0) * tab_Cp(0, 0);
   lambda_t.echange_espace_virtuel();
@@ -394,7 +385,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
   // de diffusion
   if (flux_bords.size_array()==0)
     {
-      DoubleTab resu(la_zone_VDF->nb_faces_tot());
+      DoubleTab resu(la_zone_VDF->nb_faces_tot(), 1);
       operateur_diff.ajouter(ref_cast(DoubleTab,teta),resu);
     }
   const DoubleVect& faces_surfaces = la_zone_VDF->face_surfaces();

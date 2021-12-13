@@ -42,23 +42,23 @@ Postraitement_ft_lata::Postraitement_ft_lata()
 // Description: Appel a Postraitement_lata::readOn
 // Precondition: mon_probleme.valeur() doit etre de type :
 // Probleme_FT_Disc_gen
-// Pb_Thermohydraulique_QC_fraction_massique
-// Pb_Thermohydraulique_Turbulent_QC_fraction_massique
+// Pb_Thermohydraulique_Especes_QC
+// Pb_Thermohydraulique_Especes_Turbulent_QC
 Entree& Postraitement_ft_lata::readOn(Entree& is)
 {
   // Verification du type du probleme
   const Nom& type_pb =  mon_probleme.valeur().que_suis_je();
   if ( (!sub_type(Probleme_FT_Disc_gen, mon_probleme.valeur()))
-       && (type_pb!="Pb_Thermohydraulique_QC_fraction_massique")
-       && (type_pb!="Pb_Thermohydraulique_Turbulent_QC_fraction_massique") )
+       && (type_pb!="Pb_Thermohydraulique_Especes_QC")
+       && (type_pb!="Pb_Thermohydraulique_Especes_Turbulent_QC") )
     {
 
       Cerr << " Reading Postraitement_ft_lata\n";
       Cerr << " postraitement_ft_lata is not accepted for a problem of type "<<type_pb << finl;
       Cerr << " The recognized problems are :" << finl;
       Cerr << " Probleme_FT_Disc_gen " << finl;
-      Cerr << " Pb_Thermohydraulique_QC_fraction_massique " << finl;
-      Cerr << " Pb_Thermohydraulique_Turbulent_QC_fraction_massique " << finl;
+      Cerr << " Pb_Thermohydraulique_Especes_QC " << finl;
+      Cerr << " Pb_Thermohydraulique_Especes_Turbulent_QC " << finl;
       exit();
     }
 

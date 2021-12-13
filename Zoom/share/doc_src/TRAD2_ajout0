@@ -93,7 +93,7 @@ pb_hydraulique_concentration_turbulent_scalaires_passifs pb_avec_passif pb_hydra
   attr navier_stokes_turbulent navier_stokes_turbulent navier_stokes_turbulent 1 Navier-Stokes equations as well as the associated turbulence model equations.
   attr convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent convection_diffusion_concentration_turbulent 1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   ref constituant constituant
-pb_thermohydraulique_turbulent_qc_fraction_massique pb_avec_passif pb_thermohydraulique_turbulent_qc_fraction_massique -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
+pb_thermohydraulique_especes_turbulent_qc pb_avec_passif pb_thermohydraulique_especes_turbulent_qc -1 Resolution of turbulent thermohydraulic problem under low Mach number with passive scalar equations.
   attr navier_stokes_turbulent_qc navier_stokes_turbulent_qc navier_stokes_turbulent_qc 0 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
   attr convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_turbulent_qc 0 Energy equation under low Mach number as well as the associated turbulence model equations.
 navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier-Stokes equations as well as the associated turbulence model equations.
@@ -101,11 +101,9 @@ navier_stokes_turbulent navier_stokes_standard navier_stokes_turbulent -1 Navier
 navier_stokes_turbulent_qc navier_stokes_turbulent navier_stokes_turbulent_qc -1 Navier-Stokes equations under low Mach number as well as the associated turbulence model equations.
 convection_diffusion_temperature_turbulent eqn_base convection_diffusion_temperature_turbulent -1 Energy equation (temperature diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
-convection_diffusion_chaleur_turbulent_qc convection_diffusion_chaleur_qc convection_diffusion_chaleur_turbulent_qc -1 Energy equation under low Mach number as well as the associated turbulence model equations.
-  attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model for the energy equation.
 convection_diffusion_concentration_turbulent convection_diffusion_concentration convection_diffusion_concentration_turbulent -1 Constituent transport equations (concentration diffusion convection) as well as the associated turbulence model equations.
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used in the constituent transport equations. The only model currently available is Schmidt.
-convection_diffusion_fraction_massique_turbulent_qc eqn_base convection_diffusion_fraction_massique_turbulent_qc -1 not_set
+convection_diffusion_espece_multi_turbulent_qc eqn_base convection_diffusion_espece_multi_turbulent_qc -1 not_set
   attr modele_turbulence modele_turbulence_scal_base modele_turbulence 1 Turbulence model to be used.
   attr espece espece espece 0 not_set
 modele_turbulence_hyd_nul modele_turbulence_hyd_deriv NUL 0 not_set
@@ -135,6 +133,8 @@ schmidt modele_turbulence_scal_base schmidt -1 The Schmidt model. For the scalar
 modele_fonction_bas_reynolds_base objet_lecture modele_fonction_bas_reynolds_base -1 not_set
 transport_k_epsilon eqn_base transport_k_epsilon -1 The (k-eps) transport equation. To resume from a previous mixing length calculation, an external MED-format file containing reconstructed K and Epsilon quantities can be read (see fichier_ecriture_k_eps) thanks to the Champ_fonc_MED keyword. NL2 Warning, When used with the Quasi-compressible model, k and eps should be viewed as rho k and rho epsilon when defining initial and boundary conditions or when visualizing values for k and eps. This bug will be fixed in a future version.
   attr with_nu chaine(into=["yes","no"]) with_nu 1 yes/no
+transport_k eqn_base transport_k -1 The k transport equation in bicephale (standard or realisable) k-eps model.
+transport_epsilon eqn_base transport_epsilon -1 The eps transport equation in bicephale (standard or realisable) k-eps model. 
 mod_turb_hyd_rans modele_turbulence_hyd_deriv mod_turb_hyd_rans -1 Class for RANS turbulence model for Navier-Stokes equations.
   attr eps_min floattant eps_min 1 Lower limitation of epsilon (default value 1.e-10).
   attr eps_max floattant eps_max 1 Upper limitation of epsilon (default value 1.e+10).
@@ -187,6 +187,10 @@ utau_imp turbulence_paroi_base utau_imp 1 Keyword to impose the friction velocit
   attr u_tau field_base u_tau 1 Field type.
   attr lambda_c chaine lambda_c 1 The friction coefficient. It can be function of the spatial coordinates x,y,z, the Reynolds number Re, and the hydraulic diameter.
   attr diam_hydr field_base diam_hydr 1 The hydraulic diameter.
+source_transport_eps source_base source_transport_eps -1 Keyword to alter the source term constants for eps in the bicephale k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92
+  attr c1_eps floattant c1_eps 1 First constant.
+  attr c2_eps floattant c2_eps 1 Second constant.
+source_transport_k source_base source_transport_k -1 Keyword to alter the source term constants for k in the bicephale k-eps model epsilon transport equation.
 source_transport_k_eps source_base source_transport_k_eps -1 Keyword to alter the source term constants in the standard k-eps model epsilon transport equation. By default, these constants are set to: C1_eps=1.44 C2_eps=1.92
   attr c1_eps floattant c1_eps 1 First constant.
   attr c2_eps floattant c2_eps 1 Second constant.
@@ -220,3 +224,4 @@ bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the syn
   attr p floattant p 0 Wave number factor
   attr timeScale floattant timeScale 0 Integral time scale
   attr dir_fluct listf dir_fluct 0 direction of fluctuations
+

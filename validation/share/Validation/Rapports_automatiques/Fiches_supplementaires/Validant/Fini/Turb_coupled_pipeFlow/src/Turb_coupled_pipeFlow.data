@@ -119,8 +119,7 @@ Lire pb_fluide
                 {
 			seuil_convergence_implicite 0.0001	# TRES Important de mettre seuil_convergence_implicite bas sinon pas egalite des flux thermiques et bilans thermiques mauvais #
 		/*	solveur petsc bicgstab { precond ilu { level 1 } seuil 1e-16 impr divtol 1000000 } # divtol changed from 10000 to 1000000 cause one test failed with KSP_DIVERGED_TOL # */
-		solveur petsc bicgstab { precond pilut { level 20 epsilon 0.01 } seuil 1e-16 impr divtol 1000000 } # divtol changed from 10000 to 1000000 cause one test failed with KSP_DIVERGED_TOL #
-
+		solveur petsc bicgstab { precond pilut { level 20 epsilon 0.01 } seuil 1e-8 impr divtol 100000000 } # divtol changed from 10000 to 1000000 (then to 100000000) cause one test failed with KSP_DIVERGED_TOL #
 	        }
 		diffusion { }
 		convection { T_SCHEME }

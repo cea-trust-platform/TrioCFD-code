@@ -82,7 +82,7 @@ void Terme_Source_Qdm_VEF_Face::associer_zones(const Zone_dis& zone_dis,
 
 DoubleTab& Terme_Source_Qdm_VEF_Face::ajouter(DoubleTab& resu) const
 {
-  int nb_comp=resu.dimension(1);
+  int nb_comp=resu.line_size();
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
   const Zone_Cl_VEF& zone_Cl_VEF=la_zone_Cl_VEF.valeur();
   const IntTab& elem_faces = zone_VEF.elem_faces();

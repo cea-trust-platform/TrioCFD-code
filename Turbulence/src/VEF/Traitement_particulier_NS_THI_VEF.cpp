@@ -1628,7 +1628,7 @@ double Traitement_particulier_NS_THI_VEF::calcul_Ec_spatial(const DoubleTab& vit
   //  const int nb_faces_tot = zone_VF.nb_faces_tot();
   const Conds_lim& les_cl = zone_Cl_VEF.les_conditions_limites();
   int nb_cl=les_cl.size();
-  int nb_comp=vitesse.dimension(1);
+  const int nb_comp=vitesse.line_size();
   double Ec = 0;
   double Ec_min = 1e+20;
   double Ec_max = 0;
@@ -1954,7 +1954,7 @@ void Traitement_particulier_NS_THI_VEF::calcul_vitesse_moyenne(const DoubleTab& 
   MD_Vector_tools::get_sequential_items_flags(tab_global.get_md_vector(), flags);
 
   moyenne = 0;
-  int nb_comp = tab_global.dimension(1);
+  const int nb_comp = tab_global.line_size();
 
   // calcul de la moyenne, recherche du minimum et du maximum
   for (int num_cl=0; num_cl<nb_cl; num_cl++)

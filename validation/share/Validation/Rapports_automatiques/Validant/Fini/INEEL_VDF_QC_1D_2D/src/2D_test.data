@@ -54,7 +54,7 @@ Read air
         pression   92665.5
         mu Champ_Uniforme  1  1.983e-5
 
-        loi_etat gaz_parfait {
+        loi_etat gaz_parfait_qc {
                 Prandtl 0.72
                 Cp 1006.
                 gamma 1.4

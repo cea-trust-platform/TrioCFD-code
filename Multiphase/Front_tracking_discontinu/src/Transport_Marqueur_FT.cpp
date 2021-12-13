@@ -558,7 +558,7 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
         }
       else
         {
-          const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,mil);
+          const Fluide_base& fluide = ref_cast(Fluide_base,mil);
           const DoubleTab& rho = fluide.masse_volumique().valeurs();
           const DoubleTab& visco_dyn = fluide.viscosite_dynamique().valeurs();
           rho_fluide_som_ = rho(0,0);
@@ -583,7 +583,7 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
     }
   else
     {
-      const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_ns.milieu());
+      const Fluide_base& fluide = ref_cast(Fluide_base,eq_ns.milieu());
       const Champ_base& champ_masse_vol =  fluide.masse_volumique();
       const Champ_base& champ_visco_dyn =  fluide.viscosite_dynamique();
 

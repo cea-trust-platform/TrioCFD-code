@@ -31,7 +31,7 @@
 #include <Schema_Temps_base.h>
 #include <Debog.h>
 #include <Modele_rayo_semi_transp.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VEF.h>
 
@@ -204,7 +204,7 @@ void Flux_radiatif_VEF::calculer_flux_radiatif(const Equation_base& eq_temp)
   DoubleTab& Flux = flux_radiatif().valeurs();
   Flux.resize(le_bord.nb_faces(),1);
   Eq_rayo_semi_transp_VEF& eq_rayo = ref_cast( Eq_rayo_semi_transp_VEF,zone_Cl_dis().equation());
-  Fluide_Incompressible& fluide = eq_rayo.fluide();
+  Fluide_base& fluide = eq_rayo.fluide();
   DoubleTab& indice = fluide.indice().valeurs();
   DoubleTab& irradiance = eq_rayo.inconnue().valeurs();
 

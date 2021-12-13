@@ -23,7 +23,7 @@
 #include <Source_rayo_semi_transp_VDF_P0_VDF.h>
 #include <Modele_rayo_semi_transp.h>
 #include <Zone_VDF.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 
 Implemente_instanciable(Source_rayo_semi_transp_VDF_P0_VDF,"Source_rayo_semi_transp_VDF_P0_VDF",Source_rayo_semi_transp_base);
@@ -55,7 +55,7 @@ DoubleTab& Source_rayo_semi_transp_VDF_P0_VDF::ajouter(DoubleTab& resu) const
   const Equation_rayonnement& eq_rayo = Modele().eq_rayo();
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,eq_rayo.zone_dis().valeur());
   int nb_elem = zvdf.nb_elem();
-  const Fluide_Incompressible& fluide = eq_rayo.fluide();
+  const Fluide_base& fluide = eq_rayo.fluide();
   const DoubleTab& kappa = fluide.kappa().valeurs();
   const DoubleTab& indice = fluide.indice().valeurs();
   const DoubleTab& G = eq_rayo.inconnue().valeurs();

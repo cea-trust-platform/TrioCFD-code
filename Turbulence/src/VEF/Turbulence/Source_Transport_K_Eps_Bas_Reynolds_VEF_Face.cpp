@@ -24,7 +24,7 @@
 #include <Source_Transport_K_Eps_Bas_Reynolds_VEF_Face.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VEF.h>
@@ -139,7 +139,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter(DoubleTab& resu
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
   const DoubleTab& visco_turb = mod_turb.viscosite_turbulente().valeurs();
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   //const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
   /*
@@ -231,7 +231,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::associer_pb(const
     }
   const Equation_base& eqn = pb.equation(1);
   const Milieu_base& milieu = eqn.milieu();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,milieu);
+  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
 
   if (sub_type(Fluide_Quasi_Compressible,fluide))
     {
@@ -246,7 +246,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::associer_pb(const
     {
       const Convection_Diffusion_Temperature& eqn_th = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
       eq_thermique = eqn_th;
-      const Fluide_Incompressible& fluide_2 = eq_thermique->fluide();
+      const Fluide_base& fluide_2 = eq_thermique->fluide();
       if (fluide_2.beta_t().non_nul())
         beta_t = fluide_2.beta_t();
       gravite = fluide_2.gravite();
@@ -274,7 +274,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
   const DoubleTab& alpha_turb =        le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleTab& g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
-  const Fluide_Incompressible& fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   /*
     const DoubleTab& tab_visco = ch_visco_cin->valeurs();

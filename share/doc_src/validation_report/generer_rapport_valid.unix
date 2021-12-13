@@ -3,7 +3,7 @@
 cd ../../..
 version=$(pwd)
 echo 'emplacement version: '$version
-cd $version/share/doc_src/rapport_validation
+cd $version/share/doc_src/validation_report
 rapport=$(pwd)
 echo 'emplactement rapport: ' $rapport
 ##################################################
@@ -272,9 +272,9 @@ cd FTD_oscillating_bubble
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble/build/* .
+cp -R $version/Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble/build/.[!.]* .
+cp -R $version/Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -298,9 +298,9 @@ cd FTD_hanging_drop
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop/build/* .
+cp -R $version/Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop/build/.[!.]* .
+cp -R $version/Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_hanging_drop/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -402,8 +402,10 @@ sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 #           Generation document final
 ##################################################
 cd $rapport
-
+echo 'emplactement rapport: ' $rapport
+echo 'generation ' $(pwd)
 pdflatex validation_report_TrioCFD.tex
-mv validation_report_TrioCFD.pdf $version/share/doc/.
+pdflatex validation_report_TrioCFD.tex
+mv validation_report_TrioCFD.pdf $version/share/doc/TrioCFD_validation_report.pdf
 cd $version/share/doc
-okular validation_report_TrioCFD.pdf&
+okular TrioCFD_validation_report.pdf&

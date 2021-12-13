@@ -28,6 +28,9 @@
 #include <Navier_Stokes_phase_field.h>
 
 Implemente_instanciable(Schema_Phase_field,"Schema_Phase_field",Schema_Temps_base);
+// XD schema_phase_field schema_temps_base schema_phase_field -1 Keyword for the only available Scheme for time discretization of the Phase Field problem.
+// XD attr schema_ch schema_temps_base schema_ch 1 Time scheme for the Cahn-Hilliard equation.
+// XD attr schema_ns schema_temps_base schema_ns 1 Time scheme for the Navier-Stokes equation.
 
 
 // Description:

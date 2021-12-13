@@ -34,7 +34,7 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Constituant.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <EFichier.h>
 #include <Mod_turb_hyd_base.h>
 #include <Probleme_base.h>
@@ -141,7 +141,7 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
   const Turbulence_paroi& loi = mod_turb_hydr.loi_paroi();
-  const Fluide_Incompressible& le_fluide   = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
   const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
 
   if (!sub_type(ParoiVDF_TBLE,loi.valeur()))
@@ -259,7 +259,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const DoubleVect& volumes = zone_VDF.volumes();
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr  = mon_modele_turb_scal->equation().probleme().equation(0);
-  const Fluide_Incompressible& le_fluide   = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
   const double& tps = eqn_temp.schema_temps().temps_courant();
   const double& dt = eqn_temp.schema_temps().pas_de_temps();

@@ -1,0 +1,116 @@
+\rhead{DEFINITIONS}
+
+\lettrine[lines=2,slope=0pt,nindent=4pt]{\textbf{L}}{e} projet TrioCFD fait intervenir diff\'erents acteurs et
+utilise diverses notions qui seront expliqu\'es dans cette seconde partie.
+
+\chapter{\label{chapitre:termes}D\'efinition des termes utilis\'es}
+\lhead{D\'efinition des termes utilis\'es}
+\rhead{DEFINITIONS}
+
+\textbf{TULEAP :} logiciel OpenSource permettant la gestion du cycle de vie de \texttt{TrioCFD}. Il dispose de plusieurs outils
+dont plusieurs sont utilis\'es dans le cadre de la gestion du code TrioCFD : \smallskip
+\begin{itemize}[label=$\Rightarrow$, font=\LARGE]
+  \item \textbf{BugTracker :} Syst\`eme de "tracker" pour suivi des bugs, t\^aches, demandes de support, exigences, stories...
+  \item \textbf{Gestion de version :} Tuleap supporte le d\'ep\^ot GIT de \texttt{TrioCFD}. C'est via Tuleap que les d\'eveloppeurs vont demander l'int\'egration de leur branche de travail dans la version de d\'eveloppement par des \texttt{Pull Request}. Tuleap permet \'egalement de g\'erer les droits d'acc\'es \`a la base GIT du code ;
+  \item \textbf{MediaWiki :} Syst\`eme de gestion de contenu permettant de générer des wikis pour les d\'eveloppeurs et utilisateurs du code. Il est collaboratif et peut \^etre enrichi ou mis \`a jour par n'importe quel membre du projet TULEAP. Il fournit des informations sur la m\'ethodologie de d\'eveloppement dans \texttt{TrioCFD}, des m\'emos, un \'etat des lieux de la validation pour les versions livr\'ees,...
+  \item \textbf{Documents :} Stockage des documents relatifs \`a \texttt{TrioCFD} \`a destination des d\'eveloppeurs/utilisateurs internes CEA et TMA (\textit{e.g.} notes techniques CEA, supports des r\'eunions de d\'eveloppement, sp\'ecifications techniques \'emises,...)
+\end{itemize}\smallskip
+
+\textbf{Atelier de G\'enie Logiciel :} Ensemble de proc\'edures en Python et/ou bash constituant l'atelier "maison" de la plateforme et permettant sa v\'erification quotidienne, son bon fonctionnement, sa livraison, la g\'en\'eration de la documentation, ... \smallskip\newline
+
+\textbf{GIT :} outil de gestion de versions d\'ecentralis\'e sur lequel \texttt{TrioCFD} est stock\'e et l'\'evolution de son contenu d'arborescence g\'er\'e.\smallskip\newline
+
+\textbf{Branche master :} branche d'origine du d\'ep\^ot GIT. C'est elle qui est la r\'ef\'erence et qui permet de g\'en\'erer les versions de livraison. Celle-ci est mise \`a jour \`a chaque livraison de version, une fois que la version est consid\'er\'ee comme propre et stable. L'Atelier de G\'enie Logiciel part de cette branche du 
+code pour g\'en\'erer l'archive pour la livraison qui sera distribu\'ee aux utilisateurs et install\'ee sur les diff\'erentes machines/clusters.\smallskip\newpage
+
+\textbf{Branche triou/TMA :} branche de d\'eveloppement de \texttt{TrioCFD} dans laquelle sont r\'eguli\`erment int\'egr\'ees les branches GIT des d\'eveloppeurs ou de la TMA. C'est sur cette branche que l'Atelier de G\'enie Logiciel lance quotidiennement les tests de v\'erification sur les diff\'erentes machines du parc.\smallskip\newline
+
+\textbf{Branche GIT :} branche GIT d'un d\'eveloppeur ou d'un membre de la TMA issue de la branche de d\'eveloppement \textbf{triou/TMA} \`a un instant donn\'e. La Branche GIT a une vie propre en gestion de configuration. Elle peut \^etre synchronis\'ee avec une autre branche par les d\'eveloppeurs et la TMA. Tout nouveau d\'eveloppement ou correcif est effectu\'e dans une nouvelle branche d\'edi\'ee \`a ce travail. Le nom de cette branche doit respecter un certain formalisme, \`a savoir TCFDXXXXXX\_activit\'e o\`u \texttt{XXXXXX} correspond \`a l'Artifact ID (numéro d'identification) de la fiche de suivi correspondante ouverte dans le BugTracker et \texttt{activit\'e}, \`a un descriptif sur quelques caract\`eres du domaine concern\'e par la branche (\textit{e.g.} turbulence, documentation,...). Une fois arriv\'ee \`a maturit\'ee, celle-ci sera int\'egr\'ee dans la version de d\'eveloppement de TrioCFD.\smallskip\newline
+
+\textbf{Tag GIT :} r\'epertoire GIT des versions "fig\'ees" du projet.\smallskip\newline
+
+\textbf{Pull Request :} m\'ecanisme qui permet au d\'eveloppeur de pr\'evenir les membres de son \'equipe et notamment l'int\'egrateur que sa branche GIT  est fonctionnelle, test\'ee et donc pr\^ete \`a \^etre int\'egr\'ee dans la branche de d\'eveloppement de TrioCFD (branche \textbf{triou/TMA}). 4 informations sont n\'ecessaires pour faire une Pull Request : le d\'ep\^ot source, la branche source, le d\'ep\^ot cible et la branche cible. \smallskip\newline\newline
+
+\textbf{Jeu De Donn\'ees :} (JDD) il s'agit d'un ensemble de valeurs (ou donn\'ees) permettant de d\'efinir les caract\'eristiques et les mod\'eles qui seront utilis\'es lors de la simulation d'un applicatif. Le Jeu De Donn\'ees est structur\'e en diff\'erentes parties : d\'efinition de la g\'eom\'etrie, du maillage, des probl\`emes trait\'es (\textit{e.g.} turbulence, convection, diffusion,...), des conditions aux limites, des variables \`a extraire pour le post-traitement,...\smallskip\newline\newline
+
+\textbf{Demande d'intervention :} (DI) Demande d'intervention d'un Initiateur ou d'un Utilisateur sur le code. Pour chaque Demande d'Intervention, une fiche de suivi est ouverte dans le BugTracker de la forge TULEAP de \texttt{TrioCFD}.
+Cet outil permet le suivi de la r\'ealisation de son cycle de vie autant par le CEA que par la TMA. Il garantit la tra\c cabilit\'e des demandes et permet le calcul des indicateurs de la TMA. Ces Demandes d'Intervention peuvent \^etre de diff\'erentes natures :
+\begin{itemize}[label=$\Rightarrow$, font=\LARGE]
+  \item \textbf{Maintenance Corrective (MC) :} action permettant la correction d'anomalies dans les sources du code, dans les outils de maintenance, dans la documentation et dans les Jeux De Donn\'ees de la base de test.
+  \item \textbf{Maintenance Evolutive (ME) :} action de modification des sources du code et des outils de maintenance associ\'es qui ont pour cons\'equence :
+  \begin{itemize}
+    \item L'ajout de nouvelles fonctionnalit\'es ; 
+    \item L'adaptation \`a un changement d'environnement logiciel et syst\`eme ;
+    \item L'am\'elioration des performances informatiques ;
+    \item La r\'ealisation de fiches de v\'erification automatis\'ees.
+  \end{itemize}
+  \item \textbf{Assistance Aux Utilisateurs (AAU) :} action permettant de r\'epondre au besoin d'un utilisateur sans que cela implique la r\'ealisation d'une maintenance corrective ou \'evolutive. Cela couvre les actions d'installation ou d'aide \`a l'utilisation des codes du lot consid\'er\'e mais exclut les actions de formation ou d'expertise physique.
+  \item \textbf{Action de PORtage (POR) :} service ayant pour objet le portage des versions des codes sur les syst\`emes d'exploitation (OS) support\'es.
+  \item \textbf{Tests de Non-R\'egression (TNR) :} action permettant d'assurer le suivi quotidien de l'\'etat d'une version d'un code suite \`a l'int\'egration de corrections d'anomalies ou de d\'eveloppements.
+  \item \textbf{FORmations (FOR) :} ensemble des actions permettant de pr\'eparer et r\'ealiser une session de formation sur le code. Les formations sont planifi\'ees et organis\'ees par le CEA (sp\'ecification dans les lettres de cadrage semestrielles) qui en confie la pr\'eparation et l'ex\'ecution \`a la TMA.
+  \item \textbf{LIVraison de nouvelles versions (LIV) :} ensemble des actions permettant d'assurer la production de versions sur les diff\'erents syst\`emes d'exploitation (OS) et leur documentation en vue de la livraison des versions du code. 
+\end{itemize}\smallskip
+Suivant la nature et/ou la complexit\'e de la Demande d'Intervention, celle-ci peut \^etre trait\'ee soit par l'\'equipe TMA soit par l'\'equipe CEA.\smallskip\newline
+
+\textbf{R\'egression :} D\'egradation du comportement du code apr\`es int\'egration d'une modification ou d'une correction.\smallskip\newline
+
+\textbf{TNR :} Test de Non R\'egression, ensemble de calculs r\'ealis\'es apr\`es int\'egration d'une modification du code (dans le cadre du processus de d\'eveloppement ou d'action de maintenance), pour s'assurer de l'int\'egrit\'e de la version du code.\smallskip\newline
+
+\textbf{Robustesse :} notion qui rend compte du fait que l'utilisateur, lan\c cant un calcul aura la certitude que celui-ci ne soit pas interrompu avant l'atteinte de la fin du calcul, par le code lui-m\^eme sur crit\`ere de mauvaise convergence.\smallskip\newline
+
+\textbf{Portabilit\'e :} notion qui rend compte du fait qu'un m\^eme calcul, r\'ealis\'e dans diff\'erents environnements (compilateur, OS, machine PC ou serveur de calcul), produira un r\'esultat le moins sensible possible \`a cet environnement de calcul. Pour statuer sur la bonne portabilit\'e d'un code de calcul, on accepte g\'en\'eralement une tol\'erance de 2\% d'\'ecart entre les diff\'erentes configurations test\'ees.\smallskip\newline
+
+\textbf{Mode de compilation :} afin de s'assurer du bon fonctionnement du code apr\'es chaque int\'egration, celui-ci est compil\'e chaque nuit par l'atelier logiciel avec diff\'erents modes de compilation et diff\'erentes options. 3 modes de compilation sont test\'es r\'eguli\`erement : 
+\begin{itemize}
+  \item le mode optimis\'e : on autorise, dans ce cas, au compilateur \`a effectuer des op\'erations d'optimisation afin de g\'en\'erer le code pour une vitesse maximale d'ex\'ecution ou une taille minimale du code compil\'es ; le code compil\'e est alors plus complexe, une compilation plus longue mais une taille de code compil\'e r\'eduite. Par exemple, en mode optimis\'e, seules les variables globales sont initialis\'ees \`a 0 et non pas l'ensemble des variables. Ainsi, quand les variables sont lues dans des contextes particuliers, comme \`a l'int\'erieur d'une boucle, ces absences d'initialisation ne sont pas toujours d\'etect\'ees par le compilateur. 
+  \item le mode debug : ce mode de compilation est principalement d\'edi\'e au d\'eboggage lors du d\'eveloppement. Dans ce cas-l\`a, toutes les optimisations sont d\'esactiv\'ees (informations symboliques conserv\'ees, ajout de points d'arr\^et,...). Ce mode de compilation permet de mieux comprendre le fonctionnement d'un programme, d'ex\'ecuter le code pas \`a pas (gr\^ace un debugger type gdb) et de corriger facilement les erreurs. Le temps de compilation est alors plus court, l'utilisation de la m\'emoire est moins importante mais la taille du code compil\'e sera plus   importante ainsi que son temps d'ex\'ecution. Ce mode d'ex\'ecution est souvent coupl\'e \`a des outils de debug/analyse de performance, type valgrind pour d\'etecter d'\'eventuelles fuites m\'emoire parfois ind\'etectables par le compilateur.
+  \item le mode semi-optimis\'e : il s'agit d'un mode de compilation interm\'ediaire entre le mode optimis\'e et le mode d\'ebug.
+\end{itemize}
+\newpage
+
+\chapter{D\'efinition des acteurs}
+\lhead{D\'efinition des acteurs}
+\rhead{DEFINITIONS}
+
+\textbf{TMA : } Tierce Maintenance Applicative est la maintenance appliqu\'ee du logiciel. Elle est assur\'ee par un prestataire externe dans les domaines de l'informatique et de la thermo-hydraulique. Un cahier des charges est \'emis par le CEA auquel plusieurs candidats vont r\'epondre. A l'issue de cette consultation, un des candidats sera retenu et deviendra le titulaire du contrat de maintenance. Le contrat actuel de TMA est \'etabli pour deux ans fermes avec la possibilit\'e de lever des options pour trois ann\'ees suppl\'ementaires. Sur \texttt{TrioCFD}, l'\'equipe technique de TMA est compos\'ee de deux intervenants principaux :\smallskip\newline
+
+\begin{itemize}[label=$\Rightarrow$, font=\LARGE]
+  \item Le \textbf{Responsable Maintenance Logiciel} (RML) est g\'en\'eralement le membre le plus exp\'eriment\'e de l'\'equipe de TMA. Il est responsable de diff\'erentes t\^aches comme :
+  \begin{itemize}
+    \item la centralisation des Demandes d'Intervention (r\'eception des actions de maintenance,  v\'erification de leur coh\'erence et leur recevabilit\'e ) ;
+    \item la r\'epartition du traitement des Demandes d'Intervention au sein de l'\'equipe TMA ;
+    \item le bon fonctionnement de l'Atelier de G\'enie Logiciel ;
+    \item le suivi de la base de v\'erification quotidienne ;
+    \item la tenue de la bonne r\'esolution des Demandes d'Intervention (qualit\'e, temps de traitement,...) ;
+    \item le reporting des statistiques sur les travaux de la TMA ;
+    \item l'archivage rigoureux de l'ensemble des documents associ\'es aux Demandes d'Intervention en cours ou closes ;
+    \item le chiffrage et l'\'emission d'une propostion de travail pour les Demandes d'Intervention de type \texttt{Maintenance Evolutive} ;
+    \item la r\'esolution des Demandes d'Intervention (g\'en\'eralement celles n\'ecessitant la plus grande comp\'etence
+    m\'etier ;
+    \item ...
+  \end{itemize}
+  \item L'\textbf{Intervenant Maintenance Logiciel} (IML) est, quant \`a lui, charg\'e de la r\'esolution des Demandes d'Intervention qui lui sont attribu\'ees par le RML et de l'accomplissement des t\^aches que le RML peut lui avoir d\'el\'egu\'ees;
+\end{itemize}\smallskip
+
+Le \textbf{Responsable de Produit Logiciel (RPL)} (agent CEA) s'assure du bon déroulé du contrat de TMA et remonte au chargé d'affaire CEA, les performances de l'équipe TMA qui seront étudiées lors du COmité de PILotage (COPIL) qui se déroule tous les 2 mois. Il statue sur les priorisations entre les différents codes couverts par l'équipe de TMA.\smallskip\newline
+
+Le \textbf{Responsable de Code} (agent CEA) est en charge du bon fonctionnement du code et des outils associ\'es, de sa gestion ainsi que de la coh\'erence techniques des diff\'erentes actions men\'ees sur le code. Ainsi, sont de son ressort :
+\begin{itemize}[label=$\Rightarrow$, font=\LARGE]
+  \item la bonne conduite de l'int\'egration de nouveaux d\'eveloppements ou de correctifs dans la version  consid\'er\'ee,
+  \item la r\'ealisation p\'eriodique des tests de non-r\'egression lorsque la branche de d\'eveloppement a fait l'objet de modifications,
+  \item le d\'epouillement des r\'esultats associ\'es, au moyen d'outils du projet et prononce la validit\'e (ou non) de cette version autant d'un point de vue physique que num\'erique,
+  \item la mise \`a jour de la liste des tests de non-r\'egression de la branche consid\'er\'ee (ajout/suppression),
+  \item la fourniture d'un cadre de travail optimum aux d\'eveloppeurs et utilisateurs du code en terme d'outils, de pr\'econisations, de documentation,...
+  \item le lien entre l'\'equipe CEA et l'\'equipe TMA travaillant sur les Demandes d'Intervention \'emanant de l'\'equipe de d\'eveloppement
+  \item les v\'erifications du ressort du CEA lors de la livraison des versions
+  \item la communication autour du code (r\'eunions de d\'eveloppement, s\'eminaires, site web,...)
+\end{itemize}\smallskip
+
+Le \textbf{Relecteur} s'occupe de la relecture des branches des d\'eveloppeurs avant que celles-ci ne soient int\'egr\'ees dans la branche de d\'eveloppement du code. Suite \`a cette relecture, des corrections sur la branche consid\'er\'ee peuvent \^etre n\'ecessaires afin que le code r\'eponde aux recommandations de codage et aux exigences. Ce r\^ole est, la plupart du temps, endoss\'e par le Responsable de Code.\smallskip\newline
+
+L'\textbf{Int\'egrateur}, après approbation d'une branche de d\'eveloppement, sera en charge de fusionner cette branche dans la branche de d\'eveloppement de TrioCFD. Ce r\^ole est \'egalement majoritairement endoss\'e par le Responsable de Code.\smallskip\newline
+
+L'\textbf{Initiateur} est celui qui d\'etecte une anomalie sur les versions en d\'eveloppement. La d\'etection de cette anomalie entrainera l'ouverture d'une Demande d'Intervention et donc d'une fiche dans le BugTracker.\smallskip\newline
+
+\textbf{L'utilisateur :} L'utilisateur formalise une Demande de maintenance et est destinataire de sa correction.
+

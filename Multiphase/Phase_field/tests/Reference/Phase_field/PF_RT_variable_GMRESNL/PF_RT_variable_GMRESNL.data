@@ -64,7 +64,7 @@ Lire fluide
 {
 	mu Champ_Uniforme 1 1.e-1
 	rho Champ_Uniforme 1 1000.
-	beta_co Champ_Fonc_Fonction concentration 1 0.9
+	beta_co Champ_Fonc_Fonction pb concentration 1 0.9
 }
 
 Champ_Uniforme gravite
@@ -93,13 +93,15 @@ Lire pb
 				seuil 1.e-15
 		}
 		convection { quick }
-		approximation_de_boussinesq		   non {
-			rho_1 				   550 
-			rho_2     			   1450 
+		approximation_de_boussinesq		   non { 
+			probleme pb
+			rho_1 550 
+			rho_2 1450 
 		}
-		viscosite_dynamique_constante		   non {
-			mu_1				   1.e-2
-			mu_2				   1.e-1
+		viscosite_dynamique_constante		   non { 
+			probleme pb
+			mu_1 1.e-2
+			mu_2 1.e-1
 		}
 		diffusion { }
                 sources {

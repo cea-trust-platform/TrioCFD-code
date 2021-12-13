@@ -26,7 +26,7 @@
 
 #include <Ref_Champ_base.h>
 #include <Champ_Fonc.h>
-#include <Ref_Fluide_Incompressible.h>
+#include <Ref_Fluide_base.h>
 #include <Ref_Champ_Inc.h>
 #include <Ref_Equation_base.h>
 #include <Ref_Champ_Don.h>
@@ -53,6 +53,8 @@ public:
 
   inline const Equation_base& equation() const;
   inline  Equation_base& equation();
+  inline const Equation_base& seconde_equation() const;
+  inline  Equation_base& seconde_equation();
   inline const DoubleTab& get_S() const;
   inline  DoubleTab& get_S();
   inline const DoubleTab& get_Cmu( void ) const;
@@ -79,6 +81,12 @@ public:
   virtual void Contributions_Sources_Paroi(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K_Eps, const double EPS_MIN,
                                            const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) =0;
 
+  virtual void Calcul_C1_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
+  virtual void Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)  =0;
+  virtual void Contributions_Sources_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN) =0;
+  virtual void Contributions_Sources_Paroi_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+                                               const DoubleTab& visco_tab, const DoubleTab& visco_turb,const DoubleTab& tab_paroi,const int idt) =0;
+
   Entree& lire(const Motcle&, Entree&);
 
   //Methodes de l interface des champs postraitables
@@ -90,6 +98,11 @@ public:
 
   void associer_eqn(const Equation_base& );
 
+  virtual void associer_eqn_2(const Equation_base& );
+
+public:
+  REF(Equation_base) ma_seconde_equation;
+
 protected :
 
   DoubleTab S_;
@@ -98,7 +111,7 @@ protected :
 
   REF(Equation_base) mon_equation;
 
-  REF(Fluide_Incompressible) le_fluide;
+  REF(Fluide_base) le_fluide;
   REF(Champ_Inc) la_vitesse_transportante;
   REF(Equation_base) eq_hydraulique;
   REF(Champ_Don) visco_;
@@ -128,6 +141,26 @@ inline const Equation_base& Modele_Fonc_Realisable_base::equation() const
 inline Equation_base& Modele_Fonc_Realisable_base::equation()
 {
   return mon_equation.valeur();
+}
+
+inline const Equation_base& Modele_Fonc_Realisable_base::seconde_equation() const
+{
+  if (ma_seconde_equation.non_nul()==0)
+    {
+      Cerr << "\nError in Modele_Fonc_Realisable_base::seconde_equation() : The equation is unknown !" << finl;
+      Process::exit();
+    }
+  return ma_seconde_equation.valeur();
+}
+
+inline Equation_base& Modele_Fonc_Realisable_base::seconde_equation()
+{
+  if (ma_seconde_equation.non_nul()==0)
+    {
+      Cerr << "\nError in Modele_Fonc_Realisable_base::seconde_equation() : The equation is unknown !" << finl;
+      Process::exit();
+    }
+  return ma_seconde_equation.valeur();
 }
 
 inline const DoubleTab& Modele_Fonc_Realisable_base::get_S() const

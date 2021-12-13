@@ -25,6 +25,7 @@
 #include <Les_Pb_Turb.h>
 #include <Modele_turbulence_scal_Fluctuation_Temperature_W.h>
 #include <Param.h>
+#include <Fluide_base.h>
 
 Implemente_instanciable(Transport_K_Eps_Bas_Reynolds,"Transport_K_Eps_Bas_Reynolds",Transport_K_Eps_non_std);
 
@@ -107,7 +108,7 @@ void Transport_K_Eps_Bas_Reynolds::associer_modele_turbulence(const Mod_turb_hyd
 
 void Transport_K_Eps_Bas_Reynolds::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  le_fluide = ref_cast(Fluide_Incompressible, un_milieu);
+  le_fluide = ref_cast(Fluide_base, un_milieu);
 }
 
 const Motcle& Transport_K_Eps_Bas_Reynolds::domaine_application() const

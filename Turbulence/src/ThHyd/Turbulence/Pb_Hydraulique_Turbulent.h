@@ -24,7 +24,7 @@
 #ifndef Pb_Hydraulique_Turbulent_included
 #define Pb_Hydraulique_Turbulent_included
 
-#include <Pb_qdm_fluide.h>
+#include <Pb_Fluide_base.h>
 #include <Navier_Stokes_Turbulent.h>
 
 class Champ_Fonc;
@@ -40,9 +40,9 @@ class Champ_Fonc;
 //     pour un fluide incompressible
 //     La formulation est de type vitesse pression
 // .SECTION voir aussi
-//     Pb_qdm_fluide Navier_Stokes_Turbulent Pb_Hydraulique
+//     Pb_Fluide_base Navier_Stokes_Turbulent Pb_Hydraulique
 //////////////////////////////////////////////////////////////////////////////
-class Pb_Hydraulique_Turbulent : public Pb_qdm_fluide
+class Pb_Hydraulique_Turbulent : public Pb_Fluide_base
 {
   Declare_instanciable(Pb_Hydraulique_Turbulent);
 

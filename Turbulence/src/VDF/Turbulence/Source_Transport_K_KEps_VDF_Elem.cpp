@@ -24,7 +24,7 @@
 #include <Transport_K_KEps.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Probleme_base.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
@@ -212,7 +212,7 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
   DoubleTrav tab_couches(nb_elem_tot);
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1;
@@ -451,7 +451,7 @@ void Source_Transport_K_KEps_anisotherme_VDF_Elem::associer_pb(const Probleme_ba
   const Convection_Diffusion_Temperature& eqn_th =
     ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
   eq_thermique = eqn_th;
-  const Fluide_Incompressible& fluide = eq_thermique->fluide();
+  const Fluide_base& fluide = eq_thermique->fluide();
   beta_t = fluide.beta_t();
   gravite = fluide.gravite();
 }
@@ -500,7 +500,7 @@ DoubleTab& Source_Transport_K_KEps_anisotherme_VDF_Elem::ajouter(DoubleTab& resu
   double d_visco,y_etoile, critere_switch;
 
   //Extraction de la viscosite moleculaire
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eq_hydraulique->milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   double visco=-1;

@@ -480,11 +480,7 @@ DoubleTab& Op_Conv_VEF_Face::ajouter(const DoubleTab& transporte,
             }
         }
 
-      DoubleTab tab;
-      if (ncomp_ch_transporte == 1)
-        tab.resize(nb_faces_perio);
-      else
-        tab.resize(nb_faces_perio,ncomp_ch_transporte);
+      DoubleTab tab(nb_faces_perio,ncomp_ch_transporte);
 
       nb_faces_perio=0;
       for (n_bord=0; n_bord<nb_bord; n_bord++)

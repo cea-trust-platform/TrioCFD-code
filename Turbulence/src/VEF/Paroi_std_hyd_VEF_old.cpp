@@ -23,7 +23,7 @@
 #include <Paroi_std_hyd_VEF_old.h>
 #include <Champ_Q1NC.h>
 #include <Champ_P1NC.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>
@@ -87,7 +87,7 @@ int Paroi_std_hyd_VEF_old::init_lois_paroi_hydraulique()
 
 int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
 {
-  int nb_dim = tab.nb_dim();
+  const int nb_comp = tab.line_size();
   const IntTab& face_voisins = la_zone_VEF->face_voisins();
 
   // Boucle sur les bords
@@ -110,22 +110,13 @@ int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
           ndeb = le_bord.num_premiere_face();
           nfin = ndeb + le_bord.nb_faces();
 
-          if (nb_dim == 1)
+          if (tab.nb_dim() == 2)
             for (int num_face=ndeb; num_face<nfin; num_face++)
               {
                 elem = face_voisins(num_face,0);
-                tab(elem) = 0;
+                for (int k=0; k<nb_comp; k++)
+                  tab(elem,k) = 0;
               }
-          else if (nb_dim == 2)
-            {
-              int nb_comp= tab.dimension(1);
-              for (int num_face=ndeb; num_face<nfin; num_face++)
-                {
-                  elem = face_voisins(num_face,0);
-                  for (int k=0; k<nb_comp; k++)
-                    tab(elem,k) = 0;
-                }
-            }
           else
             {
               Cerr << "Erreur TRUST dans Paroi_std_hyd_VEF_old::preparer_calculer_hyd" << finl;
@@ -138,6 +129,326 @@ int Paroi_std_hyd_VEF_old::preparer_calcul_hyd(DoubleTab& tab)
 }                   // fin de preparer_calcul_hydraulique
 
 
+int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
+{
+  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+
+
+  //const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
+  const IntTab& face_voisins = zone_VEF.face_voisins();
+  const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
+  const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
+  const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
+  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const Zone& zone = zone_VEF.zone();
+  int nfac = zone.nb_faces_elem();
+
+  //int ndebint = zone_VEF.premiere_face_int();
+  double visco=-1;
+  int l_unif;
+  if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
+    {
+      visco = max(tab_visco(0,0),DMINFLOAT);
+      l_unif = 1;
+    }
+  else
+    l_unif = 0;
+
+  // preparer_calcul_hyd_BiK(tab_k,tab_eps);
+  if ((!l_unif) && (tab_visco.local_min_vect()<DMINFLOAT))
+    //   on ne doit pas changer tab_visco ici !
+    {
+      Cerr<<" visco <=0 ?"<<finl;
+      exit();
+    }
+  //    tab_visco+=DMINFLOAT;
+
+  int ndeb,nfin,nfc;
+  double norm_v=-1;//,norm_v1,norm_v2;
+  double dist=-1;
+  double u_plus_d_plus,d_visco=-1,u_star;
+  //double val1,val2,val3;
+  ArrOfDouble val(dimension);
+  IntVect num(nfac);
+  Cisaillement_paroi_=0;
+  int is_champ_Q1NC=sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur());
+  //  methode_calcul_face_bloquee pour garder l'ancien comportement
+  int  methode_calcul_face_bloquee=1;
+  remplir_face_keps_imposee( flag_face_keps_imposee_, methode_calcul_face_bloquee,face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+
+  // Boucle sur les bords
+  ArrOfInt is_defilante_face(zone_VEF.nb_faces_tot());
+  for (int n_bord=0; n_bord<zone_VEF.nb_front_Cl(); n_bord++)
+    {
+
+      // pour chaque condition limite on regarde son type
+      // On applique les lois de paroi uniquement
+      // aux voisinages des parois
+
+      const Cond_lim& la_cl = la_zone_Cl_VEF->les_conditions_limites(n_bord);
+      if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || (sub_type(Dirichlet_paroi_defilante,la_cl.valeur())))
+        {
+          int is_defilante=sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ;
+          const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
+          const IntTab& elem_faces = zone_VEF.elem_faces();
+          ndeb = 0;
+          nfin = le_bord.nb_faces();
+          //          int ndeb_virt = 0;
+          //int nfin_virt = nb_faces_virt;
+          if ((dimension == 2)|| (dimension ==3))
+            {
+
+              // On traite les faces de bord reelles.
+              for (int ind_face=ndeb; ind_face<nfin; ind_face++)
+                {
+                  int num_face=le_bord.num_face(ind_face);
+                  is_defilante_face[num_face]=is_defilante;
+                  int elem=face_voisins(num_face,0);
+                  int nf2;
+
+                  // on determine les face de l'elements qui sont autres que le num_face traite
+                  for (nf2=0; nf2<nfac; nf2++)
+                    {
+                      num[nf2] = elem_faces(elem,nf2);
+                    }
+                  // Maintenant on place le num_face en fin de tableau
+                  for (nf2=0; nf2<nfac-1; nf2++)
+                    {
+                      num[nf2] = elem_faces(elem,nf2);
+                      if (num[nf2] == num_face)
+                        {
+                          num[nf2] = num[nfac-1];
+                          num[nfac-1] = num_face;
+                        }
+                    }
+
+                  nfc=0;
+                  // Boucle sur les faces :
+                  for (int nf=0; nf<nfac; nf++)
+                    {
+                      if (num[nf]==num_face)
+                        {
+
+
+                          //          if (sub_type(Champ_P1NC,eqn_hydr.inconnue().valeur()))
+                          // Strategie pour les tetras :
+                          // On impose k et eps a la paroi :
+                          // approximation: d(k)/d(n) = 0 a la paroi
+                          // c'est faux mais ca marche
+                          tab_k(num[nf])=0.;
+                          tab_eps(num[nf])=0.;
+                          int nk=0;
+
+                          for (int k=0; k<nfac; k++)
+                            //if ( (num[k] >= ndebint) && (k != nf))
+                            if ( (face_keps_imposee_[num[k]]>-1) && (k != nf))
+                              {
+
+                                tab_k(num[nf])+= tab_k(num[k]);
+                                tab_eps(num[nf])+= tab_eps(num[k]);
+                                nk++;
+                              }
+
+                          if (nk != 0 )
+                            {
+                              tab_k(num[nf])/=nk;
+                              tab_eps(num[nf])/=nk;
+                            }
+
+                        }
+
+
+                      // On verifie si num[nf] n'est pas une face de bord :
+
+                      else  if ( (face_keps_imposee_[num[nf]]>-1))//if (num[nf]>=ndebint)
+                        {
+
+
+                          nfc++;
+                          norm_v=norm_vit_lp_k(vit,num[nf],num_face,zone_VEF,val,is_defilante);
+                          //  dist=distance_face(num_face,num[nf],zone_VEF);
+                          //if (sub_type(Champ_P1NC,eqn_hydr.inconnue().valeur()))
+                          if (!is_champ_Q1NC)
+                            {
+                              dist=distance_face(num_face,num[nf],zone_VEF);
+                            }
+                          else
+                            {
+                              assert(sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur())) ;
+                              dist=distance_face_elem(num_face,elem,zone_VEF);
+                            }
+
+                          if (l_unif)
+                            d_visco = visco;
+                          else
+                            d_visco = tab_visco[elem];
+                          u_plus_d_plus = norm_v*dist/d_visco;
+
+                          // Calcul de u* et des grandeurs turbulentes:
+                          u_star=calculer_local_BiK(u_plus_d_plus,d_visco,tab_k,tab_eps,norm_v,dist,num[nf],num_face);
+                          // Calcul de la contrainte tangentielle
+                          double vit_frot = u_star*u_star;
+                          for (int dir=0; dir<dimension; dir++)
+                            Cisaillement_paroi_(num_face,dir) += vit_frot*val[dir];
+                          //Cisaillement_paroi_(num_face,0) += u_star*u_star*val[0];
+                          // Fin de la strategie du calcul generalise de la loi de paroi
+                        }
+                      else
+                        {
+                          //Cerr<<"Attention, on n'a rien fait dans Paroi_std_hyd_VEF_old::calculer_hyd"<<finl;
+                          //Cerr<<"pour le numero de face num[nf] = "<<num[nf]<<" et num_face = "<<num_face<<finl;
+                          //Cerr<<"ndebint = "<<ndebint<<finl;
+                        }
+                    }
+                  // A voir si juste :
+                  if (nfc != 0 )
+                    for (int dir=0; dir<dimension; dir++)
+                      Cisaillement_paroi_(num_face,dir)/=nfc;
+
+                  double res=0;
+                  for (int dir=0; dir<dimension; dir++)
+                    {
+                      res+=tau_tang(num_face,dir)*tau_tang(num_face,dir);
+                    }
+                  res=sqrt(sqrt(res));
+                  /*
+                    if (res!=sqrt(tau_tang(num_face,0)))
+                    {
+                    Cerr<<"ici"<<tau_tang(num_face,1)<<finl;
+                    exit();
+                    }
+                  */
+                  tab_u_star_(num_face)=res;
+                  // Calcul de u+ d+
+                  calculer_uplus_dplus(uplus_, tab_d_plus_, tab_u_star_, num_face, dist, d_visco, norm_v) ;
+                } // Fin du traitement des faces reelles
+            }
+
+
+
+        }  // fin de la cond Dirichlet paroi_fixe
+
+    }   // fin de la boucle for CL
+
+
+
+
+
+#ifdef CONTROL
+  // TEST faces_k_eps
+  if ((!flag_face_keps_imposee_)&&(!is_champ_Q1NC))
+    {
+      if (0)
+        {
+          int nb_faces_tot=zone_VEF.nb_faces_tot();
+          DoubleVect toto(nb_faces_tot);
+          const ArrOfInt& renum=Debog::renum_faces();
+          for (int i=0; i<nb_faces_tot; i++)
+            if ((face_keps_imposee_(i)>-1)&&(Debog::mode_db==1))
+              {
+                if (i>1000) Cerr<<me()<<" face_virt "<<i<<finl;
+                toto(i)=renum(face_keps_imposee_(i));
+              }
+            else toto(i)=face_keps_imposee_(i);
+          barrier();
+          Debog::verifier("face_keps ",toto);
+        }
+      int tutu=0;
+      ArrOfInt test;
+      //  methode_calcul_face_bloquee pour garder l'ancien comportement
+      int  methode_calcul_face_bloquee=1;
+      remplir_face_keps_imposee( tutu, test,methode_calcul_face_bloquee, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+      test-=face_keps_imposee_;
+      if (max(test)>0|| min(test)<0)
+        {
+          const DoubleTab& xv=zone_VEF.xv();
+          Cerr<<"TEST "<<finl;
+          int compteur=0,compteur2=0;
+          for (int i=0; i<test.size_array(); i++)
+            {
+              test(i)+=face_keps_imposee_(i);
+              if (test(i)!=face_keps_imposee_(i))
+                {
+
+                  Cerr<<me()<<" face "<<i<<" : " <<face_keps_imposee_(i)<<" "<<test(i)<<" pos "<<xv(i,0)<<" "<<xv(i,1);
+                  if (dimension==3) Cerr<<" "<<xv(i,2);
+
+                  if (face_keps_imposee_(i)!=-2)
+                    {
+                      Cerr<<" pos trouve "<<xv(face_keps_imposee_(i),0)<<" "<<xv(face_keps_imposee_(i),1);
+                      if (dimension==3) Cerr<<" "<<xv(face_keps_imposee_(i),2);
+                    }
+                  if (test(i)!=-2)
+                    {
+                      Cerr<<" pos test "<<xv(test(i),0)<<" "<<xv(test(i),1);
+                      if (dimension==3) Cerr<<" "<<xv(test(i),2);
+                    }
+                  Cerr<<finl;
+                }
+              if (test(i)>-1) compteur++;
+              if (face_keps_imposee_(i)>-1) compteur2++;
+            }
+          Cerr<<"compteurs "<<compteur2<<" "<<compteur<<finl;
+          exit();
+        }
+      // else exit();
+
+    }
+#endif
+
+  // on recalcule partout ou c'est impose
+  int nb_faces_tot=zone_VEF.nb_faces_tot();
+  //int tutu=0;
+  //remplir_face_keps_imposee( flag_face_keps_imposee_, face_keps_imposee_, zone_VEF,la_zone_Cl_VEF,!is_champ_Q1NC);
+  //  if (!is_champ_Q1NC)
+  for (int face=0; face<nb_faces_tot; face++)
+    {
+      int num_face=face_keps_imposee_[face];;
+      if (num_face>-1)
+        {
+          //int elem_voisin;
+          int elem=face_voisins(num_face,0);
+          //if (face_voisins(face,0)!=elem) elem_voisin=face_voisins(face,0);
+          //else elem_voisin=face_voisins(face,1);
+          //int elem_voisin=face_voisins(num_face,0);
+          // ce n'est pas le bon voisin!!!!
+          double distbis;
+
+          //dist=distance_face(num_face,face,zone_VEF);
+
+          if (!is_champ_Q1NC)
+            {
+              distbis=distance_face(num_face,face,zone_VEF);
+            }
+          else
+            {
+              assert(sub_type(Champ_Q1NC,eqn_hydr.inconnue().valeur())) ;
+              distbis=distance_face_elem(num_face,elem,zone_VEF);
+            }
+
+          norm_v=norm_vit_lp_k(vit,face,num_face,zone_VEF,val,is_defilante_face[num_face]);
+
+
+          if (l_unif)
+            d_visco = visco;
+          else
+            d_visco = tab_visco[elem];
+          u_plus_d_plus = norm_v*distbis/d_visco;
+          u_star=calculer_local_BiK(u_plus_d_plus,d_visco,tab_k,tab_eps,norm_v,distbis,face,num_face);
+        }
+    }
+
+
+  Cisaillement_paroi_.echange_espace_virtuel();
+  tab_k.echange_espace_virtuel();
+  tab_eps.echange_espace_virtuel();
+
+
+
+  return 1;
+}  // fin de calcul_hyd_BiK (K-eps bicephale)
+
 int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
 {
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
@@ -146,7 +457,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
   //const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
@@ -464,7 +775,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const IntVect& rang_elem_non_std = zone_VEF.rang_elem_non_std();
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
@@ -1054,6 +1365,40 @@ double Paroi_std_hyd_VEF_old::calculer_local(double u_plus_d_plus,double d_visco
 }
 
 
+double Paroi_std_hyd_VEF_old::calculer_local_BiK(double u_plus_d_plus,double d_visco,
+                                                 DoubleTab& k,DoubleTab& eps,double norm_vit,
+                                                 double dist,int face,int num_face)
+{
+  double u_star;
+  double valmin = table_hyd.val(5);
+  double valmax = table_hyd.val(30);
+
+
+
+  if (u_plus_d_plus <= valmin)
+    {
+      u_star=calculer_u_star_sous_couche_visq(norm_vit,d_visco,dist,num_face);
+      calculer_sous_couche_visq_BiK(k,eps,face);
+    }
+
+  else if ((u_plus_d_plus > valmin) && ( u_plus_d_plus < valmax))
+    {
+      double d_plus;
+      u_star=calculer_u_star_sous_couche_tampon(d_plus,u_plus_d_plus,d_visco,dist,num_face);
+      calculer_sous_couche_tampon_BiK(u_star,k,eps,d_visco,d_plus,face,num_face);
+    }
+
+  else // if (u_plus_d_plus >= valmax)
+    {
+      assert(u_plus_d_plus >= valmax);
+      u_star=calculer_u_star_sous_couche_log(norm_vit,d_visco,dist,num_face);
+      calculer_sous_couche_log_BiK(u_star,k,eps,dist,face,num_face);
+    }
+
+  return u_star;
+}
+
+
 
 double Paroi_std_hyd_VEF_old::calculer_local(double u_plus_d_plus,double d_visco,
                                              DoubleTab& tab_nu_t,DoubleTab& tab_k,double norm_vit,
@@ -1101,6 +1446,16 @@ int Paroi_std_hyd_VEF_old::calculer_sous_couche_visq(DoubleTab& K_eps,int face)
 
   K_eps(face,0) = 0.;
   K_eps(face,1) = 0.;
+  return 1;
+}
+
+
+int Paroi_std_hyd_VEF_old::calculer_sous_couche_visq_BiK(DoubleTab& K,DoubleTab& eps,int face)
+{
+  // Dans la sous couche visqueuse: k = eps = 0
+
+  K(face) = 0.;
+  eps(face) = 0.;
   return 1;
 }
 
@@ -1183,6 +1538,23 @@ int Paroi_std_hyd_VEF_old::calculer_sous_couche_tampon(double u_star, DoubleTab&
   K_eps(face,0) = x*x/sqrt(Cmu) ;
 
   K_eps(face,1) = (K_eps(face,0)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
+
+  return 1;
+}
+
+
+int Paroi_std_hyd_VEF_old::calculer_sous_couche_tampon_BiK(double u_star, DoubleTab& K, DoubleTab& eps,double d_visco,
+                                                           double d_plus,int face,int num_face)
+{
+
+  // Calcul des grandeurs turbulentes a partir de d_plus et de u_star
+  double lm_plus = calcul_lm_plus(d_plus);
+  double  deriv = Fdypar_direct(lm_plus);
+  double x= lm_plus*u_star*deriv;
+
+  K(face) = x*x/sqrt(Cmu) ;
+
+  eps(face) = (K(face)*u_star*u_star*deriv)*sqrt(Cmu)/d_visco;
 
   return 1;
 }
@@ -1275,6 +1647,25 @@ int Paroi_std_hyd_VEF_old::calculer_sous_couche_log(double u_star,DoubleTab& K_e
 
   K_eps(face,0) = u_star_carre/sqrt(Cmu);
   K_eps(face,1) = u_star_carre*u_star/(Kappa*dist);
+
+  return 1;
+}
+
+
+int Paroi_std_hyd_VEF_old::calculer_sous_couche_log_BiK(double u_star,DoubleTab& K,DoubleTab& eps,double dist,
+                                                        int face,int num_face)
+{
+
+  // K et Eps sont donnes par les formules suivantes:
+  //
+  //              2                      3
+  //    k =     u*/sqrt(Cmu)  et eps = u* / Kd
+  //
+
+  double u_star_carre = u_star*u_star;
+
+  K(face) = u_star_carre/sqrt(Cmu);
+  eps(face) = u_star_carre*u_star/(Kappa*dist);
 
   return 1;
 }

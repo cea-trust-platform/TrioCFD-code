@@ -84,7 +84,7 @@ Chapter {
 		Description "60_60 standard"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta60_60/standard/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -98,7 +98,7 @@ Chapter {
 		Description "60_60 improved"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta60_60/improved/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -112,7 +112,7 @@ Chapter {
 		Description "60_60 hysteresis (liss:01)"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -126,7 +126,7 @@ Chapter {
 		Description "60_60 hysteresis (liss:05)"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -140,7 +140,7 @@ Chapter {
 		Description "60_60 hysteresis (liss:10)"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta60_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -229,7 +229,7 @@ Chapter {
 		Description "30_120 standard"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta30_120/standard/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -243,7 +243,7 @@ Chapter {
 		Description "30_120 improved"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta30_120/improved/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -257,7 +257,7 @@ Chapter {
 		Description "30_120 hysteresis (liss:01)"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -271,7 +271,7 @@ Chapter {
 		Description "30_120 hysteresis (liss:05)"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -285,7 +285,7 @@ Chapter {
 		Description "30_120 hysteresis (liss:10)"
 		Cycles -1
 		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Equilibre_60/Theta30_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -380,7 +380,7 @@ Chapter {
 		Description "Theta85_120 standard"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Theta85_120/standard/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -394,7 +394,7 @@ Chapter {
 		Description "Theta85_120 improved"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Theta85_120/improved/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -408,7 +408,7 @@ Chapter {
 		Description "Theta85_120 hysteresis (liss:01)"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -422,7 +422,7 @@ Chapter {
 		Description "Theta85_120 hysteresis (liss:05)"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -436,7 +436,7 @@ Chapter {
 		Description "Theta85_120 hysteresis (liss:10)"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Theta85_120/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -525,7 +525,7 @@ Chapter {
 		Description "Reverse_20_60 standard"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/standard/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -539,7 +539,7 @@ Chapter {
 		Description "Reverse_20_60 improved"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/improved/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -553,7 +553,7 @@ Chapter {
 		Description "Reverse_20_60 hysteresis (liss:01)"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre01/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -567,7 +567,7 @@ Chapter {
 		Description "Reverse_20_60 hysteresis (liss:05)"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre05/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27
@@ -581,7 +581,7 @@ Chapter {
 		Description "Reverse_20_60 hysteresis (liss:10)"
 		Cycles -1
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES
-		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE som
+		pseudocolor Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata INTERFACES COURBURE SOM
 		mesh Sphere/Hors_equil_85_120/Reverse_20_60/hysteresis/It2_coeff2.0_Npre10/SEQ/lata/post.lata dom
 		Operator slice 0. 0. 0. 0. 0. 1.
 		Normal3D 0.17 -0.95 0.27

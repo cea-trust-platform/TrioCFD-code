@@ -29,7 +29,7 @@
 #include <Champ_Uniforme_Morceaux.h>
 #include <Champ_Fonc_Tabule.h>
 #include <Champ_Fonc_Tabule_P0_VEF.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_base.h>
 #include <Mod_turb_hyd_base.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
@@ -96,7 +96,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const IntTab& face_voisins = zone_VEF.face_voisins();
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible,eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
   const DoubleVect& volumes_maille = zone_VEF.volumes();
@@ -137,8 +137,8 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
       if (alpha_uniforme)
         {
           double d_alpha = alpha(0,0);
-          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha.valeurs().dimension(1));
-          for (int nc=0; nc<alpha.valeurs().dimension(1); nc++)
+          assert(ref_cast(Convection_Diffusion_Concentration,eqn).constituant().nb_constituants()==alpha.valeurs().line_size());
+          for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
             {
               if (d_alpha!=alpha(0,nc))
                 {
@@ -153,7 +153,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
           for (int elem=0; elem<alpha.valeurs().dimension(0); elem++)
             {
               double d_alpha = alpha(elem,0);
-              for (int nc=0; nc<alpha.valeurs().dimension(1); nc++)
+              for (int nc=0; nc<alpha.valeurs().line_size(); nc++)
                 {
                   if (d_alpha!=alpha(elem,nc))
                     {
@@ -212,7 +212,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 
               // Alex. C. : 11/04/2003
               double u_star = tab_u_star(num_face);
-              double d_alpha = (alpha_uniforme ? alpha(0,0) : (alpha.valeurs().nb_dim()==1 ? alpha(elem) : alpha(elem,0)) );
+              double d_alpha = (alpha_uniforme ? alpha(0,0) : alpha(elem,0) );
               if (u_star == 0 || d_alpha==0)
                 {
                   dist_equiv[ind_face] = dist;
@@ -220,7 +220,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
               else
                 {
                   // calcul de la viscosite en y+
-                  double d_visco = (l_unif ? visco : (tab_visco.nb_dim()==1 ? tab_visco(elem) : tab_visco(elem,0)));
+                  double d_visco = (l_unif ? visco : tab_visco(elem,0));
                   double Pr = d_visco/d_alpha;
                   double y_plus = dist*u_star/d_visco;
                   dist_equiv[ind_face] = (d_alpha + alpha_t(elem)) * T_plus(y_plus,Pr) / u_star;

@@ -25,7 +25,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Champ_P0_VDF.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_Dilatable_base.h>
 #include <Navier_Stokes_Turbulent.h>
 #include <Operateur_base.h>
 
@@ -252,8 +252,8 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
   {
     Eval_Diff_K_Eps_VDF& eval_diff = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
 
-    const Fluide_Incompressible& mil = ref_cast(Fluide_Incompressible,mon_equation->milieu());
-    const Champ_Don& mvol = mil.masse_volumique();
+    const Fluide_base& mil = ref_cast(Fluide_base,mon_equation->milieu());
+    const Champ_base& mvol = mil.masse_volumique();
     //
     eval_diff.associer_mvolumique(mvol);
   }

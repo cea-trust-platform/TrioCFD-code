@@ -247,8 +247,7 @@ du mod\`ele $C'_{\eta}$, $C_{\epsilon_{1}}$, $C_{\epsilon_{2}}$,
 $\sigma_{k}$ et $\sigma_{\epsilon}$ sont fix\'ees par d\'efaut \`a : $C'_{\eta}=0.09$,
 $C_{\epsilon_{1}}=1.44$, $C_{\epsilon_{2}}=1.92$, $\sigma_{k}=1.0$
 et $\sigma_{\epsilon}=1.3$. Certaines d'entre elles peuvent aussi
-varier selon le type d'\'ecoulement consid\'er\'e (voir table \ref{tab:Synthese-valeurs_Coeffkeps})
-:
+varier selon le type d'\'ecoulement consid\'er\'e (voir table \ref{tab:Synthese-valeurs_Coeffkeps}).
 
 \begin{table}
 \begin{centering}
@@ -269,6 +268,10 @@ R\'ef\'erence & $C_{\eta}'$ & $\sigma_{k}$ & $\sigma_{\epsilon}$ & $C_{\epsilon_
 \protect\caption{\label{tab:Synthese-valeurs_Coeffkeps}Synth\`ese des valeurs des param\`etres
 du mod\`ele $\overline{k}-\overline{\epsilon}$ (repris de \cite{Genty_RapportCEA_2019}).}
 \end{table}
+
+\bigskip
+
+Notonq que, si l'on fait appel au mod\`ele standard k-$\epsilon$, ces deux \'equations sont g\'er\'ees comme une seule \'equation (au format TRUST) avec une inconnue vectorielle (k-$\epsilon$) de dimension 2. On peut \'egalement faire appel au mod\`ele dit \og bic\'ephale \fg, où ces deux \'equations sont consid\'er\'ees s\'epar\'ement, ce qui permet par exemple d'utiliser des conditions aux limites diff\'erentes pour k et $\epsilon$.
 
 
 

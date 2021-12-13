@@ -302,6 +302,19 @@ void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1 (const Zone_dis& zone_dis, const Zone
 
 }
 
+void Modele_Shih_Zhu_Lumley_VEF::Calcul_C1_BiK (const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
+{
+  for (int face=0; face<nfaces_; face++)
+    {
+      double eta;
+
+      eta = S_(face) * K(face)/( Eps(face) + BR_EPS );
+
+      C1_[face] = max( 0.43 , eta / ( 5. + eta ) );
+    }
+
+}
+
 void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K_Eps, const double EPS_MIN)
 {
   const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
@@ -366,6 +379,70 @@ void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S(const Zone_dis& zone_dis, cons
     }
 }
 
+void  Modele_Shih_Zhu_Lumley_VEF::Calcul_Cmu_et_S_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse, const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
+{
+  const Zone_VEF&       zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
+  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zone_Cl_dis.valeur());
+
+  DoubleTab S_face;
+  init_tenseur_face(S_face,zone_VEF,2);
+  DoubleTab R_face;
+  init_tenseur_face(R_face,zone_VEF,2);
+
+  calcul_tenseur_face(S_face,S_elem_,zone_VEF,zone_Cl_VEF);
+  calcul_tenseur_face(R_face,R_elem_,zone_VEF,zone_Cl_VEF);
+
+  DoubleTab U_etoile_face;
+  zone_VEF.creer_tableau_faces(U_etoile_face);
+  DoubleTab As_face;
+  zone_VEF.creer_tableau_faces(As_face);
+
+  for (int face=0; face<nfaces_; face++)
+    {
+      double somme  = 0.;
+      double somme2 = 0.;
+      double somme3 = 0.;
+
+      for (int i=0; i<Objet_U::dimension; i++)
+        {
+          for (int j=0; j<Objet_U::dimension; j++)
+            {
+              somme  += S_face(face,i,j)*S_face(face,i,j)+R_face(face,i,j)*R_face(face,i,j);
+              somme2 += S_face(face,i,j)*S_face(face,i,j);
+              for (int k=0; k<Objet_U::dimension; k++)
+                {
+                  somme3 += S_face(face,i,j)*S_face(face,j,k)*S_face(face,k,i);
+                }
+            }
+        }
+
+      U_etoile_face(face)  = sqrt(somme);
+      double S_tilde       = sqrt(somme2);
+      S_[face]             = sqrt(2.*somme2);
+      double val_cosinus   = sqrt(6.) * somme3 / ( S_tilde * S_tilde * S_tilde +1.e-20 );
+
+      if ( val_cosinus > 1. )
+        {
+          val_cosinus = 1. ;
+        }
+      else if ( val_cosinus < -1. )
+        {
+          val_cosinus = -1. ;
+        }
+
+      As_face(face)       = sqrt(6.) * cos ( (1./3.) * acos( val_cosinus ) );
+
+//       // Definition d'un Cmu extremum base sur EPS_MIN = 1e-10
+//       if (K_Eps(face,1) <= EPS_MIN)
+//         Cmu_[face] = 1./(A0_+As_face(face)*U_etoile_face(face)*K_Eps(face,0)/BR_EPS);
+//       else
+//         Cmu_[face] = 1./(A0_+As_face(face)*U_etoile_face(face)*K_Eps(face,0)/K_Eps(face,1));
+
+      Cmu_[face] = 1./(A0_+As_face(face)*U_etoile_face(face)*K(face)/( Eps(face) + BR_EPS));
+
+    }
+}
+
 
 void  Modele_Shih_Zhu_Lumley_VEF::associer(const Zone_dis& zone_dis,
                                            const Zone_Cl_dis& zone_Cl_dis)
@@ -395,3 +472,21 @@ void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_Paroi(const Zone_dis& zon
   Calcul_Cmu_et_S(zone_dis,zone_Cl_dis,vitesse,K_Eps,EPS_MIN);
   Calcul_C1(zone_dis,zone_Cl_dis,vitesse,K_Eps,EPS_MIN);
 }
+
+void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN)
+{
+  Calcul_Tenseurs_S_et_R_elem(zone_dis,zone_Cl_dis,vitesse);
+  Calcul_Cmu_et_S_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
+  Calcul_C1_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
+}
+
+void Modele_Shih_Zhu_Lumley_VEF::Contributions_Sources_Paroi_BiK(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis,const DoubleTab& vitesse,const DoubleTab& K, const DoubleTab& Eps, const double EPS_MIN,
+                                                                 const DoubleTab& visco, const DoubleTab& visco_turb,const DoubleTab& loi_paroi,const int idt)
+{
+  Calcul_Tenseurs_S_et_R_elem_Paroi(zone_dis,zone_Cl_dis,vitesse,visco,visco_turb,loi_paroi,idt);
+  Calcul_Cmu_et_S_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
+  Calcul_C1_BiK(zone_dis,zone_Cl_dis,vitesse,K,Eps,EPS_MIN);
+}
+
+
+

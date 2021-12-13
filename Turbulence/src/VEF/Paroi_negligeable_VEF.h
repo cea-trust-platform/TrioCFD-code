@@ -48,6 +48,7 @@ public:
 
   virtual int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   int calculer_hyd(DoubleTab& , DoubleTab& );
   virtual int calculer_scal(Champ_Fonc_base& );
   virtual bool use_shear() const;

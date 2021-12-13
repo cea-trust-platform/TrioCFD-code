@@ -30,7 +30,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Neumann_paroi.h>
 #include <Probleme_base.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Fluide_base.h>
 #include <Convection_Diffusion_std.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Constituant.h>
@@ -105,7 +105,7 @@ void Paroi_scal_hyd_base_VDF::imprimer_nusselt(Sortie& os) const
   int ndeb,nfin,elem;
   const Convection_Diffusion_std& eqn = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr = eqn.probleme().equation(0);
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& conductivite = le_fluide.conductivite();
   const DoubleTab& temperature = eqn.probleme().equation(1).inconnue().valeurs();
 

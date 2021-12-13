@@ -61,7 +61,11 @@ public :
   // Imprimer_u_star de la loi de paroi Hybride n'est pas encore OK.
   //void imprimer_ustar(Sortie& ) const ;
 
+  // Simple appel aux calculer_hyd des differentes lois de parois en mode bicephale
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab&) ;
 
+  //Appel des calculer_hyd des differentes lois de parois et remplissage du tableau de Cisaillement en mode bicephale
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& , Zone_dis_base const& , Zone_Cl_dis_base const& , DoubleTab& );
 
 private:
   VECT(Turbulence_paroi) vect_lp;

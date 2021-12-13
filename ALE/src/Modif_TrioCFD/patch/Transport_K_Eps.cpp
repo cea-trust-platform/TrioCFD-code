@@ -25,12 +25,14 @@
 #include <Les_Pb_Turb.h>
 #include <Param.h>
 #include <EChaine.h>
-
+#include <Fluide_Quasi_Compressible.h>
 #include <Pb_Hydraulique_Turbulent_ALE.h>
 #include <Op_Conv_ALE.h>
 #include <DoubleTrav.h>
 #include <Debog.h>
 #include <Discretisation_base.h>
+
+
 
 
 Implemente_instanciable(Transport_K_Eps,"Transport_K_Eps",Transport_K_Eps_base);
@@ -140,7 +142,7 @@ int Transport_K_Eps::lire_motcle_non_standard(const Motcle& mot, Entree& is)
         }
       else
         {
-          const Fluide_Incompressible& fluide_inc = ref_cast(Fluide_Incompressible,le_fluide.valeur());
+          const Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
           if (sub_type(Fluide_Quasi_Compressible,fluide_inc))
             terme_diffusif.associer_diffusivite(fluide_inc.viscosite_dynamique());
           else

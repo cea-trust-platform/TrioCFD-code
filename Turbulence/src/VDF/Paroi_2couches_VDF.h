@@ -50,6 +50,7 @@ public:
   virtual void set_param(Param& param);
   virtual int init_lois_paroi();
   int calculer_hyd(DoubleTab& );
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
   int calculer_hyd(DoubleTab& , DoubleTab& );
   void calculer_uplus_dplus(DoubleVect& ,DoubleVect& ,DoubleVect& ,int ,double ,double ,double ) ;
 

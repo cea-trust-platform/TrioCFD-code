@@ -1,0 +1,682 @@
+Parameters {
+	newvalidTrio
+	Title "Comparaison of the coupled and decoupled methods for solving the k-epsilon transport equations"
+	VersionTrio_U "1.8.4"
+
+	ParametersTrio_U Type of problem : hydraulique_turbulent
+	ParametersTrio_U Discretization : VDF and VEF
+	ParametersTrio_U Time scheme : implicit Euler
+	ParametersTrio_U Solving of equations : hydraulique_turbulent
+	ParametersTrio_U Turbulence model : standard $k$-$\varepsilon$
+	ParametersTrio_U Wall law : standard
+	ParametersTrio_U Type of boundary conditions : periodicity, symmetry and wall
+	ParametersTrio_U Location : /validation/share/Validation/Rapports_automatiques/Validant/Fini/Canal_plan_VDF_VEF_k_eps_standard_bicephale
+
+	TestCase K_EPS_STANDARD_VDF_2D Cas.data /*see data set in the appendix*/
+	TestCase K_EPS_BICEPHALE_VDF_2D Cas.data
+	TestCase K_EPS_STANDARD_VEF_2D Cas.data
+	TestCase K_EPS_BICEPHALE_VEF_2D Cas.data
+	TestCase K_EPS_STANDARD_VDF_3D Cas.data
+	TestCase K_EPS_BICEPHALE_VDF_3D Cas.data
+	TestCase K_EPS_STANDARD_VEF_3D Cas.data
+	TestCase K_EPS_BICEPHALE_VEF_3D Cas.data
+
+	Author "Pierre-Emmanuel Angeli"
+	IncludeData 2
+}
+#
+Objectif {
+	Description "The objective is to check that new method of resolution of the $k$-$\varepsilon$ model (\latex_("bic\'ephale"\latex_): equations are decoupled and each one may be solved with its own parameters) gives nearly the same results that the "historical" method (\latex_("standard"\latex_): equations are coupled and the options apply to both $k$ and $\varepsilon$ equations). The model considered is the standard $k$-$\varepsilon$ (the realizable model will be added later)."
+}
+#
+Pb_description {
+	geometrie {
+		Description "A rectangle of dimensions 0.1 $\times$ 1 (in 2D), a box of dimensions 0.1 $\times$ 1 $\times$ 0.1 (in 3D)."
+	}
+	CICL {
+		Description "$\bullet$ Periodicity in $x$-direction (in 2D) and in $x$, $z$-directions (in 3D)."
+		Description "$\bullet$ Fixed wall at $y = 0$."
+		Description "$\bullet$ Symmetry at $y = 1$."
+	}
+	Propfluide {
+		Description "$\bullet$ Dynamic viscosity: \latex_($\mu$ = 0.001\latex_) Pa.s"
+		Description "$\bullet$ Density: \latex_($\rho$ = 1000\latex_) kg/m3"
+	}
+	Phyecou {
+		Description "The test case is a turbulent plane channel flow (\latex_($\text{Re}_\tau \approx 550$\latex_))."
+	}
+}
+#
+Casesetup {
+	Maillage {
+		Description "The mesh has a uniform size along the direction normal to the wall, with larger meshes near the wall in order to comply with the validity of the logarithmic wall function ($y^+ \geq 30$)."
+		Figure {
+			Title "Overview of the meshes with the location of a profile (red points) used hereinafter." 
+			picture meshes.png
+			width 11cm
+		}
+	}
+	Options_modele {
+		Description "The standard wall law is applied at the wall boundary."
+	}
+	Autres_options {
+		Description "The upwind scheme is applied for convective terms. The time scheme is implicit with a time step equal to 20 times the stability time step. The calculations are stopped using the tmax criterion."
+	}
+}
+#
+Results {
+	Figure {
+		Titre "Plots of the velocity residuals ($x$-component is shown in VEF)."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "residuals"
+		RangeX auto auto
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($6)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Plots of the k residuals."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "residuals"
+		RangeX auto auto
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($7)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($7)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($7)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($7)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($8)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($8)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($9)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($9)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Plots of the epsilon residuals."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "residuals"
+		RangeX auto auto
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($8)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($8)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($8)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($8)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($9)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($9)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($10)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($10)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Evolution of the time step."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "time step"
+		RangeX auto auto
+		LogY
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/Cas.dt_ev
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Convergence of $y^+$."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "y+"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/Cas_pb_ustar_mean_only.out
+			Colonnes ($1) ($3)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Plots of $x$-velocity velocity component."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "variable"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/vitesse.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Plots of the turbulent kinetic energy k."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "variable"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/tke.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Plots of the turbulent dissipation rate epsilon."
+		titre_figure
+		Width 12cm
+		Dimension 2
+		LabelX "y"
+		LabelY "variable"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "standard, VDF 2D"
+			Fichier ./K_EPS_STANDARD_VDF_2D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 2D"
+			Fichier ./K_EPS_BICEPHALE_VDF_2D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 2
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VDF 3D"
+			Fichier ./K_EPS_STANDARD_VDF_3D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VDF 3D"
+			Fichier ./K_EPS_BICEPHALE_VDF_3D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 4
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 2D"
+			Fichier ./K_EPS_STANDARD_VEF_2D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 5
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 2D"
+			Fichier ./K_EPS_BICEPHALE_VEF_2D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 6
+			Linewidth 1
+			}
+		Courbe {
+			Legende "standard, VEF 3D"
+			Fichier ./K_EPS_STANDARD_VEF_3D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 7
+			Linewidth 1
+			}
+		Courbe {
+			Legende "bicephale, VEF 3D"
+			Fichier ./K_EPS_BICEPHALE_VEF_3D/epsilon.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 8
+			Linewidth 1
+			}
+		}
+}
+#
+Conclusion {
+	Description "With the same numerical schemes and meshes, we observe the following points:"
+	Description "\latex_(\medskip\latex_)"
+	Description "$\bullet$ residuals: in VEF, the residuals behave similarly between the standard and bicephale approaches. In VDF, they behave differently (the bicephale residuals do not decrease)."
+	Description "\latex_(\medskip\latex_)"
+	Description "$\bullet$ numerical solutions (time steps, $y^+$, velocity, k and epsilon) : in VEF they are nearly identical (except an unphysical variation of velocity near the symmetric boundary in the bicephale case), not in VDF."
+	Description "\latex_(\medskip\latex_)"
+	Description "$\bullet$" calculation time (time/step): the bicephale method is overall more expensive than the historical one (+18% in VDF 2D, +10% in VDF 3D, +7% in VEF 2D, -1% in VEF 3D).
+}

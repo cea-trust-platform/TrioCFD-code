@@ -57,7 +57,7 @@ void MuLambda_TBLE_Fcts_T::initialiser(const Milieu_base& milieu)
   p_lambda.addVar("val");
   p_lambda.parseString();
 
-  if (!sub_type(Champ_Uniforme,milieu.masse_volumique().valeur()))
+  if (!sub_type(Champ_Uniforme,milieu.masse_volumique()))
     {
       Cerr << "Variable volume mass is not possible yet with TBLE law." << finl;
       exit();

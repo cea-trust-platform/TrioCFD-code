@@ -26,7 +26,7 @@
 #include <Champ_Uniforme.h>
 #include <Zone_Cl_VDF.h>
 #include <Dirichlet_paroi_fixe.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Equation_base.h>
 #include <Mod_turb_hyd_base.h>
 #include <distances_VDF.h>
@@ -65,7 +65,7 @@ Entree& Paroi_negligeable_VDF::readOn(Entree& s)
 int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+  if(sub_type(Fluide_base, eqn_hydr.milieu()))
     {
       int ndeb,nfin,elem,ori,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
@@ -73,7 +73,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
       const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
       const IntTab& face_voisins = zone_VDF.face_voisins();
       const IntVect& orientation = zone_VDF.orientation();
-      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
       const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
@@ -143,7 +143,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_k_eps)
 int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  if(sub_type(Fluide_Incompressible, eqn_hydr.milieu()))
+  if(sub_type(Fluide_base, eqn_hydr.milieu()))
     {
       int ndeb,nfin,elem,ori,l_unif;
       double norm_tau,u_etoile,norm_v=0, dist, val0, val1, val2, d_visco=0, visco=1.;
@@ -151,7 +151,7 @@ int Paroi_negligeable_VDF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
       const IntTab& face_voisins = zone_VDF.face_voisins();
       const IntVect& orientation = zone_VDF.orientation();
-      const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+      const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
       const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
       const DoubleTab& vit = eqn_hydr.inconnue().valeurs();

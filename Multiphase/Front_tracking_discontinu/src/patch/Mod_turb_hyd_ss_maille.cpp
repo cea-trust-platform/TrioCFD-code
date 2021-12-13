@@ -22,9 +22,10 @@
 
 #include <Mod_turb_hyd_ss_maille.h>
 #include <Equation_base.h>
+#include <Probleme_base.h>
 #include <Param.h>
 #include <Discretisation_base.h>
-#include <Modifier_nut_pour_QC.h>
+#include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Debog.h>
 #include <stat_counters.h>
 #include <Paroi_std_hyd_VEF_diphasique.h>
@@ -179,7 +180,8 @@ void Mod_turb_hyd_ss_maille::mettre_a_jour(double )
   calculer_energie_cinetique_turb();
   loipar->calculer_hyd(la_viscosite_turbulente,energie_cinetique_turbulente());
   limiter_viscosite_turbulente();
-  Correction_nut_et_cisaillement_paroi_si_qc(*this);
+
+  if (equation().probleme().is_dilatable()) correction_nut_et_cisaillement_paroi_si_qc(*this);
   energie_cinetique_turb_.valeurs().echange_espace_virtuel();
   la_viscosite_turbulente->valeurs().echange_espace_virtuel();
   statistiques().end_count(nut_counter_);

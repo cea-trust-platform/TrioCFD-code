@@ -127,7 +127,7 @@ fluide_Quasi_compressible milieu
 Lire milieu
   { 
         pression 100000.
-	loi_etat Melange_gaz_parfait {
+	loi_etat multi_gaz_parfait_qc {
 		 Prandtl 0.70999966608084363884
 	       	 Sc 0.8
 		 ignore_check_fraction
@@ -140,7 +140,7 @@ Champ_Uniforme gravite
 Read gravite 2 0 -9.81
 
 # Association between the different objects #
-Pb_Thermohydraulique_Turbulent_QC_fraction_massique pb 
+Pb_Thermohydraulique_Especes_Turbulent_QC pb 
 Associer milieu gravite
 Associer pb dom
 Associer pb mon_schema
@@ -228,7 +228,7 @@ Lire pb
       }
       Equations_Scalaires_Passifs
       {
-	  Convection_Diffusion_Fraction_Massique_Turbulent_QC
+	  Convection_Diffusion_Espece_Multi_Turbulent_QC
         {
                 diffusion { } # D = mu/Sc # 
                 convection {  ef_stab { alpha 1.0 }  }
@@ -257,7 +257,7 @@ Lire pb
 			Masse_molaire 0.029099
 		}
       }
-	  Convection_Diffusion_Fraction_Massique_Turbulent_QC
+	  Convection_Diffusion_Espece_Multi_Turbulent_QC
         {
                 diffusion { } # D = mu/Sc # 
                 convection {  ef_stab { alpha 1.0 }  }

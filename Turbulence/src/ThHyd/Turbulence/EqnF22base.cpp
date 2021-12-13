@@ -87,7 +87,7 @@ Entree& EqnF22base::readOn(Entree& s )
   // typage de l'operateur de diffusion.
   if ( sub_type(Fluide_Incompressible,le_fluide.valeur()))
     {
-      Fluide_Incompressible& fluide_inc = ref_cast(Fluide_Incompressible,le_fluide.valeur());
+      Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
       terme_diffusif.associer_diffusivite(fluide_inc.viscosite_cinematique());
     }
   Nom type="Op_DiffF22_";
