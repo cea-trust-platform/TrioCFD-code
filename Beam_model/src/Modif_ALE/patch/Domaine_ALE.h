@@ -104,6 +104,7 @@ protected:
   DoubleVect fluidForceOnBeam;
   double tempsComputeForceOnBeam;
   bool associate_eq;
+  bool re_start;
   Champs_front_ALE_projection field_ALE_projection_;
   Noms name_ALE_boundary_projection_;
 };
