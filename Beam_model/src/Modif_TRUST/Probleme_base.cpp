@@ -135,6 +135,7 @@ bool Probleme_base::initTimeStep(double dt)
 
   bool ok=schema_temps().initTimeStep(dt);
   domaine().set_dt(dt);
+  milieu().initTimeStep(dt);
   for(int i=0; i<nombre_d_equations(); i++)
     ok = ok && equation(i).initTimeStep(dt);
 
@@ -422,7 +423,7 @@ Sortie& Probleme_base::printOn(Sortie& os) const
 // 151 pour dire que c'est la version initiee a la version 1.5.1 de TRUST
 inline int version_format_sauvegarde()
 {
-  return 155;
+  return 184;
 }
 
 // Description:
@@ -636,7 +637,7 @@ Entree& Probleme_base::readOn(Entree& is)
             }
           else
             {
-              // Lecture du format de sauvegarde
+              // Lecture du format de Lsauvegarde
               if(format_rep != "single_hdf")
                 fic.valeur() >> reprise_version_;
               else
@@ -652,8 +653,9 @@ Entree& Probleme_base::readOn(Entree& is)
                 }
               if (reprise_version_>version_format_sauvegarde())
                 {
-                  Cerr << "The format " << reprise_version_ << " of the resumption file " << nomfic << " is not compatible" << finl;
-                  Cerr << "with the format "<<version_format_sauvegarde()<<" recognized by this version of TRUST." << finl;
+                  Cerr << "The format " << reprise_version_ << " of the resumption file " << nomfic << " is posterior" << finl;
+                  Cerr << "to the format "<<version_format_sauvegarde()<<" recognized by this version of TRUST." << finl;
+                  Cerr << "Please use a more recent version." << finl;
                   exit();
                 }
             }
@@ -939,6 +941,8 @@ void Probleme_base::discretiser(const Discretisation_base& une_discretisation)
     {
       equation(i).associer_zone_dis(domaine_dis().zone_dis(0));
       equation(i).discretiser();
+      //remontee de l'inconnue vers le milieu
+      equation(i).associer_milieu_equation();
     }
   // Discretisation du milieu:
   //   ATTENTION (BM): il faudra faire quelque chose ici car si on associe deux
@@ -1181,7 +1185,6 @@ void Probleme_base::finir()
   // alors on effectue la sauvegarde finale xyz
   if (Motcle(format_sauv)!="xyz" && (EcritureLectureSpecial::Active))
     sauver_xyz(1);
-
 }
 
 // Description:
@@ -1552,7 +1555,7 @@ const Equation_base& Probleme_base::equation(const Nom& type) const
       if(Type_eqn==Type)
         return equation(i);
     }
-  Cerr << que_suis_je() << "does not contain any equation of type: " << type << finl;
+  Cerr << que_suis_je() << " does not contain any equation of type: " << type << finl;
   Cerr << "Here is the list of possible equations for a " << que_suis_je() << " problem: " << finl;
   for(int i=0; i<nombre_d_equations(); i++)
     {
@@ -1609,7 +1612,7 @@ Equation_base& Probleme_base::equation(const Nom& type)
       if(Type_eqn==Type)
         return equation(i);
     }
-  Cerr << que_suis_je() << "does not contain any equation of type: " << type << finl;
+  Cerr << que_suis_je() << " does not contain any equation of type: " << type << finl;
   Cerr << "Here is the list of possible equations for a " << que_suis_je() << " problem: " << finl;
   for(int i=0; i<nombre_d_equations(); i++)
     {
@@ -1813,6 +1816,9 @@ void Probleme_base::mettre_a_jour(double temps)
   // Update the name of the problem being debugged
   Debog::set_nom_pb_actuel(le_nom());
 
+  // TODO : overload in Pb_multiphase because for turbulence, le_modele_turbulence.mettre_a_jour(temps)
+  // should be called before equation(i).mettre_a_jour(temps)
+
   // Update the equations:
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).mettre_a_jour(temps);
@@ -1855,15 +1861,16 @@ void Probleme_base::mettre_a_jour(double temps)
 void Probleme_base::preparer_calcul()
 {
   const double temps = schema_temps().temps_courant();
-  milieu().initialiser(temps);
   // Modification du tableau Qdm porte par la zone_dis() dans le cas
   // ou il y a des conditions aux limites periodiques.
   // Rq : Si l'une des equations porte la condition a la limite periodique
   //      alors les autres doivent forcement la porter.
   equation(0).zone_dis()->modifier_pour_Cl(equation(0).zone_Cl_dis().les_conditions_limites());
+  milieu().initialiser(temps);
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).preparer_calcul();
-  equation(0).milieu().preparer_calcul();
+  milieu().preparer_calcul();
+
   if(schema_temps().file_allocation() && EcritureLectureSpecial::Active)
     file_size_xyz();
 
@@ -1916,9 +1923,9 @@ void Probleme_base::postraiter_interfaces(const Nom& nomfich, Sortie& s, const N
 }
 
 // En attendant de mieux poser les equations
-int Probleme_base::is_QC() const
+int Probleme_base::is_dilatable() const
 {
-  return (milieu().que_suis_je()=="Fluide_Quasi_Compressible");
+  return (milieu().que_suis_je()=="Fluide_Quasi_Compressible" || milieu().que_suis_je()=="Fluide_Weakly_Compressible");
 }
 
 // Description:

@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_std.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd
+// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Equations
 // Version:     /main/121
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 #include <Navier_Stokes_std.h>
 #include <Probleme_base.h>
 #include <Domaine.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Discret_Thyd.h>
 #include <Avanc.h>
 #include <Debog.h>
@@ -430,6 +430,7 @@ void Navier_Stokes_std::completer()
   gradient_P.associer_eqn(*this);
   la_pression_en_pa.associer_eqn(*this);
   la_pression_en_pa->completer(la_zone_Cl_dis.valeur());
+  la_pression_en_pa->associer_zone_cl_dis(la_zone_Cl_dis);
   divergence.completer();
   gradient.completer();
   assembleur_pression_.associer_zone_cl_dis_base(zone_Cl_dis().valeur());
@@ -461,7 +462,7 @@ void Navier_Stokes_std::discretiser()
 
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
 
-  dis.vitesse(schema_temps(), zone_dis(), la_vitesse);
+  discretiser_vitesse();
   champs_compris_.ajoute_champ(la_vitesse);
   la_vitesse.valeur().add_synonymous(Nom("velocity"));
 
@@ -491,6 +492,12 @@ void Navier_Stokes_std::discretiser()
   discretiser_assembleur_pression();
 
   Equation_base::discretiser();
+}
+
+void Navier_Stokes_std::discretiser_vitesse()
+{
+  const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+  dis.vitesse(schema_temps(), zone_dis(), la_vitesse);
 }
 
 // Description:
@@ -803,13 +810,13 @@ SolveurSys& Navier_Stokes_std::solveur_pression()
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: Fluide_Incompressible&
+// Retour: Fluide_base&
 //    Signification: le fluide incompressible associe a l'equation
 //    Contraintes: reference constante
 // Exception:
 // Effets de bord:
 // Postcondition: la methode ne modifie pas l'objet
-const Fluide_Incompressible& Navier_Stokes_std::fluide() const
+const Fluide_base& Navier_Stokes_std::fluide() const
 {
   return le_fluide.valeur();
 }
@@ -824,17 +831,63 @@ const Fluide_Incompressible& Navier_Stokes_std::fluide() const
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: Fluide_Incompressible&
+// Retour: Fluide_base&
 //    Signification: le fluide incompressible associe a l'equation
 //    Contraintes:
 // Exception:
 // Effets de bord:
 // Postcondition:
-Fluide_Incompressible& Navier_Stokes_std::fluide()
+Fluide_base& Navier_Stokes_std::fluide()
 {
   return le_fluide.valeur();
 }
 
+Entree& Navier_Stokes_std::lire_cond_init(Entree& is)
+{
+  Cerr << "Reading of initial conditions\n";
+  Nom nom;
+  Motcle motlu;
+  is >> nom;
+  motlu = nom;
+  if(motlu!=Motcle("{"))
+    {
+      Cerr << "We expected a { while reading " << que_suis_je() << finl;
+      Cerr << "and not : " << nom << finl;
+      exit();
+    }
+  Motcles compris(3);
+  compris[0]="}";
+  compris[1]="vitesse";
+  compris[2]="pression";
+  int ind = -1;
+  while (ind!=0)
+    {
+      is >> nom;
+      motlu = nom;
+      ind = compris.rang(motlu);
+      if (ind==1)
+        {
+          Champ_Don ch_init;
+          is >> ch_init;
+          verifie_ch_init_nb_comp(inconnue(),ch_init.nb_comp());
+          inconnue()->affecter(ch_init.valeur());
+        }
+      else if (ind==2)
+        {
+          Champ_Don ch_init;
+          is >> ch_init;
+          verifie_ch_init_nb_comp(pression(),ch_init.nb_comp());
+          pression()->affecter(ch_init.valeur());
+        }
+      else if (ind==-1)
+        {
+          Cerr << nom << " is not understood. Keywords are:" << finl;
+          Cerr << compris << finl;
+          exit();
+        }
+    }
+  return is;
+}
 
 // Description:
 // Add a specific term for Navier Stokes (-gradP(n)) if necessary
@@ -1006,7 +1059,7 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
 // Postcondition:
 void Navier_Stokes_std::projeter()
 {
-  if (probleme().is_QC() && probleme().reprise_effectuee())
+  if (probleme().is_dilatable() && probleme().reprise_effectuee())
     {
       Cerr<<"WARNING: Quasi compressible model --> no projection (except the first time step)."<<finl;
     }
@@ -1213,10 +1266,12 @@ int Navier_Stokes_std::preparer_calcul()
 
 
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression av projeter", la_pression.valeurs());
+  int proj_fait=0;
   if (projection_a_faire())
     {
       Cerr << "Projection of initial and boundaries conditions " << finl;
       projeter();
+      proj_fait=1;
     }
   else
     {
@@ -1271,25 +1326,24 @@ int Navier_Stokes_std::preparer_calcul()
               }
             sources().ajouter(vpoint);
             // <IBM> Taking into account potential Source_PDF term for Immersed Boundary Method
-            if ((i_source_pdf_ != -1) && ((correction_matrice_projection_initiale_==1)||(matrice_pression_penalisee_H1_==1)))
+            if ((i_source_pdf_ != -1) && ((correction_matrice_projection_initiale_==1)||(matrice_pression_penalisee_H1_==1)) && proj_fait)
               {
-                // Source_PDF& src = ref_cast(Source_PDF, (sources())[i_source_pdf_].valeur());
-                // if (src.getInterpolationBool())
-                //   {
-                //     src.calculer_vitesse_imposee();
-                //   }
-                if ((i_source_pdf_ != -1)&&(((correction_matrice_projection_initiale_==1)||(matrice_pression_penalisee_H1_==1))))
-                  {
-                    Cerr<<"(IBM) Immersed Interface: modified pressure gradient for initial pressure computation."<<finl;
-                    vpoint/=champ_coeff_pdf_som_;
-                  }
+                const Source_PDF_base& src = dynamic_cast<Source_PDF_base&>((sources())[i_source_pdf_].valeur());
+                Cerr<<"Immersed Interface: Dirichlet velocity in initial pressure computation for PDF (if any)."<<finl;
+                DoubleTrav secmem_pdf(vpoint);
+                src.calculer_pdf(secmem_pdf);
+                vpoint -= secmem_pdf;
+                vpoint.echange_espace_virtuel();
               }
             // </IBM>
             if (mod)
               le_schema_en_temps->set_dt()=0;
           }
-
-        if (discretisation().que_suis_je() != "PolyMAC") //PolyMAC -> pas vraiment faisable
+        if (discretisation().que_suis_je() == "PolyMAC") //PolyMAC -> pas vraiment faisable
+          {
+            Cerr << "Not done with PolyMAC !" << finl;
+          }
+        else
           {
             solveur_masse.appliquer(vpoint);
             vpoint.echange_espace_virtuel();
@@ -1312,6 +1366,7 @@ int Navier_Stokes_std::preparer_calcul()
             // On veut que l'espace virtuel soit a jour, donc all_items
             operator_add(la_pression.valeurs(), inc_pre, VECT_ALL_ITEMS);
           }
+
         gradient.calculer(la_pression.valeurs(),gradient_P.valeurs());
         divergence.calculer(la_vitesse.valeurs(),divergence_U.valeurs());
         divergence_U.valeurs()=0.;  // on remet les bons flux bords pour div
@@ -1489,13 +1544,20 @@ bool Navier_Stokes_std::initTimeStep(double dt)
   // <IBM> Immersed Boundary Method
   double ddt = Equation_base::initTimeStep(dt);
 
+  for (int i=1; i<=sch_tps.nb_valeurs_futures(); i++) if (i <= pression().nb_valeurs_temporelles())
+      {
+        double tps=sch_tps.temps_futur(i);
+        // Mise a jour du temps dans les champs de pression
+        pression()->changer_temps_futur(tps,i);
+        pression_pa()->changer_temps_futur(tps,i);
+        pression()->futur(i)=pression()->valeurs();
+        pression_pa()->futur(i)=pression()->valeurs();
+      }
+
   if (i_source_pdf_ != -1)
     {
       Source_PDF_base& src = dynamic_cast<Source_PDF_base&>((sources())[i_source_pdf_].valeur());
-      if (!sub_type(Fluide_Incompressible,le_fluide.valeur()))
-        {
-          src.updateChampRho();
-        }
+      src.updateChampRho();
       src.calculer_vitesse_imposee();
       bool mat_var = src.get_matrice_pression_variable_bool_();
       if (mat_var == false) return  ddt;
@@ -1529,10 +1591,10 @@ void Navier_Stokes_std::calculer_la_pression_en_pa()
 {
   DoubleTab& Pa=la_pression_en_pa.valeurs();
   DoubleTab& tab_pression=la_pression.valeurs();
-  const Champ_Don& rho=milieu().masse_volumique();
+  const Champ_base& rho=milieu().masse_volumique();
   Pa = tab_pression;
   // On multiplie par rho si uniforme sinon deja en Pa...
-  if (sub_type(Champ_Uniforme,rho.valeur()))
+  if (sub_type(Champ_Uniforme,rho))
     Pa *= rho(0,0);
 }
 
@@ -1598,13 +1660,13 @@ int Navier_Stokes_std::reprendre(Entree& is)
 
 // Description:
 //    Associe un mileu physique a l'equation en construisant
-//    dynamiquement (cast) un objet de type Fluide_Incompressible
+//    dynamiquement (cast) un objet de type Fluide_base
 //    a partir de l'objet Milieu_base passe en parametre.
 // Precondition:
 // Parametre: Milieu_base& un_milieu
 //    Signification: le milieu a associer a l'equation
 //    Valeurs par defaut:
-//    Contraintes: le milieu doit etre de type Fluide_Incompressible
+//    Contraintes: le milieu doit etre de type Fluide_base
 //    Acces: entree
 // Retour:
 //    Signification:
@@ -1614,9 +1676,9 @@ int Navier_Stokes_std::reprendre(Entree& is)
 // Postcondition:
 void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  if (sub_type(Fluide_Incompressible,un_milieu))
+  if (sub_type(Fluide_base, un_milieu))
     {
-      const Fluide_Incompressible& un_fluide = ref_cast(Fluide_Incompressible,un_milieu);
+      const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
       associer_fluide(un_fluide);
     }
   else
@@ -1628,7 +1690,7 @@ void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 
 // Description:
 //    Renvoie le milieu physique de l'equation
-//    (le Fluide_Incompressible upcaste en Milieu_base)
+//    (le Fluide_base upcaste en Milieu_base)
 // Precondition:
 // Parametre:
 //    Signification:
@@ -1636,7 +1698,7 @@ void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 //    Contraintes:
 //    Acces:
 // Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible de l'equation upcaste en Milieu_base
+//    Signification: le Fluide_base de l'equation upcaste en Milieu_base
 //    Contraintes:
 // Exception:
 // Effets de bord:
@@ -1653,7 +1715,7 @@ const Milieu_base& Navier_Stokes_std::milieu() const
 
 // Description:
 //    Renvoie le milieu physique de l'equation
-//    (le Fluide_Incompressible upcaste en Milieu_base)
+//    (le Fluide_base upcaste en Milieu_base)
 //    (version const)
 // Precondition:
 // Parametre:
@@ -1662,7 +1724,7 @@ const Milieu_base& Navier_Stokes_std::milieu() const
 //    Contraintes:
 //    Acces:
 // Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible de l'equation upcaste en Milieu_base
+//    Signification: le Fluide_base de l'equation upcaste en Milieu_base
 //    Contraintes: reference constante
 // Exception:
 // Effets de bord:
@@ -1779,8 +1841,8 @@ void  Navier_Stokes_std::calculer_pression_hydrostatique(Champ_base& pression_hy
       Cerr<<"postprocessing of presion_hydrostatique needs gravity"<<finl;
       exit();
     }
-  const Champ_Don& rho = milieu().masse_volumique();
-  if (!sub_type(Champ_Uniforme,rho.valeur()))
+  const Champ_base& rho = milieu().masse_volumique();
+  if (!sub_type(Champ_Uniforme,rho))
     {
       Cerr<<"postprocessing of presion_hydrostatique availabe only for incompressible flow"<<finl;
       exit();
@@ -1923,7 +1985,7 @@ void Navier_Stokes_std::get_noms_champs_postraitables(Noms& nom,Option opt) cons
 int Navier_Stokes_std::impr(Sortie& os) const
 {
   // Affichage des bilans volumiques si on n'est pas en QC, ni en Front Tracking
-  if (!probleme().is_QC() && probleme().que_suis_je()!="Probleme_FT_Disc_gen")
+  if (!probleme().is_dilatable() && probleme().que_suis_je()!="Probleme_FT_Disc_gen")
     {
       double LocalFlowRateError=mp_max_abs_vect(divergence_U.valeurs());
       os << finl;
@@ -2024,12 +2086,30 @@ static void construire_matrice_implicite(Operateur_base& op,
     }
 }
 
-/* pour que le gradient puisse elargir le stencil de l'equation de N-S */
-void Navier_Stokes_std::dimensionner_matrice_internal(Matrice_Morse& matrice)
+/* dans CoviMAC, le gradient contribue a la matrice de l'equation de N-S */
+void Navier_Stokes_std::dimensionner_matrice_sans_mem(Matrice_Morse& matrice)
 {
-  Equation_base::dimensionner_matrice_internal(matrice);
-  gradient.valeur().dimensionner_NS(matrice);
-  return;
+  Equation_base::dimensionner_matrice_sans_mem(matrice);
+  if (discretisation().que_suis_je() == "CoviMAC")
+    gradient.valeur().dimensionner_blocs({{ "vitesse", &matrice }});
+}
+
+int Navier_Stokes_std::has_interface_blocs() const
+{
+  return Equation_base::has_interface_blocs() && gradient.valeur().has_interface_blocs();
+}
+
+/* le gradient passe en dernier */
+void Navier_Stokes_std::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+{
+  Equation_base::dimensionner_blocs(matrices, semi_impl);
+  gradient.valeur().dimensionner_blocs(matrices, semi_impl);
+}
+
+void Navier_Stokes_std::assembler_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+{
+  Equation_base::assembler_blocs(matrices, secmem, semi_impl);
+  gradient.valeur().ajouter_blocs(matrices, secmem, semi_impl);
 }
 
 DoubleTab& Navier_Stokes_std::derivee_en_temps_inco(DoubleTab& derivee)
