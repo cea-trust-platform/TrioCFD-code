@@ -27,7 +27,7 @@
 #include <Echange_externe_impose.h>
 #include <Neumann_paroi.h>
 #include <Neumann_homogene.h>
-#include <Fluide_Incompressible.h>
+#include <Fluide_base.h>
 #include <Scalaire_impose_paroi.h>
 #include <Champ_Uniforme.h>
 #include <Operateur.h>
@@ -161,11 +161,7 @@ void calculer_gradientP1NC(const DoubleTab& variable,
   int premiere_face_int = zone_VEF.premiere_face_int();
 
   int dimension=Objet_U::dimension;
-  int nb_comp;
-  if (variable.nb_dim() == 1)
-    nb_comp=1;
-  else
-    nb_comp=variable.dimension(1);
+  const int nb_comp = variable.line_size();
 
   gradient_elem=0.;
   int icomp,fac,i,elem1,elem2,elem,num_face;
@@ -494,7 +490,6 @@ void Champ_P1NC::verifie_valeurs_cl()
   int nb_cl = zcl.nb_cond_lim();
   DoubleTab& ch_tab = valeurs();
   int nb_compo = nb_comp();
-  int nb_dimension = ch_tab.nb_dim();
   int ndeb,nfin,num_face;
 
   for (int i=0; i<nb_cl; i++)
@@ -509,32 +504,16 @@ void Champ_P1NC::verifie_valeurs_cl()
           int voisine;
           double moy;
 
-          if (nb_dimension==1)
+          for (num_face=ndeb; num_face<nfin; num_face++)
             {
-              for (num_face=ndeb; num_face<nfin; num_face++)
+              voisine = la_cl_perio.face_associee(num_face-ndeb) + ndeb;
+              for (int comp=0; comp<nb_compo; comp++)
                 {
-                  voisine = la_cl_perio.face_associee(num_face-ndeb) + ndeb;
-                  if (ch_tab[num_face] != ch_tab[voisine])
+                  if (ch_tab(num_face,comp) != ch_tab(voisine,comp))
                     {
-                      moy = 0.5*(ch_tab[num_face] + ch_tab[voisine]);
-                      ch_tab[num_face] = moy;
-                      ch_tab[voisine] = moy;
-                    }
-                }
-            }
-          else
-            {
-              for (num_face=ndeb; num_face<nfin; num_face++)
-                {
-                  voisine = la_cl_perio.face_associee(num_face-ndeb) + ndeb;
-                  for (int comp=0; comp<nb_compo; comp++)
-                    {
-                      if (ch_tab(num_face,comp) != ch_tab(voisine,comp))
-                        {
-                          moy = 0.5*(ch_tab(num_face,comp) + ch_tab(voisine,comp));
-                          ch_tab(num_face,comp) = moy;
-                          ch_tab(voisine,comp) = moy;
-                        }
+                      moy = 0.5*(ch_tab(num_face,comp) + ch_tab(voisine,comp));
+                      ch_tab(num_face,comp) = moy;
+                      ch_tab(voisine,comp) = moy;
                     }
                 }
             }
@@ -593,7 +572,7 @@ void Champ_P1NC::calcul_y_plus(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plu
   const IntTab& face_voisins = zone_VEF.face_voisins();
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Equation_base& eqn_hydr = equation();
-  const Fluide_Incompressible& le_fluide = ref_cast(Fluide_Incompressible, eqn_hydr.milieu());
+  const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
 
@@ -807,9 +786,9 @@ void Champ_P1NC::calcul_h_conv(const Zone_Cl_VEF& zone_Cl_VEF, DoubleTab& h_conv
       // Selon les conditions limites
       if (sub_type(Echange_externe_impose,la_cl.valeur()))
         {
-          const Champ_Don& rho = equation().milieu().masse_volumique();
+          const Champ_base& rho = equation().milieu().masse_volumique();
           const Champ_Don& Cp = equation().milieu().capacite_calorifique();
-          int rho_uniforme=(sub_type(Champ_Uniforme,rho.valeur()) ? 1:0);
+          int rho_uniforme=(sub_type(Champ_Uniforme,rho) ? 1:0);
           int cp_uniforme=(sub_type(Champ_Uniforme,Cp.valeur()) ? 1:0);
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
@@ -876,7 +855,7 @@ static double norme_L2(const DoubleTab& u, const Zone_VEF& zone_VEF)
   const int nb_faces = zone_VEF.nb_faces();
   int i=0;
   double norme =0;
-  int nb_compo_=u.dimension(1);
+  int nb_compo_=u.line_size();
   for(; i<nb_faces; i++)
     {
       double s=0;
