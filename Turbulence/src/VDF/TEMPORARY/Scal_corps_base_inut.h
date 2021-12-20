@@ -411,49 +411,6 @@ inline double CLASSNAME::secmem_face(int,
   return 0;
 }
 
-
-//// flux_face avec NSCBC
-//
-
-inline double CLASSNAME::flux_face(const DoubleTab& inco, int face,
-                                   const NSCBC& la_cl, int ) const
-{
-  Cerr<<" CLASSNAME scalaire "<<finl;
-  assert(0);
-  Process::exit();
-
-
-  return 0;
-}
-
-//// coeffs_face avec NSCBC
-
-inline void CLASSNAME::coeffs_face(int face, int,
-                                   const NSCBC& la_cl,
-                                   double& aii, double& ajj) const
-{
-  Cerr<<" CLASSNAME scalaire "<<finl;
-  assert(0);
-  Process::exit();
-
-}
-
-//// secmem_face avec NSCBC
-//
-
-inline double CLASSNAME::secmem_face(int,
-                                     const NSCBC&,
-                                     int ) const
-{
-  Cerr<<" CLASSNAME scalaire "<<finl;
-  assert(0);
-  Process::exit();
-  return 0;
-}
-
-
-
-
 //// flux_faces_interne
 //
 

@@ -110,12 +110,5 @@ inline int CLASSNAME::calculer_flux_faces_periodique() const
   return 1;
 }
 
-//// calculer_flux_faces_NSCBC
-//
-
-inline int CLASSNAME::calculer_flux_faces_NSCBC() const
-{
-  return 0;
-}
 
 

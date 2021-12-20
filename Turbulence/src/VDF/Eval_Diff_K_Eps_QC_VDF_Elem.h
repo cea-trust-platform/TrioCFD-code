@@ -26,6 +26,7 @@
 #define Eval_Diff_K_Eps_QC_VDF_Elem_included
 
 #include <Eval_Diff_K_Eps_VDF.h>
+#include <CL_Types_include.h>
 #include <Champ_Fonc.h>
 #include <Eval_VDF_Elem.h>
 #include <Fluide_Quasi_Compressible.h>
@@ -54,7 +55,6 @@ public:
   inline int calculer_flux_faces_sortie_libre() const ;
   inline int calculer_flux_faces_symetrie() const ;
   inline int calculer_flux_faces_periodique() const ;
-  inline int calculer_flux_faces_NSCBC() const ;
 
   // Fonctions qui servent a calculer le flux de grandeurs scalaires
   // Elles sont de type double et renvoient le flux
@@ -69,7 +69,6 @@ public:
   inline double flux_face(const DoubleTab&, int , const Neumann_sortie_libre&, int ) const;
   inline double flux_face(const DoubleTab&, int , const Symetrie&, int ) const;
   inline double flux_face(const DoubleTab&, int , const Periodique&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const NSCBC&, int ) const;
   inline double flux_faces_interne(const DoubleTab&, int ) const;
 
   // Fonctions qui servent a calculer le flux de grandeurs vectorielles
@@ -96,10 +95,6 @@ public:
                         int, DoubleVect& flux) const;
   inline void flux_face(const DoubleTab&, int , const Echange_global_impose&,
                         int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const NSCBC&,
-                        int, DoubleVect& flux) const;
-  //inline void flux_face(const DoubleTab&, int ,const Nouvelle_Cl_VDF&,
-  //                      int, DoubleVect& flux) const=0;
 
   inline void flux_faces_interne(const DoubleTab&, int ,
                                  DoubleVect& flux) const;
@@ -117,7 +112,6 @@ public:
   inline void coeffs_face(int,int,int,int, const Echange_externe_impose&, double& aii, double& ajj ) const;
   inline void coeffs_face(int,int, const Echange_global_impose&, double& aii, double& ajj ) const;
   inline void coeffs_face(int,int, const Periodique&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const NSCBC&, double& aii, double& ajj ) const;
   inline void coeffs_faces_interne(int, double& aii, double& ajj ) const;
 
   // Fonctions qui servent a calculer la contribution des conditions limites
@@ -133,7 +127,6 @@ public:
   inline double secmem_face(int, int, int, const Echange_externe_impose&, int ) const;
   inline double secmem_face(int, const Echange_global_impose&, int ) const;
   inline double secmem_face(int, const Periodique&, int ) const;
-  inline double secmem_face(int, const NSCBC&, int ) const;
   inline double secmem_faces_interne(int ) const;
 
 
@@ -150,7 +143,6 @@ public:
   inline void coeffs_face(int,int,int,int, const Echange_externe_impose&, DoubleVect& aii, DoubleVect& ajj ) const;
   inline void coeffs_face(int,int, const Echange_global_impose&, DoubleVect& aii, DoubleVect& ajj ) const;
   inline void coeffs_face(int,int, const Periodique&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const NSCBC&, DoubleVect& aii, DoubleVect& ajj ) const;
 
   //virtual void coeffs_face(const DoubleTab&, int , const Nouvelle_Cl_VDF&, int,
   //                           DoubleVect& aii, DoubleVect& ajj ) const;
@@ -170,7 +162,6 @@ public:
   inline void secmem_face(int, int, int, const Echange_externe_impose&, int, DoubleVect& ) const;
   inline void secmem_face(int, const Echange_global_impose&, int, DoubleVect& ) const;
   inline void secmem_face(int, const Periodique&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const NSCBC&, int, DoubleVect& ) const;
   inline void secmem_faces_interne(int, DoubleVect& ) const;
 
   //inline double secmem_face(const DoubleTab&, int , const Nouvelle_Cl_VDF&, int, DoubleVect& ) const;
