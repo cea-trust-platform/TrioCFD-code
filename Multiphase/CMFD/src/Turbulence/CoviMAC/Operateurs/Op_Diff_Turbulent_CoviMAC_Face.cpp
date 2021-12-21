@@ -23,12 +23,18 @@
 #include <Op_Diff_Turbulent_CoviMAC_Face.h>
 #include <Pb_Multiphase.h>
 #include <Viscosite_turbulente_base.h>
+#include <Pb_Multiphase.h>
+#include <Op_Diff_CoviMAC_Face.h>
+#include <CoviMAC_discretisation.h>
+
+#include <vector>
 
 Implemente_instanciable( Op_Diff_Turbulent_CoviMAC_Face, "Op_Diff_Turbulent_CoviMAC_Face|Op_Diff_Turbulente_CoviMAC_Face", Op_Diff_CoviMAC_Face ) ;
 
 Sortie& Op_Diff_Turbulent_CoviMAC_Face::printOn( Sortie& os ) const
 {
   Op_Diff_CoviMAC_base::printOn( os );
+
   return os;
 }
 
@@ -36,7 +42,47 @@ Entree& Op_Diff_Turbulent_CoviMAC_Face::readOn( Entree& is )
 {
   //lecture de la correlation de viscosite turbulente
   corr.typer_lire(equation().probleme(), "viscosite_turbulente", is);
+
+  const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
+  noms_nu_t_post_.dimensionner(pb.nb_phases()), nu_t_post_.resize(pb.nb_phases());
+  for (int i = 0; i < pb.nb_phases(); i++)
+    {
+      champs_compris_.ajoute_nom_compris(noms_nu_t_post_[i] = Nom("viscosite_turbulente_") + pb.nom_phase(i));
+    }
+
   return is;
+}
+
+void Op_Diff_Turbulent_CoviMAC_Face::creer_champ(const Motcle& motlu)
+{
+  Op_Diff_CoviMAC_Face::creer_champ(motlu);
+  int i = noms_nu_t_post_.rang(motlu);
+  if (i >= 0 && !(nu_t_post_[i].non_nul()))
+    {
+      const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
+      const CoviMAC_discretisation dis = ref_cast(CoviMAC_discretisation, equation().discretisation());
+      Noms noms(1), unites(1);
+      noms[0] = Nom("viscosite_turbulente_") + pb.nom_phase(i);
+      Motcle typeChamp = "champ_elem" ;
+      dis.discretiser_champ(typeChamp, equation().zone_dis(), scalaire, noms , unites, 1, 0, nu_t_post_[0]);
+    }
+}
+
+void Op_Diff_Turbulent_CoviMAC_Face::mettre_a_jour(double temps)
+{
+  Op_Diff_CoviMAC_Face::mettre_a_jour(temps);
+
+  int N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases();
+  for (int n = 0; n < N; n++) if (nu_t_post_[n].non_nul()) //viscosite turbulente : toujours scalaire
+      {
+        const DoubleTab& rho = equation().milieu().masse_volumique().passe() ;
+        DoubleTab& val = nu_t_post_[n]->valeurs();
+        int nl = val.dimension(0);
+        int cR = (rho.dimension(0) == 1);
+        DoubleTrav nu_t(nl, N);
+        ref_cast(Viscosite_turbulente_base, corr.valeur()).eddy_viscosity(nu_t); //remplissage par la correlation
+        for (int i = 0; i < nl; i++) val(i, 0) = rho(!cR * i, n) * nu_t(i, n);
+      }
 }
 
 void Op_Diff_Turbulent_CoviMAC_Face::modifier_nu(DoubleTab& mu) const

@@ -21,6 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Viscosite_turbulente_base.h>
+#include <Pb_Multiphase.h>
+
 Implemente_base(Viscosite_turbulente_base, "Viscosite_turbulente_base", Correlation_base);
 
 Sortie& Viscosite_turbulente_base::printOn(Sortie& os) const

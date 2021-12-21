@@ -44,6 +44,7 @@ class Viscosite_turbulente_base : public Correlation_base
 public:
   virtual void eddy_viscosity(DoubleTab& nu_t) const = 0;
   virtual void reynolds_stress(DoubleTab& R_ij) const = 0;
+
 };
 
 #endif
