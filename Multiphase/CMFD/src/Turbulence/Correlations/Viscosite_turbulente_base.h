@@ -29,12 +29,13 @@
 //
 // .DESCRIPTION
 //    classe Viscosite_turbulente_base
-//    correlations de viscosite turbulente decrivant le tenseur de Reynolds R_{ij} = - < rho u'_i u'_j>
+//    correlations de viscosite turbulente decrivant le tenseur de Reynolds R_{ij} = - < u'_i u'_j>
 //    Methodes implementees :
 //    - eddy_viscosity(nu_t) -> remplit le DoubleTab "nu_t" tel que
 //                              <u'_i u'_j>  = - nu_t (dui / dx_j + duj / dx_i + (partie trace))
-//    - reynolds_stress(R_ij) -> remplit le DoubleTab "R_ij" avec le tenseur de Reynolds
-//                               complet (pour utilisation par un modele GGDH dans une autre equation)
+//    - reynolds_stress(R_ij) -> remplit R_ij = < u'_i u'_j> (pour utilisation par un modele GGDH dans une autre equation)
+//                               format : R_ij(e, n, i, j) avec e l'indice d'element, n l'indice de phase, (i, j) les composantes
+//    - k_over_eps(k_sur_eps) -> renvoie la quantite "k / epsilon" (utilisee par exemple dans le GGDH)
 //    Dans les deux cas, les tableaux doivent etre dimensionnes par la fonction appelante.
 //////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +45,7 @@ class Viscosite_turbulente_base : public Correlation_base
 public:
   virtual void eddy_viscosity(DoubleTab& nu_t) const = 0;
   virtual void reynolds_stress(DoubleTab& R_ij) const = 0;
-
+  virtual void k_over_eps(DoubleTab& k_sur_eps) const = 0;
 };
 
 #endif

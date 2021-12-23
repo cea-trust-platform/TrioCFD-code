@@ -14,35 +14,42 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
-// Directory:   $TRUST_ROOT/src/Turbulence/Correlations
-// Version:     /main/18
+// File:        Op_Diff_CoviMAC_Elem.h
+// Directory:   $TRUST_ROOT/src/Turbulence/CoviMAC/Operateurs
+// Version:     1
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
-#include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
+#ifndef Op_Diff_Turbulent_CoviMAC_Elem_included
+#define Op_Diff_Turbulent_CoviMAC_Elem_included
 
-//////////////////////////////////////////////////////////////////////////////
+#include <Op_Diff_CoviMAC_Elem.h>
+#include <Correlation.h>
+
+/////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
-//////////////////////////////////////////////////////////////////////////////
+// .DESCRIPTION : class Op_Diff_Turbulent_CoviMAC_Elem
+//
+// Version de Op_Diff_CoviMAC_Elem prenant en compte l'effet de la turbulence
+// par le biais d'une correlation de type Transport_turbulent.
+// (celle-ci reposera sur la modelisation de la viscosite turbulente fournie
+//  par la correlation Viscosite_turbulente de l'operateur de diffusion de la QDM)
+//
+/////////////////////////////////////////////////////////////////////////////
 
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+class Op_Diff_Turbulent_CoviMAC_Elem : public Op_Diff_CoviMAC_Elem
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
-public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
 
+  Declare_instanciable( Op_Diff_Turbulent_CoviMAC_Elem ) ;
+  virtual int dimension_min_nu() const //pour que la correlation force l'anisotrope (cf. GGDH)
+  {
+    return dimension * dimension;
+  }
+  virtual void completer();
+  virtual void modifier_nu(DoubleTab& ) const; //prend en compte la diffusivite turbulente
+
+protected :
+  Correlation corr; //correlation de transport turbulent
 };
 
-#endif
+#endif /* Op_Diff_CoviMAC_Elem_included */

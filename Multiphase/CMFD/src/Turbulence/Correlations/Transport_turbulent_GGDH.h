@@ -14,35 +14,40 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
+// File:        Transport_turbulent_GGDH.h
 // Directory:   $TRUST_ROOT/src/Turbulence/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
+#ifndef Transport_turbulent_GGDH_included
+#define Transport_turbulent_GGDH_included
 #include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
+#include <Transport_turbulent_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+//    classe Transport_turbulent_GGDH
+//    Transport turbulent de type GGDH:
+//    < u'_i theta'> = - C_s * k / epsilon * <u'_i u'_j> * d_j theta
 //////////////////////////////////////////////////////////////////////////////
 
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+class Transport_turbulent_GGDH : public Transport_turbulent_base
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
+  Declare_instanciable(Transport_turbulent_GGDH);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
+  virtual int dimension_min_nu() const
+  {
+    return dimension * dimension; //anisotrope complet!
+  }
+  virtual int gradu_required() const
+  {
+    return 1; /* on a besoin de grad u */
+  };
+  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const;
 private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
-
+  double C_s = 0.3; //facteur multiplicatif
 };
 
 #endif

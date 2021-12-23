@@ -14,35 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
+// File:        Transport_turbulent_SGDH.h
 // Directory:   $TRUST_ROOT/src/Turbulence/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
+#ifndef Transport_turbulent_SGDH_included
+#define Transport_turbulent_SGDH_included
 #include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
+#include <Transport_turbulent_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+//    classe Transport_turbulent_SGDH
+//    Transport turbulent de type SGDH:
+//    < u'_i theta'> = - nu_t / Pr_t d_i theta = - sigma_t nu_t d_i theta
+//    (l'utilisateur peut donner sigma_t ou Pr_t)
 //////////////////////////////////////////////////////////////////////////////
 
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+class Transport_turbulent_SGDH : public Transport_turbulent_base
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
+  Declare_instanciable(Transport_turbulent_SGDH);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
+  virtual int dimension_min_nu() const
+  {
+    return 1; //isotrope
+  }
+  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const;
 private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
-
+  double sigma_ = 1; //facteur multiplicatif
 };
 
 #endif

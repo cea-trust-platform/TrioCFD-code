@@ -24,6 +24,7 @@
 #include <Param.h>
 #include <Probleme_base.h>
 #include <Champ_base.h>
+#include <ConstDoubleTab_parts.h>
 
 Implemente_instanciable(Viscosite_turbulente_k_tau, "Viscosite_turbulente_k_tau", Viscosite_turbulente_base);
 
@@ -54,5 +55,22 @@ void Viscosite_turbulente_k_tau::eddy_viscosity(DoubleTab& nu_t) const
 
 void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const
 {
-  abort(); //TBD
+  const DoubleTab& k = pb_->get_champ("k").passe(), &tau = pb_->get_champ("tau").passe(),
+                   &nu = pb_->get_champ("viscosite_cinematique").passe(), &grad_u = pb_->get_champ("gradient_vitesse").passe();
+  ConstDoubleTab_parts p_gu(grad_u); //en CoviMAC, grad_u contient (nf.grad)u_i aux faces, puis (d_j u_i) aux elements
+  int i, d, db, D = dimension, i_part = -1, n, N = nu.dimension(1), Nk = k.dimension(1);
+  for (i = 0; i < p_gu.size(); i++) if (p_gu[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support que k
+  if (i_part < 0) Process::exit("Viscosite_turbulente_k_tau : inconsistency between velocity gradient and k!");
+  const DoubleTab& gu = p_gu[i_part]; //le bon tableau
+  for (i = 0; i < R_ij.dimension(0); i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
+          R_ij(i, n, d, db) = n < Nk ? 2. / 3 * k(i, n) * (d ==db) - max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) * (gu(i, d, D * n + db) + gu(i, db, D * n + d)) : 0;
+}
+
+void Viscosite_turbulente_k_tau::k_over_eps(DoubleTab& k_sur_eps) const
+{
+  const DoubleTab& tau = pb_->get_champ("tau").passe();
+  int i, nl = k_sur_eps.dimension_tot(0), n, N = k_sur_eps.dimension(1), Nt = tau.dimension(1);
+  assert(nl == tau.dimension_tot(0) && Nt <= N);
+  /* comme tau = 1 / omega et omega = epsilon / k, k / epsilon = tau ! */
+  for (i = 0; i < nl; i++) for (n = 0; n < N; n++) k_sur_eps(i, n) = n < Nt ? tau(i, n) : 0;
 }

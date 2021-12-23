@@ -14,35 +14,41 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
+// File:        Transport_turbulent_base.h
 // Directory:   $TRUST_ROOT/src/Turbulence/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
+#ifndef Transport_turbulent_base_included
+#define Transport_turbulent_base_included
 #include <DoubleTab.h>
+#include <Correlation_base.h>
+#include <Convection_Diffusion_std.h>
 #include <Viscosite_turbulente_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+//    classe Transport_turbulent_base
+//    correlations decrivant l'effet de la turbulence dans une autre equation (thermique, quantites turbulentes...)
+//    Methodes implementees :
+//    - dimension_min_nu() -> nombre de composantes minimal du tenseur de diffusion par composante (1, D, D^2)
+//    - modifier_nu() -> ajoute au tenseur de diffusion de l'equation la contribution de la turbulence
+//                       prend en argument la correlation de viscosite turbulente de l'operateur de diffusion de la QDM
+//    - gradu_required() -> 1 si la correlation a besoin du tenseur grad u
 //////////////////////////////////////////////////////////////////////////////
 
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+class Transport_turbulent_base : public Correlation_base
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
+  Declare_base(Transport_turbulent_base);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
-
+  virtual int dimension_min_nu() const = 0;
+  virtual int gradu_required() const
+  {
+    return 0;
+  };
+  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const = 0;
 };
 
 #endif

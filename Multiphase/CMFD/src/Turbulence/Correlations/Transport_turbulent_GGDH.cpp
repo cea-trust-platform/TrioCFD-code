@@ -14,35 +14,46 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
+// File:        Transport_turbulent_GGDH.cpp
 // Directory:   $TRUST_ROOT/src/Turbulence/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
-#include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
+#include <Transport_turbulent_GGDH.h>
+#include <Param.h>
+#include <Probleme_base.h>
+#include <Champ_Don.h>
+#include <Pb_Multiphase.h>
+#include <DoubleTrav.h>
+#include <MD_Vector_tools.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
-//////////////////////////////////////////////////////////////////////////////
+Implemente_instanciable(Transport_turbulent_GGDH, "Transport_turbulent_GGDH|Transport_turbulent_anisotrope", Transport_turbulent_base);
 
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+Sortie& Transport_turbulent_GGDH::printOn(Sortie& os) const
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
-public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
+  return os;
+}
 
-};
+Entree& Transport_turbulent_GGDH::readOn(Entree& is)
+{
+  Param param(que_suis_je());
+  param.ajouter("C_s", &C_s);
+  param.lire_avec_accolades_depuis(is);
+  return is;
+}
 
-#endif
+void Transport_turbulent_GGDH::modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
+{
+  const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
+                   *alp = sub_type(Pb_Multiphase, pb_.valeur()) ? &pb_->get_champ("alpha").passe() : NULL; //produit par alpha si Pb_Multiphase
+  int i, nl = nu.dimension_tot(0), n, N = nu.dimension(1), d, db, D = dimension;
+  //par la viscosite turbulente : tenseur de Reynolds, facteur k / eps
+  DoubleTrav Rij(0, N, D, D), k_sur_eps(0, N);
+  MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);
+  MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), k_sur_eps);
+  visc_turb.reynolds_stress(Rij), visc_turb.k_over_eps(k_sur_eps);
+  //formule pour passer de nu a mu : mu0 / nu0 * C_s * k / eps * <u'i u'_j>
+  for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) for (db = 0; db < D; db++)
+          nu(i, n, d, db) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) / nu0(i, n) * C_s * k_sur_eps(i, n) * Rij(i, n, d, db);
+}

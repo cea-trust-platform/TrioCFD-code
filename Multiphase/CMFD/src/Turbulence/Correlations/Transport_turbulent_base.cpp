@@ -14,35 +14,21 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
+// File:        Transport_turbulent_base.cpp
 // Directory:   $TRUST_ROOT/src/Turbulence/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
-#include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
+#include <Transport_turbulent_base.h>
+Implemente_base(Transport_turbulent_base, "Transport_turbulent_base", Correlation_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
-//////////////////////////////////////////////////////////////////////////////
-
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+Sortie& Transport_turbulent_base::printOn(Sortie& os) const
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
-public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
+  return os;
+}
 
-};
-
-#endif
+Entree& Transport_turbulent_base::readOn(Entree& is)
+{
+  return is;
+}
