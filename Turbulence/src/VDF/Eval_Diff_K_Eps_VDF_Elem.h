@@ -20,8 +20,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef Eval_Diff_K_Eps_VDF_Elem_included
 #define Eval_Diff_K_Eps_VDF_Elem_included
 
@@ -29,164 +27,58 @@
 #include <Champ_Fonc.h>
 #include <Eval_VDF_Elem.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Eval_Diff_K_Eps_VDF_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
 class Eval_Diff_K_Eps_VDF_Elem : public Eval_Diff_K_Eps_VDF, public Eval_VDF_Elem
 {
-
 public:
-
   inline Eval_Diff_K_Eps_VDF_Elem();
 
-  inline int calculer_flux_faces_echange_externe_impose() const ;
-  inline int calculer_flux_faces_echange_global_impose() const ;
-  inline int calculer_flux_faces_entree_fluide() const ;
-  inline int calculer_flux_faces_paroi() const ;
-  inline int calculer_flux_faces_paroi_adiabatique() const ;
-  inline int calculer_flux_faces_paroi_defilante() const ;
-  inline int calculer_flux_faces_paroi_fixe() const ;
-  inline int calculer_flux_faces_sortie_libre() const ;
-  inline int calculer_flux_faces_symetrie() const ;
-  inline int calculer_flux_faces_periodique() const ;
+  inline void flux_face(const DoubleTab&, int , const Symetrie&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Periodique&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Neumann_sortie_libre&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Dirichlet_entree_fluide&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Dirichlet_paroi_fixe&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Dirichlet_paroi_defilante&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Neumann_paroi_adiabatique&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Neumann_paroi&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , int, int, const Echange_externe_impose&, int, ArrOfDouble& flux) const;
+  inline void flux_face(const DoubleTab&, int , const Echange_global_impose&, int, ArrOfDouble& flux) const;
+  inline void flux_faces_interne(const DoubleTab&, int ,  ArrOfDouble& flux) const;
 
-  // Fonctions qui servent a calculer le flux de grandeurs scalaires
-  // Elles sont de type double et renvoient le flux
+  inline void coeffs_face(int,int, const Symetrie&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int, int,const Neumann_sortie_libre&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Dirichlet_entree_fluide&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Dirichlet_paroi_fixe&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Dirichlet_paroi_defilante&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Neumann_paroi_adiabatique&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Neumann_paroi&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int,int,int, const Echange_externe_impose&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Echange_global_impose&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_face(int,int, const Periodique&, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
+  inline void coeffs_faces_interne(int, ArrOfDouble& aii, ArrOfDouble& ajj ) const;
 
-  inline double flux_face(const DoubleTab&, int , const Dirichlet_entree_fluide&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Dirichlet_paroi_defilante&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Dirichlet_paroi_fixe&, int ) const;
-  inline double flux_face(const DoubleTab&, int , int, int, const Echange_externe_impose&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Echange_global_impose&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Neumann_paroi&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Neumann_paroi_adiabatique&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Neumann_sortie_libre&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Symetrie&, int ) const;
-  inline double flux_face(const DoubleTab&, int , const Periodique&, int ) const;
-  inline double flux_faces_interne(const DoubleTab&, int ) const;
-
-  // Fonctions qui servent a calculer le flux de grandeurs vectorielles
-  // Elles sont de type void et remplissent le tableau flux
-
-
-  inline void flux_face(const DoubleTab&, int , const Symetrie&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Periodique&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Neumann_sortie_libre&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Dirichlet_entree_fluide&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Dirichlet_paroi_fixe&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Dirichlet_paroi_defilante&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Neumann_paroi_adiabatique&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Neumann_paroi&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , int, int, const Echange_externe_impose&,
-                        int, DoubleVect& flux) const;
-  inline void flux_face(const DoubleTab&, int , const Echange_global_impose&,
-                        int, DoubleVect& flux) const;
-  //inline void flux_face(const DoubleTab&, int ,const Nouvelle_Cl_VDF&,
-  //                      int, DoubleVect& flux) const=0;
-
-  inline void flux_faces_interne(const DoubleTab&, int ,
-                                 DoubleVect& flux) const;
-
-  // Fonctions qui servent a calculer les coefficients de la matrice pour des grandeurs
-  // scalaires.
-
-  inline void coeffs_face(int,int, const Symetrie&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Neumann_sortie_libre&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Dirichlet_entree_fluide&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Dirichlet_paroi_fixe&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Dirichlet_paroi_defilante&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Neumann_paroi_adiabatique&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Neumann_paroi&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int,int,int, const Echange_externe_impose&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Echange_global_impose&, double& aii, double& ajj ) const;
-  inline void coeffs_face(int,int, const Periodique&, double& aii, double& ajj ) const;
-  inline void coeffs_faces_interne(int, double& aii, double& ajj ) const;
-
-  // Fonctions qui servent a calculer la contribution des conditions limites
-  // au second membre pour l'implicite pour les grandeurs scalaires.
-
-  inline double secmem_face(int, const Symetrie&, int ) const;
-  inline double secmem_face(int, const Neumann_sortie_libre&, int ) const;
-  inline double secmem_face(int, const Dirichlet_entree_fluide&, int ) const;
-  inline double secmem_face(int, const Dirichlet_paroi_fixe&, int ) const;
-  inline double secmem_face(int, const Dirichlet_paroi_defilante&, int ) const;
-  inline double secmem_face(int, const Neumann_paroi_adiabatique&, int ) const;
-  inline double secmem_face(int, const Neumann_paroi&, int ) const;
-  inline double secmem_face(int, int, int, const Echange_externe_impose&, int ) const;
-  inline double secmem_face(int, const Echange_global_impose&, int ) const;
-  inline double secmem_face(int, const Periodique&, int ) const;
-  inline double secmem_faces_interne(int ) const;
-
-
-  // Fonctions qui servent a calculer les coefficients de la matrice pour des grandeurs
-  // vectorielles.
-
-  inline void coeffs_face(int,int, const Symetrie&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int, int,const Neumann_sortie_libre&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Dirichlet_entree_fluide&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Dirichlet_paroi_fixe&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Dirichlet_paroi_defilante&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Neumann_paroi_adiabatique&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Neumann_paroi&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int,int,int, const Echange_externe_impose&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Echange_global_impose&, DoubleVect& aii, DoubleVect& ajj ) const;
-  inline void coeffs_face(int,int, const Periodique&, DoubleVect& aii, DoubleVect& ajj ) const;
-
-  //virtual void coeffs_face(const DoubleTab&, int , const Nouvelle_Cl_VDF&, int,
-  //                           DoubleVect& aii, DoubleVect& ajj ) const;
-
-  inline void coeffs_faces_interne(int, DoubleVect& aii, DoubleVect& ajj ) const;
-
-  // Fonctions qui servent a calculer la contribution des conditions limites
-  // au second membre pour l'implicite pour les grandeurs vectorielles.
-
-  inline void secmem_face(int, const Symetrie&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Neumann_sortie_libre&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Dirichlet_entree_fluide&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Dirichlet_paroi_fixe&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Dirichlet_paroi_defilante&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Neumann_paroi_adiabatique&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Neumann_paroi&, int, DoubleVect& ) const;
-  inline void secmem_face(int, int, int, const Echange_externe_impose&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Echange_global_impose&, int, DoubleVect& ) const;
-  inline void secmem_face(int, const Periodique&, int, DoubleVect& ) const;
-  inline void secmem_faces_interne(int, DoubleVect& ) const;
-
-  //inline double secmem_face(const DoubleTab&, int , const Nouvelle_Cl_VDF&, int, DoubleVect& ) const;
-
+  inline void secmem_face(int, const Symetrie&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Neumann_sortie_libre&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Dirichlet_entree_fluide&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Dirichlet_paroi_fixe&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Dirichlet_paroi_defilante&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Neumann_paroi_adiabatique&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Neumann_paroi&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, int, int, const Echange_externe_impose&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Echange_global_impose&, int, ArrOfDouble& ) const;
+  inline void secmem_face(int, const Periodique&, int, ArrOfDouble& ) const;
+  inline void secmem_faces_interne(int, ArrOfDouble& ) const;
 };
 
-//
-// Fonctions inline de la classe Eval_Diff_K_Eps_VDF_Elem
-//
 
-inline Eval_Diff_K_Eps_VDF_Elem::Eval_Diff_K_Eps_VDF_Elem()
-  : Eval_Diff_K_Eps_VDF() {}
+inline Eval_Diff_K_Eps_VDF_Elem::Eval_Diff_K_Eps_VDF_Elem() : Eval_Diff_K_Eps_VDF() {}
 // DEBUT DES DEFINES
 #define CLASSNAME Eval_Diff_K_Eps_VDF_Elem
 #define nu_1(i,k) (db_diffusivite+dv_diffusivite_turbulente(i)/Prdt[k])
-//#define nu_1(i,k) dv_diffusivite_turbulente(i)/Prdt[k]
-// normalement nu2 ne sert pas!!
-//#define nu_2(i,k) 1.;assert(0);Process::exit();
 #define nu_2(i,k) nu_1(i,k)
 #define f_heq(d0,i,d1,j,k) heq=0.5*(nu_1(i,k) + nu_1(j,k))/(d1+d0);
 #undef D_AXI
 #undef DEQUIV
 #undef MULTD
-//#define MULTD 1*
-#include <Cal_std.h>
-#include <Scal_corps_base_inut.h>
 #include <Vect_corps_base.h>
 #undef CLASSNAME
 #undef f_heq

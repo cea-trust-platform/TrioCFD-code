@@ -23,10 +23,10 @@
 #ifndef Op_DiffF22_VDF_Elem_included
 #define Op_DiffF22_VDF_Elem_included
 
+#include <Eval_Diff_VDF_Elem_leaves.h>
 #include <Op_Diff_VDF_base.h>
-#include <ItVDFEl.h>
 #include <Op_VDF_Elem.h>
-class Eval_DiffF22_VDF_const_Elem;
+#include <ItVDFEl.h>
 
 //
 // .DESCRIPTION class Op_DiffF22_VDF_Elem
