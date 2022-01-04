@@ -412,7 +412,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
 
   DoubleTab termes_sources;
-  termes_sources.resize(zone_VDF.nb_faces());
+  termes_sources.resize(zone_VDF.nb_faces(),1);
   termes_sources = 0.;
   // On calcule les termes sources, sauf celui de Boussinesq (TBLE recalcule par lui meme ce terme s'il est demande)
   const Sources& les_sources=eqn_hydr.sources();
@@ -959,7 +959,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
 
   DoubleTab termes_sources;
-  termes_sources.resize(zone_VDF.nb_faces());
+  termes_sources.resize(zone_VDF.nb_faces(),1);
   termes_sources = 0.;
   // On calcule les termes sources, sauf celui de Boussinesq (TBLE recalcule par lui meme ce terme s'il est demande)
   const Sources& les_sources=eqn_hydr.sources();

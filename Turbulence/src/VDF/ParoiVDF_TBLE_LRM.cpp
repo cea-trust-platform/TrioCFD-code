@@ -580,7 +580,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   gradient.calculer(p, grad_p);  // Calcul du gradient de pression
 
   DoubleTab termes_sources;
-  termes_sources.resize(zone_VDF.nb_faces());
+  termes_sources.resize(zone_VDF.nb_faces(),1);
   eqn_hydr.sources().calculer(termes_sources); //les termes sources
 
   const double& tps = eqnNS.schema_temps().temps_courant();
@@ -1502,7 +1502,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   gradient.calculer(p, grad_p);  // Calcul du gradient de pression
 
   DoubleTab termes_sources;
-  termes_sources.resize(zone_VDF.nb_faces());
+  termes_sources.resize(zone_VDF.nb_faces(),1);
   eqn_hydr.sources().calculer(termes_sources); //les termes sources
 
   const double& tps = eqnNS.schema_temps().temps_courant();
