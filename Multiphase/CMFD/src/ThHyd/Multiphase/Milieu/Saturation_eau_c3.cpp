@@ -113,7 +113,7 @@ double Saturation_eau_c3::sigma_(const double T, const double P) const
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
   F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
   /* calcul a T */
-  double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
-  F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
-  return sigma;
+  double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, surfaceTension, dP_surfaceTension;
+  F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &surfaceTension, &dP_surfaceTension);
+  return surfaceTension;
 }
