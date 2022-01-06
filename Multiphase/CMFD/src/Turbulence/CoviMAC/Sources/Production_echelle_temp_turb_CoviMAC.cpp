@@ -81,11 +81,9 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
   const DoubleTab&                     tab_grad = grad.valeurs();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, Op_diff.corr.valeur());
-  const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
-  const DoubleTab&                      tab_tau = tau.valeurs();
+  const DoubleTab&                      tab_tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()).valeurs();
   const DoubleTab&                           nu = pb.get_champ("viscosite_cinematique").passe();
-  const Champ_P0_CoviMAC&                     k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k"));
-  const DoubleTab&                        tab_k = k.valeurs();
+  const DoubleTab&                        tab_k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k")).valeurs();
 
   int N = pb.nb_phases(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
 
@@ -97,35 +95,38 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
   int n = 0 ; // the only kinetic energy production is in phase 0
 
   // Derivees
-  for (auto &&i_m : matrices) if (i_m.first == "tau")
-      {
-        Matrice_Morse& mat = *i_m.second;
-        for (int e = 0; e < ne; e++)
-          {
-            double deriv = 0;
-            for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-                {
-                  deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-                }
-            deriv *= alpha_omega_*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
-            mat(e, e) += deriv;
-          }
-      }
+  for (auto &&i_m : matrices)
+    {
+      if (i_m.first == "tau")
+        {
+          Matrice_Morse& mat = *i_m.second;
+          for (int e = 0; e < ne; e++)
+            {
+              double deriv = 0;
+              for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+                  {
+                    deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+                  }
+              deriv *= alpha_omega_*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
+              mat(e, e) += deriv;
+            }
+        }
 
-  for (auto &&i_m : matrices) if (i_m.first == "k")
-      {
-        Matrice_Morse& mat = *i_m.second;
-        for (int e = 0; e < ne; e++)
-          {
-            double deriv = 0;
-            for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-                {
-                  deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-                }
-            deriv *= (-1)*alpha_omega_*tab_tau(e, n)*tab_tau(e, n)*tab_tau(e, n)/(max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))*max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))) ;
-            mat(e, e) += deriv;
-          }
-      }
+      else if (i_m.first == "k")
+        {
+          Matrice_Morse& mat = *i_m.second;
+          for (int e = 0; e < ne; e++)
+            {
+              double deriv = 0;
+              for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+                  {
+                    deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+                  }
+              deriv *= (-1)*alpha_omega_*tab_tau(e, n)*tab_tau(e, n)*tab_tau(e, n)/(max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))*max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))) ;
+              mat(e, e) += deriv;
+            }
+        }
+    }
 
   // Second membre
   for(int e = 0 ; e < ne ; e++)
@@ -136,6 +137,6 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
             secmem_en += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
           }
       secmem_en *= (-1)*alpha_omega_*tab_tau(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
-      secmem(e, n) = secmem_en;
+      secmem(e, n) += secmem_en;
     }
 }

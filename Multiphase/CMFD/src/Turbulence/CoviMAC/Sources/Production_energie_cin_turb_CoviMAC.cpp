@@ -65,7 +65,7 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   int N = pb.nb_phases(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
 
   DoubleTrav Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij);
   visc_turb.reynolds_stress(Rij);
   assert((ne == Rij.dimension(0)));
 

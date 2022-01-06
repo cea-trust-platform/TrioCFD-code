@@ -51,9 +51,6 @@ public :
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) { };
   void associer_pb(const Probleme_base& ) { };
   void mettre_a_jour(double temps) { };
-
-private:
-  REF(Correlation) correlation_visc_turb_;
 };
 
 #endif

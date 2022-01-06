@@ -53,7 +53,6 @@ public :
   void mettre_a_jour(double temps) { };
 
 private:
-  REF(Correlation) correlation_visc_turb_;
   double alpha_omega_;
 };
 

@@ -14,44 +14,45 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Diff_CoviMAC_Elem.h
-// Directory:   $TRUST_ROOT/src/Turbulence/CoviMAC/Operateurs
-// Version:     1
+// File:        Production_echelle_temp_turb_CoviMAC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Op_Diff_Turbulent_CoviMAC_Elem_included
-#define Op_Diff_Turbulent_CoviMAC_Elem_included
+#ifndef Diffusion_supplementaire_echelle_temp_turb_CoviMAC_included
+#define Diffusion_supplementaire_echelle_temp_turb_CoviMAC_included
 
-#include <Op_Diff_CoviMAC_Elem.h>
-#include <Correlation.h>
+#include <Source_base.h>
+#include <Ref_Correlation.h>
+#include <DoubleTab.h>
 
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION : class Op_Diff_Turbulent_CoviMAC_Elem
+// .DESCRIPTION
+//    Classe Diffusion_supplementaire_echelle_temp_turb_CoviMAC
+//    Cette classe implemente dans CoviMAC la diffusion supplementaire venant de l'introduction du temps tau
 //
-// Version de Op_Diff_CoviMAC_Elem prenant en compte l'effet de la turbulence
-// par le biais d'une correlation de type Transport_turbulent.
-// (celle-ci reposera sur la modelisation de la viscosite turbulente fournie
-//  par la correlation Viscosite_turbulente de l'operateur de diffusion de la QDM)
-//
-/////////////////////////////////////////////////////////////////////////////
-
-class Op_Diff_Turbulent_CoviMAC_Elem : public Op_Diff_CoviMAC_Elem
+// .SECTION voir aussi
+//    Operateur_CoviMAC_base Operateur_base
+//////////////////////////////////////////////////////////////////////////////
+class Diffusion_supplementaire_echelle_temp_turb_CoviMAC: public Source_base
 {
-
-  Declare_instanciable( Op_Diff_Turbulent_CoviMAC_Elem ) ;
-  virtual int dimension_min_nu() const //pour que la correlation force l'anisotrope (cf. GGDH)
+  Declare_instanciable(Diffusion_supplementaire_echelle_temp_turb_CoviMAC);
+public :
+  int has_interface_blocs() const
   {
-    return dimension * dimension;
+    return 1;
   }
-  virtual void completer();
-  virtual void modifier_nu(DoubleTab& ) const; //prend en compte la diffusivite turbulente
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
+  void check_multiphase_compatibility() const {}; //of course
 
-public:
-  Correlation corr; //correlation de transport turbulent
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) { };
+  void associer_pb(const Probleme_base& ) { };
+  void mettre_a_jour(double temps) { };
 
-protected :
+private:
 };
 
-#endif /* Op_Diff_CoviMAC_Elem_included */
+#endif

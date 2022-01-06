@@ -43,6 +43,8 @@ public:
     return 1; //isotrope
   }
   virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const;
+  inline double sigma() const {return sigma_;};
+
 private:
   double sigma_ = 1; //facteur multiplicatif
 };
