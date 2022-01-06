@@ -300,10 +300,14 @@ int Probleme_base::postraiter(int force)
   //specific ALE postraitement
   if(le_domaine_dis.domaine().que_suis_je()=="Domaine_ALE")
     {
-      //compute the projection on the ALE boundaries
-      Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis.domaine());
-      double temps = le_schema_en_temps->temps_courant();
-      dom_ale.update_ALE_projection(temps);
+      if(!resuming_in_progress_)  //no projection during the iteration of resumption of computation
+        {
+          //compute the projection on the ALE boundaries
+          Domaine_ALE& dom_ale = ref_cast(Domaine_ALE,le_domaine_dis.domaine());
+          double temps = le_schema_en_temps->temps_courant();
+          dom_ale.update_ALE_projection(temps);
+        }
+      resuming_in_progress_=0; //reset to false in order to make the following projections
     }
 
   return 1;
@@ -381,6 +385,7 @@ Probleme_base::Probleme_base() :
   //ficsauv(0),
   osauv_hdf_(0),
   reprise_effectuee_(0),
+  resuming_in_progress_(0),
   reprise_version_(155),
   restart_file(0),
   initialized(false),
@@ -671,6 +676,7 @@ Entree& Probleme_base::readOn(Entree& is)
 #endif
             }
           reprise_effectuee_=1;
+          resuming_in_progress_=1;
         }
       ////////////////////////////////////////////////
       // Lecture des options de sauvegarde d'un calcul
