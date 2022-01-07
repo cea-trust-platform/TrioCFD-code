@@ -14,34 +14,34 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Terme_dissipation_echelle_temporelle_turbulente_CoviMAC_Elem.h
+// File:        Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC.h
 // Directory:   $TRUST_ROOT/src/CoviMAC/Sources
 // Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Terme_dissipation_echelle_temporelle_turbulente_CoviMAC_Elem_included
-#define Terme_dissipation_echelle_temporelle_turbulente_CoviMAC_Elem_included
+#ifndef Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC_included
+#define Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC_included
 
 #include <Source_base.h>
 
 class Convection_Diffusion_std;
 //
-// .DESCRIPTION class Terme_dissipation_echelle_temporelle_turbulente_CoviMAC_Elem
+// .DESCRIPTION class Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC
 //
-// Terme de dissipation - beta_omaga * alpha * rho  dans l'equation d'energie cinetique turbulente
+// Terme de dissipation -beta * (alpha * rho * k) * omega dans l'equation d'energie cinetique turbulente
 
-class Terme_dissipation_echelle_temporelle_turbulente_CoviMAC_Elem : public Source_base 	// Terme_Source_CoviMAC_base
+class Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC : public Source_base 	// Terme_Source_CoviMAC_base
 {
 
-  Declare_instanciable(Terme_dissipation_echelle_temporelle_turbulente_CoviMAC_Elem);
+  Declare_instanciable(Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC);
 
 public:
   int has_interface_blocs() const
   {
     return 1;
   };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const { }; //rien
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
   void check_multiphase_compatibility() const { }; //rien
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) { };
@@ -49,7 +49,7 @@ public:
   void mettre_a_jour(double temps) { };
 
 protected:
-  double beta_omega = 0.075; // Kok and Speikreijse (2000)
+  double beta_k = 0.09; // Wilcox
 };
 
 #endif
