@@ -57,6 +57,13 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Sonde,"Sonde",Objet_U);
 // XD attr point_deb un_point point_deb 0 First outer probe segment point.
 // XD attr point_fin un_point point_fin 0 Second outer probe segment point.
 
+// XD radius sonde_base radius 0 not_set
+// XD attr nbr entier nbr 0 Number of probe points of the segment, evenly distributed.
+// XD attr point_deb un_point point_deb 0 First outer probe segment point.
+// XD attr radius floattant radius 0 not_set
+// XD attr teta1 floattant teta1 0 not_set
+// XD attr teta2 floattant teta2 0 not_set
+
 static int fichier_sondes_cree=0;
 
 // Description:
