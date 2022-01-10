@@ -52,7 +52,6 @@ public :
   void associer_pb(const Probleme_base& ) { };
   void mettre_a_jour(double temps) { };
 
-private:
 };
 
 #endif

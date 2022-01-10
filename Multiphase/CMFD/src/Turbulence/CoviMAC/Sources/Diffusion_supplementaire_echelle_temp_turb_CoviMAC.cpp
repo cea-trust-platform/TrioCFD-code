@@ -84,34 +84,21 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const DoubleTab&                      tab_tau = tau.valeurs();
   const IntTab&                             fcl = tau.fcl();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
-  const DoubleTab&                       nu_lam = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleTab&                    tab_alpha = equation().probleme().get_champ("alpha").passe();
-  const Op_Diff_Turbulent_CoviMAC_Face& Op_diff_qdm = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, Op_diff_qdm.corr.valeur());
   const Op_Diff_Turbulent_CoviMAC_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_CoviMAC_Elem, eq.operateur(0).l_op_base());
-  const Transport_turbulent_SGDH&     corr_SGDH = ref_cast(Transport_turbulent_SGDH, Op_diff_loc.corr.valeur());
-  const double                        sigma_loc = corr_SGDH.sigma();
+  const DoubleTab&                       nu_tot = Op_diff_loc.nu();
+  const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
 
   int N = tab_tau.dimension(1), N_phases = eq_qdm.vitesse()->valeurs().dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), D = dimension ;
   int n = 0 ; // the only kinetic energy production is in phase 0
 
   DoubleTrav grad_f_sqrt_tau(0, N);
   DoubleTrav sq_grad_sqrt_tau(0, N);
-  DoubleTrav nu_tot(0, N); // the nu_turb of the diffusion operator is a tensor by default, we need a double here
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse()->valeurs().get_md_vector(), grad_f_sqrt_tau);
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), sq_grad_sqrt_tau);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), nu_tot);
-  tau.update_tab_grad(tau.recuperer_temps_passe(), 0);
+  tau.init_grad(0);
   IntTab& f_d = tau.fgrad_d, f_e = tau.fgrad_e;             // Tables used in zone_CoviMAC::fgrad
   DoubleTab f_w = tau.fgrad_w;
-
-  // Calculation of total viscosity
-  visc_turb.eddy_viscosity(nu_tot);
-  for (int e = 0; e<ne; e++)
-    {
-      nu_tot(e, n) *= sigma_loc;
-      nu_tot(e, n) += nu_lam(e, n);
-    }
 
   // Calculation of grad of root of tau at surface
   for (int f = 0; f < nf; f++)
@@ -147,7 +134,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   // Second membre
   for(int e = 0 ; e < ne ; e++)
     {
-      secmem(e, n) += -8 * tab_alpha(e, n) * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
+      secmem(e, n) += -8 * tab_alpha(e, n) * tab_rho(e, n) * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
     }
 
   // Derivees
@@ -156,7 +143,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
         Matrice_Morse& mat = *i_m.second;
         for (int e = 0; e < ne; e++)
           {
-            mat(e, e*N_phases+n) += 8 * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
+            mat(e, e*N_phases+n) += 8 * tab_rho(e, n) * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
           }
       }
 }

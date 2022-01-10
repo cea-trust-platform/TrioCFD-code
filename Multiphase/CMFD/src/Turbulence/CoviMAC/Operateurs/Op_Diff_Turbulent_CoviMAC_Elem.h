@@ -25,6 +25,7 @@
 
 #include <Op_Diff_CoviMAC_Elem.h>
 #include <Correlation.h>
+#include <Transport_turbulent_base.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -43,15 +44,13 @@ class Op_Diff_Turbulent_CoviMAC_Elem : public Op_Diff_CoviMAC_Elem
   Declare_instanciable( Op_Diff_Turbulent_CoviMAC_Elem ) ;
   virtual int dimension_min_nu() const //pour que la correlation force l'anisotrope (cf. GGDH)
   {
-    return dimension * dimension;
+    return ref_cast(Transport_turbulent_base, corr.valeur()).dimension_min_nu();
   }
   virtual void completer();
   virtual void modifier_nu(DoubleTab& ) const; //prend en compte la diffusivite turbulente
 
-public:
+protected:
   Correlation corr; //correlation de transport turbulent
-
-protected :
 };
 
 #endif /* Op_Diff_CoviMAC_Elem_included */
