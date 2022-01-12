@@ -46,9 +46,8 @@
 //// flux_face avec Dirichlet_entree_fluide
 //
 
-inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
-                                 const Dirichlet_entree_fluide& la_cl,
-                                 int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& inco, int face, const Dirichlet_entree_fluide& la_cl, int num1,Type_Double& flux) const
 {
   int n0 = elem_(face,0);
   int n1 = elem_(face,1);
@@ -56,21 +55,21 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
   double dist = Dist_norm_bord(face);
   if (n0 != -1)
 #ifdef ISQUASI
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (la_cl.val_imp(face-num1,k)-inco(n0,k))/dv_mvol(n0)
                 *surface(face)*porosite(face)*nu_1(n0,k)/dist;
 #else
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (la_cl.val_imp(face-num1,k)-inco(n0,k))
                 *surface(face)*porosite(face)*nu_1(n0,k)/dist;
 #endif
   else  // n1 != -1
 #ifdef ISQUASI
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (inco(n1,k)-la_cl.val_imp(face-num1,k))/dv_mvol(n1)
                 *surface(face)*porosite(face)*nu_1(n1,k)/dist;
 #else
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (inco(n1,k)-la_cl.val_imp(face-num1,k))
                 *surface(face)*porosite(face)*nu_1(n1,k)/dist;
 #endif
@@ -78,8 +77,8 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
 
 //// coeffs_face avec Dirichlet_entree_fluide
 //
-
-inline void CLASSNAME::coeffs_face(int face,int, const Dirichlet_entree_fluide& la_cl,DoubleVect& aii, DoubleVect& ajj) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int face,int, const Dirichlet_entree_fluide& la_cl,Type_Double& aii, Type_Double& ajj) const
 {
   int k;
   int i = elem_(face,0);
@@ -88,24 +87,24 @@ inline void CLASSNAME::coeffs_face(int face,int, const Dirichlet_entree_fluide& 
 
   if (i != -1)
     {
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) = surface(face)*porosite(face)*nu_1(i,k)/dist;
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) = 0;
     }
   else  // j != -1
     {
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) = surface(face)*(porosite(face)*nu_1(elem_(face,1),k))/dist;
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) = 0;
     }
 }
 
 //// secmem_face avec Dirichlet_entree_fluide
 //
-
-inline void CLASSNAME::secmem_face(int face, const Dirichlet_entree_fluide& la_cl,  int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int face, const Dirichlet_entree_fluide& la_cl,  int num1,Type_Double& flux) const
 {
   int i = elem_(face,0);
   //  int j = elem(face,1);
@@ -113,22 +112,20 @@ inline void CLASSNAME::secmem_face(int face, const Dirichlet_entree_fluide& la_c
   double dist = Dist_norm_bord(face);
 
   if (i != -1)
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = la_cl.val_imp(face-num1,k)
                 *surface(face)*porosite(face)*nu_1(i,k)/dist;
 
   else // j != -1
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = -la_cl.val_imp(face-num1,k)
                 *surface(face)*(porosite(face)*nu_1(elem_(face,1),k))/dist;
 }
 
 //// flux_face avec Dirichlet_paroi_defilante
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab&, int ,
-                                 const Dirichlet_paroi_defilante&,
-                                 int, DoubleVect&  ) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab&, int , const Dirichlet_paroi_defilante&, int, Type_Double&  ) const
 {
   // coder dans evbasreyconst comme entree_fluide ????
   assert(0);
@@ -138,10 +135,8 @@ inline void CLASSNAME::flux_face(const DoubleTab&, int ,
 
 //// coeffs_face avec Dirichlet_paroi_defilante
 //
-
-inline void CLASSNAME::coeffs_face(int , int,
-                                   const Dirichlet_paroi_defilante&,
-                                   DoubleVect&, DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int , int, const Dirichlet_paroi_defilante&, Type_Double&, Type_Double& ) const
 {
   // coder dans evbasreyconst comme entree_fluide ????
   assert(0);
@@ -151,9 +146,8 @@ inline void CLASSNAME::coeffs_face(int , int,
 
 //// secmem_face avec Dirichlet_paroi_defilante
 //
-
-inline void CLASSNAME::secmem_face(int, const Dirichlet_paroi_defilante&,
-                                   int, DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int, const Dirichlet_paroi_defilante&, int, Type_Double& ) const
 {
   // coder dans evbasreyconst comme entree_fluide ????
   assert(0);
@@ -164,10 +158,8 @@ inline void CLASSNAME::secmem_face(int, const Dirichlet_paroi_defilante&,
 
 //// flux_face avec Dirichlet_paroi_fixe
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
-                                 const Dirichlet_paroi_fixe&,
-                                 int num1, DoubleVect& flux ) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& inco, int face, const Dirichlet_paroi_fixe&, int num1, Type_Double& flux ) const
 {
   // coder dans evbasreyconst comme entree_fluide ????
   //
@@ -178,21 +170,21 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
   double dist = Dist_norm_bord(face);
   if (n0 != -1)
 #ifdef ISQUASI
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (-inco(n0,k))
                 *surface(face)*porosite(face)*nu_1(n0,k)/dv_mvol(n0)/dist;
 #else
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (-inco(n0,k))
                 *surface(face)*porosite(face)*nu_1(n0,k)/dist;
 #endif
   else  // n1 != -1
 #ifdef ISQUASI
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (inco(n1,k))
                 *surface(face)*porosite(face)*nu_1(n1,k)/dv_mvol(n1)/dist;
 #else
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = (inco(n1,k))
                 *surface(face)*porosite(face)*nu_1(n1,k)/dist;
 #endif
@@ -200,9 +192,8 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
 
 //// coeffs_face avec Dirichlet_paroi_fixe
 //
-
-inline void CLASSNAME::coeffs_face(int face,int num1, const Dirichlet_paroi_fixe&,
-                                   DoubleVect& aii , DoubleVect& ajj) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int face,int num1, const Dirichlet_paroi_fixe&, Type_Double& aii , Type_Double& ajj) const
 {
   int n0 = elem_(face,0);
   int n1 = elem_(face,1);
@@ -211,15 +202,15 @@ inline void CLASSNAME::coeffs_face(int face,int num1, const Dirichlet_paroi_fixe
   if (n0 != -1)
     {
 #ifdef ISQUASI
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) =
           surface(face)*porosite(face)*nu_1(n0,k)/dv_mvol(n0)/dist;
 #else
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) =
           surface(face)*porosite(face)*nu_1(n0,k)/dist;
 #endif
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         ajj(k) =0;
     }
 
@@ -227,16 +218,16 @@ inline void CLASSNAME::coeffs_face(int face,int num1, const Dirichlet_paroi_fixe
     {
       if (n1==-1) Process::exit();
 #ifdef ISQUASI
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) =
           surface(face)*porosite(face)*nu_1(n1,k)/dv_mvol(n1)/dist;
 #else
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) =
           surface(face)*porosite(face)*nu_1(n1,k)/dist;
 
 #endif
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         aii(k) =0.;
 
     }
@@ -244,9 +235,8 @@ inline void CLASSNAME::coeffs_face(int face,int num1, const Dirichlet_paroi_fixe
 
 //// secmem_face avec Dirichlet_paroi_fixe
 //
-
-inline void CLASSNAME::secmem_face(int face, const Dirichlet_paroi_fixe&,
-                                   int, DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int face, const Dirichlet_paroi_fixe&, int, Type_Double& flux) const
 {
   // coder dans evbasreyconst comme entree_fluide ????
   flux=0  ;
@@ -255,10 +245,8 @@ inline void CLASSNAME::secmem_face(int face, const Dirichlet_paroi_fixe&,
 
 //// flux_face avec Echange_externe_impose
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& inco, int boundary_index, int face, int local_face,
-                                 const Echange_externe_impose& la_cl,
-                                 int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& inco, int boundary_index, int face, int local_face, const Echange_externe_impose& la_cl, int num1,Type_Double& flux) const
 {
   // C.L de type Echange_externe_impose : 1/h_total = (1/h_imp) + (e/diffusivite)
   // La C.L fournit h_imp ; il faut calculer e/diffusivite
@@ -276,7 +264,7 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int boundary_index, int 
   if (n0 != -1)
     {
       //e = la_zone->xv(face,ori) - la_zone->xp(n0,ori);
-      for (k=0; k<flux.size(); k++)
+      for (k=0; k<flux.size_array(); k++)
         {
           h_total_inv = 1/la_cl.h_imp(face-num1,k) + e/nu_2(n0,k);
           flux(k) = (la_cl.T_ext(face-num1,k) - inco(n0,k))*surface(face)/h_total_inv;
@@ -285,7 +273,7 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int boundary_index, int 
   else
     {
       //    e = la_zone->xp(n1,ori) - la_zone->xv(face,ori);
-      for (k=0; k<flux.size(); k++)
+      for (k=0; k<flux.size_array(); k++)
         {
           h_total_inv = 1/la_cl.h_imp(face-num1,k) + e/nu_2(n1,k);
           flux(k) = (inco(n1,k) - la_cl.T_ext(face-num1,k))*surface(face)/h_total_inv;
@@ -295,10 +283,8 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int boundary_index, int 
 
 //// coeffs_face avec Echange_externe_impose
 //
-
-inline void CLASSNAME::coeffs_face(int boundary_index, int face, int local_face, int num1,
-                                   const Echange_externe_impose& la_cl,
-                                   DoubleVect& aii, DoubleVect& ajj) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int boundary_index, int face, int local_face, int num1, const Echange_externe_impose& la_cl, Type_Double& aii, Type_Double& ajj) const
 {
   // C.L de type Echange_externe_impose : 1/h_total = (1/h_imp) + (e/diffusivite)
   // La C.L fournit h_imp ; il faut calculer e/diffusivite
@@ -312,31 +298,30 @@ inline void CLASSNAME::coeffs_face(int boundary_index, int face, int local_face,
   if (i != -1)
     {
       //      e = la_zone->xv(face,ori) - la_zone->xp(i,ori);
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         {
           h_total_inv =  1/la_cl.h_imp(face-num1,k) + e/nu_2(i,k);
           aii(k) = surface(face)/h_total_inv;
         }
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) = 0;
     }
   else
     {
       //e = la_zone->xp(j,ori) - la_zone->xv(face,ori);
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         {
           h_total_inv = 1/la_cl.h_imp(face-num1,k) + e/nu_2(elem_(face,1),k);
           ajj(k) = surface(face)/h_total_inv;
         }
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) = 0;
     }
 }
 
 //// secmem
-
-inline void CLASSNAME::secmem_face(int boundary_index, int face, int local_face, const Echange_externe_impose& la_cl,
-                                   int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int boundary_index, int face, int local_face, const Echange_externe_impose& la_cl, int num1,Type_Double& flux) const
 {
   // C.L de type Echange_externe_impose : 1/h_total = (1/h_imp) + (e/diffusivite)
   // La C.L fournit h_imp ; il faut calculer e/diffusivite
@@ -351,7 +336,7 @@ inline void CLASSNAME::secmem_face(int boundary_index, int face, int local_face,
   if (i != -1)
     {
       //e = la_zone->xv(face,ori) - la_zone->xp(i,ori);
-      for (k=0; k<flux.size(); k++)
+      for (k=0; k<flux.size_array(); k++)
         {
           h_imp = la_cl.h_imp(face-num1,k);
           h_total_inv = 1/h_imp + e/nu_2(i,k);
@@ -361,7 +346,7 @@ inline void CLASSNAME::secmem_face(int boundary_index, int face, int local_face,
   else
     {
       //e = la_zone->xp(j,ori) - la_zone->xv(face,ori);
-      for (k=0; k<flux.size(); k++)
+      for (k=0; k<flux.size_array(); k++)
         {
           h_imp = la_cl.h_imp(face-num1,k);
           h_total_inv = 1/h_imp + e/nu_2(elem_(face,1),k);
@@ -372,10 +357,8 @@ inline void CLASSNAME::secmem_face(int boundary_index, int face, int local_face,
 
 //// flux_face avec Echange_global_impose
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& inco, int face ,
-                                 const Echange_global_impose& la_cl,
-                                 int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& inco, int face , const Echange_global_impose& la_cl,  int num1,Type_Double& flux) const
 {
 #ifdef ISQUASI
   Cerr<<__FILE__<< " QC BORD non code ligne "<<(int)__LINE__<<finl;
@@ -385,57 +368,56 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face ,
   int n1 = elem_(face,1);
   int k;
   if (n0 != -1)
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = la_cl.h_imp(face-num1,k)*(la_cl.T_ext(face-num1,k) - inco(n0,k))
                 *surface(face);
   else
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       flux(k) = la_cl.h_imp(face-num1,k)*(inco(n1,k) - la_cl.T_ext(face-num1,k))
                 *surface(face);
 }
 
 //// coeffs_face avec Echange_global_impose
 //
-
-inline void CLASSNAME::coeffs_face(int face,int num1,  const Echange_global_impose& la_cl, DoubleVect& aii, DoubleVect& ajj ) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int face,int num1,  const Echange_global_impose& la_cl, Type_Double& aii, Type_Double& ajj ) const
 {
   int i = elem_(face,0);
   //  int j = elem(face,1);
   int k;
   if (i != -1)
     {
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) = la_cl.h_imp(face-num1,k)*surface(face);
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) = 0;
     }
   else
     {
-      for (k=0; k<ajj.size(); k++)
+      for (k=0; k<ajj.size_array(); k++)
         ajj(k) = la_cl.h_imp(face-num1,k)*surface(face);
-      for (k=0; k<aii.size(); k++)
+      for (k=0; k<aii.size_array(); k++)
         aii(k) = 0;
     }
 }
 
 //// secmem_face avec Echange_global_impose
 //
-
-inline void CLASSNAME::secmem_face(int face, const Echange_global_impose& la_cl,
-                                   int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int face, const Echange_global_impose& la_cl,  int num1,Type_Double& flux) const
 {
   int k;
   double h;
   int i = elem_(face,0);
   //int j = elem(face,1);
   if (i != -1)
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       {
         h = la_cl.h_imp(face-num1,k);
         flux(k) = h*la_cl.T_ext(face-num1,k)*surface(face);
       }
   else
-    for (k=0; k<flux.size(); k++)
+    for (k=0; k<flux.size_array(); k++)
       {
         h = la_cl.h_imp(face-num1,k);
         flux(k) = -h*la_cl.T_ext(face-num1,k)*surface(face);
@@ -445,73 +427,61 @@ inline void CLASSNAME::secmem_face(int face, const Echange_global_impose& la_cl,
 
 //// flux_face avec Neumann_paroi
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& , int face,
-                                 const Neumann_paroi& la_cl,
-                                 int num1,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& , int face, const Neumann_paroi& la_cl,  int num1,Type_Double& flux) const
 {
-  for (int k=0; k<flux.size(); k++)
+  for (int k=0; k<flux.size_array(); k++)
     flux(k) = la_cl.flux_impose(face-num1,k)*surface(face);
 }
 
 //// coeffs_face avec Neumann_paroi
 //
-
-inline void CLASSNAME::coeffs_face(int ,int,
-                                   const Neumann_paroi& ,
-                                   DoubleVect& , DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int ,int,  const Neumann_paroi& ,  Type_Double& , Type_Double& ) const
 {
   ;
 }
 
 //// secmem_face avec Neumann_paroi
 //
-
-inline void CLASSNAME::secmem_face(int face, const Neumann_paroi& la_cl,
-                                   int num1, DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int face, const Neumann_paroi& la_cl,  int num1, Type_Double& flux) const
 {
-  for (int k=0; k<flux.size(); k++)
+  for (int k=0; k<flux.size_array(); k++)
     flux(k) = la_cl.flux_impose(face-num1,k)*surface(face);
 }
 
 
 //// flux_face avec Neumann_paroi_adiabatique
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& , int ,
-                                 const Neumann_paroi_adiabatique&,
-                                 int ,DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& , int , const Neumann_paroi_adiabatique&, int ,Type_Double& ) const
 {
   ;
 }
 
 //// coeffs_face avec Neumann_paroi_adiabatique
 //
-
-inline void CLASSNAME::coeffs_face(int ,int,
-                                   const Neumann_paroi_adiabatique&,
-                                   DoubleVect&, DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int ,int,  const Neumann_paroi_adiabatique&, Type_Double&, Type_Double& ) const
 {
   ;
 }
 
 //// secmem_face avec Neumann_paroi_adiabatique
 //
-
-inline void CLASSNAME::secmem_face(int, const Neumann_paroi_adiabatique&,
-                                   int, DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int, const Neumann_paroi_adiabatique&, int, Type_Double& ) const
 {
   ;
 }
 
 //// flux_face avec Neumann_sortie_libre
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& , int ,
-                                 const Neumann_sortie_libre& ,
-                                 int ,DoubleVect& flux ) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& , int ,  const Neumann_sortie_libre& ,  int ,Type_Double& flux ) const
 {
-  for (int k=0; k<flux.size(); k++)
+  for (int k=0; k<flux.size_array(); k++)
     {
       if (flux(k)!=0)
         {
@@ -524,56 +494,48 @@ inline void CLASSNAME::flux_face(const DoubleTab& , int ,
 
 //// coeffs_face avec Neumann_sortie_libre
 //
-
-inline void CLASSNAME::coeffs_face(int,int, const Neumann_sortie_libre& ,
-                                   DoubleVect&, DoubleVect&) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int,int, const Neumann_sortie_libre& , Type_Double&, Type_Double&) const
 {
   ;
 }
 
 //// secmem_face avec Neumann_sortie_libre
 //
-
-inline void CLASSNAME::secmem_face(int, const Neumann_sortie_libre& ,
-                                   int , DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int, const Neumann_sortie_libre& ,  int , Type_Double& ) const
 {
   ;
 }
 
 //// flux_face avec Symetrie
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab&, int ,
-                                 const Symetrie&,
-                                 int ,DoubleVect& ) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab&, int ,  const Symetrie&,  int ,Type_Double& ) const
 {
   ;
 }
 
 //// coeffs_face avec Symetrie
 //
-
-inline void CLASSNAME::coeffs_face(int, int,const Symetrie&,
-                                   DoubleVect&, DoubleVect&) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int, int,const Symetrie&, Type_Double&, Type_Double&) const
 {
   ;
 }
 
 //// secmem_face avec Symetrie
 //
-
-inline void CLASSNAME::secmem_face(int, const Symetrie&,
-                                   int, DoubleVect&) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int, const Symetrie&, int, Type_Double&) const
 {
   ;
 }
 
 //// flux_face avec Periodique
 //
-
-inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
-                                 const Periodique& la_cl,
-                                 int , DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_face(const DoubleTab& inco, int face, const Periodique& la_cl, int , Type_Double& flux) const
 {
   int n0 = elem_(face,0);
   int n1 = elem_(face,1);
@@ -581,13 +543,13 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
   double d1 = la_zone->dist_face_elem1_period(face,n1,la_cl.distance());
   double heq;
 #ifdef ISQUASI
-  for (int k=0; k<flux.size(); k++)
+  for (int k=0; k<flux.size_array(); k++)
     {
       f_heq(d0,n0,d1,n1,k);
       flux(k) = heq*(inco(n1,k)/dv_mvol(n1) - inco(n0,k)/dv_mvol(n0))*surface(face)*porosite(face);
     }
 #else
-  for (int k=0; k<flux.size(); k++)
+  for (int k=0; k<flux.size_array(); k++)
     {
       f_heq(d0,n0,d1,n1,k);
       flux(k) = heq*(inco(n1,k) - inco(n0,k))*surface(face)*porosite(face);
@@ -597,9 +559,8 @@ inline void CLASSNAME::flux_face(const DoubleTab& inco, int face,
 
 //// coeffs_face avec Periodique
 //
-
-inline void CLASSNAME::coeffs_face(int face,int, const Periodique& la_cl,
-                                   DoubleVect& aii, DoubleVect& ajj ) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_face(int face,int, const Periodique& la_cl,  Type_Double& aii, Type_Double& ajj ) const
 {
   int k;
   int i = elem_(face,0);
@@ -608,12 +569,12 @@ inline void CLASSNAME::coeffs_face(int face,int, const Periodique& la_cl,
   double d1 = la_zone->dist_face_elem1_period(face,j,la_cl.distance());
   double heq;
 
-  for (k=0; k<aii.size(); k++)
+  for (k=0; k<aii.size_array(); k++)
     {
       f_heq(d0,i,d1,j,k);
       aii(k) =  heq*surface(face)*porosite(face);
     }
-  for (k=0; k<ajj.size(); k++)
+  for (k=0; k<ajj.size_array(); k++)
     {
       f_heq(d0,i,d1,j,k);
       ajj(k)=  heq*surface(face)*porosite(face);
@@ -623,9 +584,8 @@ inline void CLASSNAME::coeffs_face(int face,int, const Periodique& la_cl,
 
 //// secmem_face avec Periodique
 //
-
-inline void CLASSNAME::secmem_face(int, const Periodique&,
-                                   int, DoubleVect&) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_face(int, const Periodique&,  int, Type_Double&) const
 {
   ;
 }
@@ -633,16 +593,15 @@ inline void CLASSNAME::secmem_face(int, const Periodique&,
 
 //// flux_faces_interne
 //
-
-inline void CLASSNAME::flux_faces_interne(const DoubleTab& inco,
-                                          int face,DoubleVect& flux) const
+template <typename Type_Double>
+inline void CLASSNAME::flux_faces_interne(const DoubleTab& inco, int face,Type_Double& flux) const
 {
   int n0 = elem_(face,0);
   int n1 = elem_(face,1);
   double d0 = la_zone->Dist_face_elem0(face,n0);
   double d1 = la_zone->Dist_face_elem1(face,n1);
   double heq;
-  for (int k=0; k<flux.size(); k++)
+  for (int k=0; k<flux.size_array(); k++)
     {
       f_heq(d0,n0,d1,n1,k);
 #ifdef ISQUASI
@@ -655,8 +614,8 @@ inline void CLASSNAME::flux_faces_interne(const DoubleTab& inco,
 
 //// coeffs_faces_interne
 //
-
-inline void CLASSNAME::coeffs_faces_interne(int face, DoubleVect& aii, DoubleVect& ajj ) const
+template <typename Type_Double>
+inline void CLASSNAME::coeffs_faces_interne(int face, Type_Double& aii, Type_Double& ajj ) const
 {
   int k;
   int i = elem_(face,0);
@@ -664,12 +623,12 @@ inline void CLASSNAME::coeffs_faces_interne(int face, DoubleVect& aii, DoubleVec
   double d0 = la_zone->Dist_face_elem0(face,i);
   double d1 = la_zone->Dist_face_elem1(face,j);
   double heq;
-  for ( k=0; k<aii.size(); k++)
+  for ( k=0; k<aii.size_array(); k++)
     {
       f_heq(d0,i,d1,j,k);
       aii(k) = heq*surface(face)*porosite(face);
     }
-  for ( k=0; k<ajj.size(); k++)
+  for ( k=0; k<ajj.size_array(); k++)
     {
       f_heq(d0,i,d1,j,k);
       ajj(k) = heq*surface(face)*porosite(face);
@@ -679,11 +638,11 @@ inline void CLASSNAME::coeffs_faces_interne(int face, DoubleVect& aii, DoubleVec
 
 //// secmem_faces_interne
 //
-
-inline void CLASSNAME::secmem_faces_interne( int, DoubleVect& flux ) const
+template <typename Type_Double>
+inline void CLASSNAME::secmem_faces_interne( int, Type_Double& flux ) const
 {
   int k;
-  for ( k=0; k<flux.size(); k++)
+  for ( k=0; k<flux.size_array(); k++)
     {
       flux(k)=0.;
     }

@@ -331,7 +331,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const double rhoCp = le_milieu_fluide.capacite_calorifique().valeurs()(0, 0) * le_milieu_fluide.masse_volumique().valeurs()(0, 0);
 
   DoubleTab termes_sources;
-  termes_sources.resize(nb_elems);
+  termes_sources.resize(nb_elems,1);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
   termes_sources /= rhoCp;
 

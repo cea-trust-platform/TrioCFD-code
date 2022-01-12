@@ -20,10 +20,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <Modele_turbulence_hyd_K_Eps_V2.h>
 #include <Op_DiffF22_VDF_Elem.h>
 #include <Champ_P0_VDF.h>
-#include <Modele_turbulence_hyd_K_Eps_V2.h>
-#include <Eval_DiffF22_VDF_const_Elem.h>
 
 Implemente_instanciable_sans_constructeur(Op_DiffF22_VDF_Elem,"Op_DiffF22_VDF_const_P0_VDF",Op_Diff_VDF_base);
 implemente_It_VDF_Elem(Eval_DiffF22_VDF_const_Elem)

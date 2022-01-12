@@ -184,7 +184,7 @@ int Paroi_TBLE_scal_VDF::init_lois_paroi()
   compteur_faces_paroi = 0; //Reinitialisation de compteur_faces_paroi
 
   DoubleTab termes_sources;
-  termes_sources.resize(nb_elems);
+  termes_sources.resize(nb_elems,1);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
   termes_sources /= rhoCp;
 
@@ -266,7 +266,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const double& dt_min = eqn_temp.schema_temps().pas_temps_min();
   const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
   DoubleTab termes_sources;
-  termes_sources.resize(nb_elems);
+  termes_sources.resize(nb_elems,1);
   eqn_temp.sources().calculer(termes_sources); //les termes sources
   termes_sources /= rhoCp;
 
