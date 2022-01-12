@@ -44,6 +44,7 @@
 #include <Dirichlet.h>
 
 #include <cmath>
+#include <vector>
 
 Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_CoviMAC,"Diffusion_supplementaire_echelle_temp_turb_P0_CoviMAC", Source_base);
 
@@ -126,9 +127,10 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   for (int e = 0; e < ne_tot; e++)
     {
       sq_grad_sqrt_tau(e, n) = 0;
+      std::vector<double> grad_sqrt_tau(D);
       for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
-          sq_grad_sqrt_tau(e, n) += zone.vec(j, d) * grad_f_sqrt_tau(f, n);
-      sq_grad_sqrt_tau(e, n) *= sq_grad_sqrt_tau(e, n);
+          grad_sqrt_tau[d] += zone.vec(j, d) * grad_f_sqrt_tau(f, n);
+      for (int d = 0 ; d<D ; d++) sq_grad_sqrt_tau(e, n) += grad_sqrt_tau[d] * grad_sqrt_tau[d];
     }
 
   // Second membre
