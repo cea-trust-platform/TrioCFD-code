@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.5_beta : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
-
+12/01/22 (TrioCFD) Major Change: No more scalar methods for VDF flux iterators/evaluators
+12/01/22 (TrioCFD) Major Change: ArrOfDouble for VDF elem/face fluxes and not DoubleVect (no // structure required !)
+12/01/22 (TrioCFD) Major Change: Class and Substitution Failure Is Not An Error (SFINAE) templates are extensively used for the VDF evaluators, iterators and operators
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.4 : Enhancements, modifications and corrected bugs since version 1.8.3 :
 --------------------------------------------------------------------------------------------------
