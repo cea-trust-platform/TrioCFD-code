@@ -48,23 +48,10 @@ Entree& Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC::readOn(Entre
 void Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
-  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), Ntau = equation().inconnue().valeurs().line_size(); //, Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size();
-  //const int Nphases = equation().probleme().get_champ("alpha").valeurs().line_size();
+  const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), Ntau = equation().inconnue().valeurs().line_size();
 
-//  for (auto &&i_m : matrices) if (i_m.first == "alpha" || i_m.first == "temperature" || i_m.first == "pression")
-//      {
-//        Matrice_Morse mat;
-//        IntTrav stencil(0, 2);
-//        stencil.set_smart_resize(1);
-//        if (i_m.first == "alpha") for (int e = 0; e < ne; e++) for(int n = 0; n < Ntau ; n++) stencil.append_line(Ntau * e + n, Nphases * e + n);
-//        if (i_m.first == "temperature") for (int e = 0; e < ne; e++) for(int n = 0; n < Ntau ; n++) stencil.append_line(Ntau * e + n, Nt * e + n);
-//        if (i_m.first == "pression") for (int e = 0; e < ne; e++) for(int n = 0, mp = 0; n < Ntau ; n++, mp += (Np > 1)) stencil.append_line(Ntau * e + n, Np * e + mp); // attention reduction en pression
-//        tableau_trier_retirer_doublons(stencil);
-//        Matrix_tools::allocate_morse_matrix(ne_tot, ne_tot, stencil, mat);
-//        i_m.second->nb_colonnes() ? *i_m.second += mat : *i_m.second = mat;
-//      }
-
-  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "tau" || n_m.first == "temperature" || n_m.first == "pression")
+  assert( Ntau == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
+  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -72,7 +59,7 @@ void Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC::dimensionner_bl
             M  = dep.line_size();
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
-        if (n_m.first == "alpha" || n_m.first == "temperature")
+        if (n_m.first == "alpha" || n_m.first == "temperature") // N <= M
           for (int e = 0; e < ne; e++) for (int n = 0; n < Ntau; n++) sten.append_line(Ntau * e + n, M * e + n);
         if (n_m.first == "pression" )
           for (int e = 0; e < ne; e++) for (int n = 0, m = 0; n < Ntau; n++, m+=(M>1)) sten.append_line(Ntau * e + n, M * e + m);
@@ -95,15 +82,17 @@ void Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_blocs(m
 
   int mtau, mp;
 
+  assert( Ntau == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
+
   for (int e = 0; e < nb_elem; e++) for (mtau = 0, mp = 0; mtau < Ntau; mtau++, mp += (Np > 1))
       {
-        secmem(e, mtau) -= beta_omega * alpha_rho(e, mtau) ;
+        secmem(e, mtau) += beta_omega * alpha_rho(e, mtau) ;
         for (auto &&i_m : matrices)
           {
             Matrice_Morse& mat = *i_m.second;
-            if (i_m.first == "alpha") 		mat(Ntau * e + mtau, Na * e + mtau) += beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, mtau) : NULL );
-            if (i_m.first == "temperature") mat(Ntau * e + mtau, Nt * e + mtau) += beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, mtau) : NULL );	// derivee par rapport a la temperature
-            if (i_m.first == "pression") 	mat(Ntau * e + mtau, Np * e + mp) 	+= beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, mtau) : NULL );		// derivee par rapport a la pression
+            if (i_m.first == "alpha") 		mat(Ntau * e + mtau, Na * e + mtau) -= beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, mtau) : NULL );			// derivee par rapport au taux de vide
+            if (i_m.first == "temperature") mat(Ntau * e + mtau, Nt * e + mtau) -= beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, mtau) : NULL );// derivee par rapport a la temperature
+            if (i_m.first == "pression") 	mat(Ntau * e + mtau, Np * e + mp) 	-= beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, mtau) : NULL );		// derivee par rapport a la pression
           }
       }
 }
