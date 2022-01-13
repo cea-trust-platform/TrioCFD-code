@@ -30,6 +30,12 @@ class Convection_Diffusion_std;
 // .DESCRIPTION class Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC
 //
 // Terme de dissipation -beta * (alpha * rho * k) * omega dans l'equation d'energie cinetique turbulente
+//
+// la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
+// Actuellement k est necessairement un scalaire.
+// Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
+// en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
+
 
 class Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC : public Source_base 	// Terme_Source_CoviMAC_base
 {
