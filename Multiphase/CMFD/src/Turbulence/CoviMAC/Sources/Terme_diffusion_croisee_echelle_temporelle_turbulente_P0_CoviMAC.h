@@ -32,6 +32,12 @@ class Convection_Diffusion_std;
 //
 // Terme de diffusion croisee dans l'equation de transport de tau (tau = 1 / omega) du modele de turbulence k-omega SST
 // Cd = sigma_d * alpha * rho *tau * min(grad k, grad tau, 0)
+//
+// la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
+// Actuellement k et tau sont necessairement scalaires.
+// Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
+// en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
+
 
 class Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC : public Source_base 	// Terme_Source_CoviMAC_base
 {
