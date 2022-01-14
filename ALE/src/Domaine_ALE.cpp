@@ -79,7 +79,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       int nb_faces=la_zone_VF.nb_faces();
       int nb_som_face=la_zone_VF.nb_som_face();
       IntTab& face_sommets=la_zone_VF.face_sommets();
-      creer_mes_domaines_frontieres(la_zone_VF);//update the boundary surface domain
+      //creer_mes_domaines_frontieres(la_zone_VF);//update the boundary surface domain
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
       //On recalcule les metriques
