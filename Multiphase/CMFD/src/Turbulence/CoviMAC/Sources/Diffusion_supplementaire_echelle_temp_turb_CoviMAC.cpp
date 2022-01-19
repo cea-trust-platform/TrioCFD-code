@@ -85,7 +85,6 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const DoubleTab&                      tab_tau = tau.valeurs();
   const IntTab&                             fcl = tau.fcl();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
-  const DoubleTab&                    tab_alpha = equation().probleme().get_champ("alpha").passe();
   const Op_Diff_Turbulent_CoviMAC_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_CoviMAC_Elem, eq.operateur(0).l_op_base());
   const DoubleTab&                       nu_tot = Op_diff_loc.nu();
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
@@ -134,7 +133,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   // Second membre
   for(int e = 0 ; e < ne ; e++)
     {
-      secmem(e, n) += -8 * tab_alpha(e, n) * tab_rho(e, n) * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
+      secmem(e, n) += -8  * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
     }
 
   // Derivees

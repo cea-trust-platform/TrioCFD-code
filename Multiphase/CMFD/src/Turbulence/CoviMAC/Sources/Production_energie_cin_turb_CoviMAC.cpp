@@ -62,11 +62,10 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
 
-  int N = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
-
-  DoubleTrav Rij(ne, N, D, D);
+  int N = pb.get_champ("vitesse").valeurs().dimension(1), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
+  DoubleTrav Rij(0, N, D, D);
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
-  assert((ne == Rij.dimension(0)));
 
   int n = 0 ; // the only kinetic energy production is in phase 0
 

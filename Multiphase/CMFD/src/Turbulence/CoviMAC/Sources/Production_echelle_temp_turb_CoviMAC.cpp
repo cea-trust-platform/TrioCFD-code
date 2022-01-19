@@ -87,7 +87,8 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
 
   int N = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
 
-  DoubleTrav Rij(ne, N, D, D);
+  DoubleTrav Rij(0, N, D, D);
+  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
   assert((ne == Rij.dimension(0)));
 
