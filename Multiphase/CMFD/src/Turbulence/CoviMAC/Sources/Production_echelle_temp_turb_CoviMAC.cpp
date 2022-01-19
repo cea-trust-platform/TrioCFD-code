@@ -24,14 +24,14 @@
 
 #include <Zone_CoviMAC.h>
 #include <Champ_P0_CoviMAC.h>
-#include <Pb_Multiphase.h>
+#include <Probleme_base.h>
 #include <grad_Champ_Face_CoviMAC.h>
 #include <Champ_Uniforme.h>
 #include <Flux_interfacial_base.h>
 #include <Milieu_composite.h>
 #include <Operateur_Diff.h>
 #include <Op_Diff_Turbulent_CoviMAC_Face.h>
-#include <QDM_Multiphase.h>
+#include <Navier_Stokes_std.h>
 #include <Viscosite_turbulente_k_tau.h>
 #include <Energie_cinetique_turbulente.h>
 #include <Array_tools.h>
@@ -48,7 +48,7 @@ Sortie& Production_echelle_temp_turb_CoviMAC::printOn(Sortie& os) const
 Entree& Production_echelle_temp_turb_CoviMAC::readOn(Entree& is)
 {
   Param param(que_suis_je());
-  param.ajouter("alpha_omega", &alpha_omega_);
+  param.ajouter("alpha_omega", &alpha_omega_, Param::REQUIRED);
   param.lire_avec_accolades_depuis(is);
   Cout << "alpha_omega = " << alpha_omega_ << finl ;
 
@@ -75,8 +75,8 @@ void Production_echelle_temp_turb_CoviMAC::dimensionner_blocs(matrices_t matrice
 void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
-  const Pb_Multiphase&                       pb = ref_cast(Pb_Multiphase, equation().probleme());
-  const QDM_Multiphase&                  eq_qdm = ref_cast(QDM_Multiphase, pb.equation(0));
+  const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
+  const Navier_Stokes_std&                  eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const grad_Champ_Face_CoviMAC&           grad = ref_cast(grad_Champ_Face_CoviMAC, eq_qdm.get_champ("gradient_vitesse"));
   const DoubleTab&                     tab_grad = grad.valeurs();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
@@ -85,10 +85,9 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
   const DoubleTab&                           nu = pb.get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        tab_k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k")).valeurs();
 
-  int N = pb.nb_phases(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
+  int N = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
 
-  DoubleTrav Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //
+  DoubleTrav Rij(ne, N, D, D);
   visc_turb.reynolds_stress(Rij);
   assert((ne == Rij.dimension(0)));
 

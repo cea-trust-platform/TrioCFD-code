@@ -90,9 +90,9 @@ void Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_blocs(m
         for (auto &&i_m : matrices)
           {
             Matrice_Morse& mat = *i_m.second;
-            if (i_m.first == "alpha") 		mat(Ntau * e + mtau, Na * e + mtau) -= beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, mtau) : NULL );			// derivee par rapport au taux de vide
-            if (i_m.first == "temperature") mat(Ntau * e + mtau, Nt * e + mtau) -= beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, mtau) : NULL );// derivee par rapport a la temperature
-            if (i_m.first == "pression") 	mat(Ntau * e + mtau, Np * e + mp) 	-= beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, mtau) : NULL );		// derivee par rapport a la pression
+            if (i_m.first == "alpha") 		mat(Ntau * e + mtau, Na * e + mtau) -= beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, mtau) : 0 );			// derivee par rapport au taux de vide
+            if (i_m.first == "temperature") mat(Ntau * e + mtau, Nt * e + mtau) -= beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, mtau) : 0 );// derivee par rapport a la temperature
+            if (i_m.first == "pression") 	mat(Ntau * e + mtau, Np * e + mp) 	-= beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, mtau) : 0 );		// derivee par rapport a la pression
           }
       }
 }

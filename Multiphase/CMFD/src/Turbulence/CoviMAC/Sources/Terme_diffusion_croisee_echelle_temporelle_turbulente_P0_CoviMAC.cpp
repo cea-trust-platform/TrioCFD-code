@@ -25,7 +25,7 @@
 #include <Zone_Cl_CoviMAC.h>
 #include <Champ_P0_CoviMAC.h>
 #include <Equation_base.h>
-#include <Pb_Multiphase.h>
+#include <Probleme_base.h>
 #include <Milieu_composite.h>
 #include <grad_Champ_Face_CoviMAC.h>
 #include <Matrix_tools.h>
@@ -172,18 +172,18 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
 
   /* remplissage des matrices et du second membre */
 
-  Matrice_Morse *Mtau = matrices.count(ch_tau.le_nom().getString()) ? matrices.at(ch_tau.le_nom().getString()) : NULL;
-  Matrice_Morse *Ma = matrices.count("alpha") ? matrices.at("alpha") : NULL;
-  Matrice_Morse *Mp = matrices.count("pression") ? matrices.at("pression") : NULL;
-  Matrice_Morse *Mtemp	= matrices.count("temperature") ? matrices.at("temperature") : NULL;
+  Matrice_Morse *Mtau = matrices.count(ch_tau.le_nom().getString()) ? matrices.at(ch_tau.le_nom().getString()) : nullptr;
+  Matrice_Morse *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr;
+  Matrice_Morse *Mp = matrices.count("pression") ? matrices.at("pression") : nullptr;
+  Matrice_Morse *Mtemp	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
 
   for (int e = 0; e < nb_elem; e++) for (int ntau = 0, mp = 0; ntau < Ntau; ntau++, mp += (Np>1))
       {
         secmem(e, ntau) += sigma_d * alpha_rho_tau(e, ntau) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.);
-        if (Ma)	  (*Ma)(Ntau * e + ntau, Na * e + ntau)   	-= sigma_d * (der_alpha_rho_tau.count("alpha") ? der_alpha_rho_tau.at("alpha")(e,ntau) : NULL ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee en alpha
-        if (Mtemp)(*Mtemp)(Ntau * e + ntau, Nt * e + ntau)	-= sigma_d * (der_alpha_rho_tau.count("temperature") ? der_alpha_rho_tau.at("temperature")(e,ntau) : NULL ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la temperature
-        if (Mp)	  (*Mp)(Ntau * e + ntau, Np * e + mp)     	-= sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,ntau) : NULL ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la pression
-        if (Mtau) (*Mtau)(Ntau * e + ntau, Ntau * e + ntau) -= sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,ntau) : NULL ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee en tau
+        if (!(Ma==nullptr))    (*Ma)(Ntau * e + ntau, Na * e + ntau)   	-= sigma_d * (der_alpha_rho_tau.count("alpha") ? der_alpha_rho_tau.at("alpha")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee en alpha
+        if (!(Mtemp==nullptr)) (*Mtemp)(Ntau * e + ntau, Nt * e + ntau)	-= sigma_d * (der_alpha_rho_tau.count("temperature") ? der_alpha_rho_tau.at("temperature")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la temperature
+        if (!(Mp==nullptr))	   (*Mp)(Ntau * e + ntau, Np * e + mp)     	-= sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la pression
+        if (!(Mtau==nullptr))  (*Mtau)(Ntau * e + ntau, Ntau * e + ntau)-= sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee en tau
       }
 }
 

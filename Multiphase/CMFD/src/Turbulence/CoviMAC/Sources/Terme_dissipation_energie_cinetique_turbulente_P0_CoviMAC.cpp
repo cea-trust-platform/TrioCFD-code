@@ -90,11 +90,11 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::ajouter_blocs(ma
 
   const int Nk = k.line_size(), Ntau = tau.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size(), nb_elem = zone.nb_elem();
 
-  Matrice_Morse *Ma = matrices.count("alpha") ? matrices.at("alpha") : NULL,
-                 *Mk = matrices.count(ch_k.le_nom().getString()) ? matrices.at(ch_k.le_nom().getString()) : NULL,
-                  *Mtau = matrices.count("tau") ? matrices.at("tau") : NULL,
-                   *Mp = matrices.count("pression") ? matrices.at("pression") : NULL,
-                    *Mt	= matrices.count("temperature") ? matrices.at("temperature") : NULL;
+  Matrice_Morse *Ma = matrices.count("alpha") ? matrices.at("alpha") : nullptr,
+                 *Mk = matrices.count(ch_k.le_nom().getString()) ? matrices.at(ch_k.le_nom().getString()) : nullptr,
+                  *Mtau = matrices.count("tau") ? matrices.at("tau") : nullptr,
+                   *Mp = matrices.count("pression") ? matrices.at("pression") : nullptr,
+                    *Mt	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
 
   double inv_tau = 0;
 
@@ -104,11 +104,11 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::ajouter_blocs(ma
       {
         inv_tau = k(e, mk) / max(k(e, mk) * tau(e, mk), visc_turb.limiteur() * nu(e, mk));
         secmem(e, mk) -= beta_k * alpha_rho_k(e,mk) * inv_tau;
-        if (Ma) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += beta_k * (der_alpha_rho_k.count("alpha") ? der_alpha_rho_k.at("alpha")(e,mk) : NULL ) * inv_tau;	// derivee en alpha
-        if (Mk) 	(*Mk)(Nk * e + mk, Nk * e + mk)       += beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : NULL ) * inv_tau; // derivee en k
-        if (Mtau) (*Mtau)(Nk * e + mk, Ntau * e + mk)     += beta_k * alpha_rho_k(e, mk) * (-pow(inv_tau,2)); // derivee en tau
-        if (Mt) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : NULL ) * inv_tau;	// derivee par rapport a la temperature
-        if (Mp) 	(*Mp)(Nk * e + mk, Np * e + mp)       += beta_k * (der_alpha_rho_k.count("pression") ? der_alpha_rho_k.at("pression")(e, mk) : NULL ) * inv_tau;		// derivee par rapport a la pression
+        if (!(Ma==nullptr)) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += beta_k * (der_alpha_rho_k.count("alpha") ? der_alpha_rho_k.at("alpha")(e,mk) : 0 ) * inv_tau;	// derivee en alpha
+        if (!(Mk==nullptr)) 	(*Mk)(Nk * e + mk, Nk * e + mk)       += beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) * inv_tau; // derivee en k
+        if (!(Mtau==nullptr)) (*Mtau)(Nk * e + mk, Ntau * e + mk)     += beta_k * alpha_rho_k(e, mk) * (-pow(inv_tau,2)); // derivee en tau
+        if (!(Mt==nullptr)) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * inv_tau;	// derivee par rapport a la temperature
+        if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += beta_k * (der_alpha_rho_k.count("pression") ? der_alpha_rho_k.at("pression")(e, mk) : 0 ) * inv_tau;		// derivee par rapport a la pression
       }
 }
 

@@ -80,7 +80,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const Zone_Cl_CoviMAC&                    zcl = ref_cast(Zone_Cl_CoviMAC, equation().zone_Cl_dis().valeur());
   const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
-  const QDM_Multiphase&                  eq_qdm = ref_cast(QDM_Multiphase, equation().probleme().equation(0));
+  const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
   const DoubleTab&                      tab_tau = tau.valeurs();
   const IntTab&                             fcl = tau.fcl();
@@ -93,10 +93,8 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   int N = tab_tau.dimension(1), N_phases = eq_qdm.vitesse()->valeurs().dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), D = dimension ;
   int n = 0 ; // the only kinetic energy production is in phase 0
 
-  DoubleTrav grad_f_sqrt_tau(0, N);
-  DoubleTrav sq_grad_sqrt_tau(0, N);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse()->valeurs().get_md_vector(), grad_f_sqrt_tau);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), sq_grad_sqrt_tau);
+  DoubleTrav grad_f_sqrt_tau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
+  DoubleTrav sq_grad_sqrt_tau(eq_qdm.pression()->valeurs().dimension_tot(0), N);
   tau.init_grad(0);
   IntTab& f_d = tau.fgrad_d, f_e = tau.fgrad_e;             // Tables used in zone_CoviMAC::fgrad
   DoubleTab f_w = tau.fgrad_w;

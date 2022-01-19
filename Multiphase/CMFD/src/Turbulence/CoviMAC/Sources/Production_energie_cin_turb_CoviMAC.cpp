@@ -25,14 +25,14 @@
 #include <Zone_CoviMAC.h>
 #include <Champ_P0_CoviMAC.h>
 #include <Matrix_tools.h>
-#include <Pb_Multiphase.h>
+#include <Probleme_base.h>
 #include <grad_Champ_Face_CoviMAC.h>
 #include <Champ_Uniforme.h>
 #include <Flux_interfacial_base.h>
 #include <Milieu_composite.h>
 #include <Operateur_Diff.h>
 #include <Op_Diff_Turbulent_CoviMAC_Face.h>
-#include <QDM_Multiphase.h>
+#include <Navier_Stokes_std.h>
 #include <Viscosite_turbulente_base.h>
 
 Implemente_instanciable(Production_energie_cin_turb_CoviMAC,"Production_energie_cin_turb_P0_CoviMAC", Source_base);
@@ -55,24 +55,21 @@ void Production_energie_cin_turb_CoviMAC::dimensionner_blocs(matrices_t matrices
 void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
-  const Pb_Multiphase&                       pb = ref_cast(Pb_Multiphase, equation().probleme());
-  const QDM_Multiphase&                  eq_qdm = ref_cast(QDM_Multiphase, pb.equation(0));
+  const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
+  const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const grad_Champ_Face_CoviMAC&           grad = ref_cast(grad_Champ_Face_CoviMAC, eq_qdm.get_champ("gradient_vitesse"));
   const DoubleTab&                     tab_grad = grad.valeurs();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
 
-  int N = pb.nb_phases(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
+  int N = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
 
-  DoubleTrav Rij(0, N, D, D);
-  MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij);
+  DoubleTrav Rij(ne, N, D, D);
   visc_turb.reynolds_stress(Rij);
   assert((ne == Rij.dimension(0)));
 
   int n = 0 ; // the only kinetic energy production is in phase 0
 
   for(int e = 0 ; e < ne ; e++) for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-        {
-          secmem(e, n) += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-        }
+        secmem(e, n) += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
 }
