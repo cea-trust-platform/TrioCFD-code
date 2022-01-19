@@ -84,6 +84,8 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
   const DoubleTab&                      tab_tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()).valeurs();
   const DoubleTab&                           nu = pb.get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        tab_k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k")).valeurs();
+  const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
+  const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
 
   int N = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
 
@@ -107,7 +109,7 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
                   {
                     deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
                   }
-              deriv *= alpha_omega_*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
+              deriv *= (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
               mat(e, e) += deriv;
             }
         }
@@ -122,7 +124,7 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
                   {
                     deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
                   }
-              deriv *= (-1)*alpha_omega_*tab_tau(e, n)*tab_tau(e, n)*tab_tau(e, n)/(max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))*max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))) ;
+              deriv *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)*tab_tau(e, n)*tab_tau(e, n)/(max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))*max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))) ;
               mat(e, e) += deriv;
             }
         }
@@ -136,7 +138,7 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
           {
             secmem_en += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
           }
-      secmem_en *= (-1)*alpha_omega_*tab_tau(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
+      secmem_en *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
       secmem(e, n) += secmem_en;
     }
 }

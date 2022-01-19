@@ -61,6 +61,8 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   const DoubleTab&                     tab_grad = grad.valeurs();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
+  const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
+  const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
 
   int N = pb.get_champ("vitesse").valeurs().dimension(1), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
   DoubleTrav Rij(0, N, D, D);
@@ -69,6 +71,12 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
 
   int n = 0 ; // the only kinetic energy production is in phase 0
 
-  for(int e = 0 ; e < ne ; e++) for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-        secmem(e, n) += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+  for(int e = 0 ; e < ne ; e++)
+  {
+      double secmem_en = 0;
+  	  for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+  		secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+  	secmem_en *= (-1) * tab_alp(e, n) * tab_rho(e, n) ;
+  	secmem(e, n) += secmem_en;
+  }
 }

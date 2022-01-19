@@ -53,7 +53,7 @@ void Viscosite_turbulente_k_tau::eddy_viscosity(DoubleTab& nu_t) const
       nu_t(i, n) = n < k.dimension(1) ? max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) : 0;
 }
 
-void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const
+void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
 {
   const DoubleTab& k = pb_->get_champ("k").passe(), &tau = pb_->get_champ("tau").passe(),
                    &nu = pb_->get_champ("viscosite_cinematique").passe(), &grad_u = pb_->get_champ("gradient_vitesse").passe();
