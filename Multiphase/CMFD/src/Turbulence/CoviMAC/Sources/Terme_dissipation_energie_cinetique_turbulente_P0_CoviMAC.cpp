@@ -105,10 +105,24 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::ajouter_blocs(ma
         inv_tau = k(e, mk) / max(k(e, mk) * tau(e, mk), visc_turb.limiteur() * nu(e, mk));
         secmem(e, mk) -= beta_k * alpha_rho_k(e,mk) * inv_tau;
         if (!(Ma==nullptr)) 	(*Ma)(Nk * e + mk, Na * e + mk)   	  += beta_k * (der_alpha_rho_k.count("alpha") ? der_alpha_rho_k.at("alpha")(e,mk) : 0 ) * inv_tau;	// derivee en alpha
-        if (!(Mk==nullptr)) 	(*Mk)(Nk * e + mk, Nk * e + mk)       += beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) * inv_tau; // derivee en k
-        if (!(Mtau==nullptr)) (*Mtau)(Nk * e + mk, Ntau * e + mk)     += beta_k * alpha_rho_k(e, mk) * (-pow(inv_tau,2)); // derivee en tau
         if (!(Mt==nullptr)) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * inv_tau;	// derivee par rapport a la temperature
         if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += beta_k * (der_alpha_rho_k.count("pression") ? der_alpha_rho_k.at("pression")(e, mk) : 0 ) * inv_tau;		// derivee par rapport a la pression
+        if (!(Mk==nullptr))
+          {
+//        	(*Mk)(Nk * e + mk, Ntau * e + mk)     += beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e, mk) : 0 ) * inv_tau; // derivee en k
+            if (k(e, mk) * tau(e, mk) > visc_turb.limiteur() * nu(e, mk))
+              (*Mk)(Nk * e + mk, Nk * e + mk)       += beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) / tau(e, mk); // derivee en k
+            else
+              (*Mk)(Nk * e + mk, Nk * e + mk)       += 2 * beta_k * alpha_rho_k(e, mk) / (visc_turb.limiteur() * nu(e, mk)); // derivee en k
+          }
+        if (!(Mtau==nullptr))
+          {
+            if ( k(e, mk) * tau(e, mk) > visc_turb.limiteur() * nu(e, mk))
+              (*Mtau)(Nk * e + mk, Nk * e + mk)       += beta_k * alpha_rho_k(e, mk) * (-1)/(tau(e,mk)*tau(e,mk)); // derivee en tau
+            else
+              (*Mtau)(Nk * e + mk, Nk * e + mk)       += 0;
+//        	(*Mtau)(Nk * e + mk, Ntau * e + mk)     += beta_k * alpha_rho_k(e, mk) * (-pow(inv_tau,2)); // derivee en tau
+          }
       }
 }
 

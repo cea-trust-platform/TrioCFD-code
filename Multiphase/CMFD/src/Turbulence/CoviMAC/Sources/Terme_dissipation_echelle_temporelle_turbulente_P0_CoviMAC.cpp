@@ -86,7 +86,10 @@ void Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_blocs(m
 
   for (int e = 0; e < nb_elem; e++) for (mtau = 0, mp = 0; mtau < Ntau; mtau++, mp += (Np > 1))
       {
-        secmem(e, mtau) += beta_omega * alpha_rho(e, mtau) ;
+        double secmem_en  = beta_omega * alpha_rho(e, mtau) ;
+        secmem(e, mtau) += secmem_en ;
+//        Cerr << e << "secmem" << secmem_en << "---+++++++++++++++++++++++++++-------" << finl ;
+
         for (auto &&i_m : matrices)
           {
             Matrice_Morse& mat = *i_m.second;

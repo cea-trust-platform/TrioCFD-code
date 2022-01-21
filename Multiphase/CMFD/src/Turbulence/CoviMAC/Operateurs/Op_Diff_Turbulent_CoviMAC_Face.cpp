@@ -53,6 +53,14 @@ Entree& Op_Diff_Turbulent_CoviMAC_Face::readOn( Entree& is )
   return is;
 }
 
+void Op_Diff_Turbulent_CoviMAC_Face::completer()
+{
+  Op_Diff_CoviMAC_Face::completer();
+  //si la correlation a besoin du gradient de u, on doit le creer maintenant
+  if (corr.non_nul() && ref_cast(Viscosite_turbulente_base, corr.valeur()).gradu_required())
+    equation().probleme().creer_champ("gradient_vitesse");
+}
+
 void Op_Diff_Turbulent_CoviMAC_Face::creer_champ(const Motcle& motlu)
 {
   Op_Diff_CoviMAC_Face::creer_champ(motlu);

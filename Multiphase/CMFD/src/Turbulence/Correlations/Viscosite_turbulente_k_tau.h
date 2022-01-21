@@ -41,6 +41,7 @@ public:
   virtual void reynolds_stress(DoubleTab& R_ij) const;
   virtual void k_over_eps(DoubleTab& k_sur_eps) const;
   inline double limiteur() const {return limiter_;};
+  virtual int gradu_required() const  {  return 1; };
 
 private:
   double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)

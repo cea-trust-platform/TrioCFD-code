@@ -60,19 +60,6 @@ Entree& Diffusion_supplementaire_echelle_temp_turb_CoviMAC::readOn(Entree& is)
 
 void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
-  const Zone_CoviMAC&       zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
-  int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
-
-  for (auto &&i_m : matrices) if (i_m.first == "alpha")
-      {
-        Matrice_Morse mat;
-        IntTrav stencil(0, 2);
-        stencil.set_smart_resize(1);
-        for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++) stencil.append_line(e, e*N+n);
-        tableau_trier_retirer_doublons(stencil);
-        Matrix_tools::allocate_morse_matrix(ne_tot, ne_tot, stencil, mat);
-        i_m.second->nb_colonnes() ? *i_m.second += mat : *i_m.second = mat;
-      }
 }
 
 void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
@@ -82,15 +69,18 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
-  const DoubleTab&                      tab_tau = tau.valeurs();
+  const DoubleTab&                tab_tau_passe = tau.passe();
+//  const DoubleTab&                      tab_tau = tau.valeurs();
+  //const DoubleTab&                  tab_k_passe = equation().probleme().get_champ("k").passe();
   const IntTab&                             fcl = tau.fcl();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
   const Op_Diff_Turbulent_CoviMAC_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_CoviMAC_Elem, eq.operateur(0).l_op_base());
   const DoubleTab&                       nu_tot = Op_diff_loc.nu();
-  const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
+  //const Op_Diff_Turbulent_CoviMAC_Face& op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
+  //const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.corr.valeur());
+// const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();
 
-  int N = tab_tau.dimension(1), N_phases = eq_qdm.vitesse()->valeurs().dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), D = dimension ;
-  int n = 0 ; // the only kinetic energy production is in phase 0
+  int N = tab_tau_passe.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), D = dimension ;
 
   DoubleTrav grad_f_sqrt_tau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
   DoubleTrav sq_grad_sqrt_tau(eq_qdm.pression()->valeurs().dimension_tot(0), N);
@@ -99,50 +89,59 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   DoubleTab f_w = tau.fgrad_w;
 
   // Calculation of grad of root of tau at surface
-  for (int f = 0; f < nf; f++)
-    {
-      grad_f_sqrt_tau(f, n) = 0;
-      for (int j = f_d(f); j < f_d(f+1) ; j++)
-        {
-          int e = f_e(j);
-          int f_bord;
-          if ( e < ne_tot) //contrib d'un element
-            {
-              double val_e = sqrt(tab_tau(e, n));
-              grad_f_sqrt_tau(f, n) += f_w(j) * val_e;
-            }
-          else if (fcl(f_bord = e - ne_tot, 0) == 3) //contrib d'un bord : seul Dirichlet contribue
-            {
-              double val_f_bord = sqrt(ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), n));
-              grad_f_sqrt_tau(f, n) += f_w(j) * val_f_bord;
-            }
-        }
-    }
+  for (int f = 0; f < nf; f++) for (int n=0 ; n<N ; n++)
+      {
+        grad_f_sqrt_tau(f, n) = 0;
+        for (int j = f_d(f); j < f_d(f+1) ; j++)
+          {
+            int e = f_e(j);
+            int f_bord;
+            if ( e < ne_tot) //contrib d'un element
+              {
+                double val_e = sqrt(std::max(0., tab_tau_passe(e, n)));
+//                double val_e = tab_tau_passe(e, n);
+//                double val_e = tab_tau(e, n);
+                grad_f_sqrt_tau(f, n) += f_w(j) * val_e;
+              }
+            else if (fcl(f_bord = e - ne_tot, 0) == 3) //contrib d'un bord : seul Dirichlet contribue
+              {
+                double val_f_bord = sqrt(ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), n));
+//                double val_f_bord = ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), n);
+                grad_f_sqrt_tau(f, n) += f_w(j) * val_f_bord;
+              }
+          }
+      }
 
   // Calculation of square of grad of root of tau at elements
   zone.init_ve();
-  for (int e = 0; e < ne_tot; e++)
-    {
-      sq_grad_sqrt_tau(e, n) = 0;
-      std::vector<double> grad_sqrt_tau(D);
-      for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
-          grad_sqrt_tau[d] += zone.vec(j, d) * grad_f_sqrt_tau(f, n);
-      for (int d = 0 ; d<D ; d++) sq_grad_sqrt_tau(e, n) += grad_sqrt_tau[d] * grad_sqrt_tau[d];
-    }
+  for (int e = 0; e < ne_tot; e++) for (int n=0 ; n<N ; n++)
+      {
+        sq_grad_sqrt_tau(e, n) = 0;
+        std::vector<double> grad_sqrt_tau(D);
+        for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
+            grad_sqrt_tau[d] += zone.vec(j, d) * grad_f_sqrt_tau(f, n);
+        for (int d = 0 ; d<D ; d++) sq_grad_sqrt_tau(e, n) += grad_sqrt_tau[d] * grad_sqrt_tau[d];
+      }
+
+//  Matrice_Morse *Mtau = matrices.count("tau") ? matrices.at("tau") : nullptr;
 
   // Second membre
-  for(int e = 0 ; e < ne ; e++)
-    {
-      secmem(e, n) += -8  * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
-    }
-
-  // Derivees
-  for (auto &&i_m : matrices) if (i_m.first == "alpha")
+  for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
       {
-        Matrice_Morse& mat = *i_m.second;
-        for (int e = 0; e < ne; e++)
-          {
-            mat(e, e*N_phases+n) += 8 * tab_rho(e, n) * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
-          }
+        double secmem_en = -8  * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
+//        Cerr << e << "secmem" << secmem_en << "--------------------------------------------------" << finl ;
+
+//        double inv_tau = tab_k_passe(e, n) / std::max(tab_k_passe(e, n) * tab_tau_passe(e, n), visc_turb.limiteur() * nu_visc(e, n));
+//       double inv_tau = tab_k_passe(e, n) / std::max(tab_k_passe(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu_visc(e, n));
+//       double secmem_en = -2  * inv_tau *nu_tot(e, n) * sq_grad_sqrt_tau(e, n) ;
+
+        /*        if (!(Mtau==nullptr))           	 // derivee en tau
+                  {
+                    if (tab_k_passe(e, n) * tab_tau(e, n) > visc_turb.limiteur() * nu_visc(e, n))
+                      (*Mtau)(N * e + n, N * e + n)   += (-2) * nu_tot(e, n) * sq_grad_sqrt_tau(e, n) / (tab_tau(e, n)*tab_tau(e, n));
+                    else
+                      (*Mtau)(N * e + n, N * e + n) += 0;
+                  }*/
+        secmem(e, n) += secmem_en;
       }
 }

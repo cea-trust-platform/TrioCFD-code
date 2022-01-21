@@ -64,19 +64,19 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
 
-  int N = pb.get_champ("vitesse").valeurs().dimension(1), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
-  DoubleTrav Rij(0, N, D, D);
+  int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
+  int N = equation().inconnue()->valeurs().line_size();
+
+  DoubleTrav Rij(0, Nph, D, D);
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
 
-  int n = 0 ; // the only kinetic energy production is in phase 0
-
-  for(int e = 0 ; e < ne ; e++)
-  {
-      double secmem_en = 0;
-  	  for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-  		secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-  	secmem_en *= (-1) * tab_alp(e, n) * tab_rho(e, n) ;
-  	secmem(e, n) += secmem_en;
-  }
+  for(int e = 0 ; e < ne ; e++) for(int n = 0; n<N ; n++)
+      {
+        double secmem_en = 0;
+        for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+            secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+        secmem_en *= (-1) * tab_alp(e, n) * tab_rho(e, n) ;
+        secmem(e, n) += secmem_en;
+      }
 }

@@ -42,6 +42,8 @@ public:
   virtual void eddy_viscosity(DoubleTab& nu_t) const;
   virtual void reynolds_stress(DoubleTab& R_ij) const;
   virtual void k_over_eps(DoubleTab& k_sur_eps) const;
+  inline double limiteur() const {return limiter_;};
+  virtual int gradu_required() const  {  return 1; };
 
   const double& get_l_melange() const
   {
@@ -50,6 +52,7 @@ public:
 
 protected:
   double l_melange_;
+  double limiter_ = 0.01;
 };
 
 #endif

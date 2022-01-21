@@ -63,7 +63,7 @@ void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const // Renvo
   if (i_part < 0) Process::exit("Viscosite_turbulente_k_tau : inconsistency between velocity gradient and k!");
   const DoubleTab& gu = p_gu[i_part]; //le bon tableau
   for (i = 0; i < R_ij.dimension(0); i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
-          R_ij(i, n, d, db) = n < Nk ? 2. / 3 * k(i, n) * (d ==db) - max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) * (gu(i, d, D * n + db) + gu(i, db, D * n + d)) : 0;
+          R_ij(i, n, d, db) = n < Nk ? 2. / D * k(i, n) * (d ==db) - max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) * (gu(i, d, D * n + db) + gu(i, db, D * n + d)) : 0;
 }
 
 void Viscosite_turbulente_k_tau::k_over_eps(DoubleTab& k_sur_eps) const

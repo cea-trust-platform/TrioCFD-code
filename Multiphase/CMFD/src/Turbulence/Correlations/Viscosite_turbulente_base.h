@@ -46,6 +46,11 @@ public:
   virtual void eddy_viscosity(DoubleTab& nu_t) const = 0;
   virtual void reynolds_stress(DoubleTab& R_ij) const = 0;
   virtual void k_over_eps(DoubleTab& k_sur_eps) const = 0;
+  inline double limiteur() const {return limiter_;};
+  virtual int gradu_required() const  {  return 0; };
+
+private:
+  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente
 };
 
 #endif

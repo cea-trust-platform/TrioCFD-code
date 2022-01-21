@@ -70,7 +70,7 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::dimension
         if (n_m.first == "alpha" || n_m.first == "temperature")	// N <= M
           for (e = 0; e < nb_elem; e++) for (n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
         if (n_m.first == "pression")
-          for (e = 0; e < nb_elem; e++) for (n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
+          for (e = 0; e < nb_elem; e++) for (n = 0; n < N; n++) for (m = 0; m<M; m++) sten.append_line(N * e + n, M * e + m);
         Matrix_tools::allocate_morse_matrix(N * zone.nb_elem_tot(), M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -91,16 +91,14 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
   const IntTab&				fcl_tau 			= ch_tau.fcl(); // tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
   const IntTab&             fcl_k 				= ch_k.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
-  const int Mt = tau_passe.dimension(1), nf = zone.nb_faces(), D = dimension, nb_elem = zone.nb_elem() ;
+  const int Mt = tau_passe.dimension(1), nf = zone.nb_faces(), D = dimension, nb_elem = zone.nb_elem(), nb_elem_tot = zone.nb_elem() ;
   const int Ntau = tau_passe.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
 
   assert(Ntau == 1 || k_passe.line_size() == 1); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes decrites par un modele k-tau dans le calcul de grad_f_k et dans le remplissage des matrices
 
   /* Calcul de grad de tau aux faces */
 
-  DoubleTrav grad_f_tau(0, Mt);
-
-  MD_Vector_tools::creer_tableau_distribue(equation().probleme().get_champ("vitesse").valeurs().get_md_vector(), grad_f_tau);
+  DoubleTrav grad_f_tau(nf, Mt);
   ch_tau.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   IntTab& f_d_tau = ch_tau.fgrad_d, f_e_tau = ch_tau.fgrad_e; // Tables utilisees dans zone_CoviMAC::fgrad pour le calcul du gradient
   DoubleTab f_w_tau = ch_tau.fgrad_w;
@@ -112,14 +110,14 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
           {
             int e = f_e_tau(j);
             int f_bord;
-            if (e < nb_elem) //contribution d'un element
+            if (e < nb_elem_tot) //contribution d'un element
               {
                 double val_e = tau_passe(e, n);
                 grad_f_tau(f, n) += f_w_tau(j) * val_e;
               }
-            else if (fcl_tau(f_bord = e - nb_elem, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
+            else if (fcl_tau(f_bord = e - nb_elem_tot, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
               {
-                double val_f_bord = sqrt(ref_cast(Dirichlet, cls_tau[fcl_tau(f_bord, 1)].valeur()).val_imp(fcl_tau(f_bord, 2), n));
+                double val_f_bord = ref_cast(Dirichlet, cls_tau[fcl_tau(f_bord, 1)].valeur()).val_imp(fcl_tau(f_bord, 2), n);
                 grad_f_tau(f, n) += f_w_tau(j) * val_f_bord;
               }
           }
@@ -127,8 +125,7 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
 
   /* Calcul de grad de k aux faces */
 
-  DoubleTrav grad_f_k(0, Mt);
-  MD_Vector_tools::creer_tableau_distribue(equation().probleme().get_champ("vitesse").valeurs().get_md_vector(), grad_f_k); // on cree un tableau distribue de meme structure que la vitesse
+  DoubleTrav grad_f_k(nf, Mt);
   ch_k.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   IntTab& f_d_k = ch_k.fgrad_d, f_e_k = ch_k.fgrad_e;  // Tables utilisees dans zone_CoviMAC::fgrad pour le calcul du gradient
   DoubleTab f_w_k = ch_k.fgrad_w;
@@ -140,14 +137,14 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
           {
             int e = f_e_k(j);
             int f_bord;
-            if (e < nb_elem) //contribution d'un element
+            if (e < nb_elem_tot) //contribution d'un element
               {
                 double val_e = k_passe(e, n);
                 grad_f_k(f, n) += f_w_k(j) * val_e;
               }
-            else if (fcl_k(f_bord = e - nb_elem, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
+            else if (fcl_k(f_bord = e - nb_elem_tot, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
               {
-                double val_f_bord = sqrt(ref_cast(Dirichlet, cls_k[fcl_k(f_bord, 1)].valeur()).val_imp(fcl_k(f_bord, 2), n));
+                double val_f_bord = ref_cast(Dirichlet, cls_k[fcl_k(f_bord, 1)].valeur()).val_imp(fcl_k(f_bord, 2), n);
                 grad_f_k(f, n) += f_w_k(j) * val_f_bord;
               }
           }
@@ -177,13 +174,15 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
   Matrice_Morse *Mp = matrices.count("pression") ? matrices.at("pression") : nullptr;
   Matrice_Morse *Mtemp	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
 
-  for (int e = 0; e < nb_elem; e++) for (int ntau = 0, mp = 0; ntau < Ntau; ntau++, mp += (Np>1))
+  for (int e = 0; e < nb_elem; e++) for (int ntau = 0; ntau < Ntau; ntau++)
       {
         secmem(e, ntau) += sigma_d * alpha_rho_tau(e, ntau) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.);
         if (!(Ma==nullptr))    (*Ma)(Ntau * e + ntau, Na * e + ntau)   	-= sigma_d * (der_alpha_rho_tau.count("alpha") ? der_alpha_rho_tau.at("alpha")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee en alpha
         if (!(Mtemp==nullptr)) (*Mtemp)(Ntau * e + ntau, Nt * e + ntau)	-= sigma_d * (der_alpha_rho_tau.count("temperature") ? der_alpha_rho_tau.at("temperature")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la temperature
-        if (!(Mp==nullptr))	   (*Mp)(Ntau * e + ntau, Np * e + mp)     	-= sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la pression
         if (!(Mtau==nullptr))  (*Mtau)(Ntau * e + ntau, Ntau * e + ntau)-= sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee en tau
+        for (int mp = 0; mp<Np; mp++) if (!(Mp==nullptr))
+            (*Mp)(Ntau * e + ntau, Np * e + mp)     	-= sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,ntau) : 0 ) * std::min(grad_f_tau_dot_grad_f_k(e, ntau), 0.); // derivee par rapport a la pression
+
       }
 }
 

@@ -43,6 +43,7 @@ class Op_Diff_Turbulent_CoviMAC_Face : public Op_Diff_CoviMAC_Face
   Declare_instanciable( Op_Diff_Turbulent_CoviMAC_Face ) ;
   void creer_champ(const Motcle& motlu);
   void mettre_a_jour(double temps);
+  virtual void completer();
   virtual void modifier_nu(DoubleTab& ) const; //prend en compte la diffusivite turbulente
 public:
   Correlation corr; //correlation de viscosite turbulente
