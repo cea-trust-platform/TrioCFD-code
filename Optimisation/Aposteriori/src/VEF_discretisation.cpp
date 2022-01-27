@@ -34,6 +34,7 @@
 #include <Taux_cisaillement_P0_VEF.h>
 #include <estimateur_aposteriori_P0_VEF.h>
 #include <Champ_P0_VEF.h>
+#include <Champ_P1_isoP1Bulle.h>
 #include <Correlation_Vec_Sca_VEF.h>
 #include <Fluide_Ostwald.h>
 #include <Champ_Ostwald_VEF.h>
@@ -705,7 +706,10 @@ void VEF_discretisation::estimateur_aposteriori(const Zone_dis& z, const Zone_Cl
   estimateur_aposteriori_P0_VEF& ch=ref_cast(estimateur_aposteriori_P0_VEF,champ.valeur());
   ch.associer_zone_dis_base(zone_vef);
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse.valeur());
-  const Champ_P0_VEF& pres = ref_cast(Champ_P0_VEF, ch_pression.valeur());
+  cout << "VEF_discretisation:  Avant cast de la pression  " << endl;
+//  const Champ_P0_VEF& pres = ref_cast(Champ_P0_VEF, ch_pression.valeur());
+  const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, ch_pression.valeur());
+  cout << "VEF_discretisation: Apres cast de la pression  " << endl;
   const Champ_Uniforme& visc = ref_cast(Champ_Uniforme, viscosite_cinematique.valeur());
   ch.associer_champ(vit, pres, visc, zone_cl_vef);
   ch.nommer("estimateur_aposteriori");
@@ -726,5 +730,20 @@ void VEF_discretisation::modifier_champ_tabule(const Zone_dis_base& zone_dis, Ch
   le_champ_tabule_dis.fixer_nb_comp(le_champ_tabule.nb_comp());
   le_champ_tabule_dis.fixer_nb_valeurs_nodales(zone_dis.nb_elem());
   le_champ_tabule_dis.changer_temps(ch_inc.temps());
+}
+
+void VEF_discretisation::residu( const Zone_dis& z, const Champ_Inc& ch_inco, Champ_Fonc& champ ) const
+{
+  Nom ch_name(ch_inco.le_nom());
+  ch_name += "_residu";
+  Cerr << "Discretization of " << ch_name << finl;
+
+  const Zone_VEF& zone_vef = ref_cast( Zone_VEF, z.valeur( ) );
+  int nb_comp = ch_inco.valeurs().nb_dim()==1?1:ch_inco.valeurs().dimension(1);
+  Discretisation_base::discretiser_champ("champ_face",zone_vef, ch_name,"units_not_defined", nb_comp, ch_inco.temps(), champ);
+  Champ_Fonc_base& ch_fonc = ref_cast(Champ_Fonc_base,champ.valeur());
+  DoubleTab& tab=ch_fonc.valeurs();
+  tab = -10000.0 ;
+  Cerr << "[Information] Discretisation_base::residu : the residue is set to -10000.0 at initial time" <<finl;
 }
 
