@@ -52,6 +52,9 @@ public :
   void associer_pb(const Probleme_base& ) { };
   void mettre_a_jour(double temps) { };
 
+protected :
+  double limiter_ = 5. ;
+
 };
 
 #endif

@@ -151,7 +151,7 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
               //            Cerr << "gradV " << tab_grad(nf_tot + d_X + e * D , D * n + d_U) << finl;
             }
         secmem_en *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
-        if (secmem_en > 0) Cerr << "--------------------------------------------------" << finl ;
+//        if (secmem_en > 0) Cerr << "--------------------------------------------------" << finl ;
 //       Cerr << "secmem" << secmem_en << finl;
         secmem(e, n) += secmem_en;
       }

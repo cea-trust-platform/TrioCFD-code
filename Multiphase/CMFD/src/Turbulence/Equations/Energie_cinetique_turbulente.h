@@ -65,6 +65,7 @@ public :
     return { "alpha_rho_k", calculer_alpha_rho_k };
   }
 
+  virtual int positive_unkown() {return 0;};
 
 protected :
 

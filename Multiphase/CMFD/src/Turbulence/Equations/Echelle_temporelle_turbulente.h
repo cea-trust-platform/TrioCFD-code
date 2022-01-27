@@ -65,6 +65,7 @@ public :
     return { "alpha_rho_tau", calculer_alpha_rho_tau };
   }
 
+  virtual int positive_unkown() {return 1;};
 
 protected :
 
