@@ -14,46 +14,37 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_echelle_temp_turb_CoviMAC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
-// Version:     /main/12
+// File:        Viscosite_turbulente_k_omega.h
+// Directory:   $TRUST_ROOT/src/Turbulence/Correlations
+// Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Diffusion_supplementaire_echelle_temp_turb_CoviMAC_included
-#define Diffusion_supplementaire_echelle_temp_turb_CoviMAC_included
-
-#include <Source_base.h>
-#include <Ref_Correlation.h>
+#ifndef Viscosite_turbulente_k_omega_included
+#define Viscosite_turbulente_k_omega_included
 #include <DoubleTab.h>
+#include <Viscosite_turbulente_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Diffusion_supplementaire_echelle_temp_turb_CoviMAC
-//    Cette classe implemente dans CoviMAC la diffusion supplementaire venant de l'introduction du temps tau
-//
-// .SECTION voir aussi
-//    Operateur_CoviMAC_base Operateur_base
+//    classe Viscosite_turbulente_k_omega
+//    Viscosite turbulente pour un modele "k-omega" : nu_t = k / omega
+//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
 //////////////////////////////////////////////////////////////////////////////
-class Diffusion_supplementaire_echelle_temp_turb_CoviMAC: public Source_base
+
+class Viscosite_turbulente_k_omega : public Viscosite_turbulente_base
 {
-  Declare_instanciable(Diffusion_supplementaire_echelle_temp_turb_CoviMAC);
-public :
-  int has_interface_blocs() const
-  {
-    return 1;
-  }
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
-  void check_multiphase_compatibility() const {}; //of course
+  Declare_instanciable(Viscosite_turbulente_k_omega);
+public:
+  virtual void eddy_viscosity(DoubleTab& nu_t) const;
+  virtual void reynolds_stress(DoubleTab& R_ij) const;
+  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
+  inline double limiteur() const {return limiter_;};
+  virtual int gradu_required() const  {  return 1; };
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) { };
-  void associer_pb(const Probleme_base& ) { };
-  void mettre_a_jour(double temps) { };
-
-protected :
-  double limiter_ = 5 ;
+private:
+  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k / omega, 0.01 * limiter_)
 
 };
 

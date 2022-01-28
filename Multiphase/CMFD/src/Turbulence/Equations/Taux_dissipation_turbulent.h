@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Energie_cinetique_turbulente.h
+// File:        Taux_dissipation_turbulent.h
 // Directory:   $TRUST_ROOT/src/Turbulence/Equations
 // Version:     /main/20
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Energie_cinetique_turbulente_included
-#define Energie_cinetique_turbulente_included
+#ifndef Taux_dissipation_turbulent_included
+#define Taux_dissipation_turbulent_included
 
 #include <Convection_Diffusion_std.h>
 #include <Fluide_base.h>
@@ -30,18 +30,18 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//     classe Energie_cinetique_turbulente
-//     Equation de transport d'une energie cinetique turbulente (modeles k-{eps,omega,tau})
+//     classe Taux_dissipation_turbulent
+//     Equation de transport du taux de dissipation turbulen (modele k-omega)
 // .SECTION voir aussi
 //     Conv_Diffusion_std Convection_Diffusion_Temperature
 //////////////////////////////////////////////////////////////////////////////
-class Energie_cinetique_turbulente : public Convection_Diffusion_std
+class Taux_dissipation_turbulent : public Convection_Diffusion_std
 {
-  Declare_instanciable_sans_constructeur(Energie_cinetique_turbulente);
+  Declare_instanciable_sans_constructeur(Taux_dissipation_turbulent);
 
 public :
 
-  Energie_cinetique_turbulente();
+  Taux_dissipation_turbulent();
 
   void associer_fluide(const Fluide_base& );
   inline const Champ_Inc& inconnue() const;
@@ -53,16 +53,16 @@ public :
   Milieu_base& milieu();
   void associer_milieu_base(const Milieu_base& );
   virtual int impr(Sortie& os) const;
-  const Champ_Don& diffusivite_pour_transport();
-  const Champ_base& diffusivite_pour_pas_de_temps();
+  const Champ_Don& diffusivite_pour_transport() const;
+  const Champ_base& diffusivite_pour_pas_de_temps() const;
 
   virtual const Motcle& domaine_application() const;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
-  static void calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
+  static void calculer_alpha_rho_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
   virtual std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const
   {
-    return { "alpha_rho_k", calculer_alpha_rho_k };
+    return { "alpha_rho_omega", calculer_alpha_rho_omega };
   }
 
   virtual int positive_unkown() {return 1;};
@@ -92,7 +92,7 @@ protected :
 // Exception:
 // Effets de bord:
 // Postcondition:
-inline const Champ_Inc& Energie_cinetique_turbulente::inconnue() const
+inline const Champ_Inc& Taux_dissipation_turbulent::inconnue() const
 {
   return l_inco_ch;
 }
@@ -113,7 +113,7 @@ inline const Champ_Inc& Energie_cinetique_turbulente::inconnue() const
 // Exception:
 // Effets de bord:
 // Postcondition:
-inline Champ_Inc& Energie_cinetique_turbulente::inconnue()
+inline Champ_Inc& Taux_dissipation_turbulent::inconnue()
 {
   return l_inco_ch;
 }

@@ -60,6 +60,40 @@ Entree& Diffusion_supplementaire_echelle_temp_turb_CoviMAC::readOn(Entree& is)
 
 void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
+  const Zone_CoviMAC&       zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
+  const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
+
+  if (!matrices.count("tau") || semi_impl.count("tau")) return;
+
+  int N = equation().inconnue().valeurs().line_size(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot() ;
+
+  tau.init_grad(0);
+  IntTab& f_d = tau.fgrad_d, f_e = tau.fgrad_e;             // Tables used in zone_CoviMAC::fgrad
+
+
+  for (auto &&i_m : matrices) if (i_m.first == "tau")
+      {
+        Matrice_Morse mat;
+        IntTrav stencil(0, 2);
+        stencil.set_smart_resize(1);
+
+        for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++) for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
+              {
+                int f = zone.vej(i);
+                for (int j = f_d(f); j < f_d(f+1) ; j++)
+                  {
+                    int ed = f_e(j);
+                    if ( ed < ne_tot) //contrib d'un element ; contrib d'un bord : pas de derivee
+                      {
+                        stencil.append_line(N * e + n, N * ed + n);
+                      }
+                  }
+              }
+        tableau_trier_retirer_doublons(stencil);
+        Matrix_tools::allocate_morse_matrix(ne_tot, ne_tot, stencil, mat);
+        i_m.second->nb_colonnes() ? *i_m.second += mat : *i_m.second = mat;
+
+      }
 }
 
 void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
@@ -69,8 +103,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
-  const DoubleTab&                tab_tau_passe = tau.passe();
-  const DoubleTab&                      tab_tau = tau.valeurs();
+  const DoubleTab&                      tab_tau = semi_impl.count("tau") ? tau.passe() : tau.valeurs();
   const DoubleTab&                  tab_k_passe = equation().probleme().get_champ("k").passe();
   const IntTab&                             fcl = tau.fcl();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
@@ -80,7 +113,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.corr.valeur());
   const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();
 
-  int N = tab_tau_passe.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;
+  int N = tab_tau.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;
 
   DoubleTrav grad_sqrt_tau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
   tau.init_grad(0);
@@ -88,7 +121,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   DoubleTab f_w = tau.fgrad_w;
 
   // Calculation of grad of root of tau at faces
-  Matrice_Morse *Mtau = matrices.count("tau") ? matrices.at("tau") : nullptr;
+  Matrice_Morse *Mtau = (matrices.count("tau") && !semi_impl.count("tau")) ? matrices.at("tau") : nullptr;
 
   for (int f = 0; f < nf; f++) for (int n=0 ; n<N ; n++)
       {
@@ -99,7 +132,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
             int f_bord;
             if ( e < ne_tot) //contrib d'un element
               {
-                double val_e = (Mtau == nullptr) ? sqrt(std::max(0., tab_tau_passe(e, n))) : sqrt(std::max(0., tab_tau(e, n))) ; // Si implicite ou pas
+                double val_e = sqrt(std::max(0., tab_tau(e, n))) ; // Si implicite ou pas
                 grad_sqrt_tau(f, n) += f_w(j) * val_e;
               }
             else if (fcl(f_bord = e - ne_tot, 0) == 3) //contrib d'un bord : seul Dirichlet contribue
@@ -125,7 +158,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
 
   // Creation of a limiter so that (|additionnal diffusion| < |5*diffusion|) ; on regarde seulement le second membre
 
-  DoubleTrav sec_m(tab_tau_passe); //residus
+  DoubleTrav sec_m(tab_tau); //residus
   matrices_t mat_m; //derivees
   eq.operateur(0).l_op_base().ajouter_blocs(mat_m, sec_m, semi_impl);
 
@@ -141,19 +174,19 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
         // Jacobienne ; si on est dans le limiteur, pas de derivee
         else if (!(Mtau == nullptr))
           {
-            for (int d = 0 ; d<D ; d++) for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
-                {
-                  int f = zone.vej(i);
-                  for (int j = f_d(f); j < f_d(f+1) ; j++)
-                    {
-                      int ed = f_e(j);
-                      if ( ed < ne_tot) //contrib d'un element ; contrib d'un bord : pas de derivee
+            for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
+              {
+                int f = zone.vej(i);
+                for (int j = f_d(f); j < f_d(f+1) ; j++)
+                  {
+                    int ed = f_e(j);
+                    if ( ed < ne_tot) for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
                         {
                           double inv_sqrt_tau = sqrt(tab_k_passe(ed, n) / std::max(tab_k_passe(ed, n) * tab_tau(ed, n), visc_turb.limiteur() * nu_visc(ed, n)));
-                          (*Mtau)(N * e + n, N * ed + n) += sqrt(2) * grad_sqrt_tau(nf_tot + D*ed+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau;
+                          (*Mtau)(N * e + n, N * ed + n) += 8  * mu_tot(e, n) * sqrt(2) * grad_sqrt_tau(nf_tot + D*ed+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau;
                         }
-                    }
-                }
+                  }
+              }
           }
 
         secmem(e, n) += secmem_en;
