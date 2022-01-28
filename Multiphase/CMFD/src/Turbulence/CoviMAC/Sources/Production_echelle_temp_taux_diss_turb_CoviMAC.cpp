@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_energie_cin_turb_CoviMAC.cpp
+// File:        Production_echelle_temp_taux_diss_turb_CoviMAC.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Production_echelle_temp_turb_CoviMAC.h"
+#include <Production_echelle_temp_taux_diss_turb_CoviMAC.h>
 
 #include <Zone_CoviMAC.h>
 #include <Champ_P0_CoviMAC.h>
@@ -36,16 +36,17 @@
 #include <Energie_cinetique_turbulente.h>
 #include <Array_tools.h>
 #include <Matrix_tools.h>
+#include <Echelle_temporelle_turbulente.h>
+#include <Taux_dissipation_turbulent.h>
 
+Implemente_instanciable(Production_echelle_temp_taux_diss_turb_CoviMAC,"Production_echelle_temp_taux_diss_turb_P0_CoviMAC", Source_base);
 
-Implemente_instanciable(Production_echelle_temp_turb_CoviMAC,"Production_echelle_temp_turb_P0_CoviMAC", Source_base);
-
-Sortie& Production_echelle_temp_turb_CoviMAC::printOn(Sortie& os) const
+Sortie& Production_echelle_temp_taux_diss_turb_CoviMAC::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Production_echelle_temp_turb_CoviMAC::readOn(Entree& is)
+Entree& Production_echelle_temp_taux_diss_turb_CoviMAC::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("alpha_omega", &alpha_omega_, Param::REQUIRED);
@@ -55,7 +56,7 @@ Entree& Production_echelle_temp_turb_CoviMAC::readOn(Entree& is)
   return is;
 }
 
-void Production_echelle_temp_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Production_echelle_temp_taux_diss_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Zone_CoviMAC&       zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
@@ -72,7 +73,7 @@ void Production_echelle_temp_turb_CoviMAC::dimensionner_blocs(matrices_t matrice
       }
 }
 
-void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
@@ -80,20 +81,33 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
   const grad_Champ_Face_CoviMAC&           grad = ref_cast(grad_Champ_Face_CoviMAC, eq_qdm.get_champ("gradient_vitesse"));
   const DoubleTab&                     tab_grad = grad.passe();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, Op_diff.corr.valeur());
-  const DoubleTab&                      tab_tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()).valeurs();
+  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
+  const DoubleTab&                     tab_diss = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                           nu = pb.get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        tab_k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k")).valeurs();
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
 
   int Nph = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
-  int N = tab_tau.line_size();
+  int N = tab_diss.line_size();
 
   DoubleTrav Rij(0, Nph, D, D);
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
   assert((ne == Rij.dimension(0)));
+
+  std::string Type_diss = ""; // omega or tau dissipation
+  if same_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
+  else if same_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
+  if (Type_diss == "") abort();
+
+  DoubleTrav prod_scal(Rij.dimension_tot(0), Nph);
+  for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+      {
+        prod_scal(e, n) = 0;
+        for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+            prod_scal(e, n) += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+      }
 
   // Derivees
   for (auto &&i_m : matrices)
@@ -103,17 +117,23 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
           Matrice_Morse& mat = *i_m.second;
           for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
               {
-                double deriv = 0;
-                for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-                    {
-                      deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-                    }
-                if (tab_k(e, n) * tab_tau(e, n) > visc_turb.limiteur() * nu(e, n))
+                double deriv = prod_scal(e, n);
+                if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
                   deriv *= (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
-                else
-                  deriv *= (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_tau(e, n)/(visc_turb.limiteur() * nu(e, n));
+                else deriv *= (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
+                mat(N * e + n, N * e + n) += deriv;
+              }
+        }
 
-//                deriv *= (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
+      else if (i_m.first == "omega")
+        {
+          Matrice_Morse& mat = *i_m.second;
+          for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+              {
+                double deriv = prod_scal(e, n);
+                if (tab_diss(e, n) <= 0) deriv *= 0 ;
+                else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
+                else deriv *= (1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) / tab_k(e, n) ;
                 mat(N * e + n, N * e + n) += deriv;
               }
         }
@@ -121,38 +141,39 @@ void Production_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Do
       else if (i_m.first == "k")
         {
           Matrice_Morse& mat = *i_m.second;
-          for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
-              {
-                double deriv = 0;
-                for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-                    {
-                      deriv += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-                    }
-                if (tab_k(e, n) * tab_tau(e, n) > visc_turb.limiteur() * nu(e, n))
-                  deriv *= (1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_tau(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
-                else
-                  deriv *= 0;
-//                deriv *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)*tab_tau(e, n)*tab_tau(e, n)/(max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))*max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n))) ;
-                mat(N * e + n, N * e + n) += deriv;
-              }
+          if (Type_diss == "tau")
+            {
+              for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+                  {
+                    double deriv = prod_scal(e, n);
+                    if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
+                      deriv *= (1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
+                    else deriv *= 0;
+                    mat(N * e + n, N * e + n) += deriv;
+                  }
+            }
+          else if (Type_diss == "omega")
+            for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+                {
+                  double deriv = prod_scal(e, n);
+                  if (tab_diss(e, n) <= 0) deriv *= 0 ;
+                  else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
+                  else deriv *= (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
+                  mat(N * e + n, N * e + n) += deriv;
+                }
+
+
         }
     }
 
   // Second membre
   for(int e = 0 ; e < ne ; e++) for(int n = 0; n<N ; n++)
       {
-        double secmem_en = 0 ;
-//       Cerr << "new" << e << finl;
-        for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-            {
-              secmem_en += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-//             Cerr << "d_U " << d_U  << "d_X " << d_X << finl;
-//             Cerr << "Rij " << Rij(e, n, d_U, d_X) << finl;
-              //            Cerr << "gradV " << tab_grad(nf_tot + d_X + e * D , D * n + d_U) << finl;
-            }
-        secmem_en *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_tau(e, n)*tab_tau(e, n)/max(tab_k(e, n) * tab_tau(e, n), visc_turb.limiteur() * nu(e, n)) ;
-//        if (secmem_en > 0) Cerr << "--------------------------------------------------" << finl ;
-//       Cerr << "secmem" << secmem_en << finl;
+        double secmem_en = prod_scal(e, n);
+        if (Type_diss == "tau")
+          secmem_en *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
+        else if (Type_diss == "omega")
+          secmem_en *= (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* (tab_diss(e, n) <= 0) ? 0 : (max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n))) ;
         secmem(e, n) += secmem_en;
       }
 }

@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Production_echelle_temp_turb_CoviMAC.h
+// File:        Production_echelle_temp_taux_diss_turb_CoviMAC.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
 // Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Production_echelle_temp_turb_CoviMAC_included
-#define Production_echelle_temp_turb_CoviMAC_included
+#ifndef Production_echelle_temp_taux_diss_turb_CoviMAC_included
+#define Production_echelle_temp_taux_diss_turb_CoviMAC_included
 
 #include <Source_base.h>
 #include <Ref_Correlation.h>
@@ -30,15 +30,15 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Production_echelle_temp_turb_CoviMAC
-//    Cette classe implemente dans CoviMAC un operateur de production de l'échelle de temps turbulente tau
+//    Classe Production_echelle_temp_taux_diss_turb_CoviMAC
+//    Cette classe implemente dans CoviMAC un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
 //
 // .SECTION voir aussi
 //    Operateur_CoviMAC_base Operateur_base
 //////////////////////////////////////////////////////////////////////////////
-class Production_echelle_temp_turb_CoviMAC: public Source_base
+class Production_echelle_temp_taux_diss_turb_CoviMAC: public Source_base
 {
-  Declare_instanciable(Production_echelle_temp_turb_CoviMAC);
+  Declare_instanciable(Production_echelle_temp_taux_diss_turb_CoviMAC);
 public :
   int has_interface_blocs() const
   {

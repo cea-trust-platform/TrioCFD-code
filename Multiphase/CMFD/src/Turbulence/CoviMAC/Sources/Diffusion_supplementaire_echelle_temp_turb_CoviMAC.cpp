@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Diffusion_supplementaire_echelle_temp_turb_CoviMAC.h"
+#include <Diffusion_supplementaire_echelle_temp_turb_CoviMAC.h>
 
 #include <Zone_CoviMAC.h>
 #include <Zone_Cl_CoviMAC.h>
