@@ -95,8 +95,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
   const int N = diss_passe.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
 
   std::string Type_diss = ""; // omega or tau dissipation
-  if same_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
-  else if same_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
+  if sub_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
+  else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
   if (Type_diss == "") abort();
 
 
@@ -202,12 +202,12 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
 
             if (diss(e,n)>0) // Else everything = 0
               {
-                secmem(e, n) += sigma_d * alpha_rho(e, n) / diss(e, n)* std::min(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
+                secmem(e, n) += sigma_d * alpha_rho(e, n) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
                 if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= sigma_d * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e,n) : 0 ) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
                 if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= sigma_d * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e,n) : 0 ) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
                 for (int mp = 0; mp<Np; mp++) if (!(Mp==nullptr))
                     (*Mp)(N * e + n, Np * e + mp)     	-= sigma_d * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e,n) : 0 ) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
-                if (!(M==nullptr))     (*M)(N * e + n, N * e + n) -= sigma_d * alpha_rho(e, n) * (-1/(diss(e,n)*diss(e,n))) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
+                if (!(M==nullptr))     (*M)(N * e + n, N * e + n) -= sigma_d * alpha_rho(e, n) * (-1/(diss(e,n)*diss(e,n))) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
               }
           }
       }

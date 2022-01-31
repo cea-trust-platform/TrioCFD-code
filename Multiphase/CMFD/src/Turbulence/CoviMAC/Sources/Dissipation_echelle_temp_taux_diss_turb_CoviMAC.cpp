@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dissipation_echelle_temp_taux_dis_turb_CoviMAC.cpp
+// File:        Dissipation_echelle_temp_taux_diss_turb_CoviMAC.cpp
 // Directory:   $TRUST_ROOT/src/Turbulence/CoviMAC/Sources
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Dissipation_echelle_temp_taux_dis_turb_CoviMAC.h>
+#include <Dissipation_echelle_temp_taux_diss_turb_CoviMAC.h>
 #include <Zone_CoviMAC.h>
 #include <Champ_P0_CoviMAC.h>
 #include <Equation_base.h>
@@ -31,15 +31,15 @@
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 
-Implemente_instanciable(Dissipation_echelle_temp_taux_dis_turb_CoviMAC,"Dissipation_echelle_temp_taux_dis_turb_P0_CoviMAC", Source_base);
+Implemente_instanciable(Dissipation_echelle_temp_taux_diss_turb_CoviMAC,"Dissipation_echelle_temp_taux_diss_turb_P0_CoviMAC", Source_base);
 // XD Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC source_base Terme_dissipation_echelle_temporelle_turbulente_P0_CoviMAC 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
 
-Sortie& Dissipation_echelle_temp_taux_dis_turb_CoviMAC::printOn(Sortie& os) const
+Sortie& Dissipation_echelle_temp_taux_diss_turb_CoviMAC::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Dissipation_echelle_temp_taux_dis_turb_CoviMAC::readOn(Entree& is)
+Entree& Dissipation_echelle_temp_taux_diss_turb_CoviMAC::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("beta_omega", &beta_omega);
@@ -47,7 +47,7 @@ Entree& Dissipation_echelle_temp_taux_dis_turb_CoviMAC::readOn(Entree& is)
   return is;
 }
 
-void Dissipation_echelle_temp_taux_dis_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Dissipation_echelle_temp_taux_diss_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
@@ -70,7 +70,7 @@ void Dissipation_echelle_temp_taux_dis_turb_CoviMAC::dimensionner_blocs(matrices
       }
 }
 
-void Dissipation_echelle_temp_taux_dis_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
+void Dissipation_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl)  const
 {
   const Zone_CoviMAC& 		zone 			= ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const Champ_P0_CoviMAC& 	ch_diss			= ref_cast(Champ_P0_CoviMAC,equation().inconnue().valeur()); // Champ tau ou omega
@@ -83,8 +83,8 @@ void Dissipation_echelle_temp_taux_dis_turb_CoviMAC::ajouter_blocs(matrices_t ma
   const int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
 
   std::string Type_diss = ""; // omega or tau dissipation
-  if same_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
-  else if same_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
+  if sub_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
+  else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
   if (Type_diss == "") abort();
 
   int m, mp;

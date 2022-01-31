@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include "Production_energie_cin_turb_CoviMAC.h"
+#include <Production_energie_cin_turb_CoviMAC.h>
 
 #include <Zone_CoviMAC.h>
 #include <Champ_P0_CoviMAC.h>

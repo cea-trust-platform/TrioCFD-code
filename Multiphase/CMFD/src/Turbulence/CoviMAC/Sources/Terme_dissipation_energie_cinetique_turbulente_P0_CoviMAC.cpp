@@ -59,8 +59,8 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::dimensionner_blo
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
     {
-      if same_type(Echelle_temporelle_turbulente, equation().probleme().equation(i)) Type_diss = "tau";
-      else if same_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
+      if sub_type(Echelle_temporelle_turbulente, equation().probleme().equation(i)) Type_diss = "tau";
+      else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
     }
   if (Type_diss == "") abort();
 
@@ -101,8 +101,8 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::ajouter_blocs(ma
   std::string Type_diss = ""; // omega or tau dissipation
   for (int i = 0 ; i < equation().probleme().nombre_d_equations() ; i++)
     {
-      if same_type(Echelle_temporelle_turbulente, equation().probleme().equation(i)) Type_diss = "tau";
-      else if same_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
+      if sub_type(Echelle_temporelle_turbulente, equation().probleme().equation(i)) Type_diss = "tau";
+      else if sub_type(Taux_dissipation_turbulent, equation().probleme().equation(i)) Type_diss = "omega";
     }
   if (Type_diss == "") abort();
   const Champ_P0_CoviMAC& 			ch_diss 	= ref_cast(Champ_P0_CoviMAC,equation().probleme().get_champ(Nom(Type_diss.c_str()))); // Champ tau ou omega

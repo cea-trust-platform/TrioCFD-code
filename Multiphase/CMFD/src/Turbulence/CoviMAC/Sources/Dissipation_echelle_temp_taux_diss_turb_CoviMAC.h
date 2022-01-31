@@ -14,20 +14,20 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Dissipation_echelle_temp_taux_dis_turb_CoviMAC.h
+// File:        Dissipation_echelle_temp_taux_diss_turb_CoviMAC.h
 // Directory:   $TRUST_ROOT/src/CoviMAC/Sources
 // Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Dissipation_echelle_temp_taux_dis_turb_CoviMAC_included
-#define Dissipation_echelle_temp_taux_dis_turb_CoviMAC_included
+#ifndef Dissipation_echelle_temp_taux_diss_turb_CoviMAC_included
+#define Dissipation_echelle_temp_taux_diss_turb_CoviMAC_included
 
 #include <Source_base.h>
 
 class Convection_Diffusion_std;
 //
-// .DESCRIPTION class Dissipation_echelle_temp_taux_dis_turb_CoviMAC
+// .DESCRIPTION class Dissipation_echelle_temp_taux_diss_turb_CoviMAC
 //
 // Terme de dissipation beta_omega * alpha * rho et de -beta_omega * alpha * rho * omega**2 dans l'equation d'energie cinetique turbulente
 //
@@ -37,10 +37,10 @@ class Convection_Diffusion_std;
 // en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
 
 
-class Dissipation_echelle_temp_taux_dis_turb_CoviMAC : public Source_base 	// Terme_Source_CoviMAC_base
+class Dissipation_echelle_temp_taux_diss_turb_CoviMAC : public Source_base 	// Terme_Source_CoviMAC_base
 {
 
-  Declare_instanciable(Dissipation_echelle_temp_taux_dis_turb_CoviMAC);
+  Declare_instanciable(Dissipation_echelle_temp_taux_diss_turb_CoviMAC);
 
 public:
   int has_interface_blocs() const

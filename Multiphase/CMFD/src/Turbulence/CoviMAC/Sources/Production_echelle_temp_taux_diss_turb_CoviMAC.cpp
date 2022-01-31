@@ -97,8 +97,8 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
   assert((ne == Rij.dimension(0)));
 
   std::string Type_diss = ""; // omega or tau dissipation
-  if same_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
-  else if same_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
+  if sub_type(Echelle_temporelle_turbulente, equation()) Type_diss = "tau";
+  else if sub_type(Taux_dissipation_turbulent, equation()) Type_diss = "omega";
   if (Type_diss == "") abort();
 
   DoubleTrav prod_scal(Rij.dimension_tot(0), Nph);
@@ -173,7 +173,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
         if (Type_diss == "tau")
           secmem_en *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
         else if (Type_diss == "omega")
-          secmem_en *= (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* (tab_diss(e, n) <= 0) ? 0 : (max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n))) ;
+          secmem_en *= (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* ((tab_diss(e, n) <= 0) ? 0 : (max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
         secmem(e, n) += secmem_en;
       }
 }
