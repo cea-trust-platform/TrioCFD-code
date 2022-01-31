@@ -111,7 +111,8 @@ Lire pb
 {
 	Navier_Stokes_QC
 	{
-		solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-8 }
+		/* solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-8 } */
+		solveur_pression petsc cholesky { }
 		convection { amont }
 		diffusion { }
 		conditions_initiales {

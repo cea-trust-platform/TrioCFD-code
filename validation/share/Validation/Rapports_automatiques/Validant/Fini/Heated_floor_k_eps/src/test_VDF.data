@@ -71,7 +71,7 @@ Read pb
        		solveur_pression Gcp 
 		{ 
 			precond ssor { omega 1.5 } 
-                        seuil 1.e-8
+                        seuil 1.e-10
 			impr
                 } 
        		convection { Quick }
