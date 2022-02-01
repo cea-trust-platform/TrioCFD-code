@@ -104,14 +104,16 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
   const DoubleTab&                      tab_tau = semi_impl.count("tau") ? tau.passe() : tau.valeurs();
-  const DoubleTab&                  tab_k_passe = equation().probleme().get_champ("k").passe();
+//  const DoubleTab&                  tab_k_passe = equation().probleme().get_champ("k").passe();
   const IntTab&                             fcl = tau.fcl();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
   const Op_Diff_Turbulent_CoviMAC_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_CoviMAC_Elem, eq.operateur(0).l_op_base());
   const DoubleTab&                       mu_tot = Op_diff_loc.nu();
-  const Op_Diff_Turbulent_CoviMAC_Face& op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.corr.valeur());
-  const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();
+//  const Op_Diff_Turbulent_CoviMAC_Face& op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
+//  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.corr.valeur());
+//  const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();
+  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique();
+  const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
 
   int N = tab_tau.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;
 
@@ -132,7 +134,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
             int f_bord;
             if ( e < ne_tot) //contrib d'un element
               {
-                double val_e = sqrt(std::max(0., tab_tau(e, n))) ; // Si implicite ou pas
+                double val_e = sqrt(std::max(1e-10, tab_tau(e, n))) ; // Si implicite ou pas
                 grad_sqrt_tau(f, n) += f_w(j) * val_e;
               }
             else if (fcl(f_bord = e - ne_tot, 0) == 3) //contrib d'un bord : seul Dirichlet contribue
@@ -159,7 +161,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   // Creation of a limiter so that (|additionnal diffusion| < |5*diffusion|) ; on regarde seulement le second membre
 
   DoubleTrav sec_m(tab_tau); //residus
-  matrices_t mat_m; //derivees
+  matrices_t mat_m; //derivees vides
   eq.operateur(0).l_op_base().ajouter_blocs(mat_m, sec_m, semi_impl);
 
   for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
@@ -169,11 +171,16 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
         for (int d = 0; d<D; d++) secmem_en += grad_sqrt_tau(nf_tot + D*e+d, n)*grad_sqrt_tau(nf_tot + D*e+d, n) ;
         secmem_en *= -8  * mu_tot(e, n);
 
-        // limiteur
-        if (limiter_*std::abs(sec_m(e,n)) < std::abs(secmem_en)) secmem_en *= limiter_*std::abs(sec_m(e,n))/std::abs(secmem_en);
+        int limiter_used = 0;
+
+        // limiteur 1 : au plus 5 fois la diffusion
+        if (4*std::abs(sec_m(e,n)) < std::abs(secmem_en)) {secmem_en *= 4*std::abs(sec_m(e,n))/std::abs(secmem_en); limiter_used = 1;}
+        // limiteur 2 : au plus 1.33 fois la dissipation
+        if (1.3333333*0.075 * alpha_rho(e, n) < std::abs(secmem_en)) {secmem_en *= 1.3333333*0.075 * alpha_rho(e, n)/std::abs(secmem_en); limiter_used = 2;}
         // Jacobienne ; si on est dans le limiteur, pas de derivee
-        else if (!(Mtau == nullptr))
+        if (!(Mtau == nullptr)&&(limiter_used == 0))
           {
+            limiter_used = 3;
             for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
               {
                 int f = zone.vej(i);
@@ -182,16 +189,19 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
                     int ed = f_e(j);
                     if ( ed < ne_tot) for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
                         {
-                          double inv_sqrt_tau = sqrt(tab_k_passe(ed, n) / std::max(tab_k_passe(ed, n) * tab_tau(ed, n), visc_turb.limiteur() * nu_visc(ed, n)));
-                          (*Mtau)(N * e + n, N * ed + n) += 8  * mu_tot(e, n) * sqrt(2) * grad_sqrt_tau(nf_tot + D*ed+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau;
+//                          double inv_sqrt_tau = sqrt(tab_k_passe(ed, n) / std::max(tab_k_passe(ed, n) * tab_tau(ed, n), visc_turb.limiteur() * nu_visc(ed, n)));
+                          double inv_sqrt_tau = (tab_tau(ed, n) > 1e-10) ? sqrt(1/tab_tau(ed, n)) : 1e5;
+                          (*Mtau)(N * e + n, N * ed + n) += 8  * mu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau;
                         }
                   }
               }
           }
-
+//        Cerr << e << "--- tau  " << tab_tau(e,n) << "  secmem  " << secmem_en << "limiter   " << limiter_used << finl;
+        Cerr << limiter_used ;
         secmem(e, n) += secmem_en;
 
       }
+  Cerr << finl ;
 }
 
 

@@ -97,6 +97,7 @@ void Dissipation_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t m
           {
             double secmem_en  = beta_omega * alpha_rho(e, m) ;
             secmem(e, m) += secmem_en ;
+//            Cerr << e << "  secmem  " << secmem_en << finl;
             for (auto &&i_m : matrices)
               {
                 Matrice_Morse& mat = *i_m.second;
