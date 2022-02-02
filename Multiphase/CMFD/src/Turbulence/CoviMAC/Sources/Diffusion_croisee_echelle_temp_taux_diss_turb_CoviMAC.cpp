@@ -85,10 +85,10 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
   const Conds_lim&          cls_k 				= ch_k.zone_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
   const IntTab&             fcl_k 				= ch_k.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
-  const Champ_P0_CoviMAC& 	ch_diss 		= ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()); 		// Champ tau
+  const Champ_P0_CoviMAC& 	ch_diss 		= ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()); 		// Champ tau ou omega
   const DoubleTab& 			diss_passe			= ch_diss.passe();
   const DoubleTab& 			      diss			= ch_diss.valeurs();
-  const Conds_lim& 		   	cls_diss			= ch_diss.zone_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau
+  const Conds_lim& 		   	cls_diss			= ch_diss.zone_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau ou omega
   const IntTab&				   fcl_diss 			= ch_diss.fcl(); // tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
   const int nf = zone.nb_faces(), D = dimension, nb_elem = zone.nb_elem(), nb_elem_tot = zone.nb_elem() ;
@@ -186,11 +186,11 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
             const Champ_Inc_base& 	ch_alpha_rho_tau 	= equation().champ_conserve();
             const DoubleTab& 			alpha_rho_tau		= ch_alpha_rho_tau.valeurs();
             const tabs_t& 			der_alpha_rho_tau 	= ch_alpha_rho_tau.derivees(); // dictionnaire des derivees
-
-            secmem(e, n) += sigma_d * alpha_rho_tau(e, n) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.);
+            double secmem_en = sigma_d * alpha_rho_tau(e, n) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.);
+            secmem(e, n) += secmem_en;
             if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= sigma_d * (der_alpha_rho_tau.count("alpha") ? der_alpha_rho_tau.at("alpha")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
             if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= sigma_d * (der_alpha_rho_tau.count("temperature") ? der_alpha_rho_tau.at("temperature")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
-            if (!(M==nullptr))     (*M)(N * e + n, N * e + n)-= sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en tau
+            if (!(M==nullptr))     (*M)(N * e + n, N * e + n)       -= sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en tau
             for (int mp = 0; mp<Np; mp++) if (!(Mp==nullptr))
                 (*Mp)(N * e + n, Np * e + mp)     	-= sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
           }

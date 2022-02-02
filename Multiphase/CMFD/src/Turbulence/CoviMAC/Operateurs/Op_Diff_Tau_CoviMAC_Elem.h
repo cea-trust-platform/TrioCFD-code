@@ -45,7 +45,7 @@ class Op_Diff_Tau_CoviMAC_Elem : public Op_Diff_Turbulent_CoviMAC_Elem
   Declare_instanciable( Op_Diff_Tau_CoviMAC_Elem ) ;
   virtual void completer();
   virtual void modifier_nu(DoubleTab& ) const; //prend en compte la diffusivite turbulente
-  virtual void remodifier_nu(DoubleTab& ) const;
+  virtual double calculer_dt_stab() const;
 
   virtual void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
   virtual void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;

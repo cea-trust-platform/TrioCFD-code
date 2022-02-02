@@ -49,8 +49,14 @@ class Op_Diff_Turbulent_CoviMAC_Elem : public Op_Diff_CoviMAC_Elem
   virtual void completer();
   virtual void modifier_nu(DoubleTab& ) const; //prend en compte la diffusivite turbulente
 
+  void creer_champ(const Motcle& motlu);
+  void mettre_a_jour(double temps);
+
 protected:
   Correlation corr; //correlation de transport turbulent
+
+  Champ_Fonc secmem_diff_; //gradient des vitesses de chaque phase
+  Motcle nom_secmem_diff_; //leurs noms
 };
 
 #endif /* Op_Diff_CoviMAC_Elem_included */
