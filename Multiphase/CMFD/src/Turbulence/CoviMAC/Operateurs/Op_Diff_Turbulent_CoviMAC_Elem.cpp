@@ -72,7 +72,7 @@ void Op_Diff_Turbulent_CoviMAC_Elem::mettre_a_jour(double temps)
       matrices_t mat_m; //derivees vides
       tabs_t semi_impl;
       semi_impl[equation().inconnue().le_nom().getString()] = equation().inconnue().passe();
-      ajouter_blocs(mat_m, sec_m, semi_impl); 
+      ajouter_blocs(mat_m, sec_m, semi_impl);
 
       int N = tab_tau.dimension(1), ne = zone.nb_elem() ;
 
