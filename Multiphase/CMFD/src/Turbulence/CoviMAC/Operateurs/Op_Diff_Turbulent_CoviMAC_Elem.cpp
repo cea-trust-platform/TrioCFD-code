@@ -64,7 +64,7 @@ void Op_Diff_Turbulent_CoviMAC_Elem::mettre_a_jour(double temps)
 {
   if (secmem_diff_.non_nul())
     {
-      const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
+      //    const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
       const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
       const DoubleTab&                      tab_tau = tau.valeurs();
 
@@ -72,12 +72,13 @@ void Op_Diff_Turbulent_CoviMAC_Elem::mettre_a_jour(double temps)
       matrices_t mat_m; //derivees vides
       tabs_t semi_impl;
       semi_impl[equation().inconnue().le_nom().getString()] = equation().inconnue().passe();
-      ajouter_blocs(mat_m, sec_m, semi_impl);
+      secmem_diff_.valeurs() = 0;
+      ajouter_blocs({}, secmem_diff_.valeurs());
 
-      int N = tab_tau.dimension(1), ne = zone.nb_elem() ;
+      /*      int N = tab_tau.dimension(1), ne = zone.nb_elem() ;
 
-      for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
-          secmem_diff_(e,n) = sec_m(e, n) ;
+            for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
+                secmem_diff_.valeurs()(e,n) = sec_m(e, n) ; */
     }
   Op_Diff_CoviMAC_Elem::mettre_a_jour(temps);
 }

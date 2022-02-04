@@ -323,7 +323,8 @@ void Echelle_temporelle_turbulente::calculer_alpha_rho_tau(const Objet_U& obj, D
   for (i = 0; i < Nl; i++) for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * tau(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a une zone_dis_base */
-  DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab(), b_rho, b_tau = eqn.inconnue()->valeur_aux_bords();
+  DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab() ;
+  DoubleTab b_rho, b_tau = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_tau.dimension_tot(0);
   if (ch_rho.a_une_zone_dis_base()) b_rho = ch_rho.valeur_aux_bords();
   else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Zone_VF, eqn.zone_dis().valeur()).xv_bord(), b_rho);
