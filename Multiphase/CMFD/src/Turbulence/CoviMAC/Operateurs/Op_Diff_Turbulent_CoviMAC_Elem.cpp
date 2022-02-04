@@ -40,46 +40,16 @@ Entree& Op_Diff_Turbulent_CoviMAC_Elem::readOn( Entree& is )
 {
   //lecture de la correlation de viscosite turbulente
   corr.typer_lire(equation().probleme(), "transport_turbulent", is);
-
-  champs_compris_.ajoute_nom_compris(nom_secmem_diff_ = Nom("Diffusion_turbulente_") + equation().que_suis_je());
-
   return is;
 }
 
 void Op_Diff_Turbulent_CoviMAC_Elem::creer_champ(const Motcle& motlu)
 {
-  if ((nom_secmem_diff_==motlu) && !(secmem_diff_.non_nul()))
-    {
-      int N = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()).valeurs().dimension(1) ;
-      Noms noms(N), unites(N);
-      for (int n = 0 ; n<N ; n++) {unites[0] = "m2/s"; noms[0] = nom_secmem_diff_;}
-      Motcle typeChamp = "champ_elem" ;
-      ref_cast(CoviMAC_discretisation, equation().discretisation()).discretiser_champ(typeChamp, equation().zone_dis(), scalaire, noms , unites, N, 0, secmem_diff_);
-      champs_compris_.ajoute_champ(secmem_diff_);
-    }
   Op_Diff_CoviMAC_Elem::creer_champ(motlu);
 }
 
 void Op_Diff_Turbulent_CoviMAC_Elem::mettre_a_jour(double temps)
 {
-  if (secmem_diff_.non_nul())
-    {
-      //    const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
-      const Champ_P0_CoviMAC&                   tau = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur());
-      const DoubleTab&                      tab_tau = tau.valeurs();
-
-      DoubleTrav sec_m(tab_tau); //residus
-      matrices_t mat_m; //derivees vides
-      tabs_t semi_impl;
-      semi_impl[equation().inconnue().le_nom().getString()] = equation().inconnue().passe();
-      secmem_diff_.valeurs() = 0;
-      ajouter_blocs({}, secmem_diff_.valeurs());
-
-      /*      int N = tab_tau.dimension(1), ne = zone.nb_elem() ;
-
-            for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
-                secmem_diff_.valeurs()(e,n) = sec_m(e, n) ; */
-    }
   Op_Diff_CoviMAC_Elem::mettre_a_jour(temps);
 }
 
