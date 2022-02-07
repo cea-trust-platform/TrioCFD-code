@@ -55,14 +55,18 @@ void Op_Diff_Tau_CoviMAC_Elem::modifier_nu(DoubleTab& mu) const // Multiplicatio
 {
   Op_Diff_Turbulent_CoviMAC_Elem::modifier_nu(mu);
   const DoubleTab& tau = equation().probleme().get_champ("tau").passe();
-  int i, nl = mu.dimension_tot(0), n, N = mu.dimension(1), d, D = dimension;
+  int i, nl = mu.dimension_tot(0), n, N = mu.dimension(1), D = dimension;
   // Ici on divise mu par 1/tau^2
   if (mu.nb_dim() == 2) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) //isotrope
-        mu(i, n) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(i,n)*tau(i,n)) : 1);
-  else if (mu.nb_dim() == 3) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope diagonal
-          mu(i, n, d) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(i,n)*tau(i,n)) : 1);
-  else for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope complet
-          mu(i, n, d, d) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(i,n)*tau(i,n)) : 1);
+        {
+//          if ( (i == 100) | (i == 109) | (i == 199)) Cerr << i << "  " << mu(i, n) << "  " ;
+          mu(i, n) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
+//          if ( (i == 100) | (i == 109) | (i == 199)) Cerr << i << "  " << mu(i, n) << "  " ;
+        }
+  else if (mu.nb_dim() == 3) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (int d = 0; d < D; d++) //anisotrope diagonal
+          mu(i, n, d) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
+  else for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (int d1 = 0; d1 < D; d1++) for (int d2 = 0; d2 < D; d2++) //anisotrope complet
+            mu(i, n, d1, d2) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
 }
 
 double Op_Diff_Tau_CoviMAC_Elem::calculer_dt_stab() const
@@ -79,11 +83,11 @@ double Op_Diff_Tau_CoviMAC_Elem::calculer_dt_stab() const
 
   DoubleTrav nu_loc(nu_); //nu local sans le 1/tau^2 pour stabilite
   if (nu_.nb_dim() == 2) for (e = 0; e < zone.nb_elem(); e++) for (n = 0; n < N; n++) //isotrope
-        nu_loc(e, n) = nu_(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(e,n)*tau(e,n)) : 1);
+        nu_loc(e, n) = nu_(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
   else if (nu_.nb_dim() == 3) for (e = 0; e < zone.nb_elem(); e++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope diagonal
-          nu_loc(e, n, d) = nu_(e,n, d) / ((tau(e,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(e,n)*tau(e,n)) : 1);
+          nu_loc(e, n, d) = nu_(e,n, d) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
   else for (e = 0; e < zone.nb_elem(); e++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope complet
-          nu_loc(e, n, d, d) = nu_(e,n, d, d) / ((tau(e,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(e,n)*tau(e,n)) : 1);
+          nu_loc(e, n, d, d) = nu_(e,n, d, d) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
 
   double dt = 1e10;
   DoubleTrav flux(N);
@@ -107,7 +111,7 @@ void Op_Diff_Tau_CoviMAC_Elem::dimensionner_blocs(matrices_t matrices, const tab
 
 void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const DoubleTab& tau = equation().probleme().get_champ("tau").valeurs();
+  const DoubleTab& tau = equation().probleme().get_champ("tau").passe();
 
   update_phif();
   const std::string& nom_inco = equation().inconnue().le_nom().getString();
@@ -141,29 +145,34 @@ void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& sec
   for (f = 0; f < zone0.nb_faces(); f++)
     {
       for (flux = 0, i = phif_d(f); i < phif_d(f + 1); i++)
-        if ((fb = (eb = phif_e(i)) - zone0.nb_elem_tot()) < 0) //element
-          {
-            for (n = 0; n < N[0]; n++) flux(n) += phif_c(i, n) * fs[0](f) * inco[0](eb, n);
-            if (mat[0]) for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //derivees
-                    (*mat[0])(N[0] * e + n, N[0] * eb + n) += (j ? 1 : -1) * phif_c(i, n) * fs[0](f) / ((tau(e,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(e,n)*tau(e,n)) : 1) ;
-          }
-        else if (fcl[0](fb, 0) == 1 || fcl[0](fb, 0) == 2) for (n = 0; n < N[0]; n++) //Echange_impose_base
-            flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Echange_impose_base, cls[0].get()[fcl[0](fb, 1)].valeur()).T_ext(fcl[0](fb, 2), n) : 0);
-        else if (fcl[0](fb, 0) == 4) for (n = 0; n < N[0]; n++) //Neumann non homogene
-            flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Neumann_paroi, cls[0].get()[fcl[0](fb, 1)].valeur()).flux_impose(fcl[0](fb, 2), n) : 0);
-        else if (fcl[0](fb, 0) == 6) for (n = 0; n < N[0]; n++) //Dirichlet
-            flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Dirichlet, cls[0].get()[fcl[0](fb, 1)].valeur()).val_imp(fcl[0](fb, 2), n) : 0);
+        {
+          if ((fb = (eb = phif_e(i)) - zone0.nb_elem_tot()) < 0) //element
+            {
+              for (n = 0; n < N[0]; n++) flux(n) += phif_c(i, n) * fs[0](f) * tau(eb, n);
+              if (mat[0]) for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //derivees
+                      (*mat[0])(N[0] * e + n, N[0] * eb + n) += (j ? 1 : -1) * phif_c(i, n) * fs[0](f) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_) ;
+            }
+          else if (fcl[0](fb, 0) == 1 || fcl[0](fb, 0) == 2) for (n = 0; n < N[0]; n++) //Echange_impose_base
+              flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Echange_impose_base, cls[0].get()[fcl[0](fb, 1)].valeur()).T_ext(fcl[0](fb, 2), n) : 0);
+          else if (fcl[0](fb, 0) == 4) for (n = 0; n < N[0]; n++) //Neumann non homogene
+              flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Neumann_paroi, cls[0].get()[fcl[0](fb, 1)].valeur()).flux_impose(fcl[0](fb, 2), n) : 0);
+          else if (fcl[0](fb, 0) == 6) for (n = 0; n < N[0]; n++) //Dirichlet
+              flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Dirichlet, cls[0].get()[fcl[0](fb, 1)].valeur()).val_imp(fcl[0](fb, 2), n) : 0);
+          else if (fcl[0](fb, 0) != 5) Cerr <<  "condslim" << fcl[0](fb, 0) ;
+        }
 
       for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //second membre -> amont/aval
-            secmem_loc(e, n) += (j ? -1 : 1) * flux(n) ;
-      if (f < zone0.premiere_face_int()) for (n = 0; n < N[0]; n++) flux_bords_(f, n) = flux(n); //flux aux bords
+            {
+              secmem_loc(e, n) += (j ? -1 : 1) * flux(n) ;
+//              if ( (e == 100) | (e == 109) | (e == 199) | (e==255)) Cerr << e << "  " << (j ? -1 : 1) * flux(n) << "  " << f_e[0](f, 0) << "  " << f_e[0](f, 1) << "   " ;
+            }
+
+      Matrice_Morse* mat2 = (matrices.count("tau")) ? matrices.at("tau") : nullptr;
+
+      for (e = 0 ; e<zone0.nb_elem() ; e++)  for (n = 0; n < N[0]; n++)
+          {
+            secmem(e,n) += secmem_loc(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
+            if (!(mat2==nullptr)) (*mat2)(N[0] * e + n, N[0] * e + n) -= 2 * secmem_loc(e,n) * ((tau(e,n) > limiter_tau_) ? tau(e,n)/limiter_tau_ : 0)  ;
+          }
     }
-
-  Matrice_Morse* mat2 = (matrices.count("tau")) ? matrices.at("tau") : nullptr;
-
-  for (e = 0 ; e<zone0.nb_elem() ; e++)  for (n = 0; n < N[0]; n++)
-      {
-        secmem(e,n) += secmem_loc(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_*limiter_tau_/(tau(e,n)*tau(e,n)) : 1);
-        if (!(mat2==nullptr)) (*mat2)(N[0] * e + n, N[0] * e + n) -= 2 * secmem_loc(e,n) * ((tau(e,n) > limiter_tau_) ? tau(e,n)/(limiter_tau_*limiter_tau_) : 0)  ;
-      }
 }
