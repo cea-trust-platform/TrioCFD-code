@@ -59,9 +59,7 @@ void Op_Diff_Tau_CoviMAC_Elem::modifier_nu(DoubleTab& mu) const // Multiplicatio
   // Ici on divise mu par 1/tau^2
   if (mu.nb_dim() == 2) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) //isotrope
         {
-//          if ( (i == 100) | (i == 109) | (i == 199)) Cerr << i << "  " << mu(i, n) << "  " ;
           mu(i, n) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
-//          if ( (i == 100) | (i == 109) | (i == 199)) Cerr << i << "  " << mu(i, n) << "  " ;
         }
   else if (mu.nb_dim() == 3) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (int d = 0; d < D; d++) //anisotrope diagonal
           mu(i, n, d) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
@@ -94,7 +92,7 @@ double Op_Diff_Tau_CoviMAC_Elem::calculer_dt_stab() const
   for (e = 0; e < zone.nb_elem(); e++)
     {
       for (flux = 0, i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) for (n = 0; n < N; n++)
-          flux(n) += zone.nu_dot(&nu_, e, n, &nf(f, 0), &nf(f, 0)) / vf(f);
+          flux(n) += zone.nu_dot(&nu_loc, e, n, &nf(f, 0), &nf(f, 0)) / vf(f);
       for (n = 0; n < N; n++) if ((!alp || (*alp)(e, n) > 1e-3) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
           dt = min(dt, pe(e) * ve(e) * (alp ? (*alp)(e, n) : 1) * (lambda(!cL * e, n) / diffu(!cD * e, n)) / flux(n));
       if (dt < 0) abort();
@@ -162,17 +160,14 @@ void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& sec
         }
 
       for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //second membre -> amont/aval
-            {
-              secmem_loc(e, n) += (j ? -1 : 1) * flux(n) ;
-//              if ( (e == 100) | (e == 109) | (e == 199) | (e==255)) Cerr << e << "  " << (j ? -1 : 1) * flux(n) << "  " << f_e[0](f, 0) << "  " << f_e[0](f, 1) << "   " ;
-            }
-
-      Matrice_Morse* mat2 = (matrices.count("tau")) ? matrices.at("tau") : nullptr;
-
-      for (e = 0 ; e<zone0.nb_elem() ; e++)  for (n = 0; n < N[0]; n++)
-          {
-            secmem(e,n) += secmem_loc(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
-            if (!(mat2==nullptr)) (*mat2)(N[0] * e + n, N[0] * e + n) -= 2 * secmem_loc(e,n) * ((tau(e,n) > limiter_tau_) ? tau(e,n)/limiter_tau_ : 0)  ;
-          }
+            secmem_loc(e, n) += (j ? -1 : 1) * flux(n) ;
     }
+  Matrice_Morse* mat2 = (matrices.count("tau")) ? matrices.at("tau") : nullptr;
+
+  for (e = 0 ; e<zone0.nb_elem() ; e++)  for (n = 0; n < N[0]; n++)
+      {
+        secmem(e,n) += secmem_loc(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
+        if (!(mat2==nullptr)) (*mat2)(N[0] * e + n, N[0] * e + n) -= 2 * secmem_loc(e,n) * ((tau(e,n) > limiter_tau_) ? tau(e,n)/limiter_tau_ : 0)  ;
+      }
+
 }

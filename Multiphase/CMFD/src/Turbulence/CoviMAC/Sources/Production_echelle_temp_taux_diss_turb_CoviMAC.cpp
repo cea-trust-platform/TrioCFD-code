@@ -87,6 +87,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
   const DoubleTab&                        tab_k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k")).valeurs();
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
+  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 
   int Nph = pb.get_champ("vitesse").valeurs().line_size(), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
   int N = tab_diss.line_size();
@@ -119,8 +120,8 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
               {
                 double deriv = prod_scal(e, n);
                 if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
-                  deriv *= (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
-                else deriv *= (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
+                  deriv *=    pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
+                else deriv *= pe(e) * ve(e) * (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
                 mat(N * e + n, N * e + n) += deriv;
               }
         }
@@ -133,7 +134,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
                 double deriv = prod_scal(e, n);
                 if (tab_diss(e, n) <= 0) deriv *= 0 ;
                 else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
-                else deriv *= (1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) / tab_k(e, n) ;
+                else deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) / tab_k(e, n) ;
                 mat(N * e + n, N * e + n) += deriv;
               }
         }
@@ -147,7 +148,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
                   {
                     double deriv = prod_scal(e, n);
                     if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
-                      deriv *= (1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
+                      deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
                     else deriv *= 0;
                     mat(N * e + n, N * e + n) += deriv;
                   }
@@ -158,7 +159,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
                   double deriv = prod_scal(e, n);
                   if (tab_diss(e, n) <= 0) deriv *= 0 ;
                   else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
-                  else deriv *= (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
+                  else deriv *= pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
                   mat(N * e + n, N * e + n) += deriv;
                 }
 
@@ -171,9 +172,9 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
       {
         double secmem_en = prod_scal(e, n);
         if (Type_diss == "tau")
-          secmem_en *= alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
+          secmem_en *= pe(e) * ve(e) *      alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
         else if (Type_diss == "omega")
-          secmem_en *= (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* ((tab_diss(e, n) <= 0) ? 0 : (max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
+          secmem_en *= pe(e) * ve(e) * (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* ((tab_diss(e, n) <= 0) ? 0 : (max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
         secmem(e, n) += secmem_en;
       }
 }

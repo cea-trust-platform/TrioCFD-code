@@ -51,7 +51,7 @@ class Op_Diff_Tau_CoviMAC_Elem : public Op_Diff_Turbulent_CoviMAC_Elem
   virtual void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
 
 protected :
-  double limiter_tau_ = 1.e-8 ;
+  double limiter_tau_ = 1.e-6 ;
 
 };
 

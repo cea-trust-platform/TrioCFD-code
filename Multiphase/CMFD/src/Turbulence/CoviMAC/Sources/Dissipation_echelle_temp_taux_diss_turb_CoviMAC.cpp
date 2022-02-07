@@ -78,6 +78,7 @@ void Dissipation_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t m
   const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique();
   const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
   const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
+  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 
   const int nb_elem = zone.nb_elem(), N = diss.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
   const int Na = sub_type(Pb_Multiphase,equation().probleme()) ? equation().probleme().get_champ("alpha").valeurs().line_size() : 1;
@@ -95,28 +96,28 @@ void Dissipation_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t m
       {
         if (Type_diss == "tau")
           {
-            double secmem_en  = beta_omega * alpha_rho(e, m) ;
+            double secmem_en  = pe(e) * ve(e) * beta_omega * alpha_rho(e, m) ;
             secmem(e, m) += secmem_en ;
 //            Cerr << e << "  secmem  " << secmem_en << finl;
             for (auto &&i_m : matrices)
               {
                 Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 		mat(N * e + m, Na * e + m) -= beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, m) : 0 );			// derivee par rapport au taux de vide
-                if (i_m.first == "temperature") mat(N * e + m, Nt * e + m) -= beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, m) : 0 );// derivee par rapport a la temperature
-                if (i_m.first == "pression") 	mat(N * e + m, Np * e + mp) 	-= beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, m) : 0 );		// derivee par rapport a la pression
+                if (i_m.first == "alpha") 		mat(N * e + m, Na * e + m)   -= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, m) : 0 );			// derivee par rapport au taux de vide
+                if (i_m.first == "temperature") mat(N * e + m, Nt * e + m) -= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, m) : 0 );// derivee par rapport a la temperature
+                if (i_m.first == "pression") 	mat(N * e + m, Np * e + mp)  -= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, m) : 0 );		// derivee par rapport a la pression
               }
           }
         else if (Type_diss == "omega")
           {
-            double secmem_en  = - beta_omega * alpha_rho(e, m) * diss(e,m) * diss(e,m);
+            double secmem_en  = - pe(e) * ve(e) * beta_omega * alpha_rho(e, m) * diss(e,m) * diss(e,m);
             secmem(e, m) += secmem_en ;
             for (auto &&i_m : matrices)
               {
                 Matrice_Morse& mat = *i_m.second;
-                if (i_m.first == "alpha") 		mat(N * e + m, Na * e + m) += beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, m) : 0 ) * diss(e,m) * diss(e,m);			// derivee par rapport au taux de vide
-                if (i_m.first == "temperature") mat(N * e + m, Nt * e + m) += beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, m) : 0 ) * diss(e,m) * diss(e,m);// derivee par rapport a la temperature
-                if (i_m.first == "pression") 	mat(N * e + m, Np * e + mp) 	+= beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, m) : 0 ) * diss(e,m) * diss(e,m);		// derivee par rapport a la pression
-                if (i_m.first == "omega")   mat(N * e + m, N * e + m) 	+= beta_omega * alpha_rho(e, m) *2* diss(e,m) ;
+                if (i_m.first == "alpha") 		mat(N * e + m, Na * e + m)  += pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e, m) : 0 ) * diss(e,m) * diss(e,m);			// derivee par rapport au taux de vide
+                if (i_m.first == "temperature") mat(N * e + m, Nt * e + m)+= pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e, m) : 0 ) * diss(e,m) * diss(e,m);// derivee par rapport a la temperature
+                if (i_m.first == "pression") 	mat(N * e + m, Np * e + mp) += pe(e) * ve(e) * beta_omega * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e, m) : 0 ) * diss(e,m) * diss(e,m);		// derivee par rapport a la pression
+                if (i_m.first == "omega")   mat(N * e + m, N * e + m)   	+= pe(e) * ve(e) * beta_omega * alpha_rho(e, m) *2* diss(e,m) ;
               }
           }
       }

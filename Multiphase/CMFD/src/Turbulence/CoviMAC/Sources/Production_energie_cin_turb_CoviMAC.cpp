@@ -63,6 +63,7 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
+  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 
   int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
   int N = equation().inconnue()->valeurs().line_size();
@@ -76,7 +77,7 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
         double secmem_en = 0;
         for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
             secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
-        secmem_en *= (-1) * tab_alp(e, n) * tab_rho(e, n) ;
+        secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
         secmem(e, n) += secmem_en;
       }
 }
