@@ -34,6 +34,8 @@
 #include <Op_Diff_Turbulent_CoviMAC_Face.h>
 #include <Navier_Stokes_std.h>
 #include <Viscosite_turbulente_base.h>
+#include <ConstDoubleTab_parts.h>
+
 
 Implemente_instanciable(Production_energie_cin_turb_CoviMAC,"Production_energie_cin_turb_P0_CoviMAC", Source_base);
 
@@ -57,26 +59,27 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   const Zone_CoviMAC&                      zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
-  const grad_Champ_Face_CoviMAC&           grad = ref_cast(grad_Champ_Face_CoviMAC, eq_qdm.get_champ("gradient_vitesse"));
-  const DoubleTab&                     tab_grad = grad.valeurs();
+  const DoubleTab&                     tab_grad = pb.get_champ("gradient_vitesse").passe();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
   const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 
-  int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nf_tot = zone.nb_faces_tot(), ne = zone.nb_elem(), D = dimension ;
+  int Nph = pb.get_champ("vitesse").valeurs().dimension(1), nb_elem = zone.nb_elem(), D = dimension, nf_tot = zone.nb_faces_tot() ;
   int N = equation().inconnue()->valeurs().line_size();
 
   DoubleTrav Rij(0, Nph, D, D);
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
 
-  for(int e = 0 ; e < ne ; e++) for(int n = 0; n<N ; n++)
+  for(int e = 0 ; e < nb_elem ; e++) for(int n = 0; n<N ; n++)
       {
         double secmem_en = 0;
         for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
-            secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+            {
+              secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
+            }
         secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
         secmem(e, n) += secmem_en;
       }

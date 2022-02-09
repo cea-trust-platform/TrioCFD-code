@@ -65,6 +65,7 @@ void Op_Diff_Tau_CoviMAC_Elem::modifier_nu(DoubleTab& mu) const // Multiplicatio
           mu(i, n, d) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
   else for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (int d1 = 0; d1 < D; d1++) for (int d2 = 0; d2 < D; d2++) //anisotrope complet
             mu(i, n, d1, d2) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
+  mu.echange_espace_virtuel();
 }
 
 double Op_Diff_Tau_CoviMAC_Elem::calculer_dt_stab() const

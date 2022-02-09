@@ -67,12 +67,12 @@ void Op_Diff_Turbulent_CoviMAC_Face::creer_champ(const Motcle& motlu)
   int i = noms_nu_t_post_.rang(motlu);
   if (i >= 0 && !(nu_t_post_[i].non_nul()))
     {
-      const Pb_Multiphase& pb = ref_cast(Pb_Multiphase, equation().probleme());
       const CoviMAC_discretisation dis = ref_cast(CoviMAC_discretisation, equation().discretisation());
       Noms noms(1), unites(1);
-      noms[0] = Nom("viscosite_turbulente_") + pb.nom_phase(i);
+      noms[0] = noms_nu_t_post_[i];
       Motcle typeChamp = "champ_elem" ;
       dis.discretiser_champ(typeChamp, equation().zone_dis(), scalaire, noms , unites, 1, 0, nu_t_post_[0]);
+      champs_compris_.ajoute_champ(nu_t_post_[i]);
     }
 }
 
@@ -108,4 +108,5 @@ void Op_Diff_Turbulent_CoviMAC_Face::modifier_nu(DoubleTab& mu) const
   else if (mu.nb_dim() == 4) //nu anisotrope complet
     for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) mu(i, n, d, d) += (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * nu_t(i, n);
   else abort();
+  mu.echange_espace_virtuel();
 }
