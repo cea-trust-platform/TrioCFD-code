@@ -63,10 +63,10 @@ public:
   void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                  const Frontiere& frontF,IntVect& connect,
                  const DoubleTab& incoG,
-                 DoubleTab& tab, int nb_comp);
+                 DoubleTab& tab, int nb_comp) override;
   void calculer(Zone_VF& zonef,
                 Zone_VF& zoneg,
-                IntVect& connect_ff);
+                IntVect& connect_ff) override;
 
 private:
 

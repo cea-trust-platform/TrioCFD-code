@@ -48,7 +48,7 @@ class EqnF22VDF : public EqnF22base, public Calcul_Production_K_VDF
 
 public:
 
-  void resoudre();
+  void resoudre() override;
 
 private:
   REF(Champ_Inc) KEps;

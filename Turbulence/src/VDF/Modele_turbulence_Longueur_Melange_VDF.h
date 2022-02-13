@@ -42,16 +42,16 @@ class Modele_turbulence_Longueur_Melange_VDF : public Mod_turb_hyd_RANS_0_eq
   Declare_instanciable_sans_constructeur(Modele_turbulence_Longueur_Melange_VDF);
 
 public:
-  void set_param(Param& param);
+  void set_param(Param& param) override;
   Modele_turbulence_Longueur_Melange_VDF();
-  void associer(const Zone_dis&, const Zone_Cl_dis&);
+  void associer(const Zone_dis&, const Zone_Cl_dis&) override;
 
 protected:
 
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
-  virtual void calculer_energie_cinetique_turb();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_energie_cinetique_turb() override;
   void calculer_Sij2();
-  int preparer_calcul();
+  int preparer_calcul() override;
 
   DoubleVect Sij2;
 

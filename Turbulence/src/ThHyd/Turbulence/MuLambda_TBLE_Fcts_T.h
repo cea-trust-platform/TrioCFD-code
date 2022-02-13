@@ -41,12 +41,12 @@ class MuLambda_TBLE_Fcts_T : public MuLambda_TBLE_base
 
 public :
 
-  void initialiser(const Milieu_base&);
+  void initialiser(const Milieu_base&) override;
 
   // "ind" represente le numero d'une maille TBLE sur l'instance eq_couch_lim referencee dans cette classe
-  virtual double getNu(REF(Eq_couch_lim) eq_T, int ind) ;
+  double getNu(REF(Eq_couch_lim) eq_T, int ind) override ;
 
-  virtual double getAlpha(REF(Eq_couch_lim) eq_T, int ind) ;
+  double getAlpha(REF(Eq_couch_lim) eq_T, int ind) override ;
 
   void setFcts(Nom&, Nom&) ;
 

@@ -47,15 +47,15 @@ public :
 
 protected :
 
-  void renorm_Ec(void);
-  void init_calc_spectre(void);
-  void calcul_spectre(void);
-  void sorties_globales(void);
+  void renorm_Ec(void) override;
+  void init_calc_spectre(void) override;
+  void calcul_spectre(void) override;
+  void sorties_globales(void) override;
   void calcul_Ec_D(double&, double&) ;
 
   void ch_vit_pour_fft(DoubleTab& );
   void ch_vit_pour_fft_operateur(DoubleTab& , DoubleTab& );
-  void calcul_spectre_operateur(int , DoubleTab& ,DoubleTab& ,double) ;
+  void calcul_spectre_operateur(int , DoubleTab& ,DoubleTab& ,double) override ;
   void calcul_skewness_ordre_2(double& );
 };
 

@@ -37,24 +37,24 @@ class Convection_Diffusion_Temperature_FT_Disc: public Convection_Diffusion_Temp
 public:
 
   Convection_Diffusion_Temperature_FT_Disc();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual void preparer_pas_de_temps(void);
   virtual void corriger_pas_de_temps(double dt);
-  DoubleTab&   derivee_en_temps_inco(DoubleTab&);
-  void         mettre_a_jour(double temps);
+  DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
+  void         mettre_a_jour(double temps) override;
 
   void         calculer_grad_t();
   void         calculer_mpoint(Champ_base& mpoint);
   virtual void suppression_interfaces(const IntVect& num_compo, const ArrOfInt& flags_compo_a_supprimer, int nouvelle_phase);
 
-  void                associer_milieu_base(const Milieu_base& milieu);
-  Milieu_base&        milieu();
-  const Milieu_base& milieu() const;
-  const Champ_base& vitesse_pour_transport();
+  void                associer_milieu_base(const Milieu_base& milieu) override;
+  Milieu_base&        milieu() override;
+  const Milieu_base& milieu() const override;
+  const Champ_base& vitesse_pour_transport() override;
 
 
-  void    discretiser(void);
+  void    discretiser(void) override;
 
 protected:
   // Quelle phase cette equation concerne-t-elle ? 0 ou 1

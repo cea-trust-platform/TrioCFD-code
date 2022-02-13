@@ -33,7 +33,7 @@ class Paroi_scal_analytique_VEF  : public Paroi_scal_hyd_base_VEF
   Declare_instanciable(Paroi_scal_analytique_VEF);
 
 public:
-  virtual int calculer_scal(Champ_Fonc_base& );
+  int calculer_scal(Champ_Fonc_base& ) override;
 
 protected :
 

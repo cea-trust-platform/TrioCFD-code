@@ -42,8 +42,8 @@ class Source_Masse_Ajoutee : public Source_Action_Particules
 public :
 
   Source_Masse_Ajoutee();
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected :
 

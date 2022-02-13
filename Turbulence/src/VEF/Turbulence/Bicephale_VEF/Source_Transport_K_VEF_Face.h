@@ -67,10 +67,10 @@ class Source_Transport_K_VEF_Face : public Source_base,
 
 public:
 
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-  void mettre_a_jour(double temps)
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
+  void mettre_a_jour(double temps) override
   {
     Calcul_Production_K_VEF::mettre_a_jour(temps);
   }
@@ -82,8 +82,8 @@ protected:
   REF(Transport_K_ou_Eps)  mon_eq_transport_K;
   REF(Transport_K_ou_Eps)  mon_eq_transport_Eps;
 
-  virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_pb(const Probleme_base& pb) override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -106,9 +106,9 @@ class Source_Transport_K_anisotherme_VEF_Face :
 
 public:
 
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected:
 
@@ -139,9 +139,9 @@ class Source_Transport_K_aniso_concen_VEF_Face :
 
 public:
 
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected:
 
@@ -171,9 +171,9 @@ class Source_Transport_K_aniso_therm_concen_VEF_Face :
 
 public:
 
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected:
 

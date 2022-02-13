@@ -52,16 +52,16 @@ class ParoiVDF_TBLE_LRM : public Paroi_hyd_base_VDF
 
 public:
 
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab&);
-  int calculer_hyd(DoubleTab& , DoubleTab&);
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab&) override;
+  int calculer_hyd(DoubleTab& , DoubleTab&) override;
   int calculer_sous_couche_log(DoubleTab& ,double ,int ,int );
   Eq_couch_lim& get_eq_couch_lim(int i)
   {
     return eq_k_U_W[i];
   };
-  void imprimer_ustar(Sortie& os) const;
+  void imprimer_ustar(Sortie& os) const override;
 
 protected:
 

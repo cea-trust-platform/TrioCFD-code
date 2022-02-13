@@ -32,11 +32,11 @@ class Navier_Stokes_std_ALE: public Navier_Stokes_std
   Declare_instanciable(Navier_Stokes_std_ALE);
 
 public :
-  virtual void renewing_jacobians( DoubleTab& derivee );
-  virtual void div_ale_derivative( DoubleTrav& deriveeALE, double timestep, DoubleTab& derivee, DoubleTrav& secmemP );
-  virtual void update_pressure_matrix( void );
-  virtual void discretiser();
-  void mettre_a_jour(double);
+  void renewing_jacobians( DoubleTab& derivee ) override;
+  void div_ale_derivative( DoubleTrav& deriveeALE, double timestep, DoubleTab& derivee, DoubleTrav& secmemP ) override;
+  void update_pressure_matrix( void ) override;
+  void discretiser() override;
+  void mettre_a_jour(double) override;
 
 protected :
   Champ_Inc ALEMeshVelocity_;

@@ -38,7 +38,7 @@ class Imprimer_Fichiers_RANS_VDF : public Interprete
 {
   Declare_instanciable(Imprimer_Fichiers_RANS_VDF);
 public :
-  Entree& interpreter(Entree&);
+  Entree& interpreter(Entree&) override;
 
 //private :
 //  int temperature;

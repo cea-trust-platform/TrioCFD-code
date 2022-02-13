@@ -58,10 +58,10 @@ class Paroi_Cisaillement_Imp_VEF : public Paroi_hyd_base_VEF , Paroi_UTAU_IMP_Im
 
 public:
 
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
 
 private:

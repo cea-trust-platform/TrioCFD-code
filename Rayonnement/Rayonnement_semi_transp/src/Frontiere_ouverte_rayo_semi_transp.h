@@ -40,8 +40,8 @@ class Frontiere_ouverte_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, publ
 
 public :
 
-  const Cond_lim_base& la_cl() const;
-  void completer();
+  const Cond_lim_base& la_cl() const override;
+  void completer() override;
 
   inline Champ_front& temperature_bord();
   inline const Champ_front& temperature_bord() const;

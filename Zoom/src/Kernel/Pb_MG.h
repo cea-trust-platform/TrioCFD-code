@@ -62,16 +62,16 @@ public:
   //                                              //
   //////////////////////////////////////////////////
 
-  virtual void initialize();
-  virtual void terminate();
-  virtual double computeTimeStep(bool& stop) const;
-  virtual bool initTimeStep(double dt);
-  virtual bool solveTimeStep();
-  virtual void validateTimeStep();
-  virtual bool isStationary() const;
+  void initialize() override;
+  void terminate() override;
+  double computeTimeStep(bool& stop) const override;
+  bool initTimeStep(double dt) override;
+  bool solveTimeStep() override;
+  void validateTimeStep() override;
+  bool isStationary() const override;
 
-  virtual int postraiter(int force=1);
-  virtual bool updateGivenFields();
+  int postraiter(int force=1) override;
+  bool updateGivenFields() override;
 
   ///////////////////////////////////////////////////////////
   //                                                       //

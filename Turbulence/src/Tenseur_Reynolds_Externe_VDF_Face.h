@@ -51,13 +51,13 @@ class Tenseur_Reynolds_Externe_VDF_Face : public Source_base, public Terme_Sourc
 
 public:
   Tenseur_Reynolds_Externe_VDF_Face();
-  ~Tenseur_Reynolds_Externe_VDF_Face();
+  ~Tenseur_Reynolds_Externe_VDF_Face() override;
 
-  void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double );
-  void completer();
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double ) override;
+  void completer() override;
 
 protected:
   void readNN();
@@ -69,7 +69,7 @@ protected:
 
   REF(Zone_VDF) la_zone_VDF;
   REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 
   void Calcul_RSLambda();
   DoubleTab& Calcul_bij_TBNN(DoubleTab& resu) const;

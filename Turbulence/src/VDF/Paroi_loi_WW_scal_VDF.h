@@ -43,8 +43,8 @@ class Paroi_loi_WW_scal_VDF : public Paroi_scal_hyd_base_VDF
 public:
 
 
-  int calculer_scal(Champ_Fonc_base& );
-  int init_lois_paroi();
+  int calculer_scal(Champ_Fonc_base& ) override;
+  int init_lois_paroi() override;
 
 
 private:

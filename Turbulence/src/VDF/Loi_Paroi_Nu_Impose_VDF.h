@@ -55,8 +55,8 @@ class Loi_Paroi_Nu_Impose_VDF : public Paroi_scal_hyd_base_VDF //Turbulence_paro
   Declare_instanciable(Loi_Paroi_Nu_Impose_VDF);
 
 public:
-  int calculer_scal(Champ_Fonc_base& ) ;
-  void imprimer_nusselt(Sortie&) const;
+  int calculer_scal(Champ_Fonc_base& ) override ;
+  void imprimer_nusselt(Sortie&) const override;
 
 protected:
 

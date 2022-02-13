@@ -31,17 +31,17 @@ class Neumann_paroi_rayo_semi_transp_VEF : public Cond_Lim_rayo_semi_transp, pub
   Declare_instanciable(Neumann_paroi_rayo_semi_transp_VEF);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const;
-  const Cond_lim_base& la_cl() const;
-  void mettre_a_jour(double temps);
-  virtual double flux_impose(int i) const;
-  virtual double flux_impose(int i,int j) const;
+  int compatible_avec_eqn(const Equation_base&) const override;
+  const Cond_lim_base& la_cl() const override;
+  void mettre_a_jour(double temps) override;
+  double flux_impose(int i) const override;
+  double flux_impose(int i,int j) const override;
   inline Champ_front& temperature_bord();
   inline const Champ_front& temperature_bord() const;
 
   void calculer_temperature_bord(double temps);
 
-  void completer();
+  void completer() override;
 
 protected :
   Champ_front temperature_bord_;

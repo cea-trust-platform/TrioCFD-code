@@ -38,14 +38,14 @@ class Schema_Euler_Implicite_Stationnaire : public Schema_Euler_Implicite
   Declare_instanciable(Schema_Euler_Implicite_Stationnaire);
 
 public :
-  void set_param(Param& );
-  virtual int mettre_a_jour();
-  virtual int reprendre(Entree& );
-  void ajouter_inertie(Matrice_Base& mat_morse,DoubleTab& secmem,const Equation_base& eqn) const;
-  void initialize();
+  void set_param(Param& ) override;
+  int mettre_a_jour() override;
+  int reprendre(Entree& ) override;
+  void ajouter_inertie(Matrice_Base& mat_morse,DoubleTab& secmem,const Equation_base& eqn) const override;
+  void initialize() override;
 
-  void mettre_a_jour_dt_stab();
-  bool corriger_dt_calcule(double& dt_calc) const;
+  void mettre_a_jour_dt_stab() override;
+  bool corriger_dt_calcule(double& dt_calc) const override;
   void calculer_pas_de_temps_local_pb();
 
   // pour implicite ajoute l'inertie a la matrice et au scd membre avec pas de temps local

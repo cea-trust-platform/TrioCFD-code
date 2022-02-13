@@ -37,7 +37,7 @@ class Echange_contact_ODVM_VDF: public Echange_contact_VDF
 
 public :
 
-  void calculer_Teta_equiv(DoubleTab& La_T_ext,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps);
+  void calculer_Teta_equiv(DoubleTab& La_T_ext,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
 
 
 protected :

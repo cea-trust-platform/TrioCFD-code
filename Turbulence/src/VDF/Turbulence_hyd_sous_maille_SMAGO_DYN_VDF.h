@@ -34,11 +34,11 @@ class Turbulence_hyd_sous_maille_SMAGO_DYN_VDF : public Turbulence_hyd_sous_mail
 public:
 
   Turbulence_hyd_sous_maille_SMAGO_DYN_VDF();
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis);
-  void mettre_a_jour(double);
-  int preparer_calcul();
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis) override;
+  void mettre_a_jour(double) override;
+  int preparer_calcul() override;
 
 
   static void calculer_length_scale(DoubleVect& ,const Zone_VDF& );
@@ -70,8 +70,8 @@ protected :
   void calculer_Mij(const DoubleTab& ,const DoubleTab& ,const DoubleVect& ,DoubleTab& );
   void calculer_model_coefficient(const DoubleTab& ,const DoubleTab& );
   Champ_Fonc& calculer_viscosite_turbulente(const DoubleVect& ,const DoubleVect& );
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
-  void calculer_energie_cinetique_turb();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_energie_cinetique_turb() override;
   Champ_Fonc& calculer_energie_cinetique_turb(const DoubleVect& ,const DoubleVect& );
   void controler_grandeurs_turbulentes();
 

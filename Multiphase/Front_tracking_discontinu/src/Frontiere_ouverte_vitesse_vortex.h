@@ -28,7 +28,7 @@ class Frontiere_ouverte_vitesse_vortex : public Entree_fluide_vitesse_imposee
 {
   Declare_instanciable(Frontiere_ouverte_vitesse_vortex);
 public:
-  void mettre_a_jour(double temps);
+  void mettre_a_jour(double temps) override;
 protected:
   // Sous-zone sur laquelle on veut calculer "integrale"
   Nom nom_sous_zone_;

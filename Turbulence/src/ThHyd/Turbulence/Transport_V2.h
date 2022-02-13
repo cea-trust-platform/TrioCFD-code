@@ -51,29 +51,29 @@ class Transport_V2: public Equation_base
 public:
 
   Transport_V2();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline void associer_Champ_Inconnu(const Champ_Inc& );
-  void associer_milieu_base(const Milieu_base&);
+  void associer_milieu_base(const Milieu_base&) override;
   void associer_modele_turbulence(const Modele_turbulence_hyd_K_Eps_V2& );
-  void discretiser();
+  void discretiser() override;
   void discretiser_V2(const Schema_Temps_base& sch,Zone_dis& z, Champ_Inc& ch) const;
-  const Milieu_base& milieu() const ;
-  Milieu_base& milieu() ;
+  const Milieu_base& milieu() const override ;
+  Milieu_base& milieu() override ;
   inline const Modele_turbulence_hyd_K_Eps_V2& modele_turbulence() const;
   inline Modele_turbulence_hyd_K_Eps_V2& modele_turbulence();
-  int nombre_d_operateurs() const;
-  const Operateur& operateur(int) const;
-  Operateur& operateur(int);
+  int nombre_d_operateurs() const override;
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
   inline const Champ_Inc& vitesse_transportante();
-  virtual const Champ_Inc& inconnue() const;
-  virtual Champ_Inc& inconnue();
+  const Champ_Inc& inconnue() const override;
+  Champ_Inc& inconnue() override;
   int controler_V2();
-  const RefObjU& get_modele(Type_modele type) const;
+  const RefObjU& get_modele(Type_modele type) const override;
 
 
   /////////////////////////////////////////////////////
-  const Motcle& domaine_application() const;
+  const Motcle& domaine_application() const override;
 
 protected :
 

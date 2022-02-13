@@ -34,11 +34,11 @@ class Source_Robin : public Source_base
   Declare_instanciable(Source_Robin);
 
 public:
-  virtual void associer_pb(const Probleme_base&);
-  DoubleTab& ajouter(DoubleTab&) const;
-  DoubleTab& calculer(DoubleTab&) const;
-  void mettre_a_jour(double) { };
-  void completer();
+  void associer_pb(const Probleme_base&) override;
+  DoubleTab& ajouter(DoubleTab&) const override;
+  DoubleTab& calculer(DoubleTab&) const override;
+  void mettre_a_jour(double) override { };
+  void completer() override;
   inline const DoubleVect& tab_u_star() const
   {
     return tab_u_star_;
@@ -51,7 +51,7 @@ public:
 protected:
   REF(Zone_VEF) la_zone_VEF;
   REF(Zone_Cl_VEF) la_zone_Cl_VEF;
-  void associer_zones(const Zone_dis&, const Zone_Cl_dis&);
+  void associer_zones(const Zone_dis&, const Zone_Cl_dis&) override;
 //  double dt_post;
   Noms noms_parois;
   mutable DoubleVect tab_u_star_;	// mutable pour etre modifie dans ajouter() => pas top, devrait etre modifie dans mettre_a_jour

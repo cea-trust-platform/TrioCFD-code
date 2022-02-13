@@ -41,10 +41,10 @@ class Marqueur_FT : public Marqueur_Lagrange_base
   Declare_instanciable(Marqueur_FT);
 public:
 
-  void discretiser(const Probleme_base& pb, const  Discretisation_base& dis);
-  virtual inline Ensemble_Lagrange_base& ensemble_points();
-  virtual inline const Ensemble_Lagrange_base& ensemble_points() const;
-  virtual void calculer_valeurs_champs();
+  void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
+  inline Ensemble_Lagrange_base& ensemble_points() override;
+  inline const Ensemble_Lagrange_base& ensemble_points() const override;
+  void calculer_valeurs_champs() override;
 
 protected:
 

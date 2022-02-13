@@ -46,12 +46,12 @@ class Mod_turb_hyd_ss_maille : public Mod_turb_hyd_base
 public:
 
   Mod_turb_hyd_ss_maille();
-  void set_param(Param& param);
-  virtual void discretiser();
+  void set_param(Param& param) override;
+  void discretiser() override;
   void verifie_loi_paroi_diphasique();
-  int preparer_calcul();
-  virtual void completer();
-  void mettre_a_jour(double );
+  int preparer_calcul() override;
+  void completer() override;
+  void mettre_a_jour(double ) override;
   inline virtual Champ_Fonc& energie_cinetique_turbulente()
   {
     return energie_cinetique_turb_;

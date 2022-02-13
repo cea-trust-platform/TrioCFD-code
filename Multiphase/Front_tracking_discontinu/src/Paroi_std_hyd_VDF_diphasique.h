@@ -40,8 +40,8 @@ class Paroi_std_hyd_VDF_diphasique : public Paroi_std_hyd_VDF
 public :
 
   // overloaded functions
-  int calculer_hyd(DoubleTab& );  // for k-eps turbulence model
-  int calculer_hyd(DoubleTab& , DoubleTab& );  // for LES
+  int calculer_hyd(DoubleTab& ) override;  // for k-eps turbulence model
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;  // for LES
   //int calculer_hyd(DoubleTab& , int isKeps,DoubleTab& );
 
 protected :

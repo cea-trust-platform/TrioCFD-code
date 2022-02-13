@@ -61,8 +61,8 @@ public:
   virtual void associer_pb(const Probleme_base& ) = 0;
   virtual void associer_eqn(const Equation_base& );
   virtual void associer(const Zone_dis& , const Zone_Cl_dis& )= 0;
-  virtual int sauvegarder(Sortie& ) const;
-  virtual int reprendre(Entree& );
+  int sauvegarder(Sortie& ) const override;
+  int reprendre(Entree& ) override;
 
   virtual DoubleTab& Calcul_D(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const = 0;
   virtual DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const = 0;
@@ -74,9 +74,9 @@ public:
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 protected :

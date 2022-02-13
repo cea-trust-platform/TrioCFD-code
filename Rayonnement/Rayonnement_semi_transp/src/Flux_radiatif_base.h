@@ -50,10 +50,10 @@ public :
   virtual void calculer_flux_radiatif(const Equation_base& eq_temp)=0;
   inline Champ_front& flux_radiatif();
   inline const Champ_front& flux_radiatif() const;
-  void completer();
+  void completer() override;
 
-  double flux_impose(int i) const;
-  double flux_impose(int i,int j) const;
+  double flux_impose(int i) const override;
+  double flux_impose(int i,int j) const override;
 
 protected :
   double A_;

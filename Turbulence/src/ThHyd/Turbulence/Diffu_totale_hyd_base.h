@@ -45,7 +45,7 @@ class Diffu_totale_hyd_base : public Diffu_totale_base
 public :
 
   //virtual DoubleVect& calculer_a(DoubleVect& tab_a) = 0 ;
-  virtual double calculer_a_local(int ind) = 0 ;
+  double calculer_a_local(int ind) override = 0 ;
   void associer_eqn_T(Eq_couch_lim& e)
   {
     eq_couch_lim_T = e;

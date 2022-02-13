@@ -47,30 +47,30 @@ class Navier_Stokes_Turbulent_ALE : public Navier_Stokes_std_ALE
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline const Champ_Fonc& viscosite_turbulente() const;
   inline const Mod_turb_hyd& modele_turbulence() const;
-  int sauvegarder(Sortie&) const;
-  int reprendre(Entree&);
-  virtual int preparer_calcul();
-  virtual bool initTimeStep(double dt);
-  void mettre_a_jour(double );
-  virtual void completer();
-  const Champ_Don& diffusivite_pour_transport();
-  const Champ_base& diffusivite_pour_pas_de_temps();
+  int sauvegarder(Sortie&) const override;
+  int reprendre(Entree&) override;
+  int preparer_calcul() override;
+  bool initTimeStep(double dt) override;
+  void mettre_a_jour(double ) override;
+  void completer() override;
+  const Champ_Don& diffusivite_pour_transport() override;
+  const Champ_base& diffusivite_pour_pas_de_temps() override;
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
-  void imprimer(Sortie& ) const;
-  const RefObjU& get_modele(Type_modele type) const;
-  virtual void imprime_residu(SFichier&);
-  virtual Nom expression_residu();
+  void imprimer(Sortie& ) const override;
+  const RefObjU& get_modele(Type_modele type) const override;
+  void imprime_residu(SFichier&) override;
+  Nom expression_residu() override;
 
 protected:
   Entree& lire_op_diff_turbulent(Entree& is);

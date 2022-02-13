@@ -46,17 +46,17 @@ class Mod_turb_hyd_RANS_Bicephale : public Mod_turb_hyd_base
 public:
 
   Mod_turb_hyd_RANS_Bicephale();
-  void set_param(Param& param);
+  void set_param(Param& param) override;
   virtual int nombre_d_equations() const=0;
   virtual Transport_K_ou_Eps_base& eqn_transp_K()=0;
   virtual Transport_K_ou_Eps_base& eqn_transp_Eps()=0;
   virtual const Transport_K_ou_Eps_base& eqn_transp_K() const=0;
   virtual const Transport_K_ou_Eps_base& eqn_transp_Eps() const=0;
-  virtual void completer();
+  void completer() override;
 
   virtual void verifie_loi_paroi();
-  int sauvegarder(Sortie& os) const;
-  int reprendre(Entree& is);
+  int sauvegarder(Sortie& os) const override;
+  int reprendre(Entree& is) override;
 
   virtual const Equation_base& equation_k_eps(int) const=0 ;
 
@@ -76,8 +76,8 @@ public:
   /////////////////////////////////////////////////////
   //Methode creer_champ non codee a surcharger si necessaire
   //virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 protected:

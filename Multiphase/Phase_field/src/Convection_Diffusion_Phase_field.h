@@ -47,10 +47,10 @@ class Convection_Diffusion_Phase_field : public Convection_Diffusion_Concentrati
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   Convection_Diffusion_Phase_field();
-  void discretiser();
+  void discretiser() override;
   Champ_Fonc& set_mutilde_()
   {
     return ch_mutilde;
@@ -115,10 +115,10 @@ public :
   {
     return pression_thermo;
   };
-  int preparer_calcul();
+  int preparer_calcul() override;
   Operateur_Grad& operateur_gradient();
   const Operateur_Grad& operateur_gradient() const;
-  void completer();
+  void completer() override;
 
   /////////////////////////////////////////////////////
 

@@ -47,8 +47,8 @@ class Paroi_ODVM_scal_VDF : public Paroi_scal_hyd_base_VDF
   Declare_instanciable_sans_constructeur(Paroi_ODVM_scal_VDF);
 
 public:
-  int calculer_scal(Champ_Fonc_base& );
-  virtual int init_lois_paroi();
+  int calculer_scal(Champ_Fonc_base& ) override;
+  int init_lois_paroi() override;
   double get_Tf0(int num_face) const
   {
     return Tf0(num_face);

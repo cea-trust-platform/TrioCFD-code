@@ -54,7 +54,7 @@ public:
   Proprietes_part_vol();
 
   void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void completer();
   void fixer_nb_particules(const int& nb_part);
   void lire_distribution(Entree& is);

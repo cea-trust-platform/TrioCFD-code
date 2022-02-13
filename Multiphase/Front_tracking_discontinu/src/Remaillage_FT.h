@@ -66,8 +66,8 @@ public:
   void barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage);
   void barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume);
 
-  int  sauvegarder(Sortie& ) const;
-  int  reprendre(Entree&);
+  int  sauvegarder(Sortie& ) const override;
+  int  reprendre(Entree&) override;
 
   double calculer_variation_volume(const Maillage_FT_Disc& maillage,
                                    const DoubleTab& position_initiale,

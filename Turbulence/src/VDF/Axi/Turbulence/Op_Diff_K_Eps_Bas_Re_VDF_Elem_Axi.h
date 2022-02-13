@@ -49,14 +49,14 @@ public:
 
   Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
-  void associer_diffusivite(const Champ_base& );
-  void associer_diffusivite_turbulente();
-  inline  void dimensionner(Matrice_Morse& ) const;
-  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
+                const Champ_Inc& ) override;
+  void associer_diffusivite(const Champ_base& ) override;
+  void associer_diffusivite_turbulente() override;
+  inline  void dimensionner(Matrice_Morse& ) const override;
+  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
   void mettre_a_jour_diffusivite() const;
   const Champ_Fonc& diffusivite_turbulente() const;
-  const Champ_base& diffusivite() const;
+  const Champ_base& diffusivite() const override;
 };
 
 // Description:

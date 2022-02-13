@@ -48,8 +48,8 @@ class Connectivites_DWF : public Connectivites_base
   Declare_instanciable(Connectivites_DWF);
 
 public:
-  virtual void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
-                                      Domaine& domg);
+  void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
+                              Domaine& domg) override;
   IntVect& connectivites_faceG_faceF() ;
 
 

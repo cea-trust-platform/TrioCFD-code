@@ -43,21 +43,21 @@ class Transport_K_Eps_Realisable : public Transport_K_Eps_base
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   virtual const Champ_Don& diffusivite_pour_transport();
   virtual const Champ_base& vitesse_pour_transport();
-  int nombre_d_operateurs() const;
-  const Operateur& operateur(int) const;
-  Operateur& operateur(int);
+  int nombre_d_operateurs() const override;
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
 
-  void associer_milieu_base(const Milieu_base&);
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS&);
+  void associer_milieu_base(const Milieu_base&) override;
+  void associer_modele_turbulence(const Mod_turb_hyd_RANS&) override;
   inline const Modele_Fonc_Realisable& modele_fonc() const;
   inline  Modele_Fonc_Realisable& modele_fonc();
 //   inline const Champ_Inc& vitesse_transportante();
-  const Motcle& domaine_application() const;
-  void completer();
+  const Motcle& domaine_application() const override;
+  void completer() override;
 
 protected:
   int with_nu_;

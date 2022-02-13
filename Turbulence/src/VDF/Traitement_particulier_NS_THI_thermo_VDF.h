@@ -54,8 +54,8 @@ protected :
   REF(Convection_Diffusion_std) mon_equation_NRJ;
 
 private:
-  void init_calc_spectre(void);
-  void calcul_spectre(void);
+  void init_calc_spectre(void) override;
+  void calcul_spectre(void) override;
   void sorties_fichiers(void);
   double calcul_enstrophie(void);
 

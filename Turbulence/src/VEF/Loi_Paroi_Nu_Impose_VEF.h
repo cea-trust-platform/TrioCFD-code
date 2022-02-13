@@ -43,8 +43,8 @@ class Loi_Paroi_Nu_Impose_VEF : public Paroi_scal_hyd_base_VEF
   Declare_instanciable(Loi_Paroi_Nu_Impose_VEF);
 
 public:
-  int calculer_scal(Champ_Fonc_base& ) ;
-  void imprimer_nusselt(Sortie&) const;
+  int calculer_scal(Champ_Fonc_base& ) override ;
+  void imprimer_nusselt(Sortie&) const override;
 
 protected:
 

@@ -40,9 +40,9 @@ class Operateur_Conv_sensibility : public Operateur_Conv_base
 
 public :
 
-  void associer_vitesse(const Champ_base& vit );
-  virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
-  virtual DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const;
+  void associer_vitesse(const Champ_base& vit ) override;
+  DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const override;
+  DoubleTab& calculer(const DoubleTab&, DoubleTab& ) const override;
   inline const Champ_Inc_base& vitesse() const
   {
     return  la_vitesse.valeur();
@@ -54,7 +54,7 @@ public :
 
 protected :
   Operateur_Conv op_conv;
-  virtual void associer(const Zone_dis&, const Zone_Cl_dis&, const Champ_Inc& inco) ;//Classe abstraite de Operateur base
+  void associer(const Zone_dis&, const Zone_Cl_dis&, const Champ_Inc& inco) override ;//Classe abstraite de Operateur base
   REF(Domaine) dom;
   REF(Champ_Inc_base) la_vitesse;
 

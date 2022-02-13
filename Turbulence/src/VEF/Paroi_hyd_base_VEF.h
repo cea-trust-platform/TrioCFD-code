@@ -47,15 +47,15 @@ class Paroi_hyd_base_VEF : public Turbulence_paroi_base
 
 public:
 
-  void associer(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
   void init_lois_paroi_();
-  DoubleTab& corriger_derivee_impl(DoubleTab& d) const;
+  DoubleTab& corriger_derivee_impl(DoubleTab& d) const override;
   inline const ArrOfInt& face_keps_imposee() const
   {
     return face_keps_imposee_ ;
   };
-  void imprimer_premiere_ligne_ustar(int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const;
-  void imprimer_ustar_mean_only(Sortie&, int, const LIST(Nom)&, const Nom& ) const;
+  void imprimer_premiere_ligne_ustar(int boundaries_, const LIST(Nom)& boundaries_list, const Nom& nom_fichier_) const override;
+  void imprimer_ustar_mean_only(Sortie&, int, const LIST(Nom)&, const Nom& ) const override;
 
 protected:
 

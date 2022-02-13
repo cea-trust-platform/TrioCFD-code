@@ -37,12 +37,12 @@ class Paroi_negligeable_PolyMAC : public Turbulence_paroi_base
   Declare_instanciable_sans_constructeur(Paroi_negligeable_PolyMAC);
 
 public:
-  void associer(const Zone_dis&, const Zone_Cl_dis&);
-  int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
-  virtual bool use_shear() const;
+  void associer(const Zone_dis&, const Zone_Cl_dis&) override;
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
+  bool use_shear() const override;
 
 protected:
 

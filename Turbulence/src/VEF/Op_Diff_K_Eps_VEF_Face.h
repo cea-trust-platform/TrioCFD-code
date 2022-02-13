@@ -56,19 +56,19 @@ class Op_Diff_K_Eps_VEF_Face : public Op_Diff_K_Eps_VEF_base, public Op_VEF_Face
 public:
 
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
-  void associer_diffusivite_turbulente();
+                const Champ_Inc& ) override;
+  void associer_diffusivite_turbulente() override;
   const Champ_Fonc& diffusivite_turbulente() const;
-  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
-  DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
+  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
+  DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline double viscA(int, int, int, double) const;
   void calc_visc(ArrOfDouble& diffu_tot,const Zone_VEF& la_zone,int num_face,int num2,int dimension, int num_elem,double diffu_turb,const DoubleTab& diffu,int is_mu_unif,const ArrOfDouble& inv_Prdt) const;
   // Methodes pour l implicite.
 
-  inline void dimensionner(Matrice_Morse& ) const;
-  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
-  inline void contribuer_au_second_membre(DoubleTab& ) const;
+  inline void dimensionner(Matrice_Morse& ) const override;
+  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
+  inline void contribuer_au_second_membre(DoubleTab& ) const override;
   void contribue_au_second_membre(DoubleTab& ) const;
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 

@@ -39,9 +39,9 @@ class Modele_Rayonnement_Milieu_Transparent: public Modele_Rayonnement_base
 
 public:
 
-  void discretiser(const Discretisation_base&, const Domaine& );
-  void mettre_a_jour (double temps);
-  void preparer_calcul ();
+  void discretiser(const Discretisation_base&, const Domaine& ) override;
+  void mettre_a_jour (double temps) override;
+  void preparer_calcul () override;
   double flux_radiatif( int num_face_global) const; // 0 < face < nb_faces_de_bord
   inline int nb_faces_rayonnantes() const;
   inline int nb_faces_totales() const;
@@ -68,10 +68,10 @@ private :
   DoubleTab les_flux_radiatifs;
   mutable IntVect corres;
   // void calculer_temperatures(Cond_lim_base&);
-  void calculer_temperatures();
-  void calculer_radiosites();
-  void calculer_flux_radiatifs();
-  void imprimer_flux_radiatifs(Sortie& ) const;
+  void calculer_temperatures() override;
+  void calculer_radiosites() override;
+  void calculer_flux_radiatifs() override;
+  void imprimer_flux_radiatifs(Sortie& ) const override;
   double temps_; // on garde le temps pour les impressions
   mutable int deja_imprime_;
 protected :

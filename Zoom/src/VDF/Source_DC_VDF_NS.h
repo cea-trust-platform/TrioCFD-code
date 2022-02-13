@@ -47,13 +47,13 @@ class Source_DC_VDF_NS : public Source_Correction_Deficitaire
 
 public:
 
-  void associer_zones(const Zone_dis&, const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
 
 
 
-  virtual DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) ;
+  DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) override ;
 
-  virtual inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) ;
+  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) override ;
 
 
 

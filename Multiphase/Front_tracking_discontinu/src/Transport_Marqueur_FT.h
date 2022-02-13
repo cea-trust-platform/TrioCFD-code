@@ -77,19 +77,19 @@ class Transport_Marqueur_FT : public Transport_Interfaces_FT_Disc
 public:
 
   Transport_Marqueur_FT();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  Entree& lire_cond_init(Entree& is);
-  Entree& lire_cl(Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  Entree& lire_cond_init(Entree& is) override;
+  Entree& lire_cl(Entree&) override;
   Entree& lire_injection(Entree& is);
   Entree& lire_transformation(Entree& is);
 
-  void    discretiser(void);
-  int  preparer_calcul();
-  void    completer();
+  void    discretiser(void) override;
+  int  preparer_calcul() override;
+  void    completer() override;
 
-  void  mettre_a_jour(double temps);
-  bool initTimeStep(double dt);
+  void  mettre_a_jour(double temps) override;
+  bool initTimeStep(double dt) override;
   void imposer_cond_lim();
   static void appliquer_reflexion_vitesse(const double& x, const double& y, const double& z,
                                           const int& som,int& face_bord,
@@ -97,7 +97,7 @@ public:
                                           DoubleTab& vitesse);
 
   //Effectue l integration d un ensemble de points (sans notion de facettes)
-  virtual void integrer_ensemble_lagrange(const double temps);
+  void integrer_ensemble_lagrange(const double temps) override;
 
   //Calcul des proprietes du fluide aux positions des particule
   void calculer_proprietes_fluide_pos_particules(const Maillage_FT_Disc& ens_points);
@@ -145,26 +145,26 @@ public:
                                         const ArrOfDouble&                volumes);
 
   //On surcharge les deux methodes suivantes pour quelle ne fasse rien
-  int  sauvegarder(Sortie& ) const;
-  int  reprendre(Entree&);
+  int  sauvegarder(Sortie& ) const override;
+  int  reprendre(Entree&) override;
 
   //Methodes de l interface des champs postraitables (champs euleriens)
   /////////////////////////////////////////////////////
   //Methode creer_champ pas codee a surcharger si necessaire
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
   /////////////////////////////////////////////////////
 
   //methodes utilisees pour le post-traitement des quantites lagrangiennes
-  virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab = 0) const;
-  virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab *itab = 0) const;
+  int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab = 0) const override;
+  int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab *itab = 0) const override;
 
   const DoubleTab& calculer_valeurs_densite(DoubleTab& val_densite) const;
   const DoubleTab& calculer_valeurs_volumes(DoubleTab& val_volume) const;
 
 
-  const Champ_Inc& inconnue(void) const;     //renvoie un champ bidon
-  Champ_Inc&        inconnue(void);
+  const Champ_Inc& inconnue(void) const override;     //renvoie un champ bidon
+  Champ_Inc&        inconnue(void) override;
 
   //Methodes d acces aux tableaux contenant les proprietes du fluide
   inline const DoubleTab& vitesse_fluide() const;

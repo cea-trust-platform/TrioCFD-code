@@ -39,17 +39,17 @@ class Transport_Fluctuation_Temperature_W_Bas_Re : public Transport_Fluctuation_
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void associer_modele_turbulence(const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& );
-  inline const Milieu_base& milieu() const;
-  inline Milieu_base& milieu();
+  inline const Milieu_base& milieu() const override;
+  inline Milieu_base& milieu() override;
   // inline Modele_Fonc_Bas_Reynolds_Thermique& modele_fonc();
   // inline const Modele_Fonc_Bas_Reynolds_Thermique& modele_fonc() const;
   inline Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_turbulence();
   inline const Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re& modele_turbulence() const;
-  const Operateur& operateur(int) const;
-  Operateur& operateur(int);
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
   // int a_pour_Champ_Inc(const Motcle&, REF(Champ_base)& ) const;
 
 protected :

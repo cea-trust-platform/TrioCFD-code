@@ -38,7 +38,7 @@ class Paroi_std_hyd_VEF_3couches : public Paroi_std_hyd_VEF
 
 public:
 
-  int calculer_k_eps(double& , double& , double , double , double , double);
+  int calculer_k_eps(double& , double& , double , double , double , double) override;
 
 protected:
 

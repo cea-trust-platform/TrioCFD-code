@@ -47,8 +47,8 @@ class Champ_front_rayonnement : public Champ_front_var_instationnaire
 
 public :
 
-  Champ_front_base& affecter_(const Champ_front_base& ch);
-  void mettre_a_jour(double);
+  Champ_front_base& affecter_(const Champ_front_base& ch) override;
+  void mettre_a_jour(double) override;
 
 };
 

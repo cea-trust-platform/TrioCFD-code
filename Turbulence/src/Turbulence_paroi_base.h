@@ -89,20 +89,20 @@ public :
   inline double tab_d_plus(int face) const;
 
   //OC 01/2006: ajout de la fonctionnalite sauvegarde/reprise : utile pour TBLE pour l'instant.
-  virtual int sauvegarder(Sortie&) const
+  int sauvegarder(Sortie&) const override
   {
     return 0;
   };
-  virtual int reprendre(Entree& )
+  int reprendre(Entree& ) override
   {
     return 0;
   };
 
   //Methodes de l interface des champs postraitables
   //////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
   // Ecriture dans un fichier separe de u_star, Cisaillement_paroi etc...
   void ouvrir_fichier_partage(EcrFicPartage&,const Nom&) const;

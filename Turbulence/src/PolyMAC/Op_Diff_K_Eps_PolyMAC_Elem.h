@@ -44,17 +44,17 @@ class Op_Diff_K_Eps_PolyMAC_Elem : public Op_Diff_K_Eps_base
   Declare_instanciable( Op_Diff_K_Eps_PolyMAC_Elem ) ;
 
 public:
-  void associer_diffusivite_turbulente();
-  void associer_diffusivite(const Champ_base& diffu);
+  void associer_diffusivite_turbulente() override;
+  void associer_diffusivite(const Champ_base& diffu) override;
 
   inline void associer_Pr_K_Eps(double, double);
-  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
-  void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const;
-  DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
-  void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc& );
-  void dimensionner(Matrice_Morse& mat) const;
-  void completer();
-  void modifier_pour_Cl(Matrice_Morse& la_matrice, DoubleTab& secmem) const;
+  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
+  void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const override;
+  DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
+  void associer(const Zone_dis& , const Zone_Cl_dis& , const Champ_Inc& ) override;
+  void dimensionner(Matrice_Morse& mat) const override;
+  void completer() override;
+  void modifier_pour_Cl(Matrice_Morse& la_matrice, DoubleTab& secmem) const override;
   void calculer_nu_sur_pr() const;
 
 protected:

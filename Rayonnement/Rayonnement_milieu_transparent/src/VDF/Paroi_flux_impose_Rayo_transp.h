@@ -38,8 +38,8 @@ class Paroi_flux_impose_Rayo_transp : public Paroi_Rayo_transp
 public :
 
   void calculer_Teta_i();
-  void mettre_a_jour(double temps);
-  void completer();
+  void mettre_a_jour(double temps) override;
+  void completer() override;
 protected:
   void calculer_Teta_i_VDF();
   void calculer_Teta_i_VEF();

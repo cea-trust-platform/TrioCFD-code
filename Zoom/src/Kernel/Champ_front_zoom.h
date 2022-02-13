@@ -56,9 +56,9 @@ class Champ_front_zoom : public Ch_front_var_instationnaire_dep
 
 public:
   void creer(Nom&, Nom&, Nom&, Nom&,  Motcle&);
-  Champ_front_base& affecter_(const Champ_front_base&) ;
-  virtual int initialiser(double temps, const Champ_Inc_base& inco);
-  virtual void mettre_a_jour(double temps);
+  Champ_front_base& affecter_(const Champ_front_base&) override ;
+  int initialiser(double temps, const Champ_Inc_base& inco) override;
+  void mettre_a_jour(double temps) override;
   //  Nom& nature_cond_lim();
   Pb_MG& le_pb_MG();
   Probleme_base& le_pb_fin();

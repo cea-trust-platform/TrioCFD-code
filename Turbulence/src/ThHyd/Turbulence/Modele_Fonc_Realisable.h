@@ -47,8 +47,8 @@ public:
   inline void mettre_a_jour(double );
   inline void discretiser();
   inline void completer();
-  inline int sauvegarder(Sortie& os) const;
-  inline int reprendre(Entree& is);
+  inline int sauvegarder(Sortie& os) const override;
+  inline int reprendre(Entree& is) override;
   inline int Calcul_is_Reynolds_stress_isotrope() const;
   inline int Calcul_is_Cmu_constant() const;
 

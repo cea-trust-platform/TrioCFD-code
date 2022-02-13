@@ -45,11 +45,11 @@ class Turbulence_hyd_sous_maille_Smago_VEF : public Mod_turb_hyd_ss_maille_VEF
 public:
 
   Turbulence_hyd_sous_maille_Smago_VEF();
-  void set_param(Param& param);
+  void set_param(Param& param) override;
 
 protected :
 
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
   virtual void calculer_S_barre();
 
   double cs;

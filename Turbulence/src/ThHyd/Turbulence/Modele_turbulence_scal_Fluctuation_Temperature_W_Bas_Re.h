@@ -32,27 +32,27 @@ class Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re :  public Modele_t
   Declare_instanciable(Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re);
 
 public:
-  virtual void completer();
-  int preparer_calcul();
-  virtual void mettre_a_jour(double );
+  void completer() override;
+  int preparer_calcul() override;
+  void mettre_a_jour(double ) override;
   //void associer_eqn(const Equation_base&);
 
-  inline Champ_Inc& Fluctu_Temperature();
-  inline const Champ_Inc& Fluctu_Temperature() const;
+  inline Champ_Inc& Fluctu_Temperature() override;
+  inline const Champ_Inc& Fluctu_Temperature() const override;
 
-  inline Transport_Fluctuation_Temperature_W& equation_Fluctu();
-  inline const Transport_Fluctuation_Temperature_W& equation_Fluctu() const;
+  inline Transport_Fluctuation_Temperature_W& equation_Fluctu() override;
+  inline const Transport_Fluctuation_Temperature_W& equation_Fluctu() const override;
 
   inline Modele_Fonc_Bas_Reynolds_Thermique& associe_modele_fonction();
   inline const Modele_Fonc_Bas_Reynolds_Thermique& associe_modele_fonction() const;
-  virtual Champ_Fonc& calculer_diffusivite_turbulente();
-  void set_param(Param&);
-  virtual int lire_motcle_non_standard(const Motcle&, Entree&);
+  Champ_Fonc& calculer_diffusivite_turbulente() override;
+  void set_param(Param&) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   //////////////////////////////////////////////////////
   //Methode creer_champ pas codee a surcharger si necessaire
   //virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 private :

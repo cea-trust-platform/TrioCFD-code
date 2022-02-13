@@ -48,16 +48,16 @@ public:
 
   Ch_front_input_ALE();
 
-  virtual Champ_front_base& affecter_(const Champ_front_base&)
+  Champ_front_base& affecter_(const Champ_front_base&) override
   {
     return *this;
   }
-  virtual void getTemplate(TrioField& afield) const;
-  virtual void setValue(const TrioField& afield);
-  virtual int initialiser(double temps, const Champ_Inc_base& inco);
+  void getTemplate(TrioField& afield) const override;
+  void setValue(const TrioField& afield) override;
+  int initialiser(double temps, const Champ_Inc_base& inco) override;
 
   inline DoubleTab& get_vit_som_bord_ALE();
-  virtual void mettre_a_jour(double temps);
+  void mettre_a_jour(double temps) override;
   void remplir_vit_som_bord_ALE(double);
 
 protected:

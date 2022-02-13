@@ -47,8 +47,8 @@ public:
 
   //virtual int comprend_mot(const Motcle& ) const;
   void associer_viscosite_turbulente(const Champ_Fonc& );
-  virtual void completer();
-  virtual int reprendre(Entree& );
+  void completer() override;
+  int reprendre(Entree& ) override;
 
 protected:
 

@@ -43,7 +43,7 @@ public :
   inline Modele_rayo_semi_transp& Modele();
   inline const Modele_rayo_semi_transp& Modele() const;
   virtual void associer_modele_rayo(Modele_rayo_semi_transp& modele);
-  void mettre_a_jour(double temps)
+  void mettre_a_jour(double temps) override
   {
     ;
   }

@@ -48,10 +48,10 @@ class Turbulence_hyd_sous_maille_selectif_mod_VEF : public Turbulence_hyd_sous_m
 
 public:
 
-  Champ_Fonc& calculer_viscosite_turbulente();
-  void calculer_fonction_structure();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_fonction_structure() override;
   int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)& ) const;
-  void discretiser();
+  void discretiser() override;
 
 
 

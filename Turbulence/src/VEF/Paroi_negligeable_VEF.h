@@ -46,12 +46,12 @@ class Paroi_negligeable_VEF : public Paroi_hyd_base_VEF
 
 public:
 
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
   virtual int calculer_scal(Champ_Fonc_base& );
-  virtual bool use_shear() const;
+  bool use_shear() const override;
 protected:
 
   IntVect elem_paroi,elem_paroi_double;

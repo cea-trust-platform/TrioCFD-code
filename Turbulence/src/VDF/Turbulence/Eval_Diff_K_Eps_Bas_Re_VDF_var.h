@@ -40,7 +40,7 @@ public:
                                  double Prandt_Eps =PRDT_EPS_DEFAUT ) ;
   void associer_diff_turb(const Champ_Fonc& );
   inline const Champ_Fonc& diffusivite_turbulente() const;
-  void mettre_a_jour( );
+  void mettre_a_jour( ) override;
 protected:
 
   double Prdt_K;

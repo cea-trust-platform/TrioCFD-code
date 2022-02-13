@@ -50,8 +50,8 @@ public:
 
   Turbulence_hyd_sous_maille_Fst_sel_VEF();
   int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)& ) const;
-  void discretiser();
-  void calculer_racine();
+  void discretiser() override;
+  void calculer_racine() override;
 
 protected :
 

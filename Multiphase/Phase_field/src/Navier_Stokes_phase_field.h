@@ -67,12 +67,12 @@ class Navier_Stokes_phase_field : public Navier_Stokes_std
 public :
 
   Navier_Stokes_phase_field();
-  ~Navier_Stokes_phase_field();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  virtual void discretiser();
-  void completer();
-  virtual int preparer_calcul();
+  ~Navier_Stokes_phase_field() override;
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void discretiser() override;
+  void completer() override;
+  int preparer_calcul() override;
   virtual void rho_aux_faces(const DoubleTab&, Champ_Don&);
   inline const Champ_Don& rho() const;
   inline const Champ_Don& drhodc() const;
@@ -82,18 +82,18 @@ public :
   inline int& get_boussi_();
   inline DoubleVect& get_g_();
   inline const DoubleVect& get_g_() const;
-  DoubleTab& derivee_en_temps_inco(DoubleTab& );
-  virtual void mettre_a_jour(double );
-  const Champ_Don& diffusivite_pour_transport();
+  DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
+  void mettre_a_jour(double ) override;
+  const Champ_Don& diffusivite_pour_transport() override;
 
-  void creer_champ(const Motcle& motlu);
+  void creer_champ(const Motcle& motlu) override;
 
   /////////////////////////////////////////////////////
 
   virtual void calculer_rho(const bool init=false);
   virtual void calculer_mu(const bool init=false);
 
-  double calculer_pas_de_temps() const;
+  double calculer_pas_de_temps() const override;
 
   inline int& getset_terme_source_();
   inline int& getset_compressible_();

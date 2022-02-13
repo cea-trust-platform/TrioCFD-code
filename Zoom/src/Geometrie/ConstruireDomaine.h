@@ -48,7 +48,7 @@ class ConstruireDomaine : public Interprete_geometrique_base
 
 public :
 
-  Entree& interpreter_(Entree&);
+  Entree& interpreter_(Entree&) override;
 
 protected :
 

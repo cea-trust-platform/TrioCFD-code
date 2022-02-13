@@ -37,9 +37,9 @@ class Paroi_negligeable_VDF : public Paroi_std_hyd_VDF
 
 public:
 
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
-  virtual bool use_shear() const;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
+  bool use_shear() const override;
 
 protected:
 

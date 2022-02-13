@@ -59,17 +59,17 @@ class Source_Transport_Fluctuation_Temperature_W_VDF_Elem : public Source_base,
 
 public :
 
-  void associer_pb(const Probleme_base& );
+  void associer_pb(const Probleme_base& ) override;
   inline Source_Transport_Fluctuation_Temperature_W_VDF_Elem(double ctea = Ca_Default, double cteb = Cb_Default,  double ctec = Cc_Default,  double cted = Cd_Default);
   DoubleTab& calculer_Prod_uteta_T(const Zone_VDF&,const Zone_Cl_VDF&, const DoubleTab&,const  DoubleTab&, DoubleTab&) const;
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
   DoubleTab& calculer_u_teta_W(const Zone_VDF&,const Zone_Cl_VDF&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,DoubleTab&) const;
   DoubleTab& calculer_terme_destruction_K_W(const Zone_VDF&,const Zone_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
   DoubleTab& calculer_terme_destruction_K_W(const Zone_VDF&,const Zone_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleVect&) const;
-  void mettre_a_jour(double temps)
+  void mettre_a_jour(double temps) override
   {
     Calcul_Production_K_VDF::mettre_a_jour(temps);
   }
@@ -87,7 +87,7 @@ protected :
   REF(Convection_Diffusion_Temperature) eq_thermique;
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite_;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 
 };
 

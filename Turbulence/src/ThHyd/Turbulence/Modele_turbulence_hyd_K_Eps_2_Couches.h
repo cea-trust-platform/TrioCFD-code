@@ -41,12 +41,12 @@ class Modele_turbulence_hyd_K_Eps_2_Couches : public Mod_turb_hyd_RANS
 
 public:
 
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void completer();
-  int preparer_calcul();
-  virtual bool initTimeStep(double dt);
-  void mettre_a_jour(double );
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void completer() override;
+  int preparer_calcul() override;
+  bool initTimeStep(double dt) override;
+  void mettre_a_jour(double ) override;
   inline Champ_Inc& K_Eps();
   inline const Champ_Inc& K_Eps() const;
   inline int get_nbcouches() const;
@@ -55,10 +55,10 @@ public:
   inline int get_switch() const;
   inline int get_impr() const;
 
-  inline int nombre_d_equations() const;
-  inline Transport_K_Eps_base& eqn_transp_K_Eps();
-  inline const Transport_K_Eps_base& eqn_transp_K_Eps() const;
-  const Equation_base& equation_k_eps(int) const;
+  inline int nombre_d_equations() const override;
+  inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
+  inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
+  const Equation_base& equation_k_eps(int) const override;
 
   //  void imprimer(Sortie& os) const;
 protected :

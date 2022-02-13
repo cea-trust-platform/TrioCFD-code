@@ -47,9 +47,9 @@ class Traitement_particulier_NS_THI_VEF_new : public Traitement_particulier_NS_T
 
 protected :
 
-  void renorm_Ec(void);
-  void init_calc_spectre(void);
-  void calcul_spectre(void);
+  void renorm_Ec(void) override;
+  void init_calc_spectre(void) override;
+  void calcul_spectre(void) override;
 
 private:
 

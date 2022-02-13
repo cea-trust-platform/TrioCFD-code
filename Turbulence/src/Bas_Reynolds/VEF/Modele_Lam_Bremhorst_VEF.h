@@ -59,21 +59,21 @@ public :
 
 
   virtual void set_param(Param& param);
-  virtual DoubleTab& Calcul_D(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
-  virtual DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const ;
-  virtual DoubleTab& Calcul_Cmu(DoubleTab&,
-                                const Zone_dis&,  const Zone_Cl_dis&,
-                                const DoubleTab&, const DoubleTab&, const double) const;
-  virtual DoubleTab& Calcul_Cmu_Paroi(DoubleTab&,
-                                      const Zone_dis&, const Zone_Cl_dis&,
-                                      const DoubleTab& , const DoubleTab& ,
-                                      const DoubleTab& ,const int,
-                                      const DoubleTab&, const DoubleTab&,
-                                      const double) const;
+  DoubleTab& Calcul_D(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
+  DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_Cmu(DoubleTab&,
+                        const Zone_dis&,  const Zone_Cl_dis&,
+                        const DoubleTab&, const DoubleTab&, const double) const override;
+  DoubleTab& Calcul_Cmu_Paroi(DoubleTab&,
+                              const Zone_dis&, const Zone_Cl_dis&,
+                              const DoubleTab& , const DoubleTab& ,
+                              const DoubleTab& ,const int,
+                              const DoubleTab&, const DoubleTab&,
+                              const double) const override;
   //  virtual DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis& ) const ;
-  virtual DoubleTab& Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const;
-  virtual int Calcul_is_Reynolds_stress_isotrope() const;
-  virtual int Calcul_is_Cmu_constant() const;
+  DoubleTab& Calcul_F1( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_eps_Bas_Re,const Champ_base& ch_visco) const override;
+  int Calcul_is_Reynolds_stress_isotrope() const override;
+  int Calcul_is_Cmu_constant() const override;
   void init_tenseur_elem(DoubleTab&, const Zone_VEF&, const int) const;
   void init_tenseur_face(DoubleTab&, const Zone_VEF&, const int) const;
   virtual DoubleTab calcul_norme_elem(const Zone_VEF&, const DoubleTab) const;
@@ -81,17 +81,17 @@ public :
   virtual DoubleTab& calcul_tenseur_face(DoubleTab&, const DoubleTab&,
                                          const Zone_VEF&, const Zone_Cl_VEF&) const;
 
-  virtual bool calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+  bool calcul_tenseur_Re(const DoubleTab&, const DoubleTab&, DoubleTab&) const override;
   virtual DoubleTab calcul_tenseur_Re_elem(const Discretisation_base& dis,
                                            const Zone_dis&,const DoubleTab&, const DoubleTab&, const DoubleTab&,
                                            const DoubleTab&, const Champ_base& K_Eps) const;
-  virtual DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base&) const ;
-  virtual DoubleTab& Calcul_Fmu ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don& )const ;
+  DoubleTab& Calcul_F2(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const Champ_base&) const override ;
+  DoubleTab& Calcul_Fmu ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don& )const override ;
   Entree& lire(const Motcle&, Entree&);
   // void associer_pb(const Probleme_base& );
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
-  void mettre_a_jour(double);
-  virtual void lire_distance_paroi( );
+  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void mettre_a_jour(double) override;
+  void lire_distance_paroi( ) override;
   DoubleTab calcul_tenseur_Re_elem_shih(const Discretisation_base&,
                                         const Zone_dis&,
                                         const DoubleTab&, const DoubleTab&,
@@ -104,22 +104,22 @@ public :
 
 
 
-  virtual DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const;
-  virtual DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
-                                          const DoubleTab& , const DoubleTab& ,
-                                          const DoubleTab& ,const int,
-                                          const DoubleTab&, const DoubleTab&, const DoubleTab&,
-                                          const double) const;
-  virtual bool calcul_tenseur_Re_BiK(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
+  DoubleTab& Calcul_Cmu_BiK(DoubleTab&,const Zone_dis&, const Zone_Cl_dis&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const double) const override;
+  DoubleTab& Calcul_Cmu_Paroi_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,
+                                  const DoubleTab& , const DoubleTab& ,
+                                  const DoubleTab& ,const int,
+                                  const DoubleTab&, const DoubleTab&, const DoubleTab&,
+                                  const double) const override;
+  bool calcul_tenseur_Re_BiK(const DoubleTab&, const DoubleTab&, DoubleTab&) const override;
   virtual DoubleTab calcul_tenseur_Re_elem_BiK(const Discretisation_base& dis,
                                                const Zone_dis&,const DoubleTab&, const DoubleTab&, const DoubleTab&,
                                                const DoubleTab&, const Champ_base& K, const Champ_base& Eps) const;
 
-  virtual DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const;
-  virtual DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const ;
-  virtual DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const;
-  virtual DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const ;
-  virtual DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const ;
+  DoubleTab& Calcul_D_BiK(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const override;
+  DoubleTab& Calcul_E_BiK(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const Champ_Don&, const DoubleTab& ) const override ;
+  DoubleTab& Calcul_F1_BiK( DoubleTab& F1, const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis, const DoubleTab& P,const DoubleTab& K_Bas_Re,const DoubleTab& eps_Bas_Re,const Champ_base& ch_visco) const override;
+  DoubleTab& Calcul_F2_BiK(DoubleTab&, DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,const Champ_base&) const override ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
 
 protected:
 

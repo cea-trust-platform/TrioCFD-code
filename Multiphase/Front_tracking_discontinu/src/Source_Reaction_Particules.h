@@ -49,14 +49,14 @@ class Source_Reaction_Particules : public Source_base
   Declare_base(Source_Reaction_Particules);
 public :
 
-  virtual void mettre_a_jour(double temps);
-  DoubleTab& calculer(DoubleTab& ) const;
+  void mettre_a_jour(double temps) override;
+  DoubleTab& calculer(DoubleTab& ) const override;
   void associer_eq_marqueur(const Equation_base& equation);
 
 protected:
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  void associer_pb(const Probleme_base& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_pb(const Probleme_base& ) override;
 
 
   REF(Transport_Marqueur_FT) eq_marqueur_; //Reference a l equation de type Transport_Marqueur_FT

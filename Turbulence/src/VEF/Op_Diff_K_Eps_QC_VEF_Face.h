@@ -48,7 +48,7 @@ class Op_Diff_K_Eps_QC_VEF_Face : public Op_Diff_K_Eps_VEF_Face
 
 public:
 
-  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
+  DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 };
 

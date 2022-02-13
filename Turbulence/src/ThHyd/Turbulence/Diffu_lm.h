@@ -47,8 +47,8 @@ private:
 
 public :
 
-  double calculer_a_local(int ind);
-  double calculer_D_local(int ind);
+  double calculer_a_local(int ind) override;
+  double calculer_D_local(int ind) override;
 
 
 };

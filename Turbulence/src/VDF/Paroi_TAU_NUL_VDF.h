@@ -37,9 +37,9 @@ class Paroi_TAU_NUL_VDF : public Paroi_std_hyd_VDF
 
 public:
 
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
 
 protected:

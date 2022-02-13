@@ -53,7 +53,7 @@ class Eq_couch_lim : public Objet_U
 public :
 
   Eq_couch_lim();
-  ~Eq_couch_lim();
+  ~Eq_couch_lim() override;
 
   void initialiser(int, int, double, double, int, int) ;
 

@@ -34,8 +34,8 @@ class Paroi_Rayo_transp: public Cond_Lim_Rayo, public Neumann_paroi
   Declare_base(Paroi_Rayo_transp);
 
 public :
-  double flux_impose(int i) const;
-  double flux_impose(int i,int j) const;
+  double flux_impose(int i) const override;
+  double flux_impose(int i,int j) const override;
 
 };
 

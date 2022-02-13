@@ -36,7 +36,7 @@ public:
 
 protected :
 
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
   virtual void calculer_fonction_structure();
   void calculer_delta_c(DoubleTab& ) ;
 
