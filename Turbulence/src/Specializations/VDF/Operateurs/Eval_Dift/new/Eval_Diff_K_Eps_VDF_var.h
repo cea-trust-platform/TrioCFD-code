@@ -14,52 +14,50 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Eval_Diff_K_Eps_VDF.cpp
+// File:        Eval_Diff_K_Eps_VDF_var.h
 // Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/10
+// Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef Eval_Diff_K_Eps_VDF_var_included
+#define Eval_Diff_K_Eps_VDF_var_included
+
 #include <Eval_Diff_K_Eps_VDF.h>
-#include <Champ_Fonc.h>
-#include <Champ_Uniforme.h>
+#include <Champ_Don.h>
 
-void Eval_Diff_K_Eps_VDF::associer_diff_turb(const Champ_Fonc& diffu)
+class Eval_Diff_K_Eps_VDF_var : public Eval_Diff_K_Eps_VDF
 {
-  diffusivite_turbulente_ = diffu;
-}
+public:
 
-void Eval_Diff_K_Eps_VDF::associer_Pr_K_Eps(double Pr_K, double Pr_Eps)
-{
-  Prdt_K = Pr_K;
-  Prdt_Eps = Pr_Eps;
-  Prdt[0] = Pr_K;
-  Prdt[1] = Pr_Eps;
-}
+  inline void associer(const Champ_Don& diffu)
+  {
+    diffusivite_ = diffu.valeur();
+    dv_diffusivite.ref(diffu.valeurs());
+  }
 
-void Eval_Diff_K_Eps_VDF::mettre_a_jour( )
-{
-  //  Cerr << " AVANT dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); " << finl;
-  //Debog::verifier("Eval_Diff_K_Eps_VDF::mettre_a_jour : dv_diffusivite_turbulente",diffusivite_turbulente_->valeurs());
-  dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
-  //  Cerr << " APRES dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); " << finl;
-  if (sub_type(Champ_Uniforme, diffusivite_.valeur()))
-    db_diffusivite = diffusivite_.valeur()(0,0);
-}
+  inline virtual void mettre_a_jour()
+  {
+    (diffusivite_->valeurs().echange_espace_virtuel());
+    dv_diffusivite.ref(diffusivite_->valeurs());
+    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
+  }
 
-void Eval_Diff_K_Eps_VDF::associer_mvolumique(const Champ_base& mvol)
-{
-  masse_volumique_ = mvol;
-  dv_mvol.ref(mvol.valeurs());
-}
+  // Methods used by the flux computation in template class:
+  inline double nu_1_impl(int i, int compo) const
+  {
+    return dv_diffusivite(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
+  }
 
-// Description:
-// associe le champ de diffusivite
-void Eval_Diff_K_Eps_VDF::associer(const Champ_base& diffu)
-{
-  diffusivite_ =  diffu;
-  if (sub_type(Champ_Uniforme, diffu))
-    {
-      db_diffusivite = diffu(0,0);
-    }
-}
+  inline double nu_2_impl(int i, int compo) const { return nu_1_impl(i,compo); }
+
+  inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const
+  {
+    return 0.5*(nu_1_impl(i,compo)+nu_1_impl(j,compo))/(d0+d1);
+  }
+
+protected:
+  DoubleVect dv_diffusivite;
+};
+
+#endif /* Eval_Diff_K_Eps_VDF_var_included */

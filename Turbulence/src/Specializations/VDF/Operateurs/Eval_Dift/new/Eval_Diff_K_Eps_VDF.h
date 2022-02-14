@@ -20,79 +20,68 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Eval_Diff_K_Eps_VDF_included
 #define Eval_Diff_K_Eps_VDF_included
 
-#define PRDT_K_DEFAUT 1
-#define PRDT_EPS_DEFAUT 1.3
-
-#include <Evaluateur_VDF.h>
 #include <Ref_Champ_Fonc.h>
-#include <Ref_Champ_Uniforme.h>
-
-#include <Champ_Don.h>
-#include <Ref_Champ_Don_base.h>
 #include <Ref_Champ_base.h>
+#include <Champ_Uniforme.h>
+#include <Champ_Fonc.h>
+#include <Champ_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Eval_Diff_K_Eps_VDF
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Eval_Diff_K_Eps_VDF : public Evaluateur_VDF
+class Eval_Diff_K_Eps_VDF
 {
-
 public:
+  virtual ~Eval_Diff_K_Eps_VDF() { }
 
-  inline Eval_Diff_K_Eps_VDF(double Prandt_K = PRDT_K_DEFAUT ,
-                             double Prandt_Eps =PRDT_EPS_DEFAUT );
-  void associer_diff_turb(const Champ_Fonc& );
-  void associer_mvolumique(const Champ_base& );
-  void associer(const Champ_base& );
-  void associer_Pr_K_Eps(double,double);
-  inline const Champ_Fonc& diffusivite_turbulente() const;
-  inline const Champ_base& diffusivite() const;
-  void mettre_a_jour( );
+  Eval_Diff_K_Eps_VDF(double Prandt_K = PRDT_K_DEFAUT, double Prandt_Eps = PRDT_EPS_DEFAUT ) : Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps), db_diffusivite(-123.)
+  {
+    Prdt[0]=Prandt_K;
+    Prdt[1]=Prandt_Eps;
+  }
+
+  inline void associer_diff_turb(const Champ_Fonc& diffu) { diffusivite_turbulente_ = diffu; }
+
+  inline void associer_mvolumique(const Champ_base& mvol)
+  {
+    masse_volumique_ = mvol;
+    dv_mvol.ref(mvol.valeurs());
+  }
+
+  inline void associer_Pr_K_Eps(double Pr_K,double Pr_Eps)
+  {
+    Prdt_K = Pr_K;
+    Prdt_Eps = Pr_Eps;
+    Prdt[0] = Pr_K;
+    Prdt[1] = Pr_Eps;
+  }
+
+  inline void associer(const Champ_base& diffu)
+  {
+    diffusivite_ =  diffu;
+    if (sub_type(Champ_Uniforme, diffu))  db_diffusivite = diffu(0,0);
+  }
+
+  inline virtual void mettre_a_jour()
+  {
+    dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs());
+    if (sub_type(Champ_Uniforme, diffusivite_.valeur())) db_diffusivite = diffusivite_.valeur()(0,0);
+  }
+
+  inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
+  inline const Champ_base& diffusivite() const { return diffusivite_.valeur(); }
+
+  // Pour CRTP !
+  inline int get_ind_Fluctu_Term() const { throw; }
+  inline double get_equivalent_distance(int boundary_index,int local_face) const { throw; }
+  inline double get_dv_mvol(const int i) const { return dv_mvol[i]; }
 
 protected:
-
-  double Prdt_K;
-  double Prdt_Eps;
-  double Prdt[2];
+  static constexpr double PRDT_K_DEFAUT = 1.0, PRDT_EPS_DEFAUT = 1.3;
+  double Prdt_K, Prdt_Eps, db_diffusivite, Prdt[2];
+  DoubleVect dv_diffusivite_turbulente, dv_mvol;
   REF(Champ_Fonc) diffusivite_turbulente_;
-  DoubleVect dv_diffusivite_turbulente;
-  REF(Champ_base) masse_volumique_;
-  DoubleVect dv_mvol;
-  REF(Champ_base) diffusivite_;
-  double db_diffusivite;
-
+  REF(Champ_base) masse_volumique_, diffusivite_;
 };
 
-//
-//  Fonctions inline de la classe Eval_Diff_K_Eps_VDF
-//
-
-
-
-inline Eval_Diff_K_Eps_VDF::Eval_Diff_K_Eps_VDF(double Prandt_K ,double Prandt_Eps)
-  : Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps),db_diffusivite(-123.)
-{
-  Prdt[0]=Prandt_K;
-  Prdt[1]=Prandt_Eps;
-}
-
-//inline Eval_Diff_K_Eps_VDF::Eval_Diff_K_Eps_VDF(double Prandt_K ,double Prandt_Eps)
-//: Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps) { Prdt[0]=Prdt_K;Prdt[1]=Prdt_Eps;}
-
-inline const Champ_Fonc& Eval_Diff_K_Eps_VDF::diffusivite_turbulente() const
-{
-  return diffusivite_turbulente_.valeur();
-}
-
-inline const Champ_base& Eval_Diff_K_Eps_VDF::diffusivite() const
-{
-  return diffusivite_.valeur();
-}
-#endif
+#endif /* Eval_Diff_K_Eps_VDF_included */
