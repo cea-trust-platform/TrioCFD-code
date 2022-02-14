@@ -29,7 +29,7 @@
 class Eval_Diff_K_Eps_QC_var_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_QC_var_VDF_Elem>, public Eval_Diff_K_Eps_VDF_var
 {
 public:
-  static constexpr bool IS_MULTD = false, IS_QUASI = true;
+  static constexpr bool IS_MULTD = false, IS_QUASI = true, IS_RANS = true;
 };
 
 #endif /* Eval_Diff_K_Eps_QC_var_VDF_Elem_included */

@@ -29,7 +29,7 @@
 class Eval_Diff_K_Eps_VDF_Elem_Axi : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_VDF_Elem_Axi>, public Eval_Diff_K_ou_Eps_VDF_const
 {
 public:
-  static constexpr bool IS_MULTD = false, IS_AXI = true;
+  static constexpr bool IS_MULTD = false, IS_AXI = true, IS_RANS = true;
 };
 
 #endif /* Eval_Diff_K_Eps_VDF_Elem_Axi_included */

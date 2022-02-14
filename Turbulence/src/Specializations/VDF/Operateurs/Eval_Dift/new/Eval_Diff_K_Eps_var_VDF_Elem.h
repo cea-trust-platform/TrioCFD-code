@@ -27,6 +27,9 @@
 #include <Eval_Diff_VDF_Elem.h>
 
 class Eval_Diff_K_Eps_var_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_var_VDF_Elem>, public Eval_Diff_K_Eps_VDF_var
-{ };
+{
+public:
+  static constexpr bool IS_RANS = true;
+};
 
 #endif /* Eval_Diff_K_Eps_var_VDF_Elem_included */
