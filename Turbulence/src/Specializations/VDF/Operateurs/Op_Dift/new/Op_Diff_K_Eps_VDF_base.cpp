@@ -100,7 +100,7 @@ void Op_Diff_K_Eps_VDF_base::completer()
       if(sub_type( Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence()))
         {
           const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-          Eval_Diff_K_Eps_VDF_Elem& eval_diff = (Eval_Diff_K_Eps_VDF_Elem&) iter.evaluateur();
+          Eval_Diff_K_Eps_VDF_Elem& eval_diff = (Eval_Diff_K_Eps_VDF_Elem&) (iter.evaluateur());
           eval_diff.associer_Pr_K_Eps(mod_turb.get_Prandtl_K(),mod_turb.get_Prandtl_Eps());
         }
     }
@@ -146,13 +146,13 @@ void Op_Diff_K_Eps_VDF_base::completer()
 }
 void Op_Diff_K_Eps_VDF_base::associer_diffusivite(const Champ_base& ch_diff)
 {
-  Eval_Diff_K_Eps_VDF& eval_diff_turb = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
+  Eval_Diff_K_Eps_VDF& eval_diff_turb = dynamic_cast<Eval_Diff_K_Eps_VDF&> (iter.evaluateur());
   eval_diff_turb.associer(ch_diff);
 }
 
 const Champ_base& Op_Diff_K_Eps_VDF_base::diffusivite() const
 {
-  Eval_Diff_K_Eps_VDF& eval_diff_turb = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
+  const Eval_Diff_K_Eps_VDF& eval_diff_turb = dynamic_cast<const Eval_Diff_K_Eps_VDF&> (iter.evaluateur());
   return eval_diff_turb.diffusivite();
 }
 
@@ -168,7 +168,7 @@ void Op_Diff_K_Eps_VDF_Elem::associer(const Zone_dis& zone_dis,
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
   iter.associer(zvdf, zclvdf, *this);
 
-  Eval_Diff_K_Eps_VDF_Elem& eval_diff = (Eval_Diff_K_Eps_VDF_Elem&) iter.evaluateur();
+  Eval_Diff_K_Eps_VDF_Elem& eval_diff = dynamic_cast<Eval_Diff_K_Eps_VDF_Elem&> (iter.evaluateur());
   eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
   eval_diff.associer_inconnue(inco );        // Eval_VDF_::associer_inconnue
 }
@@ -184,7 +184,7 @@ void Op_Diff_K_VDF_Elem::associer( const Zone_dis& zone_dis,
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
   iter.associer(zvdf, zclvdf, *this);
 
-  Eval_Diff_K_VDF_Elem& eval_diff = (Eval_Diff_K_VDF_Elem&) iter.evaluateur();
+  Eval_Diff_K_VDF_Elem& eval_diff = dynamic_cast<Eval_Diff_K_VDF_Elem&> (iter.evaluateur());
   eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
   eval_diff.associer_inconnue(inco );        // Eval_VDF_::associer_inconnue
 }
@@ -200,7 +200,7 @@ void Op_Diff_Eps_VDF_Elem::associer( const Zone_dis& zone_dis,
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
   iter.associer(zvdf, zclvdf, *this);
 
-  Eval_Diff_Eps_VDF_Elem& eval_diff = (Eval_Diff_Eps_VDF_Elem&) iter.evaluateur();
+  Eval_Diff_Eps_VDF_Elem& eval_diff = dynamic_cast<Eval_Diff_Eps_VDF_Elem&> (iter.evaluateur());
   eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
   eval_diff.associer_inconnue(inco );        // Eval_VDF_::associer_inconnue
 }
@@ -219,7 +219,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
 
         const Mod_turb_hyd_RANS& mod_turb = ref_cast(Mod_turb_hyd_RANS,eqn_transport.modele_turbulence());
         const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
-        Eval_Diff_K_Eps_VDF& eval_diff = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
+        Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Eps_VDF&> (iter.evaluateur());
         eval_diff.associer_diff_turb(diff_turb);
       }
     }
@@ -233,12 +233,12 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
 
         if ( eqn_transport.transporte_t_il_K( ) )
           {
-            Eval_Diff_K_VDF_Elem& eval_diff = (Eval_Diff_K_VDF_Elem&) iter.evaluateur();
+            Eval_Diff_K_VDF_Elem& eval_diff = dynamic_cast<Eval_Diff_K_VDF_Elem&> (iter.evaluateur());
             eval_diff.associer_diff_turb(diff_turb);
           }
         else
           {
-            Eval_Diff_Eps_VDF_Elem& eval_diff = (Eval_Diff_Eps_VDF_Elem&) iter.evaluateur();
+            Eval_Diff_Eps_VDF_Elem& eval_diff = dynamic_cast<Eval_Diff_Eps_VDF_Elem&> (iter.evaluateur());
             eval_diff.associer_diff_turb(diff_turb);
           }
       }
@@ -250,7 +250,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
     }
   // association de la masse_volumique (pour le QC)
   {
-    Eval_Diff_K_Eps_VDF& eval_diff = (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
+    Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<Eval_Diff_K_Eps_VDF&> (iter.evaluateur());
 
     const Fluide_base& mil = ref_cast(Fluide_base,mon_equation->milieu());
     const Champ_base& mvol = mil.masse_volumique();
@@ -262,8 +262,7 @@ void Op_Diff_K_Eps_VDF_base::associer_diffusivite_turbulente()
 
 const Champ_Fonc& Op_Diff_K_Eps_VDF_base::diffusivite_turbulente() const
 {
-  const Eval_Diff_K_Eps_VDF& eval_diff =
-    (Eval_Diff_K_Eps_VDF&) iter.evaluateur();
+  const Eval_Diff_K_Eps_VDF& eval_diff = dynamic_cast<const Eval_Diff_K_Eps_VDF&> (iter.evaluateur());
   return eval_diff.diffusivite_turbulente();
 }
 

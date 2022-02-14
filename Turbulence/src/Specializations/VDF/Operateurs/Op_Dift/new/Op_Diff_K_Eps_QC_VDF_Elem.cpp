@@ -14,25 +14,21 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Diff_K_Eps_VDF_Elem_Axi.cpp
-// Directory:   $TRUST_ROOT/src/VDF/Axi/Turbulence
-// Version:     /main/10
+// File:        Op_Diff_K_Eps_QC_VDF_Elem.cpp
+// Directory:   $TRUST_ROOT/src/VDF/Turbulence
+// Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Diff_K_Eps_VDF_Elem_Axi.h>
-#include <Modele_turbulence_hyd_K_Eps.h>
+#include <Op_Diff_K_Eps_QC_VDF_Elem.h>
 #include <Champ_P0_VDF.h>
 
 
-Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem_Axi,"Op_Diff_K_Eps_VDF_P0_VDF_Axi",Op_Diff_K_Eps_VDF_base);
+Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_QC_VDF_Elem,"Op_Diff_K_Eps_QC_VDF_P0_VDF",Op_Diff_K_Eps_VDF_base);
 
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem_Axi)
+implemente_It_VDF_Elem(Eval_Diff_K_Eps_QC_VDF_Elem)
 
-////  printOn
-//
-
-Sortie& Op_Diff_K_Eps_VDF_Elem_Axi::printOn(Sortie& s ) const
+Sortie& Op_Diff_K_Eps_QC_VDF_Elem::printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
 }
@@ -40,34 +36,36 @@ Sortie& Op_Diff_K_Eps_VDF_Elem_Axi::printOn(Sortie& s ) const
 //// readOn
 //
 
-Entree& Op_Diff_K_Eps_VDF_Elem_Axi::readOn(Entree& s )
+
+Entree& Op_Diff_K_Eps_QC_VDF_Elem::readOn(Entree& s )
 {
   return s ;
 }
 
 
+
 // Description:
 // complete l'iterateur et l'evaluateur
-void Op_Diff_K_Eps_VDF_Elem_Axi::associer(const Zone_dis& zone_dis,
-                                          const Zone_Cl_dis& zone_cl_dis,
-                                          const Champ_Inc& ch_diffuse)
+void Op_Diff_K_Eps_QC_VDF_Elem::associer(const Zone_dis& zone_dis,
+                                         const Zone_Cl_dis& zone_cl_dis,
+                                         const Champ_Inc& ch_diffuse)
 {
-  //  Cerr << "Op_Diff_K_Eps_VDF_Elem_Axi::associer() " << finl;
   const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
   const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
   const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
   iter.associer(zvdf, zclvdf, *this);
 
-  Eval_Diff_K_Eps_VDF_Elem_Axi& eval_diff = (Eval_Diff_K_Eps_VDF_Elem_Axi&) iter.evaluateur();
+  Eval_Diff_K_Eps_QC_VDF_Elem& eval_diff = dynamic_cast<Eval_Diff_K_Eps_QC_VDF_Elem&> (iter.evaluateur());
   eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
   eval_diff.associer_inconnue(inco );        // Eval_VDF_Elem::associer_inconnue
 }
 
 
+
 //
-// Fonctions inline de la classe Op_Diff_K_Eps_VDF_Elem_Axi
+// Fonctions inline de la classe Op_Diff_K_Eps_QC_VDF_Elem
 //
-Op_Diff_K_Eps_VDF_Elem_Axi::Op_Diff_K_Eps_VDF_Elem_Axi() :
-  Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem_Axi)())
+Op_Diff_K_Eps_QC_VDF_Elem::Op_Diff_K_Eps_QC_VDF_Elem() :
+  Op_Diff_K_Eps_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_QC_VDF_Elem)())
 {
 }
