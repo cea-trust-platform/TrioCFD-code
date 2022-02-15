@@ -20,48 +20,43 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 #define Eval_Diff_K_Eps_Bas_Re_VDF_var_included
 
-#define PRDT_K_DEFAUT 1
-#define PRDT_EPS_DEFAUT 1.3
-
-#include <Eval_Diff_VDF_var_old.h>
+#include <Eval_Diff_VDF_var.h>
 #include <Ref_Champ_Fonc.h>
 #include <Ref_Champ_Uniforme.h>
+#include <Champ_Fonc.h>
 
-class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF_var_old
+class  Eval_Diff_K_Eps_Bas_Re_VDF_var : public Eval_Diff_VDF_var
 {
-
 public:
+  Eval_Diff_K_Eps_Bas_Re_VDF_var(double Prandt_K = PRDT_K_DEFAUT , double Prandt_Eps =PRDT_EPS_DEFAUT ) : Prdt_K(Prandt_K) , Prdt_Eps(Prandt_Eps)
+  {
+    Prdt[0]=Prandt_K;
+    Prdt[1]=Prandt_Eps;
+  }
 
-  Eval_Diff_K_Eps_Bas_Re_VDF_var(double Prandt_K = PRDT_K_DEFAUT ,
-                                 double Prandt_Eps =PRDT_EPS_DEFAUT ) ;
-  void associer_diff_turb(const Champ_Fonc& );
-  inline const Champ_Fonc& diffusivite_turbulente() const;
-  void mettre_a_jour( );
+  inline void associer_diff_turb(const Champ_Fonc& diffu) { diffusivite_turbulente_ = diffu; }
+  inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
+  inline void mettre_a_jour() { dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); }
+
+  // pour CRTP
+  inline double nu_1_impl(int i, int compo) const
+  {
+    return dv_diffusivite(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
+  }
+
+  inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const
+  {
+    return 0.5*(nu_1_impl(i,compo) + nu_1_impl(j,compo))/(d0+d1);
+  }
+
 protected:
-
-  double Prdt_K;
-  double Prdt_Eps;
-  double Prdt[2];
+  static constexpr double PRDT_K_DEFAUT = 1.0, PRDT_EPS_DEFAUT = 1.3;
+  double Prdt_K, Prdt_Eps, Prdt[2];
   REF(Champ_Fonc) diffusivite_turbulente_;
   DoubleVect dv_diffusivite_turbulente;
-
 };
 
-//
-//  Fonctions inline de la classe Eval_Diff_K_Eps_Bas_Re_VDF_var
-//
-
-
-
-
-inline const Champ_Fonc& Eval_Diff_K_Eps_Bas_Re_VDF_var::diffusivite_turbulente() const
-{
-  return diffusivite_turbulente_.valeur();
-}
-
-
-#endif
+#endif /* Eval_Diff_K_Eps_Bas_Re_VDF_var_included */

@@ -82,7 +82,7 @@ const Champ_base& Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::diffusivite() const
 {
   const Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem& eval_diff_turb =
     (const Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem&) iter.evaluateur();
-  return eval_diff_turb.diffusivite();
+  return eval_diff_turb.get_diffusivite();
 }
 
 void Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::associer_diffusivite_turbulente()

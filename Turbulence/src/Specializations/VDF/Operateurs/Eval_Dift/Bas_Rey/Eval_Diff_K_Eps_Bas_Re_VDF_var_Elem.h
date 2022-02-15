@@ -20,89 +20,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem_included
 #define Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem_included
 
 #include <Eval_Diff_K_Eps_Bas_Re_VDF_var.h>
-#include <Champ_Fonc.h>
-#include <Eval_VDF_Elem.h>
+#include <Eval_Diff_VDF_Elem.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem : public Eval_Diff_K_Eps_Bas_Re_VDF_var, public Eval_VDF_Elem
+class Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem>, public Eval_Diff_K_Eps_Bas_Re_VDF_var
 {
 public:
-  inline Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem();
-
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Symetrie&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Periodique&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Neumann_sortie_libre&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Dirichlet_entree_fluide&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Dirichlet_paroi_fixe&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Dirichlet_paroi_defilante&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Neumann_paroi_adiabatique&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Neumann_paroi&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const int, const int, const Echange_externe_impose&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_face(const DoubleTab&, const int , const Echange_global_impose&, int, Type_Double& ) const;
-  template <typename Type_Double> inline void flux_faces_interne(const DoubleTab&, const int ,  Type_Double& ) const;
-
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Symetrie&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Neumann_sortie_libre&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Dirichlet_entree_fluide&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Dirichlet_paroi_fixe&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Dirichlet_paroi_defilante&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Neumann_paroi_adiabatique&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Neumann_paroi&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const int, const int, const Echange_externe_impose&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Echange_global_impose&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_face(const int, const int, const Periodique&, Type_Double& , Type_Double&  ) const;
-  template <typename Type_Double> inline void coeffs_faces_interne(int, Type_Double& , Type_Double&  ) const;
-
-  template <typename Type_Double> inline void secmem_face(const int, const Symetrie&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Neumann_sortie_libre&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Dirichlet_entree_fluide&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Dirichlet_paroi_fixe&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Dirichlet_paroi_defilante&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Neumann_paroi_adiabatique&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Neumann_paroi&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const int, const int, const Echange_externe_impose&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Echange_global_impose&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_face(const int, const Periodique&, const int, Type_Double& ) const;
-  template <typename Type_Double> inline void secmem_faces_interne(const int, Type_Double& ) const;
+  static constexpr bool IS_RANS = true;
 };
 
-//
-// Fonctions inline de la classe Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem
-//
-
-inline Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem::Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem()
-  : Eval_Diff_K_Eps_Bas_Re_VDF_var() {}
-// DEBUT DES DEFINES
-#define CLASSNAME Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem
-#define nu_1(i,k) (dv_diffusivite(i)+dv_diffusivite_turbulente(i)/Prdt[k])
-#define nu_2(i,k) dv_diffusivite(i)
-#define f_heq(d0,i,d1,j,k) heq=0.5*(nu_1(i,k) + nu_1(j,k))/(d1+d0);
-#undef D_AXI
-#undef DEQUIV
-#define MULTD
-#include <Vect_corps_base.h>
-#undef CLASSNAME
-#undef f_heq
-#undef nu_1
-#undef nu_2
-#undef DEQUIV
-#undef MULTD
-#undef D_AXI
-#undef Dist_face_elem0
-#undef Dist_face_elem1
-#undef Dist_norm_bord_externe
-#undef Dist_norm_bord
-#undef MODIF_DEQ
-#undef ISQUASI
-#endif
+#endif /* Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem_included */

@@ -56,5 +56,22 @@ public:
   }
 };
 
+class Eval_Diff_K_Eps_Bas_Re_VDF_const : public Eval_Diff_K_Eps_VDF
+{
+public:
+  // Methods used by the flux computation in template class:
+  inline double nu_1_impl(int i, int compo) const
+  {
+    return db_diffusivite + dv_diffusivite_turbulente(i)/Prdt[compo];
+  }
+
+  inline double nu_2_impl(int i, int compo) const { return db_diffusivite; }
+
+  inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const
+  {
+    return 0.5*(nu_1_impl(i,compo)+nu_1_impl(j,compo))/(d0+d1);
+  }
+};
+
 
 #endif /* Eval_Diff_K_Eps_VDF_const_included */

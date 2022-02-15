@@ -23,11 +23,12 @@
 #ifndef Eval_Diff_K_Eps_V2_VDF_const_Elem_included
 #define Eval_Diff_K_Eps_V2_VDF_const_Elem_included
 
-#include <Eval_Diff_K_Eps_Bas_Re_VDF_const.h>
+#include <Eval_Diff_K_Eps_VDF_const.h>
 #include <Champ_Fonc.h>
 #include <Eval_VDF_Elem.h>
+#include <Evaluateur_VDF.h>
 
-class Eval_Diff_K_Eps_V2_VDF_const_Elem : public Eval_Diff_K_Eps_Bas_Re_VDF_const, public Eval_VDF_Elem
+class Eval_Diff_K_Eps_V2_VDF_const_Elem : public Eval_Diff_K_Eps_Bas_Re_VDF_const, public Eval_VDF_Elem, public Evaluateur_VDF
 {
 
 public:
