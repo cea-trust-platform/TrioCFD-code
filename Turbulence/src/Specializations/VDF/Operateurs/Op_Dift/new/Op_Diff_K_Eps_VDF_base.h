@@ -20,172 +20,75 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef Op_Diff_K_Eps_VDF_base_included
 #define Op_Diff_K_Eps_VDF_base_included
 
-#include <Op_Diff_K_Eps_base.h>
-#include <ItVDFEl.h>
 #include <Eval_Diff_K_Eps_VDF_leaves.h>
+#include <Op_Diff_K_Eps_base.h>
 #include <Op_VDF_Elem.h>
+#include <ItVDFEl.h>
 
-class Zone_dis;
 class Zone_Cl_dis;
+class Zone_dis;
 class Champ_Inc;
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Op_Diff_K_Eps_VDF_base
-//
-//////////////////////////////////////////////////////////////////////////////
 
 class Op_Diff_K_Eps_VDF_base : public Op_Diff_K_Eps_base, public Op_VDF_Elem
 {
-
   Declare_base(Op_Diff_K_Eps_VDF_base);
-
 public:
+  Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& iter_base) : iter(iter_base) { }
 
-  inline Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& );
-  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
-  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
-  inline void contribuer_au_second_membre(DoubleTab& ) const;
-  virtual void mettre_a_jour_diffusivite() const;
   void completer();
   void associer_diffusivite(const Champ_base& ch_diff);
   void associer_diffusivite_turbulente();
-  // void associer_diffusivite(const Champ_Don& );
-  // void associer_mvolumique();
-  inline  void dimensionner(Matrice_Morse& ) const;
   void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
   const Champ_Fonc& diffusivite_turbulente() const;
-  const Champ_base& diffusivite() const ;
+  const Champ_base& diffusivite() const;
+
+  virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }
+
+  inline void dimensionner(Matrice_Morse& matrice) const { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
+  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const { iter->ajouter_contribution(inco, matrice); }
+  inline void contribuer_au_second_membre(DoubleTab& resu) const { iter->contribuer_au_second_membre(resu); }
+
+  inline DoubleTab& ajouter(const DoubleTab& inco,  DoubleTab& resu) const
+  {
+    mettre_a_jour_diffusivite();
+    return iter->ajouter(inco, resu);
+  }
+
+  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const
+  {
+    mettre_a_jour_diffusivite();
+    return iter->calculer(inco, resu);
+  }
+
+  inline Iterateur_VDF& get_iter() { return iter; }
 
 protected:
-
-  //Champ_Fonc diff_tot;
   Iterateur_VDF iter;
-
 };
 
-declare_It_VDF_Elem(Eval_Diff_K_Eps_VDF_Elem)
-declare_It_VDF_Elem(Eval_Diff_K_VDF_Elem)
-declare_It_VDF_Elem(Eval_Diff_Eps_VDF_Elem)
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Op_Diff_K_Eps_VDF_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Op_Diff_K_Eps_VDF_Elem : public Op_Diff_K_Eps_VDF_base
+// one for all !
+template<typename OP_TYPE>
+class Op_Diff_K_Eps_VDF_Generique
 {
+protected:
 
-  Declare_instanciable_sans_constructeur(Op_Diff_K_Eps_VDF_Elem);
+  template <typename EVAL_TYPE>
+  inline void associer_impl(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_cl_dis, const Champ_Inc& ch_diffuse)
+  {
+    const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
+    const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
+    const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
+    iter_()->associer(zvdf, zclvdf,static_cast<OP_TYPE&>(*this));
+    EVAL_TYPE& eval_diff = static_cast<EVAL_TYPE&> (iter_()->evaluateur());
+    eval_diff.associer_zones(zvdf, zclvdf );
+    eval_diff.associer_inconnue(inco );
+  }
 
-public:
-
-  Op_Diff_K_Eps_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
+private:
+  inline Iterateur_VDF& iter_() { return static_cast<OP_TYPE *>(this)->get_iter(); } // CRTP pour recuperer l'iter
 };
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Op_Diff_K_VDF_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Op_Diff_K_VDF_Elem : public Op_Diff_K_Eps_VDF_base
-{
-
-  Declare_instanciable_sans_constructeur(Op_Diff_K_VDF_Elem);
-
-public:
-
-  Op_Diff_K_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
-};
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Op_Diff_Eps_VDF_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Op_Diff_Eps_VDF_Elem : public Op_Diff_K_Eps_VDF_base
-{
-
-  Declare_instanciable_sans_constructeur(Op_Diff_Eps_VDF_Elem);
-
-public:
-
-  Op_Diff_Eps_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
-};
-
-
-//
-// Fonctions inline de la classe Op_Diff_K_Eps_VDF_base
-//
-
-// Description:
-// constructeur
-inline Op_Diff_K_Eps_VDF_base::Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& iter_base) :
-  iter(iter_base)
-{}
-
-
-// Description:
-// ajoute la contribution de la diffusion au second membre resu
-// renvoie resu
-inline DoubleTab& Op_Diff_K_Eps_VDF_base::ajouter(const DoubleTab& inco,  DoubleTab& resu) const
-{
-  mettre_a_jour_diffusivite();
-  return iter.ajouter(inco, resu);
-}
-
-//Description:
-//on assemble la matrice.
-
-inline void Op_Diff_K_Eps_VDF_base::contribuer_a_avec(const DoubleTab& inco,
-                                                      Matrice_Morse& matrice) const
-{
-//  Cerr << "dans Op_Diff_K_Eps_VDF_base::contribuer_a_avec" << finl;
-  iter.ajouter_contribution(inco, matrice);
-}
-
-//Description:
-//on ajoute la contribution du second membre.
-
-inline void Op_Diff_K_Eps_VDF_base::contribuer_au_second_membre(DoubleTab& resu) const
-{
-  Cerr << "dans Op_Diff_K_Eps_VDF_base::contribuer_au_second_membre "<< finl;
-  iter.contribuer_au_second_membre(resu);
-}
-
-
-// Description:
-// calcule la contribution de la diffusion, la range dans resu
-// renvoie resu
-inline DoubleTab& Op_Diff_K_Eps_VDF_base::calculer(const DoubleTab& inco,  DoubleTab& resu) const
-{
-  mettre_a_jour_diffusivite();
-  return iter.calculer(inco, resu);
-}
-
-// Description:
-// on dimensionne notre matrice.
-inline  void Op_Diff_K_Eps_VDF_base::dimensionner(Matrice_Morse& matrice) const
-{
-  Op_VDF_Elem::dimensionner(iter.zone(), iter.zone_Cl(), matrice);
-}
-
-
-
-
-#endif
+#endif /* Op_Diff_K_Eps_VDF_base_included */
