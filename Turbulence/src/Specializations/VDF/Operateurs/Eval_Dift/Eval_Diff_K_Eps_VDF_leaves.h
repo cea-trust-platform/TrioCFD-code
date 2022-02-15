@@ -14,22 +14,66 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Eval_Diff_K_VDF_Elem.h
+// File:        Eval_Diff_K_Eps_VDF_leaves.h
 // Directory:   $TRUST_ROOT/src/VDF/Turbulence
 // Version:     /main/15
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Eval_Diff_K_VDF_Elem_included
-#define Eval_Diff_K_VDF_Elem_included
+#ifndef Eval_Diff_K_Eps_VDF_leaves_included
+#define Eval_Diff_K_Eps_VDF_leaves_included
 
 #include <Eval_Diff_K_Eps_VDF_const.h>
+#include <Eval_Diff_K_Eps_VDF_var.h>
 #include <Eval_Diff_VDF_Elem.h>
 
+/// \cond DO_NOT_DOCUMENT
+class Eval_Diff_K_Eps_VDF_leaves { };
+/// \endcond
+
+// const
+class Eval_Diff_K_Eps_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_VDF_Elem>, public Eval_Diff_K_Eps_VDF_const
+{
+public:
+  static constexpr bool IS_MULTD = false, IS_RANS = true;
+};
+
+class Eval_Diff_K_Eps_VDF_Elem_Axi : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_VDF_Elem_Axi>, public Eval_Diff_K_ou_Eps_VDF_const
+{
+public:
+  static constexpr bool IS_MULTD = false, IS_AXI = true, IS_RANS = true;
+};
+
+class Eval_Diff_K_Eps_QC_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_QC_VDF_Elem>, public Eval_Diff_K_Eps_VDF_const
+{
+public:
+  static constexpr bool IS_MULTD = false, IS_QUASI = true, IS_RANS = true;
+};
+
+// var
+class Eval_Diff_K_Eps_var_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_var_VDF_Elem>, public Eval_Diff_K_Eps_VDF_var
+{
+public:
+  static constexpr bool IS_RANS = true;
+};
+
+class Eval_Diff_K_Eps_QC_var_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_Eps_QC_var_VDF_Elem>, public Eval_Diff_K_Eps_VDF_var
+{
+public:
+  static constexpr bool IS_MULTD = false, IS_QUASI = true, IS_RANS = true;
+};
+
+// Bicephale
 class Eval_Diff_K_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_K_VDF_Elem>, public Eval_Diff_K_ou_Eps_VDF_const
 {
 public:
   static constexpr bool IS_MULTD = false, IS_RANS = true;
 };
 
-#endif /* Eval_Diff_K_VDF_Elem_included*/
+class Eval_Diff_Eps_VDF_Elem : public Eval_Diff_VDF_Elem<Eval_Diff_Eps_VDF_Elem>, public Eval_Diff_K_ou_Eps_VDF_const
+{
+public:
+  static constexpr bool IS_MULTD = false, IS_RANS = true;
+};
+
+#endif /* Eval_Diff_K_Eps_VDF_leaves_included */

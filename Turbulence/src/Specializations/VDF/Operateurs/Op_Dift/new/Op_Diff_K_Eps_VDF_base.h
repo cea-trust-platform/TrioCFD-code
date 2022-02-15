@@ -27,9 +27,7 @@
 
 #include <Op_Diff_K_Eps_base.h>
 #include <ItVDFEl.h>
-#include <Eval_Diff_K_Eps_VDF_Elem.h>
-#include <Eval_Diff_K_VDF_Elem.h>
-#include <Eval_Diff_Eps_VDF_Elem.h>
+#include <Eval_Diff_K_Eps_VDF_leaves.h>
 #include <Op_VDF_Elem.h>
 
 class Zone_dis;
