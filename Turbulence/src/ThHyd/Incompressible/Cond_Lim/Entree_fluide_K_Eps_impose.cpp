@@ -89,11 +89,10 @@ int Entree_fluide_K_Eps_impose::compatible_avec_eqn(const Equation_base& eqn) co
 {
   Motcle dom_app=eqn.domaine_application();
   Motcle K_Eps="Transport_Keps";
-  Motcle K_Eps_V2="Transport_Keps_V2";
   Motcle K_Eps_Bas_Re="Transport_Keps_Bas_Re";
   Motcle K_Eps_Rea="Transport_Keps_Rea";
   Motcle indetermine="indetermine";
-  if ( (dom_app==K_Eps) || (dom_app==K_Eps_Bas_Re) || (dom_app==K_Eps_V2) || (dom_app==K_Eps_Rea) || (dom_app==indetermine) )
+  if ( (dom_app==K_Eps) || (dom_app==K_Eps_Bas_Re) || (dom_app==K_Eps_Rea) || (dom_app==indetermine) )
     return 1;
   else
     {

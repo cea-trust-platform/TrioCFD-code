@@ -34,12 +34,6 @@ Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem::printOn(Sortie& s ) const { return s << q
 Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem::readOn(Entree& s ) { return s ; }
 Op_Diff_K_Eps_Bas_Re_VDF_Elem::Op_Diff_K_Eps_Bas_Re_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)()) { }
 
-Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_V2_VDF_Elem,"Op_Diff_K_Eps_V2_VDF_const_P0_VDF",Op_Diff_K_Eps_Bas_Re_VDF_base);
-implemente_It_VDF_Elem(Eval_Diff_K_Eps_V2_VDF_const_Elem)
-Sortie& Op_Diff_K_Eps_V2_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
-Entree& Op_Diff_K_Eps_V2_VDF_Elem::readOn(Entree& s ) { return s ; }
-Op_Diff_K_Eps_V2_VDF_Elem::Op_Diff_K_Eps_V2_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_V2_VDF_const_Elem)()) { }
-
 ///////////////////////////////////
 // VAR
 

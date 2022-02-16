@@ -21,7 +21,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
-#include <Transport_K_Eps_V2.h>
 #include <Champ_Don.h>
 #include <Champ_Uniforme.h>
 #include <Discretisation_base.h>
@@ -229,47 +228,22 @@ void Op_Diff_K_Eps_Bas_Re::typer()
       Nom nom_type;
       Cerr << "equation().valeur() " << equation() << finl;
       //if ( (!sub_type(Transport_K_Eps,equation().que_suis_je())) && (!sub_type(Transport_K_Eps_Bas_Re,equation().que_suis_je())) )
-      if ( sub_type(Transport_K_Eps_V2,equation()))
+      nom_type="Op_Diff_K_Eps_Bas_Re_";
+      Nom discr = equation().discretisation().que_suis_je();
+      if (discr=="VEFPreP1B") discr = "VEF";
+      Nom type_diff;
+      nom_type +=discr;
+      if (discr!="VDF_Hyper")
         {
-          Cerr << "DANS LE IF V2" << finl;
-          nom_type="Op_Diff_K_Eps_V2_";
-          Nom discr = equation().discretisation().que_suis_je();
-          if (discr=="VEFPreP1B") discr = "VEF";
-          Nom type_diff;
-          nom_type +=discr;
-          if (discr!="VDF_Hyper")
-            {
-              if(sub_type(Champ_Uniforme,diffusivite()))
-                type_diff="_const_";
-              else
-                type_diff="_var_";
-              nom_type+= type_diff;
-              Nom type_inco=equation().inconnue()->que_suis_je();
-              nom_type+=(type_inco.suffix("Champ_"));
-              if (axi)
-                nom_type += "_Axi";
-            }
-        }
-      else
-        {
-          Cerr << "DANS LE ELSE" << finl;
-          nom_type="Op_Diff_K_Eps_Bas_Re_";
-          Nom discr = equation().discretisation().que_suis_je();
-          if (discr=="VEFPreP1B") discr = "VEF";
-          Nom type_diff;
-          nom_type +=discr;
-          if (discr!="VDF_Hyper")
-            {
-              if(sub_type(Champ_Uniforme,diffusivite()))
-                type_diff="_const_";
-              else
-                type_diff="_var_";
-              nom_type+= type_diff;
-              Nom type_inco=equation().inconnue()->que_suis_je();
-              nom_type+=(type_inco.suffix("Champ_"));
-              if (axi)
-                nom_type += "_Axi";
-            }
+          if(sub_type(Champ_Uniforme,diffusivite()))
+            type_diff="_const_";
+          else
+            type_diff="_var_";
+          nom_type+= type_diff;
+          Nom type_inco=equation().inconnue()->que_suis_je();
+          nom_type+=(type_inco.suffix("Champ_"));
+          if (axi)
+            nom_type += "_Axi";
         }
       Cerr << " type = " << nom_type << finl;
       DERIV(Op_Diff_K_Eps_Bas_Re_base)::typer(nom_type);

@@ -25,9 +25,7 @@
 
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Modele_turbulence_hyd_K_Eps_2_Couches.h>
-#include <Eval_Diff_K_Eps_V2_VDF_const_Elem.h>
 #include <Eval_Diff_K_Eps_Bas_Re_VDF_leaves.h>
-#include <Modele_turbulence_hyd_K_Eps_V2.h>
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
 #include <Op_VDF_Elem.h>
 #include <ItVDFEl.h>
@@ -75,23 +73,15 @@ public:
     return eval_diff_turb.diffusivite();
   }
 
-  enum class TYPE_EQ { BAS_RE , V2 };
-
-  template <TYPE_EQ _TYPE_ ,typename EVAL_TYPE, typename EVAL_TYPE2 = EVAL_TYPE /* for var only */>
-  inline typename std::enable_if<_TYPE_ == TYPE_EQ::BAS_RE, void>::type
-  associer_diffusivite_turbulente_impl();
-
-  template <TYPE_EQ _TYPE_ ,typename EVAL_TYPE>
-  inline typename std::enable_if<_TYPE_ == TYPE_EQ::V2, void>::type
-  associer_diffusivite_turbulente_impl();
+  template <typename EVAL_TYPE, typename EVAL_TYPE2 = EVAL_TYPE /* for var only */>
+  void associer_diffusivite_turbulente_impl();
 
 protected:
   Iterateur_VDF iter;
 };
 
-template <Op_Diff_K_Eps_Bas_Re_VDF_base::TYPE_EQ _TYPE_ ,typename EVAL_TYPE, typename EVAL_TYPE2>
-inline typename std::enable_if<_TYPE_ == Op_Diff_K_Eps_Bas_Re_VDF_base::TYPE_EQ::BAS_RE, void>::type
-Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
+template <typename EVAL_TYPE, typename EVAL_TYPE2>
+void Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
 {
   assert(mon_equation.non_nul());
   if(sub_type(Transport_K_KEps,mon_equation.valeur()))
@@ -116,21 +106,6 @@ Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
       const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
       const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
       EVAL_TYPE2& eval_diff = static_cast<EVAL_TYPE2&> (iter->evaluateur());
-      eval_diff.associer_diff_turb(diff_turb);
-    }
-}
-
-template <Op_Diff_K_Eps_Bas_Re_VDF_base::TYPE_EQ _TYPE_ ,typename EVAL_TYPE>
-inline typename std::enable_if<_TYPE_ == Op_Diff_K_Eps_Bas_Re_VDF_base::TYPE_EQ::V2, void>::type
-Op_Diff_K_Eps_Bas_Re_VDF_base::associer_diffusivite_turbulente_impl()
-{
-  assert(mon_equation.non_nul());
-  if(sub_type(Transport_K_Eps_V2,mon_equation.valeur()))
-    {
-      const Transport_K_Eps_V2& eqn_transport = ref_cast(Transport_K_Eps_V2,mon_equation.valeur());
-      const Modele_turbulence_hyd_K_Eps_V2& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_V2,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
-      EVAL_TYPE& eval_diff = static_cast<EVAL_TYPE&> (iter->evaluateur());
       eval_diff.associer_diff_turb(diff_turb);
     }
 }
