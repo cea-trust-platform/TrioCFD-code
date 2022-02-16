@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,81 +12,54 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem.h
+// Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
+//
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem_included
+#define Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem_included
+
+#include <Source_Transport_Eps_Realisable_VDF_Elem.h>
+
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Source_Transport_K_KEps_VDF_Elem.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/12
-//
-//////////////////////////////////////////////////////////////////////////////
-
-
-#ifndef Source_Transport_K_KEps_VDF_Elem_included
-#define Source_Transport_K_KEps_VDF_Elem_included
-
-#include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Ref_Transport_K_KEps.h>
-
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
-class Champ_Face;
-
-
-
-//.DESCRIPTION class Source_Transport_K_KEps_VDF_Elem
+// CLASS: Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem
 //
 // Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) avec le modele a deux couches et dans le cas
-// ou les equations de Navier-Stokes
-// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion
-// d'une concentration.
+// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
+// sont couplees a l'equation d'un transport d'un constituant
+// On suppose que le coefficient de variation de la masse volumique
+// du fluide en fonction de ce scalaire est un coefficient uniforme.
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_KEps_VDF_Elem : public Source_base,
-  public Calcul_Production_K_VDF
+class Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem : public Source_Transport_Eps_Realisable_VDF_Elem
 {
-
-  Declare_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem);
-
+  Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem);
 public:
 
-  inline Source_Transport_K_KEps_VDF_Elem(double cte1 = C1_DEFAULT,
-                                          double cte2 = C2_DEFAULT );
+  inline Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem(double cte2 = C2_DEFAULT,
+                                                               double cte3 = C3_DEFAULT_K_EPS_REALISABLE);
+  virtual void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
   DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double temps)
-  {
-    Calcul_Production_K_VDF::mettre_a_jour(temps);
-  }
 
 protected:
-
-  double C1;
-  double C2;
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  REF(Equation_base) eq_hydraulique;
-  REF(Transport_K_KEps)  mon_eq_transport_K_Eps;
-
-  virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  double C3_;
+  REF(Convection_Diffusion_Concentration) eq_concentration;
+  REF(Champ_Don) beta_c;
+  REF(Champ_Don_base) gravite;
 
 };
 
+inline Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem::
+Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem(double cte2,double cte3)
 
-inline Source_Transport_K_KEps_VDF_Elem::
-Source_Transport_K_KEps_VDF_Elem(double cte1,double cte2)
-
-  : C1(cte1), C2(cte2) {}
-
+  : Source_Transport_Eps_Realisable_VDF_Elem(cte2) , C3_(cte3) {}
 
 
 
-#endif
+#endif /* Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem_included */

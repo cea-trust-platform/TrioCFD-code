@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,83 +12,61 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem.h
+// Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
+//
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem_included
+#define Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem_included
+
+#include <Source_Transport_K_Eps_Realisable_VDF_Elem.h>
+
+
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Source_Transport_K_VDF_Elem.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/16
-//
-//////////////////////////////////////////////////////////////////////////////
-
-
-#ifndef Source_Transport_K_VDF_Elem_included
-#define Source_Transport_K_VDF_Elem_included
-
-
-#include <Source_base.h>
-#include <Ref_Zone_VDF.h>
-#include <Ref_Champ_Don.h>
-#include <Ref_Champ_Don_base.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Ref_Equation_base.h>
-#include <Ref_Transport_K_ou_Eps.h>
-#include <Calcul_Production_K_VDF.h>
-
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
-class Champ_Face;
-
-//////////////////////////////////////////////////////////////////////////////
-//.DESCRIPTION class Source_Transport_K_VDF_Elem
+// CLASS: Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem
 //
 // Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier-Stokes
-// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion
-// d'une concentration.
+// de transport du couple (k,eps) dans le cas ou les equations de
+// Navier_Stokes sont couplees a l'equation de convection diffusion
+// d'une concentration et a l'equation de la thermique
+// Les champs beta_t et beta_c sont uniformes
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_VDF_Elem : public Source_base,
-  public Calcul_Production_K_VDF
+class Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem :
+  public Source_Transport_K_Eps_Realisable_VDF_Elem
 {
 
-  Declare_instanciable(Source_Transport_K_VDF_Elem);
+  Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem);
 
 public:
 
+  inline Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem(double cte2 = C2_DEFAULT,
+                                                                       double cte3 = C3_DEFAULT_K_EPS_REALISABLE);
+  virtual void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
   DoubleTab& calculer(DoubleTab& ) const;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-  void mettre_a_jour(double temps) ;
 
 protected:
 
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Equation_base) eq_hydraulique;
-  REF(Transport_K_ou_Eps)  mon_eq_transport_K;
-  REF(Transport_K_ou_Eps)  mon_eq_transport_Eps;
+  double C3_;
+  REF(Convection_Diffusion_Temperature) eq_thermique;
+  REF(Convection_Diffusion_Concentration) eq_concentration;
+  REF(Champ_Don) beta_t;
+  REF(Champ_Don) beta_c;
+  REF(Champ_Don_base) gravite;
 
-  virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
 };
 
-//// readOn
-//
-inline void error(const Nom& source, const Nom& problem)
-{
-  Cerr << "Error ! You can't use the " << source << " source term for the K equation of the problem: " << problem << finl;
-  Cerr << "Check the reference manual. It is may be another source term Source_Transport_K_.... which should be used." << finl;
-  Process::exit();
-}
+
+inline Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem::
+Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem(double cte2,double cte3)
+
+  : Source_Transport_K_Eps_Realisable_VDF_Elem(cte2) , C3_(cte3) {}
 
 
-
-#endif
-
-
+#endif /* Source_Transport_K_Eps_Realisable_aniso_therm_concen_VDF_Elem_included */

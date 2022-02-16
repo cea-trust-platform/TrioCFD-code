@@ -83,98 +83,6 @@ protected :
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-//.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem :
-  public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
-{
-
-  Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem);
-
-public:
-
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                  double cte2 = C21_DEFAULT );
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-};
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique, et ou le fluide est quasi compressible.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem
-{
-
-  Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem);
-
-public:
-
-  DoubleTab& ajouter(DoubleTab& ) const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                     double cte2 = C21_DEFAULT );
-protected:
-};
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de
-// Navier_Stokes sont couplees a l'equation de convection diffusion
-// d'une concentration et a l'equation de la thermique
-// Les champs beta_t et beta_c sont uniformes
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem :
-  public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
-{
-
-  Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem);
-
-public:
-
-  DoubleTab& ajouter(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                         double cte2 = C21_DEFAULT );
-
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-};
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -188,18 +96,6 @@ Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(double cte1,double cte2)
   : C1(cte1), C2(cte2) {}
 
 
-inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(double cte1 ,double cte2 )
 
-  : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2) {}
-inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem(double cte1 ,double cte2 )
-
-  : Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(cte1,cte2) {}
-
-inline Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem(double cte1, double cte2)
-
-  : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2) {}
 
 #endif
