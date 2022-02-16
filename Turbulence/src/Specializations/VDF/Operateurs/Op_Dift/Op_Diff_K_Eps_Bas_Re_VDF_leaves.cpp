@@ -14,51 +14,39 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Op_Diff_K_Eps_Bas_Re_VDF_var_Elem.cpp
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/13
+// File:        Op_Diff_K_Eps_Bas_Re_VDF_leaves.cpp
+// Directory:   $TRUST_ROOT/src/VDF/Axi/Turbulence
+// Version:     /main/11
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Op_Diff_K_Eps_Bas_Re_VDF_var_Elem.h>
-#include <Champ_P0_VDF.h>
-#include <Modele_turbulence_hyd_K_Eps_2_Couches.h>
-#include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
+#include <Op_Diff_K_Eps_Bas_Re_VDF_leaves.h>
+
+Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi,"Op_Diff_K_Eps_Bas_Re_VDF_const_P0_VDF_Axi",Op_Diff_K_Eps_Bas_Re_VDF_base);
+implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi)
+Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::printOn(Sortie& s ) const { return s << que_suis_je() ; }
+Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::readOn(Entree& s ) { return s ; }
+Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi::Op_Diff_K_Eps_Bas_Re_VDF_Elem_Axi() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem_Axi)()) { }
+
+Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem,"Op_Diff_K_Eps_Bas_Re_VDF_const_P0_VDF",Op_Diff_K_Eps_Bas_Re_VDF_base);
+implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)
+Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
+Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem::readOn(Entree& s ) { return s ; }
+Op_Diff_K_Eps_Bas_Re_VDF_Elem::Op_Diff_K_Eps_Bas_Re_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)()) { }
+
+Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_V2_VDF_Elem,"Op_Diff_K_Eps_V2_VDF_const_P0_VDF",Op_Diff_K_Eps_Bas_Re_VDF_base);
+implemente_It_VDF_Elem(Eval_Diff_K_Eps_V2_VDF_const_Elem)
+Sortie& Op_Diff_K_Eps_V2_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
+Entree& Op_Diff_K_Eps_V2_VDF_Elem::readOn(Entree& s ) { return s ; }
+Op_Diff_K_Eps_V2_VDF_Elem::Op_Diff_K_Eps_V2_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_V2_VDF_const_Elem)()) { }
+
+///////////////////////////////////
+// VAR
 
 Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_var_Elem,"Op_Diff_K_Eps_Bas_Re_VDF_var_P0_VDF",Op_Diff_K_Eps_Bas_Re_VDF_base);
 implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem)
-
 Sortie& Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 Entree& Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::readOn(Entree& s ) { return s ; }
-
-void Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::associer_diffusivite_turbulente()
-{
-  assert(mon_equation.non_nul());
-  if(sub_type(Transport_K_KEps,mon_equation.valeur()))
-    {
-      const Transport_K_KEps& eqn_transport = ref_cast(Transport_K_KEps,mon_equation.valeur());
-      const Modele_turbulence_hyd_K_Eps_2_Couches& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_2_Couches,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
-      Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem& eval_diff = static_cast<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem&> (iter->evaluateur());
-      eval_diff.associer_diff_turb(diff_turb);
-    }
-  else if(sub_type(Transport_K_Eps_Bas_Reynolds,mon_equation.valeur()))
-    {
-      const Transport_K_Eps_Bas_Reynolds& eqn_transport = ref_cast(Transport_K_Eps_Bas_Reynolds,mon_equation.valeur());
-      const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
-      Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem& eval_diff = static_cast<Eval_Diff_K_Eps_Bas_Re_VDF_var_Elem&> (iter->evaluateur());
-      eval_diff.associer_diff_turb(diff_turb);
-    }
-  else if(sub_type(Transport_K_Eps,mon_equation.valeur()))
-    {
-      const Transport_K_Eps& eqn_transport = ref_cast(Transport_K_Eps,mon_equation.valeur());
-      const Modele_turbulence_hyd_K_Eps& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps,eqn_transport.modele_turbulence());
-      const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
-      Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem& eval_diffc = static_cast<Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem&> (iter->evaluateur());
-      eval_diffc.associer_diff_turb(diff_turb);
-    }
-}
 
 double Op_Diff_K_Eps_Bas_Re_VDF_var_Elem::calculer_dt_stab() const
 {

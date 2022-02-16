@@ -27,6 +27,7 @@
 #include <CL_Types_include.h>
 #include <Evaluateur_VDF.h>
 #include <Eval_VDF_Elem.h>
+#include <Ref_Champ_Inc.h>
 
 class Eval_Diff_K_Eps_V2_VDF_const_Elem : public Eval_Diff_K_Eps_Bas_Re_VDF_const, public Eval_VDF_Elem, public Evaluateur_VDF
 {
