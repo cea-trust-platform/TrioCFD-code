@@ -24,6 +24,7 @@
 #define Eval_Diff_K_Eps_V2_VDF_const_Elem_included
 
 #include <Eval_Diff_K_Eps_VDF_const.h>
+#include <CL_Types_include.h>
 #include <Evaluateur_VDF.h>
 #include <Eval_VDF_Elem.h>
 

@@ -29,50 +29,14 @@ Implemente_instanciable_sans_constructeur(Op_Diff_K_Eps_Bas_Re_VDF_Elem,"Op_Diff
 
 implemente_It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)
 
-Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem::printOn(Sortie& s ) const
-{
-  return s << que_suis_je() ;
-}
+Sortie& Op_Diff_K_Eps_Bas_Re_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
+Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem::readOn(Entree& s ) { return s ; }
 
-Entree& Op_Diff_K_Eps_Bas_Re_VDF_Elem::readOn(Entree& s )
-{
-  return s ;
-}
-
-
-
-// Description:
-// complete l'iterateur et l'evaluateur
-void Op_Diff_K_Eps_Bas_Re_VDF_Elem::associer(const Zone_dis& zone_dis,
-                                             const Zone_Cl_dis& zone_cl_dis,
-                                             const Champ_Inc& ch_diffuse)
-{
-  const Champ_P0_VDF& inco = ref_cast(Champ_P0_VDF,ch_diffuse.valeur());
-  const Zone_VDF& zvdf = ref_cast(Zone_VDF,zone_dis.valeur());
-  const Zone_Cl_VDF& zclvdf = ref_cast(Zone_Cl_VDF,zone_cl_dis.valeur());
-  iter.associer(zvdf, zclvdf, *this);
-  Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem& eval_diff = (Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem&) iter.evaluateur();
-  eval_diff.associer_zones(zvdf, zclvdf );          // Evaluateur_VDF::associer_zones
-  eval_diff.associer_inconnue(inco );        // Eval_VDF_Elem::associer_inconnue
-}
-
-// Description:
-// associe le champ de diffusivite a l'evaluateur
-void Op_Diff_K_Eps_Bas_Re_VDF_Elem::associer_diffusivite(const Champ_base& ch_diff)
-{
-  Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem& eval_diff_turb = (Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem&) iter.evaluateur();
-  eval_diff_turb.associer(ch_diff);
-}
-
-// Description:
-// associe le champ de diffusivite_turbulente a l'evaluateur
 void Op_Diff_K_Eps_Bas_Re_VDF_Elem::associer_diffusivite_turbulente()
 {
   assert(mon_equation.non_nul());
   if(sub_type(Transport_K_Eps_base,mon_equation.valeur()))
     {
-      // Cerr << "dans Transport_K_KEps Op_Diff_K_Eps_VDF_Elem " << finl;
-      //Cerr << "equation.que_suis_je() Op_Diff_K_Eps_VDF_Elem" << mon_equation->que_suis_je() << finl;
       const Transport_K_Eps_base& eqn_transport = ref_cast(Transport_K_Eps_base,mon_equation.valeur());
       const Mod_turb_hyd_RANS& mod_turb = ref_cast(Mod_turb_hyd_RANS,eqn_transport.modele_turbulence());
       const Champ_Fonc& diff_turb = mod_turb.viscosite_turbulente();
@@ -81,25 +45,4 @@ void Op_Diff_K_Eps_Bas_Re_VDF_Elem::associer_diffusivite_turbulente()
     }
 }
 
-const Champ_Fonc& Op_Diff_K_Eps_Bas_Re_VDF_Elem::diffusivite_turbulente() const
-{
-  const Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem& eval_diff =
-    (Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem&) iter.evaluateur();
-  return eval_diff.diffusivite_turbulente();
-}
-
-const Champ_base& Op_Diff_K_Eps_Bas_Re_VDF_Elem::diffusivite() const
-{
-  const Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem& eval_diff_turb =
-    (Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem&) iter.evaluateur();
-  return eval_diff_turb.diffusivite();
-}
-
-//
-// Fonctions inline de la classe Op_Diff_K_Eps_Bas_Re_VDF_Elem
-//
-Op_Diff_K_Eps_Bas_Re_VDF_Elem::Op_Diff_K_Eps_Bas_Re_VDF_Elem() :
-  Op_Diff_K_Eps_Bas_Re_VDF_base(
-    It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)())
-{
-}
+Op_Diff_K_Eps_Bas_Re_VDF_Elem::Op_Diff_K_Eps_Bas_Re_VDF_Elem() : Op_Diff_K_Eps_Bas_Re_VDF_base(It_VDF_Elem(Eval_Diff_K_Eps_Bas_Re_VDF_const_Elem)()) { }
