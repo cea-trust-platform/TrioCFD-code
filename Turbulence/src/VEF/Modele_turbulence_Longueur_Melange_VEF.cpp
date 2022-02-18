@@ -32,6 +32,7 @@
 #include <Fluide_base.h>
 #include <Champ_Uniforme.h>
 #include <Param.h>
+#include <Postraitement.h>
 
 Implemente_instanciable_sans_constructeur(Modele_turbulence_Longueur_Melange_VEF,"Modele_turbulence_hyd_Longueur_Melange_VEF",Mod_turb_hyd_RANS_0_eq);
 
@@ -416,9 +417,28 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
 
 int Modele_turbulence_Longueur_Melange_VEF::preparer_calcul( )
 {
-  if (cas==4)
+  // On ne doit pas lire_distance_paroi dans le cas ou on post-traite le champs Distance_paroi
+  // car c'est deja fait dans la classe mere Mod_turb_hyd_base
+  LIST_CURSEUR(DERIV(Postraitement_base)) curseur = equation().probleme().postraitements();
+  bool contient_distance_paroi = false;
+  while (curseur && !contient_distance_paroi)
+    {
+      if (sub_type(Postraitement,curseur.valeur().valeur()))
+        {
+          Postraitement& post = ref_cast(Postraitement,curseur.valeur().valeur());
+          for (int i=0; i<post.noms_champs_a_post().size(); i++)
+            {
+              if (post.noms_champs_a_post()[i].contient("DISTANCE_PAROI"))
+                {
+                  contient_distance_paroi = true;
+                  break;
+                }
+            }
+        }
+      ++curseur;
+    }
+  if (!contient_distance_paroi && cas == 4)
     lire_distance_paroi();
-
   Mod_turb_hyd_base::preparer_calcul();
   mettre_a_jour(0.);
 
@@ -427,8 +447,5 @@ int Modele_turbulence_Longueur_Melange_VEF::preparer_calcul( )
 
 void Modele_turbulence_Longueur_Melange_VEF::discretiser()
 {
-  const Discretisation_base& dis=ref_cast(Discretisation_base, mon_equation->discretisation());
   Mod_turb_hyd_RANS_0_eq::discretiser();
-  dis.discretiser_champ("champ_elem",mon_equation->zone_dis().valeur(),"distance_paroi","m",1,mon_equation->schema_temps().temps_courant(),wall_length_);
-  champs_compris_.ajoute_champ(wall_length_);
 }

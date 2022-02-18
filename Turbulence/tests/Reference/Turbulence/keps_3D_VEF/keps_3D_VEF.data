@@ -53,6 +53,11 @@ Partition DOM_DOM
 End 
 END PARTITION #
 
+# BEGIN MESH #
+Distance_paroi DOM_DOM 1 WALL formatte
+# END MESH #
+
+
 # BEGIN SCATTER 
 Scatter DOM.Zones DOM_DOM
 
@@ -182,6 +187,8 @@ Read pb
       		viscosite_turbulente 
       		K 
       		eps 
+		distance_paroi
+		distance_paroi elem
       	}
     }
 sauvegarde formatte hybou3.sauv
