@@ -1,0 +1,39 @@
+#!/bin/bash
+# Yannick & Elie
+# tester codage Operateur diff 
+
+LISTE_CAS="CONST_LAM VAR_LAM CONST_TURB VAR_TURB"
+SRCDATA=CAS.data
+DOM=croix_Pb1.geom
+
+for CAS in $LISTE_CAS; do
+
+  REP=./$CAS
+  mkdir $REP
+  DESTDATA=$REP/$SRCDATA
+  cp $DOM $REP/$DOM
+
+  if test "$CAS" = "CONST_LAM"; then
+
+    cp $SRCDATA $DESTDATA
+
+  elif test "$CAS" = "VAR_LAM"; then
+
+    sed "s~Champ_Uniforme 1 0.002~Champ_fonc_xyz dom_pb1 1 0.002~" $SRCDATA > $DESTDATA
+
+  elif test "$CAS" = "CONST_TURB"; then
+
+  sed "s~Pb_Hydraulique~Pb_Hydraulique_turbulent~;
+       s~Navier_Stokes_standard~Navier_Stokes_turbulent~;
+       s~/\* modele_turbulence~modele_turbulence~;
+       s~negligeable } \*/~negligeable }~" $SRCDATA > $DESTDATA
+
+ else # VAR_TURB
+   sed "s~Pb_Hydraulique~Pb_Hydraulique_turbulent~;
+       s~Champ_Uniforme 1 0.002~Champ_fonc_xyz dom_pb1 1 0.002~;
+       s~Navier_Stokes_standard~Navier_Stokes_turbulent~;
+       s~/\* modele_turbulence~modele_turbulence~;
+       s~negligeable } \*/~negligeable }~" $SRCDATA > $DESTDATA
+
+  fi
+done
