@@ -14,38 +14,43 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
+// File:        Transport_turbulent_GGDH_WIT.h
 // Directory:   $TRUST_ROOT/src/Turbulence/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
+#ifndef Transport_turbulent_GGDH_WIT_included
+#define Transport_turbulent_GGDH_WIT_included
 #include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
+#include <Transport_turbulent_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+//    classe Transport_turbulent_GGDH_WIT
+//    Transport turbulent de type GGDH pour l'equation sur WIT:
+//    < u'_i theta'> = - C_s * temps caract * <u'_i u'_j> * d_j theta
 //////////////////////////////////////////////////////////////////////////////
 
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+class Transport_turbulent_GGDH_WIT : public Transport_turbulent_base
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
+  Declare_instanciable(Transport_turbulent_GGDH_WIT);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-  inline double limiteur() const {return limiter_;};
-  virtual int gradu_required() const  {  return 1; };
-
+  virtual int dimension_min_nu() const
+  {
+    return dimension * dimension; //anisotrope complet!
+  }
+  virtual int gradu_required() const
+  {
+    return 1; /* on a besoin de grad u */
+  };
+  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const;
 private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
-  double sigma_ = 1.;
+  double delta_ = 1.3 ; // rapport volume perturbe par la bulle / volume de la bulle
+  double gamma_ = 1. ; //rapport d'aspect des bulles
+  double limiteur_alpha_ = 1e-6;
+  double C_s = 1.;
 };
 
 #endif

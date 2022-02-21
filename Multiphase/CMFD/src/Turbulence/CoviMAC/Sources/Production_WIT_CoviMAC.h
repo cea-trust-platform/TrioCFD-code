@@ -14,38 +14,47 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_k_tau.h
-// Directory:   $TRUST_ROOT/src/Turbulence/Correlations
-// Version:     /main/18
+// File:        Production_WIT_CoviMAC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Viscosite_turbulente_k_tau_included
-#define Viscosite_turbulente_k_tau_included
+#ifndef Production_WIT_CoviMAC_WIT_CoviMAC_included
+#define Production_WIT_CoviMAC_WIT_CoviMAC_included
+
+#include <Source_base.h>
+#include <Ref_Correlation.h>
 #include <DoubleTab.h>
-#include <Viscosite_turbulente_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Viscosite_turbulente_k_tau
-//    Viscosite turbulente pour un modele "k-tau" : nu_t = k * tau
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+//    Classe Production_WIT_CoviMAC
+//    Cette classe implemente dans CoviMAC la production de l'equation de WIT
+//
+// .SECTION voir aussi
+//    Operateur_CoviMAC_base Operateur_base
 //////////////////////////////////////////////////////////////////////////////
-
-class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
+class Production_WIT_CoviMAC: public Source_base
 {
-  Declare_instanciable(Viscosite_turbulente_k_tau);
-public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-  inline double limiteur() const {return limiter_;};
-  virtual int gradu_required() const  {  return 1; };
+  Declare_instanciable(Production_WIT_CoviMAC);
+public :
+  int has_interface_blocs() const
+  {
+    return 1;
+  }
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
+  void check_multiphase_compatibility() const {}; //of course
 
-private:
-  double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)
-  double sigma_ = 1.;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) { };
+  void associer_pb(const Probleme_base& ) { };
+  void mettre_a_jour(double temps) { };
+
+protected:
+  double Reb_c_ = 170.;
+  double g_ = 9.81;
 };
 
 #endif

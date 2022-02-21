@@ -66,7 +66,8 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
 
   const DoubleTab&                       vf_dir = zone.volumes_entrelaces_dir();
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
-  const& nf = zone.face_normales();
+  const DoubleTab& normales_f = zone.face_normales();
+  const IntTab& voisins_f = zone.face_voisins();
 
   if (!sub_type(Viscosite_turbulente_base, Op_diff.corr.valeur())) Process::exit("The turbulence correlation must be multiple");
   const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.corr.valeur());
@@ -81,7 +82,7 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
   DoubleTrav grad_Rij(0, N, D, D);
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.vitesse()->valeurs().get_md_vector(), grad_Rij); //Necessary to exchange virtual elements after calculation of the gradient at the faces()
 
-  const Champ_P0_CoviMAC& ch_alpha = ref_cast(Champ_P0_CoviMAC, equation().probleme().get_champ("alpha"));	// Champ alpha qui servira à obtenir les coeffs du gradient ; normalement toujours des CAL de Neumann ; cas monophasique sans pb_multiphase a gerer plus tard
+  const Champ_P0_CoviMAC& ch_alpha = ref_cast(Champ_P0_CoviMAC, equation().probleme().get_champ("alpha"));	// Champ alpha qui servira à obtenir les coeffs du gradient ; normalement toujours des CAL de Neumann ; terme source qui n'apparait qu'en multiphase
   ch_alpha.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   IntTab& f_d = ch_alpha.fgrad_d, f_e = ch_alpha.fgrad_e; // Tables utilisees dans zone_CoviMAC::fgrad pour le calcul du gradient
   DoubleTab f_w = ch_alpha.fgrad_w;
@@ -101,14 +102,14 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
                   }
                 else if (ch_alpha.fcl()(f_bord = e - ne_tot, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
                   {
-                    Process::exit("You must have a neumann limit condition on alpha for RIJ_BIF to work !")
+                    Process::exit("You must have a neumann limit condition on alpha for RIJ_BIF to work !");
                   }
               }
           }
 
   // On interpole le gradient de Rij aux elements
   zone.init_ve();
-  for (int n = 0; n < N; n++) for (int e = 0; e < nb_elem; e++) for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
+  for (int n = 0; n < N; n++) for (int e = 0; e < ne; e++) for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
         for (int d_i = 0; d_i <D ; d_i++) for (int d_j = 0; d_j <D ; d_j++)
             {
               grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) = 0;
@@ -116,7 +117,6 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
                   {
                     grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) += zone.vec(j, d_d) * grad_Rij(f, n, d_i,  d_j);
                   }
-              for (int d = 0 ; d < D ; d++) grad_f_diss_dot_grad_f_k(e, n) += grad_diss[d] * grad_k[d]; // produit scalaire
             }
 
   grad_Rij.echange_espace_virtuel();
@@ -127,7 +127,7 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
         {
           double secmem_en = 0;
           for (int d_j = 0; d_j < D; d_j++)
-            double secmem_en += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
+            secmem_en += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
           secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ; // For us, Rij = <u_i u_j>, therefore *(-1)
           secmem(nf_tot + e*D + d_i, n) += secmem_en;
         }
@@ -136,15 +136,15 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
 
   int e;
 
-  for(int f = 0 ; f < nf ; f++) for(int n = 0; n<N ; n++) for (int i = 0; i < 2 && (e = f_e(f, i)) >= 0; i++)
+  for(int f = 0 ; f < nf ; f++) for(int n = 0; n<N ; n++) for (int i = 0; i < 2 && (e = voisins_f(f, i)) >= 0; i++)
         {
           DoubleTrav secmem_en(3); // Contains the vector of the divergence of R_ij at the face
           secmem_en = 0;
           for (int d_i = 0; d_i < D; d_i++) for (int d_j = 0; d_j < D; d_j++)
-              double secmem_en(d_i) += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
+              secmem_en(d_i) += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
           for (int d_i = 0; d_i < D; d_i++)
             secmem_en(d_i) *= (-1) * pe(e) * vf_dir(f, i) * tab_alp(e, n) * tab_rho(e, n);// For us, Rij = <u_i u_j>, therefore *(-1)
-          double flux_face = dot(&nf(f, 0), secmem_en(0));
+          double flux_face = zone.dot(&normales_f(f, 0), &secmem_en(0));
           secmem(f, n) += flux_face;
         }
 

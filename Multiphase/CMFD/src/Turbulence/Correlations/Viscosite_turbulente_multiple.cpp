@@ -82,7 +82,6 @@ void Viscosite_turbulente_multiple::reynolds_stress_BIF(DoubleTab& R_ij) const /
   int D = dimension;
   R_ij = 0;
   DoubleTrav R_ij_loc = DoubleTrav(R_ij);
-  MD_Vector_tools::creer_tableau_distribue(R_ij.get_md_vector(), R_ij_loc);
   for (auto &&corr : viscs_turbs) if ((corr.first == "BIF") | (corr.first == "WIF") | (corr.first == "WIT"))
       {
         R_ij_loc = 0;
@@ -95,4 +94,14 @@ void Viscosite_turbulente_multiple::reynolds_stress_BIF(DoubleTab& R_ij) const /
 
 void Viscosite_turbulente_multiple::k_over_eps(DoubleTab& k_sur_eps) const
 {
+  k_sur_eps = 0;
+  DoubleTrav k_sur_eps_loc = DoubleTrav(k_sur_eps);
+  for (auto &&corr : viscs_turbs)
+    {
+      k_sur_eps_loc = 0;
+      ref_cast(Viscosite_turbulente_base, corr.second.valeur()).k_over_eps(k_sur_eps_loc);
+      for (int i = 0; i < k_sur_eps.dimension_tot(0); i++) for (int n = 0; n < k_sur_eps.dimension(1); n++)
+          k_sur_eps(i, n) += k_sur_eps_loc(i,n);
+    }
+
 }
