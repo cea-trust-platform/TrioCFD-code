@@ -14,55 +14,44 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_K_KEps_anisotherme_VDF_Elem.h
+// File      : Source_Transport_K_Eps_anisotherme_VDF_Elem.cpp
 // Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_K_KEps_anisotherme_VDF_Elem_included
-#define Source_Transport_K_KEps_anisotherme_VDF_Elem_included
+#include <Source_Transport_K_Eps_anisotherme_VDF_Elem.h>
+#include <Modele_turbulence_hyd_K_Eps.h>
+#include <Zone_VDF.h>
 
-#include <Source_Transport_K_KEps_VDF_Elem.h>
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_Eps_anisotherme_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) pour le modele a deux couches et dans le cas
-// ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
+Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_anisotherme_VDF_Elem,"Source_Transport_K_Eps_anisotherme_VDF_P0_VDF",Source_Transport_K_Eps_VDF_Elem);
 
-class Source_Transport_K_KEps_anisotherme_VDF_Elem :
-  public Source_Transport_K_KEps_VDF_Elem
+Sortie& Source_Transport_K_Eps_anisotherme_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Entree& Source_Transport_K_Eps_anisotherme_VDF_Elem::readOn(Entree& is) { return Source_Transport_VDF_Elem_base::readOn_anisotherme(is); }
+
+void Source_Transport_K_Eps_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
+  Source_Transport_K_Eps_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+  Source_Transport_K_Eps_VDF_Elem::associer_pb(pb);
+  Source_Transport_K_Eps_VDF_Elem::associer_pb_anisotherme(pb);
+}
 
-  Declare_instanciable_sans_constructeur(Source_Transport_K_KEps_anisotherme_VDF_Elem);
+void Source_Transport_K_Eps_anisotherme_VDF_Elem::fill_resu_anisotherme(const DoubleVect& G, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
+{
+  const DoubleTab& K_eps = mon_eq_transport_K_Eps->inconnue().valeurs();
+  double C3_loc, LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_LeK_MIN() ;
+  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+    {
+      resu(elem,0) += G(elem)*volumes(elem)*porosite_vol(elem);
+      if (K_eps(elem,0) >= LeK_MIN)
+        {
+          C3_loc = G(elem) > 0. ? 0. : C3;
+          resu(elem,1) += (1-C3_loc)*G(elem)*volumes(elem)*porosite_vol(elem)*K_eps(elem,1)/K_eps(elem,0);
+        }
+    }
+}
 
-public:
-
-  inline Source_Transport_K_KEps_anisotherme_VDF_Elem(double cte1 = C1_DEFAULT,
-                                                      double cte2 = C2_DEFAULT,
-                                                      double cte3 = C3_DEFAULT);
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-
-protected:
-
-  double C3;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-
-};
-
-inline Source_Transport_K_KEps_anisotherme_VDF_Elem::
-Source_Transport_K_KEps_anisotherme_VDF_Elem(double cte1,double cte2,double cte3)
-
-  : Source_Transport_K_KEps_VDF_Elem(cte1,cte2) , C3(cte3) {}
-
-#endif /* Source_Transport_K_KEps_anisotherme_VDF_Elem_included */
+DoubleTab& Source_Transport_K_Eps_anisotherme_VDF_Elem::ajouter(DoubleTab& resu) const
+{
+  Source_Transport_K_Eps_VDF_Elem::ajouter(resu); // VB : plutot que de calculer P on appelle ajouter de la classe mere
+  return Source_Transport_K_Eps_VDF_Elem::ajouter_anisotherme(resu);
+}

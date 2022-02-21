@@ -52,7 +52,7 @@ Entree& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::readOn(Entre
 /************************************************/
 //Fonctions qui calculent le terme g*beta*teta^2
 /************************************************/
-DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_gteta2(const Zone_VDF& zone_VDF, DoubleTab& gteta2 ,const DoubleTab& fluctu_temp, double beta,const DoubleVect& gravite) const
+DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_gteta2(const Zone_VDF& zone_VDF, DoubleTab& gteta2 ,const DoubleTab& fluctu_temp, double beta,const DoubleVect& grav) const
 {
   //
   // gteta2 est discretise au centre des elements
@@ -65,7 +65,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
   gteta2 = 0;
 
   //                ------->  -------->
-  // Calcul de beta.gravite . tetacarre
+  // Calcul de beta.grav . tetacarre
 
   const Zone& la_zone=zone_VDF.zone();
   int nb_faces_elem = la_zone.nb_faces_elem();
@@ -76,11 +76,11 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   for (int elem=0; elem<nb_elem; elem++)
     for (int dim=0; dim<dimension; dim++)
-      gteta2(elem,dim) = beta*gravite(dim)*fluctu_temp(elem,0) ;
+      gteta2(elem,dim) = beta*grav(dim)*fluctu_temp(elem,0) ;
   return gteta2;
 }
 
-DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_gteta2(const Zone_VDF& zone_VDF,DoubleTab& gteta2 ,const DoubleTab& fluctu_temp,const DoubleTab& beta,const DoubleVect& gravite) const
+DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_gteta2(const Zone_VDF& zone_VDF,DoubleTab& gteta2 ,const DoubleTab& fluctu_temp,const DoubleTab& beta,const DoubleVect& grav) const
 {
   //
   // gteta2 est discretise au centre des elements
@@ -93,7 +93,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
   gteta2 = 0;
 
   //                ------->  -------->
-  // Calcul de beta.gravite . tetacarre
+  // Calcul de beta.grav . tetacarre
 
   const Zone& la_zone=zone_VDF.zone();
   int nb_faces_elem = la_zone.nb_faces_elem();
@@ -104,7 +104,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
 
   for (int elem=0; elem<nb_elem; elem++)
     for (int dim=0; dim<dimension; dim++)
-      gteta2(elem,dim) = beta(elem)*gravite(dim)*fluctu_temp(elem,0) ;
+      gteta2(elem,dim) = beta(elem)*grav(dim)*fluctu_temp(elem,0) ;
   return gteta2;
 }
 
@@ -258,7 +258,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
                                                                                                       const DoubleTab& fluctuTemp,
                                                                                                       const DoubleTab& keps,
                                                                                                       const DoubleTab& alpha_turb,
-                                                                                                      double beta,const DoubleVect& gravite) const
+                                                                                                      double beta,const DoubleVect& grav) const
 {
   //
   // G est discretise comme K et Eps i.e au centre des elements
@@ -281,13 +281,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
   calculer_u_teta_W(zone_VDF,zcl_VDF,temper,fluctuTemp,keps,alpha_turb,u_teta);
 
   //                                          ------> ----->
-  // On calcule ensuite une valeur moyenne de gravite.u_teta sur chaque
+  // On calcule ensuite une valeur moyenne de grav.u_teta sur chaque
   // element.
 
   G = 0;
 
   //                ------->  ------>
-  // Calcul de beta.gravite . u_teta
+  // Calcul de beta.grav . u_teta
 
   const Zone& la_zone=zone_VDF.zone();
   int nb_faces_elem = la_zone.nb_faces_elem();
@@ -307,13 +307,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
                      + u_teta(numfa[dimension+1])*porosite_face(numfa[dimension+1]));
 
       if (dimension == 2)
-        G[elem] = beta*(gravite(0)*coef(0) + gravite(1)*coef(1));
+        G[elem] = beta*(grav(0)*coef(0) + grav(1)*coef(1));
 
       else if (dimension == 3)
         {
           coef(2) = 0.5*(u_teta(numfa[2])*porosite_face(numfa[2])
                          + u_teta(numfa[5])*porosite_face(numfa[5]));
-          G[elem] = beta*(gravite(0)*coef(0) + gravite(1)*coef(1) + gravite(2)*coef(2));
+          G[elem] = beta*(grav(0)*coef(0) + grav(1)*coef(1) + grav(2)*coef(2));
         }
 
     }
@@ -327,7 +327,7 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
                                                                                                       const DoubleTab& fluctuTemp,
                                                                                                       const DoubleTab& keps,
                                                                                                       const DoubleTab& alpha_turb,
-                                                                                                      const DoubleTab& beta,const DoubleVect& gravite) const
+                                                                                                      const DoubleTab& beta,const DoubleVect& grav) const
 {
   //
   // G est discretise comme K et Eps i.e au centre des elements
@@ -350,13 +350,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
   calculer_u_teta_W(zone_VDF,zcl_VDF,temper,fluctuTemp,keps,alpha_turb,u_teta);
 
   //                                          ------> ----->
-  // On calcule ensuite une valeur moyenne de gravite.u_teta sur chaque
+  // On calcule ensuite une valeur moyenne de grav.u_teta sur chaque
   // element.
 
   G = 0;
 
   //                ------->  ------>
-  // Calcul de beta.gravite . u_teta
+  // Calcul de beta.grav . u_teta
 
   const Zone& la_zone=zone_VDF.zone();
   int nb_faces_elem = la_zone.nb_faces_elem();
@@ -375,13 +375,13 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::calculer_
                      + u_teta(numfa[dimension+1])*porosite_face(numfa[dimension+1]));
 
       if (dimension ==2)
-        G[elem] = beta(elem)*(gravite(0)*coef(0) + gravite(1)*coef(1));
+        G[elem] = beta(elem)*(grav(0)*coef(0) + grav(1)*coef(1));
 
       else if (dimension == 3)
         {
           coef(2) = 0.5*(u_teta(numfa[2])*porosite_face(numfa[2])
                          + u_teta(numfa[5])*porosite_face(numfa[5]));
-          G[elem] = beta(elem)*(gravite(0)*coef(0) + gravite(1)*coef(1) + gravite(2)*coef(2));
+          G[elem] = beta(elem)*(grav(0)*coef(0) + grav(1)*coef(1) + grav(2)*coef(2));
         }
 
     }

@@ -22,12 +22,15 @@
 #ifndef Source_Transport_VDF_Elem_base_included
 #define Source_Transport_VDF_Elem_base_included
 
+#include <Ref_Convection_Diffusion_Temperature.h>
+#include <Modele_turbulence_hyd_K_Eps.h>
 #include <Calcul_Production_K_VDF.h>
+#include <Ref_Champ_Don_base.h>
 #include <Ref_Equation_base.h>
 #include <Ref_Zone_Cl_VDF.h>
 #include <Ref_Zone_VDF.h>
 #include <Source_base.h>
-#include <Modele_turbulence_hyd_K_Eps.h>
+
 class Modele_Fonc_Bas_Reynolds;
 class Probleme_base;
 class Zone_Cl_dis;
@@ -42,18 +45,33 @@ public :
   DoubleTab& calculer(DoubleTab& ) const;
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
   virtual void associer_pb(const Probleme_base& );
-  virtual DoubleTab& ajouter(DoubleTab& ) const = 0;
+
+  virtual DoubleTab& ajouter(DoubleTab& ) const = 0; // XXX XXX XXX Elie Saikali : like that !!
+
   inline virtual void mettre_a_jour(double t) { Calcul_Production_K_VDF::mettre_a_jour(t); }
 
 protected :
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
+
+  // pour les classes derivees
+  void verifier_pb_keps();
+  DoubleTab& ajouter_keps(DoubleTab& ) const;
+
   double C1 = C1__, C2 = C2__;
   REF(Zone_VDF) la_zone_VDF;
   REF(Zone_Cl_VDF) la_zone_Cl_VDF;
   REF(Equation_base) eq_hydraulique;
 
-  void verifier_pb_keps();
-  DoubleTab& ajouter_keps(DoubleTab& ) const;
+  // pour les classes anisotherme
+  Entree& readOn_anisotherme(Entree& is);
+  void verifier_pb_keps_anisotherme(const Probleme_base&, const Nom& nom);
+  void associer_pb_anisotherme(const Probleme_base& );
+  DoubleTab& ajouter_anisotherme(DoubleTab& ) const;
+
+  double C3 = C3__;
+  REF(Champ_Don) beta_t;
+  REF(Champ_Don_base) gravite;
+  REF(Convection_Diffusion_Temperature) eq_thermique;
 
 private:
   // methodes a surcharger sinon throw !!
@@ -64,6 +82,7 @@ private:
   virtual void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu(const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
 };
 
 #endif /* Source_Transport_VDF_Elem_base_included */

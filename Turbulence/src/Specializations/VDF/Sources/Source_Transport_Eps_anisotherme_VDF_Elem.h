@@ -24,7 +24,6 @@
 
 #include <Source_Transport_Eps_VDF_Elem.h>
 
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // CLASS: Source_Transport_Eps_anisotherme_VDF_Elem
@@ -37,34 +36,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_Eps_anisotherme_VDF_Elem :
-  public Source_Transport_Eps_VDF_Elem
+class Source_Transport_Eps_anisotherme_VDF_Elem : public Source_Transport_Eps_VDF_Elem
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_anisotherme_VDF_Elem);
-
 public:
+  Source_Transport_Eps_anisotherme_VDF_Elem(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) :
+    Source_Transport_Eps_VDF_Elem(cte1,cte2) { C3 = cte3; }
 
-  inline Source_Transport_Eps_anisotherme_VDF_Elem(double cte1 = C1_DEFAULT,
-                                                   double cte2 = C2_DEFAULT,
-                                                   double cte3 = C3_DEFAULT);
-  virtual void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  virtual void associer_pb(const Probleme_base& );
 
-protected:
-
-  double C3;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-
+private:
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
 };
-
-inline Source_Transport_Eps_anisotherme_VDF_Elem::
-Source_Transport_Eps_anisotherme_VDF_Elem(double cte1,double cte2,double cte3)
-
-  : Source_Transport_Eps_VDF_Elem(cte1,cte2) , C3(cte3) {}
-
 
 #endif /* Source_Transport_Eps_anisotherme_VDF_Elem_included */

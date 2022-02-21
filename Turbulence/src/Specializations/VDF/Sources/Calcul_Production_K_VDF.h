@@ -84,9 +84,9 @@ protected:
                              const DoubleTab& , const DoubleTab& ,DoubleTab& ,int ) const;
 };
 
-inline void error_keps(const Nom& source, const Nom& problem)
+inline void error_keps(const Nom& source, const Nom& nom)
 {
-  Cerr << "Error ! You can't use the " << source << " source term for the problem: " << problem << finl;
+  Cerr << "Error ! You can't use the " << source << " source term with a " << nom << " problem/medium !!" << finl;
   Cerr << "Check the reference manual. It is may be another source term which should be used." << finl;
   Process::exit();
 }
