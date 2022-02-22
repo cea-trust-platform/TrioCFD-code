@@ -54,41 +54,27 @@ class Zone_Cl_dis;
 class Zone_Cl_VDF;
 class Champ_Face;
 
-class Source_Transport_K_Eps_Realisable_VDF_Elem : public Source_base,public Calcul_Production_K_VDF
+#include <Source_Transport_Realisable_VDF_Elem_base.h>
 
-
+class Source_Transport_K_Eps_Realisable_VDF_Elem : public Source_Transport_Realisable_VDF_Elem_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_VDF_Elem);
-
 public :
-
-  inline Source_Transport_K_Eps_Realisable_VDF_Elem( double cte2 = C21_DEFAULT_K_EPS_REALISABLE );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  inline Modele_Fonc_Realisable_base&  associe_modele_fonc();
-  inline const Modele_Fonc_Realisable_base&  associe_modele_fonc() const;
-  virtual void associer_pb(const Probleme_base& );
+  Source_Transport_K_Eps_Realisable_VDF_Elem( double cte2 = C21_R__ ) : Source_Transport_Realisable_VDF_Elem_base(cte2) { C2 = cte2; }
   void mettre_a_jour(double temps);
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
+  virtual void associer_pb(const Probleme_base& );
+
+  inline DoubleTab& ajouter(DoubleTab& resu) const { return Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(resu); }
 
 protected :
-
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  double C2_;
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
   REF(Transport_K_Eps_Realisable) eqn_keps_Rea;
-  REF(Transport_Flux_Chaleur_Turbulente) eqn_flux_chaleur;
-  REF(Equation_base) eq_hydraulique;
 
+private:
+  const DoubleTab& get_visc_turb() const;
+  const Modele_Fonc_Realisable_base& get_modele_fonc() const;
+  void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const;
+  void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const;
+  void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const;
 };
 
-
-inline Source_Transport_K_Eps_Realisable_VDF_Elem::
-Source_Transport_K_Eps_Realisable_VDF_Elem(double cte2)
-
-  : C2_(cte2) {}
-
-
-
-#endif
+#endif /* Source_Transport_K_Eps_Realisable_VDF_Elem_included */

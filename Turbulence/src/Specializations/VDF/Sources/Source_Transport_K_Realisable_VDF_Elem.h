@@ -55,37 +55,21 @@ class Zone_Cl_dis;
 class Zone_Cl_VDF;
 class Champ_Face;
 
-class Source_Transport_K_Realisable_VDF_Elem : public Source_base,public Calcul_Production_K_VDF
+#include <Source_Transport_Realisable_VDF_Elem_base.h>
 
-
+class Source_Transport_K_Realisable_VDF_Elem : public Source_Transport_Realisable_VDF_Elem_base
 {
   Declare_instanciable(Source_Transport_K_Realisable_VDF_Elem);
-
 public :
-
   DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  inline Modele_Fonc_Realisable_base&  associe_modele_fonc();
-  inline const Modele_Fonc_Realisable_base&  associe_modele_fonc() const;
-  virtual void associer_pb(const Probleme_base& );
   void mettre_a_jour(double temps);
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
+  virtual void associer_pb(const Probleme_base& );
 
 protected :
+  REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea, eqn_eps_Rea;
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea;
-  REF(Transport_K_ou_Eps_Realisable) eqn_eps_Rea;
-  REF(Transport_Flux_Chaleur_Turbulente) eqn_flux_chaleur;
-  REF(Equation_base) eq_hydraulique;
-
+private:
+  void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const;
 };
 
-
-
-
-
-
-#endif
+#endif /* Source_Transport_K_Realisable_VDF_Elem_included */
