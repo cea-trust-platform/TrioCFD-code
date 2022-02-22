@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,53 +12,33 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //
-// File:        Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/14
+// File      : Source_Transport_Bas_Reynolds_VDF_Elem_base.h
+// Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources/new
 //
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem_included
-#define Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem_included
+#ifndef Source_Transport_Bas_Reynolds_VDF_Elem_base_included
+#define Source_Transport_Bas_Reynolds_VDF_Elem_base_included
 
-#define C11_DEFAULT   1.55 // 1.44   // Valeurs par defaut des constantes qui interviennent
-#define C21_DEFAULT  2. // 1.92   // dans l'equation de k_esp
-
-//
-// .DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
-//
-// .SECTION voir aussi
-
-#include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Ref_Transport_Flux_Chaleur_Turbulente.h>
-#include <Modele_Fonc_Bas_Reynolds.h>
-#include <Ref_Zone_dis.h>
-#include <Zone_Cl_dis.h>
 #include <Ref_Transport_K_Eps_Bas_Reynolds.h>
+#include <Source_Transport_VDF_Elem_base.h>
 
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Champ_Face;
-
-#include <Source_Transport_Bas_Reynolds_VDF_Elem_base.h>
-
-class Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem : public Source_Transport_Bas_Reynolds_VDF_Elem_base
+class Source_Transport_Bas_Reynolds_VDF_Elem_base : public Source_Transport_VDF_Elem_base
 {
-  Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem);
+  Declare_base_sans_constructeur( Source_Transport_Bas_Reynolds_VDF_Elem_base ) ;
 public :
-  Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_Bas_Reynolds_VDF_Elem_base(cte1,cte2) // TODO : FIXME : comprends pas ...
-  {
-    C1 = cte1;
-    C2 = cte2;
-  }
+  Source_Transport_Bas_Reynolds_VDF_Elem_base(double cs1, double cs2) : Source_Transport_VDF_Elem_base(cs1,cs2) { }
+  DoubleTab& ajouter(DoubleTab& ) const;
+  virtual void associer_pb(const Probleme_base& );
+
+protected :
+  static constexpr double C11__ = 1.55, C21__ = 2.; // pour Bas Re !
+  REF(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
 
 private:
-  void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const;
+  virtual void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const { return not_implemented<void>(__func__); }
 };
 
-#endif /* Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem_included */
+#endif /* Source_Transport_Bas_Reynolds_VDF_Elem_base_included */

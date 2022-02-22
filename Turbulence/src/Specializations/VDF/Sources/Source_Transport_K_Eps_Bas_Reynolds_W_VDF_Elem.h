@@ -20,10 +20,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem_included
 #define Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem_included
-
 
 #define C11_DEFAULT 1.55   // Valeurs par defaut des constantes qui interviennent
 #define C21_DEFAULT 2.   // dans l'equation de k_esp
@@ -46,47 +44,20 @@ class DoubleVect;
 class DoubleTab;
 class Champ_Face;
 
-class Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem : public Source_Transport_K_Eps_VDF_Elem
+#include <Source_Transport_Bas_Reynolds_VDF_Elem_base.h>
 
-
+class Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem : public Source_Transport_Bas_Reynolds_VDF_Elem_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem);
-
 public :
+  Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_Bas_Reynolds_VDF_Elem_base(cte1,cte2) // TODO : FIXME : comprends pas ...
+  {
+    C1 = cte1;
+    C2 = cte2;
+  }
 
-  inline Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                        double cte2 = C21_DEFAULT );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  virtual void associer_pb(const Probleme_base& );
-
-protected :
-
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  double C1;
-  double C2;
-
-  REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  REF(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
-
+private:
+  void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const;
 };
 
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//   Fonctions inline de la classe Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
-//
-//////////////////////////////////////////////////////////////////////////////
-
-inline Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(double cte1,double cte2)
-
-  : C1(cte1), C2(cte2) {}
-
-
-#endif
+#endif /* Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem_included */
