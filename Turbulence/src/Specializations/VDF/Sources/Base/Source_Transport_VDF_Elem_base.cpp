@@ -154,13 +154,13 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
   const DoubleTab& g = gravite->valeurs(), &tab_beta = beta_t->valeurs();
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
 
   // Ajout d'un espace virtuel au tableau G
   DoubleVect G;
   la_zone_VDF->zone().creer_tableau_elements(G);
 
-  DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
 
   if (sub_type(Champ_Uniforme,beta_t->valeur())) calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta(0,0),g);
   else calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);

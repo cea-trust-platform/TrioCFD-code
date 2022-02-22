@@ -14,46 +14,39 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_K_Realisable_anisotherme_VDF_Elem.h
+// File      : Source_Transport_K_Realisable_anisotherme_VDF_Elem.cpp
 // Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_K_Realisable_anisotherme_VDF_Elem_included
-#define Source_Transport_K_Realisable_anisotherme_VDF_Elem_included
+#include <Source_Transport_K_Realisable_anisotherme_VDF_Elem.h>
+#include <Zone_VDF.h>
+#include <Param.h>
 
-#include <Source_Transport_K_Realisable_VDF_Elem.h>
+Implemente_instanciable(Source_Transport_K_Realisable_anisotherme_VDF_Elem,"Source_Transport_K_Realisable_anisotherme_VDF_P0_VDF",Source_Transport_K_Realisable_VDF_Elem);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_Realisable_anisotherme_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Realisable_anisotherme_VDF_Elem :
-  public Source_Transport_K_Realisable_VDF_Elem
+Sortie& Source_Transport_K_Realisable_anisotherme_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Entree& Source_Transport_K_Realisable_anisotherme_VDF_Elem::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.lire_avec_accolades(is);
+  return is ;
+}
 
-  Declare_instanciable(Source_Transport_K_Realisable_anisotherme_VDF_Elem);
+void Source_Transport_K_Realisable_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)
+{
+  Source_Transport_K_Realisable_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+  Source_Transport_K_Realisable_VDF_Elem::associer_pb(pb);
+  Source_Transport_K_Realisable_VDF_Elem::associer_pb_anisotherme(pb);
+}
 
-public:
+void Source_Transport_K_Realisable_anisotherme_VDF_Elem::fill_resu_anisotherme(const DoubleVect& G, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
+{
+  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) resu(elem) += G(elem)*volumes(elem)*porosite_vol(elem);
+}
 
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-
-protected:
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-
-};
-
-
-#endif /* Source_Transport_K_Realisable_anisotherme_VDF_Elem_included */
+DoubleTab& Source_Transport_K_Realisable_anisotherme_VDF_Elem::ajouter(DoubleTab& resu) const
+{
+  Source_Transport_K_Realisable_VDF_Elem::ajouter(resu);
+  return Source_Transport_K_Realisable_VDF_Elem::ajouter_anisotherme(resu);
+}

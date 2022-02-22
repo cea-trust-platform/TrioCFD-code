@@ -14,41 +14,37 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_Realisable_VDF_Elem_base.h
-// Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources/new
+// File      : Source_Transport_K_Realisable_anisotherme_VDF_Elem.h
+// Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_Realisable_VDF_Elem_base_included
-#define Source_Transport_Realisable_VDF_Elem_base_included
+#ifndef Source_Transport_K_Realisable_anisotherme_VDF_Elem_included
+#define Source_Transport_K_Realisable_anisotherme_VDF_Elem_included
 
-#include <Source_Transport_VDF_Elem_base.h>
+#include <Source_Transport_K_Realisable_VDF_Elem.h>
 
-class Modele_Fonc_Realisable_base;
+//////////////////////////////////////////////////////////////////////////////
+//
+// CLASS: Source_Transport_K_Realisable_anisotherme_VDF_Elem
+//
+// Cette classe represente le terme source qui figure dans l'equation
+// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
+// sont couplees a l'equation de la thermique
+// On suppose que le coefficient de variation de la masse volumique
+// du fluide en fonction de ce scalaire est un coefficient uniforme.
+//
+//////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_Realisable_VDF_Elem_base : public Source_Transport_VDF_Elem_base
+class Source_Transport_K_Realisable_anisotherme_VDF_Elem : public Source_Transport_K_Realisable_VDF_Elem
 {
-  Declare_base_sans_constructeur(Source_Transport_Realisable_VDF_Elem_base);
-public :
-  Source_Transport_Realisable_VDF_Elem_base() { } // XXX ne touche pas
-  Source_Transport_Realisable_VDF_Elem_base(double cte2) { C2 = cte2; }
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-
-protected :
-  static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Chabard et N3S
-
-  DoubleTab& ajouter_keps_real(DoubleTab& ) const;
-
-  // pour les classes anisotherme
-  Entree& readOn_anisotherme_real(Entree& is);
+  Declare_instanciable(Source_Transport_K_Realisable_anisotherme_VDF_Elem);
+public:
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
 
 private:
-  // methodes a surcharger sinon throw !!
-  virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
-  virtual const Modele_Fonc_Realisable_base& get_modele_fonc() const { return not_implemented<Modele_Fonc_Realisable_base&>(__func__); }
-  virtual void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const { return not_implemented<void>(__func__); }
-  virtual void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const { return not_implemented<void>(__func__); }
-  virtual void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const { return not_implemented<void>(__func__); }
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
 };
 
-#endif /* Source_Transport_Realisable_VDF_Elem_base_included */
+#endif /* Source_Transport_K_Realisable_anisotherme_VDF_Elem_included */

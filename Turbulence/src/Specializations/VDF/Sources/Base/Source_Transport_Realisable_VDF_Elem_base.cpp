@@ -41,6 +41,17 @@ Entree& Source_Transport_Realisable_VDF_Elem_base::readOn(Entree& is)
   return is;
 }
 
+Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_anisotherme_real(Entree& is)
+{
+  Param param(que_suis_je());
+  param.ajouter("C2_eps", &C2);
+  param.ajouter("C3_eps", &C3);
+  param.lire_avec_accolades(is);
+  Cerr << "C2_eps = " << C2 << finl;
+  Cerr << "C3_eps = " << C3 << finl;
+  return is;
+}
+
 DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTab& resu) const
 {
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles
