@@ -54,8 +54,7 @@ public:
   void                projeter() override;
   virtual const Champ_base& calculer_div_normale_interface();
   void calculer_delta_u_interface(Champ_base& u0, int phase_pilote, int ordre);
-  const Champ_Don& diffusivite_pour_transport() override;
-
+  const Champ_Don& diffusivite_pour_transport() const override;
 
   virtual const Champ_base * get_delta_vitesse_interface() const;
   virtual const Fluide_Diphasique&     fluide_diphasique() const;

@@ -47,7 +47,7 @@ Entree& Navier_Stokes_Turbulent_QC::readOn(Entree& is)
   return is;
 }
 
-const Champ_Don& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport() const
 {
   return fluide().viscosite_dynamique();
 }

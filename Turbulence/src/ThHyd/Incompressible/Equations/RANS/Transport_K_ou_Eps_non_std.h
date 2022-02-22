@@ -45,8 +45,8 @@ public:
 
   void set_param(Param& titi) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  virtual const Champ_Don& diffusivite_pour_transport();
-  virtual const Champ_base& vitesse_pour_transport();
+  virtual const Champ_Don& diffusivite_pour_transport() const;
+  virtual const Champ_base& vitesse_pour_transport() const;
   int nombre_d_operateurs() const override;
   const Operateur& operateur(int) const override;
   Operateur& operateur(int) override;
@@ -55,9 +55,6 @@ protected:
 
   Op_Diff_K_Eps_Bas_Re terme_diffusif;
   Operateur_Conv terme_convectif;
-
-private :
-
 };
 
 #endif

@@ -127,13 +127,13 @@ Operateur& Transport_K_Eps_Realisable::operateur(int i)
   return terme_diffusif;
 }
 
-const Champ_Don& Transport_K_Eps_Realisable::diffusivite_pour_transport()
+const Champ_Don& Transport_K_Eps_Realisable::diffusivite_pour_transport() const
 {
-  Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
+  const Fluide_base& fluide_inc = ref_cast(Fluide_base,le_fluide.valeur());
   return fluide_inc.viscosite_cinematique();
 }
 
-const Champ_base& Transport_K_Eps_Realisable::vitesse_pour_transport()
+const Champ_base& Transport_K_Eps_Realisable::vitesse_pour_transport() const
 {
   const Champ_base& vitesse_transportante = probleme().equation(0).inconnue();
   return vitesse_transportante;

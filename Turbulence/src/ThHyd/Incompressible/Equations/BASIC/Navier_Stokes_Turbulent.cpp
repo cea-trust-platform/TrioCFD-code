@@ -135,12 +135,12 @@ int Navier_Stokes_Turbulent::lire_motcle_non_standard(const Motcle& mot, Entree&
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_Turbulent::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_Turbulent::diffusivite_pour_transport() const
 {
   return fluide().viscosite_cinematique();
 }
 
-const Champ_base& Navier_Stokes_Turbulent::diffusivite_pour_pas_de_temps()
+const Champ_base& Navier_Stokes_Turbulent::diffusivite_pour_pas_de_temps() const
 {
   return fluide().viscosite_cinematique();
 }

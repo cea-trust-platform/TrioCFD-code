@@ -81,7 +81,7 @@ int Convection_Diffusion_Espece_Multi_QC::lire_motcle_non_standard(const Motcle&
   return 1;
 }
 
-const Champ_base& Convection_Diffusion_Espece_Multi_QC::diffusivite_pour_pas_de_temps()
+const Champ_base& Convection_Diffusion_Espece_Multi_QC::diffusivite_pour_pas_de_temps() const
 {
   // TODO : FIXME : on passe actuellement en parametre mu_sur_Schmidt
   // qu il faut remplacer par nu_sur_Schmidt

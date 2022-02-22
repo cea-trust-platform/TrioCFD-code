@@ -149,7 +149,7 @@ int Convection_Diffusion_Temperature_FT_Disc::lire_motcle_non_standard(const Mot
   return 1;
 }
 
-const Champ_base& Convection_Diffusion_Temperature_FT_Disc::vitesse_pour_transport()
+const Champ_base& Convection_Diffusion_Temperature_FT_Disc::vitesse_pour_transport() const
 {
   return ref_eq_ns_.valeur().vitesse();
 }
