@@ -44,6 +44,8 @@ class Zone_Cl_dis;
 class Zone_Cl_VDF;
 class Champ_Face;
 
+#include <Source_Transport_VDF_Elem_base.h>
+
 //////////////////////////////////////////////////////////////////////////////
 //.DESCRIPTION class Source_Transport_K_VDF_Elem
 //
@@ -54,32 +56,27 @@ class Champ_Face;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_VDF_Elem : public Source_base,
-  public Calcul_Production_K_VDF
+class Source_Transport_K_VDF_Elem : public Source_Transport_VDF_Elem_base
 {
-
   Declare_instanciable(Source_Transport_K_VDF_Elem);
-
 public:
-
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-  void mettre_a_jour(double temps) ;
+  inline DoubleTab& ajouter(DoubleTab& resu) const { return Source_Transport_VDF_Elem_base::ajouter_keps(resu); }
 
 protected:
-
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Equation_base) eq_hydraulique;
-  REF(Transport_K_ou_Eps)  mon_eq_transport_K;
-  REF(Transport_K_ou_Eps)  mon_eq_transport_Eps;
-
+  REF(Transport_K_ou_Eps) mon_eq_transport_K, mon_eq_transport_Eps;
   virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+
+private:
+  const DoubleTab& get_visc_turb() const;
+  const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const ;
+  void calculer_terme_production(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleVect&) const;
+  void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don& , DoubleTab& , DoubleTab& ) const;
+  void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const;
+  void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const;
+  void fill_resu(const DoubleVect& , DoubleTab& ) const;
 };
 
-//// readOn
-//
 inline void error(const Nom& source, const Nom& problem)
 {
   Cerr << "Error ! You can't use the " << source << " source term for the K equation of the problem: " << problem << finl;
@@ -87,8 +84,4 @@ inline void error(const Nom& source, const Nom& problem)
   Process::exit();
 }
 
-
-
-#endif
-
-
+#endif /* Source_Transport_K_VDF_Elem_included */

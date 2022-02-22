@@ -20,205 +20,103 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Source_Transport_K_VDF_Elem.h>
-#include <Transport_K_ou_Eps.h>
-#include <Convection_Diffusion_Temperature.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Modele_turbulence_scal_base.h>
-#include <Probleme_base.h>
-#include <IntTrav.h>
-#include <Champ_Uniforme.h>
-#include <Zone_VDF.h>
-#include <Champ_Face.h>
-#include <Zone_Cl_VDF.h>
-#include <Fluide_Quasi_Compressible.h>
-#include <Debog.h>
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
+#include <Source_Transport_K_VDF_Elem.h>
 #include <DoubleTrav.h>
-#include <Pb_Hydraulique_Turbulent.h>
-#include <Pb_Hydraulique_Concentration_Turbulent.h>
-#include <Pb_Thermohydraulique_Turbulent_QC.h>
-#include <Pb_Thermohydraulique_Turbulent.h>
-#include <Pb_Thermohydraulique_Concentration_Turbulent.h>
+#include <Zone_VDF.h>
 #include <Param.h>
-#include <Constituant.h>
 
-Implemente_instanciable(Source_Transport_K_VDF_Elem,"Source_Transport_K_VDF_P0_VDF",Source_base);
+Implemente_instanciable(Source_Transport_K_VDF_Elem,"Source_Transport_K_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
 
-
-Sortie& Source_Transport_K_VDF_Elem::printOn(Sortie& s) const
-{
-  return s << que_suis_je() ;
-}
-
-
-
-
+Sortie& Source_Transport_K_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
 Entree& Source_Transport_K_VDF_Elem::readOn(Entree& is)
 {
-  const Probleme_base& problem = mon_equation->probleme();
-  if (!sub_type(Pb_Hydraulique_Turbulent,problem) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,problem)) error(que_suis_je(),problem.que_suis_je());
+  verifier_pb_keps();
   Param param(que_suis_je());
   param.lire_avec_accolades(is);
   return is ;
 }
 
-
-
-void Source_Transport_K_VDF_Elem::associer_zones(const Zone_dis& zone_dis,
-                                                 const Zone_Cl_dis&  )
-{
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-}
-
-// remplit les references eq_hydraulique et mon_eq_transport_K_Eps
 void Source_Transport_K_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
-  eq_hydraulique = pb.equation(0);
+  Source_Transport_VDF_Elem_base::associer_pb(pb);
   mon_eq_transport_K   = ref_cast(Transport_K_ou_Eps,equation());
   mon_eq_transport_Eps = ref_cast(Transport_K_ou_Eps, mon_eq_transport_K.valeur().modele_turbulence().eqn_transp_Eps());
 }
 
-DoubleTab& Source_Transport_K_VDF_Elem::ajouter(DoubleTab& resu) const
+const DoubleTab& Source_Transport_K_VDF_Elem::get_visc_turb() const
 {
-
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const Zone_Cl_VDF& zcl_VDF = ref_cast(Zone_Cl_VDF,eq_hydraulique->zone_Cl_dis().valeur());
-  const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs();
-  const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
-  const DoubleTab& visco_turb = mon_eq_transport_K->modele_turbulence().viscosite_turbulente().valeurs();
-  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
-  const DoubleVect& volumes = zone_VDF.volumes();
-  const DoubleVect& porosite_vol = zone_VDF.porosite_elem();
-
-  int nb_elem = zone_VDF.nb_elem();
-
-  // Ajout d'un espace virtuel au tableau P
-  DoubleVect P;
-
-  zone_VDF.zone().creer_tableau_elements(P);
-
-  if (axi)
-    {
-      const Champ_Face& vitesse = ref_cast(Champ_Face,eq_hydraulique->inconnue().valeur());
-      calculer_terme_production_K_BiK_Axi(zone_VDF,vitesse,P,K,visco_turb);
-    }
-  else
-    {
-      const Champ_Face& vitesse = ref_cast(Champ_Face,eq_hydraulique->inconnue().valeur());
-      calculer_terme_production_K_BiK(zone_VDF,zcl_VDF,P,K,vit,vitesse,visco_turb);
-    }
-  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
-  int is_modele_fonc=(mon_modele_fonc.non_nul());
-  //is_modele_fonc=0;
-  if (is_modele_fonc)
-    {
-
-      DoubleTab& D=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("D").valeurs());
-      DoubleTab& E=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("E").valeurs());
-      DoubleTab& F1=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("F1").valeurs());
-      DoubleTab& F2=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("F2").valeurs());
-      const Fluide_base& fluide=ref_cast(Fluide_base,eq_hydraulique.valeur().milieu());
-      const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-      // const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-      const Zone_Cl_dis& zcl_k=mon_eq_transport_K->zone_Cl_dis();
-      const Zone_dis& zone_dis_k =mon_eq_transport_K->zone_dis();
-      mon_modele_fonc.Calcul_D_BiK(D,zone_dis_k,zcl_k,vit,K, Eps,ch_visco_cin);
-      mon_modele_fonc.Calcul_E_BiK(E,zone_dis_k,zcl_k,vit,K, Eps,ch_visco_cin,visco_turb);
-
-      D.echange_espace_virtuel();
-      E.echange_espace_virtuel();
-      const Champ_base& ch_visco_cin_ou_dyn =ref_cast(Op_Diff_K_Eps_base, equation().operateur(0).l_op_base()).diffusivite();
-      DoubleTab P_tab;
-      P_tab.ref(P);
-      mon_modele_fonc.Calcul_F1_BiK(F1,zone_dis_k,zcl_k, P_tab, K,Eps,ch_visco_cin_ou_dyn);
-
-
-      mon_modele_fonc.Calcul_F2_BiK(F2,D,zone_dis_k,K, Eps, ch_visco_cin_ou_dyn  );
-      Debog::verifier("D",D);
-      Debog::verifier("E",E);
-      Debog::verifier("F2",F2);
-      Debog::verifier("F1",F1);
-      Debog::verifier("avt",resu);
-      for (int elem=0; elem<nb_elem; elem++)
-        {
-          //if (K(elem) > 1.e-10 && Eps(elem) > 1.e-10)
-          {
-            // resu(elem) += (P(elem)-eps_sur_k(elem)*K(elem))*volumes(elem)*porosite_vol(elem)-D(elem);
-            resu(elem) += (P(elem)-Eps(elem)-D(elem))*volumes(elem)*porosite_vol(elem);
-            // on en profite pour diviser D  par le volume
-          }
-        }
-      Debog::verifier("ap",resu);
-
-      // int elem=0;
-      //Cerr<<" ici "<<D(elem)<< " "<<Eps(elem)<<finl;
-    }
-  else
-    {
-      for (int elem=0; elem<nb_elem; elem++)
-        {
-          resu(elem) += (P(elem)-Eps(elem))*volumes(elem)*porosite_vol(elem);
-        }
-    }
-
-  //Debog::verifier("Source_Transport_K_VDF_Elem::ajouter resu",resu);
-  resu.echange_espace_virtuel();
-  return resu;
+  return mon_eq_transport_K->modele_turbulence().viscosite_turbulente().valeurs();
 }
 
-DoubleTab& Source_Transport_K_VDF_Elem::calculer(DoubleTab& resu) const
-{
-  resu =0.;
-  return ajouter(resu);
-}
-
-
-void  Source_Transport_K_VDF_Elem::contribuer_a_avec(const DoubleTab& a,  Matrice_Morse& matrice) const
+void Source_Transport_K_VDF_Elem::calculer_terme_production(const Champ_Face& vitesse, const DoubleTab& visco_turb, const DoubleTab& vit, DoubleVect& P) const
 {
   const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs();
+
+  if (axi) calculer_terme_production_K_BiK_Axi(la_zone_VDF.valeur(),vitesse,P,K,visco_turb);
+  else calculer_terme_production_K_BiK(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K,vit,vitesse,visco_turb);
+}
+
+const Modele_Fonc_Bas_Reynolds& Source_Transport_K_VDF_Elem::get_modele_fonc_bas_reyn() const
+{
+  return ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
+}
+
+void Source_Transport_K_VDF_Elem::calcul_D_E(const DoubleTab& vit, const DoubleTab& visco_turb, const Champ_Don& ch_visco_cin, DoubleTab& D, DoubleTab& E) const
+{
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  get_modele_fonc_bas_reyn().Calcul_D_BiK(D,mon_eq_transport_K->zone_dis(),mon_eq_transport_K->zone_Cl_dis(),vit,K, Eps,ch_visco_cin);
+  get_modele_fonc_bas_reyn().Calcul_E_BiK(E,mon_eq_transport_K->zone_dis(),mon_eq_transport_K->zone_Cl_dis(),vit,K, Eps,ch_visco_cin,visco_turb);
+}
+
+void Source_Transport_K_VDF_Elem::calcul_F1_F2(const Champ_base& ch_visco_cin_ou_dyn, DoubleTab& P_tab, DoubleTab& D, DoubleTab& F1, DoubleTab& F2) const
+{
+  const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  get_modele_fonc_bas_reyn().Calcul_F1_BiK(F1,mon_eq_transport_K->zone_dis(),mon_eq_transport_K->zone_Cl_dis(), P_tab, K, Eps,ch_visco_cin_ou_dyn);
+  get_modele_fonc_bas_reyn().Calcul_F2_BiK(F2,D,mon_eq_transport_K->zone_dis(),K, Eps, ch_visco_cin_ou_dyn  );
+}
+
+void Source_Transport_K_VDF_Elem::fill_resu_bas_rey(const DoubleVect& P, const DoubleTab& D, const DoubleTab& E, const DoubleTab& F1, const DoubleTab& F2, DoubleTab& resu) const
+{
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
   const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+    resu(elem) += (P(elem)-Eps(elem)-D(elem))*volumes(elem)*porosite_vol(elem);
+}
 
-  int size=K.dimension(0);
+void Source_Transport_K_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& resu) const
+{
+  const DoubleVect& volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++)
+    resu(elem) += (P(elem)-Eps(elem))*volumes(elem)*porosite_vol(elem);
+}
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
-  const DoubleVect& porosite = zone_VDF.porosite_elem();
+void Source_Transport_K_VDF_Elem::contribuer_a_avec(const DoubleTab& a,  Matrice_Morse& matrice) const
+{
+  const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  const DoubleVect& porosite = la_zone_VDF->porosite_elem(), &volumes = la_zone_VDF->volumes();
+  const int size = K.dimension(0);
   // on implicite le -eps et le -eps^2/k
-
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
-  int is_modele_fonc=(mon_modele_fonc.non_nul());
-  //is_modele_fonc=0;
+  const int is_modele_fonc=(mon_modele_fonc.non_nul());
   DoubleTab F2;
   if (is_modele_fonc)
     {
       DoubleTrav D(0);
       F2.resize(K.dimension_tot(0));
       const Zone_dis& zone_dis_k =mon_eq_transport_K->zone_dis();
-
       const Champ_base& ch_visco_cin_ou_dyn =ref_cast(Op_Diff_K_Eps_base, equation().operateur(0).l_op_base()).diffusivite();
-
       mon_modele_fonc.Calcul_F2_BiK(F2,D,zone_dis_k,K,Eps, ch_visco_cin_ou_dyn  );
     }
 
-  {
-    const DoubleVect& volumes=zone_VDF.volumes();
-    for (int c=0; c<size; c++)
-      {
-        // -eps*vol  donne +vol dans la bonne case
-        if (K(c)>DMINFLOAT)
-          {
-            double coef_k=porosite(c)*volumes(c)*Eps(c)/K(c);
-            matrice(c,c)+=coef_k;
-          }
-      }
-  }
-}
-
-
-
-void Source_Transport_K_VDF_Elem::mettre_a_jour(double temps)
-{
-
-  Calcul_Production_K_VDF::mettre_a_jour(temps);
-
+  for (int c=0; c<size; c++)
+    {
+      // -eps*vol  donne +vol dans la bonne case
+      if (K(c)>DMINFLOAT)
+        {
+          double coef_k=porosite(c)*volumes(c)*Eps(c)/K(c);
+          matrice(c,c)+=coef_k;
+        }
+    }
 }

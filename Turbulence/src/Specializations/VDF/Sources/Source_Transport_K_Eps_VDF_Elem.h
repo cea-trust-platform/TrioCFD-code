@@ -28,7 +28,6 @@
 #define C2_DEFAULT 1.92   // dans le calcul des termes sources des equations
 #define C3_DEFAULT 1.0    // de transport de K et Eps source: Chabard et N3S
 
-#include <Source_base.h>
 #include <Ref_Zone_VDF.h>
 #include <Ref_Champ_Don.h>
 #include <Ref_Champ_Don_base.h>
@@ -36,7 +35,6 @@
 #include <Ref_Convection_Diffusion_Concentration.h>
 #include <Ref_Equation_base.h>
 #include <Ref_Transport_K_Eps.h>
-#include <Calcul_Production_K_VDF.h>
 
 class Probleme_base;
 class Champ_Don_base;
@@ -46,6 +44,8 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Zone_Cl_VDF;
 class Champ_Face;
+
+#include <Source_Transport_VDF_Elem_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //.DESCRIPTION class Source_Transport_K_Eps_VDF_Elem
@@ -57,31 +57,31 @@ class Champ_Face;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_Eps_VDF_Elem : public Source_base,
-  public Calcul_Production_K_VDF
+class Source_Transport_K_Eps_VDF_Elem : public Source_Transport_VDF_Elem_base
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_VDF_Elem);
-
 public:
+  Source_Transport_K_Eps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) // TODO : FIXME : comprends pas ...
+  {
+    C1 = cte1;
+    C2 = cte2;
+  }
 
-  inline Source_Transport_K_Eps_VDF_Elem(double cte1 = C1_DEFAULT,
-                                         double cte2 = C2_DEFAULT );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-  void mettre_a_jour(double temps) ;
+  inline DoubleTab& ajouter(DoubleTab& resu) const { return Source_Transport_VDF_Elem_base::ajouter_keps(resu); }
 
 protected:
-
-  double C1;
-  double C2;
-  REF(Zone_VDF) la_zone_VDF;
-  REF(Equation_base) eq_hydraulique;
   REF(Transport_K_Eps)  mon_eq_transport_K_Eps;
-
   virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+
+private:
+  const DoubleTab& get_visc_turb() const;
+  const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const ;
+  void calculer_terme_production(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleVect&) const;
+  void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don& , DoubleTab& , DoubleTab& ) const;
+  void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const;
+  void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const;
+  void fill_resu(const DoubleVect& , DoubleTab& ) const;
 };
 
 inline void error(const Nom& source, const Nom& problem)
@@ -91,10 +91,4 @@ inline void error(const Nom& source, const Nom& problem)
   Process::exit();
 }
 
-inline Source_Transport_K_Eps_VDF_Elem::
-Source_Transport_K_Eps_VDF_Elem(double cte1,double cte2)
-
-  : C1(cte1), C2(cte2) {}
-
-
-#endif
+#endif /* Source_Transport_K_Eps_VDF_Elem_included */

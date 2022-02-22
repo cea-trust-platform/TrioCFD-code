@@ -34,10 +34,10 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
+#include <Nom.h>
 
 class DoubleVect;
 class DoubleTab;
-class Zone_Cl_dis;
 class Zone_Cl_VDF;
 class Champ_Face;
 class Zone_VDF;
@@ -72,10 +72,8 @@ protected:
   DoubleVect& calculer_terme_destruction_K(const Zone_VDF& , const Zone_Cl_VDF& , DoubleVect& ,
                                            const DoubleTab& , const DoubleTab& ,
                                            const DoubleVect& ,const DoubleVect&  ,int ) const;
-  void mettre_a_jour(double temps)
-  {
-    ;
-  };
+  void mettre_a_jour(double ) { }
+
 protected:
 
 
@@ -86,4 +84,18 @@ protected:
                              const DoubleTab& , const DoubleTab& ,DoubleTab& ,int ) const;
 };
 
-#endif
+inline void error_keps(const Nom& source, const Nom& problem)
+{
+  Cerr << "Error ! You can't use the " << source << " source term for the problem: " << problem << finl;
+  Cerr << "Check the reference manual. It is may be another source term which should be used." << finl;
+  Process::exit();
+}
+
+template <typename RETURN_TYPE>
+RETURN_TYPE not_implemented(const char * nom_funct)
+{
+  Cerr << "The method " << nom_funct << " should be implemented in a derived class !" << finl;
+  throw;
+}
+
+#endif /* Calcul_Production_K_VDF_included */

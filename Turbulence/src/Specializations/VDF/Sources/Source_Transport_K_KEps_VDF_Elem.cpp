@@ -34,73 +34,14 @@
 #include <Paroi_std_hyd_VDF.h>
 #include <DoubleTrav.h>
 
+Implemente_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem,"Source_Transport_K_KEps_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
 
-Implemente_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem,"Source_Transport_K_KEps_VDF_P0_VDF",Source_base);
+Sortie& Source_Transport_K_KEps_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Entree& Source_Transport_K_KEps_VDF_Elem::readOn(Entree& is) { return Source_Transport_VDF_Elem_base::readOn(is); }
 
-
-Sortie& Source_Transport_K_KEps_VDF_Elem::printOn(Sortie& s) const
-{
-  return s << que_suis_je() ;
-}
-
-Entree& Source_Transport_K_KEps_VDF_Elem::readOn(Entree& is)
-{
-  Motcle accolade_ouverte("{");
-  Motcle accolade_fermee("}");
-  Motcle motlu;
-  is >> motlu;
-  if (motlu != accolade_ouverte)
-    {
-      Cerr << "On attendait { pour commencer a lire les constantes de Source_Transport_K_KEps" << finl;
-      exit();
-    }
-  Cerr << "Lecture des constantes de Source_Transport_K_KEps" << finl;
-  Motcles les_mots(2);
-  {
-    les_mots[0] = "C1_eps";
-    les_mots[1] = "C2_eps";
-  }
-  is >> motlu;
-  while (motlu != accolade_fermee)
-    {
-      int rang=les_mots.search(motlu);
-      switch(rang)
-        {
-        case 0 :
-          {
-            is >> C1;
-            break;
-          }
-        case 1 :
-          {
-            is >> C2;
-            break;
-          }
-        default :
-          {
-            Cerr << "On ne comprend pas le mot cle : " << motlu << "dans Source_Transport_K_KEps" << finl;
-            exit();
-          }
-        }
-
-      is >> motlu;
-    }
-
-  return is ;
-}
-
-
-void Source_Transport_K_KEps_VDF_Elem::associer_zones(const Zone_dis& zone_dis,
-                                                      const Zone_Cl_dis& zone_Cl_dis)
-{
-  la_zone_VDF = ref_cast(Zone_VDF, zone_dis.valeur());
-  la_zone_Cl_VDF = ref_cast(Zone_Cl_VDF,zone_Cl_dis.valeur());
-}
-
-// remplit les references eq_hydraulique et mon_eq_transport_K_Eps
 void Source_Transport_K_KEps_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
-  eq_hydraulique = pb.equation(0);
+  Source_Transport_VDF_Elem_base::associer_pb(pb);
   mon_eq_transport_K_Eps = ref_cast(Transport_K_KEps,equation());
 }
 
@@ -118,24 +59,17 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const int nbcouches = mon_eq_transport_K_Eps->get_nbcouches();
   int ndeb,nfin,elem,face_courante,elem_courant;
-  double dist;
-  double d_visco,y_etoile, critere_switch;
+  double dist, d_visco,y_etoile, critere_switch;
   Loi_2couches_base& loi2couches =ref_cast_non_const(Transport_K_KEps,mon_eq_transport_K_Eps.valeur()).loi2couches();
-  int valswitch;
-  int icouche;
+  int valswitch, icouche;
   const int impr2 =  mon_eq_transport_K_Eps->get_impr();
 
   const int typeswitch = mon_eq_transport_K_Eps->get_switch();
-  if ( typeswitch == 0 )
-    valswitch = mon_eq_transport_K_Eps->get_yswitch();
-  else
-    valswitch = mon_eq_transport_K_Eps->get_nutswitch();
+  if ( typeswitch == 0 ) valswitch = mon_eq_transport_K_Eps->get_yswitch();
+  else valswitch = mon_eq_transport_K_Eps->get_nutswitch();
 
-  int nb_elem = zone_VDF.nb_elem();
-  int nb_elem_tot = zone_VDF.nb_elem_tot();
-  DoubleTrav P(nb_elem_tot);
-  DoubleTrav Eps(nb_elem_tot);
-  DoubleTrav tab_couches(nb_elem_tot);
+  const int nb_elem = zone_VDF.nb_elem(), nb_elem_tot = zone_VDF.nb_elem_tot();
+  DoubleTrav P(nb_elem_tot), Eps(nb_elem_tot), tab_couches(nb_elem_tot);
 
   //Extraction de la viscosite moleculaire
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
@@ -151,26 +85,17 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
   else
     l_unif = 0;
 
-
-
   //essayer de calculer u+d+ ici pour chaque elt du bord?!
-
   for (elem=0; elem<nb_elem; elem++)
     {
       Eps[elem] = K_eps(elem,1);
       tab_couches[elem]=0;
     }
 
-
   // Boucle sur les bords
-  //Cerr << " nb bord = " << zone_VDF_NS.nb_front_Cl() << finl;
   for (int n_bord=0; n_bord<zone_VDF_NS.nb_front_Cl(); n_bord++)
     {
-
-      //pour chaque condition limite on regarde son type
       const Cond_lim& la_cl = zone_Cl_VDF_NS.les_conditions_limites(n_bord);
-      //Cerr << " la cl = " << la_cl.valeur() << finl;
-
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
@@ -220,8 +145,6 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
                       {
                         break;
                       }
-                    //Cerr << "face courante  " << face_courante << finl;
-                    //Cerr << "face 0  " << elem_faces(elem_courant,0) << finl;
                     if ( elem_faces(elem_courant,0) == face_courante)
                       face_courante = elem_faces(elem_courant,2);
                     else if ( elem_faces(elem_courant,1) == face_courante)
@@ -230,13 +153,10 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
                       face_courante = elem_faces(elem_courant,0);
                     else if ( elem_faces(elem_courant,3) == face_courante)
                       face_courante = elem_faces(elem_courant,1);
-                    //Cerr << "elem courant   " << elem_courant << finl;
-                    //Cerr << "nve elem =  " << face_voisins(face_courante,0) << finl;
                     if ( face_voisins(face_courante,0) != elem_courant)
                       elem_courant = face_voisins(face_courante,0);
                     else
                       elem_courant = face_voisins(face_courante,1);
-                    //Cerr << "dist = "  << dist << finl;
                     dist+=zone_VDF_NS.distance_normale(face_courante);
 
                   }
@@ -261,14 +181,12 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
                 else
                   d_visco = tab_visco[elem];
                 dist=zone_VDF_NS.distance_normale(num_face);
-                //Cerr << "dist = " << dist << finl;
 
                 face_courante = num_face;
                 elem_courant = elem;
 
                 for(icouche=0; (icouche<nbcouches) && (elem_courant != -1); icouche++)
                   {
-                    //Cerr << "***********Couche " << icouche << "**************" << finl;
                     double kSqRt=1.e-3;
                     if (K_eps(elem_courant,0)>0)
                       kSqRt=sqrt(K_eps(elem_courant,0));
@@ -294,8 +212,6 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
                         break;
                       }
 
-                    //Cerr << "face cournate  " << face_courante << finl;
-                    //Cerr << "face 0  " << elem_faces(elem_courant,0) << finl;
 
                     if ( elem_faces(elem_courant,0) == face_courante)
                       face_courante = elem_faces(elem_courant,3);
@@ -342,22 +258,8 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
     {
       resu(elem,0) += (P(elem)-Eps(elem))*volumes(elem)*porosite_vol(elem);
       if (K_eps(elem,0) >= 10.e-10)
-        resu(elem,1) += (C1*P(elem)- C2*Eps(elem))*volumes(elem)*porosite_vol(elem)
-                        *Eps(elem)/K_eps(elem,0);
+        resu(elem,1) += (C1*P(elem)- C2*Eps(elem))*volumes(elem)*porosite_vol(elem)*Eps(elem)/K_eps(elem,0);
     }
 
-  /* if ((eq_hydraulique->schema_temps().limpr()) && (impr == 1) )
-     {
-     Cout << "Zone des 2 couches : " << finl;
-     for (elem=0; elem<nb_elem; elem++)
-     Cout << "elem = " << elem << " couche = " << tab_couches[elem] << finl;
-     }*/
   return resu;
 }
-
-DoubleTab& Source_Transport_K_KEps_VDF_Elem::calculer(DoubleTab& resu) const
-{
-  resu =0.;
-  return ajouter(resu);
-}
-
