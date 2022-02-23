@@ -19,6 +19,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include <Pb_Hydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
 #include <Source_Transport_VDF_Elem_base.h>
 #include <Pb_Thermohydraulique_Turbulent.h>
@@ -30,6 +31,7 @@
 #include <Probleme_base.h>
 #include <Fluide_base.h>
 #include <Zone_Cl_VDF.h>
+#include <Constituant.h>
 #include <Champ_Face.h>
 #include <Zone_VDF.h>
 #include <Param.h>
@@ -63,18 +65,30 @@ Entree& Source_Transport_VDF_Elem_base::readOn_anisotherme(Entree& is)
   return is ;
 }
 
-void Source_Transport_VDF_Elem_base::verifier_pb_keps()
+Entree& Source_Transport_VDF_Elem_base::readOn_concen(Entree& is) { return readOn_anisotherme(is); }
+
+void Source_Transport_VDF_Elem_base::verifier_pb_keps(const Probleme_base& pb, const Nom& nom)
 {
-  const Probleme_base& problem = mon_equation->probleme();
-  if (!sub_type(Pb_Hydraulique_Turbulent,problem) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,problem)) error_keps(que_suis_je(),problem.que_suis_je());
+  if (!sub_type(Pb_Hydraulique_Turbulent,pb) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,pb)) error_keps(nom,pb.que_suis_je());
+}
+
+void Source_Transport_VDF_Elem_base::verifier_pb_keps_milieu(const Probleme_base& pb, const Nom& nom)
+{
+  const Milieu_base& milieu = pb.equation(1).milieu();
+  if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
+  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
 }
 
 void Source_Transport_VDF_Elem_base::verifier_pb_keps_anisotherme(const Probleme_base& pb, const Nom& nom)
 {
-  const Milieu_base& milieu = pb.equation(1).milieu();
   if (!sub_type(Pb_Thermohydraulique_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
-  if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
-  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
+  verifier_pb_keps_milieu(pb,nom);
+}
+
+void Source_Transport_VDF_Elem_base::verifier_pb_keps_concen(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Hydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
+  verifier_pb_keps_milieu(pb,nom);
 }
 
 void Source_Transport_VDF_Elem_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis&  zone_Cl_dis)
@@ -94,6 +108,20 @@ void Source_Transport_VDF_Elem_base::associer_pb_anisotherme(const Probleme_base
   beta_t = fluide.beta_t();
   gravite = fluide.gravite();
   eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
+}
+
+void Source_Transport_VDF_Elem_base::associer_pb_concen(const Probleme_base& pb)
+{
+  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(0).milieu());
+  if (!fluide.beta_c().non_nul())
+    {
+      Cerr << "You forgot to define beta_co field in the fluid. It is mandatory when using the K-Eps model (buoyancy effects)." << finl;
+      Cerr << "If you don't want buoyancy effects, then specify: beta_co champ_uniforme 1 0." << finl;
+      Process::exit();
+    }
+  beta_c = fluide.beta_c();
+  gravite = fluide.gravite();
+  eq_concentration = ref_cast(Convection_Diffusion_Concentration,pb.equation(1));
 }
 
 DoubleTab& Source_Transport_VDF_Elem_base::calculer(DoubleTab& resu) const
@@ -166,5 +194,30 @@ DoubleTab& Source_Transport_VDF_Elem_base::ajouter_anisotherme(DoubleTab& resu) 
   else calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_th,G,scalaire,alpha_turb,tab_beta,g);
 
   fill_resu_anisotherme(G,volumes,porosite_vol,resu); // voir les classes filles
+  return resu;
+}
+
+DoubleTab& Source_Transport_VDF_Elem_base::ajouter_concen(DoubleTab& resu) const
+{
+  const Zone_Cl_VDF& zcl_VDF_co = ref_cast(Zone_Cl_VDF,eq_concentration->zone_Cl_dis().valeur());
+  const DoubleTab& concen = eq_concentration->inconnue().valeurs();
+  const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
+  const DoubleTab& diffu_turb  = le_modele_scalaire.conductivite_turbulente().valeurs();
+  const Champ_Uniforme& ch_beta_concen = ref_cast(Champ_Uniforme, beta_c->valeur());
+  const DoubleVect& g = gravite->valeurs(), &volumes = la_zone_VDF->volumes(), &porosite_vol = la_zone_VDF->porosite_elem();
+  const int nb_consti = eq_concentration->constituant().nb_constituants();
+
+  // Ajout d'un espace virtuel au tableau G
+  DoubleVect G;
+  la_zone_VDF->zone().creer_tableau_elements(G);
+
+  if (nb_consti == 1) calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_co,G, concen,diffu_turb,ch_beta_concen(0,0),g);
+  else
+    {
+      const DoubleVect& d_beta_c = ch_beta_concen.valeurs();
+      calculer_terme_destruction_K(la_zone_VDF.valeur(),zcl_VDF_co,G, concen,diffu_turb,d_beta_c,g, nb_consti);
+    }
+
+  fill_resu_concen(G,volumes,porosite_vol,resu); // voir les classes filles
   return resu;
 }

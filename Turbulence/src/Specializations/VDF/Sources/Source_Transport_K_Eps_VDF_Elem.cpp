@@ -28,14 +28,11 @@
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_VDF_Elem,"Source_Transport_K_Eps_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
 
 Sortie& Source_Transport_K_Eps_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
-Entree& Source_Transport_K_Eps_VDF_Elem::readOn(Entree& is)
-{
-  verifier_pb_keps();
-  return Source_Transport_VDF_Elem_base::readOn(is);
-}
+Entree& Source_Transport_K_Eps_VDF_Elem::readOn(Entree& is) { return Source_Transport_VDF_Elem_base::readOn(is); }
 
 void Source_Transport_K_Eps_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
+  Source_Transport_VDF_Elem_base::verifier_pb_keps(pb,que_suis_je());
   Source_Transport_VDF_Elem_base::associer_pb(pb);
   mon_eq_transport_K_Eps = ref_cast(Transport_K_Eps,equation());
 }

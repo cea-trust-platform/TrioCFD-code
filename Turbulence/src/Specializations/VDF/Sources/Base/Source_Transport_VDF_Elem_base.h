@@ -22,6 +22,7 @@
 #ifndef Source_Transport_VDF_Elem_base_included
 #define Source_Transport_VDF_Elem_base_included
 
+#include <Ref_Convection_Diffusion_Concentration.h>
 #include <Ref_Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Calcul_Production_K_VDF.h>
@@ -54,7 +55,7 @@ protected :
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
 
   // pour les classes derivees
-  void verifier_pb_keps();
+  void verifier_pb_keps(const Probleme_base&, const Nom& );
   DoubleTab& ajouter_keps(DoubleTab& ) const;
 
   double C1 = C1__, C2 = C2__;
@@ -64,7 +65,7 @@ protected :
 
   // pour les classes anisotherme
   Entree& readOn_anisotherme(Entree& is);
-  void verifier_pb_keps_anisotherme(const Probleme_base&, const Nom& nom);
+  void verifier_pb_keps_anisotherme(const Probleme_base&, const Nom& );
   void associer_pb_anisotherme(const Probleme_base& );
   DoubleTab& ajouter_anisotherme(DoubleTab& ) const;
 
@@ -73,7 +74,18 @@ protected :
   REF(Champ_Don_base) gravite;
   REF(Convection_Diffusion_Temperature) eq_thermique;
 
+  // pour les classes concen
+  Entree& readOn_concen(Entree& is);
+  void verifier_pb_keps_concen(const Probleme_base&, const Nom& );
+  void associer_pb_concen(const Probleme_base& );
+  DoubleTab& ajouter_concen(DoubleTab& ) const;
+
+  REF(Champ_Don) beta_c;
+  REF(Convection_Diffusion_Concentration) eq_concentration;
+
 private:
+  void verifier_pb_keps_milieu(const Probleme_base&, const Nom& );
+
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const { return not_implemented<Modele_Fonc_Bas_Reynolds&>(__func__); }
@@ -83,6 +95,7 @@ private:
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu(const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void fill_resu_concen(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); } // XXX on peut faire une methode unique avec fill_resu_anisotherme ...
 };
 
 #endif /* Source_Transport_VDF_Elem_base_included */
