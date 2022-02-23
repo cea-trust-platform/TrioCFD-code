@@ -28,6 +28,7 @@ Implemente_instanciable(Source_Transport_K_anisotherme_VDF_Elem,"Source_Transpor
 Sortie& Source_Transport_K_anisotherme_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
 Entree& Source_Transport_K_anisotherme_VDF_Elem::readOn(Entree& is)
 {
+  Source_Transport_K_VDF_Elem::verifier_pb_keps_anisotherme(mon_equation->probleme(),que_suis_je());
   Param param(que_suis_je());
   param.lire_avec_accolades(is);
   return is ;
@@ -35,7 +36,7 @@ Entree& Source_Transport_K_anisotherme_VDF_Elem::readOn(Entree& is)
 
 void Source_Transport_K_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
-  Source_Transport_K_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+  Source_Transport_K_VDF_Elem::verifier_milieu_anisotherme(pb,que_suis_je());
   Source_Transport_K_VDF_Elem::associer_pb(pb);
   Source_Transport_K_VDF_Elem::associer_pb_anisotherme(pb);
 }

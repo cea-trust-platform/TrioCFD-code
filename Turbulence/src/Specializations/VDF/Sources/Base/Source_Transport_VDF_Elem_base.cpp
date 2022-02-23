@@ -72,23 +72,28 @@ void Source_Transport_VDF_Elem_base::verifier_pb_keps(const Probleme_base& pb, c
   if (!sub_type(Pb_Hydraulique_Turbulent,pb) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,pb)) error_keps(nom,pb.que_suis_je());
 }
 
-void Source_Transport_VDF_Elem_base::verifier_pb_keps_milieu(const Probleme_base& pb, const Nom& nom)
+void Source_Transport_VDF_Elem_base::verifier_pb_keps_anisotherme(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Thermohydraulique_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
+}
+
+void Source_Transport_VDF_Elem_base::verifier_pb_keps_concen(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Hydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
+}
+
+void Source_Transport_VDF_Elem_base::verifier_milieu_anisotherme(const Probleme_base& pb, const Nom& nom)
 {
   const Milieu_base& milieu = pb.equation(1).milieu();
   if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
   if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
 }
 
-void Source_Transport_VDF_Elem_base::verifier_pb_keps_anisotherme(const Probleme_base& pb, const Nom& nom)
+void Source_Transport_VDF_Elem_base::verifier_milieu_concen(const Probleme_base& pb, const Nom& nom)
 {
-  if (!sub_type(Pb_Thermohydraulique_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
-  verifier_pb_keps_milieu(pb,nom);
-}
-
-void Source_Transport_VDF_Elem_base::verifier_pb_keps_concen(const Probleme_base& pb, const Nom& nom)
-{
-  if (!sub_type(Pb_Hydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
-  verifier_pb_keps_milieu(pb,nom);
+  const Milieu_base& milieu = pb.equation(0).milieu(); // XXX : Attention pas eq 1 car Constituant derive pas de Fluide_base !
+  if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
+  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
 }
 
 void Source_Transport_VDF_Elem_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis&  zone_Cl_dis)
@@ -112,7 +117,7 @@ void Source_Transport_VDF_Elem_base::associer_pb_anisotherme(const Probleme_base
 
 void Source_Transport_VDF_Elem_base::associer_pb_concen(const Probleme_base& pb)
 {
-  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(0).milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(0).milieu()); // XXX : Attention pas eq 1 car Constituant derive pas de Fluide_base !
   if (!fluide.beta_c().non_nul())
     {
       Cerr << "You forgot to define beta_co field in the fluid. It is mandatory when using the K-Eps model (buoyancy effects)." << finl;

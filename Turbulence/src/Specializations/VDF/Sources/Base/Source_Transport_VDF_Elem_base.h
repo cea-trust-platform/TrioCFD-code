@@ -66,6 +66,7 @@ protected :
   // pour les classes anisotherme
   Entree& readOn_anisotherme(Entree& is);
   void verifier_pb_keps_anisotherme(const Probleme_base&, const Nom& );
+  void verifier_milieu_anisotherme(const Probleme_base&, const Nom& );
   void associer_pb_anisotherme(const Probleme_base& );
   DoubleTab& ajouter_anisotherme(DoubleTab& ) const;
 
@@ -77,6 +78,7 @@ protected :
   // pour les classes concen
   Entree& readOn_concen(Entree& is);
   void verifier_pb_keps_concen(const Probleme_base&, const Nom& );
+  void verifier_milieu_concen(const Probleme_base&, const Nom& );
   void associer_pb_concen(const Probleme_base& );
   DoubleTab& ajouter_concen(DoubleTab& ) const;
 
@@ -84,7 +86,6 @@ protected :
   REF(Convection_Diffusion_Concentration) eq_concentration;
 
 private:
-  void verifier_pb_keps_milieu(const Probleme_base&, const Nom& );
 
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }

@@ -30,7 +30,7 @@ Entree& Source_Transport_Eps_Realisable_anisotherme_VDF_Elem::readOn(Entree& is)
 
 void Source_Transport_Eps_Realisable_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
-  Source_Transport_Eps_Realisable_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+  Source_Transport_Eps_Realisable_VDF_Elem::verifier_milieu_anisotherme(pb,que_suis_je());
   Source_Transport_Eps_Realisable_VDF_Elem::associer_pb(pb);
   Source_Transport_Eps_Realisable_VDF_Elem::associer_pb_anisotherme(pb);
 }

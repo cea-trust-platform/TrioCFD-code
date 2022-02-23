@@ -38,7 +38,7 @@ Entree& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::readOn(Entre
 
 void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
-  Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+  Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::verifier_milieu_anisotherme(pb,que_suis_je());
   Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::associer_pb(pb);
   Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem::associer_pb_anisotherme(pb);
 }

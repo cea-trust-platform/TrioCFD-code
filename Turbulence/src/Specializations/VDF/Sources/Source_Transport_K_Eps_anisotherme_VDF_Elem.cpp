@@ -26,11 +26,15 @@
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_anisotherme_VDF_Elem,"Source_Transport_K_Eps_anisotherme_VDF_P0_VDF",Source_Transport_K_Eps_VDF_Elem);
 
 Sortie& Source_Transport_K_Eps_anisotherme_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
-Entree& Source_Transport_K_Eps_anisotherme_VDF_Elem::readOn(Entree& is) { return Source_Transport_VDF_Elem_base::readOn_anisotherme(is); }
+Entree& Source_Transport_K_Eps_anisotherme_VDF_Elem::readOn(Entree& is)
+{
+  Source_Transport_K_Eps_VDF_Elem::verifier_pb_keps_anisotherme(mon_equation->probleme(),que_suis_je());
+  return Source_Transport_VDF_Elem_base::readOn_anisotherme(is);
+}
 
 void Source_Transport_K_Eps_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)
 {
-  Source_Transport_K_Eps_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+  Source_Transport_K_Eps_VDF_Elem::verifier_milieu_anisotherme(pb,que_suis_je());
   Source_Transport_K_Eps_VDF_Elem::associer_pb(pb);
   Source_Transport_K_Eps_VDF_Elem::associer_pb_anisotherme(pb);
 }

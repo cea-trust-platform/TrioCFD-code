@@ -41,7 +41,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::associer_pb(const
   // provisoire a garder ?
   if (sub_type(Convection_Diffusion_Temperature_Turbulent,pb.equation(1)))
     {
-      Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::verifier_pb_keps_anisotherme(pb,que_suis_je());
+      Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::verifier_milieu_anisotherme(pb,que_suis_je());
       Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem::associer_pb_anisotherme(pb);
     }
   else // correction pour quasi compressible : on utilise pas l'eq_thermique en fait (ce erait une Convection_Diffusion_Enthalpie_Turbulent sinon)
