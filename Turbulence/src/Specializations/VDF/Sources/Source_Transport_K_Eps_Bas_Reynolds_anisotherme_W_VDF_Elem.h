@@ -36,37 +36,27 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem :
-  public Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem
+class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem
 {
 
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem);
 
 public:
+  Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem(double cte1 = C11__, double cte2 = C21__) : Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(cte1,cte2)
+  {
+    C1 = cte1;
+    C2 = cte2;
+  }
 
   DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
   virtual void associer_pb(const Probleme_base& );
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                    double cte2 = C21_DEFAULT );
+
+protected:
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
   DoubleTab& calculer_u_teta_W(const Zone_VDF&,const Zone_Cl_VDF&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,DoubleTab&) const;
   DoubleTab& calculer_terme_destruction_K_W(const Zone_VDF&,const Zone_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
   DoubleTab& calculer_terme_destruction_K_W(const Zone_VDF&,const Zone_Cl_VDF&,DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleTab&,const DoubleVect&) const;
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite_;
 };
-
-inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem(double cte1 ,double cte2 )
-
-  : Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(cte1,cte2) {}
-
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem_included */

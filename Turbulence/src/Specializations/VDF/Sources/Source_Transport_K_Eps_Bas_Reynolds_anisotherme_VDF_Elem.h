@@ -24,7 +24,6 @@
 
 #include <Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem.h>
 
-
 //////////////////////////////////////////////////////////////////////////////
 //
 //.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem
@@ -37,26 +36,18 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem :
-  public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
+class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem);
-
 public:
+  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2)
+  {
+    C1 = cte1;
+    C2 = cte2;
+  }
 
   DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
   virtual void associer_pb(const Probleme_base& );
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                  double cte2 = C21_DEFAULT );
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -71,26 +62,15 @@ protected:
 
 class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem);
-
 public:
+  Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(cte1,cte2)
+  {
+    C1 = cte1;
+    C2 = cte2;
+  }
 
   DoubleTab& ajouter(DoubleTab& ) const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                     double cte2 = C21_DEFAULT );
-protected:
 };
-
-
-inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(double cte1 ,double cte2 )
-
-  : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2) {}
-inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem(double cte1 ,double cte2 )
-
-  : Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem(cte1,cte2) {}
-
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem_included */

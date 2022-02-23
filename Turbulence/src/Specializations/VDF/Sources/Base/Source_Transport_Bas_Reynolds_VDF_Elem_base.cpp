@@ -52,6 +52,7 @@ DoubleTab& Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter(DoubleTab& resu)
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const Zone_Cl_dis& zcl_keps=eqn_keps_bas_re->zone_Cl_dis();
   const Zone_dis& zone_dis_keps =eqn_keps_bas_re ->zone_dis();
+  Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
   const int nb_elem = la_zone_VDF->nb_elem();
 
   DoubleTrav P(visco_turb), D(visco_turb), E(visco_turb), F1(nb_elem), F2(nb_elem);
@@ -62,16 +63,8 @@ DoubleTab& Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter(DoubleTab& resu)
   mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re, ch_visco_cin);
 
   // Rq : la distinction entre zone_cl est importante pour les deux equations pour l imposition des conditions aux limites!!!!!!
-  if (axi)
-    {
-      Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
-      calculer_terme_production_K_Axi(la_zone_VDF.valeur(),vitesse,P,K_eps_Bas_Re,visco_turb);
-    }
-  else
-    {
-      Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
-      calculer_terme_production_K(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K_eps_Bas_Re,vit,vitesse,visco_turb);
-    }
+  if (axi) calculer_terme_production_K_Axi(la_zone_VDF.valeur(),vitesse,P,K_eps_Bas_Re,visco_turb);
+  else calculer_terme_production_K(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K_eps_Bas_Re,vit,vitesse,visco_turb);
   P.echange_espace_virtuel();
 
   fill_resu_bas_reyn(P,D,E,F1,F2,resu);
