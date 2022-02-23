@@ -48,6 +48,7 @@
 ./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/Verification_k_epsilon_transport_equation NNR
 ./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/decroissance_keps STD
 ./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/test_div_grad_Prep1b STD
+./Turbulence/share/Validation/Rapports_automatiques/Verification_codage/Op_diff_dift_vdf NNR
 ./Turbulence/share/Validation/Rapports_automatiques/pas_fini/Couplage_Implicite_Instationnaire STD
 ./Turbulence/share/Validation/Rapports_automatiques/pas_fini/k_eps_vef_perio STD
 ./Turbulence/share/Validation/Rapports_automatiques/pas_fini/wl_vef_analytic NNR
