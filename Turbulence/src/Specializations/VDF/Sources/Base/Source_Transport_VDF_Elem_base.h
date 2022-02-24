@@ -85,8 +85,15 @@ protected :
   REF(Champ_Don) beta_c;
   REF(Convection_Diffusion_Concentration) eq_concentration;
 
-private:
+  // pour les classes anisotherme_concen
+  Entree& readOn_anisotherme_concen(Entree& is);
+  void verifier_pb_keps_anisotherme_concen(const Probleme_base&, const Nom& );
+  void verifier_milieu_anisotherme_concen(const Probleme_base&, const Nom& );
+  void associer_pb_anisotherme_concen(const Probleme_base& );
+  DoubleTab& ajouter_anisotherme_concen(DoubleTab& ) const;
 
+private:
+  void verifier_beta_concen(const  Fluide_base&);
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const { return not_implemented<Modele_Fonc_Bas_Reynolds&>(__func__); }
@@ -97,6 +104,7 @@ private:
   virtual void fill_resu(const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_concen(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); } // XXX on peut faire une methode unique avec fill_resu_anisotherme ...
+  virtual void fill_resu_anisotherme_concen(const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
 };
 
 #endif /* Source_Transport_VDF_Elem_base_included */
