@@ -36,33 +36,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem :
-  public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
+class Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem);
-
 public:
+  Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2) { }
 
   DoubleTab& ajouter(DoubleTab& ) const;
   virtual void associer_pb(const Probleme_base& );
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem(double cte1 = C11_DEFAULT,
-                                                                         double cte2 = C21_DEFAULT );
-
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
 };
-
-inline Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::
-Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem(double cte1, double cte2)
-
-  : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2) {}
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem_included */
