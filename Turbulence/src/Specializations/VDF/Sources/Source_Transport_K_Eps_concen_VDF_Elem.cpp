@@ -21,7 +21,6 @@
 
 #include <Source_Transport_K_Eps_concen_VDF_Elem.h>
 #include <Transport_K_Eps.h>
-#include <Zone_VDF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_concen_VDF_Elem,"Source_Transport_K_Eps_aniso_concen_VDF_P0_VDF",Source_Transport_K_Eps_VDF_Elem);
 

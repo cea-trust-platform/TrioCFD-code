@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,55 +12,31 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //
-// File:        Source_Transport_K_KEps_VDF_Elem.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/12
+// File      : Source_Transport_K_KEps_anisotherme_VDF_Elem.h
+// Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
 //
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 
+#ifndef Source_Transport_K_KEps_anisotherme_VDF_Elem_included
+#define Source_Transport_K_KEps_anisotherme_VDF_Elem_included
 
-#ifndef Source_Transport_K_KEps_VDF_Elem_included
-#define Source_Transport_K_KEps_VDF_Elem_included
+#include <Source_Transport_K_KEps_VDF_Elem.h>
 
-#include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Ref_Transport_K_KEps.h>
-
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
-class Champ_Face;
-
-#include <Source_Transport_VDF_Elem_base.h>
-
-//.DESCRIPTION class Source_Transport_K_KEps_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) avec le modele a deux couches et dans le cas
-// ou les equations de Navier-Stokes
-// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion
-// d'une concentration.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_KEps_VDF_Elem : public Source_Transport_VDF_Elem_base
+// CLASS: Source_Transport_K_Eps_anisotherme_VDF_Elem
+// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) pour le modele a deux couches et dans le cas ou les equations de Navier_Stokes
+// sont couplees a l'equation de la thermique On suppose que le coefficient de variation de la masse volumique du fluide en fonction de ce scalaire est un coefficient uniforme.
+class Source_Transport_K_KEps_anisotherme_VDF_Elem : public Source_Transport_K_KEps_VDF_Elem
 {
-  Declare_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem);
+  Declare_instanciable_sans_constructeur(Source_Transport_K_KEps_anisotherme_VDF_Elem);
 public:
-
-  inline Source_Transport_K_KEps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) { }
+  Source_Transport_K_KEps_anisotherme_VDF_Elem(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) : Source_Transport_K_KEps_VDF_Elem(cte1,cte2) { C3 = cte3; }
+  virtual void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
 
-protected:
-  REF(Transport_K_KEps)  mon_eq_transport_K_Eps;
-
-  virtual void associer_pb(const Probleme_base& pb);
+private:
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
 };
 
-#endif /* Source_Transport_K_KEps_VDF_Elem_included */
+#endif /* Source_Transport_K_KEps_anisotherme_VDF_Elem_included */

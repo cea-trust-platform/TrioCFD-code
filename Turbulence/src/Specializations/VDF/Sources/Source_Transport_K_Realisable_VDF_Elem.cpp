@@ -24,18 +24,11 @@
 #include <Source_Transport_K_Realisable_VDF_Elem.h>
 #include <Champ_Face.h>
 #include <DoubleTrav.h>
-#include <Zone_VDF.h>
-#include <Param.h>
 
 Implemente_instanciable(Source_Transport_K_Realisable_VDF_Elem,"Source_Transport_K_Realisable_VDF_P0_VDF",Source_Transport_Realisable_VDF_Elem_base);
 
 Sortie& Source_Transport_K_Realisable_VDF_Elem::printOn(Sortie& s ) const { return s << que_suis_je() ; }
-Entree& Source_Transport_K_Realisable_VDF_Elem::readOn(Entree& is )
-{
-  Param param(que_suis_je());
-  param.lire_avec_accolades(is);
-  return is ;
-}
+Entree& Source_Transport_K_Realisable_VDF_Elem::readOn(Entree& is ) { return Source_Transport_Realisable_VDF_Elem_base::readOn_nothing(is); }
 
 void Source_Transport_K_Realisable_VDF_Elem::associer_pb(const Probleme_base& pb )
 {

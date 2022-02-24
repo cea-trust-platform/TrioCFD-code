@@ -24,18 +24,9 @@
 
 #include <Source_Transport_K_Eps_VDF_Elem.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // CLASS: Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de
-// Navier_Stokes sont couplees a l'equation de convection diffusion
-// d'une concentration et a l'equation de la thermique
-// Les champs beta_t et beta_c sont uniformes
-//
-//////////////////////////////////////////////////////////////////////////////
-
+// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de
+// Navier_Stokes sont couplees a l'equation de convection diffusion d'une concentration et a l'equation de la thermique. Les champs beta_t et beta_c sont uniformes
 class Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem : public Source_Transport_K_Eps_VDF_Elem
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_aniso_therm_concen_VDF_Elem);

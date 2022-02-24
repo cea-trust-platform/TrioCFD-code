@@ -20,18 +20,11 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Transport_K_Realisable_aniso_concen_VDF_Elem.h>
-#include <Zone_VDF.h>
-#include <Param.h>
 
 Implemente_instanciable(Source_Transport_K_Realisable_aniso_concen_VDF_Elem,"Source_Transport_K_Realisable_aniso_concen_VDF_P0_VDF",Source_Transport_K_Realisable_VDF_Elem);
 
 Sortie& Source_Transport_K_Realisable_aniso_concen_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je(); }
-Entree& Source_Transport_K_Realisable_aniso_concen_VDF_Elem::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.lire_avec_accolades(is);
-  return is ;
-}
+Entree& Source_Transport_K_Realisable_aniso_concen_VDF_Elem::readOn(Entree& is) { return Source_Transport_K_Realisable_VDF_Elem::readOn_nothing(is); }
 
 void Source_Transport_K_Realisable_aniso_concen_VDF_Elem::associer_pb(const Probleme_base& pb)
 {

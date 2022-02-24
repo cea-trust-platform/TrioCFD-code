@@ -23,27 +23,6 @@
 #ifndef Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem_included
 #define Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem_included
 
-#define C11_DEFAULT 1.55   // Valeurs par defaut des constantes qui interviennent
-#define C21_DEFAULT 2.   // dans l'equation de k_esp
-
-//
-// .DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem
-//
-// .SECTION voir aussi
-
-#include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Modele_Fonc_Bas_Reynolds.h>
-#include <Ref_Zone_dis.h>
-#include <Zone_Cl_dis.h>
-#include <Ref_Transport_K_Eps_Bas_Reynolds.h>
-
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Champ_Face;
-
 #include <Source_Transport_Bas_Reynolds_VDF_Elem_base.h>
 
 class Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem : public Source_Transport_Bas_Reynolds_VDF_Elem_base

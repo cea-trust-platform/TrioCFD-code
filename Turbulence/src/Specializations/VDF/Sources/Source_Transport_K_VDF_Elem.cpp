@@ -23,8 +23,6 @@
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Source_Transport_K_VDF_Elem.h>
 #include <DoubleTrav.h>
-#include <Zone_VDF.h>
-#include <Param.h>
 
 Implemente_instanciable(Source_Transport_K_VDF_Elem,"Source_Transport_K_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
 
@@ -32,9 +30,7 @@ Sortie& Source_Transport_K_VDF_Elem::printOn(Sortie& s) const { return s << que_
 Entree& Source_Transport_K_VDF_Elem::readOn(Entree& is)
 {
   Source_Transport_VDF_Elem_base::verifier_pb_keps(mon_equation->probleme(),que_suis_je());
-  Param param(que_suis_je());
-  param.lire_avec_accolades(is);
-  return is ;
+  return Source_Transport_VDF_Elem_base::readOn_nothing(is);
 }
 
 void Source_Transport_K_VDF_Elem::associer_pb(const Probleme_base& pb)

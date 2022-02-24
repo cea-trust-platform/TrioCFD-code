@@ -25,7 +25,6 @@
 #include <Fluide_base.h>
 #include <DoubleTrav.h>
 #include <Champ_Face.h>
-#include <Zone_VDF.h>
 
 Implemente_base_sans_constructeur( Source_Transport_Bas_Reynolds_VDF_Elem_base, "Source_Transport_Bas_Reynolds_VDF_Elem_base", Source_Transport_VDF_Elem_base ) ;
 

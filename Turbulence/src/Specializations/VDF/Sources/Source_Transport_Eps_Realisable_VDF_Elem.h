@@ -20,41 +20,11 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Transport_Eps_Realisable_VDF_Elem_included
 #define Source_Transport_Eps_Realisable_VDF_Elem_included
 
-
-#define C21_DEFAULT_K_EPS_REALISABLE  1.9   // dans l'equation de k_eps
-#define C3_DEFAULT_K_EPS_REALISABLE 1.0    // de transport de K et Eps source: Chabard et N3S
-
-//
-// .DESCRIPTION class Source_Transport_Eps_Realisable_VDF_Elem
-//
-// .SECTION voir aussi
-
-#include <Source_Transport_K_Eps_VDF_Elem.h>
-#include <Ref_Zone_Cl_VDF.h>
-#include <Ref_Transport_Flux_Chaleur_Turbulente.h>
-#include <Modele_Fonc_Realisable_base.h>
-#include <Ref_Zone_dis.h>
-#include <Zone_Cl_dis.h>
-#include <Ref_Transport_K_ou_Eps_Realisable.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Calcul_Production_K_VDF.h>
-
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Champ_Face;
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
-class Champ_Face;
-
 #include <Source_Transport_Realisable_VDF_Elem_base.h>
+#include <Ref_Transport_K_ou_Eps_Realisable.h>
 
 class Source_Transport_Eps_Realisable_VDF_Elem : public Source_Transport_Realisable_VDF_Elem_base
 {

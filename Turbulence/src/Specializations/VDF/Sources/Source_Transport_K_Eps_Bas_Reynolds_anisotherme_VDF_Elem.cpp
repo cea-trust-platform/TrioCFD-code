@@ -28,7 +28,6 @@
 #include <Fluide_base.h>
 #include <Champ_Face.h>
 #include <DoubleTrav.h>
-#include <Zone_VDF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem,"Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_P0_VDF",Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem);
 

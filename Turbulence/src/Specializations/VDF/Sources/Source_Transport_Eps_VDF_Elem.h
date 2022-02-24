@@ -20,43 +20,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Transport_Eps_VDF_Elem_included
 #define Source_Transport_Eps_VDF_Elem_included
 
-#define C1_DEFAULT 1.44   // Valeurs par defaut des constantes qui interviennent
-#define C2_DEFAULT 1.92   // dans le calcul des termes sources des equations
-#define C3_DEFAULT 1.0    // de transport de K et Eps source: Chabard et N3S
-
-#include <Ref_Zone_VDF.h>
-#include <Ref_Champ_Don.h>
-#include <Ref_Champ_Don_base.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Ref_Equation_base.h>
+#include <Source_Transport_VDF_Elem_base.h>
 #include <Ref_Transport_K_ou_Eps.h>
 
-class Probleme_base;
-class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VDF;
-class Champ_Face;
-
-#include <Source_Transport_VDF_Elem_base.h>
-
-//////////////////////////////////////////////////////////////////////////////
 //.DESCRIPTION class Source_Transport_Eps_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier-Stokes
-// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion
-// d'une concentration.
-//
-//////////////////////////////////////////////////////////////////////////////
-
+// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier-Stokes
+// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion d'une concentration.
 class Source_Transport_Eps_VDF_Elem : public Source_Transport_VDF_Elem_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_VDF_Elem);
@@ -78,12 +50,5 @@ private:
   void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const;
   void fill_resu(const DoubleVect& , DoubleTab& ) const;
 };
-
-inline void error(const Nom& source, const Nom& problem)
-{
-  Cerr << "Error ! You can't use the " << source << " source term for the Eps equation of the problem: " << problem << finl;
-  Cerr << "Check the reference manual. It is may be another source term Source_Transport_Eps_.... which should be used." << finl;
-  Process::exit();
-}
 
 #endif /* Source_Transport_Eps_VDF_Elem_included */

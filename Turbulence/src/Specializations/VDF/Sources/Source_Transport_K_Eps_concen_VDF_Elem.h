@@ -24,18 +24,9 @@
 
 #include <Source_Transport_K_Eps_VDF_Elem.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // CLASS: Source_Transport_K_Eps_concen_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation d'un transport d'un constituant
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
-
+// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes sont couplees
+// a l'equation d'un transport d'un constituant. On suppose que le coefficient de variation de la masse volumique du fluide en fonction de ce scalaire est un coefficient uniforme.
 class Source_Transport_K_Eps_concen_VDF_Elem : public Source_Transport_K_Eps_VDF_Elem
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_concen_VDF_Elem);

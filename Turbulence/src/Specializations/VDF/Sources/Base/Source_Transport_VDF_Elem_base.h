@@ -31,6 +31,7 @@
 #include <Ref_Zone_Cl_VDF.h>
 #include <Ref_Zone_VDF.h>
 #include <Source_base.h>
+#include <Zone_VDF.h>
 
 class Modele_Fonc_Bas_Reynolds;
 class Probleme_base;
@@ -55,6 +56,7 @@ protected :
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
 
   // pour les classes derivees
+  Entree& readOn_nothing(Entree& is);
   void verifier_pb_keps(const Probleme_base&, const Nom& );
   DoubleTab& ajouter_keps(DoubleTab& ) const;
 

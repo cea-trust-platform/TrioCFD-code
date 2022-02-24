@@ -21,7 +21,6 @@
 
 #include <Source_Transport_K_Eps_Realisable_anisotherme_VDF_Elem.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Zone_VDF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_anisotherme_VDF_Elem,"Source_Transport_K_Eps_Realisable_anisotherme_VDF_P0_VDF",Source_Transport_K_Eps_Realisable_VDF_Elem);
 

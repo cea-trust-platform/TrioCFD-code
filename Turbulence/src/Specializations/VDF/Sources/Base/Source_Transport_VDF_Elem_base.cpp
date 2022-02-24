@@ -34,7 +34,6 @@
 #include <Zone_Cl_VDF.h>
 #include <Constituant.h>
 #include <Champ_Face.h>
-#include <Zone_VDF.h>
 #include <Param.h>
 #include <Debog.h>
 
@@ -51,6 +50,13 @@ Entree& Source_Transport_VDF_Elem_base::readOn( Entree& is )
   Cerr << "C1_eps = " << C1 << finl;
   Cerr << "C2_eps = " << C2 << finl;
   return is;
+}
+
+Entree& Source_Transport_VDF_Elem_base::readOn_nothing(Entree& is)
+{
+  Param param(que_suis_je());
+  param.lire_avec_accolades(is);
+  return is ;
 }
 
 Entree& Source_Transport_VDF_Elem_base::readOn_anisotherme(Entree& is)
