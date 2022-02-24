@@ -14,19 +14,19 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem.h
+// File      : Source_Transport_K_Realisable_aniso_concen_VDF_Elem.h
 // Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem_included
-#define Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem_included
+#ifndef Source_Transport_K_Realisable_aniso_concen_VDF_Elem_included
+#define Source_Transport_K_Realisable_aniso_concen_VDF_Elem_included
 
-#include <Source_Transport_Eps_Realisable_VDF_Elem.h>
+#include <Source_Transport_K_Realisable_VDF_Elem.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// CLASS: Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem
+// CLASS: Source_Transport_K_Realisable_aniso_concen_VDF_Elem
 //
 // Cette classe represente le terme source qui figure dans l'equation
 // de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
@@ -36,30 +36,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem : public Source_Transport_Eps_Realisable_VDF_Elem
+class Source_Transport_K_Realisable_aniso_concen_VDF_Elem : public Source_Transport_K_Realisable_VDF_Elem
 {
-  Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem);
+  Declare_instanciable(Source_Transport_K_Realisable_aniso_concen_VDF_Elem);
 public:
-
-  inline Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem(double cte2 = C2_DEFAULT,
-                                                               double cte3 = C3_DEFAULT_K_EPS_REALISABLE);
   virtual void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
 
-protected:
-  double C3_;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-
+private:
+  void fill_resu_concen(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
 };
 
-inline Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem::
-Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem(double cte2,double cte3)
-
-  : Source_Transport_Eps_Realisable_VDF_Elem(cte2) , C3_(cte3) {}
-
-
-
-#endif /* Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem_included */
+#endif /* Source_Transport_K_Realisable_aniso_concen_VDF_Elem_included */

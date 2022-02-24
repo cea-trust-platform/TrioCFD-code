@@ -42,6 +42,9 @@ protected :
   // pour les classes anisotherme
   Entree& readOn_anisotherme_real(Entree& is);
 
+  // pour les classes concen
+  Entree& readOn_concen_real(Entree& is);
+
 private:
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
