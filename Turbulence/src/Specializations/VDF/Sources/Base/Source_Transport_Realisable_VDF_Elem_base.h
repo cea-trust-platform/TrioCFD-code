@@ -38,12 +38,12 @@ protected :
   static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Chabard et N3S
 
   DoubleTab& ajouter_keps_real(DoubleTab& ) const;
-
   // pour les classes anisotherme
   Entree& readOn_anisotherme_real(Entree& is);
-
   // pour les classes concen
   Entree& readOn_concen_real(Entree& is);
+  // pour les classes anisotherme_concen
+  Entree& readOn_anisotherme_concen_real(Entree& is);
 
 private:
   // methodes a surcharger sinon throw !!

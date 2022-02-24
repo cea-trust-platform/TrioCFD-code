@@ -54,6 +54,8 @@ Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_anisotherme_real(Entre
 
 Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_concen_real(Entree& is) { return readOn_anisotherme_real(is); }
 
+Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_anisotherme_concen_real(Entree& is) { return readOn_anisotherme_real(is); }
+
 DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTab& resu) const
 {
   const DoubleTab& visco_turb = get_visc_turb(); // voir les classes filles

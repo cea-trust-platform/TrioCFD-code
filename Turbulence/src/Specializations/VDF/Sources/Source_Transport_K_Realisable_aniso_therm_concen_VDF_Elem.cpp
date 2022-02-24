@@ -14,48 +14,40 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem.h
+// File      : Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem.cpp
 // Directory : $TURBULENCE_ROOT/src/Specializations/VDF/Sources
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem_included
-#define Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem_included
+#include <Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem.h>
+#include <Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h>
+#include <Zone_VDF.h>
+#include <Param.h>
 
-#include <Source_Transport_K_Realisable_VDF_Elem.h>
+Implemente_instanciable(Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem,"Source_Transport_K_Realisable_aniso_therm_concen_VDF_P0_VDF",Source_Transport_K_Realisable_VDF_Elem);
 
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de
-// Navier_Stokes sont couplees a l'equation de convection diffusion
-// d'une concentration et a l'equation de la thermique
-// Les champs beta_t et beta_c sont uniformes
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem :
-  public Source_Transport_K_Realisable_VDF_Elem
+Sortie& Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je(); }
+Entree& Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.lire_avec_accolades(is);
+  return is ;
+}
 
-  Declare_instanciable(Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem);
+void Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem::associer_pb(const Probleme_base& pb)
+{
+  Source_Transport_K_Realisable_VDF_Elem::verifier_milieu_anisotherme_concen(pb,que_suis_je());
+  Source_Transport_K_Realisable_VDF_Elem::associer_pb(pb);
+  Source_Transport_K_Realisable_VDF_Elem::associer_pb_anisotherme_concen(pb);
+}
 
-public:
+void Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem::fill_resu_anisotherme_concen(const DoubleVect& G_t, const DoubleVect& G_c, const DoubleVect& volumes, const DoubleVect& porosite_vol, DoubleTab& resu) const
+{
+  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) resu(elem) += (G_t(elem) + G_c(elem))*volumes(elem)*porosite_vol(elem);
+}
 
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-
-protected:
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-
-};
-
-#endif /* Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem_included */
+DoubleTab& Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem::ajouter(DoubleTab& resu) const
+{
+  Source_Transport_K_Realisable_VDF_Elem::ajouter(resu);
+  return Source_Transport_K_Realisable_VDF_Elem::ajouter_anisotherme_concen(resu);
+}

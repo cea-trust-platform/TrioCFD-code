@@ -24,7 +24,6 @@
 
 #include <Source_Transport_Eps_Realisable_VDF_Elem.h>
 
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // CLASS: Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem
@@ -37,35 +36,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem :
-  public Source_Transport_Eps_Realisable_VDF_Elem
+class Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem : public Source_Transport_Eps_Realisable_VDF_Elem
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem);
-
 public:
-
-  inline Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem(double cte2 = C2_DEFAULT,
-                                                                     double cte3 = C3_DEFAULT_K_EPS_REALISABLE);
+  Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem(double cte2 = C2__, double cte3 = C3_R__) : Source_Transport_Eps_Realisable_VDF_Elem(cte2) { C3 = cte3; }
   virtual void associer_pb(const Probleme_base& );
   DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
 
-protected:
-
-  double C3_;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-
+private:
+  void fill_resu_anisotherme_concen(const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
 };
-
-inline Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem::
-Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem(double cte2,double cte3)
-
-  : Source_Transport_Eps_Realisable_VDF_Elem(cte2) , C3_(cte3) {}
-
 
 #endif /* Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem_included */
