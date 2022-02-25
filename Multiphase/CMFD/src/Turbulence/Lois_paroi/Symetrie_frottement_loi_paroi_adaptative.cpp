@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Loi_paroi_faible_tau.cpp
+// File:        Symetrie_frottement_loi_paroi_adaptative.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/28
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Neumann_loi_paroi_faible_tau.h>
+#include <Symetrie_frottement_loi_paroi_adaptative.h>
 #include <Motcle.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
@@ -30,17 +30,18 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
+#include <Zone_CoviMAC.h>
 
 #include <math.h>
 
-Implemente_instanciable(Neumann_loi_paroi_faible_tau,"Neumann_loi_paroi_faible_tau",Neumann_loi_paroi);
+Implemente_instanciable(Symetrie_frottement_loi_paroi_adaptative,"Symetrie_frottement_loi_paroi_adaptative",Symetrie_frottement_loi_paroi);
 
-Sortie& Neumann_loi_paroi_faible_tau::printOn(Sortie& s ) const
+Sortie& Symetrie_frottement_loi_paroi_adaptative::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
-Entree& Neumann_loi_paroi_faible_tau::readOn(Entree& s )
+Entree& Symetrie_frottement_loi_paroi_adaptative::readOn(Entree& s )
 {
   Param param(que_suis_je());
   param.ajouter("beta_omega", &beta_omega);
@@ -53,7 +54,7 @@ Entree& Neumann_loi_paroi_faible_tau::readOn(Entree& s )
   return s;
 }
 
-void Neumann_loi_paroi_faible_tau::liste_faces_loi_paroi(IntTab& tab)
+void Symetrie_frottement_loi_paroi_adaptative::liste_faces_loi_paroi(IntTab& tab)
 {
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = tab.line_size();
@@ -62,76 +63,72 @@ void Neumann_loi_paroi_faible_tau::liste_faces_loi_paroi(IntTab& tab)
       tab(f + f1, n) |= 1;
 }
 
-int Neumann_loi_paroi_faible_tau::compatible_avec_eqn(const Equation_base& eqn) const
+int Symetrie_frottement_loi_paroi_adaptative::compatible_avec_eqn(const Equation_base& eqn) const
 {
   Motcle dom_app=eqn.domaine_application();
-  Motcle Turbulence="Turbulence";
+  Motcle Hydraulique="Hydraulique";
 
-  if (dom_app==Turbulence)
+  if (dom_app==Hydraulique)
     return 1;
   else err_pas_compatible(eqn);
   return 0;
 }
 
-double Neumann_loi_paroi_faible_tau::flux_impose(int i) const
+double Symetrie_frottement_loi_paroi_adaptative::coefficient_frottement(int i) const
 {
-  return valeurs_flux_(i,0);
+  return valeurs_coeff_(i,0);
 }
 
-double Neumann_loi_paroi_faible_tau::flux_impose(int i,int j) const
+double Symetrie_frottement_loi_paroi_adaptative::coefficient_frottement(int i,int j) const
 {
-  return valeurs_flux_(i,j);
+  return valeurs_coeff_(i,j);
 }
 
-int Neumann_loi_paroi_faible_tau::initialiser(double temps)
+int Symetrie_frottement_loi_paroi_adaptative::initialiser(double temps)
 {
-  valeurs_flux_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
-  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_flux_);
+  valeurs_coeff_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_coeff_);
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
   return 1;
 }
 
-void Neumann_loi_paroi_faible_tau::mettre_a_jour(double tps)
+void Symetrie_frottement_loi_paroi_adaptative::mettre_a_jour(double tps)
 {
   if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
 }
 
-void Neumann_loi_paroi_faible_tau::me_calculer()
+void Symetrie_frottement_loi_paroi_adaptative::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
+  Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, zone_Cl_dis().equation().probleme().domaine_dis().zone_dis(0).valeur());
+
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
-  const DoubleTab& y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces de la zone
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
-  int N = zone_Cl_dis().equation().inconnue().valeurs().line_size() ;
+  const DoubleTab& vit   = zone_Cl_dis().equation().inconnue().valeurs();
 
-  for (int f =0 ; f < nf ; f++)
-    {
-      int f_zone = f + f1; // number of the face in the zone
-      valeurs_flux_(f_zone, 0) = calc_flux(y(f_zone, 0), u_tau(f_zone, 0), visc(f_zone, 0));
-    }
-  for (int n =1 ; n < N ; n++) for (int f =0 ; f < nf ; f++)
+  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), nf_tot = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
+  int N = zone_Cl_dis().equation().inconnue().valeurs().line_size(), D = dimension;
+
+  const DoubleTab& n_f = zone.face_normales();
+  const DoubleVect& fs = zone.face_surfaces();
+  const IntTab& f_e = zone.face_voisins();
+
+  for (int f =0 ; f < nf ; f++) for (int n=1 ; n<N ; n++) // Est-ce la bonne maniere de gerer les autres phases ? pas clair pour moi...
       {
-        Process::exit("Neumann_loi_paroi_faible_tau : Only one phase for turbulent wall law is coded for now");
+        int f_zone = f + f1; // number of the face in the zone
+        if (f_e(f_zone, 1) >= 0) Process::exit("Symetrie_frottement_loi_paroi_adaptative : error in the definition of the boundary faces for wall laws");
+        int e = f_e(f_zone,0);
+        double u_orth = zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f);
+        DoubleTrav u_parallel(D);
+        for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - n_f(f,d) * u_orth/fs(f) ;
+        if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Symetrie_frottement_loi_paroi_adaptative : error in the calculation of the parallel velocity for wall laws");
+        double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
+        double y_loc = zone.dist_face_elem0(f,  e);
+        double y_plus_loc = y_loc * norm_u_parallel/ visc(e, n) ;
+        if (y_plus_loc>1) valeurs_coeff_(f_zone, n) = u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+        else valeurs_coeff_(f_zone, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
       }
-  valeurs_flux_.echange_espace_virtuel();
+
+  valeurs_coeff_.echange_espace_virtuel();
 }
 
-double Neumann_loi_paroi_faible_tau::calc_flux(double y, double u_tau, double visc)
-{
-  double y_p = y * u_tau / visc;
-  double w_vis = 6 * visc / (beta_omega * y * y);
-  double w_log = u_tau / ( sqrt(beta_k) * von_karman_ * y);
-  double w_1 = w_vis + w_log ;
-  double w_2 = pow( pow(w_vis, 1.2) + pow(w_log, 1.2) , 1/1.2 );
-  double blending = tanh( y_p/10*y_p/10*y_p/10*y_p/10);
-
-  double d_w_vis = - 12 * visc / (beta_omega * y * y * y);
-  double d_w_log = - u_tau / ( sqrt(beta_k) * von_karman_ * y * y);
-  double d_w_1 = d_w_vis + d_w_log ;
-  double d_w_2 = ( d_w_vis * pow(w_vis, 0.2) + d_w_log * pow(w_log, 0.2) )*pow( pow(w_vis, 1.2) + pow(w_log, 1.2) , 1/1.2-1 );
-  double d_blending = 4*u_tau/(visc*10)*(y_p/10*y_p/10*y_p/10)*(1-blending*blending);
-
-  return - ( d_blending * w_1 + blending * d_w_1 - d_blending * w_2 + (1-blending) * d_w_2 ) / ((blending * w_1 + (1-blending) * w_2) * (blending * w_1 + (1-blending) * w_2)) ;
-
-}

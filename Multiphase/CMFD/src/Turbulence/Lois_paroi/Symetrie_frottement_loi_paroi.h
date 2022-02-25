@@ -14,16 +14,16 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Neumann_loi_paroi.h
+// File:        Symetrie_frottement_loi_paroi.h
 // Directory:   $TRUST_ROOT/src/CoviMAC/Cond_Lim
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Neumann_loi_paroi_included
-#define Neumann_loi_paroi_included
+#ifndef Symetrie_frottement_loi_paroi_included
+#define Symetrie_frottement_loi_paroi_included
 
-#include <Neumann_paroi.h>
+#include <Cond_lim_base.h>
 #include <Param.h>
 #include <IntTab.h>
 #include <Ref_Correlation.h>
@@ -35,31 +35,31 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Neumann_loi_paroi
-//    Classe de base pour les flux impose pour une condition aux limites adaptative faible des equations de turbulence
+//    Classe Symetrie_frottement_loi_paroi
+//    Classe de base pour conditions aux limites de la vitesse pour une loi de paroi adaptative faible, qui impose un frottement parallele a la vitesse et une vitesse normale nulle
+//    La valeur de la force de frottement est - alpha rho u_parallele coefficient_frottement
 //    Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
 // .SECTION voir aussi
 //    Neumann
 //////////////////////////////////////////////////////////////////////////////
-class Neumann_loi_paroi : public Neumann_paroi
+class Symetrie_frottement_loi_paroi : public Cond_lim_base
 {
 
-  Declare_base(Neumann_loi_paroi);
+  Declare_base(Symetrie_frottement_loi_paroi);
 
 public:
 
   virtual void liste_faces_loi_paroi(IntTab&) =0;
   virtual void associer_correlation(const Correlation& corr)
   {
-
     correlation_loi_paroi_ = corr;
-
   };
   virtual void associer_fr_dis_base(const Frontiere_dis_base& fr) {la_frontiere_dis=fr;};
   virtual int initialiser(double temps) =0 ;
   virtual void associer_zone_cl_dis_base(const Zone_Cl_dis_base& zcl) { ma_zone_cl_dis=zcl;};
-  virtual double flux_impose(int i) const=0;
-  virtual double flux_impose(int i,int j) const=0;
+  virtual double coefficient_frottement(int i) const=0;
+  virtual double coefficient_frottement(int i,int j) const=0;
+
 
   // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
   virtual void completer() {};

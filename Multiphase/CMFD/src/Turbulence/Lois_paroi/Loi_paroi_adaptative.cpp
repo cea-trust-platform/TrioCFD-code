@@ -27,6 +27,7 @@
 #include <Zone_CoviMAC.h>
 #include <DoubleTrav.h>
 #include <Neumann_loi_paroi.h>
+#include <Symetrie_frottement_loi_paroi.h>
 #include <Cond_lim_base.h>
 #include <math.h>
 #include <Nom.h>
@@ -70,6 +71,8 @@ void Loi_paroi_adaptative::completer()
         Cond_lim cond_lim_loc = pb_.valeur().equation(i).zone_Cl_dis()->les_conditions_limites(j);
         if sub_type(Neumann_loi_paroi, cond_lim_loc.valeur())
           ref_cast(Neumann_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
+        else if sub_type(Symetrie_frottement_loi_paroi, cond_lim_loc.valeur())
+          ref_cast(Symetrie_frottement_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
       }
 }
 

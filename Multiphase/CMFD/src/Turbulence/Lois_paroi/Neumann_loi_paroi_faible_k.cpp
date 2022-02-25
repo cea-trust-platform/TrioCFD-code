@@ -85,7 +85,7 @@ double Neumann_loi_paroi_faible_k::flux_impose(int i,int j) const
 
 int Neumann_loi_paroi_faible_k::initialiser(double temps)
 {
-  valeurs_flux_.resize(0,1);
+  valeurs_flux_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_flux_);
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
   return 1;
@@ -103,12 +103,17 @@ void Neumann_loi_paroi_faible_k::me_calculer()
   const DoubleTab& y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces de la zone
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
+  int N = zone_Cl_dis().equation().inconnue().valeurs().line_size();
 
   for (int f =0 ; f < nf ; f++)
     {
       int f_zone = f + f1; // number of the face in the zone
-      valeurs_flux_ = calc_flux(y(f_zone, 0), u_tau(f_zone, 0), visc(f_zone, 0));
+      valeurs_flux_(f_zone, 0) = calc_flux(y(f_zone, 0), u_tau(f_zone, 0), visc(f_zone, 0));
     }
+  for (int n =1 ; n < N ; n++) for (int f =0 ; f < nf ; f++)
+      {
+        Process::exit("Neumann_loi_paroi_faible_k : Only one phase for turbulent wall law is coded for now");
+      }
 
   valeurs_flux_.echange_espace_virtuel();
 }

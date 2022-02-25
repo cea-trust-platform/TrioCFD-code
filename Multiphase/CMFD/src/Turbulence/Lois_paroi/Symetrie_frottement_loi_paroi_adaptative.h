@@ -14,68 +14,56 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Neumann_loi_paroi.h
-// Directory:   $TRUST_ROOT/src/CoviMAC/Cond_Lim
+// File:        Symetrie_frottement_loi_paroi_adaptative.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Neumann_loi_paroi_included
-#define Neumann_loi_paroi_included
+#ifndef Symetrie_frottement_loi_paroi_adaptative_included
+#define Symetrie_frottement_loi_paroi_adaptative_included
 
-#include <Neumann_paroi.h>
-#include <Param.h>
-#include <IntTab.h>
-#include <Ref_Correlation.h>
-#include <Correlation.h>
-#include <Frontiere_dis_base.h>
-#include <Ref_Frontiere_dis_base.h>
-
+#include <DoubleTab.h>
+#include <Symetrie_frottement_loi_paroi.h>
+#include <CL_loi_paroi.h>
+#include <Cond_lim_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Neumann_loi_paroi
-//    Classe de base pour les flux impose pour une condition aux limites adaptative faible des equations de turbulence
-//    Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
+//    Classe Symetrie_frottement_loi_paroi_adaptative
+//    Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
+//    transport de QDM.
+//    Le coefficient de frottement est calcule a partir de la correlation de loi de paroi adaptative.
 // .SECTION voir aussi
 //    Neumann
 //////////////////////////////////////////////////////////////////////////////
-class Neumann_loi_paroi : public Neumann_paroi
+class Symetrie_frottement_loi_paroi_adaptative : public Symetrie_frottement_loi_paroi
 {
 
-  Declare_base(Neumann_loi_paroi);
+  Declare_instanciable(Symetrie_frottement_loi_paroi_adaptative);
 
-public:
+public :
+  int compatible_avec_eqn(const Equation_base&) const;
+  virtual int initialiser(double temps) ;
+  virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps);
+  void me_calculer();
+  double calc_flux(double y, double u_tau, double visc);
+  virtual double coefficient_frottement(int i) const;
+  virtual double coefficient_frottement(int i,int j) const;
+  virtual void liste_faces_loi_paroi(IntTab&) ;
 
-  virtual void liste_faces_loi_paroi(IntTab&) =0;
-  virtual void associer_correlation(const Correlation& corr)
-  {
+protected :
 
-    correlation_loi_paroi_ = corr;
-
-  };
-  virtual void associer_fr_dis_base(const Frontiere_dis_base& fr) {la_frontiere_dis=fr;};
-  virtual int initialiser(double temps) =0 ;
-  virtual void associer_zone_cl_dis_base(const Zone_Cl_dis_base& zcl) { ma_zone_cl_dis=zcl;};
-  virtual double flux_impose(int i) const=0;
-  virtual double flux_impose(int i,int j) const=0;
-
-  // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
-  virtual void completer() {};
-  virtual void fixer_nb_valeurs_temporelles(int nb_cases) {};
-  virtual inline Frontiere_dis_base& frontiere_dis() {return la_frontiere_dis;};
-  virtual inline const Frontiere_dis_base& frontiere_dis() const {return la_frontiere_dis;};
-  virtual void changer_temps_futur(double temps,int i) {};
-  virtual void set_temps_defaut(double temps) {};
-  virtual void calculer_coeffs_echange(double temps) {};
-  virtual void verifie_ch_init_nb_comp() {};
+  double deriv_u_plus_de_y_plus(double y_p);
 
 
-protected:
-  REF(Correlation) correlation_loi_paroi_;
-  REF(Frontiere_dis_base) la_frontiere_dis;
-  double mon_temps = -1;
+// A reflechir
+  DoubleTab valeurs_coeff_;
+  double von_karman_ = 0.41 ;
+  double beta_omega = 0.075;
+  double beta_k = 0.09;
 };
 
 #endif
