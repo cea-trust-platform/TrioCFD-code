@@ -48,7 +48,6 @@ public :
   virtual int initialiser(double temps) ;
   virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
   void mettre_a_jour(double tps);
-  void me_calculer();
   double calc_flux(double y, double u_tau, double visc);
   double deriv_u_plus_de_y_plus(double y_p) ;
   double deriv_u_plus_de_y_plus_2(double y_p) ;
@@ -57,12 +56,13 @@ public :
   virtual void liste_faces_loi_paroi(IntTab&) ;
 
 protected :
+  void me_calculer();
+
   DoubleTab valeurs_flux_;
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
-
 };
 
 #endif

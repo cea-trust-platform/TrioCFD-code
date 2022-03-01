@@ -48,13 +48,14 @@ public :
   virtual int initialiser(double temps) ;
   virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
   void mettre_a_jour(double tps);
-  void me_calculer();
   double calc_flux(double y, double u_tau, double visc);
   virtual double flux_impose(int i) const;
   virtual double flux_impose(int i,int j) const;
   virtual void liste_faces_loi_paroi(IntTab&) ;
 
 protected :
+  void me_calculer();
+
   DoubleTab valeurs_flux_;
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;

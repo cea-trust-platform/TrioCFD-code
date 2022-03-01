@@ -30,6 +30,7 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
+#include <Zone_CoviMAC.h>
 
 #include <math.h>
 
@@ -99,16 +100,19 @@ void Neumann_loi_paroi_faible_tau::mettre_a_jour(double tps)
 void Neumann_loi_paroi_faible_tau::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
+  const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, zone_Cl_dis().equation().zone_dis().valeur());
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
   const DoubleTab& y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces de la zone
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size() ;
+  const IntTab& f_e = zone.face_voisins();
 
   for (int f =0 ; f < nf ; f++)
     {
       int f_zone = f + f1; // number of the face in the zone
-      valeurs_flux_(f_zone, 0) = calc_flux(y(f_zone, 0), u_tau(f_zone, 0), visc(f_zone, 0));
+      int e_zone = f_e(f_zone,0);
+      valeurs_flux_(f, 0) = calc_flux(y(f_zone, 0), u_tau(f_zone, 0), visc(e_zone, 0));
     }
   for (int n =1 ; n < N ; n++) for (int f =0 ; f < nf ; f++)
       {

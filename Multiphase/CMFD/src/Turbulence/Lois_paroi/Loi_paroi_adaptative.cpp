@@ -28,6 +28,7 @@
 #include <DoubleTrav.h>
 #include <Neumann_loi_paroi.h>
 #include <Symetrie_frottement_loi_paroi.h>
+#include <Echange_impose_base.h>
 #include <Cond_lim_base.h>
 #include <math.h>
 #include <Nom.h>
@@ -73,6 +74,8 @@ void Loi_paroi_adaptative::completer()
           ref_cast(Neumann_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
         else if sub_type(Symetrie_frottement_loi_paroi, cond_lim_loc.valeur())
           ref_cast(Symetrie_frottement_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
+        else if sub_type(Echange_impose_base, cond_lim_loc.valeur())
+          ref_cast(Echange_impose_base, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
       }
 }
 
