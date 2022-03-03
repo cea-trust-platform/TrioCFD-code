@@ -14,30 +14,57 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Symetrie_frottement_loi_paroi.cpp
-// Directory:   $TRUST_ROOT/src/CoviMAC/Cond_Lim
-// Version:     /main/28
+// File:        Paroi_frottante_loi.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
+// Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Symetrie_frottement_loi_paroi.h>
-#include <Motcle.h>
-#include <Equation_base.h>
-#include <Probleme_base.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Frontiere_dis_base.h>
-#include <Frontiere.h>
+#ifndef Paroi_frottante_loi_included
+#define Paroi_frottante_loi_included
 
-#include <math.h>
+#include <DoubleTab.h>
+#include <Frottement_global_impose.h>
+#include <CL_loi_paroi.h>
+#include <Cond_lim_base.h>
 
-Implemente_base(Symetrie_frottement_loi_paroi,"Symetrie_frottement_loi_paroi",Cond_lim_base);
-
-Sortie& Symetrie_frottement_loi_paroi::printOn(Sortie& s ) const
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//    Classe Paroi_frottante_loi
+//    Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
+//    transport de QDM.
+//    Le coefficient de frottement est calcule a partir de la correlation de loi de paroi adaptative.
+// .SECTION voir aussi
+//    Neumann
+//////////////////////////////////////////////////////////////////////////////
+class Paroi_frottante_loi : public Frottement_global_impose
 {
-  return s << que_suis_je() << "\n";
-}
 
-Entree& Symetrie_frottement_loi_paroi::readOn(Entree& s )
-{
-  return s;
-}
+  Declare_instanciable(Paroi_frottante_loi);
+
+public :
+  int compatible_avec_eqn(const Equation_base&) const;
+  virtual int initialiser(double temps) ;
+  virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps);
+  void me_calculer();
+  double calc_flux(double y, double u_tau, double visc);
+  virtual double coefficient_frottement(int i) const;
+  virtual double coefficient_frottement(int i,int j) const;
+  virtual void liste_faces_loi_paroi(IntTab&) ;
+
+protected :
+
+  REF(Correlation) correlation_loi_paroi_;
+  double deriv_u_plus_de_y_plus(double y_p);
+
+
+// A reflechir
+  DoubleTab valeurs_coeff_;
+  double von_karman_ = 0.41 ;
+  double beta_omega = 0.075;
+  double beta_k = 0.09;
+};
+
+#endif

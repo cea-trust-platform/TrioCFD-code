@@ -20,8 +20,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Dissipation_WIT_CoviMAC_CoviMAC_included
-#define Dissipation_WIT_CoviMAC_WIT_CoviMAC_included
+#ifndef Dissipation_WIT_CoviMAC_included
+#define Dissipation_WIT_CoviMAC_included
 
 #include <Source_base.h>
 #include <Ref_Correlation.h>

@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Symetrie_frottement_loi_paroi_adaptative.cpp
+// File:        Paroi_frottante_loi.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/28
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Symetrie_frottement_loi_paroi_adaptative.h>
+#include <Paroi_frottante_loi.h>
 #include <Motcle.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
@@ -34,14 +34,14 @@
 
 #include <math.h>
 
-Implemente_instanciable(Symetrie_frottement_loi_paroi_adaptative,"Symetrie_frottement_loi_paroi_adaptative",Symetrie_frottement_loi_paroi);
+Implemente_instanciable(Paroi_frottante_loi,"Paroi_frottante_loi", Frottement_global_impose);
 
-Sortie& Symetrie_frottement_loi_paroi_adaptative::printOn(Sortie& s ) const
+Sortie& Paroi_frottante_loi::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
-Entree& Symetrie_frottement_loi_paroi_adaptative::readOn(Entree& s )
+Entree& Paroi_frottante_loi::readOn(Entree& s )
 {
   Param param(que_suis_je());
   param.ajouter("beta_omega", &beta_omega);
@@ -54,7 +54,7 @@ Entree& Symetrie_frottement_loi_paroi_adaptative::readOn(Entree& s )
   return s;
 }
 
-void Symetrie_frottement_loi_paroi_adaptative::liste_faces_loi_paroi(IntTab& tab)
+void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
 {
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = tab.line_size();
@@ -63,7 +63,7 @@ void Symetrie_frottement_loi_paroi_adaptative::liste_faces_loi_paroi(IntTab& tab
       tab(f + f1, n) |= 1;
 }
 
-int Symetrie_frottement_loi_paroi_adaptative::compatible_avec_eqn(const Equation_base& eqn) const
+int Paroi_frottante_loi::compatible_avec_eqn(const Equation_base& eqn) const
 {
   Motcle dom_app=eqn.domaine_application();
   Motcle Hydraulique="Hydraulique";
@@ -74,17 +74,17 @@ int Symetrie_frottement_loi_paroi_adaptative::compatible_avec_eqn(const Equation
   return 0;
 }
 
-double Symetrie_frottement_loi_paroi_adaptative::coefficient_frottement(int i) const
+double Paroi_frottante_loi::coefficient_frottement(int i) const
 {
   return valeurs_coeff_(i,0);
 }
 
-double Symetrie_frottement_loi_paroi_adaptative::coefficient_frottement(int i,int j) const
+double Paroi_frottante_loi::coefficient_frottement(int i,int j) const
 {
   return valeurs_coeff_(i,j);
 }
 
-int Symetrie_frottement_loi_paroi_adaptative::initialiser(double temps)
+int Paroi_frottante_loi::initialiser(double temps)
 {
   valeurs_coeff_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_coeff_);
@@ -92,12 +92,12 @@ int Symetrie_frottement_loi_paroi_adaptative::initialiser(double temps)
   return 1;
 }
 
-void Symetrie_frottement_loi_paroi_adaptative::mettre_a_jour(double tps)
+void Paroi_frottante_loi::mettre_a_jour(double tps)
 {
-  if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
+  if (mon_temps < tps) {me_calculer() ; mon_temps=tps;}
 }
 
-void Symetrie_frottement_loi_paroi_adaptative::me_calculer()
+void Paroi_frottante_loi::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, zone_Cl_dis().equation().probleme().domaine_dis().zone_dis(0).valeur());
@@ -113,15 +113,15 @@ void Symetrie_frottement_loi_paroi_adaptative::me_calculer()
   const DoubleVect& fs = zone.face_surfaces();
   const IntTab& f_e = zone.face_voisins();
 
-  for (int f =0 ; f < nf ; f++) for (int n=1 ; n<N ; n++) // Est-ce la bonne maniere de gerer les autres phases ? pas clair pour moi...
+  for (int f =0 ; f < nf ; f++) for (int n=0 ; n<N ; n++) // Est-ce la bonne maniere de gerer les autres phases ? pas clair pour moi...
       {
         int f_zone = f + f1; // number of the face in the zone
-        if (f_e(f_zone, 1) >= 0) Process::exit("Symetrie_frottement_loi_paroi_adaptative : error in the definition of the boundary faces for wall laws");
+        if (f_e(f_zone, 1) >= 0) Process::exit("Paroi_frottante_loi : error in the definition of the boundary faces for wall laws");
         int e = f_e(f_zone,0);
         double u_orth = zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f);
         DoubleTrav u_parallel(D);
         for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - n_f(f,d) * u_orth/fs(f) ;
-        if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Symetrie_frottement_loi_paroi_adaptative : error in the calculation of the parallel velocity for wall laws");
+        if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Paroi_frottante_loi : error in the calculation of the parallel velocity for wall laws");
         double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
         double y_loc = zone.dist_face_elem0(f,  e);
         double y_plus_loc = y_loc * norm_u_parallel/ visc(e, n) ;

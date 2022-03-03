@@ -29,6 +29,7 @@
 #include <MD_Vector_tools.h>
 #include <math.h>
 #include <ConstDoubleTab_parts.h>
+#include <cmath>
 
 Implemente_instanciable(Transport_turbulent_GGDH_WIT, "Transport_turbulent_GGDH_WIT", Transport_turbulent_base);
 
