@@ -36,6 +36,7 @@
 #include <EChaine.h>
 #include <Source_Con_Phase_field_base.h>
 #include <Operateur_Diff_base.h>
+#include <Constituant.h>
 
 extern Stat_Counter_Id temps_total_execution_counter_;
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
@@ -394,9 +395,12 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
               Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (1)"<< finl;
               exit();
             }
-          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
+          //dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
+          //Mirantsoa mr264902 generalization to n components
+          const Convection_Diffusion_Concentration& eq_c=ref_cast(Convection_Diffusion_Concentration, mon_probleme.valeur().equation(1));
+          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",eq_c.constituant().nb_constituants(),0.,rho_);
           champs_compris_.ajoute_champ(rho_);
-          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"derivee_masse_volumique","kg/m3",1,0.,drhodc_);
+          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"derivee_masse_volumique","kg/m3",eq_c.constituant().nb_constituants(),0.,drhodc_);
           champs_compris_.ajoute_champ(drhodc_);
         }
       if (rho_.le_nom()=="anonyme")
@@ -441,15 +445,35 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
   else
     {
       const DoubleTab& c = eq_c.inconnue().futur(i);
-      DoubleTab& rhoTab = rho_.valeur().valeurs();
-      DoubleTab& drhodcTab = drhodc_.valeur().valeurs();
+      //Mirantsoa 264902
+      DoubleTab& rhoTab = rho_.valeurs(); /**/
+      DoubleTab& drhodcTab = drhodc_.valeurs();/**/
+      DoubleTab& betacTab = betac_.valeur().valeurs();/**/
+      Cerr << "c = "<<c<<finl;
+      Cerr << "rhoTab initial = "<<rhoTab<<finl;
+      Cerr << "drhodcTab initial = "<<drhodcTab<<finl;
+      Cerr << "betacTab initial = "<<betacTab<<finl;
       // DoubleTab& betacTab = betac_.valeur().valeurs();
       //      rho_.valeur().affecter_(betac_.valeur());
       drhodcTab=rho0_;
-      tab_multiply_any_shape(drhodcTab, betac_.valeur().valeurs());
+      DoubleTab beta_=drhodcTab;
+      Cerr << "drhodcTab = "<<drhodcTab<<finl;
+      Cerr << "beta_co Tab = "<<beta_<<finl;
+
+      //beta_ stores the values of betac_ in a DoubleTab with the same dimension as drhodcTab so that tab_multiply_any_shape can be used
+      for (i=0; i<beta_.dimension(0); i++)
+        {
+          for (int j=0; j<beta_.line_size(); j++)
+            {
+              beta_(i,j)=betac_.valeur().valeurs()(0,j);
+            }
+        }
+      tab_multiply_any_shape(drhodcTab, beta_);
+      Cerr << "drhodcTab = "<<drhodcTab<<finl;
       rhoTab=c;
       tab_multiply_any_shape(rhoTab, drhodcTab);
       rhoTab+=rho0_;
+      Cerr<<"rhoTab+"<<rhoTab<<finl;
     }
   rho_.valeur().valeurs().echange_espace_virtuel();
   drhodc_.valeur().valeurs().echange_espace_virtuel();
@@ -588,7 +612,15 @@ int Navier_Stokes_phase_field::preparer_calcul()
 
   // Calcul de la masse volumique
   rho_.valeur().initialiser(schema_temps().temps_courant());
+  Cerr << " rho_"<< rho_<< finl;
+  Cerr << "valeur de rho_"<< rho_.valeur()<< finl;
+  Cerr << "valeur de rho_ valeurs"<< rho_.valeurs()<< finl;
+
   drhodc_.valeur().initialiser(schema_temps().temps_courant());
+  Cerr << " drhodc_"<< drhodc_<< finl;
+  Cerr << "valeur de rho_"<< drhodc_.valeur()<< finl;
+  Cerr << "valeur de rho_ valeurs"<< drhodc_.valeurs()<< finl;
+
   calculer_rho(true); // RLT: cette minitialisation etait incorrecte dans TrioCFD 1.8.0 car on utilisait c.futur()
   // Calcul de la viscosite dynamique dans le cas boussi_==0 et diff_boussi_==0
   if (mu_.non_nul())

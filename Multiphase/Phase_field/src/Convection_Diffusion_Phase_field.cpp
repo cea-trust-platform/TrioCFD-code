@@ -28,6 +28,8 @@
 #include <TRUSTTrav.h>
 #include <Frontiere_dis_base.h>
 #include <Param.h>
+#include <Constituant.h>
+#include <Champ_Don.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Phase_field,"Convection_Diffusion_Phase_field",Convection_Diffusion_Concentration);
 // XD convection_diffusion_phase_field convection_diffusion_concentration convection_diffusion_phase_field -1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
@@ -113,8 +115,12 @@ void Convection_Diffusion_Phase_field::discretiser()
   Cerr << "mutilde discretization" << finl;
   //dis.mutilde(schema_temps(), zone_dis(), ch_mutilde);
 
-  dis.discretiser_champ("temperature",zone_dis().valeur(),"potentiel_chimique_generalise",".",1,schema_temps().temps_courant(),ch_mutilde);
+  Cerr << "le nombre de composants du champ donnee coefficient_diffusion = "<<diffusivite_pour_transport().nb_comp()<<finl;
+  Cerr << "le nombre de composants dans constituants = "<<constituant().nb_constituants()<<finl;
 
+
+  //dis.discretiser_champ("temperature",zone_dis().valeur(),"potentiel_chimique_generalise",".",1,schema_temps().temps_courant(),ch_mutilde);
+  dis.discretiser_champ("temperature",zone_dis().valeur(),"potentiel_chimique_generalise",".",constituant().nb_constituants(),schema_temps().temps_courant(),ch_mutilde);
   champs_compris_.ajoute_champ(ch_mutilde);
 
   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,probleme().equation(0));
@@ -154,6 +160,7 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
 
   // mutilde, div_alpha_gradC, alpha_gradC_carre et pression_thermo
   // ont la meme structure que la concentration
+
   mutilde = inconnue().valeurs();
   mutilde = 0.;
   // si on traite une variable avec "dis." (voir discretiser()), l'operation "resize" est inutile car "dis." s'en charge.
@@ -165,10 +172,17 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
 
   div_alpha_gradC = inconnue().valeurs();
   div_alpha_gradC = 0.;
+
+
   alpha_gradC_carre = div_alpha_gradC;
   pression_thermo = div_alpha_gradC;
 
-  sources().mettre_a_jour(schema_temps().temps_courant());
+  Cerr<<" mutilde : preparer_calcul = "<< mutilde <<finl;
+  Cerr<<" div_alpha_gradC : preparer_calcul = "<< div_alpha_gradC <<finl;
+  Cerr<<" alpha_gradC_carre : preparer_calcul = "<< alpha_gradC_carre <<finl;
+  Cerr<<" pression_thermo : preparer_calcul = "<< pression_thermo <<finl;
 
+
+  sources().mettre_a_jour(schema_temps().temps_courant());
   return 1;
 }

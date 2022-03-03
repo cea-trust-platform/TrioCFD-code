@@ -29,6 +29,7 @@
 #include <Champ_Fonc.h>
 #include <Champ_Don.h>
 #include <Ref_Champ_Don.h>
+#include <Constituant.h>
 
 /*! @brief classe Convection_Diffusion_Phase_field Cas particulier de Convection_Diffusion_Concentration
  *
@@ -117,8 +118,6 @@ public :
   const Operateur_Grad& operateur_gradient() const;
   void completer() override;
 
-  /////////////////////////////////////////////////////
-
   inline int& get_mutype_()
   {
     return mutype_;
@@ -140,6 +139,7 @@ protected :
   DoubleTab mutilde_demi;
 
   int mutype_;
+
 
 };
 

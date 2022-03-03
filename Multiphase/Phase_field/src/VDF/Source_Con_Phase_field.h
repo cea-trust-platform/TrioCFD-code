@@ -24,7 +24,6 @@
 #ifndef Source_Con_Phase_field_included
 #define Source_Con_Phase_field_included
 
-
 #include <Source_Con_Phase_field_base.h>
 #include <Matrice_Morse.h>
 #include <Ref_Zone_VDF.h>
@@ -32,12 +31,9 @@
 #include <Champ_Don.h>
 #include <Ref_Champ_Don.h>
 #include <Table.h>
-/*! @brief class Source_Con_Phase_field
- *
- *
- *
- * @sa Source_base, SouConPhase_field
- */
+#include <Convection_Diffusion_Concentration.h>
+#include <Equation_base.h>
+
 class Source_Con_Phase_field : public Source_Con_Phase_field_base
 {
 
@@ -64,11 +60,18 @@ protected:
   DoubleVect u_carre_;
   DoubleTab prov_face_,prov_elem_;
   double alpha, beta;
+  DoubleVect alphaMatrix, betaMatrix;
+  int nb_equation_CH;
   Table potentiel_chimique_expr_;
   double (Source_Con_Phase_field::*dWdc)(const double) const;
   double kappa;
+  DoubleVect kappaMatrix;
+  DoubleVect coeff_auto_diffusion;
+  double temperature;
   int kappa_ind;
   int type_kappa_;
+  int type_kappa_auto_diffusion_;
+  int type_systeme_binaire_;
   int kappa_moy_;
   double mult_kappa;
   Table kappa_forme_expr_;
