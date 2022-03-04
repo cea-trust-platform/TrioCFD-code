@@ -262,7 +262,10 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                   {
                     Cerr << "Source_Con_Phase_field::readOn: Error while reading systeme_binaire" << finl;
                     Cerr << motlu << " is not understood."<< finl;
-                    Cerr << "We are expecting a keyword among " << les_mots << finl;
+                    Cerr << "We are expecting a keyword among ";
+                    for (int i=1; i<8; i++)
+                      Cerr << les_mots(i) << " ";
+                    Cerr<< finl;
                     exit();
                   }
                   if(cpt0 != 6)
@@ -303,8 +306,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                 case 1:
                   {
                     cpt0++;
-                    //const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-                    //const int nb_comp =eq_c.constituant().nb_constituants();
                     DoubleVect temp_alpha(nb_equation_CH*nb_equation_CH); //define temp_alpha to avoid resize here
                     alphaMatrix = temp_alpha;
                     for(int i=0; i< temp_alpha.size(); i++)
@@ -411,6 +412,11 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                               }
                           }
                         is >> motlu;
+                        //definir ici kappaMatrix mobilite en fonction de coeff auto diff et temperature ici
+                        //DoubleVect temp_kappa(nb_equation_CH*nb_equation_CH); //define temp_alpha to avoid resize here
+                        //kappaMatrix = temp_kappa;
+                        //for(int i=0; i< temp_kappa.size(); i++)
+                        //kappaMatrix(i)=D_k/RT avec R=8.314 pour gaz parfait.... remplir en fonction de coeff auto diffusion de taille nb_equCH+1
                       }
                     else if (motlu=="non")
                       {
@@ -460,7 +466,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                         exit();
                       }
                   }
-                  //is >>motlu;
                 }
               is >> motlu;
             }
@@ -598,7 +603,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
           {
             for (i=0; i<kappaMatrix.size(); i++)
               {
-                //Cerr <<" theoretical time step = ?     dx4*"<< 1./alphaMatrix(i)/kappaMatrix(i)/2.<<" dx2*"<<1./2./kappaMatrix(i)/betaMatrix(i)<<finl;
                 Cerr <<" kappaMatrix ("<< i << ") = " << kappaMatrix(i)<<finl; //
               }
           }
@@ -617,7 +621,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
 void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
 {
   le_probleme2=pb;
-
   Navier_Stokes_phase_field& eq_ns=ref_cast(Navier_Stokes_phase_field,le_probleme2->equation(0));
   Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   rho0 = eq_ns.rho0();
@@ -905,47 +908,196 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
+  const int nb_comp = eq_c.constituant().nb_constituants();
+
 
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
-  DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
-  if (prov_face.size()==0)
-    prov_face=eq_ns.inconnue().valeurs();
-  prov_face=0.;
-
-  // Grad(F)
-  resu=0.;
-  opgrad.calculer(F,prov_face);
-  // M*Grad(F)
-  int ndeb=zone_VDF.premiere_face_int();
-  int nbfaces=zone_VDF.nb_faces();
-  int el0,el1;
-  double cface,vol0,vol1;
-  for (int fac=ndeb; fac<nbfaces; fac++)
+  if (type_systeme_binaire_==1)
     {
-      el0=face_voisins(fac,0);
-      el1=face_voisins(fac,1);
-      vol0=volumes(el0);
-      vol1=volumes(el1);
-      cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
-      prov_face(fac)=mobilite(cface)*prov_face(fac);
-    }
-  //   int taille=prov_face.size();
-  //   Cerr << "taille : " << taille << finl;
-  //   for (int i=0;i<taille;i++)
-  //     {
-  //       prov_face(i)*=mobilite(c(i));
-  //     }
-  //   Cerr << "Fin multiplication mobilite" << finl;
-  // Application solveur masse
-  eq_ns.solv_masse().appliquer(prov_face);
+      DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
 
-  // Div(M*Grad(F))
-  opdiv.calculer(prov_face,resu);
+      // Grad(F)
+      resu=0.;
+      opgrad.calculer(F,prov_face);
+      // M*Grad(F)
+      int ndeb=zone_VDF.premiere_face_int();
+      int nbfaces=zone_VDF.nb_faces();
+      int el0,el1;
+      double cface,vol0,vol1;
+      for (int fac=ndeb; fac<nbfaces; fac++)
+        {
+          el0=face_voisins(fac,0);
+          el1=face_voisins(fac,1);
+          vol0=volumes(el0);
+          vol1=volumes(el1);
+          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+          prov_face(fac)=mobilite(cface)*prov_face(fac);
+        }
+      //   int taille=prov_face.size();
+      //   Cerr << "taille : " << taille << finl;
+      //   for (int i=0;i<taille;i++)
+      //     {
+      //       prov_face(i)*=mobilite(c(i));
+      //     }
+      //   Cerr << "Fin multiplication mobilite" << finl;
+      // Application solveur masse
+      eq_ns.solv_masse().appliquer(prov_face);
+
+      // Div(M*Grad(F))
+      opdiv.calculer(prov_face,resu);
+    }
+  else if (type_systeme_binaire_==0)
+    {
+      Cerr << "face_voisins"<<face_voisins<<finl;
+      Cerr << "volumes"<<volumes<<finl;
+
+      DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
+      if (prov_face.size()==0)
+        prov_face=eq_ns.inconnue().valeurs();
+      prov_face=0.;
+
+      Cerr << "prov_face_"<<prov_face_<<finl;
+      Cerr << "prov_face"<<prov_face<<finl;
+
+
+      // Grad(F)
+      resu=0.;
+      DoubleTab temp_resu(resu.dimension(0),1);
+      temp_resu=0;
+      DoubleTab temp_F(F.dimension(0),1);
+      for (int j=0; j<nb_comp; j++)
+        {
+          prov_face=0.;
+          for (int i=0; i<temp_F.dimension(0); i++)
+            {
+              temp_F(i,0)=F(i,j);
+            }
+          opgrad.calculer(temp_F,prov_face);
+
+          Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
+          // M*Grad(F)
+          //commente par mr264902 (M*Grad(F) n'est pas utile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
+
+          int ndeb=zone_VDF.premiere_face_int();
+          int nbfaces=zone_VDF.nb_faces();
+          int el0,el1;
+          double cface,vol0,vol1;
+          Cerr <<"zone_VDF.premiere_face_int"<<ndeb<<finl;
+          Cerr <<"zone_VDF.nb_faces()"<<nbfaces<<finl;
+
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
+              cface=(vol0*c(el0,j)+vol1*c(el1,j))/(vol0+vol1);
+              prov_face(fac)=mobilite(cface)*prov_face(fac);
+            }
+          Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
+
+          //   int taille=prov_face.size();
+          //   Cerr << "taille : " << taille << finl;
+          //   for (int i=0;i<taille;i++)
+          //     {
+          //       prov_face(i)*=mobilite(c(i));
+          //     }
+          //   Cerr << "Fin multiplication mobilite" << finl;
+
+
+          // Application solveur masse
+          eq_ns.solv_masse().appliquer(prov_face);
+
+          Cerr <<"prov_face apres solv_mass"<<prov_face<<finl;
+
+
+          // Div(M*Grad(F))
+          // mr264902 ici ce n'est plus Div(M*Grad(F)) mais Div(Grad(F))
+          opdiv.calculer(prov_face,temp_resu);
+          for (int i=0; i<temp_resu.dimension(0); i++)
+            {
+              resu(i,j)=temp_resu(i,0);
+            }
+        }
+      Cerr <<"div(prov_face)"<<resu<<finl;
+
+    }
+
+
+  /* {
+    Cerr << "face_voisins"<<face_voisins<<finl;
+    Cerr << "volumes"<<volumes<<finl;
+
+    DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
+    if (prov_face.size()==0)
+  	  prov_face=eq_ns.inconnue().valeurs();
+    prov_face=0.;
+
+    Cerr << "prov_face_"<<prov_face_<<finl;
+    Cerr << "prov_face"<<prov_face<<finl;
+
+
+    // Grad(F)
+    resu=0.;
+    opgrad.calculer(F,prov_face);
+
+    Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
+    // M*Grad(F)
+    //commente par mr264902 (M*Grad(F) n'est pas utile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
+
+         int ndeb=zone_VDF.premiere_face_int();
+         int nbfaces=zone_VDF.nb_faces();
+         int el0,el1;
+         double cface,vol0,vol1;
+         Cerr <<"zone_VDF.premiere_face_int"<<ndeb<<finl;
+         Cerr <<"zone_VDF.nb_faces()"<<nbfaces<<finl;
+
+         for (int fac=ndeb; fac<nbfaces; fac++)
+           {
+             el0=face_voisins(fac,0);
+             el1=face_voisins(fac,1);
+             vol0=volumes(el0);
+             vol1=volumes(el1);
+             cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+             prov_face(fac)=mobilite(cface)*prov_face(fac);
+           }
+         Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
+         Cerr <<"mobilite0"<<mobilite(0)<<finl;
+         Cerr <<"mobilite20"<<mobilite(20)<<finl;
+         Cerr <<"mobilite25"<<mobilite(25)<<finl;
+
+
+         //   int taille=prov_face.size();
+         //   Cerr << "taille : " << taille << finl;
+         //   for (int i=0;i<taille;i++)
+         //     {
+         //       prov_face(i)*=mobilite(c(i));
+         //     }
+         //   Cerr << "Fin multiplication mobilite" << finl;
+
+
+    // Application solveur masse
+    eq_ns.solv_masse().appliquer(prov_face);
+
+    Cerr <<"prov_face apres solv_mass"<<prov_face<<finl;
+
+
+    // Div(M*Grad(F))
+    // mr264902 ici ce n'est plus Div(M*Grad(F)) mais Div(Grad(F))
+    opdiv.calculer(prov_face,resu);
+    Cerr <<"div(prov_face)"<<resu<<finl;
+   }
+   */
+
 
   return resu;
+
 }
 
 
@@ -1177,81 +1329,45 @@ void Source_Con_Phase_field::premier_demi_dt()
         }
       else if (type_systeme_binaire_==0)
         {
-          //prov_elem = 0.;
-          DoubleTab temp_mutilde(mutilde.dimension(0),1);
-          DoubleTab temp_prov_elem= temp_mutilde;
-          temp_prov_elem=0;
-          temp_mutilde=0;
-          Cerr<<" prov_elem "<<prov_elem<<finl;
-          Cerr << "temp_prov_elem "<<temp_prov_elem<<finl;
-          Cerr<<" mutilde "<<mutilde<<finl;
-          Cerr<<" temp_mutilde "<<temp_mutilde<<finl;
-
-          for (int j=0; j<mutilde.line_size(); j++)
+          if (kappa_ind==0)
             {
-              for (int i=0; i<mutilde.dimension(0); i++)
+              DoubleTab temp_mutilde(mutilde.dimension(0),1);
+              DoubleTab temp_prov_elem= temp_mutilde;
+              temp_prov_elem=0;
+              temp_mutilde=0;
+              Cerr<<" prov_elem "<<prov_elem<<finl;
+              Cerr << "temp_prov_elem "<<temp_prov_elem<<finl;
+              Cerr<<" mutilde "<<mutilde<<finl;
+              Cerr<<" temp_mutilde "<<temp_mutilde<<finl;
+
+              // laplacien(mutilde)
+              laplacien(mutilde,prov_elem);
+              Cerr << "laplacien mutilde " << prov_elem<<finl;
+
+              //kappa*laplacien(mutilde)
+              DoubleTab temp_prov_elem2 = prov_elem;
+              temp_prov_elem2 = 0;
+              const int nb_comp =eq_c.constituant().nb_constituants();
+              for (int j=0; j<prov_elem.line_size(); j++)
                 {
-                  temp_mutilde(i,0)=mutilde(i,j);
-                  // laplacien(mutilde)
-                  laplacien(temp_mutilde,temp_prov_elem);
-                  prov_elem(i,j)=temp_prov_elem(i,0);
-                  for (int k=0; k<temp_prov_elem.dimension(0); k++)
+                  for (int i=0; i<prov_elem.dimension(0); i++)
                     {
-                      prov_elem(k,j)=temp_prov_elem(k,0);
-                    }
-                }
-            }
-          Cerr << "laplacien mutilde " << prov_elem<<finl;
-
-          //kappa*laplacien(mutilde)
-
-          for (int j=0; j<prov_elem.line_size(); j++)
-            {
-              for (int i=0; i<prov_elem.dimension(0); i++)
-                {
-                  temp_prov_elem(i,0)=prov_elem(i,j);
-                  const int nb_comp =eq_c.constituant().nb_constituants();
-                  for (int k=0; k<nb_comp; k++)
-                    {
-                      prov_elem(i,j)=temp_prov_elem(i,0)*alphaMatrix(j*nb_comp+k);
-                    }
-                }
-            }
-          Cerr << "kappaMatrix * laplacien(mutilde) " << prov_elem<<finl;
-
-
-          /*
-
-                      Cerr << "laplacien mutilde " << prov_elem<<finl;
-                      //kappa*laplacien(mutilde)
-
-                      for (int j=0; j<prov_elem.line_size(); j++)
+                      temp_prov_elem(i,0)=prov_elem(i,j);
+                      for (int k=0; k<nb_comp; k++)
                         {
-                          for (int i=0; i<prov_elem.dimension(0); i++)
-                            {
-                              temp_prov_elem(i,0)=prov_elem(i,j);
-                              const int nb_comp =eq_c.constituant().nb_constituants();
-                              for (int k=0; k<nb_comp; k++)
-                                {
-                                  prov_elem(i,j)=temp_prov_elem(i,0)*alphaMatrix(j*nb_comp+k);
-                                }
-                            }
+                          temp_prov_elem2(i,k)+=temp_prov_elem(i,0)*kappaMatrix(j+k*nb_comp);
                         }
-                      Cerr << "kappaMatrix * laplacien(mutilde) " << prov_elem<<finl;
-           */
+                    }
+                }
+              prov_elem = temp_prov_elem2;
+              Cerr << "kappaMatrix " << kappaMatrix<<finl;
+              Cerr << "kappaMatrix * laplacien(mutilde) " << prov_elem<<finl;
+            }
+          else
+            {
+              Cerr << "kappa variable not implemented yet (kappa_ind==1) "<<finl;
+            }
         }
-
-
-      /* Cerr << "prov_elem"<<prov_elem<<finl;
-      int nb_eq_CH = eq_c.constituant().nb_constituants();
-      for (int j=0; j<nb_eq_CH; j++)
-      {
-        for(int i=0; i<nb_elem; i++)
-      	  kappa_var(i,j)=(this->*kappa_func_c)(c(i,j));
-        // Div(Kappa*Grad(mutilde))
-        div_kappa_grad(mutilde, kappa_var, prov_elem);
-
-       */
 
       // Pour equation Allen-Cahn (kappa constant)
       //------------------------------------------
@@ -1309,7 +1425,6 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 
       DoubleTab prov_face(temp_prov_face.dimension(0),c.line_size());
       prov_face = 0;
-
       DoubleTab temp_c(c.dimension(0),1);
       temp_c=0;
       Cerr<<" prov_face "<<prov_face<<finl;
@@ -1333,18 +1448,19 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
       Cerr<<"prov_face = grad(C)"<<prov_face<<finl;
       eq_ns.solv_masse().appliquer(prov_face);
       Cerr<<"grad(C) apres solv_masse.appliquer "<<prov_face<<finl;
+
+      // alpha*Grad(C)
       DoubleTab temp_prov_face2 = prov_face;
       temp_prov_face2 = 0;
-
+      const int nb_comp =eq_c.constituant().nb_constituants();
       for (int j=0; j<prov_face.line_size(); j++)
         {
           for (int i=0; i<prov_face.dimension(0); i++)
             {
               temp_prov_face(i,0)=prov_face(i,j);
-              const int& nb_comp =eq_c.constituant().nb_constituants();
               for (int k=0; k<nb_comp; k++)
                 {
-                  temp_prov_face2(i,j)+=temp_prov_face(i,0)*alphaMatrix(j*nb_comp+k);
+                  temp_prov_face2(i,k)+=temp_prov_face(i,0)*alphaMatrix(j+k*nb_comp);
                 }
             }
         }
@@ -1358,7 +1474,6 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
       eq_c.solv_masse().appliquer(div_alpha_gradC);
       Cerr << "div_alpha_gradC apres solv_masse.appliquer "<<div_alpha_gradC<<finl;
     }
-
 }
 
 /*! @brief Calcul de Div(alpha*rho*Grad((C)) au centre des elements
@@ -1396,7 +1511,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 
   if (boussi_==1)
     {
-      prov_face *= alphaMatrix(0)*rho0; // Cas approximation de Boussinesq
+      prov_face *= alpha*rho0; // Cas approximation de Boussinesq
     }
   else if (boussi_==0)
     {
@@ -1408,7 +1523,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
           vol1=volumes(el1);
 
           rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
-          prov_face(fac) *= alphaMatrix(0)*rho_face;
+          prov_face(fac) *= alpha*rho_face;
         }
     }
 
@@ -1473,7 +1588,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
       // Cerr << "---" << finl;
       // Cerr << "kappa constant pour le point fixe" << finl;
       // Cerr << "---" << finl;
-      kappa_var=kappaMatrix;
+      kappa_var=kappa;
     }
   else
     {
@@ -1673,7 +1788,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               if (voisin!=-1 && old_tri==-1)
                 {
                   dvar2=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
-                  valeur_diag+=-alphaMatrix(0)/dvar2;
+                  valeur_diag+=-alpha/dvar2;
                 }
 
               // Si le voisin a un numero plus petit que l'ancien minimum, on ne le prend pas en compte
@@ -1707,7 +1822,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
             }
 
           // On complete les tableaux avec les valeurs dans les voisins non aux bords du domaine
-          coeff(compt)=alphaMatrix(0)/dvarkeep;
+          coeff(compt)=alpha/dvarkeep;
           tab2(compt2)=min_tri;
           compt++;
           compt2++;
@@ -2318,30 +2433,37 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 
   Cerr << "mutilde  = -div_alpha_gradC " << mutilde << finl;
 
-  /*
-    const int taille=mutilde.size();
-    for (int i=0; i<taille; i++)
-      {
-        mutilde(i)+=beta*(this->*dWdc)(c(i));
-        if(mutype_==1)
-          {
-            mutilde(i)+=(0.5*u_carre_(i))*drhodc(i);
-          }
-      }
-      */
-  for (int j=0; j<mutilde.line_size(); j++)
+
+  if (type_systeme_binaire_==1)
     {
-      for (int i=0; i<mutilde.dimension(0); i++)
+      const int taille=mutilde.size();
+      for (int i=0; i<taille; i++)
         {
-          mutilde(i,j)+= beta*(this->*dWdc) (c(i,j));
-          if (mutype_==1)
+          mutilde(i)+=beta*(this->*dWdc)(c(i));
+          if(mutype_==1) //avec Ec
             {
-              mutilde(i,j)+=(0.5*u_carre_(i)*drhodc(i)); //a verifier et tester par rapport a drhodc(nelem) non pas drhodc (nelem,nb_comp)??mr264902
+              mutilde(i)+=(0.5*u_carre_(i))*drhodc(i);
             }
         }
+      Cerr << "beta "<< beta<< finl;
     }
-  Cerr << "beta "<< beta<< finl;
-  //Cerr << "dWdc "<< this->dWdc << finl;
+  else if (type_systeme_binaire_==0)
+    {
+      for (int j=0; j<mutilde.line_size(); j++)
+        {
+          for (int i=0; i<mutilde.dimension(0); i++)
+            {
+              mutilde(i,j)+= betaMatrix(j)*(this->*dWdc) (c(i,j));
+              if (mutype_==1) //avec Ec
+                {
+                  mutilde(i,j)+=(0.5*u_carre_(i)*drhodc(i)); //a verifier et tester par rapport a drhodc(nelem) non pas drhodc (nelem,nb_comp)??mr264902
+                }
+            }
+        }
+      Cerr << "betaMatrix "<< betaMatrix<< finl;
+
+    }
+
   Cerr << "c " << c << finl;
   Cerr << "mutilde " << mutilde << finl;
 
@@ -2568,7 +2690,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
         }
     }
 
-  alpha_gradC_carre *= alphaMatrix(0);
+  alpha_gradC_carre *= alpha;
   // Ajout B.M suite a plantage dans assert_espace_virtuel_vect dans op_conv...
   alpha_gradC_carre.echange_espace_virtuel();
 }

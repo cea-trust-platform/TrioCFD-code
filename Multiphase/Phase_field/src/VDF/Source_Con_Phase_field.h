@@ -47,6 +47,7 @@ public:
   void premier_demi_dt() override;
 
   inline const DoubleVect& get_u_carre() override;
+  inline const int& get_type_systeme_binaire();
 
   inline double drhodc(const int n_elem) const;
 
@@ -122,7 +123,10 @@ inline const DoubleVect& Source_Con_Phase_field::get_u_carre()
 {
   return u_carre_;
 }
-
+inline const int& Source_Con_Phase_field::get_type_systeme_binaire()
+{
+  return type_systeme_binaire_;
+}
 inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 {
   const DoubleTab& tab = drhodc_.valeur().valeurs();
