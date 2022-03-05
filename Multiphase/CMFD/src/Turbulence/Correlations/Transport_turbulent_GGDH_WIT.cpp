@@ -75,6 +75,6 @@ void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& e
   for (i = 0; i < nl; i++) if (alp(i, 0) >= limiteur_alpha_) for (d = 0; d < D; d++) for (db = 0; db < D; db++)
           {
             double temps_carac = 2./3. * 1./(delta_*delta_*delta_)*diam(i, 0) / (pow(gamma_, 2./3.)*alp(i, 0)*u_r(i,0));
-            nu(i, 0, d, db) += alp(i, 0) * mu0(i, 0) / nu0(i, 0) * C_s * max(temps_carac * Rij(i, 0, d, db), visc_turb.limiteur() * nu(i, 0, d, db));
+            nu(i, 0, d, db) += alp(i, 0) * mu0(i, 0) / nu0(i, 0) * C_s * std::max(temps_carac * Rij(i, 0, d, db), visc_turb.limiteur() * nu(i, 0, d, db));
           }
 }

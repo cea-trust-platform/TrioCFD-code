@@ -50,7 +50,7 @@ void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
   assert(nu_t.dimension_tot(0) == k.dimension_tot(0) && k.dimension(1) <= nu_t.dimension(1));
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
   for (int i = 0; i < nu_t.dimension_tot(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = n < k.dimension(1) ? ( (omega(i,n) > 0.) ? max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ): 0;
+      nu_t(i, n) = n < k.dimension(1) ? ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ): 0;
 }
 
 void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
@@ -63,7 +63,7 @@ void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Ren
   if (i_part < 0) Process::exit("Viscosite_turbulente_k_omega : inconsistency between velocity gradient and k!");
   const DoubleTab& gu = p_gu[i_part]; //le bon tableau
   for (i = 0; i < R_ij.dimension(0); i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
-          R_ij(i, n, d, db) = n < Nk ? 2. / D * k(i, n) * (d ==db) - ( (omega(i,n) > 0.) ? max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ) * (gu(i, d, D * n + db) + gu(i, db, D * n + d)) : 0;
+          R_ij(i, n, d, db) = n < Nk ? 2. / D * k(i, n) * (d ==db) - ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ) * (gu(i, d, D * n + db) + gu(i, db, D * n + d)) : 0;
 }
 
 void Viscosite_turbulente_k_omega::k_over_eps(DoubleTab& k_sur_eps) const

@@ -95,7 +95,7 @@ double Op_Diff_Tau_CoviMAC_Elem::calculer_dt_stab() const
       for (flux = 0, i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) for (n = 0; n < N; n++)
           flux(n) += zone.nu_dot(&nu_loc, e, n, &nf(f, 0), &nf(f, 0)) / vf(f);
       for (n = 0; n < N; n++) if ((!alp || (*alp)(e, n) > 1e-3) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
-          dt = min(dt, pe(e) * ve(e) * (alp ? (*alp)(e, n) : 1) * (lambda(!cL * e, n) / diffu(!cD * e, n)) / flux(n));
+          dt = std::min(dt, pe(e) * ve(e) * (alp ? (*alp)(e, n) : 1) * (lambda(!cL * e, n) / diffu(!cD * e, n)) / flux(n));
       if (dt < 0) abort();
     }
   return Process::mp_min(dt);
@@ -123,7 +123,7 @@ void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& sec
   std::vector<std::reference_wrapper<const IntTab>> fcl, e_f, f_e, f_s; //tableaux "fcl", "elem_faces", "faces_voisins"
   std::vector<std::reference_wrapper<const DoubleVect>> fs; //surfaces
   std::vector<std::reference_wrapper<const DoubleTab>> inco, nf, xp, xs, xv; //inconnues, normales aux faces, positions elems / faces / sommets
-  for (i = 0, M = 0; i < n_ext; M = max(M, N[i]), i++)
+  for (i = 0, M = 0; i < n_ext; M = std::max(M, N[i]), i++)
     {
       std::string nom_mat = nom_inco;
       mat[i] = !semi_impl.count(nom_inco) && matrices.count(nom_mat) ? matrices.at(nom_mat) : NULL;
