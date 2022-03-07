@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Neumann_loi_paroi_faible_tau.h
+// File:        Neumann_loi_paroi_faible_tau_omega.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Cond_Lim
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Neumann_loi_paroi_faible_tau_included
-#define Neumann_loi_paroi_faible_tau_included
+#ifndef Neumann_loi_paroi_faible_tau_omega_included
+#define Neumann_loi_paroi_faible_tau_omega_included
 
 #include <DoubleTab.h>
 #include <Neumann_loi_paroi.h>
@@ -31,27 +31,29 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Loi_paroi_faible_tau
+//    Classe Neumann_loi_paroi_faible_tau_omega
 //    Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
-//    transport de tau pour la turbulence.
+//    transport de tau ou omega pour la turbulence.
 //    Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
 // .SECTION voir aussi
 //    Neumann
 //////////////////////////////////////////////////////////////////////////////
-class Neumann_loi_paroi_faible_tau : public Neumann_loi_paroi
+class Neumann_loi_paroi_faible_tau_omega : public Neumann_loi_paroi
 {
 
-  Declare_instanciable(Neumann_loi_paroi_faible_tau);
+  Declare_instanciable(Neumann_loi_paroi_faible_tau_omega);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const override;
-  int initialiser(double temps) override;
-  int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps) override;
-  double calc_flux(double y, double u_tau, double visc);
-  double flux_impose(int i) const override;
-  double flux_impose(int i,int j) const override;
-  void liste_faces_loi_paroi(IntTab&) override;
+  int compatible_avec_eqn(const Equation_base&) const;
+  virtual int initialiser(double temps) ;
+  virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps);
+  double dy_tau(double y, double u_tau, double visc);
+  double dy_omega(double y, double u_tau, double visc);
+  virtual double flux_impose(int i) const;
+  virtual double flux_impose(int i,int j) const;
+  virtual void liste_faces_loi_paroi(IntTab&) ;
+  virtual void completer();
 
 protected :
   void me_calculer();
@@ -60,6 +62,7 @@ protected :
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;
+  double is_tau_=-1 ; // 0 : omega ; 1 : tau
 };
 
 #endif

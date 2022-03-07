@@ -56,14 +56,14 @@ void Loi_paroi_adaptative::completer()
   valeurs_loi_paroi_["y_plus"] = DoubleTab(0,1); // pour l'instant, turbulence dans seulement une phase
   valeurs_loi_paroi_["y"] = DoubleTab(0,1);
   valeurs_loi_paroi_["u_plus"] = DoubleTab(0,1);
-  valeurs_loi_paroi_["d_u_plus_y_plus"] = DoubleTab(0,1);
+  valeurs_loi_paroi_["dyp_u_plus"] = DoubleTab(0,1);
   valeurs_loi_paroi_["u_tau"] = DoubleTab(0,1);
   Faces_a_calculer_ = IntTab(nf_tot, 1);
 
   MD_Vector_tools::creer_tableau_distribue(vit.get_md_vector(), valeurs_loi_paroi_["y_plus"]);
   MD_Vector_tools::creer_tableau_distribue(vit.get_md_vector(), valeurs_loi_paroi_["y"]);
   MD_Vector_tools::creer_tableau_distribue(vit.get_md_vector(), valeurs_loi_paroi_["u_plus"]);
-  MD_Vector_tools::creer_tableau_distribue(vit.get_md_vector(), valeurs_loi_paroi_["d_u_plus_y_plus"]);
+  MD_Vector_tools::creer_tableau_distribue(vit.get_md_vector(), valeurs_loi_paroi_["dyp_u_plus"]);
   MD_Vector_tools::creer_tableau_distribue(vit.get_md_vector(), valeurs_loi_paroi_["u_tau"]);
 
   for (int i = 0 ; i <pb_.valeur().nombre_d_equations() ; i++)
@@ -87,7 +87,7 @@ void Loi_paroi_adaptative::mettre_a_jour(double temps)
   valeurs_loi_paroi_["y_plus"].echange_espace_virtuel();
   valeurs_loi_paroi_["y"].echange_espace_virtuel();
   valeurs_loi_paroi_["u_plus"].echange_espace_virtuel();
-  valeurs_loi_paroi_["d_u_plus_y_plus"].echange_espace_virtuel();
+  valeurs_loi_paroi_["dyp_u_plus"].echange_espace_virtuel();
   valeurs_loi_paroi_["u_tau"].echange_espace_virtuel();
 }
 
@@ -95,7 +95,7 @@ void Loi_paroi_adaptative::mettre_a_jour(double temps)
 void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
   Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, pb_.valeur().domaine_dis().zone_dis(0).valeur());
-  DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"], &y = valeurs_loi_paroi_["y"], &u_p = valeurs_loi_paroi_["u_plus"], &d_u_p = valeurs_loi_paroi_["d_u_plus_y_plus"];
+  DoubleTab& u_t = valeurs_loi_paroi_["u_tau"], &y_p = valeurs_loi_paroi_["y_plus"], &y = valeurs_loi_paroi_["y"], &u_p = valeurs_loi_paroi_["u_plus"], &d_u_p = valeurs_loi_paroi_["dyp_u_plus"];
   const DoubleTab& n_f = zone.face_normales();
   const DoubleVect& fs = zone.face_surfaces();
   const IntTab& f_e = zone.face_voisins();
@@ -106,9 +106,9 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
         {
           if (f_e(f, 1) >= 0) Process::exit("Error in the definition of the boundary conditions for wall laws");
           int e = f_e(f,0);
-          double u_orth = zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f);
+          double u_orth = - zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
           DoubleTrav u_parallel(D);
-          for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - n_f(f,d) * u_orth/fs(f) ;
+          for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
           if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Error in the calculation of the parallel velocity for wall laws");
           double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
           double y_loc = zone.dist_face_elem0(f,  e);

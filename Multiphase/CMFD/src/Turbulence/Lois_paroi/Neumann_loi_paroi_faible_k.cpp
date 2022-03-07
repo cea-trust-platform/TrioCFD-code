@@ -30,6 +30,7 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
+#include <Operateur_Diff_base.h>
 #include <Zone_CoviMAC.h>
 
 #include <math.h>
@@ -101,18 +102,22 @@ void Neumann_loi_paroi_faible_k::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, zone_Cl_dis().equation().zone_dis().valeur());
-  const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
-  const DoubleTab& y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces de la zone
-  const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
+  const DoubleTab&       y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces de la zone
+  const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
+  const DoubleTab&      mu = ref_cast(Operateur_Diff_base, zone_Cl_dis().equation().operateur(0).l_op_base()).diffusivite().valeurs();
+
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size();
   const IntTab& f_e = zone.face_voisins();
+
+  if (mu.nb_dim() >= 3) Process::exit("Neumann_loi_paroi_faible_k : transport of k must be SGDH !");
 
   for (int f =0 ; f < nf ; f++)
     {
       int f_zone = f + f1; // number of the face in the zone
       int e_zone = f_e(f_zone,0);
-      valeurs_flux_(f, 0) = calc_flux(y(f_zone, 0), u_tau(f_zone, 0), visc(e_zone, 0));
+      valeurs_flux_(f, 0) = mu(e_zone, 0) * calc_dy_k(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)); // flux de Neumann = -(-mu * dy_k) car 1er - avec orientation face de bord et 2e car flux selon - grad
     }
   for (int n =1 ; n < N ; n++) for (int f =0 ; f < nf ; f++)
       {
@@ -122,7 +127,7 @@ void Neumann_loi_paroi_faible_k::me_calculer()
   valeurs_flux_.echange_espace_virtuel();
 }
 
-double Neumann_loi_paroi_faible_k::calc_flux(double y, double u_tau, double visc)
+double Neumann_loi_paroi_faible_k::calc_dy_k(double y, double u_tau, double visc)
 {
   double y_p = y * u_tau / visc;
   double w_vis = 6 * visc / (beta_omega * y * y);
@@ -142,7 +147,7 @@ double Neumann_loi_paroi_faible_k::calc_flux(double y, double u_tau, double visc
   double d_u_plus   = deriv_u_plus_de_y_plus(y_p);
   double d_2_u_plus = deriv_u_plus_de_y_plus_2(y_p);
 
-  return u_tau*( (1/d_u_plus-1)*d_w + w*(-d_2_u_plus)/(d_u_plus*d_u_plus) );
+  return visc*(1/d_u_plus-1)*d_w + u_tau*w*(-d_2_u_plus)/(d_u_plus*d_u_plus);
 }
 
 double Neumann_loi_paroi_faible_k::deriv_u_plus_de_y_plus(double y_p)
