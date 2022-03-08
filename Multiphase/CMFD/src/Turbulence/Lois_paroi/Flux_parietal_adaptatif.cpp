@@ -48,7 +48,7 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
                                  double *qpk, double *da_qpk, double *dp_qpk, double *dv_qpk, double *dTf_qpk, double *dTp_qpk,
                                  double *qpi, double *da_qpi, double *dp_qpi, double *dv_qpi, double *dTf_qpi, double *dTp_qpi, int& nonlinear) const
 {
-  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur());
+  const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const double y = corr_loi_paroi.get_y(f);
   const double u_tau = corr_loi_paroi.get_utau(f);
 
@@ -56,21 +56,21 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
 
   for (int n = 0 ; n<N ; n++)for (int m = 0 ; m<N ; m++)
       {
-        qpk[n] = (n==0) ? - alpha[n] *rho[n] *Cp[n] * u_tau * (Tp-T[n]) / theta_plus : 0 ; // - as the face normal vectors are oriented outside
-        da_qpk[N * n + m] = 0;
-        dp_qpk[n]         = 0;
-        dv_qpk[N * n + m] = 0;
-        dTf_qpk[N * n + m]=  ((n==0)&&(m==0)) ? - alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // - as the face normal vectors are oriented outside
-        dTp_qpk[n]        =  (n==0)           ?   alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // + as the face normal vectors are oriented outside
+        if (qpk)    qpk[n] = (n==0) ? - alpha[n] *rho[n] *Cp[n] * u_tau * (Tp-T[n]) / theta_plus : 0 ; // - as the face normal vectors are oriented outside
+        if (da_qpk)  da_qpk[N * n + m] = 0;
+        if (dp_qpk)  dp_qpk[n]         = 0;
+        if (dv_qpk)  dv_qpk[N * n + m] = 0;
+        if (dTf_qpk) dTf_qpk[N * n + m]=  ((n==0)&&(m==0)) ? - alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // - as the face normal vectors are oriented outside
+        if (dTp_qpk) dTp_qpk[n]        =  (n==0)           ?   alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // + as the face normal vectors are oriented outside
       }
   for (int k = 0 ; k<N ; k++)for (int l = k+1 ; l<N ; l++)for (int m = 0 ; m<N ; m++)
         {
-          qpi[N * k + l] = 0;
-          da_qpi[N * (N * k + l) + m] = 0 ;
-          dp_qpi[N * k + l]=0;
-          dv_qpi[N * k + l]=0;
-          dTf_qpi[N * (N * k + l) + m]=0;
-          dTp_qpi[N * k + l] = 0;
+          if (qpi) qpi[N * k + l] = 0;
+          if (da_qpi)  da_qpi[N * (N * k + l) + m] = 0 ;
+          if (dp_qpi)  dp_qpi[N * k + l]=0;
+          if (dv_qpi)  dv_qpi[N * k + l]=0;
+          if (dTf_qpi) dTf_qpi[N * (N * k + l) + m]=0;
+          if (dTp_qpi) dTp_qpi[N * k + l] = 0;
         }
   return;
 }
