@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2020, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -445,7 +445,7 @@ int Champ_Face_implementation::imprime_Face(Sortie& os, int ncomp) const
           while (n2<ni)
             {
               n1=n2;
-              n2=::std::min(ni,n2+cmax);
+              n2=std::min(ni,n2+cmax);
               os << finl;
               os << "I=     ";
               for(i=n1; i<n2; i++)
@@ -489,7 +489,7 @@ int Champ_Face_implementation::imprime_Face(Sortie& os, int ncomp) const
       while (n2<ni)
         {
           n1=n2;
-          n2=::std::min(ni,n2+cmax);
+          n2=std::min(ni,n2+cmax);
           os << finl;
           os << "I=     ";
           for(i=n1; i<n2; i++)
