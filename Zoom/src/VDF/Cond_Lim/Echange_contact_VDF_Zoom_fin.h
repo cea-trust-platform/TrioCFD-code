@@ -48,7 +48,7 @@ class Echange_contact_VDF_Zoom_fin  : public Echange_contact_VDF_Zoom_base
 
   Declare_instanciable(Echange_contact_VDF_Zoom_fin);
 public :
-  void mettre_a_jour(double ) ;
+  void mettre_a_jour(double ) override ;
 
 };
 

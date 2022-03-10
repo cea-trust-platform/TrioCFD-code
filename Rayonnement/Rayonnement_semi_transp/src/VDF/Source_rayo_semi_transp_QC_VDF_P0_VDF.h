@@ -39,17 +39,17 @@ class Source_rayo_semi_transp_QC_VDF_P0_VDF: public Source_rayo_semi_transp_base
 
 public :
 
-  DoubleTab& ajouter(DoubleTab& resu) const;
-  DoubleTab& calculer(DoubleTab& resu) const;
-  void mettre_a_jour(double temps);
-  void completer();
+  DoubleTab& ajouter(DoubleTab& resu) const override;
+  DoubleTab& calculer(DoubleTab& resu) const override;
+  void mettre_a_jour(double temps) override;
+  void completer() override;
   inline Source& source_rayo();
   inline const Source& source_rayo() const;
-  virtual void associer_modele_rayo(Modele_rayo_semi_transp& modele);
+  void associer_modele_rayo(Modele_rayo_semi_transp& modele) override;
 
 protected :
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  void associer_pb(const Probleme_base& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_pb(const Probleme_base& ) override;
   Source le_source_rayo;
 
 };

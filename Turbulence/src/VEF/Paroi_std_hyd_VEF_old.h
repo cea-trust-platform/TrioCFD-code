@@ -48,15 +48,15 @@ class Paroi_std_hyd_VEF_old : public Paroi_hyd_base_VEF, public Paroi_log_QDM
 
 public:
 
-  virtual void set_param(Param& param);
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  void set_param(Param& param) override;
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
   inline const DoubleVect& tab_u_plus() const;
   inline double tau_tang(int face,int k) const;
-  void imprimer_ustar(Sortie& ) const;
+  void imprimer_ustar(Sortie& ) const override;
   void calculer_uplus_dplus(DoubleVect& ,DoubleVect& ,DoubleVect& ,int ,double ,double ,double ) ;
 
 protected:

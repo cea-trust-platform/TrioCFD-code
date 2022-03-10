@@ -43,20 +43,20 @@ class Mod_turb_hyd_RANS_0_eq : public Mod_turb_hyd_base
 public:
 
   Mod_turb_hyd_RANS_0_eq();
-  void set_param(Param& param);
-  int reprendre(Entree& is);
+  void set_param(Param& param) override;
+  int reprendre(Entree& is) override;
   int comprend_mot(const Motcle& mot) const ;
   int a_pour_Champ_Fonc(const Motcle& mot,REF(Champ_base)& ch_ref ) const;
   int comprend_champ(const Motcle& mot) const;
 
   /////////////////////////////////////////////////////
 
-  void completer();
-  void mettre_a_jour(double );
-  virtual void discretiser();
+  void completer() override;
+  void mettre_a_jour(double ) override;
+  void discretiser() override;
   virtual Champ_Fonc& calculer_viscosite_turbulente()=0;
   virtual void calculer_energie_cinetique_turb()=0;
-  virtual void imprimer (Sortie& )  const  ;
+  void imprimer (Sortie& )  const override  ;
   inline virtual Champ_Fonc& energie_cinetique_turbulente();
   inline virtual const Champ_Fonc& energie_cinetique_turbulente() const;
 

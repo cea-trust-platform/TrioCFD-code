@@ -42,10 +42,10 @@ class Turbulence_hyd_sous_maille_axi_VDF : public Turbulence_hyd_sous_maille_VDF
 
 public:
 
-  Champ_Fonc& calculer_viscosite_turbulente();
-  void calculer_fonction_structure() ;
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_fonction_structure() override ;
   //Surcharge vide de calculer_longueurs_caracteristiques()
-  void  calculer_longueurs_caracteristiques();
+  void  calculer_longueurs_caracteristiques() override;
 
 protected :
 

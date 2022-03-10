@@ -39,12 +39,12 @@ public:
   // constructeur qui doit etre code car Declare_instanciable_sans_constructeur
   inline Paroi_loi_WW_hyd_VDF();
 
-  virtual void set_param(Param& param);
+  void set_param(Param& param) override;
   /* calculer_hyd pour k-epsilon qui renvoie une erreur */
-  int calculer_hyd(DoubleTab& );
+  int calculer_hyd(DoubleTab& ) override;
 
   /* calculer_hyd pour L.E.S */
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
   /* PROTECTED */
 protected :
@@ -56,8 +56,8 @@ protected :
   double Y0 ;
 
 
-  int init_lois_paroi_hydraulique();
-  int preparer_calcul_hyd(DoubleTab& );
+  int init_lois_paroi_hydraulique() override;
+  int preparer_calcul_hyd(DoubleTab& ) override;
   int calculer_u_star_couche_puissance(double ,double ,double ,int );
   int calculer_couche_puissance(DoubleTab& ,DoubleTab&  ,double ,int ,int );
   int calculer_local(double, DoubleTab&  ,DoubleTab& , double ,double ,int ,int );

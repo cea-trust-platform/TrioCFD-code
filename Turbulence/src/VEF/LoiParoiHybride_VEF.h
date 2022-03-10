@@ -48,11 +48,11 @@ class LoiParoiHybride_VEF : public Paroi_hyd_base_VEF, LoiParoiHybride
 
 public:
 
-  void associer(const Zone_dis&, const Zone_Cl_dis& );
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
+  void associer(const Zone_dis&, const Zone_Cl_dis& ) override;
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
 
 protected:
 

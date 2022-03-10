@@ -36,10 +36,10 @@ class Paroi_loi_Ciofalo_hyd_VDF : public Paroi_std_hyd_VDF
 public:
 
   /* calculer_hyd pour k-epsilon qui renvoie une erreur */
-  int calculer_hyd(DoubleTab& );
+  int calculer_hyd(DoubleTab& ) override;
 
   /* calculer_hyd pour L.E.S */
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
   /* PROTECTED */
 protected :
@@ -48,8 +48,8 @@ protected :
 
   double Y0 ;
 
-  int init_lois_paroi_hydraulique();
-  int preparer_calcul_hyd(DoubleTab& );
+  int init_lois_paroi_hydraulique() override;
+  int preparer_calcul_hyd(DoubleTab& ) override;
   int calculer_u_star_sous_couche_visq(double,double,double,int);
   int calculer_u_star_couche_log(double ,double ,double ,int, double );
   int calculer_local(double ,double, DoubleTab&  ,DoubleTab& , double ,double ,int ,int );

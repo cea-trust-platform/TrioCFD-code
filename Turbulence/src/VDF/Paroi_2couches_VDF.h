@@ -47,18 +47,18 @@ class Paroi_2couches_VDF : public Paroi_hyd_base_VDF, public Paroi_log_QDM
 
 public:
 
-  virtual void set_param(Param& param);
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  void set_param(Param& param) override;
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
   void calculer_uplus_dplus(DoubleVect& ,DoubleVect& ,DoubleVect& ,int ,double ,double ,double ) ;
 
   inline const DoubleVect& tab_u_plus() const;
   //inline double tab_u_star(int face) const;
-  void imprimer_ustar(Sortie& os) const;
+  void imprimer_ustar(Sortie& os) const override;
 
-  bool use_shear() const
+  bool use_shear() const override
   {
     return false;
   }

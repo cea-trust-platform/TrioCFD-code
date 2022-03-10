@@ -48,17 +48,17 @@ class Paroi_TBLE_scal_VDF : public Paroi_std_scal_hyd_VDF, public Paroi_TBLE_QDM
   Declare_instanciable_sans_constructeur(Paroi_TBLE_scal_VDF);
 
 public:
-  int calculer_scal(Champ_Fonc_base& );
-  virtual int init_lois_paroi();
-  void imprimer_nusselt(Sortie&) const;
+  int calculer_scal(Champ_Fonc_base& ) override;
+  int init_lois_paroi() override;
+  void imprimer_nusselt(Sortie&) const override;
 
   //OC 02/2006 :methodes de reprise/sauvegarde pour TBLE. Pour l'instant les donnees TBLE sont stockes dans des fichiers differents du .sauv => a voir si on met tout cela dans le .sauv a terme
-  virtual int sauvegarder(Sortie&) const ;
-  virtual int reprendre(Entree& ) ;
-  const Probleme_base& getPbBase() const ;
-  Paroi_TBLE_QDM& getLoiParoiHydraulique();
-  virtual MuLambda_TBLE_base& getMuLambda();
-  virtual Eq_couch_lim& get_eq_couch_lim(int);
+  int sauvegarder(Sortie&) const override ;
+  int reprendre(Entree& ) override ;
+  const Probleme_base& getPbBase() const override ;
+  Paroi_TBLE_QDM& getLoiParoiHydraulique() override;
+  MuLambda_TBLE_base& getMuLambda() override;
+  Eq_couch_lim& get_eq_couch_lim(int) override;
 
 private:
   int alpha_cv;

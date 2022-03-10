@@ -44,7 +44,7 @@ class Turbulence_hyd_sous_maille_DSGS_VDF : public Turbulence_hyd_sous_maille_Sm
 public:
 
   Turbulence_hyd_sous_maille_DSGS_VDF();
-  void associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis);
+  void associer(const Zone_dis& zone_dis,const Zone_Cl_dis& zone_Cl_dis) override;
 
   /////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ protected :
   void calculer_Sij(const DoubleTab& ,DoubleTab& );
   void calculer_Mij(const DoubleTab& ,const DoubleTab& ,DoubleTab& );
   void calculer_model_coefficient(const DoubleTab& ,const DoubleTab& );
-  Champ_Fonc& calculer_viscosite_turbulente();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
 
   //  void calculer_S_barre(DoubleVect& );
 

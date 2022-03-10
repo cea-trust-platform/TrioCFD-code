@@ -39,7 +39,7 @@ class Loi_convnat : public Loi_2couches_base
   Declare_instanciable(Loi_convnat);
 
 public:
-  void  LepsLmu(double k, double nu, double dist, double y_etoile, double& Leps, double& Lmu, double& vvSqRt) ;
+  void  LepsLmu(double k, double nu, double dist, double y_etoile, double& Leps, double& Lmu, double& vvSqRt) override ;
 
 };
 

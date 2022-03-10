@@ -47,9 +47,9 @@ class Mod_echelle_cv_forcee : public Mod_echelle_LRM_base
 public:
 
 
-  double calculer_l_eps( double y, double k, double u, double visco_cin);
-  double calculer_l_mu( double y, double k, double u, double visco_cin);
-  double calculer_vv_bar(double y, double k, double u, double visco_cin);
+  double calculer_l_eps( double y, double k, double u, double visco_cin) override;
+  double calculer_l_mu( double y, double k, double u, double visco_cin) override;
+  double calculer_vv_bar(double y, double k, double u, double visco_cin) override;
 
 };
 

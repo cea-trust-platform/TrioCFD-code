@@ -58,8 +58,8 @@ public:
   //
   // Methodes reimplementees de Objet_U
   //
-  int reprendre(Entree&);
-  int sauvegarder(Sortie&) const;
+  int reprendre(Entree&) override;
+  int sauvegarder(Sortie&) const override;
   //
   // Nouvelles methodes
   //
@@ -67,7 +67,7 @@ public:
   virtual Entree& lire_param_maillage(Entree& is);
   virtual void ajouter_maillage(const Maillage_FT_Disc& maillage_tmp,int skip_facettes=0);
   virtual void recopie(const Maillage_FT_Disc& maillage_source, Statut_Maillage niveau_copie);
-  virtual const Equation_base& equation_associee() const;
+  const Equation_base& equation_associee() const override;
 
   // Proprietes pour le schema en temps...
   double temps() const;
@@ -104,7 +104,7 @@ public:
   int calculer_voisinage_facettes(IntTab& fa7Voisines,
                                   const Intersections_Elem_Facettes* ief=NULL) const;
 
-  void associer_equation_transport(const Equation_base& equation);
+  void associer_equation_transport(const Equation_base& equation) override;
   void associer_zone_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours);
   Transport_Interfaces_FT_Disc& equation_transport();
   const Transport_Interfaces_FT_Disc& equation_transport() const;

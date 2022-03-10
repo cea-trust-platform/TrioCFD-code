@@ -30,7 +30,7 @@ class Paroi_decalee_Robin : public Symetrie
   Declare_instanciable(Paroi_decalee_Robin);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const;
+  int compatible_avec_eqn(const Equation_base&) const override;
   double get_delta() const
   {
     return delta;

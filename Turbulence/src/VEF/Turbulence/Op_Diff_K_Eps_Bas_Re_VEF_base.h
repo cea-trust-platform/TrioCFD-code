@@ -59,8 +59,8 @@ public:
 
   inline Op_Diff_K_Eps_Bas_Re_VEF_base(double Prandt_K = PRDT_K_DEFAUT ,
                                        double Prandt_Eps =PRDT_EPS_DEFAUT );
-  void completer();
-  virtual void associer_diffusivite_turbulente() =0;
+  void completer() override;
+  void associer_diffusivite_turbulente() override =0;
   inline void associer_diffusivite_turbulente(const Champ_Fonc& );
   inline const Champ_Fonc& diffusivite_turbulente() const;
 

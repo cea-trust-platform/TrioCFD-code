@@ -39,10 +39,10 @@ class Modele_turb_scal_sm_dyn_VDF : public Modele_turbulence_scal_base
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
+  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
   ////virtual Entree& lire(const Motcle&, Entree&);
-  virtual void set_param(Param& titi);
-  virtual int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
 protected:
 
@@ -57,7 +57,7 @@ protected:
   DoubleTab cell_cent_vel;
   DoubleVect model_coeff;
 
-  void mettre_a_jour(double );
+  void mettre_a_jour(double ) override;
   Champ_Fonc& calculer_diffusivite_turbulente();
 
 

@@ -42,12 +42,12 @@ class Convection_Diffusion_Espece_Multi_QC : public Convection_Diffusion_Espece_
   Declare_instanciable(Convection_Diffusion_Espece_Multi_QC);
 
 public :
-  void set_param(Param& titi);
-  void completer();
-  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  const Champ_base& diffusivite_pour_pas_de_temps();
-  DoubleTab& derivee_en_temps_inco(DoubleTab& );
+  void set_param(Param& titi) override;
+  void completer() override;
+  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  const Champ_base& diffusivite_pour_pas_de_temps() override;
+  DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
 
   // Methodes inlines
   inline const Espece& espece() const { return mon_espece_; }

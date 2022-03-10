@@ -51,15 +51,15 @@ class Transport_K_ou_Eps : public Transport_K_ou_Eps_base
   Declare_instanciable(Transport_K_ou_Eps);
 
 public:
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   inline void associer_Champ_Inconnu(const Champ_Inc& );
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS_Bicephale& );
-  int nombre_d_operateurs() const;
-  virtual const Operateur& operateur(int) const;
-  virtual Operateur& operateur(int);
-  const Motcle& domaine_application() const;
-  DoubleTab& corriger_derivee_impl(DoubleTab& d);
+  void associer_modele_turbulence(const Mod_turb_hyd_RANS_Bicephale& ) override;
+  int nombre_d_operateurs() const override;
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
+  const Motcle& domaine_application() const override;
+  DoubleTab& corriger_derivee_impl(DoubleTab& d) override;
 
 protected :
   int with_nu_;

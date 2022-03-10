@@ -45,9 +45,9 @@ public:
   Modele_turbulence_scal_Prandtl();
 
   ///virtual int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)& ) const;
-  virtual void mettre_a_jour(double );
+  void mettre_a_jour(double ) override;
 
-  void set_param(Param&);
+  void set_param(Param&) override;
 //  inline double get_Prdt() const;
 protected:
   double LePrdt;

@@ -53,7 +53,7 @@ public:
 
   Op_Diff_K_Eps_QC_VDF_Elem();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& );
+                const Champ_Inc& ) override;
   // void associer_diffusivite_turbulente();
   //  void mettre_a_jour_diffusivite() const;
 

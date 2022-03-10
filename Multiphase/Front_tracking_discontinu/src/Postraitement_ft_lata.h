@@ -35,9 +35,9 @@ class Postraitement_ft_lata : public Postraitement_lata
   Declare_instanciable_sans_constructeur(Postraitement_ft_lata);
 public:
   Postraitement_ft_lata();
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void postraiter(int forcer);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void postraiter(int forcer) override;
 protected:
   void lire_champ_interface(Entree&);
   void ecrire_maillage(Fichier_Lata&, const Maillage_FT_Disc&,

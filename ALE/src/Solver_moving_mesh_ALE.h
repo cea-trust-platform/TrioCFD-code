@@ -38,7 +38,7 @@ class Solver_moving_mesh_ALE : public Interprete_geometrique_base
 {
   Declare_instanciable(Solver_moving_mesh_ALE);
 public :
-  Entree& interpreter_(Entree&);
+  Entree& interpreter_(Entree&) override;
 };
 
 #endif

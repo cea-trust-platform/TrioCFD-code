@@ -44,15 +44,15 @@ class Echange_contact_rayo_semi_transp_VDF: public Cond_Lim_rayo_semi_transp, pu
   Declare_instanciable(Echange_contact_rayo_semi_transp_VDF);
 
 public :
-  const Cond_lim_base& la_cl() const;
+  const Cond_lim_base& la_cl() const override;
   Champ_front& temperature_bord();
   void calculer_temperature_bord(double temps);
-  int compatible_avec_eqn(const Equation_base&) const;
-  void mettre_a_jour(double temps);
+  int compatible_avec_eqn(const Equation_base&) const override;
+  void mettre_a_jour(double temps) override;
 
-  void completer();
-  void calculer_Teta_paroi(DoubleTab& Teta_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps);
-  void calculer_Teta_equiv(DoubleTab& Teta_eq,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps);
+  void completer() override;
+  void calculer_Teta_paroi(DoubleTab& Teta_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
+  void calculer_Teta_equiv(DoubleTab& Teta_eq,const DoubleTab& mon_h,const DoubleTab& autre_h,int i,double temps) override;
   Echange_contact_rayo_semi_transp_VDF& la_Cl_opposee();
 
 protected :

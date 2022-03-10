@@ -43,9 +43,9 @@ class Champ_front_ALE : public Ch_front_var_instationnaire_dep
 
 public:
   inline DoubleTab& get_vit_som_bord_ALE();
-  Champ_front_base& affecter_(const Champ_front_base& ch);
-  virtual int initialiser(double temps, const Champ_Inc_base& inco);
-  virtual void mettre_a_jour(double temps);
+  Champ_front_base& affecter_(const Champ_front_base& ch) override;
+  int initialiser(double temps, const Champ_Inc_base& inco) override;
+  void mettre_a_jour(double temps) override;
   void remplir_vit_som_bord_ALE(double);
 
 protected :

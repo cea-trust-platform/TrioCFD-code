@@ -42,7 +42,7 @@ class Associer_pbMG_pbGglobal : public Interprete
 {
   Declare_instanciable(Associer_pbMG_pbGglobal);
 public :
-  Entree& interpreter(Entree&);
+  Entree& interpreter(Entree&) override;
 };
 
 #endif

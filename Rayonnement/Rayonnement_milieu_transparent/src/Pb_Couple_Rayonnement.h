@@ -41,14 +41,14 @@ public:
 
   void le_modele_rayo_associe(const Modele_Rayonnement_base&);
   void associer_cl_base(const Cond_lim_base& );
-  int associer_(Objet_U&);
+  int associer_(Objet_U&) override;
   void completer();
-  virtual void validateTimeStep();
-  virtual void initialize();
+  void validateTimeStep() override;
+  void initialize() override;
   inline Modele_Rayonnement_base& le_modele_rayo();
   inline Cond_lim_base& cond_l_base();
-  void discretiser(const Discretisation_base&);
-  virtual int postraiter(int force=1);
+  void discretiser(const Discretisation_base&) override;
+  int postraiter(int force=1) override;
 
 protected:
 

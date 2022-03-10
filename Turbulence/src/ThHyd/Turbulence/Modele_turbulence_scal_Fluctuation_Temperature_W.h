@@ -35,10 +35,10 @@ class Modele_turbulence_scal_Fluctuation_Temperature_W :  public Modele_turbulen
   Declare_instanciable(Modele_turbulence_scal_Fluctuation_Temperature_W);
 
 public:
-  virtual void completer();
-  virtual int preparer_calcul();
-  virtual bool initTimeStep(double dt);
-  virtual void mettre_a_jour(double );
+  void completer() override;
+  int preparer_calcul() override;
+  bool initTimeStep(double dt) override;
+  void mettre_a_jour(double ) override;
   //virtual void associer_eqn(const Equation_base&);
   void associer_viscosite_turbulente(const Champ_Fonc& );
   inline virtual Champ_Inc& Fluctu_Temperature();
@@ -46,19 +46,19 @@ public:
   inline virtual Transport_Fluctuation_Temperature_W& equation_Fluctu();
   inline virtual const Transport_Fluctuation_Temperature_W& equation_Fluctu() const;
 
-  int sauvegarder(Sortie& os) const;
-  int reprendre(Entree& is);
+  int sauvegarder(Sortie& os) const override;
+  int reprendre(Entree& is) override;
   virtual Champ_Fonc& calculer_diffusivite_turbulente();
-  void imprimer(Sortie&) const;
+  void imprimer(Sortie&) const override;
 
-  void set_param(Param&);
-  virtual int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param&) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
   //////////////////////////////////////////////////////
   //Methode creer_champ pas codee a surcharger si necessaire
   //virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 private :

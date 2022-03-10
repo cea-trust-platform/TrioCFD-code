@@ -50,11 +50,11 @@ class Op_Diff_K_Eps_Bas_Re_VDF_base : public Op_Diff_K_Eps_Bas_Re_base
 public:
 
   inline Op_Diff_K_Eps_Bas_Re_VDF_base(const Iterateur_VDF_base& );
-  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
-  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
-  inline void contribuer_au_second_membre(DoubleTab& ) const;
-  void completer();
+  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
+  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
+  inline void contribuer_au_second_membre(DoubleTab& ) const override;
+  void completer() override;
 
 protected:
 

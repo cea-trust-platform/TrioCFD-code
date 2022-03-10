@@ -47,19 +47,19 @@ class Source_DWF_VDF : public Source_base
 
 public:
 
-  inline void associer_zones(const Zone_dis&, const Zone_Cl_dis& );
+  inline void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
 
-  inline DoubleTab& ajouter(DoubleTab& ) const ;
-  inline DoubleTab& calculer(DoubleTab& ) const ;
-  void completer();
-  inline void associer_pb(const Probleme_base& ) { };
+  inline DoubleTab& ajouter(DoubleTab& ) const override ;
+  inline DoubleTab& calculer(DoubleTab& ) const override ;
+  void completer() override;
+  inline void associer_pb(const Probleme_base& ) override { };
 
   inline  DoubleTab& getValeurs()
   {
     return les_valeurs ;
   }
 
-  void mettre_a_jour(double temps)
+  void mettre_a_jour(double temps) override
   {
     ;
   }

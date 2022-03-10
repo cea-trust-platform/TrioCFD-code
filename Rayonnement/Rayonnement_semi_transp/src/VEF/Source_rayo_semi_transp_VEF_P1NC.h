@@ -38,14 +38,14 @@ class Source_rayo_semi_transp_VEF_P1NC: public Source_rayo_semi_transp_base
 
 public :
 
-  DoubleTab& ajouter(DoubleTab& resu) const;
-  DoubleTab& calculer(DoubleTab& resu) const;
+  DoubleTab& ajouter(DoubleTab& resu) const override;
+  DoubleTab& calculer(DoubleTab& resu) const override;
 
   //  void recherche_et_associe_le_modele();
 
 protected :
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  void associer_pb(const Probleme_base& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_pb(const Probleme_base& ) override;
 
 };
 

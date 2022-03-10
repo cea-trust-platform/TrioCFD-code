@@ -38,22 +38,22 @@ public:
   //
   // Methodes virtuelles pures de Probleme_base :
   //
-  int nombre_d_equations(void) const;
-  const Equation_base& equation(int i) const;
-  Equation_base& equation(int i);
+  int nombre_d_equations(void) const override;
+  const Equation_base& equation(int i) const override;
+  Equation_base& equation(int i) override;
 
   //
   // Methodes reimplementees de Probleme_base :
   //
-  const Equation_base& get_equation_by_name(const Nom& le_nom) const;
-  Equation_base& getset_equation_by_name(const Nom& le_nom);
-  void   associer_milieu_base(const Milieu_base& milieu);
-  int associer_(Objet_U& ob);
-  void   completer(void);
-  int    verifier(void);
-  void   preparer_calcul(void);
-  double calculer_pas_de_temps(void) const;
-  void   mettre_a_jour(double temps);
+  const Equation_base& get_equation_by_name(const Nom& le_nom) const override;
+  Equation_base& getset_equation_by_name(const Nom& le_nom) override;
+  void   associer_milieu_base(const Milieu_base& milieu) override;
+  int associer_(Objet_U& ob) override;
+  void   completer(void) override;
+  int    verifier(void) override;
+  void   preparer_calcul(void) override;
+  double calculer_pas_de_temps(void) const override;
+  void   mettre_a_jour(double temps) override;
   //
   // Methodes nouvelles de Probleme_FT_Disc_gen
   //
@@ -66,7 +66,7 @@ public:
   virtual void preparer_mise_a_jour(void);
 
   // methodes appelees dans le readOn -> on ne sait pas encore s'il faut les modifier
-  void discretiser(const Discretisation_base&);
+  void discretiser(const Discretisation_base&) override;
 protected:
 
 private:

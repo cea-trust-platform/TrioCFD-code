@@ -63,8 +63,8 @@ public:
   virtual void associer_eqn(const Equation_base& );
   virtual void associer_eqn_2(const Equation_base& );
   virtual void associer(const Zone_dis& , const Zone_Cl_dis& )= 0;
-  virtual int sauvegarder(Sortie& ) const;
-  virtual int reprendre(Entree& );
+  int sauvegarder(Sortie& ) const override;
+  int reprendre(Entree& ) override;
   virtual DoubleTab& Calcul_D(DoubleTab&, const Zone_dis&, const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, const Champ_Don&) const=0;
   virtual int Calcul_is_Reynolds_stress_isotrope() const;
   virtual int Calcul_is_Cmu_constant() const;
@@ -99,9 +99,9 @@ public:
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
   virtual void lire_distance_paroi( );
 

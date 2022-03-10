@@ -50,12 +50,12 @@ class Domaine_ALE : public Domaine
 public :
   Domaine_ALE();
   inline const double& get_dt() const;
-  virtual void set_dt(double& dt);
+  void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
-  virtual void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&);
-  virtual void initialiser (double temps, Domaine_dis&, Probleme_base&);
+  void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&) override;
+  void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
   DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
   virtual void reading_vit_bords_ALE(Entree& is);

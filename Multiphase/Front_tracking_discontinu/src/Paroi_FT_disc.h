@@ -49,7 +49,7 @@ public:
   // Si l'angle est "hysteresis", le champ frontiere doit avoir deux composantes
   enum Type_modele { CONSTANT = 0, HYSTERESIS = 1, SYMETRIE = 2 };
 
-  int         compatible_avec_eqn(const Equation_base&) const;
+  int         compatible_avec_eqn(const Equation_base&) const override;
   Type_modele    get_type_modele() const;
 
 protected:

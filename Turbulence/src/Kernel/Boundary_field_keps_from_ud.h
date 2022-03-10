@@ -33,8 +33,8 @@ class Boundary_field_keps_from_ud : public Ch_front_var_instationnaire_dep
 
 public:
 
-  virtual int initialiser(double temps, const Champ_Inc_base& inco);
-  void mettre_a_jour(double temps) ;
+  int initialiser(double temps, const Champ_Inc_base& inco) override;
+  void mettre_a_jour(double temps) override ;
 protected:
   Champ_front vitesse_; // velocity field
   double d; // hydraulic diameter

@@ -45,9 +45,9 @@ class Turbulence_hyd_sous_maille_selectif_VDF : public Turbulence_hyd_sous_maill
 public:
 
   Turbulence_hyd_sous_maille_selectif_VDF();
-  void calculer_fonction_structure();
+  void calculer_fonction_structure() override;
   int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)& ) const;
-  void discretiser();
+  void discretiser() override;
 
 protected :
 

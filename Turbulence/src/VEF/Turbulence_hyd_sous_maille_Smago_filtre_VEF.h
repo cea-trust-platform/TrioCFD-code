@@ -39,7 +39,7 @@ public:
 
 protected :
 
-  virtual void calculer_S_barre();
+  void calculer_S_barre() override;
 };
 
 #endif

@@ -49,20 +49,20 @@ class ParoiVEF_TBLE : public Paroi_hyd_base_VEF, public Paroi_TBLE_QDM, public P
 public:
 
   ParoiVEF_TBLE();
-  virtual void set_param(Param& param);
-  virtual int lire_motcle_non_standard(const Motcle&, Entree&);
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab&);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab&) override;
   int calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2);
 
-  void imprimer_ustar(Sortie&) const;
+  void imprimer_ustar(Sortie&) const override;
 
   //OC 02/2006 :methodes de reprise/sauvegarde pour TBLE. Pour l'instant les donnees TBLE sont stockes dans des fichiers differents du .sauv => a voir si on met tout cela dans le .sauv a terme
-  virtual int sauvegarder(Sortie&) const ;
-  virtual int reprendre(Entree& ) ;
-  const Probleme_base& getPbBase() const ;
+  int sauvegarder(Sortie&) const override ;
+  int reprendre(Entree& ) override ;
+  const Probleme_base& getPbBase() const override ;
 
 protected:
 

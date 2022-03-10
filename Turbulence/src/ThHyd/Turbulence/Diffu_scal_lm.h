@@ -44,8 +44,8 @@ class Diffu_scal_lm : public Diffu_totale_scal_base
 
 public :
 
-  double calculer_a_local(int ind);
-  double calculer_D_local(int ind);
+  double calculer_a_local(int ind) override;
+  double calculer_D_local(int ind) override;
 
 
 

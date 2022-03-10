@@ -42,13 +42,13 @@ class Temperature_imposee_paroi_rayo_semi_transp: public Cond_Lim_rayo_semi_tran
   Declare_instanciable(Temperature_imposee_paroi_rayo_semi_transp);
 
 public :
-  void associer_modele(const Modele_rayo_semi_transp& );
-  int compatible_avec_eqn(const Equation_base&) const;
-  const Cond_lim_base& la_cl() const;
+  void associer_modele(const Modele_rayo_semi_transp& ) override;
+  int compatible_avec_eqn(const Equation_base&) const override;
+  const Cond_lim_base& la_cl() const override;
   Champ_front& temperature_bord();
   void calculer_temperature_bord(double temps);
 
-  void completer();
+  void completer() override;
 
 protected :
 

@@ -52,9 +52,9 @@ class Transport_K_Eps_V2 : public Transport_K_Eps_non_std
 public:
 
   inline void associer_Champ_Inconnu(const Champ_Inc&);
-  void associer_milieu_base(const Milieu_base&);
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS&);
-  const Motcle& domaine_application() const;
+  void associer_milieu_base(const Milieu_base&) override;
+  void associer_modele_turbulence(const Mod_turb_hyd_RANS&) override;
+  const Motcle& domaine_application() const override;
 
 protected :
 

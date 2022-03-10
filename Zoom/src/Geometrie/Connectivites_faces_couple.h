@@ -47,8 +47,8 @@ class Connectivites_faces_couple : public Connectivites_base
   Declare_instanciable(Connectivites_faces_couple);
 
 public:
-  virtual void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
-                                      Domaine& domg);
+  void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
+                              Domaine& domg) override;
   inline IntVect& nb_facesF();
   inline const IntVect& nb_facesF() const;
 

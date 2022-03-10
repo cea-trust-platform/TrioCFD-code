@@ -50,12 +50,12 @@ class Source_Correction_Deficitaire : public Source_base
 
 public:
 
-  inline DoubleTab& ajouter(DoubleTab& ) const ;
-  inline DoubleTab& calculer(DoubleTab& ) const ;
-  void completer();
-  void associer_pb(const Probleme_base& );
-  virtual void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) = 0;
-  void mettre_a_jour(double temps)
+  inline DoubleTab& ajouter(DoubleTab& ) const override ;
+  inline DoubleTab& calculer(DoubleTab& ) const override ;
+  void completer() override;
+  void associer_pb(const Probleme_base& ) override;
+  void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override = 0;
+  void mettre_a_jour(double temps) override
   {
     ;
   }

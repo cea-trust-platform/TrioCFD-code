@@ -48,16 +48,16 @@ class Source_Gravite_PF_VDF : public Source_base
   Declare_instanciable(Source_Gravite_PF_VDF);
 
 public:
-  DoubleTab& calculer(DoubleTab& ) const;
-  inline void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  void mettre_a_jour(double temps)
+  DoubleTab& calculer(DoubleTab& ) const override;
+  inline void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void mettre_a_jour(double temps) override
   {
     ;
   }
 
 protected :
-  void associer_zones(const Zone_dis& zone,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& zone,const Zone_Cl_dis& ) override;
   REF(Zone_VDF) la_zone;
   REF(Zone_Cl_VDF) la_zone_Cl;
   REF(Probleme_base) le_probleme;

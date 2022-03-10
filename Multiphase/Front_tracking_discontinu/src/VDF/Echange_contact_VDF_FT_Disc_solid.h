@@ -38,22 +38,22 @@ class Echange_contact_VDF_FT_Disc_solid : public Echange_contact_VDF_FT_Disc
   Declare_instanciable( Echange_contact_VDF_FT_Disc_solid ) ;
 
 public :
-  void mettre_a_jour(double );
-  virtual int initialiser(double temps);
-  void completer();
+  void mettre_a_jour(double ) override;
+  int initialiser(double temps) override;
+  void completer() override;
 
 
-  virtual void changer_temps_futur(double temps,int i);
-  virtual int avancer(double temps);
-  virtual int reculer(double temps);
-  inline Champ_front& T_autre_pb()
+  void changer_temps_futur(double temps,int i) override;
+  int avancer(double temps) override;
+  int reculer(double temps) override;
+  inline Champ_front& T_autre_pb() override
   {
     if (numero_T_==0)
       return T_autre_pb_;
     assert(numero_T_==1);
     return T2_autre_pb_;
   };
-  inline const Champ_front& T_autre_pb() const
+  inline const Champ_front& T_autre_pb() const override
   {
     if (numero_T_==0)
       return T_autre_pb_;

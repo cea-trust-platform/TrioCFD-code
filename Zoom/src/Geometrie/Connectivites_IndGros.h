@@ -47,8 +47,8 @@ class Connectivites_IndGros : public Connectivites_base
   Declare_instanciable(Connectivites_IndGros);
 
 public:
-  virtual void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
-                                      Domaine& domg);
+  void calculer_connectivites(Zone_VF& zonef, Zone_VF& zoneg,
+                              Domaine& domg) override;
   inline IntVect& indice_gros(); // tableau d'entier de taille NELEM_GROS : 1 si l'elem grossier recouvre un elem fin, 0 sinon.
 
 

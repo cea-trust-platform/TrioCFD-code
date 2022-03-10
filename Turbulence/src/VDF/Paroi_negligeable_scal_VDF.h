@@ -40,8 +40,8 @@ class Paroi_negligeable_scal_VDF : public Paroi_scal_hyd_base_VDF
 
 public:
   /* virtual int init_lois_paroi(); */
-  int calculer_scal(Champ_Fonc_base& ) ;
-  virtual bool use_equivalent_distance() const;
+  int calculer_scal(Champ_Fonc_base& ) override ;
+  bool use_equivalent_distance() const override;
 
 
 };

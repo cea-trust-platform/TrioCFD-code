@@ -41,24 +41,24 @@ public:
   // Methode utilisee pour le calcul du mu du domaine
 
   // Surcharge des methodes standard du milieu_base :
-  void set_param(Param& param);
-  void verifier_coherence_champs(int& err,Nom& message);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  int initialiser(const double& temps);
-  void mettre_a_jour(double temps);
-  virtual void discretiser(const Probleme_base& pb, const  Discretisation_base& dis);
+  void set_param(Param& param) override;
+  void verifier_coherence_champs(int& err,Nom& message) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  int initialiser(const double& temps) override;
+  void mettre_a_jour(double temps) override;
+  void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
 
   // L'appel a ces methodes est invalide et genere une erreur
-  const Champ_base& masse_volumique() const;
-  Champ_base&       masse_volumique();
-  const Champ_Don& diffusivite() const;
-  Champ_Don&       diffusivite();
-  const Champ_Don& conductivite() const;
-  Champ_Don&       conductivite();
-  const Champ_Don& capacite_calorifique() const;
-  Champ_Don&       capacite_calorifique();
-  const Champ_Don& beta_t() const;
-  Champ_Don&       beta_t();
+  const Champ_base& masse_volumique() const override;
+  Champ_base&       masse_volumique() override;
+  const Champ_Don& diffusivite() const override;
+  Champ_Don&       diffusivite() override;
+  const Champ_Don& conductivite() const override;
+  Champ_Don&       conductivite() override;
+  const Champ_Don& capacite_calorifique() const override;
+  Champ_Don&       capacite_calorifique() override;
+  const Champ_Don& beta_t() const override;
+  Champ_Don&       beta_t() override;
 
 
 protected:

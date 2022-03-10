@@ -40,25 +40,25 @@ class Transport_Fluctuation_Temperature_W : public Convection_Diffusion_std
 public :
 
   Transport_Fluctuation_Temperature_W();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void associer_milieu_base(const Milieu_base& );
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void associer_milieu_base(const Milieu_base& ) override;
   void associer_modele_turbulence(const Modele_turbulence_scal_Fluctuation_Temperature_W& );
-  virtual void discretiser();
-  void completer();
-  virtual inline const Milieu_base& milieu() const;
-  virtual inline Milieu_base& milieu();
+  void discretiser() override;
+  void completer() override;
+  inline const Milieu_base& milieu() const override;
+  inline Milieu_base& milieu() override;
   inline const Modele_turbulence_scal_Fluctuation_Temperature_W& modele_turbulence() const;
   inline Modele_turbulence_scal_Fluctuation_Temperature_W& modele_turbulence();
-  int nombre_d_operateurs() const;
-  virtual const Operateur& operateur(int) const;
-  virtual Operateur& operateur(int);
-  virtual const Champ_Inc& inconnue() const;
-  virtual Champ_Inc& inconnue();
+  int nombre_d_operateurs() const override;
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
+  const Champ_Inc& inconnue() const override;
+  Champ_Inc& inconnue() override;
 
 
 
-  const Motcle& domaine_application() const;
+  const Motcle& domaine_application() const override;
   int controler_grandeur();
 
 protected :

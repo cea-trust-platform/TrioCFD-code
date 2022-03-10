@@ -41,9 +41,9 @@ class Convection_Diffusion_Concentration_FT_Disc : public Convection_Diffusion_C
 public:
 
   Convection_Diffusion_Concentration_FT_Disc();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void     mettre_a_jour(double temps);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void     mettre_a_jour(double temps) override;
 
 protected:
   void ramasse_miette_simple(double temps);

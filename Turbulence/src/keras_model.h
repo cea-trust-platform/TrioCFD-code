@@ -295,11 +295,11 @@ class KerasLayerActivation : public KerasLayer {
 
     KerasLayerActivation() : activation_type_(ActivationType::kLinear) {}
 
-    virtual ~KerasLayerActivation() {}
+    ~KerasLayerActivation() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     ActivationType activation_type_;
@@ -309,11 +309,11 @@ class KerasLayerDense : public KerasLayer {
   public:
     KerasLayerDense() {}
 
-    virtual ~KerasLayerDense() {}
+    ~KerasLayerDense() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     Tensor weights_;
@@ -326,11 +326,11 @@ class KerasLayerConvolution2d : public KerasLayer {
   public:
     KerasLayerConvolution2d() {}
 
-    virtual ~KerasLayerConvolution2d() {}
+    ~KerasLayerConvolution2d() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     Tensor weights_;
@@ -343,11 +343,11 @@ class KerasLayerFlatten : public KerasLayer {
   public:
     KerasLayerFlatten() {}
 
-    virtual ~KerasLayerFlatten() {}
+    ~KerasLayerFlatten() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
 };
@@ -356,11 +356,11 @@ class KerasLayerElu : public KerasLayer {
   public:
     KerasLayerElu() : alpha_(1.0f) {}
 
-    virtual ~KerasLayerElu() {}
+    ~KerasLayerElu() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     float alpha_;
@@ -370,11 +370,11 @@ class KerasLayerMaxPooling2d : public KerasLayer {
   public:
     KerasLayerMaxPooling2d() : pool_size_j_(0), pool_size_k_(0) {}
 
-    virtual ~KerasLayerMaxPooling2d() {}
+    ~KerasLayerMaxPooling2d() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     unsigned int pool_size_j_;
@@ -385,11 +385,11 @@ class KerasLayerLSTM : public KerasLayer {
   public:
     KerasLayerLSTM() : return_sequences_(false) {}
 
-    virtual ~KerasLayerLSTM() {}
+    ~KerasLayerLSTM() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     bool Step(Tensor* x, Tensor* out, Tensor* ht_1, Tensor* ct_1);
@@ -416,11 +416,11 @@ class KerasLayerEmbedding : public KerasLayer {
   public:
     KerasLayerEmbedding() {}
 
-    virtual ~KerasLayerEmbedding() {}
+    ~KerasLayerEmbedding() override {}
 
-    virtual bool LoadLayer(std::ifstream* file);
+    bool LoadLayer(std::ifstream* file) override;
 
-    virtual bool Apply(Tensor* in, Tensor* out);
+    bool Apply(Tensor* in, Tensor* out) override;
 
   private:
     Tensor weights_;

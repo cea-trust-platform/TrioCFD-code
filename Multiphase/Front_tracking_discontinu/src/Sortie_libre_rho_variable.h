@@ -36,8 +36,8 @@ class Sortie_libre_rho_variable : public Sortie_libre_pression_imposee
 {
   Declare_instanciable(Sortie_libre_rho_variable);
 public:
-  double flux_impose(int i) const;
-  double flux_impose(int i, int j) const;
-  void completer();
+  double flux_impose(int i) const override;
+  double flux_impose(int i, int j) const override;
+  void completer() override;
 };
 #endif

@@ -43,13 +43,13 @@ class Turbulence_hyd_sous_maille_VDF : public Mod_turb_hyd_ss_maille_VDF
 public:
 
   inline Turbulence_hyd_sous_maille_VDF();
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
 
 protected :
 
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
-  virtual void calculer_energie_cinetique_turb();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_energie_cinetique_turb() override;
   virtual void calculer_fonction_structure();
 
   int nb_points;    // nb_points=4 ou 6 selon que nous utilisons la formulation de la FST en 4 ou 6 points!!

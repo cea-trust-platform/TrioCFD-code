@@ -45,7 +45,7 @@ class Remailleur_Collision_FT_Thomas : public Remailleur_Collision_FT_Juric
 
 public:
   Remailleur_Collision_FT_Thomas();
-  int traite_RuptureCoalescenceInterfaces_Conservatif(Maillage_FT_Disc&, Champ_base&);
+  int traite_RuptureCoalescenceInterfaces_Conservatif(Maillage_FT_Disc&, Champ_base&) override;
 
   //Fonctions d'acces aux attributs
   inline const IntTab& voisinage_sommet() const;

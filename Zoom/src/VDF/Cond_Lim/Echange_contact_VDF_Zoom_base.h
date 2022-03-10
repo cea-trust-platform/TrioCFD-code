@@ -43,7 +43,7 @@ class Echange_contact_VDF_Zoom_base  : public Echange_externe_impose
 
   Declare_base(Echange_contact_VDF_Zoom_base);
 public :
-  virtual void mettre_a_jour(double ) =0;
+  void mettre_a_jour(double ) override =0;
 protected :
   double h_paroi;
 

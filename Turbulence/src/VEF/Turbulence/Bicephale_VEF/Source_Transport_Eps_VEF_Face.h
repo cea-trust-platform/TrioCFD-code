@@ -73,10 +73,10 @@ public:
 
   inline Source_Transport_Eps_VEF_Face(double cte1 = C1_DEFAULT,
                                        double cte2 = C2_DEFAULT );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-  void mettre_a_jour(double temps)
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
+  void mettre_a_jour(double temps) override
   {
     Calcul_Production_K_VEF::mettre_a_jour(temps);
   }
@@ -90,8 +90,8 @@ protected:
   REF(Transport_K_ou_Eps)  mon_eq_transport_K;
   REF(Transport_K_ou_Eps)  mon_eq_transport_Eps;
 
-  virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_pb(const Probleme_base& pb) override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -117,9 +117,9 @@ public:
   inline Source_Transport_Eps_anisotherme_VEF_Face(double cte1 = C1_DEFAULT,
                                                    double cte2 = C2_DEFAULT,
                                                    double cte3 = C3_DEFAULT);
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected:
 
@@ -153,9 +153,9 @@ public:
   inline Source_Transport_Eps_aniso_concen_VEF_Face(double cte1 = C1_DEFAULT,
                                                     double cte2 = C2_DEFAULT,
                                                     double cte3 = C3_DEFAULT);
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected:
 
@@ -189,9 +189,9 @@ public:
   inline Source_Transport_Eps_aniso_therm_concen_VEF_Face(double cte1 = C1_DEFAULT,
                                                           double cte2 = C2_DEFAULT,
                                                           double cte3 = C3_DEFAULT);
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected:
 

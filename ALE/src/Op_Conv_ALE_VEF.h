@@ -36,17 +36,17 @@ class Op_Conv_ALE_VEF : public Op_Conv_ALE, public Op_VEF_Face
   Declare_instanciable(Op_Conv_ALE_VEF);
 
 public :
-  virtual void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
-  double calculer_dt_stab() const ;
+  void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& ) override;
+  double calculer_dt_stab() const override ;
   virtual void remplir_fluent_ALEincluded(DoubleVect& ) const;
   virtual void calculateALEMeshVelocityGradientOnFaces( DoubleTab& ) const;
   virtual void calculateALEjacobian(DoubleTab& jacobianALE) const;
   double application_LIMITEUR(double, double, Motcle&) const;
-  virtual DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
-  void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const;
+  DoubleTab& ajouterALE(const DoubleTab&, DoubleTab& ) const override;
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
+  void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const override;
 
-  inline void dimensionner(Matrice_Morse& ) const;
+  inline void dimensionner(Matrice_Morse& ) const override;
 
 protected :
   REF(Zone_VEF) la_zone_vef;

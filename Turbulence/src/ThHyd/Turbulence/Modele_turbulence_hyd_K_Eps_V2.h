@@ -43,21 +43,21 @@ class Modele_turbulence_hyd_K_Eps_V2 : public Mod_turb_hyd_RANS
 
 public:
 
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void completer();
-  int preparer_calcul();
-  virtual bool initTimeStep(double dt);
-  int sauvegarder(Sortie& os) const;
-  int reprendre(Entree& is);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void completer() override;
+  int preparer_calcul() override;
+  bool initTimeStep(double dt) override;
+  int sauvegarder(Sortie& os) const override;
+  int reprendre(Entree& is) override;
 
-  inline int nombre_d_equations() const;
-  inline Transport_K_Eps_base& eqn_transp_K_Eps();
-  inline const Transport_K_Eps_base& eqn_transp_K_Eps() const;
-  const Equation_base& equation_k_eps(int) const ;
+  inline int nombre_d_equations() const override;
+  inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
+  inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
+  const Equation_base& equation_k_eps(int) const override ;
 
 
-  void verifie_loi_paroi();
+  void verifie_loi_paroi() override;
   inline  const Transport_V2& eqn_V2() const;
   inline Transport_V2& eqn_V2();
 

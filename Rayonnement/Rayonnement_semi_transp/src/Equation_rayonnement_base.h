@@ -38,28 +38,28 @@ class Equation_rayonnement_base: public Equation_base
 public:
 
   Equation_rayonnement_base();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  virtual bool initTimeStep(double dt);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  bool initTimeStep(double dt) override;
   virtual bool solve();
-  void associer_milieu_base(const Milieu_base&);
+  void associer_milieu_base(const Milieu_base&) override;
   inline void associer_fluide(const Fluide_base&);
   void associer_modele_rayonnement(const Modele_rayo_semi_transp&);
-  Milieu_base& milieu();
-  const Milieu_base& milieu() const;
+  Milieu_base& milieu() override;
+  const Milieu_base& milieu() const override;
   inline const Modele_rayo_semi_transp&  Modele() const;
   inline Modele_rayo_semi_transp& Modele();
-  int nombre_d_operateurs() const;
-  const Operateur& operateur(int) const;
-  Operateur& operateur(int);
-  virtual const Champ_Inc& inconnue() const;
-  virtual Champ_Inc& inconnue();
-  void discretiser();
+  int nombre_d_operateurs() const override;
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
+  const Champ_Inc& inconnue() const override;
+  Champ_Inc& inconnue() override;
+  void discretiser() override;
   inline Fluide_base& fluide();
   inline const Fluide_base& fluide() const;
 
   // pas de flux calcule correctement par les operateurs...
-  inline int impr(Sortie& os) const
+  inline int impr(Sortie& os) const override
   {
     return 1;
   };
@@ -76,7 +76,7 @@ public:
   const Operateur_Grad& operateur_gradient() const;
   virtual void typer_op_grad()=0;
 
-  void associer_pb_base(const Probleme_base& pb);
+  void associer_pb_base(const Probleme_base& pb) override;
 
   virtual void resoudre(double temps)=0;
   virtual void assembler_matrice()=0;
@@ -87,7 +87,7 @@ public:
   virtual void modifier_matrice()=0;
   virtual void evaluer_cl_rayonnement(double temps)=0;
 
-  void completer();
+  void completer() override;
 
 protected:
 

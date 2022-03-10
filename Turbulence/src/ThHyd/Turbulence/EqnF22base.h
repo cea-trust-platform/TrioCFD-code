@@ -50,32 +50,32 @@ class EqnF22base : public Equation_base
 public:
 
   EqnF22base();
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void associer_milieu_base(const Milieu_base&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void associer_milieu_base(const Milieu_base&) override;
   void associer_modele_turbulence(const Modele_turbulence_hyd_K_Eps_V2& );
-  const Milieu_base& milieu() const ;
-  Milieu_base& milieu() ;
+  const Milieu_base& milieu() const override ;
+  Milieu_base& milieu() override ;
   inline const Modele_turbulence_hyd_K_Eps_V2& modele_turbulence() const;
   inline Modele_turbulence_hyd_K_Eps_V2& modele_turbulence();
-  int nombre_d_operateurs() const;
-  const Operateur& operateur(int) const;
-  Operateur& operateur(int);
-  virtual const Champ_Inc& inconnue() const;
-  virtual Champ_Inc& inconnue();
-  void discretiser();
+  int nombre_d_operateurs() const override;
+  const Operateur& operateur(int) const override;
+  Operateur& operateur(int) override;
+  const Champ_Inc& inconnue() const override;
+  Champ_Inc& inconnue() override;
+  void discretiser() override;
   void discretiser_F22(const Schema_Temps_base&, Zone_dis&, Champ_Inc&) const;
 
   virtual void resoudre() =0;
-  virtual void completer();
-  virtual int preparer_calcul();
+  void completer() override;
+  int preparer_calcul() override;
 
   /////////////////////////////////////////////////////
 
-  const Motcle& domaine_application() const;
+  const Motcle& domaine_application() const override;
 
-  virtual int sauvegarder( Sortie&) const;
-  virtual int reprendre( Entree&);
+  int sauvegarder( Sortie&) const override;
+  int reprendre( Entree&) override;
 
 
 protected :

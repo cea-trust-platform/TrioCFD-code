@@ -63,8 +63,8 @@ public:
   inline void  discretiser();
   inline void resoudre();
   inline int preparer_calcul();
-  inline int sauvegarder( Sortie&) const;
-  inline int reprendre( Entree&);
+  inline int sauvegarder( Sortie&) const override;
+  inline int reprendre( Entree&) override;
   /*
     inline int comprend_mot(const Motcle& ) const;
     inline int comprend_champ(const Motcle& ) const;

@@ -41,8 +41,8 @@ class Paroi_std_scal_hyd_VDF : public Paroi_scal_hyd_base_VDF
   Declare_instanciable_sans_constructeur(Paroi_std_scal_hyd_VDF);
 
 public:
-  virtual int init_lois_paroi();
-  int calculer_scal(Champ_Fonc_base& ) ;
+  int init_lois_paroi() override;
+  int calculer_scal(Champ_Fonc_base& ) override ;
 
 protected:
   int init_lois_paroi_scalaire();

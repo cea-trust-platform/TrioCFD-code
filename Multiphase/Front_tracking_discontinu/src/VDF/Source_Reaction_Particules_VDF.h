@@ -39,7 +39,7 @@ class Source_Reaction_Particules_VDF : public Source_Reaction_Particules
   Declare_instanciable(Source_Reaction_Particules_VDF);
 public :
 
-  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
 
 protected:
 

@@ -59,11 +59,11 @@ class Mod_turb_hyd_combin : public Mod_turb_hyd_base
 public:
 
   Mod_turb_hyd_combin();
-  void set_param(Param& param);
-  virtual void discretiser();
-  virtual void completer();
-  virtual void mettre_a_jour(double );
-  int preparer_calcul();
+  void set_param(Param& param) override;
+  void discretiser() override;
+  void completer() override;
+  void mettre_a_jour(double ) override;
+  int preparer_calcul() override;
   virtual Champ_Fonc& calculer_viscosite_turbulente();
   inline virtual Champ_Fonc& energie_cinetique_turbulente();
   inline virtual const Champ_Fonc& energie_cinetique_turbulente() const;

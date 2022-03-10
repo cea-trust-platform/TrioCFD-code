@@ -101,14 +101,14 @@ class Op_Diff_K_Eps_negligeable : public Operateur_negligeable,
 
 public:
 
-  inline void associer(const Zone_dis&, const Zone_Cl_dis&, const Champ_Inc& );
-  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
-  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
-  inline void contribuer_au_second_membre(DoubleTab& ) const;
-  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
-  inline void dimensionner(Matrice_Morse& ) const;
-  inline void associer_diffusivite_turbulente();
+  inline void associer(const Zone_dis&, const Zone_Cl_dis&, const Champ_Inc& ) override;
+  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
+  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
+  inline void contribuer_au_second_membre(DoubleTab& ) const override;
+  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
+  inline void dimensionner(Matrice_Morse& ) const override;
+  inline void associer_diffusivite_turbulente() override;
 
 protected:
   REF(Champ_base) la_diffusivite;
@@ -136,15 +136,15 @@ class Op_Diff_K_Eps : public Operateur,
 
 public:
 
-  inline Operateur_base& l_op_base();
-  inline const Operateur_base& l_op_base() const;
+  inline Operateur_base& l_op_base() override;
+  inline const Operateur_base& l_op_base() const override;
   inline void associer_diffusivite_turbulente();
-  DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const;
-  DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
+  DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
+  DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
   inline Champ_base& associer_diffusivite(const Champ_base&);
   inline const Champ_base& diffusivite() const;
-  void typer();
-  virtual inline int op_non_nul() const;
+  void typer() override;
+  inline int op_non_nul() const override;
 
 protected :
 

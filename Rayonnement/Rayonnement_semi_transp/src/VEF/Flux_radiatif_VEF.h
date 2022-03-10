@@ -49,7 +49,7 @@ public :
                               const Zone_VF&, const double&, double);
 
 
-  void calculer_flux_radiatif(const Equation_base& eq_temp);
+  void calculer_flux_radiatif(const Equation_base& eq_temp) override;
 
 protected :
 };

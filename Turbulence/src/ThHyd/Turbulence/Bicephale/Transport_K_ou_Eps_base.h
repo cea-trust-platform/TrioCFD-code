@@ -50,25 +50,25 @@ class Transport_K_ou_Eps_base: public Equation_base
 public:
 
   Transport_K_ou_Eps_base();
-  void set_param(Param&);
-  double calculer_pas_de_temps() const;
+  void set_param(Param&) override;
+  double calculer_pas_de_temps() const override;
   inline void associer_vitesse(const Champ_base& );
-  virtual void associer_milieu_base(const Milieu_base&);
+  void associer_milieu_base(const Milieu_base&) override;
   virtual void associer_modele_turbulence(const Mod_turb_hyd_RANS_Bicephale& )=0;
-  virtual const Milieu_base& milieu() const ;
-  virtual Milieu_base& milieu() ;
+  const Milieu_base& milieu() const override ;
+  Milieu_base& milieu() override ;
   void associer(const Equation_base&);
-  void discretiser();
+  void discretiser() override;
   virtual void discretiser_K_Eps(const Schema_Temps_base&, Zone_dis&, Champ_Inc&) const;
 
   virtual int controler_variable();
-  void valider_iteration();
-  virtual inline const Champ_Inc& inconnue() const;
-  virtual inline Champ_Inc& inconnue();
+  void valider_iteration() override;
+  inline const Champ_Inc& inconnue() const override;
+  inline Champ_Inc& inconnue() override;
   inline const Mod_turb_hyd_RANS_Bicephale& modele_turbulence() const;
   inline Mod_turb_hyd_RANS_Bicephale& modele_turbulence();
 
-  const Champ_base& get_champ( const Motcle& nom ) const;
+  const Champ_base& get_champ( const Motcle& nom ) const override;
 //  void creer_champ( const Motcle& motlu );
 
   inline void transporte_K();

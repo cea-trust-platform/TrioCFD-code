@@ -48,7 +48,7 @@ public:
 
 protected :
 
-  Champ_Fonc& calculer_viscosite_turbulente();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
   virtual void calculer_racine();
 
   double C1;

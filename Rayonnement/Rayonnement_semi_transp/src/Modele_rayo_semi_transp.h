@@ -63,19 +63,19 @@ public:
   //                                           //
   ///////////////////////////////////////////////
 
-  virtual void terminate()
+  void terminate() override
   {
     finir();
   }
 
-  virtual double computeTimeStep(bool& stop) const
+  double computeTimeStep(bool& stop) const override
   {
     stop=false;
     return DMAXFLOAT;
   }
-  virtual bool initTimeStep(double dt);
-  virtual bool iterateTimeStep(bool& converged);
-  virtual void validateTimeStep();
+  bool initTimeStep(double dt) override;
+  bool iterateTimeStep(bool& converged) override;
+  void validateTimeStep() override;
 
   ////////////////////////////////////////////////////////
   //                                                    //
@@ -89,32 +89,32 @@ public:
   //                                                 //
   /////////////////////////////////////////////////////
 
-  virtual void completer()
+  void completer() override
   {
     ;
   }
-  virtual int nombre_d_equations() const
+  int nombre_d_equations() const override
   {
     return 1;
   }
-  virtual const Equation_base& equation(int i) const;
-  virtual Equation_base& equation(int i);
-  virtual const Equation_base& get_equation_by_name(const Nom&) const;
-  virtual Equation_base& getset_equation_by_name(const Nom&);
-  virtual double calculer_pas_de_temps() const
+  const Equation_base& equation(int i) const override;
+  Equation_base& equation(int i) override;
+  const Equation_base& get_equation_by_name(const Nom&) const override;
+  Equation_base& getset_equation_by_name(const Nom&) override;
+  double calculer_pas_de_temps() const override
   {
     return DMAXFLOAT;
   }
 
   // Cette methode ne doivent pas servir : on passe par l'interface de Problem
-  virtual void mettre_a_jour(double temps)
+  void mettre_a_jour(double temps) override
   {
     exit();
   }
 
-  virtual void preparer_calcul();
-  virtual void discretiser(const Discretisation_base&);
-  virtual void associer_sch_tps_base(const Schema_Temps_base&);
+  void preparer_calcul() override;
+  void discretiser(const Discretisation_base&) override;
+  void associer_sch_tps_base(const Schema_Temps_base&) override;
 
   //////////////////////////////////////////////////////////////
   //                                                          //

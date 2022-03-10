@@ -52,10 +52,10 @@ class Transport_K_KEps : public Transport_K_Eps_non_std
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void associer_milieu_base(const Milieu_base&);
-  void associer_modele_turbulence(const Mod_turb_hyd_RANS&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void associer_milieu_base(const Milieu_base&) override;
+  void associer_modele_turbulence(const Mod_turb_hyd_RANS&) override;
   inline int get_nbcouches() const;
   inline int get_yswitch() const;
   inline int get_switch() const;
@@ -63,7 +63,7 @@ public :
   inline int get_impr() const;
   inline const Champ_Inc& vitesse_transportante();
 
-  const Motcle& domaine_application() const;
+  const Motcle& domaine_application() const override;
   Loi_2couches_base& loi2couches()
   {
     return loi_2couches.valeur();

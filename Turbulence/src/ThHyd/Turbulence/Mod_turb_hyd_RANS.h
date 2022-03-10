@@ -46,15 +46,15 @@ class Mod_turb_hyd_RANS : public Mod_turb_hyd_base
 public:
 
   Mod_turb_hyd_RANS();
-  void set_param(Param& param);
+  void set_param(Param& param) override;
   virtual int nombre_d_equations() const=0;
   virtual Transport_K_Eps_base& eqn_transp_K_Eps()=0;
   virtual const Transport_K_Eps_base& eqn_transp_K_Eps() const=0;
-  virtual void completer();
+  void completer() override;
 
   virtual void verifie_loi_paroi();
-  int sauvegarder(Sortie& os) const;
-  int reprendre(Entree& is);
+  int sauvegarder(Sortie& os) const override;
+  int reprendre(Entree& is) override;
 
   virtual const Equation_base& equation_k_eps(int) const=0 ;
 
@@ -69,13 +69,13 @@ public:
   /////////////////////////////////////////////////////
   //Methode creer_champ non codee a surcharger si necessaire
   //virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
   inline Modele_Fonc_Bas_Reynolds& associe_modele_fonction();
   inline const Modele_Fonc_Bas_Reynolds& associe_modele_fonction() const;
-  virtual bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const
+  bool calcul_tenseur_Re(const DoubleTab& nu_turb, const DoubleTab& grad, DoubleTab& Re) const override
   {
     if (associe_modele_fonction().non_nul() && associe_modele_fonction().Calcul_is_Reynolds_stress_isotrope()==0)
       return associe_modele_fonction().valeur().calcul_tenseur_Re(nu_turb, grad, Re);

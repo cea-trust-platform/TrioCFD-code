@@ -33,8 +33,8 @@ class Frontiere_Ouverte_Rayo_transp :   public Cond_Lim_Rayo, public Neumann_sor
 
 public :
 
-  void completer();
-  void mettre_a_jour(double );
+  void completer() override;
+  void mettre_a_jour(double ) override;
   void calculer_Teta_i();
 
 

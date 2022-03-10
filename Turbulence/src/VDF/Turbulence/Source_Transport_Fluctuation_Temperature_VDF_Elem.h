@@ -61,12 +61,12 @@ class Source_Transport_Fluctuation_Temperature_VDF_Elem : public Source_base,
 
 public :
 
-  void associer_pb(const Probleme_base& );
+  void associer_pb(const Probleme_base& ) override;
   inline Source_Transport_Fluctuation_Temperature_VDF_Elem(double ctea = Ca_DEFAULT, double cteb = Cb_DEFAULT,  double ctec = Cc_DEFAULT,  double cted = Cd_DEFAULT);
   DoubleTab& calculer_Prod_uteta_T(const Zone_VDF&,const Zone_Cl_VDF&, const DoubleTab&,const  DoubleTab&, DoubleTab&) const;
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double temps)
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double temps) override
   {
     Calcul_Production_K_VDF::mettre_a_jour(temps);
   }
@@ -83,7 +83,7 @@ protected :
   REF(Convection_Diffusion_Temperature) eq_thermique;
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 
 };
 

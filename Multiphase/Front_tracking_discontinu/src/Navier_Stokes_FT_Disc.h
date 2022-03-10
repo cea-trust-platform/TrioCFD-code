@@ -40,21 +40,21 @@ public:
   //
   // Methodes surchargees
   //
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  const Milieu_base& milieu() const;
-  Milieu_base&        milieu();
-  void                associer_pb_base(const Probleme_base& probleme);
-  void                discretiser();
-  int              preparer_calcul();
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  const Milieu_base& milieu() const override;
+  Milieu_base&        milieu() override;
+  void                associer_pb_base(const Probleme_base& probleme) override;
+  void                discretiser() override;
+  int              preparer_calcul() override;
   void                preparer_pas_de_temps();
-  virtual void mettre_a_jour(double temps);
-  void                calculer_la_pression_en_pa();
-  DoubleTab&          derivee_en_temps_inco(DoubleTab& vpoint);
-  void                projeter();
+  void mettre_a_jour(double temps) override;
+  void                calculer_la_pression_en_pa() override;
+  DoubleTab&          derivee_en_temps_inco(DoubleTab& vpoint) override;
+  void                projeter() override;
   virtual const Champ_base& calculer_div_normale_interface();
   void calculer_delta_u_interface(Champ_base& u0, int phase_pilote, int ordre);
-  const Champ_Don& diffusivite_pour_transport();
+  const Champ_Don& diffusivite_pour_transport() override;
 
 
   virtual const Champ_base * get_delta_vitesse_interface() const;
@@ -68,8 +68,8 @@ public:
 
 protected:
   // Methode surchargee de Navier_Stokes_std :
-  void discretiser_assembleur_pression();
-  void associer_milieu_base(const Milieu_base& fluide);
+  void discretiser_assembleur_pression() override;
+  void associer_milieu_base(const Milieu_base& fluide) override;
 
   // Nouvelles methodes
   virtual const Probleme_FT_Disc_gen& probleme_ft() const;

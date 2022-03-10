@@ -40,10 +40,10 @@ class Echange_contact_Rayo_transp_VDF : public Cond_Lim_Rayo,public Echange_cont
 
 public :
 
-  void completer();
-  void mettre_a_jour(double );
-  void calculer_Teta_paroi(DoubleTab& tab_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps);
-  void calculer_Teta_equiv(DoubleTab& Teta_equiv,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps);
+  void completer() override;
+  void mettre_a_jour(double ) override;
+  void calculer_Teta_paroi(DoubleTab& tab_p,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;
+  void calculer_Teta_equiv(DoubleTab& Teta_equiv,const DoubleTab& mon_h,const DoubleTab& autre_h,int is_pb_fluide,double temps) override;
   //int verifier_correspondance() const;
 protected :
   int num_premiere_face_dans_pb_fluide;

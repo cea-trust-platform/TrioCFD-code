@@ -59,9 +59,9 @@ class Source_Transport_V2_VDF_Elem : public Source_base,
 public:
 
   inline Source_Transport_V2_VDF_Elem(double n_c = n_DEFAULT);
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double temps)
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double temps) override
   {
     Calcul_Production_K_VDF::mettre_a_jour(temps);
   }
@@ -75,8 +75,8 @@ protected:
   REF(Transport_K_Eps_V2)  mon_eq_transport_K_Eps;
   REF(Transport_V2)  mon_eq_transport_V2;
 
-  virtual void associer_pb(const Probleme_base& pb);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_pb(const Probleme_base& pb) override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 };
 
 

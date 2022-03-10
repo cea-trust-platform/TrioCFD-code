@@ -46,17 +46,17 @@ class Modele_Jones_Launder_Thermique_VDF : public Modele_Fonc_Bas_Reynolds_Therm
 
 public :
 
-  DoubleTab& Calcul_D(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const;
-  DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const;
-  DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  DoubleTab& Calcul_F2(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  DoubleTab& Calcul_F3(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  DoubleTab& Calcul_F4(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
-  DoubleTab& Calcul_Flambda ( DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;
+  DoubleTab& Calcul_D(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const override;
+  DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const override;
+  DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const override ;
+  DoubleTab& Calcul_F2(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const override ;
+  DoubleTab& Calcul_F3(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const override ;
+  DoubleTab& Calcul_F4(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const override ;
+  DoubleTab& Calcul_Flambda ( DoubleTab&,const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const override ;
   Entree& lire(const Motcle&, Entree&);
-  void associer_pb(const Probleme_base& );
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
-  void mettre_a_jour(double);
+  void associer_pb(const Probleme_base& ) override;
+  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void mettre_a_jour(double) override;
 
 protected:
 

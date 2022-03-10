@@ -57,19 +57,19 @@ public :
 
   inline Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(double cte1 = C11_DEFAULT,
                                                       double cte2 = C21_DEFAULT );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
   inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
   inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  virtual void associer_pb(const Probleme_base& );
-  void mettre_a_jour(double temps)
+  void associer_pb(const Probleme_base& ) override;
+  void mettre_a_jour(double temps) override
   {
     Calcul_Production_K_VEF::mettre_a_jour(temps);
   }
 
 protected :
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
   double C1;
   double C2;
 
@@ -103,9 +103,9 @@ class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face :
 
 public:
 
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
   inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
   inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
   inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face(double cte1 = C11_DEFAULT,

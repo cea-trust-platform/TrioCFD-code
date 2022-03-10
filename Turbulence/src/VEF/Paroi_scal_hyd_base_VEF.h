@@ -34,13 +34,13 @@ class Paroi_scal_hyd_base_VEF  : public Turbulence_paroi_scal_base
   Declare_base(Paroi_scal_hyd_base_VEF);
 
 public:
-  void associer(const Zone_dis& ,const Zone_Cl_dis& );
-  virtual int init_lois_paroi();
-  virtual void imprimer_nusselt(Sortie&) const;
+  void associer(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  int init_lois_paroi() override;
+  void imprimer_nusselt(Sortie&) const override;
 
   inline const DoubleVect& tab_d_reel() const;
   inline DoubleVect& tab_d_reel();
-  virtual DoubleVect& equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const ;
+  DoubleVect& equivalent_distance_name(DoubleVect& d_eq, const Nom& nom_bord) const override ;
 protected :
   REF(Zone_VEF) la_zone_VEF;
   REF(Zone_Cl_VEF) la_zone_Cl_VEF;

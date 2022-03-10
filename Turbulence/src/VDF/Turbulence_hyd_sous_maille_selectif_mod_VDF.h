@@ -47,11 +47,11 @@ class Turbulence_hyd_sous_maille_selectif_mod_VDF : public Turbulence_hyd_sous_m
 
 public:
 
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void calculer_fonction_structure();
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void calculer_fonction_structure() override;
   int a_pour_Champ_Fonc(const Motcle&, REF(Champ_base)& ) const;
-  void discretiser();
+  void discretiser() override;
   inline Turbulence_hyd_sous_maille_selectif_mod_VDF();
 
 protected :

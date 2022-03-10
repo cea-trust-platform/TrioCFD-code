@@ -40,7 +40,7 @@ class Schema_Euler_explicite_ALE: public Schema_Euler_explicite
 
 public :
 
-  virtual int faire_un_pas_de_temps_eqn_base(Equation_base&);
+  int faire_un_pas_de_temps_eqn_base(Equation_base&) override;
 
 };
 

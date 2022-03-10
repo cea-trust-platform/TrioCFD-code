@@ -47,8 +47,8 @@ class Modele_turbulence_hyd_K_Eps_V2_VDF : public Modele_turbulence_hyd_K_Eps_V2
 
 public:
 
-  void mettre_a_jour(double );
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
+  void mettre_a_jour(double ) override;
+  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
   DoubleTab& Calculer_Echelle_T(const DoubleTab&, const DoubleTab&, DoubleTab&, DoubleTab&, double, double, DoubleTab&);
   DoubleTab& Calculer_Echelle_L(const DoubleTab&, const DoubleTab&, DoubleTab&, DoubleTab&, double, double,DoubleTab& );
   DoubleTab& calculer_Sij(const Zone_VDF& ,const Zone_Cl_VDF& , DoubleTab& ,const DoubleTab&,Champ_Face& );

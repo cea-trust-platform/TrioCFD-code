@@ -37,13 +37,13 @@ class Paroi_loi_WW_hyd_VEF : public Paroi_std_hyd_VEF
   /* PUBLIC */
 public:
   inline Paroi_loi_WW_hyd_VEF();
-  virtual void set_param(Param& param);
+  void set_param(Param& param) override;
 
   /* calculer_hyd pour k-epsilon qui renvoie une erreur */
-  int calculer_hyd(DoubleTab& );
+  int calculer_hyd(DoubleTab& ) override;
 
   /* calculer_hyd pour L.E.S */
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
 
   /* PROTECTED */
@@ -55,7 +55,7 @@ protected :
 
   double Y0 ;
 
-  int init_lois_paroi_hydraulique();
+  int init_lois_paroi_hydraulique() override;
   int preparer_calcul_hyd(DoubleTab& );
   int calculer_u_star_sous_couche_visq(double ,double ,double ,int );
   int calculer_u_star_couche_puissance(double ,double ,double ,int );

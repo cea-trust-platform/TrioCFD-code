@@ -46,12 +46,12 @@ class Diffu_k : public Diffu_totale_hyd_base
 
 public :
 
-  double calculer_a_local(int ind);
+  double calculer_a_local(int ind) override;
   void associer_modele_echelles(Mod_echelle_LRM_base& mod)
   {
     mod_echelle_LRM_base = mod;
   };
-  double calculer_D_local(int ind)
+  double calculer_D_local(int ind) override
   {
     return 1.;
   };

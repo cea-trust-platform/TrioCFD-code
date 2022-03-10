@@ -40,8 +40,8 @@ class Paroi_negligeable_scal_VEF : public Paroi_scal_hyd_base_VEF
 
   Declare_instanciable(Paroi_negligeable_scal_VEF);
 public:
-  int calculer_scal(Champ_Fonc_base&);
-  virtual bool use_equivalent_distance() const;
+  int calculer_scal(Champ_Fonc_base&) override;
+  bool use_equivalent_distance() const override;
 };
 
 #endif

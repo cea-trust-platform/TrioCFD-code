@@ -46,13 +46,13 @@ class Algo_Couple_1 : public Algo_MG_base
 
 public:
 
-  virtual int initialiser();
+  int initialiser() override;
 
   // Les methodes suivantes sont specifiques a une resolution par
   // avance en temps.
 
-  virtual double computeTimeStep(bool& stop) const;
-  virtual bool solveTimeStep();
+  double computeTimeStep(bool& stop) const override;
+  bool solveTimeStep() override;
 
 private:
   int dt_unif;

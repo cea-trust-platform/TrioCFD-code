@@ -49,17 +49,17 @@ class Source_Con_Phase_field : public Source_Con_Phase_field_base
   Declare_instanciable(Source_Con_Phase_field);
 
 public:
-  void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double );
-  void premier_demi_dt();
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double ) override;
+  void premier_demi_dt() override;
 
-  inline const DoubleVect& get_u_carre();
+  inline const DoubleVect& get_u_carre() override;
 
   inline double drhodc(const int& n_elem) const;
 
-  void calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const;
+  void calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const override;
 
 protected:
   int tpsaff;
@@ -91,7 +91,7 @@ protected:
   int nkr, nit;
   double rec_min, rec_max, epsGMRES;
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
   DoubleTab& laplacien(const DoubleTab&, DoubleTab&) const;
   DoubleTab& div_kappa_grad(const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   void calculer_alpha_gradC_carre(DoubleTab&) const;

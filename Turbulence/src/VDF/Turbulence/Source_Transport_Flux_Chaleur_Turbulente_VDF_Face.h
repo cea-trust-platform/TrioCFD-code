@@ -63,18 +63,18 @@ class Source_Transport_Flux_Chaleur_Turbulente_VDF_Face : public Source_base
   Declare_instanciable_sans_constructeur(Source_Transport_Flux_Chaleur_Turbulente_VDF_Face);
 
 public :
-  void associer_pb(const Probleme_base& );
+  void associer_pb(const Probleme_base& ) override;
   inline Source_Transport_Flux_Chaleur_Turbulente_VDF_Face(double cte1 = c1_DEFAULT, double cte2 = c2_DEFAULT,  double cte3 = c3_DEFAULT);
 
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&, const DoubleTab&,const DoubleVect&) const;
 
   DoubleTab& calculer_uiuj(const Zone_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
   DoubleTab& calculer_Grad_U(const Zone_VDF&, const DoubleTab&, const DoubleTab&, DoubleTab&) const;
 
-  void mettre_a_jour(double temps)
+  void mettre_a_jour(double temps) override
   {
     ;
   };
@@ -93,7 +93,7 @@ protected :
   REF(Champ_Don) beta_t;
   REF(Champ_Don_base) gravite_;
   REF(Modele_turbulence_hyd_K_Eps_Bas_Reynolds) le_modele;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 
 };
 

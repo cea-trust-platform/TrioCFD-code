@@ -44,14 +44,14 @@ class Source_Qdm_VDF_Phase_field : public Source_base, public Terme_Source_Qdm
   Declare_instanciable(Source_Qdm_VDF_Phase_field);
 
 public:
-  void associer_pb(const Probleme_base& );
+  void associer_pb(const Probleme_base& ) override;
   DoubleTab& methode_1(DoubleTab& ) const;
   DoubleTab& methode_2(DoubleTab& ) const;
   DoubleTab& methode_3(DoubleTab& ) const;
   DoubleTab& methode_4(DoubleTab& ) const;
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double ) override;
 
 protected:
   int terme_source;
@@ -65,7 +65,7 @@ protected:
 
   REF(Zone_VDF) la_zone_VDF;
   REF(Zone_Cl_VDF) la_zone_Cl_VDF;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
   REF(Probleme_base) le_probleme2;
   DoubleTab& (Source_Qdm_VDF_Phase_field::*methode)(DoubleTab& ) const;
 };

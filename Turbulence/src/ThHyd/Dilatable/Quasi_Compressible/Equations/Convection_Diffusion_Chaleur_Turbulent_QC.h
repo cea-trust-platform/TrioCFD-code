@@ -49,24 +49,24 @@ class Convection_Diffusion_Chaleur_Turbulent_QC : public Convection_Diffusion_Tu
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void completer();
-  int sauvegarder(Sortie&) const;
-  int reprendre(Entree&);
-  void mettre_a_jour(double );
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void completer() override;
+  int sauvegarder(Sortie&) const override;
+  int reprendre(Entree&) override;
+  void mettre_a_jour(double ) override;
   void mettre_a_jour_modele(double );
-  int preparer_calcul();
-  virtual bool initTimeStep(double dt);
+  int preparer_calcul() override;
+  bool initTimeStep(double dt) override;
 
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
-  void imprimer(Sortie& os) const;
-  const RefObjU& get_modele(Type_modele type) const;
+  void imprimer(Sortie& os) const override;
+  const RefObjU& get_modele(Type_modele type) const override;
 
 
 };

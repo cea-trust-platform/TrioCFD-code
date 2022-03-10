@@ -44,8 +44,8 @@ class Diffu_laminaire : public Diffu_totale_hyd_base
 
 public :
 
-  double calculer_a_local(int ind);
-  double calculer_D_local(int ind)
+  double calculer_a_local(int ind) override;
+  double calculer_D_local(int ind) override
   {
     return 1.;
   };

@@ -49,17 +49,17 @@ class Modele_turbulence_Longueur_Melange_VEF : public Mod_turb_hyd_RANS_0_eq
 public:
 
   Modele_turbulence_Longueur_Melange_VEF();
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  void associer(const Zone_dis&, const Zone_Cl_dis&);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  void associer(const Zone_dis&, const Zone_Cl_dis&) override;
   void lire_distance_paroi( );
-  void discretiser();
-  int preparer_calcul();
+  void discretiser() override;
+  int preparer_calcul() override;
 
 protected :
 
-  virtual Champ_Fonc& calculer_viscosite_turbulente();
-  virtual void calculer_energie_cinetique_turb();
+  Champ_Fonc& calculer_viscosite_turbulente() override;
+  void calculer_energie_cinetique_turb() override;
   void calculer_Sij2();
   void calculer_f_amortissement();
 

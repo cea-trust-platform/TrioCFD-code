@@ -47,9 +47,9 @@ public:
                                           int nb_fa7Intersectees,
                                           const IntTab& couples_fa7Intersectees,
                                           const DoubleTab& segmentsInter_fa7Intersectees,
-                                          Champ_base& indicatrice);
+                                          Champ_base& indicatrice) override;
   int traite_RuptureCoalescenceInterfaces(Maillage_FT_Disc& maillage,
-                                          Champ_base& indicatrice) const;
+                                          Champ_base& indicatrice) const override;
 
 protected:
   enum Source_Isovaleur { INDICATRICE = 0, FONCTION_DISTANCE = 1};

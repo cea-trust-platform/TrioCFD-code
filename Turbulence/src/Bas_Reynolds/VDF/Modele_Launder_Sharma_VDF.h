@@ -39,11 +39,11 @@ class Modele_Launder_Sharma_VDF : public Modele_Jones_Launder_VDF
 
 public :
 
-  DoubleTab& Calcul_Fmu (DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don&) const;
+  DoubleTab& Calcul_Fmu (DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const Champ_Don&) const override;
 
-  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const ;
+  DoubleTab& Calcul_Fmu_BiK ( DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,const Champ_Don& )const override ;
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
+  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
   Entree& lire(const Motcle&, Entree&);
 
 protected:

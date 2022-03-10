@@ -40,8 +40,8 @@ public:
   inline void mettre_a_jour(double );
   inline void discretiser();
   inline void completer();
-  inline int sauvegarder(Sortie& os) const;
-  inline int reprendre(Entree& is);
+  inline int sauvegarder(Sortie& os) const override;
+  inline int reprendre(Entree& is) override;
   inline DoubleTab& Calcul_D(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&, double) const;
   inline DoubleTab& Calcul_E(DoubleTab&,const Zone_dis&,const Zone_Cl_dis&,const DoubleTab&,const DoubleTab&,double,const DoubleTab& ) const;
   inline DoubleTab& Calcul_F1(DoubleTab&, const Zone_dis&,const DoubleTab&,const DoubleTab&,double,double) const ;

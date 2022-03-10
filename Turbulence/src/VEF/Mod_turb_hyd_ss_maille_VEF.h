@@ -45,8 +45,8 @@ class Mod_turb_hyd_ss_maille_VEF : public Mod_turb_hyd_ss_maille
 
 public:
 
-  void associer(const Zone_dis& , const Zone_Cl_dis& );
-  virtual void calculer_longueurs_caracteristiques();
+  void associer(const Zone_dis& , const Zone_Cl_dis& ) override;
+  void calculer_longueurs_caracteristiques() override;
 
 protected :
 

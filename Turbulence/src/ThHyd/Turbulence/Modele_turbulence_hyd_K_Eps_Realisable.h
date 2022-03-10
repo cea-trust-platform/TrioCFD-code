@@ -45,20 +45,20 @@ class Modele_turbulence_hyd_K_Eps_Realisable : public  Mod_turb_hyd_RANS
 
 public:
 
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
-  int preparer_calcul();
-  void verifie_loi_paroi();
-  virtual bool initTimeStep(double dt);
-  void mettre_a_jour(double );
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  int preparer_calcul() override;
+  void verifie_loi_paroi() override;
+  bool initTimeStep(double dt) override;
+  void mettre_a_jour(double ) override;
   virtual inline Champ_Inc& K_Eps();
   virtual inline const Champ_Inc& K_Eps() const;
-  virtual void completer();
+  void completer() override;
 
-  inline int nombre_d_equations() const;
-  inline Transport_K_Eps_base& eqn_transp_K_Eps();
-  inline const Transport_K_Eps_base& eqn_transp_K_Eps() const;
-  const Equation_base& equation_k_eps(int) const ;
+  inline int nombre_d_equations() const override;
+  inline Transport_K_Eps_base& eqn_transp_K_Eps() override;
+  inline const Transport_K_Eps_base& eqn_transp_K_Eps() const override;
+  const Equation_base& equation_k_eps(int) const override ;
 
   inline Modele_Fonc_Realisable& associe_modele_fonction();
   inline const Modele_Fonc_Realisable& associe_modele_fonction() const;
@@ -70,8 +70,8 @@ public:
   /////////////////////////////////////////////////////
   //Methode creer_champ pas codde a surcharger
   //virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
 private :

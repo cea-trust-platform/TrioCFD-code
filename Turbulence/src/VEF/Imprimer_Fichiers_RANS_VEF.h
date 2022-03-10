@@ -40,7 +40,7 @@ class Imprimer_Fichiers_RANS_VEF : public Interprete
 {
   Declare_instanciable(Imprimer_Fichiers_RANS_VEF);
 public :
-  Entree& interpreter(Entree&);
+  Entree& interpreter(Entree&) override;
 
 
 };
