@@ -88,7 +88,7 @@ Read pb
         evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
         solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg } # solveur historique : gcp { precond ssor { omega 1.6 } seuil 1e15 } #
         convection { negligeable }
-        diffusion  { turbulente k_tau { } }
+        diffusion  { turbulente k_omega { } }
         initial_conditions
         {
 	    vitesse Champ_Uniforme 2 0. 0.
@@ -135,14 +135,14 @@ Read pb
 	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
 	}
     }
-    echelle_temporelle_turbulente
+    taux_dissipation_turbulent
     {
         diffusion { negligeable } 
         convection { negligeable }
-        initial_conditions { tau Champ_Fonc_xyz dom 1 0.92*0.09 }
+        initial_conditions { omega Champ_Fonc_xyz dom 1 1/(0.92*0.09) }
         boundary_conditions
         {
-	    sym scalaire_impose_paroi Champ_front_uniforme 1 0 
+	    sym scalaire_impose_paroi Champ_front_uniforme 1 1
         }
 	sources
 	{
@@ -158,27 +158,22 @@ Post_processing
 	{
 	epsilon transformation
             {
-                methode formule expression 1 k_loc/tau_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb tau nom_source tau_loc  } }
-            }
-	k_tau transformation
-            {
-                methode formule expression 1 k_loc*tau_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb tau nom_source tau_loc  } }
+                methode formule expression 1 k_loc*omega_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb omega nom_source omega_loc  } }
             }
 	}
  	Probes 
 	{
 		sonde_vitesse vitesse periode 0.01 points 1 0.5 0.5
 		sonde_k 	     k periode 0.01 points 1 0.5 0.5
-		sonde_tau 	   tau periode 0.01 points 1 0.5 0.5
+		sonde_omega 	 omega periode 0.01 points 1 0.5 0.5
 		sonde_epsilon epsilon periode 0.01 points 1 0.5 0.5 
-		sonde_k_tau     k_tau periode 0.01 points 1 0.5 0.5 
 		sonde_visc viscosite_turbulente_liquide_eau periode 0.01 points 1 0.5 0.5
 	} 
 	fields dt_post 200.
 	{
 			vitesse elem
 			k elem
-			tau elem
+			omega elem
 			epsilon elem
 	}
 }
