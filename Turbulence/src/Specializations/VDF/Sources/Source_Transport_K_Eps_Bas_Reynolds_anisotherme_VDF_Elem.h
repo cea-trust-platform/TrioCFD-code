@@ -37,8 +37,8 @@ public:
     C2 = cte2;
   }
 
-  DoubleTab& ajouter(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
 };
 
 //.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem
@@ -54,7 +54,7 @@ public:
     C2 = cte2;
   }
 
-  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem_included */

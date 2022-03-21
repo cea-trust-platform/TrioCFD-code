@@ -39,21 +39,21 @@ public:
     C2 = cte2;
   }
 
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
-  inline DoubleTab& ajouter(DoubleTab& resu) const { return Source_Transport_VDF_Elem_base::ajouter_keps(resu); }
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const  override;
+  inline DoubleTab& ajouter(DoubleTab& resu) const  override { return Source_Transport_VDF_Elem_base::ajouter_keps(resu); }
 
 protected:
   REF(Transport_K_Eps)  mon_eq_transport_K_Eps;
-  virtual void associer_pb(const Probleme_base& pb);
+  void associer_pb(const Probleme_base& pb) override;
 
 private:
-  const DoubleTab& get_visc_turb() const;
-  const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const ;
-  void calculer_terme_production(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleVect&) const;
-  void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don& , DoubleTab& , DoubleTab& ) const;
-  void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const;
-  void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const;
-  void fill_resu(const DoubleVect& , DoubleTab& ) const;
+  const DoubleTab& get_visc_turb() const override;
+  const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const  override;
+  void calculer_terme_production(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleVect&) const override;
+  void calcul_D_E(const DoubleTab& , const DoubleTab& , const Champ_Don& , DoubleTab& , DoubleTab& ) const override;
+  void calcul_F1_F2(const Champ_base& , DoubleTab& , DoubleTab& , DoubleTab& , DoubleTab& ) const override;
+  void fill_resu_bas_rey(const DoubleVect& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const override;
+  void fill_resu(const DoubleVect& , DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_K_Eps_VDF_Elem_included */

@@ -34,11 +34,11 @@ public:
   Source_Transport_Eps_anisotherme_VDF_Elem(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) :
     Source_Transport_Eps_VDF_Elem(cte1,cte2) { C3 = cte3; }
 
-  DoubleTab& ajouter(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
 
 private:
-  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_Eps_anisotherme_VDF_Elem_included */

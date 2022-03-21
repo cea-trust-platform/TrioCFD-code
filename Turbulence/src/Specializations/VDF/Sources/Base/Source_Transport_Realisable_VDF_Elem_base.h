@@ -32,7 +32,7 @@ class Source_Transport_Realisable_VDF_Elem_base : public Source_Transport_VDF_El
 public :
   Source_Transport_Realisable_VDF_Elem_base() { } // XXX ne touche pas
   Source_Transport_Realisable_VDF_Elem_base(double cte2) { C2 = cte2; }
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const  override;
 
 protected :
   static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Chabard et N3S
@@ -47,7 +47,7 @@ protected :
 
 private:
   // methodes a surcharger sinon throw !!
-  virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
+  const DoubleTab& get_visc_turb() const  override { return not_implemented<DoubleTab&>(__func__); }
   virtual const Modele_Fonc_Realisable_base& get_modele_fonc() const { return not_implemented<Modele_Fonc_Realisable_base&>(__func__); }
   virtual void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const { return not_implemented<void>(__func__); }

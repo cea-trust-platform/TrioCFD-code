@@ -30,15 +30,15 @@ class Source_Transport_K_Realisable_VDF_Elem : public Source_Transport_Realisabl
 {
   Declare_instanciable(Source_Transport_K_Realisable_VDF_Elem);
 public :
-  DoubleTab& ajouter(DoubleTab& ) const;
-  void mettre_a_jour(double temps);
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void mettre_a_jour(double temps) override;
+  void associer_pb(const Probleme_base& ) override;
 
 protected :
   REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea, eqn_eps_Rea;
 
 private:
-  void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const;
+  void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const override;
 };
 
 #endif /* Source_Transport_K_Realisable_VDF_Elem_included */

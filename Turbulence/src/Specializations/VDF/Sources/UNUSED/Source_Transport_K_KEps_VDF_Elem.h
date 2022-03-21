@@ -34,11 +34,11 @@ class Source_Transport_K_KEps_VDF_Elem : public Source_Transport_VDF_Elem_base
   Declare_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem);
 public:
   Source_Transport_K_KEps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) { }
-  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
 
 protected:
   REF(Transport_K_KEps)  mon_eq_transport_K_Eps;
-  virtual void associer_pb(const Probleme_base& pb);
+  void associer_pb(const Probleme_base& pb) override;
 };
 
 #endif /* Source_Transport_K_KEps_VDF_Elem_included */

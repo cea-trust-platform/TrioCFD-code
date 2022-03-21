@@ -46,19 +46,13 @@ class Mod_turb_hyd_ss_maille : public Mod_turb_hyd_base
 public:
 
   Mod_turb_hyd_ss_maille();
-  void set_param(Param& param);
-  virtual void discretiser();
-  int preparer_calcul();
-  virtual void completer();
-  void mettre_a_jour(double );
-  inline virtual Champ_Fonc& energie_cinetique_turbulente()
-  {
-    return energie_cinetique_turb_;
-  };
-  inline virtual const Champ_Fonc& energie_cinetique_turbulente() const
-  {
-    return energie_cinetique_turb_;
-  };
+  void set_param(Param& param) override;
+  void discretiser() override;
+  int preparer_calcul()  override;
+  void completer() override;
+  void mettre_a_jour(double ) override;
+  inline virtual Champ_Fonc& energie_cinetique_turbulente() { return energie_cinetique_turb_; }
+  inline virtual const Champ_Fonc& energie_cinetique_turbulente() const { return energie_cinetique_turb_; }
   virtual void calculer_longueurs_caracteristiques()=0;
   virtual Champ_Fonc& calculer_viscosite_turbulente()=0;
   virtual void calculer_energie_cinetique_turb();

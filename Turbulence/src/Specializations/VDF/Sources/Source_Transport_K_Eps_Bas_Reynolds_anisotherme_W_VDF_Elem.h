@@ -37,8 +37,8 @@ public:
     C2 = cte2;
   }
 
-  DoubleTab& ajouter(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
 
 protected:
   DoubleTab& calculer_gteta2(const Zone_VDF&,DoubleTab&,const DoubleTab&,double,const DoubleVect&) const;

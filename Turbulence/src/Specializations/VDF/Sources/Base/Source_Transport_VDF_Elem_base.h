@@ -44,13 +44,13 @@ class Source_Transport_VDF_Elem_base : public Source_base, public Calcul_Product
 public :
   Source_Transport_VDF_Elem_base() { }
   Source_Transport_VDF_Elem_base(double cs1, double cs2) : C1(cs2), C2(cs2) { }
-  DoubleTab& calculer(DoubleTab& ) const;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_pb(const Probleme_base& ) override;
 
-  virtual DoubleTab& ajouter(DoubleTab& ) const = 0; // XXX XXX XXX Elie Saikali : like that !!
+  DoubleTab& ajouter(DoubleTab& ) const override= 0; // XXX XXX XXX Elie Saikali : like that !!
 
-  inline virtual void mettre_a_jour(double t) { Calcul_Production_K_VDF::mettre_a_jour(t); }
+  inline void mettre_a_jour(double t)  override { Calcul_Production_K_VDF::mettre_a_jour(t); }
 
 protected :
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S

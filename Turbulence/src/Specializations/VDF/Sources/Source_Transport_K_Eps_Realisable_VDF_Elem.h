@@ -31,20 +31,20 @@ class Source_Transport_K_Eps_Realisable_VDF_Elem : public Source_Transport_Reali
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_VDF_Elem);
 public :
   Source_Transport_K_Eps_Realisable_VDF_Elem( double cte2 = C21_R__ ) : Source_Transport_Realisable_VDF_Elem_base(cte2) { C2 = cte2; }
-  void mettre_a_jour(double temps);
-  virtual void associer_pb(const Probleme_base& );
+  void mettre_a_jour(double temps) override;
+  void associer_pb(const Probleme_base& ) override;
 
-  inline DoubleTab& ajouter(DoubleTab& resu) const { return Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(resu); }
+  inline DoubleTab& ajouter(DoubleTab& resu) const  override { return Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(resu); }
 
 protected :
   REF(Transport_K_Eps_Realisable) eqn_keps_Rea;
 
 private:
-  const DoubleTab& get_visc_turb() const;
-  const Modele_Fonc_Realisable_base& get_modele_fonc() const;
-  void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const;
-  void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const;
-  void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const;
+  const DoubleTab& get_visc_turb() const override;
+  const Modele_Fonc_Realisable_base& get_modele_fonc() const override;
+  void calculer_terme_production_real(const Champ_Face&, const DoubleTab& , const DoubleTab& , DoubleTrav&) const override;
+  void fill_resu_real(const int , const DoubleTab& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , double& , DoubleTab& ) const override;
+  void fill_coeff_matrice(const int , const DoubleTab& , const DoubleVect& , const DoubleVect& , double& , Matrice_Morse& ) const override;
 };
 
 #endif /* Source_Transport_K_Eps_Realisable_VDF_Elem_included */

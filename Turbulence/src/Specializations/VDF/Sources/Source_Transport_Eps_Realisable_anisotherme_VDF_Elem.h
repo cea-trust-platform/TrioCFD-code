@@ -32,11 +32,11 @@ class Source_Transport_Eps_Realisable_anisotherme_VDF_Elem : public Source_Trans
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_anisotherme_VDF_Elem);
 public:
   Source_Transport_Eps_Realisable_anisotherme_VDF_Elem(double cte2 = C2__, double cte3 = C3_R__) : Source_Transport_Eps_Realisable_VDF_Elem(cte2) { C3 = cte3; }
-  virtual void associer_pb(const Probleme_base& );
-  DoubleTab& ajouter(DoubleTab& ) const;
+  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const override;
 
 private:
-  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_Eps_Realisable_anisotherme_VDF_Elem_included */

@@ -40,15 +40,15 @@ class Op_Diff_K_Eps_Bas_Re_VDF_base : public Op_Diff_K_Eps_Bas_Re_base, public O
 public:
   Op_Diff_K_Eps_Bas_Re_VDF_base(const Iterateur_VDF_base& iter_base) : iter(iter_base) { }
 
-  void completer();
+  void completer() override;
 
-  inline void mettre_a_jour_diffusivite() const { /* do nothing */ }
-  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const { iter->ajouter_contribution(inco, matrice); }
-  inline void contribuer_au_second_membre(DoubleTab& resu) const { iter->contribuer_au_second_membre(resu); }
-  inline void dimensionner(Matrice_Morse& matrice) const { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
-  inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const { Op_VDF_Elem::modifier_pour_Cl(iter->zone(), iter->zone_Cl(), matrice, secmem); }
-  inline DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& resu) const { return iter->ajouter(inco, resu); }
-  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const { return iter->calculer(inco, resu); }
+  inline void mettre_a_jour_diffusivite() const  { /* do nothing */ }
+  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const  override { iter->ajouter_contribution(inco, matrice); }
+  inline void contribuer_au_second_membre(DoubleTab& resu) const  override { iter->contribuer_au_second_membre(resu); }
+  inline void dimensionner(Matrice_Morse& matrice) const override { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
+  inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const  override { Op_VDF_Elem::modifier_pour_Cl(iter->zone(), iter->zone_Cl(), matrice, secmem); }
+  inline DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& resu) const override { return iter->ajouter(inco, resu); }
+  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override { return iter->calculer(inco, resu); }
 
   inline Iterateur_VDF& get_iter() { return iter; }
 

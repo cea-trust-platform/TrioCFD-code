@@ -36,7 +36,7 @@ public:
     dv_diffusivite.ref(diffu.valeurs());
   }
 
-  inline virtual void mettre_a_jour()
+  inline void mettre_a_jour()  override
   {
     (diffusivite_->valeurs().echange_espace_virtuel());
     dv_diffusivite.ref(diffusivite_->valeurs());
@@ -44,17 +44,11 @@ public:
   }
 
   // Methods used by the flux computation in template class:
-  inline double nu_1_impl(int i, int compo) const
-  {
-    return dv_diffusivite(i) + dv_diffusivite_turbulente(i)/Prdt[compo];
-  }
+  inline double nu_1_impl(int i, int compo) const { return dv_diffusivite(i) + dv_diffusivite_turbulente(i)/Prdt[compo]; }
 
   inline double nu_2_impl(int i, int compo) const { return nu_1_impl(i,compo); }
 
-  inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const
-  {
-    return 0.5*(nu_1_impl(i,compo)+nu_1_impl(j,compo))/(d0+d1);
-  }
+  inline double compute_heq_impl(double d0, int i, double d1, int j, int compo) const { return 0.5*(nu_1_impl(i,compo)+nu_1_impl(j,compo))/(d0+d1); }
 
 protected:
   DoubleVect dv_diffusivite;

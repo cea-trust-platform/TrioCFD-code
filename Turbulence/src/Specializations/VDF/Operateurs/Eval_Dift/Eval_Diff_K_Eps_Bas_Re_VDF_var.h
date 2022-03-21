@@ -39,7 +39,7 @@ public:
 
   inline void associer_diff_turb(const Champ_Fonc& diffu) { diffusivite_turbulente_ = diffu; }
   inline const Champ_Fonc& diffusivite_turbulente() const { return diffusivite_turbulente_.valeur(); }
-  inline void mettre_a_jour() { dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); }
+  inline void mettre_a_jour() override { dv_diffusivite_turbulente.ref(diffusivite_turbulente_->valeurs()); }
 
   // pour CRTP
   inline double nu_1_impl(int i, int compo) const

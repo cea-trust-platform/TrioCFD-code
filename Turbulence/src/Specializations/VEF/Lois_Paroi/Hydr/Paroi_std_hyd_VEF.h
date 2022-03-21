@@ -55,13 +55,13 @@ class Paroi_std_hyd_VEF : public Paroi_hyd_base_VEF, public Paroi_log_QDM
 public:
 
   Paroi_std_hyd_VEF();
-  virtual void set_param(Param& param);
-  virtual int init_lois_paroi();
-  int calculer_hyd(DoubleTab& );
-  int calculer_hyd_BiK(DoubleTab& , DoubleTab& );
-  int calculer_hyd(DoubleTab& , DoubleTab& );
+  void set_param(Param& param) override;
+  int init_lois_paroi() override;
+  int calculer_hyd(DoubleTab& ) override;
+  int calculer_hyd_BiK(DoubleTab& , DoubleTab& ) override;
+  int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
-  void imprimer_ustar(Sortie& ) const;
+  void imprimer_ustar(Sortie& ) const override;
   double calculer_u_plus(const int& ,const double& ,const  double& erugu );
 
   virtual int calculer_k_eps(double& , double& , double , double , double , double);

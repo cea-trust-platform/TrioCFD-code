@@ -36,7 +36,7 @@ public :
   }
 
 private:
-  void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const;
+  void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem_included */

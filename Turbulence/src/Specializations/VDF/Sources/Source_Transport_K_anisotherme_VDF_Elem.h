@@ -31,11 +31,11 @@ class Source_Transport_K_anisotherme_VDF_Elem : public Source_Transport_K_VDF_El
 {
   Declare_instanciable(Source_Transport_K_anisotherme_VDF_Elem);
 public:
-  DoubleTab& ajouter(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
 
 private:
-  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const;
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;
 };
 
 #endif /* Source_Transport_K_anisotherme_VDF_Elem_included */

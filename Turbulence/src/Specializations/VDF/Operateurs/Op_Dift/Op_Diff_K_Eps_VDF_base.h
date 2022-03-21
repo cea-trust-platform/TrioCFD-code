@@ -38,26 +38,26 @@ class Op_Diff_K_Eps_VDF_base : public Op_Diff_K_Eps_base, public Op_VDF_Elem
 public:
   Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& iter_base) : iter(iter_base) { }
 
-  void completer();
-  void associer_diffusivite(const Champ_base& ch_diff);
-  void associer_diffusivite_turbulente();
-  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
+  void completer() override;
+  void associer_diffusivite(const Champ_base& ch_diff) override;
+  void associer_diffusivite_turbulente() override;
+  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
   const Champ_Fonc& diffusivite_turbulente() const;
-  const Champ_base& diffusivite() const;
+  const Champ_base& diffusivite() const override;
 
   virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }
 
-  inline void dimensionner(Matrice_Morse& matrice) const { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
-  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const { iter->ajouter_contribution(inco, matrice); }
-  inline void contribuer_au_second_membre(DoubleTab& resu) const { iter->contribuer_au_second_membre(resu); }
+  inline void dimensionner(Matrice_Morse& matrice) const  override { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
+  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const  override { iter->ajouter_contribution(inco, matrice); }
+  inline void contribuer_au_second_membre(DoubleTab& resu) const  override { iter->contribuer_au_second_membre(resu); }
 
-  inline DoubleTab& ajouter(const DoubleTab& inco,  DoubleTab& resu) const
+  inline DoubleTab& ajouter(const DoubleTab& inco,  DoubleTab& resu) const override
   {
     mettre_a_jour_diffusivite();
     return iter->ajouter(inco, resu);
   }
 
-  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const
+  inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override
   {
     mettre_a_jour_diffusivite();
     return iter->calculer(inco, resu);

@@ -30,8 +30,8 @@ class Source_Transport_Bas_Reynolds_VDF_Elem_base : public Source_Transport_VDF_
   Declare_base_sans_constructeur( Source_Transport_Bas_Reynolds_VDF_Elem_base ) ;
 public :
   Source_Transport_Bas_Reynolds_VDF_Elem_base(double cs1, double cs2) : Source_Transport_VDF_Elem_base(cs1,cs2) { }
-  DoubleTab& ajouter(DoubleTab& ) const;
-  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
 
 protected :
   static constexpr double C11__ = 1.55, C21__ = 2.; // pour Bas Re !
