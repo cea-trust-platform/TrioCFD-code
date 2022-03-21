@@ -14,9 +14,8 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Convection_Diffusion_Espece_Binaire_QC.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
-// Version:     /main/27
+// File:        Convection_Diffusion_Espece_Binaire_Turbulent_QC.cpp
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
 //
 //////////////////////////////////////////////////////////////////////////////
 

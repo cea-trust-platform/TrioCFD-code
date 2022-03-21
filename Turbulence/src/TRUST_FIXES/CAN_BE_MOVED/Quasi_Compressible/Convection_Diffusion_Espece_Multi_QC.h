@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Espece_Multi_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
-// Version:     /main/15
+// Directory:   $TURBULENCE_ROOT/src/TRUST_FIXES/CAN_BE_MOVED/Quasi_Compressible
 //
 //////////////////////////////////////////////////////////////////////////////
 

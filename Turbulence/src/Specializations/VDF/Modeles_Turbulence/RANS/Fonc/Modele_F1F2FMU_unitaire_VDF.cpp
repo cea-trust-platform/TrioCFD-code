@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Modele_F1F2FMU_unitaire_VDF.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Bas_Reynolds/src/VDF
-// Version:     /main/10
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VDF/Modeles_Turbulence/RANS/Fonc
 //
 //////////////////////////////////////////////////////////////////////////////
 

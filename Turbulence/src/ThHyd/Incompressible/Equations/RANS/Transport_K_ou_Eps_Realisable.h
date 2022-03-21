@@ -14,9 +14,8 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Transport_K_ou_Eps.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
-// Version:     /main/25
+// File:        Transport_K_ou_Eps_Realisable.h
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Incompressible/Equations/RANS
 //
 //////////////////////////////////////////////////////////////////////////////
 

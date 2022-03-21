@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Turbulence_hyd_sous_maille_SMAGO_DYN_VDF.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/18
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VDF/Modeles_Turbulence/LES/Hydr
 //
 //////////////////////////////////////////////////////////////////////////////
 #ifndef Turbulence_hyd_sous_maille_SMAGO_DYN_VDF_included

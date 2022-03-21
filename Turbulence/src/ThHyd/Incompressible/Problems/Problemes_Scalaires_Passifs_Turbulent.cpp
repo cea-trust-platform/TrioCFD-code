@@ -14,9 +14,8 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Problemes_Scalaires_Passifs.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
-// Version:     /main/7
+// File:        Problemes_Scalaires_Passifs_Turbulent.cpp
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Incompressible/Problems
 //
 //////////////////////////////////////////////////////////////////////////////
 

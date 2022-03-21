@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Ref_Modele_turbulence_scal_Fluctuation_Temperature_W_Bas_Re.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Turbulence
-// Version:     /main/6
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/Common/Scal/Refs
 //
 //////////////////////////////////////////////////////////////////////////////
 

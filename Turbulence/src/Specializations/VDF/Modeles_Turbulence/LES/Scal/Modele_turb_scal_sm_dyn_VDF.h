@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Modele_turb_scal_sm_dyn_VDF.h
-// Directory:   $TRUST_ROOT/src/VDF/Turbulence
-// Version:     /main/10
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VDF/Modeles_Turbulence/LES/Scal
 //
 //////////////////////////////////////////////////////////////////////////////
 #ifndef Modele_turb_scal_sm_dyn_VDF_included

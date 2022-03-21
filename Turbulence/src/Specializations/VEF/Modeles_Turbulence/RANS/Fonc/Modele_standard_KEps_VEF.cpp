@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Modele_standard_KEps_VEF.cpp
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Bas_Reynolds/src/VEF
-// Version:     /main/20
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Modeles_Turbulence/RANS/Fonc
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Modele_standard_KEps_VEF.h>

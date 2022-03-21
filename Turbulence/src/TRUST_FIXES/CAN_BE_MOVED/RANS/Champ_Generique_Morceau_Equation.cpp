@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Champ_Generique_Morceau_Equation.cpp
-// Directory:   $TRUST_ROOT/src/Kernel/Champs
-// Version:     /main/15
+// Directory:   $TURBULENCE_ROOT/src/TRUST_FIXES/CAN_BE_MOVED/RANS
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Champ_Generique_Morceau_Equation.h>

@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Paroi_scal_analytique_VEF.cpp
-// Directory:   $TRUST_ROOT/src/VEF/Turbulence
-// Version:     /main/10
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Lois_Paroi/Scal
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <Paroi_scal_analytique_VEF.h>
