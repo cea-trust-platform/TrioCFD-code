@@ -174,7 +174,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
         if (Type_diss == "tau")
           secmem_en *= pe(e) * ve(e) *      alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/std::max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
         else if (Type_diss == "omega")
-          secmem_en *= pe(e) * ve(e) * (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* ((tab_diss(e, n) <= 0) ? 0 : (std::max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
+          secmem_en *= pe(e) * ve(e) * (-1)*alpha_omega_* tab_alp(e, n) * tab_rho(e, n)* ((tab_diss(e, n) <= 0) ? 0 : 1/(std::max(tab_k(e, n)/tab_diss(e, n), visc_turb.limiteur() * nu(e, n)))) ;
         secmem(e, n) += secmem_en;
       }
 }
