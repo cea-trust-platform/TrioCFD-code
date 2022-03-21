@@ -35,6 +35,7 @@
 #include <EcritureLectureSpecial.h>
 #include <Param.h>
 #include <Array_tools.h>
+#include <DebogFT.h>
 #include <stat_counters.h>
 
 Implemente_instanciable_sans_constructeur(Remaillage_FT,"Remaillage_FT",Objet_U);
@@ -1022,8 +1023,12 @@ double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
 
   DoubleTabFT differentielle_volume;
   DoubleTabFT barycentres;
+  DebogFT::verifier_maillage_ft("Remaillage_FT::redistribuer_sommets maillage initial", maillage);
+  DebogFT::verifier_tableau_sommets("Remaillage_FT::redistribuer_sommets var_volume_impose", maillage, var_volume_impose);
   calculer_differentielle_volume       (maillage, differentielle_volume);
+  DebogFT::verifier_tableau_sommets("Remaillage_FT::redistribuer_sommets differentielle volume", maillage, differentielle_volume);
   calculer_barycentre_facettes_voisines(maillage, barycentres);
+  DebogFT::verifier_tableau_sommets("Remaillage_FT::redistribuer_sommets barycentres", maillage, barycentres);
 
 
   // Copie du tableau des sommets pour calculer la variation de volume a posteriori:
@@ -1123,6 +1128,7 @@ double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
       Journal() << "Remaillage_FT::redistribuer_sommets clipped_move "
                 << clipped_move << " / " << nb_som << finl;
     }
+  DebogFT::verifier_tableau_sommets("Remaillage_FT::redistribuer_sommets deplacement", maillage, deplacement);
   // Deplacement des sommets du maillage.
   const Desc_Structure_FT& desc = maillage.desc_sommets();
   desc.echange_espace_virtuel(deplacement);
@@ -1133,6 +1139,7 @@ double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
   maillage.update_tableau_apres_transport(var_volume_impose, new_nb_som, desc);
   maillage.update_tableau_apres_transport(sommets, new_nb_som, desc);
 
+  DebogFT::verifier_maillage_ft("Remaillage_FT::redistribuer_sommets maillage final", maillage);
   // Calcul de la variation de volume obtenue :
   double dvolume_tot = calculer_variation_volume(maillage, sommets, var_volume_obtenu);
   return dvolume_tot;
@@ -1159,6 +1166,8 @@ void Remaillage_FT::corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var
 //  Precondition: pas de facettes virtuelles
 void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage)
 {
+  static const Stat_Counter_Id stat_counter = statistiques().new_counter(3, "Barycentre_lissage");
+  statistiques().begin_count(stat_counter);
   if (Process::je_suis_maitre())
     Journal() << "barycentrer_lisser_systematique" << finl;
   temps_dernier_lissage_ = temps;
@@ -1173,6 +1182,7 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
                        seuil_dvolume_residuel_);
   supprimer_facettes_bord(maillage);
   nettoyer_maillage(maillage);
+  statistiques().end_count(stat_counter);
 }
 
 // Description: idem mais avec le nombre d'iterations de lissage si remaillage
@@ -1283,12 +1293,13 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
 
       }
 #endif
-
+      DebogFT::verifier_tableau_sommets("Remaillage_FT::regulariser var_vol initial", maillage, var_volume);
       if (iteration > 0)
         // Ne pas lisser la variation de volume demandee a la premiere iteration.
         // Ensuite, on repartit la correction de volume sur les noeuds voisins
         // pour eviter les singularites de deplacement des sommets:
         lisser_dvolume(maillage, var_volume, 1);
+      DebogFT::verifier_tableau_sommets("Remaillage_FT::regulariser var_vol apres lisser", maillage, var_volume);
 
 #if DEBUG_CONSERV_VOLUME
       {
@@ -1312,7 +1323,7 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
           for (int i = 0; i < n; i++)
             var_volume[i] += dv_courbure[i];
 
-
+          DebogFT::verifier_tableau_sommets("Remaillage_FT::regulariser var_vol apres ajout dv", maillage, var_volume);
 #if DEBUG_CONSERV_VOLUME
           {
             double dvol = calculer_somme_dvolume(maillage, dv_courbure);
@@ -1344,6 +1355,7 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
 
       }
 #endif
+      DebogFT::verifier_tableau_sommets("Remaillage_FT::regulariser var_vol_obtenu", maillage, var_volume_obtenu);
 
       // Calcul de la correction de volume a realiser a l'iteration suivante:
       var_volume -= var_volume_obtenu;
@@ -1590,6 +1602,10 @@ inline void produit_vectoriel(const FTd_vecteur3& a, const FTd_vecteur3& b, FTd_
 // Description:
 //    Cette fonction marque a supprimer les facettes ayant leurs 3 sommets de bord
 //    Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)
+//    MODIF GB 21/07/2015 : Pour le cas sloshing par exemple, si le domaine a des coins,
+//          l'interface peut contenir un element dont les 3 sommets sont sur le bord
+//          sans pour autant que la facette soit integralement sur le bord. Elle peut
+//          avoir son 3eme cote dans le domaine. Dans ce cas, on la conserve.
 // Precondition:
 // Parametre: maillage
 //    Signification: maillage a remailler
@@ -1609,8 +1625,17 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
   const int nb_facettes = maillage.nb_facettes();
   IntTab& facettes = maillage.facettes_;
   const int nb_som_par_facette = facettes.dimension(1);
+  // Raccourci vers les coordonnees des sommets du maillage eulerien
+#define CONSERVER_FACETTES_COINS
+#ifdef CONSERVER_FACETTES_COINS
+  const int dim = Objet_U::dimension;
+  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
+  const DoubleTab& sommets = maillage.sommets();
+  const Parcours_interface& parcours = maillage.refparcours_interface_.valeur();
+#endif
 
-  int fa7, isom, som, nb_bord;
+  DoubleTab xsom(3,3); // coords des sommets de la face: xs(isom_eul, direction)
+  int fa7, isom, som =0, nb_bord;
   for (fa7=0 ; fa7<nb_facettes ; fa7++)
     {
       nb_bord = 0;
@@ -1623,6 +1648,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
             }
         }
       if (nb_bord==dimension)
+#ifndef CONSERVER_FACETTES_COINS
         {
           //facette de bord : supprimer
           res = 1;
@@ -1639,6 +1665,53 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
               facettes(fa7,isom) = facettes(fa7,0);
             }
         }
+#else
+        {
+          //facette de bord : a supprimer ou pas? Pas si simple...
+          // Pour le savoir, on regarde la normale a chacune des faces tour a tour.
+          for (isom=0 ; isom<nb_som_par_facette ; isom++)
+            {
+              som = facettes(fa7,isom);
+              const int face = maillage.sommet_face_bord_[som];
+              FTd_vecteur3 v4= {0.,0.,0.};
+              double s2 = 0.;
+              if (dim==3) s2=sommets(som,2);
+              parcours.calculer_normale_face_bord(face,
+                                                  sommets(som,0), sommets(som,1),  s2,
+                                                  v4[0], v4[1], v4[2]);
+              double ps=0.;
+              for (int direction = 0; direction < dim; direction++)
+                {
+                  ps +=  v4[direction]*normale_facettes(fa7,direction);
+                }
+              const double tol = 1.e-10;
+              if (1. - fabs(ps)> tol)
+                {
+                  // facette et face_bord ne sont pas coplanaires, on conserve la facette!
+                }
+              else
+                {
+                  // facette et face_bord sont dans le meme plan, il faut supprimer cette facette
+                  // car c'est bien une facette de bord.
+                  res = 1;
+#ifndef NDEBUG
+                  if (impr_>9000)
+                    {
+                      Process::Journal()<<"  fa7_bord -> Supp ";
+                      maillage.printFa7(fa7,0,Process::Journal());
+                    }
+#endif
+                  for (isom=1 ; isom<nb_som_par_facette ; isom++)
+                    {
+                      facettes(fa7,isom) = facettes(fa7,0);
+                    }
+                  // Attention, il semble important de sortir sinon, on reinterroge une facette nulle...
+                  // gain de temps et semble risque sinon..
+                  break;
+                }
+            }
+        }
+#endif
     }
 
   maillage.check_mesh();
@@ -2702,6 +2775,7 @@ int Remaillage_FT::diviser_grandes_aretes(Maillage_FT_Disc& maillage) const
   statistiques().end_count(stat_counter);
   //  return res;
   return 1;
+  return nb_aretes_divis_tot;
 }
 
 //cette fonction insere une ligne de "requete arete" dans le tableau
