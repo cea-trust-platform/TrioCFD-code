@@ -62,10 +62,10 @@ class Source_Transport_K_VDF_Elem : public Source_base,
 
 public:
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
-  void mettre_a_jour(double temps) override ;
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
+  void mettre_a_jour(double temps) ;
 
 protected:
 
@@ -74,8 +74,8 @@ protected:
   REF(Transport_K_ou_Eps)  mon_eq_transport_K;
   REF(Transport_K_ou_Eps)  mon_eq_transport_Eps;
 
-  void associer_pb(const Probleme_base& pb) override;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  virtual void associer_pb(const Probleme_base& pb);
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -98,9 +98,9 @@ class Source_Transport_K_anisotherme_VDF_Elem :
 
 public:
 
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
 
@@ -130,9 +130,9 @@ class Source_Transport_K_concen_VDF_Elem :
 
 public:
 
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
   REF(Convection_Diffusion_Concentration) eq_concentration;
@@ -161,9 +161,9 @@ class Source_Transport_K_aniso_therm_concen_VDF_Elem :
 
 public:
 
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
 

@@ -59,12 +59,12 @@ class Op_DiffF22_VDF_Elem : public Op_Diff_VDF_base, public Op_VDF_Elem
 public:
 
   Op_DiffF22_VDF_Elem();
-  void associer(const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& ) override;
-  void associer_diffusivite(const Champ_base& ) override;
-  const Champ_base& diffusivite() const override;
-  inline  void dimensionner(Matrice_Morse& ) const override;
-  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
-  double calculer_dt_stab() const override;
+  void associer(const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
+  void associer_diffusivite(const Champ_base& );
+  const Champ_base& diffusivite() const;
+  inline  void dimensionner(Matrice_Morse& ) const;
+  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
+  double calculer_dt_stab() const;
 
 };
 

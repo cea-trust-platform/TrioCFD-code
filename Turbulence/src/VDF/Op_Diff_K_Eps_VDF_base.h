@@ -50,20 +50,20 @@ class Op_Diff_K_Eps_VDF_base : public Op_Diff_K_Eps_base, public Op_VDF_Elem
 public:
 
   inline Op_Diff_K_Eps_VDF_base(const Iterateur_VDF_base& );
-  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const override;
-  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const override;
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
-  inline void contribuer_au_second_membre(DoubleTab& ) const override;
+  inline DoubleTab& ajouter(const DoubleTab& ,  DoubleTab& ) const;
+  inline DoubleTab& calculer(const DoubleTab& , DoubleTab& ) const;
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
+  inline void contribuer_au_second_membre(DoubleTab& ) const;
   virtual void mettre_a_jour_diffusivite() const;
-  void completer() override;
-  void associer_diffusivite(const Champ_base& ch_diff) override;
-  void associer_diffusivite_turbulente() override;
+  void completer();
+  void associer_diffusivite(const Champ_base& ch_diff);
+  void associer_diffusivite_turbulente();
   // void associer_diffusivite(const Champ_Don& );
   // void associer_mvolumique();
-  inline  void dimensionner(Matrice_Morse& ) const override;
-  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
+  inline  void dimensionner(Matrice_Morse& ) const;
+  void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
   const Champ_Fonc& diffusivite_turbulente() const;
-  const Champ_base& diffusivite() const override ;
+  const Champ_base& diffusivite() const ;
 
 protected:
 
@@ -91,7 +91,7 @@ public:
 
   Op_Diff_K_Eps_VDF_Elem();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& ) override;
+                const Champ_Inc& );
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ public:
 
   Op_Diff_K_VDF_Elem();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& ) override;
+                const Champ_Inc& );
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ public:
 
   Op_Diff_Eps_VDF_Elem();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& ) override;
+                const Champ_Inc& );
 };
 
 

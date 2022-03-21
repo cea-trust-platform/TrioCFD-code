@@ -62,10 +62,10 @@ public:
   /*  inline EqnF22base& eqn_F22(); */
   /*   inline const EqnF22base& eqn_F22() const; */
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
   //DoubleTab& calculer_Sij(const Zone_VDF& , const Zone_Cl_VDF&  , DoubleTab& , const DoubleTab&) const;
-  void mettre_a_jour(double temps) override
+  void mettre_a_jour(double temps)
   {
     Calcul_Production_K_VDF::mettre_a_jour(temps);
   }
@@ -82,8 +82,8 @@ protected:
   REF(Transport_V2)  mon_eq_transport_V2;
   REF(EqnF22base) mon_eq_f22;
 
-  void associer_pb(const Probleme_base& pb) override;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  virtual void associer_pb(const Probleme_base& pb);
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
 };
 
 
@@ -110,9 +110,9 @@ public:
   inline Source_Transport_K_Eps_V2_anisotherme_VDF_Elem(double cte1 = C1_DEFAULT,
                                                         double cte2 = C2_DEFAULT,
                                                         double cte3 = C3_DEFAULT);
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
 
@@ -146,9 +146,9 @@ public:
   inline Source_Transport_K_Eps_V2_aniso_therm_concen_VDF_Elem(double cte1 = C1_DEFAULT,
                                                                double cte2 = C2_DEFAULT,
                                                                double cte3 = C3_DEFAULT);
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
 

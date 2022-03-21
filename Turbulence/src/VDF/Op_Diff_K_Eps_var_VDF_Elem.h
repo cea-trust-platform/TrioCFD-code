@@ -59,7 +59,7 @@ public:
 
   Op_Diff_K_Eps_var_VDF_Elem();
   void associer(const Zone_dis& , const Zone_Cl_dis& ,
-                const Champ_Inc& ) override;
+                const Champ_Inc& );
 };
 
 

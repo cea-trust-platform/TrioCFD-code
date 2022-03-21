@@ -56,15 +56,15 @@ public :
 
   inline Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(double cte1 = C11_DEFAULT,
                                                         double cte2 = C21_DEFAULT );
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
   inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
   inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  void associer_pb(const Probleme_base& ) override;
+  virtual void associer_pb(const Probleme_base& );
 
 protected :
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
   double C1;
   double C2;
 
@@ -93,9 +93,9 @@ class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem :
 
 public:
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-  void associer_pb(const Probleme_base& ) override;
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
+  virtual void associer_pb(const Probleme_base& );
   inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
   inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
   inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem(double cte1 = C11_DEFAULT,

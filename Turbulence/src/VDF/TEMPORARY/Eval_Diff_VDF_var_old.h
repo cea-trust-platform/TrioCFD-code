@@ -44,10 +44,10 @@ class Eval_Diff_VDF_var_old : public Eval_Diff_VDF_old
 public:
 
   inline Eval_Diff_VDF_var_old();
-  inline void associer(const Champ_base& ) override;
-  inline void mettre_a_jour( ) override;
+  inline void associer(const Champ_base& );
+  inline void mettre_a_jour( );
   inline const Champ_base& diffusivite() const;
-  inline const Champ_base& get_diffusivite() const override;
+  inline const Champ_base& get_diffusivite() const;
 
 protected:
 

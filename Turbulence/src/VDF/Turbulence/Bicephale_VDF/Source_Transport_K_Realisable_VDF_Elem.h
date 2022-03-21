@@ -63,17 +63,17 @@ class Source_Transport_K_Realisable_VDF_Elem : public Source_base,public Calcul_
 
 public :
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
   inline Modele_Fonc_Realisable_base&  associe_modele_fonc();
   inline const Modele_Fonc_Realisable_base&  associe_modele_fonc() const;
-  void associer_pb(const Probleme_base& ) override;
-  void mettre_a_jour(double temps) override;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
+  virtual void associer_pb(const Probleme_base& );
+  void mettre_a_jour(double temps);
+  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const ;
 
 protected :
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
   REF(Zone_VDF) la_zone_VDF;
   REF(Zone_Cl_VDF) la_zone_Cl_VDF;
   REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea;
@@ -104,9 +104,9 @@ class Source_Transport_K_Realisable_anisotherme_VDF_Elem :
 
 public:
 
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
   REF(Convection_Diffusion_Temperature) eq_thermique;
@@ -135,9 +135,9 @@ class Source_Transport_K_Realisable_aniso_concen_VDF_Elem :
 
 public:
 
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
   REF(Convection_Diffusion_Concentration) eq_concentration;
@@ -166,9 +166,9 @@ class Source_Transport_K_Realisable_aniso_therm_concen_VDF_Elem :
 
 public:
 
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  virtual void associer_pb(const Probleme_base& );
+  DoubleTab& ajouter(DoubleTab& ) const;
+  DoubleTab& calculer(DoubleTab& ) const;
 
 protected:
   REF(Convection_Diffusion_Temperature) eq_thermique;
