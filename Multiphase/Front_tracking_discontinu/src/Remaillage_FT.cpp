@@ -724,7 +724,7 @@ double Remaillage_FT::calculer_variation_volume_facette_3D(int fa7, const Mailla
       facette[i] = facettes(fa7, i);
   }
   const DoubleTab& position_finale = maillage.sommets();
-#define ALGO_NON_PARALLELE
+
 #ifdef ALGO_NON_PARALLELE
   int ordre_sommets[3] = { 0, 1, 2 };
   // Calcul de l'ordre dans lequel on va construire les 3 tetraedres (ordre croissant des indices globaux
