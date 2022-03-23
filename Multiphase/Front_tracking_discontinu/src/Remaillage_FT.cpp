@@ -2916,7 +2916,6 @@ int Remaillage_FT::diviser_grandes_aretes(Maillage_FT_Disc& maillage) const
   maillage.maillage_modifie(Maillage_FT_Disc::MINIMAL);
   statistiques().end_count(stat_counter);
   //  return res;
-  return 1;
   return nb_aretes_divis_tot;
 }
 
