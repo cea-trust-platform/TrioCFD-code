@@ -183,10 +183,10 @@ void DebogFT::verifier_(const char *msg, const ArrOfDouble& sig)
           bool erreur = false;
           for (int i = 0; i < sig.size_array(); i++)
             {
-              double m = std::max(fabs(sig[i]),fabs(sig2[i]));
+              double m = std::max(std::fabs(sig[i]),std::fabs(sig2[i]));
               m = std::max(seuil_minimum_relatif_, m);
-              if (fabs(sig[i] - sig2[i]) > seuil_absolu_
-                  || fabs(sig[i] - sig2[i]) / m > seuil_relatif_)
+              if (std::fabs(sig[i] - sig2[i]) > seuil_absolu_
+                  || std::fabs(sig[i] - sig2[i]) / m > seuil_relatif_)
                 erreur = true;
             }
           if (erreur)
