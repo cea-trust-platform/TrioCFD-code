@@ -2454,12 +2454,13 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
           const IntTab& elem_faces = refzone_VF_->elem_faces();
           int k;
           FTd_vecteur3 v = {0., 0., 0.};
+          FTd_vecteur3 xyz = {x, y, z};
           FTd_vecteur3 delta_xv = {0., 0., 0.};
           const int dim = Objet_U::dimension;
           double norme2 = 0.;
           for (k = 0; k < dim; k++)
             {
-              v[k] = x - sommets(som0, k);
+              v[k] = xyz[k] - sommets(som0, k);
               norme2 += v[k] * v[k];
               const int face0 = elem_faces(elem0,k);
               const int face1 = elem_faces(elem0,k+dim);
