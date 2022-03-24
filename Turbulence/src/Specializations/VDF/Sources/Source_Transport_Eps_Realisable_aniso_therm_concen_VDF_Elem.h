@@ -33,7 +33,7 @@ class Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem : public Sourc
 public:
   Source_Transport_Eps_Realisable_aniso_therm_concen_VDF_Elem(double cte2 = C2__, double cte3 = C3_R__) : Source_Transport_Eps_Realisable_VDF_Elem(cte2) { C3 = cte3; }
   void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 private:
   void fill_resu_anisotherme_concen(const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;

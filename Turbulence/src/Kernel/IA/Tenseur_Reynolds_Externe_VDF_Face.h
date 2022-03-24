@@ -53,7 +53,7 @@ public:
   ~Tenseur_Reynolds_Externe_VDF_Face() override;
 
   void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
   DoubleTab& calculer(DoubleTab& ) const override;
   void mettre_a_jour(double ) override;
   void completer() override;

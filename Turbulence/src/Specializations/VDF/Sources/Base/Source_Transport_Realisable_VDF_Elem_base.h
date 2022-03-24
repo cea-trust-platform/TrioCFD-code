@@ -32,7 +32,7 @@ class Source_Transport_Realisable_VDF_Elem_base : public Source_Transport_VDF_El
 public :
   Source_Transport_Realisable_VDF_Elem_base() { } // XXX ne touche pas
   Source_Transport_Realisable_VDF_Elem_base(double cte2) { C2 = cte2; }
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const  override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected :
   static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Chabard et N3S

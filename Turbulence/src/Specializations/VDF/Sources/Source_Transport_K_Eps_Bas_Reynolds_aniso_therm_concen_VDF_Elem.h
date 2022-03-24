@@ -33,7 +33,7 @@ class Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem : public S
 public:
   Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem(cte1,cte2) { }
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
   void associer_pb(const Probleme_base& ) override;
 };
 

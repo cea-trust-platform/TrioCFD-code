@@ -33,8 +33,8 @@ class Source_Transport_Eps_VDF_Elem : public Source_Transport_VDF_Elem_base
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_VDF_Elem);
 public:
   Source_Transport_Eps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) { }
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const  override;
-  inline DoubleTab& ajouter(DoubleTab& resu) const  override { return Source_Transport_VDF_Elem_base::ajouter_keps(resu); }
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
   REF(Transport_K_ou_Eps)  mon_eq_transport_K, mon_eq_transport_Eps;

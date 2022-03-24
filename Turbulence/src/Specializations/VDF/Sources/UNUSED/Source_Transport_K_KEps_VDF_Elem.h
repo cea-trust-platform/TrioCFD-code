@@ -33,7 +33,7 @@ class Source_Transport_K_KEps_VDF_Elem : public Source_Transport_VDF_Elem_base
   Declare_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem);
 public:
   Source_Transport_K_KEps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) { }
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
   REF(Transport_K_KEps)  mon_eq_transport_K_Eps;

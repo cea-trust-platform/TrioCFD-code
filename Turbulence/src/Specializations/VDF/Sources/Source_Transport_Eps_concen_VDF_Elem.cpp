@@ -52,8 +52,8 @@ void Source_Transport_Eps_concen_VDF_Elem::fill_resu_concen(const DoubleVect& G,
     }
 }
 
-DoubleTab& Source_Transport_Eps_concen_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_Eps_concen_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
-  Source_Transport_Eps_VDF_Elem::ajouter(resu);
-  return Source_Transport_Eps_VDF_Elem::ajouter_concen(resu);
+  Source_Transport_Eps_VDF_Elem::ajouter_blocs(matrices,resu, semi_impl);
+  Source_Transport_Eps_VDF_Elem::ajouter_concen(resu);
 }

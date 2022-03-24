@@ -40,7 +40,7 @@ void Source_Transport_Bas_Reynolds_VDF_Elem_base::associer_pb(const Probleme_bas
 // XXX : Elie Saikali
 // a revoir si ca donne des soucis pour Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem
 // pour le moment j'ai fait comme Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
-DoubleTab& Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter(DoubleTab& resu) const
+void Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
@@ -68,5 +68,4 @@ DoubleTab& Source_Transport_Bas_Reynolds_VDF_Elem_base::ajouter(DoubleTab& resu)
 
   fill_resu_bas_reyn(P,D,E,F1,F2,resu);
   resu.echange_espace_virtuel();
-  return resu;
 }

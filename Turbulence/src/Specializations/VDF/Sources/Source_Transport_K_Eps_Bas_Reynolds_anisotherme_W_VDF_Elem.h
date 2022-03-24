@@ -37,7 +37,7 @@ public:
     C2 = cte2;
   }
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
   void associer_pb(const Probleme_base& ) override;
 
 protected:

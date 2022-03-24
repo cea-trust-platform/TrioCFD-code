@@ -36,8 +36,9 @@ void Source_Transport_K_Realisable_VDF_Elem::associer_pb(const Probleme_base& pb
   eqn_eps_Rea = ref_cast(Transport_K_ou_Eps_Realisable,eqn_eps_Rea.valeur().modele_turbulence().eqn_transp_Eps());
 }
 
-DoubleTab& Source_Transport_K_Realisable_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_K_Realisable_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
+  Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices, secmem, semi_impl);
   const DoubleTab& K_Rea = eqn_k_Rea->inconnue().valeurs(), &eps_Rea = eqn_eps_Rea->inconnue().valeurs(), &vit = eq_hydraulique->inconnue().valeurs();
   Champ_Face& vitesse = ref_cast_non_const(Champ_Face,eq_hydraulique->inconnue().valeur());
   const DoubleTab& visco_turb = eqn_k_Rea->modele_turbulence().viscosite_turbulente().valeurs();
@@ -48,9 +49,8 @@ DoubleTab& Source_Transport_K_Realisable_VDF_Elem::ajouter(DoubleTab& resu) cons
   else calculer_terme_production_K_BiK(la_zone_VDF.valeur(),la_zone_Cl_VDF.valeur(),P,K_Rea,vit,vitesse,visco_turb);
   P.echange_espace_virtuel();
 
-  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) resu(elem) += ( P(elem)-eps_Rea(elem) )*volumes(elem)*porosite_vol(elem);
+  for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) secmem(elem) += ( P(elem)-eps_Rea(elem) )*volumes(elem)*porosite_vol(elem);
 
-  return resu;
 }
 
 void Source_Transport_K_Realisable_VDF_Elem::mettre_a_jour(double temps)

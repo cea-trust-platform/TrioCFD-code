@@ -44,7 +44,7 @@ void Source_Transport_K_KEps_VDF_Elem::associer_pb(const Probleme_base& pb)
   mon_eq_transport_K_Eps = ref_cast(Transport_K_KEps,equation());
 }
 
-DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const Zone_VDF& zone_VDF_NS = ref_cast(Zone_VDF,eq_hydraulique->zone_dis().valeur());
@@ -255,10 +255,9 @@ DoubleTab& Source_Transport_K_KEps_VDF_Elem::ajouter(DoubleTab& resu) const
 
   for (elem=0; elem<nb_elem; elem++)
     {
-      resu(elem,0) += (P(elem)-Eps(elem))*volumes(elem)*porosite_vol(elem);
+      secmem(elem,0) += (P(elem)-Eps(elem))*volumes(elem)*porosite_vol(elem);
       if (K_eps(elem,0) >= 10.e-10)
-        resu(elem,1) += (C1*P(elem)- C2*Eps(elem))*volumes(elem)*porosite_vol(elem)*Eps(elem)/K_eps(elem,0);
+        secmem(elem,1) += (C1*P(elem)- C2*Eps(elem))*volumes(elem)*porosite_vol(elem)*Eps(elem)/K_eps(elem,0);
     }
 
-  return resu;
 }

@@ -42,8 +42,8 @@ void Source_Transport_K_anisotherme_VDF_Elem::fill_resu_anisotherme(const Double
   for (int elem = 0; elem < la_zone_VDF->nb_elem(); elem++) resu(elem) += G(elem)*volumes(elem)*porosite_vol(elem);
 }
 
-DoubleTab& Source_Transport_K_anisotherme_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_K_anisotherme_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  Source_Transport_K_VDF_Elem::ajouter(resu); // VB : plutot que de calculer P on appelle ajouter de la classe mere
-  return Source_Transport_K_VDF_Elem::ajouter_anisotherme(resu);
+  Source_Transport_K_VDF_Elem::ajouter_blocs(matrices, secmem, semi_impl); // VB : plutot que de calculer P on appelle ajouter de la classe mere
+  Source_Transport_K_VDF_Elem::ajouter_anisotherme(secmem);
 }

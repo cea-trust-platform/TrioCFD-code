@@ -34,7 +34,7 @@ public:
   Source_Transport_K_Eps_anisotherme_VDF_Elem(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) :
     Source_Transport_K_Eps_VDF_Elem(cte1,cte2) { C3 = cte3; }
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
   void associer_pb(const Probleme_base& ) override;
 
 private:

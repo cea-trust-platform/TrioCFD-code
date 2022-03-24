@@ -48,7 +48,9 @@ public :
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
   void associer_pb(const Probleme_base& ) override;
 
-  DoubleTab& ajouter(DoubleTab& ) const override= 0; // XXX XXX XXX Elie Saikali : like that !!
+  inline int has_interface_blocs() const override { return 1; }
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override {}
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override= 0; // XXX XXX XXX Elie Saikali : like that !!
 
   inline void mettre_a_jour(double t)  override { Calcul_Production_K_VDF::mettre_a_jour(t); }
 
