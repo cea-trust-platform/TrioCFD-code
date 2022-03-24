@@ -46,16 +46,7 @@ public:
 
   virtual inline void mettre_a_jour_diffusivite() const { assert(mon_equation.non_nul()); }
 
-  inline void dimensionner(Matrice_Morse& matrice) const  override { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
-  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const  override { iter->ajouter_contribution(inco, matrice); }
   inline void contribuer_au_second_membre(DoubleTab& resu) const  override { iter->contribuer_au_second_membre(resu); }
-
-  inline DoubleTab& ajouter(const DoubleTab& inco,  DoubleTab& resu) const override
-  {
-    mettre_a_jour_diffusivite();
-    return iter->ajouter(inco, resu);
-  }
-
   inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override
   {
     mettre_a_jour_diffusivite();
@@ -63,6 +54,11 @@ public:
   }
 
   inline Iterateur_VDF& get_iter() { return iter; }
+
+  inline int has_interface_blocs() const override { return 1; }
+
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:
   Iterateur_VDF iter;
