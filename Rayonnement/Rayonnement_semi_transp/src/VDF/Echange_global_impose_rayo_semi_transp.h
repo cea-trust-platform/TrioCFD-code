@@ -47,10 +47,7 @@ public :
   void calculer_temperature_bord(double temps);
 
   void completer() override;
-  void verifie_ch_init_nb_comp() override;
-
-protected :
-
+  void verifie_ch_init_nb_comp() const override;
 };
 
 #endif
