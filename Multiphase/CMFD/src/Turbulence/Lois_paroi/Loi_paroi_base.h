@@ -42,9 +42,6 @@ class Loi_paroi_base : public Correlation_base
   Declare_base(Loi_paroi_base);
 public:
   virtual void calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) = 0;
-  virtual void completer()  = 0 ;
-  virtual void mettre_a_jour(double temps)  = 0;
-
 protected:
 };
 

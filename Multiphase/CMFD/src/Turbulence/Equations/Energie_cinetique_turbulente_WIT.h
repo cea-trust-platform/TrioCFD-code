@@ -44,28 +44,26 @@ public :
   Energie_cinetique_turbulente_WIT();
 
   void associer_fluide(const Fluide_base& );
-  inline const Champ_Inc& inconnue() const;
-  inline Champ_Inc& inconnue();
-  void discretiser();
-  const Milieu_base& milieu() const;
-  const Fluide_base& fluide() const;
-  Fluide_base& fluide();
-  Milieu_base& milieu();
-  void associer_milieu_base(const Milieu_base& );
-  virtual int impr(Sortie& os) const;
-  const Champ_Don& diffusivite_pour_transport() const;
-  const Champ_base& diffusivite_pour_pas_de_temps() const;
+  inline const Champ_Inc& inconnue() const override;
+  inline Champ_Inc& inconnue() override;
+  void discretiser() override;
+  const Milieu_base& milieu() const override;
+  Milieu_base& milieu() override;
+  void associer_milieu_base(const Milieu_base& ) override;
+  int impr(Sortie& os) const override;
+  const Champ_Don& diffusivite_pour_transport() const override;
+  const Champ_base& diffusivite_pour_pas_de_temps() const override;
 
-  virtual const Motcle& domaine_application() const;
+  const Motcle& domaine_application() const override;
 
   /* champ convecte : alpha (si Pb_Multiphase) * rho * k */
   static void calculer_alpha_rho_k_WIT(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv);
-  virtual std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const
+  virtual std::pair<std::string, fonc_calc_t> get_fonc_champ_conserve() const override
   {
     return { "alpha_rho_k_WIT", calculer_alpha_rho_k_WIT };
   }
 
-  virtual int positive_unkown() {return 1;};
+  virtual int positive_unkown() override {return 1;};
 
 protected :
 

@@ -114,8 +114,7 @@ Entree& Taux_dissipation_turbulent::readOn(Entree& is)
 // Postcondition:
 void Taux_dissipation_turbulent::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
-  associer_fluide(un_fluide);
+  le_fluide = ref_cast(Fluide_base,un_milieu);
 }
 
 const Champ_Don& Taux_dissipation_turbulent::diffusivite_pour_transport() const
@@ -176,7 +175,7 @@ void Taux_dissipation_turbulent::discretiser()
 // Postcondition: la methode ne modifie pas l'objet
 const Milieu_base& Taux_dissipation_turbulent::milieu() const
 {
-  return fluide();
+  return le_fluide;
 }
 
 
@@ -197,56 +196,8 @@ const Milieu_base& Taux_dissipation_turbulent::milieu() const
 // Postcondition:
 Milieu_base& Taux_dissipation_turbulent::milieu()
 {
-  return fluide();
+  return le_fluide;
 }
-
-
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_base&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes: reference constante
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-const Fluide_base& Taux_dissipation_turbulent::fluide() const
-{
-  if (!le_fluide.non_nul())
-    {
-      Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
-      Process::exit();
-    }
-  return le_fluide.valeur();
-}
-
-
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_base&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes:
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition:
-Fluide_base& Taux_dissipation_turbulent::fluide()
-{
-  assert(le_fluide.non_nul());
-  return le_fluide.valeur();
-}
-
 
 // Description:
 //    Impression des flux sur les bords sur un flot de sortie.
@@ -288,26 +239,6 @@ const Motcle& Taux_dissipation_turbulent::domaine_application() const
   static Motcle mot("Turbulence");
   return mot;
 }
-
-// Description:
-//    Associe un fluide incompressible a l'equation.
-// Precondition:
-// Parametre: Fluide_base& un_fluide
-//    Signification: le milieu fluide incompressible a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation a un milieu associe
-void Taux_dissipation_turbulent::associer_fluide(const Fluide_base& un_fluide)
-{
-  le_fluide = un_fluide;
-}
-
 
 void Taux_dissipation_turbulent::calculer_alpha_rho_omega(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {

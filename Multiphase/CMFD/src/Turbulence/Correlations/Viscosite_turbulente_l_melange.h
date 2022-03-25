@@ -39,11 +39,11 @@ class Viscosite_turbulente_l_melange : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_l_melange);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
+  void eddy_viscosity(DoubleTab& nu_t) const override;
+  void reynolds_stress(DoubleTab& R_ij) const override;
+  void k_over_eps(DoubleTab& k_sur_eps) const override;
   inline double limiteur() const {return limiter_;};
-  virtual int gradu_required() const  {  return 1; };
+  int gradu_required() const override {  return 1; };
 
   const double& get_l_melange() const
   {

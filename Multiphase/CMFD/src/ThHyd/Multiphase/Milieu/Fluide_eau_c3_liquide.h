@@ -37,7 +37,7 @@ class Fluide_eau_c3_liquide: public Fluide_reel_base
   Declare_instanciable(Fluide_eau_c3_liquide);
 
   /* bornes (p, T_l) de H2OPROP.H */
-  virtual std::map<std::string, std::array<double, 2>> unknown_range() const
+  std::map<std::string, std::array<double, 2>> unknown_range() const override
   {
     return { { "pression"   , { 0.01e5, 260e5 } },
       { "temperature", {      0, 400   } }
@@ -46,18 +46,18 @@ class Fluide_eau_c3_liquide: public Fluide_reel_base
 
 protected :
   // densite
-  virtual double     rho_(const double T, const double P) const;
-  virtual double  dP_rho_(const double T, const double P) const;
-  virtual double  dT_rho_(const double T, const double P) const;
+  double     rho_(const double T, const double P) const override;
+  double  dP_rho_(const double T, const double P) const override;
+  double  dT_rho_(const double T, const double P) const override;
   // enthalpie
-  virtual double       h_(const double T, const double P) const;
-  virtual double    dP_h_(const double T, const double P) const;
-  virtual double    dT_h_(const double T, const double P) const;
+  double       h_(const double T, const double P) const override;
+  double    dP_h_(const double T, const double P) const override;
+  double    dT_h_(const double T, const double P) const override;
   // lois champs "faibles" -> pas de derivees
-  virtual double      cp_(const double T, const double P) const;
-  virtual double    beta_(const double T, const double P) const;
-  virtual double      mu_(const double T, const double P) const;
-  virtual double  lambda_(const double T, const double P) const;
+  double      cp_(const double T, const double P) const override;
+  double    beta_(const double T, const double P) const override;
+  double      mu_(const double T, const double P) const override;
+  double  lambda_(const double T, const double P) const override;
 };
 
 #endif

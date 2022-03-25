@@ -376,7 +376,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                         Text_valeurs(face-ndeb,0) = Tparoi(num_faceG-num_prem_face_vdf);
                         // Cerr << "Text = " << Text_valeurs(face-ndeb,0) << finl;
                       }
-                    double flux_tot=0;
+                    // double flux_tot=0;
                     for (face=0; face<nb_faces_front_vdf; face++)
                       {
                         // Cerr << "Tparoi= " << Tparoi(face) << finl;
@@ -384,7 +384,7 @@ void Echange_contact_VEF_VDF_Zoom::mettre_a_jour(double temps)
                         elemG =  face_voisinsG(face_glob,0);
                         if(elemG == -1)
                           elemG =  face_voisinsG(face_glob,1);
-                        flux_tot+=h_vdf(face,0)*surfacesVDF(face_glob)*(Tparoi(face)-T_VDF(elemG));
+                        // flux_tot+=h_vdf(face,0)*surfacesVDF(face_glob)*(Tparoi(face)-T_VDF(elemG));
                       }
                     // Cerr << "flux tot = " << flux_tot << finl;
                   }

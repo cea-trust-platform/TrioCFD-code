@@ -113,16 +113,15 @@ Entree& Energie_cinetique_turbulente::readOn(Entree& is)
 // Postcondition:
 void Energie_cinetique_turbulente::associer_milieu_base(const Milieu_base& un_milieu)
 {
-  const Fluide_base& un_fluide = ref_cast(Fluide_base,un_milieu);
-  associer_fluide(un_fluide);
+  le_fluide = ref_cast(Fluide_base,un_milieu);
 }
 
-const Champ_Don& Energie_cinetique_turbulente::diffusivite_pour_transport()
+const Champ_Don& Energie_cinetique_turbulente::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_dynamique();
 }
 
-const Champ_base& Energie_cinetique_turbulente::diffusivite_pour_pas_de_temps()
+const Champ_base& Energie_cinetique_turbulente::diffusivite_pour_pas_de_temps() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
@@ -174,7 +173,7 @@ void Energie_cinetique_turbulente::discretiser()
 // Postcondition: la methode ne modifie pas l'objet
 const Milieu_base& Energie_cinetique_turbulente::milieu() const
 {
-  return fluide();
+  return le_fluide.valeur();
 }
 
 
@@ -195,56 +194,8 @@ const Milieu_base& Energie_cinetique_turbulente::milieu() const
 // Postcondition:
 Milieu_base& Energie_cinetique_turbulente::milieu()
 {
-  return fluide();
-}
-
-
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_base&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes: reference constante
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-const Fluide_base& Energie_cinetique_turbulente::fluide() const
-{
-  if (!le_fluide.non_nul())
-    {
-      Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
-      Process::exit();
-    }
   return le_fluide.valeur();
 }
-
-
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_base&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes:
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition:
-Fluide_base& Energie_cinetique_turbulente::fluide()
-{
-  assert(le_fluide.non_nul());
-  return le_fluide.valeur();
-}
-
 
 // Description:
 //    Impression des flux sur les bords sur un flot de sortie.
@@ -286,26 +237,6 @@ const Motcle& Energie_cinetique_turbulente::domaine_application() const
   static Motcle mot("Turbulence");
   return mot;
 }
-
-// Description:
-//    Associe un fluide incompressible a l'equation.
-// Precondition:
-// Parametre: Fluide_base& un_fluide
-//    Signification: le milieu fluide incompressible a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation a un milieu associe
-void Energie_cinetique_turbulente::associer_fluide(const Fluide_base& un_fluide)
-{
-  le_fluide = un_fluide;
-}
-
 
 void Energie_cinetique_turbulente::calculer_alpha_rho_k(const Objet_U& obj, DoubleTab& val, DoubleTab& bval, tabs_t& deriv)
 {

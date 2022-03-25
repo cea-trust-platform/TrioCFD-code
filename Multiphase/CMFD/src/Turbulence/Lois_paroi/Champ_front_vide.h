@@ -43,13 +43,13 @@ class Champ_front_vide : public Champ_front_base
 
 public:
 
-  virtual DoubleTab& valeurs_au_temps(double temps) { Process::exit("Impossible d'appeler les valeurs d'un champ_fronc_vide"); return les_valeurs->valeurs();};
-  virtual const DoubleTab& valeurs_au_temps(double temps) const { Process::exit("Impossible d'appeler les valeurs d'un champ_fronc_vide"); return les_valeurs->valeurs();};
-  virtual int avancer(double temps) {return 1;};
-  virtual int reculer(double temps) {return 1;};
-  Champ_front_base& affecter_(const Champ_front_base& ch) {return *this;};
-  void valeurs_face(int,DoubleVect&) const {};
-  virtual void changer_temps_futur(double temps,int i) {};
+  DoubleTab& valeurs_au_temps(double temps) override { Process::exit("Impossible d'appeler les valeurs d'un champ_fronc_vide"); return les_valeurs->valeurs();};
+  const DoubleTab& valeurs_au_temps(double temps) const override { Process::exit("Impossible d'appeler les valeurs d'un champ_fronc_vide"); return les_valeurs->valeurs();};
+  int avancer(double temps) override {return 1;};
+  int reculer(double temps) override {return 1;};
+  Champ_front_base& affecter_(const Champ_front_base& ch) override {return *this;};
+  void valeurs_face(int,DoubleVect&) const override {};
+  void changer_temps_futur(double temps,int i) override {};
 };
 
 #endif

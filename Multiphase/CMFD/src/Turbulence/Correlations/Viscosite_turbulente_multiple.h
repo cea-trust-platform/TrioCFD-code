@@ -37,10 +37,10 @@ class Viscosite_turbulente_multiple : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_multiple);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
-  virtual int gradu_required() const  {  return 1; };
+  void eddy_viscosity(DoubleTab& nu_t) const override;
+  void reynolds_stress(DoubleTab& R_ij) const override;
+  void k_over_eps(DoubleTab& k_sur_eps) const override;
+  int gradu_required() const override {  return 1; };
 
   void reynolds_stress_BIF(DoubleTab& R_ij) const;
 

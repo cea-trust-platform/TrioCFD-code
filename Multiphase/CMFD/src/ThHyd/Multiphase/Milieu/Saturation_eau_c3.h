@@ -30,17 +30,17 @@ class Saturation_eau_c3 : public Saturation_base
   Declare_instanciable(Saturation_eau_c3);
 public:
 
-  virtual double    Tsat_(const double P) const;
-  virtual double dP_Tsat_(const double P) const;
-  virtual double    Psat_(const double T) const;
-  virtual double dT_Psat_(const double T) const;
-  virtual double    Lvap_(const double P) const;
-  virtual double dP_Lvap_(const double P) const;
-  virtual double     Hls_(const double P) const;
-  virtual double  dP_Hls_(const double P) const;
-  virtual double     Hvs_(const double P) const;
-  virtual double  dP_Hvs_(const double P) const;
-  virtual double   sigma_(const double T, const double P) const;
+  double    Tsat_(const double P) const override;
+  double dP_Tsat_(const double P) const override;
+  double    Psat_(const double T) const override;
+  double dT_Psat_(const double T) const override;
+  double    Lvap_(const double P) const override;
+  double dP_Lvap_(const double P) const override;
+  double     Hls_(const double P) const override;
+  double  dP_Hls_(const double P) const override;
+  double     Hvs_(const double P) const override;
+  double  dP_Hvs_(const double P) const override;
+  double   sigma_(const double T, const double P) const override;
 };
 
 #endif

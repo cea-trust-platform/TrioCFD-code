@@ -44,15 +44,15 @@ class Paroi_frottante_loi : public Frottement_global_impose
   Declare_instanciable(Paroi_frottante_loi);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const;
-  virtual int initialiser(double temps) ;
-  virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps);
+  int compatible_avec_eqn(const Equation_base&) const override;
+  virtual int initialiser(double temps) override;
+  virtual int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps) override;
   void me_calculer();
   double calc_flux(double y, double u_tau, double visc);
-  virtual double coefficient_frottement(int i) const;
-  virtual double coefficient_frottement(int i,int j) const;
-  virtual void liste_faces_loi_paroi(IntTab&) ;
+  virtual double coefficient_frottement(int i) const override;
+  virtual double coefficient_frottement(int i,int j) const override;
+  virtual void liste_faces_loi_paroi(IntTab&) override;
 
 protected :
 

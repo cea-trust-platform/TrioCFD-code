@@ -118,12 +118,12 @@ void Echelle_temporelle_turbulente::associer_milieu_base(const Milieu_base& un_m
   associer_fluide(un_fluide);
 }
 
-const Champ_Don& Echelle_temporelle_turbulente::diffusivite_pour_transport()
+const Champ_Don& Echelle_temporelle_turbulente::diffusivite_pour_transport() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_dynamique();
 }
 
-const Champ_base& Echelle_temporelle_turbulente::diffusivite_pour_pas_de_temps()
+const Champ_base& Echelle_temporelle_turbulente::diffusivite_pour_pas_de_temps() const
 {
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
@@ -176,7 +176,7 @@ void Echelle_temporelle_turbulente::discretiser()
 // Postcondition: la methode ne modifie pas l'objet
 const Milieu_base& Echelle_temporelle_turbulente::milieu() const
 {
-  return fluide();
+  return le_fluide.valeur();
 }
 
 
@@ -197,56 +197,8 @@ const Milieu_base& Echelle_temporelle_turbulente::milieu() const
 // Postcondition:
 Milieu_base& Echelle_temporelle_turbulente::milieu()
 {
-  return fluide();
-}
-
-
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_base&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes: reference constante
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-const Fluide_base& Echelle_temporelle_turbulente::fluide() const
-{
-  if (!le_fluide.non_nul())
-    {
-      Cerr << "You forgot to associate the fluid to the problem named " << probleme().le_nom() << finl;
-      Process::exit();
-    }
   return le_fluide.valeur();
 }
-
-
-// Description:
-//    Renvoie le fluide incompressible associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_base&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes:
-// Exception: pas de fluide associe a l'eqaution
-// Effets de bord:
-// Postcondition:
-Fluide_base& Echelle_temporelle_turbulente::fluide()
-{
-  assert(le_fluide.non_nul());
-  return le_fluide.valeur();
-}
-
 
 // Description:
 //    Impression des flux sur les bords sur un flot de sortie.

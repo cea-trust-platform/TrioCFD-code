@@ -44,14 +44,14 @@ class Neumann_loi_paroi_faible_tau : public Neumann_loi_paroi
   Declare_instanciable(Neumann_loi_paroi_faible_tau);
 
 public :
-  int compatible_avec_eqn(const Equation_base&) const;
-  virtual int initialiser(double temps) ;
-  virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
-  void mettre_a_jour(double tps);
+  int compatible_avec_eqn(const Equation_base&) const override;
+  int initialiser(double temps) override;
+  int avancer(double temps) override {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
+  void mettre_a_jour(double tps) override;
   double calc_flux(double y, double u_tau, double visc);
-  virtual double flux_impose(int i) const;
-  virtual double flux_impose(int i,int j) const;
-  virtual void liste_faces_loi_paroi(IntTab&) ;
+  double flux_impose(int i) const override;
+  double flux_impose(int i,int j) const override;
+  void liste_faces_loi_paroi(IntTab&) override;
 
 protected :
   void me_calculer();

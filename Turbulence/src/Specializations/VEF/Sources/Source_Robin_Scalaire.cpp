@@ -109,7 +109,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
 
       if (sub_type(Paroi_decalee_Robin,la_cl.valeur()))
         {
-          double acc_loc_tot = 0;
+          // double acc_loc_tot = 0;
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           int ndeb = le_bord.num_premiere_face();
           int nfin = ndeb + le_bord.nb_faces();
@@ -121,7 +121,7 @@ DoubleTab& Source_Robin_Scalaire::ajouter(DoubleTab& resu) const
               if (elem==-1) elem = zone_VEF.face_voisins(face,1);
               double d_lambda = (lambda_uniforme ? lambda(0,0) : lambda(elem,0));
               double acc_loc = - (d_lambda + lambda_t(elem)) * (temperature(face) - Tw) / dist_equiv[face-ndeb] * surfaces_face(face);
-              acc_loc_tot += acc_loc;
+              // acc_loc_tot += acc_loc;
               resu(face) += acc_loc;
             }
         }

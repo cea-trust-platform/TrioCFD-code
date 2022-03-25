@@ -37,15 +37,15 @@ class Transport_turbulent_GGDH : public Transport_turbulent_base
 {
   Declare_instanciable(Transport_turbulent_GGDH);
 public:
-  virtual int dimension_min_nu() const
+  virtual int dimension_min_nu() const override
   {
     return dimension * dimension; //anisotrope complet!
   }
-  virtual int gradu_required() const
+  virtual int gradu_required() const override
   {
     return 1; /* on a besoin de grad u */
   };
-  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const;
+  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
 private:
   double C_s = 0.3; //facteur multiplicatif
 };

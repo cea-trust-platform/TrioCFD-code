@@ -37,11 +37,11 @@ class Viscosite_turbulente_k_tau : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_k_tau);
 public:
-  virtual void eddy_viscosity(DoubleTab& nu_t) const;
-  virtual void reynolds_stress(DoubleTab& R_ij) const;
-  virtual void k_over_eps(DoubleTab& k_sur_eps) const;
+  void eddy_viscosity(DoubleTab& nu_t) const override;
+  void reynolds_stress(DoubleTab& R_ij) const override;
+  void k_over_eps(DoubleTab& k_sur_eps) const override;
   inline double limiteur() const {return limiter_;};
-  virtual int gradu_required() const  {  return 1; };
+  int gradu_required() const override {  return 1; };
 
 private:
   double limiter_ = 0.01; //"limiteur" fournissant une valeur minimale de la viscosite turbulente : nu_t = max(k * tau, 0.01 * limiter_)

@@ -38,11 +38,11 @@ class Transport_turbulent_SGDH : public Transport_turbulent_base
 {
   Declare_instanciable(Transport_turbulent_SGDH);
 public:
-  virtual int dimension_min_nu() const
+  int dimension_min_nu() const override
   {
     return 1; //isotrope
   }
-  virtual void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const;
+  void modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const override;
   inline double sigma() const {return sigma_;};
 
 private:

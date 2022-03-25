@@ -42,9 +42,9 @@ class Loi_paroi_adaptative : public Loi_paroi_base
 {
   Declare_instanciable(Loi_paroi_adaptative);
 public:
-  void calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc);
-  virtual void completer() ;
-  virtual void mettre_a_jour(double temps) ;
+  void calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) override;
+  void completer() override;
+  void mettre_a_jour(double temps) override;
   DoubleTab get_tab(std::string str) {return valeurs_loi_paroi_[str];};
 
 protected:

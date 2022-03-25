@@ -55,21 +55,18 @@ public:
     correlation_loi_paroi_ = corr;
 
   };
-  virtual void associer_fr_dis_base(const Frontiere_dis_base& fr) {la_frontiere_dis=fr;};
-  virtual int initialiser(double temps) =0 ;
-  virtual void associer_zone_cl_dis_base(const Zone_Cl_dis_base& zcl) { ma_zone_cl_dis=zcl;};
-  virtual double flux_impose(int i) const=0;
-  virtual double flux_impose(int i,int j) const=0;
+  void associer_fr_dis_base(const Frontiere_dis_base& fr) override {la_frontiere_dis=fr;};
+  void associer_zone_cl_dis_base(const Zone_Cl_dis_base& zcl)  override { ma_zone_cl_dis=zcl;};
 
   // fonctions de cond_lim_base qui necessitent le champ_front qu'on met a zero car on fait abstraction du champ_front
-  virtual void completer() {};
-  virtual void fixer_nb_valeurs_temporelles(int nb_cases) {};
-  virtual inline Frontiere_dis_base& frontiere_dis() {return la_frontiere_dis;};
-  virtual inline const Frontiere_dis_base& frontiere_dis() const {return la_frontiere_dis;};
-  virtual void changer_temps_futur(double temps,int i) {};
-  virtual void set_temps_defaut(double temps) {};
-  virtual void calculer_coeffs_echange(double temps) {};
-  virtual void verifie_ch_init_nb_comp() {};
+  virtual void completer() override {};
+  virtual void fixer_nb_valeurs_temporelles(int nb_cases) override {};
+  virtual inline Frontiere_dis_base& frontiere_dis() override {return la_frontiere_dis;};
+  virtual inline const Frontiere_dis_base& frontiere_dis() const override {return la_frontiere_dis;};
+  virtual void changer_temps_futur(double temps,int i) override {};
+  virtual void set_temps_defaut(double temps) override {};
+  virtual void calculer_coeffs_echange(double temps) override {};
+  void verifie_ch_init_nb_comp() const override {};
 
 
 protected:

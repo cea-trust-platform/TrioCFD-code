@@ -43,16 +43,16 @@ class Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC : public Source_
   Declare_instanciable(Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC);
 
 public:
-  int has_interface_blocs() const
+  int has_interface_blocs() const override
   {
     return 1;
   };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
-  void check_multiphase_compatibility() const { }; //rien
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) { };
-  void associer_pb(const Probleme_base& ) { };
-  void mettre_a_jour(double temps) { };
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void check_multiphase_compatibility() const override { }; //rien
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
 
 protected:
   double beta_k = 0.09; // Wilcox
