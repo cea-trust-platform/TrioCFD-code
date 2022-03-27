@@ -367,7 +367,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   DoubleTab xsom(nsom,dimension);
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
-  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+  DoubleTab& flux_b = static_cast<DoubleTab&>(flux_bords_);
   int nb_faces_bord=zone_VEF.nb_faces_bord();
   flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
   flux_b = 0.;

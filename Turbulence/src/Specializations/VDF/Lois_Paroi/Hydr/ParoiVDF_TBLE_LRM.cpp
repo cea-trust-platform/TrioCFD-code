@@ -507,7 +507,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
   Mod_echelle_LRM_base& le_mod_ech= mod_ech.valeur();
 
   const DoubleTab& nu_t = mon_modele_turb_hyd->viscosite_turbulente().valeur().valeurs();
@@ -1429,7 +1429,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
   Mod_echelle_LRM_base& le_mod_ech= mod_ech.valeur();
 
   const DoubleTab& nu_t = mon_modele_turb_hyd->viscosite_turbulente().valeur().valeurs();

@@ -93,7 +93,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const DoubleTab& state_field = eq.get_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
           // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
-          DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+          DoubleTab& flux_b = static_cast<DoubleTab&>(flux_bords_);
           int nb_faces_bord=zone_VEF.nb_faces_bord();
           flux_b.resize(nb_faces_bord,inco.dimension(1));
           flux_b = 0.;
@@ -114,7 +114,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           const DoubleTab& temperature_state = eq.get_temperature_state_field();
           const Motcle& uncertain_var =  eq.get_uncertain_variable_name();
 
-          DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+          DoubleTab& flux_b = static_cast<DoubleTab&>(flux_bords_);
           int nb_faces_bord=zone_VEF.nb_faces_bord();
           flux_b.resize(nb_faces_bord,inco.dimension(0));
           flux_b = 0.;
@@ -971,7 +971,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
 
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
-  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+  DoubleTab& flux_b = static_cast<DoubleTab&>(flux_bords_);
   int nb_faces_bord=zone_VEF.nb_faces_bord();
   flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
   flux_b = 0.;
@@ -1364,7 +1364,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
 
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
-  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+  DoubleTab& flux_b = static_cast<DoubleTab&>(flux_bords_);
   int nb_faces_bord=zone_VEF.nb_faces_bord();
   flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
   flux_b = 0.;
@@ -1802,7 +1802,7 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
   int nfac = zone.nb_faces_elem();
   int nsom = zone.nb_som_elem();
   const IntTab& sommet_elem = zone.les_elems();
-  DoubleVect& fluent_ = ref_cast(DoubleVect, tab_fluent);
+  DoubleVect& fluent_ = static_cast<DoubleVect&>(tab_fluent);
 
 
   const Elem_VEF_base& type_elemvef= zone_VEF.type_elem().valeur();
