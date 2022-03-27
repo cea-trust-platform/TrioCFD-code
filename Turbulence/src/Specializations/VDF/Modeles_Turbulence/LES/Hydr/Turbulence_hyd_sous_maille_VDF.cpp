@@ -26,7 +26,7 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Periodique.h>
 #include <Paroi_negligeable_VDF.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
 #include <Param.h>

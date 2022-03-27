@@ -25,7 +25,7 @@
 #include <Periodique.h>
 #include <Paroi_hyd_base_VEF.h>
 #include <Fluide_Quasi_Compressible.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Op_Diff_K_Eps_QC_VEF_Face,"Op_Diff_K_Eps_QC_VEF_P1NC",Op_Diff_K_Eps_VEF_Face);
 

@@ -28,7 +28,7 @@
 #include <Convection_Diffusion_Phase_field.h>
 #include <Assembleur_base.h>
 #include <Statistiques.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
 #include <Param.h>

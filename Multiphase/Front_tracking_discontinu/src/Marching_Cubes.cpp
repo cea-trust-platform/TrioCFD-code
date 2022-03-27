@@ -24,7 +24,7 @@
 #include <Deriv_Marching_Cubes.h>
 #include <Marching_Cubes_data.h>
 #include <ArrOfBit.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
 #include <Rectangle.h>

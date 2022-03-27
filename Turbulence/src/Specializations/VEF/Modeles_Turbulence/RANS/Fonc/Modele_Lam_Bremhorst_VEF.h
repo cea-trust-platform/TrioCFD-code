@@ -45,8 +45,8 @@ Rodney C. Schmidt and Suhas V. Patankar
 
 class Zone_dis;
 class Zone_Cl_dis;
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_Cl_VEF;
 
 class Modele_Lam_Bremhorst_VEF : public Modele_Fonc_Bas_Reynolds_Base

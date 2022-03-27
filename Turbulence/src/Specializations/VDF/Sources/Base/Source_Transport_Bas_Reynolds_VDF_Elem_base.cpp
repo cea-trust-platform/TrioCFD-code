@@ -23,7 +23,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Zone_Cl_VDF.h>
 #include <Fluide_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Champ_Face.h>
 
 Implemente_base_sans_constructeur( Source_Transport_Bas_Reynolds_VDF_Elem_base, "Source_Transport_Bas_Reynolds_VDF_Elem_base", Source_Transport_VDF_Elem_base ) ;

@@ -21,7 +21,7 @@
 
 #include <Paroi_negligeable_VEF.h>
 #include <Dirichlet_paroi_fixe.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Mod_turb_hyd_base.h>
 #include <Operateur.h>
 #include <Operateur_base.h>

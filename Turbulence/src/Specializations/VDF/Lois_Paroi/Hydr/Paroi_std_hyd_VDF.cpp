@@ -33,7 +33,7 @@
 #include <Mod_turb_hyd_base.h>
 #include <Param.h>
 #include <communications.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Paroi_std_hyd_VDF,"loi_standard_hydr_VDF",Paroi_hyd_base_VDF);
 Implemente_instanciable(Loi_expert_hydr_VDF,"Loi_expert_hydr_VDF",Paroi_std_hyd_VDF);

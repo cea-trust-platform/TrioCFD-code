@@ -32,8 +32,8 @@
 #include <Deriv.h>
 
 class Zone_VF;
-class DoubleTab;
-class ArrOfDouble;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Algorithmes_Transport_FT_Disc;
 
 Declare_deriv(Algorithmes_Transport_FT_Disc);

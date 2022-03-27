@@ -28,7 +28,7 @@
 #include <Fluide_Quasi_Compressible.h>
 #include <Pb_Hydraulique_Turbulent_ALE.h>
 #include <Op_Conv_ALE.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Discretisation_base.h>
 

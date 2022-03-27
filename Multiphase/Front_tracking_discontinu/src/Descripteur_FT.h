@@ -38,7 +38,7 @@
 class ArrOfDoubleFT;
 class IntTabFT;
 class DoubleTabFT;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 class Comm_Group;
 
 // .DESCRIPTION        : class Descripteur_FT

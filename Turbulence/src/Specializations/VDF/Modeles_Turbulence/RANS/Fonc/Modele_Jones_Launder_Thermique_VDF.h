@@ -33,8 +33,8 @@ class Transport_Fluctuation_Temperature_W_Bas_Re;
 class Zone_dis;
 class Zone_Cl_dis;
 class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_Cl_VDF;
 class Champ_Face;
 

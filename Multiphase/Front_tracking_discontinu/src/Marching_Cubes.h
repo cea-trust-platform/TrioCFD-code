@@ -27,9 +27,9 @@
 //#include <IntTabs.h>
 #include <Vect_IntTab.h>
 #include <Maillage_FT_Disc.h>
-#include <ArrOfInt.h>
+#include <TRUSTArray.h>
 
-class DoubleVect;
+#include <TRUSTTabs_forward.h>
 class DoubleTabFT;
 //class Maillage_FT_Disc;
 class ArrOfBit;

@@ -35,7 +35,7 @@
 #include <Operateur_base.h>
 #include <Mod_turb_hyd_base.h>
 #include <distances_VEF.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Schema_Temps_base.h>
 #include <SFichier.h>
 #include <Transport_Interfaces_FT_Disc.h>

@@ -36,8 +36,8 @@ class Restriction;
 class Pb_grossier;
 class Champ_front_zoom;
 class Pb_1G;
-class IntVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Frontiere;
 class Probleme_base;
 //

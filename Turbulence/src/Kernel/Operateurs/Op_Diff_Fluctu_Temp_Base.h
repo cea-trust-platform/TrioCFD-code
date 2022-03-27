@@ -29,7 +29,7 @@
 
 class Champ_Fonc;
 class Champ_Don;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 
 //.DESCRIPTION class Op_Diff_Fluctu_Temp_Base
 // Sert a modeliser le terme diffusif dans l'equation de transport

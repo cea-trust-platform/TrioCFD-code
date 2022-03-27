@@ -22,14 +22,14 @@
 #include <Modele_Jones_Launder_Thermique_VDF.h>
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Probleme_base.h>
 #include <Dirichlet.h>
 #include <Dirichlet_entree_fluide.h>
 #include <Symetrie.h>
 #include <Neumann.h>
 #include <Neumann_homogene.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Modele_Jones_Launder_Thermique_VDF,"Modele_Jones_Launder_Thermique_VDF",Modele_Fonc_Bas_Reynolds_Thermique_Base);
 

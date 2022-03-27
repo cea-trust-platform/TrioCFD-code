@@ -24,7 +24,7 @@
 #define Traitement_particulier_NS_THI_VDF_included
 
 #include <Traitement_particulier_NS_THI.h>
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //

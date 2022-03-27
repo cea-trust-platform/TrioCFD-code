@@ -32,7 +32,7 @@
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
 #include <Modifier_nut_pour_fluide_dilatable.h>
 #include <Modele_turbulence_scal_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <communications.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps_Realisable,"Modele_turbulence_hyd_K_Epsilon_Realisable",Mod_turb_hyd_RANS);

@@ -35,7 +35,7 @@
 #include <Champ_Uniforme.h>
 #include <Zone_VEF.h>
 #include <Symetrie.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Eq_rayo_semi_transp_VEF,"Eq_rayo_semi_transp_VEF",Equation_rayonnement_base);
 

@@ -24,7 +24,7 @@
 #include <Dirichlet_entree_fluide.h>
 #include <Neumann_sortie_libre.h>
 #include <Symetrie.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
 #include <Zone_VDF.h>

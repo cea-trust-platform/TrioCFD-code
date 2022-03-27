@@ -24,7 +24,7 @@
 #include <Navier_Stokes_std_sensibility.h>
 #include <Convection_Diffusion_Temperature_sensibility.h>
 #include <Fluide_Incompressible.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>

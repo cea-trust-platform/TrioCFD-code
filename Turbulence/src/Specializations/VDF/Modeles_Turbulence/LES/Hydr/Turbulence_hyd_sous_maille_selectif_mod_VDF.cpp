@@ -23,7 +23,7 @@
 #include <math.h>
 #include <VDF_discretisation.h>
 #include <Champ_Face.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Param.h>
 #include <Paroi_log_QDM.h>
 #include <Equation_base.h>

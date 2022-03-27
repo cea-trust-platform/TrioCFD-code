@@ -25,7 +25,7 @@
 #include <Schema_Temps_base.h>
 #include <Op_Conv_ALE_VEF.h>
 #include <Discretisation_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Discret_Thyd.h>
 

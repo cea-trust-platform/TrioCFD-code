@@ -60,7 +60,7 @@
 #include <sys/stat.h>
 #include <IntList.h>
 #include <Domaine.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <stat_counters.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT_Disc,"Transport_Interfaces_FT_Disc",Transport_Interfaces_base);

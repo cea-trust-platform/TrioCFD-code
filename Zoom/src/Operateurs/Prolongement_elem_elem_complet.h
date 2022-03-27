@@ -29,8 +29,8 @@
 #include <Prolongement_base.h>
 class Zone_VF;
 class Frontiere;
-class IntVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 //
 // .DESCRIPTION class Prolongement_elem_elem_complet
 //

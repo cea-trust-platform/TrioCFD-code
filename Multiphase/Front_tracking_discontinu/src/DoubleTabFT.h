@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef DoubleTabFT_included
 #define DoubleTabFT_included
-#include <DoubleTab.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
+#include <TRUSTTab.h>
 class DoubleTabFT : public DoubleTab
 {
 public:

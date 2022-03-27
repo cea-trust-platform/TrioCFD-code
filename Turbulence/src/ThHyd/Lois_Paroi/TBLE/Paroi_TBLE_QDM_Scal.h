@@ -23,7 +23,7 @@
 #define Paroi_TBLE_QDM_Scal_included
 
 #include <Vect_Eq_couch_lim.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 #include <Noms.h>
 #include <DoubleVects.h>
 class Motcle;

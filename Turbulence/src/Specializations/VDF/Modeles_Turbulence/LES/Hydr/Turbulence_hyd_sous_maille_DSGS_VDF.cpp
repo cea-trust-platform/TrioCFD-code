@@ -22,7 +22,7 @@
 #include <Turbulence_hyd_sous_maille_DSGS_VDF.h>
 #include <Champ_Fonc_P0_VDF.h>
 #include <Champ_Face.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Schema_Temps_base.h>
 #include <Equation_base.h>

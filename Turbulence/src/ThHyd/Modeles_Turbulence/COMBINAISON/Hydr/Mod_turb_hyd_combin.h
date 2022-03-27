@@ -25,7 +25,7 @@
 #include <Mod_turb_hyd_base.h>
 #include <Vect_Parser_U.h>
 
-class IntTab;
+#include <TRUSTTabs_forward.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //

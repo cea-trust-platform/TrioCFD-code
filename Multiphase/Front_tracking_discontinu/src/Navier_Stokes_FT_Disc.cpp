@@ -39,7 +39,7 @@
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Ref_Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Terme_Source_Constituant_Vortex_VEF_Face.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Matrice_Morse_Sym.h>
 #include <Matrice_Bloc.h>
 #include <Param.h>

@@ -21,7 +21,7 @@
 
 #ifndef Eq_ODVM_included
 #define Eq_ODVM_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Motcle.h>
 #include <Ref_Milieu_base.h>
 

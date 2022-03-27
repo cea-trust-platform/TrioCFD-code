@@ -35,8 +35,8 @@
 
 #include <Nom.h>
 
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_Cl_VDF;
 class Champ_Face;
 class Zone_VDF;

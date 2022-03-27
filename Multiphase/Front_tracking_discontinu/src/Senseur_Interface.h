@@ -25,7 +25,7 @@
 #include <Objet_U.h>
 #include <Ref_Probleme_base.h>
 #include <Ref_Equation_base.h>
-#include <ArrOfDouble.h>
+#include <TRUSTArray.h>
 class Probleme_base;
 
 // Senseur permettant de trouver l'intersection entre un segment

@@ -20,11 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Turbulence_hyd_sous_maille_SMAGO_DYN_VDF.h>
 #include <Zone.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Champ_Face.h>
 #include <Champ_Fonc_P0_VDF.h>
 #include <Debog.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <SFichier.h>
 #include <Schema_Temps_base.h>
 #include <stat_counters.h>

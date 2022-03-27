@@ -21,7 +21,7 @@
 
 #ifndef Eq_couch_lim_included
 #define Eq_couch_lim_included
-#include <IntVect.h>
+#include <TRUSTVect.h>
 
 #include <Diffu_totale.h>
 #include <Motcle.h>

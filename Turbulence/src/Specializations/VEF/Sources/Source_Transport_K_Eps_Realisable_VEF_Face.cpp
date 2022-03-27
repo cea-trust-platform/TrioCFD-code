@@ -31,7 +31,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
 #include <Champ_P1NC.h>
 #include <Debog.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Modele_Shih_Zhu_Lumley_VEF.h>
 #include <Pb_Hydraulique_Turbulent.h>

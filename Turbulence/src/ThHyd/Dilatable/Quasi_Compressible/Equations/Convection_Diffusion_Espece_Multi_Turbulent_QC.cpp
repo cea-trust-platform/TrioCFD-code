@@ -22,7 +22,7 @@
 #include <Convection_Diffusion_Espece_Multi_Turbulent_QC.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Param.h>
 
 Implemente_instanciable(Convection_Diffusion_Espece_Multi_Turbulent_QC,"Convection_Diffusion_Espece_Multi_Turbulent_QC",Convection_Diffusion_Espece_Multi_QC);

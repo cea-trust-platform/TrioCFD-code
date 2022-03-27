@@ -26,9 +26,9 @@
 #include <Remailleur_Collision_FT_Juric.h>
 #include <Transport_Interfaces_FT_Disc.h>
 
-class DoubleTab;
-class ArrOfInt;
-class IntTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_dis;
 class Zone_dis_base;
 

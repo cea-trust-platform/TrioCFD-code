@@ -30,7 +30,7 @@
 #include <Param.h>
 #include <communications.h>
 #include <Fluide_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Champ_Uniforme.h>
 #include <ConstDoubleTab_parts.h>
 #include <Champ_Inc_P0_base.h>

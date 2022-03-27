@@ -34,7 +34,7 @@
 #include <Probleme_base.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Ref_Modele_turbulence_hyd_K_Eps.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Dirichlet_paroi_defilante.h>
 #include <Echange_externe_impose.h>
 #include <Neumann.h>

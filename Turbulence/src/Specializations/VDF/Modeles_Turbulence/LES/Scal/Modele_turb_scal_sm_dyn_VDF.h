@@ -26,7 +26,7 @@
 #include <Ref_Zone_Cl_VDF.h>
 #include <Motcle.h>
 #include <Champ_Fonc.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 
 class Zone_dis;
 class Zone_Cl_dis;

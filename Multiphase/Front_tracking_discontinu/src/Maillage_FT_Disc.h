@@ -36,9 +36,9 @@ class Remaillage_FT;
 class Topologie_Maillage_FT;
 class Parcours_interface;
 class Maillage_Echange;
-class DoubleVect;
+#include <TRUSTTabs_forward.h>
 class Zone_VF;
-class IntTab;
+#include <TRUSTTabs_forward.h>
 class Maillage_FT_Disc_Data_Cache;
 Declare_deriv(Maillage_FT_Disc_Data_Cache); // Classe utilisee en interne;
 

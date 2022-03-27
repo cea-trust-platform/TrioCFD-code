@@ -23,7 +23,7 @@
 #include <Op_Conv_ALE_VEF.h>
 #include <Op_Conv_VEF_base.h>
 #include <Domaine_ALE.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>

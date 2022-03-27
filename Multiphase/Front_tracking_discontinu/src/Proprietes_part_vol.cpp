@@ -23,7 +23,7 @@
 #include <Proprietes_part_vol.h>
 #include <EFichier.h>
 #include <Motcle.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <ArrOfIntFT.h>
 #include <Param.h>
 

@@ -22,7 +22,7 @@
 #include <Modele_turbulence_scal_Fluctuation_Temperature.h>
 #include <Probleme_base.h>
 #include <Mod_turb_hyd_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Param.h>
 
 Implemente_instanciable(Modele_turbulence_scal_Fluctuation_Temperature,"Modele_turbulence_scal_Fluctuation_Temperature",Modele_turbulence_scal_base);

@@ -27,7 +27,7 @@
 
 class Zone_dis_base;
 class Zone_Cl_dis_base;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //

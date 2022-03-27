@@ -31,8 +31,8 @@
 
 class Maillage_FT_Disc;
 class Domaine;
-class IntTab;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone;
 class Zone_dis;
 class Connectivite_frontieres;

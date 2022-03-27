@@ -30,7 +30,7 @@
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Champ_P1NC.h>
 #include <Debog.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Fluide_Quasi_Compressible.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_VEF_Face,"Source_Transport_K_Eps_Bas_Reynolds_VEF_P1NC",Source_base);

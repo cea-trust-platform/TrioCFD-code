@@ -25,7 +25,7 @@
 #include <Schema_Temps_base.h>
 #include <Discretisation_base.h>
 #include <FloatTab.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_Diphasique.h>

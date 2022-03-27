@@ -22,7 +22,7 @@
 #include <Modele_turbulence_Longueur_Melange_VDF.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
 #include <Champ_Face.h>

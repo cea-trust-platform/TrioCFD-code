@@ -23,8 +23,8 @@
 #define Mod_echelle_LRM_base_included
 
 #include <Objet_U.h>
-#include <DoubleVect.h>
-#include <DoubleTab.h>
+#include <TRUSTVect.h>
+#include <TRUSTTab.h>
 
 
 //////////////////////////////////////////////////////////////////////////////

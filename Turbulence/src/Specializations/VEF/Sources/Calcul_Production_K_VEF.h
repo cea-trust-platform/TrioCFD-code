@@ -35,10 +35,10 @@
 // pour faire de l'heritage multiple.
 //
 /////////////////////////////////////////////////////////////////////////
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 class Zone_VEF;
 class Zone_Cl_VEF;
-class DoubleVect;
+#include <TRUSTTabs_forward.h>
 
 class Calcul_Production_K_VEF
 {

@@ -22,7 +22,7 @@
 
 #include <Maillage_FT_Disc.h>
 #include <Deriv_Maillage_FT_Disc.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <Zone.h>
 #include <Zone_VF.h>
 #include <Transport_Interfaces_FT_Disc.h>

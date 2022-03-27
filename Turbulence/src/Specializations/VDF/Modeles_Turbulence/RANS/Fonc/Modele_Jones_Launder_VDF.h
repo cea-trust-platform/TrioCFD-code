@@ -30,8 +30,8 @@
 
 class Zone_dis;
 class Zone_Cl_dis;
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_Cl_VDF;
 class Champ_Face;
 

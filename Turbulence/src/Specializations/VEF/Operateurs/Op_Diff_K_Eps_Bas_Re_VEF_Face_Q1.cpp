@@ -30,7 +30,7 @@
 #include <Dirichlet_paroi_fixe.h>
 #include <Symetrie.h>
 #include <Neumann_paroi.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 
 

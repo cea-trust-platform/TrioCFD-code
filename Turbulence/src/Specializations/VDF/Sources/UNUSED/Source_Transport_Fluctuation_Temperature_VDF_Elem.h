@@ -45,8 +45,8 @@
 
 class Probleme_base;
 class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_dis;
 class Zone_Cl_dis;
 class Zone_Cl_VDF;

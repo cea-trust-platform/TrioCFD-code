@@ -31,7 +31,7 @@
 #include <Champ_Uniforme.h>
 #include <Zone_VEF.h>
 #include <Champ_P1NC.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Pb_Hydraulique_Concentration_Turbulent.h>

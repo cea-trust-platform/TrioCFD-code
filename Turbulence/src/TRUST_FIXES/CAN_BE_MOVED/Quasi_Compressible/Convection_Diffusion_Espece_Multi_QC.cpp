@@ -26,7 +26,7 @@
 #include <Navier_Stokes_Turbulent_QC.h>
 #include <Navier_Stokes_QC.h>
 #include <Probleme_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Dirichlet.h>
 #include <EChaine.h>
 #include <Param.h>

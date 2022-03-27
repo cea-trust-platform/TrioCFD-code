@@ -24,7 +24,7 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Fluide_base.h>
 #include <Probleme_base.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Entree_fluide_temperature_imposee.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VDF.h>
@@ -32,7 +32,7 @@
 #include <Zone_Cl_VDF.h>
 #include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Modele_turbulence_scal_Fluctuation_Temperature.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_Fluctuation_Temperature_VDF_Elem,"Source_Transport_Fluctuation_Temperature_VDF_P0_VDF",Source_base);
 

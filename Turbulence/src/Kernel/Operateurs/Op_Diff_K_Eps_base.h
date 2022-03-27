@@ -30,7 +30,7 @@
 
 class Champ_Fonc;
 class Champ_base;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 
 
 

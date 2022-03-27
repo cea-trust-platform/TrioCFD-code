@@ -23,7 +23,7 @@
 #include <Modele_Fonc_Realisable_base.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Champ_Face.h>
 #include <Param.h>
 

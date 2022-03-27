@@ -36,7 +36,7 @@
 #include <Symetrie.h>
 #include <Ref_Champ_front.h>
 #include <Zone_VDF.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Eq_rayo_semi_transp_VDF,"Eq_rayo_semi_transp_VDF",Equation_rayonnement_base);
 
