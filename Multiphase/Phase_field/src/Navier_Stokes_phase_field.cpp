@@ -524,7 +524,7 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
   // RLT: plutot que de multiplier dt(diff) par rho ici comme c'est fait dans TrioCFD 1.8.0 (cf. coeff ci-dessous)
   // (en considerant qu'il a ete evalue dans l'operateur de diffusion (Op_Diff_VDF_Face_base) avec la viscosite dynamique - ce qui n'est vrai que pour boussi_==0)
   // on associe le champ masse volumique a l'operateur de diffusion dans le cas boussi_==0 pour que le calcul de son dt soit correct directement
-  double coeff = mp_min_vect(eq_ns.rho()); // eq_c.rho1(); // voir d'apres le FT
+  double coeff = mp_min_vect(eq_ns.rho()->valeurs()); // eq_c.rho1(); // voir d'apres le FT
 
   double dt=0;
   double dt_op;
