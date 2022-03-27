@@ -28,7 +28,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Static_Int_Lists.h>
 #include <Debog.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <EcrFicPartage.h>
 #include <Paroi_std_hyd_VEF.h>
 #include <Mod_turb_hyd_base.h>

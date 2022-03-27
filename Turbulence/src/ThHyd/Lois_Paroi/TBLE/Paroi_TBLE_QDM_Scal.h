@@ -25,7 +25,7 @@
 #include <Vect_Eq_couch_lim.h>
 #include <TRUSTTab.h>
 #include <Noms.h>
-#include <DoubleVects.h>
+#include <TRUSTVects.h>
 class Motcle;
 class Zone_dis_base;
 class Zone_Cl_dis_base;

@@ -29,7 +29,7 @@
 #include <Periodique.h>
 #include <Static_Int_Lists.h>
 #include <Debog.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <EcrFicPartage.h>
 #include <Mod_turb_hyd_RANS_0_eq.h>
 #include <Neumann_sortie_libre.h>

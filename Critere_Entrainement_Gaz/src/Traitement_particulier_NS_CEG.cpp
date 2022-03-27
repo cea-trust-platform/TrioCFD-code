@@ -31,7 +31,7 @@
 #include <Milieu_base.h>
 #include <SFichier.h>
 #include <Domaine.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <Statistiques.h>
 #include <stat_counters.h>
 #include <Fluide_Incompressible.h>

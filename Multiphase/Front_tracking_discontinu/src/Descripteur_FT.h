@@ -31,7 +31,7 @@
 #include <Objet_U.h>
 #include <ArrOfIntFT.h>
 #include <Schema_Comm_FT.h>
-#include <Vect_ArrOfInt.h>
+#include <TRUSTArrays.h>
 #include <MD_Vector.h>
 #include <MD_Vector_tools.h>
 

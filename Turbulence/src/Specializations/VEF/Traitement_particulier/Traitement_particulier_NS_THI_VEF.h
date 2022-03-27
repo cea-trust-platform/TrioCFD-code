@@ -26,7 +26,7 @@
 #include <Traitement_particulier_NS_THI.h>
 #include <Op_Diff_VEF_Face.h>
 #include <Champ_P1NC.h>
-#include <DoubleVects.h>
+#include <TRUSTVects.h>
 
 
 //////////////////////////////////////////////////////////////////////////////

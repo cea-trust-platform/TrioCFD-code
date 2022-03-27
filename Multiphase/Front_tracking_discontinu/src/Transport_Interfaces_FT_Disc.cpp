@@ -58,7 +58,7 @@
 #include <EFichierBin.h>
 #include <Param.h>
 #include <sys/stat.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <Domaine.h>
 #include <TRUSTTrav.h>
 #include <stat_counters.h>

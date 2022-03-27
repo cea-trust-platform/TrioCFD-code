@@ -25,7 +25,7 @@
 #include <Probleme_base.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Ref_Champ_Inc_base.h>
-#include <DoubleTabs.h>
+#include <TRUSTTabs.h>
 
 Implemente_instanciable(RK3_FT,"RK3_FT",RK3);
 
