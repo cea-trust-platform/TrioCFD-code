@@ -40,10 +40,9 @@
 #include <Ref_Loi_horaire.h>
 #include <Proprietes_part_vol.h>
 #include <Ref_Navier_Stokes_FT_Disc.h>
+#include <TRUSTTabFT_forward.h>
 
 class Transport_Interfaces_FT_Disc_interne;
-class DoubleTabFT;
-class ArrOfDoubleFT;
 class FloatTab;
 
 class Transport_Interfaces_FT_Disc : public Transport_Interfaces_base

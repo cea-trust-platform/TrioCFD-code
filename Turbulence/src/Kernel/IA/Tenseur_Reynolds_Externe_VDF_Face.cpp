@@ -438,7 +438,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::Calcul_RSLambda()
   DoubleTab gij(nb_elem_tot,dimension,dimension);
   const Champ_Face& vitesse = ref_cast( Champ_Face,eqn_NS_->inconnue().valeur() );
 
-  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse,gij,zone_Cl_VDF );
+  ref_cast_non_const(Champ_Face,vitesse).calcul_duidxj( vitesse.valeurs(),gij,zone_Cl_VDF );
 
   DoubleTab lambda_1(nb_elem_tot);
   DoubleTab lambda_2(nb_elem_tot);

@@ -6126,7 +6126,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
         zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
         dI_dt.echange_espace_virtuel();
-        ramasse_miettes(maillage, variables_internes_->tmp_flux, dI_dt);
+        ramasse_miettes(maillage, variables_internes_->tmp_flux->valeurs(), dI_dt);
         transfert_conservatif_eulerien_vers_lagrangien_sommets(maillage, dI_dt, var_volume);
       }
       // var_volume est une derivee par rapport au temps.

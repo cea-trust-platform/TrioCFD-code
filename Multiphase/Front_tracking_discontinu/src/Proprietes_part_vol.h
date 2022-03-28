@@ -24,9 +24,7 @@
 #define Proprietes_part_vol_included
 
 #include <Objet_U.h>
-#include <DoubleTabFT.h>
-
-class ArrOfIntFT;
+#include <TRUSTTabFT.h>
 class Param;
 
 //Description

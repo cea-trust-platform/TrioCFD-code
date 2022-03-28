@@ -212,7 +212,7 @@ inline int Turbulence_paroi::calculer_hyd(Champ_Inc& ch)
 // Postcondition:
 inline int Turbulence_paroi::calculer_hyd_BiK(Champ_Inc& ch1 , Champ_Inc& ch2 )
 {
-  return valeur().calculer_hyd_BiK(ch1,ch2);
+  return valeur().calculer_hyd_BiK(ch1->valeurs(),ch2->valeurs());
 }
 
 

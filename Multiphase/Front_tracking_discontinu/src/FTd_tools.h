@@ -22,7 +22,7 @@
 #ifndef FTd_tools_inclus
 #define FTd_tools_inclus
 
-class DoubleTabFT;
+#include <TRUSTTabFT_forward.h>
 #include <TRUSTTabs_forward.h>
 
 typedef double FTd_matrice22[2][2];

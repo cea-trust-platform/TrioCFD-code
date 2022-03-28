@@ -87,7 +87,7 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
   DoubleTab ALEjacobian_Old=dom_ale.getOldJacobian();
   DoubleTab ALEjacobian_New=dom_ale.getNewJacobian();
   DoubleTab& vitesse_faces_ALE= dom_ale.vitesse_faces();
-  DoubleTab term_Jacobian_ratio_U_n(la_vitesse);               // For (Jacobian n/Jacobian n+1) * Un / timestep , initialized every iteration with with new la_vitesse values.
+  DoubleTab term_Jacobian_ratio_U_n(la_vitesse->valeurs());               // For (Jacobian n/Jacobian n+1) * Un / timestep , initialized every iteration with with new la_vitesse values.
 
   for (int num_face=0; num_face<(vitesse_faces_ALE.size()/dimension); num_face++)
     {

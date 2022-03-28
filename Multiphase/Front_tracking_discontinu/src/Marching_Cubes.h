@@ -27,9 +27,8 @@
 #include <TRUSTTabs.h>
 #include <Maillage_FT_Disc.h>
 #include <TRUSTArray.h>
-
+#include <TRUSTTabFT_forward.h>
 #include <TRUSTTabs_forward.h>
-class DoubleTabFT;
 class ArrOfBit;
 class Desc_Structure_FT;
 class Zone;

@@ -24,7 +24,7 @@
 #define Topologie_Maillage_FT_included
 
 #include <FTd_tools.h>
-#include <IntTabFT.h>
+#include <TRUSTTabFT.h>
 #include <Remailleur_Collision_FT.h>
 
 class Maillage_FT_Disc;

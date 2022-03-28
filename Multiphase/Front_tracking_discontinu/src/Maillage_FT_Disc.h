@@ -24,8 +24,7 @@
 #define Maillage_FT_Disc_included
 
 #include <Ensemble_Lagrange_base.h>
-#include <ArrOfDoubleFT.h>
-#include <IntTabFT.h>
+#include <TRUSTTabFT.h>
 #include <Descripteur_FT.h>
 #include <Ref_Zone_dis.h>
 #include <Ref_Parcours_interface.h>

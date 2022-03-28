@@ -24,7 +24,7 @@
 #include <EFichier.h>
 #include <Motcle.h>
 #include <TRUSTVect.h>
-#include <ArrOfIntFT.h>
+#include <TRUSTTabFT.h>
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Proprietes_part_vol,"Proprietes_part_vol",Objet_U);

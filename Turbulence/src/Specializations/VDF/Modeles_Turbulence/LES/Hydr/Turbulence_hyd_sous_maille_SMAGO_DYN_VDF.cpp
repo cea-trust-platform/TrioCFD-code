@@ -192,7 +192,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::mettre_a_jour(double temps)
   calculer_Mij(Sij_grid_scale,Sij_test_scale,l,Mij);
   Debog::verifier("Lij",Lij);
   calculer_model_coefficient(Lij,Mij);
-  Debog::verifier("model_coeff",coeff_field);
+  Debog::verifier("model_coeff",coeff_field->valeurs());
   calculer_viscosite_turbulente(S_grid_scale_norme,l);
   calculer_energie_cinetique_turb(S_grid_scale_norme,l);
   loipar->calculer_hyd(la_viscosite_turbulente,energie_cinetique_turbulente());
@@ -565,7 +565,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_model_coefficient(
   const DoubleTab& Lij,
   const DoubleTab& Mij)
 {
-  DoubleVect& model_coeff = coeff_field;
+  DoubleVect& model_coeff = coeff_field->valeurs();
   int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
   DoubleTab haut, bas;
   la_zone_VDF->zone().creer_tableau_elements(haut);
@@ -645,7 +645,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_viscosite_turbule
 
 
 
-  DoubleVect& model_coeff = coeff_field;
+  DoubleVect& model_coeff = coeff_field->valeurs();
   double temps = mon_equation->inconnue().temps();
   DoubleTab& visco_turb = la_viscosite_turbulente.valeurs();
   int nb_elem = la_zone_VDF->zone().nb_elem();
@@ -678,7 +678,7 @@ Champ_Fonc& Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::calculer_energie_cinetique
   const DoubleVect& SMA_barre,
   const DoubleVect& l)
 {
-  DoubleVect& model_coeff = coeff_field;
+  DoubleVect& model_coeff = coeff_field->valeurs();
   double temps = mon_equation->inconnue().temps();
   DoubleVect& k = energie_cinetique_turb_.valeurs();
   int nb_elem_tot = la_zone_VDF->zone().nb_elem_tot();
@@ -881,7 +881,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_6_points(
   const DoubleTab& haut,
   const DoubleTab& bas )
 {
-  DoubleVect& model_coeff = coeff_field;
+  DoubleVect& model_coeff = coeff_field->valeurs();
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   int nb_elem = zone_VDF.zone().nb_elem();
@@ -994,7 +994,7 @@ void Turbulence_hyd_sous_maille_SMAGO_DYN_VDF::stabilise_moyenne_plans_parallele
   const DoubleTab& haut,
   const DoubleTab& bas )
 {
-  DoubleVect& model_coeff = coeff_field;
+  DoubleVect& model_coeff = coeff_field->valeurs();
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   int nb_elem = zone_VDF.zone().nb_elem();
   int nb_elem_tot = zone_VDF.zone().nb_elem_tot();

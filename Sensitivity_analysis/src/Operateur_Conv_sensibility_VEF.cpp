@@ -103,7 +103,7 @@ DoubleTab& Operateur_Conv_sensibility_VEF::ajouter(const DoubleTab& inco, Double
           //ajouter_Lstate_sensibility_Amont(state, inco, resu);
           //ajouter_Lsensibility_state_Amont(inco, state, resu);
           if(uncertain_var=="MU")
-            add_diffusion_term(state, resu);
+            add_diffusion_term(state.valeurs(), resu);
           opConvVEFbase.modifier_flux(*this); // Multiplication by rho
 
         }
@@ -1878,7 +1878,7 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
         }
 
       // calcul de vc (a l'intersection des 3 facettes) vc vs vsom proportionnelles a la prosite
-      calcul_vc(face,vc,vs,vsom,vitesse(),itypcl);
+      calcul_vc(face,vc,vs,vsom,vitesse().valeurs(),itypcl);
       // Boucle sur les facettes du polyedre non standard:
       for (fa7=0; fa7<nfa7; fa7++)
         {

@@ -21,8 +21,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Descripteur_FT.h>
-#include <IntTabFT.h>
-#include <ArrOfDoubleFT.h>
 #include <Comm_Group.h>
 #include <TRUSTTabs.h>
 #include <communications.h>

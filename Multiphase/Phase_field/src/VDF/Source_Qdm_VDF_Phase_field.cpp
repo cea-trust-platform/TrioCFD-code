@@ -171,7 +171,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
 
-  const DoubleTab& mutilde=eq_c.get_mutilde_();
+  const DoubleTab& mutilde=eq_c.get_mutilde_()->valeurs();
   mutilde_NS=mutilde;
   u_carre=source_pf.get_u_carre();
 
