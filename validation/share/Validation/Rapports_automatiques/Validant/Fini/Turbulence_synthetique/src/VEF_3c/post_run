@@ -1,0 +1,10 @@
+visit -cli -s image.py -nowin
+
+convert image0000.png -trim -bordercolor white -border 5%x5% -resize 100% tmp
+montage -tile 1x1 tmp -title VEF_3c -pointsize 20 -geometry 902x902 image.png
+
+rm -f image0000.png visitlog.py tmp
+
+cd ../
+
+montage -tile 3x3 VEF_1a/image.png VEF_2a/image.png VEF_3a/image.png VEF_1b/image.png VEF_2b/image.png VEF_3b/image.png VEF_1c/image.png VEF_2c/image.png VEF_3c/image.png -geometry 902x902 image_VEF.png

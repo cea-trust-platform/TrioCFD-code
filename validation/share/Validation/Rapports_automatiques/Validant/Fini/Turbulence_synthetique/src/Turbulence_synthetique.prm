@@ -1,0 +1,268 @@
+Parameters {
+	newvalidTrio
+	Title "Generation of synthetic isotropic and homogeneous turbulence at the inlet of a domain"
+	VersionTrio_U "1.8.4"
+
+	ParametersTrio_U Type of problem : hydraulic
+	ParametersTrio_U Discretization : VDF and VEF
+	ParametersTrio_U Time scheme : explicit Euler
+	ParametersTrio_U Solving of equations : none
+	ParametersTrio_U Type of boundary conditions : inlet/outlet + walls
+	ParametersTrio_U Location : /validation/share/Validation/Rapports_automatiques/Validant/Fini/Turbulence_synthetique
+	
+	Reference "\latex_($[1]$ P.-E. Angeli, G\'en\'eration de turbulence synth\'etique : description, validation et utilisation dans TrioCFD (note technique DES/ISAS/DM2S/STMF/LMSF/NT/2022-69746/A).\latex_)"
+
+	TestCase VDF_1a Cas /*see data set in the appendix*/
+	TestCase VDF_1b Cas
+	TestCase VDF_1c Cas
+	TestCase VDF_1d Cas
+	TestCase VDF_2a Cas
+	TestCase VDF_2b Cas
+	TestCase VDF_2c Cas
+	TestCase VDF_2d Cas
+	TestCase VDF_3a Cas
+	TestCase VDF_3b Cas
+	TestCase VDF_3c Cas
+	TestCase VDF_3d Cas
+	TestCase VDF_1d_pas_de_temps_1_Tau Cas
+	TestCase VDF_1d_pas_de_temps_0.1_Tau Cas
+	TestCase VDF_1d_pas_de_temps_0.01_Tau Cas
+	TestCase VEF_1a Cas
+	TestCase VEF_1b Cas
+	TestCase VEF_1c Cas
+	TestCase VEF_2a Cas
+	TestCase VEF_2b Cas
+	TestCase VEF_2c Cas
+	TestCase VEF_3a Cas
+	TestCase VEF_3b Cas
+
+	Author "Pierre-Emmanuel Angeli"
+	IncludeData 2
+}
+#
+Objectif {
+	Description "The objective is to check the behavior of the synthetic isotropic and homogeneous turbulence inlet condition. The theoretical aspects are described in reference [1]."
+}
+#
+Pb_description {
+	geometrie {
+			Description "A box of dimensions $L/10 \times L \times L$ with $L = 0.1$ m."
+		}
+	CICL {
+			Description "$\bullet$ Fluctuating inlet velocity at the boundary $x = 0$."
+			Description "$\bullet$ Uniform outlet pressure at the boundary $x = 0.01$."
+			Description "$\bullet$ Fixed wall for other boundaries."
+			}
+	Propfluide {
+			Description "$\bullet$ Dynamic viscosity: \latex_($\mu$ = 0.001\latex_) Pa.s"
+			Description "$\bullet$ Density: \latex_($\rho$ = 1000\latex_) kg/m3"
+			}
+	Phyecou {
+			Description "No numerical resolution is performed. This file focuses on the behavior of the inlet boundary condition instead of analyzing Navier-Stokes solutions."
+			}
+}
+#
+Casesetup {
+	Maillage {
+			Description "In VDF, the box is discretized in a Cartesian manner with 5 \latex_($\times$ $(P+1)$ $\times$ $(P+1)$\latex_) nodes, where \latex_($P$\latex_) is a parameter. In VEF, we use 3 \latex_($\times$ $(P+1)$ $\times$ $(P+1)$\latex_) nodes and divide each cell into 48 tetrahedra with the \latex_(\texttt{tetraedriser\_homogene\_fin}\latex_) keyword. In VDF, the computed mesh size at the inlet boundary is \latex_($\Delta = \sqrt{\dfrac{L^2}{P^2}} = \dfrac{L}{P}$\latex_). In VEF, the computed mesh size at the inlet boundary is \latex_($\Delta = \sqrt{\dfrac{L^2}{8 P^2}} = \dfrac{\sqrt{2}}{4} \dfrac{L}{P}$\latex_)"
+			}
+	Options_modele {
+			Description "We use the following syntax for the synthetic turbulence at the inlet:"
+			Description ""
+			Description "\latex_(\texttt{champ\_front\_synt 3 \{}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} moyenne 1 0 0}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} lenghtScale 0.000974}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} nbModes 100}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} turbKinEn 0.2}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} turbDissRate 50}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} p 5}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} timeScale 4e-3}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} dir\_fluct 1 1 1}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} ratioCutoffWavenumber 2}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} \}}\latex_)"
+			Description "We check the sensitivity to the parameter \latex_(\texttt{timeScale}\latex_), hereinafter denoted by \latex_($\tau_t$\latex_). We also vary the number of mesh points \latex_($P$\latex_) as well as the parameter \latex_(\texttt{ratioCutoffWavenumber}\latex_) according to the following tables. Note that the cut-off wavenumber was computed separately by integrating the turbulent kinetic energy spectrum."
+			Description ""
+			Table {
+				Title "Chart of test cases (VDF)."
+				nb_columns 4
+				label parameter \latex_($P$\latex_) | \latex_(\texttt{ratioCutoffWavenumber}\latex_) | cut-off wavenumber \latex_($\kappa_\Delta$\latex_) | \latex_($k_\text{res} / k_\text{tot}$\latex_)
+				line {
+					legend VDF 1a
+					values 16 2 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VDF 1b
+					values 32 1 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VDF 1c
+					values 64 0.5 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VDF 1d
+					values 128 0.25 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VDF 2a
+					values 50 2 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VDF 2b
+					values 100 1 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VDF 2c
+					values 200 0.5 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VDF 2d
+					values 400 0.25 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VDF 3a
+					values 256 2 \latex_(16085~rad/m\latex_) 90.07%
+					}
+				line {
+					legend VDF 3b
+					values 512 1 \latex_(16085~rad/m\latex_) 90.07%
+					}
+				line {
+					legend VDF 3c
+					values 1024 0.5 \latex_(16085~rad/m\latex_) 90.07%
+					}
+				line {
+					legend VDF 3d
+					values 2048 0.25 \latex_(16085~rad/m\latex_) 90.07%
+					}
+				}
+			Description ""
+			Table {
+				Title "Chart of test cases (VEF)."
+				nb_columns 4
+				label mesh points \latex_($P$\latex_) | \latex_(\texttt{ratioCutoffWavenumber}\latex_) | cut-off wavenumber \latex_($\kappa_\Delta$\latex_) | \latex_($k_\text{res} / k_\text{tot}$\latex_)
+				line {
+					legend VEF 1a
+					values 8 1.414 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VEF 1b
+					values 16 0.707 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VEF 1c
+					values 32 0.353 \latex_(1005~rad/m\latex_) 10.62%
+					}
+				line {
+					legend VEF 2a
+					values 25 1.414 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VEF 2b
+					values 50 0.707 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VEF 2c
+					values 100 0.353 \latex_(3142~rad/m\latex_) 50.99%
+					}
+				line {
+					legend VEF 3a
+					values 128 1.414 \latex_(16085~rad/m\latex_) 90.07%
+					}
+				line {
+					legend VEF 3b
+					values 256 0.707 \latex_(16085~rad/m\latex_) 90.07%
+					}
+				}
+			}
+}
+#
+Results {
+	Figure {
+		Title "Fluctuating velocity field (face-normal component located at faces) produced by the synthetic turbulence method depending on the mesh size and on the parameter \latex_(\texttt{ratioCutoffWavenumber}\latex_) (VDF cases)."
+		picture ./image_VDF.png
+		width 16cm
+		}
+	Figure {
+		Title "Fluctuating velocity field (face-normal component located at faces) produced by the synthetic turbulence method depending on the mesh size and on the parameter \latex_(\texttt{ratioCutoffWavenumber}\latex_) (VEF cases)."
+		picture ./image_VEF.png
+		width 16cm
+		}
+	Figure {
+		Titre "Plots of the face-normal velocity component along the segment y=L/2 for different mesh refinements."
+		titre_figure "VDF cases"
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "residuals"
+		RangeX auto auto
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "VDF_1d"
+			Fichier ./VDF_1d/Cas_VITESSE_LIGNE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "VDF_2d"
+			Fichier ./VDF_2d/Cas_VITESSE_LIGNE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			Linewidth 1
+			}
+		Courbe {
+			Legende "VDF_3d"
+			Fichier ./VDF_3d/Cas_VITESSE_LIGNE_SOM.coupe
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		}
+	Figure {
+		Titre "Plots of the face-normal velocity component at the center of the face for different values of the time step dt."
+		titre_figure "VDF cases"
+		Width 12cm
+		Dimension 2
+		LabelX "time"
+		LabelY "residuals"
+		RangeX auto 10
+		InclureDescCourbes 0
+		Legende below
+		Courbe {
+			Legende "dt/timeScale = 1"
+			Fichier ./VDF_1d_pas_de_temps_1_Tau/point.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 20
+			Linewidth 1
+			}
+		Courbe {
+			Legende "dt/timeScale = 0.1"
+			Fichier ./VDF_1d_pas_de_temps_0.1_Tau/point.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 1
+			Linewidth 1
+			}
+		Courbe {
+			Legende "dt/timeScale = 0.01"
+			Fichier ./VDF_1d_pas_de_temps_0.01_Tau/point.dat
+			Colonnes ($1) ($2)
+			Style lines
+			TypeLigne 3
+			Linewidth 1
+			}
+		}
+}
+#
+Conclusion {
+	Description "A few recommendations:"
+	Description "- Refining the mesh and decreasing the parameter \latex_(\texttt{ratioCutoffWavenumber}\latex_) while keeping constant the resolved turbulent kinetic energy ratio results in smoother fluctuations. It is recommended to select \latex_(\texttt{ratioCutoffWavenumber} $\leq 1 $\latex_) (e.g. \latex_(\texttt{ratioCutoffWavenumber}\latex_) = 1, 0.5 or 0.25 are generally good choices)."
+	Description "- Taking $p$ equal to a few units ($2 \leq p \leq 10$) will be appropriate in most cases."
+	Description "- The simulation time step varies usually during the simulation, but we recommend to take it reasonably small compared to the caracteristic time scale \latex_($\tau_t$\latex_) (for example \latex_($0.01 \leq \delta t/\tau_t \leq 0.1$\latex_))."
+	Description "- The caracteristic length and time scales can be estimated through a RANS preliminary simulation. For more details, report to reference [1]."
+}
