@@ -113,7 +113,7 @@ void Echange_global_impose_rayo_semi_transp::completer()
   Echange_global_impose::completer();
 }
 
-void Echange_global_impose_rayo_semi_transp::verifie_ch_init_nb_comp()
+void Echange_global_impose_rayo_semi_transp::verifie_ch_init_nb_comp() const
 {
   if (le_champ_front.non_nul())
     {

@@ -556,7 +556,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_FT_Disc::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_FT_Disc::diffusivite_pour_transport() const
 {
   return champ_mu_;
 }

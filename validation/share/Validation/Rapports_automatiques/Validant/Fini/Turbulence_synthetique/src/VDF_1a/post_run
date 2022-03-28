@@ -1,0 +1,15 @@
+extrait_coupe Cas VITESSE_LIGNE_FACES
+extrait_coupe Cas VITESSE_LIGNE_SOM
+
+n=`grep vitesse_ligne_som Cas.data | awk '{print $6}'`
+
+sed -i 1d Cas_VITESSE_LIGNE_SOM.coupe
+sed -i ${n}d Cas_VITESSE_LIGNE_SOM.coupe
+sed -i 1d Cas_VITESSE_LIGNE_SOM.coupe
+
+visit -cli -s image.py -nowin
+
+convert image0000.png -trim -bordercolor white -border 5%x5% -resize 100% tmp
+montage -tile 1x1 tmp -title VDF_1a -pointsize 20 -geometry 902x902 image.png
+
+rm -f image0000.png visitlog.py tmp

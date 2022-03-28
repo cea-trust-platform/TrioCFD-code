@@ -47,13 +47,10 @@ public:
   void         calculer_grad_t();
   void         calculer_mpoint(Champ_base& mpoint);
   virtual void suppression_interfaces(const IntVect& num_compo, const ArrOfInt& flags_compo_a_supprimer, int nouvelle_phase);
-
   void                associer_milieu_base(const Milieu_base& milieu) override;
   Milieu_base&        milieu() override;
   const Milieu_base& milieu() const override;
-  const Champ_base& vitesse_pour_transport() override;
-
-
+  const Champ_base& vitesse_pour_transport() const override;
   void    discretiser(void) override;
 
 protected:

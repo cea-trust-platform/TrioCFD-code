@@ -308,7 +308,7 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport() const
 {
   if(boussi_==0)
     {

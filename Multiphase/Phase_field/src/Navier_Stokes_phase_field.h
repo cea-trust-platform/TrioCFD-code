@@ -84,8 +84,7 @@ public :
   inline const DoubleVect& get_g_() const;
   DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
   void mettre_a_jour(double ) override;
-  const Champ_Don& diffusivite_pour_transport() override;
-
+  const Champ_Don& diffusivite_pour_transport() const override;
   void creer_champ(const Motcle& motlu) override;
 
   /////////////////////////////////////////////////////

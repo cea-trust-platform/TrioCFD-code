@@ -1,0 +1,1 @@
+cat Cas_VITESSE_CENTRE.son | sed 1,4d | awk '{print $1/4e-3" "$2}' > point.dat
