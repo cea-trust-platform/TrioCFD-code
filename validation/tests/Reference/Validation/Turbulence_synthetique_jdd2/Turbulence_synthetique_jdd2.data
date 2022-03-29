@@ -1,0 +1,95 @@
+Dimension 3
+
+Pb_hydraulique pb
+
+Domaine dom
+Mailler dom
+{
+	pave bloc
+	{
+		origine 0 0 0
+		longueurs 0.01 0.1 0.1
+		nombre_de_noeuds 5 33 33
+		}
+		{
+		bord entree	X = 0		0 <= Y <= 0.1	0 <= Z <= 0.1
+		bord sortie	X = 0.01	0 <= Y <= 0.1	0 <= Z <= 0.1
+		bord paroi	Y = 0		0 <= X <= 0.01	0 <= Z <= 0.1
+		bord paroi	Y = 0.1		0 <= X <= 0.01	0 <= Z <= 0.1
+		bord paroi	Z = 0		0 <= X <= 0.01	0 <= Y <= 0.1
+		bord paroi	Z = 0.1		0 <= X <= 0.01	0 <= Y <= 0.1
+		}
+}
+
+VDF dis
+
+Schema_Euler_explicite sch
+Lire sch
+{
+	tinit 0
+	nb_pas_dt_max 3
+	tmax 4e-2
+	dt_min 4e-6
+	dt_max 4e-6
+	precision_impr 8
+	seuil_statio -1
+	dt_sauv -1
+}
+
+Fluide_incompressible fluide
+Lire fluide
+{
+	mu	champ_uniforme 1 0.001
+	rho	champ_uniforme 1 1000
+}
+
+Associer pb dom
+Associer pb fluide
+Associer pb sch
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression	petsc GCP { precond_nul seuil 1 }
+		convection		{ negligeable }
+		diffusion		{ negligeable }
+		conditions_initiales	{ vitesse champ_uniforme 3 1 0 0 }
+		conditions_limites	{
+					entree	frontiere_ouverte_vitesse_imposee champ_front_synt 3 { moyenne 1 0 0 lenghtScale 0.000974 nbModes 100 turbKinEn 0.2 turbDissRate 50 p 5 timeScale 4e-3 dir_fluct 1 1 1 ratioCutoffWavenumber 1 }
+					sortie	frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
+					paroi	paroi_fixe
+					}
+	}
+
+	Postraitement
+	{
+		Definition_champs	{
+					vitesse_som interpolation { localisation som sources { refChamp { Pb_champ pb vitesse } } }
+					}
+		Sondes			{
+					vitesse_centre vitesse periode 1e-6 points 1 0 0.05 0.05
+
+					vitesse_ligne_som vitesse_som periode 1e-6 segment 33 0 0 0.05 0 0.1 0.05
+
+					vitesse_ligne_faces vitesse periode 1e-6 segment 32 0.00000000e+00 1.56250000e-03 5.15625000e-02 0.00000000e+00 9.84375000e-02 5.15625000e-02
+					# P points #
+					# xmin ymin zmin = 0 0.1/(2P) 0.05+0.1/(2P) #
+					# xmax ymax zmax = 0 0.1-0.1/(2P) 0.05+0.1/(2P) #
+					}
+		Format lml
+		Champs binaire dt_post 1e6
+					{
+					vitesse
+					vitesse_som
+					}
+	}
+}
+
+EcritureLectureSpecial 0
+
+Resoudre pb
+
+Fin
