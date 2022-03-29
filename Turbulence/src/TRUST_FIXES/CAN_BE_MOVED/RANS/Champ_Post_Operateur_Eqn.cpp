@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -77,7 +77,7 @@ void Champ_Post_Operateur_Eqn::verification_cas_compo() const
     }
 
   // Verification de compo
-  const int& nb_compo= ref_eq_.valeur().inconnue().valeur().nb_comp();
+  const int nb_compo= ref_eq_.valeur().inconnue().valeur().nb_comp();
   if ((compo_<-1)||(compo_>nb_compo-1))
     {
       Cerr<<"Error in Champ_Post_Operateur_Eqn::verification_cas_compo()"<<finl;
@@ -255,7 +255,6 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
         Cerr << "Cause Masse_PolyMAC_Face::appliquer_impl do not divide per volume." << finl;
         //Process::exit();
       }
-
   }
   es.echange_espace_virtuel();
   // apres je recupere juste la composante si elle est demandee
