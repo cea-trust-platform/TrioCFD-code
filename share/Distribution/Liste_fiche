@@ -86,7 +86,7 @@
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Backward_Facing_Step_3D NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Backward_Facing_Step_impl NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/Canal_plan_VDF_VEF_k_eps_standard_bicephale STD
-./validation/share/Validation/Rapports_automatiques/Validant/Fini/Champ_front_synt NNR
+./validation/share/Validation/Rapports_automatiques/Validant/Fini/Turbulence_synthetique NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/ChannelKEps_CLboitePerio_entree NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/ChannelML3DVDF_fNydxdz NNR
 ./validation/share/Validation/Rapports_automatiques/Validant/Fini/ChannelML3DVEF_fNydxdz NNR
