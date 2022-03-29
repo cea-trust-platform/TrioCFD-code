@@ -35,7 +35,7 @@
 
 Implemente_instanciable_sans_constructeur(Domaine_ALE,"Domaine_ALE",Domaine);
 //XD domaine_ale domaine domaine_ale -1 Domain with nodes at the interior of the domain which are displaced in an arbitrarily prescribed way thanks to ALE (Arbitrary Lagrangian-Eulerian) description. NL2 Keyword to specify that the domain is mobile following the displacement of some of its boundaries.
-Domaine_ALE::Domaine_ALE() : nb_bords_ALE(0),update_or_not_matrix_coeffs_(1)
+Domaine_ALE::Domaine_ALE() : nb_bords_ALE(0),update_or_not_matrix_coeffs_(1), resumption(0)
 {
 
 }
@@ -492,7 +492,7 @@ void Domaine_ALE::set_dt(double& dt)
 void Domaine_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,DoubleTab& NewValueOf_ALEjacobian_new, int TimeStepNr)
 {
 
-  if(TimeStepNr==0)
+  if(TimeStepNr==0 && resumption==0)
     {
       //Initially ALEjacobian_old= 1.0
       ALEjacobian_old=NewValueOf_ALEjacobian_new; //Give a right size
@@ -505,6 +505,14 @@ void Domaine_ALE::update_ALEjacobians(DoubleTab& NewValueOf_ALEjacobian_old,Doub
       ALEjacobian_old=NewValueOf_ALEjacobian_old;
       ALEjacobian_new=NewValueOf_ALEjacobian_new;
     }
+}
+
+void Domaine_ALE::resumptionJacobian(DoubleTab& ValueOf_ALEjacobian_old, DoubleTab& ValueOf_ALEjacobian_new)
+{
+
+  ALEjacobian_old=ValueOf_ALEjacobian_old;
+  ALEjacobian_new=ValueOf_ALEjacobian_new;
+  resumption=1;
 }
 void Domaine_ALE::reading_vit_bords_ALE(Entree& is)
 {

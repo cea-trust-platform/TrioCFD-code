@@ -37,6 +37,8 @@ public :
   virtual void update_pressure_matrix( void );
   virtual void discretiser();
   void mettre_a_jour(double);
+  virtual int sauvegarder(Sortie&) const;
+  virtual int reprendre(Entree&);
 
 protected :
   Champ_Inc ALEMeshVelocity_;
