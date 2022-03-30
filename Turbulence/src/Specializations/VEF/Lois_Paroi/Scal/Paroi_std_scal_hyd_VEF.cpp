@@ -97,7 +97,7 @@ int Paroi_std_scal_hyd_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const DoubleVect& volumes_maille = zone_VEF.volumes();
   const DoubleVect& surfaces_face = zone_VEF.face_surfaces();
   int l_unif;

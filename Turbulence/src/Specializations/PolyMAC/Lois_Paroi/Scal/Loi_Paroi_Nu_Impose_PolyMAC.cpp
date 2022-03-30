@@ -140,7 +140,7 @@ int  Loi_Paroi_Nu_Impose_PolyMAC::calculer_scal(Champ_Fonc_base& diffusivite_tur
   const DoubleVect& fs = zone.face_surfaces();
   DoubleVect pos(dimension);
 
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int l_unif;
   double visco=-1;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))

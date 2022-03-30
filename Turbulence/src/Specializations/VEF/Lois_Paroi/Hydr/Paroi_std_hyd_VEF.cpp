@@ -683,7 +683,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -1071,7 +1071,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -1480,7 +1480,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 

@@ -83,7 +83,7 @@ int Paroi_Cisaillement_Imp_VEF::calculer_hyd_commun()
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
   const DoubleTab& xv = zone_VEF.xv();    // centre de gravite des faces

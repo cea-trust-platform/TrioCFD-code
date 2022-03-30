@@ -336,7 +336,7 @@ void Modele_turbulence_Longueur_Melange_VEF::calculer_f_amortissement( )
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base, mon_equation->milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const DoubleTab& vit = mon_equation->inconnue().valeurs();
 
   f_amortissement.resize(nb_elem);

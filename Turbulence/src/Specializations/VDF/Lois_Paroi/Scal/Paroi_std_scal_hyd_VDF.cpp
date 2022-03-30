@@ -96,7 +96,7 @@ int  Paroi_std_scal_hyd_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
 
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int l_unif;
   double visco=-1;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))

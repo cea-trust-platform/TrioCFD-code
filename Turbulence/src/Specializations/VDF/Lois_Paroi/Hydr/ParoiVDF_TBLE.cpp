@@ -359,7 +359,7 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
   if (source_boussinesq==1)
     {
@@ -906,7 +906,7 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = static_cast<const DoubleTab&>(ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
   if (source_boussinesq==1)
     {
