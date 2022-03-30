@@ -86,8 +86,9 @@ double Paroi_frottante_loi::coefficient_frottement(int i,int j) const
 
 int Paroi_frottante_loi::initialiser(double temps)
 {
-  valeurs_coeff_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  valeurs_coeff_.resize(0, ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).nb_phases());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_coeff_);
+  valeurs_coeff_ = 0 ;
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
   return 1;
 }
@@ -104,9 +105,12 @@ void Paroi_frottante_loi::me_calculer()
 
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab& vit   = zone_Cl_dis().equation().inconnue().valeurs();
+  const DoubleTab& vit   = zone_Cl_dis().equation().probleme().get_champ("vitesse").valeurs(),
+                   &rho = zone_Cl_dis().equation().probleme().get_champ("masse_volumique").valeurs(),
+                    *alp = sub_type(Pb_Multiphase, zone_Cl_dis().equation().probleme()) ? &zone_Cl_dis().equation().probleme().get_champ("alpha").valeurs() : NULL;
 
-  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), nf_tot = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
+
+  int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), nf_tot = zone.nb_faces_tot(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size(), D = dimension;
 
   const DoubleTab& n_f = zone.face_normales();
@@ -124,9 +128,9 @@ void Paroi_frottante_loi::me_calculer()
         if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Paroi_frottante_loi : error in the calculation of the parallel velocity for wall laws");
         double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
         double y_loc = zone.dist_face_elem0(f,  e);
-        double y_plus_loc = y_loc * norm_u_parallel/ visc(e, n) ;
-        if (y_plus_loc>1) valeurs_coeff_(f_zone, n) = u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-        else valeurs_coeff_(f_zone, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
+        double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
+        if (y_plus_loc>1) valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+        else valeurs_coeff_(f, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
       }
 
   valeurs_coeff_.echange_espace_virtuel();

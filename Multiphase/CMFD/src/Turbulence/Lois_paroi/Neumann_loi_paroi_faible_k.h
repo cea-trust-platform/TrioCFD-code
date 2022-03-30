@@ -48,12 +48,13 @@ public :
   virtual int initialiser(double temps) ;
   virtual int avancer(double temps) {return 1;}; // Avancer ne fait rien car le champ est modifie dans mettre_a_jour
   void mettre_a_jour(double tps);
-  double calc_dy_k(double y, double u_tau, double visc);
+  double calc_dyplus_kplus(double yp);
   double deriv_u_plus_de_y_plus(double y_p) ;
   double deriv_u_plus_de_y_plus_2(double y_p) ;
   virtual double flux_impose(int i) const;
   virtual double flux_impose(int i,int j) const;
   virtual void liste_faces_loi_paroi(IntTab&) ;
+  virtual void completer();
 
 protected :
   void me_calculer();

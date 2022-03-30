@@ -34,6 +34,8 @@
 #include <Operateur_Diff_base.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
+#include <Op_Diff_CoviMAC_base.h>
+#include <Op_Diff_Tau_CoviMAC_Elem.h>
 
 #include <math.h>
 
@@ -111,10 +113,10 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, zone_Cl_dis().equation().zone_dis().valeur());
-  const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
-  const DoubleTab&       y = corr_loi_paroi.get_tab("y"); // y_p est numerote selon les faces de la zone
+  const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
+  const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab& visc_c  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = ref_cast(Operateur_Diff_base, zone_Cl_dis().equation().operateur(0).l_op_base()).diffusivite().valeurs();
+  const DoubleTab&      mu = ref_cast(Op_Diff_CoviMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size() ;
@@ -125,11 +127,14 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
 
   if (is_tau_ == 1)
     {
+      if (!sub_type(Op_Diff_Tau_CoviMAC_Elem, zone_Cl_dis().equation().operateur(0).l_op_base())) Cerr << "Neumann_loi_paroi_faible_tau : the tau diffusion operator must be Op_Diff_Tau_CoviMAC_Elem !";
+      double limiter = ref_cast(Op_Diff_Tau_CoviMAC_Elem, zone_Cl_dis().equation().operateur(0).l_op_base()).limiter_tau();
+      const DoubleTab& tau = zone_Cl_dis().equation().inconnue().passe();
       for (int f =0 ; f < nf ; f++)
         {
           int f_zone = f + f1; // number of the face in the zone
           int e_zone = f_e(f_zone,0);
-          valeurs_flux_(f, 0) = mu(e_zone, 0) * dy_tau(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)); // flux de Neumann = -(-mu * dy_tau) car 1er - avec orientation face de bord et 2e car flux selon - grad
+          valeurs_flux_(f, 0) = mu(e_zone, 0) * dy_tau(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)) / ((tau(e_zone,0) > limiter) ? limiter/(tau(e_zone,0)*tau(e_zone,0)) : 1/limiter); // flux de Neumann = -(-mu * dy_tau) car 1er - avec orientation face de bord et 2e car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
         }
     }
   if (is_tau_ == 0)
@@ -149,15 +154,15 @@ double Neumann_loi_paroi_faible_tau_omega::dy_tau(double y, double u_tau, double
 {
   double y_p = y * u_tau / visc;
   double w_vis = 6 * visc / (beta_omega * y * y);
-  double w_log = u_tau / ( sqrt(beta_k) * von_karman_ * y);
+  double w_log = u_tau / ( std::sqrt(beta_k) * von_karman_ * y);
   double w_1 = w_vis + w_log ;
-  double w_2 = pow( pow(w_vis, 1.2) + pow(w_log, 1.2) , 1/1.2 );
-  double blending = tanh( y_p/10*y_p/10*y_p/10*y_p/10);
+  double w_2 = std::pow( std::pow(w_vis, 1.2) + std::pow(w_log, 1.2) , 1/1.2 );
+  double blending = std::tanh( y_p/10*y_p/10*y_p/10*y_p/10);
 
   double d_w_vis = - 12 * visc / (beta_omega * y * y * y);
-  double d_w_log = - u_tau / ( sqrt(beta_k) * von_karman_ * y * y);
+  double d_w_log = - u_tau / ( std::sqrt(beta_k) * von_karman_ * y * y);
   double d_w_1 = d_w_vis + d_w_log ;
-  double d_w_2 = ( d_w_vis * pow(w_vis, 0.2) + d_w_log * pow(w_log, 0.2) )*pow( pow(w_vis, 1.2) + pow(w_log, 1.2) , 1/1.2-1 );
+  double d_w_2 = ( d_w_vis * std::pow(w_vis, 0.2) + d_w_log * std::pow(w_log, 0.2) )*std::pow( std::pow(w_vis, 1.2) + std::pow(w_log, 1.2) , 1/1.2-1 );
   double d_blending = 4*u_tau/(visc*10)*(y_p/10*y_p/10*y_p/10)*(1-blending*blending);
 
   return - ( d_blending * w_1 + blending * d_w_1 - d_blending * w_2 + (1-blending) * d_w_2 ) / ((blending * w_1 + (1-blending) * w_2) * (blending * w_1 + (1-blending) * w_2)) ;
@@ -168,15 +173,15 @@ double Neumann_loi_paroi_faible_tau_omega::dy_omega(double y, double u_tau, doub
 {
   double y_p = y * u_tau / visc;
   double w_vis = 6 * visc / (beta_omega * y * y);
-  double w_log = u_tau / ( sqrt(beta_k) * von_karman_ * y);
+  double w_log = u_tau / ( std::sqrt(beta_k) * von_karman_ * y);
   double w_1 = w_vis + w_log ;
-  double w_2 = pow( pow(w_vis, 1.2) + pow(w_log, 1.2) , 1/1.2 );
-  double blending = tanh( y_p/10*y_p/10*y_p/10*y_p/10);
+  double w_2 = std::pow( std::pow(w_vis, 1.2) + std::pow(w_log, 1.2) , 1/1.2 );
+  double blending = std::tanh( y_p/10*y_p/10*y_p/10*y_p/10);
 
   double d_w_vis = - 12 * visc / (beta_omega * y * y * y);
-  double d_w_log = - u_tau / ( sqrt(beta_k) * von_karman_ * y * y);
+  double d_w_log = - u_tau / ( std::sqrt(beta_k) * von_karman_ * y * y);
   double d_w_1 = d_w_vis + d_w_log ;
-  double d_w_2 = ( d_w_vis * pow(w_vis, 0.2) + d_w_log * pow(w_log, 0.2) )*pow( pow(w_vis, 1.2) + pow(w_log, 1.2) , 1/1.2-1 );
+  double d_w_2 = ( d_w_vis * std::pow(w_vis, 0.2) + d_w_log * std::pow(w_log, 0.2) )*std::pow( std::pow(w_vis, 1.2) + std::pow(w_log, 1.2) , 1/1.2-1 );
   double d_blending = 4*u_tau/(visc*10)*(y_p/10*y_p/10*y_p/10)*(1-blending*blending);
 
   return d_blending * w_1 + blending * d_w_1 - d_blending * w_2 + (1-blending) * d_w_2 ;

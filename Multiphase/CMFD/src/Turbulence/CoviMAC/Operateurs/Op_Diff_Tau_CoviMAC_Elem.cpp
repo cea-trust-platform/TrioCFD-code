@@ -154,7 +154,7 @@ void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& sec
           else if (fcl[0](fb, 0) == 1 || fcl[0](fb, 0) == 2) for (n = 0; n < N[0]; n++) //Echange_impose_base
               flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Echange_impose_base, cls[0].get()[fcl[0](fb, 1)].valeur()).T_ext(fcl[0](fb, 2), n) : 0);
           else if (fcl[0](fb, 0) == 4) for (n = 0; n < N[0]; n++) //Neumann non homogene
-              flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Neumann_paroi, cls[0].get()[fcl[0](fb, 1)].valeur()).flux_impose(fcl[0](fb, 2), n) : 0);
+              flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Neumann_paroi, cls[0].get()[fcl[0](fb, 1)].valeur()).flux_impose(fcl[0](fb, 2), n) : 0) * ((tau(f_s[0](f,0),n) > limiter_tau_) ? limiter_tau_/(tau(f_s[0](f,0),n)*tau(f_s[0](f,0),n)) : 1/limiter_tau_); // Pour compenser la correction de flux qui vient avec le tau**2 a la fin
           else if (fcl[0](fb, 0) == 6) for (n = 0; n < N[0]; n++) //Dirichlet
               flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Dirichlet, cls[0].get()[fcl[0](fb, 1)].valeur()).val_imp(fcl[0](fb, 2), n) : 0);
           else if (fcl[0](fb, 0) != 5) Cerr <<  "condslim" << fcl[0](fb, 0) ;

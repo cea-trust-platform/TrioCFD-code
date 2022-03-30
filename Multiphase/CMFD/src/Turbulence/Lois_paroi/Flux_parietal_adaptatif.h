@@ -75,7 +75,7 @@ public:
   virtual void completer() ;
 
 protected :
-  double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Diam_hyd_) const;
+  double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;
 
   REF(Correlation) correlation_loi_paroi_;
 };

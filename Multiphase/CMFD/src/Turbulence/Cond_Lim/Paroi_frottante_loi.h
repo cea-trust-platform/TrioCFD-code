@@ -60,7 +60,6 @@ protected :
   double deriv_u_plus_de_y_plus(double y_p);
 
 
-// A reflechir
   DoubleTab valeurs_coeff_;
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;

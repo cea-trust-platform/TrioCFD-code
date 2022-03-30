@@ -25,6 +25,8 @@
 #include <Correlation.h>
 #include <Pb_Multiphase.h>
 
+#include <math.h>
+
 Implemente_instanciable(Flux_parietal_adaptatif, "Flux_parietal_adaptatif", Flux_parietal_base);
 
 Sortie& Flux_parietal_adaptatif::printOn(Sortie& os) const
@@ -52,15 +54,15 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
   const double y = corr_loi_paroi.get_y(f);
   const double u_tau = corr_loi_paroi.get_utau(f);
 
-  double theta_plus = calc_theta_plus(y, u_tau, mu[0], lambda[0], rho[0], D_h);
+  double theta_plus = calc_theta_plus(y, u_tau, mu[0], lambda[0], rho[0], Cp[0], D_h);
 
   for (int n = 0 ; n<N ; n++)for (int m = 0 ; m<N ; m++)
       {
-        if (qpk)    qpk[n] = (n==0) ? - alpha[n] *rho[n] *Cp[n] * u_tau * (Tp-T[n]) / theta_plus : 0 ; // - as the face normal vectors are oriented outside
+        if (qpk)     qpk[n] = (n==0) ? - alpha[n] *rho[n] *Cp[n] * u_tau * (Tp-T[n]) / theta_plus : 0 ; // - as the face normal vectors are oriented outside
         if (da_qpk)  da_qpk[N * n + m] = 0;
         if (dp_qpk)  dp_qpk[n]         = 0;
         if (dv_qpk)  dv_qpk[N * n + m] = 0;
-        if (dTf_qpk) dTf_qpk[N * n + m]=  ((n==0)&&(m==0)) ? - alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // - as the face normal vectors are oriented outside
+        if (dTf_qpk) dTf_qpk[N * n + m]= 0;//((n==0)&&(m==0)) ? - alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // - as the face normal vectors are oriented outside
         if (dTp_qpk) dTp_qpk[n]        =  (n==0)           ?   alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // + as the face normal vectors are oriented outside
       }
   for (int k = 0 ; k<N ; k++)for (int l = k+1 ; l<N ; l++)for (int m = 0 ; m<N ; m++)
@@ -75,14 +77,14 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
   return;
 }
 
-double Flux_parietal_adaptatif::calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Diam_hyd_) const
+double Flux_parietal_adaptatif::calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp,double Diam_hyd_) const
 {
-  double Prandtl = mu/lambda;
+  double Prandtl = mu*Cp/lambda;
   double visc = mu/rho;
   double y_plus = y * u_tau/visc;
-  double beta = pow(3.85*pow(Prandtl, 1./3)-1.3, 2) + 2.12*log(Prandtl);
+  double beta = std::pow(3.85*std::pow(Prandtl, 1./3)-1.3, 2) + 2.12*std::log(Prandtl);
   double gamma = 0.01*(Prandtl*y_plus)*(Prandtl*y_plus)*(Prandtl*y_plus)*(Prandtl*y_plus)/(1+5*Prandtl*Prandtl*Prandtl*y_plus);
-  double y_on_D_h = (Diam_hyd_>0)? y/Diam_hyd_:0;
-  return Prandtl*y_plus*exp(-gamma) + (2.12*log((1+y_plus)*1.5*(2-y_on_D_h)/(1+2*(1-y_on_D_h)*(1-y_on_D_h)))+beta)*exp(-gamma);
+  double y_on_D_h = 0 ; //(Diam_hyd_>0)? y/Diam_hyd_:0;
+  return Prandtl*y_plus*std::exp(-gamma) + (2.12*std::log((1+y_plus)*1.5*(2-y_on_D_h)/(1+2*(1-y_on_D_h)*(1-y_on_D_h)))+beta)*std::exp(-1/gamma);
 }
 

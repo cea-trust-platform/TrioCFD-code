@@ -104,23 +104,24 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
 
   for (int f = 0 ; f < nf ; f ++) for (int n = 0 ; n < N ; n++) if (Faces_a_calculer_(f,0)==1)
         {
-          if (f_e(f, 1) >= 0) Process::exit("Error in the definition of the boundary conditions for wall laws");
-          int e = f_e(f,0);
-          double u_orth = - zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-          DoubleTrav u_parallel(D);
-          for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-          if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Error in the calculation of the parallel velocity for wall laws");
-          double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
-          double y_loc = zone.dist_face_elem0(f,  e);
-          u_t(f, n) = calc_u_tau_loc(norm_u_parallel, nu_visc(e, n), y_loc);
-          y_p(f, n) = y_loc*u_t(f, n)/nu_visc(e, n);
-          y(f,n) = y_loc;
-          if ( abs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n))));
-          u_p(f, n) = norm_u_parallel/u_t(f, n);
-          d_u_p(f,n)= deriv_u_plus_de_y_plus(y_p(f, n));
+          {
+            if (f_e(f, 1) >= 0) Process::exit("Error in the definition of the boundary conditions for wall laws");
+            int e = f_e(f,0);
+            double u_orth = - zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+            DoubleTrav u_parallel(D);
+            for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+            if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Error in the calculation of the parallel velocity for wall laws");
+            double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
+            double y_loc = zone.dist_face_elem0(f,  e);
+            u_t(f, n) = calc_u_tau_loc(norm_u_parallel, nu_visc(e, n), y_loc);
+            y_p(f, n) = y_loc*u_t(f, n)/nu_visc(e, n);
+            y(f,n) = y_loc;
+            if ( abs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n))));
+            u_p(f, n) = norm_u_parallel/u_t(f, n);
+            d_u_p(f,n)= deriv_u_plus_de_y_plus(y_p(f, n));
+          }
         }
 }
-
 double Loi_paroi_adaptative::calc_u_tau_loc(double u_par, double nu, double y)
 {
   double eps = 1.e-6;
@@ -157,27 +158,27 @@ double Loi_paroi_adaptative::to_zero(double u_tau, double u_par, double nu, doub
 
 double Loi_paroi_adaptative::u_plus_de_y_plus(double y_p) // Blended Reichardt model
 {
-  double reichardt = log(1+0.4*y_p)/von_karman_;
+  double reichardt = std::log(1+0.4*y_p)/von_karman_;
   reichardt += 7.8;
-  reichardt += -7.8*exp(-y_p/11);
-  reichardt += -7.8*y_p/11*exp(-y_p/3);
+  reichardt += -7.8*std::exp(-y_p/11);
+  reichardt += -7.8*y_p/11*std::exp(-y_p/3);
 
-  double log_law = log(y_p)/von_karman_ + 5.1;
+  double log_law = std::log(y_p+limiteur_y_p)/von_karman_ + 5.1;
 
-  double blending = tanh( y_p/27*y_p/27*y_p/27*y_p/27);
+  double blending = std::tanh( y_p/27*y_p/27*y_p/27*y_p/27);
 
   return (1-blending)*reichardt + blending*log_law;
 }
 
 double Loi_paroi_adaptative::deriv_u_plus_de_y_plus(double y_p)
 {
-  double reichardt = log(1+0.4*y_p)/von_karman_ + 7.8 -7.8*exp(-y_p/11) -7.8*y_p/11*exp(-y_p/3);
-  double log_law = log(y_p)/von_karman_ + 5.1;
-  double blending = tanh( y_p/27*y_p/27*y_p/27*y_p/27);
+  double reichardt = std::log(1+0.4*y_p)/von_karman_ + 7.8 -7.8*std::exp(-y_p/11) -7.8*y_p/11*std::exp(-y_p/3);
+  double log_law = std::log(y_p+limiteur_y_p)/von_karman_ + 5.1;
+  double blending = std::tanh( y_p/27*y_p/27*y_p/27*y_p/27);
 
   double d_reichardt = 0.4/(1+0.4*y_p)*1/von_karman_;
-  d_reichardt += 7.8/11*exp(-y_p/11);
-  d_reichardt += -7.8/11*exp(-y_p/3) + 7.8*y_p/33*exp(-y_p/3) ;
+  d_reichardt += 7.8/11*std::exp(-y_p/11);
+  d_reichardt += -7.8/11*std::exp(-y_p/3) + 7.8*y_p/33*std::exp(-y_p/3) ;
   double d_log_law = 1/(y_p+limiteur_y_p);
   double d_blending = 4/27*(y_p/27*y_p/27*y_p/27)*(1-blending*blending);
 
