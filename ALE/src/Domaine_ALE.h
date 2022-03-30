@@ -83,7 +83,7 @@ protected:
   int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
-  int resumption; //!=0 if resumption else 0
+  int resumption; //1 if resumption of calculation else 0
 };
 
 
