@@ -97,7 +97,6 @@ void Source_Transport_Eps_VDF_Elem::dimensionner_blocs(matrices_t matrices, cons
   Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL, mat2;
   if(!mat) return;
 
-  const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   IntTab stencil(0, 2);
   stencil.set_smart_resize(1);
   const int size = mon_eq_transport_K->inconnue().valeurs().dimension(0);
