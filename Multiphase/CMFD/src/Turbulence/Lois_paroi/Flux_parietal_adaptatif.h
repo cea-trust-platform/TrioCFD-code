@@ -70,9 +70,9 @@ public:
                   const double *alpha, const double *T, const double p, const double *v, const double Tp,
                   const double *lambda, const double *mu, const double *rho, const double *Cp,
                   double *qpk, double *da_qpk, double *dp_qpk, double *dv_qpk, double *dTf_qpk, double *dTp_qpk,
-                  double *qpi, double *da_qpi, double *dp_qpi, double *dv_qpi, double *dTf_qpi, double *dTp_qpi, int& nonlinear) const;
+                  double *qpi, double *da_qpi, double *dp_qpi, double *dv_qpi, double *dTf_qpi, double *dTp_qpi, int& nonlinear) const override;
 
-  virtual void completer() ;
+  virtual void completer() override;
 
 protected :
   double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;

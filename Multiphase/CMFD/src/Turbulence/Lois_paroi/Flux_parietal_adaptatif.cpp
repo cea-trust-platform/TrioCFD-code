@@ -54,26 +54,13 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
   const double y = corr_loi_paroi.get_y(f);
   const double u_tau = corr_loi_paroi.get_utau(f);
 
-  double theta_plus = calc_theta_plus(y, u_tau, mu[0], lambda[0], rho[0], Cp[0], D_h);
+  double theta_plus = calc_theta_plus(y, u_tau, mu[0], lambda[0], rho[0], Cp[0], D_h),
+         fac = alpha[0] * rho[0] * Cp[0] * u_tau / theta_plus;
+  Cerr << "theta_plus = " << theta_plus << finl;
+  if (qpk) qpk[0] = fac * (Tp - T[0]);
+  if (dTf_qpk) dTf_qpk[0] = -fac;
+  if (dTp_qpk) dTp_qpk[0] = fac;
 
-  for (int n = 0 ; n<N ; n++)for (int m = 0 ; m<N ; m++)
-      {
-        if (qpk)     qpk[n] = (n==0) ? - alpha[n] *rho[n] *Cp[n] * u_tau * (Tp-T[n]) / theta_plus : 0 ; // - as the face normal vectors are oriented outside
-        if (da_qpk)  da_qpk[N * n + m] = 0;
-        if (dp_qpk)  dp_qpk[n]         = 0;
-        if (dv_qpk)  dv_qpk[N * n + m] = 0;
-        if (dTf_qpk) dTf_qpk[N * n + m]= 0;//((n==0)&&(m==0)) ? - alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // - as the face normal vectors are oriented outside
-        if (dTp_qpk) dTp_qpk[n]        =  (n==0)           ?   alpha[n] *rho[n] *Cp[n] * u_tau / theta_plus : 0; // + as the face normal vectors are oriented outside
-      }
-  for (int k = 0 ; k<N ; k++)for (int l = k+1 ; l<N ; l++)for (int m = 0 ; m<N ; m++)
-        {
-          if (qpi) qpi[N * k + l] = 0;
-          if (da_qpi)  da_qpi[N * (N * k + l) + m] = 0 ;
-          if (dp_qpi)  dp_qpi[N * k + l]=0;
-          if (dv_qpi)  dv_qpi[N * k + l]=0;
-          if (dTf_qpi) dTf_qpi[N * (N * k + l) + m]=0;
-          if (dTp_qpi) dTp_qpi[N * k + l] = 0;
-        }
   return;
 }
 
