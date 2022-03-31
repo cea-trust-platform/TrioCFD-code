@@ -1,4 +1,10 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.8.5 : Enhancements, modifications and corrected bugs since version 1.8.4 :
+--------------------------------------------------------------------------------------------------
+xx/xx/22 (TrioCFD) Enhancement : Adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid (ALE context)
+xx/xx/22 (TrioCFD) New feature : Adams Bashforth time scheme on a mobile (ALE context)
+xx/xx/22 (TrioCFD) New feature : LES model on a mobile gird (ALE context)
+--------------------------------------------------------------------------------------------------
 Release notes version 1.8.4 : Enhancements, modifications and corrected bugs since version 1.8.3 :
 --------------------------------------------------------------------------------------------------
 07/12/21 (TrioCFD) New feature : New documentation available: Configuration Management Plan (PGC)
