@@ -117,21 +117,24 @@ void Paroi_frottante_loi::me_calculer()
   const DoubleVect& fs = zone.face_surfaces();
   const IntTab& f_e = zone.face_voisins();
 
-  for (int f =0 ; f < nf ; f++) for (int n=0 ; n<N ; n++) // Est-ce la bonne maniere de gerer les autres phases ? pas clair pour moi...
-      {
-        int f_zone = f + f1; // number of the face in the zone
-        if (f_e(f_zone, 1) >= 0) Process::exit("Paroi_frottante_loi : error in the definition of the boundary faces for wall laws");
-        int e = f_e(f_zone,0);
-        double u_orth = zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f);
-        DoubleTrav u_parallel(D);
-        for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - n_f(f,d) * u_orth/fs(f) ;
-        if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Paroi_frottante_loi : error in the calculation of the parallel velocity for wall laws");
-        double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
-        double y_loc = zone.dist_face_elem0(f,  e);
-        double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
-        if (y_plus_loc>1) valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-        else valeurs_coeff_(f, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
-      }
+  int n = 0 ; // la phase turbulente frotte
+  for (int f =0 ; f < nf ; f++)
+    {
+      int f_zone = f + f1; // number of the face in the zone
+      if (f_e(f_zone, 1) >= 0) Process::exit("Paroi_frottante_loi : error in the definition of the boundary faces for wall laws");
+      int e = f_e(f_zone,0);
+      double u_orth = zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f);
+      DoubleTrav u_parallel(D);
+      for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - n_f(f,d) * u_orth/fs(f) ;
+      if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Paroi_frottante_loi : error in the calculation of the parallel velocity for wall laws");
+      double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
+      double y_loc = zone.dist_face_elem0(f,  e);
+      double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
+      if (y_plus_loc>1) valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+      else valeurs_coeff_(f, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
+    }
+
+  for (n=1 ; n<N ; n++) for (int f =0 ; f < nf ; f++)  valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont des symmetries
 
   valeurs_coeff_.echange_espace_virtuel();
 }
