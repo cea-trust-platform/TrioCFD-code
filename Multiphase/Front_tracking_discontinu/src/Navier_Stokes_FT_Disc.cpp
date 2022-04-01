@@ -279,7 +279,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Zone_dis_base& zdis,
       DoubleTab& val_mu = champ_mu_.valeur().valeurs();
       DoubleTab& val_rho_faces = champ_rho_faces_.valeur().valeurs();
 
-      fluide.masse_volumique().valeur_aux_elems(cg,les_polys,val_rho);
+      fluide.masse_volumique()->valeur_aux_elems(cg,les_polys,val_rho);
       fluide.viscosite_dynamique()->valeur_aux_elems(cg,les_polys,val_mu);
       val_rho.echange_espace_virtuel();
       val_mu.echange_espace_virtuel();
