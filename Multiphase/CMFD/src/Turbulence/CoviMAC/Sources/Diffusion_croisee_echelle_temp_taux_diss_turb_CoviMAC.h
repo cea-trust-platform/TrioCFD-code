@@ -55,9 +55,12 @@ public:
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& )  override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
+  void completer() override;
 
 protected:
   double sigma_d = 0.; // Kok and Spekreijse (2000) Efficient and accurate implementation of the k-omega turbulence model in the NLR multi-block Navier-Stokes system
+  int f_grad_k_fixe = 1 ;
+  int f_grad_tau_omega_fixe = 1 ;
 };
 
 #endif
