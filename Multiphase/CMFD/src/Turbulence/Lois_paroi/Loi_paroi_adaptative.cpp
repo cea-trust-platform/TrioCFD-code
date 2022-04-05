@@ -69,7 +69,7 @@ void Loi_paroi_adaptative::completer()
   for (int i = 0 ; i <pb_.valeur().nombre_d_equations() ; i++)
     for (int j = 0 ; j<pb_.valeur().equation(i).zone_Cl_dis()->nb_cond_lim(); j++)
       {
-        Cond_lim cond_lim_loc = pb_.valeur().equation(i).zone_Cl_dis()->les_conditions_limites(j);
+        Cond_lim& cond_lim_loc = pb_.valeur().equation(i).zone_Cl_dis()->les_conditions_limites(j);
         if sub_type(Neumann_loi_paroi, cond_lim_loc.valeur())
           ref_cast(Neumann_loi_paroi, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
         else if sub_type(Paroi_frottante_loi, cond_lim_loc.valeur())
@@ -106,24 +106,26 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
 
   for (int f = 0 ; f < nf ; f ++) if (Faces_a_calculer_(f,0)==1)
       {
-        {
-          if (f_e(f, 1) >= 0) Process::exit("Error in the definition of the boundary conditions for wall laws");
-          int e = f_e(f,0);
-          double u_orth = -1 ;
-          if (D==2) u_orth = - (vit(nf_tot + e * D, n)*n_f(f,0)+vit(nf_tot + e * D + 1, n)*n_f(f,1))/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le - ; probleme avec zone.dot => passage a la mano
-          else u_orth = - (vit(nf_tot + e * D, n)*n_f(f,0)+vit(nf_tot + e * D + 1, n)*n_f(f,1)+vit(nf_tot + e * D + 2, n)*n_f(f,2))/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le - ; probleme avec zone.dot => passage a la mano
-          DoubleTrav u_parallel(D);
-          for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
-          if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Loi_paroi_adaptative : Error in the calculation of the parallel velocity for wall laws");
-          double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
-          double y_loc = zone.dist_face_elem0(f,  e);
-          u_t(f, n) = calc_u_tau_loc(norm_u_parallel, nu_visc(e, n), y_loc);
-          y_p(f, n) = y_loc*u_t(f, n)/nu_visc(e, n);
-          y(f,n) = y_loc;
-          if ( abs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n))));
-          u_p(f, n) = norm_u_parallel/u_t(f, n);
-          d_u_p(f,n)= deriv_u_plus_de_y_plus(y_p(f, n));
-        }
+        if (f_e(f, 1) >= 0) Process::exit("Error in the definition of the boundary conditions for wall laws");
+        int e = f_e(f,0);
+
+        double u_orth = 0 ;
+        for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e * D+d, n)*n_f(f,d)/fs(f); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+
+        DoubleTrav u_parallel(D);
+        for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - u_orth*(-n_f(f,d))/fs(f) ; // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+        double residu = 0 ;
+        for (int d = 0; d <D ; d++) residu += u_parallel(d)*n_f(f,d)/fs(f);
+        if (residu > 1e-8) Process::exit("Loi_paroi_adaptative : Error in the calculation of the parallel velocity for wall laws");
+        double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
+
+        double y_loc = zone.dist_face_elem0(f,  e);
+        u_t(f, n) = calc_u_tau_loc(norm_u_parallel, nu_visc(e, n), y_loc);
+        y_p(f, n) = y_loc*u_t(f, n)/nu_visc(e, n);
+        y(f,n) = y_loc;
+        if ( abs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n))));
+        u_p(f, n) = norm_u_parallel/u_t(f, n);
+        d_u_p(f,n)= deriv_u_plus_de_y_plus(y_p(f, n));
       }
 }
 double Loi_paroi_adaptative::calc_u_tau_loc(double u_par, double nu, double y)

@@ -123,12 +123,18 @@ void Paroi_frottante_loi::me_calculer()
       int f_zone = f + f1; // number of the face in the zone
       if (f_e(f_zone, 1) >= 0) Process::exit("Paroi_frottante_loi : error in the definition of the boundary faces for wall laws");
       int e = f_e(f_zone,0);
-      double u_orth = zone.dot(&vit(nf_tot + e * D, n), &n_f(f,0))/fs(f);
+
+      double u_orth = 0 ;
+      for (int d = 0; d <D ; d++) u_orth -= vit(nf_tot + e * D+d, n)*n_f(f_zone,d)/fs(f_zone); // ! n_f pointe vers la face 1 donc vers l'exterieur de l'element, d'ou le -
+
       DoubleTrav u_parallel(D);
-      for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) - n_f(f,d) * u_orth/fs(f) ;
-      if (zone.dot(&u_parallel(0), &n_f(f,0))/fs(f) > 1e-8) Process::exit("Paroi_frottante_loi : error in the calculation of the parallel velocity for wall laws");
+      for (int d = 0 ; d < D ; d++) u_parallel(d) = vit(nf_tot + e * D + d, n) + n_f(f_zone,d) * u_orth/fs(f_zone) ; // ! + car on a mis - au-dessus
+      double residu = 0 ;
+      for (int d = 0; d <D ; d++) residu += u_parallel(d)*n_f(f_zone,d)/fs(f_zone);
+      if (residu > 1e-8) Process::exit("Paroi_frottante_loi : Error in the calculation of the parallel velocity for wall laws");
       double norm_u_parallel = std::sqrt(zone.dot(&u_parallel(0), &u_parallel(0)));
-      double y_loc = zone.dist_face_elem0(f,  e);
+
+      double y_loc = zone.dist_face_elem0(f_zone,  e);
       double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
       if (y_plus_loc>1) valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
       else valeurs_coeff_(f, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
