@@ -241,7 +241,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
                     {
                       int num_face = le_bord.num_face(ind_face);
                       int elem = face_voisins(num_face,0);
-                      traitement_pres_bord_(elem)=1;
+                      traitement_pres_bord_[elem]=1;
                     }
                 }
             }
@@ -263,19 +263,19 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
                     for (int som=0; som<size; som++)
                       {
                         int face = le_bord.num_face(ind_face);
-                        est_un_sommet_de_bord_(zone_VEF.face_sommets(face,som))=1;
+                        est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
                       }
                 }
             }
           for (int elem=0; elem<nb_elem_tot; elem++)
             {
               if (rang_elem_non_std(elem)!=-1)
-                traitement_pres_bord_(elem)=1;
+                traitement_pres_bord_[elem]=1;
               else
                 {
                   for (int n_som=0; n_som<nsom; n_som++)
-                    if (est_un_sommet_de_bord_(les_elems(elem,n_som)))
-                      traitement_pres_bord_(elem)=1;
+                    if (est_un_sommet_de_bord_[les_elems(elem,n_som)])
+                      traitement_pres_bord_[elem]=1;
                 }
             }
         }
@@ -292,7 +292,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
               for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                 {
                   int num_face = le_bord.num_face(ind_face);
-                  est_une_face_de_dirichlet_(num_face) = 1;
+                  est_une_face_de_dirichlet_[num_face] = 1;
                 }
             }
         }
@@ -440,7 +440,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
           elem1=face_voisins(fac,0);
           elem2=face_voisins(fac,1);
           int minmod_pres_du_bord = 0;
-          if (ordre==3 && (traitement_pres_bord_(elem1) || traitement_pres_bord_(elem2))) minmod_pres_du_bord = 1;
+          if (ordre==3 && (traitement_pres_bord_[elem1] || traitement_pres_bord_[elem2])) minmod_pres_du_bord = 1;
           for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
             for (i=0; i<dimension; i++)
               {
@@ -503,18 +503,18 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
           for (face_adj=0; face_adj<nfac; face_adj++)
             {
               int face_ = elem_faces(poly,face_adj);
-              face(face_adj)= face_;
+              face[face_adj]= face_;
               if (face_<nb_faces_) contrib=1; // Une face reelle sur l'element virtuel
             }
           //
           if (contrib)
             {
-              int calcul_flux_en_un_point = (ordre != 3) && (ordre==1 || traitement_pres_bord_(poly));
+              int calcul_flux_en_un_point = (ordre != 3) && (ordre==1 || traitement_pres_bord_[poly]);
               for (j=0; j<dimension; j++)
                 {
-                  vs(j) = vitesse_face_absolue(face(0),j)*porosite_face(face(0));
+                  vs[j] = vitesse_face_absolue(face[0],j)*porosite_face[face[0]];
                   for (i=1; i<nfac; i++)
-                    vs(j)+= vitesse_face_absolue(face(i),j)*porosite_face(face(i));
+                    vs[j]+= vitesse_face_absolue(face[i],j)*porosite_face[face[i]];
                 }
               // calcul de la vitesse aux sommets des polyedres
               // On va utliser les fonctions de forme implementees dans la classe Champs_P1_impl ou Champs_Q1_impl
@@ -522,7 +522,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
                 {
                   for (i=0; i<nsom; i++)
                     for (j=0; j<dimension; j++)
-                      vsom(i,j) = (vs(j) - dimension*vitesse_face_absolue(face(i),j)*porosite_face(face(i)));
+                      vsom(i,j) = (vs[j] - dimension*vitesse_face_absolue(face[i],j)*porosite_face[face[i]]);
                 }
               else
                 {
@@ -563,8 +563,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
               // Boucle sur les facettes du polyedre non standard:
               for (fa7=0; fa7<nfa7; fa7++)
                 {
-                  num10 = face(KEL(0,fa7));
-                  num20 = face(KEL(1,fa7));
+                  num10 = face[KEL(0,fa7)];
+                  num20 = face[KEL(1,fa7)];
                   // normales aux facettes
                   if (rang==-1)
                     for (i=0; i<dimension; i++)
@@ -598,7 +598,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_conv_term(const Champ_Inc_base& vel
                   // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
                   int appliquer_cl_dirichlet=0;
                   if (option_appliquer_cl_dirichlet)
-                    if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
+                    if (est_une_face_de_dirichlet_[num10] || est_une_face_de_dirichlet_[num20])
                       {
                         appliquer_cl_dirichlet = 1;
                         psc_m = psc_c;
@@ -861,19 +861,19 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
                 for (int som=0; som<size; som++)
                   {
                     int face = le_bord.num_face(ind_face);
-                    est_un_sommet_de_bord_(zone_VEF.face_sommets(face,som))=1;
+                    est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
                   }
             }
         }
       for (int elem=0; elem<nb_elem_tot; elem++)
         {
           if (rang_elem_non_std(elem)!=-1)
-            traitement_pres_bord_(elem)=1;
+            traitement_pres_bord_[elem]=1;
           else
             {
               for (int n_som=0; n_som<nsom; n_som++)
-                if (est_un_sommet_de_bord_(les_elems(elem,n_som)))
-                  traitement_pres_bord_(elem)=1;
+                if (est_un_sommet_de_bord_[les_elems(elem,n_som)])
+                  traitement_pres_bord_[elem]=1;
             }
         }
       // Construction du tableau est_une_face_de_dirichlet_
@@ -889,7 +889,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
               for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                 {
                   int num_face = le_bord.num_face(ind_face);
-                  est_une_face_de_dirichlet_(num_face) = 1;
+                  est_une_face_de_dirichlet_[num_face] = 1;
                 }
             }
         }
@@ -994,7 +994,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
       for (face_adj=0; face_adj<nfac; face_adj++)
         {
           int face_ = elem_faces(poly,face_adj);
-          face(face_adj)= face_;
+          face[face_adj]= face_;
           if (face_<nb_faces_) contrib=1; // Une face reelle sur l'element virtuel
         }
       //
@@ -1002,12 +1002,12 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
         {
           for (j=0; j<dimension; j++)
             {
-              vs(j) = state_field(face(0),j);
-              vs_inco(j) = inco(face(0),j);
+              vs[j] = state_field(face[0],j);
+              vs_inco[j] = inco(face[0],j);
               for (i=1; i<nfac; i++)
                 {
-                  vs(j)+= state_field(face(i),j);
-                  vs_inco(j) = inco(face(i),j);
+                  vs[j]+= state_field(face[i],j);
+                  vs_inco[j] = inco(face[i],j);
                 }
             }
           // calcul de la vitesse aux sommets des polyedres
@@ -1016,8 +1016,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
               for (i=0; i<nsom; i++)
                 for (j=0; j<dimension; j++)
                   {
-                    vsom(i,j) = (vs(j) - dimension*state_field(face(i),j));
-                    vsom_inco(i,j) = (vs_inco(j) - dimension*inco(face(i),j));
+                    vsom(i,j) = (vs[j] - dimension*state_field(face[i],j));
+                    vsom_inco(i,j) = (vs_inco[j] - dimension*inco(face[i],j));
                   }
             }
           else
@@ -1038,8 +1038,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
           // Boucle sur les facettes du polyedre non standard:
           for (fa7=0; fa7<nfa7; fa7++)
             {
-              num10 = face(KEL(0,fa7));
-              num20 = face(KEL(1,fa7));
+              num10 = face[KEL(0,fa7)];
+              num20 = face[KEL(1,fa7)];
 
               // normales aux facettes
               if (rang==-1)
@@ -1078,7 +1078,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lstate_sensibility_Amont(const Doub
               // On applique les CL de Dirichlet si num1 ou num2 est une face avec CL de Dirichlet
               // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
               if (option_appliquer_cl_dirichlet)
-                if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
+                if (est_une_face_de_dirichlet_[num10] || est_une_face_de_dirichlet_[num20])
                   {
                     psc_m = psc_c;
                     psc_m_inco = psc_c_inco;
@@ -1253,19 +1253,19 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
                 for (int som=0; som<size; som++)
                   {
                     int face = le_bord.num_face(ind_face);
-                    est_un_sommet_de_bord_(zone_VEF.face_sommets(face,som))=1;
+                    est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
                   }
             }
         }
       for (int elem=0; elem<nb_elem_tot; elem++)
         {
           if (rang_elem_non_std(elem)!=-1)
-            traitement_pres_bord_(elem)=1;
+            traitement_pres_bord_[elem]=1;
           else
             {
               for (int n_som=0; n_som<nsom; n_som++)
-                if (est_un_sommet_de_bord_(les_elems(elem,n_som)))
-                  traitement_pres_bord_(elem)=1;
+                if (est_un_sommet_de_bord_[les_elems(elem,n_som)])
+                  traitement_pres_bord_[elem]=1;
             }
         }
 
@@ -1282,7 +1282,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
               for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                 {
                   int num_face = le_bord.num_face(ind_face);
-                  est_une_face_de_dirichlet_(num_face) = 1;
+                  est_une_face_de_dirichlet_[num_face] = 1;
                 }
             }
         }
@@ -1385,7 +1385,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
       for (face_adj=0; face_adj<nfac; face_adj++)
         {
           int face_ = elem_faces(poly,face_adj);
-          face(face_adj)= face_;
+          face[face_adj]= face_;
           if (face_<nb_faces_) contrib=1; // Une face reelle sur l'element virtuel
         }
       //
@@ -1393,12 +1393,12 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
         {
           for (j=0; j<dimension; j++)
             {
-              vs(j) = inco(face(0),j);
-              vs_state(j) = state_field(face(0),j);
+              vs[j] = inco(face[0],j);
+              vs_state[j] = state_field(face[0],j);
               for (i=1; i<nfac; i++)
                 {
-                  vs(j)+= inco(face(i),j);
-                  vs_state(j) = state_field(face(i),j);
+                  vs[j]+= inco(face[i],j);
+                  vs_state[j] = state_field(face[i],j);
                 }
             }
           // calcul de la vitesse aux sommets des polyedres
@@ -1407,8 +1407,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
               for (i=0; i<nsom; i++)
                 for (j=0; j<dimension; j++)
                   {
-                    vsom(i,j) = (vs(j) - dimension*inco(face(i),j));
-                    vsom_state(i,j) = (vs_state(j) - dimension*state_field(face(i),j));
+                    vsom(i,j) = (vs[j] - dimension*inco(face[i],j));
+                    vsom_state(i,j) = (vs_state[j] - dimension*state_field(face[i],j));
                   }
             }
           else
@@ -1428,8 +1428,8 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
           // Boucle sur les facettes du polyedre non standard:
           for (fa7=0; fa7<nfa7; fa7++)
             {
-              num10 = face(KEL(0,fa7));
-              num20 = face(KEL(1,fa7));
+              num10 = face[KEL(0,fa7)];
+              num20 = face[KEL(1,fa7)];
 
               // normales aux facettes
               if (rang==-1)
@@ -1469,7 +1469,7 @@ void Operateur_Conv_sensibility_VEF::ajouter_Lsensibility_state_Amont(const Doub
               // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
               //int appliquer_cl_dirichlet=0;
               if (option_appliquer_cl_dirichlet)
-                if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
+                if (est_une_face_de_dirichlet_[num10] || est_une_face_de_dirichlet_[num20])
                   {
                     //appliquer_cl_dirichlet = 1;
                     psc_m = psc_c;
@@ -1850,20 +1850,20 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
 
       // calcul des numeros des faces du polyedre
       for (face_adj=0; face_adj<nfac; face_adj++)
-        face(face_adj)= elem_faces(poly,face_adj);
+        face[face_adj]= elem_faces(poly,face_adj);
 
       for (j=0; j<dimension; j++)
         {
-          vs(j) = vitesse_face(face(0),j);
+          vs[j] = vitesse_face(face[0],j);
           for (i=1; i<nfac; i++)
-            vs(j)+= vitesse_face(face(i),j);
+            vs[j]+= vitesse_face(face[i],j);
         }
       // calcul de la vitesse aux sommets des polyedres
       if (istetra==1)
         {
           for (i=0; i<nsom; i++)
             for (j=0; j<dimension; j++)
-              vsom(i,j) = (vs(j) - dimension*vitesse_face(face(i),j));
+              vsom(i,j) = (vs[j] - dimension*vitesse_face(face[i],j));
         }
       else
         {
@@ -1882,8 +1882,8 @@ void Operateur_Conv_sensibility_VEF::remplir_fluent(DoubleVect& tab_fluent) cons
       // Boucle sur les facettes du polyedre non standard:
       for (fa7=0; fa7<nfa7; fa7++)
         {
-          num1 = face(KEL(0,fa7));
-          num2 = face(KEL(1,fa7));
+          num1 = face[KEL(0,fa7)];
+          num2 = face[KEL(1,fa7)];
           // normales aux facettes
           if (rang==-1)
             {

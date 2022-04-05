@@ -433,7 +433,7 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
           if (Facei.emissivite()!=-1)
             {
               //                    secmem(irayo) = Facei.emissivite()*SIGMA*(pow(Facei.T_face_rayo(),4));
-              secmem(irayo) =(pow(Facei.T_face_rayo(),4));
+              secmem[irayo] =(pow(Facei.T_face_rayo(),4));
               irayo ++;
             }
         }
@@ -464,7 +464,7 @@ void Modele_Rayonnement_Milieu_Transparent::calculer_flux_radiatifs()
                 {
                   les_flux_radiatifs(ii) = 0.;
                   for (jj=0; jj<nb_faces_rayonnantes(); jj++)
-                    les_flux_radiatifs(ii) += matrice_rayo(ii,jj)*secmem(jj);
+                    les_flux_radiatifs(ii) += matrice_rayo(ii,jj)*secmem[jj];
                 }
             }
           else

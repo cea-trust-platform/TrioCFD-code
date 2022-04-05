@@ -388,21 +388,21 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K,const Champ_Inc& le_cha
        */
       ArrOfDouble values(3);
 
-      values(0)=k_min;
-      values(1)=eps_min;
-      values(2)=nut_min;
+      values[0]=k_min;
+      values[1]=eps_min;
+      values[2]=nut_min;
       mp_min_for_each_item(values);
-      k_min=values(0);
-      eps_min=values(1);
-      nut_min=values(2);
+      k_min=values[0];
+      eps_min=values[1];
+      nut_min=values[2];
 
-      values(0)=k_max;
-      values(1)=eps_max;
-      values(2)=nut_max;
+      values[0]=k_max;
+      values[1]=eps_max;
+      values[2]=nut_max;
       mp_max_for_each_item(values);
-      k_max=values(0);
-      eps_max=values(1);
-      nut_max=values(2);
+      k_max=values[0];
+      eps_max=values[1];
+      nut_max=values[2];
       if (Process::je_suis_maitre())
         {
           Cout << finl << "K_Eps evolution (" << (avant?"before":"after") << " law of the wall applies) at time " << le_champ_K.temps() << ":" << finl;

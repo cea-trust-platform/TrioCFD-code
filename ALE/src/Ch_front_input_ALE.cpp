@@ -147,11 +147,11 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
       for (int s=0; s<ffaces.dimension(1); s++)
         {
           int som=ffaces(f,s);
-          if (som >= 0 && marqueur(som)==-1)
+          if (som >= 0 && marqueur[som]==-1)
             {
 
-              marqueur(som)=nn;
-              liste_sommets(nn)=som ;
+              marqueur[som]=nn;
+              liste_sommets[nn]=som ;
               nn++;
             }
         }
@@ -169,7 +169,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
         {
           for( j=0; j<nb_comp(); j++)
             {
-              vit_som_bord_ALE(liste_sommets(i),j)=initial_value_(j);
+              vit_som_bord_ALE(liste_sommets[i],j)=initial_value_[j];
             }
         }
   }
@@ -179,7 +179,7 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
         {
           for( j=0; j<nb_comp(); j++)
             {
-              vit_som_bord_ALE(liste_sommets(i),j)=les_valeurs_som[1].valeurs()(i,j);
+              vit_som_bord_ALE(liste_sommets[i],j)=les_valeurs_som[1].valeurs()(i,j);
               //std::cout << "i : " << i << ", j: " << j << ",  les_valeurs_som: " << les_valeurs_som[1].valeurs()(i,j)  << std::endl ;
             }
         }

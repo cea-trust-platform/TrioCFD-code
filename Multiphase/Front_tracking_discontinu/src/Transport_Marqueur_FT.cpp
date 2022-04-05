@@ -755,7 +755,7 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
         {
           const double indic_phase = phase_marquee_+(1.-2*phase_marquee_)*indic(elem);
           const double v = indic_phase * vol_elem(elem);
-          volumes(num_group) += v;
+          volumes[num_group] += v;
           for (int j=0; j<dim; j++)
             positions(num_group,j) += xp_elem(elem,j) * v;
         }
@@ -766,7 +766,7 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
 
   for (int num_group=0; num_group<nb_compo; num_group++)
     {
-      const double inv_v = 1. / volumes(num_group);
+      const double inv_v = 1. / volumes[num_group];
       for (int j=0; j<dim; j++)
         positions(num_group,j) *= inv_v;
     }
@@ -914,8 +914,8 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
             }
           temp_tmp(compt,0) = 273.;
           mvol_tmp(compt,0) = rho_val;
-          vol_tmp(compt,0) = volumes(i);
-          diam_tmp(compt,0) = pow(volumes(i)*3./(4.*M_PI), 1./3) * 2.;
+          vol_tmp(compt,0) = volumes[i];
+          diam_tmp(compt,0) = pow(volumes[i]*3./(4.*M_PI), 1./3) * 2.;
           compt++;
         }
     }

@@ -261,7 +261,7 @@ void Proprietes_part_vol::lire_distribution(Entree& is)
   for (int j=0; j<dim; j++)
     {
       for (int i=0; i<nb_particules_; i++)
-        vitesse_p_(i,j) = vitesse(j);
+        vitesse_p_(i,j) = vitesse[j];
     }
 
   for (int i=0; i<nb_particules_; i++)

@@ -1842,13 +1842,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         {
           const IntVect& orientation = ref_cast(Zone_VDF, zone_dis().valeur()).orientation();
           for (int face=0; face<n; face++)
-            gravite_face(face,0)=volumes_entrelaces(face)*g(orientation[face]);
+            gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
         }
       else
         {
           for (int face=0; face<n; face++)
             for (int dim=0; dim<m; dim++)
-              gravite_face(face,dim)=volumes_entrelaces(face)*g(dim);
+              gravite_face(face,dim)=volumes_entrelaces(face)*g[dim];
         }
       solveur_masse.appliquer(gravite_face);
     }

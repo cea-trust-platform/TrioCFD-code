@@ -90,17 +90,17 @@ void Eq_couch_lim::mailler_fin()
   //********************************
 
   double delta;
-  y_(0)=y0;
-  y_(N)=yn;
-  yc(0)=y0;
-  yc(N)=yn;
+  y_[0]=y0;
+  y_[N]=yn;
+  yc[0]=y0;
+  yc[N]=yn;
 
   if(facteur==1.)
     {
       delta=(yn-y0)/(N-1);
       for (int i=1 ; i<N ; i++)
         {
-          yc(i)=yc(i-1)+delta;
+          yc[i]=yc[i-1]+delta;
         }
     }
   else
@@ -108,12 +108,12 @@ void Eq_couch_lim::mailler_fin()
       delta = yn*(1.-facteur)/(1.-pow(facteur,N-1));
       for (int i=1 ; i<N ; i++)
         {
-          yc(i)=yc(i-1)+delta*pow(facteur,i-1);
+          yc[i]=yc[i-1]+delta*pow(facteur,i-1);
         }
     }
   for (int i=1 ; i<N ; i++)
     {
-      y_(i)=0.5*(yc(i)+yc(i-1));
+      y_[i]=0.5*(yc[i]+yc[i-1]);
     }
 
   if (Process::je_suis_maitre())
@@ -121,7 +121,7 @@ void Eq_couch_lim::mailler_fin()
       SFichier fic_mesh("tble_mesh.dat",ios::app); // ouverture du fichier conv.dat
       for(int i=0 ; i<N+1 ; i++)
         {
-          fic_mesh << i << " " << y_(i) << finl;
+          fic_mesh << i << " " << y_[i] << finl;
         }
       fic_mesh << finl;
     }
@@ -161,47 +161,47 @@ void Eq_couch_lim::aller_au_temps(double t_final)
       cpt++;
 
       for(int i= 0; i<N ; i++)
-        visco_tot(i) = le_a.calculer_a_local(i);
+        visco_tot[i] = le_a.calculer_a_local(i);
 
       //bb evaluation
       for(int i=1 ; i<N ; i++)
         {
-          bb(i) = visco_tot(i)/(y_(i+1)-y_(i));
-          dd(i)=1./(yc(i)-yc(i-1));
+          bb[i] = visco_tot[i]/(y_[i+1]-y_[i]);
+          dd[i]=1./(yc[i]-yc[i-1]);
         }
 
-      dd(1) = 1./(yc(1)-y0);
+      dd[1] = 1./(yc[1]-y0);
 
-      bb(0) = visco_tot(0)/(2.*(y_(1)-y_(0)));
+      bb[0] = visco_tot[0]/(2.*(y_[1]-y_[0]));
 
       //cc evaluation
-      cc(N-1) = dd(N-1)*(bb(N-1)+bb(N-2))+(1./dt);
+      cc[N-1] = dd[N-1]*(bb[N-1]+bb[N-2])+(1./dt);
 
       for(int i=N-2 ; i>0 ; i--)
         {
-          cc(i) = dd(i)*(bb(i)+bb(i-1))-((dd(i)*dd(i+1)*bb(i)*bb(i))/cc(i+1))+(1./dt);
+          cc[i] = dd[i]*(bb[i]+bb[i-1])-((dd[i]*dd[i+1]*bb[i]*bb[i])/cc[i+1])+(1./dt);
         }
 
       //a evaluation
       for (int j = 0 ; j < N_comp ; j++)
-        tabdouble(aa,j,N-1) = tabdouble(F,j,N-1) + dd(N-1)*bb(N-1)*tabdouble(Unp1,j,N) + (tabdouble(Un_old,j,N-1)/dt);
+        tabdouble(aa,j,N-1) = tabdouble(F,j,N-1) + dd[N-1]*bb[N-1]*tabdouble(Unp1,j,N) + (tabdouble(Un_old,j,N-1)/dt);
 
       for (int j = 0 ; j < N_comp ; j++)
         for(int i=N-2 ; i>0 ; i--)
           {
-            tabdouble(aa,j,i) = tabdouble(F,j,i) + dd(i)*bb(i)*tabdouble(aa,j,i+1)/cc(i+1) + (tabdouble(Un_old,j,i)/dt);
+            tabdouble(aa,j,i) = tabdouble(F,j,i) + dd[i]*bb[i]*tabdouble(aa,j,i+1)/cc[i+1] + (tabdouble(Un_old,j,i)/dt);
           }
 
       //Velocity computation
       for (int j = 0 ; j < N_comp ; j++)
         {
-          tabdouble(Unp1,j,1) = (tabdouble(aa,j,1)+2*bb(0)*dd(1)*tabdouble(Unp1,j,0))/(cc(1)+bb(0)*dd(1));
+          tabdouble(Unp1,j,1) = (tabdouble(aa,j,1)+2*bb[0]*dd[1]*tabdouble(Unp1,j,0))/(cc[1]+bb[0]*dd[1]);
         }
       for (int j = 0 ; j < N_comp ; j++)
         {
           for (int i=2 ; i<N ; i++)
             {
-              tabdouble(Unp1,j,i) = (dd(i)*bb(i-1)/cc(i))*tabdouble(Unp1,j,i-1)+(tabdouble(aa,j,i)/cc(i));
+              tabdouble(Unp1,j,i) = (dd[i]*bb[i-1]/cc[i])*tabdouble(Unp1,j,i-1)+(tabdouble(aa,j,i)/cc[i]);
             }
         }//FIN RESOLUTION Un
 
@@ -243,8 +243,8 @@ void Eq_couch_lim::aller_au_temps(double t_final)
       for (int j = 0 ; j < N_comp ; j++)
         {
 
-          cis(j) = le_a.calculer_a_local(0)*(tabdouble(Unp1,j,1)-tabdouble(Unp1,j,0))/((y_(1)-y0));
-          frottement += cis(j)*cis(j);
+          cis[j] = le_a.calculer_a_local(0)*(tabdouble(Unp1,j,1)-tabdouble(Unp1,j,0))/((y_[1]-y0));
+          frottement += cis[j]*cis[j];
         }
 
       //frottement : carre de la densite de flux diffusifs sur le bord

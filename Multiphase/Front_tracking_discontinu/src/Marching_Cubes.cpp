@@ -1127,7 +1127,7 @@ void Marching_Cubes::construire_noeuds_uniques(IntTab& def_noeud,
       if (noeud_PE == mon_PE)
         keep_last_node = 1;
 
-      renumerotation(noeud_ancien_numero) = dernier;
+      renumerotation[noeud_ancien_numero] = dernier;
     }
   if (keep_last_node)
     {
@@ -1161,7 +1161,7 @@ void Marching_Cubes::construire_noeuds_uniques(IntTab& def_noeud,
     for (i = 0; i < nb_sommets; i++)
       {
         int num_sommet = tab[i];
-        num_sommet = renumerotation(num_sommet);
+        num_sommet = renumerotation[num_sommet];
         assert(num_sommet > -1);
         tab[i] = num_sommet;
       }
