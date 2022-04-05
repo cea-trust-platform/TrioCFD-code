@@ -47,7 +47,7 @@ void Transport_turbulent_GGDH::modifier_nu(const Convection_Diffusion_std& eq, c
 {
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
                    *alp = sub_type(Pb_Multiphase, pb_.valeur()) ? &pb_->get_champ("alpha").passe() : NULL; //produit par alpha si Pb_Multiphase
-  int i, nl = nu.dimension_tot(0), n, N = nu.dimension(1), d, db, D = dimension;
+  int i, nl = nu.dimension(0), n, N = nu.dimension(1), d, db, D = dimension;
   //par la viscosite turbulente : tenseur de Reynolds, facteur k / eps
   DoubleTrav Rij(0, N, D, D), k_sur_eps(0, N);
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);

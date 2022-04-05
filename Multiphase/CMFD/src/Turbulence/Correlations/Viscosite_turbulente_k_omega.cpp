@@ -47,9 +47,9 @@ void Viscosite_turbulente_k_omega::eddy_viscosity(DoubleTab& nu_t) const
   const DoubleTab& k = pb_->get_champ("k").passe(), &omega = pb_->get_champ("omega").passe(),
                    &nu = pb_->get_champ("viscosite_cinematique").passe();
   //il faut que nu_t et k aient la meme localisation et que nu_t ait au moins autant de composantes que k
-  assert(nu_t.dimension_tot(0) == k.dimension_tot(0) && k.dimension(1) <= nu_t.dimension(1));
+  assert(nu_t.dimension(0) == k.dimension(0) && k.dimension(1) <= nu_t.dimension(1));
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
-  for (int i = 0; i < nu_t.dimension_tot(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
+  for (int i = 0; i < nu_t.dimension(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
       nu_t(i, n) = n < k.dimension(1) ? ( (omega(i,n) > 0.) ? std::max(k(i, n) / omega(i, n), limiter_ * nu(i, n)): limiter_ * nu(i, n) ): 0;
 }
 
@@ -69,7 +69,7 @@ void Viscosite_turbulente_k_omega::reynolds_stress(DoubleTab& R_ij) const // Ren
 void Viscosite_turbulente_k_omega::k_over_eps(DoubleTab& k_sur_eps) const
 {
   const DoubleTab& omega = pb_->get_champ("omega").passe();
-  int i, nl = k_sur_eps.dimension_tot(0), n, N = k_sur_eps.dimension(1), Nt = omega.dimension(1);
-  assert(nl == omega.dimension_tot(0) && Nt <= N);
+  int i, nl = k_sur_eps.dimension(0), n, N = k_sur_eps.dimension(1), Nt = omega.dimension(1);
+  assert(nl == omega.dimension(0) && Nt <= N);
   for (i = 0; i < nl; i++) for (n = 0; n < N; n++) k_sur_eps(i, n) = (n < Nt) ? ( (omega(i,n) > 0.) ? 1/omega(i, n) : 0) : 0;
 }

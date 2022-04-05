@@ -51,7 +51,7 @@ void Transport_turbulent_SGDH::modifier_nu(const Convection_Diffusion_std& eq, c
 {
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
                    *alp = sub_type(Pb_Multiphase, pb_.valeur()) ? &pb_->get_champ("alpha").passe() : NULL; //produit par alpha si Pb_Multiphase
-  int i, nl = nu.dimension_tot(0), n, N = nu.dimension(1), d, D = dimension;
+  int i, nl = nu.dimension(0), n, N = nu.dimension(1), d, D = dimension;
   //viscosite cinematique turbulente
   DoubleTrav nu_t(nl, N);
   visc_turb.eddy_viscosity(nu_t);

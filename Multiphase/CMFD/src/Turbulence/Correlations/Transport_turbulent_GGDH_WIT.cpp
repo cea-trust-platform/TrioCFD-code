@@ -54,7 +54,7 @@ void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& e
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
                    alp = pb_->get_champ("alpha").passe(), diam = pb_->get_champ("diametre_bulles").passe(),
                    &tab_u = pb_->get_champ("vitesse").passe();
-  int i, nl = nu.dimension_tot(0), N = nu.dimension(1), d, db, D = dimension, i_part=-1;
+  int i, nl = nu.dimension(0), N = nu.dimension(1), d, db, D = dimension, i_part=-1;
   if (N!= 1) Process::exit("Only the liquid phase can have WIT for now");
   DoubleTrav Rij(0, N, D, D);
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);

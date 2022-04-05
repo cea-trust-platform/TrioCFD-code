@@ -73,4 +73,5 @@ void Op_Diff_Turbulent_CoviMAC_Elem::modifier_nu(DoubleTab& mu) const
     Process::exit(que_suis_je() + ": no turbulent viscosity correlation found!");
   //un "simple" appel a la correlation!
   ref_cast(Transport_turbulent_base, corr.valeur()).modifier_nu(ref_cast(Convection_Diffusion_std, equation()), ref_cast(Viscosite_turbulente_base, corr_visc.valeur()), mu);
+  mu.echange_espace_virtuel();
 }
