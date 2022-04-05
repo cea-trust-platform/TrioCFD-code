@@ -149,7 +149,7 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::ajouter_blocs(ma
             if (!(Mt==nullptr)) 	(*Mt)(Nk * e + mk, Nt * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("temperature") ? der_alpha_rho_k.at("temperature")(e, mk) : 0 ) * diss(e, mk);	// derivee par rapport a la temperature
             if (!(Mp==nullptr)) 	(*Mp)(Nk * e + mk, Np * e + mp)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("pression") ? der_alpha_rho_k.at("pression")(e, mk) : 0 ) * diss(e, mk);		// derivee par rapport a la pression
             if (!(Mk==nullptr))   (*Mk)(Nk * e + mk, Nk * e + mk)       += pe(e) * ve(e) * beta_k * (der_alpha_rho_k.count("k") ? der_alpha_rho_k.at("k")(e,mk) : 0 ) * diss(e, mk); // derivee en k
-            if (!(Mdiss==nullptr)) (*Mdiss)(Nk * e + mk, Nk * e + mk)   += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk); // derivee en tau
+            if (!(Mdiss==nullptr)) (*Mdiss)(Nk * e + mk, Nk * e + mk)   += pe(e) * ve(e) * beta_k * alpha_rho_k(e, mk); // derivee en omega
           }
       }
 }
