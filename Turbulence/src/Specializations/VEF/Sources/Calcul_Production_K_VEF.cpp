@@ -20,11 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Calcul_Production_K_VEF.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
-#include <DoubleVect.h>
-#include <DoubleTrav.h>
+#include <TRUSTVect.h>
+#include <TRUSTTrav.h>
 #include <Champ_P1NC.h>
 #include <Periodique.h>
 #include <Champ_Uniforme.h>

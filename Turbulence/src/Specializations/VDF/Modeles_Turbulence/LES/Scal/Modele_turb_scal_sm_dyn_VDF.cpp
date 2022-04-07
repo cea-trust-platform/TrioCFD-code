@@ -385,7 +385,7 @@ void Modele_turb_scal_sm_dyn_VDF::calculer_grad_teta(
   if (flux_bords.size_array()==0)
     {
       DoubleTab resu(la_zone_VDF->nb_faces_tot(), 1);
-      operateur_diff.ajouter(ref_cast(DoubleTab,teta),resu);
+      operateur_diff.ajouter(static_cast<const DoubleTab&>(teta),resu);
     }
   const DoubleVect& faces_surfaces = la_zone_VDF->face_surfaces();
   DoubleTab grad_teta_face(nb_faces_tot);

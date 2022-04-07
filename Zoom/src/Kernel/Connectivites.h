@@ -28,7 +28,7 @@
 #include <Connectivites_base.h>
 class Zone_VF;
 class Domaine;
-class IntVect;
+#include <TRUSTTabs_forward.h>
 
 //
 // .DESCRIPTION class Connectivites

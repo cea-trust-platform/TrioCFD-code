@@ -250,7 +250,7 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
 
       while ((n<taille) && (trouve == 0))
         {
-          if (elem(n) == num_elemG)
+          if (elem[n] == num_elemG)
             {
               trouve = 1;
               trouve2 = 1;
@@ -262,7 +262,7 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
             }
           while((trouve2 == 0) && (k<nbfaceG))
             {
-              if (elem(n) == numerosG2(k))
+              if (elem[n] == numerosG2(k))
                 trouve2 = 1;
               else
                 k=k+1;
@@ -275,7 +275,7 @@ void Prolongement_elem_elem_FMG::prolonger(Zone_VF& zone_VFG,
           else
             {
               trouve = 1;
-              numG2 = elem(n);
+              numG2 = elem[n];
             }
         }
       if (nb_comp == 1)

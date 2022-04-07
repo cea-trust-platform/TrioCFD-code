@@ -24,7 +24,7 @@
 #include <EFichier.h>
 #include <Frontiere_dis_base.h>
 #include <Domaine.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 
 Implemente_instanciable_sans_constructeur(Ensemble_Faces_base,"Ensemble_Faces_base",Objet_U);
 // Precondition :

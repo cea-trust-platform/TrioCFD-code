@@ -23,7 +23,7 @@
 #include <Equation_base.h>
 #include <Probleme_base.h>
 #include <Zone_VF.h>
-#include <DoubleTabs.h>
+#include <TRUSTTabs.h>
 #include <Modifier_nut_pour_fluide_dilatable.h>
 #include <stat_counters.h>
 #include <Param.h>

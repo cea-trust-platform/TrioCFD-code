@@ -32,7 +32,7 @@
 #include <Schema_Temps_base.h>
 #include <Probleme_base.h>
 #include <Equation_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <communications.h>
 
 Implemente_base(Paroi_hyd_base_VDF,"Paroi_hyd_base_VDF",Turbulence_paroi_base);

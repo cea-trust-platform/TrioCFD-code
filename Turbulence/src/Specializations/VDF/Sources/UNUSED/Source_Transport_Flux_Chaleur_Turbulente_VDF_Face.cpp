@@ -26,11 +26,11 @@
 #include <Convection_Diffusion_Temperature.h>
 #include <Fluide_base.h>
 #include <Probleme_base.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Champ_Uniforme.h>
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_Flux_Chaleur_Turbulente_VDF_Face,"Source_Transport_Flux_Chaleur_Turbulente_VDF_Face",Source_base);
 

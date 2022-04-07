@@ -32,8 +32,8 @@
 
 class Zone_dis;
 class Zone_Cl_dis;
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_Cl_VEF;
 
 class Modele_EASM_Baglietto_VEF : public Modele_Lam_Bremhorst_VEF

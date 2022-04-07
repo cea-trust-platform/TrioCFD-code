@@ -26,7 +26,7 @@
 
 
 #include <Prolongement_base.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 
 //
 // .DESCRIPTION class Prolongement_elem_face

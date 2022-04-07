@@ -22,7 +22,7 @@
 
 #include <Maillage_FT_Disc.h>
 #include <Deriv_Maillage_FT_Disc.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <Zone.h>
 #include <Zone_VF.h>
 #include <Transport_Interfaces_FT_Disc.h>
@@ -1342,8 +1342,8 @@ void Maillage_FT_Disc::construire_noeuds(IntTab& def_noeud,const DoubleTab& soms
       nb_noeuds=som;
       int PE_element;
       int numero_element_a_stocker;
-      PE_element = tmp3(som);
-      numero_element_a_stocker = tmp2(som);
+      PE_element = tmp3[som];
+      numero_element_a_stocker = tmp2[som];
       def_noeud(nb_noeuds, 0) = 0;
       def_noeud(nb_noeuds, 1) = 0;
       def_noeud(nb_noeuds, 2) = PE_element;

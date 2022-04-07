@@ -34,8 +34,8 @@
 /////////////////////////////////////////////////////////////////////////
 
 
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Zone_Cl_dis;
 class Zone_Cl_PolyMAC;
 class Champ_Face_PolyMAC;

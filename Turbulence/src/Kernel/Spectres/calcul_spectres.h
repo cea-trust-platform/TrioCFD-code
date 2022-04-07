@@ -19,8 +19,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <IntTab.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
+#include <TRUSTTab.h>
 
 /*
   extern "C" void calc_sp_nouveau(DoubleTab&  ,int , double, double& );

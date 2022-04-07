@@ -58,9 +58,9 @@
 #include <EFichierBin.h>
 #include <Param.h>
 #include <sys/stat.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <Domaine.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <stat_counters.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT_Disc,"Transport_Interfaces_FT_Disc",Transport_Interfaces_base);
@@ -2551,7 +2551,7 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
         }
       // Calcul de dforce contribution de la force du fluide sur la face i
       // si ce n'est pas une face commune a plusieurs processeurs
-      if (sequential_items_flags(face))
+      if (sequential_items_flags[face])
         {
           if (nbdim1) // VDF
             {
@@ -2627,7 +2627,7 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
       Nom espace=" \t";
       schema_temps().imprimer_temps_courant(Force);
       for(int k=0; k<dimension; k++)
-        Force << espace << force_(k);
+        Force << espace << force_[k];
       Force << finl;
       const Zone& zone=zone_dis().zone();
       const int& impr_mom = zone.Moments_a_imprimer();
@@ -2637,7 +2637,7 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
           ouvrir_fichier(Moment,"moment",impr_mom,*this);
           schema_temps().imprimer_temps_courant(Moment);
           for(int k=0; k<moment_.size_array(); k++)
-            Moment << espace << moment_(k);
+            Moment << espace << moment_[k];
           Moment << finl;
         }
     }
@@ -2731,34 +2731,34 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
       {
         // Calcul de dforce contribution de la force du fluide sur la face i
         // si c'est une face sequentielle
-        if (sequential_items_flags(i))
+        if (sequential_items_flags[i])
           {
             dforce=0;
             if (zvdf)
               {
                 int j = zvdf->orientation(i);
-                dforce(j) = -termes_sources_face(i);
-                force_(j) += dforce(j);
+                dforce[j] = -termes_sources_face(i);
+                force_[j] += dforce[j];
               }
             else
               for (int j = 0; j < dimension; j++)
                 {
-                  dforce(j) = -termes_sources_face(i,j);
-                  force_(j) += dforce(j);
+                  dforce[j] = -termes_sources_face(i,j);
+                  force_[j] += dforce[j];
                 }
             // Ajout de dforce au calcul eventuel du moment
             if (impr_mom)
               {
                 for (int j = 0; j < dimension; j++)
-                  xgr(j) = centre_faces(i,j) - centre_gravite(j);
+                  xgr[j] = centre_faces(i,j) - centre_gravite[j];
 
                 if (dimension==2)
-                  moment_(0) += dforce(1)*xgr(0) - dforce(0)*xgr(1);
+                  moment_[0] += dforce[1]*xgr[0] - dforce[0]*xgr[1];
                 else
                   {
-                    moment_(0) += dforce(2)*xgr(1) - dforce(1)*xgr(2);
-                    moment_(1) += dforce(0)*xgr(2) - dforce(2)*xgr(0);
-                    moment_(2) += dforce(1)*xgr(0) - dforce(0)*xgr(1);
+                    moment_[0] += dforce[2]*xgr[1] - dforce[1]*xgr[2];
+                    moment_[1] += dforce[0]*xgr[2] - dforce[2]*xgr[0];
+                    moment_[2] += dforce[1]*xgr[0] - dforce[0]*xgr[1];
                   }
               }
           }
@@ -2863,14 +2863,14 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
         {
           // Calcul de la vitesse au centre de la face par la loi horaire a temps+dt
           for (int j = 0; j < dim; j++)
-            coord(j) = xv(i,j);
+            coord[j] = xv(i,j);
           v_imp = variables_internes_->loi_horaire_->vitesse(temps+dt,coord);
 
           if (zvdf)
-            vitesse_imp(i,0) = v_imp(zvdf->orientation(i));
+            vitesse_imp(i,0) = v_imp[zvdf->orientation(i)];
           else
             for (int j = 0; j < dim; j++)
-              vitesse_imp(i,j) = v_imp(j);
+              vitesse_imp(i,j) = v_imp[j];
         }
     }
   else if (variables_internes_->methode_transport == Transport_Interfaces_FT_Disc_interne::VITESSE_IMPOSEE)
@@ -5666,7 +5666,7 @@ void Transport_Interfaces_FT_Disc::projete_point_face_fluide( int& nb_proj_modif
                   ArrOfDouble v(dim) ;
                   v = variables_internes_->loi_horaire_->vitesse(t+dt,coord_projete);
                   if (zvdf)
-                    v_imp(i_face)=v(zvdf->orientation(i_face));
+                    v_imp(i_face)=v[zvdf->orientation(i_face)];
                 }
             }
         }
@@ -5893,7 +5893,7 @@ void Transport_Interfaces_FT_Disc::projete_point_face_interface( int& nb_proj_mo
                   ArrOfDouble v(dim);
                   v = variables_internes_->loi_horaire_->vitesse(t+dt,coord_projete);
                   if (zvdf)
-                    v_imp(i_face)=v(zvdf->orientation(i_face));
+                    v_imp(i_face)=v[zvdf->orientation(i_face)];
                 }
             }
         }
@@ -6126,7 +6126,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
         zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
         dI_dt.echange_espace_virtuel();
-        ramasse_miettes(maillage, variables_internes_->tmp_flux, dI_dt);
+        ramasse_miettes(maillage, variables_internes_->tmp_flux->valeurs(), dI_dt);
         transfert_conservatif_eulerien_vers_lagrangien_sommets(maillage, dI_dt, var_volume);
       }
       // var_volume est une derivee par rapport au temps.
@@ -6405,7 +6405,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
         mp_sum_for_each_item(coord_barycentre);
         for (int j = 0; j < dim; j++)
           {
-            coord_barycentre(j)=coord_barycentre(j)/nb_sommets_reels;
+            coord_barycentre[j]=coord_barycentre[j]/nb_sommets_reels;
           }
         // Impression eventuelle de la loi horaire et du centre de gravite "discret" de l'interface
         if (schema_temps().limpr())

@@ -362,7 +362,7 @@ void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
                   if (i_sommet >= nb_sommets_locaux || i_glob != indice_global_sommet[i_sommet])
                     continue;
                   int i_face = -1;
-                  const int i_face_local = tmp(j);
+                  const int i_face_local = tmp[j];
                   if (i_face_local >= 0)
                     {
                       const int elem = mesh.sommet_elem_[i_sommet];

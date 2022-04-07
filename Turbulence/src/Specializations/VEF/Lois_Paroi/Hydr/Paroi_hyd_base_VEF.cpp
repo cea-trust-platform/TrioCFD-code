@@ -28,7 +28,7 @@
 #include <Schema_Temps_base.h>
 #include <Probleme_base.h>
 #include <Equation_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <communications.h>
 #include <Dirichlet_paroi_fixe.h>
 #include <Dirichlet_paroi_defilante.h>

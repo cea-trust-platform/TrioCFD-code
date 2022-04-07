@@ -24,7 +24,7 @@
 #include <Probleme_base.h>
 #include <Zone_VDF.h>
 #include <Champ_front_uniforme.h>
-#include <DoubleTabs.h>
+#include <TRUSTTabs.h>
 #include <Champ_Uniforme.h>
 #include <Neumann_paroi.h>
 #include <Modele_Rayonnement_Milieu_Transparent.h>

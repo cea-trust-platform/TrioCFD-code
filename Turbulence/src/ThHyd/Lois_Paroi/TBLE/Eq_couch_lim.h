@@ -21,7 +21,7 @@
 
 #ifndef Eq_couch_lim_included
 #define Eq_couch_lim_included
-#include <IntVect.h>
+#include <TRUSTVect.h>
 
 #include <Diffu_totale.h>
 #include <Motcle.h>
@@ -43,7 +43,7 @@
 //ATTENTION : cette macro n'est valable que si il existe une dimension commune
 //a tous les anciens DoubleTab, ici N_comp.
 
-#define tabdouble(__tab__,__i__,__j__) __tab__(__i__+(__j__)*N_comp)
+#define tabdouble(__tab__,__i__,__j__) __tab__[__i__+(__j__)*N_comp]
 
 class Eq_couch_lim : public Objet_U
 {
@@ -178,7 +178,7 @@ public :
 
   double get_visco_tot(int i) const
   {
-    return visco_tot(i);
+    return visco_tot[i];
   };
   double get_nut(int i)
   {
@@ -206,7 +206,7 @@ public :
   };
   double get_cis(int j)
   {
-    return cis(j);
+    return cis[j];
   };
   double get_utau_old()
   {
@@ -214,11 +214,11 @@ public :
   };
   double get_y(int i)
   {
-    return y_(i);
+    return y_[i];
   };
   double get_yc(int i)
   {
-    return yc(i);
+    return yc[i];
   };
 
   double get_Unp1(int j, int i) const
@@ -235,7 +235,7 @@ public :
   };
   double get_cis(int j) const
   {
-    return cis(j);
+    return cis[j];
   };
   double get_utau_old() const
   {
@@ -247,11 +247,11 @@ public :
   };
   double get_y(int i) const
   {
-    return y_(i);
+    return y_[i];
   };
   double get_yc(int i) const
   {
-    return yc(i);
+    return yc[i];
   };
 
   Diffu_totale_base& get_diffu()

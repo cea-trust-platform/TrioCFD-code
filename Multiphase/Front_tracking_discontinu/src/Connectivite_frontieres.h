@@ -22,7 +22,7 @@
 #ifndef Connectivite_frontieres_included
 #define Connectivite_frontieres_included
 
-#include <IntTab.h>
+#include <TRUSTTab.h>
 #include <Ref_Zone_VF.h>
 
 class Zone_VF;

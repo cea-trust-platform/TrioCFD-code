@@ -25,7 +25,7 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Probleme_base.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Champ_Uniforme.h>
 #include <Zone_PolyMAC.h>
 #include <Champ_Face_PolyMAC.h>
@@ -33,7 +33,7 @@
 #include <Fluide_Quasi_Compressible.h>
 #include <Debog.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Pb_Hydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>

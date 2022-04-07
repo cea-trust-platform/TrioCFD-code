@@ -25,7 +25,7 @@
 #include <Discret_Thyd.h>
 #include <Matrice_Morse_Sym.h>
 #include <Navier_Stokes_phase_field.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Frontiere_dis_base.h>
 #include <Param.h>
 

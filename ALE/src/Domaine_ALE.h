@@ -24,8 +24,7 @@
 #define Domaine_ALE_included
 
 #include <Domaine.h>
-#include <DoubleLists.h>
-#include <IntLists.h>
+#include <TRUSTLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
 

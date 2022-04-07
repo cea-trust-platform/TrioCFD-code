@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Reaction_Particules_VDF.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Transport_Marqueur_FT.h>
 #include <Domaine.h>
 #include <Zone_VDF.h>

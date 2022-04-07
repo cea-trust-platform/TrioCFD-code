@@ -29,7 +29,7 @@
 #include <Zone_VEF.h>
 #include <Zone_dis.h>
 #include <Equation_base.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <Ref_Zone_VEF.h>
 
 class Champ_Fonc_base;

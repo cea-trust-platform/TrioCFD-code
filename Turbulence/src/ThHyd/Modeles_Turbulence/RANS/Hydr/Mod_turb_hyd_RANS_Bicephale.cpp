@@ -21,7 +21,7 @@
 
 #include <Mod_turb_hyd_RANS_Bicephale.h>
 #include <Transport_K_ou_Eps_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Param.h>
 
 Implemente_base_sans_constructeur(Mod_turb_hyd_RANS_Bicephale,"Mod_turb_hyd_RANS_Bicephale",Mod_turb_hyd_base);

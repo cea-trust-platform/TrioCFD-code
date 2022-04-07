@@ -22,8 +22,8 @@
 
 #include <Algorithmes_Transport_FT_Disc.h>
 #include <Parser.h>
-#include <ArrOfInt.h>
-#include <DoubleTab.h>
+#include <TRUSTArray.h>
+#include <TRUSTTab.h>
 #include <Zone_VF.h>
 
 Implemente_instanciable(Algorithmes_Transport_FT_Disc,"Algorithmes_Transport_FT_Disc",Objet_U);

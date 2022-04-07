@@ -25,7 +25,7 @@
 #include <Turbulence_paroi_scal_base.h>
 #include <Ref_Zone_VEF.h>
 #include <Ref_Zone_Cl_VEF.h>
-#include <DoubleVects.h>
+#include <TRUSTVects.h>
 //
 class Paroi_scal_hyd_base_VEF  : public Turbulence_paroi_scal_base
 {

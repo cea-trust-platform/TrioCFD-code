@@ -23,16 +23,12 @@
 #ifndef Remaillage_FT_included
 #define Remaillage_FT_included
 
+#include <TRUSTTabFT_forward.h>
+#include <Ref_Zone_VF.h>
 #include <Objet_U.h>
 #include <Zone_dis.h>
-#include <Ref_Zone_VF.h>
 #include <FTd_tools.h>
-
 class Maillage_FT_Disc;
-class ArrOfIntFT;
-class IntTabFT;
-class ArrOfDoubleFT;
-class DoubleTabFT;
 class Zone_VF;
 class Param;
 

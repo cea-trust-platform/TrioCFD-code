@@ -22,7 +22,7 @@
 #ifndef Diffu_totale_base_included
 #define Diffu_totale_base_included
 #include <Ref_Eq_couch_lim.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Ref_MuLambda_TBLE_base.h>
 class Eq_couch_lim ;
 

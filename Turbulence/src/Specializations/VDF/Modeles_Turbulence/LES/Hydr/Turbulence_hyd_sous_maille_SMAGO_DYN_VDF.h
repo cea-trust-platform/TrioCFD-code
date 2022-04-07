@@ -22,7 +22,7 @@
 #define Turbulence_hyd_sous_maille_SMAGO_DYN_VDF_included
 
 #include <Turbulence_hyd_sous_maille_Smago_VDF.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 
 /////////////////////////////////////////////////////////////////////
 class Turbulence_hyd_sous_maille_SMAGO_DYN_VDF : public Turbulence_hyd_sous_maille_Smago_VDF

@@ -23,7 +23,7 @@
 #define Paroi_negligeable_PolyMAC_included
 
 #include <Turbulence_paroi_base.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 
 class Champ_Fonc_base;
 class Zone_dis;

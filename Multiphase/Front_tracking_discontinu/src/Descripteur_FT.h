@@ -29,16 +29,13 @@
 #define Descripteur_FT_included
 
 #include <Objet_U.h>
-#include <ArrOfIntFT.h>
 #include <Schema_Comm_FT.h>
-#include <Vect_ArrOfInt.h>
+#include <TRUSTArrays.h>
 #include <MD_Vector.h>
 #include <MD_Vector_tools.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabFT.h>
 
-class ArrOfDoubleFT;
-class IntTabFT;
-class DoubleTabFT;
-class DoubleTab;
 class Comm_Group;
 
 // .DESCRIPTION        : class Descripteur_FT

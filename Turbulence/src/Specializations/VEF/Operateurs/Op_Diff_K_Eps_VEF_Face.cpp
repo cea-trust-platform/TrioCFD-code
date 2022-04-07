@@ -1014,7 +1014,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
         // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
         for (int face=0; face<size; face++)
           {
-            if (face_keps_imposee(face)!=-2)
+            if (face_keps_imposee[face]!=-2)
               {
                 for (int comp=0; comp<nb_comp; comp++)
                   {
@@ -1051,7 +1051,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
         // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
         for (int face=0; face<size; face++)
           {
-            if (face_keps_imposee(face)!=-2)
+            if (face_keps_imposee[face]!=-2)
               {
                 for (int comp=0; comp<nb_comp; comp++)
                   {
@@ -1086,7 +1086,7 @@ void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab&
         // on change la matrice et le resu sur toutes les lignes ou k_eps_ est imposee....
         for (int face=0; face<size; face++)
           {
-            if (face_keps_imposee(face)!=-2)
+            if (face_keps_imposee[face]!=-2)
               {
 
                 // on doit remettre la ligne a l'identite et le secmem a l'inconnue

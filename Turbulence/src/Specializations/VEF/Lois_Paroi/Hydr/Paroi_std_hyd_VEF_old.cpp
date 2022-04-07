@@ -28,7 +28,7 @@
 #include <Dirichlet_paroi_defilante.h>
 #include <Static_Int_Lists.h>
 #include <Debog.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <EcrFicPartage.h>
 #include <Paroi_std_hyd_VEF.h>
 #include <Mod_turb_hyd_base.h>
@@ -139,7 +139,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -459,7 +459,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_k_eps)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -777,7 +777,7 @@ int Paroi_std_hyd_VEF_old::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 

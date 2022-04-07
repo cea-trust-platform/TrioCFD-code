@@ -270,7 +270,7 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   termes_sources /= rhoCp;
 
   DoubleTab& alpha_t = diffusivite_turb.valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int l_unif;
   // double visco=-1;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))

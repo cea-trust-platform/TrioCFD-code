@@ -34,7 +34,7 @@
 #include <Discretisation_base.h>
 #include <Statistiques.h>
 #include <Schema_Temps_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Dirichlet.h>
 #include <Probleme_base.h>

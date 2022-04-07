@@ -26,7 +26,7 @@
 #include <Maillage_FT_Disc.h>
 #include <Connex_components.h>
 #include <Static_Int_Lists.h>
-#include <ArrOfInt.h>
+#include <TRUSTArray.h>
 
 // Description: Calcul des ensembles connexes par sommets d'elements
 //  non "marques" (les elements sont relies entre eux par un graphe

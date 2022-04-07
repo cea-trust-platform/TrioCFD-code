@@ -22,7 +22,7 @@
 
 #ifndef Intersections_Elem_Facettes_Data_included
 #define Intersections_Elem_Facettes_Data_included
-#include <IntTabFT.h>
+#include <TRUSTTabFT.h>
 // ====================================================================
 class Intersections_Elem_Facettes_Data
 {

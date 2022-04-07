@@ -67,16 +67,16 @@ void Mod_turb_hyd_ss_maille_PolyMAC::calculer_longueurs_caracteristiques()
   for(int elem=0 ; elem<nb_elem ; elem ++)
     {
       for (int i=0 ; i<dimension ; i++)
-        h(i)= std::pow(zone_PolyMAC.volumes(elem), 1. / dimension);
+        h[i]= std::pow(zone_PolyMAC.volumes(elem), 1. / dimension);
 
       if (dimension==2)
-        l_(elem)=exp((log(h(0)*h(1)))/2);
+        l_(elem)=exp((log(h[0]*h[1]))/2);
       else
-        l_(elem)=exp((log(h(0)*h(1)*h(2)))/3);
+        l_(elem)=exp((log(h[0]*h[1]*h[2]))/3);
 
       if (modele_scotti)
         {
-          dist_tot=h(0)+h(1)+h(2);
+          dist_tot=h[0]+h[1]+h[2];
 
           dist_min=min_array(h);
           dist_max=max_array(h);

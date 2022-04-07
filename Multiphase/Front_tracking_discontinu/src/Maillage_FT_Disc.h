@@ -24,8 +24,7 @@
 #define Maillage_FT_Disc_included
 
 #include <Ensemble_Lagrange_base.h>
-#include <ArrOfDoubleFT.h>
-#include <IntTabFT.h>
+#include <TRUSTTabFT.h>
 #include <Descripteur_FT.h>
 #include <Ref_Zone_dis.h>
 #include <Ref_Parcours_interface.h>
@@ -36,9 +35,9 @@ class Remaillage_FT;
 class Topologie_Maillage_FT;
 class Parcours_interface;
 class Maillage_Echange;
-class DoubleVect;
+#include <TRUSTTabs_forward.h>
 class Zone_VF;
-class IntTab;
+#include <TRUSTTabs_forward.h>
 class Maillage_FT_Disc_Data_Cache;
 Declare_deriv(Maillage_FT_Disc_Data_Cache); // Classe utilisee en interne;
 

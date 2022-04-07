@@ -29,7 +29,7 @@
 #include <Periodique.h>
 #include <Static_Int_Lists.h>
 #include <Debog.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <EcrFicPartage.h>
 #include <Mod_turb_hyd_RANS_0_eq.h>
 #include <Neumann_sortie_libre.h>
@@ -188,7 +188,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
           for (int som=0; som<nb_som_face; som++)
             {
               int sommet=face_sommets(face,som);
-              is_sommet_sur_bord(sommet)++;
+              is_sommet_sur_bord[sommet]++;
             }
         }
 
@@ -207,7 +207,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
           for (int som=0; som<nb_som_face; som++)
             {
               int sommet=face_sommets(face,som);
-              int n=(is_sommet_sur_bord(sommet))++;
+              int n=(is_sommet_sur_bord[sommet])++;
               som_face_bord.set_value(sommet,n,face);
             }
         }
@@ -239,7 +239,7 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
                       int num_face = le_bord.num_face(ind_face);
                       int elem = face_voisins(num_face,0);
                       for (int i=0; i<nb_faces_elem; i++)
-                        traite_face(elem_faces(elem,i))=1;
+                        traite_face[elem_faces(elem,i)]=1;
                     }
                 }
             }
@@ -251,14 +251,14 @@ void remplir_face_keps_imposee_gen(int& flag_face_keps_imposee_,
         }
       const DoubleTab& xv=zone_VEF.xv();
       for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
-        if (traite_face(ind_face))
+        if (traite_face[ind_face])
           {
             // on regarde combien de sommets sont en commun avec le bord
             IntList test;
             for (int som=0; som<nb_som_face; som++)
               {
                 int sommet=face_sommets(ind_face,som);
-                if (is_sommet_sur_bord(sommet))
+                if (is_sommet_sur_bord[sommet])
                   test.add(sommet);
               }
             int test_size=test.size();
@@ -683,7 +683,7 @@ int Paroi_std_hyd_VEF::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -1071,7 +1071,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_k_eps)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -1480,7 +1480,7 @@ int Paroi_std_hyd_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
   const DoubleTab& vitesse = eqn_hydr.inconnue().valeurs();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   const Zone& zone = zone_VEF.zone();
   int nfac = zone.nb_faces_elem();
 
@@ -1873,19 +1873,19 @@ void Paroi_std_hyd_VEF::imprimer_ustar(Sortie& os) const
   */
 
   ArrOfDouble array(6);
-  array(0)=upmoy;
-  array(1)=dpmoy;
-  array(2)=utaumoy;
-  array(3)=seuil_moy;
-  array(4)=iter_moy;
-  array(5)=compt;
+  array[0]=upmoy;
+  array[1]=dpmoy;
+  array[2]=utaumoy;
+  array[3]=seuil_moy;
+  array[4]=iter_moy;
+  array[5]=compt;
   mp_sum_for_each_item(array);
-  upmoy=array(0);
-  dpmoy=array(1);
-  utaumoy=array(2);
-  seuil_moy=array(3);
-  iter_moy=array(4);
-  compt=(int)array(5);
+  upmoy=array[0];
+  dpmoy=array[1];
+  utaumoy=array[2];
+  seuil_moy=array[3];
+  iter_moy=array[4];
+  compt=(int)array[5];
   if (je_suis_maitre())
     {
       if (compt)

@@ -940,7 +940,7 @@ void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
             zoneG.rang_elems_sommet(elems, xpF(nb_elementF, 0),  xpF(nb_elementF, 1), xpF(nb_elementF, 2));
 
           //On remplit le tableau de connectivites
-          connect_elemF_elemG(nb_elementF) = elems(0);
+          connect_elemF_elemG(nb_elementF) = elems[0];
         }
       EcrFicCollecteBin fic2_elem(nom_dom);
       for(nb_elementF = 0; nb_elementF<nb_elemF; nb_elementF++)

@@ -22,8 +22,8 @@
 #ifndef FTd_tools_inclus
 #define FTd_tools_inclus
 
-class DoubleTabFT;
-class DoubleTab;
+#include <TRUSTTabFT_forward.h>
+#include <TRUSTTabs_forward.h>
 
 typedef double FTd_matrice22[2][2];
 typedef double FTd_vecteur2[2];

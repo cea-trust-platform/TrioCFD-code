@@ -22,7 +22,7 @@
 #include <Modele_Jones_Launder_VDF.h>
 #include <Zone_VDF.h>
 #include <Zone_Cl_VDF.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Dirichlet.h>
 #include <Dirichlet_homogene.h>
 #include <Dirichlet_paroi_defilante.h>

@@ -890,7 +890,7 @@ void Source_Con_Phase_field::premier_demi_dt()
       calculer_mutilde(mutilde);
       mutilde.echange_espace_virtuel();
 
-      DoubleTab& prov_elem=ref_cast(DoubleTab, prov_elem_);
+      DoubleTab& prov_elem = prov_elem_;
       if (prov_elem.size()==0)
         prov_elem=mutilde;
 

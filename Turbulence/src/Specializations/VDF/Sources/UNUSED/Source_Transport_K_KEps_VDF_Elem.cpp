@@ -31,7 +31,7 @@
 #include <Fluide_base.h>
 #include <Zone_Cl_VDF.h>
 #include <Champ_Face.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_KEps_VDF_Elem,"Source_Transport_K_KEps_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
 

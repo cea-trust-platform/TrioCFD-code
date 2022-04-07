@@ -25,8 +25,8 @@
 
 #include <Piso.h>
 #include <Equation_base.h>
-#include <DoubleTab.h>
-#include <DoubleTrav.h>
+#include <TRUSTTab.h>
+#include <TRUSTTrav.h>
 #include <Navier_Stokes_std.h>
 
 class Implicite_ALE: public Implicite

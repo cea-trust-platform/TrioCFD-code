@@ -26,14 +26,14 @@
 #include <Champ_P1NC.h>
 #include <Domaine.h>
 #include <Periodique.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Pave.h>
 #include <Pb_Hydraulique_Turbulent.h>
 #include <Noms.h>
 #include <Nom.h>
 #include <distances_VEF.h>
 #include <SFichier.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <MD_Vector_tools.h>
 
 // appels librairies fonctions calcul FFT (JMFFT)

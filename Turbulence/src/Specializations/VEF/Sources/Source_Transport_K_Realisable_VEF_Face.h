@@ -45,8 +45,8 @@
 
 class Probleme_base;
 class Champ_Don_base;
-class DoubleVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Champ_Face;
 
 class Source_Transport_K_Realisable_VEF_Face : public Source_base,public Calcul_Production_K_VEF

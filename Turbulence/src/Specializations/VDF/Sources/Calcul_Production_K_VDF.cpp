@@ -25,7 +25,7 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Modele_turbulence_scal_base.h>
 #include <Probleme_base.h>
-#include <IntTrav.h>
+#include <TRUSTTrav.h>
 #include <Entree_fluide_temperature_imposee.h>
 #include <Entree_fluide_concentration_imposee.h>
 #include <Champ_Uniforme.h>
@@ -34,7 +34,7 @@
 #include <Zone_Cl_VDF.h>
 #include <Fluide_Quasi_Compressible.h>
 #include <Debog.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 ////////////////////////////////////////////////////////////////////////////
 //

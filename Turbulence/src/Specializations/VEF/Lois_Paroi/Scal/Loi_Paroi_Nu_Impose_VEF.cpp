@@ -140,7 +140,7 @@ int  Loi_Paroi_Nu_Impose_VEF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   ArrOfDouble v(dimension);
   static DoubleVect pos(dimension);
 
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   int l_unif;
   double visco=-1;
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))

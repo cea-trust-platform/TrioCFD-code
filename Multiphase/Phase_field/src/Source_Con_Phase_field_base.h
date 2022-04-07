@@ -26,7 +26,7 @@
 
 
 #include <Source_base.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Champ_Don.h>
 
 #include <Ref_Probleme_base.h>

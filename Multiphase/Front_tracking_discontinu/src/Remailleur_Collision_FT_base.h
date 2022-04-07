@@ -25,8 +25,8 @@
 
 #include <Objet_U.h>
 class Maillage_FT_Disc;
-class IntTab;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Champ_base;
 
 //////////////////////////////////////////////////////////////////////////////

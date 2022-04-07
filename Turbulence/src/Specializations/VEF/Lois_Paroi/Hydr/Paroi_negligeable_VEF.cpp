@@ -21,7 +21,7 @@
 
 #include <Paroi_negligeable_VEF.h>
 #include <Dirichlet_paroi_fixe.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Mod_turb_hyd_base.h>
 #include <Operateur.h>
 #include <Operateur_base.h>
@@ -141,7 +141,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_k_eps)
       const IntTab& elem_faces = zone_VEF.elem_faces();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-      const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+      const DoubleTab& tab_visco = ch_visco_cin->valeurs();
       const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
 
       if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
@@ -242,7 +242,7 @@ int Paroi_negligeable_VEF::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& tab_k)
       const IntTab& elem_faces = zone_VEF.elem_faces();
       const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
       const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-      const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+      const DoubleTab& tab_visco = ch_visco_cin->valeurs();
       const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
 
       if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))

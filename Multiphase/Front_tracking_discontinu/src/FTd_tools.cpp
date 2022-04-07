@@ -22,7 +22,7 @@
 
 #include <FTd_tools.h>
 #include <math.h>
-#include <DoubleTabFT.h>
+#include <TRUSTTabFT.h>
 
 // Description:
 //    Cette fonction calcule le max de la norme d'un ensemble de vecteurs
