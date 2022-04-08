@@ -75,7 +75,7 @@ void Dissipation_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t m
   const Zone_CoviMAC& 		zone 			= ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const Champ_P0_CoviMAC& 	ch_diss			= ref_cast(Champ_P0_CoviMAC,equation().inconnue().valeur()); // Champ tau ou omega
   const DoubleTab& 			diss 			= ch_diss.valeurs() ;
-  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique();
+  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
   const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();

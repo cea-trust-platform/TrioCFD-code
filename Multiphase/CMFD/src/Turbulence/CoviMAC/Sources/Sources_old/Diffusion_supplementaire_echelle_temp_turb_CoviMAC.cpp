@@ -112,7 +112,7 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
 //  const Op_Diff_Turbulent_CoviMAC_Face& op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
 //  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.corr.valeur());
 //  const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();
-  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique();
+  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
   const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
 
   int N = tab_tau.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;

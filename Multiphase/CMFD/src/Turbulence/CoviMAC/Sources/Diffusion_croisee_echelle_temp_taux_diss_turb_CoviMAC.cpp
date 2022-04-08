@@ -216,7 +216,7 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
           }
         else if (Type_diss == "omega")
           {
-            const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique();
+            const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
             const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
             const tabs_t& 			der_alpha_rho 	= ref_cast(Champ_Inc_base, ch_alpha_rho).derivees(); // dictionnaire des derivees
 
