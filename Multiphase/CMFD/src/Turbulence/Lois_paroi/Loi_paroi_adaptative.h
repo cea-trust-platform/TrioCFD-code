@@ -22,8 +22,8 @@
 
 #ifndef Loi_paroi_adaptative_included
 #define Loi_paroi_adaptative_included
-#include <DoubleTab.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
+#include <TRUSTTab.h>
 #include <Correlation_base.h>
 #include <Loi_paroi_base.h>
 #include <vector>

@@ -22,7 +22,7 @@
 
 #ifndef Viscosite_turbulente_l_melange_included
 #define Viscosite_turbulente_l_melange_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
 #include <Champ_Fonc.h>
 #include <Schema_Temps_base.h>

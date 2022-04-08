@@ -23,7 +23,7 @@
 #ifndef CL_loi_paroi_included
 #define CL_loi_paroi_included
 #include <Param.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 #include <Ref_Correlation.h>
 #include <Correlation.h>
 #include <Frontiere_dis_base.h>

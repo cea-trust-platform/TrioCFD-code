@@ -25,7 +25,7 @@
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
 #include <Zone_CoviMAC.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Neumann_loi_paroi.h>
 #include <Paroi_frottante_loi.h>
 #include <Echange_impose_base.h>

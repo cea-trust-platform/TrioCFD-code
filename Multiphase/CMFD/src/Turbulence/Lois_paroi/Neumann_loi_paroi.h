@@ -25,7 +25,7 @@
 
 #include <Neumann_paroi.h>
 #include <Param.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 #include <Ref_Correlation.h>
 #include <Correlation.h>
 #include <Frontiere_dis_base.h>

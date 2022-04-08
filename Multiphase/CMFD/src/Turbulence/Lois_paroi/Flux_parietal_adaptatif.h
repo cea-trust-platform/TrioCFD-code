@@ -22,7 +22,7 @@
 
 #ifndef Flux_parietal_adaptatif_included
 #define Flux_parietal_adaptatif_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
 #include <Ref_Correlation.h>
 

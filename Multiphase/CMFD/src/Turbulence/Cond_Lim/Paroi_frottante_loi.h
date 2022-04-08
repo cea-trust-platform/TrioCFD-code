@@ -23,7 +23,7 @@
 #ifndef Paroi_frottante_loi_included
 #define Paroi_frottante_loi_included
 
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Frottement_global_impose.h>
 #include <CL_loi_paroi.h>
 #include <Cond_lim_base.h>

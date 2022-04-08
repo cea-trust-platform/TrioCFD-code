@@ -25,7 +25,7 @@
 #include <Probleme_base.h>
 #include <Champ_base.h>
 #include <ConstDoubleTab_parts.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Viscosite_turbulente_WIF, "Viscosite_turbulente_WIF", Viscosite_turbulente_base);
 

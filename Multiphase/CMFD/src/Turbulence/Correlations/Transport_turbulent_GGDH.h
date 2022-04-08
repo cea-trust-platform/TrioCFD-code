@@ -22,7 +22,7 @@
 
 #ifndef Transport_turbulent_GGDH_included
 #define Transport_turbulent_GGDH_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Transport_turbulent_base.h>
 
 //////////////////////////////////////////////////////////////////////////////

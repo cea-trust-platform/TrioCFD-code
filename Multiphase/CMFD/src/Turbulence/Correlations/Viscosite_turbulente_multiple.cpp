@@ -25,8 +25,8 @@
 #include <Probleme_base.h>
 #include <Champ_base.h>
 #include <ConstDoubleTab_parts.h>
-#include <DoubleTab.h>
-#include <DoubleTrav.h>
+#include <TRUSTTab.h>
+#include <TRUSTTrav.h>
 #include <MD_Vector_tools.h>
 
 

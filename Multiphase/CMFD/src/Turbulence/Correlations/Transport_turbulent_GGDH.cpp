@@ -25,7 +25,7 @@
 #include <Probleme_base.h>
 #include <Champ_Don.h>
 #include <Pb_Multiphase.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <MD_Vector_tools.h>
 
 Implemente_instanciable(Transport_turbulent_GGDH, "Transport_turbulent_GGDH|Transport_turbulent_anisotrope", Transport_turbulent_base);

@@ -22,7 +22,7 @@
 
 #ifndef Viscosite_turbulente_base_included
 #define Viscosite_turbulente_base_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Correlation_base.h>
 
 //////////////////////////////////////////////////////////////////////////////

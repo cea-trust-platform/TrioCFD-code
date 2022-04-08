@@ -22,7 +22,7 @@
 
 #ifndef Viscosite_turbulente_k_omega_included
 #define Viscosite_turbulente_k_omega_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
 
 //////////////////////////////////////////////////////////////////////////////

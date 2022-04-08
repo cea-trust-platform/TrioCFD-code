@@ -23,7 +23,7 @@
 #include <Loi_paroi_base.h>
 #include <Pb_Multiphase.h>
 #include <Zone_CoviMAC.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <CL_loi_paroi.h>
 #include <Cond_lim_base.h>
 #include <math.h>

@@ -23,7 +23,7 @@
 #ifndef Neumann_loi_paroi_faible_k_included
 #define Neumann_loi_paroi_faible_k_included
 
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Neumann_loi_paroi.h>
 #include <CL_loi_paroi.h>
 #include <Cond_lim_base.h>
