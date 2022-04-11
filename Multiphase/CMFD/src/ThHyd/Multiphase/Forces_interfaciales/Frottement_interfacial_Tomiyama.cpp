@@ -43,21 +43,20 @@ Entree& Frottement_interfacial_Tomiyama::readOn(Entree& is)
 
 void Frottement_interfacial_Tomiyama::coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
                                                   const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
-                                                  const DoubleTab& ndv, int e, DoubleTab& coeff) const
+                                                  const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const
 {
-  const DoubleTab& diametres = ref_cast(Pb_Multiphase, pb_.valeur()).get_champ("diametre_bulles").valeurs();
   int k, l, N = ndv.dimension(0);
 
   for (k = 1; k < N; k++)
     {
-      double Re = rho(0) * ndv(0,k) * diametres(e, k)/mu(0);
-      double Eo = g_ * std::abs(rho(0)-rho(k)) * diametres(e, k)*diametres(e, k)/sigma(0,k);
+      double Re = rho(0) * ndv(0,k) * d_bulles(k)/mu(0);
+      double Eo = g_ * std::abs(rho(0)-rho(k)) * d_bulles(k)*d_bulles(k)/sigma(0,k);
       double Cd = -1;
       if (contamination_==0) Cd = std::max( std::min( 16/Re*(1+0.15*std::pow(Re, 0.687)) , 48/Re )   , 8*Eo/(3*(Eo+4)));
       if (contamination_==1) Cd = std::max( std::min( 24/Re*(1+0.15*std::pow(Re, 0.687)) , 72/Re )   , 8*Eo/(3*(Eo+4)));
       if (contamination_==2) Cd = std::max(           24/Re*(1+0.15*std::pow(Re, 0.687))             , 8*Eo/(3*(Eo+4)));
 
-      coeff(k, 0, 0) = (coeff(k, 0, 1) = 3/4*Cd/diametres(e,k) * alpha(k) * rho(0)) * ndv(0,k);
+      coeff(k, 0, 0) = (coeff(k, 0, 1) = 3/4*Cd/d_bulles(k) * alpha(k) * rho(0)) * ndv(0,k);
       coeff(0, k, 0) =  coeff(k, 0, 0);
       coeff(0, k, 1) =  coeff(k, 0, 1);
     }

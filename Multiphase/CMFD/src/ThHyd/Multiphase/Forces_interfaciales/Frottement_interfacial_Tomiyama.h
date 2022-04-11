@@ -14,7 +14,7 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Frottement_interfacial_bulles.h
+// File:        Frottement_interfacial_Tomiyama.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
@@ -37,7 +37,7 @@ class Frottement_interfacial_Tomiyama : public Frottement_interfacial_base
 public:
   void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
                    const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
-                   const DoubleTab& ndv, int e, DoubleTab& coeff) const override;
+                   const DoubleTab& ndv, const DoubleTab& d_bulles, DoubleTab& coeff) const override;
 protected:
   double g_=9.81;
   int contamination_ = 0 ; // contamination 0 for pure system, 1 for moderate contamination, 2 for high contamination
