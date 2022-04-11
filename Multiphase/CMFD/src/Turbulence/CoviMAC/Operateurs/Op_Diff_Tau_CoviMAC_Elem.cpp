@@ -147,7 +147,7 @@ void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& sec
         {
           if ((fb = (eb = phif_e(i)) - zone0.nb_elem_tot()) < 0) //element
             {
-              for (n = 0; n < N[0]; n++) flux(n) += phif_c(i, n) * fs[0](f) * tau(eb, n);
+              for (n = 0; n < N[0]; n++) flux(n) += phif_c(i, n) * fs[0](f) * inco[0](eb, n);
               if (mat[0]) for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //derivees
                       (*mat[0])(N[0] * e + n, N[0] * eb + n) += (j ? 1 : -1) * phif_c(i, n) * fs[0](f) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_) ;
             }
@@ -163,12 +163,10 @@ void Op_Diff_Tau_CoviMAC_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& sec
       for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //second membre -> amont/aval
             secmem_loc(e, n) += (j ? -1 : 1) * flux(n) ;
     }
-  Matrice_Morse* mat2 = (matrices.count("tau")) ? matrices.at("tau") : nullptr;
 
   for (e = 0 ; e<zone0.nb_elem() ; e++)  for (n = 0; n < N[0]; n++)
       {
         secmem(e,n) += secmem_loc(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
-        if (!(mat2==nullptr)) (*mat2)(N[0] * e + n, N[0] * e + n) -= 2 * secmem_loc(e,n) * ((tau(e,n) > limiter_tau_) ? tau(e,n)/limiter_tau_ : 0)  ;
       }
 
 }
