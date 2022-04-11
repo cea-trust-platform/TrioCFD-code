@@ -75,7 +75,7 @@ Casesetup {
 			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} nbModes 100}\latex_)"
 			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} turbKinEn 0.2}\latex_)"
 			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} turbDissRate 50}\latex_)"
-			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} p 5}\latex_)"
+			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} KeOverKmin 5}\latex_)"
 			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} timeScale 4e-3}\latex_)"
 			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} dir\_fluct 1 1 1}\latex_)"
 			Description "\latex_(\texttt{\hphantom{champ\_front\_synt 3 \{} ratioCutoffWavenumber 2}\latex_)"
@@ -262,7 +262,7 @@ Results {
 Conclusion {
 	Description "A few recommendations:"
 	Description "- Refining the mesh and decreasing the parameter \latex_(\texttt{ratioCutoffWavenumber}\latex_) while keeping constant the resolved turbulent kinetic energy ratio results in smoother fluctuations. It is recommended to select \latex_(\texttt{ratioCutoffWavenumber} $\leq 1 $\latex_) (e.g. \latex_(\texttt{ratioCutoffWavenumber}\latex_) = 1, 0.5 or 0.25 are generally good choices)."
-	Description "- Taking $p$ equal to a few units ($2 \leq p \leq 10$) will be appropriate in most cases."
+	Description "- Taking \latex_(\texttt{KeOverKmin}\latex_) equal to a few units (\latex_($2 \leq \texttt{KeOverKmin} \leq 10$\latex_)) will be appropriate in most cases."
 	Description "- The simulation time step varies usually during the simulation, but we recommend to take it reasonably small compared to the caracteristic time scale \latex_($\tau_t$\latex_) (for example \latex_($0.01 \leq \delta t/\tau_t \leq 0.1$\latex_))."
 	Description "- The caracteristic length and time scales can be estimated through a RANS preliminary simulation. For more details, report to reference [1]."
 }
