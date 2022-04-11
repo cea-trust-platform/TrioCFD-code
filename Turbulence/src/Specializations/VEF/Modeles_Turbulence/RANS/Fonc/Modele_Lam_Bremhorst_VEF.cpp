@@ -541,7 +541,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem(const Discretisation_
   const Motcle wtype= "champ_elem";
   dis.discretiser_champ(wtype,zone_dis,multi_scalaire,noms,unites,2,0.,K_Eps_elem);
   K_Eps_elem->affecter(K_Eps);
-  DoubleTab tab_K_Eps  = K_Eps_elem.valeur();
+  DoubleTab tab_K_Eps  = K_Eps_elem->valeurs();
 
   DoubleTab ReNL;
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
@@ -604,8 +604,8 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_BiK(const Discretisat
 
   K_elem->affecter(K);
   Eps_elem->affecter(Eps);
-  DoubleTab tab_K    = K_elem.valeur();
-  DoubleTab tab_Eps  = Eps_elem.valeur();
+  DoubleTab tab_K    = K_elem->valeurs();
+  DoubleTab tab_Eps  = Eps_elem->valeurs();
 
   DoubleTab ReNL;
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
@@ -700,7 +700,7 @@ DoubleTab Modele_Lam_Bremhorst_VEF::calcul_tenseur_Re_elem_shih(const Discretisa
   const Motcle wtype= "champ_elem";
   dis.discretiser_champ(wtype,zone_dis,multi_scalaire,noms,unites,2,0.,K_Eps_elem);
   K_Eps_elem->affecter(K_Eps);
-  DoubleTab tab_K_Eps  = K_Eps_elem.valeur();
+  DoubleTab tab_K_Eps  = K_Eps_elem->valeurs();
 
   DoubleTab ReNL;
   const Zone_VEF& zone_VEF = ref_cast(Zone_VEF,zone_dis.valeur());
