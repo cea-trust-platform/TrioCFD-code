@@ -59,7 +59,7 @@ Lire pb
 		diffusion		{ negligeable }
 		conditions_initiales	{ vitesse champ_uniforme 3 1 0 0 }
 		conditions_limites	{
-					entree	frontiere_ouverte_vitesse_imposee champ_front_synt 3 { moyenne 1 0 0 lenghtScale 0.000974 nbModes 100 turbKinEn 0.2 turbDissRate 50 p 5 timeScale 4e-3 dir_fluct 1 1 1 ratioCutoffWavenumber 1.414 }
+					entree	frontiere_ouverte_vitesse_imposee champ_front_synt 3 { moyenne 1 0 0 lenghtScale 0.000974 nbModes 100 turbKinEn 0.2 turbDissRate 50 KeOverKmin 5 timeScale 4e-3 dir_fluct 1 1 1 ratioCutoffWavenumber 1.414 }
 					sortie	frontiere_ouverte_pression_imposee champ_front_uniforme 1 0
 					paroi	paroi_fixe
 					}
