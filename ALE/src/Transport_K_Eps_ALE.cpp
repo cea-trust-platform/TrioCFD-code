@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,26 +12,55 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-#include <Cond_lim.h>
-
 //////////////////////////////////////////////////////////////////////////////
 //
-// .DESCRIPTION
-//    Interface du module ThHyd.
-//    Contient 1 fonction:
-//      int tester_compatibilite_hydr_turb(const Zone_Cl_dis& , const Zone_Cl_dis& )
-//    qui servent a tester la coherence des conditions aux limites
-//    et la fonction
-//      int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& )
-//    qui affiche un message d'erreur pour la compatibilite hyd/turb
-// .SECTION voir aussi
-//    Fonction de librairie hors classe
+// File:        Transport_K_Eps_ALE.cpp
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/
+//
 //////////////////////////////////////////////////////////////////////////////
 
-class Zone_Cl_dis;
+#include <Transport_K_Eps_ALE.h>
+#include <Pb_Hydraulique_Turbulent_ALE.h>
+#include <Op_Conv_ALE.h>
+#include <TRUSTTrav.h>
+#include <Debog.h>
+#include <Discretisation_base.h>
 
-// Fonctions qui servent a tester la coherence des conditions aux limites
+Implemente_instanciable(Transport_K_Eps_ALE,"Transport_K_Eps_ALE",Transport_K_Eps);
 
-int tester_compatibilite_hydr_turb(const Zone_Cl_dis& , const Zone_Cl_dis& );
+Sortie& Transport_K_Eps_ALE::printOn(Sortie& s ) const
+{
+  return Transport_K_Eps::printOn(s);
+}
 
-int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& );
+Entree& Transport_K_Eps_ALE::readOn(Entree& s )
+{
+  return Transport_K_Eps::readOn(s);
+}
+
+void Transport_K_Eps_ALE::corriger_derivee_impl_ALE(DoubleTab& d)
+{
+  // ALE part start
+  if( sub_type(Op_Conv_ALE, terme_convectif.valeur()) )
+    {
+      Nom discr=discretisation().que_suis_je();
+      if (discr != "VEFPreP1B")
+        {
+          Cerr<<"volume_entrelace_Cl used in the mass matrix is wrong for the ALE treatment on the boundaries"<<finl;
+          Cerr<<"(vol_entrelace_Cl=0 for some of the boundaries indeed a correction is necessary) :"<<finl;
+          Cerr<<"the VEFPreP1B discretization must be used to avoid this problem. "<<finl;
+          exit();
+        }
+      Cerr << "Adding ALE contribution to K Eps..." << finl;
+      Op_Conv_ALE& opale=ref_cast(Op_Conv_ALE, terme_convectif.valeur());
+      DoubleTrav ALE(d); // copie de la structure, initialise a zero
+      opale.ajouterALE(inconnue().valeurs(), ALE);
+      ALE.echange_espace_virtuel();
+      solveur_masse.appliquer(ALE);
+      ALE.echange_espace_virtuel();
+      d+=ALE;
+      d.echange_espace_virtuel();
+      Debog::verifier("Transport_K_Eps::corriger_derivee_impl",d);
+    }
+}
+

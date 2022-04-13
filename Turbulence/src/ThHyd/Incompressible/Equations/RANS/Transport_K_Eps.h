@@ -59,6 +59,8 @@ public:
   Operateur& operateur(int) override;
   const Motcle& domaine_application() const override;
   DoubleTab& corriger_derivee_impl(DoubleTab& d) override;
+  /////
+  virtual void corriger_derivee_impl_ALE(DoubleTab& d) { throw; } // pour ALE seulement
 
 protected :
   int with_nu_;

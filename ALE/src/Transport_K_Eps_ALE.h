@@ -14,38 +14,18 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Entree_fluide_vitesse_imposee.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/17
+// File:        Transport_K_Eps_ALE.h
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <Transport_K_Eps.h>
 
-#ifndef Entree_fluide_vitesse_imposee_ALE_included
-#define Entree_fluide_vitesse_imposee_ALE_included
-
-#include <Entree_fluide_vitesse_imposee.h>
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Entree_fluide_vitesse_imposee
-//    Cas particulier de la classe Dirichlet_entree_fluide
-//    pour la vitesse imposee: impose la vitesse d'entree du fluide dans
-//    une equation de type Navier_Stokes
-// .SECTION voir aussi
-//    Dirichlet_entree_fluide Navier_Stokes_std
-//////////////////////////////////////////////////////////////////////////////
-class Entree_fluide_vitesse_imposee_ALE  : public Entree_fluide_vitesse_imposee
+class Transport_K_Eps_ALE : public Transport_K_Eps
 {
+  Declare_instanciable(Transport_K_Eps_ALE);
 
-  Declare_instanciable(Entree_fluide_vitesse_imposee_ALE);
-
-public :
-
-
+public:
+  void corriger_derivee_impl_ALE(DoubleTab& d) override;
 };
-
-#endif
 

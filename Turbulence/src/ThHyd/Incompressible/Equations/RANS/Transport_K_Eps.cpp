@@ -25,7 +25,12 @@
 #include <Param.h>
 #include <EChaine.h>
 #include <Fluide_Quasi_Compressible.h>
-
+#include <TRUSTTrav.h>
+#include <Debog.h>
+#include <Discretisation_base.h>
+#include <Probleme_base.h>
+#include <Equation_base.h>
+#include <Nom.h>
 
 Implemente_instanciable(Transport_K_Eps,"Transport_K_Eps",Transport_K_Eps_base);
 
@@ -86,7 +91,14 @@ Entree& Transport_K_Eps::readOn(Entree& s )
       const Probleme_base& pb = probleme();
       Cerr << "Construction and typing for the source term of the Transport_K_Eps equation." << finl;
       REF(Champ_base) ch;
+      Nom pbb = probleme().que_suis_je();
       if (sub_type(Pb_Hydraulique_Turbulent,pb) || milieu().que_suis_je()=="Fluide_Quasi_Compressible")
+        {
+          Nom typ = "Source_Transport_K_Eps";
+          Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
+          so.typer(typ,*this);
+        }
+      else if (pbb.contient("ALE"))
         {
           Nom typ = "Source_Transport_K_Eps";
           Cerr << "TYPAGE DES SOURCES : this " << *this << finl;
@@ -296,6 +308,9 @@ const Motcle& Transport_K_Eps::domaine_application() const
 
 DoubleTab& Transport_K_Eps::corriger_derivee_impl(DoubleTab& d)
 {
+  Nom pbb = probleme().que_suis_je();
+  if (pbb.contient("ALE")) corriger_derivee_impl_ALE(d);
+
   const Turbulence_paroi_base& loi_paroi=modele_turbulence().loi_paroi().valeur();
   loi_paroi.corriger_derivee_impl(d);
   return Transport_K_Eps_base::corriger_derivee_impl(d);
