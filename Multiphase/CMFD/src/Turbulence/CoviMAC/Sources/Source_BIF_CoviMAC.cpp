@@ -72,7 +72,7 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
   if (!sub_type(Viscosite_turbulente_base, Op_diff.corr.valeur())) Process::exit("The turbulence correlation must be multiple");
   const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.corr.valeur());
 
-  int N = pb.get_champ("vitesse").valeurs().dimension(1), ne = zone.nb_elem(), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot() ;
+  int N = pb.get_champ("vitesse").valeurs().dimension(1), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot() ;
 
   // On recupere les tensions de reynolds des termes de BIF
   DoubleTrav Rij(0, N, D, D);
@@ -88,19 +88,19 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
   DoubleTab f_w = ch_alpha.fgrad_w;
 
   // On calcule le gradient de Rij aux faces
-  for (int n = 0; n < N; n++) for (int f = 0; f < nf; f++) for (int d_i = 0; d_i <D ; d_i++) for (int d_j = 0; d_j <D ; d_j++)
+  for (int n = 0; n < N; n++) for (int f = 0; f < nf_tot; f++) for (int d_i = 0; d_i <D ; d_i++) for (int d_j = 0; d_j <D ; d_j++)
           {
             grad_Rij(f, n, d_i, d_j) = 0;
+            // grad_Rij(face, phase, x-coord, y-coord)   or
+            // grad_Rij(nb_face_tot + dimension*element*gradient_component, phase, x-coord, y-coord)
             for (int j = f_d(f); j < f_d(f+1) ; j++)
               {
                 int e = f_e(j);
                 int f_bord;
-                if (e < ne_tot) //contribution d'un element
-                  {
-                    double val_e = Rij(e, n, d_i, d_j);
-                    grad_Rij(f, n, d_i, d_j) += f_w(j) * val_e;
-                  }
-                else if (ch_alpha.fcl()(f_bord = e - ne_tot, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
+                if ( (f_bord = e - ne_tot) < 0) //contribution d'un element
+                  grad_Rij(f, n, d_i, d_j) += f_w(j) * Rij(e, n, d_i, d_j);
+                else if ( (ch_alpha.fcl()(f_bord, 0) == 1) || (ch_alpha.fcl()(f_bord, 0) == 2)
+                          || (ch_alpha.fcl()(f_bord, 0) == 3) || (ch_alpha.fcl()(f_bord, 0) == 6))
                   {
                     Process::exit("You must have a neumann limit condition on alpha for RIJ_BIF to work !");
                   }
@@ -109,21 +109,17 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
 
   // On interpole le gradient de Rij aux elements
   zone.init_ve();
-  for (int n = 0; n < N; n++) for (int e = 0; e < ne; e++) for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
+  for (int n = 0; n < N; n++) for (int e = 0; e < ne_tot; e++) for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
         for (int d_i = 0; d_i <D ; d_i++) for (int d_j = 0; d_j <D ; d_j++)
             {
               grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) = 0;
               for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
-                  {
-                    grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) += zone.vec(j, d_d) * grad_Rij(f, n, d_i,  d_j);
-                  }
+                  grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) += zone.vec(j, d_d) * grad_Rij(f, n, d_i,  d_j);
             }
-
-  grad_Rij.echange_espace_virtuel();
 
   // On calcule le second membre aux elements
 
-  for(int e = 0 ; e < ne ; e++) for(int n = 0; n<N ; n++) for (int d_i = 0; d_i < D; d_i++)
+  for(int e = 0 ; e < ne_tot ; e++) for(int n = 0; n<N ; n++) for (int d_i = 0; d_i < D; d_i++)
         {
           double secmem_en = 0;
           for (int d_j = 0; d_j < D; d_j++)

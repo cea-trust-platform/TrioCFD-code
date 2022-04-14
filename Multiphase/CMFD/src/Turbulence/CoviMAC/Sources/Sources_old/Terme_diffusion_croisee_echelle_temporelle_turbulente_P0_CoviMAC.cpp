@@ -115,7 +115,7 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
                 double val_e = tau_passe(e, n);
                 grad_f_tau(f, n) += f_w_tau(j) * val_e;
               }
-            else if (fcl_tau(f_bord = e - nb_elem_tot, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
+            else if (fcl_tau(f_bord = e - nb_elem_tot, 0) == 6) //contribution d'un bord : seul Dirichlet contribue
               {
                 double val_f_bord = ref_cast(Dirichlet, cls_tau[fcl_tau(f_bord, 1)].valeur()).val_imp(fcl_tau(f_bord, 2), n);
                 grad_f_tau(f, n) += f_w_tau(j) * val_f_bord;
@@ -142,7 +142,7 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_CoviMAC::ajouter_b
                 double val_e = k_passe(e, n);
                 grad_f_k(f, n) += f_w_k(j) * val_e;
               }
-            else if (fcl_k(f_bord = e - nb_elem_tot, 0) == 3) //contribution d'un bord : seul Dirichlet contribue
+            else if (fcl_k(f_bord = e - nb_elem_tot, 0) == 6) //contribution d'un bord : seul Dirichlet contribue
               {
                 double val_f_bord = ref_cast(Dirichlet, cls_k[fcl_k(f_bord, 1)].valeur()).val_imp(fcl_k(f_bord, 2), n);
                 grad_f_k(f, n) += f_w_k(j) * val_f_bord;

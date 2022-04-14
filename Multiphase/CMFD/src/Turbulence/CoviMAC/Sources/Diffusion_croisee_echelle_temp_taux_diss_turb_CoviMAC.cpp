@@ -127,23 +127,21 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
   const IntTab& f_d_tau = ch_diss.fgrad_d, &f_e_tau = ch_diss.fgrad_e; // Tables utilisees dans zone_CoviMAC::fgrad pour le calcul du gradient
   const DoubleTab& f_w_tau = ch_diss.fgrad_w;
 
-  for (int n = 0; n < N; n++) for (int f = 0; f < nf; f++)
+  for (int f = 0; f < nf; f++) for (int n = 0; n < N; n++)
       {
         grad_f_diss(f, n) = 0;
         for (int j = f_d_tau(f); j < f_d_tau(f+1) ; j++)
           {
             int e = f_e_tau(j);
             int f_bord;
-            if (e < nb_elem_tot) //contribution d'un element
-              {
-                double val_e = diss_passe(e, n);
-                grad_f_diss(f, n) += f_w_tau(j) * val_e;
-              }
-            else if (fcl_diss(f_bord = e - nb_elem_tot, 0) == 6) //contribution d'un bord : seul Dirichlet contribue
-              {
-                double val_f_bord = ref_cast(Dirichlet, cls_diss[fcl_diss(f_bord, 1)].valeur()).val_imp(fcl_diss(f_bord, 2), n);
-                grad_f_diss(f, n) += f_w_tau(j) * val_f_bord;
-              }
+            if ( (f_bord = e-nb_elem_tot) < 0) //contribution d'un element
+              grad_f_diss(f, n) += f_w_tau(j, n) * diss_passe(e, n);
+            else if (fcl_diss(f_bord, 0) == 1 || fcl_diss(f_bord, 0) == 2) //Echange_impose_base
+              grad_f_diss(f, n) += (f_w_tau(j, n) ? f_w_tau(j, n) * ref_cast(Echange_impose_base, cls_diss[fcl_diss(f_bord, 1)].valeur()).T_ext(fcl_diss(f_bord, 2), n) : 0);
+            else if (fcl_diss(f_bord, 0) == 4) //Neumann non homogene
+              grad_f_diss(f, n) += (f_w_tau(j, n) ? f_w_tau(j, n) * ref_cast(Neumann_paroi      , cls_diss[fcl_diss(f_bord, 1)].valeur()).flux_impose(fcl_diss(f_bord, 2), n) : 0);
+            else if (fcl_diss(f_bord, 0) == 6) // Dirichlet
+              grad_f_diss(f, n) += f_w_tau(j) * ref_cast(Dirichlet, cls_diss[fcl_diss(f_bord, 1)].valeur()).val_imp(fcl_diss(f_bord, 2), n);
           }
       }
 
@@ -162,16 +160,14 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matric
           {
             int e = f_e_k(j);
             int f_bord;
-            if (e < nb_elem_tot) //contribution d'un element
-              {
-                double val_e = k_passe(e, n);
-                grad_f_k(f, n) += f_w_k(j) * val_e;
-              }
-            else if (fcl_k(f_bord = e - nb_elem_tot, 0) == 6) //contribution d'un bord : seul Dirichlet contribue
-              {
-                double val_f_bord = ref_cast(Dirichlet, cls_k[fcl_k(f_bord, 1)].valeur()).val_imp(fcl_k(f_bord, 2), n);
-                grad_f_k(f, n) += f_w_k(j) * val_f_bord;
-              }
+            if ( (f_bord = e-nb_elem_tot) < 0) //contribution d'un element
+              grad_f_k(f, n) += f_w_k(j) * k_passe(e, n);
+            else if (fcl_k(f_bord, 0) == 1 || fcl_k(f_bord, 0) == 2) //Echange_impose_base
+              grad_f_k(f, n) += (f_w_k(j, n) ? f_w_k(j, n) * ref_cast(Echange_impose_base, cls_k[fcl_k(f_bord, 1)].valeur()).T_ext(fcl_k(f_bord, 2), n) : 0);
+            else if (fcl_k(f_bord, 0) == 4) //Neumann non homogene
+              grad_f_k(f, n) += (f_w_k(j, n) ? f_w_k(j, n) * ref_cast(Neumann_paroi      , cls_k[fcl_k(f_bord, 1)].valeur()).flux_impose(fcl_k(f_bord, 2), n) : 0);
+            else if (fcl_k(f_bord, 0) == 6) // Dirichlet
+              grad_f_k(f, n) += f_w_k(j) * ref_cast(Dirichlet, cls_k[fcl_k(f_bord, 1)].valeur()).val_imp(fcl_k(f_bord, 2), n);
           }
       }
 
