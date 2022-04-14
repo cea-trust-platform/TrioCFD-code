@@ -42,6 +42,7 @@
 #include <Array_tools.h>
 #include <Matrix_tools.h>
 #include <Dirichlet.h>
+#include <Neumann_loi_paroi_faible_tau_omega.h>
 
 #include <cmath>
 #include <vector>
@@ -56,6 +57,16 @@ Sortie& Diffusion_supplementaire_echelle_temp_turb_CoviMAC::printOn(Sortie& os) 
 Entree& Diffusion_supplementaire_echelle_temp_turb_CoviMAC::readOn(Entree& is)
 {
   return is;
+}
+
+void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::completer()
+{
+  for (int j = 0 ; j<equation().zone_Cl_dis()->nb_cond_lim(); j++)
+    {
+      const Cond_lim& cond_lim_loc = equation().zone_Cl_dis()->les_conditions_limites(j);
+      if sub_type(Neumann_loi_paroi_faible_tau_omega, cond_lim_loc.valeur()) f_grad_tau_fixe = 0;
+    }
+
 }
 
 void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
@@ -112,13 +123,14 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
 //  const Op_Diff_Turbulent_CoviMAC_Face& op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
 //  const Viscosite_turbulente_k_tau&   visc_turb = ref_cast(Viscosite_turbulente_k_tau, op_diff.corr.valeur());
 //  const DoubleTab&                      nu_visc	= equation().probleme().get_champ("viscosite_cinematique").passe();
-  const Champ_base& 		ch_alpha_rho 	= sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
-  const DoubleTab& 			alpha_rho		= ch_alpha_rho.valeurs();
+//  const Champ_base&     ch_alpha_rho   = sub_type(Pb_Multiphase,equation().probleme()) ? ref_cast(Pb_Multiphase,equation().probleme()).eq_masse.champ_conserve() : equation().milieu().masse_volumique().valeur();
+//  const DoubleTab&       alpha_rho    = ch_alpha_rho.valeurs();
 
   int N = tab_tau.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;
 
   DoubleTrav grad_sqrt_tau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
-  tau.init_grad(0);
+  if (f_grad_tau_fixe) tau.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
+  else tau.calc_grad(0); // Si on a des CAL qui evoluent avec les lois de paroi, on recalcule le fgrad a chaque pas de temps
   IntTab& f_d = tau.fgrad_d, f_e = tau.fgrad_e;             // Tables used in zone_CoviMAC::fgrad
   DoubleTab f_w = tau.fgrad_w;
 
@@ -132,16 +144,14 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
           {
             int e = f_e(j);
             int f_bord;
-            if ( e < ne_tot) //contrib d'un element
-              {
-                double val_e = sqrt(std::max(1e-10, tab_tau(e, n))) ; // Si implicite ou pas
-                grad_sqrt_tau(f, n) += f_w(j) * val_e;
-              }
-            else if (fcl(f_bord = e - ne_tot, 0) == 3) //contrib d'un bord : seul Dirichlet contribue
-              {
-                double val_f_bord = sqrt(ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), n));
-                grad_sqrt_tau(f, n) += f_w(j) * val_f_bord;
-              }
+            if ( (f_bord = e-ne_tot) < 0) //contrib d'un element
+              grad_sqrt_tau(f, n) += f_w(j) * std::sqrt(std::max(limiter_tau_, tab_tau(e, n))) ; // Si implicite ou pas
+            else if (fcl(f_bord, 0) == 1 || fcl(f_bord, 0) == 2) //Echange_impose_base
+              grad_sqrt_tau(f, n) += f_w(j, n) ? f_w(j, n) * ref_cast(Echange_impose_base, cls[fcl(f_bord, 1)].valeur()).T_ext(fcl(f_bord, 2), n)     *.5/std::sqrt(std::max(limiter_tau_, tab_tau(zone.face_voisins(f_bord, 0), n))) : 0;
+            else if (fcl(f_bord, 0) == 4) //Neumann non homogene
+              grad_sqrt_tau(f, n) += f_w(j, n) ? f_w(j, n) * ref_cast(Neumann_paroi      , cls[fcl(f_bord, 1)].valeur()).flux_impose(fcl(f_bord, 2), n)*.5/std::sqrt(std::max(limiter_tau_, tab_tau(zone.face_voisins(f_bord, 0), n))) : 0;
+            else if (fcl(f_bord, 0) == 6) // Dirichlet
+              grad_sqrt_tau(f, n) += f_w(j) * std::sqrt(ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), n));
           }
       }
 
@@ -167,20 +177,21 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
   for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
       {
         // Second membre
+        double fac = pe(e)*ve(e) ;
         double secmem_en = 0 ;
         for (int d = 0; d<D; d++) secmem_en += grad_sqrt_tau(nf_tot + D*e+d, n)*grad_sqrt_tau(nf_tot + D*e+d, n) ;
-        secmem_en *= -8  * mu_tot(e, n);
+        secmem_en *= fac * -8  * mu_tot(e, n);
 
-        int limiter_used = 0;
+        //int limiter_used = 0;
 
         // limiteur 1 : au plus 5 fois la diffusion
-        if (4*std::abs(sec_m(e,n)) < std::abs(secmem_en)) {secmem_en *= 4*std::abs(sec_m(e,n))/std::abs(secmem_en); limiter_used = 1;}
+        // if (4*std::abs(sec_m(e,n)) < std::abs(secmem_en)) {secmem_en *= 4*std::abs(sec_m(e,n))/std::abs(secmem_en); limiter_used = 1;}
         // limiteur 2 : au plus 1.33 fois la dissipation
-        if (1.3333333*0.075 * alpha_rho(e, n) < std::abs(secmem_en)) {secmem_en *= 1.3333333*0.075 * alpha_rho(e, n)/std::abs(secmem_en); limiter_used = 2;}
+        // if (1.3333333*0.075 * alpha_rho(e, n) < std::abs(secmem_en)) {secmem_en *= 1.3333333*0.075 * alpha_rho(e, n)/std::abs(secmem_en); limiter_used = 2;}
         // Jacobienne ; si on est dans le limiteur, pas de derivee
-        if (!(Mtau == nullptr)&&(limiter_used == 0))
+        if (!(Mtau == nullptr))//&&(limiter_used == 0))
           {
-            limiter_used = 3;
+//            limiter_used = 3;
             for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
               {
                 int f = zone.vej(i);
@@ -190,18 +201,18 @@ void Diffusion_supplementaire_echelle_temp_turb_CoviMAC::ajouter_blocs(matrices_
                     if ( ed < ne_tot) for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
                         {
 //                          double inv_sqrt_tau = sqrt(tab_k_passe(ed, n) / std::max(tab_k_passe(ed, n) * tab_tau(ed, n), visc_turb.limiteur() * nu_visc(ed, n)));
-                          double inv_sqrt_tau = (tab_tau(ed, n) > 1e-10) ? sqrt(1/tab_tau(ed, n)) : 1e5;
-                          (*Mtau)(N * e + n, N * ed + n) += 8  * mu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau;
+                          double inv_sqrt_tau = (tab_tau(ed, n) > limiter_tau_) ? std::sqrt(1/tab_tau(ed, n)) : std::sqrt(1/limiter_tau_);
+                          (*Mtau)(N * e + n, N * ed + n) += fac * 8  * mu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau * std::sqrt(2.);
                         }
                   }
               }
           }
 //        Cerr << e << "--- tau  " << tab_tau(e,n) << "  secmem  " << secmem_en << "limiter   " << limiter_used << finl;
-        Cerr << limiter_used ;
+//        Cerr << limiter_used ;
         secmem(e, n) += secmem_en;
 
       }
-  Cerr << finl ;
+//  Cerr << finl ;
 }
 
 

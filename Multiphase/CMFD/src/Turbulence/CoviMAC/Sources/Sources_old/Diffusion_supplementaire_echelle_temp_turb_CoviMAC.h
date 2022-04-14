@@ -51,10 +51,12 @@ public :
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
+  void completer() override;
 
 protected :
   double limiter_ = 5 ;
-
+  double limiter_tau_ = 1.e-6;
+  int f_grad_tau_fixe = 1 ;
 };
 
 #endif
