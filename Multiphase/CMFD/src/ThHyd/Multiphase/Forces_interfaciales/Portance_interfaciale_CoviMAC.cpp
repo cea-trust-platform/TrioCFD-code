@@ -42,9 +42,18 @@ Sortie& Portance_interfaciale_CoviMAC::printOn(Sortie& os) const
 
 Entree& Portance_interfaciale_CoviMAC::readOn(Entree& is)
 {
-  const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
-  if (pbm.has_correlation("Portance_interfaciale")) correlation_ = pbm.get_correlation("Portance_interfaciale"); //correlation fournie par le bloc correlation
-  else correlation_.typer_lire(pbm, "Portance_interfaciale", is); //sinon -> on la lit
+  Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
+
+  if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
+  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
+  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
+
+  if (pbm->has_correlation("Portance_interfaciale")) correlation_ = pbm->get_correlation("Portance_interfaciale"); //correlation fournie par le bloc correlation
+  else correlation_.typer_lire((*pbm), "Portance_interfaciale", is); //sinon -> on la lit
+
+  pbm->creer_champ("vorticite"); // Besoin de vorticite
+
   return is;
 }
 
@@ -57,9 +66,9 @@ void Portance_interfaciale_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab
   const Champ_Face_CoviMAC& ch = ref_cast(Champ_Face_CoviMAC, equation().inconnue().valeur());
   const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl(), &e_f = zone.elem_faces();
-  const DoubleTab& n_f = zone.face_normales();
+  const DoubleTab& n_f = zone.face_normales(), &vf_dir = zone.volumes_entrelaces_dir();
   const DoubleVect& pe = zone.porosite_elem(), &pf = zone.porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces(), &dh_e = zone.diametre_hydraulique_elem();
-  const DoubleTab& pvit = ch.passe(), &mu_f = ref_cast(Op_Grad_CoviMAC_Face, ref_cast(Navier_Stokes_std, equation()).operateur_gradient().valeur()).mu_f(),
+  const DoubleTab& pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
                      &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
@@ -77,86 +86,82 @@ void Portance_interfaciale_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab
 
   /* elements */
   for (e = 0; e < zone.nb_elem_tot(); e++)   for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
-      if ( (e < zone.nb_elem()) || (f<zone.nb_faces()))
-        {
-          /* arguments de coeff */
-          for (n = 0; n < N; n++) a_l(n)   = alpha(e, n);
-          for (n = 0; n < N; n++) p_l(n)   = press(e, n * (Np > 1));
-          for (n = 0; n < N; n++) T_l(n)   =  temp(e, n);
-          for (n = 0; n < N; n++) rho_l(n) =   rho(!cR * e, n);
-          for (n = 0; n < N; n++) mu_l(n)  =    mu(!cM * e, n);
-          for (n = 0; n < N; n++)
-            {
-              for (k = 0; k < N; k++) if(milc.has_interface(n, k))
-                  {
-                    Interface_base& sat = milc.get_interface(n, k);
-                    sigma_l(n,k) = sat.sigma_(temp(e,n), press(e,n * (Np > 1)));
-                  }
-            }
+      {
+        /* arguments de coeff */
+        for (n = 0; n < N; n++) a_l(n)   = alpha(e, n);
+        for (n = 0; n < N; n++) p_l(n)   = press(e, n * (Np > 1));
+        for (n = 0; n < N; n++) T_l(n)   =  temp(e, n);
+        for (n = 0; n < N; n++) rho_l(n) =   rho(!cR * e, n);
+        for (n = 0; n < N; n++) mu_l(n)  =    mu(!cM * e, n);
+        for (n = 0; n < N; n++)
+          {
+            for (k = 0; k < N; k++) if(milc.has_interface(n, k))
+                {
+                  Interface_base& sat = milc.get_interface(n, k);
+                  sigma_l(n,k) = sat.sigma_(temp(e,n), press(e,n * (Np > 1)));
+                }
+          }
 
-          for (k = 0; k < N; k++) for (l = 0; l < N; l++) dv(k, l) = std::max(ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0)), dv_min);
-          correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dh_e(e), dv, e, coeff);
+        for (k = 0; k < N; k++) for (l = 0; l < N; l++) dv(k, l) = std::max(ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0)), dv_min);
+        correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dh_e(e), dv, e, coeff);
 
-          fac_e = pe(e) * ve(e);
-          k=0;
+        fac_e = pe(e) * ve(e);
 
-          if (D==2)
-            {
-              if (e < zone.nb_elem())
-                for (l = 1; l < N; l++)
-                  {
-                    i = zone.nb_faces_tot() + D * e;
-                    secmem(i, k) += fac_e * coeff(k, l) * (pvit(i+1, l) -pvit(i+1, k)) * vort(e, 0) ;
-                    secmem(i, l) -= fac_e * coeff(k, l) * (pvit(i+1, l) -pvit(i+1, k)) * vort(e, 0) ;
-                    secmem(i+1,k)-= fac_e * coeff(k, l) * (pvit(i  , l) -pvit(i  , k)) * vort(e, 0) ;
-                    secmem(i+1,l)+= fac_e * coeff(k, l) * (pvit(i  , l) -pvit(i  , k)) * vort(e, 0) ;
-                  } // 100% explicit
+        if (D==2)
+          {
+            for (k = 0; k < N; k++) if (k!= n_l) // gas phase
+                {
+                  i = zone.nb_faces_tot() + D * e;
+                  secmem(i, n_l) += fac_e * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
+                  secmem(i,  k ) -= fac_e * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
+                  secmem(i+1,n_l)-= fac_e * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
+                  secmem(i+1, k )+= fac_e * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
+                } // 100% explicit
 
-              if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
-                  {
-                    c = (e == f_e(f,0)) ? 0 : 1 ;
-                    fac_f = pf(f) * vf(f);
-                    for (l = 1; l < N; l++)
+            if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
+                {
+                  c = (e == f_e(f,0)) ? 0 : 1 ;
+                  fac_f = pf(f) * vf(f);
+                  for (k = 0; k < N; k++) if (k!= n_l) // gas phase
                       {
-                        secmem(f, k) += fac_f * mu_f(f, k, c) * n_f(f, 0)/fs(f) * coeff(k, l) * (pvit(i+1, l) -pvit(i+1, k)) * vort(e, 0) ;
-                        secmem(f, l) -= fac_f * mu_f(f, l, c) * n_f(f, 0)/fs(f) * coeff(k, l) * (pvit(i+1, l) -pvit(i+1, k)) * vort(e, 0) ;
-                        secmem(f, k) -= fac_f * mu_f(f, k, c) * n_f(f, 1)/fs(f) * coeff(k, l) * (pvit(i  , l) -pvit(i  , k)) * vort(e, 0) ;
-                        secmem(f, l) += fac_f * mu_f(f, l, c) * n_f(f, 1)/fs(f) * coeff(k, l) * (pvit(i  , l) -pvit(i  , k)) * vort(e, 0) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
+                        secmem(f, n_l) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
+                        secmem(f,  k ) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
                       } // 100% explicit
 
-                  }
-            }
+                }
+          }
 
-          if (D==3)
-            {
-              if (e < zone.nb_elem())
-                for (l = 1; l < N; l++)
-                  {
-                    i = zone.nb_faces_tot() + D * e;
-                    secmem(i, k) += fac_e * coeff(k, l) * ((pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 2, k) - (pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 1, k)) ;
-                    secmem(i, l) -= fac_e * coeff(k, l) * ((pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 2, k) - (pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 1, k)) ;
-                    secmem(i+1,k)+= fac_e * coeff(k, l) * ((pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 0, k) - (pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 2, k)) ;
-                    secmem(i+1,l)-= fac_e * coeff(k, l) * ((pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 0, k) - (pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 2, k)) ;
-                    secmem(i+2,k)+= fac_e * coeff(k, l) * ((pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 1, k) - (pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 0, k)) ;
-                    secmem(i+2,l)-= fac_e * coeff(k, l) * ((pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 1, k) - (pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 0, k)) ;
-                  } // 100% explicit
+        if (D==3)
+          {
+            for (k = 0; k < N; k++) if (k!= n_l) // gas phase
+                {
+                  i = zone.nb_faces_tot() + D * e;
+                  secmem(i, n_l) += fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
+                  secmem(i,  k ) -= fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
+                  secmem(i+1,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
+                  secmem(i+1, k )-= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
+                  secmem(i+2,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                  secmem(i+2, k )-= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                } // 100% explicit
 
-              if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
-                  {
-                    c = (e == f_e(f,0)) ? 0 : 1 ;
-                    fac_f = pf(f) * vf(f);
-                    for (l = 1; l < N; l++)
+            if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
+                {
+                  c = (e == f_e(f,0)) ? 0 : 1 ;
+                  fac_f = pf(f) * vf(f);
+                  for (k = 0; k < N; k++) if (k!= n_l) // gas phase
                       {
-                        secmem(f, k) += fac_f * mu_f(f, k, c) * n_f(f, 0)/fs(f) * coeff(k, l) * ((pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 2, k) - (pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 1, k)) ;
-                        secmem(f, l) -= fac_f * mu_f(f, l, c) * n_f(f, 0)/fs(f) * coeff(k, l) * ((pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 2, k) - (pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 1, k)) ;
-                        secmem(f, k) += fac_f * mu_f(f, k, c) * n_f(f, 0)/fs(f) * coeff(k, l) * ((pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 0, k) - (pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 2, k)) ;
-                        secmem(f, l) -= fac_f * mu_f(f, l, c) * n_f(f, 0)/fs(f) * coeff(k, l) * ((pvit(i+2, l) -pvit(i+2, k)) * vort(D*e+ 0, k) - (pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 2, k)) ;
-                        secmem(f, k) += fac_f * mu_f(f, k, c) * n_f(f, 0)/fs(f) * coeff(k, l) * ((pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 1, k) - (pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 0, k)) ;
-                        secmem(f, l) -= fac_f * mu_f(f, l, c) * n_f(f, 0)/fs(f) * coeff(k, l) * ((pvit(i+0, l) -pvit(i+0, k)) * vort(D*e+ 1, k) - (pvit(i+1, l) -pvit(i+1, k)) * vort(D*e+ 0, k)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
                       } // 100% explicit
 
-                  }
-            }
+                }
+          }
 
-        }
+      }
 }

@@ -36,6 +36,15 @@ Entree& Portance_interfaciale_Tomiyama::readOn(Entree& is)
   Param param(que_suis_je());
   param.ajouter("constante_gravitation", &g_);
   param.lire_avec_accolades_depuis(is);
+
+  const Pb_Multiphase *pbm = sub_type(Pb_Multiphase, pb_.valeur()) ? &ref_cast(Pb_Multiphase, pb_.valeur()) : NULL;
+
+  if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
+  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
+
+  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
+
   return is;
 }
 
@@ -44,20 +53,20 @@ void Portance_interfaciale_Tomiyama::coefficient(const DoubleTab& alpha, const D
                                                  const DoubleTab& ndv, int e, DoubleTab& coeff) const
 {
   const DoubleTab& diametres = ref_cast(Pb_Multiphase, pb_.valeur()).get_champ("diametre_bulles").valeurs();
-  int k, l, N = ndv.dimension(0);
+  int k, N = ndv.dimension(0);
 
   coeff = 0;
-  k = 0; // Phase porteuse
-  for (l = 1; l < N; l++)
-    {
-      double Re = rho(k) * ndv(k,l) * diametres(e, l)/mu(k);
-      double Eo = g_ * std::abs(rho(k)-rho(l)) * diametres(e, l)*diametres(e, l)/sigma(k,l);
-      double f_Eo = .00105*Eo*Eo*Eo - .0159*Eo*Eo - .0204*Eo + .474;
-      double Cl;
-      if (Eo<4) Cl = std::min( .288*std::tanh( .121*Re ), f_Eo) ;
-      else      Cl = f_Eo ;
 
-      coeff(l, k) = Cl * rho(k) * alpha(l) ;
-      coeff(k, l) =  coeff(k, 0);
-    }
+  for (k = 0; k < N; k++) if (k!=n_l) // k gas phase
+      {
+        double Re = rho(n_l) * ndv(n_l,k) * diametres(e, k)/mu(n_l);
+        double Eo = g_ * std::abs(rho(n_l)-rho(k)) * diametres(e, k)*diametres(e, k)/sigma(n_l,k);
+        double f_Eo = .00105*Eo*Eo*Eo - .0159*Eo*Eo - .0204*Eo + .474;
+        double Cl;
+        if (Eo<4) Cl = std::min( .288*std::tanh( .121*Re ), f_Eo) ;
+        else      Cl = f_Eo ;
+
+        coeff(k, n_l) = Cl * rho(n_l) * alpha(k) ;
+        coeff(n_l, k) =  coeff(k, n_l);
+      }
 }

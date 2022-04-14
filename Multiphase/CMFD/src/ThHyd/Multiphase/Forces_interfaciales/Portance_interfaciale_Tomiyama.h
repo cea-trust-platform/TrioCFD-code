@@ -29,7 +29,7 @@
 // .DESCRIPTION
 //    classe Portance_interfaciale_Tomiyama
 //      coefficients de portance interfaciale d'un ecoulement a bulles deformables
-//      Le coefficient renvoyé par cette classe est toujours >0, c'est Portanc_interfaciale_CoviMAC qui gere les signes
+//      Le coefficient renvoye par cette classe est toujours >0, c'est Portanc_interfaciale_CoviMAC qui gere les signes
 //////////////////////////////////////////////////////////////////////////////
 
 class Portance_interfaciale_Tomiyama : public Portance_interfaciale_base
@@ -41,6 +41,8 @@ public:
                    const DoubleTab& ndv, int e, DoubleTab& coeff) const override;
 protected:
   double g_=9.81;
+  int n_l = -1; //phase liquide
+
 };
 
 #endif

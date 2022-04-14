@@ -31,9 +31,9 @@
 // .DESCRIPTION
 //    Classe Portance_interfaciale_CoviMAC
 //    Cette classe implemente dans CoviMAC un operateur de portance interfaciale
-//    de la forme F_{0l} = - F_{l0} = C_{0l} (u_l - u_0) x rot(u_0) ou la phase
-//    0 est la phase liquide porteuse
-//    le calcul de C_{kl} est realise par la hierarchie Portance_interfaciale_base
+//    de la forme F_{n_l} = - F_{k} = C_{n_l, k} (u_k - u_n_l) x rot(u_n_l) ou la phase
+//    n_l est la phase liquide porteuse et k une phase gazeuse
+//    le calcul de C_{n_l, k} est realise par la hierarchie Portance_interfaciale_base
 // .SECTION voir aussi
 //    Operateur_CoviMAC_base Operateur_base
 //////////////////////////////////////////////////////////////////////////////
@@ -54,6 +54,8 @@ public :
   void mettre_a_jour(double temps) override { };
 private:
   Correlation correlation_; //correlation donnant le coeff de frottement interfacial
+  int n_l = -1; //phase liquide
+
 };
 
 #endif
