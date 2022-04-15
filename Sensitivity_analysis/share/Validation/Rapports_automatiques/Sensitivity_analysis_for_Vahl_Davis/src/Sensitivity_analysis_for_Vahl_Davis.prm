@@ -6,7 +6,11 @@ Parameters {
 	Description "The aim of this test case is to investigate how the model response in a point is affected by a change in the boundary conditions on the temperature, the heat capacity, the thermal conductivity, and the thermal diffusivity."	
 	Description "A detailed analysis of the Sensitivity equation method  is presented in [1]." 
 
-       TestCase Td VAHL_DAVIS.data /*jdd en annexe*/ 
+       TestCase Tg VAHL_DAVIS.data /*jdd en annexe*/
+       TestCase Td VAHL_DAVIS.data
+       TestCase Cp VAHL_DAVIS.data
+       TestCase Beta VAHL_DAVIS.data
+       TestCase Lambda VAHL_DAVIS.data
 	ParametersTRUST Problem: Pb_Thermohydraulique_sensibility
 	ParametersTRUST Dimension: 2D
 	ParametersTRUST Discretization: VEFPre1B
