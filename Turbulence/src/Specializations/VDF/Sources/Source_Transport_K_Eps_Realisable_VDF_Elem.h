@@ -33,7 +33,7 @@ public :
   void mettre_a_jour(double temps) override;
   void associer_pb(const Probleme_base& ) override;
 
-  inline DoubleTab& ajouter(DoubleTab& resu) const  override { return Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(resu); }
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected :
   REF(Transport_K_Eps_Realisable) eqn_keps_Rea;

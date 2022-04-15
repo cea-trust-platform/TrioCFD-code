@@ -48,7 +48,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::associer_pb(const
 }
 
 // TODO : FIXME : a factoriser avec Source_Transport_K_Eps_Bas_Reynolds_anisotherme_W_VDF_Elem::ajouter
-DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
   const Zone_Cl_dis& zcl=eq_hydraulique->zone_Cl_dis();
   const Zone_Cl_dis& zcl_keps=eqn_keps_bas_re->zone_Cl_dis();
@@ -96,8 +96,6 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter(Dou
           resu(elem,1) += C1*F1(elem)*G(elem)*volumes(elem)*porosite_vol(elem)*K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0);
         }
     }
-
-  return resu;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +105,7 @@ Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_an
 Sortie& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
 Entree& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::readOn(Entree& s) { return s ; }
 
-DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
   const Zone_dis& z = eq_hydraulique->zone_dis();
   const Zone_VDF& zone_VDF = ref_cast(Zone_VDF,z.valeur());
@@ -139,6 +137,4 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem::ajouter(
       if (K_eps_Bas_Re(elem,0) >= 1.e-20)
         resu(elem,1) += (C1*F1(elem)*P(elem)- C2*F2(elem)*K_eps_Bas_Re(elem,1)) * volumes(elem)*porosite_vol(elem) *(K_eps_Bas_Re(elem,1)/K_eps_Bas_Re(elem,0));
     }
-
-  return resu;
 }

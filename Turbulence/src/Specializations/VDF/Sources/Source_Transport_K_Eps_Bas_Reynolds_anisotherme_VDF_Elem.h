@@ -37,7 +37,7 @@ public:
     C2 = cte2;
   }
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
   void associer_pb(const Probleme_base& ) override;
 };
 
@@ -54,7 +54,7 @@ public:
     C2 = cte2;
   }
 
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 };
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem_included */

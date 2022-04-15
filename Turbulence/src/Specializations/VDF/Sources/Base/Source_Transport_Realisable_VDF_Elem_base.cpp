@@ -80,8 +80,12 @@ DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTa
   return resu;
 }
 
-void Source_Transport_Realisable_VDF_Elem_base::contribuer_a_avec(const DoubleTab& a,  Matrice_Morse& matrice) const
+void Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
+  Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
+  if(!mat) return;
+
   const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
   const DoubleTab& tab_visco = ch_visco_cin->valeurs();
@@ -89,5 +93,5 @@ void Source_Transport_Realisable_VDF_Elem_base::contribuer_a_avec(const DoubleTa
   const int is_visco_const = sub_type(Champ_Uniforme,ch_visco_cin.valeur());
   double visco = -1.;
   if (is_visco_const) visco = std::max(tab_visco(0,0),DMINFLOAT);
-  fill_coeff_matrice(is_visco_const,tab_visco,volumes,porosite,visco,matrice); // voir les classes filles
+  fill_coeff_matrice(is_visco_const,tab_visco,volumes,porosite,visco,*mat); // voir les classes filles
 }

@@ -43,7 +43,7 @@ void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::associer_p
 }
 
 // TODO : FIXME : a factoriser avec Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem::ajouter
-DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& resu, const tabs_t& semi_impl) const
 {
   const Zone_Cl_dis& zcl=eq_hydraulique->zone_Cl_dis();
   const Zone_Cl_dis& zcl_keps=eqn_keps_bas_re->zone_Cl_dis();
@@ -99,5 +99,4 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_aniso_therm_concen_VDF_Elem::ajou
           resu(elem,1) += C1*F1(elem)*(G_t(elem)+G_c(elem))*volumes(elem)*porosite_vol(elem)*K_eps_Bas_Re(elem,0)/K_eps_Bas_Re(elem,1)+E(elem)*volumes(elem)*porosite_vol(elem);
         }
     }
-  return resu;
 }

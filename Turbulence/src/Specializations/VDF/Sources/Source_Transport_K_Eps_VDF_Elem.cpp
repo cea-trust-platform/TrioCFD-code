@@ -93,8 +93,15 @@ void Source_Transport_K_Eps_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& 
     }
 }
 
-void Source_Transport_K_Eps_VDF_Elem::contribuer_a_avec(const DoubleTab& a,  Matrice_Morse& matrice) const
+
+void Source_Transport_K_Eps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
+  Source_Transport_VDF_Elem_base::ajouter_keps(secmem);
+
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
+  Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
+  if(!mat) return;
+
   const DoubleTab& val=equation().inconnue().valeurs();
   const DoubleVect& porosite = la_zone_VDF->porosite_elem(), &volumes = la_zone_VDF->volumes();
   const int size=val.dimension(0);
@@ -117,10 +124,12 @@ void Source_Transport_K_Eps_VDF_Elem::contribuer_a_avec(const DoubleTab& a,  Mat
       if (val(c,0)>DMINFLOAT)
         {
           double coef_k=porosite(c)*volumes(c)*val(c,1)/val(c,0);
-          matrice(c*2,c*2)+=coef_k;
+          (*mat)(c*2,c*2)+=coef_k;
           double coef_eps=C2*coef_k;
           if (is_modele_fonc) coef_eps*=F2(c);
-          matrice(c*2+1,c*2+1)+=coef_eps;
+          (*mat)(c*2+1,c*2+1)+=coef_eps;
         }
     }
+
+
 }

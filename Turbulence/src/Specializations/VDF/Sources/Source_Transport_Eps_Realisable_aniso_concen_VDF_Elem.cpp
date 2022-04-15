@@ -49,8 +49,8 @@ void Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem::fill_resu_concen(con
     }
 }
 
-DoubleTab& Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem::ajouter(DoubleTab& resu) const
+void Source_Transport_Eps_Realisable_aniso_concen_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  Source_Transport_Eps_Realisable_VDF_Elem::ajouter(resu);
-  return Source_Transport_Eps_Realisable_VDF_Elem::ajouter_concen(resu);
+  Source_Transport_Eps_Realisable_VDF_Elem::ajouter_blocs(matrices, secmem, semi_impl);
+  Source_Transport_Eps_Realisable_VDF_Elem::ajouter_concen(secmem);
 }

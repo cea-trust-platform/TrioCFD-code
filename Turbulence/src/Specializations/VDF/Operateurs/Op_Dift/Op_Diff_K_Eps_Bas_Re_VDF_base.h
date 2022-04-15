@@ -28,6 +28,9 @@
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
 #include <Op_VDF_Elem.h>
 #include <ItVDFEl.h>
+#include <Statistiques.h>
+
+extern Stat_Counter_Id diffusion_counter_;
 
 class Zone_Cl_dis;
 class Zone_dis;
@@ -42,12 +45,32 @@ public:
   void completer() override;
 
   inline void mettre_a_jour_diffusivite() const  { /* do nothing */ }
-  inline void contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const  override { iter->ajouter_contribution(inco, matrice); }
   inline void contribuer_au_second_membre(DoubleTab& resu) const  override { iter->contribuer_au_second_membre(resu); }
-  inline void dimensionner(Matrice_Morse& matrice) const override { Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), matrice); }
   inline void modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const  override { Op_VDF_Elem::modifier_pour_Cl(iter->zone(), iter->zone_Cl(), matrice, secmem); }
-  inline DoubleTab& ajouter(const DoubleTab& inco, DoubleTab& resu) const override { return iter->ajouter(inco, resu); }
   inline DoubleTab& calculer(const DoubleTab& inco, DoubleTab& resu) const override { return iter->calculer(inco, resu); }
+
+  inline void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const override
+  {
+    const std::string& nom_inco = equation().inconnue().le_nom().getString();
+    Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL, mat2;
+    if (!mat)
+      return;
+    Op_VDF_Elem::dimensionner(iter->zone(), iter->zone_Cl(), mat2);
+    mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
+  }
+
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override
+  {
+    statistiques().begin_count(diffusion_counter_);
+    const std::string& nom_inco = equation().inconnue().le_nom().getString();
+    Matrice_Morse* mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
+    const DoubleTab& inco = semi_impl.count(nom_inco) ? semi_impl.at(nom_inco) : equation().inconnue().valeur().valeurs();
+    if(mat) iter.ajouter_contribution(inco, *mat);
+    iter.ajouter(inco,secmem);
+    statistiques().end_count(diffusion_counter_);
+  }
+  inline int has_interface_blocs() const override { return 1; }
+
 
   inline Iterateur_VDF& get_iter() { return iter; }
 

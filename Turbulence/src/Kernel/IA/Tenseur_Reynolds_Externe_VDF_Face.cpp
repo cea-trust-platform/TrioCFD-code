@@ -170,7 +170,7 @@ void Tenseur_Reynolds_Externe_VDF_Face::associer_zones(const Zone_dis& zone_dis,
 }
 
 
-DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
+void Tenseur_Reynolds_Externe_VDF_Face::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const Zone_Cl_VDF& zone_Cl_VDF = la_zone_Cl_VDF.valeur();
@@ -208,7 +208,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
                   vol = volumes_entrelaces(num_face);
                   //  for (ncomp=0; ncomp<dimension ; ncomp++)
                   ncomp = orientation(num_face);
-                  resu(num_face)+= s(ncomp)*vol;
+                  secmem(num_face)+= s(ncomp)*vol;
                 }
             }
           else if (sub_type(Neumann_sortie_libre,la_cl.valeur()))
@@ -222,7 +222,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
                 {
                   vol = volumes_entrelaces(num_face)*porosite_surf(num_face);
                   ncomp = orientation(num_face);
-                  resu(num_face)+= s(ncomp)*vol;
+                  secmem(num_face)+= s(ncomp)*vol;
                 }
 
             }
@@ -246,7 +246,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
         {
           vol = volumes_entrelaces(num_face)*porosite_surf(num_face);
           ncomp = orientation(num_face);
-          resu(num_face) += s(ncomp)*vol;
+          secmem(num_face) += s(ncomp)*vol;
 
         }
     }
@@ -280,11 +280,11 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
                   elem1 = face_voisins(num_face,0);
 
                   if (elem1 != -1)
-                    resu(num_face)+= s(elem1,ncomp)*vol;
+                    secmem(num_face)+= s(elem1,ncomp)*vol;
                   else
                     {
                       elem2 = face_voisins(num_face,1);
-                      resu(num_face)+= s(elem2,ncomp)*vol;
+                      secmem(num_face)+= s(elem2,ncomp)*vol;
                     }
                 }
 
@@ -307,7 +307,7 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
                   vol = volumes_entrelaces(num_face)*porosite_surf(num_face);
                   ncomp = orientation(num_face);
                   s_face = 0.5*( s(face_voisins(num_face,0),ncomp) + s(face_voisins(num_face,1),ncomp) );
-                  resu(num_face) += s_face*vol;
+                  secmem(num_face) += s_face*vol;
                 }
 
             }
@@ -324,11 +324,10 @@ DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::ajouter(DoubleTab& resu) const
           vol = volumes_entrelaces(num_face)*porosite_surf(num_face);
           ncomp = orientation(num_face);
           s_face = 0.5*( s(face_voisins(num_face,0),ncomp) + s(face_voisins(num_face,1),ncomp) );
-          resu(num_face) += s_face*vol;
+          secmem(num_face) += s_face*vol;
 
         }
     }
-  return resu;
 }
 
 DoubleTab& Tenseur_Reynolds_Externe_VDF_Face::calculer(DoubleTab& resu) const

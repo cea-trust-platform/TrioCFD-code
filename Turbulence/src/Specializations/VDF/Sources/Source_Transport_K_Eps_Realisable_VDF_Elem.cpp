@@ -95,3 +95,11 @@ void Source_Transport_K_Eps_Realisable_VDF_Elem::fill_coeff_matrice(const int is
         }
     }
 }
+
+void Source_Transport_K_Eps_Realisable_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+{
+  Source_Transport_Realisable_VDF_Elem_base::ajouter_blocs(matrices, secmem, semi_impl);
+  Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(secmem);
+
+}
+

@@ -32,7 +32,7 @@ class Source_Transport_K_Realisable_anisotherme_VDF_Elem : public Source_Transpo
   Declare_instanciable(Source_Transport_K_Realisable_anisotherme_VDF_Elem);
 public:
   void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 private:
   void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;

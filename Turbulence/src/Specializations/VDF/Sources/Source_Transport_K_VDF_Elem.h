@@ -32,8 +32,8 @@ class Source_Transport_K_VDF_Elem : public Source_Transport_VDF_Elem_base
 {
   Declare_instanciable(Source_Transport_K_VDF_Elem);
 public:
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const  override;
-  inline DoubleTab& ajouter(DoubleTab& resu) const  override { return Source_Transport_VDF_Elem_base::ajouter_keps(resu); }
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
+
 
 protected:
   REF(Transport_K_ou_Eps) mon_eq_transport_K, mon_eq_transport_Eps;

@@ -22,6 +22,8 @@
 #include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
 #include <Source_Transport_Eps_VDF_Elem.h>
 #include <TRUSTTrav.h>
+#include <Array_tools.h>
+#include <Matrix_tools.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_Eps_VDF_Elem,"Source_Transport_Eps_VDF_P0_VDF",Source_Transport_VDF_Elem_base);
 
@@ -89,8 +91,30 @@ void Source_Transport_Eps_VDF_Elem::fill_resu(const DoubleVect& P, DoubleTab& re
       resu(elem) += (C1*P(elem)- C2*Eps(elem))*volumes(elem)*porosite_vol(elem)*Eps(elem)/K(elem);
 }
 
-void Source_Transport_Eps_VDF_Elem::contribuer_a_avec(const DoubleTab& a,  Matrice_Morse& matrice) const
+void Source_Transport_Eps_VDF_Elem::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
+  Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL, mat2;
+  if(!mat) return;
+
+  IntTab stencil(0, 2);
+  stencil.set_smart_resize(1);
+  const int size = mon_eq_transport_K->inconnue().valeurs().dimension(0);
+  for (int e = 0; e < size; e++)
+    stencil.append_line(e, e);
+  tableau_trier_retirer_doublons(stencil);
+  Matrix_tools::allocate_morse_matrix(size, size, stencil, mat2);
+  mat->nb_colonnes() ? *mat += mat2 : *mat = mat2;
+}
+
+void Source_Transport_Eps_VDF_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+{
+  Source_Transport_VDF_Elem_base::ajouter_keps(secmem);
+
+  const std::string& nom_inco = equation().inconnue().le_nom().getString();
+  Matrice_Morse *mat = matrices.count(nom_inco) ? matrices.at(nom_inco) : NULL;
+  if(!mat) return;
+
   const DoubleTab& K = mon_eq_transport_K->inconnue().valeurs(), &Eps = mon_eq_transport_Eps->inconnue().valeurs();
   const DoubleVect& porosite = la_zone_VDF->porosite_elem(), &volumes = la_zone_VDF->volumes();
   const int size = K.dimension(0);
@@ -114,7 +138,7 @@ void Source_Transport_Eps_VDF_Elem::contribuer_a_avec(const DoubleTab& a,  Matri
         {
           double coef_eps=C2*porosite(c)*volumes(c)*Eps(c)/K(c);
           if (is_modele_fonc) coef_eps*=F2(c);
-          matrice(c,c)+=coef_eps;
+          (*mat)(c,c)+=coef_eps;
         }
     }
 }
