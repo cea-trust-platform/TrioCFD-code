@@ -223,9 +223,8 @@ Read pb_sensibilite
 
 		}
 		# Fields #
-		fichier sensibilite
-                format lata # lata for VisIt tool #
-		fields dt_post 5  # Note: Warning to memory space if dt_post too small #
+               format lata # lata for VisIt tool #
+		fields dt_post 5.  # Note: Warning to memory space if dt_post too small #
 		{
 
 			pression som

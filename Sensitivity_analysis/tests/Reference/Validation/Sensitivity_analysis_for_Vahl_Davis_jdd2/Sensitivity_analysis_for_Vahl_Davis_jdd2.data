@@ -4,7 +4,7 @@ dimension 2
 
 Domaine dom
 # BEGIN MESH #
- Read_MED family_names_from_group_names dom FinerMeshSquare_T ../FinerMeshSquare_T.med
+ Read_MED family_names_from_group_names dom FinerMeshSquare_T FinerMeshSquare_T.med
 # END MESH #
 
 
@@ -32,8 +32,8 @@ Scheme_euler_explicit sch
 Read sch
 {
 	tinit 0.
+	nb_pas_dt_max 3
 	tmax 5.
-	# nb_pas_dt_max 100 # 
 	dt_min 1e-8
 	# dt_max 1e-1 #
 	dt_impr 1e-8
@@ -143,10 +143,9 @@ Read pb_etat
                         temperature_etat_y_g  temperature periode 0.001 segment 50  0.0025 0.  0.0025 0.01
                         pression_etat_y_g  pression periode 0.001 segment 50  0.0025 0.  0.0025 0.01
                         
-                        
 		}
                 fichier etat
-                format lata # lata for VisIt tool #
+                format lml # lata for VisIt tool #
 		fields dt_post 5.
 		{
 			pression som
@@ -166,7 +165,7 @@ Read pb_sensibilite
 		# solveur_pression PETSc Cholesky { } #
                 convection { Sensibility { amont } }
                 diffusion { }
-		sources { boussinesq_temperature { T0 0. } }
+		sources { boussinesq_temperature { T0 0 } }
                 initial_conditions {
                         vitesse Champ_Uniforme 2 0. 0.
                         }
@@ -179,7 +178,7 @@ Read pb_sensibilite
         }
 	Convection_Diffusion_Temperature_sensibility
 	{
-                uncertain_variable { Cp }
+                uncertain_variable { temperature }
                 velocity_state { pb_champ_evaluateur pb_etat  vitesse } 
 		temperature_state { pb_champ_evaluateur pb_etat  temperature } 
 		diffusion { }
@@ -189,7 +188,7 @@ Read pb_sensibilite
 			Haut paroi_adiabatique
 			Bas paroi_adiabatique
  			Gauche Paroi_temperature_imposee Champ_Front_fonc_xyz 1 0
-			Droit Paroi_temperature_imposee Champ_Front_Uniforme 1 0
+			Droit Paroi_temperature_imposee Champ_Front_Uniforme 1 1
 		}
 		initial_conditions { Temperature Champ_Uniforme 1 0 }
 	}
@@ -223,8 +222,7 @@ Read pb_sensibilite
 
 		}
 		# Fields #
-
-                format lata # lata for VisIt tool #
+                format lml # lata for VisIt tool #
 		fields dt_post 5.  # Note: Warning to memory space if dt_post too small #
 		{
 

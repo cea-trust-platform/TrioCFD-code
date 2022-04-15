@@ -46,15 +46,15 @@ Chapter {
 	}
 	visu {
 		title "Sensitivity of the temperature with \latex_($a = T_1$\latex_)"
-		pseudocolor ./Tg/sensibilite.lata dom TEMPERATURE SOM
+		pseudocolor ./Tg/VAHL_DAVIS.lata dom TEMPERATURE SOM
 	}
 	visu {
 		title "Sensitivity of the horizontal velocity with \latex_($a = T_1$\latex_)"
-		pseudocolor ./Tg/sensibilite.lata dom VITESSE_X SOM
+		pseudocolor ./Tg/VAHL_DAVIS.lata dom VITESSE_X SOM
 	}
 	visu {
 		title "Sensitivity of the vertical velocity with \latex_($a = T_1$\latex_)"
-		pseudocolor ./Tg/sensibilite.lata dom VITESSE_Y SOM
+		pseudocolor ./Tg/VAHL_DAVIS.lata dom VITESSE_Y SOM
 	}
 }
 

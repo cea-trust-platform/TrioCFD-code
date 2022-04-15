@@ -4,7 +4,7 @@ dimension 2
 
 Domaine dom
 # BEGIN MESH #
- Read_MED family_names_from_group_names dom FinerMeshSquare_T ../FinerMeshSquare_T.med
+ Read_MED family_names_from_group_names dom FinerMeshSquare_T FinerMeshSquare_T.med
 # END MESH #
 
 
@@ -32,8 +32,8 @@ Scheme_euler_explicit sch
 Read sch
 {
 	tinit 0.
+	nb_pas_dt_max 3
 	tmax 5.
-	# nb_pas_dt_max 100 # 
 	dt_min 1e-8
 	# dt_max 1e-1 #
 	dt_impr 1e-8
@@ -146,7 +146,7 @@ Read pb_etat
                         
 		}
                 fichier etat
-                format lata # lata for VisIt tool #
+                format lml # lata for VisIt tool #
 		fields dt_post 5.
 		{
 			pression som
@@ -224,7 +224,7 @@ Read pb_sensibilite
 		}
 		# Fields #
 
-                format lata # lata for VisIt tool #
+                format lml # lata for VisIt tool #
 		fields dt_post 5.  # Note: Warning to memory space if dt_post too small #
 		{
 
