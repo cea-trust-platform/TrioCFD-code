@@ -1061,7 +1061,7 @@ void Transport_Marqueur_FT::imposer_cond_lim()
   //  int nb_positions;
   int face_bord;
   //nb_positions=0;
-  double x,y,z;
+  double x = 0.,y= 0.,z= 0.;
 
   for (int som = 0; som < nb_pos_tot; som++)
     {
