@@ -50,13 +50,13 @@ DoubleTab& Source_Masse_Ajoutee::ajouter(DoubleTab& resu) const
   const DoubleTab& vitesse_p = vitesse_particules();
   const DoubleTab& delta_vit = delta_v();
   const DoubleTab& volume_p = volumes_particules();
-  const int& dim0 = vitesse_p.dimension(0);
-  const int& dim1 = Objet_U::dimension;
+  const int dim0 = vitesse_p.dimension(0);
+  const int dim1 = Objet_U::dimension;
   const Transport_Marqueur_FT& eq = ref_cast(Transport_Marqueur_FT,equation());
   //const double& dt =eq.probleme().schema_temps().pas_de_temps();
-  const double& dt = eq.dela_t();
+  const double dt = eq.dela_t();
   double derivee;
-  const int& impl = eq.resol_implicite();
+  const int impl = eq.resol_implicite();
 
   if (!impl)
     {

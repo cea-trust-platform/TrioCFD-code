@@ -4653,7 +4653,7 @@ void Maillage_FT_Disc::nettoyer_noeuds_virtuels_et_frontieres()
   if (Comm_Group::check_enabled()) check_mesh(1,1,1);
 }
 
-void Maillage_FT_Disc::nettoyer_phase(const Nom& nom_eq, const int& phase)
+void Maillage_FT_Disc::nettoyer_phase(const Nom& nom_eq, const int phase)
 {
   assert(statut_ >= MINIMAL);
 

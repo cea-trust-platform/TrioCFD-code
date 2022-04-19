@@ -60,7 +60,7 @@ protected :
   // Methodes
   void critere_areva();
   void critere_cea_jaea();
-  void imprimer(const double& , const Nom& , const ArrOfDouble& , const double& );
+  void imprimer(const double , const Nom& , const ArrOfDouble& , const double );
   int lpost(double temps_courant, double dt_post) const;
 };
 

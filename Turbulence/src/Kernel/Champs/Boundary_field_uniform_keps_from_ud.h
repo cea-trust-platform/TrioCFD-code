@@ -47,7 +47,7 @@ struct pair
   double eps;
 };
 
-inline pair k_eps_from_udi(const double& u, const double& d, const double& I, const int& dimension)
+inline pair k_eps_from_udi(const double u, const double d, const double I, const int dimension)
 {
   //Now compute associated K and Eps by appling formula given by :
   //http://en.wikipedia.org/wiki/Turbulence_kinetic_energy

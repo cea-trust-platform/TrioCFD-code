@@ -410,7 +410,7 @@ int  Remailleur_Collision_FT_Thomas::mettre_a_jour_data(const Maillage_FT_Disc& 
 //                    3 => transport du volume perdu pour une maille a distance de l'interface >1
 //                    4 => transport du volume perdu pour une maille a distance de l'interface =1
 //                   -1 => situation problematique (une erreur s'est produite)
-int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const int& elem,const Maillage_FT_Disc& maillage)
+int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const int elem,const Maillage_FT_Disc& maillage)
 {
   const Zone_VF& zone_VF = ref_cast(Zone_VF,zone_dis(maillage).valeur());
   const Zone& zone = zone_VF.zone();
@@ -610,7 +610,7 @@ double  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_element(const
 //(astuce de gestion memoire avec l'objet ArrOfInt)
 //REMARQUE : pour le parallele, "liste_voisins" contient egalement des elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::voisinage_sommets()
-int Remailleur_Collision_FT_Thomas::elements_voisins(const int& elem,
+int Remailleur_Collision_FT_Thomas::elements_voisins(const int elem,
                                                      ArrOfInt& liste_voisins,
                                                      const Zone_dis_base& une_zone_dis) const
 {
@@ -665,7 +665,7 @@ int Remailleur_Collision_FT_Thomas::elements_voisins(const int& elem,
 //REMARQUE : l'attribut "distance_interface_element_eulerien_" doit etre initialise
 //REMARQUE : pour le parallele, "liste_voisins" contient egalement des elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::voisinage_sommets() et Remailleur_Collision_FT_Thomas::elements_voisins()
-int  Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite2(const int& elem,
+int  Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite2(const int elem,
                                                                               ArrOfInt& liste_voisins) const
 {
   const int distance_interface_elem = distance_interface_element_eulerien_[elem];
@@ -700,7 +700,7 @@ int  Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite2(co
 //Voisinage d'un element "elem" := union des voisinages des sommets "si" de "elem"
 //REMARQUE : pour le parallele, cette fonction comptabilise egalement les elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::elements_voisins()
-int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int& elem, const Zone_dis_base& une_zone_dis) const
+int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int elem, const Zone_dis_base& une_zone_dis) const
 {
   ArrOfInt liste_voisins;
   elements_voisins(elem,liste_voisins,une_zone_dis);
@@ -714,7 +714,7 @@ int  Remailleur_Collision_FT_Thomas::nb_elements_voisins(const int& elem, const 
 //Voisinage d'un element "elem" := union des voisinages des sommets "si" de "elem"
 //REMARQUE : pour le parallele, cette fonction comptabilise egalement les elements voisins virtuels
 //VOIR : Remailleur_Collision_FT_Thomas::elements_voisins_a_distance_plus_petite()
-int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int& elem, const Zone_dis_base& une_zone_dis) const
+int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int elem, const Zone_dis_base& une_zone_dis) const
 {
   ArrOfInt liste_voisins;
   elements_voisins(elem,liste_voisins,une_zone_dis);
@@ -722,7 +722,7 @@ int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(c
   return liste_voisins.size_array();
 }
 
-int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int& elem) const
+int Remailleur_Collision_FT_Thomas::nb_elements_voisins_a_distance_plus_petite(const int elem) const
 {
   assert(nombre_de_voisins_plus_proches_.dimension_tot(0)>elem);
   return nombre_de_voisins_plus_proches_[elem];
@@ -871,7 +871,7 @@ int Remailleur_Collision_FT_Thomas::traite_RuptureCoalescenceInterfaces_Conserva
 //           euleriennes traversees par l'interface
 //REMARQUE : l'attribut "volume_perdu_" est suppose avoir ete initialise
 //REMARQUE : l'attribut "distance_interface_element_eulerien_" est suppose avoir ete initialise
-int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int& elem, ArrOfDouble& volume_perdu_sommet, const Maillage_FT_Disc& maillage) const
+int  Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(const int elem, ArrOfDouble& volume_perdu_sommet, const Maillage_FT_Disc& maillage) const
 {
   const Intersections_Elem_Facettes& intersections =
     maillage.intersections_elem_facettes();
@@ -980,7 +980,7 @@ double Remailleur_Collision_FT_Thomas::transport_volume_perdu_sur_sommet(ArrOfDo
 //Fonction qui renvoie la surface occupee par l'interface
 //dans un element "elem" REEL donne
 //REMARQUE : renvoie 0 si l'element n'est pas traverse par l'interface
-double  Remailleur_Collision_FT_Thomas::surface_intersection(const int& elem, const Maillage_FT_Disc& maillage) const
+double  Remailleur_Collision_FT_Thomas::surface_intersection(const int elem, const Maillage_FT_Disc& maillage) const
 {
   const Intersections_Elem_Facettes& intersections =
     maillage.intersections_elem_facettes();

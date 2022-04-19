@@ -150,7 +150,7 @@ public:
                      const int is_explicite,
                      const double eta);
   void modifie_source(DoubleTab& so_modif,const DoubleTab& so_val,const DoubleTab& rho_faces,
-                      const int& n,const int& m, const int& is_QC,
+                      const int n,const int m, const int is_QC,
                       const DoubleVect& vol_entrelaces,const Solveur_Masse& solv_masse);
 
   void calcul_effort_fluide_interface(const DoubleTab& vpoint,const DoubleTab& rho_faces,
@@ -160,7 +160,7 @@ public:
 
   //Calcul la vitesse imposee a l interface a partir de expression_vitesse_imposee
   virtual void calcul_vitesse(DoubleTab& vitesse_imp, const DoubleTab& champ_vitesse,
-                              const DoubleTab& vpoint, const double& temps, const double& dt);
+                              const DoubleTab& vpoint, const double temps, const double dt);
   virtual void get_expression_vitesse_imposee(DoubleTab& vitesse_imp);
   //Effectue l integration d un ensemble de points (sans notion de facettes)
   void integrer_ensemble_lagrange(const double temps) override;

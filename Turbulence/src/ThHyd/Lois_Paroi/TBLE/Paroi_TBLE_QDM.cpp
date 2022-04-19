@@ -188,7 +188,7 @@ int Paroi_TBLE_QDM::lire_motcle_non_standard(const Motcle& mot, Entree& is)
 
 int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_base& la_zone_Cl)
 {
-  const int& nb_elem = zone_dis.nb_elem();
+  const int nb_elem = zone_dis.nb_elem();
 
   num_faces_post.resize(nb_post_pts);
   num_global_faces_post.resize(nb_post_pts);

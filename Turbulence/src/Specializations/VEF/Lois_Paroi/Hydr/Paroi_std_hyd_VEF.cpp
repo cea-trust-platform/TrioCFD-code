@@ -1763,7 +1763,7 @@ int Paroi_std_hyd_VEF::calculer_k_eps(double& k, double& eps , double yp, double
   return 1;
 }
 
-double Paroi_std_hyd_VEF::calculer_u_plus(const int& ind_face,const double& u_plus_d_plus,const double& erugu)
+double Paroi_std_hyd_VEF::calculer_u_plus(const int ind_face,const double u_plus_d_plus,const double erugu)
 {
   // PQ : 05/04/07 : formulation continue de la loi de paroi
   // construite d'apres la loi de Reichardt

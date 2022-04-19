@@ -122,7 +122,7 @@ protected :
 };
 
 // Methode de calcul de la valeur sur un champ aux elements d'un champ uniforme ou non a plusieurs composantes
-inline double& valeur(DoubleTab& valeurs, const int& elem, const int& dim)
+inline double& valeur(DoubleTab& valeurs, const int elem, const int dim)
 {
   return valeurs(elem,dim);
 }

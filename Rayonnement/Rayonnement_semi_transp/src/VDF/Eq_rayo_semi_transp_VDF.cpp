@@ -106,7 +106,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
   const DoubleTab& indice = fluide().indice().valeurs();
-  const double& sigma = Modele().valeur_sigma();
+  const double sigma = Modele().valeur_sigma();
 
   secmem = 0;
   int elem;

@@ -91,8 +91,8 @@ public:
   void  mettre_a_jour(double temps) override;
   bool initTimeStep(double dt) override;
   void imposer_cond_lim();
-  static void appliquer_reflexion_vitesse(const double& x, const double& y, const double& z,
-                                          const int& som,int& face_bord,
+  static void appliquer_reflexion_vitesse(const double x, const double y, const double z,
+                                          const int som,int& face_bord,
                                           const Zone_VF& zone_vf,
                                           DoubleTab& vitesse);
 
@@ -105,7 +105,7 @@ public:
   void calcul_vitesse_p(DoubleTab& deplacement) const;
 
   //Resolution du bilan de qdm des particules
-  void resoudre_edo(DoubleTab& vitesse_p, DoubleTab& source_stockage, const double& delta_t);
+  void resoudre_edo(DoubleTab& vitesse_p, DoubleTab& source_stockage, const double delta_t);
 
   //Actualiser d une partie ou tout le tableau delta_v
   void update_delta_v(int n_deb,int n_fin,const Maillage_FT_Disc& ens_points,int calc=1);

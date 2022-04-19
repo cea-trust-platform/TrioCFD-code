@@ -149,7 +149,7 @@ int Paroi_ODVM_scal_VDF::init_lois_paroi()
   const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
   const Zone_Cl_VDF& zone_Cl_VDF_th = ref_cast(Zone_Cl_VDF,eqn_temp.zone_Cl_dis().valeur());
 
-  const double& t0 = eqn_temp.schema_temps().temps_courant();
+  const double t0 = eqn_temp.schema_temps().temps_courant();
   double T0=0.;
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const Milieu_base& le_milieu_fluide = eqn_hydr.milieu();
@@ -406,8 +406,8 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const Zone_Cl_VDF& zone_Cl_VDF_th = ref_cast(Zone_Cl_VDF,eqn_temp.zone_Cl_dis().valeur());
 
 
-  const double& tps = eqn_temp.schema_temps().temps_courant();
-  const double& dtG = eqn_temp.schema_temps().pas_de_temps();
+  const double tps = eqn_temp.schema_temps().temps_courant();
+  const double dtG = eqn_temp.schema_temps().pas_de_temps();
   double T0=0.;
 
 
@@ -532,7 +532,7 @@ int Paroi_ODVM_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
                       else diff = alpha(elem,0);
                     }
 
-                  const double& Temp_solid = t_autre(num_face-ndeb,0);
+                  const double Temp_solid = t_autre(num_face-ndeb,0);
 
                   /*        double Pr = visco_cin/diff;
                             double Beta = pow(3.85*pow(Pr,1./3.)-1.3,2.)+2.12*log(Pr);

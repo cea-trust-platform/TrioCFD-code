@@ -343,8 +343,8 @@ void imprimer_evolution_keps(const Champ_Inc& le_champ_K,const Champ_Inc& le_cha
       ConstDoubleTab_parts parts2(le_champ_Eps.valeurs());
       for (int n=0; n<size; n++)
         {
-          const double& k = K(n);
-          const double& eps = Eps(n);
+          const double k = K(n);
+          const double eps = Eps(n);
           double nut = 0;
           if (eps > 0) nut = LeCmu*k*k/eps;
           if (k < k_min)

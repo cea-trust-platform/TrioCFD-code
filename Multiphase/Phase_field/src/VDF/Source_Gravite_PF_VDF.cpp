@@ -124,7 +124,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
 
   int num_cl;
 
-  const int& boussi = eq_NS_PF.get_boussi_();
+  const int boussi = eq_NS_PF.get_boussi_();
 
   if (boussi == 0)
     {
