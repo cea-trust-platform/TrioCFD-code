@@ -26,7 +26,9 @@
 #include <Neumann_sortie_libre.h>
 #include <Motcle.h>
 #include <Frontiere_dis_base.h>
-
+#include <Probleme_base.h>
+#include <Equation_base.h>
+#include <Nom.h>
 
 // Description:
 //    Teste la compatibilite des conditions aux limites
@@ -119,10 +121,12 @@ int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_C
 
       // hyd (Entree_fluide_vitesse_imposee ou Frontiere_ouverte_vitesse_imposee)
       // et turb (Entree_fluide_K_Eps_impose ou Frontiere_ouverte_K_Eps_impose)
+      Nom pbb = zone_Cl_hydr->equation().probleme().que_suis_je();
       if ( sub_type(Entree_fluide_vitesse_imposee,la_cl_hydr.valeur()) &&
            ! ( sub_type(Neumann_sortie_libre,la_cl_turb.valeur()) ||
                sub_type(Entree_fluide_K_Eps_impose,la_cl_turb.valeur()) ||
-               sub_type(Symetrie,la_cl_turb.valeur()) ) )
+               sub_type(Symetrie,la_cl_turb.valeur()) ) &&
++	       !pbb.contient("ALE"))
         {
           message_erreur_turb( la_cl_hydr, la_cl_turb, num_Cl);
         }
