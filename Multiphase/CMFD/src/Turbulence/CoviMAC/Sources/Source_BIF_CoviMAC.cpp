@@ -69,8 +69,8 @@ void Source_BIF_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, c
   const DoubleTab& normales_f = zone.face_normales();
   const IntTab& voisins_f = zone.face_voisins();
 
-  if (!sub_type(Viscosite_turbulente_base, Op_diff.corr.valeur())) Process::exit("The turbulence correlation must be multiple");
-  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.corr.valeur());
+  if (!sub_type(Viscosite_turbulente_base, Op_diff.correlation().valeur())) Process::exit("The turbulence correlation must be multiple");
+  const Viscosite_turbulente_multiple&    visc_turb = ref_cast(Viscosite_turbulente_multiple, Op_diff.correlation().valeur());
 
   int N = pb.get_champ("vitesse").valeurs().dimension(1), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot() ;
 

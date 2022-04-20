@@ -41,11 +41,15 @@
 class Op_Diff_Turbulent_CoviMAC_Face : public Op_Diff_CoviMAC_Face
 {
   Declare_instanciable( Op_Diff_Turbulent_CoviMAC_Face ) ;
+
+public:
   void creer_champ(const Motcle& motlu) override;
   void mettre_a_jour(double temps) override;
   void completer() override;
   void modifier_nu(DoubleTab& ) const override; //prend en compte la diffusivite turbulente
-public:
+  inline const Correlation& correlation() const { return corr ;};
+
+protected :
   Correlation corr; //correlation de viscosite turbulente
 
   std::vector<Champ_Fonc> nu_t_post_; //flux massiques (kg/m2/s)

@@ -95,7 +95,7 @@ void Terme_dissipation_energie_cinetique_turbulente_P0_CoviMAC::ajouter_blocs(ma
   const tabs_t& 				der_alpha_rho_k = ref_cast(Champ_Inc_base, ch_alpha_rho_k).derivees(); // dictionnaire des derivees
   const Navier_Stokes_std&     eq_qdm 	= ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Op_Diff_Turbulent_CoviMAC_Face& op_diff 		= ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.corr.valeur());
+  const Viscosite_turbulente_base&   	visc_turb 		= ref_cast(Viscosite_turbulente_base, op_diff.correlation().valeur());
   const DoubleTab&                      nu 		  		= equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 

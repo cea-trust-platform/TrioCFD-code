@@ -68,7 +68,7 @@ void Op_Diff_Turbulent_CoviMAC_Elem::modifier_nu(DoubleTab& mu) const
   const Operateur_base& op_qdm = equation().probleme().equation(0).operateur(0).l_op_base();
   if (!sub_type(Op_Diff_Turbulent_CoviMAC_Face, op_qdm))
     Process::exit(que_suis_je() + ": no turbulent momentum diffusion found!");
-  const Correlation& corr_visc = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, op_qdm).corr;
+  const Correlation& corr_visc = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, op_qdm).correlation();
   if (!corr.non_nul() || !sub_type(Viscosite_turbulente_base, corr_visc.valeur()))
     Process::exit(que_suis_je() + ": no turbulent viscosity correlation found!");
   //un "simple" appel a la correlation!

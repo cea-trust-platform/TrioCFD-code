@@ -81,7 +81,7 @@ void Production_echelle_temp_taux_diss_turb_CoviMAC::ajouter_blocs(matrices_t ma
   const grad_Champ_Face_CoviMAC&           grad = ref_cast(grad_Champ_Face_CoviMAC, eq_qdm.get_champ("gradient_vitesse"));
   const DoubleTab&                     tab_grad = grad.passe();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
+  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.correlation().valeur());
   const DoubleTab&                     tab_diss = ref_cast(Champ_P0_CoviMAC, equation().inconnue().valeur()).valeurs(); // tau ou omega selon l'equation
   const DoubleTab&                           nu = pb.get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        tab_k = ref_cast(Champ_P0_CoviMAC, pb.get_champ("k")).valeurs();

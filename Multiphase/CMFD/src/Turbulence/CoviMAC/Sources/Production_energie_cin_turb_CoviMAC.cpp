@@ -61,7 +61,7 @@ void Production_energie_cin_turb_CoviMAC::ajouter_blocs(matrices_t matrices, Dou
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const DoubleTab&                     tab_grad = pb.get_champ("gradient_vitesse").passe();
   const Op_Diff_Turbulent_CoviMAC_Face& Op_diff = ref_cast(Op_Diff_Turbulent_CoviMAC_Face, eq_qdm.operateur(0).l_op_base());
-  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.corr.valeur());
+  const Viscosite_turbulente_base&    visc_turb = ref_cast(Viscosite_turbulente_base, Op_diff.correlation().valeur());
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
