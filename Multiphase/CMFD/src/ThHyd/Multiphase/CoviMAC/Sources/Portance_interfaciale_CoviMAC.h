@@ -14,39 +14,48 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Portance_interfaciale_base.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
+// File:        Portance_interfaciale_CoviMAC.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Portance_interfaciale_base_included
-#define Portance_interfaciale_base_included
-#include <DoubleTab.h>
-#include <Correlation_base.h>
+#ifndef Portance_interfaciale_CoviMAC_included
+#define Portance_interfaciale_CoviMAC_included
+
+#include <Source_base.h>
+#include <Correlation.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Portance_interfaciale_base
-//      utilitaire pour les operateurs de frottement interfacial prenant la forme
-//      F_{0l} = - F_{l0} = C_{0l} (u_l - u_0) x rot(u_0) ou la phase
-//      0 est la phase porteuse et l != 0 une phase quelconque
-//      cette classe definit une fonction C_{kl} dependant de :
-//        alpha, p, T -> inconnues (une valeur par phase chacune)
-//        rho, mu, sigma -> proprietes physiques (idem)
-//        ndv(k, l) -> ||v_k - v_l||, a remplir pour k < l
-//    sortie :
-//        coeff(k, l, 0/1) -> coefficient C_{kl} et sa derivee en ndv(k, l), rempli pour k < l
+//    Classe Portance_interfaciale_CoviMAC
+//    Cette classe implemente dans CoviMAC un operateur de portance interfaciale
+//    de la forme F_{n_l} = - F_{k} = C_{n_l, k} (u_k - u_n_l) x rot(u_n_l) ou la phase
+//    n_l est la phase liquide porteuse et k une phase gazeuse
+//    le calcul de C_{n_l, k} est realise par la hierarchie Portance_interfaciale_base
+// .SECTION voir aussi
+//    Operateur_CoviMAC_base Operateur_base
 //////////////////////////////////////////////////////////////////////////////
-
-class Portance_interfaciale_base : public Correlation_base
+class Portance_interfaciale_CoviMAC: public Source_base
 {
-  Declare_base(Portance_interfaciale_base);
-public:
-  virtual void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                           const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
-                           const DoubleTab& ndv, int e, DoubleTab& coeff) const  = 0;
+  Declare_instanciable(Portance_interfaciale_CoviMAC);
+public :
+  int has_interface_blocs() const override
+  {
+    return 1;
+  };
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void check_multiphase_compatibility() const override {}; //of course
+
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
+private:
+  Correlation correlation_; //correlation donnant le coeff de portance interfaciale
+  int n_l = -1; //phase liquide
+
 };
 
 #endif

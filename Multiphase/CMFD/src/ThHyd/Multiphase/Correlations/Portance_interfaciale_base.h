@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,35 +14,39 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Portance_interfaciale_Tomiyama.h
+// File:        Portance_interfaciale_base.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Portance_interfaciale_Tomiyama_included
-#define Portance_interfaciale_Tomiyama_included
-#include <Portance_interfaciale_base.h>
+#ifndef Portance_interfaciale_base_included
+#define Portance_interfaciale_base_included
+#include <DoubleTab.h>
+#include <Correlation_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Portance_interfaciale_Tomiyama
-//      coefficients de portance interfaciale d'un ecoulement a bulles deformables
-//      Le coefficient renvoye par cette classe est toujours >0, c'est Portanc_interfaciale_CoviMAC qui gere les signes
+//    classe Portance_interfaciale_base
+//      utilitaire pour les operateurs de frottement interfacial prenant la forme
+//      F_{0l} = - F_{l0} = C_{0l} (u_l - u_0) x rot(u_0) ou la phase
+//      0 est la phase porteuse et l != 0 une phase quelconque
+//      cette classe definit une fonction C_{kl} dependant de :
+//        alpha, p, T -> inconnues (une valeur par phase chacune)
+//        rho, mu, sigma -> proprietes physiques (idem)
+//        ndv(k, l) -> ||v_k - v_l||, a remplir pour k < l
+//    sortie :
+//        coeff(k, l, 0/1) -> coefficient C_{kl} et sa derivee en ndv(k, l), rempli pour k < l
 //////////////////////////////////////////////////////////////////////////////
 
-class Portance_interfaciale_Tomiyama : public Portance_interfaciale_base
+class Portance_interfaciale_base : public Correlation_base
 {
-  Declare_instanciable(Portance_interfaciale_Tomiyama);
+  Declare_base(Portance_interfaciale_base);
 public:
-  void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                   const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
-                   const DoubleTab& ndv, int e, DoubleTab& coeff) const override;
-protected:
-  double g_=9.81;
-  int n_l = -1; //phase liquide
-
+  virtual void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
+                           const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
+                           const DoubleTab& ndv, int e, DoubleTab& coeff) const  = 0;
 };
 
 #endif

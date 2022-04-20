@@ -67,7 +67,7 @@ void Portance_interfaciale_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab
   const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, equation().zone_dis().valeur());
   const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl(), &e_f = zone.elem_faces();
   const DoubleTab& n_f = zone.face_normales(), &vf_dir = zone.volumes_entrelaces_dir();
-  const DoubleVect& pe = zone.porosite_elem(), &pf = zone.porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces(), &dh_e = zone.diametre_hydraulique_elem();
+  const DoubleVect& pe = zone.porosite_elem(), &pf = zone.porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces();
   const DoubleTab& pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
@@ -103,7 +103,7 @@ void Portance_interfaciale_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab
           }
 
         for (k = 0; k < N; k++) for (l = 0; l < N; l++) dv(k, l) = std::max(ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0)), dv_min);
-        correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dh_e(e), dv, e, coeff);
+        correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dv, e, coeff);
 
         fac_e = pe(e) * ve(e);
 

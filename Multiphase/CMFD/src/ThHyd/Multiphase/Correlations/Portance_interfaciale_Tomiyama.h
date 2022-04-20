@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2022, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,46 +14,33 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Portance_interfaciale_CoviMAC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/CoviMAC
-// Version:     /main/12
+// File:        Portance_interfaciale_Tomiyama.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
+// Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Portance_interfaciale_CoviMAC_included
-#define Portance_interfaciale_CoviMAC_included
-
-#include <Source_base.h>
-#include <Correlation.h>
+#ifndef Portance_interfaciale_Tomiyama_included
+#define Portance_interfaciale_Tomiyama_included
+#include <Portance_interfaciale_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    Classe Portance_interfaciale_CoviMAC
-//    Cette classe implemente dans CoviMAC un operateur de portance interfaciale
-//    de la forme F_{n_l} = - F_{k} = C_{n_l, k} (u_k - u_n_l) x rot(u_n_l) ou la phase
-//    n_l est la phase liquide porteuse et k une phase gazeuse
-//    le calcul de C_{n_l, k} est realise par la hierarchie Portance_interfaciale_base
-// .SECTION voir aussi
-//    Operateur_CoviMAC_base Operateur_base
+//    classe Portance_interfaciale_Tomiyama
+//      coefficients de portance interfaciale d'un ecoulement a bulles deformables
+//      Le coefficient renvoye par cette classe est toujours >0, c'est Portanc_interfaciale_CoviMAC qui gere les signes
 //////////////////////////////////////////////////////////////////////////////
-class Portance_interfaciale_CoviMAC: public Source_base
-{
-  Declare_instanciable(Portance_interfaciale_CoviMAC);
-public :
-  int has_interface_blocs() const override
-  {
-    return 1;
-  };
-  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
-  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
-  void check_multiphase_compatibility() const override {}; //of course
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
-  void associer_pb(const Probleme_base& ) override { };
-  void mettre_a_jour(double temps) override { };
-private:
-  Correlation correlation_; //correlation donnant le coeff de frottement interfacial
+class Portance_interfaciale_Tomiyama : public Portance_interfaciale_base
+{
+  Declare_instanciable(Portance_interfaciale_Tomiyama);
+public:
+  void coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
+                   const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
+                   const DoubleTab& ndv, int e, DoubleTab& coeff) const override;
+protected:
+  double g_=9.81;
   int n_l = -1; //phase liquide
 
 };

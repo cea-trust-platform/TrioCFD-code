@@ -49,7 +49,7 @@ Entree& Portance_interfaciale_Tomiyama::readOn(Entree& is)
 }
 
 void Portance_interfaciale_Tomiyama::coefficient(const DoubleTab& alpha, const DoubleTab& p, const DoubleTab& T,
-                                                 const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma, double Dh,
+                                                 const DoubleTab& rho, const DoubleTab& mu, const DoubleTab& sigma,
                                                  const DoubleTab& ndv, int e, DoubleTab& coeff) const
 {
   const DoubleTab& diametres = ref_cast(Pb_Multiphase, pb_.valeur()).get_champ("diametre_bulles").valeurs();
