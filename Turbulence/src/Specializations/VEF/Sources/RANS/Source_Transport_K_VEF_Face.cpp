@@ -1,0 +1,217 @@
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+//////////////////////////////////////////////////////////////////////////////
+//
+// File:        Source_Transport_K_VEF_Face.cpp
+// Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Sources
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#include <Source_Transport_K_VEF_Face.h>
+#include <Paroi_negligeable_VEF.h>
+#include <Mod_turb_hyd_base.h>
+#include <Transport_K_ou_Eps.h>
+#include <Convection_Diffusion_Temperature.h>
+#include <Convection_Diffusion_Concentration.h>
+#include <Modele_turbulence_scal_base.h>
+#include <Fluide_base.h>
+#include <Probleme_base.h>
+#include <Champ_Uniforme.h>
+#include <Zone_VEF.h>
+#include <Champ_P1NC.h>
+#include <TRUSTTrav.h>
+#include <Fluide_Quasi_Compressible.h>
+#include <Pb_Hydraulique_Turbulent.h>
+#include <Pb_Hydraulique_Concentration_Turbulent.h>
+#include <Pb_Thermohydraulique_Turbulent_QC.h>
+#include <Pb_Thermohydraulique_Turbulent.h>
+#include <Pb_Thermohydraulique_Concentration_Turbulent.h>
+#include <Param.h>
+#include <Constituant.h>
+
+#include <Modele_turbulence_hyd_K_Eps_Bicephale.h>
+
+Implemente_instanciable(Source_Transport_K_VEF_Face,"Source_Transport_K_VEF_P1NC",Source_base);
+
+
+Sortie& Source_Transport_K_VEF_Face::printOn(Sortie& s) const
+{
+  return s << que_suis_je() ;
+}
+
+
+
+
+
+
+///
+/// readOn
+///
+Entree& Source_Transport_K_VEF_Face::readOn(Entree& is)
+{
+  const Probleme_base& problem = mon_equation->probleme();
+  if (!sub_type(Pb_Hydraulique_Turbulent,problem) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,problem)) error(que_suis_je(),problem.que_suis_je());
+  Param param(que_suis_je());
+  param.lire_avec_accolades(is);
+  return is;
+}
+
+
+
+
+
+void Source_Transport_K_VEF_Face::associer_zones(const Zone_dis& zone_dis,
+                                                 const Zone_Cl_dis& )
+{
+  la_zone_VEF = ref_cast(Zone_VEF, zone_dis.valeur());
+}
+
+
+///
+/// associer_pb
+///
+void Source_Transport_K_VEF_Face::associer_pb(const Probleme_base& pb)
+{
+  eq_hydraulique = pb.equation(0);
+  mon_eq_transport_K   = ref_cast(Transport_K_ou_Eps,equation());
+  mon_eq_transport_Eps = ref_cast(Transport_K_ou_Eps, mon_eq_transport_K.valeur().modele_turbulence().eqn_transp_Eps());
+}
+
+
+
+
+
+
+DoubleTab& Source_Transport_K_VEF_Face::calculer(DoubleTab& resu) const
+{
+  resu =0.;
+  return ajouter(resu);
+}
+
+
+
+DoubleTab& Source_Transport_K_VEF_Face::ajouter(DoubleTab& resu) const
+{
+
+  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,eq_hydraulique->zone_Cl_dis().valeur());
+  const DoubleTab& K   = mon_eq_transport_K->inconnue().valeurs();
+  const DoubleTab& Eps = mon_eq_transport_Eps->inconnue().valeurs();
+  const DoubleTab& visco_turb = mon_eq_transport_K->modele_turbulence().viscosite_turbulente().valeurs();
+  const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
+  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
+  /*Paroi*/
+  const Modele_turbulence_hyd_K_Eps_Bicephale& mod  =
+    ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence());
+  const DoubleTab& tab = mod.loi_paroi().valeur().Cisaillement_paroi();
+  /**/
+  int nb_faces_ = zone_VEF.nb_faces();
+  DoubleTrav P(nb_faces_);
+
+  calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K,vit,visco_turb);
+
+
+  const Modele_Fonc_Bas_Reynolds& mon_modele_fonc=ref_cast(Modele_turbulence_hyd_K_Eps_Bicephale,mon_eq_transport_K->modele_turbulence()).associe_modele_fonction();
+  int is_modele_fonc=(mon_modele_fonc.non_nul());
+  //is_modele_fonc=0;
+  if (is_modele_fonc)
+    {
+      /*
+      DoubleTrav D(nb_faces_);
+      DoubleTrav E(nb_faces_);
+      DoubleTrav F1(nb_faces_);
+      DoubleTrav F2(nb_faces_); */
+      DoubleTab& D=ref_cast_non_const(DoubleTab,mon_modele_fonc.valeur().get_champ("D").valeurs());
+
+      const Fluide_base& fluide=ref_cast(Fluide_base,eq_hydraulique.valeur().milieu());
+      const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
+      // const DoubleTab& tab_visco = ch_visco_cin->valeurs();
+      const Zone_Cl_dis& zcl_keps=mon_eq_transport_K->zone_Cl_dis();
+      const Zone_dis& zone_dis_keps =mon_eq_transport_K->zone_dis();
+      mon_modele_fonc.Calcul_D_BiK(D,zone_dis_keps,zcl_keps,vit,K,Eps,ch_visco_cin);
+
+      D.echange_espace_virtuel();
+
+      // Pour modele EASM
+      int nb_elem_tot = zone_VEF.nb_elem_tot();
+
+      int is_Reynolds_stress_isotrope = mon_modele_fonc.Calcul_is_Reynolds_stress_isotrope();
+      if (is_Reynolds_stress_isotrope==0)
+        {
+          Cerr << "On utilise une diffusion turbulente non linaire dans le terme source P" << finl;
+          const DoubleTab& visco_scal = ch_visco_cin->valeurs();
+          DoubleTab visco_tab(nb_elem_tot);
+          assert(sub_type(Champ_Uniforme,ch_visco_cin.valeur()));
+          visco_tab = visco_scal(0,0);
+          DoubleTab gradient_elem(nb_elem_tot,Objet_U::dimension,Objet_U::dimension);
+          gradient_elem=0.;
+          Champ_P1NC::calcul_gradient(vit,gradient_elem,zone_Cl_VEF);
+          /*Paroi*/
+          Nom lp=mod.loi_paroi().valeur().que_suis_je();
+          if (lp!="negligeable_VEF")
+            {
+              if (mon_equation->schema_temps().nb_pas_dt()>0)
+                Champ_P1NC::calcul_duidxj_paroi(gradient_elem,visco_tab,visco_turb,tab,zone_Cl_VEF);
+            }
+          gradient_elem.echange_espace_virtuel();
+          DoubleTab Re(gradient_elem);
+          mon_modele_fonc.valeur().calcul_tenseur_Re_BiK(visco_turb, gradient_elem, Re);
+          Re.echange_espace_virtuel();
+
+          calculer_terme_production_K_EASM(zone_VEF,zone_Cl_VEF,P,K,gradient_elem,visco_turb,Re);
+        }
+      // Fin pour modele EASM
+      for (int fac=0; fac<nb_faces_; fac++)
+        {
+          resu(fac) += (P(fac)-Eps(fac)-D(fac))*volumes_entrelaces(fac);
+        }
+    }
+  else
+    {
+
+      for (int fac=0; fac<nb_faces_; fac++)
+        {
+          resu(fac) += (P(fac)-Eps(fac))*volumes_entrelaces(fac);
+        }
+    }
+  return resu;
+}
+
+
+void Source_Transport_K_VEF_Face::contribuer_a_avec(const DoubleTab& a, Matrice_Morse& matrice) const
+{
+//   const DoubleTab& K_eps=equation().inconnue().valeurs(); GLAP
+//   int size=K_eps.dimension(0);
+//   double LeK_MIN = mon_eq_transport_K_Eps->modele_turbulence().get_LeK_MIN();
+//
+//   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
+//   const DoubleVect& porosite_face = zone_VEF.porosite_face();
+//   // on implicite le -eps et le -eps^2/k
+//   const DoubleVect& volumes_entrelaces=zone_VEF.volumes_entrelaces();
+//   for (int face=0; face<size; face++)
+//     {
+//       // -eps*vol  donne +vol dans la bonne case
+//       if (K(face) >= LeK_MIN)
+//         {
+//           double coef_k=porosite_face(face)*volumes_entrelaces(face)*Eps(face)/K(face);
+//           matrice(face*2,face*2)+=coef_k;
+//           double coef_eps=C2*Eps(face)/K(face)*volumes_entrelaces(face)*porosite_face(face);
+//           matrice(face*2+1,face*2+1)+=coef_eps;
+//         }
+//     }
+}
+
+
+

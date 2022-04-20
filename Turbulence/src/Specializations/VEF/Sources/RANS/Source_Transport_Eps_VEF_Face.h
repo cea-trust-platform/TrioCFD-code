@@ -14,14 +14,18 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Source_Transport_K_VEF_Face.h
+// File:        Source_Transport_Eps_VEF_Face.h
 // Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Sources
 //
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef Source_Transport_K_VEF_Face_included
-#define Source_Transport_K_VEF_Face_included
+#ifndef Source_Transport_Eps_VEF_Face_included
+#define Source_Transport_Eps_VEF_Face_included
+
+#define C1_DEFAULT 1.44   // Valeurs par defaut des constantes qui interviennent
+#define C2_DEFAULT 1.92   // dans le calcul des termes sources des equations
+#define C3_DEFAULT 1.0    // de transport de K et Eps source: Chabard de N3S
 
 #include <Source_base.h>
 #include <Ref_Zone_VEF.h>
@@ -49,7 +53,7 @@ class Champ_base;
 
 
 
-//.DESCRIPTION class Source_Transport_K_VEF_Face
+//.DESCRIPTION class Source_Transport_Eps_VEF_Face
 //
 // Cette classe represente le terme source qui figure dans l'equation
 // de transport du couple (k,eps) dans le cas ou les equations de Navier-Stokes
@@ -58,14 +62,16 @@ class Champ_base;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_VEF_Face : public Source_base,
+class Source_Transport_Eps_VEF_Face : public Source_base,
   public Calcul_Production_K_VEF
 {
 
-  Declare_instanciable(Source_Transport_K_VEF_Face);
+  Declare_instanciable_sans_constructeur(Source_Transport_Eps_VEF_Face);
 
 public:
 
+  inline Source_Transport_Eps_VEF_Face(double cte1 = C1_DEFAULT,
+                                       double cte2 = C2_DEFAULT );
   DoubleTab& ajouter(DoubleTab& ) const override;
   DoubleTab& calculer(DoubleTab& ) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
@@ -76,6 +82,8 @@ public:
 
 protected:
 
+  double C1;
+  double C2;
   REF(Zone_VEF) la_zone_VEF;
   REF(Equation_base) eq_hydraulique;
   REF(Transport_K_ou_Eps)  mon_eq_transport_K;
@@ -85,105 +93,18 @@ protected:
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
 };
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_anisotherme_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
 
-class Source_Transport_K_anisotherme_VEF_Face :
-  public Source_Transport_K_VEF_Face
+inline Source_Transport_Eps_VEF_Face::
+Source_Transport_Eps_VEF_Face(double cte1,double cte2)
+
+  : C1(cte1), C2(cte2) {}
+
+inline void error(const Nom& source, const Nom& problem)
 {
+  Cerr << "Error ! You can't use the " << source << " source term for the K-Eps equation of the problem: " << problem << finl;
+  Cerr << "Check the reference manual. It is may be another source term Source_Transport_Eps_.... which should be used." << finl;
+  Process::exit();
+}
 
-  Declare_instanciable(Source_Transport_K_anisotherme_VEF_Face);
-
-public:
-
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-
-protected:
-
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-
-};
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_aniso_concen_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de
-// Navier_Stokes sont couplees a l'equation de convection diffusion
-// d'une concentration
-// Le champ beta_c est uniforme
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_aniso_concen_VEF_Face :
-  public Source_Transport_K_VEF_Face
-{
-
-  Declare_instanciable(Source_Transport_K_aniso_concen_VEF_Face);
-
-public:
-
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-
-protected:
-
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-
-};
-
-//////////////////////////////////////////////////////////////////////////////
-//
-// CLASS: Source_Transport_K_aniso_therm_concen_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de
-// Navier_Stokes sont couplees a l'equation de convection diffusion
-// d'une concentration et a l'equation de la thermique
-// Les champs beta_t et beta_c sont uniformes
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_aniso_therm_concen_VEF_Face :
-  public Source_Transport_K_VEF_Face
-{
-
-  Declare_instanciable(Source_Transport_K_aniso_therm_concen_VEF_Face);
-
-public:
-
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-
-};
 
 #endif
-
-
