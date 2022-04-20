@@ -45,6 +45,7 @@ public:
   void reynolds_stress(DoubleTab& R_ij) const override;
   void k_over_eps(DoubleTab& k_sur_eps) const override;
   int gradu_required() const override {  return 1; };
+  void eps(DoubleTab& eps) const override;
 
   void reynolds_stress_BIF(DoubleTab& R_ij) const;
 

@@ -64,3 +64,8 @@ void Viscosite_turbulente_WIT::k_over_eps(DoubleTab& k_sur_eps) const
 {
   k_sur_eps =  0;
 }
+
+void Viscosite_turbulente_WIT::eps(DoubleTab& eps) const
+{
+  eps =  0;
+}

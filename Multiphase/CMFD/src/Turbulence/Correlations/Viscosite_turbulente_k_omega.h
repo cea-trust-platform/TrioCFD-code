@@ -40,6 +40,7 @@ public:
   void eddy_viscosity(DoubleTab& nu_t) const override;
   void reynolds_stress(DoubleTab& R_ij) const override;
   void k_over_eps(DoubleTab& k_sur_eps) const override;
+  void eps(DoubleTab& eps) const override;
   inline double limiteur() const {return limiter_;};
   int gradu_required() const override {  return 1; };
 

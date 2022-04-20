@@ -64,3 +64,8 @@ void Viscosite_turbulente_l_melange::k_over_eps(DoubleTab& k_sur_eps) const
 {
   abort(); //TBD
 }
+
+void Viscosite_turbulente_l_melange::eps(DoubleTab& k_sur_eps) const
+{
+  abort(); //TBD
+}
