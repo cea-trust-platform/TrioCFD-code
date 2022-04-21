@@ -2226,7 +2226,7 @@ void Operateur_Conv_sensibility_VEF::add_diffusion_scalar_term(const DoubleTab& 
   // On dimensionne et initialise le tableau des bilans de flux:
   tab_flux_bords.resize(zone_VEF.nb_faces_bord(),1);
   tab_flux_bords=0.;
-  const int& premiere_face_int=zone_VEF.premiere_face_int();
+  const int premiere_face_int=zone_VEF.premiere_face_int();
 
   // On traite les faces bord
   for (n_bord=0; n_bord<nb_bords; n_bord++)

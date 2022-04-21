@@ -582,9 +582,9 @@ int ParoiVDF_TBLE_LRM::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
   termes_sources.resize(zone_VDF.nb_faces(),1);
   eqn_hydr.sources().calculer(termes_sources); //les termes sources
 
-  const double& tps = eqnNS.schema_temps().temps_courant();
-  const double& dt = eqnNS.schema_temps().pas_de_temps();
-  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+  const double tps = eqnNS.schema_temps().temps_courant();
+  const double dt = eqnNS.schema_temps().pas_de_temps();
+  const double dt_min = eqnNS.schema_temps().pas_temps_min();
 
 
   //SFichier fic_v("v.dat",ios::app); // impression de la vitesse normale pour test
@@ -1504,9 +1504,9 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
   termes_sources.resize(zone_VDF.nb_faces(),1);
   eqn_hydr.sources().calculer(termes_sources); //les termes sources
 
-  const double& tps = eqnNS.schema_temps().temps_courant();
-  const double& dt = eqnNS.schema_temps().pas_de_temps();
-  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+  const double tps = eqnNS.schema_temps().temps_courant();
+  const double dt = eqnNS.schema_temps().pas_de_temps();
+  const double dt_min = eqnNS.schema_temps().pas_temps_min();
 
 
   //SFichier fic_v("v.dat",ios::app); // impression de la vitesse normale pour test
@@ -2346,7 +2346,7 @@ int ParoiVDF_TBLE_LRM::calculer_hyd(DoubleTab& tab_k_eps)
 void ParoiVDF_TBLE_LRM::imprimer_ustar(Sortie& os) const
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double& tps = eqn_hydr.inconnue().temps();
+  const double tps = eqn_hydr.inconnue().temps();
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();
 

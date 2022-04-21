@@ -126,7 +126,7 @@ public:
   void transporter_simple(const DoubleTab& deplacement);
   //Nettoyage des sommets virtuels et des sommets sur frontiere ouverte
   void nettoyer_noeuds_virtuels_et_frontieres();
-  void nettoyer_phase(const Nom& nom_eq, const int& phase);
+  void nettoyer_phase(const Nom& nom_eq, const int phase);
 
   void nettoyer_elements_virtuels();
   virtual void nettoyer_maillage();

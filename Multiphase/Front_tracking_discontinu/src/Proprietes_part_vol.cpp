@@ -151,7 +151,7 @@ void Proprietes_part_vol::completer()
 }
 
 //Methode qui permet a un objet exterieur de modifier la valeur de nb_particules_
-void Proprietes_part_vol::fixer_nb_particules(const int& nb_part)
+void Proprietes_part_vol::fixer_nb_particules(const int nb_part)
 {
   nb_particules_ = nb_part;
 }

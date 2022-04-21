@@ -48,8 +48,8 @@ DoubleTab& Source_Flottabilite::ajouter(DoubleTab& resu) const
   const DoubleTab& rho_p = rho_particules();
   const DoubleTab& volume_p = volumes_particules();
 
-  const int& dim0 = rho_p .dimension(0);
-  const int& dim1 =  Objet_U::dimension;
+  const int dim0 = rho_p .dimension(0);
+  const int dim1 =  Objet_U::dimension;
   double masse_particule, terme_pression;
 
   for (int i=0; i<dim0; i++)

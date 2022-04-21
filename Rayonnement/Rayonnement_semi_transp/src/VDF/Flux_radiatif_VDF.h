@@ -46,7 +46,7 @@ class Flux_radiatif_VDF : public Flux_radiatif_base
 public :
   void evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&,
                               const Champ_Don&, const Champ_Don&,
-                              const Zone_VF&, const double&, double);
+                              const Zone_VF&, const double, double);
 
   void calculer_flux_radiatif(const Equation_base& eq_temp) override;
 

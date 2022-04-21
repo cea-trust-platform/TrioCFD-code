@@ -121,7 +121,7 @@ inline void Terme_Boussinesq_base::check() const
   if (equation_scalaire().probleme().schema_temps().nb_pas_dt()>0 || equation_scalaire().probleme().reprise_effectuee() || verif_==0 || !sub_type(Convection_Diffusion_Temperature,equation_scalaire())) return;
 
   // Nouveau : on verifie que moyenne(T)==T0 au demarrage du calcul uniquement
-  const double& T0 = Scalaire0(0);
+  const double T0 = Scalaire0(0);
   double moyenne_T = mp_moyenne_vect(equation_scalaire().inconnue().valeurs());
   if (inf_ou_egal(moyenne_T,T0-10) || sup_ou_egal(moyenne_T,T0+10))
     {
@@ -140,7 +140,7 @@ inline void Terme_Boussinesq_base::check() const
 }
 
 // Methode de calcul de la valeur sur un champ aux elements d'un champ uniforme ou non a plusieurs composantes
-inline double valeur(const DoubleTab& valeurs, const int& elem, const int& dim)
+inline double valeur(const DoubleTab& valeurs, const int elem, const int dim)
 {
   if(valeurs.nb_dim()==1)
     return valeurs(elem);
@@ -149,7 +149,7 @@ inline double valeur(const DoubleTab& valeurs, const int& elem, const int& dim)
 }
 
 // Methode de calcul de la valeur sur une face encadree par elem1 et elem2 d'un champ uniforme ou non a plusieurs composantes
-inline double valeur(const DoubleTab& valeurs_champ, int elem1, int elem2, const int& compo)
+inline double valeur(const DoubleTab& valeurs_champ, int elem1, int elem2, const int compo)
 {
   if (valeurs_champ.dimension(0)==1)
     return valeurs_champ(0,compo); // Champ uniforme

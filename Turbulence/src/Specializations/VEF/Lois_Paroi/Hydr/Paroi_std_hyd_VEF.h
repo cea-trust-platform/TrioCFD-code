@@ -61,7 +61,7 @@ public:
   int calculer_hyd(DoubleTab& , DoubleTab& ) override;
 
   void imprimer_ustar(Sortie& ) const override;
-  double calculer_u_plus(const int& ,const double& ,const  double& erugu );
+  double calculer_u_plus(const int ,const double ,const  double erugu );
 
   virtual int calculer_k_eps(double& , double& , double , double , double , double);
 

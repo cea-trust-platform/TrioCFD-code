@@ -148,7 +148,7 @@ int Fluide_Diphasique::formule_mu() const
 }
 
 
-int Fluide_Diphasique::initialiser(const double& temps)
+int Fluide_Diphasique::initialiser(const double temps)
 {
   phase0_.initialiser(temps);
   phase1_.initialiser(temps);

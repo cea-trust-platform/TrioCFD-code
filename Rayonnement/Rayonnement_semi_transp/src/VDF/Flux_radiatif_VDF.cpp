@@ -92,7 +92,7 @@ Entree& Flux_radiatif_VDF::readOn(Entree& s )
 // Effets de bord:
 // Postcondition:
 void Flux_radiatif_VDF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don& coeff_abs, const Champ_Don& longueur_rayo,
-                                               const Champ_Don& indice,const Zone_VF& zvf, const double& sigma, double temps)
+                                               const Champ_Don& indice,const Zone_VF& zvf, const double sigma, double temps)
 {
   //  Cerr<<"Flux_radiatif_VDF::evaluer_cl_rayonnement() : Debut"<<finl;
   const DoubleTab& l_rayo = longueur_rayo.valeurs();

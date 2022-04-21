@@ -2169,7 +2169,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //  prise en compte des conditions aux limites de pression/vitesse
 
   DoubleTab& secmem = variables_internes().second_membre_projection.valeurs();
-  const double& dt = schema_temps().pas_de_temps();
+  const double dt = schema_temps().pas_de_temps();
   const DoubleTab& inco = inconnue().valeur().valeurs();
   // secmem = div(U/dt+vpoint) = div(U(n+1)/dt)
   DoubleTab du(inco);

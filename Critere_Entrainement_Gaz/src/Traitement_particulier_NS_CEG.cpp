@@ -646,7 +646,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
     }
 }
 
-void Traitement_particulier_NS_CEG::imprimer(const double& valeur_critere, const Nom& critere, const ArrOfDouble& centre_vortex, const double& rayon_vortex)
+void Traitement_particulier_NS_CEG::imprimer(const double valeur_critere, const Nom& critere, const ArrOfDouble& centre_vortex, const double rayon_vortex)
 {
   Nom filename=Objet_U::nom_du_cas();
   filename+="_";

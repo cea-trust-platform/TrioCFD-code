@@ -426,9 +426,9 @@ int ParoiVDF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k, DoubleTab& tab_eps)
     }
 
 
-  const double& tps = eqnNS.schema_temps().temps_courant();
-  const double& dt = eqnNS.schema_temps().pas_de_temps();
-  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+  const double tps = eqnNS.schema_temps().temps_courant();
+  const double dt = eqnNS.schema_temps().pas_de_temps();
+  const double dt_min = eqnNS.schema_temps().pas_temps_min();
 
   int compteur_faces_paroi = 0;
 
@@ -973,9 +973,9 @@ int ParoiVDF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
     }
 
 
-  const double& tps = eqnNS.schema_temps().temps_courant();
-  const double& dt = eqnNS.schema_temps().pas_de_temps();
-  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+  const double tps = eqnNS.schema_temps().temps_courant();
+  const double dt = eqnNS.schema_temps().pas_de_temps();
+  const double dt_min = eqnNS.schema_temps().pas_temps_min();
 
   int compteur_faces_paroi = 0;
 
@@ -1471,8 +1471,8 @@ int ParoiVDF_TBLE::calculer_stats()
   const IntVect& orientation = zone_VDF.orientation();
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double& tps = eqn_hydr.inconnue().temps();
-  const double& dt = eqn_hydr.schema_temps().pas_de_temps();
+  const double tps = eqn_hydr.inconnue().temps();
+  const double dt = eqn_hydr.schema_temps().pas_de_temps();
 
 
   //////////////////////////////////////
@@ -1543,7 +1543,7 @@ int ParoiVDF_TBLE::calculer_stats()
 void ParoiVDF_TBLE::imprimer_ustar(Sortie& os) const
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double& tps = eqn_hydr.inconnue().temps();
+  const double tps = eqn_hydr.inconnue().temps();
 
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntVect& orientation = zone_VDF.orientation();

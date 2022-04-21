@@ -44,7 +44,7 @@ public:
   void set_param(Param& param) override;
   void verifier_coherence_champs(int& err,Nom& message) override;
   int lire_motcle_non_standard(const Motcle&, Entree&) override;
-  int initialiser(const double& temps) override;
+  int initialiser(const double temps) override;
   void mettre_a_jour(double temps) override;
   void discretiser(const Probleme_base& pb, const  Discretisation_base& dis) override;
 

@@ -93,7 +93,7 @@ Entree& Flux_radiatif_VEF::readOn(Entree& s )
 void Flux_radiatif_VEF::evaluer_cl_rayonnement(Champ_front& Tb, const Champ_Don&
                                                coeff_abs, const Champ_Don& longueur_rayo,
                                                const Champ_Don& indice,const Zone_VF& zvf,
-                                               const double& sigma, double temps)
+                                               const double sigma, double temps)
 {
   const DoubleTab& n = indice.valeurs();
   const DoubleTab& epsilon = emissivite().valeurs();

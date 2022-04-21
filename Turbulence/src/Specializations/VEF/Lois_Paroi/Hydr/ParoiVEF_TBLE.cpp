@@ -110,7 +110,7 @@ int ParoiVEF_TBLE::init_lois_paroi()
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
+  const int nfac = zone.nb_faces_elem();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base,eqn_hydr.milieu());
   const DoubleTab& vit = eqn_hydr.inconnue().valeurs();
@@ -321,7 +321,7 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
+  const int nfac = zone.nb_faces_elem();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
@@ -384,9 +384,9 @@ int ParoiVEF_TBLE::calculer_hyd_BiK(DoubleTab& tab_k,DoubleTab& tab_eps)
   termes_sources=0;
   // On calcule les termes sources, sauf celui de lambda_uprime et de Boussinesq (TBLE recalcule par lui meme ce terme s'il est demande)
 
-  const double& tps = eqnNS.schema_temps().temps_courant();
-  const double& dt = eqnNS.schema_temps().pas_de_temps();
-  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+  const double tps = eqnNS.schema_temps().temps_courant();
+  const double dt = eqnNS.schema_temps().pas_de_temps();
+  const double dt_min = eqnNS.schema_temps().pas_temps_min();
 
   int compteur_faces_paroi = 0;
 
@@ -702,7 +702,7 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
+  const int nfac = zone.nb_faces_elem();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
 
@@ -784,9 +784,9 @@ int ParoiVEF_TBLE::calculer_hyd(DoubleTab& tab1,int isKeps,DoubleTab& tab2)
 
 
 
-  const double& tps = eqnNS.schema_temps().temps_courant();
-  const double& dt = eqnNS.schema_temps().pas_de_temps();
-  const double& dt_min = eqnNS.schema_temps().pas_temps_min();
+  const double tps = eqnNS.schema_temps().temps_courant();
+  const double dt = eqnNS.schema_temps().pas_de_temps();
+  const double dt_min = eqnNS.schema_temps().pas_temps_min();
 
   int compteur_faces_paroi = 0;
 
@@ -1288,11 +1288,11 @@ int ParoiVEF_TBLE::calculer_stats()
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
+  const int nfac = zone.nb_faces_elem();
 
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double& tps = eqn_hydr.inconnue().temps();
-  const double& dt = eqn_hydr.schema_temps().pas_de_temps();
+  const double tps = eqn_hydr.inconnue().temps();
+  const double dt = eqn_hydr.schema_temps().pas_de_temps();
 
   int num_face, num_face_global;
   double surf;
@@ -1396,12 +1396,12 @@ int ParoiVEF_TBLE::calculer_stats()
 void ParoiVEF_TBLE::imprimer_ustar(Sortie& os) const
 {
   const Equation_base& eqn_hydr = mon_modele_turb_hyd->equation();
-  const double& tps = eqn_hydr.inconnue().temps();
+  const double tps = eqn_hydr.inconnue().temps();
 
   const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
+  const int nfac = zone.nb_faces_elem();
 
   int num_face, num_face_global;
   double surf;

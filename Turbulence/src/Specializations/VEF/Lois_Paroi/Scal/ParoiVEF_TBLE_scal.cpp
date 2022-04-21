@@ -105,7 +105,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
+  const int nfac = zone.nb_faces_elem();
 
   const Equation_base& eqn_temp = mon_modele_turb_scal->equation();
   const DoubleTab& Temp = eqn_temp.inconnue().valeurs();
@@ -270,7 +270,7 @@ int ParoiVEF_TBLE_scal::init_lois_paroi()
         }
     }
 
-  const double& tps = eqn_temp.schema_temps().temps_courant();
+  const double tps = eqn_temp.schema_temps().temps_courant();
   if(oui_stats==1 && tps>tps_deb_stats)
     {
       Cerr << " Reprise des stats non code dans TBLE_scal : .... a faire a l'occasion !!! " << finl;
@@ -292,8 +292,8 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   const IntTab& elem_faces = zone_VEF.elem_faces();
   const Zone& zone = zone_VEF.zone();
   const DoubleTab& face_normale = zone_VEF.face_normales();
-  const int& nfac = zone.nb_faces_elem();
-  const int& nb_faces = zone_VEF.nb_faces_tot();
+  const int nfac = zone.nb_faces_elem();
+  const int nb_faces = zone_VEF.nb_faces_tot();
   const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
@@ -323,9 +323,9 @@ int ParoiVEF_TBLE_scal::calculer_scal(Champ_Fonc_base& diffusivite_turb)
   double F;// terme de forcage
 
 
-  const double& tps = eqn_temp.schema_temps().temps_courant();
-  const double& dt = eqn_temp.schema_temps().pas_de_temps();
-  const double& dt_min = eqn_temp.schema_temps().pas_temps_min();
+  const double tps = eqn_temp.schema_temps().temps_courant();
+  const double dt = eqn_temp.schema_temps().pas_de_temps();
+  const double dt_min = eqn_temp.schema_temps().pas_temps_min();
 
   int compteur_faces_paroi = 0;
 
@@ -495,8 +495,8 @@ int ParoiVEF_TBLE_scal::calculer_stats()
   const DoubleTab& face_normale = zone_VEF.face_normales();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double& tps = eqn_temp.inconnue().temps();
-  const double& dt = eqn_temp.schema_temps().pas_de_temps();
+  const double tps = eqn_temp.inconnue().temps();
+  const double dt = eqn_temp.schema_temps().pas_de_temps();
   const Equation_base& eq_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eq_hydr.get_modele(TURBULENCE);
   const Mod_turb_hyd_base& le_modele = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
@@ -599,7 +599,7 @@ int ParoiVEF_TBLE_scal::calculer_stats()
 void ParoiVEF_TBLE_scal::imprimer_nusselt(Sortie& os) const
 {
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double& tps = eqn_temp.inconnue().temps();
+  const double tps = eqn_temp.inconnue().temps();
   Paroi_scal_hyd_base_VEF::imprimer_nusselt(os);
   Paroi_TBLE_QDM_Scal::imprimer_sondes(os, tps, equivalent_distance_);
   Paroi_TBLE_QDM_Scal::imprimer_stat(os, tps);

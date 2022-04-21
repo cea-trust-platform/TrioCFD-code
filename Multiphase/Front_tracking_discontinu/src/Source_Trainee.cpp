@@ -74,8 +74,8 @@ DoubleTab& Source_Trainee::ajouter(DoubleTab& resu) const
       sigma = fluide.sigma();
     }
 
-  const int& dim0 =  vitesse_p.dimension(0);
-  const int& dim1 =  vitesse_p.dimension(1);
+  const int dim0 =  vitesse_p.dimension(0);
+  const int dim1 =  vitesse_p.dimension(1);
   assert(vitesse_p.dimension(0)==vitesse_f.dimension(0));
 
   double norme_delta_v, Reynolds_p, Cd, Surface, pi;

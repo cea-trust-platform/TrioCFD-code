@@ -58,7 +58,7 @@ void Source_Transport_K_KEps_VDF_Elem::ajouter_blocs(matrices_t matrices, Double
   const IntTab& elem_faces = zone_VDF.elem_faces();
   const int nbcouches = mon_eq_transport_K_Eps->get_nbcouches();
   int ndeb,nfin,elem,face_courante,elem_courant;
-  double dist, d_visco,y_etoile, critere_switch;
+  double dist, d_visco,y_etoile, critere_switch=0.;
   Loi_2couches_base& loi2couches =ref_cast_non_const(Transport_K_KEps,mon_eq_transport_K_Eps.valeur()).loi2couches();
   int valswitch, icouche;
   const int impr2 =  mon_eq_transport_K_Eps->get_impr();

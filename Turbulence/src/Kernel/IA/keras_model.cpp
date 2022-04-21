@@ -263,8 +263,8 @@ bool KerasLayerConvolution2d::Apply(Tensor* in, Tensor* out) {
                     // Iterate over kernel.
                     for (int k = 0; k < weights_.dims_[2]; k++) {
                         for (int l = 0; l < weights_.dims_[3]; l++) {
-                            const float& weight = weights_(i, j, k, l);
-                            const float& value =
+                            const float weight = weights_(i, j, k, l);
+                            const float value =
                                 (*in)(j, tj - st_nj + k, tk - st_nk + l);
 
                             tmp(i, tj - st_nj, tk - st_nk) += weight * value;
@@ -355,7 +355,7 @@ bool KerasLayerMaxPooling2d::Apply(Tensor* in, Tensor* out) {
 
                 for (unsigned int pj = 0; pj < pool_size_j_; pj++) {
                     for (unsigned int pk = 0; pk < pool_size_k_; pk++) {
-                        const float& pool_val = (*in)(i, tj + pj, tk + pk);
+                        const float pool_val = (*in)(i, tj + pj, tk + pk);
                         if (pool_val > max_val) {
                             max_val = pool_val;
                         }

@@ -253,16 +253,16 @@ int Paroi_TBLE_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 {
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
-  const int& nb_elems = zone_VDF.nb_elem();
+  const int nb_elems = zone_VDF.nb_elem();
   const IntVect& orientation = zone_VDF.orientation();
   const DoubleVect& volumes = zone_VDF.volumes();
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
   const Equation_base& eqn_hydr  = mon_modele_turb_scal->equation().probleme().equation(0);
   const Fluide_base& le_fluide   = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin            = le_fluide.viscosite_cinematique();
-  const double& tps = eqn_temp.schema_temps().temps_courant();
-  const double& dt = eqn_temp.schema_temps().pas_de_temps();
-  const double& dt_min = eqn_temp.schema_temps().pas_temps_min();
+  const double tps = eqn_temp.schema_temps().temps_courant();
+  const double dt = eqn_temp.schema_temps().pas_de_temps();
+  const double dt_min = eqn_temp.schema_temps().pas_temps_min();
   const double rhoCp = le_fluide.capacite_calorifique().valeurs()(0, 0) * le_fluide.masse_volumique().valeurs()(0, 0);
   DoubleTab termes_sources;
   termes_sources.resize(nb_elems,1);
@@ -456,8 +456,8 @@ int Paroi_TBLE_scal_VDF::calculer_stats()
   const IntVect& orientation = zone_VDF.orientation();
 
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double& tps = eqn_temp.inconnue().temps();
-  const double& dt = eqn_temp.schema_temps().pas_de_temps();
+  const double tps = eqn_temp.inconnue().temps();
+  const double dt = eqn_temp.schema_temps().pas_de_temps();
   const Equation_base& eqn_hydr = mon_modele_turb_scal->equation().probleme().equation(0);
   const RefObjU& modele_turbulence_hydr = eqn_hydr.get_modele(TURBULENCE);
   const Mod_turb_hyd_base& mod_turb_hydr = ref_cast(Mod_turb_hyd_base,modele_turbulence_hydr.valeur());
@@ -533,7 +533,7 @@ int Paroi_TBLE_scal_VDF::calculer_stats()
 void Paroi_TBLE_scal_VDF::imprimer_nusselt(Sortie& os) const
 {
   const Convection_Diffusion_std& eqn_temp = mon_modele_turb_scal->equation();
-  const double& tps = eqn_temp.inconnue().temps();
+  const double tps = eqn_temp.inconnue().temps();
 
   Paroi_scal_hyd_base_VDF::imprimer_nusselt(os);
 

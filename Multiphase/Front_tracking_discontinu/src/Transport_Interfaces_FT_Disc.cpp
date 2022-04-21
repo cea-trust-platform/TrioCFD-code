@@ -2429,7 +2429,7 @@ void Transport_Interfaces_FT_Disc::calcul_source(const DoubleTab& inco_val,
     }
 }
 
-void ouvrir_fichier(SFichier& os,const Nom& type, const int& flag, const Transport_Interfaces_FT_Disc& equation)
+void ouvrir_fichier(SFichier& os,const Nom& type, const int flag, const Transport_Interfaces_FT_Disc& equation)
 {
 
   // flag nul on n'ouvre pas le fichier
@@ -2449,7 +2449,7 @@ void ouvrir_fichier(SFichier& os,const Nom& type, const int& flag, const Transpo
   fichier+=equation.le_nom();
   fichier+=".out";
   const Schema_Temps_base& sch=equation.probleme().schema_temps();
-  const int& precision=sch.precision_impr();
+  const int precision=sch.precision_impr();
   // On cree le fichier a la premiere impression avec l'en tete ou si le fichier n'existe pas
   struct stat f;
   if (stat(fichier,&f) || (sch.nb_impr()==1 && !equation.probleme().reprise_effectuee()))
@@ -2492,7 +2492,7 @@ void ouvrir_fichier(SFichier& os,const Nom& type, const int& flag, const Transpo
 }
 
 void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face,const DoubleTab& source_val,const DoubleTab& rho_faces,
-                                                  const int& n,const int& m, const int& is_QC,
+                                                  const int n,const int m, const int is_QC,
                                                   const DoubleVect& vol_entrelaces,const Solveur_Masse& un_solv_masse)
 {
 
@@ -2590,7 +2590,7 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
 //            Force << espace << dforce(k);
           Force << espace << values(0,k);
         Force << finl;
-        const int& impr_mom = 1 ;
+        const int impr_mom = 1 ;
 
         SFichier Pressure;
         ouvrir_fichier(Pressure,"Pressure",impr_mom,*this);
@@ -2630,7 +2630,7 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
         Force << espace << force_[k];
       Force << finl;
       const Zone& zone=zone_dis().zone();
-      const int& impr_mom = zone.Moments_a_imprimer();
+      const int impr_mom = zone.Moments_a_imprimer();
       if (impr_mom)
         {
           SFichier Moment;
@@ -2652,7 +2652,7 @@ void Transport_Interfaces_FT_Disc::update_critere_statio()
   Schema_Temps_base& sch_tps = schema_temps();
   const DoubleTab& present = inconnue().valeurs();
   const DoubleTab& passe = inconnue().passe();
-  const double& dt = sch_tps.pas_de_temps();
+  const double dt = sch_tps.pas_de_temps();
   DoubleTab tab_critere(present);
 
   tab_critere = present;
@@ -2713,7 +2713,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
     force_=0;
     moment_=0;
     const Zone& zone=zone_dis().zone();
-    const int& impr_mom = zone.Moments_a_imprimer();
+    const int impr_mom = zone.Moments_a_imprimer();
     const ArrOfDouble& centre_gravite = zone.cg_moments();
     const DoubleTab& centre_faces = ref_cast(Zone_VF,zone_dis().valeur()).xv();
     ArrOfDouble xgr(dimension);
@@ -2837,8 +2837,8 @@ void Transport_Interfaces_FT_Disc::get_expression_vitesse_imposee(DoubleTab& vit
 void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
                                                   const DoubleTab& vitesse,
                                                   const DoubleTab& vpoint,
-                                                  const double& temps,
-                                                  const double& dt)
+                                                  const double temps,
+                                                  const double dt)
 {
   const int dim = Objet_U::dimension;
   const int dimension3 = (dim==3);

@@ -611,7 +611,7 @@ void Source_Con_Phase_field::associer_zones(const Zone_dis& zone_dis,
 }
 
 
-inline double mobilite(const double& c)
+inline double mobilite(const double c)
 {
   return (1.);
   //   return (c*c);
@@ -2231,14 +2231,14 @@ void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo
 }
 
 
-void Source_Con_Phase_field::calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
+void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
 {
   if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
     {
       const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
       const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
       const Table& table = ch_champ_fonc_c.table();
-      const int& isfct = table.isfonction();
+      const int isfct = table.isfonction();
       DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();
       // code ci-dessous adapte de Champ_Fonc_Tabule_P0_VDF.mettre_a_jour
       if (!(val_c.nb_dim() == mes_valeurs.nb_dim()))

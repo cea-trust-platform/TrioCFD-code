@@ -181,7 +181,7 @@ int Schema_Phase_field::mettre_a_jour()
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Schema_Phase_field::changer_temps_courant(const double& t)
+void Schema_Phase_field::changer_temps_courant(const double t)
 {
   sch2.valeur().changer_temps_courant(t);
   sch3.valeur().changer_temps_courant(t);

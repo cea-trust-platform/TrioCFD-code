@@ -81,34 +81,34 @@ protected:
 
   // Fonction qui distribue la perte de volume due au remaillage de l'interface,
   // a un element "elem" donne qui est traverse par la nouvelle interface remaillee.
-  int transport_volume_perdu_sur_element(const int&,const Maillage_FT_Disc&) ;
+  int transport_volume_perdu_sur_element(const int,const Maillage_FT_Disc&) ;
 
   // Fonction qui distribue la perte de volume due au remaillage de l'interface,
   double transport_volume_perdu_sur_element(const Maillage_FT_Disc&) ;
 
   //Fonction qui a chaque sommet du maillage de l'interface associe une partie du
   //volume perdu dans l'element "elem" lors du remaillage
-  int transport_volume_perdu_sur_sommet(const int&, ArrOfDouble&, const Maillage_FT_Disc&) const;
+  int transport_volume_perdu_sur_sommet(const int, ArrOfDouble&, const Maillage_FT_Disc&) const;
 
   //Fonction qui a chaque sommet du maillage de l'interface associe une partie du
   //volume perdu lors du remaillage
   double transport_volume_perdu_sur_sommet(ArrOfDouble&, const Maillage_FT_Disc&) const;
 
   //Fonction qui donne la liste des elements voisins a un element "elem" (numero global) donne
-  int elements_voisins(const int&, ArrOfInt&, const Zone_dis_base&) const;
+  int elements_voisins(const int, ArrOfInt&, const Zone_dis_base&) const;
 
   //Fonction qui donne la liste des elements voisins a un element "elem" (numero global) donne et
   //situes a une distance de l'interface strictement plus petite que la distance separant "elem"
   //de l'interface. (normalement la difference des deux distances doit etre de 1)
-  int elements_voisins_a_distance_plus_petite2(const int&, ArrOfInt&) const;
+  int elements_voisins_a_distance_plus_petite2(const int, ArrOfInt&) const;
 
   // Fonction qui donne le nombre d'elements voisins a un element "elem" donne
-  int nb_elements_voisins(const int&, const Zone_dis_base&) const;
+  int nb_elements_voisins(const int, const Zone_dis_base&) const;
 
   //Soit "elem" (numero global) un element du maillage eulerien a distance "n" de l'interface
   //La fonction renvoie le nombre d'elements voisins de "elem" a distance "n-1"
-  int nb_elements_voisins_a_distance_plus_petite(const int&, const Zone_dis_base&) const;
-  int nb_elements_voisins_a_distance_plus_petite(const int&) const;
+  int nb_elements_voisins_a_distance_plus_petite(const int, const Zone_dis_base&) const;
+  int nb_elements_voisins_a_distance_plus_petite(const int) const;
 
 
 private :
@@ -131,7 +131,7 @@ private :
   ArrOfBit tmp_flag_elements_; // tableau temporaire utilise dans elements_voisins()
   //Fonction qui renvoie la surface occupee par l'interface
   //dans un element donne
-  double surface_intersection(const int&, const Maillage_FT_Disc&) const;
+  double surface_intersection(const int, const Maillage_FT_Disc&) const;
 
   //Fonction qui renvoie la zone discrete dans laquelle evolue l'interface
   inline const Zone_dis& zone_dis(const Maillage_FT_Disc&) const;
