@@ -65,7 +65,7 @@ void Dissipation_WIT_CoviMAC::ajouter_blocs(matrices_t matrices, DoubleTab& secm
   const DoubleTab&                      tab_rho = equation().probleme().get_champ("masse_volumique").passe();
   const DoubleTab&                      tab_alp = equation().probleme().get_champ("alpha").passe();
   const DoubleTab&                          vit = equation().probleme().get_champ("vitesse").passe();
-  const DoubleTab&                         diam = equation().probleme().get_champ("diametre_bulles").passe();
+  const DoubleTab&                         diam = equation().probleme().get_champ("diametre_bulles").valeurs();
   const DoubleTab&                           nu = equation().probleme().get_champ("viscosite_cinematique").passe();
   const DoubleTab&                        k_WIT = equation().inconnue().passe();
 

@@ -52,7 +52,7 @@ Entree& Transport_turbulent_GGDH_WIT::readOn(Entree& is)
 void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& eq, const Viscosite_turbulente_base& visc_turb, DoubleTab& nu) const
 {
   const DoubleTab& mu0 = eq.diffusivite_pour_transport().passe(), &nu0 = eq.diffusivite_pour_pas_de_temps().passe(), //viscosites moleculaires
-                   alp = pb_->get_champ("alpha").passe(), diam = pb_->get_champ("diametre_bulles").passe(),
+                   alp = pb_->get_champ("alpha").passe(), diam = pb_->get_champ("diametre_bulles").valeurs(),
                    &tab_u = pb_->get_champ("vitesse").passe();
   int i, nl = nu.dimension(0), N = nu.dimension(1), d, db, D = dimension, i_part=-1;
   if (N!= 1) Process::exit("Only the liquid phase can have WIT for now");
