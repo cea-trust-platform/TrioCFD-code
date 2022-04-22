@@ -19,7 +19,6 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Transport_K_Eps_VEF_Face_included
 #define Source_Transport_K_Eps_VEF_Face_included
 
@@ -27,85 +26,37 @@
 #define C2_DEFAULT 1.92   // dans le calcul des termes sources des equations
 #define C3_DEFAULT 1.0    // de transport de K et Eps source: Chabard de N3S
 
-#include <Source_base.h>
-#include <Ref_Zone_VEF.h>
-#include <Ref_Champ_Don.h>
-#include <Ref_Champ_Don_base.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Convection_Diffusion_Concentration.h>
-#include <Ref_Equation_base.h>
+#include <Source_Transport_VEF_Face_base.h>
 #include <Ref_Transport_K_Eps.h>
-#include <Calcul_Production_K_VEF.h>
-
-class Probleme_base;
-class Champ_Don_base;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-class Zone_dis;
-class Zone_Cl_dis;
-class Zone_Cl_VEF;
-class Champ_Face;
-class Champ_base;
-//
-//  Remarque:  On n'a pas integre les classes qui suivent dans la hierarchie
-//             Terme_Source_VEF_base car il etait plus simple de les traiter
-//             hors hierarchie
-
-
 
 //.DESCRIPTION class Source_Transport_K_Eps_VEF_Face
-//
 // Cette classe represente le terme source qui figure dans l'equation
 // de transport du couple (k,eps) dans le cas ou les equations de Navier-Stokes
-// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion
-// d'une concentration.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Eps_VEF_Face : public Source_base,
-  public Calcul_Production_K_VEF
+// ne sont pas couplees a la thermique ou a l'equation de convection-diffusion d'une concentration.
+class Source_Transport_K_Eps_VEF_Face : public Source_Transport_VEF_Face_base
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_VEF_Face);
-
 public:
-
-  inline Source_Transport_K_Eps_VEF_Face(double cte1 = C1_DEFAULT,
-                                         double cte2 = C2_DEFAULT );
+  Source_Transport_K_Eps_VEF_Face(double cte1 = C1__, double cte2 = C2__) : Source_Transport_VEF_Face_base(cte1,cte2) { }
   DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
-  void mettre_a_jour(double temps) override
-  {
-    Calcul_Production_K_VEF::mettre_a_jour(temps);
-  }
 
 protected:
-
-  double C1;
-  double C2;
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Equation_base) eq_hydraulique;
+  void associer_pb(const Probleme_base& pb) override;
   REF(Transport_K_Eps)  mon_eq_transport_K_Eps;
 
-  void associer_pb(const Probleme_base& pb) override;
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+private:
+  const DoubleTab& get_visc_turb() const override;
+  const DoubleTab& get_cisaillement_paroi() const override;
+  const DoubleTab& get_K_pour_production() const override;
+  const Modele_Fonc_Bas_Reynolds& get_modele_fonc_bas_reyn() const override;
+  void calcul_tabs_bas_reyn(const DoubleTrav&, const DoubleTab&, const DoubleTab&, const Champ_Don&, const Champ_base&, DoubleTab&, DoubleTab&, DoubleTab&, DoubleTab&) const override;
+  const Nom get_type_paroi() const override;
+  void calcul_tenseur_reyn(const DoubleTab&, const DoubleTab&, DoubleTab&) const override;
+  void fill_resu_bas_rey(const DoubleVect&, const DoubleTrav&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, DoubleTab&) const override;
+  void fill_resu(const DoubleVect& , const DoubleTrav& , DoubleTab& ) const override;
 };
 
+inline void error(const Nom& source, const Nom& problem) { Process::exit(); }
 
-inline void error(const Nom& source, const Nom& problem)
-{
-  Cerr << "Error ! You can't use the " << source << " source term for the K-Eps equation of the problem: " << problem << finl;
-  Cerr << "Check the reference manual. It is may be another source term Source_Transport_K_Eps_.... which should be used." << finl;
-  Process::exit();
-}
-
-
-
-inline Source_Transport_K_Eps_VEF_Face::
-Source_Transport_K_Eps_VEF_Face(double cte1,double cte2)
-
-  : C1(cte1), C2(cte2) {}
-
-
-#endif
+#endif /* Source_Transport_K_Eps_VEF_Face_included */

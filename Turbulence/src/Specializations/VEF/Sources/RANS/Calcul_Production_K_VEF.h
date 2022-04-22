@@ -49,4 +49,18 @@ protected:
   void mettre_a_jour(double temps) { }
 };
 
+inline void error_keps(const Nom& source, const Nom& nom)
+{
+  Cerr << "Error ! You can't use the " << source << " source term with a " << nom << " problem/medium !!" << finl;
+  Cerr << "Check the reference manual. It is may be another source term which should be used." << finl;
+  Process::exit();
+}
+
+template <typename RETURN_TYPE>
+RETURN_TYPE not_implemented(const char * nom_funct)
+{
+  Cerr << "The method " << nom_funct << " should be implemented in a derived class !" << finl;
+  throw;
+}
+
 #endif /* Calcul_Production_K_VEF_included */
