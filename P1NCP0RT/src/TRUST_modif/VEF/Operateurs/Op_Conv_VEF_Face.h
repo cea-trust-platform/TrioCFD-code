@@ -24,9 +24,9 @@
 #ifndef Op_Conv_VEF_Face_included
 #define Op_Conv_VEF_Face_included
 
+#include <TRUSTTabs_forward.h>
 #include <Op_Conv_VEF_base.h>
 #include <Motcle.h>
-#include <TRUSTArray.h>
 //
 // .DESCRIPTION class Op_Conv_VEF_Face
 //
