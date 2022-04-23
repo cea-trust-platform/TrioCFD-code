@@ -44,11 +44,11 @@ public :
 
   void associer_pb(const Probleme_base& pb) override;
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
   DoubleTab& calculer(DoubleTab& ) const override;
   DoubleTab& ajouter(DoubleTab& ) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 
   inline void mettre_a_jour(double temps) override { Calcul_Production_K_VEF::mettre_a_jour(temps); }
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { return not_implemented<void>(__func__); }
 
 protected :
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S
@@ -63,6 +63,18 @@ protected :
   REF(Zone_Cl_VEF) la_zone_Cl_VEF;
   REF(Equation_base) eq_hydraulique;
 
+  // pour les classes anisotherme
+  Entree& readOn_anisotherme(Entree& is);
+  void verifier_pb_keps_anisotherme(const Probleme_base&, const Nom& );
+  void verifier_milieu_anisotherme(const Probleme_base&, const Nom& );
+  void associer_pb_anisotherme(const Probleme_base& );
+  DoubleTab& ajouter_anisotherme(DoubleTab& ) const;
+
+  double C3 = C3__;
+  REF(Champ_Don) beta_t;
+  REF(Champ_Don_base) gravite;
+  REF(Convection_Diffusion_Temperature) eq_thermique;
+
 private:
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
@@ -74,6 +86,7 @@ private:
   virtual void calcul_tenseur_reyn(const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTrav& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu(const DoubleVect& , const DoubleTrav& , DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
 };
 
 #endif /* Source_Transport_VEF_Face_base_included */

@@ -21,8 +21,10 @@
 
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
 #include <Source_Transport_VEF_Face_base.h>
+#include <Pb_Thermohydraulique_Turbulent.h>
 #include <Modele_turbulence_hyd_K_Eps.h>
 #include <Pb_Hydraulique_Turbulent.h>
+#include <Fluide_Dilatable_base.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_base.h>
 #include <Zone_Cl_VEF.h>
@@ -52,9 +54,34 @@ Entree& Source_Transport_VEF_Face_base::readOn_nothing(Entree& is)
   return is ;
 }
 
+Entree& Source_Transport_VEF_Face_base::readOn_anisotherme(Entree& is)
+{
+  Param param(que_suis_je());
+  param.ajouter("C1_eps", &C1);
+  param.ajouter("C2_eps", &C2);
+  param.ajouter("C3_eps", &C3);
+  param.lire_avec_accolades(is);
+  Cerr << "C1_eps = " << C1 << finl;
+  Cerr << "C2_eps = " << C2 << finl;
+  Cerr << "C3_eps = " << C3 << finl;
+  return is ;
+}
+
 void Source_Transport_VEF_Face_base::verifier_pb_keps(const Probleme_base& pb, const Nom& nom)
 {
   if (!sub_type(Pb_Hydraulique_Turbulent,pb) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,pb)) error_keps(nom,pb.que_suis_je());
+}
+
+void Source_Transport_VEF_Face_base::verifier_pb_keps_anisotherme(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Thermohydraulique_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
+}
+
+void Source_Transport_VEF_Face_base::verifier_milieu_anisotherme(const Probleme_base& pb, const Nom& nom)
+{
+  const Milieu_base& milieu = pb.equation(1).milieu(); // eq thermique
+  if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
+  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
 }
 
 void Source_Transport_VEF_Face_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis)
@@ -66,6 +93,14 @@ void Source_Transport_VEF_Face_base::associer_zones(const Zone_dis& zone_dis, co
 void Source_Transport_VEF_Face_base::associer_pb(const Probleme_base& pb)
 {
   eq_hydraulique = pb.equation(0);
+}
+
+void Source_Transport_VEF_Face_base::associer_pb_anisotherme(const Probleme_base& pb)
+{
+  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(1).milieu());
+  beta_t = fluide.beta_t();
+  gravite = fluide.gravite();
+  eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
 }
 
 DoubleTab& Source_Transport_VEF_Face_base::calculer(DoubleTab& resu) const
@@ -136,7 +171,23 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_keps(DoubleTab& resu) const
   return resu;
 }
 
-void Source_Transport_VEF_Face_base::contribuer_a_avec(const DoubleTab& a, Matrice_Morse& matrice) const
+DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme(DoubleTab& resu) const
 {
-  return not_implemented<void>(__func__);
+  // on ajoute directement G
+  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF,eq_thermique->zone_Cl_dis().valeur());
+  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
+  const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
+  DoubleTab alpha_turb(le_modele_scalaire.diffusivite_turbulente().valeurs());
+  const DoubleTab& g = gravite->valeurs();
+  const Champ_Don& ch_beta = beta_t.valeur();
+  const DoubleVect& volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
+
+  int nb_face = la_zone_VEF->nb_faces();
+  DoubleTrav G(nb_face);
+
+  // C'est l'objet de type zone_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
+  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(),zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
+
+  fill_resu_anisotherme(G,volumes_entrelaces,resu); // voir les classes filles
+  return resu;
 }

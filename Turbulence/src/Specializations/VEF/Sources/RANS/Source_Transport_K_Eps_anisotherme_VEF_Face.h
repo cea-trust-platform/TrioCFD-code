@@ -24,53 +24,22 @@
 
 #include <Source_Transport_K_Eps_VEF_Face.h>
 
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
 // CLASS: Source_Transport_K_Eps_anisotherme_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
+// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
+// sont couplees a l'equation de la thermique. On suppose que le coefficient de variation de la masse volumique
 // du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Eps_anisotherme_VEF_Face :
-  public Source_Transport_K_Eps_VEF_Face
+class Source_Transport_K_Eps_anisotherme_VEF_Face : public Source_Transport_K_Eps_VEF_Face
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_anisotherme_VEF_Face);
-
 public:
+  inline Source_Transport_K_Eps_anisotherme_VEF_Face(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) :
+    Source_Transport_K_Eps_VEF_Face(cte1,cte2) { C3 = cte3; }
 
-  inline Source_Transport_K_Eps_anisotherme_VEF_Face(double cte1 = C1_DEFAULT,
-                                                     double cte2 = C2_DEFAULT,
-                                                     double cte3 = C3_DEFAULT);
-  void associer_pb(const Probleme_base& ) override;
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base&) override;
+  DoubleTab& ajouter(DoubleTab&) const override;
 
-protected:
-
-  double C3;
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-
+private:
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;
 };
-
-
-inline Source_Transport_K_Eps_anisotherme_VEF_Face::
-Source_Transport_K_Eps_anisotherme_VEF_Face(double cte1,double cte2,double cte3)
-
-  : Source_Transport_K_Eps_VEF_Face(cte1,cte2) , C3(cte3) {}
-
-
-
-
-
 
 #endif /* Source_Transport_K_Eps_anisotherme_VEF_Face_included */
