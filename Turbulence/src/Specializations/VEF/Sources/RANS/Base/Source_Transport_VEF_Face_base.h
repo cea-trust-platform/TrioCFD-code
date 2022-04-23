@@ -34,6 +34,7 @@
 #include <Source_base.h>
 
 class Modele_Fonc_Bas_Reynolds;
+class Fluide_base;
 
 class Source_Transport_VEF_Face_base : public Source_base, public Calcul_Production_K_VEF
 {
@@ -75,7 +76,18 @@ protected :
   REF(Champ_Don_base) gravite;
   REF(Convection_Diffusion_Temperature) eq_thermique;
 
+  // pour les classes concen
+  Entree& readOn_concen(Entree& is);
+  void verifier_pb_keps_concen(const Probleme_base&, const Nom& );
+  void verifier_milieu_concen(const Probleme_base&, const Nom& );
+  void associer_pb_concen(const Probleme_base& );
+  DoubleTab& ajouter_concen(DoubleTab& ) const;
+
+  REF(Champ_Don) beta_c;
+  REF(Convection_Diffusion_Concentration) eq_concentration;
+
 private:
+  void verifier_beta_concen(const Fluide_base&);
   // methodes a surcharger sinon throw !!
   virtual const DoubleTab& get_visc_turb() const { return not_implemented<DoubleTab&>(__func__); }
   virtual const DoubleTab& get_cisaillement_paroi() const { return not_implemented<DoubleTab&>(__func__); }
@@ -87,6 +99,8 @@ private:
   virtual void fill_resu_bas_rey(const DoubleVect& , const DoubleTrav& , const DoubleTab& , const DoubleTab& , const DoubleTab& , const DoubleTab& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu(const DoubleVect& , const DoubleTrav& , DoubleTab& ) const { return not_implemented<void>(__func__); }
   virtual void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); }
+  virtual void fill_resu_concen(const DoubleTrav& , const DoubleVect& , DoubleTab& ) const { return not_implemented<void>(__func__); } // XXX on peut faire une methode unique avec fill_resu_anisotherme ...
+
 };
 
 #endif /* Source_Transport_VEF_Face_base_included */
