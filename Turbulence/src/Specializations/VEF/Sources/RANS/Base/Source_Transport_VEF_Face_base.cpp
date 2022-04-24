@@ -19,6 +19,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
+#include <Pb_Thermohydraulique_Concentration_Turbulent.h>
 #include <Pb_Hydraulique_Concentration_Turbulent.h>
 #include <Pb_Thermohydraulique_Turbulent_QC.h>
 #include <Source_Transport_VEF_Face_base.h>
@@ -71,6 +72,8 @@ Entree& Source_Transport_VEF_Face_base::readOn_anisotherme(Entree& is)
 
 Entree& Source_Transport_VEF_Face_base::readOn_concen(Entree& is) { return readOn_anisotherme(is); }
 
+Entree& Source_Transport_VEF_Face_base::readOn_anisotherme_concen(Entree& is) { return readOn_anisotherme(is); }
+
 void Source_Transport_VEF_Face_base::verifier_pb_keps(const Probleme_base& pb, const Nom& nom)
 {
   if (!sub_type(Pb_Hydraulique_Turbulent,pb) && !sub_type(Pb_Thermohydraulique_Turbulent_QC,pb)) error_keps(nom,pb.que_suis_je());
@@ -86,6 +89,11 @@ void Source_Transport_VEF_Face_base::verifier_pb_keps_concen(const Probleme_base
   if (!sub_type(Pb_Hydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
 }
 
+void Source_Transport_VEF_Face_base::verifier_pb_keps_anisotherme_concen(const Probleme_base& pb, const Nom& nom)
+{
+  if (!sub_type(Pb_Thermohydraulique_Concentration_Turbulent,pb)) error_keps(nom,pb.que_suis_je());
+}
+
 void Source_Transport_VEF_Face_base::verifier_milieu_anisotherme(const Probleme_base& pb, const Nom& nom)
 {
   const Milieu_base& milieu = pb.equation(1).milieu(); // eq thermique
@@ -97,6 +105,13 @@ void Source_Transport_VEF_Face_base::verifier_milieu_concen(const Probleme_base&
 {
   const Milieu_base& milieu = pb.equation(0).milieu(); // XXX : Attention pas eq 1 car Constituant derive pas de Fluide_base ! donc eq hydro
   if (pb.nombre_d_equations()<2) error_keps(nom,pb.que_suis_je());
+  if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
+}
+
+void Source_Transport_VEF_Face_base::verifier_milieu_anisotherme_concen(const Probleme_base& pb, const Nom& nom)
+{
+  const Milieu_base& milieu = pb.equation(1).milieu(); // eq thermique
+  if (pb.nombre_d_equations()<3) error_keps(nom,pb.que_suis_je());
   if (sub_type(Fluide_Dilatable_base,ref_cast(Fluide_base,milieu))) error_keps(nom,milieu.que_suis_je());
 }
 
@@ -126,6 +141,17 @@ void Source_Transport_VEF_Face_base::associer_pb_concen(const Probleme_base& pb)
   beta_c = fluide.beta_c();
   gravite = fluide.gravite();
   eq_concentration = ref_cast(Convection_Diffusion_Concentration,pb.equation(1));
+}
+
+void Source_Transport_VEF_Face_base::associer_pb_anisotherme_concen(const Probleme_base& pb)
+{
+  const Fluide_base& fluide = ref_cast(Fluide_base,pb.equation(1).milieu()); // a partir de l'eq thermique
+  verifier_beta_concen(fluide);
+  beta_t = fluide.beta_t();
+  beta_c = fluide.beta_c();
+  gravite = fluide.gravite();
+  eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
+  eq_concentration = ref_cast(Convection_Diffusion_Concentration,pb.equation(2));
 }
 
 void Source_Transport_VEF_Face_base::verifier_beta_concen(const Fluide_base& fluide)
@@ -244,3 +270,26 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
   fill_resu_concen(G,volumes_entrelaces,resu); // voir les classes filles
   return resu;
 }
+
+DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab& resu) const
+{
+  // on ajoute directement G
+  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF, eq_thermique->zone_Cl_dis().valeur());
+  const Zone_Cl_VEF& zcl_VEF_co = ref_cast(Zone_Cl_VEF, eq_concentration->zone_Cl_dis().valeur());
+  const DoubleTab& temper = eq_thermique->inconnue().valeurs(), &concen = eq_concentration->inconnue().valeurs();
+  const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
+  DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs());
+  double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
+  alpha_turb /= rhocp;
+  const DoubleVect& g = gravite->valeurs(), &volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
+  const Champ_Don& ch_beta_temper = beta_t.valeur(), &ch_beta_concen = beta_c.valeur();
+  const int nb_face = la_zone_VEF->nb_faces(), nb_consti = eq_concentration->constituant().nb_constituants();
+  DoubleTrav P(nb_face), G_t(nb_face), G_c(nb_face);
+
+  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(), zcl_VEF_th, G_t, temper, alpha_turb, ch_beta_temper, g, 0);
+  calculer_terme_destruction_K_gen(la_zone_VEF.valeur(), zcl_VEF_co, G_c, concen, alpha_turb, ch_beta_concen, g, nb_consti);
+
+  fill_resu_anisotherme_concen(G_t, G_c, volumes_entrelaces,resu); // voir les classes filles
+  return resu;
+}
+
