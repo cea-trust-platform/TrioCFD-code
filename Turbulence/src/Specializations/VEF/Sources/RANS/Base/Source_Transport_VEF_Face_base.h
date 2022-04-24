@@ -49,7 +49,7 @@ public :
   DoubleTab& ajouter(DoubleTab& ) const override = 0; // XXX XXX XXX Elie Saikali : like that !!;
 
   inline void mettre_a_jour(double temps) override { Calcul_Production_K_VEF::mettre_a_jour(temps); }
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { return not_implemented<void>(__func__); }
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override { /* Do Nothing */ }
 
 protected :
   static constexpr double C1__ = 1.44, C2__ = 1.92, C3__ = 1.0; // Chabard et N3S

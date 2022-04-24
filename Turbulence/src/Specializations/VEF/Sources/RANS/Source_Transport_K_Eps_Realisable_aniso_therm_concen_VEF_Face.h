@@ -45,7 +45,7 @@ class Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face :
 
 public:
 
-  inline Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face(double cte2 = C2_DEFAULT,
+  inline Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face(double cte2 = C2__,
                                                                        double cte3 = C3_DEFAULT_KEPS_REALISABLE);
   void associer_pb(const Probleme_base& ) override;
   DoubleTab& ajouter(DoubleTab& ) const override;

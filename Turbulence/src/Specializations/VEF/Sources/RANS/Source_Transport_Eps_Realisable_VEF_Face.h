@@ -19,71 +19,36 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Transport_Eps_Realisable_VEF_Face_included
 #define Source_Transport_Eps_Realisable_VEF_Face_included
-
-
 
 #define C21_DEFAULT_KEPS_REALISABLE 1.9   //  Valeurs par defaut des constantes qui interviennent dans l'equation de k_esp
 #define C3_DEFAULT_KEPS_REALISABLE 1.0    // de transport de K et Eps source: Chabard de N3S
 
-//
-// .DESCRIPTION class Source_Transport_Eps_Realisable_VEF_Face
-//
-// .SECTION voir aussi
-
-#include <Source_Transport_K_Eps_VEF_Face.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Ref_Transport_Flux_Chaleur_Turbulente.h>
-#include <Modele_Fonc_Realisable_base.h>
-#include <Ref_Zone_dis.h>
-#include <Zone_Cl_dis.h>
+#include <Source_Transport_Realisable_VEF_Face_base.h>
 #include <Ref_Transport_K_ou_Eps_Realisable.h>
-#include <Ref_Convection_Diffusion_Temperature.h>
-#include <Ref_Convection_Diffusion_Concentration.h>
+#include <Transport_K_ou_Eps_Realisable.h>
 
-class Probleme_base;
-class Champ_Don_base;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-class Champ_Face;
-
-class Source_Transport_Eps_Realisable_VEF_Face : public Source_base,public Calcul_Production_K_VEF
-
-
+class Source_Transport_Eps_Realisable_VEF_Face : public Source_Transport_Realisable_VEF_Face_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_VEF_Face);
-
 public :
+  Source_Transport_Eps_Realisable_VEF_Face(double cte2 = C21_R__) : Source_Transport_Realisable_VEF_Face_base(cte2) { C2 = cte2; }
 
-  inline Source_Transport_Eps_Realisable_VEF_Face(double cte2 = C21_DEFAULT_KEPS_REALISABLE );
   DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-  inline Modele_Fonc_Realisable_base&  associe_modele_fonc();
-  inline const Modele_Fonc_Realisable_base&  associe_modele_fonc() const;
   void associer_pb(const Probleme_base& ) override;
   void mettre_a_jour(double temps) override;
-  void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
 protected :
+  REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea, eqn_eps_Rea;
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
-  double C2_;
-
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
-  REF(Transport_K_ou_Eps_Realisable) eqn_k_Rea;
-  REF(Transport_K_ou_Eps_Realisable) eqn_eps_Rea;
-  REF(Transport_Flux_Chaleur_Turbulente) eqn_flux_chaleur;
-  REF(Equation_base) eq_hydraulique;
-
+private:
+  const DoubleTab& get_visc_turb() const override;
+  const Modele_Fonc_Realisable_base& get_modele_fonc() const override;
+  void calculer_terme_production_real(const DoubleTab&, const DoubleTab&, DoubleTrav&) const override;
+  void fill_resu_real(const int, const DoubleVect&, const DoubleTrav&, const DoubleTab&, const DoubleTab&, const double, DoubleTab&) const override;
+  inline int get_size_k_eps() const override { return eqn_k_Rea->inconnue().valeurs().dimension(0); }
+  void fill_coeff_matrice(const int , const DoubleVect& , const DoubleVect& , const double , Matrice_Morse& ) const override;
 };
 
-
-inline Source_Transport_Eps_Realisable_VEF_Face::
-Source_Transport_Eps_Realisable_VEF_Face(double cte2)
-
-  : C2_(cte2) {}
-
-#endif
+#endif /* Source_Transport_Eps_Realisable_VEF_Face_included */

@@ -74,7 +74,7 @@ Entree& Source_Transport_K_Eps_Realisable_anisotherme_VEF_Face::readOn(Entree& i
         {
         case 0 :
           {
-            is >> C2_;
+            is >> C2;
             break;
           }
         case 1 :

@@ -76,7 +76,7 @@ Entree& Source_Transport_Eps_Realisable_aniso_therm_concen_VEF_Face::readOn(Entr
         {
         case 0 :
           {
-            is >> C2_;
+            is >> C2;
             break;
           }
         case 1 :

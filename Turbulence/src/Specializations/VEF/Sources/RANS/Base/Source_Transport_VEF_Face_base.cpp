@@ -118,7 +118,7 @@ void Source_Transport_VEF_Face_base::verifier_milieu_anisotherme_concen(const Pr
 void Source_Transport_VEF_Face_base::associer_zones(const Zone_dis& zone_dis, const Zone_Cl_dis& zone_Cl_dis)
 {
   la_zone_VEF = ref_cast(Zone_VEF, zone_dis.valeur());
-  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zone_Cl_dis.valeur()); // a voir si utile ...
+  la_zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zone_Cl_dis.valeur());
 }
 
 void Source_Transport_VEF_Face_base::associer_pb(const Probleme_base& pb)
