@@ -23,7 +23,7 @@
 #include <Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2.h>
 
 #include <Zone_PolyMAC_V2.h>
-#include <Zone_Cl_PolyMAC_V2.h>
+#include <Zone_Cl_PolyMAC.h>
 #include <Champ_P0_PolyMAC_V2.h>
 #include <Pb_Multiphase.h>
 #include <grad_Champ_Face_PolyMAC_V2.h>
@@ -79,7 +79,7 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::dimensionner_blocs
   int N = equation().inconnue().valeurs().line_size(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot() ;
 
   tau.init_grad(0);
-  IntTab& f_d = tau.fgrad_d, f_e = tau.fgrad_e;             // Tables used in zone_PolyMAC_V2::fgrad
+  const IntTab& fg_d = tau.fgrad_d, &fg_e = tau.fgrad_e, &e_f = zone.elem_faces();             // Tables used in zone_PolyMAC_V2::fgrad
 
 
   for (auto &&i_m : matrices) if (i_m.first == "tau")
@@ -88,18 +88,15 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::dimensionner_blocs
         IntTrav stencil(0, 2);
         stencil.set_smart_resize(1);
 
-        for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++) for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
-              {
-                int f = zone.vej(i);
-                for (int j = f_d(f); j < f_d(f+1) ; j++)
-                  {
-                    int ed = f_e(j);
-                    if ( ed < ne_tot) //contrib d'un element ; contrib d'un bord : pas de derivee
-                      {
-                        stencil.append_line(N * e + n, N * ed + n);
-                      }
-                  }
-              }
+        for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++) for (int i = 0, f; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+              for (int j = fg_d(f); j < fg_d(f+1) ; j++)
+                {
+                  int ed = fg_e(j);
+                  if ( ed < ne_tot) //contrib d'un element ; contrib d'un bord : pas de derivee
+                    {
+                      stencil.append_line(N * e + n, N * ed + n);
+                    }
+                }
         tableau_trier_retirer_doublons(stencil);
         Matrix_tools::allocate_morse_matrix(ne_tot, ne_tot, stencil, mat);
         i_m.second->nb_colonnes() ? *i_m.second += mat : *i_m.second = mat;
@@ -110,19 +107,19 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::dimensionner_blocs
 void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Zone_PolyMAC_V2&                      zone = ref_cast(Zone_PolyMAC_V2, equation().zone_dis().valeur());
-  const Zone_Cl_PolyMAC_V2&                    zcl = ref_cast(Zone_Cl_PolyMAC_V2, equation().zone_Cl_dis().valeur());
+  const Zone_Cl_PolyMAC&                    zcl = ref_cast(Zone_Cl_PolyMAC, equation().zone_Cl_dis().valeur());
   const Echelle_temporelle_turbulente&       eq = ref_cast(Echelle_temporelle_turbulente, equation());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, equation().probleme().equation(0));
   const Champ_P0_PolyMAC_V2&                   tau = ref_cast(Champ_P0_PolyMAC_V2, equation().inconnue().valeur());
   const DoubleTab&                      tab_tau = semi_impl.count("tau") ? tau.passe() : tau.valeurs();
   const DoubleTab&                tab_tau_passe = tau.passe();
 
-  const IntTab&                             fcl = tau.fcl();
+  const IntTab&                             fcl = tau.fcl(), &e_f = zone.elem_faces(), &f_e = zone.face_voisins();
   const Conds_lim&                          cls = zcl.les_conditions_limites();
   const Op_Diff_Turbulent_PolyMAC_V2_Elem& Op_diff_loc = ref_cast(Op_Diff_Turbulent_PolyMAC_V2_Elem, eq.operateur(0).l_op_base());
-  const DoubleTab&                       mu_tot = Op_diff_loc.nu();
+  const DoubleTab&                       mu_tot = Op_diff_loc.nu(), &xp = zone.xp(), &xv = zone.xv();
 
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
 
   int N = tab_tau.dimension(1), nf = zone.nb_faces(), ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), nf_tot = zone.nb_faces_tot(), D = dimension ;
 
@@ -133,7 +130,7 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::ajouter_blocs(matr
   if (Mtau) grad_1_sqrt_tau_dtau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
   if (f_grad_tau_fixe) tau.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   else tau.calc_grad(0); // Si on a des CAL qui evoluent avec les lois de paroi, on recalcule le fgrad a chaque pas de temps
-  IntTab& f_d = tau.fgrad_d, f_e = tau.fgrad_e;             // Tables used in zone_PolyMAC_V2::fgrad
+  const IntTab& fg_d = tau.fgrad_d, fg_e = tau.fgrad_e;             // Tables used in zone_PolyMAC_V2::fgrad
   DoubleTab f_w = tau.fgrad_w;
 
   // Calculation of grad of root of tau at faces
@@ -141,9 +138,9 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::ajouter_blocs(matr
   for (int f = 0; f < nf; f++) for (int n=0 ; n<N ; n++)
       {
         grad_sqrt_tau(f, n) = 0;
-        for (int j = f_d(f); j < f_d(f+1) ; j++)
+        for (int j = fg_d(f); j < fg_d(f+1) ; j++)
           {
-            int e = f_e(j);
+            int e = fg_e(j);
             int f_bord;
             if ( (f_bord = e-ne_tot) < 0) //contrib d'un element
               grad_sqrt_tau(f, n) += f_w(j) * std::sqrt(std::max(limiter_tau_, tab_tau_passe(e, n))) ; // Si implicite ou pas
@@ -159,9 +156,9 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::ajouter_blocs(matr
   if (Mtau) for (int f = 0; f < nf; f++) for (int n=0 ; n<N ; n++)
         {
           grad_1_sqrt_tau_dtau(f, n) = 0;
-          for (int j = f_d(f); j < f_d(f+1) ; j++)
+          for (int j = fg_d(f); j < fg_d(f+1) ; j++)
             {
-              int e = f_e(j);
+              int e = fg_e(j);
               int f_bord;
               if ( (f_bord = e-ne_tot) < 0) //contrib d'un element
                 grad_1_sqrt_tau_dtau(f, n) += f_w(j) * (tab_tau(e, n) - tab_tau_passe(e, n))/ std::sqrt(std::max(limiter_tau_, tab_tau_passe(e, n))) ; // Si implicite ou pas
@@ -171,25 +168,18 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::ajouter_blocs(matr
 
 
   // Calculation of grad of root of tau at elements ; same if implicit or explicit
-  zone.init_ve();
   for (int e = 0; e < ne_tot; e++) for (int n=0 ; n<N ; n++) for (int d = 0; d < D; d++)
         {
           grad_sqrt_tau(nf_tot + D*e+d, n) = 0;
-          for (int j = zone.ved(e); j < zone.ved(e + 1); j++)
-            {
-              int f = zone.vej(j);
-              grad_sqrt_tau(nf_tot + D*e+d, n) += zone.vec(j, d) * grad_sqrt_tau(f, n);
-            }
+          for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
+            grad_sqrt_tau(nf_tot + D*e+d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_sqrt_tau(f, n);
         }
 
   if (Mtau) for (int e = 0; e < ne_tot; e++) for (int n=0 ; n<N ; n++) for (int d = 0; d < D; d++)
           {
             grad_1_sqrt_tau_dtau(nf_tot + D*e+d, n) = 0;
-            for (int j = zone.ved(e); j < zone.ved(e + 1); j++)
-              {
-                int f = zone.vej(j);
-                grad_1_sqrt_tau_dtau(nf_tot + D*e+d, n) += zone.vec(j, d) * grad_1_sqrt_tau_dtau(f, n);
-              }
+            for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
+              grad_1_sqrt_tau_dtau(nf_tot + D*e+d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_1_sqrt_tau_dtau(f, n);
           }
 
   DoubleTrav sec_m(tab_tau); //residus
@@ -206,19 +196,16 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_V2::ajouter_blocs(matr
 
         if (Mtau)
           {
-            for (int i = zone.ved(e); i < zone.ved(e + 1); i++)
-              {
-                int f = zone.vej(i);
-                for (int j = f_d(f); j < f_d(f+1) ; j++)
-                  {
-                    int ed = f_e(j);
-                    if ( ed < ne_tot) for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
-                        {
-                          double inv_sqrt_tau = (tab_tau_passe(ed, n) > limiter_tau_) ? std::sqrt(1/tab_tau_passe(ed, n)) : std::sqrt(1/limiter_tau_);
-                          (*Mtau)(N * e + n, N * ed + n) += fac * 8  * mu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * zone.vec(i, d) * f_w(j) * inv_sqrt_tau ;
-                        }
-                  }
-              }
+            for (int i = 0, f; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+              for (int j = fg_d(f); j < fg_d(f+1) ; j++)
+                {
+                  int ed = fg_e(j);
+                  if ( ed < ne_tot) for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
+                      {
+                        double inv_sqrt_tau = (tab_tau_passe(ed, n) > limiter_tau_) ? std::sqrt(1/tab_tau_passe(ed, n)) : std::sqrt(1/limiter_tau_);
+                        (*Mtau)(N * e + n, N * ed + n) += fac * 8  * mu_tot(e, n) * grad_sqrt_tau(nf_tot + D*e+d, n) * (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * f_w(j) * inv_sqrt_tau ;
+                      }
+                }
           }
         secmem(e, n) += secmem_en;
 

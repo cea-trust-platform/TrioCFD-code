@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Variation_rho_Yao_Morel.h>
+#include <Variation_rho_Yao_Morel_PolyMAC_V2.h>
 #include <Pb_Multiphase.h>
 #include <Champ_P0_PolyMAC_V2.h>
 #include <Matrix_tools.h>

@@ -58,7 +58,7 @@ void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const // Renvo
 {
   const DoubleTab& k = pb_->get_champ("k").passe(), &tau = pb_->get_champ("tau").passe(),
                    &nu = pb_->get_champ("viscosite_cinematique").passe(), &grad_u = pb_->get_champ("gradient_vitesse").passe();
-  ConstDoubleTab_parts p_gu(grad_u); //en CoviMAC, grad_u contient (nf.grad)u_i aux faces, puis (d_j u_i) aux elements
+  ConstDoubleTab_parts p_gu(grad_u); //en PolyMAC_V2, grad_u contient (nf.grad)u_i aux faces, puis (d_j u_i) aux elements
   int i, d, db, D = dimension, i_part = -1, n, N = nu.dimension(1), Nk = k.dimension(1);
   for (i = 0; i < p_gu.size(); i++) if (p_gu[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support que k
   if (i_part < 0) Process::exit("Viscosite_turbulente_k_tau : inconsistency between velocity gradient and k!");

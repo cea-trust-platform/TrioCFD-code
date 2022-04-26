@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Force_Tchen.h>
+#include <Force_Tchen_PolyMAC_V2.h>
 #include <Pb_Multiphase.h>
 #include <Champ_Face_PolyMAC_V2.h>
 #include <Op_Grad_PolyMAC_V2_Face.h>

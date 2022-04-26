@@ -26,7 +26,7 @@
 #include <Pb_Multiphase.h>
 #include <Domaine_dis.h>
 #include <Zone_VF.h>
-#include <Op_Diff_CoviMAC_base.h>
+#include <Op_Diff_PolyMAC_base.h>
 
 #include <math.h>
 
@@ -57,7 +57,7 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
   const double y = corr_loi_paroi.get_y(f);
   const double u_tau = corr_loi_paroi.get_utau(f);
   int e = ref_cast(Zone_VF, pb_->domaine_dis().zone_dis(0).valeur()).face_voisins()(f,0);
-  const DoubleTab& diffu_th = ref_cast(Op_Diff_CoviMAC_base, pb_->equation(2).operateur(0).l_op_base()).nu();
+  const DoubleTab& diffu_th = ref_cast(Op_Diff_PolyMAC_base, pb_->equation(2).operateur(0).l_op_base()).nu();
 
   double theta_plus = calc_theta_plus(y, u_tau, mu[0], lambda[0], rho[0], Cp[0], D_h),
          fac = alpha[0] *rho[0] *Cp[0] * u_tau / theta_plus   *   1./(1-rho[0]*Cp[0]*y/ diffu_th(e, 0) * u_tau/theta_plus);

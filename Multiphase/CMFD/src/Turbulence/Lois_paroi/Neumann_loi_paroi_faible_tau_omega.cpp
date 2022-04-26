@@ -30,12 +30,12 @@
 #include <Frontiere.h>
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
-#include <Zone_CoviMAC.h>
+#include <Zone_VF.h>
 #include <Operateur_Diff_base.h>
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
-#include <Op_Diff_CoviMAC_base.h>
-#include <Op_Diff_Tau_CoviMAC_Elem.h>
+#include <Op_Diff_PolyMAC_base.h>
+#include <Op_Diff_Tau_PolyMAC_V2_Elem.h>
 
 #include <math.h>
 
@@ -112,11 +112,11 @@ void Neumann_loi_paroi_faible_tau_omega::mettre_a_jour(double tps)
 void Neumann_loi_paroi_faible_tau_omega::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  const Zone_CoviMAC& zone = ref_cast(Zone_CoviMAC, zone_Cl_dis().equation().zone_dis().valeur());
+  const Zone_VF& zone = ref_cast(Zone_VF, zone_Cl_dis().equation().zone_dis().valeur());
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab& visc_c  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = ref_cast(Op_Diff_CoviMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
+  const DoubleTab&      mu = ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size() ;
@@ -127,8 +127,8 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
 
   if (is_tau_ == 1)
     {
-      if (!sub_type(Op_Diff_Tau_CoviMAC_Elem, zone_Cl_dis().equation().operateur(0).l_op_base())) Cerr << "Neumann_loi_paroi_faible_tau : the tau diffusion operator must be Op_Diff_Tau_CoviMAC_Elem !";
-      double limiter = ref_cast(Op_Diff_Tau_CoviMAC_Elem, zone_Cl_dis().equation().operateur(0).l_op_base()).limiter_tau();
+      if (!sub_type(Op_Diff_Tau_PolyMAC_V2_Elem, zone_Cl_dis().equation().operateur(0).l_op_base())) Cerr << "Neumann_loi_paroi_faible_tau : the tau diffusion operator must be Op_Diff_Tau_PolyMAC_V2_Elem !";
+      double limiter = ref_cast(Op_Diff_Tau_PolyMAC_V2_Elem, zone_Cl_dis().equation().operateur(0).l_op_base()).limiter_tau();
       const DoubleTab& tau = zone_Cl_dis().equation().inconnue().passe();
       for (int f =0 ; f < nf ; f++)
         {

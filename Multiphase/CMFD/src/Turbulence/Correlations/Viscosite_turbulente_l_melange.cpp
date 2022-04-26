@@ -25,7 +25,7 @@
 #include <Pb_Multiphase.h>
 #include <Noms.h>
 #include <Motcle.h>
-#include <CoviMAC_discretisation.h>
+#include <PolyMAC_V2_discretisation.h>
 
 Implemente_instanciable(Viscosite_turbulente_l_melange, "Viscosite_turbulente_l_melange", Viscosite_turbulente_base);
 

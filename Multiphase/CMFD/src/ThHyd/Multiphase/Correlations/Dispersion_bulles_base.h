@@ -22,7 +22,7 @@
 
 #ifndef Dispersion_bulles_base_included
 #define Dispersion_bulles_base_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Correlation_base.h>
 
 //////////////////////////////////////////////////////////////////////////////

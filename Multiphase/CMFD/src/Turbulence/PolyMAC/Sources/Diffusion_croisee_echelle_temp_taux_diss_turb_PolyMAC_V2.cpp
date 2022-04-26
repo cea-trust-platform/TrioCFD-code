@@ -22,7 +22,7 @@
 
 #include <Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_V2.h>
 #include <Zone_PolyMAC_V2.h>
-#include <Zone_Cl_PolyMAC_V2.h>
+#include <Zone_Cl_PolyMAC.h>
 #include <Champ_P0_PolyMAC_V2.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
@@ -97,10 +97,10 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_V2::ajouter_blocs(mat
 {
   const Zone_PolyMAC_V2& 		 zone 				= ref_cast(Zone_PolyMAC_V2, equation().zone_dis().valeur());
   const Champ_P0_PolyMAC_V2& 	ch_k 				= ref_cast(Champ_P0_PolyMAC_V2, equation().probleme().get_champ("k"));	// Champ k
-  const DoubleTab& 	  		k_passe				= ch_k.passe();
+  const DoubleTab& 	  		k_passe				= ch_k.passe(), &xp = zone.xp(), &xv = zone.xv();
   const Conds_lim&          cls_k 			= ch_k.zone_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
-  const IntTab&             fcl_k 			= ch_k.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
+  const IntTab&             fcl_k 			= ch_k.fcl(), &e_f = zone.elem_faces(), &f_e = zone.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes(), &fs = zone.face_surfaces();
 
   const Champ_P0_PolyMAC_V2& 	ch_diss 		= ref_cast(Champ_P0_PolyMAC_V2, equation().inconnue().valeur()); 		// Champ tau ou omega
   const DoubleTab& 			diss_passe			= ch_diss.passe();
@@ -174,16 +174,15 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_V2::ajouter_blocs(mat
   /* Calcul de grad(tau/omega).(grad k) */
 
   DoubleTrav grad_f_diss_dot_grad_f_k(nb_elem, N);
-  zone.init_ve();
   for (int n = 0; n < N; n++) for (int e = 0; e < nb_elem; e++)
       {
         grad_f_diss_dot_grad_f_k(e, n) = 0;
         std::vector<double> grad_diss(D), grad_k(D);
         for (int d = 0 ; d < D ; d++ ) {grad_diss[d] = 0 ;  grad_k[d] = 0;}
-        for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
+        for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++) for (int d = 0; d < D; d++)
             {
-              grad_diss[d] += zone.vec(j, d) * grad_f_diss(f, n);
-              grad_k[d]   += zone.vec(j, d) * grad_f_k(f, n);
+              grad_diss[d] += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_diss(f, n);
+              grad_k[d]   += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_k(f, n);
             }
         for (int d = 0 ; d < D ; d++) grad_f_diss_dot_grad_f_k(e, n) += grad_diss[d] * grad_k[d]; // produit scalaire
       }

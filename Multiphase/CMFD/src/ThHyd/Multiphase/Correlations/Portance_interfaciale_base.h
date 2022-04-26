@@ -22,7 +22,7 @@
 
 #ifndef Portance_interfaciale_base_included
 #define Portance_interfaciale_base_included
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Correlation_base.h>
 
 //////////////////////////////////////////////////////////////////////////////

@@ -22,7 +22,7 @@
 
 #include <Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_V2.h>
 #include <Zone_PolyMAC_V2.h>
-#include <Zone_Cl_PolyMAC_V2.h>
+#include <Zone_Cl_PolyMAC.h>
 #include <Champ_P0_PolyMAC_V2.h>
 #include <Equation_base.h>
 #include <Probleme_base.h>
@@ -89,7 +89,7 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_V2::ajoute
   const Conds_lim& 		   	cls_tau				= ch_tau.zone_Cl_dis().les_conditions_limites(); 	// conditions aux limites du champ tau
   const Conds_lim&          cls_k 				= ch_k.zone_Cl_dis().les_conditions_limites(); 		// conditions aux limites du champ k
   const IntTab&				fcl_tau 			= ch_tau.fcl(); // tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
-  const IntTab&             fcl_k 				= ch_k.fcl();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
+  const IntTab&             fcl_k 				= ch_k.fcl(), &e_f = zone.elem_faces(), &f_e = zone.face_voisins();	// tableaux utilitaires sur les CLs : fcl(f, .) = (type de la CL, no de la CL, indice dans la CL)
 
   const int Mt = tau_passe.dimension(1), nf = zone.nb_faces(), D = dimension, nb_elem = zone.nb_elem(), nb_elem_tot = zone.nb_elem() ;
   const int Ntau = tau_passe.line_size(), Np = equation().probleme().get_champ("pression").valeurs().line_size(), Na = equation().probleme().get_champ("alpha").valeurs().line_size(), Nt = equation().probleme().get_champ("temperature").valeurs().line_size();
@@ -100,8 +100,9 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_V2::ajoute
 
   DoubleTrav grad_f_tau(nf, Mt);
   ch_tau.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
-  IntTab& f_d_tau = ch_tau.fgrad_d, f_e_tau = ch_tau.fgrad_e; // Tables utilisees dans zone_PolyMAC_V2::fgrad pour le calcul du gradient
-  DoubleTab f_w_tau = ch_tau.fgrad_w;
+  const IntTab& f_d_tau = ch_tau.fgrad_d, &f_e_tau = ch_tau.fgrad_e; // Tables utilisees dans zone_PolyMAC_V2::fgrad pour le calcul du gradient
+  const DoubleTab& f_w_tau = ch_tau.fgrad_w, &xp = zone.xp(), &xv = zone.xv();
+  const DoubleVect& fs = zone.face_surfaces(), &ve = zone.volumes();
 
   for (int n = 0; n < Ntau; n++) for (int f = 0; f < nf; f++)
       {
@@ -127,8 +128,8 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_V2::ajoute
 
   DoubleTrav grad_f_k(nf, Mt);
   ch_k.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
-  IntTab& f_d_k = ch_k.fgrad_d, f_e_k = ch_k.fgrad_e;  // Tables utilisees dans zone_PolyMAC_V2::fgrad pour le calcul du gradient
-  DoubleTab f_w_k = ch_k.fgrad_w;
+  const IntTab& f_d_k = ch_k.fgrad_d, &f_e_k = ch_k.fgrad_e;  // Tables utilisees dans zone_PolyMAC_V2::fgrad pour le calcul du gradient
+  const DoubleTab& f_w_k = ch_k.fgrad_w;
 
   for (int n = 0; n < Ntau; n++) for (int f = 0; f < nf; f++)
       {
@@ -154,15 +155,14 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_V2::ajoute
 
   DoubleTrav grad_f_tau_dot_grad_f_k(0, Mt);
   MD_Vector_tools::creer_tableau_distribue(equation().probleme().get_champ("vitesse").valeurs().get_md_vector(), grad_f_tau_dot_grad_f_k); // on cree un tableau distribue de meme structure que la vitesse
-  zone.init_ve();
   for (int n = 0; n < Ntau; n++) for (int e = 0; e < nb_elem; e++)
       {
         grad_f_tau_dot_grad_f_k(e, n) = 0;
         std::vector<double> grad_tau(D), grad_k(D);
-        for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
+        for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++) for (int d = 0; d < D; d++)
             {
-              grad_tau[d] += zone.vec(j, d) * grad_f_tau(f, n);
-              grad_k[d]   += zone.vec(j, d) * grad_f_k(f, n);
+              grad_tau[d] += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_tau(f, n);
+              grad_k[d]   += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_k(f, n);
             }
         for (int d = 0 ; d < D ; d++) grad_f_tau_dot_grad_f_k(e, n) += grad_tau[d] * grad_k[d]; // produit scalaire
       }

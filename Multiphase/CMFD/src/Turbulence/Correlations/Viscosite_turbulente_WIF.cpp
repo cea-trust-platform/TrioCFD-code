@@ -51,7 +51,7 @@ void Viscosite_turbulente_WIF::eddy_viscosity(DoubleTab& nu_t) const
 void Viscosite_turbulente_WIF::reynolds_stress(DoubleTab& R_ij) const // Renvoie <u_i'u_j'>
 {
   const DoubleTab& tab_alpha = pb_->get_champ("alpha").passe(), &tab_u = pb_->get_champ("vitesse").passe();
-  ConstDoubleTab_parts p_u(tab_u); //en CoviMAC, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
+  ConstDoubleTab_parts p_u(tab_u); //en PolyMAC_V2, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
 
   int i, d, db, D = dimension, i_part = -1, N = tab_alpha.dimension(1);
   if (N!=2) Process::exit("Visocisty_turbulente_WIF is only coded for 2 phases");

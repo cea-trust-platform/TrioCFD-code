@@ -25,7 +25,7 @@
 #include <Zone_PolyMAC_V2.h>
 #include <Champ_Face_PolyMAC_V2.h>
 #include <Champ_P0_PolyMAC_V2.h>
-#include <Zone_Cl_PolyMAC_V2.h>
+#include <Zone_Cl_PolyMAC.h>
 #include <Array_tools.h>
 #include <Matrix_tools.h>
 #include <Pb_Multiphase.h>
@@ -93,9 +93,9 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
   const Champ_Face_PolyMAC_V2& ch = ref_cast(Champ_Face_PolyMAC_V2, equation().inconnue().valeur());
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : NULL;
   const Zone_PolyMAC_V2& zone = ref_cast(Zone_PolyMAC_V2, equation().zone_dis().valeur());
-  const IntTab& f_e = zone.face_voisins(), fcl = ch.fcl();
-  const DoubleVect& pe = zone.porosite_elem(), &pf = zone.porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces();
-  const DoubleTab& vf_dir = zone.volumes_entrelaces_dir();
+  const IntTab& f_e = zone.face_voisins(), &fcl = ch.fcl(), &e_f = zone.elem_faces();
+  const DoubleVect& pe = zone.porosite_elem(), &pf = zone.porosite_face(), &ve = zone.volumes(), &vf = zone.volumes_entrelaces(), &fs = zone.face_surfaces();
+  const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &xp = zone.xp(), &xv = zone.xv();
   const DoubleTab& inco = ch.valeurs(), &pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                     &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
@@ -121,7 +121,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
 
   /* calculaiton of the gradient of alpha at the face */
   const Champ_P0_PolyMAC_V2& ch_a = ref_cast(Champ_P0_PolyMAC_V2, ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue());
-  DoubleTrav grad_f_a(equation().inconnue());
+  DoubleTrav grad_f_a(equation().inconnue().valeurs());
   ch_a.init_grad(0);
   const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables utilisees dans zone_PolyMAC_V2::fgrad pour le calcul du gradient
   const DoubleTab& fg_w = ch_a.fgrad_w;
@@ -147,13 +147,9 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
       }
 
   /* Calcul du grad aux elems */
-  zone.init_ve();
   for (int n = 0; n < N; n++) for (int e = 0; e < ne_tot; e++)
-      {
-        for (int j = zone.ved(e); j < zone.ved(e + 1); j++) for (int f = zone.vej(j), d = 0; d < D; d++)
-            grad_f_a(nf_tot + D*e +d, n) += zone.vec(j, d) * grad_f_a(f, n);
-      }
-
+      for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++) for (int d = 0; d < D; d++)
+          grad_f_a(nf_tot + D*e +d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_a(f, n);
 
   /* faces */
   for (int f = 0; f < nf; f++) if (fcl(f, 0) < 2)

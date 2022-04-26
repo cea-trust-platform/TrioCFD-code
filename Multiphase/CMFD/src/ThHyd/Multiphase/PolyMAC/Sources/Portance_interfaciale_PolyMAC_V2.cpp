@@ -25,7 +25,7 @@
 #include <Zone_PolyMAC_V2.h>
 #include <Champ_Face_PolyMAC_V2.h>
 #include <Op_Grad_PolyMAC_V2_Face.h>
-#include <Zone_Cl_PolyMAC_V2.h>
+#include <Zone_Cl_PolyMAC.h>
 #include <Array_tools.h>
 #include <Matrix_tools.h>
 #include <Pb_Multiphase.h>
