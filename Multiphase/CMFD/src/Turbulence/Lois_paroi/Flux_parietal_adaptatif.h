@@ -29,37 +29,11 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Flux_parietal_base
-//      correlations de flux parietal de la forme
-//        flux de chaleur sensible : q_{p}(k)     = F(alpha_f, p, T_f, T_p, v_f, D_h, D_ch)
-//        flux de chaleur latente  : q_{pi}(k, l) = F(alpha_f, p, T_f, T_p, v_f, D_h, D_ch)
-//          (par ex ebullition nucleee : Gamma_{kl} = q_{pi}(k, l) / Lvap)
-//      cette classe definit deux fonctions q_pk, q_pi avec :
-//    entrees :
-//        N : nombre de phases
-//        f : numero de la face de bord
-//        D_h, D_ch -> diametre hyd, diametre hyd chauffant
-//        alpha[n]  -> taux de presence de la phase n
-//        T[n]      -> temperature de la phase n
-//        p         -> pression
-//        v[n]      -> norme de la vitesse de la phase n
-//        Tp        -> temperature de la paroi (une seule!)
-//        lambda[n], mu[n], rho[n], Cp[n] -> diverses proprietes physiques de la phase n
+//    classe Flux_parietal_adaptatif
+//      classe qui implemente une correlation de flux parietal monophasique
+//      pour un ecoulement turbulent avec une loi de paroi adaptative
+//      (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
 //
-//    sorties :
-//           qpk[n]         -> flux de chaleur vers la phase n
-//        da_qpk[N * n + m] -> derivee par rapport a alpha_m
-//        dp_qpk[n]         -> derivee par rapport a p
-//        dv_qpk[N * n + m] -> derivee par rapport a v[m]
-//       dTf_qpk[N * n + m] -> derivee par rapport a T[m]
-//       dTp_qpk[n]         -> derivee par rapport a Tp
-//           qpi[N * k + l]           -> flux de chaleur fourni au changement de la phase k vers la phase l (a remplir pour k < l)
-//        da_qpi[N * (N * k + l) + m] -> derivee par rapport a alpha_m
-//        dp_qpi[N * k + l]           -> derivee par rapport a p
-//        dv_qpi[N * k + l]           -> derivee par rapport a v[m]
-//       dTf_qpi[N * (N * k + l) + m] -> derivee par rapport a T[m]
-//       dTp_qpi[N * k + l]           -> derivee par rapport a Tp
-//      nonlinear                     -> regler a 1 si q_pk / q_pi est non-lineaire en Tp / Tf; ne pas toucher sinon
 //////////////////////////////////////////////////////////////////////////////
 
 class Flux_parietal_adaptatif : public Flux_parietal_base
@@ -69,8 +43,8 @@ public:
   virtual void qp(int N, int f, double D_h, double D_ch,
                   const double *alpha, const double *T, const double p, const double *v, const double Tp,
                   const double *lambda, const double *mu, const double *rho, const double *Cp,
-                  double *qpk, double *da_qpk, double *dp_qpk, double *dv_qpk, double *dTf_qpk, double *dTp_qpk,
-                  double *qpi, double *da_qpi, double *dp_qpi, double *dv_qpi, double *dTf_qpi, double *dTp_qpi, int& nonlinear) const override;
+                  DoubleTab *qpk, DoubleTab *da_qpk, DoubleTab *dp_qpk, DoubleTab *dv_qpk, DoubleTab *dTf_qpk, DoubleTab *dTp_qpk,
+                  DoubleTab *qpi, DoubleTab *da_qpi, DoubleTab *dp_qpi, DoubleTab *dv_qpi, DoubleTab *dTf_qpi, DoubleTab *dTp_qpi, int& nonlinear) const override;
 
   virtual void completer() override;
 

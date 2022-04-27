@@ -50,8 +50,8 @@ void Flux_parietal_adaptatif::completer()
 void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
                                  const double *alpha, const double *T, const double p, const double *v, const double Tp,
                                  const double *lambda, const double *mu, const double *rho, const double *Cp,
-                                 double *qpk, double *da_qpk, double *dp_qpk, double *dv_qpk, double *dTf_qpk, double *dTp_qpk,
-                                 double *qpi, double *da_qpi, double *dp_qpi, double *dv_qpi, double *dTf_qpi, double *dTp_qpi, int& nonlinear) const
+                                 DoubleTab *qpk, DoubleTab *da_qpk, DoubleTab *dp_qpk, DoubleTab *dv_qpk, DoubleTab *dTf_qpk, DoubleTab *dTp_qpk,
+                                 DoubleTab *qpi, DoubleTab *da_qpi, DoubleTab *dp_qpi, DoubleTab *dv_qpi, DoubleTab *dTf_qpi, DoubleTab *dTp_qpi, int& nonlinear) const
 {
   const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const double y = corr_loi_paroi.get_y(f);
@@ -61,9 +61,9 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
 
   double theta_plus = calc_theta_plus(y, u_tau, mu[0], lambda[0], rho[0], Cp[0], D_h),
          fac = alpha[0] *rho[0] *Cp[0] * u_tau / theta_plus   *   1./(1-rho[0]*Cp[0]*y/ diffu_th(e, 0) * u_tau/theta_plus);
-  if (qpk) qpk[0] = fac * (Tp - T[0]);
-  if (dTf_qpk) dTf_qpk[0] = -fac;
-  if (dTp_qpk) dTp_qpk[0] = fac;
+  if (qpk) (*qpk)(0) = fac * (Tp - T[0]);
+  if (dTf_qpk) (*dTf_qpk)(0,0) = -fac;
+  if (dTp_qpk) (*dTp_qpk)(0)   = fac;
   return;
 }
 
