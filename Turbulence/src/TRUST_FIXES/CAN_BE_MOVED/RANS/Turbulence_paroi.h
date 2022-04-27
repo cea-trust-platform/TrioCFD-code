@@ -124,7 +124,7 @@ inline int Turbulence_paroi::init_lois_paroi()
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: int
+// Retour:
 //    Signification: code de retour propage
 //    Contraintes:
 // Exception:
@@ -145,7 +145,7 @@ inline void Turbulence_paroi::imprimer_ustar(Sortie& os) const
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: int
+// Retour:
 //    Signification: code de retour propage
 //    Contraintes:
 // Exception:
@@ -166,7 +166,7 @@ inline void Turbulence_paroi::imprimer_ustar_mean_only(Sortie& os, int boundarie
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: int
+// Retour:
 //    Signification: code de retour propage
 //    Contraintes:
 // Exception:

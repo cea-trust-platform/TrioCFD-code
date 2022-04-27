@@ -87,7 +87,7 @@ Entree& Modele_turbulence_scal_Schmidt::readOn(Entree& is )
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: Entree&
+// Retour:
 //    Signification: le flot d'entree
 //    Contraintes:
 // Exception:

@@ -202,7 +202,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces: entree/sortie
-// Retour: Entree&
+// Retour:
 //    Signification: le flot d'entree modifie
 //    Contraintes:
 // Exception:

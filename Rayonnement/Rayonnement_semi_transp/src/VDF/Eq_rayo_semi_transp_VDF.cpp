@@ -301,7 +301,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces: entree/sortie
-// Retour: Entree&
+// Retour:
 //    Signification: le flot d'entree modifie
 //    Contraintes:
 // Exception:
