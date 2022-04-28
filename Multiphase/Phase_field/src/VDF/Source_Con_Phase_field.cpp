@@ -760,7 +760,7 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -936,7 +936,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -974,7 +974,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1041,7 +1041,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1408,7 +1408,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1517,7 +1517,7 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1620,7 +1620,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1977,7 +1977,7 @@ l5:
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2018,7 +2018,7 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2109,7 +2109,7 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2206,7 +2206,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:

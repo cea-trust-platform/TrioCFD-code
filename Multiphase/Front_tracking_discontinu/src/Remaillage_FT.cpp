@@ -196,7 +196,7 @@ void Remaillage_FT::set_param(Param& p)
 //    Valeurs par defaut: NA
 //    Contraintes: NA
 //    Acces: lecture
-// Retour: Entree
+// Retour:
 //    Signification: le flot d'entree
 //    Contraintes:
 // Exception:

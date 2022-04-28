@@ -296,7 +296,7 @@ bool Schema_Phase_field::corriger_dt_calcule(double& dt) const
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: int
+// Retour:
 //    Signification: retourne toujours 1
 //    Contraintes:
 // Exception:
