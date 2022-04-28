@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -614,7 +614,9 @@ void Champ_P1NC::calcul_y_plus(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plu
     {
       const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
 
-      if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
+      if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
+           sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ||
+           la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           ndeb = le_bord.num_premiere_face();
@@ -924,9 +926,9 @@ void Champ_P1NC::calcul_h_conv(const Zone_Cl_VEF& zone_Cl_VEF, DoubleTab& h_conv
       // Selon les conditions limites
       if (sub_type(Echange_externe_impose,la_cl.valeur()))
         {
-          const Champ& rho = equation().milieu().masse_volumique();
+          const Champ_base& rho = equation().milieu().masse_volumique().valeur();
           const Champ_Don& Cp = equation().milieu().capacite_calorifique();
-          int rho_uniforme=(sub_type(Champ_Uniforme,rho.valeur()) ? 1:0);
+          int rho_uniforme=(sub_type(Champ_Uniforme,rho) ? 1:0);
           int cp_uniforme=(sub_type(Champ_Uniforme,Cp.valeur()) ? 1:0);
           for (int num_face=ndeb; num_face<nfin; num_face++)
             {
@@ -1158,7 +1160,8 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& gij, const DoubleTab& nu, 
       int nfin = ndeb + la_front_dis.nb_faces();
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
-          sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
+          sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ||
+          la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
         {
 
           for (fac=ndeb; fac<nfin ; fac++)
