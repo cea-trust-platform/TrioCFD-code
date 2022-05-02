@@ -91,7 +91,6 @@ void Loi_paroi_adaptative::mettre_a_jour(double temps)
   valeurs_loi_paroi_["u_tau"].echange_espace_virtuel();
 }
 
-
 void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
 {
   Zone_Poly_base& zone = ref_cast(Zone_Poly_base, pb_.valeur().domaine_dis().zone_dis(0).valeur());
@@ -128,6 +127,7 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
         d_u_p(f,n)= deriv_u_plus_de_y_plus(y_p(f, n));
       }
 }
+
 double Loi_paroi_adaptative::calc_u_tau_loc(double u_par, double nu, double y)
 {
   double eps = 1.e-6;

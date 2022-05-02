@@ -49,9 +49,6 @@ Entree& Dispersion_bulles_PolyMAC_V2::readOn(Entree& is)
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
-  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
-    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
-  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
 
   if (pbm->has_correlation("Dispersion_turbulente")) correlation_ = pbm->get_correlation("Dispersion_turbulente"); //correlation fournie par le bloc correlation
   else correlation_.typer_lire((*pbm), "Dispersion_turbulente", is); //sinon -> on la lit
@@ -115,7 +112,6 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
 
   int N = inco.line_size() , Np = press.line_size(), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),  cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
   DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), ddv(N, N, 4), ddv_c(4), nut_l(N), k_l(N), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
-  double dv_min = 0.;
 
   const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_.valeur());
 
@@ -161,7 +157,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
         mu_l = 0 ;
         d_b_l=0;
         sigma_l=0;
-        dv = dv_min, ddv = 0 ;
+        dv = 0, ddv = 0 ;
         int e;
         for (int c = 0; c < 2 && (e = f_e(f, c)) >= 0; c++)
           {
@@ -182,12 +178,11 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
                 {
                   double dv_c = ch.v_norm(pvit, pvit, e, f, k, l, NULL, &ddv_c(0));
                   int i ;
-                  if (dv_c > dv(k, l)) for (i = 0, dv(k, l) = dv_c; i < 4; i++) ddv(k, l, i) = ddv_c(i);
+                  for (i = 0, dv(k, l) = dv_c; i < 4; i++) ddv(k, l, i) = ddv_c(i);
                 }
           }
-        correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff);
+        correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff); // correlation identifies the liquid phase
 
-        /* contributions : on prend le max entre les deux cotes */
         for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) if (k != l)
               {
                 double fac = pf(f) * vf(f);
@@ -215,9 +210,8 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
               sigma_l(n,k) += sat.sigma_(temp(e,n),press(e,n * (Np > 1)));
             }
 
-      for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = std::max(ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0)), dv_min);
+      for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
       correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff);
-      for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) coeff(k, l, 1) *= (dv(k, l) > dv_min); //pas de derivee si dv < dv_min
 
       for (int d = 0, i = nf_tot + D * e; d < D; d++, i++) for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) if (k != l)
               {

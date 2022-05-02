@@ -53,9 +53,10 @@ public :
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
 
+  const Correlation& correlation() const {return correlation_;};
+
 private:
   Correlation correlation_; //correlation donnant le coeff de dispersion turbulente
-  int n_l = -1; //phase liquide
   int is_turb = 0;
 };
 
