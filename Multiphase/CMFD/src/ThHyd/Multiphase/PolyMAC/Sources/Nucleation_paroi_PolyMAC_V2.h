@@ -14,45 +14,40 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Flux_parietal_adaptatif.h
+// File:        Nucleation_paroi_PolyMAC_V2.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Flux_parietal_adaptatif_included
-#define Flux_parietal_adaptatif_included
-#include <TRUSTTab.h>
-#include <Flux_parietal_base.h>
-#include <Ref_Correlation.h>
+#ifndef Nucleation_paroi_PolyMAC_V2_included
+#define Nucleation_paroi_PolyMAC_V2_included
+#include <Source_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Flux_parietal_adaptatif
-//      classe qui implemente une correlation de flux parietal monophasique
-//      pour un ecoulement turbulent avec une loi de paroi adaptative
-//      (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
-//
+//    classe Nucleation_paroi_PolyMAC_V2
+//      forme pi * d_nuc**2 * N_nuc
 //////////////////////////////////////////////////////////////////////////////
 
-class Flux_parietal_adaptatif : public Flux_parietal_base
+class Nucleation_paroi_PolyMAC_V2: public Source_base
 {
-  Declare_instanciable(Flux_parietal_adaptatif);
-public:
-  virtual void qp(int N, int f, double D_h, double D_ch,
-                  const double *alpha, const double *T, const double p, const double *v, const double Tp,
-                  const double *lambda, const double *mu, const double *rho, const double *Cp,
-                  DoubleTab *qpk, DoubleTab *da_qpk, DoubleTab *dp_qpk, DoubleTab *dv_qpk, DoubleTab *dTf_qpk, DoubleTab *dTp_qpk,
-                  DoubleTab *qpi, DoubleTab *da_qpi, DoubleTab *dp_qpi, DoubleTab *dv_qpi, DoubleTab *dTf_qpi, DoubleTab *dTp_qpi,
-                  DoubleTab *d_nuc, int& nonlinear) const override;
+  Declare_instanciable(Nucleation_paroi_PolyMAC_V2);
+public :
+  int has_interface_blocs() const override
+  {
+    return 1;
+  };
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void check_multiphase_compatibility() const override {}; //of course
 
-  virtual void completer() override;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
+protected:
 
-protected :
-  double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;
-
-  REF(Correlation) correlation_loi_paroi_;
 };
 
 #endif

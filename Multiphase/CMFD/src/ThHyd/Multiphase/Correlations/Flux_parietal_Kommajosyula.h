@@ -14,31 +14,32 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Flux_parietal_adaptatif.h
+// File:        Flux_parietal_Kommajosyula.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Flux_parietal_adaptatif_included
-#define Flux_parietal_adaptatif_included
+#ifndef Flux_parietal_Kommajosyula_included
+#define Flux_parietal_Kommajosyula_included
 #include <TRUSTTab.h>
 #include <Flux_parietal_base.h>
-#include <Ref_Correlation.h>
+#include <Correlation.h>
+#include <Param.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Flux_parietal_adaptatif
+//    classe Flux_parietal_Kommajosyula
 //      classe qui implemente une correlation de flux parietal monophasique
 //      pour un ecoulement turbulent avec une loi de paroi adaptative
 //      (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
-//
+//      cf page 123 de la these de Kommajosyula
 //////////////////////////////////////////////////////////////////////////////
 
-class Flux_parietal_adaptatif : public Flux_parietal_base
+class Flux_parietal_Kommajosyula : public Flux_parietal_base
 {
-  Declare_instanciable(Flux_parietal_adaptatif);
+  Declare_instanciable(Flux_parietal_Kommajosyula);
 public:
   virtual void qp(int N, int f, double D_h, double D_ch,
                   const double *alpha, const double *T, const double p, const double *v, const double Tp,
@@ -49,10 +50,15 @@ public:
 
   virtual void completer() override;
 
-protected :
-  double calc_theta_plus(double y, double u_tau, double mu, double lambda, double rho, double Cp, double Diam_hyd_) const;
+  int calculates_bubble_nucleation_diameter() const override {return 1;} ;
 
-  REF(Correlation) correlation_loi_paroi_;
+protected :
+  Correlation correlation_monophasique_;
+  double theta_ ; //contact angle on the surface
+  double molar_mass_ ; //contact angle on the surface
+
+  double Lambert_W_function(double x) const;
+  double Hibiki_Ishii_Site_density(double rho_v, double rho_l, double T_v, double T_l, double p, double Tp, double h_lv, double T_sat, double sigma, double theta, double molar_mass) const;
 };
 
 #endif

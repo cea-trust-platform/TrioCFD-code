@@ -51,7 +51,8 @@ void Flux_parietal_adaptatif::qp(int N, int f, double D_h, double D_ch,
                                  const double *alpha, const double *T, const double p, const double *v, const double Tp,
                                  const double *lambda, const double *mu, const double *rho, const double *Cp,
                                  DoubleTab *qpk, DoubleTab *da_qpk, DoubleTab *dp_qpk, DoubleTab *dv_qpk, DoubleTab *dTf_qpk, DoubleTab *dTp_qpk,
-                                 DoubleTab *qpi, DoubleTab *da_qpi, DoubleTab *dp_qpi, DoubleTab *dv_qpi, DoubleTab *dTf_qpi, DoubleTab *dTp_qpi, int& nonlinear) const
+                                 DoubleTab *qpi, DoubleTab *da_qpi, DoubleTab *dp_qpi, DoubleTab *dv_qpi, DoubleTab *dTf_qpi, DoubleTab *dTp_qpi,
+                                 DoubleTab *d_nuc, int& nonlinear) const
 {
   const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const double y = corr_loi_paroi.get_y(f);
