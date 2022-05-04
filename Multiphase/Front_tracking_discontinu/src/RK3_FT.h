@@ -24,7 +24,7 @@
 #define RK3_FT_included
 
 #include <Deriv.h>
-#include <RK3.h>
+#include <Schema_RK_Williamson.h>
 #include <Vect_Ref_Probleme_base.h>
 #include <Probleme_Couple.h>
 
@@ -48,36 +48,11 @@
 //////////////////////////////////////////////////////////////////////////////
 class RK3_FT: public RK3
 {
-
   Declare_instanciable(RK3_FT);
 public :
-
-  ////////////////////////////////
-  //                            //
-  // Caracteristiques du schema //
-  //                            //
-  ////////////////////////////////
-
-  int nb_valeurs_temporelles() const override;
-  int nb_valeurs_futures() const override;
-  double temps_futur(int i) const override;
-  double temps_defaut() const override;
-
-  /////////////////////////////////////////
-  //                                     //
-  // Fin des caracteristiques du schema  //
-  //                                     //
-  /////////////////////////////////////////
-
   int faire_un_pas_de_temps_eqn_base(Equation_base&) override;
   bool iterateTimeStep(bool& converged) override;
-  inline void completer() override;
   int faire_un_pas_de_temps_pb_couple(Probleme_Couple&);
-
 };
 
-inline void RK3_FT::completer()
-{
-  /*   Cerr << "*** On passe dans Euler_Explicite::completer() ***" << finl; */
-}
 #endif
