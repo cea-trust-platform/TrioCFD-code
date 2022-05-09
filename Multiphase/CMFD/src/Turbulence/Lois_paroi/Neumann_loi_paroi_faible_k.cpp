@@ -31,6 +31,7 @@
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
 #include <Op_Diff_PolyMAC_base.h>
+#include <Op_Diff_PolyMAC_V2_base.h>
 #include <Zone_VF.h>
 #include <Energie_cinetique_turbulente.h>
 
@@ -111,7 +112,8 @@ void Neumann_loi_paroi_faible_k::me_calculer()
   const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab&  visc_c = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
-  const DoubleTab&      mu = ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
+  const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
+                             ref_cast(Op_Diff_PolyMAC_V2_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() ;
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size();
