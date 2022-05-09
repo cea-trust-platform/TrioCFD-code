@@ -50,8 +50,8 @@ Entree& Dispersion_bulles_PolyMAC_V2::readOn(Entree& is)
 
   if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
 
-  if (pbm->has_correlation("Dispersion_turbulente")) correlation_ = pbm->get_correlation("Dispersion_turbulente"); //correlation fournie par le bloc correlation
-  else correlation_.typer_lire((*pbm), "Dispersion_turbulente", is); //sinon -> on la lit
+  if (pbm->has_correlation("Dispersion_bulles")) correlation_ = pbm->get_correlation("Dispersion_bulles"); //correlation fournie par le bloc correlation
+  else correlation_.typer_lire((*pbm), "Dispersion_bulles", is); //sinon -> on la lit
 
   if sub_type(Op_Diff_Turbulent_PolyMAC_V2_Face, equation().operateur(0).l_op_base()) is_turb = 1;
 
@@ -95,7 +95,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
   const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &xp = zone.xp(), &xv = zone.xv();
   const DoubleTab& inco = ch.valeurs(), &pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                    &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
+                    &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
                      &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique().passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe();
@@ -110,13 +110,13 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
       ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_V2_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
     }
 
-  int N = inco.line_size() , Np = press.line_size(), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),  cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1);
-  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), ddv(N, N, 4), ddv_c(4), nut_l(N), k_l(N), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
+  int N = inco.line_size() , Np = press.line_size(), D = dimension, nf_tot = zone.nb_faces_tot(), nf = zone.nb_faces(), ne_tot = zone.nb_elem_tot(),  cR = (rho.dimension_tot(0) == 1), cM = (mu.dimension_tot(0) == 1), Nk = (k_turb) ? (*k_turb).dimension(1) : 1;
+  DoubleTrav a_l(N), p_l(N), T_l(N), rho_l(N), mu_l(N), sigma_l(N,N), dv(N, N), ddv(N, N, 4), ddv_c(4), nut_l(N), k_l(Nk), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
 
   const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_.valeur());
 
   /* calculaiton of the gradient of alpha at the face */
-  const Champ_P0_PolyMAC_V2& ch_a = ref_cast(Champ_P0_PolyMAC_V2, ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue());
+  const Champ_P0_PolyMAC_V2& ch_a = ref_cast(Champ_P0_PolyMAC_V2, ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().valeur());
   DoubleTrav grad_f_a(equation().inconnue().valeurs());
   ch_a.init_grad(0);
   const IntTab& fg_d = ch_a.fgrad_d, &fg_e = ch_a.fgrad_e;  // Tables utilisees dans zone_PolyMAC_V2::fgrad pour le calcul du gradient
@@ -167,7 +167,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
             for (int n = 0; n < N; n++) rho_l(n) += vf_dir(f, c)/vf(f) * rho(!cR * e, n);
             for (int n = 0; n < N; n++) mu_l(n)  += vf_dir(f, c)/vf(f) * mu(!cM * e, n);
             for (int n = 0; n < N; n++) nut_l(n) += is_turb    ? vf_dir(f, c)/vf(f) * nut(e,n) : 0;
-            for (int n = 0; n < N; n++) k_l  (n) += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,n) : 0;
+            for (int n = 0; n <Nk; n++) k_l(n)   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
             for (int n = 0; n < N; n++) d_b_l(n) += (d_bulles) ? vf_dir(f, c)/vf(f) * (*d_bulles)(e,n) : 0;
             for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
                   {
@@ -181,7 +181,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
                   for (i = 0, dv(k, l) = dv_c; i < 4; i++) ddv(k, l, i) = ddv_c(i);
                 }
           }
-        correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff); // correlation identifies the liquid phase
+        correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, d_b_l, dv, coeff); // correlation identifies the liquid phase
 
         for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) if (k != l)
               {
@@ -202,7 +202,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
       for (int n = 0; n < N; n++) rho_l(n) =   rho(!cR * e, n);
       for (int n = 0; n < N; n++) mu_l(n)  =    mu(!cM * e, n);
       for (int n = 0; n < N; n++) nut_l(n) += is_turb    ? nut(e,n) : 0;
-      for (int n = 0; n < N; n++) k_l  (n) += (k_turb)   ? (*k_turb)(e,n) : 0;
+      for (int n = 0; n <Nk; n++) k_l(n)   += (k_turb)   ? (*k_turb)(e,0) : 0;
       for (int n = 0; n < N; n++) d_b_l(n) += (d_bulles) ? (*d_bulles)(e,n) : 0;
       for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
             {
@@ -211,7 +211,7 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
             }
 
       for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
-      correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff);
+      correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, d_b_l, dv, coeff);
 
       for (int d = 0, i = nf_tot + D * e; d < D; d++, i++) for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) if (k != l)
               {

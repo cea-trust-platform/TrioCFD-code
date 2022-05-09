@@ -14,28 +14,28 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Force_Lubchenko_PolyMAC_V2.h
+// File:        Correction_Lubchenko_PolyMAC_V2.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Force_Lubchenko_PolyMAC_V2_included
-#define Force_Lubchenko_PolyMAC_V2_included
+#ifndef Correction_Lubchenko_PolyMAC_V2_included
+#define Correction_Lubchenko_PolyMAC_V2_included
 #include <Source_base.h>
 #include <Ref_Correlation.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Force_Lubchenko_PolyMAC_V2
-//      Force de répulsion en paroi de Lubchenko dans un ecoulement multiphase
+//    classe Correction_Lubchenko_PolyMAC_V2
+//      Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class Force_Lubchenko_PolyMAC_V2: public Source_base
+class Correction_Lubchenko_PolyMAC_V2: public Source_base
 {
-  Declare_instanciable(Force_Lubchenko_PolyMAC_V2);
+  Declare_instanciable(Correction_Lubchenko_PolyMAC_V2);
 public :
   int has_interface_blocs() const override
   {

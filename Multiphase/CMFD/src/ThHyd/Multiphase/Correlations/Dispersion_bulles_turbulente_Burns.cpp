@@ -26,7 +26,7 @@
 #include <Frottement_interfacial_base.h>
 #include <math.h>
 
-Implemente_instanciable(Dispersion_bulles_turbulente_Burns, "Dispersion_turbulente_Burns", Dispersion_bulles_base);
+Implemente_instanciable(Dispersion_bulles_turbulente_Burns, "Dispersion_bulles_turbulente_Burns", Dispersion_bulles_base);
 
 Sortie& Dispersion_bulles_turbulente_Burns::printOn(Sortie& os) const
 {
@@ -54,7 +54,7 @@ void Dispersion_bulles_turbulente_Burns::coefficient( const DoubleTab& alpha, co
                                                       const DoubleTab& nut, const DoubleTab& k_turb, const DoubleTab& d_bulles,
                                                       const DoubleTab& ndv, DoubleTab& coeff) const
 {
-  const Frottement_interfacial_base& corr = ref_cast(Frottement_interfacial_base, correlation_drag_);
+  const Frottement_interfacial_base& corr = ref_cast(Frottement_interfacial_base, correlation_drag_.valeur());
   int N = ndv.dimension(0);
 
   DoubleTrav coeff_drag(N, N, 2);

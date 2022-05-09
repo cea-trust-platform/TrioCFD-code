@@ -14,13 +14,13 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Force_Lubchenko_PolyMAC_V2.cpp
+// File:        Correction_Lubchenko_PolyMAC_V2.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Force_Lubchenko_PolyMAC_V2.h>
+#include <Correction_Lubchenko_PolyMAC_V2.h>
 #include <Pb_Multiphase.h>
 #include <Portance_interfaciale_PolyMAC_V2.h>
 #include <Portance_interfaciale_base.h>
@@ -34,14 +34,14 @@
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Force_Lubchenko_PolyMAC_V2, "Force_Lubchenko_PolyMAC_V2", Source_base);
+Implemente_instanciable(Correction_Lubchenko_PolyMAC_V2, "Correction_Lubchenko_Face_PolyMAC_V2", Source_base);
 
-Sortie& Force_Lubchenko_PolyMAC_V2::printOn(Sortie& os) const
+Sortie& Correction_Lubchenko_PolyMAC_V2::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Force_Lubchenko_PolyMAC_V2::readOn(Entree& is)
+Entree& Correction_Lubchenko_PolyMAC_V2::readOn(Entree& is)
 {
   //identification des phases
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
@@ -57,7 +57,7 @@ Entree& Force_Lubchenko_PolyMAC_V2::readOn(Entree& is)
   return is;
 }
 
-void Force_Lubchenko_PolyMAC_V2::completer() // We must wait for all readOn's to be sure that the bubble dispersion and lift correlations are created
+void Correction_Lubchenko_PolyMAC_V2::completer() // We must wait for all readOn's to be sure that the bubble dispersion and lift correlations are created
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
 
@@ -65,21 +65,21 @@ void Force_Lubchenko_PolyMAC_V2::completer() // We must wait for all readOn's to
     if sub_type(Portance_interfaciale_PolyMAC_V2, equation().sources()(i).valeur()) correlation_lift_ = ref_cast(Portance_interfaciale_PolyMAC_V2, equation().sources()(i).valeur()).correlation();
 
   for (int i = 0 ; i < equation().sources().size() ; i++)
-    if sub_type(Dispersion_bulles_PolyMAC_V2, equation().sources()(i).valeur()) correlation_dispersion_ = ref_cast(Portance_interfaciale_PolyMAC_V2, equation().sources()(i).valeur()).correlation();
+    if sub_type(Dispersion_bulles_PolyMAC_V2, equation().sources()(i).valeur()) correlation_dispersion_ = ref_cast(Dispersion_bulles_PolyMAC_V2, equation().sources()(i).valeur()).correlation();
 
-  if ( (!correlation_lift_.non_nul()) || (!correlation_dispersion_.non_nul()) ) Process::exit("Force_Lubchenko_PolyMAC_V2::completer() : a dispersion_bulles and a portance_interfaciale force must be defined !");
+  if ( (!correlation_lift_.non_nul()) || (!correlation_dispersion_.non_nul()) ) Process::exit("Correction_Lubchenko_PolyMAC_V2::completer() : a dispersion_bulles and a portance_interfaciale force must be defined !");
 
   if sub_type(Op_Diff_Turbulent_PolyMAC_V2_Face, equation().operateur(0).l_op_base()) is_turb = 1;
 
-  if (!pbm.has_champ("diametre_bulles")) Process::exit("Force_Lubchenko_PolyMAC_V2::completer() : a bubble diameter must be defined !");
+  if (!pbm.has_champ("diametre_bulles")) Process::exit("Correction_Lubchenko_PolyMAC_V2::completer() : a bubble diameter must be defined !");
 }
 
 
-void Force_Lubchenko_PolyMAC_V2::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const // The necessary dimensionner_bloc is taken care of in the dispersion_bulles_PolyMAC_V2 and Portance_interfaciale_PolyMAC_V2 functions
+void Correction_Lubchenko_PolyMAC_V2::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const // The necessary dimensionner_bloc is taken care of in the dispersion_bulles_PolyMAC_V2 and Portance_interfaciale_PolyMAC_V2 functions
 {
 }
 
-void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Correction_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Champ_Face_PolyMAC_V2& ch = ref_cast(Champ_Face_PolyMAC_V2, equation().inconnue().valeur());
   Matrice_Morse *mat = matrices.count(ch.le_nom().getString()) ? matrices.at(ch.le_nom().getString()) : NULL;
@@ -89,7 +89,7 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
   const DoubleTab& vf_dir = zone.volumes_entrelaces_dir(), &n_f = zone.face_normales();
   const DoubleTab& inco = ch.valeurs(), &pvit = ch.passe(),
                    &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                    &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
+                    &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
                      &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
                       &rho   = equation().milieu().masse_volumique().passe(),
                        &mu    = ref_cast(Fluide_base, equation().milieu()).viscosite_dynamique().passe(),
@@ -111,13 +111,14 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
   // Partie dispersion bulles de Lubchenko
 
   DoubleTab const * k_turb = (equation().probleme().has_champ("k")) ? &equation().probleme().get_champ("k").passe() : NULL ;
+  int  Nk = (k_turb) ? (*k_turb).dimension(1) : 1;
 
   DoubleTrav nut(mu); //viscosite turbulente
   if (is_turb) ref_cast(Viscosite_turbulente_base, ref_cast(Op_Diff_Turbulent_PolyMAC_V2_Face, equation().operateur(0).l_op_base()).correlation().valeur()).eddy_viscosity(nut); //remplissage par la correlation
 
-  const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_dispersion_.valeur());
+  const Dispersion_bulles_base& correlation_db = ref_cast(Dispersion_bulles_base, correlation_dispersion_->valeur());
 
-  DoubleTrav nut_l(N), k_l(N), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
+  DoubleTrav nut_l(N), k_l(1), d_b_l(N), coeff(N, N, 2); //arguments pour coeff
 
   // There is no need to calculate the gradient of alpha here
 
@@ -141,7 +142,7 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
             for (int n = 0; n < N; n++) rho_l(n) += vf_dir(f, c)/vf(f) * rho(!cR * e, n);
             for (int n = 0; n < N; n++) mu_l(n)  += vf_dir(f, c)/vf(f) * mu(!cM * e, n);
             for (int n = 0; n < N; n++) nut_l(n) += is_turb    ? vf_dir(f, c)/vf(f) * nut(e,n) : 0;
-            for (int n = 0; n < N; n++) k_l  (n) += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,n) : 0;
+            for (int n = 0; n <Nk; n++) k_l(n)   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
             for (int n = 0; n < N; n++) d_b_l(n) += vf_dir(f, c)/vf(f) * d_bulles(e,n) ;
             for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
                   {
@@ -155,7 +156,7 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
                   for (i = 0, dv(k, l) = dv_c; i < 4; i++) ddv(k, l, i) = ddv_c(i);
                 }
           }
-        correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff);
+        correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, d_b_l, dv, coeff);
 
         double sum_alphag_wall = 0 ;
         for (int k = 0; k<N ; k++) if (k!=n_l) sum_alphag_wall += (y_faces(f)<d_b_l(k)/2) ? a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) :0 ;
@@ -189,7 +190,7 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
       for (int n = 0; n < N; n++) rho_l(n) =   rho(!cR * e, n);
       for (int n = 0; n < N; n++) mu_l(n)  =    mu(!cM * e, n);
       for (int n = 0; n < N; n++) nut_l(n) += is_turb    ? nut(e,n) : 0;
-      for (int n = 0; n < N; n++) k_l  (n) += (k_turb)   ? (*k_turb)(e,n) : 0;
+      for (int n = 0; n <Nk; n++) k_l(n)   += (k_turb)   ? (*k_turb)(e,0) : 0;
       for (int n = 0; n < N; n++) d_b_l(n) += d_bulles(e,n) ;
       for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
             {
@@ -198,7 +199,7 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
             }
 
       for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
-      correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, dv, d_b_l, coeff);
+      correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, d_b_l, dv, coeff);
 
       double sum_alphag_wall = 0 ;
       for (int k = 0; k<N ; k++) if (k!=n_l) sum_alphag_wall += (y_elem(e)<d_b_l(k)/2) ? a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) :0 ;
@@ -225,7 +226,7 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
 
   // Partie portance interfaciale de Lubchenko
 
-  const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_lift_.valeur());
+  const Portance_interfaciale_base& correlation_pi = ref_cast(Portance_interfaciale_base, correlation_lift_->valeur());
 
   coeff.resize(N, N);
 
@@ -251,18 +252,17 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
         for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
         correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dv, e, coeff);
 
-        double fac_e = pe(e) * ve(e);
-
-        // Damping of the lift force close to the wall;
-        if (y_elem(e) < .5*d_bulles(e)) fac_e *= -1 ; // suppresses lift
-        if (y_elem(e) >    d_bulles(e)) fac_e *=  0 ; // no effect
-        else                            fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e)-2, 3)) - 1; // partial damping
-
-
         if (D==2)
           {
             for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
                 {
+                  double fac_e = pe(e) * ve(e);
+
+                  // Damping of the lift force close to the wall;
+                  if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
+                  if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
+                  else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
+
                   int i = nf_tot + D * e;
                   secmem(i, n_l) += fac_e * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
                   secmem(i,  k ) -= fac_e * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
@@ -270,23 +270,22 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
                   secmem(i+1, k )+= fac_e * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
                 } // 100% explicit
 
-            if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
+            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++) if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
 
-                for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
-                    {
-                      int c = (e == f_e(f,0)) ? 0 : 1 ;
-                      double fac_f = pf(f) * vf(f);
-                      double d_loc = (f_e(f, 1) != -1) ? d_bulles(f_e(f, 0), k)*vf_dir(f, 0)/vf(f) + d_bulles(f_e(f, 1), k)*vf_dir(f, 1)/vf(f) : d_bulles(f_e(f, 0), k);
-                      if (y_faces(e) < .5*d_loc) fac_f *= -1 ; // suppresses lift
-                      if (y_faces(e) >    d_loc) fac_f *=  0 ; // no effect
-                      else                       fac_f *= (3*std::pow(2*y_faces(f)/d_loc-2, 2) - 2*std::pow(2*y_faces(f)/d_loc-2, 3)) - 1; // partial damping
+                  for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
+                      {
+                        double fac_f = pf(f) * vf(f);  // Coherence with portance_interfaciale that calculates the correlation at the element
+                        if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
+                        if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
+                        else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
 
-                      int i = nf_tot + D * e;
-                      secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
-                      secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
-                      secmem(f, n_l) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
-                      secmem(f,  k ) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
-                    } // 100% explicit
+                        int c = (e == f_e(f, 0)) ? 0 : 1 ;
+                        int i = nf_tot + D * e;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, 0) ;
+                        secmem(f, n_l) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
+                        secmem(f,  k ) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
+                      } // 100% explicit
 
           }
 
@@ -294,6 +293,13 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
           {
             for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
                 {
+                  double fac_e = pe(e) * ve(e);
+
+                  // Damping of the lift force close to the wall;
+                  if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
+                  if (y_elem(e) >    d_bulles(e,k)) fac_e *=  0 ; // no effect
+                  else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
+
                   int i = nf_tot + D * e;
                   secmem(i, n_l) += fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
                   secmem(i,  k ) -= fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
@@ -303,25 +309,23 @@ void Force_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& s
                   secmem(i+2, k )-= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
                 } // 100% explicit
 
-            if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
-                for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
-                    {
-                      int c = (e == f_e(f,0)) ? 0 : 1 ;
-                      double fac_f = pf(f) * vf(f);
+            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++) if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
+                  for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
+                      {
+                        double fac_f = pf(f) * vf(f);
+                        if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
+                        if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
+                        else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
 
-                      double d_loc = (f_e(f, 1) != -1) ? d_bulles(f_e(f, 0), k)*vf_dir(f, 0)/vf(f) + d_bulles(f_e(f, 1), k)*vf_dir(f, 1)/vf(f) : d_bulles(f_e(f, 0), k);
-                      if (y_faces(e) < .5*d_loc) fac_f *= -1 ; // suppresses lift
-                      if (y_faces(e) >    d_loc) fac_f *=  0 ; // no effect
-                      else                       fac_f *= (3*std::pow(2*y_faces(f)/d_loc-2, 2) - 2*std::pow(2*y_faces(f)/d_loc-2, 3)) - 1; // partial damping
-
-                      int i = nf_tot + D * e;
-                      secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
-                      secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
-                      secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
-                      secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
-                      secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
-                      secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
-                    } // 100% explicit
+                        int c = (e == f_e(f, 0)) ? 0 : 1 ;
+                        int i = nf_tot + D * e;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                      } // 100% explicit
 
           }
 
