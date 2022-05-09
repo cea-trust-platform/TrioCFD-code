@@ -301,12 +301,12 @@ void Correction_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleT
                   else                              fac_e *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
 
                   int i = nf_tot + D * e;
-                  secmem(i, n_l) += fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
-                  secmem(i,  k ) -= fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
-                  secmem(i+1,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
-                  secmem(i+1, k )-= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
-                  secmem(i+2,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
-                  secmem(i+2, k )-= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                  secmem(i, n_l) += fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
+                  secmem(i,  k ) -= fac_e * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
+                  secmem(i+1,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
+                  secmem(i+1, k )-= fac_e * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
+                  secmem(i+2,n_l)+= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
+                  secmem(i+2, k )-= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
                 } // 100% explicit
 
             for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++) if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
@@ -319,12 +319,12 @@ void Correction_Lubchenko_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleT
 
                         int c = (e == f_e(f, 0)) ? 0 : 1 ;
                         int i = nf_tot + D * e;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 2, n_l) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 1, n_l)) ;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(D*e+ 0, n_l) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 2, n_l)) ;
-                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
-                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(D*e+ 1, n_l) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(D*e+ 0, n_l)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 0)/fs(f) * coeff(n_l, k) * ((pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 2) - (pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 1)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 1)/fs(f) * coeff(n_l, k) * ((pvit(i+2, k) -pvit(i+2, n_l)) * vort(e, n_l*D+ 0) - (pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 2)) ;
+                        secmem(f, n_l) += fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
+                        secmem(f,  k ) -= fac_f * vf_dir(f, c)/vf(f) * n_f(f, 2)/fs(f) * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
                       } // 100% explicit
 
           }
