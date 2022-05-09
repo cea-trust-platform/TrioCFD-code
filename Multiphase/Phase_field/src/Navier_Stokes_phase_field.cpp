@@ -612,14 +612,14 @@ int Navier_Stokes_phase_field::preparer_calcul()
 
   // Calcul de la masse volumique
   rho_.valeur().initialiser(schema_temps().temps_courant());
-  Cerr << " rho_"<< rho_<< finl;
-  Cerr << "valeur de rho_"<< rho_.valeur()<< finl;
-  Cerr << "valeur de rho_ valeurs"<< rho_.valeurs()<< finl;
+  //Cerr << " rho_"<< rho_<< finl;
+  //Cerr << "valeur de rho_"<< rho_.valeur()<< finl;
+  //Cerr << "valeur de rho_ valeurs"<< rho_.valeurs()<< finl;
 
   drhodc_.valeur().initialiser(schema_temps().temps_courant());
-  Cerr << " drhodc_"<< drhodc_<< finl;
-  Cerr << "valeur de rho_"<< drhodc_.valeur()<< finl;
-  Cerr << "valeur de rho_ valeurs"<< drhodc_.valeurs()<< finl;
+  //Cerr << " drhodc_"<< drhodc_<< finl;
+  //Cerr << "valeur de rho_"<< drhodc_.valeur()<< finl;
+  //Cerr << "valeur de rho_ valeurs"<< drhodc_.valeurs()<< finl;
 
   calculer_rho(true); // RLT: cette minitialisation etait incorrecte dans TrioCFD 1.8.0 car on utilisait c.futur()
   // Calcul de la viscosite dynamique dans le cas boussi_==0 et diff_boussi_==0

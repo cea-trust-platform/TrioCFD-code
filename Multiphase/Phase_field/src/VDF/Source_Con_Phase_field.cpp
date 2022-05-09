@@ -980,6 +980,30 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
             }
           opgrad.calculer(temp_F,prov_face);
 
+<<<<<<< HEAD
+      Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
+      // M*Grad(F)
+      //commente par mr264902 car inutile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
+      /*
+      int ndeb=zone_VDF.premiere_face_int();
+      int nbfaces=zone_VDF.nb_faces();
+      int el0,el1;
+      double cface,vol0,vol1;
+      Cerr <<"zone_VDF.premiere_face_int"<<ndeb<<finl;
+      Cerr <<"zone_VDF.nb_faces()"<<nbfaces<<finl;
+
+      for (int fac=ndeb; fac<nbfaces; fac++)
+        {
+          el0=face_voisins(fac,0);
+          el1=face_voisins(fac,1);
+          vol0=volumes(el0);
+          vol1=volumes(el1);
+          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+          prov_face(fac)=mobilite(cface)*prov_face(fac);
+        }
+      Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
+<<<<<<< HEAD
+=======
           Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
           // M*Grad(F)
           //commente par mr264902 (M*Grad(F) n'est pas utile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
@@ -1001,6 +1025,7 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
               prov_face(fac)=mobilite(cface)*prov_face(fac);
             }
           Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
+>>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
 
           //   int taille=prov_face.size();
           //   Cerr << "taille : " << taille << finl;
@@ -1009,6 +1034,8 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
           //       prov_face(i)*=mobilite(c(i));
           //     }
           //   Cerr << "Fin multiplication mobilite" << finl;
+=======
+>>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
 
 
           // Application solveur masse
@@ -1367,6 +1394,16 @@ void Source_Con_Phase_field::premier_demi_dt()
             {
               Cerr << "kappa variable not implemented yet (kappa_ind==1) "<<finl;
             }
+<<<<<<< HEAD
+          prov_elem = temp_prov_elem2;
+          Cerr << "kappaMatrix " << kappaMatrix<<finl;
+          Cerr << "kappaMatrix * laplacien(mutilde) " << prov_elem<<finl;
+
+<<<<<<< HEAD
+=======
+>>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
+=======
+>>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
         }
 
       // Pour equation Allen-Cahn (kappa constant)
