@@ -24,7 +24,6 @@
 #include <Pb_Multiphase.h>
 #include <Zone_VF.h>
 #include <TRUSTTrav.h>
-#include <CL_loi_paroi.h>
 #include <Cond_lim_base.h>
 #include <math.h>
 

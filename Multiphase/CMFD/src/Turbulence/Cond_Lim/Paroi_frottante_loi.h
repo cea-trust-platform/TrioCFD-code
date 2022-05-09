@@ -25,7 +25,7 @@
 
 #include <TRUSTTab.h>
 #include <Frottement_global_impose.h>
-#include <CL_loi_paroi.h>
+#include <Ref_Correlation.h>
 #include <Cond_lim_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
