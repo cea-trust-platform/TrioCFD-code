@@ -55,6 +55,7 @@ public :
 protected:
   double C_d_star_ ;
   double C_lambda_ = 2.7;
+  int n_l = -1 ;
 };
 
 #endif

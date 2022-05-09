@@ -25,7 +25,7 @@
 #include <Zone_PolyMAC_V2.h>
 #include <Champ_P0_PolyMAC_V2.h>
 #include <Matrix_tools.h>
-#include <Probleme_base.h>
+#include <Pb_Multiphase.h>
 #include <grad_Champ_Face_PolyMAC_V2.h>
 #include <Champ_Uniforme.h>
 #include <Flux_interfacial_base.h>
@@ -51,6 +51,14 @@ Entree& Production_WIT_PolyMAC_V2::readOn(Entree& is)
   param.ajouter("Reb_c", &Reb_c_);
   param.ajouter("g", &g_);
   param.lire_avec_accolades_depuis(is);
+
+  Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
+
+  if (!pbm || pbm->nb_phases() == 1) Process::exit(que_suis_je() + " : not needed for single-phase flow!");
+  for (int n = 0; n < pbm->nb_phases(); n++) //recherche de n_l, n_g : phase {liquide,gaz}_continu en priorite
+    if (pbm->nom_phase(n).debute_par("liquide") && (n_l < 0 || pbm->nom_phase(n).finit_par("continu")))  n_l = n;
+  if (n_l < 0) Process::exit(que_suis_je() + " : liquid phase not found!");
+
   return is;
 }
 
@@ -70,25 +78,17 @@ void Production_WIT_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab& se
 
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 
-  int N = equation().inconnue().valeurs().dimension(1), ne = zone.nb_elem(), D = dimension, i_part=-1 ;
-  if (N!=1) Process::exit("WIT is only in the liquid phase");
+  int Nk = equation().inconnue().valeurs().dimension(1), N = ref_cast(Pb_Multiphase, equation().probleme()).nb_phases(), ne = zone.nb_elem(), nf_tot = zone.nb_faces_tot(), D = dimension ;
+  if (Nk!=1) Process::exit("WIT is only in the liquid phase");
   if (D!=3) Process::exit("WIT is only coded for 3 dimensions");
 
-  ConstDoubleTab_parts p_u(vit); //en PolyMAC_V2, vit contient (nf.u) aux faces, puis (u_i) aux elements
-  for (int i = 0; i < p_u.size(); i++) if (p_u[i].get_md_vector() == nu.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
-  if (i_part < 0) Process::exit("Viscosite_turbulente_WIF : inconsistency between velocity and viscosity!");
-  const DoubleTab& u = p_u[i_part]; //le bon tableau
-  DoubleTrav u_r(u.dimension(0), 1);
-  for (int i = 0; i < u_r.dimension(0); i++)
-    {
-      for (int d = 0; d < D; d++) u_r(i, 0) += (u(i, d, 1) - u(i, d, 0))*(u(i, d, 1) - u(i, d, 0)); // relative speed = gas speed - liquid speed
-      u_r(i, 0) = std::sqrt(u_r(i, 0));
-    }
-
   // On calcule le second membre aux elements (implicite uniquement pour le moment)
-  for(int e = 0 ; e < ne ; e++)
-    {
-      double Reb = diam(e,0)*u_r(e, 0)/nu(e,0);
-      secmem(e, 0) += ve(e) * pe(e) * tab_alp(e, 0)* tab_rho(e, 0) * tab_alp(e, 1) *(tab_rho(e, 0)-tab_rho(e, 1))/tab_rho(e, 0)*g_*u_r(e,0) *(0.9 - exp(-Reb/Reb_c_));
-    }
+  for(int e = 0 ; e < ne ; e++) for (int k = 0 ; k<N ; k++) if (k!=n_l)
+        {
+          double u_r = 0;
+          for (int d = 0; d < D; d++) u_r += (vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l))*(vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l)); // relative speed = gas speed - liquid speed
+          u_r = std::sqrt(u_r);
+          double Reb = diam(e,k)*u_r/nu(e,n_l);
+          secmem(e, 0) += ve(e) * pe(e) * tab_alp(e, n_l)* tab_rho(e, n_l) * tab_alp(e, k) *(tab_rho(e, n_l)-tab_rho(e, k))/tab_rho(e, n_l)*g_*u_r*(0.9 - exp(-Reb/Reb_c_));
+        }
 }
