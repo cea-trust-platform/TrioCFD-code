@@ -14,14 +14,14 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Flux_interfacial_Ranz_Mashall.h
+// File:        Flux_interfacial_Ranz_Marshall.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Flux_interfacial_Ranz_Mashall_included
-#define Flux_interfacial_Ranz_Mashall_included
+#ifndef Flux_interfacial_Ranz_Marshall_included
+#define Flux_interfacial_Ranz_Marshall_included
 
 #include <Flux_interfacial_base.h>
 #include <TRUSTTabs_forward.h>
@@ -33,9 +33,9 @@
 //    Flux interfacial a coefficient constant par phase
 //////////////////////////////////////////////////////////////////////////////
 
-class Flux_interfacial_Ranz_Mashall : public Flux_interfacial_base
+class Flux_interfacial_Ranz_Marshall : public Flux_interfacial_base
 {
-  Declare_instanciable(Flux_interfacial_Ranz_Mashall);
+  Declare_instanciable(Flux_interfacial_Ranz_Marshall);
 public:
   void coeffs(const double dh, const double *alpha, const double *T, const double p, const double *nv,
               const double *lambda, const double *mu, const double *rho, const double *Cp, int e,
