@@ -14,25 +14,25 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Variation_rho_Yao_Morel.h
+// File:        Variation_rho.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Variation_rho_Yao_Morel_included
-#define Variation_rho_Yao_Morel_included
+#ifndef Variation_rho_included
+#define Variation_rho_included
 #include <Source_base.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
-//    classe Variation_rho_Yao_Morel
+//    classe Variation_rho
 //////////////////////////////////////////////////////////////////////////////
 
-class Variation_rho_Yao_Morel: public Source_base
+class Variation_rho: public Source_base
 {
-  Declare_instanciable(Variation_rho_Yao_Morel);
+  Declare_instanciable(Variation_rho);
 public :
   int has_interface_blocs() const override
   {

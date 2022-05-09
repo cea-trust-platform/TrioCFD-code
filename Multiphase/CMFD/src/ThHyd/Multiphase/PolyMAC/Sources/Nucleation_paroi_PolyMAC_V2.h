@@ -46,8 +46,9 @@ public :
   void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
   void associer_pb(const Probleme_base& ) override { };
   void mettre_a_jour(double temps) override { };
-protected:
 
+protected:
+  int n_l = -1 ; // liquid phase
 };
 
 #endif

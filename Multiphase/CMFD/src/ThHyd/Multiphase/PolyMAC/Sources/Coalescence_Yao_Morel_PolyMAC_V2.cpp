@@ -30,7 +30,7 @@
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Coalescence_Yao_Morel, "Coalescence_Yao_Morel_PolyMAC_V2", Source_base);
+Implemente_instanciable(Coalescence_Yao_Morel, "Coalescence_Yao_Morel_P0_PolyMAC_V2", Source_base);
 
 Sortie& Coalescence_Yao_Morel::printOn(Sortie& os) const
 {
@@ -47,20 +47,18 @@ void Coalescence_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs_t
   const Zone_PolyMAC_V2& zone = ref_cast(Zone_PolyMAC_V2, equation().zone_dis().valeur());
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
-  assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
   for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
         int nc = dep.dimension_tot(0),
-            M  = dep.line_size(),
-            n_l = 0 ; // phase porteuse
+            M  = dep.line_size();
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "alpha")
           for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, N * e + n);
         if (n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega") // N <= M
-          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e +n_l);
+          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) for (int n_l = 0; n_l < M; n_l++) sten.append_line(N * e + n, M * e +n_l);
         Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -72,10 +70,10 @@ void Coalescence_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
-                   &inco_p = equation().inconnue().passe() ,
+                   &d_bulles_p = equation().probleme().get_champ("diametre_bulles").passe(),
                     &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().valeurs(),
                      &alpha_p = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                      &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
+                      &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
                        &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
                         &rho   = equation().milieu().masse_volumique().passe(),
                          &nu = equation().probleme().get_champ("viscosite_cinematique").passe(),
@@ -100,7 +98,7 @@ void Coalescence_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
                   *Mk = matrices.count("k") ? matrices.at("k") : NULL,
                    *Mtau = matrices.count("tau") ? matrices.at("tau") : NULL,
                     *Momega = matrices.count("omega") ? matrices.at("omega") : NULL,
-                     *Mai = matrices.count("interfacialarea") ? matrices.at("interfacialarea") : NULL;
+                     *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : NULL;
 
   /* elements */
   int n_l = 0 ; // phase porteuse
@@ -110,8 +108,7 @@ void Coalescence_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
           {
             Interface_base& interface = milc.get_interface(n_l, k) ;
             double sigma = interface.sigma_(temp(e,n_l),press(e,n_l * (Np > 1)));
-            double d_S = 6 * alpha_p(e, k) / inco_p(e, k) ; //past
-            double We = 2 * rho(e, n_l) * std::pow(epsilon(e, n_l)*d_S, 2./3.) * d_S / sigma ;
+            double We = 2 * rho(e, n_l) * std::pow(epsilon(e, n_l)*d_bulles_p(e,k), 2./3.) * d_bulles_p(e,k) / sigma ;
             double g_alpha = (alpha_max_1_3 - std::pow(alpha_p(e,k), 1./3.) ) / alpha_max_1_3 ;
             double eps_loc ;
 

@@ -14,32 +14,32 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Variation_rho_Yao_Morel.cpp
+// File:        Variation_rho.cpp
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Variation_rho_Yao_Morel_PolyMAC_V2.h>
+#include <Variation_rho_PolyMAC_V2.h>
 #include <Pb_Multiphase.h>
 #include <Champ_P0_PolyMAC_V2.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Variation_rho_Yao_Morel, "Variation_rho_Yao_Morel_PolyMAC_V2", Source_base);
+Implemente_instanciable(Variation_rho, "Variation_rho_P0_PolyMAC_V2", Source_base);
 
-Sortie& Variation_rho_Yao_Morel::printOn(Sortie& os) const
+Sortie& Variation_rho::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Variation_rho_Yao_Morel::readOn(Entree& is)
+Entree& Variation_rho::readOn(Entree& is)
 {
   return is;
 }
 
-void Variation_rho_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Champ_base& ch_rho = equation().milieu().masse_volumique();
   const Champ_Inc_base *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL;
@@ -49,8 +49,7 @@ void Variation_rho_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs
   const Zone_PolyMAC_V2& zone = ref_cast(Zone_PolyMAC_V2, equation().zone_dis().valeur());
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
-  assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
-  for (auto &&n_m : matrices) if (n_m.first == "interfacialarea" || n_m.first == "temperature" || n_m.first == "pression")
+  for (auto &&n_m : matrices) if (n_m.first == "interfacial_area" || n_m.first == "temperature" || n_m.first == "pression")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -58,7 +57,7 @@ void Variation_rho_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs
             M  = dep.line_size();
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
-        if (n_m.first == "interfacialarea" || n_m.first == "temperature") // N <= M
+        if (n_m.first == "interfacial_area" || n_m.first == "temperature") // N <= M
           for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
         if (n_m.first == "pression" )
           for (int e = 0; e < ne; e++) for (int n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
@@ -67,7 +66,7 @@ void Variation_rho_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs
       }
 }
 
-void Variation_rho_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Champ_base& ch_rho = equation().milieu().masse_volumique();
   const Champ_Inc_base *pch_rho = sub_type(Champ_Inc_base, ch_rho) ? &ref_cast(Champ_Inc_base, ch_rho) : NULL;
@@ -88,7 +87,7 @@ void Variation_rho_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secm
 
   Matrice_Morse *Mp = matrices.count("pression")    ? matrices.at("pression")    : NULL,
                  *Mt = matrices.count("temperature") ? matrices.at("temperature") : NULL,
-                  *Mai = matrices.count("interfacialarea") ? matrices.at("interfacialarea") : NULL;
+                  *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : NULL;
 
   /* elements */
   int n_l = 0 ; // phase porteuse
@@ -98,7 +97,7 @@ void Variation_rho_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secm
           double fac = 2./3.*1/pas_tps * pe(e) * ve(e) ;
           secmem(e , k) += fac * inco(e, k) * ( 1 - rho_p(e, k)/rho(e, k));
           if (Mp) (*Mp)(N * e + k , e) -= fac * inco(e, k) * rho_p(e, k) * -dP_rho(e, k)/(rho(e, k)*rho(e, k));
-          if (Mt) (*Mp)(N * e + k , N * e + k) -= fac * inco(e, k) * rho_p(e, k) * -dT_rho(e, k)/(rho(e, k)*rho(e, k));
+          if (Mt) (*Mt)(N * e + k , N * e + k) -= fac * inco(e, k) * rho_p(e, k) * -dT_rho(e, k)/(rho(e, k)*rho(e, k));
           if (Mai)(*Mai)(N * e + k, N * e + k) -= fac * ( 1 - rho_p(e, k)/rho(e, k));
         }
 }

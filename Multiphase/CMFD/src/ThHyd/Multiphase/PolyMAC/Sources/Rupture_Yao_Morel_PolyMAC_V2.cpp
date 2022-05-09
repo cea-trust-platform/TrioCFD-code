@@ -30,7 +30,7 @@
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Rupture_Yao_Morel, "Rupture_Yao_Morel_PolyMAC_V2", Source_base);
+Implemente_instanciable(Rupture_Yao_Morel, "Rupture_Yao_Morel_P0_PolyMAC_V2", Source_base);
 
 Sortie& Rupture_Yao_Morel::printOn(Sortie& os) const
 {
@@ -47,8 +47,7 @@ void Rupture_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs_t& se
   const Zone_PolyMAC_V2& zone = ref_cast(Zone_PolyMAC_V2, equation().zone_dis().valeur());
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
-  assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
-  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "interfacialarea")
+  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "interfacial_area")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -58,7 +57,11 @@ void Rupture_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs_t& se
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "alpha")
-          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, N * e + n), sten.append_line(N * e + n, N * e + n_l);
+          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++)
+              {
+                sten.append_line(N * e + n, N * e + n_l);
+                if (n != n_l) sten.append_line(N * e + n, N * e + n);
+              }
         if (n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega") // N <= M
           for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e +n_l);
         Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
@@ -75,7 +78,7 @@ void Rupture_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, co
                    &inco_p = equation().inconnue().passe() ,
                     &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().valeurs(),
                      &alpha_p = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
-                      &press = ref_cast(QDM_Multiphase, equation()).pression().passe(),
+                      &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
                        &temp  = ref_cast(Pb_Multiphase, equation().probleme()).eq_energie.inconnue().passe(),
                         &rho   = equation().milieu().masse_volumique().passe(),
                          &nu = equation().probleme().get_champ("viscosite_cinematique").passe(),
@@ -100,7 +103,7 @@ void Rupture_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, co
                   *Mk = matrices.count("k") ? matrices.at("k") : NULL,
                    *Mtau = matrices.count("tau") ? matrices.at("tau") : NULL,
                     *Momega = matrices.count("omega") ? matrices.at("omega") : NULL,
-                     *Mai = matrices.count("interfacialarea") ? matrices.at("interfacialarea") : NULL;
+                     *Mai = matrices.count("interfacial_area") ? matrices.at("interfacial_area") : NULL;
 
   /* elements */
   int n_l = 0 ; // phase porteuse
