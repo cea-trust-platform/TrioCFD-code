@@ -135,11 +135,11 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_V2::ajouter_blocs(mat
             int e = f_e_tau(j);
             int f_bord;
             if ( (f_bord = e-nb_elem_tot) < 0) //contribution d'un element
-              grad_f_diss(f, n) += f_w_tau(j, n) * diss_passe(e, n);
+              grad_f_diss(f, n) += f_w_tau(j) * diss_passe(e, n);
             else if (fcl_diss(f_bord, 0) == 1 || fcl_diss(f_bord, 0) == 2) //Echange_impose_base
-              grad_f_diss(f, n) += (f_w_tau(j, n) ? f_w_tau(j, n) * ref_cast(Echange_impose_base, cls_diss[fcl_diss(f_bord, 1)].valeur()).T_ext(fcl_diss(f_bord, 2), n) : 0);
+              grad_f_diss(f, n) += (f_w_tau(j) ? f_w_tau(j, n) * ref_cast(Echange_impose_base, cls_diss[fcl_diss(f_bord, 1)].valeur()).T_ext(fcl_diss(f_bord, 2), n) : 0);
             else if (fcl_diss(f_bord, 0) == 4) //Neumann non homogene
-              grad_f_diss(f, n) += (f_w_tau(j, n) ? f_w_tau(j, n) * ref_cast(Neumann_paroi      , cls_diss[fcl_diss(f_bord, 1)].valeur()).flux_impose(fcl_diss(f_bord, 2), n) : 0);
+              grad_f_diss(f, n) += (f_w_tau(j) ? f_w_tau(j, n) * ref_cast(Neumann_paroi      , cls_diss[fcl_diss(f_bord, 1)].valeur()).flux_impose(fcl_diss(f_bord, 2), n) : 0);
             else if (fcl_diss(f_bord, 0) == 6) // Dirichlet
               grad_f_diss(f, n) += f_w_tau(j) * ref_cast(Dirichlet, cls_diss[fcl_diss(f_bord, 1)].valeur()).val_imp(fcl_diss(f_bord, 2), n);
           }
@@ -163,9 +163,9 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_V2::ajouter_blocs(mat
             if ( (f_bord = e-nb_elem_tot) < 0) //contribution d'un element
               grad_f_k(f, n) += f_w_k(j) * k_passe(e, n);
             else if (fcl_k(f_bord, 0) == 1 || fcl_k(f_bord, 0) == 2) //Echange_impose_base
-              grad_f_k(f, n) += (f_w_k(j, n) ? f_w_k(j, n) * ref_cast(Echange_impose_base, cls_k[fcl_k(f_bord, 1)].valeur()).T_ext(fcl_k(f_bord, 2), n) : 0);
+              grad_f_k(f, n) += (f_w_k(j) ? f_w_k(j, n) * ref_cast(Echange_impose_base, cls_k[fcl_k(f_bord, 1)].valeur()).T_ext(fcl_k(f_bord, 2), n) : 0);
             else if (fcl_k(f_bord, 0) == 4) //Neumann non homogene
-              grad_f_k(f, n) += (f_w_k(j, n) ? f_w_k(j, n) * ref_cast(Neumann_paroi      , cls_k[fcl_k(f_bord, 1)].valeur()).flux_impose(fcl_k(f_bord, 2), n) : 0);
+              grad_f_k(f, n) += (f_w_k(j) ? f_w_k(j, n) * ref_cast(Neumann_paroi      , cls_k[fcl_k(f_bord, 1)].valeur()).flux_impose(fcl_k(f_bord, 2), n) : 0);
             else if (fcl_k(f_bord, 0) == 6) // Dirichlet
               grad_f_k(f, n) += f_w_k(j) * ref_cast(Dirichlet, cls_k[fcl_k(f_bord, 1)].valeur()).val_imp(fcl_k(f_bord, 2), n);
           }

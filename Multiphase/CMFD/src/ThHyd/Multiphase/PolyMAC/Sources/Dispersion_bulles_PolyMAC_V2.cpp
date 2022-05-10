@@ -134,9 +134,9 @@ void Dispersion_bulles_PolyMAC_V2::ajouter_blocs(matrices_t matrices, DoubleTab&
             if ( (f_bord = e-ne_tot) < 0) //contribution d'un element
               grad_f_a(f, n) += fg_w(j) * alpha(e, n);
             else if (fcl_a(f_bord, 0) == 1 || fcl_a(f_bord, 0) == 2) //Echange_impose_base
-              grad_f_a(f, n) += (fg_w(j, n) ? fg_w(j, n) * ref_cast(Echange_impose_base, cls_a[fcl_a(f_bord, 1)].valeur()).T_ext(fcl_a(f_bord, 2), n) : 0);
+              grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Echange_impose_base, cls_a[fcl_a(f_bord, 1)].valeur()).T_ext(fcl_a(f_bord, 2), n) : 0;
             else if (fcl_a(f_bord, 0) == 4) //Neumann non homogene
-              grad_f_a(f, n) += (fg_w(j, n) ? fg_w(j, n) * ref_cast(Neumann_paroi      , cls_a[fcl_a(f_bord, 1)].valeur()).flux_impose(fcl_a(f_bord, 2), n) : 0);
+              grad_f_a(f, n) += fg_w(j) ? fg_w(j) * ref_cast(Neumann_paroi      , cls_a[fcl_a(f_bord, 1)].valeur()).flux_impose(fcl_a(f_bord, 2), n) : 0;
             else if (fcl_a(f_bord, 0) == 6) // Dirichlet
               grad_f_a(f, n) += fg_w(j) * ref_cast(Dirichlet, cls_a[fcl_a(f_bord, 1)].valeur()).val_imp(fcl_a(f_bord, 2), n);
           }

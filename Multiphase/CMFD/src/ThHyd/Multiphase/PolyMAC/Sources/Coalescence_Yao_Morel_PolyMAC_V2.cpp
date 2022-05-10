@@ -124,7 +124,7 @@ void Coalescence_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
             if (Mai)(*Mai)(N * e + k , N * e + k) -= - fac * std::pow(alpha(e, k), 1./3.) * 5./3. * std::pow(inco(e, k), 2./3.) * std::pow(eps_loc, 1./3.) ;
             if (Type_diss == "tau")
               {
-                if ((*tab_k)(e, k) * (*tau)(e, k) > limiter * nu(e, k)) // derivee en k ; depend de l'activation ou non du limiteur
+                if ((*tab_k)(e, n_l) * (*tau)(e, n_l) > limiter * nu(e, n_l)) // derivee en k ; depend de l'activation ou non du limiteur
                   {
                     if (Mk) (*Mk)(N * e + k, Nk * e + n_l)   -=
                         - fac * std::pow(alpha(e, k), 1./3.) * std::pow(inco(e, k), 5./3.) * 1./3. * std::pow((*tab_k)(e, n_l),-2./3.) /std::pow((*tau)(e, n_l), 1./3.);
