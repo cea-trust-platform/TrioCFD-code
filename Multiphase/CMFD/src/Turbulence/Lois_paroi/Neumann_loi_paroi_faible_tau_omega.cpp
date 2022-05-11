@@ -136,7 +136,7 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
         {
           int f_zone = f + f1; // number of the face in the zone
           int e_zone = f_e(f_zone,0);
-          valeurs_flux_(f, 0) = mu(e_zone, 0) * dy_tau(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)) / ((tau(e_zone,0) > limiter) ? limiter/(tau(e_zone,0)*tau(e_zone,0)) : 1/limiter); // flux de Neumann = -(-mu * dy_tau) car 1er - avec orientation face de bord et 2e car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
+          valeurs_flux_(f, 0) = - mu(e_zone, 0) * dy_tau(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)) / ((tau(e_zone,0) > limiter) ? limiter/(tau(e_zone,0)*tau(e_zone,0)) : 1/limiter); // flux de Neumann = -mu * dy_tau car flux selon - grad ; besoin de multiplier par tau**2 à cause de la forme partiucliere de la diffusion
         }
     }
   if (is_tau_ == 0)
@@ -145,7 +145,7 @@ void Neumann_loi_paroi_faible_tau_omega::me_calculer()
         {
           int f_zone = f + f1; // number of the face in the zone
           int e_zone = f_e(f_zone,0);
-          valeurs_flux_(f, 0) = mu(e_zone, 0) * dy_omega(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)); // flux de Neumann = -(-mu * dy_omega) car 1er - avec orientation face de bord et 2e car flux selon - grad
+          valeurs_flux_(f, 0) = - mu(e_zone, 0) * dy_omega(y(f_zone, 0), u_tau(f_zone, 0), visc_c(e_zone, 0)); // flux de Neumann = -mu * dy_omega car flux selon - grad
         }
     }
 

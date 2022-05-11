@@ -125,7 +125,7 @@ void Neumann_loi_paroi_faible_k::me_calculer()
     {
       int f_zone = f + f1; // number of the face in the zone
       int e_zone = f_e(f_zone,0);
-      valeurs_flux_(f, 0) = mu(e_zone, 0) * u_tau(f_zone, 0)*u_tau(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0) *calc_dyplus_kplus(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)); // flux de Neumann = -(-mu * dy_k) car 1er - avec orientation face de bord et 2e car flux selon - grad
+      valeurs_flux_(f, 0) = -mu(e_zone, 0) * u_tau(f_zone, 0)*u_tau(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0) *calc_dyplus_kplus(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)); // flux de Neumann = -mu * dy_k car flux selon - grad
     }
   for (int n =1 ; n < N ; n++) for (int f =0 ; f < nf ; f++)
       {
