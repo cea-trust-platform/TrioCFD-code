@@ -113,6 +113,7 @@ Read pb_etat
         }
 	Post_processing
 	{
+	  DeprecatedKeepDuplicatedProbes 1
    	  Probes
 		{
 		 U_H2 nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
