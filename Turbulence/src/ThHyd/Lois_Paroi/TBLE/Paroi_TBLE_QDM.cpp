@@ -271,13 +271,13 @@ int Paroi_TBLE_QDM::init_lois_paroi(const Zone_VF& zone_dis, const Zone_Cl_dis_b
   if (getPbBase().milieu().conductivite().non_nul() && sub_type(Champ_Fonc_Fonction,getPbBase().milieu().conductivite().valeur()))
     {
       lambda_fonction =1;
-      lambda_chaine=ref_cast(Champ_Fonc_Fonction,getPbBase().milieu().conductivite().valeur()).table().parser(0).getString().toChar();
+      lambda_chaine=ref_cast(Champ_Fonc_Fonction,getPbBase().milieu().conductivite().valeur()).table().parser(0).getString().c_str();
     }
   const Champ_base& mu=ref_cast(Fluide_base,getPbBase().milieu()).viscosite_dynamique().valeur();
   if (sub_type(Champ_Fonc_Fonction,mu))
     {
       mu_fonction =1;
-      mu_chaine=ref_cast(Champ_Fonc_Fonction,mu).table().parser(0).getString().toChar();
+      mu_chaine=ref_cast(Champ_Fonc_Fonction,mu).table().parser(0).getString().c_str();
     }
   // Choix entre MuLambda cte ou MuLambda fonctions de T
   if ((mu_fonction == 0) && (lambda_fonction == 0))

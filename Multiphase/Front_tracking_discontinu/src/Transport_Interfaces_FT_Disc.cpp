@@ -2137,7 +2137,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
 {
   const int dimension3 = (Objet_U::dimension==3);
   // Preparation des parsers...
-  String2 sx(expression_vitesse[0]);
+  std::string sx(expression_vitesse[0]);
   parser_x.setString(sx);
   parser_x.setNbVar(4);
   parser_x.addVar("x");
@@ -2148,7 +2148,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
   parser_x.setVar("z", 0.);
   parser_x.setVar("t", temps);
 
-  String2 sy(expression_vitesse[1]);
+  std::string sy(expression_vitesse[1]);
   parser_y.setString(sy);
   parser_y.setNbVar(4);
   parser_y.addVar("x");
@@ -2160,9 +2160,9 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
   parser_y.setVar("t", temps);
 
   Nom unused_expr("0");
-  String2 sz(dimension3
-             ? expression_vitesse[2]
-             : unused_expr /* inutilise */);
+  std::string sz(dimension3
+                 ? expression_vitesse[2]
+                 : unused_expr /* inutilise */);
 
   parser_z.setString(sz);
   parser_z.setNbVar(4);

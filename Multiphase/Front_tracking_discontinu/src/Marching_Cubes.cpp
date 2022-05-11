@@ -326,7 +326,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
       exit();
     }
 
-  String2 expr_chaine(expression);
+  std::string expr_chaine(expression);
   Parser parser(expr_chaine, dimension);
   parser.addVar("x");
   parser.addVar("y");
