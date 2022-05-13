@@ -32,7 +32,7 @@
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
 #include <Champ_Uniforme.h>
-#include <ConstDoubleTab_parts.h>
+#include <TRUSTTab_parts.h>
 #include <Champ_Inc_P0_base.h>
 
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps,"Modele_turbulence_hyd_K_Epsilon",Mod_turb_hyd_RANS);
