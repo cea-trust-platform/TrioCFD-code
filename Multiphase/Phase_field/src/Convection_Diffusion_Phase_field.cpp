@@ -162,6 +162,7 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
   // ont la meme structure que la concentration
 
   mutilde = inconnue().valeurs();
+  Cerr<<"mutilde initial"<<mutilde<<finl;
   mutilde = 0.;
   // si on traite une variable avec "dis." (voir discretiser()), l'operation "resize" est inutile car "dis." s'en charge.
   // En sequentiel : resize() autorise
@@ -181,7 +182,6 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
   Cerr<<" div_alpha_gradC : preparer_calcul = "<< div_alpha_gradC <<finl;
   Cerr<<" alpha_gradC_carre : preparer_calcul = "<< alpha_gradC_carre <<finl;
   Cerr<<" pression_thermo : preparer_calcul = "<< pression_thermo <<finl;
-
 
   sources().mettre_a_jour(schema_temps().temps_courant());
   return 1;

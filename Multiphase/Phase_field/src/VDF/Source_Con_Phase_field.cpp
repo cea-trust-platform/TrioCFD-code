@@ -114,22 +114,22 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
     }
   int cpt = 0;
   is >> motlu;
-  if (motlu!="systeme_binaire")
+  if (motlu!="systeme_naire")
     {
-      Cerr<<"Source_Con_Phase_field::readOn: We are expecting 'syteme_binaire' instead of " << motlu <<finl;
+      Cerr<<"Source_Con_Phase_field::readOn: We are expecting 'syteme_naire' instead of " << motlu <<finl;
       exit ();
     }
   else
     {
-      Motcle temp_systeme_binaire;
-      is >> temp_systeme_binaire;
-      if (temp_systeme_binaire=="oui")
+      Motcle temp_systeme_naire;
+      is >> temp_systeme_naire;
+      if (temp_systeme_naire=="non")
         {
-          type_systeme_binaire_=1;
+          type_systeme_naire_=0;
           is >> motlu;
           if (motlu!="{")
             {
-              Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after 'oui' instead of "<< motlu <<finl;
+              Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after 'non' instead of "<< motlu <<finl;
               exit();
             }
           is >>motlu;
@@ -260,7 +260,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                   }
                 default :
                   {
-                    Cerr << "Source_Con_Phase_field::readOn: Error while reading systeme_binaire" << finl;
+                    Cerr << "Source_Con_Phase_field::readOn: Error while reading systeme_naire" << finl;
                     Cerr << motlu << " is not understood."<< finl;
                     Cerr << "We are expecting a keyword among ";
                     for (int i=1; i<8; i++)
@@ -279,13 +279,13 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
 
             }
         }
-      else if (temp_systeme_binaire=="non")
+      else if (temp_systeme_naire=="oui")
         {
-          type_systeme_binaire_=0;
+          type_systeme_naire_=1;
           is >> motlu;
           if (motlu!="{")
             {
-              Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after 'non' instead of "<< motlu <<finl;
+              Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after 'oui' instead of "<< motlu <<finl;
               exit();
             }
           is >>motlu;
@@ -298,8 +298,6 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                 case 0:
                   {
                     cpt0++;
-                    //const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-                    //const int nb_comp =eq_c.constituant().nb_constituants();
                     is >> nb_equation_CH;
                     break;
                   }
@@ -384,7 +382,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                               case 0:
                                 {
                                   cpt1++;
-                                  DoubleVect temp_coeff_diffusion(nb_equation_CH+1); //define temp_alpha to avoid resize here
+                                  DoubleVect temp_coeff_diffusion(nb_equation_CH+1); //define temp_coeff_diffusion to avoid resize here
                                   coeff_auto_diffusion = temp_coeff_diffusion;
                                   for(int i=0; i< temp_coeff_diffusion.size(); i++)
                                     is >> coeff_auto_diffusion(i);
@@ -410,13 +408,10 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                                     exit();
                                   }
                               }
+                            is>> motlu;
                           }
-                        is >> motlu;
-                        //definir ici kappaMatrix mobilite en fonction de coeff auto diff et temperature ici
-                        //DoubleVect temp_kappa(nb_equation_CH*nb_equation_CH); //define temp_alpha to avoid resize here
-                        //kappaMatrix = temp_kappa;
-                        //for(int i=0; i< temp_kappa.size(); i++)
-                        //kappaMatrix(i)=D_k/RT avec R=8.314 pour gaz parfait.... remplir en fonction de coeff auto diffusion de taille nb_equCH+1
+                        //is >> motlu;
+                        kappaMatrix_func_c=&Source_Con_Phase_field::kappa_func_auto_diffusion;
                       }
                     else if (motlu=="non")
                       {
@@ -424,7 +419,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                         is >> motlu;
                         if (motlu!="{")
                           {
-                            Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after 'oui' instead of "<< motlu <<finl;
+                            Cerr<<"Source_Con_Phase_field::readOn: We are expecting { after 'non' instead of "<< motlu <<finl;
                             exit();
                           }
                         is >> motlu;
@@ -435,7 +430,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                               {
                               case 4:
                                 {
-                                  DoubleVect temp_kappa(nb_equation_CH*nb_equation_CH); //define temp_alpha to avoid resize here
+                                  DoubleVect temp_kappa(nb_equation_CH*nb_equation_CH); //define temp_kappa to avoid resize here
                                   kappaMatrix = temp_kappa;
                                   for(int i=0; i< temp_kappa.size(); i++)
                                     is >> kappaMatrix(i);
@@ -454,7 +449,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                       }
                     else
                       {
-                        Cerr << "Source_Con_Phase_field::readOn: Error while reading systeme_binaire" << finl;
+                        Cerr << "Source_Con_Phase_field::readOn: Error while reading systeme_naire" << finl;
                         Cerr << motlu << " is not understood."<< finl;
                         Cerr << "We are expecting a keyword among " << les_mots << finl;
                         exit();
@@ -595,25 +590,12 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
       Cerr << "You should specify all these parameters: " << les_mots << finl;
       exit();
     }
-  if (type_systeme_binaire_==0)
 
-    for (int i=0; i<nb_equation_CH; i++)
-      {
-        if (kappaMatrix(i)>0)
-          {
-            for (i=0; i<kappaMatrix.size(); i++)
-              {
-                Cerr <<" kappaMatrix ("<< i << ") = " << kappaMatrix(i)<<finl; //
-              }
-          }
-        Cerr <<" alpha " << alphaMatrix<<finl;
-      }
-  else if (type_systeme_binaire_==1)
+  if (type_systeme_naire_==0)
     if(kappa>0)
       {
         Cerr <<" theoretical time step = ?     dx4*"<< 1./alpha/kappa/2.<<" dx2*"<<1./2./kappa/beta<<finl;
       }
-  Cerr<<" alpha "<<alpha<<finl;
   return is ;
 
 }
@@ -666,7 +648,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
       Cerr<<"================================================="<<finl;
       exit();
     }
-  if (type_systeme_binaire_==1)
+  if (type_systeme_naire_==0)
     {
       if(type_kappa_==1)
         {
@@ -692,7 +674,7 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
         }
     }
 
-  if (type_systeme_binaire_==1)
+  if (type_systeme_naire_==0)
     {
       if(mult_kappa<=0)
         {
@@ -788,17 +770,18 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
     }
   Nom mobilite_variable;
   Nom moyenne_kappa;
-  if (type_systeme_binaire_==1)
-    {
-      if(type_kappa_==1)
-        {
-          mobilite_variable="oui";
-        }
-      else
-        {
-          mobilite_variable="non";
-        }
 
+  if(type_kappa_==1 || type_kappa_auto_diffusion_==1)
+    {
+      mobilite_variable="oui";
+    }
+  else
+    {
+      mobilite_variable="non";
+    }
+
+  if (type_systeme_naire_==0)
+    {
       if(kappa_moy_==0)
         {
           moyenne_kappa="arithmetique (+)";
@@ -840,15 +823,14 @@ void Source_Con_Phase_field::associer_pb(const Probleme_base& pb)
     }
   Cerr << "  - potentiel chimique generalise                   : " << mutilde_d << finl;
   Cerr << "  - couplage NS / CH via le potentiel chimique      : " << type_couplage << finl;
-  if (type_systeme_binaire_==1)
+
+  Cerr << "  - mobilite variable                               : " << mobilite_variable << finl;
+  if(type_kappa_==1)
     {
-      Cerr << "  - mobilite variable                               : " << mobilite_variable << finl;
-      if(type_kappa_==1)
-        {
-          Cerr << "  - type de moyenne pour la mobilite                : " << moyenne_kappa << finl;
-          Cerr << "  - multiplicateur de la mobilite                   : " << mult_kappa << finl;
-        }
+      Cerr << "  - type de moyenne pour la mobilite                : " << moyenne_kappa << finl;
+      Cerr << "  - multiplicateur de la mobilite                   : " << mult_kappa << finl;
     }
+
   if(implicitation_==1 && gmres_==0)
     {
       Cerr << "  - dans le cas du point fixe ... " << finl;
@@ -915,15 +897,15 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
-  if (type_systeme_binaire_==1)
-    {
-      DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
-      if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
-      prov_face=0.;
+  DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
+  if (prov_face.size()==0)
+    prov_face=eq_ns.inconnue().valeurs();
+  prov_face=0.;
+  resu=0.;
 
+  if (type_systeme_naire_==0)
+    {
       // Grad(F)
-      resu=0.;
       opgrad.calculer(F,prov_face);
       // M*Grad(F)
       int ndeb=zone_VDF.premiere_face_int();
@@ -952,22 +934,9 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
       // Div(M*Grad(F))
       opdiv.calculer(prov_face,resu);
     }
-  else if (type_systeme_binaire_==0)
+  else if (type_systeme_naire_==1)
     {
-      Cerr << "face_voisins"<<face_voisins<<finl;
-      Cerr << "volumes"<<volumes<<finl;
-
-      DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
-      if (prov_face.size()==0)
-        prov_face=eq_ns.inconnue().valeurs();
-      prov_face=0.;
-
-      Cerr << "prov_face_"<<prov_face_<<finl;
-      Cerr << "prov_face"<<prov_face<<finl;
-
-
       // Grad(F)
-      resu=0.;
       DoubleTab temp_resu(resu.dimension(0),1);
       temp_resu=0;
       DoubleTab temp_F(F.dimension(0),1);
@@ -979,154 +948,25 @@ DoubleTab& Source_Con_Phase_field::laplacien(const DoubleTab& F, DoubleTab& resu
               temp_F(i,0)=F(i,j);
             }
           opgrad.calculer(temp_F,prov_face);
-
-<<<<<<< HEAD
-      Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
-      // M*Grad(F)
-      //commente par mr264902 car inutile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
-      /*
-      int ndeb=zone_VDF.premiere_face_int();
-      int nbfaces=zone_VDF.nb_faces();
-      int el0,el1;
-      double cface,vol0,vol1;
-      Cerr <<"zone_VDF.premiere_face_int"<<ndeb<<finl;
-      Cerr <<"zone_VDF.nb_faces()"<<nbfaces<<finl;
-
-      for (int fac=ndeb; fac<nbfaces; fac++)
-        {
-          el0=face_voisins(fac,0);
-          el1=face_voisins(fac,1);
-          vol0=volumes(el0);
-          vol1=volumes(el1);
-          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
-          prov_face(fac)=mobilite(cface)*prov_face(fac);
-        }
-      Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
-<<<<<<< HEAD
-=======
           Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
-          // M*Grad(F)
-          //commente par mr264902 (M*Grad(F) n'est pas utile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
-
-          int ndeb=zone_VDF.premiere_face_int();
-          int nbfaces=zone_VDF.nb_faces();
-          int el0,el1;
-          double cface,vol0,vol1;
-          Cerr <<"zone_VDF.premiere_face_int"<<ndeb<<finl;
-          Cerr <<"zone_VDF.nb_faces()"<<nbfaces<<finl;
-
-          for (int fac=ndeb; fac<nbfaces; fac++)
-            {
-              el0=face_voisins(fac,0);
-              el1=face_voisins(fac,1);
-              vol0=volumes(el0);
-              vol1=volumes(el1);
-              cface=(vol0*c(el0,j)+vol1*c(el1,j))/(vol0+vol1);
-              prov_face(fac)=mobilite(cface)*prov_face(fac);
-            }
-          Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-
-          //   int taille=prov_face.size();
-          //   Cerr << "taille : " << taille << finl;
-          //   for (int i=0;i<taille;i++)
-          //     {
-          //       prov_face(i)*=mobilite(c(i));
-          //     }
-          //   Cerr << "Fin multiplication mobilite" << finl;
-=======
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
-
 
           // Application solveur masse
           eq_ns.solv_masse().appliquer(prov_face);
-
           Cerr <<"prov_face apres solv_mass"<<prov_face<<finl;
 
-
-          // Div(M*Grad(F))
-          // mr264902 ici ce n'est plus Div(M*Grad(F)) mais Div(Grad(F))
+          // Laplacien = Div(Grad(F))
           opdiv.calculer(prov_face,temp_resu);
           for (int i=0; i<temp_resu.dimension(0); i++)
             {
               resu(i,j)=temp_resu(i,0);
             }
         }
+
       Cerr <<"div(prov_face)"<<resu<<finl;
-
     }
-
-
-  /* {
-    Cerr << "face_voisins"<<face_voisins<<finl;
-    Cerr << "volumes"<<volumes<<finl;
-
-    DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
-    if (prov_face.size()==0)
-  	  prov_face=eq_ns.inconnue().valeurs();
-    prov_face=0.;
-
-    Cerr << "prov_face_"<<prov_face_<<finl;
-    Cerr << "prov_face"<<prov_face<<finl;
-
-
-    // Grad(F)
-    resu=0.;
-    opgrad.calculer(F,prov_face);
-
-    Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
-    // M*Grad(F)
-    //commente par mr264902 (M*Grad(F) n'est pas utile, d'autant plus que mobilite(c) donne toujours 1 selon la definition de la methode mobilite)
-
-         int ndeb=zone_VDF.premiere_face_int();
-         int nbfaces=zone_VDF.nb_faces();
-         int el0,el1;
-         double cface,vol0,vol1;
-         Cerr <<"zone_VDF.premiere_face_int"<<ndeb<<finl;
-         Cerr <<"zone_VDF.nb_faces()"<<nbfaces<<finl;
-
-         for (int fac=ndeb; fac<nbfaces; fac++)
-           {
-             el0=face_voisins(fac,0);
-             el1=face_voisins(fac,1);
-             vol0=volumes(el0);
-             vol1=volumes(el1);
-             cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
-             prov_face(fac)=mobilite(cface)*prov_face(fac);
-           }
-         Cerr <<"prov_face apres M*Grad(F)"<<prov_face<<finl;
-         Cerr <<"mobilite0"<<mobilite(0)<<finl;
-         Cerr <<"mobilite20"<<mobilite(20)<<finl;
-         Cerr <<"mobilite25"<<mobilite(25)<<finl;
-
-
-         //   int taille=prov_face.size();
-         //   Cerr << "taille : " << taille << finl;
-         //   for (int i=0;i<taille;i++)
-         //     {
-         //       prov_face(i)*=mobilite(c(i));
-         //     }
-         //   Cerr << "Fin multiplication mobilite" << finl;
-
-
-    // Application solveur masse
-    eq_ns.solv_masse().appliquer(prov_face);
-
-    Cerr <<"prov_face apres solv_mass"<<prov_face<<finl;
-
-
-    // Div(M*Grad(F))
-    // mr264902 ici ce n'est plus Div(M*Grad(F)) mais Div(Grad(F))
-    opdiv.calculer(prov_face,resu);
-    Cerr <<"div(prov_face)"<<resu<<finl;
-   }
-   */
-
-
   return resu;
 
 }
-
 
 DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const DoubleTab& kappa_var, DoubleTab& resu) const
 {
@@ -1136,40 +976,139 @@ DoubleTab& Source_Con_Phase_field::div_kappa_grad(const DoubleTab& F, const Doub
 
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
   const DoubleTab& c=eq_c.inconnue().valeurs();
+  const int nb_comp = eq_c.constituant().nb_constituants();
 
   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   const IntTab& face_voisins = zone_VDF.face_voisins();
   const DoubleVect& volumes = zone_VDF.volumes();
 
+
   DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
   if (prov_face.size()==0)
     prov_face=eq_ns.inconnue().valeurs();
   prov_face=0.;
-
   resu=0.;
 
-  // Grad(F)
-  opgrad.calculer(F,prov_face);
-  // M*Kappa*Grad(F)
-  int ndeb=zone_VDF.premiere_face_int();
-  int nbfaces=zone_VDF.nb_faces();
-  int el0,el1;
-  double cface,kappa_face,vol0,vol1;
-  for (int fac=ndeb; fac<nbfaces; fac++)
+  if (type_systeme_naire_==0)
     {
-      el0=face_voisins(fac,0);
-      el1=face_voisins(fac,1);
-      vol0=volumes(el0);
-      vol1=volumes(el1);
-      kappa_face=(vol0*kappa_var(el0)+vol1*kappa_var(el1))/(vol0+vol1);
-      cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
-      prov_face(fac)=kappa_face*mobilite(cface)*prov_face(fac);
-    }
-  // Application solveur masse (/M)
-  eq_ns.solv_masse().appliquer(prov_face);
+      // Grad(F)
+      opgrad.calculer(F,prov_face);
+      Cerr <<"prov_face"<<prov_face<<finl;
+      // M*Kappa*Grad(F)
+      int ndeb=zone_VDF.premiere_face_int();
+      int nbfaces=zone_VDF.nb_faces();
+      int el0,el1;
+      double cface,kappa_face,vol0,vol1;
 
-  // Div(Kappa*Grad(F))
-  opdiv.calculer(prov_face,resu);
+      for (int fac=ndeb; fac<nbfaces; fac++)
+        {
+          el0=face_voisins(fac,0);
+          el1=face_voisins(fac,1);
+          vol0=volumes(el0);
+          vol1=volumes(el1);
+          kappa_face=(vol0*kappa_var(el0)+vol1*kappa_var(el1))/(vol0+vol1);
+          cface=(vol0*c(el0)+vol1*c(el1))/(vol0+vol1);
+          prov_face(fac)=kappa_face*mobilite(cface)*prov_face(fac);
+        }
+
+      // Application solveur masse (/M)
+      eq_ns.solv_masse().appliquer(prov_face);
+
+      // Div(Kappa*Grad(F))
+      opdiv.calculer(prov_face,resu);
+
+    }
+  else if (type_systeme_naire_==1)
+    {
+      // Grad(F)
+      DoubleTab temp_resu(resu.dimension(0),1);
+      temp_resu=0;
+      DoubleTab temp_F(F.dimension(0),1);
+      DoubleTab temp_prov_face(prov_face.dimension(0),F.line_size());
+      for (int j=0; j<nb_comp; j++)
+        {
+          //prov_face=0.;
+          for (int i=0; i<temp_F.dimension(0); i++)
+            {
+              temp_F(i,0)=F(i,j);
+            }
+          opgrad.calculer(temp_F,prov_face);
+          Cerr <<"prov_face apres opgrad"<<prov_face<<finl;
+          for (int i=0; i<prov_face.dimension(0); i++)
+            {
+              temp_prov_face(i,j)=prov_face(i,0);
+            }
+          Cerr << "opgrads"<<temp_prov_face<<finl;
+        }
+      Cerr << "opgrad F"<<temp_prov_face<<finl;
+
+      // Determine kappa_face et cface (faces interieures)
+      int ndeb=zone_VDF.premiere_face_int();
+      int nbfaces=zone_VDF.nb_faces();
+      int el0,el1;
+      double vol0,vol1;
+      DoubleTab kappa_face(prov_face.dimension(0),nb_comp*nb_comp);
+      DoubleTab cface(prov_face.dimension(0),nb_comp);
+      for (int j=0; j<nb_comp*nb_comp; j++)
+        {
+          for (int fac=ndeb; fac<nbfaces; fac++)
+            {
+              el0=face_voisins(fac,0);
+              el1=face_voisins(fac,1);
+              vol0=volumes(el0);
+              vol1=volumes(el1);
+              // pour le calcul de kappa_face, soit on calcule kappa_face comme la moyenne des kappa entre voisins
+              kappa_face(fac,j)=(vol0*kappa_var(el0,j)+vol1*kappa_var(el1,j))/(vol0+vol1);
+              // pour le calcul de kappa_face, soit on calcule kappa_face sur les voisins comme kappa(c_face)
+              //              if (j<nb_comp)
+              //                {
+              //                  cface(fac,j)=(vol0*c(el0,j)+vol1*c(el1,j))/(vol0+vol1);
+              //                }
+//              	  	  	  R = 8.314;
+              //              kappa_face(fac,j) = 1/(R*temperature)*(this->*kappaMatrix_func_c)(cface(fac,j), coeff_auto_diffusion);
+
+
+            }
+        }
+      Cerr <<"kappa_face"<<kappa_face<<finl;
+      //      Cerr <<"cface"<<cface<<finl;
+
+      // kappa*Grad(F) - sur les faces
+      DoubleTab temp_prov_face2 = temp_prov_face;
+      temp_prov_face2 = 0;
+      for (int j=0; j<nb_comp; j++)
+        {
+          for (int i=0; i<prov_face.dimension(0); i++)
+            {
+              prov_face(i,0)=temp_prov_face(i,j);
+              for (int k=0; k<nb_comp; k++)
+                {
+                  temp_prov_face2(i,k)+=prov_face(i,0)*kappa_face(i,j+k*nb_comp);
+                }
+            }
+        }
+      Cerr <<"kappa*gradF"<<temp_prov_face2<<finl;
+
+      // Application solveur masse (/M)
+      eq_ns.solv_masse().appliquer(temp_prov_face2);
+      Cerr <<"kappa*gradF après solveur masse "<<temp_prov_face2<<finl;
+
+      // Div(Kappa*Grad(F))
+      for (int j=0; j<nb_comp; j++)
+        {
+          for (int i=0; i<prov_face.dimension(0); i++)
+            {
+              prov_face(i,0)=temp_prov_face2(i,j);
+            }
+          opdiv.calculer(prov_face,temp_resu);
+          for (int i=0; i<temp_resu.dimension(0); i++)
+            {
+              resu(i,j)=temp_resu(i,0);
+            }
+        }
+      Cerr <<"div(kappa*gradF) "<<resu<<finl;
+
+    }
 
   return resu;
 }
@@ -1225,7 +1164,6 @@ void Source_Con_Phase_field::premier_demi_dt()
   //calculer_div_alpha_rho_gradC(div_alpha_rho_gradC);
   //
   // ---
-
    */
   DoubleTab& div_alpha_gradC=eq_c.set_div_alpha_gradC();
   calculer_div_alpha_gradC(div_alpha_gradC);
@@ -1336,7 +1274,7 @@ void Source_Con_Phase_field::premier_demi_dt()
       if (prov_elem.size()==0)
         prov_elem=mutilde;
 
-      if (type_systeme_binaire_==1)
+      if (type_systeme_naire_==0)
         {
           if(kappa_ind==1)
             {
@@ -1347,16 +1285,16 @@ void Source_Con_Phase_field::premier_demi_dt()
               // Div(Kappa*Grad(mutilde))
               div_kappa_grad(mutilde, kappa_var, prov_elem);
             }
-          else
+          else if (kappa_ind==0)
             {
               // Kappa*Laplacien(mutilde)
               laplacien(mutilde,prov_elem);
               prov_elem*=kappa;
             }
         }
-      else if (type_systeme_binaire_==0)
+      else if (type_systeme_naire_==1)
         {
-          if (kappa_ind==0)
+          if (type_kappa_auto_diffusion_==0)
             {
               DoubleTab temp_mutilde(mutilde.dimension(0),1);
               DoubleTab temp_prov_elem= temp_mutilde;
@@ -1390,20 +1328,27 @@ void Source_Con_Phase_field::premier_demi_dt()
               Cerr << "kappaMatrix " << kappaMatrix<<finl;
               Cerr << "kappaMatrix * laplacien(mutilde) " << prov_elem<<finl;
             }
-          else
+          else if (type_kappa_auto_diffusion_==1)
             {
+
+              DoubleTab kappaMatrix_variable(prov_elem.dimension(0),c.line_size()*c.line_size());
+              //kappaMatrix_variable=0.;
+              kappaMatrix_variable = (this->*kappaMatrix_func_c)(c, coeff_auto_diffusion);
+              double R=8.314;
+              kappaMatrix_variable *= 1/(R*temperature);
+              Cerr <<"kappaMatrix_variable (1/RT)"<<kappaMatrix_variable<<finl;
+
+              //Div_kappa_grad à implementer pour cas n-aire
+              div_kappa_grad(mutilde, kappaMatrix_variable, prov_elem);
+
+              //for(int ikappa=0; ikappa<nb_elem; ikappa++)
+              //kappaMatrix_var(ikappa, 2, 0)=(this->*kappaMatrix_func_c)(c(ikappa));
+              // Div(Kappa*Grad(mutilde))
+              //div_kappa_grad(mutilde, kappa_var, prov_elem);
+              //(this->*kappa_func_c)(c(ikappa));
+              Cerr << "kappaMatrix degeneree"<<kappaMatrix_variable<<finl;
               Cerr << "kappa variable not implemented yet (kappa_ind==1) "<<finl;
             }
-<<<<<<< HEAD
-          prov_elem = temp_prov_elem2;
-          Cerr << "kappaMatrix " << kappaMatrix<<finl;
-          Cerr << "kappaMatrix * laplacien(mutilde) " << prov_elem<<finl;
-
-<<<<<<< HEAD
-=======
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-=======
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
         }
 
       // Pour equation Allen-Cahn (kappa constant)
@@ -1417,6 +1362,8 @@ void Source_Con_Phase_field::premier_demi_dt()
 
       // Utile pour pouvoir utiliser n'importe quel dt - voir Schema_Phase_Field
       c_demi=c;
+
+      Cerr <<"c_demi sd" << c_demi<< finl;
     }
   else
     {
@@ -1436,7 +1383,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
   const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
   const Operateur_Div& opdiv= eq_ns.operateur_divergence();
 
-  if (type_systeme_binaire_==1)
+  if (type_systeme_naire_==0)
     {
       DoubleTab& prov_face=ref_cast_non_const( DoubleTab, prov_face_);
       if (prov_face.size()==0)
@@ -1453,7 +1400,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
       opdiv.calculer(prov_face,div_alpha_gradC);
       eq_c.solv_masse().appliquer(div_alpha_gradC);
     }
-  else if (type_systeme_binaire_==0)
+  else if (type_systeme_naire_==1)
     {
       DoubleTab& temp_prov_face= ref_cast_non_const(DoubleTab,prov_face_);
       if (temp_prov_face.size()==0)
@@ -2471,7 +2418,7 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
   Cerr << "mutilde  = -div_alpha_gradC " << mutilde << finl;
 
 
-  if (type_systeme_binaire_==1)
+  if (type_systeme_naire_==0)
     {
       const int taille=mutilde.size();
       for (int i=0; i<taille; i++)
@@ -2484,7 +2431,7 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
         }
       Cerr << "beta "<< beta<< finl;
     }
-  else if (type_systeme_binaire_==0)
+  else if (type_systeme_naire_==1)
     {
       for (int j=0; j<mutilde.line_size(); j++)
         {

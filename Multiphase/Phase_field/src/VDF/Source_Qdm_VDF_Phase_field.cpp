@@ -171,7 +171,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   DoubleTab mutilde_NS;
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
-  int type_systeme_binaire = source_pf.get_type_systeme_binaire(); //si type_systeme_binaire = 0 ou 1
+  int type_systeme_naire = source_pf.get_type_systeme_naire(); //si type_systeme_naire = 0 ou 1
 
 
   const DoubleTab& mutilde=eq_c.get_mutilde_()->valeurs();
@@ -188,7 +188,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
     }
   // Dans le cas mutype_==1, on utilise mutilde_d dans CH, mais mutilde dans NS
 
-  if (type_systeme_binaire==1)
+  if (type_systeme_naire==0)
     {
       DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab,  grad_mutilde_);
       if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
@@ -218,32 +218,8 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
             }
         }
     }
-
-  else if (type_systeme_binaire==0)
+  else if (type_systeme_naire==1)
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab,  grad_mutilde_);
-      if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
-      grad_mutilde=0.;
-      const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
-      DoubleTab temp_mutilde_NS(mutilde_NS.dimension(0),1);
-      DoubleTab temp_resu = resu;
-
-      for (int i=0; i<nb_comp; i++)
-        {
-          temp_mutilde_NS=0;
-          Cerr <<"mutilde_NS.dimension(0) = "<<mutilde_NS.dimension(0)<<finl;
-          Cerr <<"temp_mutilde_NS.dimension(0) = "<<temp_mutilde_NS.dimension(0)<<finl;
-
-          for (int j=0; j<mutilde_NS.dimension(0); j++)
-            {
-              temp_mutilde_NS(j,0) = mutilde_NS(j,i);
-            }
-          Cerr <<"temp_mutilde_NS = "<<temp_mutilde_NS<<finl;
-          opgrad.calculer(temp_mutilde_NS,grad_mutilde);
-          Cerr <<"grad_mutilde = "<<grad_mutilde<<finl;
-=======
       ///// Kim2012 terme source somme c.Grad(mutilde)
       Cerr << "mutildeNS "<<mutilde_NS<<finl;
 
@@ -268,33 +244,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
           Cerr << "c " << c<<finl;
           // on interpole c et on calcule la source
           //------------------------------------------------
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-=======
-      DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab,  grad_mutilde_);
-      if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
-      grad_mutilde=0.;
-      const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
-      DoubleTab temp_mutilde_NS(mutilde_NS.dimension(0),1);
-      DoubleTab temp_resu = resu;
 
-      for (int i=0; i<nb_comp; i++)
-        {
-          temp_mutilde_NS=0;
-          Cerr <<"mutilde_NS.dimension(0) = "<<mutilde_NS.dimension(0)<<finl;
-          Cerr <<"temp_mutilde_NS.dimension(0) = "<<temp_mutilde_NS.dimension(0)<<finl;
-
-          for (int j=0; j<mutilde_NS.dimension(0); j++)
-            {
-              temp_mutilde_NS(j,0) = mutilde_NS(j,i);
-            }
-          Cerr <<"temp_mutilde_NS = "<<temp_mutilde_NS<<finl;
-          opgrad.calculer(temp_mutilde_NS,grad_mutilde);
-          Cerr <<"grad_mutilde = "<<grad_mutilde<<finl;
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
-
-          // on interpole c et on calcule la source
-          //------------------------------------------------
-          temp_resu=0;
           for (int fac=ndeb; fac<nbfaces; fac++)
             {
               el0=face_voisins(fac,0);
@@ -302,18 +252,6 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
               vol0=volumes(el0);
               vol1=volumes(el1);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-              cface=(vol0*c(el0,i)+vol1*c(el1,i))/(vol0+vol1);
-              if (boussi_==1)
-                {
-                  temp_resu(fac) -= cface*grad_mutilde(fac) / rho0; // Cas approximation de Boussinesq
-                }
-              else if (boussi_==0)
-                {
-                  rho_face=(vol0*rhoPF(el0,1)+vol1*rhoPF(el1,1))/(vol0+vol1);
-                  temp_resu(fac) -= cface*grad_mutilde(fac) / rho_face;
-=======
               cface=(vol0*c(el0,j)+vol1*c(el1,j))/(vol0+vol1);
               Cerr << "cface"<<cface<<finl;
               if (boussi_==1)
@@ -324,27 +262,12 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
                 {
                   rho_face=(vol0*rhoPF(el0,j)+vol1*rhoPF(el1,j))/(vol0+vol1);
                   resu(fac) -= cface*grad_mutilde(fac) / rho_face;
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-=======
-              cface=(vol0*c(el0,i)+vol1*c(el1,i))/(vol0+vol1);
-              if (boussi_==1)
-                {
-                  temp_resu(fac) -= cface*grad_mutilde(fac) / rho0; // Cas approximation de Boussinesq
-                }
-              else if (boussi_==0)
-                {
-                  rho_face=(vol0*rhoPF(el0,1)+vol1*rhoPF(el1,1))/(vol0+vol1);
-                  temp_resu(fac) -= cface*grad_mutilde(fac) / rho_face;
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
                 }
             }
-          Cerr<<"temp_resu = "<<temp_resu<<finl;
-          resu+=temp_resu;
-          Cerr<<"resu = "<<resu<<finl;
         }
+      Cerr<<"-cface*grad_mutilde/rho0"<<resu<<finl;
 
     }
-
   //===============================================
   return resu;
 
@@ -628,13 +551,9 @@ DoubleTab& Source_Qdm_VDF_Phase_field::ajouter(DoubleTab& resu) const
 
   //   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
 
-
-  Cerr <<"resu ajouter methode source QDM "<< resu<<finl;
-
   (this->*methode)(resu);
 
-  Cerr <<"resu methode "<<resu<<finl;
-
+  //Cerr<<"max de la force "<<grad_mutilde.max_abs()<<finl;
   return resu;
 }
 
@@ -665,3 +584,4 @@ void Source_Qdm_VDF_Phase_field::mettre_a_jour(double temps)
       // Cout.precision(8);
     }
 }
+

@@ -47,7 +47,7 @@ public:
   void premier_demi_dt() override;
 
   inline const DoubleVect& get_u_carre() override;
-  inline const int& get_type_systeme_binaire();
+  inline const int& get_type_systeme_naire();
 
   inline double drhodc(const int n_elem) const;
 
@@ -67,12 +67,13 @@ protected:
   double (Source_Con_Phase_field::*dWdc)(const double) const;
   double kappa;
   DoubleVect kappaMatrix;
+  DoubleTab (Source_Con_Phase_field::*kappaMatrix_func_c)(const DoubleTab&, const DoubleVect&) const;
   DoubleVect coeff_auto_diffusion;
   double temperature;
   int kappa_ind;
   int type_kappa_;
   int type_kappa_auto_diffusion_;
-  int type_systeme_binaire_;
+  int type_systeme_naire_;
   int kappa_moy_;
   double mult_kappa;
   Table kappa_forme_expr_;
@@ -105,6 +106,7 @@ protected:
   double kappa_func_c_defaut(const double) const;
   double dWdc_general(const double) const;
   double kappa_func_c_general(const double) const;
+  DoubleTab kappa_func_auto_diffusion(const DoubleTab&, const DoubleVect& ) const;
 
   virtual void construire_systeme(const DoubleTab&, const Matrice_Morse&, DoubleTab&, const DoubleTab&);
   virtual void matvect(const DoubleTab&, const Matrice_Morse&, const DoubleTab&, const DoubleTab&, DoubleTab&);
@@ -123,9 +125,9 @@ inline const DoubleVect& Source_Con_Phase_field::get_u_carre()
 {
   return u_carre_;
 }
-inline const int& Source_Con_Phase_field::get_type_systeme_binaire()
+inline const int& Source_Con_Phase_field::get_type_systeme_naire()
 {
-  return type_systeme_binaire_;
+  return type_systeme_naire_;
 }
 inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 {
@@ -163,6 +165,76 @@ inline double Source_Con_Phase_field::dWdc_defaut(const double c) const
 inline double Source_Con_Phase_field::kappa_func_c_defaut(const double c) const
 {
   return std::max(mult_kappa*kappa*(c+0.5)*(0.5-c),0.);
+}
+inline DoubleTab Source_Con_Phase_field::kappa_func_auto_diffusion(const DoubleTab& c, const DoubleVect& coeff_auto_diff) const
+{
+  DoubleTab temp_c(c.dimension(0),c.line_size()+1);
+  DoubleTab temp_kappa(c.dimension(0), nb_equation_CH, nb_equation_CH); //define temp_alpha to avoid resize here
+  DoubleTab kappaMat=temp_kappa;
+  kappaMat = 0;
+  DoubleTab kappa_ij (temp_kappa);
+  DoubleTab somme_c(c.dimension(0));
+  somme_c=0;
+  DoubleTab kappaMatrixDegenere (c.dimension(0), nb_equation_CH*nb_equation_CH);
+  Cerr << "c"<<c<<finl;
+
+  // creation d'un tableau temp_c qui contiendra toutes les concentrations des n composants non pas les n-1 seulements (n-1 eqs).
+  //La dernière colonne correspondra a 1-somme(concentration)
+
+  for (int k=0; k<c.line_size(); k++)
+    {
+      for (int l=0; l<c.dimension(0); l++)
+        {
+          temp_c(l,k)= c(l,k);
+          somme_c(l) += c(l,k);
+          temp_c(l,c.line_size())=1.0-somme_c(l);
+        }
+    }
+
+  Cerr <<"somme_c"<< somme_c<<finl;
+  Cerr <<"temp_c"<< temp_c<<finl;
+
+  // calcul de la mobilite kappa dans un doubleTab (n1,n2,n3)
+  for(int k=0; k< nb_equation_CH+1; k++)
+    {
+      for (int j=0; j<nb_equation_CH; j++)
+        {
+          for (int i=0; i<nb_equation_CH; i++)
+            {
+              for (int l=0; l<c.dimension(0); l++)
+                {
+                  //            kappa_ij(l,i,j) = (j==k) ? 1-temp_c(l,j) : -temp_c(l,j);
+                  //            kappa_ij(l,i,j) *= (i==k) ? 1-temp_c(l,i) : -temp_c(l,i);
+                  //            kappa_ij(l,i,j) *= temp_c(l,k)*coeff_auto_diff(k);
+                  //
+                  if (j==k)
+                    kappa_ij(l,i,j)=1-temp_c(l,j);
+                  else
+                    kappa_ij(l,i,j)=-temp_c(l,j);
+                  if (i==k)
+                    kappa_ij(l,i,j)*=1-temp_c(l,i);
+                  else
+                    kappa_ij(l,i,j)*=-temp_c(l,i);
+                  kappa_ij(l,i,j) *= temp_c(l,k)*coeff_auto_diff(k);
+                }
+            }
+        }
+      kappaMat+=kappa_ij;
+    }
+  Cerr << "kappa_ij"<<kappa_ij<<finl;
+  Cerr <<"kappaMat"<<kappaMat<<finl;
+
+  //retour vers un DoubleTab (n1,n2)
+  for (int j=0; j<nb_equation_CH; j++)
+    for (int i=0; i<nb_equation_CH; i++)
+      for (int l=0; l<c.dimension(0); l++)
+        {
+          kappaMatrixDegenere(l,i+nb_equation_CH*j)=kappaMat(l,i,j);
+        }
+  Cerr <<"kappaMatrixDegenere"<<kappaMatrixDegenere<<finl;
+
+  return kappaMatrixDegenere;
+
 }
 
 inline double Source_Con_Phase_field::dWdc_general(const double c) const

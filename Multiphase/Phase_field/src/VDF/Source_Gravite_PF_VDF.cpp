@@ -87,36 +87,20 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
   Navier_Stokes_phase_field& eq_NS_PF = ref_cast_non_const(Navier_Stokes_phase_field, equation());
   const DoubleVect& g = eq_NS_PF.get_g_();
 
-  //mr264902
-  const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme->equation(1));
-  const DoubleTab& c=eq_c.inconnue().valeurs();
-  const int nb_comp = eq_c.constituant().nb_constituants();
-
-  Sources list_sources = eq_c.sources();
-  Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
-  int type_systeme_binaire = source_pf.get_type_systeme_binaire(); //si type_systeme_binaire = 0 ou 1
-
-
   int num_cl;
 
   const int boussi = eq_NS_PF.get_boussi_();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme->equation(1));
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
-  int type_systeme_binaire = source_pf.get_type_systeme_binaire(); //si type_systeme_binaire = 0 ou 1
+  int type_systeme_naire = source_pf.get_type_systeme_naire(); //si type_systeme_naire = 0 ou 1
 
   const int nb_comp = eq_c.constituant().nb_constituants();
 
-  Cerr << "type_systeme_binaire = " << type_systeme_binaire<<finl;
+  Cerr << "type_systeme_naire = " << type_systeme_naire<<finl;
 
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-=======
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
-  if (type_systeme_binaire==1)
+  if (type_systeme_naire==0)
     {
       if (boussi == 0)
         {
@@ -178,7 +162,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
             }
         }
     }
-  else if (type_systeme_binaire==0)
+  else if (type_systeme_naire==1)
     {
       if (boussi == 0)
         {
@@ -204,49 +188,6 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
         }
       else if (boussi == 1)
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
-          const DoubleTab& rho = eq_NS_PF.rho().valeur().valeurs();
-          double rho0 = eq_NS_PF.rho0();
-          const IntTab& face_voisins = la_zone->face_voisins();
-          const DoubleVect& volumes = la_zone->volumes();
-          Cerr<<"rho gravite"<< rho<<finl;
-          Cerr<<"nb comp "<<nb_comp<<finl;
-          Cerr<<"c"<<c<<finl;
-
-
-          for (num_cl=0 ; num_cl<la_zone->nb_front_Cl() ; num_cl++)
-            {
-              const Cond_lim& la_cl = la_zone_Cl->les_conditions_limites(num_cl);
-              const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
-              int ndeb = le_bord.num_premiere_face();
-              int nfin = ndeb + le_bord.nb_faces();
-              if (sub_type(Dirichlet,la_cl.valeur()) || sub_type(Dirichlet_homogene,la_cl.valeur()))
-                ;
-              else
-                for (face=ndeb ; face<nfin ; face++)
-                  {
-                    int el0=face_voisins(face,0);
-                    int el1=face_voisins(face,1);
-                    double vol0=volumes(el0);
-                    double vol1=volumes(el1);
-                    double cbetaface=(vol0*(rho(el0)/rho0-1.0)+vol1*(rho(el1)/rho0-1.0))/(vol0+vol1);
-                    resu(face) += cbetaface * g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
-                  }
-            }
-
-          for (face=premiere_face_interne ; face<nb_faces; face++)
-            {
-              int el0=face_voisins(face,0);
-              int el1=face_voisins(face,1);
-              double vol0=volumes(el0);
-              double vol1=volumes(el1);
-              double cbetaface=(vol0*(rho(el0)/rho0-1.0)+vol1*(rho(el1)/rho0-1.0))/(vol0+vol1);
-              resu(face) += cbetaface * g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
-<<<<<<< HEAD
-=======
           for (int j=0; j<nb_comp; j++)
             {
               const DoubleTab& rho = eq_NS_PF.rho().valeur().valeurs();
@@ -283,21 +224,12 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
                   double cbetaface=(vol0*(rho(el0,j)/rho0-1.0)+vol1*(rho(el1,j)/rho0-1.0))/(vol0+vol1);
                   resu(face) += cbetaface * g(orientation(face)) * porosite_surf(face) * volumes_entrelaces(face);
                 }
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-=======
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
             }
         }
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
 
->>>>>>> 9f088c42fbb55979afbaaa1702e3258c0e31805b
-=======
->>>>>>> aa8a0d012849b586ea522309f4439b8c3d92c197
   return resu;
 }
 
@@ -312,3 +244,5 @@ DoubleTab& Source_Gravite_PF_VDF::calculer(DoubleTab& resu) const
   resu = 0.;
   return ajouter(resu);
 }
+
+

@@ -389,6 +389,7 @@ int Schema_Phase_field::premier_dt(Convection_Diffusion_Phase_field& eq_c)
 int Schema_Phase_field::deuxieme_dt(Convection_Diffusion_Phase_field& eq_c)
 {
   DoubleTab& present = eq_c.inconnue().valeurs();
+  Cerr <<"present avant" <<present<<finl;
   DoubleTab intermediaire(present);
   intermediaire = present;
 
@@ -399,8 +400,10 @@ int Schema_Phase_field::deuxieme_dt(Convection_Diffusion_Phase_field& eq_c)
 
   sch2.valeur().faire_un_pas_de_temps_eqn_base(eq_c);
   set_stationnaire_atteint()=sch2.valeur().isStationary();
+  Cerr <<"present after faire un pas de temps but before =intermediate " <<present<<finl;
   present=intermediaire;
   Cerr << "present apres = "<<present<<finl;
+  Cerr << "inconnue.valeurs"<<eq_c.inconnue().valeurs()<<finl;
 
   return 1;
 }
