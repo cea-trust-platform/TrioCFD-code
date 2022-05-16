@@ -14,58 +14,48 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_l_melange.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
+// File:        Op_Diff_Tau_PolyMAC_P0_Elem.h
+// Directory:   $TRUST_ROOT/src/Turbulence/PolyMAC_P0/Operateurs
+// Version:     1
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Viscosite_turbulente_l_melange.h>
+#ifndef Op_Diff_Tau_PolyMAC_P0_Elem_included
+#define Op_Diff_Tau_PolyMAC_P0_Elem_included
 
-#include <Pb_Multiphase.h>
-#include <Noms.h>
-#include <Motcle.h>
-#include <PolyMAC_P0_discretisation.h>
+#include <Op_Diff_PolyMAC_P0_Elem.h>
+#include <Op_Diff_Turbulent_PolyMAC_P0_Elem.h>
+#include <Correlation.h>
+#include <Transport_turbulent_base.h>
 
-Implemente_instanciable(Viscosite_turbulente_l_melange, "Viscosite_turbulente_l_melange", Viscosite_turbulente_base);
+/////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION : class Op_Diff_Tau_PolyMAC_P0_Elem
+//
+// Version de Op_Diff_PolyMAC_P0_Elem prenant en compte l'effet de la turbulence
+// par le biais d'une correlation de type Transport_turbulent.
+// (celle-ci reposera sur la modelisation de la viscosite turbulente fournie
+//  par la correlation Viscosite_turbulente de l'operateur de diffusion de la QDM)
+//
+/////////////////////////////////////////////////////////////////////////////
 
-Sortie& Viscosite_turbulente_l_melange::printOn(Sortie& os) const
+class Op_Diff_Tau_PolyMAC_P0_Elem : public Op_Diff_Turbulent_PolyMAC_P0_Elem
 {
-  return os;
-}
 
-Entree& Viscosite_turbulente_l_melange::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("l_melange", &l_melange_);
-  param.lire_avec_accolades_depuis(is);
-  Cout << "l_melange = " << l_melange_ << finl ;
+  Declare_instanciable( Op_Diff_Tau_PolyMAC_P0_Elem ) ;
+public :
+  virtual void completer() override;
+  virtual void modifier_nu(DoubleTab& ) const override; //prend en compte la diffusivite turbulente
+  virtual double calculer_dt_stab() const override;
 
-  pb_->creer_champ("taux_cisaillement"); //On en aura besoin pour le calcul de la viscosite turbulente
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
 
-  return is ;
-}
+  double limiter_tau() const {return limiter_tau_;};
 
-void Viscosite_turbulente_l_melange::eddy_viscosity(DoubleTab& nu_t) const
-{
-  const DoubleTab& tc = pb_->get_champ("taux_cisaillement").valeurs();
-  assert(nu_t.dimension_tot(0) == tc.dimension_tot(0) && tc.dimension(1) <= nu_t.dimension(1));
-  //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
-  for (int i = 0; i < nu_t.dimension_tot(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = n < tc.dimension(1) ? tc(i, n)*tc(i,n) * l_melange_ : 0;
-}
+protected :
+  double limiter_tau_ = 1.e-6 ;
 
-void Viscosite_turbulente_l_melange::reynolds_stress(DoubleTab& R_ij) const
-{
-  abort(); //TBD
-}
+};
 
-void Viscosite_turbulente_l_melange::k_over_eps(DoubleTab& k_sur_eps) const
-{
-  abort(); //TBD
-}
-
-void Viscosite_turbulente_l_melange::eps(DoubleTab& k_sur_eps) const
-{
-  abort(); //TBD
-}
+#endif /* Op_Diff_PolyMAC_P0_Elem_included */

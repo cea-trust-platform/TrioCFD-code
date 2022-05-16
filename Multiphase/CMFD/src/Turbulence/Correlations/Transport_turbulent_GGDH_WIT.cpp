@@ -28,7 +28,7 @@
 #include <TRUSTTrav.h>
 #include <MD_Vector_tools.h>
 #include <math.h>
-#include <ConstDoubleTab_parts.h>
+#include <TRUSTTab_parts.h>
 #include <cmath>
 
 Implemente_instanciable(Transport_turbulent_GGDH_WIT, "Transport_turbulent_GGDH_WIT", Transport_turbulent_base);
@@ -59,7 +59,7 @@ void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& e
   DoubleTrav Rij(0, N, D, D);
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);
 
-  ConstDoubleTab_parts p_u(tab_u); //en PolyMAC_V2, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
+  ConstDoubleTab_parts p_u(tab_u); //en PolyMAC_P0, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
   for (i = 0; i < p_u.size(); i++) if (p_u[i].get_md_vector() == Rij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
   if (i_part < 0) Process::exit("Viscosite_turbulente_WIF : inconsistency between velocity and Rij!");
   const DoubleTab& u = p_u[i_part]; //le bon tableau

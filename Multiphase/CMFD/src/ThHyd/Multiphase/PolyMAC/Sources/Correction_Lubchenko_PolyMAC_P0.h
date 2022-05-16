@@ -14,58 +14,46 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_l_melange.cpp
+// File:        Correction_Lubchenko_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
 // Version:     /main/18
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Viscosite_turbulente_l_melange.h>
+#ifndef Correction_Lubchenko_PolyMAC_P0_included
+#define Correction_Lubchenko_PolyMAC_P0_included
+#include <Source_base.h>
+#include <Ref_Correlation.h>
 
-#include <Pb_Multiphase.h>
-#include <Noms.h>
-#include <Motcle.h>
-#include <PolyMAC_P0_discretisation.h>
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//    classe Correction_Lubchenko_PolyMAC_P0
+//      Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
+//
+//////////////////////////////////////////////////////////////////////////////
 
-Implemente_instanciable(Viscosite_turbulente_l_melange, "Viscosite_turbulente_l_melange", Viscosite_turbulente_base);
-
-Sortie& Viscosite_turbulente_l_melange::printOn(Sortie& os) const
+class Correction_Lubchenko_PolyMAC_P0: public Source_base
 {
-  return os;
-}
+  Declare_instanciable(Correction_Lubchenko_PolyMAC_P0);
+public :
+  int has_interface_blocs() const override
+  {
+    return 1;
+  };
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void check_multiphase_compatibility() const override {}; //of course
+  void completer() override;
 
-Entree& Viscosite_turbulente_l_melange::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("l_melange", &l_melange_);
-  param.lire_avec_accolades_depuis(is);
-  Cout << "l_melange = " << l_melange_ << finl ;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
+protected:
+  int n_l = -1; //phase liquide
+  int is_turb = 0;
+  REF(Correlation) correlation_lift_;
+  REF(Correlation) correlation_dispersion_;
+};
 
-  pb_->creer_champ("taux_cisaillement"); //On en aura besoin pour le calcul de la viscosite turbulente
-
-  return is ;
-}
-
-void Viscosite_turbulente_l_melange::eddy_viscosity(DoubleTab& nu_t) const
-{
-  const DoubleTab& tc = pb_->get_champ("taux_cisaillement").valeurs();
-  assert(nu_t.dimension_tot(0) == tc.dimension_tot(0) && tc.dimension(1) <= nu_t.dimension(1));
-  //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
-  for (int i = 0; i < nu_t.dimension_tot(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = n < tc.dimension(1) ? tc(i, n)*tc(i,n) * l_melange_ : 0;
-}
-
-void Viscosite_turbulente_l_melange::reynolds_stress(DoubleTab& R_ij) const
-{
-  abort(); //TBD
-}
-
-void Viscosite_turbulente_l_melange::k_over_eps(DoubleTab& k_sur_eps) const
-{
-  abort(); //TBD
-}
-
-void Viscosite_turbulente_l_melange::eps(DoubleTab& k_sur_eps) const
-{
-  abort(); //TBD
-}
+#endif

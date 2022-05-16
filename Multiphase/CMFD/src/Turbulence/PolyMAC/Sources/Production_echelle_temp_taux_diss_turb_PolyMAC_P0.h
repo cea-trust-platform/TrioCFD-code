@@ -14,58 +14,46 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Viscosite_turbulente_l_melange.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Correlations
-// Version:     /main/18
+// File:        Production_echelle_temp_taux_diss_turb_PolyMAC_P0.h
+// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
+// Version:     /main/12
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Viscosite_turbulente_l_melange.h>
+#ifndef Production_echelle_temp_taux_diss_turb_PolyMAC_P0_included
+#define Production_echelle_temp_taux_diss_turb_PolyMAC_P0_included
 
-#include <Pb_Multiphase.h>
-#include <Noms.h>
-#include <Motcle.h>
-#include <PolyMAC_P0_discretisation.h>
+#include <Source_base.h>
+#include <Ref_Correlation.h>
+#include <TRUSTTab.h>
 
-Implemente_instanciable(Viscosite_turbulente_l_melange, "Viscosite_turbulente_l_melange", Viscosite_turbulente_base);
-
-Sortie& Viscosite_turbulente_l_melange::printOn(Sortie& os) const
+//////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION
+//    Classe Production_echelle_temp_taux_diss_turb_PolyMAC_P0
+//    Cette classe implemente dans PolyMAC_P0 un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
+//
+// .SECTION voir aussi
+//    Operateur_PolyMAC_P0_base Operateur_base
+//////////////////////////////////////////////////////////////////////////////
+class Production_echelle_temp_taux_diss_turb_PolyMAC_P0: public Source_base
 {
-  return os;
-}
+  Declare_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0);
+public :
+  int has_interface_blocs() const override
+  {
+    return 1;
+  }
+  void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const override;
+  void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const override;
+  void check_multiphase_compatibility() const override {}; //of course
 
-Entree& Viscosite_turbulente_l_melange::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("l_melange", &l_melange_);
-  param.lire_avec_accolades_depuis(is);
-  Cout << "l_melange = " << l_melange_ << finl ;
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override { };
+  void associer_pb(const Probleme_base& ) override { };
+  void mettre_a_jour(double temps) override { };
 
-  pb_->creer_champ("taux_cisaillement"); //On en aura besoin pour le calcul de la viscosite turbulente
+private:
+  double alpha_omega_;
+};
 
-  return is ;
-}
-
-void Viscosite_turbulente_l_melange::eddy_viscosity(DoubleTab& nu_t) const
-{
-  const DoubleTab& tc = pb_->get_champ("taux_cisaillement").valeurs();
-  assert(nu_t.dimension_tot(0) == tc.dimension_tot(0) && tc.dimension(1) <= nu_t.dimension(1));
-  //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
-  for (int i = 0; i < nu_t.dimension_tot(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
-      nu_t(i, n) = n < tc.dimension(1) ? tc(i, n)*tc(i,n) * l_melange_ : 0;
-}
-
-void Viscosite_turbulente_l_melange::reynolds_stress(DoubleTab& R_ij) const
-{
-  abort(); //TBD
-}
-
-void Viscosite_turbulente_l_melange::k_over_eps(DoubleTab& k_sur_eps) const
-{
-  abort(); //TBD
-}
-
-void Viscosite_turbulente_l_melange::eps(DoubleTab& k_sur_eps) const
-{
-  abort(); //TBD
-}
+#endif
