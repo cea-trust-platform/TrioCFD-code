@@ -31,6 +31,7 @@
 #include <Convection_tools.h>
 #include <Debog.h>
 #include <Champ_P1NC.h>
+#include <CL_Types_include.h>
 
 Implemente_instanciable(Op_Conv_ALE_VEF,"Op_Conv_ALE_VEF",Op_Conv_ALE);
 

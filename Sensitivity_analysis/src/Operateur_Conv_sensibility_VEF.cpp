@@ -38,6 +38,7 @@
 #include <Champ_P1NC.h>
 #include <Porosites_champ.h>
 #include <Convection_tools.h>
+#include <CL_Types_include.h>
 
 
 Implemente_instanciable( Operateur_Conv_sensibility_VEF, "Op_Conv_sensibility_VEF_P1NC",Operateur_Conv_sensibility ) ;
