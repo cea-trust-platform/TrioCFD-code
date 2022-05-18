@@ -32,80 +32,120 @@ Sortie& Fluide_eau_c3_liquide::printOn(Sortie& os) const
 
 Entree& Fluide_eau_c3_liquide::readOn(Entree& is)
 {
+#if HAVE_LIBC3
   Fluide_reel_base::readOn(is);
+#else
+  Process::exit(que_suis_je() + " : this binary was not compiled with C3 water laws!");
+#endif
   return is;
 }
 
 double Fluide_eau_c3_liquide::rho_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return rhol;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::dT_rho_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return dT_rhol;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::dP_rho_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return dP_rhol;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::h_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return hl;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::dT_h_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return dT_hl;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::dP_h_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return dP_hl;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::cp_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
   F77NAME(FTLIQ)(&un, &P, &T, &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
   return cpl;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::mu_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl = h_(T, P), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
   F77NAME(FHLIQA)(&un, &P, &hl, &T, &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
   return visc;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::lambda_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   int un = 1;
   double hl = h_(T, P), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
   F77NAME(FHLIQA)(&un, &P, &hl, &T, &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
   return cond;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_liquide::beta_(const double T, const double P) const

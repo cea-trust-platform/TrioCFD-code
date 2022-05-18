@@ -32,12 +32,17 @@ Sortie& Fluide_eau_c3_gaz::printOn(Sortie& os) const
 
 Entree& Fluide_eau_c3_gaz::readOn(Entree& is)
 {
+#if HAVE_LIBC3
   Fluide_reel_base::readOn(is);
+#else
+  Process::exit(que_suis_je() + " : this binary was not compiled with C3 water laws!");
+#endif
   return is;
 }
 
 double Fluide_eau_c3_gaz::rho_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -47,10 +52,14 @@ double Fluide_eau_c3_gaz::rho_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return rhog;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::dT_rho_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -60,10 +69,14 @@ double Fluide_eau_c3_gaz::dT_rho_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return dT_rhog;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::dP_rho_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -73,10 +86,14 @@ double Fluide_eau_c3_gaz::dP_rho_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return dP_rhog;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::h_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -86,10 +103,14 @@ double Fluide_eau_c3_gaz::h_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return hg;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::dT_h_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -99,10 +120,14 @@ double Fluide_eau_c3_gaz::dT_h_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return cpg;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::dP_h_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -112,10 +137,14 @@ double Fluide_eau_c3_gaz::dP_h_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return dP_hg;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::cp_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0, ier, itest;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -125,10 +154,14 @@ double Fluide_eau_c3_gaz::cp_(const double T, const double P) const
   F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
                  &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
   return cpg;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::mu_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -137,10 +170,14 @@ double Fluide_eau_c3_gaz::mu_(const double T, const double P) const
   double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
   F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
   return visc;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::lambda_(const double T, const double P) const
 {
+#if HAVE_LIBC3
   /* calcul a saturation */
   int un = 1, ienc = 0;
   double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
@@ -149,6 +186,9 @@ double Fluide_eau_c3_gaz::lambda_(const double T, const double P) const
   double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
   F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
   return cond;
+#else
+  return 0;
+#endif
 }
 
 double Fluide_eau_c3_gaz::beta_(const double T, const double P) const

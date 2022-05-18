@@ -5,8 +5,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 #include <arch.h>
-
+#define HAVE_LIBC3 0
 /* prototypes des fonctions Fortran */
+#ifdef HAVE_LIBC3
 extern "C" {
 #ifdef F77_Majuscule
   int F77DECLARE(FTSATP)(const int *nsca, const int* ienc, const double *pv,
@@ -277,3 +278,4 @@ extern "C" {
   }
 #endif
 }
+#endif
