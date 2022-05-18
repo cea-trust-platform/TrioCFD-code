@@ -27,6 +27,7 @@
 #include <stat_counters.h>
 #include <Zone_VEF_PreP1b.h>
 #include <Convection_tools.h>
+#include <CL_Types_include.h>
 
 extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Zone_Cl_VEF& zcl, const Zone_VEF& zone_VEF);
 Implemente_instanciable_sans_constructeur(Op_Conv_VEF_Face,"Op_Conv_Generic_VEF_P1NC",Op_Conv_VEF_base);
