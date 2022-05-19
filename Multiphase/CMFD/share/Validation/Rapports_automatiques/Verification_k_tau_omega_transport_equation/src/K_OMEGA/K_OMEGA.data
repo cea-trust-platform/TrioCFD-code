@@ -1,13 +1,15 @@
+# PARALLEL OK 4 #
 Dimension 3
 
 Domaine dom
+# BEGIN MESH #
 Mailler dom
 {
 	pave bloc
 	{
 		origine 0 0 0
 		longueurs 1 1 1
-		nombre_de_noeuds 101 101 101
+		nombre_de_noeuds 21 21 21
 		}
 		{
 		bord periox	X = 0	0 <= Y <= 1	0 <= Z <= 1
@@ -20,12 +22,24 @@ Mailler dom
 }
 
 Polyedriser dom
+# END MESH #
 
+# BEGIN PARTITION
+Partition dom
+{
+    Partition_tool tranche { tranches 2 2 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
 
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
 
-CoviMAC  dis
-option_covimac {  }
-
+PolyMAC_P0  dis
+option_PolyMAC_P0 {  }
 
 Schema_euler_implicite sch
 Read sch
