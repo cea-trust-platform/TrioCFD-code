@@ -37,7 +37,7 @@
 #include <TRUSTTab_parts.h>
 
 
-Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const
 {

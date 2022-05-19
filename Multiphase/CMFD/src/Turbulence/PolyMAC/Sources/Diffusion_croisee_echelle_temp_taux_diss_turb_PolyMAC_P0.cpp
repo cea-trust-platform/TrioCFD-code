@@ -36,7 +36,7 @@
 #include <Neumann_loi_paroi_faible_k.h>
 #include <Neumann_loi_paroi_faible_tau_omega.h>
 
-Implemente_instanciable(Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0,"Diffusion_croisee_echelle_temp_taux_diss_turb_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0,"Diffusion_croisee_echelle_temp_taux_diss_turb_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::printOn(Sortie& os) const
 {

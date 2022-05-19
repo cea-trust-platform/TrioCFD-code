@@ -27,7 +27,7 @@
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Variation_rho, "Variation_rho_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Variation_rho, "Variation_rho_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Variation_rho::printOn(Sortie& os) const
 {

@@ -30,7 +30,7 @@
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Nucleation_paroi_PolyMAC_P0, "Nucleation_paroi_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Nucleation_paroi_PolyMAC_P0, "Nucleation_paroi_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Nucleation_paroi_PolyMAC_P0::printOn(Sortie& os) const
 {

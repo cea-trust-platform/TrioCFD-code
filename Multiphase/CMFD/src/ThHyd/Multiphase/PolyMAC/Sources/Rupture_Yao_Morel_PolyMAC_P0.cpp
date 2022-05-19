@@ -30,7 +30,7 @@
 #include <Array_tools.h>
 #include <math.h>
 
-Implemente_instanciable(Rupture_Yao_Morel, "Rupture_Yao_Morel_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Rupture_Yao_Morel, "Rupture_Yao_Morel_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Rupture_Yao_Morel::printOn(Sortie& os) const
 {

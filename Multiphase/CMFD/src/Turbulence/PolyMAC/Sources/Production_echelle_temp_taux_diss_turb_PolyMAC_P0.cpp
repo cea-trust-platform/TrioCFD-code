@@ -39,7 +39,7 @@
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 
-Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0,"Production_echelle_temp_taux_diss_turb_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0,"Production_echelle_temp_taux_diss_turb_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Production_echelle_temp_taux_diss_turb_PolyMAC_P0::printOn(Sortie& os) const
 {

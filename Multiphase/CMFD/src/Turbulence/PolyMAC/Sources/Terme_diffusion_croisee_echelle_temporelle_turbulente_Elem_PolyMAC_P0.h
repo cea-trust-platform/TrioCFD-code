@@ -14,21 +14,21 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0.h
+// File:        Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0.h
 // Directory:   $TRUST_ROOT/src/PolyMAC_P0/Sources
 // Version:     /main/16
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0_included
-#define Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0_included
+#ifndef Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0_included
+#define Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0_included
 
 #include <Source_base.h>
 #include <Champ_Elem_PolyMAC_P0.h>	// a retirer plus tard
 
 class Convection_Diffusion_std;
 //
-// .DESCRIPTION class Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0
+// .DESCRIPTION class Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0
 //
 // Terme de diffusion croisee dans l'equation de transport de tau (tau = 1 / omega) du modele de turbulence k-omega SST
 // Cd = sigma_d * alpha * rho *tau * min(grad k, grad tau, 0)
@@ -39,10 +39,10 @@ class Convection_Diffusion_std;
 // en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
 
 
-class Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
+class Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
 {
 
-  Declare_instanciable(Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0);
+  Declare_instanciable(Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0);
 
 public:
   int has_interface_blocs() const override

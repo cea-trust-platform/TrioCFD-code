@@ -47,7 +47,7 @@
 #include <cmath>
 #include <vector>
 
-Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_echelle_temp_turb_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0,"Diffusion_supplementaire_echelle_temp_turb_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::printOn(Sortie& os) const
 {

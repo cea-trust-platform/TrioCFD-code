@@ -38,7 +38,7 @@
 #include <TRUSTTab_parts.h>
 
 
-Implemente_instanciable(Dissipation_WIT_PolyMAC_P0,"Dissipation_WIT_P0_PolyMAC_P0", Source_base);
+Implemente_instanciable(Dissipation_WIT_PolyMAC_P0,"Dissipation_WIT_Elem_PolyMAC_P0", Source_base);
 
 Sortie& Dissipation_WIT_PolyMAC_P0::printOn(Sortie& os) const
 {

@@ -31,8 +31,8 @@
 #include <Echelle_temporelle_turbulente.h>
 #include <Taux_dissipation_turbulent.h>
 
-Implemente_instanciable(Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0,"Dissipation_echelle_temp_taux_diss_turb_P0_PolyMAC_P0", Source_base);
-// XD Terme_dissipation_echelle_temporelle_turbulente_P0_PolyMAC_P0 source_base Terme_dissipation_echelle_temporelle_turbulente_P0_PolyMAC_P0 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
+Implemente_instanciable(Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0,"Dissipation_echelle_temp_taux_diss_turb_Elem_PolyMAC_P0", Source_base);
+// XD Terme_dissipation_echelle_temporelle_turbulente_Elem_PolyMAC_P0 source_base Terme_dissipation_echelle_temporelle_turbulente_Elem_PolyMAC_P0 0 Source term which corresponds to the dissipation source term that appears in the transport equation for tau (in the k-tau turbulence model)
 
 Sortie& Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::printOn(Sortie& os) const
 {

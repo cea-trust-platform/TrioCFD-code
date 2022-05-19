@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0.h>
+#include <Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0.h>
 #include <Zone_PolyMAC_P0.h>
 #include <Zone_Cl_PolyMAC.h>
 #include <Champ_Elem_PolyMAC_P0.h>
@@ -31,15 +31,15 @@
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 
-Implemente_instanciable(Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0,"Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0", Source_base);
-// XD Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0 source_base Terme_diffusion_croisee_echelle_temporelle_turbulente 0 Source term which corresponds to the cross-diffusion term that appears in the turbulent tau equation (k-tau turbulence model)
+Implemente_instanciable(Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0,"Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0", Source_base);
+// XD Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0 source_base Terme_diffusion_croisee_echelle_temporelle_turbulente 0 Source term which corresponds to the cross-diffusion term that appears in the turbulent tau equation (k-tau turbulence model)
 
-Sortie& Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0::printOn(Sortie& os) const
+Sortie& Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0::printOn(Sortie& os) const
 {
   return os;
 }
 
-Entree& Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0::readOn(Entree& is)
+Entree& Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0::readOn(Entree& is)
 {
   Param param(que_suis_je());
   param.ajouter("sigma_d", &sigma_d);
@@ -47,7 +47,7 @@ Entree& Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0::rea
   return is;
 }
 
-void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
+void Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
 {
   const Zone_PolyMAC_P0& 		zone 		= ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
   const Champ_Elem_PolyMAC_P0& 	ch_tau 		= ref_cast(Champ_Elem_PolyMAC_P0, equation().inconnue().valeur()); 		// Champ tau
@@ -76,7 +76,7 @@ void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0::dimens
       }
 }
 
-void Terme_diffusion_croisee_echelle_temporelle_turbulente_P0_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
+void Terme_diffusion_croisee_echelle_temporelle_turbulente_Elem_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   const Champ_Elem_PolyMAC_P0& 	ch_k 				= ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k"));	// Champ k
   const DoubleTab& 			k_passe				= ch_k.passe();
