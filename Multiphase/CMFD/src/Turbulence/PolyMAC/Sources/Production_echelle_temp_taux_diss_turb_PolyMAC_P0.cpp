@@ -118,7 +118,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
           Matrice_Morse& mat = *i_m.second;
           for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
               {
-                double deriv = prod_scal(e, n);
+                double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                 if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
                   deriv *=    pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n)/tab_k(e, n) ;
                 else deriv *= pe(e) * ve(e) * (-2) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(visc_turb.limiteur() * nu(e, n));
@@ -131,7 +131,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
           Matrice_Morse& mat = *i_m.second;
           for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
               {
-                double deriv = prod_scal(e, n);
+                double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                 if (tab_diss(e, n) <= 0) deriv *= 0 ;
                 else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
                 else deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) / tab_k(e, n) ;
@@ -146,7 +146,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
             {
               for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
                   {
-                    double deriv = prod_scal(e, n);
+                    double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                     if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
                       deriv *= pe(e) * ve(e) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/(tab_k(e, n)*tab_k(e, n)) ;
                     else deriv *= 0;
@@ -156,7 +156,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
           else if (Type_diss == "omega")
             for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
                 {
-                  double deriv = prod_scal(e, n);
+                  double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                   if (tab_diss(e, n) <= 0) deriv *= 0 ;
                   else if (tab_k(e, n)/tab_diss(e, n)<visc_turb.limiteur() * nu(e, n)) deriv *= 0 ;
                   else deriv *= pe(e) * ve(e) * (-1) * alpha_omega_* tab_alp(e, n) * tab_rho(e, n) * tab_diss(e, n)/ (tab_k(e, n)*tab_k(e, n)) ;
@@ -170,7 +170,7 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   // Second membre
   for(int e = 0 ; e < ne ; e++) for(int n = 0; n<N ; n++)
       {
-        double secmem_en = prod_scal(e, n);
+        double secmem_en = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
         if (Type_diss == "tau")
           secmem_en *= pe(e) * ve(e) *      alpha_omega_* tab_alp(e, n) * tab_rho(e, n)*tab_diss(e, n)*tab_diss(e, n)/std::max(tab_k(e, n) * tab_diss(e, n), visc_turb.limiteur() * nu(e, n)) ;
         else if (Type_diss == "omega")
