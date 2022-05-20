@@ -44,8 +44,9 @@ Solver_moving_mesh_ALE dom { PETSC GCP { precond ssor { omega 1.5 } seuil 1e-7 i
 VEFPreP1B ma_discretisation
 
 
-# Time scheme, choice between: explicit or implicit #
+# Time scheme, choice between: Euler explicit or implicit, and Adams Bashforth order 2  or order 3 #
 Schema_euler_explicite_ALE mon_schema
+# Schema_Adams_Bashforth_order_2 mon_schema #
 # Scheme_euler_implicit mon_schema #
 Read mon_schema
 {

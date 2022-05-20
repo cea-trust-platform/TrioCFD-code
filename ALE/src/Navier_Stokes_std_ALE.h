@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_std_ALE.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src/New
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -37,6 +37,8 @@ public :
   void update_pressure_matrix( void ) override;
   void discretiser() override;
   void mettre_a_jour(double) override;
+  virtual int sauvegarder(Sortie&) const override;
+  virtual int reprendre(Entree&) override;
 
 protected :
   Champ_Inc ALEMeshVelocity_;

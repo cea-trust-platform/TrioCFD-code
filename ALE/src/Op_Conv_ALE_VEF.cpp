@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,7 +16,6 @@
 //
 // File:        Op_Conv_ALE_VEF.cpp
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/14
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -1037,7 +1036,9 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
   const int nb_faces_tot = zone_VEF.nb_faces_tot();
   DoubleTab ALEmeshVelocityGradient(nb_faces_tot,dimension,dimension);
-  jacobianALE.resize(nb_faces_tot,dimension);
+  //jacobianALE.resize(nb_faces_tot,dimension);
+  jacobianALE= equation().inconnue().valeurs();
+  jacobianALE=1.;
   calculateALEMeshVelocityGradientOnFaces(ALEmeshVelocityGradient);
 
   //Multiply ALE mesh velocity gradient values with time step and used the result to calculate Jacobian determinants on faces.

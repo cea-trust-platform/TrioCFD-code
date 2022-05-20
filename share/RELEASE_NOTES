@@ -1,7 +1,9 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.5_beta : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
-XX/XX/22 (TrioCFD) New feature : ALE - implementation of the adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid
+20/05/22 (TrioCFD) New feature : Adams Bashforth time scheme on a mobile (ALE context)
+20/05/22 (TrioCFD) New feature : LES model on a mobile gird (ALE context)
+20/04/22 (TrioCFD) Enhancement : Adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid (ALE context)
 28/03/22 (TrioCFD) Bug fixed   : Update the Turbulence_synthetique validation sheet following the correction of the BC in TRUST
 21/02/22 (TrioCFD) Major Change: TRUST VDF face Diff/Dift operators changed : the transpose term of the velocity gradient is always used ! We use the good formulation now !
 12/01/22 (TrioCFD) Major Change: No more scalar methods for VDF flux iterators/evaluators

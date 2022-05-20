@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,7 +16,6 @@
 //
 // File:        Domaine_ALE.h
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/11
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -62,8 +61,11 @@ public :
   virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
+  void resumptionJacobian(DoubleTab&, DoubleTab&);
   inline const DoubleTab& getOldJacobian();
+  inline const DoubleTab& getOldJacobian() const;
   inline const DoubleTab& getNewJacobian();
+  inline const DoubleTab& getNewJacobian() const;
 
 protected:
 
@@ -79,6 +81,7 @@ protected:
   int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
+  int resumption; //1 if resumption of calculation else 0
 };
 
 
@@ -108,8 +111,16 @@ inline const DoubleTab& Domaine_ALE::getOldJacobian()
 {
   return ALEjacobian_old;
 }
+inline const DoubleTab& Domaine_ALE::getOldJacobian() const
+{
+  return ALEjacobian_old;
+}
 
 inline const DoubleTab& Domaine_ALE::getNewJacobian()
+{
+  return ALEjacobian_new;
+}
+inline const DoubleTab& Domaine_ALE::getNewJacobian() const
 {
   return ALEjacobian_new;
 }
