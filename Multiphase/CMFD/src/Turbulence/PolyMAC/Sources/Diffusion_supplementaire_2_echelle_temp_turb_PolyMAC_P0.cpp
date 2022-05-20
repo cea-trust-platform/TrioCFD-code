@@ -126,8 +126,8 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matr
   Matrice_Morse *Mtau = (matrices.count("tau") && !semi_impl.count("tau")) ? matrices.at("tau") : nullptr;
 
   DoubleTrav grad_sqrt_tau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
-  DoubleTrav grad_1_sqrt_tau_dtau ;
-  if (Mtau) grad_1_sqrt_tau_dtau(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
+  DoubleTrav grad_tau_sqrt_tau ;
+  if (Mtau) grad_tau_sqrt_tau = DoubleTrav(eq_qdm.vitesse()->valeurs().dimension_tot(0), N);
   if (f_grad_tau_fixe) tau.init_grad(0); // Initialisation des tables fgrad_d, fgrad_e, fgrad_w qui dependent de la discretisation et du type de conditions aux limites --> pas de mises a jour necessaires
   else tau.calc_grad(0); // Si on a des CAL qui evoluent avec les lois de paroi, on recalcule le fgrad a chaque pas de temps
   const IntTab& fg_d = tau.fgrad_d, fg_e = tau.fgrad_e;             // Tables used in zone_PolyMAC_P0::fgrad
@@ -155,14 +155,20 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matr
 
   if (Mtau) for (int f = 0; f < nf; f++) for (int n=0 ; n<N ; n++)
         {
-          grad_1_sqrt_tau_dtau(f, n) = 0;
+          grad_tau_sqrt_tau(f, n) = 0;
           for (int j = fg_d(f); j < fg_d(f+1) ; j++)
             {
               int e = fg_e(j);
               int f_bord;
               if ( (f_bord = e-ne_tot) < 0) //contrib d'un element
-                grad_1_sqrt_tau_dtau(f, n) += f_w(j) * (tab_tau(e, n) - tab_tau_passe(e, n))/ std::sqrt(std::max(limiter_tau_, tab_tau_passe(e, n))) ; // Si implicite ou pas
-              // Nothing in BC
+                grad_tau_sqrt_tau(f, n) += f_w(j) * tab_tau(e, n) / std::sqrt(std::max(limiter_tau_, tab_tau_passe(e, n))) ; // Si implicite ou pas
+              // same bc as sqrt
+              else if (fcl(f_bord, 0) == 1 || fcl(f_bord, 0) == 2) //Echange_impose_base
+                grad_tau_sqrt_tau(f, n) += f_w(j, n) ? f_w(j, n) * ref_cast(Echange_impose_base, cls[fcl(f_bord, 1)].valeur()).T_ext(fcl(f_bord, 2), n)     *.5/std::sqrt(std::max(limiter_tau_, tab_tau(zone.face_voisins(f_bord, 0), n))) : 0;
+              else if (fcl(f_bord, 0) == 4) //Neumann non homogene
+                grad_tau_sqrt_tau(f, n) += f_w(j, n) ? f_w(j, n) * ref_cast(Neumann_paroi      , cls[fcl(f_bord, 1)].valeur()).flux_impose(fcl(f_bord, 2), n)*.5/std::sqrt(std::max(limiter_tau_, tab_tau(zone.face_voisins(f_bord, 0), n))) : 0;
+              else if (fcl(f_bord, 0) == 6) // Dirichlet
+                grad_tau_sqrt_tau(f, n) += f_w(j) * std::sqrt(ref_cast(Dirichlet, cls[fcl(f_bord, 1)].valeur()).val_imp(fcl(f_bord, 2), n));
             }
         }
 
@@ -177,9 +183,9 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matr
 
   if (Mtau) for (int e = 0; e < ne_tot; e++) for (int n=0 ; n<N ; n++) for (int d = 0; d < D; d++)
           {
-            grad_1_sqrt_tau_dtau(nf_tot + D*e+d, n) = 0;
+            grad_tau_sqrt_tau(nf_tot + D*e+d, n) = 0;
             for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
-              grad_1_sqrt_tau_dtau(nf_tot + D*e+d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_1_sqrt_tau_dtau(f, n);
+              grad_tau_sqrt_tau(nf_tot + D*e+d, n) += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_tau_sqrt_tau(f, n);
           }
 
   DoubleTrav sec_m(tab_tau); //residus
@@ -191,8 +197,9 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matr
         // Second membre
         double fac = pe(e)*ve(e) ;
         double secmem_en = 0 ;
-        for (int d = 0; d<D; d++) secmem_en += grad_sqrt_tau(nf_tot + D*e+d, n)*grad_sqrt_tau(nf_tot + D*e+d, n) ;
-        secmem_en *= fac * -8  * mu_tot(e, n);
+
+        for (int d = 0; d<D; d++) secmem_en += grad_sqrt_tau(nf_tot + D*e+d, n)* ((Mtau) ? grad_tau_sqrt_tau(nf_tot + D*e+d, n) :grad_sqrt_tau(nf_tot + D*e+d, n));
+        secmem(e, n) += fac * -8  * mu_tot(e, n) * secmem_en;
 
         if (Mtau)
           {
@@ -207,7 +214,5 @@ void Diffusion_supplementaire_2_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matr
                       }
                 }
           }
-        secmem(e, n) += secmem_en;
-
       }
 }
