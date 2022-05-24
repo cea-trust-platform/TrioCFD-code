@@ -160,6 +160,7 @@ bool Probleme_base::solveTimeStep()
 
   // Calculs coeffs echange sur l'instant sur lequel doivent agir les operateurs.
   double tps=schema_temps().temps_defaut();
+  domaine().mettre_a_jour(tps,domaine_dis(),*this);
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).zone_Cl_dis()->calculer_coeffs_echange(tps);
 
@@ -1836,7 +1837,7 @@ void Probleme_base::mettre_a_jour(double temps)
   les_postraitements.mettre_a_jour(temps);
 
   // Update the domain:
-  domaine().mettre_a_jour(temps,domaine_dis(),*this);
+  //domaine().mettre_a_jour(temps,domaine_dis(),*this);
 
   LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
   while (curseur)

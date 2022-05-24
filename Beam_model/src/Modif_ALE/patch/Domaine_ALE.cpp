@@ -93,7 +93,7 @@ void Domaine_ALE::mettre_a_jour (double temps, Domaine_dis& le_domaine_dis, Prob
       int nb_faces=la_zone_VF.nb_faces();
       int nb_som_face=la_zone_VF.nb_som_face();
       IntTab& face_sommets=la_zone_VF.face_sommets();
-      creer_mes_domaines_frontieres(la_zone_VF);//update the boundary surface domain
+      //creer_mes_domaines_frontieres(la_zone_VF);//update the boundary surface domain
       calculer_vitesse_faces(ALE_mesh_velocity,nb_faces,nb_som_face,face_sommets);
 
       //On recalcule les metriques
@@ -593,7 +593,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
               {
                 int som=zone_VEF.face_sommets(face,isom);
                 som=get_renum_som_perio(som);
-                diag[som]=1.e6;
+                diag[som]=1.e14;
               }
           }
       }
@@ -630,7 +630,7 @@ DoubleTab& Domaine_ALE::laplacien(Domaine_dis& le_domaine_dis,Probleme_base& pb,
                 {
                   int som=zone_VEF.face_sommets(face,isom);
                   som=get_renum_som_perio(som);
-                  secmem(som)=1.e6*vit_bords(som,comp);
+                  secmem(som)=1.e14*vit_bords(som,comp);
                 }
             }
         }
