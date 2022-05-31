@@ -79,6 +79,6 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
         for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
             secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
         secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
-        secmem(e, n) += std::max(secmem_en, 0);
+        secmem(e, n) += std::max(secmem_en, 0.);
       }
 }
