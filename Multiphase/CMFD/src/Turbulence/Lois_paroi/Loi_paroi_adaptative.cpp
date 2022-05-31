@@ -23,6 +23,7 @@
 #include <Loi_paroi_adaptative.h>
 #include <Correlation_base.h>
 #include <Pb_Multiphase.h>
+#include <QDM_Multiphase.h>
 #include <Navier_Stokes_std.h>
 #include <Zone_Poly_base.h>
 #include <TRUSTTrav.h>
@@ -34,6 +35,7 @@
 #include <Nom.h>
 #include <Motcle.h>
 #include <Champ_base.h>
+#include <TRUSTTab_parts.h>
 
 Implemente_instanciable(Loi_paroi_adaptative, "Loi_paroi_adaptative", Loi_paroi_base);
 
@@ -77,6 +79,9 @@ void Loi_paroi_adaptative::completer()
         else if sub_type(Echange_impose_base, cond_lim_loc.valeur())
           ref_cast(Echange_impose_base, cond_lim_loc.valeur()).liste_faces_loi_paroi(Faces_a_calculer_);  // met des 1 si doit remplir la table
       }
+
+  DoubleTab& tab_y_p = valeurs_loi_paroi_["y_plus"];
+  for (int i = 0 ; i < tab_y_p.dimension_tot(0) ; i ++) for (int n = 0 ; n < tab_y_p.dimension_tot(1) ; n++) tab_y_p(i,n) = -1.;
 }
 
 void Loi_paroi_adaptative::mettre_a_jour(double temps)
@@ -89,6 +94,7 @@ void Loi_paroi_adaptative::mettre_a_jour(double temps)
   valeurs_loi_paroi_["u_plus"].echange_espace_virtuel();
   valeurs_loi_paroi_["dyp_u_plus"].echange_espace_virtuel();
   valeurs_loi_paroi_["u_tau"].echange_espace_virtuel();
+  if (sub_type(QDM_Multiphase, pb_->equation(0)) && pb_->has_champ("y_plus")) ref_cast(QDM_Multiphase, pb_->equation(0)).update_y_plus(DoubleTab_parts(valeurs_loi_paroi_["y_plus"])[1]);
 }
 
 void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc)
@@ -121,6 +127,7 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
         double y_loc = zone.dist_face_elem0(f,  e);
         u_t(f, n) = calc_u_tau_loc(norm_u_parallel, nu_visc(e, n), y_loc);
         y_p(f, n) = y_loc*u_t(f, n)/nu_visc(e, n);
+        y_p(nf_tot+D*e, n) = y_p(f, n);
         y(f,n) = y_loc;
         if ( abs(norm_u_parallel/u_t(f, n) - u_plus_de_y_plus(y_p(f, n))) > 1e-4) Process::exit(Nom("No convergence on the Dichotomic algorithm ; u_t=") + Nom(u_t(f, n)) + Nom("u_parr=") + Nom(norm_u_parallel) +Nom("u_plus=") + Nom(u_plus_de_y_plus(y_p(f, n))));
         u_p(f, n) = norm_u_parallel/u_t(f, n);
