@@ -25,21 +25,23 @@ Polyedriser dom
 # END MESH #
 
 # BEGIN PARTITION
-Partition dom
+Decouper dom
 {
-    Partition_tool tranche { tranches 2 2 }
+    partitionneur metis { nb_parts 4 }
+    nb_parts_tot 2
     Larg_joint 2
-    zones_name DOM
+    Nom_Zones dom
 }
-End
+Fin
 END PARTITION #
 
 # BEGIN SCATTER
-Scatter DOM.Zones dom
+Scatter dom.Zones dom
 END SCATTER #
 
-PolyMAC_P0  dis
-option_PolyMAC_P0 {  }
+CoviMAC  dis
+option_covimac {  }
+
 
 Schema_euler_implicite sch
 Read sch
@@ -196,6 +198,9 @@ Lire pb
 					diff_k 	diff_k 		periode 1 position_like vitesse
 					diff_tau 	diff_tau 		periode 1 position_like vitesse
 					diff_vit 	diff_vit 		periode 1 position_like vitesse
+					
+					k		k			periode 1 position_like vitesse
+					tau		tau			periode 1 position_like vitesse					
 					}
 		format lata
 		champs binaire dt_post 1e6
