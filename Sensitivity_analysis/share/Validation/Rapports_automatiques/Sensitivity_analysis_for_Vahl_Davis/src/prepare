@@ -1,0 +1,22 @@
+# This is a prepare script for the validation test case Vahl_Davis #
+
+cd Cp
+cp ../post_run .
+cd ..
+
+cd Tg
+cp ../post_run .
+cd ..
+
+cd Td
+cp ../post_run .
+cd ..
+
+cd Lambda
+cp ../post_run .
+cd ..
+
+cd Beta
+cp ../post_run .
+cd ..
+
