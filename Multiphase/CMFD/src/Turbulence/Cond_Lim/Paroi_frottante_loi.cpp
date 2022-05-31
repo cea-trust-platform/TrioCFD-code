@@ -31,6 +31,8 @@
 #include <Pb_Multiphase.h>
 #include <Navier_Stokes_std.h>
 #include <Zone_Poly_base.h>
+#include <Op_Diff_PolyMAC_base.h>
+#include <Op_Diff_PolyMAC_P0_base.h>
 
 #include <math.h>
 
@@ -107,8 +109,9 @@ void Paroi_frottante_loi::me_calculer()
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
   const DoubleTab& vit   = zone_Cl_dis().equation().probleme().get_champ("vitesse").valeurs(),
                    &rho = zone_Cl_dis().equation().probleme().get_champ("masse_volumique").valeurs(),
-                    *alp = sub_type(Pb_Multiphase, zone_Cl_dis().equation().probleme()) ? &zone_Cl_dis().equation().probleme().get_champ("alpha").valeurs() : NULL;
-
+                    *alp = sub_type(Pb_Multiphase, zone_Cl_dis().equation().probleme()) ? &zone_Cl_dis().equation().probleme().get_champ("alpha").valeurs() : NULL,
+                     &mu = sub_type(Op_Diff_PolyMAC_base   , zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
+                           ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu();
 
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), nf_tot = zone.nb_faces_tot(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = zone_Cl_dis().equation().inconnue().valeurs().line_size(), D = dimension;
@@ -136,8 +139,8 @@ void Paroi_frottante_loi::me_calculer()
 
       double y_loc = zone.dist_face_elem0(f_zone,  e);
       double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
-      if (y_plus_loc>1) valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-      else valeurs_coeff_(f, n) = visc(e, n)/y_loc; // viscous case : if u_tau is small
+      if (y_plus_loc>1) valeurs_coeff_(f, n) = (is_calc_qdm ? 1 : 1/mu(e,n)) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+      else valeurs_coeff_(f, n) = (is_calc_qdm ? 1 : 1/mu(e,n)) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
     }
 
   for (n=1 ; n<N ; n++) for (int f =0 ; f < nf ; f++)  valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont des symmetries
