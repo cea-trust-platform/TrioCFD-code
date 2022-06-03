@@ -25,11 +25,11 @@
 #include <Dispersion_bulles_base.h>
 #include <Correlation.h>
 
-/*! @brief classe Dispersion_bulles_turbulente_Burns coefficients de
- *
- *
+/*! @brief classe Dispersion_bulles_turbulente_Burns 
+ *     coefficients de dispersion selon le modele Burns et al 2004
  *
  */
+
 class Dispersion_bulles_turbulente_Burns : public Dispersion_bulles_base
 {
   Declare_instanciable(Dispersion_bulles_turbulente_Burns);
