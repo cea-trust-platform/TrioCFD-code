@@ -1,0 +1,271 @@
+# PARALLEL OK 4 #
+Dimension 3
+
+Domaine dom
+# BEGIN MESH #
+Mailler dom
+{
+	pave bloc
+	{
+		origine 0 0 0
+		longueurs 1 1 1
+		nombre_de_noeuds 21 21 21
+		}
+		{
+		bord periox	X = 0	0 <= Y <= 1	0 <= Z <= 1
+		bord periox	X = 1	0 <= Y <= 1	0 <= Z <= 1
+		bord perioy	Y = 0	0 <= X <= 1	0 <= Z <= 1
+		bord perioy	Y = 1	0 <= X <= 1	0 <= Z <= 1
+		bord perioz	Z = 0	0 <= X <= 1	0 <= Y <= 1
+		bord perioz	Z = 1	0 <= X <= 1	0 <= Y <= 1
+		}
+}
+
+Polyedriser dom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+    Partition_tool tranche { tranches 2 2 }
+    Larg_joint 2
+    zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+PolyMAC_P0  dis
+option_PolyMAC_P0 {  }
+
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0
+    nb_pas_dt_max 0
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-5 pression 1e8 vitesse 1e8 temperature 1e8 k 1e-5 omega 1. }
+        iter_min 5
+        solveur petsc cli { }
+        seuil_convergence_implicite 1e30
+    }
+}
+
+Fluide_Incompressible eau_liquide
+Read eau_liquide
+{
+	mu champ_uniforme 1 0.001
+ 	rho champ_uniforme 1 1000
+	lambda Champ_Uniforme  1 1.
+        Cp Champ_Uniforme      1 1.
+        beta_th Champ_Uniforme 1 0.
+}
+Pb_Multiphase pb
+
+phases pb
+{
+    liquide { eau }
+}
+
+associate  pb dom
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Lire pb
+{
+    correlations
+    {
+    }
+    QDM_Multiphase
+    {
+        equation_non_resolue	(t>0)
+        evanescence { homogene { alpha_res 1 alpha_res_min 0.5 } }
+        solveur_pression petsc cli_quiet { -pc_type hypre -pc_hypre_type boomeramg }
+        convection { centre }
+        diffusion  { turbulente k_tau { } }
+        initial_conditions
+        {
+            vitesse  champ_fonc_xyz dom 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z) 
+            pression Champ_Fonc_xyz dom 1 1e5
+        }
+	conditions_limites	
+	{
+	    periox	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
+	    perioy	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
+	    perioz	frontiere_ouverte_vitesse_imposee_sortie champ_front_fonc_xyz 3 -2*cos(2*3.14*x)*sin(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*cos(2*3.14*y)*sin(2*3.14*z) sin(2*3.14*x)*sin(2*3.14*y)*cos(2*3.14*z)
+	}
+    }
+    Masse_Multiphase
+    {
+        equation_non_resolue	(t>0)
+        initial_conditions { alpha Champ_Fonc_xyz dom 1 1 }
+        convection { amont }
+	conditions_limites	
+	{
+	    periox	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+	    perioy	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+	    perioz	frontiere_ouverte a_ext Champ_Front_Uniforme 1 1
+	}
+        sources { }
+    }
+    Energie_Multiphase
+    {
+        equation_non_resolue	(t>0)
+        diffusion { negligeable }
+        convection { negligeable }
+        initial_conditions { temperature Champ_Uniforme 1 0 }
+        boundary_conditions
+        {
+	    periox	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+	    perioy	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+	    perioz	frontiere_ouverte T_ext Champ_Front_Uniforme 1 0
+        }
+        sources
+        {
+        }
+    }
+    energie_cinetique_turbulente
+    {
+        equation_non_resolue	(t>0)
+        diffusion { turbulente SGDH { sigma 0.67 } }
+        convection { centre }
+        initial_conditions { k champ_fonc_xyz dom 1 cos(2*3.14*y)+2 }
+        boundary_conditions
+        {
+	    periox	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
+	    perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
+	    perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 cos(2*3.14*y)+2
+        }
+	sources
+	{
+	Production_energie_cin_turb ,
+	Terme_dissipation_energie_cinetique_turbulente { beta_k 0.09 }
+	}
+    }
+    echelle_temporelle_turbulente
+    {
+        equation_non_resolue	(t>0)
+        diffusion { tau SGDH { sigma 0.5 } }
+        convection { centre }
+        initial_conditions { tau Champ_Fonc_xyz dom 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09 }
+        boundary_conditions
+        {
+	    periox	scalaire_impose_paroi champ_front_fonc_xyz 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09
+	    perioy	scalaire_impose_paroi champ_front_fonc_xyz 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09
+	    perioz	scalaire_impose_paroi champ_front_fonc_xyz 1 (cos(2*3.14*y)+2)/(sin(2*3.14*y)+2)*0.09
+        }
+	sources
+	{
+	Production_echelle_temp_taux_diss_turb { alpha_omega 0.5 } ,
+	Dissipation_echelle_temp_taux_diss_turb { beta_omega 0.075 } ,
+	Diffusion_croisee_echelle_temp_taux_diss_turb { sigma_d 0.5 }
+	}
+    }
+    Postraitement
+	{
+		Definition_champs	{
+					prod_k 	operateur_eqn	{
+									numero_source 0
+									sources { refChamp { pb_champ pb k } }
+									}
+					diss_k 	operateur_eqn	{
+									numero_source 1
+									sources { refChamp { pb_champ pb k } }
+									}
+					diff_k	       operateur_eqn	{
+									numero_op 0
+									sources { refChamp { pb_champ pb k } }
+									}
+					conv_k 	operateur_eqn	{
+									numero_op 1
+									sources { refChamp { pb_champ pb k } }
+									}
+					prod_tau 	operateur_eqn	{
+									numero_source 0
+									sources { refChamp { pb_champ pb tau } }
+									}
+					diss_tau 	operateur_eqn	{
+									numero_source 1
+									sources { refChamp { pb_champ pb tau } }
+									}
+					diff_crois_tau	operateur_eqn	{
+									numero_source 2
+									sources { refChamp { pb_champ pb tau } }
+									}
+					diff_tau	operateur_eqn	{
+									numero_op 0
+									sources { refChamp { pb_champ pb tau } }
+									}
+					conv_tau 	operateur_eqn	{
+									numero_op 1
+									sources { refChamp { pb_champ pb tau } }
+									}					
+					epsilon         transformation {
+							                methode formule expression 1 0.09*k_loc/tau_loc localisation elem sources { refChamp { Pb_champ pb k nom_source k_loc } , refchamp { Pb_champ pb tau nom_source tau_loc  } }
+							               }
+					}
+		sondes			{
+					vitesseX	vitesseX		periode 1 segment 100 0.005 0.005 0.005 0.995 0.995 0.995
+					vitesseY	vitesseY		periode 1 position_like vitesseX
+					vitesseZ	vitesseZ		periode 1 position_like vitesseX
+
+					k		k			periode 1 segment 100 0.005 0.005 0.005 0.995 0.995 0.995
+					tau		tau			periode 1 position_like k
+					epsilon	epsilon		periode 1 position_like k
+					nut		viscosite_turbulente_liquide_eau	periode 1 position_like k
+
+					prod_k 	prod_k 		periode 1 position_like k
+					diss_k 	diss_k 		periode 1 position_like k
+					diff_k 	diff_k 		periode 1 position_like k
+					conv_k 	conv_k 		periode 1 position_like k
+
+					prod_tau 	prod_tau 		periode 1 position_like tau
+					diss_tau 	diss_tau 		periode 1 position_like tau
+					diff_tau 	diff_tau 		periode 1 position_like tau
+					conv_tau 	conv_tau 		periode 1 position_like tau
+					diff_crois_tau diff_crois_tau		periode 1 position_like tau
+
+					grad_v		gradient_vitesse_liquide_eau periode 1 position_like tau
+					
+					vitesseX_bord	vitesseX		periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+					vitesseY_bord	vitesseY		periode 1 position_like vitesseX_bord
+					vitesseZ_bord	vitesseZ		periode 1 position_like vitesseX_bord
+
+					k_bord		k			periode 1 segment 100 0.005 0.005 0.005 0.005 0.995 0.005
+					tau_bord	tau			periode 1 position_like k_bord
+					epsilon_bord	epsilon		periode 1 position_like k_bord
+					nut_bord	viscosite_turbulente_liquide_eau	periode 1 position_like k_bord
+
+					prod_k_bord 	prod_k 		periode 1 position_like k_bord
+					diss_k_bord 	diss_k 		periode 1 position_like k_bord
+					diff_k_bord 	diff_k 		periode 1 position_like k_bord
+					conv_k_bord 	conv_k 		periode 1 position_like k_bord
+
+					prod_tau_bord 	prod_tau 		periode 1 position_like tau_bord
+					diss_tau_bord 	diss_tau 		periode 1 position_like tau_bord
+					diff_tau_bord 	diff_tau 		periode 1 position_like tau_bord
+					conv_tau_bord 	conv_tau 		periode 1 position_like tau_bord
+					}
+		format lata
+		champs binaire dt_post 1e6
+					{
+					k elem
+					tau elem
+					vitesse elem
+					viscosite_turbulente_liquide_eau elem
+					}
+	}
+}
+
+EcritureLectureSpecial EcrFicPartageBin
+
+Resoudre pb
+
+Fin

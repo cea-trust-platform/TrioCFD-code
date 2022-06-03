@@ -128,7 +128,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
         nb_faces=1;
       for (i=0; i<nb_faces; i++)
         {
-          double fij,total_calcule=0,total_lu;
+          double fij,total_lu;
           // Lecture du fichier Ansys
           ansys>>motlu;
           while(motlu!="TOTAL=")
@@ -145,7 +145,6 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
                 {
                   ansys>>fij;
                   FiJ+=fij;
-                  total_calcule+=fij;
                 }
               if (deja_regroupe_dans_ansys)
                 FIJ(I,J)=FiJ;

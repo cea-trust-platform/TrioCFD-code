@@ -6605,7 +6605,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
     const ArrOfInt& index_elem = intersections.index_elem();
     DoubleTab& surface = variables_internes_->surface_interface.valeur().valeurs();
     const int nb_elements = surface.dimension(0);
-    double sum=0.;
+    // double sum=0.;
     for (int element = 0; element < nb_elements; element++)
       {
         int index = index_elem[element];
@@ -6618,7 +6618,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
             index = data.index_facette_suivante_;
           }
         surface[element] = surface_totale;
-        sum += surface[element];
+        // sum += surface[element];
       }
     surface.echange_espace_virtuel();
     variables_internes_->surface_interface.mettre_a_jour(temps);

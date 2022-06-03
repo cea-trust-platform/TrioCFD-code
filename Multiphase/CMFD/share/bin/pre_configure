@@ -1,0 +1,26 @@
+#!/bin/bash
+project_directory="$( cd -- "$(dirname "$0")/../.." >/dev/null 2>&1 ; pwd -P )"
+if [  -e $project_directory/archives/libC3.tar.gz ]; then
+  cat > $project_directory/project.cfg <<EOF
+# description section (required)
+[description] 
+name       : CMFD        
+author     : TrioCFD
+executable : CMFD        
+
+[prerequisite1]
+name : libC3
+prog_test : test_ftsatp.cpp 
+librairies_flag : -lC3
+EOF
+  sed 's/HAVE_LIBC3 0/HAVE_LIBC3 1/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
+else
+  cat > $project_directory/project.cfg <<EOF
+# description section (required)
+[description] 
+name       : CMFD        
+author     : TrioCFD
+executable : CMFD        
+EOF
+  sed 's/HAVE_LIBC3 1/HAVE_LIBC3 0/g' -i.bak $project_directory/src/ThHyd/Multiphase/Milieu/Lois_eau_c3.h
+fi

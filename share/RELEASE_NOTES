@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.5_beta : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
+XX/XX/XX (TrioCFD) New feature : Multiphase CFD (CMFD baltik) ; still a work in progress
 20/05/22 (TrioCFD) New feature : Adams Bashforth time scheme on a mobile (ALE context)
 20/05/22 (TrioCFD) New feature : LES model on a mobile gird (ALE context)
 20/04/22 (TrioCFD) Enhancement : Adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid (ALE context)
