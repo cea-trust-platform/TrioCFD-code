@@ -77,7 +77,9 @@ void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
 
   /* elements */
   for (int f = 0; f < zone.premiere_face_int(); f++) // On n'injecte que dans les elems de bord
-    for (int k = 0, mp = 0 ; k<N ; k++ , mp += (Np > 1)) if (k != n_l) if (milc.has_saturation(n_l, k)) //phase vapeur
+    for (int k = 0, mp = 0 ; k<N ; k++ , mp += (Np > 1))
+      if (k != n_l)
+        if (milc.has_saturation(n_l, k)) //phase vapeur
           {
             Saturation_base& sat = milc.get_saturation(n_l, k);
             int e = f_e(f, 0);

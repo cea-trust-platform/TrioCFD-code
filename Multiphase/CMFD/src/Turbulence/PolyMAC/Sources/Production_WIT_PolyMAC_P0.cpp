@@ -83,7 +83,9 @@ void Production_WIT_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& se
   if (D!=3) Process::exit("WIT is only coded for 3 dimensions");
 
   // On calcule le second membre aux elements (implicite uniquement pour le moment)
-  for(int e = 0 ; e < ne ; e++) for (int k = 0 ; k<N ; k++) if (k!=n_l)
+  for(int e = 0 ; e < ne ; e++)
+    for (int k = 0 ; k<N ; k++)
+      if (k!=n_l)
         {
           double u_r = 0;
           for (int d = 0; d < D; d++) u_r += (vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l))*(vit(nf_tot + D*e+d, k) - vit(nf_tot + D*e+d, n_l)); // relative speed = gas speed - liquid speed

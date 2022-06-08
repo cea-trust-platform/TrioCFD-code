@@ -57,18 +57,22 @@ void Viscosite_turbulente_WIF::reynolds_stress(DoubleTab& R_ij) const // Renvoie
   if (N!=2) Process::exit("Visocisty_turbulente_WIF is only coded for 2 phases");
   if (D!=3) Process::exit("Visocisty_turbulente_WIF is only coded for 3 dimensions");
 
-  for (i = 0; i < p_u.size(); i++) if (p_u[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
+  for (i = 0; i < p_u.size(); i++)
+    if (p_u[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
   if (i_part < 0) Process::exit("Viscosite_turbulente_WIF : inconsistency between velocity and Rij!");
   const DoubleTab& u = p_u[i_part]; //le bon tableau
   DoubleTrav u_r(u.dimension(0), D);
   DoubleTrav u_r_carre(u.dimension(0), 1);
-  for (i = 0; i < R_ij.dimension(0); i++) for (d = 0; d < D; d++)
+  for (i = 0; i < R_ij.dimension(0); i++)
+    for (d = 0; d < D; d++)
       {
         u_r(i, d) = u(i, d, 1) - u(i, d, 0); // relative speed = gas speed - liquid speed
         u_r_carre(i,0) += u_r(i, d)*u_r(i, d);
       }
 
-  for (i = 0; i < R_ij.dimension(0); i++) for (d = 0; d < D; d++) for (db = 0; db < D; db++)
+  for (i = 0; i < R_ij.dimension(0); i++)
+    for (d = 0; d < D; d++)
+      for (db = 0; db < D; db++)
         {
           R_ij(i, 1, d, db) = 0 ; // No WIF for gas phase
           R_ij(i, 0, d, db) = tab_alpha(i, 0) * ( 3/20 * u_r_carre(i,0) * (db==d?1:0) + (1/20 + 1.5 * gamma_*gamma_*gamma_*0.25) * u_r(i, d)* u_r(i, db) ) ;

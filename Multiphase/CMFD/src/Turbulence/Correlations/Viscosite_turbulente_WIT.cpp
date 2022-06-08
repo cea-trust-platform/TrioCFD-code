@@ -53,7 +53,9 @@ void Viscosite_turbulente_WIT::reynolds_stress(DoubleTab& R_ij) const // Renvoie
   int i, d, db, D = dimension, N = R_ij.dimension(1);
   if (N!=2) Process::exit("WIT only works when there are 2 phases");
 
-  for (i = 0; i < R_ij.dimension(0); i++) for (d = 0; d < D; d++) for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
+  for (i = 0; i < R_ij.dimension(0); i++)
+    for (d = 0; d < D; d++)
+      for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
         {
           R_ij(i, 1, d, db) = 0 ; // No WIT for gas phase
           R_ij(i, 0, d, db) = 2./3. * (db==d?1:0) * tab_k_WIT(i, 0) ;

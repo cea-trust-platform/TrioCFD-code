@@ -53,7 +53,8 @@ void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matr
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
   assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
-  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
+  for (auto &&n_m : matrices)
+    if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -62,9 +63,11 @@ void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matr
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "alpha" || n_m.first == "temperature") // N <= M
-          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
         if (n_m.first == "pression" )
-          for (int e = 0; e < ne; e++) for (int n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
         Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -92,7 +95,8 @@ void Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_
 
   assert( N == 1 ); // si Ntau > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
 
-  for (int e = 0; e < nb_elem; e++) for (m = 0, mp = 0; m < N; m++, mp += (Np > 1))
+  for (int e = 0; e < nb_elem; e++)
+    for (m = 0, mp = 0; m < N; m++, mp += (Np > 1))
       {
         if (Type_diss == "tau")
           {

@@ -61,7 +61,8 @@ void Paroi_frottante_loi::liste_faces_loi_paroi(IntTab& tab)
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = tab.line_size();
 
-  for (int f =0 ; f < nf ; f++) for (int n = 0 ; n<N ; n++)
+  for (int f =0 ; f < nf ; f++)
+    for (int n = 0 ; n<N ; n++)
       tab(f + f1, n) |= 1;
 }
 
@@ -143,7 +144,8 @@ void Paroi_frottante_loi::me_calculer()
       else valeurs_coeff_(f, n) = (is_calc_qdm ? 1 : 1/mu(e,n)) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
     }
 
-  for (n=1 ; n<N ; n++) for (int f =0 ; f < nf ; f++)  valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont des symmetries
+  for (n=1 ; n<N ; n++)
+    for (int f =0 ; f < nf ; f++)  valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont des symmetries
 
   valeurs_coeff_.echange_espace_virtuel();
 }

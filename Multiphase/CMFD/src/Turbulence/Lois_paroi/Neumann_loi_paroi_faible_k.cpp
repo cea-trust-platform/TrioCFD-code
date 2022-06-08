@@ -69,7 +69,8 @@ void Neumann_loi_paroi_faible_k::liste_faces_loi_paroi(IntTab& tab)
   int nf = la_frontiere_dis.valeur().frontiere().nb_faces(), f1 = la_frontiere_dis.valeur().frontiere().num_premiere_face();
   int N = tab.line_size();
 
-  for (int f =0 ; f < nf ; f++) for (int n = 0 ; n<N ; n++)
+  for (int f =0 ; f < nf ; f++)
+    for (int n = 0 ; n<N ; n++)
       tab(f + f1, n) |= 1;
 }
 

@@ -82,13 +82,16 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::dimensionner_blocs(m
   const IntTab& fg_d = tau.fgrad_d, fg_e = tau.fgrad_e, &e_f = zone.elem_faces(); // Tables used in zone_PolyMAC_P0::fgrad
 
 
-  for (auto &&i_m : matrices) if (i_m.first == "tau")
+  for (auto &&i_m : matrices)
+    if (i_m.first == "tau")
       {
         Matrice_Morse mat;
         IntTrav stencil(0, 2);
         stencil.set_smart_resize(1);
 
-        for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++) for (int i = 0, f; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+        for(int e = 0 ; e < ne ; e++)
+          for (int n=0 ; n<N ; n++)
+            for (int i = 0, f; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
               for (int j = fg_d(f); j < fg_d(f+1) ; j++)
                 {
                   int ed = fg_e(j);
@@ -135,7 +138,8 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
   // Calculation of grad of root of tau at faces
   Matrice_Morse *Mtau = (matrices.count("tau") && !semi_impl.count("tau")) ? matrices.at("tau") : nullptr;
 
-  for (int f = 0; f < nf; f++) for (int n=0 ; n<N ; n++)
+  for (int f = 0; f < nf; f++)
+    for (int n=0 ; n<N ; n++)
       {
         grad_sqrt_tau(f, n) = 0;
         for (int j = fg_d(f); j < fg_d(f+1) ; j++)
@@ -154,7 +158,9 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
       }
 
   // Calculation of grad of root of tau at elements ; same if implicit or explicit
-  for (int e = 0; e < ne_tot; e++) for (int n=0 ; n<N ; n++) for (int d = 0; d < D; d++)
+  for (int e = 0; e < ne_tot; e++)
+    for (int n=0 ; n<N ; n++)
+      for (int d = 0; d < D; d++)
         {
           grad_sqrt_tau(nf_tot + D*e+d, n) = 0;
           for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
@@ -168,7 +174,8 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
   matrices_t mat_m; //derivees vides
   eq.operateur(0).l_op_base().ajouter_blocs(mat_m, sec_m, semi_impl);
 
-  for(int e = 0 ; e < ne ; e++) for (int n=0 ; n<N ; n++)
+  for(int e = 0 ; e < ne ; e++)
+    for (int n=0 ; n<N ; n++)
       {
         // Second membre
         double fac = pe(e)*ve(e) ;
@@ -190,7 +197,8 @@ void Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0::ajouter_blocs(matric
               for (int j = fg_d(f); j < fg_d(f+1) ; j++)
                 {
                   int ed = fg_e(j);
-                  if ( ed < ne_tot) for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
+                  if ( ed < ne_tot)
+                    for (int d = 0 ; d<D ; d++) //contrib d'un element ; contrib d'un bord : pas de derivee
                       {
 //                          double inv_sqrt_tau = sqrt(tab_k_passe(ed, n) / std::max(tab_k_passe(ed, n) * tab_tau(ed, n), visc_turb.limiteur() * nu_visc(ed, n)));
                         double inv_sqrt_tau = (tab_tau(ed, n) > limiter_tau_) ? std::sqrt(1/tab_tau(ed, n)) : std::sqrt(1/limiter_tau_);

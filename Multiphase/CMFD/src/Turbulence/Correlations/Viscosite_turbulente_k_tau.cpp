@@ -50,7 +50,8 @@ void Viscosite_turbulente_k_tau::eddy_viscosity(DoubleTab& nu_t) const
   //il faut que nu_t et k aient la meme localisation et que nu_t ait au moins autant de composantes que k
   assert((k.dimension(1) <= nu_t.dimension(1)));
   //on met 0 pour les composantes au-dela de k.dimension(1) (ex. : vapeur dans Pb_Multiphase)
-  for (int i = 0; i < nu_t.dimension(0); i++) for (int n = 0; n < nu_t.dimension(1); n++)
+  for (int i = 0; i < nu_t.dimension(0); i++)
+    for (int n = 0; n < nu_t.dimension(1); n++)
       nu_t(i, n) = (n < k.dimension(1)) ? sigma_ * std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) : 0;
 }
 
@@ -60,10 +61,14 @@ void Viscosite_turbulente_k_tau::reynolds_stress(DoubleTab& R_ij) const // Renvo
                    &nu = pb_->get_champ("viscosite_cinematique").passe(), &grad_u = pb_->get_champ("gradient_vitesse").passe();
   ConstDoubleTab_parts p_gu(grad_u); //en PolyMAC_P0, grad_u contient (nf.grad)u_i aux faces, puis (d_j u_i) aux elements
   int i, d, db, D = dimension, i_part = -1, n, N = nu.dimension(1), Nk = k.dimension(1);
-  for (i = 0; i < p_gu.size(); i++) if (p_gu[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support que k
+  for (i = 0; i < p_gu.size(); i++)
+    if (p_gu[i].get_md_vector() == R_ij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support que k
   if (i_part < 0) Process::exit("Viscosite_turbulente_k_tau : inconsistency between velocity gradient and k!");
   const DoubleTab& gu = p_gu[i_part]; //le bon tableau
-  for (i = 0; i < R_ij.dimension(0); i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
+  for (i = 0; i < R_ij.dimension(0); i++)
+    for (n = 0; n < N; n++)
+      for (d = 0; d < D; d++)
+        for (db = 0; db < D; db++) //on ne remplit que les phases concernees par k
           R_ij(i, n, d, db) = n < Nk ? sigma_ * (2. / D * k(i, n) * (d ==db) - std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) * (gu(i, d, D * n + db) + gu(i, db, D * n + d))) : 0;
 }
 
@@ -73,7 +78,8 @@ void Viscosite_turbulente_k_tau::k_over_eps(DoubleTab& k_sur_eps) const
   int i, nl = k_sur_eps.dimension(0), n, N = k_sur_eps.dimension(1), Nt = tau.dimension(1);
   assert(nl == tau.dimension(0) && Nt <= N);
   /* comme tau = 1 / omega et omega = epsilon / k, k / epsilon = tau ! */
-  for (i = 0; i < nl; i++) for (n = 0; n < N; n++) k_sur_eps(i, n) = n < Nt ? tau(i, n) : 0;
+  for (i = 0; i < nl; i++)
+    for (n = 0; n < N; n++) k_sur_eps(i, n) = n < Nt ? tau(i, n) : 0;
 }
 
 void Viscosite_turbulente_k_tau::eps(DoubleTab& eps) const
@@ -84,5 +90,6 @@ void Viscosite_turbulente_k_tau::eps(DoubleTab& eps) const
   int i, nl = eps.dimension(0), n, N = eps.dimension(1), Nt = tau.dimension(1);
   assert(nl == tau.dimension(0) && Nt <= N);
   /* comme tau = 1 / omega et omega = epsilon / k, epsilon = k / tau ! */
-  for (i = 0; i < nl; i++) for (n = 0; n < N; n++) eps(i, n) = ((n < Nt) && (k(i, n)>1.e-8) ) ? k(i, n)*k(i, n)/ std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) : 0;
+  for (i = 0; i < nl; i++)
+    for (n = 0; n < N; n++) eps(i, n) = ((n < Nt) && (k(i, n)>1.e-8) ) ? k(i, n)*k(i, n)/ std::max(k(i, n) * tau(i, n), limiter_ * nu(i, n)) : 0;
 }

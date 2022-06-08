@@ -81,7 +81,8 @@ void Loi_paroi_adaptative::completer()
       }
 
   DoubleTab& tab_y_p = valeurs_loi_paroi_["y_plus"];
-  for (int i = 0 ; i < tab_y_p.dimension_tot(0) ; i ++) for (int n = 0 ; n < tab_y_p.dimension_tot(1) ; n++) tab_y_p(i,n) = -1.;
+  for (int i = 0 ; i < tab_y_p.dimension_tot(0) ; i ++)
+    for (int n = 0 ; n < tab_y_p.dimension_tot(1) ; n++) tab_y_p(i,n) = -1.;
 }
 
 void Loi_paroi_adaptative::mettre_a_jour(double temps)
@@ -109,7 +110,8 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
 
   int n=0; // pour l'instant, turbulence dans seulement une phase
 
-  for (int f = 0 ; f < nf ; f ++) if (Faces_a_calculer_(f,0)==1)
+  for (int f = 0 ; f < nf ; f ++)
+    if (Faces_a_calculer_(f,0)==1)
       {
         if (f_e(f, 1) >= 0) Process::exit("Error in the definition of the boundary conditions for wall laws");
         int e = f_e(f,0);

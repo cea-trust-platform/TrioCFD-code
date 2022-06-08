@@ -49,7 +49,8 @@ void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
   const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
-  for (auto &&n_m : matrices) if (n_m.first == "interfacial_area" || n_m.first == "temperature" || n_m.first == "pression")
+  for (auto &&n_m : matrices)
+    if (n_m.first == "interfacial_area" || n_m.first == "temperature" || n_m.first == "pression")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -58,9 +59,11 @@ void Variation_rho::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_i
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "interfacial_area" || n_m.first == "temperature") // N <= M
-          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
         if (n_m.first == "pression" )
-          for (int e = 0; e < ne; e++) for (int n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0, m = 0; n < N; n++, m+=(M>1)) sten.append_line(N * e + n, M * e + m);
         Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -92,7 +95,8 @@ void Variation_rho::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const 
   /* elements */
   int n_l = 0 ; // phase porteuse
   for (int e = 0; e < zone.nb_elem(); e++)
-    for (int k = 0, mp = 0 ; k<N ; k++ , mp += (Np > 1)) if (k != n_l) //phase gazeuse
+    for (int k = 0, mp = 0 ; k<N ; k++ , mp += (Np > 1))
+      if (k != n_l) //phase gazeuse
         {
           double fac = 2./3.*1/pas_tps * pe(e) * ve(e) ;
           secmem(e , k) += fac * inco(e, k) * ( 1 - rho_p(e, k)/rho(e, k));

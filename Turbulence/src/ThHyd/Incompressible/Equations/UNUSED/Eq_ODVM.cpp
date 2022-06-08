@@ -257,7 +257,8 @@ void Eq_ODVM::aller_au_temps(double dtn1, double Tw_np1, double Tnp1, double dif
 
 
   // Calculating the temperature variance ratio for forcing.
-  if(compt>=6) for(int i=0; i<N; i++) Q(i) = sqrt(std::fabs(qb(i))/std::fabs(qb(N-1)+1.e-20));
+  if(compt>=6)
+    for(int i=0; i<N; i++) Q(i) = sqrt(std::fabs(qb(i))/std::fabs(qb(N-1)+1.e-20));
 
   // Calculating the turbulent diffusivity.
   double D;

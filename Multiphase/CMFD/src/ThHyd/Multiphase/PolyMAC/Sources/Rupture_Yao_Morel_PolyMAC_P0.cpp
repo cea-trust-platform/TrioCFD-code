@@ -47,7 +47,8 @@ void Rupture_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs_t& se
   const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
   const int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
-  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "interfacial_area")
+  for (auto &&n_m : matrices)
+    if (n_m.first == "alpha" || n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "interfacial_area")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -57,13 +58,15 @@ void Rupture_Yao_Morel::dimensionner_blocs(matrices_t matrices, const tabs_t& se
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "alpha")
-          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++)
+          for (int e = 0; e < ne; e++)
+            for (int n = 0; n < N; n++)
               {
                 sten.append_line(N * e + n, N * e + n_l);
                 if (n != n_l) sten.append_line(N * e + n, N * e + n);
               }
         if (n_m.first == "k" || n_m.first == "tau" || n_m.first == "omega") // N <= M
-          for (int e = 0; e < ne; e++) for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e +n_l);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0; n < N; n++) sten.append_line(N * e + n, M * e +n_l);
         Matrix_tools::allocate_morse_matrix(N * ne_tot, M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -108,7 +111,8 @@ void Rupture_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, co
   /* elements */
   int n_l = 0 ; // phase porteuse
   for (int e = 0; e < zone.nb_elem(); e++)
-    for (int k = 0 ; k<N ; k++) if (k != n_l) //phase gazeuse
+    for (int k = 0 ; k<N ; k++)
+      if (k != n_l) //phase gazeuse
         if (alpha(e, k) > 1.e-6)
           {
             Interface_base& interface = milc.get_interface(n_l, k);
