@@ -8,7 +8,7 @@
 \usepackage{geometry}
 \usepackage{amsmath,amssymb,amsfonts,textcomp}
 \usepackage{color}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{colortbl}
 \usepackage{graphicx}
 \usepackage{fancyhdr}
@@ -24,6 +24,13 @@
 \usepackage{babel}
 \usepackage{float}
 \usepackage{chngcntr}
+\usepackage{wrapfig}
+\usepackage{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{tikzpagenodes}
+\usepackage{pdflscape}
 % espacement table des matieres et des figures entre numero et titre
 \usepackage{tocloft}
 \renewcommand{\cftpartnumwidth}{3em}
@@ -34,17 +41,18 @@
 \usepackage{makeidx}
 \usepackage{hyperref}
 \hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
-%
+
+\setlength{\arrayrulewidth}{1.5pt}%
 \setlength\hoffset{0cm}
 \setlength\voffset{0cm}
 \setlength\oddsidemargin{0cm}
 \setlength\evensidemargin{0cm}
 \setlength\topmargin{0cm}
 \setlength\headheight{0.45cm}
-\setlength\headsep{0.6cm}
+\setlength\headsep{0.8cm} %0.6
 \setlength\marginparsep{0cm}
 \setlength\marginparwidth{0cm}
-\setlength\footskip{1.4cm}
+\setlength\footskip{0.6cm} %1.4
 \setlength{\textheight}{670pt} 
 \setlength\textwidth{16.4cm}
 \setlength{\cellspacebottomlimit}{5pt}
@@ -164,13 +172,13 @@
 \end{multicols}
 \cornersize{.2}
 \Ovalbox{\begin{minipage}{16.2cm}
-\begin{center} \vspace{2cm}
-\parbox[t]{12cm}{\hspace{1cm}\huge{\textbf{USER DOCUMENTATION :}}
-\newline
-\hspace{3cm}\LARGE{\textbf{Validation Report TrioCFD v1.8.4}}} \end{center}
-\vspace{0.4cm}
+\begin{center} \vspace{1.5cm}
+\parbox[t]{12cm}{\hspace{1.3cm}\huge{\textbf{USER DOCUMENTATION :}}
+\vspace{0.4cm}\newline 
+\hspace{5cm}\LARGE{\textbf{Validation Report TrioCFD v1.8.4}}} \end{center}
+\vspace{0.3cm}
 \begin{center}\includegraphics[scale=0.65]{tools/Trio-CFD.png} \end{center}
-\vspace{0.4cm}
+\vspace{0.3cm}
 \begin{center}\includegraphics[scale=0.65]{tools/DM2S.png} \end{center}
 \vspace{0.4cm}
 \setlength{\tabcolsep}{0.5cm}
@@ -217,6 +225,20 @@ v1.8.4 & \today && P.E. ANGELI\\
 \input{./part2-methodology.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Laminar Flow}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [LimeGreen,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [LimeGreen,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
 \rhead{LAMINAR FLOW}
 \normalsize \normalfont
 \input{./part3-laminar.tex}
@@ -237,7 +259,22 @@ v1.8.4 & \today && P.E. ANGELI\\
 \input{./fiches/Cir_Cyl_Re100/build/.tmp/fic.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Thermal Laminar Flow}
-\markright{THERMAL LAMINAR FLOW}
+%\markright{THERMAL LAMINAR FLOW}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [ForestGreen,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [ForestGreen,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
+\rhead{THERMAL LAMINAR FLOW}
 \normalsize \normalfont
 \input{./part4-thermallaminar.tex}
 \newpage
@@ -251,6 +288,20 @@ v1.8.4 & \today && P.E. ANGELI\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Turbulent Flow}
 \markright{TURBULENT FLOW}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [SkyBlue,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [SkyBlue,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
 \normalsize \normalfont
 \input{./part5-turbulent.tex}
 \newpage
@@ -264,6 +315,20 @@ v1.8.4 & \today && P.E. ANGELI\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Thermal Turbulent Flow}
 \markright{THERMAL TURBULENT FLOW}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [Blue,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [Blue,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
 \normalsize \normalfont
 \input{./part6-thermalturbulent.tex}
 \newpage
@@ -277,6 +342,20 @@ v1.8.4 & \today && P.E. ANGELI\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Two-phase Flows with Front-Tracking}
 \markright{TWO-PHASE FLOWS WITH FRONT-TRACKING}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [Orchid,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [Orchid,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
 \normalsize \normalfont
 \input{./part7-FT.tex}
 \newpage
@@ -290,6 +369,20 @@ v1.8.4 & \today && P.E. ANGELI\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Fluid-structure interactions with ALE}
 \markright{FLUID-STRUCTURE INTERACTIONS WITH ALE}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [Goldenrod,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [Goldenrod,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
 \normalsize \normalfont
 \input{./part8-ALE.tex}
 \newpage
@@ -307,12 +400,35 @@ v1.8.4 & \today && P.E. ANGELI\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Conclusion}
 \markboth{}{CONCLUSION}
+\chead{
+\tikz[remember picture,overlay] {%
+    \fill [White,fill opacity=.2]
+    ([yshift=0pt]current page header area.south west -| current page.north west)
+    rectangle
+    (current page.north east)
+    ;
+    \fill [White,fill opacity=.2]
+    ([yshift=-45pt]current page.south west)
+    rectangle
+    (current page footer area.north east -| current page.north east)
+    ;
+  }
+}
 \normalsize \normalfont
 \input{./part9-conclusion.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section*{Annexe A: One example of \texttt{PRM} file}
-%\rhead{Annexe A: One example of \texttt{PRM} file}
-%\addcontentsline{toc}{part}{Annexe A: One example of \texttt{PRM} file}
+\begin{landscape}
+\section*{Annexe A: List of TrioCFD \texttt{PRM} files}
+
+\rhead{Annexe A: List of TrioCFD \texttt{PRM} files}
+\addcontentsline{toc}{part}{Annexe A: List of TrioCFD \texttt{PRM} files}
+\input{./ANNEXEA_PRMlist}
+\end{landscape}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section*{Annexe B: One example of \texttt{PRM} file}
+%\rhead{Annexe B: One example of \texttt{PRM} file}
+%\addcontentsline{toc}{part}{Annexe B: One example of \texttt{PRM} file}
 %\begin{center}
 %\begin{algorithm}[H]
 %{\footnotesize{}\VerbatimInput{AnnexeA.txt}}{\footnotesize\par}
