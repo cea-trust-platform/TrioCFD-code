@@ -12,12 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Champ_Generique_Morceau_Equation.cpp
-// Directory:   $TURBULENCE_ROOT/src/TRUST_FIXES/CAN_BE_MOVED/RANS
-//
-//////////////////////////////////////////////////////////////////////////////
 #include <Champ_Generique_Morceau_Equation.h>
 #include <Zone_VF.h>
 #include <Champ_Generique_refChamp.h>

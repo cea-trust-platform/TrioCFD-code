@@ -12,12 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Champ_Post_Operateur_Eqn.cpp
-// Directory:   $TURBULENCE_ROOT/src/TRUST_FIXES/CAN_BE_MOVED/RANS
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_Post_Operateur_Eqn.h>
 #include <Probleme_base.h>
@@ -246,8 +240,8 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ& espace_stockage) co
     else
       ref_eq_->sources()(numero_source_).calculer(es);
     if (!sans_solveur_masse_)
-      ref_eq_->solv_masse().valeur().appliquer_impl(es);
-    // Hack: car Masse_PolyMAC_Face::appliquer_impl ne divise par le volume (matrice de masse)....
+      ref_eq_->solv_masse().valeur().appliquer_impl(es); //On divise par le volume
+    // Hack: car Masse_PolyMAC_Face::appliquer_impl ne divise pas par le volume (matrice de masse)....
     if (ref_eq_->solv_masse().valeur().que_suis_je()=="Masse_PolyMAC_Face")
       {
         //Cerr << "Volumic source terms on faces with PolyMAC can't be post-processed yet." << finl;
