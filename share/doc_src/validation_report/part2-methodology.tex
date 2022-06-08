@@ -12,7 +12,7 @@ giving accurate instructions and commands in next sections.
 \section{Inventory and sort}
 \lhead{\textit{Inventory and sort}}
 \rhead{\textit{METHODOLOGY}}
-Currently, the \texttt{TrioCFD} database contains 162 test
+Currently, the \texttt{TrioCFD} database contains 165 test
 cases archived in different folders (see Table \ref{tab:List-of-folders}).
 First, an important inventory work was carried out to sort the test
 cases for targeting quickly the use of \texttt{TrioCFD} in different
@@ -45,12 +45,8 @@ data.
 \caption{\label{tab:List-of-folders}List of folders of \texttt{TrioCFD} test cases.}
 \end{table}
 
-This files arrangement of Table \ref{tab:List-of-folders} is not
-intuitive and can lose users and sometimes be confusing (e.g. subdirectory
-names such as \textquotedbl{}\textsf{pas\_fini}\textquotedbl{}, \textquotedbl{}\textsf{Fiches\_supplementaires}\textquotedbl{},
-\textquotedbl{}\textsf{Bench}\textquotedbl{}, and so on ...). For
-a better understanding of future versions, all files and subfolders
-will be re-ordered and the directory tree will be simplified.
+Since version 1.9.0, the validation sheets are present in the Baltik necessary to execute them. Some of them can run only with TRUST (laminar and thermal laminar problems) but the choice was made to keep them in \texttt{TrioCFD}. All the validation sheets are accessible in the Baltik validation in the \texttt{/validation/share/Validation/Rapports\_automatiques/} directory.They are grouped here in accordance with the themes structuring this present validation report (Laminar Flow, Thermal Laminar Flow,...)
+In addition, since version v1.9.0, the summary table of all these validation sheets is present in the appendix \textbf{Annexe A: List of TrioCFD \texttt{PRM} files} of this report.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Development of a new \textsf{PRM} template}
