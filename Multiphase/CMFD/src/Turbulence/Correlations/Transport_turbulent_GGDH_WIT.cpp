@@ -60,7 +60,8 @@ void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& e
   MD_Vector_tools::creer_tableau_distribue(nu.get_md_vector(), Rij);
 
   ConstDoubleTab_parts p_u(tab_u); //en PolyMAC_P0, tab_u contient (nf.u) aux faces, puis (u_i) aux elements
-  for (i = 0; i < p_u.size(); i++) if (p_u[i].get_md_vector() == Rij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
+  for (i = 0; i < p_u.size(); i++)
+    if (p_u[i].get_md_vector() == Rij.get_md_vector()) i_part = i; //on cherche une partie ayant le meme support
   if (i_part < 0) Process::exit("Viscosite_turbulente_WIF : inconsistency between velocity and Rij!");
   const DoubleTab& u = p_u[i_part]; //le bon tableau
   DoubleTrav u_r(u.dimension(0), 1);
@@ -72,7 +73,10 @@ void Transport_turbulent_GGDH_WIT::modifier_nu(const Convection_Diffusion_std& e
 
   visc_turb.reynolds_stress(Rij);
   //formule pour passer de nu a mu : mu0 / nu0 * C_s * temps_carac * <u'i u'_j>
-  for (i = 0; i < nl; i++) if (alp(i, 0) >= limiteur_alpha_) for (d = 0; d < D; d++) for (db = 0; db < D; db++)
+  for (i = 0; i < nl; i++)
+    if (alp(i, 0) >= limiteur_alpha_)
+      for (d = 0; d < D; d++)
+        for (db = 0; db < D; db++)
           {
             double temps_carac = 2./3. * 1./(delta_*delta_*delta_)*diam(i, 0) / (pow(gamma_, 2./3.)*alp(i, 0)*u_r(i,0));
             nu(i, 0, d, db) += alp(i, 0) * mu0(i, 0) / nu0(i, 0) * C_s * std::max(temps_carac * Rij(i, 0, d, db), visc_turb.limiteur() * nu(i, 0, d, db));

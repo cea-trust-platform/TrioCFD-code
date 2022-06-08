@@ -57,13 +57,21 @@ void Op_Diff_Tau_PolyMAC_P0_Elem::modifier_nu(DoubleTab& mu) const // Multiplica
   const DoubleTab& tau = equation().probleme().get_champ("tau").passe();
   int i, nl = mu.dimension_tot(0), n, N = mu.dimension(1), D = dimension;
   // Ici on divise mu par 1/tau^2
-  if (mu.nb_dim() == 2) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) //isotrope
+  if (mu.nb_dim() == 2)
+    for (i = 0; i < nl; i++)
+      for (n = 0; n < N; n++) //isotrope
         {
           mu(i, n) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
         }
-  else if (mu.nb_dim() == 3) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (int d = 0; d < D; d++) //anisotrope diagonal
+  else if (mu.nb_dim() == 3)
+    for (i = 0; i < nl; i++)
+      for (n = 0; n < N; n++)
+        for (int d = 0; d < D; d++) //anisotrope diagonal
           mu(i, n, d) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
-  else for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (int d1 = 0; d1 < D; d1++) for (int d2 = 0; d2 < D; d2++) //anisotrope complet
+  else for (i = 0; i < nl; i++)
+      for (n = 0; n < N; n++)
+        for (int d1 = 0; d1 < D; d1++)
+          for (int d2 = 0; d2 < D; d2++) //anisotrope complet
             mu(i, n, d1, d2) *= ((tau(i,n) > limiter_tau_) ? limiter_tau_/(tau(i,n)*tau(i,n)) : 1/limiter_tau_);
   mu.echange_espace_virtuel();
 }
@@ -81,20 +89,29 @@ double Op_Diff_Tau_PolyMAC_P0_Elem::calculer_dt_stab() const
   int i, d, e, f, n, N = equation().inconnue().valeurs().dimension(1), cD = diffu.dimension(0) == 1, cL = lambda.dimension(0) == 1, D = dimension;
 
   DoubleTrav nu_loc(nu_); //nu local sans le 1/tau^2 pour stabilite
-  if (nu_.nb_dim() == 2) for (e = 0; e < zone.nb_elem(); e++) for (n = 0; n < N; n++) //isotrope
+  if (nu_.nb_dim() == 2)
+    for (e = 0; e < zone.nb_elem(); e++)
+      for (n = 0; n < N; n++) //isotrope
         nu_loc(e, n) = nu_(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
-  else if (nu_.nb_dim() == 3) for (e = 0; e < zone.nb_elem(); e++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope diagonal
+  else if (nu_.nb_dim() == 3)
+    for (e = 0; e < zone.nb_elem(); e++)
+      for (n = 0; n < N; n++)
+        for (d = 0; d < D; d++) //anisotrope diagonal
           nu_loc(e, n, d) = nu_(e,n, d) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
-  else for (e = 0; e < zone.nb_elem(); e++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope complet
+  else for (e = 0; e < zone.nb_elem(); e++)
+      for (n = 0; n < N; n++)
+        for (d = 0; d < D; d++) //anisotrope complet
           nu_loc(e, n, d, d) = nu_(e,n, d, d) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
 
   double dt = 1e10;
   DoubleTrav flux(N);
   for (e = 0; e < zone.nb_elem(); e++)
     {
-      for (flux = 0, i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++) for (n = 0; n < N; n++)
+      for (flux = 0, i = 0; i < e_f.dimension(1) && (f = e_f(e, i)) >= 0; i++)
+        for (n = 0; n < N; n++)
           flux(n) += zone.nu_dot(&nu_loc, e, n, &nf(f, 0), &nf(f, 0)) / vf(f);
-      for (n = 0; n < N; n++) if ((!alp || (*alp)(e, n) > 1e-3) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
+      for (n = 0; n < N; n++)
+        if ((!alp || (*alp)(e, n) > 1e-3) && flux(n)) /* sous 0.5e-6, on suppose que l'evanescence fait le job */
           dt = std::min(dt, pe(e) * ve(e) * (alp ? (*alp)(e, n) : 1) * (lambda(!cL * e, n) / diffu(!cD * e, n)) / flux(n));
       if (dt < 0) abort();
     }
@@ -148,23 +165,32 @@ void Op_Diff_Tau_PolyMAC_P0_Elem::ajouter_blocs(matrices_t matrices, DoubleTab& 
           if ((fb = (eb = phif_e(i)) - zone0.nb_elem_tot()) < 0) //element
             {
               for (n = 0; n < N[0]; n++) flux(n) += phif_c(i, n) * fs[0](f) * inco[0](eb, n);
-              if (mat[0]) for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //derivees
+              if (mat[0])
+                for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++)
+                  if (e < zone[0].get().nb_elem())
+                    for (n = 0; n < N[0]; n++) //derivees
                       (*mat[0])(N[0] * e + n, N[0] * eb + n) += (j ? 1 : -1) * phif_c(i, n) * fs[0](f) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_) ;
             }
-          else if (fcl[0](fb, 0) == 1 || fcl[0](fb, 0) == 2) for (n = 0; n < N[0]; n++) //Echange_impose_base
+          else if (fcl[0](fb, 0) == 1 || fcl[0](fb, 0) == 2)
+            for (n = 0; n < N[0]; n++) //Echange_impose_base
               flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Echange_impose_base, cls[0].get()[fcl[0](fb, 1)].valeur()).T_ext(fcl[0](fb, 2), n) : 0);
-          else if (fcl[0](fb, 0) == 4) for (n = 0; n < N[0]; n++) //Neumann non homogene
+          else if (fcl[0](fb, 0) == 4)
+            for (n = 0; n < N[0]; n++) //Neumann non homogene
               flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Neumann_paroi, cls[0].get()[fcl[0](fb, 1)].valeur()).flux_impose(fcl[0](fb, 2), n) : 0) * ((tau(f_e[0](fb,0),n) > limiter_tau_) ? limiter_tau_/(tau(f_e[0](fb,0),n)*tau(f_e[0](fb,0),n)) : 1/limiter_tau_); // Pour compenser la correction de flux qui vient avec le tau**2 a la fin
-          else if (fcl[0](fb, 0) == 6) for (n = 0; n < N[0]; n++) //Dirichlet
+          else if (fcl[0](fb, 0) == 6)
+            for (n = 0; n < N[0]; n++) //Dirichlet
               flux(n) += (phif_c(i, n) ? phif_c(i, n) * fs[0](f) * ref_cast(Dirichlet, cls[0].get()[fcl[0](fb, 1)].valeur()).val_imp(fcl[0](fb, 2), n) : 0);
           else if (fcl[0](fb, 0) != 5) Cerr <<  "condslim" << fcl[0](fb, 0) ;
         }
 
-      for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++) if (e < zone[0].get().nb_elem()) for (n = 0; n < N[0]; n++) //second membre -> amont/aval
+      for (j = 0; j < 2 && (e = f_e[0](f, j)) >= 0; j++)
+        if (e < zone[0].get().nb_elem())
+          for (n = 0; n < N[0]; n++) //second membre -> amont/aval
             secmem_loc(e, n) += (j ? -1 : 1) * flux(n) ;
     }
 
-  for (e = 0 ; e<zone0.nb_elem() ; e++)  for (n = 0; n < N[0]; n++)
+  for (e = 0 ; e<zone0.nb_elem() ; e++)
+    for (n = 0; n < N[0]; n++)
       {
         secmem(e,n) += secmem_loc(e,n) / ((tau(e,n) > limiter_tau_) ? limiter_tau_/(tau(e,n)*tau(e,n)) : 1/limiter_tau_);
       }

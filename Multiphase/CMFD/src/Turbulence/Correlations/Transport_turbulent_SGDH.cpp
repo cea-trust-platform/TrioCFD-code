@@ -56,10 +56,17 @@ void Transport_turbulent_SGDH::modifier_nu(const Convection_Diffusion_std& eq, c
   DoubleTrav nu_t(nl, N);
   visc_turb.eddy_viscosity(nu_t);
   //formule pour passer de nu a mu : mu0 * sigma_ * nu_t / nu0
-  if (nu.nb_dim() == 2) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) //isotrope
+  if (nu.nb_dim() == 2)
+    for (i = 0; i < nl; i++)
+      for (n = 0; n < N; n++) //isotrope
         nu(i, n) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) * sigma_ * nu_t(i, n) / nu0(i, n);
-  else if (nu.nb_dim() == 3) for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope diagonal
+  else if (nu.nb_dim() == 3)
+    for (i = 0; i < nl; i++)
+      for (n = 0; n < N; n++)
+        for (d = 0; d < D; d++) //anisotrope diagonal
           nu(i, n, d) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) * sigma_ * nu_t(i, n) / nu0(i, n);
-  else for (i = 0; i < nl; i++) for (n = 0; n < N; n++) for (d = 0; d < D; d++) //anisotrope complet
+  else for (i = 0; i < nl; i++)
+      for (n = 0; n < N; n++)
+        for (d = 0; d < D; d++) //anisotrope complet
           nu(i, n, d, d) += (alp ? (*alp)(i, n) : 1) * mu0(i, n) * sigma_ * nu_t(i, n) / nu0(i, n);
 }

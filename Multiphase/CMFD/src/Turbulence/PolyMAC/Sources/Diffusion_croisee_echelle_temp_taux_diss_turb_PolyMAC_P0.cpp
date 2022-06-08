@@ -75,7 +75,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_bloc
   assert(N == 1); // si N > 1 il vaut mieux iterer sur les id_composites des phases turbulentes
   assert(ref_cast(Champ_Elem_PolyMAC_P0, equation().probleme().get_champ("k")).valeurs().line_size() == 1);
 
-  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
+  for (auto &&n_m : matrices)
+    if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "pression")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -85,9 +86,12 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_bloc
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "alpha" || n_m.first == "temperature")	// N <= M
-          for (e = 0; e < nb_elem; e++) for (n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
+          for (e = 0; e < nb_elem; e++)
+            for (n = 0; n < N; n++) sten.append_line(N * e + n, M * e + n);
         if (n_m.first == "pression")
-          for (e = 0; e < nb_elem; e++) for (n = 0; n < N; n++) for (m = 0; m<M; m++) sten.append_line(N * e + n, M * e + m);
+          for (e = 0; e < nb_elem; e++)
+            for (n = 0; n < N; n++)
+              for (m = 0; m<M; m++) sten.append_line(N * e + n, M * e + m);
         Matrix_tools::allocate_morse_matrix(N * zone.nb_elem_tot(), M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -127,7 +131,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   const IntTab& f_d_tau = ch_diss.fgrad_d, &f_e_tau = ch_diss.fgrad_e; // Tables utilisees dans zone_PolyMAC_P0::fgrad pour le calcul du gradient
   const DoubleTab& f_w_tau = ch_diss.fgrad_w;
 
-  for (int f = 0; f < nf; f++) for (int n = 0; n < N; n++)
+  for (int f = 0; f < nf; f++)
+    for (int n = 0; n < N; n++)
       {
         grad_f_diss(f, n) = 0;
         for (int j = f_d_tau(f); j < f_d_tau(f+1) ; j++)
@@ -153,7 +158,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   const IntTab& f_d_k = ch_k.fgrad_d, &f_e_k = ch_k.fgrad_e;  // Tables utilisees dans zone_PolyMAC_P0::fgrad pour le calcul du gradient
   const DoubleTab& f_w_k = ch_k.fgrad_w;
 
-  for (int n = 0; n < N; n++) for (int f = 0; f < nf; f++)
+  for (int n = 0; n < N; n++)
+    for (int f = 0; f < nf; f++)
       {
         grad_f_k(f, n) = 0;
         for (int j = f_d_k(f); j < f_d_k(f+1) ; j++)
@@ -174,12 +180,14 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   /* Calcul de grad(tau/omega).(grad k) */
 
   DoubleTrav grad_f_diss_dot_grad_f_k(nb_elem, N);
-  for (int n = 0; n < N; n++) for (int e = 0; e < nb_elem; e++)
+  for (int n = 0; n < N; n++)
+    for (int e = 0; e < nb_elem; e++)
       {
         grad_f_diss_dot_grad_f_k(e, n) = 0;
         std::vector<double> grad_diss(D), grad_k(D);
         for (int d = 0 ; d < D ; d++ ) {grad_diss[d] = 0 ;  grad_k[d] = 0;}
-        for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++) for (int d = 0; d < D; d++)
+        for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
+          for (int d = 0; d < D; d++)
             {
               grad_diss[d] += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_diss(f, n);
               grad_k[d]   += (e == f_e(f, 0) ? 1 : -1) * fs(f) * (xv(f, d) - xp(e, d)) / ve(e) * grad_f_k(f, n);
@@ -194,7 +202,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
   Matrice_Morse *Mp = matrices.count("pression") ? matrices.at("pression") : nullptr;
   Matrice_Morse *Mtemp	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
 
-  for (int e = 0; e < nb_elem; e++) for (int n = 0; n < N; n++)
+  for (int e = 0; e < nb_elem; e++)
+    for (int n = 0; n < N; n++)
       {
         if (Type_diss == "tau")
           {
@@ -206,7 +215,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
             if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("alpha") ? der_alpha_rho_tau.at("alpha")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
             if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("temperature") ? der_alpha_rho_tau.at("temperature")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
             if (!(M==nullptr))     (*M)(N * e + n, N * e + n)       -= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("tau") ? der_alpha_rho_tau.at("tau")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en tau
-            for (int mp = 0; mp<Np; mp++) if (!(Mp==nullptr))
+            for (int mp = 0; mp<Np; mp++)
+              if (!(Mp==nullptr))
                 (*Mp)(N * e + n, Np * e + mp)     	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho_tau.count("pression") ? der_alpha_rho_tau.at("pression")(e,n) : 0 ) * std::min(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
           }
         else if (Type_diss == "omega")
@@ -220,7 +230,8 @@ void Diffusion_croisee_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(mat
                 secmem(e, n) += pe(e) * ve(e) * sigma_d * alpha_rho(e, n) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.) ;
                 if (!(Ma==nullptr))    (*Ma)(N * e + n, Na * e + n)   	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("alpha") ? der_alpha_rho.at("alpha")(e,n) : 0 ) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en alpha
                 if (!(Mtemp==nullptr)) (*Mtemp)(N * e + n, Nt * e + n)	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("temperature") ? der_alpha_rho.at("temperature")(e,n) : 0 ) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la temperature
-                for (int mp = 0; mp<Np; mp++) if (!(Mp==nullptr))
+                for (int mp = 0; mp<Np; mp++)
+                  if (!(Mp==nullptr))
                     (*Mp)(N * e + n, Np * e + mp)     	-= pe(e) * ve(e) * sigma_d * (der_alpha_rho.count("pression") ? der_alpha_rho.at("pression")(e,n) : 0 ) / diss(e, n)* std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee par rapport a la pression
                 if (!(M==nullptr))     (*M)(N * e + n, N * e + n) -= pe(e) * ve(e) * sigma_d * alpha_rho(e, n) * (-1/(diss(e,n)*diss(e,n))) * std::max(grad_f_diss_dot_grad_f_k(e, n), 0.); // derivee en omega
               }

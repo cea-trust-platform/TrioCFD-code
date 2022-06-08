@@ -251,29 +251,35 @@ void Taux_dissipation_turbulent::calculer_alpha_rho_omega(const Objet_U& obj, Do
 
   /* valeurs du champ */
   int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
-  for (i = 0; i < Nl; i++) for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * omega(i, n);
+  for (i = 0; i < Nl; i++)
+    for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * omega(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a une zone_dis_base */
   DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab(), b_rho, b_omega = eqn.inconnue()->valeur_aux_bords();
   int Nb = b_omega.dimension_tot(0);
   if (ch_rho.a_une_zone_dis_base()) b_rho = ch_rho.valeur_aux_bords();
   else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Zone_VF, eqn.zone_dis().valeur()).xv_bord(), b_rho);
-  for (i = 0; i < Nb; i++) for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_omega(i, n);
+  for (i = 0; i < Nb; i++)
+    for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_omega(i, n);
 
   if (alpha)//derivee en alpha : rho * omega
     {
       DoubleTab& d_a = deriv["alpha"];
-      for (d_a.resize(Nl, N), i = 0; i < Nl; i++) for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * omega(i, n);
+      for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
+        for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * omega(i, n);
     }
   //derivee en omega : alpha * rho
   DoubleTab& d_omega = deriv["omega"];
-  for (d_omega.resize(Nl, N), i = 0; i < Nl; i++) for (n = 0; n < N; n++) d_omega(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n);
+  for (d_omega.resize(Nl, N), i = 0; i < Nl; i++)
+    for (n = 0; n < N; n++) d_omega(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n);
 
   /* derivees a travers rho */
-  if (pch_rho) for (auto && n_d :pch_rho->derivees())
+  if (pch_rho)
+    for (auto && n_d :pch_rho->derivees())
       {
         DoubleTab& d_v = deriv[n_d.first];
-        for (d_v.resize(Nl, N), i = 0; i < Nl; i++) for (n = 0; n < N; n++)
+        for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
+          for (n = 0; n < N; n++)
             d_v(i, n) = (alpha ? (*alpha)(i, n) : 1) * omega(i, n) * n_d.second(i, n);
       }
 }

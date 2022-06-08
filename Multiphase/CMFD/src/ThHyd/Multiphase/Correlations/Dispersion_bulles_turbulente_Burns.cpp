@@ -62,7 +62,9 @@ void Dispersion_bulles_turbulente_Burns::coefficient( const DoubleTab& alpha, co
 
   coeff = 0;
 
-  for (int k = 0; k < N; k++) if (k!=n_l) for (int i = 0 ; i<2 ; i++) // k gas phase
+  for (int k = 0; k < N; k++)
+    if (k!=n_l)
+      for (int i = 0 ; i<2 ; i++) // k gas phase
         {
           coeff(k, n_l, i) = (alpha(k) > 1.e-6) ? nut(n_l)/Prt_ * coeff_drag(k, n_l, i)/alpha(k)  : 0 ;
           coeff(n_l, k, i) = (alpha(n_l)>1.e-6) ? nut(n_l)/Prt_ * coeff_drag(n_l, k, i)/alpha(n_l): 0 ;

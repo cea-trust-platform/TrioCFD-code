@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,12 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Convection_Diffusion_Espece_Multi_QC.cpp
-// Directory:   $TURBULENCE_ROOT/src/TRUST_FIXES/CAN_BE_MOVED/Quasi_Compressible
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Convection_Diffusion_Espece_Multi_QC.h>
 #include <Fluide_Quasi_Compressible.h>
@@ -274,7 +268,7 @@ void Convection_Diffusion_Espece_Multi_QC::assembler( Matrice_Morse& matrice, co
             if (std::fabs(test(i))>1e-5)
               Cerr<<i << " "<<test(i)<<finl;
           //        Cerr<<resu <<finl;
-          exit();
+          Process::exit();
         }
     }
   matrice.ajouter_multvect(inco,resu);
@@ -337,7 +331,7 @@ void Convection_Diffusion_Espece_Multi_QC::assembler_blocs_avec_inertie(matrices
 
   schema_temps().ajouter_blocs(matrices, secmem, *this);
 
-  if (!discretisation().que_suis_je().finit_par("MAC"))
+  if (!discretisation().que_suis_je().debute_par("PolyMAC"))
     modifier_pour_Cl(*mat,secmem);
 
   statistiques().end_count(assemblage_sys_counter_);

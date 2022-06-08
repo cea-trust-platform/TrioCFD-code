@@ -56,7 +56,8 @@ Entree& Flux_parietal_Kommajosyula::readOn(Entree& is)
 
   const Milieu_composite& milc = ref_cast(Milieu_composite, pb_->milieu());
   int n_g = -1;
-  for (int k = 1 ; k<pbm.nb_phases() ; k++) if (milc.has_saturation(0, k)) n_g += 1;
+  for (int k = 1 ; k<pbm.nb_phases() ; k++)
+    if (milc.has_saturation(0, k)) n_g += 1;
   if (n_g > 0) Process::exit("Flux_parietal_Kommajosyula::readOn : there can only be one evaporating phase for the carrying liquid for now ! Please feel free to update the code if you need.");
 
   return is;
@@ -83,7 +84,9 @@ void Flux_parietal_Kommajosyula::qp(int N, int f, double D_h, double D_ch,
   int n_l = 0 ;
   const Milieu_composite& milc = ref_cast(Milieu_composite, pb_->milieu());
 
-  for (int k = 0 ; k<N ; k++) if (n_l != k) if (milc.has_saturation(n_l, k))
+  for (int k = 0 ; k<N ; k++)
+    if (n_l != k)
+      if (milc.has_saturation(n_l, k))
         {
           Saturation_base& sat = milc.get_saturation(n_l, k);
 

@@ -61,12 +61,14 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::dimensionner_blocs(matri
   const Zone_PolyMAC_P0&       zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
   int ne = zone.nb_elem(), ne_tot = zone.nb_elem_tot(), N = equation().inconnue().valeurs().line_size();
 
-  for (auto &&i_m : matrices) if (i_m.first == "k")
+  for (auto &&i_m : matrices)
+    if (i_m.first == "k")
       {
         Matrice_Morse mat;
         IntTrav stencil(0, 2);
         stencil.set_smart_resize(1);
-        for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++) stencil.append_line(N * e + n, N * e + n);
+        for (int e = 0; e < ne; e++)
+          for(int n = 0; n<N ; n++) stencil.append_line(N * e + n, N * e + n);
         tableau_trier_retirer_doublons(stencil);
         Matrix_tools::allocate_morse_matrix(ne_tot, ne_tot, stencil, mat);
         i_m.second->nb_colonnes() ? *i_m.second += mat : *i_m.second = mat;
@@ -103,10 +105,12 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
   if (Type_diss == "") abort();
 
   DoubleTrav prod_scal(Rij.dimension_tot(0), Nph);
-  for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+  for (int e = 0; e < ne; e++)
+    for(int n = 0; n<N ; n++)
       {
         prod_scal(e, n) = 0;
-        for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+        for (int d_U = 0; d_U < D; d_U++)
+          for (int d_X = 0; d_X < D; d_X++)
             prod_scal(e, n) += Rij(e, n, d_U, d_X) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
       }
 
@@ -116,7 +120,8 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
       if (i_m.first == "tau")
         {
           Matrice_Morse& mat = *i_m.second;
-          for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+          for (int e = 0; e < ne; e++)
+            for(int n = 0; n<N ; n++)
               {
                 double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                 if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
@@ -129,7 +134,8 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
       else if (i_m.first == "omega")
         {
           Matrice_Morse& mat = *i_m.second;
-          for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+          for (int e = 0; e < ne; e++)
+            for(int n = 0; n<N ; n++)
               {
                 double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                 if (tab_diss(e, n) <= 0) deriv *= 0 ;
@@ -144,7 +150,8 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
           Matrice_Morse& mat = *i_m.second;
           if (Type_diss == "tau")
             {
-              for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+              for (int e = 0; e < ne; e++)
+                for(int n = 0; n<N ; n++)
                   {
                     double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                     if (tab_k(e, n) * tab_diss(e, n) > visc_turb.limiteur() * nu(e, n))
@@ -154,7 +161,8 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
                   }
             }
           else if (Type_diss == "omega")
-            for (int e = 0; e < ne; e++) for(int n = 0; n<N ; n++)
+            for (int e = 0; e < ne; e++)
+              for(int n = 0; n<N ; n++)
                 {
                   double deriv = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
                   if (tab_diss(e, n) <= 0) deriv *= 0 ;
@@ -168,7 +176,8 @@ void Production_echelle_temp_taux_diss_turb_PolyMAC_P0::ajouter_blocs(matrices_t
     }
 
   // Second membre
-  for(int e = 0 ; e < ne ; e++) for(int n = 0; n<N ; n++)
+  for(int e = 0 ; e < ne ; e++)
+    for(int n = 0; n<N ; n++)
       {
         double secmem_en = std::min(prod_scal(e, n),0.) ; // So the production is always negative for tau and positive for omega
         if (Type_diss == "tau")

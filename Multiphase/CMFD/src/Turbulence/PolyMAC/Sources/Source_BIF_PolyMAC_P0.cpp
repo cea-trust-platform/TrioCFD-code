@@ -89,7 +89,10 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
   DoubleTab fg_w = ch_alpha.fgrad_w;
 
   // On calcule le gradient de Rij aux faces
-  for (int n = 0; n < N; n++) for (int f = 0; f < nf_tot; f++) for (int d_i = 0; d_i <D ; d_i++) for (int d_j = 0; d_j <D ; d_j++)
+  for (int n = 0; n < N; n++)
+    for (int f = 0; f < nf_tot; f++)
+      for (int d_i = 0; d_i <D ; d_i++)
+        for (int d_j = 0; d_j <D ; d_j++)
           {
             grad_Rij(f, n, d_i, d_j) = 0;
             // grad_Rij(face, phase, x-coord, y-coord)   or
@@ -109,8 +112,11 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
           }
 
   // On interpole le gradient de Rij aux elements
-  for (int n = 0; n < N; n++) for (int e = 0; e < ne_tot; e++) for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
-        for (int d_i = 0; d_i <D ; d_i++) for (int d_j = 0; d_j <D ; d_j++)
+  for (int n = 0; n < N; n++)
+    for (int e = 0; e < ne_tot; e++)
+      for (int d_d=0 ; d_d<D ; d_d++) // on derive / d_d
+        for (int d_i = 0; d_i <D ; d_i++)
+          for (int d_j = 0; d_j <D ; d_j++)
             {
               grad_Rij(nf_tot + D *e + d_d, n, d_i,  d_j) = 0;
               for (int j = 0, f; j < e_f.dimension(1) && (f = e_f(e, j)) >= 0; j++)
@@ -119,7 +125,9 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
 
   // On calcule le second membre aux elements
 
-  for(int e = 0 ; e < ne_tot ; e++) for(int n = 0; n<N ; n++) for (int d_i = 0; d_i < D; d_i++)
+  for(int e = 0 ; e < ne_tot ; e++)
+    for(int n = 0; n<N ; n++)
+      for (int d_i = 0; d_i < D; d_i++)
         {
           double secmem_en = 0;
           for (int d_j = 0; d_j < D; d_j++)
@@ -132,11 +140,14 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
 
   int e;
 
-  for(int f = 0 ; f < nf ; f++) for(int n = 0; n<N ; n++) for (int i = 0; i < 2 && (e = voisins_f(f, i)) >= 0; i++)
+  for(int f = 0 ; f < nf ; f++)
+    for(int n = 0; n<N ; n++)
+      for (int i = 0; i < 2 && (e = voisins_f(f, i)) >= 0; i++)
         {
           DoubleTrav secmem_en(3); // Contains the vector of the divergence of R_ij at the face
           secmem_en = 0;
-          for (int d_i = 0; d_i < D; d_i++) for (int d_j = 0; d_j < D; d_j++)
+          for (int d_i = 0; d_i < D; d_i++)
+            for (int d_j = 0; d_j < D; d_j++)
               secmem_en(d_i) += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
           for (int d_i = 0; d_i < D; d_i++)
             secmem_en(d_i) *= (-1) * pe(e) * vf_dir(f, i) * tab_alp(e, n) * tab_rho(e, n);// For us, Rij = <u_i u_j>, therefore *(-1)

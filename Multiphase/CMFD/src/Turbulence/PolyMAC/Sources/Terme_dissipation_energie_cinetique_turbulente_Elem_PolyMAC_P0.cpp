@@ -68,7 +68,8 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionne
   if (Type_diss == "tau") assert(ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ("tau")).valeurs().line_size() == 1);
   if (Type_diss == "omega") assert(ref_cast(Champ_Elem_PolyMAC_P0,equation().probleme().get_champ("omega")).valeurs().line_size() == 1);
 
-  for (auto &&n_m : matrices) if (n_m.first == "alpha" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "temperature" || n_m.first == "pression")
+  for (auto &&n_m : matrices)
+    if (n_m.first == "alpha" || n_m.first == "tau" || n_m.first == "omega" || n_m.first == "temperature" || n_m.first == "pression")
       {
         Matrice_Morse& mat = *n_m.second, mat2;
         const DoubleTab& dep = equation().probleme().get_champ(n_m.first.c_str()).valeurs();
@@ -77,9 +78,12 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::dimensionne
         IntTrav sten(0, 2);
         sten.set_smart_resize(1);
         if (n_m.first == "alpha" || n_m.first == "temperature" || n_m.first == "tau"|| n_m.first == "omega")
-          for (int e = 0; e < ne; e++) for (int n = 0; n < Nk; n++) if (n < M) sten.append_line(Nk * e + n, M * e + n);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0; n < Nk; n++)
+              if (n < M) sten.append_line(Nk * e + n, M * e + n);
         if (n_m.first == "pression" )
-          for (int e = 0; e < ne; e++) for (int n = 0, m = 0; n < Nk; n++, m+=(M>1)) sten.append_line(Nk * e + n, M * e + m);
+          for (int e = 0; e < ne; e++)
+            for (int n = 0, m = 0; n < Nk; n++, m+=(M>1)) sten.append_line(Nk * e + n, M * e + m);
         Matrix_tools::allocate_morse_matrix(Nk * ne_tot, M * nc, sten, mat2);
         mat.nb_colonnes() ? mat += mat2 : mat = mat2;
       }
@@ -118,7 +122,8 @@ void Terme_dissipation_energie_cinetique_turbulente_Elem_PolyMAC_P0::ajouter_blo
                    *Mp = matrices.count("pression") ? matrices.at("pression") : nullptr,
                     *Mt	= matrices.count("temperature") ? matrices.at("temperature") : nullptr;
 
-  for (int e = 0; e < nb_elem; e++) for (int mk = 0, mp = 0; mk < Nk; mk++, mp += (Np > 1))
+  for (int e = 0; e < nb_elem; e++)
+    for (int mk = 0, mp = 0; mk < Nk; mk++, mp += (Np > 1))
       {
         if (Type_diss == "tau")
           {

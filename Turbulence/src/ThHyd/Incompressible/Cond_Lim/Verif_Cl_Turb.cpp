@@ -126,7 +126,7 @@ int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_C
            ! ( sub_type(Neumann_sortie_libre,la_cl_turb.valeur()) ||
                sub_type(Entree_fluide_K_Eps_impose,la_cl_turb.valeur()) ||
                sub_type(Symetrie,la_cl_turb.valeur()) ) &&
-+	       !pbb.contient("ALE"))
+           +	       !pbb.contient("ALE"))
         {
           message_erreur_turb( la_cl_hydr, la_cl_turb, num_Cl);
         }

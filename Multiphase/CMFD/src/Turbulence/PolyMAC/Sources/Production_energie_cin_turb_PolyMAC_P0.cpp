@@ -73,10 +73,12 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
 
-  for(int e = 0 ; e < nb_elem ; e++) for(int n = 0; n<N ; n++)
+  for(int e = 0 ; e < nb_elem ; e++)
+    for(int n = 0; n<N ; n++)
       {
         double secmem_en = 0;
-        for (int d_U = 0; d_U < D; d_U++) for (int d_X = 0; d_X < D; d_X++)
+        for (int d_U = 0; d_U < D; d_U++)
+          for (int d_X = 0; d_X < D; d_X++)
             secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
         secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
         secmem(e, n) += std::max(secmem_en, 0.);

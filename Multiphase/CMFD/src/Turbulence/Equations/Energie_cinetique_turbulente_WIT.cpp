@@ -270,7 +270,8 @@ void Energie_cinetique_turbulente_WIT::calculer_alpha_rho_k_WIT(const Objet_U& o
 
   /* valeurs du champ */
   int i, n, N = val.line_size(), Nl = val.dimension_tot(0), cR = sub_type(Champ_Uniforme, ch_rho);
-  for (i = 0; i < Nl; i++) for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * k(i, n);
+  for (i = 0; i < Nl; i++)
+    for (n = 0; n < N; n++) val(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n) * k(i, n);
 
   /* on ne peut utiliser valeur_aux_bords que si ch_rho a une zone_dis_base */
   DoubleTab b_al = ch_alpha ? ch_alpha->valeur_aux_bords() : DoubleTab();
@@ -278,22 +279,27 @@ void Energie_cinetique_turbulente_WIT::calculer_alpha_rho_k_WIT(const Objet_U& o
   int Nb = b_k.dimension_tot(0);
   if (ch_rho.a_une_zone_dis_base()) b_rho = ch_rho.valeur_aux_bords();
   else b_rho.resize(Nb, rho.line_size()), ch_rho.valeur_aux(ref_cast(Zone_VF, eqn.zone_dis().valeur()).xv_bord(), b_rho);
-  for (i = 0; i < Nb; i++) for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_k(i, n);
+  for (i = 0; i < Nb; i++)
+    for (n = 0; n < N; n++) bval(i, n) = (alpha ? b_al(i, n) : 1) * b_rho(i, n) * b_k(i, n);
 
   if (alpha)//derivee en alpha : rho * k
     {
       DoubleTab& d_a = deriv["alpha"];
-      for (d_a.resize(Nl, N), i = 0; i < Nl; i++) for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * k(i, n);
+      for (d_a.resize(Nl, N), i = 0; i < Nl; i++)
+        for (n = 0; n < N; n++) d_a(i, n) = rho(!cR * i, n) * k(i, n);
     }
   //derivee en k : alpha * rho
   DoubleTab& d_k = deriv["k_WIT"];
-  for (d_k.resize(Nl, N), i = 0; i < Nl; i++) for (n = 0; n < N; n++) d_k(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n);
+  for (d_k.resize(Nl, N), i = 0; i < Nl; i++)
+    for (n = 0; n < N; n++) d_k(i, n) = (alpha ? (*alpha)(i, n) : 1) * rho(!cR * i, n);
 
   /* derivees a travers rho */
-  if (pch_rho) for (auto && n_d :pch_rho->derivees())
+  if (pch_rho)
+    for (auto && n_d :pch_rho->derivees())
       {
         DoubleTab& d_v = deriv[n_d.first];
-        for (d_v.resize(Nl, N), i = 0; i < Nl; i++) for (n = 0; n < N; n++)
+        for (d_v.resize(Nl, N), i = 0; i < Nl; i++)
+          for (n = 0; n < N; n++)
             d_v(i, n) = (alpha ? (*alpha)(i, n) : 1) * k(i, n) * n_d.second(i, n);
       }
 }

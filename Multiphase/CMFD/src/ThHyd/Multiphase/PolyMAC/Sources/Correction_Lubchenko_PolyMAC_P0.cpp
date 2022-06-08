@@ -123,7 +123,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
   // There is no need to calculate the gradient of alpha here
 
   /* faces */
-  for (int f = 0; f < nf; f++) if (fcl(f, 0) < 2)
+  for (int f = 0; f < nf; f++)
+    if (fcl(f, 0) < 2)
       {
         a_l = 0 ;
         p_l = 0 ;
@@ -144,12 +145,15 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
             for (int n = 0; n < N; n++) nut_l(n) += is_turb    ? vf_dir(f, c)/vf(f) * nut(e,n) : 0;
             for (int n = 0; n <Nk; n++) k_l(n)   += (k_turb)   ? vf_dir(f, c)/vf(f) * (*k_turb)(e,0) : 0;
             for (int n = 0; n < N; n++) d_b_l(n) += vf_dir(f, c)/vf(f) * d_bulles(e,n) ;
-            for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
+            for (int n = 0; n < N; n++)
+              for (int k = 0; k < N; k++)
+                if (milc.has_interface(n,k))
                   {
                     Interface_base& sat = milc.get_interface(n, k);
                     sigma_l(n,k) += vf_dir(f, c)/vf(f) * sat.sigma_(temp(e,n),press(e,n * (Np > 1)));
                   }
-            for (int k = 0; k < N; k++) for (int l = 0; l < N; l++)
+            for (int k = 0; k < N; k++)
+              for (int l = 0; l < N; l++)
                 {
                   double dv_c = ch.v_norm(pvit, pvit, e, f, k, l, NULL, &ddv_c(0));
                   int i;
@@ -159,8 +163,11 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
         correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, d_b_l, dv, coeff);
 
         double sum_alphag_wall = 0 ;
-        for (int k = 0; k<N ; k++) if (k!=n_l) sum_alphag_wall += (y_faces(f)<d_b_l(k)/2) ? a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) :0 ;
-        for (int k = 0; k < N; k++) if (k != n_l) if (y_faces(f)<d_b_l(k)/2)
+        for (int k = 0; k<N ; k++)
+          if (k!=n_l) sum_alphag_wall += (y_faces(f)<d_b_l(k)/2) ? a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) :0 ;
+        for (int k = 0; k < N; k++)
+          if (k != n_l)
+            if (y_faces(f)<d_b_l(k)/2)
               {
                 double fac = 0 ;
                 for (int d = 0 ; d<D ; d++) fac += n_y_faces(f, d) * n_f(f, d)/fs(f);
@@ -170,7 +177,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                 secmem(f, n_l) -= fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
                 secmem(f, n_l) -= fac * coeff(n_l, k, 0) * sum_alphag_wall;
 
-                if (mat) for (int j = 0; j < 2; j++)
+                if (mat)
+                  for (int j = 0; j < 2; j++)
                     {
                       (*mat)(N * f + k, N * f + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(k, n_l, 1) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f)) * ddv(k, n_l, 3);
                       (*mat)(N * f + k, N * f + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(n_l, k, 1) * sum_alphag_wall * ddv(k, n_l, 3) ;
@@ -192,18 +200,25 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
       for (int n = 0; n < N; n++) nut_l(n) += is_turb    ? nut(e,n) : 0;
       for (int n = 0; n <Nk; n++) k_l(n)   += (k_turb)   ? (*k_turb)(e,0) : 0;
       for (int n = 0; n < N; n++) d_b_l(n) += d_bulles(e,n) ;
-      for (int n = 0; n < N; n++) for (int k = 0; k < N; k++) if (milc.has_interface(n,k))
+      for (int n = 0; n < N; n++)
+        for (int k = 0; k < N; k++)
+          if (milc.has_interface(n,k))
             {
               Interface_base& sat = milc.get_interface(n, k);
               sigma_l(n,k) += sat.sigma_(temp(e,n),press(e,n * (Np > 1)));
             }
 
-      for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
+      for (int k = 0; k < N; k++)
+        for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
       correlation_db.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, nut_l, k_l, d_b_l, dv, coeff);
 
       double sum_alphag_wall = 0 ;
-      for (int k = 0; k<N ; k++) if (k!=n_l) sum_alphag_wall += (y_elem(e)<d_b_l(k)/2) ? a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) :0 ;
-      for (int d = 0, i = nf_tot + D * e; d < D; d++, i++) for (int k = 0; k < N; k++) if (k != n_l) if (y_elem(e)<d_b_l(k)/2)
+      for (int k = 0; k<N ; k++)
+        if (k!=n_l) sum_alphag_wall += (y_elem(e)<d_b_l(k)/2) ? a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) :0 ;
+      for (int d = 0, i = nf_tot + D * e; d < D; d++, i++)
+        for (int k = 0; k < N; k++)
+          if (k != n_l)
+            if (y_elem(e)<d_b_l(k)/2)
               {
                 double fac = pe(e) * ve(e);
                 secmem(i, k) += fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
@@ -211,7 +226,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                 secmem(i, n_l) -= fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
                 secmem(i, n_l) -= fac * coeff(n_l, k, 0) * sum_alphag_wall * n_y_elem(e, d);
 
-                if (mat) for (int j = 0; j < 2; j++)
+                if (mat)
+                  for (int j = 0; j < 2; j++)
                     {
                       (*mat)(N * i + k, N * i + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(k, n_l, 1) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * ddv(k, n_l, 3);
                       (*mat)(N * i + k, N * i + (j ? n_l : k)) -= fac * (j ? -1 : 1) * coeff(n_l, k, 1) * sum_alphag_wall * ddv(k, n_l, 3) ;
@@ -232,7 +248,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 
   /* elements */
   int f;
-  for (int e = 0; e < zone.nb_elem_tot(); e++)   for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
+  for (int e = 0; e < zone.nb_elem_tot(); e++)
+    for (int b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
       {
         /* arguments de coeff */
         for (int n = 0; n < N; n++) a_l(n)   = alpha(e, n);
@@ -242,19 +259,22 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
         for (int n = 0; n < N; n++) mu_l(n)  =    mu(!cM * e, n);
         for (int n = 0; n < N; n++)
           {
-            for (int k = 0; k < N; k++) if(milc.has_interface(n, k))
+            for (int k = 0; k < N; k++)
+              if(milc.has_interface(n, k))
                 {
                   Interface_base& sat = milc.get_interface(n, k);
                   sigma_l(n,k) = sat.sigma_(temp(e,n), press(e,n * (Np > 1)));
                 }
           }
 
-        for (int k = 0; k < N; k++) for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
+        for (int k = 0; k < N; k++)
+          for (int l = 0; l < N; l++) dv(k, l) = ch.v_norm(pvit, pvit, e, -1, k, l, NULL, &ddv(k, l, 0));
         correlation_pi.coefficient(a_l, p_l, T_l, rho_l, mu_l, sigma_l, dv, e, coeff);
 
         if (D==2)
           {
-            for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
+            for (int k = 0; k < N; k++)
+              if (k!= n_l) // gas phase
                 {
                   double fac_e = pe(e) * ve(e);
 
@@ -270,9 +290,12 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                   secmem(i+1, k )+= fac_e * coeff(n_l, k) * (pvit(i  , k) -pvit(i  , n_l)) * vort(e, 0) ;
                 } // 100% explicit
 
-            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++) if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
+            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
+              if (f<zone.nb_faces())
+                if (fcl(f, 0) < 2)
 
-                  for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
+                  for (int k = 0; k < N; k++)
+                    if (k!= n_l) // gas phase
                       {
                         double fac_f = pf(f) * vf(f);  // Coherence with portance_interfaciale that calculates the correlation at the element
                         if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
@@ -291,7 +314,8 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
 
         if (D==3)
           {
-            for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
+            for (int k = 0; k < N; k++)
+              if (k!= n_l) // gas phase
                 {
                   double fac_e = pe(e) * ve(e);
 
@@ -309,8 +333,11 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                   secmem(i+2, k )-= fac_e * coeff(n_l, k) * ((pvit(i+0, k) -pvit(i+0, n_l)) * vort(e, n_l*D+ 1) - (pvit(i+1, k) -pvit(i+1, n_l)) * vort(e, n_l*D+ 0)) ;
                 } // 100% explicit
 
-            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++) if (f<zone.nb_faces()) if (fcl(f, 0) < 2)
-                  for (int k = 0; k < N; k++) if (k!= n_l) // gas phase
+            for (b = 0; b < e_f.dimension(1) && (f = e_f(e, b)) >= 0; b++)
+              if (f<zone.nb_faces())
+                if (fcl(f, 0) < 2)
+                  for (int k = 0; k < N; k++)
+                    if (k!= n_l) // gas phase
                       {
                         double fac_f = pf(f) * vf(f);
                         if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
