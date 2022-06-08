@@ -80,12 +80,12 @@ void Viscosite_turbulente_k_omega::k_over_eps(DoubleTab& k_sur_eps) const
     for (n = 0; n < N; n++) k_sur_eps(i, n) = (n < Nt) ? ( (omega(i,n) > 0.) ? 1/omega(i, n) : 0) : 0;
 }
 
-void Viscosite_turbulente_k_omega::eps(DoubleTab& eps) const
+void Viscosite_turbulente_k_omega::eps(DoubleTab& eps_) const
 {
   const DoubleTab& omega = pb_->get_champ("omega").passe(),
                    &k = pb_->get_champ("k").passe();
-  int i, nl = eps.dimension(0), n, N = eps.dimension(1), Nt = omega.dimension(1);
+  int i, nl = eps_.dimension(0), n, N = eps_.dimension(1), Nt = omega.dimension(1);
   assert(nl == omega.dimension(0) && Nt <= N);
   for (i = 0; i < nl; i++)
-    for (n = 0; n < N; n++) eps(i, n) = (n < Nt) ? k(i,n) * omega(i, n) : 0;
+    for (n = 0; n < N; n++) eps_(i, n) = (n < Nt) ? k(i,n) * omega(i, n) : 0;
 }
