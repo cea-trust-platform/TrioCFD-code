@@ -89,6 +89,7 @@ Lire pb
 {
 	Navier_Stokes_phase_field
 	{
+		equation_non_resolue 1
 		solveur_pression GCP {
 				precond ssor { omega 1.5 }
 				seuil 1.e-15

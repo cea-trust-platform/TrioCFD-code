@@ -28,6 +28,7 @@
 #include <time.h>
 #include <Ref_Champ_Don.h>
 #include <Constituant.h>
+#include <Source_Con_Phase_field.h>
 
 
 /*! @brief classe Navier_Stokes_phase_field Cette classe porte les termes de l'equation de la dynamique

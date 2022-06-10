@@ -171,7 +171,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   DoubleTab mutilde_NS;
   Sources list_sources = eq_c.sources();
   Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
-  int type_systeme_naire = source_pf.get_type_systeme_naire(); //si type_systeme_naire = 0 ou 1
+  int type_systeme_naire = source_pf.get_type_systeme_naire();
 
 
   const DoubleTab& mutilde=eq_c.get_mutilde_()->valeurs();
@@ -221,14 +221,12 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
   else if (type_systeme_naire==1)
     {
       ///// Kim2012 terme source somme c.Grad(mutilde)
-      Cerr << "mutildeNS "<<mutilde_NS<<finl;
 
       DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab,  grad_mutilde_);
       if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
       grad_mutilde=0.;
       DoubleTab temp_mutilde_NS(mutilde_NS.dimension(0),1);
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
-      //opgrad.calculer(temp_mutilde_NS,grad_mutilde);
 
       for (int j=0; j<nb_comp; j++)
         {
@@ -239,9 +237,6 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
             }
           opgrad.calculer(temp_mutilde_NS, grad_mutilde);
 
-          Cerr << "mutilde_NS " << mutilde_NS<<finl;
-          Cerr << "grad mutilde_NS " << grad_mutilde<<finl;
-          Cerr << "c " << c<<finl;
           // on interpole c et on calcule la source
           //------------------------------------------------
 
@@ -251,22 +246,18 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
               el1=face_voisins(fac,1);
               vol0=volumes(el0);
               vol1=volumes(el1);
-
               cface=(vol0*c(el0,j)+vol1*c(el1,j))/(vol0+vol1);
-              Cerr << "cface"<<cface<<finl;
               if (boussi_==1)
                 {
                   resu(fac) -= cface*grad_mutilde(fac) / rho0; // Cas approximation de Boussinesq
                 }
               else if (boussi_==0)
                 {
-                  rho_face=(vol0*rhoPF(el0,j)+vol1*rhoPF(el1,j))/(vol0+vol1);
+                  rho_face=(vol0*rhoPF(el0)+vol1*rhoPF(el1))/(vol0+vol1);
                   resu(fac) -= cface*grad_mutilde(fac) / rho_face;
                 }
             }
         }
-      Cerr<<"-cface*grad_mutilde/rho0"<<resu<<finl;
-
     }
   //===============================================
   return resu;
@@ -545,11 +536,6 @@ DoubleTab& Source_Qdm_VDF_Phase_field::ajouter(DoubleTab& resu) const
   //   const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
   //   const IntTab& face_voisins = zone_VDF.face_voisins();
   //   const DoubleVect& volumes = zone_VDF.volumes();
-
-  //   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field,le_probleme2->equation(1));
-  //   const DoubleTab& c=eq_c.inconnue().valeurs();
-
-  //   const Navier_Stokes_std& eq_ns=ref_cast(Navier_Stokes_std,le_probleme2->equation(0));
 
   (this->*methode)(resu);
 

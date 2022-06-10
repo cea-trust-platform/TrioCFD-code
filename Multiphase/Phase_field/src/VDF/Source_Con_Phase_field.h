@@ -33,6 +33,9 @@
 #include <Table.h>
 #include <Convection_Diffusion_Concentration.h>
 #include <Equation_base.h>
+#include <math.h>
+
+#define PI 3.14159265
 
 class Source_Con_Phase_field : public Source_Con_Phase_field_base
 {
@@ -62,17 +65,28 @@ protected:
   DoubleTab prov_face_,prov_elem_;
   double alpha, beta;
   DoubleVect alphaMatrix, betaMatrix;
+  DoubleVect angle_psi,angle_phi,x0Eq,x1Eq,x2Eq,a0Eq,a1Eq,a2Eq;
   int nb_equation_CH;
   Table potentiel_chimique_expr_;
   double (Source_Con_Phase_field::*dWdc)(const double) const;
+  DoubleTab (Source_Con_Phase_field::*dWdc_naire)(const DoubleTab&, const DoubleVect&, const DoubleVect&) const;
+  DoubleTab (Source_Con_Phase_field::*dWdc_naire_analytique_ter)(const DoubleTab& , const DoubleVect&, const DoubleVect& , const DoubleVect&, const DoubleVect& , const DoubleVect& ) const;
+  DoubleTab (Source_Con_Phase_field::*dWdc_naire_analytique_quater)(const DoubleTab& , const DoubleVect& , const DoubleVect& ,const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect&, const DoubleVect&) const ;
+  DoubleVect eq1, eq2;
   double kappa;
   DoubleVect kappaMatrix;
   DoubleTab (Source_Con_Phase_field::*kappaMatrix_func_c)(const DoubleTab&, const DoubleVect&) const;
   DoubleVect coeff_auto_diffusion;
   double temperature;
+  double molarVolume;
+  double alpha_ref;
+  double angle_alphaMatrix;
+  double diagonal_coeff;
   int kappa_ind;
   int type_kappa_;
   int type_kappa_auto_diffusion_;
+  int type_alpha_rotation_;
+  int type_potentiel_analytique_;
   int type_systeme_naire_;
   int kappa_moy_;
   double mult_kappa;
@@ -107,6 +121,9 @@ protected:
   double dWdc_general(const double) const;
   double kappa_func_c_general(const double) const;
   DoubleTab kappa_func_auto_diffusion(const DoubleTab&, const DoubleVect& ) const;
+  DoubleTab dWdc_naire_defaut(const DoubleTab&, const DoubleVect&, const DoubleVect&) const;
+  DoubleTab dWdc_naire_analytique_ternaire(const DoubleTab& , const DoubleVect&, const DoubleVect& , const DoubleVect&, const DoubleVect& , const DoubleVect& ) const;
+  DoubleTab dWdc_naire_analytique_quaternaire(const DoubleTab& , const DoubleVect& , const DoubleVect& ,const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect& , const DoubleVect&, const DoubleVect&) const ;
 
   virtual void construire_systeme(const DoubleTab&, const Matrice_Morse&, DoubleTab&, const DoubleTab&);
   virtual void matvect(const DoubleTab&, const Matrice_Morse&, const DoubleTab&, const DoubleTab&, DoubleTab&);
@@ -159,9 +176,93 @@ inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 
 inline double Source_Con_Phase_field::dWdc_defaut(const double c) const
 {
-  return (4.*c*(c+0.5)*(c-0.5));
+//  return (4.*c*(c+0.5)*(c-0.5));
+  return 2*(c-0.12)*(c-0.65)*(2*c-0.12-0.65);
+
 }
 
+inline DoubleTab Source_Con_Phase_field::dWdc_naire_defaut(const DoubleTab& c, const DoubleVect& a, const DoubleVect& b) const
+{
+  DoubleTab dWdc_(c);
+  dWdc_=0;
+  for (int j=0; j<c.line_size(); j++)
+    {
+      for (int i=0; i<c.dimension(0); i++)
+        {
+          dWdc_(i,j) = 2*(c(i,j)-a(j))*(c(i,j)-b(j))*(2*c(i,j)-a(j)-b(j));//4*c(i,j)*(c(i,j)+0.5)*(c(i,j)-0.5);
+        }
+    }
+  return dWdc_;
+}
+
+inline DoubleTab Source_Con_Phase_field::dWdc_naire_analytique_ternaire(const DoubleTab& c, const DoubleVect& psi_, const DoubleVect& cUEq, const DoubleVect& cZrEq, const DoubleVect& aUEq, const DoubleVect& aZrEq) const
+{
+  DoubleTab dWdc_(c);
+  dWdc_=0;
+  DoubleTab P(c.dimension(0),2);
+  P = 0;
+  DoubleTab dPdx0(P);
+  DoubleTab dPdx1(P);
+
+  for (int j=0; j<2; j++)
+    {
+      for (int i=0; i<c.dimension(0); i++)
+        {
+          P(i,j) = pow(((cos(psi_(j)* PI / 180.0)*(c(i,0)-cUEq(j))+sin(psi_(j)* PI / 180.0)*(c(i,1)-cZrEq(j)))/(aUEq(j))),2)+pow(((-sin(psi_(j)* PI / 180.0)*(c(i,0)-cUEq(j))+cos(psi_(j)* PI / 180.0)*(c(i,1)-cZrEq(j)))/(aZrEq(j))),2) ;
+        }
+    }
+  for (int j=0; j<2; j++)
+    {
+      for (int i=0; i<c.dimension(0); i++)
+        {
+          dPdx0(i,j) = 2*(c(i,0)-cUEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)))+ 2*(c(i,1)-cZrEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)));
+          dPdx1(i,j) = 2*(c(i,0)-cUEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+ 2*(c(i,1)-cZrEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)));
+        }
+    }
+  for (int i=0; i<c.dimension(0); i++)
+    {
+      dWdc_(i,0)=P(i,0)*dPdx0(i,1)+P(i,1)*dPdx0(i,0); //+muUeq a rajouter
+      dWdc_(i,1)=P(i,0)*dPdx1(i,1)+P(i,1)*dPdx1(i,0);//+muZrEq a rajouter
+    }
+
+  return dWdc_;
+}
+
+inline DoubleTab Source_Con_Phase_field::dWdc_naire_analytique_quaternaire(const DoubleTab& c, const DoubleVect& psi_, const DoubleVect& phi_,const DoubleVect& cUEq, const DoubleVect& cZrEq, const DoubleVect& cFeEq, const DoubleVect& aUEq, const DoubleVect& aZrEq, const DoubleVect& aFeEq) const
+{
+  DoubleTab dWdc_(c);
+  dWdc_=0;
+  DoubleTab P(c.dimension(0),2);
+  P = 0;
+  DoubleTab dPdx0(P);
+  DoubleTab dPdx1(P);
+  DoubleTab dPdx2(P);
+
+  for (int j=0; j<2; j++)
+    {
+      for (int i=0; i<c.dimension(0); i++)
+        {
+          P(i,j) = pow(((cos(psi_(j)* PI / 180.0)*(c(i,0)-cUEq(j))+sin(psi_(j)* PI / 180.0)*cos(phi_(j)* PI /180.0)*(c(i,1)-cZrEq(j))+sin(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)*(c(i,2)-cFeEq(j)))/(aUEq(j))),2)+pow(((-sin(psi_(j)* PI / 180.0)*(c(i,0)-cUEq(j))+cos(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)*(c(i,1)-cZrEq(j))+cos(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)*(c(i,2)-cFeEq(j)))/(aZrEq(j))),2)+pow(((-sin(phi_(j)* PI / 180.0)*(c(i,1)-cZrEq(j))+cos(phi_(j)* PI / 180.0)*(c(i,2)-cFeEq(j)))/(aFeEq(j))),2) ;
+        }
+    }
+  for (int j=0; j<2; j++)
+    {
+      for (int i=0; i<c.dimension(0); i++)
+        {
+          dPdx0(i,j) = 2*(c(i,0)-cUEq(j))*((pow(cos(psi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(sin(psi_(j)* PI / 180.0)/(aZrEq(j)),2)))+ 2*(c(i,1)-cZrEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+2*(c(i,2)-cFeEq(j))*((cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(cos(psi_(j)* PI / 180.0)*sin(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0))/(pow(aZrEq(j),2)));
+          dPdx1(i,j) = 2*(c(i,0)-cUEq(j))*((sin(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+ 2*(c(i,1)-cZrEq(j))*((pow(sin(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(cos(psi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)/(aZrEq(j)),2))+pow(sin(phi_(j)* PI / 180.0)/(aFeEq(j)),2))+2*(c(i,2)-cFeEq(j))*((pow(sin(psi_(j)* PI / 180.0),2)*cos(phi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)/(pow(aUEq(j),2)))+pow(cos(psi_(j)* PI / 180.0),2)*cos(phi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)/(pow(aZrEq(j),2))+(sin(phi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)/(pow(aFeEq(j),2))));
+          dPdx2(i,j) = 2*(c(i,0)-cUEq(j))*((sin(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aUEq(j),2))-(sin(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)*cos(psi_(j)* PI / 180.0))/(pow(aZrEq(j),2)))+2*(c(i,1)-cZrEq(j))*((pow(sin(psi_(j)* PI / 180.0),2)*sin(phi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)/(pow(aUEq(j),2)))+pow(cos(psi_(j)* PI / 180.0),2)*sin(phi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)/(pow(aZrEq(j),2))+(-sin(phi_(j)* PI / 180.0)*cos(phi_(j)* PI / 180.0)/(pow(aFeEq(j),2))))+ 2*(c(i,2)-cFeEq(j))*(pow(sin(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)/(aUEq(j)),2)+pow(cos(psi_(j)* PI / 180.0)*sin(phi_(j)* PI / 180.0)/(aZrEq(j)),2)+pow(cos(phi_(j)* PI / 180.0)/(aFeEq(j)),2));
+        }
+    }
+  for (int i=0; i<c.dimension(0); i++)
+    {
+      dWdc_(i,0)=P(i,0)*dPdx0(i,1)+P(i,1)*dPdx0(i,0); //+muUeq a rajouter
+      dWdc_(i,1)=P(i,0)*dPdx1(i,1)+P(i,1)*dPdx1(i,0);//+muZrEq a rajouter
+      dWdc_(i,2)=P(i,0)*dPdx2(i,1)+P(i,1)*dPdx2(i,0);//+muFeEq a rajouter
+    }
+
+  return dWdc_;
+}
 inline double Source_Con_Phase_field::kappa_func_c_defaut(const double c) const
 {
   return std::max(mult_kappa*kappa*(c+0.5)*(0.5-c),0.);
@@ -169,17 +270,16 @@ inline double Source_Con_Phase_field::kappa_func_c_defaut(const double c) const
 inline DoubleTab Source_Con_Phase_field::kappa_func_auto_diffusion(const DoubleTab& c, const DoubleVect& coeff_auto_diff) const
 {
   DoubleTab temp_c(c.dimension(0),c.line_size()+1);
-  DoubleTab temp_kappa(c.dimension(0), nb_equation_CH, nb_equation_CH); //define temp_alpha to avoid resize here
+  DoubleTab temp_kappa(c.dimension(0), nb_equation_CH, nb_equation_CH); //define temp to avoid resize here
   DoubleTab kappaMat=temp_kappa;
   kappaMat = 0;
   DoubleTab kappa_ij (temp_kappa);
   DoubleTab somme_c(c.dimension(0));
   somme_c=0;
-  DoubleTab kappaMatrixDegenere (c.dimension(0), nb_equation_CH*nb_equation_CH);
-  Cerr << "c"<<c<<finl;
+  DoubleTab kappaMatrix_(c.dimension(0), nb_equation_CH*nb_equation_CH);
 
   // creation d'un tableau temp_c qui contiendra toutes les concentrations des n composants non pas les n-1 seulements (n-1 eqs).
-  //La dernière colonne correspondra a 1-somme(concentration)
+  //La dernière colonne correspondra a 1-somme sur (n-1) des concentrations
 
   for (int k=0; k<c.line_size(); k++)
     {
@@ -190,9 +290,6 @@ inline DoubleTab Source_Con_Phase_field::kappa_func_auto_diffusion(const DoubleT
           temp_c(l,c.line_size())=1.0-somme_c(l);
         }
     }
-
-  Cerr <<"somme_c"<< somme_c<<finl;
-  Cerr <<"temp_c"<< temp_c<<finl;
 
   // calcul de la mobilite kappa dans un doubleTab (n1,n2,n3)
   for(int k=0; k< nb_equation_CH+1; k++)
@@ -208,32 +305,36 @@ inline DoubleTab Source_Con_Phase_field::kappa_func_auto_diffusion(const DoubleT
                   //            kappa_ij(l,i,j) *= temp_c(l,k)*coeff_auto_diff(k);
                   //
                   if (j==k)
-                    kappa_ij(l,i,j)=1-temp_c(l,j);
+                    {
+                      kappa_ij(l,i,j)=1-temp_c(l,j);
+                    }
                   else
-                    kappa_ij(l,i,j)=-temp_c(l,j);
+                    {
+                      kappa_ij(l,i,j)=-temp_c(l,j);
+                    }
                   if (i==k)
-                    kappa_ij(l,i,j)*=1-temp_c(l,i);
+                    {
+                      kappa_ij(l,i,j)*=1-temp_c(l,i);
+                    }
                   else
-                    kappa_ij(l,i,j)*=-temp_c(l,i);
+                    {
+                      kappa_ij(l,i,j)*=-temp_c(l,i);
+                    }
                   kappa_ij(l,i,j) *= temp_c(l,k)*coeff_auto_diff(k);
                 }
             }
         }
       kappaMat+=kappa_ij;
     }
-  Cerr << "kappa_ij"<<kappa_ij<<finl;
-  Cerr <<"kappaMat"<<kappaMat<<finl;
 
   //retour vers un DoubleTab (n1,n2)
   for (int j=0; j<nb_equation_CH; j++)
     for (int i=0; i<nb_equation_CH; i++)
       for (int l=0; l<c.dimension(0); l++)
         {
-          kappaMatrixDegenere(l,i+nb_equation_CH*j)=kappaMat(l,i,j);
+          kappaMatrix_(l,i+nb_equation_CH*j)=kappaMat(l,i,j);
         }
-  Cerr <<"kappaMatrixDegenere"<<kappaMatrixDegenere<<finl;
-
-  return kappaMatrixDegenere;
+  return kappaMatrix_;
 
 }
 

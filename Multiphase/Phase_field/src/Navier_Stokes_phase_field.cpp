@@ -37,6 +37,7 @@
 #include <Source_Con_Phase_field_base.h>
 #include <Operateur_Diff_base.h>
 #include <Constituant.h>
+#include <Source_Con_Phase_field.h>
 
 extern Stat_Counter_Id temps_total_execution_counter_;
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field,"Navier_Stokes_phase_field",Navier_Stokes_std);
@@ -395,12 +396,9 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
               Cerr << "Navier_Stokes_phase_field::creer_champ: should not be here (1)"<< finl;
               exit();
             }
-          //dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
-          //Mirantsoa mr264902 generalization to n components
-          const Convection_Diffusion_Concentration& eq_c=ref_cast(Convection_Diffusion_Concentration, mon_probleme.valeur().equation(1));
-          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",eq_c.constituant().nb_constituants(),0.,rho_);
+          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"masse_volumique","kg/m3",1,0.,rho_);
           champs_compris_.ajoute_champ(rho_);
-          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"derivee_masse_volumique","kg/m3",eq_c.constituant().nb_constituants(),0.,drhodc_);
+          dis.discretiser_champ("CHAMP_ELEM",zone_dis().valeur(),"derivee_masse_volumique","kg/m3",1,0.,drhodc_);
           champs_compris_.ajoute_champ(drhodc_);
         }
       if (rho_.le_nom()=="anonyme")
@@ -424,6 +422,10 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
 void Navier_Stokes_phase_field::calculer_rho(const bool init)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme.valeur().equation(1));
+  Sources list_sources = eq_c.sources();
+  Source_Con_Phase_field& source_pf = ref_cast(Source_Con_Phase_field, list_sources(0).valeur());
+  int type_systeme_naire = source_pf.get_type_systeme_naire();
+
   int i = 1;
   double temps = schema_temps().temps_futur(i);
   if (init)
@@ -436,10 +438,10 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       // normalement, quelque chose comme 'rho_.valeur().mettre_a_jour(schema_temps().temps_futur(i))' devrait faire l'affaire
       // probleme, cette evaluation se fait avec c(n) alors que l'on veut evaluer avec c(n+1)
       // on introduit une methode specifique (qui depend de la discretisation) que l'on met arbitrairement dans Source_Con_Phase_field_base
-      Sources list_sources = eq_c.sources();
-      Source_Con_Phase_field_base& source_pf = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
-      source_pf.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue().futur(i));
-      source_pf.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue().futur(i));
+      //Sources list_sources = eq_c.sources();
+      Source_Con_Phase_field_base& source_pf_base = ref_cast(Source_Con_Phase_field_base, list_sources(0).valeur());
+      source_pf_base.calculer_champ_fonc_c(temps, rho_, eq_c.inconnue().futur(i));
+      source_pf_base.calculer_champ_fonc_c(temps, drhodc_, eq_c.inconnue().futur(i));
       //Cerr << "rho = " << rho_.valeur().valeurs()[14*48+24] << finl;
     }
   else
@@ -448,32 +450,52 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       //Mirantsoa 264902
       DoubleTab& rhoTab = rho_.valeurs(); /**/
       DoubleTab& drhodcTab = drhodc_.valeurs();/**/
-      DoubleTab& betacTab = betac_.valeur().valeurs();/**/
-      Cerr << "c = "<<c<<finl;
-      Cerr << "rhoTab initial = "<<rhoTab<<finl;
-      Cerr << "drhodcTab initial = "<<drhodcTab<<finl;
-      Cerr << "betacTab initial = "<<betacTab<<finl;
+      DoubleTab betacTab = betac_.valeur().valeurs();/**/
+      DoubleTab rho0Tab(rhoTab);
+      //Cerr << "c = "<<c<<finl;
       // DoubleTab& betacTab = betac_.valeur().valeurs();
       //      rho_.valeur().affecter_(betac_.valeur());
-      drhodcTab=rho0_;
-      DoubleTab beta_=drhodcTab;
-      Cerr << "drhodcTab = "<<drhodcTab<<finl;
-      Cerr << "beta_co Tab = "<<beta_<<finl;
 
-      //beta_ stores the values of betac_ in a DoubleTab with the same dimension as drhodcTab so that tab_multiply_any_shape can be used
-      for (i=0; i<beta_.dimension(0); i++)
+
+      if (type_systeme_naire==0)
         {
-          for (int j=0; j<beta_.line_size(); j++)
-            {
-              beta_(i,j)=betac_.valeur().valeurs()(0,j);
-            }
+          drhodcTab=rho0_;
+          tab_multiply_any_shape(drhodcTab, betac_.valeur().valeurs());
+          rhoTab=c;
+          tab_multiply_any_shape(rhoTab, drhodcTab);
+          rhoTab+=rho0_;
         }
-      tab_multiply_any_shape(drhodcTab, beta_);
-      Cerr << "drhodcTab = "<<drhodcTab<<finl;
-      rhoTab=c;
-      tab_multiply_any_shape(rhoTab, drhodcTab);
-      rhoTab+=rho0_;
-      Cerr<<"rhoTab+"<<rhoTab<<finl;
+      else if (type_systeme_naire==1)
+        {
+          DoubleTab beta_(rhoTab);
+
+          //calcul de drhodcTab comme rho0*somme(betac)
+          drhodcTab=rho0_;
+          for (i=0; i<beta_.dimension(0); i++)
+            {
+              for (int j=0; j<betacTab.line_size(); j++)
+                {
+                  beta_(i)+=betac_.valeur().valeurs()(i,j);
+                }
+            }
+          tab_multiply_any_shape(drhodcTab, beta_);
+
+          //calcul de rhoTab comme rho0+rho0*somme(betac*c)
+          rhoTab=0;
+          tab_multiply_any_shape(betacTab, c);
+          for (i=0; i<betacTab.dimension(0); i++)
+            {
+              for (int j=0; j<betacTab.line_size(); j++)
+                {
+                  rhoTab(i)+=betacTab(i,j);
+                }
+            }
+          rho0Tab=rho0_;
+          tab_multiply_any_shape(rhoTab, rho0Tab);
+          rhoTab+=rho0_;
+          //Cerr<<"rhoTab+"<<rhoTab<<finl;
+
+        }
     }
   rho_.valeur().valeurs().echange_espace_virtuel();
   drhodc_.valeur().valeurs().echange_espace_virtuel();
