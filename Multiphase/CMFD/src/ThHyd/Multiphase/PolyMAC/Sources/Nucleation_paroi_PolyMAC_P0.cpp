@@ -26,6 +26,7 @@
 #include <Op_Diff_PolyMAC_P0_Elem.h>
 #include <Milieu_composite.h>
 #include <Flux_parietal_base.h>
+#include <Flux_interfacial_PolyMAC.h>
 #include <Matrix_tools.h>
 #include <Array_tools.h>
 #include <math.h>
@@ -63,12 +64,11 @@ void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
 {
   const Pb_Multiphase& pbm = ref_cast(Pb_Multiphase, equation().probleme());
   const Zone_PolyMAC_P0& zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
-  const DoubleVect& pe = zone.porosite_elem(), &ve = zone.volumes();
   const IntTab& f_e = zone.face_voisins();
 
   const DoubleTab& rho = pbm.milieu().masse_volumique().passe(),
                    &press = pbm.eq_qdm.pression().passe(),
-                    &qpi = ref_cast(Op_Diff_PolyMAC_P0_Elem, pbm.equation(2).operateur(0).l_op_base()).q_pi(),
+                    &qpi = ref_cast(Flux_interfacial_PolyMAC, pbm.equation(2).sources().dernier().valeur().valeur()).qpi(),
                      &dnuc = ref_cast(Op_Diff_PolyMAC_P0_Elem, pbm.equation(2).operateur(0).l_op_base()).d_nucleation();
 
   int N = pbm.nb_phases(), Np = pbm.get_champ("pression").valeurs().line_size();
@@ -83,8 +83,7 @@ void Nucleation_paroi_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& 
           {
             Saturation_base& sat = milc.get_saturation(n_l, k);
             int e = f_e(f, 0);
-            double fac = pe(e) * ve(e) ;
-            secmem(e , k) += fac * 6. * qpi(e, n_l, k) / ( std::max(dnuc(e,k), 1.e-8) * rho(e, k) * sat.Lvap(press(e, mp))) ;
+            secmem(e , k) += 6. * qpi(e, n_l, k) / ( std::max(dnuc(e,k), 1.e-8) * rho(e, k) * sat.Lvap(press(e, mp))) ;
           }
 
 }
