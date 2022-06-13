@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_std.h
-// Directory:   $TRUST_ROOT/src/ThHyd
+// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Equations
 // Version:     /main/52
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@
 #ifndef Navier_Stokes_std_included
 #define Navier_Stokes_std_included
 
-#include <Ref_Fluide_Incompressible.h>
+#include <Ref_Fluide_base.h>
 #include <Operateur_Conv.h>
 #include <Operateur_Diff.h>
 #include <Operateur_Div.h>
@@ -71,11 +71,11 @@ public :
   void set_param(Param& titi);
   int lire_motcle_non_standard(const Motcle&, Entree&);
   void associer_pb_base(const Probleme_base&);
-  inline void associer_fluide(const Fluide_Incompressible& );
+  inline void associer_fluide(const Fluide_base& );
   const Milieu_base& milieu() const;
   Milieu_base& milieu();
-  const Fluide_Incompressible& fluide() const;
-  Fluide_Incompressible& fluide();
+  const Fluide_base& fluide() const;
+  Fluide_base& fluide();
   void associer_milieu_base(const Milieu_base& );
   int nombre_d_operateurs() const;
   int nombre_d_operateurs_tot() const;
@@ -91,12 +91,24 @@ public :
   Champ_Inc& inconnue();
   SolveurSys& solveur_pression();
   virtual void discretiser();
+  virtual void discretiser_vitesse();
   virtual void completer();
+  Entree& lire_cond_init(Entree&) override;
   virtual bool initTimeStep(double dt);
   virtual void mettre_a_jour(double temps);
   virtual void abortTimeStep();
   virtual int impr(Sortie& os) const;
-  virtual void dimensionner_matrice_internal(Matrice_Morse& mat_morse);
+
+  void dimensionner_matrice_sans_mem(Matrice_Morse& matrice);
+
+  /*
+    interface {dimensionner,assembler}_blocs
+    specificites : prend en compte le gradient de pression (en dernier)
+  */
+  virtual  int has_interface_blocs() const;
+  virtual void dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl = {}) const;
+  virtual void assembler_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl = {}) const;
+
 
   int sauvegarder(Sortie&) const;
   int reprendre(Entree&);
@@ -169,7 +181,7 @@ protected:
   virtual void discretiser_assembleur_pression();
 
 
-  REF(Fluide_Incompressible) le_fluide;
+  REF(Fluide_base) le_fluide;
 
   Champ_Inc la_vitesse;
   Champ_Inc la_pression;
@@ -346,7 +358,7 @@ inline const Champ_Inc& Navier_Stokes_std::div() const
 // Description:
 //    Associe un fluide incompressible a l'equation.
 // Precondition:
-// Parametre: Fluide_Incompressible& un_fluide
+// Parametre: Fluide_base& un_fluide
 //    Signification: le fluide incompressible a associer
 //    Valeurs par defaut:
 //    Contraintes: reference constante
@@ -358,7 +370,7 @@ inline const Champ_Inc& Navier_Stokes_std::div() const
 // Effets de bord:
 // Postcondition: la methode ne modifie pas l'objet
 // Postcondition: l'equation a un fluide associe
-inline void Navier_Stokes_std::associer_fluide(const Fluide_Incompressible& un_fluide)
+inline void Navier_Stokes_std::associer_fluide(const Fluide_base& un_fluide)
 {
   le_fluide = un_fluide;
 }

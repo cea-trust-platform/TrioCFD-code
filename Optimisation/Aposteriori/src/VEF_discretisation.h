@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2017, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -82,7 +82,7 @@ public :
   void grad_u(const Zone_dis& z,const Zone_Cl_dis&,const Champ_Inc& temperature, Champ_Fonc& ch) const;
   void h_conv(const Zone_dis& z,const Zone_Cl_dis&,const Champ_Inc& temperature, Champ_Fonc& ch, Motcle& nom, int temp_ref) const;
   void taux_cisaillement(const Zone_dis&, const Zone_Cl_dis&,const Champ_Inc&, Champ_Fonc&) const;
-  void estimateur_aposteriori(const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_vitesse, const Champ_Inc& ch_pression, const Champ_Don& viscosite_cinematique, Champ_Fonc& champ) const;
+  void estimateur_aposteriori(const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_vitesse, const Champ_Inc& ch_pression, const Champ_Don& viscosite_cinematique, Champ_Fonc&) const;
   void residu(const Zone_dis& , const Champ_Inc&, Champ_Fonc& ) const;
   //void pression_residu( const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_inco, Champ_Fonc& champ ) const;
 
@@ -94,7 +94,7 @@ private:
     int nb_comp, double temps,
     Objet_U& champ) const;
 
-  void modifier_champ_tabule(const Zone_dis_base& zone_dis,Champ_Fonc_Tabule& ch_tab,const Champ_base& ch_inc) const;
+  void modifier_champ_tabule(const Zone_dis_base& zone_dis,Champ_Fonc_Tabule& ch_tab,const VECT(REF(Champ_base))& ch_inc) const;
 
 
 

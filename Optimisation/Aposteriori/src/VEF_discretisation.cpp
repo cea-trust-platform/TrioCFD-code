@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2017, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,11 +43,11 @@
 #include <Tetra_VEF.h>
 #include <Quadri_VEF.h>
 #include <Hexa_VEF.h>
-#include <Fluide_Quasi_Compressible.h>
 #include <Champ_Uniforme.h>
 #include <Champ_Fonc_Q1NC.h>
 #include <Schema_Temps.h>
 #include <Schema_Temps_base.h>
+
 
 Implemente_instanciable(VEF_discretisation,"VEF",Discret_Thyd);
 
@@ -700,27 +700,22 @@ void VEF_discretisation::taux_cisaillement(const Zone_dis& z, const Zone_Cl_dis&
 
 void VEF_discretisation::estimateur_aposteriori(const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_vitesse, const Champ_Inc& ch_pression, const Champ_Don& viscosite_cinematique, Champ_Fonc& champ) const
 {
-  const Zone_VEF& zone_vef=ref_cast(Zone_VEF, z.valeur());
+  const Zone_VEF_PreP1b& zone_vef=ref_cast(Zone_VEF_PreP1b, z.valeur());
   const Zone_Cl_VEF& zone_cl_vef=ref_cast(Zone_Cl_VEF, zcl.valeur());
   champ.typer("estimateur_aposteriori_P0_VEF");
   estimateur_aposteriori_P0_VEF& ch=ref_cast(estimateur_aposteriori_P0_VEF,champ.valeur());
   ch.associer_zone_dis_base(zone_vef);
   const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse.valeur());
-  cout << "VEF_discretisation:  Avant cast de la pression  " << endl;
-//  const Champ_P0_VEF& pres = ref_cast(Champ_P0_VEF, ch_pression.valeur());
   const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, ch_pression.valeur());
-  cout << "VEF_discretisation: Apres cast de la pression  " << endl;
-  const Champ_Uniforme& visc = ref_cast(Champ_Uniforme, viscosite_cinematique.valeur());
-  ch.associer_champ(vit, pres, visc, zone_cl_vef);
+  ch.associer_champ(vit, pres, viscosite_cinematique, zone_cl_vef);
   ch.nommer("estimateur_aposteriori");
   ch.fixer_nb_comp(1);
   ch.fixer_nb_valeurs_nodales(zone_vef.nb_elem());
-//  cout << " nombre de ??? =  " << zone_vef.nb_elem() << endl;
   ch.fixer_unite("sans");
   ch.changer_temps(ch_vitesse.temps());
 }
 
-void VEF_discretisation::modifier_champ_tabule(const Zone_dis_base& zone_dis, Champ_Fonc_Tabule& le_champ_tabule, const Champ_base& ch_inc) const
+void VEF_discretisation::modifier_champ_tabule(const Zone_dis_base& zone_dis, Champ_Fonc_Tabule& le_champ_tabule, const VECT(REF(Champ_base))& ch_inc) const
 {
   le_champ_tabule.le_champ_tabule_discretise().typer("Champ_Fonc_Tabule_P0_VEF");
   Champ_Fonc_Tabule_P0_VEF& le_champ_tabule_dis = ref_cast(Champ_Fonc_Tabule_P0_VEF,le_champ_tabule.le_champ_tabule_discretise().valeur());
@@ -729,7 +724,7 @@ void VEF_discretisation::modifier_champ_tabule(const Zone_dis_base& zone_dis, Ch
   le_champ_tabule_dis.nommer(le_champ_tabule.le_nom()); // We give a name to this field, help for debug
   le_champ_tabule_dis.fixer_nb_comp(le_champ_tabule.nb_comp());
   le_champ_tabule_dis.fixer_nb_valeurs_nodales(zone_dis.nb_elem());
-  le_champ_tabule_dis.changer_temps(ch_inc.temps());
+  le_champ_tabule_dis.changer_temps(ch_inc[0].valeur().temps());
 }
 
 void VEF_discretisation::residu( const Zone_dis& z, const Champ_Inc& ch_inco, Champ_Fonc& champ ) const
@@ -739,7 +734,7 @@ void VEF_discretisation::residu( const Zone_dis& z, const Champ_Inc& ch_inco, Ch
   Cerr << "Discretization of " << ch_name << finl;
 
   const Zone_VEF& zone_vef = ref_cast( Zone_VEF, z.valeur( ) );
-  int nb_comp = ch_inco.valeurs().nb_dim()==1?1:ch_inco.valeurs().dimension(1);
+  int nb_comp =ch_inco.valeurs().line_size();
   Discretisation_base::discretiser_champ("champ_face",zone_vef, ch_name,"units_not_defined", nb_comp, ch_inco.temps(), champ);
   Champ_Fonc_base& ch_fonc = ref_cast(Champ_Fonc_base,champ.valeur());
   DoubleTab& tab=ch_fonc.valeurs();

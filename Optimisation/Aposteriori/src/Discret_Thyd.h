@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2017, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Discret_Thyd.h
-// Directory:   $TRUST_ROOT/src/ThHyd
+// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible
 // Version:     /main/33
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -27,11 +27,12 @@
 #include <Discret_Thermique.h>
 #include <Champ_Don.h>
 class Navier_Stokes_std;
-class Fluide_Incompressible;
+class Fluide_base;
 class Fluide_Ostwald;
 class Equation_base;
 class Champ_Don;
 class Convection_Diffusion_Temperature;
+class Terme_Source_Qdm_VEF_Face;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -50,8 +51,8 @@ class Convection_Diffusion_Temperature;
 //      void pression(const Schema_Temps_base&, Zone_dis&, Champ_Inc&) const
 //      void concentration(const Schema_Temps_base&, Zone_dis&, Champ_Inc&,
 //                         int =1) const
-//      void proprietes_physiques_fluide_incompressible(Zone_dis& ,
-//                         Fluide_Incompressible&, const Champ_Inc& ) const
+//      void proprietes_physiques_Fluide_base(Zone_dis& ,
+//                         Fluide_base&, const Champ_Inc& ) const
 //      void proprietes_physiques_fluide_Ostwald(Zone_dis& ,Fluide_Ostwald&,
 //                                                 const Navier_Stokes_std& ,
 //                                                   const Champ_Inc& ) const ;
@@ -63,7 +64,7 @@ class Discret_Thyd : public Discret_Thermique
 
 public :
 
-  void vitesse(const Schema_Temps_base&, Zone_dis&, Champ_Inc&) const;
+  void vitesse(const Schema_Temps_base&, Zone_dis&, Champ_Inc&, int nb_comp = 1) const;
   void translation(const Schema_Temps_base&, Zone_dis&, Champ_Fonc&) const;
   void entcor(const Schema_Temps_base&, Zone_dis&, Champ_Fonc&) const;
   void pression(const Schema_Temps_base&, Zone_dis&, Champ_Inc&) const;
@@ -85,7 +86,7 @@ public :
     Cerr << "estimateur_aposteriori keyword not available for this discretization." << finl;
     exit();
   };
-  inline virtual void reynolds_maille(const Zone_dis&, const Fluide_Incompressible&, const Champ_Inc&, Champ_Fonc&) const
+  inline virtual void reynolds_maille(const Zone_dis&, const Fluide_base&, const Champ_Inc&, Champ_Fonc&) const
   {
     Cerr << "Reynolds_maille keyword not available for this discretization." << finl;
     exit();
@@ -97,6 +98,7 @@ public :
   };
   void porosite_volumique(const Zone_dis&, const Schema_Temps_base&, Champ_Fonc&) const;
   void diametre_hydraulique(const Zone_dis&, const Schema_Temps_base&, Champ_Fonc&) const;
+  void section_passage(const Zone_dis&, const Schema_Temps_base&, Champ_Fonc&) const;
   virtual void y_plus(const Zone_dis& ,const Zone_Cl_dis&,  const Champ_Inc&, Champ_Fonc& ) const;
   virtual void grad_T(const Zone_dis& z,const Zone_Cl_dis& zcl, const Champ_Inc& eqn,Champ_Fonc& ch) const;
   virtual void h_conv(const Zone_dis& z,const Zone_Cl_dis& zcl, const Champ_Inc& eqn,Champ_Fonc& ch, Motcle& nom, int temp_ref) const;
@@ -105,6 +107,7 @@ public :
     Cerr << "Taux_cisaillement keyword not available for this discretization." << finl;
     exit();
   };
+
 };
 
 #endif

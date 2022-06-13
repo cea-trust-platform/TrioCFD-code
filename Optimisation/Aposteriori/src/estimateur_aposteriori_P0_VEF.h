@@ -25,10 +25,8 @@
 #include <Champ_Fonc_P0_VEF.h>
 #include <Ref_Champ_P1NC.h>
 #include <Ref_Zone_Cl_VEF.h>
-#include <Ref_Champ_P0_VEF.h>
 #include <Ref_Champ_P1_isoP1Bulle.h>
-#include <Ref_Champ_Uniforme.h>
-
+#include <Ref_Champ_Don.h>
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -46,8 +44,7 @@ class estimateur_aposteriori_P0_VEF : public Champ_Fonc_P0_VEF
 public :
 
   void mettre_a_jour(double );
-  void associer_champ(const Champ_P1NC&, const Champ_P0_VEF&, const Champ_Uniforme&, const Zone_Cl_dis_base&);
-  void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Uniforme&, const Zone_Cl_dis_base&);
+  void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Don&, const Zone_Cl_dis_base&);
 
 protected :
 
@@ -55,9 +52,9 @@ private:
 
   REF(Zone_Cl_VEF) la_zone_Cl_VEF;
   REF(Champ_P1NC) vitesse_;
-  REF(Champ_P0_VEF) pression_p0_;
   REF(Champ_P1_isoP1Bulle) pression_p1isop1b_;
-  REF(Champ_Uniforme) viscosite_cinematique_;
+  REF(Champ_Don) viscosite_cinematique_;
+  REF(Champ_P1NC) source_qdm_;
 };
 
 #endif /* estimateur_aposteriori_P0_VEF_included */
