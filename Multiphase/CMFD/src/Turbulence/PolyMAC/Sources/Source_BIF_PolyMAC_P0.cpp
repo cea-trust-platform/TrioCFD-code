@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Source_BIF_PolyMAC_P0.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/PolyMAC_P0
-// Version:     /main/13
+// Directory:   $TRUST_ROOT/Multiphase/CMFD/src/Turbulence/PolyMAC/Sources
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +131,7 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
           double secmem_en = 0;
           for (int d_j = 0; d_j < D; d_j++)
             secmem_en += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
-          secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ; // For us, Rij = <u_i u_j>, therefore *(-1)
+          secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ; // For us, Rij = < u_i u_j >, therefore *(-1)
           secmem(nf_tot + e*D + d_i, n) += secmem_en;
         }
 
@@ -150,7 +149,7 @@ void Source_BIF_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
             for (int d_j = 0; d_j < D; d_j++)
               secmem_en(d_i) += grad_Rij(nf_tot + D *e + d_j, n, d_i,  d_j) ;
           for (int d_i = 0; d_i < D; d_i++)
-            secmem_en(d_i) *= (-1) * pe(e) * vf_dir(f, i) * tab_alp(e, n) * tab_rho(e, n);// For us, Rij = <u_i u_j>, therefore *(-1)
+            secmem_en(d_i) *= (-1) * pe(e) * vf_dir(f, i) * tab_alp(e, n) * tab_rho(e, n);// For us, Rij = < u_i u_j >, therefore *(-1)
           double flux_face = zone.dot(&normales_f(f, 0), &secmem_en(0));
           secmem(f, n) += flux_face;
         }

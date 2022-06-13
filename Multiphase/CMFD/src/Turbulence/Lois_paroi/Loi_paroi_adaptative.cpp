@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Loi_paroi_adaptative.cpp
-// Directory:   $TRUST_ROOT/src/Turbulence/Correlations
-// Version:     /main/18
+// Directory:   $TRUST_ROOT/Multiphase/CMFD/src/Turbulence/Lois_paroi
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -164,8 +163,8 @@ double Loi_paroi_adaptative::calc_u_tau_loc(double u_par, double nu, double y)
 
   return u_tau_0;
 }
-
-double Loi_paroi_adaptative::to_zero(double u_tau, double u_par, double nu, double y) // fonction for which we are looking for the root
+// fonction for which we are looking for the root
+double Loi_paroi_adaptative::to_zero(double u_tau, double u_par, double nu, double y)
 {
   double y_p = y*u_tau/nu;
   return u_plus_de_y_plus(y_p) - u_par/u_tau;
