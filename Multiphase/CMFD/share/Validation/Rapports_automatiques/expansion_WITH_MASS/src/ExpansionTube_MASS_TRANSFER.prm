@@ -6,12 +6,12 @@ Parameters {
 	VersionTrio_U "1.9.0"
 #
 	ParametersTrio_U Type of problem: 1D Two-phase problem
-	ParametersTrio_U Discretization: CoviMAC
+	ParametersTrio_U Discretization: PolyMAC_P0
 	ParametersTrio_U Time scheme: Implicit Euler for CoviMac
 	ParametersTrio_U Momentum convection scheme: Amont
 	ParametersTrio_U Solving of equations: QDM_Multiphase
 	ParametersTrio_U Master Test case: expansion_avec_mass_HEM.data
-	ParametersTrio_U Location: validation/share/Validation/Rapports_automatiques/Validant/Fini/Expansion-WMT-HEM??????????
+	ParametersTrio_U Location: /Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_WITH_MASS
 #
 	Reference " $[1]$ M. Pelanti, K.M. Shyue. A mixture-energy-consistent six-equation two-phase numerical model for fluids with interfaces, cavitation and evaporation waves. J. Comput. Phys., 259 (2014), pp. 331-357 "
 	Reference " $[2]$ A. Zein, M. Hantke, G. Warnecke. Modeling phase transition for compressible two-phase flows applied to metastable liquids. J. Comput. Phys., 229 (2010), pp. 2964-2998 "

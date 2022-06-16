@@ -6,8 +6,8 @@ Parameters {
 	VersionTrio_U "1.9.0"
 #
 	ParametersTrio_U Type of problem: 1D Two-phase problem
-	ParametersTrio_U Discretization: CoviMAC
-	ParametersTrio_U Time scheme: Implicit Euler for CoviMac
+	ParametersTrio_U Discretization: PolyMAC_P0
+	ParametersTrio_U Time scheme: Implicit Euler for PolyMAC_P0
 	ParametersTrio_U Momentum convection scheme: Amont
 	ParametersTrio_U Solving of equations: QDM_Multiphase
 	ParametersTrio_U Master Test case: expansion_sans_mass_HEM.data
@@ -24,7 +24,7 @@ Parameters {
 	IncludeData 2
 }
 Objectif {
-	Description "The aim of this test is to validate the the Homogeneous Equilibrium Model (HEM) coupled with a Stiffened Gas Equation of state (EOS) on the known expansion tube test cas $[1-3]$. No mass transfer is considered in this test. "
+	Description "The aim of this test is to validate the Homogeneous Equilibrium Model (HEM) coupled with a Stiffened Gas Equation of state (EOS) on the known expansion tube test cas $[1-3]$. No mass transfer is considered in this test. "
 	Description " \latex_(\underline{Validation with:}\latex_) numerical solution of Rodio and Abgrall $[3]$
 }
 #
