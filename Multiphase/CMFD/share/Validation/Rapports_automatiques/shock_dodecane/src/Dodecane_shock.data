@@ -1,5 +1,4 @@
-# PARALLEL OK 8 #
-system "rm -rf lata; mkdir -p lata"
+# PARALLEL OK 4 #
 dimension 2
 Domaine dom
 
@@ -24,8 +23,7 @@ mailler dom
 # BEGIN PARTITION
 Decouper dom
 {
-    partitionneur metis { nb_parts 2 }
-    nb_parts_tot 2
+    partitionneur metis { nb_parts 4 }
     Larg_joint 2
     Nom_Zones dom
 }
@@ -36,8 +34,8 @@ END PARTITION #
 Scatter dom.Zones dom
 END SCATTER #
 
-CoviMAC  dis
-option_covimac {  }
+PolyMAC_P0  dis
+option_PolyMAC_P0 {  }
 
 Schema_euler_implicite sch
 Read sch
@@ -126,11 +124,8 @@ Read pb
                p grav        pression periode 1e8 segment 10000 0 0.5 1 0.5
             eint grav energie_interne periode 1e8 segment 10000 0 0.5 1 0.5
         }
-        Format Lata
-        fichier lata/Dodecane_shock
-        fields dt_post 1e-6
-        # Format lml
-        fields dt_post 1e-2 #
+        Format lml 
+        fields dt_post 1e-2
         {
             alpha elem
             vitesse elem

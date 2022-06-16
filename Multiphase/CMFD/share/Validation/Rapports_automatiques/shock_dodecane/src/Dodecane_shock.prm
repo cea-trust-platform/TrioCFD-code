@@ -91,7 +91,7 @@ Casesetup {
 		visu {
 			Title "Mesh overview. Zoom on 0.11<x<0.14 and 0.065<y<0.07."
 			Width 14cm, trim= 100 100 50 650,clip
-			mesh lata/Dodecane_shock.lata dom
+			mesh Dodecane_shock.lml dom
 			zoom2D 0.1133 0.141 0.0625 0.09
 		}
  }
@@ -105,7 +105,7 @@ Results {
 #		Title "Pressure fields at t = 0.000473s "
 #		Width 11cm
 #		#viewport= 100 100 1000 350,clip
-#		Pseudocolor lata/Dodecane_shock.lata dom PRESSION ELEM
+#		Pseudocolor Dodecane_shock.lml dom PRESSION ELEM
 #		cycles -1
 #	}
 	Figure {
