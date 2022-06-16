@@ -10,6 +10,7 @@ Makefile
 README.BALTIK
 index.html
 .test*
+Lois_eau_c3.h.bak
 
 # Eclipse
 .cproject
