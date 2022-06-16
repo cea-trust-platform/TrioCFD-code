@@ -41,6 +41,7 @@ Schema_euler_implicite sch
 Read sch
 {
     tinit 0
+	nb_pas_dt_max 3
     dt_start dt_fixe 1e-9
     tmax 0.000473
     seuil_statio -1 # 1e-6 #
