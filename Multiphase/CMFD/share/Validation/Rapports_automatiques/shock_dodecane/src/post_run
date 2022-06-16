@@ -1,0 +1,5 @@
+#!/bin/bash
+
+extrait_coupe Dodecane_shock ALP
+extrait_coupe Dodecane_shock P
+extrait_coupe Dodecane_shock V

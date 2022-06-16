@@ -1,0 +1,208 @@
+Parameters {
+	newvalidTrio
+#
+	Title "Two-phase dodecane shock tube - TP_shock_tube-HEM"
+#
+	VersionTrio_U "1.9.0"
+#
+	ParametersTrio_U Type of problem: 1D Two-phase problem
+	ParametersTrio_U Discretization: CoviMAC
+	ParametersTrio_U Time scheme: Implicit Euler for CoviMac
+	ParametersTrio_U Momentum convection scheme: Amont
+	ParametersTrio_U Solving of equations: QDM_Multiphase
+	ParametersTrio_U Master Test case: Dodecane_shock.data
+	ParametersTrio_U Location: validation/share/Validation/Rapports_automatiques/Validant/Fini/Expansion-WMT-HEM??????????
+#
+	Reference " $[1]$ M. Pelanti, K.M. Shyue. A mixture-energy-consistent six-equation two-phase numerical model for fluids with interfaces, cavitation and evaporation waves. J. Comput. Phys., 259 (2014), pp. 331-357 "
+	Reference " $[2]$ R. Saurel, F. Petitpas, R. Abgrall. Modelling phase transition in metastable liquids: application to cavitating and ﬂashing ﬂows. J. Fluid Mech., 607 (2008) 313–350 "
+	Reference " $[3]$ M.G. Rodio, R. Abgrall, An innovative phase transition modeling for reproducing cavitation through a five-equation model and theoretical generalization to six and seven-equation models. Int. J. of Heat and Mass Transfer, 89 (2015), pp. 1386-1401 "
+#
+#
+	TestCase . Dodecane_shock.data /*jdd en annexe*/
+#
+	Author "Alan BURLOT, Claire BEAUCHESNE, Julie DARONA, Antoine GERSCHENFELD, Corentin REISS, Maria Giovanna RODIO and Elie SAIKALI"
+	IncludeData 2
+}
+Objectif {
+	Description "The aim of this test is to validate the the Homogeneous Equilibrium Model (HEM) on a two-phase shock tube $[1-3]$. "
+	Description " \latex_(\underline{Validation with:}\latex_) numerical solution of Rodio and Abgrall $[3]$
+}
+#
+Pb_description {
+	Description " In this test-case, the shock tube is filled out with liquid dodecane on the left at high pressure \latex_($P_L=10^8$ \latex_) and vapor dodecane on the right at atmospheric pressure \latex_($P_L=10^5$ \latex_). The diaphragm is located at x = 0.75 m (the tube is 1 m long) and the results are shown at a time of \latex_($t=473 \mu$s \latex_). The computation are performed by using a 10000 mesh grid in the x direction. In the y-direction only 1 cell is used."
+	CICL {
+		Description "The initial conditions on the left and the right part of the tube are summerized in Table 1. In Figure 1 we can observe the initial pressure discontinuity imposed at x=0.75 m.  
+	Table {
+		Title " Initial conditions on the left and the right of the diaphragm "
+		nb_columns 5
+		label Phase |\latex_($\rho$\latex_) (kg/$m^3$) | \latex_($P$\latex_) [Pa]| \latex_($v$\latex_) (m/s)| T (°C) 
+		line {
+			legend " Left "
+			values Liq. 500 $10^8$ 0.0 414.63 
+		}
+		line {
+			legend " Right "
+			values Vap. 2 $10^5$ 0.0 724.36 
+		}
+			}
+		Figure {
+			Title "Initial pressure (a) and vapor fraction (b) contours at t=0 s"
+			Width 12cm
+			picture initialP-A.png 
+		}
+		Description "Hydraulic boundary condition: "
+		Description " $\bullet$ HAUT : symmetry "
+		Description " $\bullet$ BAS : symmetry "
+		Description " $\bullet$ GAUCHE : frontiere ouverte vitesse imposee sortie champ front fonc t 4 0.0 0.0 0.0 0.0 "
+		Description " $\bullet$ DROITE : frontiere ouverte vitesse imposee sortie champ front fonc t 4 0.0 0.0 0.0 0.0 "		
+		Description "Mass initial and boundary condition : "
+		Description " $\bullet$ initial_conditions { alpha Champ Fonc xyz dom 2 1*(x[0.75)+0*(x>0.75) 0*(x[0.75)+1*(x>0.75) } "
+		Description " $\bullet$ GAUCHE : frontiere ouverte a_ext Champ Front Uniforme 2 1 0 "
+		Description " $\bullet$ DROITE : frontiere ouverte a_ext Champ Front Uniforme 2 0 1 "
+		Description "Energie initial and boundary condition (Note: the temperature is expressed in Celsius degree) : "
+		Description " $\bullet$ initial_conditions { temperature Champ Fonc xyz dom 2 414.63 724.36 } "
+		Description " $\bullet$ GAUCHE : frontiere ouverte T_ext Champ Front Uniforme 2 414.63 724.36 "
+		Description " $\bullet$ DROITE : frontiere ouverte T_ext Champ Front Uniforme 2 414.63 724.36 "
+		}
+	Propfluide {
+		Description "The Equation of State (EOS) used for this simulation is the Stiffened Gas. The coefficients used for the liquid and vapor phase are the following :"
+        Table {
+		Title " Stiffened Gas EOS coefficients "
+		nb_columns 4
+		label $\gamma$ | \latex_($P_{\infty}$\latex_) [Pa]| \latex_($C_v$\latex_) |q 
+		line {
+			legend " Liquid Dodecane "
+			values 2.35 $4^8$ 1077.7 -775.269e3
+		}
+		line {
+			legend " Vapor Dodecane "
+			values 1.025 0.0 1956.45 -237.547e3 
+		}
+			}
+	}
+	Phyecou {
+		Description "The pressure discontinuity in the center of the channel produces a rarefaction wave that propagates on the right and the shock on the right. "
+	}
+}
+#
+Casesetup {
+	Maillage {
+		Description " The mesh of 10000 cells was built with TRUST. It is homogeneous in all domain. "
+		visu {
+			Title "Mesh overview. Zoom on 0.11<x<0.14 and 0.065<y<0.07."
+			Width 14cm, trim= 100 100 50 650,clip
+			mesh lata/Dodecane_shock.lata dom
+			zoom2D 0.1133 0.141 0.0625 0.09
+		}
+ }
+}
+#
+Results {
+# Validation specific informations automatically generate
+	Description " The simulations have been perfomed up to 0.000473s of physical time. As we can observe in Figure 3, the pressure discontinuity imposed initially at x=0.75m generates a shock that propagates on the right direction, allowing to moves the phase separation interface on the right (see Figure 6). On the contrary a rarefaction wave propagates on the left par of the tube as we can observe in Figure 4. In Figures 4-6 we can observe the comparaison of the pressure, velocity and volume fraction gas profiles obtained avec TrioCFD and the numerical profiles obtained in Rodio-Abgrall [3], showing, in all three figures, excellent agreement for the pressure and the vapor volume fraction. "
+
+#	visu {
+#		Title "Pressure fields at t = 0.000473s "
+#		Width 11cm
+#		#viewport= 100 100 1000 350,clip
+#		Pseudocolor lata/Dodecane_shock.lata dom PRESSION ELEM
+#		cycles -1
+#	}
+	Figure {
+		Title "(a) Velocity and (b) Pressure contours obtained at 0.000473s"
+		Width 14 cm
+		picture pev.png 
+	}
+	# Description "$\bullet$ \latex_(\textbf{Pressure evolution at the cylinder surface}\latex_) "
+	# Description " It can be seen that the time of stabilization of the oscillations is of about 40s. From this instant, an oscillation frequency can be determined. " 
+	Figure {
+		Title " Comparison of the pressure profiles obtained by TrioCFD and Rodio-Abgrall [3] profile "
+		Description "$$\ $$ "
+		Width 11.5cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 1
+		logy
+		LabelY "Pressure (Pa)"
+		RangeY 10000 100000000
+		Include_Description_Curves 0
+		Curve {
+		       legend "TrioCFD"
+		       file Dodecane_shock_P.coupe
+#		       columns ($1) ($2)
+		       Style lines
+#		       TypeLigne 1
+		}
+		Curve {
+		       legend " Rodio-Abgrall 2015 "
+		       file pressure_dodecane_RODIO.txt
+		       columns 1 2
+		       Style lines
+#		       TypeLigne 2
+	       }
+       }
+#
+	Figure {
+		Title " Comparison of the x-velocity profiles obtained by TrioCFD and Rodio-Abgrall [3] profile "
+		Width 11.5cm
+		Dimension 2
+
+		LabelX " x (m)"
+		RangeX 0 1
+		LabelY "x-Velocity (m/s)"
+		RangeY 0 200
+		Include_Description_Curves 0
+		Curve {
+			legend "TrioCFD"
+			origin "Trio_U"
+			file Dodecane_shock_V.coupe
+#			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " Rodio-Abgrall 2015 "
+			origin "Trio_U"
+			file velocity_dodecane_RODIO.txt
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+	}
+#pressure oscillations time from 40 up to 50s
+#
+	Figure {
+		Title " Comparison of the gas volume fraction profiles obtained by TrioCFD and Rodio-Abgrall [3] profile "
+		Width 11.5cm
+		Dimension 2
+
+		LabelX " x (m)"
+		RangeX 0 1
+		LabelY "Gas volume Fraction"
+		RangeY 0 1
+		Include_Description_Curves 0
+		Curve {
+			legend " TrioCFD"
+			origin "Trio_U"
+			file Dodecane_shock_ALP.coupe
+#			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " Rodio-Abgrall 2015 "
+			origin "Trio_U"
+			file alpha_dodecane_RODIO.txt
+			columns 1 2
+			Style lines
+			TypePoints 1 
+		}
+	}
+}
+#
+Conclusion {
+	Description " The computation of this test with TrioCFD is satisfactory with a good agreement between calculated results with others numerical results by Rodio-Abgrall $[3]$$[2]$. "
+	Description " The calculation ends normally without any particular numerical troubles. "
+	Description " This simulation enables the validation of the HEM model for reproducing a two-phase shock-tube."
+
+}

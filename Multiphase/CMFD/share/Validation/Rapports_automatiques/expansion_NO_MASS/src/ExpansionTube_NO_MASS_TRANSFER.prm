@@ -1,0 +1,234 @@
+Parameters {
+	newvalidTrio
+#
+	Title "Two-phase expansion tube without mass transfer - Expansion-NT-HEM"
+#
+	VersionTrio_U "1.9.0"
+#
+	ParametersTrio_U Type of problem: 1D Two-phase problem
+	ParametersTrio_U Discretization: CoviMAC
+	ParametersTrio_U Time scheme: Implicit Euler for CoviMac
+	ParametersTrio_U Momentum convection scheme: Amont
+	ParametersTrio_U Solving of equations: QDM_Multiphase
+	ParametersTrio_U Master Test case: expansion_sans_mass_HEM.data
+	ParametersTrio_U Location: /Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_NO_MASS
+#
+	Reference " $[1]$ M. Pelanti, K.M. Shyue. A mixture-energy-consistent six-equation two-phase numerical model for fluids with interfaces, cavitation and evaporation waves. J. Comput. Phys., 259 (2014), pp. 331-357 "
+	Reference " $[2]$ A. Zein, M. Hantke, G. Warnecke. Modeling phase transition for compressible two-phase flows applied to metastable liquids. J. Comput. Phys., 229 (2010), pp. 2964-2998 "
+	Reference " $[3]$ M.G.Rodio, R.Abgrall, An innovative phase transition modeling for reproducing cavitation through a five-equation model and theoretical generalization to six and seven-equation models. Int. J. of Heat and Mass Transfer, 89 (2015), pp. 1386-1401 "
+#
+#
+	TestCase . expansion_sans_mass_HEM.data /*jdd en annexe*/
+#
+	Author "Alan BURLOT, Claire BEAUCHESNE, Julie DARONA, Antoine GERSCHENFELD, Corentin REISS, Maria Giovanna RODIO and Elie SAIKALI"
+	IncludeData 2
+}
+Objectif {
+	Description "The aim of this test is to validate the the Homogeneous Equilibrium Model (HEM) coupled with a Stiffened Gas Equation of state (EOS) on the known expansion tube test cas $[1-3]$. No mass transfer is considered in this test. "
+	Description " \latex_(\underline{Validation with:}\latex_) numerical solution of Rodio and Abgrall $[3]$
+}
+#
+Pb_description {
+	Description " Let us consider a tube of unit length, filled out with liquid water at an atmospheric pressure P=$10^5$ Pa. The liquid is assumed to contain a uniformly distributed small amount of gas (\latex_($\alpha_G$\latex_)=0.01), in the whole domain. The liquid temperature is equal to  \latex_($T_L = 354.728$\latex_) K. A velocity discontinuity is set at x = 0.5 m at initial time. We set V=-2 m/s on the left and V=2 m/s on the right of the discontinuity. We assume a thermodynamic equilibrium between the gas and the liquid phase, so \latex_($T_L=T_G$, $P_L=P_G$, $V_L=V_G$ \latex_). The solutions are shown at a time t = 3.2 ms and the computation is performed by using a mesh of 5000 cells in the x direction. In the y-direction only 1 cell is used. "
+	geometrie {
+		Description "In the following scheme, L = 1.0 m ; W = 1.0 m"
+		Figure {
+			Title "Geometry"
+			Width 14cm
+			picture geometry.png
+		}
+	}
+	CICL {
+		Description "Hydraulic initial conditions for both phases (see Figure 2): 
+		Description " $\bullet$ \latex_($V_{y}$\latex_) = 0 m/s "
+		Description " $\bullet$ \latex_($V_{x}$\latex_) = -2 m/s for x<0.5m "
+		Description " $\bullet$ \latex_($V_{x}$\latex_) = 2 m/s for x>=0.5m "
+		Description " $\bullet$ P=1e05 Pa "
+		Description " $\bullet$ T=81.578°C "
+		Figure {
+			Title "Velocity profile at t=0 s"
+			Width 8cm
+			picture velocity.png 
+		}
+		Description "Hydraulic boundary condition: "
+		Description " $\bullet$ HAUT : paroi_fixe "
+		Description " $\bullet$ BAS : paroi_fixe "
+		Description " $\bullet$ GAUCHE : frontiere ouverte vitesse imposee sortie champ front fonc t 4 -2 -2 0.0 0.0 "
+		Description " $\bullet$ DROITE : frontiere ouverte vitesse imposee sortie champ front fonc t 4 2 2 0.0 0.0 "		
+		Description "Mass initial and boundary condition : "
+		Description " $\bullet$ initial_conditions { alpha Champ Fonc xyz dom 2 0.99 0.01 } "
+		Description " $\bullet$ GAUCHE : frontiere ouverte a_ext Champ Front Uniforme 2 0.99 0.01 "
+		Description " $\bullet$ DROITE : frontiere ouverte a_ext Champ Front Uniforme 2 0.99 0.01 "
+		Description "Energie initial and boundary condition (Note: the temperature is expressed in Celsius degree) : "
+		Description " $\bullet$ initial_conditions { temperature Champ Fonc xyz dom 2 81.578 81.578 } "
+		Description " $\bullet$ GAUCHE : frontiere ouverte T_ext Champ Front Uniforme 2 81.578 81.578 "
+		Description " $\bullet$ DROITE : frontiere ouverte T_ext Champ Front Uniforme 2 81.578 81.578 "
+		}
+	Propfluide {
+		Description "The fluid used in this test is liquid water. We suppose a initial ammount of gas. The mixture has the following properties : "
+		Table {
+			Title "Physical properties of the liquid water and of the dispersed gas"
+			Description " "
+			nb_columns 1
+			label Value
+			line {
+				legend " \latex_($\rho_L$\latex_) (kg/$m^3$) "
+				file propertiesGeometry.dat     
+				nb_columns_file 3
+				columns ($1)
+			}
+			line {
+				legend " \latex_($\rho_G$\latex_) (kg/$m^3$) "
+				file propertiesGeometry.dat     
+				nb_columns_file 3
+				columns ($3)
+			}
+			line {
+				legend " \latex_($T_L=T_G$\latex_) (K) "
+				file propertiesGeometry.dat     
+				nb_columns_file 3
+				columns ($2)
+			}
+		}
+		Description "The Equation of State (EOS) used for this simulation is the Stiffened Gas. The coefficients used for the liquid and vapor phase are the following :"
+        Table {
+		Title " Stiffened Gas EOS coefficients "
+		nb_columns 4
+		label $\gamma$ | \latex_($P_{\infty}$\latex_) [Pa]| \latex_($C_v$\latex_) |q 
+		line {
+			legend " Liquid "
+			values 2.35 $10^9$ 1816.0 -1167.0e3
+		}
+		line {
+			legend " Gas "
+			values 1.43 0.0 1040.0 2030.0e3 
+		}
+			}
+	}
+	Phyecou {
+		Description "The velocity discontinuity in the center of the channel produces a mechanical expansion. In this region, we can observe a pressure decrease that could attain the saturation value (about 0.5 bar) and, consequently, generate a vapor zone. However, in this test case, we do not impose mass transfer, so we can observe the pressure decrease under the saturation value (See Figures 3 and 4). "
+	}
+}
+#
+Casesetup {
+	Maillage {
+		Description " The mesh of 5000 cells was built with TRUST. It is homogeneous in all domain. "
+		visu {
+			Title "Mesh overview."
+			Title "Mesh overview. Zoom on 0.11<x<0.14 and 0.065<y<0.07."
+			Width 14cm, trim= 100 100 50 650,clip
+			mesh lata/expansion_sans_mass_HEM.lata dom
+			zoom2D 0.11 0.14 0.065 0.07
+			zoom2D 0.1133 0.141 0.0625 0.09
+		}
+ }
+}
+#
+Results {
+# Validation specific informations automatically generate
+	Description " The simulations have been perfomed up to 0.0032s of physical time. As we can observe in Figure 4, the velocity discontinuity imposed initially at x=0.5m generates a central depression zone that propagates in both directions. As previously explained, the pressure drops below the saturation pressure, but since we have not imposed mass transfer, the pressure drops to \latex_($10^4$\latex_) Pa (see Figure 5). In Figures 5-7 we can observe the pressure, velocity and volume fraction gas profiles obtained avec TrioCFD, respectively. They are compared with the numerical profiles obtained in Rhodium-Abgrall [3], showing, in all three figures, excellent agreement. "
+
+#	visu {
+#		Title "Pressure fields at t = 0.0032s "
+#		Width 11cm
+#		#viewport= 100 100 1000 350,clip
+#		Pseudocolor lata/expansion_sans_mass_HEM.lata dom PRESSION ELEM
+#		cycles -1
+#	}
+	Figure {
+		Title "(a) Velocity and (b) Pressure contours obtained at 0.0032s"
+		Width 14 cm
+		picture pev.png 
+	}
+	# Description "$\bullet$ \latex_(\textbf{Pressure evolution at the cylinder surface}\latex_) "
+	# Description " It can be seen that the time of stabilization of the oscillations is of about 40s. From this instant, an oscillation frequency can be determined. " 
+	Figure {
+		Title " Comparison of the pressure profiles obtained by TrioCFD and Rodio-Abgrall [3] profile "
+		Description "$$\ $$ "
+		Width 11.5cm
+		Dimension 2
+		LabelX " x (m)"
+		RangeX 0 1
+		LabelY "Velocity (m/s)"
+		RangeY 10000 100000
+		Include_Description_Curves 0
+		Curve {
+		       legend "TrioCFD"
+		       file expansion_sans_mass_HEM_P.coupe
+#		       columns ($1) ($2)
+		       Style lines
+#		       TypeLigne 1
+		}
+		Curve {
+		       legend " Rodio-Abgrall 2015 "
+		       file pressure_expansion_RODIO.txt
+		       columns 1 2
+		       Style lines
+#		       TypeLigne 2
+	       }
+       }
+#
+	Figure {
+		Title " Comparison of the x-velocity profiles obtained by TrioCFD and Rodio-Abgrall [3] profile "
+		Width 11.5cm
+		Dimension 2
+
+		LabelX " x (m)"
+		RangeX 0 1
+		LabelY "x-Velocity (m/s)"
+		RangeY -2 2
+		Include_Description_Curves 0
+		Curve {
+			legend "TrioCFD"
+			origin "Trio_U"
+			file expansion_sans_mass_HEM_V.coupe
+#			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " Rodio-Abgrall 2015 "
+			origin "Trio_U"
+			file velocity_expansion_RODIO.txt
+			columns 1 2
+			Style lines
+			TypeLigne 2
+		}
+	}
+#pressure oscillations time from 40 up to 50s
+#
+	Figure {
+		Title " Comparison of the gas volume fraction profiles obtained by TrioCFD and Rodio-Abgrall [3] profile "
+		Width 11.5cm
+		Dimension 2
+
+		LabelX " x (m)"
+		RangeX 0 1
+		LabelY "Gas volume Fraction"
+		RangeY 0 1
+		Include_Description_Curves 0
+		Curve {
+			legend " TrioCFD"
+			origin "Trio_U"
+			file expansion_sans_mass_HEM_ALP.coupe
+#			columns ($1) ($2)
+			Style lines
+			TypeLigne 1
+		}
+		Curve {
+			legend " Rodio-Abgrall 2015 "
+			origin "Trio_U"
+			file alpha_expansion_RODIO.txt
+			columns 1 2
+			Style lines
+			TypePoints 1 
+		}
+	}
+}
+#
+Conclusion {
+	Description " The computation of this test with TrioCFD is satisfactory with a good agreement between calculated results with others numerical results by Rodio-Abgrall $[3]$$[2]$. "
+	Description " The calculation ends normally without any particular numerical troubles. "
+	Description " This simulation enables the validation of the HEM model with Trio-CFD using a Stiffened Gas EOS for defining the fluid properties for both phases."
+
+}
