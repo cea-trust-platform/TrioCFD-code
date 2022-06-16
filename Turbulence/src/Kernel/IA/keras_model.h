@@ -1,3 +1,4 @@
+// TRUST_NO_INDENT
 /*
  * Copyright (c) 2016 Robert W. Rose
  *
