@@ -14,26 +14,27 @@
 *****************************************************************************/
 //////////////////////////////////////////////////////////////////////////////
 //
-// File:        Cond_lim_k_simple.h
+// File:        Cond_lim_k_simple_flux_nul.h
 // Directory:   $TRUST_ROOT/src/ThSol
 // Version:     /main/13
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef Cond_lim_k_simple_included
-#define Cond_lim_k_simple_included
+#ifndef Cond_lim_k_simple_flux_nul_included
+#define Cond_lim_k_simple_flux_nul_included
 
 #include <Echange_global_impose.h>
 #include <Ref_Correlation.h>
 
 
-/*! @brief Classe Cond_lim_k_simple:
+/*! @brief Classe Cond_lim_k_simple_flux_nul:
  *
  */
-class Cond_lim_k_simple  : public Echange_global_impose
+class Cond_lim_k_simple_flux_nul  : public Echange_global_impose
+
 {
 
-  Declare_instanciable(Cond_lim_k_simple);
+  Declare_instanciable(Cond_lim_k_simple_flux_nul);
 
 public :
 
