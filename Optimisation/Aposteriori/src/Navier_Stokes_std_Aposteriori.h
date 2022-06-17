@@ -12,17 +12,27 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Navier_Stokes_std_Aposteriori.h
-// Directory:   $TRUST_ROOT/Optimisation/Aposteriori/src
-//
-//////////////////////////////////////////////////////////////////////////////
+
+#ifndef Navier_Stokes_std_Aposteriori_included
+#define Navier_Stokes_std_Aposteriori_included
+
 #include <Navier_Stokes_std.h>
 
 class Navier_Stokes_std_Aposteriori : public Navier_Stokes_std
 {
-  Declare_instanciable(Navier_Stokes_std_Aposteriori);
+  Declare_instanciable_sans_constructeur(Navier_Stokes_std_Aposteriori);
 public:
-void creer_champ(const Motcle& motlu) override;
-}
+  // constructeur
+  Navier_Stokes_std_Aposteriori() : Navier_Stokes_std()
+  {
+    champs_compris_.ajoute_nom_compris("estimateur_aposteriori");
+  }
+
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void creer_champ(const Motcle& motlu) override;
+
+protected:
+  Champ_Fonc estimateur_aposteriori;
+};
+
+#endif /* Navier_Stokes_std_Aposteriori_included */

@@ -26,6 +26,7 @@
 #include <Champ_P0_VEF.h>
 #include <Champ_Uniforme.h>
 #include <Champ_Don.h>
+#include <Champ_Fonc.h>
 #include <Champ_P1_isoP1Bulle.h>
 #include <Zone_Cl_VEF.h>
 
@@ -54,7 +55,7 @@ void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
   const Zone_Cl_VEF& zone_cl_VEF = la_zone_Cl_VEF.valeur();
   const Zone_VEF& zone_VEF = zone_cl_VEF.zone_VEF();
   const Zone_VEF_PreP1b& zone_VEF_p = ref_cast(Zone_VEF_PreP1b,
-                                               la_zone_VEF.valeur());
+                                               la_zone_VF.valeur());
   const Zone& zone = zone_VEF_p.zone();
 
 
@@ -175,7 +176,7 @@ void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
           if (elem1>=0)
             {
               signe=1.;
-              som_opp = la_zone_VEF->get_num_fac_loc(fac, 0);
+              som_opp = la_zone_VF->get_num_fac_loc(fac, 0);
               som_opp = som_elem(elem1, som_opp);
               for (j=0; j<dim; j++)
                 {
@@ -186,7 +187,7 @@ void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
           if (elem2>=0)
             {
               signe=-1.;
-              som_opp = la_zone_VEF->get_num_fac_loc(fac, 1);
+              som_opp = la_zone_VF->get_num_fac_loc(fac, 1);
               som_opp = som_elem(elem2, som_opp);
               for (j=0; j<dim; j++)
                 {

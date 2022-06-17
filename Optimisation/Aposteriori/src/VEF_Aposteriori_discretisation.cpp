@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,53 +12,36 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Taux_cisaillement_P0_VEF.cpp
-// Directory:   $TRUST_ROOT/src/VEF/Champs
-// Version:     /main/3
-//
-//////////////////////////////////////////////////////////////////////////////
 
-#include <Taux_cisaillement_P0_VEF.h>
-#include <Zone_VEF.h>
-#include <Champ_P1NC.h>
+#include <VEF_Aposteriori_discretisation.h>
+#include <estimateur_aposteriori_P0_VEF.h>
+#include <Champ_P1_isoP1Bulle.h>
+#include <Zone_Cl_dis.h>
 #include <Zone_Cl_VEF.h>
+#include <Zone_VEF.h>
+#include <Champ_P0_VEF.h>
+#include <Champ_Fonc.h>
+#include <Champ_P1NC.h>
 
-Implemente_instanciable(Taux_cisaillement_P0_VEF,"Taux_cisaillement_P0_VEF",Champ_Fonc_P0_VEF);
+Implemente_instanciable(VEF_Aposteriori_discretisation,"VEF_Aposteriori_discretisation",VEF_discretisation);
 
+Entree& VEF_Aposteriori_discretisation::readOn(Entree& s) { return s ; }
 
-//     printOn()
-/////
+Sortie& VEF_Aposteriori_discretisation::printOn(Sortie& s) const { return s ; }
 
-Sortie& Taux_cisaillement_P0_VEF::printOn(Sortie& s) const
+void VEF_Aposteriori_discretisation::estimateur_aposteriori(const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_vitesse, const Champ_Inc& ch_pression, const Champ_Don& viscosite_cinematique, Champ_Fonc& champ) const
 {
-  return s << que_suis_je() << " " << le_nom();
+  const Zone_VEF_PreP1b& zone_vef=ref_cast(Zone_VEF_PreP1b, z.valeur());
+  const Zone_Cl_VEF& zone_cl_vef=ref_cast(Zone_Cl_VEF, zcl.valeur());
+  champ.typer("estimateur_aposteriori_P0_VEF");
+  estimateur_aposteriori_P0_VEF& ch=ref_cast(estimateur_aposteriori_P0_VEF,champ.valeur());
+  ch.associer_zone_dis_base(zone_vef);
+  const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse.valeur());
+  const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, ch_pression.valeur());
+  ch.associer_champ(vit, pres, viscosite_cinematique, zone_cl_vef);
+  ch.nommer("estimateur_aposteriori");
+  ch.fixer_nb_comp(1);
+  ch.fixer_nb_valeurs_nodales(zone_vef.nb_elem());
+  ch.fixer_unite("sans");
+  ch.changer_temps(ch_vitesse.temps());
 }
-
-//// readOn
-//
-
-Entree& Taux_cisaillement_P0_VEF::readOn(Entree& s)
-{
-  return s ;
-}
-
-void Taux_cisaillement_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Zone_Cl_dis_base& la_zone_Cl_dis_base)
-{
-  la_zone_Cl_VEF  = ref_cast(Zone_Cl_VEF, la_zone_Cl_dis_base);
-  vitesse_= la_vitesse;
-}
-
-void Taux_cisaillement_P0_VEF::mettre_a_jour(double tps)
-{
-  int nb_elem = la_zone_VEF->nb_elem();
-  DoubleVect tmp(nb_elem);
-  vitesse_->calcul_S_barre(vitesse_.valeur().valeurs(),tmp,la_zone_Cl_VEF.valeur());
-  DoubleTab& S = valeurs(); // Shear rate
-  for (int i=0; i<nb_elem; i++)
-    S(i) = sqrt(tmp(i));
-  changer_temps(tps);
-  Champ_Fonc_base::mettre_a_jour(tps);
-}
-

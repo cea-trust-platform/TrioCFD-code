@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2021, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,49 +12,18 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : estimateur_aposteriori_P0_VEF.h
-// Directory : $APOSTERIORI_FOR_TRIOCFD_ROOT/src
-//
-/////////////////////////////////////////////////////////////////////////////
 
-#ifndef estimateur_aposteriori_P0_VEF_included
-#define estimateur_aposteriori_P0_VEF_included
+#ifndef VEF_Aposteriori_discretisation_included
+#define VEF_Aposteriori_discretisation_included
 
-#include <Champ_Fonc_P0_VEF.h>
-#include <Ref_Champ_P1NC.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Ref_Champ_P1_isoP1Bulle.h>
-#include <Ref_Champ_Don.h>
+#include <VEF_discretisation.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class estimateur_aposteriori_P0_VEF
-//
-// <Description of class estimateur_aposteriori_P0_VEF>
-//
-/////////////////////////////////////////////////////////////////////////////
-
-class estimateur_aposteriori_P0_VEF : public Champ_Fonc_P0_VEF
+class VEF_Aposteriori_discretisation : public VEF_discretisation
 {
-
-  Declare_instanciable( estimateur_aposteriori_P0_VEF ) ;
-
-public :
-
-  void mettre_a_jour(double ) override;
-  void associer_champ(const Champ_P1NC&, const Champ_P1_isoP1Bulle&, const Champ_Don&, const Zone_Cl_dis_base&);
-
-protected :
-
-private:
-
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
-  REF(Champ_P1NC) vitesse_;
-  REF(Champ_P1_isoP1Bulle) pression_p1isop1b_;
-  REF(Champ_Don) viscosite_cinematique_;
-  REF(Champ_P1NC) source_qdm_;
+  Declare_instanciable(VEF_Aposteriori_discretisation);
+public:
+  void estimateur_aposteriori(const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_vitesse, const Champ_Inc& ch_pression, const Champ_Don& viscosite_cinematique, Champ_Fonc&) const override;
 };
 
-#endif /* estimateur_aposteriori_P0_VEF_included */
+
+#endif /* VEF_Aposteriori_discretisation_included */
