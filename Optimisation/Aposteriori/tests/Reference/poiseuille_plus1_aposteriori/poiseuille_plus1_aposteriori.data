@@ -22,7 +22,7 @@ Mailler dom
                 }
 }
 trianguler dom
-VEFPreP1B dis
+VEF_Aposteriori dis
 
 Schema_Euler_explicite sch
 Read sch
@@ -51,7 +51,7 @@ Associate pb fluide
 Discretize pb dis
 Read pb
 {
-	Navier_Stokes_standard
+	Navier_Stokes_std_Aposteriori
 	{
 		solveur_pression GCP { 
 			precond ssor { omega 1.650000 } 

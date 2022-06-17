@@ -21,7 +21,7 @@ Mailler dom
 }
 Tetraedriser_homogene_fin dom
 
-VEFPreP1b dis
+VEF_Aposteriori_discretisation dis
 
 Schema_Euler_explicite sch
 Lire sch
@@ -50,7 +50,7 @@ Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+	Navier_Stokes_std_Aposteriori
 	{
 		Solveur_pression	PETSC Cholesky { impr }
 		Convection		{ EF_stab { alpha 0.5 } }

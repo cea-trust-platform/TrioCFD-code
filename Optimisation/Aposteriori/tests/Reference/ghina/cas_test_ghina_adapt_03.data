@@ -13,7 +13,7 @@ Read SSZ
           Cotes   4.25 0.4 
 }
 
-VEFPreP1B ma_discretisation  
+VEF_Aposteriori_discretisation ma_discretisation  
 Read ma_discretisation 
 {
     P0
@@ -31,7 +31,8 @@ Read mon_schema
     # facsec 20
     facsec_max 200 #
     # seuil_statio 1.e-5 #
-    nb_pas_dt_max 90000
+    nb_pas_dt_max 0 # pour eviter qu'il tourne #
+#   nb_pas_dt_max 90000 #
     solveur implicite { solveur gmres { diag seuil 1e-20 nb_it_max 3 } }
 }
 # I define a medium #
@@ -54,7 +55,7 @@ Discretize pb ma_discretisation
 # Problem description #
 Read pb
 {
-	Navier_Stokes_standard
+	Navier_Stokes_std_Aposteriori
 	{
 		# Pressure matrix solved with #
 		solveur_pression PETSc Cholesky {  }

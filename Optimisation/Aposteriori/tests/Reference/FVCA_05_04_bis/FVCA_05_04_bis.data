@@ -7,7 +7,7 @@ Mailler dom
 	Pave Cavite
 	{
 		Origine 0 0 0
-		Nombre_de_noeuds 3 3 3
+		Nombre_de_noeuds 9 9 9
 		Longueurs 1 1 1
 		}
 		{
@@ -21,7 +21,7 @@ Mailler dom
 }
 Tetraedriser_homogene_fin dom
 
-VEFPreP1b dis
+VEF_Aposteriori_discretisation dis
 
 Schema_Euler_explicite sch
 Lire sch
@@ -30,7 +30,7 @@ Lire sch
 	dt_min 1e-6
 	dt_max 1e+6
 	dt_impr 1e-6
-	facsec 0.5
+	facsec 1
 	precision_impr 8
 	seuil_statio 1e-7
 }
@@ -50,7 +50,7 @@ Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_standard
+	Navier_Stokes_std_Aposteriori
 	{
 		Solveur_pression	PETSC Cholesky { impr }
 		Convection		{ EF_stab { alpha 0.5 } }
@@ -67,7 +67,7 @@ Lire pb
 					Derriere	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
 					}
 	}
-	    Post_processings
+    Post_processings
     {
 	lata {
         format lata
@@ -86,6 +86,7 @@ Lire pb
         }
   	}
     } 
+
 	Postraitement
 	{
 		Definition_champs	{
@@ -319,8 +320,9 @@ Lire pb
 					errp_elem			errp_elem	periode 1e+6 numero_elem_sur_maitre 0
 					errdivu				errdivu		periode 1e+6 numero_elem_sur_maitre 0
 					}
+		Format lata
 	}
-	sauvegarde formatte Cas0.sauv
+	sauvegarde formatte Cas4bis.sauv
 }
 
 Resoudre pb
