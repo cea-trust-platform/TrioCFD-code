@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,37 +12,19 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-/////////////////////////////////////////////////////////////////////////////
-//
-// File      : estimateur_aposteriori_P0_VEF.cpp
-// Directory : $APOSTERIORI_FOR_TRIOCFD_ROOT/src
-//
-/////////////////////////////////////////////////////////////////////////////
 
-#include <estimateur_aposteriori_P0_VEF.h>
-#include <Domaine.h>
-#include <Zone_VEF.h>
-#include <Champ_P1NC.h>
-#include <Champ_P0_VEF.h>
-#include <Champ_Uniforme.h>
-#include <Champ_Don.h>
-#include <Champ_Fonc.h>
+#include <Estimateur_Aposteriori_P0_VEF.h>
 #include <Champ_P1_isoP1Bulle.h>
-#include <Zone_Cl_VEF.h>
+#include <Champ_P1NC.h>
+#include <Champ_Don.h>
 
-Implemente_instanciable( estimateur_aposteriori_P0_VEF, "estimateur_aposteriori_P0_VEF", Champ_Fonc_P0_VEF ) ;
+Implemente_instanciable( Estimateur_Aposteriori_P0_VEF, "Estimateur_Aposteriori_P0_VEF", Champ_Fonc_P0_VEF ) ;
 
-Sortie& estimateur_aposteriori_P0_VEF::printOn( Sortie& s ) const
-{
-  return s << que_suis_je() << " " << le_nom();
-}
+Sortie& Estimateur_Aposteriori_P0_VEF::printOn( Sortie& s ) const { return s << que_suis_je() << " " << le_nom(); }
 
-Entree& estimateur_aposteriori_P0_VEF::readOn( Entree& s )
-{
-  return s;
-}
+Entree& Estimateur_Aposteriori_P0_VEF::readOn( Entree& s ) { return s; }
 
-void estimateur_aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Zone_Cl_dis_base& la_zone_Cl_dis_base)
+void Estimateur_Aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse, const Champ_P1_isoP1Bulle& la_pression, const Champ_Don& la_viscosite_cinematique, const Zone_Cl_dis_base& la_zone_Cl_dis_base)
 {
   la_zone_Cl_VEF  = ref_cast(Zone_Cl_VEF, la_zone_Cl_dis_base);
   vitesse_= la_vitesse;
@@ -50,14 +32,12 @@ void estimateur_aposteriori_P0_VEF::associer_champ(const Champ_P1NC& la_vitesse,
   viscosite_cinematique_ = la_viscosite_cinematique;
 }
 
-void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
+void Estimateur_Aposteriori_P0_VEF::mettre_a_jour(double tps)
 {
   const Zone_Cl_VEF& zone_cl_VEF = la_zone_Cl_VEF.valeur();
   const Zone_VEF& zone_VEF = zone_cl_VEF.zone_VEF();
-  const Zone_VEF_PreP1b& zone_VEF_p = ref_cast(Zone_VEF_PreP1b,
-                                               la_zone_VF.valeur());
+  const Zone_VEF_PreP1b& zone_VEF_p = ref_cast(Zone_VEF_PreP1b, la_zone_VF.valeur());
   const Zone& zone = zone_VEF_p.zone();
-
 
   const DoubleTab& face_normales = zone_VEF.face_normales();
   const DoubleVect& face_surfaces = zone_VEF.face_surfaces();
@@ -66,7 +46,6 @@ void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
   const IntTab& face_voisins = zone_VEF.face_voisins();
   int premiere_face_int = zone_VEF.premiere_face_int();
   const IntTab& som_elem=zone.les_elems();
-
 
   double sautdirectionnel;
   double estimtot;
@@ -85,9 +64,9 @@ void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
   const DoubleVect& inverse_volumes = zone_VEF.inverse_volumes();
   DoubleTab la_vitesse = vitesse_.valeur().valeurs();
   DoubleTab la_pression = pression_p1isop1b_.valeur().valeurs();
-  cout << "estimateur_aposteriori_P0_VEF ici " << endl;
+  cout << "Estimateur_Aposteriori_P0_VEF ici " << endl;
   DoubleTab le_terme_source(vitesse_.valeur().valeurs());
-  cout << "estimateur_aposteriori_P0_VEF la " << endl;
+  cout << "Estimateur_Aposteriori_P0_VEF la " << endl;
   le_terme_source = 0.;
   DoubleTab gradient_elem(nb_elem_tot,dim,dim);
   gradient_elem=0.;
@@ -416,7 +395,7 @@ void estimateur_aposteriori_P0_VEF::mettre_a_jour(double tps)
       estim(ielem) = sqrt(estim(ielem));
     }
   estimtot = sqrt(estimtot);
-  cout << "estimateur_aposteriori_P0_VEF::mettre_a_jour - estimateur = " << estimtot << endl;
+  cout << "Estimateur_Aposteriori_P0_VEF::mettre_a_jour - estimateur = " << estimtot << endl;
 
   changer_temps(tps);
   Champ_Fonc_base::mettre_a_jour(tps);

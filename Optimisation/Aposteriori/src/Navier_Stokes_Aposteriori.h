@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -13,35 +13,29 @@
 *
 *****************************************************************************/
 
-#include <VEF_Aposteriori_discretisation.h>
-#include <estimateur_aposteriori_P0_VEF.h>
-#include <Champ_P1_isoP1Bulle.h>
-#include <Zone_Cl_dis.h>
-#include <Zone_Cl_VEF.h>
-#include <Zone_VEF.h>
-#include <Champ_P0_VEF.h>
-#include <Champ_Fonc.h>
-#include <Champ_P1NC.h>
+#ifndef Navier_Stokes_Aposteriori_included
+#define Navier_Stokes_Aposteriori_included
 
-Implemente_instanciable(VEF_Aposteriori_discretisation,"VEF_Aposteriori_discretisation",VEF_discretisation);
+#include <Navier_Stokes_std.h>
 
-Entree& VEF_Aposteriori_discretisation::readOn(Entree& s) { return s ; }
-
-Sortie& VEF_Aposteriori_discretisation::printOn(Sortie& s) const { return s ; }
-
-void VEF_Aposteriori_discretisation::estimateur_aposteriori(const Zone_dis& z, const Zone_Cl_dis& zcl, const Champ_Inc& ch_vitesse, const Champ_Inc& ch_pression, const Champ_Don& viscosite_cinematique, Champ_Fonc& champ) const
+class Navier_Stokes_Aposteriori : public Navier_Stokes_std
 {
-  const Zone_VEF_PreP1b& zone_vef=ref_cast(Zone_VEF_PreP1b, z.valeur());
-  const Zone_Cl_VEF& zone_cl_vef=ref_cast(Zone_Cl_VEF, zcl.valeur());
-  champ.typer("estimateur_aposteriori_P0_VEF");
-  estimateur_aposteriori_P0_VEF& ch=ref_cast(estimateur_aposteriori_P0_VEF,champ.valeur());
-  ch.associer_zone_dis_base(zone_vef);
-  const Champ_P1NC& vit = ref_cast(Champ_P1NC, ch_vitesse.valeur());
-  const Champ_P1_isoP1Bulle& pres = ref_cast(Champ_P1_isoP1Bulle, ch_pression.valeur());
-  ch.associer_champ(vit, pres, viscosite_cinematique, zone_cl_vef);
-  ch.nommer("estimateur_aposteriori");
-  ch.fixer_nb_comp(1);
-  ch.fixer_nb_valeurs_nodales(zone_vef.nb_elem());
-  ch.fixer_unite("sans");
-  ch.changer_temps(ch_vitesse.temps());
-}
+  Declare_instanciable_sans_constructeur(Navier_Stokes_Aposteriori);
+public:
+
+  // constructeur
+  Navier_Stokes_Aposteriori() : Navier_Stokes_std()
+  {
+    champs_compris_.ajoute_nom_compris("estimateur_aposteriori");
+  }
+
+  void discretiser() override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void creer_champ(const Motcle& motlu) override;
+
+private:
+  Champ_Fonc estimateur_aposteriori_;
+  void estimateur_aposteriori();
+};
+
+#endif /* Navier_Stokes_Aposteriori_included */

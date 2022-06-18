@@ -13,26 +13,43 @@
 *
 *****************************************************************************/
 
-#ifndef Navier_Stokes_std_Aposteriori_included
-#define Navier_Stokes_std_Aposteriori_included
+#include <Pb_Hydraulique_Aposteriori.h>
+#include <Fluide_base.h>
 
-#include <Navier_Stokes_std.h>
+Implemente_instanciable(Pb_Hydraulique_Aposteriori,"Pb_Hydraulique_Aposteriori",Pb_Fluide_base);
 
-class Navier_Stokes_std_Aposteriori : public Navier_Stokes_std
+Sortie& Pb_Hydraulique_Aposteriori::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
+
+Entree& Pb_Hydraulique_Aposteriori::readOn(Entree& is) { return Pb_Fluide_base::readOn(is); }
+
+const Equation_base& Pb_Hydraulique_Aposteriori::equation(int i) const
 {
-  Declare_instanciable_sans_constructeur(Navier_Stokes_std_Aposteriori);
-public:
-  // constructeur
-  Navier_Stokes_std_Aposteriori() : Navier_Stokes_std()
-  {
-    champs_compris_.ajoute_nom_compris("estimateur_aposteriori");
-  }
+  if (i!=0)
+    {
+      Cerr << "Error in Pb_Hydraulique_Aposteriori::equation() : The problem has only one equation !" << finl;
+      Process::exit();
+    }
+  return eq_hydraulique_aps;
+}
 
-  const Champ_base& get_champ(const Motcle& nom) const override;
-  void creer_champ(const Motcle& motlu) override;
+Equation_base& Pb_Hydraulique_Aposteriori::equation(int i)
+{
+  if (i!=0)
+    {
+      Cerr << "Error in Pb_Hydraulique_Aposteriori::equation() : The problem has only one equation !" << finl;
+      Process::exit();
+    }
+  return eq_hydraulique_aps;
+}
 
-protected:
-  Champ_Fonc estimateur_aposteriori;
-};
-
-#endif /* Navier_Stokes_std_Aposteriori_included */
+void Pb_Hydraulique_Aposteriori::associer_milieu_base(const Milieu_base& mil)
+{
+  if (sub_type(Fluide_base,mil))
+    eq_hydraulique_aps.associer_milieu_base(mil);
+  else
+    {
+      Cerr << "Un milieu de type " << mil.que_suis_je() << " ne peut etre associe a " << finl;
+      Cerr << "un probleme de type Pb_Hydraulique_Aposteriori " << finl;
+      Process::exit();
+    }
+}

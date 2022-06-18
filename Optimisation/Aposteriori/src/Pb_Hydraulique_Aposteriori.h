@@ -13,41 +13,23 @@
 *
 *****************************************************************************/
 
-#include <Navier_Stokes_std_Aposteriori.h>
-#include <Schema_Temps_base.h>
-#include <Discret_Thyd.h>
+#ifndef Pb_Hydraulique_Aposteriori_included
+#define Pb_Hydraulique_Aposteriori_included
 
-Implemente_instanciable_sans_constructeur(Navier_Stokes_std_Aposteriori,"Navier_Stokes_std_Aposteriori",Navier_Stokes_std);
+#include <Navier_Stokes_Aposteriori.h>
+#include <Pb_Fluide_base.h>
 
-Sortie& Navier_Stokes_std_Aposteriori::printOn(Sortie& is) const { return Navier_Stokes_std::printOn(is); }
-Entree& Navier_Stokes_std_Aposteriori::readOn(Entree& is) { return Navier_Stokes_std::readOn(is); }
-
-void Navier_Stokes_std_Aposteriori::creer_champ(const Motcle& motlu)
+class Pb_Hydraulique_Aposteriori : public Pb_Fluide_base
 {
-  Navier_Stokes_std::creer_champ(motlu);
+  Declare_instanciable(Pb_Hydraulique_Aposteriori);
+public :
+  int nombre_d_equations() const override { return 1; }
+  const Equation_base& equation(int) const override;
+  Equation_base& equation(int) override;
+  void associer_milieu_base(const Milieu_base& ) override;
 
-  if (motlu == "estimateur_aposteriori")
-    {
-      if (!estimateur_aposteriori.non_nul())
-        {
-          const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
-          dis.estimateur_aposteriori(zone_dis(), zone_Cl_dis(), la_vitesse, la_pression, diffusivite_pour_transport(), estimateur_aposteriori);
-          champs_compris_.ajoute_champ(estimateur_aposteriori);
-        }
-    }
-}
+protected :
+  Navier_Stokes_Aposteriori eq_hydraulique_aps;
+};
 
-const Champ_base& Navier_Stokes_std_Aposteriori::get_champ(const Motcle& nom) const
-{
-  const double temps_init = schema_temps().temps_init();
-
-  if (nom == "estimateur_aposteriori")
-    {
-      Champ_Fonc_base& ch = ref_cast_non_const(Champ_Fonc_base, estimateur_aposteriori.valeur());
-      if (((ch.temps() != la_vitesse->temps()) || (ch.temps() == temps_init)) && (la_vitesse->mon_equation_non_nul()))
-        ch.mettre_a_jour(la_vitesse->temps());
-      return champs_compris_.get_champ(nom);
-    }
-  else
-    return Navier_Stokes_std::get_champ(nom);
-}
+#endif /* Pb_Hydraulique_Aposteriori_included */
