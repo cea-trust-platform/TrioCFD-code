@@ -1,7 +1,9 @@
+# PARALLEL NOT #
 Dimension 3
-Pb_hydraulique pb
+Pb_hydraulique_Aposteriori pb
 
 Domaine dom
+# BEGIN MESH #
 Mailler dom
 {
 	Pave Cavite
@@ -20,8 +22,22 @@ Mailler dom
 		}
 }
 Tetraedriser_homogene_fin dom
+# END MESH #
 
-VEF_Aposteriori_discretisation dis
+# BEGIN PARTITION
+Partition dom
+{
+  Partition_tool Tranche { tranches 2 1 1 }
+  Larg_joint 2
+  zones_name dom
+}
+End
+END PARTITION #
+# BEGIN SCATTER
+Scatter dom.Zones dom
+END SCATTER #
+
+VEFprep1b dis
 
 Schema_Euler_explicite sch
 Lire sch
@@ -29,6 +45,7 @@ Lire sch
 	tinit 0
 	dt_min 1e-6
 	dt_max 1e+6
+	nb_pas_dt_max 200
 	dt_impr 1e-6
 	facsec 0.5
 	precision_impr 8
@@ -50,7 +67,7 @@ Discretiser pb dis
 
 Lire pb
 {
-	Navier_Stokes_std_Aposteriori
+	Navier_Stokes_Aposteriori
 	{
 		Solveur_pression	PETSC Cholesky { impr }
 		Convection		{ EF_stab { alpha 0.5 } }
@@ -67,27 +84,16 @@ Lire pb
 					Derriere	frontiere_ouverte_vitesse_imposee champ_front_fonc_xyz 3 y-z z-x x-y
 					}
 	}
-	    Post_processings
-    {
-	lata {
-        format lata
-        fichier FVCA_05_0
-        fields  dt_post 0.2
-        {
-             estimateur_aposteriori elem 
-        }
- 	}
- 	lml {
-        format lml
-        fichier FVCA_05_0
-        fields  dt_post 0.2
-        {
-             estimateur_aposteriori elem 
-        }
-  	}
-    } 
+
+
 	Postraitement
 	{
+	
+	format lml
+	fields  dt_post 100
+        {
+             estimateur_aposteriori elem 
+        }
 		Definition_champs	{
 					# L2_norm_norme_uex = norme L2 de la norme de uex (valeur calculee sur le maillage) #				
 					# L2_norm_norme_uex	reduction_0D	{
@@ -320,7 +326,6 @@ Lire pb
 					errdivu				errdivu		periode 1e+6 numero_elem_sur_maitre 0
 					}
 	}
-	sauvegarde formatte Cas0.sauv
 }
 
 Resoudre pb

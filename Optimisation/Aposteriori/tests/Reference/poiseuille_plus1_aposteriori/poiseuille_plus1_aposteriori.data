@@ -1,11 +1,9 @@
-# Hydraulique 2D : Poiseuille 2D #
-# uc=DP/L/8.=0.125 m/s #
-# Or a cause de la premiere et derniere demi maille #
-# On trouve uc=0.125/0.95=0.131 #
+# PARALLEL NOT #
 dimension 2
 
-Pb_hydraulique pb
+Pb_hydraulique_Aposteriori pb
 Domaine dom
+# BEGIN MESH #
 Mailler dom
 {
         Pave Entree
@@ -22,7 +20,22 @@ Mailler dom
                 }
 }
 trianguler dom
-VEF_Aposteriori dis
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom
+{
+  Partition_tool Tranche { tranches 2 1 1 }
+  Larg_joint 2
+  zones_name dom
+}
+End
+END PARTITION #
+# BEGIN SCATTER
+Scatter dom.Zones dom
+END SCATTER #
+
+VEFprep1b dis
 
 Schema_Euler_explicite sch
 Read sch
@@ -34,6 +47,7 @@ Read sch
 	dt_impr 0.1
 	dt_sauv 100
 	seuil_statio 1.e-8
+	nb_pas_dt_max 50
 }
 
 Fluide_Incompressible fluide
@@ -51,7 +65,7 @@ Associate pb fluide
 Discretize pb dis
 Read pb
 {
-	Navier_Stokes_std_Aposteriori
+	Navier_Stokes_Aposteriori
 	{
 		solveur_pression GCP { 
 			precond ssor { omega 1.650000 } 
@@ -72,7 +86,6 @@ Read pb
 	}
 	Postraitement
 	{
-		format lata
 		Sondes
 		{
 		 seg_P pression periode 0.1 segment 10 0 0.25  1 0.25
@@ -80,34 +93,14 @@ Read pb
 		 sonde_pression pression periode 0.1 points 1 0.5 0.425
 		 sonde_vitesse  vitesse periode 0.1 points 1 0.5 0.425
 		}
+		format lml
 		Champs dt_post 1.0
 		{
 			pression elem
-			pression som
 			vitesse elem
-			vitesse som
+			 estimateur_aposteriori elem
 		}
 	}
-	    Post_processings
-    {
-	lata {
-        format lata
-        fichier cas_test_ghina_adapt_03
-        fields  dt_post 0.1
-        {
-             estimateur_aposteriori elem 
-        }
- 	}
- 	lml {
-        format lml
-        fichier cas_test_ghina_adapt_03
-        fields  dt_post 0.1
-        {
-             estimateur_aposteriori elem 
-        }
-  	}
-    } 
-
 }
 Solve pb
 Fin
