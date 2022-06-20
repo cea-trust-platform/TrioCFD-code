@@ -46,7 +46,7 @@
 #define old_forme
 
 Implemente_instanciable(Echelle_temporelle_turbulente,"Echelle_temporelle_turbulente",Convection_Diffusion_std);
-// XD Echelle_temporelle_turbulente eqn_base Echelle_temporelle_turbulente -1 Internal energy conservation equation for a multi-phase problem where the unknown is the temperature
+
 
 // Description:
 //    Simple appel a: Convection_Diffusion_std::printOn(Sortie&)

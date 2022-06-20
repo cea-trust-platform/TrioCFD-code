@@ -32,6 +32,13 @@
 #include <functional>
 
 Implemente_instanciable( Op_Diff_Tau_PolyMAC_P0_Elem, "Op_Diff_Tau_PolyMAC_P0_Elem", Op_Diff_Turbulent_PolyMAC_P0_Elem ) ;
+// XD diffusion_turb diffusion_deriv turbulente 0 not_set.
+// XD attr type_diffusion chaine(into=["k_omega","k_tau","SGDH"]) type_diffusion 1 not_set
+// XD attr bloc bloc_lecture bloc  1 not_set
+
+// XD diffusion_tau diffusion_deriv tau 0 not_set.
+// XD attr type_diffusion chaine(into=["k_omega","k_tau","SGDH"]) type_diffusion 1 not_set
+// XD attr bloc bloc_lecture bloc  1 not_set
 
 Sortie& Op_Diff_Tau_PolyMAC_P0_Elem::printOn( Sortie& os ) const
 {

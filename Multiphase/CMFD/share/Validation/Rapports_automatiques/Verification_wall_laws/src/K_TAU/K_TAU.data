@@ -75,8 +75,6 @@ phases pb
 }
 
 associate  pb dom
-
-Associate  pb dom
 Associate  pb sch
 Discretize pb dis
 

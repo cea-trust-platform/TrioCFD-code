@@ -41,6 +41,8 @@
 #include <math.h>
 
 Implemente_instanciable(Neumann_loi_paroi_faible_tau_omega,"Neumann_loi_paroi_faible_tau|Neumann_loi_paroi_faible_omega",Neumann_loi_paroi);
+// XD Neumann_loi_paroi_faible_omega condlim_base Neumann_loi_paroi_faible_omega 1 not_set
+// XD Neumann_loi_paroi_faible_tau condlim_base Neumann_loi_paroi_faible_tau 1 not_set
 
 Sortie& Neumann_loi_paroi_faible_tau_omega::printOn(Sortie& s ) const
 {
