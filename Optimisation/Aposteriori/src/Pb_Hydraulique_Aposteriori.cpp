@@ -17,6 +17,8 @@
 #include <Fluide_base.h>
 
 Implemente_instanciable(Pb_Hydraulique_Aposteriori,"Pb_Hydraulique_Aposteriori",Pb_Fluide_base);
+// XD pb_hydraulique_aposteriori Pb_base pb_hydraulique_aposteriori -1 not_set
+// XD attr Navier_Stokes_Aposteriori Navier_Stokes_Aposteriori Navier_Stokes_Aposteriori 0 Navier-Stokes equations.
 
 Sortie& Pb_Hydraulique_Aposteriori::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 

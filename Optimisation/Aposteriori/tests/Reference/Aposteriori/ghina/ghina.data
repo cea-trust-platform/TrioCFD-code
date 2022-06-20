@@ -9,7 +9,7 @@ VerifierCoin dom { }
 # BEGIN PARTITION
 Partition dom
 {
-  Partition_tool Tranche { tranches 2 1 1 }
+  Partition_tool Tranche { tranches 2 1 }
   Larg_joint 2
   zones_name dom
 }

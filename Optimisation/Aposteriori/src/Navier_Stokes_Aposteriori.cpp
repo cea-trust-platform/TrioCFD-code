@@ -21,6 +21,7 @@
 #include <Champ_P1NC.h>
 
 Implemente_instanciable_sans_constructeur(Navier_Stokes_Aposteriori,"Navier_Stokes_Aposteriori",Navier_Stokes_std);
+// XD Navier_Stokes_Aposteriori navier_stokes_standard Navier_Stokes_Aposteriori -1 Navier-Stokes equations.
 
 Sortie& Navier_Stokes_Aposteriori::printOn(Sortie& is) const { return Navier_Stokes_std::printOn(is); }
 Entree& Navier_Stokes_Aposteriori::readOn(Entree& is) { return Navier_Stokes_std::readOn(is); }
