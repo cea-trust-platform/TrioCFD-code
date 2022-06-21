@@ -17,6 +17,8 @@
 #include <Fluide_base.h>
 
 Implemente_instanciable(Pb_Hydraulique_Aposteriori,"Pb_Hydraulique_Aposteriori",Pb_Fluide_base);
+// XD pb_hydraulique_aposteriori Pb_base pb_hydraulique_aposteriori -1 Modification of the pb_hydraulique problem in order to accept the estimateur_aposteriori post-processing.
+// XD attr Navier_Stokes_Aposteriori Navier_Stokes_Aposteriori Navier_Stokes_Aposteriori 0 Modification of the Navier_Stokes_standard class in order to accept the estimateur_aposteriori post-processing. To post-process estimateur_aposteriori, add this keyword into the list of fields to be post-processed. This estimator whill generate a map of aposteriori error estimators; it is defined on each mesh cell and is a measure of the local discretisation error. This will serve for adaptive mesh refinement
 
 Sortie& Pb_Hydraulique_Aposteriori::printOn(Sortie& os) const { return Pb_Fluide_base::printOn(os); }
 

@@ -9,7 +9,7 @@ Mailler dom
         Pave Entree
                 {
                 Origine 0. 0.
-                Nombre_de_Noeuds 41 21
+                Nombre_de_Noeuds 21 11
                 Longueurs 1 0.5
                 }
                 {
@@ -25,7 +25,7 @@ trianguler dom
 # BEGIN PARTITION
 Partition dom
 {
-  Partition_tool Tranche { tranches 2 1 1 }
+  Partition_tool Tranche { tranches 2 1 }
   Larg_joint 2
   zones_name dom
 }
@@ -46,8 +46,8 @@ Read sch
 	dt_max 1.0
 	dt_impr 0.1
 	dt_sauv 100
+	nb_pas_dt_max 20
 	seuil_statio 1.e-8
-	nb_pas_dt_max 50
 }
 
 Fluide_Incompressible fluide
@@ -98,9 +98,10 @@ Read pb
 		{
 			pression elem
 			vitesse elem
-			 estimateur_aposteriori elem
+			estimateur_aposteriori elem 
 		}
 	}
+
 }
 Solve pb
 Fin

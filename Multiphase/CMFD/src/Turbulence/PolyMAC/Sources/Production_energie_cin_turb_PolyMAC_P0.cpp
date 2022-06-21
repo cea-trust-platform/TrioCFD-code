@@ -38,6 +38,8 @@
 
 
 Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_base);
+// XD Production_energie_cin_turb source_base Production_energie_cin_turb 0 Production source term for the TKE equation
+
 
 Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const
 {

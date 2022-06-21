@@ -21,6 +21,7 @@
 #include <Champ_P1NC.h>
 
 Implemente_instanciable_sans_constructeur(Navier_Stokes_Aposteriori,"Navier_Stokes_Aposteriori",Navier_Stokes_std);
+// XD Navier_Stokes_Aposteriori navier_stokes_standard Navier_Stokes_Aposteriori -1 Modification of the Navier_Stokes_standard class in order to accept the estimateur_aposteriori post-processing. To post-process estimateur_aposteriori, add this keyword into the list of fields to be post-processed. This estimator whill generate a map of aposteriori error estimators; it is defined on each mesh cell and is a measure of the local discretisation error. This will serve for adaptive mesh refinement
 
 Sortie& Navier_Stokes_Aposteriori::printOn(Sortie& is) const { return Navier_Stokes_std::printOn(is); }
 Entree& Navier_Stokes_Aposteriori::readOn(Entree& is) { return Navier_Stokes_std::readOn(is); }

@@ -37,6 +37,7 @@
 #include <math.h>
 
 Implemente_instanciable(Paroi_frottante_loi,"Paroi_frottante_loi", Frottement_global_impose);
+// XD Paroi_frottante_loi condlim_base Paroi_frottante_loi 1 Adaptive wall-law boundary condition for velocity
 
 Sortie& Paroi_frottante_loi::printOn(Sortie& s ) const
 {

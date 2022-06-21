@@ -53,12 +53,13 @@ Read sch
     }
 }
 
-typer_lire eau_liquide stiffenedGas { gamma 2.35 pinf 4.0e8 Cv 1077.7 q -775269.0 } 
-typer_lire eau_gaz stiffenedGas { gamma 1.025 pinf 0.0 Cv 1956.45 q -237547.0  }  
+stiffenedGas eau_liquide
+Read eau_liquide { gamma 2.35 pinf 4.0e8 Cv 1077.7 q -775269.0 }
+stiffenedGas eau_gaz
+Read eau_gaz { gamma 1.025 pinf 0.0 Cv 1956.45 q -237547.0  }
  
 Pb_HEM pb
 phases pb { liquide { eau } gaz { eau } }
-associate  pb dom
 
 Associate  pb dom
 Associate  pb sch
