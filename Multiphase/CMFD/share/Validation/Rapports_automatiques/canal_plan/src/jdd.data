@@ -58,7 +58,7 @@ Scatter DOM.Zones dom
 END SCATTER #
 
 PolyMAC_P0  dis
-option_covimac {  }
+option_PolyMAC_P0 {  }
 
 
 Schema_euler_implicite sch
