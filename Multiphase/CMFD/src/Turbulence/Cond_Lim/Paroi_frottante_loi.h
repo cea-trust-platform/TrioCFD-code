@@ -49,6 +49,8 @@ public :
   double calc_flux(double y, double u_tau, double visc);
   virtual double coefficient_frottement(int i) const override;
   virtual double coefficient_frottement(int i,int j) const override;
+  virtual double coefficient_frottement_grad(int i) const override;
+  virtual double coefficient_frottement_grad(int i,int j) const override;
   virtual void liste_faces_loi_paroi(IntTab&) override;
 
 protected :
@@ -56,8 +58,9 @@ protected :
   REF(Correlation) correlation_loi_paroi_;
   double deriv_u_plus_de_y_plus(double y_p);
 
-
   DoubleTab valeurs_coeff_;
+  DoubleTab valeurs_coeff_grad_;
+
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;

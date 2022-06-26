@@ -88,11 +88,26 @@ double Paroi_frottante_loi::coefficient_frottement(int i,int j) const
   return valeurs_coeff_(i,j);
 }
 
+double Paroi_frottante_loi::coefficient_frottement_grad(int i) const
+{
+  return valeurs_coeff_grad_(i,0);
+}
+
+double Paroi_frottante_loi::coefficient_frottement_grad(int i,int j) const
+{
+  return valeurs_coeff_grad_(i,j);
+}
+
 int Paroi_frottante_loi::initialiser(double temps)
 {
   valeurs_coeff_.resize(0, ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).nb_phases());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_coeff_);
   valeurs_coeff_ = 0 ;
+
+  valeurs_coeff_grad_.resize(0, ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).nb_phases());
+  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(valeurs_coeff_grad_);
+  valeurs_coeff_grad_ = 0 ;
+
   correlation_loi_paroi_ = ref_cast(Pb_Multiphase, zone_Cl_dis().equation().probleme()).get_correlation("Loi_paroi");
   return 1;
 }
@@ -141,13 +156,28 @@ void Paroi_frottante_loi::me_calculer()
 
       double y_loc = zone.dist_face_elem0(f_zone,  e);
       double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
-      if (y_plus_loc>1) valeurs_coeff_(f, n) = (is_calc_qdm ? 1 : 1/mu(e,n)) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-      else valeurs_coeff_(f, n) = (is_calc_qdm ? 1 : 1/mu(e,n)) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
+      if (y_plus_loc>1)
+        {
+          valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+          valeurs_coeff_grad_(f, n) = 1/mu(e,n) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+//          valeurs_coeff_grad_(f, n) = (alp ? (*alp)(e, n) : 1) * 1./y_loc * 1./norm_u_parallel; // dirichlet for calculation of gradient
+        }
+      else
+        {
+          valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
+          valeurs_coeff_grad_(f, n) = 1/mu(e,n) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
+//          valeurs_coeff_grad_(f, n) = (alp ? (*alp)(e, n) : 1) * 1./y_loc * 1./norm_u_parallel; // dirichlet for calculation of gradient
+        }
     }
 
-  for (n=1 ; n<N ; n++)
-    for (int f =0 ; f < nf ; f++)  valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont des symmetries
-
+  for (n=1 ; n<N ; n++) 
+    for (int f =0 ; f < nf ; f++)
+      {
+        valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
+        valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
+      }
+    
   valeurs_coeff_.echange_espace_virtuel();
+  valeurs_coeff_grad_.echange_espace_virtuel();
 }
 
