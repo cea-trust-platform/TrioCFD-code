@@ -1,5 +1,5 @@
-./Sensitivity_analysis/share/Validation/Rapports_automatiques/Sensitivity_analysis_for_Steady_Obstacle
-./Sensitivity_analysis/share/Validation/Rapports_automatiques/Sensitivity_analysis_for_Vahl_Davis
+./Sensitivity_analysis/share/Validation/Rapports_automatiques/Sensitivity_analysis_for_Steady_Obstacle STD
+./Sensitivity_analysis/share/Validation/Rapports_automatiques/Sensitivity_analysis_for_Vahl_Davis STD
 ./Critere_Entrainement_Gaz/share/Validation/Rapports_automatiques/Verification_CEG NNR
 ./P1NCP0RT/share/Validation/Rapports_automatiques/NoFlow STD
 ./P1NCP0RT/share/Validation/Rapports_automatiques/StatVortex2D NNR
@@ -62,6 +62,9 @@
 ./ALE/share/Validation/Rapports_automatiques/3dOscillatingBeam NNR
 ./ALE/share/Validation/Rapports_automatiques/SquareObstacleALE NNR
 ./ALE/share/Validation/Rapports_automatiques/DivaALE NNR
+./Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_NO_MASS STD
+./Multiphase/CMFD/share/Validation/Rapports_automatiques/expansion_WITH_MASS NNR
+./Multiphase/CMFD/share/Validation/Rapports_automatiques/shock_dodecane STD
 ./Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/Bullage_Huile_Creuset_Froid NNR
 ./Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/iodure-iodate STD
 ./Multiphase/Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_particles_coupling NNR
