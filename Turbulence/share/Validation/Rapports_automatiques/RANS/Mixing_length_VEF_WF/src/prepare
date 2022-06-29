@@ -1,7 +1,8 @@
 #!/bin/bash
-mkdir 2D_100000_11 2D_100000_21 2D_100000_41 2D_100000_6 2D_10000_11 2D_10000_21 2D_10000_41 2D_10000_6 3D_11 3D_21 3D_21_keps 3D_41 3D_6 3D_6_keps
+mkdir -p 2D_100000_11 2D_100000_21 2D_100000_41 2D_100000_6 2D_10000_11 2D_10000_21 2D_10000_41 2D_10000_6 3D_11 3D_21 3D_21_keps 3D_41 3D_6 3D_6_keps
 
 cd 2D_100000_11
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 11/" 2D.data > modifie.data
@@ -11,6 +12,7 @@ sed "s/10000/100000/" modifie > post_run
 rm modifie.data
 
 cd ../2D_100000_21
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 21/" 2D.data > modifie.data
@@ -20,6 +22,7 @@ sed "s/10000/100000/" modifie > post_run
 rm modifie.data
 
 cd ../2D_100000_41
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 41/" 2D.data > modifie.data
@@ -29,6 +32,7 @@ sed "s/10000/100000/" modifie > post_run
 rm modifie.data
 
 cd ../2D_100000_6
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/dt_impr_moy_spat 1./dt_impr_moy_spat 10./" 2D.data > modifie.data
@@ -38,6 +42,7 @@ mv modifie post_run
 rm modifie.data
 
 cd ../2D_10000_11
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 11/" 2D.data > modifie.data
@@ -46,6 +51,7 @@ sed "s/6/11/" post_run > modifie
 mv modifie post_run
 
 cd ../2D_10000_21
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 21/" 2D.data > modifie.data
@@ -54,6 +60,7 @@ sed "s/6/21/" post_run > modifie
 mv modifie post_run
 
 cd ../2D_10000_41
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6/Nombre_de_Noeuds 3 41/" 2D.data > modifie.data
@@ -62,6 +69,7 @@ sed "s/6/41/" post_run > modifie
 mv modifie post_run
 
 cd ../3D_11
+rm -f *_Wall_length.xyz
 cp ../3D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6 3/Nombre_de_Noeuds 3 11  3/" 3D.data > modifie.data
@@ -72,6 +80,7 @@ sed "s/10000/rien/" post_run > modifie
 mv modifie post_run
 
 cd ../3D_21
+rm -f *_Wall_length.xyz
 cp ../3D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6 3/Nombre_de_Noeuds 3 21  3/" 3D.data > modifie.data
@@ -82,6 +91,7 @@ sed "s/10000/rien/" post_run > modifie
 mv modifie post_run
 
 cd ../3D_41
+rm -f *_Wall_length.xyz
 cp ../3D.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6 3/Nombre_de_Noeuds 3 41  3/" 3D.data > modifie.data
@@ -92,6 +102,7 @@ sed "s/10000/rien/" post_run > modifie
 mv modifie post_run
 
 cd ../3D_21_keps
+rm -f *_Wall_length.xyz
 cp ../3D_keps.data .
 cp ../post_run .
 sed "s/Nombre_de_Noeuds 3 6 3/Nombre_de_Noeuds 3 21  3/" 3D_keps.data > modifie.data
@@ -102,18 +113,21 @@ sed "s/10000/keps/" post_run > modifie
 mv modifie post_run
 
 cd ../3D_6_keps
+rm -f *_Wall_length.xyz
 cp ../3D_keps.data .
 cp ../post_run .
 sed "s/2D/3D/" post_run > modifie
 sed "s/10000/keps/" modifie > post_run
 
 cd ../3D_6
+rm -f *_Wall_length.xyz
 cp ../3D.data .
 cp ../post_run .
 sed "s/2D/3D/" post_run > modifie
 sed "s/10000/rien/" modifie > post_run
 
 cd ../2D_10000_6
+rm -f *_Wall_length.xyz
 cp ../2D.data .
 cp ../post_run .
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 [ ! -f Couche_Limite_Atmospherique_2couches.msh ] && gunzip Couche_Limite_Atmospherique_2couches.msh.gz
-mkdir Sol_lisse Sol_rugueux_Erugu Sol_rugueux_Erugu+sigma
+mkdir -p Sol_lisse Sol_rugueux_Erugu Sol_rugueux_Erugu+sigma
 
 cd Sol_lisse
 cp ../Couche_Limite_Atmospherique.data Sol_lisse.data
