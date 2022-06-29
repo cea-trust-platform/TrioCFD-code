@@ -1,6 +1,7 @@
 --------------------------------------------------------------------------------------------------
 Release notes version 1.8.5_beta : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
+29/06/22 (TrioCFD) Enhancement : Improvement of Front-Tracking remesh
 19/06/22 (TrioCFD) New feature : New Baltik Optimisation/Aposteriori - First version for stationnary cases
 16/06/22 (TrioCFD) New feature : Add validation sheet to validate the new Pb_HEM
 03/06/22 (TrioCFD) New feature : Multiphase CFD (CMFD baltik) ; still a work in progress
