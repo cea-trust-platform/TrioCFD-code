@@ -1,0 +1,102 @@
+# Sommet reel passant seul sur un proc (sans facette)  #
+# PARALLEL ONLY 8 #
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 64
+  nbelem_j 64
+  nbelem_k 64
+  uniform_domain_size_i 0.0026179938779914945
+  uniform_domain_size_j 0.0026179938779914945
+  uniform_domain_size_k 0.0026179938779914945
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 2
+  nproc_j 2
+  nproc_k 2
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 30
+  timestep 5.4e-5
+  timestep_facsec 0.4
+  dt_post 1 # 100 #
+  champs_a_postraiter 1 tous
+  check_stop_file stop.txt
+  dt_sauvegarde 30 # Pour avoir le dt juste avant le bug #
+  nb_pas_dt_max 2 #  12000 #
+Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 3
+      Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }
+      Coarsen_Operator_Uniform {  } 	
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 20 1
+
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces
+  {
+    compute_distance_autres_interfaces 
+    # Soit un fichier genere externe #
+    # Choix1
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+     FinChoix1 #
+    # Soit un fichier de sauvegarde d'un precedent calcul #
+    # Choix2 #
+    fichier_reprise_interface test.repr.lata
+    timestep_reprise_interface       1
+    lata_meshname   INTERFACES
+    # FinChoix2 #
+    remaillage_ft_ijk {
+        nb_iter_barycentrage 1
+        relax_barycentrage 1
+        nb_iter_correction_volume 6
+        lissage_courbure_iterations_systematique 0
+    }
+
+  }
+  # FIN AJOUT #
+  check_divergence
+  gravite 3 -9.81 0. 0.
+  # vitesse_entree 0.01 #
+  # terme_force_init   A*(0.06-v_moy)-B*force  #
+  # terme_force_init   0.48*(0.063585-v_moy)-0.06*force #
+  expression_derivee_force 0.48*(0.063585-v_moyen)-0.06*force
+  rho_liquide 594.38
+  rho_vapeur 101.93
+  mu_liquide 6.8327e-5
+  mu_vapeur 2.3108e-5
+  sigma 0.0046695
+  # Pour Creer le fichier de Reprise #
+  nom_sauvegarde bidon.repr
+  # REPRISE du champ de vitesse :
+ expression_vx_init 0.005
+ expression_vy_init 0.06
+ expression_vz_init 0.
+ #
+ nom_reprise test.repr
+}
+Fin

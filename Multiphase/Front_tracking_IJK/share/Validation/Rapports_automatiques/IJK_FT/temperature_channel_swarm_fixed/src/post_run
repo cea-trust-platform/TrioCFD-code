@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ $1 == "DNS_fixe" ] ; then 
+   echo "At the end of fixe calculation, we prepare the restart for a reset"
+   sed -e "s/fichier_reprise_integrated_velocity.*/fichier_reprise_integrated_velocity RESET/" \
+       -e "s/fichier_reprise_integrated_pressure.*/fichier_reprise_integrated_pressure RESET/" \
+       -e "s/fichier_reprise_integrated_timescale.*/fichier_reprise_integrated_timescale RESET/" \
+       -e "s/fichier_reprise_indicatrice_non_perturbe.*/fichier_reprise_indicatrice_non_perturbe RESET/" \
+       diph_fixe.sauv > diph_fixe_reset.sauv
+fi

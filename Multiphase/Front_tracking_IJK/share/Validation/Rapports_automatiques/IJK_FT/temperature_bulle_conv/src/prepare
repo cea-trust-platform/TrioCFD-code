@@ -1,0 +1,122 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+
+#########################################
+# Converting the bubble mesh into a .lata 
+#########################################
+cat >deplacements.txt <<EOF
+0.0 0.0 0.0 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+#############################
+# Fluid and domain properties
+#############################
+
+# For channel_length calculation from Hadamard solution
+D=1e-3
+Eo=0.01
+#####################
+# Changing properties
+#####################
+
+declare -a tableau_Reynolds=(1 10 20 50 100 200 500 1000)
+#declare -a tableau_Reynolds=(1)
+
+for Re in ${tableau_Reynolds[@]} 
+do
+	dir="Re_${Re}"
+	echo "-> Creating " $dir "directory"
+	mkdir -p $dir
+	
+	echo "-> Copy init files to " $dir "directory"
+	cp init* $dir 
+
+	declare -a domain_parameters=$(python parameters_from_Re_Pr.py $D $Re $Eo 2>&1 > /dev/null)
+	#Fluids properties
+	g=${domain_parameters[0]}	
+	v_inf=${domain_parameters[1]}	
+	Pr_liq=${domain_parameters[2]}
+
+	mu_liquide=${domain_parameters[3]}
+	rho_liquide=${domain_parameters[4]}
+	cp_liquide=${domain_parameters[5]}
+	lambda_liquide=${domain_parameters[6]}
+
+	mu_vapeur=${domain_parameters[7]}
+	rho_vapeur=${domain_parameters[8]}
+	cp_vapeur=${domain_parameters[9]}
+	lambda_vapeur=${domain_parameters[10]}
+
+	force_init=${domain_parameters[11]}
+	sigma=${domain_parameters[12]}
+
+	# Domain
+	vel_percent=95
+ 	nb_elem_per_radius=25	
+	declare -a channel=$(python domain_procs.py $D $mu_liquide $mu_vapeur $vel_percent $nb_elem_per_radius 2>&1 > /dev/null)
+	channel_height=${channel[0]}
+	channel_origin=${channel[1]}
+	channel_elements=${channel[2]}
+	yz_width=${channel[3]}
+	yz_origin=${channel[4]}
+	yz_elements=${channel[5]}
+
+	channel_procs=${channel[6]}
+	yz_procs=${channel[7]}
+	n_elem_over_n_procs=${channel[8]}
+
+		
+	echo "    -> Bubble diameter: " $D " m"
+	echo "    -> Channel length to get " $vel_percent " % of terminal velocity: " $channel_height
+	echo "    -> Theoretical terminal velocity: " $v_inf
+        echo "    -> Acceleration g: " $g	
+	echo "    -> Fluid properties: mu_liquide: " $mu_liquide ", rho_liquide:  " $rho_liquide ", cp_liquide:" $cp_liquide ", lambda_liquide" $lambda_liquide 
+	echo "    -> Vapour properties: mu_vapeur: " $mu_vapeur ", rho_vapeur:  " $rho_vapeur ", cp_vapeur:" $cp_vapeur ", lambda_vapeur" $lambda_vapeur 
+ 	echo "    -> Transverse width: " $yz_width
+	echo "    -> Number of elements per radius " $nb_elem_per_radius
+	echo "    -> Number of elements: width = " $yz_elements ", height = " $channel_elements	
+	echo "    -> Number of processors: width = " $yz_procs ", height = " $channel_procs
+	echo "    -> Check the number of processor elements/procs: " $n_elem_over_n_procs
+
+	echo "-> Modifying the .data files for each Re and Pr cases"
+        sed -e "s/nbelem_i .*/nbelem_i $channel_elements/g"\
+        -e "s/nbelem_j .*/nbelem_j $yz_elements/g"\
+        -e "s/nbelem_k .*/nbelem_k $yz_elements/g"\
+        -e "s/uniform_domain_size_i .*/uniform_domain_size_i $channel_height/g"\
+        -e "s/uniform_domain_size_j .*/uniform_domain_size_j $yz_width/g"\
+        -e "s/uniform_domain_size_k .*/uniform_domain_size_k $yz_width/g"\
+        -e "s/origin_i .*/origin_i -$channel_origin/g"\
+        -e "s/origin_j .*/origin_j -$yz_origin/g"\
+        -e "s/origin_k .*/origin_k -$yz_origin/g"\
+	-e "s/nproc_i .*/nproc_i $channel_procs/g"    \
+	-e "s/nproc_j .*/nproc_j $yz_procs/g"    \
+	-e "s/nproc_k .*/nproc_k $yz_procs/g"    \
+	-e "s/rho_liquide .*/rho_liquide $rho_liquide/g"    \
+	-e "s/rho_vapeur .*/rho_vapeur $rho_vapeur/g"   \
+	-e "s/cp_liquid .*/cp_liquid $cp_liquide/g" \
+	-e "s/cp_vapor .*/cp_vapor $cp_vapeur/g"    \
+	-e "s/lambda_liquid .*/lambda_liquid $lambda_liquide/g" \
+	-e "s/lambda_vapor .*/lambda_vapor $lambda_vapeur/g" \
+	-e "s/mu_liquide .*/mu_liquide $mu_liquide/g"   \
+	-e "s/mu_vapeur .*/mu_vapeur $mu_vapeur/g" \
+	-e "s/terme_force_init .*/terme_force_init $force_inf/g" \
+	-e "s/expression_vx_init .*/expression_vx_init -$v_hadamard/g"\
+        -e "s/gravite 3 .*/gravite 3 -$g 0.0 0.0/g"\
+        -e "s/sigma .*/sigma $sigma/g"	basic_temperature_conv.data > $dir/$dir.data
+	
+	echo "-> Create a pre_run file for " $dir "case"
+	sed -e "s/timestep .*/  timestep 1e-7/g"      \
+	-e "s/dt_post .*/   dt_post 1/g"             \
+	-e "s/dt_sauvegarde .*/   dt_sauvegarde 1/g" \
+	-e "s/nb_pas_dt_max .*/   nb_pas_dt_max 1/g" \
+	-e "s/fichier_reprise_interface.*/fichier_reprise_interface init\.lata/g"                    \
+	-e "/timestep_reprise_vitesse/d"               \
+	-e "/fichier_reprise_vitesse/d" $dir/$dir.data > $dir/pre_run.data
+	
+	echo "-> Copy post_run in " $dir "directory"
+	cp post_run $dir	
+done
+

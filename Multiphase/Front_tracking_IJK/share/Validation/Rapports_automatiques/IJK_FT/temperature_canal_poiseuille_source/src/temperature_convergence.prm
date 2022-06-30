@@ -1,0 +1,227 @@
+Parametres {
+	Titre "Fiche de validation de la convergence des schemas en temperature
+
+	Description <<EOF
+		In order to validate the algorithm implemented for the resolution of the energy equation, we performed some particular test cases in which numerical solutions are compared to the corresponding analytical ones.
+	\latex_($$\rho c_p \left( \partial_t T + \mathbf{u}.\nabla T \right) = \nabla (\lambda \nabla T)$$\latex_)
+	To this equation, we add spatial boundary conditions (BC) and an initial condition.
+	\latex_( \begin{center} \begin{tabular}{|c|c|c|c|c|c|c|} \hline $L_x$ & $L_y$ & $L_z$ & $N_x$ & $N_y$ & $N_z$ & $\Delta t$ \\ \hline 0.006 &0.006 & 0.003 & 64 & 64 & 32 & 2.4e-4 \\  \hline \end{tabular} \end{center} \latex_)
+	Where L, N and $\Delta t$ stand respectively for the length, number of nodes and time step. The subscripts $x$, $y$ and $z$ indicate the different directions.
+	The velocity profile is prescribed (and independant of time) as:
+	\latex_(
+$$u_x = U\frac{z}{L_z} \left(1-\frac{z}{L_z}\right)$$
+with $U=0.004m/s$. It corresponds to $u_\tau=\sqrt{\nu U/L_z}$ 
+and $Re_\tau=\frac{\rho u_\tau L_z}{2\mu} = \sqrt{\frac{U L_z}{4\nu}}=\sqrt{3}$
+\latex_)
+		EOF
+
+        Description "The wall-normal temperature profile should be of the form of a Poiseuille profile" <<EOF
+\latex_(
+\begin{equation}
+T=T_w-\frac{q_w}{\lambda} z\left(1-\frac{z}{L_z}\right)
+\end{equation}
+where the wall temperature $T_w$ can be determined from the knowledge of the initial temperature ${T_0(x,y,z)=0}$. 
+Indeed, using the effect of the incoming wall flux injected between time $t=0$ and $t$, $2 tq_w/L_z$, we have
+\begin{equation}
+\left<T(t)\right>=T_0 +2 tq_w/L_z= \frac{1}{V}\iiint_V T(t)dv=T_w(t)-\frac{q_w}{\lambda} \frac{1}{L_z}\int_0^{L_z} z\left(1-\frac{z}{L_z}\right) dz
+\end{equation}
+which leads to the determination of the wall temperature $T_w$ as 
+\begin{equation}
+T_w=2 t q_w/L_z + \frac{q_w L_z}{6\lambda} 
+\end{equation}
+In conclusion, for an infinite channel, the analytical solution should be: 
+\begin{equation}
+T_{ana} = T-2 t q_w/L_z =\frac{q_w}{\lambda} \left(\frac{z^2}{L_z}-z+\frac{L_z}{6}\right)
+\end{equation}
+with $q_w/\lambda=10K$.
+
+Now we search for the solution $\theta$ to the problem with a source $S$:
+\begin{equation}
+\nabla (\lambda \nabla \theta)+S = 0 \quad\mbox{with}\quad S=\rho c_p u_x(z) \frac{dT_m}{dx}; \quad
+\frac{dT_m}{dx} = \frac{12 q_w}{\rho c_p U L_z}
+\end{equation}
+
+Defining the local wall-normal flux $q(z)=-\lambda \frac{\partial \theta}{\partial z}$
+(by choice, we have $\int_0^{L_z} S(z)dz = 2q_w$ and $q(0)=-q_w$ and $q(L_z)=q_w$), 
+the integration of the previous equation gives:
+\begin{equation}
+q(z)= q_w\left(\frac{z^2}{L_z^2}\left(6-4\frac{z}{L_z}\right)-1\right)
+\frac{dT_m}{dx} = \frac{z^2}{L_z^2}
+\end{equation}
+
+A second integration lead to the temperature $\theta$:
+\begin{equation}
+\theta(z) = \theta_w+ \frac{1}{\lambda}\int_0^z q(z) = \theta_w+ \frac{q_w\,z}{\lambda}\left(2\frac{z^2}{L_z^2}-\frac{z^3}{L_z^3}-1\right)
+\end{equation}
+
+The wall temperature is determined from the knowledge of the initial condition ${\theta_0(x,y,z)=0}$ and the
+the energy conservation and the equilibrium between the source and the incoming wall flux recalling that $\int_0^{L_z} S(z)dz = 2q_w$), we obtain:
+\begin{equation}
+L_z \left<\theta(t)\right> = 
+L_z \left<\theta(0)\right> = 0
+\end{equation}
+which can be combined to the direct evaluation of the integral to obtain:
+\begin{equation}
+\theta_w(t\to\infty) = \frac{q_w L_z}{5 \lambda}
+\end{equation}
+Then, the analytical solution to the problem with the source is: 
+\begin{equation}
+\theta(z) = \frac{q_w L_z}{\lambda} \left(-z^{\star \,4}+2z^{\star \,3}-z^{\star}+\frac{1}{5}\right)
+\end{equation}
+with $z^\star = z/L_z$.
+
+
+\latex_)	
+
+
+EOF
+
+        Description "Constant thermal source :" <<EOF
+
+\latex_(
+
+If one consider a channel flow with periodicity along the x axis (streamwise), the temperature derivative is nul along this axis. Then $\frac{d\langle T \rangle}{dx} = 0$.
+Then when integrating the equation over the whole domain it gives :
+\begin{equation}
+\frac{d}{dt}\left(\int_V{\rho c_p T}dV\right) = 2Sq_w
+\end{equation}
+\begin{equation}
+\int_V{\rho c_p T}dV =  2Sq_wt + \textrm{cte}
+\end{equation}
+Then :
+\begin{equation}
+\int_V{\rho c_p \left(T - \frac{2Sq_wt}{\rho c_pV}\right)}dV = \textrm{cte}
+\end{equation}
+Hence the variable change $\theta = T - \frac{2Sq_wt}{\rho c_pV}$ being.
+It gives :
+\begin{equation}
+\rho c_p \left(\frac{\partial \theta}{\partial t} + \frac{2Sq_w}{\rho c_p} + \underline{u}\cdot \nabla \theta \right) = \nabla (\lambda\nabla\theta)
+\end{equation}
+
+\latex_)
+
+
+EOF
+
+	Auteur "A.S. and G.B."
+	CasTest . canal_poiseuille.data 1
+	CasTest FINE canal_poiseuille.data 3
+}
+
+Chapitre {
+        Figure {
+                Titre "Comparison of probes of Temperature with the source Dabiri."
+                Description "Wall temperature is stable with the new source patch_dabiri."
+                incluredesccourbes 0
+                labelY  "T [K]"
+                labelX  "time [s]"
+                courbe {
+                        fichier canal_poiseuille_SONDE_T0.son
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "T0 : Old source"
+                }
+                Curve {
+                        fichier canal_poiseuille_SONDE_T1.son
+                        colonnes ($1) ($2)
+                        Legende "T1 : patch"
+                        Style lines
+                }
+                Curve {
+                        fichier FINE/canal_poiseuille_SONDE_T1.son
+                        colonnes ($1) ($2)
+                        Legende "T1(fine) : patch"
+                        Style lines
+                }
+                Curve {
+                        fichier canal_poiseuille_SONDE_T2.son
+                        colonnes ($1) ($2)
+                        Legende "T2 : unweighted source (uniform)"
+                        Style lines
+                }
+                Curve {
+                        fichier FINE/canal_poiseuille_SONDE_T2.son
+                        colonnes ($1) ($2)
+                        Legende "T2(fine) : unweighted source (uniform)"
+                        Style lines
+                }
+        }
+        Figure {
+                Titre "Poiseuille profile."
+                incluredesccourbes 0
+                labelX  "z [m]"
+                labelY  "T [K]"
+                courbe {
+                        fichier final_T1.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "T1 : final profile"
+                }
+                courbe {
+                        fichier FINE/final_T1.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "T1(fine) : final profile"
+                }
+                courbe {
+                        fichier final_T2.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "T2 : final profile (unweighted source)"
+                }
+                courbe {
+                        fichier FINE/final_T2.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "T2(fine) : final profile (unweighted source)"
+                }
+                Curve {
+                        fichier final_T1.txt
+                        colonnes ($1) (10.*(($1)*($1)/0.003-($1)+(0.003/6)))
+                        Legende "Analytical solution for theoretical poiseuille"
+                        Style lines
+                }
+                Curve {
+                        fichier final_T1.txt
+                        colonnes ($1) (10.*0.003*(-($1/0.003)**4+2*($1/0.003)**3-($1/0.003)+1./5.))
+                        Legende "Analytical solution with source"
+                        Style lines
+                }
+        }
+        Figure {
+                Titre "The streamwise temperature profile is flat thanks to the source Dabiri."
+                Description "temperature do not evolve in the streamwise direction with the source patch_dabiri."
+                incluredesccourbes 0
+                labelY  "T [K]"
+                labelX  "x [m]"
+                courbe {
+                        fichier final_T1_stream.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "T1 : patch source"
+                        Style linespoints
+                }
+                courbe {
+                        fichier FINE/final_T1_stream.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "T1(fine) : patch source"
+                        Style linespoints
+                }
+                courbe {
+                        fichier final_T2_stream.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "T2 : unweighted source"
+                        Style linespoints
+                }
+                courbe {
+                        fichier FINE/final_T2_stream.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "T2(fine) : unweighted source"
+                        Style linespoints
+                }
+        }
+
+}

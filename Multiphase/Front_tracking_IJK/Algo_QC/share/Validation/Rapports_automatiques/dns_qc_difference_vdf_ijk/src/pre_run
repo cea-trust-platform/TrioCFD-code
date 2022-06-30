@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# convertir le fichier lata en ijk pour relecture par la maquette:
+if test -f reprise_ijk.lata
+then
+  echo pre_run already done
+
+else
+echo doing prerun
+
+echo Creation d une condition initiale
+triou cond_initial.data 1>cond_initial.out 2>cond_initial.err
+
+lata2dx cond_initial.lata regularize=1e-6 timestep=1 export_fields_at_faces writelata=reprise_ijk.lata
+
+# La maquette ijk nomme les champs velocity et rho, et le domaine dom, renommer dans le fichier lata:
+
+cp reprise_ijk.lata reprise_ijk.lata.orig
+
+sed 's/CHAMP VITESSE/CHAMP VELOCITY/g;
+s/CHAMP MASSE_VOLUMIQUE/CHAMP RHO/g;
+s/geometrie=dom_IJK/geometrie=grid_geom/g;
+s/GEOM.*dom_IJK/GEOM grid_geom/g' reprise_ijk.lata.orig >reprise_ijk.lata
+
+# creation du jdd vdf pour la suite du calcul:
+
+starttime=`awk '$0~"Backup of the field vitesse performed on time"{t=$10}END{print t}' cond_initial.err`
+pthermoinit=`tail -n 1 evol_glob | awk '{print $4}'`
+
+sed "s/tinit .*/tinit $starttime/;
+s/sauvegarde/reprise binaire/;
+s/dt_post .*/dt_post 0.00001/;
+s/nb_pas_dt_max .*/nb_pas_dt_max 50/
+" cond_initial.data >jdd_vdf.data
+# poour NR
+cp jdd_vdf.data dns_qc_difference_vdf_ijk_jdd1.data
+
+# creation des donnees de reprise pour le calcul ijk
+
+cat >reprise_ijk.data <<EOF
+{
+  tinit $starttime
+  fichier_reprise_vitesse reprise_ijk.lata
+  timestep_reprise_vitesse 1
+  fichier_reprise_rho reprise_ijk.lata
+  timestep_reprise_rho 1
+  p_thermo_init $pthermoinit
+  terme_acceleration_init 0.
+}
+EOF
+
+cp reprise_ijk.data dns_qc_difference_vdf_ijk_jdd2.data
+fi

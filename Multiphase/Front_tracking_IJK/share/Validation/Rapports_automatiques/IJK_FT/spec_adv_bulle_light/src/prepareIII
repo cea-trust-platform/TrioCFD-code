@@ -1,0 +1,81 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+gmsh bulle_nulle.geo -2 -format msh2
+
+# Generation de 3 bulles  :
+# 0.01 0.0025 0.0025 bulle_nulle.msh
+cat >deplacements.txt <<EOF
+0.0 0.0 0.0 bulle_nulle.msh
+EOF
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Placement des sondes
+~/mybin/place_sondes.sh spec_bulles spec_bulles_point2 cree [2,2,2,.] [force_ph,velocity]
+
+# Deplacement de ce qui est utile au calcul dans le dossier RUN00
+
+# Nombre de pas de temps pour une petite simulation (dossier AVEC_REPRISE)
+nt=8;
+# Nombre de reprises (dans like_sub_file)
+nr=0;
+
+# On cree AVEC_REPRISE et SANS_REPRISE pour comparer les deux ensembles de resultats
+currentRepo=$PWD
+echo "$currentRepo"
+re='^[0-9]+$'>--
+if ! [[ $jobid =~ $re ]] ; then
+    jobidnext=00
+
+    ADV1_Repo=ADV1/RUN00
+    NO_ADV_Repo=NO_ADV_/RUN00
+    echo "mkdir -p $ADV1_Repo/NEXT"
+    echo "mkdir -p $NO_ADV_Repo/NEXT"
+    mkdir -p $ADV1_Repo/NEXT
+    mkdir -p $NO_ADV_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV1_Repo
+    cp spec_bulles_point2.data $NO_ADV_Repo
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV1_Repo/spec_bulles_point2.data; 
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_Repo/spec_bulles_point2.data; 
+    grep "nb_pas_dt_max" $ADV1_Repo/spec_bulles_point2.data
+    grep "nb_pas_dt_max" $NO_ADV_Repo/spec_bulles_point2.data
+    # sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV1_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/ dt_sauvegarde (($nt/2))/" $ADV1_Repo/spec_bulles_    point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV1_Repo/spec_bulles_point2.data 
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV1_Repo
+    cp like_sub_file $ADV1_Repo
+    cp like_sub_file $NO_ADV_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV1_Repo/like_sub_file
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_Repo/like_sub_file
+
+
+    # sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $(($nt/2))/" $NO_ADV_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_Repo
+    cp post_run $ADV1_Repo
+    cp post_run $NO_ADV_Repo
+    cp prepare $ADV1_Repo
+    cp prepare $NO_ADV_Repo
+
+else
+    # = Dans les faits, prepare n'est appele qu'une fois en debut de lancement de fiche, depuis le dossier build. Donc on ne rentre jamais dans le build. Si je veux executer les instructions suivantes elles doivent se trouver dans le post-run.
+    echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    echo "c'est bizar, je pensais que le prepare n'etait appele q'une fois, avant d'executer le prm..."
+    jobidnext=$((jobid+1))
+    newRepo="../RUN$(printf "%02d" $jobidnext)"
+    
+    echo "mkdir -p $newRepo/NEXT"
+    mkdir -p $newRepo/NEXT
+    cp spec_bulles_point2.data $newRepo
+    # mv init.lata* $newRepo
+    cp post_run $newRepo
+    cp like_sub_file $newRepo
+    cp prepare $newRepo
+fi
+
+

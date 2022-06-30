@@ -1,0 +1,123 @@
+Les solutions analytiques sont obtenues par integration dans un repere spherique, sur une tranche d'epaisseur dz centree sur z, ou z est variable. 
+
+$\phi \in [0,\pi]$ est l'angle signe entre l'axe (Oz) et le vecteur OP.
+
+$\theta \in [0,2\pi]$ est l'angle signe entre l'axe (Ox) et le vecteur OP' ou P' est la projection de P sur le plan (Oxy).
+
+Le changement de coordonnees s'ecrit:
+\begin{subequations}
+\begin{align}
+x&=\rho \sin \phi \cos \theta \\
+y&=\rho \sin \phi \sin \theta \\
+z&=\rho \cos \phi
+\end{align}
+\end{subequations}
+
+Le vecteur normale a l'interface s'ecrit:
+\begin{subequations}
+\begin{align}
+nx&=\sin \phi \cos \theta\\
+ny&=\sin \phi \sin \theta\\
+nz&=\cos \phi 
+\end{align}
+\end{subequations}
+
+L'element de surface infinitesimal pour $\rho$ constant est:
+$d^2s = \rho^2 sin \phi d\phi d\theta$.
+
+Sur la sphere, $\rho = R=0.004$. La courbure est definie par $\kappa = -2/R$.
+
+On definit les grandeurs moyennes:
+$$\overline{\phi} = \int_v \phi \delta^i dv $$
+ou $v=L_x L_y \Delta z$ est le volume d'une tranche d'epaisseur $\Delta z$
+
+\subsection{CAS 1 : SPHERE }
+
+Dans le cas de la sphere, on obtient:
+\begin{subequations}
+\begin{align}
+  a_i    &= \int_v \delta^i dv = \frac{2\pi R}{L_xL_y} \\
+  a_iN_x &= \int_v N_x \delta^i dv = 0 \\
+  a_iN_y &= 0 \\
+  a_iN_z &= \frac{2\pi}{L_xL_y} z 
+\end{align}
+\end{subequations}
+
+Comme $\kappa = -2/R$ est constante pour le sphere, les intégrales suivante se déduisent rapidement:
+\begin{subequations}
+\begin{align}
+  \kappa a_iN_x &= \int_v N_x \delta^i dv = 0  \\
+  \kappa a_iN_y &= 0  \\
+  \kappa a_iN_z &= -\frac{2}{R} \frac{2\pi}{L_xL_y} z
+\end{align}
+\end{subequations}
+
+\subsection{CAS 2 : HEMISPHERE }
+
+L'hemisphere est composee de la moitie superieure de la sphere et d'un disque horizontal de rayon $R$. 
+A la jonction entre ces 2 elements, grace au lissage, on cree une petite zone de transition dont l'aire est
+faible, mais dont la courbure est grande. Pour evaluer analytiquement les grandeurs, on suppose cette zone de
+transition negligeable. Cette hypothese est acceptable, sauf dans le cas des termes proportionnels a la 
+courbure. Pour l'integration d'une tranche de plan, les formules de la page "segment circulaire" de wiki 
+permette de determiner l'aire de l'intersection de la partie plane par la tranche de prise de moyenne ($ai_p$)
+alors que la partie sphérique ($ai_{hs}$) est donnee par la moitie de la valeur pour la sphere ci-dessus :
+
+\begin{subequations}
+\begin{align}
+ai_p &= \frac{1}{L_xL_y \Delta z} \frac{R^2}{2} \left[2\theta - \sin 2\theta \right]_{\theta_p}^{\theta_m} \\
+ai_{hs} &= \frac{\pi R}{L_x L_y} \\
+ai  &= ai_p+ai_{hs}
+\end{align}
+\end{subequations}
+avec $\theta=arccos{z/R}$
+
+Pour la partie plane, la normale est constante $\vec{N} = {-1,0,0}$ donc:
+
+\begin{subequations}
+\begin{align}
+  (a_iN_x)_p &= -ai_p \\
+  (a_iN_y)_p &= 0 \\
+  (a_iN_z)_p &= 0
+\end{align}
+\end{subequations}
+ 
+
+Pour la partie spherique, la composante selon x s'obtient par integration ou plus simplement en remarquant que le
+produit par $N_x$ correspond a une projection sur le plan (Oyz), ce qui conduit a : 
+$$(a_iN_x)_{hs} = ai_p $$
+
+Les autres composantes se deduisent aisement du cas precedent. En raison de la symetrie, elle valent la moitie du cas de la 
+sphere:
+
+\begin{subequations}
+\begin{align}
+  (a_iN_y)_{hs} &= 0 \\
+  (a_iN_z)_{hs} &= \frac{\pi}{L_xL_y} z
+\end{align}
+\end{subequations}
+
+
+En ponderant par une courbure nulle pour la partie plane et une courbure $\kappa = -2/R$ pour la partie spherique, on obtient 
+la solution analytique approchee 
+\begin{subequations}
+\begin{align}
+  \kappa a_iN_x &= -2/R ai_p \\
+  \kappa a_iN_y &= 0  \\
+  \kappa a_iN_z &= -\frac{2}{R} \frac{\pi}{L_xL_y} z
+\end{align}
+\end{subequations}
+
+qui n'est que partielle car la zone de jonction entre les 2 parties a une courbure inversement proportionnelle a la surface
+(cad plus la surface est petite plus la courbure y est grande), ce qui conduit a un terme non negligeable du premier ordre.
+Il est difficile a evaluer analytiquement. 
+
+On peut simplement dire que l'erreur commise est negative pour l'evaluation de kaiNx et qu'elle est du meme signe que z pour kaiNz
+
+
+Pour valeurs numeriques, on prend : 
+
+Lx=0.018
+Ly=0.015
+Lz=0.01
+N=80
+R=0.004

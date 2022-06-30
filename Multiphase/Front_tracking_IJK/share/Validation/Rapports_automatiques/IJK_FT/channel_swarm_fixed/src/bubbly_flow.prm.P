@@ -1,0 +1,116 @@
+Parametres {
+	Titre "Ecoulement à bulles dans un canal plan périodique soumis à la gravité"
+	Auteur "A.C."
+	# CasTest . bubbly_flow.data
+	# CasTest . bubbly_flow_rhog.data
+
+}
+
+#Pmacro VISU(_titre_,_timestep_, _fichier_, _interf_,_var_,_pos_)
+	visu {
+		titre _titre_
+		cycles _timestep_
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		mesh        _fichier_.lata DOM
+		mesh        _fichier_.lata _interf_
+		pseudocolor _fichier_.lata _interf_ _var_ _pos_
+	}
+
+#Pendmacro(VISU)
+
+#Pmacro VISU2(_titre_,_timestep_, _fichier_, _mesh_,_var_,_pos_)
+	visu {
+		titre _titre_
+		cycles _timestep_
+		pseudocolor _fichier_.lata _mesh_ _var_ _pos_
+		Operator Slice2D_y 0. 0.39 0.
+	}
+
+#Pendmacro(VISU2)
+
+#Pmacro FIGURE(_titre_,_fics_,_cols_)
+	figure {
+		titre _titre_	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "Re"
+#Pforeach _fichier_(_fics_)
+#Pforeach _COL_(_cols_)
+		Courbe {
+		   fichier _fichier_.out
+		   colonnes ($2) sqrt($5)*6000
+		}
+#Pendforeach(_COL_)
+#Pendforeach(_fichier_)
+	}
+#Pendmacro(FIGURE)
+
+Chapitre {
+
+	Titre "Présentation du cas"
+	
+	Description " Le but de ce cas test est de simuler un canal plan (pi/2 x pi/4 x 2) périodique selon  " <<EOF 
+	les directions x et y, et avec des conditions d'adhérence aux parois en z=0 et z=2. L'écoulement est motorisé selon l'axe x
+	par un gradient de pression uniforme et constant compensé en partie avec une gravité de signe oposé (-0.1,0,0).\\
+	
+	Dans l'article de référence pour ce cas test ('dynamics of nearly spherical bubbles in a turbulent channel upflow' par
+	Gretar Tryggvason J. Fluid Mech 2013), l'équation à résoudre est : \\
+	
+	$\latex_(\dfrac{\partial\rho\mathbf{v}}{\partial t}+\nabla .(\rho\mathbf{v}\otimes\mathbf{v})=-\nabla P^{NUM}-\beta\mathbf{e_x}+(\rho-\langle{\rho}\rangle)g+\nabla(\mu(\nabla\mathbf{v}+\nabla^T\mathbf{v}))-\kappa\sigma\mathbf{n}\delta^i\latex_)$ \\
+	
+	
+	où $\latex_(P^{num}\latex_)$ est compatible avec la periodicite.En effet, on peut tirer des equations de Navier-Stokes
+	standard une relation d'équilibre statistique qui s'écrit: $\latex_( \tau_w=-(\frac{dP0}{dz}+\rho_{av}g)h=\beta h\latex_)$. Dans ces conditions,
+	le terme  $\latex_(p+\rho g z \latex_)$. En l'intégrant aux équations de Navier Stokes, on obtient un terme source qui vient
+	remplacer le gradient de pression incompatible avec la périodicité de l'écoulement en x. \\
+	
+	Seulement la formulation classique des équations diphasiques dans TrioCFD n'est pas strictement identique. En particulier, le terme de gravité 
+	a été modifié afin d'empêcher les mouvements parasites. L'équation résolue est alors :
+	
+	$\latex_(\dfrac{\partial\rho\mathbf{v}}{\partial t}+\nabla .(\rho\mathbf{v}\otimes\mathbf{v})=-\nabla P^{NUM}-\beta\mathbf{e_x}+\nabla(\mu(\nabla\mathbf{v}+\nabla^T\mathbf{v}))+(\phi(\rho_l-\rho_v)-\kappa\sigma)\mathbf{n}\delta^i\latex_)$ \\
+
+	Seulement cette formulation ne garantie probablement pas exactement la périodicité de la pression.Il faut la discuter. \\ 
+	A l'état initial, on répartit aléatoirement 35 bulles de diamètres 0.16 (pour un taux de vide de 0.0304).on veut simuler un écoulement à  $\latex_(Re^+=250\latex_)$,
+ 	ce qui correspond à un terme source $\latex_(\beta=-0.001736\latex_)$. La masse volumique de l'eau vaut 1 et celle des bulles vaut 0.1. On prend une tension de 
+ 	surface égale à 0.00512.Comme condition initiale en vitesse : un profil de poiseuille bruité ($\latex_(U_{max}=0.67\latex_)$).	\\
+
+
+EOF
+	
+	
+	
+#Pusemacro(VISU)("Etat initial (maillage et interfaces)",0,PRE_RUN_GRAD_OK/pre_run,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU2)("Etat initial(champ de vitesse)",0,PRE_RUN_GRAD_OK/pre_run,DOM_dual,VELOCITY_X,FACES)
+		
+}
+
+Chapitre {
+	
+	Titre "Résultats grad"
+
+	Description " Pour vérifier que le terme source est bien dimenssionné, on peut tracer le nombre de Reynolds pariétal en fonction du temps." <<EOF 
+	On constate que le système tend vers la valeur souhaitée.\\
+	Un des principaux résultats de G.Tryggvason est que les bulles à tension de surface suffisamment élevée pour demeurer
+	sphériques ont tendance à migrer vers les bords jusqu'à atteindre un taux de vide local suffisant pour inverser le gradient de pression. \\
+	
+EOF	
+	
+	
+	
+#Pusemacro(VISU)("Migration des bulles",1,bubbly_flow,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU2)("champ de vitesse instantanné",1,bubbly_flow,DOM_dual,VELOCITY_X,FACES)
+#Pusemacro(FIGURE)("Re+ en fonction du temps dans le cas grad_i",PRE_RUN_GRAD_OK/pre_run_acceleration PRE_RUN_GRAD_OK/pre_run2_acceleration PRE_RUN_GRAD_OK/pre_run3_acceleration,1)
+		
+}
+
+Chapitre {
+	
+	Titre "Résultats rho_g"
+
+
+#Pusemacro(VISU)("Migration des bulles",1,bubbly_flow_rhog,INTERFACES,COMPO_CONNEXE,ELEM)
+#Pusemacro(VISU2)("champ de vitesse instantanné",1,bubbly_flow_rhog,DOM_dual,VELOCITY_X,FACES)	
+#Pusemacro(FIGURE)("Re+ en fonction du temps dans le cas rho_g",PRE_RUN_RHO_OK/pre_run_acceleration PRE_RUN_RHO_OK/pre_run2_acceleration PRE_RUN_RHO_OK/pre_run3_acceleration,1)	
+}

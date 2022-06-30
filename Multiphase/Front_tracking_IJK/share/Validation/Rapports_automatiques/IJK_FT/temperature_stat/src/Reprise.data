@@ -1,0 +1,64 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 5
+  nbelem_j 5
+  nbelem_k 64
+  uniform_domain_size_i 0.06
+  uniform_domain_size_j 0.06
+  uniform_domain_size_k 0.06
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep 1.64794e-5 # Choisi pour le maillage 64 #
+  timestep_facsec 1.e12
+  dt_post 200
+ #  disable_diphasique #
+   Boundary_Conditions {
+                bctype_kmin Symetrie
+                bctype_kmax Symetrie
+  }
+  cfl 1.0
+  fo  1.0
+  oh  1.0
+  t_debut_statistiques 0.
+  champs_a_postraiter 5 TEMPERATURE TEMPERATURE_ANA ECART_T_ANA DIV_LAMBDA_GRAD_T_VOLUME PRESSURE_LIQ
+  check_stop_file stop.txt
+  dt_sauvegarde 3000
+  nb_pas_dt_max 100  #  tf= 0.012641488699082916 tel qu'en 2D (cos(x)*cos(y)) l'amplitude ait decru de moitie #
+  disable_solveur_poisson
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0
+  }
+  nom_reprise Test.sauv
+  rho_liquide 10.
+  mu_liquide 0.
+  expression_vx_init 1.
+  expression_vy_init 0.
+  expression_vz_init 0.
+  Sondes
+    {
+       # Il faut mettre +epsilon pour etre sur d'avoir la vitesse sur la bonne face... 
+       IL ecrit dans le fichier sonde la coord precise de la position post-traitee (face ici). #
+       pp_T temperature periode 1e-9 points 1 0.03 0.03 0.015
+    }
+  
+}
+Fin

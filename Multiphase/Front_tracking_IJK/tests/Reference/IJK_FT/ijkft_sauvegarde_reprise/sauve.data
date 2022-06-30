@@ -1,0 +1,109 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 64
+  nbelem_j 64
+  nbelem_k 64
+  uniform_domain_size_i 0.010666666666666666
+  uniform_domain_size_j 0.010666666666666666
+  uniform_domain_size_k 0.010666666666666666
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+system "mkdir -p PREV"
+IJK_FT_double
+{
+  Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  # timestep 0.0001 #
+  # timestep 0.0005 #
+  timestep 0.00025
+  timestep_facsec 0.4
+  dt_post 10 # 1 24 #
+  champs_a_postraiter 4 INDICATRICE INTERFACES COURBURE COMPO_CONNEXE
+  check_stop_file stop.txt
+  dt_sauvegarde 10
+  nb_pas_dt_max 10
+  # disable_convection_qdm #
+  # disable_source_interf #
+
+  multigrid_solver {
+    coarsen_operators 0
+    solver_precision double
+    # ca doit marcher si tu ne mets pas de coarsen_operator :
+       coarsen_operators 0
+       mettre aussi solver_precision double ...
+
+      pour faire converger des problemes un peu raides,
+      augmenter pre_smooth_steps et smooth_steps
+
+      essayer en mettant 2 coarsen operators au lieu de 3
+    #
+    #
+    coarsen_operators 3
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  }
+    #
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    # Seuil du solveur_grossier par rapport au seuil gloabal : facteur 1/10 #
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 } }
+    # Seuil par rapport au residu initial : facteur 1e5 #
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    #    IMPR #
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces
+  {
+    fichier_reprise_interface prepare.sauv.lata
+    timestep_reprise_interface       1
+    lata_meshname   INTERFACES
+    # remaillage_ft_ijk {
+	nb_iter_barycentrage 1
+	relax_barycentrage 1
+	nb_iter_correction_volume 6
+	lissage_courbure_iterations_systematique 2
+    } #
+    remaillage_ft_ijk {
+	nb_iter_barycentrage 1
+	relax_barycentrage 1
+	nb_iter_correction_volume 1
+	lissage_courbure_iterations_systematique 0
+    }
+  }
+  check_divergence
+  gravite 3 0. 0. 0.
+  rho_liquide 1000.
+  rho_vapeur  1.
+  mu_liquide 1.e-5
+  mu_vapeur 1.e-7
+  nom_sauvegarde PREV/BASE.sauv
+  sigma 0.07
+  expression_vx_init 0.
+  expression_vy_init 0.
+  expression_vz_init 0.
+}
+Fin
+	Sondes
+	{
+		sonde_pression nodes pression periode 2.e-3 Points 2 0.005 0.005 0.005 0.009 0.009 0.009
+	}

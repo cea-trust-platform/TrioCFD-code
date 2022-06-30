@@ -1,0 +1,191 @@
+# Boite 3D avec periodicite dans les trois directions : suite du calcul #
+# PARALLEL OK #
+dimension 3 # 2 #
+
+Pb_hydraulique_turbulent pb
+Domaine dom
+
+# DEBUT MAILLAGE #
+# Mailler dom
+{
+	Pave Entree 
+	{
+	Origine 0. 0. 
+	Nombre_de_Noeuds 65 65
+	Longueurs 0.064 0.064 	}
+	{
+	Bord periox X = 0. 0. <= Y <= 0.064
+	Bord periox X = 0.064 0. <= Y <= 0.064
+	Bord perioy Y = 0. 0. <= X <= 0.064
+	Bord perioy Y = 0.064 0. <= X <= 0.064
+
+	}
+}
+# 
+
+Mailler dom
+{
+	Pave Entree 
+	{
+	Origine 0. 0. 0. 
+	Nombre_de_Noeuds 65 65 5
+	Longueurs 0.064 0.064 0.004 	}
+	{
+	Bord periox X = 0. 0. <= Y <= 0.064   0. <= Z <= 0.004   
+	Bord periox X = 0.064 0. <= Y <= 0.064   0. <= Z <= 0.004 
+	Bord perioy Y = 0. 0. <= X <= 0.064   0. <= Z <= 0.004 
+	Bord perioy Y = 0.064 0. <= X <= 0.064   0. <= Z <= 0.004 
+	Bord perioz Z = 0. 0. <= X <= 0.064   0. <= Y <= 0.064 
+	Bord perioz Z = 0.004 0. <= X <= 0.064   0. <= Y <= 0.064 
+
+	}
+}
+
+
+#
+MaillerParallel
+{
+        domain dom
+        nb_nodes 3 65 65
+        splitting 3 1 1 1
+        ghost_thickness 2
+        perio_x
+        perio_y
+	perio_z
+        function_coord_x 0.064*x
+        function_coord_y 0.064*y
+        function_coord_z 0.064*z
+        boundary_xmin periox
+        boundary_xmax periox
+        boundary_ymin perioy
+        boundary_ymax perioy
+        boundary_zmin perioz
+        boundary_zmax perioz
+}
+
+#
+
+VDF dis
+
+# Runge_Kutta_ordre_3 sch #
+schema_euler_explicite sch 
+Lire sch
+{
+	tinit 0.
+	tmax 2000.0
+	dt_min 1e-2
+	dt_max 1e-2	
+	dt_impr 0.01
+	dt_sauv 100
+	seuil_statio 1.e-8
+	nb_pas_dt_max 10
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu Champ_fonc_xyz dom 1 5.e-4
+	rho Champ_Uniforme 1 500
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb air
+
+Discretiser pb dis
+
+IJK_discretization vdf_to_ijk
+
+Lire vdf_to_ijk
+{
+        vdf_problem pb
+        splitting 3 1 1 1
+        perio_i
+        perio_j
+	perio_k
+#	boundary_conditions bc 
+	{
+		bctype_kmin Symetrie
+		bctype_kmax Symetrie
+	} #
+}
+
+IJK_Grid_Geometry DOMIJK
+Lire DOMIJK
+{
+  nbelem_i 64
+  nbelem_j 64
+  nbelem_k 4
+  uniform_domain_size_i 0.064
+  uniform_domain_size_j 0.064
+  uniform_domain_size_k 0.004
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOMIJK
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+
+Lire pb
+{
+	Navier_Stokes_turbulent
+
+	{
+		solveur_pression petsc cholesky { }
+		convection { negligeable }
+		diffusion {  IJK }
+		conditions_initiales {                 
+				# acos(0.5)-pi/2 = -0.5235987755982987     et    acos(0.5)-pi/4 = 0.2617993877991496 #
+#				vitesse Champ_fonc_xyz dom 3 2.*0.001*cos(y*98.17477042468103-0.5235987755982987)
+			       				     0.  
+			       				     0.  
+	#			vitesse Champ_fonc_xyz dom 3 0.001*1
+			       				     0.  
+			       				     0.  
+#				vitesse Champ_fonc_xyz dom 2 2.*0.001*cos(x*98.17477042468103+0.2617993877991496)*cos(y*98.17477042468103-0.5235987755982987)
+			       				     2.*0.001*sin(x*98.17477042468103+0.2617993877991496)*sin(y*98.17477042468103-0.5235987755982987)  
+	#		}
+	modele_turbulence sous_maille_wale { cw 0. turbulence_paroi negligeable }
+		conditions_limites {
+periox periodique 
+perioy periodique 
+perioz periodique 
+
+			
+		}
+					
+	        	
+
+        }
+	Postraitement
+	{
+	
+	format lata
+		Champs dt_post 512e-2
+		{
+			pression elem			
+			vitesse faces	
+		
+		
+		}
+	  Sondes
+    {
+       pp_vx nodes vitesseX periode 1e-9 points 1 0.008000 0.015875 0.0025
+       pp_vy nodes vitesseY periode 1e-9 points 1 0.008125 0.016000 0.0025 #
+       pp_vx nodes vitesseX periode 1e-9 points 1 0.0030 0.01350 
+       pp_vy nodes vitesseY periode 1e-9 points 1 0.0035 0.01300 #
+    }
+	}
+}
+
+Resoudre pb
+Fin
+

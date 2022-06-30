@@ -1,0 +1,111 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 48
+  nbelem_j 48
+  nbelem_k 5 # 24 plutot 5 #
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep 2.40e-4
+  timestep_facsec 1.e12
+  dt_post 20
+   Boundary_Conditions {
+                # bctype_kmin Paroi
+                bctype_kmax Paroi #
+                bctype_kmin Symetrie
+                bctype_kmax Symetrie
+  }
+
+  disable_diphasique
+  disable_diffusion_qdm
+  
+  # ajouter disable solver poisson #
+  disable_solveur_poisson
+
+  champs_a_postraiter 3 TEMPERATURE TEMPERATURE_ANA ECART_T_ANA  
+  check_stop_file stop.txt
+  dt_sauvegarde 3000
+  tinit 0
+	nb_pas_dt_max 3
+  
+  multigrid_solver {
+  }
+
+  check_divergence
+
+  # gravite 3 -9.81 0. 0. #
+  rho_liquide 1000.
+  mu_liquide 1e-3
+  sigma 0.07
+
+  # plutot utiliser une vitesse imposée #
+  expression_vx_init 1.0
+  expression_vy_init 0.1
+  expression_vz_init 1.0
+ 
+ thermique
+  {
+    # Cas du swarm avec un profil de temperature periodique #
+    {
+
+    # convection_temperature_negligible #
+    diff_temp_negligible
+
+    Boundary_Conditions {
+                 bctype_kmin Perio 
+                 bctype_kmax Perio
+    }
+
+    # Etude de la diffusion #
+    # DIFF expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
+    expression_T_ana 0.5*exp(-0.1/4000.*(2*(2*Pi/0.006)^2)*t)*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006) 
+    DIFF #
+
+    # Etude de la convection #
+      expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
+    expression_T_ana 0.5*cos(x*2*Pi/0.006)*cos((y-0.1*t)*2*Pi/0.006)
+    
+
+    # Etude du schéma temps #
+    # TEMPS expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
+    expression_T_ana 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)+exp(-t/(0.00024*800))-1
+    expression_source_temperature -1/(0.00024*800)*exp(-t/(0.00024*800))
+    TEMPS #
+    cp_vapor 1.
+    lambda_vapor 1.
+    fo 0.5
+    cp_liquid 4.
+    lambda_liquid 0.1
+    }
+  }
+
+ Sondes
+    {
+       # Il faut mettre +epsilon pour etre sur d'avoir la vitesse sur la bonne face...
+       IL ecrit dans le fichier sonde la coord precise de la position post-traitee (face ici). #
+       pp_T temperature_0 periode 1e-9 points 1 0.003 0.003 0.0015
+    }
+
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

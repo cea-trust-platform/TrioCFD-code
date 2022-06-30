@@ -1,0 +1,32 @@
+#!/bin/bash
+# ce script est execute avant de lire les cas tests
+
+cat >deplacements3.txt <<EOF
+0.0015823 0.0015798 0.00151354 bulle3.msh
+0.0045867 0.0010343 0.00155486 bulle3.msh
+0.0055337 0.0029443 0.00255486 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements3.txt init_multi.lata
+
+# Creation d'un JDD de reprise suite au pre_run : 
+echo "JDD pour Preparation du calcul en avancant la bulle au bout du domaine..."
+sed -e "s/t_debut_statistiques .*/t_debut_statistiques 1000000/g" \
+    -e "s/dt_sauvegarde .*/   dt_sauvegarde 10/g" \
+    -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 10/g" \
+    -e "s/fichier_reprise_interface.*/fichier_reprise_interface init_multi\.lata/g"                    \
+    -e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+    -e "/timestep_reprise_vitesse/d"               \
+    -e "/fichier_reprise_vitesse/d"                \
+    -e "s/champs_a_postraiter 1 TEMPERATURE/champs_a_postraiter 8 INTERFACES INDICATRICE COMPO_CONNEXE COURBURE DISTANCE_AUTRES_INTERFACES REPULSION_FT PRESSURE VELOCITY_FT/g" basic_temperature.data > pre_run.data
+
+dir=CHMTVAR
+# Genearation du cas test correspondant a $dir
+echo "JDD pour calcul de base " $dir
+sed -e "s/basic_temperature/ ${dir}/g"   \
+    -e "s/BASIC_TEMPERATURE/ $dir/g" \
+    -e "s/nproc_i .*/nproc_i 2/g" \
+    -e "s/nproc_j .*/nproc_j 2/g" \
+    -e "s/expression_T_init .*/expression_T_init 9*ff+1/g" \
+    -e "s/^ *champs_a_postraiter .*/champs_a_postraiter 6 TEMPERATURE INTERFACES COMPO_CONNEXE VELOCITY_FT INDICATRICE TEMPERATURE_ADIM_BULLES/g" basic_temperature.data > ${dir}.data
+

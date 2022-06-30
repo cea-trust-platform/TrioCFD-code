@@ -1,0 +1,38 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+
+if [ "c"$1 == "cswitch" ]
+then
+   echo "post_run does nothing for switch"
+   exit 0
+fi
+
+## Preparation d'une reprise 
+chmod 777 like_sub_file
+./like_sub_file
+
+## Rangement des donnees de la simulation
+# mkdir -p OUT SON TXT LATAS
+# mv *out OUT
+# mv *son SON
+# mv *txt TXT
+# mv *son SON
+# mv *lata* LATAS
+
+# ## Traitement des donnees de la simulation
+# # Position et relevé des sondes
+# python $project_directory/share/PyTools/DEPSONDES/coord_and_values.py spectral_point2 ./SON/ [F]
+# # Correlations du forcage spectral impose
+# # python $project_directory/share/PyTools/DEPSONDES/correlations_vII.py ./SON/ '**' 15 [X,Y,Z] [X,Y,Z] [-1,-1] 1>correlations.logF
+# python $project_directory/share/PyTools/DEPSONDES/correlations_vIV.py ./SON/ '**' F 15 [X,Y,Z] [X,Y,Z] [-1,-1] 1>F_correlations.logF
+# python $project_directory/share/PyTools/DEPSONDES/correlations_vIV.py ./SON/ '**' V 15 [X,Y,Z] [X,Y,Z] [-1,-1] 1>V_correlations.logF
+# # Obtention des energies cinetiques et des dissipations
+# python $project_directory/share/PyTools/SOME_PYTHON/accplot_vAB.py fig_acc 0. NEXT/spectral_UO.sauv spectral_point2.data 1>accplot.logF
+# python $project_directory/share/PyTools/SOME_PYTHON/energy.py liq fig_ene spectral_point2.data ./TXT/ accplot.logF 0 [-1,-1] 1>energy.logF
+# 
+# ## Rangement des figures et fichiers de post-traitement
+# mkdir FIGURES_POST-TRT
+# mv *logF *errF *png *pdf FIGURES_POST-TRT
+
+
+

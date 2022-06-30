@@ -1,0 +1,255 @@
+#!/bin/bash
+# ce script est execute avant de lire les cas tests
+
+# Trois cas test avec variations de proprietes physiques (AIR,ALUMINA,WATER) 
+# Etude de convergence sur la simulation AIR_WATER
+
+
+		
+#######################################################################################
+# Etude sur 3 couple liquide/vapeur solide/vapeur solide/liquide
+printf "%b\n"
+echo "Etude sur differents melanges (.data files)"
+
+declare -a tableau_elem
+declare -a tableau_ldomain
+declare -a tableau_centroid
+
+for dir in "AIR_WATER" "ALUMINA_AIR" "ALUMINA_WATER"
+do
+
+printf "%b\n"
+echo $dir
+	mkdir -p $dir
+	case_type=$dir
+	# Generation du cas test correspondant a $dir
+	if [ $dir == "AIR_WATER" ]
+	then
+declare -a tab_nbelem=(144 216 240)
+ldomain=0.01
+rho_liquide=1000.
+rho_vapeur=1.2
+cp_liquide=4200.0
+cp_vapeur=1000.0
+lambda_liquide=0.6
+lambda_vapeur=0.03
+fo=1
+tf_scope=0.01
+t_study=8e-4,3.2e-3,6.4e-3,9.6e-3
+	fi
+
+	if [ $dir == "ALUMINA_AIR" ]
+	then
+declare -a tab_nbelem=(144 218 240)
+ldomain=0.030
+rho_liquide=1.2
+rho_vapeur=4000.
+cp_liquide=1.e3
+cp_vapeur=9.e2
+lambda_liquide=3.e-2
+lambda_vapeur=3.e1
+fo=1	
+tf_scope=0.11
+t_study=8e-4,8.0e-3,4.0e-2,1.0e-1
+	fi
+
+	if [ $dir == "ALUMINA_WATER" ]
+	then
+declare -a tab_nbelem=(144 218 240)
+ldomain=0.012
+rho_liquide=1000.
+rho_vapeur=4000.
+cp_liquide=4.2e3
+cp_vapeur=9.e2
+lambda_liquide=6.e-1
+lambda_vapeur=3.e1
+fo=1
+tf_scope=0.5
+t_study=8.0e-3,4.0e-2,1.6e-1,4.8e-1
+	fi
+
+
+
+#Créer fichier .lata (format visit) contenant le mesh
+tableau_convergence=( "${tableau_convergence[@]}" $nbelem )
+declare -a tab_param=$(python time_step_calculation.py ${tab_nbelem[0]} $ldomain $fo $rho_vapeur $cp_vapeur $lambda_vapeur $rho_liquide $cp_liquide $lambda_liquide $tf_scope 2>&1 > /dev/null)
+nb_dt_max=${tab_param[0]}
+centroid=${tab_param[1]}
+cat >deplacements3.txt <<EOF
+$centroid $centroid $centroid bulle3.msh 
+EOF
+./cree_multi_bulles.sh deplacements3.txt init_multi.lata
+
+post_process_all=1
+printf "%b\n"
+echo "Etude de convergence (.data files)"
+declare -a tableau_convergence
+for dir_conv in "COARSE" "MEDIUM" "FINE"
+do
+
+	case_type=CONVERGENCE
+
+	mkdir -p $dir/$dir_conv
+	printf "%b\n"
+	echo $dir_conv
+
+	if [ $dir_conv == "COARSE" ]
+	then
+		nbelem=${tab_nbelem[0]}
+	fi
+	if [ $dir_conv == "MEDIUM" ]
+	then
+		nbelem=${tab_nbelem[1]}
+	fi
+	if [ $dir_conv == "FINE" ]
+	then
+		nbelem=${tab_nbelem[2]}
+	fi
+	
+	tableau_convergence=( "${tableau_convergence[@]}" $nbelem )
+	declare -a tab_param=$(python time_step_calculation.py $nbelem $ldomain $fo $rho_vapeur $cp_vapeur $lambda_vapeur $rho_liquide $cp_liquide $lambda_liquide $tf_scope 2>&1 > /dev/null)
+	nb_dt_max=${tab_param[0]}
+	centroid=${tab_param[1]}
+	echo "Nombre iterations necessaires pour la plage temporelle..."$nb_dt_max	
+	let "segment=nbelem/2"
+	echo "JDD pour le calcul parallele..."$dir/$dir_conv		
+	sed -e "s/nbelem_i .*/ nbelem_i $nbelem/g"   \
+		-e "s/nbelem_j .*/ nbelem_j $nbelem/g"      \
+		-e "s/nbelem_k .*/ nbelem_k $nbelem/g"      \
+		-e "s/uniform_domain_size_i .*/ uniform_domain_size_i $ldomain/g"	\
+		-e "s/uniform_domain_size_j .*/ uniform_domain_size_j $ldomain/g"	\
+		-e "s/uniform_domain_size_k .*/ uniform_domain_size_k $ldomain/g"	\
+		-e "s/nproc_i 1/nproc_i 2/g"    \
+		-e "s/nproc_j 1/nproc_j 2/g"    \
+		-e "s/nproc_k 1/nproc_k 2/g"    \
+		-e "s/nb_pas_dt_max .*/   nb_pas_dt_max $nb_dt_max/g" \
+		-e "s/rho_liquide .*/ rho_liquide $rho_liquide/g"	\
+		-e "s/rho_vapeur .*/ rho_vapeur $rho_vapeur/g"	\
+		-e "s/fo .*/ fo $fo/g"	\
+		-e "s/cp_liquid .*/ cp_liquid $cp_liquide/g"	\
+		-e "s/cp_vapor .*/ cp_vapor $cp_vapeur/g"	\
+		-e "s/lambda_liquid .*/ lambda_liquid $lambda_liquide/g"	\
+		-e "s/lambda_vapor .*/ lambda_vapor $lambda_vapeur/g"	\
+		-e "s/sonde_temp .*/ sonde_temp temperature periode 1e-10 segment $segment $centroid $centroid $centroid $ldomain $centroid $centroid/g" basic_temperature.data > basic_temperature_tmp.data
+		mv basic_temperature_tmp.data $dir/$dir_conv/${dir_conv}.data 	
+
+		echo "JDD pour preparation du calcul en avancant la bulle au bout du domaine..."$dir/$dir_conv
+		sed -e "s/timestep .*/  timestep 1e-7/g"      \
+		-e "s/dt_post .*/   dt_post 1/g"             \
+		-e "s/dt_sauvegarde .*/   dt_sauvegarde 1/g" \
+		-e "s/nb_pas_dt_max .*/   nb_pas_dt_max 1/g" \
+		-e "s/fichier_reprise_interface.*/fichier_reprise_interface init_multi\.lata/g"                    \
+		-e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+		-e "/timestep_reprise_vitesse/d"               \
+		-e "/fichier_reprise_vitesse/d"                \
+		-e "s/champs_a_postraiter .*/champs_a_postraiter 9 TEMPERATURE INTERFACES INDICATRICE COMPO_CONNEXE COURBURE DISTANCE_AUTRES_INTERFACES REPULSION_FT PRESSURE VELOCITY_FT/g" $dir/$dir_conv/${dir_conv}.data > $dir/$dir_conv/pre_run.data
+
+
+	echo "Adaptation du post_run..." $dir/$dir_conv
+		sed -e "s/case_type=0/ case_type=$case_type/g" \
+		-e "s/post_process_all=0/post_process_all=$post_process_all/g" \
+		-e "s/ldomain=0/ ldomain=$ldomain/g" \
+		-e "s/nbelem=0/ nbelem=$nbelem/g" \
+		-e "s/rho_liquide=0/ rho_liquide=$rho_liquide/g" \
+		-e "s/rho_vapeur=0/ rho_vapeur=$rho_vapeur/g" \
+		-e "s/cp_liquide=0/ cp_liquide=$cp_liquide/g" \
+		-e "s/cp_vapeur=0/ cp_vapeur=$cp_vapeur/g" \
+		-e "s/lambda_liquide=0/lambda_liquide=$lambda_liquide/g" \
+		-e "s/lambda_vapeur=0/ lambda_vapeur=$lambda_vapeur/g" \
+		-e "s/tf_scope=0/ tf_scope=$tf_scope/g" \
+		-e "s/t_study=0/ t_study=$t_study/g" post_run > $dir/$dir_conv/post_run
+
+
+	cp init_multi.lata* $dir/$dir_conv
+
+	done
+
+# ------------------------------------------------------------------------------------------------	
+	printf "%b\n"
+	echo "Calculs sequentiel et paralelle avec et sans reprises"
+
+	cp init_multi.lata* $dir
+	cp diffusion_1D.py $dir
+	nbelem=96
+	case_type=$dir
+	tableau_elem=( "${tableau_elem[@]}" $nbelem )
+	tableau_ldomain=( "${tableau_ldomain[@]}" $ldomain )
+	declare -a tab_param=$(python time_step_calculation.py $nbelem $ldomain $fo $rho_vapeur $cp_vapeur $lambda_vapeur $rho_liquide $cp_liquide $lambda_liquide $tf_scope 2>&1 > /dev/null)
+	nb_dt_max=${tab_param[0]}
+	centroid=${tab_param[1]}
+	tableau_centroid=( "${tableau_centroid[@]}" $centroid )
+
+
+	echo "Nombre iterations necessaires pour la plage temporelle..."$nb_dt_max	
+	let "segment=nbelem/2"
+	echo "Modification des proprietes physiques des phases..."$dir
+		sed -e "s/nbelem_i .*/ nbelem_i $nbelem/g"   \
+		-e "s/nbelem_j .*/nbelem_j $nbelem/g"      \
+		-e "s/nbelem_k .*/nbelem_k $nbelem/g"      \
+		-e "s/uniform_domain_size_i .*/uniform_domain_size_i $ldomain/g"	\
+		-e "s/uniform_domain_size_j .*/uniform_domain_size_j $ldomain/g"	\
+		-e "s/uniform_domain_size_k .*/uniform_domain_size_k $ldomain/g"	\
+		-e "s/nb_pas_dt_max .*/nb_pas_dt_max $nb_dt_max/g" \
+		-e "s/rho_liquide .*/rho_liquide $rho_liquide/g"	\
+		-e "s/rho_vapeur .*/rho_vapeur $rho_vapeur/g"	\
+		-e "s/fo .*/fo $fo/g"	\
+		-e "s/cp_liquid .*/cp_liquid $cp_liquide/g"	\
+		-e "s/cp_vapor .*/cp_vapor $cp_vapeur/g"	\
+		-e "s/lambda_liquid .*/lambda_liquid $lambda_liquide/g"	\
+		-e "s/lambda_vapor .*/lambda_vapor $lambda_vapeur/g"	\
+		-e "s/sonde_temp .*/sonde_temp temperature periode 1e-10 segment $segment $centroid $centroid $centroid $ldomain $centroid $centroid/g" basic_temperature.data > basic_temperature_tmp.data
+		mv basic_temperature_tmp.data basic_temperature.data
+
+
+	echo "Adaptation du post_run..."$dir
+		sed -e "s/case_type=0/case_type=$case_type/g" \
+		-e "s/post_process_all=0/post_process_all=$post_process_all/g" \
+		-e "s/ldomain=0/ldomain=$ldomain/g" \
+		-e "s/nbelem=0/nbelem=$nbelem/g" \
+		-e "s/rho_liquide=0/rho_liquide=$rho_liquide/g" \
+		-e "s/rho_vapeur=0/rho_vapeur=$rho_vapeur/g" \
+		-e "s/cp_liquide=0/cp_liquide=$cp_liquide/g" \
+		-e "s/cp_vapeur=0/cp_vapeur=$cp_vapeur/g" \
+		-e "s/lambda_liquide=0/rho_vapeur=$rho_vapeur/g" \
+		-e "s/lambda_vapeur=0/lambda_vapeur=$lambda_vapeur/g" \
+		-e "s/tf_scope=0/tf_scope=$tf_scope/g" \
+		-e "s/t_study=0/t_study=$t_study/g" post_run > $dir/post_run
+
+	# Creation d'un JDD de reprise suite au pre_run : 
+	echo "JDD pour preparation du calcul en avancant la bulle au bout du domaine..."$dir
+		sed -e "s/timestep .*/timestep 1e-7/g"      \
+		-e "s/dt_post .*/dt_post 1/g"             \
+		-e "s/dt_sauvegarde .*/dt_sauvegarde 1/g" \
+		-e "s/nb_pas_dt_max .*/nb_pas_dt_max 1/g" \
+		-e "s/fichier_reprise_interface.*/fichier_reprise_interface init_multi\.lata/g"                    \
+		-e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+		-e "/timestep_reprise_vitesse/d"               \
+		-e "/fichier_reprise_vitesse/d"                \
+		-e "s/champs_a_postraiter .*/champs_a_postraiter 9 TEMPERATURE INTERFACES INDICATRICE COMPO_CONNEXE COURBURE DISTANCE_AUTRES_INTERFACES REPULSION_FT PRESSURE VELOCITY_FT/g" basic_temperature.data > $dir/pre_run.data
+	
+	# Generation du cas sequentiel
+	echo "JDD pour calcul de base... "$dir
+		sed -e "s/basic_temperature/ ${dir}_seq/g"   \
+		-e "s/basic_temperature/ $dir/g"  basic_temperature.data > $dir/${dir}_seq.data
+	
+	# Generation du cas parallele
+	echo "JDD pour le calcul parallele ..."$dir
+		sed -e "s/nproc_i 1/nproc_i 2/g"    \
+		-e "s/nproc_j 1/nproc_j 2/g"    \
+		-e "s/nproc_k 1/nproc_k 2/g"    \
+		-e "s/seq/par8/g" $dir/${dir}_seq.data > $dir/${dir}_par8.data
+
+done
+
+sed -e "s/L_x = L_y = L_z$ \& 1 \& 1 \& 1/L_x = L_y = L_z$ \& ${tableau_ldomain[0]} \& ${tableau_ldomain[1]} \& ${tableau_ldomain[2]}/g" \
+ -e "s/N_x = N_y = N_z$ \& 1 \& 1 \& 1/N_x = N_y = N_z$ \& ${tableau_elem[0]} \& ${tableau_elem[1]} \& ${tableau_elem[2]}/g" \
+ -e "s/COARSE (1) to FINE (1) via MEDIUM (1)/COARSE (${tableau_convergence[0]}) to FINE (${tableau_convergence[1]}) via MEDIUM (${tableau_convergence[2]})/g"\
+ -e "s/centroid1/${tableau_centroid[0]}/g"\
+ -e "s/centroid2/${tableau_centroid[1]}/g"\
+ -e "s/centroid3/${tableau_centroid[2]}/g" basic_temperature.prm > basic_temperature_tmp.prm
+ mv basic_temperature_tmp.prm basic_temperature.prm
+
+
+
+
+

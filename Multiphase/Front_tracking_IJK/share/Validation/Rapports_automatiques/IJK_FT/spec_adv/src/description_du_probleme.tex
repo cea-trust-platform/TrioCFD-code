@@ -1,0 +1,29 @@
+Un écoulement monophasique de fluide de masse volumique $\r$ est considéré. Cet écoulement périodique dans les trois directions est simulé dans un domaine cubique de côté $L$. La gravité est nulle ($\bm{g} =  \bm{0}$), la convection et la diffusion sont ignorées. Une force extérieure $f$ est imposée au fluide. Seul l'effet du champ de pression ($\bm{\na} p$) est conservé. Les équations résolues dans le domaine sont donc : 
+
+\begin{align}
+&\p_t \bm{u} = - \frac{1}{\r} \bm{\nabla} p + \bm{f} \\                
+&\bm{ \nabla \cdot u } = 0 \\
+\end{align}
+
+Les différentes forces testées sont : 
+
+\begin{align}
+&\bm{f}(x;t)  = 2 cos(\k_1 x - \o_{1/2} t) \bm{e_y} \\
+&\bm{f}(x;t)  = 2 cos(\k_1 x - \o_{1/2} t) \bm{e_x} \\
+&\bm{f}(x;t)  = 2 cos(\k_1 y - \o_{1/2} t) \bm{e_y} \\
+&\bm{f}(x;t)  = 2 cos(\k_1 z - \o_{1/2} t) \bm{e_z} \\
+&\bm{f}(x;t)  = 2 cos(\k_1 (x-z) - \o_{1/2} t) \frac{1}{\sqrt{2}}(\bm{e_x - e_z}) \\
+\end{align}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+$\r(kg.m^{-3})$ & $ L(m)$ &  $\k_n(rad.m^{-1})$        & $\o_q(rad.s^{-1})$ & N \\ \hline
+1171.3          & 0.004   &  $2 \pi n / L$             & $2 \pi / q $       & 40
+\end{tabular}
+\end{center}
+\caption{Paramètres physiques et numérique de la simulation}
+\end{table}
+
+$\k_n$ est défini de sorte à observer $n$ périodes de $f$ sur le domaine.
+$\o_q$ est défini de sorte à translater champ $f$ d'une longueur de domaine selon $x$,$y$ ou $z$ en $q$ secondes.

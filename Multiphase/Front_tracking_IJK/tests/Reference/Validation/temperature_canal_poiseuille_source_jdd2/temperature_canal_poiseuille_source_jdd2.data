@@ -1,0 +1,136 @@
+# PARALLEL ONLY 3 #
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 12
+  nbelem_j 12
+  nbelem_k 96 
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 3
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep 1.
+  timestep_facsec 0.5
+  dt_post 1000
+   Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+
+  disable_diphasique
+  disable_diffusion_qdm
+  disable_convection_qdm
+  # ajouter disable solver poisson #
+  disable_solveur_poisson
+
+  champs_a_postraiter 5 TEMPERATURE SOURCE_TEMPERATURE VELOCITY TEMPERATURE_ADIMENSIONNELLE_THETA div_lambda_grad_T_volume
+  check_stop_file stop.txt
+  dt_sauvegarde 3000
+  tinit 0
+	nb_pas_dt_max 3
+  
+  multigrid_solver {
+  }
+
+  # check_divergence #
+
+  rho_liquide 1000.
+  mu_liquide 1e-3
+  # sigma 0.07 #
+
+  # plutot utiliser une vitesse imposee #
+  expression_vx_init 0.001*(4*z/0.003-4*z*z/0.000009)
+  expression_vy_init 0.0
+  expression_vz_init 0.0
+ 
+ thermique
+  {
+    # Cas du swarm avec un profil de temperature periodique #
+    {
+    # conv_temperature_negligible #
+    # diff_temp_negligible #
+    Boundary_Conditions {
+                 bctype_kmin Paroi_Flux_impose 
+                 bctype_kmax Paroi_Flux_impose
+                 flux_impose_kmin 1.
+                 flux_impose_kmax 1.
+    }
+    expression_T_init 0.
+    fo 0.5
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 4.
+    lambda_vapor 0.1
+    type_T_source dabiri
+    wall_flux
+    } , 
+
+    # Source PATCH : # 
+    {
+    # conv_temperature_negligible #
+    # diff_temp_negligible #
+    Boundary_Conditions {
+                 bctype_kmin Paroi_Flux_impose 
+                 bctype_kmax Paroi_Flux_impose
+                 flux_impose_kmin 1.
+                 flux_impose_kmax 1.
+    }
+    expression_T_init 0.
+    fo 0.5
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 4.
+    lambda_vapor 0.1
+    type_T_source patch_dabiri
+    wall_flux
+    } , 
+
+    # Source PATCH : # 
+    {
+    # conv_temperature_negligible #
+    # diff_temp_negligible #
+    Boundary_Conditions {
+                 bctype_kmin Paroi_Flux_impose 
+                 bctype_kmax Paroi_Flux_impose
+                 flux_impose_kmin 1.
+                 flux_impose_kmax 1.
+    }
+    expression_T_init 0.
+    fo 0.5
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 4.
+    lambda_vapor 0.1
+    type_T_source unweighted_dabiri
+    wall_flux
+    }
+  }
+  
+  Sondes
+  {
+    sonde_T0 temperature_0 periode 1e-10 segment 96 0.003 0.003 0. 0.003 0.003 0.003
+    sonde_T1 temperature_1 periode 1e-10 segment 96 0.003 0.003 0. 0.003 0.003 0.003
+    sonde_streamwise_T1 temperature_1 periode 1e-10 segment 12 0.003 0. 0.0015 0.003 0.006 0.0015
+    sonde_T2 temperature_2 periode 1e-10 segment 96 0.003 0.003 0. 0.003 0.003 0.003
+    sonde_streamwise_T2 temperature_2 periode 1e-10 segment 12 0.003 0. 0.0015 0.003 0.006 0.0015
+  }
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

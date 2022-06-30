@@ -1,0 +1,65 @@
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 256
+  nbelem_j 128
+  nbelem_k 128
+  uniform_domain_size_i 2.
+  uniform_domain_size_j 1.
+  uniform_domain_size_k 1.
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 2
+  nproc_j 2
+  nproc_k 2
+}
+
+#Pmacro RUNTEST(_GHOST_,_SMOOTH_STEPS_,_RELAX_)
+system "echo Running test ghost= _GHOST_ smooth_steps= _SMOOTH_STEPS_ relax = _RELAX_"
+system "SECONDS=0"
+IJK_Test_Multigrille
+{
+  ijk_splitting grid_splitting
+  expression_rho 3+sin(x*3.13159265)+cos(2*y*3.13159265)*sin(z*3.14159265)
+  expression_rhs sin(10*x*3.13159265)*sin(1.21344*x*3.13159265)*cos(8*y*3.13159265)*sin(2*z*3.13159265)
+
+  multigrid_solver {
+   coarsen_operators 4
+ 	Coarsen_Operator_Uniform { }
+ 	Coarsen_Operator_Uniform { }
+ 	Coarsen_Operator_Uniform { }
+	Coarsen_Operator_Uniform { }
+    ghost_size _GHOST_
+    pre_smooth_steps 1 _SMOOTH_STEPS_
+    smooth_steps 1 _SMOOTH_STEPS_
+    relax_jacobi 1 _RELAX_
+    solveur_grossier GCP { seuil  0.5e-6 precond ssor { omega 1.5 }  }
+    check_residu 0
+    seuil 1e-5
+    nb_full_mg_steps 2 5 1
+    solver_precision mixed
+  }
+}
+system "echo *************** Multigrid Time : $SECONDS (ghost= _GHOST_ smooth_steps= _SMOOTH_STEPS_ relax = _RELAX_) *************** "
+
+#Pendmacro(RUNTEST)
+#Pforeach _ITER_(4 5 6 7 8 9)
+#Pforeach _SM_(0.65 0.68 0.7 0.72)
+#Pusemacro(RUNTEST)(4,_ITER_,_SM_)
+#Pendforeach(_SM_)
+#Pendforeach(_ITER_)
+#Pusemacro(RUNTEST)(1,5,0.72)
+#Pusemacro(RUNTEST)(2,5,0.72)
+#Pusemacro(RUNTEST)(3,5,0.72)
+#Pusemacro(RUNTEST)(4,6,0.72)
+#Pusemacro(RUNTEST)(4,7,0.72)
+#Pusemacro(RUNTEST)(5,4,0.72)
+#Pusemacro(RUNTEST)(5,9,0.72)
+Fin

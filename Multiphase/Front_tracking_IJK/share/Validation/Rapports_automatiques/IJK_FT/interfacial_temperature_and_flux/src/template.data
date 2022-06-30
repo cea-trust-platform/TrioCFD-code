@@ -1,0 +1,129 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i @N@
+  nbelem_j @N@
+  nbelem_k @N@
+  uniform_domain_size_i 0.003
+  uniform_domain_size_j 0.003
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0 # 20 #
+  timestep 1.e-8 # Force the maximum timestep very small so fields don't change #
+  timestep_facsec 1 # a diminuer #
+  dt_post 5
+  Boundary_Conditions 
+  {         
+  	bctype_kmin Perio
+        bctype_kmax Perio
+  }
+  champs_a_postraiter 7 TEMPERATURE INTERFACES VELOCITY INDICATRICE INTERFACE_TEMPERATURE INTERFACE_PHIN COURBURE 
+  check_stop_file stop.txt
+
+  dt_sauvegarde 25
+  tinit 0
+  nb_pas_dt_max 5
+    
+    multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0
+      # Coarsen_Operator_Uniform { } #
+      # Coarsen_Operator_Uniform { } #
+    ghost_size 1
+    pre_smooth_steps 1 10
+    smooth_steps 1 10
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 } impr }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    impr
+  }
+
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init5.lata
+    timestep_reprise_interface       1
+    ncells_forbidden 1
+  # Bary et lissage # 
+    remaillage_ft_ijk {
+     pas_remaillage 2.e-09
+     nb_iter_barycentrage 1
+     relax_barycentrage 1.0
+     critere_arete 3.49999999999999978e-01
+     seuil_dvolume_residuel 0.00000000000000000e+00
+     nb_iter_correction_volume 6
+     nb_iter_remaillage 6
+     facteur_longueur_ideale 0.75
+     equilateral 1
+     lissage_courbure_coeff -2.5e-02
+     lissage_courbure_iterations_systematique 20  # Exceptionnally high to reach rapidely the equilibrium bubble #
+     lissage_courbure_iterations_si_remaillage 10
+   }
+   terme_gravite rho_g
+  }
+
+  disable_convection_qdm
+  disable_diffusion_qdm
+  disable_solveur_poisson
+
+  # Properties from Panda et al. #
+  # water #
+  rho_liquide 1000.
+  mu_liquide 0 
+
+  # air #
+  rho_vapeur 1000.
+  mu_vapeur 0  
+  sigma 0.0
+  
+  expression_vx_init 0.0
+  expression_vy_init 0.0
+  expression_vz_init 0.0
+ # Initialisation of a temperature difference between each phase #
+
+ thermique
+  { 
+    # CSTE LAMBDA #
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+    expression_T_init 10.*(sqrt((x-1.5e-3)^2+(y-1.5e-3)^2+(z-1.5e-3)^2)-0.001)
+    fo 1
+
+    cp_liquid 4200.0
+    lambda_liquid 0.1
+
+    cp_vapor 1000.0
+    lambda_vapor 0.1 
+    } 
+    # FLAG_ADD_FIELD #
+  }
+
+ Sondes
+ {
+    sonde_temp temperature periode 1e-10 segment @N@ 0.0 0.0015 0.0015 0.003 0.0015 0.0015
+ }    
+}  
+# Lata_to_other lml NOM_DU_CAS NOM_DU_CAS #
+Fin

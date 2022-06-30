@@ -1,0 +1,14 @@
+# Decription du cas : 
+#    o Initialisation avec 648 bulles (18x6x6).
+#    o Maillage : 432x144x144 = 9Mons.
+#    o Decoup   : 6x2x2 = 24.
+
+# Creation des bulles  : 
+gmsh bulle1mm.geo -2
+
+# Creation du fichier init.lata multibulles : 
+python generate_initial_distrib.py
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+# Parallel run : 
+qsub sub_file

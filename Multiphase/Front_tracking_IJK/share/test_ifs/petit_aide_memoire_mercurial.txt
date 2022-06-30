@@ -1,0 +1,72 @@
+hg designe l'executable hg
+(par exemple /work/jd235850/usr/mercurial-2.1.1/hg)
+
+
+Serveur web pour se promener dans la base de donnees:
+>hg serve
+Ensuite, se connecter sur l'adresse indiquee avec firefox
+
+
+Ajout d'un nouveau fichier a la base:
+>hg add FICHIER
+
+Enregistrement de tous les fichiers modifies dans la base
+(uniquement ceux qui ont ete prealablement enregistres)
+>hg commit -u NOMUTILISATEUR
+Une fenetre vi s'ouvre et on y ecrit les commentaires pour decrire
+les modifications qui ont ete faites
+
+
+Recuperation des modifications sur une autre base:
+/work/jd235850/usr/mercurial-2.1.1/hg incoming ssh://mathieu@gre027058//work/mathieu/New_algo_qc --remotecmd /work/mathieu/usr/mercurial-2.1.1/hg
+/work/jd235850/usr/mercurial-2.1.1/hg pull ssh://mathieu@gre027058//work/mathieu/New_algo_qc --remotecmd /work/mathieu/usr/mercurial-2.1.1/hg 
+/work/jd235850/usr/mercurial-2.1.1/hg update
+
+10/04/2013
+----------
+Sur gre058509 (pc grenoble)
+/work/jd235850/usr/mercurial-2.1.1/hg
+
+Preconisation d'Eli:
+Creer sur une des machines une base "centralisee" de reference pour Jonathan
+(a priori le poste fixe a Saclay par exemple).
+A chaque changement de poste de travail:
+- mettre a jour la version locale a partir de la version centralisee,
+- travailler,
+- mettre a jour la version centralisee
+
+Je cree un script avec deux options:
+- un pour mettre a jour la version locale
+- un pour exporter les modifications dans la base centrale
+
+Il y aura en plus deux operations pour synchroniser avec les changements faits par BMathieu
+de son cote, commun avec le projet d'A.Toutant et G.Bois.
+
+Customisation de mercurial pour de jolis diff et merge:
+
+Dans le fichier ~/.hgrc  mettre ceci (il doit etre sur toutes les machines):
+
+[ui]
+editor = nedit
+merge = kdiff3
+
+[extensions]
+hgext.extdiff=
+
+[extdiff]
+cmd.kdiff3 =
+cmd.vdiff=kdiff3
+
+[merge-tools]
+kdiff3-executable = /usr/bin/kdiff3
+kdiff3.args = $base $local $other -o $output
+kdiff3.premerge = False
+
+On a clone la base sur le homedir de jonathan comme ceci:
+/work/jd235850/usr/mercurial-2.1.1/hg clone -U /work/jd235850/New_algo_qc ~/Maquette_ifs_central_repository
+(l'option -U pour ne pas creer les fichiers .cpp et autres mais uniquement copier la base)
+
+
+Attention le fichier init_jd.sh doit etre le meme sur toutes les machines, pour l'instant il n'est prevu que pour le pc portable plus machine GRE, il faudra le changer pour inclure le pc saclay (ne pas oublier le .hgrc)
+
+Attention, apres un merge, avant de faire un push, bien verifier que le code compile plus faire quelques cas tests!!!!!

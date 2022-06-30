@@ -1,0 +1,24 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+echo $PWD $1
+cd ..
+# python ./ordre_cvg.py
+
+# cd EULER ; grep "ERROR FIELD 0.5" */*err > a
+# sed -e "s/Niv//g;s/\/calcul.err:GB: ERROR FIELD 0.5//g" a > b
+
+grep "ERROR FIELD 0.5" */*err > err_vit.txt && sed -i -e "s/Niv//g;s/\/calcul.err:GB: ERROR FIELD 0.5//g" err_vit.txt
+grep "ERROR P FIELD 0.5" */*err > err_press.txt && sed -i -e "s/Niv//g;s/\/calcul.err:GB: ERROR P FIELD 0.5//g" err_press.txt
+if [ `basename $PWD ` == "RK3" ] ; then
+cd ..
+gnuplot  << EOF
+set terminal "png"   
+set output "plot_vit.png"
+set log xy; plot  "EULER/err_vit.txt" u 1:2 w lp, "" u 1:3 w lp, "" u 1:4 w lp, \
+                  1e-11*x, "RK3/err_vit.txt" u 1:2 w lp, "" u 1:3 w lp, "" u 1:4 w lp, 1e-18*x*x*x
+set output "plot_pression.png"
+set log xy; plot  "EULER/err_press.txt" u 1:2 w lp, 1e-6*x, "RK3/err_press.txt" u 1:2 w lp, 1e-10*x*x*x
+EOF
+fi

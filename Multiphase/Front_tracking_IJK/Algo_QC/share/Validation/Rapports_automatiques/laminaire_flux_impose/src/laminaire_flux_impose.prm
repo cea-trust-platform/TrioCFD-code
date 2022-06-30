@@ -1,0 +1,34 @@
+parametres {
+	titre "Test 1 d'un nouvel algorithme pour le QC : canal périodique laminaire à flux imposé"
+	auteur "Adrien"
+	description "On vérifie que la température est linéaire. Cela n'est pas évident dans la mesure où on travaille sur la masse volumique et on en déduit la température."
+	casTest . laminaire_flux_impose.data  en annexe
+}
+Chapitre {
+
+	Figure
+	{
+	labelx y
+	labely °C
+	
+
+	Titre "Température"
+	Description "On compare la température calculée par le nouvel algorithme et celle prévue analytiquement. Comme le seul transfert thermique est la conduction et que les propriétés du gaz sont supposées constantes (sauf la masse volumique), le profil de température doit être linéaire. La pente de ce profil est déterminée par la condition à la limite de flux imposé. L'ordonnée à l'origine est déterminé par la conservation de la masse (combinée à la loi des gaz parfaits) dans le canal (domaine fermé)."
+	legende bottom
+	inclureDesccourbes 0
+	courbe {
+	fichier Moyennes_spatiales_Temp
+
+	legende calcul
+	style linespoints
+	}
+	courbe {
+
+	fonction 6666.667*x+257.778
+	legende analytique
+	style lines
+	}
+	}	
+
+	
+}

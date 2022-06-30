@@ -1,0 +1,50 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# ./schema_temps.sh
+# ./convection.sh
+# ./diffusion.sh
+#
+# Creation d'un cas CONVECTION en z:
+sed -e "s/_i /www/" \
+    -e "s/_k/_i/" \
+    -e "s/www/_k /" \
+    -e "s/_vx/www/" \
+    -e "s/_vz/_vx/" \
+    -e "s/www/_vz/" \
+    -e "s/_x/www/" \
+    -e "s/_z/_x/" \
+    -e "s/www/_z/" \
+    -e "s/bctype_i/bctype_k/" \
+    -e "s/0.003201 0.01325001 0.01245303125/0.01245303125 0.01325001 0.003201/" \
+    -e "s/0.003325 0.016001 0.01245303125/0.01245303125 0.016001 0.003325/" \
+   convection.data > convectionz.data
+
+sed -e "s/_i /_k /g" \
+    -e "s/CONVECTION/CONVECTIONZ/" \
+    -e "s/convection/convectionz/" \
+    -e "s/VX/VZ/g" \
+    -e "/valx/s/4/8/" \
+    -e "/cvgx_L2/s/3/5/" \
+    convection.sh > convectionz.sh
+
+chmod +x convectionz.sh
+mkdir -p PAR
+cp post_run PAR
+for fic in "convection" "convectionz" "schema_temps" "diffusion"
+do
+   # sh ./$fic.sh
+   # Il faut penser pour le ghost a avoir assez de mailles par proc 
+   # (ie au moins  5)
+   sed -e "s/nproc_i .*/nproc_i 2/g" \
+       -e "s/nproc_j .*/nproc_j 2/g" \
+       -e "s/nproc_k .*/nproc_k 2/g" \
+       -e "s/nbelem_k 5/nbelem_k 10/g" \
+       -e "s/nbelem_i 5/nbelem_i 10/g" \
+          $fic.data > PAR/${fic}_par8.data
+   if [ $fic == "schema_temps" ] ; then 
+       sed -i \
+           -e "s/nbelem_i 5/nbelem_i 10/g" \
+           -e "s/nbelem_j 5/nbelem_j 10/g" PAR/${fic}_par8.data
+   fi 
+done

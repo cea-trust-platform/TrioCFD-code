@@ -1,0 +1,1241 @@
+Parametres {
+	Titre "Statistiques par plan : Calcul des derivees (IJK_FT diphasique)"
+	Description "On impose une solution analytique pour P et les composantes de vitesse."  <<EOF
+Puis on fait un pas de temps, sans solveur. 
+Et on calcule les grads dans les stats.
+
+Pour la solution initiale, on impose : 
+$$ P = P_m (1+A cos(2 \pi x/ L_x+\phi_x)) (1+B cos(2 \pi y/L_y+\phi_y)) (1+C cos(\pi z/L_z))+(K_p) $$
+$$ U = U_m (1+D cos(2 \pi x/ L_x+\phi_x)) (1+E cos(2 \pi y/L_y+\phi_y)) sin(\pi z/L_z)+(K_u) $$
+$$ V = V_m (1+D cos(2 \pi x/ L_x+\phi_x)) (1+E cos(2 \pi y/L_y+\phi_y)) sin(\pi z/L_z)+(K_u) $$
+$$ W = W_m (1+D cos(2 \pi x/ L_x+\phi_x)) (1+E cos(2 \pi y/L_y+\phi_y)) sin(\pi z/L_z)+(K_u) $$
+
+avec pour respecter les conditions de periodicite et de vitesse nulle aux parois : 
+$$ K_u=0.   K_v=0.   K_w=0. $$
+
+Ce champ ne verifie pas divu=0. Pour valeurs numeriques, on prend : 
+
+A=B=C=D=E=1
+
+Lx=2.
+Ly=3.
+Lz=5.
+
+Pm=8.
+Um=10.
+Vm=7.
+Wm=3.
+
+Kp=-1
+
+phix=0.
+phiy=0.
+
+Les solutions analytiques des gradients et seconds gradients sont calcules et fournis dans le jdd. Les champs sont
+post-traites grace au mot cle check_stats. L'erreur entre le champ analytique et le gradient calcule par le code est
+calculee par visit (en norme Lmax ou L2). Les resultats sont resumes dans cette fiche. Tous les premiers gradients
+sont evalues au deuxieme ordre.   Les interpolations etant toujours centrees, elles sont d'ordre 2 :  
+$$ \hat{\phi}_i = \frac{\phi_{i+1}+\phi_i}{2} + \Delta^2 f" + \mathcal{O}(h^4) $$
+
+Le gradient de Pression est evalue aux faces (comme le champ de vitesse) a partir de la pression aux elements. La
+condition de periodicite est utilise en (xy). Selon z, aux parois, le gradient est suppose nul.  
+
+Le second gradient de pression est construit a partir du gradient aux faces. Il est evalue au centre des elems, en
+utilisant eventuellement des interpolations si necessaire (pour les croises).
+
+Statistiques_dns_ijk::face_to_cell_gradient
+Option bc_type = 0 : pour la vitesse, suppose une valeur nulle au bord (inusite en diphasique). 
+               = 1 : pour le grad P, suppose une valeur au bord egale a celle au centre de la derniere cellule.
+	             Mais pas tout a fait... 
+
+Les gradients sont calcules a partir des 2 voisins separes de h ou 2h selon la direction sauf pour les premieres et
+dernieres derivees en z (u denote ici une compo de gradP) : 
+$$ \\frac{\\partial u}{\\partial z} = \\frac{-4u_m + 3u_c +u_p}{3\Delta z} $$ pour le bord gauche, avec $u_m = 0$
+$$ \\frac{\\partial u}{\\partial z} = \\frac{-u_m - 3u_c +4u_p}{3\Delta z} $$ pour le bord en z+, avec $u_p = 0$
+ou les indices m, c, p designe : plus, centre et moins resp.
+
+Pour la vitesse, on a besoin de calculer le gradient a l'avance dans une premiere boucle pour pouvoir calculer les
+gradients doubles (croises) dans un deuxieme temps. Pour le gradient de vitesse, on calcule : 
+
+Statistiques_dns_ijk::compute_and_store_gradU_cell
+
+--> Cette methode contient les memes formules que face_to_cell_gradient(bc_type = 0), mais ne calcule pas autant de
+gradient et stocke ce qu'elle calcule dans un champ. 
+
+Les gradients sont calcules a partir des 2 voisins separes de h ou 2h selon la direction sauf pour les premieres et
+dernieres derivees en z : 
+$$ \\frac{\\partial u}{\\partial z} = \\frac{-4u_m + 3u_c +u_p}{3\Delta z} $$ pour le bord gauche, avec $u_m = 0$
+$$ \\frac{\\partial u}{\\partial z} = \\frac{-u_m - 3u_c +4u_p}{3\Delta z} $$ pour le bord en z+, avec $u_p = 0$
+ou les indices m, c, p designe : plus, centre et moins resp.
+
+Il ne reste plus que le second gradient de vitesse a calculer.
+Une partie et calcule dans Statistiques_dns_ijk::calculer_gradients_vitesse qui recalcule inutilement les premiers
+gradients de vitesse. Les derivees secondes droites (dxx ou dyy ou dzz) sont evaluees comme ceci : 
+$$  ddukdxx = (We_pi - 2*We_ci + We_mi ) / dx2 $$
+sauf pres des bords en z ou un schema decentre conduit a : 
+$$     dduidzz = (4*Ue_pk - 12*Ue_ck + 8*Ue_mk ) / (3*dz2) $$ pour le bord gauche;
+$$     dduidzz = (8*Ue_pk - 12*Ue_ck + 4*Ue_mk ) / (3*dz2) ;$$ pour le bord droit;
+
+Une autre methode evalue simplement par difference centree les autres composantes : 
+
+Statistiques_dns_ijk::cell_to_cell_gradient(i,j,k, \\
+			      field_dudx, field_dvdy, field_dwdx, \\
+			      field_dudz, field_dvdz, field_dwdz,  \\
+			      /* Et les outputs en ref aussi!! */ \\
+			      ddUdxdy, ddUdxdz, ddUdydz,  \\
+			      ddVdxdy, ddVdxdz, ddVdydz,  \\
+			      ddWdxdy, ddWdxdz, ddWdydz);
+
+L'astuce est de ne pas calculer a ce niveau de derivee en z pour eviter le traitement difficile des conditions aux
+limite. 
+
+RESULTATS : 
+Tous les premiers gradients sont d'ordre 2. 
+
+Pour la pression, les seconds gradients sont tous au second ordre, y compris les deux evaluations equivalentes des croisees d(dPdx)dz
+ou d(dPdz)dx et d(dPdy)dz ou d(dPdz)dy (regle de schwartz).
+
+Les seconds gradients de vitesse sont aussi au second ordre sauf les derivees secondes en z qui sont a l'ordre 1 (effet du pas
+variable a la condition limite de bord, d(dUdz)dz, d(dVdz)dz et d(dWdz)dz au bord).  
+
+On verifie aussi que les EV sont a jours en checkant que l'erreur en parralelle est la meme qu'en sequentiel pour un maillage N=40
+bi-decoupe dans toutes les directions. 
+
+En integrant les solutions analytiques par plans, on obtient de profils de reference a comparer au fichier statistiques
+monophasique_moyenne_spatiale_XXX.txt.
+
+EOF
+	Auteur "G.B."
+	CasTest N5/P111_U11 ijkft_stat_diph_gradUP.data
+	CasTest N10/P111_U11 ijkft_stat_diph_gradUP.data
+	CasTest N20/P111_U11 ijkft_stat_diph_gradUP.data
+	CasTest N40/P111_U11 ijkft_stat_diph_gradUP.data
+	CasTest N40/P111_U11 ijkft_stat_diph_gradUP_par8.data 8
+	CasTest N80/P111_U11 ijkft_stat_diph_gradUP_par8.data 8
+#	Prerequisite sh ./prereq_reprise.sh #
+	CasTest N80/P111_U11/R ijkft_stat_diph_gradUP_par8.data 8
+	Prerequisite visit -nowin -cli -s ./post_visit.py P 
+	Prerequisite visit -nowin -cli -s ./post_visit.py U
+	Prerequisite visit -nowin -cli -s ./post_visit.py V
+	Prerequisite visit -nowin -cli -s ./post_visit.py W
+#	Prerequisite ./post_visit.py #
+}
+Chapitre {
+	Titre "Validation des derivees pour la pression"
+	Description "on doit trouver du second ordre"
+        Figure {
+                Titre "Derivees (premieres) de la pression"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dPdx"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dPdy"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dPdz"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la pression"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddPdd_X"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddPdd_Y"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddPdd_Z"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddPdxdy"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddPdxdz"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddPdydz"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_P_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (premieres) de la pression"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dPdx"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dPdy"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dPdz"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la pression"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddPdd_X"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddPdd_Y"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddPdd_Z"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddPdxdy"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddPdxdz"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddPdydz"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_P_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+}
+Chapitre {
+	Titre "Validation des derivees pour la vitesse U"
+	Description "on doit trouver du second ordre (sauf ddUdzdz)"
+        Figure {
+                Titre "Derivees (premieres) de la vitesse U"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dUdx"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dUdy"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dUdz"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la vitesse U"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddUdd_X"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddUdd_Y"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddUdd_Z"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddUdxdy"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddUdxdz"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddUdydz"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_U_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (premieres) de la vitesse U"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dUdx"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dUdy"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dUdz"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la vitesse U"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddUdd_X"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddUdd_Y"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddUdd_Z"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddUdxdy"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddUdxdz"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddUdydz"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_U_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+}
+Chapitre {
+	Titre "Validation des derivees pour la vitesse V"
+	Description "on doit trouver du second ordre (sauf ddVdzdz)"
+        Figure {
+                Titre "Derivees (premieres) de la vitesse V"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dVdx"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dVdy"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dVdz"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la vitesse V"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddVdd_X"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddVdd_Y"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddVdd_Z"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddVdxdy"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddVdxdz"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddVdydz"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_V_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (premieres) de la vitesse V"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dVdx"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dVdy"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dVdz"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la vitesse V"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddVdd_X"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddVdd_Y"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddVdd_Z"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddVdxdy"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddVdxdz"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddVdydz"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_V_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+}
+Chapitre {
+	Titre "Validation des derivees pour la vitesse W"
+	Description "on doit trouver du second ordre (sauf ddWdzdz)"
+        Figure {
+                Titre "Derivees (premieres) de la vitesse W"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dWdx"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dWdy"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dWdz"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la vitesse W"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur max"
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddWdd_X"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddWdd_Y"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddWdd_Z"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddWdxdy"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddWdxdz"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddWdydz"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_W_max.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (premieres) de la vitesse W"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($2)
+                        style linespoints
+                        Legende "dWdx"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($3)
+                        style linespoints
+                        Legende "dWdy"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($4)
+                        style linespoints
+                        Legende "dWdz"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+        Figure {
+                Titre "Derivees (secondes) de la vitesse W"
+                incluredesccourbes 0
+                logX
+		logY
+		labelX  "Nx"
+                labelY  "Erreur L2"
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($5)
+                        style linespoints
+                        Legende "ddWdd_X"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($6)
+                        style linespoints
+                        Legende "ddWdd_Y"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($7)
+                        style linespoints
+                        Legende "ddWdd_Z"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($8)
+                        style linespoints
+                        Legende "ddWdxdy"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($9)
+                        style linespoints
+                        Legende "ddWdxdz"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 ($10)
+                        style linespoints
+                        Legende "ddWdydz"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 (10.*$1**-1)
+                        style lines
+                        Legende "ordre 1"
+                }
+                courbe {
+                        fichier cvg_W_L2.txt
+                        colonnes $1 (100.*$1**-2)
+                        style lines
+                        Legende "ordre 2"
+                }
+	}
+}
+
+
+
+
+Chapitre {
+	Titre "Verification des moyennes par plan"
+	Description "Comparaison de la valeur dans le fichier monophasique_moyenne_spatiale_0.000155.txt" <<EOF
+a la solution analytique. On verifie que le calcul et la ref se superposent. 
+Comme il y a trop de stats, on n'en verifie que quelques une.
+On pourrait poursuivre au dela de colonne 180 : IWdPdx... 
+mais je trouve que ca fait trop de courbes...
+
+
+EOF
+	
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la vitesse U"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "Ul"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  3
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 10.*sin(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la vitesse V"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "Vl"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  4
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction (  7.*sin(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la vitesse W"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "Wl"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  5
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction (  3.*sin(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la pression"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "P"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  6
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 8*(1+cos(pi*x/5))-1)
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la correlation UU"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "UUl"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  11
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 10.*sin(pi*x/5)*10.*sin(pi*x/5)*9./4.)
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la correlation UV"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "UVl"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  14
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 10.*sin(pi*x/5)*7.*sin(pi*x/5)*9./4.)
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la correlation UW"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "UWl"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  16
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 10.*sin(pi*x/5)*3.*sin(pi*x/5)*9./4.)
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la correlation UUU"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "UUUl"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  17
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( (10.*sin(pi*x/5))**3*5./2.*5./2.)
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la correlation UP "
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "UP"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  27
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 10.*8.*9./4.*(1+cos(pi*x/5))*sin(pi*x/5)-10.*sin(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de derivees de la vitesse selon x ou y"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "dUidx ou dUidy"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 72
+                        style linespoints
+                        Legende "Col 72"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 73
+                        style linespoints
+                        Legende "Col 73"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 74
+                        style linespoints
+                        Legende "Col 74"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 75
+                        style linespoints
+                        Legende "Col 75"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 76
+                        style linespoints
+                        Legende "Col 76"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 77
+                        style linespoints
+                        Legende "Col 77"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        Fonction 0.
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la derivee dUdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "dUdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  78
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( 10.*pi/5.*cos(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la derivee dVdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "dVdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  79
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction (  7.*pi/5.*cos(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la derivee dWdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "dWdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  80
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction (  3.*pi/5.*cos(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de du correlation PdUdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "PdUdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  87
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction (  10.*8.*9./4.*(1+cos(pi*x/5))*pi/5.*cos(pi*x/5)-10.*pi/5.*cos(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la correlation PdWdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "PdWdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  89
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction (  3.*8.*9./4.*(1+cos(pi*x/5))*pi/5.*cos(pi*x/5)-3.*pi/5.*cos(pi*x/5))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la derivee dPdx ou dPdy ou VdPdx ou VdPdy"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "dPdx ou dPdy ou VdPdx ou VdPdy"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 171
+                        style linespoints
+                        Legende "Col 171"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 172
+                        style linespoints
+                        Legende "Col 172"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 177
+                        style linespoints
+                        Legende "Col 177"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1 178
+                        style linespoints
+                        Legende "Col 178"
+                }
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        Fonction 0.
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la derivee dPdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "dPdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  173
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( -8*pi/5.*sin(pi*x/5.))
+                        style lines
+                        Legende "ref"
+                }
+	}
+        Figure {
+                Titre "Moyenne instantanee plan (xy) de la derivee VdPdz"
+                incluredesccourbes 0
+		labelX  "z"
+                labelY  "VdPdz"
+                courbe {
+                        fichier N80/P111_U11/monophasique_moyenne_spatiale_0.000155.txt
+                        colonnes $1  179
+                        style linespoints
+                        Legende "Calcul N80"
+                }
+                courbe {
+                        Fonction ( -2*7*9*pi/5*sin(pi*x/5.)*sin(pi*x/5.))
+                        style lines
+                        Legende "ref"
+                }
+	}
+# P =  8.*(1+1*cos(3.141592653589793*x))*(1+1*cos(2.*3.141592653589793*y/3.+0.))*(1+1*cos(3.141592653589793*z/5.))
+#  vy_dPdz 7.*8.*(1+cos(3.141592653589793*x))*(1+cos(3.141592653589793*x))
+#               *(1+cos(2.*3.141592653589793*y/3.))*(1+cos(2.*3.141592653589793*y/3.))
+#               *sin(pi*z/5.)*(-pi/5.*sin(pi*z/5.))
+
+}
+
+Chapitre {
+	Titre "Reprise"
+	Description "Verification de la reprise" <<EOF
+On check simplement qu'il y ait 2 lignes dans le tableau.
+On n'affiche que les 9 premieres colonnes (il n'en a que 9).
+EOF
+
+         Table {
+                 Title "fichier reprise acceleration.out"
+                 description "The table below headlines of the *acceleration.out file."
+                 description " "
+
+                 nb_columns 8
+                 Label  time|Vx|rhoVx|tauw|da/dt|NewT|acceleration|fac_var_source
+                 lines {
+                            nb_columns_file 9
+                            file ./N80/P111_U11/R/ijkft_stat_diph_gradUP_par8_acceleration.out
+                       }
+         }
+}
+

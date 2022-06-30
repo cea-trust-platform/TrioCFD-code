@@ -1,0 +1,11 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+# python ./ordre_cvg.py
+cd ..
+cas=`echo $1|sed "s/_par8//g"`
+./$cas.sh
+
+[ $cas == "convection" ] && ./${cas}z.sh
+

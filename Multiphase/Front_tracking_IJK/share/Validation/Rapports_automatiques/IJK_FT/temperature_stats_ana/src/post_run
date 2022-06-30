@@ -1,0 +1,10 @@
+#!/bin/bash
+# Ce script est execute apres avoir lance les cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+# python ./ordre_cvg.py
+source $project_directory/share/PyTools3/venv/bin/activate
+echo "-> Start Post-Processing"
+python ./post-trait.py
+echo "-> End Post-Processing"
+

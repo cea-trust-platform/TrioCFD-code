@@ -1,0 +1,82 @@
+Parametres {
+	Titre "Barycentrage et lissage front-tracking en IJK"
+	Description ""
+	Auteur "G.B."
+	CasTest . bary1.data     8
+	CasTest . baryliss1.data 8
+	CasTest . bary4.data     8
+	CasTest . baryliss4.data 8
+	CasTest . bary6.data     8
+	CasTest . baryliss6.data 8
+}
+
+Chapitre {
+	Titre "Verification visuelle"
+
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+	visu {
+		titre "Etat final barycentrage"
+		cycles -1
+		mesh        bary4.lata INTERFACES
+		pseudocolor bary4.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+	visu {
+		titre "Etat final barycentrage+lissage"
+		cycles -1
+		mesh        baryliss4.lata INTERFACES
+		pseudocolor baryliss4.lata INTERFACES COMPO_CONNEXE ELEM
+	}
+}
+
+Chapitre {
+	Titre "Verification de la conservation du volume"
+	Description "Trace de la variation du volume de la bulle, relative au volume initial."
+	Description "On doit voir de l'ordre de 1E-6 pour 1 iteration et 1E-10 pour 4 iterations."
+	Figure {
+		Titre "Variation de volume"
+		incluredesccourbes 0
+		logY
+		labelX  "t"
+		labelY  "abs((vol(t) - vol(t=0) / vol(t=0))"
+		courbe {
+			fichier bary1_bulles_dvolume.out
+			colonnes ($1) (abs($2)+1e-17)
+			style linespoints
+			Legende "bary, 1 iter correction"
+		}
+		courbe {
+			fichier baryliss1_bulles_dvolume.out
+			colonnes ($1) (abs($2)+1e-17)
+			style linespoints
+			Legende "bary+liss, 1 iter correction"
+		}
+		courbe {
+			fichier bary4_bulles_dvolume.out
+			colonnes ($1) (abs($2)+1e-17)
+			style linespoints
+			Legende "bary, 4 iter correction"
+		}
+		courbe {
+			fichier baryliss4_bulles_dvolume.out
+			colonnes ($1) (abs($2)+1e-17)
+			style linespoints
+			Legende "bary+liss, 4 iter correction"
+		}
+		courbe {
+			fichier bary6_bulles_dvolume.out
+			colonnes ($1) (abs($2)+1e-17)
+			style linespoints
+			Legende "bary, 6 iter correction"
+		}
+		courbe {
+			fichier baryliss6_bulles_dvolume.out
+			colonnes ($1) (abs($2)+1e-17)
+			style linespoints
+			Legende "bary+liss, 6 iter correction"
+		}
+	}
+}

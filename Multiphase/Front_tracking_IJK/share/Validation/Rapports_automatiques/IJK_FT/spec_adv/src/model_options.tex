@@ -1,0 +1,91 @@
+Le premier test correspond à résoudre les équations : 
+
+\begin{align*}
+&\bm{f} = 2 cos(\k_1 x - \o_{1/2} t) \bm{e_y} \\
+&\p_t \bm{u} = - \frac{1}{\r} \bm{\nabla} p + \bm{f} \\                
+&\bm{ \nabla \cdot u } = 0 \\
+\end{align*}
+
+$f$ ne dépend que de $x$ et de $t$. $f$ est la seule cause de mouvement dans ce problème. Ainsi les grandeurs du problème sont indépendantes de $y$ et de $z$ ($\p_y = \p_z = 0$ et $p=p(x,t)$ notamment). L'équation de Poisson pour la pression est : $\D p = 0$. Par conséquent $\p_x p  = C(t)$. Le champ de pression respecte la condition de périodicité si $C(t) = 0$. Le champ de pression est donc constant et uniforme.
+La composante $y$ de l'équation de conservation de quantité de mouvement donne : 
+
+\begin{align*}
+&\p_t u_y = f_y = 2 cos(\k_1 x - \o_{1/2} t)\\ 
+\end{align*}
+
+Ce premier test a pour solution analytique :
+\begin{mdframed}
+\begin{align*} 
+&\bm{u}(\bm{x};t) = - \frac{2}{\o_{1/2}} sin(\k_1 x - \o_{1/2} t)  \\
+&p(\bm{x};t)=p.   
+\end{align*}
+\end{mdframed}
+\ti{Onde de vitesse}
+
+Le deuxième test correspond à résoudre les équations : 
+
+\begin{align*}
+&\bm{f} = 2 cos(\k_1 x - \o_{1/2} t) \bm{e_x} \\
+&\p_t \bm{u} = - \frac{1}{\r} \bm{\nabla} p + \bm{f} \\                
+&\bm{ \nabla \cdot u } = 0 \\
+\end{align*}
+
+De même que pour le test précédent, les grandeurs du problème sont indépendantes de $y$ et de $z$. L’équation de Poisson pour la pression est $\D p = \r \na \cdot f$ et se développe :  
+
+\begin{align*}
+&\p_{xx} p= - 2 \r \k_1 sin(\k_1 x - \o_{1/2} t) \\
+&p(x,t) = 2 \frac{\r}{\k_1} sin(\k_1 x - \o_{1/2} t)
+\end{align*}
+
+Ce deuxième test a donc pour solution analytique (\ti{ce cas a un peu plus de justificaitons a dooner. En relisant je me is que c'est mieux de les donner qd même}): 
+
+\begin{mdframed}
+\begin{align*} 
+&p(\bm{x},t) = - 2 \frac{\r}{\k_1} sin(\k_1 x - \o_{1/2} t)  \\
+&\bm{u} = \bm{0}.   
+\end{align*}
+\end{mdframed}
+\ti{Onde de pression}
+
+On montre facilement que les tests suivants ont respectivement pour solutions analytiques : 
+
+Troisième test : 
+\begin{mdframed}
+\begin{align*} 
+&p(\bm{x},t) = - 2 \frac{\r}{\k_1} sin(\k_1 y - \o_{1/2} t)  \\
+&\bm{u} = \bm{0}.   
+\end{align*}
+\end{mdframed}
+\ti{Onde de pression}
+
+Quatrième test : 
+\begin{mdframed}
+\begin{align*} 
+&p(\bm{x},t) = - 2 \frac{\r}{\k_1} sin(\k_1 z - \o_{1/2} t)  \\
+&\bm{u} = \bm{0}.   
+\end{align*}
+\end{mdframed}
+\ti{Onde de pression}
+
+Cinquième test : 
+\begin{mdframed}
+\begin{align*} 
+&p(\bm{x},t) = - \frac{2}{\sqrt{2}} \frac{\r}{\k_1} sin(\k_1 (x-z) - \o_{1/2} t) \\
+&\bm{u} = \bm{0}.   
+\end{align*}
+\end{mdframed}
+\ti{Onde de pression}
+
+\tb{Applications numériques} : Le valeurs numériques des paramètres $\k_1$; $\o_{1/2}$ ainsi que les normes des solutions analytiques des tests sont regroupées dans le tableau \ref{tab : AN}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c}
+ N  & $\k_1(rad.m^{-1})$        & $\o_{1/2}(rad.s^{-1})$ & $2/ \o_{1/2}$ (sol. 1) & $2 \r / \k_1$ (sol. 2,3,4) & $\sqrt(2) \r / \k_1$ (sol. 5)  \\ \hline
+ 40 & 1571                      &   12.57                & 0.1592                &   1.491                    & 1.054
+\end{tabular}
+\end{center}
+\caption{Nombre de mailles par direction et applications numériques}
+\label{tab : AN}
+\end{table}
+

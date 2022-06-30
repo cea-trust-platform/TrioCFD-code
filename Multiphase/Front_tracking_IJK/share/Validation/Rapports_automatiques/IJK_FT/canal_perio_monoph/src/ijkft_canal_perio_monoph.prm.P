@@ -1,0 +1,139 @@
+Parametres {
+	Titre "Poiseuille monophasique en IJK : Cas laminaire (Ret=1) et turbulent (Ret180)"
+	Description ""
+	Auteur "G.B."
+	CasTest Ret1       ijkft_canal_perio_monoph_Ret1 8
+	CasTest Ret1       ijkft_canal_perio_monoph_Ret1_repr 8
+	CasTest Ret1_RK3   ijkft_canal_perio_monoph_Ret1_RK3 8
+	CasTest Ret1_RK3   ijkft_canal_perio_monoph_Ret1_RK3_repr 8
+	CasTest Ret180     ijkft_canal_perio_monoph_Ret180 8
+	CasTest Ret180     ijkft_canal_perio_monoph_Ret180_repr 8
+	CasTest Ret180_RK3 ijkft_canal_perio_monoph_Ret180_RK3 8
+	CasTest Ret180_RK3 ijkft_canal_perio_monoph_Ret180_RK3_repr 8
+}
+
+Chapitre {
+	Titre "Presentation generale"
+	Description "La partie diphasique est disable par disable_diphasique."
+	Description "On teste le terme de forcage (avec ou sans asservissement pour Ret=1 et 180 respectivement) et la reprise."
+	Description "- Le cas Ret=1 debute avec un champ de vitesse initial perturbe. La force est asservie pour atteindre la vitesse debitante objectif fixee : 0.3339842 "
+	Description "  Cette vitesse a ete obtenue par un calcul long jusqu'au stationnaire en imposant la force constante pour que Ret vaille 1."
+
+	Description "- Le cas Ret=180 debute avec un champ de vitesse repris. tau/h est impose en terme source pour que Ret vaille 180." 
+		
+	Description "Validation aussi du pilotage en pas de temps par le CFL et le Fo."
+	Description "- Le nombre de Fourier pilote pour le cas Ret=1."
+	Description "- Le CFL pilote pour le cas Ret=180."
+
+	Description "Validation de la reprise des statistiques sur les 2 cas. Les statistiques doivent evoluer continuement a la reprise."
+	
+	Description "Validation du schema temps RK3_FT en monophasique... (a analyser : c'est peut etre normal qu'on n'ai pas les memes resu qu'avec euler)"
+	
+	Description Explication du forcage : <<EOF
+
+   ----------------------------------------------------------------- 
+   
+               FORCAGE DE L'ECOULEMENT :                        
+	            
+   ----------------------------------------------------------------- 
+   
+   expression_derivee_force   A*(Ub_objectif+(b*C/a)-v_moy)-B*force  
+   
+   avec C = rho * tau_moy/h 
+   
+         A = omega**2 * rho
+	 
+         B = 2 * omega * rho 
+	 
+   terme_force_init = C = tau_moy/h 
+   
+   Choix 1 : Ub = 0.33398423   et $\omega = 10. s^{-1}$  
+
+   La vitesse cible Ub a ete determinee par un expression_derivee_force nul.
+
+EOF
+}
+
+#Pmacro DOING_ALL(_VALREY_,_TREPR_)
+	visu {
+		titre "Etat initial Pression"
+		cycles 0
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY_.lata DOM PRESSURE ELEM
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	visu {
+		titre "Etat initial Vitesse"
+		cycles 0
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY_.lata DOM_dual VELOCITY_X FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	
+	visu {
+		titre "Etat final Pression"
+		cycles -1
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY_.lata DOM PRESSURE ELEM
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	visu {
+		titre "Etat final Vitesse x"
+		cycles -1
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY_.lata DOM_dual VELOCITY_X FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	visu {
+		titre "Etat final Vitesse y"
+		cycles -1
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY_.lata DOM_dual VELOCITY_Y FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}	
+	visu {
+		titre "Etat final Reprise Pression"
+		cycles -1
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY__repr.lata DOM PRESSURE ELEM
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	visu {
+		titre "Etat final Reprise Vitesse"
+		cycles -1
+		pseudocolor Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY__repr.lata DOM_dual VELOCITY_X FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	Figure {
+		Titre "Vitesse axiale moyennee par plan (instantane)"
+		Description "Les traits les plus sombres correspondent aux derniers instants. On doit voir un poiseuille."
+		Image Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY__Uinst.png
+	}
+	Figure {
+		Titre "Evolution temporelle du Reynolds"
+		Description "Les courbes doivent etre continues a la sauvegarde/reprise (ie T= _TREPR_)."
+		Description "Le pas de Ret doit se stabiliser autour de 1"
+		Image Ret_VALREY_/ijkft_canal_perio_monoph_Ret_VALREY__multi.png
+	}
+#Pendmacro(DOING_ALL)
+
+Chapitre {
+	Titre "Calcul laminaire Ret = 1"
+#Pusemacro(DOING_ALL)(1, 0.4213)
+}
+
+Chapitre {
+	Titre "Calcul laminaire Ret = 1 -- Schema RK3"
+#Pusemacro(DOING_ALL)(1, X.XXXX)
+}
+
+Chapitre {
+	Titre "Calcul turbulent Ret = 180"
+#Pusemacro(DOING_ALL)(180, 4.98374)
+}
+
+Chapitre {
+	Titre "Calcul turbulent Ret = 180 -- Schema RK3"
+#Pusemacro(DOING_ALL)(180_RK3, 6.63678)
+}

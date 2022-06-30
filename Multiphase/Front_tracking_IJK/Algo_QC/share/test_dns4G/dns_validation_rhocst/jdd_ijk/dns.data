@@ -1,0 +1,81 @@
+# 
+15/05/2013
+Benoit Mathieu et Adrien Toutant
+Canal turbulent isotherme pour validation du qc
+(pour comparaison des grandeurs statistiques entre le codage vdf et le codage ijk)
+Reprise du champ de vitesse a partir d'un champ instantane calcule sur jade 
+avec l'algorithme vdf.
+Sur Castor avec 64 procs: 9.5s/dt
+#
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 384
+  nbelem_j 384
+  uniform_domain_size_i 0.187528
+  uniform_domain_size_j 0.093764
+  file_coord_k          coord_k_level0.txt
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 8
+  nproc_j 8
+  nproc_k 1
+  process_grouping_i 2
+  process_grouping_j 2
+  process_grouping_k 1
+}
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting
+  timestep 1
+  nb_pas_dt_max 30000
+  multigrid_solver {
+   coarsen_operators 6
+	Coarsen_Operator_K { file_z_coord coord_k_level1.txt } 
+	Coarsen_Operator_K { file_z_coord coord_k_level2.txt }
+	Coarsen_Operator_K { file_z_coord coord_k_level3.txt }
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 2 coarsen_k 2 }
+	Coarsen_Operator_Uniform {  }
+	Coarsen_Operator_Uniform {  }
+    ghost_size 2
+    pre_smooth_steps 6 5 5 5 11 11 11
+    smooth_steps 6 5 5 5 11 11 11
+    relax_jacobi 6 0.69 0.69 0.69 0.65 0.65 0.65
+    solveur_grossier GCP { seuil  0.5e-9 precond ssor { omega 1.5 } }
+    check_residu 0
+    seuil 2.5e-9
+    nb_full_mg_steps 2 3 1 
+    solver_precision mixed
+    impr
+  }
+  timestep_facsec 1.
+  
+  tinit 0.
+  fichier_reprise_vitesse dns_ijk_swapped.lata
+  timestep_reprise_vitesse 1
+  expression_t_init  293.0
+
+  dt_post 1000
+  champs_a_postraiter 3 velocity pressure temperature 
+  dt_sauvegarde 10000
+  nom_sauvegarde dns.sauv
+  check_stop_file dns.stop
+
+  t_paroi_impose_kmin 293.0
+  t_paroi_impose_kmax 293.0
+  p_thermo_init       1.0E5
+  cp                  1005.0
+  gamma               1.4 
+
+  terme_force_init    2.2
+  expression_derivee_force (2.96795-v_moyen)*4e8-(force-2.2)*4e4
+}

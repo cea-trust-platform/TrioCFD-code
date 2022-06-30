@@ -1,0 +1,187 @@
+Parametres {
+	Titre "Ecoulement à bulles en canal / en essaim de bulles libres / en essaim de bulles fixes"
+	Auteur "A.C."
+	CasTest . DNS_canal.data 4
+	CasTest . DNS_swarm.data 4
+	CasTest . DNS_fixe.data 4
+	# CasTest . DNS_fixe_reprise.data 4 #
+	# CasTest . DNS_fixe_reprise_reset.data 4 #
+	# CasTest . switch.data #
+    # CasTest . DNS_canal_refine.data 4 #
+}
+
+
+
+
+Chapitre {
+
+	Titre "Resultats interfaces"
+	
+	visu {
+		titre "Canal : Etat final (maillage et interfaces)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		mesh        diph_canal.sauv.lata INTERFACES
+	}
+	
+	visu {
+		titre "Essaim libre : Etat final (maillage et interfaces)"
+		nb_img_without_newline 1
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		mesh        diph_swarm.sauv.lata INTERFACES
+	}
+
+	visu {
+		titre "Essaim fixe : Etat final (maillage et interfaces)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		mesh        diph_fixe.sauv.lata INTERFACES
+	}
+
+}
+
+
+Chapitre {
+
+	Titre "Resultats champs de vitesse"
+
+	visu {
+		titre "Canal : Etat final (vz)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor diph_canal.sauv.lata DOM_dual VELOCITY_X FACES
+	}
+
+	visu {
+		titre "Essaim libre : Etat final (vz)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor diph_swarm.sauv.lata DOM_dual VELOCITY_X FACES
+	}
+
+	visu {
+		titre "Essaim fixe : Etat final (vz)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor diph_fixe.sauv.lata DOM_dual VELOCITY_X FACES
+	}
+
+	visu {
+		titre "Essaim fixe : Etat final (vz moyenne en temps)"
+		Normal3d 0 1 0
+		Up3D 1 0 0
+		zoom3D 0 0 1.
+		pseudocolor diph_fixe.sauv.lata DOM_dual INTEGRATED_VELOCITY_X FACES
+	}
+
+
+
+
+
+}
+
+
+Chapitre {
+
+	Titre "Resultats convergence en temps"
+
+	figure {
+		titre "debit en fonction du temps pour le canal"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "debit"
+		Courbe {
+		   fichier DNS_canal_acceleration.out
+		   colonnes ($2) ($4)
+		}
+	}
+
+
+	figure {
+		titre "debit en fonction du temps pour les essaims"
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "debit"
+		Courbe {
+		   fichier DNS_swarm_acceleration.out
+		   colonnes ($2) ($4)
+		}
+		Courbe {
+		   fichier DNS_fixe_acceleration.out
+		   colonnes ($2) ($4)
+		}
+	}
+		
+}
+
+
+
+Chapitre {
+
+	Titre "Resultats statistiques"
+
+	figure {
+		titre "taux de vide pour un ecoulement en canal"
+		incluredesccourbes 0
+		labelX  "z"
+		labelY  "taux de vide"
+		Courbe {
+		   fichier diphasique_statistiques_0.030000.txt
+		   colonnes ($1) ($2)
+		}
+	}
+
+	figure {
+		titre "taux de vide pour essaims"
+		incluredesccourbes 0
+		labelX  "z"
+		labelY  "taux de vide"
+		Courbe {
+		   fichier diphasique_statistiques_0.030000.txt
+		   colonnes ($1) ($2)
+		}
+		Courbe {
+		   fichier diphasique_statistiques_0.009000.txt
+		   colonnes ($1) ($2)
+		}
+
+	}
+
+
+
+	figure {
+		titre "vitesse relative pour un ecoulement en canal"
+		incluredesccourbes 0
+		labelX  "z"
+		labelY  "ur"
+		Courbe {
+		   fichier diphasique_statistiques_0.030000.txt
+		   colonnes ($1) ((($7)/(1.-($2)))-(($3)/($2)))
+		}
+	}
+
+	figure {
+		titre "vitesse relative pour essaims"
+		incluredesccourbes 0
+		labelX  "z"
+		labelY  "ur"
+		Courbe {
+		   fichier diphasique_statistiques_0.030000.txt
+		   colonnes ($1) ((($7)/(1.-($2)))-(($3)/($2)))
+		}
+		Courbe {
+		   fichier diphasique_statistiques_0.009000.txt
+		   colonnes ($1) ((($7)/(1.-($2)))-(($3)/($2)))
+		}
+
+	}
+
+}
+

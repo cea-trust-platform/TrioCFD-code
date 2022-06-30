@@ -1,0 +1,11 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+for file in bary1 baryliss1 bary4 baryliss4 bary6 baryliss6
+do
+  if test -f ${file}_bulles_volume.out
+  then
+    awk 'NR==1{v1=$2}
+{printf "%.13g %.13g\n",$1,($2-v1)/v1}' ${file}_bulles_volume.out >${file}_bulles_dvolume.out
+  fi
+done
+

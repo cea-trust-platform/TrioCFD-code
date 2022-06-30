@@ -1,0 +1,2 @@
+tar xzf ref.tgz
+compare_lata dns.sauv.lata ref/dns.sauv.lata

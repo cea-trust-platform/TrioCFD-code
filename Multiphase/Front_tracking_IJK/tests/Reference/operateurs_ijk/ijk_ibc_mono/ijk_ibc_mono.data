@@ -1,0 +1,60 @@
+# A cylinder modeled with ibc #
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 32
+  nbelem_j 2
+  nbelem_k 24
+  uniform_domain_size_i 2.
+  uniform_domain_size_j 1.
+  uniform_domain_size_k 1.5
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+# DEBUT MAILLAGE #
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1  
+# FIN MAILLAGE # 
+# DEBUT LECTURE 
+  nproc_i 4
+  nproc_j 1
+  nproc_k 1
+ FIN LECTURE #
+}
+
+# DEBUT DECOUPAGE 
+Fin
+ FIN DECOUPAGE #
+
+IJK_problem_double 
+{
+  ijk_splitting grid_splitting
+  timestep 4e-6
+  nb_pas_dt_max 2
+  pressure_gradient 200
+  multigrid_solver {
+    solver_precision double
+    coarsen_operators 2
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.75
+    solveur_grossier GCP { seuil 1  precond ssor { omega 1.5 } }
+    seuil 1
+    nb_full_mg_steps 2 10 1
+    impr
+  }
+  check_divergence  
+}
+lata_to_other lml nom_du_cas.lata nom_du_cas.lml
+Fin

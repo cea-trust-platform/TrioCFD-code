@@ -1,0 +1,53 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+cd Ret1
+# tar xvzf ../init.tgz
+ln -sf ../post_run . 
+sed -e "/nom_sauvegarde/d" \
+    -e "/nom_reprise/s/#//g" \
+    ijkft_canal_perio_monoph_Ret1.data  > ijkft_canal_perio_monoph_Ret1_repr.data
+
+cd ..
+mkdir -p Ret1_RK3
+cd Ret1_RK3
+ln -sf ../post_run . 
+# tar xvzf ../init.tgz
+sed -e "/time_scheme/s/#//g" \
+    ../Ret1/ijkft_canal_perio_monoph_Ret1.data > ijkft_canal_perio_monoph_Ret1_RK3.data
+
+sed -e "/nom_sauvegarde/d"  \
+    -e "/nom_reprise/s/#//g" \
+    ijkft_canal_perio_monoph_Ret1_RK3.data  > ijkft_canal_perio_monoph_Ret1_RK3_repr.data
+
+
+
+# sed -e "s/time_scheme RK3_FT/time_scheme euler_explicite/g" \
+#     -e "s/dt_post 1000/dt_post 100/g" \
+#     -e "s/nb_pas_dt_max 2000/nb_pas_dt_max 500/g" \
+#     ijkft_canal_perio_monoph_Ret1.data  > ../Ret1_Euler/ijkft_canal_perio_monoph_Ret1_Euler.data
+# 
+# cd ../Ret1_Euler
+# tar xvzf ../init.tgz
+
+cd ../Ret180
+ln -sf ../post_run . 
+# tar xvzf ../init.tgz
+tar xzf ../vitesse_Ret180.tgz
+sed -e "/nom_sauvegarde/d"  \
+    -e "/nom_reprise/s/#//g" \
+    ijkft_canal_perio_monoph_Ret180.data  > ijkft_canal_perio_monoph_Ret180_repr.data
+
+
+cd ..
+mkdir -p Ret180_RK3
+cd Ret180_RK3
+ln -sf ../post_run . 
+# tar xvzf ../init.tgz
+tar xzf ../vitesse_Ret180.tgz
+sed -e "/time_scheme/s/#//g" \
+    ../Ret180/ijkft_canal_perio_monoph_Ret180.data > ijkft_canal_perio_monoph_Ret180_RK3.data
+
+sed -e "/nom_sauvegarde/d"  \
+    -e "/nom_reprise/s/#//g" \
+    ijkft_canal_perio_monoph_Ret180_RK3.data  > ijkft_canal_perio_monoph_Ret180_RK3_repr.data

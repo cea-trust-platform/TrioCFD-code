@@ -1,0 +1,8 @@
+# Decompacte le fichier lata contenant le maillage front-tracking initial
+tar xzf init.lata.tgz
+
+# Genere le fichier Debog en mode write_pass
+sed 's/check_pass/write_pass/' ijkft_debog.data >prepare.data
+
+triou prepare.data
+

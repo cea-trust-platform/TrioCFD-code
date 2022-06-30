@@ -1,0 +1,28 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 2 bulles : une sur l'axe de rotation, l'autre non
+cat >deplacements.txt <<EOF
+0. 0. 0.1 bulle3.msh
+0.1  0. 0.1 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Calcul avec lissage : 
+sed -e "s/# DEBUT REMAILL/# DEBUT REMAILL #/" \
+    -e "s/FIN REMAILL #/# FIN REMAILL #/" \
+    vinterp_repere_local.data > vinterp_repere_local_avec_remaillage.data
+
+# Calcul RK3 avec lissage : 
+mkdir -p RK3 
+sed -e "/time_scheme/s/#//g" \
+    vinterp_repere_local_avec_remaillage.data > RK3/vinterp_repere_local_avec_remaillage.data
+
+cd RK3
+ln -sf ../init* .

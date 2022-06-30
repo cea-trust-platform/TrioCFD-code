@@ -1,0 +1,17 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+# python ./ordre_cvg.py
+cas=`echo $1`
+rm -r CONVERGENCE 
+mkdir CONVERGENCE
+echo "Début post traitement"
+cd CONVERGENCE/
+cp ../$cas.data .
+cp ../$cas.sh .
+chmod +x ./$cas.sh
+./$cas.sh
+cd ..
+echo "Fin de post traitement"
+

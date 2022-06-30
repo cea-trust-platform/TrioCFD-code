@@ -1,0 +1,3 @@
+plot "Moyennes_spatiales_Temp_0.100047" u 1:($10*1005+$22),"Moyennes_spatiales_Temp_0.100047" u 1:($10*1005),"Moyennes_spatiales_Temp_0.100047" u 1:22,"Moyennes_spatiales_Temp_0.100047" u 1:23
+
+plot "Moyennes_spatiales_Temp_0.150004" u 1:($10*1005+$22),"Moyennes_spatiales_Temp_0.150004" u 1:($10*1005),"Moyennes_spatiales_Temp_0.150004" u 1:22,"Moyennes_spatiales_Temp_0.150004" u 1:23

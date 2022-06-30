@@ -1,0 +1,13 @@
+LATA_V2.1
+titi
+Trio_U
+Format LITTLE_ENDIAN,C_INDEXING,C_ORDERING,F_MARKERS_NO,INT32,REAL32
+Geom DOM type_elem=HEXAEDRE
+Champ SOMMETS_IJK_I ConvSpherePerio.repr.lata.coordx geometrie=DOM size=33 composantes=1
+Champ SOMMETS_IJK_J ConvSpherePerio.repr.lata.coordy geometrie=DOM size=17 composantes=1
+Champ SOMMETS_IJK_K ConvSpherePerio.repr.lata.coordz geometrie=DOM size=65 composantes=1
+TEMPS 0.03
+Champ VELOCITY ConvSpherePerio.repr.lata.0.VELOCITY geometrie=DOM size=36465 localisation=FACES composantes=3 nature=vector
+Geom INTERFACES type_elem=TRIANGLE_3D
+Champ SOMMETS ConvSpherePerio.repr.lata.0.INTERFACES.SOMMETS geometrie=INTERFACES size=1357 composantes=3
+Champ ELEMENTS ConvSpherePerio.repr.lata.0.INTERFACES.ELEMENTS geometrie=INTERFACES size=2708 composantes=3 format=INT32

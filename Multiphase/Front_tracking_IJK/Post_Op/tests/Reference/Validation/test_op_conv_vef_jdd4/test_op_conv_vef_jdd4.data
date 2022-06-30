@@ -1,0 +1,190 @@
+# Test dirchlet entree #
+# PARALLEL OK 8 #
+
+dimension 2
+Domaine dom_canal
+
+# DEBUT MAILLAGE #
+Mailler dom_canal
+        {
+        Pave Cavite
+                {
+                Origine 0. 0.
+		 /* Nombre_de_Noeuds  79 79 */  
+		 Nombre_de_Noeuds  11 11 
+		Longueurs  6.28318530717959 6.28318530717959
+		}
+
+                {
+		Bord periox   X = 0.                      0. <= Y <= 6.28318530717959
+                Bord periox  X = 6.28318530717959        0. <= Y <= 6.28318530717959    
+                Bord perioy   Y = 0.            	  0. <= X <= 6.28318530717959  
+                Bord perioy   Y = 6.28318530717959        0. <= X <= 6.28318530717959     
+
+                }
+        }
+trianguler_h dom_canal
+# FIN MAILLAGE #
+# DEBUT DECOUPAGE
+
+Decouper dom_canal
+{
+        Partitionneur metis { nb_parts  2 }
+        Larg_joint 2
+        Nom_Zones DOM
+	Periodique 2 perioy periox
+}
+Fin
+FIN DECOUPAGE #
+
+
+# DEBUT LECTURE 
+Scatter DOM.Zones dom_canal
+ FIN LECTURE #
+
+Pb_Thermohydraulique pb_canal
+
+VEFpreP1b dis
+
+
+
+schema_euler_explicite    sch_qc   
+lire sch_qc
+
+{
+        tinit 0
+	nb_pas_dt_max 3
+        dt_min 1.e-11
+        dt_start dt_fixe 0.00000000002 
+        facsec 1 
+        diffusion_implicite 0
+}
+
+
+# fluide  #
+Fluide_Incompressible fuilde_canal
+Lire fuilde_canal
+{
+        mu Champ_uniforme 1 1.461e-6
+        rho Champ_uniforme 1 1.
+	lambda Champ_uniforme 1 1.
+	Cp Champ_uniforme 1 1.
+	beta_th Champ_uniforme 1 1.
+}
+
+
+# Association #
+Associer pb_canal dom_canal
+Associer pb_canal fuilde_canal
+Associer pb_canal sch_qc
+Discretiser pb_canal dis
+
+Lire pb_canal
+{ 
+        Navier_Stokes_standard
+        {
+		solveur_pression  GCP { precond ssor { omega 1.5 } seuil 1.e+14   }
+                projection_initiale 0								
+
+
+	 	convection { amont_old }
+	    diffusion { negligeable }
+
+		#  #
+
+		conditions_initiales 
+		{   
+	vitesse champ_fonc_xyz dom_canal 	2  0.1*sin(x-y)+1 0.1*sin(x-y)
+		 }
+                                                      
+
+                conditions_limites 
+
+		{
+		        periox periodique
+			perioy periodique
+                }
+	}
+
+	# Thermique #				
+        Convection_Diffusion_temperature
+        {
+
+		
+		diffusion { negligeable }
+		convection { amont_old }
+
+		conditions_initiales {
+		 Temperature Champ_Fonc_xyz dom_canal 1  (1+0.1*sin(x-y))
+	 } 
+
+	conditions_limites 
+
+            {
+		perioy periodique
+		periox periodique
+	    }
+
+        }
+
+	Postraitement
+        	{
+	definition_champs 
+		{
+		convection_qdm champ_post_operateur_eqn
+		 { sources {   champ_post_refchamp { pb_champ pb_canal vitesse }  }  
+		numero_op 1
+		 }
+		
+		erreur_conv_qdm	champ_post_transformation  {
+		 methode vecteur expression 2 abs(convection_qdm+(0.1*cos(x-y-t))) abs(convection_qdm+(0.1*cos(x-y-t)))
+		source_reference convection_qdm
+		}
+		erreur_conv_qdm_elem interpolation { localisation elem source_reference  erreur_conv_qdm } 
+		max_erreur_conv_qdm champ_post_reduction_0D {
+		 methode max
+ 		source_reference erreur_conv_qdm
+		}
+	convection_T champ_post_operateur_eqn
+		 { sources {   champ_post_refchamp { pb_champ pb_canal temperature }  }  
+		numero_op 1
+		 } 
+
+		erreur_conv_T	champ_post_transformation  {
+		 methode formule expression 1 abs(convection_T+(0.1*cos(x-y-t))) 
+		source_reference convection_T
+		}
+			erreur_conv_T_elem interpolation { localisation elem source_reference  erreur_conv_T } 
+		max_erreur_conv_T champ_post_reduction_0D {
+		 methode max
+ 		source_reference erreur_conv_T
+		}
+	}
+      	 		format lml
+                	Champs dt_post 1
+                	{
+                         temperature elem
+			vitesse
+		
+			erreur_conv_T_elem
+			erreur_conv_qdm_elem
+			/* convection_qdm
+			convection_T 
+			erreur_conv_T
+			erreur_conv_qdm  
+	 */
+			
+                        }
+        	
+        	Sondes 
+        		{ 
+		
+		max_erreur_conv_qdm max_erreur_conv_qdm periode 1e-7 numero_elem_sur_maitre 0	
+			max_erreur_conv_T max_erreur_conv_T periode 1e-7 numero_elem_sur_maitre 0	
+				
+			}
+		}
+}
+
+Resoudre pb_canal
+fin

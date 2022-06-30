@@ -1,0 +1,14 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+cas=`echo $1`
+
+echo "je suis post_run"
+
+if [[ $cas == "pre_run" ]]
+then
+    echo "Copie pre_run dans les autres dossiers pour reprise"
+    cp ${cas}.sauv* ../Same_rho_cp/
+    cp ${cas}.sauv* ../Same_rapp_rho_cp/
+else
+    echo $cas
+fi

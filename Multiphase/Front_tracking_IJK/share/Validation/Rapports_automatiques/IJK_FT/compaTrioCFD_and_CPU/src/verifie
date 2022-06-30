@@ -1,0 +1,52 @@
+#!/bin/bash
+ret_code=0
+
+echo "***********************" COMPA SEQ/PAR "***********************"
+   for c in "IJK" "FTD"
+   do 
+      for n in 1 101
+      do
+         echo "Comparaison SEQ/PAR $c n=$n... "
+	 if compare_lata SEQ_${c}_swarm_n${n}_velocity.lata PAR_${c}_swarm_n${n}_velocity.lata
+         then
+           echo "OK"
+           echo "*********************************"
+         else
+           echo "Comparaison echouee."
+           let ret_code+=1
+           # break #exit $ret_code
+         fi
+      done 
+   done
+echo "***********************" VELOCITY "***********************"
+for p in "SEQ" "PAR"
+do
+   for c in "IJK" "FTD"
+   do 
+      for n in 1 101
+      do
+         echo "Comparaison $p $c n=$n a la ref. SEQ_IJK... "
+	 if compare_lata SEQ_FTD_swarm_n${n}_velocity.lata ${p}_${c}_swarm_n${n}_velocity.lata
+         then
+           echo "OK"
+           echo "*********************************"
+         else
+           echo "Comparaison echouee."
+           let ret_code+=1
+         fi
+      done 
+   done
+done
+
+echo "***********************" INTERFACES "***********************"
+echo "Comparaison SEQ IJK/TrioCFD, interfaces only"
+if compare_lata  SEQ_IJK_swarm_n1_mod.lata SEQ_FTD_swarm_n1.lata --dernier
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison des interfaces echouee."
+  let ret_code+=1
+fi
+
+exit $ret_code

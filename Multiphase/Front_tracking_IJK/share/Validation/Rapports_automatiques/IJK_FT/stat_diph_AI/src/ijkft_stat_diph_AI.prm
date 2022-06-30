@@ -1,0 +1,805 @@
+Parametres {
+	Titre "Statistiques par plan : Calcul des derivees (IJK_FT diphasique)"
+	Description ""  <<EOF
+Cette fiche comporte 2 chapitres: Un pour une bulle spherique, l'autre pour une hemisphere. 
+Dans les 2 cas, on compare les statistiques moyennes calculees par Statistiques_dns_ijk_FT a celles obtenues analytiquement ou avec visit. 
+
+La solution analytique pour l'hemisphere neglige la zone de transition entre la sphere et le plan. La surface associee est tres petite, propto delta. Mais cette
+hypothese n'est pas valide pour le calcul de kappa*ai*N[xyz] car la courbure est localement propto 1/delta... ce qui rend le produit k*ai d'ordre 1, donc non
+negligeable. 
+
+Dans chaque cas, un premier calcul sequentiel est realise, puis un calcul parallele afin de verifier que le decoupage n'impacte pas le resultat. Enfin, un dernier calcul est
+realise en translatant la bulle au bord du domaine pour provoquer la creation d'un ghost. Le resultat doit toujours etre identique, ce qui permet de verifier que
+l'aire de la bulle ghost ou le parallelisme sont bien pris en compte. 
+
+PS : La solution analytique pour P et les composantes de vitesse est identique au cas : stat_diph_gradUP. Mais comme tout le solveur est desactive, elle n'a pas
+d'influence. 
+
+
+RESULTATS : 
+
+ATTENTION !!! Toutes les courbes doivent etre superposees SAUF kappa*ai*N[xyz] pour le cas hemisphere car la solution analytique n'est que partielle. 
+Elle ne tiens pas compte du petit anneau tres fortement courbe.
+
+EOF
+	Auteur "G.B."
+	CasTest GEOM_sphere/TRANS_+0.0000 ijkft_stat_diph_AI.data
+	CasTest GEOM_sphere/TRANS_+0.0000/PAR8 ijkft_stat_diph_AI_par8.data 8
+	#               #
+	CasTest GEOM_hemisphere/TRANS_+0.0000 ijkft_stat_diph_AI.data
+	CasTest GEOM_hemisphere/TRANS_+0.0000/PAR8 ijkft_stat_diph_AI_par8.data 8
+	# Cas translates : #
+	CasTest GEOM_sphere/TRANS_-0.0041 ijkft_stat_diph_AI.data
+	# CasTest GEOM_sphere/TRANS_-0.0041/PAR8 ijkft_stat_diph_AI_par8.data 8 #
+	CasTest GEOM_hemisphere/TRANS_-0.0002 ijkft_stat_diph_AI.data
+	# CasTest GEOM_hemisphere/TRANS_-0.0002/PAR8 ijkft_stat_diph_AI_par8.data 8 #
+	#               #
+	Prerequisite ./analytical.py > analytical.log
+	Prerequisite ./compare.py > compare.log
+	Prerequisite visit -nowin -cli -quiet -s ./post_visit.py > post_visit.log
+}
+
+Chapitre {
+	Titre "Presentation des solutions analytiques"
+	Figure {
+		Title "Repere de coordonnees spheriques (http://fr.wikipedia.org/wiki/Coordonn%C3%A9es_sph%C3%A9riques)"
+        	width 9cm
+		Image ./repere_spherique.png
+	}
+	Description "\latex_( \input{\orig/description.tex}\latex_)" 
+	Description "Maillage sphere translate -0.0041."
+        visu {
+                Cycles  -1
+                titre "illustration du maillage interfacial et d'une coupe du domaine DOM"
+                mesh GEOM_sphere/TRANS_-0.0041/ijkft_stat_diph_AI.lata INTERFACES
+                mesh GEOM_sphere/TRANS_-0.0041/ijkft_stat_diph_AI.lata DOM
+		Operator Slice 0 0 0.005 0 0 1
+        }
+	Description "Maillage hemisphere translate -0.0002."
+        visu {
+                Cycles  -1
+                titre "illustration du maillage interfacial et d'une coupe du domaine DOM"
+                mesh GEOM_hemisphere/TRANS_-0.0002/ijkft_stat_diph_AI.lata INTERFACES
+                mesh GEOM_hemisphere/TRANS_-0.0002/ijkft_stat_diph_AI.lata DOM
+                Operator Slice 0 0 0.005 0 0 1
+        }
+}
+
+
+Chapitre {
+	Titre "Validation des moyennes surfaciques sur le cas sphere"
+	Description "Comparaison des grandeurs adimensionnees calculees par le code aux valeurs analytiques de reference."
+        Figure {
+                Titre "Evolution transverse de AI pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "AI/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de aiNx pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "aiNx/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de aiNy pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "aiNy/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de aiNz pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "aiNz/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de kaiNx pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "kaiNx/(2 pi R/(Lx Ly)kappa)"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de kaiNy pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "kaiNy/(2 pi R/(Lx Ly)kappa)"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de kaiNz pour le cas sphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "kaiNz/(2 pi R/(Lx Ly)kappa)"
+                courbe {
+                        fichier sphere.ana
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.num
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/sphere_0._PAR8/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.num
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ"
+                }
+                courbe {
+                        fichier LINKS/sphere_-0.0041_SEQ/sphere.dat
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0041_SEQ (visit)"
+                }
+	}
+}
+Chapitre {
+	Titre "Validation des moyennes surfaciques sur le cas hemisphere"
+	Description "Comparaison des grandeurs adimensionnees calculees par le code aux valeurs analytiques de reference."
+        Figure {
+                Titre "Evolution transverse de AI pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "AI/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($2/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de aiNx pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "aiNx/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($3/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de aiNy pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "aiNy/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($4/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de aiNz pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "aiNz/(2 pi R/(Lx Ly))"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($5/93.084226773030935)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de kaiNx pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "kaiNx/(2 pi R/(Lx Ly)kappa)"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($11/-46542.11338651547)
+                        style lines
+                        Legende "tr=0._SEQ (visit (-600<kappa<-400))"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($6/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de kaiNy pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "kaiNy/(2 pi R/(Lx Ly)kappa)"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($7/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+        Figure {
+                Titre "Evolution transverse de kaiNz pour le cas hemisphere."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "kaiNz/(2 pi R/(Lx Ly)kappa)"
+                courbe {
+                        fichier hemisphere.ana
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "ana"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._SEQ (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($12/-46542.11338651547)
+                        style lines
+                        Legende "tr=0._SEQ (visit (-600<kappa<-400))"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_0._PAR8/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=0._PAR8 (visit)"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.num
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ"
+                }
+                courbe {
+                        fichier LINKS/hemisphere_-0.0002_SEQ/hemisphere.dat
+                        colonnes (($1-0.005)/0.004) ($8/-46542.11338651547)
+                        style linespoints
+                        Legende "tr=-0.0002_SEQ (visit)"
+                }
+	}
+}
+
+
+
+
+Chapitre {
+	Titre "Synthese de quelques resultats"
+	Description "Verification des resultats." <<EOF
+Dans le tableau ci-dessous, la valeur relative est calculee en divisant l'erreur par le max du champ analytique. 
+undef signifie que le champ analytique est nul, il n'est donc pas possible de definir une valeur relative. 
+
+Les erreurs relatives sont inferieures a 5% pour la sphere. 
+Pour l'hemisphere, elles sont de l'ordre de 10% sauf pour les champs kaiN[xyz] pour lesquels on rappelle que la solution analytique n'est que partielle...
+donc inexacte... 
+EOF	
+	
+	Table {
+                Title "fichier de comparaison aux solutions analytiques"
+                description "The table below shows..."
+                description " "
+                nb_columns 7
+		Label  translate | run |variable      |err.max         |err.std      |err_rel.max(%)     |err_rel.std(%)
+
+		lines { 
+			file resu.txt
+			number_first_line 2
+			nb_columns_file 8
+		}
+        }
+
+}
+

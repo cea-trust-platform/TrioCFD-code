@@ -1,0 +1,42 @@
+Parametres {
+	Titre "Comparison et analyse de performance IJK vs TrioCFD (sequentiel et parallele)"
+	Description ""
+	Auteur "G.B."
+	CasTest . init.data
+	CasTest . SEQ_IJK_swarm_n1.data
+	CasTest . SEQ_FTD_swarm_n1.data
+	CasTest . PAR_IJK_swarm_n1.data 8
+	CasTest . PAR_FTD_swarm_n1.data 8
+	CasTest . SEQ_IJK_swarm_n101.data
+	CasTest . SEQ_FTD_swarm_n101.data
+	CasTest . PAR_IJK_swarm_n101.data 8
+	CasTest . PAR_FTD_swarm_n101.data 8
+}
+
+Chapter
+{
+	Title "Brief main goals description."
+	Description "This case runs as follows." <<EOF
+First, we start by doing the init.data case that initializes from diph_swarm.tgz (initially taken channel_swarm_fixed).
+It removes the bubbles too close to periodic boundaries (through the keyword ncells_deleted>ijk_splitting_ft_extension).
+It creates the diph_swarm_init.* files used in all other calculations.
+Then, we perform a bunch of similar calculations that all start from those conditions in various ways. 
+Some use IJK, others TrioCFD (FTD). Some in sequential, others in parallel. Some on a single timestep, other on 101. 
+The ultimate goal is to compare in a file verifie the lata generated and also to assess the various performances (CPU needs) 
+of each case.
+
+There is some differences even though we remove the source from both cases. 
+It seems present event at timestep 0 (is there initial projection,
+remeshing...). These questions have not been investigated. 
+The command verifie is here for test; it should respond something like 9
+differences but is not used at the moment. 
+
+EOF
+}
+
+Chapter
+{
+	Title "Computer performance"
+        tableau_performance {
+        }
+}

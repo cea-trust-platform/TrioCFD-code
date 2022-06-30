@@ -1,0 +1,17 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+gmsh bulle3.geo -2 -format msh2
+
+# Generation de 4 bulles a 4 positions differentes:
+cat >deplacements.txt <<EOF
+0.1 0.1 0.1 bulle3.msh 1.0
+0.3649 0.2649 0.4 bulle3.msh 1.2
+0.3649 0.1  0.38 bulle3.msh 0.8
+0.2  0.26 0.12 bulle3.msh 0.9
+EOF
+
+./cree_multi_bulles_scale.sh deplacements.txt init.lata
+

@@ -1,0 +1,371 @@
+Parametres {
+	Titre "Ordre de convergence du schema en temps RK3 et consistance avec le solveur en pression"
+	Description "Cette fiche permet de valider le schema RK3 en temps : " <<EOF
+o coherence du solveur de pression avec le RK3
+o ordre de convergence du schema EULER 
+o ordre de convergence du schema RK3
+EOF
+	Auteur "A.C. and G.B."	
+	 CasTest PRESSION_SEULE/EULER/Niv100 calcul.data
+	 CasTest PRESSION_SEULE/EULER/Niv50  calcul.data
+	 CasTest PRESSION_SEULE/EULER/Niv20  calcul.data
+	 CasTest PRESSION_SEULE/EULER/Niv10  calcul.data
+	 CasTest PRESSION_SEULE/EULER/Niv5   calcul.data
+#	 CasTest PRESSION_SEULE/EULER/Niv1   calcul.data
+	 CasTest PRESSION_SEULE/RK3/Niv100 calcul.data
+	 CasTest PRESSION_SEULE/RK3/Niv50  calcul.data
+	 CasTest PRESSION_SEULE/RK3/Niv20  calcul.data
+	 CasTest PRESSION_SEULE/RK3/Niv10  calcul.data
+	 CasTest PRESSION_SEULE/RK3/Niv5	calcul.data
+#	 CasTest PRESSION_SEULE/RK3/Niv1	calcul.data
+
+	 CasTest PRESSION_UNIFORME/EULER/Niv100 calcul.data
+	 CasTest PRESSION_UNIFORME/EULER/Niv50  calcul.data
+	 CasTest PRESSION_UNIFORME/EULER/Niv20  calcul.data
+	 CasTest PRESSION_UNIFORME/EULER/Niv10  calcul.data
+	 CasTest PRESSION_UNIFORME/EULER/Niv5   calcul.data
+	 CasTest PRESSION_UNIFORME/EULER/Niv1   calcul.data
+#	 CasTest PRESSION_UNIFORME/RK3/Niv100 calcul.data
+	 CasTest PRESSION_UNIFORME/RK3/Niv50  calcul.data
+	 CasTest PRESSION_UNIFORME/RK3/Niv20  calcul.data
+	 CasTest PRESSION_UNIFORME/RK3/Niv10  calcul.data
+	 CasTest PRESSION_UNIFORME/RK3/Niv5   calcul.data
+#	 CasTest PRESSION_UNIFORME/RK3/Niv1   calcul.data	
+
+	 CasTest PRESSION_SINUSOIDALE/EULER/Niv100 calcul.data
+	 CasTest PRESSION_SINUSOIDALE/EULER/Niv50  calcul.data
+	 CasTest PRESSION_SINUSOIDALE/EULER/Niv20  calcul.data
+	 CasTest PRESSION_SINUSOIDALE/EULER/Niv10  calcul.data
+	 CasTest PRESSION_SINUSOIDALE/EULER/Niv5   calcul.data
+#	 CasTest PRESSION_SINUSOIDALE/EULER/Niv1   calcul.data
+	 CasTest PRESSION_SINUSOIDALE/RK3/Niv100 calcul.data
+	 CasTest PRESSION_SINUSOIDALE/RK3/Niv50  calcul.data
+	 CasTest PRESSION_SINUSOIDALE/RK3/Niv20  calcul.data
+	 CasTest PRESSION_SINUSOIDALE/RK3/Niv10  calcul.data
+	 CasTest PRESSION_SINUSOIDALE/RK3/Niv5   calcul.data
+#	 CasTest PRESSION_SINUSOIDALE/RK3/Niv1   calcul.data	
+}
+
+
+Chapitre {
+	Titre "Test de l'ordre du schema en temps RK3 vs Euler :"
+	Description "" <<EOF
+
+On veut d'abord verifier que le schema RK3 se comporte bien avec le solveur de pression. Cette fiche 
+permet aussi de verifier l'ordre des schemas en temps. On utilise pour cela un jeu de donnee desactivant tout sauf la marche en temps et le
+solveur de pression. On impose un terme source dependant du temps. 
+
+Navier Stokes simplifie : 
+\latex_($$ \frac{\partial u }{\partial t} = -\nabla P + S $$\latex_)
+\latex_($$ \nabla \cdot u = 0 $$\latex_)
+avec $u=0, v=0, P=0$ en solution initiale.
+
+Terme source explicite : 
+\latex_($$ S=\nabla \Phi + \nabla \wedge \Psi $$\latex_)
+\latex_($$ \Phi = 100. \cos(\omega_z z) \cos (\omega_p t ) $$\latex_)
+\latex_($$ \Psi = \left[\Psi_x, \Psi_y, \Psi_z \right]^T \quad \mbox{avec} \quad \Psi_x = \Psi_y = 0 \quad \mbox{et} \quad 
+           \Psi_z = \frac{L_z(L_z-1)}{L_z^2}\, \omega_t \cos (\omega_t t )\cos (\omega_x x )\cos (\omega_y y )$$\latex_)
+avec \latex_($\omega_p = \frac{\pi}{2}$, $\omega_t = \pi $, $\omega_x = \frac{2\pi}{L_x} $ et $\omega_y = \frac{2\pi}{L_y} $\latex_)
+
+On evalue les normes L2 des erreurs a \latex_($t_f = 0.5$\latex_) (en faisant varier le pas de temps et le nombre de pas de temps) 
+par comparaison a la solution analytique : 
+\latex_($$ u=-\omega_y \sin(\omega_t t ) \cos (\omega_x x )\sin (\omega_y y ) $$\latex_) 
+\latex_($$ v= \omega_x \sin(\omega_t t ) \sin (\omega_x x )\cos (\omega_y y ) $$\latex_)
+\latex_($$ P= \Phi + cste = 100. \cos(\omega_z z) \cos (\omega_p t ) + cste $$\latex_)
+
+EOF
+}
+Chapitre {
+	Titre "Test avec \latex_($\phi$\latex_) a pression sinusoidale en z et vitesse nulle."
+	Description "" <<EOF
+Avec $\phi$, la pression est sinusoidale. La solution sinusoidale est obtenue par le solveur en pression, jusqu'a la precision demandee. 
+EOF
+	Figure {
+	Title "Figure 1 : Convergence vitesse. Pression sinusoidale et vitesse nulle"
+                LogX
+                LogY
+		incluredesccourbes 0
+		labelX  "1/dt"
+		labelY  "erreur"
+		Width 10cm
+		Courbe {
+		   fichier PRESSION_SEULE/RK3/err_vit.txt
+		   colonnes ($1) ($2)
+		   Legende "RK3 u"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SEULE/RK3/err_vit.txt
+		   colonnes ($1) ($3)
+		   Legende "RK3 v"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SEULE/RK3/err_vit.txt
+		   colonnes ($1) ($4)
+		   Legende "RK3 w"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-18*x*x*x
+		   style lines
+		   Legende "Ordre 3"
+		}
+		Courbe {
+		   fichier PRESSION_SEULE/EULER/err_vit.txt
+		   colonnes ($1) ($2)
+		   Legende "Euler u"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SEULE/EULER/err_vit.txt
+		   colonnes ($1) ($3)
+		   Legende "Euler v"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SEULE/EULER/err_vit.txt
+		   colonnes ($1) ($4)
+		   Legende "Euler w"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-11*x
+		   style lines
+		   Legende "Ordre 1"
+		}
+	}
+	Figure {
+	Title "Figure 1 : Convergence Pression. Pression sinusoidale et vitesse nulle"
+                LogX
+                LogY
+		incluredesccourbes 0
+		labelX  "1/dt"
+		labelY  "erreur"
+		Width 10cm
+		Courbe {
+		   fichier PRESSION_SEULE/RK3/err_press.txt
+		   colonnes ($1) ($2)
+		   Legende "RK3 p"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-10*x*x*x
+		   style lines
+		   Legende "Ordre 3"
+		}
+		Courbe {
+		   fichier PRESSION_SEULE/EULER/err_press.txt
+		   colonnes ($1) ($2)
+		   Legende "Euler p"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-2*x
+		   style lines
+		   Legende "Ordre 1"
+		}
+	}
+
+}
+	
+
+
+
+Chapitre {
+	Titre "Test sans \latex_($\phi$\latex_) a pression nulle."
+	Description "" <<EOF
+Sans $\phi$, la pression est nulle, et l'erreur sur la pression est proportionnelle au nombre de pas de temps. 
+Elle est tres faible et le solveur en pression ne fait rien. 
+Idem sur la composante z de la vitesse dont l'erreur augmente proportionnellement au nombre de pas de temps. 
+Sur la vitesse, on obtient les ordres escomptes (1 pour EULER et 3 pour RK3).
+EOF
+	Figure {
+	Title "Figure 1 : Convergence vitesse. Pression uniforme"
+                LogX
+                LogY
+		incluredesccourbes 0
+		labelX  "1/dt"
+		labelY  "erreur"
+		Width 10cm
+		Courbe {
+		   fichier PRESSION_UNIFORME/RK3/err_vit.txt
+		   colonnes ($1) ($2)
+		   Legende "RK3 u"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_UNIFORME/RK3/err_vit.txt
+		   colonnes ($1) ($3)
+		   Legende "RK3 v"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_UNIFORME/RK3/err_vit.txt
+		   colonnes ($1) ($4)
+		   Legende "RK3 w"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-18*x*x*x
+		   style lines
+		   Legende "Ordre 3"
+		}
+		Courbe {
+		   fichier PRESSION_UNIFORME/EULER/err_vit.txt
+		   colonnes ($1) ($2)
+		   Legende "Euler u"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_UNIFORME/EULER/err_vit.txt
+		   colonnes ($1) ($3)
+		   Legende "Euler v"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_UNIFORME/EULER/err_vit.txt
+		   colonnes ($1) ($4)
+		   Legende "Euler w"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-11*x
+		   style lines
+		   Legende "Ordre 1"
+		}
+	}
+	Figure {
+	Title "Figure 1 : Convergence Pression. Pression uniforme"
+                LogX
+                LogY
+		incluredesccourbes 0
+		labelX  "1/dt"
+		labelY  "erreur"
+		Width 10cm
+		Courbe {
+		   fichier PRESSION_UNIFORME/RK3/err_press.txt
+		   colonnes ($1) ($2)
+		   Legende "RK3 p"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-10*x*x*x
+		   style lines
+		   Legende "Ordre 3"
+		}
+		Courbe {
+		   fichier PRESSION_UNIFORME/EULER/err_press.txt
+		   colonnes ($1) ($2)
+		   Legende "Euler p"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-6*x
+		   style lines
+		   Legende "Ordre 1"
+		}
+	}
+
+}
+Chapitre {
+	Titre "Test avec \latex_($\phi$\latex_) a pression sinusoidale en z."
+	Description "" <<EOF
+Avec $\phi$, la pression est sinusoidale. La solution sinusoidale est obtenue par le solveur en pression, jusqu'a la precision demandee. 
+Cependant, comme le schema est explicite, la source est evaluee au (sous-) pas de temps precedent. Donc l'erreur commise sur la pression 
+ne provient plus du solveur en pression, mais du second membre dont la precision est \latex_($\mathcal{O}(\Delta t)$\latex_) (avec le 
+sous-pas de temps dans le cas du RK3 ce qui explique qu'il ait une precision legerement meilleure, la constante etant plus faible). 
+Dans ce cas, les solutions de vitesses retombent a l'ordre 1, quel que soit le schema. 
+Pourquoi u ne reste pas d'ordre 3? 
+EOF
+	Figure {
+	Title "Figure 1 : Convergence vitesse. Pression sinusoidale"
+                LogX
+                LogY
+		incluredesccourbes 0
+		labelX  "1/dt"
+		labelY  "erreur"
+		Width 10cm
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/RK3/err_vit.txt
+		   colonnes ($1) ($2)
+		   Legende "RK3 u"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/RK3/err_vit.txt
+		   colonnes ($1) ($3)
+		   Legende "RK3 v"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/RK3/err_vit.txt
+		   colonnes ($1) ($4)
+		   Legende "RK3 w"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-18*x*x*x
+		   style lines
+		   Legende "Ordre 3"
+		}
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/EULER/err_vit.txt
+		   colonnes ($1) ($2)
+		   Legende "Euler u"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/EULER/err_vit.txt
+		   colonnes ($1) ($3)
+		   Legende "Euler v"
+		   style points
+		}
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/EULER/err_vit.txt
+		   colonnes ($1) ($4)
+		   Legende "Euler w"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-11*x
+		   style lines
+		   Legende "Ordre 1"
+		}
+	}
+	Figure {
+	Title "Figure 1 : Convergence Pression. Pression sinusoidale"
+                LogX
+                LogY
+		incluredesccourbes 0
+		labelX  "1/dt"
+		labelY  "erreur"
+		Width 10cm
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/RK3/err_press.txt
+		   colonnes ($1) ($2)
+		   Legende "RK3 p"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-10*x*x*x
+		   style lines
+		   Legende "Ordre 3"
+		}
+		Courbe {
+		   fichier PRESSION_SINUSOIDALE/EULER/err_press.txt
+		   colonnes ($1) ($2)
+		   Legende "Euler p"
+		   style points
+		}
+		Courbe {
+		   fonction 1e-2*x
+		   style lines
+		   Legende "Ordre 1"
+		}
+	}
+
+}
+	
+
+

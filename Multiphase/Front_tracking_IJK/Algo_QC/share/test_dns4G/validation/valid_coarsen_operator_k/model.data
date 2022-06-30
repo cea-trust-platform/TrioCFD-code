@@ -1,0 +1,126 @@
+# Modification du jdd de Frederic Aulery le 04/07/2012 #
+# ThermoHydraulique 3D : canal quasi compressible gaz parfait VDF turbulent #
+# PARALLEL OK #
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+MaillerParallel {
+    domain dom
+    nb_nodes 3 NNODES
+    splitting 3 SPLITTING_VDF
+    ghost_thickness 2
+    perio_x
+    perio_z
+    function_coord_x DOM_SIZE_X*x
+    file_coord_y coord_level0.txt
+    function_coord_z DOM_SIZE_Z*z
+    boundary_xmin periox
+    boundary_xmax periox
+    boundary_ymin bas
+    boundary_ymax haut
+    boundary_zmin perioz
+    boundary_zmax perioz
+}
+
+# FIN MAILLAGE #
+
+VDF dis
+
+Runge_Kutta_ordre_3_QC sch
+Lire sch
+{
+        tinit 0
+        tmax 10
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	seuil_statio 1.e-8
+	nb_pas_dt_max 1
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu champ_Uniforme_Morceaux dom 1 { defaut 1. /* juste popur declencher le calcul ... */ }
+        lambda champ_Uniforme_Morceaux dom 1 { defaut 1. /* juste popur declencher le calcul ... */ }
+        pression 100000.
+        loi_etat gaz_parfait { Prandtl 0.76 Cp 1005 gamma 1.4 }
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+		PRESSURE_SOLVER		
+                convection { centre4b }
+                diffusion { }
+                Sources { Canal_perio { direction_ecoulement 0 h 0.0149 } }	
+		conditions_initiales 
+		{
+			vitesse champ_fonc_xyz dom 3 
+			INITIALVELOCITYX
+			# 50.06*y*(0.025-y)*4/(0.025*0.025)*0.25*(4+sin(x*6.28318530717959)+sin(x*6.28318530717959*3/0.05)+sin(x*6.28318530717959*7/0.05)+sin(x*6.28318530717959*13/0.05)) #
+			0.
+			0.
+		}
+                conditions_limites 
+		{
+                        periox   periodique 
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		}  
+	}
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+                convection { quickb }
+		Sources {	}	
+		conditions_initiales { Temperature Champ_fonc_xyz dom 1 
+                  293+y*(800-293)/0.05+300*sin(x*6.28318530717959*10/0.05)*sin(y*3.1415926535/0.025) }
+		conditions_limites 
+                {
+                 	periox periodique 
+			perioz periodique 
+ 		        haut paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 800. H_imp Champ_Front_Uniforme 1  1.e14
+			bas paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 293. H_imp Champ_Front_Uniforme 1  1.e14
+		}
+    		Modele_turbulence Prandtl
+		{ 
+ 			turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+        { 			
+		format lata
+		fichier lata/y
+		Champs dt_post 0.25e-3
+		{
+      			vitesse som
+      			masse_volumique elem
+			pression elem
+			temperature_qc elem
+         	}
+	}
+
+#         reprise binaire reprise.data.sauv #
+         sauvegarde_simple binaire reprise.data.sauv 
+}
+
+Resoudre pb
+Fin

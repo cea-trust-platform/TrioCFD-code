@@ -1,0 +1,20 @@
+#!/bin/bash
+# ce script est execute avant de lire les cas tests
+cat >deplacements3.txt <<EOF
+0.003 0.003 0.0011 bulle3.msh
+0.003 0.003 0.00501 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements3.txt init_multi.lata
+
+# echo "JDD pour Preparation du calcul en avancant la bulle au bout du domaine..."
+# sed -e "s/timestep .*/  timestep 0.0001655/g"      \
+#     -e "s/dt_post .*/   dt_post 459/g"             \
+#     -e "s/dt_sauvegarde .*/   dt_sauvegarde 1/g" \
+#     -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 1/g" \
+#     -e "s/fichier_reprise_interface.*/fichier_reprise_interface init_multi\.lata/g"\
+#     -e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+#     -e "/timestep_reprise_vitesse/d"               \
+#     -e "/fichier_reprise_vitesse/d"                \
+#     -e "s/champs_a_postraiter .*/champs_a_postraiter 8 INTERFACES INDICATRICE COMPO_CONNEXE COURBURE DISTANCE_AUTRES_INTERFACES REPULSION_FT PRESSURE VELOCITY_FT/g" canal_bulles_sym.data > pre_run.data
+# 

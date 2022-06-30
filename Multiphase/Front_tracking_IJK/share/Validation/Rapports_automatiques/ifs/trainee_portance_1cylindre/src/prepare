@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# The default .data file computes a coarse mesh and is also used for regression tests
+# We generate finer meshes for convergence
+#  increase n cells
+#  decrease mesh thickness in k (correct aspect ratio for multigrid convergence)
+#  suppress lml output
+sed 's/nbelem_k 128/nbelem_k 256/;
+s/nbelem_i 128/nbelem_i 256/;
+s/uniform_domain_size_j 0.025/uniform_domain_size_j 0.0125/;
+s/Lata_to_other.*//' cylindre.data >cylindre_fin.data

@@ -1,0 +1,48 @@
+La figure \ref{fig : X00} montre les évolutions des grandeurs pour le deuxième cas :
+\begin{align}
+\gf(\bx;t) = 2cos(\k_1 x - \o_{1/2}t) \bm{e_x}
+\end{align} 
+
+La force physique $f_x(x,0,0;t_i)$ en rouge, la vitesse $u_x(x,0,0;t_i)$ en bleu et la pression $p(x,0,0;t_i)$ en vert pour différents instants allant de $t=0.012s$ à $t=0.26s$ sont tracés. On constate bien qu'entre $t_0=0.012s \approx 0s$ et $t_i = 0.26 \approx t_0 + 1/4 s$, le champ de force $f_y$ (rouge) a été translaté d'une distance $L/2$ dans la direction $x$. \tb{La translation du champ dans la direction $x$ est validée pour un champ d'onde transversale.}
+
+\begin{figure}
+\begin{center}
+	\begin{subfigure}[t]{0.4\textwidth}                                                                                                                                   
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_X00_t1.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : X00_t1}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_X00_t6.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : X00_t6}
+	\end{subfigure}
+\\
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_X00_t11.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : X00_t11}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_X00_t16.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : X00_t16}
+	\end{subfigure}
+\\
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_X00_t21.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : X00_t21}
+	\end{subfigure}	
+\end{center}
+\caption{Évolution le long de $(x,y=0,z=0)$ de : la force $f_x$ (rouge), la vitesse $u_x$ (bleu), la pression $p$ (vert).}
+\label{fig : X00}
+\end{figure}
+
+L'observation du champ de vitesse seul montre qu'il n'est pas strictement nul. Son amplitude est de l'ordre de $|u_x|_{max}=10^{-5} m.s^{-1}$. Son évolution est de la forme $u_y = cos(\k_1 \cdot x)cos(\D x \cdot x)$. Cette évolution est due à l'absence de phénomènes diffusifs dans l'écoulement, ce qui laisse un courant parasite s'établir. La résolution de la pression, est satisfaisante sur deux aspects. Le premier est que l'amplitude de la pression est de l'ordre de grandeur attendu : $\frac{2\r}{\k_1}\approx 1.5$, le second est l'évolution du champ qui est bien déphasée de $\pi/4$ par rapport au champ $f$. Ce qui est sujet à discussion est "l'offset" fluctuant qui est observé pour ce champ. En effet, la pression semble évoluer comme :
+
+\begin{align}
+p(\bm{x},t) = 2 \frac{\r}{\k_1} (sin(\k_1 \frac{L}{2})- sin(\k_1 x - \o_{1/2} t) )
+\end{align}
+
+Cette correction a pour effet d'assurer $p(x=x_{min}) = p(x=x_{max}) = 0$.

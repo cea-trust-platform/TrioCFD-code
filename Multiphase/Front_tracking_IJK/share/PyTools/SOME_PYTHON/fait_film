@@ -1,0 +1,102 @@
+#!/bin/bash
+###########################################################################
+# (appele dans fait_film_total.sh)
+# Creation d'un film a partir d'une suite d'images.
+# mode d'emploi : ./fait_film chemin_images chemin_logos liste_logos film.mp4
+#                               1              2            3           4
+# 1 : ne doit contenir que les images pour le film
+# 2 : DOIT finir par "/" .peut etre mis a zero si on ne veut pas de logo
+# 3 : [logo1,0,0] -> ajoute un logo en bas a droite
+#     [logo1,logo2,0] -> ajoute --/-/-- et un en haut a droite
+# 4 : Il FAUT ecrire explicitement .mp4 .
+###########################################################################
+function tes {
+    echo "#############################"
+    echo $@
+    
+    chemin_images=$1;
+    chemin_logos=$2;
+    logo1=$(echo "$3" | tr -d "\[" | tr -d "\]" | cut -d"," -f1);
+    #logo1=$(echo "$chemin$logo1");
+    logo2=$(echo "$3" | tr -d "\[" | tr -d "\]" | cut -d"," -f2);
+    #logo2=$(echo "$chemin$logo2");
+    logo3=$(echo "$3" | tr -d "\[" | tr -d "\]" | cut -d"," -f3);
+    #logo3=$(echo "$chemin_logos$logo3");
+    nom_film=$4;
+
+    echo "Dossier avec uniquement les images pour le film : $chemin_images"
+    echo "Dossier avec uniquement les logos a appliquer : $chemin_logos"
+    echo "Les logos a appliquer : $logo1, $logo2, $logo3"    
+ 
+   modele=$(ls -1 $chemin_images | head -1)
+   radical_images=$(echo "$modele" | cut -d"." -f1);
+   radical_images=$(echo "$modele" | cut -d"0" -f1);
+   bis_radical_images=$(echo "bis$radical_images");
+   terminaison_images=$(echo "$(ls -1 $chemin_images | head -1)" | cut -d"." -f2);
+
+    echo "nom des images : $radical_images";
+    echo "format des images : $terminaison_images"; 
+   initial_repo=$(pwd)
+   
+   
+   ###################################################
+   # In chemin_images repository
+   echo "moving from $initial_repo to $chemin_images"
+   cd $chemin_images
+
+   mkdir -p LOGOS
+   # Get image width and image height 
+   image_width=$(identify -format '%w\n' $modele)
+   image_height=$(identify -format '%h\n' $modele)
+   # Aspect ratio between real picture and logos
+   ar=8
+   logo_width=$(($image_width/$ar))
+   logo_height=$(($image_height/$ar)) 
+   logo_x=$(($image_width-$logo_width))
+   logo_y=$(($image_width-$logo_width))
+   # Redimensionnement des logo1,2 et 3
+   convert $chemin_logos$logo1 -resize $logo_widthx$logo_height -quality 60 ./LOGOS/$logo1
+   convert $chemin_logos$logo2 -resize $logo_widthx$logo_height -quality 60 ./LOGOS/$logo2
+   convert $chemin_logos$logo3 -resize $logo_widthx$logo_height -quality 60 ./LOGOS/$logo3	
+
+   for image in $(ls -1 $radical_images* ); do
+        # echo "$image; $radical_images; bis$radical_images"
+        image2=$(echo "$image" | sed -e "s/$radical_images/bis$radical_images/");
+        image3=$(echo "$image" | sed -e "s/$radical_images/ter$radical_images/");
+        image4=$(echo "$image" | sed -e "s/$radical_images/qua$radical_images/");
+        image5=$(echo "$image" | sed -e "s/$radical_images/qui$radical_images/");
+    
+        # Ajout des logos1,2 et 3
+        composite -geometry +$logo_x+000 ./LOGOS/$logo1 $image $image2;
+        composite -geometry +$logo_x+$logo_height ./LOGOS/$logo2 $image2 $image2;
+        composite -geometry +$logo_x+$((2*$logo_height)) ./LOGOS/$logo3 $image2 $image2;
+        
+        # Redimensionnement de l'image pour etre certain davoir une taille divisible par 2
+        convert $image2 -resize 200% -quality 60 $image2
+    done;
+    
+    
+    echo "#######################"
+    echo "LOGOS : $(ls ./LOGOS)"
+    echo "Images pour film : $bis_radical_images*"
+    echo "cat $bis_radical_images* | \
+ffmpeg -r 48 -i -  -c:v libx264  -preset veryslow  -pix_fmt yuv420p -filter:v \"setpts=8.0*PTS\" $nom_film;
+"
+    echo "#######################"
+
+    cat $bis_radical_images* | \
+ffmpeg -r 48 -i -  -c:v libx264  -preset veryslow  -pix_fmt yuv420p -filter:v "setpts=8.0*PTS" $nom_film;
+    
+    rm $bis_radical_images*;
+    rm -r ./LOGOS;
+    
+    echo "#######################"
+    echo "Emplacment film : $PWD"
+    echo "Le film : $(ls *mp4)"
+    echo " ~ The end ~ "
+    echo "#######################"
+    ######################################################
+    cd $initial_repo
+}
+
+tes $1 $2 $3 $4;

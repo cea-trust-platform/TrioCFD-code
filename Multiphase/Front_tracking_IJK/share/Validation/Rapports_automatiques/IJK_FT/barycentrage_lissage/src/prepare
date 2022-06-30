@@ -1,0 +1,42 @@
+#!/bin/sh
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 4 bulles a 4 positions differentes:
+cat >deplacements.txt <<EOF
+0. 0. 0. bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+# genere les variantes de jdd
+sed 's/lissage_courbure_iterations_systematique.*/lissage_courbure_iterations_systematique 0/;
+s/nb_iter_correction_volume.*/nb_iter_correction_volume 6/' ijkft_barycentrage_lissage.data>bary6.data
+
+sed 's/lissage_courbure_iterations_systematique.*/lissage_courbure_iterations_systematique 2/;
+s/nb_iter_correction_volume.*/nb_iter_correction_volume 6/' ijkft_barycentrage_lissage.data>baryliss6.data
+
+sed 's/lissage_courbure_iterations_systematique.*/lissage_courbure_iterations_systematique 0/;
+s/nb_iter_correction_volume.*/nb_iter_correction_volume 4/' ijkft_barycentrage_lissage.data>bary4.data
+
+sed 's/lissage_courbure_iterations_systematique.*/lissage_courbure_iterations_systematique 2/;
+s/nb_iter_correction_volume.*/nb_iter_correction_volume 4/' ijkft_barycentrage_lissage.data>baryliss4.data
+
+sed 's/lissage_courbure_iterations_systematique.*/lissage_courbure_iterations_systematique 0/;
+s/nb_iter_correction_volume.*/nb_iter_correction_volume 1/' ijkft_barycentrage_lissage.data>bary1.data
+
+sed 's/lissage_courbure_iterations_systematique.*/lissage_courbure_iterations_systematique 2/;
+s/nb_iter_correction_volume.*/nb_iter_correction_volume 1/' ijkft_barycentrage_lissage.data>baryliss1.data
+
+
+# deforme la bulle pour tester lissage et barycentrage
+cp init.lata.nodes init.lata.nodes.old
+awk 'BEGIN{r=0.035}{x=$1;y=$2;z=$3;
+x=x*x*x/(r*r)+0.1+y*0.1;
+y=y+0.1;
+z=z+0.1;
+print x,y,z}' init.lata.nodes.old >init.lata.nodes
+

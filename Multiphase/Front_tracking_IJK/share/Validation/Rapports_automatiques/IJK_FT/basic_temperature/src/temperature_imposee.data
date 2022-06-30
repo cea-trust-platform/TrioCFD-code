@@ -1,0 +1,132 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 8
+  nbelem_j 8
+  nbelem_k 4
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 20
+    timestep 2.4e-4   # 1.5e-3 #
+  #  time_scheme RK3_FT #
+  timestep_facsec 12
+  dt_post 10
+  tinit 0.
+  disable_diphasique
+   Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  # champs_a_postraiter 1 tous #
+  champs_a_postraiter 3 TEMPERATURE TEMPERATURE_ANA ECART_T_ANA  # GRAD_T ECART_T_ANA #
+			# INTERFACES INDICATRICE COMPO_CONNEXE COURBURE #
+                        # DISTANCE_AUTRES_INTERFACES REPULSION_FT #
+			# PRESSURE VELOCITY_FT #
+  check_stop_file stop.txt
+  dt_sauvegarde 200
+  nb_pas_dt_max 50
+#  t_debut_statistiques 0. #
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 2
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  }
+    ghost_size 1
+    pre_smooth_steps 1 10
+    smooth_steps 1 10
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 } impr }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    impr
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+#  interfaces #
+#  { #
+    # Soit un fichier genere externe #
+    # Choix1 #
+ #   fichier_reprise_interface pre_run.sauv.lata #
+ #   timestep_reprise_interface       1 #
+  # lata_meshname   FTMESH #
+  # Bary et lissage #
+ #   remaillage_ft_ijk { #
+   #     nb_iter_barycentrage 1 #
+  #      relax_barycentrage 1 #
+   #     nb_iter_correction_volume 6 #
+   #     lissage_courbure_iterations_systematique 0 #
+  #  } #
+ # } #
+
+   interfaces 
+  { # fichier_reprise_interface ?? #
+  fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+ }
+ 
+ thermique
+  {
+{
+   Boundary_Conditions {
+                bctype_kmin Paroi_Temperature_imposee
+                bctype_kmax Paroi_Temperature_imposee
+		# Paroi_Flux_impose #
+		# Paroi_Temperature_imposee #
+		# flux_impose_kmin 0. #
+		# flux_impose_kmax 0. #
+		 temperature_imposee_kmin 10. 
+		 temperature_imposee_kmax 10. 
+    }
+
+    expression_T_init 10.-5.*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)*sin(z*2*Pi/0.003) 
+	# x*(0.006-x)*y*(0.006-y)*z*(0.003-z) #
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    expression_T_ana 10.-5.*exp(-t*1.e-6*((2*Pi/0.006)^2+(2*Pi/0.006)^2+(2*Pi/0.003)^2))*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)*sin(z*2*Pi/0.003)
+  }
+}
+  # FIN AJOUT #
+  check_divergence
+  gravite 3 -9.81 0. 0. 
+  # vitesse_entree 0.01 #
+   rho_liquide 1000.
+   mu_liquide 0.
+   rho_vapeur 600
+   mu_vapeur 0.
+   sigma 0.07
+  expression_vx_init 0.
+  expression_vy_init 0.
+  expression_vz_init 0.
+  fichier_reprise_vitesse pre_run.sauv.lata
+  timestep_reprise_vitesse 1
+ # Sondes #
+#    { #
+#              pp_T temperature periode 1e-9 points 1 0.002 0.002 0.001 #
+#    } #
+
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

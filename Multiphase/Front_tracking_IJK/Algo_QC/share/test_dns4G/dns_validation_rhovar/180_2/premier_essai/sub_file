@@ -1,0 +1,18 @@
+#!/bin/bash
+#@ job_name = dns
+#@ job_type = parallel
+#@ wall_clock_limit = 48:00:00
+#@ class = general
+#@ network.MPI = sn_all,,us
+#@ total_tasks = 64
+#@ node = 4
+#@ output = job$(jobid).out
+#@ error = job$(jobid).err
+#@ initialdir = /gpfs/scratch/pr86bo/pr3da072/DNS_QC/valid_anisotherme/180_2/reprise0
+#@ node_topology = island
+#@ island_count = 1
+#@ energy_policy_tag = NONE
+#@ queue
+export MP_COLLECTIVE_OFFLOAD=yes # Improve allreduce performances
+[ -f ld_env.sh ] && . ./ld_env.sh # Chargement d'un eventuel environnement
+poe  ./New_algo_qc_opt dns -mpi -journal_master 1>dns.out 2>dns.err

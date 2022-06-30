@@ -1,0 +1,184 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+gmsh bulle_nulle.geo -2 -format msh2
+
+# Generation de 3 bulles  :
+# 0.01 0.0025 0.0025 bulle_nulle.msh
+cat >deplacements.txt <<EOF
+0.0 0.0 0.0 bulle_nulle.msh
+EOF
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Placement des sondes
+${project_directory}/share/PyTools/probes/place_sondes.sh spec_bulles spec_bulles_point2 cree [2,2,2,.] [force_ph,velocity]
+${project_directory}/share/PyTools/probes/place_sondes.sh spec_bulles spec_bulles_point2_no_thi cree [2,2,2,.] [velocity]
+
+# Deplacement de ce qui est utile au calcul dans le dossier RUN00
+
+# Nombre de pas de temps pour une petite simulation (dossier AVEC_REPRISE)
+nt=10;
+# Nombre de reprises (dans like_sub_file)
+nr=0;
+# Vitesse d'advection
+v=0.008
+vi=`echo "scale=9; $v/sqrt(2)" | bc`;
+# Amplitude gravite
+g=9.81
+
+# On cree NO_ADV_THI, NO_ADV_THI, NO_ADV_BBL, NO_ADV_THI_BBL
+# On cree ADV_THI, ADV_THI_BBL, ADV_001, ADV_101
+# -> Pour voir l'effet de l'advection du champ dans toutes les directions
+currentRepo=$PWD
+echo "$currentRepo"
+re='^[0-9]+$'>--
+if ! [[ $jobid =~ $re ]] ; then
+    jobidnext=00
+
+    ### ADVECTION ACTIVE
+
+    # THI seule
+    # force : Uhlenbeck-Ornstein
+    # Advection : Constante imposee 
+    ADV_THI_Repo=ADV_THI/RUN00
+    echo "mkdir -p $ADV_THI_Repo/NEXT"
+    mkdir -p $ADV_THI_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_THI_Repo
+    # sed -i "s/type 3/type 100/" $ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/# disable_diphasique #/disable_diphasique/" $ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/terme_force_init 11712.999999999997/terme_force_init 0/" $ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "/expression_derivee_force/c\  expression_derivee_force 0" $ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$v 0.0 0.0/"  $ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 0.0/" $ADV_THI_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV_THI_Repo
+    cp post_run $ADV_THI_Repo
+    cp like_sub_file $ADV_THI_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_THI_Repo/like_sub_file
+    cp prepare $ADV_THI_Repo
+
+    # THI et bulles
+    # force : Uhlenbeck-Ornstein
+    # Advection : A partir de u_liq
+    ADV_THI_BBL_Repo=ADV_THI_BBL/RUN00
+    echo "mkdir -p $ADV_THI_BBL_Repo/NEXT"
+    mkdir -p $ADV_THI_BBL_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_THI_BBL_Repo
+    # sed -i "s/type 3/type 010/" $ADV_THI_BBL_Repo/spec_bulles_point2.data
+    # sed -i "s/forced_advection -1/forced_advection 1/" $ADV_THI_BBL_Repo/spec_bulles_point2.data
+    # sed -i "s/123 123 123/0.0 $v 0.0/"  $ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/disable_diphasique/# disable_diphasique #/" $ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/ijk_splitting_ft_extension 0/ijk_splitting_ft_extension 10/" $ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "/champs_a_postraiter/c\  champs_a_postraiter 3 VELOCITY FORCE_PH INTERFACES" $ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 $g 0.0 0.0/" $ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    cp init.lata* $ADV_THI_BBL_Repo
+    cp post_run $ADV_THI_BBL_Repo
+    cp like_sub_file $ADV_THI_BBL_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_THI_BBL_Repo/like_sub_file
+    cp prepare $ADV_THI_BBL_Repo
+
+
+    ### ADVECTION DESACTIVE
+    # THI seule
+    # force : Uhlenbeck-Ornstein
+    NO_ADV_THI_Repo=NO_ADV_THI/RUN00
+    echo "mkdir -p $NO_ADV_THI_Repo/NEXT"
+    mkdir -p $NO_ADV_THI_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_THI_Repo
+    sed -i "s/# disable_diphasique #/disable_diphasique/" $NO_ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/terme_force_init 11712.999999999997/terme_force_init 0/" $NO_ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "/expression_derivee_force/c\  expression_derivee_force 0" $NO_ADV_THI_Repo/spec_bulles_point2.data
+    # sed -i "s/type 3/type 100/" $NO_ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$v 0.0 0.0/"  $NO_ADV_THI_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_THI_Repo/spec_bulles_point2.data 
+    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 0.0/" $NO_ADV_THI_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_THI_Repo
+    cp post_run $NO_ADV_THI_Repo
+    cp like_sub_file $NO_ADV_THI_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_THI_Repo/like_sub_file
+    cp prepare $NO_ADV_THI_Repo
+
+    # Bulles seules
+    # force : 0
+    NO_ADV_BBL_Repo=NO_ADV_BBL/RUN00
+    echo "mkdir -p $NO_ADV_BBL_Repo/NEXT"
+    mkdir -p $NO_ADV_BBL_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2_no_thi.data $NO_ADV_BBL_Repo
+    mv $NO_ADV_BBL_Repo/spec_bulles_point2_no_thi.data $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/type 3/type 0/" $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    # sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    # sed -i "s/123 123 123/0.0 0.0 $v/"  $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/disable_diphasique/# disable_diphasique #/" $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/ijk_splitting_ft_extension 0/ijk_splitting_ft_extension 10/" $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    sed -i "/champs_a_postraiter/c\  champs_a_postraiter 2 VELOCITY INTERFACES" $NO_ADV_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 $g 0.0 1e-6/" $NO_ADV_BBL_Repo/spec_bulles_point2.data 
+    cp init.lata* $NO_ADV_BBL_Repo
+    cp post_run $NO_ADV_BBL_Repo
+    cp like_sub_file $NO_ADV_BBL_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_BBL_Repo/like_sub_file
+    cp prepare $NO_ADV_BBL_Repo
+
+    # THI et bulles
+    # force : Uhlenbeck-Ornstein
+    NO_ADV_THI_BBL_Repo=NO_ADV_THI_BBL/RUN00
+    echo "mkdir -p $NO_ADV_THI_BBL_Repo/NEXT"
+    mkdir -p $NO_ADV_THI_BBL_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_THI_BBL_Repo
+    # sed -i "s/type 3/type 101/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$vi 0.0 -$vi/"  $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $((2*$nt))/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/disable_diphasique/# disable_diphasique #/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/ijk_splitting_ft_extension 0/ijk_splitting_ft_extension 10/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "/champs_a_postraiter/c\  champs_a_postraiter 3 VELOCITY FORCE_PH INTERFACES" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 $g 0.0 0.0/" $NO_ADV_THI_BBL_Repo/spec_bulles_point2.data 
+    cp init.lata* $NO_ADV_THI_BBL_Repo
+    cp post_run $NO_ADV_THI_BBL_Repo
+    cp like_sub_file $NO_ADV_THI_BBL_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_THI_BBL_Repo/like_sub_file
+    cp prepare $NO_ADV_THI_BBL_Repo
+
+else
+    # = Dans les faits, prepare n'est appele qu'une fois en debut de lancement de fiche, depuis le dossier build. Donc on ne rentre jamais dans le build. Si je veux executer les instructions suivantes elles doivent se trouver dans le post-run.
+    echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    echo "c'est bizar, je pensais que le prepare n'etait appele q'une fois, avant d'executer le prm..."
+    jobidnext=$((jobid+1))
+    newRepo="../RUN$(printf "%02d" $jobidnext)"
+    
+    echo "mkdir -p $newRepo/NEXT"
+    mkdir -p $newRepo/NEXT
+    cp spec_bulles_point2.data $newRepo
+    # mv init.lata* $newRepo
+    cp post_run $newRepo
+    cp like_sub_file $newRepo
+    cp prepare $newRepo
+fi
+
+

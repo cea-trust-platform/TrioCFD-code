@@ -1,0 +1,41 @@
+La simulation du premier cas est trop gourmande en temps de calcul pour être raisonnablement implémentée telle quelle dans cette validation. La pulsation d'advection du premier cas $\o_{1/2}$ est donc changée en $\o_{1/20}$ (voir définition $\o_q$) ce qui déplace le champ de force 10 fois plus vite et permet de retrouver une évolution satisfaisante en un temps de calcul raisonnable. La figure \ref{fig : 0X0} montre les évolutions des grandeurs pour le premier cas (modifié en accord avec ce qui précède) :
+\begin{align}
+\gf(\bx;t) = 2cos(\k_1 x - \o_{1/20}t) \bm{e_y}
+\end{align} 
+
+La force physique $f_y(x,0,0;t_i)$ en rouge, la vitesse $u_y(x,0,0;t_i)$ en bleu et la pression $p(x,0,0;t_i)$ en vert pour différents instants allant de $t=0.008s$ à $t=0.076s$ sont tracés. On constate bien qu'entre $t_0=0.008s \approx 0s$ et $t_i = 0.0503 \approx t_0 + 1/20 s$, le champ de force $f_y$ (rouge) a été translaté d'une distance $L$ dans la direction $x$. \tb{La translation du champ dans la direction $x$ est validée pour un champ d'onde transversale.}
+
+\begin{figure}
+\begin{center}
+	\begin{subfigure}[t]{0.4\textwidth}                                                                                                                                   
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_0X0_t1.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : 0X0_t1}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_0X0_t6.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : 0X0_t6}
+	\end{subfigure}
+\\
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_0X0_t11.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : 0X0_t11}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_0X0_t16.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : 0X0_t16}
+	\end{subfigure}
+\\
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_ADV_0X0_t17.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : 0X0_t21}
+	\end{subfigure}	
+\end{center}
+\caption{Évolution le long de $(x,y=0,z=0)$ de : la force $f_y$ (rouge), la vitesse $u_y$ (bleu), la pression $p$ (vert).}
+\label{fig : 0X0}
+\end{figure}
+

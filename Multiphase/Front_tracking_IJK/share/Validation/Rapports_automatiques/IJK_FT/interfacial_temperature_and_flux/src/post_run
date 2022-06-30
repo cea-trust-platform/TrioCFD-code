@@ -1,0 +1,31 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+
+case=`echo $1`
+lata2dx $case.lata asciiout writelata=ascii.lata
+echo "Post traitement fichier python ${case}"
+python post_flux.py >$case.txt
+grep PHIN $case.txt > ${case}_PHIN.txt
+grep TEMPERATURE $case.txt > ${case}_TEMPERATURE.txt
+
+if [ $case == "test_24_par8_trans" ] ; then 
+	exit 0
+fi
+
+n=${case:5}
+nn=`echo $n/12 | bc`
+cat <<EOF >> plot.gplot
+    "${case}_PHIN.txt" u 3:(\$4) w p ps $nn t "", \
+    "" u 3:(abs(\$5)):(2*\$6) w yerrorbars ls $nn t "", \
+    "" u 3:(abs(\$5)) w l ls $nn t "N=$n", \\
+EOF
+
+if [ $case == "test_48" ] ; then 
+	sed -i '$s/, \\//g' plot.gplot
+	echo "# pause -1" >> plot.gplot
+	gnuplot plot.gplot
+	sed "s/PHIN/TEMPERATURE/g" plot.gplot > plot-T.gplot
+	gnuplot plot-T.gplot
+fi
+
+

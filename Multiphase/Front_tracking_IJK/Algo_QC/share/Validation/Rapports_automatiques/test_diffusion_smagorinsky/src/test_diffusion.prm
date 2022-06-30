@@ -1,0 +1,1056 @@
+Parameters {
+	Title "Validation de l'operateur de diffusion turbulente de la quantit\'e de mouvement avec le mod\`ele de Smagorinsky dans la formulation 'Favre'"
+	Author "Dorian Dupuy"
+	VersionTrio_U 1.7.4
+ 	TestCase VX_DIRX test_diffusion.data
+ 	TestCase VY_DIRX test_diffusion.data
+ 	TestCase VZ_DIRX test_diffusion.data
+ 	TestCase VX_DIRY test_diffusion.data
+ 	TestCase VY_DIRY test_diffusion.data
+ 	TestCase VZ_DIRY test_diffusion.data
+	Description "Info pour completer un prm: firefox \$TRUST_ROOT/Validation/Outils/Genere_courbe/doc/manuel.xhtml "
+}
+
+Chapter {
+Description "\latex_(\input{../description_cas.tex}\latex_)"
+}
+
+Chapter {
+
+ 
+  	Title "Cas VX_DIRX" 
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_x"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_x"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_x"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata error_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_x"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_x"
+			file VX_DIRX/simu_dv_x0000.curve
+		}
+		Curve {
+			legend "ana_dv_x"
+			file VX_DIRX/ana_dv_x0000.curve
+		}
+		Curve {
+			legend "error_dv_x"
+			file VX_DIRX/error_dv_x0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_y"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_y"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_y"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata error_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_y"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_y"
+			file VX_DIRX/simu_dv_y0000.curve
+		}
+		Curve {
+			legend "ana_dv_y"
+			file VX_DIRX/ana_dv_y0000.curve
+		}
+		Curve {
+			legend "error_dv_y"
+			file VX_DIRX/error_dv_y0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_z"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_z"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_z"
+		cycles -1
+		Instruction_visit execfile("VX_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRX/test_diffusion_lata_1.sauv.lata error_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_z"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_z"
+			file VX_DIRX/simu_dv_z0000.curve
+		}
+		Curve {
+			legend "ana_dv_z"
+			file VX_DIRX/ana_dv_z0000.curve
+		}
+		Curve {
+			legend "error_dv_z"
+			file VX_DIRX/error_dv_z0000.curve
+		}
+		Width 14cm
+	}
+}
+Chapter {
+
+ 
+  	Title "Cas VX_DIRY" 
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_x"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_x"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_x"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata error_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_x"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_x"
+			file VX_DIRY/simu_dv_x0000.curve
+		}
+		Curve {
+			legend "ana_dv_x"
+			file VX_DIRY/ana_dv_x0000.curve
+		}
+		Curve {
+			legend "error_dv_x"
+			file VX_DIRY/error_dv_x0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_y"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_y"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_y"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata error_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_y"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_y"
+			file VX_DIRY/simu_dv_y0000.curve
+		}
+		Curve {
+			legend "ana_dv_y"
+			file VX_DIRY/ana_dv_y0000.curve
+		}
+		Curve {
+			legend "error_dv_y"
+			file VX_DIRY/error_dv_y0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_z"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_z"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_z"
+		cycles -1
+		Instruction_visit execfile("VX_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VX_DIRY/test_diffusion_lata_1.sauv.lata error_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_z"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_z"
+			file VX_DIRY/simu_dv_z0000.curve
+		}
+		Curve {
+			legend "ana_dv_z"
+			file VX_DIRY/ana_dv_z0000.curve
+		}
+		Curve {
+			legend "error_dv_z"
+			file VX_DIRY/error_dv_z0000.curve
+		}
+		Width 14cm
+	}
+}
+Chapter {
+
+ 
+  	Title "Cas VY_DIRX" 
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_x"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_x"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_x"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata error_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_x"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_x"
+			file VY_DIRX/simu_dv_x0000.curve
+		}
+		Curve {
+			legend "ana_dv_x"
+			file VY_DIRX/ana_dv_x0000.curve
+		}
+		Curve {
+			legend "error_dv_x"
+			file VY_DIRX/error_dv_x0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_y"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_y"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_y"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata error_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_y"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_y"
+			file VY_DIRX/simu_dv_y0000.curve
+		}
+		Curve {
+			legend "ana_dv_y"
+			file VY_DIRX/ana_dv_y0000.curve
+		}
+		Curve {
+			legend "error_dv_y"
+			file VY_DIRX/error_dv_y0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_z"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_z"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_z"
+		cycles -1
+		Instruction_visit execfile("VY_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRX/test_diffusion_lata_1.sauv.lata error_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_z"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_z"
+			file VY_DIRX/simu_dv_z0000.curve
+		}
+		Curve {
+			legend "ana_dv_z"
+			file VY_DIRX/ana_dv_z0000.curve
+		}
+		Curve {
+			legend "error_dv_z"
+			file VY_DIRX/error_dv_z0000.curve
+		}
+		Width 14cm
+	}
+}
+Chapter {
+
+ 
+  	Title "Cas VY_DIRY" 
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_x"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_x"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_x"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata error_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_x"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_x"
+			file VY_DIRY/simu_dv_x0000.curve
+		}
+		Curve {
+			legend "ana_dv_x"
+			file VY_DIRY/ana_dv_x0000.curve
+		}
+		Curve {
+			legend "error_dv_x"
+			file VY_DIRY/error_dv_x0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_y"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_y"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_y"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata error_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_y"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_y"
+			file VY_DIRY/simu_dv_y0000.curve
+		}
+		Curve {
+			legend "ana_dv_y"
+			file VY_DIRY/ana_dv_y0000.curve
+		}
+		Curve {
+			legend "error_dv_y"
+			file VY_DIRY/error_dv_y0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_z"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_z"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_z"
+		cycles -1
+		Instruction_visit execfile("VY_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VY_DIRY/test_diffusion_lata_1.sauv.lata error_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_z"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_z"
+			file VY_DIRY/simu_dv_z0000.curve
+		}
+		Curve {
+			legend "ana_dv_z"
+			file VY_DIRY/ana_dv_z0000.curve
+		}
+		Curve {
+			legend "error_dv_z"
+			file VY_DIRY/error_dv_z0000.curve
+		}
+		Width 14cm
+	}
+}
+Chapter {
+
+ 
+  	Title "Cas VZ_DIRX" 
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_x"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_x"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_x"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata error_dv_x
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_x"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_x"
+			file VZ_DIRX/simu_dv_x0000.curve
+		}
+		Curve {
+			legend "ana_dv_x"
+			file VZ_DIRX/ana_dv_x0000.curve
+		}
+		Curve {
+			legend "error_dv_x"
+			file VZ_DIRX/error_dv_x0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_y"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_y"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_y"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata error_dv_y
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_y"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_y"
+			file VZ_DIRX/simu_dv_y0000.curve
+		}
+		Curve {
+			legend "ana_dv_y"
+			file VZ_DIRX/ana_dv_y0000.curve
+		}
+		Curve {
+			legend "error_dv_y"
+			file VZ_DIRX/error_dv_y0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_z"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata simu_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_z"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata ana_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_z"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRX/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRX/test_diffusion_lata_1.sauv.lata error_dv_z
+		Operator Slice2D_Y 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_z"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_z"
+			file VZ_DIRX/simu_dv_z0000.curve
+		}
+		Curve {
+			legend "ana_dv_z"
+			file VZ_DIRX/ana_dv_z0000.curve
+		}
+		Curve {
+			legend "error_dv_z"
+			file VZ_DIRX/error_dv_z0000.curve
+		}
+		Width 14cm
+	}
+}
+Chapter {
+
+ 
+  	Title "Cas VZ_DIRY" 
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_x"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_x"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_x"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata error_dv_x
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_x"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_x"
+			file VZ_DIRY/simu_dv_x0000.curve
+		}
+		Curve {
+			legend "ana_dv_x"
+			file VZ_DIRY/ana_dv_x0000.curve
+		}
+		Curve {
+			legend "error_dv_x"
+			file VZ_DIRY/error_dv_x0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_y"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_y"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_y"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata error_dv_y
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_y"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_y"
+			file VZ_DIRY/simu_dv_y0000.curve
+		}
+		Curve {
+			legend "ana_dv_y"
+			file VZ_DIRY/ana_dv_y0000.curve
+		}
+		Curve {
+			legend "error_dv_y"
+			file VZ_DIRY/error_dv_y0000.curve
+		}
+		Width 14cm
+	}
+
+	visu {
+		nb_img_without_newline 2
+		Description "Simu dv_z"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata simu_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Ana dv_z"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata ana_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "Error dv_z"
+		cycles -1
+		Instruction_visit execfile("VZ_DIRY/instructions.py")
+	         origine instruction
+	
+		pseudocolor VZ_DIRY/test_diffusion_lata_1.sauv.lata error_dv_z
+		Operator Slice2D_X 0.33 0.33 0.33
+		Width 7.5cm
+	}
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.33"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "dv_z"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_dv_z"
+			file VZ_DIRY/simu_dv_z0000.curve
+		}
+		Curve {
+			legend "ana_dv_z"
+			file VZ_DIRY/ana_dv_z0000.curve
+		}
+		Curve {
+			legend "error_dv_z"
+			file VZ_DIRY/error_dv_z0000.curve
+		}
+		Width 14cm
+	}
+}
+

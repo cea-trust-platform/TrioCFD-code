@@ -1,0 +1,99 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+Lx=0.018
+Ly=0.015
+Lz=0.01
+
+Pm=8.
+Um=10.
+Vm=7.
+Wm=3.
+
+Kp=-1
+# Il faut 0 pour respecter la CL au bord : 
+Ku=0.
+Kv=0.
+Kw=0.
+
+phix=0.
+phiy=0.
+
+pi=3.141592653589793
+
+A=1
+B=1
+C=1
+D=1
+E=1
+N=40
+
+sed -e "s/@Lx@/$Lx/g" \
+    -e "s/@Ly@/$Ly/g" \
+    -e "s/@Lz@/$Lz/g" \
+    -e "s/@Pm@/$Pm/g" \
+    -e "s/@Um@/$Um/g" \
+    -e "s/@Vm@/$Vm/g" \
+    -e "s/@Wm@/$Wm/g" \
+    -e "s/@Kp@/$Kp/g" \
+    -e "s/@Ku@/$Ku/g" \
+    -e "s/@Kv@/$Kv/g" \
+    -e "s/@Kw@/$Kw/g" \
+    -e "s/@phix@/$phix/g" \
+    -e "s/@phiy@/$phiy/g" \
+    -e "s/@pi@/$pi/g" \
+    -e "s/@A@/$A/g" \
+    -e "s/@B@/$B/g" \
+    -e "s/@C@/$C/g" \
+    -e "s/@D@/$D/g" \
+    -e "s/@E@/$E/g" \
+    -e "s/@N@/$N/g" \
+    ijkft_stat_diph_AI.data > model.data
+
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh sphere.geo -2
+# gmsh hemisphere.geo -2
+
+for cas in "sphere" "hemisphere"
+do
+   for translate in +0.0000 -0.0002 -0.0041
+   do
+      fold=GEOM_$cas/TRANS_$translate
+      mkdir -p $fold
+      \cp -f $cas.msh prepare.data pre_run $fold
+      \cp -f model.data $fold/ijkft_stat_diph_AI.data
+      # Generation du lata de l'ellipsoide initial:
+      cat > $fold/deplacements.txt <<EOF
+$translate 0. 0. $cas.msh
+EOF
+      cd $fold
+      # Creation du init.lata:
+      ../../cree_multi_bulles.sh deplacements.txt init.lata
+      # Lisse le maillage init.lata
+      echo -n "[$fold] Preparation du maillage initial par un lissage..."
+      if [ $N -ge 40 ] 
+      then
+        mkdir -p PAR8
+	cp -f pre_run PAR8/
+	sed -e 's/nproc_i 1/nproc_i 1/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 4/' \
+	     ijkft_stat_diph_AI.data > PAR8/ijkft_stat_diph_AI_par8.data
+# 	    -e "s@prepare.sauv@../prepare.sauv@g" \
+	     # cd PAR8 && ln -sf ../prepare.sauv.lata* . && cd ../   # Not yet created... 
+	  fi
+      echo "done!"
+      cd ../..
+   done
+done
+
+# Pour le post-traitement : 
+mkdir -p LINKS && cd LINKS
+ln -sf ../GEOM_hemisphere/TRANS_+0.0000 hemisphere_0._SEQ
+ln -sf ../GEOM_hemisphere/TRANS_+0.0000/PAR8 hemisphere_0._PAR8
+ln -sf ../GEOM_sphere/TRANS_+0.0000 sphere_0._SEQ
+ln -sf ../GEOM_sphere/TRANS_+0.0000/PAR8 sphere_0._PAR8
+# Apres translation:
+ln -sf ../GEOM_sphere/TRANS_-0.0041 sphere_-0.0041_SEQ
+ln -sf ../GEOM_hemisphere/TRANS_-0.0002 hemisphere_-0.0002_SEQ
+

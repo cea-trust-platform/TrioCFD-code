@@ -1,0 +1,83 @@
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 256
+  nbelem_j 2
+  nbelem_k 128
+  uniform_domain_size_i 0.15
+  uniform_domain_size_j 1.8750e-2
+  uniform_domain_size_k 0.0576
+  perio_i
+  perio_j
+ 
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 4
+  nproc_j 1
+  nproc_k 1
+}
+
+DoubleTab positions_tubes
+Lire_fichier positions_tubes positions.txt
+
+IJK_problem_double 
+{
+  ijk_splitting grid_splitting
+  timestep 0.008
+  timestep_facsec 0.4
+
+  dt_post 100
+  champs_a_postraiter 1 tous
+  check_stop_file stop.txt
+
+  dt_sauvegarde 1000
+  nb_pas_dt_max 50000
+  pressure_gradient 0
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 4
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 } 	
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 } 	
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-9  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 20 1
+  }
+  check_divergence
+  viscosite_cinematique 1.00e-6
+  vitesse_entree 0.01
+  rho 1000
+
+  couplage_tubes_ibc {
+    rho_fluide_pour_adim 1000
+    t_lache 50
+    tube_r 5e-3
+    omega_ 0
+    z_lache 2.5e-3
+    vz_lache 0
+    A 0
+    B 0
+    pulsation 0
+    pulsation2 0
+    para_libre 1
+    rho_cylindre 3794.25
+    c 1.116e-3
+    k 8.8458e-4
+    h_cylindre 1.8750e-2
+    mouvement libre
+    donnees_tubes positions_tubes
+    Num_cylindre_mobile 12
+  }
+}
+
+Fin
