@@ -1,0 +1,22 @@
+Parametres {
+	Titre "Fiche du changement de variable pour les statistiques dans un SWARM"
+
+	Description <<EOF
+
+	EOF
+
+	Auteur "A.S."
+	CasTest . pre_run.data 1
+	CasTest . CHMTVAR.data 4
+}
+
+Chapitre {
+	Titre "Evolution de la temperature avec des conditions aux limites de temperature imposee a la paroi"
+	visu {
+		titre "Calculated solution"
+			cycles -1
+			width 12cm
+			pseudocolor ./CHMTVAR.lata DOM TEMPERATURE_0 ELEM
+	}
+
+}

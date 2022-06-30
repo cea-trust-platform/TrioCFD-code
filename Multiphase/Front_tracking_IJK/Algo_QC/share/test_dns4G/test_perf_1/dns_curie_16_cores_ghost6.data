@@ -1,0 +1,165 @@
+# Modification du jdd de Frederic Aulery le 04/07/2012 #
+# ThermoHydraulique 3D : canal quasi compressible gaz parfait VDF turbulent #
+# PARALLEL OK #
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+# DEBUT MAILLAGE #
+#
+ Dimensions du domaine d'origine (jdd de F.A. du 4/7/2012) : 
+         x=0.375056 y=0.029846 z=0.187528
+  nb_nodes 897       201       449
+ Pas de maillage en x: 0.0004185892857142857
+ Pas de maillage en z: 0.0004185892857142857
+ Pas de maillage en y: 0.0000284800355704 (premiere maille)
+ Pour retrouver la taille de la premiere maille avec un maillage regulier il faut 1048 mailles
+#
+
+MaillerParallel {
+    domain dom
+    nb_nodes 3 129 257 129
+    splitting 3 4 2 2
+    ghost_thickness 2
+    perio_x
+    perio_z
+    function_coord_x x*0.0004185892857142857*128
+    function_coord_y y*0.0000284800355704*256
+    function_coord_z z*0.0004185892857142857*128
+    boundary_xmin periox
+    boundary_xmax periox
+    boundary_ymin bas
+    boundary_ymax haut
+    boundary_zmin perioz
+    boundary_zmax perioz
+}
+
+# FIN MAILLAGE #
+
+VDF dis
+
+Runge_Kutta_ordre_3_QC sch
+Lire sch
+{
+        tinit 1.357308e+00 
+        tmax 10
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	seuil_statio 1.e-8
+	nb_pas_dt_max 2
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu champ_fonc_fonction pb temperature_qc 1 (1.461e-6*(val^1.5)/(val+111.))
+        lambda champ_fonc_fonction pb temperature_qc 1 (1.93198026315789000e-3*val^1.5)/(val+111.)
+
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+}
+
+
+Associer pb dom
+Associer pb sch
+Associer pb fluide
+
+Discretiser pb dis
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+                solveur_pression multigrille_adrien {
+
+			K_coarse_sizes 4 128 64 32 16
+			nb_isotropic_coarsening 1
+			ghost_size 6
+			pre_smooth_steps 1  5 
+			smooth_steps 1  5 
+			relax_jacobi 0.65
+			perio_i 1
+			perio_j 1
+			solveur_grossier GCP { 
+				seuil  1e-9  
+				precond ssor { omega 1.5 } 
+			}
+			check_residu 1
+			seuil  1e-9 
+			impr
+			nb_full_mg_steps 2 10 1 
+			# iterations_gmres 3 n_krilov 2 nb_full_mg_steps 2 2 1 #
+			decoupage 3 4 2 2 
+		}
+		
+                convection { centre4 }
+                diffusion { }
+                Sources 
+		{ 
+			Canal_perio { direction_ecoulement 0 h 0.0149 } 
+		}	
+		conditions_initiales 
+		{
+                        vitesse champ_fonc_xyz dom 3 10.06*y*(0.029846-y)*4/(0.029846*0.029846) (sin((x-0.375056)/0.375056*6.28318530717959)*sin(z/0.187528*6.28318530717959)+sin((x-0.375056)/0.375056*6.28318530717959*6)*sin(z/0.187528*6.28318530717959*4)*sin(y/(4*0.029846)*6.28318530717959*4)+sin((x-0.375056)/0.375056*6.28318530717959*2)*sin(z/0.187528*6.28318530717959*1)*sin(y/(4*0.029846)*6.28318530717959*1))*y*(0.029846-y)*4/(0.029846*0.029846) 0.
+		}
+                conditions_limites 
+		{
+                        periox   periodique 
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		}  
+	}
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+                convection { quick }
+		Sources {	}	
+		conditions_initiales { Temperature Champ_fonc_xyz dom 1 (2.93*y/0.029846+293.) }
+		conditions_limites 
+                {
+                 	periox periodique 
+			perioz periodique 
+ 		        haut paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 295.93 H_imp Champ_Front_Uniforme 1  1.e14
+			bas paroi_echange_externe_impose T_ext Champ_Front_Uniforme 1 293. H_imp Champ_Front_Uniforme 1  1.e14
+		}
+    		Modele_turbulence Prandtl
+		{ 
+ 			turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+         { 			
+			format lata
+			Champs dt_post 0.1
+			{
+      				vitesse faces
+      				masse_volumique elem
+				pression elem
+				temperature_qc elem
+      				viscosite_turbulente elem
+				Vorticite elem
+				Critere_Q elem
+         		}
+	       }
+#
+         reprise binaire ../rep24/LES-395-1.01_25.sauv 
+         sauvegarde_simple binaire LES-395-1.01_26.sauv 
+#
+}
+
+Resoudre pb
+Fin

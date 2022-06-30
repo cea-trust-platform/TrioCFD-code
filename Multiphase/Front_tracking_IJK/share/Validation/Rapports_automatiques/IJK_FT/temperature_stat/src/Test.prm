@@ -1,0 +1,14 @@
+Parametres {
+	Titre "Fiche de validation des statistiques de la temperature"
+	Auteur "A.S."
+        CasTest . Test.data 1
+	CasTest . Reprise.data 1
+	CasTest . Test_par2.data 2
+	CasTest . Reprise_par2.data 2
+}
+
+Chapitre {
+	Titre "Test 1"
+}
+
+ 

@@ -1,0 +1,70 @@
+Parametres {
+	Titre "Transport periodique de la température avec schéma QUICK sans diffusion"
+	Description ""
+	Auteur "A. S."
+	CasTest V_1 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_5 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_8 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_10 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_20 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_40 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_50 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest V_100 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_8 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_12 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_16 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_24 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_32 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_40 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_50 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_64 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_80 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_100 ijkft_ConvectionMultiSphere_seq.data 4
+	CasTest DX_EUL_128 ijkft_ConvectionMultiSphere_seq.data 4
+}
+Chapitre {
+	Titre "Maillage genere par cree_multi_bulles.sh"
+
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+}
+
+Chapitre {
+	Titre "Verification du calcul initial sequentiel"
+	visu {
+		titre "Etat initial"
+		cycles 0
+		mesh                      ijkft_ConvectionMultiSphere_seq.lata INTERFACES
+		pseudocolor               ijkft_ConvectionMultiSphere_seq.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity  ijkft_ConvectionMultiSphere_seq.lata DOM MU ELEM 0.1
+		mesh                      ijkft_ConvectionMultiSphere_seq.lata DOM_EXT
+	}
+	visu {
+		titre "Etat final"
+		cycles -1
+		mesh                      ijkft_ConvectionMultiSphere_seq.lata INTERFACES
+		pseudocolor               ijkft_ConvectionMultiSphere_seq.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity  ijkft_ConvectionMultiSphere_seq.lata DOM MU ELEM 0.1
+		mesh                      ijkft_ConvectionMultiSphere_seq.lata DOM_EXT
+	}
+	visu {
+		titre "Coupe du champ de vitesse Y sur le domaine etendu"
+		cycles -1
+		mesh        ijkft_ConvectionMultiSphere_seq.lata INTERFACES
+		mesh        ijkft_ConvectionMultiSphere_seq.lata DOM
+		pseudocolor ijkft_ConvectionMultiSphere_seq.lata DOM_EXT_dual VELOCITY_FT_Y FACES 
+		operator_to_all slice2d_z 0. 0. 0.1
+	}
+	visu {
+	        titre "Decoupage parallele des interfaces"
+		cycles -1
+		mesh                     ijkft_ConvectionMultiSphere_seq.lata INTERFACES
+		pseudocolor              ijkft_ConvectionMultiSphere_seq.lata INTERFACES FACETTE_PE_OWNER ELEM
+		pseudocolor_with_opacity ijkft_ConvectionMultiSphere_seq.lata DOM MU ELEM 0.1
+		mesh                     ijkft_ConvectionMultiSphere_seq.lata DOM_EXT
+	}
+}
+

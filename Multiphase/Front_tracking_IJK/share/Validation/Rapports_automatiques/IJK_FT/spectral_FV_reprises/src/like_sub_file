@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# = Paramètres utilisateurs
+jdd=spectral_point2  # Nom du jeu de données
+temps_simu=53950  # Temps alloue, en secondes
+errorfile=$jdd.err  # Nom du fichier erreur
+outputfile=$jdd.out  # Nom du fichier output
+fichier_sub=like_sub_file  # Nom du fichier de soumission
+nrun=2  # Nombre de RUN à lancer
+# versionIJK=/home/shared/shrdmpr/IJK_GIT/IJK_master/env_IJK.sh  # Emplacement d'IJK
+
+# Nécessaire pour l'écriture de la reprise
+mkdir -p NEXT
+
+# Déplacement dans le dossier de soumission
+# cd $SLURM_SUBMIT_DIR
+
+# = Identifiant du job
+jobid=$(sed "s/RUN//" <<< ${PWD##*/}) #$(find .. -type d -name RUN* | wc -l)
+jobid=$(grep -o ..$ <<< ${PWD##*/})
+##jobid=$((jobid-1))
+echo "JobID"
+echo $jobid
+
+# = Source IJK
+# source $versionIJK
+
+# = Prépatation reprise
+if ! [ -a NO-REPRISE ]; then
+    echo "= Création de la reprise"
+    # -> Si on est dans un dossier INITIAL ou INITIALE, ou qui ne fini pas par deux chiffres, alors la reprise se fera dans un fichier RUN00
+    ## How do I test if a variable is a number in Bash? : How do I test if a variable is a number in Bash?
+    re='^[0-9]+$'	
+    if ! [[ $jobid =~ $re ]] ; then
+        jobidnext=00
+        echo $yournumber
+        echo "error: Not a number"
+    else
+      jobidnext=$((jobid+1))
+    fi
+    
+    newRepo="../RUN$(printf "%02d" $jobidnext)"
+    echo "  $newRepo"
+    mkdir -p $newRepo
+    cp $jdd.data $fichier_sub $newRepo/
+    currentRepo=$(pwd)
+
+    # = Copie pour la reprise
+    cp prepare post_run $newRepo
+ 
+    if [[ $jobid =~ $re ]] ; then
+        echo "like_sub_file, l52 : $jobid"
+        grep -e "nom_reprise PREV\/$jdd.sauv" $newRepo/$jdd.data
+        sed -i "s/# nom_reprise PREV\/$jdd.sauv #/nom_reprise PREV\/$jdd.sauv/g" $newRepo/$jdd.data
+    fi
+    cd $newRepo
+    # sbatch --dependency=afterany:$SLURM_JOB_ID $fichier_sub
+    if [[ $(basename $PWD) == "RUN$(printf "%02d" $nrun)" ]]; then
+        touch NO-REPRISE
+    fi
+    cd $currentRepo
+    pwd
+else
+    echo "= Pas de création de reprise"
+fi
+
+# = NB : manque la variable BRIDGE_MSUB_MAXTIME pour automatiser cette commande
+# Dans 0h10, cree le fichier stop :
+# sleep $temps_simu && echo "1" > stop.txt  &
+# pid=$!
+
+# = Lancement du calcul
+# date > $jdd.time
+# srun --mpi=pmi2 -K1 --resv-ports -n $SLURM_NTASKS $exec $jdd $SLURM_NTASKS 1>$outputfile 2>$errorfile
+# date >> $jdd.time
+
+# = Fin du calcul
+grep -q "Arret des processes" $errorfile
+# grep -q "Finished correctly" $jdd.stop
+if [ $? == 0 ] ; then
+    # = Nettoyage du dossier
+    # Création des dossiers pour le rangement
+    mkdir -p LATAS/ LOGS/ OUT/ SON/ TXT/
+    # mv *.log LOGS
+    rm *log
+    mv *.out OUT
+    mv *lata* LATAS
+    mv *son SON
+    mv *txt TXT 
+   
+    cp -r NEXT $newRepo/PREV
+    cp $jdd.dt_ev OUT/* TXT/* $newRepo
+    # cp /home/ramirezg/SUB_FILES/sub_file_clean_runs_and_lata ./
+    # sed -i "s/comp_run/clSC6_ROTATION/g"
+    # sbatch sub_file_clean_runs_and_lata
+fi
+
+# Si la commande sleep ne s'est pas bien terminée :
+# kill $pid
+# kill $pid2

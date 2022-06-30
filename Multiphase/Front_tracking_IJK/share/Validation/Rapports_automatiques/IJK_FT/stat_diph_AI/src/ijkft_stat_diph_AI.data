@@ -1,0 +1,162 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i @N@
+  nbelem_j @N@
+  nbelem_k @N@
+  uniform_domain_size_i @Lx@
+  uniform_domain_size_j @Ly@
+  uniform_domain_size_k @Lz@
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1 # 3 #
+  nproc_j 1 # 2 #
+  nproc_k 1 # 2 #
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 20
+  timestep 0.000001
+  Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  dt_post 1
+  dt_post_stats_bulles 1000000
+  dt_post_stats_plans 1
+  t_debut_statistiques 0.0
+  champs_a_postraiter 5 INDICATRICE INTERFACES COURBURE COMPO_CONNEXE AIRE_INTERF
+  nb_pas_dt_max 1
+  disable_solveur_poisson
+  multigrid_solver { }
+  disable_diffusion_qdm
+  disable_convection_qdm
+  # disable_source_interf #
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface prepare.sauv.lata
+    timestep_reprise_interface       1
+    lata_meshname   INTERFACES
+    remaillage_ft_ijk {
+      pas_remaillage 1.0000000000000005e-07
+      nb_iter_barycentrage 1
+      relax_barycentrage 1.
+      critere_arete 0.35
+      seuil_dvolume_residuel 0.
+      nb_iter_correction_volume 6
+      nb_iter_remaillage 6
+      facteur_longueur_ideale 0.75
+      lissage_courbure_coeff -0.025
+      lissage_courbure_iterations_systematique 1
+      lissage_courbure_iterations_si_remaillage 10
+    }
+  }
+  # check_divergence #
+  rho_liquide 1.0
+  mu_liquide 1.0e-3
+  sigma 0.07
+  # Verification des calculs des gradients et tout ce que ca implique : #
+  check_stats
+  # Champ initial impose : #
+  expression_p_init
+@Pm@*(1+@A@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@B@*cos(2.*@pi@*y/@Ly@+@phiy@))*(1+@C@*cos(@pi@*z/@Lz@))+(@Kp@)
+  expression_vx_init
+@Um@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)+(@Ku@)
+  expression_vy_init
+@Vm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)+(@Ku@)
+  expression_vz_init
+@Wm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)+(@Ku@)
+  # Solution analytique connue pour le gradU et gradP # 
+  expression_dPdx_ana 
+@Pm@*(-@A@*2.*@pi@/@Lx@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@B@*cos(2.*@pi@*y/@Ly@+@phiy@))*(1+@C@*cos(@pi@*z/@Lz@))
+  expression_dPdy_ana 
+@Pm@*(1+@A@*cos(2.*@pi@*x/@Lx@+@phix@))*(-@B@*2.*@pi@/@Ly@*sin(2.*@pi@*y/@Ly@+@phiy@))*(1+@C@*cos(@pi@*z/@Lz@))
+  expression_dPdz_ana 
+@Pm@*(1+@A@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@B@*cos(2.*@pi@*y/@Ly@+@phiy@))*(-@pi@/@Lz@*@C@*sin(@pi@*z/@Lz@))
+  expression_dUdx_ana 
+@Um@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_dUdy_ana 
+@Um@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_dUdz_ana 
+@Um@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  expression_dVdx_ana 
+@Vm@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_dVdy_ana 
+@Vm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_dVdz_ana 
+@Vm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  expression_dWdx_ana 
+@Wm@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_dWdy_ana 
+@Wm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_dWdz_ana 
+@Wm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  # -------------------------------------------- #
+  # Solution analytique connue pour le grad2P # 
+  # -------------------------------------------- #
+  expression_ddPdxdx_ana 
+@Pm@*(-@A@*2.*@pi@/@Lx@*2.*@pi@/@Lx@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@B@*cos(2.*@pi@*y/@Ly@+@phiy@))*(1+@C@*cos(@pi@*z/@Lz@))
+  expression_ddPdydy_ana 
+@Pm@*(1+@A@*cos(2.*@pi@*x/@Lx@+@phix@))*(-@B@*2.*@pi@/@Ly@*2.*@pi@/@Ly@*cos(2.*@pi@*y/@Ly@+@phiy@))*(1+@C@*cos(@pi@*z/@Lz@))
+  expression_ddPdzdz_ana 
+@Pm@*(1+@A@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@B@*cos(2.*@pi@*y/@Ly@+@phiy@))*(-@pi@/@Lz@*@pi@/@Lz@*@C@*cos(@pi@*z/@Lz@))
+  expression_ddPdxdy_ana 
+@Pm@*(-@A@*2.*@pi@/@Lx@*sin(2.*@pi@*x/@Lx@+@phix@))*(-@B@*2.*@pi@/@Ly@*sin(2.*@pi@*y/@Ly@+@phiy@))*(1+@C@*cos(@pi@*z/@Lz@))
+  expression_ddPdxdz_ana 
+@Pm@*(-@A@*2.*@pi@/@Lx@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@B@*cos(2.*@pi@*y/@Ly@+@phiy@))*(-@pi@/@Lz@*sin(@pi@*z/@Lz@))
+  expression_ddPdydz_ana 
+@Pm@*(1+@A@*cos(2.*@pi@*x/@Lx@+@phix@))*(-@B@*2.*@pi@/@Ly@*sin(2.*@pi@*y/@Ly@+@phiy@))*(-@pi@/@Lz@*@C@*sin(@pi@*z/@Lz@))
+  # -------------------------------------------- #
+  # Solutions analytiques pour les grad2U V et W # 
+  # -------------------------------------------- #
+  expression_ddUdxdx_ana 
+@Um@*(-2.*@pi@/@Lx@*2.*@pi@/@Lx@*@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddUdydy_ana 
+@Um@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*2.*@pi@/@Ly@*@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddUdzdz_ana 
+@Um@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*(-1)*@pi@/@Lz@*@pi@/@Lz@*sin(@pi@*z/@Lz@)
+  expression_ddUdxdy_ana 
+@Um@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddUdxdz_ana 
+@Um@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  expression_ddUdydz_ana 
+@Um@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  # -------------------------------------------- #
+  expression_ddVdxdx_ana 
+@Vm@*(-2.*@pi@/@Lx@*2.*@pi@/@Lx@*@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddVdydy_ana 
+@Vm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*2.*@pi@/@Ly@*@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddVdzdz_ana 
+@Vm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*(-1)*@pi@/@Lz@*@pi@/@Lz@*sin(@pi@*z/@Lz@)
+  expression_ddVdxdy_ana 
+@Vm@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddVdxdz_ana 
+@Vm@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  expression_ddVdydz_ana 
+@Vm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  # -------------------------------------------- #
+  expression_ddWdxdx_ana 
+@Wm@*(-2.*@pi@/@Lx@*2.*@pi@/@Lx@*@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddWdydy_ana 
+@Wm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*2.*@pi@/@Ly@*@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddWdzdz_ana 
+@Wm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*(-1)*@pi@/@Lz@*@pi@/@Lz@*sin(@pi@*z/@Lz@)
+  expression_ddWdxdy_ana 
+@Wm@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*sin(@pi@*z/@Lz@)
+  expression_ddWdxdz_ana 
+@Wm@*(-2.*@pi@/@Lx@*@D@*sin(2.*@pi@*x/@Lx@+@phix@))*(1+@E@*cos(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  expression_ddWdydz_ana 
+@Wm@*(1+@D@*cos(2.*@pi@*x/@Lx@+@phix@))*(-2.*@pi@/@Ly@*@E@*sin(2.*@pi@*y/@Ly@+@phiy@))*@pi@/@Lz@*cos(@pi@*z/@Lz@)
+  # -------------------------------------------- #
+}
+Fin

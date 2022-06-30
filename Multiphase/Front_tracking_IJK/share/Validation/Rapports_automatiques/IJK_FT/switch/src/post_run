@@ -1,0 +1,23 @@
+#!/bin/bash
+# Ce script est execute apres chaque cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+cas=`echo $1`
+head=${cas::6}
+suff=${cas:7}
+if [ $head = "switch" ]
+then
+    echo "post_run modifying refine_$suff.sauv into refine_${suff}_mod.sauv "
+    if [ ${suff::4} == "peri" ] ; then 
+       inp='perio'
+    else
+       inp='wall'
+    fi 
+    par=`echo ${suff} | awk -F_ '{print $2}'`
+    [ s$par == "spar8" ] && export par=_${par}
+    sed '/thermique/,$d' refine_${suff}.sauv > refine_${suff}_mod.sauv
+    sed -e "s/T_init/T_ana/g"  \
+        -e "/fo 1./i fichier_reprise_temperature refine_${inp}${par}.sauv.lata\n    timestep_reprise_temperature 1" \
+        -e "s/Fin//g" ${inp}.txt >> refine_${suff}_mod.sauv
+fi
+

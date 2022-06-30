@@ -1,0 +1,22 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Pour lire les conditions initiales
+# Ce tgz provient originellement de la fiche channel_swarm_fixed + "rename_sauv diph_swarm.sauv diph_swarm_init.sauv"
+tar xzf diph_swarm.tgz
+
+# Calculs paralleles : 
+\rm -f PAR_*.data SEQ_*.data
+echo "Preparing parallel calculations..."
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/' IJK_swarm.data > PAR_IJK_swarm.data
+make_PAR.data FTD_swarm.data 1> /dev/null
+
+# Calculs 1 et 101 dt : 
+for n in "1" "101"
+do
+  echo "Preparing input files for $n timestep..."
+  sed 's/nb_pas_dt_max .*/nb_pas_dt_max '$n'/' IJK_swarm.data > SEQ_IJK_swarm_n$n.data
+  sed 's/nb_pas_dt_max .*/nb_pas_dt_max '$n'/' PAR_IJK_swarm.data > PAR_IJK_swarm_n$n.data
+  sed 's/nb_pas_dt_max .*/nb_pas_dt_max '$n'/' SEQ_FTD_swarm.data > SEQ_FTD_swarm_n$n.data
+  sed 's/nb_pas_dt_max .*/nb_pas_dt_max '$n'/' PAR_FTD_swarm.data > PAR_FTD_swarm_n$n.data
+done

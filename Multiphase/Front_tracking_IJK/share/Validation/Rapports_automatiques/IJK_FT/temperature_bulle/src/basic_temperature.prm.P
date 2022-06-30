@@ -1,0 +1,293 @@
+Parametres {
+	Titre "Test cases: Fixed bubble and thermal diffusion only, convergence study and comparison with sequential and parallel calculations for several combinations of solid/liquid/gas bubbles and domains"
+
+	Description <<EOF
+	In order to validate the first part of the thermal algorithm implementation i.e. without any convection or phase changes, a bubble (fluid or solid) of diameter d=2mm=2R is initialised at the centre of a cubic domain (fluid) of width a=xd (x large enough to consider an infinite domain). A temperature difference between the two phases is set using the indicator function denoted by the variable ff(1 outside the bubble, 0 inside the bubble, 0<ff<1 for the elements shared by the two sub-domain at the interface). The resulting temperature field will be studied along the radial axis (spherical coordinates) over time.
+
+		The solution will be compared to results obtained from 1D finite difference simulation in a similar manner to Das et al. (2018). The system of equations for diffusion is solved in spherical coordinates along the radial axis and is given by the following expression:
+
+\latex_($$ \left\{ \begin{array}{ll}  \dfrac{\partial T}{\partial t} = \dfrac{\alpha_0}{r^2} \dfrac{\partial}{\partial r} \left( r^2 \dfrac{\partial T}{\partial r} \right) & r \leq R \\ \dfrac{\partial T}{\partial t} = \dfrac{\alpha_1}{r^2} \dfrac{\partial}{\partial r} \left( r^2 \dfrac{\partial T}{\partial r} \right) & R \leq r \leq R_{\infty} \end{array} \right. $$\latex_)
+	
+Where \latex_($\alpha_0$\latex_) and \latex_($\alpha_1$\latex_) are the diffusion coefficient of the bubble and the fluid domain respectively such as \latex_($\alpha_i=\dfrac{\lambda_i}{\rho_i Cp_i}$\latex_). 
+
+
+		To this 1D equation, we add spatial boundary conditions (BC) to take into account the symmetry, a constant infinite temperature field and finally the temperature and heat flux continuity at the interface. Initial conditions are also required. They are summarised in the following table:
+	\latex_($$ \left\{ \begin{array}{ll} r = 0 & \dfrac{\partial T}{\partial r}=0\\ r = R_{\infty} & T=T_1 \\ r = R & T_0 = T_1 \\ &-\lambda_0 \left. \dfrac{\partial T}{\partial r} \right|_0  = -\lambda_1 \left. \dfrac{\partial T}{\partial r} \right|_1 \\ t = 0 & T=T_0\\ & T =  T_1\end{array} \right. $$\latex_)
+
+		Temperature is discretised using a backward 2nd order finite difference (1st order for the first iteration) for the temporal term while the spatial term is discretised using a central difference at the first order (forward 2nd order for the zero derivative condition at r=0). Discretised equation can be expressed as follow where i stands is the spatial subscript while j is the time superscript :
+		\latex_($$ \dfrac{1}{2\Delta T}\left[ 3 T_{i}^{j+1} -4 T_{i}^{j} + T_{i}^{j-1} \right] = \dfrac{\alpha_i}{r_i^2}\dfrac{1}{\Delta r^2} \left[ r_{i-1/2}^{2}T_{i-1}^{j+1} -\left(r_{i-1/2}^{2}+r_{i+1/2}^{2}\right) T_{i}^{j+1} + r_{i+1/2}^{2}T_{i+1}^{j+1} \right]$$\latex_)
+
+The system can be re-written into a linear system to solve at time iteration j+1:
+\latex_($$ A^{j}T^{j+1}=B^{j-1,j} \leftrightarrow T^{j+1} = (A^{j})^{-1}B^{j-1,j}$$\latex_)
+
+		By combining the continuity of the heat flux and the temperature at the interface, an equation of the temperature at the interface T* can be obtained.
+\latex_($$ T^{*}= \dfrac{\lambda_0(9T_{n_1}-T_{n_1-1})+\lambda_1(9T_{n_1+1}-T_{n_1+2})}{8(\lambda_0+\lambda_1)}$$\latex_)
+
+		Temperature and fluid/solid parameters used for both 1D and 3D simulations are based on Panda et.al. study. They checked the implementation of their diffusion algorithm using three different combinations: vapour/fluid, solid/vapour and solid/gas. 
+
+	\latex_(\begin{center} \begin{tabular}{ll|ccc} Physical properties & Units & Air & Water & Alumina (solid) \\ \hline \hline Density $\rho$ & kg.m$^{-3}$ & 1.2 & 1000 & 4000\\ Heat Capacity $C_p$ & J.kg$^{-1}$.K$^{-1}$ & 1.0 $\times10^3$ & 4.2 $\times10^3$ & 9.0 $\times10^2$  \\ Thermal conductivity $k$ & W.m$^{-1}$.K$^{-1}$ & 3.0 $\times10^{-2}$ & 6.0 $\times10^{-1}$ & 3.0 $\times10^1$\\ Domain size & $d_p$ & 5$d_p$ & 15$d_p$ & 6$d_p$ \\ \end{tabular} \end{center}\latex_)
+
+		The temperature is initialised at \latex_($ T_0=373 $ K \latex_) and \latex_( $ T_1=273 $ K \latex_) in both 1D and 3D simulations. The time step for the 1D case is chosen to be \latex_( $dt_{1D}=2 \times 10^{-4}$ \latex_) s and is coupled with a grid resolution \latex_( $d/\Delta = 80$ \latex_) to ensure convergence according to Panda et al. (2018).
+
+		The 3D domain is set to match the 1D configuration and the condition on the domain size:
+	\latex_(\begin{center} \begin{tabular}{ll|ccc} Domain properties &  & Air & Water & Alumina (solid) \\ \hline \hline Dimensions (m) & $L_x = L_y = L_z$ & 1 & 1 & 1 \\ Elements (nb)  & $N_x = N_y = N_z$ & 1 & 1 & 1  \\ \end{tabular} \end{center}\latex_)
+		Where \latex_( $ L_i $ \latex_), \latex_( $ N_i $ \latex_) stand respectively for the length, number of nodes. The subscripts $x$, $y$ and $z$ indicate the different directions. The thermal time step is generated using Fourier number i.e. the ratio of the diffusion and storage energy.
+
+		Periodic boundary conditions are used on each axis $x$, $y$ and $z$. Gravity is disabled and a zero velocity field is initialised. 
+
+		A convergence study is realised using three meshes for the AIR_WATER case with a certain number of elements (-): from COARSE (1) to FINE (1) via MEDIUM (1). Extrapolation can be made to assess convergence.
+
+	EOF
+
+	Auteur "A.S.-M.G"
+
+	CasTest AIR_WATER/COARSE pre_run.data 8
+	CasTest AIR_WATER/COARSE COARSE.data 8
+	CasTest AIR_WATER/MEDIUM pre_run.data 8
+	CasTest AIR_WATER/MEDIUM MEDIUM.data 8
+	CasTest AIR_WATER/FINE pre_run.data 8
+	CasTest AIR_WATER/FINE FINE.data 8
+
+	CasTest AIR_WATER pre_run.data 8 
+	CasTest AIR_WATER AIR_WATER_seq.data 1
+	CasTest AIR_WATER AIR_WATER_par8.data 8
+
+	CasTest ALUMINA_WATER/COARSE pre_run.data 8
+	CasTest ALUMINA_WATER/COARSE COARSE.data 8
+	CasTest ALUMINA_WATER/MEDIUM pre_run.data 8
+	CasTest ALUMINA_WATER/MEDIUM MEDIUM.data 8
+	CasTest ALUMINA_WATER/FINE pre_run.data 8
+	CasTest ALUMINA_WATER/FINE FINE.data 8
+
+	CasTest ALUMINA_WATER pre_run.data 8
+	CasTest ALUMINA_WATER ALUMINA_WATER_seq.data 1
+	CasTest ALUMINA_WATER ALUMINA_WATER_par8.data 8
+
+	CasTest ALUMINA_AIR/COARSE pre_run.data 8
+	CasTest ALUMINA_AIR/COARSE COARSE.data 8
+	CasTest ALUMINA_AIR/MEDIUM pre_run.data 8
+	CasTest ALUMINA_AIR/MEDIUM MEDIUM.data 8
+	CasTest ALUMINA_AIR/FINE pre_run.data 8
+	CasTest ALUMINA_AIR/FINE FINE.data 8
+	
+	CasTest ALUMINA_AIR pre_run.data 8
+	CasTest ALUMINA_AIR ALUMINA_AIR_seq.data 1
+	CasTest ALUMINA_AIR ALUMINA_AIR_par8.data 8
+
+}
+
+
+
+#################################################################
+#######   CONVERGENCE STUDY   ###################################
+#################################################################
+ Chapitre {
+ 	Titre "Mesh visualisation for the convergence study (AIR_WATER/FINE)"
+ 	visu {
+ 		titre "Bubble interface"
+ 		cycles -1
+ 		width 12cm
+		mesh AIR_WATER/FINE/pre_run.lata INTERFACES
+ 	}
+
+ 	visu {
+ 		titre "Mesh of the liquid domain (AIR_WATER/FINE simulation)"
+ 		cycles -1
+ 		width 12cm
+	 	mesh AIR_WATER/FINE/pre_run.lata DOM
+		normal3D 1 1 1	
+ 	}
+ }
+
+###################################################################
+ Chapitre {
+ 	Titre "Checking the temperature field initialisation"
+
+ 	visu {
+ 		titre "Initial temperature field (2D slice in the AIR_WATER simulation)"
+ 		cycles -1 
+ 		width 12cm
+ 		pseudocolor AIR_WATER/FINE/pre_run.lata DOM TEMPERATURE_0 ELEM
+ 		operator slice2d_y centroid1 centroid1 centroid1
+		mesh AIR_WATER/FINE/pre_run.lata INTERFACES
+		operator slice2d_y centroid1 centroid1 centroid1
+ 	}
+	visu {
+ 		titre "Initial temperature field (3 slices in the AIR_WATER simulation)"
+ 		cycles -1 
+ 		width 12cm
+ 		pseudocolor AIR_WATER/FINE/pre_run.lata DOM TEMPERATURE_0 ELEM
+ 		operator threeslice centroid1 centroid1 centroid1  
+		mesh AIR_WATER/FINE/pre_run.lata INTERFACES
+		operator threeslice centroid1 centroid1 centroid1 
+		operator no_bounding_box
+		normal3D 0.5 0.5 1		
+ 	}
+
+
+
+ }
+###################################################################
+ Chapitre {
+	Titre "Results for the (COARSE,MEDIUM,FINE) set of meshes "
+	Figure 
+	{
+		titre "1D FD and TrioIJK (COARSE,MEDIUM,FINE) simulated temperature profiles over time"
+		Image AIR_WATER/CONVERGENCE_TEMPERATURE.png
+	}
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated (COARSE,MEDIUM,FINE) temperature error"
+		Image AIR_WATER/CONVERGENCE_ERRORS.png
+	}
+	Figure 
+	{
+		titre "1D FD and TrioIJK (COARSE,MEDIUM,FINE) simulated temperature profiles over time"
+		Image ALUMINA_WATER/CONVERGENCE_TEMPERATURE.png
+	}
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated (COARSE,MEDIUM,FINE) temperature error"
+		Image ALUMINA_WATER/CONVERGENCE_ERRORS.png
+	}
+	Figure 
+	{
+		titre "1D FD and TrioIJK (COARSE,MEDIUM,FINE) simulated temperature profiles over time"
+		Image ALUMINA_AIR/CONVERGENCE_TEMPERATURE.png
+	}
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated (COARSE,MEDIUM,FINE) temperature error"
+		Image ALUMINA_AIR/CONVERGENCE_ERRORS.png
+	}
+ }
+
+
+#####################################################################
+ Chapitre {
+ 	Titre "Air bubble in water domain"
+
+ 	visu {
+ 		titre "Sequential calculation (Visual check, last iteration)"
+ 		cycles -1
+ 		width 12cm
+ 		pseudocolor_with_range AIR_WATER/AIR_WATER_seq.lata DOM TEMPERATURE_0 ELEM 293.0 373.0
+ 		operator slice2d_y centroid1 centroid1 centroid1
+		mesh AIR_WATER/AIR_WATER_seq.lata INTERFACES
+		operator slice2d_y centroid1 centroid1 centroid1
+ 	
+ 	}
+ 	visu {
+ 		titre "Parallel calculation on 8 procs (Visual check, last iteration)"
+ 		cycles -1
+ 		width 12cm
+ 		pseudocolor_with_range AIR_WATER/AIR_WATER_par8.lata DOM TEMPERATURE_0 ELEM 293.0 373.0
+ 		operator slice2d_y centroid1 centroid1 centroid1
+		mesh AIR_WATER/AIR_WATER_par8.lata INTERFACES
+		operator slice2d_y centroid1 centroid1 centroid1
+ 	
+ 	}
+
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated temperature profile over time"
+		Image AIR_WATER/AIR_WATER_seq_TEMPERATURE.png
+	}
+
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated temperature error"
+		Image AIR_WATER/AIR_WATER_seq_ERRORS.png
+	}
+}
+
+ Chapitre {
+ 	Titre "Alumina bubble in air domain"
+
+ 	visu {
+ 		titre "Sequential calculation (Visual check, last iteration)"
+ 		cycles -1
+ 		width 12cm
+ 		pseudocolor_with_range ALUMINA_AIR/ALUMINA_AIR_seq.lata DOM TEMPERATURE_0 ELEM 293.0 373.0
+ 		operator slice2d_y centroid2 centroid2 centroid2
+		mesh ALUMINA_AIR/ALUMINA_AIR_seq.lata INTERFACES
+		operator slice2d_y centroid2 centroid2 centroid2
+ 	
+ 	}
+ 	visu {
+ 		titre "Parallel calculation on 8 procs (Visual check, last iteration)"
+ 		cycles -1
+ 		width 12cm
+ 		pseudocolor_with_range ALUMINA_AIR/ALUMINA_AIR_par8.lata DOM TEMPERATURE_0 ELEM 293.0 373.0
+ 		operator slice2d_y centroid2 centroid2 centroid2
+		mesh ALUMINA_AIR/ALUMINA_AIR_par8.lata INTERFACES
+		operator slice2d_y centroid2 centroid2 centroid2
+ 	
+ 	}
+
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated temperature profile over time"
+		Image ALUMINA_AIR/ALUMINA_AIR_seq_TEMPERATURE.png
+	}
+
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated temperature error"
+		Image ALUMINA_AIR/ALUMINA_AIR_seq_ERRORS.png
+	}
+}
+
+ Chapitre {
+ 	Titre "Alumina bubble in water domain"
+
+ 	visu {
+ 		titre "Sequential calculation (Visual check, last iteration)"
+ 		cycles -1
+ 		width 12cm
+ 		pseudocolor_with_range ALUMINA_WATER/ALUMINA_WATER_seq.lata DOM TEMPERATURE_0 ELEM 293.0 373.0
+ 		operator slice2d_y centroid3 centroid3 centroid3
+		mesh ALUMINA_WATER/ALUMINA_WATER_seq.lata INTERFACES
+		operator slice2d_y centroid3 centroid3 centroid3
+ 	
+ 	}
+ 	visu {
+ 		titre "Parallel calculation on 8 procs (Visual check, last iteration)"
+ 		cycles -1
+ 		width 12cm
+ 		pseudocolor_with_range ALUMINA_WATER/ALUMINA_WATER_par8.lata DOM TEMPERATURE_0 ELEM 293.0 373.0
+ 		operator slice2d_y centroid3 centroid3 centroid3
+		mesh ALUMINA_WATER/ALUMINA_WATER_par8.lata INTERFACES
+		operator slice2d_y centroid3 centroid3 centroid3
+ 	
+ 	}
+
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated temperature profile over time"
+		Image ALUMINA_WATER/ALUMINA_WATER_seq_TEMPERATURE.png
+	}
+
+	Figure 
+	{
+		titre "1D FD and TrioIJK simulated temperature error"
+		Image ALUMINA_WATER/ALUMINA_WATER_seq_ERRORS.png
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+

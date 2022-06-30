@@ -1,0 +1,34 @@
+\usepackage[
+backend=biber,% On utilise biber pour la compilation biblatex
+citestyle=numeric,
+bibstyle=numeric,
+sorting=nyt, % Tri dans l'ordre : nom, année, titre.
+maxnames=2, % Les citations dans le texte avec \textcite n'affiche que le nom du premier auteur et met un "et al.". Changer en et coll. ?
+maxbibnames=99, % Mettre tous les noms dans la biblio (ne met pas de et al. dans la bibliographie)
+language=french, % test du français
+alldates=year, % la date n'affiche que l'année
+isbn=false, % Ne pas afficher l'isbn
+url=false, % Ne pas afficher l'url
+doi=false, % Afficher le DOI
+eprint=false, % Ne pas afficher le numéro eprint
+%refsegment=chapter, % pour faire des bibliographies par chapitre
+backref=false % Ajouter une mention renvoyant où la publication a été citée
+]{biblatex}
+\addbibresource{/volatile/biblio/biblio.bib} 
+
+\renewbibmacro{in:}{}
+\newbibmacro{string+doiurlisbn}[1]{%
+  \iffieldundef{doi}{%
+    \iffieldundef{url}{%
+      \iffieldundef{isbn}{%
+        \iffieldundef{issn}{%
+          #1%
+}{\href{https://books.google.com/books?vid=ISSN\thefield{issn}}{#1}}%
+}{\href{https://books.google.com/books?vid=ISBN\thefield{isbn}}{#1}}%
+    }{\href{\thefield{url}}{#1}}%
+  }{\href{https://doi.org/\thefield{doi}}{#1}}%
+}
+
+\DeclareFieldFormat{title}{\usebibmacro{string+doiurlisbn}{\mkbibemph{#1}}}
+\DeclareFieldFormat[article,incollection,inproceedings,thesis,inbook]{title}%
+    {\usebibmacro{string+doiurlisbn}{\mkbibquote{#1}}} 

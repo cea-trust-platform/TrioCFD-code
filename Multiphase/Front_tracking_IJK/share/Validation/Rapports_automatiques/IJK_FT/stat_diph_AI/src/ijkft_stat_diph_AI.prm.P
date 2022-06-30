@@ -1,0 +1,189 @@
+Parametres {
+	Titre "Statistiques par plan : Calcul des derivees (IJK_FT diphasique)"
+	Description ""  <<EOF
+Cette fiche comporte 2 chapitres: Un pour une bulle spherique, l'autre pour une hemisphere. 
+Dans les 2 cas, on compare les statistiques moyennes calculees par Statistiques_dns_ijk_FT a celles obtenues analytiquement ou avec visit. 
+
+La solution analytique pour l'hemisphere neglige la zone de transition entre la sphere et le plan. La surface associee est tres petite, propto delta. Mais cette
+hypothese n'est pas valide pour le calcul de kappa*ai*N[xyz] car la courbure est localement propto 1/delta... ce qui rend le produit k*ai d'ordre 1, donc non
+negligeable. 
+
+Dans chaque cas, un premier calcul sequentiel est realise, puis un calcul parallele afin de verifier que le decoupage n'impacte pas le resultat. Enfin, un dernier calcul est
+realise en translatant la bulle au bord du domaine pour provoquer la creation d'un ghost. Le resultat doit toujours etre identique, ce qui permet de verifier que
+l'aire de la bulle ghost ou le parallelisme sont bien pris en compte. 
+
+PS : La solution analytique pour P et les composantes de vitesse est identique au cas : stat_diph_gradUP. Mais comme tout le solveur est desactive, elle n'a pas
+d'influence. 
+
+
+RESULTATS : 
+
+ATTENTION !!! Toutes les courbes doivent etre superposees SAUF kappa*ai*N[xyz] pour le cas hemisphere car la solution analytique n'est que partielle. 
+Elle ne tiens pas compte du petit anneau tres fortement courbe.
+
+EOF
+	Auteur "G.B."
+	CasTest GEOM_sphere/TRANS_+0.0000 ijkft_stat_diph_AI.data
+	CasTest GEOM_sphere/TRANS_+0.0000/PAR8 ijkft_stat_diph_AI_par8.data 8
+	#               #
+	CasTest GEOM_hemisphere/TRANS_+0.0000 ijkft_stat_diph_AI.data
+	CasTest GEOM_hemisphere/TRANS_+0.0000/PAR8 ijkft_stat_diph_AI_par8.data 8
+	# Cas translates : #
+	CasTest GEOM_sphere/TRANS_-0.0041 ijkft_stat_diph_AI.data
+	# CasTest GEOM_sphere/TRANS_-0.0041/PAR8 ijkft_stat_diph_AI_par8.data 8 #
+	CasTest GEOM_hemisphere/TRANS_-0.0002 ijkft_stat_diph_AI.data
+	# CasTest GEOM_hemisphere/TRANS_-0.0002/PAR8 ijkft_stat_diph_AI_par8.data 8 #
+	#               #
+	Prerequisite ./analytical.py > analytical.log
+	Prerequisite ./compare.py > compare.log
+	Prerequisite visit -nowin -cli -quiet -s ./post_visit.py > post_visit.log
+}
+
+Chapitre {
+	Titre "Presentation des solutions analytiques"
+	Figure {
+		Title "Repere de coordonnees spheriques (http://fr.wikipedia.org/wiki/Coordonn%C3%A9es_sph%C3%A9riques)"
+        	width 9cm
+		Image ./repere_spherique.png
+	}
+	Description "\latex_( \input{\orig/description.tex}\latex_)" 
+	Description "Maillage sphere translate -0.0041."
+        visu {
+                Cycles  -1
+                titre "illustration du maillage interfacial et d'une coupe du domaine DOM"
+                mesh GEOM_sphere/TRANS_-0.0041/ijkft_stat_diph_AI.lata INTERFACES
+                mesh GEOM_sphere/TRANS_-0.0041/ijkft_stat_diph_AI.lata DOM
+		Operator Slice 0 0 0.005 0 0 1
+        }
+	Description "Maillage hemisphere translate -0.0002."
+        visu {
+                Cycles  -1
+                titre "illustration du maillage interfacial et d'une coupe du domaine DOM"
+                mesh GEOM_hemisphere/TRANS_-0.0002/ijkft_stat_diph_AI.lata INTERFACES
+                mesh GEOM_hemisphere/TRANS_-0.0002/ijkft_stat_diph_AI.lata DOM
+                Operator Slice 0 0 0.005 0 0 1
+        }
+}
+
+
+#Pmacro CHAPTER(@CAS@)
+Chapitre {
+	Titre "Validation des moyennes surfaciques sur le cas @CAS@"
+	Description "Comparaison des grandeurs adimensionnees calculees par le code aux valeurs analytiques de reference."
+#Pforeach @VAR_NAME@(AI aiNx aiNy aiNz kaiNx kaiNy kaiNz)
+#Pset(__var__ @VAR_NAME@)
+#Pif ("@VAR_NAME@" == "AI")
+#Pset(__ivar__ 2)
+#Pset(__iskappa__ )
+#Pset(__over__ /93.084226773030935)
+#Pelif ("@VAR_NAME@" == "aiNx")
+#Pset(__ivar__ 3)
+#Pset(__iskappa__ )
+#Pset(__over__ /93.084226773030935)
+#Pelif ("@VAR_NAME@" == "aiNy")
+#Pset(__ivar__ 4)
+#Pset(__iskappa__ )
+#Pset(__over__ /93.084226773030935)
+#Pelif ("@VAR_NAME@" == "aiNz")
+#Pset(__ivar__ 5)
+#Pset(__iskappa__ )
+#Pset(__over__ /93.084226773030935)
+#Pelif ("@VAR_NAME@" == "kaiNx")
+#Pset(__ivar__ 6)
+#Pset(__iskappa__ kappa)
+#Pset(__over__ /-46542.11338651547)
+#Pelif ("@VAR_NAME@" == "kaiNy")
+#Pset(__ivar__ 7)
+#Pset(__iskappa__ kappa)
+#Pset(__over__ /-46542.11338651547)
+#Pelif ("@VAR_NAME@" == "kaiNz")
+#Pset(__ivar__ 8)
+#Pset(__iskappa__ kappa)
+#Pset(__over__ /-46542.11338651547)
+#Pelse
+#Pset(__ivar__ 22222)
+#Punset(__over__)
+#Punset(__iskappa__)
+#Pendif
+        Figure {
+                Titre "Evolution transverse de @VAR_NAME@ pour le cas @CAS@."
+                width 9cm
+                incluredesccourbes 0
+		labelX  "$z^+=(z-zc)/R$"
+                labelY  "@VAR_NAME@/(2 pi R/(Lx Ly)__iskappa__)"
+                courbe {
+                        fichier @CAS@.ana
+                        colonnes (($1-0.005)/0.004) ($__ivar____over__)
+                        style linespoints
+                        Legende "ana"
+                }
+#Pforeach @SUF@(0._SEQ 0._PAR8 -0.0002_SEQ -0.0041_SEQ)
+#Pif (("@CAS@ @SUF@" == "sphere -0.0002_SEQ" )or("@CAS@ @SUF@" == "hemisphere -0.0041_SEQ" ))
+#Pelse
+                courbe {
+                        fichier LINKS/@CAS@_@SUF@/@CAS@.num
+                        colonnes (($1-0.005)/0.004) ($__ivar____over__)
+                        style linespoints
+                        Legende "tr=@SUF@"
+                }
+                courbe {
+                        fichier LINKS/@CAS@_@SUF@/@CAS@.dat
+                        colonnes (($1-0.005)/0.004) ($__ivar____over__)
+                        style linespoints
+                        Legende "tr=@SUF@ (visit)"
+                }
+#Pendif
+#Pif (("@CAS@ @SUF@" == "hemisphere 0._SEQ")and(__ivar__==6))
+                courbe {
+                        fichier LINKS/@CAS@_@SUF@/@CAS@.dat
+                        colonnes (($1-0.005)/0.004) ($11__over__)
+                        style lines
+                        Legende "tr=@SUF@ (visit (-600<kappa<-400))"
+                }
+#Pendif
+#Pif (("@CAS@ @SUF@" == "hemisphere 0._SEQ")and(__ivar__==8))
+                courbe {
+                        fichier LINKS/@CAS@_@SUF@/@CAS@.dat
+                        colonnes (($1-0.005)/0.004) ($12__over__)
+                        style lines
+                        Legende "tr=@SUF@ (visit (-600<kappa<-400))"
+                }
+#Pendif
+#Pendforeach(@SUF@)
+	}
+#Pendforeach(@VAR_NAME@)
+}
+#Pendmacro(CHAPTER)
+#Pusemacro(CHAPTER)(sphere)
+#Pusemacro(CHAPTER)(hemisphere)
+
+
+
+
+Chapitre {
+	Titre "Synthese de quelques resultats"
+	Description "Verification des resultats." <<EOF
+Dans le tableau ci-dessous, la valeur relative est calculee en divisant l'erreur par le max du champ analytique. 
+undef signifie que le champ analytique est nul, il n'est donc pas possible de definir une valeur relative. 
+
+Les erreurs relatives sont inferieures a 5% pour la sphere. 
+Pour l'hemisphere, elles sont de l'ordre de 10% sauf pour les champs kaiN[xyz] pour lesquels on rappelle que la solution analytique n'est que partielle...
+donc inexacte... 
+EOF	
+	
+	Table {
+                Title "fichier de comparaison aux solutions analytiques"
+                description "The table below shows..."
+                description " "
+                nb_columns 7
+		Label  translate | run |variable      |err.max         |err.std      |err_rel.max(%)     |err_rel.std(%)
+
+		lines { 
+			file resu.txt
+			number_first_line 2
+			nb_columns_file 8
+		}
+        }
+
+}
+

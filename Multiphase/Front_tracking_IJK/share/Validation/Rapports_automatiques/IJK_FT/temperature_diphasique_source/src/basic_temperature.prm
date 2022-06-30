@@ -1,0 +1,26 @@
+Parametres {
+	Titre "Fiche de validation de la temperature source de temperature dans les bulles"
+
+	Description <<EOF
+
+	EOF
+
+	Auteur "A.S."
+	CasTest . pre_run.data 1
+	# CasTest SWARM SWARM_seq.data 1
+	# CasTest SWARM SWARM_par8.data 8
+	# CasTest SWARM SWARM_repr.data 1
+	# CasTest SWARM SWARM_repr_par8.data 8
+	CasTest CHMTVAR CHMTVAR_seq.data 1
+}
+
+Chapitre {
+	Titre "Evolution de la temperature avec des conditions aux limites de temperature imposee a la paroi"
+	visu {
+		titre "Calculated solution"
+			cycles -1
+			width 12cm
+			pseudocolor CHMTVAR/CHMTVAR_seq.lata DOM TEMPERATURE_0 ELEM
+	}
+
+}

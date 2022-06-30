@@ -1,0 +1,46 @@
+#!/bin/sh
+#SBATCH -J test_chmtvar
+#SBATCH -t 24:00
+#SBATCH -o myjob.%j.o
+#SBATCH -e myjob.%j.e
+#SBATCH --constraint=HSW24
+#SBATCH -n 4
+#SBATCH -N 1
+# #SBATCH --qos bonus
+# #SBATCH --exclusive
+#SBATCH -d afterok:4374678
+#TOTO
+#
+#  -cwd
+#  -S /bin/bash
+#  -p slim
+#  -t 2880
+#  --qos=normal
+#
+cd $SLURM_SUBMIT_DIR
+[ -f ld_env.sh ] && . ./ld_env.sh # To load an environment file if necessary
+
+# Environnement pour Trio_U :
+# source /panfs/panasas/cnt0025/dms7712/SHARED/Antoine/IJK_intel/env_IJK.sh
+# source /panfs/panasas/cnt0025/dms7712/SHARED/IJK_cobalt/env_IJK.sh
+# source /home/shared/shrdmpr/IJK_GIT/IJK_temperature/env_IJK.sh
+source /panfs/panasas/cnt0025/dms7712/asonolet/IJK/env_IJK.sh
+
+export I_MPI_DAPL_TRANSLATION_CACHE=0
+echo "lala" > lala.txt  &
+echo $I_MPI_DAPL_TRANSLATION_CACHE > toto.txt  &
+
+# Dans 23h30, cree le fichier stop : 
+sleep 83800 && echo "1" > stop.txt  &
+pid=$!
+
+
+# lancement du calcul
+# ATTENTION: penser a remettre le nombre de processeurs apres "-np" :
+date > $datafile.time
+# srun --mpi=pmi2 -K1 --resv-ports -n $SLURM_NTASKS  Run_fiche > fiche.out
+srun -n $SLURM_NTASKS  Run_fiche > fiche.out
+
+# Pour ne pas rester bloquer sur le sleep alors que le calcul est termine : 
+kill $pid
+

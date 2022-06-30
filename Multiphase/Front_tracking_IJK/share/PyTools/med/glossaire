@@ -1,0 +1,38 @@
+#!/bin/bash
+#########################
+# How to use this script : ./glossaire [python file]
+# What it does : this script writes in a .gl the name of all the functions declared in a .py file.
+#########################
+function argv {
+	for arg in ${BASH_ARGV[*]};do
+		fich=$(echo "GLOSSAIRE_${arg}t" | tr '.py' '.tx');
+		echo -n "glossaire de "; echo -n "$arg"; echo -n " : "; echo "$fich";
+		echo "INVENTAIRE DES FONCTIONS DE : $arg" > $fich; 
+		echo " " >> $fich; echo " " >> $fich;
+		IFS=$'\n'
+        expl=0;
+		for ligne in $(cat $arg);do
+        
+			mot1=$(echo $ligne | cut -d' ' -f1)
+			mot2=$(echo $ligne | tr -s ' ' | cut -d' ' -f2)
+            lign=$(echo $ligne | cut -c-6);
+			def=$(echo "def");
+            
+            if [ "$mot1" == "def" ]; then
+				echo "" >> $fich;
+				echo "$ligne" >> $fich;
+			fi
+            if [ "$lign" == "    ##" ]; then
+                expl=$((1-$expl));
+            fi
+            if [[ $expl == 1 && "$lign" == "    # " ]]; then
+                echo "$ligne" >> $fich;
+            fi
+			if [ "$mot2" == "return" ]; then
+				echo "$ligne" >> $fich;
+			fi
+		done
+	done
+}
+
+argv

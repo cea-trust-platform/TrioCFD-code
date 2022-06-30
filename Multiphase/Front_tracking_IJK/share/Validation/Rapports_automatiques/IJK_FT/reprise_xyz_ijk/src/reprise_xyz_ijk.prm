@@ -1,0 +1,17 @@
+Parametres {
+	Titre "Verrification de la reprise d'une sauvegarde IJK (format xyz) par TrioCFD (sequentiel et parallele)"
+	Description ""
+	Auteur "G.B."
+	CasTest . reprise_xyz_ijk.data
+	CasTest . reprise_xyz_ijk_par8.data 8
+	CasTest . SEQ_reprise_TrioCFD_reference.data
+	CasTest . SEQ_reprise_TrioCFD_fromSEQIJK.data
+	CasTest . SEQ_reprise_TrioCFD_fromPARIJK.data
+	CasTest . PAR_reprise_TrioCFD_fromSEQIJK.data 8
+	CasTest . PAR_reprise_TrioCFD_fromPARIJK.data 8
+}
+
+Chapter
+{
+	Title "To be done someday."
+}

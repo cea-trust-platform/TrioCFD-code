@@ -1,0 +1,13 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+
+# calcul les fluctuations du volume des bulles par rapport au volume initial
+if [ $1 == "ijkft_conservation_volume" ] ; then 
+   echo "post_run waits for ijkft_conservation_volume2 to be run."
+fi
+
+for file in ijkft_conservation_volume ijkft_conservation_volume2 
+do
+  awk 'NR==1{v1=$2;v2=$3;v3=$4;v4=$5}
+{printf "%.13g %.13g %.13g %.13g %.13g\n",$1,($2-v1)/v1,($3-v2)/v2,($4-v3)/v3,($5-v4)/v4}' ${file}_bulles_volume.out >${file}_bulles_dvolume.out
+done

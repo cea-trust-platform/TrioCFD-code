@@ -1,0 +1,85 @@
+#!/bin/bash
+# ce script est execute avant de lire les cas tests
+
+#Créer fichier .lata (format visit) contenant le mesh
+cat >deplacements.txt <<EOF
+0.0 0.0 0.0 bulle3.msh 
+EOF
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+centroid=0.0015
+cat >deplacements5.txt <<EOF
+$centroid $centroid $centroid bulle3.msh
+EOF
+./cree_multi_bulles.sh deplacements5.txt init5.lata
+
+# Modif of the prm itself :
+sed -i "s/centroid1/$centroid/g" interfacial_temperature_and_flux.prm
+
+# Text to be added to datafile: 
+ltfile=/tmp/lambda_template.txt
+cat > $ltfile <<EOF
+  ,
+    # LAMBDA_RATIO @ratio@ #
+    {
+    Boundary_Conditions
+      {
+        bctype_kmin Perio
+        bctype_kmax Perio
+      }
+    # bubble radius : rb=1e-3 #
+    # bubble centre : rc=1.5e-3 #
+    # T=l*r #
+    expression_T_init (sqrt((x-1.5e-3)^2+(y-1.5e-3)^2+(z-1.5e-3)^2)-0.001)/(0.1*(((x-1.5e-3)^2+(y-1.5e-3)^2+(z-1.5e-3)^2)<1e-6)+@lambdal@*(((x-1.5e-3)^2+(y-1.5e-3)^2+(z-1.5e-3)^2)_GE_1e-6))
+    fo 1
+
+    cp_liquid 4200.0
+    lambda_liquid @lambdal@
+
+    cp_vapor 1000.0
+    lambda_vapor 0.1
+    } 
+EOF
+
+for ratio in 1.1 1.5 2. 5. 10. 100. 
+do
+   echo "adding $ratio to lambda ratios list"
+   lambdal=`echo 0.1*$ratio | bc -l`
+   sed -e "s/@lambdal@/$lambdal/g" -e "s/@ratio@/$ratio/g" $ltfile > lr.txt
+   # The command '-e //N is to make the input BEFORE the flag. 
+   sed -i -e '/# FLAG_ADD_FIELD #/r lr.txt' -e //N template.data
+   # Remove only first occurence of flag in the file : 
+   # sed -i -e "0,/FLAG_ADD_FIELD/s/# FLAG_ADD_FIELD #//g" template.data
+   # sed -e "s/@ratio@/$ratio/g;s/@lambdal@/$lambdal/g" -i template.data
+   if [ "$ratio" == "2." ] ; then 
+	echo "For the $ratio of lambda ratios list, case with init from CHI."
+	sed -i -e "s@expression_T_init .*@expression_T_init (sqrt((x-1.5e-3)^2+(y-1.5e-3)^2+(z-1.5e-3)^2)-0.001)/(0.1*(1.-ff)+2.*ff)@" lr.txt
+	sed -i -e '/# FLAG_ADD_FIELD #/r lr.txt' -e //N template.data
+   fi
+done 
+
+for N in 12 24 48 # 96
+do
+  echo "generating datafile with $N^3 elements"
+  sed -e "s/@N@/$N/g" \
+	  template.data > test_$N.data
+done
+\rm lr.txt
+
+# One last case : // for validation + convection
+sed -e "s/expression_vx_init .*/expression_vx_init 0.01/" \
+    -e "s/expression_vy_init .*/expression_vy_init 0.01/" \
+    -e "s/expression_vz_init .*/expression_vz_init 0.01/" \
+    -e "s/nproc_i .*/nproc_i 2/" \
+    -e "s/nproc_j .*/nproc_j 2/" \
+    -e "s/nproc_k .*/nproc_k 2/" \
+    -e "s/ijk_splitting_ft_extension .*/ijk_splitting_ft_extension 20/" \
+    -e "/Sondes/,+3d" \
+    test_24.data > test_24_par8_trans.data
+
+echo "set log xy" >  plot.gplot
+echo "set terminal png" >> plot.gplot
+echo "set output \"errors_PHIN.png\"" >> plot.gplot
+echo "set xlabel \"ratio lambda liq/vap\"" >> plot.gplot
+echo "set ylabel \"errors\"" >> plot.gplot
+echo "plot \\" >> plot.gplot

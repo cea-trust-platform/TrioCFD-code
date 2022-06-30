@@ -1,0 +1,11 @@
+#!/bin/bash
+
+[ $1 == "ijkft_stat_diph_AI_par8" ] && [ -f "../prepare.sauv.lata" ] && echo \
+      "Linking prepare.sauv.lata* files into the current directory..." && ln -sf ../prepare.sauv.lata* . && exit
+
+[ $1 == "ijkft_stat_diph_AI" ] && [ -f "./prepare.sauv.lata" ] && echo \
+      "No need to run again prepare case for sequential calculation. prepare.sauv.lata* files already into the current directory..." && exit
+
+echo -n "Running prepare to smooth initial interfacial mesh..."
+triou prepare.data 1>prepare.out 2>prepare.err
+echo "Ok!"

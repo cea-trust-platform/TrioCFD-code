@@ -1,0 +1,76 @@
+# Test pour verification de la diffusion vitesse #
+# PARALLEL OK 2 #
+# Le decoupage ne fait rien #
+# Astuce pour que make_PAR.data trouve deux processeurs de calcul:
+Nom_Zones toto 
+#
+# DEBUT DECOUPAGE
+system "touch toto_0000.Zones toto_0001.Zones toto_0002.Zones toto_0003.Zones"
+Fin
+  FIN DECOUPAGE #
+
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 4
+  nbelem_j 4
+ 
+  uniform_domain_size_i 0.023441
+  uniform_domain_size_j 0.03 
+  # coord_k is generated in the prepare script #
+  file_coord_k coord_k.txt
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+# DEBUT MAILLAGE #
+Lire grid_splitting { ijk_grid_geometry grid_geom  nproc_i 1  nproc_j 1  nproc_k 1 }
+# FIN MAILLAGE #
+# DEBUT LECTURE 
+Lire grid_splitting { ijk_grid_geometry grid_geom  nproc_i 1  nproc_j 1  nproc_k 4 }
+  FIN LECTURE #
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting
+  timestep 0.0025
+  timestep_facsec 1.
+  nb_pas_dt_max 10
+  multigrid_solver { 
+    coarsen_operators 1
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+    ghost_size 1
+    pre_smooth_steps 1 5
+    smooth_steps 1 5
+    relax_jacobi 1 0.65
+    solveur_grossier GCP { seuil  0.5e-25 precond ssor { omega 1.5 } }
+    seuil 1.e-20
+    nb_full_mg_steps 2 5 1
+    solver_precision mixed
+  }
+  dt_post 800
+sauvegarde_post_instantanes
+  champs_a_postraiter 1 VELOCITY
+
+  t_paroi_impose_kmin 300
+  t_paroi_impose_kmax 300
+  p_thermo_init       214072
+  cp                  1005.0
+  gamma               1.4
+  # Pour 300K on a mu=1.84314e-05, rho=2.48508 #
+  # rho*dvx/dt = mu*laplacien(vx)= - mu*(3.14159265358979/0.029846)**2 * vx #
+  # donc dvx/dt= - 0.082176 * vx #
+  # vx(t) = vx(t=0) * exp(-0.082176*t) #
+  
+  expression_vx_init SIN(z*3.14159265358979/0.029846)*0.01
+  expression_vy_init 0.
+  expression_vz_init 0.
+  expression_t_init  300
+debit_massique 0
+dumping_factor 1e99
+}
+Lata_to_other lml qc_ijk_poiseuille_non_uniforme_lata_1.sauv.lata NOM_DU_CAS
+Fin

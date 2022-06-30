@@ -1,0 +1,205 @@
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+MaillerParallel
+{
+	domain dom
+	nb_nodes 3 21 41 3
+	splitting 3 1 1 1
+	ghost_thickness 2
+	perio_x
+	perio_z
+	function_coord_x x*4
+	function_coord_y y*1.
+	function_coord_z z*0.8
+	boundary_xmin periox
+	boundary_xmax periox
+	boundary_ymin bas
+	boundary_ymax haut
+	boundary_zmin perioz
+	boundary_zmax perioz
+}
+
+/*
+# DEBUT MAILLAGE #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0.
+		Nombre_de_Noeuds 21 41 
+		Longueurs  4. 1.
+		}
+		{
+		Bord periox   X = 0.    0. <= Y <= 1.   
+		Bord periox   X = 4.    0. <= Y <= 1.  
+		Bord bas      Y = 0.    0. <= X <= 4.    
+		Bord haut     Y = 1    	0. <= X <= 4.  
+		}
+	}
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+Decouper dom
+{
+	partitionneur Tranche  { tranches 2 3  }
+	Larg_joint 2
+	Nom_Zones canalQCdt20K
+	Periodique 1 periox
+}
+Fin
+ FIN DECOUPAGE #
+*/
+# DEBUT LECTURE 
+Scatter canalQCdt20K.Zones dom
+ FIN LECTURE #
+
+VDF dis
+
+Runge_kutta_ordre_3_qc sch_ex
+Lire sch_ex
+{
+	tinit 0.
+	nb_pas_dt_max 200
+	tmax 500.
+	dt_min 1.e-11
+	dt_max 1.
+	dt_impr 1.e-7
+	dt_sauv 0.05
+	dt_start dt_calc
+	seuil_statio 1.e-8
+	facsec 1
+	diffusion_implicite 0
+}
+
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+	mu 	   champ_fonc_fonction pb temperature_qc 1 (1.461e-6*(val^1.5)/(val+111.))
+	lambda champ_fonc_fonction pb temperature_qc 1 (1.93198026315789000e-3*(val^1.5)/(val+111.))
+	pression 100000.
+	loi_etat gaz_parfait 
+	{
+		Prandtl 0.76
+		Cp 1005
+		gamma 1.4
+	}
+	traitement_pth conservation_masse
+}
+
+Associer pb dom
+Associer pb sch_ex
+Associer pb fluide
+
+Discretiser pb dis
+
+IJK_discretization vdf_to_ijk
+
+Lire vdf_to_ijk
+{
+        vdf_problem pb
+        splitting 3 1 1 1
+        y_maps_to k /* signifie que la coordonnee j du maillage vdf va deven
+ir la direction k du maillage ijk */
+        z_maps_to j
+        perio_i
+        perio_j /* c'est bien ca, la direction z est devenue j */
+}
+
+Lire pb
+{
+	Navier_Stokes_Turbulent_QC
+	{
+		/* solveur_pression GCP { precond ssor { omega 1.5 } seuil 1.e-7  } */
+		solveur_pression multigrille_adrien 
+		{
+			solver_precision mixed
+			coarsen_operators 3
+			Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+			Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+			Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+	  
+			ghost_size 2
+			pre_smooth_steps 1 7
+			smooth_steps 1 7
+			relax_jacobi 1 0.7
+			solveur_grossier GCP { seuil 1e-9 precond ssor { omega 1.5 } }
+			seuil 1e-8
+			nb_full_mg_steps 2 3 1
+			impr 
+		} 
+			convection { quick }
+			diffusion { }
+			Sources 
+		{ 
+			Canal_perio { direction_ecoulement 0 h 0.0149 } 
+		}	
+		conditions_initiales 
+		{
+			vitesse champ_init_canal_sinal 3  { Ucent 0.05 h 1  ampli_sin 0.03 omega 0.1 ampli_bruit 0.005 dir_wall 1 dir_flow 0 }
+		}
+		conditions_limites 
+		{
+            periox   periodique 
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+		}
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.
+		} 
+		Traitement_particulier
+        {
+			Canal
+			{
+				dt_impr_moy_spat 0.025
+				dt_impr_moy_temp 0.025
+				debut_stat 0.
+				fin_stat 20.
+			}
+		} 
+  
+	}
+				
+	Convection_Diffusion_Chaleur_Turbulent_QC
+	{
+		diffusion { }
+		convection { quick }
+		Sources {	}	
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 300.+300.*y }
+		conditions_limites 
+		{
+			periox periodique 
+			perioz periodique
+			haut paroi_temperature_imposee champ_front_uniforme 1 600.
+			bas  paroi_temperature_imposee champ_front_uniforme 1 300.
+		}
+		Modele_turbulence Prandtl
+		{ 
+			turbulence_paroi negligeable_scalaire 
+		}
+	}
+
+	Postraitement
+	{ 
+		format lml
+		Champs dt_post 0.00000001
+		{
+			vitesse elem
+			masse_volumique elem
+			temperature_qc elem
+			viscosite_dynamique elem
+			pression elem
+		}								        
+	}
+
+	sauvegarde formatte canal_turb.sauv	
+}
+
+Resoudre pb
+Fin

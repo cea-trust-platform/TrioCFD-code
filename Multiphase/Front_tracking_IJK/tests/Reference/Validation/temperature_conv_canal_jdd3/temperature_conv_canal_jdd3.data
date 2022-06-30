@@ -1,0 +1,116 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 48
+  nbelem_j 48
+  nbelem_k 24
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep 2.40e-4
+  timestep_facsec 1.e12
+  dt_post 20
+   Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+
+  disable_diphasique
+  disable_diffusion_qdm
+  disable_convection_qdm
+
+  champs_a_postraiter 1 TEMPERATURE 
+  check_stop_file stop.txt
+  dt_sauvegarde 3000
+  tinit 0
+	nb_pas_dt_max 3
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 2
+      Coarsen_Operator_Uniform { }
+      Coarsen_Operator_Uniform { }
+    ghost_size 1
+    pre_smooth_steps 1 10
+    smooth_steps 1 10
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 } impr }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    impr
+  }
+
+  check_divergence
+
+  gravite 3 -9.81 0. 0. 
+  rho_liquide 1000.
+  mu_liquide 1e-3
+  sigma 0.07
+
+  expression_vx_init 0.0
+ expression_vy_init 0.1
+  expression_vz_init 0.0
+ 
+ thermique
+  {
+    # Cas du swarm avec un profil de temperature periodique #
+    {
+
+    conv_temperature_negligible
+    diff_temp_negligible
+
+    Boundary_Conditions {
+                 bctype_kmin Paroi_Flux_impose 
+                 bctype_kmax Paroi_Flux_impose
+                 flux_impose_kmin 1.
+                 flux_impose_kmax -1.
+    }
+
+    # Etude de la diffusion #
+    # DIFF expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
+    DIFF #
+
+    # Etude de la convection #
+    # CONV  expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
+    CONV #
+
+    # Etude du schéma temps #
+     expression_T_init 0.5*cos(x*2*Pi/0.006)*cos(y*2*Pi/0.006)
+    expression_source_temperature -1/(0.00024*800)*exp(-t/(0.00024*800))
+    
+    cp_vapor 1.
+    lambda_vapor 1.
+    fo 0.5
+    cp_liquid 4.
+    lambda_liquid 0.1
+    }
+  }
+
+ Sondes
+    {
+       # Il faut mettre +epsilon pour etre sur d'avoir la vitesse sur la bonne face...
+       IL ecrit dans le fichier sonde la coord precise de la position post-traitee (face ici). #
+       pp_T temperature_0 periode 1e-9 points 1 0.003 0.003 0.0015
+    }
+
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

@@ -1,0 +1,94 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 11
+  nbelem_j 10
+  nbelem_k 12
+  uniform_domain_size_i 0.003
+  uniform_domain_size_j 0.003
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_Grid_Geometry DOM_NEW
+Lire DOM_NEW
+{
+  nbelem_i 17
+  nbelem_j 24
+  nbelem_k 14 # flag #
+  uniform_domain_size_i 0.003
+  uniform_domain_size_j 0.003
+  uniform_domain_size_k 0.003 # unif #
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting_NEW
+Lire grid_splitting_NEW
+{
+  ijk_grid_geometry DOM_NEW
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+# CAS REFINE #
+switch_FT_double
+{
+   direct_write 0
+   old_ijk_splitting_ft_extension 5
+   old_ijk_splitting grid_splitting
+   new_ijk_splitting grid_splitting_NEW
+   nom_reprise    precurseur_@FLAG@.sauv
+   nom_sauvegarde refine_@FLAG@.sauv
+}
+
+# CAS COARSEN #
+IJK_Grid_Geometry DOM_COARSE
+Lire DOM_COARSE
+{
+  nbelem_i 8
+  nbelem_j 4
+  nbelem_k 4
+  uniform_domain_size_i 0.003
+  uniform_domain_size_j 0.003
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting_COARSE
+Lire grid_splitting_COARSE
+{
+  ijk_grid_geometry DOM_COARSE
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+switch_FT_double
+{
+   direct_write 0
+   old_ijk_splitting_ft_extension 3
+   old_ijk_splitting grid_splitting
+   new_ijk_splitting grid_splitting_COARSE
+   nom_reprise    precurseur_@FLAG@.sauv
+   nom_sauvegarde coarse_@FLAG@.sauv
+}
+
+# The end #
+Fin

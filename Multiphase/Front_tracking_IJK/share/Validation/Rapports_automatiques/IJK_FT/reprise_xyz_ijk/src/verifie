@@ -1,0 +1,82 @@
+#!/bin/bash
+ret_code=0
+
+echo "Comparaison IJK seq/par"
+if compare_lata reprise_xyz_ijk_velocity.lata  reprise_xyz_ijk_par8_velocity.lata
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison echouee."
+  ret_code=1
+  exit $ret_code
+fi
+
+echo "Comparaison TrioCFD seq/par (From IJK SEQ)"
+if compare_lata SEQ_reprise_TrioCFD_fromSEQIJK_velocity.lata PAR_reprise_TrioCFD_fromSEQIJK_velocity.lata
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison echouee."
+  ret_code=2
+  exit $ret_code
+fi
+
+echo "Comparaison TrioCFD seq/par (From IJK PAR)"
+if compare_lata SEQ_reprise_TrioCFD_fromPARIJK_velocity.lata PAR_reprise_TrioCFD_fromPARIJK_velocity.lata
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison echouee."
+  ret_code=22
+  exit $ret_code
+fi
+
+echo "Comparaison TrioCFD seq/seq (From IJK SEQ vs PAR)"
+if compare_lata SEQ_reprise_TrioCFD_fromSEQIJK_velocity.lata SEQ_reprise_TrioCFD_fromPARIJK_velocity.lata
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison echouee."
+  ret_code=23
+  exit $ret_code
+fi
+
+echo "Comparaison TrioCFD seq/reference"
+if compare_lata SEQ_reprise_TrioCFD_fromSEQIJK_velocity.lata SEQ_reprise_TrioCFD_reference_velocity.lata
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison echouee."
+  ret_code=3
+  exit $ret_code
+fi
+
+echo "Comparaison IJK seq versus reference"
+if compare_lata reprise_xyz_ijk_velocity.lata SEQ_reprise_TrioCFD_reference_velocity.lata
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison echouee."
+  ret_code=4
+  exit $ret_code
+fi
+
+echo "Comparaison IJK seq TrioCFD (all seq), interfaces only"
+if compare_lata reprise_xyz_ijk_mod.lata  SEQ_reprise_TrioCFD_fromSEQIJK.lata --dernier
+then
+  echo "OK"
+  echo "*********************************"
+else
+  echo "Comparaison des interfaces echouee."
+  ret_code=5
+  exit $ret_code
+fi
+compare_lata reprise_xyz_ijk_mod.lata  SEQ_reprise_TrioCFD_fromSEQIJK.lata --dernier
+
+exit $ret_code

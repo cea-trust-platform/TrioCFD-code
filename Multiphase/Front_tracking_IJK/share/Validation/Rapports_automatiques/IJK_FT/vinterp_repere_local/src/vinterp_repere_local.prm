@@ -1,0 +1,117 @@
+Parametres {
+	Titre "Interpolation des vitesses dans le repere local aux bulles en front-tracking en IJK"
+	Description ""
+	Auteur "G.B."
+	CasTest . vinterp_repere_local.data 8 
+	CasTest . vinterp_repere_local_avec_remaillage 8
+	CasTest RK3 vinterp_repere_local_avec_remaillage 8
+        Prerequisite python ./trajectory.py
+}
+
+Chapitre {
+	Titre "FT"
+	Description "2 bulles en mouvement dans un champ de rotation solide."
+	Description "Le solveur de poisson et les operateurs conv+diff sont disable car les cdlims ne sont pas perio."
+	
+	Description "A verifier:"
+	Description "- Les marqueurs ne doivent pas bouger pour les 2 bulles spheriques dans un champ de rotation solide"
+
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+	visu {
+		titre "Etat initial relu"
+		cycles 0
+		mesh        vinterp_repere_local.lata INTERFACES
+		pseudocolor vinterp_repere_local.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity vinterp_repere_local.lata DOM MU ELEM 0.1
+		mesh        vinterp_repere_local.lata DOM_EXT	
+
+	}
+	Description "Le calcul est lance sans barycentrage ni lissage. La qualite du maillage se degrade un peu au bout d'un tour car la normale moyenne evaluee aux sommets n'est pas rigoureusement perpendiculaire au champ de rotation." 
+	visu {
+		titre "1/8 de tour"
+		cycles 1
+		mesh        vinterp_repere_local.lata INTERFACES
+		pseudocolor vinterp_repere_local.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity vinterp_repere_local.lata DOM MU ELEM 0.1
+		mesh        vinterp_repere_local.lata DOM_EXT	
+	}
+	visu {
+		titre "1/4 de tour"
+		cycles 2
+		mesh        vinterp_repere_local.lata INTERFACES
+		pseudocolor vinterp_repere_local.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity vinterp_repere_local.lata DOM MU ELEM 0.1
+		mesh        vinterp_repere_local.lata DOM_EXT	
+	}
+	visu {
+		titre "Final calcul"
+		cycles -1
+		mesh        vinterp_repere_local.lata INTERFACES
+		pseudocolor vinterp_repere_local.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity vinterp_repere_local.lata DOM MU ELEM 0.1
+		mesh        vinterp_repere_local.lata DOM_EXT	
+	}
+	visu {
+		titre "Final calcul"
+		cycles -1
+		mesh        vinterp_repere_local.lata INTERFACES
+		pseudocolor vinterp_repere_local.lata INTERFACES COURBURE SOM
+		BlackVector vinterp_repere_local.lata DOM_dual VELOCITY FACES 0.2
+		Operator Slice 0 0 0 0 0 1
+		zoom3D -0.15 0. 1.8
+	}
+	visu {
+		titre "Final calcul (avec remaillage)"
+		cycles -1
+		mesh        vinterp_repere_local_avec_remaillage.lata INTERFACES
+		pseudocolor vinterp_repere_local_avec_remaillage.lata INTERFACES COURBURE SOM
+		BlackVector vinterp_repere_local_avec_remaillage.lata DOM_dual VELOCITY FACES 0.2
+		Operator Slice 0 0 0 0 0 1
+		zoom3D -0.15 0. 1.8
+	}
+       Figure {
+                Titre "Trajectoire du centre de gravite"
+                Description "En RK3, on est plus proche du cercle."
+                Description "Avec Euler, on a une ellipse plus marquee"
+                Image trajectory.png
+        }
+        visu {
+                titre "Final calcul (avec remaillage en RK3)"
+                cycles -1
+                mesh        RK3/vinterp_repere_local_avec_remaillage.lata INTERFACES
+                pseudocolor RK3/vinterp_repere_local_avec_remaillage.lata INTERFACES COURBURE SOM
+                BlackVector RK3/vinterp_repere_local_avec_remaillage.lata DOM_dual VELOCITY FACES 0.2
+                Operator Slice 0 0 0 0 0 1
+                zoom3D -0.15 0. 1.8
+        }
+
+
+}
+Chapitre {
+	Titre "Temperature"
+	Description "2 bulles en mouvement dans un champ de rotation solide, avec une temperature initiale"
+	Description "Le but est de constater qu'en absence de diffusion le schéma convectif n'est pas trop difusif."
+	
+        visu {
+                titre "Final calcul temperature (avec remaillage en RK3)"
+                cycles -1
+                pseudocolor vinterp_repere_local_avec_remaillage.lata DOM TEMPERATURE_0 ELEM
+                Operator Slice2D 0 0 0.1 0 0 1
+        }
+        visu {
+                titre "Final calcul temperature (avec remaillage en RK3) et difference cp"
+                cycles -1
+                pseudocolor vinterp_repere_local_avec_remaillage.lata DOM TEMPERATURE_1 ELEM
+                Operator Slice2D 0 0 0.1 0 0 1
+        }
+        visu {
+                titre "Final calcul temperature (avec remaillage en RK3) et energie conservee"
+                cycles -1
+                pseudocolor vinterp_repere_local_avec_remaillage.lata DOM TEMPERATURE_2 ELEM
+                Operator Slice2D 0 0 0.1 0 0 1
+        }
+}

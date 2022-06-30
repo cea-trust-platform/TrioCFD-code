@@ -1,0 +1,96 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 5
+  nbelem_j 5
+  nbelem_k 5
+  uniform_domain_size_i 0.004
+  uniform_domain_size_j 0.004
+  uniform_domain_size_k 0.004
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep .125000000
+  # time_scheme RK3_FT  #
+  type_velocity_convection_op  Quick
+  timestep_facsec 1.e12 # 0.9 #
+  Boundary_Conditions {
+                bctype_kmin Symetrie
+                bctype_kmax Symetrie
+  }
+  cfl 1.0
+  fo  1.0
+  oh  1.0
+  dt_post 3000
+  t_debut_statistiques 100.
+  champs_a_postraiter 6 PRESSURE VELOCITY COORDS VELOCITY_ANA ECART_ANA
+  			D_VELOCITY      # DU_DT #
+  # postraiter_sous_pas_de_temps #
+  check_stop_file stop.txt
+  dt_sauvegarde 3000
+  nb_pas_dt_max 32
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0
+    #  Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }	 #
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 20 1
+    
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+  }
+  # FIN AJOUT #
+  check_divergence
+  disable_diphasique 
+  disable_diffusion_qdm
+  disable_convection_qdm
+  rho_liquide 500.
+  mu_liquide 2.e-5
+  # A = 2 pi / Lx = 67.01063635488659 ou 98.17477042468103 # 
+  # terme_force_init 500.
+  expression_derivee_force -500.*exp(-t)
+  expression_vx_init 0.0
+  expression_vx_ana  1.-exp(-t) #
+  terme_force_init -500.
+  expression_derivee_force 500.*(cos(t)+sin(t))
+  expression_vx_init 0.0
+  expression_vx_ana  1.-1.*(cos(t)+sin(t))
+  #   then # 
+  expression_vy_init 2.0
+  expression_vz_init 0.
+  expression_vy_ana 2.0
+  expression_vz_ana 0.
+  Sondes
+    {
+       p velocity_x periode 1e-9 points 1 0.002001 0.002001 0.002001 # selon x: + epsilon.. #
+    }
+  
+}
+Fin

@@ -1,0 +1,25 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 2 bulles : une sur l'axe de rotation, l'autre non
+cat >deplacements.txt <<EOF
+0. 0. 0.1 bulle3.msh
+0.1  0. 0.1 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Calculs paralleles : 
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/' reprise_xyz_ijk.data > reprise_xyz_ijk_par8.data
+\rm -f PAR_reprise_TrioCFD*.data SEQ_reprise_TrioCFD*.data
+
+# Decommente les lignes qui contiennent la premiere balise
+sed "/initiale.*reprise_xyz_ijk.sauv.xyz/s/#//g" reprise_TrioCFD.data > reprise_TrioCFD_fromSEQIJK.data
+sed -e "/initiale.*reprise_xyz_ijk_par8/s/#//g" reprise_TrioCFD.data \
+    -e "s/reprise_xyz_ijk.med/reprise_xyz_ijk_par8.med/g"       > reprise_TrioCFD_fromPARIJK.data
+sed "/initiale.*champ_Fonc_xyz/s/#//g" reprise_TrioCFD.data     > SEQ_reprise_TrioCFD_reference.data

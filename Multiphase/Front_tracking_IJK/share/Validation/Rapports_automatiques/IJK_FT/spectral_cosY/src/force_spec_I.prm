@@ -1,0 +1,160 @@
+Parameters {
+	Title "Validation du terme source spectral et du relevé des sondes de ce terme - I."
+	Author "Gabriel Ramirez"
+	Testcase . spectral_point2
+    IncludeData 1
+    VersionTRUST "1.8.2"
+}
+
+Chapitre {
+
+Titre "Purpose"
+Description "Valider le placement et le relevé des sondes pour les grandeurs FORCE_PH_* . Valider la grandeur FORCE_PH_*"
+
+}
+
+Chapitre {
+Titre "Description du problème"
+Description "On impose un champ de force dans le domaine. Le champs de force est : \latex_( $F_{ph} = cos(\frac{2 \pi}{L_y} y)$\latex_)"
+Description "test "
+Description "Le domaine est un cube de côté 0.0025, allant de -0.00125 à 0.00125."
+Description "Chaque face est périodique"
+Description "La viscosité cinématique est fixée à 3.0128062836164946e-07 . La masse volumique à 1171.3. Il n'y a pas de phase gazeuse."
+}
+
+Chapitre {
+Titre "Description du cas" 
+Description "Le domaine est discrétisé en $32^3$ éléments tous de même taille. Le point de coordonnées (0, 0, 0) se trouve au centre du domaine."
+Description "les sondes selon X sont placées comme tel : Segment 32 -0.0012239583333333334 -0.000390625 -0.000390625 0.00125 -0.000390625 -0.000390625  "
+}
+
+
+Chapitre {
+        Titre "Résultats"
+        Description "On montre ici lLa visualitation des champs de la force spectrale ajoutée," <<EOF
+ obtenus avec l'outil de visualisation visit pour le 2eme et le 5eme pas de temps pour la composante X.
+EOF
+
+        visu {
+                titre "Force spectrale selon X - Deuxième pas de temps"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        LATAS/spectral_point2.lata DOM
+                pseudocolor LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+        visu {
+                titre "Force spectrale selon X - Cinquième pas de temps"
+                cycles 4
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        LATAS/spectral_point2.lata DOM
+                pseudocolor LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+            
+        visu {
+                titre "Force_spectrale selon Y - Deuxième pas de temps"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        LATAS/spectral_point2.lata DOM
+                pseudocolor LATAS/spectral_point2.lata DOM_dual FORCE_PH_Y FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+        visu {
+                titre "Force_spectrale selon Z - Deuxième pas de temps"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        LATAS/spectral_point2.lata DOM
+                pseudocolor LATAS/spectral_point2.lata DOM_dual FORCE_PH_Z FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }            
+            
+    Description " Les figures suivantes montrent la position des sondes de relevé ainsi que les valeurs prises par ces sondes"
+
+     figure {
+               titre "Position des sondes - Plan XY"
+               Image coord_XY.png
+               Description "Position des points de relevé." <<EOF 
+               Signes : 'x' pour les sondes selon X, '+' pour les sondes selon Y
+               , '.' pour les sondes selon Z. Couleurs : rouge pour pour la force selon X, vert pour la force selon Y,
+               bleu pou rla force selon Z.
+               EOF
+               
+     }
+     figure {
+               titre "Position des sondes - Plan XZ"
+               Image coord_XZ.png
+               Description "Position des points de relevé." <<EOF 
+               Signes : 'x' pour les sondes selon X, '+' pour les sondes selon Y
+               , '.' pour les sondes selon Z. Couleurs : rouge pour pour la force selon X, vert pour la force selon Y,
+               bleu pou rla force selon Z.
+               EOF  
+     }
+     figure {
+               titre "Position des sondes - Plan YZ"
+               Image coord_YZ.png
+               Description "Position des points de relevé." <<EOF 
+               Signes : 'x' pour les sondes selon X, '+' pour les sondes selon Y
+               , '.' pour les sondes selon Z. Couleurs : rouge pour pour la force selon X, vert pour la force selon Y,
+               bleu pou rla force selon Z.
+               EOF  
+     }
+     
+     Description "Les figures suivantes montrent les valeur relevées en en ces points de relevé." 
+    
+    figure {
+               titre "Valeurs des points de relevé des sondes"
+               Image valeur_X.png
+                Description "Valeurs relevée." <<EOF 
+               Signes : 'x' pour les sondes selon X, '+' pour les sondes selon Y
+               , '.' pour les sondes selon Z. Couleurs : rouge pour pour la force selon X, vert pour la force selon Y,
+               bleu pou rla force selon Z.
+               EOF             
+     }
+     figure {
+               titre "Valeurs des points de relevé des sondes"
+               Image valeur_Y.png
+               Description "Valeurs relevés." <<EOF 
+               Signes : 'x' pour les sondes selon X, '+' pour les sondes selon Y
+               , '.' pour les sondes selon Z. Couleurs : rouge pour pour la force selon X, vert pour la force selon Y,
+               bleu pou rla force selon Z.
+               EOF
+     }
+     figure {
+               titre "Valeurs des points de relevé des sondes"
+               Image valeur_Z.png
+               Description "Valeurs relevées." <<EOF 
+               Signes : 'x' pour les sondes selon X, '+' pour les sondes selon Y
+               , '.' pour les sondes selon Z. Couleurs : rouge pour pour la force selon X, vert pour la force selon Y,
+               bleu pou rla force selon Z.
+               EOF
+     }
+     
+}
+
+Chapter {
+Titre "Conclusion"
+Description "En conclusion, les sondes ne sont pas placées aux bons endroits et ne relèvent pas les bonnes valeurs"
+}
+
+Chapter {
+	Title Computer performance
+	Tableau_performance {
+	}
+}

@@ -1,0 +1,58 @@
+# Test pour verifications des proprietes thermodynamiques lambda, rho et mu de T #
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 4
+  nbelem_j 4
+  nbelem_k 32
+  uniform_domain_size_i 0.023441
+  uniform_domain_size_j 0.03
+  uniform_domain_size_k 0.029846
+  perio_i
+  perio_j
+}
+IJK_Splitting grid_splitting
+Lire grid_splitting { ijk_grid_geometry grid_geom  nproc_i 1  nproc_j 1  nproc_k 1 }
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting
+  timestep 0.001
+  timestep_facsec 1.
+/* tinit 0. */
+	nb_pas_dt_max 1
+  multigrid_solver { 
+    coarsen_operators 1
+	Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+    ghost_size 1
+    pre_smooth_steps 1 5
+    smooth_steps 1 5
+    relax_jacobi 1 0.65
+    solveur_grossier GCP { seuil  0.5e-25 precond ssor { omega 1.5 } impr }
+    seuil 1.e-20
+    nb_full_mg_steps 2 5 1
+    solver_precision mixed
+  }
+  champs_a_postraiter 1 tous
+dt_post 1
+sauvegarde_post_instantanes 
+  t_paroi_impose_kmin 200
+  t_paroi_impose_kmax 1000
+  p_thermo_init       214072
+  cp                  1005.0
+  gamma               1.4
+
+  
+  debit_massique 0.
+  dumping_factor 1e99
+expression_vx_init 0.
+  expression_vy_init 0.
+  expression_vz_init 0.
+  expression_t_init 200+800*z/0.029846
+}
+# pour NR #
+system "ln -sf *_1.sauv.lata qc_ijk_proprietes_thermo_jdd1.lata"
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

@@ -1,0 +1,27 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# !!! On n'utilise pas le lissage car les bulles ne sont pas dans le domaine. 
+# 
+#Creation d'un JDD pour le cas : terme source <rho>g pour la gravite
+echo "le prepare genere un fichier .data de reprise du cas essaim de bulles fixes"
+sed -e "s/ nom_sauvegarde.*/ nom_sauvegarde reprise.sauv/g" \
+    -e "s/ # nom_reprise.*/ nom_reprise diph_fixe.sauv/g" \
+    -e "s/ timestep_reprise_vitesse.*/  timestep_reprise_vitesse 1 /g" \
+    -e "s/ expression_vx_init.*/  # expression_vx_init 0.0/g" \
+    -e "s/ expression_vz_init.*/  expression_vz_init 0.0 #/g"  DNS_fixe.data > DNS_fixe_reprise.data 
+    
+echo "reset test for fixed bubbles"
+sed -e "s/diph_fixe.sauv/diph_fixe_reset.sauv/" DNS_fixe_reprise.data > DNS_fixe_reprise_reset.data
+
+echo "preparation d'une reprise du canal refined"
+sed -e "s/DOM/DOM_NEW/g" \
+    -e "s/nbelem_k .*/nbelem_k 256/g" \
+    -e "s/nb_pas_dt_max .*/nb_pas_dt_max 1/g" \
+    -e "s/RK3_FT/Euler_explicit/" \
+    -e "s/dt_post .*/dt_post 1/g" \
+    -e "s/ nom_sauvegarde.*/ nom_sauvegarde DNS_canal_refine.sauv/g" \
+    -e "s/ # nom_reprise.*/ nom_reprise refine.sauv/g" \
+    -e "s/ timestep_reprise_vitesse.*/  timestep_reprise_vitesse 1 /g" \
+    -e "s/ expression_vx_init.*/  # expression_vx_init 0.0/g" \
+    -e "s/ expression_vz_init.*/  expression_vz_init 0.0 #/g"  DNS_canal.data > DNS_canal_refine.data 

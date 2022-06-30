@@ -1,0 +1,62 @@
+Parametres {
+	Titre "Transport periodique front-tracking en IJK"
+	Description ""
+	Auteur "B.M. and G.B."
+	CasTest . calcul_distance.data 8
+	CasTest . repulsion.data 4
+	CasTest . repulsion2.data 4
+}
+
+Chapitre {
+	Titre "Test du calcul de la distance entre interfaces en parallele"
+	Description "Les bulles sont sur des processeurs differents"
+	visu {
+		titre "Distribution parallele du maillage front-tracking"
+		mesh calcul_distance.lata INTERFACES
+		pseudocolor calcul_distance.lata INTERFACES FACETTE_PE_LOCAL ELEM
+		normal3d -0.462333 0.261789 -0.847181
+		cycles 0
+	}
+	visu {
+		titre "Composantes connexes (negatif = ghost)"
+		mesh calcul_distance.lata INTERFACES
+		pseudocolor calcul_distance.lata INTERFACES COMPO_CONNEXE ELEM
+		normal3d -0.462333 0.261789 -0.847181
+		cycles 0
+	}
+	visu {
+		titre "Distance aux autres interfaces"
+		mesh calcul_distance.lata INTERFACES
+		pseudocolor calcul_distance.lata INTERFACES  DISTANCE_AUTRES_INTERFACES SOM
+		normal3d -0.462333 0.261789 -0.847181		
+		cycles 0
+	}
+}
+
+Chapitre {
+	Titre "Test de la repulsion"
+	Description "On laisse les bulles monter sous l'effet de la gravite"
+
+	visu {
+		titre "Distribution parallele du maillage front-tracking, etat initial"
+		mesh repulsion.lata INTERFACES
+		pseudocolor repulsion.lata INTERFACES FACETTE_PE_LOCAL ELEM
+		normal3d -0.462333 0.261789 -0.847181
+		cycles 0
+	}
+	visu {
+		titre "Etat final, distance aux autres interfaces"
+		mesh repulsion.lata INTERFACES
+		pseudocolor repulsion.lata INTERFACES  DISTANCE_AUTRES_INTERFACES SOM
+		normal3d -0.462333 0.261789 -0.847181		
+		cycles -1
+	}
+	visu {
+		titre "Etat final, distance aux autres interfaces, tension de surface reduite"
+		mesh repulsion2.lata INTERFACES
+		pseudocolor repulsion2.lata INTERFACES  DISTANCE_AUTRES_INTERFACES SOM
+		normal3d -0.462333 0.261789 -0.847181		
+		cycles -1
+	}
+	
+}

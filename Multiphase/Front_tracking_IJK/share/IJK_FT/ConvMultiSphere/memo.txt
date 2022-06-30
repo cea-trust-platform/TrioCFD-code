@@ -1,0 +1,32 @@
+# Decription du cas : 
+#    o Traversee frontiere perio.
+#    o Parallele.
+#    o Interpolation du champ de vitesse etendue.
+#    o Sauvegarde/Reprise.
+#
+# On place 4 bulles monodisperses dans le domaine.
+# Elles sont convectees pendant 24dt par une vitesse uniforme.
+# Puis on sauvegarde. On est alors juste avant le passage d'une 
+# bulle reelle a travers la frontiere perio X+.
+# 
+# Ensuite, on lance une reprise sur 24dt pour tester aussi la relecture 
+# lorsque des bulles sont dans le domaine etendu. Dans cette reprise, 
+# un champ de vitesse sinusoidal (perio) est impose sur le domaine NS 
+# pour verifier que l'interpolation fonctionne. 
+# Le tout sur 8 procs.
+
+# Creation des bulles  : 
+# gmsh bulle1.geo -2
+# gmsh bulle2.geo -2
+gmsh bulle3.geo -2
+
+# Creation du fichier init.lata multibulles : 
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+# Parallel run : 
+export exec=/export/home/gb218285/BALTIKS/IJK/v1.6.7/IJK/New_algo_qc
+
+triou ConvMultiSpherePerio_Part1_CreateRepr 8
+triou ConvMultiSpherePerio_Part2_RunRepr 8
+# mpirun -gdb -np 2 $ijk ConvMultiSpherePerio_Part2_RunRepr 2
+# $Mpirun -np 4 $exec datafile.data -mpi -debugscript=./debug_trio_u.sh

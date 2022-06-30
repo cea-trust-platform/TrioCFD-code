@@ -1,0 +1,50 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 3 bulles  :
+# 0.134 0.131 0.151 bulle3.msh
+# 0.201 0.271 0.152 bulle3.msh
+# cat >deplacements.txt <<EOF
+# 0.0015823 0.0015798 0.00151354 bulle3.msh
+# EOF
+
+# On met une bulle pres de y- : 
+cat >deplacements.txt <<EOF
+0.0015823 0.00101 0.00151354 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+cat >deplacements3.txt <<EOF
+0.0015823 0.0015798 0.00151354 bulle3.msh
+0.0045867 0.0010100 0.00155486 bulle3.msh
+0.0055337 0.0029443 0.00155486 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements3.txt init_multi.lata
+
+# Generation du cas test multi-bulles : 
+echo "JDD pour calcul multi-bulles..."
+sed -e "s/init\.lata/init_multi.lata/g" \
+    -e "s/nbelem_i .*/nbelem_i 48/g" \
+    -e "s/nbelem_j .*/nbelem_j 48/g" \
+    -e "s/uniform_domain_size_i .*/uniform_domain_size_i 0.006/g" \
+    -e "s/uniform_domain_size_j .*/uniform_domain_size_j 0.006/g" \
+       ijkft_follow_colors_seq.data > ijkft_follow_colors_multi_seq.data
+
+# Generation du cas test multi-bulles reprise (avec repulsion) : 
+echo "JDD pour calcul multi-bulles reprise (avec repulsion) ..."
+sed -e "s/init_multi/ijkft_follow_colors_multi_seq\.sauv/g" \
+    -e "/lata_meshname/d" \
+    -e "/nom_reprise/s/#//g" \
+    -e "s/remaillage_ft_ijk/portee_force_repulsion 0.00025 \n delta_p_max_repulsion 100.\n remaillage_ft_ijk/" \
+    -e "s/expression_vz_init 0./&\n  fichier_reprise_vitesse ijkft_follow_colors_multi_seq.sauv.lata\n timestep_reprise_vitesse 1/"  ijkft_follow_colors_multi_seq.data > ijkft_follow_colors_multi_repr_seq.data
+    
+# Generation des cas tests paralleles
+echo "JDD pour calcul paralleles ..."
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;' ijkft_follow_colors_seq.data >ijkft_follow_colors_par8.data
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;' ijkft_follow_colors_multi_seq.data >ijkft_follow_colors_multi_par8.data

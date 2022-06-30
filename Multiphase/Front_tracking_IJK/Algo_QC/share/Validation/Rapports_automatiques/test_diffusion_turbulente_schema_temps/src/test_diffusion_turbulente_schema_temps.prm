@@ -1,0 +1,88 @@
+Parameters {
+	Title "Validation de l'operateur de diffusion turbulente (sch\'ema en temps)"
+	Author "Dorian Dupuy"
+	VersionTrio_U 1.7.4
+ 	TestCase test_diffusion_turbulente_schema_temps test_diffusion_turbulente_schema_temps.data
+	Description "Info pour completer un prm: firefox \$TRUST_ROOT/Validation/Outils/Genere_courbe/doc/manuel.xhtml "
+}
+
+Chapter {
+ 
+  	Title "Cas test_diffusion_turbulente_schema_temps" 
+
+Description "\latex_(\input{../description_cas.tex}\latex_)"
+
+	visu {
+		nb_img_without_newline 2
+		Description "simu_vz"
+		cycles -1
+		Instruction_visit execfile("test_diffusion_turbulente_schema_temps/instructions.py")
+                origine instruction
+
+		pseudocolor test_diffusion_turbulente_schema_temps/test_diffusion_turbulente_schema_temps_lata_1.sauv.lata simu_vz 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "ana_vz_tinit"
+		cycles -1
+		Instruction_visit execfile("test_diffusion_turbulente_schema_temps/instructions.py")
+                origine instruction
+
+		pseudocolor test_diffusion_turbulente_schema_temps/test_diffusion_turbulente_schema_temps_lata_1.sauv.lata ana_vz_tinit 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "ana_vz_tfinal"
+		cycles -1
+		Instruction_visit execfile("test_diffusion_turbulente_schema_temps/instructions.py")
+                origine instruction
+
+		pseudocolor test_diffusion_turbulente_schema_temps/test_diffusion_turbulente_schema_temps_lata_1.sauv.lata ana_vz_tfinal 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+	visu {
+		nb_img_without_newline 2
+		Description "error_vz"
+		cycles -1
+		Instruction_visit execfile("test_diffusion_turbulente_schema_temps/instructions.py")
+                origine instruction
+
+		pseudocolor test_diffusion_turbulente_schema_temps/test_diffusion_turbulente_schema_temps_lata_1.sauv.lata error_vz 
+		Operator Slice2D_Y 0.5 0.5 0.5
+		Width 7cm
+	}
+
+	Figure {
+		Title_figure "Profil suivant z a x=y=0.5"
+		nb_img_without_newline 2
+		LabelX "z"
+		LabelY "vz"
+		include_description_curves 0
+		legend bottom right
+
+		Curve {
+			legend "simu_vz"
+			file test_diffusion_turbulente_schema_temps/simu_vz0000.curve
+		}
+		Curve {
+			legend "ana_vz_tinit"
+			file test_diffusion_turbulente_schema_temps/ana_vz_tinit0000.curve
+		}
+		Curve {
+			legend "ana_vz_tfinal"
+			file test_diffusion_turbulente_schema_temps/ana_vz_tfinal0000.curve
+		}
+		Curve {
+			legend "error_vz"
+			file test_diffusion_turbulente_schema_temps/error_vz0000.curve
+		}
+		Width 14cm
+	}
+
+}
+

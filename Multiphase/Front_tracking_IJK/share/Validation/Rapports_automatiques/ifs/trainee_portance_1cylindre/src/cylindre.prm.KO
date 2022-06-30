@@ -1,0 +1,55 @@
+Parametres {
+	Titre "Trainee et portance d'un cylindre en IBC"
+	Description "Ecoulement transverse monophasique, Re=100"
+	Auteur "J.D."
+	CasTest . cylindre.data
+	CasTest . cylindre_fin.data 
+}
+
+Chapitre {
+	Titre "FT"
+	Description " test visu "
+visu {
+	titre "test slice2d"
+	description "on trace le maillage et indicatrice"
+	description "et on fait une coupe 2D"
+	mesh         cylindre.lata DOM
+	pseudocolor  cylindre.lata DOM_dual VELOCITY_X FACES
+	operator_to_all slice2d 0. 0.0125 0.  0. -1. 0 
+}
+}
+Chapitre {
+	Titre "toto"
+Figure {
+        Dimension 2
+	Titre "Trainee et portance"
+        LabelX "Time (sec)"
+        LabelY "Coefficient adimensionnalise"
+	incluredesccourbes 0
+        RangeY -0.5 2.8
+	Courbe {
+         Legende "Trainee"
+         fichier C_cylindre.out.txt
+         colonnes ($1) ($2)
+         Style lines
+        }
+	Courbe {
+         Legende "Portance"
+         fichier C_cylindre.out.txt
+         colonnes ($1) ($4)
+         Style lines
+        }
+	Courbe {
+         Legende "Trainee (fine)"
+         fichier C_cylindre_fin.out.txt
+         colonnes ($1) ($2)
+         Style lines
+        }
+	Courbe {
+         Legende "Portance (fine)"
+         fichier C_cylindre_fin.out.txt
+         colonnes ($1) ($4)
+         Style lines
+        }
+ }
+}

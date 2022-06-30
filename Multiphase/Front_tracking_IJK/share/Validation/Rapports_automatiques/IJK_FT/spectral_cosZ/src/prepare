@@ -1,0 +1,19 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 3 bulles  :
+# 0.01 0.0025 0.0025 bulle3.msh
+cat >deplacements.txt <<EOF
+0.0 0.0 0.0 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+mkdir -p NEXT
+
+${project_directory}/share/PyTools/probes/place_sondes.sh spectral spectral_point2 cree [2,2,2,.] [force_ph]
+

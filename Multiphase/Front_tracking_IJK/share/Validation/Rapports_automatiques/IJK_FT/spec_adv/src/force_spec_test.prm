@@ -1,0 +1,53 @@
+Parameters {
+    NewValidTrio
+	Title "Validation de l'advection du champ de force."
+	Author "Gabriel Ramirez"
+	Testcase ADV_X00/RUN00 spec_bulles_point2 8
+	Testcase NO_ADV_X00/RUN00 spec_bulles_point2 8
+	Testcase ADV_0X0/RUN00 spec_bulles_point2 8
+	Testcase NO_ADV_0X0/RUN00 spec_bulles_point2 8
+	Testcase ADV_010/RUN00 spec_bulles_point2 8
+	Testcase NO_ADV_010/RUN00 spec_bulles_point2 8
+	Testcase ADV_001/RUN00 spec_bulles_point2 8
+	Testcase NO_ADV_001/RUN00 spec_bulles_point2 8
+	Testcase ADV_101/RUN00 spec_bulles_point2 8
+	Testcase NO_ADV_101/RUN00 spec_bulles_point2 8
+   IncludeData 0
+    VersionTRUST "1.8.3"
+}
+
+Purpose {
+    Description "Valider l'advection constante et forcée du champ de force imposé dans l'écoulement à travers cinq test élémentaires. Le premier test reproduit l'évolution d'une onde transversale, les quatre autres tests reproduisent l'évolution d'une onde transversale. \latex_( \input{\orig/PREAMBULE/raccourcis} \latex_) "
+}
+
+pb_description {
+# geometry; icbc; fluidprop; flowphy
+      Description "\latex_( \input{\orig/description_du_probleme} \latex_)"
+}
+
+casesetup {
+# grid; model_options; other_options
+    grid_mesh {
+        Description "\latex_( \input{\orig/grid} \latex_)"
+    }
+    model_options {
+        Description "\latex_( \input{\orig/model_options} \latex_)"
+    }
+    other_options {
+        Description "\latex_( \input{\orig/other_options} \latex_)"
+    }
+}
+
+results {
+# J'aurai aime mettre directement des visu de visit, mais je n'ai pas trouve facilement comment faire un lineout. Je passe donc par visit -cli; puis insertion de figures
+    Description ""
+    Description "\latex_( \input{\orig/results_cas1_partie1} \latex_)     
+    Description "\latex_( \input{\orig/results_cas1_partie2} \latex_)     
+    Description "\latex_( \input{\orig/results_cas2_partie1} \latex_)     
+    Description "\latex_( \input{\orig/results_cas34_partie1} \latex_)     
+    Description "\latex_( \input{\orig/results_cas5_partie1} \latex_)     
+}
+
+conclusion {
+Description "\latex_( \input{\orig/conclusion} \latex_)"
+}

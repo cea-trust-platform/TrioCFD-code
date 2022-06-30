@@ -1,0 +1,230 @@
+Parameters {
+	Title "Validation de la reprise pour le forcage spectral."
+	Author "Gabriel Ramirez"
+	Testcase AVEC_REPRISES/RUN00 spectral_point2 8
+	Testcase AVEC_REPRISES/RUN01 spectral_point2 8
+	Testcase AVEC_REPRISES/RUN02 spectral_point2 8
+	Testcase AVEC_REPRISES/RUN03 spectral_point2 8
+	Testcase AVEC_REPRISES/RUN04 spectral_point2 8
+	Testcase AVEC_REPRISES/RUN05 spectral_point2 8
+	Testcase SANS_REPRISES/RUN00 spectral_point2 8
+    IncludeData 1
+    VersionTRUST "1.8.2"
+}
+
+Chapitre {
+
+Titre "Purpose"
+Description "Valider la reprise de simulation avec le forcage spectral"
+
+}
+
+Chapitre {
+Titre "Description du problème"
+Description "Le texte n'est pas à jour du tout. La suite de génrérateur aléatoires se trouve dans .../OUT/random...out."
+Description "On impose un champ de force dans le domaine. Le champs de force est donné par les équations suivantes : "
+Description "\latex_( $F_{ph} = \mathcal{TF}(b(k,t_{i+1}) - \frac{k(k \cdot b(k, t_{i+1}))}{k \cdot k})$ \latex_)"
+Description "\latex_($ b(k,t_{i+1}) = b(k,t_i)(1-\frac{\Delta t}{T_L}) + e_i(k,t) (2\sigma^2 \frac{\Delta t}{T_L})^{1/2}$\latex_)"
+Description "Le domaine est un cube de côté 01, allant de -0.005 a  0.005."
+Description "Chaque face est périodique"
+Description "La viscosité cinématique est fixée à 3.0128062836164946e-07 . La masse volumique à 1171.3. Il n'y a pas de phase gazeuse."
+}
+
+Chapitre {
+Titre "Description du cas" 
+Description "Le domaine est discrétisé en \latex_($128^3$\latex_) éléments tous de même taille."
+Description " On dispose quatre segments de relevé alignés selon X, quatre segments selon Y et 4 segments selon Z. "
+}
+
+
+Chapitre {
+        Titre "Résultats"
+        Description "On montre ici la visualitation des champs de la force spectrale ajoutée," <<EOF
+ obtenus avec l'outil de visualisation visit .
+EOF
+        Description "Force spectrale, avec reprises" <<EOF
+ obtenus avec l'outil de visualisation visit .
+EOF
+
+         visu {
+                 titre "Force spectrale selon X - Deuxième pas de temps - AVEC_REPRISES/RUN00"
+                 cycles 1
+                 Normal3d 0 0 1
+                 Up3D 1 0 0
+                 zoom3D 0 0 1.
+                 mesh        AVEC_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                 pseudocolor AVEC_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                 Operator slice 0. 0. 0. 0. 0. 1.
+                 # Operator_to_all no_legend
+                 Operator_to_all no_databaseinfo
+             }
+
+         visu {
+                 titre "Force spectrale selon X - Deuxième pas de temps - SANS_REPRISES/RUN00"
+                 cycles 1
+                 Normal3d 0 0 1
+                 Up3D 1 0 0
+                 zoom3D 0 0 1.
+                 mesh        SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                 pseudocolor SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                 Operator slice 0. 0. 0. 0. 0. 1.
+                 # Operator_to_all no_legend
+                 Operator_to_all no_databaseinfo
+             }
+             
+        visu {
+                titre "Force spectrale selon X - Dixième pas de temps - AVEC_REPRISES/RUN01"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        AVEC_REPRISES/RUN01/LATAS/spectral_point2.lata DOM
+                pseudocolor AVEC_REPRISES/RUN01/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+            
+        visu {
+                titre "Force spectrale selon X - Quatrième pas de temps - SANS_REPRISES/RUN00"
+                cycles 3
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                pseudocolor SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+
+            
+        visu {
+                titre "Force_spectrale selon X - Deuxième pas de temps - AVEC_REPRISES/RUN02"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        AVEC_REPRISES/RUN02/LATAS/spectral_point2.lata DOM
+                pseudocolor AVEC_REPRISES/RUN02/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+            
+        visu {
+                titre "Force_spectrale selon X - Sixième pas de temps - SANS_REPRISES/RUN00"
+                cycles 5
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                pseudocolor SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }            
+            
+            
+        visu {
+                titre "Force_spectrale selon X - Deuxième pas de temps - AVEC_REPRISES/RUN03"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        AVEC_REPRISES/RUN03/LATAS/spectral_point2.lata DOM
+                pseudocolor AVEC_REPRISES/RUN03/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+
+
+        visu {
+                titre "Force_spectrale selon X - Huitième pas de temps - SANS_REPRISES/RUN00"
+                cycles 7
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                pseudocolor SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+
+        visu {
+                titre "Force_spectrale selon X - Deuxième pas de temps - AVEC_REPRISES/RUN04"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        AVEC_REPRISES/RUN04/LATAS/spectral_point2.lata DOM
+                pseudocolor AVEC_REPRISES/RUN04/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }         
+
+
+        visu {
+                titre "Force_spectrale selon X - Dixième pas de temps"
+                cycles 9
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                pseudocolor SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }
+
+        visu {
+                titre "Force_spectrale selon X - Deuxième pas de temps - AVEC_REPRISES/RUN05"
+                cycles 1
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        AVEC_REPRISES/RUN05/LATAS/spectral_point2.lata DOM
+                pseudocolor AVEC_REPRISES/RUN05/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            }     
+
+        visu {
+                titre "Force_spectrale selon X - Douxième pas de temps"
+                cycles 11
+                Normal3d 0 0 1
+                Up3D 1 0 0
+                zoom3D 0 0 1.
+                mesh        SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM
+                pseudocolor SANS_REPRISES/RUN00/LATAS/spectral_point2.lata DOM_dual FORCE_PH_X FACES 
+                Operator slice 0. 0. 0. 0. 0. 1.
+                # Operator_to_all no_legend
+                Operator_to_all no_databaseinfo
+            } 
+            
+        Description "Forces spectrales, obtenues d'une traite" <<EOF
+ obtenus avec l'outil de visualisation visit .
+EOF
+            
+               
+            
+                
+     Description "Les marques correspondent aux premiers relevés tels que l'autocorrélation soit nulle ou négative." <<EOF
+     
+     EOF
+}
+
+Chapter {
+Titre "Conclusion"
+Description "En conclusion, on n'observe pas d'abhérrance"
+}
+
+Chapter {
+	Title Computer performance
+	Tableau_performance {
+	}
+}

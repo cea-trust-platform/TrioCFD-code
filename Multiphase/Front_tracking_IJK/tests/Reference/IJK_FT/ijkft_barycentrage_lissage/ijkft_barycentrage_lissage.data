@@ -1,0 +1,85 @@
+# PARALLEL OK 8 #
+# Le decoupage ne fait rien #
+# Astuce pour que make_PAR.data trouve deux processeurs de calcul:
+Nom_Zones toto 
+#
+# DEBUT DECOUPAGE
+system "touch toto_0000.Zones toto_0001.Zones toto_0002.Zones toto_0003.Zones"
+system "touch toto_0004.Zones toto_0005.Zones toto_0006.Zones toto_0007.Zones"
+Fin
+  FIN DECOUPAGE #
+
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 32
+  nbelem_j 32
+  nbelem_k 32
+  uniform_domain_size_i 0.20245
+  uniform_domain_size_j 0.2065
+  uniform_domain_size_k 0.2014
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+# DEBUT MAILLAGE #
+Lire grid_splitting { ijk_grid_geometry DOM  nproc_i 1  nproc_j 1  nproc_k 1 }
+# FIN MAILLAGE #
+# DEBUT LECTURE 
+Lire grid_splitting { ijk_grid_geometry DOM  nproc_i 2  nproc_j 2  nproc_k 2 }
+  FIN LECTURE #
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 7
+  timestep 0.01
+  timestep_facsec 0.4
+  dt_post 100
+  champs_a_postraiter 1 INDICATRICE
+  check_stop_file stop.txt
+  dt_sauvegarde 1000
+  nb_pas_dt_max 2
+  Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 3
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  } 	
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+    remaillage_ft_ijk {
+	nb_iter_barycentrage 1
+	relax_barycentrage 1
+	nb_iter_correction_volume 4
+	lissage_courbure_iterations_systematique 2
+    }
+  }
+  check_divergence
+  gravite 3 0. 0. 0. 
+  rho_liquide 1000
+  mu_liquide 1e-3
+  expression_vx_init 0.
+  expression_vy_init 0.
+  expression_vz_init 0.
+}
+Fin

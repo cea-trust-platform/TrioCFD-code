@@ -1,0 +1,33 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh ellipsoid.geo -2
+
+# Generation du lata de l'ellipsoide initial:
+cat >deplacements.txt <<EOF
+0. 0. 0. ellipsoid.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# deforme la bulle pour l'incliner :
+# ./cree_multi_bulles.sh deplacements.txt init_incl.lata
+# cp init_incl.lata.nodes init_incl.lata.nodes.old
+# awk 'BEGIN{cos45=0.70710678118654757; sin45=0.70710678118654757}{x=$1;y=$2;z=$3;
+# x=(x*1.0);
+# y=(y*1.0);
+# z=(z*1.0);
+# xtmp=(x*cos45+y*sin45);
+# ytmp=(-x*sin45+y*cos45);
+# x=xtmp;
+# y=ytmp;
+# z=z;
+# print x,y,z}' init_incl.lata.nodes.old >init_incl.lata.nodes
+
+# Lisse le maillage init.lata
+echo -n "Preparation du maillage initial par un lissage..."
+triou prepare.data 1> prepare.out 2> prepare.err 
+echo "done!"

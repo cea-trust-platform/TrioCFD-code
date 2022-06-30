@@ -1,0 +1,62 @@
+# interpolation du fichier LES 192x140x288 en DNS 384x384x300 #
+
+IJK_Grid_Geometry old_grid_geom
+
+Lire old_grid_geom
+{
+  nbelem_i 192
+  nbelem_j 288
+  uniform_domain_size_i 0.187528
+  uniform_domain_size_j 0.093764
+  file_coord_k          coord_k_level0.txt
+  perio_i
+  perio_j
+}
+/* Ancien decoupage */
+IJK_Splitting old_grid_splitting
+Lire old_grid_splitting
+{
+  ijk_grid_geometry old_grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+/* Nouveau maillage */
+IJK_Grid_Geometry new_grid_geom
+
+Lire new_grid_geom
+{
+  nbelem_i 384
+  nbelem_j 576
+  uniform_domain_size_i 0.187528
+  uniform_domain_size_j 0.093764
+  file_coord_k          coord_k_level0_DNS.txt
+  perio_i
+  perio_j
+}
+/* Nouveau splitting */
+IJK_Splitting new_grid_splitting
+Lire new_grid_splitting
+{
+  ijk_grid_geometry new_grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+Switch_double
+{
+  old_ijk_splitting old_grid_splitting
+  new_ijk_splitting new_grid_splitting
+  
+  cp                  1005
+  gamma               1.4
+  
+  t_paroi_impose_kmin 293. /* temperature paroi froide */
+  t_paroi_impose_kmax 586. /* temperature paroi chaude */
+
+  nom_reprise    ancien_maillage.sauv
+  nom_sauvegarde nouveau_maillage.sauv
+}
+

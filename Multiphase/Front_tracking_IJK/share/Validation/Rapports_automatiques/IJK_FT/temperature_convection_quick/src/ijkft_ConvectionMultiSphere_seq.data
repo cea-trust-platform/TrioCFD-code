@@ -1,0 +1,111 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 32
+  nbelem_j 16
+  nbelem_k 64
+  uniform_domain_size_i 0.2
+  uniform_domain_size_j 0.2
+  uniform_domain_size_k 0.2
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 2
+  nproc_j 2
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  disable_convection_qdm
+  disable_diffusion_qdm
+  disable_solveur_poisson
+    Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+    }
+
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 7
+  timestep 0.01
+  timestep_facsec 0.4
+  dt_post 20
+  champs_a_postraiter 22 TEMPERATURE_ADIM_BULLES VELOCITY PRESSURE INDICATRICE_FT INDICATRICE RHO MU VELOCITY_FT GRAD_INDICATRICE_FT REBUILT_INDICATRICE_FT REPULSION_FT AIRE_INTERF PRESSURE_LIQ PRESSURE_VAP GRAD_U GRAD_V GRAD_W INTERFACES COMPO_CONNEXE COURBURE DISTANCE_AUTRES_INTERFACES TEMPERATURE
+  check_stop_file stop.txt
+  dt_sauvegarde 40
+  nb_pas_dt_max 1000
+  
+  multigrid_solver {
+  }
+
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+  }
+
+  rho_liquide 1000
+  rho_vapeur 1000
+  mu_liquide 1e-3
+  mu_vapeur 1e-3
+  sigma 0.0
+  expression_vx_init 0.1
+  expression_vy_init 0. 
+  expression_vz_init 0.
+
+thermique 
+{
+{
+    Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+    }
+    diff_temp_negligible
+    expression_T_init ff
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 4.
+    lambda_vapor 0.1
+    fo 0.5
+}
+,
+{
+    Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+    }
+    diff_temp_negligible
+    expression_T_init ff
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 3.
+    lambda_vapor 0.1
+    fo 0.5
+}
+,
+{
+    Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+    }
+    diff_temp_negligible
+    expression_T_init ff
+    cp_liquid 40.
+    lambda_liquid 0.1
+    cp_vapor 0.3
+    lambda_vapor 0.1
+    fo 0.5
+}
+}
+
+}
+Fin

@@ -1,0 +1,19 @@
+#!/bin/sh
+# Trouve le nom du cas test:
+n=`basename *.lml.gz .lml.gz`
+mkdir -p reference
+cd reference
+tar xzf ../${n}.lata.tgz
+cd ..
+
+# cherche le fichier lata le plus recent 
+src=`ls -rt *${n}.lata | tail -n 1`
+echo Comparaison $src reference/${n}.lata
+if compare_lata $src reference/${n}.lata
+then
+  exit 0
+else
+  echo Comparaison avec le lata de reference echouee.
+  exit 1
+fi
+

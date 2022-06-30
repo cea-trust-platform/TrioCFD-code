@@ -1,0 +1,45 @@
+#!/bin/bash
+# ce script est execute avant de lire les cas tests
+
+for dir in "CANAL" # "SWARM"
+do
+    mkdir -p $dir
+    cp post_run $dir
+    # Genearation du ca test correspondant a $dir
+    echo "JDD pour calcul de base " $dir
+    sed -e "s/basic_temperature/ ${dir}_seq/g"   \
+        -e "s/BASIC_TEMPERATURE/ $dir/g" basic_temperature.data > $dir/${dir}_seq.data
+    sed -e "s/BASIC_TEMPERATURE/$dir/g"          \
+        -e "s/basic_temperature/${dir}_seq/g" basic_temperature.sh > $dir/${dir}_seq.sh
+    cd $dir
+    # Generation des cas tests paralleles
+    echo "JDD pour calcul paralleles ..."
+    sed -e "s/nproc_i 1/nproc_i 2/g"    \
+        -e "s/nproc_j 1/nproc_j 2/g"    \
+        -e "s/nproc_k 1/nproc_k 2/g"    \
+	-e "s/# RUN #/# PARALLEL ONLY 8 #/g" \
+        -e "s/seq/par8/g" ${dir}_seq.data >${dir}_par8.data
+    # Generation du cas avec reprise
+    echo "JDD pour calcul avec reprise ..."
+    sed -e "s/ # reprise #/ nom_sauvegarde reprise\.sauv/g" \
+        -e "s/ # REPRISE #/ nom_reprise ${dir}_seq\.sauv/g" \
+        -e "s/ # reprise_T #/  fichier_reprise_temperature ${dir}_seq\.sauv\.lata\n timestep_reprise_temperature 1/g"   \
+        -e "s/# fichier_reprise_vitesse pre_run/fichier_reprise_vitesse ${dir}_seq/g"    \
+        -e "s/ timestep_reprise_vitesse.*/  timestep_reprise_vitesse 1 /g" \
+        -e "s/ expression_vx_init.*/  # expression_vx_init.*/g" \
+        -e "s/ expression_vz_init.*/ expression_vz_init.* #/g"  ${dir}_seq.data > ${dir}_repr_.data
+
+    n=`grep -n thermique ${dir}_repr_.data | awk -F":" '{print $1}'`
+    head -n$n  ${dir}_repr_.data > ${dir}_repr.data
+    rm ${dir}_repr_.data
+    sed -i "s/thermique/}\nFin/g" ${dir}_repr.data 
+
+    sed -e "s/nproc_i 1/nproc_i 2/g"        \
+        -e "s/nproc_j 1/nproc_j 2/g"        \
+        -e "s/nproc_k 1/nproc_k 2/g"        \
+        -e "s/_seq/_par8/g" ${dir}_repr.data >${dir}_repr_par8.data
+    cd ..
+done
+
+
+

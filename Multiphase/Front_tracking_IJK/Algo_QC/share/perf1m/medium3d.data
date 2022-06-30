@@ -1,0 +1,209 @@
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+# DEBUT MAILLAGE #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Nombre_de_Noeuds 129 257 33
+		Longueurs  0.093764 0.029846 0.027
+		tanh_taille_premiere_maille 8.29e-5
+		}
+		{
+		Bord periox   X = 0.          0. <= Y <= 0.029846     0. <= Z <= 0.027
+		Bord periox   X = 0.093764    0. <= Y <= 0.029846     0. <= Z <= 0.027
+		Bord perioz   Z = 0.          0. <= X <= 0.093764     0. <= Y <= 0.029846
+		Bord perioz   Z = 0.027       0. <= X <= 0.093764     0. <= Y <= 0.029846  
+		Bord bas      Y = 0.          0. <= X <= 0.093764     0. <= Z <= 0.027
+		Bord haut     Y = 0.029846    0. <= X <= 0.093764     0. <= Z <= 0.027
+		}
+	}
+# FIN MAILLAGE # 
+
+# DEBUT DECOUPAGE 
+Decouper dom
+{
+	partitionneur Tranche  { tranches 4 2 1 }
+	Larg_joint 2
+	Nom_Zones canalQCdt20K
+	Periodique 2 periox perioz
+}
+Fin
+ FIN DECOUPAGE # 
+
+# DEBUT LECTURE 
+Scatter canalQCdt20K.Zones dom
+ FIN LECTURE #
+
+VDF dis
+/*
+
+Runge_Kutta_Rationnel_ordre_2 sch_ex 
+*/
+
+Runge_Kutta_ordre_3 sch_rk
+Lire sch_rk
+{
+        tinit 0
+        tmax 5
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.01
+        seuil_statio 1.e-8
+nb_pas_dt_max 3
+}
+
+
+schema_euler_explicite sch_ex
+Lire sch_ex
+{
+        tinit 0.
+	nb_pas_dt_max 3000
+        tmax 0.25
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	dt_start dt_calc
+        seuil_statio 1.e-8
+	
+	diffusion_implicite 0
+}
+
+Schema_Euler_Implicite sch
+Lire sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 5.62
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	dt_start dt_calc
+        seuil_statio 1.e-8
+	facsec 10
+	Solveur Piso
+	{ 
+		seuil_convergence_solveur 1.e-8
+	solveur gen { seuil 1e-12 solv_elem bicgstab precond ilu { type 2 filling 20 } }
+	}
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu champ_fonc_fonction pb temperature 1 (1.461e-6*((100000./(287.14*val))^1.5)/((100000./(287.14*val))+111.))
+        lambda champ_fonc_fonction pb temperature 1 (1.93198026315789000e-3*((100000./(287.14*val))^1.5)/((100000./(287.14*val))+111.))
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+	traitement_pth conservation_masse
+}
+
+Associer pb dom
+Associer pb sch_rk
+Associer pb fluide
+
+Discretiser pb dis
+# Debog pb seq faces 1e-6 0 #
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+
+                solveur_pression GCP { impr optimized  precond ssor { omega 1.5 } seuil 1.e-7  }
+                convection { quick }
+                diffusion { }
+                Sources 
+		{ 
+			Canal_perio { direction_ecoulement 0 h 0.0149 } 
+		}	
+		conditions_initiales 
+		{
+                        vitesse champ_init_canal_sinal 3  { Ucent 15. h 0.0149  ampli_sin 2. omega 67.01 ampli_bruit 0.0 dir_wall 1 dir_flow 0 }
+                }
+                conditions_limites 
+		{
+                        periox   periodique
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		} 
+		Traitement_particulier
+                    		{
+                                Canal
+                            			{
+                                                dt_impr_moy_spat 0.025
+                                                dt_impr_moy_temp 0.025
+						debut_stat 10.
+						fin_stat 20.
+						}
+                                } 
+  
+	}
+				
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+                convection { quick }
+		Sources {	}	
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 293.+293.*y/0.029846 }
+		conditions_limites 
+                {
+                 	periox periodique
+			perioz periodique 
+ /*		        haut paroi_flux_impose Champ_Front_Uniforme 1  170.
+			bas paroi_flux_impose Champ_Front_Uniforme 1  -170. */
+			haut paroi_temperature_imposee champ_front_uniforme 1 580.
+			bas paroi_temperature_imposee champ_front_uniforme 1 290.
+		}
+    Modele_turbulence Prandtl
+		{ 
+ 		turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+         { 
+
+	
+			
+			format lata
+			Champs binaire dt_post 0.001
+			{
+      				vitesse elem
+      				masse_volumique elem
+				temperature_qc elem
+				viscosite_dynamique elem
+				pression elem
+      				viscosite_turbulente elem
+         		}
+        	 Statistiques dt_post 0.001
+		 {
+			t_deb 10. t_fin 20.
+			moyenne vitesse
+			}										        
+        }
+	
+	sauvegarde formatte canal_turb.sauv
+
+}
+
+Resoudre pb
+Fin
+

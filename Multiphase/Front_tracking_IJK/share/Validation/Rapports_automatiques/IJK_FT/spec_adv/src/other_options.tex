@@ -1,0 +1,30 @@
+Le coeur des tests présentés ici est de valider que la force imposée à l'écoulement est de la forme demandée, notamment en ce qui concerne la translation du champ. Il s'agit ici de valider l'évolution temporelle en $\o_q t$ dans l'argument du cosinus. La résolution physique de l'écoulement vient dans un deuxième temps pour étoffer cette base de test mais elle n'est pas l'objet de la validation.
+
+La force imposée est définie dans le domaine spectral. Une transformée de Fourier inverse \ref{eq : FT-1} permet de transposer cette force au domaine physique (domaine dans lequel les équations sont résolues). Les forces spectrales $\hf_i$ à définir pour observer des champs de la forme $f_i=cos(\bm{\k}_n \cdot \bm{x})$ sont donc des paires de dirac : $\hf_{i;st} = \d(\bm{\k}-\bm{\k_n}) + \d(\bm{\k}+\bm{\k_n})$. Pour translater ce champ dans le temps, deux choix équivalents sont possibles. Le premier consiste à définir les forces mobiles $\bm{\hf_{mb}}$ à partir des forces statiques $\bm{\hf_{st}} $: \ref{eq : choix1}. Le deuxième choix consiste à définir une transformée de Fourier inverse alternative : \ref{eq : choix2}.
+
+\begin{align}
+&f(\bm{x};t) = \int \hf(\bm{\k};t) e^{i \bm{\k \cdot x} } d\bm{\k}
+\label{eq : FT-1} \\
+    &\hf_{mb} = \hf_{st} \cdot e^{-i \bk \cdot \bl_{1/q}(t)}
+\label{eq : choix1} \\
+    &f(\bm{x};t) = \int \hf(\bm{\k};t) e^{i {\bk \cdot (\bx - \bl_{1/q}(t))} } d\bm{\k},
+\label{eq : choix2}
+\end{align}
+
+avec $\bl_{1/q}(t)$ le vecteur de translation du champ de force à l'instant $t$. Le deuxième choix est implémenté dans le code de calcul pour des raisons informatiques. Ce qui signifie qu'à tout instant la force spectrale est définie et calculée sans avoir été translatée. La translation est effective lors du passage du domaine spectral au domaine physique uniquement. La valeur du vecteur de déplacement $\bl_{1/q}(t)$ est mise à jour en fonction de $t$. Les correspondances spectral-physique des cas test étudiés sont regroupées dans le tableau \ref{tab : spec_phys}.
+
+\begin{table}
+\begin{tabular}{lll}
+    Spectral : $\ghf(\bk;t) = [\d(\bm{\k}-\bm{\k_1}) + \d(\bm{\k}+\bm{\k_1})] \bm{e}$ & Translation : $e^{-i \bk \cdot \bl_{1/q}(t)}$ & Physique : $\gf(\bx;t)$  \\ \hline
+$\bk_1 = (\k_1; 0; 0)^T$; $\bm{e} = \bm{e_y}$  &  $\bl(t) = (2Lt; 0; 0)^T$      & $ 2 cos(\k_1 x - \o_{1/2} t) \bm{e_y}$       \\
+$\bk_1 = (\k_1; 0; 0)^T$; $\bm{e} = \bm{e_x}$  &  $\bl(t) = (2Lt; 0; 0)^T$      & $ 2 cos(\k_1 x - \o_{1/2} t) \bm{e_x}$       \\
+$\bk_1 = (0; \k_1; 0)^T$; $\bm{e} = \bm{e_y}$  &  $\bl(t) = (0; 2Lt; 0)^T$      & $ 2 cos(\k_1 y - \o_{1/2} t) \bm{e_y}$       \\
+$\bk_1 = (0; 0; \k_1)^T$; $\bm{e} = \bm{e_z}$  &  $\bl(t) = (0; 0; 2Lt)^T$      & $ 2 cos(\k_1 z - \o_{1/2} t) \bm{e_z}$       \\
+$\bk_1 = (\k_1; 0; -\k_1)^T$; $\bm{e} = 1/\sqrt{2}(\bm{e_x}-\bm{e_z}) $ & $\bl(t) = (Lt; 0; -Lt)^T$ & $ \frac{2}{\sqrt{2}} cos(\k_1 (x-z) - \o_{1/2} t) (\bm{e_x}-\bm{e_z})$     \\ \hline
+\end{tabular}
+\caption{Paramètres de  définition de la force spectrale.}
+\label{tab : spec_phys}
+\end{table}
+
+La pulsation de déplacement $\o_q$ introduite plus haut peut être liée au vecteur de déplacement $\bl_{1/q}(t)$ par la relation : $\o_q = \bk_1 \cdot \bl_{1/q}(t)$. Où $\bl_{1/q}(t) = \frac{1}{q} L t$, dans notre cas $q=1/2$.
+

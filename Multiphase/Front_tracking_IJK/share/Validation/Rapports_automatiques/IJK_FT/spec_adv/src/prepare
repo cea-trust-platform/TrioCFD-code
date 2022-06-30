@@ -1,0 +1,267 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+############################################################
+## Si on veut JUSTE re-faire le pdf, une fois que Run_fiche a ete lance : 
+##   --> Depuis build : python /volatile/TRUST/trust-code/Validation/Outils/Genere_courbe/src/genererCourbes.py -p nom_fiche.prm 
+############################################################
+
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+gmsh bulle_nulle.geo -2 -format msh2
+
+# Generation de 3 bulles  :
+# 0.01 0.0025 0.0025 bulle_nulle.msh
+cat >deplacements.txt <<EOF
+0.0 0.0 0.0 bulle_nulle.msh
+EOF
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Placement des sondes
+${project_directory}/share/PyTools/probes/place_sondes.sh spec_bulles spec_bulles_point2 cree [2,2,2,.] [force_ph,velocity]
+
+# Deplacement de ce qui est utile au calcul dans le dossier RUN00
+
+# Nombre de pas de temps pour une petite simulation (dossier AVEC_REPRISE)
+nt=63;
+# Nombre de reprises (dans like_sub_file)
+nr=0;
+# Vitesse d'advection
+v=0.008
+dv=`echo "scale=3; 10*$v" | bc`;
+v_moitie=`echo "scale=3; $v/2" | bc`;
+vi=`echo "scale=9; $v/sqrt(2)" | bc`;
+
+# On cree NO_ADV_100, NO_ADV_010, NO_ADV_001, NO_ADV_101
+# On cree ADV_100, ADV_010, ADV_001, ADV_101
+# -> Pour voir l'effet de l'advection du champ dans toutes les directions
+currentRepo=$PWD
+echo "$currentRepo"
+re='^[0-9]+$'>--
+if ! [[ $jobid =~ $re ]] ; then
+    jobidnext=00
+
+    # ADVECTION ACTIVE
+    # force : cos(x) ex
+    ADV_X00_Repo=ADV_X00/RUN00
+    echo "mkdir -p $ADV_X00_Repo/NEXT"
+    mkdir -p $ADV_X00_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_X00_Repo
+    sed -i "s/type 3/type 100/" $ADV_X00_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV_X00_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$v 0.0 0.0/"  $ADV_X00_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV_X00_Repo/spec_bulles_point2.data 
+   sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_X00_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_X00_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_X00_Repo/spec_bulles_point2.data 
+    #sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 0.0/" $ADV_X00_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV_X00_Repo
+    cp post_run $ADV_X00_Repo
+    cp like_sub_file $ADV_X00_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_X00_Repo/like_sub_file
+    cp prepare $ADV_X00_Repo
+
+    # force : cos(x) ey
+    ADV_0X0_Repo=ADV_0X0/RUN00
+    echo "mkdir -p $ADV_0X0_Repo/NEXT"
+    mkdir -p $ADV_0X0_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_0X0_Repo
+    sed -i "s/type 3/type 200/" $ADV_0X0_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV_0X0_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $((3*$nt/2))/" $ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post 3/dt_post 2/" $ADV_X00_Repo/spec_bulles_point2.data 
+    sed -i "s/123 123 123/$dv 0.0 0.0/"  $ADV_0X0_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_0X0_Repo/spec_bulles_point2.data 
+    #sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 0.0/" $ADV_0X0_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV_0X0_Repo
+    cp post_run $ADV_0X0_Repo
+    cp like_sub_file $ADV_0X0_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_0X0_Repo/like_sub_file
+    cp prepare $ADV_0X0_Repo
+    
+    # force : cos(y) ey
+    ADV_010_Repo=ADV_010/RUN00
+    echo "mkdir -p $ADV_010_Repo/NEXT"
+    mkdir -p $ADV_010_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_010_Repo
+    sed -i "s/type 3/type 010/" $ADV_010_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV_010_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/0.0 $v 0.0/"  $ADV_010_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV_010_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_010_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_010_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_010_Repo/spec_bulles_point2.data 
+    #sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 0.0 1e-6 0.0/" $ADV_010_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV_010_Repo
+    cp post_run $ADV_010_Repo
+    cp like_sub_file $ADV_010_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_010_Repo/like_sub_file
+    cp prepare $ADV_010_Repo
+
+    # force : cos(z) ez
+    ADV_001_Repo=ADV_001/RUN00
+    echo "mkdir -p $ADV_001_Repo/NEXT"
+    mkdir -p $ADV_001_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_001_Repo
+    sed -i "s/type 3/type 001/" $ADV_001_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV_001_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/0.0 0.0 $v/"  $ADV_001_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $ADV_001_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_001_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_001_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_001_Repo/spec_bulles_point2.data 
+#     sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 0.0 0.0 1e-6/" $ADV_001_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV_001_Repo
+    cp post_run $ADV_001_Repo
+    cp like_sub_file $ADV_001_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_001_Repo/like_sub_file
+    cp prepare $ADV_001_Repo
+
+    # force : cos(x+Z) (1/sqrt(2))(ex+ez)
+    ADV_101_Repo=ADV_101/RUN00
+    echo "projected velocity : $vi";
+    echo "mkdir -p $ADV_101_Repo/NEXT"
+    mkdir -p $ADV_101_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $ADV_101_Repo
+    sed -i "s/type 3/type 101/" $ADV_101_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 1/" $ADV_101_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$v_moitie 0.0 -$v_moitie/"  $ADV_101_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $((2*$nt))/" $ADV_101_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $ADV_101_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $ADV_101_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $ADV_101_Repo/spec_bulles_point2.data 
+#     sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 -1e-6/" $ADV_101_Repo/spec_bulles_point2.data 
+    # cp init.lata* $ADV_101_Repo
+    cp post_run $ADV_101_Repo
+    cp like_sub_file $ADV_101_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $ADV_101_Repo/like_sub_file
+    cp prepare $ADV_101_Repo
+
+    # ADVECTION DESACTIVE
+    # force : cos(x) ex
+    NO_ADV_X00_Repo=NO_ADV_X00/RUN00
+    echo "mkdir -p $NO_ADV_X00_Repo/NEXT"
+    mkdir -p $NO_ADV_X00_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_X00_Repo
+    sed -i "s/type 3/type 100/" $NO_ADV_X00_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_X00_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$v 0.0 0.0/"  $NO_ADV_X00_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_X00_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_X00_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_X00_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_X00_Repo/spec_bulles_point2.data 
+#     sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 0.0/" $NO_ADV_X00_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_X00_Repo
+    cp post_run $NO_ADV_X00_Repo
+    cp like_sub_file $NO_ADV_X00_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_X00_Repo/like_sub_file
+    cp prepare $NO_ADV_X00_Repo
+
+    # force : cos(x) ey
+    NO_ADV_0X0_Repo=NO_ADV_0X0/RUN00
+    echo "mkdir -p $NO_ADV_0X0_Repo/NEXT"
+    mkdir -p $NO_ADV_0X0_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_0X0_Repo
+    sed -i "s/type 3/type 100/" $NO_ADV_0X0_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_0X0_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$v 0.0 0.0/"  $NO_ADV_0X0_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_0X0_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_0X0_Repo/spec_bulles_point2.data 
+#     sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 0.0/" $NO_ADV_0X0_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_0X0_Repo
+    cp post_run $NO_ADV_0X0_Repo
+    cp like_sub_file $NO_ADV_0X0_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_0X0_Repo/like_sub_file
+    cp prepare $NO_ADV_0X0_Repo
+
+    # force : cos(y) ey
+    NO_ADV_010_Repo=NO_ADV_010/RUN00
+    echo "mkdir -p $NO_ADV_010_Repo/NEXT"
+    mkdir -p $NO_ADV_010_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_010_Repo
+    sed -i "s/type 3/type 010/" $NO_ADV_010_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_010_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/0.0 $v 0.0/"  $NO_ADV_010_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_010_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_010_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_010_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_010_Repo/spec_bulles_point2.data 
+#    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 0.0 1e-6 0.0/" $NO_ADV_010_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_010_Repo
+    cp post_run $NO_ADV_010_Repo
+    cp like_sub_file $NO_ADV_010_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_010_Repo/like_sub_file
+    cp prepare $NO_ADV_010_Repo
+
+    # force : cos(z) ez
+    NO_ADV_001_Repo=NO_ADV_001/RUN00
+    echo "mkdir -p $NO_ADV_001_Repo/NEXT"
+    mkdir -p $NO_ADV_001_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_001_Repo
+    sed -i "s/type 3/type 001/" $NO_ADV_001_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_001_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/0.0 0.0 $v/"  $NO_ADV_001_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $NO_ADV_001_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_001_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_001_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_001_Repo/spec_bulles_point2.data 
+#    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 0.0 0.0 1e-6/" $NO_ADV_001_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_001_Repo
+    cp post_run $NO_ADV_001_Repo
+    cp like_sub_file $NO_ADV_001_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_001_Repo/like_sub_file
+    cp prepare $NO_ADV_001_Repo
+
+    # force : cos(x+Z) (1/sqrt(2))(ex+ez)
+    NO_ADV_101_Repo=NO_ADV_101/RUN00
+    echo "mkdir -p $NO_ADV_101_Repo/NEXT"
+    mkdir -p $NO_ADV_101_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spec_bulles_point2.data $NO_ADV_101_Repo
+    sed -i "s/type 3/type 101/" $NO_ADV_101_Repo/spec_bulles_point2.data
+    sed -i "s/forced_advection -1/forced_advection 0/" $NO_ADV_101_Repo/spec_bulles_point2.data
+    sed -i "s/123 123 123/$vi 0.0 -$vi/"  $NO_ADV_101_Repo/spec_bulles_point2.data
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $((2*$nt))/" $NO_ADV_101_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_bulles 2/dt_post_stats_bulles $nt/" $NO_ADV_101_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_post_stats_plans 2/dt_post_stats_plans $nt/" $NO_ADV_101_Repo/spec_bulles_point2.data 
+    sed -i "s/dt_sauvegarde 20/dt_sauvegarde (($nt/2))/" $NO_ADV_101_Repo/spec_bulles_point2.data 
+#    sed -i "s/gravite 3 0.0 0.0 0.0/gravite 3 1e-6 0.0 1e-6/" $NO_ADV_101_Repo/spec_bulles_point2.data 
+    # cp init.lata* $NO_ADV_101_Repo
+    cp post_run $NO_ADV_101_Repo
+    cp like_sub_file $NO_ADV_101_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $NO_ADV_101_Repo/like_sub_file
+    cp prepare $NO_ADV_101_Repo
+
+else
+    # = Dans les faits, prepare n'est appele qu'une fois en debut de lancement de fiche, depuis le dossier build. Donc on ne rentre jamais dans le build. Si je veux executer les instructions suivantes elles doivent se trouver dans le post-run.
+    echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    echo "c'est bizar, je pensais que le prepare n'etait appele q'une fois, avant d'executer le prm..."
+    jobidnext=$((jobid+1))
+    newRepo="../RUN$(printf "%02d" $jobidnext)"
+    
+    echo "mkdir -p $newRepo/NEXT"
+    mkdir -p $newRepo/NEXT
+    cp spec_bulles_point2.data $newRepo
+    # mv init.lata* $newRepo
+    cp post_run $newRepo
+    cp like_sub_file $newRepo
+    cp prepare $newRepo
+fi
+
+

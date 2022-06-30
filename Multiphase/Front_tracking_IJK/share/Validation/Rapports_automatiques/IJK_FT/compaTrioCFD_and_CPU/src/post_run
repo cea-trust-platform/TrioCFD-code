@@ -1,0 +1,30 @@
+#!/bin/bash
+# Ce script est execute apres le lancement des cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+if [ $1 == "init" ] ; then 
+  # Pour creer le maillage interfacial a relire par TrioCFD
+  #sed '/INTERFACES/d' diph_swarm_init.sauv.lata > diph_swarm_velocity.lata
+  source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh 
+  sed -e '/IJK_EXT/d' -e '/FACETTE_PE/d' -e '/COMPO_CONNEXE/d'  -e '/INDEX_SOMMET_REEL/d' diph_swarm_init.sauv.lata > diph_swarm_interf.lata
+  echo "Preparing med for initializing interfaces..."
+  python $TRUST_ROOT/Outils/lata2dx/lata2dx/Lata_to_med.py diph_swarm_interf.lata diph_swarm.med INTERFACES 1 1>/dev/null
+  
+  # Pour remettre a zero le temps dans le fichier sauv d'initialisation des calculs suivants.
+  sed -i "s/tinit .*/tinit 0.0/" diph_swarm_init.sauv
+  exit
+fi
+
+# Pour preparer le verifie, on cree des latas sans interfaces:
+if [ ${1:4:3} == "FTD" ] ; then 
+   # TrioCFD calculation...
+   echo 'post_run removing INTERFACES from lata of a TrioCFD calculation'
+   sed '/INTERFACES/d' $1.lata > ${1}_velocity.lata
+else
+   # IJK calculation... 
+   echo 'post_run removing INTERFACES from lata of a IJK calculation'
+   sed '/INTERFACES/d' $1.sauv.lata > ${1}_velocity.lata
+   sed -e '/DOM_EXT/d' -e '/FACETTE_PE/d' -e '/COMPO_CONNEXE/d'  -e '/INDEX_SOMMET_REEL/d' $1.lata > ${1}_mod.lata
+fi
+
+

@@ -1,0 +1,62 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+\rm -rf *son
+# Generation des interfaces pour l'etat initial:
+# On genere le msh en executant cette commande:
+echo -n "Running gmsh..."
+gmsh bulle2.geo -2 -format msh2 &> gmsh.log
+echo "ok"
+
+# Generation de 3 bulles  :
+cat >deplacements.txt <<EOF
+0.0006323 0.0015798 0.00061354 bulle2.msh
+0.0015823 0.0015798 0.00151354 bulle2.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+    
+echo "JDD pour precurseur avec des profils 1D..."
+sed -e "s/perio_k//g" \
+    -e "s/bctype_kmin Paroi/bctype_kmin perio/g" \
+    -e "s/bctype_kmax Paroi/bctype_kmax perio/g" \
+    precurseur.data > precurseur_perio.data
+cat perio.txt >> precurseur_perio.data
+cat precurseur.data wall.txt > precurseur_wall.data
+
+sed "s/@FLAG@/perio/g" switch.data > switch_perio.data
+sed "s/@FLAG@/wall/g"  switch.data > switch_wall.data
+sed -i "s/perio_k//g"  switch_wall.data
+
+echo "JDD pour cas 3D..."
+sed -e "s/expression_vz_init .*/expression_vz_init 1.e-4-(x-1.5e-3)*exp(-((x-1.5e-3)^2+(z-1.5e-3)^2)\/(1.5e-3)^2*5.)/" precurseur_wall.data > precurseur_3D.data
+
+echo "JDD pour switch variable DZ..."
+sed -e "s/uniform_domain_size_k 0.003 # unif #/file_coord_k a.txt/" \
+    -e "s/nbelem_i 17/nbelem_i 11/" \
+    -e "s/nbelem_j 24/nbelem_j 6/" \
+    -e "s/refine/refine_varDZ/"  \
+    -e "/# flag #/d" switch_wall.data > switch_varDZ_wall.data
+#    -e "s/precurseur/precurseur_3D/"  \
+
+# Generation du cas test parallele
+echo "JDD pour calcul parallele ..."
+for cas in "perio" "wall"
+do
+  echo $cas
+  sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;/nom_sauvegarde/s/\.sauv/_par8.sauv/' switch_${cas}.data >switch_${cas}_par8.data
+  sed "s/@FLAG@/${cas}/g" post.data > post_${cas}.data
+  # sed "s/T_init/T_ana/g" ${cas}.txt >> post_${cas}.data
+  sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;/nom_reprise/s/_mod\.sauv/_par8_mod.sauv/' post_${cas}.data >post_${cas}_par8.data
+
+done
+
+# Impossible de mettre des sondes pour les champs 2 et 3 qui n'existent pas :  
+sed -i -e "s/perio_k//g" \
+       -e "/2 periode/d" \
+       -e "s/sx_T/sz_T/g" \
+       -e "s/sx_e/sz_e/g" \
+       -e "s/17 0.000 0.0015 0.0015 0.003 0.0015 0.0015/14 0.0015 0.0015 0.000 0.0015 0.0015 0.003/g" \
+       -e "/3 periode/d" post_wall.data 
+
+sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/;/nom_reprise/s/_mod\.sauv/_par8_mod.sauv/' post_wall.data >post_wall_par8.data

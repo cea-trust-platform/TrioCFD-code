@@ -1,0 +1,185 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 128
+  nbelem_j 64
+  nbelem_k 64
+  uniform_domain_size_i 0.005
+  uniform_domain_size_j 0.0025
+  uniform_domain_size_k 0.0025
+  origin_i -0.0025
+  origin_j -0.00125
+  origin_k -0.00125
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+# Parallel_io_parameters
+{
+  block_size_megabytes 10
+  writing_processes 8
+} #
+
+
+IJK_FT_double
+{
+  vol_bulle_monodisperse 5.23583e-10 # r=0.5mm #
+  # Bulles fixes : #
+  coef_mean_force 0.0
+  coef_force_time_n 0.0
+  coef_immobilisation 3e5  # 10  4e5 #
+  coef_ammortissement -1.5e-3 # -200 -6000. Pour amortir les oscillations #
+  coef_rayon_force_rappel 1.5
+  
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 15 # approximativement (Rb/Delta)+3 #
+  timestep 1
+  # time_scheme RK3_FT RK3_FT si euler_explicit diminuer le facsec #
+  type_velocity_convection_op Centre
+  
+  Boundary_Conditions 
+  {
+    bctype_kmin perio
+    bctype_kmax perio
+  }
+  timestep_facsec 0.25 # 0.25 -> For EULER #
+  cfl 1
+  fo  1
+  oh  1
+  dt_post 25 # 200 #
+  dt_post_stats_bulles 1
+  dt_post_stats_plans 200
+#  t_debut_statistiques 0.0 #
+  champs_a_postraiter 6 COMPO_CONNEXE INDICATRICE VELOCITY COURBURE INTERFACES TEMPERATURE
+  check_stop_file stop.txt
+  dt_sauvegarde 25
+  nb_pas_dt_max 1000
+  
+   multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0 # Pure GCP as a begining #
+#      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 } #
+#      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 } #
+    ghost_size 2
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8 precond ssor { omega 1.5 }  } # 1.e-3 au premier pas de temps post switch, puis 1e-8 #
+    seuil 1e-7 # 1.e-2 au premier pas de temps post switch, puis 1.e-7 #
+    nb_full_mg_steps 2 20 2
+    impr
+    iterations_mixed_solver 20
+  }   multigrid_solver {
+    solver_precision mixed
+    seuil 1e-8  precond ssor { omega 1.5 } impr }
+    impr
+  }
+
+  check_divergence
+  gravite 3 -9.81 0.0 0.0
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface pre_run.sauv.lata
+    timestep_reprise_interface       1
+  # lata_meshname   FTMESH #
+  # Bary et lissage # 
+    remaillage_ft_ijk {
+     pas_remaillage 2.5e-07
+     nb_iter_barycentrage 1
+     relax_barycentrage 1.0
+     critere_arete 3.49999999999999978e-01
+     seuil_dvolume_residuel 0.00000000000000000e+00
+     nb_iter_correction_volume 6
+     nb_iter_remaillage 6
+     facteur_longueur_ideale 0.75
+     equilateral 1
+     lissage_courbure_coeff -2.5e-02
+     lissage_courbure_iterations_systematique 1   # TESTER 20? #
+     lissage_courbure_iterations_si_remaillage 10
+   }   
+   terme_gravite rho_g
+   positions_reference 2
+   1 3
+   3
+   0.0 0.0 0.0
+  }
+
+
+  terme_force_init 9810
+  # 
+  ('alv= ', 0.016754655999999996)
+  ('Ret= ', 0.0)
+  ('rhom ', 1153.14205778672)
+  ('beta ', 1131.2323586887724)
+  #
+  # Pas d'asservissement : (source constante) #
+  # expression_derivee_force 0.0 #
+  # Pour <rho*v> = cte = 0. theoriquement : #
+  expression_derivee_force -6400.*(rhov_moyen-(-0.023)*1153.14205778672)-160.*(force+rappel_moyen-1131.23)
+  # Pour chercher un stationnaire autour de <v_vap> = 0. #
+  # check_divergence #
+  # refuse_patch_conservation_QdM_RK3_source_interf #
+  
+  rho_liquide 1171.3	
+  rho_vapeur 87.545	
+  mu_liquide 0.00035289
+  mu_vapeur 0.00035289 # Should I keep muv=mul= 0.00035289 instead of 1.3493e-05 #
+  sigma 0.1
+  
+  sauvegarder_xyz
+  # nom_sauvegarde diph.sauv #
+  # nom_reprise diph.sauv #
+  
+  expression_vx_init -0.023 # Une estimation de V_terminale #
+  expression_vy_init 0.
+  expression_vz_init 0.
+
+  fichier_reprise_vitesse pre_run.sauv.lata 
+  timestep_reprise_vitesse 1
+
+ thermique
+  { 
+    {
+    Boundary_Conditions 
+    {
+        bctype_kmin Perio
+        bctype_kmax Perio
+    }
+
+    expression_T_init (1.-ff) 
+        
+    fo 1.
+
+    # reprise_T #
+   
+    # Properties from Panda et al. #
+    # water #
+    cp_liquid 4200.0
+    lambda_liquid 0.6
+
+    # air # 
+    cp_vapor 1000.0
+    lambda_vapor 0.03
+
+    lambda_moy_harmo 1
+
+    }
+
+  }
+}
+Fin

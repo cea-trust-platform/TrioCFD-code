@@ -1,0 +1,41 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+
+case=`echo $1`
+case_type=0
+post_process_all=0
+ldomain=0
+nbelem=0
+rho_vapeur=0
+cp_vapeur=0
+lambda_vapeur=0
+rho_liquide=0
+cp_liquide=0
+lambda_liquide=0
+tf_scope=0
+t_study=0
+
+if [ $case != "pre_run" ] && [ $post_process_all == 1 ]
+then
+	if [ $case == "FINE" ] || [ $case == ${case_type}_par8 ]
+	then
+		printf "%b\n"
+		echo "Post traitement fichier python ${case_type}"
+		case_dir=${PWD##*/}
+		cd ..
+		python diffusion_1D.py $case $case_type $post_process_all $case_dir $ldomain $nbelem $rho_vapeur $cp_vapeur $lambda_vapeur $rho_liquide $cp_liquide $lambda_liquide $tf_scope $t_study 
+	fi	
+fi
+
+if [ $post_process_all == 0 ] && [ $case != "pre_run" ]
+then
+	printf "%b\n"
+	echo "Post traitement fichier python ${case}"
+	case_dir=${PWD##*/}
+	cd ..
+	python diffusion_1D.py $case $case_type $post_process_all $case_dir $ldomain $nbelem $rho_vapeur $cp_vapeur $lambda_vapeur $rho_liquide $cp_liquide $lambda_liquide $tf_scope $t_study 
+
+fi
+
+
+

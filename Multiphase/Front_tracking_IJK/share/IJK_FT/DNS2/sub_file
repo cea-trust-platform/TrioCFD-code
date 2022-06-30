@@ -1,0 +1,35 @@
+#!/bin/bash
+# mpivoltaire : obligatoire
+# sur la ligne suivante : 8 = nbprocesseurs
+#$ -pe openmpi 8
+# executer le script dans le repertoire d'ou j'ai soumis le job:
+#$ -cwd
+# nom du job (apparait dans qstat):
+#$ -N Calc
+# nom de la queue de calcul (pas d'autre choix possible):
+#$ -q prod_par
+#$ -o /dev/null
+#$ -e /dev/null
+#$ -V
+
+# Environnement pour Trio_U :
+if [ ${#TRIO_U_ROOT} = 0 ]   
+then                         
+  TRIO_U_ROOT=/home/triou/Trio_U-1.6.7/Trio_U
+  ici=`pwd`;cd $TRIO_U_ROOT;. bin/Init_Trio_U 1>/dev/null 2>&1;cd $ici
+fi                                                                    
+
+# nom de l'executable a utiliser:
+export exec=/workdir/gb218285/TRIO_U/IJK_Compil/New_algo_qc_opt
+
+# nom du jeu de donnees (sans .data)
+export datafile=prepare
+$TRIO_U_ROOT/bin/mpirun -np 8 $exec $datafile -mpi 1>$datafile.out 2>$datafile.err
+
+export datafile=DNS2
+
+# lancement du calcul
+# ATTENTION: penser a remettre le nombre de processeurs apres "-np" :
+$TRIO_U_ROOT/bin/mpirun -np 8 $exec $datafile -mpi 1>$datafile.out 2>$datafile.err
+# $TRIO_U_ROOT/bin/mpirun -machinefile $TMPDIR/machines -np 24 /opt/Sge/mpi/preexec.sh $exec PAR_$datafile -mpi 1>$datafile.out 2>$datafile.err
+# reprise_auto && /usr/bin/mpirun -machinefile $TMPDIR/machines -np 24 /opt/Sge/mpi/preexec.sh $exec $datafile 24 1>$datafile.out 2>$datafile.err

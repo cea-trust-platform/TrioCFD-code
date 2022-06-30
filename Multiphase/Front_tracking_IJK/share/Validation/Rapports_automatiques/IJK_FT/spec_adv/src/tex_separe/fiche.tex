@@ -1,0 +1,64 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+
+\input{PREAMBULE/packages.tex}
+\input{PREAMBULE/param_biblio.tex}
+
+\usepackage{hyperref}
+
+\usepackage{hyperref}
+\hypersetup{
+  % backref=true,               %% permet d'ajouter des liens dans...
+  % pagebackref=true,           %% ...les bibliographies ;
+  % hyperindex=true,            %% ajoute des liens dans les index ;
+  breaklinks=true,              %% permet le retour à la ligne dans les liens trop longs ;
+  colorlinks=true,              %% colorise les liens ;
+  urlcolor= blue,               %% couleur des hyperliens ;
+  linkcolor=blue,               %% couleur des liens internes ;
+  citecolor=blue,               %% couleur des liens de citations ;
+  % bookmarks=true,             %% créé des signets pour Acrobat ;
+  % bookmarksopen=true,         %% si les signets Acrobat sont créés, les afficher complètement ;
+  pdftitle={simus_grossieres},             %% informations apparaissant...
+  pdfauthor={Gabriel Ramirez},  %% ...dans les informations...
+  pdfsubject={Écoulements turbulents à bulles - expérimental}, %% ...du document...
+  pdfkeywords={Écoulements à bulles, turbulence},  %% ...dans le lecteur pdf.
+  pdfencoding={unicode}
+}
+\geometry{top=5mm}
+
+
+\author{Gabriel Ramirez}
+\title{Validation advection}
+
+\setlength{\parskip}{1em}
+
+\input{PREAMBULE/raccourcis.tex}
+
+\begin{document}
+
+\section{Description du probleme}
+\input{description_du_probleme.tex}
+\section{Description du cas 1}
+\subsection{Grid}
+\input{grid.tex}
+\subsection{Model options}
+\input{model_options}
+\subsection{Other options}
+\input{other_options}
+\section{results}
+\input{results_cas1_partie1}
+\input{results_cas1_partie2}
+\input{results_cas2_partie1}
+\input{results_cas34_partie1}
+\input{results_cas5_partie1}
+\section{Conclusions}
+\input{conclusion}
+%\section{Pour les fiches de validation}
+%\input{pour_les_fiches_de_validation}
+\newpage
+\printbibliography
+
+
+\end{document}

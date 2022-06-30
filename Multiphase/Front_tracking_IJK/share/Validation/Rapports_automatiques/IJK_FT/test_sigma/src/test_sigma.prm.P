@@ -1,0 +1,86 @@
+Parametres {
+	Titre "Transport periodique front-tracking en IJK"
+	Description ""
+	Auteur "G.B."
+	CasTest . test_sigma_seq.data
+	CasTest . test_sigma_par8.data 8
+}
+
+Chapitre {
+	Titre "Maillage généré par cree_multi_bulles.sh"
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+	
+	Titre "Maillage avant le prepare"
+	Description "La courbure est tres irreguliere avant le prepare (maillage directement issu de GMSH)."
+	visu {
+		Cycles 0
+		titre "Preparation du maillage initial. Courbure de GMSH "
+		mesh prepare.lata INTERFACES
+		pseudocolor prepare.lata INTERFACES COURBURE SOM
+	}
+	
+	Titre "Maillage obtenu a la fin du prepare (grace au lissage)"
+	Description "La courbure est quasi constante a la fin du prepare (grace au fort lissage)."
+	visu {
+		Cycles -1
+		titre "Preparation du maillage initial. Courbure apres lissage "
+		mesh prepare.lata INTERFACES
+		pseudocolor prepare.lata INTERFACES COURBURE SOM
+	}
+	Description "Certains champs ne sont pas disponibles au pas de temps 0. On ne regarde donc pas le premier dt."
+	
+}
+
+#Pmacro CHAPITRE(_TITRE_,_FICHIER_, _TYPE_, _TIMESTEP_)
+
+Chapitre {
+	Titre _TITRE_
+	Description "Calcul _TYPE_."
+	visu {
+		Cycles _TIMESTEP_
+		titre "dt= _TIMESTEP_"
+		mesh _FICHIER_ INTERFACES
+		pseudocolor _FICHIER_ INTERFACES COURBURE SOM
+	}
+	Description "Champ de vitesse dont les variations doivent etre inferieures a 1e-4".
+	visu {
+		Cycles _TIMESTEP_
+		titre "dt= _TIMESTEP_"
+		mesh _FICHIER_ INTERFACES
+                pseudocolor _FICHIER_ DOM_dual norme_VELOCITY FACES
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+	Description "Le saut de pression theorique est de l'ordre de 20Pa pour la grande bulle et 28.6Pa pour les petites".
+	visu {
+		Cycles _TIMESTEP_
+		titre "dt= _TIMESTEP_"
+		mesh _FICHIER_ INTERFACES
+                pseudocolor _FICHIER_ DOM PRESSURE ELEM
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+	visu {
+		Cycles _TIMESTEP_
+		titre "dt= _TIMESTEP_"
+		mesh _FICHIER_ INTERFACES
+                pseudocolor_with_range _FICHIER_ DOM_EXT REPULSION_FT ELEM -3.4e-5 max
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+	visu {
+		Cycles _TIMESTEP_
+		titre "dt= _TIMESTEP_"
+		mesh _FICHIER_ INTERFACES
+                pseudocolor _FICHIER_ DOM_EXT_dual SOURCE_QDM_INTERF_Y FACES
+                Operator_to_all Slice2D_z 0 0 0.17
+	}
+}
+
+
+#Pendmacro(CHAPITRE)
+#Pusemacro(CHAPITRE)("calcul séquentiel",test_sigma_seq.lata, "séquentiel", 1)
+#Pusemacro(CHAPITRE)("calcul séquentiel",test_sigma_seq.lata, "séquentiel", -1)
+#Pusemacro(CHAPITRE)("calcul parallele",test_sigma_par8.lata, "parallele", 1)
+#Pusemacro(CHAPITRE)("calcul parallele",test_sigma_par8.lata, "parallele", -1)

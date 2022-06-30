@@ -1,0 +1,153 @@
+12c12
+< 
+---
+> import DNSTools3 as dtool
+21c21
+<     Construit les temres du bilan de qdm : convection; diffusion; interfaces; maj de rho; ...
+---
+>     Construit les termes du bilan de qdm : convection; diffusion; interfaces; maj de rho; ...
+28,29c28,29
+< # mode d'emploi : python use_check_etapes_et_termes_IV.py nom_fig chemin_out directions  N_smooth [temps0,temps1]
+< #                                0                           1        2        3          4         5
+---
+> # mode d'emploi : python use_check_etapes_et_termes_V.py nom_fig chemin_out jdd directions  N_smooth [temps0,temps1]
+> #                                0                           1        2       3       4         5         6
+40c40
+<         Tracons les termes du QDM et les forces interfaciales au cours du temps \n\
+---
+>         Tracons les termes du bilan de QDM et les forces interfaciales au cours du temps \n\
+52,53c52,54
+< directions = sys.argv[3]
+< N_smooth = float(sys.argv[4])
+---
+> fichier_data = sys.argv[3]
+> directions = sys.argv[4]
+> N_smooth = float(sys.argv[5])
+55c56
+< t_deb, t_fin = float(sys.argv[5].rstrip("]").lstrip("[").split(",")[-2]),float(sys.argv[5].rstrip("]").lstrip("[").split(",")[-1])
+---
+> t_deb, t_fin = float(sys.argv[6].rstrip("]").lstrip("[").split(",")[-2]),float(sys.argv[6].rstrip("]").lstrip("[").split(",")[-1])
+85c86
+<         "ru_ap_proj"         : {"x":9,  "y":10,  "z":11},  # rho_u_euler_av_prediction
+---
+>         "ru_ap_proj"         : {"x":9,  "y":10, "z":11},  # rho_u_euler_av_prediction
+108a110
+>     ## Le schema temporel de resolution est RK3
+138a141
+>     ## Le schema temporel de resolution est EUler explicite
+255a259,260
+> rl = dtool.getParam(fichier_data, "rho_liquide")
+> rv = dtool.getParam(fichier_data, "rho_vapeur")
+290a296
+> fig_t_intf_ms, (ax_t_intf_ms) = plt.subplots(1,1,figsize=(10,10))
+292a299
+> fig_all_ms,    (ax_all_ms)    = plt.subplots(1,1,figsize=(10,10))
+294c301,302
+< fig_t_intf.suptitle(r"$ dt \times \langle \frac{\mathcal{F_i}}{\tilde{\rho} \mathcal{V} }\rangle$", fontsize=24)
+---
+> fig_t_intf.suptitle(r"$ dt \times \langle \frac{\mathcal{F}_i}{\mathcal{V} }\rangle$", fontsize=24)
+> fig_t_intf_ms.suptitle(r"$ dt \times \langle \frac{\mathcal{F}_i}{\tilde{\rho} \mathcal{V} } \rangle$", fontsize=24)
+300c308
+<     fig_t_conv.suptitle(r"$ dt \times \frac{ \langle \tilde{\rho} \mathcal{S} \left[ -u_i u_j \right] \rangle }{\tilde{\rho}} \frac{1}{\mathcal{V}}$", fontsize=24)
+---
+>     fig_t_conv_ms.suptitle(r"$ dt \times \frac{ \langle \tilde{\rho} \mathcal{S} \left[ -u_i u_j \right] \rangle }{\tilde{\rho}} \frac{1}{\mathcal{V}}$", fontsize=24)
+306a315
+> fig_t_diff_ms.suptitle(r"$ dt \times \frac{ \langle \mathcal{S} \left[ \mu s_{ij} \right] + \mathcal{C} \rangle \frac{1}{\mathcal{V}} - \langle \mathcal{C} \rangle \frac{1}{\mathcal{V}} }{\tilde{\rho}}$", fontsize=24)
+311c320
+<     fig_t_pr_d.suptitle(r"$ dt \times \nabla{p} _{1/2} - dt \times \frac{1}{\rho} \nabla{p}$", fontsize=24)
+---
+>     fig_t_pr_d.suptitle(r"$ \tilde{\rho}^* dt \times \nabla{p} _{1/2} - dt \times \frac{1}{\rho} \nabla{p}$", fontsize=24)
+318a328
+> fig_all_ms.suptitle(r"Somme des termes, after m.s.", fontsize=24)
+341c351,352
+<     pr_d = (np.abs(rl-rv)/2.)*pr_2 - pr_3
+---
+>     # On s'attedns a avoir pr_d = 0 partout, tout le temps
+>     pr_d = (1./rl + 1./rv)/2.*pr_2 - pr_3
+345a357,362
+>     # Grandeurs apres etre passees au mass solver
+>     intf_ms = check_0[:,[rosette["t_intf_af_ms"][direction]]].flatten()
+>     conv_ms = check_0[:,[rosette["t_conv_mass_sol"][direction]]].flatten()
+>     diff_ms = check_0[:,[rosette["t_diff_mass_sol"][direction]]].flatten()
+> 
+> 
+353a371,374
+>         # Grandeurs apres etre passees au mass solver
+>         intf_ms_1, intf_ms_2 = check_1[:,[rosette["t_intf_af_ms"][direction]]].flatten()      , check_2[:,[rosette["t_intf_af_ms"][direction]]].flatten()      
+>         conv_ms_1, conv_ms_2 = check_1[:,[rosette["t_conv_mass_sol"][direction]]].flatten()      , check_2[:,[rosette["t_conv_mass_sol"][direction]]].flatten()      
+>         diff_ms_1, diff_ms_2 = check_1[:,[rosette["t_diff_mass_sol"][direction]]].flatten()      , check_2[:,[rosette["t_diff_mass_sol"][direction]]].flatten()      
+367a389,392
+>         # Grandeurs apres etre passe au mass solver
+>         intf_ms = intf_ms*alpha_0 + intf_ms_1*alpha_1 + intf_ms_2*alpha_2
+>         conv_ms = conv_ms*alpha_0 + conv_ms_1*alpha_1 + conv_ms_2*alpha_2
+>         diff_ms = diff_ms*alpha_0 + diff_ms_1*alpha_1 + diff_ms_2*alpha_2
+376,377c401,407
+< 
+<     # Construction du bilan, homogene a du
+---
+>     # Grandeurs apres etre passe au mass solver
+>     intf_ms_dt = intf_ms*dt
+>     conv_ms_dt = conv_ms*dt
+>     diff_ms_dt = diff_ms*dt
+>     # print("intf_ms_dt",intf_ms_dt)
+>     ###################################################
+>     # Construction du bilan, homogene a rho du pou rles variables "normales" et homognee a du pour les variables en _ms
+385,393c415,418
+<     print(intf.shape)
+<     print(conv.shape)
+<     print(pr_3.shape)
+<     print(pr_2.shape)
+<     print(diff.shape)
+<     print(drho_u.shape)
+<     print(dt.shape)
+<     print(temps_plot.shape,(conv*dt[:]).shape)
+<     bilan = (intf+conv+pr_2+diff)*dt + drho_u
+---
+>     
+>     # bilan = (intf+conv+pr_2+diff)*dt + drho_u
+>     bilan = intf_dt+conv_dt+pr_2_dt+diff_dt + drho_u                          # @ d(\rho u)/dt
+>     bilan_ms = intf_ms_dt+conv_ms_dt+pr_3_dt+diff_ms_dt + drho_u*(2./(rl+rv))  # @ du/dt   (apres mass solver)
+396c421
+<     # ax_t_intf.plot(temps_plot,check[it_deb:it_fin+1,[rosette["t_intf_af_ms"][direction]]], color=color[direction]     ,linestyle=linestyle[1],label=direction+" interfaces af. ms")
+---
+>     ax_t_intf_ms.plot(temps_plot,intf_ms_dt, color=color[direction]     ,linestyle=linestyle[1],label=direction+" interfaces af. ms")
+399a425
+>     ax_t_conv_ms.plot(temps_plot,conv_ms_dt, color=color[direction]     ,linestyle=linestyle[0],label=direction+" conv. after m.s.")
+407a434
+>     ax_t_diff_ms.plot(temps_plot,diff_ms_dt, color=color[direction]     ,linestyle=linestyle[0],label=direction+" diff. after m.s.")
+414a442
+>     ax_all_ms.plot(temps_plot,bilan_ms, color=color[direction]     ,linestyle="solid",label=direction+r" $(\mathcal{I} + \mathcal{C} + \mathcal{P} + \mathcal{D})\times dt + (\partial \rho) u$, after m.s.")
+428a457
+> ax_t_intf_ms.legend();ax_t_intf_ms.grid(True,'minor')
+429a459
+> ax_t_conv_ms.legend();ax_t_conv_ms.grid(True,'minor')
+430a461
+> ax_t_diff_ms.legend();ax_t_diff_ms.grid(True,'minor')
+431a463
+> ax_all_ms.legend();ax_all_ms.grid(True,'minor')
+436a469
+> ax_t_intf_ms.set_xlabel("temps (s)"    ,fontsize=22)
+437a471
+> ax_t_conv_ms.set_xlabel("temps (s)"    ,fontsize=22)
+438a473
+> ax_t_diff_ms.set_xlabel("temps (s)"     ,fontsize=22)
+439a475
+> ax_all_ms.set_xlabel("temps (s)"     ,fontsize=22)
+446a483
+> ax_t_intf_ms.set_ylabel(r"$\frac{1}{\tilde{\rho}} \int \sigma^{n} \kappa^{n} n $ "      , fontsize=22)
+447a485
+> ax_t_conv_ms.set_ylabel(r"$ \frac{1}{\tilde{\rho}} u^{*n} \nabla u^{*n}$ "    , fontsize=22)
+448a487
+> ax_t_diff_ms.set_ylabel(r"$\frac{1}{\tilde{\rho}} 2 \nu \nabla s_{ij}$ ", fontsize=22)
+452a492
+> ax_all.set_ylabel(r"$ u$, bilan"                             , fontsize=22)
+454a495
+> # plt.show()
+456a498
+> fig_t_intf_ms.savefig(nom_figure+"_t_intf_ms"+directions+".png")
+457a500
+> fig_t_conv_ms.savefig(nom_figure+"_t_conv_ms"+directions+".png")
+458a502
+> fig_t_diff_ms.savefig(nom_figure+"_t_diff_ms"+directions+".png")
+463a508
+> fig_all_ms.savefig(nom_figure+"_all_ms_"+directions+".png")

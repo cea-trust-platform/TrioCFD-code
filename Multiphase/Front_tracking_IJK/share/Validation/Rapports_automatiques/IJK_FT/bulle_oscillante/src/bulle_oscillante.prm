@@ -1,0 +1,227 @@
+Parametres {
+	Titre "Oscillation d'une bulle en IJK"
+	Description "Inspiré de la fiche de validation de Trio_U Oscillation d'une bulle."
+	Auteur "G.B."
+	CasTest . ijkft_bulle_oscillante.data 8
+}
+
+Chapter {
+	Titre "Objectif"
+	Description "Comme dans le cas FT, une bulle légèrement ellipsoidale est placée dans du liquide au repos. "
+        Description En l'absence de gravité, le retour à l'équilibre des forces de tension de surface se fait par oscillation. <<EOF
+La viscosité du fluide est choisie très faible pour se comparer aux résultats analytiques sur les
+fréquences d'oscillation dans le cas non-visqueux. 
+L'amortissement des oscillations fournit une estimation du taux de dissipation d'énergie du schéma numérique. 
+EOF
+}
+
+
+Chapter {
+	Titre "Description"
+	
+	Description Parametres geometriques : <<EOF
+  rayon 1.6mm
+  Domaine carre de cote 10.66mm
+
+Parametres physiques : 
+  rho_liquide 1000.
+  rho_vapeur  1.
+  mu_liquide 1.e-5
+  mu_vapeur 1.e-7
+  sigma 0.07
+EOF
+
+	Description Parametres de remaillage :  <<EOF
+  nb_iter_barycentrage 1
+  relax_barycentrage 1
+  nb_iter_correction_volume 1
+  lissage_courbure_iterations_systematique 2
+EOF
+	Description "Etude du mode d'excitation $n=3$ qui correspond a une frequence d'oscillation de 50Hz."
+}
+
+Chapter {
+	Titre "Verification visuelle cas vertical"
+
+	Description Le maillage initial init.lata est cree par gmsh. <<EOF
+Sa courbure n'est pas calculee mais elle n'est pas très régulière.
+L'etat initial du prepare le montre (avec des courbures de -800 a -1900 environ).
+Grace au lissage, on obtient une courbure plus reguliere sans perdre la deformation voulue 
+(courbure entre -950 et -1270, cf etat du calcul apres le lissage dans le prepare).
+EOF
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+	visu {
+		titre "Etat initial du prepare tel que relu depuis l'init"
+		cycles 0
+		mesh prepare.lata INTERFACES
+		pseudocolor prepare.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etat du calcul apres lissage dans le prepare"
+		cycles 5
+		mesh prepare.lata INTERFACES
+		pseudocolor prepare.lata INTERFACES COURBURE SOM
+	}
+	Description "Les 5 figures suivantes montrent l'oscillation au cours du temps."
+	visu {
+		titre "Etats intermediaires 0"
+		cycles 0
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 1"
+		cycles 1
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 2"
+		cycles 2
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 3"
+		cycles 3
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 4"
+		cycles 4
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 5"
+		cycles 5
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 6"
+		cycles 6
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 7"
+		cycles 7
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etats intermediaires 8"
+		cycles 8
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+	visu {
+		titre "Etat final"
+		cycles -1
+		Normal3d 1 0 0
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_bulle_oscillante.lata INTERFACES
+		pseudocolor ijkft_bulle_oscillante.lata INTERFACES COURBURE SOM
+	}
+
+}
+
+
+Chapter {
+	Titre "Saut de pression" 
+	Description "Trace de la difference de pression entre l'interieur de la bulle et l'exterieur."
+	Description "La valeur theorique est de 88Pa."
+	Description "Figure A INCLURE quand l'equivalent du sonde existera!!!!!!!!!!!!!!!!!!!!!!!!!!!! xxxxxxxxxxxxxxx"
+}
+
+Chapter {	
+	Titre "Aire interfaciale" 
+	Description "Evolution de l'aire interfaciale au cours du temps."
+	Description La frequence theorique des oscillations est 50Hz. <<EOF
+La surface discretisee n'est pas celle de la sphere. 
+Les noeuds sont sur la sphere, les triangles sont donc legerement a l'interieur.
+On a donc un volume un peu plus faible que celui attendu (environ 6%). 
+Le rayon equivalent recalcule a partir du volume est 0.00174.
+Pour tout adimensionner, on se base sur l'aire de la sphere de rayon 0.00174
+cad. Ssphere=3.8078021257418986e-05.
+EOF
+	Description A la fin, la sphere discrete a une surface superieure a celle <<EOF
+utilisee pour l'adim car on utilise des triangles. 
+Les resultats de l'optim sont (!!!! En dur dans la fiche!!! a lire en sortir du
+post_run!!!)
+
+pulse = 764.10386476595102
+tau = 0.067454656905649238
+EOF
+	Figure {
+		Titre "Aire interfaciale"
+		incluredesccourbes 0
+		labelX  "temps (s)"
+		labelY  "Aire interfaciale (m2)"
+		courbe {
+			fichier ijkft_bulle_oscillante_bulles_Sadim.out
+			colonnes ($1) ($2)
+			style linespoints
+			Legende "Aire de la bulle (adim)"
+		}
+		courbe {
+			fichier Surface_FTD.txt
+			colonnes ($1) ($2/3.20047e-05)
+			style linespoints
+			Legende "Fiche de valid FTD (S/Sfinal)"
+		}
+        	Curve {
+			fichier ijkft_bulle_oscillante_bulles_Sadim.out
+			colonnes ($1) ($3)
+			Legende "Sphere"
+	                Style lines
+        	}
+        	Curve {
+			fichier ijkft_bulle_oscillante_bulles_Sadim.out
+			colonnes ($1) ($5)
+			Legende "Enveloppe"
+	                Style lines
+        	}
+        	Curve {
+			fichier ijkft_bulle_oscillante_bulles_Sadim.out
+			colonnes ($1) ($6)
+			Legende "Decroissance Amortissement tau=0.075"
+	                Style lines
+        	}
+	}
+}
+

@@ -1,0 +1,46 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 3 bulles  :
+# 0.134 0.131 0.151 bulle3.msh
+# 0.201 0.271 0.152 bulle3.msh
+cat >deplacements.txt <<EOF
+0.0015823 0.0015798 0.00151354 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+cat >deplacements3.txt <<EOF
+0.0015823 0.0015798 0.00151354 bulle3.msh
+0.0045867 0.0010343 0.00155486 bulle3.msh
+0.0055337 0.0029443 0.00155486 bulle3.msh
+EOF
+
+./cree_multi_bulles.sh deplacements3.txt init_multi.lata
+
+# !!! On n'utilise pas le lissage car les bulles ne sont pas dans le domaine. 
+# 
+
+cp ijkft_basic_temperature.data ijkft_basic_temperature_seq.data
+# Creation d'un JDD de reprise suite au pre_run : 
+echo "JDD pour Preparation du calcul en avancant la bulle au bout du domaine..."
+sed -e "s/timestep .*/  timestep 0.0001655/g"      \
+    -e "s/dt_post .*/   dt_post 459/g"             \
+    -e "s/dt_sauvegarde .*/   dt_sauvegarde 459/g" \
+    -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 459/g" \
+    -e "s/pre_run\.sauv/init/g"                    \
+    -e "s/# lata_meshname   FTMESH #/lata_meshname   FTMESH/g" \
+    -e "/timestep_reprise_vitesse/d"               \
+    -e "/fichier_reprise_vitesse/d"  ijkft_basic_temperature_seq.data > pre_run.data
+
+# Creation d'un JDD pour la reprise avec :
+echo "Creating JDD for restart with temperature"
+sed -e "/nom_reprise/s/#//g"                       \
+    -e "/nom_sauvegarde/s/#//g"                    \
+    -e "s/nb_pas_dt_max .*/   nb_pas_dt_max 3/g" \
+    ijkft_basic_temperature_seq.data > ijkft_basic_temperature_seq_repr.data
+
