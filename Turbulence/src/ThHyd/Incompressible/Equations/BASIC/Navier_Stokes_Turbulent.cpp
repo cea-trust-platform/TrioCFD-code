@@ -173,7 +173,14 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
   type+= type_diff;
 
   Nom type_inco=inconnue()->que_suis_je();
-  type+=(type_inco.suffix("Champ_"));
+  if (type_inco=="Champ_Q1_EF")
+    {
+      type+="Q1";
+    }
+  else
+    {
+      type+=(type_inco.suffix("Champ_"));
+    }
 
   if (axi)
     type+="_Axi";
@@ -232,6 +239,20 @@ Entree& Navier_Stokes_Turbulent::lire_op_diff_turbulent(Entree& is)
       terme_diffusif.l_op_base().associer_eqn(*this);
       terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
       is>>terme_diffusif.valeur();
+    }
+  else if (motbidon=="option")
+    {
+      type+="option";
+      if ( discr == "EF" ) type="Op_Dift_EF_Q1_option";
+      terme_diffusif.typer(type);
+      Cerr << terme_diffusif.valeur().que_suis_je() << finl;
+      terme_diffusif.l_op_base().associer_eqn(*this);
+      terme_diffusif->associer_diffusivite(terme_diffusif.diffusivite());
+      is>>terme_diffusif.valeur();
+      is >> motbidon;
+      //on lit la fin de diffusion { }
+      if ( motbidon != accfermee)
+        Cerr << " On ne peut plus entrer d option apres option "<< finl;
     }
   else
     {

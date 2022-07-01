@@ -136,7 +136,14 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
       type+= type_diff;
 
       Nom type_inco=eqn.inconnue()->que_suis_je();
-      type+=(type_inco.suffix("Champ_"));
+      if (type_inco=="Champ_Q1_EF")
+        {
+          type+="Q1";
+        }
+      else
+        {
+          type+=(type_inco.suffix("Champ_"));
+        }
 
       if (Objet_U::axi)
         type+="_Axi";
