@@ -477,7 +477,7 @@ Entree& IJK_FT_double::interpreter(Entree& is)
 
   param.ajouter("interfaces", &interfaces_);
   // GAB, THI
-  param.ajouter("forcage", &forcage_); // XD forcage_ forcage_ forcage_ 1 attr type 0 description
+  param.ajouter("forcage", &forcage_); // X_D forcage_ forcage_ forcage_ 1 attr type 0 description
   param.ajouter("corrections_qdm", &qdm_corrections_);
   // Read list of thermic equations:
   param.ajouter("thermique", &thermique_);
