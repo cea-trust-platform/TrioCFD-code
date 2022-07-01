@@ -2,7 +2,7 @@
 # Ajout du bin de IJK dans PATH
 # Ajout de PYTHONPATH dans l'environnement de IJK
 project_directory=`dirname $0`/../..
-for env in ${project_directory}/env_IJK.sh
+for env in ${project_directory}/env_Front_tracking_IJK.sh
 do
    for path in share/PyTools3
    do
