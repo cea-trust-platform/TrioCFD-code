@@ -116,7 +116,7 @@ void Flux_parietal_Kommajosyula::qp(int N, int f, double D_h, double D_ch,
                 {
                   const Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, ref_cast(Pb_Multiphase, pb_.valeur()).get_correlation("Loi_paroi").valeur());
                   const double u_tau = corr_loi_paroi.get_utau(f);
-                  u_bulk = 15.*u_tau; // Big approximation...
+                  u_bulk = 20.*u_tau; // Big approximation...
                 }
               else Cerr << "Flux_parietal_Kommajosyula::qp isn't adapted to a single-phase " << correlation_monophasique_->que_suis_je() << " heat flux for now ! " , Process::exit();
 
@@ -138,10 +138,10 @@ void Flux_parietal_Kommajosyula::qp(int N, int f, double D_h, double D_ch,
               double dTp_chi =  - 0.05 * Delta_T_sub     * -dTp_Delta_T_sup / std::pow(Delta_T_sup, 2);
               double dTl_chi =  - 0.05 * dTl_Delta_T_sub / Delta_T_sup;
 
-              double K     = chi     * 2*std::sqrt(3/M_PI) *Ja_sup    *std::sqrt(lambda[n_l]/(rho[n_l]*Cp[n_l]));
-              double dTp_K = dTp_chi * 2*std::sqrt(3/M_PI) *Ja_sup    *std::sqrt(lambda[n_l]/(rho[n_l]*Cp[n_l]))
-                             + chi   * 2*std::sqrt(3/M_PI) *dTp_Ja_sup*std::sqrt(lambda[n_l]/(rho[n_l]*Cp[n_l]));
-              double dTl_K = dTl_chi * 2*std::sqrt(3/M_PI) *Ja_sup    *std::sqrt(lambda[n_l]/(rho[n_l]*Cp[n_l]));
+              double K     = chi     * 2*std::sqrt(3/M_PI) *Ja_sup    *lambda[n_l]/(rho[n_l]*Cp[n_l]);
+              double dTp_K = dTp_chi * 2*std::sqrt(3/M_PI) *Ja_sup    *lambda[n_l]/(rho[n_l]*Cp[n_l])
+                             + chi   * 2*std::sqrt(3/M_PI) *dTp_Ja_sup*lambda[n_l]/(rho[n_l]*Cp[n_l]);
+              double dTl_K = dTl_chi * 2*std::sqrt(3/M_PI) *Ja_sup    *lambda[n_l]/(rho[n_l]*Cp[n_l]);
 
               // Bubble growth time (page 44 Kommajosyula PhD)
               double t_g     = D_d*D_d       / (16*K*K) ;
