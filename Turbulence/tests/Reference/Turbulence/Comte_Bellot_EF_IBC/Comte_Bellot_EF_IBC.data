@@ -1,0 +1,178 @@
+# PARALLEL OK #
+# Hydraulique 2D turbulent Comte-Bellot
+  Re = (rho*U_moy*L)/mu
+  rho = 1.208 kg/m^3
+  U_moy = 8.6 m/s
+  L = 0.18 m                  
+  Re = 103200
+  mu = (rho*U_moy*L)/Re
+  A.N.
+  mu =1.812 e-5 #
+
+dimension 3
+Pb_Thermohydraulique_Turbulent pb
+Domaine dom
+
+# DEBUT MAILLAGE #
+read_MED short_family_names dom domain_mesh res_domain_mesh_80_pl_mesh_1.med
+
+regroupebord dom Wall { TOP BOTTOM }
+regroupebord dom Postpro { IN OUT }
+regroupebord dom Sortie { UP }
+regroupebord dom Entree { DOWN }
+# FIN MAILLAGE #
+
+# DEBUT DECOUPAGE 
+Partition dom
+{
+	Partition_tool tranche { tranches 2 2 1 }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+FIN DECOUPAGE #
+
+# BEGIN SCATTER 
+Scatter DOM.Zones dom
+END SCATTER #
+
+# DISCRETISATION EF ---------------------------------- #
+
+# VEFPrep1b dis #
+EF dis
+
+# SCHEMA EN TEMPS ------------------------------------ #
+
+Schema_Euler_implicite sch
+Read sch
+{
+    tinit 0
+    tmax 0.5
+    dt_min 5.e-8
+    dt_impr 5.e-1
+    dt_sauv 100.
+    seuil_statio 1.e-4
+    solveur implicite
+    {
+        seuil_convergence_implicite 1.e-10
+        seuil_convergence_solveur  1e-10
+        solveur Petsc IBICGSTAB { precond diag { } seuil 1e-10 impr }
+    }
+    dt_start dt_calc
+    dt_max 0.1
+    nb_pas_dt_max 3
+#    nb_pas_dt_max 1000 #
+    facsec 2.5
+}
+
+
+Fluide_Incompressible fluid
+
+Read fluid
+{
+    mu  Champ_Uniforme 1 1.812e-5
+    rho Champ_Uniforme 1 1.208
+    lambda  Champ_Uniforme 1 1.0e-3
+    Cp      Champ_Uniforme 1 1000.0
+    beta_th Champ_Uniforme 1 1.0e-3
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb fluid
+
+Discretiser pb dis
+
+Read pb
+{
+    Navier_Stokes_Turbulent
+    {
+        modele_turbulence combinaison {
+                nb_var 0
+		fonction ((x_GT_0.09+1.0e-6)*(x_LT_0.18)*(-73.23977*x*x*x*x+49.986*x*x*x-12.824*x*x+1.44741*x-0.0579525084)+(x_GT_0.18)*(x_LT_0.27-1.0e-6)*(-73.240*x*x*x*x+55.479*x*x*x-15.79*x*x+2.020*x-0.097))
+		turbulence_paroi negligeable
+		}
+        projection_initiale 1
+        methode_calcul_pression_initiale sans_rien
+        solveur_pression petsc cholesky { }
+	convection {  btd { btd 2. facteur 1. } }
+        diffusion { option { grad_u_transpose_partout 1 } }
+        initial_conditions
+        {
+            vitesse Champ_fonc_xyz dom  3 0. ((x_GT_0.09+1.0e-6)*(x_LT_0.0941)*(1551.034*x-139.49)+(x_GT_0.0941)*(x_LT_0.2659)*(-18950.5*x*x*x*x+13637.507*x*x*x-3946.121*x*x+537.066*x-18.548)+(x_GT_0.2659)*(x_LT_0.27-1.0e-6)*(-1551.034*x+418.544))  0.  
+        }
+        sources
+        {
+	Source_PDF
+            {
+                aire Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh aire elem 0.
+                rotation Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh rotation elem 0.
+                modele
+                {
+                    eta 1.0e-12
+                    vitesse_imposee_data champ_uniforme 3 0. 0. 0.
+                }
+                interpolation Interpolation_IBM_power_law_tbl
+                {
+                    points_fluides Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh projection_Fluid som 0.
+                    points_solides Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh projection_Solid som 0.
+                    elements_fluides Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh fl_elem_number som 0.
+                    correspondance_elements Champ_Fonc_MED last_time res_domain_mesh_80_pl_mesh_1.med domain_mesh TRUST_SALOME_correspondance elem 0.
+		    impr
+                }
+            } 
+        }
+        boundary_conditions
+        {
+            Wall Symetrie
+            Postpro paroi_fixe
+            Sortie frontiere_ouverte_pression_imposee Champ_front_Uniforme 1 1.0
+            Entree frontiere_ouverte_vitesse_imposee Champ_front_fonc_txyz 3 0. ((x_GT_0.09+1.0e-6)*(x_LT_0.0941)*(1551.034*x-139.497)+(x_GT_0.0941)*(x_LT_0.2659)*(-18950.5*x*x*x*x+13637.507*x*x*x-3946.121*x*x+537.066*x-18.548)+(x_GT_0.2659)*(x_LT_0.27-1.0e-6)*(-1551.034*x+418.544))    0. 
+        }
+    }
+    Convection_Diffusion_Temperature_Turbulent {
+        Modele_turbulence Prandtl
+               { Turbulence_paroi negligeable_scalaire
+	       }
+    	equation_non_resolue 1
+	convection {  btd { btd 2. facteur 1. } }
+	diffusion {  }
+	conditions_initiales { temperature champ_uniforme 1 20. }
+	conditions_limites {
+            Wall Symetrie
+            Postpro paroi_adiabatique
+	    Sortie frontiere_ouverte t_ext Champ_front_fonc_txyz 1  20.
+            Entree frontiere_ouverte_temperature_imposee Champ_front_uniforme 1  20.
+			    }
+     } 
+
+    Post_processings
+    {
+	lml
+	{
+       		Definition_champs
+        	{
+			V refchamp { pb_champ pb vitesse }
+	  	 	Vy transformation
+	  	    	{
+				methode composante numero 1
+		        	sources_reference { V }
+		     	}
+		}
+		Probes
+        	{
+			prof_5m_vite  Vy   periode 1.   segment 40  0.0 5.0  0.5 0.36  5.0 0.5
+        	}
+		format lml fichier Comte_Bellot_EF_IBC
+        	Champs dt_post 0.05e0
+        	{
+                        gradient_pression som
+            		pression elem
+            		Divergence_U elem
+            		vitesse som
+        	}
+	}
+    }
+}
+resoudre pb
+fin
