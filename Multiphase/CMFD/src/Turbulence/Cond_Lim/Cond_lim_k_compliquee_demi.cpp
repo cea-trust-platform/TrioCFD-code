@@ -117,7 +117,6 @@ void Cond_lim_k_compliquee_demi::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
   const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().zone_dis().valeur());
-  const DoubleTab&   u_tau = corr_loi_paroi.get_tab("u_tau");
   const DoubleTab&       y = corr_loi_paroi.get_tab("y");
   const DoubleTab&      mu = sub_type(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()) ? ref_cast(Op_Diff_PolyMAC_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu() :
                              ref_cast(Op_Diff_PolyMAC_P0_base, zone_Cl_dis().equation().operateur(0).l_op_base()).nu(),

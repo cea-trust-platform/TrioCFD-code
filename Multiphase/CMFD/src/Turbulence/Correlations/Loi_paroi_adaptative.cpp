@@ -31,6 +31,7 @@
 #include <Paroi_frottante_loi.h>
 #include <Echange_impose_base.h>
 #include <Cond_lim_base.h>
+#include <Param.h>
 #include <math.h>
 #include <Nom.h>
 #include <Motcle.h>
@@ -46,6 +47,10 @@ Sortie& Loi_paroi_adaptative::printOn(Sortie& os) const
 
 Entree& Loi_paroi_adaptative::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("eps_u_tau", &eps_u_tau_);
+  param.lire_avec_accolades_depuis(is);
+
   return is;
 }
 
@@ -142,8 +147,8 @@ void Loi_paroi_adaptative::calc_u_tau_y_plus(const DoubleTab& vit, const DoubleT
 
 double Loi_paroi_adaptative::calc_u_tau_loc(double u_par, double nu, double y)
 {
-  double eps = 1.e-6;
-  int iter_max = 50;
+  double eps = eps_u_tau_;
+  int iter_max = 60;
   int n_iter = 0;
 
   double u_tau_1 = 1. ;

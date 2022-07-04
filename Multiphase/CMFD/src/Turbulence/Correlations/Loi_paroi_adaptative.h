@@ -43,11 +43,12 @@ public:
   void calc_u_tau_y_plus(const DoubleTab& vit, const DoubleTab& nu_visc) override;
   void completer() override;
   void mettre_a_jour(double temps) override;
-  DoubleTab get_tab(std::string str) {return valeurs_loi_paroi_[str];};
+  DoubleTab& get_tab(std::string str) {return valeurs_loi_paroi_[str];};
   double get_y(int f) const {return valeurs_loi_paroi_.at("y")(f,0);};
   double get_utau(int f) const { return valeurs_loi_paroi_.at("u_tau")(f,0);};
   double get_dyp_u_plus(int f) const { return valeurs_loi_paroi_.at("dyp_u_plus")(f,0);};
   double calc_u_tau_loc(double u_par, double nu, double y);
+  int    a_calculer(int f) {return Faces_a_calculer_(f, 0);};
 
 protected:
   double u_plus_de_y_plus(double y_p); // Blended Reichardt model
@@ -57,6 +58,8 @@ protected:
 
   double von_karman_ = 0.41;
   double limiteur_y_p = 0.01; // To prevent numerical issues ; no consequence on the calculation, as it falls in the region where the blending function is zero
+
+  double eps_u_tau_ = 1.e-10;
 
   IntTab Faces_a_calculer_;
   std::map<std::string, DoubleTab> valeurs_loi_paroi_; // contient "y_plus", "u_plus", "dyp_u_plus", "u_tau" pour toutes les faces

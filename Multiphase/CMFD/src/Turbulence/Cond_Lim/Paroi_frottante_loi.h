@@ -64,6 +64,11 @@ protected :
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;
   double beta_k = 0.09;
+
+  double y_p_prod_k_ = 2. ;
+  double fac_prod_k_ = 1. ;
+  double y_p_prod_k_grand_ = 150. ;
+  double fac_prod_k_grand_ = .4 ;
 };
 
 #endif

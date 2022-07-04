@@ -133,7 +133,7 @@ void Cond_lim_k_simple_transition_constante_Dirichlet::me_calculer()
 double Cond_lim_k_simple_transition_constante_Dirichlet::calc_k(double y, double u_tau, double visc)
 {
   double y_p = y * u_tau / visc;
-  double b = std::pow(   (1+std::tanh(   std::log(y_p)-1.   ))/2   ,3.); // -1.2 avant modif
+  double b = std::pow(   (1+std::tanh(   1.5 * std::log(y_p)-1.5   ))/2   ,3.); // std::log(y_p)-1.2 avant modif ; std::log(y_p)-1. marchait pas mal ;
 
   return u_tau*u_tau*std::max(1/std::sqrt(beta_k_)*b, 0.);
 }

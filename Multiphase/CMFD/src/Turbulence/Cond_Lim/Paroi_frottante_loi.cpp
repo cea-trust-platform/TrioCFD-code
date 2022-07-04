@@ -50,6 +50,10 @@ Entree& Paroi_frottante_loi::readOn(Entree& s )
   param.ajouter("beta_omega", &beta_omega);
   param.ajouter("beta_k", &beta_k);
   param.ajouter("von_karman", &von_karman_);
+  param.ajouter("y_p_prod_k", &y_p_prod_k_);
+  param.ajouter("fac_prod_k", &fac_prod_k_);
+  param.ajouter("y_p_prod_k_grand", &y_p_prod_k_grand_);
+  param.ajouter("fac_prod_k_grand", &fac_prod_k_grand_);
   param.lire_avec_accolades_depuis(s);
 
   le_champ_front.typer("Champ_front_vide");
@@ -120,7 +124,7 @@ void Paroi_frottante_loi::mettre_a_jour(double tps)
 void Paroi_frottante_loi::me_calculer()
 {
   Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
-  Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().probleme().domaine_dis().zone_dis(0).valeur());
+  const Zone_Poly_base& zone = ref_cast(Zone_Poly_base, zone_Cl_dis().equation().probleme().domaine_dis().zone_dis(0).valeur());
 
   const DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau"); // y_p est numerote selon les faces de la zone
   const DoubleTab& visc  = ref_cast(Navier_Stokes_std, zone_Cl_dis().equation().probleme().equation(0)).diffusivite_pour_pas_de_temps().valeurs();
@@ -156,25 +160,33 @@ void Paroi_frottante_loi::me_calculer()
 
       double y_loc = zone.dist_face_elem0(f_zone,  e);
       double y_plus_loc = y_loc * u_tau(f_zone, n)/ visc(e, n) ;
+      double fac_coeff_grad_ = 1 + fac_prod_k_ * std::tanh( (y_plus_loc/y_p_prod_k_)*(y_plus_loc/y_p_prod_k_) ) - fac_prod_k_grand_ * std::tanh( (y_plus_loc/y_p_prod_k_grand_)*(y_plus_loc/y_p_prod_k_grand_)*(y_plus_loc/y_p_prod_k_grand_) );
       if (y_plus_loc>1)
         {
           valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-          valeurs_coeff_grad_(f, n) = 1/mu(e,n) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
-//          valeurs_coeff_grad_(f, n) = (alp ? (*alp)(e, n) : 1) * 1./y_loc * 1./norm_u_parallel; // dirichlet for calculation of gradient
+          valeurs_coeff_grad_(f, n) = fac_coeff_grad_ * 1/mu(e,n) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * u_tau(f_zone, n)*u_tau(f_zone, n)/norm_u_parallel; // f_tau = - alpha_k rho_k u_tau**2 n_par, coeff = u_tau**2 /u_par
+//          valeurs_coeff_grad_(f, n) = (alp ? (*alp)(e, n) : 1) * 1./y_loc ; // dirichlet for calculation of gradient
         }
       else
         {
           valeurs_coeff_(f, n) = (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
-          valeurs_coeff_grad_(f, n) = 1/mu(e,n) * (alp ? (*alp)(e, n) : 1) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
-//          valeurs_coeff_grad_(f, n) = (alp ? (*alp)(e, n) : 1) * 1./y_loc * 1./norm_u_parallel; // dirichlet for calculation of gradient
+          if (norm_u_parallel > 1.e-6) valeurs_coeff_grad_(f, n) = fac_coeff_grad_ * (alp ? (*alp)(e, n) : 1) * 1./y_loc ; // dirichlet for calculation of gradient
+          else                         valeurs_coeff_grad_(f, n) = fac_coeff_grad_ * (alp ? (*alp)(e, n) : 1) * 1/mu(e,n) * rho(e, n) * visc(e, n)/y_loc; // viscous case : if u_tau is small
         }
     }
 
   for (n=1 ; n<N ; n++)
     for (int f =0 ; f < nf ; f++)
       {
-        valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
-        valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
+        /*        valeurs_coeff_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
+                valeurs_coeff_grad_(f, n) = 0; // les phases non turbulentes sont non porteuses : pas de contact paroi => des symmetries
+                */
+
+        // Test : faire frotter un peu quand même
+        int f_zone = f + f1; // number of the face in the zone
+        int e = f_e(f_zone,0);
+        valeurs_coeff_(f, n)      = valeurs_coeff_(f, n)      * mu(e,n) / mu(e,0) ;
+        valeurs_coeff_grad_(f, n) = valeurs_coeff_grad_(f, n) ;
       }
     
   valeurs_coeff_.echange_espace_virtuel();
