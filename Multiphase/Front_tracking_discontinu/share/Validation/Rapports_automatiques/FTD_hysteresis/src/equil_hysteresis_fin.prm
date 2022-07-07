@@ -46,7 +46,7 @@ Parameters {
 # 	TestCase Sphere/Equilibre_60/Theta30_120 PAR_equil_hysteresis_fin.data 4
 # 	TestCase Sphere/Equilibre_60/Theta30_120/SEQ equil_hysteresis_fin.data
 # 	TestCase Sphere/Equilibre_60/Theta30_120/Liss_IS01_ISR01_coef-0.1 equil_hysteresis_fin.data
-	DISABLE_PARALLEL_RUN
+	# DISABLE_PARALLEL_RUN #
 }
 
 Chapter {

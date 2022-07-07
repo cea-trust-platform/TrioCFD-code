@@ -5,7 +5,7 @@ Parameters {
         TestCase . PeriodicBoxRANS 2
         TestCase . DomainFlowRANS 6
 	TestCase . DomainFlowLES 6
-	DISABLE_PARALLEL_RUN
+	# DISABLE_PARALLEL_RUN #
 	IncludeData 2
 }
    
