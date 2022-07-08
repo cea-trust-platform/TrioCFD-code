@@ -108,7 +108,7 @@ vector<double> PrePostNN::ReadDataFromLine(string buffer,string tag,size_t npos)
   vector<double> ret;
   double val;
   string sval;
-  int ltag;
+  size_t ltag;
 
   ltag = tag.length();
   sval = buffer.substr(npos+ltag,buffer.length()-ltag);
@@ -125,7 +125,7 @@ double PrePostNN::ReadOneDataFromLine(string buffer,string tag,size_t npos)
 {
   double ret;
   string sval;
-  int ltag;
+  size_t ltag;
 
   ltag = tag.length();
   sval = buffer.substr(npos+ltag,buffer.length()-ltag);
@@ -138,7 +138,7 @@ double PrePostNN::ReadOneDataFromLine(string buffer,string tag,size_t npos)
 enum pp_T PrePostNN::ReadPPTFromLine(string buffer,string tag,size_t npos)
 {
   string tmp;
-  int ltag;
+  size_t ltag;
   enum pp_T ret = INDEFT;
 
   ltag = tag.length();
@@ -154,7 +154,7 @@ enum pp_T PrePostNN::ReadPPTFromLine(string buffer,string tag,size_t npos)
 enum pp_lambda PrePostNN::ReadPPLFromLine(string buffer,string tag,size_t npos)
 {
   string tmp;
-  int ltag;
+  size_t ltag;
   enum pp_lambda ret = INDEFL;
 
   ltag = tag.length();
@@ -173,7 +173,7 @@ vector<int> PrePostNN::ReadIndexFromLine(string buffer,string tag,size_t npos)
   vector<int> ret;
   string sval;
   int val;
-  int ltag;
+  size_t ltag;
 
   ltag = tag.length();
   sval = buffer.substr(npos+ltag,buffer.length()-ltag);

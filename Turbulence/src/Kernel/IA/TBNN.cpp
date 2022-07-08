@@ -30,7 +30,7 @@ void TBNN::process_lambda(vector<double> lambda)
 {
   vector<double> lc;                 // lambda centre
   vector<double> lcr;                // lambda centre reduit
-  unsigned int nbl = lambda.size();  // nombre d'invariants lambda
+  size_t nbl = lambda.size();  // nombre d'invariants lambda
 
   lc.resize(nbl);
   lcr.resize(nbl);
@@ -103,8 +103,8 @@ void TBNN::process_lambda(vector<double> lambda)
 
 void TBNN::process_T(vector<vector<double>> T)
 {
-  unsigned int nbt = T.size();    // nombre de tenseurs T
-  unsigned int nbb = T[0].size(); // taille de chacun des tenseurs T
+  size_t nbt = T.size();    // nombre de tenseurs T
+  size_t nbb = T[0].size(); // taille de chacun des tenseurs T
 
   _pT.resize(nbt);
   for(unsigned i=0;i<nbt;i++)
@@ -144,8 +144,8 @@ void TBNN::process_T(vector<vector<double>> T)
 void TBNN::process_b()
 {
   vector<int> iT = _ppNN->get_iT();
-  unsigned int nbt = iT.size();
-  unsigned int nbb = _pT[0].size();
+  size_t nbt = iT.size();
+  size_t nbb = _pT[0].size();
 
   // calcul de _pb a partir de _g et de _pT
   _pb.resize(nbb);
@@ -165,9 +165,9 @@ void TBNN::applyNN()
 {
   vector<int> il = _ppNN->get_ilambda();
   vector<int> iT = _ppNN->get_iT();
-  Tensor in(il.size());
+  Tensor in((int)il.size());
   Tensor out;
-  unsigned int nbt = iT.size();
+  size_t nbt = iT.size();
 
   _g.resize(nbt);
 

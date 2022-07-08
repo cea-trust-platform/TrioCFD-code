@@ -6958,7 +6958,7 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
             const int n = valeurs.size_array();
             ftab->resize(n,1);
             for (int ii = 0; ii < n; ii++)
-              (*ftab)(ii,0) = valeurs[ii];
+              (*ftab)(ii,0) = (float)valeurs[ii]; // downcast to float
             break;
           }
         case 2:

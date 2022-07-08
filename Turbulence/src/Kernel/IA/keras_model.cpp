@@ -101,17 +101,17 @@ bool KerasLayerActivation::Apply(Tensor* in, Tensor* out) {
         break;
     case kSoftPlus:
         for (size_t i = 0; i < out->data_.size(); i++) {
-            out->data_[i] = std::log(1.0 + std::exp(out->data_[i]));
+            out->data_[i] = (float)std::log(1.0 + std::exp(out->data_[i]));
         }
         break;
     case kHardSigmoid:
         for (size_t i = 0; i < out->data_.size(); i++) {
-            float x = (out->data_[i] * 0.2) + 0.5;
+            float x = (out->data_[i] * 0.2f) + 0.5f;
 
             if (x <= 0) {
-                out->data_[i] = 0.0;
+                out->data_[i] = 0.0f;
             } else if (x >= 1) {
-                out->data_[i] = 1.0;
+                out->data_[i] = 1.0f;
             } else {
                 out->data_[i] = x;
             }
@@ -122,10 +122,10 @@ bool KerasLayerActivation::Apply(Tensor* in, Tensor* out) {
             float& x = out->data_[i];
 
             if (x >= 0) {
-                out->data_[i] = 1.0 / (1.0 + std::exp(-x));
+                out->data_[i] = 1.0f / (1.0f + std::exp(-x));
             } else {
                 float z = std::exp(x);
-                out->data_[i] = z / (1.0 + z);
+                out->data_[i] = z / (1.0f + z);
             }
         }
         break;
@@ -319,7 +319,7 @@ bool KerasLayerElu::Apply(Tensor* in, Tensor* out) {
 
     for (size_t i = 0; i < out->data_.size(); i++) {
         if (out->data_[i] < 0.0) {
-            out->data_[i] = alpha_ * (exp(out->data_[i]) - 1.0);
+            out->data_[i] = alpha_ * ((float)exp(out->data_[i]) - 1.0f);
         }
     }
 
@@ -582,9 +582,9 @@ bool KerasLayerEmbedding::Apply(Tensor* in, Tensor* out) {
 
     std::for_each(in->data_.begin(), in->data_.end(), [=](float i) {
         std::vector<float>::const_iterator first =
-            this->weights_.data_.begin() + (i * output_cols);
+            this->weights_.data_.begin() + (std::lrint(i) * output_cols);
         std::vector<float>::const_iterator last =
-            this->weights_.data_.begin() + (i + 1) * output_cols;
+            this->weights_.data_.begin() + (std::lrint(i) + 1) * output_cols;
 
         out->data_.insert(out->data_.end(), first, last);
     });

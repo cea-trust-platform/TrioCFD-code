@@ -232,7 +232,7 @@ void Flux_parietal_Kommajosyula::qp(int N, int f, double D_h, double D_ch,
               if (qpk)     (*qpk)(n_l)          += S_sl*2*h_fc*(Tp-T[n_l]);
               if (dTf_qpk) (*dTf_qpk)(n_l, n_l) +=-S_sl*2*h_fc + dTl_S_sl*2*h_fc*(Tp-T[n_l]) ;
               if (dTf_qpk) (*dTf_qpk)(n_l, k)   +=               dTk_S_sl*2*h_fc*(Tp-T[n_l]) ;
-              if (dTp_qpk) (*dTp_qpk)(n_l, p)   += S_sl*2*h_fc + dTp_S_sl*2*h_fc*(Tp-T[n_l]) ;
+              if (dTp_qpk) (*dTp_qpk)(n_l, k)   += S_sl*2*h_fc + dTp_S_sl*2*h_fc*(Tp-T[n_l]) ;
 
               // Evaporation (calculer les derivees/T apres)
               if (qpi)         (*qpi)(n_l, k)      = 1./6.*M_PI * rho[k] * sat.Lvap(p) *              std::pow(D_lo,3) *     f_dep *     N_active;

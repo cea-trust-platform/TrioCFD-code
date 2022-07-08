@@ -342,7 +342,7 @@ void Postraitement_ft_lata::ecrire_maillage(Fichier_Lata& file,
     for (int i = 0; i < n; i++)
       {
         for (int j = 0; j < m; j++)
-          data[j] = sommets(i,j);
+          data[j] = (float)sommets(i,j); // downcast to float ...
         sfichier.put(data, m, m+1);
       }
   }
@@ -409,7 +409,7 @@ void Postraitement_ft_lata::ecrire_maillage(Fichier_Lata& file,
                   const int n = itab.dimension(0);
                   ftab.resize(n,1);
                   for (int j = 0; j < n; j++)
-                    ftab(j,0) = itab(j);
+                    ftab(j,0) = (float)itab(j);
                 }
               else
                 {
@@ -418,7 +418,7 @@ void Postraitement_ft_lata::ecrire_maillage(Fichier_Lata& file,
                   ftab.resize(n, m);
                   for (int j = 0; j < n; j++)
                     for (int k = 0; k < m; k++)
-                      ftab(j,k) = itab(j,k);
+                      ftab(j,k) = (float)itab(j,k);
                 }
             }
           else
