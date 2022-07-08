@@ -116,7 +116,6 @@
 ./Multiphase/Front_tracking_IJK/Algo_QC/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky NNR
 ./Multiphase/Front_tracking_IJK/Algo_QC/share/Validation/Rapports_automatiques/test_diffusion_smagorinsky_anisotrope NNR
 ./Multiphase/Front_tracking_IJK/Algo_QC/share/Validation/Rapports_automatiques/turbulent_flux_impose NNR
-./Multiphase/Front_tracking_IJK/Algo_QC/share/laminaire_flux_impose_jdd1 NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/spectral_UO_MED_SEQ NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/vinterp_repere_local NNR
 ./Multiphase/Front_tracking_IJK/share/Validation/Rapports_automatiques/IJK_FT/stat_diph_AI NNR

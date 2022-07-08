@@ -8,27 +8,27 @@ This software is OpenSource (BSD license).
 
 
 
-# **How to install TrioCFD-1.8.4 version ?**
+# **How to install TrioCFD-1.9.0 version ?**
 
-### If TRUST-1.8.4 is not already installed, [please follow TRUST install instructions](https://github.com/cea-trust-platform/trust-code#readme).
+### If TRUST-1.9.0 is not already installed, [please follow TRUST install instructions](https://github.com/cea-trust-platform/trust-code#readme).
 
-### Once TRUST installed, install TrioCFD-1.8.4 using one of these methods:
+### Once TRUST installed, install TrioCFD-1.9.0 using one of these methods:
 
 ### **First method**
 
-    $> git clone https://github.com/cea-trust-platform/TrioCFD-code.git TrioCFD-1.8.4
-    $> cd TrioCFD-1.8.4
-    $> source PathToTRUST-1.8.4/env_TRUST.sh
+    $> git clone https://github.com/cea-trust-platform/TrioCFD-code.git TrioCFD-1.9.0
+    $> cd TrioCFD-1.9.0
+    $> source PathToTRUST-1.9.0/env_TRUST.sh
     $> baltik_build_configure -execute
     $> make optim debug
 
 ### **Second method**
 
-    $> wget ftp://ftp.cea.fr/pub/TRUST/TrioCFD/versions/v1.8.4/TrioCFD-1.8.4.tar.gz
-    $> tar xzf TrioCFD-1.8.4.tar.gz
-    $> mv TrioCFD TrioCFD-1.8.4
-    $> cd TrioCFD-1.8.4
-    $> source PathToTRUST-1.8.4/env_TRUST.sh
+    $> wget ftp://ftp.cea.fr/pub/TRUST/TrioCFD/versions/v1.9.0/TrioCFD-1.9.0.tar.gz
+    $> tar xzf TrioCFD-1.9.0.tar.gz
+    $> mv TrioCFD TrioCFD-1.9.0
+    $> cd TrioCFD-1.9.0
+    $> source PathToTRUST-1.9.0/env_TRUST.sh
     $> baltik_build_configure -execute
     $> make optim debug
 

@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------------------------
-Release notes version 1.8.5_beta : Enhancements, modifications and corrected bugs since version 1.8.4 :
+Release notes version 1.9.0 : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
 04/07/22 (TrioCFD) New feature : Add new Turbulence model "combinaison" in EF discretization with standard wall law and WW hydraulics
 30/06/22 (TrioCFD) New feature : Integration of TrioIJK as a new Baltik of TrioCFD in Multiphase Baltik under the name Front_Tracking_IJK
