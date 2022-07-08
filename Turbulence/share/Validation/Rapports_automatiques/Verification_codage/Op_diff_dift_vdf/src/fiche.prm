@@ -2,7 +2,7 @@ Parameters
 {
   Title "Verification codage operateur diff/dift const/var VDF"
   Description "We consider a problem with arete_mixte. We test the const/var diff/dift vdf operators. The WALE constant is set to zero with no wall law so that the comparison makes sense ! We expect the four caculations to give exactly the same results !"
-  VersionTrio_U "1.8.5"
+  VersionTrio_U "1.9.0"
   Author "Yannick Gorsse, Elie Saikali"
   TestCase CONST_LAM CAS.data
   TestCase VAR_LAM CAS.data

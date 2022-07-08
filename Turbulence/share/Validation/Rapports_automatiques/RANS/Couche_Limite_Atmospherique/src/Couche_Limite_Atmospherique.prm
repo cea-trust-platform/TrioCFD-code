@@ -100,7 +100,7 @@ Chapter {
 			file ./Sol_lisse/Sol_lisse_VITESSE_SORTIE.son
 			origin "Trio_U"
 			Version 1.6.2
-			columns 1 500
+			columns 1 59
 			Style lines
 			linewidth 2
 		}
@@ -109,7 +109,7 @@ Chapter {
 			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_VITESSE_SORTIE.son
 			origin "Trio_U"
 			Version 1.6.2
-			columns 1 500
+			columns 1 59
 			Style lines
 			linewidth 2
 		}
@@ -118,7 +118,7 @@ Chapter {
 			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_VITESSE_SORTIE.son
 			origin "Trio_U"
 			Version 1.6.2
-			columns 1 500
+			columns 1 59
 			linewidth 2
 		}
 	}
@@ -135,7 +135,7 @@ Chapter {
 			file ./Sol_lisse/Sol_lisse_K_SORTIE.son
 			origin "Trio_U"
 			Version 1.6.2
-			columns 1 500
+			columns 1 59
 			Style lines
 			linewidth 2
 		}
@@ -144,7 +144,7 @@ Chapter {
 			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_K_SORTIE.son
 			origin "Trio_U"
 			Version 1.6.2
-			columns 1 500
+			columns 1 59
 			Style lines
 			linewidth 2
 		}
@@ -153,7 +153,7 @@ Chapter {
 			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_K_SORTIE.son
 			origin "Trio_U"
 			Version 1.6.2
-			columns 1 500
+			columns 1 59
 			linewidth 2
 		}
 	}
