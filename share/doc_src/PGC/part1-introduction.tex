@@ -285,11 +285,17 @@ Pour TrioCFD, les \'evolutions majeures sont explicit\'ees sur la frise chronolo
 	\draw (7.8,02.36) -- (8.2,02.36) ;
 	\draw (7.8,02.36) node[left]{$2022$} ;
 	\draw (7.8,01.94) -- (8.0,01.94) ;
+	\draw (9.8,01.86) node[right]{\textbf{Baltik} Optimisation/Aposteriori};
 	\draw (7.8,01.52) -- (8.0,01.52) ;
+	\draw[blue,thick,dashed] (8.0,01.52) -- (8.7,01.52) ;
+	\draw[green,thick,dashed] (6.3,01.52) -- (8.0,01.52) ;	
+	\draw (6.2,01.52) node[left]{R\'eorganisation des fiches de validation} ;	
+	\draw (8.8,01.52) node[right]{\textcolor{blue}{v1.9.0} \textbf{Baltik} Multiphase/CMFD};
 	\draw (7.8,01.10) -- (8.0,01.10) ;
-%	\draw (7.8,00.68) -- (8.2,00.68) ;
-%	\draw (7.8,02.68) node[left]{$2023$} ;
-%	\draw (7.8,02.26) -- (8.0,02.26) ;
+	\draw (9.8,01.18) node[right]{\textbf{Baltik} Multiphase/Front\_tracking\_IJK};
+	\draw (7.8,00.68) -- (8.2,00.68) ;
+	\draw (7.8,00.42) node[left]{$2023$} ;
+	\draw (7.8,00.42) -- (8.0,00.42) ;
 %	\draw (7.8,01.84) -- (8.0,01.84) ;
 %	\draw (7.8,01.42) -- (8.0,01.42) ;
 %	\draw (7.8,01.00) -- (8.2,01.00) ;
@@ -392,6 +398,8 @@ TrioCFD est lui-même composé de plusieurs Baltiks et sous-Baltiks ayant tous u
  & pour les interactions fluide-structure & \tabularnewline\hline
 \textbf{Critere\_Entrainement\_Gaz} &  & Turbulence \tabularnewline\hline
 \textbf{Multiphase} & & \tabularnewline
+$\hookrightarrow$ CMFD & Computational Multiphase Fluid Dynamics  & SO \tabularnewline
+$\hookrightarrow$ Front\_tracking\_IJK & Int\'egration de TrioIJK dans TrioCFD  & Turbulence \& FTD \tabularnewline
 $\hookrightarrow$ Front\_tracking\_discontinu & Suivi d'interface avec la méthode de Front-Tracking & Turbulence \tabularnewline
 $\hookrightarrow$ Phase\_field & Écoulements diphasiques incompressibles de & SO \tabularnewline
 & fluides non miscibles & \tabularnewline\hline
@@ -429,7 +437,7 @@ Ces différents Baltiks permettent de couvrir les domaines de modélisation phys
   \begin{itemize}
     \item Front-Tracking
     \item Interface diffuse incompressible
-    \item Modèle Homogène Équilibré (HEM) dont une $1^{\`ere}$ version sera intégrée fin 2021
+    \item Modèle Homogène Équilibré (HEM) pr\'esent dans le Baltik CMFD
   \end{itemize}
   \item Interactions fluide/structure par la méthode ALE
   \item Chimie
