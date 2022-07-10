@@ -1,0 +1,178 @@
+
+@InProceedings{Gerschenfeld_PolyMAC2022,
+  author     = {Antoine Gerschenfeld and Yannick Gorsse},
+  booktitle  = {NURETH 2022},
+  title      = {Development of a Robust multiphase low solver on General Meshes; application to sodium boiling at the subchannel scale},
+  year       = {2022},
+  abstract   = {Euler-Euler simulations of two-phase flows, such as the 6-equations model adopted in many system thermal-hydraulics (STH) codes, becomes more challenging as the gas-liquid density ratio ρl/ρg increases. On structured meshes, the association of a staggered ”MAC” numerical scheme with a semiimplicit ”ICE” solution algorithm has proven particularly robust, and is currently used in the 3D modules of the TRACE, CATHARE or RELAP codes. 
+
+However, structured meshes are too restrictive to cover a number of potential applications : apart from the CFD scale, unstructured, polyhedral meshes are also encountered at the component scale when modelling SFR subassemblies. This later case is the focus of the TrioMC code developed at CEA. In 2019, this code was reimplemented using a new numerical scheme (”PolyMAC”) designed to generalise to arbitrary meshes the main properties of the MAC staggered numerical scheme. In 2020-2021, this scheme, originally designed to solve the single-phase Navier-Stokes and energy equations, was extended to multiphase flows: physical models dedicated to sodium boiling were then implemented in TrioMC, and preliminary validation was carried out against a benchmark sodium boiling test (the KNS-37 L22 test provided by the ESFR-SMART H2020 project).},
+  file       = {:C\:/Users/cr268029/Desktop/Bibliographie/Articles_Jabref/Gerschen conf pb_multiphase.pdf:PDF},
+  groups     = {Note CMFD modeles turbulence},
+  keywords   = {numerical scheme, subchannel, multiphase, SFR, sodium boiling},
+  readstatus = {skimmed},
+}
+
+@TechReport{Gerschenfeld_PolyMAC2018,
+  author      = {Antoine Gerschenfeld},
+  institution = {DEN/DANS/DM2S/STMF/LMEC},
+  title       = {Schéma numérique PolyMAC. Application à l’OCS TrioMC. Unification des échelles sous-canal et CFD},
+  year        = {2018},
+  file        = {:C\:/Users/cr268029/Desktop/Bibliographie/Articles_Jabref/LMEC NT 2018-64061 A_PolyMAC.pdf:PDF},
+  groups      = {Note CEA, Non public, Note CMFD modeles turbulence},
+  readstatus  = {skimmed},
+}
+
+@Book{Wilcox2006,
+  author    = {David C. Wilcox},
+  publisher = {DCW Industries},
+  title     = {Turbulence Modeling for CFD},
+  year      = {2006},
+  file      = {:Articles_Jabref/Wilcox_Turbulence-modeling-for-CFD livre.pdf:PDF},
+  groups    = {Note CMFD modeles turbulence},
+}
+
+@InProceedings{Menter2003,
+  author    = {F. R. Menter and M. Kuntz and R. Langtry},
+  booktitle = {Turbulence, Heat and Mass Transfer 4},
+  title     = {Ten Years of Industrial Experience with the SST Turbulence Model},
+  year      = {2003},
+  file      = {:Articles_Jabref/Turbulence monophasique/Menter SST turbulence model.pdf:PDF},
+  groups    = {Note CMFD modeles turbulence},
+}
+
+@TechReport{Ktau2000,
+  author      = {J.C. Kok and S.P. Spekreijse},
+  institution = {National Aerospace Laboratory NLR},
+  title       = {Efficient and accurate implementation of the k-omega turbulence model in the NLR multi-block Navier-Stokes system},
+  year        = {2000},
+  number      = {NLR-TP-2000-144},
+  file        = {:Articles_Jabref/Turbulence monophasique/k-tau premier papier 2000.pdf:PDF},
+  groups      = {Note CMFD modeles turbulence},
+}
+
+@TechReport{NEK50002020,
+  author      = {Dillon Shaver and Aleks Obabko and Ananias Tomboulides and Victor Coppo-Leite and Yu-Hsiang Lan and MiSun Min and Paul Fischer and Christopher Boyd},
+  institution = {Argonne National Laboratory},
+  title       = {Nek5000 Developments in Support of Industry and the NRC},
+  year        = {2020},
+  number      = {ANL/NSE-20/48},
+  file        = {:Articles_Jabref/CFD framework/NEK5000 2020.pdf:PDF},
+  groups      = {Note CMFD modeles turbulence},
+}
+
+@InProceedings{Menter1993,
+  author       = {Florian R. Menter},
+  booktitle    = {American Institute of Aeronautics and Astronautics 24th Fluid Dynamics Conference},
+  title        = {Zonal Two Equation k-cl, Turbulence Models for Aerodynamic Flows},
+  year         = {1993},
+  note         = {AlAA 93-2906},
+  organization = {American Institute of Aeronautics and Astronautics},
+  groups       = {Note CMFD modeles turbulence},
+  institution  = {NASA-Ames Research Center},
+}
+
+@InProceedings{Fun3D2015,
+  author    = {Jan-Renee Carlson and Veer N. Vatsay and Jeery Whitey},
+  booktitle = {22nd AIAA Computational Fluid Dynamics Conference},
+  title     = {Node-Centered Wall Function Models for the Unstructured Flow Code Fun3D},
+  year      = {2015},
+  pages     = {2758},
+  file      = {:Articles_Jabref/Wall laws/Fun3D_wall_law_algorithm 2015.pdf:PDF},
+  groups    = {Note CMFD modeles turbulence},
+}
+
+@InProceedings{Mierka2007,
+  author    = {O. Kuzman and S. Mierka, and S. Turek},
+  booktitle = {International Journal of Computing Science and Mathematics archive},
+  title     = {On the implementation of the k-epsilon turbulence model inincompressible flow solvers based on a finite element discretisation},
+  year      = {2007},
+  pages     = {193-206},
+  volume    = {1},
+  file      = {:Articles_Jabref/Wall laws/mierka2004_conditions_faibles.pdf:PDF},
+  groups    = {Note CMFD modeles turbulence},
+}
+
+@Article{Kalitzin2005,
+  author    = {Georgi Kalitzin and Gorazd Medic and Gianluca Iaccarino and Paul Durbin},
+  journal   = {Journal of Computational Physics},
+  title     = {Near-wall behavior of {RANS} turbulence models and implications for wall functions},
+  year      = {2005},
+  month     = {mar},
+  number    = {1},
+  pages     = {265--291},
+  volume    = {204},
+  doi       = {10.1016/j.jcp.2004.10.018},
+  file      = {:C\:/Users/cr268029/Desktop/Bibliographie/Articles_Jabref/Wall laws/Kalitzin_2004_wall_turbulence k omega.pdf:PDF},
+  groups    = {Note CMFD modeles turbulence},
+  publisher = {Elsevier {BV}},
+}
+
+@Article{Knopp2007,
+  author  = {Tobias Knopp and Thomas Alrutz and Dieter Schwamborn},
+  journal = {Journal of Computational Physics},
+  title   = {A grid and flow adaptive wall-function method for RANS turbulence modelling},
+  year    = {2006},
+  pages   = {19-40},
+  volume  = {220},
+  groups  = {Note CMFD modeles turbulence},
+}
+
+@Article{Reichardt1951,
+  author  = {H. Reichardt},
+  journal = {Z. angew. Math. Mech.},
+  title   = {Vollständige Darstellung der turbulenten Geschwindigkeitsverteilung in glatten Leitungen},
+  year    = {1951},
+  number  = {7},
+  pages   = {208-219},
+  volume  = {31},
+  file    = {:Articles_Jabref/Wall laws/Reichardt 1951 blending.pdf:PDF},
+  groups  = {Note CMFD modeles turbulence},
+}
+
+@Article{Kader1981,
+  author  = {B.A. Kader},
+  journal = {Int. J. Heat Mass Transfer},
+  title   = {Temperature and concentration profiles in fully turbulent boundary layers},
+  year    = {1981},
+  number  = {9},
+  pages   = {1541-1544},
+  volume  = {24},
+  file    = {:Articles_Jabref/Wall laws/Kader1981_temperature_profiles.pdf:PDF},
+  groups  = {Note CMFD modeles turbulence},
+}
+
+@Article{Mitrovic2004,
+  author  = {Bojan M. Mitrovic and Phuong M. Le and Dimitrios V. Papavassilioua},
+  journal = {Chemical Engineering Science},
+  title   = {On the Prandtl or Schmidt number dependence of the turbulent heat or mass transfer coefficient},
+  year    = {2004},
+  pages   = {543-555},
+  volume  = {59},
+  groups  = {Note CMFD modeles turbulence},
+}
+
+@TechReport{Kok1999,
+  author      = {J.C. Kok},
+  institution = {National Aerospace Laboratory NLR},
+  title       = {Resolving the dependence on free-stream values for the k-omega turbulence model},
+  year        = {1999},
+  number      = {NLR-TP-99295},
+  file        = {:Articles_Jabref/Turbulence monophasique/Kok new values k-omega coefficients used in k-tau.pdf:PDF},
+  groups      = {Note CMFD modeles turbulence},
+}
+
+@Article{Wilcox1988,
+  author    = {David C. Wilcox},
+  journal   = {{AIAA} Journal},
+  title     = {Reassessment of the scale-determining equation for advanced turbulence models},
+  year      = {1988},
+  month     = {nov},
+  number    = {11},
+  pages     = {1299--1310},
+  volume    = {26},
+  doi       = {10.2514/3.10041},
+  file      = {:C\:/Users/cr268029/Desktop/Bibliographie/Articles_Jabref/Turbulence monophasique/wilcox1988.pdf:PDF},
+  groups    = {Note CMFD modeles turbulence},
+  publisher = {American Institute of Aeronautics and Astronautics ({AIAA})},
+}

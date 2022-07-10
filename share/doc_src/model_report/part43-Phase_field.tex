@@ -1,0 +1,521 @@
+\newpage
+\rhead{\'ECOULEMENTS DIPHASIQUES}
+\chapter{\label{sec:PF}Mod\`ele \`a interface diffuse incompr\'essible}
+\lhead{Phase Field}
+
+\section{Pr\'esentation du mod\`ele}
+Le mod\`ele \textit{Phase Field} est un mod\`ele \`a interface diffuse d\'edi\'e
+\`a la \texttt{simulation num\'erique directe d'\'ecoulements diphasiques
+incompressibles de fluides non miscibles}. Dans les mod\`eles \`a interface
+diffuse, les interfaces s\'eparant les phases du syst\`eme ne sont pas
+mod\'elis\'ees comme des surfaces de discontinuit\'e mais comme des
+\texttt{zones volumiques de transition} \`a travers lesquelles toutes les
+grandeurs physiques varient de mani\`ere continue. Ces mod\`eles sont bas\'es
+sur l'introduction d'un \texttt{param\`etre d'ordre} caract\'eristique des
+phases. Dans le mod\`ele pr\'esent\'e ici,  ce param\`etre d'ordre est
+repr\'esentatif du \texttt{taux de pr\'esence volumique} de l'une des phases,
+que l'on note $\varphi$. Afin de prendre en compte les \texttt{ph\'enom\`enes
+capillaires}, importants en simulation num\'erique directe, l'\'energie du
+syst\`eme est suppos\'ee d\'ependre de $\varphi$ mais \'egalement de $\nabla
+\varphi$ sous la forme suivante :
+\begin{equation}
+E = W\left(\varphi\right)+\frac{\alpha}{2}\left(\nabla \varphi\right)^2
+\end{equation}
+o\`u $\alpha$ est appel\'ee \texttt{coefficient de capillarit\'e interne}. La
+fonction $W\left(\varphi\right)$ est une fonction double-puit dont la forme la plus
+simple est :
+\begin{equation}
+W\left(\varphi\right)=\beta\varphi^2\left(1-\varphi\right)^2
+\end{equation}
+o\`u $\beta$ est une constante caract\'eristique du mod\`ele.\newline
+Les coefficients $\alpha$ et $\beta$ sont caract\'eristiques de la tension
+interfaciale $\sigma$ et de l'\'epaisseur $h$ des interfaces. En effet, on a les
+relations suivantes :
+\begin{equation}
+\sigma=\frac{\sqrt{2\alpha\beta}}{6}
+\end{equation}
+\begin{equation}
+h=4\sqrt{\frac{\alpha}{2\beta}}
+\end{equation}
+La tension interfaciale $\sigma$ est une caract\`eristique des fluides en
+pr\'esence et l'\'epaisseur $h$ est en g\'en\'eral choisie \'egale \`a environ 4 ou
+5 fois la taille des mailles.\medskip\newline
+Par application de second principe de la thermodynamique, on peut montrer que les
+\'equations du mouvement sont les suivantes :
+\begin{equation}
+\frac{d\varphi}{dt}=\nabla\cdot\left[\kappa\left(\varphi\right)\nabla\left(\tilde{\mu}+\frac{d\rho}{d\varphi}
+\frac{u^2}{2}\right)\right]\label{eq:Cahn-Hilliard}
+\end{equation}
+\begin{equation}
+\rho\left(\varphi\right)\frac{du}{dt}=-\nabla P + \tilde{\mu}\nabla\varphi+\rho\left(\varphi\right)g+\nabla\cdot\tau\label{eq:bilanQDM}
+\end{equation}
+\begin{equation}
+\nabla\cdot u=0\label{eq:GradU}
+\end{equation}
+o\`u
+\begin{equation}
+\tilde{\mu}=\frac{dW}{d\varphi}-\nabla\cdot\left(\alpha\nabla\varphi\right)
+\end{equation}
+est le potentiel chimique g\'en\'eralis\'e et 
+\begin{equation}
+\rho\left(\varphi\right)=\rho_{1}+\varphi\left(\rho_{2}-\rho_{1}\right)
+\end{equation}
+est la masse volumique, $\rho_{1}$ et $\rho_{2}$ repr\'esentant la masse volumique des phase correspondant \`a $\varphi=0$ et $\varphi=1$
+respectivement.\newline
+Dans le syst\`eme pr\'ec\'edent, $d/dt$ repr\'esente la d\'eriv\'e convective, $P$ est la pression et $\tau$ le tenseur des contraintes
+visqueuses.\newline
+L'\'equation d'\'evolution de $\varphi$ (\'equation \ref{eq:Cahn-Hilliard}) est appel\'ee \texttt{\'equation de Cahn-Hilliard}. Le coefficient
+$\kappa$ apparaissant dans cette \'equation est appel\'e \texttt{mobilit\'e} et peut d\'ependre de $\varphi$ de mani\`ere quadratique :
+\begin{equation}
+\kappa\left(\varphi\right)=a\kappa_{0}\varphi\left(1-\varphi\right)\label{eq:kappa}
+\end{equation}
+o\`u $a$ et $\kappa_{0}$ sont des constantes.\newline
+A noter que le terme $\tilde{\mu}\nabla\varphi$ apparaissant dans l'\'equation de bilan de quantit\'e de mouvement (\'equation \ref{eq:bilanQDM})
+repr\'esente les \texttt{forces capillaires}.
+
+\subsection{Changement de variable}
+Pour des raisons de simplicit\'e de programmation, l'\'equation de Cahn-Hilliard est consid\'er\'ee comme une \'equation de convection-diffusion
+de concentration. Le second memebre de l'\'equation de Cahn-Hilliard (\'equation \ref{eq:Cahn-Hilliard}) est consid\'er\'e comme un terme source,
+de m\^eme que le terme en $\tilde{\mu}\nabla\varphi$ de l'\'equation de bilan de quantit\'e de mouvement (\'equation \ref{eq:bilanQDM}).\newline
+Pour des raisons de sym\'etrie, la "concentration", \textit{i.e.} l'inconnue de l'\'equation de Cahn-Hilliard, est d\'efinie par :
+\begin{equation}
+c=\varphi-\frac{1}{2}
+\end{equation}
+$c$ varie alors de $-1/2$ \`a $+1/2$ \`a la travers\'ee d'une interface. Les relations de fermeture $W\left(\varphi\right)$,
+$\rho\left(\varphi\right)$ et $\kappa\left(\varphi\right)$ doivent donc \^etre modifi\'ees en cons\'equence :
+\begin{equation}
+W\left(\varphi\right)=\beta\left(c-\frac{1}{2}\right)^2\left(c+\frac{1}{2}\right)^2
+\end{equation}
+\begin{equation}
+\rho\left(\varphi\right)=\frac{\rho_{1}+\rho_{2}}{2}+c\left(\rho_{2}-\rho_{1}\right)\label{eq:rhoc}
+\end{equation}
+\begin{equation}
+\kappa\left(\varphi\right)=a\kappa_{0}\left(\frac{1}{2}+c\right)\left(\frac{1}{2}-c\right)
+\end{equation}
+
+\subsection{Approximation de Boussinesq}
+Le mod\`ele g\'en\'eral peut \^etre d\'egrad\'e en utilisant l'\texttt{approximation de Boussinesq} dans laquelle la masse volumique est
+suppos\'ee constante mis \`a part dans le terme de gravit\'e o\`u elle est lin\'earis\'ee. Cette approximation est celle classiquement utilis\'ee
+dans \texttt{TrioCFD} et les variables servant\`a la r\'esolution num\'erique du syst\`eme d'\{equations ainsi obtenu sont celles classiquement
+utilis\'ees dans \texttt{TrioCFD}. En particulier, la "pression" utilis\'ee pour la r\'esolution coupl\'ee des \'equations de bilan de quantit\'e
+de mouvement et de divergence nulle de la vitesse est en fait $(P/\rho_{m}-gz)$, o\`u $\rho_{m}=(\rho_{1} + \rho_{2}/2$ est la masse volumique
+moyenne et $z$ la coordonn\'ee verticale (suivant la direction de la gravit\'e). Etant donn\'ee la forme \ref{eq:rhoc} de la fonction $\rho(c)$,
+le terme source li\'e \`a la gravit\'e, a l'expression suivante :
+\begin{equation}
+\frac{\rho_{2}-\rho_{1}}{\rho_{m}} c g
+\end{equation}
+Cette forme permet de d\'efinir la valeur du param\`etre \texttt{beta\_co} (\textit{i.e.} $(\rho_{2}-\rho_{1})/\rho_{m}$).
+
+\subsection{Formes du bilan de quantit\'e de mouvement}
+Diff\'erentes formes du bilan de quantit\'e de mouvement sont possibles et quatre sont acctuellement disponibles. Si ces formes sont
+\'equivalentes au niveau continu, elles peuvent potentiellement donner des r\'esultats diff\'erents du fait de la discr\'etisation spatiale et de
+la r\'esolution num\'erique. Ces formes modifient la d\'efinition de la "pression" utilis\'ee pour la r\'esolution de l'\'equation de Poisson
+lors de la r\'esolution du bilan de quantit\'e de mouvement (cf paragraphe \ref{subsec:EQ_bilan_QDM}). Les formes disponibles sont les suivantes :
+\medskip\newline
+\textbf{Forme 1}\newline
+\begin{equation}
+-\nabla P + \tilde{\mu}\nabla c = -\nabla\left(P - \tilde{\mu}c\right) - c\nabla\tilde{\mu}\label{eq:bilanQDM2}
+\end{equation}
+\textbf{Forme 2}\newline
+\begin{equation}
+-\nabla P + \tilde{\mu}\nabla c = -\nabla\left(P+W+c\nabla\cdot\left(\alpha\nabla c\right)\right)+c\nabla\left[\nabla\cdot\left(\alpha\nabla
+c\right)\right]
+\end{equation}
+\textbf{Forme 3}\newline
+\begin{equation}
+-\nabla P + \tilde{\mu}\nabla c = -\nabla\left(P+W-\alpha\frac{\left(\nabla c\right)^2}{2}+c\nabla\cdot\left(\alpha\nabla
+c\right)\right)+c\nabla\left[\nabla\cdot\left(\alpha\nabla c\right)\right]-\nabla\left(\alpha\frac{\left(\nabla c\right)^2}{2}\right)
+\end{equation}
+\textbf{Forme 4}\newline
+\begin{equation}
+-\nabla P + \tilde{\mu}\nabla c = -\nabla\left(P+W\right)-\nabla\cdot\left(\alpha\nabla c\right)\nabla c
+\end{equation}
+La premi\`ere forme (\'equation \ref{eq:bilanQDM2}) est en g\'en\'eral pr\'ef\'er\'ee aux autres, plus historiques. Cette forme pr\'esente en
+effet l'avantage num\'erique d'avoir un terme source nul \`a l'\'equilibre, ce dernier \'etant en partticulier caract\'eris\'e par la condition
+$\tilde{\mu}=cste$. En revanche, la "pression" $(P-\tilde{\mu}c$ est constante \`a la travers\'ee d'une interface courbe \`a l'\'equilibre, ce
+qui ne correspond pas \`a la pression habituelle des physiciens ; la pression habituelle du physicien est en fait, $P$.
+\bigskip
+\section{R\'esolution num\'erique}
+Le syst\`eme d'\'equations \ref{eq:Cahn-Hilliard} \`a \ref{eq:kappa} est r\'esolu num\'eriquement en deux \'etapes principales :\smallskip\newline
+1. r\'esolution de l'\'equation de \texttt{Cahn-Hilliard} (\'equation \ref{eq:Cahn-Hilliard}), ce qui permet de d\'eterminer $varphi^{n+1}$ et $\tilde{\mu}^{n+1}$;\smallskip\newline
+2. r\'esolution de l'\'equation de bilan de quantit\'e de mouvement (\'equation \ref{eq:bilanQDM}) coupl\'ee \`a la contrainte (\ref{eq:GradU}) par une m\'ethode de
+projection qui permet de d\'eterminer $u^{n+1}$ et $P^{n+1}$.\medskip\newline
+La r\'esolution de l'\'equation de Cahn-Hilliard peut se faire soit de mani\`ere explicite, soit de mani\`ere implicite. La r\'esolution implicite est effectu\'ee
+soit par une m\'ethode du point fixe soit par une m\'ethode de Newton-Krylov et permet essentiellement d'augmenter le pas de temps de stabilit\'e (parfois de
+mani\`ere significative).\newline
+Les sch\'emas de discr\'etisation en temps des \'equations de Cahn-Hilliard et de bilan de quantit\'e de mouvement peuvent \^etre diff\'erents.
+
+\subsection{Equation de Cahn-Hilliard}
+L'avanc\'ee en temps du champ de $c$ s'effectue en deux grandes sous-\'etapes :\smallskip\newline
+1. d\'etermination de $c^{n+1/2}$ en tenant compte uniquement du membre de droite de l'\'equation de Cahn-Hilliard ; cette \'etape peut \^etre r\'esolue soit de
+mani\`ere explicite, soit de mani\`ere implicite.\smallskip\newline
+2. d\'etermination de $c^{n+1}$ en prenant en compte le terme de convection ; c'est pour cette seconde \'etape que l'on peut choisir le sch\'ema en temps (Euler,
+Runge-Kutta, \textit{etc.} ).\smallskip\newline
+La r\'esolution explicite de la premi\`ere sous-\'etape permet de r\'esoudre l'\'equation suivante :\newline
+\begin{equation}
+\frac{c^{n+1/2}-c^n}{\Delta t}=\nabla\cdot\left[\kappa\left(c^n\right)\nabla\left(\tilde{\mu}^n+\frac{d\rho}{d\varphi}\frac{\left(u^n\right)^2}{2}\right)\right]
+\end{equation}
+La r\'esolution implicite m\'erite plus d'explications car elle est bas\'ee sur l'utilisation d'une approximation semi-implicite de $\tilde{\mu}$. Pour tout champ
+$\phi$, on note :
+\begin{equation}
+\phi^{n+1/4}=\theta\phi^{n+1/2}+\left(1-\theta\right)\phi^{n}, avec \theta \in \left[0;1\right]
+\end{equation}
+Pour des raisons de stabilit\'e et de pr\'ecision, la valeur de $\theta$ est impos\'ee \`a 0.6.
+\begin{equation}
+\frac{c^{n+1/2}-c^n}{\Delta
+t}=\nabla\cdot\left[\kappa\left(c^n\right)\nabla\left(\tilde{\mu}^{n+1/4}+\frac{d\rho}{d\varphi}\frac{\left(u^n\right)^2}{2}\right)\right]\label{eq:Cahn1}
+\end{equation}
+avec
+\begin{equation}
+\tilde{\mu}^{n+1/4}=W\left(c^{1/4}\right)+\nabla\cdot\left(\alpha\nabla c^{n+1/4}\right)\label{eq:Cahn2}
+\end{equation}
+Le syst\`eme d'\'equations \ref{eq:Cahn1} - \ref{eq:Cahn2} est non lin\'eaire (du fait de la non lin\'earit\'e de $W(c)$) et est r\'esolu de
+mani\`ere it\'erative soit par une m\'ethode du point fixe, soit par une m\'ethode de Nawton-Krylov (\'egalement appel\'ee m\'ethode GMRES non
+lin\'eaire). A noter que, pour des raisons de simplification du syst\`eme non lin\'eaire, la mobilit\'e est toujours d\'etermin\'ee au pas de
+temps $n$ et non pas au pas de temps $(n+1)$.
+
+\subsection{Equation de bilan de quantit\'e de mouvement}\label{subsec:EQ_bilan_QDM}
+\medskip
+L'\'equation de bilan de quantit\'e de mouvement, coupl\'ee \`a la contrainte de divergence nulle de la vitesse, est r\'esolue par une m\'ethode
+de projection dont on rappelle ici les grandes \'etapes. Pour simplifier ici, on consid\`ere uniquement un sch\`ema d'Euler explicite et l'on met
+l'\'equation de bilan de quantit\'e de mouvement sous la forme suivante :
+\begin{equation}
+\rho\frac{\partial u}{\partial t}=-\nabla P + F
+\end{equation}
+o\`u le vecteur $F$ repr\'esente toutes les forces autres que celle de pression.\newline
+Cette \'equation est discr\'etis\'ee de la mani\`ere suivante :
+\begin{equation}
+\rho^n \frac{u^{n+1}-u^n}{\Delta t}=-\nabla P^{n+1}+F
+\end{equation}
+o\`u le pas de temps auquel est \'evalu\'e $F$ n'est pas pr\'ecis\'e car cela peut d\'ependre des probl\`emes trait\'es. Cependant, les
+d\'ependances en $u$ de $F$ doivent \^etre explicites.\newline
+Apr\`es division par $\rho^n$n application de l'op\'erateur de divergence et prise en compte de la condition \ref{eq:GradU}, on obtient l'\'equation de Poisson
+sur la pression suivante :
+\begin{equation}
+\nabla\cdot\left(\frac{1}{\rho^n}\nabla P^{n+1}\right)=\nabla\cdot\left(\frac{F}{\rho^n}\right)
+\end{equation}
+La matrice en pression associ\'ee \`a la discr\'etisation de cette \'equation d\'epend du champ $\rho^n$ et doit par cons\'equent \^etre
+assembl\'ee \`a chaque pas de temps. C'est la raison pour laquelle les m\'ethodes li\'ees aux assembleurs ont dues \^etre modifi\'ees.
+\bigskip
+
+
+\section{Modification of the \texttt{Phase\_field} baltik: generalization of the closure laws for the Navier-Stokes/Cahn-Hilliard binary model}
+\medskip
+Since version v1.8.3, the baltik Phase Field has had changes
+in order  to generalize the thermodynamic landscape, the density law and
+so on of this binary Cahn-Hilliard model coupled with the Navier-Stokes
+equations (isothermal).
+\medskip
+\subsection{Chemical potential function $\frac{dW}{dc}$} 
+
+The chemical potential function $\frac{dW}{dc}$ is associated with the homogeneous contribution $W$ (so-called ``thermodynamic landscape'') function of $c=\varphi - \frac{1}{2}$ to the energy density $E$.
+ 
+\begin{description}
+ \item[TrioCFD v1.8.2:] the potential has the following prescribed form 
+ \begin{equation}
+  \frac{dW}{dc} = \beta \left( 4 c \left(c-\frac{1}{2}\right) \left(c+\frac{1}{2}\right)\right)
+ \end{equation} 
+
+ \item[Modification since 1.8.3:] the potential is written as:
+ \begin{equation}
+ \frac{dW}{dc} = \beta \times \left\{\begin{disarray}{lrcl} 
+                                 4 c \left(c-\frac{1}{2}\right) \left(c+\frac{1}{2}\right) & \text{if } \texttt{Op}_W & = & \texttt{defaut} \\
+                                 \texttt{f}_W & \text{if } \texttt{Op}_W & = & \texttt{fonction}~\texttt{f}_W \\
+                             \end{disarray}\right.
+ \end{equation}
+where \texttt{f}$_W$ is a univariate function (as read by the \texttt{lire\_f} of the \texttt{Table} class of TRUST) whose variable $c$ should be referred as \texttt{var} e.g. \texttt{(4.*val*(val+0.5)*(val-0.5))}.
+\medskip
+ \item[Syntax evolution:]
+~\newline
+\end{description}
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      beta $\beta$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile} &
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      beta $\beta$
+      potentiel_chimique { Op$_W$ }
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}
+
+\subsection{Kinetic parameter (so-called ``mobility'') $\kappa$} 
+The kinetic parameter (so-called ``mobility'') $\kappa$ that is either a constant or a function of $c$ in the Cahn-Hilliard equation.
+
+
+\begin{description}
+ \item[TrioCFD v1.8.2:] the mobility is written as:
+ \begin{equation}
+  \kappa = \kappa_0 \times \left\{\begin{disarray}{lrcl} 
+                                 1 & \text{if } \texttt{Op}_K & = & \texttt{non} \\
+                                 a \left(\frac{1}{2}+c\right) \left(\frac{1}{2}-c\right) & \text{if } \texttt{Op}_K & = & \texttt{oui} 
+                             \end{disarray}\right.
+ \end{equation}
+
+ \item[Modification since v1.8.3:] the mobility is written as:
+ \begin{equation}
+ \kappa = \kappa_0 \times \left\{\begin{disarray}{lrcl} 
+                                 1 & \text{if } \texttt{Op}_K & = & \texttt{non} \\
+                                 a \left(\frac{1}{2}+c\right) \left(\frac{1}{2}-c\right) & \text{if } \texttt{Op}_K & = & \texttt{defaut} \\
+                                 a \texttt{f}_K & \text{if } \texttt{Op}_K & = & \texttt{fonction}~\texttt{f}_K
+                             \end{disarray}\right.
+ \end{equation}
+where \texttt{f}$_K$ is a univariate function (as read by the \texttt{lire\_f} of the \texttt{Table} class of TRUST) whose variable $c$ should be referred as \texttt{var}.
+\medskip
+ \item[Syntax evolution:]
+~\newline
+\end{description}
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      kappa $\kappa_0$
+      kappa_variable Op$_K$
+      multiplicateur_de_kappa $a$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile}&
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  sources { 
+    Source_Con_Phase_field {
+      ...
+      kappa $\kappa_0$
+      kappa_variable { Op$_K$ }
+      multiplicateur_de_kappa $a$
+      ...
+    }
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}
+
+\subsection{Mass density $\rho$} 
+The mass density $\rho$ is described as a function of $c$.
+
+\begin{description}
+ \item[TrioCFD v1.8.2:] the mass density has the following prescribed form:
+ \begin{equation}
+  \displaystyle \rho = \frac{\rho_1+\rho_2}{2}+c\frac{\rho_2-\rho_1}{2}
+ \end{equation}
+
+ \item[Modification since v1.8.3:] different mass density formulation are available depending if the Boussinesq approximation (input parameter \texttt{Op$_{\text{Boussinesq}}$}) is made (\texttt{Op$_{\text{Boussinesq}}$ = oui}) or not (\texttt{Op$_{\text{Boussinesq}}$ = non})
+ 
+ \begin{itemize}
+ 
+ \item if \texttt{Op$_{\text{Boussinesq}}$ = oui}, it can be written in terms of the fluid properties as:
+  \begin{equation}
+   \rho = \rho_0 \left( 1 + \beta_c c\right)
+  \end{equation}
+
+  \item otherwise, for both \texttt{Op$_{\text{Boussinesq}}$ = oui}  and \texttt{Op$_{\text{Boussinesq}}$ = non}, it can take the following prescribed form:
+  \begin{equation}
+   \rho = \frac{\rho_1+\rho_2}{2}+c\frac{\rho_2-\rho_1}{2}
+  \end{equation}
+
+ \item or be of the general form:
+  \begin{equation}
+  \rho = \texttt{F}_\rho
+  \end{equation}
+  where \texttt{F}$_\rho$ is a TRUST input field giving $\frac{d\rho}{dc}$.
+ \end{itemize}
+
+ \item[Syntax evolution:]
+\end{description}
+~\newline
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = oui}}\\
+\hline
+Not available &
+\begin{inputfile}
+Lire fluide
+{
+  ...
+  rho Champ_Uniforme 1 $\rho_0$
+  beta_co Champ_Uniforme 1 $\beta_c$
+  ...
+}
+...
+Navier_Stokes_phase_field {
+  ... 
+  approximation_de_boussinesq oui { }
+  ...
+}
+\end{inputfile}\\
+\hline
+\multicolumn{2}{|Sc|}{- whatever the value of \texttt{Op$_{\text{Boussinesq}}$}}\\
+\hline
+ \begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  rho_1 $\rho_1$
+  rho_2 $\rho_2$
+  ...
+} \end{inputfile} &
+ \begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  rho_1 $\rho_1$
+  rho_2 $\rho_2$
+  ...
+} \end{inputfile} \\
+\hline
+\multicolumn{2}{|Sc|}{- if $\rho$ has a general form}\\
+\hline
+Not available & 
+\begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  approximation_de_boussinesq Op$_{\text{Boussinesq}}$ {
+    rho_fonc_c F$_\rho$ F$_{\rho'}$
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}
+
+\subsection{Dynamic viscosity $\mu$ function of $c$} 
+The dynamic viscosity $\mu$ is either constant or described as a function of $c$. The dynamic viscosity (and actually the kinematic viscosity $\nu$) is treated differently depending on the input parameters \texttt{Op$_{\text{Boussinesq}}$} (Boussinesq approximation) and the \texttt{Op$_{\text{constant }\mu}$} (constant dynamic viscosity approximation) that can both be set to \texttt{oui} (activated) or \texttt{non} (deactivated):
+
+ \begin{minipage}[t]{\textwidth}
+ \begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  approximation_de_boussinesq Op$_{\text{Boussinesq}}$ 
+  viscosite_dynamique_constante Op$_{\text{constant }\mu}$
+  ...
+}
+\end{inputfile}
+ \end{minipage}
+\begin{description}
+ \item[TrioCFD v1.8.2:] ~
+ \begin{itemize}
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = oui} or  \texttt{Op$_{\text{constant }\mu}$ = oui}, the dynamic viscosity is constant and given by:
+  \begin{equation}
+   \mu = \mu_0
+  \end{equation}
+
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = non} and \texttt{Op$_{\text{constant }\mu}$ = non}, the dynamic viscosity has the following prescribed form:
+ \begin{equation}
+  \mu = \frac{\mu_1+\mu_2}{2}+c\frac{\mu_2-\mu_1}{2}
+ \end{equation}
+ \end{itemize}
+
+ \item[Modification since v1.8.3:] ~
+ \begin{itemize}
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = oui} or  \texttt{Op$_{\text{constant }\mu}$ = oui}, the dynamic viscosity is constant and given by:
+  \begin{equation}
+   \mu = \mu_0
+  \end{equation}
+
+  \item if \texttt{Op$_{\text{Boussinesq}}$ = non} and \texttt{Op$_{\text{constant }\mu}$ = non}, the dynamic viscosity can take the following prescribed form:
+ \begin{equation}
+  \mu = \frac{\mu_1+\mu_2}{2}+c\frac{\mu_2-\mu_1}{2}
+ \end{equation}
+
+ \item or be of the general form:
+ \begin{equation}
+  \mu = \texttt{F}_\mu
+ \end{equation}
+where \texttt{F}$_\mu$ is a TRUST input field associated1. \\ 
+ \end{itemize}
+
+\item[Syntax evolution:] ~
+\end{description} 
+~\newline
+\begin{tabular}{|Sc|Sc|}
+\hline
+Input file excerpt in v1.8.2 & Input file excerpt since v1.8.3\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = oui} or \texttt{Op$_{\text{constant }\mu}$ = oui}}\\
+\hline
+\begin{inputfile}
+Lire fluide
+{
+  ...
+  mu Champ_Uniforme 1 $\mu_0$
+  ...
+}
+\end{inputfile} &
+\begin{inputfile}
+Lire fluide
+{
+  ...
+  mu Champ_Uniforme 1 $\mu_0$
+  ...
+}
+\end{inputfile}\\
+\hline
+\multicolumn{2}{|Sc|}{- if \texttt{Op$_{\text{Boussinesq}}$ = non} and \texttt{Op$_{\text{constant }\mu}$ = non}}\\
+\hline
+\begin{inputfile}
+Convection_diffusion_Phase_field {
+  ...
+  mu_1 $\mu_1$
+  mu_2 $\mu_2$
+  ...
+}
+\end{inputfile} &
+\begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  viscosite_dynamique_constante non {
+    mu_1 $\mu_1$
+    mu_2 $\mu_2$
+  }
+  ...
+}\end{inputfile}\\
+\hline
+\multicolumn{2}{|Sc|}{- if $\mu$ has a general form}\\
+\hline
+Not available &
+\begin{inputfile}
+Navier_Stokes_phase_field {
+  ... 
+  viscosite_dynamique_constante non {
+    rho_fonc_c F$_\mu$
+  }
+  ...
+}
+\end{inputfile}\\
+\hline
+\end{tabular}

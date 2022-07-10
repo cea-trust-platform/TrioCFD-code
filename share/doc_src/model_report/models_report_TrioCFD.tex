@@ -8,12 +8,15 @@
 \usepackage{lettrine}
 \usepackage{geometry}
 \usepackage{amsmath,amssymb,amsfonts,amsgen,amsbsy,textcomp,pifont}
+\usepackage{bbold,stackrel,dsfont,mathrsfs,soul,tcolorbox,verbatimbox}
 \usepackage{amsthm}
 \usepackage{textcomp}
 \usepackage{color}
 \usepackage{xcolor}
 \usepackage{colortbl}
+\usepackage{ae,aecompl}
 \usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf}
 \usepackage{fancyhdr}
 \usepackage{fancybox}
 \usepackage{fancyvrb}
@@ -59,6 +62,38 @@
 \newcommand{\vale}{\vec{u}_{\text{ALE}}} 
 \newcommand{\normal}{\vec{ n}}
 \newcommand{\point}{x}
+
+%%%%%   CMFD   %%%%%
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\def\l|{\left|\left|}
+\def\r|{\right|\right|}
+\def\R{\mathds R}
+\def\P{\mathds P}
+\def\N{\mathds N}
+\def\Z{\mathds Z}
+\def\E{\mathds E}
+\def\1{\mathds 1}
+\def\T{{\sf T}}
+\def\B{{\sf B}}
+\def\S{{\sf S}}
+\def\G{{\sf G}}
+\def\Vect{\mathrm{ Vect}}
+\def\th{\mathrm{\,th\,}}
+\def\ch{\mathrm{\,ch\, }}
+\def\argth{\mathrm{\,ath\, }}
+\def\sh{\mathrm{\,sh\, }}
+\def\ve{\varepsilon}
+\def\hZ{\hat Z}
+\def\hpsi{\hat \psi}
+\def\cM{{\cal M}}
+\def\de{{\rm d}}
+\def\red{\color{red}}
+\def\pink{\color{pink}}
+\def\blue{\color{blue}}
+\def\green{\color{green}}
+\def\gray{\color{gray}}
+\def\white{\color{white}}
 
 %%%%%   SENSITIVITY   %%%%%
 \def\b_u{\mathbf{u}}
@@ -235,7 +270,7 @@
 %\renewcommand{\headrulewidth}{0pt}
 %\renewcommand{\footrulewidth}{0pt}
 \begin{multicols}{2}
-\includegraphics[scale=0.75]{../pictures/cealogo.png}
+%%\includegraphics[scale=0.75]{../pictures/cealogo.png}
 \begin{flushright}\Ovalbox{\begin{minipage}{8cm} \begin{center} \vspace{0.4cm}\Large{DES/ISAS/DM2S/STMF/LMSF}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
 \begin{flushright}\Ovalbox{\begin{minipage}{4cm} \begin{center} \vspace{0.4cm}\Large{\thepage/\pageref{LastPage}}\vspace{0.4cm}\end{center}\end{minipage}}\end{flushright}
 \end{multicols}
@@ -256,7 +291,7 @@
 Code Version & Date & Code manager & Authors \\
  & & J. DARONA & \\ \hline
  & &\multirow{3}{*}{\includegraphics[scale=0.6]{../validation_report/tools/sign_JD.png}} &  \\
-v1.8.4 & \today && TrioCFD Team\\
+v1.9.0 & \today && TrioCFD Team\\
  & &&  \\ \hline
 \multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } models\_report\_TrioCFD.tex } \\
 \multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
@@ -298,7 +333,9 @@ v1.8.4 & \today && TrioCFD Team\\
 \part{\label{sec:Diphasique}Mod\`eles des \'ecoulement diphasiques}
 \normalsize \normalfont
 %\input{./part41-FT.tex}
-\input{./part42-Phase_field.tex}
+\input{./part41-CMFD.tex}
+\input{./part42-IJK.tex}
+\input{./part43-Phase_field.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{\label{sec:ALE}The Arbitrary Lagrangian-Eulerian Method}
 \normalsize \normalfont
@@ -325,5 +362,5 @@ v1.8.4 & \today && TrioCFD Team\\
 \lhead{}
 \rhead{BIBLIOGRAPHIE}
 \bibliographystyle{plain}
-\bibliography{BibTeX_TrioCFD,18-Stokes_bib,bibALE,bibSENSITIVITY.bib}
+\bibliography{BibTeX_TrioCFD,18-Stokes_bib,bibALE,bibCMFD,bibIJK,bibSENSITIVITY.bib}
 \end{document}
