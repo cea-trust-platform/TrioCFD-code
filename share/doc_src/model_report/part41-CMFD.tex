@@ -920,3 +920,155 @@ The heat transfer due to evaporation is:
 	\cdot
 	N''_a
 \end{equation}
+
+\section{Homogeneous Equilibrium Model}
+\label{sec:homog-equil-model}
+
+\textit{Disclaimer: this documentation is a very short, incomplete and
+inaccurate introduction to the modelling of an homogeneous equilibrium
+model in TrioCFD. Being a work in progress, this documentation will be
+revised in a near future.}
+
+The CMFD baltik gathers the development of the multiphase CFD in
+TrioCFD. This approach designates all RANS approaches for multiphase
+flows. It is based on the Pb\_Multiphase problem. The model uses
+instantaneous relaxation of a fully unequilibrated model rather than a
+direct approach as in \cite{Goncalves2009}.\\
+The Homogeneous Equilibrium Model (HEM hereafter) is an approximation
+of a multiphase flow where the phases are mechanically and thermally
+coupled. They move at the same velocity and have the same temperature
+which may not be their saturated temperature if the fluids are not of
+the same type.
+
+\subsection{The non-viscous system of equation}
+\label{sec:non-viscous-system}
+
+
+
+A non viscous two-phase flow can be describe by Euler's equations
+where every thermodynamical variable in the system describes the
+mixing as the sum of each phase's contributions:
+
+\begin{align}
+&\partial_t (\rho) +\partial_x (\rho u) = 0, \nonumber\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%V
+&\partial_t (\rho u) +\partial_x (\rho u^2 + P) = 0, \nonumber\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+&\partial_t (\alpha\rho E) +\partial_x (\rho uH) = 0,  \nonumber
+\label{sistema1}
+\end{align}
+
+whit $E=e+\frac{u^2}{2}$ the total energy of the system and
+$H=h+\frac{u^2}{2}$ the total enthalpy. $e$ et $h$ are the internal
+energy and internal enthalpy of the mixing. They both depend on the
+volume fraction and properties of each phase:
+
+\begin{align}
+\rho e&\triangleq\alpha_G \rho_G e_G + (1 -\alpha_G)\rho_L e_L \\
+\rho h&\triangleq\alpha_G \rho_G h_G + (1 -\alpha_G)\rho_L h_L.
+\end{align}
+
+The mixing density $\rho$ is defined by:
+\begin{equation}
+\rho \triangleq \alpha_G\rho_G+(1-\alpha_G)\rho_L
+\end{equation}
+with $\rho_L$ and $\rho_G$ the liquid and gas densities, respectively.
+The void fraction $\alpha_G$ stands for the \emph{attendance rate} of
+the gaz phase. It is defined between 0 and 1.
+
+
+The system unkowns are $\alpha_G$, $P_k$, $T_k$, $v_k$ et $\rho_k$,
+but the applied simplification ($P_G=P_L$, $T_G=T_L$ et $v_G=v_L$) allows for a reduction of the number of
+equations. To close the system, a equation of state (EOS) for each
+phase is needed as well as a thermodynamics relationship for the
+mixing between the system pressure, another thermodynamics variable
+(temperature, enthalpy, or density), and the void fraction.
+
+\subsection{The equation of state}
+In this section, the different approach for the choice of the equation
+of state are presented. They are all available in \texttt{Pb\_HEM}.
+
+\subsubsection{Incompressible}
+
+For the incompressible case, both densities are taken constant in each
+phase.
+
+\subsubsection{Quasi-compressible formulation}
+For the quasi compressible case, the densities only depend on the
+temperature. The following equations of state can thus be used for a
+range of temperature between 50°C and 263°C~\cite{Rodio2019} :
+\begin{equation}
+\rho(T)=-0.0023864182 T^2-0.22507878 T + 1007.1165.
+\label{loi_qc}
+\end{equation}
+
+\subsubsection{Compressible case}
+A stiffened gas equation has been added to the code. It allows to
+guarantee the hyperbolicity of the system as the sound velocity is
+always positive, being squared. It is defined as follows:
+
+\begin{align}
+P(\rho ,e)&=(\gamma-1)\rho(e-q)-\gamma P_{\infty}\\
+P(\rho ,T)&=\rho (\gamma-1)C_vT-\gamma P_{\infty}\\
+T(\rho ,h)&=\frac{h-q}{C_p}\\
+c^2&=\gamma\frac{P+P_{\infty}}{\rho},
+\end{align}
+with $\gamma=C_p/C_v$ the polytropique coefficient, $C_p$ and $C_v$
+the calorimetric coefficients, and $P_{\infty}$ a constant reference pressure.
+
+\subsubsection{More complex equations of state}
+\label{sec:more-compl-equat}
+
+More complex equations of state will be available in the near future
+with the use of an library of equations of state (as the commercial
+RefProp library for instance) through a in-house code.
+
+
+\subsection{The Navier-stokes system of equations}
+The complete system of equations is defined as follows:
+% \begin{scriptsize}
+\begin{equation}
+% \left\{
+% \begin{split}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\partial_t (W) + \nabla (F_c-F_v) = S,
+% \end{split}
+% \right.
+% \label{sistema2}
+% \end{equation}
+% \end{scriptsize}
+\quad \mbox{où}\quad
+% \begin{scriptsize}
+% \begin{equation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+W=\begin{pmatrix}
+\rho\\
+\rho U\\
+\rho E\\
+\varepsilon_{turb}
+\end{pmatrix},
+F_c=\begin{pmatrix}
+\rho U\\
+\rho V\bigotimes U\\
+(\rho E +P)U\\
+\varepsilon_{turb} U
+\end{pmatrix},
+F_v=\begin{pmatrix}
+0\\
+\bar{\bar{\tau^v}} +\bar{\bar{\tau^t}}\\
+(\bar{\bar{\tau^v}} +\bar{\bar{\tau^t}})\cdot U-Q^v-Q^t\\
+S_{turb}
+\end{pmatrix}
+\label{sistema4}
+\end{equation}
+% \end{scriptsize}
+Source termes are added to the previous Euler system of equations. $W$
+stands for the conservative variables, $F_c$ et $F_v$ for the
+convective and viscous flux respectively, $S$ the sources terms, and
+$\varepsilon_{turb}$ the turbulence model variables.
+
+The viscous stress tensor $\bar{\bar{\tau}}$ can be defined following
+the Boussinesq hypothesis.
+
+Several turbulence model can be defined, as defined in the more
+complete model.
