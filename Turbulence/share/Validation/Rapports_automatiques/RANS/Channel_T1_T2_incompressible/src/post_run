@@ -42,7 +42,27 @@ extrait_coupe $fichier SONDE_TEMPERATURE
 extrait_coupe $fichier SONDE_VITESSE
 
 # Parametre d'adimensionnalisation
-Colonnes=`grep -E "# Bord:|# Boundary:" $fichier\_pb_Contrainte_visqueuse.out | sed "s?# Bord:??g" | sed "s?# Boundary:??g" | sed "s?Total??g"`
+#Colonnes=`grep -E "# Bord:|# Boundary:" $fichier\_pb_Contrainte_visqueuse.out | sed "s?# Bord:??g" | sed "s?# Boundary:??g" | sed "s?Total??g"`
+Colonnes=`grep -E "# * Time " $fichier\_pb_Contrainte_visqueuse.out | sed "s?# * Time??g" | sed "s?Total_[X-Z]??g"`
+nb_colonnes=`echo $Colonnes | wc -w`
+i=1
+while (( i <= nb_colonnes ))
+do
+	Col=`echo $Colonnes | awk '{print $'$i'}'`
+	if [ "$Col" == "Bas_Y" ]
+	then
+		Col_PhyQDM_bas=`awk "BEGIN{print $i}"`
+		#Col_PhyNRJ_bas=`awk "BEGIN{print $i+$j+1}"`
+	fi
+	if [ "$Col" == "Haut_Y" ]
+	then
+		Col_PhyQDM_haut=`awk "BEGIN{print $i}"`
+		#Col_PhyNRJ_haut=`awk "BEGIN{print $i+$j+1}"`
+	fi
+	((i=i+1))
+done
+
+Colonnes=`grep -E "# * Time " $fichier\_pb_Diffusion_chaleur.out | sed "s?# * Time??g" | sed "s?Total_[X-Z]??g"`
 nb_colonnes=`echo $Colonnes | wc -w`
 i=1
 while (( i <= nb_colonnes ))
@@ -50,16 +70,17 @@ do
 	Col=`echo $Colonnes | awk '{print $'$i'}'`
 	if [ "$Col" == "Bas" ]
 	then
-		Col_PhyQDM_bas=`awk "BEGIN{print ($i+$j-1)*3+2}"`
-		Col_PhyNRJ_bas=`awk "BEGIN{print $i+$j+1}"`
+		#Col_PhyQDM_bas=`awk "BEGIN{print '$i'}"`
+		Col_PhyNRJ_bas=`awk "BEGIN{print $i+1}"`
 	fi
 	if [ "$Col" == "Haut" ]
 	then
-		Col_PhyQDM_haut=`awk "BEGIN{print ($i+$j-1)*3+2}"`
-		Col_PhyNRJ_haut=`awk "BEGIN{print $i+$j+1}"`
+		#Col_PhyQDM_haut=`awk "BEGIN{print '$i'}"`
+		Col_PhyNRJ_haut=`awk "BEGIN{print $i+1}"`
 	fi
 	((i=i+1))
 done
+
 
 Phy_diff_QDM_bas=`tail -1 $fichier\_pb_Contrainte_visqueuse.out | awk '{print $'$Col_PhyQDM_bas'}'`
 Phy_diff_NRJ_bas=`tail -1 $fichier\_pb_Diffusion_chaleur.out | awk '{print $'$Col_PhyNRJ_bas'}'`
