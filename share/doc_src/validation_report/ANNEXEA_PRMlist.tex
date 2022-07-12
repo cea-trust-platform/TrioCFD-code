@@ -98,10 +98,6 @@
 \rowcolor{LimeGreen!10}Vorticite\_et\_fonction & Pb\_hydraulique & VDF & 2 & 7 $\Rightarrow$ 16 to 65536 rect & 40 & Verification of vorticity and & old format \\ 
 \rowcolor{LimeGreen!10}\_de\_Courant & \textbf{Pb\_conduction} & VEF & & 7 $\Rightarrow$ 16 to 65536 quad & & Stream function in a square cavity &  \\ 
 \rowcolor{LimeGreen!10} &  & VEF & & 6 $\Rightarrow$ 40 to 104420 tri & & & \\ \hline
-\rowcolor{LimeGreen!10}Sensitivity\_analysis\_for & Pb\_hydraulique & & & & & \textbf{Sensitivity equation method}  & \\ 
-\rowcolor{LimeGreen!10}\_Steady\_Obstacle & \textbf{Pb\_Hydraulique\_} & VEF & 2 & 91829 triang. & 1 & for the Navier-Stokes : & old format \\ 
-\rowcolor{LimeGreen!10} & \textbf{sensibility} & & & & & Estimation of the variance & \\ 
-\hline
 \rowcolor{LimeGreen!10}2D\_VEF\_Cylindre & Pb\_hydraulique & VEF & 2 & 999 tri & 1 & \textbf{Implicit\_Euler\_steady\_scheme} & old format \\
 \rowcolor{LimeGreen!10}\_steady & & & & & & \textbf{Numerical Test} & \\ \hline
 \rowcolor{LimeGreen!10}Navier\_Stokes\_2d & Pb\_hydraulique & VEF & 2 & 104420 tri. & 8 & \textbf{Implicit\_Euler\_steady\_scheme} & old format \\
@@ -647,6 +643,17 @@
 \rowcolor{Peach!20}channel\_VEF & \textbf{Pb\_Conduction} & & & & & a solid with power output & exclu\_nr \\ \hline
 \rowcolor{Peach!20}NoFlow-lami & Pb\_Thermohydraulique & VDF & 3 & 4000 hexa & 2 & Mixing of species without chemical reactions & new format \\ 
 \rowcolor{Peach!20}-espece & \_Especes\_QC & VEF & & 24000 tetra & &  & \\ \hline
+
+\rowcolor{CadetBlue!30} \multicolumn{8}{c}{\textbf{Sensitivity Analysis}} \\
+\hline
+\rowcolor{CadetBlue!10}Sensitivity\_analysis\_for & Pb\_Thermohydraulique & & & & & \textbf{Sensitivity equation method}  & \\ 
+\rowcolor{CadetBlue!10}\_Steady\_Obstacle & \textbf{Pb\_Hydraulique\_} & VEF & 2 & 91829 triang. & 1 & for the Navier-Stokes : & new format \\ 
+\rowcolor{CadetBlue!10} & \textbf{sensibility} & & & & & Estimation of the variance & \\ 
+\hline
+\rowcolor{CadetBlue!10}Sensitivity\_analysis\_for & Pb\_Thermohydraulique & & & & & \textbf{Sensitivity equation method}  & \\ 
+\rowcolor{CadetBlue!10}\_Vahl\_Davis & \textbf{Pb\_Hydraulique\_} & VEF & 2 & 98635 triang. & 5 & for the Navier-Stokes : applied on & new format \\ 
+\rowcolor{CadetBlue!10} & \textbf{sensibility} & & & & & the benchmark problem of natural convection & \\ 
+\hline
 
 \rowcolor{Gray} \multicolumn{8}{c}{\textbf{Other applications}} \\
 \hline
