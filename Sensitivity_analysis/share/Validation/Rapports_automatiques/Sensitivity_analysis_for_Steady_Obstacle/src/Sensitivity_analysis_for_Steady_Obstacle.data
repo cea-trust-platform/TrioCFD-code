@@ -160,6 +160,7 @@ Read pb_sensibilite
         }
 	Post_processing
 	{
+	  DeprecatedKeepDuplicatedProbes 1
 	  Probes {
 			  U_H2_sens nodes vitesse periode 0.01 segment 350 0 0.2 2.0 0.2 
 		          P_H2_sens grav pression periode 0.01 segment 350 0 0.2 2.0 0.2  
