@@ -450,7 +450,6 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
       //Mirantsoa 264902
       DoubleTab& rhoTab = rho_.valeurs(); /**/
       DoubleTab& drhodcTab = drhodc_.valeurs();/**/
-      DoubleTab betacTab = betac_.valeur().valeurs();/**/
       DoubleTab rho0Tab(rhoTab);
       //Cerr << "c = "<<c<<finl;
       // DoubleTab& betacTab = betac_.valeur().valeurs();
@@ -464,10 +463,13 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
           rhoTab=c;
           tab_multiply_any_shape(rhoTab, drhodcTab);
           rhoTab+=rho0_;
+          Cerr << "c = "<< c<<finl;
+
         }
       else if (type_systeme_naire==1)
         {
           DoubleTab beta_(rhoTab);
+          DoubleTab betacTab(c);
 
           //calcul de drhodcTab comme rho0*somme(betac)
           drhodcTab=rho0_;
@@ -475,7 +477,8 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
             {
               for (int j=0; j<betacTab.line_size(); j++)
                 {
-                  beta_(i)+=betac_.valeur().valeurs()(i,j);
+                  betacTab(i,j)=betac_.valeur().valeurs()(0,j);
+                  beta_(i)+=betacTab(i,j);
                 }
             }
           tab_multiply_any_shape(drhodcTab, beta_);
@@ -493,7 +496,11 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
           rho0Tab=rho0_;
           tab_multiply_any_shape(rhoTab, rho0Tab);
           rhoTab+=rho0_;
-          //Cerr<<"rhoTab+"<<rhoTab<<finl;
+          Cerr<<"rhoTab+"<<rhoTab<<finl;
+          Cerr << "beta_ = "<<beta_<<finl;
+          Cerr << "betacTab = "<< betacTab<<finl;
+          Cerr << "c = "<< c<<finl;
+
 
         }
     }

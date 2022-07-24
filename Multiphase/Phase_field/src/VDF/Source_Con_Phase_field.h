@@ -34,6 +34,9 @@
 #include <Convection_Diffusion_Concentration.h>
 #include <Equation_base.h>
 #include <math.h>
+#include <SolveurSys.h>
+#include <EChaine.h>
+
 
 #define PI 3.14159265
 
@@ -112,6 +115,7 @@ protected:
   void calculer_div_alpha_rho_gradC(DoubleTab&) const;
   void calculer_div_alpha_gradC(DoubleTab&) const;
   void calculer_pression_thermo(DoubleTab&) const;
+  //const DoubleTab& get_terme_non_lineaire(DoubleTab&);
   virtual void assembler_matrice_point_fixe(Matrice_Morse&);
   virtual void calculer_point_fixe(const DoubleTab&, const DoubleTab&, const Matrice_Morse&, DoubleTab&, DoubleTab&);
   virtual void calculer_u2_elem(DoubleVect&);
@@ -176,8 +180,8 @@ inline double Source_Con_Phase_field::drhodc(const int n_elem) const
 
 inline double Source_Con_Phase_field::dWdc_defaut(const double c) const
 {
-//  return (4.*c*(c+0.5)*(c-0.5));
-  return 2*(c-0.12)*(c-0.65)*(2*c-0.12-0.65);
+  return (4*c*(c+0.5)*(c-0.5));
+  //return 2*(c-0.12)*(c-0.65)*(2*c-0.12-0.65);
 
 }
 

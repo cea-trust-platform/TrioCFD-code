@@ -225,7 +225,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
       DoubleTab& grad_mutilde=ref_cast_non_const(DoubleTab,  grad_mutilde_);
       if (grad_mutilde.size()==0) grad_mutilde=eq_ns.inconnue().valeurs();
       grad_mutilde=0.;
-      DoubleTab temp_mutilde_NS(mutilde_NS.dimension(0),1);
+      DoubleTab temp_mutilde_NS(mutilde_NS.dimension_tot(0),1);
       const Operateur_Grad& opgrad=eq_ns.operateur_gradient();
 
       for (int j=0; j<nb_comp; j++)
@@ -258,6 +258,7 @@ DoubleTab& Source_Qdm_VDF_Phase_field::methode_1(DoubleTab& resu) const
                 }
             }
         }
+      resu.echange_espace_virtuel(); //ajoute mr264902
     }
   //===============================================
   return resu;
