@@ -148,7 +148,7 @@ void Coarsen_Operator_Uniform::coarsen(const IJK_Field_float & fine, IJK_Field_f
 
   float coef;
   if (compute_weighted_average)
-    coef = 1. / ((float) coarsen_factors_[0] * coarsen_factors_[1] * coarsen_factors_[2]);
+    coef = (float)(1. / (coarsen_factors_[0] * coarsen_factors_[1] * coarsen_factors_[2]));
   else
     coef = 1.;
 
@@ -621,7 +621,7 @@ void Coarsen_Operator_Uniform::coarsen(const IJK_Field_double & fine, IJK_Field_
 
   double coef;
   if (compute_weighted_average)
-    coef = 1. / ((double) coarsen_factors_[0] * coarsen_factors_[1] * coarsen_factors_[2]);
+    coef = (double)(1. / (coarsen_factors_[0] * coarsen_factors_[1] * coarsen_factors_[2]));
   else
     coef = 1.;
 

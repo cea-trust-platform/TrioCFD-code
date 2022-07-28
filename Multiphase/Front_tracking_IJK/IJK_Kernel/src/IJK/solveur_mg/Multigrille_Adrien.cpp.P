@@ -168,7 +168,7 @@ void Multigrille_Adrien::jacobi_residu(IJK_Field__TYPE_ & x,
   const IJK_Field_local__TYPE_ & coeffs_face = grids_data__TYPE__[grid_level].get_faces_coefficients();
 
   IJ_layout layout(x);
-  const double relax = relax_jacobi(grid_level);
+  const _TYPE_ relax = (_TYPE_)relax_jacobi(grid_level);
   // We can do at most this number of passes per sweep:
   const int nb_passes_max_per_sweep = x.ghost();
   // We have to do this number of passes in total:
@@ -211,7 +211,7 @@ void Multigrille_Adrien::jacobi_residu(IJK_Field__TYPE_ & x,
       flop_count = 0;
     }
   }
- 	statistiques().end_count(jacobi_residu_counter_, flop_count);
+ 	statistiques().end_count(jacobi_residu_counter_, (int)flop_count);
 }
 
 void Multigrille_Adrien::coarsen(const IJK_Field__TYPE_ & fine, IJK_Field__TYPE_ & coarse, int fine_level) const
@@ -294,7 +294,7 @@ void Multigrille_Adrien::set_rho__TYPE_(const IJK_Field__TYPE2_ & rho, bool set_
       for (k = 0; k < nk; k++) 
 		  for (j = 0; j < nj; j++)
 			 for (i = 0; i < ni; i++)
-				r(i,j,k) = rho(i,j,k);
+				r(i,j,k) = (_TYPE_)rho(i,j,k);
     }
     else
       coarsen_operators_[l-1].valeur().coarsen(grids_data__TYPE__[l-1].get_rho(),
@@ -342,7 +342,7 @@ void Multigrille_Adrien::set_inv_rho__TYPE_(const IJK_Field__TYPE2_ & rho, bool 
       for (k = 0; k < nk; k++) 
 	for (j = 0; j < nj; j++)
 	  for (i2 = 0; i2 < ni; i2++)
-	    r(i2,j,k) = rho(i2,j,k);
+	    r(i2,j,k) = (_TYPE_)rho(i2,j,k);
     } else
       coarsen_operators_[i-1].valeur().coarsen(grids_data__TYPE__[i-1].get_rho(),
 					       grids_data__TYPE__[i].get_update_rho(),
@@ -381,7 +381,7 @@ void Multigrille_Adrien::prepare_secmem(IJK_Field__TYPE_ & x) const
   double val = moyenne / nb_elem_tot;
   const int m = x.data().size_array();
   for (int i = 0; i < m; i++)
-    x.data()[i] -= val;
+    x.data()[i] -= (_TYPE_)val;
 }
 
 void Multigrille_Adrien::dump_lata(const Nom & field, const IJK_Field__TYPE_ & data, int tstep) const

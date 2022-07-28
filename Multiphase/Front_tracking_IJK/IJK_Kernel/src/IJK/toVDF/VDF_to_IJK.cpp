@@ -270,7 +270,7 @@ void VDF_to_IJK::convert_to_ijk(const DoubleVect & x, IJK_Field_double & ijk_x) 
       const int ii = index % ijk_ni_;
       const int jj = (index / ijk_ni_) % ijk_nj_;
       const int kk = (index / ijk_ni_) / ijk_nj_;
-      ijk_x(ii,jj,kk) = buf[j];
+      ijk_x(ii,jj,kk) = (double)buf[j];
     }
   }
   sch.end_comm();
@@ -358,7 +358,7 @@ void VDF_to_IJK::convert_to_ijk(const DoubleVect & x, IJK_Field_float & ijk_x) c
       const int ii = index % ijk_ni_;
       const int jj = (index / ijk_ni_) % ijk_nj_;
       const int kk = (index / ijk_ni_) / ijk_nj_;
-      ijk_x(ii,jj,kk) = buf[j];
+      ijk_x(ii,jj,kk) = (float)buf[j];
     }
   }
   sch.end_comm();

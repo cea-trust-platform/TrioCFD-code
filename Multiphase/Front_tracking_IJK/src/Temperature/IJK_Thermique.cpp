@@ -395,8 +395,8 @@ void IJK_Thermique::update_thermal_properties()
   const int nx = indic.ni();
   const int ny = indic.nj();
   const int nz = indic.nk();
-  const int rho_l = ref_ijk_ft_->rho_liquide_;
-  const int rho_v = ref_ijk_ft_->rho_vapeur_;
+  const double rho_l = ref_ijk_ft_->rho_liquide_;
+  const double rho_v = ref_ijk_ft_->rho_vapeur_;
   const bool geometric_mean = ((!lambda_moy_arith_) and (lambda_liquid_ > DMINFLOAT) and (lambda_vapor_ >DMINFLOAT));
   for (int k=0; k < nz ; k++)
     for (int j=0; j< ny; j++)

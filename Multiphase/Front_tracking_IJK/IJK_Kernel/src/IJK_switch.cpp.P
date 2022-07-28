@@ -80,7 +80,7 @@ void Switch_STTT::switch_vit_direct(SFichier & binary_file)
                     for (int dj = 0; dj < 2; dj++)
                       for (int dk = 0; dk < 2; dk++)
                         x += coeff_i[dir](i, di) * coeff_j[dir](j, dj) * coeff_k[dir](k, dk) * old_velocity_[dir](i2+di, j2+dj, k2+dk);
-                  tmp[(j * (new_ni_+1) + i) * 3 + dir] = x;
+                  tmp[(j * (new_ni_+1) + i) * 3 + dir] = (float)x;
               }
           }
       }
@@ -457,7 +457,7 @@ void Switch_STTT::switch_scalar_field_direct(SFichier & binary_file,
               for (int dj = 0; dj < 2; dj++)
                 for (int dk = 0; dk < 2; dk++)
                   x += coeff_i(i, di) * coeff_j(j, dj) * coeff_k(k, dk) * fld(i2+di, j2+dj, k2+dk);
-            tmp[j * new_ni_ + i] = x;
+            tmp[j * new_ni_ + i] = (float)x;
         }
       Cerr << "Writing field, layer " << k << " / " << new_nk_ << endl;
       binary_file.put(tmp.addr(), tmp.size_array(), 1);

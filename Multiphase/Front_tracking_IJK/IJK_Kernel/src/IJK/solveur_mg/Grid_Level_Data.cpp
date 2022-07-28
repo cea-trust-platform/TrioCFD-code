@@ -185,18 +185,18 @@ void Grid_Level_Data_double::compute_faces_coefficients_from_inv_rho()
 void Grid_Level_Data_double::compute_faces_coefficients_from_rho_cst_i_cst_j_cst_k()
 {
 // mesh is uniform in i direction: define a constant value
-const double delta_i = local_delta_xyz_[0][0];
-const double i_delta_i = 1. / local_delta_xyz_[0][0];
+const double delta_i = (double)local_delta_xyz_[0][0];
+const double i_delta_i = (double)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const double delta_j = local_delta_xyz_[1][0];
-const double i_delta_j = 1. / local_delta_xyz_[1][0];
+const double delta_j = (double)local_delta_xyz_[1][0];
+const double i_delta_j = (double)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh is uniform in k direction: define a constant value
-const double delta_k = local_delta_xyz_[2][0];
-const double i_delta_k = 1. / local_delta_xyz_[2][0];
+const double delta_k = (double)local_delta_xyz_[2][0];
+const double i_delta_k = (double)(1. / local_delta_xyz_[2][0]);
 #define DELTA_k delta_k
 #define invDELTA_k i_delta_k
 
@@ -222,7 +222,7 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const double rho = 2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const double rho = (double)(2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const double f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -233,7 +233,7 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const double rho = double(2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const double f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -258,7 +258,7 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 	const double *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const double rho = (double)(2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const double f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -298,18 +298,18 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 void Grid_Level_Data_double::compute_faces_coefficients_from_inv_rho_cst_i_cst_j_cst_k()
 {
 // mesh is uniform in i direction: define a constant value
-const double delta_i = local_delta_xyz_[0][0];
-const double i_delta_i = 1. / local_delta_xyz_[0][0];
+const double delta_i = (double)local_delta_xyz_[0][0];
+const double i_delta_i = (double)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const double delta_j = local_delta_xyz_[1][0];
-const double i_delta_j = 1. / local_delta_xyz_[1][0];
+const double delta_j = (double)local_delta_xyz_[1][0];
+const double i_delta_j = (double)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh is uniform in k direction: define a constant value
-const double delta_k = local_delta_xyz_[2][0];
-const double i_delta_k = 1. / local_delta_xyz_[2][0];
+const double delta_k = (double)local_delta_xyz_[2][0];
+const double i_delta_k = (double)(1. / local_delta_xyz_[2][0]);
 #define DELTA_k delta_k
 #define invDELTA_k i_delta_k
 
@@ -335,7 +335,7 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const double rho = 0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const double rho = (double)(0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const double f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -346,7 +346,7 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const double rho = (double)(0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const double f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -371,7 +371,7 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 	const double *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const double rho = (double)(0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const double f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -411,13 +411,13 @@ const double i_delta_k = 1. / local_delta_xyz_[2][0];
 void Grid_Level_Data_double::compute_faces_coefficients_from_rho_cst_i_cst_j_var_k()
 {
 // mesh is uniform in i direction: define a constant value
-const double delta_i = local_delta_xyz_[0][0];
-const double i_delta_i = 1. / local_delta_xyz_[0][0];
+const double delta_i = (double)local_delta_xyz_[0][0];
+const double i_delta_i = (double)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const double delta_j = local_delta_xyz_[1][0];
-const double i_delta_j = 1. / local_delta_xyz_[1][0];
+const double delta_j = (double)local_delta_xyz_[1][0];
+const double i_delta_j = (double)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh has variable size in k direction: compute the inverse of
@@ -432,12 +432,12 @@ ArrOfDouble_with_ghost i_delta_k_array;
   i_delta_k_array.resize(n, ghost);
   const int imin = -ghost + 1;
   const int imax = n + ghost;
-  delta_k_array[-ghost] = local_delta_xyz_[2][-ghost];
+  delta_k_array[-ghost] = (double)local_delta_xyz_[2][-ghost];
   for (int i = imin; i < imax; i++) {
-    delta_k_array[i] = local_delta_xyz_[2][i];
+    delta_k_array[i] = (double)local_delta_xyz_[2][i];
     double x = delta_k_array[i-1];
     double y = delta_k_array[i];
-    i_delta_k_array[i] = 2. / (x+y);
+    i_delta_k_array[i] = (double)(2. / (x+y));
   }
 }
 #define DELTA_k delta_k_array[k]
@@ -465,7 +465,7 @@ ArrOfDouble_with_ghost i_delta_k_array;
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const double rho = 2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const double rho = (double)(2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const double f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -476,7 +476,7 @@ ArrOfDouble_with_ghost i_delta_k_array;
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const double rho = double(2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const double f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -501,7 +501,7 @@ ArrOfDouble_with_ghost i_delta_k_array;
 	const double *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const double rho = (double)(2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const double f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -541,13 +541,13 @@ ArrOfDouble_with_ghost i_delta_k_array;
 void Grid_Level_Data_double::compute_faces_coefficients_from_inv_rho_cst_i_cst_j_var_k()
 {
 // mesh is uniform in i direction: define a constant value
-const double delta_i = local_delta_xyz_[0][0];
-const double i_delta_i = 1. / local_delta_xyz_[0][0];
+const double delta_i = (double)local_delta_xyz_[0][0];
+const double i_delta_i = (double)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const double delta_j = local_delta_xyz_[1][0];
-const double i_delta_j = 1. / local_delta_xyz_[1][0];
+const double delta_j = (double)local_delta_xyz_[1][0];
+const double i_delta_j = (double)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh has variable size in k direction: compute the inverse of
@@ -562,12 +562,12 @@ ArrOfDouble_with_ghost i_delta_k_array;
   i_delta_k_array.resize(n, ghost);
   const int imin = -ghost + 1;
   const int imax = n + ghost;
-  delta_k_array[-ghost] = local_delta_xyz_[2][-ghost];
+  delta_k_array[-ghost] = (double)local_delta_xyz_[2][-ghost];
   for (int i = imin; i < imax; i++) {
-    delta_k_array[i] = local_delta_xyz_[2][i];
+    delta_k_array[i] = (double)local_delta_xyz_[2][i];
     double x = delta_k_array[i-1];
     double y = delta_k_array[i];
-    i_delta_k_array[i] = 2. / (x+y);
+    i_delta_k_array[i] = (double)(2. / (x+y));
   }
 }
 #define DELTA_k delta_k_array[k]
@@ -595,7 +595,7 @@ ArrOfDouble_with_ghost i_delta_k_array;
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const double rho = 0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const double rho = (double)(0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const double f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -606,7 +606,7 @@ ArrOfDouble_with_ghost i_delta_k_array;
 	double *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const double rho = (double)(0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const double f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -631,7 +631,7 @@ ArrOfDouble_with_ghost i_delta_k_array;
 	const double *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const double rho = 0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const double rho = (double)(0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const double f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -825,18 +825,18 @@ void Grid_Level_Data_float::compute_faces_coefficients_from_inv_rho()
 void Grid_Level_Data_float::compute_faces_coefficients_from_rho_cst_i_cst_j_cst_k()
 {
 // mesh is uniform in i direction: define a constant value
-const float delta_i = local_delta_xyz_[0][0];
-const float i_delta_i = 1. / local_delta_xyz_[0][0];
+const float delta_i = (float)local_delta_xyz_[0][0];
+const float i_delta_i = (float)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const float delta_j = local_delta_xyz_[1][0];
-const float i_delta_j = 1. / local_delta_xyz_[1][0];
+const float delta_j = (float)local_delta_xyz_[1][0];
+const float i_delta_j = (float)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh is uniform in k direction: define a constant value
-const float delta_k = local_delta_xyz_[2][0];
-const float i_delta_k = 1. / local_delta_xyz_[2][0];
+const float delta_k = (float)local_delta_xyz_[2][0];
+const float i_delta_k = (float)(1. / local_delta_xyz_[2][0]);
 #define DELTA_k delta_k
 #define invDELTA_k i_delta_k
 
@@ -862,7 +862,7 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const float rho = 2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const float rho = (float)(2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const float f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -873,7 +873,7 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const float rho = float(2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const float f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -898,7 +898,7 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 	const float *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const float rho = (float)(2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const float f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -938,18 +938,18 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 void Grid_Level_Data_float::compute_faces_coefficients_from_inv_rho_cst_i_cst_j_cst_k()
 {
 // mesh is uniform in i direction: define a constant value
-const float delta_i = local_delta_xyz_[0][0];
-const float i_delta_i = 1. / local_delta_xyz_[0][0];
+const float delta_i = (float)local_delta_xyz_[0][0];
+const float i_delta_i = (float)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const float delta_j = local_delta_xyz_[1][0];
-const float i_delta_j = 1. / local_delta_xyz_[1][0];
+const float delta_j = (float)local_delta_xyz_[1][0];
+const float i_delta_j = (float)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh is uniform in k direction: define a constant value
-const float delta_k = local_delta_xyz_[2][0];
-const float i_delta_k = 1. / local_delta_xyz_[2][0];
+const float delta_k = (float)local_delta_xyz_[2][0];
+const float i_delta_k = (float)(1. / local_delta_xyz_[2][0]);
 #define DELTA_k delta_k
 #define invDELTA_k i_delta_k
 
@@ -975,7 +975,7 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const float rho = 0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const float rho = (float)(0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const float f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -986,7 +986,7 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const float rho = (float)(0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const float f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1011,7 +1011,7 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 	const float *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const float rho = (float)(0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const float f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1051,13 +1051,13 @@ const float i_delta_k = 1. / local_delta_xyz_[2][0];
 void Grid_Level_Data_float::compute_faces_coefficients_from_rho_cst_i_cst_j_var_k()
 {
 // mesh is uniform in i direction: define a constant value
-const float delta_i = local_delta_xyz_[0][0];
-const float i_delta_i = 1. / local_delta_xyz_[0][0];
+const float delta_i = (float)local_delta_xyz_[0][0];
+const float i_delta_i = (float)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const float delta_j = local_delta_xyz_[1][0];
-const float i_delta_j = 1. / local_delta_xyz_[1][0];
+const float delta_j = (float)local_delta_xyz_[1][0];
+const float i_delta_j = (float)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh has variable size in k direction: compute the inverse of
@@ -1072,12 +1072,12 @@ ArrOfFloat_with_ghost i_delta_k_array;
   i_delta_k_array.resize(n, ghost);
   const int imin = -ghost + 1;
   const int imax = n + ghost;
-  delta_k_array[-ghost] = local_delta_xyz_[2][-ghost];
+  delta_k_array[-ghost] = (float)local_delta_xyz_[2][-ghost];
   for (int i = imin; i < imax; i++) {
-    delta_k_array[i] = local_delta_xyz_[2][i];
+    delta_k_array[i] = (float)local_delta_xyz_[2][i];
     float x = delta_k_array[i-1];
     float y = delta_k_array[i];
-    i_delta_k_array[i] = 2. / (x+y);
+    i_delta_k_array[i] = (float)(2. / (x+y));
   }
 }
 #define DELTA_k delta_k_array[k]
@@ -1105,7 +1105,7 @@ ArrOfFloat_with_ghost i_delta_k_array;
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const float rho = 2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const float rho = (float)(2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const float f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1116,7 +1116,7 @@ ArrOfFloat_with_ghost i_delta_k_array;
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const float rho = float(2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const float f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1141,7 +1141,7 @@ ArrOfFloat_with_ghost i_delta_k_array;
 	const float *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const float rho = (float)(2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const float f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1181,13 +1181,13 @@ ArrOfFloat_with_ghost i_delta_k_array;
 void Grid_Level_Data_float::compute_faces_coefficients_from_inv_rho_cst_i_cst_j_var_k()
 {
 // mesh is uniform in i direction: define a constant value
-const float delta_i = local_delta_xyz_[0][0];
-const float i_delta_i = 1. / local_delta_xyz_[0][0];
+const float delta_i = (float)local_delta_xyz_[0][0];
+const float i_delta_i = (float)(1. / local_delta_xyz_[0][0]);
 #define DELTA_i delta_i
 #define invDELTA_i i_delta_i
 // mesh is uniform in j direction: define a constant value
-const float delta_j = local_delta_xyz_[1][0];
-const float i_delta_j = 1. / local_delta_xyz_[1][0];
+const float delta_j = (float)local_delta_xyz_[1][0];
+const float i_delta_j = (float)(1. / local_delta_xyz_[1][0]);
 #define DELTA_j delta_j
 #define invDELTA_j i_delta_j
 // mesh has variable size in k direction: compute the inverse of
@@ -1202,12 +1202,12 @@ ArrOfFloat_with_ghost i_delta_k_array;
   i_delta_k_array.resize(n, ghost);
   const int imin = -ghost + 1;
   const int imax = n + ghost;
-  delta_k_array[-ghost] = local_delta_xyz_[2][-ghost];
+  delta_k_array[-ghost] = (float)local_delta_xyz_[2][-ghost];
   for (int i = imin; i < imax; i++) {
-    delta_k_array[i] = local_delta_xyz_[2][i];
+    delta_k_array[i] = (float)local_delta_xyz_[2][i];
     float x = delta_k_array[i-1];
     float y = delta_k_array[i];
-    i_delta_k_array[i] = 2. / (x+y);
+    i_delta_k_array[i] = (float)(2. / (x+y));
   }
 }
 #define DELTA_k delta_k_array[k]
@@ -1235,7 +1235,7 @@ ArrOfFloat_with_ghost i_delta_k_array;
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const float rho = 0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const float rho = (float)(0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const float f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1246,7 +1246,7 @@ ArrOfFloat_with_ghost i_delta_k_array;
 	float *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const float rho = (float)(0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const float f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1271,7 +1271,7 @@ ArrOfFloat_with_ghost i_delta_k_array;
 	const float *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const float rho = 0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const float rho = (float)(0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const float f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -1338,6 +1338,6 @@ void Grid_Level_Data_float::compute_faces_coefficients_from_double_coeffs(const 
     
       for (int j = jmin; j < jmax; j++)
 	for (int i = imin; i < imax; i++)
-	  ijk_faces_coefficients_(i, j, k, compo) = src(i,j,k,compo);
+	  ijk_faces_coefficients_(i, j, k, compo) = (float)src(i,j,k,compo);
     }
 }

@@ -170,7 +170,7 @@ void Multigrille_Adrien::jacobi_residu(IJK_Field_double & x,
   const IJK_Field_local_double & coeffs_face = grids_data_double_[grid_level].get_faces_coefficients();
 
   IJ_layout layout(x);
-  const double relax = relax_jacobi(grid_level);
+  const double relax = (double)relax_jacobi(grid_level);
   // We can do at most this number of passes per sweep:
   const int nb_passes_max_per_sweep = x.ghost();
   // We have to do this number of passes in total:
@@ -213,7 +213,7 @@ void Multigrille_Adrien::jacobi_residu(IJK_Field_double & x,
       flop_count = 0;
     }
   }
- 	statistiques().end_count(jacobi_residu_counter_, flop_count);
+ 	statistiques().end_count(jacobi_residu_counter_, (int)flop_count);
 }
 
 void Multigrille_Adrien::coarsen(const IJK_Field_double & fine, IJK_Field_double & coarse, int fine_level) const
@@ -295,7 +295,7 @@ void Multigrille_Adrien::set_rho_double(const IJK_Field_double & rho, bool set_c
       for (k = 0; k < nk; k++) 
 		  for (j = 0; j < nj; j++)
 			 for (i = 0; i < ni; i++)
-				r(i,j,k) = rho(i,j,k);
+				r(i,j,k) = (double)rho(i,j,k);
     }
     else
       coarsen_operators_[l-1].valeur().coarsen(grids_data_double_[l-1].get_rho(),
@@ -333,7 +333,7 @@ void Multigrille_Adrien::set_rho_double(const IJK_Field_float & rho, bool set_co
       for (k = 0; k < nk; k++) 
 		  for (j = 0; j < nj; j++)
 			 for (i = 0; i < ni; i++)
-				r(i,j,k) = rho(i,j,k);
+				r(i,j,k) = (double)rho(i,j,k);
     }
     else
       coarsen_operators_[l-1].valeur().coarsen(grids_data_double_[l-1].get_rho(),
@@ -371,7 +371,7 @@ void Multigrille_Adrien::set_inv_rho_double(const IJK_Field_double & rho, bool s
       for (k = 0; k < nk; k++) 
 	for (j = 0; j < nj; j++)
 	  for (i2 = 0; i2 < ni; i2++)
-	    r(i2,j,k) = rho(i2,j,k);
+	    r(i2,j,k) = (double)rho(i2,j,k);
     } else
       coarsen_operators_[i-1].valeur().coarsen(grids_data_double_[i-1].get_rho(),
 					       grids_data_double_[i].get_update_rho(),
@@ -408,7 +408,7 @@ void Multigrille_Adrien::set_inv_rho_double(const IJK_Field_float & rho, bool se
       for (k = 0; k < nk; k++) 
 	for (j = 0; j < nj; j++)
 	  for (i2 = 0; i2 < ni; i2++)
-	    r(i2,j,k) = rho(i2,j,k);
+	    r(i2,j,k) = (double)rho(i2,j,k);
     } else
       coarsen_operators_[i-1].valeur().coarsen(grids_data_double_[i-1].get_rho(),
 					       grids_data_double_[i].get_update_rho(),
@@ -438,7 +438,7 @@ void Multigrille_Adrien::prepare_secmem(IJK_Field_double & x) const
   double val = moyenne / nb_elem_tot;
   const int m = x.data().size_array();
   for (int i = 0; i < m; i++)
-    x.data()[i] -= val;
+    x.data()[i] -= (double)val;
 }
 
 void Multigrille_Adrien::dump_lata(const Nom & field, const IJK_Field_double & data, int tstep) const
@@ -495,7 +495,7 @@ void Multigrille_Adrien::jacobi_residu(IJK_Field_float & x,
   const IJK_Field_local_float & coeffs_face = grids_data_float_[grid_level].get_faces_coefficients();
 
   IJ_layout layout(x);
-  const double relax = relax_jacobi(grid_level);
+  const float relax = (float)relax_jacobi(grid_level);
   // We can do at most this number of passes per sweep:
   const int nb_passes_max_per_sweep = x.ghost();
   // We have to do this number of passes in total:
@@ -538,7 +538,7 @@ void Multigrille_Adrien::jacobi_residu(IJK_Field_float & x,
       flop_count = 0;
     }
   }
- 	statistiques().end_count(jacobi_residu_counter_, flop_count);
+ 	statistiques().end_count(jacobi_residu_counter_, (int)flop_count);
 }
 
 void Multigrille_Adrien::coarsen(const IJK_Field_float & fine, IJK_Field_float & coarse, int fine_level) const
@@ -620,7 +620,7 @@ void Multigrille_Adrien::set_rho_float(const IJK_Field_double & rho, bool set_co
       for (k = 0; k < nk; k++) 
 		  for (j = 0; j < nj; j++)
 			 for (i = 0; i < ni; i++)
-				r(i,j,k) = rho(i,j,k);
+				r(i,j,k) = (float)rho(i,j,k);
     }
     else
       coarsen_operators_[l-1].valeur().coarsen(grids_data_float_[l-1].get_rho(),
@@ -661,7 +661,7 @@ void Multigrille_Adrien::set_rho_float(const IJK_Field_float & rho, bool set_coa
       for (k = 0; k < nk; k++) 
 		  for (j = 0; j < nj; j++)
 			 for (i = 0; i < ni; i++)
-				r(i,j,k) = rho(i,j,k);
+				r(i,j,k) = (float)rho(i,j,k);
     }
     else
       coarsen_operators_[l-1].valeur().coarsen(grids_data_float_[l-1].get_rho(),
@@ -702,7 +702,7 @@ void Multigrille_Adrien::set_inv_rho_float(const IJK_Field_double & rho, bool se
       for (k = 0; k < nk; k++) 
 	for (j = 0; j < nj; j++)
 	  for (i2 = 0; i2 < ni; i2++)
-	    r(i2,j,k) = rho(i2,j,k);
+	    r(i2,j,k) = (float)rho(i2,j,k);
     } else
       coarsen_operators_[i-1].valeur().coarsen(grids_data_float_[i-1].get_rho(),
 					       grids_data_float_[i].get_update_rho(),
@@ -742,7 +742,7 @@ void Multigrille_Adrien::set_inv_rho_float(const IJK_Field_float & rho, bool set
       for (k = 0; k < nk; k++) 
 	for (j = 0; j < nj; j++)
 	  for (i2 = 0; i2 < ni; i2++)
-	    r(i2,j,k) = rho(i2,j,k);
+	    r(i2,j,k) = (float)rho(i2,j,k);
     } else
       coarsen_operators_[i-1].valeur().coarsen(grids_data_float_[i-1].get_rho(),
 					       grids_data_float_[i].get_update_rho(),
@@ -775,7 +775,7 @@ void Multigrille_Adrien::prepare_secmem(IJK_Field_float & x) const
   double val = moyenne / nb_elem_tot;
   const int m = x.data().size_array();
   for (int i = 0; i < m; i++)
-    x.data()[i] -= val;
+    x.data()[i] -= (float)val;
 }
 
 void Multigrille_Adrien::dump_lata(const Nom & field, const IJK_Field_float & data, int tstep) const

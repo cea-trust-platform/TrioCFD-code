@@ -266,7 +266,7 @@ void moyenne_glissante::initialise()
 void moyenne_glissante::set_time(double time, double time_step, double time_iteration)
 {
   time_ = time;
-  tstep_ = time_iteration;
+  tstep_ = (int)time_iteration;
   timestep_ = time_step;
 }
 void moyenne_glissante::compute_v_cible(double vitesse_relative)

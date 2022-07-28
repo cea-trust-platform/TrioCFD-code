@@ -190,7 +190,7 @@ class IJK_Splitting : public Objet_U
         //const double l = grid_geom_.get_domain_length(i);
         //const int N = grid_geom_.get_nb_elem_tot(i);
         const double val = (coords[i] - o)/d;
-        const int ival = floor(val);
+        const int ival = (int)std::lrint(std::floor(val));
         ijk_global[i] = ival;
         assert((ival>=0) && (ival<grid_geom_.get_nb_elem_tot(i)));
         const int ioff = get_offset_local(i);

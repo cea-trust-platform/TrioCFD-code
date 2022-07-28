@@ -37,7 +37,7 @@ inline void putzero(IJK_Field_local_double & flux)
   const int nj = flux.nj();
   double *ptr = &flux(0,0,0);
   double *end_ptr = &flux(ni-1,nj-1,0);
-  const int n = end_ptr - ptr + 1;
+  const int n = (int)(end_ptr - ptr + 1);
   Simd_double zero = 0.;
   for (int i = 0; i < n; i += vsize)
     SimdPut(ptr+i, zero);

@@ -1935,7 +1935,7 @@ void IJK_FT_double::run()
 //  rho_field_.echange_espace_virtuel(2);
 //  recalculer_rho_de_chi(chi_, rho_field_, 2);
   Cerr << " Allocating " << nalloc << " arrays, approx total size= "
-       << molecular_mu_.data().size_array() * sizeof(double) * nalloc
+       << (double)(molecular_mu_.data().size_array() * (int)sizeof(double) * nalloc)
        * 9.537E-07 << " MB per core" << finl;
 
 // Les champs ont etes alloues.

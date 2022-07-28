@@ -155,7 +155,7 @@ void IJK_Field_local__TYPE_::allocate(int Ni, int Nj, int Nk, int ghosts, int ad
   char *cptr = (char *) ptr;
   long long iptr = (long long) cptr;
   long long decal = iptr & (CacheLineSizeBytes - 1);
-  offset_ += (CacheLineSizeBytes - decal) / sizeof(_TYPE_);
+  offset_ += (int)(CacheLineSizeBytes - decal) / (int)sizeof(_TYPE_);
   
 }
 
@@ -400,7 +400,7 @@ _TYPE_ max_ijk(const IJK_Field__TYPE_& residu)
   const int ni = residu.ni();
   const int nj = residu.nj();
   const int nk = residu.nk();
-  _TYPE_ res = -1.e30;
+  _TYPE_ res = (_TYPE_)-1.e30;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -408,7 +408,7 @@ _TYPE_ max_ijk(const IJK_Field__TYPE_& residu)
           _TYPE_ x = residu(i,j,k);
 	res = std::max(x,res);
         }
-  res = Process::mp_max(res);
+  res = (_TYPE_)Process::mp_max(res);
   return res;
 }
 
@@ -429,7 +429,7 @@ _TYPE_ prod_scal_ijk(const IJK_Field__TYPE_ & x, const IJK_Field__TYPE_ & y)
       }
     }
   }
-  somme = Process::mp_sum(somme);
+  somme = (_TYPE_)Process::mp_sum(somme);
   return somme;
 }
 
@@ -451,7 +451,7 @@ double somme_ijk(const IJK_Field__TYPE_ & residu)
     }
     somme += partial1;
   }
-  somme = Process::mp_sum(somme);
+  somme = (_TYPE_)Process::mp_sum(somme);
   return somme;
 }
 

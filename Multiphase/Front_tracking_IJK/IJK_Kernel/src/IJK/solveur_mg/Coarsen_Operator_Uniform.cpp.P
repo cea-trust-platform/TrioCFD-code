@@ -219,7 +219,7 @@ void Coarsen_Operator_Uniform::coarsen(const IJK_Field__TYPE_ & fine, IJK_Field_
 
   _TYPE_ coef;
   if (compute_weighted_average)
-    coef = 1. / ((_TYPE_) coarsen_factors_[0] * coarsen_factors_[1] * coarsen_factors_[2]);
+    coef = (_TYPE_)(1. / (coarsen_factors_[0] * coarsen_factors_[1] * coarsen_factors_[2]));
   else
     coef = 1.;
 
