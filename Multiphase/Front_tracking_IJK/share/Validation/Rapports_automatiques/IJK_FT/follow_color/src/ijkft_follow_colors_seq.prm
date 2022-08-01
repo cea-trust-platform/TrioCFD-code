@@ -1,0 +1,472 @@
+Parametres {
+	Titre "Suivi de la couleur des bulles a la traversee d'une frontiere en front-tracking en IJK"
+	Description "Cette fiche verifie : " <<EOF
+o Qu'on detecte la traversee de la frontiere y. 
+o Qu'on est capable de la suivre au cours du temps. 
+EOF
+	Auteur "G.B."
+	CasTest . ijkft_follow_colors_seq.data
+	CasTest . ijkft_follow_colors_multi_seq.data
+	CasTest . ijkft_follow_colors_multi_repr_seq.data
+	CasTest . ijkft_follow_colors_par8.data 8
+	CasTest . ijkft_follow_colors_multi_par8.data 8
+}
+
+
+
+
+
+Chapitre {
+	Titre "Mono-bulle"
+	Description "Calcul monobulle." <<EOF
+Un courant negatif est impose pour qu'elle commence par descendre.
+EOF
+	
+	visu {
+		titre "Init"
+		cycles 0
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 14
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 15
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 44
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 45
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+
+	Description "La couleur de la bulle passe de 0 (valeur initiale) a -1 puis +1 lorsqu'elle " <<EOF
+lorsqu'elle traverse les frontieres.  
+EOF
+
+	figure {
+		titre "Position des bulles en y"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier ijkft_follow_colors_seq_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "seq col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_par8_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "par col2 y/Ly"
+		     Style points
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_seq_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "seq col2 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_par8_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "par col2 color"
+		     Style points
+		     }
+	}
+
+}
+
+
+Chapitre {
+	Titre "Multi-bulles"
+	
+	visu {
+		titre "Init"
+		cycles 0
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 14
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 15
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 44
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "Init"
+		cycles 45
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+
+	figure {
+		titre "Position des bulles en y"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "seq col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "par col2 y/Ly"
+		     Style points
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "seq col2 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "par col2 color"
+		     Style points
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_centre_y.out
+		     colonnes ($1) ($3/0.003)
+		     Legende "seq col3 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_centre_y.out
+		     colonnes ($1) ($3/0.003)
+		     Legende "par col3 y/Ly"
+		     Style points
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_colors.out
+		     colonnes ($1) ($3)
+		     Legende "seq col3 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_colors.out
+		     colonnes ($1) ($3)
+		     Legende "par col3 color"
+		     Style points
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_centre_y.out
+		     colonnes ($1) ($4/0.003)
+		     Legende "seq col4 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_centre_y.out
+		     colonnes ($1) ($4/0.003)
+		     Legende "par col4 y/Ly"
+		     Style points
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_colors.out
+		     colonnes ($1) ($4)
+		     Legende "seq col4 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_colors.out
+		     colonnes ($1) ($4)
+		     Legende "par col4 color"
+		     Style points
+		     }
+	}
+
+}
+
+Chapitre {
+	Titre "Multi-bulles reprise"
+
+	figure {
+		titre "Cas reprise"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier ijkft_follow_colors_multi_repr_seq_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "ijkft_follow_colors_multi_repr_seq col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_repr_seq_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_follow_colors_multi_repr_seq col2 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_repr_seq_bulles_centre_y.out
+		     colonnes ($1) ($3/0.003)
+		     Legende "ijkft_follow_colors_multi_repr_seq col3 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_repr_seq_bulles_colors.out
+		     colonnes ($1) ($3)
+		     Legende "ijkft_follow_colors_multi_repr_seq col3 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_repr_seq_bulles_centre_y.out
+		     colonnes ($1) ($4/0.003)
+		     Legende "ijkft_follow_colors_multi_repr_seq col4 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_repr_seq_bulles_colors.out
+		     colonnes ($1) ($4)
+		     Legende "ijkft_follow_colors_multi_repr_seq col4 color"
+		     Style lines
+		     }
+	}
+}
+
+
+Chapitre {
+	Titre "Comparaison sequentiel / parallele mono-bulle "
+	
+	visu {
+		titre "debut"
+		cycles 0
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "fin"
+		cycles -1
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_seq.lata DOM
+		mesh        ijkft_follow_colors_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+
+	visu {
+		titre "debut"
+		cycles 0
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_par8.lata DOM
+		mesh        ijkft_follow_colors_par8.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_par8.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "fin"
+		cycles -1
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_par8.lata DOM
+		mesh        ijkft_follow_colors_par8.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_par8.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+
+	figure {
+		titre "Position des bulles en y"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier ijkft_follow_colors_seq_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "ijkft_follow_colors_seq col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_seq_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_follow_colors_seq col2 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_par8_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "ijkft_follow_colors_par8 col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_par8_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_follow_colors_par8 col2 color"
+		     Style lines
+		     }
+	}
+
+}
+
+
+Chapitre {
+	Titre "Comparaison sequentiel / parallele multi-bulle "
+	
+	visu {
+		titre "debut"
+		cycles 0
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "fin"
+		cycles -1
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_seq.lata DOM
+		mesh        ijkft_follow_colors_multi_seq.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_seq.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+
+	visu {
+		titre "debut"
+		cycles 0
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_par8.lata DOM
+		mesh        ijkft_follow_colors_multi_par8.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_par8.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+	visu {
+		titre "fin"
+		cycles -1
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+		mesh        ijkft_follow_colors_multi_par8.lata DOM
+		mesh        ijkft_follow_colors_multi_par8.lata INTERFACES
+		pseudocolor_with_range ijkft_follow_colors_multi_par8.lata INTERFACES COLOR_Y ELEM -1 1
+	}
+
+
+	figure {
+		titre "Position des bulles en y"	  
+		incluredesccourbes 0
+		labelX  "t"
+		labelY  "x"
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "ijkft_follow_colors_multi_seq col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_seq_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_follow_colors_multi_seq col2 color"
+		     Style lines
+		     }
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_centre_y.out
+		     colonnes ($1) ($2/0.003)
+		     Legende "ijkft_follow_colors_multi_par8 col2 y/Ly"
+		     Style lines
+		}
+		Courbe {
+		   fichier ijkft_follow_colors_multi_par8_bulles_colors.out
+		     colonnes ($1) ($2)
+		     Legende "ijkft_follow_colors_multi_par8 col2 color"
+		     Style lines
+		     }
+	}
+
+}
+
+ 

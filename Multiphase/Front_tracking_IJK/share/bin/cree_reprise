@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Verifie le nombre d'argument :
+if [ $# != 0 ] && [ $# != 1 ] # "$#" is number of parameters
+then
+        echo "Usage `basename $0` [repr_dir]"
+        echo "   last arg is optional. Default value : R"
+        exit -1
+else
+   if  [ $# == 1 ] 
+   then
+      R=$1
+   else
+      R=R
+   fi
+   echo "[cmd] `basename $0` "
+   echo "      option : $R"
+fi
+
+if [ -f DNS.data ]
+then
+   jdd=DNS.data
+   s=diph
+else
+   jdd=`ls *data | head -n1`
+   s=`ls *sauv | head -n1`
+   echo $s
+   s=${s::(${#s}-5)} # Tronque le .sauv
+   echo $s
+fi
+
+if [ -f $R/$jdd ]
+then
+   echo "Error! datafile $R/$jdd already exists!"
+   exit -1 
+elif [ -f $R/sub_file ] || [ ! -f sub_file ]
+then
+   mkdir -p $R # Il faut peut-etre re-creer $R
+   # sub_file est deja present dans R et seul fichier : 
+   rename_sauv $s.sauv $R/${s}_init.sauv
+   \cp -f $jdd cree_reprise *son *bulles_*.out *acceleration.out *_bilan_qdm.out *_dmin.out *.dt_ev $R/
+elif [ -d $R ] 
+then
+   echo "Error! Fold $R already exists but $R/sub_file is missing!"
+   exit -2
+else
+   mkdir $R
+   rename_sauv $s.sauv $R/${s}_init.sauv
+   \cp -f sub_file $jdd cree_reprise *son *bulles_*.out *acceleration.out *_bilan_qdm.out *_dmin.out *.dt_ev $R/
+fi
+
+cd $R
+
+
+echo "Finish!"

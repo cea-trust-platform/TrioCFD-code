@@ -102,7 +102,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
 
   if (sub_type(Champ_Uniforme,ch_visco_cin_ph1.valeur()) && sub_type(Champ_Uniforme,ch_visco_cin_ph0.valeur()) )
     {
-      visco_ph0 = max(tab_visco_ph0(0,0),DMINFLOAT);
+      visco_ph0 = std::max(tab_visco_ph0(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -254,7 +254,7 @@ int Paroi_std_hyd_VEF_diphasique::calculer_hyd(DoubleTab& tab_nu_t,DoubleTab& ta
                   norm += normales(num_face,comp)*normales(num_face,comp);
                 }
               // psc /= norm; // Fixed bug: Arithmetic exception
-              if (dabs(norm)>=DMINFLOAT) psc/=norm;
+              if (std::fabs(norm)>=DMINFLOAT) psc/=norm;
 
               for(int comp=0; comp<dimension; comp++)
                 {

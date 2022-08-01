@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "-> Clean .txt files"
+rm -f monopha*
+rm -f dipha*
+
+echo "-> Clean .dt_ev files and directories" 
+rm -rf Unsteady*
+rm -rf Final*
+rm -rf Stats*
+

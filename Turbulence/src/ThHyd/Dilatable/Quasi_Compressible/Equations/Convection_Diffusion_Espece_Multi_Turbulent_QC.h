@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Espece_Multi_Turbulent_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/15
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -40,26 +39,26 @@ class Convection_Diffusion_Espece_Multi_Turbulent_QC :
 
 public :
 
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   //Methodes de l interface des champs postraitables
   /////////////////////////////////////////////////////
-  virtual void creer_champ(const Motcle& motlu);
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  virtual void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const;
+  void creer_champ(const Motcle& motlu) override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  void get_noms_champs_postraitables(Noms& nom,Option opt=NONE) const override;
   /////////////////////////////////////////////////////
 
-  const RefObjU& get_modele(Type_modele type) const;
+  const RefObjU& get_modele(Type_modele type) const override;
 
 protected :
 
 private:
 
-  void completer();
-  int sauvegarder(Sortie&) const;
-  int reprendre(Entree&);
-  void mettre_a_jour(double );
-  int preparer_calcul();
+  void completer() override;
+  int sauvegarder(Sortie&) const override;
+  int reprendre(Entree&) override;
+  void mettre_a_jour(double ) override;
+  int preparer_calcul() override;
 
 };
 

@@ -1,0 +1,243 @@
+# Thermohydraulique 2D VEF Boussinesq #
+# PARALLEL OK #
+dimension 2
+
+Domaine dom
+# BEGIN MESH #
+ Read_MED family_names_from_group_names dom FinerMeshSquare_T FinerMeshSquare_T.med
+# END MESH #
+
+
+# BEGIN PARTITION
+Partition dom
+{
+	Partition_tool metis { Nb_parts 2 kmetis }
+	Larg_joint 2
+	zones_name DOM
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM.Zones dom
+END SCATTER #
+
+Pb_Thermohydraulique pb_etat
+Pb_Thermohydraulique_sensibility pb_sensibilite
+
+VEFPreP1B dis
+
+
+Scheme_euler_explicit sch
+Read sch
+{
+	tinit 0.
+	nb_pas_dt_max 3
+	tmax 5.
+	dt_min 1e-8
+	# dt_max 1e-1 #
+	dt_impr 1e-8
+	dt_sauv 100
+	seuil_statio 1.e-6
+}
+
+Fluide_Incompressible etat
+Read etat
+{
+	mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.17
+	lambda Champ_Uniforme 1 0.0262 
+	Cp Champ_Uniforme 1 1006
+	beta_th Champ_Uniforme 1 3.6e-3
+}
+
+Fluide_Incompressible sensibilite
+Read sensibilite
+{
+        mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.17
+        lambda Champ_Uniforme 1 0.0262 
+	Cp Champ_Uniforme 1 1006
+	beta_th Champ_Uniforme 1 3.6e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate etat gravite
+Associate sensibilite gravite
+
+Associate pb_etat dom
+Associate pb_etat etat
+
+Associate pb_sensibilite dom
+Associate pb_sensibilite sensibilite
+
+Probleme_Couple pbc
+Associate pbc pb_etat
+Associate pbc pb_sensibilite
+Associate pbc sch
+Discretize pbc dis
+
+
+Read pb_etat
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression GCP { 
+			precond ssor { omega 1.5 } 
+			seuil 1.e-16
+		}
+		convection { amont }
+		diffusion { }
+		sources { boussinesq_temperature { T0 278.15 } }
+		initial_conditions {
+			vitesse Champ_Uniforme 2 0. 0.
+			}
+		boundary_conditions {
+			Haut paroi_fixe
+			Bas paroi_fixe
+			Gauche paroi_fixe
+			Droit paroi_fixe
+		}
+	}
+	Convection_Diffusion_Temperature
+	{
+		diffusion { }
+		convection { amont }
+		boundary_conditions 
+		{
+			Haut paroi_adiabatique
+			Bas paroi_adiabatique
+ 			Gauche Paroi_temperature_imposee Champ_Front_fonc_xyz 1 283.15
+			Droit Paroi_temperature_imposee Champ_Front_Uniforme 1 273.15
+		}
+		initial_conditions { Temperature Champ_Uniforme 1 278.15 }
+	}
+
+	Post_processing
+	{
+		Probes
+		{
+                        vitesse_etat_x_c  vitesse periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        temperature_etat_x_c temperature periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        pression_etat_x_c  pression periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        
+                        vitesse_etat_x_h  vitesse periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        temperature_etat_x_h  temperature periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        pression_etat_x_h  pression periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        
+                        vitesse_etat_x_b  vitesse periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        temperature_etat_x_b  temperature periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        pression_etat_x_b  pression periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        
+                        vitesse_etat_y_c  vitesse periode 0.001 segment 50  0.005 0.  0.005 0.01
+                        temperature_etat_y_c  temperature periode 0.001 segment 50 0.005 0.  0.005 0.01
+                        pression_etat_y_c  pression periode 0.001 segment 50 0.005 0.  0.005 0.01
+                        
+                        vitesse_etat_y_d  vitesse periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        temperature_etat_y_d  temperature periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        pression_etat_y_d  pression periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        
+                        vitesse_etat_y_g  vitesse periode 0.001 segment 50 0.0025 0.  0.0025 0.01
+                        temperature_etat_y_g  temperature periode 0.001 segment 50  0.0025 0.  0.0025 0.01
+                        pression_etat_y_g  pression periode 0.001 segment 50  0.0025 0.  0.0025 0.01
+                        
+		}
+                fichier etat
+                format lml # lata for VisIt tool #
+		fields dt_post 5.
+		{
+			pression som
+			vitesse som
+			temperature som
+		}
+	}
+}
+
+Read pb_sensibilite
+{
+        Navier_Stokes_standard_sensibility
+        {       
+                uncertain_variable { vitesse }
+		state { pb_champ_evaluateur pb_etat  vitesse } 
+      		solveur_pression gcp  { precond ssor { omega 1.5 } seuil 1.e-10 }  
+		# solveur_pression PETSc Cholesky { } #
+                convection { Sensibility { amont } }
+                diffusion { }
+		sources { boussinesq_temperature { T0 278.15  verif_boussinesq 0 } }
+                initial_conditions {
+                        vitesse Champ_Uniforme 2 0. 0.
+                        }
+                boundary_conditions {
+			Haut paroi_fixe
+			Bas paroi_fixe
+			Gauche paroi_fixe
+			Droit paroi_fixe
+                }
+        }
+	Convection_Diffusion_Temperature_sensibility
+	{
+                uncertain_variable { beta_th }
+                velocity_state { pb_champ_evaluateur pb_etat  vitesse } 
+		temperature_state { pb_champ_evaluateur pb_etat  temperature } 
+		diffusion { }
+		convection { Sensibility { amont } }
+		boundary_conditions 
+		{
+			Haut paroi_adiabatique
+			Bas paroi_adiabatique
+ 			Gauche Paroi_temperature_imposee Champ_Front_fonc_xyz 1 0
+			Droit Paroi_temperature_imposee Champ_Front_Uniforme 1 0
+		}
+		initial_conditions { Temperature Champ_Uniforme 1 0 }
+	}
+	Post_processing
+	{
+             Probes
+		{
+                        vitesse_sensibilite_x_c  vitesse periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        temperature_sensibilite_x_c  temperature periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        pression_sensibilite_x_c  pression periode 0.001 segment 50 0. 0.005 0.01 0.005
+                        
+                        vitesse_sensibilite_x_h  vitesse periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        temperature_sensibilite_x_h  temperature periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        pression_sensibilite_x_h  pression periode 0.001 segment 50 0. 0.0075 0.01 0.0075
+                        
+                        vitesse_sensibilite_x_b  vitesse periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        temperature_sensibilite_x_b  temperature periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        pression_sensibilite_x_b  pression periode 0.001 segment 50 0. 0.0025 0.01 0.0025
+                        
+                        vitesse_sensibilite_y_c  vitesse periode 0.001 segment 50  0.005 0.  0.005 0.01
+                        temperature_sensibilite_y_c  temperature periode 0.001 segment 50 0.005 0.  0.005 0.01
+                        pression_sensibilite_y_c  pression periode 0.001 segment 50 0.005 0.  0.005 0.01
+                        
+                        vitesse_sensibilite_y_d  vitesse periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        temperature_sensibilite_y_d  temperature periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        pression_sensibilite_y_d  pression periode 0.001 segment 50 0.0075 0. 0.0075 0.01
+                        
+                        vitesse_sensibilite_y_g  vitesse periode 0.001 segment 50 0.0025 0.  0.0025 0.01
+                        temperature_sensibilite_y_g temperature periode 0.001 segment 50  0.0025 0.  0.0025 0.01
+                        pression_sensibilite_y_g  pression periode 0.001 segment 50  0.0025 0.  0.0025 0.01
+
+		}
+		# Fields #
+                format lml # lata for VisIt tool #
+		fields dt_post 5.  # Note: Warning to memory space if dt_post too small #
+		{
+
+			pression som
+			vitesse som
+                        temperature som
+
+		}
+	}	
+
+}
+
+
+Solve pbc
+End
+
+
+

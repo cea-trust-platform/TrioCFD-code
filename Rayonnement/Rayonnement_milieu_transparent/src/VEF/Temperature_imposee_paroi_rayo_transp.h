@@ -32,9 +32,9 @@ class Temperature_imposee_paroi_rayo_transp : public Cond_Lim_Rayo, public Tempe
 
 public :
 
-  void associer_modele_rayo(Modele_Rayonnement_base& );
-  void completer();
-  void mettre_a_jour(double temps);
+  void associer_modele_rayo(Modele_Rayonnement_base& ) override;
+  void completer() override;
+  void mettre_a_jour(double temps) override;
   void calculer_Teta_i(double temps);
 
 protected:

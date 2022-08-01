@@ -1,0 +1,78 @@
+# Chgt proc par arrete et elimination facettes virt a la reprise. #
+# PARALLEL ONLY 4 #
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 64
+  nbelem_j 64
+  nbelem_k 32
+  # uniform_domain_size_i 0.2
+  uniform_domain_size_j 0.2
+  uniform_domain_size_k 0.2 #
+  origin_i -0.2
+  origin_j -0.2
+  origin_k 0.
+  uniform_domain_size_i 0.4
+  uniform_domain_size_j 0.4
+  uniform_domain_size_k 0.2
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 2
+  nproc_k 2
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 15
+  timestep 0.8
+  timestep_facsec 0.16666666666666666 # 0.4 *5/12 #
+  # time_scheme RK3 #
+  dt_post 2 # 60 4 #
+  # postraiter_sous_pas_de_temps #
+  champs_a_postraiter 5 INTERFACES COMPO_CONNEXE MU COURBURE VELOCITY
+  check_stop_file stop.txt
+  dt_sauvegarde 60
+  nb_pas_dt_max 4 # 480 = 1 tour #
+                     # 2400 = 5 tour #
+ Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+ 
+  multigrid_solver { }
+  disable_solveur_poisson
+  disable_diffusion_qdm
+  disable_convection_qdm
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init.lata
+# DEBUT REMAILL #
+    remaillage_ft_ijk {
+        nb_iter_barycentrage 1
+        relax_barycentrage 1
+        nb_iter_correction_volume 6
+        lissage_courbure_iterations_systematique 0
+    }
+# FIN REMAILL #
+  }
+  check_divergence
+  gravite 3 0. 0. 0. 
+  rho_liquide 1000
+  mu_liquide 1e-3
+  # Initialisation du tourbillon periodisee ... #
+  # pi*2/0.4 = 2.5132741228718345 #
+  expression_vx_init 0.2*sin(y*2.5132741228718345)
+  expression_vy_init -0.2*sin(x*2.5132741228718345)
+  expression_vz_init 0.
+}
+Fin

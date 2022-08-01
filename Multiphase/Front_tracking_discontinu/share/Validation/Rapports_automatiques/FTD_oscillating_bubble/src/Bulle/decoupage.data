@@ -5,7 +5,7 @@ Mailler dom
 	Pave Cavite
 		{
 		Origine 0. 0. 0.
-		Nombre_de_Noeuds 61 61 61
+		Nombre_de_Noeuds 43 43 43
 		Longueurs 0.01 0.01 0.01
 		}
 		{
@@ -18,7 +18,7 @@ Mailler dom
 		} 
 }
 Partition dom {
-        partitionneur tranche { tranches 2 2 1 }
+        partitionneur tranche { tranches 2 1 1 }
         larg_joint 2
         nom_zones dom
 }

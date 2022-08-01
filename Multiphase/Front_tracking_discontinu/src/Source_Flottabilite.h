@@ -41,8 +41,8 @@ class Source_Flottabilite : public Source_Action_Particules
   Declare_instanciable(Source_Flottabilite);
 
 public :
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected :
 

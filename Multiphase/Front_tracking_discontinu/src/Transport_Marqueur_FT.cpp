@@ -25,7 +25,7 @@
 #include <Schema_Temps_base.h>
 #include <Discretisation_base.h>
 #include <FloatTab.h>
-#include <IntTab.h>
+#include <TRUSTTab.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
 #include <Fluide_Diphasique.h>
@@ -407,8 +407,8 @@ bool Transport_Marqueur_FT::initTimeStep(double dt)
     {
       if (methode_calcul_vp_==BILAN_QDM)
         {
-          const int& dim = Objet_U::dimension;
-          const int& nb_particules = proprietes_particules().nb_particules();
+          const int dim = Objet_U::dimension;
+          const int nb_particules = proprietes_particules().nb_particules();
           const Maillage_FT_Disc& ens_points = maillage_interface();
           DoubleTab& vitesse_p = proprietes_particules().vitesse_particules();
           dt_p_ = dt/nb_it_;
@@ -459,7 +459,7 @@ int Transport_Marqueur_FT::reprendre(Entree& is)
 
 void Transport_Marqueur_FT::integrer_ensemble_lagrange(const double temps)
 {
-  const double& t_debut_integr = temps_debut_integration();
+  const double t_debut_integr = temps_debut_integration();
   Maillage_FT_Disc& ens_points = maillage_interface();
   if (sup_ou_egal(temps,t_debut_integr))
     {
@@ -584,8 +584,8 @@ void Transport_Marqueur_FT::calculer_proprietes_fluide_pos_particules(const Mail
   else
     {
       const Fluide_base& fluide = ref_cast(Fluide_base,eq_ns.milieu());
-      const Champ_base& champ_masse_vol =  fluide.masse_volumique();
-      const Champ_base& champ_visco_dyn =  fluide.viscosite_dynamique();
+      const Champ_base& champ_masse_vol =  fluide.masse_volumique().valeur();
+      const Champ_base& champ_visco_dyn =  fluide.viscosite_dynamique().valeur();
 
       DoubleTab& les_positions = tableaux_positions();
       IntVect& les_elements = vecteur_elements();
@@ -755,7 +755,7 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
         {
           const double indic_phase = phase_marquee_+(1.-2*phase_marquee_)*indic(elem);
           const double v = indic_phase * vol_elem(elem);
-          volumes(num_group) += v;
+          volumes[num_group] += v;
           for (int j=0; j<dim; j++)
             positions(num_group,j) += xp_elem(elem,j) * v;
         }
@@ -766,7 +766,7 @@ void Transport_Marqueur_FT::calcul_proprietes_geometriques(const IntVect&       
 
   for (int num_group=0; num_group<nb_compo; num_group++)
     {
-      const double inv_v = 1. / volumes(num_group);
+      const double inv_v = 1. / volumes[num_group];
       for (int j=0; j<dim; j++)
         positions(num_group,j) *= inv_v;
     }
@@ -914,8 +914,8 @@ void Transport_Marqueur_FT::construction_ensemble_proprietes(const IntVect&     
             }
           temp_tmp(compt,0) = 273.;
           mvol_tmp(compt,0) = rho_val;
-          vol_tmp(compt,0) = volumes(i);
-          diam_tmp(compt,0) = pow(volumes(i)*3./(4.*M_PI), 1./3) * 2.;
+          vol_tmp(compt,0) = volumes[i];
+          diam_tmp(compt,0) = pow(volumes[i]*3./(4.*M_PI), 1./3) * 2.;
           compt++;
         }
     }
@@ -1015,11 +1015,11 @@ void Transport_Marqueur_FT::update_delta_v(int n_deb,int n_fin,const Maillage_FT
 //Methode de resolution du bilan de qdm des particules
 //vitesse_p = vitesse_p + sources*dt
 //distinction pour explicite et implicite
-void Transport_Marqueur_FT::resoudre_edo(DoubleTab& vitesse_p, DoubleTab& une_source_stockage,const double& delta_t)
+void Transport_Marqueur_FT::resoudre_edo(DoubleTab& vitesse_p, DoubleTab& une_source_stockage,const double delta_t)
 {
 
-  const int& nb_particules = proprietes_particules().nb_particules();
-  const int& dim = Objet_U::dimension;
+  const int nb_particules = proprietes_particules().nb_particules();
+  const int dim = Objet_U::dimension;
   const DoubleTab& masse_vol_p = proprietes_particules().masse_vol_particules();
   const DoubleTab& volume_p = proprietes_particules().volume_particules();
 
@@ -1061,7 +1061,7 @@ void Transport_Marqueur_FT::imposer_cond_lim()
   //  int nb_positions;
   int face_bord;
   //nb_positions=0;
-  double x,y,z;
+  double x = 0.,y= 0.,z= 0.;
 
   for (int som = 0; som < nb_pos_tot; som++)
     {
@@ -1087,8 +1087,8 @@ void Transport_Marqueur_FT::imposer_cond_lim()
 //-Inversion du signe de la composante normale du vecteur vitesse dans cette base
 //-Calcul des nouvelles composantes du vecteur vitesse dans la base (e0,e1,e2)
 
-void Transport_Marqueur_FT::appliquer_reflexion_vitesse(const double& x, const double& y, const double& z,
-                                                        const int& som,int& face_bord,
+void Transport_Marqueur_FT::appliquer_reflexion_vitesse(const double x, const double y, const double z,
+                                                        const int som,int& face_bord,
                                                         const Zone_VF& zone_vf,
                                                         DoubleTab& vitesse_p)
 {

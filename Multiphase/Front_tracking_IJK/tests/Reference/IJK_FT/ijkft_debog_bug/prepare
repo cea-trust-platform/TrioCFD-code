@@ -1,0 +1,10 @@
+# Decompacte le fichier lata contenant le maillage front-tracking initial
+tar xzf init.lata.tgz
+
+# Genere le fichier Debog en mode write_pass
+# On produit une error de debog en changeant un petit parametre
+sed 's/check_pass/write_pass/;
+s/relax_barycentrage 1/relax_barycentrage 0.99999/' ijkft_debog_bug.data >prepare.data
+
+triou prepare.data
+

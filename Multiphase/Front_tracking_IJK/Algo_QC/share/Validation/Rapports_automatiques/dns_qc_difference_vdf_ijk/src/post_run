@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Extraction des pas de temps diffusion, convection et total
+# il semble que triou standart affiche le dt du pas de temps precedent,
+# on decale a t-dt pour superposer les courbes
+
+awk '$0~"We treat the time step number"{x=1}
+x==1 && $1=="dt"{dt=$3}
+x==1 && $1=="time"{t=$3;x=2}
+x==2 && $0~"diffusive time step"{dtdiffns=$5;x=3}
+x==3 && $0~"convective time step"{dtconv=$5;x=4}
+x==4 && $0~"diffusive time step"{dtdifft=$5;x=5;print t-dt,dt,dtdiffns,dtdifft,dtconv}' jdd_vdf.out >pas_de_temps_vdf.txt
+
+awk '$3=="dtconv="{print $2,$10,$8,$6,$4}' jdd_ijk.out >pas_de_temps_ijk.txt
+
+awk '$1=="T="&&$2>t{t=$2;print t,p}$1=="calcul_p_thermo"{p=$11}' jdd_ijk.out >pthermo_ijk.txt

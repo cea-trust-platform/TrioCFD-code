@@ -30,7 +30,7 @@ class Ecr_fic_Ansys : public Interprete
 
   Declare_instanciable(Ecr_fic_Ansys);
 public :
-  Entree& interpreter(Entree&);
+  Entree& interpreter(Entree&) override;
 
 };
 #endif

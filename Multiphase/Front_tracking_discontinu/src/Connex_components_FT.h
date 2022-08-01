@@ -23,9 +23,9 @@
 #define Connex_components_FT_H_INCLU
 #include <arch.h>
 
-class IntTab;
-class IntVect;
-class ArrOfInt;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 class Maillage_FT_Disc;
 
 int search_connex_components_local_FT(const Maillage_FT_Disc& mesh, ArrOfInt& num_compo);

@@ -1,0 +1,56 @@
+  thermique
+  {
+    {
+      Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+      }
+    expression_T_init 10.-5.*0.003/Pi*cos(x*2*Pi/0.003)*cos(y*2*Pi/0.003)*sin(z*Pi/0.003)
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    }
+, 
+    {
+      Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+      }
+    expression_T_init -0.5*cos(x*2*Pi/0.003+0.82) # dephasage #
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    }
+, 
+    {
+      Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+      }
+    expression_T_init -0.5*cos(y*2*Pi/0.003+0.82) # dephasage #
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    }
+, 
+    {
+      Boundary_Conditions {
+                bctype_kmin Perio
+                bctype_kmax Perio
+      }
+    expression_T_init -0.5*cos(z*2*Pi/0.003+0.82) # dephasage #
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    }
+  }
+}
+Fin

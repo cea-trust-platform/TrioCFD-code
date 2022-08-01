@@ -15,15 +15,14 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Convection_Diffusion_Espece_Multi_Turbulent_QC.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/21
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
 //
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Convection_Diffusion_Espece_Multi_Turbulent_QC.h>
 #include <Probleme_base.h>
 #include <Debog.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Param.h>
 
 Implemente_instanciable(Convection_Diffusion_Espece_Multi_Turbulent_QC,"Convection_Diffusion_Espece_Multi_Turbulent_QC",Convection_Diffusion_Espece_Multi_QC);

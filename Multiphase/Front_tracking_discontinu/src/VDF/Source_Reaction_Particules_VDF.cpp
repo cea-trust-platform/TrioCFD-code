@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Reaction_Particules_VDF.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Transport_Marqueur_FT.h>
 #include <Domaine.h>
 #include <Zone_VDF.h>
@@ -87,7 +87,7 @@ DoubleTab& Source_Reaction_Particules_VDF::ajouter(DoubleTab& resu) const
   if (sub_type(Navier_Stokes_FT_Disc,equation()))
     is_FT = 1;
 
-  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique());
+  const Champ_base& champ_rho = (is_FT==1?ref_cast(Navier_Stokes_FT_Disc,equation()).champ_rho_faces():equation().milieu().masse_volumique().valeur());
   const DoubleTab& rho_faces = champ_rho.valeurs();
 
   //Remplissage de source_som (interpolation de source_stockage aux sommets)

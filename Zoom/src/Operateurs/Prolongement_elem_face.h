@@ -26,7 +26,7 @@
 
 
 #include <Prolongement_base.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 
 //
 // .DESCRIPTION class Prolongement_elem_face
@@ -47,11 +47,11 @@ class Prolongement_elem_face : public Prolongement_base
 public:
 
   inline DoubleTab& distances();
-  void calculer(Zone_VF& , Zone_VF& , IntVect& );
+  void calculer(Zone_VF& , Zone_VF& , IntVect& ) override;
   void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                  const Frontiere& frontF,IntVect& connect,
                  const DoubleTab& incoG,
-                 DoubleTab& tab, int nb_comp);
+                 DoubleTab& tab, int nb_comp) override;
 
 private:
   DoubleTab distances_;

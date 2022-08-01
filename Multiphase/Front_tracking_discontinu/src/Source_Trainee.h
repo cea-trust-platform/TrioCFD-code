@@ -43,8 +43,8 @@ class Source_Trainee : public Source_Action_Particules
   Declare_instanciable(Source_Trainee);
 
 public :
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
 protected :
 

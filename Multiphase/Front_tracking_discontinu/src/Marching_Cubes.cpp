@@ -24,7 +24,7 @@
 #include <Deriv_Marching_Cubes.h>
 #include <Marching_Cubes_data.h>
 #include <ArrOfBit.h>
-#include <DoubleVect.h>
+#include <TRUSTVect.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
 #include <Rectangle.h>
@@ -326,7 +326,7 @@ int Marching_Cubes::construire_iso(const Nom& expression, double isovaleur,
       exit();
     }
 
-  String2 expr_chaine(expression);
+  std::string expr_chaine(expression);
   Parser parser(expr_chaine, dimension);
   parser.addVar("x");
   parser.addVar("y");
@@ -1127,7 +1127,7 @@ void Marching_Cubes::construire_noeuds_uniques(IntTab& def_noeud,
       if (noeud_PE == mon_PE)
         keep_last_node = 1;
 
-      renumerotation(noeud_ancien_numero) = dernier;
+      renumerotation[noeud_ancien_numero] = dernier;
     }
   if (keep_last_node)
     {
@@ -1161,7 +1161,7 @@ void Marching_Cubes::construire_noeuds_uniques(IntTab& def_noeud,
     for (i = 0; i < nb_sommets; i++)
       {
         int num_sommet = tab[i];
-        num_sommet = renumerotation(num_sommet);
+        num_sommet = renumerotation[num_sommet];
         assert(num_sommet > -1);
         tab[i] = num_sommet;
       }

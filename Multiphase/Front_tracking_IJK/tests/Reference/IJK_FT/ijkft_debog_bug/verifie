@@ -1,0 +1,13 @@
+#!/bin/sh
+# cherche le fichier err le plus recent
+src=`ls -rt *.err | tail -n 1`
+echo On verifie que debog a trouve une erreur
+if grep 'DEBOG: erreur' $src
+then
+  echo Yes, we found a lot of errors, we are happy, this is OK !
+  exit 0
+else
+  echo Erreur: Debog n a pas trouve d erreur
+  exit 1
+fi
+

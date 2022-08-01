@@ -1,0 +1,58 @@
+Parametres {
+	Titre "Taylor-Green vortices"
+	Description ""
+	Auteur "G.B."
+	CasTest . taylor_green_vortices_3D 8
+}
+
+Chapitre {
+	Titre "Presentation generale"
+	
+	Description "Validation sur les tourbillons de Taylor-Green"
+	
+	Description A faire : <<EOF
+
+   ----------------------------------------------------------------- 
+   
+Remplir la fiche...
+Corriger l'instabilite
+Voir pour la matrice du lambda2
+
+   ----------------------------------------------------------------- 
+EOF
+}
+
+
+Chapitre {
+	Titre "Taylor Green flow"
+	visu {
+		titre "Etat initial Vitesse"
+		cycles 0
+		pseudocolor taylor_green_vortices_3D.lata DOM_dual VELOCITY_X FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	
+	visu {
+		titre "Etat final Vitesse x"
+		cycles -1
+		pseudocolor taylor_green_vortices_3D.lata DOM_dual VELOCITY_X FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+	visu {
+		titre "Etat final Vitesse y"
+		cycles -1
+		pseudocolor taylor_green_vortices_3D.lata DOM_dual VELOCITY_Y FACES
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}	
+	visu {
+		titre "Etat final Pression"
+		cycles -1
+		pseudocolor taylor_green_vortices_3D.lata DOM PRESSURE ELEM
+		Normal3d 0.314479 -0.919209 0.236977
+		Up3D     0.257203 0.322815 0.910844
+	}
+}
+

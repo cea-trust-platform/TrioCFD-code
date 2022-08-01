@@ -42,15 +42,12 @@ class Echange_global_impose_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, 
   Declare_instanciable(Echange_global_impose_rayo_semi_transp);
 
 public :
-  const Cond_lim_base& la_cl() const;
+  const Cond_lim_base& la_cl() const override;
   Champ_front& temperature_bord();
   void calculer_temperature_bord(double temps);
 
-  void completer();
-  void verifie_ch_init_nb_comp();
-
-protected :
-
+  void completer() override;
+  void verifie_ch_init_nb_comp() const override;
 };
 
 #endif

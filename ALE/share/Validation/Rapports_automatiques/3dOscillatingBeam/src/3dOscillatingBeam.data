@@ -44,7 +44,7 @@ VEFPreP1B ma_discretisation
 # Lire ma_discretisation { P0 } #
 
 
-# Time scheme, choice between: explicit or implicit #
+# Time scheme, choice between: Euler explicit or implicit, and Adams Bashforth order 2  or order 3 #
 Scheme_euler_implicit mon_schema
 Read mon_schema
 {

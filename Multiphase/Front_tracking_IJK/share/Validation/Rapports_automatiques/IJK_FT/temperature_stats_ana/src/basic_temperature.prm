@@ -1,0 +1,42 @@
+Parametres {
+	Titre "Test Case: statistical validation of a single-phase flow in a channel"
+Description <<EOF
+\latex_(
+In order to validate the thermal statistics generation, a known velocity field as a well as a temperature field is imposed over time in the case of a single phase canal (bi-periodicity and walls perpendicular to x direction). Implementation of the statistics in the C++ code is not handy and human mistakes can lead to export wrong variables. Imposing both temperature and velocity fields as an analytically integrable function allows checking the average of $\overline{uT}$ over time. The following case if thus considered:
+\begin{itemize}
+\item No convection, diffusion, sources or gravity which leads to zero momentum
+\item No thermal convection or diffusion
+\item Bi periodicity of the canal and walls in the third direction (plan normal to x direction)
+\item Initial x-velocity field is initialised at $v_x = vx_ana$
+\item Initial y-velocity field is initialised at $v_y = vy_ana$
+\item Initial z-velocity field is initialised at $v_z = vz_ana$
+\item Initial Temperature field is initialised to $T = T_ana$
+\end{itemize}
+\latex_)
+EOF
+
+	Auteur "A.S.-M.G"
+	CasTest . basic_temperature.data 1
+}
+
+Chapitre {
+	Titre "Checking the thermal statistics consistency over time"
+Description <<EOF
+\latex_(
+Statistics from temperature .txt files are analysed. As the velocity and temperature are not evolving with time, time averaged values should be constants. Statistics are extracted from .txt to .dt\_ev file using share/PyTools3/commons/BuildStat.py. 
+Stats_temperature_0/Stats_temperature_0_err.out
+\latex_)
+EOF
+
+}
+
+ Chapitre {
+	Titre "Checking the last snapshot of spatial averaged values"
+Description <<EOF
+\latex_(
+Last snapshot is checked to ensure that the spatial averaged calculated when running is OK. Statistics over time are shown in the following snapshot table 
+Final_snapshot_temperature_0/Final_snapshot_temperature_0_err.out
+\latex_)
+EOF
+
+} 

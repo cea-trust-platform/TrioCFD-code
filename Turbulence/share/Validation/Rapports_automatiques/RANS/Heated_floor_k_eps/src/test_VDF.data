@@ -1,0 +1,184 @@
+# Simulation du cas test: plancher chauffant. #
+
+
+dimension 2
+export domaine dom
+# BEGIN MESH #
+Read_file dom test_Pb1_2D.geom
+# END MESH #
+# Remarque:Les Sous Zones restent 3D et ne sont pas encore coupees par 3Dto2D. #
+
+
+
+Pb_Thermohydraulique_turbulent pb
+
+
+
+# BEGIN PARTITION
+Partition dom
+{
+   Partitionneur metis { Nb_parts 2 }
+   Larg_joint 1
+   Nom_Zones DOM1
+}
+End
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom
+END SCATTER #
+
+VDF dis
+
+Schema_Euler_explicite sch
+Read sch 
+{
+        tinit 0.
+        tmax 5000.
+        dt_min 1.e-7
+        dt_max 1.e-1
+	dt_impr 1.
+	dt_start dt_calc
+        dt_sauv 500.
+        seuil_statio 1.e-8  
+        facsec 1.
+}
+
+Fluide_Incompressible fluide
+
+Read fluide {
+	mu Champ_Uniforme 1 1.85e-5
+	rho Champ_Uniforme 1 1.18
+	lambda Champ_Uniforme 1 0.0262
+	Cp Champ_Uniforme 1 1006.
+	Beta_th Champ_Uniforme 1 3.3e-3
+}
+
+Champ_Uniforme gravite
+Read gravite 2 0 -9.81
+
+Associate fluide gravite
+Associate pb dom
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Read pb
+{ 
+ 	Navier_Stokes_turbulent
+ 	{ 
+       		solveur_pression Gcp 
+		{ 
+			precond ssor { omega 1.5 } 
+                        seuil 1.e-10
+			impr
+                } 
+       		convection { Quick }
+       		diffusion  { }
+       		sources { boussinesq_temperature { T0 288. } }
+       	
+       		conditions_initiales 
+		{ 
+       			    Vitesse champ_uniforme 2 0. 0.
+       		}
+       
+       
+       		boundary_conditions 
+		{  
+				DROIT paroi_fixe
+				PAVE  paroi_fixe
+				BAS   paroi_fixe
+				HAUT  paroi_fixe
+				E_HAU paroi_fixe
+				ENTRE frontiere_ouverte_vitesse_imposee Champ_Front_Uniforme 2 0.57 0.0
+				SORTI frontiere_ouverte_pression_imposee Champ_Front_Uniforme 1 0.0
+					
+		} 
+			  
+		Modele_turbulence K_epsilon
+		{
+			cmu 0.09
+			transport_k_epsilon
+			{
+				diffusion { }
+				convection { amont }		
+				conditions_initiales { k_eps champ_uniforme 2 1.25e-3 4.92e-3 }
+				
+				boundary_conditions 
+				{ 
+					DROIT paroi
+					PAVE paroi
+					BAS   paroi
+					HAUT  paroi
+					E_HAU paroi
+					ENTRE Frontiere_ouverte_K_Eps_impose Champ_Front_Uniforme 2 1.25e-3 4.92e-3
+					SORTI Frontiere_ouverte K_Eps_ext    Champ_Front_Uniforme 2 1.25e-3 4.92e-3
+				}
+			}
+			turbulence_paroi loi_standard_hydr dt_impr_ustar 0.2
+        	}		                    
+	}
+    
+	Convection_Diffusion_Temperature_turbulent
+	{
+		diffusion { }
+		convection { Quick }
+
+		conditions_initiales { Temperature Champ_uniforme 1 287  }
+		boundary_conditions 
+		{
+			DROIT Paroi_temperature_imposee Champ_Front_Uniforme 1 288.  
+			PAVE Paroi_temperature_imposee Champ_Front_Uniforme 1 288.
+			BAS   Paroi_temperature_imposee Champ_Front_Uniforme 1 308.
+			HAUT  Paroi_temperature_imposee Champ_Front_Uniforme 1 288.
+			E_HAU Paroi_temperature_imposee Champ_Front_Uniforme 1 288.
+			ENTRE Frontiere_ouverte_temperature_imposee Champ_Front_Uniforme 1 288.
+			SORTI frontiere_ouverte T_ext Champ_Front_Uniforme 1 288.
+		}
+               Modele_Turbulence Prandtl 
+                {
+                        Turbulence_Paroi loi_standard_hydr_scalaire dt_impr_nusselt 10.
+                }
+	}
+
+	Postraitement
+        {
+		format lata       
+		
+		Champs dt_post 1000.0
+		{
+			vitesse elem
+			vitesse som
+			pression_Pa elem
+			pression som
+			temperature elem
+			temperature som
+			gradient_pression elem
+			k elem
+			eps elem
+			viscosite_turbulente elem
+			y_plus elem
+		}
+		Sondes
+		{
+			sonde_T1 temperature periode 10. segment 50 0.1 0.1 1.14 0.1
+			sonde_T2 temperature periode 10. segment 50 0.1 0.52 1.14 0.52
+			sonde_T3 temperature periode 10. segment 50 0.1 0.9 1.14 0.9
+
+			sonde_V1_hori VitesseY periode 10. segment 50 0.1 0.1 1.14 0.1
+			sonde_V2_hori VitesseY periode 10. segment 50 0.1 0.52 1.14 0.52
+			sonde_V3_hori VitesseY periode 10. segment 50 0.1 0.9 1.14 0.9
+
+			sonde_V1_verti VitesseX periode 10. segment 50 0.2 0.0 0.2 1.04
+			sonde_V2_verti VitesseX periode 10. segment 50 0.62 0.0 0.62 1.04
+			sonde_V3_verti VitesseX periode 10. segment 50 1.0 0.0 1.0 1.04
+
+			sonde_vitesse_point vitesse periode 10. point 2 0.62 0.52 1.0 0.2 
+	
+		}
+	}
+}
+
+Solve pb
+End

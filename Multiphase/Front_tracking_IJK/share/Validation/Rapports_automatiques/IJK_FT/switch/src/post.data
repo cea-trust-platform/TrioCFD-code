@@ -1,0 +1,84 @@
+IJK_Grid_Geometry DOM_NEW
+Lire DOM_NEW
+{
+  nbelem_i 17
+  nbelem_j 24
+  nbelem_k 14
+  uniform_domain_size_i 0.003
+  uniform_domain_size_j 0.003
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM_NEW
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  # ijk_splitting_ft_extension 5 #
+  # On supprime l'extension et les interfaces pour avoir acces aux sondes... #
+  ijk_splitting_ft_extension 0 disable_diphasique
+  timestep 1.e-12
+  timestep_facsec 1.
+  Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  champs_a_postraiter 7 ECART_ANA VELOCITY_ANA VELOCITY_FT TEMPERATURE VELOCITY TEMPERATURE_ANA ECART_T_ANA # INTERFACES COMPO_CONNEXE #
+  dt_sauvegarde 1
+  nb_pas_dt_max 1
+  t_debut_statistiques 1e20
+  disable_solveur_poisson disable_diffusion_qdm disable_source_interf disable_convection_qdm # disable_diphasique #
+   multigrid_solver {  }
+  interfaces 
+  {
+    fichier_reprise_interface refine_@FLAG@.sauv.lata
+    timestep_reprise_interface       1
+  }
+   rho_liquide 1000.
+   mu_liquide 1e-3
+   rho_vapeur 600
+   mu_vapeur 1e-3
+   fichier_reprise_vitesse refine_@FLAG@.sauv.lata
+  timestep_reprise_vitesse 1
+  expression_vx_ana -5.*cos(x*2*Pi/0.003+0.82)
+  expression_vy_ana -5.*cos(y*2*Pi/0.003+0.82)
+  expression_vz_ana -5.*cos(z*2*Pi/0.003+1.5707963267948966)
+  nom_reprise refine_@FLAG@_mod.sauv
+
+  Sondes
+    {
+       sx_T0    temperature_0 periode 1.e-20 segment 17 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_Tana0 temperature_ana_0 periode 1.e-20 segment 17 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_e0 ecart_t_ana_0 periode 1.e-20 segment 17 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_T1    temperature_1 periode 1.e-20 segment 17 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_Tana1 temperature_ana_1 periode 1.e-20 segment 17 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_e1 ecart_t_ana_1 periode 1.e-20 segment 17 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sy_T2 temperature_2 periode 1.e-20 segment 24 0.0015 0.000 0.0015 0.0015 0.003 0.0015
+       sy_Tana2 temperature_ana_2 periode 1.e-20 segment 24 0.0015 0.000 0.0015 0.0015 0.003 0.0015
+       sy_e2 ecart_t_ana_2 periode 1.e-20 segment 24 0.0015 0.000 0.0015 0.0015 0.003 0.0015
+       sz_T3 temperature_3 periode 1.e-20 segment 14 0.0015 0.0015 0.000 0.0015 0.0015 0.003
+       sz_Tana3 temperature_ana_3 periode 1.e-20 segment 14 0.0015 0.0015 0.000 0.0015 0.0015 0.003
+       sz_e3 ecart_t_ana_3 periode 1.e-20 segment 14 0.0015 0.0015 0.000 0.0015 0.0015 0.003
+       
+       sx_VX    velocity_X periode 1.e-20 segment 18 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_VXana velocity_ana_X periode 1.e-20 segment 18 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sx_EX    ecart_ana_X periode 1.e-20 segment 18 0.000 0.0015 0.0015 0.003 0.0015 0.0015
+       sy_VY velocity_Y periode 1.e-20 segment 24 0.0015 0.000 0.0015 0.0015 0.003 0.0015
+       sy_VYana velocity_ana_Y periode 1.e-20 segment 24 0.0015 0.000 0.0015 0.0015 0.003 0.0015
+       sy_EY ecart_ana_Y periode 1.e-20 segment 24 0.0015 0.000 0.0015 0.0015 0.003 0.0015
+       sz_vZ velocity_Z periode 1.e-20 segment 14 0.0015 0.0015 0.000 0.0015 0.0015 0.003
+       sz_VZana velocity_ana_z periode 1.e-20 segment 14 0.0015 0.0015 0.000 0.0015 0.0015 0.003
+       sz_EZ ecart_ana_z periode 1.e-20 segment 14 0.0015 0.0015 0.000 0.0015 0.0015 0.003
+    }
+}
+Fin

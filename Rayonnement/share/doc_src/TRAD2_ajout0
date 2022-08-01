@@ -235,11 +235,13 @@ Champ_front_synt front_field_base Champ_front_synt 0 Boundary condition to creat
   attr dim entier dim 0 Number of field components. It should be 3!
   attr bloc bloc_lecture_turb_synt bloc 0 bloc containing the parameters of the synthetic turbulence
 bloc_lecture_turb_synt objet_lecture nul 1 bloc containing parameters of the synthetic turbulence
-  attr moyenne listf moyenne 0 Mean Velocity
-  attr lenghtScale floattant lengthScale 0 Integral length scale
-  attr nbModes entier nbModes 0 Number of Fourier coefficients
-  attr turbKinEn floattant turbKinEn 0 Turbulent kinetic energy
-  attr p floattant p 0 Wave number factor
-  attr timeScale floattant timeScale 0 Integral time scale
-  attr dir_fluct listf dir_fluct 0 direction of fluctuations
+  attr moyenne listf moyenne 0 components of the average velocity fields
+  attr lenghtScale floattant lengthScale 0 turbulent length scale
+  attr nbModes entier nbModes 0 number of Fourier modes
+  attr turbKinEn floattant turbKinEn 0 turbulent kinetic energy (k)
+  attr turbDissRate floattant turbDissRate 0 turbulent dissipation rate (epsilon)
+  attr ratioCutoffWavenumber floattant ratioCutoffWavenumber 0 ratio between the cut-off wavenumber and pi/delta
+  attr KeOverKmin floattant KeOverKmin 0 ratio of the most energetic wavenumber Ke over the minimum wavenumber Kmin representing the largest turbulent eddies
+  attr timeScale floattant timeScale 0 turbulent time scale
+  attr dir_fluct listf dir_fluct 0 directions for the velocity fluctations (e.g 1 0 0 generates velocity fluctuations in the x-direction only)
 

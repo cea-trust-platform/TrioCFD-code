@@ -1,0 +1,5 @@
+#!/bin/bash
+
+extrait_coupe expansion_avec_mass_HEM ALP
+extrait_coupe expansion_avec_mass_HEM P
+extrait_coupe expansion_avec_mass_HEM V

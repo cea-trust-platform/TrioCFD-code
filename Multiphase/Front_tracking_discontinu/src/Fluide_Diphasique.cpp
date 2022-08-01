@@ -148,7 +148,7 @@ int Fluide_Diphasique::formule_mu() const
 }
 
 
-int Fluide_Diphasique::initialiser(const double& temps)
+int Fluide_Diphasique::initialiser(const double temps)
 {
   phase0_.initialiser(temps);
   phase1_.initialiser(temps);
@@ -175,7 +175,7 @@ void Fluide_Diphasique::discretiser(const Probleme_base& pb, const  Discretisati
 // ===========================================================================
 // Appels invalides :
 
-const Champ_base& Fluide_Diphasique::masse_volumique() const
+const Champ& Fluide_Diphasique::masse_volumique() const
 {
   Cerr << "Error : Fluide_Diphasique::masse_volumique()" << finl;
   assert(0);
@@ -184,7 +184,7 @@ const Champ_base& Fluide_Diphasique::masse_volumique() const
   return phase0_.masse_volumique();
 }
 
-Champ_base& Fluide_Diphasique::masse_volumique()
+Champ& Fluide_Diphasique::masse_volumique()
 {
   Cerr << "Error : Fluide_Diphasique::masse_volumique()" << finl;
   assert(0);

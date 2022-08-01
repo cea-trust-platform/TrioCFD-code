@@ -277,7 +277,7 @@ double Probleme_FT_Disc_gen::calculer_pas_de_temps(void) const
   if (la_chimie_.non_nul())
 
     {
-      dt=min(dt,la_chimie_.valeur().calculer_pas_de_temps());
+      dt=std::min(dt,la_chimie_.valeur().calculer_pas_de_temps());
       dt=mp_min(dt);
     }
   return dt;

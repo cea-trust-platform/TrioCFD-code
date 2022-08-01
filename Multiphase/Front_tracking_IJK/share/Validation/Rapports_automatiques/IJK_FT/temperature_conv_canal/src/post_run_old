@@ -1,0 +1,8 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# python ./ordre_cvg.py
+# cd ..
+cas=`echo $1`
+echo "Début post traitement"
+./$cas.sh

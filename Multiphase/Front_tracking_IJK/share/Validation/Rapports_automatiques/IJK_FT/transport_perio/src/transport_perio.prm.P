@@ -1,0 +1,60 @@
+Parametres {
+	Titre "Transport periodique front-tracking en IJK"
+	Description ""
+	Auteur "G.B."
+	CasTest . ijkft_ConvectionMultiSphere_seq.data
+	CasTest . ijkft_ConvectionMultiSphere_reprise.data
+	CasTest . ijkft_ConvectionMultiSphere_par8.data 8
+	CasTest . ijkft_ConvectionMultiSphere_par8_reprise.data 8
+}
+Chapitre {
+	Titre "Maillage généré par cree_multi_bulles.sh"
+
+	visu {
+		titre "Etat initial genere par cree_multi_bulles.sh"
+		mesh init.lata FTMESH
+		pseudocolor init.lata FTMESH COMPO_CONNEXE ELEM
+	}
+}
+
+#Pmacro CHAPITRE(_TITRE_,_FICHIER_)
+Chapitre {
+	Titre _TITRE_
+	visu {
+		titre "Etat initial"
+		cycles 0
+		mesh                      _FICHIER_ INTERFACES
+		pseudocolor               _FICHIER_ INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity  _FICHIER_ DOM MU ELEM 0.1
+		mesh                      _FICHIER_ DOM_EXT
+	}
+	visu {
+		titre "Etat final"
+		cycles -1
+		mesh                      _FICHIER_ INTERFACES
+		pseudocolor               _FICHIER_ INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity  _FICHIER_ DOM MU ELEM 0.1
+		mesh                      _FICHIER_ DOM_EXT
+	}
+	visu {
+		titre "Coupe du champ de vitesse Y sur le domaine etendu"
+		cycles -1
+		mesh        _FICHIER_ INTERFACES
+		mesh        _FICHIER_ DOM
+		pseudocolor _FICHIER_ DOM_EXT_dual VELOCITY_FT_Y FACES 
+		operator_to_all slice2d_z 0. 0. 0.1
+	}
+	visu {
+	        titre "Decoupage parallele des interfaces"
+		cycles -1
+		mesh                     _FICHIER_ INTERFACES
+		pseudocolor              _FICHIER_ INTERFACES FACETTE_PE_OWNER ELEM
+		pseudocolor_with_opacity _FICHIER_ DOM MU ELEM 0.1
+		mesh                     _FICHIER_ DOM_EXT
+	}
+}
+#Pendmacro(CHAPITRE)
+#Pusemacro(CHAPITRE)("Vérification du calcul initial séquentiel",ijkft_ConvectionMultiSphere_seq.lata)
+#Pusemacro(CHAPITRE)("Vérification de la reprise séquentiel",ijkft_ConvectionMultiSphere_reprise.lata)
+#Pusemacro(CHAPITRE)("Vérification du calcul initial parallèle",ijkft_ConvectionMultiSphere_par8.lata)
+#Pusemacro(CHAPITRE)("Vérification de la reprise parallèle",ijkft_ConvectionMultiSphere_par8_reprise.lata)

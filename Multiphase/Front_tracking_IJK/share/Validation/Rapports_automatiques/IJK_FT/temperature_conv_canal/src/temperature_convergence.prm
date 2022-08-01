@@ -1,0 +1,187 @@
+Parametres {
+	Titre "Fiche de validation de la convergence des schemas en temperture
+ 	Description <<EOF
+In order to validate the algorithm implemented for the resolution of the energy equation, we performed some particular test cases in which numerical solutions are compared to the corresponding analytical ones.
+\latex_($$\rho c_p \left( \partial_t T + \mathbf{u}.\nabla T \right) = \nabla (\lambda \nabla T)$$\latex_)
+To this equation, we add spatial boundary conditions (BC) and an initial condition.
+\latex_(\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+$L_x$ & $L_y$ & $L_z$ & $N_x$ & $N_y$ & $N_z$ & $\Delta t$ \\
+\hline
+0.006 &0.006 & 0.003 & 64 & 64 & 32 & 2.4e-4 \\  
+\hline
+\end{tabular}
+\end{center}\latex_)
+Where L, N and $\Delta t$ stand respectively for the length, number of nodes and time step. The subscripts $x$, $y$ and $z$ indicate the different directions.
+EOF
+
+	Auteur "A.S."
+    CasTest DIFFUSION DIFFUSION.data 1
+    CasTest CONVECTION CONVECTION.data 1
+    CasTest SCHEMA_TEMPS SCHEMA_TEMPS.data 1
+}
+
+Chapitre {
+	Titre "Evolution de la temperature avec diffusion, et convergence de l'operateur en espace"
+    Description <<EOF
+
+Dans ce cas la, on desactive la convection de temperature. Il n'y a pas de transfert de qdm (et la vitesse initiale est nulle)
+Pour le moment on regarde la solution uniquement dans un cas periodique, dans un deuxième temps la fiche prendra aussi en compte un cas avec des parois.
+Il faut aussi ajouter l'imlage de convergence de l'operateur.
+EOF
+
+	visu {
+        titre "Solution calculee"
+        cycles -1
+        width 7cm
+        pseudocolor DIFFUSION/DIFFUSION.lata DOM TEMPERATURE_0 ELEM
+    }
+	
+	visu {
+        titre "Solution analytique"
+        cycles -1
+        width 7cm
+        pseudocolor DIFFUSION/DIFFUSION.lata DOM TEMPERATURE_ANA ELEM
+    }
+
+    visu {
+        titre "Ecart a la solution analytique"
+        cycles -1
+        width 7cm
+        pseudocolor DIFFUSION/DIFFUSION.lata DOM ECART_T_ANA ELEM
+    }
+    
+    Figure {
+        Titre "Norme L2 en fonction du pas de maillage."
+        Description "Ordre 2 pour le schema OpDiffIJK"
+        LogX
+        LogY
+        width 7cm
+        incluredesccourbes 0
+        labelX  "DX"
+        courbe {
+            fichier DIFFUSION/CONVERGENCE/cvgx_L2_EUL.txt
+            colonnes ($1) ($3)
+            style points
+            Legende "EUL"
+        }
+            Curve {
+            fichier DIFFUSION/CONVERGENCE/cvgx_L2_EUL.txt
+            colonnes ($1) (2*0.00440539*10**(-1)*(($1)/8)**(-2))
+            Legende "o2"
+            Style lines
+        }
+    }
+
+    
+    # on peut rajouter la temperature adimentionnelle theta dans le cas ou on a wall_flux#
+    # on peut aussi rajouter l'evolution du nombre de Nusselt mais on va peut etre laisser ca a la fiche avec des reprises #
+}
+
+# Chapitre {	
+#     Title "Evolution de la temperature avec convection, et convergence de l'operateur en espace"
+#     Description <<EOF
+# Dans le cas de la convection, on desactice la diffusion. Pour rendre la solution non triviale, on impose un CL en vitesse constante selon y. Il n'y a pas de convection ni de diffusion de la qdm.
+# EOF
+# 	visu {
+#         titre "Solution calculee"
+#         cycles -1
+#         width 7cm
+#         pseudocolor CONVECTION/CONVECTION.lata DOM TEMPERATURE_0 ELEM
+#     }
+# 	
+# 	visu {
+#         titre "Solution analytique"
+#         cycles -1
+#         width 7cm
+#         pseudocolor CONVECTION/CONVECTION.lata DOM TEMPERATURE_ANA ELEM
+#     }
+# 
+#     visu {
+#         titre "Ecart a la solution analytique"
+#         cycles -1
+#         width 7cm
+#         pseudocolor CONVECTION/CONVECTION.lata DOM ECART_T_ANA ELEM
+#     }
+#     Description <<EOF
+# Ici on observe un comportement qui peut sembler etonnant, mais en realite c'est le comportement attendu de l'operateur QUICK qui possede un limiteur. Ce limiteur est active aux extremas de la fonction a predire, ce qui est bien le cas ici. Le limiteur degrade localement l'ordre de la solution qui passe de 3 a 1. Cela donne donc une erreur plus importante dans la zone des extremas de la fonction a predire.
+# EOF
+# 
+#     Figure {
+#         Titre "Norme L2 en fonction du pas de maillage."
+#         Description "Ordre 3 pour le schema QUICK"
+#         LogX
+#         LogY
+#         incluredesccourbes 0
+#         labelX  "DX"
+#         width 7cm
+#         courbe {
+#             fichier CONVECTION/CONVERGENCE/cvgx_L2_EUL.txt
+#             colonnes ($1) ($3)
+#             style points
+#             Legende "EUL"
+#         }
+#         Curve {
+#             fichier CONVECTION/CONVERGENCE/cvgx_L2_EUL.txt
+#             colonnes ($1) (5*2.20918e-03*(($1)/8)**(-3))
+#             Legende "o3"
+#             Style lines
+#         }
+#     }
+# 
+# 
+# 
+# }
+# 
+# Chapitre {	
+#     Title "Evolution de la temperature avec seulement le schema en temps, et convergence de l'operateur en espace"
+#     Description <<EOF
+# Pour evaluer l'ordre 1 du schema euler explicite, on desactive la convection et la diffusion, et on impose une source en temperature qui depend du temps. On choisit une source exponentielle.
+# Pour le moment la prose en compte d'une source n'est pas encore implementee donc la difference est nulle parce que la solution est constante.
+# EOF
+# 	visu {
+#         titre "Solution calculee"
+#         cycles -1
+#         width 7cm
+#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM TEMPERATURE_0 ELEM
+#     }
+# 	
+# 	visu {
+#         titre "Solution analytique"
+#         cycles -1
+#         width 7cm
+#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM TEMPERATURE_ANA ELEM
+#     }
+# 
+#     visu {
+#         titre "Ecart a la solution analytique"
+#         cycles -1
+#         width 7cm
+#         pseudocolor SCHEMA_TEMPS/SCHEMA_TEMPS.lata DOM ECART_T_ANA ELEM
+#     }
+#     Description <<EOF
+# Quand la source sera implementee, ajouter un graphe de convergence selon le pas de temps.
+# EOF
+# 
+#     Figure {
+#         Titre "Comparaison de la norme L2 de l'erreur pour l'operateur de schema en temps en fonction du pas de maillage."
+#         Description "Ordre 1 pour le schema en temps Euler"
+#         LogX
+#         LogY
+#         incluredesccourbes 0
+#         labelX  "DX"
+#         courbe {
+#             fichier SCHEMA_TEMPS/CONVERGENCE/cvgx_L2_EUL.txt
+#             colonnes ($1) ($3)
+#             style points
+#             Legende "EUL"
+#         }
+#         Curve {
+#             fichier SCHEMA_TEMPS/CONVERGENCE/cvgx_L2_EUL.txt
+#             colonnes ($1) (0.00440539*10**(-1)*(($1)/8)**(-2))
+#             Legende "o1"
+#             Style lines
+#         }
+#     }
+#}

@@ -1,0 +1,30 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle3.geo -2
+
+# Generation de 4 bulles a 4 positions differentes:
+rm -f deplacements.txt
+for k in 0.00161 0.00501
+do
+  for j in 0.00161 0.00511
+  do
+    for i in 0.00181 0.00541
+    do
+	   echo $i $j $k bulle4.msh >>deplacements.txt
+    done
+  done
+done
+
+./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Pour le test de calcul de distance on cree 3 bulles
+cat >deplacements2.txt <<EOF
+0.002 0.002 0.002 bulle4.msh
+0.006 0.002 0.002 bulle4.msh
+0.002 0.006 0.006 bulle4.msh
+EOF
+./cree_multi_bulles.sh deplacements2.txt init2.lata

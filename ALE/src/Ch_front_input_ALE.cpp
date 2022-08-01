@@ -35,7 +35,7 @@ Implemente_instanciable_sans_constructeur(Ch_front_input_ALE,"Ch_front_input_ALE
 // XD Ch_front_input_ALE  front_field_base  Ch_front_input_ALE  -1 Class to define a boundary condition on a moving boundary of a mesh (only for the Arbitrary Lagrangian-Eulerian  framework ) .  NL2  Example:  Ch_front_input_ALE { nb_comp 3 nom VITESSE_IN_ALE probleme pb initial_value 3 1. 0. 0. }
 
 Ch_front_input_ALE::Ch_front_input_ALE():
-        alreadyInit_(false)
+  alreadyInit_(false)
 {
 }
 
@@ -61,9 +61,9 @@ void Ch_front_input_ALE::setValue(const TrioField& afield)
   for(int i=0; i<NrOfNodesIn_les_valeurs_som; i++)
     {
       for(int j=0; j<afield._nb_field_components; j++)
-	{
-	  les_valeurs_som[1].valeurs()(i,j)=afield._field[afield._nb_field_components*i+j]; //Values to nodes.
-	}
+        {
+          les_valeurs_som[1].valeurs()(i,j)=afield._field[afield._nb_field_components*i+j]; //Values to nodes.
+        }
     }
   les_valeurs_som[1].valeurs().echange_espace_virtuel() ;
 }
@@ -147,11 +147,11 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
       for (int s=0; s<ffaces.dimension(1); s++)
         {
           int som=ffaces(f,s);
-          if (som >= 0 && marqueur(som)==-1)
+          if (som >= 0 && marqueur[som]==-1)
             {
 
-              marqueur(som)=nn;
-              liste_sommets(nn)=som ;
+              marqueur[som]=nn;
+              liste_sommets[nn]=som ;
               nn++;
             }
         }
@@ -163,27 +163,29 @@ void Ch_front_input_ALE::remplir_vit_som_bord_ALE(double tps)
   { Cout << liste_sommets(i) << ", " ;}
   Cout << finl ;*/
 
-  if(tps==InitialTimeValue){ //Initial values.
-  //    for( i=0; i<nb_som; i++)
+  if(tps==InitialTimeValue)  //Initial values.
+    {
+      //    for( i=0; i<nb_som; i++)
       for( i=0; i<nn; i++)
         {
           for( j=0; j<nb_comp(); j++)
             {
-              vit_som_bord_ALE(liste_sommets(i),j)=initial_value_(j);
+              vit_som_bord_ALE(liste_sommets[i],j)=initial_value_[j];
             }
         }
-  }
-  else{
-  //    for( i=0; i<nb_som; i++)
+    }
+  else
+    {
+      //    for( i=0; i<nb_som; i++)
       for( i=0; i<nn; i++)
         {
           for( j=0; j<nb_comp(); j++)
             {
-              vit_som_bord_ALE(liste_sommets(i),j)=les_valeurs_som[1].valeurs()(i,j);
+              vit_som_bord_ALE(liste_sommets[i],j)=les_valeurs_som[1].valeurs()(i,j);
               //std::cout << "i : " << i << ", j: " << j << ",  les_valeurs_som: " << les_valeurs_som[1].valeurs()(i,j)  << std::endl ;
             }
         }
-  }
+    }
   //vit_som_bord_ALE.echange_espace_virtuel();
 }
 

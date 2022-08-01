@@ -611,19 +611,19 @@ void Source_Con_Phase_field::associer_zones(const Zone_dis& zone_dis,
 }
 
 
-inline double mobilite(const double& c)
+inline double mobilite(const double c)
 {
   return (1.);
   //   return (c*c);
   //   return (0.5+2*c*c);
-  //  return (min(1.,4.*c*c));
+  //  return (std::min(1.,4.*c*c));
   //   return(0.);
   //   const double clim1 = -0.4;
   //   const double clim2 =  0.4;
   //   if (c<=clim1)
-  //     return(min(1.,-(c-clim1)/(0.5+clim1)));
+  //     return(std::min(1.,-(c-clim1)/(0.5+clim1)));
   //   else if (c>=clim2)
-  //     return(min(1.,(c-clim2)/(0.5-clim2)));
+  //     return(std::min(1.,(c-clim2)/(0.5-clim2)));
   //   else return(0.);
 }
 
@@ -760,7 +760,7 @@ void Source_Con_Phase_field::mettre_a_jour(double temps)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -890,7 +890,7 @@ void Source_Con_Phase_field::premier_demi_dt()
       calculer_mutilde(mutilde);
       mutilde.echange_espace_virtuel();
 
-      DoubleTab& prov_elem=ref_cast(DoubleTab, prov_elem_);
+      DoubleTab& prov_elem = prov_elem_;
       if (prov_elem.size()==0)
         prov_elem=mutilde;
 
@@ -936,7 +936,7 @@ void Source_Con_Phase_field::premier_demi_dt()
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -974,7 +974,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1041,7 +1041,7 @@ void Source_Con_Phase_field::calculer_div_alpha_rho_gradC(DoubleTab& div_alpha_r
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1185,7 +1185,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                   dvar2=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
                   if(kappa_moy_==2)
                     {
-                      kappa_interpolee=pow(dabs(kappa_var(elem)*kappa_var(voisin)),0.5);    // Moyenne geometrique
+                      kappa_interpolee=pow(std::fabs(kappa_var(elem)*kappa_var(voisin)),0.5);    // Moyenne geometrique
                     }
                   else if(kappa_moy_==1)
                     {
@@ -1206,7 +1206,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
               if (voisin>old_tri)
                 {
-                  min_tri=min(min_tri,voisin);
+                  min_tri=std::min(min_tri,voisin);
                   if(min_tri==voisin)
                     {
                       dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -1226,7 +1226,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
           // On complete les tableaux avec les valeurs dans les voisins non aux bords du domaine
           if (kappa_moy_==2)
             {
-              kappa_interpolee=pow(dabs(kappa_var(elem)*kappa_var(min_tri)),0.5);    // Moyenne geometrique
+              kappa_interpolee=pow(std::fabs(kappa_var(elem)*kappa_var(min_tri)),0.5);    // Moyenne geometrique
             }
           else if(kappa_moy_==1)
             {
@@ -1307,7 +1307,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               // Rq : voisin>old_tri => voisin != -1 donc pour une face au bord le if est false
               if (voisin>old_tri)
                 {
-                  min_tri=min(min_tri,voisin);
+                  min_tri=std::min(min_tri,voisin);
                   if(min_tri==voisin)
                     {
                       dvarkeep=pow((positions(elem,ori(f0))-positions(voisin,ori(f0))),2);
@@ -1408,7 +1408,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1517,7 +1517,7 @@ void Source_Con_Phase_field::calculer_point_fixe(const DoubleTab& c, const Doubl
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1620,7 +1620,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -1977,7 +1977,7 @@ l5:
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2018,7 +2018,7 @@ void Source_Con_Phase_field::calculer_mutilde(DoubleTab& mutilde) const
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2076,9 +2076,9 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
           psi = ( positions(elem,ncomp) - dom.coord(som0,ncomp) )
                 / ( dom.coord(som1,ncomp) - dom.coord(som0,ncomp) ) ;
 
-          if (dabs(psi) < 1.e-12)
+          if (std::fabs(psi) < 1.e-12)
             u2_elem(elem,ncomp) = val0 ;
-          else if (dabs(1.-psi) < 1.e-12)
+          else if (std::fabs(1.-psi) < 1.e-12)
             u2_elem(elem,ncomp) = val1 ;
           else
             u2_elem(elem,ncomp) = val0 + psi * (val1-val0) ;
@@ -2109,7 +2109,7 @@ void Source_Con_Phase_field::calculer_u2_elem(DoubleVect& u_carre)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2170,9 +2170,9 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
           psi = ( positions(elem,ncomp) - dom.coord(som0,ncomp) )
                 / ( dom.coord(som1,ncomp) - dom.coord(som0,ncomp) ) ;
 
-          if (dabs(psi) < 1.e-12)
+          if (std::fabs(psi) < 1.e-12)
             gradc2_elem(elem,ncomp) = val0 ;
-          else if (dabs(1.-psi) < 1.e-12)
+          else if (std::fabs(1.-psi) < 1.e-12)
             gradc2_elem(elem,ncomp) = val1 ;
           else
             gradc2_elem(elem,ncomp) = val0 + psi * (val1-val0) ;
@@ -2206,7 +2206,7 @@ void Source_Con_Phase_field::calculer_alpha_gradC_carre(DoubleTab& alpha_gradC_c
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: void
+// Retour:
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -2231,14 +2231,14 @@ void Source_Con_Phase_field::calculer_pression_thermo(DoubleTab& pression_thermo
 }
 
 
-void Source_Con_Phase_field::calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
+void Source_Con_Phase_field::calculer_champ_fonc_c(const double t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const
 {
   if (sub_type(Champ_Fonc_Tabule,champ_fonc_c.valeur()))
     {
       const Champ_Fonc_Tabule& ch_champ_fonc_c=ref_cast(Champ_Fonc_Tabule, champ_fonc_c.valeur());
       const Zone_VDF& zone_VDF = la_zone_VDF.valeur();
       const Table& table = ch_champ_fonc_c.table();
-      const int& isfct = table.isfonction();
+      const int isfct = table.isfonction();
       DoubleTab& mes_valeurs = champ_fonc_c.valeur().valeurs();
       // code ci-dessous adapte de Champ_Fonc_Tabule_P0_VDF.mettre_a_jour
       if (!(val_c.nb_dim() == mes_valeurs.nb_dim()))

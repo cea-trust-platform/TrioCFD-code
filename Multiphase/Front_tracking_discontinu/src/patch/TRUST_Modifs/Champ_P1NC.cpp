@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Champ_P1NC.cpp
-// Directory:   $TRUST_ROOT/src/VEF/Champs
-// Version:     /main/54
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_P1NC.h>
 #include <Periodique.h>
@@ -35,7 +28,7 @@
 #include <Operateur_base.h>
 #include <Mod_turb_hyd_base.h>
 #include <distances_VEF.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Schema_Temps_base.h>
 #include <SFichier.h>
 #include <Transport_Interfaces_FT_Disc.h>
@@ -575,7 +568,7 @@ void Champ_P1NC::calcul_y_plus(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plu
   const Equation_base& eqn_hydr = equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
 
   if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
     {
@@ -614,7 +607,9 @@ void Champ_P1NC::calcul_y_plus(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plu
     {
       const Cond_lim& la_cl = zone_Cl_VEF.les_conditions_limites(n_bord);
 
-      if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) || sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) )
+      if ( sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
+           sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ||
+           la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
         {
           const Front_VF& le_bord = ref_cast(Front_VF,la_cl.frontiere_dis());
           ndeb = le_bord.num_premiere_face();
@@ -644,7 +639,7 @@ void Champ_P1NC::calcul_y_plus(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plu
 
                       dist = distance_2D(num_face,elem,zone_VEF);
                       dist *= 3./2.;// pour se ramener a distance paroi / milieu de num[0]-num[1]
-                      norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],zone_VEF,val1,val2);
+                      norm_v=norm_2D_vit1_lp(vit.valeurs(),num_face,num[0],num[1],zone_VEF,val1,val2);
 
                     } // dim 2
                   else if (dimension == 3)
@@ -660,7 +655,7 @@ void Champ_P1NC::calcul_y_plus(const Zone_Cl_VEF& zone_Cl_VEF, DoubleVect& y_plu
 
                       dist = distance_3D(num_face,elem,zone_VEF);
                       dist *= 4./3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
-                      norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      norm_v=norm_3D_vit1_lp(vit.valeurs(), num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
 
                     }// dim 3
 
@@ -719,7 +714,7 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
 
   if (sub_type(Champ_Uniforme,ch_visco_cin_ph1.valeur()) && sub_type(Champ_Uniforme,ch_visco_cin_ph0.valeur()) )
     {
-      visco_ph0 = max(tab_visco_ph0(0,0),DMINFLOAT);
+      visco_ph0 = std::max(tab_visco_ph0(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -782,7 +777,7 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
 
                       dist = distance_2D(num_face,elem,zone_VEF);
                       dist *= 3./2.;// pour se ramener a distance paroi / milieu de num[0]-num[1]
-                      norm_v=norm_2D_vit1_lp(vit,num_face,num[0],num[1],zone_VEF,val1,val2);
+                      norm_v=norm_2D_vit1_lp(vit.valeurs(),num_face,num[0],num[1],zone_VEF,val1,val2);
 
                     } // dim 2
                   else if (dimension == 3)
@@ -798,7 +793,7 @@ void Champ_P1NC::calcul_y_plus_diphasique(const Zone_Cl_VEF& zone_Cl_VEF, Double
 
                       dist = distance_3D(num_face,elem,zone_VEF);
                       dist *= 4./3.; // pour se ramener a distance paroi / milieu de num[0]-num[1]-num[2]
-                      norm_v=norm_3D_vit1_lp(vit, num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
+                      norm_v=norm_3D_vit1_lp(vit.valeurs(), num_face, num[0], num[1], num[2], zone_VEF, val1, val2, val3);
 
                     }// dim 3
 
@@ -924,7 +919,7 @@ void Champ_P1NC::calcul_h_conv(const Zone_Cl_VEF& zone_Cl_VEF, DoubleTab& h_conv
       // Selon les conditions limites
       if (sub_type(Echange_externe_impose,la_cl.valeur()))
         {
-          const Champ_base& rho = equation().milieu().masse_volumique();
+          const Champ_base& rho = equation().milieu().masse_volumique().valeur();
           const Champ_Don& Cp = equation().milieu().capacite_calorifique();
           int rho_uniforme=(sub_type(Champ_Uniforme,rho) ? 1:0);
           int cp_uniforme=(sub_type(Champ_Uniforme,Cp.valeur()) ? 1:0);
@@ -1158,7 +1153,8 @@ DoubleTab& Champ_P1NC::calcul_duidxj_paroi(DoubleTab& gij, const DoubleTab& nu, 
       int nfin = ndeb + la_front_dis.nb_faces();
 
       if (sub_type(Dirichlet_paroi_fixe,la_cl.valeur()) ||
-          sub_type(Dirichlet_paroi_defilante,la_cl.valeur()))
+          sub_type(Dirichlet_paroi_defilante,la_cl.valeur()) ||
+          la_cl.valeur().que_suis_je() == "Entree_fluide_vitesse_imposee_ALE")
         {
 
           for (fac=ndeb; fac<nfin ; fac++)

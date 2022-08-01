@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Champ_Face3.cpp
-// Directory:   $TRUST_ROOT/src/VDF/Champs
-// Version:     /main/28
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Champ_Face.h>
 #include <Champ_Uniforme.h>
@@ -573,7 +566,7 @@ void Champ_Face::calcul_y_plus(DoubleTab& y_plus, const Zone_Cl_VDF& zone_Cl_VDF
   const Equation_base& eqn_hydr = equation();
   const Fluide_base& le_fluide = ref_cast(Fluide_base, eqn_hydr.milieu());
   const Champ_Don& ch_visco_cin = le_fluide.viscosite_cinematique();
-  const DoubleTab& tab_visco = ref_cast(DoubleTab,ch_visco_cin->valeurs());
+  const DoubleTab& tab_visco = ch_visco_cin->valeurs();
   //DoubleTab& tab_visco = ch_visco_cin.valeur().valeurs();
 
   if (sub_type(Champ_Uniforme, ch_visco_cin.valeur()))
@@ -642,12 +635,12 @@ void Champ_Face::calcul_y_plus(DoubleTab& y_plus, const Zone_Cl_VDF& zone_Cl_VDF
                   if ( dimension == 2 )
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val0);
+                      norm_v=norm_2D_vit(vit.valeurs(),elem,ori,zone_VDF,val0);
                     }
                   else if ( dimension == 3)
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                      norm_v=norm_3D_vit(vit.valeurs(),elem,ori,zone_VDF,val1,val2);
                     } // dim 3
 
                   if ( axi )
@@ -711,7 +704,7 @@ void Champ_Face::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_VDF& 
 
   if (sub_type(Champ_Uniforme,ch_visco_cin_ph1.valeur()) && sub_type(Champ_Uniforme,ch_visco_cin_ph0.valeur()) )
     {
-      visco_ph0 = max(tab_visco_ph0(0,0),DMINFLOAT);
+      visco_ph0 = std::max(tab_visco_ph0(0,0),DMINFLOAT);
       l_unif = 1;
     }
   else
@@ -766,12 +759,12 @@ void Champ_Face::calcul_y_plus_diphasique(DoubleTab& y_plus, const Zone_Cl_VDF& 
                   if ( dimension == 2 )
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_2D_vit(vit,elem,ori,zone_VDF,val0);
+                      norm_v=norm_2D_vit(vit.valeurs(),elem,ori,zone_VDF,val0);
                     }
                   else if ( dimension == 3)
                     {
                       ori = orientation(num_face);
-                      norm_v=norm_3D_vit(vit,elem,ori,zone_VDF,val1,val2);
+                      norm_v=norm_3D_vit(vit.valeurs(),elem,ori,zone_VDF,val1,val2);
                     } // dim 3
 
                   if ( axi )
@@ -1304,13 +1297,13 @@ DoubleVect& Champ_Face::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vites
                          /zone_VDF.dist_face_period(num0,num1,j);            // dv/dx
           double temp2 = (vitesse[num3]-vitesse[num2])
                          /zone_VDF.dist_face_period(num2,num3,i);            // du/dy
-          element(0) = face_voisins(num0,0);
-          element(1) = face_voisins(num0,1);
-          element(2) = face_voisins(num1,0);
-          element(3) = face_voisins(num1,1);
+          element[0] = face_voisins(num0,0);
+          element[1] = face_voisins(num0,1);
+          element[2] = face_voisins(num1,0);
+          element[3] = face_voisins(num1,1);
           for (int k=0 ; k<4 ; k++)
             {
-              SMA_barre(element(k))+=0.5*(temp1+temp2)*(temp1+temp2)*0.25;
+              SMA_barre[element[k]]+=0.5*(temp1+temp2)*(temp1+temp2)*0.25;
               // Justification du coeff :
               // on calcule la somme des termes croises :
               // 2*( (0.5*Sij)^2+(0.5*Sji)^2)
@@ -1342,12 +1335,12 @@ DoubleVect& Champ_Face::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vites
           else
             temp2  = -signe*(vitesse[num2]-vit_imp)/zone_VDF.dist_norm_bord(num1);
 
-          element(0) = face_voisins(num2,0);
-          element(1) = face_voisins(num2,1);
+          element[0] = face_voisins(num2,0);
+          element[1] = face_voisins(num2,1);
 
           for (int k=0 ; k<2 ; k++)
             {
-              SMA_barre(element(k))+=(temp1+temp2)*(temp1+temp2)*0.25;
+              SMA_barre[element[k]]+=(temp1+temp2)*(temp1+temp2)*0.25;
               // Justification du coeff :
               // on calcule la somme des termes croises :
               // 2*( (0.5*Sij)^2+(0.5*Sji)^2)
@@ -1389,13 +1382,13 @@ DoubleVect& Champ_Face::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vites
                          /zone_VDF.dist_face_period(num0,num1,j);            // dv/dx
           double temp2 = (vitesse[num3]-vitesse[num2])
                          /zone_VDF.dist_face_period(num2,num3,i);            // du/dy
-          element(0) = face_voisins(num0,0);
-          element(1) = face_voisins(num0,1);
-          element(2) = face_voisins(num1,0);
-          element(3) = face_voisins(num1,1);
+          element[0] = face_voisins(num0,0);
+          element[1] = face_voisins(num0,1);
+          element[2] = face_voisins(num1,0);
+          element[3] = face_voisins(num1,1);
           for (int k=0 ; k<4 ; k++)
             {
-              SMA_barre(element(k))+=0.5*0.5*(temp1+temp2)*(temp1+temp2)*0.25;
+              SMA_barre[element[k]]+=0.5*0.5*(temp1+temp2)*(temp1+temp2)*0.25;
               // Justification du coeff :
               // on calcule la somme des termes croises :
               // 2*( (0.5*Sij)^2+(0.5*Sji)^2)
@@ -1433,12 +1426,12 @@ DoubleVect& Champ_Face::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vites
           else
             temp2  = -signe*(vitesse[num2]-vit_imp)/zone_VDF.dist_norm_bord(num1);
 
-          element(0) = face_voisins(num2,0);
-          element(1) = face_voisins(num2,1);
+          element[0] = face_voisins(num2,0);
+          element[1] = face_voisins(num2,1);
 
           for (int k=0 ; k<2 ; k++)
             {
-              SMA_barre(element(k))+=0.5*(temp1+temp2)*(temp1+temp2)*0.25;
+              SMA_barre[element[k]]+=0.5*(temp1+temp2)*(temp1+temp2)*0.25;
               // Justification du coeff :
               // on calcule la somme des termes croises :
               // 2*( (0.5*Sij)^2+(0.5*Sji)^2)
@@ -1477,16 +1470,16 @@ DoubleVect& Champ_Face::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vites
       double temp2 = (vitesse[num3]-vitesse[num2])
                      /zone_VDF.dist_face_period(num2,num3,i);          // du/dy
 
-      element(0) = face_voisins(num0,0);
-      element(1) = face_voisins(num0,1);
-      element(2) = face_voisins(num1,0);
-      element(3) = face_voisins(num1,1);
+      element[0] = face_voisins(num0,0);
+      element[1] = face_voisins(num0,1);
+      element[2] = face_voisins(num1,0);
+      element[3] = face_voisins(num1,1);
 
       for (int k=0 ; k<4 ; k++)
         {
-          if (element(k)!=-1)
+          if (element[k]!=-1)
             {
-              SMA_barre(element(k))+=(temp1+temp2)*(temp1+temp2)*0.25;
+              SMA_barre[element[k]]+=(temp1+temp2)*(temp1+temp2)*0.25;
               // Justification du coeff :
               // on calcule la somme des termes croises :
               // 2*( (0.5*Sij)^2+(0.5*Sji)^2)
@@ -1514,13 +1507,13 @@ DoubleVect& Champ_Face::calcul_S_barre_sans_contrib_paroi(const DoubleTab& vites
                      /zone_VDF.dist_face_period(num0,num1,j);            // dv/dx
       double temp2 = (vitesse[num3]-vitesse[num2])
                      /zone_VDF.dist_face_period(num2,num3,i);            // du/dy
-      element(0) = face_voisins(num0,0);
-      element(1) = face_voisins(num0,1);
-      element(2) = face_voisins(num1,0);
-      element(3) = face_voisins(num1,1);
+      element[0] = face_voisins(num0,0);
+      element[1] = face_voisins(num0,1);
+      element[2] = face_voisins(num1,0);
+      element[3] = face_voisins(num1,1);
       for (int k=0 ; k<4 ; k++)
         {
-          SMA_barre(element(k))+=(temp1+temp2)*(temp1+temp2)*0.25;
+          SMA_barre[element[k]]+=(temp1+temp2)*(temp1+temp2)*0.25;
           // Justification du coeff :
           // on calcule la somme des termes croises :
           // 2*( (0.5*Sij)^2+(0.5*Sji)^2)

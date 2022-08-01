@@ -27,9 +27,9 @@
 
 
 #include <Objet_U.h>
-class IntVect;
+#include <TRUSTTabs_forward.h>
 class Zone_VF;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 
 //
 // .DESCRIPTION class Restriction_base

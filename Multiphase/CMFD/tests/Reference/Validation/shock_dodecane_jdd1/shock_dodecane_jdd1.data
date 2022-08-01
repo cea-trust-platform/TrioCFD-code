@@ -1,0 +1,141 @@
+# PARALLEL NOT #
+dimension 2
+Domaine dom
+
+# BEGIN MESH #
+mailler dom
+{
+    pave carre
+    {
+        origine  0.0  0.0
+        nombre_de_noeuds  10001 2
+        longueurs 1 1
+    }
+    {
+        bord  bas       Y = 0.0    0.0 <= X <= 1.0
+        bord  haut      Y = 1.0    0.0 <= X <= 1.0
+        bord  gauche    X = 0.0    0.0 <= Y <= 1.0
+        bord  droite    X = 1.0    0.0 <= Y <= 1.0
+    }
+}
+# END MESH #
+
+# BEGIN PARTITION
+Decouper dom
+{
+    partitionneur metis { nb_parts 4 }
+    Larg_joint 2
+    Nom_Zones dom
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter dom.Zones dom
+END SCATTER #
+
+PolyMAC_P0  dis
+option_PolyMAC_P0 {  }
+
+Schema_euler_implicite sch
+Read sch
+{
+    tinit 0
+	nb_pas_dt_max 3
+    dt_start dt_fixe 1e-9
+    tmax 0.000473
+    seuil_statio -1 # 1e-6 #
+    solveur ice
+    {
+        criteres_convergence { alpha 1e-6 }
+        solveur petsc cli { }
+        pression_degeneree 0 
+        seuil_convergence_implicite 1e30
+    }
+}
+
+stiffenedGas eau_liquide
+Read eau_liquide { gamma 2.35 pinf 4.0e8 Cv 1077.7 q -775269.0 }
+stiffenedGas eau_gaz
+Read eau_gaz { gamma 1.025 pinf 0.0 Cv 1956.45 q -237547.0  }
+ 
+Pb_HEM pb
+phases pb { liquide { eau } gaz { eau } }
+
+Associate  pb dom
+Associate  pb sch
+Discretize pb dis
+
+Read pb
+{
+    QDM_Multiphase
+    {
+        solveur_pression petsc cholesky { quiet }
+        convection { amont }
+        diffusion  { negligeable }
+        initial_conditions
+        {
+            vitesse  Champ_fonc_xyz dom 4 0.0 0.0 0.0 0.0
+            pression Champ_fonc_xyz dom 1 1.0e8*(x[0.75)+1.0e5*(x>0.75)
+        }
+        boundary_conditions
+        {
+            haut symetrie
+            bas symetrie
+            gauche frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 4 0 0 0 0
+            droite frontiere_ouverte_vitesse_imposee_sortie champ_front_uniforme 4 0 0 0 0
+        }
+    }
+    Masse_Multiphase
+    {
+        initial_conditions { alpha Champ_Fonc_xyz dom 2 1*(x[0.75)+0*(x>0.75) 0*(x[0.75)+1*(x>0.75) }
+        convection { amont }
+        boundary_conditions
+        {
+            haut paroi
+            bas paroi
+            gauche frontiere_ouverte a_ext Champ_Front_Uniforme 2 1 0
+            droite frontiere_ouverte a_ext Champ_Front_Uniforme 2 0 1
+        }
+    }
+    Energie_Multiphase
+    {
+        diffusion { negligeable }
+        convection { amont }
+        initial_conditions { temperature Champ_fonc_xyz dom 2 414.63 724.36 } 
+        boundary_conditions
+        {
+            haut paroi_adiabatique
+            bas paroi_adiabatique
+            gauche frontiere_ouverte T_ext Champ_Front_uniforme 2 414.63 414.63
+            droite frontiere_ouverte T_ext Champ_Front_uniforme 2 724.36 724.36
+        }
+        sources { 
+                  travail_pression , flux_interfacial 
+                  
+                } 
+        # sources { travail_pression } #
+    }
+    Post_processing
+    {
+        probes
+        {
+             alp grav alpha_gaz_eau periode 1e8 segment 10000 0 0.5 1 0.5
+             rho grav masse_volumique periode 1e8 segment 10000 0 0.5 1 0.5
+               v grav         vitesse periode 1e8 segment 10000 0 0.5 1 0.5
+               p grav        pression periode 1e8 segment 10000 0 0.5 1 0.5
+            eint grav energie_interne periode 1e8 segment 10000 0 0.5 1 0.5
+        }
+        Format lml 
+        fields dt_post 1e-2
+        {
+            alpha elem
+            vitesse elem
+            pression elem
+            temperature elem
+            energie_interne elem
+        }
+    }
+}
+Solve pb
+End

@@ -24,7 +24,7 @@
 #define Topologie_Maillage_FT_included
 
 #include <FTd_tools.h>
-#include <IntTabFT.h>
+#include <TRUSTTabFT.h>
 #include <Remailleur_Collision_FT.h>
 
 class Maillage_FT_Disc;
@@ -41,8 +41,8 @@ class Remaillage_FT;
 // .SECTION voir aussi
 //  Transport_Interfaces_FT_Disc Maillage_FT_Disc
 class Zone_VF;
-class ArrOfInt;
-class IntVect;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 
 class Topologie_Maillage_FT : public Objet_U
 {

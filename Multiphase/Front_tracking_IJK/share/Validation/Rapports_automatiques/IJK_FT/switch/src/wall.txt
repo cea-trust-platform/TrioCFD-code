@@ -1,0 +1,34 @@
+  thermique
+  {
+    {
+      Boundary_Conditions {
+                bctype_kmin Paroi_flux_impose
+                bctype_kmax Paroi_Flux_impose
+		flux_impose_kmin 3572.101888229877
+		flux_impose_kmax 3572.101888229877
+      }
+    expression_T_init 10.-5.*sin(z*Pi/0.003+0.82) # dephasage #
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    } 
+,
+    {
+      Boundary_Conditions {
+                bctype_kmin Paroi_Temperature_imposee
+                bctype_kmax Paroi_Temperature_imposee
+                temperature_imposee_kmin 10.
+                temperature_imposee_kmax 10.
+      }
+    expression_T_init 10.-5.*sin(z*Pi/0.003+0.82) # dephasage #
+    fo 1.
+    cp_liquid 1.
+    lambda_liquid 1.e-3
+    cp_vapor 3.
+    lambda_vapor 0.
+    }
+  }
+}
+Fin

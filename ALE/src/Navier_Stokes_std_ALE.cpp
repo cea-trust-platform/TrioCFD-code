@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2019, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -25,9 +25,12 @@
 #include <Schema_Temps_base.h>
 #include <Op_Conv_ALE_VEF.h>
 #include <Discretisation_base.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Debog.h>
 #include <Discret_Thyd.h>
+#include <EcritureLectureSpecial.h>
+#include <Avanc.h>
+
 
 Implemente_instanciable(Navier_Stokes_std_ALE,"Navier_Stokes_standard_ALE",Navier_Stokes_std);
 // XD Navier_Stokes_std_ALE eqn_base Navier_Stokes_std_ALE -1 Resolution of hydraulic Navier-Stokes eq. on mobile domain (ALE)
@@ -42,6 +45,70 @@ Entree& Navier_Stokes_std_ALE::readOn(Entree& is )
   Navier_Stokes_std::readOn(is);
   return is;
 }
+
+int Navier_Stokes_std_ALE::sauvegarder(Sortie& os) const
+{
+  int bytes=0, a_faire,special;
+  bytes += Navier_Stokes_std::sauvegarder(os);
+  EcritureLectureSpecial::is_ecriture_special(special,a_faire);
+  const Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  if (a_faire)
+    {
+      Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
+      JacobianOld->nommer("JacobianOld");
+      JacobianOld->valeurs() = dom_ale.getOldJacobian(); // Use good values
+      Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
+      JacobianNew->nommer("JacobianNew");
+      JacobianNew->valeurs() = dom_ale.getNewJacobian(); // Use good values
+      if (special && Process::nproc() > 1)
+        Cerr << "ATTENTION : For a parallel calculation, the field Jacobian is not saved in xyz format ... " << finl;
+      else
+        {
+          bytes += JacobianOld->sauvegarder(os);
+          bytes += JacobianNew->sauvegarder(os);
+        }
+    }
+
+  return bytes;
+}
+int Navier_Stokes_std_ALE::reprendre(Entree& is)
+{
+// start resuming
+  Navier_Stokes_std::reprendre(is);
+  // resumption Jacobian
+  Champ_Inc JacobianOld = vitesse(); // Initialize with same discretization
+  JacobianOld->nommer("JacobianOld");
+  Nom field_tag_JOld(JacobianOld->le_nom());
+  field_tag_JOld += JacobianOld.valeur().que_suis_je();
+  field_tag_JOld += probleme().domaine().le_nom();
+  field_tag_JOld += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
+  Champ_Inc JacobianNew = vitesse(); // Initialize with same discretization
+  JacobianNew->nommer("JacobianNew");
+  Nom field_tag_JNew(JacobianNew->le_nom());
+  field_tag_JNew += JacobianNew.valeur().que_suis_je();
+  field_tag_JNew += probleme().domaine().le_nom();
+  field_tag_JNew += Nom(probleme().schema_temps().temps_courant(),probleme().reprise_format_temps());
+
+  if (EcritureLectureSpecial::is_lecture_special() && Process::nproc() > 1)
+    {
+      Cerr << "Error in Navier_Stokes_std_ALE::reprendre !" << finl;
+      Cerr << "Use the sauv file to resume a parallel Navier_Stokes_std_ALE calculation (Jacobian is required) ... " << finl;
+      Process::exit();
+    }
+  else
+    {
+      avancer_fichier(is, field_tag_JOld);
+      JacobianOld->reprendre(is);
+      avancer_fichier(is, field_tag_JNew);
+      JacobianNew->reprendre(is);
+    }
+
+  // set resumption field
+  Domaine_ALE& dom_ale=ref_cast(Domaine_ALE, probleme().domaine());
+  dom_ale.resumptionJacobian(JacobianOld->valeurs(), JacobianNew->valeurs());
+  return 1;
+}
+
 
 
 
@@ -87,7 +154,7 @@ void Navier_Stokes_std_ALE::div_ale_derivative( DoubleTrav& deriveeALE, double t
   DoubleTab ALEjacobian_Old=dom_ale.getOldJacobian();
   DoubleTab ALEjacobian_New=dom_ale.getNewJacobian();
   DoubleTab& vitesse_faces_ALE= dom_ale.vitesse_faces();
-  DoubleTab term_Jacobian_ratio_U_n(la_vitesse);               // For (Jacobian n/Jacobian n+1) * Un / timestep , initialized every iteration with with new la_vitesse values.
+  DoubleTab term_Jacobian_ratio_U_n(la_vitesse->valeurs());               // For (Jacobian n/Jacobian n+1) * Un / timestep , initialized every iteration with with new la_vitesse values.
 
   for (int num_face=0; num_face<(vitesse_faces_ALE.size()/dimension); num_face++)
     {

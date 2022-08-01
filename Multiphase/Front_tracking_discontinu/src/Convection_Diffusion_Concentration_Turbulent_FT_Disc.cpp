@@ -319,16 +319,16 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
           if (elem2 < 0) elem2 = elem1;
           nu_t = ((*champ_nu_t)(elem1) + (*champ_nu_t)(elem2)) * 0.5;
         }
-      double c1 = max(0., champ1(face));
-      double c2 = max(0., champ2(face));
-      double c3 = max(0., champ3(face));
+      double c1 = std::max(0., champ1(face));
+      double c2 = std::max(0., champ2(face));
+      double c3 = std::max(0., champ3(face));
 
       // Modele 1 classique rapport B. Zoppe
       if (modele_cinetique_ == 1)
         {
           double omega = constante_cinetique_ * (1. + constante_cinetique_nu_t_ * nu_t) * c1 * c2;
-          double Rdt = min(omega * dt, c1);
-          Rdt = min(Rdt, c2);
+          double Rdt = std::min(omega * dt, c1);
+          Rdt = std::min(Rdt, c2);
 
           /* Modif des concentrations */
           champ1(face) = c1 - Rdt;
@@ -344,8 +344,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
           double l_carac = 2.0*pow(6.*volumes_entrelaces(face),1./double(dim)) ;
           double tm = l_carac*l_carac/(coeff_diffusivite + nu_t/sc_t);
 
-          double omega = min(c1,c2);
-          omega = omega/max(dt,tm);
+          double omega = std::min(c1,c2);
+          omega = omega/std::max(dt,tm);
           double Rdt = omega * dt;
 
           /* Modif des concentrations */
@@ -369,8 +369,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
 
           double tm = l_carac*l_carac*Ci*schm/(nu + nu_t);
 
-          double omega = min(c1,c2);
-          omega = omega/max(dt,tm);
+          double omega = std::min(c1,c2);
+          omega = omega/std::max(dt,tm);
           double Rdt = omega * dt;
 
           /* Modif des concentrations */
@@ -389,8 +389,8 @@ void Convection_Diffusion_Concentration_Turbulent_FT_Disc::mettre_a_jour_chimie(
           // merge de modele 2 et 3  ......
           double tm = l_carac*l_carac/nu_t;
 
-          double omega = min(c1,c2);
-          omega = omega/max(dt,tm);
+          double omega = std::min(c1,c2);
+          omega = omega/std::max(dt,tm);
           double Rdt = omega * dt;
 
           /* Modif des concentrations */

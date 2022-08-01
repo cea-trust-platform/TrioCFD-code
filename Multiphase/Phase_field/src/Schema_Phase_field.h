@@ -48,10 +48,10 @@ public :
   //                            //
   ////////////////////////////////
 
-  virtual int nb_valeurs_temporelles() const;
-  virtual int nb_valeurs_futures() const;
-  virtual double temps_futur(int i) const;
-  virtual double temps_defaut() const;
+  int nb_valeurs_temporelles() const override;
+  int nb_valeurs_futures() const override;
+  double temps_futur(int i) const override;
+  double temps_defaut() const override;
 
   /////////////////////////////////////////
   //                                     //
@@ -59,25 +59,25 @@ public :
   //                                     //
   /////////////////////////////////////////
 
-  virtual void initialize();
-  virtual bool initTimeStep(double dt);
-  virtual int faire_un_pas_de_temps_eqn_base(Equation_base&);
-  virtual bool iterateTimeStep(bool& converged);
+  void initialize() override;
+  bool initTimeStep(double dt) override;
+  int faire_un_pas_de_temps_eqn_base(Equation_base&) override;
+  bool iterateTimeStep(bool& converged) override;
   virtual int faire_un_pas_de_temps_C_D_Phase_field(Convection_Diffusion_Phase_field&);
   virtual int premier_dt(Convection_Diffusion_Phase_field& eq_c);
   virtual int deuxieme_dt(Convection_Diffusion_Phase_field& eq_c);
   inline const DoubleTab& valeur_temps_intermediaire() const;
   //virtual void lire(const Motcle&, Entree&);
-  virtual void set_param(Param& titi);
-  virtual int lire_motcle_non_standard(const Motcle&, Entree&);
-  virtual int mettre_a_jour();
-  virtual bool corriger_dt_calcule(double&) const;
-  virtual void completer();
-  virtual void changer_temps_courant(const double&);
-  virtual int stop() const;
-  virtual void imprimer(Sortie&) const;
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
+  int mettre_a_jour() override;
+  bool corriger_dt_calcule(double&) const override;
+  void completer() override;
+  void changer_temps_courant(const double) override;
+  int stop() const override;
+  void imprimer(Sortie&) const override;
 
-  virtual void associer_pb(const Probleme_base&);
+  void associer_pb(const Probleme_base&) override;
 
 protected:
   int nb_iterations_relax_;

@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Pb_Thermohydraulique_Turbulent_QC.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/27
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Problems
 //
 //////////////////////////////////////////////////////////////////////////////
 

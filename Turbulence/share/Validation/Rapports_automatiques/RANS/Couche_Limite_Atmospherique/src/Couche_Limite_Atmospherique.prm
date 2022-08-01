@@ -1,0 +1,429 @@
+Parameters {
+	Title "Simulation of the atmospheric boundary layer."
+	Description "This document is made to validate the rough wall laws on a 3D turbulent flow with atmospheric boundary layer.\newline"
+	Description ""
+	Description "Valitated model"
+	Description "....Roughness constant : Erugu"
+	Description "....\latex_({\Large $ \sigma_\epsilon $} \latex_) : Prantl-Epsilon\newline"
+	Description ""
+	Description "Valitated with"
+	Description "....analytical laws\newline"
+	Description ""
+	Author "MALOD C., BARTHEL V., VANDROUX S."
+	TestCase "./Sol_lisse" "Sol_lisse.data" "/* jdd attached */"
+	TestCase "./Sol_rugueux_Erugu" "Sol_rugueux_Erugu.data"
+	TestCase "./Sol_rugueux_Erugu+sigma" "Sol_rugueux_Erugu+sigma.data"
+	VersionTrio_U "1.6.2"
+	ParametersTrio_U "Type of problem : Pb_Hydraulique_Turbulent"
+	ParametersTrio_U "Discretization : VEFPreP1B"
+	ParametersTrio_U "Time scheme : Euler_Implicite with Solver Implicite"
+	ParametersTrio_U "Solving of equation : Navier_Stokes_turbulent with Modele_turbulence K_Epsilon and Turbulence_paroi Loi_Standard_Hydr"
+	ParametersTrio_U "Convection scheme : Ef_Stab (alpha = 0.2) for Momentum and Amont for Turbulence"
+	ParametersTrio_U "Diffusion scheme : default for all equations"
+	ParametersTrio_U "Boundary condition : Velocity inlet, Pressure outlet, Symmetry and Wall"
+	ParametersTrio_U "Wall condition : Erugu = 9.11 for Sol_lisse, 1.681e-4 for Sol_rugueux_Erugu and Sol_rugueux_Erugu+sigma"
+	ParametersTrio_U "Turbulence model : \latex_({\Large $ \sigma_\epsilon $} \latex_) = 1.3 for Sol_lisse and Sol_rugueux_Erugu, 1.196 for Sol_rugueux_Erugu+sigma"
+	ParametersTrio_U "Type of fluid : air at 20°C"
+	Prerequisite "Extract_histogram dom Sol_lisse/Sol_lisse.err  > histo"
+	Reference "Bert Blocken, Ted Stathopoulos, Jan Carmeliet : CFD simulation of the atmospheric boundary layer: wall function problems. Atmospheric Environnement 41, 238-252 (2007)."
+	IncludeData 2
+}
+Chapter {
+	Title "Tests description"
+	Description "Geometry : Channel with dimension : Length = 200 m (X axis), Width = 10 m (Y axis), Height = 30 m (Z axis)."
+	Visu {
+		Title "Mesh"
+		Description "The mesh is made with Gambit V2.4.6. It contain tetrahedral cells and 2 layers of prismatical cells. Each prismatic cell is cut into 3 tetrahedral cells with Icem V11.0.1. So the final mesh contain 27 727 tetrahedral cells, 58 506 faces and 6 259 nodes.\newline"
+		Description ""
+		Width 12cm, viewport=-300 0 1024 860, clip
+		mesh Sol_lisse/Sol_lisse.lata dom
+		normal3D -0.9 -0.4 0.2
+		up3D 0.15 0.1 1.
+		zoom3D 0.06 0.06 1.8
+		Operator no_axes
+		Operator no_bounding_box
+	}
+	Figure {
+	 Description "Histogram of largest angles of the mesh"
+	 Width 8cm
+	Title_figure " "
+        dimension 2
+        Include_Description_Curves 0
+        labelx Angle (degree)
+        labely "Cells"
+        legend sans
+        Curve
+        {
+        file histo
+        style boxes fill solid 0.3
+        columns ($2+$5)/2 8
+        }
+ 
+	}
+	Table {
+		Title "Initial and Boundaries conditions"
+		Description "Initial conditions :\latex_(\hspace*{16.5mm}\latex_)velocity function of elevation in X direction : \latex_(\hspace*{0.5cm} $ {0.912 \over 0.415} ln( { (Z+0.1)\over 0.1 } ) $ \latex_)\newline"
+		Description ""
+		Description "Boundaries conditions :\latex_(\hspace*{8mm}\latex_)Standard wall law or rough wall laws on boundary 'Sol',"
+		Description "\latex_(\hspace*{45mm}\latex_)symmetry in the Y direction and on boundary 'Haut',"
+		Description "\latex_(\hspace*{45mm}\latex_)velocity set on inlet to \latex_( $ {0.912 \over 0.415} ln( { (Z+0.1)\over 0.1 } ) $ \latex_),"
+		Description "\latex_(\hspace*{45mm}\latex_)pressure set to 0 Pa at outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)turbulent kinetic energy set to \latex_( $ 2.77 m^2/s^2 $ \latex_) on intlet and outlet,"
+		Description "\latex_(\hspace*{45mm}\latex_)turbulence dissipation rate set to \latex_( $ {1.828 \over Z}m^3/s^2 $ \latex_) on intlet and outlet.\newline"
+		Description ""
+		Description "The rough wall law modifies the standard wall law by adding a constant which is function of the roughness height \latex_( $ K_S+ = {U_* K_S \over \nu} $ \latex_), where \latex_($K_S$\latex_) is the equivalent sand-grain roughness height and is equal to \latex_( $ K_S = 3.93 E y_0 $ \latex_) [with E=9.11:Erugu for standard wall law, \latex_($y_0$\latex_)=0.1m:aerodynamic roughness length].\newline"
+		Description ""
+		Description "So the rough wall law is then written : \latex_(U$^+$ = ${1 \over \kappa}$ ln(${3.93 \over K_S+} E Y^+$)\latex_)"
+		Description "For ABL, if we want to keep the initial inlet profile constant, we have to compare it to the standard wall law \latex_(U$^+$ = ${1 \over \kappa}$ ln(E$Y^+$)\latex_) and so the Erugu value is given by \latex_(Erugu = ${\nu \over y_0 U_*}$\latex_)."
+	}
+	Table {
+		Title "Physical properties"
+		Description "\latex_(\textbf{Air at 20°C:}\latex_)"	
+		Description "$\rho$ = 1.189 kg/m$^3$"
+		Description "$\mu$ = 1.823e-5 kg/m/s"
+	}
+}
+Chapter {
+	Title "Convergence"
+	Description "This chapter presents the convergence of the calculations."
+	Description "The calculations can be stopped when a fully turbulent flow is well established. The convergence is set at about 50 s of physical time. It corresponds to two channel length travel time."
+	Figure {
+		Title "Convergence of X velocity at outlet"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 50.
+		LabelY "Vx (m/s)"
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Sol_lisse_VITESSE_SORTIE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 59
+			Style lines
+			linewidth 2
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_VITESSE_SORTIE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 59
+			Style lines
+			linewidth 2
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_VITESSE_SORTIE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 59
+			linewidth 2
+		}
+	}
+	Figure {
+		Title "Convergence of turbulent kinetic energy at outlet"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 50.
+		LabelY "k (m^2/s^2)"
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Sol_lisse_K_SORTIE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 59
+			Style lines
+			linewidth 2
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_K_SORTIE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 59
+			Style lines
+			linewidth 2
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_K_SORTIE.son
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 59
+			linewidth 2
+		}
+	}
+	Figure {
+		Title "Convergence of the pressure drag on boundary 'Sol'"
+		Width 12cm
+		LabelX "Time (s)"
+		RangeX 0. 50.
+		LabelY "P (Pa)"
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Sol_lisse_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 16
+			Style lines
+			linewidth 2
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 16
+			Style lines
+			linewidth 2
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_pb_Force_pression.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 16
+			linewidth 2
+		}
+	}
+	Table {
+		Description "\newpage"	
+	}
+}
+Chapter {
+	Title "Results"
+	Description "This chapter presents for the outlet, the profiles of velocity, turbulent kinetic energy, turbulence dissipation rate and dimensionless mean streamwise wind speed, compared with analytical solutions.\newline"
+	Description ""
+	Figure {
+		Title "X velocity profiles at outlet"
+		Width 10.5cm
+		LabelX "Vx (m/s)"
+		LabelY "Z (m)"
+		RangeY 0. 25.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Analitycal solution"
+			file ./Sol_lisse/Sol_lisse_VITESSE_SORTIE.coupe
+			origin "Trio_U"
+			columns 0.912/0.415*log(($1+0.1)/0.1) 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Sol_lisse_VITESSE_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_VITESSE_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_VITESSE_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+	}
+	Figure {
+		Title "Turbulent kinetic energy profiles at outlet"
+		Width 10.5cm
+		LabelX "K (m^2/s^2)"
+		RangeX 0. 3.
+		LabelY "Z (m)"
+		RangeY 0. 25.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Analitycal solution"
+			file ./Sol_lisse/Sol_lisse_K_SORTIE.coupe
+			origin "Trio_U"
+			columns (2.77) 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Sol_lisse_K_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_K_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_K_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+	}
+	Figure {
+		Title "Turbulence dissipation rate profiles at outlet"
+		Width 10.5cm
+		LabelX "Eps (m^2/s^3)"
+		RangeX 0. 7.
+		LabelY "Z (m)"
+		RangeY 0. 25.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "Analitycal solution"
+			file ./Sol_lisse/Sol_lisse_EPS_SORTIE.coupe
+			origin "Trio_U"
+			columns (1.828/$1) 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Sol_lisse_EPS_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Sol_rugueux_Erugu_EPS_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Sol_rugueux_Erugu+sigma_EPS_SORTIE.coupe
+			origin "Trio_U"
+			Version 1.6.2
+			columns 2 1
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+	}
+	Figure {
+		Title "Dimensionless mean streamwise wind speed profiles at outlet"
+		Description "The mean axial velocity profiles at outlet ( U$^+$ = U/U$\tau$ ; Y$^+$ = Y.U$\tau$/$\nu$ ) are compared to the law of wall for ks+<2.25 : U$^+$ = 1/0.415 ln(Y$^+$) + 5.32, and the law of wall for ks+ = 212961\newline"
+		Description ""
+		Width 10.5cm
+		LabelX "y+"
+		RangeX 1. 1000000.
+		LogX
+		LabelY "u+"
+		RangeY 0. 50.
+		Include_Description_Curves 0
+		legend below title ""
+		Curve {
+			legend "u+ = y+"
+			file ./Uplus.out
+			origin "Trio_U"
+			columns 1 2
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "u+ = f(ks+<2.25)"
+			file ./Uplus.out
+			origin "Trio_U"
+			columns 3 4
+			Style lines
+			linewidth 2
+			TypeLigne rgb "black"
+		}
+		Curve {
+			legend "u+ = f(ks+=212961)"
+			Fonction 1/0.415*log(3.93/(0.912*3.93*9.11*0.1/(0.00001823/1.189))*9.11*x)
+			origin "Trio_U"
+			Style lines
+			linewidth 2
+			TypeLigne rgb "gray"
+		}
+		Curve {
+			legend "Sol lisse   - Erugu = 9.11    Sigma_eps=1.300"
+			file ./Sol_lisse/Uplus.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			Style lines
+			linewidth 2
+			TypeLigne rgb "red"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.300"
+			file ./Sol_rugueux_Erugu/Uplus.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			Style lines
+			linewidth 2
+			TypeLigne rgb "green"
+		}
+		Curve {
+			legend "Sol Rugueux - Erugu = 1.68e-4 Sigma_eps=1.196"
+			file ./Sol_rugueux_Erugu+sigma/Uplus.out
+			origin "Trio_U"
+			Version 1.6.2
+			columns 1 2
+			linewidth 2
+			TypeLigne rgb "blue"
+		}
+	}
+}
+Chapter {
+	Title "Conclusions"
+	Description "This document shows that it is really important to modify the roughness constant 'Erugu' to correctly simulate the flow in large areas of atmospheric boundary layer type.\newline"
+	Description ""
+	Description "Indeed, the standard law of the wall is relevant only for the smooth walls. On the atmospheric boundary layer flow type, the roughness of the ground (forest area, grassy area ...) must be taken into account to not modify the velocity profile, which tends to become homogenized under the turbulence effect.\newline"
+	Description ""
+	Description "Normaly, as shown in reference paper, it is also important to modify the value of the constant \latex_({\Large $ \sigma_\epsilon $} \latex_) which should improve the approximations of the turbulence model on the ABL flow type. However, in the case treated in this document, no difference is noticeable.\newline"
+	Description ""
+}
+Chapter {
+	Title "Computer performance"
+	tableau_performance {
+	}
+}
+

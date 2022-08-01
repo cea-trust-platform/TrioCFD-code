@@ -44,15 +44,15 @@ class SourceFiltree_FT_disc_VEF_P1NC : public Source_base, public SourceFiltree_
 
   Declare_instanciable(SourceFiltree_FT_disc_VEF_P1NC);
 public :
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
-  void mettre_a_jour(double temps);
-  void completer();
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
+  void mettre_a_jour(double temps) override;
+  void completer() override;
 
 protected :
   Entree& lire(Entree& is);
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  void associer_pb(const Probleme_base& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_pb(const Probleme_base& ) override;
 
   REF(Zone_VEF) la_zone_VEF;
   REF(Zone_Cl_VEF) la_zone_Cl_VEF;

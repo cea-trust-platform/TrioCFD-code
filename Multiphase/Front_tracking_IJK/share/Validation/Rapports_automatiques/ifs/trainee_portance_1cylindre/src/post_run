@@ -1,0 +1,9 @@
+# Script execute apres les calculs trio_u
+
+# Extraction des valeurs de portance et trainees des fichier .out
+
+for i in cylindre.out cylindre_fin.out
+do
+  awk '$1=="'C'"{print $9, $4, $5, $6 ;}'   $i > C_$i.txt
+  awk '$1=="'F'"{print $9, $4, $5, $6 ;}'   $i > F_$i.txt
+done

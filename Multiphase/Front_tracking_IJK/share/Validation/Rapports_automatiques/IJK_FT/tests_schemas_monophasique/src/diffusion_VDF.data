@@ -1,0 +1,100 @@
+# Boite 3D avec periodicite dans les trois directions : suite du calcul #
+# PARALLEL OK #
+dimension 2
+
+Pb_hydraulique pb
+Domaine dom
+
+# DEBUT MAILLAGE #
+Mailler dom
+{
+	Pave Entree 
+	{
+	Origine 0. 0. 
+	Nombre_de_Noeuds 65 65
+	Longueurs 0.064 0.064 	}
+	{
+	Bord periox X = 0. 0. <= Y <= 0.064
+	Bord periox X = 0.064 0. <= Y <= 0.064
+	Bord perioy Y = 0. 0. <= X <= 0.064
+	Bord perioy Y = 0.064 0. <= X <= 0.064
+
+	}
+}
+
+VDF dis
+
+# Runge_Kutta_ordre_3 sch #
+schema_euler_explicite sch 
+Lire sch
+{
+	tinit 0.
+	tmax 2000.0
+	dt_min 1e-2
+	dt_max 1e-2	
+	dt_impr 0.01
+	dt_sauv 100
+	seuil_statio 1.e-8
+	nb_pas_dt_max 512
+}
+
+Fluide_Incompressible air
+Lire air
+{
+	mu Champ_Uniforme 1 5.e-4
+	rho Champ_Uniforme 1 500
+}
+
+Associer pb dom
+Associer pb sch
+Associer pb air
+
+Discretiser pb dis
+
+Lire pb
+{
+	Navier_Stokes_standard
+
+	{
+		solveur_pression petsc cholesky { }
+		convection { negligeable }
+		diffusion {   }
+		conditions_initiales {                 
+				# acos(0.5)-pi/2 = -0.5235987755982987     et    acos(0.5)-pi/4 = 0.2617993877991496 #
+				vitesse Champ_fonc_xyz dom 2 2.*0.001*cos(x*98.17477042468103+0.2617993877991496)*cos(y*98.17477042468103-0.5235987755982987)
+			       				     2.*0.001*sin(x*98.17477042468103+0.2617993877991496)*sin(y*98.17477042468103-0.5235987755982987)  
+			}
+		conditions_limites {
+periox periodique 
+perioy periodique 
+
+			
+		}
+					
+	        	
+
+        }
+	Postraitement
+	{
+	
+	format lata
+		Champs dt_post 2048e-2
+		{
+			pression elem			
+			vitesse faces	
+		
+		
+		}
+	  Sondes
+    {
+       pp_vx nodes vitesseX periode 1e-9 points 1 0.008000 0.015875 
+       pp_vy nodes vitesseY periode 1e-9 points 1 0.008125 0.016000 #
+       pp_vx nodes vitesseX periode 1e-9 points 1 0.0030 0.01350 
+       pp_vy nodes vitesseY periode 1e-9 points 1 0.0035 0.01300 #
+    }
+	}
+}
+
+Resoudre pb
+Fin
+

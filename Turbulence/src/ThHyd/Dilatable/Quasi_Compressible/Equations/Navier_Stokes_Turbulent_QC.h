@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_Turbulent_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/19
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -44,28 +43,21 @@ class Navier_Stokes_Turbulent_QC : public Navier_Stokes_Turbulent,public Navier_
 
 public :
 
-  void completer();
-  void mettre_a_jour(double );
-  virtual bool initTimeStep(double dt);
+  void completer() override;
+  void mettre_a_jour(double ) override;
+  bool initTimeStep(double dt) override;
 
-  int preparer_calcul();
-  int impr(Sortie&) const;
-  void imprimer(Sortie& os) const;
+  int preparer_calcul() override;
+  int impr(Sortie&) const override;
+  void imprimer(Sortie& os) const override;
 
-  DoubleTab& derivee_en_temps_inco(DoubleTab& );
-  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
-  inline const Champ_Inc& rho_la_vitesse() const;
-  void discretiser();
-  virtual const Champ_base& get_champ(const Motcle& nom) const;
-  const Champ_Don& diffusivite_pour_transport();
-
-protected:
-
+  DoubleTab& derivee_en_temps_inco(DoubleTab& ) override;
+  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
+  void assembler_avec_inertie( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
+  inline const Champ_Inc& rho_la_vitesse() const override { return rho_la_vitesse_; }
+  void discretiser() override;
+  const Champ_base& get_champ(const Motcle& nom) const override;
+  const Champ_Don& diffusivite_pour_transport() const override;
 };
-inline const Champ_Inc& Navier_Stokes_Turbulent_QC::rho_la_vitesse() const
-{
-  return rho_la_vitesse_;
-}
 
 #endif

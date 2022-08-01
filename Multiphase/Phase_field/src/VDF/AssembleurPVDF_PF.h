@@ -40,16 +40,16 @@ class AssembleurPVDF_PF : public Assembleur_P_VDF
   Declare_instanciable(AssembleurPVDF_PF);
 
 public:
-  void associer_zone_dis_base(const Zone_dis_base& )                ;
-  void associer_zone_cl_dis_base(const Zone_Cl_dis_base& )          ;
-  const Zone_dis_base& zone_dis_base() const                        ;
-  const Zone_Cl_dis_base& zone_Cl_dis_base() const                  ;
-  int assembler(Matrice&)                                        ;
-  int assembler_rho_variable(Matrice&, const Champ_Don_base& rho);
-  int assembler_QC(const DoubleTab&, Matrice&)                   ;
-  int modifier_secmem(DoubleTab&)                                ;
-  int modifier_solution(DoubleTab&)                              ;
-  void completer(const Equation_base& )                             ;
+  void associer_zone_dis_base(const Zone_dis_base& ) override                ;
+  void associer_zone_cl_dis_base(const Zone_Cl_dis_base& ) override          ;
+  const Zone_dis_base& zone_dis_base() const override                        ;
+  const Zone_Cl_dis_base& zone_Cl_dis_base() const override                  ;
+  int assembler(Matrice&) override                                        ;
+  int assembler_rho_variable(Matrice&, const Champ_Don_base& rho) override;
+  int assembler_QC(const DoubleTab&, Matrice&) override                   ;
+  int modifier_secmem(DoubleTab&) override                                ;
+  int modifier_solution(DoubleTab&) override                              ;
+  void completer(const Equation_base& ) override                             ;
 
 protected:
   int construire(Matrice& la_matrice);

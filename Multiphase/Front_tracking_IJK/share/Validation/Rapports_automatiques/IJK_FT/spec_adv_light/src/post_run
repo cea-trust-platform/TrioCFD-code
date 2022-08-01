@@ -1,0 +1,47 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+
+if [ "c"$1 == "cswitch" ]
+then
+   echo "post_run does nothing for switch"
+   exit 0
+fi
+
+## Preparation d'une reprise 
+chmod 777 like_sub_file
+./like_sub_file
+
+## Rangement des donnees de la simulation
+# mkdir -p OUT SON TXT LATAS
+# mv *out OUT
+# mv *son SON
+# mv *txt TXT
+# mv *son SON
+# mv *lata* LATAS
+
+# ## Traitement des donnees de la simulation
+# # Position et relevé des sondes
+# python $project_directory/share/PyTools/DEPSONDES/coord_and_values.py spectral_point2 ./SON/ [F]
+# # Correlations du forcage spectral impose
+# # python $project_directory/share/PyTools/DEPSONDES/correlations_vII.py ./SON/ '**' 15 [X,Y,Z] [X,Y,Z] [-1,-1] 1>correlations.logF
+# python $project_directory/share/PyTools/DEPSONDES/correlations_vIV.py ./SON/ '**' F 15 [X,Y,Z] [X,Y,Z] [-1,-1] 1>F_correlations.logF
+# python $project_directory/share/PyTools/DEPSONDES/correlations_vIV.py ./SON/ '**' V 15 [X,Y,Z] [X,Y,Z] [-1,-1] 1>V_correlations.logF
+
+# Obtention des energies cinetiques et des dissipations
+python $project_directory/share/PyTools/SOME_PYTHON/accplot_vAB.py fig_acc 0. NEXT/spectral_point2.sauv spectral_point2.data 1>accplot.logF
+python $project_directory/share/PyTools/SOME_PYTHON/energy.py liq fig_ene spectral_point2.data TXT/ accplot.logF  10 [-1,-1] 1>energy.logF
+
+# Effet du patch1 sur une simu mono de THI 
+if [[ $PWD == *"PATCH_1"*  ]];
+then
+echo $PWD
+    cd ../..
+    python $project_directory/share/PyTools/SOME_PYTHON/vitesses_phases_fusion_cas.py yz_liq fig_U [NO_PATCH/RUN01/spectral_point2.data,PATCH_1/RUN01/spectral_point2.data] [NO_PATCH/RUN01/TXT/,PATCH_1/RUN01/TXT/] [raw,patch1] [-1,-1] 0
+    python $project_directory/share/PyTools/SOME_PYTHON/vitesses_phases_fusion_cas.py yz_vap fig_U [NO_PATCH/RUN01/spectral_point2.data,PATCH_1/RUN01/spectral_point2.data] [NO_PATCH/RUN01/TXT/,PATCH_1/RUN01/TXT/] [raw,patch1] [-1,-1] 0
+    # ~~
+    # Produit une erreur car bilan_qdm est ecrit au sein d'une fonction qui n'est appelee que si la simulaiton est diphasique.
+    python $project_directory/share/PyTools/SOME_PYTHON/quantite_mvt__fusion_cas_II.py fig_qdm_bilan [NO_PATCH/RUN01/OUT/,PATCH_1/RUN01/OUT/] [raw,patch1] yz 10 [-1,-1] 0
+    # ~~
+    python $project_directory/share/PyTools/SOME_PYTHON/qdm_with_check_fusion_cas.py fig_qdm_check [NO_PATCH/RUN01/OUT/,PATCH_1/RUN01/OUT/] [raw,patch1] yz 10 [-1,-1] 0
+    cd -
+fi

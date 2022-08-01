@@ -1,0 +1,19 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+# python ./ordre_cvg.py
+cas=`echo $1`
+# cd ..
+# ls | tail
+if [ $cas = "basic_temperature" ] 
+then
+    ./$cas.sh
+    # cp $cas.sauv.* CANAL_TEMPERATURE_IMPOSEE_repr.sauv.*
+fi
+
+if [ $cas = "pre_run" ]
+then
+    cp pre_run.* CANAL/
+    # cp pre_run.* CANAL_FLUX_IMPOSE/
+fi

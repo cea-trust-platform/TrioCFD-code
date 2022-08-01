@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Navier_Stokes_Turbulent_QC.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible/Turbulence
-// Version:     /main/37
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Equations
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +47,7 @@ Entree& Navier_Stokes_Turbulent_QC::readOn(Entree& is)
   return is;
 }
 
-const Champ_Don& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_Turbulent_QC::diffusivite_pour_transport() const
 {
   return fluide().viscosite_dynamique();
 }

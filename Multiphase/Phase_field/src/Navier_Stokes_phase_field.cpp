@@ -28,7 +28,7 @@
 #include <Convection_Diffusion_Phase_field.h>
 #include <Assembleur_base.h>
 #include <Statistiques.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Zone_VF.h>
 #include <Domaine.h>
 #include <Param.h>
@@ -308,7 +308,7 @@ int Navier_Stokes_phase_field::lire_motcle_non_standard(const Motcle& mot, Entre
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport() const
 {
   if(boussi_==0)
     {
@@ -524,7 +524,7 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
   // RLT: plutot que de multiplier dt(diff) par rho ici comme c'est fait dans TrioCFD 1.8.0 (cf. coeff ci-dessous)
   // (en considerant qu'il a ete evalue dans l'operateur de diffusion (Op_Diff_VDF_Face_base) avec la viscosite dynamique - ce qui n'est vrai que pour boussi_==0)
   // on associe le champ masse volumique a l'operateur de diffusion dans le cas boussi_==0 pour que le calcul de son dt soit correct directement
-  double coeff = mp_min_vect(eq_ns.rho()); // eq_c.rho1(); // voir d'apres le FT
+  double coeff = mp_min_vect(eq_ns.rho()->valeurs()); // eq_c.rho1(); // voir d'apres le FT
 
   double dt=0;
   double dt_op;
@@ -549,7 +549,7 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
       Cout << "NS_PF : pas de temps de diffusion : " << dt_op << finl;
     }
   dt=dt+1./dt_op;
-  dt=min(1./dt,le_schema_en_temps->pas_temps_max());
+  dt=std::min(1./dt,le_schema_en_temps->pas_temps_max());
   if (le_schema_en_temps->limpr())
     {
       Cout << "NS_PF : pas de temps de calcul : " << dt << finl;

@@ -40,13 +40,13 @@ class Operateur_Conv_sensibility_VEF : public Operateur_Conv_sensibility
   Declare_instanciable( Operateur_Conv_sensibility_VEF ) ;
 
 public :
-  virtual void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& );
-  virtual DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const;
+  void associer (const Zone_dis& , const Zone_Cl_dis& ,const Champ_Inc& ) override;
+  DoubleTab& ajouter(const DoubleTab&, DoubleTab& ) const override;
   void ajouter_Lstate_sensibility_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const; //L(U0)U1
   void ajouter_Lsensibility_state_Amont(const DoubleTab&, const DoubleTab&, DoubleTab& ) const;//L(U1)U0
   void calcul_vc(const ArrOfInt&, ArrOfDouble& , const ArrOfDouble& s, const DoubleTab& , const DoubleTab& ,int  ) const;
   virtual void remplir_fluent(DoubleVect& ) const;
-  double calculer_dt_stab() const;
+  double calculer_dt_stab() const override;
   void  add_diffusion_term(const DoubleTab&, DoubleTab&) const;
   void add_diffusion_scalar_term(const DoubleTab&, DoubleTab&, double diffu=1.) const;
   inline double viscA(int face_i, int face_j, int num_elem, double diffu=1.) const;

@@ -1,0 +1,100 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 96
+  nbelem_j 32
+  nbelem_k 32
+  uniform_domain_size_i 6.283185307
+  uniform_domain_size_j 2.
+  uniform_domain_size_k 2.
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1 # 3 #
+  nproc_j 2 # 2 #
+  nproc_k 4 # 2 #
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep 0.3 # 0.01 #
+  # time_scheme RK3_FT #
+  # type_velocity_convection_op Centre # 
+  Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  timestep_facsec 1.0 # 0.9 #
+  cfl 1.0
+  fo  0.5 # pour stabiliser uy en euler_explicite.  0.6666 suffit pour RK3 #
+  oh  1.0
+  dt_post 20 # 1000 #
+  dt_post_stats_plans 20
+  t_debut_statistiques 0.1
+  champs_a_postraiter 2 PRESSURE VELOCITY
+  check_stop_file stop.txt
+  dt_sauvegarde 1000 # 500 Pour avoir le dt juste avant le bug #
+  nb_pas_dt_max 400   # 5000 #
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 3
+      Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 2 coarsen_k 2 }
+      Coarsen_Operator_Uniform {  } 	
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 20 1
+    
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  # FIN AJOUT #
+  check_divergence
+  disable_diphasique
+  gravite 3 -9.81 0. 0. 
+  # ----------------------------------------------------------------- #
+  #             FORCAGE DE L'ECOULEMENT :                             #
+  # ----------------------------------------------------------------- #
+  # expression_derivee_force   A*(Ub_objectif+(B*C/A)-v_moy)-B*force  #
+  # avec C = rho * tau_moy/h 
+         A = omega**2 * rho
+         B = 2 * omega * rho #
+  # terme_force_init = C ? = rho * tau_moy/h #
+  # Choix 1 : Ub = 0.33398423   et omega = 10. s^-1  #
+  expression_derivee_force 1.e+2*(0.33398423+0.2-v_moyen)-2.e+1*force
+  terme_force_init  1.0  # tau * 2 S / V = tau/h #
+  rho_liquide 1.0
+  # La vitesse initiale est donnee par : 
+  expression_vx_init Ub   ou    Ub*3./2.*z*(2-z)
+  expression_vy_init 0.2 * Ub * sin(.........) + 0.1 * Ub * sin(100*pi*pi*Ly*y)
+  expression_vz_init 0.
+ 
+avec Ub : Ma vitesse debitante cible.
+     ..... = SOMME_1^3 (sin(xp*omegak)*sin(zp*omegak)*sin(yp*omegak)
+     xp = x/(Lx)*2*pi = x/Ly    (car Lx = 2*pi*Ly)
+     yp = y/(Ly)*2*pi
+     zp = z/(Lz)*2*pi
+  #
+  mu_liquide 1.0
+  expression_vx_init 0.3 # *3./2.*z*(2-z)  # 
+  # Une perturbation transverse : #
+  expression_vy_init 0.6*0.3*3./2.*z*(2-z)*(sin(x/6.283185307*2*3.1415926535897931)*sin(z/2*2*3.1415926535897931)+sin(x/6.283185307*2*3.1415926535897931*6)*sin(z/2*2*3.1415926535897931*4)+sin(x/6.283185307*2*3.1415926535897931*2)*sin(z/2*2*3.1415926535897931*1)+0.5*sin(10526.009024960777*x))
+  expression_vz_init 0.
+  # Pour Creer le fichier de Reprise #
+  nom_sauvegarde monop_Ret1.repr 
+  # REPRISE du champ de vitesse de l'interface et des statistiques : #
+  # nom_reprise monop_Ret1.repr #
+}
+Fin

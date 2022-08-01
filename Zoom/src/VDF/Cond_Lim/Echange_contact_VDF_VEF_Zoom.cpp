@@ -73,7 +73,7 @@ double pdt_scalSqrt(const Zone_VEF& la_zone,int num_face,int num2,
           + la_zone.face_normales(num_face,1)*la_zone.face_normales(num2,1);
   if (dimension == 3)
     pscal += la_zone.face_normales(num_face,2)*la_zone.face_normales(num2,2);
-  pscal = sqrt(fabs(pscal));
+  pscal = sqrt(std::fabs(pscal));
   //if (!(face_voisinsF(num2,0) == num_elem)) pscal = -pscal;
   //  if ( (face_voisinsF(num_face,0) == face_voisinsF(num2,0)) ||
   //     (face_voisinsF(num_face,1) == face_voisinsF(num2,1))) pscal = -pscal;

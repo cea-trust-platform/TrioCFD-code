@@ -1,0 +1,113 @@
+Parameters {
+	
+	Title "Creeping flow around a bubble. Validation on Hadamard solution."
+	Author "M.G"
+	Testcase Re_1_Pr_1 pre_run
+	Testcase Re_1_Pr_1 Re_1_Pr_1
+
+}
+# Chapitre {
+#         Titre ""
+#         Description "Calcul Grossier." <<EOF
+# Le calcul grossier se passe en deux temps, avec une reprise. Pour les besoins de la fiche de validation, le nombre de pas de temps
+# est reduit a 600 au lieu de 6000. 
+# La bulle est maintenue en position initiale (xb reste proche de 0. a la fin, ecart inferieur a delta x).
+# L'erreur sur le terme source S obtenu a l'equilibre est d'environ 11.7749. 
+# La force de maintien de la bulle devrait tendre vers 0 (elle vaut environ 0.58 a la fin du calcul R). 
+# Donc l'integral sur le volume de simulation est negligeable puisque le taux de vide est petit ($\alpha_v F \ll S-S_{theo}$).
+# Finalement, on a une erreur de l'ordre de 11.7749 sur la conservation de la quantite de mouvement. 
+# EOF
+# 
+#         visu {
+#                 titre "Fin du premier cas grossier"
+#                 cycles -1
+#                 Normal3d 0 0 1
+#                 Up3D 1 0 0
+#                 zoom3D 0 0 1.
+#                 mesh        single_Re01.lata DOM
+#                 mesh        single_Re01.lata INTERFACES
+#                 pseudocolor single_Re01.lata INTERFACES COURBURE SOM
+# 		pseudocolor single_Re01.lata DOM_dual VELOCITY_X FACES
+# 		Operator    Slice 0. 0. 0. 0. 0. 1. 
+#         }
+#       figure {
+#                 titre "Position des bulles en x"
+#                 incluredesccourbes 0
+#                 labelX  "t"
+#                 labelY  "x"
+#                 Courbe {
+#                    fichier R/single_Re01_bulles_centre_x.out
+#                      colonnes ($1) ($2)
+#                      style lines
+#                      Legende "reprise"
+#                 }
+#                 Courbe {
+#                    fichier single_Re01_bulles_centre_x.out
+#                      colonnes ($1) ($2)
+#                      style points
+#                      Legende "Coarse"
+#                 }
+# 		Courbe {
+# 		   fichier REFINE/single_Re01_bulles_centre_x.out
+#                      colonnes ($1) ($2)
+#                      style linespoints
+#                      Legende "refine"
+#                 }
+#       }
+# 
+#       figure {
+#                 titre "Source de QdM axiale (en x)"
+#                 incluredesccourbes 0
+#                 labelX  "t"
+#                 labelY  "S"
+#                 Courbe {
+#                    fichier R/single_Re01_acceleration.out
+#                      colonnes ($2) ($8)
+#                      style lines
+#                      Legende "reprise"
+#                 }
+#                 Courbe {
+#                    fichier single_Re01_acceleration.out
+#                      colonnes ($2) ($8)
+#                      style points
+#                      Legende "Coarse"
+#                 }
+#                 Courbe {
+#                    fichier REFINE/single_Re01_acceleration.out
+#                      colonnes ($2) ($8)
+#                      style linespoints
+#                      Legende "refine"
+#                 }
+#       }
+# 
+#       figure {
+#                 titre "Force de rappel axiale (en x: $\alpha_v F_b$)"
+#                 incluredesccourbes 0
+#                 labelX  "t"
+#                 labelY  "Fx"
+#                 Courbe {
+#                    fichier R/single_Re01_acceleration.out
+#                      colonnes ($2) ($10)
+#                      style lines
+#                      Legende "reprise"
+#                 }
+#                 Courbe {
+#                    fichier single_Re01_acceleration.out
+#                      colonnes ($2) ($10)
+#                      style points
+#                      Legende "Coarse"
+#                 }
+#                 Courbe {
+#                    fichier REFINE/single_Re01_acceleration.out
+#                      colonnes ($2) ($10)
+#                      style linespoints
+#                      Legende "refine"
+#                 }
+#       }
+# 
+# }
+# Chapter {
+# 	Title Computer performance
+# 	Tableau_performance {
+# 	}
+# }

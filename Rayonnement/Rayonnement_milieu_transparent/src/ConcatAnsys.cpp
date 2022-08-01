@@ -128,7 +128,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
         nb_faces=1;
       for (i=0; i<nb_faces; i++)
         {
-          double fij,total_calcule=0,total_lu;
+          double fij,total_lu;
           // Lecture du fichier Ansys
           ansys>>motlu;
           while(motlu!="TOTAL=")
@@ -145,7 +145,6 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
                 {
                   ansys>>fij;
                   FiJ+=fij;
-                  total_calcule+=fij;
                 }
               if (deja_regroupe_dans_ansys)
                 FIJ(I,J)=FiJ;
@@ -181,8 +180,8 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
             }
           else
             {
-              min_total=dmin(min_total,total_lu);
-              max_total=dmax(max_total,total_lu);
+              min_total=std::min(min_total,total_lu);
+              max_total=std::max(max_total,total_lu);
             }
         }
     }
@@ -198,8 +197,8 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
       double total_calcule=0;
       for (J=0; J<nombre_faces_rayonnantes; J++)
         total_calcule+=FIJ(I,J);
-      min_total=dmin(min_total,total_calcule);
-      max_total=dmax(max_total,total_calcule);
+      min_total=std::min(min_total,total_calcule);
+      max_total=std::max(max_total,total_calcule);
     }
   Cerr << "Somme des facteurs de forme apres regroupement: Min=" << min_total << " Max=" << max_total << finl;
   //Cerr << FIJ << finl;
@@ -234,7 +233,7 @@ Entree& ConcatAnsys::interpreter_(Entree& is)
             x+=Fij(i,j);
           for (j=0; j<nombre_faces_rayonnantes; j++)
             Fij(i,j)/=x;
-          min_total=dmin(x,min_total);
+          min_total=std::min(x,min_total);
         }
       // On affiche apres la symetrisation...
       Cerr << "\rIteration " << inter << ": Residu="<<err<< " Min(somme normalisee des facteurs de forme)=" << min_total << "         ";

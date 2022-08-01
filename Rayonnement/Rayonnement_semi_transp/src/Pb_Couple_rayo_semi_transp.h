@@ -53,15 +53,15 @@ class Pb_Couple_rayo_semi_transp: public Probleme_Couple
 
 public:
 
-  virtual void initialize();
+  void initialize() override;
   //  virtual void terminate();
   //  virtual bool initTimeStep(double dt);
   //  virtual bool iterateTimeStep(bool& converged);
   //  virtual void validateTimeStep();
 
   void le_modele_rayo_associe(const Modele_rayo_semi_transp&);
-  virtual int associer_(Objet_U&);
-  virtual void associer_sch_tps_base(Schema_Temps_base&);
+  int associer_(Objet_U&) override;
+  void associer_sch_tps_base(Schema_Temps_base&) override;
 
   inline Modele_rayo_semi_transp& modele();
   inline const Modele_rayo_semi_transp& modele() const;

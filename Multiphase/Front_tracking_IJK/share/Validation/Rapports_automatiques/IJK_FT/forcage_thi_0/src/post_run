@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [ "c"$1 == "cswitch" ] 
+then
+   echo "post_run does nothing for switch"
+   exit 0
+fi
+
+python $project_directory/share/PyTools/follow_calcs/accplot.py fig 0. diph.sauv
+mkdir -p R
+\cp diph*sauv* R/
+[ ! -f R/single_Re01_acceleration.out ] && cp single_Re01*out R/
+[ ! -f R/single_Re01.dt_ev ] && cp single_Re01.dt_ev R/
+sed -e "s/nom_sauvegarde diph/ nom_sauvegarde diph2/" \
+    -e "/nom_reprise/s/#//g" \
+    single_Re01.data > R/single_Re01.data
+(cd R; ln -sf ../post_run .)
+
+if [ "R" == `basename $PWD` ]
+then
+   \cp -r diph2.sauv* ../REFINE/
+   sed -e "/nom_reprise/s/diph.*/refine.sauv/g" \
+       -e "/nom_sauvegarde/s/diph2/diph/" \
+       -e "s/nbelem_i 64/nbelem_i 128/" \
+       -e "/nbelem/s/32/64/" \
+       -e "/nproc/s/1/2/" \
+       -e "/ijk_splitting_ft_extension/s/8/16/" \
+       -e "s/DOM/DOM_NEW/g" \
+       -e "s/nb_pas_dt_max .*/nb_pas_dt_max 100/" \
+       single_Re01.data > ../REFINE/single_Re01.data
+   (cd ../REFINE; ln -sf ../post_run .)
+fi

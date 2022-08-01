@@ -1,0 +1,98 @@
+# PARALLEL OK 8 #
+# Le decoupage ne fait rien #
+# Astuce pour que make_PAR.data trouve deux processeurs de calcul:
+Nom_Zones toto
+#
+# DEBUT DECOUPAGE
+system "touch toto_0000.Zones toto_0001.Zones toto_0002.Zones toto_0003.Zones"
+system "touch toto_0004.Zones toto_0005.Zones toto_0006.Zones toto_0007.Zones"
+Fin
+  FIN DECOUPAGE #
+
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 16
+  nbelem_j 16 
+  uniform_domain_size_i 0.0019534166666666667
+  uniform_domain_size_j 0.00097670833333333333
+  file_coord_k  coord_k_level0.txt 
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+# DEBUT MAILLAGE #
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+# FIN MAILLAGE #
+# DEBUT LECTURE
+  nproc_i 2
+  nproc_j 2
+  nproc_k 2
+FIN LECTURE #
+
+  process_grouping_i 2
+  process_grouping_j 2
+  process_grouping_k 2
+}
+
+dns_qc_double 
+{
+  ijk_splitting grid_splitting
+  timestep 1
+  nb_pas_dt_max 3
+  projection_initiale
+  multigrid_solver {
+   coarsen_operators 5
+         Coarsen_Operator_K { file_z_coord coord_k_level1.txt }
+         Coarsen_Operator_K { file_z_coord coord_k_level2.txt } # 1536 1536 384 #
+         Coarsen_Operator_K { file_z_coord coord_k_level3.txt } # 1536 1536 384 #
+         Coarsen_Operator_Uniform { coarsen_i 1 coarsen_j 2 coarsen_k 2 }  # 1536 768 192 #
+	 Coarsen_Operator_Uniform { }  # 768 384 96 #
+    ghost_size 1 # pour utiliser 4 epaisseurs de mailles fantomes de facon optimale #
+                 # il faut que le nombre d'iterations de smooth-steps plus l'iteration pour le calcul du residu soit #
+                 # un multiple du nombre de mailles fantomes (exemple ghost-size=4 => smooth steps=3 ou 7 ou 11 ou 15 ou ...) #
+    pre_smooth_steps 5 3 3 3 7 7
+    smooth_steps 5 3 3 3 7 7 
+    relax_jacobi 5 0.72 0.72 0.72 0.68 0.65 
+    solveur_grossier GCP { seuil  0.5e-16 precond ssor { omega 1.5 } }
+    check_residu 0
+    seuil 2.5e-16
+    nb_full_mg_steps 2 20 1 
+    solver_precision double
+
+  }
+  timestep_facsec 1.
+  
+  tinit 0.
+
+  dt_post 5
+  champs_a_postraiter 3 velocity pressure temperature 
+  dt_sauvegarde 5000
+  nom_sauvegarde dns.sauv
+  # nom_reprise nouveau_maillage.sauv #
+  check_stop_file dns.stop
+
+  t_paroi_impose_kmin 293.0
+  t_paroi_impose_kmax 586.0
+  
+  p_thermo_init 214072
+  
+  expression_t_init 293.0+(586-293)*z/0.029846
+
+  expression_vx_init 0.5*z*(0.029846-z)*4/(0.029846*0.029846)+sin(x*318276)*0.01
+  expression_vy_init 0.+sin(y*318276)*0.01
+  expression_vz_init  0.01*(sin((x-0.093764)/0.093764*6.28318530717959)*sin(y/0.046882*6.28318530717959)+sin((x-0.093764)/0.093764*6.28318530717959*6)*sin(y/0.046882*6.28318530717959*4)*sin(z/(4*0.029846)*6.28318530717959*7)+sin((x-0.093764)/0.093764*6.28318530717959*2)*sin(y/0.046882*6.28318530717959*8)*sin(z/(4*0.029846)*6.28318530717959*7))*z*(0.029846-z)*4/(0.029846*0.029846)+sin(10526.009024960777*z)+sin(z*318276)*0.01
+ 
+  cp                  1005.0
+  gamma               1.4 
+sauvegarde_post_instantanes
+ debit_massique -1. /* pour calculer le debit initial */
+
+}

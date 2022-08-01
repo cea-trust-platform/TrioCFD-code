@@ -27,9 +27,9 @@
 #include <Interprete_geometrique_base.h>
 class Domaine;
 class Sous_Zone;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
 class Zone;
-class IntTab;
+#include <TRUSTTabs_forward.h>
 //////////////////////////////////////////////////////////////////////////////
 //
 // .DESCRIPTION
@@ -48,7 +48,7 @@ class ConstruireDomaine : public Interprete_geometrique_base
 
 public :
 
-  Entree& interpreter_(Entree&);
+  Entree& interpreter_(Entree&) override;
 
 protected :
 

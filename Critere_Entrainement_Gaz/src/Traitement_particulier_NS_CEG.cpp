@@ -31,7 +31,7 @@
 #include <Milieu_base.h>
 #include <SFichier.h>
 #include <Domaine.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <Statistiques.h>
 #include <stat_counters.h>
 #include <Fluide_Incompressible.h>
@@ -249,20 +249,20 @@ void Traitement_particulier_NS_CEG::critere_areva()
       epsilon*=0.25;
 
       // Calcul de K
-      double wz = dabs(vorticite(elem,2));
+      double wz = std::fabs(vorticite(elem,2));
       double omega;
       if (epsilon>0)
         omega = k * wz / epsilon;			// Rotation de l'ecoulement
       else
         omega = 0;
-      double lambda = max(-vz,0.) / sqrt(-gz*haspi_); 	// Aspiration de l'ecoulement
+      double lambda = std::max(-vz,0.) / sqrt(-gz*haspi_); 	// Aspiration de l'ecoulement
       double K = C_ * omega * lambda;			// C_ pour une normalisation
 
-      // On cherche le vortex (max(K) et son centre)
+      // On cherche le vortex (std::max(K) et son centre)
       if (K>K_max_local)
         {
           K_max_local=K;
-          for (int i=0; i<3; i++) centre_vortex(i) = zone_VF.xp(elem,i);
+          for (int i=0; i<3; i++) centre_vortex[i] = zone_VF.xp(elem,i);
         }
     }
   // Parallelisme : Impression par le processeur le plus grand qui possede le vortex
@@ -270,7 +270,7 @@ void Traitement_particulier_NS_CEG::critere_areva()
   int pe=(K_max_global==K_max_local?Process::me():-1);
   int pe_max=(int)mp_max(pe);
   if (pe==pe_max) imprimer(K_max_global, "AREVA", centre_vortex, 0);
-  Cerr << "-> AREVA criterion   : Biggest vortex at (x,y,z)=(" << centre_vortex(0) << "," << centre_vortex(1) << "," << centre_vortex(2) << ")" << finl;
+  Cerr << "-> AREVA criterion   : Biggest vortex at (x,y,z)=(" << centre_vortex[0] << "," << centre_vortex[1] << "," << centre_vortex[2] << ")" << finl;
 }
 
 int Traitement_particulier_NS_CEG::lpost(double temps_courant, double dt_post) const
@@ -389,7 +389,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           R0 = 0.6*0.75*(2*surface/perimetre);
 
           // Centre du vortex
-          for (int i=0; i<3; i++) centre_vortex(i)=zone_VF.xp(elem_centre_vortex,i);
+          for (int i=0; i<3; i++) centre_vortex[i]=zone_VF.xp(elem_centre_vortex,i);
           // Envoi des donnees tous les autres processes:
           for (int p=0; p<nproc(); p++)
             if (p!=pe_mp_max)
@@ -424,15 +424,15 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
             {
               double theta=i_theta*dtheta;
-              points(i_theta,0)=centre_vortex(0)+R*cos(theta);
-              points(i_theta,1)=centre_vortex(1)+R*sin(theta);
-              points(i_theta,2)=centre_vortex(2);
+              points(i_theta,0)=centre_vortex[0]+R*cos(theta);
+              points(i_theta,1)=centre_vortex[1]+R*sin(theta);
+              points(i_theta,2)=centre_vortex[2];
             }
           // On cherche les elements contenant le point x,y,z:
           mon_equation->zone_dis().zone().chercher_elements(points,elements);
           for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
             {
-              int elem=elements(i_theta);
+              int elem=elements[i_theta];
               // Test pour verifier que le cercle R0 est bien inscrit au tetraedre:
               if (niter==0 && pe==pe_mp_max)
                 {
@@ -462,7 +462,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               // On supprime les elements du vortex actuel de la liste
               for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
                 {
-                  int elem=elements(i_theta);
+                  int elem=elements[i_theta];
                   if (elem>=0 && elem<nb_elem)
                     {
                       if (vortex_potentiel(elem)!=0) taille_vortex++;
@@ -489,12 +489,12 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
       taille_maxi = (taille_vortex_mailles > taille_maxi ? taille_vortex_mailles : taille_maxi);
       if (points_trouves==nb_dtheta && taille_vortex_mailles>nb_mailles_mini_)
         {
-          //Cerr << printf("-> Critere CEA_JAEA: Vortex de %d mailles en (x,y,z)=(%.4f,%.4f,%.4f) Rayon=%.2f max(critere_Q)=%.2f\n",taille_vortex_mailles,centre_vortex(0),centre_vortex(1),centre_vortex(2),R,critereQ_mp_max);
+          //Cerr << printf("-> Critere CEA_JAEA: Vortex de %d mailles en (x,y,z)=(%.4f,%.4f,%.4f) Rayon=%.2f std::max(critere_Q)=%.2f\n",taille_vortex_mailles,centre_vortex(0),centre_vortex(1),centre_vortex(2),R,critereQ_mp_max);
           if (debug_)
             {
               Cerr << "-> CEA_JAEA criterion : Vortex " << nb_vortex << " de " << taille_vortex_mailles << " elements ";
-              Cerr << "in (x,y,z)=(" << centre_vortex(0) << "," << centre_vortex(1) << "," << centre_vortex(2) << ") ";
-              Cerr << "Radius=" << R << " max(critere_Q)=" << critereQ_mp_max;
+              Cerr << "in (x,y,z)=(" << centre_vortex[0] << "," << centre_vortex[1] << "," << centre_vortex[2] << ") ";
+              Cerr << "Radius=" << R << " std::max(critere_Q)=" << critereQ_mp_max;
               //int e = mon_equation->zone_dis().zone().chercher_elements(centre_vortex(0),centre_vortex(1),centre_vortex(2));
               //if (e>=0) Cerr << "Sur process " << Process::me() << " critere_Q=" << critereQ(e) << finl;
             }
@@ -506,7 +506,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
             {
               double theta=i_theta*dtheta;
-              int elem=elements(i_theta);
+              int elem=elements[i_theta];
               if (elem>=0 && elem<nb_elem)
                 {
                   alpha+=(u(i_theta,0)*cos(theta)+u(i_theta,1)*sin(theta))*R*dtheta;		// Integration vitesse normale (dans le plan)
@@ -534,10 +534,10 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
           Critere(nb_vortex,0)=alpha;				// alpha
           Critere(nb_vortex,1)=Critere(nb_vortex,0)*gamma*gamma;	// alpha*gamma^2
           Critere(nb_vortex,2)=alpha*Critere(nb_vortex,1);		// (alpha*gamma)^2
-          Rayon(nb_vortex)=R;
-          Max_Critere_Q(nb_vortex)=critereQ_mp_max;
-          Taille(nb_vortex)=taille_vortex_mailles;
-          for (int i=0; i<3; i++) Centre(nb_vortex,i)=centre_vortex(i);
+          Rayon[nb_vortex]=R;
+          Max_Critere_Q[nb_vortex]=critereQ_mp_max;
+          Taille[nb_vortex]=taille_vortex_mailles;
+          for (int i=0; i<3; i++) Centre(nb_vortex,i)=centre_vortex[i];
           if (debug_) Cerr << " alpha=" << Critere(nb_vortex,0) << " alpha*gamma^2=" << Critere(nb_vortex,1) << " (alpha*gamma)^2=" << Critere(nb_vortex,2) << finl;
           R+=dR;
           nb_vortex++;
@@ -565,14 +565,14 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
       Vortex_max=-1;
       for (int critere=0; critere<3; critere++)
         for (int vortex=0; vortex<nb_vortex; vortex++)
-          if (Critere(vortex,critere)>Critere_max(critere))
+          if (Critere(vortex,critere)>Critere_max[critere])
             {
-              Critere_max(critere)=Critere(vortex,critere);
-              Vortex_max(critere)=vortex;
+              Critere_max[critere]=Critere(vortex,critere);
+              Vortex_max[critere]=vortex;
             }
 
       // On prend comme vortex principal celui indique par alpha*gamma^2:
-      int vortex_principal = Vortex_max(1);
+      int vortex_principal = Vortex_max[1];
       if (vortex_principal>=0)
         {
           if (Process::je_suis_maitre())
@@ -589,9 +589,9 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
               for (int critere=0; critere<3; critere++)
                 {
                   //int vortex = Vortex_max(critere);
-                  for (int i=0; i<3; i++) centre_vortex(i)=Centre(vortex_principal,i);
+                  for (int i=0; i<3; i++) centre_vortex[i]=Centre(vortex_principal,i);
                   //imprimer(Critere_max(critere), Critere_nom(critere), centre_vortex, Rayon(vortex));
-                  imprimer(Critere(vortex_principal,critere), Critere_nom(critere), centre_vortex, Rayon(vortex_principal));
+                  imprimer(Critere(vortex_principal,critere), Critere_nom(critere), centre_vortex, Rayon[vortex_principal]);
 
                   // Impression periodique des caracteristiques du vortex pour chaque critere
                   if (lpost(sch.temps_courant(),dt_post_))
@@ -609,9 +609,9 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                       for (int i_theta=0; i_theta<nb_dtheta; i_theta++)
                         {
                           double theta=i_theta*dtheta;
-                          double x=centre_vortex(0)+Rayon(vortex_principal)*cos(theta);
-                          double y=centre_vortex(1)+Rayon(vortex_principal)*sin(theta);
-                          double z=centre_vortex(2)+2*R0;
+                          double x=centre_vortex[0]+Rayon[vortex_principal]*cos(theta);
+                          double y=centre_vortex[1]+Rayon[vortex_principal]*sin(theta);
+                          double z=centre_vortex[2]+2*R0;
                           file << " x= " << x << " y= " << y << " z= " << z;
                         }
                       file << finl;
@@ -637,7 +637,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
                   file << "# Champ RAYON" << finl;
                   file << "# Type POINTS" << finl;
                   file << sch.temps_courant();
-                  for (int vortex=0; vortex<nb_vortex; vortex++) file << " " << Rayon(vortex);
+                  for (int vortex=0; vortex<nb_vortex; vortex++) file << " " << Rayon[vortex];
                   file << finl;
                 }
             }
@@ -646,7 +646,7 @@ void Traitement_particulier_NS_CEG::critere_cea_jaea()
     }
 }
 
-void Traitement_particulier_NS_CEG::imprimer(const double& valeur_critere, const Nom& critere, const ArrOfDouble& centre_vortex, const double& rayon_vortex)
+void Traitement_particulier_NS_CEG::imprimer(const double valeur_critere, const Nom& critere, const ArrOfDouble& centre_vortex, const double rayon_vortex)
 {
   Nom filename=Objet_U::nom_du_cas();
   filename+="_";
@@ -667,6 +667,6 @@ void Traitement_particulier_NS_CEG::imprimer(const double& valeur_critere, const
   fic.precision(sch.precision_impr());
   fic.setf(ios::scientific);
   // Ecriture
-  fic << sch.temps_courant() << " \t" << centre_vortex(0) << " \t" << centre_vortex(1) << " \t" << centre_vortex(2) << " \t" << rayon_vortex << " \t" << valeur_critere << finl;
+  fic << sch.temps_courant() << " \t" << centre_vortex[0] << " \t" << centre_vortex[1] << " \t" << centre_vortex[2] << " \t" << rayon_vortex << " \t" << valeur_critere << finl;
   fic.close();
 }

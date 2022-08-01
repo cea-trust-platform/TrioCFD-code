@@ -24,14 +24,11 @@
 #define Marching_Cubes_included
 
 #include <Ref_Zone_VF.h>
-//#include <IntTabs.h>
-#include <Vect_IntTab.h>
+#include <TRUSTTabs.h>
 #include <Maillage_FT_Disc.h>
-#include <ArrOfInt.h>
-
-class DoubleVect;
-class DoubleTabFT;
-//class Maillage_FT_Disc;
+#include <TRUSTArray.h>
+#include <TRUSTTabFT_forward.h>
+#include <TRUSTTabs_forward.h>
 class ArrOfBit;
 class Desc_Structure_FT;
 class Zone;

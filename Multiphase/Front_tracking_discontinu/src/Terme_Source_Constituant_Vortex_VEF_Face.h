@@ -28,11 +28,11 @@ class Terme_Source_Constituant_Vortex_VEF_Face : public Terme_Source_Constituant
 {
   Declare_instanciable(Terme_Source_Constituant_Vortex_VEF_Face);
 public:
-  DoubleTab& calculer(DoubleTab& tab) const;
-  DoubleTab& ajouter(DoubleTab& tab) const;
-  void associer_pb (const Probleme_base& pb);
+  DoubleTab& calculer(DoubleTab& tab) const override;
+  DoubleTab& ajouter(DoubleTab& tab) const override;
+  void associer_pb (const Probleme_base& pb) override;
 
-  void mettre_a_jour(double temps);
+  void mettre_a_jour(double temps) override;
   void ajouter_terme_div_u(DoubleVect& secmem_pression, double dt) const;
 protected:
   double rayon_spot_;

@@ -1,0 +1,87 @@
+IJK_Grid_Geometry grid_geom
+
+Lire grid_geom
+{
+  nbelem_i 128
+  nbelem_j 2
+  nbelem_k 128
+  uniform_domain_size_i 0.1
+  uniform_domain_size_j 0.025
+  uniform_domain_size_k 0.1
+  perio_i
+  perio_j
+ 
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry grid_geom
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+Faisceau_Tubes faisceau
+# soit on met les donnees ici dans le jeu de donnees: #
+Lire faisceau
+1
+ Tube_impose { nom tubefixe   pos_x 0.05 pos_y 0. pos_z 0.05 rayon 0.005 }
+
+# soit on lit ces donnees dans un fichier separe: #
+# Lire_fichier faisceau faisceau.txt #
+
+IJK_problem_double 
+{
+  #  nom_reprise test_tube_libre.sauv #
+  boundary_conditions { bctype_kmin symetrie bctype_kmax symetrie }
+   
+  ijk_splitting grid_splitting
+  timestep 0.015
+  timestep_facsec 0.4
+  
+  dt_post 10
+  champs_a_postraiter 1 tous
+  check_stop_file stop.txt
+  
+  dt_sauvegarde 50000
+  nb_pas_dt_max 2000
+  pressure_gradient 0
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 4
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 }
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 } 	
+      Coarsen_Operator_Uniform { coarsen_i 2 coarsen_j 1 coarsen_k 2 } 	
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-9  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 20 1
+  }
+  check_divergence
+  vitesse_entree 0.01
+  expression_rho_init 1000
+  expression_alpha_init 1
+  expression_vx_init 0.01 # 0.02*z*(0.05-z)/0.025/0.025 #
+  expression_vy_init 0.
+  expression_vz_init 0.
+  
+  rho_liquide 1000
+  rho_gaz 1000
+  mu_liquide 1e-3
+  mu_gaz 1e-3
+  
+  couplage_tubes_ibc {
+    rho_fluide_pour_adim 1000
+    lissage pas_etalement
+    faisceau_tubes faisceau
+    epaisseur_lissage 0
+  } 
+	
+}
+
+Fin

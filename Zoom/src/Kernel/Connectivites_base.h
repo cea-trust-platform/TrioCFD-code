@@ -25,7 +25,7 @@
 #define Connectivites_base_included
 
 
-#include <IntVect.h>
+#include <TRUSTVect.h>
 class Zone_VF;
 class Domaine;
 //

@@ -43,7 +43,7 @@ class Source_Action_Particules : public Source_base
   Declare_base(Source_Action_Particules);
 public :
 
-  virtual void mettre_a_jour(double temps);
+  void mettre_a_jour(double temps) override;
   inline const DoubleTab& vitesse_fluide() const;
   inline const DoubleTab& rho_fluide() const;
   inline const DoubleTab& visco_dyn_fluide() const;
@@ -57,8 +57,8 @@ public :
 
 protected:
 
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& );
-  void associer_pb(const Probleme_base& );
+  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
+  void associer_pb(const Probleme_base& ) override;
 
 
 };

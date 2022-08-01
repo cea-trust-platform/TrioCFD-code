@@ -1,0 +1,123 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 10
+  nbelem_j 10
+  nbelem_k 10
+  uniform_domain_size_i 1.0
+  uniform_domain_size_j 1.0
+  uniform_domain_size_k 1.0
+  origin_i -0.0
+  origin_j -0.0
+  origin_k -0.0
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 2
+  timestep .100 
+  nb_pas_dt_max 15
+  time_scheme euler_explicit 
+  timestep_facsec 1.0   
+  dt_post 1
+  dt_post_stats_bulles 1
+  dt_post_stats_plans 1
+  Boundary_Conditions {
+                bctype_kmin perio 
+                bctype_kmax perio
+  }
+  # ECART_ANA provoque l'impression de la norme L2 dans cerr  #
+  champs_a_postraiter 5 CELL_VELOCITY PRESSURE_RHS PRESSURE VELOCITY_FT D_VELOCITY 
+			
+  check_stop_file stop.txt
+  dt_sauvegarde 10
+  t_debut_statistiques 0.0
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 1 # 0 #
+      Coarsen_Operator_Uniform {  }
+    ghost_size 1
+    pre_smooth_steps 1 10
+    smooth_steps 1 10
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 } impr }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    iterations_mixed_solver 4
+  } 
+  disable_diphasique
+  check_divergence
+  refuse_patch_conservation_QdM_RK3_source_interf
+  disable_convection_qdm
+  disable_diffusion_qdm
+  disable_source_interf
+  # 2pi/Lx = 6.28318530717959 #
+  gravite 3 0. 0. 0. 
+  rho_liquide 1.
+  mu_liquide 1e-20
+  rho_vapeur 1.
+  mu_vapeur 1e-20
+  sigma 0.
+  nom_sauvegarde NEXT/sondes.sauv
+  expression_vx_ana cos(x*6.28318530717959)
+  expression_vy_ana cos(y*6.28318530717959)
+  expression_vz_ana cos(z*6.28318530717959)
+  expression_p_ana  (cos(x)+cos(y)+0.*sin(z))*cos(t*0.)
+  expression_p_init (cos(x*6.28318530717959)+cos(y*6.28318530717959)+cos(z*6.28318530717959))
+  expression_vx_init cos(x*6.28318530717959)
+  expression_vy_init cos(y*6.28318530717959)
+  expression_vz_init cos(z*6.28318530717959)
+  Sondes
+    {
+       pression_s pressure periode 1.e-8 Segment 10 .03 .03  .03  1.03 .03 .03  
+       velocity_s velocity_z periode 1.e-8 Segment 10 0. 0. 0.0  1. 1. 1.
+       S_X_indicatrice indicatrice periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03  
+       S_Y_indicatrice indicatrice periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_indicatrice indicatrice periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       S_X_cell_velocity_x cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03  
+       S_Y_cell_velocity_x cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_cell_velocity_x cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       S_X_cell_velocity_y cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03   
+       S_Y_cell_velocity_y cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_cell_velocity_y cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       S_X_cell_velocity_z cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03  
+       S_Y_cell_velocity_z cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_cell_velocity_z cell_velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       S_X_velocity_x velocity_x periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03  
+       S_Y_velocity_x velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_velocity_x velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       S_X_velocity_y velocity_x periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03  
+       S_Y_velocity_y velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_velocity_y velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       S_X_velocity_z velocity_x periode 1.e-8 Segment 10 .03 .03 .03  1.03 .03 .03  
+       S_Y_velocity_z velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 1.03 .03 
+       S_Z_velocity_z velocity_x periode 1.e-8 Segment 10 .03 .03 .03  .03 .03 1.03 
+       dudx_s  dudx periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dudy_s  dudy periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dudz_s  dudz periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dvdx_s  dvdx periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dvdy_s  dvdy periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dvdz_s  dvdz periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dwdx_s dwdx periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dwdy_s dwdy periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+       dwdz_s dwdz periode 1.e-8 Segment 10 -5. 0. 0.0  5. 0. 0.
+
+       velocity_p  velocity_z periode 1.e-8 point 1 0.5 0.5 0.5       
+  }
+
+}
+Fin

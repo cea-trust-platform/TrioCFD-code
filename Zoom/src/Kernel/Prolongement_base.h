@@ -28,8 +28,8 @@
 #include <Objet_U.h>
 class Zone_VF;
 class Frontiere;
-class IntVect;
-class DoubleTab;
+#include <TRUSTTabs_forward.h>
+#include <TRUSTTabs_forward.h>
 
 //
 // .DESCRIPTION class Prolongement_base

@@ -3,7 +3,7 @@ Parameters {
 
 	Title "Oscillation of a bubble"
 
-	VersionTrio_U "1.6.1"
+	VersionTrio_U "1.9.0"
 
 	ParametersTrio_U Type of problem: Front Tracking problem
 	ParametersTrio_U Discretization: VDF
@@ -12,47 +12,101 @@ Parameters {
 	ParametersTrio_U Location: Front_tracking_discontinu/share/Validation/Rapports_automatiques/FTD_oscillating_bubble
 	ParametersTrio_U Master Test case: Bulle/FTD_Oscillation_Bulle_3D_VDF.data
 
-	Reference " $[1]$ Lamb. Year 1975 "
-
-	TestCase Bulle/Cas_01 FTD_Oscillation_Bulle_3D_VDF.data 4 /* data file in appendix */
-	TestCase Bulle/Cas_02 FTD_Oscillation_Bulle_3D_VDF.data 4
-
-	Author "S.Pigny"
-
+	Reference " $[1]$ Lamb, H.1932 Hydrodynamics. Cambridge University Press. "
+    Author "A DJEMA"
+	TestCase Bulle/Cas_01/M1 FTD_Oscillation_Bulle_3D_VDF.data 2 /* data file in appendix */
+	TestCase Bulle/Cas_01/M2 FTD_Oscillation_Bulle_3D_VDF.data 4
+	TestCase Bulle/Cas_01/M3 FTD_Oscillation_Bulle_3D_VDF.data 27
+	TestCase Bulle/Cas_01/M4 FTD_Oscillation_Bulle_3D_VDF.data 40
+	#TestCase Bulle/Cas_01/M5 FTD_Oscillation_Bulle_3D_VDF.data 125#
+	TestCase Bulle/Cas_02/M1 FTD_Oscillation_Bulle_3D_VDF.data 2 /* data file in appendix */
+	TestCase Bulle/Cas_02/M2 FTD_Oscillation_Bulle_3D_VDF.data 4
+	TestCase Bulle/Cas_02/M3 FTD_Oscillation_Bulle_3D_VDF.data 27
+	TestCase Bulle/Cas_02/M4 FTD_Oscillation_Bulle_3D_VDF.data 40
+	#TestCase Bulle/Cas_02/M5 FTD_Oscillation_Bulle_3D_VDF.data 125#
 #	Prerequisite "extrait_surface.sh"
 }
 
 Objectif {
-	Description "The aim of this test is to check the capability of the Front Tracking algorithm to describe the oscillations of the interface between an air bubble and the surrounding water."	
-	Description "In the current state, this sheet is not really a validation sheet strictly speaking. Indeed, no advanced comparison, whether whit other CFD codes or analytical results, is made. Rather, it is a sheet which demonstrate the capabilities of TrioCFD for the modeling of this type of phenomenon. No reference is therefore given in this sheet."
+	
+	Description "The following study consists to validate the behavior of the Front Tracking algorithm implemented in TrioCFD code. The aim of this test is to check the capability of this algorithm to describe the oscillations of the interface between an air bubble and the surrounding water, so to check if the code ensures a good coupling between the surface tensions and the inertia. This two-phase flow configuration is based on a return to equilibrium of an initial deformed bubble via capillary oscillations .This test is validated by comparing the frequencies of oscillation and the rate of damping with analytical solutions. 	
 	Description "By version v1.8.4, validation will be redone on this sheet in order to: \latex_(\smallskip\latex_)"
-	Description "$\bullet$ Check the convergence of the results,"
-	Description "$\bullet$ Resdefine the mesh if it turns out that the simulation was not converged into a mesh,"
-	Description "$\bullet$ Validate the numerical results obtained with theoretical and experimental ones or those of other CFD codes,"
-	Description "$\bullet$ Update the Test case and the PRM accordingly."
+	Description "$\bullet$ Validate the code by comparing the frequencies of oscillation and the rate of damping with analytical solutions,"
+	Description "$\bullet$ Quantify the dissipation of the numerical,"
+	Description "$\bullet$ Identify the criteria of stability on the time step according to the Lagrangian mesh at the interface according to physical parameters of fluids: density, viscosity and Surface tension."
+	
 }
 
 Pb_description {
-	Description "The test deals with the presence of a bubble in a box filled of liquid. Initially, the liquid is at rest. No gravity forces are taken into account. In the calculation, the initial shape of the bubble is slightly an ellipsoidal one. It makes it be out of equilibrium, concerning surface tension forces. Its free surface is subject to oscillations. Their wavelengths are directly connected to the mass balance. To investigate their frequencies, the analytical results to be used as reference are relative to inviscid fluids. Therefore, this test-case is intended to provide a verification of the correct balance between surface tension and inertial effects which are the only effects which control the fluid motion. In addition, since the analytical results are non-dissipative, this test-case provides a tool to estimate the rate of the energy dissipation due to the modeling method. This is connected to the problem of numerical diffusion."
-	Description " \latex_(\medskip \latex_) 
+	Description "The test deals with the presence of a bubble in a box filled of liquid. Initially, the liquid is at rest. No gravity forces are taken into account. In the calculation, the initial shape of the bubble is slightly an ellipsoidal one (a deformed bubble with mode n=2).It makes it be out of equilibrium, its free surface is subject to oscillations. We expect to observe damped oscillations between a prolate form and an oblate schape.To investigate their frequencies, the analytical results to be used as reference are relative to inviscid fluids. Therefore. In addition, since the analytical results are non-dissipative, this test-case provides a tool to estimate the rate of the energy dissipation due to the modeling method. This is connected to the problem of numerical diffusion."
+	Description " \latex_(\medskip \latex_)"
 	Description "In this two-fluid problem, the following notations are introduced to describe the fluids and interface physical and transport properties. The two fluids are considered as non-miscible. The inclusion equivalent diameter is defined as the diameter of the sphere which volume is equal to that of the actual inclusion. Let \latex_($D$\latex_) be this diameter and \latex_($R$\latex_) the corresponding radius. The test makes sense if the physical properties correspond roughly to an inertia dominated flow with a very low viscosity for the gas and the liquid. This means that the capillary numbers based on the physical properties of each phase are very small. They are defined by:"
-	Description "\latex_( $$ C_{a_{k}}\ =\ \frac{\rho_{k}}{\mu_{k}} \sqrt{\frac{D\sigma}{\rho_{k}}} $$ \latex_)"
-	Description "where the subscript k = L;G denotes respectively the liquid or the gas phase, \latex_( $ \rho_{k} $ \latex_), \latex_( $\mu_{k}$\latex_) is the dynamical viscosity and\latex_( $\sigma$\latex_) is the surface tension between the gas and the liquid. Therefore, it is assumed that viscosity effects vanish when the following condition is fulfilled:"	
-	Description "\latex_( $$ C_{a_{k}}\ \gg \ 1$$ \latex_)"
-	Description "Rayleigh in 1879 derived the frequency of oscillations of such an inclusion. This derivation is based on the potential flow theory and is valid for any arbitrary inner and outer values of the density. This is shown for example by Lamb $[1]$, (p. 475, equation 10). The angular frequency of the oscillations is obtained for each mode by using the linearized momentum jump at the interface; it is given by:"
-	Description "\latex_( $$ \omega_{n}^{2}\ =\ \frac{n(n+1)(n-2)(n+2)}{(n+1)\rho_{I} + n\rho_{O}} \frac{\sigma}{R^{3}} $$ \latex_)"
-	Description "We focus on the main oscillation mode \latex_($n = 3$\latex_), which correspond to the slowest dissipation of kinetic energy. It leads to the theoretical value of 50 Hz, for the interface oscillation"	
+	Description "\latex_( $ C_{a_{k}}\ =\ \frac{\rho_{k}}{\mu_{k}} \sqrt{\frac{D\sigma}{\rho_{k}}} $ \latex_)"
+	Description "where the subscript k = l;g denotes respectively the liquid or the gas phase, \latex_( $ \rho_{k} $ \latex_), \latex_( $\mu_{k}$\latex_) is the dynamical viscosity and\latex_( $\sigma$\latex_) is the surface tension between the gas and the liquid. Therefore, it is assumed that viscosity effects vanish when the following condition is fulfilled:"	
+	Description "\latex_( $ C_{a_{k}}\ \gg \ 1$ \latex_)"
+	Description " \latex_(\medskip \latex_)"
+
+	Description "\latex_(\textbf{Analytique validaton}\latex_)"
+	Description " \latex_(\smallskip \latex_)"
+	Description "To validate the simulations, we will estimate the frequency of oscillations and the damping rates. These parameters will be analyzed and compared to the analytical models from the literature given by Lamb $[1]$ who derived the frequency of oscillations of such an inclusion. This derivation is based on the potential flow theory and is valid for any arbitrary inner and outer values of the density. This is shown for example by Lamb $[1]$, (p. 475, equation 10). The angular frequency of the oscillations is obtained for each mode by using the linearized momentum jump at the interface; it is given by:"
+	Description "\latex_( $ \omega_{n}^{2} $ = $ \frac{n(n+1)(n-2)(n+2)}{(n+1)\rho_{g} + n\rho_{l}} \frac{\sigma}{R^{3}} $ \latex_)"
+	Description "The oscillation frequency [Hz]is given by : "
+	Description "\latex_( $ f_{n} $ = $ \frac{\omega_{n}}{2/pi} $ \latex_)"
+	Description "The rate of damping [s] is given by:"
+	Description "\latex_( $\tau = \frac{1}{(n-1)(2n+1)}\frac{r^{2}\rho_g}{\mu_g}$ \latex_)"
+	Description " \latex_(\smallskip \latex_)"
+	Description "We focus on the main oscillation mode \latex_($n = 2$\latex_), which correspond to the slowest dissipation of kinetic energy (the mode with the lowest fréquency). It leads to the theoretical value of 50 Hz, for the interface oscillation"	
 	Description "Two calculations are made in this sheet. The differences between these 2 calculations relate only to the parameters of meshing used which will be explained in the paragraph \latex_(\textbf{Mesh} \latex_)."
+	Description " \latex_(\medskip \latex_)"
+	Description "Numerically, the oscillation frequencies of the bubble will be determined by estimating its discrete area at any time during the simulation. So, the amplitudes will correspond to the surface of the bubble. Initially this surface corresponds to a scalene ellipsoid surface (half-axes of ellipsoid are different). This surface was estimated analytically by Knud Thomsen, it's given by:"
+	Description "\latex_( $ S =4\pi\Bigl(\frac{a^pb^a+a^pc^p+b^pc^p}{3}\Bigr)^{\frac{1}{p}}$ \latex_)"
+	Description " Where : a,b and c are the half-axes of the ellipsoide as \latex_( $c \prec b \prec a $ et $p=1.6075$ \latex_)"
+	Description "This result will be used as an analytical criterion to validate the initial amplitude of the numirical frequency."
+        Description " \latex_(\medskip \latex_)"
+	Description "The numerical pressure differencing latex_(  $ \ Delta P $ between the two phases at the interface will also be determined and compared with the analytical solution of Laplace, for the case of an undeformed sphere, it's given by :"
+        Description "\latex_( $\Delta P =\sigma (\frac{1}{R _1}+\frac{1}{R _2})$ \latex_)"
+	Description " Where : \latex_( $R_1$ and $R_2$ \latex_) are the main radius of curvature of a spherical bubble" 
+	Description "This result will be used to determine if the pressure variation at the interface oscillates around this reference value because in our case the bubble is not spherical"
+	Description "The table .. summarizes the analytical validation values obtained for our flow parameters" 
+
 	geometrie {
-		Description "The problem is solved in a cubic field of 0.01 meter side. A spherical bubble is initially positionned in its center."
-		# visu a ajouter
+
+		Table {
+			Title "Analytic values for validation"
+			nb_columns 1
+			label "analytic values" 
+
+			line {
+				legend "Frequency f [Hz]"
+				values 72.056
+			}
+			line {
+				legend "Rate of damping [s] "
+				values 12.8
+			}
+			line {
+				legend "Initial surface of bubble \latex_( [$m^{2}$] \latex_)"
+				values 3.23e-5
+			}
+			line {
+				legend "Pressure deffiracing [Pa] "
+				values 87.5
+			}
+		}
+
+		Description "The problem is solved in a cubic field of 0.01 meter side. An ellipsoide bubble having an equivalent diameteris of 0.032 m is initially positionned in its center."
+		Figure {
+			Title "Geometry"
+			picture Bulle/geometrie.png
+		}
 	}
+	
 	CICL {
 		Description "Different initial and boundary conditions are applied between the domain and the water-air interface."
 		Description " \latex_(\medskip \latex_) "
 		Description "$\bullet$ \latex_(\textbf{For the domain}\latex_):"
 		Description " \latex_(\smallskip \latex_) "
-		Description " \latex_($\hookrightarrow$ \textit{Initial condition}\latex_): zero uniform velocity field for the 3 directions"
+		Description " \latex_($\hookrightarrow$ \textit{Initial condition}\latex_): zero uniform velocity field for the 3 directions (fluid at rest)"
 		Description " \latex_($\hookrightarrow$ \textit{Boundary conditions}\latex_): at the top of the domain, an outlet boundary condition is defined with an uniform fiels for P/$\rho$ equal to 0 (Pa/kg.$m^3$). For the 5 other borders, a situation of adherence is defined."
 		Description " \latex_(\medskip \latex_) "
 		Description "$\bullet$ \latex_(\textbf{For the interface}\latex_):"
@@ -60,290 +114,429 @@ Pb_description {
 		Description " \latex_($\hookrightarrow$ \textit{Initial condition}\latex_): the following function is applied to define the initial shape of the bulle : \latex_( $0.0016*0.0016-((x-0.005)*(x-0.005)/1.21+(y-0.005)*(y-0.005)*1.21+(z-0.005)*(z-0.005))$\latex_)"
 		Description " \latex_($\hookrightarrow$ \textit{Boundary conditions}\latex_): a specific boundary condition for discountinuous Front_Tracking problem is defined \latex_(\textit{paroi\_ft\_disc} \latex_) with a symetrie condition."
 	}
+	
+	
 	Propfluide {
-		Description "In order to construct the diphasic fluid, two incompressible fluids, water and air, are defined by the usual keyword \latex_(\textit{Fluide\_Incompressible} \latex_). Then, they are associated to create the two-phase fluid via the keyword \latex_(\textit{Fluide\_Diphasique} \latex_)."
+		Description "In order to construct the diphasic fluid, two incompressible fluids, water and air, are defined by the usual. The fluid parameters are presented in the table bellow "
+		Table {
+			Title "Physical parameters of fluids"
+			nb_columns 4 
+			label $\rho_g$ (kg/$m^3$) | $\mu_g$ (N/$m^2$/s) | $\rho_l$ (kg/$m^3$) | $\mu_l$ (N/$m^2$/s)
+
+			line {
+				legend " Values"
+				values   1. 1e-7 1000. 1e-5
+			}
+		}
 	}
 }
 
 Casesetup {
 	Maillage {
-		Description "Regarding the general domain (the cube), the mesh is regular and consists of 61 meshes in each direction."
-		Description " \latex_(\smallskip \latex_) "
-		Description "Regarding the interface between air and water (bubble surface), a specific mesh adapted to Front-Tracking problem has been defined. 2 simulations with different parameters are performed:"
-		Description " \latex_(\smallskip \latex_) "
-		Description "$\bullet$ \latex_(\textbf{First calculation}\latex_):"
-		Description " \latex_($\hookrightarrow$ $lissage\_courbure\_iterations = 0$ \latex_)"
-		Description " \latex_($\hookrightarrow$ $facteur\_longueur\_ideale = 2$\latex_)"
+		Description "The modeling approach here is  the Front-Tracking method, so there are two meshes: a fixed hexahedral one in the phases, where ara solved the a conservation equations  and a mobile mesh which follows the interface during its displacement by  the moving of markers. In this study"
+	
+		Description "$\bullet$ \latex_(\textbf{Eulerien mesh}\latex_):"	
+		Description "Five meshes are used, they are defined as follows:"
+		Description "$\Rightarrow$ Mesh 1 : 43*43*43,"
+		Description "$\Rightarrow$ Mesh 2 : 61*61*61,"
+		Description "$\Rightarrow$ Mesh 3 : 86*86*86,"
+		Description "$\Rightarrow$ Mesh 4 : 121*121*121,"
+		Description "$\Rightarrow$ Mesh 5 : 170*170*170."
+		Description " \latex_(\medskip \latex_) "
+		Description "$\bullet$ \latex_(\textbf{Lagrangien mesh in the interface}\latex_):"
+
+		Description "The modeling approach used is the Front-Tracking, so it is essential to re-mesh the interface in order to ensure a good quality of mesh and to conserve the volume. For that, it will be necessary to determine the good parameters to use in the remeshing algorithm."
+		Description "After a series of tests, two configurations of remeshing parameters were retained. The difference between these two configurations named after case 1 and case 2 is located at the  number of Lagrangian markers at the interface and the frequency of the smoothing. The smoothing represents the frequency of diffusion of the curvature per time step during the remeshing process."
+		Description "The remeshing parameters used in thi two cases are illustrated in the data files. "
+
+		
+
 		visu {
-			Title "Bubble in a cubic box : first calculation - mesh at time = 0"
-			width 11cm, trim= 100 100 50 170, clip
-			mesh Bulle/Cas_01/lata/post.lata INTERFACES
-			cycles 0
+			nb_img_without_newline 2
+			Width 7cm 
 			normal3D 0. 0. 1.
-			up3D 0. 1. 0.
+			up3D 0. 1. 0. 
+			Title "Illustration of the Eulerien and Lagrangien mesh for 61x61x61 hexaedra "
+			mesh Bulle/Cas_01/M2/lata/post.lata dom
 		}
-		Description "$\bullet$ \latex_(\textbf{Second calculation}\latex_):"
-		Description " \latex_($\hookrightarrow$ $lissage\_courbure\_iterations = 10$ \latex_)"
-		Description " \latex_($\hookrightarrow$ $facteur\_longueur\_ideale = 0.8$ \latex_)"
+		
 		visu {
-			Title "Bubble in a cubic box : second calculation - mesh at time = 0"
-			width 11cm, trim= 100 100 50 170, clip
-			mesh Bulle/Cas_02/lata/post.lata INTERFACES
-			cycles 0
-			normal3D 0. 0. 1.
-			up3D 0. 1. 0.
-		}
+			Title "Cas_01 : M2 : Bubble in a square box : oscillations of the interface"
+#			width 15cm, viewport= 0 200 1024 650, clip
+			Width 7cm
+			mesh Bulle/Cas_01/M2/lata/post.lata INTERFACES
+			}
 	}
+	
 	Options_modele {
-		Description "This sheet deals with a generic Front-Tracking problem in the discontinuous version. It differs from others TrioCFD test cases : The problem does not state the number of equations that are enclosed in the problem.
-		Description "Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not predefined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword.
+		Description "Two equations are compulsory : a momentum balance equation (alias Navier-Stokes equation) and an interface tracking equation. The list of equations to be solved is declared in the beginning of the data file. Another difference with more classical TRUST data file, lies in the fluids definition. The two-phase fluid (Fluide_Diphasique) is made with two usual single-phase fluids (Fluide_Incompressible). As the list of equations to be solved in the generic Front-Tracking problem is declared in the data file and not predefined in the structure of the problem, each equation has to be distinctively associated with the problem with the Associer keyword."
 	}
+	
 	Autres_options {
-		Description " The time scheme defined in this test case is the Explicit Euler scheme."
+		Description "The time scheme defined in this test case is the Explicit Euler scheme ans the Rungue Kutta 3 scheme"
+		Description "The convection schemes defined in this test are : Upwind scheme (decentre amont), central differencing scheme (centre d'ordre 2) and Quick scheme"
 	}
 }
+
 
 Results {
 # Validation specific informations automatically generate
-	Description "$\bullet$ \latex_(\textbf{First calculation}\latex_):"
+	Description "$\bullet$ \latex_(\textbf{Oscillation frequency and pressure difference}\latex_):"
+	Description "\latex_(\smallskip \latex_) "
+	
+	Description "We compare the value of the frequency of the oscillation obtained in the calculation (case 1 and cas 2) to the theoretical one. We can see in the figures below that results are satisfactory.  The oscillations of free surface correspond to the theoritical value of 72  Hz. For more details, aned at first glance, the oscillation frequencies are double the reference frequency. Indeed, over an analytical period, we have two numerical periods as we can clearly see in the following figure. This is explained by the fact that the initial deformation of the bubble in mode 2 is equivalent to a flattened shape, it will oscillate in order to resume its most stable shape which is the spherical shape, passing through an elongated shape obtained after a first period of oscillation, then it will return to its original flattened shape after a second period of oscillation. It therefore takes two periods for the bubble to resume its initial deformation, and it is this period allowing an initial resumption of shape which is considered as a total period of oscillation as we can see in the second figure."
+	Description "The pressure difference between inner and outer fluid is also correctly reproduced. The area of the ellipsoide which correspond to the amplitud of the frequency curve at time 0s is wel estimated. In the is  It seems this result could be considered as a reference calculation. One can see a time damping of oscillations. This effect is due to numerical diffusion due to the utilisation of the upwind scheme." 
+	Description "
+	
+	Figure {
+		Title " Interfacial area between air and water"
+		width 7cm
+		Dimension 2
+		LabelX "Time (sec)"
+		LabelY "Interfacial area (m2)"
+		Include_Description_Curves 0
+		nb_img_without_newline 2
+		Curve {
+			legend "Cas_01 : M1"
+			file Bulle/Cas_01/M1/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M2"
+			file Bulle/Cas_01/M2/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M3"
+			file Bulle/Cas_01/M3/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M4"
+			file Bulle/Cas_01/M4/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+###		Curve {
+###			legend "Cas_01 : M5"
+###			file Bulle/Cas_01/M5/Surface.txt
+###			columns ($1) ($2)
+###			Style lines
+###		}
+#		Curve {
+#			legend "Theorical signal : Lamb "
+#			fonction 0.0000000779*Cos(2*3.14*X*72.056)*exp(-X/12.8)+0.0000321606 
+## fonction \latex_( $Y= 7.79 \times 10^{-8}\cos(2\pi\times X \times 72.056)\exp{\frac{-X}{12.8}}+3.21606 \times 10^{-5}$ \latex_)
+#			Style lines
+#		}
+	}
+	Figure {
+		Title " Interfacial area between air and water"
+		width 7cm
+		Dimension 2
+		LabelX "Time (sec)"
+		LabelY "Interfacial area (m2)"
+		Include_Description_Curves 0
+		
+		Curve {
+			legend "Cas_01 : M2"
+			file Bulle/Cas_01/M2/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M3"
+			file Bulle/Cas_01/M3/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M4"
+			file Bulle/Cas_01/M4/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+###		Curve {
+###			legend "Cas_01 : M5"
+###			file Bulle/Cas_01/M5/Surface.txt
+###			columns ($1) ($2)
+###			Style lines
+###		}
+#		Curve {
+#			legend "Theorical signal : Lamb "
+#			fonction 0.0000000779*Cos(2*3.14*X*72.056)*exp(-X/12.8)+0.0000321606 
+## fonction \latex_( $Y= 7.79 \times 10^{-8}\cos(2\pi\times X \times 72.056)\exp{\frac{-X}{12.8}}+3.21606 \times 10^{-5}$ \latex_)
+#			Style lines
+#		}
+	}
+	Description "According to the previous figure, the M1 mesh does not correctly deal with the desired problem. Its bad results can come either from an insufficient remeshing or from a too large time step of calculation. We therefore remove it from the previous curve in order to have a finer view of the results obtained with the meshes M2, M3 and M4."
+	Figure {
+		Title " Interfacial area between air and water"
+		width 13cm
+		Dimension 2
+		LabelX "Time (sec)"
+		LabelY "Interfacial area (m2)"
+		Include_Description_Curves 0
+		
+		Curve {
+			legend "Cas_01 : M3"
+			file Bulle/Cas_01/M3/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M4"
+			file Bulle/Cas_01/M4/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+###		Curve {
+###			legend "Cas_01 : M5"
+###			file Bulle/Cas_01/M5/Surface.txt
+###			columns ($1) ($2)
+###			Style lines
+###		}
+#		Curve {
+#			legend "Theorical signal : Lamb "
+#			fonction 0.0000000779*Cos(2*3.14*X*72.056)*exp(-X/12.8)+0.0000321606 
+## fonction \latex_( $Y= 7.79 \times 10^{-8}\cos(2\pi\times X \times 72.056)\exp{\frac{-X}{12.8}}+3.21606 \times 10^{-5}$ \latex_)
+#			Style lines
+#		}
+	}
+	
+	
+	
+	Figure {
+		Title " Interfacial area between air and water- comparaison of case 1 and case 2"
+		width 14cm
+		Dimension 2
+		LabelX "Time (sec)"
+		LabelY "Interfacial area (m2)"
+		Include_Description_Curves 0
+		
+		Curve {
+			legend "Cas_01 : M4"
+			file Bulle/Cas_01/M4/Surface.txt
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_02 : M4"
+			file Bulle/Cas_02/M4/Surface.txt
+			columns ($1) ($2)
+			Style linespoints
+			Style lines
+		}
+	}
+		
+	Figure {
+		Title " Mesh convergence : frequency error and time calculation - This curve is not updated when we regenerate the validation sheet"
+		picture Bulle/convergence_maillage.png
+	}
+		
+	Figure {
+		Title " Pressure difference between the inner and outer fluid"
+		Dimension 2
+		width 12cm
+		LabelX "Time (sec)"
+		LabelY "Inner/Outer pressure difference (Pa)"
+		RangeY 80. 90.
+		Include_Description_Curves 0
+		Curve {
+			legend "Cas_01 : M1"
+			file Bulle/Cas_01/M1/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+			columns ($1) ($2)
+			Style lines
+		}
+        Curve {
+			legend "Cas_01 : M2"
+			file Bulle/Cas_01/M2/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_01 : M3"
+			file Bulle/Cas_01/M3/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+			columns ($1) ($2)
+			Style lines
+		}
+        Curve {
+			legend "Cas_01 : M4"
+			file Bulle/Cas_01/M4/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+			columns ($1) ($2)
+			Style lines
+		}
+##		Curve {
+##			legend "Cas_01 : M5"
+##			file Bulle/Cas_01/M5/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+##			columns ($1) ($2)
+##			Style lines
+##		}
+		
+		Curve {
+			legend "analytique pressure"
+			fonction 87.5
+			Style lines
+		}
+	}
+	
+	Figure {
+		Title "Pressure difference between the inner and outer fluid - comparaison of case 1 and case 2"
+		width 14cm
+		LabelX "Time (sec)"
+		LabelY "Inner/Outer pressure difference (Pa)"
+		RangeY 86. 88.
+		Include_Description_Curves 0
+		
+		Curve {
+			legend "Cas_01 : M4" 
+			file Bulle/Cas_01/M4/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+			columns ($1) ($2)
+			Style lines
+		}
+		Curve {
+			legend "Cas_02 : M4"
+			file Bulle/Cas_02/M4/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
+			columns ($1) ($2)
+			Style lines
+		}
+	}
+	
+
+	Description "$\bullet$ \latex_(\textbf{Damping of oscillations with different numirical schemes}\latex_):"
 	Description " \latex_(\smallskip \latex_) "
-	Description "Here are the profiles of the oscillating bubble every 0.002 second with the first remeshing options a described in paragraph \latex_(\textbf{Mesh}\latex_)."
-	visu {
-		Title "Bubble in a cubic box : first calculation - mesh at time = 0"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+	
+	Description "Now, we will study the effect of the discretization scheme on the damping of the oscillations. For this, three numerical schemes will be analyzed : the Upwind (primary study), the centered and the Quick. From the figure bellow, it is clear that these three schemes give an identical result for the frequencies of oscillations. But he rate of damping is different, the uUpwind scheme dissipates more than the centered and the Quick, because this scheme induces more numerical diffusion unlike the centered and quick shemess which are of higher order and less diffusive.
+	Description "Regarding the damping rate, it is in order of 0.02 s for the three schemes, so the influence of the numerical scheme is is very light. This is due to the remeshing procedure which is more prevalent, inducing surface tensions which modify the shape of the bubble. Its shape will tend to approach the equilibrium shape much faster, so the oscillations are damped."
+
+	
+	Figure {
+		width 13cm
+		Title "Damping of oscillation with different numirical schemes - This curve is not updated when we regenerate the validation sheet"
+		picture Bulle/comparaison_schema.png
+	}
+	
+	Description "As we can see in the figure bellow, the reduction in remeshing and smoothing resulted in a reduction in depreciation. But the dissipation is always present, numerical damping is more accentuated than the analytical predictions."
+
+
+	Figure {
+		width 13cm
+		Title "Damping of oscillation with different numirical shemes after reduction of remeshing - This curve is not updated when we regenerate the validation sheet"
+		picture Bulle/comparaison_schema_rem.png
+	}	
+	
+	
+	Description "$\bullet$ \latex_(\textbf{Comparison of the results given by the two temporal schemes Euler and Runge Kutta 3}\latex_):"
+	Description " \latex_(\smallskip \latex_) "
+	
+	Description "As we can see in the following figure, temporal schemes (Euler explicite and Runge Kutta 3) give the same result in frequence of oscillation and the damping "
+	
+	Figure {
+		Title "Comparison of the results given by the two temporal schemes Euler and Runge Kutta 3 - This curve is not updated when we regenerate the validation sheet"
+		picture Bulle/Euler_RK.png
+	}
+	
+	
+	Description "$\bullet$ \latex_(\textbf{Study on the limit time step stability in the interface}\latex_):"
+	Description " \latex_(\smallskip \latex_) "
+	
+	
+	Description "After having validated simulations, we will interest on a very important criterion, it is the time step limit which ensures the stability of computation. It's defined as being the time step of the Navier Stokes equation beyond which the simulation becomes unstable. The added value of this present study is that can be generalized.Indeed, the aim is to find a CFL to integrate into the source code."
+	
+	Description " We will determine a limit for time step stability in order to find the proportionality factor which links this parameter to the spacing between two markers at the inetrface.In this study, the two cases of remeshing parameter were tested, in order to see if this proportionality varies according to the type of remeshing."
+	
+	Description "The results show that the limit time step stability varies linearly with the Lagrangian mesh, with a slope which depends on the parameters used in the algorithm of remeshing.The time step of stability decreases linearly with the refinement of the mesh. The proportionality factor between these two parameters is the slope which have unit of[s / m]. This slop must be dimensioned with a combination of physical parameters of fluids (viscosity, mass volume, surface tension ...). 
+	
+	Figure {
+		Title "Limit Time step for stability at the interface - This curve is not updated when we regenerate the validation sheet"
+		picture Bulle/dt_stab.png
+	}
+	
+	Figure {
+		Title "Limit Time step for stability at the interface - This curve is not updated when we regenerate the validation sheet"
+		picture Bulle/dt_stab_fac.png
+	}
+    
+    Description "$\bullet$ \latex_(\textbf{Profiles of the oscillating bubble every 0.002 second}\latex_):"
+	Description " \latex_(\smallskip \latex_) "
+    visu {
+		Title "Initial interface"
+		width 7cm, trim= 100 100 50 150, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 0
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
+		nb_img_without_newline 2
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.002s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.002s"
+		width 7cm, trim= 100 100 50 150, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 1
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.004s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.004s"
+		width 7cm, trim= 100 100 50 150, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 2
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
+		nb_img_without_newline 2
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.006s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.006s"
+		width 7cm, trim= 100 100 50 130, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 3
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.008s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.008s"
+		width 7cm, trim= 100 100 50 130, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 4
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
+		nb_img_without_newline 2
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.01s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.01s"
+		width 7cm, trim= 100 100 50 150, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 5
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.012s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.012s"
+		width 7cm, trim= 100 100 50 150, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 6
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
+		nb_img_without_newline 2
 	}
 	visu {
-		Title "Bubble in a cubic box : first calculation - oscillations of the interface at t=0.014s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_01/lata/post.lata INTERFACES
+		Title "Bubble interface at t=0.014s"
+		width 7cm, trim= 100 100 50 150, clip
+		mesh Bulle/Cas_01/M4/lata/post.lata INTERFACES
 		cycles 7
 		normal3D 0. 0. 1.
 		up3D 0. 1. 0.
 	}
-	Description "We compare the value of the frequency of the oscillation obtained in the calculation to the theoretical one. One can see in the figures below that results are not satisfactory. The oscillations of free surface do not correspond to the theoretical value of 50 Hz."
-	Figure {
-		Title "Bubble in a square box - Interfacial area between air and water"
-		width 12cm
-		Dimension 2
-		LabelX "Time (sec)"
-		LabelY "Interfacial area (m2)"
-		Include_Description_Curves 0
-		Curve {
-			legend "version_actuelle(prepare)"
-			file Bulle/Cas_01/Surface.txt
-			columns ($1) ($2)
-			Style linespoints
-			PointSize 2
-		}
-	}
-	Description "Moreover, the pressure difference between inner and outer fluid suddenly decreases after 0.13 second. The theoretical value is 88 Pa."
-	Figure {
-		Dimension 2
-		Title "Bubble in a cubic box - Pressure difference between the inner and outer fluid"
-		width 12cm
-		LabelX "Time (sec)"
-		LabelY "Inner/Outer pressure difference (Pa)"
-		Include_Description_Curves 0
-		Curve {
-			legend "version_actuelle(prepare)"
-			file Bulle/Cas_01/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
-			columns ($1) ($2)
-			Style linespoints
-			PointSize 2
-		}
-		Curve {
-			legend "ana"
-			fonction 88.
-			Style lines
-		}
-	}
-	Description "This first calculation shows the ability of the Front-Tracking baltik of TrioCFD to simulate an oscillating interface. However, the interface area is too distrurbed from one time step to another to check that the frequency of the oscillations with the theorical value."
-	Description "To reduce these instabilities, a second calculation was acrried out with finer parameterization of the Front-Tracking algorithm, in particular for the remeshing of the interface during the calculation."
-	Description " \latex_(\bigskip \latex_) "
-
-	Description "$\bullet$ \latex_(\textbf{Second calculation}\latex_):"
-	Description " \latex_(\smallskip \latex_) "
-	Description "The settings of the Front-Tracking algorithm for this second calculation are given in paragraph \latex_(\textbf{Mesh}\latex_). Here are the profiles of the oscillating bubble every 0.002 second with the second remeshing options."
-	visu {
-		Title "Bubble in a cubic box : second calculation - mesh at time = 0"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 0
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface at t=0.002s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 1
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface at t=0.004s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 2
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface at t=0.006s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 3
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface at t=0.008s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 4
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface à t=0.01s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 5
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface à t=0.012s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 6
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	visu {
-		Title "Bubble in a cubic box : second calculation - oscillations of the interface à t=0.014s"
-		width 11cm, trim= 100 100 50 100, clip
-		mesh Bulle/Cas_02/lata/post.lata INTERFACES
-		cycles 7
-		normal3D 0. 0. 1.
-		up3D 0. 1. 0.
-	}
-	Description " One can see in figures below that results are improved with regard to the previous case. The oscillations of free surface correspond to the theoritical value of 50  Hz. The pressure difference between inner and outer fluid is also correctly reproduced. It seems this result could be considered as a reference calculation. One can see a time damping of oscillations. This effect is due to numerical diffusion." 
-	Figure {
-		Title "Bubble in a cubic box - Interfacial area between air and water"
-		width 12cm
-		Dimension 2
-		LabelX "Time (sec)"
-		LabelY "Interfacial area (m2)"
-		Include_Description_Curves 0
-		Curve {
-			legend "version_actuelle(prepare)"
-			file Bulle/Cas_02/Surface.txt
-			columns ($1) ($2)
-			Style linespoints
-			PointSize 2
-		}
-	}
-	Figure {
-		Title "Bubble in a square box - Interfacial area between air and water - zoom between 0.1 an 0.16 sec"
-		width 12cm
-		Dimension 2
-		LabelX "Time (sec)"
-		RangeX 0.1 0.16
-		LabelY "Interfacial area (m2)"
-		Include_Description_Curves 0
-		Curve {
-			legend "version_actuelle(prepare)"
-			file Bulle/Cas_02/Surface.txt
-			columns ($1) ($2)
-			Style linespoints
-			PointSize 2
-		}
-	}
-	Description "The theoretical value for pressure difference is 88 Pa."
-	Figure {
-		Dimension 2
-		width 12cm
-		Title "Bubble in a cubic box - Pressure difference between the inner and outer fluid"
-		LabelX "Time (sec)"
-		LabelY "Inner/Outer pressure difference (Pa)"
-		Include_Description_Curves 0
-		Curve {
-			legend "version_actuelle(prepare)"
-			file Bulle/Cas_02/FTD_Oscillation_Bulle_3D_VDF_SONDE_PRESSION.son
-			columns ($1) ($2)
-			Style linespoints
-			PointSize 2
-		}
-		Curve {
-			legend "ana"
-			fonction 88.
-			Style lines
-		}
-	}
-
+	
+	
 }
-
 Conclusion {
-	Description "A too coarse lagrangian mesh to describe interface leads to wrong results. On the contrary, providing an accurate enough mesh is chosen, one can obtain results in agreement with theoretical data. The choice can be done via some options chosen in the input data."
-	Description "If a first comparison with the theory allowed to show that the baltik Front-Tracking of TrioCFD is able to simulate an oscillating bubble in a promising way with the appropriate configuration, this sheet does not yet want to constitute the validation of the code."
-	Description "To reach the validation stage, it is necessary to:"
-	Description "$\bullet$ check the convergence in mesh of the test case"
-	Description "$\bullet$ validate the numerical results obtained with more advanced theoretical results, experimental ones or those of other CFD codes,"
-	Description "$\bullet$ update the Test case and the PRM accordingly."
-	Description "This work is planned by version v1.8.4 (end 2021) of TrioCFD. "
-	}
 
+	Description "The present work consists of a validation of the Front-Tracking algorithm of TrioCFD on the case of the oscillating bubble. The bubble had good physical behavior during simulations when the interface remeshing parameters were well chosen.
+	Description "The results converged to the analytical soliutions, this test case demonstrates the ability of the TrioCFD code to manage this flow topology. So, the Front-Tracking algorithm  has been validated."
+	
+	}
 

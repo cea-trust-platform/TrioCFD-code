@@ -1,0 +1,78 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+#N=25
+
+Lx=2.
+Ly=3.
+Lz=5.
+
+Pm=8.
+Um=10.
+Vm=7.
+Wm=3.
+
+Kp=-1
+# Il faut 0 pour respecter la CL au bord : 
+Ku=0.
+Kv=0.
+Kw=0.
+
+phix=0.
+phiy=0.
+
+pi=3.141592653589793
+
+sed -e "s/@Lx@/$Lx/g" \
+    -e "s/@Ly@/$Ly/g" \
+    -e "s/@Lz@/$Lz/g" \
+    -e "s/@Pm@/$Pm/g" \
+    -e "s/@Um@/$Um/g" \
+    -e "s/@Vm@/$Vm/g" \
+    -e "s/@Wm@/$Wm/g" \
+    -e "s/@Kp@/$Kp/g" \
+    -e "s/@Ku@/$Ku/g" \
+    -e "s/@Kv@/$Kv/g" \
+    -e "s/@Kw@/$Kw/g" \
+    -e "s/@phix@/$phix/g" \
+    -e "s/@phiy@/$phiy/g" \
+    -e "s/@pi@/$pi/g" \
+    ijkft_stat_diph_gradUP.data > model.data
+
+# seq=`seq 0 1`
+seq=`seq 1`
+for N in 5 10 20 40 80 # 25 50 100 200 400
+do
+ for A in $seq
+ do
+  for B in $seq 
+  do
+    for C in $seq 
+    do
+      for D in $seq
+      do 
+        for E in $seq
+	do
+	  fold=N$N/P$A$B${C}_U$D$E
+	  mkdir -p $fold
+	  echo "Directory : " $fold
+	  sed -e "s/@A@/$A/g" \
+	      -e "s/@B@/$B/g" \
+	      -e "s/@C@/$C/g" \
+	      -e "s/@D@/$D/g" \
+	      -e "s/@E@/$E/g" \
+	      -e "s/@N@/$N/g" \
+	      model.data > $fold/ijkft_stat_diph_gradUP.data
+	  if [ $N -ge 40 ] 
+	  then
+	     sed 's/nproc_i 1/nproc_i 2/;s/nproc_j 1/nproc_j 2/;s/nproc_k 1/nproc_k 2/' $fold/ijkft_stat_diph_gradUP.data > $fold/ijkft_stat_diph_gradUP_par8.data
+	  fi
+	  cd $fold &&  tar xzf ../../init.tgz && cd ../../
+	done
+      done
+    done
+  done
+ done
+done   
+
+cp prereq_reprise.sh N80/P111_U11/post_run

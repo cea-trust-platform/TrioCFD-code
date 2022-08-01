@@ -50,8 +50,8 @@ class Echange_contact_VDF_VEF_Zoom  : public Echange_contact_VDF_Zoom_base
   Declare_instanciable(Echange_contact_VDF_VEF_Zoom);
 
 public :
-  void mettre_a_jour(double ) ;
-  int virtual compatible_avec_discr(const Discretisation_base& ) const;
+  void mettre_a_jour(double ) override ;
+  int compatible_avec_discr(const Discretisation_base& ) const override;
 
 };
 

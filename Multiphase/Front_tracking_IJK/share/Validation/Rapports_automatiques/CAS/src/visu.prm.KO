@@ -1,0 +1,27 @@
+Parametres {
+	Titre "Test de la visu"
+	Description "Rapport utilisant visit"
+	Auteur "J.D."
+	CasTest . despres.data
+}
+
+Chapitre {
+	Titre "FT"
+	Description " test visu "
+visu {
+	titre "test slice2d"
+	description "on trace le maillage et indicatrice"
+	description "et on fait une coupe 2D"
+	mesh despres.lata DOM
+	pseudocolor  despres.lata DOM RHO ELEM 
+ #       vector FTD_all_VEF/post1.lata DOM VITESSE ELEM 
+	operator_to_all slice2d 0. 0.0125 0.  0. 1. 0 
+      #	mesh FTD_all_VEF/post2.lata INTERFACES
+}
+
+}
+
+
+
+
+

@@ -35,7 +35,7 @@
 #include <Champ_Uniforme.h>
 #include <Zone_VEF.h>
 #include <Symetrie.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Eq_rayo_semi_transp_VEF,"Eq_rayo_semi_transp_VEF",Equation_rayonnement_base);
 
@@ -186,7 +186,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 
 
   Debog::verifier("Eq_rayo_semi_transp_VEF::resoudre irradiance",irradiance_.valeurs());
-  //Cerr<<"irradiance.max() = "<<irradiance_.max()<<", irradiance.min() = "<<irradiance_.min()<<finl;
+  //Cerr<<"irradiance.std::max() = "<<irradiance_.std::max()<<", irradiance.std::min() = "<<irradiance_.std::min()<<finl;
   //Cerr<<"Eq_rayo_semi_transp_VEF::resoudre : Fin"<<finl;
 }
 
@@ -202,7 +202,7 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces: entree/sortie
-// Retour: Entree&
+// Retour:
 //    Signification: le flot d'entree modifie
 //    Contraintes:
 // Exception:

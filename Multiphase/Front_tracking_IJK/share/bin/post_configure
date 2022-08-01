@@ -1,0 +1,40 @@
+#!/bin/bash
+# Ajout du bin de IJK dans PATH
+# Ajout de PYTHONPATH dans l'environnement de IJK
+project_directory=`dirname $0`/../..
+for env in ${project_directory}/env_Front_tracking_IJK.sh
+do
+   for path in share/PyTools3
+   do
+       if [ -d ${project_directory}/$path ]; then
+           grep "$path" $env 1>/dev/null 2>&1 # mais à quoi ça sert ???
+           echo "export PYTHONPATH=\${project_directory}/$path:\$PYTHONPATH" >> $env
+
+           # test exitence de l'environnement virtuel
+           if [ -d ${project_directory}/$path/venv ]; then
+               python_version=`python --version | sed 's/ //g' | sed 's/Python//g'`
+               venv_version=`grep ^version ${project_directory}/$path/venv/pyvenv.cfg | sed 's/version = //g'`
+               echo "trust python version is : " $python_version
+               echo "current venv python version is : " $venv_version
+               if [ $python_version = $venv_version ]; then
+                    echo "venv for PyTools3 already set"
+               else
+                   rm -rf ${project_directory}/$path/venv && python -m venv ${project_directory}/$path/venv 
+                   [ $? ] && echo "venv for PyTools3 successfully replaced" && echo "You can load any requirements using : pip install -r requirements.txt after sourcing \$project_directory/$path/venv/bin/activate"
+               fi
+           else
+               python -m venv ${project_directory}/$path/venv
+               [ $? ] && echo "venv for PyTools3 successfully created" && echo "You can load any requirements using : pip install -r requirements.txt after sourcing \$project_directory/$path/venv/bin/activate"
+           fi
+       else
+           echo "Error : please link PyTools3 in order to be able de run the fiches calling libraries from PyTools3"
+       fi
+   done
+   echo "source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh" >> $env
+   echo "echo \"source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh ... OK\"" >> $env
+   for path in share/bin
+   do
+      [ -d ${project_directory}/$path ] && grep "$path" $env 1>/dev/null 2>&1 || echo "export PATH=\${project_directory}/$path:\$PATH" >> $env
+   done
+done
+exit 0

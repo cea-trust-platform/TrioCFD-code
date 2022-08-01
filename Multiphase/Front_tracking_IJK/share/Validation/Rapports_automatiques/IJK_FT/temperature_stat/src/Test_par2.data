@@ -1,0 +1,97 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 5
+  nbelem_j 5
+  nbelem_k 64
+  uniform_domain_size_i 0.06
+  uniform_domain_size_j 0.06
+  uniform_domain_size_k 0.06
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 2
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 0
+  timestep 1.64794e-5 # Choisi pour le maillage 64 #
+  timestep_facsec 1.e12
+  dt_post 200
+ #  disable_diphasique #
+   Boundary_Conditions {
+                bctype_kmin Symetrie
+                bctype_kmax Symetrie
+  }
+  cfl 1.0
+  fo  1.0
+  oh  1.0
+  t_debut_statistiques 0.
+  champs_a_postraiter 5 TEMPERATURE TEMPERATURE_ANA ECART_T_ANA DIV_LAMBDA_GRAD_T_VOLUME PRESSURE_LIQ
+  check_stop_file stop.txt
+  dt_sauvegarde 3000
+  nb_pas_dt_max 100  #  tf= 0.012641488699082916 tel qu'en 2D (cos(x)*cos(y)) l'amplitude ait decru de moitie #
+  disable_solveur_poisson
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 0
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+ interfaces
+  {
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+  }
+  # disable_diphasique # 
+  # disable_convection_qdm #
+  # disable_diffusion_qdm #
+  thermique
+  {
+  {
+   # conv_temperature_negligible #
+   Boundary_Conditions {
+                bctype_kmin Perio  
+                bctype_kmax Perio  
+		# Paroi_Flux_impose #
+		# Paroi_Temperature_imposee #
+		# flux_impose_kmin 0.
+		flux_impose_kmax 0. #
+		# temperature_imposee_kmin 10. #
+		# temperature_imposee_kmax -10. #
+    }
+    expression_T_init 0.5*cos(z*2*Pi/0.06)
+    expression_T_ana 0.5*exp(-(0.1/40.*2*(2*Pi/0.06)^2)*t)*cos(x*2*Pi/0.06)*cos(y*2*Pi/0.06)
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 3.
+    lambda_vapor 0.1
+    fo 0.5
+  }
+  }
+  rho_liquide 10.
+  mu_liquide 0.
+  expression_vx_init 1.
+  expression_vy_init 0.
+  expression_vz_init 0.
+  nom_sauvegarde Test_par2.sauv
+  Sondes
+    {
+       # Il faut mettre +epsilon pour etre sur d'avoir la vitesse sur la bonne face... 
+       IL ecrit dans le fichier sonde la coord precise de la position post-traitee (face ici). #
+       pp_T temperature periode 1e-9 points 1 0.03 0.03 0.015
+    }
+  
+}
+Fin

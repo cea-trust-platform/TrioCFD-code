@@ -51,7 +51,7 @@ class Echange_contact_VEF_VDF_Zoom  : public Temperature_imposee_paroi
   Declare_instanciable(Echange_contact_VEF_VDF_Zoom);
 
 public :
-  void mettre_a_jour(double ) ;
+  void mettre_a_jour(double ) override ;
 
 };
 

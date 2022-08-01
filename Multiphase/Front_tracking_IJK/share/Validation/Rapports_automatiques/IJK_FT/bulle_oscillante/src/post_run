@@ -1,0 +1,67 @@
+#!/usr/bin/python
+#
+# calcul du diametre equivalent base sur le volume initial :
+# for file in ijkft_bulle_oscillante_bulles
+# do
+#   awk 'NR==1{pi=3.141592653589793;vini=$2;rayon=vini*(3/4./pi)**(1./3.);Ssphere=4*pi*rayon**2}
+# {printf "%.13g %.13g %.13g %.13g %.13g\n",$1,($2-Ssphere)/Ssphere,Ssphere,4*pi*0.0018**2/Ssphere' ${file}_surface.out >${file}_Sadim.out
+# done
+
+from math import *
+from numpy import *
+vol=loadtxt("ijkft_bulle_oscillante_bulles_volume.out")
+surf=loadtxt("ijkft_bulle_oscillante_bulles_surface.out")
+
+vini=vol[0,1]
+rayon=(vini*3/4./pi)**(1./3.)
+Ssphere=4*pi*rayon**2
+
+global Sini,Sfin,Ssphere
+Sini=surf[0,1]
+Sfin=surf[-1,-1]
+nlignes = shape(surf)[0]
+res=zeros((nlignes,6))
+Amplitude = surf[0,1]/Ssphere # L'amplitude initiale de la deformation. 
+Areel = surf[0,1]/Sfin  # L'amplitude reelle de la deformation
+tau = 0.05 # La constante de temps de l'amortissement
+pulse = 50 * 2 * pi # Pulsation 50Hz
+pulse = 120 * 2 * pi # Pulsation 125Hz
+tau = 0.075 # La constante de temps de l'amortissement
+
+
+t = surf[:,0] # Le temps
+
+res[:,0] = t # Le temps
+res[:,1] = surf[:,1]/Ssphere # La surface adim par celle de la sphere de meme volume. 
+res[:,2] = 1.                    # La surface adim de la sphere
+res[:,3] = 4*pi*0.0018**2/Ssphere # La surface adim qu'aurait une sphere de bon volume pour le rayon demande. 
+# res[:,4] = 1. + (Amplitude-1.)*exp(-t/tau) # L'enveloppe de la decroissance.
+# res[:,5] = Sfin/Ssphere + (Amplitude-1.)*exp(-t/tau)*cos(pulse*t) # La decroissance.
+res[:,4] = (Sfin + (Sini-Sfin)*exp(-t/tau) ) / Ssphere # L'enveloppe de la decroissance.
+res[:,5] = (Sfin + (Sini-Sfin)*(1.+cos(pulse*t))/2.*exp(-t/tau) ) / Ssphere # La decroissance.
+
+def func(t, pulse, tau):
+   print Sini, Sfin,Ssphere
+   return (Sfin + (Sini-Sfin)*(1.+cos(pulse*t))/2.*exp(-t/tau) ) / Ssphere
+
+from scipy.optimize import curve_fit
+popt, pcov = curve_fit(func, t, res[:,1], p0=(pulse, tau))
+
+print "(pulse, tau) = ", popt
+pulse, tau = popt
+# RESULTATS DU 22.10.2013 : (pulse, tau) =  [  7.64103865e+02   6.74546569e-02]
+
+if 0:
+   from  pylab  import *
+   plot(t,res[:,1],label="Sadim")
+   plot(t,res[:,2],label="Sphere")
+   plot(t,res[:,3],label="r=0.0018")
+   plot(t,res[:,4],label="enveloppe")
+   plot(t,res[:,5],label="decay")
+   plot(t, func(t, pulse, tau), label="opt-decay")
+   legend(loc=0)
+   show()
+
+# print pcov 
+
+savetxt("ijkft_bulle_oscillante_bulles_Sadim.out", res)

@@ -1,0 +1,5 @@
+#!/bin/bash
+[ -f $1.lml ] && gzip -f $1.lml
+
+python3 ~/Trio/IJK/share/PyTools3/follow_calcs/test_import.py
+

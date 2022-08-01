@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ $1 == "switch" ] 
+then
+   echo "preparing diph_canal_noStat.sauv for the switch"
+   sed -e "s/equilateral .*/equilateral 0/g" \
+       -e '/statistiques_FT/i\}' \
+       -e '/statistiques_FT/,$d' \
+        diph_canal.sauv > diph_canal_noStat.sauv
+fi
+
+

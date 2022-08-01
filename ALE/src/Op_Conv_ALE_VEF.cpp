@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,14 +16,13 @@
 //
 // File:        Op_Conv_ALE_VEF.cpp
 // Directory:   $TRUST_ROOT/../Composants/TrioCFD/ALE/src
-// Version:     /main/14
 //
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Op_Conv_ALE_VEF.h>
 #include <Op_Conv_VEF_base.h>
 #include <Domaine_ALE.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Op_Conv_VEF_Face.h>
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
@@ -31,6 +30,7 @@
 #include <Convection_tools.h>
 #include <Debog.h>
 #include <Champ_P1NC.h>
+#include <CL_Types_include.h>
 
 Implemente_instanciable(Op_Conv_ALE_VEF,"Op_Conv_ALE_VEF",Op_Conv_ALE);
 
@@ -145,7 +145,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
                     {
                       int num_face = le_bord.num_face(ind_face);
                       int elem = face_voisins(num_face,0);
-                      traitement_pres_bord_(elem)=1;
+                      traitement_pres_bord_[elem]=1;
                     }
                 }
             }
@@ -167,19 +167,19 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
                     for (int som=0; som<size; som++)
                       {
                         int face = le_bord.num_face(ind_face);
-                        est_un_sommet_de_bord_(zone_VEF.face_sommets(face,som))=1;
+                        est_un_sommet_de_bord_[zone_VEF.face_sommets(face,som)]=1;
                       }
                 }
             }
           for (int elem=0; elem<nb_elem_tot; elem++)
             {
               if (rang_elem_non_std(elem)!=-1)
-                traitement_pres_bord_(elem)=1;
+                traitement_pres_bord_[elem]=1;
               else
                 {
                   for (int n_som=0; n_som<nsom; n_som++)
-                    if (est_un_sommet_de_bord_(les_elems(elem,n_som)))
-                      traitement_pres_bord_(elem)=1;
+                    if (est_un_sommet_de_bord_[les_elems(elem,n_som)])
+                      traitement_pres_bord_[elem]=1;
                 }
             }
         }
@@ -196,7 +196,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
               for (int ind_face=0; ind_face<nb_faces_tot; ind_face++)
                 {
                   int num_face = le_bord.num_face(ind_face);
-                  est_une_face_de_dirichlet_(num_face) = 1;
+                  est_une_face_de_dirichlet_[num_face] = 1;
                 }
             }
         }
@@ -344,7 +344,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
           elem1=face_voisins(fac,0);
           elem2=face_voisins(fac,1);
           int minmod_pres_du_bord = 0;
-          if (ordre==3 && (traitement_pres_bord_(elem1) || traitement_pres_bord_(elem2))) minmod_pres_du_bord = 1;
+          if (ordre==3 && (traitement_pres_bord_[elem1] || traitement_pres_bord_[elem2])) minmod_pres_du_bord = 1;
           for (comp0=0; comp0<ncomp_ch_transporte; comp0++)
             for (i=0; i<dimension; i++)
               {
@@ -367,7 +367,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
   DoubleTab xsom(nsom,dimension);
 
   // Dimensionnement du tableau des flux convectifs au bord du domaine de calcul
-  DoubleTab& flux_b = ref_cast(DoubleTab,flux_bords_);
+  DoubleTab& flux_b = flux_bords_;
   int nb_faces_bord=zone_VEF.nb_faces_bord();
   flux_b.resize(nb_faces_bord,ncomp_ch_transporte);
   flux_b = 0.;
@@ -413,18 +413,18 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
           for (face_adj=0; face_adj<nfac; face_adj++)
             {
               int face_ = elem_faces(poly,face_adj);
-              face(face_adj)= face_;
+              face[face_adj]= face_;
               if (face_<nb_faces_) contrib=1; // Une face reelle sur l'element virtuel
             }
           //
           if (contrib)
             {
-              int calcul_flux_en_un_point = (ordre != 3) && (ordre==1 || traitement_pres_bord_(poly));
+              int calcul_flux_en_un_point = (ordre != 3) && (ordre==1 || traitement_pres_bord_[poly]);
               for (j=0; j<dimension; j++)
                 {
-                  vs(j) = vitesse_face_absolue(face(0),j)*porosite_face(face(0));
+                  vs[j] = vitesse_face_absolue(face[0],j)*porosite_face[face[0]];
                   for (i=1; i<nfac; i++)
-                    vs(j)+= vitesse_face_absolue(face(i),j)*porosite_face(face(i));
+                    vs[j]+= vitesse_face_absolue(face[i],j)*porosite_face[face[i]];
                 }
               // calcul de la vitesse aux sommets des polyedres
               // On va utliser les fonctions de forme implementees dans la classe Champs_P1_impl ou Champs_Q1_impl
@@ -432,7 +432,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
                 {
                   for (i=0; i<nsom; i++)
                     for (j=0; j<dimension; j++)
-                      vsom(i,j) = (vs(j) - dimension*vitesse_face_absolue(face(i),j)*porosite_face(face(i)));
+                      vsom(i,j) = (vs[j] - dimension*vitesse_face_absolue(face[i],j)*porosite_face[face[i]]);
                 }
               else
                 {
@@ -474,8 +474,8 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
               // Boucle sur les facettes du polyedre non standard:
               for (fa7=0; fa7<nfa7; fa7++)
                 {
-                  num10 = face(KEL(0,fa7));
-                  num20 = face(KEL(1,fa7));
+                  num10 = face[KEL(0,fa7)];
+                  num20 = face[KEL(1,fa7)];
                   // normales aux facettes
                   if (rang==-1)
                     for (i=0; i<dimension; i++)
@@ -509,7 +509,7 @@ DoubleTab& Op_Conv_ALE_VEF::ajouterALE(const DoubleTab& transporte, DoubleTab& r
                   // auquel cas la fa7 coincide avec la face num1 ou num2 -> C est au centre de la face
                   int appliquer_cl_dirichlet=0;
                   if (option_appliquer_cl_dirichlet)
-                    if (est_une_face_de_dirichlet_(num10) || est_une_face_de_dirichlet_(num20))
+                    if (est_une_face_de_dirichlet_[num10] || est_une_face_de_dirichlet_[num20])
                       {
                         appliquer_cl_dirichlet = 1;
                         psc_m = psc_c;
@@ -828,7 +828,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
           psc=0.;
           for (int i=0; i<dimension; i++)
             psc+=tab_vitesse(num_face,i)*face_normales(num_face,i);
-          tab_fluent(num_face)=dabs(psc);
+          tab_fluent(num_face)=std::fabs(psc);
         }
     }
 
@@ -840,7 +840,7 @@ void Op_Conv_ALE_VEF::remplir_fluent_ALEincluded(DoubleVect& tab_fluent) const
           psc=0.;
           for (int i=0; i<dimension; i++)
             psc+=(tab_vitesse(num_face,i)-tab_vitesse_faces_ALE(num_face,i))*face_normales(num_face,i);
-          tab_fluent(num_face)=dabs(psc);
+          tab_fluent(num_face)=std::fabs(psc);
         }
     }
 
@@ -1036,7 +1036,9 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
   const Zone_VEF& zone_VEF = la_zone_vef.valeur();
   const int nb_faces_tot = zone_VEF.nb_faces_tot();
   DoubleTab ALEmeshVelocityGradient(nb_faces_tot,dimension,dimension);
-  jacobianALE.resize(nb_faces_tot,dimension);
+  //jacobianALE.resize(nb_faces_tot,dimension);
+  jacobianALE= equation().inconnue().valeurs();
+  jacobianALE=1.;
   calculateALEMeshVelocityGradientOnFaces(ALEmeshVelocityGradient);
 
   //Multiply ALE mesh velocity gradient values with time step and used the result to calculate Jacobian determinants on faces.

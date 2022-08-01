@@ -25,16 +25,6 @@
 #define Prolongement_face_face_included
 
 
-/* #include <Objet_U.h> */
-/* #include <IntTab.h> */
-/* #include <Zone_VF.h> */
-/* #include <Pb_1G.h> */
-/* #include <Pb_fin.h> */
-/* #include <Probleme_base.h> */
-/* #include <DoubleTab.h> */
-/* #include <Zone_dis.h> */
-/* #include <Connectivites.h> */
-/* #include <Champ_Inc_base.h> */
 #include <Prolongement_base.h>
 
 
@@ -62,10 +52,10 @@ public:
   void prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                  const Frontiere& frontF,IntVect& connect,
                  const DoubleTab& incoG,
-                 DoubleTab& tab, int nb_comp);
+                 DoubleTab& tab, int nb_comp) override;
   void calculer(Zone_VF& zonef,
                 Zone_VF& zoneg,
-                IntVect& connect_ff);
+                IntVect& connect_ff) override;
 
 private:
 

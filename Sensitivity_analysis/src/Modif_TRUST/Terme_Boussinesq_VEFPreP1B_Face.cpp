@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Terme_Boussinesq_VEFPreP1B_Face.cpp
-// Directory:   $TRUST_ROOT/src/VEF/Sources
-// Version:     /main/30
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Terme_Boussinesq_VEFPreP1B_Face.h>
 #include <Convection_Diffusion_Temperature_sensibility.h>
@@ -27,9 +20,7 @@
 #include <Periodique.h>
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>
-#include <Navier_Stokes_std.h>
 #include <Zone_VEF_PreP1b.h>
-#include <Domaine.h>
 #include <Synonyme_info.h>
 
 extern double calculer_coef_som(int elem, int& nb_face_diri, ArrOfInt& indice_diri, const Zone_Cl_VEF& zcl, const Zone_VEF& zone_VEF);
@@ -115,8 +106,8 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
   if(dimension==2)
     {
       double tiers=0.333333333333333;
-      Poids(0)=tiers;
-      Poids(1)=Poids(2)=Poids(0);
+      Poids[0]=tiers;
+      Poids[1]=Poids[2]=Poids[0];
 
       coord_bary(0,0)=0.5;
       coord_bary(0,1)=0.;
@@ -132,8 +123,8 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
     }
   else if(dimension==3)
     {
-      Poids(0)=0.25;
-      Poids(1)=Poids(2)=Poids(3)=Poids(0);
+      Poids[0]=0.25;
+      Poids[1]=Poids[2]=Poids[3]=Poids[0];
 
       double a = 0.5854101966249685;
       double b = 0.1381966011250105;
@@ -191,21 +182,21 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
       //On remplit la matrice de changement d'element  :
       const int som_glob = elem_sommets(elem,0);
       for (int dim=0; dim<dimension; dim++)
-        a0(dim)=coord_sommets(som_glob,dim);
+        a0[dim]=coord_sommets(som_glob,dim);
 
       const int som_glob1 = elem_sommets(elem,1);
       for (int dim=0; dim<dimension; dim++)
-        a0a1(dim)=coord_sommets(som_glob1,dim)-a0(dim);
+        a0a1[dim]=coord_sommets(som_glob1,dim)-a0[dim];
 
       const int som_glob2 = elem_sommets(elem,2);
       for (int dim=0; dim<dimension; dim++)
-        a0a2(dim)=coord_sommets(som_glob2,dim)-a0(dim);
+        a0a2[dim]=coord_sommets(som_glob2,dim)-a0[dim];
 
       if(dimension == 3)
         {
           const int som_glob3 = elem_sommets(elem,3);
           for (int dim=0; dim<dimension; dim++)
-            a0a3(dim)=coord_sommets(som_glob3,dim)-a0(dim);
+            a0a3[dim]=coord_sommets(som_glob3,dim)-a0[dim];
         }
 
       //On remplit les_positions :
@@ -214,9 +205,9 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
           for (int pt=0; pt<nbpts; pt++)
             {
               for (int dim=0; dim<dimension; dim++)
-                les_positions(pt,dim)=a0(dim)
-                                      +coord_bary(pt,1)* a0a1(dim)
-                                      +coord_bary(pt,2)* a0a2(dim);
+                les_positions(pt,dim)=a0[dim]
+                                      +coord_bary(pt,1)* a0a1[dim]
+                                      +coord_bary(pt,2)* a0a2[dim];
             }
         }
       else if(dimension == 3)
@@ -224,10 +215,10 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
           for (int pt=0; pt<nbpts; pt++)
             {
               for (int dim=0; dim<dimension; dim++)
-                les_positions(pt,dim)=a0(dim)
-                                      +coord_bary(pt,1)* a0a1(dim)
-                                      +coord_bary(pt,2)* a0a2(dim)
-                                      +coord_bary(pt,3)* a0a3(dim);
+                les_positions(pt,dim)=a0[dim]
+                                      +coord_bary(pt,1)* a0a1[dim]
+                                      +coord_bary(pt,2)* a0a2[dim]
+                                      +coord_bary(pt,3)* a0a3[dim];
             }
         }
       else
@@ -256,11 +247,11 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
                   double contrib=0;
                   for (int comp=0; comp<nb_comp; comp++)
                     {
-                      contrib+=Poids(pt)*volume*(T0(comp)-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
-                      contrib+=Poids(pt)*volume*(T0_etat(comp)- valeurs_scalaire_etat(pt,comp))*beta_a*g(dim)*valeurs_Psi(pt);
+                      contrib+=Poids[pt]*volume*(T0[comp]-valeurs_scalaire(pt,comp))*valeurs_beta(pt,comp)*g(dim)*valeurs_Psi(pt);
+                      contrib+=Poids[pt]*volume*(T0_etat[comp]- valeurs_scalaire_etat(pt,comp))*beta_a*g(dim)*valeurs_Psi(pt);
                     }
                   resu(num_face,dim)+=contrib;
-                  somme(dim)+=contrib;
+                  somme[dim]+=contrib;
                   if (modif_traitement_diri)
                     {
                       for (int fdiri=0; fdiri<nb_face_diri; fdiri++)
@@ -318,7 +309,7 @@ DoubleTab& Terme_Boussinesq_VEFPreP1B_Face::ajouter(DoubleTab& resu) const
       Cout <<"Integrale : (";
       for (int dim=0; dim<dimension; ++dim)
         {
-          Cout<<somme(dim);
+          Cout<<somme[dim];
           if (dim<(dimension-1))
             Cout<<",";
         }

@@ -48,13 +48,13 @@ class Source_LDC_VDF : public  Source_Correction_Deficitaire
 
 public:
 
-  void associer_zones(const Zone_dis&, const Zone_Cl_dis& );
+  void associer_zones(const Zone_dis&, const Zone_Cl_dis& ) override;
 
 
 
-  virtual DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) ;
+  DoubleTab& calculer_residu(Connectivites_IndGros& connect, Restriction_base& rest, Equation_base& eq_fine) override ;
 
-  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) ;
+  inline DoubleTab& calculer_residu(Connectivites_base& connect, LIST(Prolongement)& P, Equation_base& eqG, Nom&) override ;
 
 
 };
@@ -64,7 +64,7 @@ inline DoubleTab& Source_LDC_VDF::calculer_residu(Connectivites_base& connect, L
   Cerr<<"N'est pas codee avec ces arguments dans la classe Source_LDC_VDF_NS !!"<<finl;
   exit();
   /* pour les compilateurs ---> il faut retourner un DoubleTab quelconque */
-  return eqG.inconnue().valeur();
+  return eqG.inconnue()->valeurs();
 }
 
 

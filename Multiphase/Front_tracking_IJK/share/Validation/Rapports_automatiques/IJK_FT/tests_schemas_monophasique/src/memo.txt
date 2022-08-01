@@ -1,0 +1,5 @@
+Diagonaliser les solutions convection et diffusion avec un pas DX != DY. 
+
+Mettre tableau pour compa SEQ / PAR . 
+
+Mettre tableau pour compa VDF / IJK sur diffusion. 

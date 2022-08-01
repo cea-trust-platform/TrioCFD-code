@@ -40,10 +40,10 @@ class Source_Portance : public Source_Action_Particules
   Declare_instanciable(Source_Portance);
 
 public :
-  DoubleTab& ajouter(DoubleTab& ) const;
-  DoubleTab& calculer(DoubleTab& ) const;
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  DoubleTab& calculer(DoubleTab& ) const override;
 
-  void completer();
+  void completer() override;
 
 protected :
 

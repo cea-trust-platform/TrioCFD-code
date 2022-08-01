@@ -38,14 +38,14 @@ class Echange_contact_VDF_FT_Disc : public Echange_contact_VDF
   Declare_instanciable( Echange_contact_VDF_FT_Disc ) ;
 
 public :
-  void mettre_a_jour(double );
-  virtual int initialiser(double temps);
-  void completer();
+  void mettre_a_jour(double ) override;
+  int initialiser(double temps) override;
+  void completer() override;
 
 
-  virtual void changer_temps_futur(double temps,int i);
-  virtual int avancer(double temps);
-  virtual int reculer(double temps);
+  void changer_temps_futur(double temps,int i) override;
+  int avancer(double temps) override;
+  int reculer(double temps) override;
 protected :
   Champ_front indicatrice_;
   double indicatrice_ref_;

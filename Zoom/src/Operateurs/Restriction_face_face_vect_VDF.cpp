@@ -172,7 +172,7 @@ void Restriction_face_face_vect_VDF::calculer(const Zone_VF& zone_VFG,
                     {
                       orien = oriF(numF);
                       //et si elle est incluse dans la face grossiere
-                      if((fabs(cg_face_fine(numF, orien)-cg_face_gros(num_faceG,orien))) < 1.e-9)
+                      if((std::fabs(cg_face_fine(numF, orien)-cg_face_gros(num_faceG,orien))) < 1.e-9)
                         {
                           trouve_facef_incluse(num_faceG) = 1;
                           for(j=0; j<max1; j++)
@@ -209,7 +209,7 @@ void Restriction_face_face_vect_VDF::calculer(const Zone_VF& zone_VFG,
                   if(oriF(numF) == oriG(num_faceG))
                     {
                       orien = oriF(numF);
-                      if((fabs(cg_face_fine(numF, orien)-cg_face_gros(num_faceG,orien ))) < 1.e-9)
+                      if((std::fabs(cg_face_fine(numF, orien)-cg_face_gros(num_faceG,orien ))) < 1.e-9)
                         {
                           //A-t-elle deja ete comptee?
                           int i = 0;
@@ -353,7 +353,7 @@ void Restriction_face_face_vect_VDF::restreindre(const Zone_VF& zone_VFG,
                     {
                       orien = oriF(numF);
                       //et si elle est incluse dans la face grossiere
-                      if(fabs(cg_face_fine(numF, orien)-cg_facesG(num_faceG,orien )) < 1.e-9)
+                      if(std::fabs(cg_face_fine(numF, orien)-cg_facesG(num_faceG,orien )) < 1.e-9)
                         {
                           trouve_facef_incluse(num_faceG) = 1;
                           for(j=0; j<max1; j++)
@@ -390,7 +390,7 @@ void Restriction_face_face_vect_VDF::restreindre(const Zone_VF& zone_VFG,
                   if(oriF(numF) == oriG(num_faceG))
                     {
                       orien = oriF(numF);
-                      if(fabs(cg_face_fine(numF, orien)-cg_facesG(num_faceG,orien )) < 1.e-9)
+                      if(std::fabs(cg_face_fine(numF, orien)-cg_facesG(num_faceG,orien )) < 1.e-9)
                         {
                           //A-t-elle deja ete comptee?
                           int i = 0;

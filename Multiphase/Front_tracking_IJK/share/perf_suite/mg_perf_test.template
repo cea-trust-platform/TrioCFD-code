@@ -1,0 +1,278 @@
+# SOLV_TYPE can be GCP MG MG_GMRES #
+# PARAI J K are number of procs in each direction #
+# MESH is MESH64x128x16 or MESH128x128x128 #
+#Pmacro DEF_MAIN(__SOLV_TYPE__,__PARAI__,__PARAJ__,__PARAK__,__MESH__)
+
+# Le decoupage dans le solveur mg est inverse car j et k sont inverses (dans la version poreux et adrien) #
+#Pmacro DEF_decoup_para() decoupage 3 __PARAI__ __PARAK__ __PARAJ__ #Pendmacro(DEF_decoup_para)
+
+#Pmacro SMOOTHSTEPS() 6 #Pendmacro(SMOOTHSTEPS)
+
+#Pmacro SEUIL() 1e-9 #Pendmacro(SEUIL)
+
+#Pif("__SOLV_TYPE__"=="MG")
+#Pmacro MG_ALGORITHM() nb_full_mg_steps 2 10 1 #Pendmacro(MG_ALGORITHM)
+#Pelif("__SOLV_TYPE__"=="MG_GMRES")
+#Pmacro MG_ALGORITHM()  iterations_gmres 3 n_krilov 2 nb_full_mg_steps 2 2 1 #Pendmacro(MG_ALGORITHM)
+#Pendif
+
+#Pmacro DEF_solveur()
+#Pif("__SOLV_TYPE__"=="GCP")
+	solveur_pression gcp {
+		seuil #Pusemacro(SEUIL)()
+		impr
+		precond ssor { omega 1.5 }
+	}
+#Pelse
+                solveur_pression multigrille_adrien {
+#Pif("__MESH__"=="MESH128x448x64")
+			K_coarse_sizes 2 224 168
+			nb_isotropic_coarsening 2			
+#Pelse
+			K_coarse_sizes 4 112 96 64 32
+			nb_isotropic_coarsening 1
+#Pendif
+			pre_smooth_steps 1 #Pusemacro(SMOOTHSTEPS)()
+			smooth_steps 1 #Pusemacro(SMOOTHSTEPS)()
+			relax_jacobi 0.65
+			perio_i 1
+			perio_j 1
+			solveur_grossier GCP { 
+				seuil #Pusemacro(SEUIL)() 
+				precond ssor { omega 1.5 } 
+			}
+			check_residu 1
+			seuil #Pusemacro(SEUIL)()
+			impr
+			nb_full_mg_steps 2 10 1 
+			# iterations_gmres 3 n_krilov 2 nb_full_mg_steps 2 2 1 #
+			#Pusemacro(DEF_decoup_para)()
+		}
+#Pendif
+#Pendmacro(DEF_solveur)
+
+dimension 3
+Pb_Thermohydraulique_Turbulent_QC pb
+
+Domaine dom
+
+# DEBUT MAILLAGE #
+Mailler dom
+	{
+	Pave Cavite
+		{
+		Origine 0. 0. 0.
+		Longueurs  0.093764 0.029846 0.027
+#Pif("__MESH__"=="MESH64x128x16")
+		Nombre_de_Noeuds 65 129 17
+		tanh_taille_premiere_maille 8.29e-5
+#Pelif("__MESH__"=="MESH128x448x64")
+                Nombre_de_Noeuds 129 449 65
+                tanh_taille_premiere_maille 3.e-5
+#Pelse
+		Nombre_de_Noeuds 129 129 129
+		tanh_taille_premiere_maille 8.29e-5
+#Pendif
+		}
+		{
+		Bord periox   X = 0.          0. <= Y <= 0.029846     0. <= Z <= 0.027
+		Bord periox   X = 0.093764    0. <= Y <= 0.029846     0. <= Z <= 0.027
+		Bord perioz   Z = 0.          0. <= X <= 0.093764     0. <= Y <= 0.029846
+		Bord perioz   Z = 0.027    0. <= X <= 0.093764     0. <= Y <= 0.029846  
+		Bord bas      Y = 0.          0. <= X <= 0.093764     0. <= Z <= 0.027
+		Bord haut     Y = 0.029846    0. <= X <= 0.093764     0. <= Z <= 0.027
+		}
+	}
+#Pif("__MESH__"=="MESH128x128x128")
+transformer dom x*2 y z*8
+#Pelif("__MESH__"=="MESH128x448x64")
+transformer dom x*.03777953*8 y z*.03777953*16
+#Pendif
+
+# FIN MAILLAGE # 
+
+# DEBUT DECOUPAGE 
+Decouper dom
+{
+	partitionneur Tranche  { tranches __PARAI__ __PARAJ__ __PARAK__ }
+	Larg_joint 2
+	Nom_Zones canalQCdt20K
+	Periodique 2 periox perioz
+}
+Fin
+ FIN DECOUPAGE # 
+
+# DEBUT LECTURE 
+Scatter canalQCdt20K.Zones dom
+ FIN LECTURE #
+
+VDF dis
+/*
+
+Runge_Kutta_Rationnel_ordre_2 sch_ex 
+*/
+
+Runge_Kutta_ordre_3 sch_rk
+Lire sch_rk
+{
+        tinit 0
+        tmax 5
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.01
+        seuil_statio 1.e-8
+	nb_pas_dt_max 3
+}
+
+
+schema_euler_explicite sch_ex
+Lire sch_ex
+{
+        tinit 0.
+	nb_pas_dt_max 3000
+        tmax 0.25
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	dt_start dt_calc
+        seuil_statio 1.e-8
+	
+	diffusion_implicite 0
+}
+
+Schema_Euler_Implicite sch
+Lire sch
+{
+        tinit 0.
+	nb_pas_dt_max 3
+        tmax 5.62
+        dt_min 1.e-11
+        dt_max 5.
+        dt_impr 1.e-7
+        dt_sauv 0.05
+	dt_start dt_calc
+        seuil_statio 1.e-8
+	facsec 10
+	Solveur Piso
+	{ 
+		seuil_convergence_solveur 1.e-8
+		solveur gen { seuil 1e-12 solv_elem bicgstab precond ilu { type 2 filling 20 } }
+	}
+}
+
+Fluide_Quasi_Compressible fluide
+Lire fluide
+{
+        mu Champ_Fonc_Fonction 1 temperature (1.461e-6*((100000./(287.14*val))^1.5)/((100000./(287.14*val))+111.))
+        lambda Champ_Fonc_Fonction 1 temperature (1.93198026315789000e-3*((100000./(287.14*val))^1.5)/((100000./(287.14*val))+111.))
+        pression 100000.
+        loi_etat gaz_parfait 	{
+                		Prandtl 0.76
+                		Cp 1005
+                		gamma 1.4
+        			}
+	traitement_pth conservation_masse
+}
+
+Associer pb dom
+Associer pb sch_rk
+Associer pb fluide
+
+Discretiser pb dis
+# Debog pb seq faces 1e-6 0 #
+
+Lire pb
+{
+        Navier_Stokes_Turbulent_QC
+        {
+		#Pusemacro(DEF_solveur)()
+                convection { quick }
+                diffusion { }
+                Sources 
+		{ 
+			Canal_perio { direction_ecoulement 0 h 0.0149 } 
+		}	
+		conditions_initiales 
+		{
+                        vitesse champ_init_canal_sinal 3  { Ucent 15. h 0.0149  ampli_sin 2. omega 67.01 ampli_bruit 0.0 dir_wall 1 dir_flow 0 }
+                }
+                conditions_limites 
+		{
+                        periox   periodique
+			perioz   periodique 
+			haut     paroi_fixe
+			bas      paroi_fixe
+                }
+		Modele_turbulence sous_maille_wale
+		{
+			turbulence_paroi negligeable
+			cw 0.5
+		} 
+		Traitement_particulier
+                    		{
+                                Canal
+                            			{
+                                                dt_impr_moy_spat 0.025
+                                                dt_impr_moy_temp 0.025
+						debut_stat 10.
+						fin_stat 20.
+						}
+                                } 
+  
+	}
+				
+        Convection_Diffusion_Chaleur_Turbulent_QC
+        {
+                diffusion { }
+                convection { quick }
+		Sources { }
+		conditions_initiales { Temperature Champ_Fonc_xyz dom 1 
+293.+293.*y/0.029846+sin(x*221.72+5.10)*4.51*sin(y*210.52+0.25)*1.62*sin(z*384.98+5.16)*1.83+sin(x*221.72+0.22)*9.54*sin(y*842.08+3.11)*1.24*sin(z*384.98+0.50)*6.44+sin(x*221.72+5.53)*5.90*sin(y*1894.68+1.84)*1.55*sin(z*384.98+1.74)*1.01+sin(x*886.86+3.43)*0.57*sin(y*210.52+4.88)*9.10*sin(z*384.98+5.40)*2.76+sin(x*886.86+5.01)*2.38*sin(y*842.08+4.91)*3.94*sin(z*384.98+5.25)*4.25+sin(x*886.86+3.82)*2.29*sin(y*1894.68+1.56)*2.77*sin(z*384.98+4.01)*9.67+sin(x*1995.44+5.73)*2.43*sin(y*210.52+2.36)*3.07*sin(z*384.98+4.77)*4.75+sin(x*1995.44+5.72)*1.40*sin(y*842.08+3.94)*3.79*sin(z*384.98+0.18)*3.20+sin(x*1995.44+2.82)*3.31*sin(y*1894.68+0.91)*2.05*sin(z*384.98+1.50)*2.75
+
+}
+		conditions_limites 
+                {
+                 	periox periodique
+			perioz periodique 
+ /*		        haut paroi_flux_impose Champ_Front_Uniforme 1  170.
+			bas paroi_flux_impose Champ_Front_Uniforme 1  -170. */
+			haut paroi_temperature_imposee champ_front_uniforme 1 580.
+			bas paroi_temperature_imposee champ_front_uniforme 1 290.
+		}
+		Modele_turbulence Prandtl
+		{ 
+ 		turbulence_paroi negligeable_scalaire 
+		}
+        }
+
+        Postraitement
+         { 
+
+	
+			
+			format lata
+			Champs binaire dt_post 0.001
+			{
+      				vitesse elem
+      				masse_volumique elem
+				temperature_qc elem
+				viscosite_dynamique elem
+				pression elem
+      				viscosite_turbulente elem
+         		}
+        	 Statistiques dt_post 0.001
+		 {
+			t_deb 10. t_fin 20.
+			moyenne vitesse
+			}										        
+        }
+	
+	sauvegarde formatte canal_turb.sauv
+
+}
+
+Resoudre pb
+Fin
+#Pendmacro(DEF_MAIN)

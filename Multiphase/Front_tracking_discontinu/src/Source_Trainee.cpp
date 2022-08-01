@@ -74,8 +74,8 @@ DoubleTab& Source_Trainee::ajouter(DoubleTab& resu) const
       sigma = fluide.sigma();
     }
 
-  const int& dim0 =  vitesse_p.dimension(0);
-  const int& dim1 =  vitesse_p.dimension(1);
+  const int dim0 =  vitesse_p.dimension(0);
+  const int dim1 =  vitesse_p.dimension(1);
   assert(vitesse_p.dimension(0)==vitesse_f.dimension(0));
 
   double norme_delta_v, Reynolds_p, Cd, Surface, pi;
@@ -94,14 +94,14 @@ DoubleTab& Source_Trainee::ajouter(DoubleTab& resu) const
       norme_delta_v = sqrt(norme_delta_v);
 
       Reynolds_p = rho_f(i)*norme_delta_v*diametre_p(i,0)/visco_dyn_f(i);
-      Cd_p =24/max(1e-12,Reynolds_p);
+      Cd_p =24/std::max(1e-12,Reynolds_p);
 
       if (sub_type(Fluide_Diphasique,mil))
         {
-          Cd_diph = min((2./3.)*sqrt((diametre_p(i,0)*diametre_p(i,0))*grav*(dabs(rho_f(i)-rho_p(i,0)))/sigma),8./3.);
+          Cd_diph = std::min((2./3.)*sqrt((diametre_p(i,0)*diametre_p(i,0))*grav*(std::fabs(rho_f(i)-rho_p(i,0)))/sigma),8./3.);
         }
 
-      Cd = max(Cd_p,Cd_diph);
+      Cd = std::max(Cd_p,Cd_diph);
 
       Surface = (dim1==3?pi*diametre_p(i,0)*diametre_p(i,0)/4.:diametre_p(i,0));
 

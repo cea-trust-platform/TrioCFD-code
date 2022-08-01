@@ -1,0 +1,602 @@
+Parametres {
+	Titre "IJK_switch : interpolation d'un maillage vers un autre"
+	Description " " <<EOF
+Validation d'IJK_switch : Pour interpoler la vitesse et reporter le maillage interfacial.
+Test couvrant uniquement le cas d'un probleme IJK_FT.
+EOF
+	Auteur "G.B."
+	CasTest . precurseur_perio.data
+	CasTest . precurseur_wall.data
+	CasTest . switch_perio.data
+	CasTest . switch_wall.data
+	CasTest . switch_perio_par8.data 8
+	CasTest . switch_wall_par8.data 8
+	CasTest . post_perio.data
+	CasTest . post_wall.data
+	CasTest . post_perio_par8.data 8
+	CasTest . post_wall_par8.data 8
+	CasTest . switch_varDZ_wall.data
+	CasTest . precurseur_3D.data
+	Prerequisite python post.py 
+}
+
+
+Chapitre {
+	Titre "Refine. Interpolation sur un maillage plus fin"
+	visu {
+                nb_img_without_newline 2
+		Description "Sauvegarde initiale du precurseur (black) versus refine (color)"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector refine_wall.sauv.lata DOM_NEW_dual VELOCITY FACES 0.2
+		Operator_to_all slice2D_z 0. 0. 1.5e-3 
+		width 7.5cm
+	}
+	visu {
+		Description "Autre plan (XZ)"
+		Normal3d 0 -1 0
+		Up3D 0 0 1
+		zoom3D 0 1. 0.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector refine_wall.sauv.lata DOM_NEW_dual VELOCITY FACES 0.2
+		Operator_to_all slice2D_y 0. 1.5e-3  0.
+		width 7.5cm
+	}
+	
+	visu {
+                nb_img_without_newline 2
+		Description "Sauvegarde initiale precurseur.sauv.lata"
+		Normal3d 0 1 0
+		Up3D 0 0 1
+		zoom3D 0 0 1.
+		mesh precurseur_wall.sauv.lata INTERFACES
+		pseudocolor precurseur_wall.sauv.lata INTERFACES COMPO_CONNEXE ELEM
+		width 7.5cm
+	}
+	visu {
+		Description "Resultat pour la reprise sur un maillage plus fin: on conserve un maillage rigoureusement identique. Le remaillage fera le travail ensuite"
+		Normal3d 0 1 0
+		Up3D 0 0 1
+		zoom3D 0 0 1.
+		mesh precurseur_wall.sauv.lata INTERFACES
+		pseudocolor refine_wall.sauv.lata INTERFACES COMPO_CONNEXE ELEM
+		width 7.5cm
+	}
+
+		
+	visu {
+                nb_img_without_newline 2
+		Description "Sauvegarde initiale temperature (T0, T1, T2 identiques) dans precurseur.sauv.lata"
+		Normal3d 0.5 -0.73 0.46
+		Up3D 0 0.5 0.84
+		zoom3D 0 0 1.
+		pseudocolor precurseur_wall.sauv.lata DOM TEMPERATURE_0 ELEM
+		width 7.5cm
+	}
+	visu {
+		Description "Resultat pour la reprise de la temperature T0 sur un maillage plus fin"
+                Normal3d 0.5 -0.73 0.46
+                Up3D 0 0.5 0.84
+		zoom3D 0 0 1.
+		pseudocolor refine_perio.sauv.lata DOM_NEW TEMPERATURE_0 ELEM
+		width 7.5cm
+	}
+
+        Figure {
+                Titre "Profils de temperature (perio_SX_T1) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "X"
+                labelY  "temperature"
+                courbe {
+                        fichier perio_SX_T1.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier perio_SX_T1.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier perio_par8_SX_T1.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier perio_SX_T1.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier perio_SX_T1.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier perio_par8_SX_T1.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de temperature (perio_SY_T2) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Y"
+                labelY  "temperature"
+                courbe {
+                        fichier perio_SY_T2.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier perio_SY_T2.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier perio_par8_SY_T2.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier perio_SY_T2.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier perio_SY_T2.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier perio_par8_SY_T2.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de temperature (perio_SZ_T3) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Z"
+                labelY  "temperature"
+                courbe {
+                        fichier perio_SZ_T3.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier perio_SZ_T3.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier perio_par8_SZ_T3.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier perio_SZ_T3.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier perio_SZ_T3.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier perio_par8_SZ_T3.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de temperature (wall_SZ_T0) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Z"
+                labelY  "temperature"
+                courbe {
+                        fichier wall_SZ_T0.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier wall_SZ_T0.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier wall_par8_SZ_T0.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier wall_SZ_T0.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier wall_SZ_T0.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier wall_par8_SZ_T0.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de temperature (wall_SZ_T1) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Z"
+                labelY  "temperature"
+                courbe {
+                        fichier wall_SZ_T1.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier wall_SZ_T1.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier wall_par8_SZ_T1.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier wall_SZ_T1.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier wall_SZ_T1.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier wall_par8_SZ_T1.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+         Table {
+                 Title "Seq/par comparison"
+                 description "The table of the comparison file compa-seq-par.txt."
+                 description "Shows the difference between seq and par calculations.  "
+                 description "there is no difference (ie 0 or 6.55725e-15), for both pario and wall cases and for both variables V and T.  "
+
+                 nb_columns 2
+                 Label  Case|abs(seq-par).max()
+                 lines {
+                            nb_columns_file 1
+                            file ./compa-seq-par.txt
+                       }
+         }
+
+	Titre "Velocity fields."
+        Figure {
+                Titre "Profils de velocity (perio_SX_VX) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "X"
+                labelY  "velocity"
+                courbe {
+                        fichier perio_SX_VX.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier perio_SX_VX.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier perio_par8_SX_VX.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier perio_SX_VX.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier perio_SX_VX.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier perio_par8_SX_VX.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de velocity (perio_SY_VY) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Y"
+                labelY  "velocity"
+                courbe {
+                        fichier perio_SY_VY.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier perio_SY_VY.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier perio_par8_SY_VY.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier perio_SY_VY.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier perio_SY_VY.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier perio_par8_SY_VY.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de velocity (perio_SZ_VZ) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Z"
+                labelY  "velocity"
+                courbe {
+                        fichier perio_SZ_VZ.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier perio_SZ_VZ.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier perio_par8_SZ_VZ.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier perio_SZ_VZ.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier perio_SZ_VZ.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier perio_par8_SZ_VZ.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+        Figure {
+                Titre "Profils de velocity (wall_SZ_VZ) sur le refine."
+                Description "Comparaison entre l'analytique et l'interpole."
+                incluredesccourbes 0
+                labelX  "Z"
+                labelY  "velocity"
+                courbe {
+                        fichier wall_SZ_VZ.txt
+                        colonnes ($1) ($3)
+                        style lines
+                        Legende "ref"
+                }
+                courbe {
+                        fichier wall_SZ_VZ.txt
+                        colonnes ($1) ($2)
+                        style lines
+                        Legende "interp"
+                }
+                courbe {
+                        fichier wall_par8_SZ_VZ.txt
+                        colonnes ($1) ($2)
+                        style points
+                        Legende "interp (par8)"
+                }
+#                Curve {
+#                        fichier wall_SZ_VZ.txt
+#                        colonnes ($1) (-0.5*cos($1*2*pi/0.003))
+#                        Legende "ana"
+#                        Style lines
+#                }
+                Curve {
+                        fichier wall_SZ_VZ.txt
+                        colonnes ($1) ($4)
+                        Legende "err"
+                        Style lines
+                }
+                Curve {
+                        fichier wall_par8_SZ_VZ.txt
+                        colonnes ($1) ($4)
+                        Legende "err (par8)"
+                        Style points
+                }
+	}
+}
+
+Chapitre {
+	Titre "Refine en parallel."
+	visu {
+                nb_img_without_newline 2
+		Description "Sauvegarde initiale du precurseur (black) versus par8_refine (color)"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector post_wall_par8.sauv.lata DOM_NEW_dual VELOCITY FACES 0.2
+		mesh precurseur_wall.sauv.lata DOM_dual black
+		mesh post_wall_par8.sauv.lata DOM_NEW_dual red
+		Operator_to_all slice2D_z 0. 0. 1.5e-3 
+		width 7.5cm
+	}
+	visu {
+		Description "Autre plan (XZ)"
+		Normal3d 0 -1 0
+		Up3D 0 0 1
+		zoom3D 0 1. 0.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector post_wall_par8.sauv.lata DOM_NEW_dual VELOCITY FACES 0.2
+		mesh precurseur_wall.sauv.lata DOM_dual black
+		mesh post_wall_par8.sauv.lata DOM_NEW_dual red
+		Operator_to_all slice2D_y 0. 1.5e-3  0.
+		width 7.5cm
+	}
+        visu {
+                nb_img_without_newline 2
+                Description "Sauvegarde initiale precurseur_wall.sauv.lata"
+                Normal3d 0 1 0
+                Up3D 0 0 1
+                zoom3D 0 0 1.
+                mesh precurseur_wall.sauv.lata INTERFACES
+                pseudocolor precurseur_wall.sauv.lata DOM_dual VELOCITY_X FACES
+                Operator_to_all slice2D_y 0. 1.5e-3 0.
+		width 7.5cm
+        }
+        visu {
+                Description "Interpolation sur un maillage plus fin dans post_wall_par8.sauv.lata"
+                Normal3d 0 1 0
+                Up3D 0 0 1
+                zoom3D 0 0 1.
+                mesh refine_wall.sauv.lata INTERFACES # les interfaces ne sont peut etre pas relues dans le post car extension=0 car Sondes sur dom_ext car sur VDF
+                pseudocolor post_wall_par8.sauv.lata DOM_NEW_dual VELOCITY_X FACES
+                Operator_to_all slice2D_y 0. 1.5e-3 0.
+		width 7.5cm
+        }
+
+}
+
+Chapitre {
+	Titre "Coarsen."
+	Description "Cela semble incorrect car il manque les vitesses descendantes dans le quart en bas a droite du tourbillon."
+	Description "Attention car visit trace 2 fois plus de vecteurs qu'il n'y en a reelement (DUAL).\\"
+	visu {
+                nb_img_without_newline 2
+		Description "Sauvegarde initiale du precurseur (black) versus coarsen (color)"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector coarse_wall.sauv.lata DOM_COARSE_dual VELOCITY FACES 0.2
+		mesh precurseur_wall.sauv.lata DOM_dual black
+		mesh coarse_wall.sauv.lata DOM_COARSE_dual red
+		Operator_to_all slice2D_z 0. 0. 1.5e-3 
+		width 7.5cm
+	}
+	visu {
+		Description "Autre plan (XZ)"
+		Normal3d 0 -1 0
+		Up3D 0 0 1
+		zoom3D 0 1. 0.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector coarse_wall.sauv.lata DOM_COARSE_dual VELOCITY FACES 0.2
+		mesh precurseur_wall.sauv.lata DOM_dual black
+		mesh coarse_wall.sauv.lata DOM_COARSE_dual red
+		Operator_to_all slice2D_y 0. 1.5e-3  0.
+		width 7.5cm
+	}
+}
+
+Chapitre {
+	Titre "Vers un maillage non-uniforme."
+	Description "Ce sont les memes maillages dans le plan XY. On voit que la composante X (resp. Y) n'est pas remplie pour le dernier rang de mailles."
+	Description "Est-ce vraiment un probleme du switch? ou est-ce lie a visit (au plugin lata) ou encore a l'ecriture des latas...\\"
+	visu {
+                nb_img_without_newline 2
+		Description "Sauvegarde initiale du precurseur (black) versus refine_varDZ (color)"
+		Normal3d 0 0 1
+		Up3D 0 1 0
+		zoom3D 0 0 1.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector refine_varDZ_wall.sauv.lata DOM_NEW_dual VELOCITY FACES 0.2
+		mesh precurseur_wall.sauv.lata DOM_dual black
+		mesh refine_varDZ_wall.sauv.lata DOM_NEW_dual red
+		Operator_to_all slice2D_z 0. 0. 1.5e-3 
+		width 7.5cm
+	}
+	visu {
+		Description "Autre plan (XZ)"
+		Normal3d 0 -1 0
+		Up3D 0 0 1
+		zoom3D 0 1. 0.
+                BlackVector precurseur_wall.sauv.lata DOM_dual VELOCITY FACES 0.2
+                vector refine_varDZ_wall.sauv.lata DOM_NEW_dual VELOCITY FACES 0.2
+		mesh precurseur_wall.sauv.lata DOM_dual black
+		mesh refine_varDZ_wall.sauv.lata DOM_NEW_dual red
+		Operator_to_all slice2D_y 0. 1.5e-3  0.
+		width 7.5cm
+	}
+}

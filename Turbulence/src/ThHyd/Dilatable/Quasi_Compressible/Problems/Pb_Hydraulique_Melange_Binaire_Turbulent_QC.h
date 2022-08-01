@@ -15,8 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Pb_Hydraulique_Melange_Binaire_Turbulent_QC.h
-// Directory:   $TRUST_ROOT/src/ThHyd/Quasi_Compressible
-// Version:     /main/11
+// Directory:   $TURBULENCE_ROOT/src/ThHyd/Dilatable/Quasi_Compressible/Problems
 //
 //////////////////////////////////////////////////////////////////////////////
 
@@ -46,11 +45,11 @@ class Pb_Hydraulique_Melange_Binaire_Turbulent_QC : public Pb_QC_base, public Pb
   Declare_instanciable(Pb_Hydraulique_Melange_Binaire_Turbulent_QC);
 
 public:
-  int verifier();
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const ;
-  Equation_base& equation(int);
-  virtual int expression_predefini(const Motcle& motlu, Nom& expression);
+  int verifier() override;
+  int nombre_d_equations() const override;
+  const Equation_base& equation(int) const override ;
+  Equation_base& equation(int) override;
+  int expression_predefini(const Motcle& motlu, Nom& expression) override;
   inline const Champ_Fonc& viscosite_turbulente() const { return eq_hydraulique.viscosite_turbulente(); }
 
 protected:

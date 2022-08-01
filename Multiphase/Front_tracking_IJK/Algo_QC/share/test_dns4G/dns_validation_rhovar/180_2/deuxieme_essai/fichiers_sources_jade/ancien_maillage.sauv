@@ -1,0 +1,9 @@
+{
+  tinit 9.99
+  terme_acceleration_init 0.
+  p_thermo_init 214072.0
+  fichier_reprise_vitesse  180-2_ijk_swapped.lata
+  fichier_reprise_rho 180-2_ijk_swapped.lata
+  timestep_reprise_vitesse 1
+  timestep_reprise_rho 1
+}

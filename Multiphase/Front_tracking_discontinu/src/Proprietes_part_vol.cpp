@@ -23,8 +23,8 @@
 #include <Proprietes_part_vol.h>
 #include <EFichier.h>
 #include <Motcle.h>
-#include <DoubleVect.h>
-#include <ArrOfIntFT.h>
+#include <TRUSTVect.h>
+#include <TRUSTTabFT.h>
 #include <Param.h>
 
 Implemente_instanciable_sans_constructeur(Proprietes_part_vol,"Proprietes_part_vol",Objet_U);
@@ -151,7 +151,7 @@ void Proprietes_part_vol::completer()
 }
 
 //Methode qui permet a un objet exterieur de modifier la valeur de nb_particules_
-void Proprietes_part_vol::fixer_nb_particules(const int& nb_part)
+void Proprietes_part_vol::fixer_nb_particules(const int nb_part)
 {
   nb_particules_ = nb_part;
 }
@@ -261,7 +261,7 @@ void Proprietes_part_vol::lire_distribution(Entree& is)
   for (int j=0; j<dim; j++)
     {
       for (int i=0; i<nb_particules_; i++)
-        vitesse_p_(i,j) = vitesse(j);
+        vitesse_p_(i,j) = vitesse[j];
     }
 
   for (int i=0; i<nb_particules_; i++)

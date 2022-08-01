@@ -1,0 +1,56 @@
+INFO : -- Help --
+
+NAME
+    genererCourbes.py
+
+SYNOPSIS
+    python genererCourbes.py [OPTIONS]
+
+DESCRIPTION
+    Tool used to generate a validation report from TRUST simulation and reference curves.
+
+    The options are:
+            -p parameters.file
+            --parameters=parameters.file
+                    to give le path of the parameters file. The format of this file is describer using the -f option.
+
+    Other possible options are:
+            -o
+            --output
+                    to specify a output file path (default: rapport.pdf)
+            -h
+            --help
+                    to show this message
+
+            -v N
+            --verbose=N
+                    to set the verbosity level. The higher N is, the more talkative the script is.
+                    Default is 0.
+
+            -f
+            --format
+                    to show the parameters file description.
+
+            --get_cmd_to_run=yes
+                    to show command lines to execute to run cases
+            --get_cmd_to_run=post_run
+                    to show command lines to execute to run post_run
+
+            --debug_figure=n
+                    to debug the figure n (-1 all figures, text ou -2 only tex)
+
+            --compare=old_path
+                    to generate a rapport including the courbes of the old_path
+
+            --DEBOG
+                    to generate a rapport including the courbes from parallel calculation
+
+SEE ALSO
+    NA.
+
+BUGS
+    No known bug today...
+
+TODO
+    Certainly some things.
+

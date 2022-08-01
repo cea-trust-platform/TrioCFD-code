@@ -1,0 +1,383 @@
+//TRUST_NO_INDENT
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : OpCentre4IJK.cpp
+// Directory : $IJK_ROOT/src/IJK/OpVDF
+//
+/////////////////////////////////////////////////////////////////////////////
+//#include <Op_Conv_centre4_VDF_Face_IJK.h>
+#include <OpCentre4IJK.h>
+#include <stat_counters.h>
+
+inline void calcul_g(const double& dxam, const double& dx, const double& dxav, double& g1, double& g2, double& g3, double& g4)
+{
+  g1 = -dx*dx*(dx/2+dxav)/(4*(dx+dxam+dxav)*(dx+dxam)*dxam);
+  g2 =  (dx+2*dxam)*(dx+2*dxav)/(8*dxam*(dx+dxav));
+  g3 =  (dx+2*dxam)*(dx+2*dxav)/(8*dxav*(dx+dxam));
+  g4 = -dx*dx*(dx/2+dxam)/(4*(dx+dxam+dxav)*dxav*(dx+dxav));  
+}
+#Pinclude(IJ_LOOP_P)
+
+#Pmacro DEFMACRO(ST)
+
+
+// g contains one line per flux computed in the z direction. 
+// The first flux at index 0 is juste before the first face owned by the processor.
+// offset is the index in the global mesh of the first element on this processor in direction z
+// istart, iend: index of the first and last fluxes computed with 4-th order, others are 2-nd order.
+// is_z_component: shall we compute coefficients for interpolation for velocity_z or for velocity_x and velocity_y ?
+// delta_z is the size of the cells on this processor, we need 2 ghost cells
+static void fill_g_compo(DoubleTab & g, int nb_values, int offset, 
+			 int istart, int iend,
+			 const ArrOfDouble_with_ghost & delta_z, bool is_z_component)
+{
+  g.resize(nb_values, 4);
+  for (int i = 0; i < nb_values; i++) {
+    if (i + offset < istart || i + offset > iend) {
+      // We are in the wall or in the first layer: degenerate coefficients for 2nd order interpolation
+      g(i,0) = 0.;
+      g(i,1) = 0.5;
+      g(i,2) = 0.5;
+      g(i,3) = 0.;
+    } else {
+      double d1, d2, d3;
+      if (is_z_component) {
+	// Filtering coefficients for faces oriented in z: interval between faces is the cell size
+	d1 = delta_z[i-2];
+	d2 = delta_z[i-1];
+	d3 = delta_z[i];
+      } else {
+	// Filtering coefficients for faces oriented in x or y: interval between centers of faces is this:
+	d1 = (delta_z[i-2] + delta_z[i-1]) * 0.5;
+	d2 = (delta_z[i-1] + delta_z[i]) * 0.5;
+	d3 = (delta_z[i]   + delta_z[i+1]) * 0.5;
+      }
+      calcul_g(d1, d2, d3, g(i,0), g(i,1), g(i,2), g(i,3));
+    }
+  }
+}
+
+void OpConvCentre4IJK_ST::initialize(const IJK_Splitting & splitting)
+{
+  channel_data_.initialize(splitting);
+
+  {
+    perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
+    // Fill 4-th order filtering coefficients for z direction:
+    const int nb_xfaces = splitting.get_nb_faces_local(0 /* for component x */, 2 /* in direction z */);
+    const int nb_zfaces = splitting.get_nb_faces_local(2 /* for component z */, 2 /* in direction z */);
+    // number of flux values computed on this processor in direction k
+    // equals the number of faces owned by the processor, plus 1
+
+    const int offset_to_global_k_layer = channel_data_.offset_to_global_k_layer();
+    const ArrOfDouble_with_ghost & delta_z = channel_data_.get_delta_z();
+
+    // first flux computed with 4th order is 1 layer after the first non zero flux, after the wall.
+    // SPECIFIC FOR CHANNEL WITH WALLS IN K DIRECTION !
+    int istart, iend;
+    istart = channel_data_.first_global_k_layer_flux(0 /* compo */, 2 /* dir */) + 1;
+    iend = channel_data_.last_global_k_layer_flux(0 /* compo */, 2 /* dir */) - 1;
+    fill_g_compo(g_compo_xy_dir_z_, nb_xfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, false);
+
+    istart = channel_data_.first_global_k_layer_flux(2 /* compo */, 2 /* dir */) + 1;
+    iend = channel_data_.last_global_k_layer_flux(2 /* compo */, 2 /* dir */) - 1;
+    fill_g_compo(g_compo_z_dir_z_, nb_zfaces + 1, offset_to_global_k_layer, istart, iend, delta_z, true);
+  }
+}
+
+void OpConvCentre4IJK_ST::calculer(const IJK_Field_ST & inputx, const IJK_Field_ST & inputy, const IJK_Field_ST & inputz, 
+				   const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+				   IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &inputx;
+  inputy_ = &inputy;
+  inputz_ = &inputz;
+  div_rho_u_ = 0;
+
+  compute_set(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+    statistiques().end_count(convection_counter_);
+  
+}
+
+void OpConvCentre4IJK_ST::ajouter(const IJK_Field_ST & inputx, const IJK_Field_ST & inputy, const IJK_Field_ST & inputz, 
+				  const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+				  IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &inputx;
+  inputy_ = &inputy;
+  inputz_ = &inputz;
+  div_rho_u_ = 0;
+
+  compute_add(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+    statistiques().end_count(convection_counter_);
+  
+}
+
+// Calcule, sur la couche k_layer de mailles, l'integrale sur la maille de div(rho_v)
+// On calcule une epaisseur de mailles ghost a gauche dans les directions i et j
+// (pour calcul de div(rhou) aux faces)
+// On suppose que c'est periodique en i en j
+static void calculer_div_rhou(const IJK_Field_ST & rhovx, const IJK_Field_ST & rhovy, const IJK_Field_ST & rhovz,
+			      IJK_Field_ST & resu, int k_layer, const Operateur_IJK_data_channel & channel)
+{
+  statistiques().begin_count(convection_counter_);
+
+  const ST surface_x = channel.get_delta_y() * channel.get_delta_z()[k_layer];
+  const ST surface_y = channel.get_delta_x() * channel.get_delta_z()[k_layer];
+  const ST surface_z = channel.get_delta_x() * channel.get_delta_y();
+  const int ni = resu.ni();
+  const int nj = resu.nj();
+  // codage simple, non vectorise:
+  for (int j = -1; j < nj; j++)
+    for (int i = -1; i < ni; i++) {
+      ST divergence = 
+	(rhovx(i+1,j,k_layer) - rhovx(i,j,k_layer)) * surface_x
+	+ (rhovy(i,j+1,k_layer) - rhovy(i,j,k_layer)) * surface_y
+	+ (rhovz(i,j,k_layer+1) - rhovz(i,j,k_layer)) * surface_z;
+      resu(i,j,k_layer) = divergence;
+    }
+      statistiques().end_count(convection_counter_);
+    
+}
+
+void OpConvCentre4IJK_ST::calculer_avec_u_div_rhou(const IJK_Field_ST & rhovx, const IJK_Field_ST & rhovy, const IJK_Field_ST & rhovz, 
+						   const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+						   IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz,
+						   IJK_Field_ST & div_rho_u)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &rhovx;
+  inputy_ = &rhovy;
+  inputz_ = &rhovz;
+  div_rho_u_ = &div_rho_u;
+  last_computed_klayer_for_div_rhou_ = -1;
+  calculer_div_rhou(*inputx_, *inputy_, *inputz_, *div_rho_u_, -1, channel_data_);
+
+  compute_set(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  div_rho_u_ = 0;
+    statistiques().end_count(convection_counter_);
+  
+}
+
+void OpConvCentre4IJK_ST::ajouter_avec_u_div_rhou(const IJK_Field_ST & rhovx, const IJK_Field_ST & rhovy, const IJK_Field_ST & rhovz, 
+						  const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+						  IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz,
+						  IJK_Field_ST & div_rho_u)
+{
+  statistiques().begin_count(convection_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  inputx_ = &rhovx;
+  inputy_ = &rhovy;
+  inputz_ = &rhovz;
+  div_rho_u_ = &div_rho_u;
+  last_computed_klayer_for_div_rhou_ = -1;
+  calculer_div_rhou(*inputx_, *inputy_, *inputz_, *div_rho_u_, -1, channel_data_);
+
+  compute_add(dvx, dvy, dvz);
+
+  vx_ = vy_ = vz_ = inputx_ = inputy_ = inputz_ = 0;
+  div_rho_u_ = 0;
+    statistiques().end_count(convection_counter_);
+  
+}
+
+
+#Pforeach _DIR_ (x y z)
+// Methode appelee a chaque couche de vitesses calculees, apres le calcul de la divergence du flux
+//  div(u x rho_u) pour la composante _DIR_ de vitesse, par Operateur_IJK_faces_base_ST::compute_
+// On ajoute ici u * div(rho_u) si c'est necessaire
+void OpConvCentre4IJK_ST::exec_after_divergence_flux__DIR_(IJK_Field_ST & resu, const int k_layer)
+{
+  if (div_rho_u_ == 0)
+    return;
+
+#Pif ("_DIR_"=="z")
+
+  const int global_k_layer = k_layer + channel_data_.offset_to_global_k_layer();
+  // global index of the layer of flux of the wall
+  //  (assume one walls at zmin and zmax)
+  const int first_global_k_layer = 0;
+  const int last_global_k_layer = resu.get_splitting().get_nb_items_global(IJK_Splitting::FACES_K, DIRECTION_K) - 1;
+
+  if (!perio_k_ && (global_k_layer <= first_global_k_layer || global_k_layer >= last_global_k_layer)) {
+    return; // pas de calcul pour les faces en paroi (de toutes facons, v=0)
+  }
+#Pendif
+
+  // Calcul de div(rho_u) sur la couche, si besoin
+  if (last_computed_klayer_for_div_rhou_ < k_layer) {
+    // Il faut calculer une couche de div_rhou:
+    calculer_div_rhou(*inputx_, *inputy_, *inputz_, *div_rho_u_, k_layer, channel_data_);
+    last_computed_klayer_for_div_rhou_ = k_layer;
+  }
+  ConstIJK_ST_ptr vitesse(*v_DIR__, 0, 0, k_layer);
+  ConstIJK_ST_ptr div_rhou(*div_rho_u_, 0, 0, k_layer);
+  IJK_ST_ptr resu_ptr(resu, 0, 0, k_layer);
+
+#Pmacro KERNEL_FLUX(__TYPE__)
+  __TYPE__ v, x_left, x_right;
+  vitesse.get_center(i, v);
+  // on prend div(rho_u) dans les elements a gauche et a droite de la face
+  // rappel: l'element a gauche de la face i est a l'indice i-1
+  div_rhou.get_left_center__DIR_(i, x_left, x_right);
+  // calcul du produit vitesse * div(rho_u) 
+  // en prenant div(rho_u) sur le volume de controle de la face (c'est l'integrale de div(rho_u)
+  // qui est stocke, donc ici moyenne au sens volume fini)
+  __TYPE__ a;
+  resu_ptr.get_center(i, a);
+  a += (x_left + x_right) * 0.5 * v;
+  resu_ptr.put_val(i, a);
+#Pendmacro(KERNEL_FLUX)
+#Pmacro KERNEL_FLUX_NEXTJ()
+  // instructions to perform to jump to next row
+  vitesse.next_j();
+  div_rhou.next_j();
+  resu_ptr.next_j();
+#Pendmacro(KERNEL_FLUX_NEXTJ)
+  const int nx = resu.ni();
+  const int ny = resu.nj();
+#Pusemacro(IJ_LOOP)(ST,nx,ny,KERNEL_FLUX,KERNEL_FLUX_NEXTJ)  
+}
+#Pendforeach(_DIR_)
+
+#Pforeach DIR (x y z)
+#Pforeach COMPO (x y z)
+// Description: compute fluxes in direction DIR for velocity component COMPO
+//  for the layer of fluxes k_layer
+// 4-th order centered convection scheme
+void OpConvCentre4IJK_ST::compute_flux_DIR_vCOMPO(IJK_Field_local_ST & resu, const int k_layer)
+{
+  // convected field
+  const IJK_Field_local_ST & src = *inputCOMPO_;
+  // Convected vector field:
+  ConstIJK_ST_ptr src_ptr(src, 0, 0, k_layer);
+  // Velocity in DIR direction (convecting velocity)
+  ConstIJK_ST_ptr vconvDIR_ptr(*vDIR_, 0, 0, k_layer);
+
+#Pif ("DIR"=="x")
+  const int idir = 0;
+  const int nx = src.ni() + 1;
+  const int ny = src.nj();
+#Pelif ("DIR"=="y")
+  const int idir = 1;
+  const int nx = src.ni();
+  const int ny = src.nj() + 1;
+#Pelif ("DIR"=="z")
+  const int idir = 2;
+  const int nx = src.ni();
+  const int ny = src.nj();
+#Pendif
+#Pif ("COMPO"=="x")
+  const int icompo = 0;
+#Pelif ("COMPO"=="y")
+  const int icompo = 1;
+#Pelif ("COMPO"=="z")
+  const int icompo = 2;
+#Pendif
+
+  // Result (fluxes in direction DIR for component COMPO of the convected field)
+  IJK_ST_ptr resu_ptr(resu, 0, 0, 0);
+
+#Pmacro KERNEL_FLUX(__TYPE__)
+  // specific coding for uniform mesh in x and y: surfaces are constant on an xy plane
+  __TYPE__ vit_0_0,vit_0,vit_1,vit_1_1; // 4 adjacent velocity values
+  src_ptr.get_leftleft_left_center_right_DIR(i,vit_0_0,vit_0,vit_1,vit_1_1);
+  __TYPE__ order4_velocity = g1 * vit_0_0 + g2 * vit_0 + g3 * vit_1 + g4 * vit_1_1;
+
+  // get convecting velocity
+  __TYPE__ vconv0, vconv1;
+  vconvDIR_ptr.get_left_center_COMPO(i, vconv0, vconv1);
+  __TYPE__ psc = vconv0 * constant_factor0 + vconv1 * constant_factor1;
+  // with porosity we would code this: vconv = (vconv0 * porosity0 + vconv1 * porosity1) * constant_factor;
+  __TYPE__ flux_conv = order4_velocity * psc;
+
+  resu_ptr.put_val(i, flux_conv);
+#Pendmacro(KERNEL_FLUX)
+
+#Pmacro KERNEL_FLUX_NEXTJ()
+  // instructions to perform to jump to next row
+  src_ptr.next_j();
+  resu_ptr.next_j();
+  vconvDIR_ptr.next_j();
+#Pendmacro(KERNEL_FLUX_NEXTJ)
+
+  const int global_k_layer = k_layer + channel_data_.offset_to_global_k_layer();
+  // global index of the layer of flux of the wall
+  //  (assume one walls at zmin and zmax)
+  const int first_global_k_layer = channel_data_.first_global_k_layer_flux(icompo, idir);
+  const int last_global_k_layer = channel_data_.last_global_k_layer_flux(icompo, idir);
+
+  if (!perio_k_ && (global_k_layer <= first_global_k_layer || global_k_layer >= last_global_k_layer)) {
+    // We are in the wall
+    putzero(resu);
+    return;
+  }
+
+  // constant or variable coefficients depending on mesh. 
+  // second order degeneration is handeled here by setting appropriate coefficients:
+  ST g1, g2, g3, g4;
+  ST constant_factor0, constant_factor1;
+  // surface of left face will be multiplied by velocity of right face, and reversed...
+  channel_data_.get_surface_leftright(k_layer, icompo, idir, constant_factor1, constant_factor0);
+  constant_factor0 *= 0.5;
+  constant_factor1 *= 0.5;
+  
+  // Specific coding for uniform mesh in i and j, variable mesh in k,
+  //  periodic in i and j, walls at bottom and top of k
+#Pif("DIR"=="x" or "DIR"=="y")
+  // Uniform mesh periodic everywhere so no special case.
+  // We always have enough data for order 4:
+  g1 = g4 = -0.0625;
+  g2 = g3 = 0.5625;
+#Pelse
+  g1 = get_g(k_layer,icompo,idir,0);
+  g2 = get_g(k_layer,icompo,idir,1);
+  g3 = get_g(k_layer,icompo,idir,2);
+  g4 = get_g(k_layer,icompo,idir,3);
+#Pendif
+#Pusemacro(IJ_LOOP)(ST,nx,ny,KERNEL_FLUX,KERNEL_FLUX_NEXTJ)
+}
+
+#Pendforeach(COMPO)
+#Pendforeach(DIR)
+#Pendmacro(DEFMACRO)
+
+#Pusemacro(DEFMACRO)(double)
+

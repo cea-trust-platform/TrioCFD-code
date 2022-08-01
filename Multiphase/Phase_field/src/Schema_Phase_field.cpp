@@ -87,7 +87,7 @@ Entree& Schema_Phase_field::readOn(Entree& s)
 //    Ici : le max des deux schemas utilises.
 int Schema_Phase_field::nb_valeurs_temporelles() const
 {
-  return max(sch2.valeur().nb_valeurs_temporelles(),sch3.valeur().nb_valeurs_temporelles());
+  return std::max(sch2.valeur().nb_valeurs_temporelles(),sch3.valeur().nb_valeurs_temporelles());
 }
 
 // Description:
@@ -181,7 +181,7 @@ int Schema_Phase_field::mettre_a_jour()
 // Exception:
 // Effets de bord:
 // Postcondition:
-void Schema_Phase_field::changer_temps_courant(const double& t)
+void Schema_Phase_field::changer_temps_courant(const double t)
 {
   sch2.valeur().changer_temps_courant(t);
   sch3.valeur().changer_temps_courant(t);
@@ -296,7 +296,7 @@ bool Schema_Phase_field::corriger_dt_calcule(double& dt) const
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: int
+// Retour:
 //    Signification: retourne toujours 1
 //    Contraintes:
 // Exception:

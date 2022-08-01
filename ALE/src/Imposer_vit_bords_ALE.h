@@ -40,7 +40,7 @@ class Imposer_vit_bords_ALE : public Interprete_geometrique_base
 {
   Declare_instanciable(Imposer_vit_bords_ALE);
 public :
-  Entree& interpreter_(Entree&);
+  Entree& interpreter_(Entree&) override;
 };
 
 #endif

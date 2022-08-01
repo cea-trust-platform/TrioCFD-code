@@ -49,7 +49,7 @@ class Echange_contact_VDF_Zoom_grossier  : public Echange_contact_VDF_Zoom_base
   Declare_instanciable(Echange_contact_VDF_Zoom_grossier);
 
 public :
-  void mettre_a_jour(double ) ;
+  void mettre_a_jour(double ) override ;
 
 };
 

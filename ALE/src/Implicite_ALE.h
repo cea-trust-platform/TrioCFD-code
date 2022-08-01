@@ -25,8 +25,8 @@
 
 #include <Piso.h>
 #include <Equation_base.h>
-#include <DoubleTab.h>
-#include <DoubleTrav.h>
+#include <TRUSTTab.h>
+#include <TRUSTTrav.h>
 #include <Navier_Stokes_std.h>
 
 class Implicite_ALE: public Implicite
@@ -36,8 +36,8 @@ class Implicite_ALE: public Implicite
 
 public :
 
-  virtual void first_special_treatment(Equation_base&, Navier_Stokes_std& eqnNS, DoubleTab& current, double dt, DoubleTrav& resu);
-  virtual void second_special_treatment(Equation_base& eqn, DoubleTab& current, DoubleTrav& resu, Matrice_Morse& matrice);
+  void first_special_treatment(Equation_base&, Navier_Stokes_std& eqnNS, DoubleTab& current, double dt, DoubleTrav& resu) override;
+  void second_special_treatment(Equation_base& eqn, DoubleTab& current, DoubleTrav& resu, Matrice_Morse& matrice) override;
 
 };
 

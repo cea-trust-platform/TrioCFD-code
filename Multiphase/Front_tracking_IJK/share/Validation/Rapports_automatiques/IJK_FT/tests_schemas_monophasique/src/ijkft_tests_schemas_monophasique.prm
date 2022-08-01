@@ -1,0 +1,571 @@
+Parametres {
+	Titre "Validation monophasique des ordres de convergence :Schema en temps, operateur de convection et operateur de diffusion."
+	Description ""
+	Auteur "G.B."
+	CasTest PAR schema_temps_par8 8
+	CasTest PAR convection_par8 8
+	CasTest PAR diffusion_par8 8
+	CasTest COMPA diffusion_VDF_compa 1
+}
+
+Chapitre {
+	Titre "Schema temps"
+	Description "Les schemas euler_explicite et RK3_FT sont testes."
+	Description Validation du schema en temps.  <<EOF
+Un champ de vitesse uniforme (spatialement) est utilise. 
+L'equation de QdM est resolue sans convection, ni diffusion, mais avec un terme source $S=\rho a$
+tel que : 
+\latex_($$\frac{dS}{dt} = \rho (\cos t + \sin t)$$\latex_)
+Les conditions limites renseignees pour les frontieres haute et basse ne sont pas utilisee car 
+il n'y a pas d'operateur de diffusion.
+
+La solution analytique est : 
+\latex_($$U = 1.-(\cos(t)+\sin(t))$$\latex_)
+
+Sur les figures ci-dessous, on observe l'evolution de l'erreur en fonction du pas de temps. 
+Deux erreurs sont considerees : l'erreur au point $p=(0.02001 0.02001 0.02001)$ et 
+la norme L2 (standard deviation) evaluee a partir de la solution analytique fournie dans le jdd par : 
+\latex_($$e=\sqrt{\frac{1}{N_{tot}} \sum u_i^{ana} - u_i}$$\latex_) 
+Dans les 2 cas, elles sont evaluees a un temps final identique quel que soit le pas de temps utilise
+\latex_($(t_{fin}=2048 DT_{min} = 0.001953125*2048)$\latex_). 
+L'erreur ne depend pas de la position de la sonde dans ce cas. 
+
+La convergence est d'ordre 1 pour la methode euler_explicite et 3 pour le schema Runge Kutta
+(RK3_FT). 
+
+Ce cas test necessite/valide la prise en compte d'une terme source fonction du temps par un schema
+du meme ordre en temps que celui utilise pour la QdM (Cf Figure). Pour le RK3_FT, avec les pas de
+temps les plus petits, l'erreur atteint un palier qui s'explique peut-etre par la precision des
+valeurs utilisees.
+
+Pour ce cas test, les champs sont uniformes (spatialement), ce qui permet de s'affranchir de
+l'erreur de discretisation spatiale. Cette erreur est visible sur la
+derivee du terme source evaluee a partir de l'expression analytique fournie. 
+
+EOF
+
+	Figure {
+		Titre "Comparaison de la norme L2 de l'erreur en fonction du pas de temps (maillage n=4)."
+		Description "Ordre 1 pour l'euler_explicite, Ordre 3 pour le RK3_FT."
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "DT/0.001953125"
+		courbe {
+			fichier SCHEMA_TEMPS/cvgt_L2_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "EUL"
+		}
+        	Curve {
+			fichier SCHEMA_TEMPS/cvgt_L2_EUL.txt
+			colonnes ($1) (3.9e-03*$1**(1))
+			Legende "o1"
+	                Style lines
+        	}
+		courbe {
+			fichier SCHEMA_TEMPS/cvgt_L2_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "RK"
+		}
+        	Curve {
+			fichier SCHEMA_TEMPS/cvgt_L2_RK.txt
+			colonnes ($1) (3.9e-11*$1**(3))
+			Legende "o3"
+	                Style lines
+        	}
+	}
+	Figure {
+		Titre "Comparaison de l'erreur au point sonde en fonction du pas de temps (maillage n=4)."
+		Description "Ordre 1 pour l'euler_explicite, Ordre 3 pour le RK3_FT."
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "DT/0.001953125"
+		courbe {
+			fichier SCHEMA_TEMPS/cvgt_son_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "EUL"
+		}
+        	Curve {
+			fichier SCHEMA_TEMPS/cvgt_son_EUL.txt
+			colonnes ($1) (3.e-03*$1**(1))
+			Legende "o1"
+	                Style lines
+        	}
+		courbe {
+			fichier SCHEMA_TEMPS/cvgt_son_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "RK"
+		}
+        	Curve {
+			fichier SCHEMA_TEMPS/cvgt_son_RK.txt
+			colonnes ($1) (3.e-11*$1**(3))
+			Legende "o3"
+	                Style lines
+        	}
+	}
+	Figure {
+		Titre "Comparaison de l'erreur sur le terme source en fonction du pas de temps (maillage n=4)."
+		Description "Ordre 1 pour l'euler_explicite, Ordre 3 pour le RK3_FT."
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "DT/0.001953125"
+		courbe {
+			fichier SCHEMA_TEMPS/cvgt_acc_EUL.txt
+			colonnes ($1) ($6)
+			style points
+			Legende "EUL - rho*acc"
+		}
+		courbe {
+			fichier SCHEMA_TEMPS/cvgt_acc_RK.txt
+			colonnes ($1) ($6)
+			style points
+			Legende "RK - rho*acc"
+		}
+        	Curve {
+			fichier SCHEMA_TEMPS/cvgt_acc_EUL.txt
+			colonnes ($1) (0.198*$1**(1))
+			Legende "o1"
+	                Style lines
+        	}
+        	Curve {
+			fichier SCHEMA_TEMPS/cvgt_acc_RK.txt
+			colonnes ($1) (1.5e-08*$1**(3))
+			Legende "o3"
+	                Style lines
+        	}
+	}
+}
+
+Chapitre {
+	Titre "Convection"
+	Description "Les schemas de convection Quick et Centre4 sont testes. "
+	Description Validation du schema de convection.  <<EOF
+L'equation de QdM est resolue sans diffusion, ni terme source.
+Le champ de vitesse est a divergence nulle et verifie au cours du temps : 
+\latex_($$U = 0.01 (1.+2 \sin((Y+0.01 T) \omega))$$\latex_)
+avec la pulsation $\omega = 2\pi /L =98.17477042468103$.
+Les conditions limites renseignees pour les frontieres haute et basse ne sont pas utilisee car 
+il n'y a pas d'operateur de diffusion.
+
+Sur les figures ci-dessous, on observe l'evolution de l'erreur en fonction du pas d'espace. 
+Deux erreurs sont considerees : l'erreur au point $p\approx(0.0032001,
+0.01325001, 0.01245303125)$ 
+(sa position precise est lue dans le fichier sonde) et 
+la norme L2 (standard deviation) evaluee a partir de la solution analytique fournie dans le jdd par : 
+\latex_($$e=\sqrt{\frac{1}{N_{tot}} \sum u_i^{ana} - u_i}.$$\latex_) 
+La position de la sonde evolue avec le maillage et la composante de  vitesse observee. 
+La solution analytique est evaluee a la position ecrite dans le fichier sonde.
+Dans les 2 cas, elles sont evaluees a un temps final identique quel que soit le pas de temps utilise
+\latex_($(t_{fin}=2048 DT_{min} = 0.001953125*2048)$.\latex_)
+
+La convergence est d'ordre 1.5 et 2 pour les schemas Quick et Centre4.
+
+Sur la premiere figure (Norme L2), on constate que l'erreur stagne pour les 3 maillages les plus
+fins avec le schema Centre4 associe a euler_explicite. Cela s'explique par l'erreur de
+discretisation temporelle qui devient dominante lorsque la discretisation spatiale est fine. 
+
+Sur la seconde figure (point sonde), on constate que l'erreur locale peut diminuer a l'ordre 4 pour
+le schema Quick. L'erreur de discretisation temporelle
+devient dominante avec le schema en temps euler_explicite
+car Quick et Centre4 donnent la meme erreur sur maillage fin
+(Cf figure sonde). 
+EOF
+
+	Figure {
+		Titre "Comparaison de la norme L2 de l'erreur en fonction du pas du maillage."
+		Description "Ordre 1.5 pour le Quick et 2 pour Centre4." 
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "Norme L2 fonction de NX"
+		courbe {
+			fichier CONVECTION/QUICK/cvgx_L2_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - EUL"
+		}
+		courbe {
+			fichier CONVECTION/CENTRE4/cvgx_L2_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - EUL"
+		}
+		courbe {
+			fichier CONVECTION/QUICK/cvgx_L2_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - RK"
+		}
+		courbe {
+			fichier CONVECTION/CENTRE4/cvgx_L2_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - RK"
+		}
+        	Curve {
+			fichier CONVECTION/QUICK/cvgx_L2_RK.txt
+			colonnes ($1) (2.20918e-05*($1/8)**(-1.5))
+			Legende "o1.5"
+	                Style lines
+        	}
+        	Curve {
+			fichier CONVECTION/QUICK/cvgx_L2_RK.txt
+			colonnes ($1) (2.39984e-06*($1/8)**(-2))
+			Legende "o2"
+	                Style lines
+        	}
+	}
+	Figure {
+		Titre "Comparaison de l'erreur au point sonde en fonction du pas du maillage."
+		Description "Localement, ordre 4 pour le Quick et Ordre 2 pour Centre4."
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "abs(err) finale pour la sonde P fonction de NX (composante VX)"
+		courbe {
+			fichier CONVECTION/QUICK/cvgx_son_VX_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - EUL - VX"
+		}
+		courbe {
+			fichier CONVECTION/CENTRE4/cvgx_son_VX_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - EUL - VX"
+		}
+		courbe {
+			fichier CONVECTION/QUICK/cvgx_son_VX_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - RK - VX"
+		}
+		courbe {
+			fichier CONVECTION/CENTRE4/cvgx_son_VX_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - RK - VX"
+		}
+        	Curve {
+			fichier CONVECTION/QUICK/cvgx_son_VX_RK.txt
+			colonnes ($1) (2.6e-9*($1/128)**(-2))
+			Legende "o2"
+	                Style lines
+        	}
+        	Curve {
+			fichier CONVECTION/QUICK/cvgx_son_VX_RK.txt
+			colonnes ($1) (1.e-8*($1/128)**(-4))
+			Legende "o4"
+	                Style lines
+        	}
+	}
+	Figure {
+		Titre "Comparaison de l'erreur au point sonde en fonction du pas du maillage."
+		Description "On devrait avoir localement, ordre 4 pour le Quick et Ordre 2 pour Centre4."
+		Description "Mais pour l'instant, la compo VY est triviale =0.1 partout... donc erreur=0"
+		LogX
+#		LogY
+		incluredesccourbes 0
+		labelX  "abs(err) finale pour la sonde P fonction de NX (composante VY)"
+		courbe {
+			fichier CONVECTION/QUICK/cvgx_son_VY_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - EUL - VY"
+		}
+		courbe {
+			fichier CONVECTION/CENTRE4/cvgx_son_VY_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - EUL - VY"
+		}
+		courbe {
+			fichier CONVECTION/QUICK/cvgx_son_VY_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - RK - VY"
+		}
+		courbe {
+			fichier CONVECTION/CENTRE4/cvgx_son_VY_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - RK - VY"
+		}
+	}
+
+	Description Verification dans la direction z.  <<EOF
+La solution precedente est transformee en inversant x et z.
+
+Sur les figures ci-dessous, on observe l'evolution de l'erreur en fonction du pas d'espace. 
+Deux erreurs sont considerees : l'erreur au point $p\approx(0.01245303125, 0.01325001, 0.0032001)$ 
+(sa position precise est lue dans le fichier sonde) et 
+la norme L2 (standard deviation) evaluee a partir de la solution analytique fournie dans le jdd par : 
+\latex_($$e=\sqrt{\frac{1}{N_{tot}} \sum u_i^{ana} - u_i}.$$\latex_) 
+La position de la sonde evolue avec le maillage et la composante de vitesse observee. 
+La solution analytique est evaluee a la position ecrite dans le fichier sonde.
+Dans les 2 cas, elles sont evaluees a un temps final identique quel que soit le pas de temps utilise
+\latex_($(t_{fin}=2048 DT_{min} = 0.001953125*2048)$.\latex_)
+
+On retrouve les ordres des 1.5 et 2, surtout tres clairement sur la norme L2.  
+EOF
+
+	Figure {
+		Titre "Comparaison de la norme L2 de l'erreur en fonction du pas du maillage (DIR Z)."
+		Description "Ordre 1.5 pour le Quick et 2 pour Centre4." 
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "Norme L2 fonction de NX"
+		courbe {
+			fichier CONVECTIONZ/QUICK/cvgx_L2_EUL.txt
+			colonnes ($1) ($5)
+			style points
+			Legende "Quick - EUL"
+		}
+		courbe {
+			fichier CONVECTIONZ/CENTRE4/cvgx_L2_EUL.txt
+			colonnes ($1) ($5)
+			style points
+			Legende "Centre4 - EUL"
+		}
+		courbe {
+			fichier CONVECTIONZ/QUICK/cvgx_L2_RK.txt
+			colonnes ($1) ($5)
+			style points
+			Legende "Quick - RK"
+		}
+		courbe {
+			fichier CONVECTIONZ/CENTRE4/cvgx_L2_RK.txt
+			colonnes ($1) ($5)
+			style points
+			Legende "Centre4 - RK"
+		}
+        	Curve {
+			fichier CONVECTIONZ/QUICK/cvgx_L2_RK.txt
+			colonnes ($1) (2.20918e-05*($1/8)**(-1.5))
+			Legende "o1.5"
+	                Style lines
+        	}
+        	Curve {
+			fichier CONVECTIONZ/QUICK/cvgx_L2_RK.txt
+			colonnes ($1) (2.39984e-06*($1/8)**(-2))
+			Legende "o2"
+	                Style lines
+        	}
+	}
+	Figure {
+		Titre "Comparaison de l'erreur au point sonde en fonction du pas du maillage (DIR Z)."
+		Description "Localement, ordre 4 pour le Quick et Ordre 2 pour Centre4."
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "abs(err) finale pour la sonde P fonction de NX (composante VZ)"
+		courbe {
+			fichier CONVECTIONZ/QUICK/cvgx_son_VZ_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - EUL - VZ"
+		}
+		courbe {
+			fichier CONVECTIONZ/CENTRE4/cvgx_son_VZ_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - EUL - VZ"
+		}
+		courbe {
+			fichier CONVECTIONZ/QUICK/cvgx_son_VZ_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Quick - RK - VZ"
+		}
+		courbe {
+			fichier CONVECTIONZ/CENTRE4/cvgx_son_VZ_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "Centre4 - RK - VZ"
+		}
+        	Curve {
+			fichier CONVECTIONZ/QUICK/cvgx_son_VZ_RK.txt
+			colonnes ($1) (2.6e-9*($1/128)**(-2))
+			Legende "o2"
+	                Style lines
+        	}
+        	Curve {
+			fichier CONVECTIONZ/QUICK/cvgx_son_VZ_RK.txt
+			colonnes ($1) (1.e-8*($1/128)**(-4))
+			Legende "o4"
+	                Style lines
+        	}
+	}
+}
+Chapitre {
+	Titre "Diffusion"
+	Description "Le schema de diffusion est teste. "
+	Description Validation du schema en temps.  <<EOF
+L'equation de QdM est resolue sans convection, ni terme source.
+Il n'y a pas de solveur de poisson, ni de verification de la divergence de la vitesse. 
+Des conditions limites de symetrie sont imposees en haut et en bas du domaine. 
+Le champ de vitesse est a divergence nulle et verifie au cours du temps : 
+\latex_($$u=2. \times 0.001 \cos(x \omega+\phi) \cos(y \omega+\psi) \exp(-4 \pi^2 (2/L_x^2) \nu T)$$\latex_)
+avec la pulsation $\omega = 2\pi /L =98.17477042468103$, $\phi= acos(0.5)-pi/2 = -0.5235987755982987$ et 
+$\psi=acos(0.5)-pi/4 = 0.2617993877991496$
+
+\latex_($$v=2. \times 0.001 \sin(x \omega+\phi) \sin(y \omega+\psi) \exp(-4 \pi^2 (2/L_x^2) \nu T)$$\latex_)
+
+Sur les figures ci-dessous, on observe l'evolution de l'erreur en fonction du pas d'espace. 
+Deux erreurs sont considerees : l'erreur au point $p\approx(0.008, 0.016, 0.01245303125)$ et 
+la norme L2 (standard deviation) evaluee a partir de la solution analytique fournie dans le jdd par : 
+\latex_($$e=\sqrt{\frac{1}{N_{tot}} \sum u_i^{ana} - u_i}.$$\latex_) 
+La position de la sonde evolue avec le maillage et la composante de  vitesse observee. 
+La solution analytique est evaluee a la position ecrite dans le fichier sonde.
+Dans les 2 cas, elles sont evaluees a un temps final identique quel que soit le pas de temps utilise
+\latex_($(t_{fin}=512 DT_{min} = 0.01*512)$\latex_)
+
+Le schema converge a l'ordre 2 (sur la vitesse). D'apres Adrien T., c'est 4 pour les flux aux faces. 
+Ce dernier cas est aussi evalue avec trio_U standard. La convergence est au meme ordre (2).  
+
+EOF
+	Figure {
+		Titre "Comparaison de la norme L2 de l'erreur en fonction du pas du maillage."
+		Description "Ordre 2 " 
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "Norme L2 fonction de NX"
+		courbe {
+			fichier DIFFUSION/OpDiffIJK/cvgx_L2_EUL.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "OpDiffIJK - EUL"
+		}
+		courbe {
+			fichier DIFFUSION/OpDiffIJK/cvgx_L2_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "OpDiffIJK - RK"
+		}
+        	Curve {
+			fichier DIFFUSION/OpDiffIJK/cvgx_L2_RK.txt
+			colonnes ($1) (4.5065e-06*($1/8)**(-2))
+			Legende "o2"
+	                Style lines
+        	}
+	}
+	Figure {
+		Titre "Comparaison de l'erreur au point sonde en fonction du pas du maillage."
+		Description "Localement, ordre 2 ."
+		LogX
+		LogY
+		incluredesccourbes 0
+		labelX  "abs(err) finale pour la sonde P fonction de NX"
+		courbe {
+			fichier DIFFUSION/OpDiffIJK/cvgx_son_VX_EUL.txt
+			colonnes ($1) ($3)
+			style linespoints
+			Legende "OpDiffIJK - EUL"
+		}
+		courbe {
+			fichier DIFFUSION/OpDiffIJK/cvgx_son_VX_RK.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "OpDiffIJK - RK"
+		}
+		courbe {
+			fichier DIFFUSION/OpDiffIJK/cvgx_son_VX_VDF.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "OpDiffIJK - VDF"
+		}
+		courbe {
+			fichier DIFFUSION/OpDiffIJK/cvgx_son_VY_VDF.txt
+			colonnes ($1) ($3)
+			style points
+			Legende "OpDiffIJK - VDF - Composante VY"
+		}
+        	Curve {
+			fichier DIFFUSION/OpDiffIJK/cvgx_L2_RK.txt
+			colonnes ($1) (7.73871e-06*($1/8)**(-2))
+			Legende "o2"
+	                Style lines
+        	}
+	}
+
+
+}
+
+Chapitre {
+	Titre "Comparaison diffusion VDF / IJK"
+	
+	Description "METTRE le tableau des ecarts."
+}
+
+Chapitre {
+	Titre "Calculs paralleles"
+	Description "Verifier que l'erreur est la meme qu'en sequentiel sur un maillage. " <<EOF
+Pour Schema_temps, la palette de couleur doit etre en 1e-10 environ et l'erreur doit donc etre quasi-nulle
+partout.
+Mettre un tableau. 
+EOF
+	visu {
+		titre "Schema temps : Vitesse finale (par8)"
+		cycles -1
+		pseudocolor PAR/schema_temps_par8.lata DOM_dual VELOCITY_X FACES
+	}
+	visu {
+		titre "Schema_temps : Etat final ecart a la solution analytique (seq)"
+		cycles -1
+		pseudocolor SCHEMA_TEMPS/DT_EUL_64/lata/schema_temps.lata DOM_dual ECART_ANA_X FACES
+	}
+	visu {
+		titre "Schema temps : Etat final ecart a la solution analytique (par8)"
+		cycles -1
+		pseudocolor PAR/schema_temps_par8.lata DOM_dual ECART_ANA_X FACES
+	}
+	visu {
+		titre "Convection : Vitesse finale X (par8)"
+		cycles -1
+		pseudocolor PAR/convection_par8.lata DOM_dual VELOCITY_X FACES
+	}
+	visu {
+		titre "Convection : Etat final ecart a la solution analytique (seq)"
+		cycles -1
+		pseudocolor CONVECTION/CENTRE4/DX_EUL_64/lata/convection.lata DOM_dual ECART_ANA_X FACES
+	}
+	visu {
+		titre "Convection : Etat final ecart a la solution analytique (par8)"
+		cycles -1
+		pseudocolor PAR/convection_par8.lata DOM_dual ECART_ANA_X FACES
+	}
+	visu {
+		titre "Diffusion : Vitesse finale X (par8)"
+		cycles -1
+		pseudocolor PAR/diffusion_par8.lata DOM_dual VELOCITY_X FACES
+	}
+	visu {
+		titre "Diffusion : Etat final ecart a la solution analytique (seq)"
+		cycles -1
+		pseudocolor DIFFUSION/OpDiffIJK/DX_EUL_64/lata/diffusion.lata DOM_dual ECART_ANA_X FACES
+	}
+	visu {
+		titre "Diffusion : Etat final ecart a la solution analytique (par8)"
+		cycles -1
+		pseudocolor PAR/diffusion_par8.lata DOM_dual ECART_ANA_X FACES
+	}
+}
+
+Chapitre { 
+	Titre "Perspective de complement pour la fiche"
+	Description "Diagonaliser les solutions convection et diffusion avec un pas DX != DY." <<EOF
+
+Mettre tableau pour compa SEQ / PAR .
+
+Mettre tableau pour compa VDF / IJK sur diffusion.
+
+EOF
+}

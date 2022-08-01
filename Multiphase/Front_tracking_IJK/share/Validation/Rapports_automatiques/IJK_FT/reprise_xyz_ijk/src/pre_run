@@ -1,0 +1,6 @@
+#!/bin/bash
+
+jdd=${1:4}
+if [ ${jdd::15} == "reprise_TrioCFD" ] && [ ! -f $1.data ] ; then 
+   make_PAR.data $jdd.data
+fi

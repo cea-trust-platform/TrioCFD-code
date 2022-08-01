@@ -1,0 +1,34 @@
+\input{\orig/PREAMBULE/raccourcis}
+
+\begin{align}
+| f(x;t) | = 2 cos(\k x - \o t)
+\end{align}
+
+Avec $\k = 2 n \pi / L$ pour $n$ périodes sur le domaine et $\o = 2 \pi / q$  pour translater $F$ d'une distance $L$ en $q$ secondes.
+
+{\color{red} Sans convection, sans diffusion, sans gravité, avec pression}
+\begin{align}
+ &\bm{f}(x;t)  = 2 cos(\k x - \o t) \bm{e_x} \\
+ &\p_t \bm{u} = - \frac{1}{\r} \bm{\nabla} p + \bm{f} \\
+  &\bm{ \nabla \cdot u } = 0 \\
+ &\Rightarrow \p_t u_x = - \frac{1}{\r} \p_x p + f_x \\
+ &\Rightarrow \D p = \r \nabla \cdot f \\
+ &\Rightarrow \p_{xx} p = - 2 \k \r sin(\k x - \o t) \\
+ &\Rightarrow p(x;t) = 2 \frac{\r}{\k} sin(\k x - \o t) \text{ et } u(x;t) = 0 
+\end{align}
+
+\tb{Application numérique} : $\r = 1000$; $\k = \frac{4 \pi}{L}$; $L = 4 \cdot 10^{-3}$ : $\frac{\r}{\k} = 0.3183098861837907$.
+ 
+\begin{align}
+&\bm{f}(x;t) = 2 cos(\k x - \o t) \bm{e_y} \\
+ &\p_t \bm{u} = - \frac{1}{\r} \bm{\nabla} p + \bm{f} \\
+ &\bm{ \nabla \cdot u } = 0 \\
+ &\Rightarrow  \p_t u_y = - \frac{1}{\r} \p_y p + f_y \\
+ &\Rightarrow \p_t u_y = 2 cos(\k x - \o t) \\
+ &\Rightarrow u_y = - 2 \frac{1}{\o} sin(\k x - \o t) \text{ et } p(x;t) = 0 \\
+ &u_y = - 2 \frac{1}{\o} sin(\k x - \o t)  \cdot sin(2 \pi t)\\
+ \mc{F} \tru
+\end{align}
+
+\tb{Application numérique} : $\o = 4 \pi$ : $\frac{1}{\o} = 0.07957747154594767$.
+ 

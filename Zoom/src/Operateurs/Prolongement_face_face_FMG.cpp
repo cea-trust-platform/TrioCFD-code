@@ -115,7 +115,7 @@ void Prolongement_face_face_FMG::prolonger(Zone_VF& zone_VFG,
                   det = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1)) * (som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0)) - (cg_face_fine(i,0)-som_gros(faces_som(j,0),0)) * (som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
 
 
-                  if(fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
+                  if(std::fabs(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0))<epsilon)
                     {
                       sign = (cg_face_fine(i,1)-som_gros(faces_som(j,0),1))/(som_gros(faces_som(j,1),1)-som_gros(faces_som(j,0),1));
                     }
@@ -124,7 +124,7 @@ void Prolongement_face_face_FMG::prolonger(Zone_VF& zone_VFG,
                       sign = (cg_face_fine(i,0)-som_gros(faces_som(j,0),0))/(som_gros(faces_som(j,1),0)-som_gros(faces_som(j,0),0));
                     }
                   ///////////
-                  if (fabs(det) < epsilon  &&  sign >0  && sign <1)
+                  if (std::fabs(det) < epsilon  &&  sign >0  && sign <1)
                     {
                       //on met directement la valG dans la valF
                       if (nb_compo == 1)

@@ -200,7 +200,7 @@ bool Schema_Euler_Implicite_Stationnaire::corriger_dt_calcule(double& dt_calc) c
       imprimer_ram_totale();
     }
   // Compute the time step dt as the minimal value between dt_max_ and stability time step (dt_stab) * security factor (facsec)
-  double dt = min (dt_max_, dt_stab_ * facsec_);
+  double dt = std::min (dt_max_, dt_stab_ * facsec_);
 
   //Definition d'un pas de temps global dans la procedure du pas de temps local
   if ( max_dt_locaux_ > 1.e-8 && nb_pas_dt_ >0)

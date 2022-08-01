@@ -1,0 +1,8 @@
+#!/bin/bash
+# ce script est execute avant de lire les cas tests
+
+mkdir -p FINE
+sed -e "s/48/96/g;s/nproc_k 1/nproc_k 3/g;s/nb_pas_dt_max .*/nb_pas_dt_max 30000/g;s/IJK_Grid_Geometry DOM/# PARALLEL ONLY 3 #\nIJK_Grid_Geometry DOM/g" canal_poiseuille.data > FINE/canal_poiseuille.data
+sed -e 's/(NR/0.5*(NR/g' post_run > FINE/post_run
+
+

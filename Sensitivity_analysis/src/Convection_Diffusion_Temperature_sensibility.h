@@ -38,11 +38,11 @@ class Convection_Diffusion_Temperature_sensibility : public Convection_Diffusion
   Declare_instanciable( Convection_Diffusion_Temperature_sensibility ) ;
 
 public :
-  void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle& mot, Entree& is);
+  void set_param(Param& param) override;
+  int lire_motcle_non_standard(const Motcle& mot, Entree& is) override;
   void associate_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
   void update_evaluator_field(const Nom& one_name_state_pb,const Motcle& one_name_state_field);
-  virtual  void mettre_a_jour(double temps);
+  void mettre_a_jour(double temps) override;
   const DoubleTab& get_velocity_state_field() const;
   const DoubleTab& get_temperature_state_field() const;
   const Champ_Inc_base& get_velocity_state() const;

@@ -24,8 +24,7 @@
 #define Maillage_FT_Disc_included
 
 #include <Ensemble_Lagrange_base.h>
-#include <ArrOfDoubleFT.h>
-#include <IntTabFT.h>
+#include <TRUSTTabFT.h>
 #include <Descripteur_FT.h>
 #include <Ref_Zone_dis.h>
 #include <Ref_Parcours_interface.h>
@@ -36,9 +35,9 @@ class Remaillage_FT;
 class Topologie_Maillage_FT;
 class Parcours_interface;
 class Maillage_Echange;
-class DoubleVect;
+#include <TRUSTTabs_forward.h>
 class Zone_VF;
-class IntTab;
+#include <TRUSTTabs_forward.h>
 class Maillage_FT_Disc_Data_Cache;
 Declare_deriv(Maillage_FT_Disc_Data_Cache); // Classe utilisee en interne;
 
@@ -58,8 +57,8 @@ public:
   //
   // Methodes reimplementees de Objet_U
   //
-  int reprendre(Entree&);
-  int sauvegarder(Sortie&) const;
+  int reprendre(Entree&) override;
+  int sauvegarder(Sortie&) const override;
   //
   // Nouvelles methodes
   //
@@ -67,7 +66,7 @@ public:
   virtual Entree& lire_param_maillage(Entree& is);
   virtual void ajouter_maillage(const Maillage_FT_Disc& maillage_tmp,int skip_facettes=0);
   virtual void recopie(const Maillage_FT_Disc& maillage_source, Statut_Maillage niveau_copie);
-  virtual const Equation_base& equation_associee() const;
+  const Equation_base& equation_associee() const override;
 
   // Proprietes pour le schema en temps...
   double temps() const;
@@ -104,7 +103,7 @@ public:
   int calculer_voisinage_facettes(IntTab& fa7Voisines,
                                   const Intersections_Elem_Facettes* ief=NULL) const;
 
-  void associer_equation_transport(const Equation_base& equation);
+  void associer_equation_transport(const Equation_base& equation) override;
   void associer_zone_dis_parcours(const Zone_dis& zone_dis, const Parcours_interface& parcours);
   Transport_Interfaces_FT_Disc& equation_transport();
   const Transport_Interfaces_FT_Disc& equation_transport() const;
@@ -127,7 +126,7 @@ public:
   void transporter_simple(const DoubleTab& deplacement);
   //Nettoyage des sommets virtuels et des sommets sur frontiere ouverte
   void nettoyer_noeuds_virtuels_et_frontieres();
-  void nettoyer_phase(const Nom& nom_eq, const int& phase);
+  void nettoyer_phase(const Nom& nom_eq, const int phase);
 
   void nettoyer_elements_virtuels();
   virtual void nettoyer_maillage();

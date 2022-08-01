@@ -1,0 +1,66 @@
+Parametres {
+	Titre "Test conservation du volume des bulles front-tracking en IJK"
+	Description ""
+	Auteur "B.M. and G.B."
+	CasTest . ijkft_conservation_volume.data 8
+	CasTest . ijkft_conservation_volume2.data 8
+}
+
+Chapitre {
+	Titre "Evolution du volume des bulles"
+	Description "On verifie qu'avec correction, courbes marquées yes, le volume est conservé à 1E-14 près avec 6 itérations de convergence pour la conservation du volume"
+
+	visu {
+		titre "Etat initial"
+		cycles 0
+		mesh        ijkft_conservation_volume.lata INTERFACES
+		pseudocolor ijkft_conservation_volume.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity ijkft_conservation_volume.lata DOM MU ELEM 0.1
+	}
+	visu {
+		titre "Etat final sans remaillage/correction"
+		cycles -1
+		mesh        ijkft_conservation_volume.lata INTERFACES
+		pseudocolor ijkft_conservation_volume.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity ijkft_conservation_volume.lata DOM MU ELEM 0.1
+	}
+	visu {
+		titre "Etat final avec remaillage/correction"
+		cycles -1
+		mesh        ijkft_conservation_volume2.lata INTERFACES
+		pseudocolor ijkft_conservation_volume2.lata INTERFACES COMPO_CONNEXE ELEM
+		pseudocolor_with_opacity ijkft_conservation_volume2.lata DOM MU ELEM 0.1
+	}
+#Pmacro FIGURE(_titre_,_fichier_)
+	figure {
+		titre _titre_	  
+		incluredesccourbes 0
+		labelX  "t"
+#Pif("_fichier_"=="dvolume")
+		logY
+		labelY "abs((vol(t) - vol(t=0) / vol(t=0))"
+#Pelse
+		  labelY "_fichier_"
+#Pendif
+#Pforeach _COL_(2 3 4 5)
+		Courbe {
+		   fichier ijkft_conservation_volume_bulles__fichier_.out
+		     colonnes ($1) (abs($_COL_)+1e-17)
+		     Legende "col_COL_ no"
+		}
+		Courbe {
+		   fichier ijkft_conservation_volume2_bulles__fichier_.out
+		     colonnes ($1) (abs($_COL_)+1e-17)
+		     Legende "col_COL_ yes"
+		     }
+#Pendforeach(_COL_)
+	}
+#Pendmacro(FIGURE)
+#Pusemacro(FIGURE)("Position des bulles en x",centre_x)
+#Pusemacro(FIGURE)("Position des bulles en y",centre_y)
+#Pusemacro(FIGURE)("Position des bulles en z",centre_z)
+#Pusemacro(FIGURE)("Surface des bulles",surface)
+#Pusemacro(FIGURE)("Volume des bulles",volume)
+#Pusemacro(FIGURE)("Variation de volume des bulles",dvolume)
+}
+

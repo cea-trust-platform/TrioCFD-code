@@ -1,0 +1,215 @@
+
+/****************************************************************************
+ * Copyright (c) 2015 - 2016, CEA
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *****************************************************************************/
+
+#include <IJK_switch_QC.h>
+
+#Pmacro DEFMACRO(STTT)
+
+Implemente_instanciable_sans_constructeur(Switch_QC_STTT, "Switch_QC_STTT", Switch_STTT);
+
+Switch_QC_STTT::Switch_QC_STTT() :
+      // Valeurs par defaut quelconques mais permettant la division...
+      Cp_gaz_(1.),
+      gamma_(2.),
+      temperature_paroi_min_(1.),
+      temperature_paroi_max_(1.),
+      P_thermodynamique_(0.),
+      constante_specifique_gaz_(0.)
+{}
+
+Sortie & Switch_QC_STTT::printOn(Sortie&s) const
+{
+  return s;
+}
+Entree & Switch_QC_STTT::readOn(Entree&s)
+{
+  return s;
+}
+
+void Switch_QC_STTT::set_param(Param& param)
+{
+  // Parametres pour le QC:
+  Switch_STTT::set_param(param);
+  param.ajouter("t_paroi_impose_kmin", &temperature_paroi_min_);
+  param.ajouter("t_paroi_impose_kmax", &temperature_paroi_max_);  
+  param.ajouter("cp", &Cp_gaz_);
+  param.ajouter("gamma", &gamma_);
+}
+
+void Switch_QC_STTT::set_param_reprise(Param& param)
+{
+  Switch_STTT::set_param_reprise(param);
+  param.ajouter("p_thermo_init", &P_thermodynamique_);
+  param.ajouter("fichier_reprise_rho", &fichier_old_rho_);
+  param.ajouter("timestep_reprise_rho", &timestep_reprise_rho_);
+}
+
+void Switch_QC_STTT::prepare_run()
+{
+  Switch_STTT::prepare_run();
+  
+  // CL on multipliera apres quand on  aura toute les donnees
+  rho_kmin_ = 1./temperature_paroi_min_ ;
+  rho_kmax_ = 1./temperature_paroi_max_ ;
+}
+
+void Switch_QC_STTT::initialise()
+{
+  Cout << que_suis_je() <<"::initialise() Pb of type DNS_QC detected." << finl;
+
+  const Nom& oldgeomname = old_mesh_.get_grid_geometry().le_nom();
+  // calcul de la constante specifique du gaz
+  constante_specifique_gaz_ = Cp_gaz_ *(1.-1./gamma_);
+  Cout << " Cp_gaz = " << Cp_gaz_
+      << "\n constante_specifique_gaz = " << constante_specifique_gaz_ << finl;
+  // calcule les valeurs aux parois
+  rho_kmin_ *= P_thermodynamique_ / constante_specifique_gaz_ ;
+  rho_kmax_	*= P_thermodynamique_ / constante_specifique_gaz_ ;
+  Cout << "\n rho_kmin_ = " << rho_kmin_
+      << "\n rho_kmax_ = " << rho_kmax_ << finl;
+
+  Cout << "Lecture rho initial dans fichier " << fichier_old_rho_ << " timestep= " << timestep_reprise_rho_ << finl;
+  lire_dans_lata(fichier_old_rho_, timestep_reprise_rho_, oldgeomname, "RHO", old_rho_);
+
+  Switch_STTT::initialise();
+}
+
+// UNUSED??
+void Switch_QC_STTT::remplir_ghost()
+{
+  for (int j=-1; j <= old_nj_ ; j++)
+    for (int i=-1; i <= old_ni_ ; i++){
+        old_rho_(i,j,-1)= rho_kmin_;
+        old_rho_(i,j,old_nk_) = rho_kmax_;
+        for (int dir= 0 ; dir < 3 ; dir ++)
+          {
+            old_velocity_[dir](i,j,-1)=0;
+            old_velocity_[dir](i,j,old_nk_)=0;
+          }
+    }
+}
+
+int Switch_QC_STTT::allocate_fields(double& sz_arr)
+{
+  int arr_nb = Switch_STTT::allocate_fields(sz_arr); 
+  // Rho
+  if (!direct_write_) {
+      new_rho_.allocate(new_mesh_, IJK_Splitting::ELEM, 1);
+      new_rho_.data() =  1.; // not zero=> might want 1./rho and must not crash
+  }
+  old_rho_.allocate(old_mesh_, IJK_Splitting::ELEM, 1);
+
+  // Fill with valid floating point data in walls and ghost cells:
+  old_rho_.data() = -1.; // not zero=> might want 1./rho and must not crash
+
+  return arr_nb+2;  // old and new
+}
+
+// flag and_lata to know if we also create the associated lata
+void Switch_QC_STTT::ecrire_fichier_reprise(const char *fichier_sauvegarde, const bool and_lata)
+{
+  Nom lata_name(fichier_sauvegarde);
+  lata_name += ".lata";
+
+  if (Process::je_suis_maitre())
+    {
+      Cerr << "T= " << current_time_ << " Checkpointing dans le fichier " << fichier_sauvegarde << finl;
+      SFichier fichier(fichier_sauvegarde);
+      fichier.precision(17);
+      fichier.setf(std::ios_base::scientific);
+      fichier << "{\n"
+          << " tinit " << current_time_ << "\n"
+          << " terme_acceleration_init " << terme_source_acceleration_ << "\n"
+          << " fichier_reprise_vitesse " << lata_name << "\n"
+          << " timestep_reprise_vitesse " << 1 << "\n" ;
+
+      fichier << " p_thermo_init " << P_thermodynamique_ << "\n"
+          << " fichier_reprise_rho " << lata_name << "\n"
+          << " timestep_reprise_rho " << 1 << "\n";
+
+      fichier << "}\n";
+    }
+
+  // [ABN] - TODO not sure the below is relevant for QC
+  
+//  if (and_lata)
+//    {
+//      ecrire_header_lata_et_interfaces(lata_name);
+//      write_velocity(lata_name);
+//      compute_and_write_extra_fields...
+//    }
+}
+
+
+
+void Switch_QC_STTT::compute_and_write_extra_fields(const Nom& lata_name, DoubleTab& coeff_i, IntTab Indice_i, 
+                                                    DoubleTab& coeff_j, IntTab Indice_j,
+                                                    DoubleTab& coeff_k, IntTab Indice_k)
+{
+  // Compute
+  calculer_coords_elem();
+  calculer_coeff(coeff_i,Indice_i,
+                 coeff_j,Indice_j,
+                 coeff_k,Indice_k);
+  switch_scalar_field(old_rho_, new_rho_,
+                      coeff_i, Indice_i,
+                      coeff_j ,Indice_j,
+                      coeff_k ,Indice_k);
+
+  // Write
+  Cout << "Adding rho to " << lata_name << finl;
+  if (!direct_write_)
+    dumplata_scalar(lata_name,"RHO", new_rho_, 0);
+  else
+    {
+      // Ecrit a la main les lignes dans le fichier lata maitre:
+      if (Process::je_suis_maitre())
+        {
+          SFichier f;
+          const IJK_Grid_Geometry& geom = new_mesh_.get_grid_geometry();
+          f.ouvrir(lata_name, ios::app);
+          // Attention, peut ne pas tenir dans un int:
+          long long n;
+          char sz_string[100];
+          n = ((long long) geom.get_nb_elem_tot(DIRECTION_I))
+                              * ((long long) geom.get_nb_elem_tot(DIRECTION_J))
+                              * ((long long) geom.get_nb_elem_tot(DIRECTION_K));
+          sprintf(sz_string, "%lld", n); // Apparemment %lld est la bonne syntaxe pour les long long
+          f << "Champ RHO " << (lata_name + Nom(".RHO.data")) << " geometrie=" << geom.le_nom() << " size=" << sz_string
+              << " localisation=ELEM composantes=1" << finl;
+        }
+    }
+}
+
+
+void Switch_QC_STTT::compute_and_write_extra_fields_direct(SFichier& file,
+                                                           DoubleTab& coeff_i, IntTab Indice_i, 
+                                                           DoubleTab& coeff_j, IntTab Indice_j,
+                                                           DoubleTab& coeff_k, IntTab Indice_k)
+{
+  calculer_coeff(coeff_i,Indice_i,
+      coeff_j,Indice_j,
+      coeff_k,Indice_k);
+  file.ouvrir(nom_sauvegarde_ + Nom(".lata.RHO.data"));
+  switch_scalar_field_direct(file, old_rho_,
+                    coeff_i, Indice_i,
+                    coeff_j ,Indice_j,
+                    coeff_k ,Indice_k);
+  file.close();
+}
+
+#Pendmacro(DEFMACRO)
+#Pusemacro(DEFMACRO)(double)

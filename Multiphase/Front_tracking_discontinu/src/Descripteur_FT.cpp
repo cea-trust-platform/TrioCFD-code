@@ -21,10 +21,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Descripteur_FT.h>
-#include <IntTabFT.h>
-#include <ArrOfDoubleFT.h>
 #include <Comm_Group.h>
-#include <Vect_IntTab.h>
+#include <TRUSTTabs.h>
 #include <communications.h>
 #include <Array_tools.h>
 #include <MD_Vector_std.h>
@@ -767,14 +765,11 @@ void Desc_Structure_FT::collecter_espace_virtuel(ArrOfInt& x, MD_Vector_tools::O
 {
   assert(status_md_ == OK);
   IntVect& y = tmp_intvect_;
-  if (sub_type(IntVect, x))
-    {
-      y.ref(ref_cast(IntVect, x));
-    }
-  else
-    {
-      y.ref_array(x);
-    }
+  IntVect* intV = dynamic_cast<IntVect*>(&x);
+
+  if (intV) y.ref(*intV);
+  else y.ref_array(x);
+
   y.set_md_vector(md_vector_);
   MD_Vector_tools::echange_espace_virtuel(y, op);
   y.reset();
@@ -784,14 +779,11 @@ void Desc_Structure_FT::collecter_espace_virtuel(ArrOfDouble& x, MD_Vector_tools
 {
   assert(status_md_ == OK);
   DoubleVect& y = tmp_doublevect_;
-  if (sub_type(DoubleVect, x))
-    {
-      y.ref(ref_cast(DoubleVect, x));
-    }
-  else
-    {
-      y.ref_array(x);
-    }
+  DoubleVect* doubleV = dynamic_cast<DoubleVect*>(&x);
+
+  if (doubleV) y.ref(*doubleV);
+  else y.ref_array(x);
+
   y.set_md_vector(md_vector_);
   MD_Vector_tools::echange_espace_virtuel(y, op);
   y.reset();

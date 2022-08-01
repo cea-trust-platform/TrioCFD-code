@@ -1,0 +1,555 @@
+//TRUST_NO_INDENT
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : OpDiffTurbIJK.cpp
+// Directory : $IJK_ROOT/src/IJK/OpVDF
+//
+/////////////////////////////////////////////////////////////////////////////
+#include <OpDiffTurbIJK.h>
+#include <IJK_Splitting.h>
+#include <stat_counters.h>
+
+#Pinclude(IJ_LOOP_P)
+
+#Pmacro DEFMACRO(ST,ZEROATWALL,CASE,_OP_NAME_)
+
+_OP_NAME__ST::_OP_NAME__ST()
+{
+  vx_ = 0;
+  vy_ = 0;
+  vz_ = 0;
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+  molecular_nu_ = 0;
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  molecular_nu_tensor_xx_ = 0;
+  molecular_nu_tensor_xy_ = 0;
+  molecular_nu_tensor_xz_ = 0;
+  molecular_nu_tensor_yx_ = 0;
+  molecular_nu_tensor_yy_ = 0;
+  molecular_nu_tensor_yz_ = 0;
+  molecular_nu_tensor_zx_ = 0;
+  molecular_nu_tensor_zy_ = 0;
+  molecular_nu_tensor_zz_ = 0;
+#Pendif
+
+#Pif ("CASE"=="Yes_Turb")
+  turbulent_nu_ = 0;
+  turbulent_k_energy_ = 0;
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  divergence_ = 0;
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+  structural_model_xx_ = 0;
+  structural_model_xy_ = 0;
+  structural_model_xz_ = 0;
+  structural_model_yx_ = 0;
+  structural_model_yy_ = 0;
+  structural_model_yz_ = 0;
+  structural_model_zx_ = 0;
+  structural_model_zy_ = 0;
+  structural_model_zz_ = 0;
+#Pendif
+}
+
+void _OP_NAME__ST::initialize(const IJK_Splitting & splitting, const Boundary_Conditions & bc)
+{
+  perio_k_= splitting.get_grid_geometry().get_periodic_flag(DIRECTION_K);
+  channel_data_.initialize(splitting);
+  ref_bc_ = bc;
+}
+
+#Pforeach _AJOUTCALCUL_(ajouter calculer)
+void _OP_NAME__ST::_AJOUTCALCUL_(const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+				const IJK_Field_ST & molecular_nu,
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+                                const IJK_Field_ST & molecular_nu_tensor_xx,
+                                const IJK_Field_ST & molecular_nu_tensor_xy,
+                                const IJK_Field_ST & molecular_nu_tensor_xz,
+                                const IJK_Field_ST & molecular_nu_tensor_yx,
+                                const IJK_Field_ST & molecular_nu_tensor_yy,
+                                const IJK_Field_ST & molecular_nu_tensor_yz,
+                                const IJK_Field_ST & molecular_nu_tensor_zx,
+                                const IJK_Field_ST & molecular_nu_tensor_zy,
+                                const IJK_Field_ST & molecular_nu_tensor_zz,
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+				const IJK_Field_ST & turbulent_nu,
+				const IJK_Field_ST & turbulent_k_energy,
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+                                const IJK_Field_ST & divergence,
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+                                const IJK_Field_ST & structural_model_xx,
+                                const IJK_Field_ST & structural_model_xy,
+                                const IJK_Field_ST & structural_model_xz,
+                                const IJK_Field_ST & structural_model_yx,
+                                const IJK_Field_ST & structural_model_yy,
+                                const IJK_Field_ST & structural_model_yz,
+                                const IJK_Field_ST & structural_model_zx,
+                                const IJK_Field_ST & structural_model_zy,
+                                const IJK_Field_ST & structural_model_zz,
+#Pendif
+				IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz)
+{
+  statistiques().begin_count(diffusion_counter_);
+
+  vx_ = &vx;
+  vy_ = &vy;
+  vz_ = &vz;
+  
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+  molecular_nu_ = &molecular_nu;
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  molecular_nu_tensor_xx_ = &molecular_nu_tensor_xx;
+  molecular_nu_tensor_xy_ = &molecular_nu_tensor_xy;
+  molecular_nu_tensor_xz_ = &molecular_nu_tensor_xz;
+  molecular_nu_tensor_yx_ = &molecular_nu_tensor_yx;
+  molecular_nu_tensor_yy_ = &molecular_nu_tensor_yy;
+  molecular_nu_tensor_yz_ = &molecular_nu_tensor_yz;
+  molecular_nu_tensor_zx_ = &molecular_nu_tensor_zx;
+  molecular_nu_tensor_zy_ = &molecular_nu_tensor_zy;
+  molecular_nu_tensor_zz_ = &molecular_nu_tensor_zz;
+#Pendif
+
+#Pif ("CASE"=="Yes_Turb")
+  turbulent_nu_ = &turbulent_nu;
+  turbulent_k_energy_ = &turbulent_k_energy;
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  divergence_ = &divergence;
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+  structural_model_xx_ = &structural_model_xx;
+  structural_model_xy_ = &structural_model_xy;
+  structural_model_xz_ = &structural_model_xz;
+  structural_model_yx_ = &structural_model_yx;
+  structural_model_yy_ = &structural_model_yy;
+  structural_model_yz_ = &structural_model_yz;
+  structural_model_zx_ = &structural_model_zx;
+  structural_model_zy_ = &structural_model_zy;
+  structural_model_zz_ = &structural_model_zz;
+#Pendif
+#Pif ("_AJOUTCALCUL_"=="calculer")
+  compute_set(dvx, dvy, dvz);
+#Pelse
+  compute_add(dvx, dvy, dvz);
+#Pendif
+  statistiques().end_count(diffusion_counter_);
+
+}
+#Pendforeach(_AJOUTCALCUL_)
+
+#Pforeach DIR (x y z)
+#Pforeach COMPO (x y z)
+
+// Description: compute fluxes in direction DIR for velocity component COMPO
+//  for the layer of fluxes k_layer
+// Diffusion
+void _OP_NAME__ST::compute_flux_DIR_vCOMPO(IJK_Field_local_ST & resu, const int k_layer)
+{
+  // Velocity field
+  ConstIJK_ST_ptr vCOMPO_ptr(*vCOMPO_, 0, 0, k_layer);
+#Pif ("DIR"!="COMPO")
+  ConstIJK_ST_ptr vDIR_ptr(*vDIR_, 0, 0, k_layer);
+#Pendif
+#Pif ("DIR"=="x")
+  const int idir = 0;
+  const int nx = vCOMPO_->ni() + 1;
+  const int ny = vCOMPO_->nj();
+#Pelif ("DIR"=="y")
+  const int idir = 1;
+  const int nx = vCOMPO_->ni();
+  const int ny = vCOMPO_->nj() + 1;
+#Pelif ("DIR"=="z")
+  const int idir = 2;
+  const int nx = vCOMPO_->ni();
+  const int ny = vCOMPO_->nj();
+#Pendif
+#Pif ("COMPO"=="x")
+  const int icompo = 0;
+#Pelif ("COMPO"=="y")
+  const int icompo = 1;
+#Pelif ("COMPO"=="z")
+  const int icompo = 2;
+#Pendif
+
+  // Result (fluxes in direction DIR for component COMPO of the convected field)
+  IJK_ST_ptr resu_ptr(resu, 0, 0, 0);
+
+#Pmacro DO_LOOP(__WALL__)
+#Pmacro KERNEL_FLUX(__TYPE__)
+ __TYPE__ flux = 0.;
+#Pif ("DIR"!="COMPO")
+  // Interpolate diffusion coefficient from values at elements:
+  #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+    __TYPE__ m_nu1, m_nu2, m_nu3, m_nu4;
+    molecular_nu.get_left_center_DIRCOMPO(i, m_nu1, m_nu2, m_nu3, m_nu4);
+  #Pendif
+  #Pif ("CASE"=="Yes_Turb")
+    __TYPE__ t_nu1, t_nu2, t_nu3, t_nu4;
+    turbulent_nu.get_left_center_DIRCOMPO(i, t_nu1, t_nu2, t_nu3, t_nu4);
+  #Pendif
+  #Pif ("CASE"=="Yes_M_Struct")
+    __TYPE__ s_mo, s_mo_dummy;
+    structural_model.get_left_center_DIR(i, s_mo_dummy, s_mo);
+  #Pendif
+  #Pif("__WALL__"=="NOWALL")
+    // recoding of Eval_Dift_VDF_var_Face::flux_arete_interne
+    #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+      __TYPE__ m_nu = (m_nu1 + m_nu2 + m_nu3 + m_nu4) * 0.25;
+    #Pendif
+    #Pif ("CASE"=="Yes_Turb")
+      __TYPE__ t_nu = (t_nu1 + t_nu2 + t_nu3 + t_nu4) * 0.25;
+    #Pendif
+  #Pelif("__WALL__"=="BOTTOM")
+    // recoding of Eval_Dift_VDF_var_Face::flux_arete_paroi
+    // bottom wall (z=0)
+    // nu1 and nu2 are "left" in direction z, hence in the wall:
+    #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+      #Pif("ZEROATWALL"=="Yes")
+        // do nothing
+      #Pelse
+        __TYPE__ m_nu = (m_nu3 + m_nu4) * 0.5;
+      #Pendif
+    #Pendif
+    #Pif ("CASE"=="Yes_Turb")
+      __TYPE__ t_nu = (t_nu3 + t_nu4) * 0.5;
+    #Pendif
+  #Pelse
+    // recoding of Eval_Dift_VDF_var_Face::flux_arete_paroi
+    // top wall (z=zmax)
+    // nu3 and nu4 are "center" in direction z, hence in the wall:
+    #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+      #Pif("ZEROATWALL"=="Yes")
+        // do nothing
+      #Pelse
+        __TYPE__ m_nu = (m_nu1 + m_nu2) * 0.5;
+      #Pendif
+    #Pendif
+    #Pif ("CASE"=="Yes_Turb")
+      __TYPE__ t_nu = (t_nu1 + t_nu2) * 0.5;
+    #Pendif
+  #Pendif
+  // gradient in direction DIR of component COMPO
+  __TYPE__ v3, v4;
+  vCOMPO_ptr.get_left_center_DIR(i, v3, v4);
+  #Pif ("__WALL__"=="NOWALL")
+    #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial")
+      __TYPE__ tau = (v4 - v3) * inv_distance_DIR;
+    #Pendif
+    #Pif ("CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+      __TYPE__ tau = (v4 - v3);
+    #Pendif
+    #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial")
+      // gradient in direction COMPO of component DIR
+      __TYPE__ v1, v2;
+      vDIR_ptr.get_left_center_COMPO(i, v1, v2);
+      __TYPE__ tau_tr = (v2 - v1) * inv_distance_COMPO;
+    #Pendif
+    #Pif ("CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+      // gradient in direction COMPO of component DIR
+      __TYPE__ v1, v2;
+      vDIR_ptr.get_left_center_COMPO(i, v1, v2);
+      __TYPE__ tau_tr = (v2 - v1);
+    #Pendif
+    #Pif ("CASE"=="Yes_Turb")
+      __TYPE__ reyn = (tau + tau_tr) * t_nu;
+       flux = (reyn + m_nu * tau) * surface;
+    #Pelif ("CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+       flux = m_nu * (tau + tau_tr) * surface;
+    #Pelif ("CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic")
+       flux = m_nu * tau * surface;
+    #Pelif ("CASE"=="Yes_M_Struct")
+       flux = s_mo * surface;
+    #Pendif
+  #Pelse
+    #Pif("ZEROATWALL"=="Yes")
+     if (perio_k_){
+      flux = 0.;
+    }
+    #Pelse
+      #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial")
+        #Pif ("__WALL__"=="BOTTOM")
+          // bottom wall (z=0), v3 is left, hence in the wall)
+          __TYPE__ tau = (v4 - 0.) * inv_distance_DIR; //inv_distance_DIR : distance to wall already contains 1/2
+        #Pelse
+          // top wall (z=zmax), v4 is center, hence in the wall)
+          __TYPE__ tau = (0. - v3) * inv_distance_DIR; //distance to wall
+        #Pendif
+      #Pendif
+      #Pif ("CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+        #Pif ("__WALL__"=="BOTTOM")
+          // bottom wall (z=0), v3 is left, hence in the wall)
+          __TYPE__ tau = (v4 - 0.) * 2.;
+        #Pelse
+          // top wall (z=zmax), v4 is center, hence in the wall)
+          __TYPE__ tau = (0. - v3) * 2.;
+        #Pendif
+      #Pendif
+      #Pif ("CASE"=="Yes_Turb")
+         flux = tau * surface * (t_nu + m_nu);
+      #Pelif ("CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+         flux = tau * surface * m_nu; // because tau_tr=dw/dx=0 at the wall.
+      #Pelif ("CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic")
+         flux = tau * surface * m_nu;
+      #Pelif ("CASE"=="Yes_M_Struct")
+         flux = surface * s_mo;
+      #Pendif
+    #Pendif
+  #Pendif
+#Pelse
+  #Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial")
+    // recoding of Eval_Dift_VDF_var_Face::flux_fa7_elem
+    __TYPE__ m_nu, m_nu_dummy;
+    // flux is between left face and center face, hence, it is centered on the "left" cell
+    molecular_nu.get_left_center_DIR(i, m_nu, m_nu_dummy);
+    __TYPE__ v1, v2;
+    vCOMPO_ptr.get_left_center_COMPO(i, v1, v2);
+    __TYPE__ tau = (v2 - v1) * inv_distance_COMPO;
+    #Pif ("CASE"=="Yes_Turb")
+      __TYPE__ t_nu, t_nu_dummy;
+      turbulent_nu.get_left_center_DIR(i, t_nu, t_nu_dummy);
+      __TYPE__ minus_reyn = t_nu * tau * (2.);
+      // Shall we include "k" or not ? If we do, it is equivalent to adding
+      //  grad(k) to the rhs of Navier Stokes, il we be "eaten" by the pressure
+      //  solver.
+      __TYPE__ k, k_dummy;
+      // flux is between left face and center face, hence, it is centered on the "left" cell
+      turbulent_k_energy.get_left_center_DIR(i, k, k_dummy);
+      minus_reyn += (-0.66666666666666666) * k;
+      // Check that diagonal terms of the Reynolds tensor are positive
+      //  (exactly copied from Eval_Dift_VDF_var_Face::flux_fa7_elem)
+      minus_reyn = SimdMin(minus_reyn, 0.);
+    #Pendif
+  #Pendif
+  #Pif ("CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+    // recoding of Eval_Dift_VDF_var_Face::flux_fa7_elem
+    __TYPE__ m_nu, m_nu_dummy;
+    // flux is between left face and center face, hence, it is centered on the "left" cell
+    molecular_nu.get_left_center_DIR(i, m_nu, m_nu_dummy);
+    __TYPE__ v1, v2;
+    vCOMPO_ptr.get_left_center_COMPO(i, v1, v2);
+    __TYPE__ tau = (v2 - v1);
+  #Pendif
+  #Pif ("CASE"=="Yes_M_Struct")
+    __TYPE__ s_mo, s_mo_dummy;
+    structural_model.get_left_center_DIR(i, s_mo, s_mo_dummy);
+  #Pendif
+  #Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+    __TYPE__ v5, v6_dummy;
+    div_ptr.get_left_center_COMPO(i, v5, v6_dummy);
+  #Pendif
+  #Pif ("CASE"=="Yes_Turb")
+     flux = (minus_reyn + m_nu * tau) * surface;
+  #Pelif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+     flux = m_nu * surface * (2. * tau - 0.66666666666666666 * v5); // The factor 2. is because tau_tr = tau
+  #Pelif ("CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_TransTensorialAnisotropic")
+     flux = m_nu * 2. * tau * surface; // The factor 2. is because tau_tr = tau
+  #Pelif ("CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic")
+     flux = m_nu * tau * surface;
+  #Pelif ("CASE"=="Yes_M_Struct")
+     flux = s_mo * surface;
+  #Pendif
+#Pendif
+
+resu_ptr.put_val(i, flux);
+#Pendmacro(KERNEL_FLUX)
+
+#Pmacro KERNEL_FLUX_NEXTJ()
+  // instructions to perform to jump to next row
+  vCOMPO_ptr.next_j();
+#Pif ("DIR"!="COMPO")
+  vDIR_ptr.next_j();
+#Pendif
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  molecular_nu.next_j();
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+  turbulent_nu.next_j();
+  #Pif ("DIR"=="COMPO")
+    turbulent_k_energy.next_j();
+  #Pendif
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  #Pif ("DIR"=="COMPO")
+    div_ptr.next_j();
+  #Pendif
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+  structural_model.next_j();
+#Pendif
+  resu_ptr.next_j();
+#Pendmacro(KERNEL_FLUX_NEXTJ)
+#Pusemacro(IJ_LOOP)(ST,nx,ny,KERNEL_FLUX,KERNEL_FLUX_NEXTJ)
+#Pendmacro(DO_LOOP)
+
+  const int global_k_layer = k_layer + channel_data_.offset_to_global_k_layer();
+  // global index of the layer of flux of the wall
+  //  (assume one walls at zmin and zmax)
+  const int first_global_k_layer = channel_data_.first_global_k_layer_flux(icompo, idir);
+  const int last_global_k_layer = channel_data_.last_global_k_layer_flux(icompo, idir);
+
+  const ST surface = - channel_data_.get_surface(k_layer, icompo, idir);
+#Pif ("DIR"!="COMPO" and ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial"))
+  const ST inv_distance_COMPO = channel_data_.inv_distance_for_gradient(k_layer, idir, icompo);
+#Pendif
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial")
+  const ST inv_distance_DIR = channel_data_.inv_distance_for_gradient(k_layer, icompo, idir);
+#Pendif
+if(!perio_k_){
+#Pif("DIR"=="z" and "COMPO"!="z")
+  // For this direction and this component, we possibly have a wall boundary condition to treat:
+  if (global_k_layer == first_global_k_layer-1) {
+    // Variable diffusion coefficients: molecular and turbulent, at elements
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+    ConstIJK_ST_ptr molecular_nu(*molecular_nu_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+    ConstIJK_ST_ptr molecular_nu(*molecular_nu_tensor_COMPODIR_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+    ConstIJK_ST_ptr turbulent_nu(*turbulent_nu_, 0, 0, k_layer);
+    // Turbulent kinetic energy from turbulence model
+    //ConstIJK_ST_ptr turbulent_k_energy(*turbulent_k_energy_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+    ConstIJK_ST_ptr structural_model(*structural_model_COMPODIR_, 0, 0, k_layer);
+#Pendif
+    // We are at bottom wall: z=0
+    switch(ref_bc_.valeur().get_bctype_k_min()) {
+    case Boundary_Conditions::Paroi: 
+      {
+#Pusemacro(DO_LOOP)(BOTTOM)
+	break;
+      } 
+    case Boundary_Conditions::Symetrie:
+      {
+	// Symetry boundary condition: momentum flux is zero
+	putzero(resu);
+	break;
+      }
+    default:
+      Cerr << "_OP_NAME__ST: wrong boundary condition." << finl;
+      Process::exit();
+    }
+    return;
+  }
+  if (global_k_layer == last_global_k_layer + 1) {
+    // Variable diffusion coefficients: molecular and turbulent, at elements
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+    ConstIJK_ST_ptr molecular_nu(*molecular_nu_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+    ConstIJK_ST_ptr molecular_nu(*molecular_nu_tensor_COMPODIR_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+    ConstIJK_ST_ptr turbulent_nu(*turbulent_nu_, 0, 0, k_layer);
+    // Turbulent kinetic energy from turbulence model
+    //ConstIJK_ST_ptr turbulent_k_energy(*turbulent_k_energy_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+    ConstIJK_ST_ptr structural_model(*structural_model_DIRCOMPO_, 0, 0, k_layer);
+#Pendif
+    // We are at top wall: z=zmax
+    switch(ref_bc_.valeur().get_bctype_k_max()) {
+    case Boundary_Conditions::Paroi: 
+      {
+#Pusemacro(DO_LOOP)(TOP)
+	break;
+      } 
+    case Boundary_Conditions::Symetrie:
+      {
+	// Symetry boundary condition: momentum flux is zero
+	putzero(resu);
+	break;
+      }
+    default:
+      Cerr << "_OP_NAME__ST: wrong boundary condition." << finl;
+      Process::exit();
+    }
+    return;
+  }
+#Pendif
+  if (global_k_layer < first_global_k_layer || global_k_layer > last_global_k_layer) {
+    // We are inside the wall
+    putzero(resu);
+    return;
+  }
+  // Variable diffusion coefficients: molecular and turbulent, at elements
+}
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+  ConstIJK_ST_ptr molecular_nu(*molecular_nu_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  ConstIJK_ST_ptr molecular_nu(*molecular_nu_tensor_COMPODIR_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+  ConstIJK_ST_ptr turbulent_nu(*turbulent_nu_, 0, 0, k_layer);
+  // Turbulent kinetic energy from turbulence model
+  ConstIJK_ST_ptr turbulent_k_energy(*turbulent_k_energy_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+    ConstIJK_ST_ptr div_ptr(*divergence_, 0, 0, k_layer);
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+  ConstIJK_ST_ptr structural_model(*structural_model_DIRCOMPO_, 0, 0, k_layer);
+#Pendif
+  #Pusemacro(DO_LOOP)(NOWALL)
+
+  // flops_ += nx * ny * 6;
+}
+#Pendforeach(COMPO)
+#Pendforeach(DIR)
+#Pendmacro(DEFMACRO)
+/*
+ * Options for CASE
+ * 
+ *          Yes_Turb: the flux is turbulent_mu * (grad u + grad^T u)  -  2/3 * k  +  molecular_mu * grad u)'
+ *          Yes_M_Grad: the flux is 'molecular_mu * grad u'
+ *          Yes_M_Trans: the flux is 'molecular_mu * (grad u + grad^T u)'
+ *          Yes_M_Div: the flux is 'molecular_mu * (grad u + grad^T u - 2/3 * div u * Id)'
+ *          Yes_M_GradAnisotropic: the flux is 'molecular_mu^a * grad^a u' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_TransAnisotropic: the flux is 'molecular_mu^a * (grad^a u + grad^a^T u)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_DivAnisotropic: the flux is 'molecular_mu^a * (grad^a u + grad^a^T u - 2/3 * div^a u * Id)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_GradTensorial: the flux is 'molecular_mu_tensor * grad u'
+ *          Yes_M_TransTensorial: the flux is 'molecular_mu_tensor * (grad u + grad^T u)'
+ *          Yes_M_DivTensorial: the flux is 'molecular_mu_tensor * (grad u + grad^T u - 2/3 * div u * Id)'
+ *          Yes_M_GradTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * grad^a u' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_TransTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * (grad^a u + grad^a^T u)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_DivTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * (grad^a u + grad^a^T u - 2/3 * div^a u * Id)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_Struct: the flux is 'structural_model'
+ */
+#Pusemacro(DEFMACRO)(double,No,Yes_Turb,OpDiffTurbIJK)
+#Pusemacro(DEFMACRO)(double,No,Yes_M_Grad,OpDiffIJK)
+#Pusemacro(DEFMACRO)(double,No,Yes_M_Trans,OpDiffStdWithLaminarTransposeIJK)
+#Pusemacro(DEFMACRO)(double,No,Yes_M_Div,OpDiffStdWithLaminarTransposeAndDivergenceIJK)
+#Pusemacro(DEFMACRO)(double,No,Yes_M_GradAnisotropic,OpDiffAnisotropicIJK)
+#Pusemacro(DEFMACRO)(double,No,Yes_M_TransAnisotropic,OpDiffStdWithLaminarTransposeAnisotropicIJK)
+#Pusemacro(DEFMACRO)(double,No,Yes_M_DivAnisotropic,OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_GradTensorial,OpDiffTensorialZeroatwallIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_TransTensorial,OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_DivTensorial,OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_GradTensorialAnisotropic,OpDiffTensorialAnisotropicZeroatwallIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_TransTensorialAnisotropic,OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_DivTensorialAnisotropic,OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK)
+#Pusemacro(DEFMACRO)(double,Yes,Yes_M_Struct,OpDiffStructuralOnlyZeroatwallIJK)

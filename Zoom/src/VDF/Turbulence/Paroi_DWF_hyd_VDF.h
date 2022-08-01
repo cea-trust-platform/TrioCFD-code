@@ -60,13 +60,13 @@ class Paroi_DWF_hyd_VDF : public Paroi_std_hyd_VDF
 public:
 
 
-  virtual int init_lois_paroi();
+  int init_lois_paroi() override;
 
   /* calculer_hyd pour k-epsilon qui renvoie une erreur */
-  int calculer_hyd(DoubleTab&);
+  int calculer_hyd(DoubleTab&) override;
 
   /* calculer_hyd pour L.E.S */
-  int calculer_hyd(DoubleTab& , DoubleTab&);
+  int calculer_hyd(DoubleTab& , DoubleTab&) override;
 
 protected :
 

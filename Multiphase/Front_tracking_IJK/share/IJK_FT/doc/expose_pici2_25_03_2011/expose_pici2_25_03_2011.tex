@@ -1,0 +1,767 @@
+\documentclass{beamer}
+
+\usepackage{beamerthemesplit}
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{ifthen}
+\usepackage{tabularx}
+
+\title{Optimisation d'algorithmes sur maillages structurés}
+\author{Benoit Mathieu}
+\date{\today}
+
+\begin{document}
+\small
+\frame{
+  \titlepage
+  \note{\tiny
+    Dans cet exposé, je vous propose de vous présenter ce que j'ai
+    appris sur l'optimisation de code en travaillant sur les
+    algorithmes de Trio\_U sur maillages structurés.
+    
+  }
+}
+\footnotesize
+\frame
+{
+  \frametitle{Plan de l'exposé}
+  \begin{itemize}
+    \item Motivations, objectifs
+    \item Algorithmes : solveur multigrille géométrique et opérateurs
+    \item Techniques d'optimisations CPU
+    \item Conclusions et perspectives
+  \end{itemize}
+}
+
+\section{Contexte, motivations, objectifs}
+\frame
+{
+  \frametitle{Motivations}
+  De nombreuses applications tirent parti des maillages structurés
+  \begin{itemize}
+  \item études amont sur la modélisation des milieux poreux,
+  \item études amont sur la modélisation des écoulements diphasiques,
+  \item études sur le risque d'entraînement de gaz dans les réacteurs GEN IV,
+  \item étude du procédé de vitrification.
+  \end{itemize}
+
+
+}
+\frame
+{
+  \frametitle{Motivations}
+  \textbf{``Y'en a marre du solveur en pression qui rame !''}
+
+  Des gains de performances considérables sont possibles par rapport
+  à l'implémentation générique des VDF dans Trio\_U, notamment
+  grâce aux solveurs multigrille.
+
+  \begin{itemize}
+  \item utilisation de solveurs multi-grille géométriques 
+    (selon la littérature : compétitif avec la FFT dans les bons cas)
+  \item spécialisation des structures de données en IJK 
+    (amplifie l'efficacité des autres optimisations),
+  \item optimisation CPU (cache-blocking et vectorisation).
+  \end{itemize}
+  Pourquoi commencer par le structuré ?
+  \begin{itemize}
+  \item Applications plus ciblées et résultats garantis sur les maillages structurés
+    \textbf{grâce aux solveurs multigrilles, résultats publiés}.
+  \item Pour les maillages non structurés, il faut d'abord lever la limitation 
+    du solveur de Poisson.
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Objectifs de ces travaux}
+  Les objectifs du travail réalisé sont les suivants~:
+  \begin{itemize}
+  \item acquérir les algorithmes à niveau avec les meilleures performances publiées,
+  \item réaliser rapidement de premières mises en \oe uvres dans Trio\_U pour
+    les applications grosses consommatrices de temps CPU.
+  \item proposer des méthodes de programmation systématiques pour optimiser le code
+    tout en conservant un niveau de maintenabilité acceptable.
+  \end{itemize}
+
+  Etat de l'art (sur coeurs Nehalem)~:
+  \begin{itemize}
+  \item Perf. du VDF(gcp) sur 100M mailles~: $30\:000$ mailles/coeur, 2.5 s/dt
+  \item Perf. réalisée avec MG géométrique~: $156\:000$ mailles/coeur, 1.2 s/dt
+  \item Objectif probablement atteignable~: $1 M$ mailles/coeur, 1 s/dt
+  \item Perf des solveurs basés sur FFT~: $2 M$ mailles, 0.4 s/dt sur 1 coeur
+  \item Perf MG publiée sur GPU~: $\simeq 10 M$ mailles/GPU, 0.5s sur 1 GPU.
+  \end{itemize}
+}
+
+\section{Algorithmes : solveur multigrille géométrique et opérateurs}
+\frame
+{
+  \begin{center} \large Algorithmes : solveur multigrille géométrique et opérateurs \end{center}
+}
+\frame
+{
+  \frametitle{Solveurs multigrille}
+  Nécessitent le choix de nombreux paramètres :
+  \begin{itemize}
+  \item Algorithme général: Full-MG ou GCP ou GMRES.
+  \item Pour GCP ou GMRES, MG est utilisé comme préconditionneur. Souvent 1 V-cycle.\\
+\scalebox{0.36}{\includegraphics{v_cycle.jpg}}  \scalebox{0.2}{\includegraphics{stacked_grids.jpg}}
+  \item Choix des maillages grossiers : agglomérations isotrope ou non
+    (but: arriver à un maillage grossier isotrope pour l'équation de Poisson)
+  \item Choix des lisseurs/interpolateurs : plus ou moins robustes
+    (simple et robuste: Jacobi relaxé, avec 4-20 itérations selon le problème)
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Solveurs multigrille}
+  \tiny
+  Etat de l'art :
+  \begin{itemize}
+  \item Des publications de référence pour les performances : proche d'une FFT (dans les cas
+  très simples).
+  \item Déjà réalisé dans Trio\_U : facteur 10 à 30 plus lent que FFT, mais sur des cas complexes
+    inaccessibles à la FFT 
+    \begin{itemize}\tiny
+    \item géométrie non parallélipipédique (DNS poreux, 1M h.cpu sur Jade, 100 M mailles),
+    \item maillage à pas variable, masse volumique variable (DNS gaz turbulent anisotherme, A. Toutant, 400 M mailles).
+    \end{itemize}
+  \item Algoritmes nécessitant 10 à 30 op/maille et 3 à 6 mémoire/maille (memory bound)
+  \end{itemize}
+  \begin{tabular}{c c}
+  \scalebox{0.12}{\includegraphics{visu_dns_poreux.jpg}}&  \scalebox{0.12}{\includegraphics{gerato_mesh.jpg}} \\
+  \tiny DNS poreux                  &   \tiny Modèle numérique de Gerato (entraînement de gaz),\\
+  MG codé et fonctionnel   &    mise en \oe uvre en cours (diphasique + CL bizarres + $\delta_h$ variable)
+\end{tabular}
+}
+\frame
+{
+  \frametitle{Opérateurs}
+  \begin{itemize}
+  \item Algorithmes utilisant un stencil et des cellules fantômes (idem pour Jacobi)\\
+    \begin{center}\scalebox{0.4}{\includegraphics{stencil_op}}\end{center}
+  \item Astuce évidente: progresser par tranche pour réutiliser les données dans les caches
+  \item Ratio calcul / mémoire :\\
+    exemple diffusion+convection QDM: 60-120 opérations par maille, 3 lectures, 3 écritures hors cache
+    (limite memory-bound, il faut agglomérer plusieurs opérateurs).
+  \end{itemize}
+}
+\section{Techniques d'optimisations CPU}
+\frame
+{
+  \begin{center} \large Techniques d'optimisations CPU \end{center}
+}
+
+\frame
+{
+  \frametitle{Ratio Flops / Bande passante}
+  Ratio du hardware \\
+   1 flop = addition, multiplication\\
+   1 mem = lit ou ecrit une valeur DP ou SP (Double precision, Simple precision)
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+    Architecture             & GFlops\footnote{
+      performance atteinte seulement si ADD et MUL sont en nombre égal
+    }(DP/SP) & GB/s & flop/mem(DP/SP) \\
+    \hline
+    Intel 2x X5472@3.00GHz   & 96 / 192        & 12   & \textbf{64} \\
+    Intel 2x X5570@2.93GHz   & 94 / 188        & 35   & 22 \\
+    Intel 2x S.Bridge EP 8c@2GHz & 256 / 512 & 102  & 20 \\
+    BlueGene/P chip (4 cores) & 13.6           & 13.6 & \textbf{8} \\
+    NVidia S1070             & 87 / 1036       & 104  & 7 / 40 \\
+    NVidia M2070             & 515 / 1030      & 148  & 28  \\
+    \hline
+  \end{tabular}
+
+  Remarques~:
+  \begin{itemize}
+  \item Ratio défavorable sur Intel Harpertown (64)
+  \item Ratio confortable sur BlueGene (8)
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Ratio Flops / Bande passante}
+  \begin{block}{Ratio naturel de différents algorithmes}
+   Hypothèse : le cache conserve les valeurs
+   utilisées plusieurs fois \\ $\Rightarrow$~chaque valeur n'est chargée qu'une fois 
+   depuis la mémoire.
+   
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+   Algorithme                   & Flop/cell & Mem/cell
+   \footnote{une transaction mémoire supplémentaire si on n'utilise pas les instructions de streaming}
+                                                      & flop/mem \\
+    \hline
+   Opérateur conv+diff QDM spécialisé & 66 & 6 & 11 \\
+   Itération Jacobi spécialisé\footnote{maillage régulier, masse volumique uniforme} 
+                                & 10 & 3 & 3.3  \\
+   Itération Jacobi (général)   & 20 & 6 & 3.3 \\
+    \hline
+ \end{tabular}
+
+ \vspace{12pt}
+ Conclusions~: 
+\begin{itemize}
+\item ces algorithmes, pris indépendamment, sont souvent ``memory bound'' si le bloc
+ de maillage ne tient pas dans le cache (environ 30~000 mailles).
+\item Inutile d'optimiser le codage des noyaux (par exemple avec SSE) si on ne lève pas cette limitation.
+\end{itemize}
+\end{block}
+}
+
+\frame
+{
+  \frametitle{Exemple de calculs nécessitant une division}
+  Rapport entre le coût d'une division et le coût d'une addition/multiplication
+  (pour du code vectorisé).
+  \center
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+    Architecture             & facteur coût (DP/SP) \\
+    \hline
+    % http://software.intel.com/sites/products/documentation/hpc/mkl/vml/functions/inv.html
+    Intel X5660 VML\footnote{Intel Vector Math Library}/HA
+    \footnote{High Accuracy mode ($\pm$ 0.5 ULP for division)} &  44 / 28 \\
+    Intel X5660 VML/LA
+    \footnote{Low Accuracy mode ($\pm$ 2.5 ULP for division)}  &  14 / 13 \\
+    % http://trac.mcs.anl.gov/projects/performance/wiki/BGP
+    BlueGene/P                         &  120 / 120 \\
+    \hline
+  \end{tabular}
+
+  \flushleft
+  \begin{itemize}
+  \item Exemple : algorithme où on utilise simultanément $x$ et $1/x$
+  \end{itemize}
+  \vspace{10pt}
+  Arbitrage selon les architectures~:
+  \begin{itemize}
+  \item précalculer $1/x$ $\Rightarrow$ consomme plus de bande passante.
+  \item recalculer $1/x$ à chaque usage $\Rightarrow$ consomme plus de flops.
+  \end{itemize}
+  
+}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Exemple: lisseur Jacobi pour maillage isotrope, coefficient constant}
+\lstset{language=C,basicstyle=\tiny\bfseries,commentstyle=\color{blue}\textit,stringstyle=\color{green}\ttfamily,labelstyle=\tiny}
+\begin{lstlisting}{language=C}
+  // Boucle sur i et j fusionnée: n = j_stride * nj
+  for (int i = 0; i < n; i += vsize) {
+    VT vleft, vcenter, vright;
+    // Lecture des valeurs gauche et droite (non alignes)
+    SimdGetLeftCenterRight(ptr, vleft, vcenter, vright);
+    // Somme des six valeurs des cellules voisines
+    VT x = vleft + vright 
+      + VT::SimdGet(ptr_kmoins) + VT::SimdGet(ptr_kplus) 
+      + VT::SimdGet(ptr + j_stride) + VT::SimdGet(ptr - j_stride);
+    // Ajout de la cellule centrale et du second membre
+    x = x * coeff_extra + vcenter * coeff_center + VT::SimdGet(rhs) * coeff_rhs;
+    // Ecriture du resultat
+    SimdPut(resu, x);
+  
+    ptr_kplus += vsize; ptr_kmoins += vsize; ptr += vsize; 
+    rhs += vsize; resu += vsize; 
+  }
+\end{lstlisting}
+Astuces supplémentaires
+\begin{itemize}
+\item Canevas identique pour tous les tableaux (même taille ij, même nombre de ghost-cells)
+$\Rightarrow$ pointeurs simplifiés, permet la ``loop fusion'' suivante,
+\item Fusion des boucles i,j $\Rightarrow$ déroulage, ``branch prediction'', etc.
+\end{itemize}
+\end{frame}
+\frame
+{
+  \frametitle{Performance brute du ``kernel'' Jacobi spécialisé}
+  \centering{\scalebox{0.8}{\includegraphics{perfs_sse/jacobi_kernel_titane}}}
+  \begin{itemize}
+  \item 7 additions, 3 multiplications $\Rightarrow$ performance crête = 16.75 GFlops (SP)
+  \item 14.1 GFlops = 85 \% de la performance crête.
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Performance brute du ``kernel'' Jacobi spécialisé}
+  \centering{\scalebox{0.8}{\includegraphics{perfs_sse/jacobi_kernel_titane_bw}}}
+
+  \begin{itemize}
+  \item Saturation de la bande passante du cache L2 et L3
+  \item Sandy-bridge : performance crête doublée... cache L3 à 48 GB/s/core/direction
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Utilisation du cache : principe}
+  \begin{itemize}
+  \item
+  Pour des opérateurs à stencil 3D, si plusieurs plans de maillage tiennent
+  dans le cache, chaque valeur n'est chargée qu'une fois depuis la mémoire.
+  \item
+  Découper le maillage de sorte que les plans IJ tiennent dans le cache (64x64xN ou 128x128xN)
+  \item
+  Pour un opérateur de diffusion QDM, plus de 10 plans de maillage utilisés 
+  (flux aux faces pour 3 directions, coefficient de diffusion, 3 composantes de vitesse, etc)
+  \item
+  Pour les GPU, shared memory très petite \\
+  $\Rightarrow$ patchs de petite taille, volume des bords importants \\
+  $\Rightarrow$ bande passante mémoire moins bien exploitée \\
+  (4Ko = 10 plans 10x10, accès non alignés pour les cellules fantômes)
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Utilisation du cache : mieux}
+  Pour de nombreux opérateurs, la bande passante mémoire reste le facteur limitant.
+  \begin{itemize}
+  \item Regroupement d'opérateurs (exemple diffusion + convection ensemble)
+
+  \item Regrouper les itérations temporelles successives ($\simeq$ loop fusion) \\
+    $\Rightarrow$ élargit le stencil $\Rightarrow$ calculs supplémentaires.
+  \end{itemize}
+  \scalebox{0.65}{\includegraphics{jacobi_sweep}}
+  \begin{itemize}
+  \item On regroupe autant qu'il faut pour ne pas saturer la bande passante mémoire.
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Performance de l'algorithme complet}
+  Tests sur Titane, compilateur icpc (peut faire mieux).
+  \begin{itemize}
+  \item ghost : nombre de passes simultanées
+  \item Gflops crête : performance du noyau de calcul, données dans le cache L1
+  \item Gflops réels : nombre d'opérations réellement effectuées par seconde
+  \item Gflops utiles : nb. op qu'il aurait fallu avec une seule passe, divisé par le temps.
+  \item BW : total des transactions avec la RAM, divisé par le temps.
+  \end{itemize}
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+   Précision & ghost & Gflops crete & Gflops réels & Gflops utiles & BW (GB/s) \\
+    \hline
+   DP       & 4     & 4.8          & 2.45         & 2.15          & 12.2 \\
+   DP       & 8     & 4.8          & 3.10         & 2.13          & 8.19 \\
+   \hline
+   SP       & 4     & 9.5          & 5.44         & 4.57          & 13.9 \\
+   SP       & 8     & 9.5          & 6.53         & 4.95          & 8.24 \\
+   \hline
+ \end{tabular}
+ Station Harpertown 8 coeurs@2.8Ghz
+
+  \begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+   Précision & ghost & Gflops crete & Gflops réels & Gflops utiles & BW (GB/s) \\
+    \hline
+    DP       & 8  & 4.3 & 1.90 & 1.30 & 5.0 \\
+    SP       & 8  & 8.8 & 4.20 & 3.18 & 5.3 \\
+    \hline
+  \end{tabular}
+}
+\section{Conclusion et perspectives}
+\frame
+{
+  \begin{center} \large Conclusion et perspectives \end{center}
+}
+\frame
+{
+  \frametitle{Sur le multigrille géométrique}
+
+  Expérience acquise sur le calcul ``DNS poreux'' (100M mailles) :
+  
+  \centering\scalebox{0.3}{\includegraphics{visu_dns_poreux.jpg}}}
+
+\frame
+{
+  \frametitle{Sur le multigrille géométrique}
+
+  Expérience acquise sur le calcul ``DNS poreux'' (100M mailles) :
+  
+  \begin{itemize}
+  \item Pour avoir un résidu à $10^{-9}$ il faut :
+    \begin{itemize}
+    \item 3 restarts de GMRES avec 3 vecteurs (9 V-cycles)
+    \item pre-smoothing: 4 it., post-smoothing: 14 it. (relaxed Jacobi)
+    \item 0.75s / solveur sur 640 coeurs avec ghost=2.
+    \end{itemize}
+  \item Avec 2 GFlops, on peut faire, avec 1M mailles/coeur (100 coeurs) :
+    \begin{itemize}
+      \item $20 \cdot 9$ itérations en 0.9s,
+      \item solution du système linéaire en 1.5s ?
+      \end{itemize}
+    \end{itemize}
+
+{\flushright\scalebox{0.12}{\includegraphics{visu_dns_poreux.jpg}}}
+}
+\frame
+{
+  \frametitle{Sur le multigrille géométrique et les opérateurs}
+  Perspectives~:
+  \begin{itemize}
+  \item Mise en \oe vre des instructions AVX (1h de travail ?)
+  \item Optimisation des autres opérateurs de Trio\_U
+  \item Challenge : réalisation d'une DNS à $2\cdot10^9$ mailles d'un canal
+    turbulent anisotherme ($\rho$ variable), sur Curie (Sandy-Bridge) ?\\
+    10 000 c\oe urs = 200 000 mailles par c\oe ur.
+  \item Extension pour les problèmes d'entraînement de gaz\\
+    actuellement : 512 c\oe urs, envisagé : 10-50 c\oe urs.
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Sur la vectorisation SIMD}
+\scriptsize
+  \begin{itemize}
+  \item La vectorisation impose quasiment à coup sûr un reformatage des structures de données.
+  \item Organisation des algorithmes en trois phases :
+    \begin{itemize}\scriptsize
+    \item copie / reformatage des données dans un tampon local (cache/shared mem des GPU)
+    \item algorithmes (vectorisation)
+    \item copie / reformatage des résultats vers la mémoire
+    \end{itemize}
+  \item Inconvénient : sérialise opérations mémoire et calculs.
+  \item Simple précision, parfois suffisant ?
+  \end{itemize}
+\tiny
+  Support SIMD sur différentes architectures (taille des vecteurs) :
+  \begin{tabular}{|c|c|c|}
+    \hline
+            & float & double \\
+            \hline
+    Nehalem & 4     & 2 \\
+    Sandy Bridge & 8 & 4 \\
+    BlueGene & NA & 2 \\
+    Power 7  & 4  & 2 \\
+    Sparc64 viii & ? & 2 \\
+    \hline
+  \end{tabular}
+  
+  \scriptsize
+  Autre effet bénéfique : 
+  \begin{itemize} 
+  \item forçage d'un déroulage des boucles
+  \item algorithmes de copie: +50\% en utilisant des vecteurs de vecteurs simd (Simd\_float4 = vecteur de 16 valeurs)
+  \end{itemize}
+}
+\frame
+{
+  \frametitle{Sur la génération de code}
+  \begin{itemize}
+  \item Génération de code : ``mieux'' que les templates pour les grosses portions de code
+    (débuggage et compréhension du code), discussion...
+  \item Exemple: déclaration et implémentation des classes SIMD
+  \item Permet de générer des versions génériques et des versions optimisées avec des
+    constantes codées en dur (pour les tailles de blocs optimales en fonction de l'architecture).
+  \end{itemize}
+\scalebox{0.7}{\lstinputlisting{exemple_gencode.txt}}
+}
+\frame
+{
+  \frametitle{Autres idées en vrac}
+  \begin{itemize}
+  \item hyperthreading :
+    \begin{itemize}
+    \item pendant les phases de ``copie'' (memory bound) les unités flottantes sont sous-exploitées
+    \item l'hyperthreading peut agir comme les warps entrelacés sur GPU : cacher la latence des phases de copie.
+    \end{itemize}
+  \item recouvrement communications-calculs :
+    \begin{itemize}
+    \item le cache blocking oblige à découper les maillages en blocs
+    \item profitons-en pour mettre à part les blocs qui sont au bords
+    \item on économise le gros effort de mise en \oe uvre de l'overlapping
+      (transformation des algorithmes pour séparer le calcul de l'intérieur du
+      calcul du bord, transformation généralement intrusive dans tous les algorithmes
+      de calcul).
+    \item boucles génériques sur les blocs (calcul
+      intérieur + communication des bords, puis calcul des bords).
+    \end{itemize}
+  \end{itemize}
+}
+\end{document}
+
+
+
+Resu lecture(sans prefetch, unroll2) avec putstream:
+
+test_jacobi_kernel_float: ni= 128 nj= 32 ghost= 4 time(100M)= 0.110767 gflops= 9.59218e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 4 time= 0.421364 gflops(useful)= 3.98164 gflops(actual)= 4.74072 membw= 1.52189 totalbw = 1.52189
+Difference pour float: 1.78814e-07                                                                                                                                 
+test_jacobi_kernel_double: ni= 128 nj= 32 ghost= 4 time(100M)= 0.221164 gflops= 4.80411e+09                                                                        
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 4 time= 0.677436 gflops(useful)= 2.47658 gflops(actual)= 2.94872 membw= 1.89323 totalbw = 1.89323
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 64 nj= 64 ghost= 4 time(100M)= 0.126584 gflops= 8.88736e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 64 jslice= 64 ghost= 4 time= 0.425384 gflops(useful)= 3.94402 gflops(actual)= 4.75658 membw= 1.45513 totalbw = 1.45513
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 64 nj= 64 ghost= 4 time(100M)= 0.234331 gflops= 4.80089e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 64 jslice= 64 ghost= 4 time= 0.70979 gflops(useful)= 2.36369 gflops(actual)= 2.85066 membw= 1.74414 totalbw = 1.74414
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 64 ghost= 4 time(100M)= 0.111043 gflops= 9.56834e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 4 time= 0.402517 gflops(useful)= 4.16808 gflops(actual)= 4.74753 membw= 1.47552 totalbw = 1.47552
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 64 ghost= 4 time(100M)= 0.224738 gflops= 4.72772e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 4 time= 0.638649 gflops(useful)= 2.62699 gflops(actual)= 2.9922 membw= 1.85993 totalbw = 1.85993
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 32 ghost= 8 time(100M)= 0.117032 gflops= 9.61273e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 8 time= 0.773533 gflops(useful)= 4.33782 gflops(actual)= 6.29783 membw= 1.0404 totalbw = 1.0404
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 32 ghost= 8 time(100M)= 0.234016 gflops= 4.80735e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 8 time= 1.32968 gflops(useful)= 2.52349 gflops(actual)= 3.66371 membw= 1.21049 totalbw = 1.21049
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 64 ghost= 8 time(100M)= 0.116987 gflops= 9.61643e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 8 time= 0.687892 gflops(useful)= 4.87786 gflops(actual)= 6.4348 membw= 1.01559 totalbw = 1.01559
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 64 ghost= 8 time(100M)= 0.238522 gflops= 4.71653e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 8 time= 1.19575 gflops(useful)= 2.80613 gflops(actual)= 3.70181 membw= 1.16849 totalbw = 1.16849
+Difference pour double: 3.33067e-16
+
+Resu lecture(sans prefetch, unroll4) avec putstream:
+
+test_jacobi_kernel_float: ni= 128 nj= 32 ghost= 4 time(100M)= 0.10953 gflops= 9.70051e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 4 time= 0.351524 gflops(useful)= 4.77271 gflops(actual)= 5.68259 membw= 1.82426 totalbw = 1.82426
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 32 ghost= 4 time(100M)= 0.218917 gflops= 4.85343e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 4 time= 0.658885 gflops(useful)= 2.5463 gflops(actual)= 3.03174 membw= 1.94653 totalbw = 1.94653
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 64 nj= 64 ghost= 4 time(100M)= 0.125627 gflops= 8.95506e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 64 jslice= 64 ghost= 4 time= 0.368016 gflops(useful)= 4.55883 gflops(actual)= 5.49806 membw= 1.68196 totalbw = 1.68196
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 64 nj= 64 ghost= 4 time(100M)= 0.231732 gflops= 4.85473e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 64 jslice= 64 ghost= 4 time= 0.693207 gflops(useful)= 2.42023 gflops(actual)= 2.91886 membw= 1.78587 totalbw = 1.78587
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 64 ghost= 4 time(100M)= 0.109302 gflops= 9.72075e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 4 time= 0.337085 gflops(useful)= 4.97715 gflops(actual)= 5.66908 membw= 1.76193 totalbw = 1.76193
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 64 ghost= 4 time(100M)= 0.222551 gflops= 4.77417e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 4 time= 0.62166 gflops(useful)= 2.69878 gflops(actual)= 3.07397 membw= 1.91076 totalbw = 1.91076
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 32 ghost= 8 time(100M)= 0.117067 gflops= 9.60986e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 8 time= 0.661409 gflops(useful)= 5.07317 gflops(actual)= 7.36545 membw= 1.21677 totalbw = 1.21677
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 32 ghost= 8 time(100M)= 0.231884 gflops= 4.85155e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 8 time= 1.30364 gflops(useful)= 2.5739 gflops(actual)= 3.7369 membw= 1.23467 totalbw = 1.23467
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 64 ghost= 8 time(100M)= 0.115606 gflops= 9.7313e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 8 time= 0.591507 gflops(useful)= 5.6727 gflops(actual)= 7.48333 membw= 1.18107 totalbw = 1.18107
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 64 ghost= 8 time(100M)= 0.234989 gflops= 4.78745e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 8 time= 1.16874 gflops(useful)= 2.87099 gflops(actual)= 3.78736 membw= 1.1955 totalbw = 1.1955
+Difference pour double: 3.33067e-16
+
+Resu lecture(sans prefetch, unroll4) sans putstream:
+
+test_jacobi_kernel_float: ni= 128 nj= 32 ghost= 4 time(100M)= 0.11083 gflops= 9.58673e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 4 time= 0.366604 gflops(useful)= 4.57639 gflops(actual)= 5.44884 membw= 1.74922 totalbw = 1.74922
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 32 ghost= 4 time(100M)= 0.221106 gflops= 4.80538e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 4 time= 0.674607 gflops(useful)= 2.48696 gflops(actual)= 2.96108 membw= 1.90117 totalbw = 1.90117
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 64 nj= 64 ghost= 4 time(100M)= 0.126281 gflops= 8.90868e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 64 jslice= 64 ghost= 4 time= 0.431545 gflops(useful)= 3.88771 gflops(actual)= 4.68867 membw= 1.43435 totalbw = 1.43435
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 64 nj= 64 ghost= 4 time(100M)= 0.234209 gflops= 4.80339e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 64 jslice= 64 ghost= 4 time= 0.768096 gflops(useful)= 2.18426 gflops(actual)= 2.63427 membw= 1.61175 totalbw = 1.61175
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 64 ghost= 4 time(100M)= 0.110574 gflops= 9.60893e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 4 time= 0.345037 gflops(useful)= 4.86244 gflops(actual)= 5.53843 membw= 1.72132 totalbw = 1.72132
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 64 ghost= 4 time(100M)= 0.224024 gflops= 4.74278e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 4 time= 0.637461 gflops(useful)= 2.63188 gflops(actual)= 2.99777 membw= 1.86339 totalbw = 1.86339
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 32 ghost= 8 time(100M)= 0.117454 gflops= 9.57819e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 8 time= 0.676214 gflops(useful)= 4.9621 gflops(actual)= 7.2042 membw= 1.19013 totalbw = 1.19013
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 32 ghost= 8 time(100M)= 0.233719 gflops= 4.81346e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 8 time= 1.32415 gflops(useful)= 2.53403 gflops(actual)= 3.67902 membw= 1.21554 totalbw = 1.21554
+Difference pour double: 3.33067e-16
+test_jacobi_kernel_float: ni= 128 nj= 64 ghost= 8 time(100M)= 0.116711 gflops= 9.63917e+09
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 8 time= 0.601562 gflops(useful)= 5.57788 gflops(actual)= 7.35825 membw= 1.16133 totalbw = 1.16133
+Difference pour float: 1.78814e-07
+test_jacobi_kernel_double: ni= 128 nj= 64 ghost= 8 time(100M)= 0.238169 gflops= 4.72352e+09
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 8 time= 1.19251 gflops(useful)= 2.81375 gflops(actual)= 3.71186 membw= 1.17166 totalbw = 1.17166
+Difference pour double: 3.33067e-16
+
+Resu 8 rocs, lecture(sans prefetch, unroll4) sans putstream:
+
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 4 time= 0.391997 gflops(useful)= 4.27993 gflops(actual)= 5.09588 membw= 1.6359 totalbw = 13.0872
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 4 time= 0.812756 gflops(useful)= 2.06424 gflops(actual)= 2.45777 membw= 1.57801 totalbw = 12.6241
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 64 jslice= 64 ghost= 4 time= 0.525263 gflops(useful)= 3.19406 gflops(actual)= 3.85211 membw= 1.17843 totalbw = 9.42747
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 64 jslice= 64 ghost= 4 time= 1.0567 gflops(useful)= 1.58771 gflops(actual)= 1.91481 membw= 1.17155 totalbw = 9.37242
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 4 time= 0.395127 gflops(useful)= 4.24603 gflops(actual)= 4.83633 membw= 1.50311 totalbw = 12.0249
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 4 time= 0.847905 gflops(useful)= 1.97867 gflops(actual)= 2.25375 membw= 1.40091 totalbw = 11.2073
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 8 time= 0.764669 gflops(useful)= 4.3881 gflops(actual)= 6.37083 membw= 1.05246 totalbw = 8.41966
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 8 time= 1.63952 gflops(useful)= 2.0466 gflops(actual)= 2.97134 membw= 0.981729 totalbw = 7.85383
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 8 time= 0.704839 gflops(useful)= 4.76058 gflops(actual)= 6.28008 membw= 0.991168 totalbw = 7.92934
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 8 time= 2.59118 gflops(useful)= 1.29495 gflops(actual)= 1.70827 membw= 0.539224 totalbw = 4.3138
+Difference pour double: 3.33067e-16
+
+Resu 8 rocs, lecture(sans prefetch, unroll4) avec putstream:
+
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 4 time= 0.367007 gflops(useful)= 4.57136 gflops(actual)= 5.44286 membw= 1.7473 totalbw = 13.9784
+Difference pour float: 1.78814e-07                                                                                                                                
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 4 time= 0.810862 gflops(useful)= 2.06906 gflops(actual)= 2.46351 membw= 1.5817 totalbw = 12.6536
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 64 jslice= 64 ghost= 4 time= 0.418345 gflops(useful)= 4.01038 gflops(actual)= 4.83661 membw= 1.47961 totalbw = 11.8369
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 64 jslice= 64 ghost= 4 time= 0.847255 gflops(useful)= 1.98018 gflops(actual)= 2.38815 membw= 1.46116 totalbw = 11.6893
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 4 time= 0.386245 gflops(useful)= 4.34367 gflops(actual)= 4.94754 membw= 1.53768 totalbw = 12.3014
+Difference pour float: 1.78814e-07
+
+
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 4 time= 0.77854 gflops(useful)= 2.15496 gflops(actual)= 2.45455 membw= 1.52573 totalbw = 12.2058
+
+
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 6 time= 0.57222 gflops(useful)= 4.39793 gflops(actual)= 5.79279 membw= 1.25775 totalbw = 10.062
+Difference pour float: 6.7234e-05
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 6 time= 1.13577 gflops(useful)= 2.21574 gflops(actual)= 2.9185 membw= 1.26735 totalbw = 10.1388
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 6 time= 0.509544 gflops(useful)= 4.93889 gflops(actual)= 6.05913 membw= 1.26475 totalbw = 10.118
+Difference pour float: 6.53863e-05
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 6 time= 1.25467 gflops(useful)= 2.00578 gflops(actual)= 2.46073 membw= 1.02728 totalbw = 8.21821
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 32 ghost= 8 time= 0.750799 gflops(useful)= 4.46916 gflops(actual)= 6.48852 membw= 1.0719 totalbw = 8.57521
+Difference pour float: 1.78814e-07
+
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 32 ghost= 8 time= 1.57077 gflops(useful)= 2.13617 gflops(actual)= 3.10139 membw= 1.0247 totalbw = 8.19757
+
+Difference pour double: 3.33067e-16
+ni= 128 nj= 128 nk= 128 type= float islice= 128 jslice= 64 ghost= 8 time= 0.677494 gflops(useful)= 4.95273 gflops(actual)= 6.53356 membw= 1.03117 totalbw = 8.24939
+Difference pour float: 1.78814e-07
+ni= 128 nj= 128 nk= 128 type= double islice= 128 jslice= 64 ghost= 8 time= 2.40488 gflops(useful)= 1.39526 gflops(actual)= 1.84061 membw= 0.580997 totalbw = 4.64797
+
+
+
+FICHIER .TU du calcul poreux:
+Statistiques d'initialisation du calcul                                                           
+
+Temps total                       64.3686
+
+Statistiques de resolution du probleme
+
+Temps total                       71296.2
+Timesteps                         18000  
+Secondes / pas de temps           3.71259
+Nb solveur / pas de temps         3      
+Secondes / solveur                0.733586
+Iterations / solveur              1       
+Communications avg        57.7 % of total time
+Communications max        65 % of total time  
+Communications min        48.1 % of total time
+Network latency benchmark 4.70901e-05 ms      
+Network bandwidth max     246.333 MB/s        
+Total network traffic     198488 MB / timestep
+Average message size      4.65087 kB          
+
+Fichier.data:
+                solveur_pression Multigrille_poreux { 
+                        ni 60                         
+                        nj 40                         
+                        nk 40                         
+                        kmax_cubes 18                 
+                        refine_levels 4 10 5 2 1      
+                        x_size_tot 3.                 
+                        relax_jacobi 0.65             
+                        pre_smooth_steps 3 4 4 4      
+                        smooth_steps     3 14 50 34   
+                        nb_full_mg_steps 2 1 1        
+                        seuil 1e-4                    
+                        decoupage 3 10 8 8            
+                        solveur_grossier gcp { optimized seuil 1e-16 precond ssor { omega 1.7 } }
+                        n_krilov 3                                                               
+                        iterations_gmres 3                                                       
+
+                        ghost_size 2
+                        check_residu 1
+                }                     
+
+.out et .err:
+gmres iteration 0 norme(residu) 14496.4
+
+Convergence en 216 iterations
+Residu final: 9.06132e-17 (3.2888e-14)
+
+Convergence en 227 iterations
+Residu final: 8.72582e-17 (1.87712e-14)
+
+Convergence en 231 iterations
+Residu final: 9.44967e-17 (1.05784e-14)
+facteurs r : 14706.8 -144.712 3.67891 -0.111072
+matrice de hessenberg 2
+4 3
+12
+0.985802 0.0110825 -0.000507875
+0.0098558 1.00215 0.0266939
+0 0.0265199 1.04123
+0 0 0.0301788
+
+gmres iteration 1 norme(residu) 0.113707
+
+Convergence en 232 iterations
+Residu final: 9.30684e-17 (1.05366e-14)
+
+Convergence en 234 iterations
+Residu final: 8.02397e-17 (7.59578e-15)
+
+Convergence en 234 iterations
+Residu final: 8.36797e-17 (1.03891e-14)
+facteurs r : 0.110803 -0.00544058 0.000150733 -5.24248e-06
+matrice de hessenberg 2
+4 3
+12
+1.0287 0.0510341 0.000272022
+0.0512488 1.04071 0.0286068
+0 0.0287604 1.03573
+0 0 0.0347604
+
+gmres iteration 2 norme(residu) 2.14829e-05
+gmres: norme(residu) < seuil=0.0001 => return
+clock Ax=B: 0.752343 s
+
+
+
+Statistiques d'execution globale : Statistiques de resolution du probleme
+ Le temps a ete mesure par la methode suivante :
+ gettimeofday (elapsed CPU time)
+                                        Counter (level)   avg time         (min,max)                avg count (min,max)                  avg qty (min,max)
+                                       Temps total (01)   71296.17  100.0% (71296.17,71296.17)              0                                  0
+                                   Preparer calcul (01)       0.00    0.0%                                  0                                  0
+                          Resoudre (timestep loop) (01)   66574.63   93.4% (66489.50,66826.58)        1.8e+04                                  0
+                      SolveurSys::resoudre_systeme (01)   39114.03   54.9% (38848.42,39613.63)        5.4e+04                            5.4e+04
+                             Assembleur::assembler (01)       0.00    0.0%                                  0                                  0
+                                                m1 (01)       0.00    0.0%                                  0                                  0
+                                                m2 (01)       0.00    0.0%                                  0                                  0
+                                                m3 (01)       0.00    0.0%                                  0                                  0
+                DoubleVect::echange_espace_virtuel (02)       0.00    0.0%                                  0                                  0
+                        MPI_sendrecv:MPI_send_recv (02)   25611.32   35.9% (21146.51,27910.68)        1.2e+09 (1.03e+09,1.26e+09)       5.58e+12 (4.62e+12,5.93e+12)
+                             MPI_sendrecv:MPI_send (02)       0.43    0.0% (0.27,4.53)               1.53e+04 (9.54e+03,3.68e+06)       1.19e+09 (1.47e+07,1.21e+09)
+                             MPI_sendrecv:MPI_recv (02)    2779.24    3.9% (785.47,2805.06)          1.53e+04 (5.76e+03,6.1e+06)        1.19e+09 (2.3e+04,7.62e+11)
+                        MPI_sendrecv:MPI_broadcast (02)      46.25    0.1% (0.93,46.38)              1.08e+05                            7.2e+05
+                         MPI_sendrecv:MPI_alltoall (02)       0.00    0.0%                                  0                                  0
+                      MPI_allreduce:MPI_partialsum (02)      28.04    0.0% (0.00,42.90)                   945                                  0
+                       MPI_allreduce:MPI_sumdouble (02)   12707.93   17.8% (10285.22,15580.34)       1.54e+08                                  0
+                       MPI_allreduce:MPI_mindouble (02)       0.00    0.0%                                  0                                  0
+                       MPI_allreduce:MPI_maxdouble (02)       0.00    0.0%                                  0                                  0
+                          MPI_allreduce:MPI_sumint (02)       0.00    0.0%                                  0                                  0
+                          MPI_allreduce:MPI_minint (02)       0.00    0.0%                                  0                                  0
+                          MPI_allreduce:MPI_maxint (02)       0.00    0.0%                                  0                                  0
+                         MPI_allreduce:MPI_barrier (02)      24.80    0.0% (0.30,124.61)             3.51e+03                                  0
+                               io:MPI_send_recv_io (02)       0.00    0.0%                                  0                                  0
+                                           Scatter (02)       0.00    0.0%                                  0                                  0
+                                      ijk_exchange (01)   13055.23   18.3% (12223.22,14084.74)       2.19e+07                                  0
+                                  jacobi_fine_mesh (01)    5125.63    7.2% (4501.25,5844.54)         3.67e+06                           1.06e+13 (1.04e+13,1.08e+13)
+                                        jacobi_all (01)   18891.09   26.5% (17974.69,19390.62)       2.38e+06                           6.04e+12 (5.87e+12,6.24e+12)
+                                     coarse_solver (01)    9992.32   14.0% (9984.06,9998.94)         3.24e+05                                  0
+                                      MPI_sendrecv (00)   28437.24   39.9% (23954.99,30746.75)        1.2e+09 (1.03e+09,1.26e+09)       5.58e+12 (4.62e+12,5.93e+12)
+                                     MPI_allreduce (00)   12760.77   17.9% (10342.14,15627.84)       1.54e+08                                  0
+                                                io (00)       0.00    0.0%                                  0                                  0

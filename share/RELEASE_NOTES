@@ -1,4 +1,21 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.9.0 : Enhancements, modifications and corrected bugs since version 1.8.4 :
+--------------------------------------------------------------------------------------------------
+04/07/22 (TrioCFD) New feature : Add new Turbulence model "combinaison" in EF discretization with standard wall law and WW hydraulics
+30/06/22 (TrioCFD) New feature : Integration of TrioIJK as a new Baltik of TrioCFD in Multiphase Baltik under the name Front_Tracking_IJK
+29/06/22 (TrioCFD) Enhancement : Improvement of Front-Tracking remesh
+19/06/22 (TrioCFD) New feature : New Baltik Optimisation/Aposteriori - First version for stationnary cases
+16/06/22 (TrioCFD) New feature : Add validation sheet to validate the new Pb_HEM
+03/06/22 (TrioCFD) New feature : Multiphase CFD (CMFD baltik) ; still a work in progress
+20/05/22 (TrioCFD) New feature : Adams Bashforth time scheme on a mobile (ALE context)
+20/05/22 (TrioCFD) New feature : LES model on a mobile gird (ALE context)
+20/04/22 (TrioCFD) Enhancement : Adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid (ALE context)
+28/03/22 (TrioCFD) Bug fixed   : Update the Turbulence_synthetique validation sheet following the correction of the BC in TRUST
+21/02/22 (TrioCFD) Major Change: TRUST VDF face Diff/Dift operators changed : the transpose term of the velocity gradient is always used ! We use the good formulation now !
+12/01/22 (TrioCFD) Major Change: No more scalar methods for VDF flux iterators/evaluators
+12/01/22 (TrioCFD) Major Change: SingleDouble/ArrOfDouble for VDF elem/face fluxes and not DoubleVect (no // structure required !)
+12/01/22 (TrioCFD) Major Change: Class and Substitution Failure Is Not An Error (SFINAE) templates are extensively used for the VDF evaluators, iterators and operators
+--------------------------------------------------------------------------------------------------
 Release notes version 1.8.4 : Enhancements, modifications and corrected bugs since version 1.8.3 :
 --------------------------------------------------------------------------------------------------
 07/12/21 (TrioCFD) New feature : New documentation available: Configuration Management Plan (PGC)

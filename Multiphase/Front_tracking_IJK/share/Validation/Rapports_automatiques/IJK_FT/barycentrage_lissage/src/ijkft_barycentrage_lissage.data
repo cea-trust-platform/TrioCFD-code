@@ -1,0 +1,78 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 32
+  nbelem_j 32
+  nbelem_k 32
+  uniform_domain_size_i 0.202
+  uniform_domain_size_j 0.202
+  uniform_domain_size_k 0.202
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 2
+  nproc_j 2
+  nproc_k 2
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 7
+  timestep 0.01
+  timestep_facsec 0.4
+  # time_scheme euler_explicite # 
+  Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+
+  dt_post 24
+  champs_a_postraiter 3 mu INTERFACES COMPO_CONNEXE
+  check_stop_file stop.txt
+  dt_sauvegarde 1000
+  nb_pas_dt_max 8
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 3
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  }
+      Coarsen_Operator_Uniform {  } 	
+    ghost_size 1
+    pre_smooth_steps 1 7
+    smooth_steps 1 7
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-10  precond ssor { omega 1.5 } }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    
+  }
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init.lata
+    timestep_reprise_interface       1
+    lata_meshname   FTMESH
+    remaillage_ft_ijk {
+	nb_iter_barycentrage 1
+	relax_barycentrage 1
+	nb_iter_correction_volume 6
+	lissage_courbure_iterations_systematique 2
+    }
+  }
+  check_divergence
+  gravite 3 0. 0. 0. 
+  rho_liquide 1000
+  mu_liquide 1e-3
+  expression_vx_init 0.
+  expression_vy_init 0.
+  expression_vz_init 0.
+}
+Fin

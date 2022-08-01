@@ -55,10 +55,10 @@ Read sch
 	tinit 	0.
 	nb_pas_dt_max 3
 	tmax 1.6
-        dt_start dt_fixe 4.5e-3
+        dt_start dt_fixe 4.5e-4
 	dt_min 0.5e-4
 #	dt_max 0.01 #
-	dt_max 0.005
+	dt_max 0.0005
 	dt_impr 1.e-10
 	dt_sauv 3
 	seuil_statio -1

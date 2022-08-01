@@ -21,9 +21,9 @@ cd Poiseuille_flow_2D_VDF_VEF
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF/build/* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Laminar/Poiseuille_flow_2D_VDF_VEF/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Poiseuille_flow_2D_VDF_VEF/build/.[!.]* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Laminar/Poiseuille_flow_2D_VDF_VEF/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -73,9 +73,9 @@ cd Cir_Cyl_Re100
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Cir_Cyl_Re100/build/* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Laminar/Cir_Cyl_Re100/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Cir_Cyl_Re100/build/.[!.]* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Laminar/Cir_Cyl_Re100/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -102,9 +102,9 @@ cd Convection_Vahl_Davis
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Convection_Vahl_Davis/build/* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Thermal_Laminar/Convection_Vahl_Davis/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Convection_Vahl_Davis/build/.[!.]* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Thermal_Laminar/Convection_Vahl_Davis/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -128,9 +128,9 @@ cd Oscillating_Flow
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Oscillating_Flow/build/* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Thermal_Laminar/Oscillating_Flow/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Oscillating_Flow/build/.[!.]* .
+cp -R $version/validation/share/Validation/Rapports_automatiques/Thermal_Laminar/Oscillating_Flow/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -157,9 +157,9 @@ cd OBI_diffuser_VEF_k_eps
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/OBI_diffuser_VEF_k_eps/build/* .
+cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/OBI_diffuser_VEF_k_eps/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/OBI_diffuser_VEF_k_eps/build/.[!.]* .
+cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/OBI_diffuser_VEF_k_eps/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -183,9 +183,9 @@ cd Mixing_length_VEF_WF
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Mixing_length_VEF_WF/build/* .
+cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/Mixing_length_VEF_WF/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Mixing_length_VEF_WF/build/.[!.]* .
+cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/Mixing_length_VEF_WF/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)
@@ -206,31 +206,31 @@ sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 #           fiches thermique + laminaire
 ##################################################
 ########### Thermal_stratification_flow  ################
-cd $rapport/fiches
-mkdir Thermal_stratification_flow
-cd Thermal_stratification_flow
-mkdir build
-cd build
-#copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Thermal_stratification_flow/build/* .
-#copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Thermal_stratification_flow/build/.[!.]* .
-#nettoyage des fichiers tex
-cd .tmp
-echo 'traitement ' $(pwd)
-sed -i '45d' fic.tex
-sed -i "s@rhead{}@rhead{THERMAL TURBULENT FLOW}@g" fic.tex
-sed -i '/documentclass/d' fic.tex
-sed -i '/usepackage/d' fic.tex
-sed -i '/setlength/d' fic.tex
-sed -i '/renewcommand/d' fic.tex
-sed -i '/pagestyle/d' fic.tex
-sed -i '/makeindex/d' fic.tex
-sed -i '/begin{document}/d' fic.tex
-sed -i '/huge/d' fic.tex
-sed -i '/end{document}/d' fic.tex
-sed -i "s@orig{..}@orig{./fiches/Thermal_stratification_flow/build}@g" fic.tex
-sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
+#cd $rapport/fiches
+#mkdir Thermal_stratification_flow
+#cd Thermal_stratification_flow
+#mkdir build
+#cd build
+##copie de tous les fichiers
+#cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/Thermal_stratification_flow/build/* .
+##copie supplementaire des fichiers et repertoires caches
+#cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/Thermal_stratification_flow/build/.[!.]* .
+##nettoyage des fichiers tex
+#cd .tmp
+#echo 'traitement ' $(pwd)
+#sed -i '45d' fic.tex
+#sed -i "s@rhead{}@rhead{THERMAL TURBULENT FLOW}@g" fic.tex
+#sed -i '/documentclass/d' fic.tex
+#sed -i '/usepackage/d' fic.tex
+#sed -i '/setlength/d' fic.tex
+#sed -i '/renewcommand/d' fic.tex
+#sed -i '/pagestyle/d' fic.tex
+#sed -i '/makeindex/d' fic.tex
+#sed -i '/begin{document}/d' fic.tex
+#sed -i '/huge/d' fic.tex
+#sed -i '/end{document}/d' fic.tex
+#sed -i "s@orig{..}@orig{./fiches/Thermal_stratification_flow/build}@g" fic.tex
+#sed -i "s@input{corps}@input{\\\orig/.tmp/corps}@g" fic.tex
 ########### Channel_T1_T2_incompressible ################
 cd $rapport/fiches
 mkdir Channel_T1_T2_incompressible
@@ -238,9 +238,9 @@ cd Channel_T1_T2_incompressible
 mkdir build
 cd build
 #copie de tous les fichiers
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Channel_T1_T2_incompressible/build/* .
+cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/Channel_T1_T2_incompressible/build/* .
 #copie supplementaire des fichiers et repertoires caches
-cp -R $version/validation/share/Validation/Rapports_automatiques/Validant/Fini/Channel_T1_T2_incompressible/build/.[!.]* .
+cp -R $version/Turbulence/share/Validation/Rapports_automatiques/RANS/Channel_T1_T2_incompressible/build/.[!.]* .
 #nettoyage des fichiers tex
 cd .tmp
 echo 'traitement ' $(pwd)

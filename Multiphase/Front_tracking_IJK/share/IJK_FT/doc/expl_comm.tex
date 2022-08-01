@@ -1,0 +1,35 @@
+\begin{verbatim}
+PROC1:                                   
+ doit envoyer le sommet 0 au processeur 2
+ doit envoyer le sommet 4 au processeur 2
+
+
+PROC2:
+ doit recevoir, dans l'ordre, du processeur 1:
+    le premier sommet recu dans le sommet 3,  
+    le deuxieme sommet recu dans le sommet 4  
+
+PROC1:
+maillage.desc_sommets_.espace_distant_.elements_[2] =
+   { 0, 4 }                                          
+
+PROC2:
+maillage.desc_sommets_.espace_virtuel_.elements_[1] =
+   { 3, 4 }
+
+
+sur le processeur 1:
+appeler maillage.creer_sommets_virtuels(
+   liste_sommets = { 0, 4 }
+   liste_pe = { 2, 2 }
+)
+c'est une methode parallele, le proc 1 va envoyer des donnees
+et le proc 2 va en attendre en reception,
+il faut donc appeler la methode sur le proc2  aussi, en meme temps:
+
+PROC2:
+maillage.creer_sommets_virtuels(
+   liste_sommets= {}
+   liste_pe = {}
+)
+\end{verbatim}

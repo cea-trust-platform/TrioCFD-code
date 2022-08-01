@@ -1,0 +1,12 @@
+#Pmacro SIMD_CLASS_DEF(__type__,__psd__,__mtype__,__vsize__)
+class Simd___type__
+{
+public:
+  typedef __type__ value_type;
+}
+#Pendmacro(SIMD_CLASS_DEF)
+
+// Implementation for single precision type
+#Pusemacro(SIMD_CLASS_DEF)(float,ps,__m128,4)
+// Implementation for double precision type
+#Pusemacro(SIMD_CLASS_DEF)(double,pd,__m128d,2)

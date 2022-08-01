@@ -1,0 +1,143 @@
+Parametres {
+	Titre "Validation of the computation and post processing of interfacial temperature and fluxes."
+	Description <<EOF
+	In order to validate this, two cases are considered : (i) with continuous conductivity or (ii) with discontinuity.
+The temperature fields are initialsed into the same test case and correspond to vatiables T0 and T1 respectively. 
+The initial field is: 
+\latex_(\begin{align}
+T_0 &=\frac{r}{\lambda_0} \mbox{ with } \lambda_l=\lambda_v = \lambda_0 = 0.1 \\
+T_1 &= \frac{r}{H(r-r_b) \lambda_v+\lambda_l H(r_b-r)} \mbox{ with } \lambda_l=10. \mbox{ and }\lambda_v=0.1
+\end{align}
+with $r=\sqrt{(x-x_b)^2+(y-y_b)^2+(z-z_b)^2}$, $r_b=10^{-3}$\,m the bubble radius, 
+and $(x_b,y_b,z_b)=(1.5,1.5,1.5)\times10^{-3}$\,m the coordinates of the bubble center. 
+The effect of the discontinuity and mesh refinement are assessed. Ratios $\eta=\lambda_l/\lambda_v$ 
+are taken in the list: 1., 1.1, 1.5, 2., 5., 10., 100.
+Cubic Meshes are assessed with $N$ in 12, 24 and 48.
+\latex_)
+
+EOF
+
+	Auteur "Guillaume BOIS"
+	CasTest . test_12.data 1
+	CasTest . test_24.data 1
+        CasTest . test_48.data 1
+        CasTest . test_24_par8_trans.data 8 
+}
+
+#################################################################
+#######   CONVERGENCE STUDY   ###################################
+#################################################################
+ Chapitre {
+ 	Titre "Mesh visualisation "
+ 	visu {
+ 		titre "Bubble interface"
+ 		cycles -1
+ 		width 7cm
+		mesh test_24.lata INTERFACES
+		normal3D 1 1 1	
+ 	}
+ }
+
+###################################################################
+ Chapitre {
+ 	Titre "Checking the temperature field initialisation"
+
+ 	visu {
+ 		titre "Initial temperature field (2D slice)"
+		nb_img_without_newline 2
+ 		cycles -1 
+ 		width 7cm
+ 		pseudocolor test_24.lata DOM TEMPERATURE_0 ELEM
+ 		operator slice2d_y centroid1 centroid1 centroid1
+		mesh test_24.lata INTERFACES
+		operator slice2d_y centroid1 centroid1 centroid1
+ 	}
+	visu {
+ 		cycles -1 
+ 		width 7cm
+ 		pseudocolor test_24.lata DOM TEMPERATURE_3 ELEM
+ 		operator slice2d_y centroid1 centroid1 centroid1
+		mesh test_24.lata INTERFACES
+		operator slice2d_y centroid1 centroid1 centroid1
+ 	}
+	visu {
+ 		titre "Initial temperature field (3 slices)"
+ 		cycles -1 
+ 		width 7cm
+ 		pseudocolor test_24.lata DOM TEMPERATURE_0 ELEM
+ 		operator threeslice centroid1 centroid1 centroid1  
+		mesh test_24.lata INTERFACES
+		operator threeslice centroid1 centroid1 centroid1 
+		operator no_bounding_box
+		normal3D 0.5 0.5 1		
+ 	}
+
+
+
+ }
+###################################################################
+ Chapitre {
+	Titre "Results for the 3 set of meshes "
+	Figure 
+	{
+		titre "Error on the flux compared to the reference phi=1. for 3 meshes as a function of the ratio of lambdas."
+		Image errors_PHIN.png
+	}
+	Description <<EOF
+Il y a 2 points pour le ratio 2 qui correspondent a 2 initialisations de la temperature. 
+Dans le premier cas, Tini est evaluee a partir de la position du centre de gravite de l'element. 
+Dans le second cas, elle est evaluee a partir de la fonction indicatrice calculee dans chaque element. 
+On observe une erreur beaucoup plus grande dans ce second cas. 
+EOF
+	Figure 
+	{
+		titre "Error on the interfacial temperature (theoretical is 0.) as a function of the ratio of lambdas."
+		Image errors_TEMPERATURE.png
+	}
+        Figure {
+                Title "Computed average over each bubble as a function of time (mesh 48)"
+                Dimension 2
+                LabelX "Time"
+                RangeX 0.0 5.e-8
+                LabelY "Interfacial mean flux"
+                Include_Description_Curves 0
+                        Curve {
+                                legend "Field 0"
+                                file test_24_bulles_phin_0.out
+                                columns ($1) ($2)
+                                Style linespoints
+                        }
+                        Curve {
+                                legend "Field 4"
+                                file test_24_bulles_phin_4.out
+                                columns ($1) ($2)
+                                Style linespoints
+                        }
+	}
+	Figure {
+                Title "Computed average over each bubble as a function of time (mesh 48)"
+                Dimension 2
+                LabelX "Time"
+                RangeX 0.0 5.e-8
+                LabelY "Interfacial mean Temperature" 
+                Include_Description_Curves 0
+                        Curve {
+                                legend "Field 0"
+                                file test_24_bulles_Ti_0.out
+                                columns ($1) ($2)
+                                Style linespoints
+                        }
+                        Curve {
+                                legend "Field 4"
+                                file test_24_bulles_Ti_4.out
+                                columns ($1) ($2)
+                                Style linespoints
+                        }
+	}
+ }
+
+###################################################################
+ Chapitre {
+        Titre "Parallel validation to be done !!"
+
+ }

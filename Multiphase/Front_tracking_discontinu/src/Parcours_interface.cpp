@@ -1078,9 +1078,9 @@ int Parcours_interface::calcul_intersection_facelem_3D(
             //H v_prec > |------------|----\.
             //           ^       ^    ^    ^
             //           0       uX   u    u_prec
-            double B = max(u,u_prec);    //grande base du trapeze
-            double b = min(u,u_prec);    //petite base du trapeze
-            double h = dabs(v - v_prec); //hauteur du trapeze
+            double B = std::max(u,u_prec);    //grande base du trapeze
+            double b = std::min(u,u_prec);    //petite base du trapeze
+            double h = std::fabs(v - v_prec); //hauteur du trapeze
             //le CdG du trapeze : le CdG des CdG du rectangle et du triangle
             double Sr = b * h;
             double CdGrX = b/2.;
@@ -1553,7 +1553,7 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
   if (aire_projetee!=0.)
     {
       // Volume de la partie "projection sur la face face_bas (y_bas=0)
-      v = signe_princ * dabs(aire_projetee) * (centre_de_gravite_ref[1]);
+      v = signe_princ * std::fabs(aire_projetee) * (centre_de_gravite_ref[1]);
     }
   if (coupe_face_opp!=-1)
     {
@@ -1684,7 +1684,7 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
       //calcul du volume du tetraedre
       //  calcul de l'aire de la base du tetraedre : aire du triangle proj_som1,proj2_som0,proj2_som1
       base = (proj_som1[2]-proj2_som0[2]) * (proj2_som1[0]-proj2_som0[0]) - (proj_som1[0]-proj2_som0[0]) * (proj2_som1[2]-proj2_som0[2]);
-      base = dabs(base * 0.5);
+      base = std::fabs(base * 0.5);
       //  calcul de la hauteur du tetraedre
       h = som1[1];
       //  calcul du volume du tetraedre : base * hauteur / 3.
@@ -1696,7 +1696,7 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
   v /= v_elem;
 
   // On force la valeur entre 0 et 1 strictement.
-  if (dabs(v) < Erreur_relative_maxi_)
+  if (std::fabs(v) < Erreur_relative_maxi_)
     v = Erreur_relative_maxi_;
   else if (v > 1. - Erreur_relative_maxi_)
     v = 1. - Erreur_relative_maxi_;
@@ -1835,7 +1835,7 @@ double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
   double v = 0.;
 
   // Volume de la partie "projection sur la face face_bas"
-  v = signe_princ * fabs(aire_projetee) * (centre_de_gravite[1] - y_bas);
+  v = signe_princ * std::fabs(aire_projetee) * (centre_de_gravite[1] - y_bas);
 
   // Recherche d'un segment coupant la face du haut
   for (i = 0; i < nb_sommets_poly; i++)
@@ -1861,7 +1861,7 @@ double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
             * (y_haut - y_bas)
             * (poly_reelles(coupe_face_haut,2) - poly_reelles(coupe_face_haut_p1,2));
 
-          v += signe_compl0 * dabs(vol_compl0);
+          v += signe_compl0 * std::fabs(vol_compl0);
 
           if (coupe_face_droite >= 0)
             {
@@ -1872,7 +1872,7 @@ double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
                 * (y_haut - y_bas)
                 * (poly_reelles(coupe_face_droite,2) - z_arriere);
 
-              v += signe_compl1 * dabs(vol_compl1);
+              v += signe_compl1 * std::fabs(vol_compl1);
             }
         }
     }
@@ -1942,7 +1942,7 @@ int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
           // telle que x|y|z_intersection = x0|y0|z0 * (1.-t) + x1|y1|z1 * t
           // double t = f0 / (f0-f1); // Fixed bug: Arithmetic exception
           double t = t_sortie;
-          if (dabs(f0-f1)>=DMINFLOAT) t = f0 / (f0-f1);
+          if (std::fabs(f0-f1)>=DMINFLOAT) t = f0 / (f0-f1);
           if (t < t_sortie)
             {
               t_sortie = t;
@@ -2236,9 +2236,9 @@ double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
     {
       double a = 0., b = 0., c = 0., d = 0.;
       calcul_eq_plan(zone_vf, elem, i, a, b, c, d);
-      a = dabs(a);
-      b = dabs(b);
-      c = dabs(c);
+      a = std::fabs(a);
+      b = std::fabs(b);
+      c = std::fabs(c);
       somme_m_x += a;
       somme_m_y += b;
       somme_m_z += c;
@@ -2271,7 +2271,7 @@ double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
           // on a des angles de 45 degres qui font qu'on retombe sur des cas particuliers)
           // Il faut un facteur significativement superieur a 1 pour que l'algorithme converge
           // en moins de 10 iterations.
-          double r = 2.0389787 * dabs(a) + 3.07687 * dabs(b) + 2.528764 * dabs(c);
+          double r = 2.0389787 * std::fabs(a) + 3.07687 * std::fabs(b) + 2.528764 * std::fabs(c);
           double coef = coef_lagrange[i] - rho * (dist - r * Erreur_max_coordonnees_);
           coef = (coef > 0.) ? coef : 0.;
           nsol_x += a * s * coef;

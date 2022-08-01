@@ -1,0 +1,53 @@
+Mes notes:
+
+03/07/2012
+ Recuperation de la base mercurial sur vonnes:
+ /work/mathieu/usr/mercurial-2.1.1/hg clone ssh://trioform@vonnes//work/trioform/gauthier/New_algo_qc/ --remotecmd /work/trioform/mercurial-
+
+04/07/2012
+ Repertoire share/test_dns4G : differents tests pour les developpements 
+  en vue du calcul 4Gmailles. 
+ LES-395-1.01.data
+ /work/mathieu/tmp/New_algo_qc/share/test_dns4G/test_perf_1/dns1.data:
+   jdd test 256k mailles
+
+06/07/2012
+ Stockage des coefficients des faces dans un tableau ijk*4 composantes
+ (nouvelle fonctionnalite du tableau IJK_Field: n composantes).
+ Les coefficients et la somme sont precalcules et non plus calcules a la volee.
+ 
+21/08/2012
+ Coarsen_Operator_K.cpp codé.
+ Test en comparant entre Coarsen_Operator_Uniform et Coarsen_Operator_K
+ (repertoire valid_Coarsen_Operator_K)
+
+04/09/2012
+ Operateur centre 4 ijk code, perfs x40 par rapport a vdf sur mon pc.
+ Compilation sur curie gcc4.7:
+
+module unload intel...
+module load gnu/4.6.3    (pour le path vers libquadmath.so.0 sinon crash du test_mpi.f)
+. module_load_gcc4.7 (de benoit)
+
+
+Modifier le Installer de LIBLAPACK (ajouter TARGET=NEHALEM aux commandes make pour 64 bits)
+
+rm -rf LIBMED
+touch lib/src/LIBMED/MED/include/med++.h
+
+
+Environnement:
+
+module unload intel/11.1.072
+module load gnu/4.6.3
+. /ccc/work/cont002/den/mathieub/module_load_gcc4.7
+export PATH=$GD/bin:$PATH
+export OMPI_CC=$GD/bin/gcc
+export OMPI_CXX=$GD/bin/g++
+export OMPI_F77=/ccc/work/cont002/den/mathieub/usr/src/gcc-4.7.0-build/bin/gfortran
+export OMPI_F90=/ccc/work/cont002/den/mathieub/usr/src/gcc-4.7.0-build/bin/gfortran
+export OMPI_FC=/ccc/work/cont002/den/mathieub/usr/src/gcc-4.7.0-build/bin/gfortran
+
+#pour libgfortran
+export LD_LIRBARY_PATH=/ccc/work/cont002/den/mathieub/usr/src/gcc-4.7.0-build/lib64/:$LD_LIBRARY_PATH
+

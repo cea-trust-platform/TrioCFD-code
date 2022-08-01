@@ -82,7 +82,7 @@ Entree& Source_Gravite_PF_VDF::readOn(Entree& is)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces: entree/sortie
-// Retour: Entree&
+// Retour:
 //    Signification: le flot d'entree modifie
 //    Contraintes:
 // Exception:
@@ -104,7 +104,7 @@ void Source_Gravite_PF_VDF::associer_zones(const Zone_dis& zone,const Zone_Cl_di
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces:
-// Retour: Entree&
+// Retour: DoubleTab&
 //    Signification:
 //    Contraintes:
 // Exception:
@@ -124,7 +124,7 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
 
   int num_cl;
 
-  const int& boussi = eq_NS_PF.get_boussi_();
+  const int boussi = eq_NS_PF.get_boussi_();
 
   if (boussi == 0)
     {

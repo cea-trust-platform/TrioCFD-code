@@ -1,0 +1,43 @@
+De plus, on observe que le champ de pression reste constant et uniforme comme prédit. $p = 0$. L’évolution de la vitesse $u_y$, montrée seule sur les figures \ref{fig : v_0X0} permet de voir que l'ordre de grandeur de l'amplitude maximale observée correspond à l'amplitude prédite. En mettant en regard \ref{fig : v_0X0} et \ref{fig : 0X0} on constate que la vitesse $u_y$ est déphasé de $\pi/4$ par rapport à la force $f_y$. Cependant il n'est pas possible de conclure que la solution analytique est strictement respectée car l'amplitude de la vitesse $u_y$ varie au cours du temps. On relève notamment que l'amplitude s'annule pour $t=0.05s$ avec un changement brusque de signe de $u_y$. La tendance observée laisse supposer que l'amplitude s'annule encore pour $t=0.1$. Une simulation plus longue en remplaçant $\o_{1/20}$ par $\o_{1/2}$ (non reproduite ici, mais facilement reproductible) montre que cette amplitude s'annule pour $t=0.5s$ et pour $t=1s$. On suppose donc que le champ de vitesse simulé est des la forme :
+
+\begin{align}
+u_y(x;t) = sin(\frac{\o_q \pi}{L} t ) \cdot ( - \frac{2}{\o_{q}} sin(\k_1 x - \o_{1/2} t))
+\end{align}
+
+
+\begin{figure}
+\begin{center}
+	\begin{subfigure}[t]{0.4\textwidth}                                                                                                                                   
+		\includegraphics[scale=0.23]{../../build/lineout_velocity_ADV_0X0_t1.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : v_0X0_t1}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_velocity_ADV_0X0_t6.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : v_0X0_t6}
+	\end{subfigure}
+\\
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_velocity_ADV_0X0_t11.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : v_0X0_t11}
+	\end{subfigure}\hfill
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_velocity_ADV_0X0_t16.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : v_0X0_t16}
+	\end{subfigure}
+\\
+	\begin{subfigure}[t]{0.4\textwidth}
+		\includegraphics[scale=0.23]{../../build/lineout_velocity_ADV_0X0_t17.png}
+		\caption{ $\bm{t=s}$}
+		\label{fig : v_0X0_t17}
+	\end{subfigure}	
+\end{center}
+\caption{Évolution le long de $(x,y=0,z=0)$ de : la force $f_y$ (rouge), la vitesse $u_y$ (bleu), la pression $p$ (vert).}
+\label{fig : v_0X0}
+\end{figure}
+
+
+

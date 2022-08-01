@@ -26,7 +26,7 @@
 
 
 #include <Source_base.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Champ_Don.h>
 
 #include <Ref_Probleme_base.h>
@@ -48,7 +48,7 @@ class Source_Con_Phase_field_base : public Source_base
 public:
   virtual void premier_demi_dt()=0;
   virtual const DoubleVect& get_u_carre()=0;
-  virtual void calculer_champ_fonc_c(const double& t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const = 0;
+  virtual void calculer_champ_fonc_c(const double t, Champ_Don& champ_fonc_c, const DoubleTab& val_c) const = 0;
 };
 
 #endif

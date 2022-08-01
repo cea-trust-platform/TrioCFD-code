@@ -24,9 +24,7 @@
 #define Proprietes_part_vol_included
 
 #include <Objet_U.h>
-#include <DoubleTabFT.h>
-
-class ArrOfIntFT;
+#include <TRUSTTabFT.h>
 class Param;
 
 //Description
@@ -54,9 +52,9 @@ public:
   Proprietes_part_vol();
 
   void set_param(Param& param);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   void completer();
-  void fixer_nb_particules(const int& nb_part);
+  void fixer_nb_particules(const int nb_part);
   void lire_distribution(Entree& is);
   void nettoyer(const ArrOfInt& som_utilises);
   void ajouter_proprietes(const Proprietes_part_vol& proprietes_tmp);

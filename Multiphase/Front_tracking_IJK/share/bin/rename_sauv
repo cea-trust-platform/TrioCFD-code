@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# Verifie le nombre d'argument :
+if [ $# != 2 ] && [ $# != 3 ] # "$#" is number of parameters
+then
+        echo "Usage `basename $0` <sauv_file> <new_name> [copy|move|link]"
+        echo "   Rename sauv file and do some stuff"
+        echo "   last arg is optional. Default value : copy"
+        exit -1
+else
+   old=$1
+   new=$2
+   if  [ $# == 2 ] 
+   then
+      action="copy"
+   else
+      action=$3
+   fi
+   echo "[cmd] `basename $0` $1 $2"
+   echo "      option : $action"
+fi
+
+nc=`expr length $old`
+echo ${fic:$nc}
+
+if [ $action == "copy" ]
+then
+   echo "Option copy..."
+   for fic in $old*
+   do
+      echo -n "Dealing with $fic"
+      ext=${fic:$nc}
+      echo " $new$ext"
+      cp -f $fic $new$ext
+   done
+   name_old=`basename $old`
+   name_new=`basename $new`
+   if [ -f $new ]
+   then
+      sed -i "s/$name_old/$name_new/g" $new
+   else
+      echo "File $new missing"
+      exit -2 
+   fi
+   if [ -f $new.lata ]
+   then
+      sed -i "s/$name_old/$name_new/g" $new.lata
+   else
+      echo "File $new.lata missing"
+      exit -2 
+   fi
+elif [ $action == "move" ]
+then
+   echo "Option move Not implemented yet..."
+   exit -1
+elif [ $action == "link" ]
+then
+   echo "Option link Not implemented yet..."
+   exit -1
+else
+   echo "Unknown type of action..."
+   exit -1
+fi
+
+echo "Finish!"

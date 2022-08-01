@@ -1,0 +1,9 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+tail -n1 canal_poiseuille_SONDE_T1.son | sed -e "s/ /\n/g" | sed -e '1d' | awk '{print (NR*6.25e-5-3.125e-5)" "$0}' > final_T1.txt
+tail -n1 canal_poiseuille_SONDE_STREAMWISE_T1.son | sed -e "s/ /\n/g" | sed -e '1d' | awk '{print NR*5e-4-2.5e-4" "$0}' > final_T1_stream.txt
+tail -n1 canal_poiseuille_SONDE_T2.son | sed -e "s/ /\n/g" | sed -e '1d' | awk '{print (NR*6.25e-5-3.125e-5)" "$0}' > final_T2.txt
+tail -n1 canal_poiseuille_SONDE_STREAMWISE_T2.son | sed -e "s/ /\n/g" | sed -e '1d' | awk '{print NR*5e-4-2.5e-4" "$0}' > final_T2_stream.txt
+
+

@@ -1,0 +1,85 @@
+NOTE A L'ATTENTION DE L'UTILISATEUR DES FICHIERS :
+    -methodes_2020.py
+    -outils_physiques.py
+    -exemple.py
+    -tests_2020.py
+________________________________________________________________________
+
+1.  DESCRIPTION
+________________________________________________________________________
+Ce groupe de fichiers a pour but de faciliter le travail et la manipulation
+de fichiers au format .med, en se servant de python. L'objectif a notamment
+ete de (conserver les drives spatiales deja fournies et de) recuperer la moyenne
+temporelle, la moyenne par plan d'un champ donne ainsi que les tensions
+de Reynolds de l'ecoulement.
+________________________________________________________________________
+1.0 methodes_2020
+
+Dans ce fichier on trouve toutes les fonctions necessaires aux objectifs
+et qui ne traitent pas a proprement parler de physique.
+
+Les librairies importees sont :
+    -from optparse import OptionParser
+    -import MEDCouplingRemapper
+    -import numpy as np
+    -import time
+    -import MEDLoader as ml
+    -import methodes_2020
+    -import outils_physique
+    -import matplotlib.pyplot as plt
+
+Les fonctions definies sont :
+    voir GLOSSAIRE_methodes_2020.txt
+________________________________________________________________________
+1.1 outils_physique_2020
+
+Dans ce fichier on trouve les fonctions directement necessaires aux objectifs,
+et qui font intervenir de la physique.
+
+Le librairies importee sont :
+     - from optparse import OptionParser
+     - import MEDCouplingRemapper 
+     - import numpy as np
+     - import time 
+     - import MEDLoader as ml
+     - import methodes_2020
+     - import outils_physique
+     - import matplotlib.pyplot as plt
+
+Les fonctions definies sont :
+    voir GLOSSAIRE_outils_thxique.txt
+________________________________________________________________________
+1.2 tests_2020
+
+Ce fichier execute des tests unitaires sur chacune des fonctions definies dans
+les deux fichiers precedents.
+________________________________________________________________________
+1.3 exemple
+
+Fichier à lancer pour construire les fichiers.med contenant les moyennes,
+Rij et jacobienne. Attention, le .med d'origine doit être proprement
+renseigné à la l.13 .
+________________________________________________________________________
+
+2.  UTILISATION
+________________________________________________________________________
+
+Si on se cantonne l'utilisation des moyennes (par plan ou temporelle) et
+au jacobien et gradien scalaire, on a normalement a invoquer uniquement
+les fonctions de outil_physique. Dans methodes_2020, les fonctions de
+conversion de support d'information (...To...) peuvent etre utiles pour
+l'utilisateur, notament si son choix de visualisation ncessite un
+changement de support.
+________________________________________________________________________
+Le script exemple.py est un bon script de scénario d'utilisation simple.
+Il suffit d'activer le bloc conditionel souhaité pour voir l'effet de
+telle ou telle fonction.
+A l'issue de son exécution, on peut visualiser les différents .med à l'aide
+de Paraview.
+________________________________________________________________________
+
+3. REMARQUE
+________________________________________________________________________
+--> Il faut (chercher et) trouver comment on nomme les diférentes
+ composantes d'un champ (ex : les Rij, car on s'y retrouve pas dans la visu
+ Paraview...)

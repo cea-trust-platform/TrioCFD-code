@@ -1,0 +1,190 @@
+//TRUST_NO_INDENT
+/****************************************************************************
+* Copyright (c) 2015 - 2016, CEA
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+* 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+* 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+*****************************************************************************/
+/////////////////////////////////////////////////////////////////////////////
+//
+// File      : OpDiffTurbIJK.h
+// Directory : $IJK_ROOT/src/IJK/OpVDF
+//
+/////////////////////////////////////////////////////////////////////////////
+#ifndef OpDiffTurbIJK_H
+#define OpDiffTurbIJK_H
+#include <IJK_Field.h>
+#include <IJK_Field_simd_tools.h>
+#include <TRUSTTab.h>
+#include <IJK_Splitting.h>
+#include <Operateur_IJK_base.h>
+#include <Operateur_IJK_data_channel.h>
+#include <Boundary_Conditions.h>
+
+#Pmacro DEF_OpConvDiffH(ST,ZEROATWALL,CASE,_OP_NAME_)
+
+class _OP_NAME__ST : public Operateur_IJK_faces_base_ST
+{
+public:
+_OP_NAME__ST();
+void initialize(const IJK_Splitting & splitting, const Boundary_Conditions &);
+void calculer(const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+	const IJK_Field_ST & molecular_nu,
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+        const IJK_Field_ST & molecular_nu_tensor_xx,
+        const IJK_Field_ST & molecular_nu_tensor_xy,
+        const IJK_Field_ST & molecular_nu_tensor_xz,
+        const IJK_Field_ST & molecular_nu_tensor_yx,
+        const IJK_Field_ST & molecular_nu_tensor_yy,
+        const IJK_Field_ST & molecular_nu_tensor_yz,
+        const IJK_Field_ST & molecular_nu_tensor_zx,
+        const IJK_Field_ST & molecular_nu_tensor_zy,
+        const IJK_Field_ST & molecular_nu_tensor_zz,
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+	const IJK_Field_ST & turbulent_nu,
+	const IJK_Field_ST & turbulent_k_energy,
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+        const IJK_Field_ST & divergence,
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+        const IJK_Field_ST & structural_model_xx,
+        const IJK_Field_ST & structural_model_xy,
+        const IJK_Field_ST & structural_model_xz,
+        const IJK_Field_ST & structural_model_yx,
+        const IJK_Field_ST & structural_model_yy,
+        const IJK_Field_ST & structural_model_yz,
+        const IJK_Field_ST & structural_model_zx,
+        const IJK_Field_ST & structural_model_zy,
+        const IJK_Field_ST & structural_model_zz,
+#Pendif
+	IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz);
+void ajouter(const IJK_Field_ST & vx, const IJK_Field_ST & vy, const IJK_Field_ST & vz, 
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+        const IJK_Field_ST & molecular_nu,
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+        const IJK_Field_ST & molecular_nu_tensor_xx,
+        const IJK_Field_ST & molecular_nu_tensor_xy,
+        const IJK_Field_ST & molecular_nu_tensor_xz,
+        const IJK_Field_ST & molecular_nu_tensor_yx,
+        const IJK_Field_ST & molecular_nu_tensor_yy,
+        const IJK_Field_ST & molecular_nu_tensor_yz,
+        const IJK_Field_ST & molecular_nu_tensor_zx,
+        const IJK_Field_ST & molecular_nu_tensor_zy,
+        const IJK_Field_ST & molecular_nu_tensor_zz,
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+       const IJK_Field_ST & turbulent_nu,
+	const IJK_Field_ST & turbulent_k_energy,
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+        const IJK_Field_ST & divergence,
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+        const IJK_Field_ST & structural_model_xx,
+        const IJK_Field_ST & structural_model_xy,
+        const IJK_Field_ST & structural_model_xz,
+        const IJK_Field_ST & structural_model_yx,
+        const IJK_Field_ST & structural_model_yy,
+        const IJK_Field_ST & structural_model_yz,
+        const IJK_Field_ST & structural_model_zx,
+        const IJK_Field_ST & structural_model_zy,
+        const IJK_Field_ST & structural_model_zz,
+#Pendif
+       IJK_Field_ST & dvx, IJK_Field_ST & dvy, IJK_Field_ST & dvz);
+protected:
+#Pforeach DIR (x y z)
+#Pforeach COMPO (x y z)
+void compute_flux_DIR_vCOMPO(IJK_Field_local_ST & resu, const int k_layer) override;
+#Pendforeach(COMPO)
+#Pendforeach(DIR)
+
+Operateur_IJK_data_channel channel_data_;
+REF(Boundary_Conditions) ref_bc_;
+// Pointers to input data (velocity at faces, diffustion coeffs at elements)
+const IJK_Field_local_ST *vx_;
+const IJK_Field_local_ST *vy_;
+const IJK_Field_local_ST *vz_;
+bool perio_k_ ;
+#Pif ("CASE"=="Yes_Turb" or "CASE"=="Yes_M_Grad" or "CASE"=="Yes_M_Trans" or "CASE"=="Yes_M_Div" or "CASE"=="Yes_M_GradAnisotropic" or "CASE"=="Yes_M_TransAnisotropic" or "CASE"=="Yes_M_DivAnisotropic")
+  const IJK_Field_local_ST *molecular_nu_;
+#Pendif
+#Pif ("CASE"=="Yes_M_GradTensorial" or "CASE"=="Yes_M_TransTensorial" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_GradTensorialAnisotropic" or "CASE"=="Yes_M_TransTensorialAnisotropic" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  const IJK_Field_local_ST *molecular_nu_tensor_xx_;
+  const IJK_Field_local_ST *molecular_nu_tensor_xy_;
+  const IJK_Field_local_ST *molecular_nu_tensor_xz_;
+  const IJK_Field_local_ST *molecular_nu_tensor_yx_;
+  const IJK_Field_local_ST *molecular_nu_tensor_yy_;
+  const IJK_Field_local_ST *molecular_nu_tensor_yz_;
+  const IJK_Field_local_ST *molecular_nu_tensor_zx_;
+  const IJK_Field_local_ST *molecular_nu_tensor_zy_;
+  const IJK_Field_local_ST *molecular_nu_tensor_zz_;
+#Pendif
+#Pif ("CASE"=="Yes_Turb")
+  const IJK_Field_local_ST *turbulent_nu_;
+  const IJK_Field_local_ST *turbulent_k_energy_;
+#Pendif
+#Pif ("CASE"=="Yes_M_Div" or "CASE"=="Yes_M_DivAnisotropic" or "CASE"=="Yes_M_DivTensorial" or "CASE"=="Yes_M_DivTensorialAnisotropic")
+  const IJK_Field_local_ST *divergence_;
+#Pendif
+#Pif ("CASE"=="Yes_M_Struct")
+  const IJK_Field_local_ST *structural_model_xx_;
+  const IJK_Field_local_ST *structural_model_xy_;
+  const IJK_Field_local_ST *structural_model_xz_;
+  const IJK_Field_local_ST *structural_model_yx_;
+  const IJK_Field_local_ST *structural_model_yy_;
+  const IJK_Field_local_ST *structural_model_yz_;
+  const IJK_Field_local_ST *structural_model_zx_;
+  const IJK_Field_local_ST *structural_model_zy_;
+  const IJK_Field_local_ST *structural_model_zz_;
+#Pendif
+};
+
+#Pendmacro(DEF_OpConvDiffH)
+/*
+ * Options for CASE
+ * 
+ *          Yes_Turb: the flux is turbulent_mu * (grad u + grad^T u)  -  2/3 * k  +  molecular_mu * grad u)'
+ *          Yes_M_Grad: the flux is 'molecular_mu * grad u'
+ *          Yes_M_Trans: the flux is 'molecular_mu * (grad u + grad^T u)'
+ *          Yes_M_Div: the flux is 'molecular_mu * (grad u + grad^T u - 2/3 * div u * Id)'
+ *          Yes_M_GradAnisotropic: the flux is 'molecular_mu^a * grad^a u' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_TransAnisotropic: the flux is 'molecular_mu^a * (grad^a u + grad^a^T u)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_DivAnisotropic: the flux is 'molecular_mu^a * (grad^a u + grad^a^T u - 2/3 * div^a u * Id)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_GradTensorial: the flux is 'molecular_mu_tensor * grad u'
+ *          Yes_M_TransTensorial: the flux is 'molecular_mu_tensor * (grad u + grad^T u)'
+ *          Yes_M_DivTensorial: the flux is 'molecular_mu_tensor * (grad u + grad^T u - 2/3 * div u * Id)'
+ *          Yes_M_GradTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * grad^a u' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_TransTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * (grad^a u + grad^a^T u)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_DivTensorialAnisotropic: the flux is 'molecular_mu_tensor^a * (grad^a u + grad^a^T u - 2/3 * div^a u * Id)' where (grad^a)_i = Delta_i (grad)_i
+ *          Yes_M_Struct: the flux is 'structural_model'
+ */
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_Turb,OpDiffTurbIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_M_Grad,OpDiffIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_M_Trans,OpDiffStdWithLaminarTransposeIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_M_Div,OpDiffStdWithLaminarTransposeAndDivergenceIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_M_GradAnisotropic,OpDiffAnisotropicIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_M_TransAnisotropic,OpDiffStdWithLaminarTransposeAnisotropicIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,No,Yes_M_DivAnisotropic,OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_GradTensorial,OpDiffTensorialZeroatwallIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_TransTensorial,OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_DivTensorial,OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_GradTensorialAnisotropic,OpDiffTensorialAnisotropicZeroatwallIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_TransTensorialAnisotropic,OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_DivTensorialAnisotropic,OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK)
+#Pusemacro(DEF_OpConvDiffH)(double,Yes,Yes_M_Struct,OpDiffStructuralOnlyZeroatwallIJK)
+
+
+#endif

@@ -1,0 +1,10 @@
+#!/bin/bash
+# Ce script est execute apres le lancement des cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+mkdir -p EULER
+cd EULER
+ln -sf ../vinterp_repere_local_avec_remaillage.data .
+ln -sf ../vinterp_repere_local_avec_remaillage_bulles_*out . 
+
+cd ..

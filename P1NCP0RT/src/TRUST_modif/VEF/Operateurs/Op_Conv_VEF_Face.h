@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,21 +12,14 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Op_Conv_VEF_Face.h
-// Directory:   $TRUST_ROOT/src/VEF/Operateurs
-// Version:     /main/19
-//
-//////////////////////////////////////////////////////////////////////////////
 
 
 #ifndef Op_Conv_VEF_Face_included
 #define Op_Conv_VEF_Face_included
 
+#include <TRUSTTabs_forward.h>
 #include <Op_Conv_VEF_base.h>
 #include <Motcle.h>
-#include <ArrOfInt.h>
 //
 // .DESCRIPTION class Op_Conv_VEF_Face
 //
@@ -48,13 +41,13 @@ class Op_Conv_VEF_Face : public Op_Conv_VEF_base
 
 public:
   Op_Conv_VEF_Face() : alpha_(1), type_op(amont) {};
-  DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const;
-  virtual void remplir_fluent(DoubleVect& ) const;
+  DoubleTab& ajouter(const DoubleTab& , DoubleTab& ) const override;
+  void remplir_fluent(DoubleVect& ) const override;
   // Methodes pour l implicite.
-  inline void dimensionner(Matrice_Morse& ) const;
-  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const;
-  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const;
-  inline void contribuer_au_second_membre(DoubleTab& ) const;
+  inline void dimensionner(Matrice_Morse& ) const override;
+  inline void modifier_pour_Cl(Matrice_Morse&, DoubleTab&) const override;
+  inline void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override;
+  inline void contribuer_au_second_membre(DoubleTab& ) const override;
   void contribue_au_second_membre(DoubleTab& ) const;
   void ajouter_contribution(const DoubleTab&, Matrice_Morse& ) const;
 
@@ -81,11 +74,10 @@ protected:
 // on dimensionne notre matrice au moyen de la methode dimensionner de la classe
 // Op_VEF_Face.
 
-inline  void Op_Conv_VEF_Face::dimensionner(Matrice_Morse& matrice) const
+inline void Op_Conv_VEF_Face::dimensionner(Matrice_Morse& matrice) const
 {
-  Op_VEF_Face::dimensionner(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice);
+  Op_VEF_Face::dimensionner(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
-
 
 // Description:
 // On modifie le second membre et la matrice dans le cas des
@@ -93,15 +85,13 @@ inline  void Op_Conv_VEF_Face::dimensionner(Matrice_Morse& matrice) const
 
 inline void Op_Conv_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
-  Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(),la_zcl_vef.valeur(), matrice, secmem);
+  Op_VEF_Face::modifier_pour_Cl(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice, secmem);
 }
-
 
 //Description:
 //on assemble la matrice des inconnues implicite.
 
-inline void Op_Conv_VEF_Face::contribuer_a_avec(const DoubleTab& inco,
-                                                Matrice_Morse& matrice) const
+inline void Op_Conv_VEF_Face::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
   ajouter_contribution(inco, matrice);
 }

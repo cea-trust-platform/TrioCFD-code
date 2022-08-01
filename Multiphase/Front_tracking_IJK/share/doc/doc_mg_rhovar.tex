@@ -1,0 +1,82 @@
+\documentclass[a4paper,twoside,10pt]{article}
+
+\usepackage[left=2.5cm,right=2.5cm,top=0.5cm,bottom=2.5cm]{geometry}
+\usepackage{graphicx,type1cm,eso-pic,color}
+\usepackage{url}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+% Extension postscript
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[english,french]{babel}
+\usepackage[toc,page]{appendix} 
+\usepackage{palatino}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{ifthen}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{subfigure}
+\usepackage{rotating}
+\bibliographystyle{unsrt}
+\usepackage{lastpage} 
+\usepackage{multirow}
+\usepackage{fancyhdr}
+\newcommand{\topfigrule}{%
+  \vspace*{5pt}\hrule\vspace{-5pt}}
+
+\newcommand\musec{\mu\text{s}}
+
+\title{Solveur multigrille pour le VDF}
+
+\author{Benoit Mathieu}
+\begin{document}
+\selectlanguage{french}
+
+\section{Mesures de performances}
+
+Performances des différentes versions du solveur sur différentes machines.
+
+\begin{table}
+
+\centering
+\begin{tabular}{c c c c c c}
+\hline\hline
+Machine & Nb coeurs & GCP & MG1 & MG2(ghost4)\\
+\hline
+Titane (Nehalem)
+       & 1 & 42.5 & 23.1 \\
+       & 2 & 40.1 & 12.2 & 6.1 \\
+       & 4 & 37.9 & 6.48 & 3.45 \\
+       & 8 & 23.6 & 3.23  & 1.77\\
+\hline
+Jade (Harpertown)
+       & 1 & 92.3 & 23.7 \\
+       & 2 & 101.1 & 12.4 \\
+       & 4 & 53.0 & 6.34 \\
+       & 8 & 54.3 & 3.6  \\
+\hline
+PC (Harpertown)
+       & 1 &  &  & NON14.9 \\
+       & 2 &  &  & NON7.9 \\
+       & 4 &  &  & NON4.6 \\
+       & 8 &  &  & NON3.2 \\
+
+
+\end{tabular}
+\small
+\begin{tabular}{l l}
+GCP & Gradient conjugué de Trio\_U (SSOR, omega=1.5) \\
+MG1 & Première implémentation du multigrille (pas de cache-blocking, pas de SSE,
+       double précision, \\
+    &  recalcul des coefficients de la matrice à chaque
+       itération) \\
+\end{tabular}
+\caption{Performances des différentes versions du solveur sur 
+différentes machines, cas 128x128x128 (2 millions de mailles).
+Convergence à~$10^{-8}$.}
+\end{table}
+
+\end{document}

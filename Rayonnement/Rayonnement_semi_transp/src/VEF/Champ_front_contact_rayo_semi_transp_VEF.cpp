@@ -122,7 +122,7 @@ void Champ_front_contact_rayo_semi_transp_VEF::calculer_temperature_bord(double 
       // CALCUL DU TERME D'AMORTISSEMENT
       Schema_Temps_base& sch = l_inconnue->equation().probleme().schema_temps();
       double dt=sch.pas_de_temps();
-      double e=dmax(coeff_amort_num_autre_pb(fac_front),coeff_amort_num(fac_front));
+      double e=std::max(coeff_amort_num_autre_pb(fac_front),coeff_amort_num(fac_front));
       //      double e = coeff_amort_num_autre_pb(fac_front) + coeff_amort_num(fac_front);
       double omega=dt/(dt+e/(coeff_amort_denum_autre_pb(fac_front) + coeff_amort_denum(fac_front)));
       omega = 1.;

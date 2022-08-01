@@ -1,0 +1,130 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 48
+  nbelem_j 48
+  nbelem_k 24
+  uniform_domain_size_i 0.006
+  uniform_domain_size_j 0.006
+  uniform_domain_size_k 0.003
+  perio_i
+  perio_j
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_FT_double
+{
+  ijk_splitting grid_splitting
+  ijk_splitting_ft_extension 20
+    timestep 0.0001655
+  timestep_facsec 1 # a diminuer #
+     dt_post 459
+   Boundary_Conditions {
+                bctype_kmin Paroi
+                bctype_kmax Paroi
+  }
+  # champs_a_postraiter 1 tous #
+  champs_a_postraiter 4 TEMPERATURE INTERFACES COMPO_CONNEXE VELOCITY_FT 
+  check_stop_file stop.txt
+     dt_sauvegarde 459
+  tinit 0
+     nb_pas_dt_max 459
+  
+  multigrid_solver {
+    solver_precision mixed
+    coarsen_operators 2
+      Coarsen_Operator_Uniform { }
+      Coarsen_Operator_Uniform { }
+    ghost_size 1
+    pre_smooth_steps 1 10
+    smooth_steps 1 10
+    relax_jacobi 1 0.7
+    solveur_grossier GCP { seuil 1e-8  precond ssor { omega 1.5 } impr }
+    seuil 1e-8
+    nb_full_mg_steps 2 4 1
+    impr
+  }
+
+  # LECTURE DES INTERFACES DANS UN FICHIER LATA #
+  interfaces 
+  {
+    fichier_reprise_interface init_multi.lata
+    timestep_reprise_interface       1
+  lata_meshname   FTMESH
+  # Bary et lissage #
+    remaillage_ft_ijk {
+        nb_iter_barycentrage 1
+        relax_barycentrage 1
+        nb_iter_correction_volume 6
+        lissage_courbure_iterations_systematique 0
+    }
+  }
+
+  check_divergence
+  gravite 3 -9.81 0. 0. 
+# vitesse_entree 0.01 #
+   rho_liquide 1000.
+   mu_liquide 1e-3
+   rho_vapeur 600
+   mu_vapeur 1e-3
+   sigma 0.07
+  # Pour creer le fichier des reprises #
+  # reprise #
+  # REPRISE #
+  sauvegarder_xyz
+  # nom_reprise #
+  expression_vx_init 0.0
+  expression_vy_init 0.0
+  expression_vz_init 0.0
+ 
+ thermique
+  {
+    {
+    Boundary_Conditions {
+                bctype_kmin Paroi_Temperature_imposee
+                bctype_kmax Paroi_Temperature_imposee
+		temperature_imposee_kmin 10.
+		temperature_imposee_kmax -10.
+    }
+
+    expression_T_init 0.
+    # reprise_T #
+
+    cp_liquid 4.
+    lambda_liquid 0.1
+    cp_vapor 3.
+    lambda_vapor 0.1
+    }
+,
+    {
+    Boundary_Conditions {
+                 bctype_kmin Paroi_Flux_impose
+                 bctype_kmax Paroi_Flux_impose
+                 flux_impose_kmin 10.
+                 flux_impose_kmax 10.
+    }
+    expression_T_init 1./0.1*(0.25*z^4-z^3+1.5*z^2-z)
+    # reprise_T #
+
+    fo 1.
+    cp_liquid 2100.
+    lambda_liquid 0.1
+    cp_vapor 21000.
+    lambda_vapor 0.1
+    expression_T_ana (z/1.)*(1.-(0.5*(z/1.)))-0.0408
+    wall_flux
+    }
+
+  }
+}
+Lata_to_other lml NOM_DU_CAS NOM_DU_CAS
+Fin

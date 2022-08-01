@@ -1,0 +1,16 @@
+#!/bin/bash
+# Ce script est execute apres le lancement des cas tests
+[ -f $1.lml ] && gzip -f $1.lml
+
+jdd=${1:4}
+if [ ${jdd::15} == "reprise_TrioCFD" ] ; then 
+   sed '/INTERFACES/d' $1.lata > ${1}_velocity.lata
+fi
+
+if [ $1 == "reprise_xyz_ijk" ] || [ $1 == "reprise_xyz_ijk_par8" ] ; then 
+   sed '/INTERFACES/d' $1.sauv.lata > ${1}_velocity.lata
+   sed -e '/IJK_EXT/d' -e '/FACETTE_PE/d' -e '/COMPO_CONNEXE/d'  -e '/INDEX_SOMMET_REEL/d' $1.lata > ${1}_mod.lata
+   source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh 
+   #python ./Lata_to_med.py $1.sauv.lata $1.med INTERFACES 1
+   python $TRUST_ROOT/Outils/lata2dx/lata2dx/Lata_to_med.py $1.sauv.lata $1.med INTERFACES 1
+fi

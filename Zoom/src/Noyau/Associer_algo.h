@@ -43,7 +43,7 @@ class Associer_algo : public Interprete
 {
   Declare_instanciable(Associer_algo);
 public :
-  Entree& interpreter(Entree&);
+  Entree& interpreter(Entree&) override;
 };
 
 #endif

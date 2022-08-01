@@ -45,10 +45,10 @@ class Pb_Hydraulique_ALE : public Pb_Fluide_base
 
 public :
 
-  int nombre_d_equations() const;
-  const Equation_base& equation(int) const;
-  Equation_base& equation(int);
-  void associer_milieu_base(const Milieu_base& );
+  int nombre_d_equations() const override;
+  const Equation_base& equation(int) const override;
+  Equation_base& equation(int) override;
+  void associer_milieu_base(const Milieu_base& ) override;
 
 protected :
 

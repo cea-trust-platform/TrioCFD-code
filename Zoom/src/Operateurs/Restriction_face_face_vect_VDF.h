@@ -52,14 +52,14 @@ public:
   inline IntVect& nb_faceF();
   void restreindre(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect,
                    DoubleTab& incoG,
-                   const DoubleTab& incoF,int nbcomp);
+                   const DoubleTab& incoF,int nbcomp) override;
   inline void restreindre(const Zone_VF& zone_VFG,
                           const Zone_VF& zone_VFF,
                           const  IntVect& connect,
                           DoubleTab& incoG,
                           const DoubleTab& incoF, int nb_comp,
-                          int num_prem_face_frontG);
-  void calculer(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect);
+                          int num_prem_face_frontG) override;
+  void calculer(const Zone_VF& zone_VFG, const Zone_VF& zone_VFF, const IntVect& connect) override;
 
 
 private:

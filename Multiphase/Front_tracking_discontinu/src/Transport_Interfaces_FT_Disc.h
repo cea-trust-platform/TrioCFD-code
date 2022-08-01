@@ -40,10 +40,9 @@
 #include <Ref_Loi_horaire.h>
 #include <Proprietes_part_vol.h>
 #include <Ref_Navier_Stokes_FT_Disc.h>
+#include <TRUSTTabFT_forward.h>
 
 class Transport_Interfaces_FT_Disc_interne;
-class DoubleTabFT;
-class ArrOfDoubleFT;
 class FloatTab;
 
 class Transport_Interfaces_FT_Disc : public Transport_Interfaces_base
@@ -53,46 +52,46 @@ public:
 
   Transport_Interfaces_FT_Disc();
   //
-  void set_param(Param& titi);
-  int lire_motcle_non_standard(const Motcle&, Entree&);
+  void set_param(Param& titi) override;
+  int lire_motcle_non_standard(const Motcle&, Entree&) override;
   // Methodes virtuelles pures de Equation_base
   //
-  int            nombre_d_operateurs(void) const; // Zero, y'en a pas.
-  const Operateur& operateur(int i) const;    // Erreur
-  Operateur&        operateur(int i);         // Erreur
-  const Champ_Inc& inconnue(void) const;         // C'est l'indicatrice
-  Champ_Inc&        inconnue(void);
+  int            nombre_d_operateurs(void) const override; // Zero, y'en a pas.
+  const Operateur& operateur(int i) const override;    // Erreur
+  Operateur&        operateur(int i) override;         // Erreur
+  const Champ_Inc& inconnue(void) const override;         // C'est l'indicatrice
+  Champ_Inc&        inconnue(void) override;
   //
   // Methodes surchargees de Equation_base
   //
-  void                associer_milieu_base(const Milieu_base& milieu);
+  void                associer_milieu_base(const Milieu_base& milieu) override;
 
   void                 associer_equation_ns(const Navier_Stokes_FT_Disc& ns);
 
-  Milieu_base&        milieu();       // Erreur
-  const Milieu_base& milieu() const;  // Erreur
-  void    associer_pb_base(const Probleme_base& probleme);
-  void    discretiser(void);
-  Entree& lire_cond_init(Entree& is);
-  int  verif_Cl() const;
-  double  calculer_pas_de_temps(void) const;
-  DoubleTab& derivee_en_temps_inco(DoubleTab& derivee);
-  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) ;
+  Milieu_base&        milieu() override;       // Erreur
+  const Milieu_base& milieu() const override;  // Erreur
+  void    associer_pb_base(const Probleme_base& probleme) override;
+  void    discretiser(void) override;
+  Entree& lire_cond_init(Entree& is) override;
+  int  verif_Cl() const override;
+  double  calculer_pas_de_temps(void) const override;
+  DoubleTab& derivee_en_temps_inco(DoubleTab& derivee) override;
+  void assembler( Matrice_Morse& mat_morse, const DoubleTab& present, DoubleTab& secmem) override ;
 
-  void    mettre_a_jour(double temps);
-  int  sauvegarder(Sortie& ) const;
-  int  reprendre(Entree&);
-  virtual int impr(Sortie& os) const;
+  void    mettre_a_jour(double temps) override;
+  int  sauvegarder(Sortie& ) const override;
+  int  reprendre(Entree&) override;
+  int impr(Sortie& os) const override;
   void update_critere_statio();
 
   //
   // Nouvelles methodes
   //
   virtual void                            lire_maillage_ft_cao(Entree& is);
-  virtual int                          preparer_calcul();
+  int                          preparer_calcul() override;
   virtual void                            preparer_pas_de_temps();
   const Maillage_FT_Disc&                 maillage_interface() const;
-  virtual const Champ_base&               get_update_indicatrice();
+  const Champ_base&               get_update_indicatrice() override;
   virtual const Champ_base&               get_indicatrice_faces();
   virtual const Champ_base&               get_compute_indicatrice_faces();
   virtual const Parcours_interface&       parcours_interface() const;
@@ -125,7 +124,7 @@ public:
   virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab = 0) const;
   virtual int get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab   *itab = 0) const;
   virtual const Maillage_FT_Disc& maillage_interface_pour_post() const;
-  virtual int get_mesh_tag() const
+  int get_mesh_tag() const override
   {
     return maillage_interface_pour_post().get_mesh_tag();
   };
@@ -134,10 +133,10 @@ public:
   const Probleme_base& get_probleme_base() const;
 
   //Modifie vpoint (pour N_S) pour imposer au fluide la vitesse de l interface
-  virtual void modifier_vpoint_pour_imposer_vit(const DoubleTab& inco_val,DoubleTab& vpoint0,
-                                                DoubleTab& vpoint,const DoubleTab& rho_faces,
-                                                DoubleTab& terme_source,const double temps, const double dt,
-                                                const int is_explicite,const double eta);
+  void modifier_vpoint_pour_imposer_vit(const DoubleTab& inco_val,DoubleTab& vpoint0,
+                                        DoubleTab& vpoint,const DoubleTab& rho_faces,
+                                        DoubleTab& terme_source,const double temps, const double dt,
+                                        const int is_explicite,const double eta) override;
 
   //Methode outil utilisee par modifier_vpoint_pour_imposer_vit(...)
   void calcul_source(const DoubleTab& inco_val,
@@ -151,7 +150,7 @@ public:
                      const int is_explicite,
                      const double eta);
   void modifie_source(DoubleTab& so_modif,const DoubleTab& so_val,const DoubleTab& rho_faces,
-                      const int& n,const int& m, const int& is_QC,
+                      const int n,const int m, const int is_QC,
                       const DoubleVect& vol_entrelaces,const Solveur_Masse& solv_masse);
 
   void calcul_effort_fluide_interface(const DoubleTab& vpoint,const DoubleTab& rho_faces,
@@ -161,10 +160,10 @@ public:
 
   //Calcul la vitesse imposee a l interface a partir de expression_vitesse_imposee
   virtual void calcul_vitesse(DoubleTab& vitesse_imp, const DoubleTab& champ_vitesse,
-                              const DoubleTab& vpoint, const double& temps, const double& dt);
+                              const DoubleTab& vpoint, const double temps, const double dt);
   virtual void get_expression_vitesse_imposee(DoubleTab& vitesse_imp);
   //Effectue l integration d un ensemble de points (sans notion de facettes)
-  virtual void integrer_ensemble_lagrange(const double temps);
+  void integrer_ensemble_lagrange(const double temps) override;
 
   virtual void interpoler_vitesse_face(const DoubleTab& distance_interface,
                                        const int phase, const int stencil_width,
@@ -376,7 +375,7 @@ public:
 
 
   {};
-  ~Transport_Interfaces_FT_Disc_interne()
+  ~Transport_Interfaces_FT_Disc_interne() override
   {};
 private:
   Transport_Interfaces_FT_Disc_interne(const Transport_Interfaces_FT_Disc_interne& a): Objet_U(a)
@@ -387,8 +386,8 @@ private:
   }; // Interdit
 
 public:
-  int sauvegarder(Sortie& os) const;
-  int reprendre(Entree& is);
+  int sauvegarder(Sortie& os) const override;
+  int reprendre(Entree& is) override;
 
   // Les membres suivantes sont sauvegardes et repris:
   Champ_Inc        indicatrice_cache;     // L'indicatrice calculee par get_update_indicatrice

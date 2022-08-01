@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <Senseur_Interface.h>
 #include <Champ_base.h>
-#include <DoubleTab.h>
+#include <TRUSTTab.h>
 #include <Transport_Interfaces_FT_Disc.h>
 #include <Zone.h>
 #include <Zone_VF.h>

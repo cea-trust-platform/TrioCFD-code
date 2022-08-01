@@ -46,7 +46,7 @@ Sortie& SourceFiltree_FT_disc_base::ecrire_donnees(Sortie& os) const
   os<<"phase 0 : Fonctions : { "<<finl;
   for (i=0 ; i<dimension_ ; i++)
     {
-      os << (fI_xyz_t[i]->getString()).toChar() ;
+      os << (fI_xyz_t[i]->getString()).c_str() ;
       if (i<dimension_-1)
         {
           os << " , ";
@@ -56,7 +56,7 @@ Sortie& SourceFiltree_FT_disc_base::ecrire_donnees(Sortie& os) const
   os<<"phase 1 : Fonctions : { "<<finl;
   for (i=0 ; i<dimension_ ; i++)
     {
-      os << (fI_xyz_t[dimension_+i]->getString()).toChar() ;
+      os << (fI_xyz_t[dimension_+i]->getString()).c_str() ;
       if (i<dimension_-1)
         {
           os << " , ";
@@ -118,14 +118,15 @@ Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
               {
                 is >> tmp;
                 const char *s =  tmp.getChar();
-                String2 ss(s);
+                std::string ss(s);
+                for (auto & c: ss) c = toupper(c);
                 fI_xyz_t[i] = new Parser(ss,4);
                 fI_xyz_t[i]->addVar("x");
                 fI_xyz_t[i]->addVar("y");
                 fI_xyz_t[i]->addVar("z");
                 fI_xyz_t[i]->addVar("t");
                 fI_xyz_t[i]->parseString();
-                Cerr<<"lecture phase0["<<i<<"] : "<<(fI_xyz_t[i]->getString()).toChar()<<finl;
+                Cerr<<"lecture phase0["<<i<<"] : "<<(fI_xyz_t[i]->getString()).c_str()<<finl;
               }
             is >> motlu;
             assert(motlu==accolade_fermee);
@@ -140,14 +141,15 @@ Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
               {
                 is >> tmp;
                 const char *s =  tmp.getChar();
-                String2 ss(s);
+                std::string ss(s);
+                for (auto & c: ss) c = toupper(c);
                 fI_xyz_t[dimension_+i] = new Parser(ss,4);
                 fI_xyz_t[dimension_+i]->addVar("x");
                 fI_xyz_t[dimension_+i]->addVar("y");
                 fI_xyz_t[dimension_+i]->addVar("z");
                 fI_xyz_t[dimension_+i]->addVar("t");
                 fI_xyz_t[dimension_+i]->parseString();
-                Cerr<<"lecture phase1["<<dimension_+i<<"] : "<<(fI_xyz_t[dimension_+i]->getString()).toChar()<<finl;
+                Cerr<<"lecture phase1["<<dimension_+i<<"] : "<<(fI_xyz_t[dimension_+i]->getString()).c_str()<<finl;
               }
             is >> motlu;
             assert(motlu==accolade_fermee);
@@ -175,7 +177,7 @@ Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
       for (i=0 ; i<dimension_ ; i++)
         {
           is >> tmp;
-          String2 ss("");
+          std::string ss("");
           fI_xyz_t[i] = new Parser(ss,4);
           fI_xyz_t[i]->addVar("x");
           fI_xyz_t[i]->addVar("y");
@@ -189,7 +191,7 @@ Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
       for (i=0 ; i<dimension_ ; i++)
         {
           is >> tmp;
-          String2 ss("0");
+          std::string ss("0");
           fI_xyz_t[dimension_+i] = new Parser(ss,4);
           fI_xyz_t[dimension_+i]->addVar("x");
           fI_xyz_t[dimension_+i]->addVar("y");

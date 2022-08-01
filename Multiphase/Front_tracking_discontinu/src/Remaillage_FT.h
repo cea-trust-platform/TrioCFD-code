@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +15,7 @@
 //////////////////////////////////////////////////////////////////////////////
 //
 // File:        Remaillage_FT.h
-// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Front_tracking_discontinu/src
+// Directory:   $TRUST_ROOT/../Composants/TrioCFD/Multiphase/Front_tracking_discontinu/src
 // Version:     /main/patch_168/1
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -23,18 +23,17 @@
 #ifndef Remaillage_FT_included
 #define Remaillage_FT_included
 
+#include <TRUSTTabFT_forward.h>
+#include <Ref_Zone_VF.h>
 #include <Objet_U.h>
 #include <Zone_dis.h>
-#include <Ref_Zone_VF.h>
 #include <FTd_tools.h>
-
 class Maillage_FT_Disc;
-class ArrOfIntFT;
-class IntTabFT;
-class ArrOfDoubleFT;
-class DoubleTabFT;
 class Zone_VF;
 class Param;
+
+// POUR DEBUGGER LA CONSERVATION DU VOLUME
+#define DEBUG_CONSERV_VOLUME 0
 
 // ====================================================================
 // .DESCRIPTION        : class Remaillage_FT
@@ -63,11 +62,12 @@ public:
 
   // Regularisations du maillage (deplacement des sommets sans changer la connectivite)
   void corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume);
+  void corriger_volume_(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume, const int nb_iter_corrections_vol);
   void barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage);
   void barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume);
 
-  int  sauvegarder(Sortie& ) const;
-  int  reprendre(Entree&);
+  int  sauvegarder(Sortie& ) const override;
+  int  reprendre(Entree&) override;
 
   double calculer_variation_volume(const Maillage_FT_Disc& maillage,
                                    const DoubleTab& position_initiale,
@@ -81,6 +81,10 @@ public:
                                     const double coeff,
                                     ArrOfDouble& dvolume) const;
 
+#if DEBUG_CONSERV_VOLUME
+  double calculer_volume_mesh(const Maillage_FT_Disc& mesh) const;
+  double calculer_somme_dvolume(const Maillage_FT_Disc&, const ArrOfDouble&) const;
+#endif
 protected:
 
   int tester_a_remailler(const Maillage_FT_Disc& maillage) const;

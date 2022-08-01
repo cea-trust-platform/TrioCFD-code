@@ -1,0 +1,89 @@
+# PARALLEL OK 2 #
+
+dimension 3
+Pb_Hydraulique pb
+export domaine dom_pb1
+
+# BEGIN MESH #
+Read_file dom_pb1 croix_Pb1.geom
+# END MESH #
+
+# BEGIN PARTITION
+Partition dom_pb1
+{
+	Partitionneur metis { Nb_parts 2 }
+	Larg_joint 1
+	Nom_Zones DOM1
+}
+Fin
+END PARTITION #
+
+# BEGIN SCATTER
+Scatter DOM1.Zones dom_pb1
+END SCATTER #
+
+VDF dis
+Runge_Kutta_ordre_3 sch
+Lire sch
+{
+	tinit 0.
+	tmax 15.
+	dt_min 1.e-9
+	dt_max 1.e-1
+	dt_impr 0.125
+	seuil_statio 1.e-18
+}
+
+Fluide_Incompressible fluide
+Lire fluide
+{
+	mu Champ_Uniforme 1 0.002
+	rho Champ_Uniforme 1 2
+}
+
+Associate pb dom_pb1
+Associate pb sch
+Associate pb fluide
+
+Discretize pb dis
+
+Lire pb
+{
+	Navier_Stokes_standard
+	{
+		solveur_pression  GCP { precond ssor { omega 1.5 } seuil 1.e-13  impr }
+		convection { centre }
+		diffusion { }
+		conditions_initiales { vitesse Champ_Uniforme 3 0. 0. 0. }
+		boundary_conditions
+		{
+			entree frontiere_ouverte_pression_imposee Champ_front_uniforme 1 2.
+			sud frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			nord frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			gauche frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			droit frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			bas frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			haut frontiere_ouverte_pression_imposee Champ_front_uniforme 1 0.
+			paroi paroi_fixe
+		}
+		/* modele_turbulence Sous_maille_wale { cw 0.0 turbulence_paroi negligeable } */
+	}
+
+
+	Postraitement
+	{
+		Sondes
+		{
+			sonde_vitesse1 vitesse periode 1.e-3 points 2  0.2 0.11 0.1 0.4 0.11 0.1
+			sonde_pression1 pression periode 1.e-3 points 2  0.2 0.11 0.1 0.4 0.11 0.1
+		}
+		format lml
+		Champs dt_post 5.
+		{
+			vitesse elem
+		}
+	}
+}
+
+Solve pb
+Fin

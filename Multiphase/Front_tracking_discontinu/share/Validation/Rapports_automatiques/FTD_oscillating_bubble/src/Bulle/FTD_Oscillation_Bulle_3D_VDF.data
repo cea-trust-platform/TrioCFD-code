@@ -1,5 +1,5 @@
 # Hydraulique 3D laminaire : schema upwind #
-# PARALLEL ONLY 4 #
+# PARALLEL ONLY #
 dimension 3
 Probleme_FT_Disc_gen pb
 Domaine dom
@@ -11,9 +11,9 @@ Schema_Euler_explicite  sch
 Read sch
 {
 	tinit 0.0
-	tmax  0.2
+	tmax  0.1
 	dt_min 1.e-10
-	dt_max 5.e-4
+	dt_max 9.e-4
 	dt_impr 0.2
 	dt_sauv 0.1
 	seuil_statio -1.e-8
@@ -100,7 +100,7 @@ interf
                 pas_lissage 1e-8
                 lissage_courbure_iterations 10
                 lissage_courbure_coeff -0.1
-                nb_iter_barycentrage 5
+                nb_iter_barycentrage 25
                 relax_barycentrage 1.
                 facteur_longueur_ideale 0.8
                 nb_iter_correction_volume 1

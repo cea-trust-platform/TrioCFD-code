@@ -36,7 +36,7 @@
 #include <Symetrie.h>
 #include <Ref_Champ_front.h>
 #include <Zone_VDF.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 
 Implemente_instanciable(Eq_rayo_semi_transp_VDF,"Eq_rayo_semi_transp_VDF",Equation_rayonnement_base);
 
@@ -106,7 +106,7 @@ void Eq_rayo_semi_transp_VDF::resoudre(double temps)
   assert(pb.equation(1).inconnue().le_nom()=="temperature");
   const DoubleTab& temper = pb.equation(1).inconnue().valeurs();
   const DoubleTab& indice = fluide().indice().valeurs();
-  const double& sigma = Modele().valeur_sigma();
+  const double sigma = Modele().valeur_sigma();
 
   secmem = 0;
   int elem;
@@ -301,7 +301,7 @@ void Eq_rayo_semi_transp_VDF::evaluer_cl_rayonnement(double temps)
 //    Valeurs par defaut:
 //    Contraintes:
 //    Acces: entree/sortie
-// Retour: Entree&
+// Retour:
 //    Signification: le flot d'entree modifie
 //    Contraintes:
 // Exception:

@@ -58,9 +58,9 @@
 #include <EFichierBin.h>
 #include <Param.h>
 #include <sys/stat.h>
-#include <IntList.h>
+#include <TRUSTList.h>
 #include <Domaine.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <stat_counters.h>
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT_Disc,"Transport_Interfaces_FT_Disc",Transport_Interfaces_base);
@@ -2137,7 +2137,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
 {
   const int dimension3 = (Objet_U::dimension==3);
   // Preparation des parsers...
-  String2 sx(expression_vitesse[0]);
+  std::string sx(expression_vitesse[0]);
   parser_x.setString(sx);
   parser_x.setNbVar(4);
   parser_x.addVar("x");
@@ -2148,7 +2148,7 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
   parser_x.setVar("z", 0.);
   parser_x.setVar("t", temps);
 
-  String2 sy(expression_vitesse[1]);
+  std::string sy(expression_vitesse[1]);
   parser_y.setString(sy);
   parser_y.setNbVar(4);
   parser_y.addVar("x");
@@ -2160,9 +2160,9 @@ static void init_parser_v_impose(const Noms& expression_vitesse, Parser& parser_
   parser_y.setVar("t", temps);
 
   Nom unused_expr("0");
-  String2 sz(dimension3
-             ? expression_vitesse[2]
-             : unused_expr /* inutilise */);
+  std::string sz(dimension3
+                 ? expression_vitesse[2]
+                 : unused_expr /* inutilise */);
 
   parser_z.setString(sz);
   parser_z.setNbVar(4);
@@ -2429,7 +2429,7 @@ void Transport_Interfaces_FT_Disc::calcul_source(const DoubleTab& inco_val,
     }
 }
 
-void ouvrir_fichier(SFichier& os,const Nom& type, const int& flag, const Transport_Interfaces_FT_Disc& equation)
+void ouvrir_fichier(SFichier& os,const Nom& type, const int flag, const Transport_Interfaces_FT_Disc& equation)
 {
 
   // flag nul on n'ouvre pas le fichier
@@ -2449,7 +2449,7 @@ void ouvrir_fichier(SFichier& os,const Nom& type, const int& flag, const Transpo
   fichier+=equation.le_nom();
   fichier+=".out";
   const Schema_Temps_base& sch=equation.probleme().schema_temps();
-  const int& precision=sch.precision_impr();
+  const int precision=sch.precision_impr();
   // On cree le fichier a la premiere impression avec l'en tete ou si le fichier n'existe pas
   struct stat f;
   if (stat(fichier,&f) || (sch.nb_impr()==1 && !equation.probleme().reprise_effectuee()))
@@ -2492,7 +2492,7 @@ void ouvrir_fichier(SFichier& os,const Nom& type, const int& flag, const Transpo
 }
 
 void Transport_Interfaces_FT_Disc::modifie_source(DoubleTab& termes_sources_face,const DoubleTab& source_val,const DoubleTab& rho_faces,
-                                                  const int& n,const int& m, const int& is_QC,
+                                                  const int n,const int m, const int is_QC,
                                                   const DoubleVect& vol_entrelaces,const Solveur_Masse& un_solv_masse)
 {
 
@@ -2551,7 +2551,7 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
         }
       // Calcul de dforce contribution de la force du fluide sur la face i
       // si ce n'est pas une face commune a plusieurs processeurs
-      if (sequential_items_flags(face))
+      if (sequential_items_flags[face])
         {
           if (nbdim1) // VDF
             {
@@ -2590,7 +2590,7 @@ void Transport_Interfaces_FT_Disc::impr_effort_fluide_interface( DoubleTab& sour
 //            Force << espace << dforce(k);
           Force << espace << values(0,k);
         Force << finl;
-        const int& impr_mom = 1 ;
+        const int impr_mom = 1 ;
 
         SFichier Pressure;
         ouvrir_fichier(Pressure,"Pressure",impr_mom,*this);
@@ -2627,17 +2627,17 @@ int Transport_Interfaces_FT_Disc::impr(Sortie& os) const
       Nom espace=" \t";
       schema_temps().imprimer_temps_courant(Force);
       for(int k=0; k<dimension; k++)
-        Force << espace << force_(k);
+        Force << espace << force_[k];
       Force << finl;
       const Zone& zone=zone_dis().zone();
-      const int& impr_mom = zone.Moments_a_imprimer();
+      const int impr_mom = zone.Moments_a_imprimer();
       if (impr_mom)
         {
           SFichier Moment;
           ouvrir_fichier(Moment,"moment",impr_mom,*this);
           schema_temps().imprimer_temps_courant(Moment);
           for(int k=0; k<moment_.size_array(); k++)
-            Moment << espace << moment_(k);
+            Moment << espace << moment_[k];
           Moment << finl;
         }
     }
@@ -2652,7 +2652,7 @@ void Transport_Interfaces_FT_Disc::update_critere_statio()
   Schema_Temps_base& sch_tps = schema_temps();
   const DoubleTab& present = inconnue().valeurs();
   const DoubleTab& passe = inconnue().passe();
-  const double& dt = sch_tps.pas_de_temps();
+  const double dt = sch_tps.pas_de_temps();
   DoubleTab tab_critere(present);
 
   tab_critere = present;
@@ -2713,7 +2713,7 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
     force_=0;
     moment_=0;
     const Zone& zone=zone_dis().zone();
-    const int& impr_mom = zone.Moments_a_imprimer();
+    const int impr_mom = zone.Moments_a_imprimer();
     const ArrOfDouble& centre_gravite = zone.cg_moments();
     const DoubleTab& centre_faces = ref_cast(Zone_VF,zone_dis().valeur()).xv();
     ArrOfDouble xgr(dimension);
@@ -2731,34 +2731,34 @@ void Transport_Interfaces_FT_Disc::calcul_effort_fluide_interface(const DoubleTa
       {
         // Calcul de dforce contribution de la force du fluide sur la face i
         // si c'est une face sequentielle
-        if (sequential_items_flags(i))
+        if (sequential_items_flags[i])
           {
             dforce=0;
             if (zvdf)
               {
                 int j = zvdf->orientation(i);
-                dforce(j) = -termes_sources_face(i);
-                force_(j) += dforce(j);
+                dforce[j] = -termes_sources_face(i);
+                force_[j] += dforce[j];
               }
             else
               for (int j = 0; j < dimension; j++)
                 {
-                  dforce(j) = -termes_sources_face(i,j);
-                  force_(j) += dforce(j);
+                  dforce[j] = -termes_sources_face(i,j);
+                  force_[j] += dforce[j];
                 }
             // Ajout de dforce au calcul eventuel du moment
             if (impr_mom)
               {
                 for (int j = 0; j < dimension; j++)
-                  xgr(j) = centre_faces(i,j) - centre_gravite(j);
+                  xgr[j] = centre_faces(i,j) - centre_gravite[j];
 
                 if (dimension==2)
-                  moment_(0) += dforce(1)*xgr(0) - dforce(0)*xgr(1);
+                  moment_[0] += dforce[1]*xgr[0] - dforce[0]*xgr[1];
                 else
                   {
-                    moment_(0) += dforce(2)*xgr(1) - dforce(1)*xgr(2);
-                    moment_(1) += dforce(0)*xgr(2) - dforce(2)*xgr(0);
-                    moment_(2) += dforce(1)*xgr(0) - dforce(0)*xgr(1);
+                    moment_[0] += dforce[2]*xgr[1] - dforce[1]*xgr[2];
+                    moment_[1] += dforce[0]*xgr[2] - dforce[2]*xgr[0];
+                    moment_[2] += dforce[1]*xgr[0] - dforce[0]*xgr[1];
                   }
               }
           }
@@ -2837,8 +2837,8 @@ void Transport_Interfaces_FT_Disc::get_expression_vitesse_imposee(DoubleTab& vit
 void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
                                                   const DoubleTab& vitesse,
                                                   const DoubleTab& vpoint,
-                                                  const double& temps,
-                                                  const double& dt)
+                                                  const double temps,
+                                                  const double dt)
 {
   const int dim = Objet_U::dimension;
   const int dimension3 = (dim==3);
@@ -2863,14 +2863,14 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
         {
           // Calcul de la vitesse au centre de la face par la loi horaire a temps+dt
           for (int j = 0; j < dim; j++)
-            coord(j) = xv(i,j);
+            coord[j] = xv(i,j);
           v_imp = variables_internes_->loi_horaire_->vitesse(temps+dt,coord);
 
           if (zvdf)
-            vitesse_imp(i,0) = v_imp(zvdf->orientation(i));
+            vitesse_imp(i,0) = v_imp[zvdf->orientation(i)];
           else
             for (int j = 0; j < dim; j++)
-              vitesse_imp(i,j) = v_imp(j);
+              vitesse_imp(i,j) = v_imp[j];
         }
     }
   else if (variables_internes_->methode_transport == Transport_Interfaces_FT_Disc_interne::VITESSE_IMPOSEE)
@@ -2935,7 +2935,7 @@ void Transport_Interfaces_FT_Disc::calcul_vitesse(DoubleTab& vitesse_imp,
                 dt_loc = (1./dt_loc)*(le_schema_en_temps->facteur_securite_pas());
                 dt_loc = Process::mp_min(dt_loc);
                 // si le dt_loc obtenu est plus grand que le dt_min du jdd :
-                dt_loc = dmin(dt_loc,dt);
+                dt_loc = std::min(dt_loc,dt);
                 Cerr << "Transport_Interfaces_FT_Disc::calculer_vitesse_imposee avec dt_loc : "<<dt_loc<<finl;
               }
             if (zvdf)
@@ -3189,7 +3189,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
                 {
                   int a = elem_faces(i_elem, dir) ;
                   int b = elem_faces(i_elem, dir+dim) ;
-                  const double pas = fabs(zone_vdf.distance_face(a,b,dir)) ;
+                  const double pas = std::fabs(zone_vdf.distance_face(a,b,dir)) ;
                   int traverse = 0 ;
                   calcul_nb_traverse(xe,pas,dim,dir,maillage,i_elem,traverse) ;
                   trav(i_elem,dir) = traverse ;
@@ -3247,7 +3247,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       typeface.echange_espace_virtuel() ;
       for( int i=0 ; i<FACEJOINT.size() ; i++ )
         {
-          typeface(FACEJOINT[i]) = dmax(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
+          typeface(FACEJOINT[i]) = std::max(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
           if( typefacejoint(FACEJOINT[i]) < 0 && typeface(FACEJOINT[i]) > -1 )
             cpt_ref++;
         }
@@ -3280,7 +3280,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       typeface.echange_espace_virtuel() ;
       for( int i=0 ; i<FACEJOINT.size() ; i++ )
         {
-          typeface(FACEJOINT[i]) = dmax(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
+          typeface(FACEJOINT[i]) = std::max(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
           if( typefacejoint(FACEJOINT[i]) < 0 && typeface(FACEJOINT[i]) > -1
               && indicatrice_face(FACEJOINT[i]) != 0. && indicatrice_face(FACEJOINT[i]) != 1.
               && indicatrice_face(FACEJOINT[i]) != 0.5 )
@@ -3309,7 +3309,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       typeface.echange_espace_virtuel() ;
       for( int i=0 ; i<FACEJOINT.size() ; i++ )
         {
-          typeface(FACEJOINT[i]) = dmax(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
+          typeface(FACEJOINT[i]) = std::max(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
           if( typefacejoint(FACEJOINT[i]) < 0 && typeface(FACEJOINT[i]) > -1  && indicatrice_face(FACEJOINT[i]) == 0.5 )
             cpt_halfref++;
         }
@@ -3421,7 +3421,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
           typeface.echange_espace_virtuel() ;
           for( int i=0 ; i<FACEJOINT.size() ; i++ )
             {
-              typeface(FACEJOINT[i]) = dmax(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
+              typeface(FACEJOINT[i]) = std::max(typefacejoint(FACEJOINT[i]),typeface(FACEJOINT[i])) ;
               if( typefacejoint(FACEJOINT[i]) < 0 && typeface(FACEJOINT[i]) > -1
                   && indicatrice_face(FACEJOINT[i]) != 0. && indicatrice_face(FACEJOINT[i]) != 1.
                   && indicatrice_face(FACEJOINT[i]) != 0.5 )
@@ -3450,12 +3450,12 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
               if( faces_elem(i_face,0) > -1 )
                 {
                   j_face = elem_faces(faces_elem(i_face,0), ori) + elem_faces(faces_elem(i_face,0), ori+dim) - i_face ;
-                  dxa = fabs(zone_vdf.distance_face(i_face,j_face,ori)) ;
+                  dxa = std::fabs(zone_vdf.distance_face(i_face,j_face,ori)) ;
                 }
               if( faces_elem(i_face,1) > -1 )
                 {
                   j_face = elem_faces(faces_elem(i_face,1), ori) + elem_faces(faces_elem(i_face,1), ori+dim) - i_face ;
-                  dxb =  fabs(zone_vdf.distance_face(i_face,j_face,ori)) ;
+                  dxb =  std::fabs(zone_vdf.distance_face(i_face,j_face,ori)) ;
                 }
               if( dxa < dxb )
                 {
@@ -3474,11 +3474,11 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
                     {
                       int a = elem_faces(elem_voisin, k) ;
                       int b = elem_faces(elem_voisin, k+dim) ;
-                      double pas = fabs(zone_vdf.distance_face(a,b,k)) ;
+                      double pas = std::fabs(zone_vdf.distance_face(a,b,k)) ;
                       Lref += 0.25*pas*pas ;
                     }
                 }
-              const double ratio = fabs(distance_interface_faces(i_face))/sqrt(Lref) ;
+              const double ratio = std::fabs(distance_interface_faces(i_face))/sqrt(Lref) ;
               const double tol_distface = 1e-3 ;
               const int test1 = ( ratio < tol_distface ) ;
               if( test1 )
@@ -3505,7 +3505,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
       for( i_face=0 ; i_face<nfaces ; i_face++ )
         {
           if( distance_interface_faces(i_face) > invalid_test )
-            dist_face_cor(i_face) = (2.*typeface(i_face) - 1.)*fabs(distance_interface_faces(i_face)) ;
+            dist_face_cor(i_face) = (2.*typeface(i_face) - 1.)*std::fabs(distance_interface_faces(i_face)) ;
           else
             dist_face_cor(i_face) = distance_interface_faces(i_face) ;
         }
@@ -3574,7 +3574,7 @@ void Transport_Interfaces_FT_Disc::interpoler_vitesse_face(
                 }
               else
                 {
-                  if( fabs(dist_face_cor(i_face) - distance_interface_faces(i_face)) != 0. )
+                  if( std::fabs(dist_face_cor(i_face) - distance_interface_faces(i_face)) != 0. )
                     {
                       cpt_face_diphasique_signemodifiee++ ;
                     }
@@ -4273,7 +4273,7 @@ void Transport_Interfaces_FT_Disc::calcul_nb_traverse( const DoubleTab& xe, cons
       // produit scalaire entre un vecteur directeur au rayon et la normale a la facette
       // le vecteur de reference est unitaire valant un sur la composante ori.
       // Si le produit scalaire est nul alors il n'existe pas de I dans la facette
-      if( fabs( normale_facettes(i_facette,ori) ) > 0. )
+      if( std::fabs( normale_facettes(i_facette,ori) ) > 0. )
         {
           DoubleTab A(dim), B(dim), C(dim), U(dim), I(dim);
           A = 0. ;
@@ -4304,10 +4304,10 @@ void Transport_Interfaces_FT_Disc::calcul_nb_traverse( const DoubleTab& xe, cons
 
 
           double FIscalU = (I(ori)-xe(ori))*U(ori) ;
-          double FI = fabs( I(ori)-xe(ori) ) ;
+          double FI = std::fabs( I(ori)-xe(ori) ) ;
           double theta = acos(FIscalU/FI) ;
-          double theta_rel = fabs( theta - (2.0*atan(1.)) ) / (2.0*atan(1.)) ;
-          double ecart_elem = fabs(xe(ori)-I(ori))  ;
+          double theta_rel = std::fabs( theta - (2.0*atan(1.)) ) / (2.0*atan(1.)) ;
+          double ecart_elem = std::fabs(xe(ori)-I(ori))  ;
 
           if( theta_rel >= tol_theta && ecart_elem <= 0.5*dx  )
             {
@@ -4317,8 +4317,8 @@ void Transport_Interfaces_FT_Disc::calcul_nb_traverse( const DoubleTab& xe, cons
                   double ABscalAB = (B(0)-A(0))*(B(0)-A(0)) + (B(1)-A(1))*(B(1)-A(1)) ;
                   double xx = AIscalAB / ABscalAB ;
 
-                  const int test1 = ( fabs( xx ) <= precision ) ;
-                  const int test2 = ( fabs( xx  - 1. ) <= precision ) ;
+                  const int test1 = ( std::fabs( xx ) <= precision ) ;
+                  const int test2 = ( std::fabs( xx  - 1. ) <= precision ) ;
                   const int test3 = ( xx > precision ) ;
                   const int test4 = ( xx < 1.-precision ) ;
                   if( test1 || test2 )
@@ -4366,12 +4366,12 @@ void Transport_Interfaces_FT_Disc::calcul_nb_traverse( const DoubleTab& xe, cons
                   double beta  = AireICA/AireABC ;
                   double gamma = AireIAB/AireABC ;
 
-                  int test1 = ( fabs(alpha-1.)<=precision && fabs(beta)<=precision && fabs(gamma)<=precision ) ;
-                  int test2 = ( fabs(beta-1.)<=precision && fabs(alpha)<=precision && fabs(gamma)<=precision ) ;
-                  int test3 = ( fabs(gamma-1.)<=precision && fabs(alpha)<=precision && fabs(beta)<=precision ) ;
-                  int test4 = ( fabs(alpha)<=precision && precision<beta && beta<1.-precision && precision<gamma && gamma<1.-precision ) ;
-                  int test5 = ( fabs(beta)<=precision && precision<alpha && alpha<1.-precision && precision<gamma && gamma<1.-precision ) ;
-                  int test6 = ( fabs(gamma)<=precision && precision<beta && beta<1.-precision && precision<alpha && alpha<1.-precision ) ;
+                  int test1 = ( std::fabs(alpha-1.)<=precision && std::fabs(beta)<=precision && std::fabs(gamma)<=precision ) ;
+                  int test2 = ( std::fabs(beta-1.)<=precision && std::fabs(alpha)<=precision && std::fabs(gamma)<=precision ) ;
+                  int test3 = ( std::fabs(gamma-1.)<=precision && std::fabs(alpha)<=precision && std::fabs(beta)<=precision ) ;
+                  int test4 = ( std::fabs(alpha)<=precision && precision<beta && beta<1.-precision && precision<gamma && gamma<1.-precision ) ;
+                  int test5 = ( std::fabs(beta)<=precision && precision<alpha && alpha<1.-precision && precision<gamma && gamma<1.-precision ) ;
+                  int test6 = ( std::fabs(gamma)<=precision && precision<beta && beta<1.-precision && precision<alpha && alpha<1.-precision ) ;
                   int test7 = ( precision<alpha && alpha<1.-precision) ;
                   int test8 = ( precision<beta && beta<1.-precision) ;
                   int test9 = ( precision<gamma && gamma<1.-precision) ;
@@ -5051,7 +5051,7 @@ void Transport_Interfaces_FT_Disc::plan_facette_existant( Maillage_FT_Disc& mail
         plan3 = D[i] + A[i] * x3 + B[i] * y3 + C[i] * z3 ;
 
 
-      if( fabs(plan1)<eps && fabs(plan2)<eps && fabs(plan3)<eps )
+      if( std::fabs(plan1)<eps && std::fabs(plan2)<eps && std::fabs(plan3)<eps )
         test_liste= 1 ;
       i++ ;
     }
@@ -5138,14 +5138,14 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_diphasique( const in
     {
       voisin = voisin0 ;
       const int face_voisine = elem_faces(voisin0,ori) + elem_faces(voisin0,ori+dim) - i_face ;
-      L(ori) = fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
     }
   if( voisin1 > -1  && indicatrice(voisin1) != 0. && indicatrice(voisin1) != 1. )
     {
       voisin = voisin1 ;
       const int face_voisine = elem_faces(voisin1,ori) + elem_faces(voisin1,ori+dim) - i_face ;
-      double xx = fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
-      L(ori) = dmax( L(ori), xx ) ;
+      double xx = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      L(ori) = std::max( L(ori), xx ) ;
     }
 
   for( int k = 0 ; k<dim ; k++ )
@@ -5154,7 +5154,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_diphasique( const in
         {
           const int face0 = elem_faces(voisin,k) ;
           const int face1 = elem_faces(voisin,k+dim) ;
-          L(k) = fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
+          L(k) = std::fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
         }
     }
   for( int k = 0 ; k<dim ; k++ )
@@ -5188,13 +5188,13 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
       const int face_voisine = elem_faces(voisin0,ori) + elem_faces(voisin0,ori+dim) - i_face ;
       if( indicatrice_face(face_voisine) != 0. && indicatrice_face(face_voisine) != 1. )
         {
-          L(ori) = fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+          L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
 
           const int voisin_voisin = faces_elem(face_voisine,0) + faces_elem(face_voisine,1) - voisin0 ;
           if( voisin_voisin > -1 )
             {
               const int face_voisine_voisine = elem_faces(voisin_voisin,ori) + elem_faces(voisin_voisin,ori+dim) - face_voisine ;
-              L(ori) += fabs(zone_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
+              L(ori) += std::fabs(zone_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
             }
           for( int k = 0 ; k<dim ; k++ )
             {
@@ -5202,7 +5202,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                 {
                   const int face0 = elem_faces(voisin0,k) ;
                   const int face1 = elem_faces(voisin0,k+dim) ;
-                  L(k) = fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
+                  L(k) = std::fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
                 }
             }
           for( int k = 0 ; k<dim ; k++ )
@@ -5219,13 +5219,13 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
       const int face_voisine = elem_faces(voisin1,ori) + elem_faces(voisin1,ori+dim) -i_face ;
       if( indicatrice_face(face_voisine) != 0. && indicatrice_face(face_voisine) != 1. )
         {
-          L(ori) = fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+          L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
 
           const int voisin_voisin = faces_elem(face_voisine,0) + faces_elem(face_voisine,1) - voisin1 ;
           if( voisin_voisin > -1 )
             {
               const int face_voisine_voisine = elem_faces(voisin_voisin,ori) + elem_faces(voisin_voisin,ori+dim) - face_voisine ;
-              L(ori) += fabs(zone_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
+              L(ori) += std::fabs(zone_vdf.distance_face(face_voisine,face_voisine_voisine,ori)) ;
             }
           for( int k = 0 ; k<dim ; k++ )
             {
@@ -5233,7 +5233,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                 {
                   const int face0 = elem_faces(voisin1,k) ;
                   const int face1 = elem_faces(voisin1,k+dim) ;
-                  L(k) = fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
+                  L(k) = std::fabs(zone_vdf.distance_face(face0,face1,k))/2. ;
                 }
             }
           for( int k = 0 ; k<dim ; k++ )
@@ -5243,7 +5243,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
           tol1 = sqrt(tol1) ;
         }
     }
-  double tol_long = dmax(tol0,tol1) ;
+  double tol_long = std::max(tol0,tol1) ;
 
 
   //------------------------------------------------------------------------------------------------
@@ -5256,14 +5256,14 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
     {
       voisin = voisin0 ;
       const int face_voisine = elem_faces(voisin0,ori) + elem_faces(voisin0,ori+dim) - i_face ;
-      L(ori) = fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      L(ori) = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
     }
   if( voisin1 > -1 )
     {
       voisin = voisin1 ;
       const int face_voisine = elem_faces(voisin1,ori) + elem_faces(voisin1,ori+dim) - i_face ;
-      double xx = fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
-      L(ori) = dmax( L(ori), xx ) ;
+      double xx = std::fabs(zone_vdf.distance_face(i_face,face_voisine,ori)) ;
+      L(ori) = std::max( L(ori), xx ) ;
     }
 
   DoubleTab xx_max(dim) ;
@@ -5279,7 +5279,7 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
           const int voisin_voisin = faces_elem(autre_face,0) +  faces_elem(autre_face,1) - voisin ;
           const int ori_face = orientation[autre_face] ;
           const int autre_face_voisine = elem_faces(voisin_voisin,ori_face) + elem_faces(voisin_voisin,ori_face+dim) - autre_face ;
-          double xx = fabs(zone_vdf.distance_face(autre_face,autre_face_voisine,ori_face)) ;
+          double xx = std::fabs(zone_vdf.distance_face(autre_face,autre_face_voisine,ori_face)) ;
           if( xx_max(ori_face) < xx )
             xx_max(ori_face) = xx ;
         }
@@ -5298,11 +5298,11 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
                 {
                   const int face0 = elem_faces(voisin,k) ;
                   const int face1 = elem_faces(voisin,k+dim) ;
-                  double yy  = 0.5*fabs(zone_vdf.distance_face(face0,face1,k)) ;
+                  double yy  = 0.5*std::fabs(zone_vdf.distance_face(face0,face1,k)) ;
                   double a = 0.5*yy + xx_max(k) ;
                   const int face3 = elem_faces(voisin,l) ;
                   const int face4 = elem_faces(voisin,l+dim) ;
-                  double b = 0.5*fabs(zone_vdf.distance_face(face3,face4,l)) ;
+                  double b = 0.5*std::fabs(zone_vdf.distance_face(face3,face4,l)) ;
                   TOL_TMP(cpt) = L(ori)*L(ori) + a*a + b*b ;
                   cpt++ ;
                 }
@@ -5311,12 +5311,12 @@ void Transport_Interfaces_FT_Disc::calcul_tolerance_projete_monophasique( const 
     }
   double tol_trans = TOL_TMP(0) ;
   if( dim == 3 )
-    tol_trans = dmax(tol_trans,TOL_TMP(1)) ;
+    tol_trans = std::max(tol_trans,TOL_TMP(1)) ;
   tol_trans = sqrt( tol_trans ) ;
   //------------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------------
   //------------------------------------------------------------------------------------------------
-  tol = dmax(tol_long,tol_trans) ;
+  tol = std::max(tol_long,tol_trans) ;
 }
 
 // Verification du projete
@@ -5324,7 +5324,7 @@ void Transport_Interfaces_FT_Disc::verifprojete( const int monophasique,const do
                                                  const DoubleTab& V, DoubleTab& coord_projete, int& cpt )
 {
   const int dim = coord_projete.dimension(0) ;
-  const double dist_IBC = fabs(d) ;
+  const double dist_IBC = std::fabs(d) ;
   const double precision = Objet_U::precision_geom ;
   double dist_proj = 0. ;
   int projete_modifie = 0 ;
@@ -5342,7 +5342,7 @@ void Transport_Interfaces_FT_Disc::verifprojete( const int monophasique,const do
 
   const double facsec = 0.5 ;
   const int test0 = ( dist_proj < precision ) ;
-  const int test1 = ( fabs( dist_IBC - dist_proj ) > facsec*dist_IBC ) ;
+  const int test1 = ( std::fabs( dist_IBC - dist_proj ) > facsec*dist_IBC ) ;
   const int test2 = ( dist_proj > (1.+facsec)*Lref ) ;
 
   if( monophasique )
@@ -5429,9 +5429,9 @@ void Transport_Interfaces_FT_Disc::uzawa(const double d, const DoubleTab& C,
       double norme1_int = 0. ;
       for (int i=0; i<nb_lignes; i++)
         {
-          norme1_int += dabs( C(i,j) ) ;
+          norme1_int += std::fabs( C(i,j) ) ;
         }
-      norme1 = dmax( norme1 , norme1_int ) ;
+      norme1 = std::max( norme1 , norme1_int ) ;
     }
 
   for (int i=0; i<nb_lignes; i++)
@@ -5439,9 +5439,9 @@ void Transport_Interfaces_FT_Disc::uzawa(const double d, const DoubleTab& C,
       double norme_infty_int = 0.;
       for (int j=0; j<nb_colonnes; j++)
         {
-          norme_infty_int += dabs( C(i,j) ) ;
+          norme_infty_int += std::fabs( C(i,j) ) ;
         }
-      norme_infty = dmax( norme_infty , norme_infty_int ) ;
+      norme_infty = std::max( norme_infty , norme_infty_int ) ;
     }
   rho = 1. / ( norme1 * norme_infty ) ; //car ||A||_2^2 <= ||A||_1 ||A||_infty
 
@@ -5496,12 +5496,12 @@ void Transport_Interfaces_FT_Disc::uzawa(const double d, const DoubleTab& C,
           if ( d > 0 )
             {
               // cote solide
-              lambda(i) = dmax( lambda(i) + rho * xx , 0. ) ;
+              lambda(i) = std::max( lambda(i) + rho * xx , 0. ) ;
             }
           else
             {
               //cote fluide
-              lambda(i) = dmin( lambda(i) + rho * xx , 0. ) ;
+              lambda(i) = std::min( lambda(i) + rho * xx , 0. ) ;
             }
         }
       // Calcul et mise a jour de la condition du while
@@ -5510,7 +5510,7 @@ void Transport_Interfaces_FT_Disc::uzawa(const double d, const DoubleTab& C,
       if (Objet_U::dimension==3)
         distance += ( x_ibc(2) - x[2] ) * ( x_ibc(2) - x[2] ) ;
 
-      deplacement_relatif = fabs(distance - distance_old) ;
+      deplacement_relatif = std::fabs(distance - distance_old) ;
       nb_iter++ ;
 
     }
@@ -5666,7 +5666,7 @@ void Transport_Interfaces_FT_Disc::projete_point_face_fluide( int& nb_proj_modif
                   ArrOfDouble v(dim) ;
                   v = variables_internes_->loi_horaire_->vitesse(t+dt,coord_projete);
                   if (zvdf)
-                    v_imp(i_face)=v(zvdf->orientation(i_face));
+                    v_imp(i_face)=v[zvdf->orientation(i_face)];
                 }
             }
         }
@@ -5893,7 +5893,7 @@ void Transport_Interfaces_FT_Disc::projete_point_face_interface( int& nb_proj_mo
                   ArrOfDouble v(dim);
                   v = variables_internes_->loi_horaire_->vitesse(t+dt,coord_projete);
                   if (zvdf)
-                    v_imp(i_face)=v(zvdf->orientation(i_face));
+                    v_imp(i_face)=v[zvdf->orientation(i_face)];
                 }
             }
         }
@@ -6126,7 +6126,7 @@ void Transport_Interfaces_FT_Disc::deplacer_maillage_ft_v_fluide(const double te
         zone_dis().valeur().zone().creer_tableau_elements(dI_dt);
         ns.calculer_dI_dt(dI_dt);
         dI_dt.echange_espace_virtuel();
-        ramasse_miettes(maillage, variables_internes_->tmp_flux, dI_dt);
+        ramasse_miettes(maillage, variables_internes_->tmp_flux->valeurs(), dI_dt);
         transfert_conservatif_eulerien_vers_lagrangien_sommets(maillage, dI_dt, var_volume);
       }
       // var_volume est une derivee par rapport au temps.
@@ -6405,7 +6405,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
         mp_sum_for_each_item(coord_barycentre);
         for (int j = 0; j < dim; j++)
           {
-            coord_barycentre(j)=coord_barycentre(j)/nb_sommets_reels;
+            coord_barycentre[j]=coord_barycentre[j]/nb_sommets_reels;
           }
         // Impression eventuelle de la loi horaire et du centre de gravite "discret" de l'interface
         if (schema_temps().limpr())
@@ -6605,7 +6605,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
     const ArrOfInt& index_elem = intersections.index_elem();
     DoubleTab& surface = variables_internes_->surface_interface.valeur().valeurs();
     const int nb_elements = surface.dimension(0);
-    double sum=0.;
+    // double sum=0.;
     for (int element = 0; element < nb_elements; element++)
       {
         int index = index_elem[element];
@@ -6618,7 +6618,7 @@ void Transport_Interfaces_FT_Disc::mettre_a_jour(double temps)
             index = data.index_facette_suivante_;
           }
         surface[element] = surface_totale;
-        sum += surface[element];
+        // sum += surface[element];
       }
     surface.echange_espace_virtuel();
     variables_internes_->surface_interface.mettre_a_jour(temps);

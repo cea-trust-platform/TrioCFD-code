@@ -1,0 +1,65 @@
+IJK_Grid_Geometry DOM
+
+Lire DOM
+{
+  nbelem_i 64
+  nbelem_j 32
+  nbelem_k 32
+  uniform_domain_size_i 0.005
+  uniform_domain_size_j 0.0025
+  uniform_domain_size_k 0.0025
+  origin_i -0.0025
+  origin_j -0.00125
+  origin_k -0.00125
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting
+Lire grid_splitting
+{
+  ijk_grid_geometry DOM
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+
+IJK_Grid_Geometry DOM_NEW
+Lire DOM_NEW
+{
+  nbelem_i 128
+  nbelem_j 64
+  nbelem_k 64
+  uniform_domain_size_i 0.005
+  uniform_domain_size_j 0.0025
+  uniform_domain_size_k 0.0025
+  origin_i -0.0025
+  origin_j -0.00125
+  origin_k -0.00125
+  perio_i
+  perio_j
+  perio_k
+}
+
+IJK_Splitting grid_splitting_NEW
+Lire grid_splitting_NEW
+{
+  ijk_grid_geometry DOM_NEW
+  nproc_i 1
+  nproc_j 1
+  nproc_k 1
+}
+# CAS REFINE #
+switch_FT_double
+{
+   direct_write 0
+   old_ijk_splitting_ft_extension 8
+   old_ijk_splitting grid_splitting
+   new_ijk_splitting grid_splitting_NEW
+   nom_reprise    diph2.sauv
+   nom_sauvegarde refine.sauv
+}
+
+# The end #
+Fin

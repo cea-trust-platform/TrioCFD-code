@@ -39,7 +39,7 @@
 #include <Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Ref_Convection_Diffusion_Temperature_FT_Disc.h>
 #include <Terme_Source_Constituant_Vortex_VEF_Face.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Matrice_Morse_Sym.h>
 #include <Matrice_Bloc.h>
 #include <Param.h>
@@ -279,7 +279,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Zone_dis_base& zdis,
       DoubleTab& val_mu = champ_mu_.valeur().valeurs();
       DoubleTab& val_rho_faces = champ_rho_faces_.valeur().valeurs();
 
-      fluide.masse_volumique().valeur_aux_elems(cg,les_polys,val_rho);
+      fluide.masse_volumique()->valeur_aux_elems(cg,les_polys,val_rho);
       fluide.viscosite_dynamique()->valeur_aux_elems(cg,les_polys,val_mu);
       val_rho.echange_espace_virtuel();
       val_mu.echange_espace_virtuel();
@@ -556,7 +556,7 @@ int Navier_Stokes_FT_Disc::lire_motcle_non_standard(const Motcle& mot, Entree& i
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_FT_Disc::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_FT_Disc::diffusivite_pour_transport() const
 {
   return champ_mu_;
 }
@@ -879,7 +879,7 @@ int Navier_Stokes_FT_Disc::preparer_calcul()
                                      secmem,
                                      la_pression.valeurs()
                                     );
-  assembleur_pression_.modifier_solution(la_pression);
+  assembleur_pression_.modifier_solution(la_pression->valeurs());
   // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
   DoubleTab& gradP = variables_internes().gradient_pression.valeurs();
   gradient.calculer(la_pression.valeur().valeurs(), gradP);
@@ -989,7 +989,7 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
           // Clipping de la courbure: si la courbure est superieure a la
           // valeur maxi autorisee, on limite (permet de ne pas plomber le
           // pas de temps s'il y a une singularite geometrique dans le maillage)
-          if (fabs(c) > clipping_courbure_max)
+          if (std::fabs(c) > clipping_courbure_max)
             {
               clip_counter++;
               c = ((c > 0) ? 1. : -1.) * clipping_courbure_max;
@@ -1309,7 +1309,7 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
       //const int nb_sommets_par_element = les_elems.dimension(1);
 
       // Calcul d'une indicatrice p1bulle
-      DoubleTab& indic_p1b = variables_internes().indicatrice_p1b;
+      DoubleTab& indic_p1b = variables_internes().indicatrice_p1b->valeurs();
       // Verification du support du champ indicatrice_p1b
       if (dimension==2 && indic_p1b.size_totale()!=nb_elem_tot+zone.nb_som_tot())
         {
@@ -1842,13 +1842,13 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         {
           const IntVect& orientation = ref_cast(Zone_VDF, zone_dis().valeur()).orientation();
           for (int face=0; face<n; face++)
-            gravite_face(face,0)=volumes_entrelaces(face)*g(orientation[face]);
+            gravite_face(face,0)=volumes_entrelaces(face)*g[orientation[face]];
         }
       else
         {
           for (int face=0; face<n; face++)
             for (int dim=0; dim<m; dim++)
-              gravite_face(face,dim)=volumes_entrelaces(face)*g(dim);
+              gravite_face(face,dim)=volumes_entrelaces(face)*g[dim];
         }
       solveur_masse.appliquer(gravite_face);
     }
@@ -2169,7 +2169,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
   //  prise en compte des conditions aux limites de pression/vitesse
 
   DoubleTab& secmem = variables_internes().second_membre_projection.valeurs();
-  const double& dt = schema_temps().pas_de_temps();
+  const double dt = schema_temps().pas_de_temps();
   const DoubleTab& inco = inconnue().valeur().valeurs();
   // secmem = div(U/dt+vpoint) = div(U(n+1)/dt)
   DoubleTab du(inco);
@@ -2218,7 +2218,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
       // Distance a l'interface discretisee aux elements:
       const DoubleTab& distance = eq_transport.get_update_distance_interface().valeurs();
       DoubleTab secmem2(secmem);
-      divergence.calculer(variables_internes().delta_u_interface, secmem2);
+      divergence.calculer(variables_internes().delta_u_interface->valeurs(), secmem2);
       // On ne conserve que la divergence des elements traverses par l'interface
       const int nb_elem = secmem2.dimension(0);
       for (int elem = 0; elem < nb_elem; elem++)
@@ -2414,7 +2414,7 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
                                      secmem,
                                      la_pression.valeurs()
                                     );
-  assembleur_pression_.modifier_solution(la_pression);
+  assembleur_pression_.modifier_solution(la_pression->valeurs());
   // Calcul d(u)/dt = vpoint + 1/rho*grad(P)
   gradient.calculer(la_pression.valeur().valeurs(), gradP);
   solveur_masse.appliquer(gradP);

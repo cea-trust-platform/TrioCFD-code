@@ -39,10 +39,10 @@ class Champ_front_contact_rayo_semi_transp_VEF: public Champ_front_contact_VEF
   Declare_instanciable(Champ_front_contact_rayo_semi_transp_VEF);
 
 public :
-  virtual int initialiser(double temps, const Champ_Inc_base& inco);
+  int initialiser(double temps, const Champ_Inc_base& inco) override;
   void calculer_temperature_bord(double temps);
-  Champ_front_base& affecter_(const Champ_front_base& ch) ;
-  void mettre_a_jour(double temps);
+  Champ_front_base& affecter_(const Champ_front_base& ch) override ;
+  void mettre_a_jour(double temps) override;
   inline Champ_Inc_base& inconnue1();
   inline const Champ_Inc_base& inconnue1() const;
 
@@ -57,7 +57,7 @@ public :
   inline void associer_modele_rayo(const Modele_rayo_semi_transp& modele);
   inline const Modele_rayo_semi_transp& modele_rayo() const;
   void mettre_a_jour_flux_radiatif(); // le copie du modele
-  void calcul_grads_locaux(double temps);
+  void calcul_grads_locaux(double temps) override;
   void modifie_gradients_pour_rayonnement(DoubleVect& gradient_num_transf, DoubleVect& gradient_num_transf_autre_pb);
 
 

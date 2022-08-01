@@ -1,0 +1,73 @@
+#!/bin/bash
+# Ce script est execute avant de lancer les cas tests
+
+# Generation des interfaces pour l'etat initial:
+# On suppose que gmsh a deja ete execute avec cette commande:
+# gmsh bulle_nulle.geo -2 -format msh2
+
+# Generation de 3 bulles  :
+# 0.01 0.0025 0.0025 bulle3.msh
+# cat >deplacements.txt <<EOF
+# 0.0 0.0 0.0 bulle3.msh
+# EOF
+# ./cree_multi_bulles.sh deplacements.txt init.lata
+
+
+# Placement des sondes
+${project_directory}/share/PyTools/probes/place_sondes.sh spectral spectral_point2 cree [2,2,2,.] [force_ph,velocity]
+
+# Deplacement de ce qui est utile au calcul dans le dossier RUN00
+
+# Nombre de pas de temps pour une petite simulation (dossier AVEC_REPRISE)
+nt=4;
+# Nombre de reprises (dans like_sub_file)
+nr=5;
+
+# On cree AVEC_REPRISE et SANS_REPRISE pour comparer les deux ensembles de resultats
+currentRepo=$PWD
+echo "$currentRepo"
+re='^[0-9]+$'>--
+if ! [[ $jobid =~ $re ]] ; then
+    jobidnext=00
+    AVEC_REPRISES_Repo=AVEC_REPRISES/RUN00
+    echo "mkdir -p $AVEC_REPRISES_Repo/NEXT"
+    mkdir -p $AVEC_REPRISES_Repo/NEXT
+    # = Copie des fichiers essentiels pour lancer un calcul (et de prepare meme s'il ne sert pas pour lancer les clcs)
+    cp spectral_point2.data $AVEC_REPRISES_Repo
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $nt/" $AVEC_REPRISES_Repo/spectral_point2.data 
+    sed -i "s/ dt_sauvegarde 20/ dt_sauvegarde $(($nt/2))/" $AVEC_REPRISES_Repo/spectral_point2.data 
+    cp init.lata* $AVEC_REPRISES_Repo
+    cp post_run $AVEC_REPRISES_Repo
+    cp like_sub_file $AVEC_REPRISES_Repo
+    sed -i "s/nrun=5/nrun=$nr/" $AVEC_REPRISES_Repo/like_sub_file
+    cp prepare $AVEC_REPRISES_Repo
+
+    SANS_REPRISES_Repo=SANS_REPRISES/RUN00
+    echo "mkdir -p $SANS_REPRISES_Repo/NEXT"
+    mkdir -p $SANS_REPRISES_Repo/NEXT
+    cp spectral_point2.data $SANS_REPRISES_Repo
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $((($nr+1)*$nt))/" $SANS_REPRISES_Repo/spectral_point2.data 
+    sed -i "s/nb_pas_dt_max 40/nb_pas_dt_max $(((($nr+1)*$nt)/2))/" $SANS_REPRISES_Repo/spectral_point2.data 
+    cp init.lata* $SANS_REPRISES_Repo
+    cp post_run $SANS_REPRISES_Repo
+    cp like_sub_file $SANS_REPRISES_Repo
+    sed -i "s/nrun=5/nrun=0/" $SANS_REPRISES_Repo/like_sub_file
+    cp prepare $SANS_REPRISES_Repo
+
+else
+    # = Dans les faits, prepare n'est appele qu'une fois en debut de lancement de fiche, depuis le dossier build. Donc on ne rentre jamais dans le build. Si je veux executer les instructions suivantes elles doivent se trouver dans le post-run.
+    echo "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    echo "c'est bizar, je pensais que le prepare n'etait appele q'une fois, avant d'executer le prm..."
+    jobidnext=$((jobid+1))
+    newRepo="../RUN$(printf "%02d" $jobidnext)"
+    
+    echo "mkdir -p $newRepo/NEXT"
+    mkdir -p $newRepo/NEXT
+    cp spectral_point2.data $newRepo
+    # mv init.lata* $newRepo
+    cp post_run $newRepo
+    cp like_sub_file $newRepo
+    cp prepare $newRepo
+fi
+
+

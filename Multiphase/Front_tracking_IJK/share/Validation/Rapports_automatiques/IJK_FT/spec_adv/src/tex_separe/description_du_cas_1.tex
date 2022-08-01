@@ -1,0 +1,14 @@
+Le premier test correspond à résoudre les équations : 
+
+\begin{align*}
+&\bm{f} = 2 cos(\k_1 x - \o_{1/2} t) \bm{e_y} \\
+&\p_t \bm{u} = - \frac{1}{\r} \bm{\nabla} p + \bm{f} \\                
+&\bm{ \nabla \cdot u } = 0 \\
+\end{align*}
+
+Les composantes $x$ et $z$ de l'équation de conservation de quantité de mouvement donnent $\p_t u_i = - \frac{1}{\r} \p_i p$ donc $u_i(\bm{x},t) = u_i(\bm{x},0) = 0$ pour $i={x,z}$. Donc $p$ ne dépend pas de $x$ ni de $z$ : $ p(\bm{x};t) = p(y,t)$ . De plus, $f$ n'évolue qu'en fonction de $x$ et de $t$. $f$ est la seule cause de mouvement dans ce problème. D'où $\p_y = \p_z = 0$, puis $ p(\bm{x};t) = p(t)$. Enfin, composante $y$ de l'équation de conservation de quantité de mouvement donne : 
+
+\begin{align*}
+&\p_t u_y = f_y = 2 cos(\k_1 x - \o_{1/2} t)\\  
+\Rightarrow &u_y(\bm{x};t) = u_y(x;t) = - \frac{2}{\o_{1/2}} sin(\k_1 x - \o_{1/2} t)  \text{ et } p(\bm{x};t)=p(t).   
+\end{align*}

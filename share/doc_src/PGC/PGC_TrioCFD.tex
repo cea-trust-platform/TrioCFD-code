@@ -1,5 +1,4 @@
 \documentclass[10pt,twoside,a4paper]{memoir}
-\usepackage[ascii]{}
 \usepackage[T1]{fontenc}
 \usepackage{longtable}
 \usepackage[utf8]{inputenc}
@@ -23,6 +22,7 @@
 \usepackage{enumitem}
 \usepackage[french]{babel}
 \usepackage{float}
+\usepackage{microtype}
 \usepackage{chngcntr}
 % espacement table des matieres et des figures entre numero et titre
 \usepackage{tocloft}
@@ -33,14 +33,15 @@
 %
 % Pour supprimer les encadres rouges des liens et definir leur fonte en bleu
 \usepackage{makeidx}
-\usepackage{hyperref,varioref}
-\hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
 % packages pour les figures
 \usepackage{chronosys}
 \usepackage{tikz}
 \usetikzlibrary{arrows}
 \usetikzlibrary{decorations.pathreplacing}
+\usepackage{hyperref,varioref}
+\hypersetup{linkcolor=blue,colorlinks=true,bookmarks=true,bookmarksopen=true,bookmarksnumbered=true}
 %
+
 \setlength\hoffset{0cm}
 \setlength\voffset{0cm}
 \setlength\oddsidemargin{0cm}
@@ -80,14 +81,14 @@
 \makeatother
 %
 \fancypagestyle{part}{%
-\lfoot{\textit{Plan de Gestion Logiciel TrioCFD, v1.8.4}}
+\lfoot{\textit{Plan de Gestion Logiciel TrioCFD, v1.9.0}}
 \cfoot{}
 \rfoot{\thepage}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.3pt}}
 %
 \fancypagestyle{chapter}{%
-\lfoot{\textit{Plan de Gestion Logiciel TrioCFD, v1.8.4}}
+\lfoot{\textit{Plan de Gestion Logiciel TrioCFD, v1.9.0}}
 \cfoot{}
 \rfoot{\thepage}
 \renewcommand{\headrulewidth}{0.5pt}
@@ -99,7 +100,7 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.3pt}
 \chead{}
-\lfoot{\textit{Plan de Gestion Logiciel TrioCFD, v1.8.4}}
+\lfoot{\textit{Plan de Gestion Logiciel TrioCFD, v1.9.0}}
 \cfoot{}
 \rfoot{\thepage}
 %
@@ -170,7 +171,7 @@
 \begin{center} \vspace{1.8cm}
 \parbox[t]{12cm}{\hspace{1.2cm}\huge{\textbf{USER DOCUMENTATION :}}
 \vspace{0.4cm}\\
-\hspace{2.8cm}\LARGE{\textbf{Plan de Gestion de Configuration de  TrioCFD v1.8.4}}} \end{center}
+\hspace{2.8cm}\LARGE{\textbf{Plan de Gestion de Configuration de  TrioCFD v1.9.0}}} \end{center}
 \vspace{0.3cm}
 \begin{center}\includegraphics[scale=0.7]{pictures/TrioCFD.png} \end{center}
 \vspace{0.3cm}
@@ -182,7 +183,7 @@
 Code Version & Date & Code manager & Authors \\
  & & J. DARONA & \\ \hline
  & &\multirow{3}{*}{\includegraphics[scale=0.55]{pictures/sign_JD.png}} &  \\
-v1.8.4 & \today && J.DARONA\\
+v1.9.0 & \today && J.DARONA\\
  & &&  \\ \hline
 \multicolumn{2}{Sc|}{ } & \multicolumn{2}{Sl}{\textit{Input file : } PGC\_TrioCFD.tex } \\
 \multicolumn{2}{c|}{\textbf{DES/ISAS/DM2S} } & \multicolumn{2}{l}{\textit{Software : } TrioCFD } \\
