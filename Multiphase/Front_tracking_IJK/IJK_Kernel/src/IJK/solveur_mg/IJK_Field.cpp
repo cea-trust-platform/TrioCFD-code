@@ -174,7 +174,7 @@ void IJK_Field_local_float::allocate(int Ni, int Nj, int Nk, int ghosts, int add
   char *cptr = (char *) ptr;
   long long iptr = (long long) cptr;
   long long decal = iptr & (CacheLineSizeBytes - 1);
-  offset_ += (CacheLineSizeBytes - decal) / sizeof(float);
+  offset_ += (int)(CacheLineSizeBytes - decal) / (int)sizeof(float);
   
 }
 
@@ -396,7 +396,7 @@ float max_ijk(const IJK_Field_float& residu)
   const int ni = residu.ni();
   const int nj = residu.nj();
   const int nk = residu.nk();
-  float res = -1.e30;
+  float res = (float)-1.e30;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -404,7 +404,7 @@ float max_ijk(const IJK_Field_float& residu)
           float x = residu(i,j,k);
 	res = std::max(x,res);
         }
-  res = Process::mp_max(res);
+  res = (float)Process::mp_max(res);
   return res;
 }
 
@@ -425,7 +425,7 @@ float prod_scal_ijk(const IJK_Field_float & x, const IJK_Field_float & y)
       }
     }
   }
-  somme = Process::mp_sum(somme);
+  somme = (float)Process::mp_sum(somme);
   return somme;
 }
 
@@ -447,7 +447,7 @@ double somme_ijk(const IJK_Field_float & residu)
     }
     somme += partial1;
   }
-  somme = Process::mp_sum(somme);
+  somme = (float)Process::mp_sum(somme);
   return somme;
 }
 
@@ -505,7 +505,7 @@ void IJK_Field_local_double::allocate(int Ni, int Nj, int Nk, int ghosts, int ad
   char *cptr = (char *) ptr;
   long long iptr = (long long) cptr;
   long long decal = iptr & (CacheLineSizeBytes - 1);
-  offset_ += (CacheLineSizeBytes - decal) / sizeof(double);
+  offset_ += (int)(CacheLineSizeBytes - decal) / (int)sizeof(double);
   
 }
 
@@ -741,7 +741,7 @@ double max_ijk(const IJK_Field_double& residu)
   const int ni = residu.ni();
   const int nj = residu.nj();
   const int nk = residu.nk();
-  double res = -1.e30;
+  double res = (double)-1.e30;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
@@ -749,7 +749,7 @@ double max_ijk(const IJK_Field_double& residu)
           double x = residu(i,j,k);
 	res = std::max(x,res);
         }
-  res = Process::mp_max(res);
+  res = (double)Process::mp_max(res);
   return res;
 }
 
@@ -770,7 +770,7 @@ double prod_scal_ijk(const IJK_Field_double & x, const IJK_Field_double & y)
       }
     }
   }
-  somme = Process::mp_sum(somme);
+  somme = (double)Process::mp_sum(somme);
   return somme;
 }
 
@@ -792,7 +792,7 @@ double somme_ijk(const IJK_Field_double & residu)
     }
     somme += partial1;
   }
-  somme = Process::mp_sum(somme);
+  somme = (double)Process::mp_sum(somme);
   return somme;
 }
 

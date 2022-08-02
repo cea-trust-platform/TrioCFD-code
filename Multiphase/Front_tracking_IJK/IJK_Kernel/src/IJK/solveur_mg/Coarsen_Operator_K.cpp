@@ -263,7 +263,7 @@ void Coarsen_Operator_K::coarsen(const IJK_Field_float & fine, IJK_Field_float &
     const int fine_k = src_dest_index_local_(index, 0);
     const int coarse_k = src_dest_index_local_(index, 1);
     
-    const float coef = coef_array[index];
+    const float coef = (float)coef_array[index];
     if (coarse_k != previous_coarse_k) {
       // Start a new layer, overwrite value
       for (int j = 0; j < nj; j++)
@@ -306,7 +306,7 @@ void Coarsen_Operator_K::interpolate_sub_shiftk(const IJK_Field_float & coarse, 
   for (int index = index_start; index != index_end; index += delta_index) {
     const int fine_k = src_dest_index_local_(index, 0);
     const int coarse_k = src_dest_index_local_(index, 1);
-    const float coef = coef_array[index];
+    const float coef = (float)coef_array[index];
     if (fine_k != previous_fine_k) {
       previous_fine_k = fine_k;
       // Start a new layer from the fine mesh, take data from shifted position:
@@ -528,7 +528,7 @@ void Coarsen_Operator_K::coarsen(const IJK_Field_double & fine, IJK_Field_double
     const int fine_k = src_dest_index_local_(index, 0);
     const int coarse_k = src_dest_index_local_(index, 1);
     
-    const double coef = coef_array[index];
+    const double coef = (double)coef_array[index];
     if (coarse_k != previous_coarse_k) {
       // Start a new layer, overwrite value
       for (int j = 0; j < nj; j++)
@@ -571,7 +571,7 @@ void Coarsen_Operator_K::interpolate_sub_shiftk(const IJK_Field_double & coarse,
   for (int index = index_start; index != index_end; index += delta_index) {
     const int fine_k = src_dest_index_local_(index, 0);
     const int coarse_k = src_dest_index_local_(index, 1);
-    const double coef = coef_array[index];
+    const double coef = (double)coef_array[index];
     if (fine_k != previous_fine_k) {
       previous_fine_k = fine_k;
       // Start a new layer from the fine mesh, take data from shifted position:

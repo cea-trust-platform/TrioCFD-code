@@ -23,6 +23,7 @@
 #include <SourceFiltree_FT_disc_base.h>
 #include <Parser.h>
 #include <Transport_Interfaces_FT_Disc.h>
+#include <algorithm>
 
 SourceFiltree_FT_disc_base::SourceFiltree_FT_disc_base()
 {
@@ -119,7 +120,7 @@ Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
                 is >> tmp;
                 const char *s =  tmp.getChar();
                 std::string ss(s);
-                for (auto & c: ss) c = toupper(c);
+                std::transform(ss.begin(), ss.end(), ss.begin(), ::toupper);
                 fI_xyz_t[i] = new Parser(ss,4);
                 fI_xyz_t[i]->addVar("x");
                 fI_xyz_t[i]->addVar("y");
@@ -142,7 +143,7 @@ Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
                 is >> tmp;
                 const char *s =  tmp.getChar();
                 std::string ss(s);
-                for (auto & c: ss) c = toupper(c);
+                std::transform(ss.begin(), ss.end(), ss.begin(), ::toupper);
                 fI_xyz_t[dimension_+i] = new Parser(ss,4);
                 fI_xyz_t[dimension_+i]->addVar("x");
                 fI_xyz_t[dimension_+i]->addVar("y");

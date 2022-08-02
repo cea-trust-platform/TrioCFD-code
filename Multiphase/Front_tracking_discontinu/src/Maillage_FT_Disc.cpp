@@ -1029,7 +1029,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
         // Correction testee en VDF mais deux cas test VEF ont fait des ecarts
         if(count == 1)
           {
-            elems_to_change.append_line(elem, somme);
+            elems_to_change.append_line(elem, (int)std::lrint(somme));
           }
         if (count > 1)
           {
@@ -1973,7 +1973,7 @@ int Maillage_FT_Disc::sauvegarder(Sortie& os) const
       // On augmente la precision d'ecriture du maillage Front Tracking
       // au moment de l'ecriture et on restaure l'ancienne apres
       // Probleme rencontre sur la FA819
-      int old_precision = os.get_ostream().precision(14);
+      int old_precision = (int)os.get_ostream().precision(14);
       os << sommets_;
       bytes += 8 * sommets_.size_array();
       os.precision(old_precision);

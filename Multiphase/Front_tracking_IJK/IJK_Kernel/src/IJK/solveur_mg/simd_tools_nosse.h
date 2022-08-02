@@ -240,7 +240,7 @@ inline Simd_float SimdDivideMed(const Simd_float & a, const Simd_float & b)
 // Returns a 22 bits accurate result of 1/b
 inline Simd_float SimdReciprocalMed(const Simd_float & b)
 {
-  return 1. / b.data_;
+  return 1.f / b.data_;
 }
 
 // Implementation for double precision type

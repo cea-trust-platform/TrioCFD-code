@@ -41,7 +41,7 @@ static inline double get_clock()
 {
   struct timeval time;
   gettimeofday(& time, 0);
-  return (double) time.tv_sec + 0.000001 * time.tv_usec;
+  return (double) time.tv_sec + 0.000001 * (double)time.tv_usec;
 }
 void fill_dummy(IJK_Field_local_float & tab, int seed)
 {
@@ -57,7 +57,7 @@ void fill_dummy(IJK_Field_local_float & tab, int seed)
       for (int j = jmin; j < jmax; j++)
 	for (int i = imin; i < imax; i++) {
 	  double x = i * 0.2 + j * 0.9893 + k * 0.87987 + seed;
-	  tab(i,j,k) = 1. + 0.5 * sin(x);
+	  tab(i,j,k) = (float)(1. + 0.5 * sin(x));
 	}
   } else {
     const int n = tab.nb_compo();
@@ -66,7 +66,7 @@ void fill_dummy(IJK_Field_local_float & tab, int seed)
 	for (int j = jmin; j < jmax; j++)
 	  for (int i = imin; i < imax; i++) {
 	    double x = i * 0.2 + j * 0.9893 + k * 0.87987 + compo * 0.238768 + seed;
-	    tab(i,j,k,compo) = 1. + 0.5 * sin(x);
+	    tab(i,j,k,compo) = (float)(1. + 0.5 * sin(x));
 	  }
   }
 }
@@ -84,7 +84,7 @@ void fill_dummy(IJK_Field_local_double & tab, int seed)
       for (int j = jmin; j < jmax; j++)
 	for (int i = imin; i < imax; i++) {
 	  double x = i * 0.2 + j * 0.9893 + k * 0.87987 + seed;
-	  tab(i,j,k) = 1. + 0.5 * sin(x);
+	  tab(i,j,k) = (double)(1. + 0.5 * sin(x));
 	}
   } else {
     const int n = tab.nb_compo();
@@ -93,7 +93,7 @@ void fill_dummy(IJK_Field_local_double & tab, int seed)
 	for (int j = jmin; j < jmax; j++)
 	  for (int i = imin; i < imax; i++) {
 	    double x = i * 0.2 + j * 0.9893 + k * 0.87987 + compo * 0.238768 + seed;
-	    tab(i,j,k,compo) = 1. + 0.5 * sin(x);
+	    tab(i,j,k,compo) = (double)(1. + 0.5 * sin(x));
 	  }
   }
 }
@@ -102,7 +102,7 @@ void fill_dummy(IJK_Field_local_double & tab, int seed)
 void reference_kernel_float(const IJK_Field_local_float & tab, const IJK_Field_local_float & coeffs, const IJK_Field_local_float & secmem, IJK_Field_local_float & resu, 
 			     const float relax, const bool residue)
 {
-  const float one_minus_relax = 1. - relax;
+  const float one_minus_relax = (float)(1. - relax);
 
   const int kmin = - tab.ghost() + 1;
   const int kmax = tab.nk() + tab.ghost() - 1;
@@ -152,7 +152,7 @@ float compute_difference(const IJK_Field_local_float & a, const IJK_Field_local_
 void reference_kernel_double(const IJK_Field_local_double & tab, const IJK_Field_local_double & coeffs, const IJK_Field_local_double & secmem, IJK_Field_local_double & resu, 
 			     const double relax, const bool residue)
 {
-  const double one_minus_relax = 1. - relax;
+  const double one_minus_relax = (double)(1. - relax);
 
   const int kmin = - tab.ghost() + 1;
   const int kmax = tab.nk() + tab.ghost() - 1;
@@ -909,7 +909,7 @@ void test64x64_float(const int kstride_input, const int jstride_input, int nk, i
     }
   }
 
-  const float relax_coefficient = 0.65;
+  const float relax_coefficient = (float)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -1732,7 +1732,7 @@ void test68x68_float(const int kstride_input, const int jstride_input, int nk, i
     }
   }
 
-  const float relax_coefficient = 0.65;
+  const float relax_coefficient = (float)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -2555,7 +2555,7 @@ void test72x72_float(const int kstride_input, const int jstride_input, int nk, i
     }
   }
 
-  const float relax_coefficient = 0.65;
+  const float relax_coefficient = (float)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -3378,7 +3378,7 @@ void test76x76_float(const int kstride_input, const int jstride_input, int nk, i
     }
   }
 
-  const float relax_coefficient = 0.65;
+  const float relax_coefficient = (float)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -4201,7 +4201,7 @@ void test80x80_float(const int kstride_input, const int jstride_input, int nk, i
     }
   }
 
-  const float relax_coefficient = 0.65;
+  const float relax_coefficient = (float)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -5024,7 +5024,7 @@ void testgeneric_float(const int kstride_input, const int jstride_input, int nk,
     }
   }
 
-  const float relax_coefficient = 0.65;
+  const float relax_coefficient = (float)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -5847,7 +5847,7 @@ void test64x64_double(const int kstride_input, const int jstride_input, int nk, 
     }
   }
 
-  const double relax_coefficient = 0.65;
+  const double relax_coefficient = (double)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -6670,7 +6670,7 @@ void test68x68_double(const int kstride_input, const int jstride_input, int nk, 
     }
   }
 
-  const double relax_coefficient = 0.65;
+  const double relax_coefficient = (double)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -7493,7 +7493,7 @@ void test72x72_double(const int kstride_input, const int jstride_input, int nk, 
     }
   }
 
-  const double relax_coefficient = 0.65;
+  const double relax_coefficient = (double)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -8316,7 +8316,7 @@ void test76x76_double(const int kstride_input, const int jstride_input, int nk, 
     }
   }
 
-  const double relax_coefficient = 0.65;
+  const double relax_coefficient = (double)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -9139,7 +9139,7 @@ void test80x80_double(const int kstride_input, const int jstride_input, int nk, 
     }
   }
 
-  const double relax_coefficient = 0.65;
+  const double relax_coefficient = (double)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;
@@ -9962,7 +9962,7 @@ void testgeneric_double(const int kstride_input, const int jstride_input, int nk
     }
   }
 
-  const double relax_coefficient = 0.65;
+  const double relax_coefficient = (double)0.65;
   const int nvalues = tab.j_stride() * (nj-1) + ni;
 
   Nom kernname;

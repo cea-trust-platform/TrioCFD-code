@@ -93,8 +93,8 @@ Sortie& Random_process::printOn( Sortie& os ) const
   gen_read >> long_gen;
   gen_read.close();
 
-  semi_gen_et_modulo_reprise(0) = long_gen/2; // 10 (en binaire) : "10 >> 1 = 01"
-  semi_gen_et_modulo_reprise(1) = (long_gen)%2;
+  semi_gen_et_modulo_reprise(0) = (int)(long_gen/2); // 10 (en binaire) : "10 >> 1 = 01"
+  semi_gen_et_modulo_reprise(1) = (int)(long_gen%2);
   //  IntTab like_gen;
   //  like_gen.resize(625);
   //  for (int i=0; i<625; i++)
@@ -295,7 +295,7 @@ void Random_process::next_step2(double dt, int it)
                       if (sorties_supplementaires)
                         Detail_gen << gen << std::endl;
                       process_flt[ind_CDIlmn] = old_process[ind_CDIlmn]*(1-dt/tL);
-                      process_flt[ind_CDIlmn] += Gaussian[cpx][dir]*sqrtf(2*eps_etoile*(0.0+dt)/pow(tL,2));
+                      process_flt[ind_CDIlmn] += Gaussian[cpx][dir]*sqrt(2.0*eps_etoile*(0.0+dt)/pow(tL,2));
                     }
                   // Symetrie Hermitienne. Sous nos conventions, -k[ind] = k[n_lmn - ind]
                   // Remarque : on ne se sert meme pas de l'autre moitie.
@@ -372,7 +372,7 @@ void Random_process::next_step3(ArrOfDouble& advection_velocity, double dt, int 
                           Gaussian[cpx][dir] = distribution(gen);
                           Detail_gen << gen << std::endl;
                           process_flt[ind_RCDIlmn] = process_flt[ind_RCDIlmn]*(1-dt/tL);
-                          process_flt[ind_RCDIlmn] += Gaussian[cpx][dir]*sqrtf(2*eps_etoile*(0.0+dt)/pow(tL,2));
+                          process_flt[ind_RCDIlmn] += Gaussian[cpx][dir]*sqrt(2*eps_etoile*(0.0+dt)/pow(tL,2));
                         }
                       // Symetrie Hermitienne. Sous nos conventions, -k[ind] = k[n_lmn - ind]
                       // Remarque : on ne se sert meme pas de l'autre moitie.

@@ -148,7 +148,7 @@ double max_val_abs_ijk(const IJK_Field_double& residu,const IJK_Field_double& x)
   const int ni = residu.ni();
   const int nj = residu.nj();
   const int nk = residu.nk();
-  float m = 0.;
+  double m = 0.;
   for (int k = 0; k < nk; k++)
     {
       for (int j = 0; j < nj; j++)

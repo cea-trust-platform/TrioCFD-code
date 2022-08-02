@@ -180,8 +180,8 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_inv_rho()
 #Pmacro DEFINE_DELTAS(DIRLETTER,DIRNUM,ISCONST)
 #Pif("ISCONST"=="CONST")
 // mesh is uniform in DIRLETTER direction: define a constant value
-const _TYPE_ delta_DIRLETTER = local_delta_xyz_[DIRNUM][0];
-const _TYPE_ i_delta_DIRLETTER = 1. / local_delta_xyz_[DIRNUM][0];
+const _TYPE_ delta_DIRLETTER = (_TYPE_)local_delta_xyz_[DIRNUM][0];
+const _TYPE_ i_delta_DIRLETTER = (_TYPE_)(1. / local_delta_xyz_[DIRNUM][0]);
 #define DELTA_DIRLETTER delta_DIRLETTER
 #define invDELTA_DIRLETTER i_delta_DIRLETTER
 #Pelse
@@ -197,12 +197,12 @@ ArrOf_Type__with_ghost i_delta_DIRLETTER_array;
   i_delta_DIRLETTER_array.resize(n, ghost);
   const int imin = -ghost + 1;
   const int imax = n + ghost;
-  delta_DIRLETTER_array[-ghost] = local_delta_xyz_[DIRNUM][-ghost];
+  delta_DIRLETTER_array[-ghost] = (_TYPE_)local_delta_xyz_[DIRNUM][-ghost];
   for (int i = imin; i < imax; i++) {
-    delta_DIRLETTER_array[i] = local_delta_xyz_[DIRNUM][i];
+    delta_DIRLETTER_array[i] = (_TYPE_)local_delta_xyz_[DIRNUM][i];
     _TYPE_ x = delta_DIRLETTER_array[i-1];
     _TYPE_ y = delta_DIRLETTER_array[i];
-    i_delta_DIRLETTER_array[i] = 2. / (x+y);
+    i_delta_DIRLETTER_array[i] = (_TYPE_)(2. / (x+y));
   }
 }
 #define DELTA_DIRLETTER delta_DIRLETTER_array[DIRLETTER]
@@ -254,7 +254,7 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_rho__UI___UJ___UK_(
 	_TYPE_ *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const _TYPE_ rho = 2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const _TYPE_ rho = (_TYPE_)(2. / (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const _TYPE_ f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -265,7 +265,7 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_rho__UI___UJ___UK_(
 	_TYPE_ *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const _TYPE_ rho = 2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const _TYPE_ rho = _TYPE_(2. / (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const _TYPE_ f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -290,7 +290,7 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_rho__UI___UJ___UK_(
 	const _TYPE_ *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const _TYPE_ rho = 2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const _TYPE_ rho = (_TYPE_)(2. / (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const _TYPE_ f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -367,7 +367,7 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_inv_rho__UI___UJ___
 	_TYPE_ *coeff = ijk_faces_coefficients_.k_layer(k, 0);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax+1; i++) {
-	    const _TYPE_ rho = 0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j));
+	    const _TYPE_ rho = (_TYPE_)(0.5 * (layout(src_rho, i-1, j) + layout(src_rho, i, j)));
 	    const _TYPE_ f = invDELTA_i * DELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -378,7 +378,7 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_inv_rho__UI___UJ___
 	_TYPE_ *coeff = ijk_faces_coefficients_.k_layer(k, 1);
 	for (int j = jmin; j < jmax+1; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const _TYPE_ rho = 0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j));
+	    const _TYPE_ rho = (_TYPE_)(0.5 * (layout(src_rho, i, j-1) + layout(src_rho, i, j)));
 	    const _TYPE_ f = DELTA_i * invDELTA_j * DELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -403,7 +403,7 @@ void Grid_Level_Data__TYPE_::compute_faces_coefficients_from_inv_rho__UI___UJ___
 	const _TYPE_ *src_rho_right = ijk_rho_.k_layer(k);
 	for (int j = jmin; j < jmax; j++) {
 	  for (int i = imin; i < imax; i++) {
-	    const _TYPE_ rho = 0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j));
+	    const _TYPE_ rho = (_TYPE_)(0.5 * (layout(src_rho_left, i, j) + layout(src_rho_right, i, j)));
 	    const _TYPE_ f = DELTA_i * DELTA_j * invDELTA_k;
 	    layout(coeff, i, j) = rho * f;
 	  }
@@ -478,6 +478,6 @@ void Grid_Level_Data_float::compute_faces_coefficients_from_double_coeffs(const 
     
       for (int j = jmin; j < jmax; j++)
 	for (int i = imin; i < imax; i++)
-	  ijk_faces_coefficients_(i, j, k, compo) = src(i,j,k,compo);
+	  ijk_faces_coefficients_(i, j, k, compo) = (float)src(i,j,k,compo);
     }
 }

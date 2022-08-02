@@ -379,7 +379,7 @@ void Multigrille_base::coarse_solver(IJK_Field_float & x, const IJK_Field_float 
   for (k = 0; k < nk; k++) 
     for (j = 0; j < nj; j++)
       for (i = 0; i < ni; i++)
-	x(i,j,k) = inco[mat.renum(i,j,k)];
+	x(i,j,k) = (float)inco[mat.renum(i,j,k)];
 
   //statistiques().end_count(counter);
 }
@@ -489,7 +489,7 @@ void Multigrille_base::resoudre_avec_gcp(IJK_Field_float & x, IJK_Field_float & 
     
     ajoute_alpha_v(R, alpha, residu);
 
-    float nr = norme_ijk(R);
+    float nr = (float)norme_ijk(R);
     Cout << "GCP+MG iteration " << iter << " residu " << nr << finl;
     if (nr < seuil_)
       break;
@@ -641,7 +641,7 @@ inline double ajouter_alpha_v_multiple_(IJK_Field_float & x, ArrOfDouble & coeff
   double somme = 0.;
   for (nn = 0; nn < n; nn++) {
     y_ptr[nn] = y[nfirst + nn].data().addr();
-    c[nn] = coeff[nfirst + nn];
+    c[nn] = (float)coeff[nfirst + nn];
   }
   for (int k = 0; k < nk; k++) {
     for (int j = 0; j < nj; j++) {
@@ -788,7 +788,7 @@ void Multigrille_base::resoudre_avec_gmres(IJK_Field_float & x, IJK_Field_float 
 	   << "\n Residue= " << norme_b << finl;
       Process::exit();
     }
-    krilov_space[0].data() *= (1. / norme_b);
+    krilov_space[0].data() *= (float)(1. / norme_b);
     
     hessenberg = 0.;
 
@@ -829,7 +829,7 @@ void Multigrille_base::resoudre_avec_gmres(IJK_Field_float & x, IJK_Field_float 
       double norme_v0 = ajouter_alpha_v_multiple(krilov_space[i+1], coeff, krilov_space, i+1);
       norme_v0 = sqrt(mp_sum(norme_v0));
       hessenberg(i + 1, i) = norme_v0;
-      krilov_space[i+1].data() *= 1. / norme_v0;
+      krilov_space[i+1].data() *= (float)(1. / norme_v0);
     }
 
     DoubleTab mat(n_krilov + 1, n_krilov);
@@ -1114,7 +1114,7 @@ void Multigrille_base::coarse_solver(IJK_Field_double & x, const IJK_Field_doubl
   for (k = 0; k < nk; k++) 
     for (j = 0; j < nj; j++)
       for (i = 0; i < ni; i++)
-	x(i,j,k) = inco[mat.renum(i,j,k)];
+	x(i,j,k) = (double)inco[mat.renum(i,j,k)];
 
   //statistiques().end_count(counter);
 }
@@ -1224,7 +1224,7 @@ void Multigrille_base::resoudre_avec_gcp(IJK_Field_double & x, IJK_Field_double 
     
     ajoute_alpha_v(R, alpha, residu);
 
-    double nr = norme_ijk(R);
+    double nr = (double)norme_ijk(R);
     Cout << "GCP+MG iteration " << iter << " residu " << nr << finl;
     if (nr < seuil_)
       break;
@@ -1376,7 +1376,7 @@ inline double ajouter_alpha_v_multiple_(IJK_Field_double & x, ArrOfDouble & coef
   double somme = 0.;
   for (nn = 0; nn < n; nn++) {
     y_ptr[nn] = y[nfirst + nn].data().addr();
-    c[nn] = coeff[nfirst + nn];
+    c[nn] = (double)coeff[nfirst + nn];
   }
   for (int k = 0; k < nk; k++) {
     for (int j = 0; j < nj; j++) {
@@ -1523,7 +1523,7 @@ void Multigrille_base::resoudre_avec_gmres(IJK_Field_double & x, IJK_Field_doubl
 	   << "\n Residue= " << norme_b << finl;
       Process::exit();
     }
-    krilov_space[0].data() *= (1. / norme_b);
+    krilov_space[0].data() *= (double)(1. / norme_b);
     
     hessenberg = 0.;
 
@@ -1564,7 +1564,7 @@ void Multigrille_base::resoudre_avec_gmres(IJK_Field_double & x, IJK_Field_doubl
       double norme_v0 = ajouter_alpha_v_multiple(krilov_space[i+1], coeff, krilov_space, i+1);
       norme_v0 = sqrt(mp_sum(norme_v0));
       hessenberg(i + 1, i) = norme_v0;
-      krilov_space[i+1].data() *= 1. / norme_v0;
+      krilov_space[i+1].data() *= (double)(1. / norme_v0);
     }
 
     DoubleTab mat(n_krilov + 1, n_krilov);
@@ -1627,7 +1627,7 @@ void Multigrille_base::resoudre_systeme_IJK_float(const IJK_Field_float & rhs, I
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	ijk_b(i,j,k) = rhs(i,j,k);
+	ijk_b(i,j,k) = (float)rhs(i,j,k);
       }
   
   solve_ijk_in_storage_float();
@@ -1635,7 +1635,7 @@ void Multigrille_base::resoudre_systeme_IJK_float(const IJK_Field_float & rhs, I
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	x(i,j,k) = ijk_x(i,j,k);
+	x(i,j,k) = (float)ijk_x(i,j,k);
       }
 }
 void Multigrille_base::resoudre_systeme_IJK_float(const IJK_Field_double & rhs, IJK_Field_double & x)
@@ -1650,7 +1650,7 @@ void Multigrille_base::resoudre_systeme_IJK_float(const IJK_Field_double & rhs, 
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	ijk_b(i,j,k) = rhs(i,j,k);
+	ijk_b(i,j,k) = (float)rhs(i,j,k);
       }
   
   solve_ijk_in_storage_float();
@@ -1658,7 +1658,7 @@ void Multigrille_base::resoudre_systeme_IJK_float(const IJK_Field_double & rhs, 
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	x(i,j,k) = ijk_x(i,j,k);
+	x(i,j,k) = (double)ijk_x(i,j,k);
       }
 }
 
@@ -1769,7 +1769,7 @@ void Multigrille_base::resoudre_systeme_IJK_double(const IJK_Field_float & rhs, 
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	ijk_b(i,j,k) = rhs(i,j,k);
+	ijk_b(i,j,k) = (double)rhs(i,j,k);
       }
   
   solve_ijk_in_storage_double();
@@ -1777,7 +1777,7 @@ void Multigrille_base::resoudre_systeme_IJK_double(const IJK_Field_float & rhs, 
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	x(i,j,k) = ijk_x(i,j,k);
+	x(i,j,k) = (float)ijk_x(i,j,k);
       }
 }
 void Multigrille_base::resoudre_systeme_IJK_double(const IJK_Field_double & rhs, IJK_Field_double & x)
@@ -1792,7 +1792,7 @@ void Multigrille_base::resoudre_systeme_IJK_double(const IJK_Field_double & rhs,
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	ijk_b(i,j,k) = rhs(i,j,k);
+	ijk_b(i,j,k) = (double)rhs(i,j,k);
       }
   
   solve_ijk_in_storage_double();
@@ -1800,7 +1800,7 @@ void Multigrille_base::resoudre_systeme_IJK_double(const IJK_Field_double & rhs,
   for (k = 0; k < kmax; k++)
     for (j = 0; j < jmax; j++)
       for (i = 0; i < imax; i++) {
-	x(i,j,k) = ijk_x(i,j,k);
+	x(i,j,k) = (double)ijk_x(i,j,k);
       }
 }
 
@@ -1851,14 +1851,14 @@ void Multigrille_base::solve_ijk_in_storage_double()
     for (k = 0; k < nk; k++)
       for (j = 0; j < nj; j++)
 	for (i = 0; i < ni; i++) 
-	  float_b(i,j,k) = ijk_b(i,j,k);
+	  float_b(i,j,k) = (float)ijk_b(i,j,k);
     int iteration = 0;
     do {
       if (iteration > 0)
 	for (k = 0; k < nk; k++)
 	  for (j = 0; j < nj; j++)
 	    for (i = 0; i < ni; i++) 
-	      float_b(i,j,k) = -ijk_residu(i,j,k);
+	      float_b(i,j,k) = (float)(-ijk_residu(i,j,k));
 
       
       // Launch multigrid solver in single precision:

@@ -86,7 +86,7 @@ void Switch_FT_double::initialise()
   const Nom& vdf_name = geom_new.le_nom()+Nom("_VDF");
 
   const double old_to_new_ratio = std::min(dx/new_dx, dy/new_dy);
-  const int new_ijk_splitting_ft_extension = ceil(old_ijk_splitting_ft_extension_* old_to_new_ratio);
+  const int new_ijk_splitting_ft_extension = (int)std::lrint(std::ceil(old_ijk_splitting_ft_extension_* old_to_new_ratio));
   Cerr << "Extended splitting dimensions. old = " << old_ijk_splitting_ft_extension_
       << " new = " <<new_ijk_splitting_ft_extension << finl;
   Cerr << "Construction de la zone VDF..." << finl;

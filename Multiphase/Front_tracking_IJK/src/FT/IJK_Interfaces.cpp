@@ -70,7 +70,7 @@ void dumplata_ft_mesh(const char *filename, const char *meshname,
 
   for (int i=0; i<nb_som; i++)
     for(int j=0; j<3; j++)
-      tmp(i,j)=sommets(i,j);
+      tmp(i,j)=(float)sommets(i,j);
   EcrFicPartageBin file;
   file.ouvrir(fdsom);
   file.put(tmp.addr(), tmp.size_array(), 3);
@@ -4176,7 +4176,7 @@ void IJK_Interfaces::ajouter_terme_source_interfaces(FixedVector<IJK_Field_doubl
                                                               bary_facettes_dans_elem);
 
                   // On memorise les compo presentes, le potentiel et l'indic :
-                  num_compo_presentes[i_compo](i,j,k) = num_compo;
+                  num_compo_presentes[i_compo](i,j,k) = (float)num_compo;
                   indic_par_compo[i_compo](i,j,k) = indic;
                   phi_par_compo[i_compo](i,j,k) = phi;
                   repul_par_compo[i_compo](i,j,k) = repul;

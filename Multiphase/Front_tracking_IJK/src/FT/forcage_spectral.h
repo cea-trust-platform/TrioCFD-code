@@ -69,9 +69,9 @@ public :
   // ~forcage_spectral();
 
   void fftw_org_multi_D_MPI_DFT_real_data();
-  int get_compteur0();
-  int get_compteur1();
-  int get_compteur2();
+  double get_compteur0();
+  double get_compteur1();
+  double get_compteur2();
   void set_nk_kmin_kmax(const int number_k, const double kmin, const double kmax);
   void set_spectral_domain();
   void set_a_force();

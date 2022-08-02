@@ -208,7 +208,7 @@ long long IJK_Striped_Writer::write_data_float_parallele_plan(const char * filen
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	tmp[(k*nj+j)*ni+i] = f(i,j,k);
+	tmp[(k*nj+j)*ni+i] = (float)f(i,j,k);
 
   SFichier binary_file;
   binary_file.set_bin(1);
@@ -262,9 +262,9 @@ long long IJK_Striped_Writer::write_data_float_parallele_plan(const char * filen
   for (int k = 0; k < nk; k++) {
     for (int j = 0; j < nj; j++) {
       for (int i = 0; i < ni; i++) {
-	tmp[((k*nj+j)*ni+i)*nbcompo+0] = vx(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+1] = vy(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+2] = vz(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+0] = (float)vx(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+1] = (float)vy(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+2] = (float)vz(i,j,k);
       }
     }
   }
@@ -308,7 +308,7 @@ void IJK_Striped_Writer::redistribute(const IJK_Field_double & input, ArrOfFloat
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	sendtmp[(k*nj+j)*ni+i] = input(i,j,k);
+	sendtmp[(k*nj+j)*ni+i] = (float)input(i,j,k);
 
   // Some processors might have empty domain, will not receive any message so do not send !
   if (!Process::je_suis_maitre() && splitting.get_nb_elem_local(0) > 0) {
@@ -430,7 +430,7 @@ void IJK_Striped_Writer::redistribute_load(const ArrOfFloat & input, IJK_Field_d
     for (int k = 0; k < nk; k++)
       for (int j = 0; j < nj; j++)
 	 for (int i = 0; i < ni; i++)
-   	  output(i,j,k) = recv_tmp[(k*nj+j)*ni+i];
+   	  output(i,j,k) = (double)recv_tmp[(k*nj+j)*ni+i];
   }
 }
 
@@ -577,13 +577,13 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
   }
   schema_comm.set_send_recv_pe_list(send_pe_list, recv_pe_list, 1 /* allow sending to myself */);
   
-  int total_number_of_blocks = (total_data_bytes + block_size - 1) / block_size;
+  int total_number_of_blocks = (int)((total_data_bytes + block_size - 1) / block_size);
 
   // Temporary array for interlaced data:
   ArrOfFloat tmp(std::max(vx.ni(), std::max(vy.ni(), vz.ni())) * nb_components);
   ArrOfFloat recv_tmp;
   if (my_writing_process_index >= 0)
-    recv_tmp.resize_array(block_size / sizeof(float));
+    recv_tmp.resize_array((int)(block_size / sizeof(float)));
 
   // Index of the block that the first writing processor wants to write:
   // writing process 0 writes block 0, writing process 1 writes block 1, etc
@@ -639,7 +639,7 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
 		if (k < src_field.nk() && j < src_field.nj()) {
 		  const int max_this_compo = src_field.ni();
 		  for (int i = 0; i < max_this_compo; i++) {
-		    tmp[i * nb_components + i_component] = src_field(i, j, k);
+		    tmp[i * nb_components + i_component] = (float)src_field(i, j, k);
 		  }
 		}
 	      }
@@ -818,7 +818,7 @@ long long IJK_Striped_Writer::write_data_float_parallele_plan(const char * filen
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	tmp[(k*nj+j)*ni+i] = f(i,j,k);
+	tmp[(k*nj+j)*ni+i] = (float)f(i,j,k);
 
   SFichier binary_file;
   binary_file.set_bin(1);
@@ -872,9 +872,9 @@ long long IJK_Striped_Writer::write_data_float_parallele_plan(const char * filen
   for (int k = 0; k < nk; k++) {
     for (int j = 0; j < nj; j++) {
       for (int i = 0; i < ni; i++) {
-	tmp[((k*nj+j)*ni+i)*nbcompo+0] = vx(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+1] = vy(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+2] = vz(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+0] = (float)vx(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+1] = (float)vy(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+2] = (float)vz(i,j,k);
       }
     }
   }
@@ -918,7 +918,7 @@ void IJK_Striped_Writer::redistribute(const IJK_Field_float & input, ArrOfFloat 
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	sendtmp[(k*nj+j)*ni+i] = input(i,j,k);
+	sendtmp[(k*nj+j)*ni+i] = (float)input(i,j,k);
 
   // Some processors might have empty domain, will not receive any message so do not send !
   if (!Process::je_suis_maitre() && splitting.get_nb_elem_local(0) > 0) {
@@ -1040,7 +1040,7 @@ void IJK_Striped_Writer::redistribute_load(const ArrOfFloat & input, IJK_Field_f
     for (int k = 0; k < nk; k++)
       for (int j = 0; j < nj; j++)
 	 for (int i = 0; i < ni; i++)
-   	  output(i,j,k) = recv_tmp[(k*nj+j)*ni+i];
+   	  output(i,j,k) = (float)recv_tmp[(k*nj+j)*ni+i];
   }
 }
 
@@ -1187,13 +1187,13 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
   }
   schema_comm.set_send_recv_pe_list(send_pe_list, recv_pe_list, 1 /* allow sending to myself */);
   
-  int total_number_of_blocks = (total_data_bytes + block_size - 1) / block_size;
+  int total_number_of_blocks = (int)((total_data_bytes + block_size - 1) / block_size);
 
   // Temporary array for interlaced data:
   ArrOfFloat tmp(std::max(vx.ni(), std::max(vy.ni(), vz.ni())) * nb_components);
   ArrOfFloat recv_tmp;
   if (my_writing_process_index >= 0)
-    recv_tmp.resize_array(block_size / sizeof(float));
+    recv_tmp.resize_array((int)(block_size / sizeof(float)));
 
   // Index of the block that the first writing processor wants to write:
   // writing process 0 writes block 0, writing process 1 writes block 1, etc
@@ -1249,7 +1249,7 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
 		if (k < src_field.nk() && j < src_field.nj()) {
 		  const int max_this_compo = src_field.ni();
 		  for (int i = 0; i < max_this_compo; i++) {
-		    tmp[i * nb_components + i_component] = src_field(i, j, k);
+		    tmp[i * nb_components + i_component] = (float)src_field(i, j, k);
 		  }
 		}
 	      }
@@ -1428,7 +1428,7 @@ long long IJK_Striped_Writer::write_data_double_parallele_plan(const char * file
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	tmp[(k*nj+j)*ni+i] = f(i,j,k);
+	tmp[(k*nj+j)*ni+i] = (double)f(i,j,k);
 
   SFichier binary_file;
   binary_file.set_bin(1);
@@ -1482,9 +1482,9 @@ long long IJK_Striped_Writer::write_data_double_parallele_plan(const char * file
   for (int k = 0; k < nk; k++) {
     for (int j = 0; j < nj; j++) {
       for (int i = 0; i < ni; i++) {
-	tmp[((k*nj+j)*ni+i)*nbcompo+0] = vx(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+1] = vy(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+2] = vz(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+0] = (double)vx(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+1] = (double)vy(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+2] = (double)vz(i,j,k);
       }
     }
   }
@@ -1528,7 +1528,7 @@ void IJK_Striped_Writer::redistribute(const IJK_Field_double & input, ArrOfDoubl
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	sendtmp[(k*nj+j)*ni+i] = input(i,j,k);
+	sendtmp[(k*nj+j)*ni+i] = (double)input(i,j,k);
 
   // Some processors might have empty domain, will not receive any message so do not send !
   if (!Process::je_suis_maitre() && splitting.get_nb_elem_local(0) > 0) {
@@ -1650,7 +1650,7 @@ void IJK_Striped_Writer::redistribute_load(const ArrOfDouble & input, IJK_Field_
     for (int k = 0; k < nk; k++)
       for (int j = 0; j < nj; j++)
 	 for (int i = 0; i < ni; i++)
-   	  output(i,j,k) = recv_tmp[(k*nj+j)*ni+i];
+   	  output(i,j,k) = (double)recv_tmp[(k*nj+j)*ni+i];
   }
 }
 
@@ -1797,13 +1797,13 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
   }
   schema_comm.set_send_recv_pe_list(send_pe_list, recv_pe_list, 1 /* allow sending to myself */);
   
-  int total_number_of_blocks = (total_data_bytes + block_size - 1) / block_size;
+  int total_number_of_blocks = (int)((total_data_bytes + block_size - 1) / block_size);
 
   // Temporary array for interlaced data:
   ArrOfDouble tmp(std::max(vx.ni(), std::max(vy.ni(), vz.ni())) * nb_components);
   ArrOfDouble recv_tmp;
   if (my_writing_process_index >= 0)
-    recv_tmp.resize_array(block_size / sizeof(double));
+    recv_tmp.resize_array((int)(block_size / sizeof(double)));
 
   // Index of the block that the first writing processor wants to write:
   // writing process 0 writes block 0, writing process 1 writes block 1, etc
@@ -1859,7 +1859,7 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
 		if (k < src_field.nk() && j < src_field.nj()) {
 		  const int max_this_compo = src_field.ni();
 		  for (int i = 0; i < max_this_compo; i++) {
-		    tmp[i * nb_components + i_component] = src_field(i, j, k);
+		    tmp[i * nb_components + i_component] = (double)src_field(i, j, k);
 		  }
 		}
 	      }
@@ -2038,7 +2038,7 @@ long long IJK_Striped_Writer::write_data_double_parallele_plan(const char * file
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	tmp[(k*nj+j)*ni+i] = f(i,j,k);
+	tmp[(k*nj+j)*ni+i] = (double)f(i,j,k);
 
   SFichier binary_file;
   binary_file.set_bin(1);
@@ -2092,9 +2092,9 @@ long long IJK_Striped_Writer::write_data_double_parallele_plan(const char * file
   for (int k = 0; k < nk; k++) {
     for (int j = 0; j < nj; j++) {
       for (int i = 0; i < ni; i++) {
-	tmp[((k*nj+j)*ni+i)*nbcompo+0] = vx(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+1] = vy(i,j,k);
-	tmp[((k*nj+j)*ni+i)*nbcompo+2] = vz(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+0] = (double)vx(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+1] = (double)vy(i,j,k);
+	tmp[((k*nj+j)*ni+i)*nbcompo+2] = (double)vz(i,j,k);
       }
     }
   }
@@ -2138,7 +2138,7 @@ void IJK_Striped_Writer::redistribute(const IJK_Field_float & input, ArrOfDouble
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
       for (int i = 0; i < ni; i++)
-	sendtmp[(k*nj+j)*ni+i] = input(i,j,k);
+	sendtmp[(k*nj+j)*ni+i] = (double)input(i,j,k);
 
   // Some processors might have empty domain, will not receive any message so do not send !
   if (!Process::je_suis_maitre() && splitting.get_nb_elem_local(0) > 0) {
@@ -2260,7 +2260,7 @@ void IJK_Striped_Writer::redistribute_load(const ArrOfDouble & input, IJK_Field_
     for (int k = 0; k < nk; k++)
       for (int j = 0; j < nj; j++)
 	 for (int i = 0; i < ni; i++)
-   	  output(i,j,k) = recv_tmp[(k*nj+j)*ni+i];
+   	  output(i,j,k) = (float)recv_tmp[(k*nj+j)*ni+i];
   }
 }
 
@@ -2407,13 +2407,13 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
   }
   schema_comm.set_send_recv_pe_list(send_pe_list, recv_pe_list, 1 /* allow sending to myself */);
   
-  int total_number_of_blocks = (total_data_bytes + block_size - 1) / block_size;
+  int total_number_of_blocks = (int)((total_data_bytes + block_size - 1) / block_size);
 
   // Temporary array for interlaced data:
   ArrOfDouble tmp(std::max(vx.ni(), std::max(vy.ni(), vz.ni())) * nb_components);
   ArrOfDouble recv_tmp;
   if (my_writing_process_index >= 0)
-    recv_tmp.resize_array(block_size / sizeof(double));
+    recv_tmp.resize_array((int)(block_size / sizeof(double)));
 
   // Index of the block that the first writing processor wants to write:
   // writing process 0 writes block 0, writing process 1 writes block 1, etc
@@ -2469,7 +2469,7 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
 		if (k < src_field.nk() && j < src_field.nj()) {
 		  const int max_this_compo = src_field.ni();
 		  for (int i = 0; i < max_this_compo; i++) {
-		    tmp[i * nb_components + i_component] = src_field(i, j, k);
+		    tmp[i * nb_components + i_component] = (double)src_field(i, j, k);
 		  }
 		}
 	      }
@@ -2599,7 +2599,7 @@ void dumplata_add_geometry(const char *filename, const IJK_Field_double & f)
       n = coord.size_array();
       tmp.resize_array(n);
       for (i = 0; i < n; i++)
-	tmp[i] = coord[i];
+	tmp[i] = (float)coord[i];
       binary_file.put(tmp.addr(), n, 1);
       binary_file.close();
     }
@@ -2911,7 +2911,7 @@ void read_lata_parallel_double(const char *filename_with_path, int tstep, const 
   const int slice_k = splitting.get_local_slice_index(DIRECTION_K);
   const int n_slices_i = splitting.get_nprocessor_per_direction(DIRECTION_I);
   // Load data by batches of 32MB.
-  const int batch_size = Parallel_io_parameters::get_max_block_size() / sizeof(double);
+  const int batch_size = (int)(Parallel_io_parameters::get_max_block_size() / sizeof(double));
 
   // If I have no data in the field, skip:
   if (slice_i >= 0) {
@@ -2937,9 +2937,9 @@ void read_lata_parallel_double(const char *filename_with_path, int tstep, const 
       else
 	locstring = "FACES";
       db_field = &lata_db.get_field(tstep, geometryname, fieldname, locstring);
-      input_ni_tot = lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_I", "", LataDB::FIRST_AND_CURRENT).size_;
-      input_nj_tot = lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_J", "", LataDB::FIRST_AND_CURRENT).size_;
-      input_nk_tot = lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_K", "", LataDB::FIRST_AND_CURRENT).size_;
+      input_ni_tot = (int)lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_I", "", LataDB::FIRST_AND_CURRENT).size_;
+      input_nj_tot = (int)lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_J", "", LataDB::FIRST_AND_CURRENT).size_;
+      input_nk_tot = (int)lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_K", "", LataDB::FIRST_AND_CURRENT).size_;
       if (input_ni_tot-1 != splitting.get_grid_geometry().get_nb_elem_tot(DIRECTION_I)
 	  || input_nj_tot-1 != splitting.get_grid_geometry().get_nb_elem_tot(DIRECTION_J)
 	  || input_nk_tot-1 != splitting.get_grid_geometry().get_nb_elem_tot(DIRECTION_K))
@@ -2985,7 +2985,7 @@ void read_lata_parallel_double(const char *filename_with_path, int tstep, const 
 	  // First processor in the row reads the data
 	  const long long start = ((long long) global_k * input_nj_tot + global_j) * input_ni_tot;
 	  const long long n = number_of_j_this_batch * input_ni_tot;
-	  lata_db.read_data(*db_field, tmp_read, start, n);
+	  lata_db.read_data(*db_field, tmp_read, start, (int)n);
 	  if (tmp_read.dimension(1) <= i_compo) {
 	    Cerr << "Error in read_lata_parallel_double: requested component " << i_compo
 		 << " but only " << tmp_read.dimension(1) << " components are available" << finl;
@@ -3058,7 +3058,7 @@ void dumplata_add_geometry(const char *filename, const IJK_Field_float & f)
       n = coord.size_array();
       tmp.resize_array(n);
       for (i = 0; i < n; i++)
-	tmp[i] = coord[i];
+	tmp[i] = (float)coord[i];
       binary_file.put(tmp.addr(), n, 1);
       binary_file.close();
     }
@@ -3370,7 +3370,7 @@ void read_lata_parallel_float(const char *filename_with_path, int tstep, const c
   const int slice_k = splitting.get_local_slice_index(DIRECTION_K);
   const int n_slices_i = splitting.get_nprocessor_per_direction(DIRECTION_I);
   // Load data by batches of 32MB.
-  const int batch_size = Parallel_io_parameters::get_max_block_size() / sizeof(float);
+  const int batch_size = (int)(Parallel_io_parameters::get_max_block_size() / sizeof(float));
 
   // If I have no data in the field, skip:
   if (slice_i >= 0) {
@@ -3396,9 +3396,9 @@ void read_lata_parallel_float(const char *filename_with_path, int tstep, const c
       else
 	locstring = "FACES";
       db_field = &lata_db.get_field(tstep, geometryname, fieldname, locstring);
-      input_ni_tot = lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_I", "", LataDB::FIRST_AND_CURRENT).size_;
-      input_nj_tot = lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_J", "", LataDB::FIRST_AND_CURRENT).size_;
-      input_nk_tot = lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_K", "", LataDB::FIRST_AND_CURRENT).size_;
+      input_ni_tot = (int)lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_I", "", LataDB::FIRST_AND_CURRENT).size_;
+      input_nj_tot = (int)lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_J", "", LataDB::FIRST_AND_CURRENT).size_;
+      input_nk_tot = (int)lata_db.get_field(tstep, geometryname, "SOMMETS_IJK_K", "", LataDB::FIRST_AND_CURRENT).size_;
       if (input_ni_tot-1 != splitting.get_grid_geometry().get_nb_elem_tot(DIRECTION_I)
 	  || input_nj_tot-1 != splitting.get_grid_geometry().get_nb_elem_tot(DIRECTION_J)
 	  || input_nk_tot-1 != splitting.get_grid_geometry().get_nb_elem_tot(DIRECTION_K))
@@ -3444,7 +3444,7 @@ void read_lata_parallel_float(const char *filename_with_path, int tstep, const c
 	  // First processor in the row reads the data
 	  const long long start = ((long long) global_k * input_nj_tot + global_j) * input_ni_tot;
 	  const long long n = number_of_j_this_batch * input_ni_tot;
-	  lata_db.read_data(*db_field, tmp_read, start, n);
+	  lata_db.read_data(*db_field, tmp_read, start, (int)n);
 	  if (tmp_read.dimension(1) <= i_compo) {
 	    Cerr << "Error in read_lata_parallel_float: requested component " << i_compo
 		 << " but only " << tmp_read.dimension(1) << " components are available" << finl;
@@ -3531,7 +3531,7 @@ void dumplata_ft_field(const char *filename, const char *meshname,
   const int n = field.size_array();
   ArrOfFloat tmp(n);
   for (int i = 0; i < n; i++)
-    tmp[i] = field[i];
+    tmp[i] = (float)field[i];
 
   file.put(tmp.addr(), field.size_array(), 1);
   file.syncfile();
