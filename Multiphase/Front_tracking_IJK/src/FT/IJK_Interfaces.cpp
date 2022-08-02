@@ -4445,7 +4445,7 @@ void IJK_Interfaces::ajouter_terme_source_interfaces(FixedVector<IJK_Field_doubl
                                   // Dans ce cas, on a aussi besoin de la surface, du potentiel et de l'indic de l'elem :
                                   const double surface = surface_par_compo[icol1](elem1[0],elem1[1],elem1[2]); // la compo dans l'elem c'est icol1.
                                   // assert provisoir :
-                                  assert(num_compo_presentes[icol2](elem2[0],elem2[1],elem2[2]) == num_compo);
+                                  assert(int(num_compo_presentes[icol2](elem2[0],elem2[1],elem2[2])) == num_compo);
                                   assert(indic_voisin > -0.5);
                                   assert(surface_voisin > 0.);
 

@@ -2,7 +2,7 @@
 if [ -f u_star.lata ] ; then
    #gunzip -k ref_u_star.lata.gz
    tar xzvf ref_u_star_lata.tar.gz 1>tar_ref_u_star_lata.tar.log
-   compare_lata Reference_LATAFILES/ref_u_star.lata u_star.lata 1>compare_lata.log 2>compare_lata.err
+   compare_lata Reference_LATAFILES/ref_u_star.lata u_star.lata 1>compare_lata.log 2>&1
    if [ $? -eq 0 ] ; then
      echo "Latafile and reference latafile match. Everything is OK"
      exit 0
