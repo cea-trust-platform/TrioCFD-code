@@ -39,7 +39,7 @@ class Champ_front_ALE_Beam : public Champ_front_ALE
   Declare_instanciable( Champ_front_ALE_Beam ) ;
 
 public :
-  virtual void remplir_vit_som_bord_ALE(double);
+  void remplir_vit_som_bord_ALE(double) override;
 
 protected :
 

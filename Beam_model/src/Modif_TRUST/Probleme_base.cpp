@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2021, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -481,9 +481,8 @@ Entree& Probleme_base::readOn(Entree& is)
       exit();
     }
 
-  lire_equations(is);
+  lire_equations(is, motlu); //"motlu" contient le premier mot apres la lecture des equations
 
-  is >> motlu;
   // Si le postraitement comprend le mot, on en lit un autre...
   while (les_postraitements.lire_postraitements(is, motlu, *this))
     {
@@ -569,7 +568,7 @@ Entree& Probleme_base::readOn(Entree& is)
               //     exit();
               //   }
               // Look for the last time and set it to tinit if tinit not set
-              double last_time;
+              double last_time = -1.;
               if(format_rep == "single_hdf")
                 {
 #ifdef MPI_
@@ -756,7 +755,7 @@ Entree& Probleme_base::readOn(Entree& is)
 // Exception:
 // Effets de bord:
 // Postcondition: les equations ont ete lues
-Entree& Probleme_base::lire_equations(Entree& is)
+Entree& Probleme_base::lire_equations(Entree& is, Motcle& dernier_mot)
 {
   Nom un_nom;
   int nb_eq= nombre_d_equations();
@@ -767,7 +766,7 @@ Entree& Probleme_base::lire_equations(Entree& is)
       is >> un_nom ;
       is >> getset_equation_by_name(un_nom);
     }
-
+  is >> dernier_mot;
   return is;
 }
 
@@ -1134,6 +1133,7 @@ void Probleme_base::sauver() const
     }
   Debog::set_nom_pb_actuel(le_nom());
   statistiques().end_count(sauvegarde_counter_, bytes);
+  Cout << "[IO] " << statistiques().last_time(sauvegarde_counter_) << " s to write save file." << finl;
 }
 
 // Description:
@@ -1646,6 +1646,47 @@ void Probleme_base::creer_champ(const Motcle& motlu)
     }
 }
 
+bool Probleme_base::has_champ(const Motcle& un_nom) const
+{
+  Champ_base const * champ = NULL ;
+
+  int nb_eq = nombre_d_equations();
+  for (int i=0; i<nb_eq; i++)
+    {
+      try
+        {
+          champ = &equation(i).get_champ(un_nom);
+        }
+      catch (Champs_compris_erreur)
+        {
+        }
+      try
+        {
+          champ = &equation(i).milieu().get_champ(un_nom);
+        }
+      catch (Champs_compris_erreur)
+        {
+        }
+    }
+
+  CONST_LIST_CURSEUR(REF(Loi_Fermeture_base)) curseur = liste_loi_fermeture_;
+  while (curseur)
+    {
+      const Loi_Fermeture_base& loi=curseur.valeur().valeur();
+      try
+        {
+          champ = &loi.get_champ(un_nom);
+        }
+      catch(Champs_compris_erreur)
+        {
+        }
+      ++curseur;
+    }
+
+  if (champ) return true ;
+  return false;
+}
+
 const Champ_base& Probleme_base::get_champ(const Motcle& un_nom) const
 {
   int nb_eq = nombre_d_equations();
@@ -1823,15 +1864,16 @@ void Probleme_base::mettre_a_jour(double temps)
   // Update the name of the problem being debugged
   Debog::set_nom_pb_actuel(le_nom());
 
-  // TODO : overload in Pb_multiphase because for turbulence, le_modele_turbulence.mettre_a_jour(temps)
-  // should be called before equation(i).mettre_a_jour(temps)
-
   // Update the equations:
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).mettre_a_jour(temps);
 
   // Update the media:
   milieu().mettre_a_jour(temps);
+
+  // Update the conserved fields in the equations (must be done after the media):
+  for(int i=0; i<nombre_d_equations(); i++)
+    equation(i).mettre_a_jour_champs_conserves(temps);
 
   // Update the post-processing:
   les_postraitements.mettre_a_jour(temps);
@@ -1877,6 +1919,8 @@ void Probleme_base::preparer_calcul()
   for(int i=0; i<nombre_d_equations(); i++)
     equation(i).preparer_calcul();
   milieu().preparer_calcul();
+  for(int i=0; i<nombre_d_equations(); i++) /* on peut maintenant remplir les champs conserves */
+    equation(i).mettre_a_jour_champs_conserves(temps);
 
   if(schema_temps().file_allocation() && EcritureLectureSpecial::Active)
     file_size_xyz();
@@ -1912,7 +1956,7 @@ double Probleme_base::calculer_pas_de_temps() const
   Debog::set_nom_pb_actuel(le_nom());
   double dt=schema_temps().pas_temps_max();
   for(int i=0; i<nombre_d_equations(); i++)
-    dt=min(dt,equation(i).calculer_pas_de_temps());
+    dt=std::min(dt,equation(i).calculer_pas_de_temps());
   return dt;
 }
 
@@ -2017,6 +2061,7 @@ void Probleme_base::allocation() const
 int Probleme_base::allocate_file_size(long int& size) const
 {
 #ifndef MICROSOFT
+#ifndef __APPLE__
 #ifndef RS6000
 #ifdef CHECK_ALLOCATE
   Nom Fichier_File_size(Objet_U::nom_du_cas());
@@ -2050,6 +2095,7 @@ int Probleme_base::allocate_file_size(long int& size) const
     }
   close(fichier);                                        // fermeture du fichier
   remove(file);                                                // Destruction du fichier File_size
+#endif
 #endif
 #endif
 #endif
@@ -2141,5 +2187,6 @@ void Probleme_base::sauver_xyz(int verbose) const
   (ficsauv_.valeur()).flush();
   (ficsauv_.valeur()).syncfile();
   ficsauv_.detach();
+  Cout << "[IO] " << statistiques().last_time(sauvegarde_counter_) << " s to write xyz file." << finl;
   statistiques().end_count(sauvegarde_counter_, bytes);
 }

@@ -21,8 +21,8 @@
 
 #include <Beam_model.h>
 #include <Domaine_ALE.h>
-#include <DoubleVect.h>
-#include <IntTab.h>
+#include <TRUSTVects.h>
+#include <TRUSTTabs.h>
 #include <Probleme_base.h>
 #include <Zone_VEF.h>
 #include <Zone_Cl_VEF.h>

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,8 +24,7 @@
 #define Domaine_ALE_included
 
 #include <Domaine.h>
-#include <DoubleLists.h>
-#include <IntLists.h>
+#include <TRUSTLists.h>
 #include <Champs_front.h>
 #include <Champ_P1NC.h>
 #include <Ref_Equation_base.h>
@@ -54,25 +53,30 @@ public :
   Domaine_ALE();
   ~Domaine_ALE();
   inline const double& get_dt() const;
-  virtual void set_dt(double& dt);
+  void set_dt(double& dt) override;
   inline const DoubleTab& vitesse() const;
   inline DoubleTab& vitesse_faces();
   inline const DoubleTab& vitesse_faces() const;
-  virtual void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&);
-  virtual void initialiser (double temps, Domaine_dis&, Probleme_base&);
+  void mettre_a_jour (double temps, Domaine_dis&, Probleme_base&) override;
+  void initialiser (double temps, Domaine_dis&, Probleme_base&) override;
   DoubleTab calculer_vitesse(double temps,Domaine_dis&, Probleme_base&, bool&);
   DoubleTab& calculer_vitesse_faces(DoubleTab&, int, int, IntTab&);
-  virtual void reading_vit_bords_ALE(Entree& is);
+  void reading_vit_bords_ALE(Entree& is);
   void reading_solver_moving_mesh_ALE(Entree& is);
-  virtual void reading_beam_model(Entree& is);
-  virtual void reading_projection_ALE_boundary(Entree& is);
+  void reading_beam_model(Entree& is);
+  void reading_projection_ALE_boundary(Entree& is);
   void  update_ALE_projection(double, Nom&, Champ_front_ALE_projection& , int);
   void  update_ALE_projection(const double);
-  virtual DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
+  DoubleTab& laplacien(Domaine_dis&, Probleme_base&, const DoubleTab&, DoubleTab&);
   int update_or_not_matrix_coeffs() const;
   void update_ALEjacobians(DoubleTab&, DoubleTab&, int);
+  void resumptionJacobian(DoubleTab&, DoubleTab&);
   inline const DoubleTab& getOldJacobian();
+  inline const DoubleTab& getOldJacobian() const;
   inline const DoubleTab& getNewJacobian();
+  inline const DoubleTab& getNewJacobian() const;
+
+
   DoubleVect interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const;
   void initializationBeam (double velocity) ;
   double computeDtBeam(Domaine_dis&);
@@ -99,14 +103,15 @@ protected:
   int update_or_not_matrix_coeffs_; //=1 in case of zero ALE boundary/mesh velocity, =0 otherwise (see Domaine_ALE::calculer_vitesse).
   DoubleTab ALEjacobian_old; // n
   DoubleTab ALEjacobian_new; // n+1
+  int resumption; //1 if resumption of calculation else 0
   Beam_model *beam;
   REF(Equation_base) eq;
   DoubleVect fluidForceOnBeam;
-  double tempsComputeForceOnBeam;
-  bool associate_eq;
-  bool re_start;
   Champs_front_ALE_projection field_ALE_projection_;
   Noms name_ALE_boundary_projection_;
+  bool associate_eq;
+  bool re_start;
+  double tempsComputeForceOnBeam;
 };
 
 
@@ -136,11 +141,20 @@ inline const DoubleTab& Domaine_ALE::getOldJacobian()
 {
   return ALEjacobian_old;
 }
+inline const DoubleTab& Domaine_ALE::getOldJacobian() const
+{
+  return ALEjacobian_old;
+}
 
 inline const DoubleTab& Domaine_ALE::getNewJacobian()
 {
   return ALEjacobian_new;
 }
+inline const DoubleTab& Domaine_ALE::getNewJacobian() const
+{
+  return ALEjacobian_new;
+}
+
 inline void Domaine_ALE::associer_equation(const Equation_base& une_eq)
 {
   eq = une_eq;

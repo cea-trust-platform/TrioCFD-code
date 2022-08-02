@@ -40,7 +40,7 @@ class Projection_ALE_boundary : Interprete_geometrique_base
 public :
 
 protected :
-  Entree& interpreter_(Entree&);
+  Entree& interpreter_(Entree&) override;
 };
 
 

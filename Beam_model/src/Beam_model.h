@@ -45,7 +45,7 @@ class Beam_model : public Interprete_geometrique_base
 public :
   Beam_model();
   ~Beam_model();
-  Entree& interpreter_(Entree&);
+  Entree& interpreter_(Entree&) override;
   inline const int& getNbModes() const;
   inline double getTime() const;
   inline void setNbModes(const int&) ;

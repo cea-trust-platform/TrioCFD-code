@@ -27,7 +27,7 @@
 #include <Domaine.h>
 #include <Zone_VEF.h>
 #include <Cond_lim.h>
-#include <DoubleVect.h>
+#include <TRUSTVects.h>
 #include <fstream>
 #include <math.h>
 #define pi 3.14159265

@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2020, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,13 +12,6 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Navier_Stokes_std.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Incompressible/Equations
-// Version:     /main/121
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Navier_Stokes_std.h>
 #include <Probleme_base.h>
@@ -34,7 +27,7 @@
 #include <Frontiere_dis_base.h>
 #include <solv_iteratif.h>
 #include <Schema_Temps.h>
-#include <DoubleTrav.h>
+#include <TRUSTTrav.h>
 #include <Check_espace_virtuel.h>
 #include <Assembleur_base.h>
 #include <communications.h>
@@ -45,7 +38,7 @@
 #include <MD_Vector_std.h>
 #include <MD_Vector_composite.h>
 #include <MD_Vector_tools.h>
-#include <ConstDoubleTab_parts.h>
+#include <TRUSTTab_parts.h>
 #include <Zone_VF.h>
 #include <Source_PDF_base.h> // For Immersed Boundary Method (IBM)
 
@@ -335,17 +328,17 @@ int Navier_Stokes_std::lire_motcle_non_standard(const Motcle& mot, Entree& is)
   return 1;
 }
 
-const Champ_Don& Navier_Stokes_std::diffusivite_pour_transport()
+const Champ_Don& Navier_Stokes_std::diffusivite_pour_transport() const
 {
   return fluide().viscosite_cinematique();
 }
 
-const Champ_base& Navier_Stokes_std::diffusivite_pour_pas_de_temps()
+const Champ_base& Navier_Stokes_std::diffusivite_pour_pas_de_temps() const
 {
   return terme_diffusif.diffusivite();
 }
 
-const Champ_base& Navier_Stokes_std::vitesse_pour_transport()
+const Champ_base& Navier_Stokes_std::vitesse_pour_transport() const
 {
   return la_vitesse;
 }
@@ -435,6 +428,17 @@ void Navier_Stokes_std::completer()
   gradient.completer();
   assembleur_pression_.associer_zone_cl_dis_base(zone_Cl_dis().valeur());
   assembleur_pression_.completer(*this);
+
+  if (distance_paroi_globale.non_nul())// On initialize la distance au bord au début du calcul si on en a besoin, ce ne sera plus mis a jour par la suite car le maillage est fixe ; on le fait tard car il faut avoir lu les CL
+    {
+      Zone_dis_base& zone = zone_dis().valeur();
+      zone.init_dist_paroi_globale(zone_Cl_dis().les_conditions_limites());
+      Cerr << "Initializing distance_paroi_globale ... " << finl;
+      const DoubleTab& dist_calc = zone.y_elem();
+      for (int e = 0 ; e < zone.nb_elem() ; e++) distance_paroi_globale->valeurs()(e, 0) = dist_calc(e);
+      distance_paroi_globale->valeurs().echange_espace_virtuel();
+    }
+
 }
 
 int Navier_Stokes_std::verif_Cl() const
@@ -459,7 +463,6 @@ int Navier_Stokes_std::verif_Cl() const
 void Navier_Stokes_std::discretiser()
 {
   Cerr << "Hydraulic equation discretization (Navier_Stokes_std::discretiser)" << finl;
-
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
 
   discretiser_vitesse();
@@ -967,46 +970,29 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
   // Set print of the linear system solve according to dt_impr:
   solveur_pression_->fixer_schema_temps_limpr(schema_temps().limpr());
 
-  const bool is_PolyMAC = ( discretisation().que_suis_je() == "PolyMAC" );
   const bool is_ALE = ( sub_type(Op_Conv_ALE, terme_convectif.valeur()) );
 
   if (assembleur_pression_.valeur().get_resoudre_increment_pression())
     {
-
-      if ( ! is_PolyMAC )
+      if( is_ALE )
         {
-          if( is_ALE )
-            {
-              // we don't want to have domaine_ale object here
-              div_ale_derivative( deriveeALE, timestep, derivee, secmemP );
-            }
-          // Solve B M-1 Bt Cp = M-1(F - BtP)
-          DoubleTrav Cp(tab_pression);
-          solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, Cp);
-
-          // P(n+1) = P(n) + Cp
-          tab_pression += Cp;
-          assembleur_pression_.modifier_solution(tab_pression);
-
-          // M-1 Bt P(n+1)
-          solveur_masse.appliquer(gradP);
-          derivee += gradP; // M-1 F
+          // we don't want to have domaine_ale object here
+          div_ale_derivative( deriveeALE, timestep, derivee, secmemP );
         }
-      else //PolyMAC : le solveur pression calcule la correction en vitesse...
-        {
-          DoubleTrav Cp(tab_pression);
-          DoubleTab_parts Cp_parts(Cp);
-          //secmemP contient (- div v, 0) / Cp contient (- corr en pression, nouvelles vitesses)
-          solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, Cp);
-          tab_pression -= Cp;
-          assembleur_pression_.modifier_solution(tab_pression);
-          //l'assembleur pression a une fonction pour corriger les vitesses
-          assembleur_pression_.valeur().corriger_vitesses(Cp, derivee);
-        }
+      // Solve B M-1 Bt Cp = M-1(F - BtP)
+      DoubleTrav Cp(tab_pression);
+      solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, Cp);
+
+      // P(n+1) = P(n) + Cp
+      tab_pression += Cp;
+      assembleur_pression_.modifier_solution(tab_pression);
+
+      // M-1 Bt P(n+1)
+      solveur_masse.appliquer(gradP);
+      derivee += gradP; // M-1 F
     }
   else
     {
-      if (discretisation().que_suis_je() == "PolyMAC") abort();
       // Solve B M-1 Bt P(n+1) = B M-1 F
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(), secmemP, tab_pression);
       assembleur_pression_.modifier_solution(tab_pression);
@@ -1016,22 +1002,19 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
       // See: http://www.sciencedirect.com/science/article/pii/S0021999108004518
     }
 
-  if ( ! is_PolyMAC ) //en PolyMAC, on a deja modifie la vitesse
-    {
-      // (BM) gradient operator requires updated virtual space in source vector
-      // Calculate Bt P(n+1)
-      tab_pression.echange_espace_virtuel();
-      gradient.calculer(tab_pression, gradP);
+  // (BM) gradient operator requires updated virtual space in source vector
+  // Calculate Bt P(n+1)
+  tab_pression.echange_espace_virtuel();
+  gradient.calculer(tab_pression, gradP);
 
-      // gradP = Bt P(n+1) is kept and
-      // M-1Bt P(n+1) is calculated:
-      DoubleTrav Mmoins1gradP(gradP);
-      Mmoins1gradP = gradP;
-      solveur_masse.appliquer(Mmoins1gradP);
+  // gradP = Bt P(n+1) is kept and
+  // M-1Bt P(n+1) is calculated:
+  DoubleTrav Mmoins1gradP(gradP);
+  Mmoins1gradP = gradP;
+  solveur_masse.appliquer(Mmoins1gradP);
 
-      // dU/dt = M-1(F-Bt P(n+1))
-      derivee -= Mmoins1gradP;
-    }
+  // dU/dt = M-1(F-Bt P(n+1))
+  derivee -= Mmoins1gradP;
 
   return derivee;
 }
@@ -1073,7 +1056,7 @@ void Navier_Stokes_std::projeter()
       // voir ca penalise le calcul en p1B et CL p<>0
       // On prend un DoubleTrav au lieu d'un DoubleTab pour avoir lagrange=0
       DoubleTrav lagrange(la_pression.valeurs());
-      DoubleTab gradP(gradient_P.valeurs());
+      DoubleTrav gradP(gradient_P.valeurs());
 
       double normal_seuil=0;
 
@@ -1091,8 +1074,8 @@ void Navier_Stokes_std::projeter()
       divergence.calculer(tab_vitesse, secmem);
       // Desormais on calcule le pas de temps avant la projection
       // Avant, on avait dt=dt_min au debut du calcul
-      double dt = max(le_schema_en_temps->pas_temps_min(),calculer_pas_de_temps());
-      dt = min(dt, le_schema_en_temps->pas_temps_max());
+      double dt = std::max(le_schema_en_temps->pas_temps_min(),calculer_pas_de_temps());
+      dt = std::min(dt, le_schema_en_temps->pas_temps_max());
 
       secmem*=(-1./dt);
       secmem.echange_espace_virtuel();
@@ -1113,26 +1096,28 @@ void Navier_Stokes_std::projeter()
       solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),secmem,lagrange);
       assembleur_pression_.modifier_solution(lagrange);
       lagrange.echange_espace_virtuel();
-      if (discretisation().que_suis_je() == "PolyMAC") //en PolyMAC, on a deja les vitesses
-        lagrange *= -dt, assembleur_pression_.valeur().corriger_vitesses(lagrange, tab_vitesse);
+
+      // M-1 Bt l
+      gradient->multvect(lagrange, gradP);
+      if ((i_source_pdf_ != -1) && (correction_vitesse_projection_initiale_==1))
+        {
+          Cerr<<"(IBM) Immersed Interface: modified velocity corrector for initial projection."<<finl;
+          gradP /= champ_coeff_pdf_som_;
+        }
+      gradP.echange_espace_virtuel();
+
+      solveur_masse.appliquer(gradP);
+      gradP.echange_espace_virtuel();
+
+      if (tab_vitesse.dimension_tot(0) == gradP.dimension_tot(0))
+        tab_vitesse.ajoute(-dt,gradP);
       else
         {
-          // M-1 Bt l
-          gradient->multvect(lagrange, gradP);
-          if ((i_source_pdf_ != -1) && (correction_vitesse_projection_initiale_==1))
-            {
-              Cerr<<"(IBM) Immersed Interface: modified velocity corrector for initial projection."<<finl;
-              gradP /= champ_coeff_pdf_som_;
-            }
-          gradP.echange_espace_virtuel();
-
-          solveur_masse.appliquer(gradP);
-          gradP.echange_espace_virtuel();
-
-          tab_vitesse.ajoute(-dt,gradP);
-          tab_vitesse.echange_espace_virtuel();
-          solveur_masse.corriger_solution(tab_vitesse, tab_vitesse);
+          DoubleTab_parts partv(tab_vitesse);
+          partv[0].ajoute(-dt,gradP);
         }
+      tab_vitesse.echange_espace_virtuel();
+      solveur_masse.corriger_solution(tab_vitesse, tab_vitesse);
 
       Debog::verifier("Navier_Stokes_std::projeter, vitesse", tab_vitesse);
 
@@ -1196,7 +1181,6 @@ int Navier_Stokes_std::projection_a_faire()
 int Navier_Stokes_std::preparer_calcul()
 // assemblage du systeme en pression
 {
-  Cerr << "Navier_Stokes_std::preparer_calcul()" << finl;
   const double temps = schema_temps().temps_courant();
   sources().mettre_a_jour(temps);
   Equation_base::preparer_calcul();
@@ -1266,7 +1250,10 @@ int Navier_Stokes_std::preparer_calcul()
 
 
   Debog::verifier("Navier_Stokes_std::preparer_calcul, la_pression av projeter", la_pression.valeurs());
+
   int proj_fait=0;
+
+
   if (projection_a_faire())
     {
       Cerr << "Projection of initial and boundaries conditions " << finl;
@@ -1280,7 +1267,6 @@ int Navier_Stokes_std::preparer_calcul()
     }
   divergence_U.changer_temps(temps);
 
-
   // Au cas ou une cl de pression depend de u que l'on vient de modifier
   la_zone_Cl_dis->mettre_a_jour(temps);
   gradient.calculer(la_pression.valeurs(), gradient_P.valeurs());
@@ -1289,7 +1275,6 @@ int Navier_Stokes_std::preparer_calcul()
 
   // Initialisation du champ de pression (resolution de Laplacien(P)=0 avec les conditions limites en pression)
   // Permet de demarrer la resolution avec une bonne approximation de la pression (important pour le Piso ou P!=0)
-
   if  (methode_calcul_pression_initiale_!=3)
     if (!probleme().reprise_effectuee())
       {
@@ -1319,8 +1304,8 @@ int Navier_Stokes_std::preparer_calcul()
             int mod=0;
             if (le_schema_en_temps->pas_de_temps()==0)
               {
-                double dt = max(le_schema_en_temps->pas_temps_min(),calculer_pas_de_temps());
-                dt = min(dt, le_schema_en_temps->pas_temps_max());
+                double dt = std::max(le_schema_en_temps->pas_temps_min(),calculer_pas_de_temps());
+                dt = std::min(dt, le_schema_en_temps->pas_temps_max());
                 le_schema_en_temps->set_dt()=(dt);
                 mod=1;
               }
@@ -1339,40 +1324,34 @@ int Navier_Stokes_std::preparer_calcul()
             if (mod)
               le_schema_en_temps->set_dt()=0;
           }
-        if (discretisation().que_suis_je() == "PolyMAC") //PolyMAC -> pas vraiment faisable
-          {
-            Cerr << "Not done with PolyMAC !" << finl;
-          }
-        else
-          {
-            solveur_masse.appliquer(vpoint);
-            vpoint.echange_espace_virtuel();
-            divergence.calculer(vpoint, secmem);
-            secmem*=-1;
-            secmem.echange_espace_virtuel();
 
-            DoubleTrav inc_pre(la_pression.valeurs());
-            solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),secmem, inc_pre);
-            // <IBM> Correction of pressure for Immersed Boundary Method
-            Cerr << "Pressure increment computed successfully" << finl;
-            if ((i_source_pdf_ != -1) && (correction_calcul_pression_initiale_ == 1))
-              {
-                Cerr<<"(IBM) Immersed Interface: correction of initial pressure."<<finl;
-                const Source_PDF_base& src = dynamic_cast<Source_PDF_base&>((sources())[i_source_pdf_].valeur());
-                src.correct_incr_pressure(champ_coeff_pdf_som_, inc_pre);
-                inc_pre.echange_espace_virtuel();
-              }
-            // </IBM>
-            // On veut que l'espace virtuel soit a jour, donc all_items
-            operator_add(la_pression.valeurs(), inc_pre, VECT_ALL_ITEMS);
+        solveur_masse.appliquer(vpoint);
+        vpoint.echange_espace_virtuel();
+        divergence.calculer(vpoint, secmem);
+        secmem*=-1;
+        secmem.echange_espace_virtuel();
+
+        assembleur_pression_->modifier_secmem_pour_incr_p(la_pression.valeurs(), 1, secmem);
+        DoubleTrav inc_pre(la_pression.valeurs());
+        solveur_pression_.resoudre_systeme(matrice_pression_.valeur(),secmem, inc_pre);
+        // <IBM> Correction of pressure for Immersed Boundary Method
+        Cerr << "Pressure increment computed successfully" << finl;
+        if ((i_source_pdf_ != -1) && (correction_calcul_pression_initiale_ == 1))
+          {
+            Cerr<<"(IBM) Immersed Interface: correction of initial pressure."<<finl;
+            const Source_PDF_base& src = dynamic_cast<Source_PDF_base&>((sources())[i_source_pdf_].valeur());
+            src.correct_incr_pressure(champ_coeff_pdf_som_, inc_pre);
+            inc_pre.echange_espace_virtuel();
           }
+        // </IBM>
+        // On veut que l'espace virtuel soit a jour, donc all_items
+        operator_add(la_pression.valeurs(), inc_pre, VECT_ALL_ITEMS);
 
         gradient.calculer(la_pression.valeurs(),gradient_P.valeurs());
         divergence.calculer(la_vitesse.valeurs(),divergence_U.valeurs());
         divergence_U.valeurs()=0.;  // on remet les bons flux bords pour div
       }
   calculer_la_pression_en_pa();
-
 
   if (le_traitement_particulier.non_nul())
     le_traitement_particulier.preparer_calcul_particulier();
@@ -1469,7 +1448,7 @@ void Navier_Stokes_std::mettre_a_jour(double temps)
       else
         seuil_dyn/=raison_seuil_divU;
       double seuil_dyn_max = 1.e-10;
-      seuil_dyn=max(seuil_dyn,seuil_dyn_max);
+      seuil_dyn=std::max(seuil_dyn,seuil_dyn_max);
       solv_iter.set_seuil(seuil_dyn);
     }
   // fin procedure de determination du seuil dynamique de convergence en pression
@@ -1504,8 +1483,8 @@ bool Navier_Stokes_std::initTimeStep(double dt)
   // Verification que dt_max est correctement fixe pour un champ
   // de vitesse nul et diffusion_implicite active <=> dt_conv=INF
   const Schema_Temps_base& sch_tps = le_schema_en_temps.valeur();
-  const double& dt_max = sch_tps.pas_temps_max();
-  const int& diff_implicite = sch_tps.diffusion_implicite();
+  const double dt_max = sch_tps.pas_temps_max();
+  const int diff_implicite = sch_tps.diffusion_implicite();
   if (diff_implicite)
     {
       const DoubleTab& tab_vitesse = inconnue().valeurs();
@@ -1544,14 +1523,15 @@ bool Navier_Stokes_std::initTimeStep(double dt)
   // <IBM> Immersed Boundary Method
   double ddt = Equation_base::initTimeStep(dt);
 
-  for (int i=1; i<=sch_tps.nb_valeurs_futures(); i++) if (i <= pression().nb_valeurs_temporelles())
+  for (int i=1; i<=sch_tps.nb_valeurs_futures(); i++)
+    if (i <= pression().nb_valeurs_temporelles())
       {
         double tps=sch_tps.temps_futur(i);
         // Mise a jour du temps dans les champs de pression
         pression()->changer_temps_futur(tps,i);
         pression_pa()->changer_temps_futur(tps,i);
         pression()->futur(i)=pression()->valeurs();
-        pression_pa()->futur(i)=pression()->valeurs();
+        pression_pa()->futur(i)=pression_pa()->valeurs();
       }
 
   if (i_source_pdf_ != -1)
@@ -1591,8 +1571,13 @@ void Navier_Stokes_std::calculer_la_pression_en_pa()
 {
   DoubleTab& Pa=la_pression_en_pa.valeurs();
   DoubleTab& tab_pression=la_pression.valeurs();
-  const Champ_base& rho=milieu().masse_volumique();
-  Pa = tab_pression;
+  ConstDoubleTab_parts ppart(tab_pression);
+  const Champ_base& rho=milieu().masse_volumique().valeur();
+  if (Pa.get_md_vector() == tab_pression.get_md_vector())
+    Pa = tab_pression; //Pa et tab_pression ont le meme support
+  else if (Pa.get_md_vector() == ppart[0].get_md_vector())
+    Pa = ppart[0]; //tab_pression a un morceau en plus
+  else abort(); //euh...
   // On multiplie par rho si uniforme sinon deja en Pa...
   if (sub_type(Champ_Uniforme,rho))
     Pa *= rho(0,0);
@@ -1747,7 +1732,7 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
     {
       if (!la_vorticite.non_nul())
         {
-          const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());
+          const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
           dis.creer_champ_vorticite(schema_temps(),la_vitesse,la_vorticite);
           champs_compris_.ajoute_champ(la_vorticite);
         }
@@ -1778,6 +1763,15 @@ void Navier_Stokes_std::creer_champ(const Motcle& motlu)
           const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
           dis.y_plus(zone_dis(),zone_Cl_dis(),la_vitesse,y_plus);
           champs_compris_.ajoute_champ(y_plus);
+        }
+    }
+  else if (motlu == "distance_paroi_globale")
+    {
+      if (!distance_paroi_globale.non_nul())
+        {
+          const Discret_Thyd& dis=ref_cast(Discret_Thyd,discretisation());
+          dis.distance_paroi_globale(schema_temps(), zone_dis(), distance_paroi_globale);
+          champs_compris_.ajoute_champ(distance_paroi_globale);
         }
     }
   else if (motlu == "reynolds_maille")
@@ -1841,7 +1835,7 @@ void  Navier_Stokes_std::calculer_pression_hydrostatique(Champ_base& pression_hy
       Cerr<<"postprocessing of presion_hydrostatique needs gravity"<<finl;
       exit();
     }
-  const Champ_base& rho = milieu().masse_volumique();
+  const Champ_base& rho = milieu().masse_volumique().valeur();
   if (!sub_type(Champ_Uniforme,rho))
     {
       Cerr<<"postprocessing of presion_hydrostatique availabe only for incompressible flow"<<finl;
@@ -1869,6 +1863,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
   if (nom=="gradient_pression") postraitement_gradient_P_=1;
   if (nom=="vorticite")
     {
+      if (!la_vorticite.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,la_vorticite.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1876,6 +1871,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="critere_Q")
     {
+      if (!critere_Q.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,critere_Q.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1883,6 +1879,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="porosite_volumique")
     {
+      if (!porosite_volumique.non_nul())  throw Champs_compris_erreur();
       double temps_courant = schema_temps().temps_courant();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,porosite_volumique.valeur());
       if ((ch.temps()!=temps_courant) || (ch.temps()==temps_init))
@@ -1891,6 +1888,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="y_plus")
     {
+      if (!y_plus.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,y_plus.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1898,6 +1896,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="reynolds_maille")
     {
+      if (!Reynolds_maille.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,Reynolds_maille.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1905,6 +1904,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="courant_maille")
     {
+      if (!Courant_maille.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,Courant_maille.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1912,6 +1912,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="taux_cisaillement")
     {
+      if (!Taux_cisaillement.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,Taux_cisaillement.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1919,6 +1920,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="gradient_vitesse")
     {
+      if (!grad_u.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base, grad_u.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         ch.mettre_a_jour(la_vitesse->temps());
@@ -1926,6 +1928,7 @@ const Champ_base& Navier_Stokes_std::get_champ(const Motcle& nom) const
     }
   if (nom=="pression_hydrostatique")
     {
+      if (!pression_hydrostatique_.non_nul())  throw Champs_compris_erreur();
       Champ_Fonc_base& ch=ref_cast_non_const(Champ_Fonc_base,pression_hydrostatique_.valeur());
       if (((ch.temps()!=la_vitesse->temps()) || (ch.temps()==temps_init)) && (la_vitesse->mon_equation_non_nul()))
         {
@@ -2025,7 +2028,7 @@ int Navier_Stokes_std::impr(Sortie& os) const
       const solv_iteratif& solv_iter=ref_cast(solv_iteratif,solveur_pression_.valeur());
       os << " seuil de convergence du solveur iteratif  : " << solv_iter.get_seuil() << finl;
     }
-  //Equation_base::impr(os);
+  Equation_base::impr(os);
   divergence.impr(os);
   gradient.impr(os);
   terme_diffusif.impr(os);
@@ -2086,11 +2089,11 @@ static void construire_matrice_implicite(Operateur_base& op,
     }
 }
 
-/* dans CoviMAC, le gradient contribue a la matrice de l'equation de N-S */
+/* dans PolyMAC, le gradient contribue a la matrice de l'equation de N-S */
 void Navier_Stokes_std::dimensionner_matrice_sans_mem(Matrice_Morse& matrice)
 {
   Equation_base::dimensionner_matrice_sans_mem(matrice);
-  if (discretisation().que_suis_je() == "CoviMAC")
+  if (gradient.valeur().has_interface_blocs())
     gradient.valeur().dimensionner_blocs({{ "vitesse", &matrice }});
 }
 
@@ -2109,7 +2112,15 @@ void Navier_Stokes_std::dimensionner_blocs(matrices_t matrices, const tabs_t& se
 void Navier_Stokes_std::assembler_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
   Equation_base::assembler_blocs(matrices, secmem, semi_impl);
-  gradient.valeur().ajouter_blocs(matrices, secmem, semi_impl);
+  if (!discretisation().que_suis_je().debute_par("PolyMAC"))
+    {
+      DoubleTab tmp(secmem);
+      tmp = 0.0;
+      gradient.valeur().ajouter_blocs(matrices, tmp, semi_impl);
+      secmem-=tmp;
+    }
+  else
+    gradient.valeur().ajouter_blocs(matrices, secmem, semi_impl);
 }
 
 DoubleTab& Navier_Stokes_std::derivee_en_temps_inco(DoubleTab& derivee)
@@ -2236,7 +2247,7 @@ void Navier_Stokes_std::uzawa(const DoubleTab& secmem,
   int niter=0;
   int nmax=Cp.size();
   Cerr << "Uzawa, initial residue : " << dnew << finl;
-  //     seuil=dmax(seuil, dnew*1.e-12);
+  //     seuil=std::max(seuil, dnew*1.e-12);
   while ( ( dnew > seuil ) && (niter++ < nmax) )
     {
       gradient->multvect(Cp, grad);
