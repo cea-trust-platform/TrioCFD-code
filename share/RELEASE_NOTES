@@ -1,4 +1,7 @@
 --------------------------------------------------------------------------------------------------
+Release notes version 1.9.1_beta : Enhancements, modifications and corrected bugs since version 1.9.0 :
+--------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------
 Release notes version 1.9.0 : Enhancements, modifications and corrected bugs since version 1.8.4 :
 --------------------------------------------------------------------------------------------------
 04/07/22 (TrioCFD) New feature : Add new Turbulence model "combinaison" in EF discretization with standard wall law and WW hydraulics
