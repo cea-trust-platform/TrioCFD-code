@@ -496,10 +496,10 @@ void Navier_Stokes_phase_field::calculer_rho(const bool init)
           rho0Tab=rho0_;
           tab_multiply_any_shape(rhoTab, rho0Tab);
           rhoTab+=rho0_;
-          Cerr<<"rhoTab+"<<rhoTab<<finl;
+          /*Cerr<<"rhoTab+"<<rhoTab<<finl;
           Cerr << "beta_ = "<<beta_<<finl;
           Cerr << "betacTab = "<< betacTab<<finl;
-          Cerr << "c = "<< c<<finl;
+          Cerr << "c = "<< c<<finl;*/
 
 
         }

@@ -53,6 +53,9 @@ public:
   void premier_demi_dt() override;
 
   inline const DoubleVect& get_u_carre() override;
+  inline const DoubleVect& get_maxX();
+  inline const DoubleVect& get_minX();
+
   inline const int& get_type_systeme_naire();
 
   inline double drhodc(const int n_elem) const;
@@ -67,7 +70,7 @@ protected:
   DoubleVect u_carre_;
   DoubleTab prov_face_,prov_elem_;
   double alpha, beta;
-  DoubleVect alphaMatrix, betaMatrix;
+  DoubleVect alphaMatrix, betaMatrix, minX, maxX;
   DoubleVect angle_psi,angle_phi,x0Eq,x1Eq,x2Eq,a0Eq,a1Eq,a2Eq;
   int nb_equation_CH;
   Table potentiel_chimique_expr_;
@@ -350,6 +353,14 @@ inline double Source_Con_Phase_field::dWdc_general(const double c) const
 inline double Source_Con_Phase_field::kappa_func_c_general(const double c) const
 {
   return std::max(mult_kappa*kappa*kappa_forme_expr_.val(c,0),0.);
+}
+inline const DoubleVect& Source_Con_Phase_field::get_minX()
+{
+  return minX;
+}
+inline const DoubleVect& Source_Con_Phase_field::get_maxX()
+{
+  return maxX;
 }
 
 #endif

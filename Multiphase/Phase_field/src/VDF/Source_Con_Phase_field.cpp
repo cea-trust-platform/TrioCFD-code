@@ -69,7 +69,7 @@ Sortie& Source_Con_Phase_field::printOn(Sortie& s ) const { return s << que_suis
 Entree& Source_Con_Phase_field::readOn(Entree& is )
 {
   Cerr<<"Source_Con_Phase_field::readOn"<<finl;
-  Motcles les_mots(21);
+  Motcles les_mots(23);
   les_mots[0]="nb_equation_CH";
   les_mots[1]="alpha";
   les_mots[2]="potentiel_chimique";
@@ -91,6 +91,8 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
   les_mots[18]="Temps_d_affichage";
   les_mots[19]="kappa_auto_diffusion";
   les_mots[20]="alpha_rotation";
+  les_mots[21]="min_x";
+  les_mots[22]="max_x";
 
   Motcle motlu;
   is >> motlu;
@@ -103,7 +105,7 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
   is >> motlu;
   if (motlu!="systeme_naire")
     {
-      Cerr<<"Source_Con_Phase_field::readOn: We are expecting 'syteme_naire' instead of " << motlu <<finl;
+      Cerr<<"Source_Con_Phase_field::readOn: We are expecting 'systeme_naire' instead of " << motlu <<finl;
       exit ();
     }
   else
@@ -661,6 +663,24 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                       is >> betaMatrix(i);
                     break;
                   }
+                case 21:
+                  {
+                    cpt0++;
+                    DoubleVect temp_min_x(nb_equation_CH);
+                    minX = temp_min_x;
+                    for(int i=0; i< nb_equation_CH; i++)
+                      is >> minX(i);
+                    break;
+                  }
+                case 22:
+                  {
+                    cpt0++;
+                    DoubleVect temp_max_x(nb_equation_CH);
+                    maxX = temp_max_x;
+                    for(int i=0; i< nb_equation_CH; i++)
+                      is >> maxX(i);
+                    break;
+                  }
                 case 19:
                   {
                     cpt0++;
@@ -766,15 +786,17 @@ Entree& Source_Con_Phase_field::readOn(Entree& is )
                         Cerr << "We are expecting a keyword among " << les_mots << finl;
                         exit();
                       }
-                    if(cpt0 != 5)
-                      {
-                        Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
-                        Cerr << "You should specify all these parameters: " << les_mots << finl;
-                        exit();
-                      }
+
                     break; //test break
                   }
+                  if(cpt0 != 7)
+                    {
+                      Cerr << "Source_Con_Phase_field::readOn: Error while reading Source_Con_Phase_field: wrong number of parameters" << finl;
+                      Cerr << "You should specify all these parameters: " << les_mots << finl;
+                      exit();
+                    }
                 }
+
               is >> motlu;
             }
         }
@@ -1851,7 +1873,27 @@ void Source_Con_Phase_field::premier_demi_dt()
           const double theta=0.6;
           // On stocke les nouveaux c et mutilde
 
-          if (type_systeme_naire_==1)
+
+          if (type_systeme_naire_==0)
+            {
+              for(int n_elem=0; n_elem<nb_elem; n_elem++)
+                {
+                  // Commente par DJ
+                  //----------------
+                  //               c_demi(n_elem)=x1(n_elem);
+                  //----------------
+                  c_demi(n_elem)-=(1-theta)*c(n_elem);
+                  c_demi(n_elem)/=theta;
+
+                  // Commente par DJ
+                  //----------------
+                  //               mutilde_demi(n_elem)=x1(n_elem+nb_elem);
+                  //----------------
+                  mutilde_demi(n_elem)-=(1-theta)*mutilde(n_elem);
+                  mutilde_demi(n_elem)/=theta;
+                }
+            }
+          else if (type_systeme_naire_==1)
             {
               for (int j=0; j<nb_equation_CH; j++)
                 {
@@ -1873,27 +1915,8 @@ void Source_Con_Phase_field::premier_demi_dt()
                     }
                 }
             }
-          else if (type_systeme_naire_==0)
-            {
-              for(int n_elem=0; n_elem<nb_elem; n_elem++)
-                {
-                  // Commente par DJ
-                  //----------------
-                  //               c_demi(n_elem)=x1(n_elem);
-                  //----------------
-                  c_demi(n_elem)-=(1-theta)*c(n_elem);
-                  c_demi(n_elem)/=theta;
-
-                  // Commente par DJ
-                  //----------------
-                  //               mutilde_demi(n_elem)=x1(n_elem+nb_elem);
-                  //----------------
-                  mutilde_demi(n_elem)-=(1-theta)*mutilde(n_elem);
-                  mutilde_demi(n_elem)/=theta;
-                }
-            }
-          Cerr <<"c_demi after 1-theta/theta = "<<c_demi<<finl;
-          Cerr <<"mutilde_demi after 1-theta/theta = "<<mutilde_demi<<finl;
+          //Cerr <<"c_demi after 1-theta/theta = "<<c_demi<<finl;
+          //Cerr <<"mutilde_demi after 1-theta/theta = "<<mutilde_demi<<finl;
 
         }
 
@@ -2071,7 +2094,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
 
       for (int j=0; j<c.line_size(); j++)
         {
-          for (int i=0; i<temp_c.dimension(0); i++)
+          for (int i=0; i<temp_c.dimension_tot(0); i++)
             {
               temp_c(i,0)=c(i,j);
             }
@@ -2084,7 +2107,7 @@ void Source_Con_Phase_field::calculer_div_alpha_gradC(DoubleTab& div_alpha_gradC
               prov_face(k,j)=temp_prov_face(k,0);
             }
         }
-      eq_ns.solv_masse().appliquer(prov_face);
+      //eq_ns.solv_masse().appliquer(prov_face); a revoir..
 
       // alpha*Grad(C)
       DoubleTab temp_prov_face2 = prov_face;
@@ -2183,8 +2206,8 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
   const DoubleTab& positions = zone_VDF.xp();
   const IntVect& ori = zone_VDF.orientation();
 
-  Cerr <<"face_ voisins "<< face_voisins<<finl;
-  Cerr <<"elem_faces "<< elem_faces<<finl;
+  /* Cerr <<"face_ voisins "<< face_voisins<<finl;
+   Cerr <<"elem_faces "<< elem_faces<<finl;*/
 
 
   int compt=0;
@@ -2243,7 +2266,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
             }
         }
-      Cerr <<"kappa_var = " << kappa_var<<finl;
+      //Cerr <<"kappa_var = " << kappa_var<<finl;
 
       dimensionnement=(2*nb_compo_+1)*nb_elem;
 
@@ -2267,7 +2290,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
       DoubleVect& coeff=matrice_diffusion_CH.get_set_coeff();
       IntVect& tab2=matrice_diffusion_CH.get_set_tab2();
       IntVect& tab1=matrice_diffusion_CH.get_set_tab1();
-      Cerr <<"matrice_diffusion_CH = "<<matrice_diffusion_CH<<finl;
+      //Cerr <<"matrice_diffusion_CH = "<<matrice_diffusion_CH<<finl;
 
       // Boucle sur le nombre d'elements
       for(int elem=0; elem<nb_elem; elem++)
@@ -2348,7 +2371,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                     }
                 }
 
-              Cerr <<" min_tri = min(min_tri,voisin) if voisin>old_tri ====== "<<min_tri<<finl;
+              //Cerr <<" min_tri = min(min_tri,voisin) if voisin>old_tri ====== "<<min_tri<<finl;
               // Si l'ancien minimum est inferieur a elem et le nouveau superieur, il faut traiter elem juste avant le nouveau voisin
               if (old_tri<elem && min_tri>elem)
                 {
@@ -2391,8 +2414,8 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
 
               // On sauve le numero d'element "minimum"
               old_tri=min_tri;
-              Cerr <<"old_tri = "<<old_tri<<finl;
-              Cerr <<"min_tri fin = "<< min_tri<<finl;
+              //Cerr <<"old_tri = "<<old_tri<<finl;
+              //Cerr <<"min_tri fin = "<< min_tri<<finl;
             }
 
         }
@@ -2566,7 +2589,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
           //kappa_var(ikappa)=(this->*kappa_func_c)(c(ikappa));
           //}
         }
-      Cerr <<"kappaMatrix_Var = "<< kappa_Matrix_var<< finl;
+      //Cerr <<"kappaMatrix_Var = "<< kappa_Matrix_var<< finl;
 
       // Forme de la matrice pour un systeme -naire :
       // ici on montre uniquement pour un systeme quaternaire
@@ -2609,7 +2632,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
       DoubleVect& coeff=matrice_diffusion_CH.get_set_coeff();
       IntVect& tab2=matrice_diffusion_CH.get_set_tab2();
       IntVect& tab1=matrice_diffusion_CH.get_set_tab1();
-      Cerr <<"matrice_diffusion_CH = "<<matrice_diffusion_CH<<finl;
+      //Cerr <<"matrice_diffusion_CH = "<<matrice_diffusion_CH<<finl;
 
 
       // Boucle sur le nombre d'equation pour la generalisation
@@ -2685,7 +2708,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                           // Cas kappa variable : on utilise la moyenne (geometrique, harmonique ou arithmetique) des valeurs des mobilites
                           // des elements concernes par la face de calcul ("kappa_naire_interpolee")
 
-                          Cerr <<"f0 = "<<f0<<finl;
+                          //Cerr <<"f0 = "<<f0<<finl;
 
                           if (voisin!=-1 && old_tri==-1)
                             {
@@ -2760,7 +2783,7 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
                           compt++;
                           compt2++;
                         }
-                      Cerr <<"kappa_naire_interpolee = "<<kappa_naire_interpolee<<finl;
+                      //Cerr <<"kappa_naire_interpolee = "<<kappa_naire_interpolee<<finl;
                       // On sauve le numero d'element "minimum"
                     }
                   old_tri=min_tri;
@@ -2772,10 +2795,10 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
         }
 
       // Test des tableaux
-      Cerr<<"coeff="<<coeff<<finl;
+      /*Cerr<<"coeff="<<coeff<<finl;
       Cerr<<"tab1="<<tab1<<finl;
       Cerr<<"tab2="<<tab2<<finl;
-      Cerr <<"matrice_diffusion_CH final = "<<matrice_diffusion_CH<<finl;
+      //Cerr <<"matrice_diffusion_CH final = "<<matrice_diffusion_CH<<finl;*/
 
       // Assemblage de la moitie superieure de la matrice : B et I
       // Boucle sur le nombre de matrice dans la grosse matrice (matrice d'une matrice)
@@ -2788,8 +2811,8 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               old_tri=-1;
               nb_faces_au_bord=0;
 
-              // On saute de ligne en prenant la valeur compte2
-              tab1(compt1)=compt2;
+              // On saute de ligne en prenant la valeur de compte2 -1
+              tab1(compt1)=compt2+1;
               compt1++;
 
 
@@ -2890,7 +2913,6 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
               tab2(compt2)=((ligne+nb_equation_CH)*nb_elem)+elem;
               compt++;
               compt2++;
-
             }
 
         }
@@ -3041,10 +3063,10 @@ void Source_Con_Phase_field::assembler_matrice_point_fixe(Matrice_Morse& matrice
 
 
       // Test des tableaux
-      Cerr<<"coeff="<<coeff<<finl;
+      /*Cerr<<"coeff="<<coeff<<finl;
       Cerr<<"tab1="<<tab1<<finl;
-      Cerr<<"tab2="<<tab2<<finl;
-      Cerr <<"matrice_diffusion_CH final = "<<matrice_diffusion_CH<<finl;
+      Cerr<<"tab2="<<tab2<<finl;*/
+      //Cerr <<"matrice_diffusion_CH final = "<<matrice_diffusion_CH<<finl;
 
     }
 
@@ -3180,8 +3202,8 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
 
           second_membre(n_elem+nb_elem)=term_cin(n_elem)+beta*(this->*dWdc)(x1(n_elem));
         }
-      Cerr <<"second_membre = "<<second_membre<<finl;
-      Cerr <<"x1 = "<<x1<<finl;
+      /*Cerr <<"second_membre = "<<second_membre<<finl;
+      Cerr <<"x1 = "<<x1<<finl;*/
 
       //   // Ajoute par DJ pour Debog
       //   //-------------------------
@@ -3290,10 +3312,10 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
               second_membre(n_elem+nb_elem_tot+(j*nb_elem))=terme_non_lin(n_elem,j);
             }
         }
-      Cerr <<"c second_membre = "<<c<<finl;
-      Cerr <<"x1_c = "<<x1_c<<finl;
-      Cerr <<"terme_non_lineaire = "<<terme_non_lin<<finl;
-      Cerr <<"second_membre = "<<second_membre<<finl;
+      /* Cerr <<"c second_membre = "<<c<<finl;
+       Cerr <<"x1_c = "<<x1_c<<finl;
+       Cerr <<"terme_non_lineaire = "<<terme_non_lin<<finl;
+       Cerr <<"second_membre = "<<second_membre<<finl;*/
 
 
       //   // Ajoute par DJ pour Debog
@@ -3333,7 +3355,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
             Ax1(n_elem+nb_elem_tot) = Ax1_mutilde(n_elem);
           }
       }
-      Cerr <<"Ax1 = "<<Ax1<<finl;
+      //Cerr <<"Ax1 = "<<Ax1<<finl;
 
       //---------------
       //   // Ajouter par DJ pour Debog
@@ -3356,7 +3378,7 @@ void Source_Con_Phase_field::construire_systeme(const DoubleTab& c, const Matric
         {
           v0(n_elem)=(Ax1(n_elem)-second_membre(n_elem));
         }
-      Cerr <<"v0 = "<<v0<<finl;
+      //Cerr <<"v0 = "<<v0<<finl;
 
 
     }
@@ -3428,6 +3450,9 @@ int Source_Con_Phase_field::non_lin_gmres(const DoubleTab& c, const DoubleTab& m
           x1(n_elem+nb_elem_tot)=mutilde(n_elem);
         }
       //--------------
+      /* Cerr <<"c = "<<c<<finl;
+       Cerr <<"mutilde = "<<mutilde<<finl;
+       Cerr <<"x1 = "<<x1<<finl;*/
 
       // A present dans le jdd
       //   double epsGMRES=1.e-10;
@@ -3730,10 +3755,10 @@ l5:
               x1(nelem+(ncomponent*nb_elem)+nb_elem_tot)=mutilde(nelem,ncomponent);
             }
         }
-      Cerr <<"c = "<<c<<finl;
+      /*Cerr <<"c = "<<c<<finl;
       Cerr <<"mutilde = "<<mutilde<<finl;
       Cerr <<"x1 = "<<x1<<finl;
-
+      */
 
       //--------------
 
@@ -4011,8 +4036,8 @@ l5naire:
               //         return 1;
               Cerr << "Number of iterations to reach convergence : " << it+1 << finl;
               Cerr << "" << finl;
-              Cerr <<"c_demi = "<<c_demi<<finl;
-              Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
+              //Cerr <<"c_demi = "<<c_demi<<finl;
+              //Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
 
               return it;
             }
@@ -4031,8 +4056,8 @@ l5naire:
                 }
 
               //--------------
-              Cerr <<"c_demi = "<<c_demi<<finl;
-              Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
+              //Cerr <<"c_demi = "<<c_demi<<finl;
+              //Cerr <<"mutilde_demi = "<<mutilde_demi<<finl;
               Cerr << "Stopped before convergence" << finl;
               Cerr << "" << finl;
             }

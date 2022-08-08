@@ -30,6 +30,7 @@
 #include <Param.h>
 #include <Constituant.h>
 #include <Champ_Don.h>
+#include <Mass_Redistribution_Phase_Field.h>
 
 Implemente_instanciable_sans_constructeur(Convection_Diffusion_Phase_field,"Convection_Diffusion_Phase_field",Convection_Diffusion_Concentration);
 // XD convection_diffusion_phase_field convection_diffusion_concentration convection_diffusion_phase_field -1 Cahn-Hilliard equation of the Phase Field problem. The unknown of this equation is the concentration C.
@@ -159,6 +160,10 @@ int Convection_Diffusion_Phase_field::preparer_calcul()
 
   mutilde = inconnue().valeurs();
   mutilde = 0.;
+
+  Mass_Redistribution_Phase_Field::c_ini = inconnue().valeurs();
+
+
   // si on traite une variable avec "dis." (voir discretiser()), l'operation "resize" est inutile car "dis." s'en charge.
   // En sequentiel : resize() autorise
   // En parallele : resize() interdit, car alors on ne prend pas en compte les joints
