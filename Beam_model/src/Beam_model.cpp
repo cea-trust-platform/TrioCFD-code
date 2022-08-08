@@ -287,8 +287,10 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
     {
       DoubleVect displacement(3);
       DoubleVect velocity(3);
+      DoubleVect acceleration(3);
       displacement=0.;
       velocity=0.;
+      acceleration=0.;
       for(int j=0; j < nbModes_; j++)
         {
           const DoubleTab& u=u_(j);
@@ -296,6 +298,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
             {
               displacement[i] += qDisplacement_[j]*u(output_position_,i);
               velocity[i] += qSpeed_[j]*u(output_position_,i);
+              acceleration[i] += qAcceleration_[j]*u(output_position_,i);
             }
         }
 
@@ -303,11 +306,15 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_2;
       ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_3;
+      ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
 
       ofs_1<<temps_<<" "<<displacement[0]<<" "<<displacement[1]<<" "<<displacement[2]<<endl;
       ofs_1.close();
       ofs_2<<temps_<<" "<< velocity[0]<<" "<< velocity[1]<<" "<< velocity[2]<<endl;
       ofs_2.close();
+      ofs_3<<temps_<<" "<< acceleration[0]<<" "<< acceleration[1]<<" "<< acceleration[2]<<endl;
+      ofs_3.close();
     }
 
   if (je_suis_maitre())
@@ -342,8 +349,10 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
     {
       DoubleVect displacement(3);
       DoubleVect velocity(3);
+      DoubleVect acceleration(3);
       displacement=0.;
       velocity=0.;
+      acceleration=0.;
       for(int j=0; j < nbModes_; j++)
         {
           const DoubleTab& u=u_(j);
@@ -351,6 +360,7 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
             {
               displacement[i] += qDisplacement_[j]*u(output_position_,i);
               velocity[i] += qSpeed_[j]*u(output_position_,i);
+              acceleration[i] += qAcceleration_[j]*u(output_position_,i);
             }
         }
 
@@ -358,13 +368,16 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
       std::ofstream ofs_2;
       ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_3;
+      ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
 
       ofs_1<<temps_<<" "<<displacement[0]<<" "<<displacement[1]<<" "<<displacement[2]<<endl;
       ofs_1.close();
       ofs_2<<temps_<<" "<< velocity[0]<<" "<< velocity[1]<<" "<< velocity[2]<<endl;
       ofs_2.close();
+      ofs_3<<temps_<<" "<< acceleration[0]<<" "<< acceleration[1]<<" "<< acceleration[2]<<endl;
+      ofs_3.close();
     }
-
   if (je_suis_maitre())
     {
       std::ofstream ofs_sauve;
