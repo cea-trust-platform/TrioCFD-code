@@ -89,9 +89,6 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
 
   if(monFlux)
     {
-      /*string line;  // read the first line
-      getline(monFlux, line);
-      monFlux.ignore();*/
       double mass, stiffness, damping;
       for(int i=0; i<nbModes_; i++)
         {
@@ -104,8 +101,8 @@ void Beam_model::readInputMassStiffnessFiles(Nom& masse_and_stiffness_file_name)
             }
           else
             {
-              Cerr<<" Beam_model::read_input_files values ​​of mass and stiffness are wrong in the file "<<masse_and_stiffness_file_name<<finl;
-              Cerr<<" Value ​​of mass = "<< mass<< " and value of stiffness = "<<stiffness<<finl;
+              Cerr<<" Beam_model::read_input_files values of mass and stiffness are wrong in the file "<<masse_and_stiffness_file_name<<finl;
+              Cerr<<" Value of mass = "<< mass<< " and value of stiffness = "<<stiffness<<finl;
               exit();
             }
         }
@@ -167,9 +164,6 @@ void Beam_model::readInputCIFile(Nom& CI_file_name)
 
   if(monFlux)
     {
-      /*string line;  // read the first line
-      getline(monFlux, line);
-      monFlux.ignore();*/
       double displacement;
       for(int i=0; i<nbModes_; i++)
         {
@@ -279,7 +273,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       double coeff2 =	damping_[j]*qHalfSpeed_[j] + stiffness_[j]*qDisplacement_[j];
       qAcceleration_[j]= (fluidForce[j] - coeff2)/coeff1;
       qSpeed_[j] = qHalfSpeed_[j] + halfDt*qAcceleration_[j];
-      qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
+      //qHalfSpeed_[j] = qSpeed_[j] + halfDt*qAcceleration_[j];
     }
 
 
@@ -328,7 +322,7 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
       ofs_sauve.close();
     }
 
-  return qHalfSpeed_;
+  return qSpeed_;
 }
 
 DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& fluidForce)
@@ -400,7 +394,7 @@ DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const D
       temps_=0.;
       return qSpeed_;
     }
-  else if(temps_!=tps) // mise à jours du qSpeed_ une seule fois par pas de temps!
+  else if(temps_!=tps) // update qSpeed_ only once per time step!
     {
       temps_=tps;
       if(timeScheme_)
@@ -409,12 +403,8 @@ DoubleVect& Beam_model::getVelocity(const double& tps, const double& dt, const D
         return NewmarkSchemeFD(dt, fluidForce);
     }
   else
-    {
-      if(timeScheme_)
-        return qSpeed_;
-      else
-        return qHalfSpeed_;
-    }
+    return qSpeed_;
+
 }
 
 DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
