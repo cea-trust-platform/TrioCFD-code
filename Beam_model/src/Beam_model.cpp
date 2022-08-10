@@ -52,7 +52,8 @@ Beam_model::Beam_model()
   activate_=false;
   timeScheme_=true;
   temps_ =0.;
-  output_position_=0;
+  output_position_.resize(0);
+  output_position_=0.;
 }
 Beam_model::~Beam_model()
 {
@@ -277,50 +278,8 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
     }
 
 
-  if (je_suis_maitre())
-    {
-      DoubleVect displacement(3);
-      DoubleVect velocity(3);
-      DoubleVect acceleration(3);
-      displacement=0.;
-      velocity=0.;
-      acceleration=0.;
-      for(int j=0; j < nbModes_; j++)
-        {
-          const DoubleTab& u=u_(j);
-          for(int i=0; i<3; i++)
-            {
-              displacement[i] += qDisplacement_[j]*u(output_position_,i);
-              velocity[i] += qSpeed_[j]*u(output_position_,i);
-              acceleration[i] += qAcceleration_[j]*u(output_position_,i);
-            }
-        }
-
-      std::ofstream ofs_1;
-      ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
-      std::ofstream ofs_2;
-      ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
-      std::ofstream ofs_3;
-      ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
-
-      ofs_1<<temps_<<" "<<displacement[0]<<" "<<displacement[1]<<" "<<displacement[2]<<endl;
-      ofs_1.close();
-      ofs_2<<temps_<<" "<< velocity[0]<<" "<< velocity[1]<<" "<< velocity[2]<<endl;
-      ofs_2.close();
-      ofs_3<<temps_<<" "<< acceleration[0]<<" "<< acceleration[1]<<" "<< acceleration[2]<<endl;
-      ofs_3.close();
-    }
-
-  if (je_suis_maitre())
-    {
-      std::ofstream ofs_sauve;
-      ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
-      for(int j=0; j < nbModes_; j++)
-        {
-          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<fluidForce[j]<<endl;
-        }
-      ofs_sauve.close();
-    }
+  saveBeamForRestart(fluidForce);
+  if(output_position_.size()>0) printOutputPosition();
 
   return qSpeed_;
 }
@@ -339,49 +298,8 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
       qSpeed_[j] += halfDt*(PreviousqAcceleration + qAcceleration_[j]);
     }
 
-  if (je_suis_maitre())
-    {
-      DoubleVect displacement(3);
-      DoubleVect velocity(3);
-      DoubleVect acceleration(3);
-      displacement=0.;
-      velocity=0.;
-      acceleration=0.;
-      for(int j=0; j < nbModes_; j++)
-        {
-          const DoubleTab& u=u_(j);
-          for(int i=0; i<3; i++)
-            {
-              displacement[i] += qDisplacement_[j]*u(output_position_,i);
-              velocity[i] += qSpeed_[j]*u(output_position_,i);
-              acceleration[i] += qAcceleration_[j]*u(output_position_,i);
-            }
-        }
-
-      std::ofstream ofs_1;
-      ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
-      std::ofstream ofs_2;
-      ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
-      std::ofstream ofs_3;
-      ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
-
-      ofs_1<<temps_<<" "<<displacement[0]<<" "<<displacement[1]<<" "<<displacement[2]<<endl;
-      ofs_1.close();
-      ofs_2<<temps_<<" "<< velocity[0]<<" "<< velocity[1]<<" "<< velocity[2]<<endl;
-      ofs_2.close();
-      ofs_3<<temps_<<" "<< acceleration[0]<<" "<< acceleration[1]<<" "<< acceleration[2]<<endl;
-      ofs_3.close();
-    }
-  if (je_suis_maitre())
-    {
-      std::ofstream ofs_sauve;
-      ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
-      for(int j=0; j < nbModes_; j++)
-        {
-          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<fluidForce[j]<<endl;
-        }
-      ofs_sauve.close();
-    }
+  saveBeamForRestart(fluidForce);
+  if(output_position_.size()>0) printOutputPosition();
 
   return qSpeed_;
 }
@@ -554,3 +472,88 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
 
     }
 }*/
+
+
+void Beam_model::saveBeamForRestart(const DoubleVect& fluidForce) const
+{
+
+  if (je_suis_maitre())
+    {
+      std::ofstream ofs_sauve;
+      ofs_sauve.open ("SaveBeamForRestart.txt", std::ofstream::out | std::ofstream::trunc);
+      for(int j=0; j < nbModes_; j++)
+        {
+          ofs_sauve<<temps_<<"  "<<qDisplacement_[j]<<" "<<qSpeed_[j]<<" "<<qAcceleration_[j]<<" "<<fluidForce[j]<<endl;
+        }
+      ofs_sauve.close();
+    }
+
+}
+void Beam_model::printOutputPosition() const
+{
+
+  if (je_suis_maitre())
+    {
+      int nb_output_points= output_position_.size();
+      DoubleTab displacement(nb_output_points,3);
+      DoubleTab velocity(nb_output_points,3);
+      DoubleTab acceleration(nb_output_points,3);
+      displacement=0.;
+      velocity=0.;
+      acceleration=0.;
+      for(int j=0; j < nbModes_; j++)
+        {
+          const DoubleTab& u=u_(j);
+          for(int k=0; k<output_position_.size(); k++)
+            {
+              for(int i=0; i<3; i++)
+                {
+                  displacement(k, i) += qDisplacement_[j]*u(output_position_[k],i);
+                  velocity(k, i) += qSpeed_[j]*u(output_position_[k],i);
+                  acceleration(k, i) += qAcceleration_[j]*u(output_position_[k],i);
+                }
+            }
+        }
+
+      std::ofstream ofs_1;
+      ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_2;
+      ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_3;
+      ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
+
+      ofs_1<<temps_<<" ";
+      for(int k=0; k<output_position_.size(); k++)
+        {
+          for(int i=0; i<3; i++)
+            {
+              ofs_1<< displacement(k, i)<<" ";
+            }
+        }
+      ofs_1<<endl;
+      ofs_1.close();
+
+      ofs_2<<temps_<<" ";
+      for(int k=0; k<output_position_.size(); k++)
+        {
+          for(int i=0; i<3; i++)
+            {
+              ofs_2<< velocity(k, i)<<" ";
+            }
+        }
+      ofs_2<<endl;
+      ofs_2.close();
+
+      ofs_3<<temps_<<" ";
+      for(int k=0; k<output_position_.size(); k++)
+        {
+          for(int i=0; i<3; i++)
+            {
+              ofs_3<< acceleration(k, i)<<" ";
+            }
+        }
+      ofs_3<<endl;
+      ofs_3.close();
+
+    }
+}

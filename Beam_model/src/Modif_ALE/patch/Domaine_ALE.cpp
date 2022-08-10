@@ -797,7 +797,8 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Nom Restart_file_name="none";
   int var_int;
   int nb_modes;
-  int output;
+  int nb_output_points=0;
+  DoubleVect output_position(nb_output_points);
   double var_double;
   is >> motlu;
   if (motlu != accolade_ouverte)
@@ -882,8 +883,16 @@ void Domaine_ALE::reading_beam_model(Entree& is)
         }
       if(motlu=="Output_position")
         {
-          is>>output;
-          beam->setOutputPosition(output);
+          is>>nb_output_points;
+          output_position.resize(nb_output_points);
+          double poz;
+          for (int i=0; i< nb_output_points; i ++)
+            {
+              is >>poz;
+              output_position[i]=poz;
+            }
+
+          beam->setOutputPosition(output_position);
         }
       if (motlu=="Restart_file_name")
         {
@@ -927,6 +936,62 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           Cerr<< "ERROR: Unable to open the file." <<Restart_file_name<<finl;
         }
     }
+  else
+    {
+      //delete old files if ever the simulation is released in the same folder. This will not delete the files in case of resumption of calculation
+      std::remove("BeamDisplacement1D.txt");
+      std::remove("BeamVelocity1D.txt");
+      std::remove("BeamAcceleration1D.txt");
+      std::remove("ModalForceFluide1D.txt");
+      //end delete old files
+
+      //prepare the headers of the output file ModalForceFluide1D
+      std::ofstream ofs;
+      ofs.open ("ModalForceFluide1D.txt", std::ofstream::out | std::ofstream::app);
+      ofs<<"# Printing modal 1D fluid force: time mode  ";
+      for(int k=0; k<nb_modes; k++) ofs<<k+1<<" ";
+      ofs<<endl;
+      ofs.close();
+      //end prepare the headers of the output file ModalForceFluide1D
+
+      if(nb_output_points>0)
+        {
+          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
+          std::ofstream ofs_1;
+          ofs_1.open ("BeamDisplacement1D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_2;
+          ofs_2.open ("BeamVelocity1D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_3;
+          ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
+
+          ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
+          for(int k=0; k<nb_output_points; k++)
+            {
+              ofs_1<<output_position[k]<<" ";
+            }
+          ofs_1<<endl;
+          ofs_1.close();
+
+          ofs_2<<"# Printing Beam 1D velocity: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points; k++)
+            {
+              ofs_2<<output_position[k]<<" ";
+            }
+          ofs_2<<endl;
+          ofs_2.close();
+
+
+          ofs_3<<"# Printing Beam 1D acceleration: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points; k++)
+            {
+              ofs_3<<output_position[k]<<" ";
+            }
+          ofs_3<<endl;
+          ofs_3.close();
+          //end prepare the headers
+        }
+    }
+
 }
 DoubleVect Domaine_ALE::interpolationOnThe3DSurface(const double& x, const double& y, const double& z, const DoubleTab& u, const DoubleTab& R) const
 {
