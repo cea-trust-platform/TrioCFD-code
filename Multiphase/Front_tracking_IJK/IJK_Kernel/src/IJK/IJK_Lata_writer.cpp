@@ -649,8 +649,9 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
 	      // Length is in bytes
 	      const int data_length = (int) (offset_intersection_end - offset_intersection_start);
 	      send_buffer << start_index_within_block << data_length;
-	      send_buffer.put(tmp.addr() + start_index_within_tmp/sizeof(float), 
-			      data_length/sizeof(float), 1);
+              const int sz =  (int)sizeof(float);
+	      send_buffer.put(tmp.addr() + start_index_within_tmp/sz, 
+			      data_length/sz, 1);
 	    }
 	  }
 	}
@@ -688,8 +689,9 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
 	      Cerr << "Internal error in writing ijk lata file: index out of bound" << finl;
 	      Process::exit();
 	    }
-	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sizeof(float), 
-			    data_length/sizeof(float));
+	    const int sz =  (int)sizeof(float);
+	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sz, 
+			    data_length/sz);
 	  }
 	}
 	// Each process writes the data chunk
@@ -1259,8 +1261,9 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
 	      // Length is in bytes
 	      const int data_length = (int) (offset_intersection_end - offset_intersection_start);
 	      send_buffer << start_index_within_block << data_length;
-	      send_buffer.put(tmp.addr() + start_index_within_tmp/sizeof(float), 
-			      data_length/sizeof(float), 1);
+              const int sz =  (int)sizeof(float);
+	      send_buffer.put(tmp.addr() + start_index_within_tmp/sz, 
+			      data_length/sz, 1);
 	    }
 	  }
 	}
@@ -1298,8 +1301,9 @@ void IJK_Striped_Writer::write_data_parallel2_float(const char * filename,
 	      Cerr << "Internal error in writing ijk lata file: index out of bound" << finl;
 	      Process::exit();
 	    }
-	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sizeof(float), 
-			    data_length/sizeof(float));
+	    const int sz =  (int)sizeof(float);
+	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sz, 
+			    data_length/sz);
 	  }
 	}
 	// Each process writes the data chunk
@@ -1869,8 +1873,9 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
 	      // Length is in bytes
 	      const int data_length = (int) (offset_intersection_end - offset_intersection_start);
 	      send_buffer << start_index_within_block << data_length;
-	      send_buffer.put(tmp.addr() + start_index_within_tmp/sizeof(double), 
-			      data_length/sizeof(double), 1);
+              const int sz =  (int)sizeof(double);
+	      send_buffer.put(tmp.addr() + start_index_within_tmp/sz, 
+			      data_length/sz, 1);
 	    }
 	  }
 	}
@@ -1908,8 +1913,9 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
 	      Cerr << "Internal error in writing ijk lata file: index out of bound" << finl;
 	      Process::exit();
 	    }
-	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sizeof(double), 
-			    data_length/sizeof(double));
+	    const int sz =  (int)sizeof(double);
+	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sz, 
+			    data_length/sz);
 	  }
 	}
 	// Each process writes the data chunk
@@ -2479,8 +2485,9 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
 	      // Length is in bytes
 	      const int data_length = (int) (offset_intersection_end - offset_intersection_start);
 	      send_buffer << start_index_within_block << data_length;
-	      send_buffer.put(tmp.addr() + start_index_within_tmp/sizeof(double), 
-			      data_length/sizeof(double), 1);
+              const int sz =  (int)sizeof(double);
+	      send_buffer.put(tmp.addr() + start_index_within_tmp/sz, 
+			      data_length/sz, 1);
 	    }
 	  }
 	}
@@ -2518,8 +2525,9 @@ void IJK_Striped_Writer::write_data_parallel2_double(const char * filename,
 	      Cerr << "Internal error in writing ijk lata file: index out of bound" << finl;
 	      Process::exit();
 	    }
-	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sizeof(double), 
-			    data_length/sizeof(double));
+	    const int sz =  (int)sizeof(double);
+	    recv_buffer.get(recv_tmp.addr() + start_index_within_block/sz, 
+			    data_length/sz);
 	  }
 	}
 	// Each process writes the data chunk

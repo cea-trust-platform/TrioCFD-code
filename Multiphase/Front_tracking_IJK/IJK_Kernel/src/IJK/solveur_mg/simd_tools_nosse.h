@@ -196,7 +196,7 @@ inline Simd_float operator*(Simd_float a, Simd_float b)
 
 inline Simd_float Simd_absolute_value(Simd_float a)
 {
-	return abs(a.data_);
+   return std::fabs(a.data_);
 }
 
 // Description: This function performs the following operation on the vectors
@@ -378,7 +378,7 @@ inline Simd_double operator*(Simd_double a, Simd_double b)
 
 inline Simd_double Simd_absolute_value(Simd_double a)
 {
-	return abs(a.data_);
+   return std::fabs(a.data_);
 }
 
 // Description: This function performs the following operation on the vectors

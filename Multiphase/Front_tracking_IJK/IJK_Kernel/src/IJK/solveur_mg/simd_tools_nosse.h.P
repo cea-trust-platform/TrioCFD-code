@@ -193,7 +193,7 @@ inline Simd___type__ operator*(Simd___type__ a, Simd___type__ b)
 
 inline Simd___type__ Simd_absolute_value(Simd___type__ a)
 {
-	return abs(a.data_);
+   return std::fabs(a.data_);
 }
 
 // Description: This function performs the following operation on the vectors

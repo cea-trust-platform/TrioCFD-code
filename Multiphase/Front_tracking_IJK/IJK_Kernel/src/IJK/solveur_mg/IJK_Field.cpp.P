@@ -67,11 +67,11 @@ void ArrOf_TYPE__with_ghost::echange_espace_virtuel(int pe_min, int pe_max)
   // envoi a pe_max et reception de pe_min
   const int n = tab_.size_array() - ghost_ * 2;
   _SCALARTYPE_ *pdata = tab_.addr();
-  envoyer_recevoir(pdata + n, ghost_ * sizeof(_SCALARTYPE_), pe_max,
-						 pdata, ghost_ * sizeof(_SCALARTYPE_), pe_min);
+  envoyer_recevoir(pdata + n, ghost_ * (int)sizeof(_SCALARTYPE_), pe_max,
+						 pdata, ghost_ * (int)sizeof(_SCALARTYPE_), pe_min);
   // l'autre
-  envoyer_recevoir(pdata + ghost_, ghost_ * sizeof(_SCALARTYPE_), pe_min,
-						 pdata + n + ghost_, ghost_ * sizeof(_SCALARTYPE_), pe_max);
+  envoyer_recevoir(pdata + ghost_, ghost_ * (int)sizeof(_SCALARTYPE_), pe_min,
+						 pdata + n + ghost_, ghost_ * (int)sizeof(_SCALARTYPE_), pe_max);
   statistiques().end_count(echange_vect_counter_);
 }
 #Pendmacro(DEFARROFTYPE_WITHGHOST)
@@ -146,10 +146,10 @@ void IJK_Field_local__TYPE_::allocate(int Ni, int Nj, int Nk, int ghosts, int ad
 
   // Align origin on cache line boundary
   const int CacheLineSizeBytes = 64;
-  sz += CacheLineSizeBytes/sizeof(_TYPE_);
+  sz += CacheLineSizeBytes/(int)sizeof(_TYPE_);
   // Add supplemental data at end for the last SIMD instruction of the loop that might go
   // beyond the end of the usefull data
-  sz += CacheLineSizeBytes/sizeof(_TYPE_);
+  sz += CacheLineSizeBytes/(int)sizeof(_TYPE_);
   data_.resize_array(sz);
   _TYPE_ *ptr = data_.addr() + offset_;
   char *cptr = (char *) ptr;

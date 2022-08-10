@@ -161,7 +161,7 @@ void Force_sp::compute_step2(ArrOfDouble& process_flt)
               kappa[1] = - kmax + (m)*(2*kmax)/(2*nm);
               kappa[2] = - kmax + (n)*(2*kmax)/(2*nn);
 
-              if (abs(kappa[0])<kmin && abs(kappa[1])<kmin && abs(kappa[2])<kmin)
+              if (std::fabs(kappa[0])<kmin && std::fabs(kappa[1])<kmin && std::fabs(kappa[2])<kmin)
                 {
                   /* Le nombre d'onde est trop petit pour etre dans le domaine force*/
                   for (int cpx=0; cpx<2; cpx++)
@@ -225,7 +225,7 @@ void Force_sp::field_advection(const ArrOfDouble& advection_length, const double
                   kappa[1] = - kmax + (m)*(2*kmax)/(2*nm);
                   kappa[2] = - kmax + (n)*(2*kmax)/(2*nn);
 
-                  if (!(abs(kappa[0])<kmin && abs(kappa[1])<kmin && abs(kappa[2])<kmin))
+                  if (!(std::fabs(kappa[0])<kmin && std::fabs(kappa[1])<kmin && std::fabs(kappa[2])<kmin))
                     {
                       /* Le nombre d'onde est dans le domaine force*/
 
