@@ -103,9 +103,6 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
 
             }
         }
-
-
-
     }
   vit_som_bord_ALE.echange_espace_virtuel();
 }

@@ -52,8 +52,10 @@ Beam_model::Beam_model()
   activate_=false;
   timeScheme_=true;
   temps_ =0.;
-  output_position_.resize(0);
-  output_position_=0.;
+  output_position_1D_.resize(0);
+  output_position_1D_=0.;
+  output_position_3D_.resize(0);
+  output_position_3D_=0.;
 }
 Beam_model::~Beam_model()
 {
@@ -279,7 +281,8 @@ DoubleVect& Beam_model::NewmarkSchemeFD (const double& dt, const DoubleVect& flu
 
 
   saveBeamForRestart(fluidForce);
-  if(output_position_.size()>0) printOutputPosition();
+  if(output_position_1D_.size()>0) printOutputPosition1D();
+  if(output_position_3D_.size()>0) printOutputPosition3D();
 
   return qSpeed_;
 }
@@ -299,7 +302,8 @@ DoubleVect& Beam_model::NewmarkSchemeMA (const double& dt, const DoubleVect& flu
     }
 
   saveBeamForRestart(fluidForce);
-  if(output_position_.size()>0) printOutputPosition();
+  if(output_position_1D_.size()>0) printOutputPosition1D();
+  if(output_position_3D_.size()>0) printOutputPosition3D();
 
   return qSpeed_;
 }
@@ -489,12 +493,12 @@ void Beam_model::saveBeamForRestart(const DoubleVect& fluidForce) const
     }
 
 }
-void Beam_model::printOutputPosition() const
+void Beam_model::printOutputPosition1D() const
 {
 
   if (je_suis_maitre())
     {
-      int nb_output_points= output_position_.size();
+      int nb_output_points= output_position_1D_.size();
       DoubleTab displacement(nb_output_points,3);
       DoubleTab velocity(nb_output_points,3);
       DoubleTab acceleration(nb_output_points,3);
@@ -504,13 +508,13 @@ void Beam_model::printOutputPosition() const
       for(int j=0; j < nbModes_; j++)
         {
           const DoubleTab& u=u_(j);
-          for(int k=0; k<output_position_.size(); k++)
+          for(int k=0; k<nb_output_points; k++)
             {
               for(int i=0; i<3; i++)
                 {
-                  displacement(k, i) += qDisplacement_[j]*u(output_position_[k],i);
-                  velocity(k, i) += qSpeed_[j]*u(output_position_[k],i);
-                  acceleration(k, i) += qAcceleration_[j]*u(output_position_[k],i);
+                  displacement(k, i) += qDisplacement_[j]*u(output_position_1D_[k],i);
+                  velocity(k, i) += qSpeed_[j]*u(output_position_1D_[k],i);
+                  acceleration(k, i) += qAcceleration_[j]*u(output_position_1D_[k],i);
                 }
             }
         }
@@ -523,7 +527,7 @@ void Beam_model::printOutputPosition() const
       ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
 
       ofs_1<<temps_<<" ";
-      for(int k=0; k<output_position_.size(); k++)
+      for(int k=0; k<nb_output_points; k++)
         {
           for(int i=0; i<3; i++)
             {
@@ -534,7 +538,7 @@ void Beam_model::printOutputPosition() const
       ofs_1.close();
 
       ofs_2<<temps_<<" ";
-      for(int k=0; k<output_position_.size(); k++)
+      for(int k=0; k<nb_output_points; k++)
         {
           for(int i=0; i<3; i++)
             {
@@ -545,7 +549,77 @@ void Beam_model::printOutputPosition() const
       ofs_2.close();
 
       ofs_3<<temps_<<" ";
-      for(int k=0; k<output_position_.size(); k++)
+      for(int k=0; k<nb_output_points; k++)
+        {
+          for(int i=0; i<3; i++)
+            {
+              ofs_3<< acceleration(k, i)<<" ";
+            }
+        }
+      ofs_3<<endl;
+      ofs_3.close();
+
+    }
+}
+void Beam_model::printOutputPosition3D() const
+{
+
+  if (je_suis_maitre())
+    {
+      int nb_output_points= output_position_3D_.dimension(0);
+      DoubleTab displacement(nb_output_points,3);
+      DoubleTab velocity(nb_output_points,3);
+      DoubleTab acceleration(nb_output_points,3);
+      displacement=0.;
+      velocity=0.;
+      acceleration=0.;
+      DoubleVect phi3D(3);
+      for(int j=0; j < nbModes_; j++)
+        {
+          const DoubleTab& u=u_(j);
+          const DoubleTab& R=R_(j);
+          for(int k=0; k<nb_output_points; k++)
+            {
+              phi3D=interpolationOnThe3DSurface(output_position_3D_(k,0),output_position_3D_(k,1),output_position_3D_(k,2), u, R);
+              for(int i=0; i<3; i++)
+                {
+                  displacement(k, i) += qDisplacement_[j]*phi3D[i];
+                  velocity(k, i) += qSpeed_[j]*phi3D[i];
+                  acceleration(k, i) += qAcceleration_[j]*phi3D[i];
+                }
+            }
+        }
+      std::ofstream ofs_1;
+      ofs_1.open ("BeamDisplacement3D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_2;
+      ofs_2.open ("BeamVelocity3D.txt", std::ofstream::out | std::ofstream::app);
+      std::ofstream ofs_3;
+      ofs_3.open ("BeamAcceleration3D.txt", std::ofstream::out | std::ofstream::app);
+
+      ofs_1<<temps_<<" ";
+      for(int k=0; k<nb_output_points; k++)
+        {
+          for(int i=0; i<3; i++)
+            {
+              ofs_1<< displacement(k, i)<<" ";
+            }
+        }
+      ofs_1<<endl;
+      ofs_1.close();
+
+      ofs_2<<temps_<<" ";
+      for(int k=0; k<nb_output_points; k++)
+        {
+          for(int i=0; i<3; i++)
+            {
+              ofs_2<< velocity(k, i)<<" ";
+            }
+        }
+      ofs_2<<endl;
+      ofs_2.close();
+
+      ofs_3<<temps_<<" ";
+      for(int k=0; k<nb_output_points; k++)
         {
           for(int i=0; i<3; i++)
             {

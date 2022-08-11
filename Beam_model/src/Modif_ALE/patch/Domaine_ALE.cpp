@@ -797,8 +797,10 @@ void Domaine_ALE::reading_beam_model(Entree& is)
   Nom Restart_file_name="none";
   int var_int;
   int nb_modes;
-  int nb_output_points=0;
-  DoubleVect output_position(nb_output_points);
+  int nb_output_points_1D=0;
+  DoubleVect output_position_1D(nb_output_points_1D);
+  int nb_output_points_3D=0;
+  DoubleTab output_position_3D(nb_output_points_3D,0);
   double var_double;
   is >> motlu;
   if (motlu != accolade_ouverte)
@@ -881,18 +883,35 @@ void Domaine_ALE::reading_beam_model(Entree& is)
 
           beam->setTimeScheme(scheme);
         }
-      if(motlu=="Output_position")
+      if(motlu=="Output_position_1D")
         {
-          is>>nb_output_points;
-          output_position.resize(nb_output_points);
+          Cerr << "Beam Output_position_1D "<< finl;
+          is>>nb_output_points_1D;
+          output_position_1D.resize(nb_output_points_1D);
           double poz;
-          for (int i=0; i< nb_output_points; i ++)
+          for (int i=0; i< nb_output_points_1D; i ++)
             {
               is >>poz;
-              output_position[i]=poz;
+              output_position_1D[i]=poz;
             }
 
-          beam->setOutputPosition(output_position);
+          beam->setOutputPosition1D(output_position_1D);
+        }
+      if(motlu=="Output_position_3D")
+        {
+          Cerr << "Beam Output_position_3D "<< finl;
+          is>>nb_output_points_3D;
+          output_position_3D.resize(nb_output_points_3D, 3);
+          double poz=0.;
+          for (int i=0; i< nb_output_points_3D; i ++)
+            {
+              for (int j=0; j< 3; j ++)
+                {
+                  is >>poz;
+                  output_position_3D(i,j)=poz;
+                }
+            }
+          beam->setOutputPosition3D(output_position_3D);
         }
       if (motlu=="Restart_file_name")
         {
@@ -933,7 +952,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
         }
       else
         {
-          Cerr<< "ERROR: Unable to open the file." <<Restart_file_name<<finl;
+          Cerr<< "ERROR: Unable to open the file " <<Restart_file_name<<finl;
         }
     }
   else
@@ -942,6 +961,9 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       std::remove("BeamDisplacement1D.txt");
       std::remove("BeamVelocity1D.txt");
       std::remove("BeamAcceleration1D.txt");
+      std::remove("BeamDisplacement3D.txt");
+      std::remove("BeamVelocity3D.txt");
+      std::remove("BeamAcceleration3D.txt");
       std::remove("ModalForceFluide1D.txt");
       //end delete old files
 
@@ -954,7 +976,7 @@ void Domaine_ALE::reading_beam_model(Entree& is)
       ofs.close();
       //end prepare the headers of the output file ModalForceFluide1D
 
-      if(nb_output_points>0)
+      if(nb_output_points_1D>0)
         {
           // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
           std::ofstream ofs_1;
@@ -965,26 +987,62 @@ void Domaine_ALE::reading_beam_model(Entree& is)
           ofs_3.open ("BeamAcceleration1D.txt", std::ofstream::out | std::ofstream::app);
 
           ofs_1<<"# Printing Beam 1D displacement: time  values of x y z -component at points ";
-          for(int k=0; k<nb_output_points; k++)
+          for(int k=0; k<nb_output_points_1D; k++)
             {
-              ofs_1<<output_position[k]<<" ";
+              ofs_1<<output_position_1D[k]<<" ";
             }
           ofs_1<<endl;
           ofs_1.close();
 
           ofs_2<<"# Printing Beam 1D velocity: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points; k++)
+          for(int k=0; k<nb_output_points_1D; k++)
             {
-              ofs_2<<output_position[k]<<" ";
+              ofs_2<<output_position_1D[k]<<" ";
             }
           ofs_2<<endl;
           ofs_2.close();
 
 
           ofs_3<<"# Printing Beam 1D acceleration: time values of x y z -component at points ";
-          for(int k=0; k<nb_output_points; k++)
+          for(int k=0; k<nb_output_points_1D; k++)
             {
-              ofs_3<<output_position[k]<<" ";
+              ofs_3<<output_position_1D[k]<<" ";
+            }
+          ofs_3<<endl;
+          ofs_3.close();
+          //end prepare the headers
+        }
+      if(nb_output_points_3D>0)
+        {
+          // prepare the headers of the output files of the displacement, velocity and accelerations of the beam
+          std::ofstream ofs_1;
+          ofs_1.open ("BeamDisplacement3D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_2;
+          ofs_2.open ("BeamVelocity3D.txt", std::ofstream::out | std::ofstream::app);
+          std::ofstream ofs_3;
+          ofs_3.open ("BeamAcceleration3D.txt", std::ofstream::out | std::ofstream::app);
+
+          ofs_1<<"# Printing Beam 3D displacement: time  values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_3D; k++)
+            {
+              ofs_1<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
+            }
+          ofs_1<<endl;
+          ofs_1.close();
+
+          ofs_2<<"# Printing Beam 3D velocity: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_3D; k++)
+            {
+              ofs_2<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
+            }
+          ofs_2<<endl;
+          ofs_2.close();
+
+
+          ofs_3<<"# Printing Beam 3D acceleration: time values of x y z -component at points ";
+          for(int k=0; k<nb_output_points_3D; k++)
+            {
+              ofs_3<<"("<< output_position_3D(k, 0)<<", "<<output_position_3D(k, 1)<<", "<<output_position_3D(k, 2)<<") ";
             }
           ofs_3<<endl;
           ofs_3.close();
@@ -1012,7 +1070,7 @@ double Domaine_ALE::computeDtBeam(Domaine_dis& le_domaine_dis)
   minSurf = Process::mp_min(minSurf);
   //Cerr << " Surface min: "<< minSurf << endl;
   double soundSpeed=beam->soundSpeed();
-  //Cerr << " soundSpeed: "<< soundSpeed << endl;
+  //Cerr << "soundSpeed: "<< soundSpeed << endl;
   dt = 0.5*(minSurf/soundSpeed);
   return dt;
 }

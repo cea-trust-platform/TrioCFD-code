@@ -63,7 +63,8 @@ public :
   inline void setActivate(const bool&) ;
   inline const bool& getTimeScheme() const;
   inline void setTimeScheme(const bool&) ;
-  inline void setOutputPosition(const DoubleVect&) ;
+  inline void setOutputPosition1D(const DoubleVect&) ;
+  inline void setOutputPosition3D(const DoubleTab&) ;
   void readInputMassStiffnessFiles (Nom& masse_and_stiffness_file_name);
   void readInputAbscFiles (Nom& absc_file_name);
   void readInputModalDeformation(Noms& modal_deformation_file_name);
@@ -81,7 +82,8 @@ public :
   inline  const DoubleTab& getDisplacement(int i) const;
   inline  const DoubleTab& getRotation(int i) const;
   void saveBeamForRestart(const DoubleVect&) const;
-  void printOutputPosition() const;
+  void printOutputPosition1D() const;
+  void printOutputPosition3D() const;
 
 protected :
   int nbModes_;
@@ -102,7 +104,8 @@ protected :
   bool timeScheme_;
   //DoubleTab phi3D_;
   double temps_;
-  DoubleTab output_position_;
+  DoubleVect output_position_1D_;
+  DoubleTab output_position_3D_;
 
 };
 inline const int& Beam_model::getNbModes() const
@@ -186,9 +189,14 @@ const DoubleTab& Beam_model::getRotation(int i) const
 
 }
 
-void Beam_model::setOutputPosition(const DoubleVect& pos)
+void Beam_model::setOutputPosition1D(const DoubleVect& pos)
 {
-  output_position_=pos;
+  output_position_1D_=pos;
+
+}
+void Beam_model::setOutputPosition3D(const DoubleTab& pos)
+{
+  output_position_3D_=pos;
 
 }
 
