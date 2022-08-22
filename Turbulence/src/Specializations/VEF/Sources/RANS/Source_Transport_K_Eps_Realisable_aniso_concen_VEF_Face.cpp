@@ -20,187 +20,39 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face.h>
-#include <Convection_Diffusion_Temperature.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Modele_turbulence_scal_base.h>
-#include <Fluide_base.h>
-#include <Probleme_base.h>
-#include <Champ_Uniforme.h>
-#include <Zone_VEF.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable.h>
-#include <Champ_P1NC.h>
-#include <Debog.h>
-#include <TRUSTTrav.h>
-#include <Fluide_Quasi_Compressible.h>
-#include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Pb_Hydraulique_Turbulent.h>
-#include <Pb_Hydraulique_Concentration_Turbulent.h>
-#include <Pb_Thermohydraulique_Turbulent_QC.h>
-#include <Pb_Thermohydraulique_Turbulent.h>
-#include <Pb_Thermohydraulique_Concentration_Turbulent.h>
-#include <Constituant.h>
+#include <Zone_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face,"Source_Transport_K_Eps_Realisable_aniso_concen_VEF_P1NC",Source_Transport_K_Eps_Realisable_VEF_Face);
 
-Sortie& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::printOn(Sortie& s) const
-{
-  return s << que_suis_je() ;
-}
-
-
-
-
-Entree& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::readOn(Entree& is)
-{
-  Motcle accolade_ouverte("{");
-  Motcle accolade_fermee("}");
-  Motcle motlu;
-
-  is >> motlu;
-  if (motlu != accolade_ouverte)
-    {
-      Cerr << "On attendait { pour commencer a lire les constantes de Source_Transport_K_Eps_Realisable_aniso_concen (peut-estre choisi automatiquement en raison de la nature du probleme)" << finl;
-      exit();
-    }
-  Cerr << "Lecture des constantes de Source_Transport_K_Eps_Realisable_aniso_concen (peut-estre choisi automatiquement en raison de la nature du probleme)" << finl;
-  Motcles les_mots(2);
-  {
-    les_mots[0] = "C2_eps";
-    les_mots[1] = "C3_eps";
-  }
-  is >> motlu;
-  while (motlu != accolade_fermee)
-    {
-      int rang=les_mots.search(motlu);
-      switch(rang)
-        {
-        case 0 :
-          {
-            is >> C2;
-            break;
-          }
-        case 1 :
-          {
-            is >> C3_;
-            break;
-          }
-        default :
-          {
-            Cerr << "On ne comprend pas le mot cle : " << motlu << "dans Source_Transport_K_Eps_Realisable_aniso_concen (peut-estre choisi automatiquement en raison de la nature du probleme)" << finl;
-            exit();
-          }
-        }
-
-      is >> motlu;
-    }
-  return is;
-}
-
-
-
-
+Sortie& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Entree& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::readOn(Entree& is) { return Source_Transport_Realisable_VEF_Face_base::readOn_concen_real(is); }
 
 void Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::associer_pb(const Probleme_base& pb)
 {
-  if (pb.nombre_d_equations()<2)
-    {
-      Cerr<<"The K_Eps_Realisable source term "<<que_suis_je()<<" cannot be activated"<<finl;
-      Cerr<<"for a "<<pb.que_suis_je()<<" problem."<<finl;
-    }
-
-  const Equation_base& eqn = pb.equation(1);
-  const Milieu_base& milieu = pb.equation(0).milieu();
-  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
-
-  if (sub_type(Fluide_Quasi_Compressible,fluide))
-    {
-      Cerr<<"The K_Eps_Realisable source term "<<que_suis_je()<<" cannot be activated"<<finl;
-      Cerr<<"with a "<<milieu.que_suis_je()<<" medium."<<finl;
-      exit();
-    }
-
+  Source_Transport_K_Eps_Realisable_VEF_Face::verifier_milieu_concen(pb,que_suis_je());
   Source_Transport_K_Eps_Realisable_VEF_Face::associer_pb(pb);
-
-  const Convection_Diffusion_Concentration& eqn_c = ref_cast(Convection_Diffusion_Concentration,eqn);
-  eq_concentration = eqn_c;
-  if (!fluide.beta_c().non_nul())
-    {
-      Cerr << "You forgot to define beta_co field in the fluid." << finl;
-      Cerr << "It is mandatory when using the K-Eps model (buoyancy effects)." << finl;
-      Cerr << "If you don't want buoyancy effects, then specify: beta_co champ_uniforme 1 0." << finl;
-      exit();
-    }
-  beta_c = fluide.beta_c();
-  gravite = fluide.gravite();
-}
-
-
-
-
-
-DoubleTab& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::calculer(DoubleTab& resu) const
-{
-  resu = 0;
-  return ajouter(resu);
+  Source_Transport_K_Eps_Realisable_VEF_Face::associer_pb_concen(pb);
 }
 
 DoubleTab& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::ajouter(DoubleTab& resu) const
 {
   Source_Transport_K_Eps_Realisable_VEF_Face::ajouter(resu);
-  //
-  // Plutost que de calculer P, on appelle Source_Transport_K_Eps_Realisable_VEF_Face::ajouter(resu)
-  // et on ajoute directement G
-  // On en profite pour faire des tests sur LeK_MIN
-  //
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zcl_VEF_co = ref_cast(Zone_Cl_VEF,eq_concentration->zone_Cl_dis().valeur());
-  const DoubleTab& K_eps = eqn_keps_Rea->inconnue().valeurs();
-  const DoubleTab& concen = eq_concentration->inconnue().valeurs();
-  const Modele_turbulence_scal_base& le_modele_scalaire =
-    ref_cast(Modele_turbulence_scal_base,eq_concentration->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
-  const DoubleVect& g = gravite->valeurs();
-  const Champ_Don& ch_beta_concen = beta_c.valeur();
-
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
-  int nb_face = zone_VEF.nb_faces();
-
-  DoubleTrav G(nb_face);
-
-  int nb_consti = eq_concentration->constituant().nb_constituants();
-
-  calculer_terme_destruction_K_gen(zone_VEF,zcl_VEF_co,G,concen,alpha_turb,ch_beta_concen,g,nb_consti);
-
-  double C1_loc=1.44; // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
-  double C3_loc;
-  double LeK_MIN = eqn_keps_Rea->modele_turbulence().get_LeK_MIN() ;
-  for (int face=0; face<nb_face; face++)
-    {
-
-      resu(face,0) += G(face)*volumes_entrelaces(face);
-
-      if (K_eps(face,0) >= LeK_MIN)
-        {
-          C3_loc = C3_ ;
-          if ( G(face) > 0.) C3_loc = 0 ;
-          resu(face,1) += C1_loc*(1-C3_loc)*G(face)*volumes_entrelaces(face)
-                          *K_eps(face,1)/K_eps(face,0);
-
-        }
-    }
-  return resu;
+  return Source_Transport_K_Eps_Realisable_VEF_Face::ajouter_concen(resu);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+void Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::fill_resu_concen(const DoubleTrav& G, const DoubleVect& volumes_entrelaces, DoubleTab& resu) const
+{
+  const DoubleTab& K_eps = eqn_keps_Rea->inconnue().valeurs();
+  // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
+  double C3_loc, C1_loc = C1__, LeK_MIN = eqn_keps_Rea->modele_turbulence().get_LeK_MIN();
+  for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
+    {
+      resu(face, 0) += G(face) * volumes_entrelaces(face);
+      if (K_eps(face, 0) >= LeK_MIN)
+        {
+          C3_loc = G(face) > 0. ? 0. : C3;
+          resu(face, 1) += C1_loc * (1 - C3_loc) * G(face) * volumes_entrelaces(face) * K_eps(face, 1) / K_eps(face, 0);
+        }
+    }
+}

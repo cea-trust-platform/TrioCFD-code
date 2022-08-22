@@ -259,6 +259,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
   const DoubleTab& concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_concentration->get_modele(TURBULENCE).valeur());
   const DoubleTab& lambda_turb = le_modele_scalaire.conductivite_turbulente().valeurs();
+//  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(); // XXX : realisable utilise ca ???? a voir
   const DoubleVect& g = gravite->valeurs();
   const Champ_Don& ch_beta_concen = beta_c.valeur();
   const DoubleVect& volumes_entrelaces = la_zone_VEF->volumes_entrelaces();
