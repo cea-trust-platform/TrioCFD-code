@@ -45,7 +45,7 @@ void Source_Transport_Eps_Realisable_anisotherme_VEF_Face::fill_resu_anisotherme
 {
   const DoubleTab& K = eqn_k_Rea->inconnue().valeurs(), &eps = eqn_eps_Rea->inconnue().valeurs();
   // C1 value is not a constant in Realizable K-Epsilon model but here, we take the default value of C1 used in standard K-Epsilon, as proposed by litterature
-  double C3_loc, C1_loc = 1.44, LeK_MIN = eqn_k_Rea->modele_turbulence().get_LeK_MIN();
+  double C3_loc, C1_loc = C1__, LeK_MIN = eqn_k_Rea->modele_turbulence().get_LeK_MIN();
 
   for (int face = 0; face < la_zone_VEF->nb_faces(); face++)
     if (K(face) >= LeK_MIN)

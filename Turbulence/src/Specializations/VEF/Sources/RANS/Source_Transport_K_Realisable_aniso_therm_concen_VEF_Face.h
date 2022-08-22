@@ -24,50 +24,18 @@
 
 #include <Source_Transport_K_Realisable_VEF_Face.h>
 
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
 // CLASS: Source_Transport_K_Realisable_aniso_therm_concen_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport de k dans le cas ou les equations de
-// Navier_Stokes sont couplees a l'equation de convection diffusion
-// d'une concentration et a l'equation de la thermique
-// Les champs beta_t et beta_c sont uniformes
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Realisable_aniso_therm_concen_VEF_Face :
-  public Source_Transport_K_Realisable_VEF_Face
+// Cette classe represente le terme source qui figure dans l'equation de transport de k dans le cas ou les equations de
+// Navier_Stokes sont couplees a l'equation de convection diffusion d'une concentration et a l'equation de la thermique. Les champs beta_t et beta_c sont uniformes
+class Source_Transport_K_Realisable_aniso_therm_concen_VEF_Face : public Source_Transport_K_Realisable_VEF_Face
 {
-
   Declare_instanciable(Source_Transport_K_Realisable_aniso_therm_concen_VEF_Face);
-
 public:
-
   void associer_pb(const Probleme_base& ) override;
   DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
 
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Convection_Diffusion_Concentration) eq_concentration;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don) beta_c;
-  REF(Champ_Don_base) gravite;
-
+private:
+  void fill_resu_anisotherme_concen(const DoubleTrav& , const DoubleTrav& , const DoubleVect& , DoubleTab& ) const override;
 };
-
-
-
-
-
-
-
-
 
 #endif /* Source_Transport_K_Realisable_aniso_therm_concen_VEF_Face_included */

@@ -272,6 +272,7 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_concen(DoubleTab& resu) const
   return resu;
 }
 
+// TODO : FIXME : on peut factoriser avec les 2 methodes ajouter_anisotherme et ajouter_concen
 DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab& resu) const
 {
   // on ajoute directement G
@@ -279,6 +280,10 @@ DoubleTab& Source_Transport_VEF_Face_base::ajouter_anisotherme_concen(DoubleTab&
   const Zone_Cl_VEF& zcl_VEF_co = ref_cast(Zone_Cl_VEF, eq_concentration->zone_Cl_dis().valeur());
   const DoubleTab& temper = eq_thermique->inconnue().valeurs(), &concen = eq_concentration->inconnue().valeurs();
   const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
+
+  // XXX : Elie Saikali : vaut mieux utiliser diffusivite_turbulente au lie de faire ca ....
+  // voila dans Source_Transport_K_Eps_Realisable_aniso_therm_concen_VEF_Face
+  // const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
   DoubleTab alpha_turb(le_modele_scalaire.conductivite_turbulente().valeurs());
   double rhocp = eq_thermique->milieu().capacite_calorifique().valeurs()(0, 0) * eq_thermique->milieu().masse_volumique().valeurs()(0, 0);
   alpha_turb /= rhocp;
