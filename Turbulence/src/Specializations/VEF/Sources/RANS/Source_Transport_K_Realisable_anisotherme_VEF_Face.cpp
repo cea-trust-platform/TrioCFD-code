@@ -20,120 +20,28 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Transport_K_Realisable_anisotherme_VEF_Face.h>
-#include <Convection_Diffusion_Temperature.h>
-#include <Convection_Diffusion_Concentration.h>
-#include <Modele_turbulence_scal_base.h>
-#include <Fluide_base.h>
-#include <Probleme_base.h>
-#include <Champ_Uniforme.h>
-#include <Zone_VEF.h>
 #include <Modele_turbulence_hyd_K_Eps_Realisable_Bicephale.h>
-#include <Champ_P1NC.h>
-#include <Debog.h>
-#include <TRUSTTrav.h>
-#include <Fluide_Quasi_Compressible.h>
-#include <Modele_Shih_Zhu_Lumley_VEF.h>
-#include <Pb_Hydraulique_Turbulent.h>
-#include <Pb_Hydraulique_Concentration_Turbulent.h>
-#include <Pb_Thermohydraulique_Turbulent_QC.h>
-#include <Pb_Thermohydraulique_Turbulent.h>
-#include <Pb_Thermohydraulique_Concentration_Turbulent.h>
-#include <Constituant.h>
-#include <Param.h>
+#include <Zone_VEF.h>
 
 Implemente_instanciable(Source_Transport_K_Realisable_anisotherme_VEF_Face,"Source_Transport_K_Realisable_anisotherme_VEF_P1NC",Source_Transport_K_Realisable_VEF_Face);
 
-Sortie& Source_Transport_K_Realisable_anisotherme_VEF_Face::printOn(Sortie& s) const
-{
-  return s << que_suis_je() ;
-}
-
-Entree& Source_Transport_K_Realisable_anisotherme_VEF_Face::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.lire_avec_accolades(is);
-  return is ;
-}
-
-
-
+Sortie& Source_Transport_K_Realisable_anisotherme_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Entree& Source_Transport_K_Realisable_anisotherme_VEF_Face::readOn(Entree& is) { return Source_Transport_K_Realisable_VEF_Face::readOn_nothing(is); }
 
 void Source_Transport_K_Realisable_anisotherme_VEF_Face::associer_pb(const Probleme_base& pb)
 {
-  if (pb.nombre_d_equations()<2)
-    {
-      Cerr<<"The K_Eps_Realisable source term "<<que_suis_je()<<" cannot be activated"<<finl;
-      Cerr<<"for a "<<pb.que_suis_je()<<" problem."<<finl;
-    }
-  const Equation_base& eqn = pb.equation(1);
-  const Milieu_base& milieu = eqn.milieu();
-  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
-
-  if (sub_type(Fluide_Quasi_Compressible,fluide))
-    {
-      Cerr<<"The K_Eps_Realisable source term "<<que_suis_je()<<" cannot be activated"<<finl;
-      Cerr<<"with a "<<milieu.que_suis_je()<<" medium."<<finl;
-      exit();
-    }
+  Source_Transport_K_Realisable_VEF_Face::verifier_milieu_anisotherme(pb,que_suis_je());
   Source_Transport_K_Realisable_VEF_Face::associer_pb(pb);
-  const Convection_Diffusion_Temperature& eqn_th = ref_cast(Convection_Diffusion_Temperature,eqn);
-  eq_thermique = eqn_th;
-  beta_t=fluide.beta_t();
-  gravite = fluide.gravite();
+  Source_Transport_K_Realisable_VEF_Face::associer_pb_anisotherme(pb);
 }
 
-
-
-
-
-DoubleTab& Source_Transport_K_Realisable_anisotherme_VEF_Face::calculer(DoubleTab& resu) const
-{
-  resu=0;
-  return ajouter(resu);
-}
 DoubleTab& Source_Transport_K_Realisable_anisotherme_VEF_Face::ajouter(DoubleTab& resu) const
 {
   Source_Transport_K_Realisable_VEF_Face::ajouter(resu);
-  //
-  // Plutost que de calculer P, on appelle Source_Transport_K_Realisable_VEF_Face::ajouter(resu)
-  // et on ajoute directement G
-  //
-  const Zone_VEF& zone_VEF = la_zone_VEF.valeur();
-  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF,eq_thermique->zone_Cl_dis().valeur());
-  const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
-  const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs();
-  const DoubleTab& g = gravite->valeurs();
-  const Champ_Don& ch_beta = beta_t.valeur();
-  const DoubleVect& volumes_entrelaces = zone_VEF.volumes_entrelaces();
-
-  int nb_face = zone_VEF.nb_faces();
-  DoubleTrav G(nb_face);
-
-  // C'est l'objet de type zone_Cl_dis de l'equation thermique
-  // qui est utilise dans le calcul de G
-  calculer_terme_destruction_K_gen(zone_VEF,zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
-
-  for (int face=0; face<nb_face; face++)
-    {
-      resu(face) += G(face)*volumes_entrelaces(face);
-    }
-  return resu;
+  return Source_Transport_K_Realisable_VEF_Face::ajouter_anisotherme(resu);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void Source_Transport_K_Realisable_anisotherme_VEF_Face::fill_resu_anisotherme(const DoubleVect& G, const DoubleVect& volumes_entrelaces, DoubleTab& resu) const
+{
+  for (int face = 0; face < la_zone_VEF->nb_faces(); face++) resu(face) += G(face) * volumes_entrelaces(face);
+}

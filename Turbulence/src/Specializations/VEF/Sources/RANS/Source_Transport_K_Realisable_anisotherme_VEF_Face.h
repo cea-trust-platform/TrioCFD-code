@@ -24,49 +24,18 @@
 
 #include <Source_Transport_K_Realisable_VEF_Face.h>
 
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
 // CLASS: Source_Transport_K_Realisable_anisotherme_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport de k dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Realisable_anisotherme_VEF_Face :
-  public Source_Transport_K_Realisable_VEF_Face
+// Cette classe represente le terme source qui figure dans l'equation de transport de k dans le cas ou les equations de Navier_Stokes sont couplees a l'equation de la thermique
+// On suppose que le coefficient de variation de la masse volumique du fluide en fonction de ce scalaire est un coefficient uniforme.
+class Source_Transport_K_Realisable_anisotherme_VEF_Face : public Source_Transport_K_Realisable_VEF_Face
 {
-
   Declare_instanciable(Source_Transport_K_Realisable_anisotherme_VEF_Face);
-
 public:
-
   void associer_pb(const Probleme_base& ) override;
   DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
 
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
-
+private:
+  void fill_resu_anisotherme(const DoubleVect& , const DoubleVect& , DoubleTab& ) const override;
 };
-
-
-
-
-
-
-
-
-
-
-
 
 #endif /* Source_Transport_K_Realisable_anisotherme_VEF_Face_included */
