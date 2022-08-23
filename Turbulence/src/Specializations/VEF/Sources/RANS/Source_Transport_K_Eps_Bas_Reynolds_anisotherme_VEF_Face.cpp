@@ -20,123 +20,70 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face.h>
+#include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
 #include <Convection_Diffusion_Temperature.h>
 #include <Modele_turbulence_scal_base.h>
-#include <Fluide_base.h>
 #include <Probleme_base.h>
-#include <Champ_Uniforme.h>
-#include <Zone_VEF.h>
-#include <Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h>
-#include <Champ_P1NC.h>
-#include <Debog.h>
+#include <Zone_Cl_VEF.h>
+#include <Fluide_base.h>
 #include <TRUSTTrav.h>
-#include <Fluide_Quasi_Compressible.h>
+#include <Zone_VEF.h>
 
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face,"Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_P1NC",Source_Transport_K_Eps_Bas_Reynolds_VEF_Face);
 
-Sortie& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::printOn(Sortie& s) const
-{
-  return s << que_suis_je() ;
-}
-
-Entree& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::readOn(Entree& s)
-{
-  return s ;
-}
-
+Sortie& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je() ; }
+Entree& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::readOn(Entree& s) { return s ; }
 
 void Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::associer_pb(const Probleme_base& pb)
 {
-  if (pb.nombre_d_equations()<2)
-    {
-      Cerr<<"The K_Eps source term "<<que_suis_je()<<" cannot be activated"<<finl;
-      Cerr<<"for a "<<pb.que_suis_je()<<" problem."<<finl;
-    }
-  const Equation_base& eqn = pb.equation(1);
-  const Milieu_base& milieu = eqn.milieu();
-  const Fluide_base& fluide = ref_cast(Fluide_base,milieu);
-
-  if (sub_type(Fluide_Quasi_Compressible,fluide))
-    {
-      Cerr<<"The K_Eps source term "<<que_suis_je()<<" cannot be activated"<<finl;
-      Cerr<<"with a "<<milieu.que_suis_je()<<" medium."<<finl;
-      exit();
-    }
+  Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::verifier_milieu_anisotherme(pb,que_suis_je());
   Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::associer_pb(pb);
-
   //correction pour quasi compressible : on utilise pas l'eq_thermique en fait (ce erait une Convection_Diffusion_Enthalpie_Turbulent sinon)
   if (sub_type(Convection_Diffusion_Temperature,pb.equation(1)))
     {
-      const Convection_Diffusion_Temperature& eqn_th = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
-      eq_thermique = eqn_th;
+      eq_thermique = ref_cast(Convection_Diffusion_Temperature,pb.equation(1));
       const Fluide_base& fluide_2 = eq_thermique->fluide();
-      if (fluide_2.beta_t().non_nul())
-        beta_t = fluide_2.beta_t();
+      if (fluide_2.beta_t().non_nul()) beta_t = fluide_2.beta_t();
       gravite = fluide_2.gravite();
     }
-  else
-    {
-      gravite = pb.equation(0).milieu().gravite();
-    }
+  else gravite = pb.equation(0).milieu().gravite();
 }
 
-
+// Elie Saikali : TODO : FIXME : a factoriser avec Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::ajouter
 DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(DoubleTab& resu) const
 {
   const Zone_Cl_dis& zcl = eq_hydraulique->zone_Cl_dis();
   const Zone_Cl_dis& zcl_keps = eqn_keps_bas_re->zone_Cl_dis();
-  const Zone_dis& zone_dis_keps = eqn_keps_bas_re ->zone_dis();
-  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF,eq_hydraulique->zone_dis().valeur());
-  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF,zcl.valeur());
-  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF,eq_thermique->zone_Cl_dis().valeur());
+  const Zone_dis& zone_dis_keps = eqn_keps_bas_re->zone_dis();
+  const Zone_VEF& zone_VEF = ref_cast(Zone_VEF, eq_hydraulique->zone_dis().valeur());
+  const Zone_Cl_VEF& zone_Cl_VEF = ref_cast(Zone_Cl_VEF, zcl.valeur());
+  const Zone_Cl_VEF& zcl_VEF_th = ref_cast(Zone_Cl_VEF, eq_thermique->zone_Cl_dis().valeur());
   const DoubleTab& K_eps_Bas_Re = eqn_keps_bas_re->inconnue().valeurs();
   const DoubleTab& scalaire = eq_thermique->inconnue().valeurs();
   const DoubleTab& vit = eq_hydraulique->inconnue().valeurs();
   const DoubleTab& visco_turb = eqn_keps_bas_re->modele_turbulence().viscosite_turbulente().valeurs();
-  const Modele_turbulence_scal_base& le_modele_scalaire =
-    ref_cast(Modele_turbulence_scal_base,eq_thermique->get_modele(TURBULENCE).valeur());
-  const DoubleTab& alpha_turb =        le_modele_scalaire.diffusivite_turbulente().valeurs();
-  const DoubleTab& g = gravite->valeurs();
+  const Modele_turbulence_scal_base& le_modele_scalaire = ref_cast(Modele_turbulence_scal_base, eq_thermique->get_modele(TURBULENCE).valeur());
+  const DoubleTab& alpha_turb = le_modele_scalaire.diffusivite_turbulente().valeurs(), &g = gravite->valeurs();
   const Champ_Don& ch_beta = beta_t.valeur();
-  const Fluide_base& fluide = ref_cast(Fluide_base,eq_hydraulique->milieu());
+  const Fluide_base& fluide = ref_cast(Fluide_base, eq_hydraulique->milieu());
   const Champ_Don& ch_visco_cin = fluide.viscosite_cinematique();
-  /*
-    const DoubleTab& tab_visco = ch_visco_cin->valeurs();
-    double visco;
-    if (sub_type(Champ_Uniforme,ch_visco_cin.valeur()))
-    {
-    visco = std::max(tab_visco(0,0),DMINFLOAT);
-    }
-    else {visco=-1;assert(0);exit();}
-  */
-  const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds,eqn_keps_bas_re->modele_turbulence());
+  const Modele_turbulence_hyd_K_Eps_Bas_Reynolds& mod_turb = ref_cast(Modele_turbulence_hyd_K_Eps_Bas_Reynolds, eqn_keps_bas_re->modele_turbulence());
   const Modele_Fonc_Bas_Reynolds& mon_modele_fonc = mod_turb.associe_modele_fonction();
   int nb_faces = zone_VEF.nb_faces();
   const DoubleVect& vol_ent = zone_VEF.volumes_entrelaces();
 
-  DoubleTrav P(nb_faces);
-  DoubleTrav G(nb_faces);
-  DoubleTrav G1(nb_faces);
-  DoubleTrav D(nb_faces);
-  DoubleTrav E(nb_faces);
-  DoubleTrav F1(nb_faces);
-  DoubleTrav F2(nb_faces);
+  DoubleTrav P(nb_faces), G(nb_faces), G1(nb_faces), D(nb_faces), E(nb_faces), F1(nb_faces), F2(nb_faces);
 
   mon_modele_fonc.Calcul_D(D,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin);
   mon_modele_fonc.Calcul_E(E,zone_dis_keps,zcl_keps,vit,K_eps_Bas_Re,ch_visco_cin,visco_turb);
-  //mon_modele_fonc.Calcul_F1(F1,zone_dis_keps);
   mon_modele_fonc.Calcul_F2(F2,D,zone_dis_keps,K_eps_Bas_Re,ch_visco_cin);
 
   calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb);
-  //  calculer_terme_production_K(zone_VEF,zone_Cl_VEF,P,K_eps_Bas_Re,vit,visco_turb,ch);
 
-  // C'est l'objet de type zone_Cl_dis de l'equation thermique
-  // qui est utilise dans le calcul de G
-
+  // C'est l'objet de type zone_Cl_dis de l'equation thermique qui est utilise dans le calcul de G
   // Nous utilisons le modele de fluctuation thermique pour le calcul du terme de destruction G.
   calculer_terme_destruction_K_gen(zone_VEF,zcl_VEF_th,G,scalaire,alpha_turb,ch_beta,g,0);
 
-  // Ajout des termes sources
   for (int num_face=0; num_face<nb_faces; num_face++)
     {
       resu(num_face,0) += (P(num_face)-K_eps_Bas_Re(num_face,1)-D(num_face))*vol_ent(num_face);
@@ -152,12 +99,3 @@ DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::ajouter(Dou
 
   return resu;
 }
-
-DoubleTab& Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::calculer(DoubleTab& resu) const
-{
-
-  resu = 0.;
-  return ajouter(resu);
-
-}
-

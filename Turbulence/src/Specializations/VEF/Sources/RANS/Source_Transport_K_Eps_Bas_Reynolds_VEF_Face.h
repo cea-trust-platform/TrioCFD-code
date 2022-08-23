@@ -19,74 +19,28 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef Source_Transport_K_Eps_Bas_Reynolds_VEF_Face_included
 #define Source_Transport_K_Eps_Bas_Reynolds_VEF_Face_included
 
-
-#define C11_DEFAULT 1.55   // Valeurs par defaut des constantes qui interviennent
-#define C21_DEFAULT 2.   // dans l'equation de k_esp
-
-//
-// .DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_VEF_Face
-//
-// .SECTION voir aussi
-
-#include <Source_Transport_K_Eps_VEF_Face.h>
-#include <Ref_Zone_Cl_VEF.h>
-#include <Ref_Transport_Flux_Chaleur_Turbulente.h>
-#include <Modele_Fonc_Bas_Reynolds.h>
-#include <Ref_Zone_dis.h>
-#include <Zone_Cl_dis.h>
 #include <Ref_Transport_K_Eps_Bas_Reynolds.h>
+#include <Source_Transport_VEF_Face_base.h>
 
-class Probleme_base;
-class Champ_Don_base;
-#include <TRUSTTabs_forward.h>
-#include <TRUSTTabs_forward.h>
-class Champ_Face;
-
-class Source_Transport_K_Eps_Bas_Reynolds_VEF_Face : public Source_base,public Calcul_Production_K_VEF
-
-
+class Source_Transport_K_Eps_Bas_Reynolds_VEF_Face : public Source_Transport_VEF_Face_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_VEF_Face);
-
 public :
-
-  inline Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(double cte1 = C11_DEFAULT,
-                                                      double cte2 = C21_DEFAULT );
-  DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  void associer_pb(const Probleme_base& ) override;
-  void mettre_a_jour(double temps) override
+  Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(double cte1 = C11__, double cte2 = C21__)
   {
-    Calcul_Production_K_VEF::mettre_a_jour(temps);
+    C1 = cte1;
+    C2 = cte2;
   }
 
+  DoubleTab& ajouter(DoubleTab& ) const override;
+  void associer_pb(const Probleme_base& ) override;
+
 protected :
-
-  void associer_zones(const Zone_dis& ,const Zone_Cl_dis& ) override;
-  double C1;
-  double C2;
-
-  REF(Zone_VEF) la_zone_VEF;
-  REF(Zone_Cl_VEF) la_zone_Cl_VEF;
+  static constexpr double C11__ = 1.55, C21__ = 2.0;
   REF(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
-  REF(Transport_Flux_Chaleur_Turbulente) eqn_flux_chaleur;
-  REF(Equation_base) eq_hydraulique;
-
 };
 
-
-
-inline Source_Transport_K_Eps_Bas_Reynolds_VEF_Face::
-Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(double cte1,double cte2)
-
-  : C1(cte1), C2(cte2) {}
-
-
-
-#endif
+#endif /* Source_Transport_K_Eps_Bas_Reynolds_VEF_Face_included */

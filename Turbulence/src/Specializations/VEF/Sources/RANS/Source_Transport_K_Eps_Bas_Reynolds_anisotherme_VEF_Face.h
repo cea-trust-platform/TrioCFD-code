@@ -24,53 +24,13 @@
 
 #include <Source_Transport_K_Eps_Bas_Reynolds_VEF_Face.h>
 
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
-//.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face
-//
-// Cette classe represente le terme source qui figure dans l'equation
-// de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique
-// On suppose que le coefficient de variation de la masse volumique
-// du fluide en fonction de ce scalaire est un coefficient uniforme.
-//
-//////////////////////////////////////////////////////////////////////////////
-
-class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face :
-  public Source_Transport_K_Eps_Bas_Reynolds_VEF_Face
+class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face : public Source_Transport_K_Eps_Bas_Reynolds_VEF_Face
 {
-
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face);
-
 public:
-
+  Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face(double cte1 = C11__, double cte2 = C21__) : Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(cte1, cte2) { }
   DoubleTab& ajouter(DoubleTab& ) const override;
-  DoubleTab& calculer(DoubleTab& ) const override;
   void associer_pb(const Probleme_base& ) override;
-  inline Modele_Fonc_Bas_Reynolds&  associe_modele_fonc();
-  inline const Modele_Fonc_Bas_Reynolds&  associe_modele_fonc() const;
-  inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face(double cte1 = C11_DEFAULT,
-                                                                  double cte2 = C21_DEFAULT );
-protected:
-
-  REF(Convection_Diffusion_Temperature) eq_thermique;
-  REF(Champ_Don) beta_t;
-  REF(Champ_Don_base) gravite;
 };
-
-
-
-
-inline Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face::
-Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face(double cte1 ,double cte2 )
-
-  : Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(cte1,cte2) {}
-
-
-
-
 
 #endif /* Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VEF_Face_included */
