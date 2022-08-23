@@ -22,9 +22,6 @@
 #ifndef Source_Transport_K_Realisable_VEF_Face_included
 #define Source_Transport_K_Realisable_VEF_Face_included
 
-#define C21_DEFAULT_KEPS_REALISABLE 1.9   //  Valeurs par defaut des constantes qui interviennent dans l'equation de k_esp
-#define C3_DEFAULT_KEPS_REALISABLE 1.0    // de transport de K et Eps source: Chabard de N3S
-
 #include <Source_Transport_Realisable_VEF_Face_base.h>
 #include <Ref_Transport_K_ou_Eps_Realisable.h>
 #include <Transport_K_ou_Eps_Realisable.h>

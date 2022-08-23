@@ -51,6 +51,4 @@ private:
   void fill_resu(const DoubleVect&, const DoubleTrav&, DoubleTab&) const override;
 };
 
-inline void error(const Nom& source, const Nom& problem) { Process::exit(); }
-
 #endif /* Source_Transport_K_VEF_Face_included */

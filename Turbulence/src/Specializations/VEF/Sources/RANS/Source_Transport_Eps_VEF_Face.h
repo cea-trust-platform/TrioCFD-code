@@ -22,10 +22,6 @@
 #ifndef Source_Transport_Eps_VEF_Face_included
 #define Source_Transport_Eps_VEF_Face_included
 
-#define C1_DEFAULT 1.44   // Valeurs par defaut des constantes qui interviennent
-#define C2_DEFAULT 1.92   // dans le calcul des termes sources des equations
-#define C3_DEFAULT 1.0    // de transport de K et Eps source: Chabard de N3S
-
 #include <Source_Transport_VEF_Face_base.h>
 #include <Ref_Transport_K_ou_Eps.h>
 
@@ -55,7 +51,5 @@ private:
   void fill_resu_bas_rey(const DoubleVect&, const DoubleTrav&, const DoubleTab&, const DoubleTab&, const DoubleTab&, const DoubleTab&, DoubleTab&) const override;
   void fill_resu(const DoubleVect&, const DoubleTrav&, DoubleTab&) const override;
 };
-
-inline void error(const Nom& source, const Nom& problem) { Process::exit(); }
 
 #endif /* Source_Transport_Eps_VEF_Face_included */

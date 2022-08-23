@@ -31,9 +31,7 @@ class Source_Transport_K_Eps_aniso_therm_concen_VEF_Face: public Source_Transpor
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_aniso_therm_concen_VEF_Face);
 public:
-  Source_Transport_K_Eps_aniso_therm_concen_VEF_Face(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) :
-    Source_Transport_K_Eps_VEF_Face(cte1,cte2) { C3 = cte3; }
-
+  Source_Transport_K_Eps_aniso_therm_concen_VEF_Face(double cte1 = C1__, double cte2 = C2__, double cte3 = C3__) : Source_Transport_K_Eps_VEF_Face(cte1,cte2) { C3 = cte3; }
   void associer_pb(const Probleme_base&) override;
   DoubleTab& ajouter(DoubleTab&) const override;
 
