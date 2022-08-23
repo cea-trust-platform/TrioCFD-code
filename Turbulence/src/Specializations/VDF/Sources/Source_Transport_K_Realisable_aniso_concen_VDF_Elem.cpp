@@ -24,7 +24,7 @@
 Implemente_instanciable(Source_Transport_K_Realisable_aniso_concen_VDF_Elem,"Source_Transport_K_Realisable_aniso_concen_VDF_P0_VDF",Source_Transport_K_Realisable_VDF_Elem);
 
 Sortie& Source_Transport_K_Realisable_aniso_concen_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je(); }
-Entree& Source_Transport_K_Realisable_aniso_concen_VDF_Elem::readOn(Entree& is) { return Source_Transport_K_Realisable_VDF_Elem::readOn_nothing(is); }
+Entree& Source_Transport_K_Realisable_aniso_concen_VDF_Elem::readOn(Entree& is) { return Source_Transport_K_Realisable_VDF_Elem::readOn_nothing(is,que_suis_je()); }
 
 void Source_Transport_K_Realisable_aniso_concen_VDF_Elem::associer_pb(const Probleme_base& pb)
 {

@@ -26,7 +26,7 @@
 Implemente_instanciable_sans_constructeur(Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face,"Source_Transport_K_Eps_Realisable_aniso_concen_VEF_P1NC",Source_Transport_K_Eps_Realisable_VEF_Face);
 
 Sortie& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::printOn(Sortie& s) const { return s << que_suis_je() ; }
-Entree& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::readOn(Entree& is) { return Source_Transport_Realisable_VEF_Face_base::readOn_concen_real(is); }
+Entree& Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::readOn(Entree& is) { return Source_Transport_Realisable_VEF_Face_base::readOn_concen_real(is,que_suis_je()); }
 
 void Source_Transport_K_Eps_Realisable_aniso_concen_VEF_Face::associer_pb(const Probleme_base& pb)
 {

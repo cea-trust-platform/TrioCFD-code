@@ -24,8 +24,6 @@
 
 #include <Source_Transport_VEF_Face_base.h>
 
-class Modele_Fonc_Realisable_base;
-
 class Source_Transport_Realisable_VEF_Face_base : public Source_Transport_VEF_Face_base
 {
   Declare_base_sans_constructeur(Source_Transport_Realisable_VEF_Face_base);
@@ -35,15 +33,7 @@ public :
   void contribuer_a_avec(const DoubleTab&, Matrice_Morse&) const override ;
 
 protected :
-  static constexpr double C21_R__ = 1.9, C3_R__ = 1.0 /* = C3__ */; // Chabard et N3S
-
   DoubleTab& ajouter_keps_real(DoubleTab& ) const;
-  // pour les classes anisotherme
-  Entree& readOn_anisotherme_real(Entree& is);
-  // pour les classes concen
-  Entree& readOn_concen_real(Entree& is);
-  // pour les classes anisotherme_concen
-  Entree& readOn_anisotherme_concen_real(Entree& is);
 
 private:
   // methodes a surcharger sinon throw !!

@@ -39,7 +39,6 @@ public :
   void associer_pb(const Probleme_base& ) override;
 
 protected :
-  static constexpr double C11__ = 1.55, C21__ = 2.0;
   REF(Transport_K_Eps_Bas_Reynolds) eqn_keps_bas_re;
 };
 

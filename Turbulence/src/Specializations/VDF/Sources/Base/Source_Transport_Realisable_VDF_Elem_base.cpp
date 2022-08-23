@@ -25,35 +25,11 @@
 #include <Fluide_base.h>
 #include <TRUSTTrav.h>
 #include <Champ_Face.h>
-#include <Param.h>
 
 Implemente_base_sans_constructeur(Source_Transport_Realisable_VDF_Elem_base, "Source_Transport_Realisable_VDF_Elem_base",Source_Transport_VDF_Elem_base) ;
 
 Sortie& Source_Transport_Realisable_VDF_Elem_base::printOn(Sortie& os) const { return os << que_suis_je(); }
-
-Entree& Source_Transport_Realisable_VDF_Elem_base::readOn(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("C2_eps", &C2);
-  param.lire_avec_accolades(is);
-  Cerr << "C2_eps = " << C2 << finl;
-  return is;
-}
-
-Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_anisotherme_real(Entree& is)
-{
-  Param param(que_suis_je());
-  param.ajouter("C2_eps", &C2);
-  param.ajouter("C3_eps", &C3);
-  param.lire_avec_accolades(is);
-  Cerr << "C2_eps = " << C2 << finl;
-  Cerr << "C3_eps = " << C3 << finl;
-  return is;
-}
-
-Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_concen_real(Entree& is) { return readOn_anisotherme_real(is); }
-
-Entree& Source_Transport_Realisable_VDF_Elem_base::readOn_anisotherme_concen_real(Entree& is) { return readOn_anisotherme_real(is); }
+Entree& Source_Transport_Realisable_VDF_Elem_base::readOn(Entree& is) { return Source_Transport_proto::readOn_real(is,que_suis_je()); }
 
 DoubleTab& Source_Transport_Realisable_VDF_Elem_base::ajouter_keps_real(DoubleTab& resu) const
 {

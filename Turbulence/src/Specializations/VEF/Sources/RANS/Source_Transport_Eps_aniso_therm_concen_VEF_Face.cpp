@@ -30,7 +30,7 @@ Sortie& Source_Transport_Eps_aniso_therm_concen_VEF_Face::printOn(Sortie& s) con
 Entree& Source_Transport_Eps_aniso_therm_concen_VEF_Face::readOn(Entree& is)
 {
   Source_Transport_Eps_VEF_Face::verifier_pb_keps_anisotherme_concen(mon_equation->probleme(), que_suis_je());
-  return Source_Transport_Eps_VEF_Face::readOn_anisotherme_concen(is);
+  return Source_Transport_Eps_VEF_Face::readOn_anisotherme_concen(is,que_suis_je());
 }
 
 void Source_Transport_Eps_aniso_therm_concen_VEF_Face::associer_pb(const Probleme_base& pb)

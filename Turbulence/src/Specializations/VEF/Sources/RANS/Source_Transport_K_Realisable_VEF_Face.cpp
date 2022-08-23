@@ -32,7 +32,7 @@ Implemente_instanciable(Source_Transport_K_Realisable_VEF_Face,"Source_Transport
 
 Sortie& Source_Transport_K_Realisable_VEF_Face::printOn(Sortie& s ) const { return s << que_suis_je() ; }
 
-Entree& Source_Transport_K_Realisable_VEF_Face::readOn(Entree& is ) { return Source_Transport_Realisable_VEF_Face_base::readOn_nothing(is); }
+Entree& Source_Transport_K_Realisable_VEF_Face::readOn(Entree& is ) { return Source_Transport_Realisable_VEF_Face_base::readOn_nothing(is,que_suis_je()); }
 
 void Source_Transport_K_Realisable_VEF_Face::associer_pb(const Probleme_base& pb)
 {

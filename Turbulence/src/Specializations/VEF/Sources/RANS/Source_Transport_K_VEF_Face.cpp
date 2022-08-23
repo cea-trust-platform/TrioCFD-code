@@ -31,7 +31,7 @@ Sortie& Source_Transport_K_VEF_Face::printOn(Sortie& s) const { return s << que_
 Entree& Source_Transport_K_VEF_Face::readOn(Entree& is)
 {
   Source_Transport_VEF_Face_base::verifier_pb_keps(mon_equation->probleme(),que_suis_je());
-  return Source_Transport_VEF_Face_base::readOn_nothing(is);
+  return Source_Transport_VEF_Face_base::readOn_nothing(is,que_suis_je());
 }
 
 void Source_Transport_K_VEF_Face::associer_pb(const Probleme_base& pb)
