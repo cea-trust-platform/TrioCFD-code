@@ -28,11 +28,7 @@ class Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem : public Source_Transport_B
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem);
 public :
-  Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_Bas_Reynolds_VDF_Elem_base(cte1,cte2) // TODO : FIXME : comprends pas ...
-  {
-    C1 = cte1;
-    C2 = cte2;
-  }
+  Source_Transport_K_Eps_Bas_Reynolds_W_VDF_Elem(double cte1 = C11__, double cte2 = C21__ ) : Source_Transport_Bas_Reynolds_VDF_Elem_base(cte1,cte2) { }
 
 private:
   void fill_resu_bas_reyn(const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , const DoubleTrav& , DoubleTab& ) const override;

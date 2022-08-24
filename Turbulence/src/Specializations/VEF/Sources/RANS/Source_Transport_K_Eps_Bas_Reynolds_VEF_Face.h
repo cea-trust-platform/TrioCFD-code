@@ -29,12 +29,7 @@ class Source_Transport_K_Eps_Bas_Reynolds_VEF_Face : public Source_Transport_VEF
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_VEF_Face);
 public :
-  Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(double cte1 = C11__, double cte2 = C21__)
-  {
-    C1 = cte1;
-    C2 = cte2;
-  }
-
+  Source_Transport_K_Eps_Bas_Reynolds_VEF_Face(double cte1 = C11__, double cte2 = C21__) : Source_Transport_VEF_Face_base(cte1,cte2) { }
   DoubleTab& ajouter(DoubleTab& ) const override;
   void associer_pb(const Probleme_base& ) override;
 

@@ -30,7 +30,7 @@ class Source_Transport_Eps_Realisable_VEF_Face : public Source_Transport_Realisa
 {
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_VEF_Face);
 public :
-  Source_Transport_Eps_Realisable_VEF_Face(double cte2 = C21_R__) : Source_Transport_Realisable_VEF_Face_base(cte2) { C2 = cte2; }
+  Source_Transport_Eps_Realisable_VEF_Face(double cte2 = C21_R__) : Source_Transport_Realisable_VEF_Face_base(cte2) { }
 
   DoubleTab& ajouter(DoubleTab& ) const override;
   void associer_pb(const Probleme_base& ) override;
