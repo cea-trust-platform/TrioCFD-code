@@ -110,6 +110,16 @@ double Cond_lim_tau_omega_simple_demi::h_imp(int i, int j) const
   return h_(i,j);
 }
 
+double Cond_lim_tau_omega_simple_demi::h_imp_grad(int i) const
+{
+  return h_grad_(i,0);
+}
+
+double Cond_lim_tau_omega_simple_demi::h_imp_grad(int i, int j) const
+{
+  return h_grad_(i,j);
+}
+
 void Cond_lim_tau_omega_simple_demi::mettre_a_jour(double tps)
 {
   if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
@@ -119,6 +129,9 @@ int Cond_lim_tau_omega_simple_demi::initialiser(double temps)
 {
   h_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
+
+  h_grad_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
 
   d_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(d_);
@@ -166,6 +179,7 @@ void Cond_lim_tau_omega_simple_demi::me_calculer()
 
           double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_zone, 0), y(f_zone, 0)/2.);
           h_(f, 0) = 2.*mu(e_zone, 0)/y(f_zone, 0) ;
+          h_grad_(f, 0) = 2./y(f_zone, 0) ;
           d_(f, 0) = calc_tau(y(f_zone, 0)/2., u_tau_demi, nu_visc(e_zone, 0));
         }
     }
@@ -185,11 +199,13 @@ void Cond_lim_tau_omega_simple_demi::me_calculer()
 
           double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_zone, 0), y(f_zone, 0)/2.);
           h_(f, 0) = 2.*mu(e_zone, 0)/y(f_zone, 0) ;
+          h_grad_(f, 0) = 2./y(f_zone, 0) ;
           d_(f, 0) = calc_omega(y(f_zone, 0)/2., u_tau_demi, nu_visc(e_zone, 0));
         }
     }
 
   h_.echange_espace_virtuel();
+  h_grad_.echange_espace_virtuel();
   d_.echange_espace_virtuel();
 }
 

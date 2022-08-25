@@ -64,6 +64,8 @@ public :
   inline virtual const Champ_front& h_imp() const override {Process::exit("Cond_lim_k_simple : You shouldn't go through h_imp ! ") ; return Echange_impose_base::h_imp();};
   double h_imp(int num) const override ;
   double h_imp(int num,int k) const override;
+  double h_imp_grad(int num) const override ;
+  double h_imp_grad(int num,int k) const override;
   double T_ext(int num) const override;
   double T_ext(int num,int k) const override;
 
@@ -77,6 +79,7 @@ protected :
   REF(Correlation) correlation_loi_paroi_;
   REF(Frontiere_dis_base) la_frontiere_dis;
   DoubleTab h_;
+  DoubleTab h_grad_;
   DoubleTab K_;
 
   double beta_k_ = 0.09;

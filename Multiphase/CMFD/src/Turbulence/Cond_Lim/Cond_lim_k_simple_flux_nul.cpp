@@ -77,6 +77,9 @@ int Cond_lim_k_simple_flux_nul::initialiser(double temps)
   h_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
 
+  h_grad_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
+
   K_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(K_);
 
@@ -108,6 +111,16 @@ double Cond_lim_k_simple_flux_nul::h_imp(int i, int j) const
   return h_(i,j);
 }
 
+double Cond_lim_k_simple_flux_nul::h_imp_grad(int i) const
+{
+  return h_grad_(i,0);
+}
+
+double Cond_lim_k_simple_flux_nul::h_imp_grad(int i, int j) const
+{
+  return h_grad_(i,j);
+}
+
 void Cond_lim_k_simple_flux_nul::mettre_a_jour(double tps)
 {
   if (mon_temps!=tps) {me_calculer() ; mon_temps=tps;}
@@ -134,7 +147,9 @@ void Cond_lim_k_simple_flux_nul::me_calculer()
       int e_zone = f_e(f_zone,0);
 
       h_(f, 0) = mu(e_zone, 0) / y(f_zone) * (1-std::tanh( std::pow(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)/10.,2))); // Coeff d'echange de mu/y ; /20 avant modif
+      h_grad_(f, 0) = 1. / y(f_zone) * (1-std::tanh( std::pow(y(f_zone, 0)*u_tau(f_zone, 0)/visc_c(e_zone, 0)/10.,2)));
     }
 
   h_.echange_espace_virtuel();
+  h_grad_.echange_espace_virtuel();
 }

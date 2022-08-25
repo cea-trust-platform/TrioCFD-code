@@ -68,6 +68,8 @@ public :
   inline virtual const Champ_front& h_imp() const override {Process::exit(que_suis_je() + " : You shouldn't go through h_imp ! ") ; return Echange_impose_base::h_imp();};
   double h_imp(int num) const override ;
   double h_imp(int num,int k) const override;
+  double h_imp_grad(int num) const override ;
+  double h_imp_grad(int num,int k) const override;
   double T_ext(int num) const override;
   double T_ext(int num,int k) const override;
 
@@ -80,6 +82,7 @@ protected :
   double mon_temps = -1.e8;
 
   DoubleTab h_;
+  DoubleTab h_grad_;
   DoubleTab d_;
   double von_karman_ = 0.41 ;
   double beta_omega = 0.075;

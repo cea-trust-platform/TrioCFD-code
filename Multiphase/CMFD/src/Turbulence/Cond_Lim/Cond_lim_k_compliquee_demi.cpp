@@ -77,6 +77,9 @@ int Cond_lim_k_compliquee_demi::initialiser(double temps)
   h_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_);
 
+  h_grad_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
+  la_frontiere_dis.valeur().frontiere().creer_tableau_faces(h_grad_);
+
   K_.resize(0,zone_Cl_dis().equation().inconnue().valeurs().line_size());
   la_frontiere_dis.valeur().frontiere().creer_tableau_faces(K_);
 
@@ -106,6 +109,16 @@ double Cond_lim_k_compliquee_demi::h_imp(int i) const
 double Cond_lim_k_compliquee_demi::h_imp(int i, int j) const
 {
   return h_(i,j);
+}
+
+double Cond_lim_k_compliquee_demi::h_imp_grad(int i) const
+{
+  return h_grad_(i,0);
+}
+
+double Cond_lim_k_compliquee_demi::h_imp_grad(int i, int j) const
+{
+  return h_grad_(i,j);
 }
 
 void Cond_lim_k_compliquee_demi::mettre_a_jour(double tps)
@@ -147,11 +160,14 @@ void Cond_lim_k_compliquee_demi::me_calculer()
 
       double u_tau_demi = corr_loi_paroi.calc_u_tau_loc(norm_u_parallel, nu_visc(e_zone, 0), y(f_zone, 0)/2.);
       h_(f, 0) = 2.*mu(e_zone, 0)/y(f_zone, 0) ;
+      h_grad_(f, 0) = 2./y(f_zone, 0) ;
       K_(f, 0) = calc_k(y(f_zone, 0)/2., u_tau_demi, nu_visc(e_zone, 0));
 
     }
 
   h_.echange_espace_virtuel();
+  h_grad_.echange_espace_virtuel();
+  K_.echange_espace_virtuel();
 }
 
 double Cond_lim_k_compliquee_demi::calc_k(double y, double u_tau, double visc)
