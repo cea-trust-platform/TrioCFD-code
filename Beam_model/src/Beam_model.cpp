@@ -375,12 +375,12 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
       alpha=1.;
       betha=0.;
     }
-  else if(abs(abscissa_[i] - s)< 1.e-5 )
+  else if(abs(abscissa_[i] - s)< 1.e-4)
     {
       alpha=1.;
       betha=0.;
     }
-  else if (abs(abscissa_[j] - s)< 1.e-5 )
+  else if (abs(abscissa_[j] - s)< 1.e-4)
     {
       alpha=0.;
       betha=1.;
@@ -389,6 +389,17 @@ DoubleVect Beam_model::interpolationOnThe3DSurface(const double& x, const double
     {
       alpha = (abscissa_[j] - s)/h;
       betha = (s - abscissa_[i])/h;
+      if(alpha <0.)
+        {
+          alpha=0.;
+          betha=1.;
+        }
+      else if (betha < 0.)
+        {
+          alpha=1.;
+          betha=0.;
+        }
+
     }
 
   ux=alpha*u(i, 0) + betha*u(j, 0);

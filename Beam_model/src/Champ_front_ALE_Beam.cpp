@@ -69,6 +69,7 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
   vit_som_bord_ALE.resize(nb_som_tot,nb_comp());
   vit_som_bord_ALE=0.;
   const DoubleVect& beamVelocity=dom_ale.getBeamVelocity(tps, dt);
+
   for( i=0; i<nb_faces; i++)
     {
       x=y=z=0;
@@ -79,8 +80,6 @@ void Champ_front_ALE_Beam::remplir_vit_som_bord_ALE(double tps)
             y=domaine.coord(faces.sommet(i,k),1);
           if(dimension>2)
             z=domaine.coord(faces.sommet(i,k),2);
-
-
           DoubleVect value(3);
           value=0.;
           DoubleVect phi(3);
