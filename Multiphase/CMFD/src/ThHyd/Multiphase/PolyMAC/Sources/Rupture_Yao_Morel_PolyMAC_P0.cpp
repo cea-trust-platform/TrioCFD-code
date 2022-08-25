@@ -78,7 +78,7 @@ void Rupture_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, co
   const DoubleVect& pe = equation().milieu().porosite_elem(), &ve = zone.volumes();
 
   const DoubleTab& inco = equation().inconnue().valeurs(),
-                   &inco_p = equation().inconnue().passe() ,
+                   &d_bulles_p = equation().probleme().get_champ("diametre_bulles").passe(),
                     &alpha = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().valeurs(),
                      &alpha_p = ref_cast(Pb_Multiphase, equation().probleme()).eq_masse.inconnue().passe(),
                       &press = ref_cast(Pb_Multiphase, equation().probleme()).eq_qdm.pression().passe(),
@@ -117,8 +117,8 @@ void Rupture_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, co
           {
             Interface_base& interface = milc.get_interface(n_l, k);
             double sigma___ = interface.sigma(temp(e,n_l),press(e,n_l * (Np > 1)));
-            double d_S = 6 * alpha_p(e, k) / inco_p(e, k) ; //past
-            double We = 2 * rho(e, n_l) * std::pow(epsilon(e, n_l)*d_S, 2./3.) * d_S / sigma___ ;
+            double We = 2 * rho(e, n_l) * std::pow(epsilon(e, n_l)*d_bulles_p(e,k), 2./3.) * d_bulles_p(e,k) / sigma___ ;
+
             double eps_loc ;
 
             if (Type_diss == "tau") eps_loc = (*tab_k)(e, n_l)>1.e-8 ? (*tab_k)(e, n_l)*(*tab_k)(e, n_l)/ std::max((*tab_k)(e, n_l) * (*tau)(e, n_l), limiter * nu(e, n_l)) : 0 ;
