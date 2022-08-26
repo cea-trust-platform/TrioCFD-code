@@ -1881,7 +1881,6 @@ double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const Double
 //  propriete particuliere non plus...
 //
 // ATTENTION : on evalue simplement la vitesse a l'endroit ou sont les sommets.
-//             pas de canne a peche ...~/vues/ft_disc/vobs/Pre_Post_TRUST/Outils/lata2dx/
 // Param nv_calc : si =1 : recalcule le champ eulerien de la vitesse par filtrage L2
 //   sinon, reutilise celui stocke dans variables_internes_
 void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
