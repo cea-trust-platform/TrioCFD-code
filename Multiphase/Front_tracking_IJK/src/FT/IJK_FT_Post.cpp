@@ -1871,7 +1871,7 @@ int IJK_FT_Post::alloc_velocity_and_co(bool flag_variable_source)
 
 void IJK_FT_Post::completer_sondes()
 {
-  les_sondes_.completer(ref_ijk_ft_);
+  les_sondes_.completer_IJK(ref_ijk_ft_);
 }
 
 void IJK_FT_Post::postraiter_sondes()
