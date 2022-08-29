@@ -345,7 +345,7 @@ void Random_process::next_step3(ArrOfDouble& advection_velocity, double dt, int 
               kappa[2] = - kmax + (n)*(2*kmax)/(2*nn);
 
 
-              if (!(abs(kappa[0])<kmin && abs(kappa[1])<kmin && abs(kappa[2])<kmin))
+              if (!(std::fabs(kappa[0])<kmin && std::fabs(kappa[1])<kmin && std::fabs(kappa[2])<kmin))
                 {
                   for (int dir=0; dir<3; dir++)
                     {

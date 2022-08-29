@@ -69,11 +69,11 @@ void ArrOfFloat_with_ghost::echange_espace_virtuel(int pe_min, int pe_max)
   // envoi a pe_max et reception de pe_min
   const int n = tab_.size_array() - ghost_ * 2;
   float *pdata = tab_.addr();
-  envoyer_recevoir(pdata + n, ghost_ * sizeof(float), pe_max,
-						 pdata, ghost_ * sizeof(float), pe_min);
+  envoyer_recevoir(pdata + n, ghost_ * (int)sizeof(float), pe_max,
+						 pdata, ghost_ * (int)sizeof(float), pe_min);
   // l'autre
-  envoyer_recevoir(pdata + ghost_, ghost_ * sizeof(float), pe_min,
-						 pdata + n + ghost_, ghost_ * sizeof(float), pe_max);
+  envoyer_recevoir(pdata + ghost_, ghost_ * (int)sizeof(float), pe_min,
+						 pdata + n + ghost_, ghost_ * (int)sizeof(float), pe_max);
   statistiques().end_count(echange_vect_counter_);
 }
 
@@ -89,11 +89,11 @@ void ArrOfDouble_with_ghost::echange_espace_virtuel(int pe_min, int pe_max)
   // envoi a pe_max et reception de pe_min
   const int n = tab_.size_array() - ghost_ * 2;
   double *pdata = tab_.addr();
-  envoyer_recevoir(pdata + n, ghost_ * sizeof(double), pe_max,
-						 pdata, ghost_ * sizeof(double), pe_min);
+  envoyer_recevoir(pdata + n, ghost_ * (int)sizeof(double), pe_max,
+						 pdata, ghost_ * (int)sizeof(double), pe_min);
   // l'autre
-  envoyer_recevoir(pdata + ghost_, ghost_ * sizeof(double), pe_min,
-						 pdata + n + ghost_, ghost_ * sizeof(double), pe_max);
+  envoyer_recevoir(pdata + ghost_, ghost_ * (int)sizeof(double), pe_min,
+						 pdata + n + ghost_, ghost_ * (int)sizeof(double), pe_max);
   statistiques().end_count(echange_vect_counter_);
 }
 
@@ -165,10 +165,10 @@ void IJK_Field_local_float::allocate(int Ni, int Nj, int Nk, int ghosts, int add
 
   // Align origin on cache line boundary
   const int CacheLineSizeBytes = 64;
-  sz += CacheLineSizeBytes/sizeof(float);
+  sz += CacheLineSizeBytes/(int)sizeof(float);
   // Add supplemental data at end for the last SIMD instruction of the loop that might go
   // beyond the end of the usefull data
-  sz += CacheLineSizeBytes/sizeof(float);
+  sz += CacheLineSizeBytes/(int)sizeof(float);
   data_.resize_array(sz);
   float *ptr = data_.addr() + offset_;
   char *cptr = (char *) ptr;
@@ -496,10 +496,10 @@ void IJK_Field_local_double::allocate(int Ni, int Nj, int Nk, int ghosts, int ad
 
   // Align origin on cache line boundary
   const int CacheLineSizeBytes = 64;
-  sz += CacheLineSizeBytes/sizeof(double);
+  sz += CacheLineSizeBytes/(int)sizeof(double);
   // Add supplemental data at end for the last SIMD instruction of the loop that might go
   // beyond the end of the usefull data
-  sz += CacheLineSizeBytes/sizeof(double);
+  sz += CacheLineSizeBytes/(int)sizeof(double);
   data_.resize_array(sz);
   double *ptr = data_.addr() + offset_;
   char *cptr = (char *) ptr;

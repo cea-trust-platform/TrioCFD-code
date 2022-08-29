@@ -430,7 +430,7 @@ void IJK_problem_double::run()
   molecular_mu_.allocate(splitting_, IJK_Splitting::ELEM, 2);
   molecular_mu_.data() = 1.;
   Cerr << " Allocating 11 arrays, approx total size= "
-       << molecular_mu_.data().size_array() * sizeof(double) * 11 * 9.537E-07 << " MB per core" << finl;
+       << molecular_mu_.data().size_array() * (int)sizeof(double) * 11 * 9.537E-07 << " MB per core" << finl;
   pressure_rhs_.allocate(splitting_, IJK_Splitting::ELEM, 1);
   rho_field_.allocate(splitting_, IJK_Splitting::ELEM, 2);
 
