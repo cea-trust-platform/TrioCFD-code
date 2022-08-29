@@ -44,7 +44,7 @@ Sortie& Sonde_IJK::printOn(Sortie& s ) const
 
 // Surcharge de la methode en remplacant la notion Pb.get_champ
 // par
-void Sonde_IJK::completer(const IJK_FT_double& ijk_ft)
+void Sonde_IJK::completer_IJK(const IJK_FT_double& ijk_ft)
 {
   const Nom bidon("bidon");
   //On devrait acceder au domaine par le champ generique

@@ -44,7 +44,7 @@ class Sondes_IJK : public LIST(Sonde_IJK)
 public :
   inline void ouvrir_fichiers();
   inline void fermer_fichiers();
-  inline void completer(const IJK_FT_double& ijk_ft);
+  inline void completer_IJK(const IJK_FT_double& ijk_ft);
   //  void associer_post(const Postraitement&);
   void postraiter();
   void mettre_a_jour(double temps, double tinit);
@@ -54,12 +54,12 @@ protected :
 
 };
 
-inline void Sondes_IJK::completer(const IJK_FT_double& ijk_ft)
+inline void Sondes_IJK::completer_IJK(const IJK_FT_double& ijk_ft)
 {
   LIST_CURSEUR(Sonde_IJK) curseur=*this;
   while(curseur)
     {
-      curseur->completer(ijk_ft);
+      curseur->completer_IJK(ijk_ft);
       ++curseur;
     }
 }
