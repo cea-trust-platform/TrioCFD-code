@@ -27,7 +27,7 @@
 #include <EcrFicPartage.h>
 #include <EcrFicPartageBin.h>
 #include <Fichier_Lata.h>
-#include <FloatTab.h>
+#include <TRUSTTab.h>
 #include <communications.h>
 #include <SFichier.h>
 #include <Param.h>
