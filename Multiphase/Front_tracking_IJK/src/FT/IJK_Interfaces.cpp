@@ -1334,7 +1334,7 @@ static void calculer_normale_sommets_interface(const Maillage_FT_IJK& maillage,
 
   normale.resize(nsom, dim);
   normale = 0.;
-  double n[3];
+  double n[3] = {0., 0. , 0.};
   // La surface autour d'un sommet :
   ArrOfDouble surface_environnante(nsom);
   surface_environnante = 0.;
