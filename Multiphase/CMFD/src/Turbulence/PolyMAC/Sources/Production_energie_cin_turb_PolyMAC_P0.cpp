@@ -35,7 +35,8 @@
 #include <Navier_Stokes_std.h>
 #include <Viscosite_turbulente_base.h>
 #include <TRUSTTab_parts.h>
-
+#include <Loi_paroi_adaptative.h>
+#include <Pb_Multiphase.h>
 
 Implemente_instanciable(Production_energie_cin_turb_PolyMAC_P0,"Production_energie_cin_turb_Elem_PolyMAC_P0", Source_base);
 // XD Production_energie_cin_turb source_base Production_energie_cin_turb 0 Production source term for the TKE equation
@@ -48,7 +49,54 @@ Sortie& Production_energie_cin_turb_PolyMAC_P0::printOn(Sortie& os) const
 
 Entree& Production_energie_cin_turb_PolyMAC_P0::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("limiter_production", &limiter_prod_);
+  param.lire_avec_accolades_depuis(is);
+
   return is;
+}
+
+void Production_energie_cin_turb_PolyMAC_P0::completer()
+{
+  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  fac_.resize(zone.nb_elem_tot(), equation().inconnue().valeur().valeurs().line_size(), 2); // 3rd column : derivative
+  fac_ = 1. ;
+
+  for (int e = 0 ; e < fac_.dimension_tot(0) ; e++)
+    for (int n = 0 ; n < fac_.dimension_tot(1) ; n++) fac_(e, n, 1) = 0. ; // 0 derivative by default
+
+  correlation_loi_paroi_ = ref_cast(Pb_Multiphase, equation().probleme()).get_correlation("Loi_paroi");
+}
+
+void Production_energie_cin_turb_PolyMAC_P0::mettre_a_jour(double tps)
+{
+  if (tps != mon_temps_) {calculer_fac() ; mon_temps_ = tps;}
+}
+void Production_energie_cin_turb_PolyMAC_P0::calculer_fac()
+{
+  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const IntTab& f_e = zone.face_voisins();
+
+  Loi_paroi_adaptative& corr_loi_paroi = ref_cast(Loi_paroi_adaptative, correlation_loi_paroi_.valeur().valeur());
+  DoubleTab& u_tau = corr_loi_paroi.get_tab("u_tau");
+  const DoubleTab& tab_k = equation().probleme().get_champ("k").passe();
+
+  int nf = zone.nb_faces(), N = tab_k.line_size() ;
+
+  fac_ = 1.;
+
+  for(int f = 0 ; f < nf ; f++)
+    for (int n = 0 ; n < N ; n++)
+      if (corr_loi_paroi.a_calculer(f))
+        if (u_tau(f, n) > 1.e-6)
+          {
+            int e = f_e(f, 0) ;
+
+            double kp = tab_k(e, n) / (u_tau(f, n)*u_tau(f, n));
+            if ( (kp-3.33) > 1. ) fac_(e, n, 0) = 1. - limiter_prod_ ;
+            else if ( (kp-3.33) < 0. ) fac_(e, n, 0) = 1. ;
+            else fac_(e, n, 0) = 1. - limiter_prod_*(kp-3.33), fac_(e, n, 1) = - limiter_prod_  / (u_tau(f, n)*u_tau(f, n)) ;
+          }
 }
 
 void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matrices, const tabs_t& semi_impl) const
@@ -58,7 +106,7 @@ void Production_energie_cin_turb_PolyMAC_P0::dimensionner_blocs(matrices_t matri
 
 void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const
 {
-  const Zone_PolyMAC_P0&                      zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
+  const Zone_PolyMAC_P0&                   zone = ref_cast(Zone_PolyMAC_P0, equation().zone_dis().valeur());
   const Probleme_base&                       pb = ref_cast(Probleme_base, equation().probleme());
   const Navier_Stokes_std&               eq_qdm = ref_cast(Navier_Stokes_std, pb.equation(0));
   const DoubleTab&                     tab_grad = pb.get_champ("gradient_vitesse").passe();
@@ -75,6 +123,8 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
   MD_Vector_tools::creer_tableau_distribue(eq_qdm.pression()->valeurs().get_md_vector(), Rij); //Necessary to compare size in reynolds_stress()
   visc_turb.reynolds_stress(Rij);
 
+  Matrice_Morse *mat = matrices.count("k") ? matrices.at("k") : nullptr;
+
   for(int e = 0 ; e < nb_elem ; e++)
     for(int n = 0; n<N ; n++)
       {
@@ -83,6 +133,9 @@ void Production_energie_cin_turb_PolyMAC_P0::ajouter_blocs(matrices_t matrices, 
           for (int d_X = 0; d_X < D; d_X++)
             secmem_en += Rij(e, n, d_X, d_U) * tab_grad(nf_tot + d_X + e * D , D * n + d_U) ;
         secmem_en *= (-1) * pe(e) * ve(e) * tab_alp(e, n) * tab_rho(e, n) ;
-        secmem(e, n) += std::max(secmem_en, 0.);
+
+        secmem(e, n) += fac_(e, n, 0) * std::max(secmem_en, 0.);
+
+        if (mat) (*mat)(N * e + n, N * e + n) -= fac_(e, n, 1) * std::max(secmem_en, 0.);
       }
 }
