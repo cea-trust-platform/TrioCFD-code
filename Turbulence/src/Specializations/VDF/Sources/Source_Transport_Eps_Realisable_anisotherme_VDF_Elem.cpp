@@ -25,7 +25,7 @@
 Implemente_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_anisotherme_VDF_Elem,"Source_Transport_Eps_Realisable_anisotherme_VDF_P0_VDF",Source_Transport_Eps_Realisable_VDF_Elem);
 
 Sortie& Source_Transport_Eps_Realisable_anisotherme_VDF_Elem::printOn(Sortie& s) const { return s << que_suis_je() ; }
-Entree& Source_Transport_Eps_Realisable_anisotherme_VDF_Elem::readOn(Entree& is) { return Source_Transport_Eps_Realisable_VDF_Elem::readOn_anisotherme_real(is); }
+Entree& Source_Transport_Eps_Realisable_anisotherme_VDF_Elem::readOn(Entree& is) { return Source_Transport_Eps_Realisable_VDF_Elem::readOn_anisotherme_real(is,que_suis_je()); }
 
 void Source_Transport_Eps_Realisable_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)
 {

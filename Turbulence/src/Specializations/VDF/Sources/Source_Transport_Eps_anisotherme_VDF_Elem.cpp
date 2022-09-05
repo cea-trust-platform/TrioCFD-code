@@ -28,7 +28,7 @@ Sortie& Source_Transport_Eps_anisotherme_VDF_Elem::printOn(Sortie& s) const { re
 Entree& Source_Transport_Eps_anisotherme_VDF_Elem::readOn(Entree& is)
 {
   Source_Transport_Eps_VDF_Elem::verifier_pb_keps_anisotherme(mon_equation->probleme(),que_suis_je());
-  return Source_Transport_VDF_Elem_base::readOn_anisotherme(is);
+  return Source_Transport_VDF_Elem_base::readOn_anisotherme(is,que_suis_je());
 }
 
 void Source_Transport_Eps_anisotherme_VDF_Elem::associer_pb(const Probleme_base& pb)

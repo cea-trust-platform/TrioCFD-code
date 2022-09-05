@@ -32,12 +32,7 @@ class Source_Transport_K_Eps_VDF_Elem : public Source_Transport_VDF_Elem_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_VDF_Elem);
 public:
-  Source_Transport_K_Eps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) // TODO : FIXME : comprends pas ...
-  {
-    C1 = cte1;
-    C2 = cte2;
-  }
-
+  Source_Transport_K_Eps_VDF_Elem(double cte1 = C1__, double cte2 = C2__ ) : Source_Transport_VDF_Elem_base(cte1,cte2) { }
   void ajouter_blocs(matrices_t matrices, DoubleTab& secmem, const tabs_t& semi_impl) const override;
 
 protected:

@@ -29,7 +29,7 @@ class Source_Transport_Eps_Realisable_VDF_Elem : public Source_Transport_Realisa
 {
   Declare_instanciable_sans_constructeur(Source_Transport_Eps_Realisable_VDF_Elem);
 public :
-  Source_Transport_Eps_Realisable_VDF_Elem( double cte2 = C21_R__ ) : Source_Transport_Realisable_VDF_Elem_base(cte2) { C2 = cte2; }
+  Source_Transport_Eps_Realisable_VDF_Elem( double cte2 = C21_R__ ) : Source_Transport_Realisable_VDF_Elem_base(cte2) { }
   void mettre_a_jour(double temps) override;
   void associer_pb(const Probleme_base& ) override;
 
