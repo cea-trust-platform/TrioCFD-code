@@ -2,7 +2,7 @@
 [ -f $1.lml ] && gzip -f $1.lml
 
 case=`echo $1`
-lata2dx $case.lata asciiout writelata=ascii.lata
+lata_analyzer $case.lata asciiout writelata=ascii.lata
 echo "Post traitement fichier python ${case}"
 python post_flux.py >$case.txt
 grep PHIN $case.txt > ${case}_PHIN.txt

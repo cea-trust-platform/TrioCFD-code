@@ -5,10 +5,10 @@
 if [ $1 == "init" ] ; then 
   # Pour creer le maillage interfacial a relire par TrioCFD
   #sed '/INTERFACES/d' diph_swarm_init.sauv.lata > diph_swarm_velocity.lata
-  source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh 
+  source $TRUST_ROOT/env_for_python.sh 
   sed -e '/IJK_EXT/d' -e '/FACETTE_PE/d' -e '/COMPO_CONNEXE/d'  -e '/INDEX_SOMMET_REEL/d' diph_swarm_init.sauv.lata > diph_swarm_interf.lata
   echo "Preparing med for initializing interfaces..."
-  python $TRUST_ROOT/Outils/lata2dx/lata2dx/Lata_to_med.py diph_swarm_interf.lata diph_swarm.med INTERFACES 1 1>/dev/null
+  python $TRUST_ROOT/exec/lata_tools/lib/Lata_to_med.py diph_swarm_interf.lata diph_swarm.med INTERFACES 1 1>/dev/null
   
   # Pour remettre a zero le temps dans le fichier sauv d'initialisation des calculs suivants.
   sed -i "s/tinit .*/tinit 0.0/" diph_swarm_init.sauv

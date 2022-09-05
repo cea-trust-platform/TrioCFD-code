@@ -11,7 +11,7 @@ echo doing prerun
 echo Creation d une condition initiale
 triou cond_initial.data 1>cond_initial.out 2>cond_initial.err
 
-lata2dx cond_initial.lata regularize=1e-6 timestep=1 export_fields_at_faces writelata=reprise_ijk.lata
+lata_analyzer cond_initial.lata regularize=1e-6 timestep=1 export_fields_at_faces writelata=reprise_ijk.lata
 
 # La maquette ijk nomme les champs velocity et rho, et le domaine dom, renommer dans le fichier lata:
 

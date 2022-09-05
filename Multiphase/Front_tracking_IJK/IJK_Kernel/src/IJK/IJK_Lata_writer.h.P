@@ -20,7 +20,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 #include <IJK_Field.h>
-#include <Lata_tools.h>
+#include <LataTools.h>
 // #include <FixedVector.h>
 
 #Pmacro DEFDUMP(ST)

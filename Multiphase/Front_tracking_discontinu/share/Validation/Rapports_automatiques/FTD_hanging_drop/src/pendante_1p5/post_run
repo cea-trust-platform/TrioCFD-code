@@ -10,7 +10,7 @@ timestep1=45
 timestep2=115
 timestep3=205
 
-lata2dx ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_0.7.lata timestep=$timestep1  asciiout fortranblocs=no splitfiles=all domain=interfaces
+lata_analyzer ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_0.7.lata timestep=$timestep1  asciiout fortranblocs=no splitfiles=all domain=interfaces
 
 # Recupere, dans le fichier ascii.lata, le nom du fichier qui contient les coordonnees des sommets lagrangiens:
 fichiercoord=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_0.7.lata`
@@ -32,7 +32,7 @@ awk 'BEGIN{cx=ENVIRON["cx"];cz=ENVIRON["cz"]}{print sqrt(($1-cx)*($1-cx)+($3-cz)
 
 ######################################################################################
 
-lata2dx ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_1.3.lata timestep=$timestep2  asciiout fortranblocs=no splitfiles=all domain=interfaces
+lata_analyzer ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_1.3.lata timestep=$timestep2  asciiout fortranblocs=no splitfiles=all domain=interfaces
 
 # Recupere, dans le fichier ascii.lata, le nom du fichier qui contient les coordonnees des sommets lagrangiens:
 fichiercoord=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_1.3.lata`
@@ -56,7 +56,7 @@ awk 'BEGIN{cx=ENVIRON["cx"];cz=ENVIRON["cz"]}{print sqrt(($1-cx)*($1-cx)+($3-cz)
 
 ######################################################################################
 
-lata2dx ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_1.9.lata timestep=$timestep3  asciiout fortranblocs=no splitfiles=all domain=interfaces
+lata_analyzer ../../build/pendante_1p5/lata/post.lata writelata_convert=ascii_angle_1.5_longueur_1.9.lata timestep=$timestep3  asciiout fortranblocs=no splitfiles=all domain=interfaces
 
 # Recupere, dans le fichier ascii.lata, le nom du fichier qui contient les coordonnees des sommets lagrangiens:
 fichiercoord=`awk '$2=="SOMMETS"{print $3}' ascii_angle_1.5_longueur_1.9.lata`

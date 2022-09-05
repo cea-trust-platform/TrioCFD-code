@@ -30,8 +30,8 @@ do
            echo "Error : please link PyTools3 in order to be able de run the fiches calling libraries from PyTools3"
        fi
    done
-   echo "source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh" >> $env
-   echo "echo \"source $TRUST_ROOT/Outils/lata2dx/lata2dx/install/env.sh ... OK\"" >> $env
+   echo "source $TRUST_ROOT/env_for_python.sh" >> $env
+   echo "echo \"source $TRUST_ROOT/env_for_python.sh ... OK\"" >> $env
    for path in share/bin
    do
       [ -d ${project_directory}/$path ] && grep "$path" $env 1>/dev/null 2>&1 || echo "export PATH=\${project_directory}/$path:\$PATH" >> $env
