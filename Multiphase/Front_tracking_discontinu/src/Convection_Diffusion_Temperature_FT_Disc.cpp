@@ -595,3 +595,8 @@ void Convection_Diffusion_Temperature_FT_Disc::suppression_interfaces(const IntV
       temp.echange_espace_virtuel();
     }
 }
+
+int Convection_Diffusion_Temperature_FT_Disc::preparer_calcul()
+{
+  return Equation_base::preparer_calcul();
+}

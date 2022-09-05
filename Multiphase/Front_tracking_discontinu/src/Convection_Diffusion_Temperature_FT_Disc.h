@@ -43,7 +43,7 @@ public:
   virtual void corriger_pas_de_temps(double dt);
   DoubleTab&   derivee_en_temps_inco(DoubleTab&) override;
   void         mettre_a_jour(double temps) override;
-
+  int preparer_calcul() override;
   void         calculer_grad_t();
   void         calculer_mpoint(Champ_base& mpoint);
   virtual void suppression_interfaces(const IntVect& num_compo, const ArrOfInt& flags_compo_a_supprimer, int nouvelle_phase);
