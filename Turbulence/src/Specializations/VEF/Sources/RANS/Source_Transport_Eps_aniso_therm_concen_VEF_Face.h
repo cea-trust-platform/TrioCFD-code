@@ -36,7 +36,7 @@ public:
   DoubleTab& ajouter(DoubleTab&) const override;
 
 private:
-  void fill_resu_anisotherme_concen(const DoubleTrav& , const DoubleTrav& , const DoubleVect& , DoubleTab& ) const final;
+  void fill_resu_anisotherme_concen(const DoubleTrav& , const DoubleTrav& , const DoubleVect& , DoubleTab& ) const final override;
 };
 
 #endif /* Source_Transport_Eps_aniso_therm_concen_VEF_Face_included */
