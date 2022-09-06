@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2022, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -12,13 +12,7 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Schema_Comm_Vecteurs.h
-// Directory:   $TRUST_ROOT/src/Kernel/Utilitaires
-// Version:     /main/7
-//
-//////////////////////////////////////////////////////////////////////////////
+
 #ifndef Schema_Comm_Vecteurs_included
 #define Schema_Comm_Vecteurs_included
 
@@ -26,29 +20,30 @@
 
 class Schema_Comm_Vecteurs_Static_Data;
 
-// .DESCRIPTION
-//  Classe outil utilisee notamment par les methodes MD_Vector::echange_espace_virtuel()
-//  Permet d'echanger avec d'autres processeurs des blocs d'ints ou de double
-//  accessibles par des tableaux dans lesquels on lit et on ecrit directement
-//  (contrairement a Schema_Comm qui utilise readOn et printOn, plus lent).
-//  Pour des raisons de performances, la communication est separee en deux parties
-//  - definition des tailles de buffers (permet d'allouer a l'avance les bufffers
-//     begin_init()
-//     add_send/recv_area_int/double(processeur, size)
-//      (declaration des types, tailles et processeurs destinataire des blocs que l'on va envoyer,
-//       on peut envoyer plusieurs blocs de types identiques ou differents a chaque processeur)
-//     end_init()
-//  - echange de donnees (autant de fois qu'on veut):
-//     begin_comm()
-//     for(each bloc to send) {
-//      ArrOfInt/Double & buf = get_next_area_int/double(pe, size);
-//      for (i=0; i<size; i++)
-//        buf[i] = ...
-//     }
-//     exchange();
-//     for (each bloc to recv) {
-//       ... get_next_area_int/double(...)
-//     end_comm();
+/*! @brief Classe outil utilisee notamment par les methodes MD_Vector::echange_espace_virtuel() Permet d'echanger avec d'autres processeurs des blocs d'ints ou de double
+ *
+ *   accessibles par des tableaux dans lesquels on lit et on ecrit directement
+ *   (contrairement a Schema_Comm qui utilise readOn et printOn, plus lent).
+ *   Pour des raisons de performances, la communication est separee en deux parties
+ *   - definition des tailles de buffers (permet d'allouer a l'avance les bufffers
+ *      begin_init()
+ *      add_send/recv_area_int/double(processeur, size)
+ *       (declaration des types, tailles et processeurs destinataire des blocs que l'on va envoyer,
+ *        on peut envoyer plusieurs blocs de types identiques ou differents a chaque processeur)
+ *      end_init()
+ *   - echange de donnees (autant de fois qu'on veut):
+ *      begin_comm()
+ *      for(each bloc to send) {
+ *       ArrOfInt/Double & buf = get_next_area_int/double(pe, size);
+ *       for (i=0; i<size; i++)
+ *         buf[i] = ...
+ *      }
+ *      exchange();
+ *      for (each bloc to recv) {
+ *        ... get_next_area_int/double(...)
+ *      end_comm();
+ *
+ */
 class Schema_Comm_Vecteurs
 {
 public:
@@ -96,14 +91,15 @@ protected:
   static int buffer_locked_;
   // Zones temporaires de lecture/ecriture, renvoyees par get_next... et qui pointent dans buffer_
   static ArrOfDouble tmp_area_double_;
+  static TRUSTArray<float> tmp_area_float_;
   static ArrOfInt tmp_area_int_;
   // Classe contenant des tableaux malloc (pour destruction automatique en fin d'execution)
   static Schema_Comm_Vecteurs_Static_Data sdata_;
 };
 
-// .DESCRIPTION
-//  Donnees statiques communes a toutes les classes Schema_Comm_Vecteur,
-//  avec destructeur pour liberer la memoire en fin d'execution
+/*! @brief Donnees statiques communes a toutes les classes Schema_Comm_Vecteur, avec destructeur pour liberer la memoire en fin d'execution
+ *
+ */
 class Schema_Comm_Vecteurs_Static_Data
 {
 public:
@@ -127,10 +123,10 @@ public:
 #endif
 
 #define BLOCSIZE_DOUBLE(sz) (sz<<3)
+#define BLOCSIZE_FLOAT(sz) (sz<<2)
 #define ALIGN_SIZE(ptr,sz) ptr=sdata_.buffer_base_+((ptr-sdata_.buffer_base_+(sz-1))&(~(sz-1)))
 
-inline void Schema_Comm_Vecteurs::add(int pe, int size, ArrOfInt& procs, ArrOfInt& buf_sizes,
-                                      int align_size)
+inline void Schema_Comm_Vecteurs::add(int pe, int size, ArrOfInt& procs, ArrOfInt& buf_sizes, int align_size)
 {
   assert(status_ == BEGIN_INIT);
   assert(size >= 0);
@@ -138,11 +134,11 @@ inline void Schema_Comm_Vecteurs::add(int pe, int size, ArrOfInt& procs, ArrOfIn
   if (x == 0 && size > 0)
     {
       const int n = procs.size_array();
-      if (n > 0 && procs[n-1] > pe)
+      if (n > 0 && procs[n - 1] > pe)
         sorted_ = 0;
       procs.append_array(pe);
     }
-  x = ((x+align_size-1)&(~(align_size-1))) + size; // Padding before block
+  x = ((x + align_size - 1) & (~(align_size - 1))) + size; // Padding before block
 }
 
 template<>
@@ -158,6 +154,12 @@ inline void Schema_Comm_Vecteurs::add_send_area_template<double>(int pe, int siz
 }
 
 template<>
+inline void Schema_Comm_Vecteurs::add_send_area_template<float>(int pe, int size)
+{
+  add(pe, BLOCSIZE_FLOAT(size), send_procs_, send_buf_sizes_, sizeof(float));
+}
+
+template<>
 inline void Schema_Comm_Vecteurs::add_recv_area_template<int>(int pe, int size)
 {
   add(pe, BLOCSIZE_INT(size), recv_procs_, recv_buf_sizes_, sizeof(int));
@@ -169,11 +171,19 @@ inline void Schema_Comm_Vecteurs::add_recv_area_template<double>(int pe, int siz
   add(pe, BLOCSIZE_DOUBLE(size), recv_procs_, recv_buf_sizes_, sizeof(double));
 }
 
-// Description: renvoie un tableau contenant les "size" valeurs suivantes
-//  recues du processeur pe lors de la communication en cours.
-//  Attention:
-//  Le tableau renvoye est une reference a un tableau interne qui n'est valide que
-//  jusqu'au prochain appel a une methode get_next_xxx.
+template<>
+inline void Schema_Comm_Vecteurs::add_recv_area_template<float>(int pe, int size)
+{
+  add(pe, BLOCSIZE_FLOAT(size), recv_procs_, recv_buf_sizes_, sizeof(float));
+}
+
+/*! @brief renvoie un tableau contenant les "size" valeurs suivantes recues du processeur pe lors de la communication en cours.
+ *
+ *   Attention:
+ *   Le tableau renvoye est une reference a un tableau interne qui n'est valide que
+ *   jusqu'au prochain appel a une methode get_next_xxx.
+ *
+ */
 template<>
 inline ArrOfInt& Schema_Comm_Vecteurs::get_next_area_template<int>(int pe, int size)
 {
@@ -203,7 +213,20 @@ inline ArrOfDouble& Schema_Comm_Vecteurs::get_next_area_template<double>(int pe,
   return tmp_area_double_;
 }
 
+template<>
+inline TRUSTArray<float>& Schema_Comm_Vecteurs::get_next_area_template<float>(int pe, int size)
+{
+  ALIGN_SIZE(sdata_.buf_pointers_[pe], sizeof(float));
+  assert(check_next_area(pe, BLOCSIZE_FLOAT(size)));
+  float *bufptr = (float *) (sdata_.buf_pointers_[pe]);
+  // attention a l'arithmetique de pointeurs, ajout d'une taille en octets
+  sdata_.buf_pointers_[pe] += BLOCSIZE_FLOAT(size);
+  tmp_area_float_.ref_data(bufptr, size);
+  return tmp_area_float_;
+}
 
 #undef BLOCSIZE_INT
 #undef BLOCSIZE_DOUBLE
-#endif
+#undef BLOCSIZE_FLOAT
+
+#endif /* Schema_Comm_Vecteurs_included */

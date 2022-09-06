@@ -43,7 +43,8 @@
 #include <TRUSTTabFT_forward.h>
 
 class Transport_Interfaces_FT_Disc_interne;
-class FloatTab;
+template <typename titi> class TRUSTTab;
+using FloatTab = TRUSTTab<float>;
 
 class Transport_Interfaces_FT_Disc : public Transport_Interfaces_base
 {

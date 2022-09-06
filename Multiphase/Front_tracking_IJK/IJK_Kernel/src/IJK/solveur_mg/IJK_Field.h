@@ -29,9 +29,7 @@
 #include <Static_Int_Lists.h>
 #include <TRUSTLists.h>
 #include <TRUSTVect.h>
-#include <TRUSTArray.h>
 #include <IJK_Splitting.h>  
-#include <ArrOfFloat.h>
 
 #define DIRECTION_I 0
 #define DIRECTION_J 1

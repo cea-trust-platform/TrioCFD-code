@@ -28,7 +28,6 @@
 #include <Discret_Thyd.h>
 #include <Schema_Temps_base.h>
 #include <Zone_VF.h>
-#include <FloatTab.h>
 #include <time.h>
 #include <Parser.h>
 #include <Zone_VF.h>

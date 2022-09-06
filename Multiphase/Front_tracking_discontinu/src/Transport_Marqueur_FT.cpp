@@ -24,7 +24,6 @@
 #include <Probleme_base.h>
 #include <Schema_Temps_base.h>
 #include <Discretisation_base.h>
-#include <FloatTab.h>
 #include <TRUSTTab.h>
 #include <Fluide_Incompressible.h>
 #include <Champ_Uniforme.h>
