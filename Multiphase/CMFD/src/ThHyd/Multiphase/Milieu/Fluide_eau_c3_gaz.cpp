@@ -12,23 +12,13 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Fluide_eau_c3_gaz.cpp
-// Directory:   $TRUST_ROOT/src/ThHyd/Multiphase/Milieu
-// Version:     /main/13
-//
-//////////////////////////////////////////////////////////////////////////////
 
 #include <Fluide_eau_c3_gaz.h>
 #include <Lois_eau_c3.h>
 
 Implemente_instanciable(Fluide_eau_c3_gaz, "Fluide_eau_c3_gaz", Fluide_reel_base);
 
-Sortie& Fluide_eau_c3_gaz::printOn(Sortie& os) const
-{
-  return os;
-}
+Sortie& Fluide_eau_c3_gaz::printOn(Sortie& os) const { return os; }
 
 Entree& Fluide_eau_c3_gaz::readOn(Entree& is)
 {
@@ -40,158 +30,202 @@ Entree& Fluide_eau_c3_gaz::readOn(Entree& is)
   return is;
 }
 
-double Fluide_eau_c3_gaz::rho_(const double T, const double P) const
+#define ind std::distance(res.begin(), &val)
+
+void Fluide_eau_c3_gaz::rho_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return rhog;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = rhog;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::dT_rho_(const double T, const double P) const
+void Fluide_eau_c3_gaz::dP_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return dT_rhog;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = dP_rhog;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::dP_rho_(const double T, const double P) const
+void Fluide_eau_c3_gaz::dT_rho_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return dP_rhog;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = dT_rhog;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::h_(const double T, const double P) const
+void Fluide_eau_c3_gaz::h_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return hg;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = hg;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::dT_h_(const double T, const double P) const
+void Fluide_eau_c3_gaz::dP_h_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return cpg;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = dP_hg;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::dP_h_(const double T, const double P) const
+void Fluide_eau_c3_gaz::dT_h_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return dP_hg;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = cpg;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::cp_(const double T, const double P) const
+void Fluide_eau_c3_gaz::cp_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0, ier, itest;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
-  F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P, &T, &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
-                 &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
-  return cpg;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0, ier, itest;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double vapa, vapb, vapc, vapdb, vapdc, hg, dP_hg, cpg, dP_cpg, dT_cpg, rhog, dP_rhog, dT_rhog, delta_h;
+      F77NAME(FTVAP)(&un, &ienc, &ier, &itest, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &hgs, &dP_hgs, &vapa, &vapb, &vapc, &vapdb, &vapdc,
+                     &hg, &dP_hg, &cpg, &dP_cpg, &dT_cpg, &rhog, &dP_rhog, &dT_rhog, &delta_h);
+      val = cpg;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::mu_(const double T, const double P) const
+void Fluide_eau_c3_gaz::beta_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
+  VectorD dT_rho___((int )res.size()), rho___((int )res.size());
+  dT_rho_(T,P,SpanD(dT_rho___),ncomp,id);
+  rho_(T,P,SpanD(rho___),ncomp,id);
+  for (auto& val : res) val = dT_rho___[ind] / rho___[ind];
+}
+
+void Fluide_eau_c3_gaz::mu_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
+{
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
-  F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
-  return visc;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
+      F77NAME(FHVAPA)(&un, &ienc, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
+      val = visc;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::lambda_(const double T, const double P) const
+void Fluide_eau_c3_gaz::lambda_(const SpanD T, const SpanD P, SpanD res, int ncomp, int id) const
 {
+  assert((int )T.size() == ncomp * (int )P.size() && (int )T.size() == ncomp * (int )res.size());
 #if HAVE_LIBC3
   /* calcul a saturation */
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
-  F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
-  return cond;
+  for (auto& val : res)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[ind], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, sigma, dP_sigma;
+      F77NAME(FHVAPA)(&un, &ienc, &P[ind], &T[ind * ncomp + id], &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &sigma, &dP_sigma);
+      val = cond;
+    }
 #else
-  return 0;
+  for (auto& val : res) val = 0;
 #endif
 }
 
-double Fluide_eau_c3_gaz::beta_(const double T, const double P) const
-{
-  return dT_rho_(T, P) / rho_(T, P);
-}
+#undef ind
