@@ -42,7 +42,7 @@ void Fluide_eau_c3_liquide::rho_(const SpanD T, const SpanD P, SpanD res, int nc
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return rhol;
+      val =  rhol;
     }
 #else
   for (auto& val : res) val = 0;
@@ -59,7 +59,7 @@ void Fluide_eau_c3_liquide::dP_rho_(const SpanD T, const SpanD P, SpanD res, int
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return dP_rhol;
+      val =  dP_rhol;
     }
 #else
   for (auto& val : res) val = 0;
@@ -76,7 +76,7 @@ void Fluide_eau_c3_liquide::dT_rho_(const SpanD T, const SpanD P, SpanD res, int
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return dT_rhol;
+      val =  dT_rhol;
     }
 #else
   for (auto& val : res) val = 0;
@@ -93,7 +93,7 @@ void Fluide_eau_c3_liquide::h_(const SpanD T, const SpanD P, SpanD res, int ncom
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return hl;
+      val =  hl;
     }
 #else
   for (auto& val : res) val = 0;
@@ -110,7 +110,7 @@ void Fluide_eau_c3_liquide::dP_h_(const SpanD T, const SpanD P, SpanD res, int n
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return dP_hl;
+      val =  dP_hl;
     }
 #else
   for (auto& val : res) val = 0;
@@ -127,7 +127,7 @@ void Fluide_eau_c3_liquide::dT_h_(const SpanD T, const SpanD P, SpanD res, int n
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return dT_hl;
+      val =  dT_hl;
     }
 #else
   for (auto& val : res) val = 0;
@@ -144,7 +144,7 @@ void Fluide_eau_c3_liquide::cp_(const SpanD T, const SpanD P, SpanD res, int nco
       int un = 1;
       double hl, dP_hl, dT_hl, cpl, dT_cpl, dP_cpl, rhol, dT_rhol, dP_rhol; //sorties
       F77NAME(FTLIQ)(&un, &P[ind], &T[ind * ncomp + id], &hl, &dP_hl, &dT_hl, &cpl, &dP_cpl, &dT_cpl, &rhol, &dP_rhol, &dT_rhol);
-      return cpl;
+      val =  cpl;
     }
 #else
   for (auto& val : res) val = 0;
@@ -168,9 +168,9 @@ void Fluide_eau_c3_liquide::mu_(const SpanD T, const SpanD P, SpanD res, int nco
   for (auto& val : res)
     {
       int un = 1;
-      double hl = h_(T, P), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
+      double hl = _h_(T[ind * ncomp + id], P[ind]), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
       F77NAME(FHLIQA)(&un, &P[ind], &hl, &T[ind * ncomp + id], &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
-      return visc;
+      val =  visc;
     }
 #else
   for (auto& val : res) val = 0;
@@ -185,9 +185,9 @@ void Fluide_eau_c3_liquide::lambda_(const SpanD T, const SpanD P, SpanD res, int
   for (auto& val : res)
     {
       int un = 1;
-      double hl = h_(T, P), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
+      double hl = _h_(T[ind * ncomp + id], P[ind]), zero = 0, cond, dcond1, dcond2, visc, dvisc1, dvisc2;
       F77NAME(FHLIQA)(&un, &P[ind], &hl, &T[ind * ncomp + id], &zero, &zero, &cond, &dcond1, &dcond2, &visc, &dvisc1, &dvisc2);
-      return cond;
+      val =  cond;
     }
 #else
   for (auto& val : res) val = 0;
