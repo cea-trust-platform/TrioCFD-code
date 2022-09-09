@@ -71,6 +71,7 @@ Lire eau
     beta_th champ_uniforme 1 1
     lambda champ_uniforme  1 10
     cp Champ_uniforme      1 1000
+    porosites_champ champ_fonc_xyz dom 1 1-0.5*(x>0.2)*(x<0.8)
 }
 
 Champ_Uniforme gravite
@@ -80,8 +81,6 @@ Associate  pb  dom
 Associate  pb  sch
 Associate  pb  eau
 Discretize pb  dis
-
-porosites_champ pb champ_fonc_xyz dom 1 1-0.5*(x>0.2)*(x<0.8)
 
 Lire pb
 {
