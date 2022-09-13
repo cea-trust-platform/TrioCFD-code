@@ -43,6 +43,9 @@
 class Op_Conv_RT_VEF_Face : public Op_Conv_VEF_Face
 {
   Declare_instanciable_sans_constructeur(Op_Conv_RT_VEF_Face);
+public:
+  DoubleTab& ajouter(const DoubleTab& transporte, DoubleTab& resu) const override;
+  void ajouter_contribution(const DoubleTab& transporte, Matrice_Morse& matrice ) const override;
 };
 
 

@@ -49,10 +49,8 @@ public:
 protected :
 
   Champ_Fonc& calculer_viscosite_turbulente() override;
-  virtual void calculer_OP1_OP2();
 
   double cw;
-  DoubleVect OP1,OP2;
 };
 
 #endif
