@@ -52,6 +52,7 @@ protected:
   int is_turb = 0;
   REF(Correlation) correlation_lift_;
   REF(Correlation) correlation_dispersion_;
+  double beta_ =  1. ; // To adjust the force in .data
 };
 
 #endif

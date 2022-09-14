@@ -43,6 +43,10 @@ Sortie& Correction_Lubchenko_PolyMAC_P0::printOn(Sortie& os) const
 
 Entree& Correction_Lubchenko_PolyMAC_P0::readOn(Entree& is)
 {
+  Param param(que_suis_je());
+  param.ajouter("beta", &beta_);
+  param.lire_avec_accolades_depuis(is);
+
   //identification des phases
   Pb_Multiphase *pbm = sub_type(Pb_Multiphase, equation().probleme()) ? &ref_cast(Pb_Multiphase, equation().probleme()) : NULL;
 
@@ -173,7 +177,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
               {
                 double fac = 0 ;
                 for (int d = 0 ; d<D ; d++) fac += n_y_faces(f, d) * n_f(f, d)/fs(f);
-                fac *= pf(f) * vf(f);
+                fac *= beta_*pf(f) * vf(f);
                 secmem(f, k) += fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
                 secmem(f, k) += fac * coeff(n_l, k, 0) * sum_alphag_wall;
                 secmem(f, n_l) -= fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_faces(f))/(d_b_l(k)-y_faces(f));
@@ -221,7 +225,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
           if (k != n_l)
             if (y_elem(e)<d_b_l(k)/2)
               {
-                double fac = pe(e) * ve(e);
+                double fac = beta_*pe(e) * ve(e);
                 secmem(i, k) += fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
                 secmem(i, k) += fac * coeff(n_l, k, 0) * sum_alphag_wall * n_y_elem(e, d);
                 secmem(i, n_l) -= fac * coeff(k, n_l, 0) * a_l(k) * 1/d_b_l(k)*(d_b_l(k)-2*y_elem(e))/(d_b_l(k)-y_elem(e)) * n_y_elem(e, d);
@@ -276,7 +280,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
             for (int k = 0; k < N; k++)
               if (k!= n_l) // gas phase
                 {
-                  double fac_e = pe(e) * ve(e);
+                  double fac_e = beta_*pe(e) * ve(e);
 
                   // Damping of the lift force close to the wall;
                   if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
@@ -297,7 +301,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                   for (int k = 0; k < N; k++)
                     if (k!= n_l) // gas phase
                       {
-                        double fac_f = pf(f) * vf(f);  // Coherence with portance_interfaciale that calculates the correlation at the element
+                        double fac_f = beta_*pf(f) * vf(f);  // Coherence with portance_interfaciale that calculates the correlation at the element
                         if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
                         if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
                         else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
@@ -317,7 +321,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
             for (int k = 0; k < N; k++)
               if (k!= n_l) // gas phase
                 {
-                  double fac_e = pe(e) * ve(e);
+                  double fac_e = beta_*pe(e) * ve(e);
 
                   // Damping of the lift force close to the wall;
                   if (y_elem(e) < .5*d_bulles(e,k)) fac_e *= -1 ; // suppresses lift
@@ -339,7 +343,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                   for (int k = 0; k < N; k++)
                     if (k!= n_l) // gas phase
                       {
-                        double fac_f = pf(f) * vf(f);
+                        double fac_f = beta_*pf(f) * vf(f);
                         if (y_elem(e) < .5*d_bulles(e,k)) fac_f *= -1 ; // suppresses lift
                         if (y_elem(e) >    d_bulles(e,k)) fac_f *=  0 ; // no effect
                         else                              fac_f *= (3*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 2) - 2*std::pow(2*y_elem(e)/d_bulles(e,k)-2, 3)) - 1; // partial damping
