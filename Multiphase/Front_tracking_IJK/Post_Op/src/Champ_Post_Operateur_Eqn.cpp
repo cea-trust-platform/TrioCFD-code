@@ -105,7 +105,7 @@ void Champ_Post_Operateur_Eqn::completer(const Postraitement_base& post)
   } 
   if (numero_eq_==-1)
   {
-   Cerr<<"On ne peut appilquer un Champ_Post_Operateur_Eqn qu à un champ inconnu du probleme"<<finl;
+   Cerr<<"Can only apply a Champ_Post_Operateur_Eqn to an unknown field of the problem"<<finl;
    exit();
   }
  
@@ -181,7 +181,7 @@ const Champ_base& Champ_Post_Operateur_Eqn::get_champ(Champ & espace_stockage) c
 
 const Noms Champ_Post_Operateur_Eqn::get_property(const Motcle & query) const
 {
- //Creation des composantes serait à faire de maniere dynamique (Eqn_...)
+ //Creation des composantes serait a faire de maniere dynamique (Eqn_...)
  
   Motcles motcles(2);  
   motcles[0] = "composantes";
