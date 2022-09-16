@@ -31,12 +31,13 @@
 //#include <Interprete.h>
 #include <IJK_Lata_writer.h>
 #include <OpConvIJKQuickScalar.h>
-#include <OpConvDiscIJKQuickScalar.h>
 #include <OpConvIJKAmont.h>
 #include <OpCentre4IJK.h>
 #include <OpDiffTurbIJKScalar.h>
+#include <OpConvDiscIJKQuickScalar.h>
 #include <Ref_IJK_FT_double.h>
 #include <Ouvrir_fichier.h>
+#include <Corrige_flux_FT.h>
 
 
 /*
@@ -53,6 +54,17 @@
  * 
  *
  */
+int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax);
+int calculer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                 const double lambda_de_t_paroi,
+                                 const double T_paroi_impose,
+                                 IJK_Field_local_double& flux_bord,
+                                 const bool bord_kmax);
+int imposer_flux_thermique_bord(const IJK_Field_double& temperature,
+                                const double flux_paroi_impose,
+                                IJK_Field_local_double& flux_bord,
+                                const bool bord_kmax);
+
 class IJK_FT_double;
 
 class IJK_Thermique;
@@ -76,7 +88,7 @@ public :
   void euler_time_step(const double timestep);
   void euler_rustine_step(const double timestep, const double dE);
   void rk3_sub_step(const int rk_step, const double total_timestep,
-                    const double fractionnal_timestep, const double time  );
+                    const double time  );
   void rk3_rustine_sub_step(const int rk_step, const double total_timestep,
                             const double fractionnal_timestep, const double time, const double dE);
   const IJK_Field_double& get_temperature() const
@@ -140,6 +152,9 @@ public :
   {
     return temperature_ft_;
   };
+  double get_rhocp_l() const;
+  double get_rhocp_v() const;
+
 protected :
   void calculer_dT(const FixedVector<IJK_Field_double, 3>& velocity);
   void compute_dT_rustine(const double dE);
@@ -164,6 +179,11 @@ protected :
   void calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T);
   void compute_interfacial_temperature(ArrOfDouble& interfacial_temperature, ArrOfDouble& interfacial_phin_ai,
                                        FixedVector<IJK_Field_double, 3> storage_) const ;
+  // This method calls to the Correction_flux_FT static method to build and interfacial temperature
+  // and heat flux field at the interface.
+  void compute_interfacial_temperature2(
+    ArrOfDouble& interfacial_temperature,
+    ArrOfDouble& flux_normal_interp) const ;
 
   REF(IJK_FT_double) ref_ijk_ft_;
   int rang_;

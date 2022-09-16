@@ -846,8 +846,8 @@ void Couplage_Tubes_IBC::force_ibc_velocity_anticipe_cube(IJK_Field_double& vx, 
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double d_OM_x = x_coord - position_cylindre[0];
                       const double d_OM_z = z_coord - position_cylindre[2];
-                      const double ABS_dOM_x = fabs(d_OM_x);
-                      const double ABS_dOM_z = fabs(d_OM_z);
+                      const double ABS_dOM_x = std::fabs(d_OM_x);
+                      const double ABS_dOM_z = std::fabs(d_OM_z);
                       Cout << "i : " << i << " j : " << j << " k : " << k << " dir : " << direction << " x_coord : " << x_coord << " z_coord : ";
                       Cout << z_coord << " ABS_d_OM_x : " << ABS_dOM_x << " ABS_d_OM_z : " << ABS_dOM_z << " velocity(i,j,k) : " << velocity(i,j,k) <<  finl;
                       const double Borne_max = L_cube_;
@@ -866,7 +866,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_anticipe_cube(IJK_Field_double& vx, 
 
                               const double d_OM_L = d_OM_z - L_cube_;
                               const double dz   = vs_z * timestep;
-                              const double ABS_dz = fabs(dz);
+                              const double ABS_dz = std::fabs(dz);
                               Cout << "d_OM_L : " << d_OM_L << " dz : " << dz << " vs_z : " << vs_z << finl;
                               if  ( d_OM_L <= ABS_dz  )
                                 {
@@ -897,7 +897,7 @@ void Couplage_Tubes_IBC::force_ibc_velocity_anticipe_cube(IJK_Field_double& vx, 
 
                               const double d_OM_L = d_OM_z - L_cube_;
                               const double dz   = vs_z * timestep;
-                              const double ABS_dz = fabs(dz);
+                              const double ABS_dz = std::fabs(dz);
                               Cout << "d_OM_L : " << d_OM_L << " dz : " << dz << " vs_z : " << vs_z << finl;
                               if  ( d_OM_L <= ABS_dz  )
                                 {
@@ -1058,8 +1058,8 @@ void Couplage_Tubes_IBC::ibc0_velocity_cube(IJK_Field_double& vx, IJK_Field_doub
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double dOMx = x_coord - position_cylindre[0]; // distance du centre au point M selon x
                       const double dOMz = z_coord - position_cylindre[2]; // distance du centre au point M selon z
-                      const double ABS_dOMx = fabs(dOMx);
-                      const double ABS_dOMz = fabs(dOMz);
+                      const double ABS_dOMx = std::fabs(dOMx);
+                      const double ABS_dOMz = std::fabs(dOMz);
                       const double Borne_z = L_cube_;
                       const double Borne_x = L_cube_;
 
@@ -1225,8 +1225,8 @@ void Couplage_Tubes_IBC::ibc0_force_cube(IJK_Field_double& vx, IJK_Field_double&
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double dOMx = x_coord - position_cylindre[0]; // distance du centre au point M selon x
                       const double dOMz = z_coord - position_cylindre[2]; // distance du centre au point M selon z
-                      const double ABS_dOMx = fabs(dOMx);
-                      const double ABS_dOMz = fabs(dOMz);
+                      const double ABS_dOMx = std::fabs(dOMx);
+                      const double ABS_dOMz = std::fabs(dOMz);
                       const double Borne_z = L_cube_;
                       const double Borne_x = L_cube_;
 
@@ -1381,8 +1381,8 @@ void Couplage_Tubes_IBC::ibc_diffuse_velocity_cube(IJK_Field_double& vx, IJK_Fie
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double dOMx = x_coord - position_cylindre[0]; // distance du centre au point M selon x
                       const double dOMz = z_coord - position_cylindre[2]; // distance du centre au point M selon z
-                      const double ABS_dOMx = fabs(dOMx);
-                      const double ABS_dOMz = fabs(dOMz);
+                      const double ABS_dOMx = std::fabs(dOMx);
+                      const double ABS_dOMz = std::fabs(dOMz);
                       const double Borne_min_z = L_cube_ - delta_z/2;
                       const double Borne_max_z = L_cube_ + delta_z/2;
                       const double Borne_min_x = L_cube_ - delta_x/2;
@@ -1571,8 +1571,8 @@ void Couplage_Tubes_IBC::ibc_diffuse_force_cube(IJK_Field_double& vx, IJK_Field_
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double dOMx = x_coord - position_cylindre[0]; // distance du centre au point M selon x
                       const double dOMz = z_coord - position_cylindre[2]; // distance du centre au point M selon z
-                      const double ABS_dOMx = fabs(dOMx);
-                      const double ABS_dOMz = fabs(dOMz);
+                      const double ABS_dOMx = std::fabs(dOMx);
+                      const double ABS_dOMz = std::fabs(dOMz);
                       const double Borne_min_z = L_cube_ - delta_z/2;
                       const double Borne_max_z = L_cube_ + delta_z/2;
                       const double Borne_min_x = L_cube_ - delta_x/2;
@@ -1765,8 +1765,8 @@ void Couplage_Tubes_IBC::ibc_localisee_velocity_cube(IJK_Field_double& vx, IJK_F
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double dOMx = x_coord - position_cylindre[0];
                       const double dOMz = z_coord - position_cylindre[2];
-                      const double ABS_dOMx = fabs(dOMx);
-                      const double ABS_dOMz = fabs(dOMz);
+                      const double ABS_dOMx = std::fabs(dOMx);
+                      const double ABS_dOMz = std::fabs(dOMz);
                       const double Borne_min_z               = L_cube_ - delta_z / 2; //                  d_OM <= L - delta_z/2 : v~* = v_s            , qdm = rho * delta_v * V_maille
                       const double Borne_intermediaire1_z    = L_cube_              ; // L - delta_z/2 <= d_OM <= L             : v~* = v_s            , qdm = rho * delta_v * V_maille * f_k
                       const double Borne_intermediaire2_z    = L_cube_ + delta_z / 2; // L             <= d_OM <= L + delta_z/2 : v~* = v_couche_limite, qdm = rho * delta_v * V_maille * f_k
@@ -2094,8 +2094,8 @@ void Couplage_Tubes_IBC::ibc_localisee_velocity_cube_qdm(IJK_Field_double& vx, I
                       const double x_coord = (direction==DIRECTION_I) ? nodes_pos[DIRECTION_I][i+offset_i] : elem_pos[DIRECTION_I][i+offset_i];
                       const double dOMx = x_coord - position_cylindre[0];
                       const double dOMz = z_coord - position_cylindre[2];
-                      const double ABS_dOMx = fabs(dOMx);
-                      const double ABS_dOMz = fabs(dOMz);
+                      const double ABS_dOMx = std::fabs(dOMx);
+                      const double ABS_dOMz = std::fabs(dOMz);
                       const double Borne_min_z               = L_cube_ - delta_z / 2; //                  d_OM <= L - delta_z/2 : v~* = v_s            , qdm = rho * delta_v * V_maille
                       const double Borne_intermediaire1_z    = L_cube_              ; // L - delta_z/2 <= d_OM <= L             : v~* = v_s            , qdm = rho * delta_v * V_maille * f_k
                       const double Borne_intermediaire2_z    = L_cube_ + delta_z / 2; // L             <= d_OM <= L + delta_z/2 : v~* = v_couche_limite, qdm = rho * delta_v * V_maille * f_k

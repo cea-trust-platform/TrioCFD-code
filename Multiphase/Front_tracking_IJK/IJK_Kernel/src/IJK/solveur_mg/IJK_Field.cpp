@@ -799,3 +799,347 @@ double somme_ijk(const IJK_Field_double & residu)
 }
 
 
+Implemente_instanciable_sans_constructeur(IJK_Field_local_int, "IJK_Field_local_int", Objet_U);
+Implemente_instanciable(IJK_Field_int, "IJK_Field_int", IJK_Field_local_int);
+Implemente_vect(IJK_Field_int);
+
+Sortie & IJK_Field_local_int::printOn(Sortie & os) const { return os; }
+Entree & IJK_Field_local_int::readOn(Entree & is) { return is; }
+Sortie & IJK_Field_int::printOn(Sortie & os) const { return os; }
+Entree & IJK_Field_int::readOn(Entree & is) { return is; }
+
+IJK_Field_local_int::IJK_Field_local_int()
+{
+  ni_ = nj_ = nk_ = ghost_size_ = 0;
+  nb_compo_ = 1;
+  j_stride_ = compo_stride_ = 0;
+  offset_ = k_layer_shift_ = additional_k_layers_ = 0;
+}
+
+
+void IJK_Field_local_int::allocate(int Ni, int Nj, int Nk, int ghosts, int additional_k_layers, int nb_compos)
+{
+  if (ghosts > Ni || ghosts > Nj || ghosts > Nk) {
+    Cerr << "Error in IJK_Field_local_int::allocate: ghostsize=" << ghosts
+	 << " is larger than the local mesh size " << Ni << " " << Nj << " " << Nk << finl;
+    Process::exit();
+  }
+  ni_ = Ni;
+  nj_ = Nj;
+  nk_ = Nk;
+  ghost_size_ = ghosts;
+  nb_compo_ = nb_compos;
+  j_stride_ = ni_ + 2 * ghosts;
+  while (j_stride_ % Simd_int::size() != 0)
+    j_stride_++;
+  compo_stride_ = j_stride_ * (nj_ + 2 * ghosts);
+  offset_ = ghost_size_ * (1 + j_stride_ + compo_stride_ * nb_compo_);
+  k_layer_shift_ = 0;
+  additional_k_layers_ = additional_k_layers;
+  int sz = (nk_ + 2 * ghosts + additional_k_layers) * compo_stride_ * nb_compo_ + 1;
+
+  // Ensure that there is some padding data at beginning:
+  offset_ += 8;
+
+  // Align origin on cache line boundary
+  const int CacheLineSizeBytes = 64;
+  sz += CacheLineSizeBytes/(int)sizeof(int);
+  // Add supplemental data at end for the last SIMD instruction of the loop that might go
+  // beyond the end of the usefull data
+  sz += CacheLineSizeBytes/(int)sizeof(int);
+  data_.resize_array(sz);
+  int *ptr = data_.addr() + offset_;
+  char *cptr = (char *) ptr;
+  long long iptr = (long long) cptr;
+  long long decal = iptr & (CacheLineSizeBytes - 1);
+  offset_ += (int)(CacheLineSizeBytes - decal) / (int)sizeof(int);
+  
+}
+
+// Adds n * compo_stride_ * nb_compo_ to the offset
+// (shifts the data by n layers in the k direction without moving memory)
+// Used by the jacobi "in place" algorithm: the result replaces the source data but is shifted in k.
+void IJK_Field_local_int::shift_k_origin(int n)
+{
+  k_layer_shift_ += n;
+  // Check that the data still fits into the allocated memory block
+  assert(k_layer_shift_ >= 0 && k_layer_shift_ <= additional_k_layers_);
+
+  offset_ += compo_stride_ * nb_compo_ * n;
+}
+
+// Creates a field with nk=1, that points to the data than src(...,...,k_layer)
+// (uses ArrOfint::ref_array() to create the reference).
+// ghostsize is identical to source array.
+void IJK_Field_local_int::ref_ij(IJK_Field_local_int & src, int k_lay)
+{
+  data_.reset();
+  ni_ = src.ni_;
+  nj_ = src.nj_;
+  nk_ = 1;
+  ghost_size_ = src.ghost_size_;
+  j_stride_ = src.j_stride_;
+  nb_compo_ = 1;
+  compo_stride_ = 0;
+  k_layer_shift_ = 0;
+  additional_k_layers_ = 0;
+
+  const int i_first = src.linear_index(-ghost_size_, -ghost_size_, k_lay);
+  const int i_last = src.linear_index(ni_ + ghost_size_ - 1, nj_ + ghost_size_ - 1, k_lay);
+  offset_ = src.linear_index(0,0,k_lay) - i_first;
+  data_.ref_array(src.data_, i_first, i_last - i_first + 1);
+}
+
+
+void IJK_Field_int::exchange_data(int pe_send_, /* processor to send to */
+			      int is, int js, int ks, /* ijk coordinates of first data to send */
+			      int pe_recv_, /* processor to recv from */
+			      int ir, int jr, int kr, /* ijk coordinates of first data to recv */
+			      int isz, int jsz, int ksz) /* size of block data to send/recv */
+{
+  if (pe_send_ == Process::me() && pe_recv_ == Process::me()) {
+    
+    // Self (periodicity on same processor)
+    int *dest = data().addr();
+    for (int k = 0; k < ksz; k++)
+      for (int j = 0; j < jsz; j++)
+	for (int i = 0; i < isz; i++)
+	  dest[linear_index(ir + i, jr + j, kr + k)] = operator()(is + i, js + j, ks + k);
+    return;
+  }
+#if 0
+  const int data_size = isz * jsz * ksz;
+  const int type_size = sizeof(int);
+  int *send_buffer = 0;
+  int **send_buffers = &send_buffer;
+  int *recv_buffer = 0;
+  int **recv_buffers = &recv_buffer;
+  
+  if (pe_send_ >= 0) {
+    send_list.resize_array(1);
+    send_list[0] = pe_send_;
+    send_size.resize_array(1);
+    send_size[0] = data_size * type_size;
+    send_buffer = new int[data_size];
+  } else {
+    send_list.resize_array(0);
+    send_size.resize_array(0);
+  }
+
+  if (pe_recv_ >= 0) {
+    recv_list.resize_array(1);
+    recv_list[0] = pe_recv_;
+    recv_size.resize_array(1);
+    recv_size[0] = data_size * type_size;
+    recv_buffer = new int[data_size];
+  } else {
+    recv_list.resize_array(0);
+    recv_size.resize_array(0);
+  }
+  
+  if (pe_send_ >= 0) {
+    // Pack send data
+    int *buf = send_buffer;
+    for (int k = 0; k < ksz; k++)
+      for (int j = 0; j < jsz; j++)
+	for (int i = 0; i < isz; i++, buf++)
+	  *buf = operator()(is + i, js + j, ks + k);
+  }
+  const Comm_Group & grp = PE_Groups::current_group();
+  grp.send_recv_start(send_list, send_size, (char**)send_buffers,
+		      recv_list, recv_size, (char**)recv_buffers,
+		      );
+  grp.send_recv_finish();
+#else 
+  const int data_size = isz * jsz * ksz;
+  const int type_size = sizeof(int);
+  int *send_buffer = 0;
+  int *recv_buffer = 0;
+  
+  if (pe_send_ >= 0) {
+    send_buffer = new int[data_size];
+    // Pack send data
+    int *buf = send_buffer;
+    for (int k = 0; k < ksz; k++)
+      for (int j = 0; j < jsz; j++)
+	for (int i = 0; i < isz; i++, buf++)
+	  *buf = operator()(is + i, js + j, ks + k);
+  }
+  if (pe_recv_ >= 0) {
+    recv_buffer = new int[data_size];
+  }
+
+  envoyer_recevoir(send_buffer, data_size * type_size, pe_send_,
+		   recv_buffer, data_size * type_size, pe_recv_);
+#endif
+  if (pe_recv_ >= 0) {
+    // Unpack recv data
+    int *buf = recv_buffer;
+    int *dest = data().addr();
+    for (int k = 0; k < ksz; k++)
+      for (int j = 0; j < jsz; j++)
+	for (int i = 0; i < isz; i++, buf++) {
+	  dest[linear_index(ir + i, jr + j, kr + k)] = *buf;
+	}
+  }
+
+  delete[] send_buffer;
+  delete[] recv_buffer;
+}
+
+// Description: Exchange data over "ghost" number of cells.
+// Precondition: ghost <= ghost_size_
+void IJK_Field_int::echange_espace_virtuel(int le_ghost)
+{
+  statistiques().begin_count(echange_vect_counter_);
+  assert(le_ghost <= ghost_size_);
+  // Exchange in i direction real cells, 
+  // then in j direction with ghost cells in i,
+  // then in k direction, with ghost cells in i and j
+  const IJK_Splitting & splitting = splitting_ref_.valeur();
+  int pe_imin_ = splitting.get_neighbour_processor(0, 0);
+  int pe_imax_ = splitting.get_neighbour_processor(1, 0);
+  int pe_jmin_ = splitting.get_neighbour_processor(0, 1);
+  int pe_jmax_ = splitting.get_neighbour_processor(1, 1);
+  int pe_kmin_ = splitting.get_neighbour_processor(0, 2);
+  int pe_kmax_ = splitting.get_neighbour_processor(1, 2);
+
+  // send left layer of real cells to right layer of virtual cells
+  exchange_data(pe_imin_, 0,   0, 0, 
+		pe_imax_, ni_, 0, 0, 
+		le_ghost, nj_, nk_); /* size of block data to send */
+
+  // send right real cells to left virtual cells
+  exchange_data(pe_imax_, ni_ - le_ghost, 0, 0,
+					 pe_imin_,     - le_ghost, 0, 0,
+					 le_ghost, nj_, nk_);
+
+  exchange_data(pe_jmin_, - le_ghost, 0, 0,
+					 pe_jmax_, - le_ghost, nj_, 0,
+					 ni_ + 2*le_ghost, le_ghost, nk_);
+
+  exchange_data(pe_jmax_, - le_ghost, nj_ - le_ghost, 0,
+					 pe_jmin_, - le_ghost,     - le_ghost, 0,
+					 ni_ + 2*le_ghost, le_ghost, nk_);
+
+  exchange_data(pe_kmin_, - le_ghost, - le_ghost, 0,
+					 pe_kmax_, - le_ghost, - le_ghost, nk_,
+					 ni_ + 2*le_ghost, nj_ + 2*le_ghost, le_ghost);
+
+  exchange_data(pe_kmax_, - le_ghost, - le_ghost, nk_ - le_ghost,
+					 pe_kmin_, - le_ghost, - le_ghost,     - le_ghost,
+					 ni_ + 2*le_ghost, nj_ + 2*le_ghost, le_ghost);
+  statistiques().end_count(echange_vect_counter_);
+}
+
+// Initializes the field and allocates memory
+// splitting: reference to the geometry of the IJK mesh and how the mesh is split on processors.
+//   The field stores a reference to this IJK_Splitting object so do not delete it.
+// loc: localisation of the field (elements, nodes, faces in direction i, j, or k)
+//   The number of "real" items in each direction (returned by the ni(), nj() or nk() method) is obtained from
+//   the IJK_Splitting object. Warning: on a processor that is in the middle of the mesh, the nodes on the
+//   right of the rightmost real element are not real, they are virtual, values are copied from the neigbour
+//   processor.
+// ghost_size: number of ghost layers to allocate. When an exchange of ghost cells data is requested, a smaller
+//   number of layers can be requested if all layers are not needed by the following operations
+// additional_k_layers: allocates more layers of cells in the k direction for use with the
+//   shift_k_origin() method (optimization trick used by the temporally blocked algorithms in the multigrid
+//   solver
+// nb_compo: number of components of the field. Warning: you cannot allocate the velocity field at faces
+//   with nb_compo=3: numbers of faces in each direction differ.
+//   Also, components are not grouped by node but stored by layers in k. nb_compo>1 is essentially used
+//   in the multigrid solver to optimize memory accesses to the components of the matrix.
+void IJK_Field_int::allocate(const IJK_Splitting & splitting, IJK_Splitting::Localisation loc, 
+				int ghost_size, int additional_k_layers, int ncompo)
+{
+  const int ni_local = splitting.get_nb_items_local(loc, 0);
+  const int nj_local = splitting.get_nb_items_local(loc, 1);
+  const int nk_local = splitting.get_nb_items_local(loc, 2);
+  IJK_Field_local_int::allocate(ni_local, nj_local, nk_local, ghost_size, additional_k_layers, ncompo);
+  splitting_ref_ = splitting;
+  localisation_ = loc;
+}
+
+double norme_ijk(const IJK_Field_int & residu)
+{
+  const int ni = residu.ni();
+  const int nj = residu.nj();
+  const int nk = residu.nk();
+  double somme = 0.;
+  for (int k = 0; k < nk; k++) {
+    double partial1 = 0.;
+    for (int j = 0; j < nj; j++) {
+      double partial2 = 0.;
+      for (int i = 0; i < ni; i++) {
+	double x = residu(i,j,k);
+	partial2 += x*x;
+      }
+      partial1 += partial2;
+    }
+    somme += partial1;
+  }
+  somme = Process::mp_sum(somme);
+  return sqrt(somme);
+}
+
+int max_ijk(const IJK_Field_int& residu)
+{
+  const int ni = residu.ni();
+  const int nj = residu.nj();
+  const int nk = residu.nk();
+  int res = (int)-1.e30;
+  for (int k = 0; k < nk; k++)
+    for (int j = 0; j < nj; j++)
+      for (int i = 0; i < ni; i++)
+        {
+          int x = residu(i,j,k);
+	res = std::max(x,res);
+        }
+  res = (int)Process::mp_max(res);
+  return res;
+}
+
+int prod_scal_ijk(const IJK_Field_int & x, const IJK_Field_int & y)
+{
+  const int ni = x.ni();
+  const int nj = x.nj();
+  const int nk = x.nk();
+  int somme = 0.;
+  const ArrOfInt & xd = x.data();
+  const ArrOfInt & yd = y.data();
+  for (int k = 0; k < nk; k++) {
+    for (int j = 0; j < nj; j++) {
+      for (int i = 0; i < ni; i++) {
+	int index = x.linear_index(i,j,k);
+	assert(index == y.linear_index(i,j,k));
+	somme += xd[index] * yd[index];
+      }
+    }
+  }
+  somme = (int)Process::mp_sum(somme);
+  return somme;
+}
+
+double somme_ijk(const IJK_Field_int & residu)
+{
+  const int ni = residu.ni();
+  const int nj = residu.nj();
+  const int nk = residu.nk();
+  double somme = 0.;
+  for (int k = 0; k < nk; k++) {
+    double partial1 = 0.;
+    for (int j = 0; j < nj; j++) {
+      double partial2 = 0.;
+      for (int i = 0; i < ni; i++) {
+	double x = residu(i,j,k);
+	partial2 += x;
+      }
+      partial1 += partial2;
+    }
+    somme += partial1;
+  }
+  somme = (int)Process::mp_sum(somme);
+  return somme;
+}
+
+

@@ -26,7 +26,9 @@
 #include <Static_Int_Lists.h>
 #include <TRUSTLists.h>
 #include <TRUSTVect.h>
+#include <TRUSTArray.h>
 #include <IJK_Splitting.h>  
+// #include <ArrOfFloat.h>
 
 #define DIRECTION_I 0
 #define DIRECTION_J 1
@@ -260,6 +262,7 @@ double somme_ijk(const IJK_Field__TYPE_ & residu);
 
 #Pusemacro(DEF_IJK_FIELD)(float,ArrOfFloat)
 #Pusemacro(DEF_IJK_FIELD)(double,ArrOfDouble)
+#Pusemacro(DEF_IJK_FIELD)(int,ArrOfInt)
 
 typedef IJK_Field_local_double IJK_Field_local;
 typedef IJK_Field_double IJK_Field;

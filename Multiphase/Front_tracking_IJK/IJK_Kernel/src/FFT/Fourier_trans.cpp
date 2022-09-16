@@ -313,7 +313,7 @@ static int retirer_doublons(ArrOfDouble& tab)
       for ( int j = i+1 ; j < taille ; j++)
         {
           const double y = tab[j];
-          if ( fabs(y-x) <= (y*1.e-3 ))
+          if ( std::fabs(y-x) <= (y*1.e-3 ))
             {
               tab[j] = tab[taille-1]+i; // on va set a une valeur tres grande
               doublons++;
@@ -343,7 +343,7 @@ static void remplir_ref_ki(ArrOfDouble& tab_k_tri ,DoubleTab& tab_k,IntTab& ref_
           {
             double y = tab_k_tri[ou];
             double compa = x > y ? x : y;
-            if ( fabs(y-x) <= (compa*1.e-3) )
+            if ( std::fabs(y-x) <= (compa*1.e-3) )
               {
                 ref_k(i,j) = ou;
                 trouver = true;

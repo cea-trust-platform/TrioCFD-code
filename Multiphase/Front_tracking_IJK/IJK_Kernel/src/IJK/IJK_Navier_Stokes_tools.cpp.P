@@ -1258,7 +1258,7 @@ void density_solver_with_rho(IJK_Field_ST & velocity, const IJK_Field_ST & rho, 
 
 
 // fonction moyenne en temps du champs de vitesse utilise dans le cas de bulles fixes
-void update_integral_velocity(const FixedVector<IJK_Field_double, 3>& v_instant,  FixedVector<IJK_Field_double, 3>& v_tmp, IJK_Field_double& indic, IJK_Field_double& indic_tmp)
+void update_integral_velocity(const FixedVector<IJK_Field_double, 3>& v_instant,  FixedVector<IJK_Field_double, 3>& v_tmp, const IJK_Field_double& indic, const IJK_Field_double& indic_tmp)
 {
   const int ni = indic_tmp.ni();
   const int nj = indic_tmp.nj();
@@ -1712,7 +1712,7 @@ void supprimer_chevauchement(IJK_Field_double& ind)
 }
 
 
-void update_integral_pressure(const IJK_Field_double& p_instant,  IJK_Field_double& p_tmp, IJK_Field_double& indic, IJK_Field_double& indic_tmp)
+void update_integral_pressure(const IJK_Field_double& p_instant,  IJK_Field_double& p_tmp, const IJK_Field_double& indic, const IJK_Field_double& indic_tmp)
 {
   const int ni = p_instant.ni();
   const int nj = p_instant.nj();
@@ -1958,7 +1958,7 @@ double calculer_variable_wall(const IJK_Field_double& variable, const IJK_Field_
 // Input and output velocity is in m/s (not the integral of the momentum on the cell).
 // On the walls, don't touch velocity
 void add_gradient_temperature(const IJK_Field_double& temperature, const double constant,
-                              IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, Boundary_Conditions_Thermique& boundary, IJK_Field_double& lambda )
+                              IJK_Field_double& vx, IJK_Field_double& vy, IJK_Field_double& vz, const Boundary_Conditions_Thermique& boundary, const IJK_Field_double& lambda )
 {
   const IJK_Grid_Geometry& geom = vx.get_splitting().get_grid_geometry();
   const int kmax = std::max(std::max(vx.nk(), vy.nk()), vz.nk());

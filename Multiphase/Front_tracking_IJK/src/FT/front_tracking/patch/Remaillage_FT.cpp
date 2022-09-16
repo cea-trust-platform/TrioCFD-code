@@ -1431,7 +1431,7 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
           // On s'arrete apres avoir converge en volume ou apres avoir atteint le nombre
           // max d'iterations de correction.
           if (iteration_correction_volume > max_nb_iter_correction_volume
-              || fabs(dvolume) < seuil_dvolume)
+              || std::fabs(dvolume) < seuil_dvolume)
             break;
         }
     };
@@ -1702,7 +1702,7 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
                   ps +=  v4[direction]*normale_facettes(fa7,direction);
                 }
               const double tol = 1.e-10;
-              if (1. - fabs(ps)> tol)
+              if (1. - std::fabs(ps)> tol)
                 {
                   // facette et face_bord ne sont pas coplanaires, on conserve la facette!
                 }

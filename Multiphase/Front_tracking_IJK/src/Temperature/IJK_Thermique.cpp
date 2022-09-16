@@ -25,6 +25,8 @@
 #include <DebogIJK.h>
 #include <stat_counters.h>
 #include <IJK_FT.h>
+#include <Corrige_flux_FT.h>
+#include <OpConvDiscIJKQuickScalar.h>
 
 Implemente_instanciable( IJK_Thermique, "IJK_Thermique", Objet_U ) ;
 
@@ -256,7 +258,7 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
     {
       Cout << "Allocating fields temperature_ft_ and storage" << finl;
       allocate_cell_vector(storage_, ref_ijk_ft_->get_splitting_ft(), 1);
-      temperature_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 1);
+      temperature_ft_.allocate(ref_ijk_ft_->get_splitting_ft(), IJK_Splitting::ELEM, 7);
       nalloc += 4;
     }
 
@@ -280,7 +282,9 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
       // la source
       if (type_T_source_ == "??")
         {
-          type_T_source_ = "dabiri";
+          Cerr << "Attention on demande des post-traitement sans avoir renseigner type_T_source" << finl;
+          throw "Erreur post et type_T_source";
+          // type_T_source_ = "dabiri";
         }
     }
   if (liste_post_instantanes_.contient_("TEMPERATURE_ADIM_BULLES"))
@@ -301,7 +305,7 @@ int IJK_Thermique::initialize(const IJK_Splitting& splitting, const int idx)
       if (expression_T_init_ != "??")
         {
           Cout << "Temperature initialization from expression \nTini = " << expression_T_init_ << finl;
-          set_field_data(temperature_, expression_T_init_, ref_ijk_ft_->indicatrice_ns_, 0.);
+          set_field_data(temperature_, expression_T_init_, ref_ijk_ft_->itfce().I(), 0.);
         }
       else
         {
@@ -390,7 +394,7 @@ void IJK_Thermique::sauvegarder_temperature(Nom& lata_name, int idx)
 void IJK_Thermique::update_thermal_properties()
 {
   const double ene_ini = compute_global_energy();
-  const IJK_Field_double& indic = ref_ijk_ft_->indicatrice_ns_;
+  const IJK_Field_double& indic = ref_ijk_ft_->itfce().I();
   // Nombre de mailles du domaine NS :
   const int nx = indic.ni();
   const int ny = indic.nj();
@@ -585,7 +589,7 @@ void IJK_Thermique::euler_time_step(const double timestep)
 }
 
 void IJK_Thermique::rk3_sub_step(const int rk_step, const double total_timestep,
-                                 const double fractionnal_timestep, const double time)
+                                 const double time)
 {
   calculer_dT(ref_ijk_ft_->velocity_);
   // Update the temperature :
@@ -730,7 +734,7 @@ void IJK_Thermique::compute_temperature_convection_conservative(const FixedVecto
           Cerr << "Operateur centre non implemente" << finl;
           break;
         case 3:
-          rho_cp_convection_op_quick_.calculer(rho_cp_T_, velocity[0], ref_ijk_ft_->indicatrice_ns_, velocity[1], velocity[2], div_rho_cp_T_);
+          rho_cp_convection_op_quick_.calculer(rho_cp_T_, velocity[0], ref_ijk_ft_->itfce().I(), velocity[1], velocity[2], div_rho_cp_T_);
           break;
         case 4:
           Cerr << "Operateur centre4 non implemente" << finl;
@@ -754,7 +758,7 @@ void IJK_Thermique::compute_temperature_convection_conservative(const FixedVecto
         for (int j = 0; j < nj; j++)
           for (int i = 0; i < ni; i++)
             {
-              const double I = ref_ijk_ft_->indicatrice_ns_(i,j,k);
+              const double I = ref_ijk_ft_->itfce().I(i,j,k);
               // dT = 1/rho_cp_h * div( rho*cp*T*v )
               div_rho_cp_T_(i,j,k) /= vol;
               d_temperature_(i,j,k) = 1/((I*rho_l*cp_liquid_) + (1.-I)*rho_v*cp_vapor_)*div_rho_cp_T_(i,j,k);
@@ -855,7 +859,7 @@ void IJK_Thermique::add_temperature_diffusion()
         {
           if (geometric_mean)
             {
-              const double chi_l = ref_ijk_ft_->indicatrice_ns_(i,j,k);
+              const double chi_l = ref_ijk_ft_->itfce().I(i,j,k);
               const double rhocpV_inv = (chi_l/rhocp_l  + (1 - chi_l)/rhocp_v) * vol_inv;
               const double ope = div_lambda_grad_T_volume_(i,j,k);
               const double resu = ope*rhocpV_inv;
@@ -872,7 +876,7 @@ void IJK_Thermique::add_temperature_diffusion()
                 }
               else
                 {
-                  const double chi_l = ref_ijk_ft_->indicatrice_ns_(i,j,k);
+                  const double chi_l = ref_ijk_ft_->itfce().I(i,j,k);
                   rhocpV = (rhocp_l * chi_l + rhocp_v * (1 - chi_l)) *  vol;
                 }
               const double ope = div_lambda_grad_T_volume_(i,j,k);
@@ -979,7 +983,7 @@ void IJK_Thermique::add_temperature_source()
             for (int j = 0; j < nj; j++)
               for (int i = 0; i < ni; i++)
                 {
-                  //const double chi = ref_ijk_ft_->indicatrice_ns_(i,j,k);
+                  //const double chi = ref_ijk_ft_->itfce().I(i,j,k);
                   //const double rho_cp_l = ref_ijk_ft_->rho_liquide_ * cp_liquid_;
                   //const double rho_cp_v = ref_ijk_ft_->rho_vapeur_ * cp_vapor_;
                   const double u = (vx(i,j,k) +vx(i+1,j,k))/2;
@@ -1012,7 +1016,7 @@ void IJK_Thermique::add_temperature_source()
           Cerr << "Type de source : unweighted_dabiri" << finl;
           const double wall_flux = boundary_conditions_.get_flux_kmax();
           const double qw = wall_flux;
-          const double liquid_fraction = calculer_v_moyen(ref_ijk_ft_->indicatrice_ns_);
+          const double liquid_fraction = calculer_v_moyen(ref_ijk_ft_->itfce().I());
           const double rho_cp_l = ref_ijk_ft_->rho_liquide_ * cp_liquid_;
           const double rho_cp_v = ref_ijk_ft_->rho_vapeur_ * cp_vapor_;
           const double rhocp_moy =  rho_cp_l*liquid_fraction + rho_cp_v*(1-liquid_fraction);
@@ -1057,7 +1061,7 @@ void IJK_Thermique::add_temperature_source()
             for (int j = 0; j < nj; j++)
               for (int i = 0; i < ni; i++)
                 {
-                  const double chi = ref_ijk_ft_->indicatrice_ns_(i, j, k);
+                  const double chi = ref_ijk_ft_->itfce().I(i, j, k);
                   const double T = temperature_(i, j, k);
                   Tv += T*(1.-chi);
                   Vv += (1.-chi);
@@ -1099,7 +1103,7 @@ void IJK_Thermique::add_temperature_source()
               for (int i = 0; i < ni; i++)
                 {
                   // chi vaut 1. dans le liquide et 0 dans les bulles
-                  const double chi = ref_ijk_ft_->indicatrice_ns_(i, j, k);
+                  const double chi = ref_ijk_ft_->itfce().I(i, j, k);
                   source_temperature_(i,j,k) = (1.-chi)*source_temperature_v_(i,j,k) + chi*source_temperature_l_(i,j,k);
                 }
           Cerr << "AY-test_source3 : " <<  Tv << finl;
@@ -1219,7 +1223,7 @@ void IJK_Thermique::calculer_temperature_physique_T(const IJK_Field_double&  vx,
 //     for (int j = 0; j < nj; j++)
 //       for (int i = 0; i < ni; i++)
 //         {
-//           const double chi = ref_ijk_ft_->indicatrice_ns_(i, j, k); // rappel : chi vaut 1. dans le liquide et 0 dans la vapeur
+//           const double chi = ref_ijk_ft_->itfce().I(i, j, k); // rappel : chi vaut 1. dans le liquide et 0 dans la vapeur
 //           const double T = temperature_(i, j, k);
 //           moy1 += T*chi;
 //           moy2 += T*(1.-chi);
@@ -1268,7 +1272,7 @@ void IJK_Thermique::calculer_energies(double& E_liq_pure, double& E_lta, double&
   const int ni = temperature_.ni();
   const int nj = temperature_.nj();
 
-  const IJK_Field_double& chi = ref_ijk_ft_->indicatrice_ns_; // rappel : chi vaut 1. dans le liquide et 0 dans la vapeur
+  const IJK_Field_double& chi = ref_ijk_ft_->itfce().I(); // rappel : chi vaut 1. dans le liquide et 0 dans la vapeur
   const double rhocpl = ref_ijk_ft_->rho_liquide_*cp_liquid_;
   const double rhocpv = ref_ijk_ft_->rho_vapeur_*cp_vapor_;
   for (int k = 0; k < nk; k++)
@@ -1286,12 +1290,12 @@ void IJK_Thermique::calculer_energies(double& E_liq_pure, double& E_lta, double&
           E_lta += indic*rhocpl*T;
           E_vth += (1.-indic)*rhocpv*Th;
           E_lth += indic*rhocpl*Th;
-          if (fabs(indic)<1.e-8)
+          if (std::fabs(indic)<1.e-8)
             {
               // vap pure
               E_vap_pure +=rhocpv*T;
             }
-          else if (fabs(1.-indic)<1.e-8)
+          else if (std::fabs(1.-indic)<1.e-8)
             {
               // liq pure
               E_liq_pure +=rhocpl*T;
@@ -1332,7 +1336,7 @@ void IJK_Thermique::calculer_temperature_adim_bulles()
   double Vl = 0.;
   double Vv = 0.;
   const IJK_Field_double& T = temperature_;
-  const IJK_Field_double& chi = ref_ijk_ft_->indicatrice_ns_; // rappel : chi vaut 1. dans le liquide et 0 dans la vapeur
+  const IJK_Field_double& chi = ref_ijk_ft_->itfce().I(); // rappel : chi vaut 1. dans le liquide et 0 dans la vapeur
 
   // assuming uniform mesh : vol_cell=cste.
   for (int k = 0; k < nk; k++)
@@ -1488,7 +1492,7 @@ void IJK_Thermique::calculer_Nusselt(const IJK_Field_double& vx)
   const double theta_adim_moy = calculer_temperature_adimensionnelle_theta_moy(vx, temperature_adimensionnelle_theta_,
                                                                                cp_,ref_ijk_ft_->rho_field_);
   double Nu = 0.;
-  if (fabs(theta_adim_moy)>1.e-10)
+  if (std::fabs(theta_adim_moy)>1.e-10)
     Nu = 2./theta_adim_moy;
   const double rho_cp_u_moy = calculer_rho_cp_u_moyen(vx, cp_,ref_ijk_ft_->rho_field_);
   // Impression dans le fichier source_temperature.out
@@ -1617,15 +1621,17 @@ void IJK_Thermique::calculer_gradient_temperature(const IJK_Field_double& temper
 // Les interfaces connaissent le splitting_ft_ donc la correspondance doit etre appliquee au splitting ft pour convertir :
 // convert_packed_to_ijk_cell.
 // Donc il faut un champ de T etendu...
-void IJK_Thermique::compute_interfacial_temperature(ArrOfDouble& interfacial_temperature, ArrOfDouble& interfacial_phin_ai,
-                                                    FixedVector<IJK_Field_double, 3> storage) const
+void IJK_Thermique::compute_interfacial_temperature(
+  ArrOfDouble& interfacial_temperature,
+  ArrOfDouble& interfacial_phin_ai,
+  FixedVector<IJK_Field_double, 3> storage) const
 {
   const IJK_Splitting& s =temperature_ft_.get_splitting();
   // Comme un cell_vector (ie cell-centered) mais en local :
   const int ni = temperature_ft_.ni();
   const int nj = temperature_ft_.nj();
   const int nk = temperature_ft_.nk();
-  const IJK_Field_double& indic = ref_ijk_ft_->indicatrice_ft_;
+  const IJK_Field_double& indic = ref_ijk_ft_->itfce().I_ft();
   const IJK_Grid_Geometry& geom = s.get_grid_geometry();
   const double dx = geom.get_constant_delta(DIRECTION_I);
   const double dy = geom.get_constant_delta(DIRECTION_J);
@@ -1751,10 +1757,55 @@ void IJK_Thermique::compute_interfacial_temperature(ArrOfDouble& interfacial_tem
   return;
 }
 
+void IJK_Thermique::compute_interfacial_temperature2(
+  ArrOfDouble& interfacial_temperature,
+  ArrOfDouble& flux_normal_interp) const
+{
+  const IJK_Grid_Geometry& geom = ref_ijk_ft_->get_geometry();
+  const double dist = 1.52 * std::pow(std::pow(geom.get_constant_delta(0), 2.) +
+                                      std::pow(geom.get_constant_delta(1), 2.) +
+                                      std::pow(geom.get_constant_delta(2), 2.), 0.5 );
+  const Maillage_FT_IJK& maillage = ref_ijk_ft_->interfaces_.maillage_ft_ijk();
+  const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
+  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
+  const int nb_facettes=maillage.nb_facettes();
+  const IntTab& facettes = maillage.facettes();
+  const DoubleTab& sommets = maillage.sommets();
+  DoubleTab coord_facettes;
+  coord_facettes.resize(nb_facettes, 3);
+  coord_facettes = 0.;
+  for (int fa7 = 0; fa7 < nb_facettes; fa7++)
+    for (int dir=0; dir < 3; dir++)
+      for (int som=0; som < 3; som++)
+        coord_facettes(fa7, dir) += sommets(facettes(fa7, som), dir);
+
+  for (int fa7 = 0; fa7 < nb_facettes; fa7++)
+    for (int dir=0; dir < 3; dir++)
+      coord_facettes(fa7, dir) /= 3.;
+
+  DoubleTab coo_liqu, coo_vap;
+  ArrOfDouble temp_liqu, temp_vap;
+  temp_liqu.set_smart_resize(1);
+  temp_vap.set_smart_resize(1);
+  coo_liqu.set_smart_resize(1);
+  coo_vap.set_smart_resize(1);
+  Corrige_flux_FT_temperature_conv::calcul_temperature_flux_interface(temperature_ft_,
+                                                                      lambda_liquid_, lambda_vapor_, dist,
+                                                                      coord_facettes, normale_facettes,
+                                                                      interfacial_temperature, flux_normal_interp,
+                                                                      temp_liqu, temp_vap,
+                                                                      coo_liqu, coo_vap);
+  for (int fa7=0; fa7 < nb_facettes; fa7++)
+    {
+      flux_normal_interp(fa7) *= surface_facettes(fa7);
+      interfacial_temperature(fa7) *= surface_facettes(fa7);
+    }
+}
+
 double IJK_Thermique::compute_global_energy(const IJK_Field_double& temperature)
 {
   global_energy_ = 0.;
-  const IJK_Field_double& indic = ref_ijk_ft_->indicatrice_ns_;
+  const IJK_Field_double& indic = ref_ijk_ft_->itfce().I();
   //const IJK_Grid_Geometry& geom = indic.get_splitting().get_grid_geometry();
   const double rhocpl = ref_ijk_ft_->rho_liquide_ *cp_liquid_;
   const double rhocpv = ref_ijk_ft_->rho_vapeur_ *cp_vapor_;
@@ -1830,7 +1881,7 @@ void IJK_Thermique::compute_T_rust(const FixedVector<IJK_Field_double, 3>& veloc
     for (int j=0; j< ny; j++)
       for (int i=0; i < nx; i++)
         {
-          const double chi_l = ref_ijk_ft_->indicatrice_ft_(i,j,k);
+          const double chi_l = ref_ijk_ft_->itfce().I(i,j,k);
           T_rust_(i,j,k) *= temperature_(i,j,k)/(chi_l*rho_l*cp_liquid_ + (1-chi_l)*rho_v*cp_vapor_);
         }
   statistiques().end_count(cnt_conv_temp);
@@ -1844,7 +1895,7 @@ void IJK_Thermique::compute_dT_rustine(const double dE)
   const int nk = T_rust_.nk();
   const double rho_l = ref_ijk_ft_->rho_liquide_;
   const double rho_v = ref_ijk_ft_->rho_vapeur_;
-  const IJK_Field_double indic = ref_ijk_ft_->indicatrice_ns_;
+  const IJK_Field_double indic = ref_ijk_ft_->itfce().I();
   double int_rhocpTrust = 0;
   for (int k = 0; k < nk; k++)
     for (int j = 0; j < nj; j++)
@@ -1939,3 +1990,9 @@ void IJK_Thermique::ecrire_reprise_thermique(SFichier& fichier )
   fichier << "   }\n";
 }
 #endif
+
+double IJK_Thermique::get_rhocp_l() const
+{ return  ref_ijk_ft_->rho_liquide_ * cp_liquid_; }
+
+double IJK_Thermique::get_rhocp_v() const
+{ return  ref_ijk_ft_->rho_vapeur_ * cp_vapor_; }

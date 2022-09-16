@@ -74,10 +74,8 @@ public:
   std::vector< std::vector< std:: vector <double >>> get_coeff();
   // std:: vector <double > get_coeff_flt();
   ArrOfDouble& get_coeff_flt();
-  // fftw_complex* get_fftw_p_coeff(int dir);
 private:
 
-  // int ni,nj,nk;
   int nl,nm,nn,n_lmn;
   int momin,momax;
   double amplitude;
@@ -85,11 +83,7 @@ private:
   double energie;
 
   std::vector< std::vector< std:: vector <double >>> force;
-  // std::vector< double > force_flt;
   ArrOfDouble force_flt;
-  // fftw_complex *fftw_forceX;
-  // fftw_complex *fftw_forceY;
-  // fftw_complex *fftw_forceZ;
 };
 
 

@@ -270,7 +270,7 @@
 #define Fry_MOY 221
 #define Frz_MOY 222
 //
-// Repulsion : sum fabs(pot_rep * dIdxb)
+// Repulsion : sum std::fabs(pot_rep * dIdxb)
 #define Frax_MOY 223
 #define Fray_MOY 224
 #define Fraz_MOY 225

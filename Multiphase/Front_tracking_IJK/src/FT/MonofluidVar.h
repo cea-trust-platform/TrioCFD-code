@@ -14,83 +14,71 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : Init_spectral.h
-// Directory : $IJK_ROOT/src
+// File      : MonofluidVar.h
+// Directory : $IJK_ROOT/src/FT
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef Chouippe_included
-#define Chouippe_included
+#ifndef IJK_MonofluidVar_included
+#define IJK_MonofluidVar_included
 
-#include <FixedVector.h>
 #include <IJK_Field.h>
-#include <Objet_U.h>
-#include <fftw3.h>
-#pragma GCC diagnostic push
-#if __GNUC__ > 5
-#pragma GCC diagnostic ignored "-Wsuggest-override"
-#endif
-#include <fftw3-mpi.h>
-#pragma GCC diagnostic pop
-#include <vector>
 
 
-/*! @brief : class Chouippe
- *
- *  <Description of class Chouippe>
- * 
- * 
- *
- */
-int unidentified_function(int argc, char **argv);
-void Create_file(std::string const& fichname, std::string const& name);
-void Add_in_file(std::string const& fichname, std::string const& information);
-void Add_in_file(std::string const& fichname, int const information);
-void Add_in_file(std::string const& fichname, ArrOfInt const& information);
-void Add_in_file(std::string const& fichname, std::string const& info, int const information);
-
-// void fftw_org_real_data_MPI_transform(int argc, char **argv);
-std::string fftw_org_real_data_MPI_transform();
-// int fftw_org_unidentified_function(int argc, char **argv);
-std::string fftw_org_unidentified_function();
+/////////////////////////////////////////////////////////////////////////////
+//
+// .DESCRIPTION : class IJK_MonofluidVar
+//
+// Cette classe vise à simplifier l'appel aux propriétés constantes par phase
+// dans la formulation monofluide.
+//
+/////////////////////////////////////////////////////////////////////////////
 
 
-class forcage_spectral : public Objet_U
+class IJK_MonofluidVar
 {
-
-  Declare_instanciable( forcage_spectral ) ;
-
 public :
-  // Constructeurs
-  // forcage_spectral();
-  // Destructeur;
-  // ~forcage_spectral();
+  IJK_MonofluidVar() {}
+  ~IJK_MonofluidVar() {}
+  void initialize(const double liqu_val, const double vap_val);
 
-  void fftw_org_multi_D_MPI_DFT_real_data();
-  int get_compteur0();
-  int get_compteur1();
-  int get_compteur2();
-  void set_nk_kmin_kmax(const int number_k, const double kmin, const double kmax);
-  void set_spectral_domain();
-  void set_a_force();
+  ///////////////
+  // Accessors //
+  ///////////////
 
-protected :
-  //void compute_inital_velocity_spectral(FixedVector<IJK_Field_double, 3>);
+  double operator()(const double indic_l) const;
+  double operator()(const IJK_Field_double& indic_l, const int i, const int j, const int k) const ;
+  void operator()(const IJK_Field_double& indic_l, IJK_Field_double& res) const;
+  double harmo(const double indic_l) const ;
+  double harmo(const IJK_Field_double indic_l, const int i, const int j, const int k) const ;
+  void harmo(const IJK_Field_double& indic_l, IJK_Field_double& res) const;
+
+  ///////////////
+  // Modifiers //
+  ///////////////
+
+  IJK_MonofluidVar& operator*= (const IJK_MonofluidVar& mono2);
+  IJK_MonofluidVar& operator/= (const IJK_MonofluidVar& mono2);
+  IJK_MonofluidVar& operator+= (const IJK_MonofluidVar& mono2);
+
+  /////////////
+  // getters //
+  /////////////
+
+  double liqu() const;
+  double vap() const;
+
 private:
-
-  double k_max,k_min;
-  int nk;
-  int nk_tot;
-  // std::vector<double> kx(), ky(),kz();
-  ArrOfDouble kx, ky,kz;
-  // std::vector<double> fx(),fy(),fz();
-  ArrOfDouble fx,fy,fz;
-
-  int compteur[3];
+  double liqu_val_;
+  double vap_val_;
 };
 
 
+// Non member functions
 
 
+IJK_MonofluidVar operator* (const IJK_MonofluidVar& mono1, const IJK_MonofluidVar& mono2);
+IJK_MonofluidVar operator/ (const IJK_MonofluidVar& mono1, const IJK_MonofluidVar& mono2);
+IJK_MonofluidVar operator+ (const IJK_MonofluidVar& mono1, const IJK_MonofluidVar& mono2);
 
-#endif /* Init_spectral_included */
+#endif /* IJK_Energie_included */

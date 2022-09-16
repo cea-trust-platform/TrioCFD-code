@@ -5071,7 +5071,7 @@ double Maillage_FT_Disc::calculer_costheta_objectif(const int s0, const int face
 
   const double costheta0 = tab_cos_theta(s0, 0);
   const double costheta1 = tab_cos_theta(s0, 1);
-  /*  if (fabs(costheta0-costheta1)<1e-5) {
+  /*  if (std::fabs(costheta0-costheta1)<1e-5) {
   	// Pas besoin de se casser la tete s'il n'y a pas d'hysterisis...
       return costheta0;
       }
@@ -5108,7 +5108,7 @@ double Maillage_FT_Disc::calculer_costheta_objectif(const int s0, const int face
       drapeau_angle_in_range.clearbit(s0);
       // L'angle reel est en dehors de l'intervalle. On retient donc la borne de l'intervalle la
       // plus proche comme valeur pour utiliser dans le calcul de la courbure.
-      if (fabs(ps-costheta0) <fabs(ps-costheta1))
+      if (std::fabs(ps-costheta0) <std::fabs(ps-costheta1))
         {
           // On est proche de la borne costheta0. C'est elle qu'on va utiliser.
           costheta = costheta0;
@@ -5430,7 +5430,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                                 {
                                   // L'angle reel est en dehors de l'intervalle. On retient donc la borne de l'intervalle la
                                   // plus proche comme valeur pour utiliser dans le calcul de la courbure.
-                                  if (fabs(ps-costheta0) <fabs(ps-costheta1))
+                                  if (std::fabs(ps-costheta0) <std::fabs(ps-costheta1))
                                     {
                                       // On est proche de la borne costheta0. C'est elle qu'on va utiliser.
                                       costheta = costheta0;
@@ -5444,7 +5444,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                                 // Pour remplacer une bonne part du bloc precedent :
                                 const double costheta_bis = calculer_costheta_objectif(s0, facette, call, store_courbure_sommets[s0],
                                                                                        tab_cos_theta, drapeau_angle_in_range);
-                                if (fabs(costheta-costheta_bis)>1e-8)
+                                if (std::fabs(costheta-costheta_bis)>1e-8)
                                   {
                                     Cerr << "Oh oh... les 2 methodes different... " << finl;
                                     Process::exit();
@@ -5566,7 +5566,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                                     parcours.calculer_normale_face_bord(numface1,
                                                                         sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
                                                                         nb1[0], nb1[1], nb1[2]);
-                                    if (fabs(nb[0]*nb1[0]+nb[1]*nb1[1]+nb[2]*nb1[2]-1.) > 0.05)
+                                    if (std::fabs(nb[0]*nb1[0]+nb[1]*nb1[1]+nb[2]*nb1[2]-1.) > 0.05)
                                       {
                                         nb+=nb1;
                                         normalize(nb);
@@ -5639,7 +5639,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                                     parcours.calculer_normale_face_bord(numface2,
                                                                         sommets_(s1,0), sommets_(s1,1),  sommets_(s1,2),
                                                                         nb2[0], nb2[1], nb2[2]);
-                                    if (fabs(nb[0]*nb2[0]+nb[1]*nb2[1]+nb[2]*nb2[2]-1.) > 0.05)
+                                    if (std::fabs(nb[0]*nb2[0]+nb[1]*nb2[1]+nb[2]*nb2[2]-1.) > 0.05)
                                       {
                                         nb+=nb2;
                                         normalize(nb);
@@ -5899,7 +5899,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
           // Quelle que soit la methode, on print si on a plus d'une passe :
           if ((call>1) && (sommet_face_bord_[i]>=0))
             {
-              double delta=fabs(courbure_sommets[i] - c);
+              double delta=std::fabs(courbure_sommets[i] - c);
               norm_L2 += delta*delta;
               count++;
               if (delta>norm_Linf)

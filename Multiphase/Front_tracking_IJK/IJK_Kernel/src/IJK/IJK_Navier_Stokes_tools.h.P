@@ -134,7 +134,7 @@ void squared_3x3(double& a11, double& a12, double& a13,
 
 // fonction moyenne en temps du champs de vitesse utilise dans le cas de bulles fixes
 void update_integral_velocity(const FixedVector<IJK_Field_double, 3>& v_instant,  FixedVector<IJK_Field_double, 3>& v_tmp,
-                              IJK_Field_double& indic, IJK_Field_double& indic_tmp);
+                              const IJK_Field_double& indic, const IJK_Field_double& indic_tmp);
 void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i,
                                   const IJK_Field_double& vitesse_j,
                                   const IJK_Field_double& vitesse_k,
@@ -148,7 +148,7 @@ void compute_and_store_gradU_cell(const IJK_Field_double& vitesse_i,
 
 void supprimer_chevauchement(IJK_Field_double& ind);
 
-void update_integral_pressure(const IJK_Field_double& p_instant,  IJK_Field_double& p_tmp, IJK_Field_double& indic, IJK_Field_double& indic_tmp);
+void update_integral_pressure(const IJK_Field_double& p_instant,  IJK_Field_double& p_tmp, const IJK_Field_double& indic, const IJK_Field_double& indic_tmp);
 void update_integral_indicatrice(const IJK_Field_double& indic, const double deltat, IJK_Field_double& out);
 double maxValue(IJK_Field_double& indic);
 
@@ -168,6 +168,6 @@ double calculer_tauw(const IJK_Field_double& vx, const double mu_liquide);
 
 void calculer_gradient_temperature(const IJK_Field_double& temperature, FixedVector<IJK_Field_double, 3>& grad_T);
 void add_gradient_temperature(const IJK_Field_double& temperature, const double constant, IJK_Field_double& vx,
-                              IJK_Field_double& vy, IJK_Field_double& vz, Boundary_Conditions_Thermique& boundary, IJK_Field_double& lambda);
+                              IJK_Field_double& vy, IJK_Field_double& vz, const Boundary_Conditions_Thermique& boundary, const IJK_Field_double& lambda);
 #Pendmacro(DEFMACRO)
 #Pusemacro(DEFMACRO)(double)

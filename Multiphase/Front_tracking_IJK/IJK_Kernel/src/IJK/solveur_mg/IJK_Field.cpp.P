@@ -100,7 +100,7 @@ void set_imin_nitot(int rank_dir, int nproc_dir,
     envoyer(n_tot, pe_min, canal);
 }
 
-#Pmacro DEF_IJK_FIELD(_TYPE_,_ARRAYTYPE_)
+#Pmacro DEF_IJK_FIELD(_TYPE_,_ARRAYTYPE_,_IS_INT_)
 
 Implemente_instanciable_sans_constructeur(IJK_Field_local__TYPE_, "IJK_Field_local__TYPE_", Objet_U);
 Implemente_instanciable(IJK_Field__TYPE_, "IJK_Field__TYPE_", IJK_Field_local__TYPE_);
@@ -458,5 +458,6 @@ double somme_ijk(const IJK_Field__TYPE_ & residu)
 
 #Pendmacro(DEF_IJK_FIELD)
 
-#Pusemacro(DEF_IJK_FIELD)(float,ArrOfFloat)
-#Pusemacro(DEF_IJK_FIELD)(double,ArrOfDouble)
+#Pusemacro(DEF_IJK_FIELD)(float,ArrOfFloat,0)
+#Pusemacro(DEF_IJK_FIELD)(double,ArrOfDouble,0)
+#Pusemacro(DEF_IJK_FIELD)(int,ArrOfInt,1)

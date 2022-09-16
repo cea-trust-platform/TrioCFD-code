@@ -59,7 +59,10 @@ public:
                                double x, double y, double z) const;
 
   double get_erreur_geometrique() const;
-
+  int get_correction_parcours_thomas() const
+  {
+    return correction_parcours_thomas_ ;
+  };
   void projeter_vecteur_sur_face(const int num_face, double& x_, double& y_, double& z_) const;
 
   void calculer_normale_face_bord(int num_face, double x, double y, double z,

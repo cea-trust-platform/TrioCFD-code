@@ -42,8 +42,10 @@
 #include <init_forcage_THI.h>
 #include <corrections_qdm.h>
 #include <Force_sp.h>
+#include <IJK_Energie.h>
 
 Declare_liste(IJK_Thermique);
+Declare_liste(IJK_Energie);
 
 // #define SMOOTHING_RHO
 
@@ -93,6 +95,10 @@ public :
   {
     return splitting_ft_ ;
   }
+  const IJK_Splitting& get_splitting_ns() const
+  {
+    return splitting_ ;
+  }
   const Probleme_base& probleme(const IJK_Splitting& split) const
   {
     if (split == splitting_ft_)
@@ -111,6 +117,14 @@ public :
   {
     return reprise_;
   }
+  double get_rho_l() const
+  {
+    return rho_liquide_;
+  }
+  double get_rho_v() const
+  {
+    return rho_vapeur_;
+  }
 //  const int& nb_thermal_equations() const
 //  {
 //      return thermique_.
@@ -120,6 +134,10 @@ public :
 
   void run();
   void euler_time_step(ArrOfDouble& var_volume_par_bulle);
+  // MODIF Aymeric : c'est plus pratique de mettre cette methode publique,
+  // c'est une methode generique cont.
+  void euler_explicit_update(const IJK_Field_double& dv, IJK_Field_double& v,
+                             const int k_layer) const;
 
   //MODIF GAB 26 nov 2020
   void write_check_etapes_et_termes(const int rk_step);
@@ -154,8 +172,34 @@ public :
   //  resu =
   //}
   //IJK_FT_double operator*=(const IJK_FT_double& )
+  // const IJK_Field_double& get_indicatrice_ft() const {return interfaces_.indicatrice_ft(); }
+  // const IJK_Field_double& get_indicatrice_ft_next() const {return interfaces_.indicatrice_ft_next(); }
+  const IJK_Interfaces& itfce() const {return interfaces_;}
+  int disable_diphasique() const {return disable_diphasique_;}
+  // Redistribute_Field& redistrib_to_ft_elem() const {return redistribute_to_splitting_ft_elem_;}
+  // FixedVector<Redistribute_Field, 3>& redistrib_to_ft_face() const {return redistribute_to_splitting_ft_faces_;}
 
+  // TODO: aym attention, cette methode n'est pas constante
+  Redistribute_Field& redistrib_from_ft_elem() {return redistribute_from_splitting_ft_elem_;}
+  // FixedVector<Redistribute_Field, 3>& redistrib_from_ft_face() const {return redistribute_from_splitting_ft_faces_;}
+  void get_redistribute_from_splitting_ft_faces(
+    const FixedVector<IJK_Field_double, 3>& faces_ft,
+    FixedVector<IJK_Field_double, 3>& faces_ns
+  )
+  {
+    for (int dir = 0; dir < 3; dir++)
+      {
+        redistribute_from_splitting_ft_faces_[dir].redistribute(
+          faces_ft[dir],
+          faces_ns[dir]);
+      }
+  }
 
+  const IJK_Grid_Geometry& get_geometry() const
+  {
+    return splitting_.get_grid_geometry();
+  }
+  const IJK_FT_Post& get_post() const {return post_;}
 
 protected :
   // Interdit constructeur par copie et operateur copie
@@ -165,15 +209,9 @@ protected :
   void update_rho_v();
   int initialise();
   void terme_source_gravite(IJK_Field_double& dv, int k_index, int dir) const;
-  void euler_explicit_update(const IJK_Field_double& dv, IJK_Field_double& v,
-                             const int k_layer) const;
   void rk3_sub_step(const int rk_step, const double total_timestep,
                     const double fractionnal_timestep, const double time);
   void calculer_dv(const double timestep, const double time, const int rk_step);
-  const IJK_Grid_Geometry& get_geometry() const
-  {
-    return splitting_.get_grid_geometry();
-  }
 
   //ab-sauv/repr-deb
   void ecrire_donnees(const FixedVector<IJK_Field_double, 3>& f3compo, SFichier& le_fichier, const int compo, bool binary) const;
@@ -189,6 +227,7 @@ protected :
   double find_timestep(const double max_timestep, const double cfl, const double fo, const double oh);
   void parcourir_maillage();
   void calculer_rho_mu_indicatrice(const bool parcourir = true);
+  void maj_indicatrice_rho_mu(const bool parcourir = true);
   void ajout_dTrustine();
   void deplacer_interfaces(const double timestep, const int rk_step, ArrOfDouble& var_volume_par_bulle);
   void deplacer_interfaces_rk3(const double timestep, const int rk_step, ArrOfDouble& var_volume_par_bulle);
@@ -397,11 +436,6 @@ protected :
   FixedVector<IJK_Field_double, 3> terme_repulsion_interfaces_ns_;
   FixedVector<IJK_Field_double, 3> terme_abs_repulsion_interfaces_ns_;
 
-  // On prevoie un tableau assez grand pour contenir tous les groupes.
-  FixedVector<IJK_Field_double, max_authorized_nb_of_groups_> groups_indicatrice_ft_;
-  FixedVector<IJK_Field_double, max_authorized_nb_of_groups_> groups_indicatrice_ns_;
-  FixedVector<IJK_Field_double, max_authorized_nb_of_groups_> groups_indicatrice_ft_test_; //pour verifier le calcul optimise de l'indicatrice
-
   // Pour l'option alternative du calcul de la diffusion :
   IJK_Field_double unit_;
   FixedVector<IJK_Field_double, 3> laplacien_velocity_;
@@ -413,12 +447,8 @@ protected :
   FixedVector<IJK_Field_double, 3> psi_velocity_;
 #endif
 
-  // Indicatrice sur le domaine etendu :
-  IJK_Field_double indicatrice_ft_;
-  IJK_Field_double indicatrice_ft_test_; //pour verifier le calcul optimise de l'indicatrice
-
-  //  Indicatrice sur le domaine NS :
-  IJK_Field_double indicatrice_ns_;
+  // Booleen pour savoir si on a mis a jour l'indicatrice avec indicatrice next
+  // bool indicatrice_is_indicatrice_next_;
 
   // Pressure field
   IJK_Field_double pressure_;
@@ -469,7 +499,7 @@ protected :
 #ifdef SMOOTHING_RHO
   int smooth_density_;
   double ratio_density_max_;
-  Redistribute_Field redistribute_to_splitting_ft_elem_; // pour le smoothing de rho..
+  // Redistribute_Field redistribute_to_splitting_ft_elem_; // pour le smoothing de rho..
   IJK_Field_double rho_field_ft_;
 #endif
   Redistribute_Field redistribute_to_splitting_ft_elem_;
@@ -533,6 +563,7 @@ protected :
 
   // Dealing with thermal aspects:
   LIST(IJK_Thermique) thermique_;
+  LIST(IJK_Energie) energie_;
 
 };
 

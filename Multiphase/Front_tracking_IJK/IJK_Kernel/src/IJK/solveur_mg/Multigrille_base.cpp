@@ -1725,7 +1725,7 @@ void Multigrille_base::resoudre_systeme_float(const Matrice_Base & a, const Doub
 	  residu -= bb;
 	  double r1 = mp_norme_vect(residu);
 	  double r2 = norme_ijk(ijk_residu);
-	  if (fabs(r2-r1)>1e-10)
+	  if (std::fabs(r2-r1)>1e-10)
 	  Cerr << "ijk " << i << " " << j << " " << k << " " << r1 << " " << r2 << "     " << r2 - r1 <<  " nx=" << nx << finl;
 	}
 
@@ -1940,7 +1940,7 @@ void Multigrille_base::resoudre_systeme_double(const Matrice_Base & a, const Dou
 	  residu -= bb;
 	  double r1 = mp_norme_vect(residu);
 	  double r2 = norme_ijk(ijk_residu);
-	  if (fabs(r2-r1)>1e-10)
+	  if (std::fabs(r2-r1)>1e-10)
 	  Cerr << "ijk " << i << " " << j << " " << k << " " << r1 << " " << r2 << "     " << r2 - r1 <<  " nx=" << nx << finl;
 	}
 

@@ -299,15 +299,15 @@ std::string fftw_org_real_data_MPI_transform()
 }
 
 
-double forcage_spectral::get_compteur0()
+int forcage_spectral::get_compteur0()
 {
   return compteur[0];
 }
-double forcage_spectral::get_compteur1()
+int forcage_spectral::get_compteur1()
 {
   return compteur[1];
 }
-double forcage_spectral::get_compteur2()
+int forcage_spectral::get_compteur2()
 {
   return compteur[2];
 }
