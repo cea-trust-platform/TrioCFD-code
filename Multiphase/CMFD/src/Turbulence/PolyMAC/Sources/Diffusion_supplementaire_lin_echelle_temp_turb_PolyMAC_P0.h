@@ -27,15 +27,12 @@
 #include <Ref_Correlation.h>
 #include <TRUSTTab.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0
-//    Cette classe implemente dans PolyMAC_P0 la diffusion supplementaire venant de l'introduction du temps tau
-//
-// .SECTION voir aussi
-//    Operateur_PolyMAC_P0_base Operateur_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Diffusion_supplementaire_echelle_temp_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 la diffusion supplementaire venant de l'introduction du temps tau
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
 class Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Diffusion_supplementaire_lin_echelle_temp_turb_PolyMAC_P0);

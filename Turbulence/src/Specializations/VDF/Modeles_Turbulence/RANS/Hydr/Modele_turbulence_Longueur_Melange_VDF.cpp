@@ -40,40 +40,22 @@ Modele_turbulence_Longueur_Melange_VDF::Modele_turbulence_Longueur_Melange_VDF()
   direction=1;
 }
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Modele_turbulence_Longueur_Melange_VDF::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
 
 
-// Description:
-//    Simple appel a Mod_turb_hyd_RANS_0_eq::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Mod_turb_hyd_RANS_0_eq::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Modele_turbulence_Longueur_Melange_VDF::readOn(Entree& s)
 {
   return Mod_turb_hyd_RANS_0_eq::readOn(s);

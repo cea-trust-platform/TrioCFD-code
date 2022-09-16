@@ -32,17 +32,12 @@
 #include <Champ_Don.h>
 #include <Ref_Champ_Don.h>
 #include <Table.h>
-//class Probleme_base;
-
-//
-// .DESCRIPTION class Source_Con_Phase_field
-//
-
-//
-// .SECTION voir aussi Source_base, SouConPhase_field
-//
-//
-
+/*! @brief class Source_Con_Phase_field
+ *
+ *
+ *
+ * @sa Source_base, SouConPhase_field
+ */
 class Source_Con_Phase_field : public Source_Con_Phase_field_base
 {
 

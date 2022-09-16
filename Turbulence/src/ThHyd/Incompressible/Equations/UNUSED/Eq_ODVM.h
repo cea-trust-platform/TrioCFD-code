@@ -25,18 +25,14 @@
 #include <Motcle.h>
 #include <Ref_Milieu_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Eq_ODVM
-//    Classe resolvant l'equation de temperature moyenne, l'equation de
-//    fluctuation de temperature et l'equation de variance de temperature
-//    en 1-D
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Eq_ODVM Classe resolvant l'equation de temperature moyenne, l'equation de
+ *
+ *     fluctuation de temperature et l'equation de variance de temperature
+ *     en 1-D
+ *
+ *
+ *
+ */
 class Eq_ODVM : public Objet_U
 {
   Declare_instanciable(Eq_ODVM);

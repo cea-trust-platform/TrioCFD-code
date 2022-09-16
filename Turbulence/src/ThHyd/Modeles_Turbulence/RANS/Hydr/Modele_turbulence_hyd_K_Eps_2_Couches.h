@@ -24,15 +24,12 @@
 
 #include <Transport_K_KEps.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Modele_turbulence_hyd_K_Eps_2_Couches
-//    Cette classe represente le modele de turbulence (k,eps) pour les
-//    equations de Navier-Stokes.
-// .SECTION voir aussi
-//    Mod_turb_hyd_base Mod_turb_hyd_ss_maille
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Modele_turbulence_hyd_K_Eps_2_Couches Cette classe represente le modele de turbulence (k,eps) pour les
+ *
+ *     equations de Navier-Stokes.
+ *
+ * @sa Mod_turb_hyd_base Mod_turb_hyd_ss_maille
+ */
 class Modele_turbulence_hyd_K_Eps_2_Couches : public Mod_turb_hyd_RANS
 {
 
@@ -70,188 +67,105 @@ private:
 };
 
 
-// Description:
-//    Renvoie le champ inconnue du modele de turbulence
-//    i.e. : (K,Epsilon). Cette inconnue est portee
-//    par l'equation de transport K-eps porte par le modele.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (K,epsilon)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ inconnue du modele de turbulence i.
+ *
+ * e. : (K,Epsilon). Cette inconnue est portee
+ *     par l'equation de transport K-eps porte par le modele.
+ *     (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps() const
 {
   return eqn_transport_K_Eps.inconnue();
 }
 
 
-// Description:
-//    Renvoie le champ inconnue du modele de turbulence
-//    i.e. : (K,Epsilon). Cette inconnue est portee
-//    par l'equation de transport K-eps porte par le modele.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (K,epsilon)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ inconnue du modele de turbulence i.
+ *
+ * e. : (K,Epsilon). Cette inconnue est portee
+ *     par l'equation de transport K-eps porte par le modele.
+ *
+ * @return (Champ_Inc&) le champ inconnue (K,epsilon)
+ */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_2_Couches::K_Eps()
 {
   return eqn_transport_K_Eps.inconnue();
 }
 
 
-// Description:
-//    Renvoie le nombre couches utilises pour les lois de paroi
-//    Ce nombre est porte par l'equation de transport K_K-eps.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre de couches
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nombre couches utilises pour les lois de paroi Ce nombre est porte par l'equation de transport K_K-eps.
+ *
+ * @return (int) le nombre de couches
+ */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nbcouches() const
 {
   return eqn_transport_K_Eps.get_nbcouches();
 }
 
 
-// Description:
-//    Renvoie le y* de switch entre les deux couches pour le modele a deux couches.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre de couches
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le y* de switch entre les deux couches pour le modele a deux couches.
+ *
+ * (version const)
+ *
+ * @return (int) le nombre de couches
+ */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_yswitch() const
 {
   return eqn_transport_K_Eps.get_yswitch();
 }
 
 
-// Description:
-//    Renvoie 0 si on choisit le switch par y*, 1 par nu_t.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie 0 si on choisit le switch par y*, 1 par nu_t.
+ *
+ * (version const)
+ *
+ * @return (int)
+ */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_switch() const
 {
   return eqn_transport_K_Eps.get_switch();
 }
 
-// Description:
-//    Renvoie la valeur de nut/nu qui delimite les deux couches.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: valeur limite de nu_t/nu
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la valeur de nut/nu qui delimite les deux couches.
+ *
+ * (version const)
+ *
+ * @return (int) valeur limite de nu_t/nu
+ */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_nutswitch() const
 {
   return eqn_transport_K_Eps.get_nutswitch();
 }
 
-// Description:
-//    indique si on doit ecrire la zone des 2 couches dans le .out.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: 1 si on imprime , 0 sinon.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief indique si on doit ecrire la zone des 2 couches dans le .
+ *
+ * out. (version const)
+ *
+ * @return (int) 1 si on imprime , 0 sinon.
+ */
 inline int Modele_turbulence_hyd_K_Eps_2_Couches::get_impr() const
 {
   return eqn_transport_K_Eps.get_impr();
 }
 
-// Description:
-//    Renvoie l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Trasnport_K_KEps
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'equation.
+ *
+ * (version const)
+ *
+ * @return (Trasnport_K_KEps)
+ */
 inline const Transport_K_Eps_base&  Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps() const
 {
   return eqn_transport_K_Eps;
 }
 
-// Description:
-//    Renvoie l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Trasnport_K_KEps
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'equation.
+ *
+ * (version const)
+ *
+ * @return (Trasnport_K_KEps)
+ */
 inline Transport_K_Eps_base& Modele_turbulence_hyd_K_Eps_2_Couches::eqn_transp_K_Eps()
 {
   return eqn_transport_K_Eps;

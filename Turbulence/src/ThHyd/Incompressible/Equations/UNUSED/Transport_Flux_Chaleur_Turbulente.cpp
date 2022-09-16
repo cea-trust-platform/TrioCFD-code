@@ -43,8 +43,9 @@ Sortie& Transport_Flux_Chaleur_Turbulente::printOn(Sortie& s ) const
   return s << que_suis_je() << "\n";
 }
 
-// Description:
-//  cf Convection_Diffusion_std::readOn(is)
+/*! @brief cf Convection_Diffusion_std::readOn(is)
+ *
+ */
 Entree& Transport_Flux_Chaleur_Turbulente::readOn(Entree& is )
 {
   Convection_Diffusion_std::readOn(is);
@@ -83,17 +84,21 @@ int Transport_Flux_Chaleur_Turbulente::lire_motcle_non_standard(const Motcle& mo
   return 1;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le nombre d'operateurs.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le nombre d'operateurs.
+ *
+ */
 int Transport_Flux_Chaleur_Turbulente::nombre_d_operateurs() const
 {
   return 2;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le ieme operateur.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le ieme operateur.
+ *
+ */
 const Operateur& Transport_Flux_Chaleur_Turbulente::operateur(int i) const
 {
   assert(i>=0);
@@ -120,9 +125,11 @@ const Operateur& Transport_Flux_Chaleur_Turbulente::operateur(int i) const
   return terme_diffusif;
 }
 
-// Description:
-// surcharge de la methode d'Equation_base.
-// renvoie le ieme operateur.
+/*! @brief surcharge de la methode d'Equation_base.
+ *
+ * renvoie le ieme operateur.
+ *
+ */
 Operateur& Transport_Flux_Chaleur_Turbulente::operateur(int i)
 {
   assert(i>=0);

@@ -430,7 +430,9 @@ void Matrice_Grossiere::add_dist_bloc(int pe, int imin, int jmin, int kmin,
 	items_to_send.append_array(index);
       }
 }
-// Description: ajoute deux coefficients diagonal/extra-diagonal a la matrice
+/*! @brief ajoute deux coefficients diagonal/extra-diagonal a la matrice
+ *
+ */
 void Matrice_Grossiere::ajoute_coeff(int i, int j, int k,
 				     int i_voisin, int j_voisin, int k_voisin,
 				     const double coeff)

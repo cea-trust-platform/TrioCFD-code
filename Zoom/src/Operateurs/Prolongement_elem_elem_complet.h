@@ -31,11 +31,9 @@ class Zone_VF;
 class Frontiere;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
-//
-// .DESCRIPTION class Prolongement_elem_elem_complet
-//
-// .SECTION voir aussi
-
+/*! @brief class Prolongement_elem_elem_complet
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

@@ -26,14 +26,14 @@
 #include <Paroi_scal_hyd_base_VDF.h>
 #include <Table.h>
 
-//.DESCRIPTION classe Paroi_loi_WW_scal_VDF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_loi_WW_scal_VDF
-
+/*! @brief classe Paroi_loi_WW_scal_VDF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_loi_WW_scal_VDF
+ *
+ */
 class Paroi_loi_WW_scal_VDF : public Paroi_scal_hyd_base_VDF
 {
 

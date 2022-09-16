@@ -47,22 +47,10 @@ Entree& Connectivites_base::readOn(Entree& s )
 }
 
 
-// Description:
-//    Calcul des connectivites entre faces fines et faces grossieres :
-//
-// Precondition:
-// Parametre:Zone_VF& zoneG, Zone_VF& zoneF
-//    Signification: zones grossiere et fine
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
+/*! @brief Calcul des connectivites entre faces fines et faces grossieres :
+ *
+ * @param (Zone_VF& zoneG, Zone_VF& zoneF) zones grossiere et fine
+ */
 void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
                                                           Zone_VF& zoneg,
                                                           Domaine& domg)
@@ -865,24 +853,14 @@ void Connectivites_base::calculer_connectivites_face_face(Zone_VF& zonef,
 }
 
 
-// Description:
-//    Calcul des connectivites entre elements fins et elements grossiers :
-//    Elle remplit le tableau "connectivites_elemF_elemG" qui contient,
-//    pour chaque element fin,
-//    l'element grossier contenant son centre de gravite
-// Precondition:
-// Parametre:Zone& zoneG, Zone& zoneF
-//    Signification: zone discretisee grossiere et fine
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: da
-// Effets de bord:
-// Postcondition: connectivites_elemF_elemG est rempli
-
+/*! @brief Calcul des connectivites entre elements fins et elements grossiers : Elle remplit le tableau "connectivites_elemF_elemG" qui contient,
+ *
+ *     pour chaque element fin,
+ *     l'element grossier contenant son centre de gravite
+ *
+ * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @throws da
+ */
 void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
                                                           Zone_VF& zone_vfG)
 {
@@ -953,22 +931,13 @@ void Connectivites_base::calculer_connectivites_elem_elem(Zone_VF& zone_vfF,
 
 
 
-// Description:
-//    Calcul des connectivites entre elements et elements
-//    et entre face et face:
-//    (simple appel aux 2 methodes precedentes)
-// Precondition:
-// Parametre:Zone& zoneG, Zone& zoneF
-//    Signification: zone discretisee grossiere et fine
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: da
-// Effets de bord:
-// Postcondition: connect_elemF_elemG et connect_face_face sont remplis
+/*! @brief Calcul des connectivites entre elements et elements et entre face et face:
+ *
+ *     (simple appel aux 2 methodes precedentes)
+ *
+ * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @throws da
+ */
 void Connectivites_base::calculer_connectivites(Zone_VF& zonef,
                                                 Zone_VF& zoneg,
                                                 Domaine& domg)

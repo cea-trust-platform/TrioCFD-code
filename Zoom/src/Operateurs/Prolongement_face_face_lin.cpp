@@ -43,25 +43,14 @@ Entree& Prolongement_face_face_lin::readOn(Entree& s )
 
 
 
-// Description:
-//    Prolongement de l'inconnue grossiere sur la frontiere fine
-//    pour inconnue vitesse en VDF 2D uniquement
-//    prolongement lineaire pour les composantes normales
-//    et moyenne pour les composantes tangentielles.
-//    remarque : pas de couplage!!
-//    car valeur
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prolongement de l'inconnue grossiere sur la frontiere fine pour inconnue vitesse en VDF 2D uniquement
+ *
+ *     prolongement lineaire pour les composantes normales
+ *     et moyenne pour les composantes tangentielles.
+ *     remarque : pas de couplage!!
+ *     car valeur
+ *
+ */
 void Prolongement_face_face_lin::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                                            const Frontiere& frontF,
                                            IntVect& connect,

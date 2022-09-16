@@ -29,17 +29,14 @@ class Modele_rayo_semi_transp;
 
 Declare_deriv(Source_rayo_semi_transp_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    class Source_rayo_semi_transp
-//    Classe generique de la hierarchie des termes sources de l'eqution de
-//    temperature pour les problemes de rayonnement semi transparent
-//    Source_rayo_semi_transp peut referencer n'importe quel
-//    objet derivant de Source_rayo_semi_transp_base.
-// .SECTION voir aussi
-//      Source_rayo_semi_transp_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief class Source_rayo_semi_transp Classe generique de la hierarchie des termes sources de l'eqution de
+ *
+ *     temperature pour les problemes de rayonnement semi transparent
+ *     Source_rayo_semi_transp peut referencer n'importe quel
+ *     objet derivant de Source_rayo_semi_transp_base.
+ *
+ * @sa Source_rayo_semi_transp_base
+ */
 class Source_rayo_semi_transp : public DERIV(Source_rayo_semi_transp_base)
 {
   Declare_instanciable(Source_rayo_semi_transp);

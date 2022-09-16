@@ -27,15 +27,12 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Boundary_field_uniform_keps_from_ud
-//     Classe derivee de Champ_front_uniforme which is for uniform fields
-//     in space and time
-// .SECTION voir aussi
-//     Champ_front_base Champ_front_uniforme
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Boundary_field_uniform_keps_from_ud Classe derivee de Champ_front_uniforme which is for uniform fields
+ *
+ *      in space and time
+ *
+ * @sa Champ_front_base Champ_front_uniforme
+ */
 class Boundary_field_uniform_keps_from_ud : public Champ_front_uniforme
 {
   Declare_instanciable(Boundary_field_uniform_keps_from_ud);

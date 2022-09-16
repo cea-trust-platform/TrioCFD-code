@@ -71,7 +71,9 @@ Remaillage_FT::Remaillage_FT() :
 {
 }
 
-// Description: Lecture des parametres de remaillage
+/*! @brief Lecture des parametres de remaillage
+ *
+ */
 Entree& Remaillage_FT::readOn(Entree& is)
 {
   Param p(que_suis_je());
@@ -120,8 +122,9 @@ Entree& Remaillage_FT::readOn(Entree& is)
   return is;
 }
 
-// Description:
-//    Cette fonction ne doit pas etre appelee
+/*! @brief Cette fonction ne doit pas etre appelee
+ *
+ */
 Sortie& Remaillage_FT::printOn(Sortie& os) const
 {
   Cerr << "Erreur : ::printOn n'est pas code." << finl;
@@ -168,7 +171,11 @@ int Remaillage_FT::sauvegarder(Sortie& os) const
   return 0;
 }
 
-// Description: Methode appelee par readOn. Declaration des parametres a lire dans le .data
+/*! @brief Methode appelee par readOn.
+ *
+ * Declaration des parametres a lire dans le .data
+ *
+ */
 void Remaillage_FT::set_param(Param& p)
 {
   p.ajouter("pas", &dt_remaillage_);
@@ -189,20 +196,11 @@ void Remaillage_FT::set_param(Param& p)
   p.ajouter("lissage_courbure_iterations_si_remaillage", &lissage_courbure_iterations_si_remaillage_);
 }
 
-// Description:
-//    Cette fonction stocke la zone_dis dans refzone_dis_
-// Precondition:
-// Parametre: zone_dis
-//    Signification: zone discretisee de calcul
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: Entree
-//    Signification: le flot d'entree
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction stocke la zone_dis dans refzone_dis_
+ *
+ * @param (zone_dis) zone discretisee de calcul 
+ * @return (Entree) le flot d'entree 
+ */
 void Remaillage_FT::associer_zone(const Zone_dis& zone_dis)
 {
   Cerr<<"Remaillage_FT::associer_zone_dis"<<finl;
@@ -232,9 +230,9 @@ int Remaillage_FT::a_lisser(double temps) const
   return res;
 }
 
-// Description: Verifie les criteres de remaillage locaux (longueur des aretes)
-//  et effectue les remaillages locaux si necessaires.
-// Postcondition: Amene le maillage dans l'etat MINIMAL
+/*! @brief Verifie les criteres de remaillage locaux (longueur des aretes) et effectue les remaillages locaux si necessaires.
+ *
+ */
 void Remaillage_FT::remaillage_local_interface(double temps, Maillage_FT_Disc& maillage)
 {
   static Stat_Counter_Id remaillage_loc_interf_counter_ = statistiques().new_counter(2, "Remaillage local", "FrontTracking");
@@ -287,36 +285,19 @@ void Remaillage_FT::remaillage_local_interface(double temps, Maillage_FT_Disc& m
 }
 
 
-// Description:
-//    Cette fonction calcule les connectivites sommet ->facettes voisines
-//    Les facettes voisines des sommets sont stockees dans le tableau fa7VoisinesSom_data
-//    sous forme de liste chainee.
-//    Pour le sommet som, le premier index de la liste est index = fa7VoisinesSom_index[som]
-//      la premiere facette est alors fa7VoisinesSom_data(index,1)
-//      et l'indice suivant index = fa7VoisinesSom_data(index,0)
-//    La chaine est terminee lorsque index==-1.
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a barycentrer
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Parametre: fa7VoisinesSom_index
-//    Signification: premier index pour le sommet som
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: ecriture
-// Parametre: fa7VoisinesSom_data
-//    Signification: premier liste des index et facettes voisines pour le sommet som
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: ecriture
-// Retour: int
-//    Signification: le nombre de connectivites trouvees
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule les connectivites sommet ->facettes voisines Les facettes voisines des sommets sont stockees dans le tableau fa7VoisinesSom_data
+ *
+ *     sous forme de liste chainee.
+ *     Pour le sommet som, le premier index de la liste est index = fa7VoisinesSom_index[som]
+ *       la premiere facette est alors fa7VoisinesSom_data(index,1)
+ *       et l'indice suivant index = fa7VoisinesSom_data(index,0)
+ *     La chaine est terminee lorsque index==-1.
+ *
+ * @param (maillage) maillage a barycentrer 
+ * @param (fa7VoisinesSom_index) premier index pour le sommet som 
+ * @param (fa7VoisinesSom_data) premier liste des index et facettes voisines pour le sommet som 
+ * @return (int) le nombre de connectivites trouvees 
+ */
 int Remaillage_FT::calculer_connectivites_sommetFacettes(const Maillage_FT_Disc& maillage,
                                                          ArrOfInt& fa7VoisinesSom_index,
                                                          IntTab& fa7VoisinesSom_data) const
@@ -388,19 +369,20 @@ int Remaillage_FT::calculer_connectivites_sommetFacettes(const Maillage_FT_Disc&
   return compteur;
 }
 
-// Description:
-//  Calcul de la differentielle du volume de phase 0 par rapport
-//  au deplacement de chaque sommet de l'interface. C'est une forme
-//  lineaire qu'on exprime sous la forme d'un vecteur v tel que
-//  differentielle(deplacement) = deplacement scalaire v.
-//  En un certain sens, v est la normale a l'interface evaluee aux sommets.
-//  Si on deplace le sommet dans un plan orthogonal au vecteur, le volume
-//  des phases est conserve a l'ordre 1 par rapport a l'amplitude du
-//  deplacement.
-// Parametre: maillage
-// Parametre: differentielle_volume
-//    Acces: ecriture
-// Retour: int (1)
+/*! @brief Calcul de la differentielle du volume de phase 0 par rapport au deplacement de chaque sommet de l'interface.
+ *
+ * C'est une forme
+ *   lineaire qu'on exprime sous la forme d'un vecteur v tel que
+ *   differentielle(deplacement) = deplacement scalaire v.
+ *   En un certain sens, v est la normale a l'interface evaluee aux sommets.
+ *   Si on deplace le sommet dans un plan orthogonal au vecteur, le volume
+ *   des phases est conserve a l'ordre 1 par rapport a l'amplitude du
+ *   deplacement.
+ *
+ * @param (maillage)  
+ * @param (differentielle_volume)  
+ * @return (int (1))  
+ */
 int Remaillage_FT::calculer_differentielle_volume(
   const Maillage_FT_Disc& maillage,
   DoubleTab& differentielle_volume) const
@@ -484,32 +466,15 @@ int Remaillage_FT::calculer_differentielle_volume(
   return 1;
 }
 
-// Description:
-//    Cette fonction calcule la difference de volume au niveau d'une facette
-//      par rapport a une position initiale des sommets
-//  version 2D
-// Precondition:
-// Parametre: fa7
-//    Signification: indice de la facette de calcul
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: maillage
-//    Signification: maillage a barycentrer
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: position_initiale
-//    Signification: position initiale des sommets
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: double
-//    Signification: la variation de volume
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule la difference de volume au niveau d'une facette par rapport a une position initiale des sommets
+ *
+ *   version 2D
+ *
+ * @param (fa7) indice de la facette de calcul 
+ * @param (maillage) maillage a barycentrer 
+ * @param (position_initiale) position initiale des sommets 
+ * @return (double) la variation de volume 
+ */
 double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Maillage_FT_Disc& maillage,
                                                            const DoubleTab& position_initiale) const
 {
@@ -648,36 +613,18 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
   return v1 + v2;
 }
 
-// Description:
-//    Cette fonction calcule la difference de volume au niveau d'une facette
-//      par rapport a une position initiale des sommets
-//    Methode corrigee le 11 juillet 2013 par B.M: dans la version precedente, l'implementation
-//     du tri des trois sommets en fonction de l'indice global des sommets etait faux
-//     d'ou de petites et rares erreurs de conservation du volume en parallele.
-//  version 3D
-// Precondition:
-// Parametre: fa7
-//    Signification: indice de la facette de calcul
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: maillage
-//    Signification: maillage a barycentrer
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: position_initiale
-//    Signification: position initiale des sommets
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: double
-//    Signification: la variation de volume
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
+/*! @brief Cette fonction calcule la difference de volume au niveau d'une facette par rapport a une position initiale des sommets
+ *
+ *     Methode corrigee le 11 juillet 2013 par B.M: dans la version precedente, l'implementation
+ *      du tri des trois sommets en fonction de l'indice global des sommets etait faux
+ *      d'ou de petites et rares erreurs de conservation du volume en parallele.
+ *   version 3D
+ *
+ * @param (fa7) indice de la facette de calcul 
+ * @param (maillage) maillage a barycentrer 
+ * @param (position_initiale) position initiale des sommets 
+ * @return (double) la variation de volume 
+ */
 static inline double calculer_volume_facette_3D_avec_ordre(const DoubleTab& position_initiale,
                                                            const DoubleTab& position_finale,
                                                            int facette[3],
@@ -771,30 +718,24 @@ if (indice_global[ordre_sommets[i]] > indice_global[ordre_sommets[j]]) \
   return varVolume;
 }
 
-// Description:
-//  Cette fonction calcule le volume de phase 0 engendre par chaque sommet lors du
-//  deplacement de l'interface entre la position initiale et la position actuelle
-//  du maillage (le volume engendre est positif si l'interface se deplace dans la
-//  direction de la normale aux facettes).
-//  On definit d'abord le volume engendre par le deplacement de chaque facette :
-//   C'est le volume d'un polyedre construit comme reunion de trois tetraedres,
-//   engendres par deplacement successifs des trois sommets
-//   dans un ordre conventionnel (deux sommets d'une arete sont toujours deplaces
-//   dans le meme ordre pour que les deux triangles voisins engendrent des
-//   tetraedres conformes, sans laisser de trous et sans se chevaucher)
-//  Ensuite, le volume engendre par chaque facette est divise en trois parts egales
-//  et reparti sur les trois sommets de la facette.
-// Parametre: maillage
-//    Signification: maillage
-// Parametre: position_initiale
-//    Signification: position initiale des sommets
-//                   (doit avoir la meme taille que maillage.sommets(),
-//                    et l'espace virtuel doit etre a jour)
-// Parametre: varVolume
-//    Signification: la variation de volume pour chaque sommet
-//                   (on lui donne la bonne taille et on met a jour l'espace virtuel)
-// Retour: double
-//    Signification: Variation de volume totale sur l'ensemble du domaine.
+/*! @brief Cette fonction calcule le volume de phase 0 engendre par chaque sommet lors du deplacement de l'interface entre la position initiale et la position actuelle
+ *
+ *   du maillage (le volume engendre est positif si l'interface se deplace dans la
+ *   direction de la normale aux facettes).
+ *   On definit d'abord le volume engendre par le deplacement de chaque facette :
+ *    C'est le volume d'un polyedre construit comme reunion de trois tetraedres,
+ *    engendres par deplacement successifs des trois sommets
+ *    dans un ordre conventionnel (deux sommets d'une arete sont toujours deplaces
+ *    dans le meme ordre pour que les deux triangles voisins engendrent des
+ *    tetraedres conformes, sans laisser de trous et sans se chevaucher)
+ *   Ensuite, le volume engendre par chaque facette est divise en trois parts egales
+ *   et reparti sur les trois sommets de la facette.
+ *
+ * @param (maillage) maillage 
+ * @param (position_initiale) position initiale des sommets (doit avoir la meme taille que maillage.sommets(), et l'espace virtuel doit etre a jour) 
+ * @param (varVolume) la variation de volume pour chaque sommet (on lui donne la bonne taille et on met a jour l'espace virtuel) 
+ * @return (double) Variation de volume totale sur l'ensemble du domaine. 
+ */
 double Remaillage_FT::calculer_variation_volume(const Maillage_FT_Disc& maillage,
                                                 const DoubleTab& position_initiale,
                                                 ArrOfDouble& varVolume) const
@@ -845,35 +786,14 @@ double Remaillage_FT::calculer_variation_volume(const Maillage_FT_Disc& maillage
   return dvolume_total;
 }
 
-// Description:
-//    Cette fonction calcule une correction sur un deplacement liee a une variation de volume imposee
-// Precondition:
-// Parametre: deplacement
-//    Signification: delacement a corriger
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Parametre: varVolume
-//    Signification: la variation de volume
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: ecriture
-// Parametre: deplacement_varVolume
-//    Signification: la normale au plan de conservation de volume
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: norme2_deplacement_varVolume
-//    Signification: carre de la normale au plan
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: int
-//    Signification: 1 si le barycentrage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule une correction sur un deplacement liee a une variation de volume imposee
+ *
+ * @param (deplacement) delacement a corriger 
+ * @param (varVolume) la variation de volume 
+ * @param (deplacement_varVolume) la normale au plan de conservation de volume 
+ * @param (norme2_deplacement_varVolume) carre de la normale au plan 
+ * @return (int) 1 si le barycentrage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::calculer_correction_deplacement(DoubleTab& deplacement,
                                                    const ArrOfDouble& varVolume,
                                                    const DoubleTab& deplacement_varVolume,
@@ -968,21 +888,16 @@ int Remaillage_FT::calculer_correction_deplacement(DoubleTab& deplacement,
   return res;
 }
 
-//=======================================================================================
-//  GESTION DU BARYCENTRAGE DES SOMMETS
-
-// Description:
-//    Cette fonction calcule pour chaque sommet le barycentre de l'ensemble
-//     des facettes voisines du sommet. Les "dimension" premieres colonnes
-//     contiennent les coordonnees du barycentre, la colonne "dimension"
-//     contient la somme des surfaces des facettes voisines du sommet.
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a barycentrer
-// Parametre: barycentres
-//    Signification: par sommet, barycentres de ses facettes voisines
-// Retour: int
-//    Signification: toujours 1...
+/*! @brief Cette fonction calcule pour chaque sommet le barycentre de l'ensemble des facettes voisines du sommet.
+ *
+ * Les "dimension" premieres colonnes
+ *      contiennent les coordonnees du barycentre, la colonne "dimension"
+ *      contient la somme des surfaces des facettes voisines du sommet.
+ *
+ * @param (maillage) maillage a barycentrer 
+ * @param (barycentres) par sommet, barycentres de ses facettes voisines 
+ * @return (int) toujours 1... 
+ */
 int Remaillage_FT::calculer_barycentre_facettes_voisines(const Maillage_FT_Disc& maillage,
                                                          DoubleTab& barycentres) const
 {
@@ -1126,21 +1041,19 @@ double Remaillage_FT::calculer_somme_dvolume(const Maillage_FT_Disc& mesh, const
 }
 #endif
 
-// Description:
-//  Deplace les sommets du maillage pour les redistribuer de facon homogene.
-//  Le deplacement est la somme d'une composante tangentielle et d'une composante
-//  normale a l'interface. La composante tangentielle ramene le sommet vers le
-//  barycentre des facettes voisines du sommet. La composante normale est calculee
-//  de sorte a produire la variation de volume imposee.
-//  Traitement des lignes de contact: le deplacement est decompose en une composante
-//  normale a la ligne de contact et une composante tangente.
-// Parametre: maillage
-//  Signification: le maillage a redistribuer (il retourne dans l'etat minimal)
-// Parametre: relaxation_direction_tangente
-//  Signification: si ce parametre vaut 1, le sommet est deplace sur le barycentre.
-//                 le parametre fixe la fraction du deplacement a realiser.
-// Parametre: relaxation_direction_normale
-//  Signification:
+/*! @brief Deplace les sommets du maillage pour les redistribuer de facon homogene.
+ *
+ * Le deplacement est la somme d'une composante tangentielle et d'une composante
+ *   normale a l'interface. La composante tangentielle ramene le sommet vers le
+ *   barycentre des facettes voisines du sommet. La composante normale est calculee
+ *   de sorte a produire la variation de volume imposee.
+ *   Traitement des lignes de contact: le deplacement est decompose en une composante
+ *   normale a la ligne de contact et une composante tangente.
+ *
+ * @param (maillage) le maillage a redistribuer (il retourne dans l'etat minimal) 
+ * @param (relaxation_direction_tangente) si ce parametre vaut 1, le sommet est deplace sur le barycentre. le parametre fixe la fraction du deplacement a realiser. 
+ * @param (relaxation_direction_normale)  
+ */
 double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
                                            const double        relaxation_direction_tangente,
                                            const double        relaxation_direction_normale,
@@ -1297,9 +1210,9 @@ double Remaillage_FT::redistribuer_sommets(Maillage_FT_Disc&   maillage,
   return dvolume_tot;
 }
 
-// Description: deplacement des sommets se sorte a produire la variation de volume
-//  prescrite a chaque sommet.
-// Precondition: pas le facettes virtuelles
+/*! @brief deplacement des sommets se sorte a produire la variation de volume prescrite a chaque sommet.
+ *
+ */
 void Remaillage_FT::corriger_volume(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume)
 {
   corriger_volume_(maillage, var_volume, nb_iter_bary_volume_seul_);
@@ -1317,9 +1230,11 @@ void Remaillage_FT::corriger_volume_(Maillage_FT_Disc& maillage, ArrOfDouble& va
   nettoyer_maillage(maillage);
 }
 
-// Description: applique barycentrage, lissage et correction de volume.
-//  On applique le nombre d'iterations de lissage systematique.
-//  Precondition: pas de facettes virtuelles
+/*! @brief applique barycentrage, lissage et correction de volume.
+ *
+ * On applique le nombre d'iterations de lissage systematique.
+ *
+ */
 void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Disc& maillage)
 {
   static Stat_Counter_Id barycentre_lissage_sys_counter_ = statistiques().new_counter(2, "bary/lissage systematiques", "FrontTracking");
@@ -1338,8 +1253,9 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
   statistiques().end_count(barycentre_lissage_sys_counter_);
 }
 
-// Description: idem mais avec le nombre d'iterations de lissage si remaillage
-// Precondition: pas d'elements virtuels (on doit avoir appele nettoyer_elements_virtuels())
+/*! @brief idem mais avec le nombre d'iterations de lissage si remaillage
+ *
+ */
 void Remaillage_FT::barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& maillage, ArrOfDouble& var_volume)
 {
   static Stat_Counter_Id barycentre_lissage_apres_counter_ = statistiques().new_counter(2, "bary/lissage apres remaillage", "FrontTracking");
@@ -1358,19 +1274,15 @@ void Remaillage_FT::barycentrer_lisser_apres_remaillage(Maillage_FT_Disc& mailla
   statistiques().end_count(barycentre_lissage_apres_counter_);
 }
 
-// Description: Algorithme general de lissage du maillage. Permet de barycentrer,
-//  regulariser la courbure, et d'appliquer une correction de volume en deplacant
-//  les noeuds dans la direction normale.
-// Parametre: maillage
-//    Signification: maillage a barycentrer
-//    Acces: lecture/ecriture
-// Parametre: var_volume
-//    Signification: pour chaque sommet du maillage initial, variation de volume
-//      a obtenir lors du deplacement. En retour, on y met le residu (difference
-//      entre var_volume initial et var_volume obtenu lors du deplacement).
-//    Acces: lecture / ecriture
-// Retour: double
-//    Signification: erreur sur la variation totale de volume obtenue (en m3)
+/*! @brief Algorithme general de lissage du maillage.
+ *
+ * Permet de barycentrer, regulariser la courbure, et d'appliquer une correction de volume en deplacant
+ *   les noeuds dans la direction normale.
+ *
+ * @param (maillage) maillage a barycentrer 
+ * @param (var_volume) pour chaque sommet du maillage initial, variation de volume a obtenir lors du deplacement. En retour, on y met le residu (difference entre var_volume initial et var_volume obtenu lors du deplacement). 
+ * @return (double) erreur sur la variation totale de volume obtenue (en m3) 
+ */
 double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
                                            ArrOfDouble& var_volume,
                                            const double facteur_barycentrage_tangent,
@@ -1527,20 +1439,19 @@ double Remaillage_FT::regulariser_maillage(Maillage_FT_Disc& maillage,
   return dvolume;
 }
 
-// Description:
-//  Regularise le champ scalaire "var_volume" defini aux sommets du "maillage".
-//  On regularise en faisant calculant une valeur moyenne par facette,
-//  puis en recalculant une moyenne aux sommets en fonction de la moyenne
-//  aux faces. Les moyennes sont ponderees par la surface des facettes...
-//  Le lissage est repete un nombre donne de fois.
-//  Cette methode est utilisee pour lisser les corrections de volume et eviter
-//  l'apparition de pointes sur les interfaces.
-// Parametre: maillage
-// Signification: le support du champ a regulariser
-// Parametre: var_volume
-// Signification: le champ a regulariser (champ aux sommets du maillage)
-// Parametre: nb_iterations
-// Signification: nombre d'iterations de l'operation de regularisation.
+/*! @brief Regularise le champ scalaire "var_volume" defini aux sommets du "maillage".
+ *
+ * On regularise en faisant calculant une valeur moyenne par facette,
+ *   puis en recalculant une moyenne aux sommets en fonction de la moyenne
+ *   aux faces. Les moyennes sont ponderees par la surface des facettes...
+ *   Le lissage est repete un nombre donne de fois.
+ *   Cette methode est utilisee pour lisser les corrections de volume et eviter
+ *   l'apparition de pointes sur les interfaces.
+ *
+ * @param (maillage) le support du champ a regulariser 
+ * @param (var_volume) le champ a regulariser (champ aux sommets du maillage) 
+ * @param (nb_iterations) nombre d'iterations de l'operation de regularisation. 
+ */
 void Remaillage_FT::lisser_dvolume(const Maillage_FT_Disc& maillage,
                                    ArrOfDouble& var_volume,
                                    const int nb_iterations) const
@@ -1592,28 +1503,15 @@ void Remaillage_FT::lisser_dvolume(const Maillage_FT_Disc& maillage,
     }
 }
 
-// Description:
-//    Cette fonction permet de gerer le decollement de l'interface de la paroi
-//    Si un sommet de bord n'a pas de sommet voisin de bord
-//     et que son deplacement tend a le faire rentrer dans le domaine,
-//     il est marque comme sommet interne
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a traiter
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Parametre: deplacement
-//    Signification: vecteur deplacement des sommets
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction permet de gerer le decollement de l'interface de la paroi Si un sommet de bord n'a pas de sommet voisin de bord
+ *
+ *      et que son deplacement tend a le faire rentrer dans le domaine,
+ *      il est marque comme sommet interne
+ *
+ * @param (maillage) maillage a traiter 
+ * @param (deplacement) vecteur deplacement des sommets 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::traite_decollement(Maillage_FT_Disc& maillage, const DoubleTab& deplacement) const
 {
   int res = 1;
@@ -1696,21 +1594,11 @@ int Remaillage_FT::traite_decollement(Maillage_FT_Disc& maillage, const DoubleTa
   maillage.maillage_modifie(Maillage_FT_Disc::MINIMAL);
   return res;
 }
-// Description:
-//    Cette fonction permet de gerer l'adherence de l'interface a la paroi
-//    Si une facette possede 3 sommets sur un paroi, elle est supprimee
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a traiter
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction permet de gerer l'adherence de l'interface a la paroi Si une facette possede 3 sommets sur un paroi, elle est supprimee
+ *
+ * @param (maillage) maillage a traiter 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::traite_adherence(Maillage_FT_Disc& maillage) const
 {
   int res = 1;
@@ -1737,25 +1625,16 @@ inline void produit_vectoriel(const FTd_vecteur3& a, const FTd_vecteur3& b, FTd_
   resu[2] = a[0]*b[1] - a[1]*b[0];
 }
 
-// Description:
-//    Cette fonction marque a supprimer les facettes ayant leurs 3 sommets de bord
-//    Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)
-//    MODIF GB 21/07/2015 : Pour le cas sloshing par exemple, si le domaine a des coins,
-//          l'interface peut contenir un element dont les 3 sommets sont sur le bord
-//          sans pour autant que la facette soit integralement sur le bord. Elle peut
-//          avoir son 3eme cote dans le domaine. Dans ce cas, on la conserve.
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a remailler
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction marque a supprimer les facettes ayant leurs 3 sommets de bord Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)
+ *
+ *     MODIF GB 21/07/2015 : Pour le cas sloshing par exemple, si le domaine a des coins,
+ *           l'interface peut contenir un element dont les 3 sommets sont sur le bord
+ *           sans pour autant que la facette soit integralement sur le bord. Elle peut
+ *           avoir son 3eme cote dans le domaine. Dans ce cas, on la conserve.
+ *
+ * @param (maillage) maillage a remailler 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
 {
 
@@ -1860,30 +1739,21 @@ int Remaillage_FT::supprimer_facettes_bord(Maillage_FT_Disc& maillage) const
   return res;
 }
 
-//=======================================================================================
-//  GESTION DES REMAILLAGES
-
-
-// Description: fonction outil utilisee par Remaillage_FT::supprimer_petites_aretes.
-//  (SPA = Supprimer Petites Aretes)
-//  Cette fonction parcourt le tableau "tab_aretesMarquees" qui est un resultat
-//  de "marquer_aretes". tab_aretesMarquees contient une liste d'aretes
-//  trop petites qu'on veut supprimer.
-//  On supprime ces aretes en remplacant l'un des sommets de l'arete par l'autre
-//  extremite. En general, deux triangles disparaissent (sauf arete
-//  de bord). Plusieurs aretes adjacentes au meme point peuvent etre supprimees.
-//  Pour chaque arete, on choisit le sommet a supprimer et le sommet a conserver.
-//  Puis on verifie qu'un sommet supprime n'est pas utilise par une autre arete
-//  pour etre conserve (non trivial en parallele).
-// Parametre: sommets_remplacement
-// Signification:
-//  On resize le tableau a (maillage.nb_sommets(), 2),
-//  puis on y stocke pour chaque sommet:
-//   - sommets_remplacement(i,0) = -1, sommets_remplacement(i,1) = -1
-//      (sommet non supprime)
-//   - sommets_remplacement(i,0) = PE, sommets_remplacement(i,1) = j
-//      (sommet a remplacer par le sommet reel d'indice local j sur PE)
-//  En sortie, sommets_remplacement a son espace_virtuel a jour.
+/*! @brief fonction outil utilisee par Remaillage_FT::supprimer_petites_aretes.
+ *
+ * (SPA = Supprimer Petites Aretes)
+ *   Cette fonction parcourt le tableau "tab_aretesMarquees" qui est un resultat
+ *   de "marquer_aretes". tab_aretesMarquees contient une liste d'aretes
+ *   trop petites qu'on veut supprimer.
+ *   On supprime ces aretes en remplacant l'un des sommets de l'arete par l'autre
+ *   extremite. En general, deux triangles disparaissent (sauf arete
+ *   de bord). Plusieurs aretes adjacentes au meme point peuvent etre supprimees.
+ *   Pour chaque arete, on choisit le sommet a supprimer et le sommet a conserver.
+ *   Puis on verifie qu'un sommet supprime n'est pas utilise par une autre arete
+ *   pour etre conserve (non trivial en parallele).
+ *
+ * @param (sommets_remplacement) On resize le tableau a (maillage.nb_sommets(), 2), puis on y stocke pour chaque sommet: - sommets_remplacement(i,0) = -1, sommets_remplacement(i,1) = -1 (sommet non supprime) - sommets_remplacement(i,0) = PE, sommets_remplacement(i,1) = j (sommet a remplacer par le sommet reel d'indice local j sur PE) En sortie, sommets_remplacement a son espace_virtuel a jour. 
+ */
 static void SPA_choisir_sommets_remplacement(const Maillage_FT_Disc& maillage,
                                              const IntTab& tab_aretesMarquees,
                                              IntTab& sommets_remplacement)
@@ -2004,27 +1874,17 @@ static void SPA_choisir_sommets_remplacement(const Maillage_FT_Disc& maillage,
     }
 }
 
-// Description:
-//  A l'aide de "marquer_aretes", on determine les aretes trop
-//  petites du maillage. On les supprime en remplacant un sommet
-//  d'une extremite de l'arete par le sommet de l'autre extremite.
-//  Pour cela, on cree des sommets virtuels, des facettes nulles (deux ou
-//  trois sommets confondus) et on change le volume des phases.
-//  La variation de volume engendree est ajoutee a varVolume.
-// Parametre: maillage
-// Signification: Le maillage a optimiser.
-//  Le maillage retourne a l'etat minimal,
-//  Le volume change,
-//  Certaines facettes sont "nulles" (plusieurs sommets confondus),
-//  On cree des sommets virtuels.
-// Parametre: varVolume
-// Signification:
-//   Un tableau de taille nb_sommets() contenant une valeur
-//   initiale de variation de volume. On augmente la taille
-//   du tableau (creation de sommets virtuels) et on ajoute
-//   la variation de volume du maillage due a la suppression
-//   des aretes. L'espace virtuel est a jour.
-// Valeur de retour: nombre total (sur tous les procs) de sommets du maillage supprimes
+/*! @brief A l'aide de "marquer_aretes", on determine les aretes trop petites du maillage.
+ *
+ * On les supprime en remplacant un sommet
+ *   d'une extremite de l'arete par le sommet de l'autre extremite.
+ *   Pour cela, on cree des sommets virtuels, des facettes nulles (deux ou
+ *   trois sommets confondus) et on change le volume des phases.
+ *   La variation de volume engendree est ajoutee a varVolume.
+ *
+ * @param (maillage) Le maillage a optimiser. Le maillage retourne a l'etat minimal, Le volume change, Certaines facettes sont "nulles" (plusieurs sommets confondus), On cree des sommets virtuels. 
+ * @param (varVolume) Un tableau de taille nb_sommets() contenant une valeur initiale de variation de volume. On augmente la taille du tableau (creation de sommets virtuels) et on ajoute la variation de volume du maillage due a la suppression des aretes. L'espace virtuel est a jour. Valeur de retour: nombre total (sur tous les procs) de sommets du maillage supprimes 
+ */
 int Remaillage_FT::supprimer_petites_aretes(Maillage_FT_Disc& maillage,
                                             ArrOfDouble& varVolume) const
 {
@@ -2252,23 +2112,15 @@ int Remaillage_FT::supprimer_petites_aretes(Maillage_FT_Disc& maillage,
   return nb_sommets_supprimes_tot;
 }
 
-// Description:
-//    Cette fonction marque a supprimer les facettes en double.
-//    Lorsque 2 facettes se trouvent avoir 3 de leur sommets en commun,
-//     il faut supprimer les 2 facettes?
-//    Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)
-// Precondition:
-//    Le maillage doit verifier la propriete "proprietaire facette = premier sommet"
-// Parametre: maillage
-//    Signification: maillage a remailler
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: Le nombre de facettes supprimees
-//    Contraintes:
-// Exception:
-// Effets de bord:
+/*! @brief Cette fonction marque a supprimer les facettes en double.
+ *
+ * Lorsque 2 facettes se trouvent avoir 3 de leur sommets en commun,
+ *      il faut supprimer les 2 facettes?
+ *     Marquer a supprimer = condenser les 3 sommets en un seul (le sommet 0)
+ *
+ * @param (maillage) maillage a remailler 
+ * @return (int) Le nombre de facettes supprimees 
+ */
 int Remaillage_FT::supprimer_doublons_facettes(Maillage_FT_Disc& maillage) const
 {
   if (Comm_Group::check_enabled()) maillage.check_mesh();
@@ -2394,27 +2246,14 @@ int Remaillage_FT::supprimer_doublons_facettes(Maillage_FT_Disc& maillage) const
 }
 
 
-// Description:
-//    Cette fonction calcule le carre de la longueur ideale d'une arete
-//    Dans un premier, cette longueur ideale est la racine cubique (en 3D) de la moyenne
-//     des volumes des elements euleriens contenant les sommets
-// Precondition:
-// Parametre: som0
-//    Signification: indice du 1er sommet de l'arete
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: som1
-//    Signification: indice du 2e sommet de l'arete
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: double
-//    Signification: carre de la longueur idealede l'arete
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule le carre de la longueur ideale d'une arete Dans un premier, cette longueur ideale est la racine cubique (en 3D) de la moyenne
+ *
+ *      des volumes des elements euleriens contenant les sommets
+ *
+ * @param (som0) indice du 1er sommet de l'arete 
+ * @param (som1) indice du 2e sommet de l'arete 
+ * @return (double) carre de la longueur idealede l'arete 
+ */
 double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& maillage,
                                                      int som0,
                                                      double x, double y, double z) const
@@ -2515,32 +2354,13 @@ double Remaillage_FT::calculer_longueurIdeale2_arete(const Maillage_FT_Disc& mai
   return lgrId2;
 }
 
-// Description:
-//    Cette fonction calcule la variation de volume liee a la suppression de sommets
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a barycentrer
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: tab_somSupp
-//    Signification: tableau des sommets a supprimer
-//      tab[som] < 0  : sommet a conserver
-//      tab[som] >=0  : sommet a remplacer par tab[som]
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: varVolume
-//    Signification: la variation de volume
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: ecriture
-// Retour: double
-//    Signification: volume total supprime
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule la variation de volume liee a la suppression de sommets
+ *
+ * @param (maillage) maillage a barycentrer 
+ * @param (tab_somSupp) tableau des sommets a supprimer tab[som] < 0  : sommet a conserver tab[som] >=0  : sommet a remplacer par tab[som] 
+ * @param (varVolume) la variation de volume 
+ * @return (double) volume total supprime 
+ */
 double Remaillage_FT::calculer_volume_sommets_supprimes(const Maillage_FT_Disc& maillage, const ArrOfInt& tab_somSupp,
                                                         ArrOfDouble& varVolume) const
 {
@@ -2609,24 +2429,11 @@ double Remaillage_FT::calculer_volume_sommets_supprimes(const Maillage_FT_Disc& 
   return res;
 }
 
-//=============================================================================================
-// FONCTIONS DE PERMUTATION DES ARETES
-
-// Description:
-//    Cette fonction effectue des permutations d'aretes
-//     afin d'ameliorer la qualite du maillage
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a remailler
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction effectue des permutations d'aretes afin d'ameliorer la qualite du maillage
+ *
+ * @param (maillage) maillage a remailler 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::permuter_aretes(Maillage_FT_Disc& maillage) const
 {
   int res = 1;
@@ -2663,20 +2470,11 @@ True_int fct_compare_tab_aretes(const void *pt1, const void *pt2)
   return x;
 }
 
-// Description:
-//    Cette fonction divise les grandes aretes en 2
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a remailler
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction divise les grandes aretes en 2
+ *
+ * @param (maillage) maillage a remailler 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::diviser_grandes_aretes(Maillage_FT_Disc& maillage) const
 {
   static Stat_Counter_Id div_aretes_counter_ = statistiques().new_counter(2, "divisions aretes", "FrontTracking");
@@ -3637,36 +3435,14 @@ int Remaillage_FT::marquer_aretes(Maillage_FT_Disc& maillage, IntTab& tab_aretes
 }
 
 
-// Description:
-//    Cette methode calcule, pour un triangle donne, sa qualite :
-//    celle-ci est comprise dans ]0,1], et vaut 1 pour un triangle equilateral.
-// Precondition:
-// Parametre: som0
-//    Signification: id du premier sommet
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: som1
-//    Signification: id du second sommet
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: som2
-//    Signification: id du troisieme sommet
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: CoordSom
-//    Signification: coordonnees des sommets
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: double
-//    Signification: le coefficient de qualite du triangle.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette methode calcule, pour un triangle donne, sa qualite : celle-ci est comprise dans ]0,1], et vaut 1 pour un triangle equilateral.
+ *
+ * @param (som0) id du premier sommet 
+ * @param (som1) id du second sommet 
+ * @param (som2) id du troisieme sommet 
+ * @param (CoordSom) coordonnees des sommets 
+ * @return (double) le coefficient de qualite du triangle. 
+ */
 double Remaillage_FT::qualiteTriangle(const FTd_vecteur3& som0, const FTd_vecteur3& som1, const FTd_vecteur3& som2, double& aire) const
 {
   int k;
@@ -3722,24 +3498,11 @@ double Remaillage_FT::qualiteTriangle(const FTd_vecteur3& som0, const FTd_vecteu
   return qual;
 }
 
-//=============================================================================================
-// FONCTIONS DE NETTOYAGE DU MAILLAGE
-
-// Description:
-//    Cette fonction "supprime" les facettes de surface nulle :
-//    Elle les reduit a 1 sommet (le sommet 0, pour ne pas changer de processeur)
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a remailler
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction "supprime" les facettes de surface nulle : Elle les reduit a 1 sommet (le sommet 0, pour ne pas changer de processeur)
+ *
+ * @param (maillage) maillage a remailler 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::supprimer_facettes_nulles(Maillage_FT_Disc& maillage) const
 {
   int res = 1;
@@ -3778,22 +3541,13 @@ int Remaillage_FT::supprimer_facettes_nulles(Maillage_FT_Disc& maillage) const
   Process::Journal()<<"FIN Remaillage_FT::supprimer_facettes_nulles nb_fa7="<<maillage.nb_facettes()<<finl;
   return res;
 }
-// Description:
-//    Cette fonction nettoie le maillage :
-//    Elle supprime les facettes reduites a 1 sommet
-//    Elle supprime les sommets non utilises
-// Precondition:
-// Parametre: maillage
-//    Signification: maillage a remailler
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Retour: int
-//    Signification: 1 si le remaillage s'est deroule correctement, 0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction nettoie le maillage : Elle supprime les facettes reduites a 1 sommet
+ *
+ *     Elle supprime les sommets non utilises
+ *
+ * @param (maillage) maillage a remailler 
+ * @return (int) 1 si le remaillage s'est deroule correctement, 0 sinon 
+ */
 int Remaillage_FT::nettoyer_maillage(Maillage_FT_Disc& maillage) const
 {
   int res = 1;
@@ -3807,11 +3561,12 @@ int Remaillage_FT::nettoyer_maillage(Maillage_FT_Disc& maillage) const
   return res;
 }
 
-// Description:
-//  Regularise le maillage en deplacant les sommets pour reduire les gradients
-//  de courbure.
-//  L'equation d'evolution du maillage est une diffusion de masse le long
-//  de l'interface proportionnelle au gradient de courbure.
+/*! @brief Regularise le maillage en deplacant les sommets pour reduire les gradients de courbure.
+ *
+ *   L'equation d'evolution du maillage est une diffusion de masse le long
+ *   de l'interface proportionnelle au gradient de courbure.
+ *
+ */
 void Remaillage_FT::regulariser_courbure(Maillage_FT_Disc& maillage,
                                          const double coeff,
                                          ArrOfDouble& dvolume) const

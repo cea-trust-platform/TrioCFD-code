@@ -27,14 +27,10 @@
 #include <Fluide_base.h>
 #include <Ref_Fluide_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Energie_cinetique_turbulente
-//     Equation de transport d'une energie cinetique turbulente (modeles k-{eps,omega,tau})
-// .SECTION voir aussi
-//     Conv_Diffusion_std Convection_Diffusion_Temperature
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Energie_cinetique_turbulente Equation de transport d'une energie cinetique turbulente (modeles k-{eps,omega,tau})
+ *
+ * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
+ */
 class Energie_cinetique_turbulente : public Convection_Diffusion_std
 {
   Declare_instanciable_sans_constructeur(Energie_cinetique_turbulente);
@@ -73,43 +69,20 @@ protected :
 
 
 
-// Description:
-//    Renvoie le champ inconnue representant l'inconnue (T ou H)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant la temperature (GP)
-//      ou l'enthalpie (GR)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ */
 inline const Champ_Inc& Energie_cinetique_turbulente::inconnue() const
 {
   return l_inco_ch;
 }
 
 
-// Description:
-//    Renvoie le champ inconnue representant l'inconnue (T ou H)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant la temperature (GP)
-//      ou l'enthalpie (GR)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ */
 inline Champ_Inc& Energie_cinetique_turbulente::inconnue()
 {
   return l_inco_ch;

@@ -30,39 +30,34 @@ Implemente_instanciable(Algorithmes_Transport_FT_Disc,"Algorithmes_Transport_FT_
 
 Implemente_deriv(Algorithmes_Transport_FT_Disc);
 
-// Description: readOn : appel interdit
+/*! @brief readOn : appel interdit
+ *
+ */
 Entree& Algorithmes_Transport_FT_Disc::readOn(Entree& is)
 {
   assert(0);
   return is;
 }
 
-// Description: printOn : appel interdit
+/*! @brief printOn : appel interdit
+ *
+ */
 Sortie& Algorithmes_Transport_FT_Disc::printOn(Sortie& os) const
 {
   assert(0);
   return os;
 }
 
-// Description: Calcul des grandeurs suivantes en fonction de l'indicatrice
-//  de phase. On calcule la somme sur tous les processeurs.
-// Parametre: indicatrice
-// Signification: le tableau des valeurs d'un champ aux elements de zone_vf (entree)
-//                Le champ est suppose constant par element.
-// Parametre: volume_total
-// Signification: (sortie) le volume total de la zone = INTEGRALE(d omega)
-// Parametre: volume_phase_1
-// Signification: (sortie) integrale de volume de l'indicatrice de phase,
-//   egale au volume de la phase 1 = INTEGRALE(indicatrice * d omega)
-// Parametre: barycentre
-// Signification:
-//  En entree: on attend un tableau de meme dimension que les coordonnees
-//  En sortie: iso-barycentre de la zone = INTEGRALE(X * d omega) / volume_phase_1
-// Parametre: barycentre_phase_1
-// Signification:
-//  En entree: idem que barycentre
-//  En sortie: barycentre de la phase_1 calcule comme
-//             INTEGRALE(indicatrice * X * d omega) / volume_phase_1
+/*! @brief Calcul des grandeurs suivantes en fonction de l'indicatrice de phase.
+ *
+ * On calcule la somme sur tous les processeurs.
+ *
+ * @param (indicatrice) le tableau des valeurs d'un champ aux elements de zone_vf (entree) Le champ est suppose constant par element.
+ * @param (volume_total) (sortie) le volume total de la zone = INTEGRALE(d omega)
+ * @param (volume_phase_1) (sortie) integrale de volume de l'indicatrice de phase, egale au volume de la phase 1 = INTEGRALE(indicatrice * d omega)
+ * @param (barycentre) En entree: on attend un tableau de meme dimension que les coordonnees En sortie: iso-barycentre de la zone = INTEGRALE(X * d omega) / volume_phase_1
+ * @param (barycentre_phase_1) En entree: idem que barycentre En sortie: barycentre de la phase_1 calcule comme INTEGRALE(indicatrice * X * d omega) / volume_phase_1
+ */
 void Algorithmes_Transport_FT_Disc::calculer_moments_indicatrice(
   const Zone_VF& zone_vf,
   const DoubleTab& indicatrice,
@@ -116,15 +111,11 @@ void Algorithmes_Transport_FT_Disc::calculer_moments_indicatrice(
     }
 }
 
-// Description: evalue les fonctions px, py et pz en (x,y,z,t)
-//             (essentiellement utilise dans integrer_vitesse_imposee)
-// Parametre: px, py, pz
-// Signification: Trois fonctions qui comprennent au moins 4 parametres.
-// Parametre: vx, vy, vz
-// Signification: References aux variables ou on stocke le resultat
-//  vx=px(x,y,z,t)
-//  vy=py(x,y,z,t)
-//  vz=pz(x,y,z,t)
+/*! @brief evalue les fonctions px, py et pz en (x,y,z,t) (essentiellement utilise dans integrer_vitesse_imposee)
+ *
+ * @param (px, py, pz) Trois fonctions qui comprennent au moins 4 parametres.
+ * @param (vx, vy, vz) References aux variables ou on stocke le resultat vx=px(x,y,z,t) vy=py(x,y,z,t) vz=pz(x,y,z,t)
+ */
 void eval_vitesse(double x, double y, double z, double t,
                   Parser& px, Parser& py, Parser& pz,
                   double& vx, double& vy, double& vz)
@@ -149,14 +140,16 @@ void eval_vitesse(double x, double y, double z, double t,
   vz = pz.eval();
 }
 
-// Description: Integre le systeme differentiel
-//   d/dt(x)=vx(x,y,z,t)
-//   d/dt(y)=vy(x,y,z,t)
-//   d/dt(z)=vy(x,y,z,t)
-//  entre "t=temps" et "t=temps+dt" par un unique pas de Runge Kutta ordre 4
-// Parametres: x,y,z
-// Signification: Position initiale (en t=temps) en entree, position finale
-//  (en t=temps+dt) en sortie.
+/*! @brief Integre le systeme differentiel d/dt(x)=vx(x,y,z,t)
+ *
+ *    d/dt(y)=vy(x,y,z,t)
+ *    d/dt(z)=vy(x,y,z,t)
+ *   entre "t=temps" et "t=temps+dt" par un unique pas de Runge Kutta ordre 4
+ *  Parametres: x,y,z
+ *  Signification: Position initiale (en t=temps) en entree, position finale
+ *   (en t=temps+dt) en sortie.
+ *
+ */
 void integrer_vitesse_imposee(
   Parser& parser_vx, Parser& parser_vy, Parser& parser_vz,
   double temps, double dt, double& x, double& y, double& z)

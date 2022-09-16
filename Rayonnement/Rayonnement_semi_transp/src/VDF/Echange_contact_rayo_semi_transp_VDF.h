@@ -26,19 +26,14 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Echange_contact_VDF.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Echange_contact_rayo_semi_transp_VDF
-//    Cette classe est utilisee pour realiser un couplage entre une
-//    paroi solide et un fluide semi transparent en prenant en compte
-//    le rayonnement de la paroi.
-//    Elle est utilisee uniquement pour une discretisation VDF.
-//
-// .SECTION voir aussi
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Echange_contact_rayo_semi_transp_VDF Cette classe est utilisee pour realiser un couplage entre une
+ *
+ *     paroi solide et un fluide semi transparent en prenant en compte
+ *     le rayonnement de la paroi.
+ *     Elle est utilisee uniquement pour une discretisation VDF.
+ *
+ *
+ */
 class Echange_contact_rayo_semi_transp_VDF: public Cond_Lim_rayo_semi_transp, public Echange_contact_VDF
 {
   Declare_instanciable(Echange_contact_rayo_semi_transp_VDF);

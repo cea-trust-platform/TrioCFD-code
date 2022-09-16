@@ -77,24 +77,15 @@ DoubleTab& rho_vitesse_impl(const DoubleTab& tab_rho,const DoubleTab& vitesse,Do
 }
 
 
-// Description:
-//    Calcule la derivee en temps de l'inconnue vitesse,
-//    i.e. l'acceleration dU/dt et la renvoie.
-//    Appelle Equation_base::derivee_en_temps_inco(DoubleTab& )
-//    Calcule egalement la pression.
-// Precondition:
-// Parametre: DoubleTab& vpoint
-//    Signification: le tableau des valeurs de l'acceleration dU/dt
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: DoubleTab&
-//    Signification: le tableau des valeurs de l'acceleration (derivee de la vitesse)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
+/*! @brief Calcule la derivee en temps de l'inconnue vitesse, i.
+ *
+ * e. l'acceleration dU/dt et la renvoie.
+ *     Appelle Equation_base::derivee_en_temps_inco(DoubleTab& )
+ *     Calcule egalement la pression.
+ *
+ * @param (DoubleTab& vpoint) le tableau des valeurs de l'acceleration dU/dt 
+ * @return (DoubleTab&) le tableau des valeurs de l'acceleration (derivee de la vitesse) 
+ */
 DoubleTab& Navier_Stokes_QC_impl::derivee_en_temps_inco_impl(Navier_Stokes_std& eqn,DoubleTab& vpoint, Fluide_Incompressible& le_fluide, Matrice& matrice_pression_,Assembleur& assembleur_pression_)
 {
   return derivee_en_temps_inco(eqn,vpoint,le_fluide,matrice_pression_,assembleur_pression_,0);

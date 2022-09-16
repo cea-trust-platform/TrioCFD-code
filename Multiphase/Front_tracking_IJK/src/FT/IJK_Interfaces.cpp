@@ -1313,13 +1313,15 @@ void IJK_Interfaces::calculer_vmoy_composantes_connexes(const Maillage_FT_IJK& m
 
 }
 
-// Methode copiee de Transport_Interfaces_FT_Disc.cpp
-// Description: calcul du vecteur normal a l'interface, aux sommets
-//  du maillage d'interface. Le tableau "normale" est efface et resize.
-//  La normale est la moyenne des normales des facettes voisines, ponderees par
-//  la surface de la facette.
-//  La norme du vecteur normal n'est pas unitaire !
-//  L'espace virtuel n'est pas a jour !
+/*! @brief calcul du vecteur normal a l'interface, aux sommets du maillage d'interface.
+ *
+ * Le tableau "normale" est efface et resize.
+ *   La normale est la moyenne des normales des facettes voisines, ponderees par
+ *   la surface de la facette.
+ *   La norme du vecteur normal n'est pas unitaire !
+ *   L'espace virtuel n'est pas a jour !
+ *
+ */
 static void calculer_normale_sommets_interface(const Maillage_FT_IJK& maillage,
                                                DoubleTab& normale)
 {

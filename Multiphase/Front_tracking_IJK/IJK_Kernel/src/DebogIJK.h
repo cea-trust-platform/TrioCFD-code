@@ -35,16 +35,13 @@ class IJK_Field_double;
 
 #include <TRUSTTabs_forward.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : DebogIJK
-// .DESCRIPTION : class DebogIJK
-//
-// <Description of class DebogIJK>
-//
-/////////////////////////////////////////////////////////////////////////////
-
-
-
+/*! @brief : class DebogIJK
+ *
+ *  <Description of class DebogIJK>
+ * 
+ * 
+ *
+ */
 class DebogIJK : public Interprete {
 
 Declare_instanciable(DebogIJK) ;

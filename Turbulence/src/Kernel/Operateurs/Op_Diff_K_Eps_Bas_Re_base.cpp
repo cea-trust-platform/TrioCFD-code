@@ -30,40 +30,22 @@ Implemente_deriv(Op_Diff_K_Eps_Bas_Re_base);
 Implemente_instanciable(Op_Diff_K_Eps_Bas_Re,"Op_Diff_K_Eps_Bas_Re",DERIV(Op_Diff_K_Eps_Bas_Re_base));
 
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie& s
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie& s) le flot de sortie modifie
+ */
 Sortie& Op_Diff_K_Eps_Bas_Re_base::printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
 }
 
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie& s
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie& s) le flot de sortie modifie
+ */
 Sortie& Op_Diff_K_Eps_Bas_Re_negligeable::printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
@@ -71,40 +53,20 @@ Sortie& Op_Diff_K_Eps_Bas_Re_negligeable::printOn(Sortie& s ) const
 
 
 
-// Description:
-//    Associe la diffusivite a l'operateur.
-// Precondition:
-// Parametre: Champ_Don& ch
-//    Signification: le champ representant la diffusivite
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe la diffusivite a l'operateur.
+ *
+ * @param (Champ_Don& ch) le champ representant la diffusivite
+ */
 void Op_Diff_K_Eps_Bas_Re_negligeable::associer_diffusivite(const Champ_base& ch)
 {
   la_diffusivite=ch;
 }
 
 
-// Description:
-//    Renvoie le champ representant la diffusivite.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Don_base&
-//    Signification: le champ representant la diffusivite
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ representant la diffusivite.
+ *
+ * @return (Champ_Don_base&) le champ representant la diffusivite
+ */
 const Champ_base& Op_Diff_K_Eps_Bas_Re_negligeable::diffusivite() const
 {
   return la_diffusivite;
@@ -114,81 +76,42 @@ const Champ_base& Op_Diff_K_Eps_Bas_Re_negligeable::diffusivite() const
 
 
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie& s
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie& s) le flot de sortie modifie
+ */
 Sortie& Op_Diff_K_Eps_Bas_Re::printOn(Sortie& s ) const
 {
   return s << que_suis_je() ;
 }
 
 
-// Description:
-//    NE FAIT RIEN
-//    A surcharger dans les classes derivees
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Entree&
-//    Signification: le flot d'entree
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree
+ */
 Entree& Op_Diff_K_Eps_Bas_Re_base::readOn(Entree& s )
 {
   return s ;
 }
 
-// Description:
-//    NE FAIT RIEN
-//    A surcharger dans les classes derivees
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Entree&
-//    Signification: le flot d'entree
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief NE FAIT RIEN A surcharger dans les classes derivees
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree
+ */
 Entree& Op_Diff_K_Eps_Bas_Re_negligeable::readOn(Entree& s )
 {
   return s ;
 }
 
-// Description:
-//    Simple appel a Operateur::lire(Entree&)
-//    Lit l'operateur a partir d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Operateur::lire(Entree&) Lit l'operateur a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Op_Diff_K_Eps_Bas_Re::readOn(Entree& s )
 {
   Operateur::lire(s);
@@ -197,22 +120,11 @@ Entree& Op_Diff_K_Eps_Bas_Re::readOn(Entree& s )
 
 
 
-// Description:
-//    Type l'operateur
-//    s'associe a son equation
-//    Associe la diffusivite turbulente a l'operateur base.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'operateur est type
+/*! @brief Type l'operateur s'associe a son equation
+ *
+ *     Associe la diffusivite turbulente a l'operateur base.
+ *
+ */
 void Op_Diff_K_Eps_Bas_Re::typer()
 {
   Cerr << "dans Op_Diff_K_Eps_Bas_Re::typer()  typ = " << typ << finl;

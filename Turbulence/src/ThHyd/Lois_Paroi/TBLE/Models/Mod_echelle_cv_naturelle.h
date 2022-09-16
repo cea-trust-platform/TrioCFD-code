@@ -27,20 +27,12 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_echelle_cv_naturelle
-//
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
+/*! @brief Classe Mod_echelle_cv_naturelle
+ *
+ *
+ *
+ *
+ */
 class Mod_echelle_cv_naturelle : public Mod_echelle_LRM_base
 {
   Declare_instanciable(Mod_echelle_cv_naturelle);

@@ -36,13 +36,12 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_std_hyd_VEF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
+/*! @brief CLASS: Paroi_std_hyd_VEF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 void remplir_face_keps_imposee(int& flag_face_keps_imposee_,int methode_calcul_face_keps_impose_, IntVect& face_keps_imposee_, const Zone_VEF& zone_VEF,const REF(Zone_Cl_VEF) la_zone_Cl_VEF,int is_champ_P1NC);
 
 
@@ -81,8 +80,11 @@ protected:
 };
 
 
-// Description: cette classe permet de specifier des options a la loi de
-// paroi standard. Elle est reservee aux experts.
+/*! @brief cette classe permet de specifier des options a la loi de paroi standard.
+ *
+ * Elle est reservee aux experts.
+ *
+ */
 class Loi_expert_hydr_VEF : public Paroi_std_hyd_VEF
 {
   Declare_instanciable(Loi_expert_hydr_VEF);

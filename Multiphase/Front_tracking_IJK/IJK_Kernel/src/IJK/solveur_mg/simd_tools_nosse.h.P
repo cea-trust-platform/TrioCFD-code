@@ -29,9 +29,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-// Wrapper functions to allocate simd aligned blocs.
-// Description: allocates a memory bloc of given size with proper alignment for SIMD.
-//  nosimd=>fall back to malloc()
+/*! @brief allocates a memory bloc of given size with proper alignment for SIMD.
+ *
+ * nosimd=>fall back to malloc()
+ *
+ */
 template<typename T>
 inline T* simd_malloc (std::size_t size)
 {
@@ -39,7 +41,9 @@ inline T* simd_malloc (std::size_t size)
 	return res_ptr;
 }
 
-// Description: frees a memory bloc previously allocated with simd_malloc()
+/*! @brief frees a memory bloc previously allocated with simd_malloc()
+ *
+ */
 inline void simd_free(void * ptr)
 {
   free(ptr);
@@ -48,8 +52,9 @@ inline void simd_free(void * ptr)
 // uintptr_t should be defined in stdint.h
 //  (this type is the result of pointer operations like ptr1-ptr2)
 typedef uintptr_t uintptr_type;
-// Description: returns 1 if pointer is aligned on size bytes, 0 otherwise
-//  Warn: size must be a power of 2.
+/*! @brief returns 1 if pointer is aligned on size bytes, 0 otherwise Warn: size must be a power of 2.
+ *
+ */
 inline int aligned(const void *ptr, int size)
 {
   return ((uintptr_type)ptr & (uintptr_type)(size-1)) == 0;
@@ -60,16 +65,18 @@ inline int aligned(const void *ptr, int size)
 
 #Pmacro SIMD_CLASS_DEF(__type__)
 #define Simd___type__SIZE 1
-// .DESCRIPTION
-// This class provides a generic access to simd operations on IA32 and Intel 64 architecture.
-// Functionalities provided by the class are designed to match those provided by common
-// processor architectures (Altivec, SSE, etc):
-//  - load vector size aligned data from memory (SimdGet)
-//  - getting x[i-1] and x[i+1] efficiently for finite difference algorithms 
-//    (SimdGetAtLeft, SimdGetAtRight, etc)
-//  - arithmetic operations (+ - * /)
-//  - conditional affectation (SimdSelect)
-// See simd_malloc() and simd_free() to allocate aligned blocs of memory.
+/*! @brief This class provides a generic access to simd operations on IA32 and Intel 64 architecture.
+ *
+ * Functionalities provided by the class are designed to match those provided by common
+ *  processor architectures (Altivec, SSE, etc):
+ *   - load vector size aligned data from memory (SimdGet)
+ *   - getting x[i-1] and x[i+1] efficiently for finite difference algorithms
+ *     (SimdGetAtLeft, SimdGetAtRight, etc)
+ *   - arithmetic operations (+ - * /)
+ *   - conditional affectation (SimdSelect)
+ *  See simd_malloc() and simd_free() to allocate aligned blocs of memory.
+ *
+ */
 class Simd___type__
 {
 public:
@@ -98,48 +105,62 @@ public:
   Simd___type__(__type__ x) : data_(x) {};
 };
 
-// Description: Returns the vector found at address data. 
-//  data must be aligned for the architecture (see simd_malloc())
+/*! @brief Returns the vector found at address data.
+ *
+ * data must be aligned for the architecture (see simd_malloc())
+ *
+ */
 inline Simd___type__ SimdGet(const __type__ *data)
 {
   return *data;
 }
 
-// Description: Stores vector x at address data. 
-//  data must be aligned for the architecture (see simd_malloc())
+/*! @brief Stores vector x at address data.
+ *
+ * data must be aligned for the architecture (see simd_malloc())
+ *
+ */
 inline void SimdPut(__type__ *data, Simd___type__ x)
 {
   *data = x.data_;
 }
 
-// Description: Returns the vector x starting at adress data+1
-//  data must be aligned for the architecture (see simd_malloc())
-//  The implementation usually needs two vector loads and a shift operation.
+/*! @brief Returns the vector x starting at adress data+1 data must be aligned for the architecture (see simd_malloc())
+ *
+ *   The implementation usually needs two vector loads and a shift operation.
+ *
+ */
 inline Simd___type__ SimdGetAtRight(const __type__ *data)
 {
   return data[1];
 }
 
-// Description: Returns the vector x starting at adress data-1
-//  data must be aligned for the architecture (see simd_malloc())
-//  The implementation usually needs two vector loads and a shift operation.
+/*! @brief Returns the vector x starting at adress data-1 data must be aligned for the architecture (see simd_malloc())
+ *
+ *   The implementation usually needs two vector loads and a shift operation.
+ *
+ */
 inline Simd___type__ SimdGetAtLeft(const __type__ *data)
 {
   return data[-1];
 }
 
-// Description: Returns the vector left and center starting at adress data-1 and data
-//  data must be aligned for the architecture (see simd_malloc())
-//  The implementation usually needs two vector loads and a shift operation
+/*! @brief Returns the vector left and center starting at adress data-1 and data data must be aligned for the architecture (see simd_malloc())
+ *
+ *   The implementation usually needs two vector loads and a shift operation
+ *
+ */
 inline void SimdGetLeftCenter(const __type__ *data, Simd___type__ &left, Simd___type__ &center)
 {
   left = data[-1];
   center = data[0];
 }
 
-// Description: Returns the vector center and right starting at adress data and data+1
-//  data must be aligned for the architecture (see simd_malloc())
-//  The implementation usually needs two vector loads and a shift operation
+/*! @brief Returns the vector center and right starting at adress data and data+1 data must be aligned for the architecture (see simd_malloc())
+ *
+ *   The implementation usually needs two vector loads and a shift operation
+ *
+ */
 inline void SimdGetCenterRight(const __type__ *data, 
 				   Simd___type__ &center,
 				   Simd___type__ &right)
@@ -148,9 +169,11 @@ inline void SimdGetCenterRight(const __type__ *data,
   right = data[1];
 }
 
-// Description: Returns the vectors left, center and right starting at adress data-1, data and data+1
-//  data must be aligned for the architecture (see simd_malloc())
-//  The implementation usually needs three vector loads and two shift operations
+/*! @brief Returns the vectors left, center and right starting at adress data-1, data and data+1 data must be aligned for the architecture (see simd_malloc())
+ *
+ *   The implementation usually needs three vector loads and two shift operations
+ *
+ */
 inline void SimdGetLeftCenterRight(const __type__ *data, 
 				   Simd___type__ &left,
 				   Simd___type__ &center,
@@ -173,19 +196,25 @@ inline void SimdGetLeftleftLeftCenterRight(const __type__ *data,
   right = data[1];
 }
 
-// Description: returns a+b
+/*! @brief returns a+b
+ *
+ */
 inline Simd___type__ operator+(Simd___type__ a, Simd___type__ b)
 {
   return a.data_ + b.data_;
 }
 
-// Description: returns a-b
+/*! @brief returns a-b
+ *
+ */
 inline Simd___type__ operator-(Simd___type__ a, Simd___type__ b)
 {
   return a.data_ - b.data_;
 }
 
-// Description: returns a*b
+/*! @brief returns a*b
+ *
+ */
 inline Simd___type__ operator*(Simd___type__ a, Simd___type__ b)
 {
   return a.data_ * b.data_;
@@ -196,12 +225,14 @@ inline Simd___type__ Simd_absolute_value(Simd___type__ a)
    return std::fabs(a.data_);
 }
 
-// Description: This function performs the following operation on the vectors
-// for (i=0; i<size())
-//   if (x1[i] < x2[i])
-//     result[i] = value_if_x1_lower_than_x2[i]
-//   else
-//     result[i] = value_otherwise[i]
+/*! @brief This function performs the following operation on the vectors for (i=0; i<size())
+ *
+ *    if (x1[i] < x2[i])
+ *      result[i] = value_if_x1_lower_than_x2[i]
+ *    else
+ *      result[i] = value_otherwise[i]
+ *
+ */
 inline Simd___type__ SimdSelect(Simd___type__ x1,
 			       Simd___type__ x2,
 			       Simd___type__ value_if_x1_lower_than_x2,
@@ -283,15 +314,21 @@ public:
   Simd_int(int x) { data_ = x; }
 };
 
-// Description: Returns the vector found at address data. 
-//  data must be aligned for the architecture (see simd_malloc())
+/*! @brief Returns the vector found at address data.
+ *
+ * data must be aligned for the architecture (see simd_malloc())
+ *
+ */
 inline Simd_int SimdGet(const int *data)
 {
   return *data;
 }
 
-// Description: Stores vector x at address data. 
-//  data must be aligned for the architecture (see simd_malloc())
+/*! @brief Stores vector x at address data.
+ *
+ * data must be aligned for the architecture (see simd_malloc())
+ *
+ */
 inline void SimdPut(int *data, Simd_int x)
 {
   *data = x.data_;

@@ -21,15 +21,12 @@
 #include <Zone_Cl_VEF.h>
 #include <Champ_Inc.h>
 #include <Ok_Perio.h>
-//////////////////////////////////////////////////////////////
-//.DESCRIPTION class Champ_P1NC
-//
-// Rq : cette classe est specifique au module VEF
-
-//.SECTION voir aussi
-// Champ_Inc_base
-//////////////////////////////////////////////////////////////
-
+/*! @brief class Champ_P1NC
+ *
+ *  Rq : cette classe est specifique au module VEF
+ *
+ * @sa Champ_Inc_base
+ */
 extern void calculer_gradientP1NC(const DoubleTab& ,
                                   const Zone_VEF&,
                                   const Zone_Cl_VEF& ,

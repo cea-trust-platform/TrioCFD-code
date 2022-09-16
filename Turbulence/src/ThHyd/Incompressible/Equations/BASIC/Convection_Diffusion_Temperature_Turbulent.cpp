@@ -25,40 +25,23 @@
 
 Implemente_instanciable(Convection_Diffusion_Temperature_Turbulent,"Convection_Diffusion_Temperature_Turbulent",Convection_Diffusion_Temperature);
 
-// Description:
-//    Simple appel a Equation_base::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a Equation_base::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Convection_Diffusion_Temperature_Turbulent::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
 
-// Description:
-//   cf Convection_Diffusion_Temperature::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: il faut specifier un modele de turbulence
-// Effets de bord:
-// Postcondition:
+/*! @brief cf Convection_Diffusion_Temperature::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws il faut specifier un modele de turbulence
+ */
 Entree& Convection_Diffusion_Temperature_Turbulent::readOn(Entree& is)
 {
   Convection_Diffusion_Temperature::readOn(is);
@@ -95,22 +78,13 @@ int Convection_Diffusion_Temperature_Turbulent::lire_motcle_non_standard(const M
   return 1;
 }
 
-// Description:
-//    Sauvegarde sur un flot de sortie, double appel a:
-//      Convection_Diffusion_Temperature::sauvegarder(Sortie& );
-//      Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Sauvegarde sur un flot de sortie, double appel a: Convection_Diffusion_Temperature::sauvegarder(Sortie& );
+ *
+ *       Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Temperature_Turbulent::sauvegarder(Sortie& os) const
 {
   int bytes=0;
@@ -119,22 +93,13 @@ int Convection_Diffusion_Temperature_Turbulent::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-// Description:
-//    Reprise a partir d'un flot d'entree, double appel a:
-//      Convection_Diffusion_Temperature::reprendre(Entree& );
-//      Convection_Diffusion_Turbulent::reprendre(Entree&);
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Reprise a partir d'un flot d'entree, double appel a: Convection_Diffusion_Temperature::reprendre(Entree& );
+ *
+ *       Convection_Diffusion_Turbulent::reprendre(Entree&);
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Temperature_Turbulent::reprendre(Entree& is)
 {
   Convection_Diffusion_Temperature::reprendre(is);
@@ -143,22 +108,11 @@ int Convection_Diffusion_Temperature_Turbulent::reprendre(Entree& is)
 }
 
 
-// Description:
-//    Double appel a:
-//     Convection_Diffusion_Turbulent::completer()
-//     Convection_Diffusion_Temperature::completer()
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Double appel a: Convection_Diffusion_Turbulent::completer()
+ *
+ *      Convection_Diffusion_Temperature::completer()
+ *
+ */
 void Convection_Diffusion_Temperature_Turbulent::completer()
 {
   Convection_Diffusion_Turbulent::completer();
@@ -166,22 +120,12 @@ void Convection_Diffusion_Temperature_Turbulent::completer()
 }
 
 
-// Description:
-//    Mise a jour en temps de l'equation, double appel a:
-//      Convection_Diffusion_Temperature::mettre_a_jour(double );
-//      Convection_Diffusion_Turbulent::mettre_a_jour(double );
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Mise a jour en temps de l'equation, double appel a: Convection_Diffusion_Temperature::mettre_a_jour(double );
+ *
+ *       Convection_Diffusion_Turbulent::mettre_a_jour(double );
+ *
+ * @param (double temps) le temps de mise a jour
+ */
 void Convection_Diffusion_Temperature_Turbulent::mettre_a_jour(double temps)
 {
   Convection_Diffusion_Temperature::mettre_a_jour(temps);
@@ -228,22 +172,12 @@ void Convection_Diffusion_Temperature_Turbulent::get_noms_champs_postraitables(N
     le_modele_turbulence->get_noms_champs_postraitables(nom,opt);
 }
 
-// Description:
-//    Double appel a:
-//      Convection_Diffusion_Turbulent::preparer_calcul()
-//      Convection_Diffusion_Temperature::preparer_calcul()
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Double appel a: Convection_Diffusion_Turbulent::preparer_calcul()
+ *
+ *       Convection_Diffusion_Temperature::preparer_calcul()
+ *
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Temperature_Turbulent::preparer_calcul()
 {
   Convection_Diffusion_Temperature::preparer_calcul();

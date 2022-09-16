@@ -32,20 +32,11 @@ Implemente_instanciable_sans_constructeur(Modele_turbulence_scal_Prandtl,"Modele
 
 Modele_turbulence_scal_Prandtl::Modele_turbulence_scal_Prandtl() : LePrdt(0.9) {}
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Modele_turbulence_scal_Prandtl::printOn(Sortie& s ) const
 {
 
@@ -53,26 +44,18 @@ Sortie& Modele_turbulence_scal_Prandtl::printOn(Sortie& s ) const
 }
 
 
-// Description:
-//    Lit les specifications d'un modele de turbulence
-//    a partir d'un flot d'entree.
-//    Format:
-//      {
-//      }
-//    (il n'y a rien a lire sauf les accolades)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Exception: accolade fermante attendue
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'un modele de turbulence a partir d'un flot d'entree.
+ *
+ *     Format:
+ *       {
+ *       }
+ *     (il n'y a rien a lire sauf les accolades)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
+ * @throws accolade fermante attendue
+ */
 Entree& Modele_turbulence_scal_Prandtl::readOn(Entree& is )
 {
   Mod_Turb_scal_diffturb_base::readOn(is);
@@ -126,21 +109,10 @@ void Modele_turbulence_scal_Prandtl::set_param(Param& param)
 
 
 
-// Description:
-//    Calcule la diffusivite turbulente et
-//    la loi de paroi.
-// Precondition:
-// Parametre: double
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: NON ACCEDE
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la diffusivite turbulente et la loi de paroi.
+ *
+ * @param (double)
+ */
 void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
 {
   calculer_diffusivite_turbulente();
@@ -167,22 +139,14 @@ void Modele_turbulence_scal_Prandtl::mettre_a_jour(double )
 }
 
 
-// Description:
-//    Calcule la diffusivite turbulente.
-//    diffusivite_turbulente = viscosite_turbulente / Prdt_turbulent
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: la diffusivite turbulente nouvellement calculee
-//    Contraintes:
-// Exception: les champs diffusivite_turbulente et viscosite_turbulente
-//            doivent avoir le meme nombre de valeurs nodales
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la diffusivite turbulente.
+ *
+ * diffusivite_turbulente = viscosite_turbulente / Prdt_turbulent
+ *
+ * @return (Champ_Fonc&) la diffusivite turbulente nouvellement calculee
+ * @throws les champs diffusivite_turbulente et viscosite_turbulente
+ * doivent avoir le meme nombre de valeurs nodales
+ */
 Champ_Fonc& Modele_turbulence_scal_Prandtl::calculer_diffusivite_turbulente()
 {
   DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();

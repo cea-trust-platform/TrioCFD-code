@@ -25,15 +25,11 @@
 #include <Objet_U.h>
 #include <Ref_Eq_couch_lim.h>
 class Milieu_base;
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe MuLambda_TBLE_base
-//    Classe abstraite calculant Mu et Lambda sur le maillage TBLE
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe MuLambda_TBLE_base Classe abstraite calculant Mu et Lambda sur le maillage TBLE
+ *
+ *
+ *
+ */
 class MuLambda_TBLE_base : public Objet_U
 {
   Declare_base(MuLambda_TBLE_base);

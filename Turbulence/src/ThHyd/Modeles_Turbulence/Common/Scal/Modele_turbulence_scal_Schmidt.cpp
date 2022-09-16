@@ -28,20 +28,11 @@ Implemente_instanciable_sans_constructeur(Modele_turbulence_scal_Schmidt,"Modele
 
 Modele_turbulence_scal_Schmidt::Modele_turbulence_scal_Schmidt() : LeScturb(0.7) {}
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Modele_turbulence_scal_Schmidt::printOn(Sortie& s ) const
 {
 
@@ -49,50 +40,29 @@ Sortie& Modele_turbulence_scal_Schmidt::printOn(Sortie& s ) const
 }
 
 
-// Description:
-//    Lit les specifications d'un modele de turbulence
-//    a partir d'un flot d'entree.
-//    Format:
-//      {
-//      }
-//    (il n'y a rien a lire sauf les accolades)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Exception: accolade fermante attendue
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'un modele de turbulence a partir d'un flot d'entree.
+ *
+ *     Format:
+ *       {
+ *       }
+ *     (il n'y a rien a lire sauf les accolades)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
+ * @throws accolade fermante attendue
+ */
 Entree& Modele_turbulence_scal_Schmidt::readOn(Entree& is )
 {
   return Mod_Turb_scal_diffturb_base::readOn(is);
 }
 
-// Description:
-//    NE FAIT RIEN
-// Precondition:
-// Parametre: Motcle&
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification: le flot d'entree
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief NE FAIT RIEN
+ *
+ * @param (Motcle&)
+ * @param (Entree& is) un flot d'entree
+ * @return le flot d'entree
+ */
 void Modele_turbulence_scal_Schmidt::set_param(Param& param)
 {
   param.ajouter("ScTurb",&LeScturb);
@@ -101,22 +71,11 @@ void Modele_turbulence_scal_Schmidt::set_param(Param& param)
 }
 
 
-// Description:
-//    Renvoie 1 si le mot cle passe en parametre
-//    est un nom de champ de l'objet
-// Precondition:
-// Parametre: Motcle& mot
-//    Signification: le mot cle a comparer aux noms de champs connus
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour: int
-//    Signification: 0 si le mot n'est pas un nom de champ
-//                   1 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie 1 si le mot cle passe en parametre est un nom de champ de l'objet
+ *
+ * @param (Motcle& mot) le mot cle a comparer aux noms de champs connus
+ * @return (int) 0 si le mot n'est pas un nom de champ 1 sinon
+ */
 int Modele_turbulence_scal_Schmidt::comprend_champ(const Motcle& mot) const
 {
   if (mot == Motcle("diffusion_turbulente"))
@@ -126,28 +85,14 @@ int Modele_turbulence_scal_Schmidt::comprend_champ(const Motcle& mot) const
 }
 
 
-// Description:
-//    Renvoie 1 si un champ fonction (Champ_Fonc) du nom specifie
-//    est porte par le modele de turbulence.
-//    Renvoie 0 sinon.
-// Precondition:
-// Parametre: Motcle& mot
-//    Signification: le nom d'un champ fonction du modele de turbulence
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: REF(Champ_base)& ch_ref
-//    Signification: la reference sur le champ recherche (si il a ete trouve)
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: int
-//    Signification: 1 si un champ fonction du nom specifie a ete trouve
-//                   0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie 1 si un champ fonction (Champ_Fonc) du nom specifie est porte par le modele de turbulence.
+ *
+ *     Renvoie 0 sinon.
+ *
+ * @param (Motcle& mot) le nom d'un champ fonction du modele de turbulence
+ * @param (REF(Champ_base)& ch_ref) la reference sur le champ recherche (si il a ete trouve)
+ * @return (int) 1 si un champ fonction du nom specifie a ete trouve 0 sinon
+ */
 int Modele_turbulence_scal_Schmidt::a_pour_Champ_Fonc(const Motcle& mot,
                                                       REF(Champ_base)& ch_ref) const
 {
@@ -160,21 +105,10 @@ int Modele_turbulence_scal_Schmidt::a_pour_Champ_Fonc(const Motcle& mot,
 }
 
 
-// Description:
-//    Calcule le coefficient turbulent utilise dans l equation et
-//    la loi de paroi.
-// Precondition:
-// Parametre: double
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: NON ACCEDE
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule le coefficient turbulent utilise dans l equation et la loi de paroi.
+ *
+ * @param (double)
+ */
 void Modele_turbulence_scal_Schmidt::mettre_a_jour(double )
 {
   calculer_diffusion_turbulente();
@@ -191,22 +125,14 @@ void Modele_turbulence_scal_Schmidt::mettre_a_jour(double )
   diffusivite_turbulente_->valeurs().echange_espace_virtuel();
 }
 
-// Description:
-//    Calcule la diffusion turbulente.
-//    diffusion_turbulente = viscosite_turbulente / Sc_turbulent
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: la diffusion turbulente nouvellement calculee
-//    Contraintes:
-// Exception: les champs diffusivite_turbulente et viscosite_turbulente
-//            doivent avoir le meme nombre de valeurs nodales
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la diffusion turbulente.
+ *
+ * diffusion_turbulente = viscosite_turbulente / Sc_turbulent
+ *
+ * @return (Champ_Fonc&) la diffusion turbulente nouvellement calculee
+ * @throws les champs diffusivite_turbulente et viscosite_turbulente
+ * doivent avoir le meme nombre de valeurs nodales
+ */
 Champ_Fonc& Modele_turbulence_scal_Schmidt::calculer_diffusion_turbulente()
 {
   DoubleTab& alpha_t = diffusivite_turbulente_.valeurs();

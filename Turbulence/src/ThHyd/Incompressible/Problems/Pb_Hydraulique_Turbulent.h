@@ -30,17 +30,14 @@ class Champ_Fonc;
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Pb_Hydraulique_Turbulent
-//     Cette classe represente un probleme d'hydraulique turbulent dans
-//     lequel on resout les equations de Navier Stokes en regime turbulent
-//     pour un fluide incompressible
-//     La formulation est de type vitesse pression
-// .SECTION voir aussi
-//     Pb_Fluide_base Navier_Stokes_Turbulent Pb_Hydraulique
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Pb_Hydraulique_Turbulent Cette classe represente un probleme d'hydraulique turbulent dans
+ *
+ *      lequel on resout les equations de Navier Stokes en regime turbulent
+ *      pour un fluide incompressible
+ *      La formulation est de type vitesse pression
+ *
+ * @sa Pb_Fluide_base Navier_Stokes_Turbulent Pb_Hydraulique
+ */
 class Pb_Hydraulique_Turbulent : public Pb_Fluide_base
 {
   Declare_instanciable(Pb_Hydraulique_Turbulent);
@@ -62,21 +59,10 @@ protected :
 
 
 
-// Description:
-//    Renvoie le champ representant la viscosite turbulente
-//    du probleme.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ representant la viscosite turbulente du probleme.
+ *
+ * @return (Champ_Fonc&) le champ representant la viscosite turbulente
+ */
 inline const Champ_Fonc& Pb_Hydraulique_Turbulent::viscosite_turbulente() const
 {
   return eq_hydraulique.viscosite_turbulente();

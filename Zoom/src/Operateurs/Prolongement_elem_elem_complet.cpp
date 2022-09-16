@@ -45,26 +45,14 @@ Entree& Prolongement_elem_elem_complet::readOn(Entree& s )
 
 
 
-// Description:
-//    Prolongement du centre de gravite des faces grossieres
-//    au centre de gravite de TOUTES les faces fines
-//    PROLONGEMENT POUR PRESSION ET TEMPERATURE
-//    EN 2D ET 3D
-//    EN VDF ET VEF pour la pression
-//    EN VDF pour la temperature
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
+/*! @brief Prolongement du centre de gravite des faces grossieres au centre de gravite de TOUTES les faces fines
+ *
+ *     PROLONGEMENT POUR PRESSION ET TEMPERATURE
+ *     EN 2D ET 3D
+ *     EN VDF ET VEF pour la pression
+ *     EN VDF pour la temperature
+ *
+ */
 void Prolongement_elem_elem_complet::prolonger(Zone_VF& zone_VFG,
                                                Zone_VF& zone_VFF,
                                                const Frontiere& frontF,

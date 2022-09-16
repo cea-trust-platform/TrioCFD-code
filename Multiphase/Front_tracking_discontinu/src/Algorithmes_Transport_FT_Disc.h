@@ -38,11 +38,13 @@ class Algorithmes_Transport_FT_Disc;
 
 Declare_deriv(Algorithmes_Transport_FT_Disc);
 
-// .DESCRIPTION        : classe Algorithmes_Transport_FT_Disc
-//
-//  Classe regroupant des algorithmes utilises pour manipuler le
-//  maillage dans l'equation de transport des interfaces.
-//  Les methodes sont eventuellement specialisees VDF / VEF
+/*! @brief : classe Algorithmes_Transport_FT_Disc
+ *
+ *   Classe regroupant des algorithmes utilises pour manipuler le
+ *   maillage dans l'equation de transport des interfaces.
+ *   Les methodes sont eventuellement specialisees VDF / VEF
+ *
+ */
 class Algorithmes_Transport_FT_Disc : public Objet_U
 {
   Declare_instanciable(Algorithmes_Transport_FT_Disc);

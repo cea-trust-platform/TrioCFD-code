@@ -25,14 +25,13 @@
 
 
 
-//
-// .DESCRIPTION class ConcatAnsys
-// Realise un maillage en decoupant chaque pave en 40 tetraedres
-// Le maillage obtenu n'a pas de directions preferentielles
-//
-// .SECTION voir aussi
-// Interprete
-
+/*! @brief class ConcatAnsys Realise un maillage en decoupant chaque pave en 40 tetraedres
+ *
+ *  Le maillage obtenu n'a pas de directions preferentielles
+ *
+ *
+ * @sa Interprete
+ */
 #include <Interprete_geometrique_base.h>
 #include <Domaine.h>
 

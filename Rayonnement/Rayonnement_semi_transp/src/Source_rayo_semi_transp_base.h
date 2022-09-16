@@ -26,14 +26,11 @@
 #include <Source_base.h>
 #include <Ref_Modele_rayo_semi_transp.h>
 class Modele_rayo_semi_transp;
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Source_rayo_semi_transp_base
-//    Classe de base de la hierarchie des termes sources de l'eqution de
-//    temperature pour les problemes de rayonnement semi transparent.
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Source_rayo_semi_transp_base Classe de base de la hierarchie des termes sources de l'eqution de
+ *
+ *     temperature pour les problemes de rayonnement semi transparent.
+ *
+ */
 class Source_rayo_semi_transp_base : public Source_base
 {
   Declare_base(Source_rayo_semi_transp_base);

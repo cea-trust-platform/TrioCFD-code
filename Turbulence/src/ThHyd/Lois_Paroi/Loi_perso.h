@@ -25,13 +25,9 @@
 #include <Loi_2couches_base.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Loi_perso
-//    Cette classe  represente les modeles 1 equation pour le modele a deux couches cale sur les resultats de convection forcee.
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Loi_perso Cette classe  represente les modeles 1 equation pour le modele a deux couches cale sur les resultats de convection forcee.
+ *
+ */
 class Loi_perso : public Loi_2couches_base
 {
 

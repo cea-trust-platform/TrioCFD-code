@@ -47,15 +47,14 @@ Declare_liste(IJK_Thermique);
 
 // #define SMOOTHING_RHO
 
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : IJK_FT
-// .DESCRIPTION : class IJK_FT
-//
-// <Description of class IJK_FT>
-//
-/////////////////////////////////////////////////////////////////////////////
-
-// La classe IJK_FT_double herite de la classe Interprete.
+/*! @brief : class IJK_FT
+ *
+ *  <Description of class IJK_FT>
+ * 
+ * 
+ *  La classe IJK_FT_double herite de la classe Interprete.
+ *
+ */
 class IJK_FT_double : public Interprete
 {
   // We take too much advantage of it ...:

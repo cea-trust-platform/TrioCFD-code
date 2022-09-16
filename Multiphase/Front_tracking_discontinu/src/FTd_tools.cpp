@@ -24,20 +24,11 @@
 #include <math.h>
 #include <TRUSTTabFT.h>
 
-// Description:
-//    Cette fonction calcule le max de la norme d'un ensemble de vecteurs
-// Precondition:
-// Parametre: vecteurs
-//    Signification: vecteurs a mesurer
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Retour: double
-//    Signification: le max du deplacement
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette fonction calcule le max de la norme d'un ensemble de vecteurs
+ *
+ * @param (vecteurs) vecteurs a mesurer
+ * @return (double) le max du deplacement
+ */
 double FTd_calculer_max_norme_vecteurs(const DoubleTab& vecteurs)
 {
   int som,k;

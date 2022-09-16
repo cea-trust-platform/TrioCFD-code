@@ -27,16 +27,13 @@
 #include <Neumann_loi_paroi.h>
 #include <Cond_lim_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Loi_paroi_faible_k
-//    Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
-//    transport de k pour la turbulence.
-//    Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
-// .SECTION voir aussi
-//    Neumann
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Loi_paroi_faible_k Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
+ *
+ *     transport de k pour la turbulence.
+ *     Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
+ *
+ * @sa Neumann
+ */
 class Neumann_loi_paroi_faible_k : public Neumann_loi_paroi
 {
 

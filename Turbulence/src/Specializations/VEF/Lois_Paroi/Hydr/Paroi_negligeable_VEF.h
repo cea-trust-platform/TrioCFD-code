@@ -30,14 +30,12 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_negligeable_VEF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_negligeable_VEF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_negligeable_VEF : public Paroi_hyd_base_VEF
 {
 

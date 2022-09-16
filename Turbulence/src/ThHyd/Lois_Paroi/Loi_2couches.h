@@ -27,13 +27,9 @@
 
 Declare_deriv(Loi_2couches_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Loi_2couches
-//    Classe generique pour les modeles 1 equation pour le modele a deux couches.
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Loi_2couches Classe generique pour les modeles 1 equation pour le modele a deux couches.
+ *
+ */
 class Loi_2couches : public DERIV(Loi_2couches_base)
 {
 
@@ -44,20 +40,9 @@ public:
 
 };
 
-// Description:
-//    Appel a l'objet sous-jacent
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Appel a l'objet sous-jacent
+ *
+ */
 inline void Loi_2couches::LepsLmu(double k, double nu, double dist, double y_etoile, double& Leps, double& Lmu, double& vvSqRt)
 {
   valeur().LepsLmu(k,nu,dist,y_etoile,Leps,Lmu,vvSqRt);

@@ -38,11 +38,9 @@ class Equation_base;
 class Champ_front_zoom;
 
 
-//
-// .DESCRIPTION class Pb_MG
-//
-// .SECTION voir aussi
-
+/*! @brief class Pb_MG
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

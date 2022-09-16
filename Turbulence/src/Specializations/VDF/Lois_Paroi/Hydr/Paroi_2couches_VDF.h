@@ -32,13 +32,12 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Param;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_2couches_VDF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
+/*! @brief CLASS: Paroi_2couches_VDF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_2couches_VDF : public Paroi_hyd_base_VDF, public Paroi_log_QDM
 {
 

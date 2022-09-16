@@ -25,13 +25,12 @@
 
 #include <Fluide_reel_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Fluide_eau_c3_gaz
-//    Cette classe represente un milieu reel
-//    dont les lois viennent de "Lois_Na"
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Fluide_eau_c3_gaz Cette classe represente un milieu reel
+ *
+ *     dont les lois viennent de "Lois_Na"
+ *
+ *
+ */
 class Fluide_eau_c3_gaz: public Fluide_reel_base
 {
   Declare_instanciable(Fluide_eau_c3_gaz);

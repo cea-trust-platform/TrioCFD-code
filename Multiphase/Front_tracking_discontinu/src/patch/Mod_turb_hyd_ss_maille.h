@@ -29,15 +29,12 @@
 
 #include <Mod_turb_hyd_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_turb_hyd_ss_maille
-//    Classe representant le modele de turbulence sous maille pour les
-//    equations de Navier-Stokes.
-// .SECTION voir aussi
-//    Mod_turb_hyd_base Modele_turbulence_hyd_K_Eps
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Mod_turb_hyd_ss_maille Classe representant le modele de turbulence sous maille pour les
+ *
+ *     equations de Navier-Stokes.
+ *
+ * @sa Mod_turb_hyd_base Modele_turbulence_hyd_K_Eps
+ */
 class Mod_turb_hyd_ss_maille : public Mod_turb_hyd_base
 {
 

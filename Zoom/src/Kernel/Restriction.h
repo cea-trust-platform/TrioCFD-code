@@ -32,19 +32,16 @@
 
 Declare_deriv(Restriction_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Restriction
-//     Classe generique de la hierarchie des algorithmes, un objet
-//     Restriction peut referencer n'importe quel objet derivant de
-//     Restriction_base.
-//     La plupart des methodes appellent les methodes de l'objet
-//     Restriction_base sous-jacent via la methode valeur() declaree grace
-//alamacroDeclare_deriv().;
-// .SECTION voir aussi
-//      Restriction_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Restriction Classe generique de la hierarchie des algorithmes, un objet
+ *
+ *      Restriction peut referencer n'importe quel objet derivant de
+ *      Restriction_base.
+ *      La plupart des methodes appellent les methodes de l'objet
+ *      Restriction_base sous-jacent via la methode valeur() declaree grace
+ * alamacroDeclare_deriv().;
+ *
+ * @sa Restriction_base
+ */
 class Restriction : public DERIV(Restriction_base)
 {
   Declare_instanciable(Restriction);

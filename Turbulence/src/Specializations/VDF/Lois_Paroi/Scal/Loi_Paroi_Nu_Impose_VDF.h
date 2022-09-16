@@ -27,13 +27,14 @@
 #include <Champ_Don.h>
 #include <Parser_U.h>
 
-//.DESCRIPTION classe Loi_Paroi_Nu_Impose_VDF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_std_hyd_VDF
+/*! @brief classe Loi_Paroi_Nu_Impose_VDF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_std_hyd_VDF
+ *
+ */
 /**
  * Cette classe permet d'imposer une loi de paroi de type nombre de Nusselt imposee.
  * La fonction de Nusselt rentree par l'utilisateur peut etre une fonction de l'espace, du nombre de Reynolds

@@ -25,37 +25,32 @@
 #include <Pave.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe PaveCoincidant
-//    Une zone particulierement facile a mailler!
-//    La structure du jeu de donnee pour specifier un PaveCoincidant est:
-//    PaveCoincidant nom_PaveCoincidant
-//     {
-//     Origine OX OY (OZ)
-//     Longueurs LX LY (LZ)
-//     Nombre_de_noeuds NX NY (NZ)
-//     Facteurs Fx Fy (Fz)
-//     (Symx)
-//     (Symy)
-//     (Symz)
-//     }
-//     {
-//     (Bord)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
-//     ...
-//     (Raccord)  local homogene nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
-//     ...
-//     (Internes)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
-//     ...
-//     (Joint)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1 PE_voisin
-//     ...
-//     }
-// .SECTION voir aussi
-//    Zone Mailler
-//    Actuellemnt c'est le seul type d'objet reconnu par Trio-U pour mailler
-//    un domaine
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe PaveCoincidant Une zone particulierement facile a mailler!
+ *
+ *     La structure du jeu de donnee pour specifier un PaveCoincidant est:
+ *     PaveCoincidant nom_PaveCoincidant
+ *      {
+ *      Origine OX OY (OZ)
+ *      Longueurs LX LY (LZ)
+ *      Nombre_de_noeuds NX NY (NZ)
+ *      Facteurs Fx Fy (Fz)
+ *      (Symx)
+ *      (Symy)
+ *      (Symz)
+ *      }
+ *      {
+ *      (Bord)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
+ *      ...
+ *      (Raccord)  local homogene nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
+ *      ...
+ *      (Internes)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
+ *      ...
+ *      (Joint)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1 PE_voisin
+ *      ...
+ *      }
+ *
+ * @sa Zone Mailler, Actuellemnt c'est le seul type d'objet reconnu par Trio-U pour mailler, un domaine
+ */
 class PaveCoincidant : public Pave
 {
   Declare_instanciable(PaveCoincidant);

@@ -55,40 +55,23 @@ bool Equation_rayonnement_base::solve()
 }
 
 
-// Description:
-//    Imprime le type de l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le type de l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Equation_rayonnement_base::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
 
-// Description:
-//    cf Equation_base::readOn(Entree& is)
-// Precondition: l'equation doit avoir un milieu fluide associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: solveur pression non defini dans jeu de donnees
-// Effets de bord:
-// Postcondition:
+/*! @brief cf Equation_base::readOn(Entree& is)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws solveur pression non defini dans jeu de donnees
+ */
 Entree& Equation_rayonnement_base::readOn(Entree& is)
 {
   Equation_base::readOn(is);
@@ -222,20 +205,10 @@ int Equation_rayonnement_base::lire_motcle_non_standard(const Motcle& mot, Entre
   return -1;
 }
 
-// Description:
-//   Associe un milieu physique a l'equation
-// Precondition:
-// Parametre: Milieu_base& un_milieu
-//    Signification: le milieu physique a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un milieu physique a l'equation
+ *
+ * @param (Milieu_base& un_milieu) le milieu physique a associer a l'equation
+ */
 void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_base,un_milieu))
@@ -263,41 +236,19 @@ void Equation_rayonnement_base::associer_milieu_base(const Milieu_base& un_milie
     }
 }
 
-// Description:
-//   Associe le modele de rayonnement a l'equation de rayonnement
-// Precondition:
-// Parametre: Modele_rayo_semi_transp& un_modele
-//    Signification: le modele de rayonnement associe a l'equation
-//                   de rayonnement
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe le modele de rayonnement a l'equation de rayonnement
+ *
+ * @param (Modele_rayo_semi_transp& un_modele) le modele de rayonnement associe a l'equation de rayonnement
+ */
 void Equation_rayonnement_base::associer_modele_rayonnement(const Modele_rayo_semi_transp& un_modele)
 {
   le_modele = un_modele;
 }
 
-// Description:
-//    Renvoie le milieu physique de l'equation
-//    (le Fluide_base upcaste en Milieu_base)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_base de l'equation upcaste en Milieu_base
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
+ *
+ * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
+ */
 const Milieu_base& Equation_rayonnement_base::milieu() const
 {
   if (!le_fluide.non_nul())
@@ -309,22 +260,12 @@ const Milieu_base& Equation_rayonnement_base::milieu() const
 }
 
 
-// Description:
-//    Renvoie le milieu physique de l'equation
-//    (le Fluide_base upcaste en Milieu_base)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_base de l'equation upcaste en Milieu_base
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le milieu physique de l'equation (le Fluide_base upcaste en Milieu_base)
+ *
+ *     (version const)
+ *
+ * @return (Milieu_base&) le Fluide_base de l'equation upcaste en Milieu_base
+ */
 Milieu_base& Equation_rayonnement_base::milieu()
 {
   if (!le_fluide.non_nul())
@@ -335,44 +276,27 @@ Milieu_base& Equation_rayonnement_base::milieu()
   return le_fluide.valeur();
 }
 
-// Description:
-//    Renvoie le nombre d'operateurs de l'equation.
-//    Ici 1.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre d'operateurs de l'equation
-//    Contraintes: toujours egal a 1
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nombre d'operateurs de l'equation.
+ *
+ * Ici 1.
+ *
+ * @return (int) le nombre d'operateurs de l'equation
+ */
 int Equation_rayonnement_base::nombre_d_operateurs() const
 {
   return 1;
 }
 
 
-// Description:
-//    Renvoie l'operateur specifie par son index:
-//     renvoie terme_diffusif si i = 0
-//     exit si i>0
-//    (version const)
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'operateur a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: i = 0
-//    Acces: entree
-// Retour: Operateur&
-//    Signification: l'operateur specifie
-//    Contraintes: reference constante
-// Exception: l'equation n'a pas plus de 1 operateur
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+ *
+ *      exit si i>0
+ *     (version const)
+ *
+ * @param (int i) l'index de l'operateur a renvoyer
+ * @return (Operateur&) l'operateur specifie
+ * @throws l'equation n'a pas plus de 1 operateur
+ */
 const Operateur& Equation_rayonnement_base::operateur(int i) const
 {
   switch(i)
@@ -389,23 +313,15 @@ const Operateur& Equation_rayonnement_base::operateur(int i) const
 }
 
 
-// Description:
-//    Renvoie l'operateur specifie par son index:
-//     renvoie terme_diffusif si i = 0
-//     exit si i>0
-//    (version const)
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'operateur a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: i = 0
-//    Acces: entree
-// Retour: Operateur&
-//    Signification: l'operateur specifie
-//    Contraintes:
-// Exception: l'equation n'a pas plus de 1 operateur
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'operateur specifie par son index: renvoie terme_diffusif si i = 0
+ *
+ *      exit si i>0
+ *     (version const)
+ *
+ * @param (int i) l'index de l'operateur a renvoyer
+ * @return (Operateur&) l'operateur specifie
+ * @throws l'equation n'a pas plus de 1 operateur
+ */
 Operateur& Equation_rayonnement_base::operateur(int i)
 {
   switch(i)
@@ -422,62 +338,29 @@ Operateur& Equation_rayonnement_base::operateur(int i)
 }
 
 
-// Description:
-//    Renvoie l'irradiance (champ inconnue de l'equation de rayonnement)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant l'irradience
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'irradiance (champ inconnue de l'equation de rayonnement) (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant l'irradience
+ */
 const Champ_Inc& Equation_rayonnement_base::inconnue() const
 {
   return irradiance_;
 }
 
 
-// Description:
-//    Renvoie l'irradiance (champ inconnue de l'equation de rayonnement)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant l'irradience
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'irradiance (champ inconnue de l'equation de rayonnement) (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant l'irradience
+ */
 Champ_Inc& Equation_rayonnement_base::inconnue()
 {
   return irradiance_;
 }
 
 
-// Description:
-//    Dicretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Dicretise l'equation.
+ *
+ */
 void Equation_rayonnement_base::discretiser()
 {
   //
@@ -505,20 +388,11 @@ void Equation_rayonnement_base::discretiser()
 }
 
 
-// Description:
-//    Renvoie la discretisation associee a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Discretisation_base&
-//    Signification: a discretisation associee a l'equation
-//    Contraintes: reference constante
-// Exception: pas de probleme associe
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la discretisation associee a l'equation.
+ *
+ * @return (Discretisation_base&) a discretisation associee a l'equation
+ * @throws pas de probleme associe
+ */
 const Discretisation_base& Equation_rayonnement_base::discretisation() const
 {
   //  if(!le_modele->probleme().non_nul())

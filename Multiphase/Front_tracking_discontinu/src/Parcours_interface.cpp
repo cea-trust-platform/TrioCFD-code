@@ -62,23 +62,28 @@ Parcours_interface::Parcours_interface()
   correction_parcours_thomas_ = 0;
 }
 
-// Description: La construction par copie est interdite !
+/*! @brief La construction par copie est interdite !
+ *
+ */
 Parcours_interface::Parcours_interface(const Parcours_interface& a): Objet_U(a)
 {
   exit();
 }
 
-// Description: L'operateur = est interdit !
+/*! @brief L'operateur = est interdit !
+ *
+ */
 const Parcours_interface& Parcours_interface::operator=(const Parcours_interface&)
 {
   exit();
   return *this;
 }
 
-// Description:
-//  Remplissage des variables persistantes de la classe
-//  (refzone_vf_, nb_faces_elem_, nb_elements_reels_, type_element_,
-//   equations_plans_faces_).
+/*! @brief Remplissage des variables persistantes de la classe (refzone_vf_, nb_faces_elem_, nb_elements_reels_, type_element_,
+ *
+ *    equations_plans_faces_).
+ *
+ */
 void Parcours_interface::associer_zone_dis(const Zone_dis& zone_dis)
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis.valeur());
@@ -744,13 +749,14 @@ inline double Parcours_interface::volume_rectangle(const Zone_VF& zone_vf,
   return v;
 }
 
-// Description:
-// Calcul de la matrice 2x2 de transformation pour passer d'une coordonnee
-// dans le repere (x,y) global a une coordonnee (u,v,1-u-v) barycentrique
-// dans un element fini triangulaire.
-// Le point 0 du triangle aura pour coordonnees (0,0,1)
-// Le point 1                                   (1,0,0)
-// Le point 2                                   (0,1,0)
+/*! @brief Calcul de la matrice 2x2 de transformation pour passer d'une coordonnee dans le repere (x,y) global a une coordonnee (u,v,1-u-v) barycentrique
+ *
+ *  dans un element fini triangulaire.
+ *  Le point 0 du triangle aura pour coordonnees (0,0,1)
+ *  Le point 1                                   (1,0,0)
+ *  Le point 2                                   (0,1,0)
+ *
+ */
 inline void Parcours_interface::matrice_triangle(int num_element,
                                                  FTd_vecteur2& origine,
                                                  FTd_matrice22& matrice,
@@ -780,10 +786,12 @@ inline void Parcours_interface::matrice_triangle(int num_element,
   matrice[1][1] = dx1 * inv_det;
 }
 
-// Description:
-// Applique la transformation calculee par matrice_triangle a une
-// coordonnee (x,y). Le resultat est stocke dans (u,v). La troisieme
-// coordonnee barycentrique est implicitement egale a 1-u-v.
+/*! @brief Applique la transformation calculee par matrice_triangle a une coordonnee (x,y).
+ *
+ * Le resultat est stocke dans (u,v). La troisieme
+ *  coordonnee barycentrique est implicitement egale a 1-u-v.
+ *
+ */
 inline void Parcours_interface::transformation_2d(const FTd_vecteur2& origine,
                                                   const FTd_matrice22& matrice,
                                                   double x, double y,
@@ -795,29 +803,30 @@ inline void Parcours_interface::transformation_2d(const FTd_vecteur2& origine,
   v = matrice[1][0] * x + matrice[1][1] * y;
 }
 
-// Description:
-// Calcul de la contribution de volume d'une facette a la valeur de
-// l'indicatrice dans un element. (x0,y0) et (x1,y1) sont les coordonnees
-// de l'extremite du segment (obligatoirement a l'interieur du triangle
-// ou sur un bord). plan_coupe* donne le numero de la face du triangle
-// sur laquelle se trouve chacun des deux sommets du segment ou -1 si le
-// sommet est strictement a l'interieur du triangle.
-// C'est une fraction du volume de l'element comprise entre
-// Erreur_relative_maxi et 1.-Erreur_relative_maxi
-//
-// sommet2
-//  ^ ordonnee=v
-//  |\.
-//  | \.
-//  |  \.
-//  |   \. face 0 (opposee au sommet 0)
-//  |    \.
-//  | 0---1.
-//  | : A :\.
-//  | :   :B\.
-//   --------  -> abscisse=u  (coordonnees dans le triangle de reference : u,v)
-// sommet0  sommet1
-
+/*! @brief Calcul de la contribution de volume d'une facette a la valeur de l'indicatrice dans un element.
+ *
+ * (x0,y0) et (x1,y1) sont les coordonnees
+ *  de l'extremite du segment (obligatoirement a l'interieur du triangle
+ *  ou sur un bord). plan_coupe* donne le numero de la face du triangle
+ *  sur laquelle se trouve chacun des deux sommets du segment ou -1 si le
+ *  sommet est strictement a l'interieur du triangle.
+ *  C'est une fraction du volume de l'element comprise entre
+ *  Erreur_relative_maxi et 1.-Erreur_relative_maxi
+ *
+ *  sommet2
+ *   ^ ordonnee=v
+ *   |\.
+ *   | \.
+ *   |  \.
+ *   |   \. face 0 (opposee au sommet 0)
+ *   |    \.
+ *   | 0---1.
+ *   | : A :\.
+ *   | :   :B\.
+ *    --------  -> abscisse=u  (coordonnees dans le triangle de reference : u,v)
+ *  sommet0  sommet1
+ *
+ */
 inline double Parcours_interface::volume_triangle(const Zone_VF& zone_vf,
                                                   int num_element,
                                                   double x0, double y0,
@@ -859,35 +868,14 @@ inline double Parcours_interface::volume_triangle(const Zone_VF& zone_vf,
   return vol;
 }
 
-// Description:
-//    Cette methode permet de calculer l'intersection entre une facette et un element du maillage eulerien
-// Precondition: dimension = 3
-// Parametre: zone_vf
-//    Signification: zone du calcul
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: maillage
-//    Signification: description du maillage de l'interface
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture/ecriture
-// Parametre: num_facette
-//    Signification: indice de la facette intersectant
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: num_element
-//    Signification: indice de l'element intersecte
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-/// Retour: int
-//    Signification: 1 si ok, 0 si ??.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette methode permet de calculer l'intersection entre une facette et un element du maillage eulerien
+ *
+ * @param (zone_vf) zone du calcul
+ * @param (maillage) description du maillage de l'interface
+ * @param (num_facette) indice de la facette intersectant
+ * @param (num_element) indice de l'element intersecte
+ * @return (int) 1 si ok, 0 si ??.
+ */
 int Parcours_interface::calcul_intersection_facelem_3D(
   const Zone_VF& zone_vf,
   Maillage_FT_Disc& maillage,
@@ -1212,25 +1200,12 @@ int Parcours_interface::calcul_intersection_facelem_3D(
   return code_retour;
 }
 
-// Description:
-//   Cette methode (statique) permet d'inverser une matrice 3x3
-// Precondition: des denominateurs non nuls
-// Parametre: matrice
-//    Signification: matrice 3x3 a inverser
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: matrice_inv
-//    Signification: inverse de la matrice 3x3
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: ecriture
-/// Retour: rien
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette methode (statique) permet d'inverser une matrice 3x3
+ *
+ * @param (matrice) matrice 3x3 a inverser
+ * @param (matrice_inv) inverse de la matrice 3x3
+ * @return (rien)
+ */
 void Parcours_interface::calcul_inverse_matrice33(const FTd_matrice33& matrice, FTd_matrice33& matrice_inv)
 {
   const double a00 = matrice[0][0];
@@ -1278,30 +1253,13 @@ void Parcours_interface::calcul_inverse_matrice33(const FTd_matrice33& matrice, 
   matrice_inv[2][2] = (t4-t8)*t17;
 }
 
-// Description:
-//   Cette methode (statique) permet de calculer le produit d'une matrice 3x3 avec un vecteur 3
-// Precondition:
-// Parametre: matrice
-//    Signification: matrice 3x3 a inverser
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: vect
-//    Signification: vecteur 3 a multiplier
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: vect
-//    Signification: vecteur 3 resultat
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: ecriture
-/// Retour: rien
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette methode (statique) permet de calculer le produit d'une matrice 3x3 avec un vecteur 3
+ *
+ * @param (matrice) matrice 3x3 a inverser
+ * @param (vect) vecteur 3 a multiplier
+ * @param (vect) vecteur 3 resultat
+ * @return (rien)
+ */
 void Parcours_interface::calcul_produit_matrice33_vecteur(const FTd_matrice33& matrice, const FTd_vecteur3& vect, FTd_vecteur3& res)
 {
   int i,j;
@@ -1316,43 +1274,18 @@ void Parcours_interface::calcul_produit_matrice33_vecteur(const FTd_matrice33& m
     }
 }
 
-// Description:
-//   Calcul de la contribution de volume d'une facette a la valeur de
-//   l'indicatrice dans un element. C'est une fraction du volume de l'element
-//   comprise entre epsilon et 1.-epsilon
-// Precondition: dimension = 3
-// Parametre: zone_vf
-//    Signification: zone du calcul
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: num_element
-//    Signification: indice de l'element intersecte
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: poly_reelles
-//    Signification: coordonnees (reelles) des sommets definissant une surface contenue dans l'element
-//         (en pratique : surface d'intersection entre une facette d'interface et l'element)
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: centre_de_gravite
-//    Signification: centre de gravite de la surface
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: epsilon
-//    Signification: erreur relative
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-/// Retour: double
-//    Signification: contribution du volume engendre par la surface dans l'element
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de la contribution de volume d'une facette a la valeur de l'indicatrice dans un element.
+ *
+ * C'est une fraction du volume de l'element
+ *    comprise entre epsilon et 1.-epsilon
+ *
+ * @param (zone_vf) zone du calcul
+ * @param (num_element) indice de l'element intersecte
+ * @param (poly_reelles) coordonnees (reelles) des sommets definissant une surface contenue dans l'element (en pratique : surface d'intersection entre une facette d'interface et l'element)
+ * @param (centre_de_gravite) centre de gravite de la surface
+ * @param (epsilon) erreur relative
+ * @return (double) contribution du volume engendre par la surface dans l'element
+ */
 double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
                                             int num_element,
                                             int num_facette,
@@ -1450,37 +1383,16 @@ double Parcours_interface::volume_tetraedre(const Zone_VF& zone_vf,
   return contrib_volume;
 }
 
-// Description:
-//   Calcul de la contribution de volume d'une facette a la valeur de
-//   l'indicatrice dans le tetraedre de reference.
-//   Dans ce tetraedre, on utilise le plan OXZ comme plan de projection (projection selon OY donc)
-// Precondition: laz surface doit etre un triangle (nb_sommets_poly==3)
-// Parametre: poly_reelles_ref
-//    Signification: coordonnees (reelles) des sommets l'element de reference
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: norme
-//    Signification: normale a la surface, dans l'element de reference
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: centre_de_gravite, dans l'element de reference
-//    Signification: centre de gravite de la surface
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: epsilon
-//    Signification: erreur relative
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-/// Retour: double
-//    Signification: contribution du volume engendre par la surface dans l'element
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de la contribution de volume d'une facette a la valeur de l'indicatrice dans le tetraedre de reference.
+ *
+ *    Dans ce tetraedre, on utilise le plan OXZ comme plan de projection (projection selon OY donc)
+ *
+ * @param (poly_reelles_ref) coordonnees (reelles) des sommets l'element de reference
+ * @param (norme) normale a la surface, dans l'element de reference
+ * @param (centre_de_gravite, dans l'element de reference) centre de gravite de la surface
+ * @param (epsilon) erreur relative
+ * @return (double) contribution du volume engendre par la surface dans l'element
+ */
 double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reelles_ref,
                                                       const FTd_vecteur3& norme_ref,
                                                       const FTd_vecteur3& centre_de_gravite_ref,
@@ -1706,48 +1618,19 @@ double Parcours_interface::volume_tetraedre_reference(const DoubleTab& poly_reel
   return v;
 }
 
-// Description:
-//   Calcul de la contribution de volume d'une facette a la valeur de
-//   l'indicatrice dans un element. C'est une fraction du volume de l'element
-//   comprise entre epsilon et 1.-epsilon
-// Precondition: dimension = 3
-// Parametre: zone_vf
-//    Signification: zone du calcul
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: num_element
-//    Signification: indice de l'element intersecte
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: poly_reelles
-//    Signification: coordonnees (reelles) des sommets definissant une surface contenue dans l'element
-//         (en pratique : surface d'intersection entre une facette d'interface et l'element)
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: norme
-//    Signification: normale a la facette
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: centre_de_gravite
-//    Signification: centre de gravite de la surface
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-// Parametre: epsilon
-//    Signification: erreur relative
-//    Valeurs par defaut: NA
-//    Contraintes: NA
-//    Acces: lecture
-/// Retour: double
-//    Signification: contribution du volume engendre par la surface dans l'element
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcul de la contribution de volume d'une facette a la valeur de l'indicatrice dans un element.
+ *
+ * C'est une fraction du volume de l'element
+ *    comprise entre epsilon et 1.-epsilon
+ *
+ * @param (zone_vf) zone du calcul
+ * @param (num_element) indice de l'element intersecte
+ * @param (poly_reelles) coordonnees (reelles) des sommets definissant une surface contenue dans l'element (en pratique : surface d'intersection entre une facette d'interface et l'element)
+ * @param (norme) normale a la facette
+ * @param (centre_de_gravite) centre de gravite de la surface
+ * @param (epsilon) erreur relative
+ * @return (double) contribution du volume engendre par la surface dans l'element
+ */
 double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
                                            int num_element,
                                            const DoubleTab& poly_reelles,
@@ -1893,22 +1776,20 @@ double Parcours_interface::volume_hexaedre(const Zone_VF& zone_vf,
   return v;
 }
 
-// ==========================================================================
-// ==========================================================================
-
-// Description:
-//  Pour un point P0 (x0, y0, z0) a l'INTERIEUR de l'element num_element
-//  et un autre point P1 (x1, y1, z1), calcule l'intersection du segment (P0,P1)
-//  avec les bords de l'element.
-//  Si le point P1 est sur un bord de l'element (a epsilon pres), on considere
-//  qu'il est a l'interieur et on ne reporte aucune intersection.
-//  Si on trouve une intersection I, on met dans pos_intersection la coordonnee
-//  barycentrique de l'intersection definie par I = (1-pos) * P0 + pos * P1
-//  Si on ne trouve pas d'intersection, pos_intersection est inchange.
-// Valeur de retour:
-//  Si une intersection a ete trouvee, numero de la face de sortie dans la zone_vf
-//  (peut servir d'index dans face_voisins par exemple).
-//  Sinon, renvoie -1.
+/*! @brief Pour un point P0 (x0, y0, z0) a l'INTERIEUR de l'element num_element et un autre point P1 (x1, y1, z1), calcule l'intersection du segment (P0,P1)
+ *
+ *   avec les bords de l'element.
+ *   Si le point P1 est sur un bord de l'element (a epsilon pres), on considere
+ *   qu'il est a l'interieur et on ne reporte aucune intersection.
+ *   Si on trouve une intersection I, on met dans pos_intersection la coordonnee
+ *   barycentrique de l'intersection definie par I = (1-pos) * P0 + pos * P1
+ *   Si on ne trouve pas d'intersection, pos_intersection est inchange.
+ *  Valeur de retour:
+ *   Si une intersection a ete trouvee, numero de la face de sortie dans la zone_vf
+ *   (peut servir d'index dans face_voisins par exemple).
+ *   Sinon, renvoie -1.
+ *
+ */
 int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
                                                      const int num_element,
                                                      double x0, double y0, double z0,
@@ -1960,35 +1841,25 @@ int Parcours_interface::calculer_face_sortie_element(const Zone_VF& zone_vf,
   return face_sortie;
 }
 
-// Description:
-// Methode outil de Maillage_FT_Disc::deplacer_un_point dans le cas d'un marqueur
-// de la ligne de contact.
-// P0 est la position initiale du marqueur en contact (sur la face_bord)
-// P1 est la position finale visee apres le deplacement
-//  Pour un point P0(x0,y0,z0) sur la face "face_bord" et un point P1(x1,y1,z1),
-//  on determine la projection orthogonale p(P1) de P1 sur le plan contenant la
-//  face, et on calcule l'intersection (x,y,z) du segment [P0,p(P1)] avec
-//  les bords de la face. S'il n'y a pas d'intersection, (x,y,z)=p(P1) et
-//  la valeur de retour est -1, sinon la valeur de retour est le numero de
-//  l'arete de la face qui est coupee par le segment [P0,p(P1)] (aretes
-//  telles qu'elles sont definies dans la classe Connectivite_frontieres).
-// Parametre:     zone_vf
-//  Signification: la Zone_VF a laquelle se rapportent les indices de face et d'element
-// Parametre:     face_0
-//  Signification: le numero de la face reelle sur laquelle se trouve le point P0
-// Parametre:     num_element
-//  Signification: un numero d'element voisin de la face face_0
-// Parametre:     x0, y0, z0
-//  Signification: Coordonnees du point P0 (en 2D, z0 est ignore)
-// Parametre:     x1, y1, z1
-//  Signification: Coordonnees du point P1 (en 2D, z1 est ignore)
-// Parametre:     x, y, z
-//  Signification: On met dans (x,y,z) les coordonnees de l'intersection s'il y en
-//                 a une, sinon on y met les coordonnees de p(P1) qui est sur la
-//                 face "face_0"
-// Valeur de retour:
-//                -1 s'il n'y a pas d'intersection
-//                sinon le numero de la face de bord ou passe le sommet
+/*! @brief Methode outil de Maillage_FT_Disc::deplacer_un_point dans le cas d'un marqueur de la ligne de contact.
+ *
+ *  P0 est la position initiale du marqueur en contact (sur la face_bord)
+ *  P1 est la position finale visee apres le deplacement
+ *   Pour un point P0(x0,y0,z0) sur la face "face_bord" et un point P1(x1,y1,z1),
+ *   on determine la projection orthogonale p(P1) de P1 sur le plan contenant la
+ *   face, et on calcule l'intersection (x,y,z) du segment [P0,p(P1)] avec
+ *   les bords de la face. S'il n'y a pas d'intersection, (x,y,z)=p(P1) et
+ *   la valeur de retour est -1, sinon la valeur de retour est le numero de
+ *   l'arete de la face qui est coupee par le segment [P0,p(P1)] (aretes
+ *   telles qu'elles sont definies dans la classe Connectivite_frontieres).
+ *
+ * @param (zone_vf) la Zone_VF a laquelle se rapportent les indices de face et d'element
+ * @param (face_0) le numero de la face reelle sur laquelle se trouve le point P0
+ * @param (num_element) un numero d'element voisin de la face face_0
+ * @param (x0, y0, z0) Coordonnees du point P0 (en 2D, z0 est ignore)
+ * @param (x1, y1, z1) Coordonnees du point P1 (en 2D, z1 est ignore)
+ * @param (x, y, z) On met dans (x,y,z) les coordonnees de l'intersection s'il y en a une, sinon on y met les coordonnees de p(P1) qui est sur la face "face_0" Valeur de retour: -1 s'il n'y a pas d'intersection sinon le numero de la face de bord ou passe le sommet
+ */
 int Parcours_interface::calculer_sortie_face_bord(const int face_0,
                                                   const int num_element,
                                                   double x0, double y0, double z0,
@@ -2167,23 +2038,28 @@ double Parcours_interface::distance_sommet_faces(const Zone_VF& zone_vf,
   return - f_min;
 }
 
-// Description:
-//  Renvoie une estimation de l'erreur geometrique (valeur homogene a
-//  une distance). Par exemple si le domaine a une dimension caracteristique de 1e-3
-//  et si la precision relative des calculs Erreur_relative_maxi_ est fixee a 1E-14
-//  (valeur fixee dans le code source) alors get_erreur_geometrique renvoie 1E-17.
-//  Cette valeur est identique sur tous les processeurs et est calculee a partir
-//  de la taille du domaine.
+/*! @brief Renvoie une estimation de l'erreur geometrique (valeur homogene a une distance).
+ *
+ * Par exemple si le domaine a une dimension caracteristique de 1e-3
+ *   et si la precision relative des calculs Erreur_relative_maxi_ est fixee a 1E-14
+ *   (valeur fixee dans le code source) alors get_erreur_geometrique renvoie 1E-17.
+ *   Cette valeur est identique sur tous les processeurs et est calculee a partir
+ *   de la taille du domaine.
+ *
+ */
 double Parcours_interface::get_erreur_geometrique() const
 {
   assert(Erreur_max_coordonnees_ > 0.);
   return Erreur_max_coordonnees_;
 }
 
-// Description: Methode outil utilisee pour le traitement des lignes de contact.
-//  Projection du vecteur x_, y_, z_ sur le plan parallele a la face num_face passant
-//  par l'origine (permet d'obtenir la direction de deplacement d'un sommet sur une
-//  ligne de contact).
+/*! @brief Methode outil utilisee pour le traitement des lignes de contact.
+ *
+ * Projection du vecteur x_, y_, z_ sur le plan parallele a la face num_face passant
+ *   par l'origine (permet d'obtenir la direction de deplacement d'un sommet sur une
+ *   ligne de contact).
+ *
+ */
 void Parcours_interface::projeter_vecteur_sur_face(const int num_face,
                                                    double& x_,
                                                    double& y_,
@@ -2217,12 +2093,13 @@ void Parcours_interface::calculer_normale_face_bord(int num_face, double x, doub
   nz_ = equations_plans_faces_(num_face, 2) * signe;
 }
 
-// Description:
-//  Algorithme base sur une version initiale de Thomas (recode par BM)
-//  Ramene le point (x,y,z) a l'interieur de l'element elem de la zone_vf a une
-//  distance >= Erreur_max_coordonnees_ par un algorithme d'Uzawa.
-// Valeur de retour: distance finale du sommet aux faces de l'element
-//  (positive si le sommet est a l'interieur)
+/*! @brief Algorithme base sur une version initiale de Thomas (recode par BM) Ramene le point (x,y,z) a l'interieur de l'element elem de la zone_vf a une
+ *
+ *   distance >= Erreur_max_coordonnees_ par un algorithme d'Uzawa.
+ *  Valeur de retour: distance finale du sommet aux faces de l'element
+ *   (positive si le sommet est a l'interieur)
+ *
+ */
 double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
                                   const int elem,
                                   double& x, double& y, double& z) const
@@ -2299,9 +2176,11 @@ double Parcours_interface::uzawa2(const Zone_VF& zone_vf,
   return dist_min;
 }
 
-// Description:
-//   Pour chaque sommet, s'il est trop pres d'une face eulerienne, deplace le sommet
-//   pour l'en eloigner. Mise a jour de l'espace virtuel des sommets
+/*! @brief Pour chaque sommet, s'il est trop pres d'une face eulerienne, deplace le sommet pour l'en eloigner.
+ *
+ * Mise a jour de l'espace virtuel des sommets
+ *
+ */
 int Parcours_interface::eloigner_sommets_des_faces(Maillage_FT_Disc& maillage) const
 {
   const int nb_sommets = maillage.nb_sommets();

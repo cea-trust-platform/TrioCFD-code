@@ -26,17 +26,12 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Temperature_imposee_paroi.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Temperature_imposee_paroi_rayo_semi_transp
-//   cette classe est utilisee pour imposer une temperature de paroi imposee
-//   uniquement pour une discretisation VEF.
-//
-// .SECTION voir aussi
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Temperature_imposee_paroi_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
+ *
+ *    uniquement pour une discretisation VEF.
+ *
+ *
+ */
 class Temperature_imposee_paroi_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Temperature_imposee_paroi
 {
   Declare_instanciable(Temperature_imposee_paroi_rayo_semi_transp);

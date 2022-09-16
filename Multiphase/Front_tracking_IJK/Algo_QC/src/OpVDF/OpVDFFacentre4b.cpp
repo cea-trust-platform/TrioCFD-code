@@ -42,9 +42,9 @@ Entree& Op_Conv_centre4b_VDF_Face::readOn(Entree& s )
   return s ;
 }
 
-// Description:
-// complete l'iterateur et l'evaluateur
-
+/*! @brief complete l'iterateur et l'evaluateur
+ *
+ */
 void Op_Conv_centre4b_VDF_Face::associer(const Zone_dis& zone_dis,
                                          const Zone_Cl_dis& zone_cl_dis,
                                          const Champ_Inc& ch_vit)
@@ -78,8 +78,9 @@ Champ_Inc_base& Op_Conv_centre4b_VDF_Face::vitesse()
   Eval_centre4b_VDF_Face& eval_conv = (Eval_centre4b_VDF_Face&) iter.evaluateur();
   return eval_conv.vitesse();
 }
-// Description:
-// constructeur
+/*! @brief constructeur
+ *
+ */
 Op_Conv_centre4b_VDF_Face::Op_Conv_centre4b_VDF_Face() :
   Op_Conv_VDF_base(It_VDF_Face(Eval_centre4b_VDF_Face)())
 {

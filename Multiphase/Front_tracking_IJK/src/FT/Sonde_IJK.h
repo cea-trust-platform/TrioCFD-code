@@ -28,15 +28,13 @@
 #include <Ref_IJK_Field_double.h>
 #include <Postraitement.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .NAME        : Sonde_IJK
-// .DESCRIPTION : class Sonde_IJK
-//
-// <Description of class Sonde_IJK>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Sonde_IJK
+ *
+ *  <Description of class Sonde_IJK>
+ * 
+ * 
+ *
+ */
 class Sonde_IJK : public Sonde
 {
 

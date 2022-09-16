@@ -29,17 +29,13 @@
 
 #include <Ref_Pb_MG.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Algo_MG_base
-//     Cette classe abstraite definit un algorithme de resolution
-//     associe a un couplage (de type Pb_MG).
-//     Il est suppose que la resolution se fait par avance en temps.
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Algo_MG_base Cette classe abstraite definit un algorithme de resolution
+ *
+ *      associe a un couplage (de type Pb_MG).
+ *      Il est suppose que la resolution se fait par avance en temps.
+ *
+ *
+ */
 class Algo_MG_base : public Objet_U
 {
   Declare_base(Algo_MG_base);

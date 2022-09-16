@@ -39,8 +39,11 @@ protected :
   int init_lois_paroi_scalaire();
 };
 
-// Description: cette classe permet de specifier des options a la loi de
-// paroi standard. Elle est reservee aux experts.
+/*! @brief cette classe permet de specifier des options a la loi de paroi standard.
+ *
+ * Elle est reservee aux experts.
+ *
+ */
 class Loi_expert_scalaire_EF : public Paroi_std_scal_hyd_EF
 {
   Declare_instanciable(Loi_expert_scalaire_EF);

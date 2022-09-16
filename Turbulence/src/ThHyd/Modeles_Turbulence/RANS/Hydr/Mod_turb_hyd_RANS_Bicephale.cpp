@@ -36,40 +36,22 @@ Mod_turb_hyd_RANS_Bicephale::Mod_turb_hyd_RANS_Bicephale()
   LeK_MIN = 1.e-10;
   lquiet = 0;
 }
-// Description:
-//    Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Mod_turb_hyd_RANS_Bicephale::printOn(Sortie& is) const
 {
   return Mod_turb_hyd_base::printOn(is);
 }
 
 
-// Description:
-//    Simple appel a Mod_turb_hyd_base::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Mod_turb_hyd_RANS_Bicephale::readOn(Entree& is)
 {
   Mod_turb_hyd_base::readOn(is);
@@ -87,19 +69,9 @@ void Mod_turb_hyd_RANS_Bicephale::set_param(Param& param)
 }
 
 
-// Description:
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief
+ *
+ */
 void Mod_turb_hyd_RANS_Bicephale::completer()
 {
   eqn_transp_K().completer();
@@ -159,24 +131,15 @@ void Mod_turb_hyd_RANS_Bicephale::get_noms_champs_postraitables(Noms& nom,Option
     }
 }
 
-// Description:
-//    Sauvegarde le modele de turbulence sur un flot de sortie.
-//    (en vue d'une reprise)
-//    Sauvegarde le type de l'objet et
-//    les equations de transport K-epsilon associees.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage de:
-//                   Transport_K_ou_Eps::sauvegarder(Sortie&)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Sauvegarde le modele de turbulence sur un flot de sortie.
+ *
+ * (en vue d'une reprise)
+ *     Sauvegarde le type de l'objet et
+ *     les equations de transport K-epsilon associees.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) code de retour propage de: Transport_K_ou_Eps::sauvegarder(Sortie&)
+ */
 int Mod_turb_hyd_RANS_Bicephale::sauvegarder(Sortie& os) const
 {
 
@@ -185,24 +148,14 @@ int Mod_turb_hyd_RANS_Bicephale::sauvegarder(Sortie& os) const
 }
 
 
-// Description:
-//    Reprise du modele a partir d'un flot d'entree.
-//    Si l'equation portee par l'objet est non nulle
-//    on effectue une reprise "bidon".
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage de:
-//                   Transport_K_ou_Eps::reprendre(Entree& is)
-//                   ou 1 si la reprise est bidon.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Reprise du modele a partir d'un flot d'entree.
+ *
+ * Si l'equation portee par l'objet est non nulle
+ *     on effectue une reprise "bidon".
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (int) code de retour propage de: Transport_K_ou_Eps::reprendre(Entree& is) ou 1 si la reprise est bidon.
+ */
 int Mod_turb_hyd_RANS_Bicephale::reprendre(Entree& is)
 {
   Mod_turb_hyd_base::reprendre(is);
@@ -222,20 +175,10 @@ int Mod_turb_hyd_RANS_Bicephale::reprendre(Entree& is)
     }
 }
 
-// Description:
-//    Associe la seconde equation en parametre au modele de turbulence.
-// Precondition:
-// Parametre: Equation_base& eqn
-//    Signification: la seconde equation a laquelle l'objet s'associe
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: le modele de turbulence a deux equations associees
+/*! @brief Associe la seconde equation en parametre au modele de turbulence.
+ *
+ * @param (Equation_base& eqn) la seconde equation a laquelle l'objet s'associe
+ */
 void Mod_turb_hyd_RANS_Bicephale::associer_seconde_eqn(const Equation_base& eqn)
 {
   ma_seconde_equation = eqn;

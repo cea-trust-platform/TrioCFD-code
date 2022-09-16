@@ -28,13 +28,12 @@
 #include <Entree_fluide_temperature_imposee.h>
 class Champ_front;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp
-//
-// .SECTION
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Frontiere_ouverte_temperature_imposee_rayo_semi_transp
+ *
+ *  .SECTION
+ *
+ *
+ */
 class Frontiere_ouverte_temperature_imposee_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Entree_fluide_temperature_imposee
 {
   Declare_instanciable(Frontiere_ouverte_temperature_imposee_rayo_semi_transp);

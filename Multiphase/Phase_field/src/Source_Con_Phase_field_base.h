@@ -31,15 +31,12 @@
 
 #include <Ref_Probleme_base.h>
 
-//
-// .DESCRIPTION class Source_Con_Phase_field_base
-//
-
-//
-// .SECTION voir aussi Source_base
-//
-//
-
+/*! @brief class Source_Con_Phase_field_base
+ *
+ *
+ *
+ * @sa Source_base
+ */
 class Source_Con_Phase_field_base : public Source_base
 {
 

@@ -49,30 +49,30 @@ public:
   int numero_element_;
 };
 
-// ====================================================================
-// .DESCRIPTION        : class Intersections_Elem_Facettes
-//
-// Cette classe contient les donnees des intersections entre les facettes
-// de l'interface et les elements euleriens sous la forme d'une liste
-// doublement chainee.
-// Pour parcourir les facettes qui coupent un element "elem", on fait:
-//
-//   int index=index_elem()[elem];
-//   while (index >= 0) {
-//     const Intersections_Elem_Facettes_Data & data = data_intersection(index);
-//     ... // faire quelque chose avec data
-//     index = data.index_facette_suivante_;
-//   }
-//
-// Pour parcourir les elements qui sont coupes par une facette "facette":
-//
-//   int index=index_facette()[facette];
-//   while (index >= 0) {
-//     const Intersections_Elem_Facettes_Data & data = data_intersection(index);
-//     ... // faire quelque chose avec data
-//     index = data.index_element_suivant_;
-//   }
-
+/*! @brief : class Intersections_Elem_Facettes
+ *
+ *  Cette classe contient les donnees des intersections entre les facettes
+ *  de l'interface et les elements euleriens sous la forme d'une liste
+ *  doublement chainee.
+ *  Pour parcourir les facettes qui coupent un element "elem", on fait:
+ *
+ *    int index=index_elem()[elem];
+ *    while (index >= 0) {
+ *      const Intersections_Elem_Facettes_Data & data = data_intersection(index);
+ *      ... // faire quelque chose avec data
+ *      index = data.index_facette_suivante_;
+ *    }
+ *
+ *  Pour parcourir les elements qui sont coupes par une facette "facette":
+ *
+ *    int index=index_facette()[facette];
+ *    while (index >= 0) {
+ *      const Intersections_Elem_Facettes_Data & data = data_intersection(index);
+ *      ... // faire quelque chose avec data
+ *      index = data.index_element_suivant_;
+ *    }
+ *
+ */
 class Intersections_Elem_Facettes
 {
 public:
@@ -122,18 +122,19 @@ private:
   Intersections_Elem_Facettes_Data * data;
 };
 
-// Description:
-//  Renvoie les donnees de l'intersection stockee a l'indice "index"
-//  dans le tableau "data" ( 0 <= index < data_real_size_ )
+/*! @brief Renvoie les donnees de l'intersection stockee a l'indice "index" dans le tableau "data" ( 0 <= index < data_real_size_ )
+ *
+ */
 inline const Intersections_Elem_Facettes_Data& Intersections_Elem_Facettes::data_intersection(int index) const
 {
   assert(index >= 0 && index < data_real_size);
   return data[index];
 }
-// Description:
-//  Renvoie les donnees de l'intersection stockee a l'indice "index"
-//  dans le tableau "data" ( 0 <= index < data_real_size_ )
-// ATTENTION A SON UTILISATION !!!
+/*! @brief Renvoie les donnees de l'intersection stockee a l'indice "index" dans le tableau "data" ( 0 <= index < data_real_size_ )
+ *
+ *  ATTENTION A SON UTILISATION !!!
+ *
+ */
 inline Intersections_Elem_Facettes_Data& Intersections_Elem_Facettes::get_set_data_intersection(int index)
 {
   assert(index >= 0 && index < data_real_size);

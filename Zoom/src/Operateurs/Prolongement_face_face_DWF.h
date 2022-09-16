@@ -31,11 +31,9 @@
 
 class Pb_1G;
 
-//
-// .DESCRIPTION class Prolongement_face_face_DWF
-//
-// .SECTION voir aussi
-
+/*! @brief class Prolongement_face_face_DWF
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

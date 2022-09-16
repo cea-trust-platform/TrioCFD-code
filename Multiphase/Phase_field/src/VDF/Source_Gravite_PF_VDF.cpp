@@ -35,59 +35,32 @@
 Implemente_instanciable(Source_Gravite_PF_VDF,"Source_Gravite_PF_VDF",Source_base);
 
 
-// Description:
-//    Imprime la source sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie pour l'impression
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime la source sur un flot de sortie.
+ *
+ * @param (Sortie& os) le flot de sortie pour l'impression
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Source_Gravite_PF_VDF::printOn(Sortie& os) const
 {
   os <<que_suis_je()<< finl;
   return os;
 }
 
-// Description:
-//    Lecture de la source sur un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree pour la lecture des parametres
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture de la source sur un flot d'entree.
+ *
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Source_Gravite_PF_VDF::readOn(Entree& is)
 {
   return is;
 }
 
-// Description:
-//    Remplit le tableau volumes
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree pour la lecture des parametres
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Remplit le tableau volumes
+ *
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres
+ * @return le flot d'entree modifie
+ */
 void Source_Gravite_PF_VDF::associer_zones(const Zone_dis& zone,const Zone_Cl_dis& zone_cl)
 {
   la_zone = ref_cast(Zone_VDF,zone.valeur());
@@ -96,20 +69,10 @@ void Source_Gravite_PF_VDF::associer_zones(const Zone_dis& zone,const Zone_Cl_di
 
 
 
-// Description:
-//    Ajoute les termes sources
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleTab&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Ajoute les termes sources
+ *
+ * @return (DoubleTab&)
+ */
 DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
 {
   int face, nb_faces = la_zone->nb_faces();
@@ -191,20 +154,11 @@ DoubleTab& Source_Gravite_PF_VDF::ajouter(DoubleTab& resu) const
 }
 
 
-// Description:
-//    Calcule la contribution de cette source
-// Precondition:
-// Parametre: DoubleTab& resu
-//    Signification: flux
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: DoubleTab&
-//    Signification: le flux
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la contribution de cette source
+ *
+ * @param (DoubleTab& resu) flux
+ * @return (DoubleTab&) le flux
+ */
 DoubleTab& Source_Gravite_PF_VDF::calculer(DoubleTab& resu) const
 {
   resu = 0.;

@@ -26,22 +26,13 @@
 #include <Frontiere_dis_base.h>
 #include <Symetrie.h>
 
-// Description:
-//    Associe une equation a l'objet.
-//    Affecte le membre Cond_Lim_rayo_semi_transp::mon_modele avec l'objet
-//    passe en parametre.
-// Precondition:
-// Parametre: Modele_rayo_semi_transp& modele
-//    Signification: le modele auquel on veut s'associer
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe une equation a l'objet.
+ *
+ * Affecte le membre Cond_Lim_rayo_semi_transp::mon_modele avec l'objet
+ *     passe en parametre.
+ *
+ * @param (Modele_rayo_semi_transp& modele) le modele auquel on veut s'associer
+ */
 void Cond_Lim_rayo_semi_transp::associer_modele(const Modele_rayo_semi_transp& un_modele)
 {
   mon_modele=un_modele;

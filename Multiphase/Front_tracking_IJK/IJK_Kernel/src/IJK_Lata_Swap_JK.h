@@ -24,14 +24,13 @@
 
 #include <Interprete.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : IJK_Lata_Swap_JK
-// .DESCRIPTION : class IJK_Lata_Swap_JK
-//
-// <Description of class IJK_Lata_Swap_JK>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class IJK_Lata_Swap_JK
+ *
+ *  <Description of class IJK_Lata_Swap_JK>
+ * 
+ * 
+ *
+ */
 class IJK_Lata_Swap_JK : public Interprete
 {
 

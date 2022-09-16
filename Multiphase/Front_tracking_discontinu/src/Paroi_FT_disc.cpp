@@ -31,20 +31,22 @@ Sortie& Paroi_FT_disc::printOn(Sortie& os ) const
   return os << que_suis_je() << "\n";
 }
 
-// Description:
-//  Lecture de l'angle impose dans le jeu de donnees.
-//  Format :
-//   soit   "constant   champ_frontiere_a_une_composante"
-//   soit   "hysteresis champ_frontiere_a_deux_composantes"
-//  Les valeurs du champ sont un angle en degres.
-//  Convention:
-//   L'angle specifie est celui entre l'interface et la paroi
-//   du cote de la phase 0.
-//               /
-//    phase 1   /\        phase 0
-//             /  | theta
-//    ________/___|________
-//
+/*! @brief Lecture de l'angle impose dans le jeu de donnees.
+ *
+ * Format :
+ *    soit   "constant   champ_frontiere_a_une_composante"
+ *    soit   "hysteresis champ_frontiere_a_deux_composantes"
+ *   Les valeurs du champ sont un angle en degres.
+ *   Convention:
+ *    L'angle specifie est celui entre l'interface et la paroi
+ *    du cote de la phase 0.
+ *                /
+ *     phase 1   /\        phase 0
+ *              /  | theta
+ *     ________/___|________
+ *
+ *
+ */
 Entree& Paroi_FT_disc::readOn(Entree& is)
 {
   Motcle motlu;
@@ -88,8 +90,9 @@ Paroi_FT_disc::Type_modele Paroi_FT_disc::get_type_modele() const
   return type_;
 }
 
-// Description: Cette condition aux limites ne support que l'equation
-//  Transport_Interfaces_FT_disc
+/*! @brief Cette condition aux limites ne support que l'equation Transport_Interfaces_FT_disc
+ *
+ */
 int Paroi_FT_disc::compatible_avec_eqn(const Equation_base& eqn) const
 {
   if (eqn.que_suis_je() == "Transport_Interfaces_FT_Disc")

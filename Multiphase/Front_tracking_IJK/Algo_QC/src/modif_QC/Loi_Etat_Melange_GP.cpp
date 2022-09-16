@@ -39,40 +39,23 @@ Loi_Etat_Melange_GP::Loi_Etat_Melange_GP()
   Sc_=-1;
 }
 
-// Description:
-//    Imprime la loi sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie pour l'impression
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime la loi sur un flot de sortie.
+ *
+ * @param (Sortie& os) le flot de sortie pour l'impression 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& Loi_Etat_Melange_GP::printOn(Sortie& os) const
 {
   os <<que_suis_je()<< finl;
   return os;
 }
 
-// Description:
-//    Lecture d'une loi sur un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree pour la lecture des parametres
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Effets de bord:
-// Postcondition: l'objet est construit avec les parametres lus
+/*! @brief Lecture d'une loi sur un flot d'entree.
+ *
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres 
+ * @return (Entree&) le flot d'entree modifie 
+ * @throws accolade ouvrante attendue 
+ */
 Entree& Loi_Etat_Melange_GP::readOn(Entree& is)
 {
   //double gamma_ = -1;
@@ -112,39 +95,18 @@ Entree& Loi_Etat_Melange_GP::readOn(Entree& is)
 }
 
 
-// Description:
-//    Associe le fluide a la loi d'etat
-// Precondition:
-// Parametre: Fluide_Quasi_Compressible& fl
-//    Signification: le fluide associe
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: lecture
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe le fluide a la loi d'etat
+ *
+ * @param (Fluide_Quasi_Compressible& fl) le fluide associe 
+ */
 void Loi_Etat_Melange_GP::associer_fluide(const Fluide_Quasi_Compressible& fl)
 {
   le_fluide = fl;
 }
 
-//Description:
-//
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief 
+ *
+ */
 void Loi_Etat_Melange_GP::initialiser_inco_ch()
 {
   Masse_mol_mel.resize(liste_Y(0).valeur().valeurs().size());
@@ -154,21 +116,10 @@ void Loi_Etat_Melange_GP::initialiser_inco_ch()
 
 
 
-// Description:
-// Associe l inconnue de chaque equation de
-// fraction massique a la loi d'etat
-// Precondition:
-// Parametre: inconnue
-//    Signification: l inconnue associee
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: lecture
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe l inconnue de chaque equation de fraction massique a la loi d'etat
+ *
+ * @param (inconnue) l inconnue associee 
+ */
 void Loi_Etat_Melange_GP::associer_inconnue(const Champ_Inc_base& inconnue)
 {
   REF(Champ_Inc_base) inco;
@@ -176,21 +127,10 @@ void Loi_Etat_Melange_GP::associer_inconnue(const Champ_Inc_base& inconnue)
   liste_Y.add(inco);
 }
 
-// Description:
-// Associe les proprietes physiques
-// d une espece a la loi d'etat
-// Precondition:
-// Parametre: M, Cp, mu, lambda
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: lecture
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe les proprietes physiques d une espece a la loi d'etat
+ *
+ * @param (M, Cp, mu, lambda)  
+ */
 void Loi_Etat_Melange_GP::associer_espece(const Convection_Diffusion_fraction_massique_QC& eq)
 {
   liste_especes.add(eq.espece());
@@ -198,21 +138,9 @@ void Loi_Etat_Melange_GP::associer_espece(const Convection_Diffusion_fraction_ma
 }
 
 
-// Description:
-//    Calcule le Cp du melange
-//    Le Cp depend du Cp de chaque espece et de la composition du melange (Yi)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule le Cp du melange Le Cp depend du Cp de chaque espece et de la composition du melange (Yi)
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_Cp()
 {
   Champ_Don& le_Cp = le_fluide->capacite_calorifique();
@@ -240,21 +168,9 @@ void Loi_Etat_Melange_GP::calculer_tab_Cp(DoubleTab& tab_Cp) const
 }
 
 
-// Description:
-//    Calcule la masse molaire du melange (M)
-//    M depend de la mase molaire de chaque espece et de la composition du melange (Yi)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la masse molaire du melange (M) M depend de la mase molaire de chaque espece et de la composition du melange (Yi)
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_masse_molaire()
 {
   // rabot deplace
@@ -355,20 +271,9 @@ void Loi_Etat_Melange_GP::rabot(int futur)
 }
 
 
-// Description:
-//    Calcule la conductivite
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la conductivite
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_lambda()
 {
 
@@ -425,20 +330,9 @@ void Loi_Etat_Melange_GP::calculer_lambda()
 
 
 
-// Description:
-//    Calcule la diffusivite
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la diffusivite
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_alpha()
 {
 
@@ -513,20 +407,9 @@ void Loi_Etat_Melange_GP::calculer_alpha()
   Debog::verifier("alpha",tab_alpha);
 }
 
-// Description:
-//    Recalcule la masse volumique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Recalcule la masse volumique
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_masse_volumique()
 {
   const DoubleTab& tab_ICh = le_fluide->inco_chaleur().valeurs();
@@ -567,20 +450,9 @@ void Loi_Etat_Melange_GP::calculer_masse_volumique()
 
 }
 
-// Description:
-//    Recalcule la masse volumique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Recalcule la masse volumique
+ *
+ */
 double Loi_Etat_Melange_GP::calculer_masse_volumique_case(double P, double T, double r, int som) const
 {
   if (inf_ou_egal(T,0))
@@ -595,20 +467,9 @@ double Loi_Etat_Melange_GP::calculer_masse_volumique_case(double P, double T, do
 
 
 
-// Description:
-//    Calcule la viscosite dynamique de reference (depend des Yi)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la viscosite dynamique de reference (depend des Yi)
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_mu0()
 {
 
@@ -655,20 +516,9 @@ void Loi_Etat_Melange_GP::calculer_mu0()
 
 
 
-// Description:
-//    Calcule la viscosite dynamique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la viscosite dynamique
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_mu()
 {
   Champ_Don& mu = le_fluide->viscosite_dynamique();
@@ -682,20 +532,9 @@ void Loi_Etat_Melange_GP::calculer_mu()
 }
 
 
-// Description:
-//    Calcule la viscosite dynamique sur Schmidt
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la viscosite dynamique sur Schmidt
+ *
+ */
 void Loi_Etat_Melange_GP::calculer_mu_sur_Sc()
 {
   const Champ_Don& mu = le_fluide->viscosite_dynamique();
@@ -738,20 +577,9 @@ void Loi_Etat_Melange_GP::calculer_mu_sur_Sc()
 }
 
 
-// Description:
-//    Recalcule la masse volumique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Recalcule la masse volumique
+ *
+ */
 double Loi_Etat_Melange_GP::calculer_masse_volumique(double P, double T) const
 {
   Cerr << "Error: the Loi_Etat_Melange_GP::calculer_masse_volumique(double P, double T) method should not be used!" << finl;

@@ -27,19 +27,16 @@
 #include <Convection_Diffusion_Temperature.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Convection_Diffusion_Temperature_Turbulent
-//     Cette classe represente le cas particulier de
-//     convection diffusion turbulente lorsque l'inconnue
-//     est la temperature.
-//     Cette herite de Convection_Diffusion_Turbulent qui contient
-//     le modele de turbulence et de Convection_Diffusion_Temperature
-//     qui modelise l'equation non turbulente.
-// .SECTION voir aussi
-//      Convection_Diffusion_Turbulent  Convection_Diffusion_Temperature
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Convection_Diffusion_Temperature_Turbulent Cette classe represente le cas particulier de
+ *
+ *      convection diffusion turbulente lorsque l'inconnue
+ *      est la temperature.
+ *      Cette herite de Convection_Diffusion_Turbulent qui contient
+ *      le modele de turbulence et de Convection_Diffusion_Temperature
+ *      qui modelise l'equation non turbulente.
+ *
+ * @sa Convection_Diffusion_Turbulent  Convection_Diffusion_Temperature
+ */
 class Convection_Diffusion_Temperature_Turbulent : public Convection_Diffusion_Turbulent ,
   public Convection_Diffusion_Temperature
 {

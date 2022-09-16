@@ -26,14 +26,10 @@
 #include <Mod_turb_hyd_base.h>
 class Equation_base;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_turb_hyd_RANS_0_eq
-//    Classe de base des modeles de type RANS a 0 equation
-// .SECTION voir aussi
-//    Mod_turb_hyd_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Mod_turb_hyd_RANS_0_eq Classe de base des modeles de type RANS a 0 equation
+ *
+ * @sa Mod_turb_hyd_base
+ */
 class Mod_turb_hyd_RANS_0_eq : public Mod_turb_hyd_base
 {
 

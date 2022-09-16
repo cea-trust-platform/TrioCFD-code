@@ -28,14 +28,14 @@
 #include <Mod_turb_hyd_ss_maille_VEF.h>
 
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_Wale_VEF
-// Cette classe correspond a la mise en oeuvre du modele sous
-// maille WALE developpe par F. NICOUD et F. DUCROS en VEF
-//
-
-// .SECTION  voir aussi
-// Mod_turb_hyd_ss_maille
-
+/*! @brief classe Turbulence_hyd_sous_maille_Wale_VEF Cette classe correspond a la mise en oeuvre du modele sous
+ *
+ *  maille WALE developpe par F. NICOUD et F. DUCROS en VEF
+ *
+ *  .SECTION  voir aussi
+ *  Mod_turb_hyd_ss_maille
+ *
+ */
 class Turbulence_hyd_sous_maille_Wale_VEF : public Mod_turb_hyd_ss_maille_VEF
 {
 

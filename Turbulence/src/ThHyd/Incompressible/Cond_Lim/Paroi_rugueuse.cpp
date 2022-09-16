@@ -27,40 +27,22 @@
 Implemente_instanciable(Paroi_rugueuse,"Paroi_rugueuse",Dirichlet_paroi_fixe);
 
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Paroi_rugueuse::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
 
-// Description:
-//    Simple appel a: Dirichlet_homogene::readOn(Entree& )
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& s
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a: Dirichlet_homogene::readOn(Entree& )
+ *
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree& s) le flot d'entree modifie
+ */
 Entree& Paroi_rugueuse::readOn(Entree& s )
 {
 

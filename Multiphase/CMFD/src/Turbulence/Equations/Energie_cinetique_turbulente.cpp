@@ -47,41 +47,21 @@
 
 Implemente_instanciable(Energie_cinetique_turbulente,"Energie_cinetique_turbulente",Convection_Diffusion_std);
 
-// Description:
-//    Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Energie_cinetique_turbulente::printOn(Sortie& is) const
 {
   return Convection_Diffusion_std::printOn(is);
 }
 
-// Description:
-//    Verifie si l'equation a une inconnue et un fluide associe
-//    et appelle Convection_Diffusion_std::readOn(Entree&).
-// Precondition: l'objet a une inconnue associee
-// Precondition: l'objet a un fluide associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& is
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Verifie si l'equation a une inconnue et un fluide associe et appelle Convection_Diffusion_std::readOn(Entree&).
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree& is) le flot d'entree modifie
+ */
 Entree& Energie_cinetique_turbulente::readOn(Entree& is)
 {
   assert(l_inco_ch.non_nul());
@@ -94,22 +74,11 @@ Entree& Energie_cinetique_turbulente::readOn(Entree& is)
   return is;
 }
 
-// Description:
-//    Associe un milieu physique a l'equation,
-//    le milieu est en fait caste en Fluide_base ou en Fluide_Ostwald.
-// Precondition:
-// Parametre: Milieu_base& un_milieu
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//                 doit pourvoir etre force au type "Fluide_base"
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: les proprietes physiques du fluide ne sont pas toutes specifiees
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un milieu physique a l'equation, le milieu est en fait caste en Fluide_base ou en Fluide_Ostwald.
+ *
+ * @param (Milieu_base& un_milieu)
+ * @throws les proprietes physiques du fluide ne sont pas toutes specifiees
+ */
 void Energie_cinetique_turbulente::associer_milieu_base(const Milieu_base& un_milieu)
 {
   le_fluide = ref_cast(Fluide_base,un_milieu);
@@ -125,20 +94,9 @@ const Champ_base& Energie_cinetique_turbulente::diffusivite_pour_pas_de_temps() 
   return ref_cast(Fluide_base,milieu()).viscosite_cinematique();
 }
 
-// Description:
-//    Discretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Discretise l'equation.
+ *
+ */
 void Energie_cinetique_turbulente::discretiser()
 {
   int nb_valeurs_temp = schema_temps().nb_valeurs_temporelles();
@@ -154,83 +112,48 @@ void Energie_cinetique_turbulente::discretiser()
   Cerr << "Energie_cinetique_turbulente::discretiser() ok" << finl;
 }
 
-// Description:
-//    Renvoie le milieu physique de l'equation.
-//    (un Fluide_base upcaste en Milieu_base)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_base upcaste en Milieu_base
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le milieu physique de l'equation.
+ *
+ * (un Fluide_base upcaste en Milieu_base)
+ *     (version const)
+ *
+ * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
+ */
 const Milieu_base& Energie_cinetique_turbulente::milieu() const
 {
   return le_fluide.valeur();
 }
 
 
-// Description:
-//    Renvoie le milieu physique de l'equation.
-//    (un Fluide_base upcaste en Milieu_base)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_base upcaste en Milieu_base
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le milieu physique de l'equation.
+ *
+ * (un Fluide_base upcaste en Milieu_base)
+ *
+ * @return (Milieu_base&) le Fluide_base upcaste en Milieu_base
+ */
 Milieu_base& Energie_cinetique_turbulente::milieu()
 {
   return le_fluide.valeur();
 }
 
-// Description:
-//    Impression des flux sur les bords sur un flot de sortie.
-//    Appelle Equation_base::impr(Sortie&)
-// Precondition: Sortie&
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Impression des flux sur les bords sur un flot de sortie.
+ *
+ * Appelle Equation_base::impr(Sortie&)
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) code de retour propage
+ */
 int Energie_cinetique_turbulente::impr(Sortie& os) const
 {
   return Equation_base::impr(os);
 }
 
-// Description:
-//    Renvoie le nom du domaine d'application de l'equation.
-//    Ici "Thermique".
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Motcle&
-//    Signification: le nom du domaine d'application de l'equation
-//    Contraintes: toujours egal a "Thermique"
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nom du domaine d'application de l'equation.
+ *
+ * Ici "Thermique".
+ *
+ * @return (Motcle&) le nom du domaine d'application de l'equation
+ */
 const Motcle& Energie_cinetique_turbulente::domaine_application() const
 {
   static Motcle mot("Turbulence");

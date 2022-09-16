@@ -30,13 +30,12 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_negligeable_EF
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_negligeable_EF .
+ *
+ * SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_negligeable_EF : public Paroi_hyd_base_EF
 {
   Declare_instanciable_sans_constructeur(Paroi_negligeable_EF);

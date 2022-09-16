@@ -30,18 +30,14 @@
 #include <Ref_Probleme_base.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION class  Source_Gravite_PF_VDF
-//
-// Cette classe represente le terme source de gravite dans l equation Navier_Stokes_phase_field,
-//  pour une discretisation VDF.
-//
-// .SECTION voir aussi
-// Source_base
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class  Source_Gravite_PF_VDF
+ *
+ *  Cette classe represente le terme source de gravite dans l equation Navier_Stokes_phase_field,
+ *   pour une discretisation VDF.
+ *
+ *
+ * @sa Source_base
+ */
 class Source_Gravite_PF_VDF : public Source_base
 {
 

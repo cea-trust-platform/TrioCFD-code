@@ -25,14 +25,14 @@
 
 #include <Paroi_std_scal_hyd_VDF.h>
 
-//.DESCRIPTION classe Paroi_2couches_scal_VDF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_2couches_VDF
-
+/*! @brief classe Paroi_2couches_scal_VDF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_2couches_VDF
+ *
+ */
 class Paroi_2couches_scal_VDF : public Paroi_std_scal_hyd_VDF
 {
   Declare_instanciable(Paroi_2couches_scal_VDF);

@@ -279,9 +279,11 @@ void OpConvCentre4IJK_ST::exec_after_divergence_flux__DIR_(IJK_Field_ST & resu, 
 
 #Pforeach DIR (x y z)
 #Pforeach COMPO (x y z)
-// Description: compute fluxes in direction DIR for velocity component COMPO
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction DIR for velocity component COMPO for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvCentre4IJK_ST::compute_flux_DIR_vCOMPO(IJK_Field_local_ST & resu, const int k_layer)
 {
   // convected field

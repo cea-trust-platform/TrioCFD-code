@@ -135,13 +135,14 @@ public:
   double z_pfl_imp;
 };
 
-// Description:
-//  Calcul de champ_rho_faces_ et champ_rho_elem_ en fonction de l'indicatrice:
-//   rho_elem_ = indicatrice * ( rho(phase_1) - rho(phase_0) ) + rho(phase_0)
-//   rho_faces_ = 0.5 * (rho_elem(voisin_0) + rho_elem(voisin_1))
-//  Le calcul des viscosites cinematique et dynamique est pour l'instant le suivant:
-//   nu_elem = indicatrice * ( nu(phase_1) - nu(phase_0) ) + nu(phase_0)
-//   mu_elem = nu_elem * rho_elem
+/*! @brief Calcul de champ_rho_faces_ et champ_rho_elem_ en fonction de l'indicatrice: rho_elem_ = indicatrice * ( rho(phase_1) - rho(phase_0) ) + rho(phase_0)
+ *
+ *    rho_faces_ = 0.5 * (rho_elem(voisin_0) + rho_elem(voisin_1))
+ *   Le calcul des viscosites cinematique et dynamique est pour l'instant le suivant:
+ *    nu_elem = indicatrice * ( nu(phase_1) - nu(phase_0) ) + nu(phase_0)
+ *    mu_elem = nu_elem * rho_elem
+ *
+ */
 static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zone_dis_base,
                                                     const Fluide_Diphasique& fluide,
                                                     const DoubleVect&         indicatrice_elem,
@@ -310,7 +311,9 @@ static void FT_disc_calculer_champs_rho_mu_nu_mono(const Zone_dis_base& zdis,
       val_rho_faces.echange_espace_virtuel();
     }
 }
-// Description: constructeur par defaut
+/*! @brief constructeur par defaut
+ *
+ */
 Navier_Stokes_FT_Disc::Navier_Stokes_FT_Disc()
 {
   variables_internes_ = new Navier_Stokes_FT_Disc_interne;
@@ -318,7 +321,9 @@ Navier_Stokes_FT_Disc::Navier_Stokes_FT_Disc()
   is_repulsion=0;
 }
 
-// Description: le destructeur qui va avec
+/*! @brief le destructeur qui va avec
+ *
+ */
 Navier_Stokes_FT_Disc::~Navier_Stokes_FT_Disc()
 {
   delete variables_internes_;
@@ -612,12 +617,14 @@ Milieu_base& Navier_Stokes_FT_Disc::milieu()
     return Navier_Stokes_Turbulent::milieu();
 }
 
-// Description:
-//  Discretisation des champs utilises dans cette equation.
-//  Fonction appelee par Probleme_base::discretiser.
-//  B. Mathieu : a titre experimental, au lieu de dupliquer les noms
-//               des champs ici et dans "a_pour_champ_Fonc", on stocke
-//               les champs dans une liste. (voir a_pour_champ_fonc).
+/*! @brief Discretisation des champs utilises dans cette equation.
+ *
+ * Fonction appelee par Probleme_base::discretiser.
+ *   B. Mathieu : a titre experimental, au lieu de dupliquer les noms
+ *                des champs ici et dans "a_pour_champ_Fonc", on stocke
+ *                les champs dans une liste. (voir a_pour_champ_fonc).
+ *
+ */
 void Navier_Stokes_FT_Disc::discretiser()
 {
   Navier_Stokes_Turbulent::discretiser();
@@ -762,11 +769,12 @@ void Navier_Stokes_FT_Disc::discretiser()
   champs_compris_.ajoute_champ(variables_internes().derivee_temporelle_indicatrice);
 }
 
-// Description:
-//  Methode surchargee de Navier_Stokes_std, appelee par
-//   Navier_Stokes_std::discretiser().
-//  L'assembleur pression est particulier pour le front-tracking
-//  en VEF (en attendant qu'on factorise tous ces assembleurs pression)
+/*! @brief Methode surchargee de Navier_Stokes_std, appelee par Navier_Stokes_std::discretiser().
+ *
+ *   L'assembleur pression est particulier pour le front-tracking
+ *   en VEF (en attendant qu'on factorise tous ces assembleurs pression)
+ *
+ */
 void Navier_Stokes_FT_Disc::discretiser_assembleur_pression()
 {
   const Discretisation_base& dis = discretisation();
@@ -788,14 +796,20 @@ void Navier_Stokes_FT_Disc::discretiser_assembleur_pression()
   assembleur.set_resoudre_en_u(1);
 }
 
-// Description: methode appelee par Navier_Stokes_std::preparer_calcul...
+/*! @brief methode appelee par Navier_Stokes_std::preparer_calcul.
+ *
+ * ..
+ *
+ */
 void Navier_Stokes_FT_Disc::projeter()
 {
   if (Process::je_suis_maitre() && limpr())
     Cerr << "Navier_Stokes_FT_Disc::projeter does nothing" << finl;
 }
 
-// Description: methode appelee par Probleme_base::preparer_calcul()
+/*! @brief methode appelee par Probleme_base::preparer_calcul()
+ *
+ */
 int Navier_Stokes_FT_Disc::preparer_calcul()
 {
   Cerr << "Navier_Stokes_FT_Disc::preparer_calcul()" << finl;
@@ -931,22 +945,18 @@ void Navier_Stokes_FT_Disc::mettre_a_jour(double temps)
 
 
 
-// Description:
-//  Calcul des forces de tension superficielles (F_sigma) et de la partie
-//  a rotationnel non nul de la gravite (G_rot) (si GRAVITE_GRAD_I) :
-//  F_sigma = INTEGRALE sur le volume de controle (
-//            sigma_aux_faces * courbure_aux_faces * gradient(indicatrice)
-//            + gradient_sigma )
-//  G_rot   = INTEGRALE sur le volume de controle (
-//               phi * gradient(rho) )   (avec phi = potentiel de pesanteur)
-// Parametre: gradient_indicatrice
-// Signification: le gradient de l'indicatrice issu de l'operateur "gradient",
-//  donc homogene a l'integrale du gradient sur les volumes de controle de la vitesse.
-// Parametre: potentiel_faces
-// Signification: un champ aux faces a une composante, ou on stocke le "potentiel aux faces"
-// Parametre: champ
-// Signification: le champ aux faces (meme discretisation que la vitesse)
-//  ou on stocke le terme source des forces superficielles.
+/*! @brief Calcul des forces de tension superficielles (F_sigma) et de la partie a rotationnel non nul de la gravite (G_rot) (si GRAVITE_GRAD_I) :
+ *
+ *   F_sigma = INTEGRALE sur le volume de controle (
+ *             sigma_aux_faces * courbure_aux_faces * gradient(indicatrice)
+ *             + gradient_sigma )
+ *   G_rot   = INTEGRALE sur le volume de controle (
+ *                phi * gradient(rho) )   (avec phi = potentiel de pesanteur)
+ *
+ * @param (gradient_indicatrice) le gradient de l'indicatrice issu de l'operateur "gradient", donc homogene a l'integrale du gradient sur les volumes de controle de la vitesse.
+ * @param (potentiel_faces) un champ aux faces a une composante, ou on stocke le "potentiel aux faces"
+ * @param (champ) le champ aux faces (meme discretisation que la vitesse) ou on stocke le terme source des forces superficielles.
+ */
 void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_FT_Disc& maillage,
                                                                  const Champ_base& gradient_indicatrice,
                                                                  Champ_base& potentiel_elements,
@@ -1273,20 +1283,21 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
   }
 }
 
-// Description:
-//  Calcul du gradient de l'indicatrice.
-//  Ce gradient est utilise pour calculer le second membre de l'equation de qdm,
-//  contenant les termes de tension de surface.
-//  En VEF, on commence par creer un champ P1B a partir du champ P0
-//  et on calcule le gradient.
-//  Design de classe a revoir pour separer VDF et VEF...
-//
-// Parametre : indicatrice
-// Signification : un champ aux elements (l'espace virtuel doit etre a jour)
-// Parametre : gradient_i
-// Signification : un champ discretise comme la vitesse dans lequel
-//  on met gradient(indicatrice).
-
+/*! @brief Calcul du gradient de l'indicatrice.
+ *
+ * Ce gradient est utilise pour calculer le second membre de l'equation de qdm,
+ *   contenant les termes de tension de surface.
+ *   En VEF, on commence par creer un champ P1B a partir du champ P0
+ *   et on calcule le gradient.
+ *   Design de classe a revoir pour separer VDF et VEF...
+ *
+ *  Parametre : indicatrice
+ *  Signification : un champ aux elements (l'espace virtuel doit etre a jour)
+ *  Parametre : gradient_i
+ *  Signification : un champ discretise comme la vitesse dans lequel
+ *   on met gradient(indicatrice).
+ *
+ */
 void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
   const Champ_base& indicatrice,
   const DoubleTab& distance_interface_sommets,
@@ -1444,14 +1455,15 @@ void Navier_Stokes_FT_Disc::calculer_gradient_indicatrice(
     }
 }
 
-// Description:
-//  Calcul du saut de vitesse a l'interface du au changement de phase
-//  phase_pilote = -1: u+u0 = champ de vitesse de deplacement de l'interface
-//  phase_pilote = 0 : u+u0 = champ de vitesse de la phase 0
-//  phase_pilote = 1 : u+u0 = champ de vitesse de la phase 1
-//  ordre = 0 : pas de prise en compte de la correction en courbure
-//  ordre = 1 : prise en compte de la correction en courbure a l'ordre 1
-//  ordre = 2 : prise en compte de la correction en courbure a l'ordre 2
+/*! @brief Calcul du saut de vitesse a l'interface du au changement de phase phase_pilote = -1: u+u0 = champ de vitesse de deplacement de l'interface
+ *
+ *   phase_pilote = 0 : u+u0 = champ de vitesse de la phase 0
+ *   phase_pilote = 1 : u+u0 = champ de vitesse de la phase 1
+ *   ordre = 0 : pas de prise en compte de la correction en courbure
+ *   ordre = 1 : prise en compte de la correction en courbure a l'ordre 1
+ *   ordre = 2 : prise en compte de la correction en courbure a l'ordre 2
+ *
+ */
 void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                                                        int phase_pilote,
                                                        int ordre)
@@ -1689,8 +1701,9 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
 
 }
 
-// Description:
-//  Calcul de la derivee en temps de la vitesse.
+/*! @brief Calcul de la derivee en temps de la vitesse.
+ *
+ */
 DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
 {
   // Preparation des champs utilises pour le calcul des derivees en temps
@@ -2491,8 +2504,9 @@ Probleme_FT_Disc_gen& Navier_Stokes_FT_Disc::probleme_ft()
   return probleme_ft_.valeur();
 }
 
-// Description:
-// In Front Tracking, pression is in Pa and so pression_pa field <=> pression field
+/*! @brief In Front Tracking, pression is in Pa and so pression_pa field <=> pression field
+ *
+ */
 void Navier_Stokes_FT_Disc::calculer_la_pression_en_pa()
 {
   la_pression_en_pa.valeurs()=la_pression.valeurs();
@@ -2507,11 +2521,13 @@ Navier_Stokes_FT_Disc_interne& Navier_Stokes_FT_Disc::variables_internes()
   return *variables_internes_;
 }
 
-// Description: Si le champ de vitesse est discontinu (calcul avec changement de phase),
-//  renvoie un pointeur vers le champ delta_v de "discontinuite", tel que
-//  inconnue - delta_v = vitesse de deplacement des interfaces
-//  (voir Transport_Interfaces_FT_Disc::deplacer_maillage_v_fluide())
-//  Si pas de changement de phase, renvoie un pointeur nul.
+/*! @brief Si le champ de vitesse est discontinu (calcul avec changement de phase), renvoie un pointeur vers le champ delta_v de "discontinuite", tel que
+ *
+ *   inconnue - delta_v = vitesse de deplacement des interfaces
+ *   (voir Transport_Interfaces_FT_Disc::deplacer_maillage_v_fluide())
+ *   Si pas de changement de phase, renvoie un pointeur nul.
+ *
+ */
 const Champ_base *  Navier_Stokes_FT_Disc::get_delta_vitesse_interface() const
 {
   if (variables_internes().ref_equation_mpoint_.non_nul() || variables_internes().ref_equation_mpoint_vap_.non_nul())

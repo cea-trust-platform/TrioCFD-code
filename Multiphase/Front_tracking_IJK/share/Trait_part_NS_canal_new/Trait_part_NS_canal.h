@@ -14,28 +14,15 @@
 
 class Navier_Stokes_Turbulent;
 
-//////////////////////////////////////////////////////////////////////////////
-// .NOM  Traitement_particulier_NS_canal
-// .ENTETE  Trio_U ThHyd/Turbulence
-// .LIBRAIRIE  libhydturb
-// .FILE  Trait_part_NS_canal.h
-// .FILE  Trait_part_NS_canal.cpp
-// 
-// .DESCRIPTION 
-//     classe Traitement_particulier_NS_canal
-//     Cette classe permet de faire les traitements particuliers
-//     pour le calcul d'un canal plan :
-//         * conservation du debit
-//         * calculs de moyennes
-//     
-// .SECTION voir aussi 
-//      Navier_Stokes_Turbulent, Traitement_particulier_base,
-//      Traitement_particulier_VDF
-// .CONTRAINTES 
-// .INVARIANTS 
-// .HTML 
-// .EPS 
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Traitement_particulier_NS_canal Cette classe permet de faire les traitements particuliers
+ *
+ *      pour le calcul d'un canal plan :
+ *          * conservation du debit
+ *          * calculs de moyennes
+ * 
+ *
+ * @sa Navier_Stokes_Turbulent, Traitement_particulier_base,, Traitement_particulier_VDF, .CONTRAINTES, .INVARIANTS, .HTML, .EPS 
+ */
 class Traitement_particulier_NS_canal : public Traitement_particulier_NS_base
 { 
   Declare_base(Traitement_particulier_NS_canal);

@@ -30,18 +30,15 @@ class Sous_Zone;
 #include <TRUSTTabs_forward.h>
 class Zone;
 #include <TRUSTTabs_forward.h>
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe ConstruireDomaine
-//    Cette classe est un interprete qui sert a lire et executer
-//    la directive ConstruireDomaine :
-//        ConstruireDomaine nom_domaine nom_sszone
-//    Cette directive sert a construire un nouveau domaine a partir
-//    d 'une sous zone
-// .SECTION voir aussi
-//    Interprete Rectangle
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe ConstruireDomaine Cette classe est un interprete qui sert a lire et executer
+ *
+ *     la directive ConstruireDomaine :
+ *         ConstruireDomaine nom_domaine nom_sszone
+ *     Cette directive sert a construire un nouveau domaine a partir
+ *     d 'une sous zone
+ *
+ * @sa Interprete Rectangle
+ */
 class ConstruireDomaine : public Interprete_geometrique_base
 {
   Declare_instanciable(ConstruireDomaine);

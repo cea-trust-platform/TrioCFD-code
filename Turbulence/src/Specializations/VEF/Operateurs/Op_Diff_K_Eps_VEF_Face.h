@@ -12,19 +12,12 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Op_Diff_K_Eps_VEF_Face.h
-// Directory:   $TURBULENCE_ROOT/src/Specializations/VEF/Operateurs
-//
-//////////////////////////////////////////////////////////////////////////////
-
-//
-// .DESCRIPTION class Op_Diff_K_Eps_VEF_Face
-//   Cette classe represente l'operateur de diffusion turbulente
-//   La discretisation est VEF
-//  Les methodes pour l'implicite sont codees.
-
+/*! @brief class Op_Diff_K_Eps_VEF_Face Cette classe represente l'operateur de diffusion turbulente
+ *
+ *    La discretisation est VEF
+ *   Les methodes pour l'implicite sont codees.
+ *
+ */
 #ifndef Op_Diff_K_Eps_VEF_Face_included
 #define Op_Diff_K_Eps_VEF_Face_included
 
@@ -98,31 +91,27 @@ inline double Op_Diff_K_Eps_VEF_Face::viscA(int num_face, int num2, int num_elem
   else
     return (pscal*diffu)*inverse_volumes(num_elem);
 }
-//
-// Fonctions inline de la classe Op_Diff_K_Eps_VEF_Face
-//
-// Description:
-// on dimensionne notre matrice au moyen de la methode dimensionner de la classe
-// Op_VEF_Face.
-
+/*! @brief on dimensionne notre matrice au moyen de la methode dimensionner de la classe Op_VEF_Face.
+ *
+ */
 inline  void Op_Diff_K_Eps_VEF_Face::dimensionner(Matrice_Morse& matrice) const
 {
   Op_VEF_Face::dimensionner(la_zone_vef.valeur(), la_zcl_vef.valeur(), matrice);
 }
 
 
-//Description:
-//on assemble la matrice des inconnues implicite.
-
+/*! @brief on assemble la matrice des inconnues implicite.
+ *
+ */
 inline void Op_Diff_K_Eps_VEF_Face::contribuer_a_avec(const DoubleTab& inco,
                                                       Matrice_Morse& matrice) const
 {
   ajouter_contribution(inco, matrice);
 }
 
-//Description:
-//on ajoute la contribution du second membre.
-
+/*! @brief on ajoute la contribution du second membre.
+ *
+ */
 inline void Op_Diff_K_Eps_VEF_Face::contribuer_au_second_membre(DoubleTab& resu) const
 {
   contribue_au_second_membre(resu);

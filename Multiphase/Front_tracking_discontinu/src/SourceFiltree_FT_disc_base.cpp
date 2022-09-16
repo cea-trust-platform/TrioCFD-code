@@ -67,21 +67,10 @@ Sortie& SourceFiltree_FT_disc_base::ecrire_donnees(Sortie& os) const
 
   return os;
 }
-// Description:
-//    Lit les parametres du terme source a partir
-//    d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les parametres du terme source a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ */
 Entree& SourceFiltree_FT_disc_base::lire_donnees(Entree& is)
 {
   Motcle accolade_ouverte("{");

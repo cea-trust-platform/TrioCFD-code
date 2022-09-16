@@ -26,20 +26,15 @@
 
 Declare_deriv(Diffu_totale_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Diffu_totale
-//    Classe generique calculant la diffusivite totale (somme diffusivite
-//    moleculaire et diffusivite turbulente) dans les equations de
-//    couche limite simplifiees necessaires
-//    a l'utilisation des lois de parois de type TBLE
-//
-// .SECTION voir aussi
-//    Diffu_totale_base
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Diffu_totale Classe generique calculant la diffusivite totale (somme diffusivite
+ *
+ *     moleculaire et diffusivite turbulente) dans les equations de
+ *     couche limite simplifiees necessaires
+ *     a l'utilisation des lois de parois de type TBLE
+ *
+ *
+ * @sa Diffu_totale_base
+ */
 class Diffu_totale : public DERIV(Diffu_totale_base)
 
 {

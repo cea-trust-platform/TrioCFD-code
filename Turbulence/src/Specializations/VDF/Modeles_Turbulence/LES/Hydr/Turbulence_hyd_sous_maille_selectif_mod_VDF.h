@@ -31,14 +31,14 @@
 #define SIN2ANGL_new 58526204e-9 // sin(14 degre) pour 32**3
 #define SIN2ANGL_new2 36408073e-9 // sin(11 degre) pour 64**3
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_selectif_VDF
-// Cette classe correspond a la mise en oeuvre du modele sous
-// maille fonction de structure selectif modifie en VDF
-// La modification concerne l angle de coupure : il depend du pas du maillage
-
-// .SECTION  voir aussi
-// Turbulence_hyd_sous_maille_VDF
-
+/*! @brief classe Turbulence_hyd_sous_maille_selectif_VDF Cette classe correspond a la mise en oeuvre du modele sous
+ *
+ *  maille fonction de structure selectif modifie en VDF
+ *  La modification concerne l angle de coupure : il depend du pas du maillage
+ *  .SECTION  voir aussi
+ *  Turbulence_hyd_sous_maille_VDF
+ *
+ */
 class Turbulence_hyd_sous_maille_selectif_mod_VDF : public Turbulence_hyd_sous_maille_VDF
 {
 

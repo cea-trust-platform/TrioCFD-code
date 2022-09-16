@@ -26,40 +26,23 @@
 
 Implemente_base(Flux_radiatif_base,"Flux_radiatif_base",Neumann_paroi);
 
-// Description:
-//    Imprime le type de l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le type de l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Flux_radiatif_base::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
 
-// Description:
-//    Appel Neumann_paroi::readOn(Entree& is)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: solveur pression non defini dans jeu de donnees
-// Effets de bord:
-// Postcondition:
+/*! @brief Appel Neumann_paroi::readOn(Entree& is)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws solveur pression non defini dans jeu de donnees
+ */
 Entree& Flux_radiatif_base::readOn(Entree& is)
 {
   Nom nom_pb, nom_bord;
@@ -112,22 +95,11 @@ Entree& Flux_radiatif_base::readOn(Entree& is)
 
 
 
-// Description:
-//    cette methode permet de typer les champs_front :
-//        - le_champ_front
-//        - flux_radiatif_
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief cette methode permet de typer les champs_front : - le_champ_front
+ *
+ *         - flux_radiatif_
+ *
+ */
 void Flux_radiatif_base::completer()
 {
   Neumann_paroi::completer();
@@ -146,20 +118,9 @@ void Flux_radiatif_base::completer()
 }
 
 
-// Description:
-//   Renvoie la valeur de flux imposes a la paroi radiative
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie la valeur de flux imposes a la paroi radiative
+ *
+ */
 double Flux_radiatif_base::flux_impose(int i) const
 {
   if (le_champ_front.valeurs().size()==1)
@@ -173,20 +134,9 @@ double Flux_radiatif_base::flux_impose(int i) const
 }
 
 
-// Description:
-//   Renvoie la valeur de flux imposes a la paroi radiative
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie la valeur de flux imposes a la paroi radiative
+ *
+ */
 double Flux_radiatif_base::flux_impose(int i,int j) const
 {
   if (le_champ_front.valeurs().dimension(0)==1)

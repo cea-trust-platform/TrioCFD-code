@@ -40,14 +40,15 @@ class Zone_VF;
 class Maillage_FT_Disc_Data_Cache;
 Declare_deriv(Maillage_FT_Disc_Data_Cache); // Classe utilisee en interne;
 
-// ====================================================================
-// .DESCRIPTION        : class Maillage_FT_Disc
-//  Cette classe decrit un maillage:
-//   un tableau de coordonnees des sommets,
-//   un tableau de facettes,
-//   drapeaux,
-//   intersections facettes / elements
-//   ...
+/*! @brief : class Maillage_FT_Disc Cette classe decrit un maillage:
+ *
+ *    un tableau de coordonnees des sommets,
+ *    un tableau de facettes,
+ *    drapeaux,
+ *    intersections facettes / elements
+ *    ...
+ *
+ */
 class Maillage_FT_Disc : public Ensemble_Lagrange_base
 {
   Declare_instanciable_sans_constructeur(Maillage_FT_Disc);
@@ -483,9 +484,11 @@ inline int Maillage_FT_Disc::sommet_face_bord(int i) const
 
 
 
-// Description:
-//  Renvoie 0 si la facette m'appartient, 1 sinon.
-//  (le test est "le premier sommet de la facette m'appartient-t-il ?")
+/*! @brief Renvoie 0 si la facette m'appartient, 1 sinon.
+ *
+ * (le test est "le premier sommet de la facette m'appartient-t-il ?")
+ *
+ */
 inline int Maillage_FT_Disc::facette_virtuelle(int i) const
 {
   const int sommet = facettes_(i, 0);

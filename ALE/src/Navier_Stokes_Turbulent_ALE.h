@@ -29,18 +29,14 @@
 #include <Mod_turb_hyd_RANS.h>
 class Champ_Fonc;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Navier_Stokes_Turbulent_ALE
-//     Cette classe represente l'equation de la dynamique pour un fluide
-//     visqueux verifiant la condition d'incompressibilite div U = 0 avec
-//     modelisation de la turbulence pour un maillage mobile (ALE).
-//     Un membre de type Mod_turb_hyd representera le modele de turbulence.
-// .SECTION voir aussi
-//      Navier_Stokes_std_ALE Mod_turb_hyd Pb_Hydraulique_Turbulent
-//      Pb_Thermohydraulique_Turbulent
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Navier_Stokes_Turbulent_ALE Cette classe represente l'equation de la dynamique pour un fluide
+ *
+ *      visqueux verifiant la condition d'incompressibilite div U = 0 avec
+ *      modelisation de la turbulence pour un maillage mobile (ALE).
+ *      Un membre de type Mod_turb_hyd representera le modele de turbulence.
+ *
+ * @sa Navier_Stokes_std_ALE Mod_turb_hyd Pb_Hydraulique_Turbulent, Pb_Thermohydraulique_Turbulent
+ */
 class Navier_Stokes_Turbulent_ALE : public Navier_Stokes_std_ALE
 {
   Declare_instanciable(Navier_Stokes_Turbulent_ALE);
@@ -82,40 +78,20 @@ protected:
 
 
 
-// Description:
-//    Renvoie le champ representant la viscosite turbulente.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: le champ representant la viscosite turbulente
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ representant la viscosite turbulente.
+ *
+ * @return (Champ_Fonc&) le champ representant la viscosite turbulente
+ */
 inline const Champ_Fonc& Navier_Stokes_Turbulent_ALE::viscosite_turbulente() const
 {
   return le_modele_turbulence.viscosite_turbulente();
 }
 
 
-// Description:
-//    Renvoie le modele de turbulence (Hydraulique) associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Mod_turb_hyd&
-//    Signification: le modele de turbulence (Hydraulique) associe a l'equation
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le modele de turbulence (Hydraulique) associe a l'equation.
+ *
+ * @return (Mod_turb_hyd&) le modele de turbulence (Hydraulique) associe a l'equation
+ */
 inline const Mod_turb_hyd& Navier_Stokes_Turbulent_ALE::modele_turbulence() const
 {
   return le_modele_turbulence;

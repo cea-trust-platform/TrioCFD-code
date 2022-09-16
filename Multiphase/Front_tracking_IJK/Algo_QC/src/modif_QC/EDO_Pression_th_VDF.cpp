@@ -59,20 +59,9 @@ void  EDO_Pression_th_VDF::associer_zones(const Zone_dis& zone, const Zone_Cl_di
 }
 
 
-// Description:
-//    Complete l'EDO : calcule rho sur les faces
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Complete l'EDO : calcule rho sur les faces
+ *
+ */
 void EDO_Pression_th_VDF::completer()
 {
   const DoubleTab& tab_ICh = le_fluide_->inco_chaleur().valeurs();
@@ -81,20 +70,10 @@ void EDO_Pression_th_VDF::completer()
   le_fluide_->checkTraitementPth(la_zone_Cl);
 }
 
-// Description:
-//    Calcule la moyenne volumique de la grandeur P0 donnee
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleTab&
-//    Signification: rho discretise par face
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la moyenne volumique de la grandeur P0 donnee
+ *
+ * @return (DoubleTab&) rho discretise par face 
+ */
 double EDO_Pression_th_VDF::moyenne_vol(const DoubleTab& tab) const
 {
   int elem, nb_elem=la_zone->nb_elem();
@@ -172,21 +151,10 @@ void EDO_Pression_th_VDF::calculer_rho_face_np1(const DoubleTab& tab_rhoP0)
     }
 }
 
-// Description:
-//    Renvoie rho avec la meme discretisation que la vitesse :
-//    une valeur par face en VDF
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleTab&
-//    Signification: rho discretise par face
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie rho avec la meme discretisation que la vitesse : une valeur par face en VDF
+ *
+ * @return (DoubleTab&) rho discretise par face 
+ */
 const DoubleTab& EDO_Pression_th_VDF::rho_discvit() const
 {
   //return tab_rho_face_demi;
@@ -195,21 +163,10 @@ const DoubleTab& EDO_Pression_th_VDF::rho_discvit() const
 // le probleme sur la pression existait deja on l'a juste rendu visible avec cette modif
 }
 
-// Description:
-//    Renvoie div(u) avec la meme discretisation que la vitesse :
-//    une valeur par face en VDF
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleTab&
-//    Signification: div(u) discretise par face
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie div(u) avec la meme discretisation que la vitesse : une valeur par face en VDF
+ *
+ * @return (DoubleTab&) div(u) discretise par face 
+ */
 void EDO_Pression_th_VDF::divu_discvit(const DoubleTab& secmem1, DoubleTab& secmem2)
 {
   assert_espace_virtuel_vect(secmem1);
@@ -234,20 +191,10 @@ void EDO_Pression_th_VDF::divu_discvit(const DoubleTab& secmem1, DoubleTab& secm
   secmem2.echange_espace_virtuel();
 }
 
-// Description:
-//    Renvoie la valeur de la pression calculee pour conserver la masse
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Double
-//    Signification: pression calculee
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie la valeur de la pression calculee pour conserver la masse
+ *
+ * @return (Double) pression calculee 
+ */
 double EDO_Pression_th_VDF::masse_totale(double P,const DoubleTab& T)
 {
   int elem, nb_elem=la_zone->nb_elem();
@@ -280,21 +227,10 @@ double EDO_Pression_th_VDF::masse_totale(double P,const DoubleTab& T)
 
 
 
-// Description:
-//    Calcule le second membre de l'equation de continuite :
-//    div(rhoU) = W = -dZ/dT    avec Z=rho
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleTab&
-//    Signification: rho discretise par face
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule le second membre de l'equation de continuite : div(rhoU) = W = -dZ/dT    avec Z=rho
+ *
+ * @return (DoubleTab&) rho discretise par face 
+ */
 void EDO_Pression_th_VDF::secmembre_divU_Z(DoubleTab& tab_W) const
 {
   double dt = le_fluide().vitesse()->equation().schema_temps().pas_de_temps();

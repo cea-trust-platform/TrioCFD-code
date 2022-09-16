@@ -27,13 +27,12 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 class Champ_front;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Frontiere_ouverte_rayo_semi_transp
-//
-// .SECTION
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Frontiere_ouverte_rayo_semi_transp
+ *
+ *  .SECTION
+ *
+ *
+ */
 class Frontiere_ouverte_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Neumann_sortie_libre
 {
   Declare_instanciable(Frontiere_ouverte_rayo_semi_transp);

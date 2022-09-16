@@ -57,48 +57,30 @@ Navier_Stokes_phase_field::Navier_Stokes_phase_field()
 
 Navier_Stokes_phase_field::~Navier_Stokes_phase_field() {}
 
-// Description:
-//    Simple appel a: Navier_Stokes_std::printOn(Sortie&)
-//    Ecrit l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Navier_Stokes_std::printOn(Sortie&) Ecrit l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Navier_Stokes_phase_field::printOn(Sortie& is) const
 {
   return Navier_Stokes_std::printOn(is);
 }
 
-// Description:
-//    Appel Navier_Stokes_phase_field::readOn(Entree& is)
-//    En sortie verifie que l'on a bien lu:
-//        - le terme diffusif,
-//        - le terme convectif,
-//        - le solveur en pression
-// Precondition: l'equation doit avoir un milieu fluide associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: terme diffusif non specifie dans jeu de donnees, specifier
-//            un type negligeable pour l'operateur si il est a negliger
-// Exception: terme convectif non specifie dans jeu de donnees, specifier
-//            un type negligeable pour l'operateur si il est a negliger
-// Exception: solveur pression non defini dans jeu de donnees
-// Effets de bord:
-// Postcondition:
+/*! @brief Appel Navier_Stokes_phase_field::readOn(Entree& is) En sortie verifie que l'on a bien lu:
+ *
+ *         - le terme diffusif,
+ *         - le terme convectif,
+ *         - le solveur en pression
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws terme diffusif non specifie dans jeu de donnees, specifier
+ * un type negligeable pour l'operateur si il est a negliger
+ * @throws terme convectif non specifie dans jeu de donnees, specifier
+ * un type negligeable pour l'operateur si il est a negliger
+ * @throws solveur pression non defini dans jeu de donnees
+ */
 Entree& Navier_Stokes_phase_field::readOn(Entree& is)
 {
   Navier_Stokes_std::readOn(is);
@@ -340,20 +322,9 @@ const Champ_Don& Navier_Stokes_phase_field::diffusivite_pour_transport() const
   return Navier_Stokes_phase_field::diffusivite_pour_transport();
 }
 
-// Description:
-//    Dicretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Dicretise l'equation.
+ *
+ */
 void Navier_Stokes_phase_field::discretiser()
 {
   Navier_Stokes_std::discretiser();
@@ -443,20 +414,9 @@ void Navier_Stokes_phase_field::creer_champ(const Motcle& motlu)
     }
 }
 
-// Description:
-//    Calcule rho_n+1 pour utilisation dans la pression
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule rho_n+1 pour utilisation dans la pression
+ *
+ */
 void Navier_Stokes_phase_field::calculer_rho(const bool init)
 {
   const Convection_Diffusion_Phase_field& eq_c=ref_cast(Convection_Diffusion_Phase_field, mon_probleme.valeur().equation(1));
@@ -578,20 +538,9 @@ double Navier_Stokes_phase_field::calculer_pas_de_temps() const
   return dt;
 }
 
-// Description:
-//    Interpole la masse volumique aux faces (pour l'assembleur pression en particulier)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Interpole la masse volumique aux faces (pour l'assembleur pression en particulier)
+ *
+ */
 void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Don& rho_face_P)
 {
   const Zone_VF& zoneVF = ref_cast(Zone_VF,zone_dis().valeur());
@@ -628,20 +577,9 @@ void Navier_Stokes_phase_field::rho_aux_faces(const DoubleTab& tab_rho, Champ_Do
     }
 }
 
-// Description:
-//    Dicretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Dicretise l'equation.
+ *
+ */
 int Navier_Stokes_phase_field::preparer_calcul()
 {
   Cerr << "** Navier_Stokes_phase_field::preparer_calcul **" << finl;

@@ -23,15 +23,11 @@
 #define MuLambda_TBLE_Cte_included
 #include <MuLambda_TBLE_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe MuLambda_TBLE_Cte
-//    Classe abstraite calculant Mu et Lambda constant sur le maillage TBLE
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe MuLambda_TBLE_Cte Classe abstraite calculant Mu et Lambda constant sur le maillage TBLE
+ *
+ *
+ *
+ */
 class MuLambda_TBLE_Cte : public MuLambda_TBLE_base
 {
   Declare_instanciable(MuLambda_TBLE_Cte);

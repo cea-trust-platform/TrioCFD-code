@@ -28,16 +28,13 @@
 #include <Ref_Correlation.h>
 #include <Cond_lim_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Paroi_frottante_loi
-//    Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
-//    transport de QDM.
-//    Le coefficient de frottement est calcule a partir de la correlation de loi de paroi adaptative.
-// .SECTION voir aussi
-//    Neumann
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Paroi_frottante_loi Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
+ *
+ *     transport de QDM.
+ *     Le coefficient de frottement est calcule a partir de la correlation de loi de paroi adaptative.
+ *
+ * @sa Neumann
+ */
 class Paroi_frottante_loi : public Frottement_global_impose
 {
 

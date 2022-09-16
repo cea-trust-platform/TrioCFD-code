@@ -26,15 +26,12 @@
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Modele_turbulence_Longueur_Melange_VDF
-//    Cette classe represente le modele de turbulence de longueur de melange de Prandtl.
-//    ATTENTION : modele code que pour un canal 2D horizontal !!!!
-// .SECTION voir aussi
-//    Mod_turb_hyd_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Modele_turbulence_Longueur_Melange_VDF Cette classe represente le modele de turbulence de longueur de melange de Prandtl.
+ *
+ *     ATTENTION : modele code que pour un canal 2D horizontal !!!!
+ *
+ * @sa Mod_turb_hyd_base
+ */
 class Modele_turbulence_Longueur_Melange_VDF : public Mod_turb_hyd_RANS_0_eq
 {
 

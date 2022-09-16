@@ -33,13 +33,12 @@ class Zone_VF;
 class Probleme_base;
 class Paroi_TBLE_QDM;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_TBLE_QDM_Scal
-//
-//.SECTION  voir aussi
-// Turbulence_paroi_scal_base
-
+/*! @brief CLASS: Paroi_TBLE_QDM_Scal
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_scal_base
+ *
+ */
 class Paroi_TBLE_QDM_Scal
 {
 public:

@@ -33,13 +33,12 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Param;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_std_hyd_VDF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
+/*! @brief CLASS: Paroi_std_hyd_VDF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_std_hyd_VDF : public Paroi_hyd_base_VDF, public Paroi_log_QDM
 {
   Declare_instanciable(Paroi_std_hyd_VDF);
@@ -99,8 +98,11 @@ inline double Paroi_std_hyd_VDF::tau_tang(int face, int k) const
   return Cisaillement_paroi_(face,k);
 }
 
-// Description: cette classe permet de specifier des options a la loi de
-// paroi standard. Elle est reservee aux experts.
+/*! @brief cette classe permet de specifier des options a la loi de paroi standard.
+ *
+ * Elle est reservee aux experts.
+ *
+ */
 class Loi_expert_hydr_VDF : public Paroi_std_hyd_VDF
 {
   Declare_instanciable(Loi_expert_hydr_VDF);

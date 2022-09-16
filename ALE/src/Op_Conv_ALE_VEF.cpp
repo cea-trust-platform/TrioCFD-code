@@ -1077,19 +1077,18 @@ void Op_Conv_ALE_VEF::calculateALEjacobian(DoubleTab& jacobianALE) const
 
 }
 
-// contribuer_a_avec() and modifier_pour_Cl() are needed when using Scheme_euler_implicit time scheme.
-
-//Description:
-//On assemble la matrice des inconnues implicite.
+/*! @brief On assemble la matrice des inconnues implicite.
+ *
+ */
 void Op_Conv_ALE_VEF::contribuer_a_avec(const DoubleTab& inco, Matrice_Morse& matrice) const
 {
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());
   opConvVEFFace.ajouter_contribution(inco, matrice);
 }
 
-// Description:
-// On modifie le second membre et la matrice dans le cas des
-// conditions de dirichlet.
+/*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
+ *
+ */
 void Op_Conv_ALE_VEF::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
   const Op_Conv_VEF_Face& opConvVEFFace = ref_cast(Op_Conv_VEF_Face, op_conv.valeur());

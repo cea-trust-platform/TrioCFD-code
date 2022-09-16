@@ -106,9 +106,11 @@ void OpDiffTurbIJK_double::calculer(const IJK_Field_double & vx, const IJK_Field
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -188,9 +190,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -268,9 +272,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -348,9 +354,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -429,9 +437,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -510,9 +520,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -590,9 +602,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -794,9 +808,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -997,9 +1013,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTurbIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1127,9 +1145,11 @@ void OpDiffIJK_double::calculer(const IJK_Field_double & vx, const IJK_Field_dou
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1190,9 +1210,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1257,9 +1279,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1324,9 +1348,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1392,9 +1418,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1454,9 +1482,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1521,9 +1551,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1698,9 +1730,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1874,9 +1908,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -1985,9 +2021,11 @@ void OpDiffStdWithLaminarTransposeIJK_double::calculer(const IJK_Field_double & 
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2048,9 +2086,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2120,9 +2160,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2192,9 +2234,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2265,9 +2309,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2327,9 +2373,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2399,9 +2447,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2581,9 +2631,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2762,9 +2814,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2878,9 +2932,11 @@ void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::calculer(const IJK_Fi
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -2945,9 +3001,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3018,9 +3076,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3091,9 +3151,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3165,9 +3227,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3231,9 +3295,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3304,9 +3370,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3487,9 +3555,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3669,9 +3739,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3784,9 +3856,11 @@ void OpDiffAnisotropicIJK_double::calculer(const IJK_Field_double & vx, const IJ
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3846,9 +3920,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3912,9 +3988,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -3978,9 +4056,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4045,9 +4125,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4106,9 +4188,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4172,9 +4256,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4348,9 +4434,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4523,9 +4611,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffAnisotropicIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4633,9 +4723,11 @@ void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::calculer(const IJK_Fiel
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4695,9 +4787,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4765,9 +4859,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4835,9 +4931,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4906,9 +5004,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -4967,9 +5067,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5037,9 +5139,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5217,9 +5321,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5396,9 +5502,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAnisotropicIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5511,9 +5619,11 @@ void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::calculer(c
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5577,9 +5687,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5648,9 +5760,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5719,9 +5833,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5791,9 +5907,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5856,9 +5974,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -5927,9 +6047,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6108,9 +6230,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6288,9 +6412,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceAnisotropicIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6442,9 +6568,11 @@ void OpDiffTensorialZeroatwallIJK_double::calculer(const IJK_Field_double & vx, 
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6505,9 +6633,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6572,9 +6702,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6639,9 +6771,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6707,9 +6841,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6769,9 +6905,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -6836,9 +6974,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7013,9 +7153,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7189,9 +7331,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7340,9 +7484,11 @@ void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::calculer(const 
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7403,9 +7549,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7475,9 +7623,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7547,9 +7697,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7620,9 +7772,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7682,9 +7836,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7754,9 +7910,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -7936,9 +8094,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8117,9 +8277,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8273,9 +8435,11 @@ void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::ca
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8340,9 +8504,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8413,9 +8579,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8486,9 +8654,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8560,9 +8730,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8626,9 +8798,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8699,9 +8873,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -8882,9 +9058,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9064,9 +9242,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9219,9 +9399,11 @@ void OpDiffTensorialAnisotropicZeroatwallIJK_double::calculer(const IJK_Field_do
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9281,9 +9463,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9347,9 +9531,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9413,9 +9599,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9480,9 +9668,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9541,9 +9731,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9607,9 +9799,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9783,9 +9977,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -9958,9 +10154,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10108,9 +10306,11 @@ void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::calc
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10170,9 +10370,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10240,9 +10442,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10310,9 +10514,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10381,9 +10587,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10442,9 +10650,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10512,9 +10722,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10692,9 +10904,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -10871,9 +11085,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11026,9 +11242,11 @@ void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11092,9 +11310,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11163,9 +11383,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11234,9 +11456,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11306,9 +11530,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11371,9 +11597,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11442,9 +11670,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11623,9 +11853,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11803,9 +12035,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStdWithLaminarTransposeAndDivergenceTensorialAnisotropicZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -11957,9 +12191,11 @@ void OpDiffStructuralOnlyZeroatwallIJK_double::calculer(const IJK_Field_double &
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12014,9 +12250,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12078,9 +12316,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12142,9 +12382,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12207,9 +12449,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12263,9 +12507,11 @@ if(!perio_k_){
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12327,9 +12573,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12499,9 +12747,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field
@@ -12670,9 +12920,11 @@ resu_ptr.put_val(i, flux);
   // flops_ += nx * ny * 6;
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// Diffusion
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  Diffusion
+ *
+ */
 void OpDiffStructuralOnlyZeroatwallIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // Velocity field

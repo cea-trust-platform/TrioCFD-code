@@ -31,25 +31,25 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// Ne pas utiliser cette classe. Utiliser plutot des conditions de symetrie
-// et une perte de cherge volumique :
-//
-// Loi de parois qui calcule le frottement a la paroi a partir
-// d'une expression analytique donnee, fonction de la vitesse
-// en premiere maille.
-//
-// Suppose que la vitesse dans cette maille est la vitesse moyenne
-// de l'ecoulement, cad que le canal ne fait qu'une maille d'epaisseur.
-//
-// A utiliser avec un modele de turbulence negligeable, i.e. qui renvoie
-// une viscosite turbulente nulle (par ex. Smagorinsky, avec Cs=0)
-// CLASS: Paroi_Cisaillement_Imp_VEF
-//
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief Ne pas utiliser cette classe.
+ *
+ * Utiliser plutot des conditions de symetrie et une perte de cherge volumique :
+ *
+ *  Loi de parois qui calcule le frottement a la paroi a partir
+ *  d'une expression analytique donnee, fonction de la vitesse
+ *  en premiere maille.
+ *
+ *  Suppose que la vitesse dans cette maille est la vitesse moyenne
+ *  de l'ecoulement, cad que le canal ne fait qu'une maille d'epaisseur.
+ *
+ *  A utiliser avec un modele de turbulence negligeable, i.e. qui renvoie
+ *  une viscosite turbulente nulle (par ex. Smagorinsky, avec Cs=0)
+ *  CLASS: Paroi_Cisaillement_Imp_VEF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_Cisaillement_Imp_VEF : public Paroi_hyd_base_VEF , Paroi_UTAU_IMP_Impl
 {
 

@@ -24,13 +24,11 @@
 #define Nucleation_paroi_PolyMAC_P0_included
 #include <Source_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Nucleation_paroi_PolyMAC_P0
-//      forme pi * d_nuc**2 * N_nuc
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Nucleation_paroi_PolyMAC_P0 forme pi * d_nuc**2 * N_nuc
+ *
+ *
+ *
+ */
 class Nucleation_paroi_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Nucleation_paroi_PolyMAC_P0);

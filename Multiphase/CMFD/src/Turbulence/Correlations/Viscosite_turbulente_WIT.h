@@ -25,14 +25,12 @@
 #include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Viscosite_turbulente_WIT
-//    Renvoie le tenseur de Reynolds pour une turbulence de bulles de type WIT ; ce tenseur est isotrope
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Viscosite_turbulente_WIT Renvoie le tenseur de Reynolds pour une turbulence de bulles de type WIT ; ce tenseur est isotrope
+ *
+ *     (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+ *
+ *
+ */
 class Viscosite_turbulente_WIT : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_WIT);

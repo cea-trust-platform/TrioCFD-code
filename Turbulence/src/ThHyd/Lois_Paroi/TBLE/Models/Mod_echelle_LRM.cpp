@@ -26,41 +26,22 @@
 Implemente_deriv(Mod_echelle_LRM_base);
 Implemente_instanciable(Mod_echelle_LRM,"Mod_echelle_LRM",DERIV(Mod_echelle_LRM_base));
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie de sauvegarde
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
-
+/*! @brief
+ *
+ * @param (Sortie& os) le flot de sortie de sauvegarde
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Mod_echelle_LRM::printOn(Sortie& os) const
 {
   return DERIV(Mod_echelle_LRM_base)::printOn(os);
 }
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree pour la lecture d'une equation
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot d'entree est modifie
-// Postcondition: l'equation est construite avec les elements lus.
+/*! @brief
+ *
+ * @param (Entree& is) le flot d'entree pour la lecture d'une equation
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Mod_echelle_LRM::readOn( Entree& is)
 {
   return DERIV(Mod_echelle_LRM_base)::readOn(is);

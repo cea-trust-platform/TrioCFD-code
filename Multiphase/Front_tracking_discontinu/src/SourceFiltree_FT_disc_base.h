@@ -31,17 +31,12 @@ class Sortie;
 class Parser;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-// class SourceFiltree_FT_disc
-// la Classe SourceFiltree permet d'ajouter un terme source dependant de la
-//  phase, du temps, de la position, ...
-// .SECTION voir aussi
-//      Probleme_FT_Disc_gen
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class SourceFiltree_FT_disc la Classe SourceFiltree permet d'ajouter un terme source dependant de la
+ *
+ *   phase, du temps, de la position, ...
+ *
+ * @sa Probleme_FT_Disc_gen
+ */
 class SourceFiltree_FT_disc_base
 {
 

@@ -27,16 +27,13 @@
 #include <Neumann_loi_paroi.h>
 #include <Cond_lim_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Neumann_loi_paroi_faible_tau_omega
-//    Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
-//    transport de tau ou omega pour la turbulence.
-//    Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
-// .SECTION voir aussi
-//    Neumann
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Neumann_loi_paroi_faible_tau_omega Cette condition limite correspond a un flux impose pour une condition aux limites adaptative faible de l'equation de
+ *
+ *     transport de tau ou omega pour la turbulence.
+ *     Le flux impose est calcule a partir de la correlation de loi de paroi adaptative.
+ *
+ * @sa Neumann
+ */
 class Neumann_loi_paroi_faible_tau_omega : public Neumann_loi_paroi
 {
 

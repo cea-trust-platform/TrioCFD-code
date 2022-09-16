@@ -27,15 +27,12 @@
 #include <Ref_Correlation.h>
 #include <TRUSTTab.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Production_echelle_temp_taux_diss_turb_PolyMAC_P0
-//    Cette classe implemente dans PolyMAC_P0 un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
-//
-// .SECTION voir aussi
-//    Operateur_PolyMAC_P0_base Operateur_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Production_echelle_temp_taux_diss_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un operateur de production de l'échelle de temps turbulente tau ou du taux de dissipation turbulent omega
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
 class Production_echelle_temp_taux_diss_turb_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Production_echelle_temp_taux_diss_turb_PolyMAC_P0);

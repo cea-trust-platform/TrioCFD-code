@@ -25,11 +25,9 @@
 
 
 
-//
-// .DESCRIPTION class Source_Transport_Flux_Chaleur_Turbulente_VDF_Face
-//
-// .SECTION voir aussi
-
+/*! @brief class Source_Transport_Flux_Chaleur_Turbulente_VDF_Face
+ *
+ */
 #define c1_DEFAULT 5     // Valeurs par defaut des constantes qui interviennent
 #define c2_DEFAULT 0.5   // dans le calcul des termes sources des equations
 #define c3_DEFAULT 0.33  //  de transport du flux de chaleur turbulent.

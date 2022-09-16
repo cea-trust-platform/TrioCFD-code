@@ -35,16 +35,17 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-////////////////////////////////////////////////////////////////////////////////
-// .DESCRIPTION  class Paroi_DWF_hyd_VDF
-//     cette classe derive de turbulence_paroi_base
-//     qui est la classe standard des lois de parois
-//     pour la turbulence
-//
-//     Surtout ne pas copier sur cette classe pour creer une loi de paroi
-//     avec un couplage !
-//
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief class Paroi_DWF_hyd_VDF cette classe derive de turbulence_paroi_base
+ *
+ *      qui est la classe standard des lois de parois
+ *      pour la turbulence
+ *
+ *      Surtout ne pas copier sur cette classe pour creer une loi de paroi
+ *      avec un couplage !
+ *
+ *
+ *
+ */
 
 ///////////////////////////////////////////////////////////////////////////
 //On conserve la classe car possible developpement dans le futur.

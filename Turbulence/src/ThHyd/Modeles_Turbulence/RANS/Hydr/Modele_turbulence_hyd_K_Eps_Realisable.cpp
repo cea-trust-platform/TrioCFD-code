@@ -47,8 +47,9 @@ Sortie& Modele_turbulence_hyd_K_Eps_Realisable::printOn(Sortie& s ) const
   return s << que_suis_je() << " " << le_nom();
 }
 
-// Description:
-// Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
+/*! @brief Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
+ *
+ */
 Entree& Modele_turbulence_hyd_K_Eps_Realisable::readOn(Entree& is)
 {
   return Mod_turb_hyd_RANS::readOn(is);

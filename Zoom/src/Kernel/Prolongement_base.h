@@ -31,11 +31,9 @@ class Frontiere;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>
 
-//
-// .DESCRIPTION class Prolongement_base
-//
-// .SECTION voir aussi
-
+/*! @brief class Prolongement_base
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

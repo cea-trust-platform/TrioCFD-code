@@ -24,9 +24,11 @@
 
 #include <Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem.h>
 
-//.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem
-// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes sont couplees
-// a l'equation de la thermique. On suppose que le coefficient de variation de la masse volumique du fluide en fonction de ce scalaire est un coefficient uniforme.
+/*! @brief class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes sont couplees
+ *
+ *  a l'equation de la thermique. On suppose que le coefficient de variation de la masse volumique du fluide en fonction de ce scalaire est un coefficient uniforme.
+ *
+ */
 class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem);
@@ -36,9 +38,11 @@ public:
   void associer_pb(const Probleme_base& ) override;
 };
 
-//.DESCRIPTION class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem
-// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
-// sont couplees a l'equation de la thermique, et ou le fluide est quasi compressible.
+/*! @brief class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations de Navier_Stokes
+ *
+ *  sont couplees a l'equation de la thermique, et ou le fluide est quasi compressible.
+ *
+ */
 class Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem : public Source_Transport_K_Eps_Bas_Reynolds_anisotherme_VDF_Elem
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_Bas_Reynolds_anisotherme_QC_VDF_Elem);

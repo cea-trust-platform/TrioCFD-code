@@ -31,66 +31,40 @@
 Implemente_instanciable(ConstruireDomaine,"ConstruireDomaine",Interprete_geometrique_base);
 
 
-// Description:
-//    Simple appel a: Interprete::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Interprete::printOn(Sortie&)
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& ConstruireDomaine::printOn(Sortie& os) const
 {
   return Interprete::printOn(os);
 }
 
 
-// Description:
-//    Simple appel a: Interprete::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a: Interprete::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& ConstruireDomaine::readOn(Entree& is)
 {
   return Interprete::readOn(is);
 }
 
 
-// Description:
-//    Fonction principale de l'interprete Raffiner
-//    Triangule 1 a 1 toutes les zones du domaine
-//    specifie par la directive.
-//    On triangule la zone grace a la methode:
-//      void Raffiner::raffiner(Zone& zone) const
-//    Raffiner signifie ici transformer en triangle des
-//    elements geometrique d'une zone.
-// Precondition: on doit etre en 2D (dimension d'espace=2)
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree
-//    Contraintes:
-// Exception: l'objet a mailler n'est pas du type Domaine
-// Effets de bord:
-// Postcondition:
+/*! @brief Fonction principale de l'interprete Raffiner Triangule 1 a 1 toutes les zones du domaine
+ *
+ *     specifie par la directive.
+ *     On triangule la zone grace a la methode:
+ *       void Raffiner::raffiner(Zone& zone) const
+ *     Raffiner signifie ici transformer en triangle des
+ *     elements geometrique d'une zone.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree
+ * @throws l'objet a mailler n'est pas du type Domaine
+ */
 Entree& ConstruireDomaine::interpreter_(Entree& is)
 {
 

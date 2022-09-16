@@ -78,21 +78,10 @@ int Paroi_negligeable_EF::calculer_scal(Champ_Fonc_base& )
 }
 
 
-// Description:
-//    Give a boolean indicating that we don't need to use shear
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: boolean
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-//
+/*! @brief Give a boolean indicating that we don't need to use shear
+ *
+ * @return (boolean)
+ */
 bool Paroi_negligeable_EF::use_shear() const
 {
   return false;

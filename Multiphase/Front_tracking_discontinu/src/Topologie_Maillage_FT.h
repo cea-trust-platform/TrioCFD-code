@@ -34,12 +34,12 @@ class Motcle;
 class Champ_base;
 class Remaillage_FT;
 
-// ====================================================================
-// .DESCRIPTION        : class Topologie_Maillage_FT
-//  Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
-//
-// .SECTION voir aussi
-//  Transport_Interfaces_FT_Disc Maillage_FT_Disc
+/*! @brief : class Topologie_Maillage_FT Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
+ *
+ *
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
+ */
 class Zone_VF;
 #include <TRUSTTabs_forward.h>
 #include <TRUSTTabs_forward.h>

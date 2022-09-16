@@ -125,11 +125,14 @@ Entree& Champ_Fonc_reprise_IJK::readOn(Entree& s)
   return s ;
 }
 
-// Description: Reciproque de la methode ecrit(...), lit uniquement les items sequentiels
-//   (donc pas les items communs recus d'un autre processeur)
-//   On verifie a la fin qu'on a bien lu exactement le nombre d'items attendus, s'il en manque
-//   c'est que le epsilon n'est pas bon (ou qu'on a change le maillage...)
-// Valeur de retour: nombre total d'items sequentiels lus (sur tous les procs)
+/*! @brief Reciproque de la methode ecrit(.
+ *
+ * ..), lit uniquement les items sequentiels (donc pas les items communs recus d'un autre processeur)
+ *    On verifie a la fin qu'on a bien lu exactement le nombre d'items attendus, s'il en manque
+ *    c'est que le epsilon n'est pas bon (ou qu'on a change le maillage...)
+ *  Valeur de retour: nombre total d'items sequentiels lus (sur tous les procs)
+ *
+ */
 static int lire_special(Entree& fich, const DoubleTab& coords, DoubleTab& val, const double epsilon)
 {
   const int dim = coords.dimension(1);

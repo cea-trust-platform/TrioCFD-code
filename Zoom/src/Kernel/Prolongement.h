@@ -32,19 +32,16 @@
 
 Declare_deriv(Prolongement_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Prolongement
-//     Classe generique de la hierarchie des algorithmes, un objet
-//     Prolongement peut referencer n'importe quel objet derivant de
-//     Prolongement_base.
-//     La plupart des methodes appellent les methodes de l'objet
-//     Prolongement_base sous-jacent via la methode valeur() declaree grace
-//alamacroDeclare_deriv().;
-// .SECTION voir aussi
-//      Prolongement_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Prolongement Classe generique de la hierarchie des algorithmes, un objet
+ *
+ *      Prolongement peut referencer n'importe quel objet derivant de
+ *      Prolongement_base.
+ *      La plupart des methodes appellent les methodes de l'objet
+ *      Prolongement_base sous-jacent via la methode valeur() declaree grace
+ * alamacroDeclare_deriv().;
+ *
+ * @sa Prolongement_base
+ */
 class Prolongement : public DERIV(Prolongement_base)
 {
   Declare_instanciable(Prolongement);

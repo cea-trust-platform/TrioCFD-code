@@ -29,70 +29,52 @@
 
 Implemente_instanciable(PaveCoincidant,"PaveCoincidant",Pave);
 
-// Description:
-//    Simple appel a: Zone::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Zone::printOn(Sortie&)
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& PaveCoincidant::printOn(Sortie& s ) const
 {
   return Zone::printOn(s) ;
 }
 
 
-// Description:
-//    Lit les specifications d'un pave a partir
-//    d'un flot d'entree.
-//    Le format de lecture d'un pave dans le jeu de donnee est le suivant:
-//     PaveCoincidant nom_pave
-//     {
-//     Origine OX OY (OZ)
-//     Longueurs LX LY (LZ)
-//     Nombre_de_noeuds NX NY (NZ)
-//     Facteurs Fx Fy (Fz)
-//     (Symx)
-//     (Symy)
-//     (Symz)
-//     }
-//     {
-//     (Bord)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
-//     ...
-//     (Raccord)  local homogene nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
-//     ...
-//     (Internes)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
-//     ...
-//     (Joint)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1 PE_voisin
-//     ...
-//     }
-// Precondition: la dimension d'espace doit avoir ete lue
-//               auparavant
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: dimension d'espace necessaire pour mailler
-// Exception: accolade ouvrante attendue
-// Exception: Symy n'a de sens que pour une dimension >= 2
-// Exception: Symz n'a de sens qu'en dimension 3
-// Exception: Les facteurs de progression doivent etre positifs
-// Exception: Il doit y avoir au moins deux mailles en x
-// Exception: accolade oubvrante attendue avant lecture des bords
-// Exception: mot cle non reconnu
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'un pave a partir d'un flot d'entree.
+ *
+ *     Le format de lecture d'un pave dans le jeu de donnee est le suivant:
+ *      PaveCoincidant nom_pave
+ *      {
+ *      Origine OX OY (OZ)
+ *      Longueurs LX LY (LZ)
+ *      Nombre_de_noeuds NX NY (NZ)
+ *      Facteurs Fx Fy (Fz)
+ *      (Symx)
+ *      (Symy)
+ *      (Symz)
+ *      }
+ *      {
+ *      (Bord)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
+ *      ...
+ *      (Raccord)  local homogene nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
+ *      ...
+ *      (Internes)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1
+ *      ...
+ *      (Joint)  nom X = X0 Y0 <= Y <= Y1 Z0 <= Z <= Z1 PE_voisin
+ *      ...
+ *      }
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws dimension d'espace necessaire pour mailler
+ * @throws accolade ouvrante attendue
+ * @throws Symy n'a de sens que pour une dimension >= 2
+ * @throws Symz n'a de sens qu'en dimension 3
+ * @throws Les facteurs de progression doivent etre positifs
+ * @throws Il doit y avoir au moins deux mailles en x
+ * @throws accolade oubvrante attendue avant lecture des bords
+ * @throws mot cle non reconnu
+ */
 Entree& PaveCoincidant::readOn(Entree& is)
 {
   Nom ledom,bh,bb,bd,bg,bder,bdev;

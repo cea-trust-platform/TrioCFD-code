@@ -27,20 +27,11 @@
 Implemente_instanciable(Temperature_imposee_paroi_rayo_semi_transp,"Paroi_temperature_imposee_rayo_semi_transp",Temperature_imposee_paroi);
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Temperature_imposee_paroi_rayo_semi_transp::printOn(Sortie& os) const
 {
   return os;
@@ -48,21 +39,11 @@ Sortie& Temperature_imposee_paroi_rayo_semi_transp::printOn(Sortie& os) const
 
 
 
-// Description:
-//    Simple appel a: Temperature_imposee_paroi::readOn(Entree&)
-//    Lit la CL a partir d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a: Temperature_imposee_paroi::readOn(Entree&) Lit la CL a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Temperature_imposee_paroi_rayo_semi_transp::readOn(Entree& is)
 {
   return Temperature_imposee_paroi::readOn(is);
@@ -76,26 +57,15 @@ void Temperature_imposee_paroi_rayo_semi_transp::completer()
 
 
 
-// Description:
-//    Renvoie un booleen indiquant la compatibilite des conditions
-//    aux limites avec l'equation specifiee en parametre.
-//    Des CL de type Temperature_imposee_paroi sont compatibles
-//    avec une equation dont le domaine est la Thermique
-//    ou bien indetermine.
-// Precondition:
-// Parametre: Equation_base& eqn
-//    Signification: l'equation avec laquelle il faut verifier la compatibilite
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour: int
-//    Signification: valeur booleenne,
-//                   1 si les CL sont compatibles avec l'equation
-//                   0 sinon
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie un booleen indiquant la compatibilite des conditions aux limites avec l'equation specifiee en parametre.
+ *
+ *     Des CL de type Temperature_imposee_paroi sont compatibles
+ *     avec une equation dont le domaine est la Thermique
+ *     ou bien indetermine.
+ *
+ * @param (Equation_base& eqn) l'equation avec laquelle il faut verifier la compatibilite
+ * @return (int) valeur booleenne, 1 si les CL sont compatibles avec l'equation 0 sinon
+ */
 int Temperature_imposee_paroi_rayo_semi_transp::compatible_avec_eqn(const Equation_base& eqn) const
 {
   Motcle dom_app=eqn.domaine_application();

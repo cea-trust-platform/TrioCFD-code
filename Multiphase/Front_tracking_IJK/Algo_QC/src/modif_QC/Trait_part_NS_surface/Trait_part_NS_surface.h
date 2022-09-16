@@ -27,19 +27,15 @@
 #include <IntTab.h>
 class Navier_Stokes_Turbulent;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Traitement_particulier_NS_surface
-//     Cette classe permet de faire les traitements particuliers
-//     pour le calcul d'un canal surface :
-//         * conservation du debit
-//         * calculs de moyennes
-//
-// .SECTION voir aussi
-//      Navier_Stokes_Turbulent, Traitement_particulier_base,
-//      Traitement_particulier_VDF
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Traitement_particulier_NS_surface Cette classe permet de faire les traitements particuliers
+ *
+ *      pour le calcul d'un canal surface :
+ *          * conservation du debit
+ *          * calculs de moyennes
+ * 
+ *
+ * @sa Navier_Stokes_Turbulent, Traitement_particulier_base,, Traitement_particulier_VDF 
+ */
 class Traitement_particulier_NS_surface : public Traitement_particulier_NS_base
 {
   Declare_base(Traitement_particulier_NS_surface);

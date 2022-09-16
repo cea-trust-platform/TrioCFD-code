@@ -27,20 +27,15 @@
 #include <Equation_rayonnement_base.h>
 
 
-/////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Eq_rayo_semi_transp
-//    Cette classe represente l'equation de rayonnement pour l'irradiance
-//    dans un milieu semi transparent.
-//    elle est associee au modele de rayonnement semi transparent
-//    Elle definit la methode resoudre et calcule l'irradiance.
-//
-// .SECTION voir aussi
-//    Equation_rayonnement
-//////////////////////////////////////////////////////////////////////
-
-
+/*! @brief classe Eq_rayo_semi_transp Cette classe represente l'equation de rayonnement pour l'irradiance
+ *
+ *     dans un milieu semi transparent.
+ *     elle est associee au modele de rayonnement semi transparent
+ *     Elle definit la methode resoudre et calcule l'irradiance.
+ *
+ *
+ * @sa Equation_rayonnement
+ */
 class Eq_rayo_semi_transp_VEF: public Equation_rayonnement_base
 {
   Declare_instanciable(Eq_rayo_semi_transp_VEF);

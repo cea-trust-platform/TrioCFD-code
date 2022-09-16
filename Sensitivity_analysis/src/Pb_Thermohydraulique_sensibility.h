@@ -26,20 +26,16 @@
 #include <Navier_Stokes_std_sensibility.h>
 #include <Convection_Diffusion_Temperature_sensibility.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Pb_Thermohydraulique_sensibility
-//
-// <Description of class Pb_Thermohydraulique_sensibility>
-//  Cette classe represente un probleme de sensibilite thermohydraulique :
-//      - Equations de Navier_Stokes_sensibility en regime laminaire
-//        pour un fluide incompressible
-//      - Equation sensibilite d'energie en regime laminaire
-// .SECTION voir aussi
-//     class Pb_Thermohydraulique, class Navier_Stokes_sensibility, class Convection_Diffusion_Temperature_sensibility
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Pb_Thermohydraulique_sensibility
+ *
+ *  <Description of class Pb_Thermohydraulique_sensibility>
+ *   Cette classe represente un probleme de sensibilite thermohydraulique :
+ *       - Equations de Navier_Stokes_sensibility en regime laminaire
+ *         pour un fluide incompressible
+ *       - Equation sensibilite d'energie en regime laminaire
+ *
+ * @sa class Pb_Thermohydraulique, class Navier_Stokes_sensibility, class Convection_Diffusion_Temperature_sensibility
+ */
 class Pb_Thermohydraulique_sensibility : public Pb_Fluide_base
 {
 

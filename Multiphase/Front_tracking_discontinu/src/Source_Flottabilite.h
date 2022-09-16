@@ -25,14 +25,14 @@
 
 
 
-// .DESCRIPTION class Source_Flottabilite
-//  Calcul de la force de flottabilite (expression vectorielle) :
-//  F_fl = rho_p*vol_p*g-vol_p*grad_P
-//  vol_p designe le volume de la particule
-//
-// .SECTION voir aussi
-//  Source_Action_Particules
-
+/*! @brief class Source_Flottabilite Calcul de la force de flottabilite (expression vectorielle) :
+ *
+ *   F_fl = rho_p*vol_p*g-vol_p*grad_P
+ *   vol_p designe le volume de la particule
+ *
+ *
+ * @sa Source_Action_Particules
+ */
 #include <Source_Action_Particules.h>
 
 

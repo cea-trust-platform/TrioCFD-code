@@ -37,15 +37,14 @@
 // #define SMOOTHING_RHO
 static const int max_authorized_nb_of_groups_ = 3;
 
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : IJK_Interfaces
-// .DESCRIPTION : class IJK_Interfaces
-//
-// Cette classe rassemble tous les algorithmes de gestion des interfaces pour le ijk
-// (le maillage, les algo de remaillage, sauvegarde, reprise, etc)
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class IJK_Interfaces
+ *
+ *  Cette classe rassemble tous les algorithmes de gestion des interfaces pour le ijk
+ *  (le maillage, les algo de remaillage, sauvegarde, reprise, etc)
+ * 
+ * 
+ *
+ */
 class IJK_Interfaces : public Objet_U
 {
 

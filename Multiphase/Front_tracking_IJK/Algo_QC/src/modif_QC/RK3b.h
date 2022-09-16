@@ -31,23 +31,20 @@
 class Pb_MG;
 class Pb_2G;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe RK3
-//     Cette classe represente un schema en temps de Runge Kutta d'ordre 3
-//     (cas 7 de Williamson) s'ecrit :
-//     q1=h f(x0)
-//     x1=x0+b1 q1
-//     q2=h f(x1) +a2 q1
-//     x2=x1+b2 q2
-//     q3=h f(x2)+a3 q2
-//     x3=x2+b3 q3
-//      avec a1=0, a2=-5/9, a3=-153/128
-//                              b1=1/3, b2=15/16, b3=8/15
-// .SECTION voir aussi
-//     Schema_Temps_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe RK3 Cette classe represente un schema en temps de Runge Kutta d'ordre 3
+ *
+ *      (cas 7 de Williamson) s'ecrit :
+ *      q1=h f(x0)
+ *      x1=x0+b1 q1
+ *      q2=h f(x1) +a2 q1
+ *      x2=x1+b2 q2
+ *      q3=h f(x2)+a3 q2
+ *      x3=x2+b3 q3
+ *       avec a1=0, a2=-5/9, a3=-153/128
+ *                               b1=1/3, b2=15/16, b3=8/15
+ *
+ * @sa Schema_Temps_base 
+ */
 class RK3b: public Schema_Temps_base
 {
 

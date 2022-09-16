@@ -26,14 +26,14 @@
 
 #include <Mod_turb_hyd_ss_maille_VDF.h>
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_Smago_VDF
-// Cette classe correspond a la mise en oeuvre du modele sous
-// maille Smagorinsky en VDF
-//
-
-// .SECTION  voir aussi
-// Mod_turb_hyd_ss_maille
-
+/*! @brief classe Turbulence_hyd_sous_maille_Smago_VDF Cette classe correspond a la mise en oeuvre du modele sous
+ *
+ *  maille Smagorinsky en VDF
+ *
+ *  .SECTION  voir aussi
+ *  Mod_turb_hyd_ss_maille
+ *
+ */
 class Turbulence_hyd_sous_maille_Smago_VDF : public Mod_turb_hyd_ss_maille_VDF
 {
 

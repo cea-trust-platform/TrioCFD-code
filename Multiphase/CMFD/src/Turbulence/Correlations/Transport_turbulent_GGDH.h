@@ -25,14 +25,12 @@
 #include <TRUSTTab.h>
 #include <Transport_turbulent_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Transport_turbulent_GGDH
-//    Transport turbulent de type GGDH:
-//    < u'_i theta'> = - C_s * k / epsilon * <u'_i u'_j> * d_j theta
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Transport_turbulent_GGDH Transport turbulent de type GGDH:
+ *
+ *     < u'_i theta'> = - C_s * k / epsilon * <u'_i u'_j> * d_j theta
+ *
+ *
+ */
 class Transport_turbulent_GGDH : public Transport_turbulent_base
 {
   Declare_instanciable(Transport_turbulent_GGDH);

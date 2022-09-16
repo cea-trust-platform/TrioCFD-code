@@ -46,8 +46,9 @@ Convection_Diffusion_Concentration_FT_Disc::Convection_Diffusion_Concentration_F
   modele_cinetique_ = 1;
 }
 
-// Description:
-//  cf Convection_Diffusion_Concentration::readOn(is)
+/*! @brief cf Convection_Diffusion_Concentration::readOn(is)
+ *
+ */
 Entree& Convection_Diffusion_Concentration_FT_Disc::readOn(Entree& is)
 {
   Convection_Diffusion_Concentration::readOn(is);
@@ -141,8 +142,11 @@ int Convection_Diffusion_Concentration_FT_Disc::lire_motcle_non_standard(const M
   return 1;
 }
 
-// Description: calcul de l'integrale du champ sur tout le domaine.
-//  A factoriser un jour quelque part...
+/*! @brief calcul de l'integrale du champ sur tout le domaine.
+ *
+ * A factoriser un jour quelque part...
+ *
+ */
 static double integrale(const Champ_base& ch)
 {
   double somme = 0.;
@@ -172,8 +176,11 @@ static double integrale(const Champ_base& ch)
   return somme;
 }
 
-// Description: calcul de l'indicatrice aux faces...
-//  A factoriser un jour...
+/*! @brief calcul de l'indicatrice aux faces.
+ *
+ * .. A factoriser un jour...
+ *
+ */
 static void calculer_indicatrice_comme(const Champ_base& src, DoubleTab& dest, const Champ_base& champ_modele)
 {
   assert(sub_type(Champ_Inc_P0_base, src));
@@ -456,8 +463,9 @@ void Convection_Diffusion_Concentration_FT_Disc::marquer_faces_sous_zone(const N
     }
 }
 
-// Description: appel a mettre_a_jour() de l'ancetre et application de l' "option_" choisie
-//   pour traiter la presence d'une interface.
+/*! @brief appel a mettre_a_jour() de l'ancetre et application de l' "option_" choisie pour traiter la presence d'une interface.
+ *
+ */
 void Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour(double temps)
 {
   Debog::verifier("Convection_Diffusion_Concentration_FT_Disc::mettre_a_jour c1", inconnue().valeur().valeurs());

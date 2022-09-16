@@ -30,11 +30,9 @@ class Zone_VF;
 class Domaine;
 #include <TRUSTTabs_forward.h>
 
-//
-// .DESCRIPTION class Connectivites
-//
-// .SECTION voir aussi
-
+/*! @brief class Connectivites
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

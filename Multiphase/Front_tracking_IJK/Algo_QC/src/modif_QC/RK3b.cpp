@@ -25,122 +25,87 @@
 Implemente_instanciable(RK3b,"Runge_Kutta_ordre_3_QC",Schema_Temps_base);
 
 
-// Description:
-//    Simple appel a: Schema_Temps_base::printOn(Sortie& )
-//    Ecrit le schema en temps sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Schema_Temps_base::printOn(Sortie& ) Ecrit le schema en temps sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& RK3b::printOn(Sortie& s) const
 {
   return  Schema_Temps_base::printOn(s);
 }
 
 
-// Description:
-//    Lit le schema en temps a partir d'un flot d'entree.
-//    Simple appel a: Schema_Temps_base::readOn(Entree& )
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit le schema en temps a partir d'un flot d'entree.
+ *
+ * Simple appel a: Schema_Temps_base::readOn(Entree& )
+ *
+ * @param (Entree& s) un flot d'entree 
+ * @return (Entree&) le flot d'entree modifie 
+ */
 Entree& RK3b::readOn(Entree& s)
 {
   return Schema_Temps_base::readOn(s) ;
 }
 
 
-////////////////////////////////
-//                            //
-// Caracteristiques du schema //
-//                            //
-////////////////////////////////
-
-
-// Description:
-//    Renvoie le nombre de valeurs temporelles a conserver.
-//    Ici : n et n+1, donc 2.
+/*! @brief Renvoie le nombre de valeurs temporelles a conserver.
+ *
+ * Ici : n et n+1, donc 2.
+ *
+ */
 int RK3b::nb_valeurs_temporelles() const
 {
   return 2 ;
 }
 
-// Description:
-//    Renvoie le nombre de valeurs temporelles futures.
-//    Ici : n+1, donc 1.
+/*! @brief Renvoie le nombre de valeurs temporelles futures.
+ *
+ * Ici : n+1, donc 1.
+ *
+ */
 int RK3b::nb_valeurs_futures() const
 {
   return 1 ;
 }
 
-// Description:
-//    Renvoie le le temps a la i-eme valeur future.
-//    Ici : t(n+1)
+/*! @brief Renvoie le le temps a la i-eme valeur future.
+ *
+ * Ici : t(n+1)
+ *
+ */
 double RK3b::temps_futur(int i) const
 {
   assert(i==1);
   return temps_courant()+pas_de_temps();
 }
 
-// Description:
-//    Renvoie le temps que doivent rendre les champs a
-//    l'appel de valeurs()
-//    Ici : t(n+1)
+/*! @brief Renvoie le temps que doivent rendre les champs a l'appel de valeurs()
+ *
+ *     Ici : t(n+1)
+ *
+ */
 double RK3b::temps_defaut() const
 {
   return temps_courant()+pas_de_temps();
 }
 
-/////////////////////////////////////////
-//                                     //
-// Fin des caract eristiques du sch ema  //
-//                                     //
-/////////////////////////////////////////
-
-
-// Description:
-//    Effectue un pas de temps de Runge Kutta d'ordre 3,
-//    sur l'equation passee en parametre.
-//    Le schema de Runge Kutta  d'ordre 3
-//     (cas 7 de Williamson) s'ecrit :
-//     q1=h f(x0)
-//     x1=x0+b1 q1
-//     q2=h f(x1) +a2 q1
-//     x2=x1+b2 q2
-//     q3=h f(x2)+a3 q2
-//     x3=x2+b3 q3
-//      avec a1=0, a2=-5/9, a3=-153/128
-//                              b1=1/3, b2=15/16, b3=8/15
-// Precondition:
-// Parametre: Equation_base& eqn
-//    Signification: l'equation que l'on veut faire avancer d'un
-//                   pas de temps
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Effectue un pas de temps de Runge Kutta d'ordre 3, sur l'equation passee en parametre.
+ *
+ *     Le schema de Runge Kutta  d'ordre 3
+ *      (cas 7 de Williamson) s'ecrit :
+ *      q1=h f(x0)
+ *      x1=x0+b1 q1
+ *      q2=h f(x1) +a2 q1
+ *      x2=x1+b2 q2
+ *      q3=h f(x2)+a3 q2
+ *      x3=x2+b3 q3
+ *       avec a1=0, a2=-5/9, a3=-153/128
+ *                               b1=1/3, b2=15/16, b3=8/15
+ *
+ * @param (Equation_base& eqn) l'equation que l'on veut faire avancer d'un pas de temps 
+ * @return (int) renvoie toujours 1 
+ */
 int RK3b::faire_un_pas_de_temps_eqn_base(Equation_base& eqn)
 {
   Cerr<<" ce schema ne doit servir que pour le QC.... qui a recode le RK3" <<finl;

@@ -128,8 +128,9 @@ void Connectivite_frontieres::associer_zone_vf(const Zone_VF& zone_vf)
   remplir_faces_voisins(zone_vf);
 }
 
-// Description:  Remplissage de faces_voisins_
-// Precondition: def_face_aretes_ doit avoir ete rempli avant.
+/*! @brief Remplissage de faces_voisins_
+ *
+ */
 void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
 {
   int i_frontiere; // Un numero de frontiere (bord, raccord ou faces internes)
@@ -282,8 +283,9 @@ void Connectivite_frontieres::remplir_faces_voisins(const Zone_VF& zone_vf)
     }
 }
 
-// Description:
-//  Constructeur par copie : produit une erreur.
+/*! @brief Constructeur par copie : produit une erreur.
+ *
+ */
 Connectivite_frontieres::Connectivite_frontieres(const Connectivite_frontieres& a): Objet_U(a)
 {
   Cerr << "Erreur : Connectivite_frontieres::Connectivite_frontieres(const Connectivite_frontieres &)"
@@ -292,8 +294,9 @@ Connectivite_frontieres::Connectivite_frontieres(const Connectivite_frontieres& 
   exit();
 }
 
-// Description:
-//  Operateur copie : produit une erreur.
+/*! @brief Operateur copie : produit une erreur.
+ *
+ */
 const Connectivite_frontieres& Connectivite_frontieres::operator=(const Connectivite_frontieres&)
 {
   Cerr << "Erreur : Connectivite_frontieres::operator=" << finl;

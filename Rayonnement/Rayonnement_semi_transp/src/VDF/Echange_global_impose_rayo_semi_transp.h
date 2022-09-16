@@ -26,17 +26,12 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Echange_global_impose.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Echange_global_impose_rayo_semi_transp
-//   cette classe est utilisee pour imposer une temperature de paroi imposee
-//   uniquement pour une discretisation VDF.
-//
-// .SECTION voir aussi
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Echange_global_impose_rayo_semi_transp cette classe est utilisee pour imposer une temperature de paroi imposee
+ *
+ *    uniquement pour une discretisation VDF.
+ *
+ *
+ */
 class Echange_global_impose_rayo_semi_transp: public Cond_Lim_rayo_semi_transp, public Echange_global_impose
 {
   Declare_instanciable(Echange_global_impose_rayo_semi_transp);

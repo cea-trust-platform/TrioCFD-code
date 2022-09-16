@@ -30,29 +30,15 @@
 #include <Schema_Temps_base.h>
 #include <Avanc.h>
 
-// Description:
-//    Associe le modele de turbulence a l'equation passee
-//    en parametre
-//    Construit le modele de turbulence a partir d'un flot d'entree,
-//    et le discretise.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Parametre: Equation_base& eqn
-//    Signification: l'equation auquel le modele de turbulence doit
-//                   etre associe
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe le modele de turbulence a l'equation passee en parametre
+ *
+ *     Construit le modele de turbulence a partir d'un flot d'entree,
+ *     et le discretise.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @param (Equation_base& eqn) l'equation auquel le modele de turbulence doit etre associe
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Convection_Diffusion_Turbulent::lire_modele(Entree& is, const Equation_base& eqn)
 {
   Cerr << "Reading and typing of the turbulence model : " << finl;
@@ -159,20 +145,9 @@ Entree& Convection_Diffusion_Turbulent::lire_op_diff_turbulent(Entree& is, const
   return is;
 }
 
-// Description:
-//    Complete le modele de turbulence.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Complete le modele de turbulence.
+ *
+ */
 void Convection_Diffusion_Turbulent::completer()
 {
   le_modele_turbulence.completer();
@@ -186,20 +161,10 @@ bool Convection_Diffusion_Turbulent::initTimeStep(double dt)
 }
 
 
-// Description:
-//    Prepare le calcul.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prepare le calcul.
+ *
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Turbulent::preparer_calcul()
 {
   le_modele_turbulence.preparer_calcul();
@@ -207,43 +172,26 @@ int Convection_Diffusion_Turbulent::preparer_calcul()
 }
 
 
-// Description:
-//    Simple appel a Modele_turbulence_scal::sauvegarder(Sortie&)
-//    sur le membre concerne.
-//    Sauvegarde le modele de turbulence sur un flot
-//    de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: code de retour propage
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a Modele_turbulence_scal::sauvegarder(Sortie&) sur le membre concerne.
+ *
+ *     Sauvegarde le modele de turbulence sur un flot
+ *     de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) code de retour propage
+ */
 int Convection_Diffusion_Turbulent::sauvegarder(Sortie& os) const
 {
   return le_modele_turbulence.sauvegarder(os);
 }
 
 
-// Description:
-//    Reprise (apres une sauvegarde) a partir d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception: fin de fichier atteinte pendant la reprise
-// Effets de bord:
-// Postcondition:
+/*! @brief Reprise (apres une sauvegarde) a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (int) renvoie toujours 1
+ * @throws fin de fichier atteinte pendant la reprise
+ */
 int Convection_Diffusion_Turbulent::reprendre(Entree& is)
 {
   le_modele_turbulence.reprendre(is);
@@ -251,20 +199,10 @@ int Convection_Diffusion_Turbulent::reprendre(Entree& is)
 }
 
 
-// Description:
-//    Mise a jour en temps du modele de turbulence.
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Mise a jour en temps du modele de turbulence.
+ *
+ * @param (double temps) le temps de mise a jour
+ */
 void Convection_Diffusion_Turbulent::mettre_a_jour(double temps)
 {
   le_modele_turbulence.mettre_a_jour(temps);
