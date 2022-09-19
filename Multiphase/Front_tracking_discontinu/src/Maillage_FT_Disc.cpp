@@ -1034,10 +1034,15 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
             somme += indicatrice[elem_voisin];
             count++;
           }
+        // Bug fix Salim Hamidi 2019/25/02
         // Si count==1 l'algo etait considere non pertinent... pas toujours correction du bug
         // Correction testee en VDF mais deux cas test VEF ont fait des ecarts
         if(count == 1)
           {
+            // TODO: A investiguer
+            // Elem est une maille diphasique.
+            // Pourquoi lui met-on la valeur de somme qui vaut ici indicatrice[elem_voisin]
+            // qui est pure (indicatrice[elem_voisin] vaut 0 ou 1)
             elems_to_change.append_line(elem, (int)std::lrint(somme));
           }
         if (count > 1)
@@ -1606,7 +1611,6 @@ void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& n
   normale.resize(nbfacettes, dimension);
   if (dimension == 2)
     {
-      // On n'a pas encore decide de la definition de la surface en axi
       for (i = 0; i < nbfacettes; i++)
         {
           int s0 = facettes_(i,0);
@@ -1614,6 +1618,15 @@ void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& n
           double dx = sommets_(s1,0) - sommets_(s0,0);
           double dy = sommets_(s1,1) - sommets_(s0,1);
           double l = sqrt(dx * dx + dy * dy);
+          double inv_l;
+          if (l == 0.)
+            inv_l = 1.;
+          else
+            inv_l = 1. / l;
+
+          if (bidim_axi)
+            l *= angle_bidim_axi()*(sommets_(s1,0) + sommets_(s0,0))*0.5;
+
           surface[i] = l;
           if (l == 0.)
             {
@@ -1621,7 +1634,11 @@ void Maillage_FT_Disc::calcul_surface_normale(ArrOfDouble& surface, DoubleTab& n
               dy = -1.;
               nfacettes_nulles++;
             }
-          double inv_l = 1. / l;
+          // GB. 2020/17/06. In order to create a unit "normale",
+          // it is necessary to have inv_l as 1./sqrt(dx * dx + dy * dy)
+          // and not as : 1. / l after the correction!
+          // That is why 'inv_l' is calculated before 'if (bidim_axi)'
+          // double inv_l = 1. / l;
           normale(i, 0) = - dy * inv_l;
           normale(i, 1) = dx * inv_l;
         }
@@ -5835,6 +5852,33 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
               d_surface(s1, 1) +=           0.5 * (r1 + r2) * (nx);
               d_surface(s2, 0) += 0.5 * L + 0.5 * (r1 + r2) * (ny);
               d_surface(s2, 1) +=           0.5 * (r1 + r2) * (-nx);
+
+              // GB 09/01/2018. Correction to account for the surface differencial
+              // from the boundary face wetted by phase 0
+              int som[2];
+              double r[2];
+              som[0] = facettes_(facette, 0);
+              som[1] = facettes_(facette, 1);
+              r[0] = sommets_(s1, 0);
+              r[1] = sommets_(s2, 0);
+              for (int i2 = 0; i2 < 2; i2++)
+                {
+                  const int face = sommet_face_bord_[som[i2]];
+                  if (face < 0) // pas une face de bord
+                    continue;
+
+                  double costheta = tab_cos_theta(som[i2], 0);
+
+                  // Normale unitaire au bord
+                  double nfx, nfy, nfz;
+                  parcours.calculer_normale_face_bord(face,
+                                                      sommets_(som[i2],0), sommets_(som[i2],1), 0.,
+                                                      nfx, nfy, nfz);
+                  // Ajout de la contribution de la surface:
+                  double signe = (i2==0) ? -1. : 1.;
+                  d_surface(som[i2], 0) +=  r[i2] * signe * nfy * costheta;
+                  d_surface(som[i2], 1) +=  r[i2] * signe * nfx * costheta;
+                }
             }
         }
     }
