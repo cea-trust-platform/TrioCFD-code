@@ -40,129 +40,172 @@ Entree& Saturation_eau_c3::readOn(Entree& is)
   return is;
 }
 
-double Saturation_eau_c3::Tsat_(const double P) const
+void Saturation_eau_c3::Tsat_(const SpanD P, SpanD res, int ncomp, int ind) const
 {
 #if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return Ts;
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] = Ts;
+    }
 #else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::dP_Tsat_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return dP_Ts;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::Psat_(const double T) const
-{
-#if HAVE_LIBC3
-  int ienc = 0;
-  double Ps, dT_Ps, d2T_Ps, hls, dT_hls, hgs, dT_hgs, cpls, dT_cpls, cpgs, dT_cpgs, rhols, dT_rhols, rhogs, dT_rhogs;
-  F77NAME(FPSATT)(&ienc, &T, &Ps, &dT_Ps, &d2T_Ps, &hls, &dT_hls, &hgs, &dT_hgs, &cpls, &dT_cpls, &cpgs, &dT_cpgs, &rhols, &dT_rhols, &rhogs, &dT_rhogs);
-  return Ps;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::dT_Psat_(const double T) const
-{
-#if HAVE_LIBC3
-  int ienc = 0;
-  double Ps, dT_Ps, d2T_Ps, hls, dT_hls, hgs, dT_hgs, cpls, dT_cpls, cpgs, dT_cpgs, rhols, dT_rhols, rhogs, dT_rhogs;
-  F77NAME(FPSATT)(&ienc, &T, &Ps, &dT_Ps, &d2T_Ps, &hls, &dT_hls, &hgs, &dT_hgs, &cpls, &dT_cpls, &cpgs, &dT_cpgs, &rhols, &dT_rhols, &rhogs, &dT_rhogs);
-  return dT_Ps;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::Lvap_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return hgs - hls;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::dP_Lvap_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return dP_hgs - dP_hls;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::Hls_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return hls;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::dP_Hls_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return dP_hls;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::Hvs_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return hgs;
-#else
-  return 0;
-#endif
-}
-double Saturation_eau_c3::dP_Hvs_(const double P) const
-{
-#if HAVE_LIBC3
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  return dP_hgs;
-#else
-  return 0;
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
 #endif
 }
 
-double Saturation_eau_c3::sigma_(const double T, const double P) const
+void Saturation_eau_c3::dP_Tsat_(const SpanD P, SpanD res, int ncomp, int ind) const
 {
 #if HAVE_LIBC3
-  /* calcul a saturation */
-  int un = 1, ienc = 0;
-  double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
-  F77NAME(FTSATP)(&un, &ienc, &P, &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
-  /* calcul a T */
-  double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, surfaceTension, dP_surfaceTension;
-  F77NAME(FHVAPA)(&un, &ienc, &P, &T, &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &surfaceTension, &dP_surfaceTension);
-  return surfaceTension;
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] =  dP_Ts;
+    }
 #else
-  return 0;
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::Psat_(const SpanD T, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)T.size() / ncomp; i++)
+    {
+      int ienc = 0;
+      double Ps, dT_Ps, d2T_Ps, hls, dT_hls, hgs, dT_hgs, cpls, dT_cpls, cpgs, dT_cpgs, rhols, dT_rhols, rhogs, dT_rhogs;
+      F77NAME(FPSATT)(&ienc, &T[i * ncomp + ind], &Ps, &dT_Ps, &d2T_Ps, &hls, &dT_hls, &hgs, &dT_hgs, &cpls, &dT_cpls, &cpgs, &dT_cpgs, &rhols, &dT_rhols, &rhogs, &dT_rhogs);
+      res[i * ncomp + ind] = Ps;
+    }
+#else
+  for (int i =0; i < (int)T.size() / ncomp; i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::dT_Psat_(const SpanD T, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)T.size() / ncomp; i++)
+    {
+      int ienc = 0;
+      double Ps, dT_Ps, d2T_Ps, hls, dT_hls, hgs, dT_hgs, cpls, dT_cpls, cpgs, dT_cpgs, rhols, dT_rhols, rhogs, dT_rhogs;
+      F77NAME(FPSATT)(&ienc, &T[i * ncomp + ind], &Ps, &dT_Ps, &d2T_Ps, &hls, &dT_hls, &hgs, &dT_hgs, &cpls, &dT_cpls, &cpgs, &dT_cpgs, &rhols, &dT_rhols, &rhogs, &dT_rhogs);
+      res[i * ncomp + ind] = dT_Ps;
+    }
+#else
+  for (int i =0; i < (int)T.size() / ncomp; i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::Lvap_(const SpanD P, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] =  hgs - hls;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::dP_Lvap_(const SpanD P, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] = dP_hgs - dP_hls;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::Hls_(const SpanD P, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] = hls;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::dP_Hls_(const SpanD P, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] = dP_hls;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::Hvs_(const SpanD P, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] = hgs;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::dP_Hvs_(const SpanD P, SpanD res, int ncomp, int ind) const
+{
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      res[i * ncomp + ind] = dP_hgs;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
+#endif
+}
+
+void Saturation_eau_c3::sigma_(const SpanD T, const SpanD P, SpanD res, int ncomp, int ind) const
+{
+  //TODO : FIXME : verifier indices ...
+#if HAVE_LIBC3
+  for (int i =0; i < (int)P.size(); i++)
+    {
+      /* calcul a saturation */
+      int un = 1, ienc = 0;
+      double Ts, dP_Ts, d2P_Ts, hls, dP_hls, hgs, dP_hgs, cpls, dP_cpls, cpgs, dP_cpgs, rhols, dP_rhols, rhogs, dP_rhogs;
+      F77NAME(FTSATP)(&un, &ienc, &P[i], &Ts, &dP_Ts, &d2P_Ts, &hls, &dP_hls, &hgs, &dP_hgs, &cpls, &dP_cpls, &cpgs, &dP_cpgs, &rhols, &dP_rhols, &rhogs, &dP_rhogs);
+      /* calcul a T */
+      double cond, dT_cond, dP_cond, visc, dP_visc, dT_visc, surfaceTension, dP_surfaceTension;
+      F77NAME(FHVAPA)(&un, &ienc, &P[i], &T[i * ncomp + ind], &Ts, &dP_Ts, &cond, &dP_cond, &dT_cond, &visc, &dP_visc, &dT_visc, &surfaceTension, &dP_surfaceTension);
+      res[i] = surfaceTension;
+    }
+#else
+  for (int i =0; i < (int)P.size(); i++) res[i] = 0;
 #endif
 }

@@ -112,8 +112,8 @@ void Coalescence_Yao_Morel::ajouter_blocs(matrices_t matrices, DoubleTab& secmem
         if (alpha(e, k) > 1.e-6)
           {
             Interface_base& interface = milc.get_interface(n_l, k) ;
-            double sigma = interface.sigma_(temp(e,n_l),press(e,n_l * (Np > 1)));
-            double We = 2 * rho(e, n_l) * std::pow(epsilon(e, n_l)*d_bulles_p(e,k), 2./3.) * d_bulles_p(e,k) / sigma ;
+            double sigma___ = interface.sigma(temp(e,n_l),press(e,n_l * (Np > 1)));
+            double We = 2 * rho(e, n_l) * std::pow(epsilon(e, n_l)*d_bulles_p(e,k), 2./3.) * d_bulles_p(e,k) / sigma___ ;
             double g_alpha = (alpha_max_1_3 - std::pow(alpha_p(e,k), 1./3.) ) / alpha_max_1_3 ;
             double eps_loc ;
 

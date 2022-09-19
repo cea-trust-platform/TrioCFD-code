@@ -150,7 +150,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
                 if (milc.has_interface(n,k))
                   {
                     Interface_base& sat = milc.get_interface(n, k);
-                    sigma_l(n,k) += vf_dir(f, c)/vf(f) * sat.sigma_(temp(e,n),press(e,n * (Np > 1)));
+                    sigma_l(n,k) += vf_dir(f, c)/vf(f) * sat.sigma(temp(e,n),press(e,n * (Np > 1)));
                   }
             for (int k = 0; k < N; k++)
               for (int l = 0; l < N; l++)
@@ -205,7 +205,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
           if (milc.has_interface(n,k))
             {
               Interface_base& sat = milc.get_interface(n, k);
-              sigma_l(n,k) += sat.sigma_(temp(e,n),press(e,n * (Np > 1)));
+              sigma_l(n,k) += sat.sigma(temp(e,n),press(e,n * (Np > 1)));
             }
 
       for (int k = 0; k < N; k++)
@@ -263,7 +263,7 @@ void Correction_Lubchenko_PolyMAC_P0::ajouter_blocs(matrices_t matrices, DoubleT
               if(milc.has_interface(n, k))
                 {
                   Interface_base& sat = milc.get_interface(n, k);
-                  sigma_l(n,k) = sat.sigma_(temp(e,n), press(e,n * (Np > 1)));
+                  sigma_l(n,k) = sat.sigma(temp(e,n), press(e,n * (Np > 1)));
                 }
           }
 
