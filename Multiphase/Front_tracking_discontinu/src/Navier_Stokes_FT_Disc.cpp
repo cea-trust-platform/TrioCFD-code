@@ -43,6 +43,7 @@
 #include <Matrice_Morse_Sym.h>
 #include <Matrice_Bloc.h>
 #include <Param.h>
+#include <Zone_Cl_VDF.h>
 
 
 Implemente_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_FT_Disc,"Navier_Stokes_FT_Disc",Navier_Stokes_Turbulent);
@@ -62,6 +63,9 @@ public:
     clipping_courbure_interface(1e40),// Par defaut, pas de clipping
     terme_gravite_(GRAVITE_GRAD_I),   // Par defaut terme gravite ft sans courants parasites
     is_explicite(1),                  // Par defaut, calcul explicite de vpoint etape predicition
+    is_boussinesq_(0),                // Par defaut, l'hypothese de Boussinesq n'est pas utilisee pour la flottabilite dans les phases.
+    historical_mass_source_(0),       // Par defaut, on utilise la nouvelle methode pour imposer le saut de vitesse du changement de phase.
+    type_interpol_indic_pour_dI_dt_(INTERP_STANDARD), // Default is the historical interpolation
     is_penalized(0),                  // Par defaut, pas de penalisation L2 du forcage
     eta(1.0),                         // Par defaut, coefficient de penalisation L2 = 1.
     p_ref_pena(-1.e40),               // Par defaut, pas de penalisation L2 de la pression sinon valeur reference
@@ -75,6 +79,7 @@ public:
   int mpointv_inactif;
 
   Champ_Fonc second_membre_projection;
+  Champ_Fonc second_membre_projection_jump_;
   Champ_Fonc derivee_u_etoile;
   Champ_Fonc gradient_pression;
   Champ_Fonc terme_diffusion;
@@ -92,6 +97,8 @@ public:
   Champ_Fonc mpoint_vap;
   // Variation temporelle indicatrice de phase
   Champ_Fonc derivee_temporelle_indicatrice;
+  Champ_Fonc ai; // Eulerian interfacial area.
+  Champ_Inc vitesse_jump0_; // Extended Velocity of phase 0.
 
   LIST(REF(Champ_base)) liste_champs_compris;
 
@@ -121,6 +128,14 @@ public:
   // Si is_explicite != 0,
   //   on calcul vpoint de facon explicite dans l etape de prediction des vitesses.
   int is_explicite;
+  // Si is_boussinesq_ != 0, on calcul une force par le modele de boussinesq
+  int is_boussinesq_;
+  // Flag pour la method du saut de vitesse :
+  int historical_mass_source_;
+
+  enum Type_interpol_indic_pour_dI_dt { INTERP_STANDARD, INTERP_MODIFIEE, INTERP_AI_BASED };
+  Type_interpol_indic_pour_dI_dt type_interpol_indic_pour_dI_dt_;
+
   // Si is_penalized != 0,
   //   on penalise L2 le terme de forcage.
   int is_penalized;
@@ -214,7 +229,7 @@ static void FT_disc_calculer_champs_rho_mu_nu_dipha(const Zone_dis_base&      zo
     nu_elem.echange_espace_virtuel();
   }
 
-// Calcul de rho aux faces (on suppose que la vitesse est aux faces)
+  // Calcul de rho aux faces (on suppose que la vitesse est aux faces)
   {
     assert(rho_elem.size() == zone_dis_base.nb_elem());
     const IntTab& face_voisins = zone_dis_base.face_voisins();
@@ -915,6 +930,31 @@ const int& Navier_Stokes_FT_Disc::get_is_penalized() const
   return variables_internes().is_penalized;
 }
 
+const int& Navier_Stokes_FT_Disc::get_historical_mass_source() const
+{
+  return variables_internes().historical_mass_source_;
+}
+
+const DoubleTab& Navier_Stokes_FT_Disc::get_interfacial_area() const
+{
+  return variables_internes().ai.valeur().valeurs();
+}
+
+DoubleTab& Navier_Stokes_FT_Disc::get_set_interfacial_area()
+{
+  return variables_internes().ai.valeur().valeurs();
+}
+
+const DoubleTab& Navier_Stokes_FT_Disc::get_mpoint() const
+{
+  return variables_internes().mpoint.valeur().valeurs();
+}
+
+DoubleTab& Navier_Stokes_FT_Disc::get_set_mpoint()
+{
+  return variables_internes().mpoint.valeur().valeurs();
+}
+
 void Navier_Stokes_FT_Disc::preparer_pas_de_temps()
 {
 }
@@ -929,7 +969,10 @@ void Navier_Stokes_FT_Disc::mettre_a_jour(double temps)
   champ_nu_.mettre_a_jour(temps);
 }
 
-
+const SolveurSys& Navier_Stokes_FT_Disc::get_solveur_pression() const
+{
+  return solveur_pression_;
+}
 
 // Description:
 //  Calcul des forces de tension superficielles (F_sigma) et de la partie

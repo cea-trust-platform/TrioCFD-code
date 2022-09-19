@@ -64,6 +64,14 @@ public:
 
   virtual void calculer_dI_dt(DoubleVect& dI_dt) const;
   const int& get_is_penalized() const;
+  const int& get_historical_mass_source() const;
+  const DoubleTab& get_interfacial_area() const;
+  DoubleTab& get_set_interfacial_area();  // Open access  in write-mode..
+  const DoubleTab& get_mpoint() const;
+  DoubleTab& get_set_mpoint(); // Open access to mpoint in write-mode...
+  //void corriger_mpoint(); // Apply correction based on TCL model
+
+  const SolveurSys& get_solveur_pression() const;
 
 protected:
   // Methode surchargee de Navier_Stokes_std :
