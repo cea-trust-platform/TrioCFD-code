@@ -24,16 +24,12 @@
 
 #include <Transport_K_ou_Eps.h>
 #include <Modele_Fonc_Bas_Reynolds.h>
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Modele_turbulence_hyd_K_Eps_Bicephale
-//    Cette classe represente le modele de turbulence (k,eps) pour les
-//    equations de Navier-Stokes ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
-// .SECTION voir aussi
-//    Mod_turb_hyd_base Mod_turb_hyd_ss_maille
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Modele_turbulence_hyd_K_Eps_Bicephale Cette classe represente le modele de turbulence (k,eps) pour les
+ *
+ *     equations de Navier-Stokes ou les 2 equations de k et eps sont gerees separement du point de vue informatique.
+ *
+ * @sa Mod_turb_hyd_base Mod_turb_hyd_ss_maille
+ */
 class Modele_turbulence_hyd_K_Eps_Bicephale : public Mod_turb_hyd_RANS_Bicephale
 {
 
@@ -74,167 +70,85 @@ protected:
 };
 
 
-// Description:
-//    Renvoie le champ inconnue K du modele de turbulence
-//    Cette inconnue est portee
-//    par l equation de transport K porte par le modele.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (K)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie le champ inconnue K du modele de turbulence Cette inconnue est portee
+ *
+ *     par l equation de transport K porte par le modele.
+ *     (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue (K)
+ */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K() const
 {
   return eqn_transport_K.inconnue();
 }
 
 
-// Description:
-//    Renvoie le champ inconnue K du modele de turbulence
-//    Cette inconnue est portee
-//    par l equation de transport K porte par le modele.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (K)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie le champ inconnue K du modele de turbulence Cette inconnue est portee
+ *
+ *     par l equation de transport K porte par le modele.
+ *
+ * @return (Champ_Inc&) le champ inconnue (K)
+ */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::K()
 {
   return eqn_transport_K.inconnue();
 }
 
-// Description:
-//    Renvoie le champ inconnue epsilon du modele de turbulence
-//    Cette inconnue est portee
-//    par l equation de transport epsilon porte par le modele.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (epsilon)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie le champ inconnue epsilon du modele de turbulence Cette inconnue est portee
+ *
+ *     par l equation de transport epsilon porte par le modele.
+ *     (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue (epsilon)
+ */
 inline const Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps() const
 {
   return eqn_transport_Eps.inconnue();
 }
 
 
-// Description:
-//    Renvoie le champ inconnue epsilon du modele de turbulence
-//    Cette inconnue est portee
-//    par l equation de transport epsilon porte par le modele.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue (epsilon)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie le champ inconnue epsilon du modele de turbulence Cette inconnue est portee
+ *
+ *     par l equation de transport epsilon porte par le modele.
+ *
+ * @return (Champ_Inc&) le champ inconnue (epsilon)
+ */
 inline Champ_Inc& Modele_turbulence_hyd_K_Eps_Bicephale::Eps()
 {
   return eqn_transport_Eps.inconnue();
 }
 
-// Description:
-//    Renvoie l equation d evolution de K du modele de turbulence
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Transport_K_ou_Eps&
-//    Signification: equation (K)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie l equation d evolution de K du modele de turbulence
+ *
+ * @return (Transport_K_ou_Eps&) equation (K)
+ */
 inline Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_K()
 {
   return eqn_transport_K;
 }
 
-// Description:
-//    Renvoie l equation d evolution de K du modele de turbulence
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Transport_K_ou_Eps&
-//    Signification: equation (K)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie l equation d evolution de K du modele de turbulence (version const)
+ *
+ * @return (Transport_K_ou_Eps&) equation (K)
+ */
 inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_K() const
 {
   return eqn_transport_K;
 }
 
-// Description:
-//    Renvoie l equation d evolution de epsilon du modele de turbulence
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Transport_K_ou_Eps&
-//    Signification: equation (epsilon)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie l equation d evolution de epsilon du modele de turbulence
+ *
+ * @return (Transport_K_ou_Eps&) equation (epsilon)
+ */
 inline Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_Eps()
 {
   return eqn_transport_Eps;
 }
 
-// Description:
-//    Renvoie l equation d evolution de epsilon du modele de turbulence
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Transport_K_ou_Eps&
-//    Signification: equation (epsilon)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l objet
+/*! @brief Renvoie l equation d evolution de epsilon du modele de turbulence (version const)
+ *
+ * @return (Transport_K_ou_Eps&) equation (epsilon)
+ */
 inline const Transport_K_ou_Eps_base& Modele_turbulence_hyd_K_Eps_Bicephale::eqn_transp_Eps() const
 {
   return eqn_transport_Eps;

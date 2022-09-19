@@ -26,14 +26,14 @@
 #include <Paroi_scal_hyd_base_VEF.h>
 
 
-//.DESCRIPTION classe Paroi_negligeable_scal_VEF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_negligeable_VEF
-
+/*! @brief classe Paroi_negligeable_scal_VEF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_negligeable_VEF
+ *
+ */
 class Paroi_negligeable_scal_VEF : public Paroi_scal_hyd_base_VEF
 {
 

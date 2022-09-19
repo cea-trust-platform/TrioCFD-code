@@ -145,11 +145,13 @@ void Sauvegarde_Reprise_Maillage_FT::ecrire_xyz(const Maillage_FT_Disc& mesh, co
   ecrire_tableau(fichier, facettes_to_save);
 }
 
-// Description: Remplissage du maillage mesh a partir d'un fichier de sauvegarde xyz (fichier)
-//  ou d'un domaine source (domaine_src pour importation d'une cao)
-//  zone_vf est la zone support du maillage (pour calcul de l'indice de l'element contenant chaque
-//  sommet du mesh. zone_vf peut etre nul dans le cas d'une reprise xyz au cours de l'etape 'avancer'.
-//  Dans ce cas, on lit les coordonnees et les elements mais on ne remplit pas mesh.
+/*! @brief Remplissage du maillage mesh a partir d'un fichier de sauvegarde xyz (fichier) ou d'un domaine source (domaine_src pour importation d'une cao)
+ *
+ *   zone_vf est la zone support du maillage (pour calcul de l'indice de l'element contenant chaque
+ *   sommet du mesh. zone_vf peut etre nul dans le cas d'une reprise xyz au cours de l'etape 'avancer'.
+ *   Dans ce cas, on lit les coordonnees et les elements mais on ne remplit pas mesh.
+ *
+ */
 void Sauvegarde_Reprise_Maillage_FT::lire_xyz(Maillage_FT_Disc& mesh,
                                               const Zone_VF * zone_vf,
                                               Entree * fichier,

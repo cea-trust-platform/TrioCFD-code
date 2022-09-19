@@ -27,16 +27,13 @@
 #include <Probleme_base.h>
 #include <Milieu_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_Turb_scal_diffuturb_base
-//    Cette classe represente la classe de base pour le modele de calcul suivant
-//    pour la diffusivite turbulente:
-//                  alpha_turb = visco_turb / coeff_turb;
-// .SECTION voir aussi
-//    Modele_turbulence_scal_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Mod_Turb_scal_diffuturb_base Cette classe represente la classe de base pour le modele de calcul suivant
+ *
+ *     pour la diffusivite turbulente:
+ *                   alpha_turb = visco_turb / coeff_turb;
+ *
+ * @sa Modele_turbulence_scal_base
+ */
 class Mod_Turb_scal_diffturb_base : public Modele_turbulence_scal_base
 {
 

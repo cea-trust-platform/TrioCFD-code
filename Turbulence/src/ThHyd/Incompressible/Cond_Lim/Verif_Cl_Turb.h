@@ -14,20 +14,17 @@
 *****************************************************************************/
 #include <Cond_lim.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Interface du module ThHyd.
-//    Contient 1 fonction:
-//      int tester_compatibilite_hydr_turb(const Zone_Cl_dis& , const Zone_Cl_dis& )
-//    qui servent a tester la coherence des conditions aux limites
-//    et la fonction
-//      int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& )
-//    qui affiche un message d'erreur pour la compatibilite hyd/turb
-// .SECTION voir aussi
-//    Fonction de librairie hors classe
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Interface du module ThHyd.
+ *
+ * Contient 1 fonction:
+ *       int tester_compatibilite_hydr_turb(const Zone_Cl_dis& , const Zone_Cl_dis& )
+ *     qui servent a tester la coherence des conditions aux limites
+ *     et la fonction
+ *       int message_erreur_turb(const Cond_lim& , const Cond_lim& , int& )
+ *     qui affiche un message d'erreur pour la compatibilite hyd/turb
+ *
+ * @sa Fonction de librairie hors classe
+ */
 class Zone_Cl_dis;
 
 // Fonctions qui servent a tester la coherence des conditions aux limites

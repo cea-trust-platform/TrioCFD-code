@@ -25,33 +25,24 @@
 Implemente_instanciable(Entree_fluide_vitesse_imposee_ALE,"Frontiere_ouverte_vitesse_imposee_ALE",Entree_fluide_vitesse_imposee);
 //XD Entree_fluide_vitesse_imposee_ALE dirichlet Frontiere_ouverte_vitesse_imposee_ALE -1 Class for velocity boundary condition on a mobile boundary (ALE framework). NL2 To be used when Reichardt's wall law is applied on a moving boundary. NL2 The imposed velocity field is vectorial of type Ch_front_input_ALE or Champ_front_ALE.  NL2 Example: frontiere_ouverte_vitesse_imposee_ALE Champ_front_ALE 2 0.5*cos(0.5*t) 0.0
 
-// Description:
-// Class for velocity boundary condition on a mobile boundary (ALE framework)
-// To be used when Reichardt's wall law is applied on a moving boundary.
-// Allowing the adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid.
-// See the mathematical considerations in the reference:
-// Computation of unsteady viscous flows around moving bodies using the (k, eps) turbulence model on unstructured dynamic grids,
-// Bruno Koobus, Charbel Farhat, Hai Tran, Comput. Methods Appl. Mech. Engrg. 2000, 1441-1466
-
+/*! @brief Class for velocity boundary condition on a mobile boundary (ALE framework) To be used when Reichardt's wall law is applied on a moving boundary.
+ *
+ *  Allowing the adaptation of the nonlinear Reichardt wall law for the turbulence models to a mobile grid.
+ *  See the mathematical considerations in the reference:
+ *  Computation of unsteady viscous flows around moving bodies using the (k, eps) turbulence model on unstructured dynamic grids,
+ *  Bruno Koobus, Charbel Farhat, Hai Tran, Comput. Methods Appl. Mech. Engrg. 2000, 1441-1466
+ *
+ */
 Sortie& Entree_fluide_vitesse_imposee_ALE::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
 }
 
-// Description:
-//    Simple appel a: Cond_lim_base::readOn(Entree& )
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& s
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a: Cond_lim_base::readOn(Entree& )
+ *
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree& s) le flot d'entree modifie
+ */
 Entree& Entree_fluide_vitesse_imposee_ALE::readOn(Entree& s)
 {
   return Entree_fluide_vitesse_imposee::readOn(s);

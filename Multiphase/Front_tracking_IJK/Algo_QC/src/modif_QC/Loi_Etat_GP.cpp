@@ -38,40 +38,23 @@ Loi_Etat_GP::Loi_Etat_GP()
   R_ = -1;
 }
 
-// Description:
-//    Imprime la loi sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie pour l'impression
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime la loi sur un flot de sortie.
+ *
+ * @param (Sortie& os) le flot de sortie pour l'impression 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& Loi_Etat_GP::printOn(Sortie& os) const
 {
   os <<que_suis_je()<< finl;
   return os;
 }
 
-// Description:
-//    Lecture d'une loi sur un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: le flot d'entree pour la lecture des parametres
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Effets de bord:
-// Postcondition: l'objet est construit avec les parametres lus
+/*! @brief Lecture d'une loi sur un flot d'entree.
+ *
+ * @param (Entree& is) le flot d'entree pour la lecture des parametres 
+ * @return (Entree&) le flot d'entree modifie 
+ * @throws accolade ouvrante attendue 
+ */
 Entree& Loi_Etat_GP::readOn(Entree& is)
 {
   double Cv_ = -1;
@@ -175,39 +158,20 @@ Entree& Loi_Etat_GP::readOn(Entree& is)
   return is;
 }
 
-// Description:
-//    Renvoie le type de fluide associe.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: le flot de sortie pour l'impression
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord: le flot de sortie est modifie
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le type de fluide associe.
+ *
+ * @param (Sortie& os) le flot de sortie pour l'impression 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 const Nom Loi_Etat_GP::type_fluide() const
 {
   return "Gaz_Parfait";
 }
 
-// Description:
-//    Associe le fluide a la loi d'etat
-// Precondition:
-// Parametre: Fluide_Quasi_Compressible& fl
-//    Signification: le fluide associe
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: lecture
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe le fluide a la loi d'etat
+ *
+ * @param (Fluide_Quasi_Compressible& fl) le fluide associe 
+ */
 void Loi_Etat_GP::associer_fluide(const Fluide_Quasi_Compressible& fl)
 {
   le_fluide = fl;
@@ -254,20 +218,9 @@ void Loi_Etat_GP::initialiser_inco_ch()
 }
 
 
-// Description:
-//    Initialise la loi d'etat : calcul Pth
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Initialise la loi d'etat : calcul Pth
+ *
+ */
 void Loi_Etat_GP::initialiser()
 {
   const DoubleTab& tab_rho = le_fluide->inco_chaleur().valeurs();			//modif YB 28/08/09
@@ -296,20 +249,11 @@ void Loi_Etat_GP::initialiser()
 //   Cerr<<"Loi_Etat_GP::initialiser tab_Temp="<<tab_Temp[0]<<"  tab_T="<<tab_T[0]<<finl;
 }
 
-// Description:
-//    Remplit le tableau de la temperature : T=temp+273.15
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Remplit le tableau de la temperature : T=temp+273.
+ *
+ * 15
+ *
+ */
 void Loi_Etat_GP::remplir_T()
 {
   //const DoubleTab& tab_rho = le_fluide->inco_chaleur().valeurs();
@@ -332,39 +276,16 @@ void Loi_Etat_GP::remplir_T()
 
 }
 
-// Description:
-//    Calcule le Cp
-//    NE FAIT RIEN : le Cp est constant
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule le Cp NE FAIT RIEN : le Cp est constant
+ *
+ */
 void Loi_Etat_GP::calculer_Cp()
 {
 }
 
-// Description:
-//    Calcule la conductivite
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la conductivite
+ *
+ */
 void Loi_Etat_GP::calculer_lambda()
 {
   const Champ_Don&  mu          = le_fluide->viscosite_dynamique();
@@ -427,20 +348,9 @@ void Loi_Etat_GP::calculer_lambda()
   //Cerr<<"YB - 'Loi_Etat_GP' - lambda = "<<min(tab_lambda)<<" "<<max(tab_lambda)<<finl;
 }
 
-// Description:
-//    Calcule la diffusivite
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la diffusivite
+ *
+ */
 void Loi_Etat_GP::calculer_alpha()
 {
   const Champ_Don& lambda = le_fluide->conductivite();
@@ -501,20 +411,9 @@ void Loi_Etat_GP::calculer_alpha()
   //Cerr<<"YB - 'Loi_Etat_GP' - alpha = "<<min(tab_alpha)<<" "<<max(tab_alpha)<<finl;
 }
 
-// Description:
-//    Recalcule la masse volumique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Recalcule la masse volumique
+ *
+ */
 double Loi_Etat_GP::calculer_masse_volumique(double P, double T) const
 {
   if (rho_constant_pour_debug_.non_nul())
@@ -530,20 +429,9 @@ double Loi_Etat_GP::calculer_masse_volumique(double P, double T) const
   return P/(R_*T);
 }
 
-// Description:
-//    Calcule la pression avec la temperature et la masse volumique
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la pression avec la temperature et la masse volumique
+ *
+ */
 double Loi_Etat_GP::inverser_Pth(double T, double rho)
 {
   return rho*R_*T;

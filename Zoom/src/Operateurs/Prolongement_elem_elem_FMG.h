@@ -31,11 +31,9 @@
 
 class Pb_1G;
 
-//
-// .DESCRIPTION class Prolongement_elem_elem_FMG
-//
-// .SECTION voir aussi
-
+/*! @brief class Prolongement_elem_elem_FMG
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

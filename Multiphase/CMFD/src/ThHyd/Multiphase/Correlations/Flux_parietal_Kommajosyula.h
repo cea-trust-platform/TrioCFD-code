@@ -27,16 +27,14 @@
 #include <Correlation.h>
 #include <Param.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Flux_parietal_Kommajosyula
-//      classe qui implemente une correlation de flux parietal monophasique
-//      pour un ecoulement turbulent avec une loi de paroi adaptative
-//      (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
-//      cf page 123 de la these de Kommajosyula
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Flux_parietal_Kommajosyula classe qui implemente une correlation de flux parietal monophasique
+ *
+ *       pour un ecoulement turbulent avec une loi de paroi adaptative
+ *       (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
+ *       cf page 123 de la these de Kommajosyula
+ *
+ *
+ */
 class Flux_parietal_Kommajosyula : public Flux_parietal_base
 {
   Declare_instanciable(Flux_parietal_Kommajosyula);

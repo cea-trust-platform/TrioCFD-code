@@ -29,14 +29,10 @@ class Equation_base;
 class Transport_K_ou_Eps_base;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_turb_hyd_RANS_Bicephale
-//    Classe de base des modeles de type RANS en formulation bicephale : les equations de k et epsilon sont gerees separement
-// .SECTION voir aussi
-//    Mod_turb_hyd_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Mod_turb_hyd_RANS_Bicephale Classe de base des modeles de type RANS en formulation bicephale : les equations de k et epsilon sont gerees separement
+ *
+ * @sa Mod_turb_hyd_base
+ */
 class Mod_turb_hyd_RANS_Bicephale : public Mod_turb_hyd_base
 {
 
@@ -119,21 +115,12 @@ inline int Mod_turb_hyd_RANS_Bicephale::get_lquiet() const
   return lquiet;
 }
 
-// Description:
-//    Renvoie la seconde equation associee au modele de turbulence en formulation bicephale.
-//    (c'est une equation du type Equation_base)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Equation_base&
-//    Signification: la seconde equation associee au modele de turbulence en formulation bicephale
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la seconde equation associee au modele de turbulence en formulation bicephale.
+ *
+ * (c'est une equation du type Equation_base)
+ *
+ * @return (Equation_base&) la seconde equation associee au modele de turbulence en formulation bicephale
+ */
 inline Equation_base& Mod_turb_hyd_RANS_Bicephale::seconde_equation()
 {
   if (ma_seconde_equation.non_nul()==0)

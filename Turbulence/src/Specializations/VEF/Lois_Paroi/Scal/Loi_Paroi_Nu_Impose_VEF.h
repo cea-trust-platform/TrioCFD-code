@@ -28,14 +28,14 @@
 #include <Champ_Don.h>
 #include <Parser_U.h>
 
-//.DESCRIPTION classe Loi_Paroi_Nu_Impose_VEF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_std_hyd_VEF
-
+/*! @brief classe Loi_Paroi_Nu_Impose_VEF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_std_hyd_VEF
+ *
+ */
 class Loi_Paroi_Nu_Impose_VEF : public Paroi_scal_hyd_base_VEF
 {
 

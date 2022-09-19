@@ -29,12 +29,11 @@ class Front_VF;
 class Zone_VDF;
 class Faces;
 
-////////////////////////////////////////////////////////////////
-
-//
-//  .DESCRIPTION classe : Echange_contact_VDF_Zoom_base
-//
-//
+/*! @brief classe : Echange_contact_VDF_Zoom_base
+ *
+ *
+ *
+ */
 
 ////////////////////////////////////////////////////////////////
 

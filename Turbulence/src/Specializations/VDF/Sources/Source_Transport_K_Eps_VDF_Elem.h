@@ -25,9 +25,11 @@
 #include <Source_Transport_VDF_Elem_base.h>
 #include <Ref_Transport_K_Eps.h>
 
-//.DESCRIPTION class Source_Transport_K_Eps_VDF_Elem
-// Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations
-// de Navier-Stokes ne sont pas couplees a la thermique ou a l'equation de convection-diffusion d'une concentration.
+/*! @brief class Source_Transport_K_Eps_VDF_Elem Cette classe represente le terme source qui figure dans l'equation de transport du couple (k,eps) dans le cas ou les equations
+ *
+ *  de Navier-Stokes ne sont pas couplees a la thermique ou a l'equation de convection-diffusion d'une concentration.
+ *
+ */
 class Source_Transport_K_Eps_VDF_Elem : public Source_Transport_VDF_Elem_base
 {
   Declare_instanciable_sans_constructeur(Source_Transport_K_Eps_VDF_Elem);

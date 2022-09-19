@@ -31,40 +31,22 @@
 Implemente_instanciable(Traitement_particulier_NS_THI_VDF,"Traitement_particulier_NS_THI_VDF",Traitement_particulier_NS_THI);
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Traitement_particulier_NS_THI_VDF::printOn(Sortie& is) const
 {
   return is;
 }
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Traitement_particulier_NS_THI_VDF::readOn(Entree& is)
 {
   return is;
@@ -171,14 +153,15 @@ void Traitement_particulier_NS_THI_VDF::renorm_Ec(void)
   return;
 }
 
-// Description:
-//  Calcul de Ec = 1/2 < u^2 >
-//            D  = 1/2 < w^2 > ou w est le rotationnel de u
-//  x^2 est le produit scalaire x*x
-//  < x > est la moyenne sur le volume
-//
-//    < x > = INTEGRALE(x_i  d Omega) / INTEGRALE(d Omega)
-//            sur Omega                 sur Omega
+/*! @brief Calcul de Ec = 1/2 < u^2 > D  = 1/2 < w^2 > ou w est le rotationnel de u
+ *
+ *   x^2 est le produit scalaire x*x
+ *   < x > est la moyenne sur le volume
+ *
+ *     < x > = INTEGRALE(x_i  d Omega) / INTEGRALE(d Omega)
+ *             sur Omega                 sur Omega
+ *
+ */
 void Traitement_particulier_NS_THI_VDF::calcul_Ec_D(double& Ec, double& D)
 {
   const Zone_dis_base& zdisbase=mon_equation->inconnue().zone_dis_base();

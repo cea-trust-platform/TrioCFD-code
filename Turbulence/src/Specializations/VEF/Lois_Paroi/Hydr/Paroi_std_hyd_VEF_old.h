@@ -33,14 +33,12 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Param;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_std_hyd_VEF_old
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_std_hyd_VEF_old
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_std_hyd_VEF_old : public Paroi_hyd_base_VEF, public Paroi_log_QDM
 {
   Declare_instanciable(Paroi_std_hyd_VEF_old);

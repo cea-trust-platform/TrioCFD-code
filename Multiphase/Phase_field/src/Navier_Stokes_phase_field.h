@@ -28,38 +28,33 @@
 #include <time.h>
 #include <Ref_Champ_Don.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Navier_Stokes_phase_field
-//    Cette classe porte les termes de l'equation de la dynamique
-//    pour un fluide sans modelisation de la turbulence.
-//    On suppose l'hypothese de fluide incompressible: div U = 0
-//    On peut 1) soit utiliser un modele a rho variable
-//            2) soit utiliser l'hypothese de Boussinesq
-//    Dans ce cas, on considere la masse volumique constante (egale a rho_0) sauf dans le
-//    terme des forces de gravite.
-//    Sous ces hypotheses, on utilise la forme suivante des equations de
-//    Navier_Stokes:
-//       DU/dt = div(terme visqueux) - gradP/rho_0 + Bt(T-T0)g + autres sources/rho_0
-//       div U = 0
-//    avec DU/dt : derivee particulaire de la vitesse
-//         rho_0 : masse volumique de reference
-//         T0    : temperature de reference
-//         Bt    : coefficient de dilatabilite du fluide
-//         g     : vecteur gravite
-//    Rq : l'implementation de la classe permet bien sur de negliger
-//         certains termes de l'equation (le terme visqueux, le terme
-//         convectif, tel ou tel terme source).
-//    L'inconnue est le champ de vitesse.
-//
-//    Pour le traitement des cas un peu particulier : ajout de Traitement_particulier
-//    exemple : THI, canal (CA)
-// .SECTION voir aussi
-//      Equation_base Pb_Hydraulique Pb_Thermohydraulique
-//
-// Post-traitement du potentiel chimique generalise
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Navier_Stokes_phase_field Cette classe porte les termes de l'equation de la dynamique
+ *
+ *     pour un fluide sans modelisation de la turbulence.
+ *     On suppose l'hypothese de fluide incompressible: div U = 0
+ *     On peut 1) soit utiliser un modele a rho variable
+ *             2) soit utiliser l'hypothese de Boussinesq
+ *     Dans ce cas, on considere la masse volumique constante (egale a rho_0) sauf dans le
+ *     terme des forces de gravite.
+ *     Sous ces hypotheses, on utilise la forme suivante des equations de
+ *     Navier_Stokes:
+ *        DU/dt = div(terme visqueux) - gradP/rho_0 + Bt(T-T0)g + autres sources/rho_0
+ *        div U = 0
+ *     avec DU/dt : derivee particulaire de la vitesse
+ *          rho_0 : masse volumique de reference
+ *          T0    : temperature de reference
+ *          Bt    : coefficient de dilatabilite du fluide
+ *          g     : vecteur gravite
+ *     Rq : l'implementation de la classe permet bien sur de negliger
+ *          certains termes de l'equation (le terme visqueux, le terme
+ *          convectif, tel ou tel terme source).
+ *     L'inconnue est le champ de vitesse.
+ *
+ *     Pour le traitement des cas un peu particulier : ajout de Traitement_particulier
+ *     exemple : THI, canal (CA)
+ *
+ * @sa Equation_base Pb_Hydraulique Pb_Thermohydraulique, Post-traitement du potentiel chimique generalise
+ */
 class Navier_Stokes_phase_field : public Navier_Stokes_std
 {
   Declare_instanciable_sans_constructeur_ni_destructeur(Navier_Stokes_phase_field);

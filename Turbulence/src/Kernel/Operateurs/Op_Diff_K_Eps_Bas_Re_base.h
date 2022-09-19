@@ -34,25 +34,19 @@ class Champ_base;
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Op_Diff_K_Eps_Bas_Re_base
-//    Classe de base de la hierarchie des operateurs de diffusion
-//    pour l'equation de transport K-epsilon bas Reynolds.
-//    Sert a modeliser le terme diffusif dans l'equation de transport
-//    de K_Eps bas Reynolds.
-//    On traite les deux equations de transport en une seule
-//    equation vectorielle.
-//    La viscosite_turbulente est a diviser par la constante Prdt_K
-//    pour la diffusion de K et par la constante Prdt_Eps pour la
-//    diffusion de Eps
-// .SECTION voir aussi
-//    Operateur_base Op_Diff_K_Eps Op_Diff_K_Eps_Bas_Re_negligeable
-//    Classe abstraite
-//    Methode abstraite:
-//      void associer_diffusivite_turbulente()
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Op_Diff_K_Eps_Bas_Re_base Classe de base de la hierarchie des operateurs de diffusion
+ *
+ *     pour l'equation de transport K-epsilon bas Reynolds.
+ *     Sert a modeliser le terme diffusif dans l'equation de transport
+ *     de K_Eps bas Reynolds.
+ *     On traite les deux equations de transport en une seule
+ *     equation vectorielle.
+ *     La viscosite_turbulente est a diviser par la constante Prdt_K
+ *     pour la diffusion de K et par la constante Prdt_Eps pour la
+ *     diffusion de Eps
+ *
+ * @sa Operateur_base Op_Diff_K_Eps Op_Diff_K_Eps_Bas_Re_negligeable, Classe abstraite, Methode abstraite:, void associer_diffusivite_turbulente()
+ */
 class Op_Diff_K_Eps_Bas_Re_base : public Operateur_base
 {
 
@@ -67,17 +61,14 @@ public:
 };
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Op_Diff_K_Eps_Bas_Re_negligeable
-//    Cette classe represente un operateur de diffusion pour
-//    l'equation de transport K-epsilon negligeable.
-//    Lorsqu'un operateur de ce type est utilise dans une equation
-//    transport K-epsilon bas Reynolds cela revient a negliger le terme de diffusion.
-// .SECTION voir aussi
-//    Op_Diff_K_Eps_Bas_Re_base Operateur_negligeable
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Op_Diff_K_Eps_Bas_Re_negligeable Cette classe represente un operateur de diffusion pour
+ *
+ *     l'equation de transport K-epsilon negligeable.
+ *     Lorsqu'un operateur de ce type est utilise dans une equation
+ *     transport K-epsilon bas Reynolds cela revient a negliger le terme de diffusion.
+ *
+ * @sa Op_Diff_K_Eps_Bas_Re_base Operateur_negligeable
+ */
 class Op_Diff_K_Eps_Bas_Re_negligeable : public Operateur_negligeable,
   public Op_Diff_K_Eps_Bas_Re_base
 
@@ -104,17 +95,13 @@ protected:
 Declare_deriv(Op_Diff_K_Eps_Bas_Re_base);
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Op_Diff_K_Eps_Bas_Re
-//    Classe generique de la hierarchie des operateurs de diffusion dans
-//    l'equation de transport K-epsilon bas Reynolds. Un objet Op_Diff_K_Eps_Bas_Re peut
-//    referencer n'importe quel objet derivant de Op_Diff_K_Eps_Bas_Re_base.
-// .SECTION voir aussi
-//    Op_Diff_K_Eps_Bas_Re_base
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Op_Diff_K_Eps_Bas_Re Classe generique de la hierarchie des operateurs de diffusion dans
+ *
+ *     l'equation de transport K-epsilon bas Reynolds. Un objet Op_Diff_K_Eps_Bas_Re peut
+ *     referencer n'importe quel objet derivant de Op_Diff_K_Eps_Bas_Re_base.
+ *
+ * @sa Op_Diff_K_Eps_Bas_Re_base
+ */
 class Op_Diff_K_Eps_Bas_Re : public Operateur,
   public DERIV(Op_Diff_K_Eps_Bas_Re_base)
 {
@@ -140,36 +127,15 @@ protected :
 };
 
 
-///////////////////////////////////////////////////////////////
-// Description:
-//    Associe divers objets a un operateurs negligeable: NE FAIT RIEN
-//    Simple appel a Operateur_negligeable::associer(const Zone_dis&,
-//                                                     const Zone_Cl_dis&,
-//                                                     const Champ_Inc&)
-// Precondition:
-// Parametre: Zone_dis& zone_dis
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Parametre: Zone_Cl_dis& zone_cl_dis
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Parametre: Champ_Inc& inco
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-///////////////////////////////////////////////////////////////
-
+/*! @brief Associe divers objets a un operateurs negligeable: NE FAIT RIEN Simple appel a Operateur_negligeable::associer(const Zone_dis&,
+ *
+ *                                                      const Zone_Cl_dis&,
+ *                                                      const Champ_Inc&)
+ *
+ * @param (Zone_dis& zone_dis)
+ * @param (Zone_Cl_dis& zone_cl_dis)
+ * @param (Champ_Inc& inco)
+ */
 inline void Op_Diff_K_Eps_Bas_Re_negligeable::associer(const Zone_dis& zone_dis,
                                                        const Zone_Cl_dis& zone_cl_dis,
                                                        const Champ_Inc& inco)
@@ -179,85 +145,46 @@ inline void Op_Diff_K_Eps_Bas_Re_negligeable::associer(const Zone_dis& zone_dis,
 
 
 
-// Description:
-//    Ajoute la contribution de l'operateur a un tableau passe en parametre.
-//    Simple appel a Operateur_negligeable::ajouter(const DoubleTab&,DoubleTab&)
-// Precondition:
-// Parametre: DoubleTab& x
-//    Signification: le tableau sur lequel on applique l'operateur
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Parametre: DoubleTab& y
-//    Signification: tableau auquel on ajoute la contribution de l'operateur
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree
-// Retour: DoubleTab&
-//    Signification: le parametre d'entree y non modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ajoute la contribution de l'operateur a un tableau passe en parametre.
+ *
+ * Simple appel a Operateur_negligeable::ajouter(const DoubleTab&,DoubleTab&)
+ *
+ * @param (DoubleTab& x) le tableau sur lequel on applique l'operateur
+ * @param (DoubleTab& y) tableau auquel on ajoute la contribution de l'operateur
+ * @return (DoubleTab&) le parametre d'entree y non modifie
+ */
 inline DoubleTab& Op_Diff_K_Eps_Bas_Re_negligeable::ajouter(const DoubleTab& x,  DoubleTab& y) const
 {
   return Operateur_negligeable::ajouter(x,y);
 }
 
 
-// Description:
-//    Initialise le parametre tableau avec la contribution
-//    de l'operateur negligeable: initialise le tableau a ZERO.
-//    Simple appel a Operateur_negligeable::(calculer(const DoubleTab&, DoubleTab&)
-// Precondition:
-// Parametre: DoubleTab& x
-//    Signification: le tableau sur lequel on applique l'operateur
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Parametre: DoubleTab& y
-//    Signification: tableau dans lequel stocke la contribution de l'operateur
-//    Valeurs par defaut:
-//    Contraintes: l'ancien contenu est ecrase
-//    Acces: sortie
-// Retour: DoubleTab&
-//    Signification: le tableau d'entree y mis a zero
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Initialise le parametre tableau avec la contribution de l'operateur negligeable: initialise le tableau a ZERO.
+ *
+ *     Simple appel a Operateur_negligeable::(calculer(const DoubleTab&, DoubleTab&)
+ *
+ * @param (DoubleTab& x) le tableau sur lequel on applique l'operateur
+ * @param (DoubleTab& y) tableau dans lequel stocke la contribution de l'operateur
+ * @return (DoubleTab&) le tableau d'entree y mis a zero
+ */
 inline DoubleTab& Op_Diff_K_Eps_Bas_Re_negligeable::calculer(const DoubleTab& x, DoubleTab& y) const
 {
   return Operateur_negligeable::calculer(x,y);
 }
 
 
-// Description:
-//    NE FAIT RIEN
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-//Description:
-//on assemble la matrice.
-
+/*! @brief NE FAIT RIEN
+ *
+ */
 inline void Op_Diff_K_Eps_Bas_Re_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                 Matrice_Morse& matrice) const
 {
   ;
 }
 
-//Description:
-//on ajoute la contribution du second membre.
-
+/*! @brief on ajoute la contribution du second membre.
+ *
+ */
 inline void Op_Diff_K_Eps_Bas_Re_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
   ;
@@ -279,22 +206,11 @@ inline void Op_Diff_K_Eps_Bas_Re_negligeable::associer_diffusivite_turbulente()
   ;
 }
 
-// Description:
-//    Renvoie l'objet sous-jacent upcaste en Operateur_base
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Operateur_base&
-//    Signification: l'objet sous-jacent upcaste en Operateur_base
-//    Contraintes:
-// Exception: l'operateur n'a pas ete type
-// Effets de bord:
-// Postcondition:
-//  Fonctions inline de la classe Op_Diff_K_Eps_Bas_Re
-///////////////////////////////////////////////////
+/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
+ *
+ * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
+ * @throws l'operateur n'a pas ete type
+ */
 inline Operateur_base& Op_Diff_K_Eps_Bas_Re::l_op_base()
 {
   if(!non_nul())
@@ -302,21 +218,11 @@ inline Operateur_base& Op_Diff_K_Eps_Bas_Re::l_op_base()
   return valeur();
 }
 
-// Description:
-//    Renvoie l'objet sous-jacent upcaste en Operateur_base
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Operateur_base&
-//    Signification: l'objet sous-jacent upcaste en Operateur_base
-//    Contraintes: reference constante
-// Exception: l'operateur n'a pas ete type
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base (version const)
+ *
+ * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
+ * @throws l'operateur n'a pas ete type
+ */
 inline const Operateur_base& Op_Diff_K_Eps_Bas_Re::l_op_base() const
 {
   if(!non_nul())
@@ -325,116 +231,60 @@ inline const Operateur_base& Op_Diff_K_Eps_Bas_Re::l_op_base() const
 }
 
 
-// Description:
-//    Appel a l'objet sous-jacent.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Appel a l'objet sous-jacent.
+ *
+ */
 inline void Op_Diff_K_Eps_Bas_Re::associer_diffusivite_turbulente()
 {
   valeur().associer_diffusivite_turbulente();
 }
 
 
-// Description:
-//    Appel a l'objet sous-jacent.
-//    Ajoute la contribution de l'operateur au tableau
-//    passe en parametre
-// Precondition:
-// Parametre: DoubleTab& inconnue
-//    Signification: tableau contenant les donnees sur lesquelles on applique
-//                   l'operateur.
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleTab& resu
-//    Signification: tableau auquel on ajoute la contribution de l'operateur
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: DoubleTab&
-//    Signification: le tableau contenant le resultat
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Appel a l'objet sous-jacent.
+ *
+ * Ajoute la contribution de l'operateur au tableau
+ *     passe en parametre
+ *
+ * @param (DoubleTab& inconnue) tableau contenant les donnees sur lesquelles on applique l'operateur.
+ * @param (DoubleTab& resu) tableau auquel on ajoute la contribution de l'operateur
+ * @return (DoubleTab&) le tableau contenant le resultat
+ */
 inline DoubleTab& Op_Diff_K_Eps_Bas_Re::ajouter(const DoubleTab& inconnue, DoubleTab& resu) const
 {
   return valeur().ajouter(inconnue, resu);
 }
 
 
-// Description:
-//    Appel a l'objet sous-jacent.
-//    Initialise le tableau passe en parametre avec la contribution
-//    de l'operateur.
-// Precondition:
-// Parametre: DoubleTab& inconnue
-//    Signification: tableau contenant les donnees sur lesquelles on applique
-//                   l'operateur.
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleTab& resu
-//    Signification: tableau dans lequel stocke la contribution de l'operateur
-//    Valeurs par defaut:
-//    Contraintes: l'ancien contenu est ecrase
-//    Acces: sortie
-// Retour: DoubleTab&
-//    Signification: le tableau contenant le resultat
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Appel a l'objet sous-jacent.
+ *
+ * Initialise le tableau passe en parametre avec la contribution
+ *     de l'operateur.
+ *
+ * @param (DoubleTab& inconnue) tableau contenant les donnees sur lesquelles on applique l'operateur.
+ * @param (DoubleTab& resu) tableau dans lequel stocke la contribution de l'operateur
+ * @return (DoubleTab&) le tableau contenant le resultat
+ */
 inline DoubleTab& Op_Diff_K_Eps_Bas_Re::calculer(const DoubleTab& inconnue, DoubleTab& resu) const
 {
   return valeur().calculer(inconnue, resu);
 }
 
 
-// Description:
-//    Renvoie le champ representant la diffusivite.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_base&
-//    Signification: le champ representant la diffusivite
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le champ representant la diffusivite.
+ *
+ * @return (Champ_base&) le champ representant la diffusivite
+ */
 inline const Champ_base& Op_Diff_K_Eps_Bas_Re::diffusivite() const
 {
   return la_diffusivite.valeur();
 }
 
 
-// Description:
-//    Associe la diffusivite a l'operateur.
-// Precondition:
-// Parametre: Champ_base& nu
-//    Signification: le champ representant la diffusivite
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour: Champ_base&
-//    Signification: le champ representant la diffusivite
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe la diffusivite a l'operateur.
+ *
+ * @param (Champ_base& nu) le champ representant la diffusivite
+ * @return (Champ_base&) le champ representant la diffusivite
+ */
 inline Champ_base& Op_Diff_K_Eps_Bas_Re::associer_diffusivite(const Champ_base& nu)
 {
   la_diffusivite=nu;

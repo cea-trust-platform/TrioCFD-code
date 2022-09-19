@@ -25,15 +25,13 @@
 #include <TRUSTTab.h>
 #include <Transport_turbulent_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Transport_turbulent_SGDH
-//    Transport turbulent de type SGDH:
-//    < u'_i theta'> = - nu_t / Pr_t d_i theta = - sigma_t nu_t d_i theta
-//    (l'utilisateur peut donner sigma_t ou Pr_t)
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Transport_turbulent_SGDH Transport turbulent de type SGDH:
+ *
+ *     < u'_i theta'> = - nu_t / Pr_t d_i theta = - sigma_t nu_t d_i theta
+ *     (l'utilisateur peut donner sigma_t ou Pr_t)
+ *
+ *
+ */
 class Transport_turbulent_SGDH : public Transport_turbulent_base
 {
   Declare_instanciable(Transport_turbulent_SGDH);

@@ -24,14 +24,13 @@
 
 #include <Paroi_std_hyd_VDF.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Paroi_std_hyd_VDF_diphasique
-//
-// <Description of class Paroi_std_hyd_VDF_diphasique>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Paroi_std_hyd_VDF_diphasique
+ *
+ *  <Description of class Paroi_std_hyd_VDF_diphasique>
+ *
+ *
+ *
+ */
 class Paroi_std_hyd_VDF_diphasique : public Paroi_std_hyd_VDF
 {
 

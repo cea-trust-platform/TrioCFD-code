@@ -24,15 +24,10 @@
 
 #include <Schema_Euler_explicite.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Schema_Euler_explicite_ALE
-//     Cette classe represente un schema en temps d'Euler explicite pour l'ALE
-// .SECTION voir aussi
-//     Schema_Euler_explicite
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Schema_Euler_explicite_ALE Cette classe represente un schema en temps d'Euler explicite pour l'ALE
+ *
+ * @sa Schema_Euler_explicite
+ */
 class Schema_Euler_explicite_ALE: public Schema_Euler_explicite
 {
 

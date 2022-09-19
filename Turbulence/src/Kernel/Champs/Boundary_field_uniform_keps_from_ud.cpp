@@ -26,22 +26,14 @@ Implemente_instanciable(Boundary_field_uniform_keps_from_ud,"Boundary_field_unif
 
 
 
-// Description:
-//    Imprime le champ sur flot de sortie.
-//    Imprime la taille du champ et la valeur (constante) sur
-//    la frontiere.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le champ sur flot de sortie.
+ *
+ * Imprime la taille du champ et la valeur (constante) sur
+ *     la frontiere.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Boundary_field_uniform_keps_from_ud::printOn(Sortie& os) const
 {
   const DoubleTab& tab=valeurs();
@@ -52,24 +44,15 @@ Sortie& Boundary_field_uniform_keps_from_ud::printOn(Sortie& os) const
 }
 
 
-// Description:
-//    Lit le champ a partir d'un flot d'entree.
-//    Format:
-//      Boundary_field_uniform_keps_from_ud nb_compo u_value d_value
-//      we expect that nb_compo=2 (one for u and one for d)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& is
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: uniforme field K and Eps are deduced from
-//                the flow rate u and the hydraulic diameter d
+/*! @brief Lit le champ a partir d'un flot d'entree.
+ *
+ * Format:
+ *       Boundary_field_uniform_keps_from_ud nb_compo u_value d_value
+ *       we expect that nb_compo=2 (one for u and one for d)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree& is) le flot d'entree modifie
+ */
 Entree& Boundary_field_uniform_keps_from_ud::readOn(Entree& is)
 {
   double u=0,d=0;

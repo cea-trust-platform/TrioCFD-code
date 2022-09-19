@@ -28,14 +28,14 @@
 #include <Ref_Zone_VDF.h>
 #include <Ref_Zone_Cl_VDF.h>
 
-//.DESCRIPTION classe Paroi_scal_hyd_base_VDF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_std_hyd_VDF
-
+/*! @brief classe Paroi_scal_hyd_base_VDF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_std_hyd_VDF
+ *
+ */
 class Paroi_scal_hyd_base_VDF : public Turbulence_paroi_scal_base
 {
 

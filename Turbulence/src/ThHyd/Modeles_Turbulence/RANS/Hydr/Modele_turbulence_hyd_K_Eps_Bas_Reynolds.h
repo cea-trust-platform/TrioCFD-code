@@ -12,22 +12,15 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Modele_turbulence_hyd_K_Eps_Bas_Reynolds.h
-// Directory:   $TURBULENCE_ROOT/src/ThHyd/Modeles_Turbulence/RANS/Hydr
-//
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION  class Modele_turbulence_hyd_K_Eps_Bas_Reynolds
-//
-// Decrire ici la classe Modele_turbulence_hyd_K_Eps_Bas_Reynolds
-// Cette classe represente le modele de turbulence (k,eps) pour de
-// faible nombre de Reynolds.
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class Modele_turbulence_hyd_K_Eps_Bas_Reynolds
+ *
+ *  Decrire ici la classe Modele_turbulence_hyd_K_Eps_Bas_Reynolds
+ *  Cette classe represente le modele de turbulence (k,eps) pour de
+ *  faible nombre de Reynolds.
+ *
+ *
+ *
+ */
 #ifndef Modele_turbulence_hyd_K_Eps_Bas_Reynolds_included
 #define Modele_turbulence_hyd_K_Eps_Bas_Reynolds_included
 

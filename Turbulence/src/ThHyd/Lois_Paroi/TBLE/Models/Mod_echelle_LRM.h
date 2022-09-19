@@ -27,20 +27,15 @@
 
 Declare_deriv(Mod_echelle_LRM_base);
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_echelle_LRM
-//    Classe generique calculant les echelle de vitesse et de longueur pour le
-//        modele bas-Reynolds  dans les equations de
-//    couche limite simplifiees necessaires
-//    a l'utilisation des lois de parois de type TBLE_LRM
-//
-// .SECTION voir aussi
-//    Mod_echelle_LRM_base
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Mod_echelle_LRM Classe generique calculant les echelle de vitesse et de longueur pour le
+ *
+ *         modele bas-Reynolds  dans les equations de
+ *     couche limite simplifiees necessaires
+ *     a l'utilisation des lois de parois de type TBLE_LRM
+ *
+ *
+ * @sa Mod_echelle_LRM_base
+ */
 class Mod_echelle_LRM : public DERIV(Mod_echelle_LRM_base)
 
 {

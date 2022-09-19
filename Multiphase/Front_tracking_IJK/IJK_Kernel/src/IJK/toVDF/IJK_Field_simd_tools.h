@@ -29,15 +29,18 @@
 
 
 
-// .DESCRIPTION 
-//  This class implements a accessor to IJK_Field values.
-//  It provides efficient access to center, left and right neighbours en i, j, and k directions
-//   and checks if i,j,k are within the bounds
-
+/*! @brief This class implements a accessor to IJK_Field values.
+ *
+ * It provides efficient access to center, left and right neighbours en i, j, and k directions
+ *    and checks if i,j,k are within the bounds
+ *
+ */
 class ConstIJK_float_ptr
 {
  public:
-  // Description: builds a pointer to field(i,j,k);
+/*! @brief builds a pointer to field(i,j,k);
+ *
+ */
   ConstIJK_float_ptr(const IJK_Field_local_float & field, int i, int j, int k) {
     ptr_ = &field(i, j, k);
     j_stride_ = field.j_stride();
@@ -55,7 +58,9 @@ class ConstIJK_float_ptr
     k_ = k;
 #endif
   }
-  // Description: increments the pointer by j_stride (eg, j = j+1)
+/*! @brief increments the pointer by j_stride (eg, j = j+1)
+ *
+ */
   void next_j() {
     ptr_ += j_stride_;
 #ifndef NDEBUG
@@ -63,12 +68,16 @@ class ConstIJK_float_ptr
     assert(j_ < j_max_);
 #endif
   }
-  // Description: returns field(i+i_offset, j, k)
+/*! @brief returns field(i+i_offset, j, k)
+ *
+ */
   void get_center(int i_offset, float & center) const {
     assert(i_ + i_offset >= i_min_ && i_ + i_offset < i_max_);
     center = ptr_[i_offset];
   }
-  // Description: returns left=field(i+i_offset-1, j, k) and center=field(i+i_offset, j, k)
+/*! @brief returns left=field(i+i_offset-1, j, k) and center=field(i+i_offset, j, k)
+ *
+ */
   void get_left_center_x(int i_offset, float & left, float & center) const {
     assert(i_ + i_offset > i_min_ && i_ + i_offset < i_max_);
     left = ptr_[i_offset - 1];
@@ -270,7 +279,9 @@ class IJK_float_ptr : public ConstIJK_float_ptr
  public:
   IJK_float_ptr(IJK_Field_local_float & field, int i, int j, int k): ConstIJK_float_ptr(field, i, j, k) { 
   }
-    // Description: Performs the assignment: field(i+i_offset,j,k) = val
+/*! @brief Performs the assignment: field(i+i_offset,j,k) = val
+ *
+ */
   void put_val(int i_offset, const float & val) {
     assert(i_ + i_offset >= i_min_ && i_ + i_offset < i_max_);
     // cast en non const ok car on avait un IJK_Field_float non const au depart
@@ -283,15 +294,18 @@ class IJK_float_ptr : public ConstIJK_float_ptr
 };
 
 
-// .DESCRIPTION 
-//  This class implements a accessor to IJK_Field values.
-//  It provides efficient access to center, left and right neighbours en i, j, and k directions
-//   and checks if i,j,k are within the bounds
-
+/*! @brief This class implements a accessor to IJK_Field values.
+ *
+ * It provides efficient access to center, left and right neighbours en i, j, and k directions
+ *    and checks if i,j,k are within the bounds
+ *
+ */
 class ConstIJK_double_ptr
 {
  public:
-  // Description: builds a pointer to field(i,j,k);
+/*! @brief builds a pointer to field(i,j,k);
+ *
+ */
   ConstIJK_double_ptr(const IJK_Field_local_double & field, int i, int j, int k) {
     ptr_ = &field(i, j, k);
     j_stride_ = field.j_stride();
@@ -309,7 +323,9 @@ class ConstIJK_double_ptr
     k_ = k;
 #endif
   }
-  // Description: increments the pointer by j_stride (eg, j = j+1)
+/*! @brief increments the pointer by j_stride (eg, j = j+1)
+ *
+ */
   void next_j() {
     ptr_ += j_stride_;
 #ifndef NDEBUG
@@ -317,12 +333,16 @@ class ConstIJK_double_ptr
     assert(j_ < j_max_);
 #endif
   }
-  // Description: returns field(i+i_offset, j, k)
+/*! @brief returns field(i+i_offset, j, k)
+ *
+ */
   void get_center(int i_offset, double & center) const {
     assert(i_ + i_offset >= i_min_ && i_ + i_offset < i_max_);
     center = ptr_[i_offset];
   }
-  // Description: returns left=field(i+i_offset-1, j, k) and center=field(i+i_offset, j, k)
+/*! @brief returns left=field(i+i_offset-1, j, k) and center=field(i+i_offset, j, k)
+ *
+ */
   void get_left_center_x(int i_offset, double & left, double & center) const {
     assert(i_ + i_offset > i_min_ && i_ + i_offset < i_max_);
     left = ptr_[i_offset - 1];
@@ -524,7 +544,9 @@ class IJK_double_ptr : public ConstIJK_double_ptr
  public:
   IJK_double_ptr(IJK_Field_local_double & field, int i, int j, int k): ConstIJK_double_ptr(field, i, j, k) { 
   }
-    // Description: Performs the assignment: field(i+i_offset,j,k) = val
+/*! @brief Performs the assignment: field(i+i_offset,j,k) = val
+ *
+ */
   void put_val(int i_offset, const double & val) {
     assert(i_ + i_offset >= i_min_ && i_ + i_offset < i_max_);
     // cast en non const ok car on avait un IJK_Field_double non const au depart

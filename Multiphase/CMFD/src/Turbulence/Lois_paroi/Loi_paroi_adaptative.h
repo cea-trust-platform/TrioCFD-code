@@ -30,14 +30,12 @@
 #include <map>
 #include <string>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Loi_paroi_adaptative
-//    correlation pour une loi de paroi adaptative qui calcule u_tau et du y_plus
-//    Methodes implementees :
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Loi_paroi_adaptative correlation pour une loi de paroi adaptative qui calcule u_tau et du y_plus
+ *
+ *     Methodes implementees :
+ *
+ *
+ */
 class Loi_paroi_adaptative : public Loi_paroi_base
 {
   Declare_instanciable(Loi_paroi_adaptative);

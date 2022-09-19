@@ -31,14 +31,12 @@ class Champ_Fonc_base;
 class Zone_dis;
 class Zone_Cl_dis;
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_UTAU_IMP_VDF
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_UTAU_IMP_VDF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_UTAU_IMP_VDF : public Paroi_hyd_base_VDF , Paroi_UTAU_IMP_Impl
 {
 

@@ -25,14 +25,12 @@
 #include <Source_base.h>
 #include <Ref_Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Correction_Lubchenko_PolyMAC_P0
-//      Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Correction_Lubchenko_PolyMAC_P0 Correction de répulsion en paroi de Lubchenko dans un ecoulement multiphase
+ *
+ *
+ *
+ *
+ */
 class Correction_Lubchenko_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Correction_Lubchenko_PolyMAC_P0);

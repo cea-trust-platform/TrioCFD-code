@@ -64,49 +64,31 @@ Navier_Stokes_std::Navier_Stokes_std():methode_calcul_pression_initiale_(0),div_
   champs_compris_.ajoute_nom_compris("taux_cisaillement");
   champs_compris_.ajoute_nom_compris("pression_hydrostatique");
 }
-// Description:
-//    Simple appel a:  Equation_base::printOn(Sortie&)
-//    Ecrit l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet la methode ne modifie pas l'objet
+/*! @brief Simple appel a:  Equation_base::printOn(Sortie&) Ecrit l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& Navier_Stokes_std::printOn(Sortie& is) const
 {
   return Equation_base::printOn(is);
 }
 
 
-// Description:
-//    Appel Equation_base::readOn(Entree& is)
-//    En sortie verifie que l'on a bien lu:
-//        - le terme diffusif,
-//        - le terme convectif,
-//        - le solveur en pression
-// Precondition: l'equation doit avoir un milieu fluide associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: terme diffusif non specifie dans jeu de donnees, specifier
-//            un type negligeable pour l'operateur si il est a negliger
-// Exception: terme convectif non specifie dans jeu de donnees, specifier
-//            un type negligeable pour l'operateur si il est a negliger
-// Exception: solveur pression non defini dans jeu de donnees
-// Effets de bord:
-// Postcondition:
+/*! @brief Appel Equation_base::readOn(Entree& is) En sortie verifie que l'on a bien lu:
+ *
+ *         - le terme diffusif,
+ *         - le terme convectif,
+ *         - le solveur en pression
+ *
+ * @param (Entree& is) un flot d'entree 
+ * @return (Entree&) le flot d'entree modifie 
+ * @throws terme diffusif non specifie dans jeu de donnees, specifier
+ * un type negligeable pour l'operateur si il est a negliger 
+ * @throws terme convectif non specifie dans jeu de donnees, specifier
+ * un type negligeable pour l'operateur si il est a negliger 
+ * @throws solveur pression non defini dans jeu de donnees 
+ */
 Entree& Navier_Stokes_std::readOn(Entree& is)
 {
   Equation_base::readOn(is);
@@ -296,24 +278,12 @@ const Champ_base& Navier_Stokes_std::vitesse_pour_transport()
 }
 
 
-// Description:
-//     S'associe au probleme:
-//     apelle Equation_base::associer_pb_base(const Probleme_base&)
-//     s'associe avec les operateurs de divergence et de gradient.
-// Precondition:
-// Parametre: Probleme_base& pb
-//    Signification: le probleme auquel s'associer
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est liee a son probleme, ainsi
-//                que les operateurs gradient et divergence qui lui sont
-//                associes.
+/*! @brief S'associe au probleme: apelle Equation_base::associer_pb_base(const Probleme_base&)
+ *
+ *      s'associe avec les operateurs de divergence et de gradient.
+ *
+ * @param (Probleme_base& pb) le probleme auquel s'associer 
+ */
 void Navier_Stokes_std::associer_pb_base(const Probleme_base& pb)
 {
   Equation_base::associer_pb_base(pb);
@@ -321,27 +291,16 @@ void Navier_Stokes_std::associer_pb_base(const Probleme_base& pb)
   gradient.associer_eqn(*this);
 }
 
-// Description:
-//    Complete l'equation base,
-//    associe la pression a l'equation,
-//    complete la divergence, le gradient et le solveur pression.
-//    Ajout de 2 termes sources: l'un representant la force centrifuge
-//    dans le cas axi-symetrique,l'autre intervenant dans la resolution
-//    en 2D axisymetrique
-//    Association d une equation de transport d interface a l ensemble
-//    de points suivis si le fluide est marque
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Complete l'equation base, associe la pression a l'equation,
+ *
+ *     complete la divergence, le gradient et le solveur pression.
+ *     Ajout de 2 termes sources: l'un representant la force centrifuge
+ *     dans le cas axi-symetrique,l'autre intervenant dans la resolution
+ *     en 2D axisymetrique
+ *     Association d une equation de transport d interface a l ensemble
+ *     de points suivis si le fluide est marque
+ *
+ */
 void Navier_Stokes_std::completer()
 {
   if (axi == 1)
@@ -390,20 +349,9 @@ int Navier_Stokes_std::verif_Cl() const
   return Equation_base::verif_Cl();
 }
 
-// Description:
-//    Dicretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Dicretise l'equation.
+ *
+ */
 void Navier_Stokes_std::discretiser()
 {
   Cerr << "Hydraulic equation discretization (Navier_Stokes_std::discretiser)" << finl;
@@ -440,12 +388,14 @@ void Navier_Stokes_std::discretiser()
   Equation_base::discretiser();
 }
 
-// Description:
-//  Typage de l'assembleur pression. Le nom de l'assembleur
-//  utilise est construit comme :
-//  Assembleur_P_xxx" ou "xxx" est le nom de la discretisation.
-//  Cette methode est virtuelle et surchargee dans le front-tracking.
-//  Elle est appelee par Navier_Stokes_std::discretiser()
+/*! @brief Typage de l'assembleur pression.
+ *
+ * Le nom de l'assembleur utilise est construit comme :
+ *   Assembleur_P_xxx" ou "xxx" est le nom de la discretisation.
+ *   Cette methode est virtuelle et surchargee dans le front-tracking.
+ *   Elle est appelee par Navier_Stokes_std::discretiser()
+ *
+ */
 void Navier_Stokes_std::discretiser_assembleur_pression()
 {
   Nom type = "Assembleur_P_";
@@ -455,21 +405,10 @@ void Navier_Stokes_std::discretiser_assembleur_pression()
   assembleur_pression_.associer_zone_dis_base(zone_dis().valeur());
 }
 
-// Description:
-//    Renvoie le nombre d'operateurs de l'equation:
-//    Pour Navier Stokes Standard c'est 2.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre d'operateur de l'equation
-//    Contraintes: toujours egal a 2
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nombre d'operateurs de l'equation: Pour Navier Stokes Standard c'est 2.
+ *
+ * @return (int) le nombre d'operateur de l'equation 
+ */
 int Navier_Stokes_std::nombre_d_operateurs() const
 {
   return 2;
@@ -480,24 +419,15 @@ int Navier_Stokes_std::nombre_d_operateurs_tot() const
   return 4;
 }
 
-// Description:
-//    Renvoie le i-eme operateur de l'equation:
-//      - le terme_diffusif si i = 0
-//      - le terme_convectif si i = 1
-//     exit si i>1
-//    (version const)
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'operateur a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: 0 <= i <= 1
-//    Acces: entree
-// Retour: Operateur&
-//    Signification: l'operateur indexe par i
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le i-eme operateur de l'equation: - le terme_diffusif si i = 0
+ *
+ *       - le terme_convectif si i = 1
+ *      exit si i>1
+ *     (version const)
+ *
+ * @param (int i) l'index de l'operateur a renvoyer 
+ * @return (Operateur&) l'operateur indexe par i 
+ */
 const Operateur& Navier_Stokes_std::operateur(int i) const
 {
   switch(i)
@@ -516,23 +446,14 @@ const Operateur& Navier_Stokes_std::operateur(int i) const
   return terme_diffusif;
 }
 
-// Description:
-//    Renvoie le i-eme operateur de l'equation:
-//      - le terme_diffusif si i = 0
-//      - le terme_convectif si i = 1
-//     exit si i>1
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'operateur a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: 0 <= i <= 1
-//    Acces: entree
-// Retour: Operateur&
-//    Signification: l'operateur indexe par i
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le i-eme operateur de l'equation: - le terme_diffusif si i = 0
+ *
+ *       - le terme_convectif si i = 1
+ *      exit si i>1
+ *
+ * @param (int i) l'index de l'operateur a renvoyer 
+ * @return (Operateur&) l'operateur indexe par i 
+ */
 Operateur& Navier_Stokes_std::operateur(int i)
 {
   switch(i)
@@ -588,194 +509,99 @@ Operateur& Navier_Stokes_std::operateur_fonctionnel(int i)
 }
 
 
-// Description:
-//    Renvoie l'operateur de calcul de la divergence
-//    associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Operateur_Div&
-//    Signification: l'operateur de calcul de la divergence.
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'operateur de calcul de la divergence associe a l'equation.
+ *
+ * @return (Operateur_Div&) l'operateur de calcul de la divergence. 
+ */
 Operateur_Div& Navier_Stokes_std::operateur_divergence()
 {
   return divergence;
 }
 
-// Description:
-//    Renvoie l'operateur de calcul de la divergence
-//    associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Operateur_Div&
-//    Signification: l'operateur de calcul de la divergence
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'operateur de calcul de la divergence associe a l'equation.
+ *
+ *     (version const)
+ *
+ * @return (Operateur_Div&) l'operateur de calcul de la divergence 
+ */
 const Operateur_Div& Navier_Stokes_std::operateur_divergence() const
 {
   return divergence;
 }
 
-// Description:
-//    Renvoie l'operateur de calcul du gradient
-//    associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Operateur_Grad&
-//    Signification: l'operateur de calcul du gradient
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'operateur de calcul du gradient associe a l'equation.
+ *
+ * @return (Operateur_Grad&) l'operateur de calcul du gradient 
+ */
 Operateur_Grad& Navier_Stokes_std::operateur_gradient()
 {
   return gradient;
 }
 
-// Description:
-//    Renvoie l'operateur de calcul du gradient
-//    associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Operateur_Grad&
-//    Signification: l'operateur de calcul du gradient
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'operateur de calcul du gradient associe a l'equation.
+ *
+ *     (version const)
+ *
+ * @return (Operateur_Grad&) l'operateur de calcul du gradient 
+ */
 const Operateur_Grad& Navier_Stokes_std::operateur_gradient() const
 {
   return gradient;
 }
 
 
-// Description:
-//    Renvoie la vitesse (champ inconnue de l'equation)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant la vitesse
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la vitesse (champ inconnue de l'equation) (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la vitesse 
+ */
 const Champ_Inc& Navier_Stokes_std::inconnue() const
 {
   return la_vitesse;
 }
 
-// Description:
-//    Renvoie la vitesse (champ inconnue de l'equation)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant la vitesse
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie la vitesse (champ inconnue de l'equation)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la vitesse 
+ */
 Champ_Inc& Navier_Stokes_std::inconnue()
 {
   return la_vitesse;
 }
 
-// Description:
-//    Renvoie le solveur en pression
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: SolveurSys&
-//    Signification: le solveur en pression
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le solveur en pression (version const)
+ *
+ * @return (SolveurSys&) le solveur en pression 
+ */
 SolveurSys& Navier_Stokes_std::solveur_pression()
 {
   return solveur_pression_;
 }
 
-// Description:
-//    Renvoie le fluide incompressible (milieu physique de l'equation)
-//    associe a l'equation.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_Incompressible&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le fluide incompressible (milieu physique de l'equation) associe a l'equation.
+ *
+ *     (version const)
+ *
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
+ */
 const Fluide_Incompressible& Navier_Stokes_std::fluide() const
 {
   return le_fluide.valeur();
 }
 
 
-// Description:
-//    Renvoie le fluide incompressible (milieu physique de l'equation)
-//    associe a l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Fluide_Incompressible&
-//    Signification: le fluide incompressible associe a l'equation
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le fluide incompressible (milieu physique de l'equation) associe a l'equation.
+ *
+ * @return (Fluide_Incompressible&) le fluide incompressible associe a l'equation 
+ */
 Fluide_Incompressible& Navier_Stokes_std::fluide()
 {
   return le_fluide.valeur();
 }
 
 
-// Description:
-// Add a specific term for Navier Stokes (-gradP(n)) if necessary
-//
+/*! @brief Add a specific term for Navier Stokes (-gradP(n)) if necessary
+ *
+ */
 DoubleTab& Navier_Stokes_std::corriger_derivee_expl(DoubleTab& derivee)
 {
   if (assembleur_pression_.valeur().get_resoudre_increment_pression())
@@ -792,9 +618,9 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_expl(DoubleTab& derivee)
   return derivee;
 }
 
-// Description:
-// Resolution de la pression, inconnue implicitee de Navier Stokes
-//
+/*! @brief Resolution de la pression, inconnue implicitee de Navier Stokes
+ *
+ */
 DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
 {
   // We want to solve:
@@ -891,26 +717,16 @@ DoubleTab& Navier_Stokes_std::corriger_derivee_impl(DoubleTab& derivee)
 }
 
 
-// Description:
-//    Calcule la solution U des equations:
-//          | M(U-V)/dt + BtP = 0
-//          |-BU=0
-//    On resoud le probleme en pression: -BM-1BtP = -BV/dt
-//    sachant que -BV represente le calcul de la divergence de V
-//    On resoud le probleme en vitesse en appliquant le solveur
-//    de masse au gradient de P:  U=V - dt*M-1BtP
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: pas de temps trop petit
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la solution U des equations: | M(U-V)/dt + BtP = 0
+ *
+ *           |-BU=0
+ *     On resoud le probleme en pression: -BM-1BtP = -BV/dt
+ *     sachant que -BV represente le calcul de la divergence de V
+ *     On resoud le probleme en vitesse en appliquant le solveur
+ *     de masse au gradient de P:  U=V - dt*M-1BtP
+ *
+ * @throws pas de temps trop petit 
+ */
 void Navier_Stokes_std::projeter()
 {
   if (probleme().is_QC() && probleme().reprise_effectuee())
@@ -1013,22 +829,12 @@ int Navier_Stokes_std::projection_a_faire()
   return 0;
 }
 
-// Description:
-//     cf Equation_base::preparer_calcul()
-//     Assemblage du solveur pression et
-//     initialisation de la pression.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief cf Equation_base::preparer_calcul() Assemblage du solveur pression et
+ *
+ *      initialisation de la pression.
+ *
+ * @return (int) renvoie toujours 1 
+ */
 int Navier_Stokes_std::preparer_calcul()
 // assemblage du systeme en pression
 {
@@ -1134,24 +940,15 @@ int Navier_Stokes_std::preparer_calcul()
   return 1;
 }
 
-// Description:
-//     Effectue une mise a jour en temps de l'equation.
-//     Appelle Equation_base::mettre_a_jour(double)
-//     et met a jour la pression.
-//     Integration des points suivis si le fluide est marque
-//     Mise a jour du champ postraitable correspondant
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Effectue une mise a jour en temps de l'equation.
+ *
+ * Appelle Equation_base::mettre_a_jour(double)
+ *      et met a jour la pression.
+ *      Integration des points suivis si le fluide est marque
+ *      Mise a jour du champ postraitable correspondant
+ *
+ * @param (double temps) le temps de mise a jour 
+ */
 void Navier_Stokes_std::mettre_a_jour(double temps)
 {
   // Mise a jour de la classe mere (on tourne la roue).
@@ -1270,12 +1067,14 @@ bool Navier_Stokes_std::initTimeStep(double dt)
   return Equation_base::initTimeStep(dt);
 }
 
-// Description:
-//  Calcul de "la_pression_en_pa" en fonction de "la_pression".
-//  Si le champ milieu().masse_volumique() est uniforme, on suppose que
-//  la_pression est P* = P/rho, et on multiplie par rho. Sinon,
-//  la_pression est deja en Pa.
-//  Cette methode est surchargee en front-tracking.
+/*! @brief Calcul de "la_pression_en_pa" en fonction de "la_pression".
+ *
+ * Si le champ milieu().masse_volumique() est uniforme, on suppose que
+ *   la_pression est P* = P/rho, et on multiplie par rho. Sinon,
+ *   la_pression est deja en Pa.
+ *   Cette methode est surchargee en front-tracking.
+ *
+ */
 void Navier_Stokes_std::calculer_la_pression_en_pa()
 {
   DoubleTab& Pa=la_pression_en_pa.valeurs();
@@ -1287,21 +1086,11 @@ void Navier_Stokes_std::calculer_la_pression_en_pa()
     Pa *= rho(0,0);
 }
 
-// Description:
-//     Appelle Equation_base::sauvegarder(Sortie&)
-//     et sauvegarde la pression sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie sur lequel sauvegarder
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Appelle Equation_base::sauvegarder(Sortie&) et sauvegarde la pression sur un flot de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie sur lequel sauvegarder 
+ * @return (int) renvoie toujours 1 
+ */
 int Navier_Stokes_std::sauvegarder(Sortie& os) const
 {
   int bytes=0;
@@ -1314,22 +1103,15 @@ int Navier_Stokes_std::sauvegarder(Sortie& os) const
   return bytes;
 }
 
-// Description:
-//     Effectue une reprise a partir d'un flot d'entree.
-//     Appelle Equation_base::reprendre()
-//     et reprend la pression.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception: la reprise a echoue, identificateur de la pression non trouve
-// Effets de bord:
-// Postcondition:
+/*! @brief Effectue une reprise a partir d'un flot d'entree.
+ *
+ * Appelle Equation_base::reprendre()
+ *      et reprend la pression.
+ *
+ * @param (Entree& is) un flot d'entree 
+ * @return (int) renvoie toujours 1 
+ * @throws la reprise a echoue, identificateur de la pression non trouve 
+ */
 int Navier_Stokes_std::reprendre(Entree& is)
 {
   Equation_base::reprendre(is);
@@ -1347,22 +1129,12 @@ int Navier_Stokes_std::reprendre(Entree& is)
   return 1;
 }
 
-// Description:
-//    Associe un mileu physique a l'equation en construisant
-//    dynamiquement (cast) un objet de type Fluide_Incompressible
-//    a partir de l'objet Milieu_base passe en parametre.
-// Precondition:
-// Parametre: Milieu_base& un_milieu
-//    Signification: le milieu a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: le milieu doit etre de type Fluide_Incompressible
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un mileu physique a l'equation en construisant dynamiquement (cast) un objet de type Fluide_Incompressible
+ *
+ *     a partir de l'objet Milieu_base passe en parametre.
+ *
+ * @param (Milieu_base& un_milieu) le milieu a associer a l'equation 
+ */
 void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
 {
   if (sub_type(Fluide_Incompressible,un_milieu))
@@ -1377,21 +1149,10 @@ void Navier_Stokes_std::associer_milieu_base(const Milieu_base& un_milieu)
     }
 }
 
-// Description:
-//    Renvoie le milieu physique de l'equation
-//    (le Fluide_Incompressible upcaste en Milieu_base)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible de l'equation upcaste en Milieu_base
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le milieu physique de l'equation (le Fluide_Incompressible upcaste en Milieu_base)
+ *
+ * @return (Milieu_base&) le Fluide_Incompressible de l'equation upcaste en Milieu_base 
+ */
 const Milieu_base& Navier_Stokes_std::milieu() const
 {
   if (!le_fluide.non_nul())
@@ -1402,22 +1163,12 @@ const Milieu_base& Navier_Stokes_std::milieu() const
   return le_fluide.valeur();
 }
 
-// Description:
-//    Renvoie le milieu physique de l'equation
-//    (le Fluide_Incompressible upcaste en Milieu_base)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Milieu_base&
-//    Signification: le Fluide_Incompressible de l'equation upcaste en Milieu_base
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le milieu physique de l'equation (le Fluide_Incompressible upcaste en Milieu_base)
+ *
+ *     (version const)
+ *
+ * @return (Milieu_base&) le Fluide_Incompressible de l'equation upcaste en Milieu_base 
+ */
 Milieu_base& Navier_Stokes_std::milieu()
 {
   if (!le_fluide.non_nul())
@@ -1637,25 +1388,16 @@ void Navier_Stokes_std::get_noms_champs_postraitables(Noms& nom,Option opt) cons
     le_traitement_particulier->get_noms_champs_postraitables(nom,opt);
 }
 
-// Description:
-//    Effectue quelques impressions sur un flot de sortie:
-//       - maximum de div U
-//       - terme convectif
-//       - terme diffusif
-//       - divergence
-//       - gradient
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Effectue quelques impressions sur un flot de sortie: - maximum de div U
+ *
+ *        - terme convectif
+ *        - terme diffusif
+ *        - divergence
+ *        - gradient
+ *
+ * @param (Sortie& os) un flot de sortie 
+ * @return (int) renvoie toujours 1 
+ */
 int Navier_Stokes_std::impr(Sortie& os) const
 {
   // Affichage des bilans volumiques si on n'est pas en QC, ni en Front Tracking
@@ -1706,20 +1448,10 @@ int Navier_Stokes_std::impr(Sortie& os) const
 }
 
 
-// Description:
-//    Renvoie le nom du domaine d'application: "Hydraulique".
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Motcle&
-//    Signification: lenom representant le domaine d'application
-//    Contraintes: toujours egal a "Hydraulique", reference constante.
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nom du domaine d'application: "Hydraulique".
+ *
+ * @return (Motcle&) lenom representant le domaine d'application 
+ */
 const Motcle& Navier_Stokes_std::domaine_application() const
 {
   static Motcle domaine = "Hydraulique";

@@ -40,8 +40,9 @@ Entree& Op_Diff_K_Eps_VEF_Face::readOn(Entree& s )
 {
   return s ;
 }
-// Description:
-// complete l'evaluateur
+/*! @brief complete l'evaluateur
+ *
+ */
 void Op_Diff_K_Eps_VEF_Face::associer(const Zone_dis& zone_dis,
                                       const Zone_Cl_dis& zone_cl_dis,
                                       const Champ_Inc& ch_diffuse)
@@ -990,9 +991,9 @@ void Op_Diff_K_Eps_VEF_Face::contribue_au_second_membre(DoubleTab& resu ) const
     }
 }
 
-// Description:
-// On modifie le second membre et la matrice dans le cas des
-// conditions de dirichlet.
+/*! @brief On modifie le second membre et la matrice dans le cas des conditions de dirichlet.
+ *
+ */
 void Op_Diff_K_Eps_VEF_Face::modifier_pour_Cl(Matrice_Morse& matrice, DoubleTab& secmem) const
 {
   // on recupere le tableau

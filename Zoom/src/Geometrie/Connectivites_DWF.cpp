@@ -839,20 +839,11 @@ void Connectivites_DWF::calculer_connectivites_face_face(Zone_VF& zonef,
 
 
 
-// Description:
-//    Calcul des connectivites faces/faces
-// Precondition:
-// Parametre:Zone& zoneG, Zone& zoneF
-//    Signification: zone discretisee grossiere et fine
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: da
-// Effets de bord:
-// Postcondition: connect_faceF_faceG et connect_faceG_faceF sont remplis
+/*! @brief Calcul des connectivites faces/faces
+ *
+ * @param (Zone& zoneG, Zone& zoneF) zone discretisee grossiere et fine
+ * @throws da
+ */
 void Connectivites_DWF::calculer_connectivites(Zone_VF& zonef,
                                                Zone_VF& zoneg,
                                                Domaine& domg)

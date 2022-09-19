@@ -24,12 +24,9 @@
 #define Variation_rho_included
 #include <Source_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Variation_rho
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Variation_rho
+ *
+ */
 class Variation_rho: public Source_base
 {
   Declare_instanciable(Variation_rho);

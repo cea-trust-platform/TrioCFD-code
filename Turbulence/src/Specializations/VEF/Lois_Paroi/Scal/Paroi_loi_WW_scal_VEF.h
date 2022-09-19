@@ -27,14 +27,14 @@
 #include <Table.h>
 #include <Zone_VEF.h>
 
-//.DESCRIPTION classe Paroi_loi_WW_scal_VEF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_loi_WW_scal_VEF
-
+/*! @brief classe Paroi_loi_WW_scal_VEF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_loi_WW_scal_VEF
+ *
+ */
 class Paroi_loi_WW_scal_VEF : public Paroi_std_scal_hyd_VEF
 {
 

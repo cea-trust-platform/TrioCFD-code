@@ -26,18 +26,14 @@
 #include <Traitement_particulier_NS_THI.h>
 #include <TRUSTTabs_forward.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Traitement_particulier_NS_THI_VDF
-//     Cette classe permet de faire les traitements particuliers
-//     pour les calculs de THI, en particulier initialisation
-//     particuliere et calculs des spectres!!
-//
-// .SECTION voir aussi
-//      Navier_Stokes_Turbulent, Traitement_particulier_base,
-//      Traitement_particulier_THI
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Traitement_particulier_NS_THI_VDF Cette classe permet de faire les traitements particuliers
+ *
+ *      pour les calculs de THI, en particulier initialisation
+ *      particuliere et calculs des spectres!!
+ *
+ *
+ * @sa Navier_Stokes_Turbulent, Traitement_particulier_base,, Traitement_particulier_THI
+ */
 class Traitement_particulier_NS_THI_VDF : public Traitement_particulier_NS_THI
 {
   Declare_instanciable(Traitement_particulier_NS_THI_VDF);

@@ -32,14 +32,14 @@ class Zone_dis;
 class Zone_Cl_dis;
 class Entree;
 
-// .DESCRIPTION classe Turbulence_hyd_Longueur_Melange_VEF
-// Cette classe correspond a la mise en oeuvre du modele
-// de longueur de melange en VEF
-//
-
-// .SECTION  voir aussi
-// Turb_hyd_RANS_0_eq
-
+/*! @brief classe Turbulence_hyd_Longueur_Melange_VEF Cette classe correspond a la mise en oeuvre du modele
+ *
+ *  de longueur de melange en VEF
+ *
+ *  .SECTION  voir aussi
+ *  Turb_hyd_RANS_0_eq
+ *
+ */
 class Modele_turbulence_Longueur_Melange_VEF : public Mod_turb_hyd_RANS_0_eq
 {
 

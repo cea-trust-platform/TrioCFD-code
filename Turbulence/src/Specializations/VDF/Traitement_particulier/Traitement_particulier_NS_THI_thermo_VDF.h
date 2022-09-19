@@ -27,21 +27,17 @@
 #include <Ref_Convection_Diffusion_std.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Traitement_particulier_NS_THI_thermo_VDF
-//     Cette classe permet de faire les traitements particuliers
-//     pour les calculs de Turbulence Homogene Isotrope en Thermique
-//     avec l'equation d'energie, ou l'on cherche a faire des spectres
-//     3D pour le champ de temperature. On ne fait qu'une sortie dans
-//     un fichier a chaque pas de temps.
-//     Cette classe herite de Trait_part_NS_THI_VDF
-//
-// .SECTION voir aussi
-//      Navier_Stokes_Turbulent, Traitement_particulier_base,
-//      Traitement_particulier_VDF, Traitement_particulier_NS_THI_VDF
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Traitement_particulier_NS_THI_thermo_VDF Cette classe permet de faire les traitements particuliers
+ *
+ *      pour les calculs de Turbulence Homogene Isotrope en Thermique
+ *      avec l'equation d'energie, ou l'on cherche a faire des spectres
+ *      3D pour le champ de temperature. On ne fait qu'une sortie dans
+ *      un fichier a chaque pas de temps.
+ *      Cette classe herite de Trait_part_NS_THI_VDF
+ *
+ *
+ * @sa Navier_Stokes_Turbulent, Traitement_particulier_base,, Traitement_particulier_VDF, Traitement_particulier_NS_THI_VDF
+ */
 class Traitement_particulier_NS_THI_thermo_VDF : public Traitement_particulier_NS_THI_VDF
 {
   Declare_instanciable(Traitement_particulier_NS_THI_thermo_VDF);

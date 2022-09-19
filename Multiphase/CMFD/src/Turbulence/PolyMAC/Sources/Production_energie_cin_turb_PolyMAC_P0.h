@@ -27,15 +27,12 @@
 #include <Ref_Correlation.h>
 #include <TRUSTTab.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Production_energie_cin_turb_PolyMAC_P0
-//    Cette classe implemente dans PolyMAC_P0 un operateur de production d'énergie cinetique turbulente k
-//
-// .SECTION voir aussi
-//    Operateur_PolyMAC_P0_base Operateur_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Production_energie_cin_turb_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un operateur de production d'énergie cinetique turbulente k
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
 class Production_energie_cin_turb_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Production_energie_cin_turb_PolyMAC_P0);

@@ -159,9 +159,11 @@ inline double conv_quick_sharp_moins(const double psc,const double vit_0,const d
 
 }
 
-// Description: compute fluxes in direction x for velocity component x
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction x for velocity component x for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -226,9 +228,11 @@ void OpConvQuickSharpIJK_double::compute_flux_x_vx(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction x for velocity component y
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction x for velocity component y for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -292,9 +296,11 @@ void OpConvQuickSharpIJK_double::compute_flux_x_vy(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction x for velocity component z
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction x for velocity component z for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -358,9 +364,11 @@ void OpConvQuickSharpIJK_double::compute_flux_x_vz(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction y for velocity component x
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction y for velocity component x for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -425,9 +433,11 @@ void OpConvQuickSharpIJK_double::compute_flux_y_vx(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction y for velocity component y
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction y for velocity component y for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -491,9 +501,11 @@ void OpConvQuickSharpIJK_double::compute_flux_y_vy(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction y for velocity component z
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction y for velocity component z for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -557,9 +569,11 @@ void OpConvQuickSharpIJK_double::compute_flux_y_vz(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction z for velocity component x
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction z for velocity component x for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -624,9 +638,11 @@ void OpConvQuickSharpIJK_double::compute_flux_z_vx(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction z for velocity component y
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction z for velocity component y for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field
@@ -690,9 +706,11 @@ void OpConvQuickSharpIJK_double::compute_flux_z_vy(IJK_Field_local_double & resu
   }
 }
 
-// Description: compute fluxes in direction z for velocity component z
-//  for the layer of fluxes k_layer
-// 4-th order centered convection scheme
+/*! @brief compute fluxes in direction z for velocity component z for the layer of fluxes k_layer
+ *
+ *  4-th order centered convection scheme
+ *
+ */
 void OpConvQuickSharpIJK_double::compute_flux_z_vz(IJK_Field_local_double & resu, const int k_layer)
 {
   // convected field

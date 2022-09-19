@@ -26,18 +26,17 @@
 #include <Source_base.h>
 #include <Transport_Marqueur_FT.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Source_Action_Particules
-//    Classe mere des classes designant une force exercee par le fluide sur une particule
-//    (ou inversement)
-//    Ces forces interviennent dans le bilan de qdm des particules (one_way_coupling)
-//    et eventuellement dans l equation de Navier_Stokes (two_way_coupling) sous forme
-//    d une source interpolee (voir Source_Reaction_Particules)
-// .SECTION
-//    Classe non instanciable.
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Source_Action_Particules Classe mere des classes designant une force exercee par le fluide sur une particule
+ *
+ *     (ou inversement)
+ *     Ces forces interviennent dans le bilan de qdm des particules (one_way_coupling)
+ *     et eventuellement dans l equation de Navier_Stokes (two_way_coupling) sous forme
+ *     d une source interpolee (voir Source_Reaction_Particules)
+ *  .SECTION
+ *     Classe non instanciable.
+ *
+ *
+ */
 class Source_Action_Particules : public Source_base
 {
   Declare_base(Source_Action_Particules);

@@ -26,16 +26,14 @@
 #include <Flux_parietal_base.h>
 #include <Ref_Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Flux_parietal_adaptatif
-//      classe qui implemente une correlation de flux parietal monophasique
-//      pour un ecoulement turbulent avec une loi de paroi adaptative
-//      (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Flux_parietal_adaptatif classe qui implemente une correlation de flux parietal monophasique
+ *
+ *       pour un ecoulement turbulent avec une loi de paroi adaptative
+ *       (i.e. qui peut gerer la zone visqueuse comme la zone log en proche paroi)
+ *
+ *
+ *
+ */
 class Flux_parietal_adaptatif : public Flux_parietal_base
 {
   Declare_instanciable(Flux_parietal_adaptatif);

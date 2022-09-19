@@ -47,13 +47,14 @@ Sortie& Proprietes_part_vol::printOn(Sortie& os) const
   return os;
 }
 
-// Description:
-//  Lecture des proprietes sur un flot d'entree.
-//  Format de lecture :
-// -cas 1 lecture dans un fichier (motcle fichier)
-// -cas 2 specification des valeurs uniformes (motcle distribution)
-//  Appel a lire_distribution()
-
+/*! @brief Lecture des proprietes sur un flot d'entree.
+ *
+ * Format de lecture :
+ *  -cas 1 lecture dans un fichier (motcle fichier)
+ *  -cas 2 specification des valeurs uniformes (motcle distribution)
+ *   Appel a lire_distribution()
+ *
+ */
 Entree& Proprietes_part_vol::readOn(Entree& is)
 {
   Cerr << "Reading of data for the particles properties" << finl;

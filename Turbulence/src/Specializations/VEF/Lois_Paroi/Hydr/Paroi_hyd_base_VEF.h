@@ -31,14 +31,12 @@
 #include <Ref_Zone_Cl_VEF.h>
 
 
-//.DESCRIPTION
-//
-// CLASS: Paroi_hyd_base_VEF
-// Classe de base des lois de paroi hydraulique en VEF
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
-
+/*! @brief CLASS: Paroi_hyd_base_VEF Classe de base des lois de paroi hydraulique en VEF
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_hyd_base_VEF : public Turbulence_paroi_base
 {
 

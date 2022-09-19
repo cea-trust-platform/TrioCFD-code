@@ -25,16 +25,13 @@
 #include <Mod_Turb_scal_diffturb_base.h>
 #include <Parser_U.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Modele_turbulence_scal_Prandtl
-//    Cette classe represente le modele de calcul suivant
-//    pour la diffusivite turbulente:
-//                  alpha_turb = visco_turb / Prdt_turb;
-// .SECTION voir aussi
-//    Mod_Turb_scal_diffuturb_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Modele_turbulence_scal_Prandtl Cette classe represente le modele de calcul suivant
+ *
+ *     pour la diffusivite turbulente:
+ *                   alpha_turb = visco_turb / Prdt_turb;
+ *
+ * @sa Mod_Turb_scal_diffuturb_base
+ */
 class Modele_turbulence_scal_Prandtl : public Mod_Turb_scal_diffturb_base
 {
 
@@ -57,24 +54,8 @@ protected:
   virtual Champ_Fonc& calculer_diffusivite_turbulente();
 };
 
-// Description:
-//    Renvoie de la valeur du Prandtl
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: la valeur Prdt
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
-//inline double Modele_turbulence_scal_Prandtl::get_Prdt() const
-//{
-//  return LePrdt ;
-//}
-
+/*! @brief Renvoie de la valeur du Prandtl
+ *
+ * @return (la valeur Prdt)
+ */
 #endif

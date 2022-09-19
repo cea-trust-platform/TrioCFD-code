@@ -160,16 +160,18 @@ void Echange_contact_VDF_FT_Disc_solid::completer()
 
 
 
-// Description:
-//    Change le i-eme temps futur de la CL.
+/*! @brief Change le i-eme temps futur de la CL.
+ *
+ */
 void Echange_contact_VDF_FT_Disc_solid::changer_temps_futur(double temps,int i)
 {
   Echange_contact_VDF_FT_Disc::changer_temps_futur(temps,i);
   T2_autre_pb_->changer_temps_futur(temps,i);
 }
 
-// Description:
-//    Tourne la roue de la CL
+/*! @brief Tourne la roue de la CL
+ *
+ */
 int Echange_contact_VDF_FT_Disc_solid::avancer(double temps)
 {
   int ok=Echange_contact_VDF_FT_Disc::avancer(temps);
@@ -177,8 +179,9 @@ int Echange_contact_VDF_FT_Disc_solid::avancer(double temps)
   return ok;
 }
 
-// Description:
-//    Tourne la roue de la CL
+/*! @brief Tourne la roue de la CL
+ *
+ */
 int Echange_contact_VDF_FT_Disc_solid::reculer(double temps)
 {
   int ok=Echange_contact_VDF_FT_Disc::reculer(temps);

@@ -29,13 +29,13 @@
 
 #define SIN2ANGL 11697778e-8
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_selectif_VDF
-// Cette classe correspond a la mise en oeuvre du modele sous
-// maille fonction de structure selectif en VDF
-
-// .SECTION  voir aussi
-// Turbulence_hyd_sous_maille_VDF
-
+/*! @brief classe Turbulence_hyd_sous_maille_selectif_VDF Cette classe correspond a la mise en oeuvre du modele sous
+ *
+ *  maille fonction de structure selectif en VDF
+ *  .SECTION  voir aussi
+ *  Turbulence_hyd_sous_maille_VDF
+ *
+ */
 class Turbulence_hyd_sous_maille_selectif_VDF : public Turbulence_hyd_sous_maille_VDF
 {
 

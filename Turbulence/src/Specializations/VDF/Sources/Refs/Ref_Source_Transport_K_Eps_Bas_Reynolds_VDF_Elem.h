@@ -12,19 +12,13 @@
 * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-//////////////////////////////////////////////////////////////////////////////
-//
-// File:        Ref_Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem.h
-// Directory:   $TURBULENCE_ROOT/src/Specializations/VDF/Sources/Refs
-//
-//////////////////////////////////////////////////////////////////////////////
-
-// .DESCRIPTION  class Ref_Sources_Bas_Re
-//
-// Decrire ici la classe Ref_Sources_Bas_Re
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class Ref_Sources_Bas_Re
+ *
+ *  Decrire ici la classe Ref_Sources_Bas_Re
+ *
+ *
+ *
+ */
 #ifndef Ref_Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem_included
 #define Ref_Source_Transport_K_Eps_Bas_Reynolds_VDF_Elem_included
 

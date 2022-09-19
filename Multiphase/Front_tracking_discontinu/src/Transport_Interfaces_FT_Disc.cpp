@@ -66,14 +66,13 @@ Implemente_instanciable_sans_constructeur_ni_destructeur(Transport_Interfaces_FT
 
 Implemente_ref(Transport_Interfaces_FT_Disc);
 
-// Description:
-//  Classe outil ou on stocke tout le bazar qui sert au fonctionnement de l'equation
-//  de transport. Permet de sauvegarder/reprendre les donnees d'interface
-//  (probleme des reprises avec pas de temps multiples),
-//  et de reduire les dependances en n'incluant presque rien dans Transport_Interfaces_FT_Disc.h
-
-
-
+/*! @brief Classe outil ou on stocke tout le bazar qui sert au fonctionnement de l'equation de transport.
+ *
+ * Permet de sauvegarder/reprendre les donnees d'interface
+ *   (probleme des reprises avec pas de temps multiples),
+ *   et de reduire les dependances en n'incluant presque rien dans Transport_Interfaces_FT_Disc.h
+ *
+ */
 static void eval_vitesse(double x, double y, double z, double t,
                          Parser& px, Parser& py, Parser& pz,
                          double& vx, double& vy, double& vz)
@@ -175,12 +174,15 @@ static void normer_vecteurs(DoubleTab& tab)
 }
 #endif
 
-// Description: calcul du vecteur normal a l'interface, aux sommets
-//  du maillage d'interface. Le tableau "normale" est efface et resize.
-//  La normale est la moyenne des normales des facettes voisines, ponderees par
-//  la surface de la facette.
-//  La norme du vecteur normal n'est pas unitaire !
-//  L'espace virtuel n'est pas a jour !
+/*! @brief calcul du vecteur normal a l'interface, aux sommets du maillage d'interface.
+ *
+ * Le tableau "normale" est efface et resize.
+ *   La normale est la moyenne des normales des facettes voisines, ponderees par
+ *   la surface de la facette.
+ *   La norme du vecteur normal n'est pas unitaire !
+ *   L'espace virtuel n'est pas a jour !
+ *
+ */
 static void calculer_normale_sommets_interface(const Maillage_FT_Disc& maillage,
                                                DoubleTab& normale)
 {
@@ -273,7 +275,9 @@ int Transport_Interfaces_FT_Disc_interne::reprendre(Entree& is)
   return 1;
 }
 
-// Description: constructeur par defaut
+/*! @brief constructeur par defaut
+ *
+ */
 Transport_Interfaces_FT_Disc::Transport_Interfaces_FT_Disc()
 {
   variables_internes_ = new Transport_Interfaces_FT_Disc_interne;
@@ -292,7 +296,9 @@ Transport_Interfaces_FT_Disc::Transport_Interfaces_FT_Disc()
   moment_.resize((dimension==2?1:dimension));
 }
 
-// Description: le destructeur qui va avec
+/*! @brief le destructeur qui va avec
+ *
+ */
 Transport_Interfaces_FT_Disc::~Transport_Interfaces_FT_Disc()
 {
   delete variables_internes_;
@@ -750,9 +756,11 @@ int Transport_Interfaces_FT_Disc::lire_motcle_non_standard(const Motcle& un_mot,
   return 1;
 }
 
-// Description: Methode appelee par Equation_base::readOn
-//  On verifie que toutes les cl sont de type Paroi_FT_disc.
-//  Fait exit() si erreur.
+/*! @brief Methode appelee par Equation_base::readOn On verifie que toutes les cl sont de type Paroi_FT_disc.
+ *
+ *   Fait exit() si erreur.
+ *
+ */
 int Transport_Interfaces_FT_Disc::verif_Cl() const
 {
   const Conds_lim& les_cl = la_zone_Cl_dis.valeur().les_conditions_limites();
@@ -1133,13 +1141,15 @@ void Transport_Interfaces_FT_Disc::lire_maillage_ft_cao(Entree& is)
 }
 
 
-// Description:
-// Lecture des conditions initiales. On s'attend a trouver ceci :
-//   { fonction EXPRESSION }
-// ou expression depend de x, y et z et sera interpretee par le
-// parser de TRUST. L'expression est envoyee a Marching_Cubes
-// pour construire l'interface.
-// Voir aussi parser et Marching_Cubes.
+/*! @brief Lecture des conditions initiales.
+ *
+ * On s'attend a trouver ceci : { fonction EXPRESSION }
+ *  ou expression depend de x, y et z et sera interpretee par le
+ *  parser de TRUST. L'expression est envoyee a Marching_Cubes
+ *  pour construire l'interface.
+ *  Voir aussi parser et Marching_Cubes.
+ *
+ */
 Entree& Transport_Interfaces_FT_Disc::lire_cond_init(Entree& is)
 {
   if (Process::je_suis_maitre())
@@ -1294,10 +1304,11 @@ void Transport_Interfaces_FT_Disc::associer_pb_base(const Probleme_base& un_prob
   Equation_base::associer_pb_base(un_probleme);
 }
 
-// Description:
-// Discretisation des champs:
-// - indicatrice_ : champ scalaire discretise aux elements
-// - typage du maillage et de l'algorithme marching cubes
+/*! @brief Discretisation des champs: - indicatrice_ : champ scalaire discretise aux elements
+ *
+ *  - typage du maillage et de l'algorithme marching cubes
+ *
+ */
 void Transport_Interfaces_FT_Disc::discretiser(void)
 {
   // Le nom des differents champs est un identifiant (indicatrice, vitesse, ...)
@@ -1503,11 +1514,12 @@ void Transport_Interfaces_FT_Disc::discretiser(void)
   la_zone_Cl_dis->associer_inconnue(inconnue());
 }
 
-// Description:
-//  Remaillage de l'interface :
-//   - amelioration petites et grandes facettes,
-//   - barycentrage,
-//   - gestion des coalescences-fragmentations.
+/*! @brief Remaillage de l'interface : - amelioration petites et grandes facettes,
+ *
+ *    - barycentrage,
+ *    - gestion des coalescences-fragmentations.
+ *
+ */
 void Transport_Interfaces_FT_Disc::remailler_interface(void)
 {
   Journal() << "Transport_Interfaces_FT_Disc::remailler_interface " << le_nom() << finl;
@@ -1593,11 +1605,12 @@ double Transport_Interfaces_FT_Disc::calculer_pas_de_temps(void) const
   return DMAXFLOAT;
 }
 
-// Description:
-//  Recalcul du champ variables_internes_->indicatrice_cache a partir de
-//  la position des interfaces.
-//  ATTENTION, ce n'est pas l'inconnue du probleme. L'inconnue est mise a jour
-//  a partir de ce champ dans mettre_a_jour.
+/*! @brief Recalcul du champ variables_internes_->indicatrice_cache a partir de la position des interfaces.
+ *
+ *   ATTENTION, ce n'est pas l'inconnue du probleme. L'inconnue est mise a jour
+ *   a partir de ce champ dans mettre_a_jour.
+ *
+ */
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
 {
   const int tag = maillage_interface().get_mesh_tag();
@@ -1612,15 +1625,17 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_indicatrice()
   return variables_internes_->indicatrice_cache.valeur();
 }
 
-// Description:
-//  Interpolation lineaire d'un champ de vitesse VDF aux faces en un point
-//  de coordonnees coord_som. Le point coord_som est suppose se trouver dans
-//  l'element "element".
-//  Pour chaque composante, on cherche le cube contenant coord_som et dont
-//  les sommets sont des noeuds de vitesse pour cette composante et on
-//  interpole lineairement dans ce cube. Au bord du domaine, la vitesse
-//  tangentielle dans le demi-element colle a la paroi est la vitesse
-//  discrete de l'element (la condition aux limites n'est PAS utilisee).
+/*! @brief Interpolation lineaire d'un champ de vitesse VDF aux faces en un point de coordonnees coord_som.
+ *
+ * Le point coord_som est suppose se trouver dans
+ *   l'element "element".
+ *   Pour chaque composante, on cherche le cube contenant coord_som et dont
+ *   les sommets sont des noeuds de vitesse pour cette composante et on
+ *   interpole lineairement dans ce cube. Au bord du domaine, la vitesse
+ *   tangentielle dans le demi-element colle a la paroi est la vitesse
+ *   discrete de l'element (la condition aux limites n'est PAS utilisee).
+ *
+ */
 void interpoler_vitesse_point_vdf(const Champ_base& champ_vitesse,
                                   const FTd_vecteur3& coord_som,
                                   const int element,
@@ -1871,17 +1886,18 @@ double Transport_Interfaces_FT_Disc::calculer_integrale_indicatrice(const Double
   return integrale;
 }
 
-// Description:
-//  Calcul de la vitesse de deplacement des noeuds du maillage a partir
-//  d'un champ eulerien par interpolation.
-//  Le deplacement fourni n'a aucune propriete particuliere de conservation
-//  du volume.
-//  Les lignes de contact sont deplacees avec une vitesse qui n'a pas de
-//  propriete particuliere non plus...
-//
-// ATTENTION : on evalue simplement la vitesse a l'endroit ou sont les sommets.
-// Param nv_calc : si =1 : recalcule le champ eulerien de la vitesse par filtrage L2
-//   sinon, reutilise celui stocke dans variables_internes_
+/*! @brief Calcul de la vitesse de deplacement des noeuds du maillage a partir d'un champ eulerien par interpolation.
+ *
+ *   Le deplacement fourni n'a aucune propriete particuliere de conservation
+ *   du volume.
+ *   Les lignes de contact sont deplacees avec une vitesse qui n'a pas de
+ *   propriete particuliere non plus...
+ *
+ *  ATTENTION : on evalue simplement la vitesse a l'endroit ou sont les sommets.
+ *  Param nv_calc : si =1 : recalcule le champ eulerien de la vitesse par filtrage L2
+ *    sinon, reutilise celui stocke dans variables_internes_
+ *
+ */
 void Transport_Interfaces_FT_Disc::calculer_vitesse_transport_interpolee(
   const Champ_base&        champ_vitesse,
   const Maillage_FT_Disc& maillage,
@@ -2116,8 +2132,9 @@ void Transport_Interfaces_FT_Disc::calculer_scalaire_interpole(
 }
 
 
-// Description:
-// Calcul de la derivee en temps de l'inconnue : zero.
+/*! @brief Calcul de la derivee en temps de l'inconnue : zero.
+ *
+ */
 DoubleTab& Transport_Interfaces_FT_Disc::derivee_en_temps_inco(DoubleTab& derivee)
 {
   derivee = 0.;
@@ -5898,11 +5915,14 @@ void Transport_Interfaces_FT_Disc::projete_point_face_interface( int& nb_proj_mo
     }
 }
 
-// Description: Deplace le maillage a l'aide du champ de vitesse impose entre l'instant maillage.temps()
-//  et l'instant "temps".
-//  La nouvelle position des sommets est obtenue par integration des lignes de courant de ce champ,
-//  par un schema RK3 (en un pas de temps) qui prend en compte la dependance en temps des vitesses imposees.
-//  On "nettoie" et on change le temps du maillage. Pas de remaillage. maillage MINIMAL en sortie.
+/*! @brief Deplace le maillage a l'aide du champ de vitesse impose entre l'instant maillage.
+ *
+ * temps() et l'instant "temps".
+ *   La nouvelle position des sommets est obtenue par integration des lignes de courant de ce champ,
+ *   par un schema RK3 (en un pas de temps) qui prend en compte la dependance en temps des vitesses imposees.
+ *   On "nettoie" et on change le temps du maillage. Pas de remaillage. maillage MINIMAL en sortie.
+ *
+ */
 static void deplacer_maillage_ft_v_impose(Noms expression_vitesse,
                                           Maillage_FT_Disc& maillage, double temps)
 {
@@ -6818,7 +6838,9 @@ void Transport_Interfaces_FT_Disc::nettoyer_proprietes_particules(const ArrOfInt
 }
 
 
-// Description:
+/*! @brief
+ *
+ */
 int Transport_Interfaces_FT_Disc::sauvegarder(Sortie& os) const
 {
   int bytes = Equation_base::sauvegarder(os);
@@ -6887,15 +6909,16 @@ const Algorithmes_Transport_FT_Disc& Transport_Interfaces_FT_Disc::algorithmes_t
   return variables_internes_->algorithmes_transport_.valeur();
 }
 
-// Description:
-//  Cherche le champ discret aux interfaces dont le nom est "champ",
-//  et verifie qu'il peut etre postraite a la localisation demandee (loc).
-//  Si oui on renvoie 1 et, si ftab est non nul, on remplit le champ ftab
-//  avec le champ demande.
-//  Si non, on renvoie 0.
-//  (la fonction est appelee avec ftab=0 lors de la lecture du postraitement,
-//   car on n'a pas besoin de la valeur du champ, on veut seulement verifier
-//   qu'il existe).
+/*! @brief Cherche le champ discret aux interfaces dont le nom est "champ", et verifie qu'il peut etre postraite a la localisation demandee (loc).
+ *
+ *   Si oui on renvoie 1 et, si ftab est non nul, on remplit le champ ftab
+ *   avec le champ demande.
+ *   Si non, on renvoie 0.
+ *   (la fonction est appelee avec ftab=0 lors de la lecture du postraitement,
+ *    car on n'a pas besoin de la valeur du champ, on veut seulement verifier
+ *    qu'il existe).
+ *
+ */
 int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, FloatTab *ftab) const
 {
   int res = 1;
@@ -7055,8 +7078,11 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
   return res;
 }
 
-// Description:
-//  Voir l'autre get_champ_post_FT. Cette fonction est specifique aux champs d'entiers.
+/*! @brief Voir l'autre get_champ_post_FT.
+ *
+ * Cette fonction est specifique aux champs d'entiers.
+ *
+ */
 int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postraitement_base::Localisation loc, IntTab *itab) const
 {
   int res = 1;
@@ -7179,18 +7205,20 @@ int Transport_Interfaces_FT_Disc::get_champ_post_FT(const Motcle& champ, Postrai
   return res;
 }
 
-// Description:
-//  Renvoie le maillage stocke specialement pour le postraitement
-//  (si on veut postraiter un etat intermediaire...)
+/*! @brief Renvoie le maillage stocke specialement pour le postraitement (si on veut postraiter un etat intermediaire.
+ *
+ * ..)
+ *
+ */
 const Maillage_FT_Disc& Transport_Interfaces_FT_Disc::maillage_interface_pour_post() const
 {
   //return variables_internes_->maillage_pour_post;
   return maillage_interface();
 }
 
-// Description:
-//  Calcule et renvoie la distance a l'interface, evaluee sur une epaisseur
-//  egale a n_iterations_distance aux elements et discretisee aux elements
+/*! @brief Calcule et renvoie la distance a l'interface, evaluee sur une epaisseur egale a n_iterations_distance aux elements et discretisee aux elements
+ *
+ */
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface() const
 {
   // Si le tag du maillage et le tag du champ sont identiques, inutile de recalculer:
@@ -7208,9 +7236,9 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_distance_interface() 
   return variables_internes_->distance_interface.valeur();
 }
 
-// Description:
-//  Calcule et renvoie la normale a l'interface, evaluee sur une epaisseur
-//  egale a n_iterations_distance aux elements et discretisee aux elements.
+/*! @brief Calcule et renvoie la normale a l'interface, evaluee sur une epaisseur egale a n_iterations_distance aux elements et discretisee aux elements.
+ *
+ */
 const Champ_base& Transport_Interfaces_FT_Disc::get_update_normale_interface() const
 {
   const int tag = maillage_interface().get_mesh_tag();
@@ -7227,10 +7255,12 @@ const Champ_base& Transport_Interfaces_FT_Disc::get_update_normale_interface() c
   return variables_internes_->normale_interface.valeur();
 }
 
-// Description:
-// Renvoi de la distance signee entre l'interface et les sommets du maillage eulerien.
-// Si cette distance n'a pas encore ete calculee, appel a calculer_distance_interface_sommets.
-// C'est un DoubleTab parce qu'il n'existe pas (encore) de champ aux sommets en VDF ...
+/*! @brief Renvoi de la distance signee entre l'interface et les sommets du maillage eulerien.
+ *
+ * Si cette distance n'a pas encore ete calculee, appel a calculer_distance_interface_sommets.
+ *  C'est un DoubleTab parce qu'il n'existe pas (encore) de champ aux sommets en VDF ...
+ *
+ */
 const DoubleTab&   Transport_Interfaces_FT_Disc::get_update_distance_interface_sommets() const
 {
   // Si le tag du maillage et le tag du champ sont identiques, inutile de recalculer:
@@ -7249,34 +7279,35 @@ const DoubleTab&   Transport_Interfaces_FT_Disc::get_update_distance_interface_s
   return dist_som;
 }
 
-// Description:
-//  Calcule dist_som, la distance entre l'interface et les sommets du
-//  maillage eulerien a partir de dist_elem et normale_elem,
-//  distance et normale a l'interface aux centres des elements euleriens.
-//  Pour un element, on evalue la distance entre chaque sommet de l'element et l'interface
-//  comme :
-//   d = d1 + d2,
-//   d2 = normale scalaire (position_sommet - centre_element)
-//   d1 est la distance entre l'interface et le centre de l'element,
-//   normale est la normale a l'interface evaluee au centre de l'element
-//  Ensuite, la distance entre un sommet et l'interface est la moyenne de toutes
-//  les distances calculee a l'aide des elements adjacents a ce sommet.
-// La distance est invalide au-dela d'une certaine epaisseur autour de l'interface
-// (voir iterations de lissage dans calculer_distance_interface).
-// Dans ce cas on met une distance de +1e30 si l'indicatrice est >0.5,
-// sinon on met -1e30 (ce choix permet d'utiliser la fonction
-// distance dans les marching-cubes sans avoir a calculer une vraie distance partout).
-// Parametre : dist_elem
-// Signification : tableau contenant pour chaque element reel et virtuel la distance
-//                 entre l'interface et le centre de l'element (calculee par
-//                 calculer_distance_interface). L'espace virtuel doit etre a jour.
-// Parametre : normale_elem
-// Signification : idem pour la normale a l'interface
-// Parametre : dist_som
-// Signification : tableau ou on stocke le resultat du calcul. Le tableau doit
-//                 avoir la bonne taille et un descripteur adequat (voir "discretiser",
-//                 a priori un tableau avec une epaisseur de joint de zero et uniquement
-//                 des items communs).
+/*! @brief Calcule dist_som, la distance entre l'interface et les sommets du maillage eulerien a partir de dist_elem et normale_elem,
+ *
+ *   distance et normale a l'interface aux centres des elements euleriens.
+ *   Pour un element, on evalue la distance entre chaque sommet de l'element et l'interface
+ *   comme :
+ *    d = d1 + d2,
+ *    d2 = normale scalaire (position_sommet - centre_element)
+ *    d1 est la distance entre l'interface et le centre de l'element,
+ *    normale est la normale a l'interface evaluee au centre de l'element
+ *   Ensuite, la distance entre un sommet et l'interface est la moyenne de toutes
+ *   les distances calculee a l'aide des elements adjacents a ce sommet.
+ *  La distance est invalide au-dela d'une certaine epaisseur autour de l'interface
+ *  (voir iterations de lissage dans calculer_distance_interface).
+ *  Dans ce cas on met une distance de +1e30 si l'indicatrice est >0.5,
+ *  sinon on met -1e30 (ce choix permet d'utiliser la fonction
+ *  distance dans les marching-cubes sans avoir a calculer une vraie distance partout).
+ *  Parametre : dist_elem
+ *  Signification : tableau contenant pour chaque element reel et virtuel la distance
+ *                  entre l'interface et le centre de l'element (calculee par
+ *                  calculer_distance_interface). L'espace virtuel doit etre a jour.
+ *  Parametre : normale_elem
+ *  Signification : idem pour la normale a l'interface
+ *  Parametre : dist_som
+ *  Signification : tableau ou on stocke le resultat du calcul. Le tableau doit
+ *                  avoir la bonne taille et un descripteur adequat (voir "discretiser",
+ *                  a priori un tableau avec une epaisseur de joint de zero et uniquement
+ *                  des items communs).
+ *
+ */
 void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
   const DoubleTab& dist_elem,
   const DoubleTab& normale_elem,
@@ -7351,19 +7382,21 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets(
   Debog::verifier("Transport_Interfaces_FT_Disc::calculer_distance_interface_sommets",dist_som);
 }
 
-// Description:
-//  Calcul d'un champ scalaire aux elements contenant une distance signee
-//  entre le centre de l'element et l'interface. La distance est positive dans
-//  la phase 1 et negative dans la phase 0.
-//  On calcule aussi un champ vectoriel aux elements contenant une normale
-//  a l'interface. Ce champ est evalue en resolvant moralement
-//   laplacien(normale) = gradient(indicatrice)
-//  ou gradient(indicatrice) est le gradient de l'indicatrice continue
-//  c'est a dire un dirac localise a la surface de l'interface.
-//  Pour l'instant, cette normale est calculee de facon approchee avec quelques
-//  iterations d'un lisseur. Le support est donc limite au voisinage de l'interface.
-//  Pour les autres elements, la distance vaut -1.e30
-// Precondition : le maillage doit etre parcouru
+/*! @brief Calcul d'un champ scalaire aux elements contenant une distance signee entre le centre de l'element et l'interface.
+ *
+ * La distance est positive dans
+ *   la phase 1 et negative dans la phase 0.
+ *   On calcule aussi un champ vectoriel aux elements contenant une normale
+ *   a l'interface. Ce champ est evalue en resolvant moralement
+ *    laplacien(normale) = gradient(indicatrice)
+ *   ou gradient(indicatrice) est le gradient de l'indicatrice continue
+ *   c'est a dire un dirac localise a la surface de l'interface.
+ *   Pour l'instant, cette normale est calculee de facon approchee avec quelques
+ *   iterations d'un lisseur. Le support est donc limite au voisinage de l'interface.
+ *   Pour les autres elements, la distance vaut -1.e30
+ *  Precondition : le maillage doit etre parcouru
+ *
+ */
 void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   const Maillage_FT_Disc& maillage,
   DoubleTab& distance_elements,
@@ -7606,40 +7639,40 @@ void Transport_Interfaces_FT_Disc::calculer_distance_interface(
   statistiques().end_count(stat_counter);
 }
 
-// Description:
-//  Calcul de la derivee par rapport au temps du volume de phase 1
-//  aux sommets du maillage lagrangien a partir du champ de vitesse
-//  eulerien. On utilise le fait que le champ eulerien est a divergence
-//  nulle
-//  Cette grandeur permet de corriger le deplacement des sommets pour
-//  conserver le volume des phases (voir these B.M. paragraphe 3.2.10).
-//  On a I = rho_0 + (rho_1-rho_0) * I. Donc:
-//   drho/dt = (rho_1-rho_0) * dI/dt  (d'une part)
-//           = div(rho*u) = div( (rho_0 + (rho_1-rho_0)*I) * u)  (d'autre part)
-//  Donc, si div(u) = 0
-//   dI/dt = div(I * u)
-//  Si non (changement de phase):
-//   dI/dt = div((rho_0/(rho_1-rho_0) + I) * u)
-// Parametre : vitesse
-// Signification: le champ de vitesse eulerien aux faces du maillage.
-//                si vitesse.dimension(1)==1, on suppose que c'est la
-//                composante normale a la face de la vitesse, sinon
-//                on suppose que c'est le vecteur vitesse 2d ou 3d.
-// Parametre : indicatrice
-// Signification: indicatrice de phase aux elements euleriens.
-//                doit avoir son espace virtuel a jour et correspondre
-//                au maillage suivant...
-// Parametre : maillage
-// Signification : le maillage de l'interface,
-//                 doit etre parcouru.
-// Parametre : rho_0_sur_delta_rho_div_u
-// Signification: resultat de l'operateur div(u) aux elements (integrale de div_u
-//                sur les elements. Si ce tableau est de taille non nulle, on ajoute
-//                le terme en div_u
-// Parametre : var_volume
-// Signification : Tableau ou on stocke la variation de volume de phase 1
-//                 pour chaque sommet du maillage lagrangien.
-
+/*! @brief Calcul de la derivee par rapport au temps du volume de phase 1 aux sommets du maillage lagrangien a partir du champ de vitesse
+ *
+ *   eulerien. On utilise le fait que le champ eulerien est a divergence
+ *   nulle
+ *   Cette grandeur permet de corriger le deplacement des sommets pour
+ *   conserver le volume des phases (voir these B.M. paragraphe 3.2.10).
+ *   On a I = rho_0 + (rho_1-rho_0) * I. Donc:
+ *    drho/dt = (rho_1-rho_0) * dI/dt  (d'une part)
+ *            = div(rho*u) = div( (rho_0 + (rho_1-rho_0)*I) * u)  (d'autre part)
+ *   Donc, si div(u) = 0
+ *    dI/dt = div(I * u)
+ *   Si non (changement de phase):
+ *    dI/dt = div((rho_0/(rho_1-rho_0) + I) * u)
+ *  Parametre : vitesse
+ *  Signification: le champ de vitesse eulerien aux faces du maillage.
+ *                 si vitesse.dimension(1)==1, on suppose que c'est la
+ *                 composante normale a la face de la vitesse, sinon
+ *                 on suppose que c'est le vecteur vitesse 2d ou 3d.
+ *  Parametre : indicatrice
+ *  Signification: indicatrice de phase aux elements euleriens.
+ *                 doit avoir son espace virtuel a jour et correspondre
+ *                 au maillage suivant...
+ *  Parametre : maillage
+ *  Signification : le maillage de l'interface,
+ *                  doit etre parcouru.
+ *  Parametre : rho_0_sur_delta_rho_div_u
+ *  Signification: resultat de l'operateur div(u) aux elements (integrale de div_u
+ *                 sur les elements. Si ce tableau est de taille non nulle, on ajoute
+ *                 le terme en div_u
+ *  Parametre : var_volume
+ *  Signification : Tableau ou on stocke la variation de volume de phase 1
+ *                  pour chaque sommet du maillage lagrangien.
+ *
+ */
 #if 0
 void Transport_Interfaces_FT_Disc::calculer_derivee_volume_phase1(
   const DoubleTab& vitesse,

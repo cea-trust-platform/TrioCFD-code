@@ -36,40 +36,22 @@ Mod_turb_hyd_combin::Mod_turb_hyd_combin()
   les_var.dimensionner(0);
 }
 
-// Description:
-//    Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a Mod_turb_hyd_base::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Mod_turb_hyd_combin::printOn(Sortie& is) const
 {
   return Mod_turb_hyd_base::printOn(is);
 }
 
 
-// Description:
-//    Simple appel a Mod_turb_hyd_base::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Mod_turb_hyd_base::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Mod_turb_hyd_combin::readOn(Entree& is)
 {
   Mod_turb_hyd_base::readOn(is);

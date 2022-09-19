@@ -27,16 +27,12 @@
 #include <TRUSTTab.h>
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_echelle_LRM_base
-//
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Mod_echelle_LRM_base
+ *
+ *
+ *
+ *
+ */
 class Mod_echelle_LRM_base : public Objet_U
 {
   Declare_base(Mod_echelle_LRM_base);

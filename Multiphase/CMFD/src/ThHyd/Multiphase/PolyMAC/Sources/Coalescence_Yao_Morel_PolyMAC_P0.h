@@ -25,12 +25,9 @@
 #include <Source_base.h>
 #include <math.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Variation_rho_Yao_Morel
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Variation_rho_Yao_Morel
+ *
+ */
 class Coalescence_Yao_Morel: public Source_base
 {
   Declare_instanciable(Coalescence_Yao_Morel);

@@ -46,14 +46,13 @@
 #include <OpConvIJKQuickScalar.h>
 #include <OpDiffTurbIJKScalar.h>
 */
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class IJK_Thermique
-//
-// <Description of class IJK_Thermique>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class IJK_Thermique
+ *
+ *  <Description of class IJK_Thermique>
+ * 
+ * 
+ *
+ */
 class IJK_FT_double;
 
 class IJK_Thermique;

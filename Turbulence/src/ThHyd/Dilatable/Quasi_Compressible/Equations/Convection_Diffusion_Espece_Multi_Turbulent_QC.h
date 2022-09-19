@@ -25,13 +25,10 @@
 #include <Convection_Diffusion_Espece_Multi_QC.h>
 #include <Convection_Diffusion_Turbulent.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Convection_Diffusion_Espece_Multi_Turbulent_QC
-// .SECTION voir aussi
-//     Convection_Diffusion_Espece_Multi_QC Convection_Diffusion_Turbulent
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Convection_Diffusion_Espece_Multi_Turbulent_QC
+ *
+ * @sa Convection_Diffusion_Espece_Multi_QC Convection_Diffusion_Turbulent
+ */
 class Convection_Diffusion_Espece_Multi_Turbulent_QC :
   public Convection_Diffusion_Turbulent, public Convection_Diffusion_Espece_Multi_QC
 {

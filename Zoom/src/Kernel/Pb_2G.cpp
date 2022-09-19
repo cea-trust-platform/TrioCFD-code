@@ -49,22 +49,9 @@ Entree& Pb_2G::readOn(Entree& s )
 }
 
 
-// Description:
-//    Calcul des connectivites entre faces fines et faces grossieres,
-//    et entre elements fins et elements grossiers
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
+/*! @brief Calcul des connectivites entre faces fines et faces grossieres, et entre elements fins et elements grossiers
+ *
+ */
 void Pb_2G::calculer_connectivites_2G()
 {
   //Cerr<<"debut de Pb_2G::calculer_connectivites_2G"<<finl;
@@ -115,24 +102,13 @@ void Pb_2G::calculer_connectivites_2G()
 }
 
 
-// Description:
-//    Prolongement de l'inconnue grossiere sur la frontiere fine
-//    pour inconnue TEMPERATURE ET PRESSION
-//    en VDF pour T du domG, en VDF et VEF pour p du domG
-//    remarque : pas de couplage!!
-//    car valeur
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prolongement de l'inconnue grossiere sur la frontiere fine pour inconnue TEMPERATURE ET PRESSION
+ *
+ *     en VDF pour T du domG, en VDF et VEF pour p du domG
+ *     remarque : pas de couplage!!
+ *     car valeur
+ *
+ */
 void Pb_2G::prolonger_2G(IntVect& connect, DoubleTab& valG, int nb_compo,
                          const Frontiere& frontF,
                          DoubleTab& tab, int num_prolongement)
@@ -171,26 +147,15 @@ void Pb_2G::prolonger_2G(IntVect& connect, DoubleTab& valG, int nb_compo,
 
 
 
-// Description:
-//    Correction du probleme grossier!!
-//    restriction de l'inconnue fine sur le domaine grossier
-//    pour inconnue TEMPERATURE ET PRESSION
-//    en VDF-VDF pour T du domG, en VDF-VDF, VDF-VEF, VEF-VEF
-//    et VEF-VDF pour p du domG
-//    remarque : pas de couplage!!
-//    car valeur
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Correction du probleme grossier!! restriction de l'inconnue fine sur le domaine grossier
+ *
+ *     pour inconnue TEMPERATURE ET PRESSION
+ *     en VDF-VDF pour T du domG, en VDF-VDF, VDF-VEF, VEF-VEF
+ *     et VEF-VDF pour p du domG
+ *     remarque : pas de couplage!!
+ *     car valeur
+ *
+ */
 void Pb_2G::restreindre_2G(IntVect& connect, DoubleTab& val_incoG, const DoubleTab& val_incoF, int nb_comp_incoG, int num_rest)
 {
   //probleme fin

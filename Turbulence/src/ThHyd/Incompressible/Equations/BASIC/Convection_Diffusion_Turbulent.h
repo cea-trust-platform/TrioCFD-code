@@ -29,25 +29,16 @@
 class Champ_Fonc;
 class Operateur_Diff;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Convection_Diffusion_Turbulent
-//     Cette classe represente la convection-diffusion d'une ou plusieurs
-//     grandeurs scalaires (la temperature, une concentration ou plusieurs
-//     concentrations) par un fluide verifiant la condition
-//     d'incompressibilite div U = 0, avec modelisation de la turbulence.
-//     Ce n'est pas (a elle seule) une classe de la hierarchie des equations
-//     de TrioU, mais elle porte un modele de turbulence.
-// .SECTION voir aussi
-//     Convection_Diffusion_std  Mod_turb_scal
-//     Convection_Diffusion_Temperature_Turbulent
-//     Convection_Diffusion_Concentration_Turbulent
-//     Cette est definie hors hierarchie Objet_U et Equation_base,
-//     ceci permet la definition des equations de convection-diffusion
-//     turbulentes par heritage multiple, voir par exemple
-//     Convection_Diffusion_Temperature_Turbulent.
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Convection_Diffusion_Turbulent Cette classe represente la convection-diffusion d'une ou plusieurs
+ *
+ *      grandeurs scalaires (la temperature, une concentration ou plusieurs
+ *      concentrations) par un fluide verifiant la condition
+ *      d'incompressibilite div U = 0, avec modelisation de la turbulence.
+ *      Ce n'est pas (a elle seule) une classe de la hierarchie des equations
+ *      de TrioU, mais elle porte un modele de turbulence.
+ *
+ * @sa Convection_Diffusion_std  Mod_turb_scal, Convection_Diffusion_Temperature_Turbulent, Convection_Diffusion_Concentration_Turbulent, Cette est definie hors hierarchie Objet_U et Equation_base,, ceci permet la definition des equations de convection-diffusion, turbulentes par heritage multiple, voir par exemple, Convection_Diffusion_Temperature_Turbulent.
+ */
 class Convection_Diffusion_Turbulent
 {
 

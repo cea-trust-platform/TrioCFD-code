@@ -25,14 +25,13 @@
 #include <Operateur_Conv.h>
 #include <Ref_Champ_Inc_base.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Operateur_Conv_sensibility
-//
-// <Description of class Operateur_Conv_sensibility>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Operateur_Conv_sensibility
+ *
+ *  <Description of class Operateur_Conv_sensibility>
+ *
+ *
+ *
+ */
 class Operateur_Conv_sensibility : public Operateur_Conv_base
 {
 

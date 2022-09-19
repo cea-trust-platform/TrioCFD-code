@@ -28,16 +28,12 @@
 class Maillage_FT_Disc;
 class Champ_base;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Remailleur_Collision_FT_Juric
-//     Classe implementant un remailleur d'interfaces entrees en collision et
-//     utilisant la reconstruction de Juric sur l'interpolation de indicatrice aux sommets
-// .SECTION voir aussi
-//     Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Remailleur_Collision_FT_Juric Classe implementant un remailleur d'interfaces entrees en collision et
+ *
+ *      utilisant la reconstruction de Juric sur l'interpolation de indicatrice aux sommets
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc Remailleur_Collision_FT_base
+ */
 class Remailleur_Collision_FT_Juric : public Remailleur_Collision_FT_base
 {
 

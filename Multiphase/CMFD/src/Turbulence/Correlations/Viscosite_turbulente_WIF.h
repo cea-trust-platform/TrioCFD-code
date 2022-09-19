@@ -25,14 +25,12 @@
 #include <TRUSTTab.h>
 #include <Viscosite_turbulente_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Viscosite_turbulente_WIF
-//    Renvoie le tenseur de Reynolds pour une turbulence de bulles de type WIF ; ce tenseur est anisotrope
-//    (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Viscosite_turbulente_WIF Renvoie le tenseur de Reynolds pour une turbulence de bulles de type WIF ; ce tenseur est anisotrope
+ *
+ *     (Energie_cinetique_turbulente / Echelle_temporelle_turbulente)
+ *
+ *
+ */
 class Viscosite_turbulente_WIF : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_WIF);

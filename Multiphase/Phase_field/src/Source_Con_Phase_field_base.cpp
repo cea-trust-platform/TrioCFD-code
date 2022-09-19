@@ -26,55 +26,38 @@
 Implemente_base(Source_Con_Phase_field_base,"Source_Con_Phase_field_base",Source_base);
 
 
-// Description:
-//    Surcharge Source_base::printOn(Sortie&)
-//    Ecriture d'un probleme sur un flot de sortie.
-//    !! Attention n'est pas symetrique de la lecture !!
-//    On ecrit les equations, le postraitement et le domaine
-//    discretise.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Surcharge Source_base::printOn(Sortie&) Ecriture d'un probleme sur un flot de sortie.
+ *
+ *     !! Attention n'est pas symetrique de la lecture !!
+ *     On ecrit les equations, le postraitement et le domaine
+ *     discretise.
+ *
+ * @param (Sortie& os) flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Source_Con_Phase_field_base::printOn(Sortie& os) const
 {
   return Source_base::printOn(os);
 }
 
-// Description:
-//    Lecture d'un probleme dans un flot d'entree, et ouverture du
-//    flot de sauvegarde.
-//    Format:
-//     {
-//     nom_equation bloc de lecture d'une equation
-//     Postraitement bloc de lecture postraitement
-//     reprise | sauvegarde
-//     formatte | binaire
-//     nom_de_fichier
-//     }
-// Precondition:
-// Parametre: Entree& is
-//    Signification: flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entre modifie
-//    Contraintes:
-// Exception: pas d'accolade ouvrante en debut de format
-// Exception: mot clef "Postraitement" n'est pas la
-// Exception: format de sauvegarde doit etre "binaire" ou "formatte"
-// Exception: pas d'accolade fermante en fin de jeu de donnee
-// Effets de bord:
-// Postcondition: Le pb est associe au postraitement.
+/*! @brief Lecture d'un probleme dans un flot d'entree, et ouverture du flot de sauvegarde.
+ *
+ *     Format:
+ *      {
+ *      nom_equation bloc de lecture d'une equation
+ *      Postraitement bloc de lecture postraitement
+ *      reprise | sauvegarde
+ *      formatte | binaire
+ *      nom_de_fichier
+ *      }
+ *
+ * @param (Entree& is) flot d'entree
+ * @return (Entree&) le flot d'entre modifie
+ * @throws pas d'accolade ouvrante en debut de format
+ * @throws mot clef "Postraitement" n'est pas la
+ * @throws format de sauvegarde doit etre "binaire" ou "formatte"
+ * @throws pas d'accolade fermante en fin de jeu de donnee
+ */
 Entree& Source_Con_Phase_field_base::readOn(Entree& is)
 {
   return Source_base::readOn(is);

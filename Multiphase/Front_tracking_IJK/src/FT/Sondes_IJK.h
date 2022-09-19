@@ -27,15 +27,13 @@
 
 Declare_liste(Sonde_IJK);
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .NAME        : Sondes_IJK
-// .DESCRIPTION : class Sondes_IJK
-//
-// <Description of class Sondes_IJK>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Sondes_IJK
+ *
+ *  <Description of class Sondes_IJK>
+ * 
+ * 
+ *
+ */
 class Sondes_IJK : public LIST(Sonde_IJK)
 {
 

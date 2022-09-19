@@ -54,8 +54,9 @@ Entree& Op_Diff_K_Eps_Bas_Re_VEF_Face::readOn(Entree& s )
 }
 
 
-// Description:
-// complete l'evaluateur
+/*! @brief complete l'evaluateur
+ *
+ */
 void Op_Diff_K_Eps_Bas_Re_VEF_Face::associer(const Zone_dis& zone_dis,
                                              const Zone_Cl_dis& zone_cl_dis,
                                              const Champ_Inc& ch_diffuse)

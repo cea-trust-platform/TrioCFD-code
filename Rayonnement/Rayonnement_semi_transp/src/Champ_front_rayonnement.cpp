@@ -25,19 +25,11 @@
 Implemente_instanciable(Champ_front_rayonnement,"Champ_front_rayonnement",Champ_front_var_instationnaire);
 
 
-// Description:
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Champ_front_rayonnement::printOn(Sortie& os) const
 {
   const DoubleTab& tab=valeurs();
@@ -48,19 +40,11 @@ Sortie& Champ_front_rayonnement::printOn(Sortie& os) const
   return os;
 }
 
-// Description:
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Champ_front_rayonnement::readOn(Entree& is)
 {
   return is;
@@ -72,24 +56,13 @@ Champ_front_base& Champ_front_rayonnement::affecter_(const Champ_front_base& ch)
 }
 
 
-// Description:
-//     Cette methode ne fait rien, le tableau de valeurs est mis a
-//     jour par Flux_radiatif_V?F::evaluer_cl_rayonnement
-//     Eviter si possible d'utiliser les champs de cette facon : le
-//     tableau de valeurs ne devrait etre modifie que par les methodes
-//     initialiser et mettre_a_jour (cf Champ_front_base).
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Cette methode ne fait rien, le tableau de valeurs est mis a jour par Flux_radiatif_V?F::evaluer_cl_rayonnement
+ *
+ *      Eviter si possible d'utiliser les champs de cette facon : le
+ *      tableau de valeurs ne devrait etre modifie que par les methodes
+ *      initialiser et mettre_a_jour (cf Champ_front_base).
+ *
+ */
 void Champ_front_rayonnement::mettre_a_jour(double temps)
 {
   Champ_front_var_instationnaire::mettre_a_jour(temps);

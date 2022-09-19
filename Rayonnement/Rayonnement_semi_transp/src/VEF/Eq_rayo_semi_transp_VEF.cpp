@@ -39,20 +39,11 @@
 
 Implemente_instanciable(Eq_rayo_semi_transp_VEF,"Eq_rayo_semi_transp_VEF",Equation_rayonnement_base);
 
-// Description:
-//    Imprime le type de l'equation sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime le type de l'equation sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Eq_rayo_semi_transp_VEF::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << "\n";
@@ -60,36 +51,23 @@ Sortie& Eq_rayo_semi_transp_VEF::printOn(Sortie& s ) const
 
 
 
-// Description:
-// Precondition:
-// Parametre: Entree& s
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief
+ *
+ * @param (Entree& s) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Eq_rayo_semi_transp_VEF::readOn(Entree& s )
 {
   return Equation_rayonnement_base::readOn(s);
 }
 
 
-// Description:
-//    Calcule le champ de l'irradiance en fonction des CLs
-//    au temps donne en parametre et de la temperature au temps par defaut.
-//    Met le resultat dans inconnue.valeurs()
-//    Suppose que le schema en temps est Euler explicite...
-// Precondition:
-// Parametre:
-// Retour:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Calcule le champ de l'irradiance en fonction des CLs au temps donne en parametre et de la temperature au temps par defaut.
+ *
+ *     Met le resultat dans inconnue.valeurs()
+ *     Suppose que le schema en temps est Euler explicite...
+ *
+ */
 void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 {
   const Zone_VF& zone_VF = ref_cast(Zone_VF, zone_dis().valeur());
@@ -193,21 +171,10 @@ void Eq_rayo_semi_transp_VEF::resoudre(double temps)
 
 
 
-// Description:
-//        modifie la matrice pour prendre en compte la presence de faces
-//        rayonnantes au voisinage des elements de bord
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief modifie la matrice pour prendre en compte la presence de faces rayonnantes au voisinage des elements de bord
+ *
+ * @return le flot d'entree modifie
+ */
 void Eq_rayo_semi_transp_VEF::modifier_matrice()
 {
   // On fait une boucle sur les conditions aux limites associees a l'equations

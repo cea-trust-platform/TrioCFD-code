@@ -31,41 +31,23 @@
 Implemente_instanciable(Neumann_paroi_rayo_semi_transp_VDF,"Paroi_flux_impose_rayo_semi_transp_VDF",Neumann_paroi);
 
 
-// Description:
-//
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Neumann_paroi_rayo_semi_transp_VDF::printOn(Sortie& os) const
 {
   return os;
 }
 
-// Description:
-//    Lecture des parametres de la condition Neumann_paroi
-//    Lecture de l'emissivite de la paroi
-//    Lecture du coefficient A
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Lecture des parametres de la condition Neumann_paroi Lecture de l'emissivite de la paroi
+ *
+ *     Lecture du coefficient A
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Neumann_paroi_rayo_semi_transp_VDF::readOn(Entree& is)
 {
   is >>  le_champ_front;

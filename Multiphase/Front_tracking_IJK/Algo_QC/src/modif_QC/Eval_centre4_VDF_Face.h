@@ -28,20 +28,18 @@
 #include <Eval_Conv_VDF.h>
 #include <Eval_VDF_Face.h>
 #include <Zone_VDF.h>
-//
-// .DESCRIPTION class Eval_centre4_VDF_Face
-//
-// Evaluateur VDF pour la convection
-// Le champ convecte est un Champ_Face
-// Schema de convection centre4 (sur 4 points)
-// Rq:Les evaluateurs de flux convectifs calculent en fait le terme
-// convectif qui figure au second membre de l'equation d'evolution
-// c.a.d l'oppose du flux convectif
-
-//
-// .SECTION voir aussi Eval_Conv_VDF
-
-
+/*! @brief class Eval_centre4_VDF_Face
+ *
+ *  Evaluateur VDF pour la convection
+ *  Le champ convecte est un Champ_Face
+ *  Schema de convection centre4 (sur 4 points)
+ *  Rq:Les evaluateurs de flux convectifs calculent en fait le terme
+ *  convectif qui figure au second membre de l'equation d'evolution
+ *  c.a.d l'oppose du flux convectif
+ * 
+ *
+ * @sa Eval_Conv_VDF 
+ */
 class Eval_centre4_VDF_Face : public Eval_Conv_VDF, public Eval_VDF_Face
 {
 

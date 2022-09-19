@@ -28,13 +28,10 @@
 
 #include <Convection_Diffusion_Phase_field.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Schema_Phase_field
-// .SECTION voir aussi
-//     Schema_Temps_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Schema_Phase_field
+ *
+ * @sa Schema_Temps_base
+ */
 class Schema_Phase_field: public Schema_Temps_base
 {
 

@@ -27,14 +27,10 @@
 #include <Ref_Equation_base.h>
 
 class ArrOfBit;
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//   Cette equation corrige le champ de concentration pour tenir compte de la
-//   presence d'une interface.
-// .SECTION voir aussi
-//      Convection_Diffusion_Concentration
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Cette equation corrige le champ de concentration pour tenir compte de la presence d'une interface.
+ *
+ * @sa Convection_Diffusion_Concentration
+ */
 class Convection_Diffusion_Concentration_Turbulent_FT_Disc : public Convection_Diffusion_Concentration_Turbulent
 {
   Declare_instanciable_sans_constructeur(Convection_Diffusion_Concentration_Turbulent_FT_Disc);

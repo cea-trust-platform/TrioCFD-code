@@ -70,22 +70,11 @@ int Convection_Diffusion_Espece_Multi_Turbulent_QC::lire_motcle_non_standard(con
   return 1;
 }
 
-// Description:
-//    Double appel a:
-//     Convection_Diffusion_Turbulent::completer()
-//     Convection_Diffusion_Espece_Multi_QC::completer()
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Double appel a: Convection_Diffusion_Turbulent::completer()
+ *
+ *      Convection_Diffusion_Espece_Multi_QC::completer()
+ *
+ */
 void Convection_Diffusion_Espece_Multi_Turbulent_QC::completer()
 {
   Convection_Diffusion_Turbulent::completer();
@@ -132,43 +121,23 @@ void Convection_Diffusion_Espece_Multi_Turbulent_QC::get_noms_champs_postraitabl
   if (le_modele_turbulence.non_nul())
     le_modele_turbulence->get_noms_champs_postraitables(nom,opt);
 }
-// Description:
-//    Mise a jour en temps de l'equation, double appel a:
-//      Convection_Diffusion_Espece_Multi_QC::mettre_a_jour(double );
-//      Convection_Diffusion_Turbulent::mettre_a_jour(double );
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Mise a jour en temps de l'equation, double appel a: Convection_Diffusion_Espece_Multi_QC::mettre_a_jour(double );
+ *
+ *       Convection_Diffusion_Turbulent::mettre_a_jour(double );
+ *
+ * @param (double temps) le temps de mise a jour
+ */
 void Convection_Diffusion_Espece_Multi_Turbulent_QC::mettre_a_jour(double temps)
 {
   Convection_Diffusion_Espece_Multi_QC::mettre_a_jour(temps);
   Convection_Diffusion_Turbulent::mettre_a_jour(temps);
 }
-// Description:
-//    Double appel a:
-//      Convection_Diffusion_Turbulent::preparer_calcul()
-//      Convection_Diffusion_Espece_Multi_QC::preparer_calcul()
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Double appel a: Convection_Diffusion_Turbulent::preparer_calcul()
+ *
+ *       Convection_Diffusion_Espece_Multi_QC::preparer_calcul()
+ *
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Espece_Multi_Turbulent_QC::preparer_calcul()
 {
   Convection_Diffusion_Turbulent::preparer_calcul();
@@ -176,22 +145,13 @@ int Convection_Diffusion_Espece_Multi_Turbulent_QC::preparer_calcul()
   return 1;
 }
 
-// Description:
-//    Sauvegarde sur un flot de sortie, double appel a:
-//      Convection_Diffusion_Espece_Multi_QC::sauvegarder(Sortie& );
-//      Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Sauvegarde sur un flot de sortie, double appel a: Convection_Diffusion_Espece_Multi_QC::sauvegarder(Sortie& );
+ *
+ *       Convection_Diffusion_Turbulent::sauvegarder(Sortie& );
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Espece_Multi_Turbulent_QC::sauvegarder(Sortie& os) const
 {
   int bytes=0;
@@ -200,22 +160,13 @@ int Convection_Diffusion_Espece_Multi_Turbulent_QC::sauvegarder(Sortie& os) cons
   return bytes;
 }
 
-// Description:
-//    Reprise a partir d'un flot d'entree, double appel a:
-//      Convection_Diffusion_Espece_Multi_QC::reprendre(Entree& );
-//      Convection_Diffusion_Turbulent::reprendre(Entree&);
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Reprise a partir d'un flot d'entree, double appel a: Convection_Diffusion_Espece_Multi_QC::reprendre(Entree& );
+ *
+ *       Convection_Diffusion_Turbulent::reprendre(Entree&);
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (int) renvoie toujours 1
+ */
 int Convection_Diffusion_Espece_Multi_Turbulent_QC::reprendre(Entree& is)
 {
   Convection_Diffusion_Espece_Multi_QC::reprendre(is);

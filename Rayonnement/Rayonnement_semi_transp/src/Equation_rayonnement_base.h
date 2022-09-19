@@ -106,101 +106,72 @@ protected:
 };
 
 
-// Description:
-//    Renvoie le modele de rayonnement semi transparent
-// Precondition :
-// Parametre :
-//    Signification :
-//    Contraintes :
-//    Acces :
-// Retour
-//    Signification :
-//    Contraintes :
-// Exception :
-// Effets de bord :
-// Postcondition :
-// Postcondition :
+/*! @brief Renvoie le modele de rayonnement semi transparent Precondition :
+ *
+ *  Parametre :
+ *     Signification :
+ *     Contraintes :
+ *     Acces :
+ *  Retour
+ *     Signification :
+ *     Contraintes :
+ *  Exception :
+ *  Effets de bord :
+ *  Postcondition :
+ *  Postcondition :
+ *
+ */
 inline Modele_rayo_semi_transp& Equation_rayonnement_base::Modele()
 {
   return le_modele.valeur();
 }
 
 
-// Description:
-//    Renvoie le modele de rayonnement semi transparent
-// Precondition :
-// Parametre :
-//    Signification :
-//    Contraintes :
-//    Acces :
-// Retour
-//    Signification :
-//    Contraintes : reference constante
-// Exception :
-// Effets de bord :
-// Postcondition :
-// Postcondition :
+/*! @brief Renvoie le modele de rayonnement semi transparent Precondition :
+ *
+ *  Parametre :
+ *     Signification :
+ *     Contraintes :
+ *     Acces :
+ *  Retour
+ *     Signification :
+ *     Contraintes : reference constante
+ *  Exception :
+ *  Effets de bord :
+ *  Postcondition :
+ *  Postcondition :
+ *
+ */
 inline const Modele_rayo_semi_transp& Equation_rayonnement_base::Modele() const
 {
   return le_modele.valeur();
 }
 
 
-// Description:
-//    Associe un fluide incompressible semi transparent a l'equation.
-// Precondition:
-// Parametre: Fluide_base& un_fluide
-//    Signification: le fluide incompressible semi transparent a associer
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
-// Postcondition: l'equation a un fluide associe
+/*! @brief Associe un fluide incompressible semi transparent a l'equation.
+ *
+ * @param (Fluide_base& un_fluide) le fluide incompressible semi transparent a associer
+ */
 inline void Equation_rayonnement_base::associer_fluide(const Fluide_base& un_fluide)
 {
   le_fluide = un_fluide;
 }
 
 
-// Description:
-//    renvoie le fluide semi transparent associe a l'equation de rayonnement
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: le fluide associe a l'equation de rayonnement
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief renvoie le fluide semi transparent associe a l'equation de rayonnement
+ *
+ * @return (le fluide associe a l'equation de rayonnement)
+ */
 inline const Fluide_base& Equation_rayonnement_base::fluide() const
 {
   return le_fluide.valeur();
 }
 
 
-// Description:
-//    renvoie le fluide semi transparent associe a l'equation de rayonnement
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: le fluide associe a l'equation de rayonnement
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief renvoie le fluide semi transparent associe a l'equation de rayonnement
+ *
+ * @return (le fluide associe a l'equation de rayonnement)
+ */
 inline Fluide_base& Equation_rayonnement_base::fluide()
 {
   return le_fluide.valeur();

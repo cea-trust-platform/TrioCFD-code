@@ -27,30 +27,27 @@
 
 #include <TRUSTTabs_forward.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_turb_hyd_combin
-//    Classe representant un modele de turbulence exprime a partir d'une combinaison de champs
-//    et (ou) des variables d espace et de temps pour l equation de Navier Stokes
-//    La syntaxe a respecter est la suivante :
-//    Modele_turbulence combinaison
-//                  {
-//                     nb_var nb_sources_a_specif
-//                     fonction ...
-//                     turbulence_paroi ...
-//                  }
-//  -Mot cle nb_var :
-//   nb_sources_a_specif est a preciser par l utilisateur : correspond aux nombre
-//  de champs sources qui interviendront dans l expression du modele (0 par defaut)
-//  -Mot cle fonction :
-//   Une expression doit etre specifiee par l utilisateur f(x,y,z,t,nom_champs_sources)
-//  -Mot cle turbulence_paroi :
-//   Choix d une loi de paroi (eventuellement negligeable) a preciser par l utilisateur
-//
-// .SECTION voir aussi
-//    Mod_turb_hyd_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Mod_turb_hyd_combin Classe representant un modele de turbulence exprime a partir d'une combinaison de champs
+ *
+ *     et (ou) des variables d espace et de temps pour l equation de Navier Stokes
+ *     La syntaxe a respecter est la suivante :
+ *     Modele_turbulence combinaison
+ *                   {
+ *                      nb_var nb_sources_a_specif
+ *                      fonction ...
+ *                      turbulence_paroi ...
+ *                   }
+ *   -Mot cle nb_var :
+ *    nb_sources_a_specif est a preciser par l utilisateur : correspond aux nombre
+ *   de champs sources qui interviendront dans l expression du modele (0 par defaut)
+ *   -Mot cle fonction :
+ *    Une expression doit etre specifiee par l utilisateur f(x,y,z,t,nom_champs_sources)
+ *   -Mot cle turbulence_paroi :
+ *    Choix d une loi de paroi (eventuellement negligeable) a preciser par l utilisateur
+ *
+ *
+ * @sa Mod_turb_hyd_base
+ */
 class Mod_turb_hyd_combin : public Mod_turb_hyd_base
 {
   Declare_instanciable_sans_constructeur(Mod_turb_hyd_combin);

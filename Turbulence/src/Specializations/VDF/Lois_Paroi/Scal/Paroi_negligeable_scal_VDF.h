@@ -25,14 +25,14 @@
 
 #include <Paroi_scal_hyd_base_VDF.h>
 
-//.DESCRIPTION classe Paroi_negligeable_scal_VDF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_negligeable_VDF
-
+/*! @brief classe Paroi_negligeable_scal_VDF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_negligeable_VDF
+ *
+ */
 class Paroi_negligeable_scal_VDF : public Paroi_scal_hyd_base_VDF
 {
   Declare_instanciable(Paroi_negligeable_scal_VDF);

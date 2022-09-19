@@ -29,15 +29,12 @@
 #include <Interprete.h>
 #include <Pb_MG.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Associer_pbMG_pbGglobal
-//     Interprete qui associe deux objets obj1 et obj2:
-//     [DANS LE JEU DE DONNEES] Associer_pbMG_pbGglobal ob1 ob2
-// .SECTION voir aussi
-//     Interprete
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Associer_pbMG_pbGglobal Interprete qui associe deux objets obj1 et obj2:
+ *
+ *      [DANS LE JEU DE DONNEES] Associer_pbMG_pbGglobal ob1 ob2
+ *
+ * @sa Interprete
+ */
 class Associer_pbMG_pbGglobal : public Interprete
 {
   Declare_instanciable(Associer_pbMG_pbGglobal);

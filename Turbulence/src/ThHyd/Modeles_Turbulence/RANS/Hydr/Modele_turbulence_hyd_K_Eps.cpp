@@ -38,40 +38,22 @@
 Implemente_instanciable(Modele_turbulence_hyd_K_Eps,"Modele_turbulence_hyd_K_Epsilon",Mod_turb_hyd_RANS);
 // XD k_epsilon mod_turb_hyd_rans k_epsilon -1 Turbulence model (k-eps).
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Modele_turbulence_hyd_K_Eps::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
 
 
-// Description:
-//    Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Mod_turb_hyd_RANS::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Modele_turbulence_hyd_K_Eps::readOn(Entree& s )
 {
   return Mod_turb_hyd_RANS::readOn(s);
@@ -111,20 +93,12 @@ int Modele_turbulence_hyd_K_Eps::lire_motcle_non_standard(const Motcle& mot, Ent
   return 1;
 }
 
-// Description:
-//    Calcule la viscosite turbulente au temps demande.
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps auquel il faut calculer la viscosite
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Fonc&
-//    Signification: la viscosite turbulente au temps demande
-//    Contraintes:
-// Exception: erreur de taille de visco_turb_K_eps
-// Effets de bord:
-// Postcondition:
+/*! @brief Calcule la viscosite turbulente au temps demande.
+ *
+ * @param (double temps) le temps auquel il faut calculer la viscosite
+ * @return (Champ_Fonc&) la viscosite turbulente au temps demande
+ * @throws erreur de taille de visco_turb_K_eps
+ */
 Champ_Fonc& Modele_turbulence_hyd_K_Eps::calculer_viscosite_turbulente(double temps)
 {
   const Champ_base& chK_Eps=eqn_transp_K_Eps().inconnue().valeur();
@@ -449,23 +423,14 @@ bool Modele_turbulence_hyd_K_Eps::initTimeStep(double dt)
   return eqn_transport_K_Eps.initTimeStep(dt);
 }
 
-// Description:
-//    Effectue une mise a jour en temps du modele de turbulence.
-//    Met a jour l'equation de transport K-epsilon,
-//    calcule la loi de paroi et la viscosite turbulente
-//    au nouveau temps.
-// Precondition:
-// Parametre: double temps
-//    Signification: le temps de mise a jour
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Effectue une mise a jour en temps du modele de turbulence.
+ *
+ * Met a jour l'equation de transport K-epsilon,
+ *     calcule la loi de paroi et la viscosite turbulente
+ *     au nouveau temps.
+ *
+ * @param (double temps) le temps de mise a jour
+ */
 void Modele_turbulence_hyd_K_Eps::mettre_a_jour(double temps)
 {
   Champ_Inc& ch_K_Eps = K_Eps();

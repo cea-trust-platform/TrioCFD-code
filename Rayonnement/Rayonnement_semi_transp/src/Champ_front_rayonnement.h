@@ -25,22 +25,18 @@
 
 #include <Champ_front_var_instationnaire.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Champ_front_rayonnement
-//     Cette classe represente un champ sur une frontiere utilise pour
-//     le rayonnement.
-//     Elle ne fait rien, le tableau de valeurs est mis a jour par
-//     Flux_radiatif_V?F::evaluer_cl_rayonnement
-//     De ce fait, elle est inclassable dans la hierarchie... Eviter
-//     si possible d'utiliser les champs de cette facon : le tableau
-//     de valeurs ne devrait etre modifie que par les methodes
-//     initialiser et mettre_a_jour (cf Champ_front_base).
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Champ_front_rayonnement Cette classe represente un champ sur une frontiere utilise pour
+ *
+ *      le rayonnement.
+ *      Elle ne fait rien, le tableau de valeurs est mis a jour par
+ *      Flux_radiatif_V?F::evaluer_cl_rayonnement
+ *      De ce fait, elle est inclassable dans la hierarchie... Eviter
+ *      si possible d'utiliser les champs de cette facon : le tableau
+ *      de valeurs ne devrait etre modifie que par les methodes
+ *      initialiser et mettre_a_jour (cf Champ_front_base).
+ *
+ *
+ */
 class Champ_front_rayonnement : public Champ_front_var_instationnaire
 {
   Declare_instanciable(Champ_front_rayonnement);

@@ -29,11 +29,9 @@
 #include <Connectivites_base.h>
 
 #include <Domaine.h>
-//
-// .DESCRIPTION class Connectivites_IndGros
-//
-// .SECTION voir aussi
-
+/*! @brief class Connectivites_IndGros
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

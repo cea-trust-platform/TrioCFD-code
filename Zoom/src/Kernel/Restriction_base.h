@@ -31,11 +31,9 @@
 class Zone_VF;
 #include <TRUSTTabs_forward.h>
 
-//
-// .DESCRIPTION class Restriction_base
-//
-// .SECTION voir aussi
-
+/*! @brief class Restriction_base
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

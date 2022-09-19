@@ -43,23 +43,9 @@ Entree& Restriction_elem_elem_2::readOn(Entree& s )
 
 
 
-// Description:
-//    calcul du nombre d'elements fins contenus dans chaque element grossier
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-//REMARQUE : FONCTIONNE AUSSI POUR LE VEF
-// MAIS LES ELEM FINS EXTERIEURS NE SONT PAS BIEN REPARTIS
-//(faire un dessin...)
+/*! @brief calcul du nombre d'elements fins contenus dans chaque element grossier
+ *
+ */
 void Restriction_elem_elem_2::calculer(const Zone_VF& zone_VFG,
                                        const Zone_VF& zone_VFF,
                                        const IntVect& connect)
@@ -137,23 +123,11 @@ void Restriction_elem_elem_2::calculer(const Zone_VF& zone_VFG,
 
 
 
-// Description:
-//    Restriction de l'inconnue fine sur le domaine grossier
-//    en utilisant les elemF interieurs a l'elemG ET
-//    les elemF autour de l'elemG
-
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Restriction de l'inconnue fine sur le domaine grossier en utilisant les elemF interieurs a l'elemG ET
+ *
+ *     les elemF autour de l'elemG
+ *
+ */
 void Restriction_elem_elem_2::restreindre(const Zone_VF& zone_VFG,
                                           const Zone_VF& zone_VFF,
                                           const IntVect& connect,

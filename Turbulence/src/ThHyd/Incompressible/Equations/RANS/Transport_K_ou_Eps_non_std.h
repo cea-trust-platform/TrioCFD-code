@@ -27,15 +27,11 @@
 #include <Op_Diff_K_Eps_Bas_Re_base.h>
 #include <Operateur_Conv.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Transport_K_ou_Eps_non_std
-//    Classe de base pour les equations de transport
-//    des modeles k_Epsilon non standard en formulation bicephale.
-// .SECTION voir aussi
-//
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Transport_K_ou_Eps_non_std Classe de base pour les equations de transport
+ *
+ *     des modeles k_Epsilon non standard en formulation bicephale.
+ *
+ */
 class Transport_K_ou_Eps_non_std : public Transport_K_ou_Eps_base
 {
 

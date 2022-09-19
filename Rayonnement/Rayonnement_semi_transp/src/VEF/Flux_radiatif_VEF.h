@@ -28,17 +28,13 @@ class Zone_VF;
 class Champ_Don;
 class Champ_front;
 
-////////////////////////////////////////////////////////////////
-// File : Flux_radiatif_VEF.h
-// Directory :        $TRUST_ROOT/Rayonnement_semi_transp
-// .DESCRIPTION
-//  Decrire ici la classe Flux_radiatif_VEF
-//
-// .FINHTML
-// .FINEPS
-////////////////////////////////////////////////////////////////
-
-
+/*! @brief Decrire ici la classe Flux_radiatif_VEF
+ *
+ *  .FINHTML
+ *  .FINEPS
+ *
+ *
+ */
 class Flux_radiatif_VEF : public Flux_radiatif_base
 {
   Declare_instanciable(Flux_radiatif_VEF);

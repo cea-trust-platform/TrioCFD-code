@@ -59,7 +59,9 @@ Entree& Op_Grad_VDF_Face::readOn(Entree& s)
 
 
 
-// Description:
+/*! @brief 
+ *
+ */
 void Op_Grad_VDF_Face::associer(const Zone_dis& zone_dis,
                                 const Zone_Cl_dis& zone_Cl_dis,
                                 const Champ_Inc& )

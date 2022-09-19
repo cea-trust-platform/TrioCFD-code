@@ -31,16 +31,16 @@ class Champ_Fonc;
 class Champ_Don;
 #include <TRUSTTabs_forward.h>
 
-//.DESCRIPTION class Op_Diff_Fluctu_Temp_Base
-// Sert a modeliser le terme diffusif dans l'equation de transport
-// des fluctuations thermiques
-// On traite les deux equations de transport en une seule
-// equation vectorielle.
-// La viscosite_turbulente est a diviser par la constante Prdt_teta
-// pour la diffusion de teta^2 et par la constante Prdt_epsteta pour la
-// diffusion de Epsteta
-
-
+/*! @brief class Op_Diff_Fluctu_Temp_Base Sert a modeliser le terme diffusif dans l'equation de transport
+ *
+ *  des fluctuations thermiques
+ *  On traite les deux equations de transport en une seule
+ *  equation vectorielle.
+ *  La viscosite_turbulente est a diviser par la constante Prdt_teta
+ *  pour la diffusion de teta^2 et par la constante Prdt_epsteta pour la
+ *  diffusion de Epsteta
+ *
+ */
 class Op_Diff_Fluctu_Temp_Base : public Operateur_base
 {
   Declare_base(Op_Diff_Fluctu_Temp_Base);
@@ -119,18 +119,18 @@ inline DoubleTab& Op_Diff_Fluctu_Temp_negligeable::calculer(const DoubleTab& x, 
   return Operateur_negligeable::calculer(x,y);
 }
 
-//Description:
-//on assemble la matrice.
-
+/*! @brief on assemble la matrice.
+ *
+ */
 inline void Op_Diff_Fluctu_Temp_negligeable::contribuer_a_avec(const DoubleTab& inco,
                                                                Matrice_Morse& matrice) const
 {
   ;
 }
 
-//Description:
-//on ajoute la contribution du second membre.
-
+/*! @brief on ajoute la contribution du second membre.
+ *
+ */
 inline void Op_Diff_Fluctu_Temp_negligeable::contribuer_au_second_membre(DoubleTab& resu) const
 {
   ;
@@ -152,12 +152,9 @@ inline void Op_Diff_Fluctu_Temp_negligeable::associer_diffusivite_turbulente()
   ;
 }
 
-///////////////////////////////////////////////////
-//  Fonctions inline de la classe Op_Diff_Fluctu_Temp
-///////////////////////////////////////////////////
-
-
-// Description:
+/*! @brief
+ *
+ */
 inline Operateur_base& Op_Diff_Fluctu_Temp::l_op_base()
 {
   if(!non_nul())
@@ -165,7 +162,9 @@ inline Operateur_base& Op_Diff_Fluctu_Temp::l_op_base()
   return valeur();
 }
 
-// Description:
+/*! @brief
+ *
+ */
 inline const Operateur_base& Op_Diff_Fluctu_Temp::l_op_base() const
 {
   if(!non_nul())

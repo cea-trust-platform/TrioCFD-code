@@ -51,8 +51,9 @@ Sortie& Convection_Diffusion_Temperature_FT_Disc::printOn(Sortie& os) const
 {
   return Convection_Diffusion_Temperature::printOn(os);
 }
-// Description:
-//  cf Convection_Diffusion_std::readOn(Entree&).
+/*! @brief cf Convection_Diffusion_std::readOn(Entree&).
+ *
+ */
 Entree& Convection_Diffusion_Temperature_FT_Disc::readOn(Entree& is)
 {
   // Ne pas faire assert(fluide non nul)
@@ -326,9 +327,12 @@ static void extrapoler_champ_elem(const Zone_VF&    zone_vf,
   champ.echange_espace_virtuel();
 }
 
-// Description: met a jour le champ grad_t en fonction du champ inconnue.
-//  Attention, l'inconnue est modifiee (on etend le champ de temperature dans la phase
-//  opposee.
+/*! @brief met a jour le champ grad_t en fonction du champ inconnue.
+ *
+ * Attention, l'inconnue est modifiee (on etend le champ de temperature dans la phase
+ *   opposee.
+ *
+ */
 void Convection_Diffusion_Temperature_FT_Disc::calculer_grad_t()
 {
   Transport_Interfaces_FT_Disc& eq_interface = ref_eq_interface_.valeur();
@@ -564,10 +568,12 @@ void Convection_Diffusion_Temperature_FT_Disc::associer_milieu_base(const Milieu
   fluide_dipha_ = ref_cast(Fluide_Diphasique, un_milieu);
 }
 
-// Description:
-//  Methode appelee par Transport_Interfaces_xxx::test_suppression_interfaces_sous_zone()
-//  lorqu'une interfaces disparait. Il faut remettre la temperature de saturation dans
-//  l'inclusion supprimee.
+/*! @brief Methode appelee par Transport_Interfaces_xxx::test_suppression_interfaces_sous_zone() lorqu'une interfaces disparait.
+ *
+ * Il faut remettre la temperature de saturation dans
+ *   l'inclusion supprimee.
+ *
+ */
 void Convection_Diffusion_Temperature_FT_Disc::suppression_interfaces(const IntVect& num_compo,
                                                                       const ArrOfInt& flags_compo_a_supprimer,
                                                                       int nouvelle_phase)

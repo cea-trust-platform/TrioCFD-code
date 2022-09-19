@@ -26,39 +26,22 @@
 
 Implemente_base(Transport_K_Eps_non_std,"Transport_K_Eps_non_std",Transport_K_Eps_base);
 
-// Description:
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Transport_K_Eps_non_std::printOn(Sortie& is) const
 {
   return is << que_suis_je() << "\n";
 
 }
 
-// Description:
-//    Simple appel a Equation_base::readOn(Entree&)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a Equation_base::readOn(Entree&)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Transport_K_Eps_non_std::readOn(Entree& is)
 {
   Transport_K_Eps_base::readOn(is);
@@ -101,10 +84,11 @@ int Transport_K_Eps_non_std::nombre_d_operateurs() const
   return 2;
 }
 
-// Description:
-// renvoie terme_diffusif si i=0
-// renvoie terme_convectif si i=1
-// exit si i>1
+/*! @brief renvoie terme_diffusif si i=0 renvoie terme_convectif si i=1
+ *
+ *  exit si i>1
+ *
+ */
 const Operateur& Transport_K_Eps_non_std::operateur(int i) const
 {
   switch(i)
@@ -123,10 +107,11 @@ const Operateur& Transport_K_Eps_non_std::operateur(int i) const
   return terme_diffusif;
 }
 
-// Description:
-// renvoie terme_diffusif si i=0
-// renvoie terme_convectif si i=1
-// exit si i>1
+/*! @brief renvoie terme_diffusif si i=0 renvoie terme_convectif si i=1
+ *
+ *  exit si i>1
+ *
+ */
 Operateur& Transport_K_Eps_non_std::operateur(int i)
 {
   switch(i)

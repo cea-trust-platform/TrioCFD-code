@@ -25,15 +25,13 @@
 
 #include <Interprete_geometrique_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Solver_moving_mesh_ALE
-//     {Into the .data} Solver_moving_mesh_ALE
-//  Read the solver used to solve the system giving the moving mesh velocity
-// .SECTION voir aussi
-//     Interprete Discretisation_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Solver_moving_mesh_ALE {Into the .
+ *
+ * data} Solver_moving_mesh_ALE
+ *   Read the solver used to solve the system giving the moving mesh velocity
+ *
+ * @sa Interprete Discretisation_base
+ */
 class Solver_moving_mesh_ALE : public Interprete_geometrique_base
 {
   Declare_instanciable(Solver_moving_mesh_ALE);

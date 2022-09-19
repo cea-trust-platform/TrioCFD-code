@@ -26,13 +26,12 @@
 #include <Cond_Lim_rayo_semi_transp.h>
 #include <Neumann_paroi.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Neumann_paroi_rayo_semi_transp_VDF
-//
-// .SECTION
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Neumann_paroi_rayo_semi_transp_VDF
+ *
+ *  .SECTION
+ *
+ *
+ */
 class Neumann_paroi_rayo_semi_transp_VDF: public Cond_Lim_rayo_semi_transp, public Neumann_paroi
 {
   Declare_instanciable(Neumann_paroi_rayo_semi_transp_VDF);

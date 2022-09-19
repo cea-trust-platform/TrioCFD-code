@@ -22,12 +22,10 @@
 #ifndef Vect_Eq_couch_lim_included
 #define Vect_Eq_couch_lim_included
 
-//
-// .DESCRIPTION class VECT(Eq_couch_lim)
-//
-// .SECTION voir aussi Eq_couch_lim
-//
-
+/*! @brief class VECT(Eq_couch_lim)
+ *
+ * @sa Eq_couch_lim
+ */
 #include <Eq_couch_lim.h>
 Declare_vect(Eq_couch_lim);
 #endif

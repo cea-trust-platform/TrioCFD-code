@@ -66,21 +66,10 @@ int Paroi_negligeable_scal_VDF::calculer_scal(Champ_Fonc_base& diffusivite_turb)
 }
 
 
-// Description:
-//    Give a boolean indicating that we don't use equivant distance
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: boolean
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-//
+/*! @brief Give a boolean indicating that we don't use equivant distance
+ *
+ * @return (boolean)
+ */
 bool Paroi_negligeable_scal_VDF::use_equivalent_distance() const
 {
   return false;

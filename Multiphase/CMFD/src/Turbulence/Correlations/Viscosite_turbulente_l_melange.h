@@ -28,13 +28,11 @@
 #include <Schema_Temps_base.h>
 #include <Zone_dis.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Diffusivite turbulente a longueur de melange et vitesse de melange identique pour les deux phases
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Diffusivite turbulente a longueur de melange et vitesse de melange identique pour les deux phases
+ *
+ *
+ *
+ */
 class Viscosite_turbulente_l_melange : public Viscosite_turbulente_base
 {
   Declare_instanciable(Viscosite_turbulente_l_melange);

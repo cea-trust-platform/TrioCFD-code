@@ -31,21 +31,16 @@ class Cond_Lim_rayo_semi_transp;
 class Cond_lim_base;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe derivee de Probleme_Couple
-//     Cette classe couple, outre des Probleme_base, un modele de
-//     rayonnement.
-//     Seule l'etape d'initialisation impose actuellement que le
-//     modele de rayonnement soit differencie, et donc l'existence de
-//     la classe Pb_Couple_rayo_semi_transp.
-//
-// .SECTION voir aussi
-//     Probleme_Couple Modele_rayo_semi_transp
-//////////////////////////////////////////////////////////////////////////////
-
-
+/*! @brief classe derivee de Probleme_Couple Cette classe couple, outre des Probleme_base, un modele de
+ *
+ *      rayonnement.
+ *      Seule l'etape d'initialisation impose actuellement que le
+ *      modele de rayonnement soit differencie, et donc l'existence de
+ *      la classe Pb_Couple_rayo_semi_transp.
+ *
+ *
+ * @sa Probleme_Couple Modele_rayo_semi_transp
+ */
 class Pb_Couple_rayo_semi_transp: public Probleme_Couple
 {
 

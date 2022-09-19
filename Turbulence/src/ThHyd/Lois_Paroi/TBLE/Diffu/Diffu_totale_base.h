@@ -26,18 +26,14 @@
 #include <Ref_MuLambda_TBLE_base.h>
 class Eq_couch_lim ;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Diffu_totale_base
-//    Classe abstraite calculant la diffusivite totale (somme diffusivite
-//    moleculaire et diffusivite turbulente) dans les equations de
-//    couche limite simplifiees necessaires
-//    a l'utilisation des lois de parois de type Balaras
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Diffu_totale_base Classe abstraite calculant la diffusivite totale (somme diffusivite
+ *
+ *     moleculaire et diffusivite turbulente) dans les equations de
+ *     couche limite simplifiees necessaires
+ *     a l'utilisation des lois de parois de type Balaras
+ *
+ *
+ */
 class Diffu_totale_base : public Objet_U
 {
   Declare_base_sans_constructeur(Diffu_totale_base);

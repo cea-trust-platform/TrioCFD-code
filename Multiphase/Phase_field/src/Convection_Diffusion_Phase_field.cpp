@@ -46,41 +46,22 @@ Convection_Diffusion_Phase_field::Convection_Diffusion_Phase_field()
     nom[0]="potentiel_chimique_generalise";
   */
 }
-// Description:
-//    Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
-// Precondition:
-// Parametre: Sortie& is
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Convection_Diffusion_std::printOn(Sortie&)
+ *
+ * @param (Sortie& is) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Convection_Diffusion_Phase_field::printOn(Sortie& is) const
 {
   return Convection_Diffusion_Concentration::printOn(is);
 }
 
 
-// Description:
-//  cf Convection_Diffusion_Concentration::readOn(is)
-// Precondition: l'objet a une concentration associee
-// Precondition: l'objet a un constituant associe
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree& is
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief cf Convection_Diffusion_Concentration::readOn(is)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree& is) le flot d'entree modifie
+ */
 Entree& Convection_Diffusion_Phase_field::readOn(Entree& is)
 {
   Convection_Diffusion_Concentration::readOn(is);
@@ -121,20 +102,9 @@ int Convection_Diffusion_Phase_field::lire_motcle_non_standard(const Motcle& mot
   return 1;
 }
 
-// Description:
-//    Discretise l'equation.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: l'equation est discretisee
+/*! @brief Discretise l'equation.
+ *
+ */
 void Convection_Diffusion_Phase_field::discretiser()
 {
   const Discret_Thyd& dis=ref_cast(Discret_Thyd, discretisation());

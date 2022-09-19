@@ -22,11 +22,12 @@
 #ifndef Fichier_dx_included
 #define Fichier_dx_included
 
-// .DESCRIPTION        :
-//  Cette classe contient un fichier de type EcrFicPartage ou EcrFicPrive,
-//  en ASCII ou en BINAIRE selon le format specifie dans le constructeur.
-//  Voir la doc du constructeur.
-
+/*! @brief : Cette classe contient un fichier de type EcrFicPartage ou EcrFicPrive,
+ *
+ *   en ASCII ou en BINAIRE selon le format specifie dans le constructeur.
+ *   Voir la doc du constructeur.
+ *
+ */
 class Fichier_dx
 {
 public:
@@ -52,9 +53,11 @@ protected:
   Postraitement_dx::Format format_;
 };
 
-// .DESCRIPTION        :
-//  Specialisation du Fichier_dx pour le fichier maitre: toujours en ASCII.
-//  On peut utiliser une precision differente si on veut
+/*! @brief : Specialisation du Fichier_dx pour le fichier maitre: toujours en ASCII.
+ *
+ *   On peut utiliser une precision differente si on veut
+ *
+ */
 class Fichier_dx_maitre : public Fichier_dx
 {
 public:

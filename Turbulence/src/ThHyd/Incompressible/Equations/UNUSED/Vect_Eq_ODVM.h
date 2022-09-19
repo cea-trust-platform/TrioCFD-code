@@ -22,12 +22,10 @@
 #ifndef Vect_Eq_ODVM_included
 #define Vect_Eq_ODVM_included
 
-//
-// .DESCRIPTION class VECT(Eq_ODVM)
-//
-// .SECTION voir aussi Eq_ODVM
-//
-
+/*! @brief class VECT(Eq_ODVM)
+ *
+ * @sa Eq_ODVM
+ */
 #include <Eq_ODVM.h>
 Declare_vect(Eq_ODVM);
 #endif

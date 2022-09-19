@@ -25,13 +25,11 @@
 #include <Dispersion_bulles_base.h>
 #include <Correlation.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Dispersion_bulles_turbulente_Burns
-//      coefficients de
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Dispersion_bulles_turbulente_Burns coefficients de
+ *
+ *
+ *
+ */
 class Dispersion_bulles_turbulente_Burns : public Dispersion_bulles_base
 {
   Declare_instanciable(Dispersion_bulles_turbulente_Burns);

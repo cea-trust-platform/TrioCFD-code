@@ -40,8 +40,9 @@ Entree& Source_rayo_semi_transp_base::readOn(Entree& s )
   return s;
 }
 
-// Description:
-// Appele par Pb_Couple_rayo_semi_transp::initialiser()
+/*! @brief Appele par Pb_Couple_rayo_semi_transp::initialiser()
+ *
+ */
 void Source_rayo_semi_transp_base::associer_modele_rayo(Modele_rayo_semi_transp& mod)
 {
   le_modele_ = mod;

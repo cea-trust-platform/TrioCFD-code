@@ -27,22 +27,15 @@
 #include <Motcle.h>
 #include <Ref_Milieu_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Eq_couch_lim
-//    Classe resolvant les equations de couche limite simplifiees necessaires
-//    a l'utilisation des lois de parois de type TBLE (Thin Boundary
-//    Layer Equations)
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
-//Macro qui transforme tous les anciens DoubleTab en ArrOfDouble
-//ATTENTION : cette macro n'est valable que si il existe une dimension commune
-//a tous les anciens DoubleTab, ici N_comp.
-
+/*! @brief Classe Eq_couch_lim Classe resolvant les equations de couche limite simplifiees necessaires
+ *
+ *     a l'utilisation des lois de parois de type TBLE (Thin Boundary
+ *     Layer Equations)
+ *
+ *
+ *
+ * @sa Macro qui transforme tous les anciens DoubleTab en ArrOfDouble, ATTENTION : cette macro n'est valable que si il existe une dimension commune, a tous les anciens DoubleTab, ici N_comp.
+ */
 #define tabdouble(__tab__,__i__,__j__) __tab__[__i__+(__j__)*N_comp]
 
 class Eq_couch_lim : public Objet_U

@@ -84,9 +84,9 @@ void Probleme_FT_Disc_gen::associer_equation(Equation_base& eq)
   equations_.add(eq);
 }
 
-// Description: Verifie que le milieu est de type Fluide_Diphasique
-//  et associe le milieu aux equations.
-// Precondition: Toutes les equations doivent avoir ete associees.
+/*! @brief Verifie que le milieu est de type Fluide_Diphasique et associe le milieu aux equations.
+ *
+ */
 void Probleme_FT_Disc_gen::associer_milieu_base(const Milieu_base& un_milieu)
 {
   // Le milieu est associe aux equations en fonction de son type :

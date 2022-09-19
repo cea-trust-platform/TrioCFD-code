@@ -42,8 +42,9 @@ Entree& Op_Conv_Quickb_VDF_Elem::readOn(Entree& s )
 }
 
 
-// Description:
-// complete l'iterateur et l'evaluateur
+/*! @brief complete l'iterateur et l'evaluateur
+ *
+ */
 void Op_Conv_Quickb_VDF_Elem::associer(const Zone_dis& zone_dis,
                                        const Zone_Cl_dis& zone_cl_dis,
                                        const Champ_Inc& ch_transporte)
@@ -80,8 +81,9 @@ Champ_Inc_base& Op_Conv_Quickb_VDF_Elem::vitesse()
 
 
 
-// Description:
-// constructeur
+/*! @brief constructeur
+ *
+ */
 Op_Conv_Quickb_VDF_Elem::Op_Conv_Quickb_VDF_Elem()
   :Op_Conv_VDF_base(It_VDF_Elem(Eval_Quickb_VDF_Elem)())
 {

@@ -26,89 +26,49 @@
 Implemente_base(Mod_Turb_scal_diffturb_base,"Mod_Turb_scal_diffturb_base",Modele_turbulence_scal_base);
 
 
-// Description:
-//    Ecrit le type de l'objet sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& s
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Ecrit le type de l'objet sur un flot de sortie.
+ *
+ * @param (Sortie& s) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Mod_Turb_scal_diffturb_base::printOn(Sortie& s ) const
 {
   return s << que_suis_je() << " " << le_nom();
 }
 
 
-// Description:
-//    Lit les specifications d'un modele de turbulence
-//    a partir d'un flot d'entree.
-//    Format:
-//      {
-//      }
-//    (il n'y a rien a lire sauf les accolades)
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Exception: accolade fermante attendue
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les specifications d'un modele de turbulence a partir d'un flot d'entree.
+ *
+ *     Format:
+ *       {
+ *       }
+ *     (il n'y a rien a lire sauf les accolades)
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ * @throws accolade ouvrante attendue
+ * @throws accolade fermante attendue
+ */
 Entree& Mod_Turb_scal_diffturb_base::readOn(Entree& is )
 {
   return Modele_turbulence_scal_base::readOn(is);
 }
 
-// Description:
-//    Associe une viscosite turbulente au modele
-//    de turbulence.
-// Precondition:
-// Parametre: Champ_Fonc& visc_turb
-//    Signification: le champ fonction representant la viscosite
-//                   turbulente a associer.
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: le modele de turbulence a une viscosite associee
+/*! @brief Associe une viscosite turbulente au modele de turbulence.
+ *
+ * @param (Champ_Fonc& visc_turb) le champ fonction representant la viscosite turbulente a associer.
+ */
 void Mod_Turb_scal_diffturb_base::associer_viscosite_turbulente(const Champ_Fonc& visc_turb)
 {
   la_viscosite_turbulente = visc_turb;
 }
 
-// Description:
-//    Complete le modele de turbulence:
-//    Appelle Modele_turbulence_scal_base::completer()
-//    associe la viscosite turbulente du probleme
-//    au modele de turbulence.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Complete le modele de turbulence: Appelle Modele_turbulence_scal_base::completer()
+ *
+ *     associe la viscosite turbulente du probleme
+ *     au modele de turbulence.
+ *
+ */
 void Mod_Turb_scal_diffturb_base::completer()
 {
   Modele_turbulence_scal_base::completer();
@@ -119,20 +79,11 @@ void Mod_Turb_scal_diffturb_base::completer()
   associer_viscosite_turbulente(visc_turb);
 }
 
-// Description:
-//    NE FAIT RIEN
-// Precondition:
-// Parametre: Entree&
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: NON ACCEDE
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief NE FAIT RIEN
+ *
+ * @param (Entree&) un flot d'entree
+ * @return (int) renvoie toujours 1
+ */
 int Mod_Turb_scal_diffturb_base::reprendre(Entree& )
 {
   return 1;

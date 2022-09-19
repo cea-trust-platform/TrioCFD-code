@@ -23,11 +23,11 @@
 #ifndef Schema_Euler_Implicite_Stationnaire_included
 #define Schema_Euler_Implicite_Stationnaire_included
 
-//////////////////////////////////////////////////////////
-// .DESCRIPTION class Schema_Euler_Implicite_Stationnaire
-//  Il herite de schema implicite base et porte le solveur Implicit_steady
-// pour effectuer les Faire_un_pas_de_temps..
-
+/*! @brief class Schema_Euler_Implicite_Stationnaire Il herite de schema implicite base et porte le solveur Implicit_steady
+ *
+ *  pour effectuer les Faire_un_pas_de_temps..
+ *
+ */
 #include <Schema_Euler_Implicite.h>
 
 class Probleme_Couple;

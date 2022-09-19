@@ -48,14 +48,18 @@ Marching_Cubes::Marching_Cubes() :
 {
 }
 
-// Description: Constructeur par copie interdit !
+/*! @brief Constructeur par copie interdit !
+ *
+ */
 Marching_Cubes::Marching_Cubes(const Marching_Cubes& a): Objet_U(a)
 {
   Cerr << "Erreur : Marching_Cubes::Marching_Cubes  Constructeur par copie interdit !" << finl;
   exit();
 }
 
-// Description: Operateur copie interdit !
+/*! @brief Operateur copie interdit !
+ *
+ */
 const Marching_Cubes& Marching_Cubes::operator=(const Marching_Cubes&)
 {
   Cerr << "Erreur : Marching_Cubes::operator= Operateur copie interdit !" << finl;
@@ -85,49 +89,18 @@ void Marching_Cubes::associer_zone_vf(const Zone_VF& zone_vf)
   remplir_renum_virt_loc(zone);
 }
 
-// Description:
-//  Construction d'un maillage en segments ou en triangles comme l'isovaleur
-//  d'une fonction discretisee aux sommets du maillage eulerien (associer_zone_vf).
-//  L'algorithme est un "marching cubes" generalise pour travailler avec un
-//  maillage vf en triangles, rectangles, cubes ou tetraedres.
-//  En cas d'erreur, le maillage est remis a zero (reset()).
-// Parametre:   valeurs_sommets
-// Signification: Un vecteur distribue de valeurs aux sommets du maillage vf
-//                dont on va construire l'isovaleur. L'espace virtuel doit etre
-//                a jour.
-// Parametre:   isovaleur
-// Signification: L'isovaleur a construire
-// Parametre:   maillage
-// Signification: L'objet maillage a construire. On efface completement son contenu
-//                et on le remplace par l'isovaleur.
-// Parametre:   indicatrice_approchee
-// Signification: On y stocke 0 si valeurs_sommets[i] < isovaleur pour tous les sommets
-//                de la maille et si valeurs_sommets[i] > isovaleur
-//                Certaines mailles (traversees par l'interface) ont une
-//                valeur differente qu'on ne calcule pas (on met 0.5).
-//                Si phase != AJOUTE_TOUTES_PHASES, on suppose que indicatrice_approchee
-//                contient une approximation de l'indicatrice des interfaces existantes
-//                avant l'entree dans cette fonction (elle doit contenir 0 ou 1 dans les
-//                mailles non traversees par une interface, et une valeur intermediaire dans
-//                les mailles traversees).
-//                Ce tableau est ecrase quoi qu'il arrive (y compris en cas de valeur de retour=0)
-//                (faire une copie du tableau avant d'appeler la fonction si on veut revenir en arriere !)
-// Parametre:   phase
-// Signification: Indique comment mettre a jour indicatrice_approchee.
-//                Ce parametre est utilise pour construire une interface en plusieurs
-//                etapes (reunion de plusieurs bulles, soustraction d'une phase, ...)
-//                phase == AJOUTE_TOUTES_PHASES :
-//                 la valeur de l'indicatrice approchee est calculee partout
-//                phase == 0 :
-//                 on met a 0 l'indicatrice si valeur<isovaleur,
-//                 l'indicatrice est inchangee si valeur>isovaleur
-//                phase == 1 :
-//                 on met a 1 l'indicatrice si valeur>isovaleur, l'indicatrice
-//                 l'indicatrice est inchangee si valeur<isovaleur
-// Valeur de retour:
-//  1: construction reussie.
-//  0: erreur: l'interface qu'on vient de construire entre en collision avec une interface
-//      existante (teste base sur la valeur de "indicatrice_approchee" a l'entree de la fonction)
+/*! @brief Construction d'un maillage en segments ou en triangles comme l'isovaleur d'une fonction discretisee aux sommets du maillage eulerien (associer_zone_vf).
+ *
+ *   L'algorithme est un "marching cubes" generalise pour travailler avec un
+ *   maillage vf en triangles, rectangles, cubes ou tetraedres.
+ *   En cas d'erreur, le maillage est remis a zero (reset()).
+ *
+ * @param (valeurs_sommets) Un vecteur distribue de valeurs aux sommets du maillage vf dont on va construire l'isovaleur. L'espace virtuel doit etre a jour.
+ * @param (isovaleur) L'isovaleur a construire
+ * @param (maillage) L'objet maillage a construire. On efface completement son contenu et on le remplace par l'isovaleur.
+ * @param (indicatrice_approchee) On y stocke 0 si valeurs_sommets[i] < isovaleur pour tous les sommets de la maille et si valeurs_sommets[i] > isovaleur Certaines mailles (traversees par l'interface) ont une valeur differente qu'on ne calcule pas (on met 0.5). Si phase != AJOUTE_TOUTES_PHASES, on suppose que indicatrice_approchee contient une approximation de l'indicatrice des interfaces existantes avant l'entree dans cette fonction (elle doit contenir 0 ou 1 dans les mailles non traversees par une interface, et une valeur intermediaire dans les mailles traversees). Ce tableau est ecrase quoi qu'il arrive (y compris en cas de valeur de retour=0) (faire une copie du tableau avant d'appeler la fonction si on veut revenir en arriere !)
+ * @param (phase) Indique comment mettre a jour indicatrice_approchee. Ce parametre est utilise pour construire une interface en plusieurs etapes (reunion de plusieurs bulles, soustraction d'une phase, ...) phase == AJOUTE_TOUTES_PHASES : la valeur de l'indicatrice approchee est calculee partout phase == 0 : on met a 0 l'indicatrice si valeur<isovaleur, l'indicatrice est inchangee si valeur>isovaleur phase == 1 : on met a 1 l'indicatrice si valeur>isovaleur, l'indicatrice l'indicatrice est inchangee si valeur<isovaleur Valeur de retour: 1: construction reussie. 0: erreur: l'interface qu'on vient de construire entre en collision avec une interface existante (teste base sur la valeur de "indicatrice_approchee" a l'entree de la fonction)
+ */
 int Marching_Cubes::construire_iso(const DoubleVect& valeurs_sommets,
                                    double isovaleur,
                                    Maillage_FT_Disc& maillage,
@@ -817,25 +790,14 @@ int Marching_Cubes::construire_noeuds_et_facettes(const ArrOfBit& signe,
   return resultat_ok;
 }
 
-// #########################################################################
-// Troisieme etape: creation de noeuds supplementaires sur les faces de joints.
-//  Un noeud est reel pour moi si mon PE est le plus petit
-//  parmi les PEs qui possedent ce noeud.
-//  Algorithme : balayer les faces de joints et creer des duplicatas
-//  des noeuds situes sur les aretes de joints, auxquels on associe
-//  le numero du PE_voisin. Apres tri de la liste complete de noeuds
-//  par ordre lexicographique des deux numeros de sommets et du numero du PE,
-//  on trouve immediatement le numero du PE qui possede chaque noeud.
-// Complexite : N (N=nombre de faces de joints)
-
-
-// Description:
-//  Ajout des sommets situes sur des faces (bords ou joints) dans le tableau
-//  def_noeud.
-//  Soit faces_sommets est une liste de faces d'un joint, dans ce cas, numero_PE
-//  est le PE_voisin du joint.
-//  Soit faces_sommets est la liste des faces de la zone et nb_faces_a_traiter
-//  est le nombre de faces de bord. Dans ce cas, numero_PE = nproc().
+/*! @brief Ajout des sommets situes sur des faces (bords ou joints) dans le tableau def_noeud.
+ *
+ *   Soit faces_sommets est une liste de faces d'un joint, dans ce cas, numero_PE
+ *   est le PE_voisin du joint.
+ *   Soit faces_sommets est la liste des faces de la zone et nb_faces_a_traiter
+ *   est le nombre de faces de bord. Dans ce cas, numero_PE = nproc().
+ *
+ */
 void Marching_Cubes::construire_noeuds_liste_faces(const ArrOfBit& signe,
                                                    const IntTab& faces_sommets,
                                                    const int nb_faces_a_traiter,

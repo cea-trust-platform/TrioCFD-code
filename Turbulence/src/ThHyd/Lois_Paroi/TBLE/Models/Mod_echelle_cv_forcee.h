@@ -29,16 +29,12 @@
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Mod_echelle_cv_forcee
-//
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Mod_echelle_cv_forcee
+ *
+ *
+ *
+ *
+ */
 class Mod_echelle_cv_forcee : public Mod_echelle_LRM_base
 {
   Declare_instanciable(Mod_echelle_cv_forcee);

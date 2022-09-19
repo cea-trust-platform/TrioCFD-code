@@ -71,15 +71,17 @@ protected :
 
 };
 
-// Description:
-// renvoie le champ inconnue.
+/*! @brief renvoie le champ inconnue.
+ *
+ */
 inline Champ_Inc& Transport_Flux_Chaleur_Turbulente::inconnue()
 {
   return le_Flux_Chaleur_Turbulente;
 }
 
-// Description:
-// renvoie le champ inconnue.
+/*! @brief renvoie le champ inconnue.
+ *
+ */
 inline const Champ_Inc& Transport_Flux_Chaleur_Turbulente::inconnue() const
 {
   return le_Flux_Chaleur_Turbulente;

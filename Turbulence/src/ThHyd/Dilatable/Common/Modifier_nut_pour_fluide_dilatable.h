@@ -23,23 +23,21 @@
 #ifndef Modifier_nut_pour_fluide_dilatable
 #define Modifier_nut_pour_fluide_dilatable
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Modifier_nut_pour_fluide_dilatable
-//     Cette classe permet de faire la conversion de la viscosite cinematique turbulente nu_t
-//       en viscosite dynamique turbulente mu_t dans le cas des equations compressibles.
-//     Pour cela il suffit de tester si l'on est dans un cas quasi-compressible :
-//       Si c'est le cas, on multiplie nu_t par rho.
-//     Cette conversion ne doit etre faite que dans le cas ou l'on utilise un modele sous-maille
-//       type LES puisque dans ce cas on renvoit un nu_t.
-//       Par contre en simulation RANS, puisque l'on rentre les bonnes grandeurs turbulentes
-//       multipliee par rho, on obtient bien au final un mu_t et l'on n'a pas besoin de faire
-//       de conversion.
-//
-// .SECTION
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Modifier_nut_pour_fluide_dilatable Cette classe permet de faire la conversion de la viscosite cinematique turbulente nu_t
+ *
+ *        en viscosite dynamique turbulente mu_t dans le cas des equations compressibles.
+ *      Pour cela il suffit de tester si l'on est dans un cas quasi-compressible :
+ *        Si c'est le cas, on multiplie nu_t par rho.
+ *      Cette conversion ne doit etre faite que dans le cas ou l'on utilise un modele sous-maille
+ *        type LES puisque dans ce cas on renvoit un nu_t.
+ *        Par contre en simulation RANS, puisque l'on rentre les bonnes grandeurs turbulentes
+ *        multipliee par rho, on obtient bien au final un mu_t et l'on n'a pas besoin de faire
+ *        de conversion.
+ *
+ *  .SECTION
+ *
+ *
+ */
 #include <Modifier_pour_fluide_dilatable.h>
 class Mod_turb_hyd_base;
 

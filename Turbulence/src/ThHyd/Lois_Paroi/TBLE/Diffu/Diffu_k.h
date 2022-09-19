@@ -28,17 +28,13 @@
 class Mod_echelle_LRM_base ;
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Diffu_k
-//    Calsse derivant de la classe Diffu_totale_hyd__base et specifiant la valeur
-//    de la diffusivite_totale
-//
-//
-// .SECTION voir aussi
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Diffu_k Calsse derivant de la classe Diffu_totale_hyd__base et specifiant la valeur
+ *
+ *     de la diffusivite_totale
+ *
+ *
+ *
+ */
 class Diffu_k : public Diffu_totale_hyd_base
 {
   Declare_instanciable(Diffu_k);

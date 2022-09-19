@@ -32,49 +32,31 @@ Implemente_instanciable(Champ_Uniforme_Morceaux,"Champ_Uniforme_Morceaux",Champ_
 
 
 
-// Description:
-//    Imprime les valeurs du champs sur un flot de sortie
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Imprime les valeurs du champs sur un flot de sortie
+ *
+ * @param (Sortie& os) un flot de sortie 
+ * @return (Sortie&) le flot de sortie modifie 
+ */
 Sortie& Champ_Uniforme_Morceaux::printOn(Sortie& os) const
 {
   return os << valeurs();
 }
 
 
-// Description:
-//    Lit les valeurs du champ uniforme par morceaux
-//    a partir d'un flot d'entree.
-//    On lit le nom du domaine (nom_domaine) le nombre de
-//    composantes du champ (nb_comp) la valeur par defaut
-//    du champ ainsi que les valeurs sur les sous zones.
-//    Format:
-//     Champ_Uniforme_Morceaux nom_domaine nb_comp
-//     { Defaut val_def sous_zone_1 val_1 ... sous_zone_i val_i }
-// Precondition: pour utiliser un objet de type Champ_Uniforme_Morceaux
-//               il faut avoir defini des objets de type Sous_Zone
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le champ d'entree modifie
-//    Contraintes:
-// Exception: accolade ouvrante attendue
-// Exception: mot clef "defaut" attendu
-// Effets de bord:
-// Postcondition:
+/*! @brief Lit les valeurs du champ uniforme par morceaux a partir d'un flot d'entree.
+ *
+ *     On lit le nom du domaine (nom_domaine) le nombre de
+ *     composantes du champ (nb_comp) la valeur par defaut
+ *     du champ ainsi que les valeurs sur les sous zones.
+ *     Format:
+ *      Champ_Uniforme_Morceaux nom_domaine nb_comp
+ *      { Defaut val_def sous_zone_1 val_1 ... sous_zone_i val_i }
+ *
+ * @param (Entree& is) un flot d'entree 
+ * @return (Entree&) le champ d'entree modifie 
+ * @throws accolade ouvrante attendue 
+ * @throws mot clef "defaut" attendu 
+ */
 Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
 {
   int dim;
@@ -206,99 +188,52 @@ Entree& Champ_Uniforme_Morceaux::readOn(Entree& is)
   return is;
 }
 
-// Description:
-//    Renvoie une reference sur le domaine associe.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: REF(Domaine)&
-//    Signification: reference sur le domaine associe
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie une reference sur le domaine associe.
+ *
+ * (version const)
+ *
+ * @return (REF(Domaine)&) reference sur le domaine associe 
+ */
 const REF(Domaine)& Champ_Uniforme_Morceaux::domaine() const
 {
   return mon_domaine;
 }
 
-// Description:
-//    Renvoie une reference sur le domaine associe.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: REF(Domaine)&
-//    Signification: reference sur le domaine associe
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie une reference sur le domaine associe.
+ *
+ * @return (REF(Domaine)&) reference sur le domaine associe 
+ */
 REF(Domaine)& Champ_Uniforme_Morceaux::domaine()
 {
   return mon_domaine;
 }
 
-// Description:
-//    Renvoie la liste des sous_zones associees.
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: LIST(REF(Sous_Zone))&
-//    Signification: la liste des sous_zones associees
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la liste des sous_zones associees.
+ *
+ * (version const)
+ *
+ * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees 
+ */
 const LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones() const
 {
   return les_sous_zones;
 }
 
-// Description:
-//    Renvoie la liste des sous_zones associees.
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: LIST(REF(Sous_Zone))&
-//    Signification: la liste des sous_zones associees
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie la liste des sous_zones associees.
+ *
+ * @return (LIST(REF(Sous_Zone))&) la liste des sous_zones associees 
+ */
 LIST(REF(Sous_Zone))& Champ_Uniforme_Morceaux::sous_zones()
 {
   return les_sous_zones;
 }
 
 
-// Description:
-//    NE FAIT RIEN
-// Precondition:
-// Parametre: mp_base& ch
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: NON ACCEDE
-// Retour: Champ_base&
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief NE FAIT RIEN
+ *
+ * @param (mp_base& ch)  
+ * @return (Champ_base&)  
+ */
 Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 {
   if(sub_type(Champ_Uniforme_Morceaux, ch))
@@ -338,26 +273,12 @@ Champ_base& Champ_Uniforme_Morceaux::affecter_(const Champ_base& ch)
 }
 
 
-// Description:
-//    Renvoie la valeur du champ au point specifie
-//    par ses coordonnees.
-// Precondition:
-// Parametre: DoubleVect& positions
-//    Signification: les coordonnees du point de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleVect& valeurs
-//    Signification: la valeur du champ au point specifie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: DoubleVect&
-//    Signification: la valeur du champ au point specifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees.
+ *
+ * @param (DoubleVect& positions) les coordonnees du point de calcul 
+ * @param (DoubleVect& valeurs) la valeur du champ au point specifie 
+ * @return (DoubleVect&) la valeur du champ au point specifie 
+ */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
                                               DoubleVect& tab_valeurs) const
 {
@@ -368,32 +289,16 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_a(const DoubleVect& positions,
 }
 
 
-// Description:
-//    Renvoie la valeur du champ au point specifie
-//    par ses coordonnees, en indiquant que ce point est
-//    situe dans un element specifie.
-// Precondition:
-// Parametre: DoubleVect&
-//    Signification: les coordonnees du point de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleVect& val
-//    Signification: la valeur du champ au point specifie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Parametre: int le_poly
-//    Signification: l'element dans lequel est situe le point de calcul
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleVect&
-//    Signification: la valeur du champ au point specifie
-//    Contraintes:
-// Exception: tableau stockant la valeur du champ de taille incorrecte
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la valeur du champ au point specifie par ses coordonnees, en indiquant que ce point est
+ *
+ *     situe dans un element specifie.
+ *
+ * @param (DoubleVect&) les coordonnees du point de calcul 
+ * @param (DoubleVect& val) la valeur du champ au point specifie 
+ * @param (int le_poly) l'element dans lequel est situe le point de calcul 
+ * @return (DoubleVect&) la valeur du champ au point specifie 
+ * @throws tableau stockant la valeur du champ de taille incorrecte 
+ */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_a_elem(const DoubleVect& ,
                                                    DoubleVect& val,
                                                    int le_poly) const
@@ -417,33 +322,16 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_a_elem(const DoubleVect& ,
 }
 
 
-// Description:
-//    Renvoie la valeur d'une composante du champ au point specifie
-//    par ses coordonnees, en indiquant que ce point est
-//    situe dans un element specifie.
-// Precondition:
-// Parametre: DoubleVect&
-//    Signification: les coordonnees du point de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: int le_poly
-//    Signification: l'element dans lequel est situe le point de calcul
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Parametre: int ncomp
-//    Signification: l'index de la composante du champ a calculer
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: double
-//    Signification: la valeur de la composante du champ specifiee au
-//                   point specifie
-//    Contraintes:
-// Exception: index de la composante du champ a calculer trop grand
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie la valeur d'une composante du champ au point specifie par ses coordonnees, en indiquant que ce point est
+ *
+ *     situe dans un element specifie.
+ *
+ * @param (DoubleVect&) les coordonnees du point de calcul 
+ * @param (int le_poly) l'element dans lequel est situe le point de calcul 
+ * @param (int ncomp) l'index de la composante du champ a calculer 
+ * @return (double) la valeur de la composante du champ specifiee au point specifie 
+ * @throws index de la composante du champ a calculer trop grand 
+ */
 double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
                                                     int le_poly,
                                                     int ncomp) const
@@ -467,26 +355,12 @@ double Champ_Uniforme_Morceaux::valeur_a_elem_compo(const DoubleVect& ,
 }
 
 
-// Description:
-//    Renvoie les valeurs du champ aux points specifies
-//    par leurs coordonnees.
-// Precondition:
-// Parametre: DoubleTab& positions
-//    Signification: le tableau des coordonnees des points de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleTab& valeurs
-//    Signification: le tableau des valeurs du champ aux points specifies
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: DoubleTab&
-//    Signification: le tableau des valeurs du champ aux points specifies
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees.
+ *
+ * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul 
+ * @param (DoubleTab& valeurs) le tableau des valeurs du champ aux points specifies 
+ * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies 
+ */
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
                                                DoubleTab& tab_valeurs) const
 {
@@ -497,33 +371,13 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux(const DoubleTab& positions,
 }
 
 
-// Description:
-//    Renvoie les valeurs d'une composante du champ aux points specifies
-//    par leurs coordonnees.
-// Precondition:
-// Parametre: DoubleTab& positions
-//    Signification: le tableau des coordonnees des points de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleVect& valeurs
-//    Signification: le tableau des valeurs de la composante du champ
-//                   aux points specifies
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Parametre: int ncomp
-//    Signification: l'index de la composante du champ a calculer
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleVect&
-//    Signification: le tableau des valeurs de la composante du champ
-//                   aux points specifies
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees.
+ *
+ * @param (DoubleTab& positions) le tableau des coordonnees des points de calcul 
+ * @param (DoubleVect& valeurs) le tableau des valeurs de la composante du champ aux points specifies 
+ * @param (int ncomp) l'index de la composante du champ a calculer 
+ * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies 
+ */
 DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions,
                                                       DoubleVect& tab_valeurs, int ncomp) const
 {
@@ -534,33 +388,16 @@ DoubleVect& Champ_Uniforme_Morceaux::valeur_aux_compo(const DoubleTab& positions
 }
 
 
-// Description:
-//    Renvoie les valeurs du champ aux points specifies
-//    par leurs coordonnees, en indiquant que les points de
-//    calculs sont situes dans les elements indiques.
-// Precondition:
-// Parametre: DoubleTab&
-//    Signification: le tableau des coordonnees des points de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: IntVect& les_polys
-//    Signification: le tableau des elements dans lesquels sont
-//                   situes les points de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleTab& val
-//    Signification: le tableau des valeurs du champ aux points specifies
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: DoubleTab&
-//    Signification: le tableau des valeurs du champ aux points specifies
-//    Contraintes:
-// Exception: le tableau des valeurs a plus de 2 entrees (rang > 2)
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie les valeurs du champ aux points specifies par leurs coordonnees, en indiquant que les points de
+ *
+ *     calculs sont situes dans les elements indiques.
+ *
+ * @param (DoubleTab&) le tableau des coordonnees des points de calcul 
+ * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul 
+ * @param (DoubleTab& val) le tableau des valeurs du champ aux points specifies 
+ * @return (DoubleTab&) le tableau des valeurs du champ aux points specifies 
+ * @throws le tableau des valeurs a plus de 2 entrees (rang > 2) 
+ */
 DoubleTab& Champ_Uniforme_Morceaux::valeur_aux_elems(const DoubleTab& ,
                                                      const IntVect& les_polys,
                                                      DoubleTab& val) const
@@ -653,40 +490,16 @@ DoubleTab& Champ_Uniforme_Morceaux::valeur_aux_elems(const DoubleTab& ,
 }
 
 
-// Description:
-//    Renvoie les valeurs d'une composante du champ aux points specifies
-//    par leurs coordonnees, en indiquant que les points de
-//    calculs sont situes dans les elements indiques.
-// Precondition:
-// Parametre: DoubleTab&
-//    Signification: le tableau des coordonnees des points de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: IntVect& les_polys
-//    Signification: le tableau des elements dans lesquels sont
-//                   situes les points de calcul
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: DoubleVect& val
-//    Signification: le tableau des valeurs de la composante du champ
-//                   aux points specifies
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Parametre: int ncomp
-//    Signification: l'index de la composante du champ a calculer
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: DoubleVect&
-//    Signification: le tableau des valeurs de la composante du champ
-//                   aux points specifies
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie les valeurs d'une composante du champ aux points specifies par leurs coordonnees, en indiquant que les points de
+ *
+ *     calculs sont situes dans les elements indiques.
+ *
+ * @param (DoubleTab&) le tableau des coordonnees des points de calcul 
+ * @param (IntVect& les_polys) le tableau des elements dans lesquels sont situes les points de calcul 
+ * @param (DoubleVect& val) le tableau des valeurs de la composante du champ aux points specifies 
+ * @param (int ncomp) l'index de la composante du champ a calculer 
+ * @return (DoubleVect&) le tableau des valeurs de la composante du champ aux points specifies 
+ */
 DoubleVect& Champ_Uniforme_Morceaux::
 valeur_aux_elems_compo(const DoubleTab&,
                        const IntVect& les_polys,

@@ -89,12 +89,9 @@ protected:
   // Iterateur_Source_VDF iter;
 };
 
-//
-//   Fonctions inline de la classe Source_Correction_Deficitaire
-//
-
-// Description:
-
+/*! @brief
+ *
+ */
 inline DoubleTab& Source_Correction_Deficitaire::ajouter(DoubleTab& resu) const
 {
   //Cout << " Dans Source_Correction_Deficitaire le_residu = " << le_residu << finl;

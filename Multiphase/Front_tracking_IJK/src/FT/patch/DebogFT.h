@@ -28,13 +28,13 @@
 class Maillage_FT_Disc;
 
 
-/////////////////////////////////////////////////////////////////////////////
-// .NAME        : DebogIJK
-// .DESCRIPTION : class DebogIJK
-//
-// <Description of class DebogIJK>
-//
-/////////////////////////////////////////////////////////////////////////////
+/*! @brief : class DebogIJK
+ *
+ *  <Description of class DebogIJK>
+ * 
+ * 
+ *
+ */
 class DebogFT : public Interprete
 {
   Declare_instanciable(DebogFT) ;

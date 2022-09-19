@@ -36,7 +36,11 @@ Remailleur_Collision_FT_Thomas::Remailleur_Collision_FT_Thomas()
   distance_utilisateur_ = 1;
 }
 
-// Description: Lecture des parametres dans le fichier .data
+/*! @brief Lecture des parametres dans le fichier .
+ *
+ * data
+ *
+ */
 Entree& Remailleur_Collision_FT_Thomas::readOn(Entree& is)
 {
   Cerr << "Remailleur_Collision_FT_Thomas::readOn()" << finl;
@@ -56,7 +60,11 @@ Entree& Remailleur_Collision_FT_Thomas::readOn(Entree& is)
   return is;
 }
 
-// Description: Erreur. Pas code.
+/*! @brief Erreur.
+ *
+ * Pas code.
+ *
+ */
 Sortie& Remailleur_Collision_FT_Thomas::printOn(Sortie& os) const
 {
   Cerr << "Erreur  Remailleur_Collision_FT_Thomas::printOn() n'est pas code." << finl;

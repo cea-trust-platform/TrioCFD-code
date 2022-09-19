@@ -26,14 +26,14 @@
 #include <Paroi_scal_hyd_base_VDF.h>
 #include <Table.h>
 
-//.DESCRIPTION classe Paroi_std_scal_hyd_VDF
-//
-//
-//
-
-//.SECTION  voir aussi
-//  Paroi_std_hyd_VDF
-
+/*! @brief classe Paroi_std_scal_hyd_VDF
+ *
+ *
+ *
+ * .SECTION  voir aussi
+ *   Paroi_std_hyd_VDF
+ *
+ */
 class Paroi_std_scal_hyd_VDF : public Paroi_scal_hyd_base_VDF
 {
 
@@ -47,8 +47,11 @@ protected:
   int init_lois_paroi_scalaire();
 };
 
-// Description: cette classe permet de specifier des options a la loi de
-// paroi standard. Elle est reservee aux experts.
+/*! @brief cette classe permet de specifier des options a la loi de paroi standard.
+ *
+ * Elle est reservee aux experts.
+ *
+ */
 class Loi_expert_scalaire_VDF : public Paroi_std_scal_hyd_VDF
 {
   Declare_instanciable(Loi_expert_scalaire_VDF);

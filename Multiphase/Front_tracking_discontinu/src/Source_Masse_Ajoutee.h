@@ -25,14 +25,14 @@
 
 
 
-// .DESCRIPTION class Source_Masse_Ajoutee
-//  Calcul de la force de masse ajoutee (expression vectorielle) :
-//  F_ma = Cma*rho_f*vol_p*d/dt(u_f-u_p)
-//  Cma = 0.5
-//
-// .SECTION voir aussi
-//  Source_Action_Particules
-
+/*! @brief class Source_Masse_Ajoutee Calcul de la force de masse ajoutee (expression vectorielle) :
+ *
+ *   F_ma = Cma*rho_f*vol_p*d/dt(u_f-u_p)
+ *   Cma = 0.5
+ *
+ *
+ * @sa Source_Action_Particules
+ */
 #include <Source_Action_Particules.h>
 
 

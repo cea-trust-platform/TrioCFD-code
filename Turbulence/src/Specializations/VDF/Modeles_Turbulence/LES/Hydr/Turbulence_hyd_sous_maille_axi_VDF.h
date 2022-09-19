@@ -26,14 +26,14 @@
 
 #include <Turbulence_hyd_sous_maille_VDF.h>
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_axi_VDF
-//  Cette classe correspond a la mise en oeuvre du modele sous
-//  maille en axi en VDF
-//
-
-// .SECTION  voir aussi
-// Turbulence_hyd_sous_maille_VDF
-
+/*! @brief classe Turbulence_hyd_sous_maille_axi_VDF Cette classe correspond a la mise en oeuvre du modele sous
+ *
+ *   maille en axi en VDF
+ *
+ *  .SECTION  voir aussi
+ *  Turbulence_hyd_sous_maille_VDF
+ *
+ */
 class Turbulence_hyd_sous_maille_axi_VDF : public Turbulence_hyd_sous_maille_VDF
 {
 

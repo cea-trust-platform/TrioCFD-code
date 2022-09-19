@@ -25,18 +25,14 @@
 
 #include <Loi_Etat_base.h>
 #include <Champ.h>
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Loi_Etat_GP
-//     Cette classe represente la loi d'etat pour les gaz parfaits.
-//     Associe a un fluide incompressible, elle definit un fluide quasi compressible
-//     dont la loi d'eata est :
-//        Pth = rho*R*T
-// .SECTION voir aussi
-//     Fluide_Quasi_Compressible Loi_Etat_base
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Loi_Etat_GP Cette classe represente la loi d'etat pour les gaz parfaits.
+ *
+ *      Associe a un fluide incompressible, elle definit un fluide quasi compressible
+ *      dont la loi d'eata est :
+ *         Pth = rho*R*T
+ *
+ * @sa Fluide_Quasi_Compressible Loi_Etat_base 
+ */
 class Loi_Etat_GP : public Loi_Etat_base
 {
   Declare_instanciable_sans_constructeur(Loi_Etat_GP);

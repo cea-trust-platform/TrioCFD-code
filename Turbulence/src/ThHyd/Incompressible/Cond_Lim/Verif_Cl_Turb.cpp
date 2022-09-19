@@ -30,47 +30,35 @@
 #include <Equation_base.h>
 #include <Nom.h>
 
-// Description:
-//    Teste la compatibilite des conditions aux limites
-//    hydrauliques et turbulentes.
-//    La liste des compatibilites est la suivante:
-//    -----------------------------------------------------------------------
-//    Hydraulique                      |       Turbulence
-//    -----------------------------------------------------------------------
-//    Dirichlet_paroi_fixe  ou
-//    Dirichlet_paroi_defilante =======> Neumann_paroi_flux_nul
-//    =================================> Dirichlet_paroi_fixe (pour bas_reynolds)
-//    -----------------------------------------------------------------------
-//    Symetrie ========================> Symetrie
-//    =================================> Neumann_paroi_flux_nul
-//    -----------------------------------------------------------------------
-//    Neumann_sortie_libre ============> Neumann_sortie_libre
-//    =================================> Entree_fluide_K_Eps_impose
-//    -----------------------------------------------------------------------
-//    Entree_fluide_vitesse_imposee ===> Entree_fluide_K_Eps_impose
-//    =================================> Neumann_sortie_libre
-//    =================================> Symetrie
-//    -----------------------------------------------------------------------
-//    Periodique ======================> Periodique
-//    -----------------------------------------------------------------------
-// Precondition:
-// Parametre: Zone_Cl_dis& zone_Cl_hydr
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: Zone_Cl_dis& zone_Cl_turb
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Exception: nombres de conditions aux limites differents
-// Exception: conditions aux limite hydraulique et turbulentes incompatible
-// Effets de bord:
-// Postcondition:
+/*! @brief Teste la compatibilite des conditions aux limites hydrauliques et turbulentes.
+ *
+ *     La liste des compatibilites est la suivante:
+ *     -----------------------------------------------------------------------
+ *     Hydraulique                      |       Turbulence
+ *     -----------------------------------------------------------------------
+ *     Dirichlet_paroi_fixe  ou
+ *     Dirichlet_paroi_defilante =======> Neumann_paroi_flux_nul
+ *     =================================> Dirichlet_paroi_fixe (pour bas_reynolds)
+ *     -----------------------------------------------------------------------
+ *     Symetrie ========================> Symetrie
+ *     =================================> Neumann_paroi_flux_nul
+ *     -----------------------------------------------------------------------
+ *     Neumann_sortie_libre ============> Neumann_sortie_libre
+ *     =================================> Entree_fluide_K_Eps_impose
+ *     -----------------------------------------------------------------------
+ *     Entree_fluide_vitesse_imposee ===> Entree_fluide_K_Eps_impose
+ *     =================================> Neumann_sortie_libre
+ *     =================================> Symetrie
+ *     -----------------------------------------------------------------------
+ *     Periodique ======================> Periodique
+ *     -----------------------------------------------------------------------
+ *
+ * @param (Zone_Cl_dis& zone_Cl_hydr)
+ * @param (Zone_Cl_dis& zone_Cl_turb)
+ * @return (int) renvoie toujours 1
+ * @throws nombres de conditions aux limites differents
+ * @throws conditions aux limite hydraulique et turbulentes incompatible
+ */
 int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_Cl_dis& zone_Cl_turb)
 {
 
@@ -137,29 +125,13 @@ int tester_compatibilite_hydr_turb(const Zone_Cl_dis& zone_Cl_hydr, const Zone_C
 }
 
 
-// Description:
-//    Affiche un message d'erreur pour la fonction precedente
-// Precondition:
-// Parametre: Zone_Cl_dis& zone_Cl_hydr
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: Zone_Cl_dis& zone_Cl_turb
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Parametre: int num_Cl
-//    Signification: numero de la CL
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour: int
-//    Signification: renvoie toujours 1
-//    Contraintes:
-// Effets de bord:
-// Postcondition:
+/*! @brief Affiche un message d'erreur pour la fonction precedente
+ *
+ * @param (Zone_Cl_dis& zone_Cl_hydr)
+ * @param (Zone_Cl_dis& zone_Cl_turb)
+ * @param (int num_Cl) numero de la CL
+ * @return (int) renvoie toujours 1
+ */
 int message_erreur_turb(const Cond_lim& la_cl_hydr, const Cond_lim& la_cl_turb, int& num_Cl)
 {
   Cerr << "The hydraulic and turbulent boundary conditions are not consitent on border:" << finl;

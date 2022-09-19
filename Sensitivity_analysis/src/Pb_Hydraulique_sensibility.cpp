@@ -27,84 +27,45 @@ Implemente_instanciable(Pb_Hydraulique_sensibility,"Pb_Hydraulique_sensibility",
 // XD  attr Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility Navier_Stokes_standard_sensibility 0 Navier-Stokes sensibility equations
 
 
-// Description:
-//    Simple appel a: Pb_Fluide_base::printOn(Sortie&)
-//    Ecrit le probleme sur un flot de sortie.
-// Precondition:
-// Parametre: Sortie& os
-//    Signification: un flot de sortie
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Sortie&
-//    Signification: le flot de sortie modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Simple appel a: Pb_Fluide_base::printOn(Sortie&) Ecrit le probleme sur un flot de sortie.
+ *
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
+ */
 Sortie& Pb_Hydraulique_sensibility::printOn(Sortie& os) const
 {
   return Pb_Fluide_base::printOn(os);
 }
 
 
-// Description:
-//    Simple appel a: Pb_Fluide_base::readOn(Entree&)
-//    Lit le probleme a partir d'un flot d'entree.
-// Precondition:
-// Parametre: Entree& is
-//    Signification: un flot d'entree
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour: Entree&
-//    Signification: le flot d'entree modifie
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Simple appel a: Pb_Fluide_base::readOn(Entree&) Lit le probleme a partir d'un flot d'entree.
+ *
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
+ */
 Entree& Pb_Hydraulique_sensibility::readOn(Entree& is)
 {
   return Pb_Fluide_base::readOn(is);
 }
 
-// Description:
-//    Renvoie le nombre d'equation,
-//    Renvoie 1 car il y a seulement 1 equation a un probleme
-//    hydraulique standard: l'equation de Navier Stokes
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: int
-//    Signification: le nombre d'equation
-//    Contraintes: toujours 1 car il n'y qu'une seule equation (Navier Stokes)
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie le nombre d'equation, Renvoie 1 car il y a seulement 1 equation a un probleme
+ *
+ *     hydraulique standard: l'equation de Navier Stokes
+ *
+ * @return (int) le nombre d'equation
+ */
 int Pb_Hydraulique_sensibility::nombre_d_equations() const
 {
   return 1;
 }
 
-// Description:
-//    Renvoie l'equation d'hydraulique de type Navier_Stokes_std
-//    si i=0, sort (exit) sinon.
-//    (version const)
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'equation a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: i doit etre egal a 0, le probleme n'a qu'une equation
-//    Acces:
-// Retour: Equation_base&
-//    Signification: l'equation d'hydraulique de type Navier_Stokes_std
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition: la methode ne modifie pas l'objet
+/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0, sort (exit) sinon.
+ *
+ *     (version const)
+ *
+ * @param (int i) l'index de l'equation a renvoyer
+ * @return (Equation_base&) l'equation d'hydraulique de type Navier_Stokes_std
+ */
 const Equation_base& Pb_Hydraulique_sensibility::equation(int i) const
 {
   if (i!=0)
@@ -115,21 +76,11 @@ const Equation_base& Pb_Hydraulique_sensibility::equation(int i) const
   return eq_hydraulique;
 }
 
-// Description:
-//    Renvoie l'equation d'hydraulique de type Navier_Stokes_std
-//    si i=0, sort (exit) sinon.
-// Precondition:
-// Parametre: int i
-//    Signification: l'index de l'equation a renvoyer
-//    Valeurs par defaut:
-//    Contraintes: i doit etre egal a 0, le probleme n'a qu'une equation
-//    Acces:
-// Retour: Equation_base&
-//    Signification: l'equation d'hydraulique de type Navier_Stokes_std
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie l'equation d'hydraulique de type Navier_Stokes_std si i=0, sort (exit) sinon.
+ *
+ * @param (int i) l'index de l'equation a renvoyer
+ * @return (Equation_base&) l'equation d'hydraulique de type Navier_Stokes_std
+ */
 Equation_base& Pb_Hydraulique_sensibility::equation(int i)
 {
   if (i!=0)
@@ -142,22 +93,13 @@ Equation_base& Pb_Hydraulique_sensibility::equation(int i)
 
 
 
-// Description:
-//    Associe le milieu au probleme.
-//    Le milieu doit etre de type fluide incompressible.
-// Precondition:
-// Parametre: Milieu_base& mil
-//    Signification: le milieu physique a associer au probleme
-//    Valeurs par defaut:
-//    Contraintes: doit etre de type fluide incompressible
-//                 reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception: le milieu n'est pas du type Fluide_Incompressible
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe le milieu au probleme.
+ *
+ * Le milieu doit etre de type fluide incompressible.
+ *
+ * @param (Milieu_base& mil) le milieu physique a associer au probleme
+ * @throws le milieu n'est pas du type Fluide_Incompressible
+ */
 void Pb_Hydraulique_sensibility::associer_milieu_base(const Milieu_base& mil)
 {
   if (sub_type(Fluide_Incompressible,mil))

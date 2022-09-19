@@ -31,11 +31,9 @@
 #include <Champ_Inc_base.h>
 #include <Restriction_base.h>
 
-//
-// .DESCRIPTION class Restriction_face_face
-//
-// .SECTION voir aussi
-
+/*! @brief class Restriction_face_face
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

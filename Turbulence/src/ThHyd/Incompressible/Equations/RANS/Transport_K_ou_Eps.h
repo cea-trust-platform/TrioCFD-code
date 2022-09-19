@@ -29,21 +29,18 @@
 
 class Motcle;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Transport_K_ou_Eps
-//    Cette classe represente l'equation de transport de l'energie cinetique
-//    turbulente K et du taux de dissipation epsilon (eps) associee au modele
-//    de turbulence (k,eps).
-//    On traite en une seule equation le transport des deux
-//    grandeurs turbulentes. Il s'agit donc d'une equation vectorielle, dont
-//    le champ inconnue possede 2 composantes: K et epsilon.
-//    On instanciera un objet de cette classe uniquement si
-//    on utilise le modele (k,eps) pour traiter la turbulence en mode "bicephale"
-// .SECTION voir aussi
-//    Equation_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Transport_K_ou_Eps Cette classe represente l'equation de transport de l'energie cinetique
+ *
+ *     turbulente K et du taux de dissipation epsilon (eps) associee au modele
+ *     de turbulence (k,eps).
+ *     On traite en une seule equation le transport des deux
+ *     grandeurs turbulentes. Il s'agit donc d'une equation vectorielle, dont
+ *     le champ inconnue possede 2 composantes: K et epsilon.
+ *     On instanciera un objet de cette classe uniquement si
+ *     on utilise le modele (k,eps) pour traiter la turbulence en mode "bicephale"
+ *
+ * @sa Equation_base
+ */
 class Transport_K_ou_Eps : public Transport_K_ou_Eps_base
 {
 
@@ -71,20 +68,10 @@ protected :
 };
 
 
-// Description:
-//    Associe un champ de vitesse (transportante)a l'equation.
-// Precondition:
-// Parametre: Champ_Inc& vit
-//    Signification: le champ de vitesse a associer a l'equation
-//    Valeurs par defaut:
-//    Contraintes: reference constante
-//    Acces: entree
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Associe un champ de vitesse (transportante)a l'equation.
+ *
+ * @param (Champ_Inc& vit) le champ de vitesse a associer a l'equation
+ */
 inline void Transport_K_ou_Eps::associer_Champ_Inconnu(const Champ_Inc& vit)
 {
   inco_eqn_associee = vit;

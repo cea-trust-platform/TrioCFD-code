@@ -25,17 +25,14 @@
 #include <Marqueur_Lagrange_base.h>
 #include <Marching_Cubes.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Marqueur_FT
-//    La classe Marqueur_FT est une classe instanciable permettant de suivre des particules
-//    -on attribue a cette classe un objet de type Maillage_FT_Disc pour
-//    beneficier de la structure gerant un suivi Lagrangien
-//    On ne retient que le suivi des sommets qui constituent les points suivis
-// .SECTION voir aussi Marqueur_Lagrange_base
-//
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Marqueur_FT La classe Marqueur_FT est une classe instanciable permettant de suivre des particules
+ *
+ *     -on attribue a cette classe un objet de type Maillage_FT_Disc pour
+ *     beneficier de la structure gerant un suivi Lagrangien
+ *     On ne retient que le suivi des sommets qui constituent les points suivis
+ *
+ * @sa Marqueur_Lagrange_base
+ */
 class Marqueur_FT : public Marqueur_Lagrange_base
 {
   Declare_instanciable(Marqueur_FT);

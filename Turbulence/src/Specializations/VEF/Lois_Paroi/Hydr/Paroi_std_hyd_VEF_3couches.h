@@ -23,13 +23,12 @@
 #define Paroi_std_hyd_VEF_3couches_included
 
 #include <Paroi_std_hyd_VEF.h>
-//.DESCRIPTION
-//
-// CLASS: Paroi_std_hyd_VEF_3couches
-//
-
-//.SECTION  voir aussi
-// Turbulence_paroi_base
+/*! @brief CLASS: Paroi_std_hyd_VEF_3couches
+ *
+ * .SECTION  voir aussi
+ *  Turbulence_paroi_base
+ *
+ */
 class Paroi_std_hyd_VEF_3couches : public Paroi_std_hyd_VEF
 {
 

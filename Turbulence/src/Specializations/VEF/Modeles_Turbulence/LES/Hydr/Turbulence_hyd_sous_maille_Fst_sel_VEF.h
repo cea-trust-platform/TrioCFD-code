@@ -31,15 +31,15 @@
 #define SIN2ANGL_new 58526204e-9 // sin(14 degre) pour 32**3
 #define SIN2ANGL_new2 36408073e-9 // sin(11 degre) pour 64**3
 
-// .DESCRIPTION classe Turbulence_hyd_sous_maille_Fst_sel_VEF
-// Cette classe correspond a la mise en oeuvre du modele sous
-// maille fonction de structure selectif modifie en VEF
-// La modification concerne l angle de coupure : il depend du pas du maillage
-// Le calcul de la fonction de structure se fait comme dans Turbulence_hyd_sous_maille_1elt_VEF
-
-// .SECTION  voir aussi
-// Turbulence_hyd_sous_maille_1elt_VEF
-
+/*! @brief classe Turbulence_hyd_sous_maille_Fst_sel_VEF Cette classe correspond a la mise en oeuvre du modele sous
+ *
+ *  maille fonction de structure selectif modifie en VEF
+ *  La modification concerne l angle de coupure : il depend du pas du maillage
+ *  Le calcul de la fonction de structure se fait comme dans Turbulence_hyd_sous_maille_1elt_VEF
+ *  .SECTION  voir aussi
+ *  Turbulence_hyd_sous_maille_1elt_VEF
+ *
+ */
 class Turbulence_hyd_sous_maille_Fst_sel_VEF : public Turbulence_hyd_sous_maille_Fst_VEF
 {
 

@@ -24,13 +24,17 @@
 
 Implemente_instanciable(Traitement_particulier_NS_CEG_VEF,"Traitement_particulier_NS_CEG_VEF",Traitement_particulier_NS_CEG);
 
-// Description: does nothing.
+/*! @brief does nothing.
+ *
+ */
 Sortie& Traitement_particulier_NS_CEG_VEF::printOn(Sortie& is) const
 {
   return is;
 }
 
-// Description: does nothing.
+/*! @brief does nothing.
+ *
+ */
 Entree& Traitement_particulier_NS_CEG_VEF::readOn(Entree& is)
 {
   return is;

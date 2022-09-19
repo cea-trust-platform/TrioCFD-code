@@ -28,18 +28,14 @@
 #include <Ch_front_input_P1.h>
 #include <TRUSTTab.h>
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     class Ch_front_input_ALE
-//
-//     Cette classe represente un champ accessible par setInputField
-//     defini sur une frontiere avec une valeur par face. In case of ALE calculation.
-//
-// .SECTION voir aussi
-//   Champ_Input_Proto
-/////////////////////////////////////////////////////////////////////////////////
-
+/*! @brief class Ch_front_input_ALE
+ *
+ *      Cette classe represente un champ accessible par setInputField
+ *      defini sur une frontiere avec une valeur par face. In case of ALE calculation.
+ *
+ *
+ * @sa Champ_Input_Proto
+ */
 class Ch_front_input_ALE : public Ch_front_input_P1
 {
   Declare_instanciable_sans_constructeur(Ch_front_input_ALE);

@@ -45,24 +45,9 @@ Entree& Prolongement_identite::readOn(Entree& s )
 
 
 
-// Description:
-//    Prolongement du centre de gravite des faces grossieres
-//    au centre de gravite de TOUTES les faces fines
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
-
-//ATTENTION
-//NE FONCTIONNE QU'EN 2D VDF - VDF!!!!!!!!!!!!!!
+/*! @brief Prolongement du centre de gravite des faces grossieres au centre de gravite de TOUTES les faces fines
+ *
+ */
 void Prolongement_identite::prolonger(Zone_VF& zone_VFG,
                                       Zone_VF& zone_VFF,
                                       const Frontiere& frontF,

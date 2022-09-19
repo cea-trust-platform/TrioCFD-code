@@ -25,12 +25,9 @@
 #include <Source_base.h>
 #include <math.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    classe Rupture_Yao_Morel
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief classe Rupture_Yao_Morel
+ *
+ */
 class Rupture_Yao_Morel: public Source_base
 {
   Declare_instanciable(Rupture_Yao_Morel);

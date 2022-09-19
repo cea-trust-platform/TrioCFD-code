@@ -28,11 +28,9 @@
 #include <Prolongement_base.h>
 #include <TRUSTTab.h>
 
-//
-// .DESCRIPTION class Prolongement_elem_face
-//
-// .SECTION voir aussi
-
+/*! @brief class Prolongement_elem_face
+ *
+ */
 
 //////////////////////////////////////////////////////////////////////////////////
 //

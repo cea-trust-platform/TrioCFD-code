@@ -35,13 +35,12 @@ class Param;
 // POUR DEBUGGER LA CONSERVATION DU VOLUME
 #define DEBUG_CONSERV_VOLUME 0
 
-// ====================================================================
-// .DESCRIPTION        : class Remaillage_FT
-//  Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
-//
-// .SECTION voir aussi
-//  Transport_Interfaces_FT_Disc Maillage_FT_Disc
-
+/*! @brief : class Remaillage_FT Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
+ *
+ *
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
+ */
 class Remaillage_FT : public Objet_U
 {
   Declare_instanciable_sans_constructeur(Remaillage_FT);

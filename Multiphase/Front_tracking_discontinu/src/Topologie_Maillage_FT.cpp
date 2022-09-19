@@ -107,7 +107,9 @@ int Topologie_Maillage_FT::get_phase_continue() const
   return phase_continue_;
 }
 
-// Description: tri du tableau tab dans l'ordre croissant.
+/*! @brief tri du tableau tab dans l'ordre croissant.
+ *
+ */
 static inline void trier_trois_entiers(int tab[3])
 {
   int tmp;
@@ -137,9 +139,9 @@ static inline void trier_trois_entiers(int tab[3])
   tab[2] = c;
 }
 
-// Description:
-//  Copie les coordonnees des trois sommets d'indices facette[i] dans
-//  la matrice coord.
+/*! @brief Copie les coordonnees des trois sommets d'indices facette[i] dans la matrice coord.
+ *
+ */
 static inline void get_coord_sommets_triangle(const int facette[3],
                                               const DoubleTab& sommets,
                                               double coord[3][3])
@@ -181,13 +183,15 @@ static inline void calcul_distance_plan(const double coord[3][3],
     distance[i] = a * coord[i][0] + b * coord[i][1] + c * coord[i][2] + d;
 }
 
-// Description: Calcul de la distance s_min et s_max par rapport au plan
-//  "2" des extremites du segment d'intersection entre un triangle est un plan "1".
-// distance_1 est la distance entre les sommets du triangle et le plan "1".
-//  On suppose que les trois valeurs ne sont pas toutes de meme signe
-//  (donc l'intersection est non vide).
-// distance_2 est la distance entre les sommets du triangle et le plan "2".
-// On renvoie s_min et s_max avec s_min < s_max.
+/*! @brief Calcul de la distance s_min et s_max par rapport au plan "2" des extremites du segment d'intersection entre un triangle est un plan "1".
+ *
+ *  distance_1 est la distance entre les sommets du triangle et le plan "1".
+ *   On suppose que les trois valeurs ne sont pas toutes de meme signe
+ *   (donc l'intersection est non vide).
+ *  distance_2 est la distance entre les sommets du triangle et le plan "2".
+ *  On renvoie s_min et s_max avec s_min < s_max.
+ *
+ */
 static inline void calcul_intersection_plan_triangle(const double distance_1[3],
                                                      const double distance_2[3],
                                                      double& s_min,
@@ -238,12 +242,14 @@ static inline double prod_vect_triangle(double *p1, double *p2, double *p3)
   return (p2[0]-p1[0])*(p3[1]-p1[1]) - (p2[1]-p1[1])*(p3[0]-p1[0]);
 }
 
-// Description:
-//  Voir test_intersection_facettes_3D. Algorithme B. Mathieu
-//  Renvoie 0 si les facettes ne se coupent pas
-//         -1 si 1 sommet commun
-//         -2 si 2 sommets communs
-//          1 si les facettes se coupent
+/*! @brief Voir test_intersection_facettes_3D.
+ *
+ * Algorithme B. Mathieu Renvoie 0 si les facettes ne se coupent pas
+ *          -1 si 1 sommet commun
+ *          -2 si 2 sommets communs
+ *           1 si les facettes se coupent
+ *
+ */
 int Topologie_Maillage_FT::test_intersection_facettes_2D(
   int fa70, int fa71,
   const Maillage_FT_Disc& maillage) const
@@ -286,17 +292,19 @@ int Topologie_Maillage_FT::test_intersection_facettes_2D(
   return 1;
 }
 
-// Description:
-//  Teste si les facettes fa70 et fa71 se coupent.
-//  Renvoie 0 si elles ne se coupent pas,
-//         -1 si elles ont deux sommets communs,
-//         -2 si elles ont trois sommets communs,
-//         -3 si le test preliminaire est positif et l'autre test non
-//         1  si les facettes se coupent et n'ont aucun sommet commun
-//         -4 si les facettes ont un sommet commun.
-// L'algorithme est identique a celui decrit dans
-//  http://www.cs.lth.se/home/Tomas_Akenine_Moller/pubs/tritri.pdf
-//  "a fast triangle-triangle intersection test (tomas moller)"
+/*! @brief Teste si les facettes fa70 et fa71 se coupent.
+ *
+ * Renvoie 0 si elles ne se coupent pas,
+ *          -1 si elles ont deux sommets communs,
+ *          -2 si elles ont trois sommets communs,
+ *          -3 si le test preliminaire est positif et l'autre test non
+ *          1  si les facettes se coupent et n'ont aucun sommet commun
+ *          -4 si les facettes ont un sommet commun.
+ *  L'algorithme est identique a celui decrit dans
+ *   http://www.cs.lth.se/home/Tomas_Akenine_Moller/pubs/tritri.pdf
+ *   "a fast triangle-triangle intersection test (tomas moller)"
+ *
+ */
 int Topologie_Maillage_FT::test_intersection_facettes_3D(
   int fa70, int fa71,
   const Maillage_FT_Disc& maillage) const
@@ -453,12 +461,13 @@ int Topologie_Maillage_FT::test_intersection_facettes_3D(
   return test_intersection;
 }
 
-// Description:
-//  Teste s'il existe deux facettes du maillage qui se coupent (avec
-//   test_intersection_facettes_2D/3D). On ne teste pas tous les couples
-//   possibles, seulement les couples de facettes qui coupent un meme
-//   element eulerien.
-// Precondition: le maillage doit etre parcouru.
+/*! @brief Teste s'il existe deux facettes du maillage qui se coupent (avec test_intersection_facettes_2D/3D).
+ *
+ * On ne teste pas tous les couples
+ *    possibles, seulement les couples de facettes qui coupent un meme
+ *    element eulerien.
+ *
+ */
 int Topologie_Maillage_FT::test_collision_facettes(const Maillage_FT_Disc& maillage,
                                                    ArrOfInt& liste_elements_collision) const
 {
@@ -555,21 +564,19 @@ int Topologie_Maillage_FT::test_collision_facettes(const Maillage_FT_Disc& maill
   return collision_trouvee;
 }
 
-// Description:
-//  Computes eulerian connex components of the phase indicator function "indicatrice"
-//  according to the get_phase_continue() property. This method must be used to
-//  compute the input data for supprimer_interfaces.
-//
-//  For each eulerian mesh cell
-//  num_compo[i] = -1 for all mesh cells containing phase "get_phase_continue()"
-//  num_compo[i] = N  with 0 <= N < Nmax, for all other mesh cells.
-//   N is a global connex component number. Two adjacent cells (by face) for
-//   which indicatrice[i] != get_phase_continue() will have the same N.
-// Parametre: num_compo
-// Signification:
-//  output: resized, md_vector setup, filled with -1 <= num_compo[i] < Nmax, and virtual space updated.
-// Valeur de retour:
-//  Returns Nmax, global number of connex components found.
+/*! @brief Computes eulerian connex components of the phase indicator function "indicatrice" according to the get_phase_continue() property.
+ *
+ * This method must be used to
+ *   compute the input data for supprimer_interfaces.
+ *
+ *   For each eulerian mesh cell
+ *   num_compo[i] = -1 for all mesh cells containing phase "get_phase_continue()"
+ *   num_compo[i] = N  with 0 <= N < Nmax, for all other mesh cells.
+ *    N is a global connex component number. Two adjacent cells (by face) for
+ *    which indicatrice[i] != get_phase_continue() will have the same N.
+ *
+ * @param (num_compo) output: resized, md_vector setup, filled with -1 <= num_compo[i] < Nmax, and virtual space updated. Valeur de retour: Returns Nmax, global number of connex components found.
+ */
 int Topologie_Maillage_FT::calculer_composantes_connexes_pour_suppression(const Zone_VF& zone_vf,
                                                                           const DoubleTab& indicatrice,
                                                                           IntVect& num_compo) const
@@ -596,14 +603,16 @@ int Topologie_Maillage_FT::calculer_composantes_connexes_pour_suppression(const 
   return nb_compo_glob;
 }
 
-// Description: Removes all interfaces contained in eulerian elements marked
-//  by the "flags_" array, and updates the "indicatrice" field by putting
-//  "get_phase_condinue()" in those elements.
-//  Virtual lagrangian elements are removed.
-//  "flags" must be of size "nb_elem" and must be built with one or more
-//  connex components (see calcul_composantes_connexes_eurleriennes).
-// Return value: Integral of the "indicatrice" change (e.g. volume of phase changed,
-//  positive or negative)
+/*! @brief Removes all interfaces contained in eulerian elements marked by the "flags_" array, and updates the "indicatrice" field by putting
+ *
+ *   "get_phase_condinue()" in those elements.
+ *   Virtual lagrangian elements are removed.
+ *   "flags" must be of size "nb_elem" and must be built with one or more
+ *   connex components (see calcul_composantes_connexes_eurleriennes).
+ *  Return value: Integral of the "indicatrice" change (e.g. volume of phase changed,
+ *   positive or negative)
+ *
+ */
 double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
                                                      const ArrOfInt& flags_compo_a_supprimer,
                                                      Maillage_FT_Disc& maillage,
@@ -651,11 +660,12 @@ double Topologie_Maillage_FT::suppression_interfaces(const IntVect& num_compo,
   return variation_indicatrice;
 }
 
-// Description:
-//  Remaillage de l'interface:
-//   - amelioration petites et grandes facettes,
-//   - barycentrage,
-//   - gestion des coalescences-fragmentations.
+/*! @brief Remaillage de l'interface: - amelioration petites et grandes facettes,
+ *
+ *    - barycentrage,
+ *    - gestion des coalescences-fragmentations.
+ *
+ */
 void Topologie_Maillage_FT::remailler_interface(const double temps,
                                                 Maillage_FT_Disc& maillage,
                                                 Champ_base& indicatrice,

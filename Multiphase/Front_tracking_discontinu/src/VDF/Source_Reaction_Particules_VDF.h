@@ -25,15 +25,10 @@
 
 #include <Source_Reaction_Particules.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Source_Reaction_Particules_VDF
-//
-// .SECTION voir aussi Source_Reaction_Particules
-//
-//////////////////////////////////////////////////////////////////////////////
-
+/*! @brief Classe Source_Reaction_Particules_VDF
+ *
+ * @sa Source_Reaction_Particules
+ */
 class Source_Reaction_Particules_VDF : public Source_Reaction_Particules
 {
   Declare_instanciable(Source_Reaction_Particules_VDF);

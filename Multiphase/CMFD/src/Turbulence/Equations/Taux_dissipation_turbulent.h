@@ -27,14 +27,10 @@
 #include <Fluide_base.h>
 #include <Ref_Fluide_base.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//     classe Taux_dissipation_turbulent
-//     Equation de transport du taux de dissipation turbulen (modele k-omega)
-// .SECTION voir aussi
-//     Conv_Diffusion_std Convection_Diffusion_Temperature
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief classe Taux_dissipation_turbulent Equation de transport du taux de dissipation turbulen (modele k-omega)
+ *
+ * @sa Conv_Diffusion_std Convection_Diffusion_Temperature
+ */
 class Taux_dissipation_turbulent : public Convection_Diffusion_std
 {
   Declare_instanciable_sans_constructeur(Taux_dissipation_turbulent);
@@ -73,43 +69,20 @@ protected :
 
 
 
-// Description:
-//    Renvoie le champ inconnue representant l'inconnue (T ou H)
-//    (version const)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant la temperature (GP)
-//      ou l'enthalpie (GR)
-//    Contraintes: reference constante
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H) (version const)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ */
 inline const Champ_Inc& Taux_dissipation_turbulent::inconnue() const
 {
   return l_inco_ch;
 }
 
 
-// Description:
-//    Renvoie le champ inconnue representant l'inconnue (T ou H)
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces:
-// Retour: Champ_Inc&
-//    Signification: le champ inconnue representant la temperature (GP)
-//      ou l'enthalpie (GR)
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Renvoie le champ inconnue representant l'inconnue (T ou H)
+ *
+ * @return (Champ_Inc&) le champ inconnue representant la temperature (GP) ou l'enthalpie (GR)
+ */
 inline Champ_Inc& Taux_dissipation_turbulent::inconnue()
 {
   return l_inco_ch;

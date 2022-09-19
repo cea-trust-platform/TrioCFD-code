@@ -45,27 +45,16 @@ Entree& Prolongement_elem_face::readOn(Entree& s )
 
 
 
-// Description:
-//    Prolongement de l'inconnue grossiere sur la frontiere fine
-//    pour inconnue TEMPERATURE ET PRESSION
-//    en VDF pour T du domG, en VDF et VEF pour p du domG
-//    en 2D et en 3D
-//    (avec une discretisation quelconque pour le domaine fin
-//    qui ne contient pas de domaine plus petit que lui-meme)
-//    remarque : pas de couplage!!
-//    car valeur
-// Precondition:
-// Parametre:
-//    Signification:
-//    Valeurs par defaut:
-//    Contraintes:
-//    Acces: entree/sortie
-// Retour:
-//    Signification:
-//    Contraintes:
-// Exception:
-// Effets de bord:
-// Postcondition:
+/*! @brief Prolongement de l'inconnue grossiere sur la frontiere fine pour inconnue TEMPERATURE ET PRESSION
+ *
+ *     en VDF pour T du domG, en VDF et VEF pour p du domG
+ *     en 2D et en 3D
+ *     (avec une discretisation quelconque pour le domaine fin
+ *     qui ne contient pas de domaine plus petit que lui-meme)
+ *     remarque : pas de couplage!!
+ *     car valeur
+ *
+ */
 void Prolongement_elem_face::prolonger(Zone_VF& zone_VFG, Zone_VF& zone_VFF,
                                        const Frontiere& frontF,
                                        IntVect& connect,

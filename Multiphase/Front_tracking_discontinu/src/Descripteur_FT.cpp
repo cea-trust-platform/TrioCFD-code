@@ -104,8 +104,11 @@ void Descripteur_FT::reset()
   status_ = OK;
 }
 
-// Description: Ajoute l'element au tableau du PE_voisin.
-// renvoie le rang de l'element ajoute dans le tableau d'elements du PE.
+/*! @brief Ajoute l'element au tableau du PE_voisin.
+ *
+ * renvoie le rang de l'element ajoute dans le tableau d'elements du PE.
+ *
+ */
 int Descripteur_FT::ajoute_element(int PE_voisin, int element)
 {
   ArrOfInt& elements_voisins = elements_[PE_voisin];
@@ -114,8 +117,11 @@ int Descripteur_FT::ajoute_element(int PE_voisin, int element)
   status_ = BAD;
   return n;
 }
-// Description: Ajoute l'element au tableau du PE_voisin.
-// renvoie la taiile du tableau d'elements du PE.
+/*! @brief Ajoute l'element au tableau du PE_voisin.
+ *
+ * renvoie la taiile du tableau d'elements du PE.
+ *
+ */
 int Descripteur_FT::ajoute_elements(int PE_voisin, const ArrOfInt& NVelements)
 {
   ArrOfInt& elements_voisins = elements_[PE_voisin];
@@ -124,8 +130,9 @@ int Descripteur_FT::ajoute_elements(int PE_voisin, const ArrOfInt& NVelements)
   return elements_voisins.size_array();
 }
 
-// Description:
-// Remplace la liste des elements par celle en parametre.
+/*! @brief Remplace la liste des elements par celle en parametre.
+ *
+ */
 void Descripteur_FT::set_elements(int PE_voisin,
                                   const ArrOfInt& new_elements)
 {
@@ -134,8 +141,9 @@ void Descripteur_FT::set_elements(int PE_voisin,
   status_ = BAD;
 }
 
-// Description: Renvoie "pas zero" si l'element est deja dans le
-// descripteur pour le pe donne, 0 sinon.
+/*! @brief Renvoie "pas zero" si l'element est deja dans le descripteur pour le pe donne, 0 sinon.
+ *
+ */
 int Descripteur_FT::contient_element(int pe, int element) const
 {
   const ArrOfInt& elems = elements_[pe];
@@ -146,9 +154,11 @@ int Descripteur_FT::contient_element(int pe, int element) const
   return 0;
 }
 
-// Description: Calcule la liste des PEs dont la liste d'elements est
-// non vide, tries dans l'ordre croissant de numero de PE.
-// Le statut passe a OK.
+/*! @brief Calcule la liste des PEs dont la liste d'elements est non vide, tries dans l'ordre croissant de numero de PE.
+ *
+ *  Le statut passe a OK.
+ *
+ */
 void Descripteur_FT::calcul_liste_pe_voisins()
 {
   pe_voisins_.resize_array(0);
@@ -161,21 +171,17 @@ void Descripteur_FT::calcul_liste_pe_voisins()
   status_ = OK;
 }
 
-// Description:
-// Pour chaque PE du descripteur, et pour 0 <= i < elements_[pe].size_array()
-// on considere l'element suivante:
-//  elem = elements_[pe][i]
-// Si nouveau_pe[elem] >= 0, on retire elem du tableau elements_[pe]
-// et on l'ajoute au tableau elements_retires.elements_[pe].
-//
-// Parametre: nouveau_pe
-//  Signification: pour chaque element i (sommet ou facette), nouveau_pe[i] indique si
-//                 l'element doit etre retire (nouveau_pe[i] >= 0) ou non
-//                 (nouveau_pe[i] < 0) du descripteur
-//  Contrainte:    la taille du tableau doit etre superieure au plus grand
-//                 numero d'element stocke dans le descripteur.
-// Parametre: elements_retires
-//  Signification: descripteur contenant les elements retires.
+/*! @brief Pour chaque PE du descripteur, et pour 0 <= i < elements_[pe].
+ *
+ * size_array() on considere l'element suivante:
+ *   elem = elements_[pe][i]
+ *  Si nouveau_pe[elem] >= 0, on retire elem du tableau elements_[pe]
+ *  et on l'ajoute au tableau elements_retires.elements_[pe].
+ *
+ *
+ * @param (nouveau_pe) pour chaque element i (sommet ou facette), nouveau_pe[i] indique si l'element doit etre retire (nouveau_pe[i] >= 0) ou non (nouveau_pe[i] < 0) du descripteur Contrainte:    la taille du tableau doit etre superieure au plus grand numero d'element stocke dans le descripteur.
+ * @param (elements_retires) descripteur contenant les elements retires.
+ */
 void Descripteur_FT::retirer_elements(const ArrOfInt& nouveau_pe,
                                       Descripteur_FT&    elements_retires)
 {
@@ -257,41 +263,54 @@ void Desc_Structure_FT::reset()
   status_md_ = BAD;
 }
 
-// Description: Renvoie une reference non-const a l'espace distant.
-// Le statut du descripteur passe a BAD => il faudra recalculer le schema de com.
+/*! @brief Renvoie une reference non-const a l'espace distant.
+ *
+ * Le statut du descripteur passe a BAD => il faudra recalculer le schema de com.
+ *
+ */
 Descripteur_FT& Desc_Structure_FT::espace_distant()
 {
   status_md_ = BAD;
   return espace_distant_;
 }
 
-// Description: Renvoie une reference const a l'espace distant.
-// Le statut reste OK.
+/*! @brief Renvoie une reference const a l'espace distant.
+ *
+ * Le statut reste OK.
+ *
+ */
 const Descripteur_FT& Desc_Structure_FT::espace_distant() const
 {
   return espace_distant_;
 }
 
-// Description: Renvoie une reference non-const a l'espace virtuel.
-// Le statut du descripteur passe a BAD => il faudra recalculer le schema de com.
+/*! @brief Renvoie une reference non-const a l'espace virtuel.
+ *
+ * Le statut du descripteur passe a BAD => il faudra recalculer le schema de com.
+ *
+ */
 Descripteur_FT& Desc_Structure_FT::espace_virtuel()
 {
   status_md_ = BAD;
   return espace_virtuel_;
 }
 
-// Description: Renvoie une reference const a l'espace virtuel.
-// Le statut reste OK.
+/*! @brief Renvoie une reference const a l'espace virtuel.
+ *
+ * Le statut reste OK.
+ *
+ */
 const Descripteur_FT& Desc_Structure_FT::espace_virtuel() const
 {
   return espace_virtuel_;
 }
 
 
-// Description:
-// Verification de la coherence de la structure (graphe des voisins
-// et taille des espaces virtuels et distants)
-// On envoie tout au processeur 0.
+/*! @brief Verification de la coherence de la structure (graphe des voisins et taille des espaces virtuels et distants)
+ *
+ *  On envoie tout au processeur 0.
+ *
+ */
 int Desc_Structure_FT::check() const
 {
   const int nb_proc = nproc();
@@ -491,25 +510,21 @@ int Desc_Structure_FT::check() const
   return 1;
 }
 
-// Description:
-// Correction des espaces distants et virtuels lors d'un changement de proprietaire
-// (noeud ou facette). Les operations sont les suivantes :
-// - sur l'ancien proprietaire de l'element, on retire l'element de l'espace distant.
-// - sur le nouveau proprietaire, on ajoute l'element a l'espace distant, pour tous
-//   les PEs ou cet element est virtuel.
-// - sur les PEs ou cet element est virtuel, on retire l'element de la liste
-//   d'elements virtuels de l'ancien PE et on l'ajoute a la fin de la liste d'elements
-//   virtuels du nouveau proprietaire.
-// L'ordre d'ajout des elements dans les espaces distants et virtuels est identique
-// pour que les espaces soient en correspondance.
-//
-// Parametre: nouveau_pe
-// Signification: tableau de taille nb_sommets ou nb_facettes,
-//            qui contient le numero du nouveau pe proprietaire,
-//            ou -1 si l'element ne change pas de main.
-//            L'espace virtuel de ce tableau doit etre a jour
-//            (echange_espace_virtuel realise).
-
+/*! @brief Correction des espaces distants et virtuels lors d'un changement de proprietaire (noeud ou facette).
+ *
+ * Les operations sont les suivantes :
+ *  - sur l'ancien proprietaire de l'element, on retire l'element de l'espace distant.
+ *  - sur le nouveau proprietaire, on ajoute l'element a l'espace distant, pour tous
+ *    les PEs ou cet element est virtuel.
+ *  - sur les PEs ou cet element est virtuel, on retire l'element de la liste
+ *    d'elements virtuels de l'ancien PE et on l'ajoute a la fin de la liste d'elements
+ *    virtuels du nouveau proprietaire.
+ *  L'ordre d'ajout des elements dans les espaces distants et virtuels est identique
+ *  pour que les espaces soient en correspondance.
+ *
+ *
+ * @param (nouveau_pe) tableau de taille nb_sommets ou nb_facettes, qui contient le numero du nouveau pe proprietaire, ou -1 si l'element ne change pas de main. L'espace virtuel de ce tableau doit etre a jour (echange_espace_virtuel realise).
+ */
 void Desc_Structure_FT::echanger_elements(const ArrOfInt& nouveau_pe)
 {
   static Descripteur_FT elements_distants_retires;
@@ -681,12 +696,14 @@ void Desc_Structure_FT::echanger_elements(const ArrOfInt& nouveau_pe)
   cles.resize_array(0); // Libere la memoire du tableau
 }
 
-// Description: remplit le tableau qui donne pour chaque element le
-// numero du pe proprietaire. Le tableau fourni doit avoir la bonne
-// taille (nombre d'elements = sommets ou facettes par ex.)
-// Ce tableau est rempli en utilisant l'espace virtuel (tous les elements
-// sont a moi, sauf ceux qui sont dans l'espace virtuel).
-
+/*! @brief remplit le tableau qui donne pour chaque element le numero du pe proprietaire.
+ *
+ * Le tableau fourni doit avoir la bonne
+ *  taille (nombre d'elements = sommets ou facettes par ex.)
+ *  Ce tableau est rempli en utilisant l'espace virtuel (tous les elements
+ *  sont a moi, sauf ceux qui sont dans l'espace virtuel).
+ *
+ */
 void Desc_Structure_FT::remplir_element_pe(ArrOfInt& element_pe) const
 {
   // Tout est a moi ...

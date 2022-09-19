@@ -26,17 +26,16 @@
 #include <Source_base.h>
 
 class Convection_Diffusion_std;
-//
-// .DESCRIPTION class Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0
-//
-// Terme de dissipation beta_omega * alpha * rho et de -beta_omega * alpha * rho * omega**2 dans l'equation d'energie cinetique turbulente
-//
-// la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
-// Actuellement k et tau sont necessairement scalaires.
-// Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
-// en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
-
-
+/*! @brief class Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0
+ *
+ *  Terme de dissipation beta_omega * alpha * rho et de -beta_omega * alpha * rho * omega**2 dans l'equation d'energie cinetique turbulente
+ *
+ *  la phase dont la turbulence est decrite avec le modele k-tau doit etre ecrite en premier dans le bloc phases { } du jeu de donnees
+ *  Actuellement k et tau sont necessairement scalaires.
+ *  Si cela est amene a evolue pour permettre de la turbulence dans plusieurs phases, il faudra alors revoir cette classe en iterant sur les id_composites des phases turbulentes.
+ *  en l'etat, si plusieurs phases sont turbulentes et sont decrites par le modele k-tau, alors elles doivent se suivre dans le bloc phases { } du jeu de donnees
+ *
+ */
 class Dissipation_echelle_temp_taux_diss_turb_PolyMAC_P0 : public Source_base 	// Terme_Source_PolyMAC_P0_base
 {
 

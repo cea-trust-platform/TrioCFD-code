@@ -34,16 +34,16 @@
 
 Implemente_instanciable_sans_constructeur(Postraitement_ft_lata,"Postraitement_ft_lata",Postraitement_lata);
 
-// Description: Constructeur par defaut
+/*! @brief Constructeur par defaut
+ *
+ */
 Postraitement_ft_lata::Postraitement_ft_lata()
 {
 }
 
-// Description: Appel a Postraitement_lata::readOn
-// Precondition: mon_probleme.valeur() doit etre de type :
-// Probleme_FT_Disc_gen
-// Pb_Thermohydraulique_Especes_QC
-// Pb_Thermohydraulique_Especes_Turbulent_QC
+/*! @brief Appel a Postraitement_lata::readOn
+ *
+ */
 Entree& Postraitement_ft_lata::readOn(Entree& is)
 {
   // Verification du type du probleme
@@ -148,7 +148,9 @@ int Postraitement_ft_lata::lire_motcle_non_standard(const Motcle& mot, Entree& i
   return 1;
 }
 
-// Description: lecture de la liste de champs aux interfaces a postraiter
+/*! @brief lecture de la liste de champs aux interfaces a postraiter
+ *
+ */
 void Postraitement_ft_lata::lire_champ_interface(Entree& is)
 {
   Motcle motcle;
@@ -204,11 +206,12 @@ void Postraitement_ft_lata::lire_champ_interface(Entree& is)
     }
 }
 
-// Description:
-//  Appel a Postraitement_lata (on ecrit l'entete la premiere fois et
-//   on postraite les champs euleriens),
-//  puis ecriture des interfaces et des champs aux interfaces.
-//  Voir aussi Postraitement_base
+/*! @brief Appel a Postraitement_lata (on ecrit l'entete la premiere fois et on postraite les champs euleriens),
+ *
+ *   puis ecriture des interfaces et des champs aux interfaces.
+ *   Voir aussi Postraitement_base
+ *
+ */
 void Postraitement_ft_lata::postraiter(int forcer)
 {
   const double temps_dernier_post_before = temps_dernier_post_;

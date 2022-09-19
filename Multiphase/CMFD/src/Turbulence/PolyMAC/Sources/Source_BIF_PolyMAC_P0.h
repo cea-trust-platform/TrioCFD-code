@@ -27,15 +27,12 @@
 #include <Ref_Correlation.h>
 #include <TRUSTTab.h>
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION
-//    Classe Source_BIF_PolyMAC_P0
-//    Cette classe implemente dans PolyMAC_P0 un terme source qui ajoute la contribution du BIF au second membre de la QDM
-//
-// .SECTION voir aussi
-//    Operateur_PolyMAC_P0_base Operateur_base
-//////////////////////////////////////////////////////////////////////////////
+/*! @brief Classe Source_BIF_PolyMAC_P0 Cette classe implemente dans PolyMAC_P0 un terme source qui ajoute la contribution du BIF au second membre de la QDM
+ *
+ *
+ *
+ * @sa Operateur_PolyMAC_P0_base Operateur_base
+ */
 class Source_BIF_PolyMAC_P0: public Source_base
 {
   Declare_instanciable(Source_BIF_PolyMAC_P0);
