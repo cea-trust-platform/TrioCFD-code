@@ -44,6 +44,14 @@
 #include <Param.h>
 #include <stat_counters.h>
 
+#define TCL_MODEL 0
+#include <Zone_VDF.h>
+#include <Zone_Cl_VDF.h>
+#include <Dirichlet_paroi_fixe.h>
+#include <Dirichlet_paroi_defilante.h>
+#include <Probleme_FT_Disc_gen.h>
+#include <Triple_Line_Model_FT_Disc.h>
+#include <Schema_Temps_base.h>
 //#define PATCH_HYSTERESIS_V2
 //#define PATCH_HYSTERESIS_V3
 #include<ArrOfBit.h>
@@ -562,7 +570,7 @@ Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
   param.dictionnaire("standard", (int)STANDARD);
   param.dictionnaire("mirror", (int)MIRROR);
   param.dictionnaire("improved", (int)IMPROVED);
-  param.dictionnaire("none", (int)none);
+  param.dictionnaire("none", (int)NONE);
   param.dictionnaire("weighted", (int)WEIGHTED);
   param.dictionnaire("hysteresis", (int)HYSTERESIS);
   param.ajouter("weight_CL",&weight_CL_);
@@ -917,13 +925,14 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
                 const int face = elem_faces(i, j);
                 const int elem = face_voisins(face, 0) + face_voisins(face, 1) - i;
                 if (elem >= 0 && elem < nb_elem_tot)
-                  elements_calcules.clearbit(elem);
+                  elements_calcules.clearbit(elem); // Voisin d'une interf => considere comme non calcule.
               }
           }
       }
   }
 
   // Ajout des contributions de volume
+  // Les elements traverses par l'interface deviennent des elements_calcules
   {
     const ArrOfInt& index_elem =
       intersections_elem_facettes_.index_elem();
@@ -946,7 +955,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
           somme_contrib -= 1.;
         while (somme_contrib < 0.)
           somme_contrib += 1.;
-        if (somme_contrib > 0.)
+        if (somme_contrib > 0.) // Pour ne pas faire les elements pures
           {
             indicatrice[i] = somme_contrib;
             elements_calcules.setbit(i);
@@ -956,6 +965,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 
   // Calcul de l'indicatrice au voisinage de l'interface a l'aide
   // de la fonction distance.
+  // Il reste dans elements_calcules[i] == 0 les voisins de l'interface
   {
     const DoubleTab& distance = equation_transport().get_update_distance_interface().valeurs();
     int i;
@@ -963,7 +973,6 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
 
     for (i = 0; i < nb_elem; i++)
       {
-
 
         if (elements_calcules[i] == 0)
           {
@@ -1268,7 +1277,7 @@ void Maillage_FT_Disc::construire_noeuds(IntTab& def_noeud,const DoubleTab& soms
   if (nb_som_tot>chunk_size)
     {
       Cerr << "The maximum of particules that you can use in your datafile is equal to " << chunk_size/nbproc << " / processor" << finl;
-      Cerr << "If you want exceed this limitation, you must parallelize your calculation with an apropriate number of processor" << finl;
+      Cerr << "If you want to exceed this limitation, you must parallelize your calculation with an apropriate number of processor" << finl;
       exit();
     }
 
@@ -5227,6 +5236,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
   const double un_tiers = 1. / 3.;
   const double un_sixieme = 1. / 6.;
 
+  // This is based on the angle given in the data file (that is the micros/Young contact angle)
   DoubleTabFT tab_cos_theta;
   calculer_costheta_minmax(tab_cos_theta);
 
@@ -5278,12 +5288,13 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
                   // la phase 0
                   for (int i2 = 0; i2 < 2; i2++)
                     {
-                      const int face = sommet_face_bord_[som[i2]];
+                      const int isom2 = som[i2];
+                      const int face = sommet_face_bord_[isom2];
                       if (face < 0) // pas une face de bord
                         continue;
 
 #ifndef PATCH_HYSTERESIS_V2
-                      const double costheta = tab_cos_theta(som[i2], 0);
+                      const double costheta = tab_cos_theta(isom2, 0);
 #else
                       const double costheta0 = tab_cos_theta(som[i2], 0);
                       const double costheta1 = tab_cos_theta(som[i2], 1);
@@ -5799,12 +5810,9 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
             }
           else
             {
-              // Cas bidim_axi (calcul pour un angle de 1 radian,
-              // comme c'est un rapport surface/volume, l'angle n'a pas d'importance)
-              // Differentielle de volume:
-
-              // const double costheta = 0.;
-              // Attention: le terme n'est pas encore pris en compte en bidim_axi
+              // Case bidim_axi (calculation for a 1radian angle,
+              // As it is a ratio surface/volume, the angle as no effect.
+              // Volume differential:
 
               const int s1 = facettes_(facette, 0);
               const int s2 = facettes_(facette, 1);
@@ -5924,7 +5932,7 @@ void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, co
       drapeau_angle_in_range = 1;
 #endif
       courbure_sommets[i] = c;
-      if (methode_calcul_courbure_contact_line_ == none)
+      if (methode_calcul_courbure_contact_line_ == NONE)
         {
           if ((call>1) && (sommet_face_bord_[i]>=0))
             //if (call>1)

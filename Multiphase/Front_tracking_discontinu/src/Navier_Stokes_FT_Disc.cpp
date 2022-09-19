@@ -678,6 +678,12 @@ void Navier_Stokes_FT_Disc::discretiser()
                         variables_internes().second_membre_projection);
   champs_compris.add(variables_internes().second_membre_projection.valeur());
   champs_compris_.ajoute_champ(variables_internes().second_membre_projection);
+  dis.discretiser_champ("champ_elem", ma_zone_dis,
+                        "second_membre_projection_jump", "",
+                        1 /* composantes */, temps,
+                        variables_internes().second_membre_projection_jump_);
+  champs_compris.add(variables_internes().second_membre_projection_jump_.valeur());
+  champs_compris_.ajoute_champ(variables_internes().second_membre_projection_jump_);
   dis.discretiser_champ("vitesse", ma_zone_dis,
                         "gradient_pression", "",
                         -1 /* nb composantes par defaut */, temps,
@@ -775,6 +781,22 @@ void Navier_Stokes_FT_Disc::discretiser()
                         variables_internes().derivee_temporelle_indicatrice);
   champs_compris.add(variables_internes().derivee_temporelle_indicatrice.valeur());
   champs_compris_.ajoute_champ(variables_internes().derivee_temporelle_indicatrice);
+
+  // Eulerian Interfacial area :
+  dis.discretiser_champ("champ_elem", ma_zone_dis,
+                        "interfacial_area", "m2",
+                        1 /* composante */, temps,
+                        variables_internes().ai);
+  champs_compris.add(variables_internes().ai.valeur());
+  champs_compris_.ajoute_champ(variables_internes().ai);
+
+  // Velocity jump "u0" computed for phase 0 :
+  Nom nom = Nom("vitesse_jump0_") + le_nom();
+  dis.discretiser_champ("vitesse", ma_zone_dis, nom, "m/s", -1 /* nb composantes par defaut */,1,  temps,
+                        variables_internes().vitesse_jump0_);
+  variables_internes().vitesse_jump0_.associer_eqn(*this);
+  champs_compris.add(variables_internes().vitesse_jump0_.valeur());
+  champs_compris_.ajoute_champ(variables_internes().vitesse_jump0_);
 }
 
 // Description:
@@ -798,7 +820,8 @@ void Navier_Stokes_FT_Disc::discretiser_assembleur_pression()
 
   Assembleur_base& assembleur = assembleur_pression_.valeur();
   assembleur.associer_zone_dis_base(zone_dis().valeur());
-  // B. Mathieu, 07_2004 : premier jet de la methode, on resout en pression :
+  // B. Mathieu, 07_2004 : premier jet de la methode, on resout en pression.
+  // Version actuelle : pas d'increment de pression
   assembleur.set_resoudre_increment_pression(0);
   assembleur.set_resoudre_en_u(1);
 }
@@ -990,11 +1013,13 @@ const SolveurSys& Navier_Stokes_FT_Disc::get_solveur_pression() const
 // Parametre: champ
 // Signification: le champ aux faces (meme discretisation que la vitesse)
 //  ou on stocke le terme source des forces superficielles.
+//
+//  The method is no longer const because it changes a member of variables_internes() to store the Eulerian interfacial Area.
 void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_FT_Disc& maillage,
                                                                  const Champ_base& gradient_indicatrice,
                                                                  Champ_base& potentiel_elements,
                                                                  Champ_base& potentiel_faces,
-                                                                 Champ_base& champ) const
+                                                                 Champ_base& champ)
 {
   const Zone_VF& zone_vf = ref_cast(Zone_VF, zone_dis().valeur());
   // Nombre de faces
@@ -1266,6 +1291,10 @@ void Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles(const Maillage_
         Debog::verifier("Navier_Stokes_FT_Disc::calculer_champ_forces_superficielles poids:",poids);
       }
   }
+
+  // I take the opportunity to store the Eulerian Interfacial Area...
+  DoubleTab& interfacial_area = get_set_interfacial_area();
+  interfacial_area=poids;
   {
     // Boucle sur les faces
     int face;
@@ -1584,7 +1613,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 break;
               default:
                 Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface ordre" << finl;
-                exit();
+                Process::exit();
               }
             switch (phase_pilote)
               {
@@ -1600,7 +1629,7 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 // Champ de vitesse tel que u + u0 soit continu et
                 // u+u0 = la vitesse de la phase 0 dans la phase 0
                 if (d < 0)
-                  p = 0.;
+                  p = 0.; // dans la phase 0
                 else
                   p *= (un_sur_rho_1 - un_sur_rho_0);
                 break;
@@ -1610,11 +1639,11 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
                 if (d < 0)
                   p *= (un_sur_rho_0 - un_sur_rho_1);
                 else
-                  p = 0.;
+                  p = 0.; // dans la phase 1
                 break;
               default:
                 Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface phase_pilote" << finl;
-                exit();
+                Process::exit();
               }
           }
         phi(i) = p;
@@ -1625,15 +1654,13 @@ void Navier_Stokes_FT_Disc::calculer_delta_u_interface(Champ_base& champ_u0,
   // Gradient de phi:
   if (champ_u0.que_suis_je() == "Champ_Face")
     {
-
       gradient.calculer(phi, u0);
-
     }
   else
     {
       Cerr << "Error for the method Navier_Stokes_FT_Disc::calculer_delta_u_interface\n"
            << " Non code pour " << champ_u0.que_suis_je() << finl;
-      exit();
+      Process::exit();
     }
 
   // On annule la vitesse calculee pour les faces adjacentes a un element
@@ -1668,9 +1695,9 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
   const double rho_1 = fluide_diphasique().fluide_phase(1).masse_volumique().valeurs()(0,0);
   const double delta_rho = rho_0-rho_1;
 
-  double rho_0_delta_rho = 0.;
+  double rho_0_sur_delta_rho = 0.;
   if (delta_rho != 0)
-    rho_0_delta_rho = rho_0 / delta_rho;
+    rho_0_sur_delta_rho = rho_0 / delta_rho;
 
   const DoubleTab& tab_vitesse = inconnue().valeurs();
   const IntTab& face_voisins = zone_dis().valeur().face_voisins();
@@ -1691,7 +1718,7 @@ void Navier_Stokes_FT_Disc::calculer_dI_dt(DoubleVect& dI_dt) const
       if (indic_1 == 0. || indic_1 == 1.)
         indic_0 = indic_1;
       const double indic_face = (indic_0 + indic_1) * 0.5;
-      const double x = rho_0_delta_rho - indic_face;
+      const double x = rho_0_sur_delta_rho - indic_face;
 
       for (int j = 0; j < dim; j++)
         tmp(i,j) *= x;
@@ -1889,6 +1916,11 @@ DoubleTab& Navier_Stokes_FT_Disc::derivee_en_temps_inco(DoubleTab& vpoint)
         }
       else
         {
+          if (variables_internes().is_boussinesq_)
+            {
+              Cerr << "Trying to use Boussinesq approximation on a 2phase flow in VEF? Not yet available. Ask TRUST support." << finl;
+              Process::exit();
+            }
           for (int face=0; face<n; face++)
             for (int dim=0; dim<m; dim++)
               gravite_face(face,dim)=volumes_entrelaces(face)*g[dim];
@@ -2630,3 +2662,13 @@ int Navier_Stokes_FT_Disc::is_terme_gravite_rhog() const
   else
     return 0;
 }
+/*
+void Navier_Stokes_FT_Disc::corriger_mpoint()
+{
+  if (probleme_ft().tcl().is_activated())
+    {
+      DoubleTab& mpoint = variables_internes().mpoint.valeur().valeurs();
+      probleme_ft().tcl().corriger_mpoint(mpoint);
+    }
+}
+*/

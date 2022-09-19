@@ -85,7 +85,7 @@ protected:
                                                     const Champ_base& gradient_indicatrice,
                                                     Champ_base& potentiel_elements,
                                                     Champ_base& potentiel_faces,
-                                                    Champ_base& champ) const;
+                                                    Champ_base& champ);
   virtual void calculer_gradient_indicatrice(const Champ_base& indicatrice,
                                              const DoubleTab& distance_interface_sommets,
                                              Champ_base& gradient_i);
