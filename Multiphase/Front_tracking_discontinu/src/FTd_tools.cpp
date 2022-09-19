@@ -58,6 +58,8 @@ double FTd_calculer_max_norme_vecteurs(const DoubleTab& vecteurs)
 
   return sqrt(norme2max);
 }
+
+// The area of a triangle is half of the cross-product!
 double FTd_calculer_aire_triangle(const FTd_vecteur2& coord_som0,
                                   const FTd_vecteur2& coord_som1,
                                   const FTd_vecteur2& coord_som2)
@@ -71,7 +73,7 @@ double FTd_calculer_aire_triangle(const FTd_vecteur2& coord_som0,
   double x2 = coord_som2[0];
   double y2 = coord_som2[1];
 
-  double aire_tr = (x1-x0) * (y2-y0) - (y1-y0) * (x2-x0);
+  double aire_tr = 0.5*((x1-x0) * (y2-y0) - (y1-y0) * (x2-x0));
 
   return aire_tr;
 }

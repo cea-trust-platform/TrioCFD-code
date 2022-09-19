@@ -406,7 +406,6 @@ int Remaillage_FT::calculer_differentielle_volume(
   const Maillage_FT_Disc& maillage,
   DoubleTab& differentielle_volume) const
 {
-  const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
   const DoubleTab& normale_facettes = maillage.get_update_normale_facettes();
   const int nb_sommets = maillage.nb_sommets();
   const int nb_facettes = maillage.nb_facettes();
@@ -429,6 +428,7 @@ int Remaillage_FT::calculer_differentielle_volume(
   // est :
   if (!bidim_axi)
     {
+      const ArrOfDouble& surface_facettes = maillage.get_update_surface_facettes();
       //  normale_unitaire * surface / nb_sommets_par_facette
       double normale[3] = { 0., 0., 0. };
       for (fa7 = 0; fa7 < nb_facettes; fa7++)
@@ -561,7 +561,7 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
       coord_som_opp[0] = sommets(som1,0);
       coord_som_opp[1] = sommets(som1,1);
     }
-  double v1 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp) * 0.5;
+  double v1 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp);
   if (bidim_axi)
     // x_G : x coordinate of the centre of gravity is located at a third of the position of all vertex.
     // Guldin's Theorem :
@@ -586,7 +586,7 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
       coord_som_opp[0] = sommets(som0,0);
       coord_som_opp[1] = sommets(som0,1);
     }
-  double v2 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp) * 0.5;
+  double v2 = FTd_calculer_aire_triangle(coord_som0,coord_som1,coord_som_opp);
   if (bidim_axi)
     v2 *= (coord_som0[0] + coord_som1[0] + coord_som_opp[0]) * un_tiers * angle_bidim_axi;
 #if DEBUG_CONSERV_VOLUME
@@ -646,7 +646,6 @@ double Remaillage_FT::calculer_variation_volume_facette_2D(int fa7, const Mailla
     }
 #endif
 #endif
-
   return v1 + v2;
 }
 
@@ -724,7 +723,6 @@ double Remaillage_FT::calculer_variation_volume_facette_3D(int fa7, const Mailla
       facette[i] = facettes(fa7, i);
   }
   const DoubleTab& position_finale = maillage.sommets();
-
 #ifdef ALGO_NON_PARALLELE
   int ordre_sommets[3] = { 0, 1, 2 };
   // Calcul de l'ordre dans lequel on va construire les 3 tetraedres (ordre croissant des indices globaux
@@ -847,6 +845,8 @@ double Remaillage_FT::calculer_variation_volume(const Maillage_FT_Disc& maillage
   return dvolume_total;
 }
 
+#if 0
+// Unused method:
 // Description:
 //    Cette fonction calcule une correction sur un deplacement liee a une variation de volume imposee
 // Precondition:
@@ -969,6 +969,7 @@ int Remaillage_FT::calculer_correction_deplacement(DoubleTab& deplacement,
 
   return res;
 }
+#endif
 
 //=======================================================================================
 //  GESTION DU BARYCENTRAGE DES SOMMETS
@@ -1330,7 +1331,8 @@ void Remaillage_FT::barycentrer_lisser_systematique(double temps, Maillage_FT_Di
   temps_dernier_lissage_ = temps;
   ArrOfDoubleFT var_volume(maillage.nb_sommets());
   var_volume = 0.;
-  regulariser_maillage(maillage, var_volume,
+  regulariser_maillage(maillage,
+                       var_volume,
                        relax_barycentrage_,
                        lissage_courbure_coeff_,
                        nb_iter_barycentrage_,

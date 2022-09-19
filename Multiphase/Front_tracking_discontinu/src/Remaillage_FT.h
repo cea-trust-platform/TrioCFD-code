@@ -108,8 +108,10 @@ protected:
                                             DoubleTab& barycentres) const;
 
   int calculer_connectivites_sommetFacettes(const Maillage_FT_Disc& maillage,ArrOfInt& fa7VoisinesSom_index, IntTab& fa7VoisinesSom_data) const;
+#if 0
+  // Unused method:
   int calculer_correction_deplacement(DoubleTab& deplacement,const ArrOfDouble& varVolume,const DoubleTab& deplacement_varVolume, const ArrOfDouble& norme2_deplacement_varVolume) const;
-
+#endif
   int calculer_differentielle_volume(const Maillage_FT_Disc& maillage,
                                      DoubleTab& differentielle_volume) const;
 
