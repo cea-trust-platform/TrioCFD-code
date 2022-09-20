@@ -48,14 +48,13 @@
 #include <Ouvrir_fichier.h>
 #include <Ref_IJK_FT_double.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Corrige_flux_FT
-//
-// <Description of class Corrige_flux_FT>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Corrige_flux_FT
+ *
+ *  <Description of class Corrige_flux_FT>
+ *
+ *
+ *
+ */
 class ParcoursIJKDir
 {
 public:

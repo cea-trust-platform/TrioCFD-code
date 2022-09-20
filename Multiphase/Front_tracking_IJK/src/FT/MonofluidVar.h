@@ -25,16 +25,14 @@
 #include <IJK_Field.h>
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class IJK_MonofluidVar
-//
-// Cette classe vise à simplifier l'appel aux propriétés constantes par phase
-// dans la formulation monofluide.
-//
-/////////////////////////////////////////////////////////////////////////////
-
-
+/*! @brief : class IJK_MonofluidVar
+ *
+ *  Cette classe vise à simplifier l'appel aux propriétés constantes par phase
+ *  dans la formulation monofluide.
+ *
+ *
+ *
+ */
 class IJK_MonofluidVar
 {
 public :

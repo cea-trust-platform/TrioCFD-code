@@ -52,8 +52,8 @@ Declare_liste(IJK_Energie);
 /*! @brief : class IJK_FT
  *
  *  <Description of class IJK_FT>
- * 
- * 
+ *
+ *
  *  La classe IJK_FT_double herite de la classe Interprete.
  *
  */

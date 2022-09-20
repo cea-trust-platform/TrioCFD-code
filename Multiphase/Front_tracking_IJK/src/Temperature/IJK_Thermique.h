@@ -50,8 +50,8 @@
 /*! @brief : class IJK_Thermique
  *
  *  <Description of class IJK_Thermique>
- * 
- * 
+ *
+ *
  *
  */
 int calculer_k_pour_bord(const IJK_Field_double& temperature, const bool bord_kmax);

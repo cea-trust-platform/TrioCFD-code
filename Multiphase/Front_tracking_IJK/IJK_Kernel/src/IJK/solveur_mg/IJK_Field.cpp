@@ -987,8 +987,9 @@ void IJK_Field_int::exchange_data(int pe_send_, /* processor to send to */
   delete[] recv_buffer;
 }
 
-// Description: Exchange data over "ghost" number of cells.
-// Precondition: ghost <= ghost_size_
+/*! @brief Exchange data over "ghost" number of cells.
+ *
+ */
 void IJK_Field_int::echange_espace_virtuel(int le_ghost)
 {
   statistiques().begin_count(echange_vect_counter_);

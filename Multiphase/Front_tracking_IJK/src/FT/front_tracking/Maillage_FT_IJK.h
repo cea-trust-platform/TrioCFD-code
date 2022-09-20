@@ -32,8 +32,8 @@ class Parcours_interface;
 /*! @brief : class Maillage_FT_IJK
  *
  *  <Description of class Maillage_FT_IJK>
- * 
- * 
+ *
+ *
  *
  */
 class Maillage_FT_IJK : public Maillage_FT_Disc

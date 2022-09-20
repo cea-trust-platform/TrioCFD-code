@@ -29,17 +29,16 @@
 #include <iostream>
 #include <math.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class consigne_initiale
-//
-// <  S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
-//                qdm_cible = qdm_du_premier_pas_de_temps
-//                TODO v_cible_ : est-ce que je le sort ?
-// >
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class consigne_initiale
+ *
+ *  <  S'OCCUPE DE CALCULER v_cible_ et qdm_cible_ UNIQUEMENT
+ *                 qdm_cible = qdm_du_premier_pas_de_temps
+ *                 TODO v_cible_ : est-ce que je le sort ?
+ *  >
+ *
+ *
+ *
+ */
 class consigne_initiale : public Objet_U
 {
 
@@ -82,8 +81,8 @@ protected :
  *                 qdm_cible = alpha_l rho_l v_cible_
  *                 v_cible_ : constante utilisateur ou .sauv
  *  >
- * 
- * 
+ *
+ *
  *
  */
 class cible_donnee : public Objet_U
@@ -134,8 +133,8 @@ protected :
  *     n <-- n+1 ...
  *   ATTENTION AUX DIMENSION : v_cible_ vaut alpha_l*v_liq (03.03.22)
  *   >
- * 
- * 
+ *
+ *
  *
  */
 class moyenne_par_morceaux : public Objet_U
@@ -197,7 +196,7 @@ protected :
  * 	      tm = duree_effective_morceau_glissant_
  *   ATTENTION AUX DIMENSIONS : v_cible_ = \ol{u}^liq - \ol{u}^vap
  *   >
- * 
+ *
  *
  */
 class moyenne_glissante : public Objet_U
@@ -256,16 +255,16 @@ protected :
 /*! @brief : class correction_one_direction
  *
  *  < Correction : "vitesse_corrigee_ = vitesse - vitesse_correction_"
- * 
+ *
  *    A partir de qdm_cible, calcule vitesse_correction_ et vitesse_corrigee_ pour une direction
- * 
+ *
  *                 u_i * = u_i - {u_correction}_i
  *                 correct_velocity_ = vel_ijk_t - value_correction_
  * 				  value_correction_= ({rho u}_i _moyen - qdm_cible)  /  rho_moyen
- * 
+ *
  *    qdm_cible : calculee par une des sous-classes.
  *   >
- * 
+ *
  *
  */
 class correction_one_direction : public Objet_U
@@ -342,8 +341,8 @@ protected :
 /*! @brief : class corrections_qdm
  *
  *  <Corrections to comply with the mean momentum budget in the three directions.>
- * 
- * 
+ *
+ *
  *
  */
 class corrections_qdm : public Objet_U

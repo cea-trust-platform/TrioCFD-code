@@ -27,8 +27,8 @@
 /*! @brief : class Remaillage_FT_IJK
  *
  *  <Description of class Remaillage_FT_IJK>
- * 
- * 
+ *
+ *
  *  Pour initialiser la classe il faut:
  *  - appeler le readOn pour lire les parametres (optionnels)
  *  - appeler associer_zone()

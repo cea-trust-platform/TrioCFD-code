@@ -48,14 +48,13 @@
 #include <Parser.h>
 #include <Ref_IJK_FT_double.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class IJK_Energie
-//
-// <Description of class IJK_Energie>
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class IJK_Energie
+ *
+ *  <Description of class IJK_Energie>
+ *
+ *
+ *
+ */
 class IJK_FT_double;
 
 class IJK_Energie;

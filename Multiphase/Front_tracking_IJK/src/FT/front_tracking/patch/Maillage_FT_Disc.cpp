@@ -550,8 +550,8 @@ void Maillage_FT_Disc::ecrire_plot(const Nom& nom,double un_temps, int niveau_re
 
 /*! @brief Cette fonction permet de lire les parametres pour le maillage des interfaces
  *
- * @param (is) flot d'entree 
- * @return (Entree) le flot d'entree 
+ * @param (is) flot d'entree
+ * @return (Entree) le flot d'entree
  */
 Entree& Maillage_FT_Disc::lire_param_maillage(Entree& is)
 {
@@ -865,7 +865,7 @@ void Maillage_FT_Disc::completer_maillage()
  *   "intersections_elem_facettes_".
  *  Les autres elements sont remplis par une methode heuristique utilisant
  *  l'indicatrice_precedente.
- * 
+ *
  *
  */
 void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
@@ -1080,7 +1080,7 @@ void Maillage_FT_Disc::calcul_indicatrice(DoubleVect& indicatrice,
  *
  *   des lignes de contact et detecte les collisions.
  *
- * @param (deplacement) un tableau de taille (nb_sommets(), Objet_U::dimension) contenant le vecteur deplacement de chaque sommet. Les deplacements des sommets virtuels sont ignores. 
+ * @param (deplacement) un tableau de taille (nb_sommets(), Objet_U::dimension) contenant le vecteur deplacement de chaque sommet. Les deplacements des sommets virtuels sont ignores.
  */
 void Maillage_FT_Disc::transporter(const DoubleTab& deplacement)
 {
@@ -2172,9 +2172,9 @@ int Maillage_FT_Disc::copier_sommet_interne(int som)
  *  sommet virtuel sur ce processeur).  Parmi les sommets de la liste_sommets,
  *  seuls ceux qui ne sont pas encore dans l'espace virtuel sont crees.
  *
- * @param (liste_sommets) une liste de numeros de sommets REELS qui peut contenir des doublons. 
- * @param (liste_pe) une liste de meme taille que liste_sommets contenant le numero du processeur sur lequel il faut creer un noeud virtuel. Le processeur ne doit pas etre moi. 
- * @param (comm) un schema de comm valide, dans lequel send_pe_list contient au moins les processeurs cites dans liste_pe. 
+ * @param (liste_sommets) une liste de numeros de sommets REELS qui peut contenir des doublons.
+ * @param (liste_pe) une liste de meme taille que liste_sommets contenant le numero du processeur sur lequel il faut creer un noeud virtuel. Le processeur ne doit pas etre moi.
+ * @param (comm) un schema de comm valide, dans lequel send_pe_list contient au moins les processeurs cites dans liste_pe.
  */
 void Maillage_FT_Disc::creer_sommets_virtuels(const ArrOfInt& liste_sommets,
                                               const ArrOfInt& liste_pe,
@@ -2266,8 +2266,8 @@ void Maillage_FT_Disc::creer_sommets_virtuels(const ArrOfInt& liste_sommets,
  *    chez le pe demande).
  *   Fait appel a creer_sommets_virtuels, donc meme preconditions.
  *
- * @param (request_sommets_pe) une liste de numeros de processeurs DIFFERENTS de me() 
- * @param (request_sommets_num) une liste de numeros de sommets. Chaque couple pe[i],num[i] designe un sommet reel d'indice "num" sur le processeur "pe". Pour chaque sommet, on cree un sommet virtuel sur me() s'il n'existe pas deja. 
+ * @param (request_sommets_pe) une liste de numeros de processeurs DIFFERENTS de me()
+ * @param (request_sommets_num) une liste de numeros de sommets. Chaque couple pe[i],num[i] designe un sommet reel d'indice "num" sur le processeur "pe". Pour chaque sommet, on cree un sommet virtuel sur me() s'il n'existe pas deja.
  */
 void Maillage_FT_Disc::creer_sommets_virtuels_numowner(const ArrOfInt& request_sommets_pe,
                                                        const ArrOfInt& request_sommets_num)
@@ -2608,7 +2608,7 @@ static void ordonner_sommets_facettes(IntTab& facettes,
  *  Le maillage retourne a l'etat minimal.
  *  Cette methode est utilisee lors de l'algorithme Marching-Cubes, du transport
  *  et du remaillage pour amener le maillage dans son etat conforme aux conventions.
- * 
+ *
  *
  */
 void Maillage_FT_Disc::corriger_proprietaires_facettes()
@@ -2700,7 +2700,7 @@ void Maillage_FT_Disc::corriger_proprietaires_facettes()
  *                   Le processeur distant ne doit pas etre moi !
  *  liste_pe = numero du pe a qui il faut envoyer chaque facette
  *  comm = un schema ou send_pe_list contient les PEs mentionnes dans la liste.
- * 
+ *
  *  Algo: Il faut d'abord creer les sommets des facettes, s'ils n'existent
  *  pas encore, puis creer les facettes.
  *  Cas general, le processeur A possede la facette (au sens du descripteur des
@@ -2963,12 +2963,12 @@ void Maillage_FT_Disc::creer_facettes_virtuelles(const ArrOfInt& liste_facettes,
  *  * On envoie a ce processeur le numero de l'element_arrivee. Le numero est
  *    converti en numero local d'un element reel sur ce processeur.
  *  Cette methode est essentiellement utilisee dans le parcours de l'interface.
- * 
  *
- * @param (liste_facettes) un tableau contenant des numeros de facettes reelles ou virtuelles, eventuellement avec doublons. 
- * @param (liste_elem_arrivee) tableau de taille identique a liste_facettes, contenant pour chacune un numero d'element virtuel. 
- * @param (facettes_recues_numfacettes) tableau rempli lors de l'echange avec la liste des facettes qui ont ete recues (meme si elles existaient deja et avec les doublons eventuels). Le contenu initial du tableau est efface. Aliasing ave liste_facettes autorise. 
- * @param (facettes_recues_numelement) tableau rempli lors de l'echange: pour chaque facette recue, numero de l'element d'arrivee (c'est la traduction du numero d'element virtuel "liste_elem_arrivee" en numero d'element reel sur le processeur qui a recu la facette. Aliasing avec liste_elem_arrivee autorise. 
+ *
+ * @param (liste_facettes) un tableau contenant des numeros de facettes reelles ou virtuelles, eventuellement avec doublons.
+ * @param (liste_elem_arrivee) tableau de taille identique a liste_facettes, contenant pour chacune un numero d'element virtuel.
+ * @param (facettes_recues_numfacettes) tableau rempli lors de l'echange avec la liste des facettes qui ont ete recues (meme si elles existaient deja et avec les doublons eventuels). Le contenu initial du tableau est efface. Aliasing ave liste_facettes autorise.
+ * @param (facettes_recues_numelement) tableau rempli lors de l'echange: pour chaque facette recue, numero de l'element d'arrivee (c'est la traduction du numero d'element virtuel "liste_elem_arrivee" en numero d'element reel sur le processeur qui a recu la facette. Aliasing avec liste_elem_arrivee autorise.
  */
 void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
                                          const ArrOfInt& liste_elem_arrivee,
@@ -3182,7 +3182,7 @@ void Maillage_FT_Disc::echanger_facettes(const ArrOfInt& liste_facettes,
  *                      de la facette ou du sommet sur le pe_distant
  *   pe_distant        = pour chaque numero de facette ou sommet, le pe proprietaire
  *
- * @param (numeros_locaux) tableau rempli par cette methode. Le contenu initial est efface. La taille est identique a celle de numeros_distants. On y met le numero local des elements (ce sont des numeros d'elements virtuels). Attention: numeros_locaux et numeros_distants peuvent referencer le meme tableau 
+ * @param (numeros_locaux) tableau rempli par cette methode. Le contenu initial est efface. La taille est identique a celle de numeros_distants. On y met le numero local des elements (ce sont des numeros d'elements virtuels). Attention: numeros_locaux et numeros_distants peuvent referencer le meme tableau
  */
 void Maillage_FT_Disc::convertir_numero_distant_local(const Desc_Structure_FT& descripteur,
                                                       const ArrOfInt& element_num_owner,
@@ -3482,8 +3482,8 @@ int Maillage_FT_Disc::deplacer_un_sommet(double& x, double& y, double& z,
  *   la paroi (on deplace le noeud de face de bord en face de bord en
  *   minimisant la distance entre le noeud et le deplacement demande.
  *
- * @param (liste_sommets_initiale) une liste non redondante de noeuds REELS a deplacer 
- * @param (deplacement_initial) le vecteur deplacement des noeuds de "liste_noeuds" ( dimension(0)==liste_noeuds.size_array() et dimension(1)==dimension ) 
+ * @param (liste_sommets_initiale) une liste non redondante de noeuds REELS a deplacer
+ * @param (deplacement_initial) le vecteur deplacement des noeuds de "liste_noeuds" ( dimension(0)==liste_noeuds.size_array() et dimension(1)==dimension )
  */
 void Maillage_FT_Disc::deplacer_sommets(const ArrOfInt& liste_sommets_initiale,
                                         const DoubleTab& deplacement_initial,
@@ -5169,9 +5169,9 @@ static void normalize(ArrOfDouble& nprime)
  * Methode de calcul : voir these B. Mathieu paragraphe 3.3.3 page 97
  *   La courbure est egale a la differentielle de la surface d'interface par rapport
  *    au deplacement des sommets, divisee par la differentielle du volume.
- * 
  *
- * @param (courbure_sommets) Tableau dans lequel on veut stocker la courbure aux sommets. La valeur initiale du tableau est perdue. L'espace virtuel du tableau resultat est a jour. 
+ *
+ * @param (courbure_sommets) Tableau dans lequel on veut stocker la courbure aux sommets. La valeur initiale du tableau est perdue. L'espace virtuel du tableau resultat est a jour.
  */
 void Maillage_FT_Disc::calcul_courbure_sommets(ArrOfDouble& courbure_sommets, const int call) const
 {

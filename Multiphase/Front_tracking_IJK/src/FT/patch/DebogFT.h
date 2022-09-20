@@ -31,8 +31,8 @@ class Maillage_FT_Disc;
 /*! @brief : class DebogIJK
  *
  *  <Description of class DebogIJK>
- * 
- * 
+ *
+ *
  *
  */
 class DebogFT : public Interprete

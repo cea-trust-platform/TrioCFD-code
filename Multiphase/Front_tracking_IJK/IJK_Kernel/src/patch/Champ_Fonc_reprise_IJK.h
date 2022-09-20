@@ -20,7 +20,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-/*! @brief 
+/*! @brief
  *
  */
 #ifndef Champ_Fonc_reprise_IJK_included
@@ -33,7 +33,7 @@
 
 /*! @brief classe Champ_Fonc_reprise_IJK Cette classe permet de relire un champ de vitesse SEULEMENT sauvegarde par IJK
  *
- * @sa Champ_Fonc_P0 
+ * @sa Champ_Fonc_P0
  */
 class Champ_Fonc_reprise_IJK: public Champ_Fonc_base
 {

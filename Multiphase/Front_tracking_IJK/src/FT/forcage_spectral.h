@@ -38,8 +38,8 @@
 /*! @brief : class Chouippe
  *
  *  <Description of class Chouippe>
- * 
- * 
+ *
+ *
  *
  */
 int unidentified_function(int argc, char **argv);

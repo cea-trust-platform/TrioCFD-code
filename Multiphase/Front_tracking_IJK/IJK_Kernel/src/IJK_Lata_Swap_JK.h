@@ -27,8 +27,8 @@
 /*! @brief : class IJK_Lata_Swap_JK
  *
  *  <Description of class IJK_Lata_Swap_JK>
- * 
- * 
+ *
+ *
  *
  */
 class IJK_Lata_Swap_JK : public Interprete

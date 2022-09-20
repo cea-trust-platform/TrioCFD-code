@@ -75,8 +75,8 @@ void print_umesh_conn(const DataArrayIdType *data);
  *
  *  Cette classe rassemble tous les algorithmes de gestion des interfaces pour le ijk
  *  (le maillage, les algo de remaillage, sauvegarde, reprise, etc)
- * 
- * 
+ *
+ *
  *
  */
 class IJK_Interfaces : public Objet_U

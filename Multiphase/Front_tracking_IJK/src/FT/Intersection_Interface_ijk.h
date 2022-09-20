@@ -41,15 +41,14 @@
 //#include <Interprete.h>
 #include <IJK_Interfaces.h>
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// .DESCRIPTION : class Interface_ijk_face
-//
-// Cette classe regroupe les information concernant les mailles qui sont
-// coupées par l'interface (leur numéro par exemple).
-//
-/////////////////////////////////////////////////////////////////////////////
-
+/*! @brief : class Interface_ijk_face
+ *
+ *  Cette classe regroupe les information concernant les mailles qui sont
+ *  coupées par l'interface (leur numéro par exemple).
+ *
+ *
+ *
+ */
 class IJK_Field_double;
 
 class Intersection_Interface_ijk
