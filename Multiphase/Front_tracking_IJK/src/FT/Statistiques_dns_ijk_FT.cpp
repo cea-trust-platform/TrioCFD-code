@@ -980,7 +980,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
   IJK_Field_double& extended_pressure_liq= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pl_: cas.pressure_;
   IJK_Field_double& extended_pressure_vap= (cas.post_.extended_pressure_computed_) ? cas.post_.extended_pv_: cas.pressure_;
   IJK_Field_double& pression=cas.pressure_;
-  IJK_Field_double& indicatrice=cas.indicatrice_ns_;
+  const IJK_Field_double& indicatrice=cas.itfce().I();
   FixedVector<IJK_Field_double, 3>& gradP=cas.post_.grad_P_;
 
   // Nombre total de mailles en K
@@ -1172,12 +1172,12 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               //}
 #ifdef STAT_VERBOSE
               // Debug pour verifier que je m'emmele pas les pinceaux dans les variables :
-              erreur = fabs(field_dudx(i,j,k)  - dUdx)
-                       + fabs(field_dvdy(i,j,k)  - dVdy)
-                       + fabs(field_dwdx(i,j,k)  - dWdx)
-                       + fabs(field_dudz(i,j,k)  - dUdz)
-                       + fabs(field_dvdz(i,j,k)  - dVdz)
-                       + fabs(field_dwdz(i,j,k)  - dWdz);
+              erreur = std::fabs(field_dudx(i,j,k)  - dUdx)
+                       + std::fabs(field_dvdy(i,j,k)  - dVdy)
+                       + std::fabs(field_dwdx(i,j,k)  - dWdx)
+                       + std::fabs(field_dudz(i,j,k)  - dUdz)
+                       + std::fabs(field_dvdz(i,j,k)  - dVdz)
+                       + std::fabs(field_dwdz(i,j,k)  - dWdz);
 
               if (erreur > PRECISION_DERIVEES)
                 {
@@ -1198,7 +1198,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                 }
 
               divU = dUdx + dVdy + dWdz;
-              if (fabs(divU) > PRECISION_DIVU)
+              if (std::fabs(divU) > PRECISION_DIVU)
                 {
                   Cerr << "Statistiques_dns_ijk_FT::update_stat -- divU : " << divU << finl;
                   Cerr << "dUdx,dVdy,dWdz : " << dUdx << " " <<  dVdy << " " << dWdz << finl;
@@ -1211,7 +1211,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               // Compute L1 and L2 norms :
               L1_erreur += erreur;
               L2_erreur += erreur*erreur;
-              L1_divU += fabs(divU);
+              L1_divU += std::fabs(divU);
               L2_divU += divU*divU;
 #endif
 
@@ -1290,9 +1290,9 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               d_divU_dx = ddUdxdx + ddVdydx + ddWdzdx;
               d_divU_dy = ddUdxdy + ddVdydy + ddWdzdy;
               d_divU_dz = ddUdxdz + ddVdydz + ddWdzdz;
-              if ((fabs(d_divU_dx) > PRECISION_DDIVU)
-                  || (fabs(d_divU_dy) > PRECISION_DDIVU)
-                  || (fabs(d_divU_dz) > PRECISION_DDIVU) )
+              if ((std::fabs(d_divU_dx) > PRECISION_DDIVU)
+                  || (std::fabs(d_divU_dy) > PRECISION_DDIVU)
+                  || (std::fabs(d_divU_dz) > PRECISION_DDIVU) )
                 {
                   Cerr << "Statistiques_dns_ijk_FT::update_stat -- grad(divU) : "
                        << d_divU_dx << " "
@@ -1307,11 +1307,11 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                 }
 
               // Compute L1 and L2 norms :
-              L1_d_divU_dx += fabs(d_divU_dx);
+              L1_d_divU_dx += std::fabs(d_divU_dx);
               L2_d_divU_dx += d_divU_dx*d_divU_dx;
-              L1_d_divU_dy += fabs(d_divU_dy);
+              L1_d_divU_dy += std::fabs(d_divU_dy);
               L2_d_divU_dy += d_divU_dy*d_divU_dy;
-              L1_d_divU_dz += fabs(d_divU_dz);
+              L1_d_divU_dz += std::fabs(d_divU_dz);
               L2_d_divU_dz += d_divU_dz*d_divU_dz;
 #endif
               // Si CURL ou CRITERE_Q sont demandes, on les remplis.
@@ -1364,9 +1364,9 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
 
 #ifdef STAT_VERBOSE
               // Debug pour verifier que je m'emmele pas les pinceaux dans les variables :
-              erreur_ddP = fabs(ddPdydx  - ddPdxdy)
-                           + fabs(ddPdzdx - ddPdxdz)
-                           + fabs(ddPdzdy - ddPdydz);
+              erreur_ddP = std::fabs(ddPdydx  - ddPdxdy)
+                           + std::fabs(ddPdzdx - ddPdxdz)
+                           + std::fabs(ddPdzdy - ddPdydz);
 
               if (erreur_ddP > PRECISION_DERIVEES)
                 {
@@ -1384,12 +1384,12 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
                 }
 
               laplP = ddPdxdx + ddPdydy + ddPdzdz;
-              if (fabs(dIdx)+fabs(dIdy)+fabs(dIdz) < PRECISION_LAPLP )
+              if (std::fabs(dIdx)+std::fabs(dIdy)+std::fabs(dIdz) < PRECISION_LAPLP )
                 {
                   // On a gradI nul sur toutes les faces donc la cellule est "franchement" monophasique.
                   // On ne devrait donc pas avoir de surprise, rho aux faces devrait etre constant
                   // et par consequent, on devrait avoir : laplP = 0
-                  if (fabs(laplP) > PRECISION_LAPLP)
+                  if (std::fabs(laplP) > PRECISION_LAPLP)
                     {
                       Cerr << "Statistiques_dns_ijk_FT::update_stat -- Laplacien P : " << laplP << finl;
                       Cerr << "On proc " << Process::me() << " Cell: " << i << " " << j << " " << k << finl;
@@ -1402,7 +1402,7 @@ void Statistiques_dns_ijk_FT::update_stat(IJK_FT_double& cas, const double dt)
               // Compute L1 and L2 norms :
               L1_erreur_ddP += erreur_ddP;
               L2_erreur_ddP += erreur_ddP*erreur_ddP;
-              L1_laplP += fabs(laplP);
+              L1_laplP += std::fabs(laplP);
               L2_laplP += laplP*laplP;
 #endif
 

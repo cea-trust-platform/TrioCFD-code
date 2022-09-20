@@ -69,6 +69,8 @@ inline int aligned(const void *ptr, int size)
 #define _SimdAligned_ __attribute__ (( aligned(simd_getalign()) ))
 
 
+// Implementation for single precision type
+
 /*! @brief This class provides a generic access to simd operations on x86, x86 AMD and ARM architectures.
  *
  * Functionalities provided by the class are :
@@ -363,6 +365,8 @@ inline Simd_float SimdReciprocalMed(const Simd_float & b)
   Vc::float_v resu = (two - b.data_ * x) * x;
   return resu;
 }
+
+// Implementation for double precision type
 
 /*! @brief This class provides a generic access to simd operations on x86, x86 AMD and ARM architectures.
  *

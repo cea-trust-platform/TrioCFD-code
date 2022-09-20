@@ -1374,7 +1374,7 @@ inline double calcul_alpha_amont_aval(const double i_cfl, const double alpha_ava
 
   double borne_inf_2 = std::max(min_alpha_consistance, std::max(d_i, std::max(a_i, b_i)));
   double borne_sup_2 = std::min(max_alpha_consistance, std::min(D_i, std::min(A_i, B_i)));
-  Cout << "borne_inf_2 = max(min_alpha_consistance, max(d_i, max(a_i, b_i))) : " << borne_inf_2 << " borne_sup_2 = min(max_alpha_consistance, min(D_i, min(A_i, B_i))) : " << borne_sup_2 << endl;
+  Cout << "borne_inf_2 = std::max(min_alpha_consistance, std::max(d_i, std::max(a_i, b_i))) : " << borne_inf_2 << " borne_sup_2 = std::min(max_alpha_consistance, std::min(D_i, std::min(A_i, B_i))) : " << borne_sup_2 << endl;
   // borne_inf_2 = borne_sup_2 =0;
 
 
@@ -1393,11 +1393,11 @@ inline double calcul_alpha_amont_aval(const double i_cfl, const double alpha_ava
     }
 #endif
 
-  Cout << "borne_inf = max(min_alpha_consistance, b_i) : " << borne_inf << " borne_sup = min(max_alpha_consistance, B_i) : " << borne_sup << endl;
+  Cout << "borne_inf = std::max(min_alpha_consistance, b_i) : " << borne_inf << " borne_sup = std::min(max_alpha_consistance, B_i) : " << borne_sup << endl;
   Cout << " min(borne_sup_2, max(borne_inf_2, alpha_aval)) : " << std::min(borne_sup_2, std::max(borne_inf_2, alpha_aval)) <<" min(B_i, max(b_i, alpha_aval)) : " << std::min(B_i, std::max(b_i, alpha_aval)) << " resu : " << resu << endl;
   Cout << "                                                  " << endl;
   return resu;
-  //return min(B_i, max(b_i, alpha_aval));
+  //return std::min(B_i, std::max(b_i, alpha_aval));
 
 
 

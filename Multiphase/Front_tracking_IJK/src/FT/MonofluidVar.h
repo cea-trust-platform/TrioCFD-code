@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2015 - 2016, CEA
+* Copyright (c) 2019, CEA
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,44 +14,69 @@
 *****************************************************************************/
 /////////////////////////////////////////////////////////////////////////////
 //
-// File      : DebogFT.h
+// File      : MonofluidVar.h
 // Directory : $IJK_ROOT/src/FT
 //
 /////////////////////////////////////////////////////////////////////////////
-#ifndef DebogFT_included
-#define DebogFT_included
-#include <Interprete.h>
-#include <EFichier.h>
-#include <SFichier.h>
-#include <TRUSTTabs_forward.h>
 
-class Maillage_FT_Disc;
+#ifndef IJK_MonofluidVar_included
+#define IJK_MonofluidVar_included
+
+#include <IJK_Field.h>
 
 
-/*! @brief : class DebogIJK
+/*! @brief : class IJK_MonofluidVar
  *
- *  <Description of class DebogIJK>
+ *  Cette classe vise à simplifier l'appel aux propriétés constantes par phase
+ *  dans la formulation monofluide.
  *
  *
  *
  */
-class DebogFT : public Interprete
+class IJK_MonofluidVar
 {
-  Declare_instanciable(DebogFT) ;
 public :
-  Entree& interpreter(Entree&) override;
-  enum DebogMode { DISABLED=0, WRITE_PASS=1, CHECK_PASS=2 };
-  static void verifier_maillage_ft(const char *msg, const Maillage_FT_Disc&);
-  static void verifier_tableau_sommets(const char *msg, const Maillage_FT_Disc&, const ArrOfDouble&);
-  static void verifier_tableau_sommets(const char *msg, const Maillage_FT_Disc&, const DoubleTab&);
-  static void verifier(const double);
-protected :
-  static void verifier_(const char *msg, const ArrOfDouble& sig);
-  static double seuil_absolu_, seuil_relatif_, seuil_minimum_relatif_;
-  static int debog_mode_;
-  static Nom filename_;
-  static EFichier infile_;
-  static SFichier outfile_;
-  static void compute_signature_sommets(const Maillage_FT_Disc&, const ArrOfDouble& data, ArrOfDouble& signature);
+  IJK_MonofluidVar() {}
+  ~IJK_MonofluidVar() {}
+  void initialize(const double liqu_val, const double vap_val);
+
+  ///////////////
+  // Accessors //
+  ///////////////
+
+  double operator()(const double indic_l) const;
+  double operator()(const IJK_Field_double& indic_l, const int i, const int j, const int k) const ;
+  void operator()(const IJK_Field_double& indic_l, IJK_Field_double& res) const;
+  double harmo(const double indic_l) const ;
+  double harmo(const IJK_Field_double indic_l, const int i, const int j, const int k) const ;
+  void harmo(const IJK_Field_double& indic_l, IJK_Field_double& res) const;
+
+  ///////////////
+  // Modifiers //
+  ///////////////
+
+  IJK_MonofluidVar& operator*= (const IJK_MonofluidVar& mono2);
+  IJK_MonofluidVar& operator/= (const IJK_MonofluidVar& mono2);
+  IJK_MonofluidVar& operator+= (const IJK_MonofluidVar& mono2);
+
+  /////////////
+  // getters //
+  /////////////
+
+  double liqu() const;
+  double vap() const;
+
+private:
+  double liqu_val_;
+  double vap_val_;
 };
-#endif /* DebogIJK_included */
+
+
+// Non member functions
+
+
+IJK_MonofluidVar operator* (const IJK_MonofluidVar& mono1, const IJK_MonofluidVar& mono2);
+IJK_MonofluidVar operator/ (const IJK_MonofluidVar& mono1, const IJK_MonofluidVar& mono2);
+IJK_MonofluidVar operator+ (const IJK_MonofluidVar& mono1, const IJK_MonofluidVar& mono2);
+
+#endif /* IJK_Energie_included */

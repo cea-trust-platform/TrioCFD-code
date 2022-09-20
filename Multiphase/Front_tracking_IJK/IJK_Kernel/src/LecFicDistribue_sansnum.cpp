@@ -37,9 +37,9 @@ LecFicDistribue_sansnum::~LecFicDistribue_sansnum()
  *
  *     Ces parametres sont les parametres de la methode open standard
  *
- * @param (const char* name) nom du fichier 
- * @param (int mode) parametre passe a open 
- * @param (int prot) parametre passe a open 
+ * @param (const char* name) nom du fichier
+ * @param (int mode) parametre passe a open
+ * @param (int prot) parametre passe a open
  */
 LecFicDistribue_sansnum::LecFicDistribue_sansnum(const char* name,IOS_OPEN_MODE mode)
 {
@@ -49,10 +49,10 @@ LecFicDistribue_sansnum::LecFicDistribue_sansnum(const char* name,IOS_OPEN_MODE 
 
 /*! @brief Ouvre le fichier avec les parametres mode et prot donnes Ces parametres sont les parametres de la methode open standard
  *
- * @param (const char* name) nom du fichier 
- * @param (int mode) parametre passe a open 
- * @param (int prot) parametre passe a open 
- * @return (Entree&) *this 
+ * @param (const char* name) nom du fichier
+ * @param (int mode) parametre passe a open
+ * @param (int prot) parametre passe a open
+ * @return (Entree&) *this
  */
 int LecFicDistribue_sansnum::ouvrir(const char* name,IOS_OPEN_MODE mode)
 {

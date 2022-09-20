@@ -38,9 +38,9 @@ class Param;
 
 /*! @brief : class Remaillage_FT Cette classe implemente les procedures de remaillage des interfaces pour le Front-Tracking :
  *
- * 
  *
- * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc 
+ *
+ * @sa Transport_Interfaces_FT_Disc Maillage_FT_Disc
  */
 class Remaillage_FT : public Objet_U
 {

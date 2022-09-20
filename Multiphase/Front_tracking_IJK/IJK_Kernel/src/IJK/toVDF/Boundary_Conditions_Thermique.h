@@ -28,8 +28,8 @@
 /*! @brief : class Boundary_Conditions_Thermique
  *
  *  <Description of class Boundary_Conditions_Thermique>
- * 
- * 
+ *
+ *
  *
  */
 class Boundary_Conditions_Thermique : public Objet_U

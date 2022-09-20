@@ -93,7 +93,7 @@ void Force_ph::initialise(int a_nproc_tot, int a_ni,int a_nj,int a_nk,int a_nl,i
 //             voir IJK_FT_post.
   // allocate_velocity(force_, splitting, 2); //: 2 a la fin -> 2 cellules ghost a la fin
   // TENTER CA
-  allocate_velocity(force_, splitting, 0); //: 2 a la fin -> 2 cellules ghost a la fin
+  allocate_velocity(force_, splitting, 2); //: 2 a la fin -> 2 cellules ghost a la fin
 
 ///////////////////////////////////////////////////////////////
   std::ofstream Physical_flux(nom_fichier.c_str());
@@ -361,7 +361,7 @@ void Force_ph::from_spect_to_phys_opti2(ArrOfDouble& coeff_force )
                   int ind_RDIlmn((0*n_dir+dir) * n_ind_lmn + ind_lmn);
                   int ind_CDImni((1*n_dir+dir) * n_ind_mni + ind_mni);
                   int ind_CDIlmn((1*n_dir+dir) * n_ind_lmn + ind_lmn);
-
+                  // Complex multiplication
                   bout_a_quart[ind_RDImni] += 1*(coeff_force[ind_RDIlmn]*expo_a[0] - coeff_force[ind_CDIlmn]*expo_a[1]);
                   bout_a_quart[ind_CDImni] += 1*(coeff_force[ind_RDIlmn]*expo_a[1] + coeff_force[ind_CDIlmn]*expo_a[0]);
                 }
@@ -388,7 +388,7 @@ void Force_ph::from_spect_to_phys_opti2(ArrOfDouble& coeff_force )
                   int ind_RDImni((0*n_dir+dir)*n_ind_mni+ind_mni);
                   int ind_CDInij((1*n_dir+dir)*n_ind_nij+ind_nij);
                   int ind_CDImni((1*n_dir+dir)*n_ind_mni+ind_mni);
-
+                  // Complex multiplication
                   bout_b_quart[ind_RDInij] += 1*(bout_a_quart[ind_RDImni]*expo_b[0] - bout_a_quart[ind_CDImni]*expo_b[1]);
                   bout_b_quart[ind_CDInij] += 1*(bout_a_quart[ind_RDImni]*expo_b[1] + bout_a_quart[ind_CDImni]*expo_b[0]);
                 }
@@ -416,7 +416,7 @@ void Force_ph::from_spect_to_phys_opti2(ArrOfDouble& coeff_force )
                   // Smetrie Hermitienne :
                   // force[0][dir][ind_ijk] += 1*(bout_b_quart[ind_RDInij]*expo_c[0] - bout_b_quart[ind_CDInij]*expo_c[1]);
                   // force[1][dir][ind_ijk] += 1*(bout_b_quart[ind_RDInij]*expo_c[1] + bout_b_quart[ind_CDInij]*expo_c[0]);
-
+                  // Real part only
                   force_[dir](i,j,k) += 1*(bout_b_quart[ind_RDInij]*expo_c[0] - bout_b_quart[ind_CDInij]*expo_c[1]);
                 }
             }

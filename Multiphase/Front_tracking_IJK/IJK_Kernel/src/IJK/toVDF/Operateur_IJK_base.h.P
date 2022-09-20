@@ -82,7 +82,7 @@ class Operateur_IJK_elem_base_ST
   virtual ~Operateur_IJK_elem_base_ST() {};
  protected:
 #Pforeach _OP_(set add)
-  void compute__OP_(IJK_Field_ST & dx);
+  virtual void compute__OP_(IJK_Field_ST & dx);
 #Pendforeach(_OP_)
 
   // The derived class must implement the computation of fluxes (3 fluxes, one per direction)

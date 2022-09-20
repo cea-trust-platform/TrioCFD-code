@@ -31,8 +31,8 @@
 /*! @brief : class Sonde_IJK
  *
  *  <Description of class Sonde_IJK>
- * 
- * 
+ *
+ *
  *
  */
 class Sonde_IJK : public Sonde

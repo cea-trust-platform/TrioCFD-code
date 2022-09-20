@@ -87,9 +87,9 @@ Entree& init_forcage_THI::readOn( Entree& is )
   param.ajouter("facteur",&facteur_forcage_);
   param.ajouter("forced_advection",&forced_advection_);
   if (forced_advection_==1)
-    param.ajouter("advection_velocity", &advection_velocity_, Param::REQUIRED);
+    {param.ajouter("advection_velocity", &advection_velocity_, Param::REQUIRED);}
   else
-    param.ajouter("advection_velocity", &advection_velocity_);
+    {param.ajouter("advection_velocity", &advection_velocity_);}
   param.ajouter("advection_length", &advection_length_);
   param.ajouter("stops_at_time_step",&forcage_ts_stop);
   param.ajouter("stops_at_time",&forcage_t_stop);
@@ -99,9 +99,9 @@ Entree& init_forcage_THI::readOn( Entree& is )
   param.ajouter("dissipation",&eps_etoile);
   param.ajouter("temps_grande_echelle",&tL);
   if (type_forcage == 3)
-    param.ajouter("random_process",&random_, Param::REQUIRED);
+    {param.ajouter("random_process",&random_, Param::REQUIRED);}
   else
-    param.ajouter("random_process",&random_);
+    {param.ajouter("random_process",&random_);}
   param.lire_avec_accolades(is);
   return is;
 }

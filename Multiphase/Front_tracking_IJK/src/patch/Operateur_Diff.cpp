@@ -33,8 +33,8 @@ Implemente_instanciable(Operateur_Diff,"Operateur_Diff",DERIV(Operateur_Diff_bas
 
 /*! @brief Simple appel a Operateur::ecrire(Sortie&) Ecrit l'operateur sur un flot de sortie.
  *
- * @param (Sortie& os) un flot de sortie 
- * @return (Sortie&) le flot de sortie modifie 
+ * @param (Sortie& os) un flot de sortie
+ * @return (Sortie&) le flot de sortie modifie
  */
 Sortie& Operateur_Diff::printOn(Sortie& os) const
 {
@@ -44,8 +44,8 @@ Sortie& Operateur_Diff::printOn(Sortie& os) const
 
 /*! @brief Simple appel a Operateur::lire(Entree&) Lit l'operateur a partir d'un flot d'entree.
  *
- * @param (Entree& is) un flot d'entree 
- * @return (Entree&) le flot d'entree modifie 
+ * @param (Entree& is) un flot d'entree
+ * @return (Entree&) le flot d'entree modifie
  */
 Entree& Operateur_Diff::readOn(Entree& is)
 {
@@ -85,7 +85,7 @@ void Operateur_Diff::typer()
 
 /*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base
  *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base 
+ * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
  */
 Operateur_base& Operateur_Diff::l_op_base()
 {
@@ -93,7 +93,7 @@ Operateur_base& Operateur_Diff::l_op_base()
 }
 /*! @brief Renvoie l'objet sous-jacent upcaste en Operateur_base (version const)
  *
- * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base 
+ * @return (Operateur_base&) l'objet sous-jacent upcaste en Operateur_base
  */
 const Operateur_base& Operateur_Diff::l_op_base() const
 {
@@ -105,9 +105,9 @@ const Operateur_base& Operateur_Diff::l_op_base() const
  * Ajoute la contribution de l'operateur au tableau
  *     passe en parametre
  *
- * @param (DoubleTab& donnee) tableau contenant les donnees sur lesquelles on applique l'operateur. 
- * @param (DoubleTab& resu) tableau auquel on ajoute la contribution de l'operateur 
- * @return (DoubleTab&) le tableau contenant le resultat 
+ * @param (DoubleTab& donnee) tableau contenant les donnees sur lesquelles on applique l'operateur.
+ * @param (DoubleTab& resu) tableau auquel on ajoute la contribution de l'operateur
+ * @return (DoubleTab&) le tableau contenant le resultat
  */
 DoubleTab& Operateur_Diff::ajouter(const DoubleTab& donnee,
                                    DoubleTab& resu) const
@@ -123,9 +123,9 @@ DoubleTab& Operateur_Diff::ajouter(const DoubleTab& donnee,
  * Initialise le tableau passe en parametre avec la contribution
  *     de l'operateur.
  *
- * @param (DoubleTab& donnee) tableau contenant les donnees sur lesquelles on applique l'operateur. 
- * @param (DoubleTab& resu) tableau dans lequel stocke la contribution de l'operateur 
- * @return (DoubleTab&) le tableau contenant le resultat 
+ * @param (DoubleTab& donnee) tableau contenant les donnees sur lesquelles on applique l'operateur.
+ * @param (DoubleTab& resu) tableau dans lequel stocke la contribution de l'operateur
+ * @return (DoubleTab&) le tableau contenant le resultat
  */
 DoubleTab& Operateur_Diff::calculer(const DoubleTab& donnee,
                                     DoubleTab& resu) const
@@ -139,7 +139,7 @@ DoubleTab& Operateur_Diff::calculer(const DoubleTab& donnee,
 
 /*! @brief Renvoie le champ representant la diffusivite.
  *
- * @return (Champ_Don&) le champ representant la diffusivite 
+ * @return (Champ_Don&) le champ representant la diffusivite
  */
 const Champ_base& Operateur_Diff::diffusivite() const
 {
@@ -149,8 +149,8 @@ const Champ_base& Operateur_Diff::diffusivite() const
 
 /*! @brief Associe la diffusivite a l'operateur.
  *
- * @param (Champ_Don& nu) le champ representant la diffusivite 
- * @return (Champ_Don&) le champ representant la diffusivite 
+ * @param (Champ_Don& nu) le champ representant la diffusivite
+ * @return (Champ_Don&) le champ representant la diffusivite
  */
 void Operateur_Diff::associer_diffusivite(const Champ_base& nu)
 {
@@ -164,7 +164,7 @@ void  Operateur_Diff::associer_diffusivite_pour_pas_de_temps(const Champ_base& n
 
 /*! @brief Type l'operateur.
  *
- * @param (Nom& typ) le nom representant le type de l'operateur 
+ * @param (Nom& typ) le nom representant le type de l'operateur
  */
 void Operateur_Diff::typer(const Nom& un_type)
 {
